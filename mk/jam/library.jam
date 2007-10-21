@@ -110,7 +110,6 @@ rule Library
   Always $(<)clean ;
   NotFile $(<)clean ;
   Clean $(<)clean : $(objects) $($(<)_CLEANEXTRA) ;
-  Clean clean : $($(<)_CLEANEXTRA) ;
 
   if ! [ IsElem nohelp : $(options) ]
   {
@@ -275,6 +274,16 @@ rule LibraryShared
     MakeLocate $(target) : $(BUILDTOP) ;
     SEARCH on $(target) = $(BUILDTOP) ;
   }
+  else
+  {
+    local target_link = $(target:D=$(BUILDTOP)) ;
+    MakeLocate $(target_link) : $(BUILDTOP) ;
+    SEARCH on $(target_link) = $(BUILDTOP) ;
+    Depends $(target_link) : $(target) ;
+    SymLink $(target_link) : $(target) ;
+    Depends $(<) : $(target_link) ;
+    $(<)_CLEANEXTRA += $(target_link) ;
+  }
   Depends $(target) : $(objects) ;
   $(<)_CLEANEXTRA += $(target) ;
   Depends $(target) : $(deplibs) ;
@@ -292,6 +301,16 @@ rule LibraryShared
     {
       NoCare $(debugfile) ;
       Depends install_lib : [ DoInstall $(debugfile) : $(libdir) : $(INSTALL_DATA) ] ;
+    }
+    if $(linklib) = $(target)
+    {
+      local debugfile_link = $(debugfile:D=$(BUILDTOP)) ;
+      MakeLocate $(debugfile_link) : $(BUILDTOP) ;
+      SEARCH on $(debugfile_link) = $(BUILDTOP) ;
+      Depends $(debugfile_link) : $(debugfile) ;
+      SymLink $(debugfile_link) : $(debugfile) ;
+      Depends $(<) : $(debugfile_link) ;
+      $(<)_CLEANEXTRA += $(debugfile_link) ;
     }
   }
   

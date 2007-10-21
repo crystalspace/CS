@@ -26,7 +26,7 @@
 #include "csutil/weakref.h"
 #include "ivaria/script.h"
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * This intermediate class can be subclassed by implementors of iScriptObject.
@@ -131,6 +131,6 @@ public:
   virtual csPtr<iScriptValue> Retrieve (const char*) = 0;
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 #endif // __CS_PLUGINCOMMON_SCRIPT_SCRIPTCOMMON_H__

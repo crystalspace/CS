@@ -378,7 +378,24 @@ public:
   GLuint boundtexture[CS_GL_MAX_LAYER]; // 32 max texture layers
   int currentUnit;
   int activeUnit[2];
-  GLuint currentBufferID, currentIndexID;
+  enum
+  {
+    boElementArray = 0, boIndexArray, boPixelPack, boPixelUnpack,
+    
+    boCount
+  };
+  GLuint currentBufferID[boCount];
+  static int GLBufferTargetToCacheIndex (GLenum target)
+  {
+    switch (target)
+    {
+    case GL_ELEMENT_ARRAY_BUFFER_ARB: return boElementArray;
+    case GL_ARRAY_BUFFER_ARB:         return boIndexArray;
+    case GL_PIXEL_PACK_BUFFER_ARB:    return boPixelPack;
+    case GL_PIXEL_UNPACK_BUFFER_ARB:  return boPixelUnpack;
+    default: return -1;      
+    }
+  }
 
   // BlendFunc/BlendFuncSeparate
   GLenum blend_sourceRGB;
@@ -568,8 +585,29 @@ public:
     memset (boundtexture, 0, CS_GL_MAX_LAYER * sizeof (GLuint));
     currentUnit = 0;
     memset (activeUnit, 0, sizeof (activeUnit));
-    currentBufferID = 0;
-    currentIndexID = 0;
+
+    memset (currentBufferID, 0, sizeof (currentBufferID));
+    {
+      static const GLenum localIndexToGLBufferBinding[boCount] =
+      { GL_ELEMENT_ARRAY_BUFFER_BINDING_ARB, GL_ARRAY_BUFFER_BINDING_ARB, 
+	GL_PIXEL_PACK_BUFFER_BINDING_ARB, GL_PIXEL_UNPACK_BUFFER_BINDING_ARB };
+
+      enum { extVBO = 1, extPBO = 2 };
+      static const GLenum requiredExt[boCount] =
+      { extVBO, extVBO, extPBO, extPBO };
+      
+      int boExt = 0;
+      if (extmgr->CS_GL_ARB_vertex_buffer_object) boExt |= extVBO;
+      if (extmgr->CS_GL_ARB_pixel_buffer_object) boExt |= extPBO;
+      for (int b = 0; b < boCount; b++)
+      {
+	if (requiredExt[b] & boExt)
+	{
+	  glGetIntegerv (localIndexToGLBufferBinding[b], 
+	    (GLint*)&currentBufferID[b]);
+	}
+      }
+    }
 
     glGetIntegerv (GL_VERTEX_ARRAY_SIZE, (GLint*)&parameter_vsize);
     glGetIntegerv (GL_VERTEX_ARRAY_STRIDE, (GLint*)&parameter_vstride);
@@ -769,41 +807,41 @@ public:
     }
   }
 
-  //VBO buffers
+  /**
+   * Bind a given VBO/PBO buffer.
+   * \remarks Doesn't check whether the relevant buffer object extension is 
+   *   actually supported, this must be done in calling code.
+   */
   void SetBufferARB (GLenum target, GLuint id)
   {
-    if (target == GL_ELEMENT_ARRAY_BUFFER_ARB)
+    int index = csGLStateCacheContext::GLBufferTargetToCacheIndex (target);
+    CS_ASSERT (index >= 0);
+    if (id != currentContext->currentBufferID[index])
     {
-      if (id != currentContext->currentIndexID)
+      extmgr->glBindBufferARB (target, id);
+      currentContext->currentBufferID[index] = id;
+
+      if (target == GL_ARRAY_BUFFER_ARB)
       {
-        extmgr->glBindBufferARB (target, id);
-        currentContext->currentIndexID = id;
-      }
-    } 
-    else 
-    {
-      if (id != currentContext->currentBufferID)
-      {
-        extmgr->glBindBufferARB (target, id);
-        currentContext->currentBufferID = id;
-        currentContext->parameter_vpointer = (GLvoid*)~0; //invalidate vertexpointer
-        currentContext->parameter_npointer = (GLvoid*)~0; //invalidate vertexpointer
-        currentContext->parameter_cpointer = (GLvoid*)~0; //invalidate vertexpointer
+        //invalidate vertex pointers
+        currentContext->parameter_vpointer = (GLvoid*)~0; 
+        currentContext->parameter_npointer = (GLvoid*)~0;
+        currentContext->parameter_cpointer = (GLvoid*)~0;
         memset(&currentContext->parameter_tpointer, ~0, sizeof(GLvoid*)*CS_GL_MAX_LAYER);
       }
     }
   }
 
+  /**
+   * Get the currently bound VBO/PBO buffer.
+   * \remarks Doesn't check whether the relevant buffer object extension is 
+   *   actually supported, this must be done in calling code.
+   */
   GLuint GetBufferARB (GLenum target)
   {
-    if (target == GL_ELEMENT_ARRAY_BUFFER_ARB)
-    {
-      return currentContext->currentIndexID;
-    } 
-    else 
-    {
-      return currentContext->currentBufferID;
-    }
+    int index = csGLStateCacheContext::GLBufferTargetToCacheIndex (target);
+    CS_ASSERT (index >= 0);
+    return currentContext->currentBufferID[index];
   }
 
   // Blend functions

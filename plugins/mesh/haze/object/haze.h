@@ -183,7 +183,7 @@ public:
   }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * Haze mesh object.
@@ -382,7 +382,7 @@ public:
   { return this->layers[layer]->scale; }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * Factory for 2D sprites. This factory also implements iHazeFactoryState.

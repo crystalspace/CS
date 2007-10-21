@@ -11,7 +11,6 @@
       <defaultshader name="ambient" file="ambient.xml" />
     </step>
     <step plugin="crystalspace.renderloop.step.lightiter">
-      <ignoretag>static</ignoretag>
       <steps>
 	<!-- stencil shadows -->
 	<step plugin="crystalspace.renderloop.step.shadow.stencil">

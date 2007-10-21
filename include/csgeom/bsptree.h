@@ -55,10 +55,10 @@ private:
   csArray<int> splitters;
 
   size_t FindBestSplitter (csTriangle* triangles, csPlane3* planes,
-	int num_triangles, const csVector3* vertices,
+	size_t num_triangles, const csVector3* vertices,
 	const csArray<int>& triidx);
   void Build (csTriangle* triangles, csPlane3* planes,
-	int num_triangles, const csVector3* vertices,
+	size_t num_triangles, const csVector3* vertices,
 	const csArray<int>& triidx);
   void Back2Front (const csVector3& pos, csDirtyAccessArray<int>& arr,
   	csSet<int>& used_indices);
@@ -75,7 +75,7 @@ public:
   /**
    * Build the BSP tree given the set of triangles.
    */
-  void Build (csTriangle* triangles, int num_triangles,
+  void Build (csTriangle* triangles, size_t num_triangles,
     const csVector3* vertices);
   void Build (CS::TriangleIndicesStream<int>& triangles, const csVector3* vertices);
   //@}

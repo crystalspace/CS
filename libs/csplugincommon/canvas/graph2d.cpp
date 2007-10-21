@@ -137,7 +137,7 @@ bool csGraphics2D::Initialize (iObjectRegistry* r)
 }
 
 // For iOffscreenCanvasCallback
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 bool csGraphics2D::Initialize (iObjectRegistry* r, int width, int height,
     int depth, void* memory, iOffscreenCanvasCallback* ofscb)
@@ -217,7 +217,7 @@ bool csGraphics2D::Initialize (iObjectRegistry* r, int width, int height,
   return true;
 }
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 void csGraphics2D::ChangeDepth (int d)
 {
@@ -314,7 +314,7 @@ bool csGraphics2D::BeginDraw ()
 }
 
 // For iOffscreenCanvasCallback
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 void csGraphics2D::FinishDraw ()
 {
@@ -323,7 +323,7 @@ void csGraphics2D::FinishDraw ()
   if (ofscb) ofscb->FinishDraw (this);
 }
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 void csGraphics2D::Clear(int color)
 {
@@ -800,7 +800,7 @@ void csGraphics2D::FreeArea (csImageArea *Area)
 }
 
 // For iOffscreenCanvasCallback
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 void csGraphics2D::SetRGB (int i, int r, int g, int b)
 {
@@ -811,7 +811,7 @@ void csGraphics2D::SetRGB (int i, int r, int g, int b)
   if (ofscb) ofscb->SetRGB (this, i, r, g, b);
 }
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 void csGraphics2D::GetRGB (int color, int& r, int& g, int& b)
 {
@@ -1131,7 +1131,7 @@ int csGraphics2D::FindRGBPalette (int r, int g, int b)
 }
 
 // For iOffscreenCanvasCallback
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 #include "csutil/custom_new_disable.h"
 csPtr<iGraphics2D> csGraphics2D::CreateOffscreenCanvas (
@@ -1152,7 +1152,7 @@ csPtr<iGraphics2D> csGraphics2D::CreateOffscreenCanvas (
 }
 #include "csutil/custom_new_enable.h"
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 bool csGraphics2D::DebugCommand (const char* /*cmd*/)
 {

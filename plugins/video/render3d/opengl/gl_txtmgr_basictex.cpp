@@ -20,6 +20,7 @@
 
 #include "cssysdef.h"
 
+#include "csgfx/imagememory.h"
 #include "csplugincommon/render3d/txtmgr.h"
 
 #include "gl_render3d.h"
@@ -37,7 +38,7 @@ csGLBasicTextureHandle::csGLBasicTextureHandle (int width,
                                                 int flags, 
                                                 csGLGraphics3D *iG3D) : 
   scfImplementationType (this), txtmgr (iG3D->txtmgr), 
-  textureClass (txtmgr->GetTextureClassID ("default")), Handle (0), 
+  textureClass (txtmgr->GetTextureClassID ("default")), Handle (0), pbo (0),
   orig_width (width), orig_height (height), orig_d (depth),
   uploadData(0), G3D (iG3D), texFormat((TextureBlitDataFormat)-1)
 {
@@ -96,6 +97,7 @@ csGLBasicTextureHandle::csGLBasicTextureHandle (
   textureClass (txtmgr->GetTextureClassID ("default")),
   alphaType (csAlphaMode::alphaNone),
   Handle (Handle),
+  pbo (0),
   orig_width (0),
   orig_height (0),
   orig_d (0),
@@ -111,6 +113,7 @@ csGLBasicTextureHandle::~csGLBasicTextureHandle()
 {
   Clear ();
   txtmgr->MarkTexturesDirty ();
+  if (pbo != 0) txtmgr->G3D->ext->glDeleteBuffersARB (1, &pbo);
 }
 
 bool csGLBasicTextureHandle::SynthesizeUploadData (
@@ -339,23 +342,24 @@ void csGLBasicTextureHandle::Blit (int x, int y, int width,
   // Make sure mipmapping is ok.
   if (!IsWasRenderTarget() || (texFormat != format))
   {
-    texFormat = format;
     bool isWholeImage = (x == 0) && (y == 0) && (width == actual_width)
       && (height == actual_height);
+
+    if (!IsWasRenderTarget())
+    {
+      SetWasRenderTarget (true);
+      SetupAutoMipping();
+    }
 
     // Pull texture data and set as RGBA/BGRA again, to prevent compression 
     // (slooow) on subsequent glTexSubImage() calls.
     if (!isWholeImage)
     {
-      EnsureUncompressed (true);
+      EnsureUncompressed (true, format);
     }
     else
     {
-      if (!IsWasRenderTarget())
-      {
-	SetWasRenderTarget (true);
-	SetupAutoMipping();
-      }
+      texFormat = format;
 
       glTexImage2D (textarget, 0, GL_RGBA8, actual_width, 
 	actual_height, 0, textureFormat, GL_UNSIGNED_BYTE, data);
@@ -649,33 +653,212 @@ GLenum csGLBasicTextureHandle::GetGLTextureTarget() const
   }
 }
 
-void csGLBasicTextureHandle::EnsureUncompressed (bool keepPixels)
+void csGLBasicTextureHandle::EnsureUncompressed (bool keepPixels,
+  TextureBlitDataFormat newTexFormat)
 {
-  if (!G3D->ext->CS_GL_ARB_texture_compression) return;
+  if (newTexFormat == (TextureType)~0) newTexFormat = texFormat;
 
   GLenum target = GetGLTextureTarget();
   // @@@ FIXME: support more than 2D
   if (target != GL_TEXTURE_2D) return;
 
-  GLint isCompressed;
-  glGetTexLevelParameteriv (target, 0, GL_TEXTURE_COMPRESSED_ARB, 
-    &isCompressed);
-  if (!isCompressed) return;
+  bool doConvert = newTexFormat != texFormat;
+  if (!doConvert && G3D->ext->CS_GL_ARB_texture_compression)
+  {
+    GLint isCompressed;
+    glGetTexLevelParameteriv (target, 0, GL_TEXTURE_COMPRESSED_ARB, 
+      &isCompressed);
+    doConvert = isCompressed != 0;
+  }
+  if (!doConvert) return;
 
+  GLuint textureFormat = (newTexFormat == RGBA8888) ? GL_RGBA : GL_BGRA;
   uint8* pixelData = 0;
   /* @@@ FIXME: This really should use the actual internal (base?) format and 
    * not just RGBA. */
-  if (keepPixels)
+  if (keepPixels || (newTexFormat != texFormat))
   {
     pixelData = (uint8*)cs_malloc (actual_width * actual_height * 4);
-    glGetTexImage (target, 0, GL_RGBA8, GL_UNSIGNED_BYTE, 
+    glGetTexImage (target, 0, textureFormat, GL_UNSIGNED_BYTE, 
       pixelData);
   }
 
   glTexImage2D (target, 0, GL_RGBA8, actual_width, actual_height, 
-    0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+    0, textureFormat, GL_UNSIGNED_BYTE, pixelData);
 
   if (pixelData != 0) cs_free (pixelData);
+
+  texFormat = newTexFormat;
+}
+
+uint8* csGLBasicTextureHandle::QueryBlitBuffer (int x, int y, 
+                                                int width, int height,
+                                                size_t& pitch, 
+                                                TextureBlitDataFormat format,
+                                                uint bufFlags)
+{ 
+  if (txtmgr->G3D->ext->CS_GL_ARB_pixel_buffer_object)
+  {
+    return QueryBlitBufferPBO (x, y, width, height, pitch, format, bufFlags);
+  }
+  else
+  {
+    return QueryBlitBufferGeneric (x, y, width, height, pitch, format, bufFlags);
+  }
+}
+
+void csGLBasicTextureHandle::ApplyBlitBuffer (uint8* buf)
+{ 
+  if (txtmgr->G3D->ext->CS_GL_ARB_pixel_buffer_object)
+  {
+    ApplyBlitBufferPBO (buf);
+  }
+  else
+  {
+    ApplyBlitBufferGeneric (buf);
+  }
+}
+
+iTextureHandle::BlitBufferNature csGLBasicTextureHandle::GetBufferNature (uint8* buf)
+{
+  if (txtmgr->G3D->ext->CS_GL_ARB_pixel_buffer_object)
+    return natureDirect;
+  else
+    return natureIndirect;
+}
+
+uint8* csGLBasicTextureHandle::QueryBlitBufferGeneric (int x, int y, 
+                                                       int width, int height,
+                                                       size_t& pitch, 
+                                                       TextureBlitDataFormat format,
+                                                       uint bufFlags)
+{ 
+  GLenum textarget = GetGLTextureTarget();
+  if ((textarget != GL_TEXTURE_2D) && (textarget != GL_TEXTURE_RECTANGLE_ARB))
+    return 0;
+
+  BlitBuffer blitBuf;
+  blitBuf.x = x;
+  blitBuf.y = y;
+  blitBuf.width = width;
+  blitBuf.height = height;
+  blitBuf.format = format;
+  /* @@@ FIXME: Improve - prolly makes sense to reuse allocated blocks of 
+     memory. */
+  uint8* p = (uint8*)cs_malloc (width * height * 4);
+  blitBuffers.Put (p, blitBuf);
+  pitch = width * 4;
+  return p;
+}
+
+void csGLBasicTextureHandle::ApplyBlitBufferGeneric (uint8* buf)
+{ 
+  BlitBuffer* blitBuf = blitBuffers.GetElementPointer (buf);
+  if (blitBuf != 0)
+  {
+    Blit (blitBuf->x, blitBuf->y, blitBuf->width, blitBuf->height, buf, 
+      blitBuf->format);
+    blitBuffers.DeleteAll (buf);
+    cs_free (buf);
+  }
+}
+
+uint8* csGLBasicTextureHandle::QueryBlitBufferPBO (int x, int y, 
+                                                   int width, int height,
+                                                   size_t& pitch, 
+                                                   TextureBlitDataFormat format,
+                                                   uint bufFlags)
+{ 
+  GLenum textarget = GetGLTextureTarget();
+  if ((textarget != GL_TEXTURE_2D) && (textarget != GL_TEXTURE_RECTANGLE_ARB))
+    return 0;
+
+  bool isWholeImage = (x == 0) && (y == 0) && (width == actual_width)
+    && (height == actual_height);
+
+  texFormat = format;
+  if (pbo == 0)
+  {
+    GLuint textureFormat = (texFormat == RGBA8888) ? GL_RGBA : GL_BGRA;
+    csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB, 0);
+    Precache ();
+    G3D->ActivateTexture (this);
+
+    G3D->ext->glGenBuffersARB (1, &pbo);
+    csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB, pbo);
+    G3D->ext->glBufferDataARB (GL_PIXEL_UNPACK_BUFFER_ARB, 
+      actual_width * actual_height * 4, 0, GL_DYNAMIC_DRAW_ARB);
+    pboMapped = 0;
+    if ((bufFlags & iTextureHandle::blitbufRetainArea) || !isWholeImage)
+    {
+      csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_PACK_BUFFER_ARB, pbo);
+      glGetTexImage (textarget, 0, textureFormat, GL_UNSIGNED_BYTE, 0);
+      csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_PACK_BUFFER_ARB, 0);
+    }
+    glTexImage2D (textarget, 0, GL_RGBA8, actual_width, actual_height, 
+      0, textureFormat, GL_UNSIGNED_BYTE, 0);
+  }
+  else
+  {
+    csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB, pbo);
+  }
+  if (pboMapped == 0)
+  {
+    GLenum bufAccess = 
+      (bufFlags & blitbufReadable) ? GL_READ_WRITE_ARB : GL_WRITE_ONLY_ARB;
+    pboMapPtr = G3D->ext->glMapBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB, 
+      bufAccess);
+  }
+  pboMapped++;
+  csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB, 0);
+  uint8* p = (uint8*)pboMapPtr;
+  p += (y * actual_width + x) * 4;
+  pitch = actual_width * 4;
+  return p;
+}
+
+void csGLBasicTextureHandle::ApplyBlitBufferPBO (uint8* buf)
+{ 
+  pboMapped--;
+  if (pboMapped == 0)
+  {
+    csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB, pbo);
+    G3D->ext->glUnmapBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB);
+    G3D->ActivateTexture (this);
+    if (!IsWasRenderTarget())
+    {
+      SetWasRenderTarget (true);
+      SetupAutoMipping();
+    }
+    GLuint textureFormat = (texFormat == RGBA8888) ? GL_RGBA : GL_BGRA;
+    glTexSubImage2D (GetGLTextureTarget(), 0, 
+      0, 0, actual_width, actual_height,
+      textureFormat, GL_UNSIGNED_BYTE,
+      0);
+    csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB, 0);
+  }
+}
+
+csPtr<iImage> csGLBasicTextureHandle::Dump ()
+{
+  // @@@ hmm... or just return an empty image?
+  if (GetHandle () == (GLuint)~0) return 0;
+
+  GLint tw, th;
+  csGLGraphics3D::statecache->SetTexture (GL_TEXTURE_2D, GetHandle ());
+
+  glGetTexLevelParameteriv (GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &tw);
+  glGetTexLevelParameteriv (GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &th);
+
+  uint8* data = new uint8[tw * th * 4];
+  glGetTexImage (GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+  csImageMemory* lmimg = 
+    new csImageMemory (tw, th,
+    data, true, 
+    CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA);
+
+  return csPtr<iImage> (lmimg);
 }
 
 }

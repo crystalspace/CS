@@ -51,6 +51,9 @@ namespace Utility
       csDirtyAccessArray<csTriangle> tris;
     };
 
+// For Thing stuff
+#include "csutil/deprecated_warn_off.h"
+
     /// Bulk of the import kit implementation.
     class Glue
     {
@@ -120,6 +123,8 @@ namespace Utility
       bool PopulateContainer (const char* filename, 
 	const char* path, ImportKit::Container& container);
     };
+
+#include "csutil/deprecated_warn_on.h"
 
   } // namespace Implementation
 } // namespace Utility

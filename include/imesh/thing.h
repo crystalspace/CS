@@ -43,7 +43,7 @@ class csPlane3;
 class csVector2;
 class csVector3;
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * A range structure for specifing polygon ranges.
@@ -852,6 +852,6 @@ struct
 
 /** @} */
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 #endif // __CS_IMESH_THING_H__

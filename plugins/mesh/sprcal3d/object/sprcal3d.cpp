@@ -2187,6 +2187,8 @@ bool csSpriteCal3DMeshObject::SetMaterial(const char *mesh_name,
     return false;
 
   meshes[meshIdx].render_mesh.material = mat;
+  meshes[meshIdx].matRef = mat;
+
   return true;
 }
 

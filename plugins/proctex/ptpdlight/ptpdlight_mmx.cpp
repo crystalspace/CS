@@ -20,7 +20,6 @@
 #include "cssysdef.h"
 #include <limits.h>
 
-#include "ivideo/texture.h"
 #include "ivaria/profile.h"
 
 #include "csgeom/math.h"
@@ -114,9 +113,19 @@ static void MultiplyAddLumels (__m64* dst, size_t dstPitch,
   }
 }
 
+struct PreApplyEMMS
+{
+  void Perform (iTextureHandle* texh, uint8* buf) 
+  { 
+    if (texh->GetBufferNature (buf) == iTextureHandle::natureIndirect)
+      _m_empty(); 
+  }
+};
 
 void ProctexPDLight::Animate_MMX ()
 {
+  BlitBufHelper<PreApplyEMMS> blitHelper (tex->GetTextureHandle ());
+
   lightBits.Clear();
   size_t numLights = 0;
   for (size_t l = 0; l < lights.GetSize(); )
@@ -169,15 +178,18 @@ void ProctexPDLight::Animate_MMX ()
     l++;
   }
 
-  LightmapScratchMMX& scratchMMX = GetScratchMMX();
-  scratchMMX.SetSize (TileHelper::tileSizeX/2 * TileHelper::tileSizeY);
-  __m64* scratch = (__m64*)scratchMMX.GetArray();
   for (size_t t = 0; t < tilesDirty.GetSize(); t++)
   {
     if (!tilesDirty.IsBitSet (t)) continue;
 
     csRect tileRect;
     tiles.GetTileRect (t, tileRect);
+
+    size_t blitPitch;
+    __m64* scratch = (__m64*)blitHelper.QueryBlitBuffer (
+      tileRect.xmin, tileRect.ymin, 
+      TileHelper::tileSizeX, TileHelper::tileSizeY,
+      blitPitch);
 
     int scratchW = tileRect.Width();
     {
@@ -199,7 +211,7 @@ void ProctexPDLight::Animate_MMX ()
               scratchPtr[x/2] = _mm_set_pi32 (v1*0x01010101, 
                 v2*0x01010101);
             }
-            scratchPtr += scratchW/2;
+            scratchPtr += blitPitch / sizeof (__m64);
             basePtr += mat_w;
           }
         }
@@ -211,7 +223,7 @@ void ProctexPDLight::Animate_MMX ()
           for (int y = 0; y < lines; y++)
           {
             memcpy (scratchPtr, basePtr, scratchW * sizeof (uint32));
-            scratchPtr += scratchW/2;
+            scratchPtr += blitPitch / sizeof (__m64);
             basePtr += mat_w;
           }
         }
@@ -229,8 +241,9 @@ void ProctexPDLight::Animate_MMX ()
         {
           for (int x = 0; x < scratchW/2; x++)
           {
-            *scratchPtr++ = baseLumelPacked;
+            scratchPtr[x] = baseLumelPacked;
           }
+          scratchPtr += blitPitch / sizeof (__m64);
         }
       }
     }
@@ -249,9 +262,9 @@ void ProctexPDLight::Animate_MMX ()
       const int mapPitch = mapTile.tilePartPitch;
 
       __m64* scratchPtr = scratch + 
-        (mapTile.tilePartY * scratchW +
-         mapTile.tilePartX) / 2;
-      int scratchPitch = (scratchW - mapW)/2;
+        mapTile.tilePartY * (blitPitch / sizeof (__m64)) +
+        mapTile.tilePartX / 2;
+      size_t scratchPitch = blitPitch / sizeof (__m64)  - mapW/2;
 
       csRGBcolor mapMax = mapTile.maxValue;
       int mapMax_red   = mapMax.red   * lightFactors_ui16[l*3+0];
@@ -285,17 +298,7 @@ void ProctexPDLight::Animate_MMX ()
             mapPtr, mapPitch, mapW, lines, lightColor);
       }
     }
-
-    {
-      CS_PROFILER_ZONE(ProctexPDLight_Animate_MMX_Blit)
-      _m_empty();
-      tex->GetTextureHandle ()->Blit (tileRect.xmin, 
-        tileRect.ymin, 
-        tileRect.Width(), tileRect.Height(),
-        (uint8*)scratch, iTextureHandle::BGRA8888);
-    }
   }
-
   _m_empty();
 }
 

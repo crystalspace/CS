@@ -7,6 +7,8 @@
 
 %ignore iNativeWindowManager::AlertV;
 %include "ivideo/natwin.h"
+%immutable CS::Graphics::CoreRenderMesh::db_mesh_name;
+%ignore CS::Graphics::RenderMeshModes::flipCulling;
 %include "ivideo/rendermesh.h"
 
 %ignore GetGlyphSize(uint8, int &, int &);

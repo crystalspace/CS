@@ -262,6 +262,15 @@
 	</OpenGL>
       </Video>
     </config>
+    <config name="nopbo">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <GL_ARB_pixel_buffer_object>no</GL_ARB_pixel_buffer_object>
+	  </UseExtension>
+	</OpenGL>
+      </Video>
+    </config>
   </configs>
   <rules>
     <!-- rule description="Some more examples">
@@ -594,6 +603,22 @@
       </conditions>
       <applicable>
 	<usecfg>nofbo</usecfg>
+      </applicable>
+    </rule>
+    
+    <!--
+      * 2007-10-19: RADEON 9700 PRO x86/MMX/3DNow!/SSE, Win32, 
+                    OpenGL 2.0.6956, GL driver: atioglxx.dll 6.14.10.6956
+		    When setting texture data with ARB_pixel_buffer_object,
+		    the first 512 lines of the texture are repeted every
+		    512 lines (in other words, data past line 512 is invalid).
+      -->
+    <rule description="ATI: Disable broken pixel buffer objects">
+      <conditions>
+	<regexp string="vendor" pattern="^ATI" />
+      </conditions>
+      <applicable>
+	<usecfg>nopbo</usecfg>
       </applicable>
     </rule>
     

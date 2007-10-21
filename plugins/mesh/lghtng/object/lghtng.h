@@ -39,7 +39,7 @@
 struct iMaterialWrapper;
 class csLightningMeshObjectFactory;
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * Lightning mesh object.
@@ -154,7 +154,7 @@ public:
   virtual void SetBandWidth (float /*value*/) { }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * Factory for 2D sprites. This factory also implements iLightningFactoryState.

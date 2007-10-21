@@ -139,16 +139,21 @@ void csMeshGeneratorGeometry::AddFactory (iMeshFactoryWrapper* factory,
   g.maxdistance = maxdist;
   g.sqmaxdistance = maxdist * maxdist;
 
-  size_t idx = factories.InsertSorted (g, CompareGeom);
-
   csRef<iInstancingFactoryState> fs =
     scfQueryInterface<iInstancingFactoryState> (
     factory->GetMeshObjectFactory ());
   if (fs != 0)
   {
-    int cell_dim = generator->GetCellCount ();
-    factories[idx].instmeshes.SetSize (cell_dim * cell_dim);
+    g.instmesh = generator->engine->CreateMeshWrapper (
+        factory, 0);
+    g.instmesh->GetMovable ()->SetPosition (generator->GetSector (),
+        csVector3 (0)); // @@@ Right position?
+    g.instmesh->GetMovable ()->UpdateMove ();
+    g.instmesh_state = scfQueryInterface<iInstancingMeshState> (
+	g.instmesh->GetMeshObject ());
   }
+
+  factories.InsertSorted (g, CompareGeom);
 
   if (maxdist > total_max_dist) total_max_dist = maxdist;
   
@@ -169,7 +174,7 @@ void csMeshGeneratorGeometry::SetDensity (float density)
   csMeshGeneratorGeometry::density = density;
 }
 
-csPtr<iMeshWrapper> csMeshGeneratorGeometry::AllocMesh (
+iMeshWrapper* csMeshGeneratorGeometry::AllocMesh (
   int cidx, const csMGCell& cell, float sqdist,
   size_t& lod, size_t& instance_id)
 {
@@ -177,52 +182,41 @@ csPtr<iMeshWrapper> csMeshGeneratorGeometry::AllocMesh (
   if (lod == csArrayItemNotFound) return 0;
 
   csMGGeom& geom = factories[lod];
-  // First check if the geometry is for instmesh.
-  if (geom.instmeshes.GetSize () > 0)
-  {
-    csMGGeomInstMesh& geominst = geom.instmeshes[cidx];
-    if (!geominst.instmesh)
-    {
-      geominst.instmesh = generator->engine->CreateMeshWrapper (
-        geom.factory, 0);
-      csVector3 cell_center (
-        (cell.box.MinX ()+cell.box.MaxX ())/2.0f,
-        0.0f,	// @@@ FIXME? OK?
-        (cell.box.MinY ()+cell.box.MaxY ())/2.0f);
-      geominst.instmesh->GetMovable ()->SetPosition (generator->GetSector (),
-        cell_center);
-      geominst.instmesh->GetMovable ()->UpdateMove ();
-      geominst.instmesh_state = scfQueryInterface<iInstancingMeshState> (
-        geominst.instmesh->GetMeshObject ());
-    }
-    if (geominst.inst_setaside.GetSize () > 0)
-      instance_id = geominst.inst_setaside.Pop ();
-    else
-      instance_id = geominst.instmesh_state->AddInstance (
-      csReversibleTransform ());
-    geominst.instmesh->IncRef ();
-    return (iMeshWrapper*)geominst.instmesh;
-  }
   // See if we have some mesh ready in the setaside or normal cache.
-  else if (geom.mesh_setaside.GetSize () > 0)
+  if (geom.mesh_setaside.GetSize () > 0)
   {
-    instance_id = csArrayItemNotFound;
-    return geom.mesh_setaside.Pop ();
+    csMGMesh mgmesh = geom.mesh_setaside.Pop ();
+    instance_id = mgmesh.instance_id;
+    return mgmesh.mesh;
   }
   else if (geom.mesh_cache.GetSize () > 0)
   {
-    instance_id = csArrayItemNotFound;
-    return geom.mesh_cache.Pop ();
+    csMGMesh mgmesh = geom.mesh_cache.Pop ();
+    instance_id = mgmesh.instance_id;
+    return mgmesh.mesh;
   }
   else
   {
-    instance_id = csArrayItemNotFound;
-    return generator->engine->CreateMeshWrapper (geom.factory, 0);
+    csRef<iMeshWrapper> mesh;
+    if (geom.instmesh)
+    {
+      instance_id = geom.instmesh_state->AddInstance (
+	  csReversibleTransform ());
+      mesh = geom.instmesh;
+    }
+    else
+    {
+      instance_id = csArrayItemNotFound;
+      mesh = generator->engine->CreateMeshWrapper (geom.factory, 0);
+    }
+
+    return mesh;
   }
 }
 
 void csMeshGeneratorGeometry::MoveMesh (int cidx, iMeshWrapper* mesh,
-                                        size_t lod, size_t instance_id, const csVector3& position,
+                                        size_t lod, size_t instance_id,
+					const csVector3& position,
                                         const csMatrix3& matrix)
 {
   if (instance_id == csArrayItemNotFound)
@@ -234,12 +228,11 @@ void csMeshGeneratorGeometry::MoveMesh (int cidx, iMeshWrapper* mesh,
   else
   {
     csMGGeom& geom = factories[lod];
-    csMGGeomInstMesh& geominst = geom.instmeshes[cidx];
     csVector3 meshpos = mesh->GetMovable ()->GetFullPosition ();
     csVector3 pos = position - meshpos;
     ////printf ("position=%g,%g,%g    meshpos=%g,%g,%g  ->  pos=%g,%g,%g\n", position.x, position.y, position.z, meshpos.x, meshpos.y, meshpos.z, pos.x, pos.y, pos.z); fflush (stdout);
     csReversibleTransform tr (matrix, pos);
-    geominst.instmesh_state->MoveInstance (instance_id, tr);
+    geom.instmesh_state->MoveInstance (instance_id, tr);
   }
 }
 
@@ -247,16 +240,10 @@ void csMeshGeneratorGeometry::SetAsideMesh (int cidx, iMeshWrapper* mesh,
                                             size_t lod, size_t instance_id)
 {
   csMGGeom& geom = factories[lod];
-  if (geom.instmeshes.GetSize () > 0)
-  {
-    csMGGeomInstMesh& geominst = geom.instmeshes[cidx];
-    geominst.inst_setaside.Push (instance_id);
-    geom.instmesh_setaside.Add (&geominst);
-  }
-  else
-  {
-    geom.mesh_setaside.Push (mesh);
-  }
+  csMGMesh mgmesh;
+  mgmesh.mesh = mesh;
+  mgmesh.instance_id = instance_id;
+  geom.mesh_setaside.Push (mgmesh);
 }
 
 void csMeshGeneratorGeometry::FreeSetAsideMeshes ()
@@ -267,23 +254,20 @@ void csMeshGeneratorGeometry::FreeSetAsideMeshes ()
     csMGGeom& geom = factories[lod];
     while (geom.mesh_setaside.GetSize () > 0)
     {
-      csRef<iMeshWrapper> mesh = geom.mesh_setaside.Pop ();
-      mesh->GetMovable ()->ClearSectors ();
-      geom.mesh_cache.Push (mesh);
-    }
-    csSet<csPtrKey<csMGGeomInstMesh> >::GlobalIterator it = geom.
-      instmesh_setaside.GetIterator ();
-    while (it.HasNext ())
-    {
-      csMGGeomInstMesh* geominst = it.Next ();
-      while (geominst->inst_setaside.GetSize () > 0)
+      csMGMesh mgmesh = geom.mesh_setaside.Pop ();
+      if (mgmesh.instance_id != csArrayItemNotFound)
       {
-        size_t instance_id = geominst->inst_setaside.Pop ();
-        geominst->instmesh_state->RemoveInstance (instance_id);
+	// @@@ Hack: we need a way to hide an instance.
+        csReversibleTransform tr (csMatrix3 (), csVector3 (10000, 10000, 10000));
+        geom.instmesh_state->MoveInstance (mgmesh.instance_id, tr);
+	//geom.instmesh_state->RemoveInstance (mgmesh.instance_id);
       }
+      else
+      {
+        mgmesh.mesh->GetMovable ()->ClearSectors ();
+      }
+      geom.mesh_cache.Push (mgmesh);
     }
-    geom.instmesh_setaside.Empty ();
-    // @@@ FIXME: remove mesh in case it has no more instances.
   }
 }
 
@@ -504,7 +488,7 @@ void csMeshGenerator::SetupSampleBox ()
       float wx = GetWorldX (x);
       cells[idx].box.Set (wx, wz, wx + samplecellwidth_x,
         wz + samplecellheight_z);
-      // Here we need to calculate the meshe relevant for this cell (i.e.
+      // Here we need to calculate the meshes relevant for this cell (i.e.
       // meshes that intersect this cell as seen in 2D space).
       // @@@ For now we just copy the list of meshes from csMeshGenerator.
       cells[idx].meshes = meshes;
@@ -816,7 +800,7 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
 
         if (show)
         {
-          csRef<iMeshWrapper> mesh = geometries[p.geom_type]->AllocMesh (
+          iMeshWrapper* mesh = geometries[p.geom_type]->AllocMesh (
             cidx, cell, sqdist, p.lod, p.instance_id);
           if (mesh)
           {
@@ -846,7 +830,7 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
           // We need a different mesh here.
           geometries[p.geom_type]->SetAsideMesh (cidx, p.mesh, p.lod,
             p.instance_id);
-          csRef<iMeshWrapper> mesh = geometries[p.geom_type]->AllocMesh (
+          iMeshWrapper* mesh = geometries[p.geom_type]->AllocMesh (
             cidx, cell, sqdist, p.lod, p.instance_id);
           p.mesh = mesh;
           if (mesh)
@@ -868,8 +852,10 @@ printf("case 2\n");
           }
         }
       }
-      if (p.mesh && use_alpha_scaling)
+      if (p.mesh && use_alpha_scaling && p.instance_id == csArrayItemNotFound)
       {
+	// @@@ For now we don't support instmesh here!
+
         // This is used only if we have both density scaling and
         // alpha scaling. It is the offset to correct the distance at which
         // the object will disappear. We can adapt alpha scaling to scale

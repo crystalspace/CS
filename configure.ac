@@ -10,9 +10,8 @@ AC_PREREQ([2.56])
 
 #------------------------------------------------------------------------------
 # cs_version_number
-#	Keep this value synchronized with CS/include/csver.h.
-#       Also, mk/autoconf/crystal.m4 should be updated with the current version
-#         number.
+#	Keep this value synchronized with CS/include/csver.h,
+#	CS/docs/texinfo/version.txi, and CS/mk/autoconf/crystal.m4.
 #------------------------------------------------------------------------------
 m4_define([cs_version_number], [1.3])
 
@@ -77,7 +76,7 @@ AS_IF([test -n "$SWIG"],
     [CS_CHECK_PROG_VERSION([swig], [$SWIG -version 2>&1], [1.3.21],
 	[9.9|.9],
         [CS_EMIT_BUILD_PROPERTY([CMD.SWIG], [$SWIG])
-         CS_EMIT_BUILD_PROPERTY([CMD.SWIG.VERSION], [$cs_prog_swig_version])])])
+        CS_EMIT_BUILD_PROPERTY([CMD.SWIG.VERSION], [$cs_prog_swig_version])])])
 
 CS_CHECK_COMMON_TOOLS_ICONS
 
@@ -237,7 +236,8 @@ CS_CHECK_HOST
 AS_IF([test "x$cs_host_macosx" = "xyes"],
     [# We assume that we always have CoreAudio available on MacOS/X.
     CS_EMIT_BUILD_PROPERTY([COREAUDIO.AVAILABLE], [yes])
-    CS_EMIT_BUILD_PROPERTY([COREAUDIO.LFLAGS], [-framework CoreAudio -framework AudioToolbox])
+    CS_EMIT_BUILD_PROPERTY([COREAUDIO.LFLAGS],
+	[-framework CoreAudio -framework AudioToolbox])
     CS_HEADER_PROPERTY([CS_PLATFORM_MACOSX])],
     [case $cs_host_family in
 	windows)
@@ -258,7 +258,7 @@ CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
 CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx], 
     [CS_CREATE_TUPLE([-mmmx])])
 AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MMX], [$cs_cv_prog_cc_mmmx], [+])])
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MMX], [$cs_cv_prog_cc_mmmx],[+])])
 
 
 AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
@@ -1322,12 +1322,17 @@ AS_IF([test $cs_cv_lib3ds = yes],
 	[], [], [CS_EMIT_BUILD_RESULT([cs_cv_lib3ds], [3DS])], [], [],
 	[$cs_cv_lib3ds_cflags], [$cs_cv_lib3ds_lflags], [$cs_cv_lib3ds_libs])
 	AS_IF([test $cs_cv_lib3ds_recent = yes],
-	    [CS_CHECK_BUILD([if lib3ds version is >= 1.3.0], [cs_cv_lib3ds_1_3],
+	    [CS_CHECK_BUILD([for generic lib3ds data I/O callbacks],
+	    [cs_cv_lib3ds_1_3],
 	    [AC_LANG_PROGRAM([[#include <lib3ds/io.h>
-	        size_t DataReadFunc (void *self, void *buffer, size_t size) {}]],
+	        size_t DataReadFunc (void *self, void *buffer, size_t n) {}]],
 	        [lib3ds_io_new (0, 0, 0, 0, DataReadFunc, 0)])],
-	    [], [C++], [CS_EMIT_BUILD_PROPERTY([LIB3DS.ONE_THREE_OH], [yes])], [], [],
-	    [$cs_cv_lib3ds_cflags], [$cs_cv_lib3ds_lflags], [$cs_cv_lib3ds_libs])])])
+	    [], [C++],
+	    [CS_EMIT_BUILD_PROPERTY([LIB3DS.GENERIC_DATA_IO_CALLBACKS],[yes])],
+	    [], [],
+	    [$cs_cv_lib3ds_cflags],
+	    [$cs_cv_lib3ds_lflags],
+	    [$cs_cv_lib3ds_libs])])])
 
 
 
@@ -1566,7 +1571,8 @@ AS_IF([test $cs_cv_libwx = yes],
 	    #endif
 	    #include "wx/glcanvas.h"
 	    ]],
-	    [wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY, wxPoint()); glVertex3f(0,0,0)])],
+	    [wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY, wxPoint());
+	    glVertex3f(0,0,0)])],
 	[CS_CREATE_TUPLE(
 	    [$cs_cv_libwx_cflags],
 	    [$cs_cv_libwx_lflags],
@@ -1621,7 +1627,7 @@ CS_CHECK_LIB_WITH([GTK],
     [CS_EMIT_BUILD_RESULT([cs_cv_libGTK], [GTK])], [], [], [], [], [gtk+-2.0])
 
 AS_IF([test $cs_cv_libGTK = yes],
-    [CS_CHECK_BUILD([if gtk_message_dialog_format_secondary_text is available], 
+    [CS_CHECK_BUILD([if gtk_message_dialog_format_secondary_text is available],
         [cs_cv_GTK_gtk_message_dialog_format_secondary_text],
 	[AC_LANG_PROGRAM(
 	    [[#include <gtk/gtk.h>]],
@@ -2435,9 +2441,14 @@ AS_IF([test $enable_leak_guard = yes],
 # Determine whether link libraries should be static or shared.
 #------------------------------------------------------------------------------
 AC_MSG_CHECKING([whether to build shared libraries])
+case $host_os in
+    mingw*|cygwin*|linux*) enable_shared_default=yes ;;
+    *) enable_shared_default=no ;;
+esac
 AC_ARG_ENABLE([shared], [AC_HELP_STRING([--enable-shared],
-    [enable creation of shared libraries (_EXPERIMENTAL_!) (default NO)])],
-    [], [enable_shared=no])
+    [enable creation of shared libraries (default YES on Win32 and Linux, 
+    NO otherwise)])],
+    [], [enable_shared=$enable_shared_default])
 AC_MSG_RESULT([$enable_shared])
 CS_EMIT_BUILD_PROPERTY([BUILD_SHARED_LIBS], [$enable_shared])
 AS_IF([test $enable_shared = yes], 

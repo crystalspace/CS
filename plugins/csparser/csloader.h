@@ -182,7 +182,7 @@ public:
   virtual bool IsError () { return error; }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * The loader for Crystal Space maps.
@@ -663,6 +663,6 @@ public:
   	iStreamSource* ssource);
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 #endif // __CS_CSLOADER_H__

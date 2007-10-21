@@ -232,7 +232,7 @@ CS_DEPRECATED_METHOD
 CS_CRYSTALSPACE_EXPORT bool csCheckVerbosity (
   int argc, char const* const argv[], char const* major, char const* minor);
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * Default iVerbosityManager implementation. Basically a thin wrapper around
@@ -285,6 +285,6 @@ public:
 
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 #endif // __CS_CSUTIL_VERBOSITY_H__

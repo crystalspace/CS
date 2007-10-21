@@ -20,6 +20,8 @@
 
 %include "cstool/pen.h"
 
+%ignore CS::Geometry::Primitives::boxTable;
+%ignore CS::Geometry::Primitives::quadTable;
 %include "cstool/primitives.h"
 
 %template(scfProcTexture) scfImplementationExt2<csProcTexture, csObject, iTextureWrapper, iProcTexture>;

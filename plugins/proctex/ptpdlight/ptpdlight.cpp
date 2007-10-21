@@ -75,11 +75,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(PTPDLight)
 
 //---------------------------------------------------------------------------
 
-CS_IMPLEMENT_STATIC_CLASSVAR_REF(ProctexPDLight, lightmapScratch, GetScratch,
-                                 ProctexPDLight::LightmapScratch, ());
-CS_IMPLEMENT_STATIC_CLASSVAR_REF(ProctexPDLight, lightmapScratchMMX, GetScratchMMX,
-                                 ProctexPDLight::LightmapScratchMMX, ());
-
 void ProctexPDLight::PDMap::ComputeValueBounds (const csRect& area, 
                                                 csRGBcolor& maxValue, 
                                                 csRect& nonNullArea)

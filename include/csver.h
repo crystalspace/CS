@@ -24,8 +24,8 @@
  */
 
 // *** NOTE ***
-// Also update CS/configure.ac and CS/docs/texinfo/version.txi when updating
-// the version number.
+// Also update CS/configure.ac, CS/docs/texinfo/version.txi, and
+// CS/mk/autoconf/crystal.m4 when updating the version number.
 
 /// Major version
 #define CS_VERSION_MAJOR CS_VER_QUOTE(1)

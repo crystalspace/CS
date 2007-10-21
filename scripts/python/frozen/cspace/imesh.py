@@ -2,7 +2,6 @@
 # Version 1.3.31
 #
 # Don't modify this file, modify the SWIG interface instead.
-# This file is compatible with both classic and new-style classes.
 
 import _imesh
 import new
@@ -48,6 +47,16 @@ except AttributeError:
 del types
 
 
+def _swig_setattr_nondynamic_method(set):
+    def set_attr(self,name,value):
+        if (name == "thisown"): return self.this.own(value)
+        if hasattr(self,name) or (name == "this"):
+            set(self,name,value)
+        else:
+            raise AttributeError("You cannot add attributes to %s" % self)
+    return set_attr
+
+
 import core
 import ivaria
 import csgeom
@@ -61,17 +70,11 @@ core.AddSCFLink(_SetSCFPointer)
 CSMutableArrayHelper = core.CSMutableArrayHelper
 
 class iObjectModelListener(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iObjectModelListener, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iObjectModelListener, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def ObjectModelChanged(*args): return _imesh.iObjectModelListener_ObjectModelChanged(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iObjectModelListener_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iObjectModelListener_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iObjectModelListener_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iObjectModelListener
     __del__ = lambda self : None;
 iObjectModelListener_swigregister = _imesh.iObjectModelListener_swigregister
@@ -79,18 +82,12 @@ iObjectModelListener_swigregister(iObjectModelListener)
 iObjectModelListener_scfGetVersion = _imesh.iObjectModelListener_scfGetVersion
 
 class iTriangleMeshIterator(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iTriangleMeshIterator, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iTriangleMeshIterator, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def HasNext(*args): return _imesh.iTriangleMeshIterator_HasNext(*args)
     def Next(*args): return _imesh.iTriangleMeshIterator_Next(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iTriangleMeshIterator_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iTriangleMeshIterator_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iTriangleMeshIterator_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTriangleMeshIterator
     __del__ = lambda self : None;
 iTriangleMeshIterator_swigregister = _imesh.iTriangleMeshIterator_swigregister
@@ -98,12 +95,7 @@ iTriangleMeshIterator_swigregister(iTriangleMeshIterator)
 iTriangleMeshIterator_scfGetVersion = _imesh.iTriangleMeshIterator_scfGetVersion
 
 class iObjectModel(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iObjectModel, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iObjectModel, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetShapeNumber(*args): return _imesh.iObjectModel_GetShapeNumber(*args)
@@ -119,8 +111,7 @@ class iObjectModel(core.iBase):
     def GetRadius(*args): return _imesh.iObjectModel_GetRadius(*args)
     def AddListener(*args): return _imesh.iObjectModel_AddListener(*args)
     def RemoveListener(*args): return _imesh.iObjectModel_RemoveListener(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iObjectModel_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iObjectModel_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iObjectModel_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iObjectModel
     __del__ = lambda self : None;
 iObjectModel_swigregister = _imesh.iObjectModel_swigregister
@@ -128,12 +119,7 @@ iObjectModel_swigregister(iObjectModel)
 iObjectModel_scfGetVersion = _imesh.iObjectModel_scfGetVersion
 
 class iGeneralMeshSubMesh(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iGeneralMeshSubMesh, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iGeneralMeshSubMesh, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetIndices(*args): return _imesh.iGeneralMeshSubMesh_GetIndices(*args)
@@ -154,12 +140,7 @@ iGeneralMeshSubMesh_swigregister = _imesh.iGeneralMeshSubMesh_swigregister
 iGeneralMeshSubMesh_swigregister(iGeneralMeshSubMesh)
 
 class iGeneralMeshCommonState(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iGeneralMeshCommonState, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iGeneralMeshCommonState, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetLighting(*args): return _imesh.iGeneralMeshCommonState_SetLighting(*args)
@@ -181,19 +162,13 @@ iGeneralMeshCommonState_swigregister = _imesh.iGeneralMeshCommonState_swigregist
 iGeneralMeshCommonState_swigregister(iGeneralMeshCommonState)
 
 class iGeneralMeshState(iGeneralMeshCommonState):
-    __swig_setmethods__ = {}
-    for _s in [iGeneralMeshCommonState]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iGeneralMeshState, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iGeneralMeshCommonState]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iGeneralMeshState, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetAnimationControl(*args): return _imesh.iGeneralMeshState_SetAnimationControl(*args)
     def GetAnimationControl(*args): return _imesh.iGeneralMeshState_GetAnimationControl(*args)
     def FindSubMesh(*args): return _imesh.iGeneralMeshState_FindSubMesh(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iGeneralMeshState_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iGeneralMeshState_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iGeneralMeshState_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iGeneralMeshState
     __del__ = lambda self : None;
 iGeneralMeshState_swigregister = _imesh.iGeneralMeshState_swigregister
@@ -201,12 +176,7 @@ iGeneralMeshState_swigregister(iGeneralMeshState)
 iGeneralMeshState_scfGetVersion = _imesh.iGeneralMeshState_scfGetVersion
 
 class iGeneralFactoryState(iGeneralMeshCommonState):
-    __swig_setmethods__ = {}
-    for _s in [iGeneralMeshCommonState]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iGeneralFactoryState, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iGeneralMeshCommonState]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iGeneralFactoryState, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetColor(*args): return _imesh.iGeneralFactoryState_SetColor(*args)
@@ -261,8 +231,11 @@ class iGeneralFactoryState(iGeneralMeshCommonState):
     def GetNormalByIndex(*args): return _imesh.iGeneralFactoryState_GetNormalByIndex(*args)
     def GetTriangleByIndex(*args): return _imesh.iGeneralFactoryState_GetTriangleByIndex(*args)
     def GetColorByIndex(*args): return _imesh.iGeneralFactoryState_GetColorByIndex(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iGeneralFactoryState_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iGeneralFactoryState_scfGetVersion)
+    def GetVerticesAsBuffer(*args): return _imesh.iGeneralFactoryState_GetVerticesAsBuffer(*args)
+    def GetNormalsAsBuffer(*args): return _imesh.iGeneralFactoryState_GetNormalsAsBuffer(*args)
+    def GetColorsAsBuffer(*args): return _imesh.iGeneralFactoryState_GetColorsAsBuffer(*args)
+    def GetTrianglesAsBuffer(*args): return _imesh.iGeneralFactoryState_GetTrianglesAsBuffer(*args)
+    scfGetVersion = staticmethod(_imesh.iGeneralFactoryState_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iGeneralFactoryState
     __del__ = lambda self : None;
 iGeneralFactoryState_swigregister = _imesh.iGeneralFactoryState_swigregister
@@ -270,12 +243,7 @@ iGeneralFactoryState_swigregister(iGeneralFactoryState)
 iGeneralFactoryState_scfGetVersion = _imesh.iGeneralFactoryState_scfGetVersion
 
 class iGenMeshAnimationControl(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iGenMeshAnimationControl, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iGenMeshAnimationControl, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def AnimatesVertices(*args): return _imesh.iGenMeshAnimationControl_AnimatesVertices(*args)
@@ -293,12 +261,7 @@ iGenMeshAnimationControl_swigregister = _imesh.iGenMeshAnimationControl_swigregi
 iGenMeshAnimationControl_swigregister(iGenMeshAnimationControl)
 
 class iGenMeshAnimationControlFactory(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iGenMeshAnimationControlFactory, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iGenMeshAnimationControlFactory, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def CreateAnimationControl(*args): return _imesh.iGenMeshAnimationControlFactory_CreateAnimationControl(*args)
@@ -310,12 +273,7 @@ iGenMeshAnimationControlFactory_swigregister = _imesh.iGenMeshAnimationControlFa
 iGenMeshAnimationControlFactory_swigregister(iGenMeshAnimationControlFactory)
 
 class iGenMeshAnimationControlType(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iGenMeshAnimationControlType, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iGenMeshAnimationControlType, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def CreateAnimationControlFactory(*args): return _imesh.iGenMeshAnimationControlType_CreateAnimationControlFactory(*args)
@@ -332,12 +290,7 @@ CS_BGT_BOX = _imesh.CS_BGT_BOX
 CS_BGT_SPHERE = _imesh.CS_BGT_SPHERE
 CS_BGT_CYLINDER = _imesh.CS_BGT_CYLINDER
 class iSkeletonBone(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonBone, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonBone, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetName(*args): return _imesh.iSkeletonBone_GetName(*args)
@@ -358,8 +311,7 @@ class iSkeletonBone(core.iBase):
     def GetFactory(*args): return _imesh.iSkeletonBone_GetFactory(*args)
     def SetTransformMode(*args): return _imesh.iSkeletonBone_SetTransformMode(*args)
     def GetTransformMode(*args): return _imesh.iSkeletonBone_GetTransformMode(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iSkeletonBone_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iSkeletonBone_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iSkeletonBone_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iSkeletonBone
     __del__ = lambda self : None;
 iSkeletonBone_swigregister = _imesh.iSkeletonBone_swigregister
@@ -367,12 +319,7 @@ iSkeletonBone_swigregister(iSkeletonBone)
 iSkeletonBone_scfGetVersion = _imesh.iSkeletonBone_scfGetVersion
 
 class iSkeletonBoneUpdateCallback(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonBoneUpdateCallback, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonBoneUpdateCallback, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def UpdateTransform(*args): return _imesh.iSkeletonBoneUpdateCallback_UpdateTransform(*args)
@@ -382,12 +329,7 @@ iSkeletonBoneUpdateCallback_swigregister = _imesh.iSkeletonBoneUpdateCallback_sw
 iSkeletonBoneUpdateCallback_swigregister(iSkeletonBoneUpdateCallback)
 
 class iSkeletonAnimationKeyFrame(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonAnimationKeyFrame, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonAnimationKeyFrame, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetName(*args): return _imesh.iSkeletonAnimationKeyFrame_GetName(*args)
@@ -405,12 +347,7 @@ iSkeletonAnimationKeyFrame_swigregister = _imesh.iSkeletonAnimationKeyFrame_swig
 iSkeletonAnimationKeyFrame_swigregister(iSkeletonAnimationKeyFrame)
 
 class iSkeletonAnimation(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonAnimation, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonAnimation, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetName(*args): return _imesh.iSkeletonAnimation_GetName(*args)
@@ -436,12 +373,7 @@ iSkeletonAnimation_swigregister = _imesh.iSkeletonAnimation_swigregister
 iSkeletonAnimation_swigregister(iSkeletonAnimation)
 
 class iSkeletonAnimationCallback(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonAnimationCallback, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonAnimationCallback, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Execute(*args): return _imesh.iSkeletonAnimationCallback_Execute(*args)
@@ -452,12 +384,7 @@ iSkeletonAnimationCallback_swigregister = _imesh.iSkeletonAnimationCallback_swig
 iSkeletonAnimationCallback_swigregister(iSkeletonAnimationCallback)
 
 class iSkeletonUpdateCallback(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonUpdateCallback, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonUpdateCallback, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Execute(*args): return _imesh.iSkeletonUpdateCallback_Execute(*args)
@@ -467,12 +394,7 @@ iSkeletonUpdateCallback_swigregister = _imesh.iSkeletonUpdateCallback_swigregist
 iSkeletonUpdateCallback_swigregister(iSkeletonUpdateCallback)
 
 class iSkeletonAnimationInstance(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonAnimationInstance, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonAnimationInstance, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetSpeed(*args): return _imesh.iSkeletonAnimationInstance_GetSpeed(*args)
@@ -487,12 +409,7 @@ iSkeletonAnimationInstance_swigregister = _imesh.iSkeletonAnimationInstance_swig
 iSkeletonAnimationInstance_swigregister(iSkeletonAnimationInstance)
 
 class iSkeleton(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeleton, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSkeleton, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetName(*args): return _imesh.iSkeleton_GetName(*args)
@@ -519,8 +436,7 @@ class iSkeleton(core.iBase):
     def RemoveUpdateCallback(*args): return _imesh.iSkeleton_RemoveUpdateCallback(*args)
     def UpdateAnimation(*args): return _imesh.iSkeleton_UpdateAnimation(*args)
     def UpdateBones(*args): return _imesh.iSkeleton_UpdateBones(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iSkeleton_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iSkeleton_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iSkeleton_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iSkeleton
     __del__ = lambda self : None;
 iSkeleton_swigregister = _imesh.iSkeleton_swigregister
@@ -528,12 +444,7 @@ iSkeleton_swigregister(iSkeleton)
 iSkeleton_scfGetVersion = _imesh.iSkeleton_scfGetVersion
 
 class iSkeletonSocket(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonSocket, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonSocket, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetName(*args): return _imesh.iSkeletonSocket_GetName(*args)
@@ -546,8 +457,7 @@ class iSkeletonSocket(core.iBase):
     def SetSceneNode(*args): return _imesh.iSkeletonSocket_SetSceneNode(*args)
     def GetSceneNode(*args): return _imesh.iSkeletonSocket_GetSceneNode(*args)
     def GetFactory(*args): return _imesh.iSkeletonSocket_GetFactory(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iSkeletonSocket_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iSkeletonSocket_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iSkeletonSocket_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iSkeletonSocket
     __del__ = lambda self : None;
 iSkeletonSocket_swigregister = _imesh.iSkeletonSocket_swigregister
@@ -555,12 +465,7 @@ iSkeletonSocket_swigregister(iSkeletonSocket)
 iSkeletonSocket_scfGetVersion = _imesh.iSkeletonSocket_scfGetVersion
 
 class iSkeletonBoneRagdollInfo(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonBoneRagdollInfo, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonBoneRagdollInfo, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetEnabled(*args): return _imesh.iSkeletonBoneRagdollInfo_SetEnabled(*args)
@@ -597,8 +502,7 @@ class iSkeletonBoneRagdollInfo(core.iBase):
     def GetJointMinTransContraints(*args): return _imesh.iSkeletonBoneRagdollInfo_GetJointMinTransContraints(*args)
     def SetJointMaxTransContraints(*args): return _imesh.iSkeletonBoneRagdollInfo_SetJointMaxTransContraints(*args)
     def GetJointMaxTransContraints(*args): return _imesh.iSkeletonBoneRagdollInfo_GetJointMaxTransContraints(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iSkeletonBoneRagdollInfo_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iSkeletonBoneRagdollInfo_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iSkeletonBoneRagdollInfo_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iSkeletonBoneRagdollInfo
     __del__ = lambda self : None;
 iSkeletonBoneRagdollInfo_swigregister = _imesh.iSkeletonBoneRagdollInfo_swigregister
@@ -606,12 +510,7 @@ iSkeletonBoneRagdollInfo_swigregister(iSkeletonBoneRagdollInfo)
 iSkeletonBoneRagdollInfo_scfGetVersion = _imesh.iSkeletonBoneRagdollInfo_scfGetVersion
 
 class iSkeletonBoneFactory(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonBoneFactory, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonBoneFactory, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetName(*args): return _imesh.iSkeletonBoneFactory_GetName(*args)
@@ -628,8 +527,7 @@ class iSkeletonBoneFactory(core.iBase):
     def SetSkinBox(*args): return _imesh.iSkeletonBoneFactory_SetSkinBox(*args)
     def GetSkinBox(*args): return _imesh.iSkeletonBoneFactory_GetSkinBox(*args)
     def GetRagdollInfo(*args): return _imesh.iSkeletonBoneFactory_GetRagdollInfo(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iSkeletonBoneFactory_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iSkeletonBoneFactory_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iSkeletonBoneFactory_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iSkeletonBoneFactory
     __del__ = lambda self : None;
 iSkeletonBoneFactory_swigregister = _imesh.iSkeletonBoneFactory_swigregister
@@ -637,12 +535,7 @@ iSkeletonBoneFactory_swigregister(iSkeletonBoneFactory)
 iSkeletonBoneFactory_scfGetVersion = _imesh.iSkeletonBoneFactory_scfGetVersion
 
 class iSkeletonSocketFactory(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonSocketFactory, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonSocketFactory, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetName(*args): return _imesh.iSkeletonSocketFactory_GetName(*args)
@@ -652,8 +545,7 @@ class iSkeletonSocketFactory(core.iBase):
     def GetFullTransform(*args): return _imesh.iSkeletonSocketFactory_GetFullTransform(*args)
     def SetBone(*args): return _imesh.iSkeletonSocketFactory_SetBone(*args)
     def GetBone(*args): return _imesh.iSkeletonSocketFactory_GetBone(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iSkeletonSocketFactory_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iSkeletonSocketFactory_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iSkeletonSocketFactory_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iSkeletonSocketFactory
     __del__ = lambda self : None;
 iSkeletonSocketFactory_swigregister = _imesh.iSkeletonSocketFactory_swigregister
@@ -661,12 +553,7 @@ iSkeletonSocketFactory_swigregister(iSkeletonSocketFactory)
 iSkeletonSocketFactory_scfGetVersion = _imesh.iSkeletonSocketFactory_scfGetVersion
 
 class iSkeletonFactory(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonFactory, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonFactory, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetName(*args): return _imesh.iSkeletonFactory_GetName(*args)
@@ -686,8 +573,7 @@ class iSkeletonFactory(core.iBase):
     def GetSocket(*args): return _imesh.iSkeletonFactory_GetSocket(*args)
     def RemoveSocket(*args): return _imesh.iSkeletonFactory_RemoveSocket(*args)
     def GetSocketsCount(*args): return _imesh.iSkeletonFactory_GetSocketsCount(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iSkeletonFactory_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iSkeletonFactory_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iSkeletonFactory_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iSkeletonFactory
     __del__ = lambda self : None;
 iSkeletonFactory_swigregister = _imesh.iSkeletonFactory_swigregister
@@ -695,12 +581,7 @@ iSkeletonFactory_swigregister(iSkeletonFactory)
 iSkeletonFactory_scfGetVersion = _imesh.iSkeletonFactory_scfGetVersion
 
 class iSkeletonGraveyard(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonGraveyard, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonGraveyard, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetFactoriesCount(*args): return _imesh.iSkeletonGraveyard_GetFactoriesCount(*args)
@@ -712,8 +593,7 @@ class iSkeletonGraveyard(core.iBase):
     def Update(*args): return _imesh.iSkeletonGraveyard_Update(*args)
     def AddSkeleton(*args): return _imesh.iSkeletonGraveyard_AddSkeleton(*args)
     def RemoveSkeleton(*args): return _imesh.iSkeletonGraveyard_RemoveSkeleton(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iSkeletonGraveyard_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iSkeletonGraveyard_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iSkeletonGraveyard_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iSkeletonGraveyard
     __del__ = lambda self : None;
 iSkeletonGraveyard_swigregister = _imesh.iSkeletonGraveyard_swigregister
@@ -721,12 +601,7 @@ iSkeletonGraveyard_swigregister(iSkeletonGraveyard)
 iSkeletonGraveyard_scfGetVersion = _imesh.iSkeletonGraveyard_scfGetVersion
 
 class iGenMeshSkeletonControlState(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iGenMeshSkeletonControlState, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iGenMeshSkeletonControlState, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetAnimatedVertices(*args): return _imesh.iGenMeshSkeletonControlState_GetAnimatedVertices(*args)
@@ -736,8 +611,7 @@ class iGenMeshSkeletonControlState(core.iBase):
     def GetAnimatedVertNormals(*args): return _imesh.iGenMeshSkeletonControlState_GetAnimatedVertNormals(*args)
     def GetAnimatedVertNormalsCount(*args): return _imesh.iGenMeshSkeletonControlState_GetAnimatedVertNormalsCount(*args)
     def GetSkeleton(*args): return _imesh.iGenMeshSkeletonControlState_GetSkeleton(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iGenMeshSkeletonControlState_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iGenMeshSkeletonControlState_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iGenMeshSkeletonControlState_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iGenMeshSkeletonControlState
     __del__ = lambda self : None;
 iGenMeshSkeletonControlState_swigregister = _imesh.iGenMeshSkeletonControlState_swigregister
@@ -745,12 +619,7 @@ iGenMeshSkeletonControlState_swigregister(iGenMeshSkeletonControlState)
 iGenMeshSkeletonControlState_scfGetVersion = _imesh.iGenMeshSkeletonControlState_scfGetVersion
 
 class csSprite2DVertexArrayReadOnly(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csSprite2DVertexArrayReadOnly, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csSprite2DVertexArrayReadOnly, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetSize(*args): return _imesh.csSprite2DVertexArrayReadOnly_GetSize(*args)
@@ -766,12 +635,7 @@ csSprite2DVertexArrayReadOnly_swigregister = _imesh.csSprite2DVertexArrayReadOnl
 csSprite2DVertexArrayReadOnly_swigregister(csSprite2DVertexArrayReadOnly)
 
 class csSprite2DVertexArrayChangeElements(csSprite2DVertexArrayReadOnly):
-    __swig_setmethods__ = {}
-    for _s in [csSprite2DVertexArrayReadOnly]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csSprite2DVertexArrayChangeElements, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csSprite2DVertexArrayReadOnly]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csSprite2DVertexArrayChangeElements, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Get(*args): return _imesh.csSprite2DVertexArrayChangeElements_Get(*args)
@@ -782,12 +646,7 @@ csSprite2DVertexArrayChangeElements_swigregister = _imesh.csSprite2DVertexArrayC
 csSprite2DVertexArrayChangeElements_swigregister(csSprite2DVertexArrayChangeElements)
 
 class csSprite2DVertexArrayChangeAll(csSprite2DVertexArrayChangeElements):
-    __swig_setmethods__ = {}
-    for _s in [csSprite2DVertexArrayChangeElements]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csSprite2DVertexArrayChangeAll, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csSprite2DVertexArrayChangeElements]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csSprite2DVertexArrayChangeAll, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetSize(*args): return _imesh.csSprite2DVertexArrayChangeAll_SetSize(*args)
@@ -808,27 +667,14 @@ class csSprite2DVertexArrayChangeAll(csSprite2DVertexArrayChangeElements):
 csSprite2DVertexArrayChangeAll_swigregister = _imesh.csSprite2DVertexArrayChangeAll_swigregister
 csSprite2DVertexArrayChangeAll_swigregister(csSprite2DVertexArrayChangeAll)
 
-class csSprite2DVertex(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csSprite2DVertex, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csSprite2DVertex, name)
+class csSprite2DVertex(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["pos"] = _imesh.csSprite2DVertex_pos_set
-    __swig_getmethods__["pos"] = _imesh.csSprite2DVertex_pos_get
-    if _newclass:pos = _swig_property(_imesh.csSprite2DVertex_pos_get, _imesh.csSprite2DVertex_pos_set)
-    __swig_setmethods__["color_init"] = _imesh.csSprite2DVertex_color_init_set
-    __swig_getmethods__["color_init"] = _imesh.csSprite2DVertex_color_init_get
-    if _newclass:color_init = _swig_property(_imesh.csSprite2DVertex_color_init_get, _imesh.csSprite2DVertex_color_init_set)
-    __swig_setmethods__["color"] = _imesh.csSprite2DVertex_color_set
-    __swig_getmethods__["color"] = _imesh.csSprite2DVertex_color_get
-    if _newclass:color = _swig_property(_imesh.csSprite2DVertex_color_get, _imesh.csSprite2DVertex_color_set)
-    __swig_setmethods__["u"] = _imesh.csSprite2DVertex_u_set
-    __swig_getmethods__["u"] = _imesh.csSprite2DVertex_u_get
-    if _newclass:u = _swig_property(_imesh.csSprite2DVertex_u_get, _imesh.csSprite2DVertex_u_set)
-    __swig_setmethods__["v"] = _imesh.csSprite2DVertex_v_set
-    __swig_getmethods__["v"] = _imesh.csSprite2DVertex_v_get
-    if _newclass:v = _swig_property(_imesh.csSprite2DVertex_v_get, _imesh.csSprite2DVertex_v_set)
+    pos = _swig_property(_imesh.csSprite2DVertex_pos_get, _imesh.csSprite2DVertex_pos_set)
+    color_init = _swig_property(_imesh.csSprite2DVertex_color_init_get, _imesh.csSprite2DVertex_color_init_set)
+    color = _swig_property(_imesh.csSprite2DVertex_color_get, _imesh.csSprite2DVertex_color_set)
+    u = _swig_property(_imesh.csSprite2DVertex_u_get, _imesh.csSprite2DVertex_u_set)
+    v = _swig_property(_imesh.csSprite2DVertex_v_get, _imesh.csSprite2DVertex_v_set)
     def __eq__(*args): return _imesh.csSprite2DVertex___eq__(*args)
     def __init__(self, *args): 
         this = _imesh.new_csSprite2DVertex(*args)
@@ -840,12 +686,7 @@ csSprite2DVertex_swigregister = _imesh.csSprite2DVertex_swigregister
 csSprite2DVertex_swigregister(csSprite2DVertex)
 
 class iColoredVertices(csSprite2DVertexArrayChangeAll):
-    __swig_setmethods__ = {}
-    for _s in [csSprite2DVertexArrayChangeAll]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iColoredVertices, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csSprite2DVertexArrayChangeAll]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iColoredVertices, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     __swig_destroy__ = _imesh.delete_iColoredVertices
@@ -854,12 +695,7 @@ iColoredVertices_swigregister = _imesh.iColoredVertices_swigregister
 iColoredVertices_swigregister(iColoredVertices)
 
 class iSprite2DUVAnimationFrame(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSprite2DUVAnimationFrame, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSprite2DUVAnimationFrame, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetName(*args): return _imesh.iSprite2DUVAnimationFrame_SetName(*args)
@@ -877,12 +713,7 @@ iSprite2DUVAnimationFrame_swigregister = _imesh.iSprite2DUVAnimationFrame_swigre
 iSprite2DUVAnimationFrame_swigregister(iSprite2DUVAnimationFrame)
 
 class iSprite2DUVAnimation(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSprite2DUVAnimation, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSprite2DUVAnimation, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetName(*args): return _imesh.iSprite2DUVAnimation_SetName(*args)
@@ -898,12 +729,7 @@ iSprite2DUVAnimation_swigregister = _imesh.iSprite2DUVAnimation_swigregister
 iSprite2DUVAnimation_swigregister(iSprite2DUVAnimation)
 
 class iSprite2DFactoryState(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSprite2DFactoryState, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSprite2DFactoryState, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetLighting(*args): return _imesh.iSprite2DFactoryState_SetLighting(*args)
@@ -918,12 +744,7 @@ iSprite2DFactoryState_swigregister = _imesh.iSprite2DFactoryState_swigregister
 iSprite2DFactoryState_swigregister(iSprite2DFactoryState)
 
 class iSprite2DState(iSprite2DFactoryState):
-    __swig_setmethods__ = {}
-    for _s in [iSprite2DFactoryState]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSprite2DState, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iSprite2DFactoryState]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSprite2DState, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def CreateRegularVertices(*args): return _imesh.iSprite2DState_CreateRegularVertices(*args)
@@ -933,8 +754,7 @@ class iSprite2DState(iSprite2DFactoryState):
     def PlayUVAnimation(*args): return _imesh.iSprite2DState_PlayUVAnimation(*args)
     def GetVertexByIndex(*args): return _imesh.iSprite2DState_GetVertexByIndex(*args)
     def GetVertexCount(*args): return _imesh.iSprite2DState_GetVertexCount(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iSprite2DState_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iSprite2DState_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iSprite2DState_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iSprite2DState
     __del__ = lambda self : None;
 iSprite2DState_swigregister = _imesh.iSprite2DState_swigregister
@@ -952,12 +772,7 @@ CS_SPR_LOD_GLOBAL = _imesh.CS_SPR_LOD_GLOBAL
 CS_SPR_LOD_TEMPLATE = _imesh.CS_SPR_LOD_TEMPLATE
 CS_SPR_LOD_LOCAL = _imesh.CS_SPR_LOD_LOCAL
 class iSpriteFrame(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSpriteFrame, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSpriteFrame, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetName(*args): return _imesh.iSpriteFrame_SetName(*args)
@@ -970,12 +785,7 @@ iSpriteFrame_swigregister = _imesh.iSpriteFrame_swigregister
 iSpriteFrame_swigregister(iSpriteFrame)
 
 class iSpriteAction(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSpriteAction, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSpriteAction, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetName(*args): return _imesh.iSpriteAction_SetName(*args)
@@ -992,12 +802,7 @@ iSpriteAction_swigregister = _imesh.iSpriteAction_swigregister
 iSpriteAction_swigregister(iSpriteAction)
 
 class iSpriteSocket(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSpriteSocket, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSpriteSocket, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetName(*args): return _imesh.iSpriteSocket_SetName(*args)
@@ -1012,12 +817,7 @@ iSpriteSocket_swigregister = _imesh.iSpriteSocket_swigregister
 iSpriteSocket_swigregister(iSpriteSocket)
 
 class iSprite3DFactoryState(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSprite3DFactoryState, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSprite3DFactoryState, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def AddVertices(*args): return _imesh.iSprite3DFactoryState_AddVertices(*args)
@@ -1068,12 +868,7 @@ iSprite3DFactoryState_swigregister = _imesh.iSprite3DFactoryState_swigregister
 iSprite3DFactoryState_swigregister(iSprite3DFactoryState)
 
 class iSprite3DState(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSprite3DState, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSprite3DState, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetMixMode(*args): return _imesh.iSprite3DState_SetMixMode(*args)
@@ -1101,8 +896,7 @@ class iSprite3DState(core.iBase):
     def GetLodLevelConfig(*args): return _imesh.iSprite3DState_GetLodLevelConfig(*args)
     def IsLodEnabled(*args): return _imesh.iSprite3DState_IsLodEnabled(*args)
     def FindSocket(*args): return _imesh.iSprite3DState_FindSocket(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iSprite3DState_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iSprite3DState_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iSprite3DState_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iSprite3DState
     __del__ = lambda self : None;
 iSprite3DState_swigregister = _imesh.iSprite3DState_swigregister
@@ -1110,12 +904,7 @@ iSprite3DState_swigregister(iSprite3DState)
 iSprite3DState_scfGetVersion = _imesh.iSprite3DState_scfGetVersion
 
 class iSpriteCal3DSocket(iSpriteSocket):
-    __swig_setmethods__ = {}
-    for _s in [iSpriteSocket]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSpriteCal3DSocket, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iSpriteSocket]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSpriteCal3DSocket, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetSubmeshIndex(*args): return _imesh.iSpriteCal3DSocket_SetSubmeshIndex(*args)
@@ -1137,12 +926,7 @@ iSpriteCal3DSocket_swigregister = _imesh.iSpriteCal3DSocket_swigregister
 iSpriteCal3DSocket_swigregister(iSpriteCal3DSocket)
 
 class iSpriteCal3DFactoryState(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSpriteCal3DFactoryState, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSpriteCal3DFactoryState, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Create(*args): return _imesh.iSpriteCal3DFactoryState_Create(*args)
@@ -1181,12 +965,7 @@ iSpriteCal3DFactoryState_swigregister = _imesh.iSpriteCal3DFactoryState_swigregi
 iSpriteCal3DFactoryState_swigregister(iSpriteCal3DFactoryState)
 
 class iAnimTimeUpdateHandler(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iAnimTimeUpdateHandler, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iAnimTimeUpdateHandler, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def UpdatePosition(*args): return _imesh.iAnimTimeUpdateHandler_UpdatePosition(*args)
@@ -1195,18 +974,11 @@ class iAnimTimeUpdateHandler(core.iBase):
 iAnimTimeUpdateHandler_swigregister = _imesh.iAnimTimeUpdateHandler_swigregister
 iAnimTimeUpdateHandler_swigregister(iAnimTimeUpdateHandler)
 
-class csSpriteCal3DActiveAnim(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csSpriteCal3DActiveAnim, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csSpriteCal3DActiveAnim, name)
+class csSpriteCal3DActiveAnim(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["index"] = _imesh.csSpriteCal3DActiveAnim_index_set
-    __swig_getmethods__["index"] = _imesh.csSpriteCal3DActiveAnim_index_get
-    if _newclass:index = _swig_property(_imesh.csSpriteCal3DActiveAnim_index_get, _imesh.csSpriteCal3DActiveAnim_index_set)
-    __swig_setmethods__["weight"] = _imesh.csSpriteCal3DActiveAnim_weight_set
-    __swig_getmethods__["weight"] = _imesh.csSpriteCal3DActiveAnim_weight_get
-    if _newclass:weight = _swig_property(_imesh.csSpriteCal3DActiveAnim_weight_get, _imesh.csSpriteCal3DActiveAnim_weight_set)
+    index = _swig_property(_imesh.csSpriteCal3DActiveAnim_index_get, _imesh.csSpriteCal3DActiveAnim_index_set)
+    weight = _swig_property(_imesh.csSpriteCal3DActiveAnim_weight_get, _imesh.csSpriteCal3DActiveAnim_weight_set)
     def __init__(self, *args): 
         this = _imesh.new_csSpriteCal3DActiveAnim(*args)
         try: self.this.append(this)
@@ -1217,12 +989,7 @@ csSpriteCal3DActiveAnim_swigregister = _imesh.csSpriteCal3DActiveAnim_swigregist
 csSpriteCal3DActiveAnim_swigregister(csSpriteCal3DActiveAnim)
 
 class iSpriteCal3DState(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSpriteCal3DState, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSpriteCal3DState, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     C3D_ANIM_TYPE_NONE = _imesh.iSpriteCal3DState_C3D_ANIM_TYPE_NONE
@@ -1262,8 +1029,7 @@ class iSpriteCal3DState(core.iBase):
     def GetCoreMeshShaderVarContext(*args): return _imesh.iSpriteCal3DState_GetCoreMeshShaderVarContext(*args)
     def GetSkeleton(*args): return _imesh.iSpriteCal3DState_GetSkeleton(*args)
     def GetCal3DModel(*args): return _imesh.iSpriteCal3DState_GetCal3DModel(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iSpriteCal3DState_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iSpriteCal3DState_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iSpriteCal3DState_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iSpriteCal3DState
     __del__ = lambda self : None;
 iSpriteCal3DState_swigregister = _imesh.iSpriteCal3DState_swigregister
@@ -1274,12 +1040,7 @@ CS_MESH_STATICPOS = _imesh.CS_MESH_STATICPOS
 CS_MESH_STATICSHAPE = _imesh.CS_MESH_STATICSHAPE
 CS_FACTORY_STATICSHAPE = _imesh.CS_FACTORY_STATICSHAPE
 class iMeshObjectDrawCallback(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iMeshObjectDrawCallback, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iMeshObjectDrawCallback, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def BeforeDrawing(*args): return _imesh.iMeshObjectDrawCallback_BeforeDrawing(*args)
@@ -1289,12 +1050,7 @@ iMeshObjectDrawCallback_swigregister = _imesh.iMeshObjectDrawCallback_swigregist
 iMeshObjectDrawCallback_swigregister(iMeshObjectDrawCallback)
 
 class iMeshObject(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iMeshObject, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iMeshObject, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetFactory(*args): return _imesh.iMeshObject_GetFactory(*args)
@@ -1320,8 +1076,7 @@ class iMeshObject(core.iBase):
     def InvalidateMaterialHandles(*args): return _imesh.iMeshObject_InvalidateMaterialHandles(*args)
     def PositionChild(*args): return _imesh.iMeshObject_PositionChild(*args)
     def BuildDecal(*args): return _imesh.iMeshObject_BuildDecal(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iMeshObject_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iMeshObject_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iMeshObject_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iMeshObject
     __del__ = lambda self : None;
 iMeshObject_swigregister = _imesh.iMeshObject_swigregister
@@ -1329,12 +1084,7 @@ iMeshObject_swigregister(iMeshObject)
 iMeshObject_scfGetVersion = _imesh.iMeshObject_scfGetVersion
 
 class iMeshObjectFactory(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iMeshObjectFactory, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iMeshObjectFactory, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetFlags(*args): return _imesh.iMeshObjectFactory_GetFlags(*args)
@@ -1350,8 +1100,7 @@ class iMeshObjectFactory(core.iBase):
     def GetMaterialWrapper(*args): return _imesh.iMeshObjectFactory_GetMaterialWrapper(*args)
     def SetMixMode(*args): return _imesh.iMeshObjectFactory_SetMixMode(*args)
     def GetMixMode(*args): return _imesh.iMeshObjectFactory_GetMixMode(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iMeshObjectFactory_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iMeshObjectFactory_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iMeshObjectFactory_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iMeshObjectFactory
     __del__ = lambda self : None;
 iMeshObjectFactory_swigregister = _imesh.iMeshObjectFactory_swigregister
@@ -1359,35 +1108,22 @@ iMeshObjectFactory_swigregister(iMeshObjectFactory)
 iMeshObjectFactory_scfGetVersion = _imesh.iMeshObjectFactory_scfGetVersion
 
 class iMeshObjectType(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iMeshObjectType, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iMeshObjectType, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def NewFactory(*args): return _imesh.iMeshObjectType_NewFactory(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iMeshObjectType_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iMeshObjectType_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iMeshObjectType_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iMeshObjectType
     __del__ = lambda self : None;
 iMeshObjectType_swigregister = _imesh.iMeshObjectType_swigregister
 iMeshObjectType_swigregister(iMeshObjectType)
 iMeshObjectType_scfGetVersion = _imesh.iMeshObjectType_scfGetVersion
 
-class csPolygonRange(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csPolygonRange, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csPolygonRange, name)
+class csPolygonRange(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["start"] = _imesh.csPolygonRange_start_set
-    __swig_getmethods__["start"] = _imesh.csPolygonRange_start_get
-    if _newclass:start = _swig_property(_imesh.csPolygonRange_start_get, _imesh.csPolygonRange_start_set)
-    __swig_setmethods__["end"] = _imesh.csPolygonRange_end_set
-    __swig_getmethods__["end"] = _imesh.csPolygonRange_end_get
-    if _newclass:end = _swig_property(_imesh.csPolygonRange_end_get, _imesh.csPolygonRange_end_set)
+    start = _swig_property(_imesh.csPolygonRange_start_get, _imesh.csPolygonRange_start_set)
+    end = _swig_property(_imesh.csPolygonRange_end_get, _imesh.csPolygonRange_end_set)
     def __init__(self, *args): 
         this = _imesh.new_csPolygonRange(*args)
         try: self.this.append(this)
@@ -1406,12 +1142,7 @@ CS_THING_NOCOMPRESS = _imesh.CS_THING_NOCOMPRESS
 CS_THING_MOVE_NEVER = _imesh.CS_THING_MOVE_NEVER
 CS_THING_MOVE_OCCASIONAL = _imesh.CS_THING_MOVE_OCCASIONAL
 class iPolygonHandle(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iPolygonHandle, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iPolygonHandle, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetThingFactoryState(*args): return _imesh.iPolygonHandle_GetThingFactoryState(*args)
@@ -1425,12 +1156,7 @@ iPolygonHandle_swigregister = _imesh.iPolygonHandle_swigregister
 iPolygonHandle_swigregister(iPolygonHandle)
 
 class iThingFactoryState(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iThingFactoryState, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iThingFactoryState, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def CompressVertices(*args): return _imesh.iThingFactoryState_CompressVertices(*args)
@@ -1478,8 +1204,7 @@ class iThingFactoryState(core.iBase):
     def SetCosinusFactor(*args): return _imesh.iThingFactoryState_SetCosinusFactor(*args)
     def AddPolygonRenderBuffer(*args): return _imesh.iThingFactoryState_AddPolygonRenderBuffer(*args)
     def GetLightmapLayout(*args): return _imesh.iThingFactoryState_GetLightmapLayout(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iThingFactoryState_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iThingFactoryState_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iThingFactoryState_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iThingFactoryState
     __del__ = lambda self : None;
 iThingFactoryState_swigregister = _imesh.iThingFactoryState_swigregister
@@ -1487,12 +1212,7 @@ iThingFactoryState_swigregister(iThingFactoryState)
 iThingFactoryState_scfGetVersion = _imesh.iThingFactoryState_scfGetVersion
 
 class iThingState(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iThingState, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iThingState, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetVertexW(*args): return _imesh.iThingState_GetVertexW(*args)
@@ -1510,8 +1230,7 @@ class iThingState(core.iBase):
     def GetPolygonLightmap(*args): return _imesh.iThingState_GetPolygonLightmap(*args)
     def GetPolygonPDLight(*args): return _imesh.iThingState_GetPolygonPDLight(*args)
     def GetReplacedMaterial(*args): return _imesh.iThingState_GetReplacedMaterial(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iThingState_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iThingState_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iThingState_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iThingState
     __del__ = lambda self : None;
 iThingState_swigregister = _imesh.iThingState_swigregister
@@ -1519,12 +1238,7 @@ iThingState_swigregister(iThingState)
 iThingState_scfGetVersion = _imesh.iThingState_scfGetVersion
 
 class iThingEnvironment(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iThingEnvironment, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iThingEnvironment, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Clear(*args): return _imesh.iThingEnvironment_Clear(*args)
@@ -1537,12 +1251,7 @@ iThingEnvironment_swigregister = _imesh.iThingEnvironment_swigregister
 iThingEnvironment_swigregister(iThingEnvironment)
 
 class csCharArrayArray(core.CustomAllocated):
-    __swig_setmethods__ = {}
-    for _s in [core.CustomAllocated]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csCharArrayArray, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.CustomAllocated]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csCharArrayArray, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     __swig_destroy__ = _imesh.delete_csCharArrayArray
     __del__ = lambda self : None;
@@ -1572,12 +1281,7 @@ csCharArrayArray_swigregister = _imesh.csCharArrayArray_swigregister
 csCharArrayArray_swigregister(csCharArrayArray)
 
 class iTerrainObjectState(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainObjectState, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainObjectState, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetMaterialPalette(*args): return _imesh.iTerrainObjectState_SetMaterialPalette(*args)
@@ -1599,8 +1303,7 @@ class iTerrainObjectState(core.iBase):
     def SetRightNeighbor(*args): return _imesh.iTerrainObjectState_SetRightNeighbor(*args)
     def SetLeftNeighbor(*args): return _imesh.iTerrainObjectState_SetLeftNeighbor(*args)
     def SetBottomNeighbor(*args): return _imesh.iTerrainObjectState_SetBottomNeighbor(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iTerrainObjectState_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iTerrainObjectState_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iTerrainObjectState_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainObjectState
     __del__ = lambda self : None;
 iTerrainObjectState_swigregister = _imesh.iTerrainObjectState_swigregister
@@ -1608,12 +1311,7 @@ iTerrainObjectState_swigregister(iTerrainObjectState)
 iTerrainObjectState_scfGetVersion = _imesh.iTerrainObjectState_scfGetVersion
 
 class iTerrainFactoryState(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainFactoryState, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainFactoryState, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetTerraFormer(*args): return _imesh.iTerrainFactoryState_SetTerraFormer(*args)
@@ -1622,26 +1320,18 @@ class iTerrainFactoryState(core.iBase):
     def GetSamplerRegion(*args): return _imesh.iTerrainFactoryState_GetSamplerRegion(*args)
     def SaveState(*args): return _imesh.iTerrainFactoryState_SaveState(*args)
     def RestoreState(*args): return _imesh.iTerrainFactoryState_RestoreState(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iTerrainFactoryState_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iTerrainFactoryState_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iTerrainFactoryState_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainFactoryState
     __del__ = lambda self : None;
 iTerrainFactoryState_swigregister = _imesh.iTerrainFactoryState_swigregister
 iTerrainFactoryState_swigregister(iTerrainFactoryState)
 iTerrainFactoryState_scfGetVersion = _imesh.iTerrainFactoryState_scfGetVersion
 
-class csLockedHeightData(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csLockedHeightData, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csLockedHeightData, name)
+class csLockedHeightData(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["data"] = _imesh.csLockedHeightData_data_set
-    __swig_getmethods__["data"] = _imesh.csLockedHeightData_data_get
-    if _newclass:data = _swig_property(_imesh.csLockedHeightData_data_get, _imesh.csLockedHeightData_data_set)
-    __swig_setmethods__["pitch"] = _imesh.csLockedHeightData_pitch_set
-    __swig_getmethods__["pitch"] = _imesh.csLockedHeightData_pitch_get
-    if _newclass:pitch = _swig_property(_imesh.csLockedHeightData_pitch_get, _imesh.csLockedHeightData_pitch_set)
+    data = _swig_property(_imesh.csLockedHeightData_data_get, _imesh.csLockedHeightData_data_set)
+    pitch = _swig_property(_imesh.csLockedHeightData_pitch_get, _imesh.csLockedHeightData_pitch_set)
     def Get(*args): return _imesh.csLockedHeightData_Get(*args)
     def Set(*args): return _imesh.csLockedHeightData_Set(*args)
     def __init__(self, *args): 
@@ -1653,18 +1343,11 @@ class csLockedHeightData(_object):
 csLockedHeightData_swigregister = _imesh.csLockedHeightData_swigregister
 csLockedHeightData_swigregister(csLockedHeightData)
 
-class csLockedMaterialMap(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csLockedMaterialMap, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csLockedMaterialMap, name)
+class csLockedMaterialMap(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["data"] = _imesh.csLockedMaterialMap_data_set
-    __swig_getmethods__["data"] = _imesh.csLockedMaterialMap_data_get
-    if _newclass:data = _swig_property(_imesh.csLockedMaterialMap_data_get, _imesh.csLockedMaterialMap_data_set)
-    __swig_setmethods__["pitch"] = _imesh.csLockedMaterialMap_pitch_set
-    __swig_getmethods__["pitch"] = _imesh.csLockedMaterialMap_pitch_get
-    if _newclass:pitch = _swig_property(_imesh.csLockedMaterialMap_pitch_get, _imesh.csLockedMaterialMap_pitch_set)
+    data = _swig_property(_imesh.csLockedMaterialMap_data_get, _imesh.csLockedMaterialMap_data_set)
+    pitch = _swig_property(_imesh.csLockedMaterialMap_pitch_get, _imesh.csLockedMaterialMap_pitch_set)
     def Get(*args): return _imesh.csLockedMaterialMap_Get(*args)
     def Set(*args): return _imesh.csLockedMaterialMap_Set(*args)
     def __init__(self, *args): 
@@ -1677,12 +1360,7 @@ csLockedMaterialMap_swigregister = _imesh.csLockedMaterialMap_swigregister
 csLockedMaterialMap_swigregister(csLockedMaterialMap)
 
 class iTerrainVector3Array(csgeom.csVector3ArrayChangeAll):
-    __swig_setmethods__ = {}
-    for _s in [csgeom.csVector3ArrayChangeAll]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainVector3Array, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csgeom.csVector3ArrayChangeAll]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainVector3Array, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     __swig_destroy__ = _imesh.delete_iTerrainVector3Array
@@ -1691,12 +1369,7 @@ iTerrainVector3Array_swigregister = _imesh.iTerrainVector3Array_swigregister
 iTerrainVector3Array_swigregister(iTerrainVector3Array)
 
 class iTerrainCollisionPairArray(ivaria.csCollisionPairArrayChangeAll):
-    __swig_setmethods__ = {}
-    for _s in [ivaria.csCollisionPairArrayChangeAll]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainCollisionPairArray, name, value)
-    __swig_getmethods__ = {}
-    for _s in [ivaria.csCollisionPairArrayChangeAll]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainCollisionPairArray, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     __swig_destroy__ = _imesh.delete_iTerrainCollisionPairArray
@@ -1705,20 +1378,14 @@ iTerrainCollisionPairArray_swigregister = _imesh.iTerrainCollisionPairArray_swig
 iTerrainCollisionPairArray_swigregister(iTerrainCollisionPairArray)
 
 class iTerrainCellCollisionProperties(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainCellCollisionProperties, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainCellCollisionProperties, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetCollidable(*args): return _imesh.iTerrainCellCollisionProperties_GetCollidable(*args)
     def SetCollidable(*args): return _imesh.iTerrainCellCollisionProperties_SetCollidable(*args)
     def SetParameter(*args): return _imesh.iTerrainCellCollisionProperties_SetParameter(*args)
     def Clone(*args): return _imesh.iTerrainCellCollisionProperties_Clone(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iTerrainCellCollisionProperties_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iTerrainCellCollisionProperties_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iTerrainCellCollisionProperties_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainCellCollisionProperties
     __del__ = lambda self : None;
 iTerrainCellCollisionProperties_swigregister = _imesh.iTerrainCellCollisionProperties_swigregister
@@ -1726,20 +1393,14 @@ iTerrainCellCollisionProperties_swigregister(iTerrainCellCollisionProperties)
 iTerrainCellCollisionProperties_scfGetVersion = _imesh.iTerrainCellCollisionProperties_scfGetVersion
 
 class iTerrainCellRenderProperties(ivideo.iShaderVariableContext):
-    __swig_setmethods__ = {}
-    for _s in [ivideo.iShaderVariableContext]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainCellRenderProperties, name, value)
-    __swig_getmethods__ = {}
-    for _s in [ivideo.iShaderVariableContext]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainCellRenderProperties, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetVisible(*args): return _imesh.iTerrainCellRenderProperties_GetVisible(*args)
     def SetVisible(*args): return _imesh.iTerrainCellRenderProperties_SetVisible(*args)
     def SetParameter(*args): return _imesh.iTerrainCellRenderProperties_SetParameter(*args)
     def Clone(*args): return _imesh.iTerrainCellRenderProperties_Clone(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iTerrainCellRenderProperties_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iTerrainCellRenderProperties_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iTerrainCellRenderProperties_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainCellRenderProperties
     __del__ = lambda self : None;
 iTerrainCellRenderProperties_swigregister = _imesh.iTerrainCellRenderProperties_swigregister
@@ -1747,19 +1408,13 @@ iTerrainCellRenderProperties_swigregister(iTerrainCellRenderProperties)
 iTerrainCellRenderProperties_scfGetVersion = _imesh.iTerrainCellRenderProperties_scfGetVersion
 
 class iTerrainCellFeederProperties(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainCellFeederProperties, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainCellFeederProperties, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetHeightmapSource(*args): return _imesh.iTerrainCellFeederProperties_SetHeightmapSource(*args)
     def SetParameter(*args): return _imesh.iTerrainCellFeederProperties_SetParameter(*args)
     def Clone(*args): return _imesh.iTerrainCellFeederProperties_Clone(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iTerrainCellFeederProperties_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iTerrainCellFeederProperties_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iTerrainCellFeederProperties_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainCellFeederProperties
     __del__ = lambda self : None;
 iTerrainCellFeederProperties_swigregister = _imesh.iTerrainCellFeederProperties_swigregister
@@ -1767,47 +1422,28 @@ iTerrainCellFeederProperties_swigregister(iTerrainCellFeederProperties)
 iTerrainCellFeederProperties_scfGetVersion = _imesh.iTerrainCellFeederProperties_scfGetVersion
 
 class iTerrainDataFeeder(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainDataFeeder, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainDataFeeder, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def CreateProperties(*args): return _imesh.iTerrainDataFeeder_CreateProperties(*args)
     def PreLoad(*args): return _imesh.iTerrainDataFeeder_PreLoad(*args)
     def Load(*args): return _imesh.iTerrainDataFeeder_Load(*args)
     def SetParameter(*args): return _imesh.iTerrainDataFeeder_SetParameter(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iTerrainDataFeeder_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iTerrainDataFeeder_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iTerrainDataFeeder_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainDataFeeder
     __del__ = lambda self : None;
 iTerrainDataFeeder_swigregister = _imesh.iTerrainDataFeeder_swigregister
 iTerrainDataFeeder_swigregister(iTerrainDataFeeder)
 iTerrainDataFeeder_scfGetVersion = _imesh.iTerrainDataFeeder_scfGetVersion
 
-class csTerrainColliderCollideSegmentResult(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csTerrainColliderCollideSegmentResult, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csTerrainColliderCollideSegmentResult, name)
+class csTerrainColliderCollideSegmentResult(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["hit"] = _imesh.csTerrainColliderCollideSegmentResult_hit_set
-    __swig_getmethods__["hit"] = _imesh.csTerrainColliderCollideSegmentResult_hit_get
-    if _newclass:hit = _swig_property(_imesh.csTerrainColliderCollideSegmentResult_hit_get, _imesh.csTerrainColliderCollideSegmentResult_hit_set)
-    __swig_setmethods__["isect"] = _imesh.csTerrainColliderCollideSegmentResult_isect_set
-    __swig_getmethods__["isect"] = _imesh.csTerrainColliderCollideSegmentResult_isect_get
-    if _newclass:isect = _swig_property(_imesh.csTerrainColliderCollideSegmentResult_isect_get, _imesh.csTerrainColliderCollideSegmentResult_isect_set)
-    __swig_setmethods__["a"] = _imesh.csTerrainColliderCollideSegmentResult_a_set
-    __swig_getmethods__["a"] = _imesh.csTerrainColliderCollideSegmentResult_a_get
-    if _newclass:a = _swig_property(_imesh.csTerrainColliderCollideSegmentResult_a_get, _imesh.csTerrainColliderCollideSegmentResult_a_set)
-    __swig_setmethods__["b"] = _imesh.csTerrainColliderCollideSegmentResult_b_set
-    __swig_getmethods__["b"] = _imesh.csTerrainColliderCollideSegmentResult_b_get
-    if _newclass:b = _swig_property(_imesh.csTerrainColliderCollideSegmentResult_b_get, _imesh.csTerrainColliderCollideSegmentResult_b_set)
-    __swig_setmethods__["c"] = _imesh.csTerrainColliderCollideSegmentResult_c_set
-    __swig_getmethods__["c"] = _imesh.csTerrainColliderCollideSegmentResult_c_get
-    if _newclass:c = _swig_property(_imesh.csTerrainColliderCollideSegmentResult_c_get, _imesh.csTerrainColliderCollideSegmentResult_c_set)
+    hit = _swig_property(_imesh.csTerrainColliderCollideSegmentResult_hit_get, _imesh.csTerrainColliderCollideSegmentResult_hit_set)
+    isect = _swig_property(_imesh.csTerrainColliderCollideSegmentResult_isect_get, _imesh.csTerrainColliderCollideSegmentResult_isect_set)
+    a = _swig_property(_imesh.csTerrainColliderCollideSegmentResult_a_get, _imesh.csTerrainColliderCollideSegmentResult_a_set)
+    b = _swig_property(_imesh.csTerrainColliderCollideSegmentResult_b_get, _imesh.csTerrainColliderCollideSegmentResult_b_set)
+    c = _swig_property(_imesh.csTerrainColliderCollideSegmentResult_c_get, _imesh.csTerrainColliderCollideSegmentResult_c_set)
     def __init__(self, *args): 
         this = _imesh.new_csTerrainColliderCollideSegmentResult(*args)
         try: self.this.append(this)
@@ -1818,20 +1454,14 @@ csTerrainColliderCollideSegmentResult_swigregister = _imesh.csTerrainColliderCol
 csTerrainColliderCollideSegmentResult_swigregister(csTerrainColliderCollideSegmentResult)
 
 class iTerrainCollider(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainCollider, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainCollider, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def CreateProperties(*args): return _imesh.iTerrainCollider_CreateProperties(*args)
     def CollideSegment(*args): return _imesh.iTerrainCollider_CollideSegment(*args)
     def CollideTriangles(*args): return _imesh.iTerrainCollider_CollideTriangles(*args)
     def Collide(*args): return _imesh.iTerrainCollider_Collide(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iTerrainCollider_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iTerrainCollider_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iTerrainCollider_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainCollider
     __del__ = lambda self : None;
 iTerrainCollider_swigregister = _imesh.iTerrainCollider_swigregister
@@ -1839,12 +1469,7 @@ iTerrainCollider_swigregister(iTerrainCollider)
 iTerrainCollider_scfGetVersion = _imesh.iTerrainCollider_scfGetVersion
 
 class iTerrainRenderer(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainRenderer, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainRenderer, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def CreateProperties(*args): return _imesh.iTerrainRenderer_CreateProperties(*args)
@@ -1853,8 +1478,7 @@ class iTerrainRenderer(core.iBase):
     def GetRenderMeshes(*args): return _imesh.iTerrainRenderer_GetRenderMeshes(*args)
     def OnMaterialPaletteUpdate(*args): return _imesh.iTerrainRenderer_OnMaterialPaletteUpdate(*args)
     def OnMaterialMaskUpdate(*args): return _imesh.iTerrainRenderer_OnMaterialMaskUpdate(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iTerrainRenderer_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iTerrainRenderer_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iTerrainRenderer_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainRenderer
     __del__ = lambda self : None;
 iTerrainRenderer_swigregister = _imesh.iTerrainRenderer_swigregister
@@ -1862,17 +1486,11 @@ iTerrainRenderer_swigregister(iTerrainRenderer)
 iTerrainRenderer_scfGetVersion = _imesh.iTerrainRenderer_scfGetVersion
 
 class iTerrainCellHeightDataCallback(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainCellHeightDataCallback, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainCellHeightDataCallback, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def OnHeightUpdate(*args): return _imesh.iTerrainCellHeightDataCallback_OnHeightUpdate(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iTerrainCellHeightDataCallback_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iTerrainCellHeightDataCallback_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iTerrainCellHeightDataCallback_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainCellHeightDataCallback
     __del__ = lambda self : None;
 iTerrainCellHeightDataCallback_swigregister = _imesh.iTerrainCellHeightDataCallback_swigregister
@@ -1880,19 +1498,13 @@ iTerrainCellHeightDataCallback_swigregister(iTerrainCellHeightDataCallback)
 iTerrainCellHeightDataCallback_scfGetVersion = _imesh.iTerrainCellHeightDataCallback_scfGetVersion
 
 class iTerrainCellLoadCallback(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainCellLoadCallback, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainCellLoadCallback, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def OnCellLoad(*args): return _imesh.iTerrainCellLoadCallback_OnCellLoad(*args)
     def OnCellPreLoad(*args): return _imesh.iTerrainCellLoadCallback_OnCellPreLoad(*args)
     def OnCellUnload(*args): return _imesh.iTerrainCellLoadCallback_OnCellUnload(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iTerrainCellLoadCallback_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iTerrainCellLoadCallback_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iTerrainCellLoadCallback_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainCellLoadCallback
     __del__ = lambda self : None;
 iTerrainCellLoadCallback_swigregister = _imesh.iTerrainCellLoadCallback_swigregister
@@ -1900,12 +1512,7 @@ iTerrainCellLoadCallback_swigregister(iTerrainCellLoadCallback)
 iTerrainCellLoadCallback_scfGetVersion = _imesh.iTerrainCellLoadCallback_scfGetVersion
 
 class iTerrainSystem(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainSystem, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainSystem, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetCell(*args): return _imesh.iTerrainSystem_GetCell(*args)
@@ -1931,8 +1538,7 @@ class iTerrainSystem(core.iBase):
     def RemoveCellLoadListener(*args): return _imesh.iTerrainSystem_RemoveCellLoadListener(*args)
     def AddCellHeightUpdateListener(*args): return _imesh.iTerrainSystem_AddCellHeightUpdateListener(*args)
     def RemoveCellHeightUpdateListener(*args): return _imesh.iTerrainSystem_RemoveCellHeightUpdateListener(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iTerrainSystem_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iTerrainSystem_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iTerrainSystem_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainSystem
     __del__ = lambda self : None;
 iTerrainSystem_swigregister = _imesh.iTerrainSystem_swigregister
@@ -1940,12 +1546,7 @@ iTerrainSystem_swigregister(iTerrainSystem)
 iTerrainSystem_scfGetVersion = _imesh.iTerrainSystem_scfGetVersion
 
 class iTerrainCell(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainCell, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainCell, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     NotLoaded = _imesh.iTerrainCell_NotLoaded
@@ -1986,8 +1587,7 @@ class iTerrainCell(core.iBase):
     def SetCollisionData(*args): return _imesh.iTerrainCell_SetCollisionData(*args)
     def GetFeederData(*args): return _imesh.iTerrainCell_GetFeederData(*args)
     def SetFeederData(*args): return _imesh.iTerrainCell_SetFeederData(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iTerrainCell_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iTerrainCell_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iTerrainCell_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainCell
     __del__ = lambda self : None;
 iTerrainCell_swigregister = _imesh.iTerrainCell_swigregister
@@ -1995,20 +1595,14 @@ iTerrainCell_swigregister(iTerrainCell)
 iTerrainCell_scfGetVersion = _imesh.iTerrainCell_scfGetVersion
 
 class iTerrainFactoryCell(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainFactoryCell, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainFactoryCell, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetRenderProperties(*args): return _imesh.iTerrainFactoryCell_GetRenderProperties(*args)
     def GetCollisionProperties(*args): return _imesh.iTerrainFactoryCell_GetCollisionProperties(*args)
     def GetFeederProperties(*args): return _imesh.iTerrainFactoryCell_GetFeederProperties(*args)
     def SetBaseMaterial(*args): return _imesh.iTerrainFactoryCell_SetBaseMaterial(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iTerrainFactoryCell_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iTerrainFactoryCell_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iTerrainFactoryCell_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainFactoryCell
     __del__ = lambda self : None;
 iTerrainFactoryCell_swigregister = _imesh.iTerrainFactoryCell_swigregister
@@ -2016,12 +1610,7 @@ iTerrainFactoryCell_swigregister(iTerrainFactoryCell)
 iTerrainFactoryCell_scfGetVersion = _imesh.iTerrainFactoryCell_scfGetVersion
 
 class iTerrainFactory(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainFactory, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainFactory, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetRenderer(*args): return _imesh.iTerrainFactory_SetRenderer(*args)
@@ -2031,8 +1620,7 @@ class iTerrainFactory(core.iBase):
     def SetMaxLoadedCells(*args): return _imesh.iTerrainFactory_SetMaxLoadedCells(*args)
     def SetVirtualViewDistance(*args): return _imesh.iTerrainFactory_SetVirtualViewDistance(*args)
     def SetAutoPreLoad(*args): return _imesh.iTerrainFactory_SetAutoPreLoad(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iTerrainFactory_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iTerrainFactory_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iTerrainFactory_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainFactory
     __del__ = lambda self : None;
 iTerrainFactory_swigregister = _imesh.iTerrainFactory_swigregister
@@ -2058,33 +1646,16 @@ CS_PARTICLE_INTEGRATE_BOTH = _imesh.CS_PARTICLE_INTEGRATE_BOTH
 CS_PARTICLE_LOCAL_MODE = _imesh.CS_PARTICLE_LOCAL_MODE
 CS_PARTICLE_LOCAL_EMITTER = _imesh.CS_PARTICLE_LOCAL_EMITTER
 CS_PARTICLE_WORLD_MODE = _imesh.CS_PARTICLE_WORLD_MODE
-class csParticle(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csParticle, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csParticle, name)
+class csParticle(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["position"] = _imesh.csParticle_position_set
-    __swig_getmethods__["position"] = _imesh.csParticle_position_get
-    if _newclass:position = _swig_property(_imesh.csParticle_position_get, _imesh.csParticle_position_set)
-    __swig_setmethods__["mass"] = _imesh.csParticle_mass_set
-    __swig_getmethods__["mass"] = _imesh.csParticle_mass_get
-    if _newclass:mass = _swig_property(_imesh.csParticle_mass_get, _imesh.csParticle_mass_set)
-    __swig_setmethods__["orientation"] = _imesh.csParticle_orientation_set
-    __swig_getmethods__["orientation"] = _imesh.csParticle_orientation_get
-    if _newclass:orientation = _swig_property(_imesh.csParticle_orientation_get, _imesh.csParticle_orientation_set)
-    __swig_setmethods__["linearVelocity"] = _imesh.csParticle_linearVelocity_set
-    __swig_getmethods__["linearVelocity"] = _imesh.csParticle_linearVelocity_get
-    if _newclass:linearVelocity = _swig_property(_imesh.csParticle_linearVelocity_get, _imesh.csParticle_linearVelocity_set)
-    __swig_setmethods__["timeToLive"] = _imesh.csParticle_timeToLive_set
-    __swig_getmethods__["timeToLive"] = _imesh.csParticle_timeToLive_get
-    if _newclass:timeToLive = _swig_property(_imesh.csParticle_timeToLive_get, _imesh.csParticle_timeToLive_set)
-    __swig_setmethods__["angularVelocity"] = _imesh.csParticle_angularVelocity_set
-    __swig_getmethods__["angularVelocity"] = _imesh.csParticle_angularVelocity_get
-    if _newclass:angularVelocity = _swig_property(_imesh.csParticle_angularVelocity_get, _imesh.csParticle_angularVelocity_set)
-    __swig_setmethods__["pad"] = _imesh.csParticle_pad_set
-    __swig_getmethods__["pad"] = _imesh.csParticle_pad_get
-    if _newclass:pad = _swig_property(_imesh.csParticle_pad_get, _imesh.csParticle_pad_set)
+    position = _swig_property(_imesh.csParticle_position_get, _imesh.csParticle_position_set)
+    mass = _swig_property(_imesh.csParticle_mass_get, _imesh.csParticle_mass_set)
+    orientation = _swig_property(_imesh.csParticle_orientation_get, _imesh.csParticle_orientation_set)
+    linearVelocity = _swig_property(_imesh.csParticle_linearVelocity_get, _imesh.csParticle_linearVelocity_set)
+    timeToLive = _swig_property(_imesh.csParticle_timeToLive_get, _imesh.csParticle_timeToLive_set)
+    angularVelocity = _swig_property(_imesh.csParticle_angularVelocity_get, _imesh.csParticle_angularVelocity_set)
+    pad = _swig_property(_imesh.csParticle_pad_get, _imesh.csParticle_pad_set)
     def __init__(self, *args): 
         this = _imesh.new_csParticle(*args)
         try: self.this.append(this)
@@ -2094,21 +1665,12 @@ class csParticle(_object):
 csParticle_swigregister = _imesh.csParticle_swigregister
 csParticle_swigregister(csParticle)
 
-class csParticleAux(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csParticleAux, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csParticleAux, name)
+class csParticleAux(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["color"] = _imesh.csParticleAux_color_set
-    __swig_getmethods__["color"] = _imesh.csParticleAux_color_get
-    if _newclass:color = _swig_property(_imesh.csParticleAux_color_get, _imesh.csParticleAux_color_set)
-    __swig_setmethods__["particleSize"] = _imesh.csParticleAux_particleSize_set
-    __swig_getmethods__["particleSize"] = _imesh.csParticleAux_particleSize_get
-    if _newclass:particleSize = _swig_property(_imesh.csParticleAux_particleSize_get, _imesh.csParticleAux_particleSize_set)
-    __swig_setmethods__["pad"] = _imesh.csParticleAux_pad_set
-    __swig_getmethods__["pad"] = _imesh.csParticleAux_pad_get
-    if _newclass:pad = _swig_property(_imesh.csParticleAux_pad_get, _imesh.csParticleAux_pad_set)
+    color = _swig_property(_imesh.csParticleAux_color_get, _imesh.csParticleAux_color_set)
+    particleSize = _swig_property(_imesh.csParticleAux_particleSize_get, _imesh.csParticleAux_particleSize_set)
+    pad = _swig_property(_imesh.csParticleAux_pad_get, _imesh.csParticleAux_pad_set)
     def __init__(self, *args): 
         this = _imesh.new_csParticleAux(*args)
         try: self.this.append(this)
@@ -2118,21 +1680,12 @@ class csParticleAux(_object):
 csParticleAux_swigregister = _imesh.csParticleAux_swigregister
 csParticleAux_swigregister(csParticleAux)
 
-class csParticleBuffer(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csParticleBuffer, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csParticleBuffer, name)
+class csParticleBuffer(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["particleData"] = _imesh.csParticleBuffer_particleData_set
-    __swig_getmethods__["particleData"] = _imesh.csParticleBuffer_particleData_get
-    if _newclass:particleData = _swig_property(_imesh.csParticleBuffer_particleData_get, _imesh.csParticleBuffer_particleData_set)
-    __swig_setmethods__["particleAuxData"] = _imesh.csParticleBuffer_particleAuxData_set
-    __swig_getmethods__["particleAuxData"] = _imesh.csParticleBuffer_particleAuxData_get
-    if _newclass:particleAuxData = _swig_property(_imesh.csParticleBuffer_particleAuxData_get, _imesh.csParticleBuffer_particleAuxData_set)
-    __swig_setmethods__["particleCount"] = _imesh.csParticleBuffer_particleCount_set
-    __swig_getmethods__["particleCount"] = _imesh.csParticleBuffer_particleCount_get
-    if _newclass:particleCount = _swig_property(_imesh.csParticleBuffer_particleCount_get, _imesh.csParticleBuffer_particleCount_set)
+    particleData = _swig_property(_imesh.csParticleBuffer_particleData_get, _imesh.csParticleBuffer_particleData_set)
+    particleAuxData = _swig_property(_imesh.csParticleBuffer_particleAuxData_get, _imesh.csParticleBuffer_particleAuxData_set)
+    particleCount = _swig_property(_imesh.csParticleBuffer_particleCount_get, _imesh.csParticleBuffer_particleCount_set)
     def __init__(self, *args): 
         this = _imesh.new_csParticleBuffer(*args)
         try: self.this.append(this)
@@ -2143,12 +1696,7 @@ csParticleBuffer_swigregister = _imesh.csParticleBuffer_swigregister
 csParticleBuffer_swigregister(csParticleBuffer)
 
 class iParticleEmitter(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iParticleEmitter, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iParticleEmitter, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetEnabled(*args): return _imesh.iParticleEmitter_SetEnabled(*args)
@@ -2166,8 +1714,7 @@ class iParticleEmitter(core.iBase):
     def Clone(*args): return _imesh.iParticleEmitter_Clone(*args)
     def ParticlesToEmit(*args): return _imesh.iParticleEmitter_ParticlesToEmit(*args)
     def EmitParticles(*args): return _imesh.iParticleEmitter_EmitParticles(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iParticleEmitter_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iParticleEmitter_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iParticleEmitter_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iParticleEmitter
     __del__ = lambda self : None;
 iParticleEmitter_swigregister = _imesh.iParticleEmitter_swigregister
@@ -2175,18 +1722,12 @@ iParticleEmitter_swigregister(iParticleEmitter)
 iParticleEmitter_scfGetVersion = _imesh.iParticleEmitter_scfGetVersion
 
 class iParticleEffector(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iParticleEffector, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iParticleEffector, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Clone(*args): return _imesh.iParticleEffector_Clone(*args)
     def EffectParticles(*args): return _imesh.iParticleEffector_EffectParticles(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iParticleEffector_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iParticleEffector_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iParticleEffector_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iParticleEffector
     __del__ = lambda self : None;
 iParticleEffector_swigregister = _imesh.iParticleEffector_swigregister
@@ -2194,12 +1735,7 @@ iParticleEffector_swigregister(iParticleEffector)
 iParticleEffector_scfGetVersion = _imesh.iParticleEffector_scfGetVersion
 
 class iParticleSystemBase(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iParticleSystemBase, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iParticleSystemBase, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetParticleRenderOrientation(*args): return _imesh.iParticleSystemBase_SetParticleRenderOrientation(*args)
@@ -2228,8 +1764,7 @@ class iParticleSystemBase(core.iBase):
     def GetEffector(*args): return _imesh.iParticleSystemBase_GetEffector(*args)
     def RemoveEffector(*args): return _imesh.iParticleSystemBase_RemoveEffector(*args)
     def GetEffectorCount(*args): return _imesh.iParticleSystemBase_GetEffectorCount(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iParticleSystemBase_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iParticleSystemBase_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iParticleSystemBase_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iParticleSystemBase
     __del__ = lambda self : None;
 iParticleSystemBase_swigregister = _imesh.iParticleSystemBase_swigregister
@@ -2237,18 +1772,12 @@ iParticleSystemBase_swigregister(iParticleSystemBase)
 iParticleSystemBase_scfGetVersion = _imesh.iParticleSystemBase_scfGetVersion
 
 class iParticleSystemFactory(iParticleSystemBase):
-    __swig_setmethods__ = {}
-    for _s in [iParticleSystemBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iParticleSystemFactory, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iParticleSystemBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iParticleSystemFactory, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetDeepCreation(*args): return _imesh.iParticleSystemFactory_SetDeepCreation(*args)
     def GetDeepCreation(*args): return _imesh.iParticleSystemFactory_GetDeepCreation(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iParticleSystemFactory_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iParticleSystemFactory_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iParticleSystemFactory_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iParticleSystemFactory
     __del__ = lambda self : None;
 iParticleSystemFactory_swigregister = _imesh.iParticleSystemFactory_swigregister
@@ -2256,12 +1785,7 @@ iParticleSystemFactory_swigregister(iParticleSystemFactory)
 iParticleSystemFactory_scfGetVersion = _imesh.iParticleSystemFactory_scfGetVersion
 
 class iParticleSystem(iParticleSystemBase):
-    __swig_setmethods__ = {}
-    for _s in [iParticleSystemBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iParticleSystem, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iParticleSystemBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iParticleSystem, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetParticleCount(*args): return _imesh.iParticleSystem_GetParticleCount(*args)
@@ -2269,8 +1793,7 @@ class iParticleSystem(iParticleSystemBase):
     def GetParticleAux(*args): return _imesh.iParticleSystem_GetParticleAux(*args)
     def LockForExternalControl(*args): return _imesh.iParticleSystem_LockForExternalControl(*args)
     def Advance(*args): return _imesh.iParticleSystem_Advance(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iParticleSystem_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iParticleSystem_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iParticleSystem_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iParticleSystem
     __del__ = lambda self : None;
 iParticleSystem_swigregister = _imesh.iParticleSystem_swigregister
@@ -2281,12 +1804,7 @@ CS_PARTICLE_BUILTIN_CENTER = _imesh.CS_PARTICLE_BUILTIN_CENTER
 CS_PARTICLE_BUILTIN_VOLUME = _imesh.CS_PARTICLE_BUILTIN_VOLUME
 CS_PARTICLE_BUILTIN_SURFACE = _imesh.CS_PARTICLE_BUILTIN_SURFACE
 class iParticleBuiltinEmitterBase(iParticleEmitter):
-    __swig_setmethods__ = {}
-    for _s in [iParticleEmitter]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iParticleBuiltinEmitterBase, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iParticleEmitter]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iParticleBuiltinEmitterBase, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetPosition(*args): return _imesh.iParticleBuiltinEmitterBase_SetPosition(*args)
@@ -2297,8 +1815,7 @@ class iParticleBuiltinEmitterBase(iParticleEmitter):
     def GetUniformVelocity(*args): return _imesh.iParticleBuiltinEmitterBase_GetUniformVelocity(*args)
     def SetInitialVelocity(*args): return _imesh.iParticleBuiltinEmitterBase_SetInitialVelocity(*args)
     def GetInitialVelocity(*args): return _imesh.iParticleBuiltinEmitterBase_GetInitialVelocity(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iParticleBuiltinEmitterBase_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iParticleBuiltinEmitterBase_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iParticleBuiltinEmitterBase_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iParticleBuiltinEmitterBase
     __del__ = lambda self : None;
 iParticleBuiltinEmitterBase_swigregister = _imesh.iParticleBuiltinEmitterBase_swigregister
@@ -2306,18 +1823,12 @@ iParticleBuiltinEmitterBase_swigregister(iParticleBuiltinEmitterBase)
 iParticleBuiltinEmitterBase_scfGetVersion = _imesh.iParticleBuiltinEmitterBase_scfGetVersion
 
 class iParticleBuiltinEmitterSphere(iParticleBuiltinEmitterBase):
-    __swig_setmethods__ = {}
-    for _s in [iParticleBuiltinEmitterBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iParticleBuiltinEmitterSphere, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iParticleBuiltinEmitterBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iParticleBuiltinEmitterSphere, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetRadius(*args): return _imesh.iParticleBuiltinEmitterSphere_SetRadius(*args)
     def GetRadius(*args): return _imesh.iParticleBuiltinEmitterSphere_GetRadius(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iParticleBuiltinEmitterSphere_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iParticleBuiltinEmitterSphere_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iParticleBuiltinEmitterSphere_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iParticleBuiltinEmitterSphere
     __del__ = lambda self : None;
 iParticleBuiltinEmitterSphere_swigregister = _imesh.iParticleBuiltinEmitterSphere_swigregister
@@ -2325,20 +1836,14 @@ iParticleBuiltinEmitterSphere_swigregister(iParticleBuiltinEmitterSphere)
 iParticleBuiltinEmitterSphere_scfGetVersion = _imesh.iParticleBuiltinEmitterSphere_scfGetVersion
 
 class iParticleBuiltinEmitterCone(iParticleBuiltinEmitterBase):
-    __swig_setmethods__ = {}
-    for _s in [iParticleBuiltinEmitterBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iParticleBuiltinEmitterCone, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iParticleBuiltinEmitterBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iParticleBuiltinEmitterCone, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetExtent(*args): return _imesh.iParticleBuiltinEmitterCone_SetExtent(*args)
     def GetExtent(*args): return _imesh.iParticleBuiltinEmitterCone_GetExtent(*args)
     def SetConeAngle(*args): return _imesh.iParticleBuiltinEmitterCone_SetConeAngle(*args)
     def GetConeAngle(*args): return _imesh.iParticleBuiltinEmitterCone_GetConeAngle(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iParticleBuiltinEmitterCone_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iParticleBuiltinEmitterCone_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iParticleBuiltinEmitterCone_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iParticleBuiltinEmitterCone
     __del__ = lambda self : None;
 iParticleBuiltinEmitterCone_swigregister = _imesh.iParticleBuiltinEmitterCone_swigregister
@@ -2346,18 +1851,12 @@ iParticleBuiltinEmitterCone_swigregister(iParticleBuiltinEmitterCone)
 iParticleBuiltinEmitterCone_scfGetVersion = _imesh.iParticleBuiltinEmitterCone_scfGetVersion
 
 class iParticleBuiltinEmitterBox(iParticleBuiltinEmitterBase):
-    __swig_setmethods__ = {}
-    for _s in [iParticleBuiltinEmitterBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iParticleBuiltinEmitterBox, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iParticleBuiltinEmitterBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iParticleBuiltinEmitterBox, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetBox(*args): return _imesh.iParticleBuiltinEmitterBox_SetBox(*args)
     def GetBox(*args): return _imesh.iParticleBuiltinEmitterBox_GetBox(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iParticleBuiltinEmitterBox_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iParticleBuiltinEmitterBox_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iParticleBuiltinEmitterBox_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iParticleBuiltinEmitterBox
     __del__ = lambda self : None;
 iParticleBuiltinEmitterBox_swigregister = _imesh.iParticleBuiltinEmitterBox_swigregister
@@ -2365,20 +1864,14 @@ iParticleBuiltinEmitterBox_swigregister(iParticleBuiltinEmitterBox)
 iParticleBuiltinEmitterBox_scfGetVersion = _imesh.iParticleBuiltinEmitterBox_scfGetVersion
 
 class iParticleBuiltinEmitterCylinder(iParticleBuiltinEmitterBase):
-    __swig_setmethods__ = {}
-    for _s in [iParticleBuiltinEmitterBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iParticleBuiltinEmitterCylinder, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iParticleBuiltinEmitterBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iParticleBuiltinEmitterCylinder, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetRadius(*args): return _imesh.iParticleBuiltinEmitterCylinder_SetRadius(*args)
     def GetRadius(*args): return _imesh.iParticleBuiltinEmitterCylinder_GetRadius(*args)
     def SetExtent(*args): return _imesh.iParticleBuiltinEmitterCylinder_SetExtent(*args)
     def GetExtent(*args): return _imesh.iParticleBuiltinEmitterCylinder_GetExtent(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iParticleBuiltinEmitterCylinder_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iParticleBuiltinEmitterCylinder_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iParticleBuiltinEmitterCylinder_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iParticleBuiltinEmitterCylinder
     __del__ = lambda self : None;
 iParticleBuiltinEmitterCylinder_swigregister = _imesh.iParticleBuiltinEmitterCylinder_swigregister
@@ -2386,20 +1879,14 @@ iParticleBuiltinEmitterCylinder_swigregister(iParticleBuiltinEmitterCylinder)
 iParticleBuiltinEmitterCylinder_scfGetVersion = _imesh.iParticleBuiltinEmitterCylinder_scfGetVersion
 
 class iParticleBuiltinEmitterFactory(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iParticleBuiltinEmitterFactory, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iParticleBuiltinEmitterFactory, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def CreateSphere(*args): return _imesh.iParticleBuiltinEmitterFactory_CreateSphere(*args)
     def CreateCone(*args): return _imesh.iParticleBuiltinEmitterFactory_CreateCone(*args)
     def CreateBox(*args): return _imesh.iParticleBuiltinEmitterFactory_CreateBox(*args)
     def CreateCylinder(*args): return _imesh.iParticleBuiltinEmitterFactory_CreateCylinder(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iParticleBuiltinEmitterFactory_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iParticleBuiltinEmitterFactory_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iParticleBuiltinEmitterFactory_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iParticleBuiltinEmitterFactory
     __del__ = lambda self : None;
 iParticleBuiltinEmitterFactory_swigregister = _imesh.iParticleBuiltinEmitterFactory_swigregister
@@ -2407,12 +1894,7 @@ iParticleBuiltinEmitterFactory_swigregister(iParticleBuiltinEmitterFactory)
 iParticleBuiltinEmitterFactory_scfGetVersion = _imesh.iParticleBuiltinEmitterFactory_scfGetVersion
 
 class iParticleBuiltinEffectorForce(iParticleEffector):
-    __swig_setmethods__ = {}
-    for _s in [iParticleEffector]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iParticleBuiltinEffectorForce, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iParticleEffector]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iParticleBuiltinEffectorForce, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetAcceleration(*args): return _imesh.iParticleBuiltinEffectorForce_SetAcceleration(*args)
@@ -2421,8 +1903,7 @@ class iParticleBuiltinEffectorForce(iParticleEffector):
     def GetForce(*args): return _imesh.iParticleBuiltinEffectorForce_GetForce(*args)
     def SetRandomAcceleration(*args): return _imesh.iParticleBuiltinEffectorForce_SetRandomAcceleration(*args)
     def GetRandomAcceleration(*args): return _imesh.iParticleBuiltinEffectorForce_GetRandomAcceleration(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iParticleBuiltinEffectorForce_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iParticleBuiltinEffectorForce_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iParticleBuiltinEffectorForce_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iParticleBuiltinEffectorForce
     __del__ = lambda self : None;
 iParticleBuiltinEffectorForce_swigregister = _imesh.iParticleBuiltinEffectorForce_swigregister
@@ -2430,20 +1911,14 @@ iParticleBuiltinEffectorForce_swigregister(iParticleBuiltinEffectorForce)
 iParticleBuiltinEffectorForce_scfGetVersion = _imesh.iParticleBuiltinEffectorForce_scfGetVersion
 
 class iParticleBuiltinEffectorLinColor(iParticleEffector):
-    __swig_setmethods__ = {}
-    for _s in [iParticleEffector]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iParticleBuiltinEffectorLinColor, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iParticleEffector]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iParticleBuiltinEffectorLinColor, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def AddColor(*args): return _imesh.iParticleBuiltinEffectorLinColor_AddColor(*args)
     def SetColor(*args): return _imesh.iParticleBuiltinEffectorLinColor_SetColor(*args)
     def GetColor(*args): return _imesh.iParticleBuiltinEffectorLinColor_GetColor(*args)
     def GetColorCount(*args): return _imesh.iParticleBuiltinEffectorLinColor_GetColorCount(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iParticleBuiltinEffectorLinColor_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iParticleBuiltinEffectorLinColor_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iParticleBuiltinEffectorLinColor_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iParticleBuiltinEffectorLinColor
     __del__ = lambda self : None;
 iParticleBuiltinEffectorLinColor_swigregister = _imesh.iParticleBuiltinEffectorLinColor_swigregister
@@ -2453,12 +1928,7 @@ iParticleBuiltinEffectorLinColor_scfGetVersion = _imesh.iParticleBuiltinEffector
 CS_PARTICLE_BUILTIN_SPIRAL = _imesh.CS_PARTICLE_BUILTIN_SPIRAL
 CS_PARTICLE_BUILTIN_RADIALPOINT = _imesh.CS_PARTICLE_BUILTIN_RADIALPOINT
 class iParticleBuiltinEffectorVelocityField(iParticleEffector):
-    __swig_setmethods__ = {}
-    for _s in [iParticleEffector]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iParticleBuiltinEffectorVelocityField, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iParticleEffector]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iParticleBuiltinEffectorVelocityField, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetType(*args): return _imesh.iParticleBuiltinEffectorVelocityField_SetType(*args)
@@ -2475,19 +1945,13 @@ iParticleBuiltinEffectorVelocityField_swigregister = _imesh.iParticleBuiltinEffe
 iParticleBuiltinEffectorVelocityField_swigregister(iParticleBuiltinEffectorVelocityField)
 
 class iParticleBuiltinEffectorFactory(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iParticleBuiltinEffectorFactory, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iParticleBuiltinEffectorFactory, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def CreateForce(*args): return _imesh.iParticleBuiltinEffectorFactory_CreateForce(*args)
     def CreateLinColor(*args): return _imesh.iParticleBuiltinEffectorFactory_CreateLinColor(*args)
     def CreateVelocityField(*args): return _imesh.iParticleBuiltinEffectorFactory_CreateVelocityField(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iParticleBuiltinEffectorFactory_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imesh.iParticleBuiltinEffectorFactory_scfGetVersion)
+    scfGetVersion = staticmethod(_imesh.iParticleBuiltinEffectorFactory_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iParticleBuiltinEffectorFactory
     __del__ = lambda self : None;
 iParticleBuiltinEffectorFactory_swigregister = _imesh.iParticleBuiltinEffectorFactory_swigregister

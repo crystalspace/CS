@@ -255,7 +255,7 @@ public:
   virtual csFlags& GetFlags () { return object_flags; }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * A bezier is a set of bezier curves.
@@ -704,7 +704,7 @@ public:
   /** @} */
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * Thing type. This is the plugin you have to use to create instances

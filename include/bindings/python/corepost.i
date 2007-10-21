@@ -171,7 +171,7 @@ PYITERATOR_PROTOCOL(scfInterfaceMetadataList)
           csmodule(corecvar.iSCF_SCF)
   def SetSCFPointer(scf_pointer):
       """Set SCF Pointer to all CrystalSpace modules"""
-      corecvar.iSCF_SCF = scf_pointer
+      SetCoreSCFPointer(scf_pointer)
       SyncSCFPointers()
   def GetSCFPointer():
       """Get SCF Pointer"""

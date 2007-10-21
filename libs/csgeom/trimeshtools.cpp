@@ -159,7 +159,7 @@ csTriangleMeshEdge* csTriangleMeshTools::CalculateEdges (iTriangleMesh* mesh,
         if (le->vt2 == vt2s)
 	{
 	  // Found!
-	  le->tri2 = i;
+	  le->tri2 = int (i);
 	  if (prev) prev->next = le->next;
 	  else edge_table[vt1s] = le->next;
 	  le->next = edge_collector;
@@ -185,7 +185,7 @@ csTriangleMeshEdge* csTriangleMeshTools::CalculateEdges (iTriangleMesh* mesh,
 	}
 	le->vt1 = vt1s;
 	le->vt2 = vt2s;
-	le->tri1 = i;
+	le->tri1 = int (i);
 	le->tri2 = -1;
 	le->next = edge_table[vt1s];
 	edge_table[vt1s] = le;
@@ -635,14 +635,14 @@ static bool In2D_X (const csVector3& v1, const csVector3& v2,
 
 bool csTriangleMeshTools::PointInClosedMesh (const csVector3& point,
   	csVector3* vertices,
-  	csTriangleMinMax* tris, int tri_count,
+  	csTriangleMinMax* tris, size_t tri_count,
 	csPlane3* planes)
 {
   // This algorithm assumes the triangles are sorted from left to right
   // (minimum x). That way we can do some quick rejections.
   float nearest_found_x = 1000000000.0f;
-  int nearest_idx = -1;
-  int i;
+  size_t nearest_idx = (size_t)-1;
+  size_t i;
   for (i = 0 ; i < tri_count ; i++)
   {
     // If the minimum x is greater then the nearest found x then
@@ -669,7 +669,7 @@ bool csTriangleMeshTools::PointInClosedMesh (const csVector3& point,
     }
   }
 
-  if (nearest_idx == -1)
+  if (nearest_idx == (size_t)-1)
   {
     // We found no triangle. So we are certainly outside.
     return false;
@@ -684,10 +684,10 @@ bool csTriangleMeshTools::PointInClosedMesh (const csVector3& point,
 bool csTriangleMeshTools::LineInClosedMesh (
 	const csVector3& p1, const csVector3& p2,
   	csVector3* vertices,
-  	csTriangleMinMax* tris, int tri_count,
+  	csTriangleMinMax* tris, size_t tri_count,
 	csPlane3* /*planes*/)
 {
-  int i;
+  size_t i;
   float minx = p1.x;
   float maxx = minx;
   if (p2.x < minx) minx = p2.x;
@@ -714,10 +714,10 @@ bool csTriangleMeshTools::LineInClosedMesh (
 
 bool csTriangleMeshTools::BoxInClosedMesh (const csBox3& box,
   	csVector3* vertices,
-  	csTriangleMinMax* tris, int tri_count,
+  	csTriangleMinMax* tris, size_t tri_count,
 	csPlane3* /*planes*/)
 {
-  int i;
+  size_t i;
   float minx = box.MinX ();
   float maxx = box.MaxX ();
 

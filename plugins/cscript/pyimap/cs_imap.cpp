@@ -2658,6 +2658,12 @@ static swig_module_info swig_module = {swig_types, 171, 0, 0, 0, 0};
 #  error "This python version requires swig to be run with the '-classic' option"
 # endif
 #endif
+#if (PY_VERSION_HEX <= 0x02020000)
+# error "This python version requires swig to be run with the '-nomodern' option"
+#endif
+#if (PY_VERSION_HEX <= 0x02020000)
+# error "This python version requires swig to be run with the '-nomodernargs' option"
+#endif
 
 /*-----------------------------------------------
               @(target):= _imap.so
@@ -3034,7 +3040,7 @@ SWIGINTERN PyObject *_wrap__SetSCFPointer(PyObject *SWIGUNUSEDPARM(self), PyObje
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:_SetSCFPointer",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"_SetSCFPointer",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSCF, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "_SetSCFPointer" "', argument " "1"" of type '" "iSCF *""'"); 
@@ -3052,7 +3058,7 @@ SWIGINTERN PyObject *_wrap__GetSCFPointer(PyObject *SWIGUNUSEDPARM(self), PyObje
   PyObject *resultobj = 0;
   iSCF *result = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)":_GetSCFPointer")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"_GetSCFPointer",0,0)) SWIG_fail;
   result = (iSCF *)GetSCFPointer();
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iSCF, 0 |  0 );
   return resultobj;
@@ -3069,7 +3075,7 @@ SWIGINTERN PyObject *_wrap_iLoaderStatus_IsReady(PyObject *SWIGUNUSEDPARM(self),
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iLoaderStatus_IsReady",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoaderStatus_IsReady",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoaderStatus, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoaderStatus_IsReady" "', argument " "1"" of type '" "iLoaderStatus *""'"); 
@@ -3091,7 +3097,7 @@ SWIGINTERN PyObject *_wrap_iLoaderStatus_IsError(PyObject *SWIGUNUSEDPARM(self),
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iLoaderStatus_IsError",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoaderStatus_IsError",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoaderStatus, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoaderStatus_IsError" "', argument " "1"" of type '" "iLoaderStatus *""'"); 
@@ -3112,7 +3118,7 @@ SWIGINTERN PyObject *_wrap_delete_iLoaderStatus(PyObject *SWIGUNUSEDPARM(self), 
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iLoaderStatus",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iLoaderStatus",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoaderStatus, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iLoaderStatus" "', argument " "1"" of type '" "iLoaderStatus *""'"); 
@@ -3129,7 +3135,7 @@ fail:
 
 SWIGINTERN PyObject *iLoaderStatus_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iLoaderStatus, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -3152,7 +3158,7 @@ SWIGINTERN PyObject *_wrap_iMissingLoaderData_MissingMaterial(PyObject *SWIGUNUS
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iMissingLoaderData_MissingMaterial",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMissingLoaderData_MissingMaterial",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMissingLoaderData, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMissingLoaderData_MissingMaterial" "', argument " "1"" of type '" "iMissingLoaderData *""'"); 
@@ -3198,7 +3204,7 @@ SWIGINTERN PyObject *_wrap_iMissingLoaderData_MissingTexture(PyObject *SWIGUNUSE
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iMissingLoaderData_MissingTexture",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMissingLoaderData_MissingTexture",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMissingLoaderData, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMissingLoaderData_MissingTexture" "', argument " "1"" of type '" "iMissingLoaderData *""'"); 
@@ -3239,7 +3245,7 @@ SWIGINTERN PyObject *_wrap_iMissingLoaderData_MissingShader(PyObject *SWIGUNUSED
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iMissingLoaderData_MissingShader",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMissingLoaderData_MissingShader",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMissingLoaderData, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMissingLoaderData_MissingShader" "', argument " "1"" of type '" "iMissingLoaderData *""'"); 
@@ -3273,7 +3279,7 @@ SWIGINTERN PyObject *_wrap_iMissingLoaderData_MissingFactory(PyObject *SWIGUNUSE
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iMissingLoaderData_MissingFactory",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMissingLoaderData_MissingFactory",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMissingLoaderData, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMissingLoaderData_MissingFactory" "', argument " "1"" of type '" "iMissingLoaderData *""'"); 
@@ -3307,7 +3313,7 @@ SWIGINTERN PyObject *_wrap_iMissingLoaderData_MissingMesh(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iMissingLoaderData_MissingMesh",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMissingLoaderData_MissingMesh",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMissingLoaderData, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMissingLoaderData_MissingMesh" "', argument " "1"" of type '" "iMissingLoaderData *""'"); 
@@ -3341,7 +3347,7 @@ SWIGINTERN PyObject *_wrap_iMissingLoaderData_MissingSector(PyObject *SWIGUNUSED
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iMissingLoaderData_MissingSector",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMissingLoaderData_MissingSector",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMissingLoaderData, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMissingLoaderData_MissingSector" "', argument " "1"" of type '" "iMissingLoaderData *""'"); 
@@ -3375,7 +3381,7 @@ SWIGINTERN PyObject *_wrap_iMissingLoaderData_MissingLight(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iMissingLoaderData_MissingLight",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMissingLoaderData_MissingLight",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMissingLoaderData, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMissingLoaderData_MissingLight" "', argument " "1"" of type '" "iMissingLoaderData *""'"); 
@@ -3403,7 +3409,7 @@ SWIGINTERN PyObject *_wrap_delete_iMissingLoaderData(PyObject *SWIGUNUSEDPARM(se
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iMissingLoaderData",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iMissingLoaderData",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMissingLoaderData, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iMissingLoaderData" "', argument " "1"" of type '" "iMissingLoaderData *""'"); 
@@ -3420,7 +3426,7 @@ fail:
 
 SWIGINTERN PyObject *iMissingLoaderData_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iMissingLoaderData, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -3442,7 +3448,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadImage__SWIG_0(PyObject *SWIGUNUSEDPARM(se
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iLoader_LoadImage",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadImage",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadImage" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -3498,7 +3504,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadImage__SWIG_1(PyObject *SWIGUNUSEDPARM(se
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iLoader_LoadImage",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadImage",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadImage" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -3561,7 +3567,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_0(PyObject *SWIGUNUSEDPARM(
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iLoader_LoadTexture",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadTexture",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadTexture" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -3635,7 +3641,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_1(PyObject *SWIGUNUSEDPARM(
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iLoader_LoadTexture",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadTexture",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadTexture" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -3700,7 +3706,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_2(PyObject *SWIGUNUSEDPARM(
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iLoader_LoadTexture",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadTexture",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadTexture" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -3756,7 +3762,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_3(PyObject *SWIGUNUSEDPARM(
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iLoader_LoadTexture",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadTexture",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadTexture" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -3836,7 +3842,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_4(PyObject *SWIGUNUSEDPARM(
   PyObject * obj7 = 0 ;
   PyObject * obj8 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOOOO:iLoader_LoadTexture",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadTexture",9,9,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadTexture" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -3932,7 +3938,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_5(PyObject *SWIGUNUSEDPARM(
   PyObject * obj6 = 0 ;
   PyObject * obj7 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOOO:iLoader_LoadTexture",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadTexture",8,8,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadTexture" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -4019,7 +4025,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_6(PyObject *SWIGUNUSEDPARM(
   PyObject * obj5 = 0 ;
   PyObject * obj6 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOO:iLoader_LoadTexture",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadTexture",7,7,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadTexture" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -4097,7 +4103,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_7(PyObject *SWIGUNUSEDPARM(
   PyObject * obj4 = 0 ;
   PyObject * obj5 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOO:iLoader_LoadTexture",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadTexture",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadTexture" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -4166,7 +4172,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_8(PyObject *SWIGUNUSEDPARM(
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iLoader_LoadTexture",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadTexture",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadTexture" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -4226,7 +4232,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_9(PyObject *SWIGUNUSEDPARM(
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iLoader_LoadTexture",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadTexture",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadTexture" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -4277,7 +4283,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_10(PyObject *SWIGUNUSEDPARM
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iLoader_LoadTexture",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadTexture",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadTexture" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -4321,7 +4327,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadImage__SWIG_2(PyObject *SWIGUNUSEDPARM(se
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iLoader_LoadImage",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadImage",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadImage" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -4374,7 +4380,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadImage__SWIG_3(PyObject *SWIGUNUSEDPARM(se
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iLoader_LoadImage",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadImage",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadImage" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -4517,7 +4523,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_11(PyObject *SWIGUNUSEDPARM
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iLoader_LoadTexture",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadTexture",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadTexture" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -4588,7 +4594,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_12(PyObject *SWIGUNUSEDPARM
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iLoader_LoadTexture",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadTexture",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadTexture" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -4650,7 +4656,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_13(PyObject *SWIGUNUSEDPARM
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iLoader_LoadTexture",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadTexture",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadTexture" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -4703,7 +4709,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_14(PyObject *SWIGUNUSEDPARM
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iLoader_LoadTexture",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadTexture",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadTexture" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -4776,7 +4782,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_15(PyObject *SWIGUNUSEDPARM
   PyObject * obj6 = 0 ;
   PyObject * obj7 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOOO:iLoader_LoadTexture",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadTexture",8,8,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadTexture" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -4860,7 +4866,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_16(PyObject *SWIGUNUSEDPARM
   PyObject * obj5 = 0 ;
   PyObject * obj6 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOO:iLoader_LoadTexture",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadTexture",7,7,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadTexture" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -4935,7 +4941,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_17(PyObject *SWIGUNUSEDPARM
   PyObject * obj4 = 0 ;
   PyObject * obj5 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOO:iLoader_LoadTexture",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadTexture",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadTexture" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -5001,7 +5007,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_18(PyObject *SWIGUNUSEDPARM
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iLoader_LoadTexture",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadTexture",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadTexture" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -5058,7 +5064,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_19(PyObject *SWIGUNUSEDPARM
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iLoader_LoadTexture",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadTexture",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadTexture" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -5106,7 +5112,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_20(PyObject *SWIGUNUSEDPARM
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iLoader_LoadTexture",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadTexture",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadTexture" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -5769,7 +5775,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadSoundSysData(PyObject *SWIGUNUSEDPARM(sel
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iLoader_LoadSoundSysData",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadSoundSysData",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadSoundSysData" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -5824,7 +5830,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadSoundStream(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iLoader_LoadSoundStream",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadSoundStream",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadSoundStream" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -5885,7 +5891,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadSoundWrapper(PyObject *SWIGUNUSEDPARM(sel
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iLoader_LoadSoundWrapper",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadSoundWrapper",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadSoundWrapper" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -5938,7 +5944,7 @@ SWIGINTERN PyObject *_wrap_iLoader_ThreadedLoadMapFile__SWIG_0(PyObject *SWIGUNU
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iLoader_ThreadedLoadMapFile",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_ThreadedLoadMapFile",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_ThreadedLoadMapFile" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -5995,7 +6001,7 @@ SWIGINTERN PyObject *_wrap_iLoader_ThreadedLoadMapFile__SWIG_1(PyObject *SWIGUNU
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iLoader_ThreadedLoadMapFile",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_ThreadedLoadMapFile",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_ThreadedLoadMapFile" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -6043,7 +6049,7 @@ SWIGINTERN PyObject *_wrap_iLoader_ThreadedLoadMapFile__SWIG_2(PyObject *SWIGUNU
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iLoader_ThreadedLoadMapFile",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_ThreadedLoadMapFile",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_ThreadedLoadMapFile" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -6082,7 +6088,7 @@ SWIGINTERN PyObject *_wrap_iLoader_ThreadedLoadMapFile__SWIG_3(PyObject *SWIGUNU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iLoader_ThreadedLoadMapFile",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_ThreadedLoadMapFile",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_ThreadedLoadMapFile" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -6242,7 +6248,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadMapFile__SWIG_0(PyObject *SWIGUNUSEDPARM(
   PyObject * obj6 = 0 ;
   PyObject * obj7 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOOO:iLoader_LoadMapFile",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadMapFile",8,8,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadMapFile" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -6326,7 +6332,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadMapFile__SWIG_1(PyObject *SWIGUNUSEDPARM(
   PyObject * obj5 = 0 ;
   PyObject * obj6 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOO:iLoader_LoadMapFile",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadMapFile",7,7,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadMapFile" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -6401,7 +6407,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadMapFile__SWIG_2(PyObject *SWIGUNUSEDPARM(
   PyObject * obj4 = 0 ;
   PyObject * obj5 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOO:iLoader_LoadMapFile",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadMapFile",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadMapFile" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -6467,7 +6473,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadMapFile__SWIG_3(PyObject *SWIGUNUSEDPARM(
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iLoader_LoadMapFile",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadMapFile",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadMapFile" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -6524,7 +6530,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadMapFile__SWIG_4(PyObject *SWIGUNUSEDPARM(
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iLoader_LoadMapFile",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadMapFile",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadMapFile" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -6572,7 +6578,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadMapFile__SWIG_5(PyObject *SWIGUNUSEDPARM(
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iLoader_LoadMapFile",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadMapFile",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadMapFile" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -6611,7 +6617,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadMapFile__SWIG_6(PyObject *SWIGUNUSEDPARM(
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iLoader_LoadMapFile",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadMapFile",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadMapFile" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -6894,7 +6900,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadMap__SWIG_0(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj6 = 0 ;
   PyObject * obj7 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOOO:iLoader_LoadMap",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadMap",8,8,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadMap" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -6975,7 +6981,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadMap__SWIG_1(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj5 = 0 ;
   PyObject * obj6 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOO:iLoader_LoadMap",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadMap",7,7,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadMap" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -7047,7 +7053,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadMap__SWIG_2(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj4 = 0 ;
   PyObject * obj5 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOO:iLoader_LoadMap",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadMap",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadMap" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -7110,7 +7116,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadMap__SWIG_3(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iLoader_LoadMap",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadMap",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadMap" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -7164,7 +7170,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadMap__SWIG_4(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iLoader_LoadMap",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadMap",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadMap" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -7209,7 +7215,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadMap__SWIG_5(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iLoader_LoadMap",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadMap",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadMap" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -7245,7 +7251,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadMap__SWIG_6(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iLoader_LoadMap",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadMap",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadMap" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -7530,7 +7536,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile__SWIG_0(PyObject *SWIGUNUSEDP
   PyObject * obj5 = 0 ;
   PyObject * obj6 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOO:iLoader_LoadLibraryFile",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadLibraryFile",7,7,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadLibraryFile" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -7605,7 +7611,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile__SWIG_1(PyObject *SWIGUNUSEDP
   PyObject * obj4 = 0 ;
   PyObject * obj5 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOO:iLoader_LoadLibraryFile",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadLibraryFile",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadLibraryFile" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -7671,7 +7677,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile__SWIG_2(PyObject *SWIGUNUSEDP
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iLoader_LoadLibraryFile",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadLibraryFile",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadLibraryFile" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -7728,7 +7734,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile__SWIG_3(PyObject *SWIGUNUSEDP
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iLoader_LoadLibraryFile",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadLibraryFile",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadLibraryFile" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -7776,7 +7782,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile__SWIG_4(PyObject *SWIGUNUSEDP
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iLoader_LoadLibraryFile",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadLibraryFile",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadLibraryFile" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -7815,7 +7821,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile__SWIG_5(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iLoader_LoadLibraryFile",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadLibraryFile",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadLibraryFile" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -8045,7 +8051,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary__SWIG_0(PyObject *SWIGUNUSEDPARM(
   PyObject * obj5 = 0 ;
   PyObject * obj6 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOO:iLoader_LoadLibrary",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadLibrary",7,7,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadLibrary" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -8117,7 +8123,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary__SWIG_1(PyObject *SWIGUNUSEDPARM(
   PyObject * obj4 = 0 ;
   PyObject * obj5 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOO:iLoader_LoadLibrary",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadLibrary",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadLibrary" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -8180,7 +8186,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary__SWIG_2(PyObject *SWIGUNUSEDPARM(
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iLoader_LoadLibrary",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadLibrary",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadLibrary" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -8234,7 +8240,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary__SWIG_3(PyObject *SWIGUNUSEDPARM(
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iLoader_LoadLibrary",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadLibrary",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadLibrary" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -8279,7 +8285,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary__SWIG_4(PyObject *SWIGUNUSEDPARM(
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iLoader_LoadLibrary",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadLibrary",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadLibrary" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -8315,7 +8321,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary__SWIG_5(PyObject *SWIGUNUSEDPARM(
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iLoader_LoadLibrary",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadLibrary",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadLibrary" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -8534,7 +8540,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadMeshObjectFactory__SWIG_0(PyObject *SWIGU
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iLoader_LoadMeshObjectFactory",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadMeshObjectFactory",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadMeshObjectFactory" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -8590,7 +8596,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadMeshObjectFactory__SWIG_1(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iLoader_LoadMeshObjectFactory",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadMeshObjectFactory",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadMeshObjectFactory" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -8693,7 +8699,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadMeshObject__SWIG_0(PyObject *SWIGUNUSEDPA
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iLoader_LoadMeshObject",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadMeshObject",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadMeshObject" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -8749,7 +8755,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadMeshObject__SWIG_1(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iLoader_LoadMeshObject",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadMeshObject",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadMeshObject" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -8877,7 +8883,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_0(PyObject *SWIGUNUSEDPARM(self), 
   PyObject * obj7 = 0 ;
   PyObject * obj8 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOOOO:iLoader_Load",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_Load",9,9,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_Load" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -8976,7 +8982,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_1(PyObject *SWIGUNUSEDPARM(self), 
   PyObject * obj6 = 0 ;
   PyObject * obj7 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOOO:iLoader_Load",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_Load",8,8,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_Load" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -9065,7 +9071,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_2(PyObject *SWIGUNUSEDPARM(self), 
   PyObject * obj5 = 0 ;
   PyObject * obj6 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOO:iLoader_Load",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_Load",7,7,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_Load" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -9143,7 +9149,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_3(PyObject *SWIGUNUSEDPARM(self), 
   PyObject * obj4 = 0 ;
   PyObject * obj5 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOO:iLoader_Load",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_Load",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_Load" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -9212,7 +9218,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_4(PyObject *SWIGUNUSEDPARM(self), 
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iLoader_Load",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_Load",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_Load" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -9272,7 +9278,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_5(PyObject *SWIGUNUSEDPARM(self), 
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iLoader_Load",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_Load",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_Load" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -9323,7 +9329,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_6(PyObject *SWIGUNUSEDPARM(self), 
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iLoader_Load",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_Load",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_Load" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -9393,7 +9399,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_7(PyObject *SWIGUNUSEDPARM(self), 
   PyObject * obj7 = 0 ;
   PyObject * obj8 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOOOO:iLoader_Load",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_Load",9,9,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_Load" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -9489,7 +9495,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_8(PyObject *SWIGUNUSEDPARM(self), 
   PyObject * obj6 = 0 ;
   PyObject * obj7 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOOO:iLoader_Load",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_Load",8,8,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_Load" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -9575,7 +9581,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_9(PyObject *SWIGUNUSEDPARM(self), 
   PyObject * obj5 = 0 ;
   PyObject * obj6 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOO:iLoader_Load",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_Load",7,7,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_Load" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -9650,7 +9656,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_10(PyObject *SWIGUNUSEDPARM(self),
   PyObject * obj4 = 0 ;
   PyObject * obj5 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOO:iLoader_Load",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_Load",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_Load" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -9716,7 +9722,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_11(PyObject *SWIGUNUSEDPARM(self),
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iLoader_Load",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_Load",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_Load" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -9773,7 +9779,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_12(PyObject *SWIGUNUSEDPARM(self),
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iLoader_Load",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_Load",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_Load" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -9821,7 +9827,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_13(PyObject *SWIGUNUSEDPARM(self),
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iLoader_Load",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_Load",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_Load" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -9889,7 +9895,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_14(PyObject *SWIGUNUSEDPARM(self),
   PyObject * obj7 = 0 ;
   PyObject * obj8 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOOOO:iLoader_Load",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_Load",9,9,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_Load" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -9985,7 +9991,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_15(PyObject *SWIGUNUSEDPARM(self),
   PyObject * obj6 = 0 ;
   PyObject * obj7 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOOO:iLoader_Load",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_Load",8,8,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_Load" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -10071,7 +10077,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_16(PyObject *SWIGUNUSEDPARM(self),
   PyObject * obj5 = 0 ;
   PyObject * obj6 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOO:iLoader_Load",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_Load",7,7,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_Load" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -10146,7 +10152,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_17(PyObject *SWIGUNUSEDPARM(self),
   PyObject * obj4 = 0 ;
   PyObject * obj5 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOO:iLoader_Load",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_Load",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_Load" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -10212,7 +10218,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_18(PyObject *SWIGUNUSEDPARM(self),
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iLoader_Load",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_Load",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_Load" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -10269,7 +10275,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_19(PyObject *SWIGUNUSEDPARM(self),
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iLoader_Load",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_Load",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_Load" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -10317,7 +10323,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_20(PyObject *SWIGUNUSEDPARM(self),
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iLoader_Load",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_Load",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_Load" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -11106,7 +11112,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadShader__SWIG_0(PyObject *SWIGUNUSEDPARM(s
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iLoader_LoadShader",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadShader",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadShader" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -11162,7 +11168,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadShader__SWIG_1(PyObject *SWIGUNUSEDPARM(s
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iLoader_LoadShader",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadShader",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadShader" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -11260,7 +11266,7 @@ SWIGINTERN PyObject *_wrap_iLoader_SetAutoRegions(PyObject *SWIGUNUSEDPARM(self)
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iLoader_SetAutoRegions",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_SetAutoRegions",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_SetAutoRegions" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -11287,7 +11293,7 @@ SWIGINTERN PyObject *_wrap_iLoader_GetAutoRegions(PyObject *SWIGUNUSEDPARM(self)
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iLoader_GetAutoRegions",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_GetAutoRegions",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_GetAutoRegions" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -11305,7 +11311,7 @@ SWIGINTERN PyObject *_wrap_iLoader_scfGetVersion(PyObject *SWIGUNUSEDPARM(self),
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iLoader_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iLoader_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -11321,7 +11327,7 @@ SWIGINTERN PyObject *_wrap_delete_iLoader(PyObject *SWIGUNUSEDPARM(self), PyObje
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iLoader",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iLoader",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iLoader" "', argument " "1"" of type '" "iLoader *""'"); 
@@ -11338,7 +11344,7 @@ fail:
 
 SWIGINTERN PyObject *iLoader_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iLoader, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -11367,7 +11373,7 @@ SWIGINTERN PyObject *_wrap_iLoaderPlugin_Parse(PyObject *SWIGUNUSEDPARM(self), P
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iLoaderPlugin_Parse",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoaderPlugin_Parse",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoaderPlugin, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoaderPlugin_Parse" "', argument " "1"" of type '" "iLoaderPlugin *""'"); 
@@ -11422,7 +11428,7 @@ SWIGINTERN PyObject *_wrap_iLoaderPlugin_scfGetVersion(PyObject *SWIGUNUSEDPARM(
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iLoaderPlugin_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iLoaderPlugin_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iLoaderPlugin_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -11438,7 +11444,7 @@ SWIGINTERN PyObject *_wrap_delete_iLoaderPlugin(PyObject *SWIGUNUSEDPARM(self), 
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iLoaderPlugin",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iLoaderPlugin",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoaderPlugin, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iLoaderPlugin" "', argument " "1"" of type '" "iLoaderPlugin *""'"); 
@@ -11455,7 +11461,7 @@ fail:
 
 SWIGINTERN PyObject *iLoaderPlugin_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iLoaderPlugin, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -11484,7 +11490,7 @@ SWIGINTERN PyObject *_wrap_iBinaryLoaderPlugin_Parse(PyObject *SWIGUNUSEDPARM(se
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iBinaryLoaderPlugin_Parse",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iBinaryLoaderPlugin_Parse",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iBinaryLoaderPlugin, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBinaryLoaderPlugin_Parse" "', argument " "1"" of type '" "iBinaryLoaderPlugin *""'"); 
@@ -11539,7 +11545,7 @@ SWIGINTERN PyObject *_wrap_iBinaryLoaderPlugin_scfGetVersion(PyObject *SWIGUNUSE
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iBinaryLoaderPlugin_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iBinaryLoaderPlugin_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iBinaryLoaderPlugin_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -11555,7 +11561,7 @@ SWIGINTERN PyObject *_wrap_delete_iBinaryLoaderPlugin(PyObject *SWIGUNUSEDPARM(s
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iBinaryLoaderPlugin",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iBinaryLoaderPlugin",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iBinaryLoaderPlugin, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iBinaryLoaderPlugin" "', argument " "1"" of type '" "iBinaryLoaderPlugin *""'"); 
@@ -11572,7 +11578,7 @@ fail:
 
 SWIGINTERN PyObject *iBinaryLoaderPlugin_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iBinaryLoaderPlugin, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -11590,7 +11596,7 @@ SWIGINTERN PyObject *_wrap_iSaver_SaveMapFile__SWIG_0(PyObject *SWIGUNUSEDPARM(s
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSaver_SaveMapFile",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSaver_SaveMapFile",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSaver, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSaver_SaveMapFile" "', argument " "1"" of type '" "iSaver *""'"); 
@@ -11619,7 +11625,7 @@ SWIGINTERN PyObject *_wrap_iSaver_SaveMapFile__SWIG_1(PyObject *SWIGUNUSEDPARM(s
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSaver_SaveMapFile",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSaver_SaveMapFile",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSaver, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSaver_SaveMapFile" "', argument " "1"" of type '" "iSaver *""'"); 
@@ -11662,7 +11668,7 @@ SWIGINTERN PyObject *_wrap_iSaver_SaveMapFile__SWIG_2(PyObject *SWIGUNUSEDPARM(s
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSaver_SaveMapFile",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSaver_SaveMapFile",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSaver, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSaver_SaveMapFile" "', argument " "1"" of type '" "iSaver *""'"); 
@@ -11745,7 +11751,7 @@ SWIGINTERN PyObject *_wrap_iSaver_SaveAllRegions(PyObject *SWIGUNUSEDPARM(self),
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSaver_SaveAllRegions",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSaver_SaveAllRegions",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSaver, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSaver_SaveAllRegions" "', argument " "1"" of type '" "iSaver *""'"); 
@@ -11780,7 +11786,7 @@ SWIGINTERN PyObject *_wrap_iSaver_SaveRegionFile(PyObject *SWIGUNUSEDPARM(self),
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iSaver_SaveRegionFile",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSaver_SaveRegionFile",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSaver, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSaver_SaveRegionFile" "', argument " "1"" of type '" "iSaver *""'"); 
@@ -11827,7 +11833,7 @@ SWIGINTERN PyObject *_wrap_iSaver_SaveRegion__SWIG_0(PyObject *SWIGUNUSEDPARM(se
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSaver_SaveRegion",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSaver_SaveRegion",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSaver, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSaver_SaveRegion" "', argument " "1"" of type '" "iSaver *""'"); 
@@ -11888,7 +11894,7 @@ SWIGINTERN PyObject *_wrap_iSaver_SaveRegion__SWIG_1(PyObject *SWIGUNUSEDPARM(se
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iSaver_SaveRegion",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSaver_SaveRegion",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSaver, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSaver_SaveRegion" "', argument " "1"" of type '" "iSaver *""'"); 
@@ -11998,7 +12004,7 @@ SWIGINTERN PyObject *_wrap_iSaver_SavePortal(PyObject *SWIGUNUSEDPARM(self), PyO
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSaver_SavePortal",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSaver_SavePortal",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSaver, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSaver_SavePortal" "', argument " "1"" of type '" "iSaver *""'"); 
@@ -12029,7 +12035,7 @@ SWIGINTERN PyObject *_wrap_delete_iSaver(PyObject *SWIGUNUSEDPARM(self), PyObjec
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSaver",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSaver",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSaver, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSaver" "', argument " "1"" of type '" "iSaver *""'"); 
@@ -12046,7 +12052,7 @@ fail:
 
 SWIGINTERN PyObject *iSaver_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSaver, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }

@@ -82,16 +82,13 @@ bool csLightIterRSLoader::Initialize (iObjectRegistry* object_reg)
 
 csPtr<iBase> csLightIterRSLoader::Parse (iDocumentNode* node, 
 				       iStreamSource*,
-				       iLoaderContext* /*ldr_context*/,
+				       iLoaderContext* /*ldr_context*/,      
 				       iBase* /*context*/)
 {
   csRef<iLightIterRenderStep> step;
   step.AttachNew (new csLightIterRenderStep (object_reg));
   csRef<iRenderStepContainer> steps =
     scfQueryInterface<iRenderStepContainer> (step);
-  
-  csRef<iStringSet> stringset = csQueryRegistryTagInterface<iStringSet> (
-    object_reg, "crystalspace.shared.stringset");
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -107,23 +104,6 @@ csPtr<iBase> csLightIterRSLoader::Parse (iDocumentNode* node,
 	    return 0;
 	}
 	break;
-      case XMLTOKEN_IGNORETAG:
-        {
-          const char* tag = child->GetContentsValue ();
-          if (!tag || !*tag)
-          {
-	    synldr->Report ("crystalspace.renderloop.step.lightiter",
-	      CS_REPORTER_SEVERITY_WARNING, child, 
-	      "Empty <ignoretag> node");
-	    return false;
-          }
-          else
-          {
-            csStringID tagID = stringset->Request (tag);
-            step->SetIgnoreTag (tagID);
-          }
-        }
-        break;
       default:
 	if (synldr) synldr->ReportBadToken (child);
 	return 0;
@@ -156,7 +136,7 @@ csPtr<iRenderStep> csLightIterRenderStepFactory::Create ()
 
 csLightIterRenderStep::csLightIterRenderStep (
   iObjectRegistry* object_reg) :
-  scfImplementationType (this), ignoreTag (csInvalidStringID)
+  scfImplementationType (this)
 {
   csLightIterRenderStep::object_reg = object_reg;
   initialized = false;
@@ -326,9 +306,6 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
     //iLight* light = lights->Get (nlights);
     iLight* light = lights.Get (nlights)->GetLight ();
     const csVector3 lightPos = light->GetMovable ()->GetFullPosition ();
-    
-    if ((ignoreTag != csInvalidStringID) && (light->IsTagSet (ignoreTag)))
-      continue;
 
     /* 
     @@@ material specific diffuse/specular/ambient.

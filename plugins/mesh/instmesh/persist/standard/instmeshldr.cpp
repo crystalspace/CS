@@ -23,6 +23,7 @@
 #include "csgeom/vector2.h"
 #include "csgeom/vector4.h"
 #include "csgeom/sphere.h"
+#include "cstool/primitives.h"
 #include "csutil/cscolor.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/scanstr.h"
@@ -52,7 +53,6 @@ CS_IMPLEMENT_PLUGIN
 enum
 {
   XMLTOKEN_BOX = 1,
-  XMLTOKEN_QUAD,
   XMLTOKEN_SPHERE,
   XMLTOKEN_LIGHTING,
   XMLTOKEN_DEFAULTCOLOR,
@@ -93,7 +93,6 @@ bool csInstFactoryLoader::Initialize (iObjectRegistry* object_reg)
   synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
   xmltokens.Register ("box", XMLTOKEN_BOX);
-  xmltokens.Register ("quad", XMLTOKEN_QUAD);
   xmltokens.Register ("sphere", XMLTOKEN_SPHERE);
   xmltokens.Register ("material", XMLTOKEN_MATERIAL);
   xmltokens.Register ("factory", XMLTOKEN_FACTORY);
@@ -118,6 +117,28 @@ static float GetDef (iDocumentNode* node, const char* attrname, float def)
     return attr->GetValueAsFloat ();
   else
     return def;
+}
+
+static void AppendOrSetData (iInstancingFactoryState* factory,
+    const csDirtyAccessArray<csVector3>& mesh_vertices,
+    const csDirtyAccessArray<csVector2>& mesh_texels,
+    const csDirtyAccessArray<csVector3>& mesh_normals,
+    const csDirtyAccessArray<csTriangle>& mesh_triangles)
+{
+  csColor4 black (0, 0, 0);
+  size_t cur_vt_count = factory->GetVertexCount ();
+  size_t i;
+  for (i = 0 ; i < mesh_vertices.GetSize () ; i++)
+    factory->AddVertex (mesh_vertices[i], mesh_texels[i],
+	  mesh_normals[i], black);
+  for (i = 0 ; i < mesh_triangles.GetSize () ; i++)
+  {
+    csTriangle tri = mesh_triangles[i];
+    tri.a += cur_vt_count;
+    tri.b += cur_vt_count;
+    tri.c += cur_vt_count;
+    factory->AddTriangle (tri);
+  }
 }
 
 csPtr<iBase> csInstFactoryLoader::Parse (iDocumentNode* node,
@@ -209,40 +230,23 @@ csPtr<iBase> csInstFactoryLoader::Parse (iDocumentNode* node,
 	break;
       case XMLTOKEN_BOX:
         {
+	  using namespace CS::Geometry;
           csBox3 box;
           if (!synldr->ParseBox (child, box))
             return 0;
-          state->GenerateBox (box);
-        }
-        break;
-      case XMLTOKEN_QUAD:
-        {
-          csVector3 v1, v2, v3, v4;
-          csRef<iDocumentNode> c = child->GetNode ("v1");
-          if (c)
-            if (!synldr->ParseVector (c, v1))
-              return 0;
-
-          c = child->GetNode ("v2");
-          if (c)
-            if (!synldr->ParseVector (c, v2))
-              return 0;
-
-          c = child->GetNode ("v3");
-          if (c)
-            if (!synldr->ParseVector (c, v3))
-              return 0;
-
-          c = child->GetNode ("v4");
-          if (c)
-            if (!synldr->ParseVector (c, v4))
-              return 0;
-
-          state->GenerateQuad (v1, v2, v3, v4);
+	  csDirtyAccessArray<csVector3> mesh_vertices;
+	  csDirtyAccessArray<csVector2> mesh_texels;
+	  csDirtyAccessArray<csVector3> mesh_normals;
+	  csDirtyAccessArray<csTriangle> mesh_triangles;
+	  Primitives::GenerateBox (box, mesh_vertices, mesh_texels,
+	      mesh_normals, mesh_triangles, 0, 0);
+	  AppendOrSetData (state, mesh_vertices, mesh_texels,
+	    mesh_normals, mesh_triangles);
         }
         break;
       case XMLTOKEN_SPHERE:
         {
+	  using namespace CS::Geometry;
           csVector3 center (0, 0, 0);
           int rim_vertices = 8;
           csEllipsoid ellips;
@@ -269,16 +273,24 @@ csPtr<iBase> csInstFactoryLoader::Parse (iDocumentNode* node,
           if (attr) rim_vertices = attr->GetValueAsInt ();
           bool cylmapping, toponly, reversed;
           if (!synldr->ParseBoolAttribute (child, "cylindrical", cylmapping,
-            false, false))
+              false, false))
             return 0;
           if (!synldr->ParseBoolAttribute (child, "toponly", toponly,
-            false, false))
+              false, false))
             return 0;
           if (!synldr->ParseBoolAttribute (child, "reversed", reversed,
-            false, false))
+              false, false))
             return 0;
-          state->GenerateSphere (ellips, rim_vertices,
-            cylmapping, toponly, reversed);
+	  csDirtyAccessArray<csVector3> mesh_vertices;
+	  csDirtyAccessArray<csVector2> mesh_texels;
+	  csDirtyAccessArray<csVector3> mesh_normals;
+	  csDirtyAccessArray<csTriangle> mesh_triangles;
+	  Primitives::GenerateSphere (ellips, rim_vertices,
+	      mesh_vertices, mesh_texels,
+	      mesh_normals, mesh_triangles, cylmapping,
+	      toponly, reversed, 0);
+	  AppendOrSetData (state, mesh_vertices, mesh_texels,
+	    mesh_normals, mesh_triangles);
         }
         break;
       case XMLTOKEN_AUTONORMALS:

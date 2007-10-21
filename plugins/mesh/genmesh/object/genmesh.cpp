@@ -768,7 +768,7 @@ void csGenmeshMeshObject::UpdateLightingOne (
   // Compute light position in object coordinates
   csVector3 wor_light_pos = li->GetMovable ()->GetFullPosition ();
   csVector3 obj_light_pos = trans.Other2This (wor_light_pos);
-  float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, 0);
+  float obj_sq_dist = obj_light_pos * obj_light_pos;
   if (obj_sq_dist >= csSquare (li->GetCutoffDistance ())) return;
   float in_obj_dist =
     (obj_sq_dist >= SMALL_EPSILON) ? csQisqrt (obj_sq_dist) : 1.0f;

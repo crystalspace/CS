@@ -20,7 +20,6 @@
 
 #include "csgfx/rgbpixel.h"
 #include "cstool/proctex.h"
-#include "csutil/dirtyaccessarray.h"
 #include "csutil/objiter.h"
 #include "csutil/scfstr.h"
 #include "csutil/util.h"
@@ -1165,7 +1164,6 @@ bool csSaver::SavePortal (iPortal *portal, iDocumentNode *parent)
 
 bool csSaver::SaveSectorLights(iSector *s, iDocumentNode *parent)
 {
-  csDirtyAccessArray<csStringID> tags;
   iLightList* lightList = s->GetLights();
   for (int i=0; i<lightList->GetCount(); i++)
   {
@@ -1199,20 +1197,6 @@ bool csSaver::SaveSectorLights(iSector *s, iDocumentNode *parent)
     colorNode->SetAttributeAsFloat("red", color.red);
     colorNode->SetAttributeAsFloat("green", color.green);
     colorNode->SetAttributeAsFloat("blue", color.blue);
-    
-    // Write tags
-    size_t tagCount = light->GetTagCount ();
-    if (tagCount > 0)
-    {
-      tags.SetSize (tagCount);
-      light->GetTags (tags.GetArray());
-      for (size_t t = 0; t < tagCount; t++)
-      {
-        const char* tagStr = strings->Request (tags[t]);
-        csRef<iDocumentNode> tagNode = CreateNode(lightNode, "tag");
-        tagNode->CreateNodeBefore (CS_NODE_TEXT)->SetValue (tagStr);
-      }
-    }
 
     iBaseHalo* halo = light->GetHalo();
 

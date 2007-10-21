@@ -21,7 +21,6 @@
 
 #include "csgeom/transfrm.h"
 #include "cstool/objmodel.h"
-#include "csutil/bitarray.h"
 #include "csutil/cscolor.h"
 #include "csutil/csobject.h"
 #include "csutil/flags.h"
@@ -50,7 +49,7 @@ struct iMeshWrapper;
 struct iLightingInfo;
 struct iSector;
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 class csLightObjectModel : public scfImplementationExt0<csLightObjectModel,
                                                         csObjectModel>
@@ -84,7 +83,7 @@ public:
   virtual iTerrainSystem* GetTerrainColldet () { return 0; }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * Class that represents the influence that a certain light
@@ -110,7 +109,7 @@ public:
 
 typedef csSet<csRef<csLightSectorInfluence> > csLightSectorInfluences;
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * Superclass of all positional lights.
@@ -207,9 +206,6 @@ protected:
 
   /// List of light/sector influences.
   csLightSectorInfluences influences;
-  
-  /// Light tags
-  csBitArray lightTags;
 
   csEngine* engine;
 public:
@@ -598,14 +594,9 @@ public:
     CalculateLighting ();
   }
 
-  void AddLightTag (csStringID tag);
-  void RemoveTag (csStringID tag);
-  bool IsTagSet (csStringID tag);
-  size_t GetTagCount ();
-  void GetTags (csStringID* tags);
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * List of lights for a sector. This class implements iLightList.

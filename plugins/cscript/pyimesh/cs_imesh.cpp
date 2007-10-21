@@ -2553,258 +2553,259 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_csTriangle swig_types[75]
 #define SWIGTYPE_p_csTriangleMesh swig_types[76]
 #define SWIGTYPE_p_csTriangleMeshBox swig_types[77]
-#define SWIGTYPE_p_csTriangleMeshPointer swig_types[78]
-#define SWIGTYPE_p_csTriangleMinMax swig_types[79]
-#define SWIGTYPE_p_csVector2 swig_types[80]
-#define SWIGTYPE_p_csVector3 swig_types[81]
-#define SWIGTYPE_p_csXRotMatrix3 swig_types[82]
-#define SWIGTYPE_p_csXScaleMatrix3 swig_types[83]
-#define SWIGTYPE_p_csYRotMatrix3 swig_types[84]
-#define SWIGTYPE_p_csYScaleMatrix3 swig_types[85]
-#define SWIGTYPE_p_csZRotMatrix3 swig_types[86]
-#define SWIGTYPE_p_csZScaleMatrix3 swig_types[87]
-#define SWIGTYPE_p_float swig_types[88]
-#define SWIGTYPE_p_iAnimTimeUpdateHandler swig_types[89]
-#define SWIGTYPE_p_iAnimatedImage swig_types[90]
-#define SWIGTYPE_p_iArrayChangeAllTcsCollisionPair_t swig_types[91]
-#define SWIGTYPE_p_iArrayChangeAllTcsShaderVariable_p_t swig_types[92]
-#define SWIGTYPE_p_iArrayChangeAllTcsSprite2DVertex_t swig_types[93]
-#define SWIGTYPE_p_iArrayChangeAllTcsVector3_t swig_types[94]
-#define SWIGTYPE_p_iArrayChangeElementsTcsCollisionPair_t swig_types[95]
-#define SWIGTYPE_p_iArrayChangeElementsTcsShaderVariable_p_t swig_types[96]
-#define SWIGTYPE_p_iArrayChangeElementsTcsSprite2DVertex_t swig_types[97]
-#define SWIGTYPE_p_iArrayChangeElementsTcsVector3_t swig_types[98]
-#define SWIGTYPE_p_iArrayReadOnlyTcsCollisionPair_t swig_types[99]
-#define SWIGTYPE_p_iArrayReadOnlyTcsShaderVariable_p_t swig_types[100]
-#define SWIGTYPE_p_iArrayReadOnlyTcsSprite2DVertex_t swig_types[101]
-#define SWIGTYPE_p_iArrayReadOnlyTcsVector3_t swig_types[102]
-#define SWIGTYPE_p_iBase swig_types[103]
-#define SWIGTYPE_p_iBodyGroup swig_types[104]
-#define SWIGTYPE_p_iCacheManager swig_types[105]
-#define SWIGTYPE_p_iClipper2D swig_types[106]
-#define SWIGTYPE_p_iCollideSystem swig_types[107]
-#define SWIGTYPE_p_iCollider swig_types[108]
-#define SWIGTYPE_p_iColoredVertices swig_types[109]
-#define SWIGTYPE_p_iCommandLineParser swig_types[110]
-#define SWIGTYPE_p_iComponent swig_types[111]
-#define SWIGTYPE_p_iConfigFile swig_types[112]
-#define SWIGTYPE_p_iConfigIterator swig_types[113]
-#define SWIGTYPE_p_iConfigManager swig_types[114]
-#define SWIGTYPE_p_iConsoleOutput swig_types[115]
-#define SWIGTYPE_p_iConsoleWatcher swig_types[116]
-#define SWIGTYPE_p_iDataBuffer swig_types[117]
-#define SWIGTYPE_p_iDebugHelper swig_types[118]
-#define SWIGTYPE_p_iDecalBuilder swig_types[119]
-#define SWIGTYPE_p_iDecalManager swig_types[120]
-#define SWIGTYPE_p_iDecalTemplate swig_types[121]
-#define SWIGTYPE_p_iDocument swig_types[122]
-#define SWIGTYPE_p_iDocumentAttribute swig_types[123]
-#define SWIGTYPE_p_iDocumentAttributeIterator swig_types[124]
-#define SWIGTYPE_p_iDocumentNode swig_types[125]
-#define SWIGTYPE_p_iDocumentNodeIterator swig_types[126]
-#define SWIGTYPE_p_iDocumentSystem swig_types[127]
-#define SWIGTYPE_p_iDynamicSystem swig_types[128]
-#define SWIGTYPE_p_iDynamics swig_types[129]
-#define SWIGTYPE_p_iDynamicsColliderCollisionCallback swig_types[130]
-#define SWIGTYPE_p_iDynamicsCollisionCallback swig_types[131]
-#define SWIGTYPE_p_iDynamicsMoveCallback swig_types[132]
-#define SWIGTYPE_p_iDynamicsStepCallback swig_types[133]
-#define SWIGTYPE_p_iDynamicsSystemCollider swig_types[134]
-#define SWIGTYPE_p_iEngineSequenceManager swig_types[135]
-#define SWIGTYPE_p_iEngineSequenceParameters swig_types[136]
-#define SWIGTYPE_p_iEvent swig_types[137]
-#define SWIGTYPE_p_iEventAttributeIterator swig_types[138]
-#define SWIGTYPE_p_iEventCord swig_types[139]
-#define SWIGTYPE_p_iEventHandler swig_types[140]
-#define SWIGTYPE_p_iEventNameRegistry swig_types[141]
-#define SWIGTYPE_p_iEventOutlet swig_types[142]
-#define SWIGTYPE_p_iEventPlug swig_types[143]
-#define SWIGTYPE_p_iEventQueue swig_types[144]
-#define SWIGTYPE_p_iFactory swig_types[145]
-#define SWIGTYPE_p_iFile swig_types[146]
-#define SWIGTYPE_p_iFont swig_types[147]
-#define SWIGTYPE_p_iFontDeleteNotify swig_types[148]
-#define SWIGTYPE_p_iFontServer swig_types[149]
-#define SWIGTYPE_p_iGenMeshAnimationControl swig_types[150]
-#define SWIGTYPE_p_iGenMeshAnimationControlFactory swig_types[151]
-#define SWIGTYPE_p_iGenMeshAnimationControlType swig_types[152]
-#define SWIGTYPE_p_iGenMeshSkeletonControlState swig_types[153]
-#define SWIGTYPE_p_iGeneralFactoryState swig_types[154]
-#define SWIGTYPE_p_iGeneralMeshCommonState swig_types[155]
-#define SWIGTYPE_p_iGeneralMeshState swig_types[156]
-#define SWIGTYPE_p_iGeneralMeshSubMesh swig_types[157]
-#define SWIGTYPE_p_iGraphics2D swig_types[158]
-#define SWIGTYPE_p_iGraphics3D swig_types[159]
-#define SWIGTYPE_p_iHalo swig_types[160]
-#define SWIGTYPE_p_iImage swig_types[161]
-#define SWIGTYPE_p_iImageIO swig_types[162]
-#define SWIGTYPE_p_iJoint swig_types[163]
-#define SWIGTYPE_p_iJoystickDriver swig_types[164]
-#define SWIGTYPE_p_iKeyComposer swig_types[165]
-#define SWIGTYPE_p_iKeyboardDriver swig_types[166]
-#define SWIGTYPE_p_iMapNode swig_types[167]
-#define SWIGTYPE_p_iMaterial swig_types[168]
-#define SWIGTYPE_p_iMaterialWrapper swig_types[169]
-#define SWIGTYPE_p_iMeshFactoryWrapper swig_types[170]
-#define SWIGTYPE_p_iMeshObject swig_types[171]
-#define SWIGTYPE_p_iMeshObjectDrawCallback swig_types[172]
-#define SWIGTYPE_p_iMeshObjectFactory swig_types[173]
-#define SWIGTYPE_p_iMeshObjectType swig_types[174]
-#define SWIGTYPE_p_iMeshWrapper swig_types[175]
-#define SWIGTYPE_p_iMouseDriver swig_types[176]
-#define SWIGTYPE_p_iMovable swig_types[177]
-#define SWIGTYPE_p_iMovieRecorder swig_types[178]
-#define SWIGTYPE_p_iNativeWindow swig_types[179]
-#define SWIGTYPE_p_iNativeWindowManager swig_types[180]
-#define SWIGTYPE_p_iODEAMotorJoint swig_types[181]
-#define SWIGTYPE_p_iODEBallJoint swig_types[182]
-#define SWIGTYPE_p_iODEDynamicState swig_types[183]
-#define SWIGTYPE_p_iODEDynamicSystemState swig_types[184]
-#define SWIGTYPE_p_iODEFrameUpdateCallback swig_types[185]
-#define SWIGTYPE_p_iODEGeneralJointState swig_types[186]
-#define SWIGTYPE_p_iODEHinge2Joint swig_types[187]
-#define SWIGTYPE_p_iODEHingeJoint swig_types[188]
-#define SWIGTYPE_p_iODEJointState swig_types[189]
-#define SWIGTYPE_p_iODESliderJoint swig_types[190]
-#define SWIGTYPE_p_iODEUniversalJoint swig_types[191]
-#define SWIGTYPE_p_iObject swig_types[192]
-#define SWIGTYPE_p_iObjectIterator swig_types[193]
-#define SWIGTYPE_p_iObjectModel swig_types[194]
-#define SWIGTYPE_p_iObjectModelListener swig_types[195]
-#define SWIGTYPE_p_iObjectNameChangeListener swig_types[196]
-#define SWIGTYPE_p_iObjectRegistry swig_types[197]
-#define SWIGTYPE_p_iObjectRegistryIterator swig_types[198]
-#define SWIGTYPE_p_iOffscreenCanvasCallback swig_types[199]
-#define SWIGTYPE_p_iParameterESM swig_types[200]
-#define SWIGTYPE_p_iParticleBuiltinEffectorFactory swig_types[201]
-#define SWIGTYPE_p_iParticleBuiltinEffectorForce swig_types[202]
-#define SWIGTYPE_p_iParticleBuiltinEffectorLinColor swig_types[203]
-#define SWIGTYPE_p_iParticleBuiltinEffectorVelocityField swig_types[204]
-#define SWIGTYPE_p_iParticleBuiltinEmitterBase swig_types[205]
-#define SWIGTYPE_p_iParticleBuiltinEmitterBox swig_types[206]
-#define SWIGTYPE_p_iParticleBuiltinEmitterCone swig_types[207]
-#define SWIGTYPE_p_iParticleBuiltinEmitterCylinder swig_types[208]
-#define SWIGTYPE_p_iParticleBuiltinEmitterFactory swig_types[209]
-#define SWIGTYPE_p_iParticleBuiltinEmitterSphere swig_types[210]
-#define SWIGTYPE_p_iParticleEffector swig_types[211]
-#define SWIGTYPE_p_iParticleEmitter swig_types[212]
-#define SWIGTYPE_p_iParticleSystem swig_types[213]
-#define SWIGTYPE_p_iParticleSystemBase swig_types[214]
-#define SWIGTYPE_p_iParticleSystemFactory swig_types[215]
-#define SWIGTYPE_p_iPath swig_types[216]
-#define SWIGTYPE_p_iPluginIterator swig_types[217]
-#define SWIGTYPE_p_iPluginManager swig_types[218]
-#define SWIGTYPE_p_iPolygonHandle swig_types[219]
-#define SWIGTYPE_p_iProcTexture swig_types[220]
-#define SWIGTYPE_p_iRenderBuffer swig_types[221]
-#define SWIGTYPE_p_iRenderView swig_types[222]
-#define SWIGTYPE_p_iRendererLightmap swig_types[223]
-#define SWIGTYPE_p_iReporter swig_types[224]
-#define SWIGTYPE_p_iReporterIterator swig_types[225]
-#define SWIGTYPE_p_iReporterListener swig_types[226]
-#define SWIGTYPE_p_iRigidBody swig_types[227]
-#define SWIGTYPE_p_iSCF swig_types[228]
-#define SWIGTYPE_p_iSceneNode swig_types[229]
-#define SWIGTYPE_p_iScript swig_types[230]
-#define SWIGTYPE_p_iScriptObject swig_types[231]
-#define SWIGTYPE_p_iScriptValue swig_types[232]
-#define SWIGTYPE_p_iSequenceTimedOperation swig_types[233]
-#define SWIGTYPE_p_iSequenceTrigger swig_types[234]
-#define SWIGTYPE_p_iSequenceWrapper swig_types[235]
-#define SWIGTYPE_p_iShader swig_types[236]
-#define SWIGTYPE_p_iShaderCompiler swig_types[237]
-#define SWIGTYPE_p_iShaderManager swig_types[238]
-#define SWIGTYPE_p_iShaderPriorityList swig_types[239]
-#define SWIGTYPE_p_iShaderVarStack swig_types[240]
-#define SWIGTYPE_p_iShaderVariableAccessor swig_types[241]
-#define SWIGTYPE_p_iShaderVariableContext swig_types[242]
-#define SWIGTYPE_p_iSimpleFormerState swig_types[243]
-#define SWIGTYPE_p_iSkeleton swig_types[244]
-#define SWIGTYPE_p_iSkeletonAnimation swig_types[245]
-#define SWIGTYPE_p_iSkeletonAnimationCallback swig_types[246]
-#define SWIGTYPE_p_iSkeletonAnimationInstance swig_types[247]
-#define SWIGTYPE_p_iSkeletonAnimationKeyFrame swig_types[248]
-#define SWIGTYPE_p_iSkeletonBone swig_types[249]
-#define SWIGTYPE_p_iSkeletonBoneFactory swig_types[250]
-#define SWIGTYPE_p_iSkeletonBoneRagdollInfo swig_types[251]
-#define SWIGTYPE_p_iSkeletonBoneUpdateCallback swig_types[252]
-#define SWIGTYPE_p_iSkeletonFactory swig_types[253]
-#define SWIGTYPE_p_iSkeletonGraveyard swig_types[254]
-#define SWIGTYPE_p_iSkeletonSocket swig_types[255]
-#define SWIGTYPE_p_iSkeletonSocketFactory swig_types[256]
-#define SWIGTYPE_p_iSkeletonUpdateCallback swig_types[257]
-#define SWIGTYPE_p_iSprite2DFactoryState swig_types[258]
-#define SWIGTYPE_p_iSprite2DState swig_types[259]
-#define SWIGTYPE_p_iSprite2DUVAnimation swig_types[260]
-#define SWIGTYPE_p_iSprite2DUVAnimationFrame swig_types[261]
-#define SWIGTYPE_p_iSprite3DFactoryState swig_types[262]
-#define SWIGTYPE_p_iSprite3DState swig_types[263]
-#define SWIGTYPE_p_iSpriteAction swig_types[264]
-#define SWIGTYPE_p_iSpriteCal3DFactoryState swig_types[265]
-#define SWIGTYPE_p_iSpriteCal3DSocket swig_types[266]
-#define SWIGTYPE_p_iSpriteCal3DState swig_types[267]
-#define SWIGTYPE_p_iSpriteFrame swig_types[268]
-#define SWIGTYPE_p_iSpriteSocket swig_types[269]
-#define SWIGTYPE_p_iStandardReporterListener swig_types[270]
-#define SWIGTYPE_p_iString swig_types[271]
-#define SWIGTYPE_p_iStringArray swig_types[272]
-#define SWIGTYPE_p_iStringSet swig_types[273]
-#define SWIGTYPE_p_iSuperLightmap swig_types[274]
-#define SWIGTYPE_p_iTerraFormer swig_types[275]
-#define SWIGTYPE_p_iTerraSampler swig_types[276]
-#define SWIGTYPE_p_iTerrainCell swig_types[277]
-#define SWIGTYPE_p_iTerrainCellCollisionProperties swig_types[278]
-#define SWIGTYPE_p_iTerrainCellFeederProperties swig_types[279]
-#define SWIGTYPE_p_iTerrainCellHeightDataCallback swig_types[280]
-#define SWIGTYPE_p_iTerrainCellLoadCallback swig_types[281]
-#define SWIGTYPE_p_iTerrainCellRenderProperties swig_types[282]
-#define SWIGTYPE_p_iTerrainCollider swig_types[283]
-#define SWIGTYPE_p_iTerrainCollisionPairArray swig_types[284]
-#define SWIGTYPE_p_iTerrainDataFeeder swig_types[285]
-#define SWIGTYPE_p_iTerrainFactory swig_types[286]
-#define SWIGTYPE_p_iTerrainFactoryCell swig_types[287]
-#define SWIGTYPE_p_iTerrainFactoryState swig_types[288]
-#define SWIGTYPE_p_iTerrainObjectState swig_types[289]
-#define SWIGTYPE_p_iTerrainRenderer swig_types[290]
-#define SWIGTYPE_p_iTerrainSystem swig_types[291]
-#define SWIGTYPE_p_iTerrainVector3Array swig_types[292]
-#define SWIGTYPE_p_iTextureHandle swig_types[293]
-#define SWIGTYPE_p_iTextureManager swig_types[294]
-#define SWIGTYPE_p_iThingEnvironment swig_types[295]
-#define SWIGTYPE_p_iThingFactoryState swig_types[296]
-#define SWIGTYPE_p_iThingState swig_types[297]
-#define SWIGTYPE_p_iTriangleMesh swig_types[298]
-#define SWIGTYPE_p_iTriangleMeshIterator swig_types[299]
-#define SWIGTYPE_p_iVFS swig_types[300]
-#define SWIGTYPE_p_iView swig_types[301]
-#define SWIGTYPE_p_iVirtualClock swig_types[302]
-#define SWIGTYPE_p_int swig_types[303]
-#define SWIGTYPE_p_int16_t swig_types[304]
-#define SWIGTYPE_p_int64_t swig_types[305]
-#define SWIGTYPE_p_int8_t swig_types[306]
-#define SWIGTYPE_p_long_long swig_types[307]
-#define SWIGTYPE_p_p_CS__Graphics__RenderMesh swig_types[308]
-#define SWIGTYPE_p_p_iLight swig_types[309]
-#define SWIGTYPE_p_p_iMaterialWrapper swig_types[310]
-#define SWIGTYPE_p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[311]
-#define SWIGTYPE_p_scfImplementation1TcsImageBase_iImage_t swig_types[312]
-#define SWIGTYPE_p_scfImplementation1TcsObject_iObject_t swig_types[313]
-#define SWIGTYPE_p_scfImplementation1TcsPath_iPath_t swig_types[314]
-#define SWIGTYPE_p_scfImplementation1TcsTriangleMeshBox_iTriangleMesh_t swig_types[315]
-#define SWIGTYPE_p_scfImplementation1TcsTriangleMeshPointer_iTriangleMesh_t swig_types[316]
-#define SWIGTYPE_p_scfImplementation1TcsTriangleMesh_iTriangleMesh_t swig_types[317]
-#define SWIGTYPE_p_scfImplementationExt0TcsImageMemory_csImageBase_t swig_types[318]
-#define SWIGTYPE_p_size_t swig_types[319]
-#define SWIGTYPE_p_uint16_t swig_types[320]
-#define SWIGTYPE_p_uint32_t swig_types[321]
-#define SWIGTYPE_p_uint64_t swig_types[322]
-#define SWIGTYPE_p_uint8_t swig_types[323]
-#define SWIGTYPE_p_unsigned_char swig_types[324]
-#define SWIGTYPE_p_unsigned_int swig_types[325]
-#define SWIGTYPE_p_unsigned_long swig_types[326]
-#define SWIGTYPE_p_unsigned_long_long swig_types[327]
-static swig_type_info *swig_types[329];
-static swig_module_info swig_module = {swig_types, 328, 0, 0, 0, 0};
+#define SWIGTYPE_p_csTriangleMeshEdge swig_types[78]
+#define SWIGTYPE_p_csTriangleMeshPointer swig_types[79]
+#define SWIGTYPE_p_csTriangleMinMax swig_types[80]
+#define SWIGTYPE_p_csVector2 swig_types[81]
+#define SWIGTYPE_p_csVector3 swig_types[82]
+#define SWIGTYPE_p_csXRotMatrix3 swig_types[83]
+#define SWIGTYPE_p_csXScaleMatrix3 swig_types[84]
+#define SWIGTYPE_p_csYRotMatrix3 swig_types[85]
+#define SWIGTYPE_p_csYScaleMatrix3 swig_types[86]
+#define SWIGTYPE_p_csZRotMatrix3 swig_types[87]
+#define SWIGTYPE_p_csZScaleMatrix3 swig_types[88]
+#define SWIGTYPE_p_float swig_types[89]
+#define SWIGTYPE_p_iAnimTimeUpdateHandler swig_types[90]
+#define SWIGTYPE_p_iAnimatedImage swig_types[91]
+#define SWIGTYPE_p_iArrayChangeAllTcsCollisionPair_t swig_types[92]
+#define SWIGTYPE_p_iArrayChangeAllTcsShaderVariable_p_t swig_types[93]
+#define SWIGTYPE_p_iArrayChangeAllTcsSprite2DVertex_t swig_types[94]
+#define SWIGTYPE_p_iArrayChangeAllTcsVector3_t swig_types[95]
+#define SWIGTYPE_p_iArrayChangeElementsTcsCollisionPair_t swig_types[96]
+#define SWIGTYPE_p_iArrayChangeElementsTcsShaderVariable_p_t swig_types[97]
+#define SWIGTYPE_p_iArrayChangeElementsTcsSprite2DVertex_t swig_types[98]
+#define SWIGTYPE_p_iArrayChangeElementsTcsVector3_t swig_types[99]
+#define SWIGTYPE_p_iArrayReadOnlyTcsCollisionPair_t swig_types[100]
+#define SWIGTYPE_p_iArrayReadOnlyTcsShaderVariable_p_t swig_types[101]
+#define SWIGTYPE_p_iArrayReadOnlyTcsSprite2DVertex_t swig_types[102]
+#define SWIGTYPE_p_iArrayReadOnlyTcsVector3_t swig_types[103]
+#define SWIGTYPE_p_iBase swig_types[104]
+#define SWIGTYPE_p_iBodyGroup swig_types[105]
+#define SWIGTYPE_p_iCacheManager swig_types[106]
+#define SWIGTYPE_p_iClipper2D swig_types[107]
+#define SWIGTYPE_p_iCollideSystem swig_types[108]
+#define SWIGTYPE_p_iCollider swig_types[109]
+#define SWIGTYPE_p_iColoredVertices swig_types[110]
+#define SWIGTYPE_p_iCommandLineParser swig_types[111]
+#define SWIGTYPE_p_iComponent swig_types[112]
+#define SWIGTYPE_p_iConfigFile swig_types[113]
+#define SWIGTYPE_p_iConfigIterator swig_types[114]
+#define SWIGTYPE_p_iConfigManager swig_types[115]
+#define SWIGTYPE_p_iConsoleOutput swig_types[116]
+#define SWIGTYPE_p_iConsoleWatcher swig_types[117]
+#define SWIGTYPE_p_iDataBuffer swig_types[118]
+#define SWIGTYPE_p_iDebugHelper swig_types[119]
+#define SWIGTYPE_p_iDecalBuilder swig_types[120]
+#define SWIGTYPE_p_iDecalManager swig_types[121]
+#define SWIGTYPE_p_iDecalTemplate swig_types[122]
+#define SWIGTYPE_p_iDocument swig_types[123]
+#define SWIGTYPE_p_iDocumentAttribute swig_types[124]
+#define SWIGTYPE_p_iDocumentAttributeIterator swig_types[125]
+#define SWIGTYPE_p_iDocumentNode swig_types[126]
+#define SWIGTYPE_p_iDocumentNodeIterator swig_types[127]
+#define SWIGTYPE_p_iDocumentSystem swig_types[128]
+#define SWIGTYPE_p_iDynamicSystem swig_types[129]
+#define SWIGTYPE_p_iDynamics swig_types[130]
+#define SWIGTYPE_p_iDynamicsColliderCollisionCallback swig_types[131]
+#define SWIGTYPE_p_iDynamicsCollisionCallback swig_types[132]
+#define SWIGTYPE_p_iDynamicsMoveCallback swig_types[133]
+#define SWIGTYPE_p_iDynamicsStepCallback swig_types[134]
+#define SWIGTYPE_p_iDynamicsSystemCollider swig_types[135]
+#define SWIGTYPE_p_iEngineSequenceManager swig_types[136]
+#define SWIGTYPE_p_iEngineSequenceParameters swig_types[137]
+#define SWIGTYPE_p_iEvent swig_types[138]
+#define SWIGTYPE_p_iEventAttributeIterator swig_types[139]
+#define SWIGTYPE_p_iEventCord swig_types[140]
+#define SWIGTYPE_p_iEventHandler swig_types[141]
+#define SWIGTYPE_p_iEventNameRegistry swig_types[142]
+#define SWIGTYPE_p_iEventOutlet swig_types[143]
+#define SWIGTYPE_p_iEventPlug swig_types[144]
+#define SWIGTYPE_p_iEventQueue swig_types[145]
+#define SWIGTYPE_p_iFactory swig_types[146]
+#define SWIGTYPE_p_iFile swig_types[147]
+#define SWIGTYPE_p_iFont swig_types[148]
+#define SWIGTYPE_p_iFontDeleteNotify swig_types[149]
+#define SWIGTYPE_p_iFontServer swig_types[150]
+#define SWIGTYPE_p_iGenMeshAnimationControl swig_types[151]
+#define SWIGTYPE_p_iGenMeshAnimationControlFactory swig_types[152]
+#define SWIGTYPE_p_iGenMeshAnimationControlType swig_types[153]
+#define SWIGTYPE_p_iGenMeshSkeletonControlState swig_types[154]
+#define SWIGTYPE_p_iGeneralFactoryState swig_types[155]
+#define SWIGTYPE_p_iGeneralMeshCommonState swig_types[156]
+#define SWIGTYPE_p_iGeneralMeshState swig_types[157]
+#define SWIGTYPE_p_iGeneralMeshSubMesh swig_types[158]
+#define SWIGTYPE_p_iGraphics2D swig_types[159]
+#define SWIGTYPE_p_iGraphics3D swig_types[160]
+#define SWIGTYPE_p_iHalo swig_types[161]
+#define SWIGTYPE_p_iImage swig_types[162]
+#define SWIGTYPE_p_iImageIO swig_types[163]
+#define SWIGTYPE_p_iJoint swig_types[164]
+#define SWIGTYPE_p_iJoystickDriver swig_types[165]
+#define SWIGTYPE_p_iKeyComposer swig_types[166]
+#define SWIGTYPE_p_iKeyboardDriver swig_types[167]
+#define SWIGTYPE_p_iMapNode swig_types[168]
+#define SWIGTYPE_p_iMaterial swig_types[169]
+#define SWIGTYPE_p_iMaterialWrapper swig_types[170]
+#define SWIGTYPE_p_iMeshFactoryWrapper swig_types[171]
+#define SWIGTYPE_p_iMeshObject swig_types[172]
+#define SWIGTYPE_p_iMeshObjectDrawCallback swig_types[173]
+#define SWIGTYPE_p_iMeshObjectFactory swig_types[174]
+#define SWIGTYPE_p_iMeshObjectType swig_types[175]
+#define SWIGTYPE_p_iMeshWrapper swig_types[176]
+#define SWIGTYPE_p_iMouseDriver swig_types[177]
+#define SWIGTYPE_p_iMovable swig_types[178]
+#define SWIGTYPE_p_iMovieRecorder swig_types[179]
+#define SWIGTYPE_p_iNativeWindow swig_types[180]
+#define SWIGTYPE_p_iNativeWindowManager swig_types[181]
+#define SWIGTYPE_p_iODEAMotorJoint swig_types[182]
+#define SWIGTYPE_p_iODEBallJoint swig_types[183]
+#define SWIGTYPE_p_iODEDynamicState swig_types[184]
+#define SWIGTYPE_p_iODEDynamicSystemState swig_types[185]
+#define SWIGTYPE_p_iODEFrameUpdateCallback swig_types[186]
+#define SWIGTYPE_p_iODEGeneralJointState swig_types[187]
+#define SWIGTYPE_p_iODEHinge2Joint swig_types[188]
+#define SWIGTYPE_p_iODEHingeJoint swig_types[189]
+#define SWIGTYPE_p_iODEJointState swig_types[190]
+#define SWIGTYPE_p_iODESliderJoint swig_types[191]
+#define SWIGTYPE_p_iODEUniversalJoint swig_types[192]
+#define SWIGTYPE_p_iObject swig_types[193]
+#define SWIGTYPE_p_iObjectIterator swig_types[194]
+#define SWIGTYPE_p_iObjectModel swig_types[195]
+#define SWIGTYPE_p_iObjectModelListener swig_types[196]
+#define SWIGTYPE_p_iObjectNameChangeListener swig_types[197]
+#define SWIGTYPE_p_iObjectRegistry swig_types[198]
+#define SWIGTYPE_p_iObjectRegistryIterator swig_types[199]
+#define SWIGTYPE_p_iOffscreenCanvasCallback swig_types[200]
+#define SWIGTYPE_p_iParameterESM swig_types[201]
+#define SWIGTYPE_p_iParticleBuiltinEffectorFactory swig_types[202]
+#define SWIGTYPE_p_iParticleBuiltinEffectorForce swig_types[203]
+#define SWIGTYPE_p_iParticleBuiltinEffectorLinColor swig_types[204]
+#define SWIGTYPE_p_iParticleBuiltinEffectorVelocityField swig_types[205]
+#define SWIGTYPE_p_iParticleBuiltinEmitterBase swig_types[206]
+#define SWIGTYPE_p_iParticleBuiltinEmitterBox swig_types[207]
+#define SWIGTYPE_p_iParticleBuiltinEmitterCone swig_types[208]
+#define SWIGTYPE_p_iParticleBuiltinEmitterCylinder swig_types[209]
+#define SWIGTYPE_p_iParticleBuiltinEmitterFactory swig_types[210]
+#define SWIGTYPE_p_iParticleBuiltinEmitterSphere swig_types[211]
+#define SWIGTYPE_p_iParticleEffector swig_types[212]
+#define SWIGTYPE_p_iParticleEmitter swig_types[213]
+#define SWIGTYPE_p_iParticleSystem swig_types[214]
+#define SWIGTYPE_p_iParticleSystemBase swig_types[215]
+#define SWIGTYPE_p_iParticleSystemFactory swig_types[216]
+#define SWIGTYPE_p_iPath swig_types[217]
+#define SWIGTYPE_p_iPluginIterator swig_types[218]
+#define SWIGTYPE_p_iPluginManager swig_types[219]
+#define SWIGTYPE_p_iPolygonHandle swig_types[220]
+#define SWIGTYPE_p_iProcTexture swig_types[221]
+#define SWIGTYPE_p_iRenderBuffer swig_types[222]
+#define SWIGTYPE_p_iRenderView swig_types[223]
+#define SWIGTYPE_p_iRendererLightmap swig_types[224]
+#define SWIGTYPE_p_iReporter swig_types[225]
+#define SWIGTYPE_p_iReporterIterator swig_types[226]
+#define SWIGTYPE_p_iReporterListener swig_types[227]
+#define SWIGTYPE_p_iRigidBody swig_types[228]
+#define SWIGTYPE_p_iSCF swig_types[229]
+#define SWIGTYPE_p_iSceneNode swig_types[230]
+#define SWIGTYPE_p_iScript swig_types[231]
+#define SWIGTYPE_p_iScriptObject swig_types[232]
+#define SWIGTYPE_p_iScriptValue swig_types[233]
+#define SWIGTYPE_p_iSequenceTimedOperation swig_types[234]
+#define SWIGTYPE_p_iSequenceTrigger swig_types[235]
+#define SWIGTYPE_p_iSequenceWrapper swig_types[236]
+#define SWIGTYPE_p_iShader swig_types[237]
+#define SWIGTYPE_p_iShaderCompiler swig_types[238]
+#define SWIGTYPE_p_iShaderManager swig_types[239]
+#define SWIGTYPE_p_iShaderPriorityList swig_types[240]
+#define SWIGTYPE_p_iShaderVarStack swig_types[241]
+#define SWIGTYPE_p_iShaderVariableAccessor swig_types[242]
+#define SWIGTYPE_p_iShaderVariableContext swig_types[243]
+#define SWIGTYPE_p_iSimpleFormerState swig_types[244]
+#define SWIGTYPE_p_iSkeleton swig_types[245]
+#define SWIGTYPE_p_iSkeletonAnimation swig_types[246]
+#define SWIGTYPE_p_iSkeletonAnimationCallback swig_types[247]
+#define SWIGTYPE_p_iSkeletonAnimationInstance swig_types[248]
+#define SWIGTYPE_p_iSkeletonAnimationKeyFrame swig_types[249]
+#define SWIGTYPE_p_iSkeletonBone swig_types[250]
+#define SWIGTYPE_p_iSkeletonBoneFactory swig_types[251]
+#define SWIGTYPE_p_iSkeletonBoneRagdollInfo swig_types[252]
+#define SWIGTYPE_p_iSkeletonBoneUpdateCallback swig_types[253]
+#define SWIGTYPE_p_iSkeletonFactory swig_types[254]
+#define SWIGTYPE_p_iSkeletonGraveyard swig_types[255]
+#define SWIGTYPE_p_iSkeletonSocket swig_types[256]
+#define SWIGTYPE_p_iSkeletonSocketFactory swig_types[257]
+#define SWIGTYPE_p_iSkeletonUpdateCallback swig_types[258]
+#define SWIGTYPE_p_iSprite2DFactoryState swig_types[259]
+#define SWIGTYPE_p_iSprite2DState swig_types[260]
+#define SWIGTYPE_p_iSprite2DUVAnimation swig_types[261]
+#define SWIGTYPE_p_iSprite2DUVAnimationFrame swig_types[262]
+#define SWIGTYPE_p_iSprite3DFactoryState swig_types[263]
+#define SWIGTYPE_p_iSprite3DState swig_types[264]
+#define SWIGTYPE_p_iSpriteAction swig_types[265]
+#define SWIGTYPE_p_iSpriteCal3DFactoryState swig_types[266]
+#define SWIGTYPE_p_iSpriteCal3DSocket swig_types[267]
+#define SWIGTYPE_p_iSpriteCal3DState swig_types[268]
+#define SWIGTYPE_p_iSpriteFrame swig_types[269]
+#define SWIGTYPE_p_iSpriteSocket swig_types[270]
+#define SWIGTYPE_p_iStandardReporterListener swig_types[271]
+#define SWIGTYPE_p_iString swig_types[272]
+#define SWIGTYPE_p_iStringArray swig_types[273]
+#define SWIGTYPE_p_iStringSet swig_types[274]
+#define SWIGTYPE_p_iSuperLightmap swig_types[275]
+#define SWIGTYPE_p_iTerraFormer swig_types[276]
+#define SWIGTYPE_p_iTerraSampler swig_types[277]
+#define SWIGTYPE_p_iTerrainCell swig_types[278]
+#define SWIGTYPE_p_iTerrainCellCollisionProperties swig_types[279]
+#define SWIGTYPE_p_iTerrainCellFeederProperties swig_types[280]
+#define SWIGTYPE_p_iTerrainCellHeightDataCallback swig_types[281]
+#define SWIGTYPE_p_iTerrainCellLoadCallback swig_types[282]
+#define SWIGTYPE_p_iTerrainCellRenderProperties swig_types[283]
+#define SWIGTYPE_p_iTerrainCollider swig_types[284]
+#define SWIGTYPE_p_iTerrainCollisionPairArray swig_types[285]
+#define SWIGTYPE_p_iTerrainDataFeeder swig_types[286]
+#define SWIGTYPE_p_iTerrainFactory swig_types[287]
+#define SWIGTYPE_p_iTerrainFactoryCell swig_types[288]
+#define SWIGTYPE_p_iTerrainFactoryState swig_types[289]
+#define SWIGTYPE_p_iTerrainObjectState swig_types[290]
+#define SWIGTYPE_p_iTerrainRenderer swig_types[291]
+#define SWIGTYPE_p_iTerrainSystem swig_types[292]
+#define SWIGTYPE_p_iTerrainVector3Array swig_types[293]
+#define SWIGTYPE_p_iTextureHandle swig_types[294]
+#define SWIGTYPE_p_iTextureManager swig_types[295]
+#define SWIGTYPE_p_iThingEnvironment swig_types[296]
+#define SWIGTYPE_p_iThingFactoryState swig_types[297]
+#define SWIGTYPE_p_iThingState swig_types[298]
+#define SWIGTYPE_p_iTriangleMesh swig_types[299]
+#define SWIGTYPE_p_iTriangleMeshIterator swig_types[300]
+#define SWIGTYPE_p_iVFS swig_types[301]
+#define SWIGTYPE_p_iView swig_types[302]
+#define SWIGTYPE_p_iVirtualClock swig_types[303]
+#define SWIGTYPE_p_int swig_types[304]
+#define SWIGTYPE_p_int16_t swig_types[305]
+#define SWIGTYPE_p_int64_t swig_types[306]
+#define SWIGTYPE_p_int8_t swig_types[307]
+#define SWIGTYPE_p_long_long swig_types[308]
+#define SWIGTYPE_p_p_CS__Graphics__RenderMesh swig_types[309]
+#define SWIGTYPE_p_p_iLight swig_types[310]
+#define SWIGTYPE_p_p_iMaterialWrapper swig_types[311]
+#define SWIGTYPE_p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[312]
+#define SWIGTYPE_p_scfImplementation1TcsImageBase_iImage_t swig_types[313]
+#define SWIGTYPE_p_scfImplementation1TcsObject_iObject_t swig_types[314]
+#define SWIGTYPE_p_scfImplementation1TcsPath_iPath_t swig_types[315]
+#define SWIGTYPE_p_scfImplementation1TcsTriangleMeshBox_iTriangleMesh_t swig_types[316]
+#define SWIGTYPE_p_scfImplementation1TcsTriangleMeshPointer_iTriangleMesh_t swig_types[317]
+#define SWIGTYPE_p_scfImplementation1TcsTriangleMesh_iTriangleMesh_t swig_types[318]
+#define SWIGTYPE_p_scfImplementationExt0TcsImageMemory_csImageBase_t swig_types[319]
+#define SWIGTYPE_p_size_t swig_types[320]
+#define SWIGTYPE_p_uint16_t swig_types[321]
+#define SWIGTYPE_p_uint32_t swig_types[322]
+#define SWIGTYPE_p_uint64_t swig_types[323]
+#define SWIGTYPE_p_uint8_t swig_types[324]
+#define SWIGTYPE_p_unsigned_char swig_types[325]
+#define SWIGTYPE_p_unsigned_int swig_types[326]
+#define SWIGTYPE_p_unsigned_long swig_types[327]
+#define SWIGTYPE_p_unsigned_long_long swig_types[328]
+static swig_type_info *swig_types[330];
+static swig_module_info swig_module = {swig_types, 329, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -2814,6 +2815,12 @@ static swig_module_info swig_module = {swig_types, 328, 0, 0, 0, 0};
 # if !defined(SWIG_PYTHON_CLASSIC)
 #  error "This python version requires swig to be run with the '-classic' option"
 # endif
+#endif
+#if (PY_VERSION_HEX <= 0x02020000)
+# error "This python version requires swig to be run with the '-nomodern' option"
+#endif
+#if (PY_VERSION_HEX <= 0x02020000)
+# error "This python version requires swig to be run with the '-nomodernargs' option"
 #endif
 
 /*-----------------------------------------------
@@ -3320,6 +3327,18 @@ SWIGINTERN csVector2 *iGeneralFactoryState_GetTexelByIndex(iGeneralFactoryState 
 SWIGINTERN csVector3 *iGeneralFactoryState_GetNormalByIndex(iGeneralFactoryState *self,int index){ return &(self->GetNormals()[index]); }
 SWIGINTERN csTriangle *iGeneralFactoryState_GetTriangleByIndex(iGeneralFactoryState *self,int index){ return &(self->GetTriangles()[index]); }
 SWIGINTERN csColor *iGeneralFactoryState_GetColorByIndex(iGeneralFactoryState *self,int index){ return &(self->GetColors()[index]); }
+SWIGINTERN PyObject *iGeneralFactoryState_GetVerticesAsBuffer(iGeneralFactoryState *self){
+        return PyBuffer_FromReadWriteMemory(self->GetVertices(),self->GetVertexCount()*sizeof( csVector3 ));
+    }
+SWIGINTERN PyObject *iGeneralFactoryState_GetNormalsAsBuffer(iGeneralFactoryState *self){
+        return PyBuffer_FromReadWriteMemory(self->GetNormals(),self->GetVertexCount()*sizeof( csVector3 ));
+    }
+SWIGINTERN PyObject *iGeneralFactoryState_GetColorsAsBuffer(iGeneralFactoryState *self){
+        return PyBuffer_FromReadWriteMemory(self->GetColors(),self->GetVertexCount()*sizeof( csColor4 ));
+    }
+SWIGINTERN PyObject *iGeneralFactoryState_GetTrianglesAsBuffer(iGeneralFactoryState *self){
+        return PyBuffer_FromReadWriteMemory(self->GetTriangles(),self->GetTriangleCount()*sizeof( csTriangle ));
+    }
 SWIGINTERN int iGeneralFactoryState_scfGetVersion(){ return scfInterfaceTraits<iGeneralFactoryState>::GetVersion(); }
 SWIGINTERN void delete_iGeneralFactoryState(iGeneralFactoryState *self){ if (self) self->DecRef (); }
 SWIGINTERN int iSkeletonBone_scfGetVersion(){ return scfInterfaceTraits<iSkeletonBone>::GetVersion(); }
@@ -3461,7 +3480,7 @@ SWIGINTERN PyObject *_wrap__SetSCFPointer(PyObject *SWIGUNUSEDPARM(self), PyObje
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:_SetSCFPointer",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"_SetSCFPointer",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSCF, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "_SetSCFPointer" "', argument " "1"" of type '" "iSCF *""'"); 
@@ -3479,7 +3498,7 @@ SWIGINTERN PyObject *_wrap__GetSCFPointer(PyObject *SWIGUNUSEDPARM(self), PyObje
   PyObject *resultobj = 0;
   iSCF *result = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)":_GetSCFPointer")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"_GetSCFPointer",0,0)) SWIG_fail;
   result = (iSCF *)GetSCFPointer();
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iSCF, 0 |  0 );
   return resultobj;
@@ -3499,7 +3518,7 @@ SWIGINTERN PyObject *_wrap_iObjectModelListener_ObjectModelChanged(PyObject *SWI
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iObjectModelListener_ObjectModelChanged",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iObjectModelListener_ObjectModelChanged",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iObjectModelListener, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iObjectModelListener_ObjectModelChanged" "', argument " "1"" of type '" "iObjectModelListener *""'"); 
@@ -3522,7 +3541,7 @@ SWIGINTERN PyObject *_wrap_iObjectModelListener_scfGetVersion(PyObject *SWIGUNUS
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iObjectModelListener_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iObjectModelListener_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iObjectModelListener_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -3538,7 +3557,7 @@ SWIGINTERN PyObject *_wrap_delete_iObjectModelListener(PyObject *SWIGUNUSEDPARM(
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iObjectModelListener",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iObjectModelListener",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iObjectModelListener, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iObjectModelListener" "', argument " "1"" of type '" "iObjectModelListener *""'"); 
@@ -3555,7 +3574,7 @@ fail:
 
 SWIGINTERN PyObject *iObjectModelListener_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iObjectModelListener, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -3568,7 +3587,7 @@ SWIGINTERN PyObject *_wrap_iTriangleMeshIterator_HasNext(PyObject *SWIGUNUSEDPAR
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTriangleMeshIterator_HasNext",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTriangleMeshIterator_HasNext",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTriangleMeshIterator, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTriangleMeshIterator_HasNext" "', argument " "1"" of type '" "iTriangleMeshIterator *""'"); 
@@ -3594,7 +3613,7 @@ SWIGINTERN PyObject *_wrap_iTriangleMeshIterator_Next(PyObject *SWIGUNUSEDPARM(s
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTriangleMeshIterator_Next",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTriangleMeshIterator_Next",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTriangleMeshIterator, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTriangleMeshIterator_Next" "', argument " "1"" of type '" "iTriangleMeshIterator *""'"); 
@@ -3620,7 +3639,7 @@ SWIGINTERN PyObject *_wrap_iTriangleMeshIterator_scfGetVersion(PyObject *SWIGUNU
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iTriangleMeshIterator_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTriangleMeshIterator_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iTriangleMeshIterator_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -3636,7 +3655,7 @@ SWIGINTERN PyObject *_wrap_delete_iTriangleMeshIterator(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iTriangleMeshIterator",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iTriangleMeshIterator",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTriangleMeshIterator, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iTriangleMeshIterator" "', argument " "1"" of type '" "iTriangleMeshIterator *""'"); 
@@ -3653,7 +3672,7 @@ fail:
 
 SWIGINTERN PyObject *iTriangleMeshIterator_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iTriangleMeshIterator, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -3666,7 +3685,7 @@ SWIGINTERN PyObject *_wrap_iObjectModel_GetShapeNumber(PyObject *SWIGUNUSEDPARM(
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iObjectModel_GetShapeNumber",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iObjectModel_GetShapeNumber",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iObjectModel, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iObjectModel_GetShapeNumber" "', argument " "1"" of type '" "iObjectModel const *""'"); 
@@ -3692,7 +3711,7 @@ SWIGINTERN PyObject *_wrap_iObjectModel_GetTriangleData(PyObject *SWIGUNUSEDPARM
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iObjectModel_GetTriangleData",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iObjectModel_GetTriangleData",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iObjectModel, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iObjectModel_GetTriangleData" "', argument " "1"" of type '" "iObjectModel *""'"); 
@@ -3719,7 +3738,7 @@ SWIGINTERN PyObject *_wrap_iObjectModel_GetTriangleDataIterator(PyObject *SWIGUN
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iObjectModel_GetTriangleDataIterator",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iObjectModel_GetTriangleDataIterator",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iObjectModel, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iObjectModel_GetTriangleDataIterator" "', argument " "1"" of type '" "iObjectModel *""'"); 
@@ -3765,7 +3784,7 @@ SWIGINTERN PyObject *_wrap_iObjectModel_SetTriangleData(PyObject *SWIGUNUSEDPARM
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iObjectModel_SetTriangleData",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iObjectModel_SetTriangleData",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iObjectModel, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iObjectModel_SetTriangleData" "', argument " "1"" of type '" "iObjectModel *""'"); 
@@ -3801,7 +3820,7 @@ SWIGINTERN PyObject *_wrap_iObjectModel_IsTriangleDataSet(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iObjectModel_IsTriangleDataSet",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iObjectModel_IsTriangleDataSet",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iObjectModel, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iObjectModel_IsTriangleDataSet" "', argument " "1"" of type '" "iObjectModel *""'"); 
@@ -3831,7 +3850,7 @@ SWIGINTERN PyObject *_wrap_iObjectModel_ResetTriangleData(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iObjectModel_ResetTriangleData",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iObjectModel_ResetTriangleData",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iObjectModel, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iObjectModel_ResetTriangleData" "', argument " "1"" of type '" "iObjectModel *""'"); 
@@ -3858,7 +3877,7 @@ SWIGINTERN PyObject *_wrap_iObjectModel_GetTerraFormerColldet(PyObject *SWIGUNUS
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iObjectModel_GetTerraFormerColldet",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iObjectModel_GetTerraFormerColldet",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iObjectModel, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iObjectModel_GetTerraFormerColldet" "', argument " "1"" of type '" "iObjectModel *""'"); 
@@ -3880,7 +3899,7 @@ SWIGINTERN PyObject *_wrap_iObjectModel_GetTerrainColldet(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iObjectModel_GetTerrainColldet",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iObjectModel_GetTerrainColldet",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iObjectModel, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iObjectModel_GetTerrainColldet" "', argument " "1"" of type '" "iObjectModel *""'"); 
@@ -3902,7 +3921,7 @@ SWIGINTERN PyObject *_wrap_iObjectModel_GetObjectBoundingBox(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iObjectModel_GetObjectBoundingBox",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iObjectModel_GetObjectBoundingBox",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iObjectModel, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iObjectModel_GetObjectBoundingBox" "', argument " "1"" of type '" "iObjectModel *""'"); 
@@ -3930,7 +3949,7 @@ SWIGINTERN PyObject *_wrap_iObjectModel_SetObjectBoundingBox(PyObject *SWIGUNUSE
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iObjectModel_SetObjectBoundingBox",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iObjectModel_SetObjectBoundingBox",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iObjectModel, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iObjectModel_SetObjectBoundingBox" "', argument " "1"" of type '" "iObjectModel *""'"); 
@@ -3967,7 +3986,7 @@ SWIGINTERN PyObject *_wrap_iObjectModel_GetRadius(PyObject *SWIGUNUSEDPARM(self)
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iObjectModel_GetRadius",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iObjectModel_GetRadius",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iObjectModel, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iObjectModel_GetRadius" "', argument " "1"" of type '" "iObjectModel *""'"); 
@@ -4008,7 +4027,7 @@ SWIGINTERN PyObject *_wrap_iObjectModel_AddListener(PyObject *SWIGUNUSEDPARM(sel
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iObjectModel_AddListener",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iObjectModel_AddListener",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iObjectModel, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iObjectModel_AddListener" "', argument " "1"" of type '" "iObjectModel *""'"); 
@@ -4038,7 +4057,7 @@ SWIGINTERN PyObject *_wrap_iObjectModel_RemoveListener(PyObject *SWIGUNUSEDPARM(
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iObjectModel_RemoveListener",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iObjectModel_RemoveListener",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iObjectModel, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iObjectModel_RemoveListener" "', argument " "1"" of type '" "iObjectModel *""'"); 
@@ -4061,7 +4080,7 @@ SWIGINTERN PyObject *_wrap_iObjectModel_scfGetVersion(PyObject *SWIGUNUSEDPARM(s
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iObjectModel_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iObjectModel_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iObjectModel_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -4077,7 +4096,7 @@ SWIGINTERN PyObject *_wrap_delete_iObjectModel(PyObject *SWIGUNUSEDPARM(self), P
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iObjectModel",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iObjectModel",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iObjectModel, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iObjectModel" "', argument " "1"" of type '" "iObjectModel *""'"); 
@@ -4094,7 +4113,7 @@ fail:
 
 SWIGINTERN PyObject *iObjectModel_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iObjectModel, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -4107,7 +4126,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshSubMesh_GetIndices(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralMeshSubMesh_GetIndices",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshSubMesh_GetIndices",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshSubMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshSubMesh_GetIndices" "', argument " "1"" of type '" "iGeneralMeshSubMesh const *""'"); 
@@ -4129,7 +4148,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshSubMesh_GetMaterial(PyObject *SWIGUNUSEDP
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralMeshSubMesh_GetMaterial",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshSubMesh_GetMaterial",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshSubMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshSubMesh_GetMaterial" "', argument " "1"" of type '" "iGeneralMeshSubMesh const *""'"); 
@@ -4151,7 +4170,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshSubMesh_GetName(PyObject *SWIGUNUSEDPARM(
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralMeshSubMesh_GetName",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshSubMesh_GetName",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshSubMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshSubMesh_GetName" "', argument " "1"" of type '" "iGeneralMeshSubMesh const *""'"); 
@@ -4173,7 +4192,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshSubMesh_GetMixmode(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralMeshSubMesh_GetMixmode",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshSubMesh_GetMixmode",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshSubMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshSubMesh_GetMixmode" "', argument " "1"" of type '" "iGeneralMeshSubMesh const *""'"); 
@@ -4198,7 +4217,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshSubMesh_SetMaterial(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralMeshSubMesh_SetMaterial",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshSubMesh_SetMaterial",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshSubMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshSubMesh_SetMaterial" "', argument " "1"" of type '" "iGeneralMeshSubMesh *""'"); 
@@ -4225,7 +4244,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshSubMesh_GetZMode(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralMeshSubMesh_GetZMode",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshSubMesh_GetZMode",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshSubMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshSubMesh_GetZMode" "', argument " "1"" of type '" "iGeneralMeshSubMesh const *""'"); 
@@ -4250,7 +4269,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshSubMesh_SetZMode(PyObject *SWIGUNUSEDPARM
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralMeshSubMesh_SetZMode",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshSubMesh_SetZMode",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshSubMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshSubMesh_SetZMode" "', argument " "1"" of type '" "iGeneralMeshSubMesh *""'"); 
@@ -4277,7 +4296,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshSubMesh_GetRenderPriority(PyObject *SWIGU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralMeshSubMesh_GetRenderPriority",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshSubMesh_GetRenderPriority",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshSubMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshSubMesh_GetRenderPriority" "', argument " "1"" of type '" "iGeneralMeshSubMesh const *""'"); 
@@ -4302,7 +4321,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshSubMesh_SetRenderPriority(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralMeshSubMesh_SetRenderPriority",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshSubMesh_SetRenderPriority",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshSubMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshSubMesh_SetRenderPriority" "', argument " "1"" of type '" "iGeneralMeshSubMesh *""'"); 
@@ -4332,7 +4351,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshSubMesh_SetMixmode(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralMeshSubMesh_SetMixmode",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshSubMesh_SetMixmode",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshSubMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshSubMesh_SetMixmode" "', argument " "1"" of type '" "iGeneralMeshSubMesh *""'"); 
@@ -4362,7 +4381,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshSubMesh_SetBack2Front(PyObject *SWIGUNUSE
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralMeshSubMesh_SetBack2Front",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshSubMesh_SetBack2Front",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshSubMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshSubMesh_SetBack2Front" "', argument " "1"" of type '" "iGeneralMeshSubMesh *""'"); 
@@ -4389,7 +4408,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshSubMesh_GetBack2Front(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralMeshSubMesh_GetBack2Front",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshSubMesh_GetBack2Front",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshSubMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshSubMesh_GetBack2Front" "', argument " "1"" of type '" "iGeneralMeshSubMesh const *""'"); 
@@ -4410,7 +4429,7 @@ SWIGINTERN PyObject *_wrap_delete_iGeneralMeshSubMesh(PyObject *SWIGUNUSEDPARM(s
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iGeneralMeshSubMesh",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iGeneralMeshSubMesh",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshSubMesh, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iGeneralMeshSubMesh" "', argument " "1"" of type '" "iGeneralMeshSubMesh *""'"); 
@@ -4427,7 +4446,7 @@ fail:
 
 SWIGINTERN PyObject *iGeneralMeshSubMesh_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iGeneralMeshSubMesh, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -4443,7 +4462,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshCommonState_SetLighting(PyObject *SWIGUNU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralMeshCommonState_SetLighting",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshCommonState_SetLighting",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshCommonState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshCommonState_SetLighting" "', argument " "1"" of type '" "iGeneralMeshCommonState *""'"); 
@@ -4470,7 +4489,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshCommonState_IsLighting(PyObject *SWIGUNUS
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralMeshCommonState_IsLighting",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshCommonState_IsLighting",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshCommonState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshCommonState_IsLighting" "', argument " "1"" of type '" "iGeneralMeshCommonState const *""'"); 
@@ -4495,7 +4514,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshCommonState_SetManualColors(PyObject *SWI
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralMeshCommonState_SetManualColors",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshCommonState_SetManualColors",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshCommonState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshCommonState_SetManualColors" "', argument " "1"" of type '" "iGeneralMeshCommonState *""'"); 
@@ -4522,7 +4541,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshCommonState_IsManualColors(PyObject *SWIG
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralMeshCommonState_IsManualColors",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshCommonState_IsManualColors",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshCommonState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshCommonState_IsManualColors" "', argument " "1"" of type '" "iGeneralMeshCommonState const *""'"); 
@@ -4547,7 +4566,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshCommonState_SetShadowCasting(PyObject *SW
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralMeshCommonState_SetShadowCasting",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshCommonState_SetShadowCasting",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshCommonState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshCommonState_SetShadowCasting" "', argument " "1"" of type '" "iGeneralMeshCommonState *""'"); 
@@ -4574,7 +4593,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshCommonState_IsShadowCasting(PyObject *SWI
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralMeshCommonState_IsShadowCasting",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshCommonState_IsShadowCasting",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshCommonState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshCommonState_IsShadowCasting" "', argument " "1"" of type '" "iGeneralMeshCommonState const *""'"); 
@@ -4599,7 +4618,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshCommonState_SetShadowReceiving(PyObject *
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralMeshCommonState_SetShadowReceiving",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshCommonState_SetShadowReceiving",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshCommonState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshCommonState_SetShadowReceiving" "', argument " "1"" of type '" "iGeneralMeshCommonState *""'"); 
@@ -4626,7 +4645,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshCommonState_IsShadowReceiving(PyObject *S
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralMeshCommonState_IsShadowReceiving",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshCommonState_IsShadowReceiving",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshCommonState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshCommonState_IsShadowReceiving" "', argument " "1"" of type '" "iGeneralMeshCommonState const *""'"); 
@@ -4657,7 +4676,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshCommonState_AddRenderBuffer(PyObject *SWI
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iGeneralMeshCommonState_AddRenderBuffer",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshCommonState_AddRenderBuffer",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshCommonState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshCommonState_AddRenderBuffer" "', argument " "1"" of type '" "iGeneralMeshCommonState *""'"); 
@@ -4696,7 +4715,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshCommonState_RemoveRenderBuffer(PyObject *
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralMeshCommonState_RemoveRenderBuffer",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshCommonState_RemoveRenderBuffer",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshCommonState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshCommonState_RemoveRenderBuffer" "', argument " "1"" of type '" "iGeneralMeshCommonState *""'"); 
@@ -4725,7 +4744,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshCommonState_GetRenderBufferCount(PyObject
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralMeshCommonState_GetRenderBufferCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshCommonState_GetRenderBufferCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshCommonState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshCommonState_GetRenderBufferCount" "', argument " "1"" of type '" "iGeneralMeshCommonState const *""'"); 
@@ -4751,7 +4770,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshCommonState_GetRenderBuffer__SWIG_0(PyObj
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralMeshCommonState_GetRenderBuffer",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshCommonState_GetRenderBuffer",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshCommonState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshCommonState_GetRenderBuffer" "', argument " "1"" of type '" "iGeneralMeshCommonState *""'"); 
@@ -4782,7 +4801,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshCommonState_GetRenderBufferName(PyObject 
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralMeshCommonState_GetRenderBufferName",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshCommonState_GetRenderBufferName",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshCommonState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshCommonState_GetRenderBufferName" "', argument " "1"" of type '" "iGeneralMeshCommonState const *""'"); 
@@ -4831,7 +4850,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshCommonState_GetRenderBuffer__SWIG_1(PyObj
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralMeshCommonState_GetRenderBuffer",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshCommonState_GetRenderBuffer",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshCommonState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshCommonState_GetRenderBuffer" "', argument " "1"" of type '" "iGeneralMeshCommonState *""'"); 
@@ -4904,7 +4923,7 @@ SWIGINTERN PyObject *_wrap_delete_iGeneralMeshCommonState(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iGeneralMeshCommonState",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iGeneralMeshCommonState",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshCommonState, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iGeneralMeshCommonState" "', argument " "1"" of type '" "iGeneralMeshCommonState *""'"); 
@@ -4921,7 +4940,7 @@ fail:
 
 SWIGINTERN PyObject *iGeneralMeshCommonState_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iGeneralMeshCommonState, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -4937,7 +4956,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshState_SetAnimationControl(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralMeshState_SetAnimationControl",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshState_SetAnimationControl",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshState_SetAnimationControl" "', argument " "1"" of type '" "iGeneralMeshState *""'"); 
@@ -4964,7 +4983,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshState_GetAnimationControl(PyObject *SWIGU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralMeshState_GetAnimationControl",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshState_GetAnimationControl",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshState_GetAnimationControl" "', argument " "1"" of type '" "iGeneralMeshState const *""'"); 
@@ -4991,7 +5010,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshState_FindSubMesh(PyObject *SWIGUNUSEDPAR
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralMeshState_FindSubMesh",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshState_FindSubMesh",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshState_FindSubMesh" "', argument " "1"" of type '" "iGeneralMeshState const *""'"); 
@@ -5016,7 +5035,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshState_scfGetVersion(PyObject *SWIGUNUSEDP
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iGeneralMeshState_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshState_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iGeneralMeshState_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -5032,7 +5051,7 @@ SWIGINTERN PyObject *_wrap_delete_iGeneralMeshState(PyObject *SWIGUNUSEDPARM(sel
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iGeneralMeshState",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iGeneralMeshState",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshState, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iGeneralMeshState" "', argument " "1"" of type '" "iGeneralMeshState *""'"); 
@@ -5049,7 +5068,7 @@ fail:
 
 SWIGINTERN PyObject *iGeneralMeshState_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iGeneralMeshState, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -5065,7 +5084,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_SetColor(PyObject *SWIGUNUSEDPAR
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralFactoryState_SetColor",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_SetColor",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_SetColor" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -5095,7 +5114,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_GetColor(PyObject *SWIGUNUSEDPAR
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralFactoryState_GetColor",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_GetColor",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_GetColor" "', argument " "1"" of type '" "iGeneralFactoryState const *""'"); 
@@ -5135,7 +5154,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_AddVertex(PyObject *SWIGUNUSEDPA
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iGeneralFactoryState_AddVertex",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_AddVertex",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_AddVertex" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -5192,7 +5211,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_SetVertexCount(PyObject *SWIGUNU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralFactoryState_SetVertexCount",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_SetVertexCount",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_SetVertexCount" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -5219,7 +5238,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_GetVertexCount(PyObject *SWIGUNU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralFactoryState_GetVertexCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_GetVertexCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_GetVertexCount" "', argument " "1"" of type '" "iGeneralFactoryState const *""'"); 
@@ -5241,7 +5260,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_GetVertices(PyObject *SWIGUNUSED
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralFactoryState_GetVertices",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_GetVertices",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_GetVertices" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -5263,7 +5282,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_GetTexels(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralFactoryState_GetTexels",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_GetTexels",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_GetTexels" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -5285,7 +5304,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_GetNormals(PyObject *SWIGUNUSEDP
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralFactoryState_GetNormals",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_GetNormals",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_GetNormals" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -5307,7 +5326,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_GetColors(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralFactoryState_GetColors",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_GetColors",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_GetColors" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -5332,7 +5351,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_AddTriangle(PyObject *SWIGUNUSED
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralFactoryState_AddTriangle",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_AddTriangle",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_AddTriangle" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -5365,7 +5384,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_SetTriangleCount(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralFactoryState_SetTriangleCount",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_SetTriangleCount",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_SetTriangleCount" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -5392,7 +5411,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_GetTriangleCount(PyObject *SWIGU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralFactoryState_GetTriangleCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_GetTriangleCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_GetTriangleCount" "', argument " "1"" of type '" "iGeneralFactoryState const *""'"); 
@@ -5414,7 +5433,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_GetTriangles(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralFactoryState_GetTriangles",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_GetTriangles",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_GetTriangles" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -5435,7 +5454,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_Invalidate(PyObject *SWIGUNUSEDP
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralFactoryState_Invalidate",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_Invalidate",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_Invalidate" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -5460,7 +5479,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_CalculateNormals__SWIG_0(PyObjec
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralFactoryState_CalculateNormals",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_CalculateNormals",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_CalculateNormals" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -5486,7 +5505,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_CalculateNormals__SWIG_1(PyObjec
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralFactoryState_CalculateNormals",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_CalculateNormals",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_CalculateNormals" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -5548,7 +5567,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_Compress(PyObject *SWIGUNUSEDPAR
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralFactoryState_Compress",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_Compress",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_Compress" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -5573,7 +5592,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_GenerateBox(PyObject *SWIGUNUSED
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralFactoryState_GenerateBox",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_GenerateBox",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_GenerateBox" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -5614,7 +5633,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_GenerateCapsule(PyObject *SWIGUN
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iGeneralFactoryState_GenerateCapsule",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_GenerateCapsule",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_GenerateCapsule" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -5670,7 +5689,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_GenerateSphere__SWIG_0(PyObject 
   PyObject * obj4 = 0 ;
   PyObject * obj5 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOO:iGeneralFactoryState_GenerateSphere",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_GenerateSphere",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_GenerateSphere" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -5735,7 +5754,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_GenerateSphere__SWIG_1(PyObject 
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iGeneralFactoryState_GenerateSphere",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_GenerateSphere",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_GenerateSphere" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -5791,7 +5810,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_GenerateSphere__SWIG_2(PyObject 
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iGeneralFactoryState_GenerateSphere",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_GenerateSphere",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_GenerateSphere" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -5838,7 +5857,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_GenerateSphere__SWIG_3(PyObject 
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iGeneralFactoryState_GenerateSphere",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_GenerateSphere",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_GenerateSphere" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -6005,7 +6024,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_SetBack2Front(PyObject *SWIGUNUS
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralFactoryState_SetBack2Front",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_SetBack2Front",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_SetBack2Front" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -6032,7 +6051,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_IsAutoNormals(PyObject *SWIGUNUS
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralFactoryState_IsAutoNormals",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_IsAutoNormals",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_IsAutoNormals" "', argument " "1"" of type '" "iGeneralFactoryState const *""'"); 
@@ -6054,7 +6073,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_IsBack2Front(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralFactoryState_IsBack2Front",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_IsBack2Front",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_IsBack2Front" "', argument " "1"" of type '" "iGeneralFactoryState const *""'"); 
@@ -6079,7 +6098,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_SetAnimationControlFactory(PyObj
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralFactoryState_SetAnimationControlFactory",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_SetAnimationControlFactory",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_SetAnimationControlFactory" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -6106,7 +6125,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_GetAnimationControlFactory(PyObj
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralFactoryState_GetAnimationControlFactory",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_GetAnimationControlFactory",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_GetAnimationControlFactory" "', argument " "1"" of type '" "iGeneralFactoryState const *""'"); 
@@ -6127,7 +6146,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_ClearSubMeshes(PyObject *SWIGUNU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralFactoryState_ClearSubMeshes",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_ClearSubMeshes",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_ClearSubMeshes" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -6166,7 +6185,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_AddSubMesh__SWIG_0(PyObject *SWI
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iGeneralFactoryState_AddSubMesh",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_AddSubMesh",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_AddSubMesh" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -6223,7 +6242,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_AddSubMesh__SWIG_1(PyObject *SWI
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iGeneralFactoryState_AddSubMesh",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_AddSubMesh",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_AddSubMesh" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -6336,7 +6355,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_FindSubMesh(PyObject *SWIGUNUSED
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralFactoryState_FindSubMesh",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_FindSubMesh",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_FindSubMesh" "', argument " "1"" of type '" "iGeneralFactoryState const *""'"); 
@@ -6368,7 +6387,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_DeleteSubMesh(PyObject *SWIGUNUS
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralFactoryState_DeleteSubMesh",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_DeleteSubMesh",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_DeleteSubMesh" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -6395,7 +6414,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_GetSubMeshCount(PyObject *SWIGUN
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralFactoryState_GetSubMeshCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_GetSubMeshCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_GetSubMeshCount" "', argument " "1"" of type '" "iGeneralFactoryState const *""'"); 
@@ -6421,7 +6440,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_GetSubMesh(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralFactoryState_GetSubMesh",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_GetSubMesh",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_GetSubMesh" "', argument " "1"" of type '" "iGeneralFactoryState const *""'"); 
@@ -6447,7 +6466,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_DisableAutoNormals(PyObject *SWI
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGeneralFactoryState_DisableAutoNormals",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_DisableAutoNormals",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_DisableAutoNormals" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -6473,7 +6492,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_GetVertexByIndex(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralFactoryState_GetVertexByIndex",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_GetVertexByIndex",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_GetVertexByIndex" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -6504,7 +6523,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_GetTexelByIndex(PyObject *SWIGUN
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralFactoryState_GetTexelByIndex",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_GetTexelByIndex",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_GetTexelByIndex" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -6535,7 +6554,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_GetNormalByIndex(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralFactoryState_GetNormalByIndex",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_GetNormalByIndex",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_GetNormalByIndex" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -6566,7 +6585,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_GetTriangleByIndex(PyObject *SWI
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralFactoryState_GetTriangleByIndex",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_GetTriangleByIndex",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_GetTriangleByIndex" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -6597,7 +6616,7 @@ SWIGINTERN PyObject *_wrap_iGeneralFactoryState_GetColorByIndex(PyObject *SWIGUN
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGeneralFactoryState_GetColorByIndex",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_GetColorByIndex",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_GetColorByIndex" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -6616,11 +6635,99 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iGeneralFactoryState_GetVerticesAsBuffer(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGeneralFactoryState *arg1 = (iGeneralFactoryState *) 0 ;
+  PyObject *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_GetVerticesAsBuffer",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_GetVerticesAsBuffer" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
+  }
+  arg1 = reinterpret_cast< iGeneralFactoryState * >(argp1);
+  result = (PyObject *)iGeneralFactoryState_GetVerticesAsBuffer(arg1);
+  resultobj = result;
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGeneralFactoryState_GetNormalsAsBuffer(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGeneralFactoryState *arg1 = (iGeneralFactoryState *) 0 ;
+  PyObject *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_GetNormalsAsBuffer",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_GetNormalsAsBuffer" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
+  }
+  arg1 = reinterpret_cast< iGeneralFactoryState * >(argp1);
+  result = (PyObject *)iGeneralFactoryState_GetNormalsAsBuffer(arg1);
+  resultobj = result;
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGeneralFactoryState_GetColorsAsBuffer(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGeneralFactoryState *arg1 = (iGeneralFactoryState *) 0 ;
+  PyObject *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_GetColorsAsBuffer",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_GetColorsAsBuffer" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
+  }
+  arg1 = reinterpret_cast< iGeneralFactoryState * >(argp1);
+  result = (PyObject *)iGeneralFactoryState_GetColorsAsBuffer(arg1);
+  resultobj = result;
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGeneralFactoryState_GetTrianglesAsBuffer(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGeneralFactoryState *arg1 = (iGeneralFactoryState *) 0 ;
+  PyObject *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_GetTrianglesAsBuffer",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralFactoryState_GetTrianglesAsBuffer" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
+  }
+  arg1 = reinterpret_cast< iGeneralFactoryState * >(argp1);
+  result = (PyObject *)iGeneralFactoryState_GetTrianglesAsBuffer(arg1);
+  resultobj = result;
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iGeneralFactoryState_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iGeneralFactoryState_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralFactoryState_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iGeneralFactoryState_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -6636,7 +6743,7 @@ SWIGINTERN PyObject *_wrap_delete_iGeneralFactoryState(PyObject *SWIGUNUSEDPARM(
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iGeneralFactoryState",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iGeneralFactoryState",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralFactoryState, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iGeneralFactoryState" "', argument " "1"" of type '" "iGeneralFactoryState *""'"); 
@@ -6653,7 +6760,7 @@ fail:
 
 SWIGINTERN PyObject *iGeneralFactoryState_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iGeneralFactoryState, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -6666,7 +6773,7 @@ SWIGINTERN PyObject *_wrap_iGenMeshAnimationControl_AnimatesVertices(PyObject *S
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGenMeshAnimationControl_AnimatesVertices",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGenMeshAnimationControl_AnimatesVertices",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshAnimationControl, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGenMeshAnimationControl_AnimatesVertices" "', argument " "1"" of type '" "iGenMeshAnimationControl const *""'"); 
@@ -6688,7 +6795,7 @@ SWIGINTERN PyObject *_wrap_iGenMeshAnimationControl_AnimatesTexels(PyObject *SWI
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGenMeshAnimationControl_AnimatesTexels",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGenMeshAnimationControl_AnimatesTexels",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshAnimationControl, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGenMeshAnimationControl_AnimatesTexels" "', argument " "1"" of type '" "iGenMeshAnimationControl const *""'"); 
@@ -6710,7 +6817,7 @@ SWIGINTERN PyObject *_wrap_iGenMeshAnimationControl_AnimatesNormals(PyObject *SW
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGenMeshAnimationControl_AnimatesNormals",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGenMeshAnimationControl_AnimatesNormals",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshAnimationControl, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGenMeshAnimationControl_AnimatesNormals" "', argument " "1"" of type '" "iGenMeshAnimationControl const *""'"); 
@@ -6732,7 +6839,7 @@ SWIGINTERN PyObject *_wrap_iGenMeshAnimationControl_AnimatesColors(PyObject *SWI
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGenMeshAnimationControl_AnimatesColors",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGenMeshAnimationControl_AnimatesColors",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshAnimationControl, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGenMeshAnimationControl_AnimatesColors" "', argument " "1"" of type '" "iGenMeshAnimationControl const *""'"); 
@@ -6765,7 +6872,7 @@ SWIGINTERN PyObject *_wrap_iGenMeshAnimationControl_Update(PyObject *SWIGUNUSEDP
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iGenMeshAnimationControl_Update",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGenMeshAnimationControl_Update",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshAnimationControl, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGenMeshAnimationControl_Update" "', argument " "1"" of type '" "iGenMeshAnimationControl *""'"); 
@@ -6818,7 +6925,7 @@ SWIGINTERN PyObject *_wrap_iGenMeshAnimationControl_UpdateVertices(PyObject *SWI
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iGenMeshAnimationControl_UpdateVertices",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGenMeshAnimationControl_UpdateVertices",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshAnimationControl, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGenMeshAnimationControl_UpdateVertices" "', argument " "1"" of type '" "iGenMeshAnimationControl *""'"); 
@@ -6876,7 +6983,7 @@ SWIGINTERN PyObject *_wrap_iGenMeshAnimationControl_UpdateTexels(PyObject *SWIGU
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iGenMeshAnimationControl_UpdateTexels",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGenMeshAnimationControl_UpdateTexels",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshAnimationControl, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGenMeshAnimationControl_UpdateTexels" "', argument " "1"" of type '" "iGenMeshAnimationControl *""'"); 
@@ -6934,7 +7041,7 @@ SWIGINTERN PyObject *_wrap_iGenMeshAnimationControl_UpdateNormals(PyObject *SWIG
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iGenMeshAnimationControl_UpdateNormals",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGenMeshAnimationControl_UpdateNormals",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshAnimationControl, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGenMeshAnimationControl_UpdateNormals" "', argument " "1"" of type '" "iGenMeshAnimationControl *""'"); 
@@ -6992,7 +7099,7 @@ SWIGINTERN PyObject *_wrap_iGenMeshAnimationControl_UpdateColors(PyObject *SWIGU
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iGenMeshAnimationControl_UpdateColors",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGenMeshAnimationControl_UpdateColors",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshAnimationControl, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGenMeshAnimationControl_UpdateColors" "', argument " "1"" of type '" "iGenMeshAnimationControl *""'"); 
@@ -7033,7 +7140,7 @@ SWIGINTERN PyObject *_wrap_delete_iGenMeshAnimationControl(PyObject *SWIGUNUSEDP
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iGenMeshAnimationControl",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iGenMeshAnimationControl",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshAnimationControl, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iGenMeshAnimationControl" "', argument " "1"" of type '" "iGenMeshAnimationControl *""'"); 
@@ -7050,7 +7157,7 @@ fail:
 
 SWIGINTERN PyObject *iGenMeshAnimationControl_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iGenMeshAnimationControl, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -7067,7 +7174,7 @@ SWIGINTERN PyObject *_wrap_iGenMeshAnimationControlFactory_CreateAnimationContro
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGenMeshAnimationControlFactory_CreateAnimationControl",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGenMeshAnimationControlFactory_CreateAnimationControl",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshAnimationControlFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGenMeshAnimationControlFactory_CreateAnimationControl" "', argument " "1"" of type '" "iGenMeshAnimationControlFactory *""'"); 
@@ -7098,7 +7205,7 @@ SWIGINTERN PyObject *_wrap_iGenMeshAnimationControlFactory_Load(PyObject *SWIGUN
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGenMeshAnimationControlFactory_Load",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGenMeshAnimationControlFactory_Load",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshAnimationControlFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGenMeshAnimationControlFactory_Load" "', argument " "1"" of type '" "iGenMeshAnimationControlFactory *""'"); 
@@ -7129,7 +7236,7 @@ SWIGINTERN PyObject *_wrap_iGenMeshAnimationControlFactory_Save(PyObject *SWIGUN
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGenMeshAnimationControlFactory_Save",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGenMeshAnimationControlFactory_Save",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshAnimationControlFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGenMeshAnimationControlFactory_Save" "', argument " "1"" of type '" "iGenMeshAnimationControlFactory *""'"); 
@@ -7155,7 +7262,7 @@ SWIGINTERN PyObject *_wrap_delete_iGenMeshAnimationControlFactory(PyObject *SWIG
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iGenMeshAnimationControlFactory",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iGenMeshAnimationControlFactory",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshAnimationControlFactory, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iGenMeshAnimationControlFactory" "', argument " "1"" of type '" "iGenMeshAnimationControlFactory *""'"); 
@@ -7172,7 +7279,7 @@ fail:
 
 SWIGINTERN PyObject *iGenMeshAnimationControlFactory_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iGenMeshAnimationControlFactory, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -7185,7 +7292,7 @@ SWIGINTERN PyObject *_wrap_iGenMeshAnimationControlType_CreateAnimationControlFa
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGenMeshAnimationControlType_CreateAnimationControlFactory",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGenMeshAnimationControlType_CreateAnimationControlFactory",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshAnimationControlType, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGenMeshAnimationControlType_CreateAnimationControlFactory" "', argument " "1"" of type '" "iGenMeshAnimationControlType *""'"); 
@@ -7206,7 +7313,7 @@ SWIGINTERN PyObject *_wrap_delete_iGenMeshAnimationControlType(PyObject *SWIGUNU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iGenMeshAnimationControlType",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iGenMeshAnimationControlType",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshAnimationControlType, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iGenMeshAnimationControlType" "', argument " "1"" of type '" "iGenMeshAnimationControlType *""'"); 
@@ -7223,7 +7330,7 @@ fail:
 
 SWIGINTERN PyObject *iGenMeshAnimationControlType_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iGenMeshAnimationControlType, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -7236,7 +7343,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBone_GetName(PyObject *SWIGUNUSEDPARM(self),
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBone_GetName",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBone_GetName",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBone, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBone_GetName" "', argument " "1"" of type '" "iSkeletonBone const *""'"); 
@@ -7262,7 +7369,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBone_SetName(PyObject *SWIGUNUSEDPARM(self),
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBone_SetName",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBone_SetName",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBone, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBone_SetName" "', argument " "1"" of type '" "iSkeletonBone *""'"); 
@@ -7291,7 +7398,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBone_GetTransform(PyObject *SWIGUNUSEDPARM(s
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBone_GetTransform",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBone_GetTransform",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBone, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBone_GetTransform" "', argument " "1"" of type '" "iSkeletonBone *""'"); 
@@ -7319,7 +7426,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBone_SetTransform(PyObject *SWIGUNUSEDPARM(s
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBone_SetTransform",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBone_SetTransform",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBone, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBone_SetTransform" "', argument " "1"" of type '" "iSkeletonBone *""'"); 
@@ -7349,7 +7456,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBone_GetFullTransform(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBone_GetFullTransform",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBone_GetFullTransform",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBone, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBone_GetFullTransform" "', argument " "1"" of type '" "iSkeletonBone *""'"); 
@@ -7377,7 +7484,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBone_SetParent(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBone_SetParent",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBone_SetParent",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBone, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBone_SetParent" "', argument " "1"" of type '" "iSkeletonBone *""'"); 
@@ -7404,7 +7511,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBone_GetParent(PyObject *SWIGUNUSEDPARM(self
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBone_GetParent",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBone_GetParent",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBone, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBone_GetParent" "', argument " "1"" of type '" "iSkeletonBone *""'"); 
@@ -7426,7 +7533,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBone_GetChildrenCount(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBone_GetChildrenCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBone_GetChildrenCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBone, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBone_GetChildrenCount" "', argument " "1"" of type '" "iSkeletonBone *""'"); 
@@ -7452,7 +7559,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBone_GetChild(PyObject *SWIGUNUSEDPARM(self)
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBone_GetChild",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBone_GetChild",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBone, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBone_GetChild" "', argument " "1"" of type '" "iSkeletonBone *""'"); 
@@ -7484,7 +7591,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBone_FindChild(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBone_FindChild",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBone_FindChild",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBone, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBone_FindChild" "', argument " "1"" of type '" "iSkeletonBone *""'"); 
@@ -7517,7 +7624,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBone_FindChildIndex(PyObject *SWIGUNUSEDPARM
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBone_FindChildIndex",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBone_FindChildIndex",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBone, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBone_FindChildIndex" "', argument " "1"" of type '" "iSkeletonBone *""'"); 
@@ -7547,7 +7654,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBone_SetSkinBox(PyObject *SWIGUNUSEDPARM(sel
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBone_SetSkinBox",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBone_SetSkinBox",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBone, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBone_SetSkinBox" "', argument " "1"" of type '" "iSkeletonBone *""'"); 
@@ -7577,7 +7684,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBone_GetSkinBox(PyObject *SWIGUNUSEDPARM(sel
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBone_GetSkinBox",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBone_GetSkinBox",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBone, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBone_GetSkinBox" "', argument " "1"" of type '" "iSkeletonBone *""'"); 
@@ -7605,7 +7712,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBone_SetUpdateCallback(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBone_SetUpdateCallback",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBone_SetUpdateCallback",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBone, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBone_SetUpdateCallback" "', argument " "1"" of type '" "iSkeletonBone *""'"); 
@@ -7632,7 +7739,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBone_GetUpdateCallback(PyObject *SWIGUNUSEDP
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBone_GetUpdateCallback",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBone_GetUpdateCallback",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBone, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBone_GetUpdateCallback" "', argument " "1"" of type '" "iSkeletonBone *""'"); 
@@ -7654,7 +7761,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBone_GetFactory(PyObject *SWIGUNUSEDPARM(sel
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBone_GetFactory",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBone_GetFactory",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBone, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBone_GetFactory" "', argument " "1"" of type '" "iSkeletonBone *""'"); 
@@ -7679,7 +7786,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBone_SetTransformMode(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBone_SetTransformMode",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBone_SetTransformMode",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBone, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBone_SetTransformMode" "', argument " "1"" of type '" "iSkeletonBone *""'"); 
@@ -7706,7 +7813,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBone_GetTransformMode(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBone_GetTransformMode",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBone_GetTransformMode",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBone, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBone_GetTransformMode" "', argument " "1"" of type '" "iSkeletonBone *""'"); 
@@ -7724,7 +7831,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBone_scfGetVersion(PyObject *SWIGUNUSEDPARM(
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iSkeletonBone_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBone_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iSkeletonBone_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -7740,7 +7847,7 @@ SWIGINTERN PyObject *_wrap_delete_iSkeletonBone(PyObject *SWIGUNUSEDPARM(self), 
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSkeletonBone",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSkeletonBone",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBone, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSkeletonBone" "', argument " "1"" of type '" "iSkeletonBone *""'"); 
@@ -7757,7 +7864,7 @@ fail:
 
 SWIGINTERN PyObject *iSkeletonBone_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSkeletonBone, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -7777,7 +7884,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneUpdateCallback_UpdateTransform(PyObject 
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSkeletonBoneUpdateCallback_UpdateTransform",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneUpdateCallback_UpdateTransform",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneUpdateCallback, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneUpdateCallback_UpdateTransform" "', argument " "1"" of type '" "iSkeletonBoneUpdateCallback *""'"); 
@@ -7811,7 +7918,7 @@ SWIGINTERN PyObject *_wrap_delete_iSkeletonBoneUpdateCallback(PyObject *SWIGUNUS
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSkeletonBoneUpdateCallback",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSkeletonBoneUpdateCallback",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneUpdateCallback, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSkeletonBoneUpdateCallback" "', argument " "1"" of type '" "iSkeletonBoneUpdateCallback *""'"); 
@@ -7828,7 +7935,7 @@ fail:
 
 SWIGINTERN PyObject *iSkeletonBoneUpdateCallback_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSkeletonBoneUpdateCallback, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -7841,7 +7948,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimationKeyFrame_GetName(PyObject *SWIGUNUS
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonAnimationKeyFrame_GetName",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimationKeyFrame_GetName",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimationKeyFrame, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimationKeyFrame_GetName" "', argument " "1"" of type '" "iSkeletonAnimationKeyFrame const *""'"); 
@@ -7867,7 +7974,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimationKeyFrame_SetName(PyObject *SWIGUNUS
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonAnimationKeyFrame_SetName",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimationKeyFrame_SetName",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimationKeyFrame, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimationKeyFrame_SetName" "', argument " "1"" of type '" "iSkeletonAnimationKeyFrame *""'"); 
@@ -7896,7 +8003,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimationKeyFrame_GetDuration(PyObject *SWIG
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonAnimationKeyFrame_GetDuration",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimationKeyFrame_GetDuration",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimationKeyFrame, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimationKeyFrame_GetDuration" "', argument " "1"" of type '" "iSkeletonAnimationKeyFrame *""'"); 
@@ -7921,7 +8028,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimationKeyFrame_SetDuration(PyObject *SWIG
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonAnimationKeyFrame_SetDuration",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimationKeyFrame_SetDuration",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimationKeyFrame, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimationKeyFrame_SetDuration" "', argument " "1"" of type '" "iSkeletonAnimationKeyFrame *""'"); 
@@ -7948,7 +8055,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimationKeyFrame_GetTransformsCount(PyObjec
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonAnimationKeyFrame_GetTransformsCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimationKeyFrame_GetTransformsCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimationKeyFrame, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimationKeyFrame_GetTransformsCount" "', argument " "1"" of type '" "iSkeletonAnimationKeyFrame *""'"); 
@@ -7981,7 +8088,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimationKeyFrame_AddTransform__SWIG_0(PyObj
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iSkeletonAnimationKeyFrame_AddTransform",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimationKeyFrame_AddTransform",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimationKeyFrame, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimationKeyFrame_AddTransform" "', argument " "1"" of type '" "iSkeletonAnimationKeyFrame *""'"); 
@@ -8028,7 +8135,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimationKeyFrame_AddTransform__SWIG_1(PyObj
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSkeletonAnimationKeyFrame_AddTransform",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimationKeyFrame_AddTransform",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimationKeyFrame, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimationKeyFrame_AddTransform" "', argument " "1"" of type '" "iSkeletonAnimationKeyFrame *""'"); 
@@ -8132,7 +8239,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimationKeyFrame_GetTransform(PyObject *SWI
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSkeletonAnimationKeyFrame_GetTransform",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimationKeyFrame_GetTransform",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimationKeyFrame, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimationKeyFrame_GetTransform" "', argument " "1"" of type '" "iSkeletonAnimationKeyFrame *""'"); 
@@ -8174,7 +8281,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimationKeyFrame_SetTransform(PyObject *SWI
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSkeletonAnimationKeyFrame_SetTransform",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimationKeyFrame_SetTransform",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimationKeyFrame, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimationKeyFrame_SetTransform" "', argument " "1"" of type '" "iSkeletonAnimationKeyFrame *""'"); 
@@ -8229,7 +8336,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimationKeyFrame_GetKeyFrameData(PyObject *
   PyObject * obj4 = 0 ;
   PyObject * obj5 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOO:iSkeletonAnimationKeyFrame_GetKeyFrameData",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimationKeyFrame_GetKeyFrameData",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimationKeyFrame, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimationKeyFrame_GetKeyFrameData" "', argument " "1"" of type '" "iSkeletonAnimationKeyFrame *""'"); 
@@ -8287,7 +8394,7 @@ SWIGINTERN PyObject *_wrap_delete_iSkeletonAnimationKeyFrame(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSkeletonAnimationKeyFrame",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSkeletonAnimationKeyFrame",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimationKeyFrame, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSkeletonAnimationKeyFrame" "', argument " "1"" of type '" "iSkeletonAnimationKeyFrame *""'"); 
@@ -8304,7 +8411,7 @@ fail:
 
 SWIGINTERN PyObject *iSkeletonAnimationKeyFrame_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSkeletonAnimationKeyFrame, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -8317,7 +8424,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation_GetName(PyObject *SWIGUNUSEDPARM(s
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonAnimation_GetName",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimation_GetName",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimation, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimation_GetName" "', argument " "1"" of type '" "iSkeletonAnimation const *""'"); 
@@ -8343,7 +8450,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation_SetName(PyObject *SWIGUNUSEDPARM(s
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonAnimation_SetName",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimation_SetName",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimation, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimation_SetName" "', argument " "1"" of type '" "iSkeletonAnimation *""'"); 
@@ -8372,7 +8479,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation_GetTime(PyObject *SWIGUNUSEDPARM(s
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonAnimation_GetTime",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimation_GetTime",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimation, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimation_GetTime" "', argument " "1"" of type '" "iSkeletonAnimation *""'"); 
@@ -8397,7 +8504,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation_SetTime(PyObject *SWIGUNUSEDPARM(s
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonAnimation_SetTime",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimation_SetTime",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimation, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimation_SetTime" "', argument " "1"" of type '" "iSkeletonAnimation *""'"); 
@@ -8424,7 +8531,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation_GetSpeed(PyObject *SWIGUNUSEDPARM(
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonAnimation_GetSpeed",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimation_GetSpeed",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimation, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimation_GetSpeed" "', argument " "1"" of type '" "iSkeletonAnimation *""'"); 
@@ -8449,7 +8556,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation_SetSpeed(PyObject *SWIGUNUSEDPARM(
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonAnimation_SetSpeed",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimation_SetSpeed",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimation, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimation_SetSpeed" "', argument " "1"" of type '" "iSkeletonAnimation *""'"); 
@@ -8479,7 +8586,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation_SetFactor(PyObject *SWIGUNUSEDPARM
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonAnimation_SetFactor",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimation_SetFactor",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimation, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimation_SetFactor" "', argument " "1"" of type '" "iSkeletonAnimation *""'"); 
@@ -8506,7 +8613,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation_GetFactor(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonAnimation_GetFactor",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimation_GetFactor",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimation, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimation_GetFactor" "', argument " "1"" of type '" "iSkeletonAnimation *""'"); 
@@ -8531,7 +8638,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation_SetLoop(PyObject *SWIGUNUSEDPARM(s
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonAnimation_SetLoop",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimation_SetLoop",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimation, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimation_SetLoop" "', argument " "1"" of type '" "iSkeletonAnimation *""'"); 
@@ -8558,7 +8665,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation_GetLoop(PyObject *SWIGUNUSEDPARM(s
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonAnimation_GetLoop",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimation_GetLoop",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimation, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimation_GetLoop" "', argument " "1"" of type '" "iSkeletonAnimation *""'"); 
@@ -8585,7 +8692,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation_CreateFrame(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonAnimation_CreateFrame",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimation_CreateFrame",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimation, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimation_CreateFrame" "', argument " "1"" of type '" "iSkeletonAnimation *""'"); 
@@ -8614,7 +8721,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation_GetFramesCount(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonAnimation_GetFramesCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimation_GetFramesCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimation, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimation_GetFramesCount" "', argument " "1"" of type '" "iSkeletonAnimation *""'"); 
@@ -8640,7 +8747,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation_GetFrame(PyObject *SWIGUNUSEDPARM(
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonAnimation_GetFrame",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimation_GetFrame",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimation, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimation_GetFrame" "', argument " "1"" of type '" "iSkeletonAnimation *""'"); 
@@ -8672,7 +8779,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation_FindFrameIndex(PyObject *SWIGUNUSE
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonAnimation_FindFrameIndex",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimation_FindFrameIndex",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimation, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimation_FindFrameIndex" "', argument " "1"" of type '" "iSkeletonAnimation *""'"); 
@@ -8704,7 +8811,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation_RemoveFrame(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonAnimation_RemoveFrame",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimation_RemoveFrame",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimation, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimation_RemoveFrame" "', argument " "1"" of type '" "iSkeletonAnimation *""'"); 
@@ -8730,7 +8837,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation_RemoveAllFrames(PyObject *SWIGUNUS
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonAnimation_RemoveAllFrames",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimation_RemoveAllFrames",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimation, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimation_RemoveAllFrames" "', argument " "1"" of type '" "iSkeletonAnimation *""'"); 
@@ -8751,7 +8858,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation_RecalcSpline(PyObject *SWIGUNUSEDP
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonAnimation_RecalcSpline",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimation_RecalcSpline",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimation, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimation_RecalcSpline" "', argument " "1"" of type '" "iSkeletonAnimation *""'"); 
@@ -8772,7 +8879,7 @@ SWIGINTERN PyObject *_wrap_delete_iSkeletonAnimation(PyObject *SWIGUNUSEDPARM(se
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSkeletonAnimation",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSkeletonAnimation",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimation, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSkeletonAnimation" "', argument " "1"" of type '" "iSkeletonAnimation *""'"); 
@@ -8789,7 +8896,7 @@ fail:
 
 SWIGINTERN PyObject *iSkeletonAnimation_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSkeletonAnimation, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -8809,7 +8916,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimationCallback_Execute(PyObject *SWIGUNUS
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSkeletonAnimationCallback_Execute",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimationCallback_Execute",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimationCallback, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimationCallback_Execute" "', argument " "1"" of type '" "iSkeletonAnimationCallback *""'"); 
@@ -8844,7 +8951,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimationCallback_OnFinish(PyObject *SWIGUNU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonAnimationCallback_OnFinish",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimationCallback_OnFinish",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimationCallback, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimationCallback_OnFinish" "', argument " "1"" of type '" "iSkeletonAnimationCallback *""'"); 
@@ -8870,7 +8977,7 @@ SWIGINTERN PyObject *_wrap_delete_iSkeletonAnimationCallback(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSkeletonAnimationCallback",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSkeletonAnimationCallback",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimationCallback, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSkeletonAnimationCallback" "', argument " "1"" of type '" "iSkeletonAnimationCallback *""'"); 
@@ -8887,7 +8994,7 @@ fail:
 
 SWIGINTERN PyObject *iSkeletonAnimationCallback_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSkeletonAnimationCallback, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -8908,7 +9015,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonUpdateCallback_Execute(PyObject *SWIGUNUSEDP
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSkeletonUpdateCallback_Execute",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonUpdateCallback_Execute",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonUpdateCallback, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonUpdateCallback_Execute" "', argument " "1"" of type '" "iSkeletonUpdateCallback *""'"); 
@@ -8940,7 +9047,7 @@ SWIGINTERN PyObject *_wrap_delete_iSkeletonUpdateCallback(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSkeletonUpdateCallback",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSkeletonUpdateCallback",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonUpdateCallback, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSkeletonUpdateCallback" "', argument " "1"" of type '" "iSkeletonUpdateCallback *""'"); 
@@ -8957,7 +9064,7 @@ fail:
 
 SWIGINTERN PyObject *iSkeletonUpdateCallback_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSkeletonUpdateCallback, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -8970,7 +9077,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimationInstance_GetSpeed(PyObject *SWIGUNU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonAnimationInstance_GetSpeed",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimationInstance_GetSpeed",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimationInstance, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimationInstance_GetSpeed" "', argument " "1"" of type '" "iSkeletonAnimationInstance *""'"); 
@@ -8995,7 +9102,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimationInstance_SetSpeed(PyObject *SWIGUNU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonAnimationInstance_SetSpeed",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimationInstance_SetSpeed",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimationInstance, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimationInstance_SetSpeed" "', argument " "1"" of type '" "iSkeletonAnimationInstance *""'"); 
@@ -9025,7 +9132,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimationInstance_SetFactor(PyObject *SWIGUN
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonAnimationInstance_SetFactor",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimationInstance_SetFactor",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimationInstance, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimationInstance_SetFactor" "', argument " "1"" of type '" "iSkeletonAnimationInstance *""'"); 
@@ -9052,7 +9159,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimationInstance_GetFactor(PyObject *SWIGUN
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonAnimationInstance_GetFactor",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimationInstance_GetFactor",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimationInstance, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimationInstance_GetFactor" "', argument " "1"" of type '" "iSkeletonAnimationInstance *""'"); 
@@ -9074,7 +9181,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimationInstance_GetDuration(PyObject *SWIG
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonAnimationInstance_GetDuration",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimationInstance_GetDuration",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimationInstance, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimationInstance_GetDuration" "', argument " "1"" of type '" "iSkeletonAnimationInstance *""'"); 
@@ -9099,7 +9206,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimationInstance_SetDuration(PyObject *SWIG
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonAnimationInstance_SetDuration",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimationInstance_SetDuration",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimationInstance, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimationInstance_SetDuration" "', argument " "1"" of type '" "iSkeletonAnimationInstance *""'"); 
@@ -9125,7 +9232,7 @@ SWIGINTERN PyObject *_wrap_delete_iSkeletonAnimationInstance(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSkeletonAnimationInstance",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSkeletonAnimationInstance",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimationInstance, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSkeletonAnimationInstance" "', argument " "1"" of type '" "iSkeletonAnimationInstance *""'"); 
@@ -9142,7 +9249,7 @@ fail:
 
 SWIGINTERN PyObject *iSkeletonAnimationInstance_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSkeletonAnimationInstance, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -9155,7 +9262,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_GetName(PyObject *SWIGUNUSEDPARM(self), PyO
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeleton_GetName",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton_GetName",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_GetName" "', argument " "1"" of type '" "iSkeleton const *""'"); 
@@ -9181,7 +9288,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_SetName(PyObject *SWIGUNUSEDPARM(self), PyO
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeleton_SetName",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton_SetName",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_SetName" "', argument " "1"" of type '" "iSkeleton *""'"); 
@@ -9210,7 +9317,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_GetBonesCount(PyObject *SWIGUNUSEDPARM(self
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeleton_GetBonesCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton_GetBonesCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_GetBonesCount" "', argument " "1"" of type '" "iSkeleton *""'"); 
@@ -9236,7 +9343,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_GetBone(PyObject *SWIGUNUSEDPARM(self), PyO
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeleton_GetBone",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton_GetBone",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_GetBone" "', argument " "1"" of type '" "iSkeleton *""'"); 
@@ -9268,7 +9375,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_FindBone(PyObject *SWIGUNUSEDPARM(self), Py
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeleton_FindBone",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton_FindBone",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_FindBone" "', argument " "1"" of type '" "iSkeleton *""'"); 
@@ -9302,7 +9409,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_FindBoneIndex(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeleton_FindBoneIndex",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton_FindBoneIndex",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_FindBoneIndex" "', argument " "1"" of type '" "iSkeleton *""'"); 
@@ -9340,7 +9447,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_Execute__SWIG_0(PyObject *SWIGUNUSEDPARM(se
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSkeleton_Execute",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton_Execute",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_Execute" "', argument " "1"" of type '" "iSkeleton *""'"); 
@@ -9379,7 +9486,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_Execute__SWIG_1(PyObject *SWIGUNUSEDPARM(se
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeleton_Execute",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton_Execute",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_Execute" "', argument " "1"" of type '" "iSkeleton *""'"); 
@@ -9462,7 +9569,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_Append(PyObject *SWIGUNUSEDPARM(self), PyOb
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeleton_Append",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton_Append",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_Append" "', argument " "1"" of type '" "iSkeleton *""'"); 
@@ -9496,7 +9603,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_Play(PyObject *SWIGUNUSEDPARM(self), PyObje
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeleton_Play",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton_Play",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_Play" "', argument " "1"" of type '" "iSkeleton *""'"); 
@@ -9528,7 +9635,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_Stop__SWIG_0(PyObject *SWIGUNUSEDPARM(self)
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeleton_Stop",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton_Stop",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_Stop" "', argument " "1"" of type '" "iSkeleton *""'"); 
@@ -9554,7 +9661,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_ClearPendingAnimations(PyObject *SWIGUNUSED
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeleton_ClearPendingAnimations",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton_ClearPendingAnimations",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_ClearPendingAnimations" "', argument " "1"" of type '" "iSkeleton *""'"); 
@@ -9576,7 +9683,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_GetAnimationsCount(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeleton_GetAnimationsCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton_GetAnimationsCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_GetAnimationsCount" "', argument " "1"" of type '" "iSkeleton *""'"); 
@@ -9602,7 +9709,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_GetAnimation(PyObject *SWIGUNUSEDPARM(self)
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeleton_GetAnimation",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton_GetAnimation",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_GetAnimation" "', argument " "1"" of type '" "iSkeleton *""'"); 
@@ -9634,7 +9741,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_FindAnimation(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeleton_FindAnimation",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton_FindAnimation",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_FindAnimation" "', argument " "1"" of type '" "iSkeleton *""'"); 
@@ -9668,7 +9775,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_FindSocket(PyObject *SWIGUNUSEDPARM(self), 
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeleton_FindSocket",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton_FindSocket",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_FindSocket" "', argument " "1"" of type '" "iSkeleton *""'"); 
@@ -9696,7 +9803,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_StopAll(PyObject *SWIGUNUSEDPARM(self), PyO
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeleton_StopAll",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton_StopAll",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_StopAll" "', argument " "1"" of type '" "iSkeleton *""'"); 
@@ -9722,7 +9829,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_Stop__SWIG_1(PyObject *SWIGUNUSEDPARM(self)
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeleton_Stop",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton_Stop",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_Stop" "', argument " "1"" of type '" "iSkeleton *""'"); 
@@ -9795,7 +9902,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_GetFactory(PyObject *SWIGUNUSEDPARM(self), 
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeleton_GetFactory",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton_GetFactory",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_GetFactory" "', argument " "1"" of type '" "iSkeleton *""'"); 
@@ -9820,7 +9927,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_SetAnimationCallback(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeleton_SetAnimationCallback",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton_SetAnimationCallback",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_SetAnimationCallback" "', argument " "1"" of type '" "iSkeleton *""'"); 
@@ -9851,7 +9958,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_AddUpdateCallback(PyObject *SWIGUNUSEDPARM(
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeleton_AddUpdateCallback",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton_AddUpdateCallback",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_AddUpdateCallback" "', argument " "1"" of type '" "iSkeleton *""'"); 
@@ -9878,7 +9985,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_GetUpdateCallbacksCount(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeleton_GetUpdateCallbacksCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton_GetUpdateCallbacksCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_GetUpdateCallbacksCount" "', argument " "1"" of type '" "iSkeleton *""'"); 
@@ -9904,7 +10011,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_GetUpdateCallback(PyObject *SWIGUNUSEDPARM(
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeleton_GetUpdateCallback",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton_GetUpdateCallback",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_GetUpdateCallback" "', argument " "1"" of type '" "iSkeleton *""'"); 
@@ -9934,7 +10041,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_RemoveUpdateCallback(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeleton_RemoveUpdateCallback",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton_RemoveUpdateCallback",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_RemoveUpdateCallback" "', argument " "1"" of type '" "iSkeleton *""'"); 
@@ -9965,7 +10072,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_UpdateAnimation(PyObject *SWIGUNUSEDPARM(se
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeleton_UpdateAnimation",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton_UpdateAnimation",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_UpdateAnimation" "', argument " "1"" of type '" "iSkeleton *""'"); 
@@ -9991,7 +10098,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_UpdateBones(PyObject *SWIGUNUSEDPARM(self),
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeleton_UpdateBones",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton_UpdateBones",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_UpdateBones" "', argument " "1"" of type '" "iSkeleton *""'"); 
@@ -10009,7 +10116,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_scfGetVersion(PyObject *SWIGUNUSEDPARM(self
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iSkeleton_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iSkeleton_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -10025,7 +10132,7 @@ SWIGINTERN PyObject *_wrap_delete_iSkeleton(PyObject *SWIGUNUSEDPARM(self), PyOb
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSkeleton",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSkeleton",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSkeleton" "', argument " "1"" of type '" "iSkeleton *""'"); 
@@ -10042,7 +10149,7 @@ fail:
 
 SWIGINTERN PyObject *iSkeleton_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSkeleton, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -10055,7 +10162,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonSocket_GetName(PyObject *SWIGUNUSEDPARM(self
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonSocket_GetName",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonSocket_GetName",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonSocket_GetName" "', argument " "1"" of type '" "iSkeletonSocket const *""'"); 
@@ -10081,7 +10188,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonSocket_SetName(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonSocket_SetName",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonSocket_SetName",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonSocket_SetName" "', argument " "1"" of type '" "iSkeletonSocket *""'"); 
@@ -10110,7 +10217,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonSocket_GetTransform(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonSocket_GetTransform",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonSocket_GetTransform",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonSocket_GetTransform" "', argument " "1"" of type '" "iSkeletonSocket *""'"); 
@@ -10138,7 +10245,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonSocket_SetTransform(PyObject *SWIGUNUSEDPARM
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonSocket_SetTransform",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonSocket_SetTransform",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonSocket_SetTransform" "', argument " "1"" of type '" "iSkeletonSocket *""'"); 
@@ -10168,7 +10275,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonSocket_GetFullTransform(PyObject *SWIGUNUSED
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonSocket_GetFullTransform",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonSocket_GetFullTransform",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonSocket_GetFullTransform" "', argument " "1"" of type '" "iSkeletonSocket *""'"); 
@@ -10196,7 +10303,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonSocket_SetBone(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonSocket_SetBone",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonSocket_SetBone",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonSocket_SetBone" "', argument " "1"" of type '" "iSkeletonSocket *""'"); 
@@ -10223,7 +10330,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonSocket_GetBone(PyObject *SWIGUNUSEDPARM(self
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonSocket_GetBone",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonSocket_GetBone",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonSocket_GetBone" "', argument " "1"" of type '" "iSkeletonSocket *""'"); 
@@ -10248,7 +10355,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonSocket_SetSceneNode(PyObject *SWIGUNUSEDPARM
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonSocket_SetSceneNode",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonSocket_SetSceneNode",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonSocket_SetSceneNode" "', argument " "1"" of type '" "iSkeletonSocket *""'"); 
@@ -10275,7 +10382,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonSocket_GetSceneNode(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonSocket_GetSceneNode",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonSocket_GetSceneNode",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonSocket_GetSceneNode" "', argument " "1"" of type '" "iSkeletonSocket *""'"); 
@@ -10297,7 +10404,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonSocket_GetFactory(PyObject *SWIGUNUSEDPARM(s
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonSocket_GetFactory",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonSocket_GetFactory",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonSocket_GetFactory" "', argument " "1"" of type '" "iSkeletonSocket *""'"); 
@@ -10315,7 +10422,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonSocket_scfGetVersion(PyObject *SWIGUNUSEDPAR
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iSkeletonSocket_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonSocket_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iSkeletonSocket_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -10331,7 +10438,7 @@ SWIGINTERN PyObject *_wrap_delete_iSkeletonSocket(PyObject *SWIGUNUSEDPARM(self)
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSkeletonSocket",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSkeletonSocket",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonSocket, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSkeletonSocket" "', argument " "1"" of type '" "iSkeletonSocket *""'"); 
@@ -10348,7 +10455,7 @@ fail:
 
 SWIGINTERN PyObject *iSkeletonSocket_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSkeletonSocket, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -10364,7 +10471,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_SetEnabled(PyObject *SWIGUNU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBoneRagdollInfo_SetEnabled",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_SetEnabled",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_SetEnabled" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -10391,7 +10498,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_GetEnabled(PyObject *SWIGUNU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBoneRagdollInfo_GetEnabled",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_GetEnabled",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_GetEnabled" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -10416,7 +10523,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_SetAttachToParent(PyObject *
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBoneRagdollInfo_SetAttachToParent",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_SetAttachToParent",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_SetAttachToParent" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -10443,7 +10550,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_GetAttachToParent(PyObject *
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBoneRagdollInfo_GetAttachToParent",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_GetAttachToParent",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_GetAttachToParent" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -10469,7 +10576,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_SetGeomName(PyObject *SWIGUN
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBoneRagdollInfo_SetGeomName",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_SetGeomName",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_SetGeomName" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -10498,7 +10605,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_GetGeomName(PyObject *SWIGUN
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBoneRagdollInfo_GetGeomName",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_GetGeomName",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_GetGeomName" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -10523,7 +10630,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_SetGeomType(PyObject *SWIGUN
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBoneRagdollInfo_SetGeomType",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_SetGeomType",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_SetGeomType" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -10550,7 +10657,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_GetGeomType(PyObject *SWIGUN
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBoneRagdollInfo_GetGeomType",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_GetGeomType",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_GetGeomType" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -10575,7 +10682,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_SetGeomDimensions(PyObject *
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBoneRagdollInfo_SetGeomDimensions",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_SetGeomDimensions",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_SetGeomDimensions" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -10605,7 +10712,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_GetGeomDimensions(PyObject *
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBoneRagdollInfo_GetGeomDimensions",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_GetGeomDimensions",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_GetGeomDimensions" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -10633,7 +10740,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_SetFriction(PyObject *SWIGUN
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBoneRagdollInfo_SetFriction",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_SetFriction",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_SetFriction" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -10660,7 +10767,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_GetFriction(PyObject *SWIGUN
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBoneRagdollInfo_GetFriction",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_GetFriction",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_GetFriction" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -10685,7 +10792,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_SetElasticity(PyObject *SWIG
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBoneRagdollInfo_SetElasticity",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_SetElasticity",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_SetElasticity" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -10712,7 +10819,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_GetElasticity(PyObject *SWIG
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBoneRagdollInfo_GetElasticity",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_GetElasticity",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_GetElasticity" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -10737,7 +10844,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_SetSoftness(PyObject *SWIGUN
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBoneRagdollInfo_SetSoftness",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_SetSoftness",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_SetSoftness" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -10764,7 +10871,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_GetSoftness(PyObject *SWIGUN
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBoneRagdollInfo_GetSoftness",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_GetSoftness",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_GetSoftness" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -10789,7 +10896,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_SetSlip(PyObject *SWIGUNUSED
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBoneRagdollInfo_SetSlip",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_SetSlip",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_SetSlip" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -10816,7 +10923,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_GetSlip(PyObject *SWIGUNUSED
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBoneRagdollInfo_GetSlip",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_GetSlip",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_GetSlip" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -10842,7 +10949,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_SetBodyName(PyObject *SWIGUN
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBoneRagdollInfo_SetBodyName",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_SetBodyName",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_SetBodyName" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -10871,7 +10978,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_GetBodyName(PyObject *SWIGUN
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBoneRagdollInfo_GetBodyName",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_GetBodyName",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_GetBodyName" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -10896,7 +11003,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_SetBodyMass(PyObject *SWIGUN
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBoneRagdollInfo_SetBodyMass",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_SetBodyMass",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_SetBodyMass" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -10923,7 +11030,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_GetBodyMass(PyObject *SWIGUN
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBoneRagdollInfo_GetBodyMass",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_GetBodyMass",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_GetBodyMass" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -10948,7 +11055,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_SetBodyGravmode(PyObject *SW
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBoneRagdollInfo_SetBodyGravmode",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_SetBodyGravmode",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_SetBodyGravmode" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -10975,7 +11082,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_GetBodyGravmode(PyObject *SW
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBoneRagdollInfo_GetBodyGravmode",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_GetBodyGravmode",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_GetBodyGravmode" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -11001,7 +11108,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_SetJointName(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBoneRagdollInfo_SetJointName",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_SetJointName",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_SetJointName" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -11030,7 +11137,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_GetJointName(PyObject *SWIGU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBoneRagdollInfo_GetJointName",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_GetJointName",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_GetJointName" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -11055,7 +11162,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_SetJointMinRotContraints(PyO
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBoneRagdollInfo_SetJointMinRotContraints",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_SetJointMinRotContraints",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_SetJointMinRotContraints" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -11085,7 +11192,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_GetJointMinRotContraints(PyO
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBoneRagdollInfo_GetJointMinRotContraints",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_GetJointMinRotContraints",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_GetJointMinRotContraints" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -11113,7 +11220,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_SetJointMaxRotContraints(PyO
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBoneRagdollInfo_SetJointMaxRotContraints",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_SetJointMaxRotContraints",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_SetJointMaxRotContraints" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -11143,7 +11250,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_GetJointMaxRotContraints(PyO
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBoneRagdollInfo_GetJointMaxRotContraints",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_GetJointMaxRotContraints",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_GetJointMaxRotContraints" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -11171,7 +11278,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_SetJointMinTransContraints(P
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBoneRagdollInfo_SetJointMinTransContraints",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_SetJointMinTransContraints",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_SetJointMinTransContraints" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -11201,7 +11308,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_GetJointMinTransContraints(P
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBoneRagdollInfo_GetJointMinTransContraints",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_GetJointMinTransContraints",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_GetJointMinTransContraints" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -11229,7 +11336,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_SetJointMaxTransContraints(P
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBoneRagdollInfo_SetJointMaxTransContraints",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_SetJointMaxTransContraints",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_SetJointMaxTransContraints" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -11259,7 +11366,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_GetJointMaxTransContraints(P
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBoneRagdollInfo_GetJointMaxTransContraints",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_GetJointMaxTransContraints",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneRagdollInfo_GetJointMaxTransContraints" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -11280,7 +11387,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneRagdollInfo_scfGetVersion(PyObject *SWIG
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iSkeletonBoneRagdollInfo_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneRagdollInfo_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iSkeletonBoneRagdollInfo_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -11296,7 +11403,7 @@ SWIGINTERN PyObject *_wrap_delete_iSkeletonBoneRagdollInfo(PyObject *SWIGUNUSEDP
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSkeletonBoneRagdollInfo",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSkeletonBoneRagdollInfo",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneRagdollInfo, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSkeletonBoneRagdollInfo" "', argument " "1"" of type '" "iSkeletonBoneRagdollInfo *""'"); 
@@ -11313,7 +11420,7 @@ fail:
 
 SWIGINTERN PyObject *iSkeletonBoneRagdollInfo_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSkeletonBoneRagdollInfo, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -11326,7 +11433,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneFactory_GetName(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBoneFactory_GetName",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneFactory_GetName",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneFactory_GetName" "', argument " "1"" of type '" "iSkeletonBoneFactory const *""'"); 
@@ -11352,7 +11459,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneFactory_SetName(PyObject *SWIGUNUSEDPARM
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBoneFactory_SetName",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneFactory_SetName",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneFactory_SetName" "', argument " "1"" of type '" "iSkeletonBoneFactory *""'"); 
@@ -11381,7 +11488,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneFactory_GetTransform(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBoneFactory_GetTransform",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneFactory_GetTransform",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneFactory_GetTransform" "', argument " "1"" of type '" "iSkeletonBoneFactory *""'"); 
@@ -11409,7 +11516,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneFactory_SetTransform(PyObject *SWIGUNUSE
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBoneFactory_SetTransform",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneFactory_SetTransform",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneFactory_SetTransform" "', argument " "1"" of type '" "iSkeletonBoneFactory *""'"); 
@@ -11439,7 +11546,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneFactory_GetFullTransform(PyObject *SWIGU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBoneFactory_GetFullTransform",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneFactory_GetFullTransform",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneFactory_GetFullTransform" "', argument " "1"" of type '" "iSkeletonBoneFactory *""'"); 
@@ -11467,7 +11574,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneFactory_SetParent(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBoneFactory_SetParent",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneFactory_SetParent",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneFactory_SetParent" "', argument " "1"" of type '" "iSkeletonBoneFactory *""'"); 
@@ -11494,7 +11601,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneFactory_GetParent(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBoneFactory_GetParent",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneFactory_GetParent",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneFactory_GetParent" "', argument " "1"" of type '" "iSkeletonBoneFactory *""'"); 
@@ -11516,7 +11623,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneFactory_GetChildrenCount(PyObject *SWIGU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBoneFactory_GetChildrenCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneFactory_GetChildrenCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneFactory_GetChildrenCount" "', argument " "1"" of type '" "iSkeletonBoneFactory *""'"); 
@@ -11542,7 +11649,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneFactory_GetChild(PyObject *SWIGUNUSEDPAR
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBoneFactory_GetChild",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneFactory_GetChild",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneFactory_GetChild" "', argument " "1"" of type '" "iSkeletonBoneFactory *""'"); 
@@ -11574,7 +11681,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneFactory_FindChild(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBoneFactory_FindChild",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneFactory_FindChild",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneFactory_FindChild" "', argument " "1"" of type '" "iSkeletonBoneFactory *""'"); 
@@ -11607,7 +11714,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneFactory_FindChildIndex(PyObject *SWIGUNU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBoneFactory_FindChildIndex",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneFactory_FindChildIndex",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneFactory_FindChildIndex" "', argument " "1"" of type '" "iSkeletonBoneFactory *""'"); 
@@ -11637,7 +11744,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneFactory_SetSkinBox(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonBoneFactory_SetSkinBox",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneFactory_SetSkinBox",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneFactory_SetSkinBox" "', argument " "1"" of type '" "iSkeletonBoneFactory *""'"); 
@@ -11667,7 +11774,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneFactory_GetSkinBox(PyObject *SWIGUNUSEDP
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBoneFactory_GetSkinBox",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneFactory_GetSkinBox",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneFactory_GetSkinBox" "', argument " "1"" of type '" "iSkeletonBoneFactory *""'"); 
@@ -11692,7 +11799,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneFactory_GetRagdollInfo(PyObject *SWIGUNU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonBoneFactory_GetRagdollInfo",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneFactory_GetRagdollInfo",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonBoneFactory_GetRagdollInfo" "', argument " "1"" of type '" "iSkeletonBoneFactory *""'"); 
@@ -11710,7 +11817,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonBoneFactory_scfGetVersion(PyObject *SWIGUNUS
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iSkeletonBoneFactory_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonBoneFactory_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iSkeletonBoneFactory_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -11726,7 +11833,7 @@ SWIGINTERN PyObject *_wrap_delete_iSkeletonBoneFactory(PyObject *SWIGUNUSEDPARM(
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSkeletonBoneFactory",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSkeletonBoneFactory",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonBoneFactory, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSkeletonBoneFactory" "', argument " "1"" of type '" "iSkeletonBoneFactory *""'"); 
@@ -11743,7 +11850,7 @@ fail:
 
 SWIGINTERN PyObject *iSkeletonBoneFactory_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSkeletonBoneFactory, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -11756,7 +11863,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonSocketFactory_GetName(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonSocketFactory_GetName",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonSocketFactory_GetName",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonSocketFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonSocketFactory_GetName" "', argument " "1"" of type '" "iSkeletonSocketFactory const *""'"); 
@@ -11782,7 +11889,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonSocketFactory_SetName(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonSocketFactory_SetName",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonSocketFactory_SetName",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonSocketFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonSocketFactory_SetName" "', argument " "1"" of type '" "iSkeletonSocketFactory *""'"); 
@@ -11811,7 +11918,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonSocketFactory_GetTransform(PyObject *SWIGUNU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonSocketFactory_GetTransform",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonSocketFactory_GetTransform",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonSocketFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonSocketFactory_GetTransform" "', argument " "1"" of type '" "iSkeletonSocketFactory *""'"); 
@@ -11839,7 +11946,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonSocketFactory_SetTransform(PyObject *SWIGUNU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonSocketFactory_SetTransform",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonSocketFactory_SetTransform",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonSocketFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonSocketFactory_SetTransform" "', argument " "1"" of type '" "iSkeletonSocketFactory *""'"); 
@@ -11869,7 +11976,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonSocketFactory_GetFullTransform(PyObject *SWI
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonSocketFactory_GetFullTransform",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonSocketFactory_GetFullTransform",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonSocketFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonSocketFactory_GetFullTransform" "', argument " "1"" of type '" "iSkeletonSocketFactory *""'"); 
@@ -11897,7 +12004,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonSocketFactory_SetBone(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonSocketFactory_SetBone",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonSocketFactory_SetBone",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonSocketFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonSocketFactory_SetBone" "', argument " "1"" of type '" "iSkeletonSocketFactory *""'"); 
@@ -11924,7 +12031,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonSocketFactory_GetBone(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonSocketFactory_GetBone",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonSocketFactory_GetBone",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonSocketFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonSocketFactory_GetBone" "', argument " "1"" of type '" "iSkeletonSocketFactory *""'"); 
@@ -11942,7 +12049,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonSocketFactory_scfGetVersion(PyObject *SWIGUN
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iSkeletonSocketFactory_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonSocketFactory_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iSkeletonSocketFactory_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -11958,7 +12065,7 @@ SWIGINTERN PyObject *_wrap_delete_iSkeletonSocketFactory(PyObject *SWIGUNUSEDPAR
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSkeletonSocketFactory",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSkeletonSocketFactory",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonSocketFactory, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSkeletonSocketFactory" "', argument " "1"" of type '" "iSkeletonSocketFactory *""'"); 
@@ -11975,7 +12082,7 @@ fail:
 
 SWIGINTERN PyObject *iSkeletonSocketFactory_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSkeletonSocketFactory, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -11988,7 +12095,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_GetName(PyObject *SWIGUNUSEDPARM(sel
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonFactory_GetName",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFactory_GetName",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_GetName" "', argument " "1"" of type '" "iSkeletonFactory const *""'"); 
@@ -12014,7 +12121,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_SetName(PyObject *SWIGUNUSEDPARM(sel
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonFactory_SetName",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFactory_SetName",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_SetName" "', argument " "1"" of type '" "iSkeletonFactory *""'"); 
@@ -12048,7 +12155,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_CreateBone(PyObject *SWIGUNUSEDPARM(
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonFactory_CreateBone",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFactory_CreateBone",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_CreateBone" "', argument " "1"" of type '" "iSkeletonFactory *""'"); 
@@ -12082,7 +12189,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_CreateAnimation(PyObject *SWIGUNUSED
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonFactory_CreateAnimation",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFactory_CreateAnimation",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_CreateAnimation" "', argument " "1"" of type '" "iSkeletonFactory *""'"); 
@@ -12116,7 +12223,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_FindAnimation(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonFactory_FindAnimation",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFactory_FindAnimation",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_FindAnimation" "', argument " "1"" of type '" "iSkeletonFactory *""'"); 
@@ -12145,7 +12252,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_GetAnimationsCount(PyObject *SWIGUNU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonFactory_GetAnimationsCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFactory_GetAnimationsCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_GetAnimationsCount" "', argument " "1"" of type '" "iSkeletonFactory *""'"); 
@@ -12171,7 +12278,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_GetAnimation(PyObject *SWIGUNUSEDPAR
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonFactory_GetAnimation",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFactory_GetAnimation",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_GetAnimation" "', argument " "1"" of type '" "iSkeletonFactory *""'"); 
@@ -12203,7 +12310,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_FindBone(PyObject *SWIGUNUSEDPARM(se
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonFactory_FindBone",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFactory_FindBone",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_FindBone" "', argument " "1"" of type '" "iSkeletonFactory *""'"); 
@@ -12237,7 +12344,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_FindBoneIndex(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonFactory_FindBoneIndex",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFactory_FindBoneIndex",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_FindBoneIndex" "', argument " "1"" of type '" "iSkeletonFactory *""'"); 
@@ -12266,7 +12373,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_GetBonesCount(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonFactory_GetBonesCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFactory_GetBonesCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_GetBonesCount" "', argument " "1"" of type '" "iSkeletonFactory const *""'"); 
@@ -12292,7 +12399,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_GetBone(PyObject *SWIGUNUSEDPARM(sel
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonFactory_GetBone",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFactory_GetBone",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_GetBone" "', argument " "1"" of type '" "iSkeletonFactory *""'"); 
@@ -12319,7 +12426,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_GetGraveyard(PyObject *SWIGUNUSEDPAR
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonFactory_GetGraveyard",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFactory_GetGraveyard",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_GetGraveyard" "', argument " "1"" of type '" "iSkeletonFactory *""'"); 
@@ -12350,7 +12457,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_CreateSocket(PyObject *SWIGUNUSEDPAR
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSkeletonFactory_CreateSocket",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFactory_CreateSocket",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_CreateSocket" "', argument " "1"" of type '" "iSkeletonFactory *""'"); 
@@ -12389,7 +12496,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_FindSocket(PyObject *SWIGUNUSEDPARM(
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonFactory_FindSocket",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFactory_FindSocket",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_FindSocket" "', argument " "1"" of type '" "iSkeletonFactory *""'"); 
@@ -12422,7 +12529,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_GetSocket(PyObject *SWIGUNUSEDPARM(s
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonFactory_GetSocket",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFactory_GetSocket",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_GetSocket" "', argument " "1"" of type '" "iSkeletonFactory *""'"); 
@@ -12452,7 +12559,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_RemoveSocket(PyObject *SWIGUNUSEDPAR
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonFactory_RemoveSocket",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFactory_RemoveSocket",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_RemoveSocket" "', argument " "1"" of type '" "iSkeletonFactory *""'"); 
@@ -12479,7 +12586,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_GetSocketsCount(PyObject *SWIGUNUSED
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonFactory_GetSocketsCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFactory_GetSocketsCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_GetSocketsCount" "', argument " "1"" of type '" "iSkeletonFactory *""'"); 
@@ -12497,7 +12604,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_scfGetVersion(PyObject *SWIGUNUSEDPA
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iSkeletonFactory_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFactory_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iSkeletonFactory_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -12513,7 +12620,7 @@ SWIGINTERN PyObject *_wrap_delete_iSkeletonFactory(PyObject *SWIGUNUSEDPARM(self
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSkeletonFactory",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSkeletonFactory",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonFactory, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSkeletonFactory" "', argument " "1"" of type '" "iSkeletonFactory *""'"); 
@@ -12530,7 +12637,7 @@ fail:
 
 SWIGINTERN PyObject *iSkeletonFactory_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSkeletonFactory, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -12543,7 +12650,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonGraveyard_GetFactoriesCount(PyObject *SWIGUN
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSkeletonGraveyard_GetFactoriesCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonGraveyard_GetFactoriesCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonGraveyard, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonGraveyard_GetFactoriesCount" "', argument " "1"" of type '" "iSkeletonGraveyard *""'"); 
@@ -12570,7 +12677,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonGraveyard_CreateFactory(PyObject *SWIGUNUSED
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonGraveyard_CreateFactory",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonGraveyard_CreateFactory",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonGraveyard, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonGraveyard_CreateFactory" "', argument " "1"" of type '" "iSkeletonGraveyard *""'"); 
@@ -12604,7 +12711,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonGraveyard_LoadFactory(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonGraveyard_LoadFactory",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonGraveyard_LoadFactory",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonGraveyard, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonGraveyard_LoadFactory" "', argument " "1"" of type '" "iSkeletonGraveyard *""'"); 
@@ -12638,7 +12745,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonGraveyard_FindFactory(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonGraveyard_FindFactory",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonGraveyard_FindFactory",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonGraveyard, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonGraveyard_FindFactory" "', argument " "1"" of type '" "iSkeletonGraveyard *""'"); 
@@ -12676,7 +12783,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonGraveyard_CreateSkeleton__SWIG_0(PyObject *S
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSkeletonGraveyard_CreateSkeleton",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonGraveyard_CreateSkeleton",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonGraveyard, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonGraveyard_CreateSkeleton" "', argument " "1"" of type '" "iSkeletonGraveyard *""'"); 
@@ -12714,7 +12821,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonGraveyard_CreateSkeleton__SWIG_1(PyObject *S
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonGraveyard_CreateSkeleton",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonGraveyard_CreateSkeleton",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonGraveyard, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonGraveyard_CreateSkeleton" "', argument " "1"" of type '" "iSkeletonGraveyard *""'"); 
@@ -12793,7 +12900,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonGraveyard_SetManualUpdates(PyObject *SWIGUNU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonGraveyard_SetManualUpdates",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonGraveyard_SetManualUpdates",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonGraveyard, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonGraveyard_SetManualUpdates" "', argument " "1"" of type '" "iSkeletonGraveyard *""'"); 
@@ -12823,7 +12930,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonGraveyard_Update(PyObject *SWIGUNUSEDPARM(se
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonGraveyard_Update",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonGraveyard_Update",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonGraveyard, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonGraveyard_Update" "', argument " "1"" of type '" "iSkeletonGraveyard *""'"); 
@@ -12853,7 +12960,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonGraveyard_AddSkeleton(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonGraveyard_AddSkeleton",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonGraveyard_AddSkeleton",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonGraveyard, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonGraveyard_AddSkeleton" "', argument " "1"" of type '" "iSkeletonGraveyard *""'"); 
@@ -12883,7 +12990,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonGraveyard_RemoveSkeleton(PyObject *SWIGUNUSE
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSkeletonGraveyard_RemoveSkeleton",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonGraveyard_RemoveSkeleton",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonGraveyard, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonGraveyard_RemoveSkeleton" "', argument " "1"" of type '" "iSkeletonGraveyard *""'"); 
@@ -12906,7 +13013,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonGraveyard_scfGetVersion(PyObject *SWIGUNUSED
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iSkeletonGraveyard_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonGraveyard_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iSkeletonGraveyard_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -12922,7 +13029,7 @@ SWIGINTERN PyObject *_wrap_delete_iSkeletonGraveyard(PyObject *SWIGUNUSEDPARM(se
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSkeletonGraveyard",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSkeletonGraveyard",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonGraveyard, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSkeletonGraveyard" "', argument " "1"" of type '" "iSkeletonGraveyard *""'"); 
@@ -12939,7 +13046,7 @@ fail:
 
 SWIGINTERN PyObject *iSkeletonGraveyard_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSkeletonGraveyard, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -12952,7 +13059,7 @@ SWIGINTERN PyObject *_wrap_iGenMeshSkeletonControlState_GetAnimatedVertices(PyOb
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGenMeshSkeletonControlState_GetAnimatedVertices",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGenMeshSkeletonControlState_GetAnimatedVertices",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshSkeletonControlState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGenMeshSkeletonControlState_GetAnimatedVertices" "', argument " "1"" of type '" "iGenMeshSkeletonControlState *""'"); 
@@ -12974,7 +13081,7 @@ SWIGINTERN PyObject *_wrap_iGenMeshSkeletonControlState_GetAnimatedVerticesCount
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGenMeshSkeletonControlState_GetAnimatedVerticesCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGenMeshSkeletonControlState_GetAnimatedVerticesCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshSkeletonControlState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGenMeshSkeletonControlState_GetAnimatedVerticesCount" "', argument " "1"" of type '" "iGenMeshSkeletonControlState *""'"); 
@@ -12996,7 +13103,7 @@ SWIGINTERN PyObject *_wrap_iGenMeshSkeletonControlState_GetAnimatedFaceNormals(P
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGenMeshSkeletonControlState_GetAnimatedFaceNormals",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGenMeshSkeletonControlState_GetAnimatedFaceNormals",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshSkeletonControlState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGenMeshSkeletonControlState_GetAnimatedFaceNormals" "', argument " "1"" of type '" "iGenMeshSkeletonControlState *""'"); 
@@ -13018,7 +13125,7 @@ SWIGINTERN PyObject *_wrap_iGenMeshSkeletonControlState_GetAnimatedFaceNormalsCo
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGenMeshSkeletonControlState_GetAnimatedFaceNormalsCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGenMeshSkeletonControlState_GetAnimatedFaceNormalsCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshSkeletonControlState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGenMeshSkeletonControlState_GetAnimatedFaceNormalsCount" "', argument " "1"" of type '" "iGenMeshSkeletonControlState *""'"); 
@@ -13040,7 +13147,7 @@ SWIGINTERN PyObject *_wrap_iGenMeshSkeletonControlState_GetAnimatedVertNormals(P
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGenMeshSkeletonControlState_GetAnimatedVertNormals",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGenMeshSkeletonControlState_GetAnimatedVertNormals",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshSkeletonControlState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGenMeshSkeletonControlState_GetAnimatedVertNormals" "', argument " "1"" of type '" "iGenMeshSkeletonControlState *""'"); 
@@ -13062,7 +13169,7 @@ SWIGINTERN PyObject *_wrap_iGenMeshSkeletonControlState_GetAnimatedVertNormalsCo
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGenMeshSkeletonControlState_GetAnimatedVertNormalsCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGenMeshSkeletonControlState_GetAnimatedVertNormalsCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshSkeletonControlState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGenMeshSkeletonControlState_GetAnimatedVertNormalsCount" "', argument " "1"" of type '" "iGenMeshSkeletonControlState *""'"); 
@@ -13084,7 +13191,7 @@ SWIGINTERN PyObject *_wrap_iGenMeshSkeletonControlState_GetSkeleton(PyObject *SW
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iGenMeshSkeletonControlState_GetSkeleton",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGenMeshSkeletonControlState_GetSkeleton",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshSkeletonControlState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGenMeshSkeletonControlState_GetSkeleton" "', argument " "1"" of type '" "iGenMeshSkeletonControlState *""'"); 
@@ -13102,7 +13209,7 @@ SWIGINTERN PyObject *_wrap_iGenMeshSkeletonControlState_scfGetVersion(PyObject *
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iGenMeshSkeletonControlState_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iGenMeshSkeletonControlState_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iGenMeshSkeletonControlState_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -13118,7 +13225,7 @@ SWIGINTERN PyObject *_wrap_delete_iGenMeshSkeletonControlState(PyObject *SWIGUNU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iGenMeshSkeletonControlState",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iGenMeshSkeletonControlState",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshSkeletonControlState, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iGenMeshSkeletonControlState" "', argument " "1"" of type '" "iGenMeshSkeletonControlState *""'"); 
@@ -13135,7 +13242,7 @@ fail:
 
 SWIGINTERN PyObject *iGenMeshSkeletonControlState_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iGenMeshSkeletonControlState, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -13148,7 +13255,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayReadOnly_GetSize(PyObject *SWIGU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csSprite2DVertexArrayReadOnly_GetSize",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertexArrayReadOnly_GetSize",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayReadOnlyTcsSprite2DVertex_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertexArrayReadOnly_GetSize" "', argument " "1"" of type '" "iArrayReadOnly<csSprite2DVertex > const *""'"); 
@@ -13174,7 +13281,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayReadOnly_Get(PyObject *SWIGUNUSE
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csSprite2DVertexArrayReadOnly_Get",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertexArrayReadOnly_Get",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayReadOnlyTcsSprite2DVertex_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertexArrayReadOnly_Get" "', argument " "1"" of type '" "iArrayReadOnly<csSprite2DVertex > const *""'"); 
@@ -13204,7 +13311,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayReadOnly_Top(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csSprite2DVertexArrayReadOnly_Top",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertexArrayReadOnly_Top",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayReadOnlyTcsSprite2DVertex_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertexArrayReadOnly_Top" "', argument " "1"" of type '" "iArrayReadOnly<csSprite2DVertex > const *""'"); 
@@ -13233,7 +13340,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayReadOnly_Find(PyObject *SWIGUNUS
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csSprite2DVertexArrayReadOnly_Find",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertexArrayReadOnly_Find",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayReadOnlyTcsSprite2DVertex_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertexArrayReadOnly_Find" "', argument " "1"" of type '" "iArrayReadOnly<csSprite2DVertex > const *""'"); 
@@ -13267,7 +13374,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayReadOnly_GetIndex(PyObject *SWIG
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csSprite2DVertexArrayReadOnly_GetIndex",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertexArrayReadOnly_GetIndex",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayReadOnlyTcsSprite2DVertex_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertexArrayReadOnly_GetIndex" "', argument " "1"" of type '" "iArrayReadOnly<csSprite2DVertex > const *""'"); 
@@ -13294,7 +13401,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayReadOnly_IsEmpty(PyObject *SWIGU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csSprite2DVertexArrayReadOnly_IsEmpty",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertexArrayReadOnly_IsEmpty",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayReadOnlyTcsSprite2DVertex_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertexArrayReadOnly_IsEmpty" "', argument " "1"" of type '" "iArrayReadOnly<csSprite2DVertex > const *""'"); 
@@ -13319,7 +13426,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayReadOnly_GetAll(PyObject *SWIGUN
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csSprite2DVertexArrayReadOnly_GetAll",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertexArrayReadOnly_GetAll",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayReadOnlyTcsSprite2DVertex_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertexArrayReadOnly_GetAll" "', argument " "1"" of type '" "iArrayReadOnly<csSprite2DVertex > const *""'"); 
@@ -13345,7 +13452,7 @@ SWIGINTERN PyObject *_wrap_delete_csSprite2DVertexArrayReadOnly(PyObject *SWIGUN
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_csSprite2DVertexArrayReadOnly",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_csSprite2DVertexArrayReadOnly",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayReadOnlyTcsSprite2DVertex_t, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_csSprite2DVertexArrayReadOnly" "', argument " "1"" of type '" "iArrayReadOnly<csSprite2DVertex > *""'"); 
@@ -13362,7 +13469,7 @@ fail:
 
 SWIGINTERN PyObject *csSprite2DVertexArrayReadOnly_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iArrayReadOnlyTcsSprite2DVertex_t, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -13379,7 +13486,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayChangeElements_Get(PyObject *SWI
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csSprite2DVertexArrayChangeElements_Get",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertexArrayChangeElements_Get",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeElementsTcsSprite2DVertex_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertexArrayChangeElements_Get" "', argument " "1"" of type '" "iArrayChangeElements<csSprite2DVertex > *""'"); 
@@ -13409,7 +13516,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayChangeElements_Top(PyObject *SWI
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csSprite2DVertexArrayChangeElements_Top",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertexArrayChangeElements_Top",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeElementsTcsSprite2DVertex_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertexArrayChangeElements_Top" "', argument " "1"" of type '" "iArrayChangeElements<csSprite2DVertex > *""'"); 
@@ -13433,7 +13540,7 @@ SWIGINTERN PyObject *_wrap_delete_csSprite2DVertexArrayChangeElements(PyObject *
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_csSprite2DVertexArrayChangeElements",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_csSprite2DVertexArrayChangeElements",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeElementsTcsSprite2DVertex_t, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_csSprite2DVertexArrayChangeElements" "', argument " "1"" of type '" "iArrayChangeElements<csSprite2DVertex > *""'"); 
@@ -13450,7 +13557,7 @@ fail:
 
 SWIGINTERN PyObject *csSprite2DVertexArrayChangeElements_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iArrayChangeElementsTcsSprite2DVertex_t, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -13470,7 +13577,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayChangeAll_SetSize__SWIG_0(PyObje
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:csSprite2DVertexArrayChangeAll_SetSize",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertexArrayChangeAll_SetSize",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsSprite2DVertex_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertexArrayChangeAll_SetSize" "', argument " "1"" of type '" "iArrayChangeAll<csSprite2DVertex > *""'"); 
@@ -13508,7 +13615,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayChangeAll_SetSize__SWIG_1(PyObje
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csSprite2DVertexArrayChangeAll_SetSize",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertexArrayChangeAll_SetSize",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsSprite2DVertex_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertexArrayChangeAll_SetSize" "', argument " "1"" of type '" "iArrayChangeAll<csSprite2DVertex > *""'"); 
@@ -13590,7 +13697,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayChangeAll_GetExtend(PyObject *SW
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csSprite2DVertexArrayChangeAll_GetExtend",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertexArrayChangeAll_GetExtend",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsSprite2DVertex_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertexArrayChangeAll_GetExtend" "', argument " "1"" of type '" "iArrayChangeAll<csSprite2DVertex > *""'"); 
@@ -13627,7 +13734,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayChangeAll_Put(PyObject *SWIGUNUS
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:csSprite2DVertexArrayChangeAll_Put",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertexArrayChangeAll_Put",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsSprite2DVertex_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertexArrayChangeAll_Put" "', argument " "1"" of type '" "iArrayChangeAll<csSprite2DVertex > *""'"); 
@@ -13666,7 +13773,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayChangeAll_Push(PyObject *SWIGUNU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csSprite2DVertexArrayChangeAll_Push",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertexArrayChangeAll_Push",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsSprite2DVertex_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertexArrayChangeAll_Push" "', argument " "1"" of type '" "iArrayChangeAll<csSprite2DVertex > *""'"); 
@@ -13700,7 +13807,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayChangeAll_PushSmart(PyObject *SW
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csSprite2DVertexArrayChangeAll_PushSmart",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertexArrayChangeAll_PushSmart",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsSprite2DVertex_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertexArrayChangeAll_PushSmart" "', argument " "1"" of type '" "iArrayChangeAll<csSprite2DVertex > *""'"); 
@@ -13730,7 +13837,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayChangeAll_Pop(PyObject *SWIGUNUS
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csSprite2DVertexArrayChangeAll_Pop",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertexArrayChangeAll_Pop",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsSprite2DVertex_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertexArrayChangeAll_Pop" "', argument " "1"" of type '" "iArrayChangeAll<csSprite2DVertex > *""'"); 
@@ -13760,7 +13867,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayChangeAll_Insert(PyObject *SWIGU
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:csSprite2DVertexArrayChangeAll_Insert",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertexArrayChangeAll_Insert",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsSprite2DVertex_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertexArrayChangeAll_Insert" "', argument " "1"" of type '" "iArrayChangeAll<csSprite2DVertex > *""'"); 
@@ -13794,7 +13901,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayChangeAll_DeleteAll(PyObject *SW
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csSprite2DVertexArrayChangeAll_DeleteAll",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertexArrayChangeAll_DeleteAll",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsSprite2DVertex_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertexArrayChangeAll_DeleteAll" "', argument " "1"" of type '" "iArrayChangeAll<csSprite2DVertex > *""'"); 
@@ -13819,7 +13926,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayChangeAll_Truncate(PyObject *SWI
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csSprite2DVertexArrayChangeAll_Truncate",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertexArrayChangeAll_Truncate",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsSprite2DVertex_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertexArrayChangeAll_Truncate" "', argument " "1"" of type '" "iArrayChangeAll<csSprite2DVertex > *""'"); 
@@ -13845,7 +13952,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayChangeAll_Empty(PyObject *SWIGUN
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csSprite2DVertexArrayChangeAll_Empty",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertexArrayChangeAll_Empty",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsSprite2DVertex_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertexArrayChangeAll_Empty" "', argument " "1"" of type '" "iArrayChangeAll<csSprite2DVertex > *""'"); 
@@ -13871,7 +13978,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayChangeAll_DeleteIndex(PyObject *
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csSprite2DVertexArrayChangeAll_DeleteIndex",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertexArrayChangeAll_DeleteIndex",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsSprite2DVertex_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertexArrayChangeAll_DeleteIndex" "', argument " "1"" of type '" "iArrayChangeAll<csSprite2DVertex > *""'"); 
@@ -13902,7 +14009,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayChangeAll_DeleteIndexFast(PyObje
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csSprite2DVertexArrayChangeAll_DeleteIndexFast",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertexArrayChangeAll_DeleteIndexFast",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsSprite2DVertex_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertexArrayChangeAll_DeleteIndexFast" "', argument " "1"" of type '" "iArrayChangeAll<csSprite2DVertex > *""'"); 
@@ -13933,7 +14040,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayChangeAll_Delete(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csSprite2DVertexArrayChangeAll_Delete",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertexArrayChangeAll_Delete",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsSprite2DVertex_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertexArrayChangeAll_Delete" "', argument " "1"" of type '" "iArrayChangeAll<csSprite2DVertex > *""'"); 
@@ -13962,7 +14069,7 @@ SWIGINTERN PyObject *_wrap_delete_csSprite2DVertexArrayChangeAll(PyObject *SWIGU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_csSprite2DVertexArrayChangeAll",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_csSprite2DVertexArrayChangeAll",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsSprite2DVertex_t, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_csSprite2DVertexArrayChangeAll" "', argument " "1"" of type '" "iArrayChangeAll<csSprite2DVertex > *""'"); 
@@ -13979,7 +14086,7 @@ fail:
 
 SWIGINTERN PyObject *csSprite2DVertexArrayChangeAll_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iArrayChangeAllTcsSprite2DVertex_t, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -13995,7 +14102,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertex_pos_set(PyObject *SWIGUNUSEDPARM(sel
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csSprite2DVertex_pos_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertex_pos_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSprite2DVertex, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertex_pos_set" "', argument " "1"" of type '" "csSprite2DVertex *""'"); 
@@ -14023,7 +14130,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertex_pos_get(PyObject *SWIGUNUSEDPARM(sel
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csSprite2DVertex_pos_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertex_pos_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSprite2DVertex, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertex_pos_get" "', argument " "1"" of type '" "csSprite2DVertex *""'"); 
@@ -14048,7 +14155,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertex_color_init_set(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csSprite2DVertex_color_init_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertex_color_init_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSprite2DVertex, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertex_color_init_set" "', argument " "1"" of type '" "csSprite2DVertex *""'"); 
@@ -14076,7 +14183,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertex_color_init_get(PyObject *SWIGUNUSEDP
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csSprite2DVertex_color_init_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertex_color_init_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSprite2DVertex, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertex_color_init_get" "', argument " "1"" of type '" "csSprite2DVertex *""'"); 
@@ -14101,7 +14208,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertex_color_set(PyObject *SWIGUNUSEDPARM(s
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csSprite2DVertex_color_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertex_color_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSprite2DVertex, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertex_color_set" "', argument " "1"" of type '" "csSprite2DVertex *""'"); 
@@ -14129,7 +14236,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertex_color_get(PyObject *SWIGUNUSEDPARM(s
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csSprite2DVertex_color_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertex_color_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSprite2DVertex, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertex_color_get" "', argument " "1"" of type '" "csSprite2DVertex *""'"); 
@@ -14154,7 +14261,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertex_u_set(PyObject *SWIGUNUSEDPARM(self)
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csSprite2DVertex_u_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertex_u_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSprite2DVertex, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertex_u_set" "', argument " "1"" of type '" "csSprite2DVertex *""'"); 
@@ -14182,7 +14289,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertex_u_get(PyObject *SWIGUNUSEDPARM(self)
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csSprite2DVertex_u_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertex_u_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSprite2DVertex, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertex_u_get" "', argument " "1"" of type '" "csSprite2DVertex *""'"); 
@@ -14207,7 +14314,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertex_v_set(PyObject *SWIGUNUSEDPARM(self)
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csSprite2DVertex_v_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertex_v_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSprite2DVertex, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertex_v_set" "', argument " "1"" of type '" "csSprite2DVertex *""'"); 
@@ -14235,7 +14342,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertex_v_get(PyObject *SWIGUNUSEDPARM(self)
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csSprite2DVertex_v_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertex_v_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSprite2DVertex, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertex_v_get" "', argument " "1"" of type '" "csSprite2DVertex *""'"); 
@@ -14261,7 +14368,7 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertex___eq__(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csSprite2DVertex___eq__",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertex___eq__",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSprite2DVertex, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertex___eq__" "', argument " "1"" of type '" "csSprite2DVertex *""'"); 
@@ -14287,7 +14394,7 @@ SWIGINTERN PyObject *_wrap_new_csSprite2DVertex(PyObject *SWIGUNUSEDPARM(self), 
   PyObject *resultobj = 0;
   csSprite2DVertex *result = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)":new_csSprite2DVertex")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"new_csSprite2DVertex",0,0)) SWIG_fail;
   result = (csSprite2DVertex *)new csSprite2DVertex();
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csSprite2DVertex, SWIG_POINTER_NEW |  0 );
   return resultobj;
@@ -14303,7 +14410,7 @@ SWIGINTERN PyObject *_wrap_delete_csSprite2DVertex(PyObject *SWIGUNUSEDPARM(self
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_csSprite2DVertex",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_csSprite2DVertex",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSprite2DVertex, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_csSprite2DVertex" "', argument " "1"" of type '" "csSprite2DVertex *""'"); 
@@ -14320,7 +14427,7 @@ fail:
 
 SWIGINTERN PyObject *csSprite2DVertex_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_csSprite2DVertex, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -14332,7 +14439,7 @@ SWIGINTERN PyObject *_wrap_delete_iColoredVertices(PyObject *SWIGUNUSEDPARM(self
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iColoredVertices",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iColoredVertices",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iColoredVertices, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iColoredVertices" "', argument " "1"" of type '" "iColoredVertices *""'"); 
@@ -14349,7 +14456,7 @@ fail:
 
 SWIGINTERN PyObject *iColoredVertices_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iColoredVertices, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -14366,7 +14473,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DUVAnimationFrame_SetName(PyObject *SWIGUNUSE
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite2DUVAnimationFrame_SetName",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DUVAnimationFrame_SetName",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DUVAnimationFrame, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DUVAnimationFrame_SetName" "', argument " "1"" of type '" "iSprite2DUVAnimationFrame *""'"); 
@@ -14395,7 +14502,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DUVAnimationFrame_GetName(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite2DUVAnimationFrame_GetName",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DUVAnimationFrame_GetName",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DUVAnimationFrame, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DUVAnimationFrame_GetName" "', argument " "1"" of type '" "iSprite2DUVAnimationFrame const *""'"); 
@@ -14421,7 +14528,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DUVAnimationFrame_GetUVCoo__SWIG_0(PyObject *
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite2DUVAnimationFrame_GetUVCoo",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DUVAnimationFrame_GetUVCoo",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DUVAnimationFrame, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DUVAnimationFrame_GetUVCoo" "', argument " "1"" of type '" "iSprite2DUVAnimationFrame *""'"); 
@@ -14451,7 +14558,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DUVAnimationFrame_GetUVCoo__SWIG_1(PyObject *
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite2DUVAnimationFrame_GetUVCoo",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DUVAnimationFrame_GetUVCoo",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DUVAnimationFrame, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DUVAnimationFrame_GetUVCoo" "', argument " "1"" of type '" "iSprite2DUVAnimationFrame *""'"); 
@@ -14514,7 +14621,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DUVAnimationFrame_GetUVCount(PyObject *SWIGUN
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite2DUVAnimationFrame_GetUVCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DUVAnimationFrame_GetUVCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DUVAnimationFrame, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DUVAnimationFrame_GetUVCount" "', argument " "1"" of type '" "iSprite2DUVAnimationFrame *""'"); 
@@ -14547,7 +14654,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DUVAnimationFrame_SetUV(PyObject *SWIGUNUSEDP
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iSprite2DUVAnimationFrame_SetUV",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DUVAnimationFrame_SetUV",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DUVAnimationFrame, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DUVAnimationFrame_SetUV" "', argument " "1"" of type '" "iSprite2DUVAnimationFrame *""'"); 
@@ -14600,7 +14707,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DUVAnimationFrame_SetFrameData(PyObject *SWIG
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iSprite2DUVAnimationFrame_SetFrameData",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DUVAnimationFrame_SetFrameData",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DUVAnimationFrame, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DUVAnimationFrame_SetFrameData" "', argument " "1"" of type '" "iSprite2DUVAnimationFrame *""'"); 
@@ -14647,7 +14754,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DUVAnimationFrame_RemoveUV(PyObject *SWIGUNUS
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite2DUVAnimationFrame_RemoveUV",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DUVAnimationFrame_RemoveUV",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DUVAnimationFrame, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DUVAnimationFrame_RemoveUV" "', argument " "1"" of type '" "iSprite2DUVAnimationFrame *""'"); 
@@ -14674,7 +14781,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DUVAnimationFrame_GetDuration(PyObject *SWIGU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite2DUVAnimationFrame_GetDuration",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DUVAnimationFrame_GetDuration",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DUVAnimationFrame, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DUVAnimationFrame_GetDuration" "', argument " "1"" of type '" "iSprite2DUVAnimationFrame *""'"); 
@@ -14699,7 +14806,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DUVAnimationFrame_SetDuration(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite2DUVAnimationFrame_SetDuration",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DUVAnimationFrame_SetDuration",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DUVAnimationFrame, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DUVAnimationFrame_SetDuration" "', argument " "1"" of type '" "iSprite2DUVAnimationFrame *""'"); 
@@ -14725,7 +14832,7 @@ SWIGINTERN PyObject *_wrap_delete_iSprite2DUVAnimationFrame(PyObject *SWIGUNUSED
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSprite2DUVAnimationFrame",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSprite2DUVAnimationFrame",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DUVAnimationFrame, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSprite2DUVAnimationFrame" "', argument " "1"" of type '" "iSprite2DUVAnimationFrame *""'"); 
@@ -14742,7 +14849,7 @@ fail:
 
 SWIGINTERN PyObject *iSprite2DUVAnimationFrame_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSprite2DUVAnimationFrame, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -14759,7 +14866,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DUVAnimation_SetName(PyObject *SWIGUNUSEDPARM
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite2DUVAnimation_SetName",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DUVAnimation_SetName",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DUVAnimation, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DUVAnimation_SetName" "', argument " "1"" of type '" "iSprite2DUVAnimation *""'"); 
@@ -14788,7 +14895,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DUVAnimation_GetName(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite2DUVAnimation_GetName",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DUVAnimation_GetName",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DUVAnimation, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DUVAnimation_GetName" "', argument " "1"" of type '" "iSprite2DUVAnimation const *""'"); 
@@ -14810,7 +14917,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DUVAnimation_GetFrameCount(PyObject *SWIGUNUS
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite2DUVAnimation_GetFrameCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DUVAnimation_GetFrameCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DUVAnimation, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DUVAnimation_GetFrameCount" "', argument " "1"" of type '" "iSprite2DUVAnimation *""'"); 
@@ -14836,7 +14943,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DUVAnimation_GetFrame__SWIG_0(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite2DUVAnimation_GetFrame",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DUVAnimation_GetFrame",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DUVAnimation, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DUVAnimation_GetFrame" "', argument " "1"" of type '" "iSprite2DUVAnimation *""'"); 
@@ -14868,7 +14975,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DUVAnimation_GetFrame__SWIG_1(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite2DUVAnimation_GetFrame",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DUVAnimation_GetFrame",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DUVAnimation, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DUVAnimation_GetFrame" "', argument " "1"" of type '" "iSprite2DUVAnimation *""'"); 
@@ -14946,7 +15053,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DUVAnimation_CreateFrame(PyObject *SWIGUNUSED
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite2DUVAnimation_CreateFrame",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DUVAnimation_CreateFrame",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DUVAnimation, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DUVAnimation_CreateFrame" "', argument " "1"" of type '" "iSprite2DUVAnimation *""'"); 
@@ -14980,7 +15087,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DUVAnimation_MoveFrame(PyObject *SWIGUNUSEDPA
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSprite2DUVAnimation_MoveFrame",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DUVAnimation_MoveFrame",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DUVAnimation, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DUVAnimation_MoveFrame" "', argument " "1"" of type '" "iSprite2DUVAnimation *""'"); 
@@ -15015,7 +15122,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DUVAnimation_RemoveFrame(PyObject *SWIGUNUSED
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite2DUVAnimation_RemoveFrame",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DUVAnimation_RemoveFrame",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DUVAnimation, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DUVAnimation_RemoveFrame" "', argument " "1"" of type '" "iSprite2DUVAnimation *""'"); 
@@ -15041,7 +15148,7 @@ SWIGINTERN PyObject *_wrap_delete_iSprite2DUVAnimation(PyObject *SWIGUNUSEDPARM(
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSprite2DUVAnimation",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSprite2DUVAnimation",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DUVAnimation, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSprite2DUVAnimation" "', argument " "1"" of type '" "iSprite2DUVAnimation *""'"); 
@@ -15058,7 +15165,7 @@ fail:
 
 SWIGINTERN PyObject *iSprite2DUVAnimation_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSprite2DUVAnimation, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -15074,7 +15181,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DFactoryState_SetLighting(PyObject *SWIGUNUSE
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite2DFactoryState_SetLighting",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DFactoryState_SetLighting",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DFactoryState_SetLighting" "', argument " "1"" of type '" "iSprite2DFactoryState *""'"); 
@@ -15101,7 +15208,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DFactoryState_HasLighting(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite2DFactoryState_HasLighting",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DFactoryState_HasLighting",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DFactoryState_HasLighting" "', argument " "1"" of type '" "iSprite2DFactoryState const *""'"); 
@@ -15123,7 +15230,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DFactoryState_GetUVAnimationCount(PyObject *S
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite2DFactoryState_GetUVAnimationCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DFactoryState_GetUVAnimationCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DFactoryState_GetUVAnimationCount" "', argument " "1"" of type '" "iSprite2DFactoryState const *""'"); 
@@ -15145,7 +15252,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DFactoryState_CreateUVAnimation(PyObject *SWI
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite2DFactoryState_CreateUVAnimation",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DFactoryState_CreateUVAnimation",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DFactoryState_CreateUVAnimation" "', argument " "1"" of type '" "iSprite2DFactoryState *""'"); 
@@ -15170,7 +15277,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DFactoryState_RemoveUVAnimation(PyObject *SWI
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite2DFactoryState_RemoveUVAnimation",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DFactoryState_RemoveUVAnimation",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DFactoryState_RemoveUVAnimation" "', argument " "1"" of type '" "iSprite2DFactoryState *""'"); 
@@ -15202,7 +15309,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DFactoryState_GetUVAnimation__SWIG_0(PyObject
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite2DFactoryState_GetUVAnimation",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DFactoryState_GetUVAnimation",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DFactoryState_GetUVAnimation" "', argument " "1"" of type '" "iSprite2DFactoryState const *""'"); 
@@ -15235,7 +15342,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DFactoryState_GetUVAnimation__SWIG_1(PyObject
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite2DFactoryState_GetUVAnimation",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DFactoryState_GetUVAnimation",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DFactoryState_GetUVAnimation" "', argument " "1"" of type '" "iSprite2DFactoryState const *""'"); 
@@ -15306,7 +15413,7 @@ SWIGINTERN PyObject *_wrap_delete_iSprite2DFactoryState(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSprite2DFactoryState",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSprite2DFactoryState",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DFactoryState, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSprite2DFactoryState" "', argument " "1"" of type '" "iSprite2DFactoryState *""'"); 
@@ -15323,7 +15430,7 @@ fail:
 
 SWIGINTERN PyObject *iSprite2DFactoryState_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSprite2DFactoryState, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -15343,7 +15450,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DState_CreateRegularVertices(PyObject *SWIGUN
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSprite2DState_CreateRegularVertices",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DState_CreateRegularVertices",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DState_CreateRegularVertices" "', argument " "1"" of type '" "iSprite2DState *""'"); 
@@ -15387,7 +15494,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DState_SetUVAnimation(PyObject *SWIGUNUSEDPAR
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iSprite2DState_SetUVAnimation",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DState_SetUVAnimation",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DState_SetUVAnimation" "', argument " "1"" of type '" "iSprite2DState *""'"); 
@@ -15431,7 +15538,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DState_GetUVAnimation__SWIG_0(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite2DState_GetUVAnimation",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DState_GetUVAnimation",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DState_GetUVAnimation" "', argument " "1"" of type '" "iSprite2DState const *""'"); 
@@ -15464,7 +15571,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DState_GetUVAnimation__SWIG_1(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite2DState_GetUVAnimation",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DState_GetUVAnimation",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DState_GetUVAnimation" "', argument " "1"" of type '" "iSprite2DState const *""'"); 
@@ -15503,7 +15610,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DState_GetUVAnimation__SWIG_2(PyObject *SWIGU
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iSprite2DState_GetUVAnimation",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DState_GetUVAnimation",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DState_GetUVAnimation" "', argument " "1"" of type '" "iSprite2DState const *""'"); 
@@ -15619,7 +15726,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DState_StopUVAnimation(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite2DState_StopUVAnimation",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DState_StopUVAnimation",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DState_StopUVAnimation" "', argument " "1"" of type '" "iSprite2DState *""'"); 
@@ -15657,7 +15764,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DState_PlayUVAnimation(PyObject *SWIGUNUSEDPA
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iSprite2DState_PlayUVAnimation",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DState_PlayUVAnimation",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DState_PlayUVAnimation" "', argument " "1"" of type '" "iSprite2DState *""'"); 
@@ -15698,7 +15805,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DState_GetVertexByIndex(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite2DState_GetVertexByIndex",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DState_GetVertexByIndex",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DState_GetVertexByIndex" "', argument " "1"" of type '" "iSprite2DState *""'"); 
@@ -15725,7 +15832,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DState_GetVertexCount(PyObject *SWIGUNUSEDPAR
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite2DState_GetVertexCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DState_GetVertexCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DState_GetVertexCount" "', argument " "1"" of type '" "iSprite2DState *""'"); 
@@ -15743,7 +15850,7 @@ SWIGINTERN PyObject *_wrap_iSprite2DState_scfGetVersion(PyObject *SWIGUNUSEDPARM
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iSprite2DState_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DState_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iSprite2DState_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -15759,7 +15866,7 @@ SWIGINTERN PyObject *_wrap_delete_iSprite2DState(PyObject *SWIGUNUSEDPARM(self),
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSprite2DState",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSprite2DState",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DState, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSprite2DState" "', argument " "1"" of type '" "iSprite2DState *""'"); 
@@ -15776,7 +15883,7 @@ fail:
 
 SWIGINTERN PyObject *iSprite2DState_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSprite2DState, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -15793,7 +15900,7 @@ SWIGINTERN PyObject *_wrap_iSpriteFrame_SetName(PyObject *SWIGUNUSEDPARM(self), 
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteFrame_SetName",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteFrame_SetName",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteFrame, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteFrame_SetName" "', argument " "1"" of type '" "iSpriteFrame *""'"); 
@@ -15822,7 +15929,7 @@ SWIGINTERN PyObject *_wrap_iSpriteFrame_GetName(PyObject *SWIGUNUSEDPARM(self), 
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSpriteFrame_GetName",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteFrame_GetName",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteFrame, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteFrame_GetName" "', argument " "1"" of type '" "iSpriteFrame const *""'"); 
@@ -15844,7 +15951,7 @@ SWIGINTERN PyObject *_wrap_iSpriteFrame_GetAnmIndex(PyObject *SWIGUNUSEDPARM(sel
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSpriteFrame_GetAnmIndex",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteFrame_GetAnmIndex",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteFrame, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteFrame_GetAnmIndex" "', argument " "1"" of type '" "iSpriteFrame const *""'"); 
@@ -15866,7 +15973,7 @@ SWIGINTERN PyObject *_wrap_iSpriteFrame_GetTexIndex(PyObject *SWIGUNUSEDPARM(sel
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSpriteFrame_GetTexIndex",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteFrame_GetTexIndex",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteFrame, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteFrame_GetTexIndex" "', argument " "1"" of type '" "iSpriteFrame const *""'"); 
@@ -15887,7 +15994,7 @@ SWIGINTERN PyObject *_wrap_delete_iSpriteFrame(PyObject *SWIGUNUSEDPARM(self), P
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSpriteFrame",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSpriteFrame",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteFrame, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSpriteFrame" "', argument " "1"" of type '" "iSpriteFrame *""'"); 
@@ -15904,7 +16011,7 @@ fail:
 
 SWIGINTERN PyObject *iSpriteFrame_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSpriteFrame, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -15921,7 +16028,7 @@ SWIGINTERN PyObject *_wrap_iSpriteAction_SetName(PyObject *SWIGUNUSEDPARM(self),
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteAction_SetName",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteAction_SetName",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteAction, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteAction_SetName" "', argument " "1"" of type '" "iSpriteAction *""'"); 
@@ -15950,7 +16057,7 @@ SWIGINTERN PyObject *_wrap_iSpriteAction_GetName(PyObject *SWIGUNUSEDPARM(self),
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSpriteAction_GetName",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteAction_GetName",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteAction, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteAction_GetName" "', argument " "1"" of type '" "iSpriteAction const *""'"); 
@@ -15972,7 +16079,7 @@ SWIGINTERN PyObject *_wrap_iSpriteAction_GetFrameCount(PyObject *SWIGUNUSEDPARM(
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSpriteAction_GetFrameCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteAction_GetFrameCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteAction, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteAction_GetFrameCount" "', argument " "1"" of type '" "iSpriteAction *""'"); 
@@ -15998,7 +16105,7 @@ SWIGINTERN PyObject *_wrap_iSpriteAction_GetFrame(PyObject *SWIGUNUSEDPARM(self)
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteAction_GetFrame",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteAction_GetFrame",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteAction, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteAction_GetFrame" "', argument " "1"" of type '" "iSpriteAction *""'"); 
@@ -16029,7 +16136,7 @@ SWIGINTERN PyObject *_wrap_iSpriteAction_GetNextFrame(PyObject *SWIGUNUSEDPARM(s
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteAction_GetNextFrame",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteAction_GetNextFrame",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteAction, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteAction_GetNextFrame" "', argument " "1"" of type '" "iSpriteAction *""'"); 
@@ -16060,7 +16167,7 @@ SWIGINTERN PyObject *_wrap_iSpriteAction_GetFrameDelay(PyObject *SWIGUNUSEDPARM(
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteAction_GetFrameDelay",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteAction_GetFrameDelay",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteAction, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteAction_GetFrameDelay" "', argument " "1"" of type '" "iSpriteAction *""'"); 
@@ -16091,7 +16198,7 @@ SWIGINTERN PyObject *_wrap_iSpriteAction_GetFrameDisplacement(PyObject *SWIGUNUS
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteAction_GetFrameDisplacement",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteAction_GetFrameDisplacement",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteAction, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteAction_GetFrameDisplacement" "', argument " "1"" of type '" "iSpriteAction *""'"); 
@@ -16129,7 +16236,7 @@ SWIGINTERN PyObject *_wrap_iSpriteAction_AddFrame(PyObject *SWIGUNUSEDPARM(self)
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iSpriteAction_AddFrame",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteAction_AddFrame",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteAction, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteAction_AddFrame" "', argument " "1"" of type '" "iSpriteAction *""'"); 
@@ -16165,7 +16272,7 @@ SWIGINTERN PyObject *_wrap_delete_iSpriteAction(PyObject *SWIGUNUSEDPARM(self), 
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSpriteAction",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSpriteAction",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteAction, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSpriteAction" "', argument " "1"" of type '" "iSpriteAction *""'"); 
@@ -16182,7 +16289,7 @@ fail:
 
 SWIGINTERN PyObject *iSpriteAction_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSpriteAction, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -16199,7 +16306,7 @@ SWIGINTERN PyObject *_wrap_iSpriteSocket_SetName(PyObject *SWIGUNUSEDPARM(self),
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteSocket_SetName",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteSocket_SetName",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteSocket_SetName" "', argument " "1"" of type '" "iSpriteSocket *""'"); 
@@ -16228,7 +16335,7 @@ SWIGINTERN PyObject *_wrap_iSpriteSocket_GetName(PyObject *SWIGUNUSEDPARM(self),
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSpriteSocket_GetName",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteSocket_GetName",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteSocket_GetName" "', argument " "1"" of type '" "iSpriteSocket const *""'"); 
@@ -16253,7 +16360,7 @@ SWIGINTERN PyObject *_wrap_iSpriteSocket_SetMeshWrapper(PyObject *SWIGUNUSEDPARM
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteSocket_SetMeshWrapper",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteSocket_SetMeshWrapper",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteSocket_SetMeshWrapper" "', argument " "1"" of type '" "iSpriteSocket *""'"); 
@@ -16280,7 +16387,7 @@ SWIGINTERN PyObject *_wrap_iSpriteSocket_GetMeshWrapper(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSpriteSocket_GetMeshWrapper",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteSocket_GetMeshWrapper",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteSocket_GetMeshWrapper" "', argument " "1"" of type '" "iSpriteSocket const *""'"); 
@@ -16305,7 +16412,7 @@ SWIGINTERN PyObject *_wrap_iSpriteSocket_SetTriangleIndex(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteSocket_SetTriangleIndex",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteSocket_SetTriangleIndex",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteSocket_SetTriangleIndex" "', argument " "1"" of type '" "iSpriteSocket *""'"); 
@@ -16332,7 +16439,7 @@ SWIGINTERN PyObject *_wrap_iSpriteSocket_GetTriangleIndex(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSpriteSocket_GetTriangleIndex",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteSocket_GetTriangleIndex",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteSocket_GetTriangleIndex" "', argument " "1"" of type '" "iSpriteSocket const *""'"); 
@@ -16353,7 +16460,7 @@ SWIGINTERN PyObject *_wrap_delete_iSpriteSocket(PyObject *SWIGUNUSEDPARM(self), 
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSpriteSocket",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSpriteSocket",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteSocket, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSpriteSocket" "', argument " "1"" of type '" "iSpriteSocket *""'"); 
@@ -16370,7 +16477,7 @@ fail:
 
 SWIGINTERN PyObject *iSpriteSocket_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSpriteSocket, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -16386,7 +16493,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_AddVertices(PyObject *SWIGUNUSE
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DFactoryState_AddVertices",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_AddVertices",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_AddVertices" "', argument " "1"" of type '" "iSprite3DFactoryState *""'"); 
@@ -16413,7 +16520,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_GetVertexCount(PyObject *SWIGUN
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite3DFactoryState_GetVertexCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_GetVertexCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_GetVertexCount" "', argument " "1"" of type '" "iSprite3DFactoryState const *""'"); 
@@ -16443,7 +16550,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_GetVertex(PyObject *SWIGUNUSEDP
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSprite3DFactoryState_GetVertex",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_GetVertex",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_GetVertex" "', argument " "1"" of type '" "iSprite3DFactoryState const *""'"); 
@@ -16489,7 +16596,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_SetVertex(PyObject *SWIGUNUSEDP
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iSprite3DFactoryState_SetVertex",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_SetVertex",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_SetVertex" "', argument " "1"" of type '" "iSprite3DFactoryState *""'"); 
@@ -16533,7 +16640,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_GetVertices(PyObject *SWIGUNUSE
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DFactoryState_GetVertices",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_GetVertices",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_GetVertices" "', argument " "1"" of type '" "iSprite3DFactoryState const *""'"); 
@@ -16567,7 +16674,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_SetVertices(PyObject *SWIGUNUSE
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSprite3DFactoryState_SetVertices",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_SetVertices",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_SetVertices" "', argument " "1"" of type '" "iSprite3DFactoryState *""'"); 
@@ -16607,7 +16714,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_GetTexel(PyObject *SWIGUNUSEDPA
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSprite3DFactoryState_GetTexel",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_GetTexel",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_GetTexel" "', argument " "1"" of type '" "iSprite3DFactoryState const *""'"); 
@@ -16653,7 +16760,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_SetTexel(PyObject *SWIGUNUSEDPA
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iSprite3DFactoryState_SetTexel",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_SetTexel",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_SetTexel" "', argument " "1"" of type '" "iSprite3DFactoryState *""'"); 
@@ -16697,7 +16804,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_GetTexels(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DFactoryState_GetTexels",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_GetTexels",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_GetTexels" "', argument " "1"" of type '" "iSprite3DFactoryState const *""'"); 
@@ -16731,7 +16838,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_SetTexels(PyObject *SWIGUNUSEDP
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSprite3DFactoryState_SetTexels",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_SetTexels",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_SetTexels" "', argument " "1"" of type '" "iSprite3DFactoryState *""'"); 
@@ -16771,7 +16878,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_GetNormal(PyObject *SWIGUNUSEDP
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSprite3DFactoryState_GetNormal",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_GetNormal",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_GetNormal" "', argument " "1"" of type '" "iSprite3DFactoryState const *""'"); 
@@ -16817,7 +16924,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_SetNormal(PyObject *SWIGUNUSEDP
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iSprite3DFactoryState_SetNormal",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_SetNormal",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_SetNormal" "', argument " "1"" of type '" "iSprite3DFactoryState *""'"); 
@@ -16861,7 +16968,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_GetNormals(PyObject *SWIGUNUSED
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DFactoryState_GetNormals",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_GetNormals",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_GetNormals" "', argument " "1"" of type '" "iSprite3DFactoryState const *""'"); 
@@ -16895,7 +17002,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_SetNormals(PyObject *SWIGUNUSED
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSprite3DFactoryState_SetNormals",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_SetNormals",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_SetNormals" "', argument " "1"" of type '" "iSprite3DFactoryState *""'"); 
@@ -16938,7 +17045,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_AddTriangle(PyObject *SWIGUNUSE
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iSprite3DFactoryState_AddTriangle",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_AddTriangle",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_AddTriangle" "', argument " "1"" of type '" "iSprite3DFactoryState *""'"); 
@@ -16979,7 +17086,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_GetTriangle(PyObject *SWIGUNUSE
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DFactoryState_GetTriangle",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_GetTriangle",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_GetTriangle" "', argument " "1"" of type '" "iSprite3DFactoryState const *""'"); 
@@ -17006,7 +17113,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_GetTriangles(PyObject *SWIGUNUS
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite3DFactoryState_GetTriangles",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_GetTriangles",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_GetTriangles" "', argument " "1"" of type '" "iSprite3DFactoryState const *""'"); 
@@ -17028,7 +17135,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_GetTriangleCount(PyObject *SWIG
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite3DFactoryState_GetTriangleCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_GetTriangleCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_GetTriangleCount" "', argument " "1"" of type '" "iSprite3DFactoryState const *""'"); 
@@ -17053,7 +17160,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_SetTriangleCount(PyObject *SWIG
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DFactoryState_SetTriangleCount",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_SetTriangleCount",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_SetTriangleCount" "', argument " "1"" of type '" "iSprite3DFactoryState *""'"); 
@@ -17087,7 +17194,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_SetTriangles(PyObject *SWIGUNUS
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSprite3DFactoryState_SetTriangles",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_SetTriangles",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_SetTriangles" "', argument " "1"" of type '" "iSprite3DFactoryState *""'"); 
@@ -17119,7 +17226,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_AddFrame(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite3DFactoryState_AddFrame",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_AddFrame",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_AddFrame" "', argument " "1"" of type '" "iSprite3DFactoryState *""'"); 
@@ -17146,7 +17253,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_FindFrame(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DFactoryState_FindFrame",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_FindFrame",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_FindFrame" "', argument " "1"" of type '" "iSprite3DFactoryState const *""'"); 
@@ -17175,7 +17282,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_GetFrameCount(PyObject *SWIGUNU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite3DFactoryState_GetFrameCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_GetFrameCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_GetFrameCount" "', argument " "1"" of type '" "iSprite3DFactoryState const *""'"); 
@@ -17201,7 +17308,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_GetFrame(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DFactoryState_GetFrame",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_GetFrame",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_GetFrame" "', argument " "1"" of type '" "iSprite3DFactoryState const *""'"); 
@@ -17228,7 +17335,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_AddAction(PyObject *SWIGUNUSEDP
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite3DFactoryState_AddAction",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_AddAction",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_AddAction" "', argument " "1"" of type '" "iSprite3DFactoryState *""'"); 
@@ -17255,7 +17362,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_FindAction(PyObject *SWIGUNUSED
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DFactoryState_FindAction",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_FindAction",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_FindAction" "', argument " "1"" of type '" "iSprite3DFactoryState const *""'"); 
@@ -17284,7 +17391,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_GetFirstAction(PyObject *SWIGUN
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite3DFactoryState_GetFirstAction",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_GetFirstAction",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_GetFirstAction" "', argument " "1"" of type '" "iSprite3DFactoryState const *""'"); 
@@ -17306,7 +17413,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_GetActionCount(PyObject *SWIGUN
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite3DFactoryState_GetActionCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_GetActionCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_GetActionCount" "', argument " "1"" of type '" "iSprite3DFactoryState const *""'"); 
@@ -17332,7 +17439,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_GetAction(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DFactoryState_GetAction",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_GetAction",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_GetAction" "', argument " "1"" of type '" "iSprite3DFactoryState const *""'"); 
@@ -17359,7 +17466,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_AddSocket(PyObject *SWIGUNUSEDP
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite3DFactoryState_AddSocket",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_AddSocket",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_AddSocket" "', argument " "1"" of type '" "iSprite3DFactoryState *""'"); 
@@ -17386,7 +17493,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_FindSocket__SWIG_0(PyObject *SW
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DFactoryState_FindSocket",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_FindSocket",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_FindSocket" "', argument " "1"" of type '" "iSprite3DFactoryState const *""'"); 
@@ -17419,7 +17526,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_FindSocket__SWIG_1(PyObject *SW
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DFactoryState_FindSocket",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_FindSocket",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_FindSocket" "', argument " "1"" of type '" "iSprite3DFactoryState const *""'"); 
@@ -17490,7 +17597,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_GetSocketCount(PyObject *SWIGUN
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite3DFactoryState_GetSocketCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_GetSocketCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_GetSocketCount" "', argument " "1"" of type '" "iSprite3DFactoryState const *""'"); 
@@ -17516,7 +17623,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_GetSocket(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DFactoryState_GetSocket",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_GetSocket",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_GetSocket" "', argument " "1"" of type '" "iSprite3DFactoryState const *""'"); 
@@ -17546,7 +17653,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_EnableTweening(PyObject *SWIGUN
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DFactoryState_EnableTweening",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_EnableTweening",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_EnableTweening" "', argument " "1"" of type '" "iSprite3DFactoryState *""'"); 
@@ -17573,7 +17680,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_IsTweeningEnabled(PyObject *SWI
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite3DFactoryState_IsTweeningEnabled",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_IsTweeningEnabled",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_IsTweeningEnabled" "', argument " "1"" of type '" "iSprite3DFactoryState const *""'"); 
@@ -17598,7 +17705,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_SetLightingQuality(PyObject *SW
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DFactoryState_SetLightingQuality",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_SetLightingQuality",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_SetLightingQuality" "', argument " "1"" of type '" "iSprite3DFactoryState *""'"); 
@@ -17625,7 +17732,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_GetLightingQuality(PyObject *SW
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite3DFactoryState_GetLightingQuality",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_GetLightingQuality",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_GetLightingQuality" "', argument " "1"" of type '" "iSprite3DFactoryState const *""'"); 
@@ -17650,7 +17757,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_SetLightingQualityConfig(PyObje
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DFactoryState_SetLightingQualityConfig",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_SetLightingQualityConfig",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_SetLightingQualityConfig" "', argument " "1"" of type '" "iSprite3DFactoryState *""'"); 
@@ -17677,7 +17784,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_GetLightingQualityConfig(PyObje
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite3DFactoryState_GetLightingQualityConfig",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_GetLightingQualityConfig",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_GetLightingQualityConfig" "', argument " "1"" of type '" "iSprite3DFactoryState const *""'"); 
@@ -17702,7 +17809,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_SetLodLevelConfig(PyObject *SWI
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DFactoryState_SetLodLevelConfig",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_SetLodLevelConfig",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_SetLodLevelConfig" "', argument " "1"" of type '" "iSprite3DFactoryState *""'"); 
@@ -17729,7 +17836,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_GetLodLevelConfig(PyObject *SWI
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite3DFactoryState_GetLodLevelConfig",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_GetLodLevelConfig",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_GetLodLevelConfig" "', argument " "1"" of type '" "iSprite3DFactoryState const *""'"); 
@@ -17758,7 +17865,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_MergeNormals__SWIG_0(PyObject *
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSprite3DFactoryState_MergeNormals",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_MergeNormals",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_MergeNormals" "', argument " "1"" of type '" "iSprite3DFactoryState *""'"); 
@@ -17793,7 +17900,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_MergeNormals__SWIG_1(PyObject *
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DFactoryState_MergeNormals",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_MergeNormals",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_MergeNormals" "', argument " "1"" of type '" "iSprite3DFactoryState *""'"); 
@@ -17819,7 +17926,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DFactoryState_MergeNormals__SWIG_2(PyObject *
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite3DFactoryState_MergeNormals",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DFactoryState_MergeNormals",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DFactoryState_MergeNormals" "', argument " "1"" of type '" "iSprite3DFactoryState *""'"); 
@@ -17902,7 +18009,7 @@ SWIGINTERN PyObject *_wrap_delete_iSprite3DFactoryState(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSprite3DFactoryState",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSprite3DFactoryState",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DFactoryState, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSprite3DFactoryState" "', argument " "1"" of type '" "iSprite3DFactoryState *""'"); 
@@ -17919,7 +18026,7 @@ fail:
 
 SWIGINTERN PyObject *iSprite3DFactoryState_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSprite3DFactoryState, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -17935,7 +18042,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_SetMixMode(PyObject *SWIGUNUSEDPARM(se
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DState_SetMixMode",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_SetMixMode",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_SetMixMode" "', argument " "1"" of type '" "iSprite3DState *""'"); 
@@ -17962,7 +18069,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_GetMixMode(PyObject *SWIGUNUSEDPARM(se
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite3DState_GetMixMode",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_GetMixMode",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_GetMixMode" "', argument " "1"" of type '" "iSprite3DState const *""'"); 
@@ -17987,7 +18094,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_SetLighting(PyObject *SWIGUNUSEDPARM(s
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DState_SetLighting",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_SetLighting",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_SetLighting" "', argument " "1"" of type '" "iSprite3DState *""'"); 
@@ -18014,7 +18121,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_IsLighting(PyObject *SWIGUNUSEDPARM(se
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite3DState_IsLighting",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_IsLighting",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_IsLighting" "', argument " "1"" of type '" "iSprite3DState const *""'"); 
@@ -18039,7 +18146,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_SetFrame(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DState_SetFrame",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_SetFrame",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_SetFrame" "', argument " "1"" of type '" "iSprite3DState *""'"); 
@@ -18066,7 +18173,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_GetCurFrame(PyObject *SWIGUNUSEDPARM(s
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite3DState_GetCurFrame",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_GetCurFrame",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_GetCurFrame" "', argument " "1"" of type '" "iSprite3DState const *""'"); 
@@ -18088,7 +18195,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_GetFrameCount(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite3DState_GetFrameCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_GetFrameCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_GetFrameCount" "', argument " "1"" of type '" "iSprite3DState const *""'"); 
@@ -18123,7 +18230,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_SetAction__SWIG_0(PyObject *SWIGUNUSED
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iSprite3DState_SetAction",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_SetAction",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_SetAction" "', argument " "1"" of type '" "iSprite3DState *""'"); 
@@ -18171,7 +18278,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_SetAction__SWIG_1(PyObject *SWIGUNUSED
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSprite3DState_SetAction",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_SetAction",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_SetAction" "', argument " "1"" of type '" "iSprite3DState *""'"); 
@@ -18210,7 +18317,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_SetAction__SWIG_2(PyObject *SWIGUNUSED
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DState_SetAction",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_SetAction",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_SetAction" "', argument " "1"" of type '" "iSprite3DState *""'"); 
@@ -18251,7 +18358,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_SetAction__SWIG_3(PyObject *SWIGUNUSED
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iSprite3DState_SetAction",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_SetAction",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_SetAction" "', argument " "1"" of type '" "iSprite3DState *""'"); 
@@ -18296,7 +18403,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_SetAction__SWIG_4(PyObject *SWIGUNUSED
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSprite3DState_SetAction",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_SetAction",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_SetAction" "', argument " "1"" of type '" "iSprite3DState *""'"); 
@@ -18332,7 +18439,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_SetAction__SWIG_5(PyObject *SWIGUNUSED
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DState_SetAction",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_SetAction",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_SetAction" "', argument " "1"" of type '" "iSprite3DState *""'"); 
@@ -18499,7 +18606,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_SetReverseAction(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DState_SetReverseAction",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_SetReverseAction",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_SetReverseAction" "', argument " "1"" of type '" "iSprite3DState *""'"); 
@@ -18529,7 +18636,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_SetSingleStepAction(PyObject *SWIGUNUS
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DState_SetSingleStepAction",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_SetSingleStepAction",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_SetSingleStepAction" "', argument " "1"" of type '" "iSprite3DState *""'"); 
@@ -18565,7 +18672,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_SetOverrideAction__SWIG_0(PyObject *SW
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSprite3DState_SetOverrideAction",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_SetOverrideAction",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_SetOverrideAction" "', argument " "1"" of type '" "iSprite3DState *""'"); 
@@ -18604,7 +18711,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_SetOverrideAction__SWIG_1(PyObject *SW
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DState_SetOverrideAction",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_SetOverrideAction",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_SetOverrideAction" "', argument " "1"" of type '" "iSprite3DState *""'"); 
@@ -18641,7 +18748,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_SetOverrideAction__SWIG_2(PyObject *SW
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSprite3DState_SetOverrideAction",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_SetOverrideAction",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_SetOverrideAction" "', argument " "1"" of type '" "iSprite3DState *""'"); 
@@ -18677,7 +18784,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_SetOverrideAction__SWIG_3(PyObject *SW
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DState_SetOverrideAction",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_SetOverrideAction",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_SetOverrideAction" "', argument " "1"" of type '" "iSprite3DState *""'"); 
@@ -18794,7 +18901,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_PropagateAction(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DState_PropagateAction",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_PropagateAction",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_PropagateAction" "', argument " "1"" of type '" "iSprite3DState *""'"); 
@@ -18823,7 +18930,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_GetCurAction(PyObject *SWIGUNUSEDPARM(
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite3DState_GetCurAction",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_GetCurAction",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_GetCurAction" "', argument " "1"" of type '" "iSprite3DState const *""'"); 
@@ -18845,7 +18952,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_GetReverseAction(PyObject *SWIGUNUSEDP
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite3DState_GetReverseAction",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_GetReverseAction",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_GetReverseAction" "', argument " "1"" of type '" "iSprite3DState const *""'"); 
@@ -18870,7 +18977,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_EnableTweening(PyObject *SWIGUNUSEDPAR
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DState_EnableTweening",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_EnableTweening",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_EnableTweening" "', argument " "1"" of type '" "iSprite3DState *""'"); 
@@ -18897,7 +19004,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_IsTweeningEnabled(PyObject *SWIGUNUSED
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite3DState_IsTweeningEnabled",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_IsTweeningEnabled",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_IsTweeningEnabled" "', argument " "1"" of type '" "iSprite3DState const *""'"); 
@@ -18918,7 +19025,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_UnsetTexture(PyObject *SWIGUNUSEDPARM(
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite3DState_UnsetTexture",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_UnsetTexture",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_UnsetTexture" "', argument " "1"" of type '" "iSprite3DState *""'"); 
@@ -18940,7 +19047,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_GetLightingQuality(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite3DState_GetLightingQuality",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_GetLightingQuality",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_GetLightingQuality" "', argument " "1"" of type '" "iSprite3DState *""'"); 
@@ -18965,7 +19072,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_SetLocalLightingQuality(PyObject *SWIG
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DState_SetLocalLightingQuality",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_SetLocalLightingQuality",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_SetLocalLightingQuality" "', argument " "1"" of type '" "iSprite3DState *""'"); 
@@ -18995,7 +19102,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_SetLightingQualityConfig(PyObject *SWI
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DState_SetLightingQualityConfig",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_SetLightingQualityConfig",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_SetLightingQualityConfig" "', argument " "1"" of type '" "iSprite3DState *""'"); 
@@ -19022,7 +19129,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_GetLightingQualityConfig(PyObject *SWI
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite3DState_GetLightingQualityConfig",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_GetLightingQualityConfig",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_GetLightingQualityConfig" "', argument " "1"" of type '" "iSprite3DState const *""'"); 
@@ -19047,7 +19154,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_SetLodLevelConfig(PyObject *SWIGUNUSED
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DState_SetLodLevelConfig",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_SetLodLevelConfig",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_SetLodLevelConfig" "', argument " "1"" of type '" "iSprite3DState *""'"); 
@@ -19074,7 +19181,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_GetLodLevelConfig(PyObject *SWIGUNUSED
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite3DState_GetLodLevelConfig",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_GetLodLevelConfig",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_GetLodLevelConfig" "', argument " "1"" of type '" "iSprite3DState const *""'"); 
@@ -19096,7 +19203,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_IsLodEnabled(PyObject *SWIGUNUSEDPARM(
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSprite3DState_IsLodEnabled",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_IsLodEnabled",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_IsLodEnabled" "', argument " "1"" of type '" "iSprite3DState const *""'"); 
@@ -19122,7 +19229,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_FindSocket__SWIG_0(PyObject *SWIGUNUSE
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DState_FindSocket",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_FindSocket",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_FindSocket" "', argument " "1"" of type '" "iSprite3DState const *""'"); 
@@ -19154,7 +19261,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_FindSocket__SWIG_1(PyObject *SWIGUNUSE
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSprite3DState_FindSocket",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_FindSocket",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite3DState_FindSocket" "', argument " "1"" of type '" "iSprite3DState const *""'"); 
@@ -19223,7 +19330,7 @@ SWIGINTERN PyObject *_wrap_iSprite3DState_scfGetVersion(PyObject *SWIGUNUSEDPARM
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iSprite3DState_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite3DState_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iSprite3DState_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -19239,7 +19346,7 @@ SWIGINTERN PyObject *_wrap_delete_iSprite3DState(PyObject *SWIGUNUSEDPARM(self),
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSprite3DState",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSprite3DState",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite3DState, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSprite3DState" "', argument " "1"" of type '" "iSprite3DState *""'"); 
@@ -19256,7 +19363,7 @@ fail:
 
 SWIGINTERN PyObject *iSprite3DState_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSprite3DState, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -19272,7 +19379,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DSocket_SetSubmeshIndex(PyObject *SWIGUNUS
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DSocket_SetSubmeshIndex",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DSocket_SetSubmeshIndex",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DSocket_SetSubmeshIndex" "', argument " "1"" of type '" "iSpriteCal3DSocket *""'"); 
@@ -19299,7 +19406,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DSocket_GetSubmeshIndex(PyObject *SWIGUNUS
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSpriteCal3DSocket_GetSubmeshIndex",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DSocket_GetSubmeshIndex",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DSocket_GetSubmeshIndex" "', argument " "1"" of type '" "iSpriteCal3DSocket const *""'"); 
@@ -19324,7 +19431,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DSocket_SetMeshIndex(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DSocket_SetMeshIndex",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DSocket_SetMeshIndex",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DSocket_SetMeshIndex" "', argument " "1"" of type '" "iSpriteCal3DSocket *""'"); 
@@ -19351,7 +19458,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DSocket_GetMeshIndex(PyObject *SWIGUNUSEDP
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSpriteCal3DSocket_GetMeshIndex",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DSocket_GetMeshIndex",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DSocket_GetMeshIndex" "', argument " "1"" of type '" "iSpriteCal3DSocket const *""'"); 
@@ -19376,7 +19483,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DSocket_SetTransform(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DSocket_SetTransform",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DSocket_SetTransform",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DSocket_SetTransform" "', argument " "1"" of type '" "iSpriteCal3DSocket *""'"); 
@@ -19406,7 +19513,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DSocket_GetTransform(PyObject *SWIGUNUSEDP
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSpriteCal3DSocket_GetTransform",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DSocket_GetTransform",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DSocket_GetTransform" "', argument " "1"" of type '" "iSpriteCal3DSocket const *""'"); 
@@ -19428,7 +19535,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DSocket_GetSecondaryCount(PyObject *SWIGUN
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSpriteCal3DSocket_GetSecondaryCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DSocket_GetSecondaryCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DSocket_GetSecondaryCount" "', argument " "1"" of type '" "iSpriteCal3DSocket const *""'"); 
@@ -19454,7 +19561,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DSocket_GetSecondaryMesh(PyObject *SWIGUNU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DSocket_GetSecondaryMesh",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DSocket_GetSecondaryMesh",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DSocket_GetSecondaryMesh" "', argument " "1"" of type '" "iSpriteCal3DSocket *""'"); 
@@ -19485,7 +19592,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DSocket_GetSecondaryTransform(PyObject *SW
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DSocket_GetSecondaryTransform",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DSocket_GetSecondaryTransform",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DSocket_GetSecondaryTransform" "', argument " "1"" of type '" "iSpriteCal3DSocket *""'"); 
@@ -19519,7 +19626,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DSocket_SetSecondaryTransform(PyObject *SW
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSpriteCal3DSocket_SetSecondaryTransform",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DSocket_SetSecondaryTransform",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DSocket_SetSecondaryTransform" "', argument " "1"" of type '" "iSpriteCal3DSocket *""'"); 
@@ -19567,7 +19674,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DSocket_AttachSecondary(PyObject *SWIGUNUS
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSpriteCal3DSocket_AttachSecondary",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DSocket_AttachSecondary",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DSocket_AttachSecondary" "', argument " "1"" of type '" "iSpriteCal3DSocket *""'"); 
@@ -19611,7 +19718,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DSocket_DetachSecondary__SWIG_0(PyObject *
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DSocket_DetachSecondary",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DSocket_DetachSecondary",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DSocket_DetachSecondary" "', argument " "1"" of type '" "iSpriteCal3DSocket *""'"); 
@@ -19643,7 +19750,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DSocket_DetachSecondary__SWIG_1(PyObject *
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DSocket_DetachSecondary",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DSocket_DetachSecondary",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DSocket_DetachSecondary" "', argument " "1"" of type '" "iSpriteCal3DSocket *""'"); 
@@ -19720,7 +19827,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DSocket_FindSecondary(PyObject *SWIGUNUSED
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DSocket_FindSecondary",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DSocket_FindSecondary",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DSocket, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DSocket_FindSecondary" "', argument " "1"" of type '" "iSpriteCal3DSocket *""'"); 
@@ -19748,7 +19855,7 @@ SWIGINTERN PyObject *_wrap_delete_iSpriteCal3DSocket(PyObject *SWIGUNUSEDPARM(se
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSpriteCal3DSocket",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSpriteCal3DSocket",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DSocket, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSpriteCal3DSocket" "', argument " "1"" of type '" "iSpriteCal3DSocket *""'"); 
@@ -19765,7 +19872,7 @@ fail:
 
 SWIGINTERN PyObject *iSpriteCal3DSocket_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSpriteCal3DSocket, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -19783,7 +19890,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_Create(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DFactoryState_Create",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_Create",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_Create" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
@@ -19811,7 +19918,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_ReportLastError(PyObject *SW
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSpriteCal3DFactoryState_ReportLastError",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_ReportLastError",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_ReportLastError" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
@@ -19836,7 +19943,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_SetLoadFlags(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DFactoryState_SetLoadFlags",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_SetLoadFlags",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_SetLoadFlags" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
@@ -19867,7 +19974,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_SetBasePath(PyObject *SWIGUN
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DFactoryState_SetBasePath",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_SetBasePath",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_SetBasePath" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
@@ -19905,7 +20012,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_LoadCoreSkeleton(PyObject *S
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSpriteCal3DFactoryState_LoadCoreSkeleton",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_LoadCoreSkeleton",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_LoadCoreSkeleton" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
@@ -19942,7 +20049,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_RescaleFactory(PyObject *SWI
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DFactoryState_RescaleFactory",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_RescaleFactory",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_RescaleFactory" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
@@ -20015,7 +20122,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_LoadCoreAnimation(PyObject *
   PyObject * obj10 = 0 ;
   PyObject * obj11 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOOOOOOO:iSpriteCal3DFactoryState_LoadCoreAnimation",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8,&obj9,&obj10,&obj11)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_LoadCoreAnimation",12,12,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8,&obj9,&obj10,&obj11)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_LoadCoreAnimation" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
@@ -20118,7 +20225,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_LoadCoreMesh(PyObject *SWIGU
   PyObject * obj4 = 0 ;
   PyObject * obj5 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOO:iSpriteCal3DFactoryState_LoadCoreMesh",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_LoadCoreMesh",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_LoadCoreMesh" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
@@ -20187,7 +20294,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_LoadCoreMorphTarget(PyObject
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iSpriteCal3DFactoryState_LoadCoreMorphTarget",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_LoadCoreMorphTarget",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_LoadCoreMorphTarget" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
@@ -20238,7 +20345,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_AddMorphAnimation(PyObject *
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DFactoryState_AddMorphAnimation",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_AddMorphAnimation",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_AddMorphAnimation" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
@@ -20281,7 +20388,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_AddMorphTarget(PyObject *SWI
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iSpriteCal3DFactoryState_AddMorphTarget",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_AddMorphTarget",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_AddMorphTarget" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
@@ -20326,7 +20433,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_AddCoreMaterial(PyObject *SW
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DFactoryState_AddCoreMaterial",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_AddCoreMaterial",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_AddCoreMaterial" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
@@ -20352,7 +20459,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_CalculateAllBoneBoundingBoxe
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSpriteCal3DFactoryState_CalculateAllBoneBoundingBoxes",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_CalculateAllBoneBoundingBoxes",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_CalculateAllBoneBoundingBoxes" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
@@ -20373,7 +20480,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_BindMaterials(PyObject *SWIG
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSpriteCal3DFactoryState_BindMaterials",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_BindMaterials",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_BindMaterials" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
@@ -20395,7 +20502,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_GetMeshCount(PyObject *SWIGU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSpriteCal3DFactoryState_GetMeshCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_GetMeshCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_GetMeshCount" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
@@ -20417,7 +20524,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_GetMorphAnimationCount(PyObj
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSpriteCal3DFactoryState_GetMorphAnimationCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_GetMorphAnimationCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_GetMorphAnimationCount" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
@@ -20443,7 +20550,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_GetMorphTargetCount(PyObject
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DFactoryState_GetMorphTargetCount",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_GetMorphTargetCount",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_GetMorphTargetCount" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
@@ -20474,7 +20581,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_GetMeshName(PyObject *SWIGUN
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DFactoryState_GetMeshName",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_GetMeshName",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_GetMeshName" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
@@ -20506,7 +20613,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_FindMeshName(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DFactoryState_FindMeshName",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_FindMeshName",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_FindMeshName" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
@@ -20540,7 +20647,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_GetDefaultMaterial(PyObject 
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DFactoryState_GetDefaultMaterial",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_GetDefaultMaterial",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_GetDefaultMaterial" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
@@ -20573,7 +20680,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_GetMorphAnimationName(PyObje
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DFactoryState_GetMorphAnimationName",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_GetMorphAnimationName",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_GetMorphAnimationName" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
@@ -20605,7 +20712,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_FindMorphAnimationName(PyObj
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DFactoryState_FindMorphAnimationName",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_FindMorphAnimationName",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_FindMorphAnimationName" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
@@ -20638,7 +20745,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_IsMeshDefault(PyObject *SWIG
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DFactoryState_IsMeshDefault",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_IsMeshDefault",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_IsMeshDefault" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
@@ -20665,7 +20772,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_AddSocket(PyObject *SWIGUNUS
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSpriteCal3DFactoryState_AddSocket",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_AddSocket",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_AddSocket" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
@@ -20692,7 +20799,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_FindSocket__SWIG_0(PyObject 
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DFactoryState_FindSocket",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_FindSocket",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_FindSocket" "', argument " "1"" of type '" "iSpriteCal3DFactoryState const *""'"); 
@@ -20725,7 +20832,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_FindSocket__SWIG_1(PyObject 
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DFactoryState_FindSocket",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_FindSocket",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_FindSocket" "', argument " "1"" of type '" "iSpriteCal3DFactoryState const *""'"); 
@@ -20796,7 +20903,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_GetSocketCount(PyObject *SWI
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSpriteCal3DFactoryState_GetSocketCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_GetSocketCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_GetSocketCount" "', argument " "1"" of type '" "iSpriteCal3DFactoryState const *""'"); 
@@ -20822,7 +20929,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_GetSocket(PyObject *SWIGUNUS
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DFactoryState_GetSocket",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_GetSocket",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_GetSocket" "', argument " "1"" of type '" "iSpriteCal3DFactoryState const *""'"); 
@@ -20849,7 +20956,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_GetCal3DCoreModel(PyObject *
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSpriteCal3DFactoryState_GetCal3DCoreModel",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_GetCal3DCoreModel",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_GetCal3DCoreModel" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
@@ -20884,7 +20991,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_RegisterAnimCallback(PyObjec
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iSpriteCal3DFactoryState_RegisterAnimCallback",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_RegisterAnimCallback",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_RegisterAnimCallback" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
@@ -20932,7 +21039,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_RemoveAnimCallback(PyObject 
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSpriteCal3DFactoryState_RemoveAnimCallback",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_RemoveAnimCallback",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_RemoveAnimCallback" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
@@ -20965,7 +21072,7 @@ SWIGINTERN PyObject *_wrap_delete_iSpriteCal3DFactoryState(PyObject *SWIGUNUSEDP
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSpriteCal3DFactoryState",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSpriteCal3DFactoryState",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSpriteCal3DFactoryState" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
@@ -20982,7 +21089,7 @@ fail:
 
 SWIGINTERN PyObject *iSpriteCal3DFactoryState_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSpriteCal3DFactoryState, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -21002,7 +21109,7 @@ SWIGINTERN PyObject *_wrap_iAnimTimeUpdateHandler_UpdatePosition(PyObject *SWIGU
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iAnimTimeUpdateHandler_UpdatePosition",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iAnimTimeUpdateHandler_UpdatePosition",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iAnimTimeUpdateHandler, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iAnimTimeUpdateHandler_UpdatePosition" "', argument " "1"" of type '" "iAnimTimeUpdateHandler *""'"); 
@@ -21033,7 +21140,7 @@ SWIGINTERN PyObject *_wrap_delete_iAnimTimeUpdateHandler(PyObject *SWIGUNUSEDPAR
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iAnimTimeUpdateHandler",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iAnimTimeUpdateHandler",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iAnimTimeUpdateHandler, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iAnimTimeUpdateHandler" "', argument " "1"" of type '" "iAnimTimeUpdateHandler *""'"); 
@@ -21050,7 +21157,7 @@ fail:
 
 SWIGINTERN PyObject *iAnimTimeUpdateHandler_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iAnimTimeUpdateHandler, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -21066,7 +21173,7 @@ SWIGINTERN PyObject *_wrap_csSpriteCal3DActiveAnim_index_set(PyObject *SWIGUNUSE
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csSpriteCal3DActiveAnim_index_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSpriteCal3DActiveAnim_index_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSpriteCal3DActiveAnim, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSpriteCal3DActiveAnim_index_set" "', argument " "1"" of type '" "csSpriteCal3DActiveAnim *""'"); 
@@ -21094,7 +21201,7 @@ SWIGINTERN PyObject *_wrap_csSpriteCal3DActiveAnim_index_get(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csSpriteCal3DActiveAnim_index_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSpriteCal3DActiveAnim_index_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSpriteCal3DActiveAnim, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSpriteCal3DActiveAnim_index_get" "', argument " "1"" of type '" "csSpriteCal3DActiveAnim *""'"); 
@@ -21119,7 +21226,7 @@ SWIGINTERN PyObject *_wrap_csSpriteCal3DActiveAnim_weight_set(PyObject *SWIGUNUS
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csSpriteCal3DActiveAnim_weight_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSpriteCal3DActiveAnim_weight_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSpriteCal3DActiveAnim, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSpriteCal3DActiveAnim_weight_set" "', argument " "1"" of type '" "csSpriteCal3DActiveAnim *""'"); 
@@ -21147,7 +21254,7 @@ SWIGINTERN PyObject *_wrap_csSpriteCal3DActiveAnim_weight_get(PyObject *SWIGUNUS
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csSpriteCal3DActiveAnim_weight_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSpriteCal3DActiveAnim_weight_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSpriteCal3DActiveAnim, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSpriteCal3DActiveAnim_weight_get" "', argument " "1"" of type '" "csSpriteCal3DActiveAnim *""'"); 
@@ -21165,7 +21272,7 @@ SWIGINTERN PyObject *_wrap_new_csSpriteCal3DActiveAnim(PyObject *SWIGUNUSEDPARM(
   PyObject *resultobj = 0;
   csSpriteCal3DActiveAnim *result = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)":new_csSpriteCal3DActiveAnim")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"new_csSpriteCal3DActiveAnim",0,0)) SWIG_fail;
   result = (csSpriteCal3DActiveAnim *)new csSpriteCal3DActiveAnim();
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csSpriteCal3DActiveAnim, SWIG_POINTER_NEW |  0 );
   return resultobj;
@@ -21181,7 +21288,7 @@ SWIGINTERN PyObject *_wrap_delete_csSpriteCal3DActiveAnim(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_csSpriteCal3DActiveAnim",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_csSpriteCal3DActiveAnim",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSpriteCal3DActiveAnim, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_csSpriteCal3DActiveAnim" "', argument " "1"" of type '" "csSpriteCal3DActiveAnim *""'"); 
@@ -21198,7 +21305,7 @@ fail:
 
 SWIGINTERN PyObject *csSpriteCal3DActiveAnim_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_csSpriteCal3DActiveAnim, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -21211,7 +21318,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_GetAnimCount(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSpriteCal3DState_GetAnimCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_GetAnimCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_GetAnimCount" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -21237,7 +21344,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_GetAnimName(PyObject *SWIGUNUSEDPAR
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DState_GetAnimName",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_GetAnimName",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_GetAnimName" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -21268,7 +21375,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_GetAnimType(PyObject *SWIGUNUSEDPAR
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DState_GetAnimType",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_GetAnimType",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_GetAnimType" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -21300,7 +21407,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_FindAnim(PyObject *SWIGUNUSEDPARM(s
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DState_FindAnim",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_FindAnim",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_FindAnim" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -21328,7 +21435,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_ClearAllAnims(PyObject *SWIGUNUSEDP
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSpriteCal3DState_ClearAllAnims",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_ClearAllAnims",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_ClearAllAnims" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -21359,7 +21466,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_SetAnimCycle__SWIG_0(PyObject *SWIG
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSpriteCal3DState_SetAnimCycle",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_SetAnimCycle",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_SetAnimCycle" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -21401,7 +21508,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_SetAnimCycle__SWIG_1(PyObject *SWIG
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSpriteCal3DState_SetAnimCycle",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_SetAnimCycle",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_SetAnimCycle" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -21503,7 +21610,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_AddAnimCycle__SWIG_0(PyObject *SWIG
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iSpriteCal3DState_AddAnimCycle",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_AddAnimCycle",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_AddAnimCycle" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -21554,7 +21661,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_AddAnimCycle__SWIG_1(PyObject *SWIG
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iSpriteCal3DState_AddAnimCycle",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_AddAnimCycle",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_AddAnimCycle" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -21668,7 +21775,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_ClearAnimCycle__SWIG_0(PyObject *SW
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSpriteCal3DState_ClearAnimCycle",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_ClearAnimCycle",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_ClearAnimCycle" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -21709,7 +21816,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_ClearAnimCycle__SWIG_1(PyObject *SW
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSpriteCal3DState_ClearAnimCycle",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_ClearAnimCycle",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_ClearAnimCycle" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -21800,7 +21907,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_GetActiveAnimCount(PyObject *SWIGUN
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSpriteCal3DState_GetActiveAnimCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_GetActiveAnimCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_GetActiveAnimCount" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -21830,7 +21937,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_GetActiveAnims(PyObject *SWIGUNUSED
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSpriteCal3DState_GetActiveAnims",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_GetActiveAnims",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_GetActiveAnims" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -21869,7 +21976,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_SetActiveAnims(PyObject *SWIGUNUSED
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSpriteCal3DState_SetActiveAnims",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_SetActiveAnims",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_SetActiveAnims" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -21914,7 +22021,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_SetAnimAction__SWIG_0(PyObject *SWI
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iSpriteCal3DState_SetAnimAction",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_SetAnimAction",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_SetAnimAction" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -21965,7 +22072,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_SetAnimAction__SWIG_1(PyObject *SWI
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iSpriteCal3DState_SetAnimAction",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_SetAnimAction",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_SetAnimAction" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -22079,7 +22186,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_SetVelocity__SWIG_0(PyObject *SWIGU
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSpriteCal3DState_SetVelocity",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_SetVelocity",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_SetVelocity" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -22115,7 +22222,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_SetVelocity__SWIG_1(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DState_SetVelocity",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_SetVelocity",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_SetVelocity" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -22198,7 +22305,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_SetDefaultIdleAnim(PyObject *SWIGUN
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DState_SetDefaultIdleAnim",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_SetDefaultIdleAnim",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_SetDefaultIdleAnim" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -22230,7 +22337,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_SetLOD(PyObject *SWIGUNUSEDPARM(sel
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DState_SetLOD",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_SetLOD",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_SetLOD" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -22262,7 +22369,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_AttachCoreMesh__SWIG_0(PyObject *SW
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DState_AttachCoreMesh",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_AttachCoreMesh",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_AttachCoreMesh" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -22296,7 +22403,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_DetachCoreMesh__SWIG_0(PyObject *SW
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DState_DetachCoreMesh",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_DetachCoreMesh",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_DetachCoreMesh" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -22333,7 +22440,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_AttachCoreMesh__SWIG_1(PyObject *SW
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSpriteCal3DState_AttachCoreMesh",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_AttachCoreMesh",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_AttachCoreMesh" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -22369,7 +22476,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_AttachCoreMesh__SWIG_2(PyObject *SW
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DState_AttachCoreMesh",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_AttachCoreMesh",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_AttachCoreMesh" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -22465,7 +22572,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_DetachCoreMesh__SWIG_1(PyObject *SW
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DState_DetachCoreMesh",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_DetachCoreMesh",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_DetachCoreMesh" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -22549,7 +22656,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_BlendMorphTarget(PyObject *SWIGUNUS
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iSpriteCal3DState_BlendMorphTarget",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_BlendMorphTarget",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_BlendMorphTarget" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -22594,7 +22701,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_ClearMorphTarget(PyObject *SWIGUNUS
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSpriteCal3DState_ClearMorphTarget",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_ClearMorphTarget",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_ClearMorphTarget" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -22630,7 +22737,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_FindSocket__SWIG_0(PyObject *SWIGUN
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DState_FindSocket",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_FindSocket",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_FindSocket" "', argument " "1"" of type '" "iSpriteCal3DState const *""'"); 
@@ -22662,7 +22769,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_FindSocket__SWIG_1(PyObject *SWIGUN
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DState_FindSocket",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_FindSocket",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_FindSocket" "', argument " "1"" of type '" "iSpriteCal3DState const *""'"); 
@@ -22744,7 +22851,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_SetMaterial(PyObject *SWIGUNUSEDPAR
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSpriteCal3DState_SetMaterial",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_SetMaterial",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_SetMaterial" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -22781,7 +22888,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_SetTimeFactor(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DState_SetTimeFactor",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_SetTimeFactor",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_SetTimeFactor" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -22808,7 +22915,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_GetTimeFactor(PyObject *SWIGUNUSEDP
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSpriteCal3DState_GetTimeFactor",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_GetTimeFactor",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_GetTimeFactor" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -22830,7 +22937,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_GetAnimationTime(PyObject *SWIGUNUS
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSpriteCal3DState_GetAnimationTime",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_GetAnimationTime",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_GetAnimationTime" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -22852,7 +22959,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_GetAnimationDuration(PyObject *SWIG
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSpriteCal3DState_GetAnimationDuration",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_GetAnimationDuration",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_GetAnimationDuration" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -22877,7 +22984,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_SetAnimationTime(PyObject *SWIGUNUS
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DState_SetAnimationTime",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_SetAnimationTime",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_SetAnimationTime" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -22907,7 +23014,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_SetAnimTimeUpdateHandler(PyObject *
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DState_SetAnimTimeUpdateHandler",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_SetAnimTimeUpdateHandler",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_SetAnimTimeUpdateHandler" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -22936,7 +23043,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_SetUserData(PyObject *SWIGUNUSEDPAR
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DState_SetUserData",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_SetUserData",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_SetUserData" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -22967,7 +23074,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_GetCoreMeshShaderVarContext(PyObjec
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSpriteCal3DState_GetCoreMeshShaderVarContext",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_GetCoreMeshShaderVarContext",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_GetCoreMeshShaderVarContext" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -22996,7 +23103,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_GetSkeleton(PyObject *SWIGUNUSEDPAR
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSpriteCal3DState_GetSkeleton",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_GetSkeleton",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_GetSkeleton" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -23035,7 +23142,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_GetCal3DModel(PyObject *SWIGUNUSEDP
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSpriteCal3DState_GetCal3DModel",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_GetCal3DModel",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_GetCal3DModel" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -23053,7 +23160,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_scfGetVersion(PyObject *SWIGUNUSEDP
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iSpriteCal3DState_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iSpriteCal3DState_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -23069,7 +23176,7 @@ SWIGINTERN PyObject *_wrap_delete_iSpriteCal3DState(PyObject *SWIGUNUSEDPARM(sel
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSpriteCal3DState",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSpriteCal3DState",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSpriteCal3DState" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
@@ -23086,7 +23193,7 @@ fail:
 
 SWIGINTERN PyObject *iSpriteCal3DState_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSpriteCal3DState, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -23107,7 +23214,7 @@ SWIGINTERN PyObject *_wrap_iMeshObjectDrawCallback_BeforeDrawing(PyObject *SWIGU
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iMeshObjectDrawCallback_BeforeDrawing",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObjectDrawCallback_BeforeDrawing",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObjectDrawCallback, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObjectDrawCallback_BeforeDrawing" "', argument " "1"" of type '" "iMeshObjectDrawCallback *""'"); 
@@ -23138,7 +23245,7 @@ SWIGINTERN PyObject *_wrap_delete_iMeshObjectDrawCallback(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iMeshObjectDrawCallback",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iMeshObjectDrawCallback",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObjectDrawCallback, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iMeshObjectDrawCallback" "', argument " "1"" of type '" "iMeshObjectDrawCallback *""'"); 
@@ -23155,7 +23262,7 @@ fail:
 
 SWIGINTERN PyObject *iMeshObjectDrawCallback_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iMeshObjectDrawCallback, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -23168,7 +23275,7 @@ SWIGINTERN PyObject *_wrap_iMeshObject_GetFactory(PyObject *SWIGUNUSEDPARM(self)
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iMeshObject_GetFactory",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_GetFactory",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObject, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObject_GetFactory" "', argument " "1"" of type '" "iMeshObject const *""'"); 
@@ -23190,7 +23297,7 @@ SWIGINTERN PyObject *_wrap_iMeshObject_GetFlags(PyObject *SWIGUNUSEDPARM(self), 
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iMeshObject_GetFlags",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_GetFlags",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObject, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObject_GetFlags" "', argument " "1"" of type '" "iMeshObject *""'"); 
@@ -23215,7 +23322,7 @@ SWIGINTERN PyObject *_wrap_iMeshObject_Clone(PyObject *SWIGUNUSEDPARM(self), PyO
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iMeshObject_Clone",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_Clone",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObject, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObject_Clone" "', argument " "1"" of type '" "iMeshObject *""'"); 
@@ -23270,7 +23377,7 @@ SWIGINTERN PyObject *_wrap_iMeshObject_GetRenderMeshes(PyObject *SWIGUNUSEDPARM(
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iMeshObject_GetRenderMeshes",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_GetRenderMeshes",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObject, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObject_GetRenderMeshes" "', argument " "1"" of type '" "iMeshObject *""'"); 
@@ -23318,7 +23425,7 @@ SWIGINTERN PyObject *_wrap_iMeshObject_SetVisibleCallback(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iMeshObject_SetVisibleCallback",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_SetVisibleCallback",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObject, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObject_SetVisibleCallback" "', argument " "1"" of type '" "iMeshObject *""'"); 
@@ -23345,7 +23452,7 @@ SWIGINTERN PyObject *_wrap_iMeshObject_GetVisibleCallback(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iMeshObject_GetVisibleCallback",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_GetVisibleCallback",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObject, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObject_GetVisibleCallback" "', argument " "1"" of type '" "iMeshObject const *""'"); 
@@ -23378,7 +23485,7 @@ SWIGINTERN PyObject *_wrap_iMeshObject_NextFrame(PyObject *SWIGUNUSEDPARM(self),
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iMeshObject_NextFrame",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_NextFrame",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObject, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObject_NextFrame" "', argument " "1"" of type '" "iMeshObject *""'"); 
@@ -23421,7 +23528,7 @@ SWIGINTERN PyObject *_wrap_iMeshObject_HardTransform(PyObject *SWIGUNUSEDPARM(se
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iMeshObject_HardTransform",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_HardTransform",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObject, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObject_HardTransform" "', argument " "1"" of type '" "iMeshObject *""'"); 
@@ -23451,7 +23558,7 @@ SWIGINTERN PyObject *_wrap_iMeshObject_SupportsHardTransform(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iMeshObject_SupportsHardTransform",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_SupportsHardTransform",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObject, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObject_SupportsHardTransform" "', argument " "1"" of type '" "iMeshObject const *""'"); 
@@ -23489,7 +23596,7 @@ SWIGINTERN PyObject *_wrap_iMeshObject_HitBeamOutline(PyObject *SWIGUNUSEDPARM(s
   PyObject * obj3 = 0 ;
   
   arg5 = &temp5;
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iMeshObject_HitBeamOutline",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_HitBeamOutline",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObject, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObject_HitBeamOutline" "', argument " "1"" of type '" "iMeshObject *""'"); 
@@ -23565,7 +23672,7 @@ SWIGINTERN PyObject *_wrap_iMeshObject_HitBeamObject(PyObject *SWIGUNUSEDPARM(se
   
   arg5 = &temp5;
   arg6 = &temp6;
-  if (!PyArg_ParseTuple(args,(char *)"OOOO|O:iMeshObject_HitBeamObject",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_HitBeamObject",4,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObject, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObject_HitBeamObject" "', argument " "1"" of type '" "iMeshObject *""'"); 
@@ -23633,7 +23740,7 @@ SWIGINTERN PyObject *_wrap_iMeshObject_SetMeshWrapper(PyObject *SWIGUNUSEDPARM(s
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iMeshObject_SetMeshWrapper",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_SetMeshWrapper",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObject, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObject_SetMeshWrapper" "', argument " "1"" of type '" "iMeshObject *""'"); 
@@ -23660,7 +23767,7 @@ SWIGINTERN PyObject *_wrap_iMeshObject_GetMeshWrapper(PyObject *SWIGUNUSEDPARM(s
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iMeshObject_GetMeshWrapper",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_GetMeshWrapper",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObject, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObject_GetMeshWrapper" "', argument " "1"" of type '" "iMeshObject const *""'"); 
@@ -23682,7 +23789,7 @@ SWIGINTERN PyObject *_wrap_iMeshObject_GetObjectModel(PyObject *SWIGUNUSEDPARM(s
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iMeshObject_GetObjectModel",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_GetObjectModel",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObject, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObject_GetObjectModel" "', argument " "1"" of type '" "iMeshObject *""'"); 
@@ -23708,7 +23815,7 @@ SWIGINTERN PyObject *_wrap_iMeshObject_SetColor(PyObject *SWIGUNUSEDPARM(self), 
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iMeshObject_SetColor",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_SetColor",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObject, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObject_SetColor" "', argument " "1"" of type '" "iMeshObject *""'"); 
@@ -23742,7 +23849,7 @@ SWIGINTERN PyObject *_wrap_iMeshObject_GetColor(PyObject *SWIGUNUSEDPARM(self), 
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iMeshObject_GetColor",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_GetColor",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObject, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObject_GetColor" "', argument " "1"" of type '" "iMeshObject const *""'"); 
@@ -23776,7 +23883,7 @@ SWIGINTERN PyObject *_wrap_iMeshObject_SetMaterialWrapper(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iMeshObject_SetMaterialWrapper",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_SetMaterialWrapper",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObject, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObject_SetMaterialWrapper" "', argument " "1"" of type '" "iMeshObject *""'"); 
@@ -23803,7 +23910,7 @@ SWIGINTERN PyObject *_wrap_iMeshObject_GetMaterialWrapper(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iMeshObject_GetMaterialWrapper",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_GetMaterialWrapper",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObject, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObject_GetMaterialWrapper" "', argument " "1"" of type '" "iMeshObject const *""'"); 
@@ -23828,7 +23935,7 @@ SWIGINTERN PyObject *_wrap_iMeshObject_SetMixMode(PyObject *SWIGUNUSEDPARM(self)
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iMeshObject_SetMixMode",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_SetMixMode",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObject, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObject_SetMixMode" "', argument " "1"" of type '" "iMeshObject *""'"); 
@@ -23855,7 +23962,7 @@ SWIGINTERN PyObject *_wrap_iMeshObject_GetMixMode(PyObject *SWIGUNUSEDPARM(self)
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iMeshObject_GetMixMode",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_GetMixMode",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObject, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObject_GetMixMode" "', argument " "1"" of type '" "iMeshObject const *""'"); 
@@ -23876,7 +23983,7 @@ SWIGINTERN PyObject *_wrap_iMeshObject_InvalidateMaterialHandles(PyObject *SWIGU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iMeshObject_InvalidateMaterialHandles",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_InvalidateMaterialHandles",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObject, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObject_InvalidateMaterialHandles" "', argument " "1"" of type '" "iMeshObject *""'"); 
@@ -23905,7 +24012,7 @@ SWIGINTERN PyObject *_wrap_iMeshObject_PositionChild(PyObject *SWIGUNUSEDPARM(se
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iMeshObject_PositionChild",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_PositionChild",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObject, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObject_PositionChild" "', argument " "1"" of type '" "iMeshObject *""'"); 
@@ -23948,7 +24055,7 @@ SWIGINTERN PyObject *_wrap_iMeshObject_BuildDecal(PyObject *SWIGUNUSEDPARM(self)
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iMeshObject_BuildDecal",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_BuildDecal",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObject, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObject_BuildDecal" "', argument " "1"" of type '" "iMeshObject *""'"); 
@@ -23981,7 +24088,7 @@ SWIGINTERN PyObject *_wrap_iMeshObject_scfGetVersion(PyObject *SWIGUNUSEDPARM(se
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iMeshObject_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iMeshObject_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -23997,7 +24104,7 @@ SWIGINTERN PyObject *_wrap_delete_iMeshObject(PyObject *SWIGUNUSEDPARM(self), Py
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iMeshObject",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iMeshObject",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObject, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iMeshObject" "', argument " "1"" of type '" "iMeshObject *""'"); 
@@ -24014,7 +24121,7 @@ fail:
 
 SWIGINTERN PyObject *iMeshObject_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iMeshObject, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -24027,7 +24134,7 @@ SWIGINTERN PyObject *_wrap_iMeshObjectFactory_GetFlags(PyObject *SWIGUNUSEDPARM(
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iMeshObjectFactory_GetFlags",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObjectFactory_GetFlags",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObjectFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObjectFactory_GetFlags" "', argument " "1"" of type '" "iMeshObjectFactory *""'"); 
@@ -24052,7 +24159,7 @@ SWIGINTERN PyObject *_wrap_iMeshObjectFactory_NewInstance(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iMeshObjectFactory_NewInstance",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObjectFactory_NewInstance",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObjectFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObjectFactory_NewInstance" "', argument " "1"" of type '" "iMeshObjectFactory *""'"); 
@@ -24091,7 +24198,7 @@ SWIGINTERN PyObject *_wrap_iMeshObjectFactory_Clone(PyObject *SWIGUNUSEDPARM(sel
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iMeshObjectFactory_Clone",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObjectFactory_Clone",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObjectFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObjectFactory_Clone" "', argument " "1"" of type '" "iMeshObjectFactory *""'"); 
@@ -24133,7 +24240,7 @@ SWIGINTERN PyObject *_wrap_iMeshObjectFactory_HardTransform(PyObject *SWIGUNUSED
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iMeshObjectFactory_HardTransform",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObjectFactory_HardTransform",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObjectFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObjectFactory_HardTransform" "', argument " "1"" of type '" "iMeshObjectFactory *""'"); 
@@ -24163,7 +24270,7 @@ SWIGINTERN PyObject *_wrap_iMeshObjectFactory_SupportsHardTransform(PyObject *SW
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iMeshObjectFactory_SupportsHardTransform",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObjectFactory_SupportsHardTransform",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObjectFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObjectFactory_SupportsHardTransform" "', argument " "1"" of type '" "iMeshObjectFactory const *""'"); 
@@ -24188,7 +24295,7 @@ SWIGINTERN PyObject *_wrap_iMeshObjectFactory_SetMeshFactoryWrapper(PyObject *SW
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iMeshObjectFactory_SetMeshFactoryWrapper",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObjectFactory_SetMeshFactoryWrapper",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObjectFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObjectFactory_SetMeshFactoryWrapper" "', argument " "1"" of type '" "iMeshObjectFactory *""'"); 
@@ -24215,7 +24322,7 @@ SWIGINTERN PyObject *_wrap_iMeshObjectFactory_GetMeshFactoryWrapper(PyObject *SW
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iMeshObjectFactory_GetMeshFactoryWrapper",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObjectFactory_GetMeshFactoryWrapper",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObjectFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObjectFactory_GetMeshFactoryWrapper" "', argument " "1"" of type '" "iMeshObjectFactory const *""'"); 
@@ -24237,7 +24344,7 @@ SWIGINTERN PyObject *_wrap_iMeshObjectFactory_GetMeshObjectType(PyObject *SWIGUN
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iMeshObjectFactory_GetMeshObjectType",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObjectFactory_GetMeshObjectType",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObjectFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObjectFactory_GetMeshObjectType" "', argument " "1"" of type '" "iMeshObjectFactory const *""'"); 
@@ -24259,7 +24366,7 @@ SWIGINTERN PyObject *_wrap_iMeshObjectFactory_GetObjectModel(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iMeshObjectFactory_GetObjectModel",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObjectFactory_GetObjectModel",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObjectFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObjectFactory_GetObjectModel" "', argument " "1"" of type '" "iMeshObjectFactory *""'"); 
@@ -24285,7 +24392,7 @@ SWIGINTERN PyObject *_wrap_iMeshObjectFactory_SetMaterialWrapper(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iMeshObjectFactory_SetMaterialWrapper",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObjectFactory_SetMaterialWrapper",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObjectFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObjectFactory_SetMaterialWrapper" "', argument " "1"" of type '" "iMeshObjectFactory *""'"); 
@@ -24312,7 +24419,7 @@ SWIGINTERN PyObject *_wrap_iMeshObjectFactory_GetMaterialWrapper(PyObject *SWIGU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iMeshObjectFactory_GetMaterialWrapper",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObjectFactory_GetMaterialWrapper",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObjectFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObjectFactory_GetMaterialWrapper" "', argument " "1"" of type '" "iMeshObjectFactory const *""'"); 
@@ -24337,7 +24444,7 @@ SWIGINTERN PyObject *_wrap_iMeshObjectFactory_SetMixMode(PyObject *SWIGUNUSEDPAR
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iMeshObjectFactory_SetMixMode",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObjectFactory_SetMixMode",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObjectFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObjectFactory_SetMixMode" "', argument " "1"" of type '" "iMeshObjectFactory *""'"); 
@@ -24364,7 +24471,7 @@ SWIGINTERN PyObject *_wrap_iMeshObjectFactory_GetMixMode(PyObject *SWIGUNUSEDPAR
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iMeshObjectFactory_GetMixMode",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObjectFactory_GetMixMode",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObjectFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObjectFactory_GetMixMode" "', argument " "1"" of type '" "iMeshObjectFactory const *""'"); 
@@ -24382,7 +24489,7 @@ SWIGINTERN PyObject *_wrap_iMeshObjectFactory_scfGetVersion(PyObject *SWIGUNUSED
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iMeshObjectFactory_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObjectFactory_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iMeshObjectFactory_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -24398,7 +24505,7 @@ SWIGINTERN PyObject *_wrap_delete_iMeshObjectFactory(PyObject *SWIGUNUSEDPARM(se
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iMeshObjectFactory",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iMeshObjectFactory",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObjectFactory, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iMeshObjectFactory" "', argument " "1"" of type '" "iMeshObjectFactory *""'"); 
@@ -24415,7 +24522,7 @@ fail:
 
 SWIGINTERN PyObject *iMeshObjectFactory_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iMeshObjectFactory, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -24428,7 +24535,7 @@ SWIGINTERN PyObject *_wrap_iMeshObjectType_NewFactory(PyObject *SWIGUNUSEDPARM(s
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iMeshObjectType_NewFactory",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObjectType_NewFactory",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObjectType, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObjectType_NewFactory" "', argument " "1"" of type '" "iMeshObjectType *""'"); 
@@ -24463,7 +24570,7 @@ SWIGINTERN PyObject *_wrap_iMeshObjectType_scfGetVersion(PyObject *SWIGUNUSEDPAR
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iMeshObjectType_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObjectType_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iMeshObjectType_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -24479,7 +24586,7 @@ SWIGINTERN PyObject *_wrap_delete_iMeshObjectType(PyObject *SWIGUNUSEDPARM(self)
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iMeshObjectType",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iMeshObjectType",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObjectType, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iMeshObjectType" "', argument " "1"" of type '" "iMeshObjectType *""'"); 
@@ -24496,7 +24603,7 @@ fail:
 
 SWIGINTERN PyObject *iMeshObjectType_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iMeshObjectType, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -24512,7 +24619,7 @@ SWIGINTERN PyObject *_wrap_csPolygonRange_start_set(PyObject *SWIGUNUSEDPARM(sel
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csPolygonRange_start_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csPolygonRange_start_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csPolygonRange, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csPolygonRange_start_set" "', argument " "1"" of type '" "csPolygonRange *""'"); 
@@ -24540,7 +24647,7 @@ SWIGINTERN PyObject *_wrap_csPolygonRange_start_get(PyObject *SWIGUNUSEDPARM(sel
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csPolygonRange_start_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csPolygonRange_start_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csPolygonRange, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csPolygonRange_start_get" "', argument " "1"" of type '" "csPolygonRange *""'"); 
@@ -24565,7 +24672,7 @@ SWIGINTERN PyObject *_wrap_csPolygonRange_end_set(PyObject *SWIGUNUSEDPARM(self)
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csPolygonRange_end_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csPolygonRange_end_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csPolygonRange, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csPolygonRange_end_set" "', argument " "1"" of type '" "csPolygonRange *""'"); 
@@ -24593,7 +24700,7 @@ SWIGINTERN PyObject *_wrap_csPolygonRange_end_get(PyObject *SWIGUNUSEDPARM(self)
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csPolygonRange_end_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csPolygonRange_end_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csPolygonRange, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csPolygonRange_end_get" "', argument " "1"" of type '" "csPolygonRange *""'"); 
@@ -24619,7 +24726,7 @@ SWIGINTERN PyObject *_wrap_new_csPolygonRange(PyObject *SWIGUNUSEDPARM(self), Py
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:new_csPolygonRange",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"new_csPolygonRange",2,2,&obj0,&obj1)) SWIG_fail;
   ecode1 = SWIG_AsVal_int(obj0, &val1);
   if (!SWIG_IsOK(ecode1)) {
     SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_csPolygonRange" "', argument " "1"" of type '" "int""'");
@@ -24653,7 +24760,7 @@ SWIGINTERN PyObject *_wrap_csPolygonRange_Set__SWIG_0(PyObject *SWIGUNUSEDPARM(s
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:csPolygonRange_Set",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csPolygonRange_Set",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csPolygonRange, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csPolygonRange_Set" "', argument " "1"" of type '" "csPolygonRange *""'"); 
@@ -24688,7 +24795,7 @@ SWIGINTERN PyObject *_wrap_csPolygonRange_Set__SWIG_1(PyObject *SWIGUNUSEDPARM(s
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csPolygonRange_Set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csPolygonRange_Set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csPolygonRange, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csPolygonRange_Set" "', argument " "1"" of type '" "csPolygonRange *""'"); 
@@ -24767,7 +24874,7 @@ SWIGINTERN PyObject *_wrap_delete_csPolygonRange(PyObject *SWIGUNUSEDPARM(self),
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_csPolygonRange",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_csPolygonRange",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csPolygonRange, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_csPolygonRange" "', argument " "1"" of type '" "csPolygonRange *""'"); 
@@ -24784,7 +24891,7 @@ fail:
 
 SWIGINTERN PyObject *csPolygonRange_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_csPolygonRange, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -24797,7 +24904,7 @@ SWIGINTERN PyObject *_wrap_iPolygonHandle_GetThingFactoryState(PyObject *SWIGUNU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iPolygonHandle_GetThingFactoryState",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iPolygonHandle_GetThingFactoryState",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iPolygonHandle, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iPolygonHandle_GetThingFactoryState" "', argument " "1"" of type '" "iPolygonHandle const *""'"); 
@@ -24819,7 +24926,7 @@ SWIGINTERN PyObject *_wrap_iPolygonHandle_GetMeshObjectFactory(PyObject *SWIGUNU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iPolygonHandle_GetMeshObjectFactory",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iPolygonHandle_GetMeshObjectFactory",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iPolygonHandle, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iPolygonHandle_GetMeshObjectFactory" "', argument " "1"" of type '" "iPolygonHandle const *""'"); 
@@ -24841,7 +24948,7 @@ SWIGINTERN PyObject *_wrap_iPolygonHandle_GetThingState(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iPolygonHandle_GetThingState",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iPolygonHandle_GetThingState",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iPolygonHandle, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iPolygonHandle_GetThingState" "', argument " "1"" of type '" "iPolygonHandle const *""'"); 
@@ -24863,7 +24970,7 @@ SWIGINTERN PyObject *_wrap_iPolygonHandle_GetMeshObject(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iPolygonHandle_GetMeshObject",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iPolygonHandle_GetMeshObject",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iPolygonHandle, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iPolygonHandle_GetMeshObject" "', argument " "1"" of type '" "iPolygonHandle const *""'"); 
@@ -24885,7 +24992,7 @@ SWIGINTERN PyObject *_wrap_iPolygonHandle_GetIndex(PyObject *SWIGUNUSEDPARM(self
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iPolygonHandle_GetIndex",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iPolygonHandle_GetIndex",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iPolygonHandle, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iPolygonHandle_GetIndex" "', argument " "1"" of type '" "iPolygonHandle const *""'"); 
@@ -24906,7 +25013,7 @@ SWIGINTERN PyObject *_wrap_delete_iPolygonHandle(PyObject *SWIGUNUSEDPARM(self),
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iPolygonHandle",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iPolygonHandle",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iPolygonHandle, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iPolygonHandle" "', argument " "1"" of type '" "iPolygonHandle *""'"); 
@@ -24923,7 +25030,7 @@ fail:
 
 SWIGINTERN PyObject *iPolygonHandle_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iPolygonHandle, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -24935,7 +25042,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_CompressVertices(PyObject *SWIGUNU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iThingFactoryState_CompressVertices",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_CompressVertices",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_CompressVertices" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -24957,7 +25064,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_GetPolygonCount(PyObject *SWIGUNUS
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iThingFactoryState_GetPolygonCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_GetPolygonCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_GetPolygonCount" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -24982,7 +25089,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_RemovePolygon(PyObject *SWIGUNUSED
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iThingFactoryState_RemovePolygon",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_RemovePolygon",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_RemovePolygon" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -25008,7 +25115,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_RemovePolygons(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iThingFactoryState_RemovePolygons",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_RemovePolygons",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_RemovePolygons" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -25035,7 +25142,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_FindPolygonByName(PyObject *SWIGUN
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iThingFactoryState_FindPolygonByName",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_FindPolygonByName",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_FindPolygonByName" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -25064,7 +25171,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_AddEmptyPolygon(PyObject *SWIGUNUS
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iThingFactoryState_AddEmptyPolygon",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_AddEmptyPolygon",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_AddEmptyPolygon" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -25098,7 +25205,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_AddTriangle(PyObject *SWIGUNUSEDPA
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iThingFactoryState_AddTriangle",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_AddTriangle",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_AddTriangle" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -25160,7 +25267,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_AddQuad(PyObject *SWIGUNUSEDPARM(s
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iThingFactoryState_AddQuad",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_AddQuad",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_AddQuad" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -25217,7 +25324,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_AddPolygon__SWIG_0(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iThingFactoryState_AddPolygon",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_AddPolygon",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_AddPolygon" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -25275,7 +25382,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_AddPolygon__SWIG_1__varargs__(PyOb
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iThingFactoryState_AddPolygon",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_AddPolygon",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_AddPolygon" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -25382,7 +25489,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_AddOutsideBox(PyObject *SWIGUNUSED
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iThingFactoryState_AddOutsideBox",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_AddOutsideBox",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_AddOutsideBox" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -25428,7 +25535,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_AddInsideBox(PyObject *SWIGUNUSEDP
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iThingFactoryState_AddInsideBox",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_AddInsideBox",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_AddInsideBox" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -25474,7 +25581,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_SetPolygonName(PyObject *SWIGUNUSE
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iThingFactoryState_SetPolygonName",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_SetPolygonName",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_SetPolygonName" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -25515,7 +25622,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_GetPolygonName(PyObject *SWIGUNUSE
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iThingFactoryState_GetPolygonName",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_GetPolygonName",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_GetPolygonName" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -25546,7 +25653,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_CreatePolygonHandle(PyObject *SWIG
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iThingFactoryState_CreatePolygonHandle",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_CreatePolygonHandle",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_CreatePolygonHandle" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -25580,7 +25687,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_SetPolygonMaterial(PyObject *SWIGU
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iThingFactoryState_SetPolygonMaterial",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_SetPolygonMaterial",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_SetPolygonMaterial" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -25619,7 +25726,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_GetPolygonMaterial(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iThingFactoryState_GetPolygonMaterial",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_GetPolygonMaterial",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_GetPolygonMaterial" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -25653,7 +25760,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_AddPolygonVertex__SWIG_0(PyObject 
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iThingFactoryState_AddPolygonVertex",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_AddPolygonVertex",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_AddPolygonVertex" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -25698,7 +25805,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_AddPolygonVertex__SWIG_1(PyObject 
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iThingFactoryState_AddPolygonVertex",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_AddPolygonVertex",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_AddPolygonVertex" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -25797,7 +25904,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_SetPolygonVertexIndices(PyObject *
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iThingFactoryState_SetPolygonVertexIndices",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_SetPolygonVertexIndices",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_SetPolygonVertexIndices" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -25841,7 +25948,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_GetPolygonVertexCount(PyObject *SW
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iThingFactoryState_GetPolygonVertexCount",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_GetPolygonVertexCount",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_GetPolygonVertexCount" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -25876,7 +25983,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_GetPolygonVertex(PyObject *SWIGUNU
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iThingFactoryState_GetPolygonVertex",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_GetPolygonVertex",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_GetPolygonVertex" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -25915,7 +26022,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_GetPolygonVertexIndices(PyObject *
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iThingFactoryState_GetPolygonVertexIndices",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_GetPolygonVertexIndices",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_GetPolygonVertexIndices" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -25954,7 +26061,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_SetPolygonTextureMapping__SWIG_0(P
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iThingFactoryState_SetPolygonTextureMapping",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_SetPolygonTextureMapping",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_SetPolygonTextureMapping" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -26016,7 +26123,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_SetPolygonTextureMapping__SWIG_1(P
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iThingFactoryState_SetPolygonTextureMapping",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_SetPolygonTextureMapping",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_SetPolygonTextureMapping" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -26098,7 +26205,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_SetPolygonTextureMapping__SWIG_2(P
   PyObject * obj6 = 0 ;
   PyObject * obj7 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOOO:iThingFactoryState_SetPolygonTextureMapping",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_SetPolygonTextureMapping",8,8,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_SetPolygonTextureMapping" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -26192,7 +26299,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_SetPolygonTextureMapping__SWIG_3(P
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iThingFactoryState_SetPolygonTextureMapping",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_SetPolygonTextureMapping",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_SetPolygonTextureMapping" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -26267,7 +26374,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_SetPolygonTextureMapping__SWIG_4(P
   PyObject * obj5 = 0 ;
   PyObject * obj6 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOO:iThingFactoryState_SetPolygonTextureMapping",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_SetPolygonTextureMapping",7,7,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_SetPolygonTextureMapping" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -26339,7 +26446,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_SetPolygonTextureMapping__SWIG_5(P
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iThingFactoryState_SetPolygonTextureMapping",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_SetPolygonTextureMapping",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_SetPolygonTextureMapping" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -26568,7 +26675,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_GetPolygonTextureMapping(PyObject 
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iThingFactoryState_GetPolygonTextureMapping",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_GetPolygonTextureMapping",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_GetPolygonTextureMapping" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -26618,7 +26725,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_SetPolygonTextureMappingEnabled(Py
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iThingFactoryState_SetPolygonTextureMappingEnabled",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_SetPolygonTextureMappingEnabled",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_SetPolygonTextureMappingEnabled" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -26657,7 +26764,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_IsPolygonTextureMappingEnabled(PyO
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iThingFactoryState_IsPolygonTextureMappingEnabled",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_IsPolygonTextureMappingEnabled",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_IsPolygonTextureMappingEnabled" "', argument " "1"" of type '" "iThingFactoryState const *""'"); 
@@ -26691,7 +26798,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_SetPolygonFlags__SWIG_0(PyObject *
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iThingFactoryState_SetPolygonFlags",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_SetPolygonFlags",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_SetPolygonFlags" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -26737,7 +26844,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_SetPolygonFlags__SWIG_1(PyObject *
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iThingFactoryState_SetPolygonFlags",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_SetPolygonFlags",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_SetPolygonFlags" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -26845,7 +26952,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_ResetPolygonFlags(PyObject *SWIGUN
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iThingFactoryState_ResetPolygonFlags",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_ResetPolygonFlags",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_ResetPolygonFlags" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -26884,7 +26991,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_GetPolygonFlags(PyObject *SWIGUNUS
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iThingFactoryState_GetPolygonFlags",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_GetPolygonFlags",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_GetPolygonFlags" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -26918,7 +27025,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_GetPolygonObjectPlane(PyObject *SW
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iThingFactoryState_GetPolygonObjectPlane",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_GetPolygonObjectPlane",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_GetPolygonObjectPlane" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -26952,7 +27059,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_IsPolygonTransparent(PyObject *SWI
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iThingFactoryState_IsPolygonTransparent",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_IsPolygonTransparent",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_IsPolygonTransparent" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -26987,7 +27094,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_PointOnPolygon(PyObject *SWIGUNUSE
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iThingFactoryState_PointOnPolygon",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_PointOnPolygon",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_PointOnPolygon" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -27022,7 +27129,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_GetVertexCount(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iThingFactoryState_GetVertexCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_GetVertexCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_GetVertexCount" "', argument " "1"" of type '" "iThingFactoryState const *""'"); 
@@ -27048,7 +27155,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_GetVertex(PyObject *SWIGUNUSEDPARM
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iThingFactoryState_GetVertex",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_GetVertex",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_GetVertex" "', argument " "1"" of type '" "iThingFactoryState const *""'"); 
@@ -27078,7 +27185,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_GetVertices(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iThingFactoryState_GetVertices",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_GetVertices",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_GetVertices" "', argument " "1"" of type '" "iThingFactoryState const *""'"); 
@@ -27104,7 +27211,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_CreateVertex(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iThingFactoryState_CreateVertex",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_CreateVertex",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_CreateVertex" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -27141,7 +27248,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_SetVertex(PyObject *SWIGUNUSEDPARM
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iThingFactoryState_SetVertex",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_SetVertex",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_SetVertex" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -27179,7 +27286,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_DeleteVertex(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iThingFactoryState_DeleteVertex",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_DeleteVertex",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_DeleteVertex" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -27213,7 +27320,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_DeleteVertices(PyObject *SWIGUNUSE
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iThingFactoryState_DeleteVertices",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_DeleteVertices",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_DeleteVertices" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -27248,7 +27355,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_SetSmoothingFlag(PyObject *SWIGUNU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iThingFactoryState_SetSmoothingFlag",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_SetSmoothingFlag",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_SetSmoothingFlag" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -27275,7 +27382,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_GetSmoothingFlag(PyObject *SWIGUNU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iThingFactoryState_GetSmoothingFlag",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_GetSmoothingFlag",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_GetSmoothingFlag" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -27297,7 +27404,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_GetNormals(PyObject *SWIGUNUSEDPAR
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iThingFactoryState_GetNormals",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_GetNormals",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_GetNormals" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -27319,7 +27426,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_GetCosinusFactor(PyObject *SWIGUNU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iThingFactoryState_GetCosinusFactor",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_GetCosinusFactor",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_GetCosinusFactor" "', argument " "1"" of type '" "iThingFactoryState const *""'"); 
@@ -27344,7 +27451,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_SetCosinusFactor(PyObject *SWIGUNU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iThingFactoryState_SetCosinusFactor",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_SetCosinusFactor",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_SetCosinusFactor" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -27384,7 +27491,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_AddPolygonRenderBuffer(PyObject *S
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iThingFactoryState_AddPolygonRenderBuffer",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_AddPolygonRenderBuffer",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_AddPolygonRenderBuffer" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -27439,7 +27546,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_GetLightmapLayout(PyObject *SWIGUN
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iThingFactoryState_GetLightmapLayout",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_GetLightmapLayout",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingFactoryState_GetLightmapLayout" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -27483,7 +27590,7 @@ SWIGINTERN PyObject *_wrap_iThingFactoryState_scfGetVersion(PyObject *SWIGUNUSED
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iThingFactoryState_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingFactoryState_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iThingFactoryState_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -27499,7 +27606,7 @@ SWIGINTERN PyObject *_wrap_delete_iThingFactoryState(PyObject *SWIGUNUSEDPARM(se
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iThingFactoryState",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iThingFactoryState",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingFactoryState, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iThingFactoryState" "', argument " "1"" of type '" "iThingFactoryState *""'"); 
@@ -27516,7 +27623,7 @@ fail:
 
 SWIGINTERN PyObject *iThingFactoryState_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iThingFactoryState, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -27533,7 +27640,7 @@ SWIGINTERN PyObject *_wrap_iThingState_GetVertexW(PyObject *SWIGUNUSEDPARM(self)
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iThingState_GetVertexW",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingState_GetVertexW",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingState_GetVertexW" "', argument " "1"" of type '" "iThingState const *""'"); 
@@ -27563,7 +27670,7 @@ SWIGINTERN PyObject *_wrap_iThingState_GetVerticesW(PyObject *SWIGUNUSEDPARM(sel
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iThingState_GetVerticesW",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingState_GetVerticesW",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingState_GetVerticesW" "', argument " "1"" of type '" "iThingState const *""'"); 
@@ -27585,7 +27692,7 @@ SWIGINTERN PyObject *_wrap_iThingState_GetMovingOption(PyObject *SWIGUNUSEDPARM(
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iThingState_GetMovingOption",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingState_GetMovingOption",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingState_GetMovingOption" "', argument " "1"" of type '" "iThingState const *""'"); 
@@ -27610,7 +27717,7 @@ SWIGINTERN PyObject *_wrap_iThingState_SetMovingOption(PyObject *SWIGUNUSEDPARM(
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iThingState_SetMovingOption",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingState_SetMovingOption",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingState_SetMovingOption" "', argument " "1"" of type '" "iThingState *""'"); 
@@ -27636,7 +27743,7 @@ SWIGINTERN PyObject *_wrap_iThingState_Prepare(PyObject *SWIGUNUSEDPARM(self), P
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iThingState_Prepare",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingState_Prepare",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingState_Prepare" "', argument " "1"" of type '" "iThingState *""'"); 
@@ -27657,7 +27764,7 @@ SWIGINTERN PyObject *_wrap_iThingState_Unprepare(PyObject *SWIGUNUSEDPARM(self),
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iThingState_Unprepare",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingState_Unprepare",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingState_Unprepare" "', argument " "1"" of type '" "iThingState *""'"); 
@@ -27686,7 +27793,7 @@ SWIGINTERN PyObject *_wrap_iThingState_ReplaceMaterial(PyObject *SWIGUNUSEDPARM(
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iThingState_ReplaceMaterial",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingState_ReplaceMaterial",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingState_ReplaceMaterial" "', argument " "1"" of type '" "iThingState *""'"); 
@@ -27717,7 +27824,7 @@ SWIGINTERN PyObject *_wrap_iThingState_ClearReplacedMaterials(PyObject *SWIGUNUS
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iThingState_ClearReplacedMaterials",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingState_ClearReplacedMaterials",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingState_ClearReplacedMaterials" "', argument " "1"" of type '" "iThingState *""'"); 
@@ -27742,7 +27849,7 @@ SWIGINTERN PyObject *_wrap_iThingState_SetMixMode(PyObject *SWIGUNUSEDPARM(self)
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iThingState_SetMixMode",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingState_SetMixMode",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingState_SetMixMode" "', argument " "1"" of type '" "iThingState *""'"); 
@@ -27769,7 +27876,7 @@ SWIGINTERN PyObject *_wrap_iThingState_GetMixMode(PyObject *SWIGUNUSEDPARM(self)
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iThingState_GetMixMode",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingState_GetMixMode",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingState_GetMixMode" "', argument " "1"" of type '" "iThingState const *""'"); 
@@ -27795,7 +27902,7 @@ SWIGINTERN PyObject *_wrap_iThingState_CreatePolygonHandle(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iThingState_CreatePolygonHandle",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingState_CreatePolygonHandle",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingState_CreatePolygonHandle" "', argument " "1"" of type '" "iThingState *""'"); 
@@ -27826,7 +27933,7 @@ SWIGINTERN PyObject *_wrap_iThingState_GetPolygonWorldPlane(PyObject *SWIGUNUSED
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iThingState_GetPolygonWorldPlane",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingState_GetPolygonWorldPlane",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingState_GetPolygonWorldPlane" "', argument " "1"" of type '" "iThingState *""'"); 
@@ -27860,7 +27967,7 @@ SWIGINTERN PyObject *_wrap_iThingState_GetPolygonLightmap(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iThingState_GetPolygonLightmap",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingState_GetPolygonLightmap",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingState_GetPolygonLightmap" "', argument " "1"" of type '" "iThingState *""'"); 
@@ -27920,7 +28027,7 @@ SWIGINTERN PyObject *_wrap_iThingState_GetPolygonPDLight(PyObject *SWIGUNUSEDPAR
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iThingState_GetPolygonPDLight",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingState_GetPolygonPDLight",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingState_GetPolygonPDLight" "', argument " "1"" of type '" "iThingState *""'"); 
@@ -27972,7 +28079,7 @@ SWIGINTERN PyObject *_wrap_iThingState_GetReplacedMaterial(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iThingState_GetReplacedMaterial",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingState_GetReplacedMaterial",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingState_GetReplacedMaterial" "', argument " "1"" of type '" "iThingState *""'"); 
@@ -27995,7 +28102,7 @@ SWIGINTERN PyObject *_wrap_iThingState_scfGetVersion(PyObject *SWIGUNUSEDPARM(se
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iThingState_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingState_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iThingState_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -28011,7 +28118,7 @@ SWIGINTERN PyObject *_wrap_delete_iThingState(PyObject *SWIGUNUSEDPARM(self), Py
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iThingState",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iThingState",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingState, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iThingState" "', argument " "1"" of type '" "iThingState *""'"); 
@@ -28028,7 +28135,7 @@ fail:
 
 SWIGINTERN PyObject *iThingState_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iThingState, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -28040,7 +28147,7 @@ SWIGINTERN PyObject *_wrap_iThingEnvironment_Clear(PyObject *SWIGUNUSEDPARM(self
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iThingEnvironment_Clear",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingEnvironment_Clear",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingEnvironment, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingEnvironment_Clear" "', argument " "1"" of type '" "iThingEnvironment *""'"); 
@@ -28062,7 +28169,7 @@ SWIGINTERN PyObject *_wrap_iThingEnvironment_GetLightmapCellSize(PyObject *SWIGU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iThingEnvironment_GetLightmapCellSize",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingEnvironment_GetLightmapCellSize",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingEnvironment, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingEnvironment_GetLightmapCellSize" "', argument " "1"" of type '" "iThingEnvironment const *""'"); 
@@ -28087,7 +28194,7 @@ SWIGINTERN PyObject *_wrap_iThingEnvironment_SetLightmapCellSize(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iThingEnvironment_SetLightmapCellSize",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingEnvironment_SetLightmapCellSize",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingEnvironment, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingEnvironment_SetLightmapCellSize" "', argument " "1"" of type '" "iThingEnvironment *""'"); 
@@ -28114,7 +28221,7 @@ SWIGINTERN PyObject *_wrap_iThingEnvironment_GetDefaultLightmapCellSize(PyObject
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iThingEnvironment_GetDefaultLightmapCellSize",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iThingEnvironment_GetDefaultLightmapCellSize",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingEnvironment, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThingEnvironment_GetDefaultLightmapCellSize" "', argument " "1"" of type '" "iThingEnvironment const *""'"); 
@@ -28135,7 +28242,7 @@ SWIGINTERN PyObject *_wrap_delete_iThingEnvironment(PyObject *SWIGUNUSEDPARM(sel
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iThingEnvironment",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iThingEnvironment",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThingEnvironment, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iThingEnvironment" "', argument " "1"" of type '" "iThingEnvironment *""'"); 
@@ -28152,7 +28259,7 @@ fail:
 
 SWIGINTERN PyObject *iThingEnvironment_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iThingEnvironment, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -28169,7 +28276,7 @@ SWIGINTERN PyObject *_wrap_new_csCharArrayArray__SWIG_0(PyObject *SWIGUNUSEDPARM
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:new_csCharArrayArray",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"new_csCharArrayArray",2,2,&obj0,&obj1)) SWIG_fail;
   ecode1 = SWIG_AsVal_size_t(obj0, &val1);
   if (!SWIG_IsOK(ecode1)) {
     SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_csCharArrayArray" "', argument " "1"" of type '" "size_t""'");
@@ -28199,7 +28306,7 @@ SWIGINTERN PyObject *_wrap_new_csCharArrayArray__SWIG_1(PyObject *SWIGUNUSEDPARM
   int ecode1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:new_csCharArrayArray",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"new_csCharArrayArray",1,1,&obj0)) SWIG_fail;
   ecode1 = SWIG_AsVal_size_t(obj0, &val1);
   if (!SWIG_IsOK(ecode1)) {
     SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_csCharArrayArray" "', argument " "1"" of type '" "size_t""'");
@@ -28217,7 +28324,7 @@ SWIGINTERN PyObject *_wrap_new_csCharArrayArray__SWIG_2(PyObject *SWIGUNUSEDPARM
   PyObject *resultobj = 0;
   csArray<csArray<char > > *result = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)":new_csCharArrayArray")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"new_csCharArrayArray",0,0)) SWIG_fail;
   result = (csArray<csArray<char > > *)new csArray<csArray<char > >();
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, SWIG_POINTER_NEW |  0 );
   return resultobj;
@@ -28242,7 +28349,7 @@ SWIGINTERN PyObject *_wrap_new_csCharArrayArray__SWIG_3(PyObject *SWIGUNUSEDPARM
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:new_csCharArrayArray",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"new_csCharArrayArray",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   ecode1 = SWIG_AsVal_size_t(obj0, &val1);
   if (!SWIG_IsOK(ecode1)) {
     SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_csCharArrayArray" "', argument " "1"" of type '" "size_t""'");
@@ -28279,7 +28386,7 @@ SWIGINTERN PyObject *_wrap_delete_csCharArrayArray(PyObject *SWIGUNUSEDPARM(self
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_csCharArrayArray",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_csCharArrayArray",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_csCharArrayArray" "', argument " "1"" of type '" "csArray<csArray<char > > *""'"); 
@@ -28302,7 +28409,7 @@ SWIGINTERN PyObject *_wrap_new_csCharArrayArray__SWIG_4(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:new_csCharArrayArray",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"new_csCharArrayArray",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t,  0  | 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_csCharArrayArray" "', argument " "1"" of type '" "csArray<csArray<char > > const &""'"); 
@@ -28397,7 +28504,7 @@ SWIGINTERN PyObject *_wrap_csCharArrayArray_GetSize(PyObject *SWIGUNUSEDPARM(sel
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csCharArrayArray_GetSize",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csCharArrayArray_GetSize",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csCharArrayArray_GetSize" "', argument " "1"" of type '" "csArray<csArray<char > > const *""'"); 
@@ -28423,7 +28530,7 @@ SWIGINTERN PyObject *_wrap_csCharArrayArray_Get__SWIG_0(PyObject *SWIGUNUSEDPARM
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csCharArrayArray_Get",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csCharArrayArray_Get",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csCharArrayArray_Get" "', argument " "1"" of type '" "csArray<csArray<char > > *""'"); 
@@ -28457,7 +28564,7 @@ SWIGINTERN PyObject *_wrap_csCharArrayArray_Get__SWIG_1(PyObject *SWIGUNUSEDPARM
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csCharArrayArray_Get",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csCharArrayArray_Get",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csCharArrayArray_Get" "', argument " "1"" of type '" "csArray<csArray<char > > const *""'"); 
@@ -28541,7 +28648,7 @@ SWIGINTERN PyObject *_wrap_csCharArrayArray_Put(PyObject *SWIGUNUSEDPARM(self), 
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:csCharArrayArray_Put",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csCharArrayArray_Put",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csCharArrayArray_Put" "', argument " "1"" of type '" "csArray<csArray<char > > *""'"); 
@@ -28580,7 +28687,7 @@ SWIGINTERN PyObject *_wrap_csCharArrayArray_Push(PyObject *SWIGUNUSEDPARM(self),
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csCharArrayArray_Push",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csCharArrayArray_Push",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csCharArrayArray_Push" "', argument " "1"" of type '" "csArray<csArray<char > > *""'"); 
@@ -28610,7 +28717,7 @@ SWIGINTERN PyObject *_wrap_csCharArrayArray_Pop(PyObject *SWIGUNUSEDPARM(self), 
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csCharArrayArray_Pop",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csCharArrayArray_Pop",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csCharArrayArray_Pop" "', argument " "1"" of type '" "csArray<csArray<char > > *""'"); 
@@ -28632,7 +28739,7 @@ SWIGINTERN PyObject *_wrap_csCharArrayArray_Top__SWIG_0(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csCharArrayArray_Top",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csCharArrayArray_Top",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csCharArrayArray_Top" "', argument " "1"" of type '" "csArray<csArray<char > > const *""'"); 
@@ -28657,7 +28764,7 @@ SWIGINTERN PyObject *_wrap_csCharArrayArray_Top__SWIG_1(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csCharArrayArray_Top",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csCharArrayArray_Top",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csCharArrayArray_Top" "', argument " "1"" of type '" "csArray<csArray<char > > *""'"); 
@@ -28725,7 +28832,7 @@ SWIGINTERN PyObject *_wrap_csCharArrayArray_Insert(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:csCharArrayArray_Insert",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csCharArrayArray_Insert",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csCharArrayArray_Insert" "', argument " "1"" of type '" "csArray<csArray<char > > *""'"); 
@@ -28764,7 +28871,7 @@ SWIGINTERN PyObject *_wrap_csCharArrayArray_Contains(PyObject *SWIGUNUSEDPARM(se
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csCharArrayArray_Contains",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csCharArrayArray_Contains",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csCharArrayArray_Contains" "', argument " "1"" of type '" "csArray<csArray<char > > const *""'"); 
@@ -28797,7 +28904,7 @@ SWIGINTERN PyObject *_wrap_csCharArrayArray_Truncate(PyObject *SWIGUNUSEDPARM(se
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csCharArrayArray_Truncate",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csCharArrayArray_Truncate",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csCharArrayArray_Truncate" "', argument " "1"" of type '" "csArray<csArray<char > > *""'"); 
@@ -28823,7 +28930,7 @@ SWIGINTERN PyObject *_wrap_csCharArrayArray_Empty(PyObject *SWIGUNUSEDPARM(self)
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csCharArrayArray_Empty",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csCharArrayArray_Empty",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csCharArrayArray_Empty" "', argument " "1"" of type '" "csArray<csArray<char > > *""'"); 
@@ -28845,7 +28952,7 @@ SWIGINTERN PyObject *_wrap_csCharArrayArray_IsEmpty(PyObject *SWIGUNUSEDPARM(sel
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csCharArrayArray_IsEmpty",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csCharArrayArray_IsEmpty",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csCharArrayArray_IsEmpty" "', argument " "1"" of type '" "csArray<csArray<char > > const *""'"); 
@@ -28870,7 +28977,7 @@ SWIGINTERN PyObject *_wrap_csCharArrayArray_SetMinimalCapacity(PyObject *SWIGUNU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csCharArrayArray_SetMinimalCapacity",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csCharArrayArray_SetMinimalCapacity",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csCharArrayArray_SetMinimalCapacity" "', argument " "1"" of type '" "csArray<csArray<char > > *""'"); 
@@ -28901,7 +29008,7 @@ SWIGINTERN PyObject *_wrap_csCharArrayArray_DeleteIndex(PyObject *SWIGUNUSEDPARM
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csCharArrayArray_DeleteIndex",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csCharArrayArray_DeleteIndex",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csCharArrayArray_DeleteIndex" "', argument " "1"" of type '" "csArray<csArray<char > > *""'"); 
@@ -28932,7 +29039,7 @@ SWIGINTERN PyObject *_wrap_csCharArrayArray_DeleteIndexFast(PyObject *SWIGUNUSED
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csCharArrayArray_DeleteIndexFast",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csCharArrayArray_DeleteIndexFast",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csCharArrayArray_DeleteIndexFast" "', argument " "1"" of type '" "csArray<csArray<char > > *""'"); 
@@ -28967,7 +29074,7 @@ SWIGINTERN PyObject *_wrap_csCharArrayArray_DeleteRange(PyObject *SWIGUNUSEDPARM
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:csCharArrayArray_DeleteRange",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csCharArrayArray_DeleteRange",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csCharArrayArray_DeleteRange" "', argument " "1"" of type '" "csArray<csArray<char > > *""'"); 
@@ -29003,7 +29110,7 @@ SWIGINTERN PyObject *_wrap_csCharArrayArray___eq__(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csCharArrayArray___eq__",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csCharArrayArray___eq__",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csCharArrayArray___eq__" "', argument " "1"" of type '" "csArray<csArray<char > > const *""'"); 
@@ -29037,7 +29144,7 @@ SWIGINTERN PyObject *_wrap_csCharArrayArray___ne__(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csCharArrayArray___ne__",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csCharArrayArray___ne__",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csCharArrayArray___ne__" "', argument " "1"" of type '" "csArray<csArray<char > > const *""'"); 
@@ -29067,7 +29174,7 @@ SWIGINTERN PyObject *_wrap_csCharArrayArray_GetAllocator(PyObject *SWIGUNUSEDPAR
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csCharArrayArray_GetAllocator",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csCharArrayArray_GetAllocator",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csCharArrayArray_GetAllocator" "', argument " "1"" of type '" "csArray<csArray<char > > const *""'"); 
@@ -29086,7 +29193,7 @@ fail:
 
 SWIGINTERN PyObject *csCharArrayArray_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -29103,7 +29210,7 @@ SWIGINTERN PyObject *_wrap_iTerrainObjectState_SetMaterialPalette(PyObject *SWIG
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainObjectState_SetMaterialPalette",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainObjectState_SetMaterialPalette",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainObjectState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainObjectState_SetMaterialPalette" "', argument " "1"" of type '" "iTerrainObjectState *""'"); 
@@ -29133,7 +29240,7 @@ SWIGINTERN PyObject *_wrap_iTerrainObjectState_GetMaterialPalette(PyObject *SWIG
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainObjectState_GetMaterialPalette",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainObjectState_GetMaterialPalette",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainObjectState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainObjectState_GetMaterialPalette" "', argument " "1"" of type '" "iTerrainObjectState const *""'"); 
@@ -29170,7 +29277,7 @@ SWIGINTERN PyObject *_wrap_iTerrainObjectState_SetMaterialMap__SWIG_0(PyObject *
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iTerrainObjectState_SetMaterialMap",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainObjectState_SetMaterialMap",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainObjectState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainObjectState_SetMaterialMap" "', argument " "1"" of type '" "iTerrainObjectState *""'"); 
@@ -29214,7 +29321,7 @@ SWIGINTERN PyObject *_wrap_iTerrainObjectState_SetMaterialMap__SWIG_1(PyObject *
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainObjectState_SetMaterialMap",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainObjectState_SetMaterialMap",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainObjectState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainObjectState_SetMaterialMap" "', argument " "1"" of type '" "iTerrainObjectState *""'"); 
@@ -29309,7 +29416,7 @@ SWIGINTERN PyObject *_wrap_iTerrainObjectState_SetMaterialAlphaMaps__SWIG_0(PyOb
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iTerrainObjectState_SetMaterialAlphaMaps",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainObjectState_SetMaterialAlphaMaps",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainObjectState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainObjectState_SetMaterialAlphaMaps" "', argument " "1"" of type '" "iTerrainObjectState *""'"); 
@@ -29353,7 +29460,7 @@ SWIGINTERN PyObject *_wrap_iTerrainObjectState_SetMaterialAlphaMaps__SWIG_1(PyOb
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainObjectState_SetMaterialAlphaMaps",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainObjectState_SetMaterialAlphaMaps",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainObjectState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainObjectState_SetMaterialAlphaMaps" "', argument " "1"" of type '" "iTerrainObjectState *""'"); 
@@ -29447,7 +29554,7 @@ SWIGINTERN PyObject *_wrap_iTerrainObjectState_SetLODValue(PyObject *SWIGUNUSEDP
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iTerrainObjectState_SetLODValue",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainObjectState_SetLODValue",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainObjectState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainObjectState_SetLODValue" "', argument " "1"" of type '" "iTerrainObjectState *""'"); 
@@ -29486,7 +29593,7 @@ SWIGINTERN PyObject *_wrap_iTerrainObjectState_GetLODValue(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainObjectState_GetLODValue",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainObjectState_GetLODValue",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainObjectState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainObjectState_GetLODValue" "', argument " "1"" of type '" "iTerrainObjectState const *""'"); 
@@ -29520,7 +29627,7 @@ SWIGINTERN PyObject *_wrap_iTerrainObjectState_SaveState(PyObject *SWIGUNUSEDPAR
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainObjectState_SaveState",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainObjectState_SaveState",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainObjectState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainObjectState_SaveState" "', argument " "1"" of type '" "iTerrainObjectState *""'"); 
@@ -29554,7 +29661,7 @@ SWIGINTERN PyObject *_wrap_iTerrainObjectState_RestoreState(PyObject *SWIGUNUSED
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainObjectState_RestoreState",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainObjectState_RestoreState",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainObjectState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainObjectState_RestoreState" "', argument " "1"" of type '" "iTerrainObjectState *""'"); 
@@ -29591,7 +29698,7 @@ SWIGINTERN PyObject *_wrap_iTerrainObjectState_CollisionDetect(PyObject *SWIGUNU
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iTerrainObjectState_CollisionDetect",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainObjectState_CollisionDetect",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainObjectState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainObjectState_CollisionDetect" "', argument " "1"" of type '" "iTerrainObjectState *""'"); 
@@ -29626,7 +29733,7 @@ SWIGINTERN PyObject *_wrap_iTerrainObjectState_SetStaticLighting(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainObjectState_SetStaticLighting",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainObjectState_SetStaticLighting",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainObjectState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainObjectState_SetStaticLighting" "', argument " "1"" of type '" "iTerrainObjectState *""'"); 
@@ -29653,7 +29760,7 @@ SWIGINTERN PyObject *_wrap_iTerrainObjectState_GetStaticLighting(PyObject *SWIGU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainObjectState_GetStaticLighting",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainObjectState_GetStaticLighting",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainObjectState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainObjectState_GetStaticLighting" "', argument " "1"" of type '" "iTerrainObjectState *""'"); 
@@ -29678,7 +29785,7 @@ SWIGINTERN PyObject *_wrap_iTerrainObjectState_SetCastShadows(PyObject *SWIGUNUS
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainObjectState_SetCastShadows",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainObjectState_SetCastShadows",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainObjectState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainObjectState_SetCastShadows" "', argument " "1"" of type '" "iTerrainObjectState *""'"); 
@@ -29705,7 +29812,7 @@ SWIGINTERN PyObject *_wrap_iTerrainObjectState_GetCastShadows(PyObject *SWIGUNUS
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainObjectState_GetCastShadows",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainObjectState_GetCastShadows",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainObjectState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainObjectState_GetCastShadows" "', argument " "1"" of type '" "iTerrainObjectState *""'"); 
@@ -29743,7 +29850,7 @@ SWIGINTERN PyObject *_wrap_iTerrainObjectState_SetMaterialMapFile__SWIG_0(PyObje
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iTerrainObjectState_SetMaterialMapFile",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainObjectState_SetMaterialMapFile",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainObjectState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainObjectState_SetMaterialMapFile" "', argument " "1"" of type '" "iTerrainObjectState *""'"); 
@@ -29799,7 +29906,7 @@ SWIGINTERN PyObject *_wrap_iTerrainObjectState_SetMaterialMapFile__SWIG_1(PyObje
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iTerrainObjectState_SetMaterialMapFile",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainObjectState_SetMaterialMapFile",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainObjectState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainObjectState_SetMaterialMapFile" "', argument " "1"" of type '" "iTerrainObjectState *""'"); 
@@ -29923,7 +30030,7 @@ SWIGINTERN PyObject *_wrap_iTerrainObjectState_GetMaterialMapFile(PyObject *SWIG
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iTerrainObjectState_GetMaterialMapFile",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainObjectState_GetMaterialMapFile",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainObjectState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainObjectState_GetMaterialMapFile" "', argument " "1"" of type '" "iTerrainObjectState *""'"); 
@@ -29972,7 +30079,7 @@ SWIGINTERN PyObject *_wrap_iTerrainObjectState_SetTopNeighbor(PyObject *SWIGUNUS
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainObjectState_SetTopNeighbor",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainObjectState_SetTopNeighbor",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainObjectState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainObjectState_SetTopNeighbor" "', argument " "1"" of type '" "iTerrainObjectState *""'"); 
@@ -30002,7 +30109,7 @@ SWIGINTERN PyObject *_wrap_iTerrainObjectState_SetRightNeighbor(PyObject *SWIGUN
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainObjectState_SetRightNeighbor",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainObjectState_SetRightNeighbor",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainObjectState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainObjectState_SetRightNeighbor" "', argument " "1"" of type '" "iTerrainObjectState *""'"); 
@@ -30032,7 +30139,7 @@ SWIGINTERN PyObject *_wrap_iTerrainObjectState_SetLeftNeighbor(PyObject *SWIGUNU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainObjectState_SetLeftNeighbor",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainObjectState_SetLeftNeighbor",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainObjectState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainObjectState_SetLeftNeighbor" "', argument " "1"" of type '" "iTerrainObjectState *""'"); 
@@ -30062,7 +30169,7 @@ SWIGINTERN PyObject *_wrap_iTerrainObjectState_SetBottomNeighbor(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainObjectState_SetBottomNeighbor",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainObjectState_SetBottomNeighbor",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainObjectState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainObjectState_SetBottomNeighbor" "', argument " "1"" of type '" "iTerrainObjectState *""'"); 
@@ -30085,7 +30192,7 @@ SWIGINTERN PyObject *_wrap_iTerrainObjectState_scfGetVersion(PyObject *SWIGUNUSE
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iTerrainObjectState_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainObjectState_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iTerrainObjectState_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -30101,7 +30208,7 @@ SWIGINTERN PyObject *_wrap_delete_iTerrainObjectState(PyObject *SWIGUNUSEDPARM(s
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iTerrainObjectState",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iTerrainObjectState",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainObjectState, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iTerrainObjectState" "', argument " "1"" of type '" "iTerrainObjectState *""'"); 
@@ -30118,7 +30225,7 @@ fail:
 
 SWIGINTERN PyObject *iTerrainObjectState_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iTerrainObjectState, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -30134,7 +30241,7 @@ SWIGINTERN PyObject *_wrap_iTerrainFactoryState_SetTerraFormer(PyObject *SWIGUNU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainFactoryState_SetTerraFormer",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainFactoryState_SetTerraFormer",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainFactoryState_SetTerraFormer" "', argument " "1"" of type '" "iTerrainFactoryState *""'"); 
@@ -30161,7 +30268,7 @@ SWIGINTERN PyObject *_wrap_iTerrainFactoryState_GetTerraFormer(PyObject *SWIGUNU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainFactoryState_GetTerraFormer",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainFactoryState_GetTerraFormer",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainFactoryState_GetTerraFormer" "', argument " "1"" of type '" "iTerrainFactoryState *""'"); 
@@ -30186,7 +30293,7 @@ SWIGINTERN PyObject *_wrap_iTerrainFactoryState_SetSamplerRegion(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainFactoryState_SetSamplerRegion",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainFactoryState_SetSamplerRegion",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainFactoryState_SetSamplerRegion" "', argument " "1"" of type '" "iTerrainFactoryState *""'"); 
@@ -30216,7 +30323,7 @@ SWIGINTERN PyObject *_wrap_iTerrainFactoryState_GetSamplerRegion(PyObject *SWIGU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainFactoryState_GetSamplerRegion",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainFactoryState_GetSamplerRegion",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainFactoryState_GetSamplerRegion" "', argument " "1"" of type '" "iTerrainFactoryState *""'"); 
@@ -30246,7 +30353,7 @@ SWIGINTERN PyObject *_wrap_iTerrainFactoryState_SaveState(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainFactoryState_SaveState",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainFactoryState_SaveState",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainFactoryState_SaveState" "', argument " "1"" of type '" "iTerrainFactoryState *""'"); 
@@ -30280,7 +30387,7 @@ SWIGINTERN PyObject *_wrap_iTerrainFactoryState_RestoreState(PyObject *SWIGUNUSE
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainFactoryState_RestoreState",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainFactoryState_RestoreState",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainFactoryState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainFactoryState_RestoreState" "', argument " "1"" of type '" "iTerrainFactoryState *""'"); 
@@ -30305,7 +30412,7 @@ SWIGINTERN PyObject *_wrap_iTerrainFactoryState_scfGetVersion(PyObject *SWIGUNUS
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iTerrainFactoryState_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainFactoryState_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iTerrainFactoryState_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -30321,7 +30428,7 @@ SWIGINTERN PyObject *_wrap_delete_iTerrainFactoryState(PyObject *SWIGUNUSEDPARM(
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iTerrainFactoryState",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iTerrainFactoryState",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainFactoryState, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iTerrainFactoryState" "', argument " "1"" of type '" "iTerrainFactoryState *""'"); 
@@ -30338,7 +30445,7 @@ fail:
 
 SWIGINTERN PyObject *iTerrainFactoryState_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iTerrainFactoryState, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -30354,7 +30461,7 @@ SWIGINTERN PyObject *_wrap_csLockedHeightData_data_set(PyObject *SWIGUNUSEDPARM(
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csLockedHeightData_data_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csLockedHeightData_data_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csLockedHeightData, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csLockedHeightData_data_set" "', argument " "1"" of type '" "csLockedHeightData *""'"); 
@@ -30382,7 +30489,7 @@ SWIGINTERN PyObject *_wrap_csLockedHeightData_data_get(PyObject *SWIGUNUSEDPARM(
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csLockedHeightData_data_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csLockedHeightData_data_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csLockedHeightData, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csLockedHeightData_data_get" "', argument " "1"" of type '" "csLockedHeightData *""'"); 
@@ -30407,7 +30514,7 @@ SWIGINTERN PyObject *_wrap_csLockedHeightData_pitch_set(PyObject *SWIGUNUSEDPARM
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csLockedHeightData_pitch_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csLockedHeightData_pitch_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csLockedHeightData, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csLockedHeightData_pitch_set" "', argument " "1"" of type '" "csLockedHeightData *""'"); 
@@ -30435,7 +30542,7 @@ SWIGINTERN PyObject *_wrap_csLockedHeightData_pitch_get(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csLockedHeightData_pitch_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csLockedHeightData_pitch_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csLockedHeightData, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csLockedHeightData_pitch_get" "', argument " "1"" of type '" "csLockedHeightData *""'"); 
@@ -30465,7 +30572,7 @@ SWIGINTERN PyObject *_wrap_csLockedHeightData_Get(PyObject *SWIGUNUSEDPARM(self)
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:csLockedHeightData_Get",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csLockedHeightData_Get",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csLockedHeightData, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csLockedHeightData_Get" "', argument " "1"" of type '" "csLockedHeightData *""'"); 
@@ -30508,7 +30615,7 @@ SWIGINTERN PyObject *_wrap_csLockedHeightData_Set(PyObject *SWIGUNUSEDPARM(self)
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:csLockedHeightData_Set",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csLockedHeightData_Set",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csLockedHeightData, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csLockedHeightData_Set" "', argument " "1"" of type '" "csLockedHeightData *""'"); 
@@ -30541,7 +30648,7 @@ SWIGINTERN PyObject *_wrap_new_csLockedHeightData(PyObject *SWIGUNUSEDPARM(self)
   PyObject *resultobj = 0;
   csLockedHeightData *result = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)":new_csLockedHeightData")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"new_csLockedHeightData",0,0)) SWIG_fail;
   result = (csLockedHeightData *)new csLockedHeightData();
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csLockedHeightData, SWIG_POINTER_NEW |  0 );
   return resultobj;
@@ -30557,7 +30664,7 @@ SWIGINTERN PyObject *_wrap_delete_csLockedHeightData(PyObject *SWIGUNUSEDPARM(se
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_csLockedHeightData",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_csLockedHeightData",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csLockedHeightData, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_csLockedHeightData" "', argument " "1"" of type '" "csLockedHeightData *""'"); 
@@ -30574,7 +30681,7 @@ fail:
 
 SWIGINTERN PyObject *csLockedHeightData_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_csLockedHeightData, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -30590,7 +30697,7 @@ SWIGINTERN PyObject *_wrap_csLockedMaterialMap_data_set(PyObject *SWIGUNUSEDPARM
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csLockedMaterialMap_data_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csLockedMaterialMap_data_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csLockedMaterialMap, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csLockedMaterialMap_data_set" "', argument " "1"" of type '" "csLockedMaterialMap *""'"); 
@@ -30618,7 +30725,7 @@ SWIGINTERN PyObject *_wrap_csLockedMaterialMap_data_get(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csLockedMaterialMap_data_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csLockedMaterialMap_data_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csLockedMaterialMap, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csLockedMaterialMap_data_get" "', argument " "1"" of type '" "csLockedMaterialMap *""'"); 
@@ -30643,7 +30750,7 @@ SWIGINTERN PyObject *_wrap_csLockedMaterialMap_pitch_set(PyObject *SWIGUNUSEDPAR
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csLockedMaterialMap_pitch_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csLockedMaterialMap_pitch_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csLockedMaterialMap, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csLockedMaterialMap_pitch_set" "', argument " "1"" of type '" "csLockedMaterialMap *""'"); 
@@ -30671,7 +30778,7 @@ SWIGINTERN PyObject *_wrap_csLockedMaterialMap_pitch_get(PyObject *SWIGUNUSEDPAR
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csLockedMaterialMap_pitch_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csLockedMaterialMap_pitch_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csLockedMaterialMap, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csLockedMaterialMap_pitch_get" "', argument " "1"" of type '" "csLockedMaterialMap *""'"); 
@@ -30701,7 +30808,7 @@ SWIGINTERN PyObject *_wrap_csLockedMaterialMap_Get(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:csLockedMaterialMap_Get",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csLockedMaterialMap_Get",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csLockedMaterialMap, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csLockedMaterialMap_Get" "', argument " "1"" of type '" "csLockedMaterialMap *""'"); 
@@ -30744,7 +30851,7 @@ SWIGINTERN PyObject *_wrap_csLockedMaterialMap_Set(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:csLockedMaterialMap_Set",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csLockedMaterialMap_Set",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csLockedMaterialMap, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csLockedMaterialMap_Set" "', argument " "1"" of type '" "csLockedMaterialMap *""'"); 
@@ -30777,7 +30884,7 @@ SWIGINTERN PyObject *_wrap_new_csLockedMaterialMap(PyObject *SWIGUNUSEDPARM(self
   PyObject *resultobj = 0;
   csLockedMaterialMap *result = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)":new_csLockedMaterialMap")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"new_csLockedMaterialMap",0,0)) SWIG_fail;
   result = (csLockedMaterialMap *)new csLockedMaterialMap();
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csLockedMaterialMap, SWIG_POINTER_NEW |  0 );
   return resultobj;
@@ -30793,7 +30900,7 @@ SWIGINTERN PyObject *_wrap_delete_csLockedMaterialMap(PyObject *SWIGUNUSEDPARM(s
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_csLockedMaterialMap",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_csLockedMaterialMap",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csLockedMaterialMap, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_csLockedMaterialMap" "', argument " "1"" of type '" "csLockedMaterialMap *""'"); 
@@ -30810,7 +30917,7 @@ fail:
 
 SWIGINTERN PyObject *csLockedMaterialMap_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_csLockedMaterialMap, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -30822,7 +30929,7 @@ SWIGINTERN PyObject *_wrap_delete_iTerrainVector3Array(PyObject *SWIGUNUSEDPARM(
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iTerrainVector3Array",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iTerrainVector3Array",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainVector3Array, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iTerrainVector3Array" "', argument " "1"" of type '" "iTerrainVector3Array *""'"); 
@@ -30839,7 +30946,7 @@ fail:
 
 SWIGINTERN PyObject *iTerrainVector3Array_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iTerrainVector3Array, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -30851,7 +30958,7 @@ SWIGINTERN PyObject *_wrap_delete_iTerrainCollisionPairArray(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iTerrainCollisionPairArray",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iTerrainCollisionPairArray",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCollisionPairArray, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iTerrainCollisionPairArray" "', argument " "1"" of type '" "iTerrainCollisionPairArray *""'"); 
@@ -30868,7 +30975,7 @@ fail:
 
 SWIGINTERN PyObject *iTerrainCollisionPairArray_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iTerrainCollisionPairArray, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -30881,7 +30988,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCellCollisionProperties_GetCollidable(PyObjec
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainCellCollisionProperties_GetCollidable",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellCollisionProperties_GetCollidable",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellCollisionProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCellCollisionProperties_GetCollidable" "', argument " "1"" of type '" "iTerrainCellCollisionProperties const *""'"); 
@@ -30906,7 +31013,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCellCollisionProperties_SetCollidable(PyObjec
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainCellCollisionProperties_SetCollidable",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellCollisionProperties_SetCollidable",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellCollisionProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCellCollisionProperties_SetCollidable" "', argument " "1"" of type '" "iTerrainCellCollisionProperties *""'"); 
@@ -30942,7 +31049,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCellCollisionProperties_SetParameter(PyObject
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iTerrainCellCollisionProperties_SetParameter",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellCollisionProperties_SetParameter",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellCollisionProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCellCollisionProperties_SetParameter" "', argument " "1"" of type '" "iTerrainCellCollisionProperties *""'"); 
@@ -30978,7 +31085,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCellCollisionProperties_Clone(PyObject *SWIGU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainCellCollisionProperties_Clone",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellCollisionProperties_Clone",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellCollisionProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCellCollisionProperties_Clone" "', argument " "1"" of type '" "iTerrainCellCollisionProperties *""'"); 
@@ -31013,7 +31120,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCellCollisionProperties_scfGetVersion(PyObjec
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iTerrainCellCollisionProperties_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellCollisionProperties_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iTerrainCellCollisionProperties_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -31029,7 +31136,7 @@ SWIGINTERN PyObject *_wrap_delete_iTerrainCellCollisionProperties(PyObject *SWIG
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iTerrainCellCollisionProperties",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iTerrainCellCollisionProperties",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellCollisionProperties, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iTerrainCellCollisionProperties" "', argument " "1"" of type '" "iTerrainCellCollisionProperties *""'"); 
@@ -31046,7 +31153,7 @@ fail:
 
 SWIGINTERN PyObject *iTerrainCellCollisionProperties_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iTerrainCellCollisionProperties, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -31059,7 +31166,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCellRenderProperties_GetVisible(PyObject *SWI
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainCellRenderProperties_GetVisible",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellRenderProperties_GetVisible",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellRenderProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCellRenderProperties_GetVisible" "', argument " "1"" of type '" "iTerrainCellRenderProperties const *""'"); 
@@ -31084,7 +31191,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCellRenderProperties_SetVisible(PyObject *SWI
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainCellRenderProperties_SetVisible",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellRenderProperties_SetVisible",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellRenderProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCellRenderProperties_SetVisible" "', argument " "1"" of type '" "iTerrainCellRenderProperties *""'"); 
@@ -31120,7 +31227,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCellRenderProperties_SetParameter(PyObject *S
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iTerrainCellRenderProperties_SetParameter",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellRenderProperties_SetParameter",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellRenderProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCellRenderProperties_SetParameter" "', argument " "1"" of type '" "iTerrainCellRenderProperties *""'"); 
@@ -31156,7 +31263,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCellRenderProperties_Clone(PyObject *SWIGUNUS
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainCellRenderProperties_Clone",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellRenderProperties_Clone",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellRenderProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCellRenderProperties_Clone" "', argument " "1"" of type '" "iTerrainCellRenderProperties *""'"); 
@@ -31191,7 +31298,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCellRenderProperties_scfGetVersion(PyObject *
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iTerrainCellRenderProperties_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellRenderProperties_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iTerrainCellRenderProperties_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -31207,7 +31314,7 @@ SWIGINTERN PyObject *_wrap_delete_iTerrainCellRenderProperties(PyObject *SWIGUNU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iTerrainCellRenderProperties",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iTerrainCellRenderProperties",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellRenderProperties, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iTerrainCellRenderProperties" "', argument " "1"" of type '" "iTerrainCellRenderProperties *""'"); 
@@ -31224,7 +31331,7 @@ fail:
 
 SWIGINTERN PyObject *iTerrainCellRenderProperties_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iTerrainCellRenderProperties, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -31241,7 +31348,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCellFeederProperties_SetHeightmapSource(PyObj
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainCellFeederProperties_SetHeightmapSource",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellFeederProperties_SetHeightmapSource",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellFeederProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCellFeederProperties_SetHeightmapSource" "', argument " "1"" of type '" "iTerrainCellFeederProperties *""'"); 
@@ -31279,7 +31386,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCellFeederProperties_SetParameter(PyObject *S
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iTerrainCellFeederProperties_SetParameter",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellFeederProperties_SetParameter",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellFeederProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCellFeederProperties_SetParameter" "', argument " "1"" of type '" "iTerrainCellFeederProperties *""'"); 
@@ -31315,7 +31422,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCellFeederProperties_Clone(PyObject *SWIGUNUS
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainCellFeederProperties_Clone",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellFeederProperties_Clone",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellFeederProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCellFeederProperties_Clone" "', argument " "1"" of type '" "iTerrainCellFeederProperties *""'"); 
@@ -31350,7 +31457,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCellFeederProperties_scfGetVersion(PyObject *
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iTerrainCellFeederProperties_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellFeederProperties_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iTerrainCellFeederProperties_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -31366,7 +31473,7 @@ SWIGINTERN PyObject *_wrap_delete_iTerrainCellFeederProperties(PyObject *SWIGUNU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iTerrainCellFeederProperties",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iTerrainCellFeederProperties",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellFeederProperties, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iTerrainCellFeederProperties" "', argument " "1"" of type '" "iTerrainCellFeederProperties *""'"); 
@@ -31383,7 +31490,7 @@ fail:
 
 SWIGINTERN PyObject *iTerrainCellFeederProperties_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iTerrainCellFeederProperties, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -31396,7 +31503,7 @@ SWIGINTERN PyObject *_wrap_iTerrainDataFeeder_CreateProperties(PyObject *SWIGUNU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainDataFeeder_CreateProperties",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainDataFeeder_CreateProperties",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainDataFeeder, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainDataFeeder_CreateProperties" "', argument " "1"" of type '" "iTerrainDataFeeder *""'"); 
@@ -31439,7 +31546,7 @@ SWIGINTERN PyObject *_wrap_iTerrainDataFeeder_PreLoad(PyObject *SWIGUNUSEDPARM(s
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainDataFeeder_PreLoad",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainDataFeeder_PreLoad",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainDataFeeder, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainDataFeeder_PreLoad" "', argument " "1"" of type '" "iTerrainDataFeeder *""'"); 
@@ -31470,7 +31577,7 @@ SWIGINTERN PyObject *_wrap_iTerrainDataFeeder_Load(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainDataFeeder_Load",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainDataFeeder_Load",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainDataFeeder, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainDataFeeder_Load" "', argument " "1"" of type '" "iTerrainDataFeeder *""'"); 
@@ -31506,7 +31613,7 @@ SWIGINTERN PyObject *_wrap_iTerrainDataFeeder_SetParameter(PyObject *SWIGUNUSEDP
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iTerrainDataFeeder_SetParameter",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainDataFeeder_SetParameter",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainDataFeeder, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainDataFeeder_SetParameter" "', argument " "1"" of type '" "iTerrainDataFeeder *""'"); 
@@ -31538,7 +31645,7 @@ SWIGINTERN PyObject *_wrap_iTerrainDataFeeder_scfGetVersion(PyObject *SWIGUNUSED
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iTerrainDataFeeder_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainDataFeeder_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iTerrainDataFeeder_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -31554,7 +31661,7 @@ SWIGINTERN PyObject *_wrap_delete_iTerrainDataFeeder(PyObject *SWIGUNUSEDPARM(se
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iTerrainDataFeeder",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iTerrainDataFeeder",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainDataFeeder, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iTerrainDataFeeder" "', argument " "1"" of type '" "iTerrainDataFeeder *""'"); 
@@ -31571,7 +31678,7 @@ fail:
 
 SWIGINTERN PyObject *iTerrainDataFeeder_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iTerrainDataFeeder, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -31587,7 +31694,7 @@ SWIGINTERN PyObject *_wrap_csTerrainColliderCollideSegmentResult_hit_set(PyObjec
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csTerrainColliderCollideSegmentResult_hit_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csTerrainColliderCollideSegmentResult_hit_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csTerrainColliderCollideSegmentResult, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csTerrainColliderCollideSegmentResult_hit_set" "', argument " "1"" of type '" "csTerrainColliderCollideSegmentResult *""'"); 
@@ -31615,7 +31722,7 @@ SWIGINTERN PyObject *_wrap_csTerrainColliderCollideSegmentResult_hit_get(PyObjec
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csTerrainColliderCollideSegmentResult_hit_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csTerrainColliderCollideSegmentResult_hit_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csTerrainColliderCollideSegmentResult, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csTerrainColliderCollideSegmentResult_hit_get" "', argument " "1"" of type '" "csTerrainColliderCollideSegmentResult *""'"); 
@@ -31640,7 +31747,7 @@ SWIGINTERN PyObject *_wrap_csTerrainColliderCollideSegmentResult_isect_set(PyObj
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csTerrainColliderCollideSegmentResult_isect_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csTerrainColliderCollideSegmentResult_isect_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csTerrainColliderCollideSegmentResult, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csTerrainColliderCollideSegmentResult_isect_set" "', argument " "1"" of type '" "csTerrainColliderCollideSegmentResult *""'"); 
@@ -31668,7 +31775,7 @@ SWIGINTERN PyObject *_wrap_csTerrainColliderCollideSegmentResult_isect_get(PyObj
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csTerrainColliderCollideSegmentResult_isect_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csTerrainColliderCollideSegmentResult_isect_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csTerrainColliderCollideSegmentResult, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csTerrainColliderCollideSegmentResult_isect_get" "', argument " "1"" of type '" "csTerrainColliderCollideSegmentResult *""'"); 
@@ -31693,7 +31800,7 @@ SWIGINTERN PyObject *_wrap_csTerrainColliderCollideSegmentResult_a_set(PyObject 
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csTerrainColliderCollideSegmentResult_a_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csTerrainColliderCollideSegmentResult_a_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csTerrainColliderCollideSegmentResult, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csTerrainColliderCollideSegmentResult_a_set" "', argument " "1"" of type '" "csTerrainColliderCollideSegmentResult *""'"); 
@@ -31721,7 +31828,7 @@ SWIGINTERN PyObject *_wrap_csTerrainColliderCollideSegmentResult_a_get(PyObject 
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csTerrainColliderCollideSegmentResult_a_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csTerrainColliderCollideSegmentResult_a_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csTerrainColliderCollideSegmentResult, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csTerrainColliderCollideSegmentResult_a_get" "', argument " "1"" of type '" "csTerrainColliderCollideSegmentResult *""'"); 
@@ -31746,7 +31853,7 @@ SWIGINTERN PyObject *_wrap_csTerrainColliderCollideSegmentResult_b_set(PyObject 
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csTerrainColliderCollideSegmentResult_b_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csTerrainColliderCollideSegmentResult_b_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csTerrainColliderCollideSegmentResult, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csTerrainColliderCollideSegmentResult_b_set" "', argument " "1"" of type '" "csTerrainColliderCollideSegmentResult *""'"); 
@@ -31774,7 +31881,7 @@ SWIGINTERN PyObject *_wrap_csTerrainColliderCollideSegmentResult_b_get(PyObject 
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csTerrainColliderCollideSegmentResult_b_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csTerrainColliderCollideSegmentResult_b_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csTerrainColliderCollideSegmentResult, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csTerrainColliderCollideSegmentResult_b_get" "', argument " "1"" of type '" "csTerrainColliderCollideSegmentResult *""'"); 
@@ -31799,7 +31906,7 @@ SWIGINTERN PyObject *_wrap_csTerrainColliderCollideSegmentResult_c_set(PyObject 
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csTerrainColliderCollideSegmentResult_c_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csTerrainColliderCollideSegmentResult_c_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csTerrainColliderCollideSegmentResult, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csTerrainColliderCollideSegmentResult_c_set" "', argument " "1"" of type '" "csTerrainColliderCollideSegmentResult *""'"); 
@@ -31827,7 +31934,7 @@ SWIGINTERN PyObject *_wrap_csTerrainColliderCollideSegmentResult_c_get(PyObject 
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csTerrainColliderCollideSegmentResult_c_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csTerrainColliderCollideSegmentResult_c_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csTerrainColliderCollideSegmentResult, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csTerrainColliderCollideSegmentResult_c_get" "', argument " "1"" of type '" "csTerrainColliderCollideSegmentResult *""'"); 
@@ -31845,7 +31952,7 @@ SWIGINTERN PyObject *_wrap_new_csTerrainColliderCollideSegmentResult(PyObject *S
   PyObject *resultobj = 0;
   csTerrainColliderCollideSegmentResult *result = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)":new_csTerrainColliderCollideSegmentResult")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"new_csTerrainColliderCollideSegmentResult",0,0)) SWIG_fail;
   result = (csTerrainColliderCollideSegmentResult *)new csTerrainColliderCollideSegmentResult();
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csTerrainColliderCollideSegmentResult, SWIG_POINTER_NEW |  0 );
   return resultobj;
@@ -31861,7 +31968,7 @@ SWIGINTERN PyObject *_wrap_delete_csTerrainColliderCollideSegmentResult(PyObject
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_csTerrainColliderCollideSegmentResult",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_csTerrainColliderCollideSegmentResult",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csTerrainColliderCollideSegmentResult, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_csTerrainColliderCollideSegmentResult" "', argument " "1"" of type '" "csTerrainColliderCollideSegmentResult *""'"); 
@@ -31878,7 +31985,7 @@ fail:
 
 SWIGINTERN PyObject *csTerrainColliderCollideSegmentResult_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_csTerrainColliderCollideSegmentResult, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -31891,7 +31998,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCollider_CreateProperties(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainCollider_CreateProperties",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCollider_CreateProperties",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCollider, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCollider_CreateProperties" "', argument " "1"" of type '" "iTerrainCollider *""'"); 
@@ -31950,7 +32057,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCollider_CollideSegment__SWIG_0(PyObject *SWI
   PyObject * obj4 = 0 ;
   PyObject * obj5 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOO:iTerrainCollider_CollideSegment",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCollider_CollideSegment",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCollider, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCollider_CollideSegment" "', argument " "1"" of type '" "iTerrainCollider *""'"); 
@@ -32015,7 +32122,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCollider_CollideSegment__SWIG_1(PyObject *SWI
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iTerrainCollider_CollideSegment",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCollider_CollideSegment",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCollider, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCollider_CollideSegment" "', argument " "1"" of type '" "iTerrainCollider *""'"); 
@@ -32162,7 +32269,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCollider_CollideTriangles(PyObject *SWIGUNUSE
   PyObject * obj7 = 0 ;
   PyObject * obj8 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOOOO:iTerrainCollider_CollideTriangles",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCollider_CollideTriangles",9,9,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCollider, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCollider_CollideTriangles" "', argument " "1"" of type '" "iTerrainCollider *""'"); 
@@ -32251,7 +32358,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCollider_Collide(PyObject *SWIGUNUSEDPARM(sel
   PyObject * obj5 = 0 ;
   PyObject * obj6 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOO:iTerrainCollider_Collide",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCollider_Collide",7,7,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCollider, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCollider_Collide" "', argument " "1"" of type '" "iTerrainCollider *""'"); 
@@ -32302,7 +32409,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCollider_scfGetVersion(PyObject *SWIGUNUSEDPA
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iTerrainCollider_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCollider_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iTerrainCollider_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -32318,7 +32425,7 @@ SWIGINTERN PyObject *_wrap_delete_iTerrainCollider(PyObject *SWIGUNUSEDPARM(self
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iTerrainCollider",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iTerrainCollider",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCollider, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iTerrainCollider" "', argument " "1"" of type '" "iTerrainCollider *""'"); 
@@ -32335,7 +32442,7 @@ fail:
 
 SWIGINTERN PyObject *iTerrainCollider_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iTerrainCollider, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -32348,7 +32455,7 @@ SWIGINTERN PyObject *_wrap_iTerrainRenderer_CreateProperties(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainRenderer_CreateProperties",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainRenderer_CreateProperties",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainRenderer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainRenderer_CreateProperties" "', argument " "1"" of type '" "iTerrainRenderer *""'"); 
@@ -32390,7 +32497,7 @@ SWIGINTERN PyObject *_wrap_iTerrainRenderer_ConnectTerrain(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainRenderer_ConnectTerrain",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainRenderer_ConnectTerrain",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainRenderer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainRenderer_ConnectTerrain" "', argument " "1"" of type '" "iTerrainRenderer *""'"); 
@@ -32420,7 +32527,7 @@ SWIGINTERN PyObject *_wrap_iTerrainRenderer_DisconnectTerrain(PyObject *SWIGUNUS
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainRenderer_DisconnectTerrain",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainRenderer_DisconnectTerrain",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainRenderer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainRenderer_DisconnectTerrain" "', argument " "1"" of type '" "iTerrainRenderer *""'"); 
@@ -32467,7 +32574,7 @@ SWIGINTERN PyObject *_wrap_iTerrainRenderer_GetRenderMeshes(PyObject *SWIGUNUSED
   PyObject * obj4 = 0 ;
   PyObject * obj5 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOO:iTerrainRenderer_GetRenderMeshes",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainRenderer_GetRenderMeshes",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainRenderer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainRenderer_GetRenderMeshes" "', argument " "1"" of type '" "iTerrainRenderer *""'"); 
@@ -32528,7 +32635,7 @@ SWIGINTERN PyObject *_wrap_iTerrainRenderer_OnMaterialPaletteUpdate(PyObject *SW
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainRenderer_OnMaterialPaletteUpdate",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainRenderer_OnMaterialPaletteUpdate",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainRenderer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainRenderer_OnMaterialPaletteUpdate" "', argument " "1"" of type '" "iTerrainRenderer *""'"); 
@@ -32577,7 +32684,7 @@ SWIGINTERN PyObject *_wrap_iTerrainRenderer_OnMaterialMaskUpdate(PyObject *SWIGU
   PyObject * obj4 = 0 ;
   PyObject * obj5 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOO:iTerrainRenderer_OnMaterialMaskUpdate",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainRenderer_OnMaterialMaskUpdate",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainRenderer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainRenderer_OnMaterialMaskUpdate" "', argument " "1"" of type '" "iTerrainRenderer *""'"); 
@@ -32623,7 +32730,7 @@ SWIGINTERN PyObject *_wrap_iTerrainRenderer_scfGetVersion(PyObject *SWIGUNUSEDPA
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iTerrainRenderer_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainRenderer_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iTerrainRenderer_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -32639,7 +32746,7 @@ SWIGINTERN PyObject *_wrap_delete_iTerrainRenderer(PyObject *SWIGUNUSEDPARM(self
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iTerrainRenderer",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iTerrainRenderer",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainRenderer, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iTerrainRenderer" "', argument " "1"" of type '" "iTerrainRenderer *""'"); 
@@ -32656,7 +32763,7 @@ fail:
 
 SWIGINTERN PyObject *iTerrainRenderer_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iTerrainRenderer, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -32676,7 +32783,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCellHeightDataCallback_OnHeightUpdate(PyObjec
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iTerrainCellHeightDataCallback_OnHeightUpdate",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellHeightDataCallback_OnHeightUpdate",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellHeightDataCallback, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCellHeightDataCallback_OnHeightUpdate" "', argument " "1"" of type '" "iTerrainCellHeightDataCallback *""'"); 
@@ -32707,7 +32814,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCellHeightDataCallback_scfGetVersion(PyObject
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iTerrainCellHeightDataCallback_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellHeightDataCallback_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iTerrainCellHeightDataCallback_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -32723,7 +32830,7 @@ SWIGINTERN PyObject *_wrap_delete_iTerrainCellHeightDataCallback(PyObject *SWIGU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iTerrainCellHeightDataCallback",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iTerrainCellHeightDataCallback",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellHeightDataCallback, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iTerrainCellHeightDataCallback" "', argument " "1"" of type '" "iTerrainCellHeightDataCallback *""'"); 
@@ -32740,7 +32847,7 @@ fail:
 
 SWIGINTERN PyObject *iTerrainCellHeightDataCallback_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iTerrainCellHeightDataCallback, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -32756,7 +32863,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCellLoadCallback_OnCellLoad(PyObject *SWIGUNU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainCellLoadCallback_OnCellLoad",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellLoadCallback_OnCellLoad",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellLoadCallback, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCellLoadCallback_OnCellLoad" "', argument " "1"" of type '" "iTerrainCellLoadCallback *""'"); 
@@ -32786,7 +32893,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCellLoadCallback_OnCellPreLoad(PyObject *SWIG
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainCellLoadCallback_OnCellPreLoad",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellLoadCallback_OnCellPreLoad",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellLoadCallback, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCellLoadCallback_OnCellPreLoad" "', argument " "1"" of type '" "iTerrainCellLoadCallback *""'"); 
@@ -32816,7 +32923,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCellLoadCallback_OnCellUnload(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainCellLoadCallback_OnCellUnload",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellLoadCallback_OnCellUnload",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellLoadCallback, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCellLoadCallback_OnCellUnload" "', argument " "1"" of type '" "iTerrainCellLoadCallback *""'"); 
@@ -32839,7 +32946,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCellLoadCallback_scfGetVersion(PyObject *SWIG
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iTerrainCellLoadCallback_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellLoadCallback_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iTerrainCellLoadCallback_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -32855,7 +32962,7 @@ SWIGINTERN PyObject *_wrap_delete_iTerrainCellLoadCallback(PyObject *SWIGUNUSEDP
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iTerrainCellLoadCallback",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iTerrainCellLoadCallback",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellLoadCallback, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iTerrainCellLoadCallback" "', argument " "1"" of type '" "iTerrainCellLoadCallback *""'"); 
@@ -32872,7 +32979,7 @@ fail:
 
 SWIGINTERN PyObject *iTerrainCellLoadCallback_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iTerrainCellLoadCallback, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -32894,7 +33001,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_GetCell__SWIG_0(PyObject *SWIGUNUSEDPA
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iTerrainSystem_GetCell",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_GetCell",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_GetCell" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
@@ -32933,7 +33040,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_GetCell__SWIG_1(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainSystem_GetCell",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_GetCell",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_GetCell" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
@@ -32970,7 +33077,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_GetCell__SWIG_2(PyObject *SWIGUNUSEDPA
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iTerrainSystem_GetCell",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_GetCell",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_GetCell" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
@@ -33009,7 +33116,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_GetCell__SWIG_3(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainSystem_GetCell",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_GetCell",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_GetCell" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
@@ -33047,7 +33154,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_GetCell__SWIG_4(PyObject *SWIGUNUSEDPA
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iTerrainSystem_GetCell",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_GetCell",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_GetCell" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
@@ -33083,7 +33190,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_GetCell__SWIG_5(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainSystem_GetCell",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_GetCell",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_GetCell" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
@@ -33227,7 +33334,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_GetCellCount(PyObject *SWIGUNUSEDPARM(
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainSystem_GetCellCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_GetCellCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_GetCellCount" "', argument " "1"" of type '" "iTerrainSystem const *""'"); 
@@ -33249,7 +33356,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_GetMaterialPalette(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainSystem_GetMaterialPalette",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_GetMaterialPalette",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_GetMaterialPalette" "', argument " "1"" of type '" "iTerrainSystem const *""'"); 
@@ -33277,7 +33384,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_SetMaterialPalette(PyObject *SWIGUNUSE
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainSystem_SetMaterialPalette",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_SetMaterialPalette",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_SetMaterialPalette" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
@@ -33323,7 +33430,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_CollideSegment__SWIG_0(PyObject *SWIGU
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iTerrainSystem_CollideSegment",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_CollideSegment",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_CollideSegment" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
@@ -33383,7 +33490,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_CollideSegment__SWIG_1(PyObject *SWIGU
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iTerrainSystem_CollideSegment",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_CollideSegment",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_CollideSegment" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
@@ -33434,7 +33541,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_CollideSegment__SWIG_2(PyObject *SWIGU
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iTerrainSystem_CollideSegment",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_CollideSegment",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_CollideSegment" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
@@ -33585,7 +33692,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_CollideTriangles(PyObject *SWIGUNUSEDP
   PyObject * obj6 = 0 ;
   PyObject * obj7 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOOO:iTerrainSystem_CollideTriangles",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_CollideTriangles",8,8,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_CollideTriangles" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
@@ -33665,7 +33772,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_Collide(PyObject *SWIGUNUSEDPARM(self)
   PyObject * obj4 = 0 ;
   PyObject * obj5 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOO:iTerrainSystem_Collide",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_Collide",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_Collide" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
@@ -33715,7 +33822,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_GetVirtualViewDistance(PyObject *SWIGU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainSystem_GetVirtualViewDistance",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_GetVirtualViewDistance",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_GetVirtualViewDistance" "', argument " "1"" of type '" "iTerrainSystem const *""'"); 
@@ -33740,7 +33847,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_SetVirtualViewDistance(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainSystem_SetVirtualViewDistance",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_SetVirtualViewDistance",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_SetVirtualViewDistance" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
@@ -33767,7 +33874,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_GetAutoPreLoad(PyObject *SWIGUNUSEDPAR
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainSystem_GetAutoPreLoad",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_GetAutoPreLoad",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_GetAutoPreLoad" "', argument " "1"" of type '" "iTerrainSystem const *""'"); 
@@ -33792,7 +33899,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_SetAutoPreLoad(PyObject *SWIGUNUSEDPAR
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainSystem_SetAutoPreLoad",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_SetAutoPreLoad",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_SetAutoPreLoad" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
@@ -33826,7 +33933,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_PreLoadCells(PyObject *SWIGUNUSEDPARM(
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iTerrainSystem_PreLoadCells",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_PreLoadCells",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_PreLoadCells" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
@@ -33862,7 +33969,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_GetHeight(PyObject *SWIGUNUSEDPARM(sel
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainSystem_GetHeight",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_GetHeight",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_GetHeight" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
@@ -33896,7 +34003,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_GetTangent(PyObject *SWIGUNUSEDPARM(se
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainSystem_GetTangent",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_GetTangent",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_GetTangent" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
@@ -33930,7 +34037,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_GetBinormal(PyObject *SWIGUNUSEDPARM(s
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainSystem_GetBinormal",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_GetBinormal",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_GetBinormal" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
@@ -33964,7 +34071,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_GetNormal(PyObject *SWIGUNUSEDPARM(sel
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainSystem_GetNormal",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_GetNormal",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_GetNormal" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
@@ -33994,7 +34101,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_GetMaxLoadedCells(PyObject *SWIGUNUSED
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainSystem_GetMaxLoadedCells",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_GetMaxLoadedCells",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_GetMaxLoadedCells" "', argument " "1"" of type '" "iTerrainSystem const *""'"); 
@@ -34019,7 +34126,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_SetMaxLoadedCells(PyObject *SWIGUNUSED
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainSystem_SetMaxLoadedCells",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_SetMaxLoadedCells",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_SetMaxLoadedCells" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
@@ -34045,7 +34152,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_UnloadOldCells(PyObject *SWIGUNUSEDPAR
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainSystem_UnloadOldCells",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_UnloadOldCells",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_UnloadOldCells" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
@@ -34070,7 +34177,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_AddCellLoadListener(PyObject *SWIGUNUS
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainSystem_AddCellLoadListener",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_AddCellLoadListener",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_AddCellLoadListener" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
@@ -34100,7 +34207,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_RemoveCellLoadListener(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainSystem_RemoveCellLoadListener",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_RemoveCellLoadListener",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_RemoveCellLoadListener" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
@@ -34130,7 +34237,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_AddCellHeightUpdateListener(PyObject *
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainSystem_AddCellHeightUpdateListener",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_AddCellHeightUpdateListener",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_AddCellHeightUpdateListener" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
@@ -34160,7 +34267,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_RemoveCellHeightUpdateListener(PyObjec
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainSystem_RemoveCellHeightUpdateListener",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_RemoveCellHeightUpdateListener",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_RemoveCellHeightUpdateListener" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
@@ -34183,7 +34290,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_scfGetVersion(PyObject *SWIGUNUSEDPARM
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iTerrainSystem_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iTerrainSystem_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -34199,7 +34306,7 @@ SWIGINTERN PyObject *_wrap_delete_iTerrainSystem(PyObject *SWIGUNUSEDPARM(self),
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iTerrainSystem",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iTerrainSystem",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iTerrainSystem" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
@@ -34216,7 +34323,7 @@ fail:
 
 SWIGINTERN PyObject *iTerrainSystem_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iTerrainSystem, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -34229,7 +34336,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_GetLoadState(PyObject *SWIGUNUSEDPARM(se
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainCell_GetLoadState",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_GetLoadState",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_GetLoadState" "', argument " "1"" of type '" "iTerrainCell const *""'"); 
@@ -34254,7 +34361,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_SetLoadState(PyObject *SWIGUNUSEDPARM(se
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainCell_SetLoadState",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_SetLoadState",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_SetLoadState" "', argument " "1"" of type '" "iTerrainCell *""'"); 
@@ -34281,7 +34388,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_GetTerrain(PyObject *SWIGUNUSEDPARM(self
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainCell_GetTerrain",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_GetTerrain",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_GetTerrain" "', argument " "1"" of type '" "iTerrainCell *""'"); 
@@ -34303,7 +34410,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_GetName(PyObject *SWIGUNUSEDPARM(self), 
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainCell_GetName",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_GetName",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_GetName" "', argument " "1"" of type '" "iTerrainCell const *""'"); 
@@ -34325,7 +34432,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_GetRenderProperties(PyObject *SWIGUNUSED
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainCell_GetRenderProperties",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_GetRenderProperties",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_GetRenderProperties" "', argument " "1"" of type '" "iTerrainCell const *""'"); 
@@ -34347,7 +34454,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_GetCollisionProperties(PyObject *SWIGUNU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainCell_GetCollisionProperties",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_GetCollisionProperties",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_GetCollisionProperties" "', argument " "1"" of type '" "iTerrainCell const *""'"); 
@@ -34369,7 +34476,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_GetFeederProperties(PyObject *SWIGUNUSED
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainCell_GetFeederProperties",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_GetFeederProperties",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_GetFeederProperties" "', argument " "1"" of type '" "iTerrainCell const *""'"); 
@@ -34391,7 +34498,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_GetGridWidth(PyObject *SWIGUNUSEDPARM(se
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainCell_GetGridWidth",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_GetGridWidth",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_GetGridWidth" "', argument " "1"" of type '" "iTerrainCell const *""'"); 
@@ -34413,7 +34520,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_GetGridHeight(PyObject *SWIGUNUSEDPARM(s
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainCell_GetGridHeight",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_GetGridHeight",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_GetGridHeight" "', argument " "1"" of type '" "iTerrainCell const *""'"); 
@@ -34435,7 +34542,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_GetHeightData(PyObject *SWIGUNUSEDPARM(s
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainCell_GetHeightData",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_GetHeightData",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_GetHeightData" "', argument " "1"" of type '" "iTerrainCell *""'"); 
@@ -34461,7 +34568,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_LockHeightData(PyObject *SWIGUNUSEDPARM(
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainCell_LockHeightData",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_LockHeightData",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_LockHeightData" "', argument " "1"" of type '" "iTerrainCell *""'"); 
@@ -34490,7 +34597,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_UnlockHeightData(PyObject *SWIGUNUSEDPAR
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainCell_UnlockHeightData",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_UnlockHeightData",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_UnlockHeightData" "', argument " "1"" of type '" "iTerrainCell *""'"); 
@@ -34512,7 +34619,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_GetPosition(PyObject *SWIGUNUSEDPARM(sel
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainCell_GetPosition",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_GetPosition",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_GetPosition" "', argument " "1"" of type '" "iTerrainCell const *""'"); 
@@ -34537,7 +34644,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_GetSize(PyObject *SWIGUNUSEDPARM(self), 
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainCell_GetSize",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_GetSize",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_GetSize" "', argument " "1"" of type '" "iTerrainCell const *""'"); 
@@ -34562,7 +34669,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_GetMaterialMapWidth(PyObject *SWIGUNUSED
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainCell_GetMaterialMapWidth",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_GetMaterialMapWidth",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_GetMaterialMapWidth" "', argument " "1"" of type '" "iTerrainCell const *""'"); 
@@ -34584,7 +34691,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_GetMaterialMapHeight(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainCell_GetMaterialMapHeight",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_GetMaterialMapHeight",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_GetMaterialMapHeight" "', argument " "1"" of type '" "iTerrainCell const *""'"); 
@@ -34606,7 +34713,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_GetMaterialPersistent(PyObject *SWIGUNUS
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainCell_GetMaterialPersistent",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_GetMaterialPersistent",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_GetMaterialPersistent" "', argument " "1"" of type '" "iTerrainCell const *""'"); 
@@ -34632,7 +34739,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_LockMaterialMap(PyObject *SWIGUNUSEDPARM
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainCell_LockMaterialMap",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_LockMaterialMap",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_LockMaterialMap" "', argument " "1"" of type '" "iTerrainCell *""'"); 
@@ -34661,7 +34768,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_UnlockMaterialMap(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainCell_UnlockMaterialMap",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_UnlockMaterialMap",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_UnlockMaterialMap" "', argument " "1"" of type '" "iTerrainCell *""'"); 
@@ -34690,7 +34797,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_SetMaterialMask__SWIG_0(PyObject *SWIGUN
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iTerrainCell_SetMaterialMask",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_SetMaterialMask",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_SetMaterialMask" "', argument " "1"" of type '" "iTerrainCell *""'"); 
@@ -34737,7 +34844,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_SetMaterialMask__SWIG_1(PyObject *SWIGUN
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iTerrainCell_SetMaterialMask",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_SetMaterialMask",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_SetMaterialMask" "', argument " "1"" of type '" "iTerrainCell *""'"); 
@@ -34851,7 +34958,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_SetBaseMaterial(PyObject *SWIGUNUSEDPARM
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainCell_SetBaseMaterial",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_SetBaseMaterial",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_SetBaseMaterial" "', argument " "1"" of type '" "iTerrainCell *""'"); 
@@ -34878,7 +34985,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_GetBaseMaterial(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainCell_GetBaseMaterial",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_GetBaseMaterial",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_GetBaseMaterial" "', argument " "1"" of type '" "iTerrainCell const *""'"); 
@@ -34916,7 +35023,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_CollideSegment(PyObject *SWIGUNUSEDPARM(
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iTerrainCell_CollideSegment",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_CollideSegment",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_CollideSegment" "', argument " "1"" of type '" "iTerrainCell *""'"); 
@@ -34992,7 +35099,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_CollideTriangles(PyObject *SWIGUNUSEDPAR
   PyObject * obj6 = 0 ;
   PyObject * obj7 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOOO:iTerrainCell_CollideTriangles",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_CollideTriangles",8,8,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_CollideTriangles" "', argument " "1"" of type '" "iTerrainCell *""'"); 
@@ -35072,7 +35179,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_Collide(PyObject *SWIGUNUSEDPARM(self), 
   PyObject * obj4 = 0 ;
   PyObject * obj5 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOO:iTerrainCell_Collide",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_Collide",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_Collide" "', argument " "1"" of type '" "iTerrainCell *""'"); 
@@ -35130,7 +35237,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_GetHeight__SWIG_0(PyObject *SWIGUNUSEDPA
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iTerrainCell_GetHeight",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_GetHeight",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_GetHeight" "', argument " "1"" of type '" "iTerrainCell const *""'"); 
@@ -35166,7 +35273,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_GetHeight__SWIG_1(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainCell_GetHeight",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_GetHeight",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_GetHeight" "', argument " "1"" of type '" "iTerrainCell const *""'"); 
@@ -35255,7 +35362,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_GetTangent__SWIG_0(PyObject *SWIGUNUSEDP
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iTerrainCell_GetTangent",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_GetTangent",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_GetTangent" "', argument " "1"" of type '" "iTerrainCell const *""'"); 
@@ -35291,7 +35398,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_GetTangent__SWIG_1(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainCell_GetTangent",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_GetTangent",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_GetTangent" "', argument " "1"" of type '" "iTerrainCell const *""'"); 
@@ -35380,7 +35487,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_GetBinormal__SWIG_0(PyObject *SWIGUNUSED
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iTerrainCell_GetBinormal",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_GetBinormal",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_GetBinormal" "', argument " "1"" of type '" "iTerrainCell const *""'"); 
@@ -35416,7 +35523,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_GetBinormal__SWIG_1(PyObject *SWIGUNUSED
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainCell_GetBinormal",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_GetBinormal",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_GetBinormal" "', argument " "1"" of type '" "iTerrainCell const *""'"); 
@@ -35505,7 +35612,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_GetNormal__SWIG_0(PyObject *SWIGUNUSEDPA
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iTerrainCell_GetNormal",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_GetNormal",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_GetNormal" "', argument " "1"" of type '" "iTerrainCell const *""'"); 
@@ -35541,7 +35648,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_GetNormal__SWIG_1(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainCell_GetNormal",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_GetNormal",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_GetNormal" "', argument " "1"" of type '" "iTerrainCell const *""'"); 
@@ -35622,7 +35729,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_GetRenderData(PyObject *SWIGUNUSEDPARM(s
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainCell_GetRenderData",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_GetRenderData",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_GetRenderData" "', argument " "1"" of type '" "iTerrainCell const *""'"); 
@@ -35647,7 +35754,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_SetRenderData(PyObject *SWIGUNUSEDPARM(s
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainCell_SetRenderData",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_SetRenderData",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_SetRenderData" "', argument " "1"" of type '" "iTerrainCell *""'"); 
@@ -35674,7 +35781,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_GetCollisionData(PyObject *SWIGUNUSEDPAR
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainCell_GetCollisionData",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_GetCollisionData",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_GetCollisionData" "', argument " "1"" of type '" "iTerrainCell const *""'"); 
@@ -35699,7 +35806,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_SetCollisionData(PyObject *SWIGUNUSEDPAR
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainCell_SetCollisionData",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_SetCollisionData",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_SetCollisionData" "', argument " "1"" of type '" "iTerrainCell *""'"); 
@@ -35726,7 +35833,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_GetFeederData(PyObject *SWIGUNUSEDPARM(s
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainCell_GetFeederData",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_GetFeederData",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_GetFeederData" "', argument " "1"" of type '" "iTerrainCell const *""'"); 
@@ -35751,7 +35858,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_SetFeederData(PyObject *SWIGUNUSEDPARM(s
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainCell_SetFeederData",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_SetFeederData",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_SetFeederData" "', argument " "1"" of type '" "iTerrainCell *""'"); 
@@ -35774,7 +35881,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_scfGetVersion(PyObject *SWIGUNUSEDPARM(s
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iTerrainCell_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iTerrainCell_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -35790,7 +35897,7 @@ SWIGINTERN PyObject *_wrap_delete_iTerrainCell(PyObject *SWIGUNUSEDPARM(self), P
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iTerrainCell",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iTerrainCell",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iTerrainCell" "', argument " "1"" of type '" "iTerrainCell *""'"); 
@@ -35807,7 +35914,7 @@ fail:
 
 SWIGINTERN PyObject *iTerrainCell_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iTerrainCell, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -35820,7 +35927,7 @@ SWIGINTERN PyObject *_wrap_iTerrainFactoryCell_GetRenderProperties(PyObject *SWI
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainFactoryCell_GetRenderProperties",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainFactoryCell_GetRenderProperties",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainFactoryCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainFactoryCell_GetRenderProperties" "', argument " "1"" of type '" "iTerrainFactoryCell const *""'"); 
@@ -35842,7 +35949,7 @@ SWIGINTERN PyObject *_wrap_iTerrainFactoryCell_GetCollisionProperties(PyObject *
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainFactoryCell_GetCollisionProperties",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainFactoryCell_GetCollisionProperties",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainFactoryCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainFactoryCell_GetCollisionProperties" "', argument " "1"" of type '" "iTerrainFactoryCell const *""'"); 
@@ -35864,7 +35971,7 @@ SWIGINTERN PyObject *_wrap_iTerrainFactoryCell_GetFeederProperties(PyObject *SWI
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iTerrainFactoryCell_GetFeederProperties",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainFactoryCell_GetFeederProperties",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainFactoryCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainFactoryCell_GetFeederProperties" "', argument " "1"" of type '" "iTerrainFactoryCell const *""'"); 
@@ -35889,7 +35996,7 @@ SWIGINTERN PyObject *_wrap_iTerrainFactoryCell_SetBaseMaterial(PyObject *SWIGUNU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainFactoryCell_SetBaseMaterial",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainFactoryCell_SetBaseMaterial",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainFactoryCell, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainFactoryCell_SetBaseMaterial" "', argument " "1"" of type '" "iTerrainFactoryCell *""'"); 
@@ -35912,7 +36019,7 @@ SWIGINTERN PyObject *_wrap_iTerrainFactoryCell_scfGetVersion(PyObject *SWIGUNUSE
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iTerrainFactoryCell_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainFactoryCell_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iTerrainFactoryCell_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -35928,7 +36035,7 @@ SWIGINTERN PyObject *_wrap_delete_iTerrainFactoryCell(PyObject *SWIGUNUSEDPARM(s
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iTerrainFactoryCell",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iTerrainFactoryCell",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainFactoryCell, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iTerrainFactoryCell" "', argument " "1"" of type '" "iTerrainFactoryCell *""'"); 
@@ -35945,7 +36052,7 @@ fail:
 
 SWIGINTERN PyObject *iTerrainFactoryCell_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iTerrainFactoryCell, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -35961,7 +36068,7 @@ SWIGINTERN PyObject *_wrap_iTerrainFactory_SetRenderer(PyObject *SWIGUNUSEDPARM(
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainFactory_SetRenderer",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainFactory_SetRenderer",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainFactory_SetRenderer" "', argument " "1"" of type '" "iTerrainFactory *""'"); 
@@ -35991,7 +36098,7 @@ SWIGINTERN PyObject *_wrap_iTerrainFactory_SetCollider(PyObject *SWIGUNUSEDPARM(
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainFactory_SetCollider",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainFactory_SetCollider",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainFactory_SetCollider" "', argument " "1"" of type '" "iTerrainFactory *""'"); 
@@ -36021,7 +36128,7 @@ SWIGINTERN PyObject *_wrap_iTerrainFactory_SetFeeder(PyObject *SWIGUNUSEDPARM(se
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainFactory_SetFeeder",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainFactory_SetFeeder",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainFactory_SetFeeder" "', argument " "1"" of type '" "iTerrainFactory *""'"); 
@@ -36081,7 +36188,7 @@ SWIGINTERN PyObject *_wrap_iTerrainFactory_AddCell(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj7 = 0 ;
   PyObject * obj8 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOOOO:iTerrainFactory_AddCell",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainFactory_AddCell",9,9,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainFactory_AddCell" "', argument " "1"" of type '" "iTerrainFactory *""'"); 
@@ -36154,7 +36261,7 @@ SWIGINTERN PyObject *_wrap_iTerrainFactory_SetMaxLoadedCells(PyObject *SWIGUNUSE
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainFactory_SetMaxLoadedCells",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainFactory_SetMaxLoadedCells",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainFactory_SetMaxLoadedCells" "', argument " "1"" of type '" "iTerrainFactory *""'"); 
@@ -36184,7 +36291,7 @@ SWIGINTERN PyObject *_wrap_iTerrainFactory_SetVirtualViewDistance(PyObject *SWIG
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainFactory_SetVirtualViewDistance",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainFactory_SetVirtualViewDistance",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainFactory_SetVirtualViewDistance" "', argument " "1"" of type '" "iTerrainFactory *""'"); 
@@ -36214,7 +36321,7 @@ SWIGINTERN PyObject *_wrap_iTerrainFactory_SetAutoPreLoad(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iTerrainFactory_SetAutoPreLoad",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainFactory_SetAutoPreLoad",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainFactory_SetAutoPreLoad" "', argument " "1"" of type '" "iTerrainFactory *""'"); 
@@ -36237,7 +36344,7 @@ SWIGINTERN PyObject *_wrap_iTerrainFactory_scfGetVersion(PyObject *SWIGUNUSEDPAR
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iTerrainFactory_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainFactory_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iTerrainFactory_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -36253,7 +36360,7 @@ SWIGINTERN PyObject *_wrap_delete_iTerrainFactory(PyObject *SWIGUNUSEDPARM(self)
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iTerrainFactory",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iTerrainFactory",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainFactory, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iTerrainFactory" "', argument " "1"" of type '" "iTerrainFactory *""'"); 
@@ -36270,7 +36377,7 @@ fail:
 
 SWIGINTERN PyObject *iTerrainFactory_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iTerrainFactory, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -36286,7 +36393,7 @@ SWIGINTERN PyObject *_wrap_csParticle_position_set(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csParticle_position_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csParticle_position_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csParticle, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csParticle_position_set" "', argument " "1"" of type '" "csParticle *""'"); 
@@ -36314,7 +36421,7 @@ SWIGINTERN PyObject *_wrap_csParticle_position_get(PyObject *SWIGUNUSEDPARM(self
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csParticle_position_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csParticle_position_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csParticle, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csParticle_position_get" "', argument " "1"" of type '" "csParticle *""'"); 
@@ -36339,7 +36446,7 @@ SWIGINTERN PyObject *_wrap_csParticle_mass_set(PyObject *SWIGUNUSEDPARM(self), P
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csParticle_mass_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csParticle_mass_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csParticle, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csParticle_mass_set" "', argument " "1"" of type '" "csParticle *""'"); 
@@ -36367,7 +36474,7 @@ SWIGINTERN PyObject *_wrap_csParticle_mass_get(PyObject *SWIGUNUSEDPARM(self), P
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csParticle_mass_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csParticle_mass_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csParticle, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csParticle_mass_get" "', argument " "1"" of type '" "csParticle *""'"); 
@@ -36392,7 +36499,7 @@ SWIGINTERN PyObject *_wrap_csParticle_orientation_set(PyObject *SWIGUNUSEDPARM(s
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csParticle_orientation_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csParticle_orientation_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csParticle, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csParticle_orientation_set" "', argument " "1"" of type '" "csParticle *""'"); 
@@ -36420,7 +36527,7 @@ SWIGINTERN PyObject *_wrap_csParticle_orientation_get(PyObject *SWIGUNUSEDPARM(s
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csParticle_orientation_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csParticle_orientation_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csParticle, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csParticle_orientation_get" "', argument " "1"" of type '" "csParticle *""'"); 
@@ -36445,7 +36552,7 @@ SWIGINTERN PyObject *_wrap_csParticle_linearVelocity_set(PyObject *SWIGUNUSEDPAR
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csParticle_linearVelocity_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csParticle_linearVelocity_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csParticle, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csParticle_linearVelocity_set" "', argument " "1"" of type '" "csParticle *""'"); 
@@ -36473,7 +36580,7 @@ SWIGINTERN PyObject *_wrap_csParticle_linearVelocity_get(PyObject *SWIGUNUSEDPAR
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csParticle_linearVelocity_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csParticle_linearVelocity_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csParticle, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csParticle_linearVelocity_get" "', argument " "1"" of type '" "csParticle *""'"); 
@@ -36498,7 +36605,7 @@ SWIGINTERN PyObject *_wrap_csParticle_timeToLive_set(PyObject *SWIGUNUSEDPARM(se
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csParticle_timeToLive_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csParticle_timeToLive_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csParticle, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csParticle_timeToLive_set" "', argument " "1"" of type '" "csParticle *""'"); 
@@ -36526,7 +36633,7 @@ SWIGINTERN PyObject *_wrap_csParticle_timeToLive_get(PyObject *SWIGUNUSEDPARM(se
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csParticle_timeToLive_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csParticle_timeToLive_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csParticle, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csParticle_timeToLive_get" "', argument " "1"" of type '" "csParticle *""'"); 
@@ -36551,7 +36658,7 @@ SWIGINTERN PyObject *_wrap_csParticle_angularVelocity_set(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csParticle_angularVelocity_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csParticle_angularVelocity_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csParticle, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csParticle_angularVelocity_set" "', argument " "1"" of type '" "csParticle *""'"); 
@@ -36579,7 +36686,7 @@ SWIGINTERN PyObject *_wrap_csParticle_angularVelocity_get(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csParticle_angularVelocity_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csParticle_angularVelocity_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csParticle, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csParticle_angularVelocity_get" "', argument " "1"" of type '" "csParticle *""'"); 
@@ -36604,7 +36711,7 @@ SWIGINTERN PyObject *_wrap_csParticle_pad_set(PyObject *SWIGUNUSEDPARM(self), Py
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csParticle_pad_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csParticle_pad_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csParticle, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csParticle_pad_set" "', argument " "1"" of type '" "csParticle *""'"); 
@@ -36632,7 +36739,7 @@ SWIGINTERN PyObject *_wrap_csParticle_pad_get(PyObject *SWIGUNUSEDPARM(self), Py
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csParticle_pad_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csParticle_pad_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csParticle, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csParticle_pad_get" "', argument " "1"" of type '" "csParticle *""'"); 
@@ -36650,7 +36757,7 @@ SWIGINTERN PyObject *_wrap_new_csParticle(PyObject *SWIGUNUSEDPARM(self), PyObje
   PyObject *resultobj = 0;
   csParticle *result = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)":new_csParticle")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"new_csParticle",0,0)) SWIG_fail;
   result = (csParticle *)new csParticle();
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csParticle, SWIG_POINTER_NEW |  0 );
   return resultobj;
@@ -36666,7 +36773,7 @@ SWIGINTERN PyObject *_wrap_delete_csParticle(PyObject *SWIGUNUSEDPARM(self), PyO
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_csParticle",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_csParticle",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csParticle, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_csParticle" "', argument " "1"" of type '" "csParticle *""'"); 
@@ -36683,7 +36790,7 @@ fail:
 
 SWIGINTERN PyObject *csParticle_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_csParticle, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -36699,7 +36806,7 @@ SWIGINTERN PyObject *_wrap_csParticleAux_color_set(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csParticleAux_color_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csParticleAux_color_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csParticleAux, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csParticleAux_color_set" "', argument " "1"" of type '" "csParticleAux *""'"); 
@@ -36727,7 +36834,7 @@ SWIGINTERN PyObject *_wrap_csParticleAux_color_get(PyObject *SWIGUNUSEDPARM(self
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csParticleAux_color_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csParticleAux_color_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csParticleAux, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csParticleAux_color_get" "', argument " "1"" of type '" "csParticleAux *""'"); 
@@ -36752,7 +36859,7 @@ SWIGINTERN PyObject *_wrap_csParticleAux_particleSize_set(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csParticleAux_particleSize_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csParticleAux_particleSize_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csParticleAux, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csParticleAux_particleSize_set" "', argument " "1"" of type '" "csParticleAux *""'"); 
@@ -36780,7 +36887,7 @@ SWIGINTERN PyObject *_wrap_csParticleAux_particleSize_get(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csParticleAux_particleSize_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csParticleAux_particleSize_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csParticleAux, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csParticleAux_particleSize_get" "', argument " "1"" of type '" "csParticleAux *""'"); 
@@ -36805,7 +36912,7 @@ SWIGINTERN PyObject *_wrap_csParticleAux_pad_set(PyObject *SWIGUNUSEDPARM(self),
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csParticleAux_pad_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csParticleAux_pad_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csParticleAux, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csParticleAux_pad_set" "', argument " "1"" of type '" "csParticleAux *""'"); 
@@ -36839,7 +36946,7 @@ SWIGINTERN PyObject *_wrap_csParticleAux_pad_get(PyObject *SWIGUNUSEDPARM(self),
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csParticleAux_pad_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csParticleAux_pad_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csParticleAux, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csParticleAux_pad_get" "', argument " "1"" of type '" "csParticleAux *""'"); 
@@ -36857,7 +36964,7 @@ SWIGINTERN PyObject *_wrap_new_csParticleAux(PyObject *SWIGUNUSEDPARM(self), PyO
   PyObject *resultobj = 0;
   csParticleAux *result = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)":new_csParticleAux")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"new_csParticleAux",0,0)) SWIG_fail;
   result = (csParticleAux *)new csParticleAux();
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csParticleAux, SWIG_POINTER_NEW |  0 );
   return resultobj;
@@ -36873,7 +36980,7 @@ SWIGINTERN PyObject *_wrap_delete_csParticleAux(PyObject *SWIGUNUSEDPARM(self), 
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_csParticleAux",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_csParticleAux",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csParticleAux, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_csParticleAux" "', argument " "1"" of type '" "csParticleAux *""'"); 
@@ -36890,7 +36997,7 @@ fail:
 
 SWIGINTERN PyObject *csParticleAux_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_csParticleAux, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -36906,7 +37013,7 @@ SWIGINTERN PyObject *_wrap_csParticleBuffer_particleData_set(PyObject *SWIGUNUSE
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csParticleBuffer_particleData_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csParticleBuffer_particleData_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csParticleBuffer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csParticleBuffer_particleData_set" "', argument " "1"" of type '" "csParticleBuffer *""'"); 
@@ -36934,7 +37041,7 @@ SWIGINTERN PyObject *_wrap_csParticleBuffer_particleData_get(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csParticleBuffer_particleData_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csParticleBuffer_particleData_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csParticleBuffer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csParticleBuffer_particleData_get" "', argument " "1"" of type '" "csParticleBuffer *""'"); 
@@ -36959,7 +37066,7 @@ SWIGINTERN PyObject *_wrap_csParticleBuffer_particleAuxData_set(PyObject *SWIGUN
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csParticleBuffer_particleAuxData_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csParticleBuffer_particleAuxData_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csParticleBuffer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csParticleBuffer_particleAuxData_set" "', argument " "1"" of type '" "csParticleBuffer *""'"); 
@@ -36987,7 +37094,7 @@ SWIGINTERN PyObject *_wrap_csParticleBuffer_particleAuxData_get(PyObject *SWIGUN
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csParticleBuffer_particleAuxData_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csParticleBuffer_particleAuxData_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csParticleBuffer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csParticleBuffer_particleAuxData_get" "', argument " "1"" of type '" "csParticleBuffer *""'"); 
@@ -37012,7 +37119,7 @@ SWIGINTERN PyObject *_wrap_csParticleBuffer_particleCount_set(PyObject *SWIGUNUS
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csParticleBuffer_particleCount_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csParticleBuffer_particleCount_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csParticleBuffer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csParticleBuffer_particleCount_set" "', argument " "1"" of type '" "csParticleBuffer *""'"); 
@@ -37040,7 +37147,7 @@ SWIGINTERN PyObject *_wrap_csParticleBuffer_particleCount_get(PyObject *SWIGUNUS
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csParticleBuffer_particleCount_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csParticleBuffer_particleCount_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csParticleBuffer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csParticleBuffer_particleCount_get" "', argument " "1"" of type '" "csParticleBuffer *""'"); 
@@ -37058,7 +37165,7 @@ SWIGINTERN PyObject *_wrap_new_csParticleBuffer(PyObject *SWIGUNUSEDPARM(self), 
   PyObject *resultobj = 0;
   csParticleBuffer *result = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)":new_csParticleBuffer")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"new_csParticleBuffer",0,0)) SWIG_fail;
   result = (csParticleBuffer *)new csParticleBuffer();
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csParticleBuffer, SWIG_POINTER_NEW |  0 );
   return resultobj;
@@ -37074,7 +37181,7 @@ SWIGINTERN PyObject *_wrap_delete_csParticleBuffer(PyObject *SWIGUNUSEDPARM(self
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_csParticleBuffer",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_csParticleBuffer",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csParticleBuffer, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_csParticleBuffer" "', argument " "1"" of type '" "csParticleBuffer *""'"); 
@@ -37091,7 +37198,7 @@ fail:
 
 SWIGINTERN PyObject *csParticleBuffer_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_csParticleBuffer, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -37107,7 +37214,7 @@ SWIGINTERN PyObject *_wrap_iParticleEmitter_SetEnabled(PyObject *SWIGUNUSEDPARM(
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleEmitter_SetEnabled",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleEmitter_SetEnabled",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleEmitter, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleEmitter_SetEnabled" "', argument " "1"" of type '" "iParticleEmitter *""'"); 
@@ -37134,7 +37241,7 @@ SWIGINTERN PyObject *_wrap_iParticleEmitter_GetEnabled(PyObject *SWIGUNUSEDPARM(
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleEmitter_GetEnabled",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleEmitter_GetEnabled",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleEmitter, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleEmitter_GetEnabled" "', argument " "1"" of type '" "iParticleEmitter const *""'"); 
@@ -37159,7 +37266,7 @@ SWIGINTERN PyObject *_wrap_iParticleEmitter_SetStartTime(PyObject *SWIGUNUSEDPAR
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleEmitter_SetStartTime",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleEmitter_SetStartTime",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleEmitter, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleEmitter_SetStartTime" "', argument " "1"" of type '" "iParticleEmitter *""'"); 
@@ -37186,7 +37293,7 @@ SWIGINTERN PyObject *_wrap_iParticleEmitter_GetStartTime(PyObject *SWIGUNUSEDPAR
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleEmitter_GetStartTime",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleEmitter_GetStartTime",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleEmitter, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleEmitter_GetStartTime" "', argument " "1"" of type '" "iParticleEmitter const *""'"); 
@@ -37211,7 +37318,7 @@ SWIGINTERN PyObject *_wrap_iParticleEmitter_SetDuration(PyObject *SWIGUNUSEDPARM
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleEmitter_SetDuration",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleEmitter_SetDuration",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleEmitter, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleEmitter_SetDuration" "', argument " "1"" of type '" "iParticleEmitter *""'"); 
@@ -37238,7 +37345,7 @@ SWIGINTERN PyObject *_wrap_iParticleEmitter_GetDuration(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleEmitter_GetDuration",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleEmitter_GetDuration",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleEmitter, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleEmitter_GetDuration" "', argument " "1"" of type '" "iParticleEmitter const *""'"); 
@@ -37263,7 +37370,7 @@ SWIGINTERN PyObject *_wrap_iParticleEmitter_SetEmissionRate(PyObject *SWIGUNUSED
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleEmitter_SetEmissionRate",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleEmitter_SetEmissionRate",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleEmitter, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleEmitter_SetEmissionRate" "', argument " "1"" of type '" "iParticleEmitter *""'"); 
@@ -37290,7 +37397,7 @@ SWIGINTERN PyObject *_wrap_iParticleEmitter_GetEmissionRate(PyObject *SWIGUNUSED
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleEmitter_GetEmissionRate",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleEmitter_GetEmissionRate",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleEmitter, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleEmitter_GetEmissionRate" "', argument " "1"" of type '" "iParticleEmitter const *""'"); 
@@ -37319,7 +37426,7 @@ SWIGINTERN PyObject *_wrap_iParticleEmitter_SetInitialTTL(PyObject *SWIGUNUSEDPA
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iParticleEmitter_SetInitialTTL",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleEmitter_SetInitialTTL",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleEmitter, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleEmitter_SetInitialTTL" "', argument " "1"" of type '" "iParticleEmitter *""'"); 
@@ -37358,7 +37465,7 @@ SWIGINTERN PyObject *_wrap_iParticleEmitter_GetInitialTTL(PyObject *SWIGUNUSEDPA
   
   arg2 = &temp2;
   arg3 = &temp3;
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleEmitter_GetInitialTTL",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleEmitter_GetInitialTTL",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleEmitter, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleEmitter_GetInitialTTL" "', argument " "1"" of type '" "iParticleEmitter const *""'"); 
@@ -37399,7 +37506,7 @@ SWIGINTERN PyObject *_wrap_iParticleEmitter_SetInitialMass(PyObject *SWIGUNUSEDP
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iParticleEmitter_SetInitialMass",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleEmitter_SetInitialMass",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleEmitter, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleEmitter_SetInitialMass" "', argument " "1"" of type '" "iParticleEmitter *""'"); 
@@ -37438,7 +37545,7 @@ SWIGINTERN PyObject *_wrap_iParticleEmitter_GetInitialMass(PyObject *SWIGUNUSEDP
   
   arg2 = &temp2;
   arg3 = &temp3;
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleEmitter_GetInitialMass",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleEmitter_GetInitialMass",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleEmitter, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleEmitter_GetInitialMass" "', argument " "1"" of type '" "iParticleEmitter const *""'"); 
@@ -37472,7 +37579,7 @@ SWIGINTERN PyObject *_wrap_iParticleEmitter_Clone(PyObject *SWIGUNUSEDPARM(self)
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleEmitter_Clone",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleEmitter_Clone",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleEmitter, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleEmitter_Clone" "', argument " "1"" of type '" "iParticleEmitter const *""'"); 
@@ -37523,7 +37630,7 @@ SWIGINTERN PyObject *_wrap_iParticleEmitter_ParticlesToEmit(PyObject *SWIGUNUSED
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iParticleEmitter_ParticlesToEmit",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleEmitter_ParticlesToEmit",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleEmitter, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleEmitter_ParticlesToEmit" "', argument " "1"" of type '" "iParticleEmitter *""'"); 
@@ -37579,7 +37686,7 @@ SWIGINTERN PyObject *_wrap_iParticleEmitter_EmitParticles__SWIG_0(PyObject *SWIG
   PyObject * obj4 = 0 ;
   PyObject * obj5 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOO:iParticleEmitter_EmitParticles",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleEmitter_EmitParticles",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleEmitter, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleEmitter_EmitParticles" "', argument " "1"" of type '" "iParticleEmitter *""'"); 
@@ -37644,7 +37751,7 @@ SWIGINTERN PyObject *_wrap_iParticleEmitter_EmitParticles__SWIG_1(PyObject *SWIG
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iParticleEmitter_EmitParticles",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleEmitter_EmitParticles",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleEmitter, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleEmitter_EmitParticles" "', argument " "1"" of type '" "iParticleEmitter *""'"); 
@@ -37767,7 +37874,7 @@ SWIGINTERN PyObject *_wrap_iParticleEmitter_scfGetVersion(PyObject *SWIGUNUSEDPA
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iParticleEmitter_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleEmitter_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iParticleEmitter_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -37783,7 +37890,7 @@ SWIGINTERN PyObject *_wrap_delete_iParticleEmitter(PyObject *SWIGUNUSEDPARM(self
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iParticleEmitter",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iParticleEmitter",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleEmitter, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iParticleEmitter" "', argument " "1"" of type '" "iParticleEmitter *""'"); 
@@ -37800,7 +37907,7 @@ fail:
 
 SWIGINTERN PyObject *iParticleEmitter_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iParticleEmitter, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -37813,7 +37920,7 @@ SWIGINTERN PyObject *_wrap_iParticleEffector_Clone(PyObject *SWIGUNUSEDPARM(self
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleEffector_Clone",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleEffector_Clone",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleEffector, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleEffector_Clone" "', argument " "1"" of type '" "iParticleEffector const *""'"); 
@@ -37867,7 +37974,7 @@ SWIGINTERN PyObject *_wrap_iParticleEffector_EffectParticles(PyObject *SWIGUNUSE
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:iParticleEffector_EffectParticles",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleEffector_EffectParticles",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleEffector, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleEffector_EffectParticles" "', argument " "1"" of type '" "iParticleEffector *""'"); 
@@ -37908,7 +38015,7 @@ SWIGINTERN PyObject *_wrap_iParticleEffector_scfGetVersion(PyObject *SWIGUNUSEDP
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iParticleEffector_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleEffector_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iParticleEffector_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -37924,7 +38031,7 @@ SWIGINTERN PyObject *_wrap_delete_iParticleEffector(PyObject *SWIGUNUSEDPARM(sel
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iParticleEffector",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iParticleEffector",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleEffector, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iParticleEffector" "', argument " "1"" of type '" "iParticleEffector *""'"); 
@@ -37941,7 +38048,7 @@ fail:
 
 SWIGINTERN PyObject *iParticleEffector_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iParticleEffector, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -37957,7 +38064,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemBase_SetParticleRenderOrientation(PyOb
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleSystemBase_SetParticleRenderOrientation",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemBase_SetParticleRenderOrientation",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystemBase_SetParticleRenderOrientation" "', argument " "1"" of type '" "iParticleSystemBase *""'"); 
@@ -37984,7 +38091,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemBase_GetParticleRenderOrientation(PyOb
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleSystemBase_GetParticleRenderOrientation",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemBase_GetParticleRenderOrientation",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystemBase_GetParticleRenderOrientation" "', argument " "1"" of type '" "iParticleSystemBase const *""'"); 
@@ -38009,7 +38116,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemBase_SetRotationMode(PyObject *SWIGUNU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleSystemBase_SetRotationMode",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemBase_SetRotationMode",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystemBase_SetRotationMode" "', argument " "1"" of type '" "iParticleSystemBase *""'"); 
@@ -38036,7 +38143,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemBase_GetRotationMode(PyObject *SWIGUNU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleSystemBase_GetRotationMode",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemBase_GetRotationMode",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystemBase_GetRotationMode" "', argument " "1"" of type '" "iParticleSystemBase const *""'"); 
@@ -38061,7 +38168,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemBase_SetSortMode(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleSystemBase_SetSortMode",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemBase_SetSortMode",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystemBase_SetSortMode" "', argument " "1"" of type '" "iParticleSystemBase *""'"); 
@@ -38088,7 +38195,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemBase_GetSortMode(PyObject *SWIGUNUSEDP
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleSystemBase_GetSortMode",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemBase_GetSortMode",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystemBase_GetSortMode" "', argument " "1"" of type '" "iParticleSystemBase const *""'"); 
@@ -38113,7 +38220,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemBase_SetIntegrationMode(PyObject *SWIG
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleSystemBase_SetIntegrationMode",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemBase_SetIntegrationMode",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystemBase_SetIntegrationMode" "', argument " "1"" of type '" "iParticleSystemBase *""'"); 
@@ -38140,7 +38247,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemBase_GetIntegrationMode(PyObject *SWIG
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleSystemBase_GetIntegrationMode",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemBase_GetIntegrationMode",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystemBase_GetIntegrationMode" "', argument " "1"" of type '" "iParticleSystemBase *""'"); 
@@ -38165,7 +38272,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemBase_SetCommonDirection(PyObject *SWIG
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleSystemBase_SetCommonDirection",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemBase_SetCommonDirection",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystemBase_SetCommonDirection" "', argument " "1"" of type '" "iParticleSystemBase *""'"); 
@@ -38195,7 +38302,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemBase_GetCommonDirection(PyObject *SWIG
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleSystemBase_GetCommonDirection",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemBase_GetCommonDirection",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystemBase_GetCommonDirection" "', argument " "1"" of type '" "iParticleSystemBase const *""'"); 
@@ -38223,7 +38330,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemBase_SetTransformMode(PyObject *SWIGUN
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleSystemBase_SetTransformMode",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemBase_SetTransformMode",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystemBase_SetTransformMode" "', argument " "1"" of type '" "iParticleSystemBase *""'"); 
@@ -38250,7 +38357,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemBase_GetTransformMode(PyObject *SWIGUN
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleSystemBase_GetTransformMode",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemBase_GetTransformMode",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystemBase_GetTransformMode" "', argument " "1"" of type '" "iParticleSystemBase const *""'"); 
@@ -38275,7 +38382,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemBase_SetUseIndividualSize(PyObject *SW
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleSystemBase_SetUseIndividualSize",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemBase_SetUseIndividualSize",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystemBase_SetUseIndividualSize" "', argument " "1"" of type '" "iParticleSystemBase *""'"); 
@@ -38302,7 +38409,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemBase_GetUseIndividualSize(PyObject *SW
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleSystemBase_GetUseIndividualSize",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemBase_GetUseIndividualSize",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystemBase_GetUseIndividualSize" "', argument " "1"" of type '" "iParticleSystemBase const *""'"); 
@@ -38327,7 +38434,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemBase_SetParticleSize(PyObject *SWIGUNU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleSystemBase_SetParticleSize",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemBase_SetParticleSize",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystemBase_SetParticleSize" "', argument " "1"" of type '" "iParticleSystemBase *""'"); 
@@ -38357,7 +38464,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemBase_GetParticleSize(PyObject *SWIGUNU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleSystemBase_GetParticleSize",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemBase_GetParticleSize",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystemBase_GetParticleSize" "', argument " "1"" of type '" "iParticleSystemBase const *""'"); 
@@ -38385,7 +38492,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemBase_SetMinBoundingBox(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleSystemBase_SetMinBoundingBox",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemBase_SetMinBoundingBox",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystemBase_SetMinBoundingBox" "', argument " "1"" of type '" "iParticleSystemBase *""'"); 
@@ -38415,7 +38522,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemBase_GetMinBoundingBox(PyObject *SWIGU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleSystemBase_GetMinBoundingBox",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemBase_GetMinBoundingBox",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystemBase_GetMinBoundingBox" "', argument " "1"" of type '" "iParticleSystemBase const *""'"); 
@@ -38443,7 +38550,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemBase_AddEmitter(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleSystemBase_AddEmitter",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemBase_AddEmitter",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystemBase_AddEmitter" "', argument " "1"" of type '" "iParticleSystemBase *""'"); 
@@ -38474,7 +38581,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemBase_GetEmitter(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleSystemBase_GetEmitter",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemBase_GetEmitter",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystemBase_GetEmitter" "', argument " "1"" of type '" "iParticleSystemBase const *""'"); 
@@ -38504,7 +38611,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemBase_RemoveEmitter(PyObject *SWIGUNUSE
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleSystemBase_RemoveEmitter",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemBase_RemoveEmitter",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystemBase_RemoveEmitter" "', argument " "1"" of type '" "iParticleSystemBase *""'"); 
@@ -38531,7 +38638,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemBase_GetEmitterCount(PyObject *SWIGUNU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleSystemBase_GetEmitterCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemBase_GetEmitterCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystemBase_GetEmitterCount" "', argument " "1"" of type '" "iParticleSystemBase const *""'"); 
@@ -38556,7 +38663,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemBase_AddEffector(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleSystemBase_AddEffector",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemBase_AddEffector",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystemBase_AddEffector" "', argument " "1"" of type '" "iParticleSystemBase *""'"); 
@@ -38587,7 +38694,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemBase_GetEffector(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleSystemBase_GetEffector",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemBase_GetEffector",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystemBase_GetEffector" "', argument " "1"" of type '" "iParticleSystemBase const *""'"); 
@@ -38617,7 +38724,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemBase_RemoveEffector(PyObject *SWIGUNUS
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleSystemBase_RemoveEffector",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemBase_RemoveEffector",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystemBase_RemoveEffector" "', argument " "1"" of type '" "iParticleSystemBase *""'"); 
@@ -38644,7 +38751,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemBase_GetEffectorCount(PyObject *SWIGUN
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleSystemBase_GetEffectorCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemBase_GetEffectorCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystemBase_GetEffectorCount" "', argument " "1"" of type '" "iParticleSystemBase const *""'"); 
@@ -38662,7 +38769,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemBase_scfGetVersion(PyObject *SWIGUNUSE
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iParticleSystemBase_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemBase_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iParticleSystemBase_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -38678,7 +38785,7 @@ SWIGINTERN PyObject *_wrap_delete_iParticleSystemBase(PyObject *SWIGUNUSEDPARM(s
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iParticleSystemBase",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iParticleSystemBase",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemBase, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iParticleSystemBase" "', argument " "1"" of type '" "iParticleSystemBase *""'"); 
@@ -38695,7 +38802,7 @@ fail:
 
 SWIGINTERN PyObject *iParticleSystemBase_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iParticleSystemBase, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -38711,7 +38818,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemFactory_SetDeepCreation(PyObject *SWIG
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleSystemFactory_SetDeepCreation",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemFactory_SetDeepCreation",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystemFactory_SetDeepCreation" "', argument " "1"" of type '" "iParticleSystemFactory *""'"); 
@@ -38738,7 +38845,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemFactory_GetDeepCreation(PyObject *SWIG
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleSystemFactory_GetDeepCreation",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemFactory_GetDeepCreation",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystemFactory_GetDeepCreation" "', argument " "1"" of type '" "iParticleSystemFactory const *""'"); 
@@ -38756,7 +38863,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystemFactory_scfGetVersion(PyObject *SWIGUN
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iParticleSystemFactory_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystemFactory_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iParticleSystemFactory_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -38772,7 +38879,7 @@ SWIGINTERN PyObject *_wrap_delete_iParticleSystemFactory(PyObject *SWIGUNUSEDPAR
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iParticleSystemFactory",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iParticleSystemFactory",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystemFactory, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iParticleSystemFactory" "', argument " "1"" of type '" "iParticleSystemFactory *""'"); 
@@ -38789,7 +38896,7 @@ fail:
 
 SWIGINTERN PyObject *iParticleSystemFactory_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iParticleSystemFactory, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -38802,7 +38909,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystem_GetParticleCount(PyObject *SWIGUNUSED
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleSystem_GetParticleCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystem_GetParticleCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystem_GetParticleCount" "', argument " "1"" of type '" "iParticleSystem const *""'"); 
@@ -38828,7 +38935,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystem_GetParticle(PyObject *SWIGUNUSEDPARM(
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleSystem_GetParticle",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystem_GetParticle",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystem_GetParticle" "', argument " "1"" of type '" "iParticleSystem *""'"); 
@@ -38859,7 +38966,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystem_GetParticleAux(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleSystem_GetParticleAux",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystem_GetParticleAux",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystem_GetParticleAux" "', argument " "1"" of type '" "iParticleSystem *""'"); 
@@ -38890,7 +38997,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystem_LockForExternalControl(PyObject *SWIG
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleSystem_LockForExternalControl",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystem_LockForExternalControl",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystem_LockForExternalControl" "', argument " "1"" of type '" "iParticleSystem *""'"); 
@@ -38920,7 +39027,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystem_Advance(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleSystem_Advance",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystem_Advance",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleSystem_Advance" "', argument " "1"" of type '" "iParticleSystem *""'"); 
@@ -38943,7 +39050,7 @@ SWIGINTERN PyObject *_wrap_iParticleSystem_scfGetVersion(PyObject *SWIGUNUSEDPAR
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iParticleSystem_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleSystem_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iParticleSystem_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -38959,7 +39066,7 @@ SWIGINTERN PyObject *_wrap_delete_iParticleSystem(PyObject *SWIGUNUSEDPARM(self)
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iParticleSystem",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iParticleSystem",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleSystem, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iParticleSystem" "', argument " "1"" of type '" "iParticleSystem *""'"); 
@@ -38976,7 +39083,7 @@ fail:
 
 SWIGINTERN PyObject *iParticleSystem_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iParticleSystem, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -38992,7 +39099,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterBase_SetPosition(PyObject *SWI
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleBuiltinEmitterBase_SetPosition",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterBase_SetPosition",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEmitterBase_SetPosition" "', argument " "1"" of type '" "iParticleBuiltinEmitterBase *""'"); 
@@ -39022,7 +39129,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterBase_GetPosition(PyObject *SWI
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleBuiltinEmitterBase_GetPosition",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterBase_GetPosition",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEmitterBase_GetPosition" "', argument " "1"" of type '" "iParticleBuiltinEmitterBase const *""'"); 
@@ -39050,7 +39157,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterBase_SetParticlePlacement(PyOb
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleBuiltinEmitterBase_SetParticlePlacement",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterBase_SetParticlePlacement",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEmitterBase_SetParticlePlacement" "', argument " "1"" of type '" "iParticleBuiltinEmitterBase *""'"); 
@@ -39077,7 +39184,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterBase_GetParticlePlacement(PyOb
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleBuiltinEmitterBase_GetParticlePlacement",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterBase_GetParticlePlacement",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEmitterBase_GetParticlePlacement" "', argument " "1"" of type '" "iParticleBuiltinEmitterBase const *""'"); 
@@ -39102,7 +39209,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterBase_SetUniformVelocity(PyObje
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleBuiltinEmitterBase_SetUniformVelocity",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterBase_SetUniformVelocity",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEmitterBase_SetUniformVelocity" "', argument " "1"" of type '" "iParticleBuiltinEmitterBase *""'"); 
@@ -39129,7 +39236,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterBase_GetUniformVelocity(PyObje
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleBuiltinEmitterBase_GetUniformVelocity",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterBase_GetUniformVelocity",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEmitterBase_GetUniformVelocity" "', argument " "1"" of type '" "iParticleBuiltinEmitterBase const *""'"); 
@@ -39158,7 +39265,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterBase_SetInitialVelocity(PyObje
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iParticleBuiltinEmitterBase_SetInitialVelocity",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterBase_SetInitialVelocity",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEmitterBase_SetInitialVelocity" "', argument " "1"" of type '" "iParticleBuiltinEmitterBase *""'"); 
@@ -39203,7 +39310,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterBase_GetInitialVelocity(PyObje
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iParticleBuiltinEmitterBase_GetInitialVelocity",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterBase_GetInitialVelocity",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterBase, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEmitterBase_GetInitialVelocity" "', argument " "1"" of type '" "iParticleBuiltinEmitterBase const *""'"); 
@@ -39237,7 +39344,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterBase_scfGetVersion(PyObject *S
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iParticleBuiltinEmitterBase_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterBase_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iParticleBuiltinEmitterBase_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -39253,7 +39360,7 @@ SWIGINTERN PyObject *_wrap_delete_iParticleBuiltinEmitterBase(PyObject *SWIGUNUS
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iParticleBuiltinEmitterBase",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iParticleBuiltinEmitterBase",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterBase, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iParticleBuiltinEmitterBase" "', argument " "1"" of type '" "iParticleBuiltinEmitterBase *""'"); 
@@ -39270,7 +39377,7 @@ fail:
 
 SWIGINTERN PyObject *iParticleBuiltinEmitterBase_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iParticleBuiltinEmitterBase, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -39286,7 +39393,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterSphere_SetRadius(PyObject *SWI
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleBuiltinEmitterSphere_SetRadius",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterSphere_SetRadius",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterSphere, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEmitterSphere_SetRadius" "', argument " "1"" of type '" "iParticleBuiltinEmitterSphere *""'"); 
@@ -39313,7 +39420,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterSphere_GetRadius(PyObject *SWI
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleBuiltinEmitterSphere_GetRadius",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterSphere_GetRadius",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterSphere, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEmitterSphere_GetRadius" "', argument " "1"" of type '" "iParticleBuiltinEmitterSphere const *""'"); 
@@ -39331,7 +39438,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterSphere_scfGetVersion(PyObject 
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iParticleBuiltinEmitterSphere_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterSphere_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iParticleBuiltinEmitterSphere_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -39347,7 +39454,7 @@ SWIGINTERN PyObject *_wrap_delete_iParticleBuiltinEmitterSphere(PyObject *SWIGUN
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iParticleBuiltinEmitterSphere",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iParticleBuiltinEmitterSphere",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterSphere, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iParticleBuiltinEmitterSphere" "', argument " "1"" of type '" "iParticleBuiltinEmitterSphere *""'"); 
@@ -39364,7 +39471,7 @@ fail:
 
 SWIGINTERN PyObject *iParticleBuiltinEmitterSphere_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iParticleBuiltinEmitterSphere, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -39380,7 +39487,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterCone_SetExtent(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleBuiltinEmitterCone_SetExtent",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterCone_SetExtent",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterCone, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEmitterCone_SetExtent" "', argument " "1"" of type '" "iParticleBuiltinEmitterCone *""'"); 
@@ -39410,7 +39517,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterCone_GetExtent(PyObject *SWIGU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleBuiltinEmitterCone_GetExtent",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterCone_GetExtent",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterCone, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEmitterCone_GetExtent" "', argument " "1"" of type '" "iParticleBuiltinEmitterCone const *""'"); 
@@ -39438,7 +39545,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterCone_SetConeAngle(PyObject *SW
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleBuiltinEmitterCone_SetConeAngle",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterCone_SetConeAngle",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterCone, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEmitterCone_SetConeAngle" "', argument " "1"" of type '" "iParticleBuiltinEmitterCone *""'"); 
@@ -39465,7 +39572,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterCone_GetConeAngle(PyObject *SW
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleBuiltinEmitterCone_GetConeAngle",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterCone_GetConeAngle",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterCone, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEmitterCone_GetConeAngle" "', argument " "1"" of type '" "iParticleBuiltinEmitterCone const *""'"); 
@@ -39483,7 +39590,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterCone_scfGetVersion(PyObject *S
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iParticleBuiltinEmitterCone_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterCone_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iParticleBuiltinEmitterCone_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -39499,7 +39606,7 @@ SWIGINTERN PyObject *_wrap_delete_iParticleBuiltinEmitterCone(PyObject *SWIGUNUS
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iParticleBuiltinEmitterCone",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iParticleBuiltinEmitterCone",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterCone, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iParticleBuiltinEmitterCone" "', argument " "1"" of type '" "iParticleBuiltinEmitterCone *""'"); 
@@ -39516,7 +39623,7 @@ fail:
 
 SWIGINTERN PyObject *iParticleBuiltinEmitterCone_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iParticleBuiltinEmitterCone, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -39532,7 +39639,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterBox_SetBox(PyObject *SWIGUNUSE
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleBuiltinEmitterBox_SetBox",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterBox_SetBox",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterBox, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEmitterBox_SetBox" "', argument " "1"" of type '" "iParticleBuiltinEmitterBox *""'"); 
@@ -39562,7 +39669,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterBox_GetBox(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleBuiltinEmitterBox_GetBox",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterBox_GetBox",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterBox, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEmitterBox_GetBox" "', argument " "1"" of type '" "iParticleBuiltinEmitterBox const *""'"); 
@@ -39583,7 +39690,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterBox_scfGetVersion(PyObject *SW
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iParticleBuiltinEmitterBox_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterBox_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iParticleBuiltinEmitterBox_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -39599,7 +39706,7 @@ SWIGINTERN PyObject *_wrap_delete_iParticleBuiltinEmitterBox(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iParticleBuiltinEmitterBox",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iParticleBuiltinEmitterBox",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterBox, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iParticleBuiltinEmitterBox" "', argument " "1"" of type '" "iParticleBuiltinEmitterBox *""'"); 
@@ -39616,7 +39723,7 @@ fail:
 
 SWIGINTERN PyObject *iParticleBuiltinEmitterBox_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iParticleBuiltinEmitterBox, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -39632,7 +39739,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterCylinder_SetRadius(PyObject *S
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleBuiltinEmitterCylinder_SetRadius",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterCylinder_SetRadius",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterCylinder, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEmitterCylinder_SetRadius" "', argument " "1"" of type '" "iParticleBuiltinEmitterCylinder *""'"); 
@@ -39659,7 +39766,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterCylinder_GetRadius(PyObject *S
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleBuiltinEmitterCylinder_GetRadius",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterCylinder_GetRadius",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterCylinder, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEmitterCylinder_GetRadius" "', argument " "1"" of type '" "iParticleBuiltinEmitterCylinder const *""'"); 
@@ -39684,7 +39791,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterCylinder_SetExtent(PyObject *S
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleBuiltinEmitterCylinder_SetExtent",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterCylinder_SetExtent",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterCylinder, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEmitterCylinder_SetExtent" "', argument " "1"" of type '" "iParticleBuiltinEmitterCylinder *""'"); 
@@ -39714,7 +39821,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterCylinder_GetExtent(PyObject *S
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleBuiltinEmitterCylinder_GetExtent",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterCylinder_GetExtent",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterCylinder, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEmitterCylinder_GetExtent" "', argument " "1"" of type '" "iParticleBuiltinEmitterCylinder const *""'"); 
@@ -39735,7 +39842,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterCylinder_scfGetVersion(PyObjec
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iParticleBuiltinEmitterCylinder_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterCylinder_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iParticleBuiltinEmitterCylinder_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -39751,7 +39858,7 @@ SWIGINTERN PyObject *_wrap_delete_iParticleBuiltinEmitterCylinder(PyObject *SWIG
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iParticleBuiltinEmitterCylinder",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iParticleBuiltinEmitterCylinder",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterCylinder, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iParticleBuiltinEmitterCylinder" "', argument " "1"" of type '" "iParticleBuiltinEmitterCylinder *""'"); 
@@ -39768,7 +39875,7 @@ fail:
 
 SWIGINTERN PyObject *iParticleBuiltinEmitterCylinder_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iParticleBuiltinEmitterCylinder, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -39781,7 +39888,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterFactory_CreateSphere(PyObject 
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleBuiltinEmitterFactory_CreateSphere",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterFactory_CreateSphere",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEmitterFactory_CreateSphere" "', argument " "1"" of type '" "iParticleBuiltinEmitterFactory const *""'"); 
@@ -39820,7 +39927,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterFactory_CreateCone(PyObject *S
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleBuiltinEmitterFactory_CreateCone",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterFactory_CreateCone",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEmitterFactory_CreateCone" "', argument " "1"" of type '" "iParticleBuiltinEmitterFactory const *""'"); 
@@ -39859,7 +39966,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterFactory_CreateBox(PyObject *SW
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleBuiltinEmitterFactory_CreateBox",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterFactory_CreateBox",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEmitterFactory_CreateBox" "', argument " "1"" of type '" "iParticleBuiltinEmitterFactory const *""'"); 
@@ -39898,7 +40005,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterFactory_CreateCylinder(PyObjec
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleBuiltinEmitterFactory_CreateCylinder",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterFactory_CreateCylinder",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEmitterFactory_CreateCylinder" "', argument " "1"" of type '" "iParticleBuiltinEmitterFactory const *""'"); 
@@ -39933,7 +40040,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterFactory_scfGetVersion(PyObject
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iParticleBuiltinEmitterFactory_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEmitterFactory_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iParticleBuiltinEmitterFactory_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -39949,7 +40056,7 @@ SWIGINTERN PyObject *_wrap_delete_iParticleBuiltinEmitterFactory(PyObject *SWIGU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iParticleBuiltinEmitterFactory",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iParticleBuiltinEmitterFactory",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEmitterFactory, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iParticleBuiltinEmitterFactory" "', argument " "1"" of type '" "iParticleBuiltinEmitterFactory *""'"); 
@@ -39966,7 +40073,7 @@ fail:
 
 SWIGINTERN PyObject *iParticleBuiltinEmitterFactory_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iParticleBuiltinEmitterFactory, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -39982,7 +40089,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorForce_SetAcceleration(PyObjec
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleBuiltinEffectorForce_SetAcceleration",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorForce_SetAcceleration",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorForce, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorForce_SetAcceleration" "', argument " "1"" of type '" "iParticleBuiltinEffectorForce *""'"); 
@@ -40012,7 +40119,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorForce_GetAcceleration(PyObjec
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleBuiltinEffectorForce_GetAcceleration",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorForce_GetAcceleration",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorForce, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorForce_GetAcceleration" "', argument " "1"" of type '" "iParticleBuiltinEffectorForce const *""'"); 
@@ -40040,7 +40147,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorForce_SetForce(PyObject *SWIG
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleBuiltinEffectorForce_SetForce",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorForce_SetForce",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorForce, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorForce_SetForce" "', argument " "1"" of type '" "iParticleBuiltinEffectorForce *""'"); 
@@ -40070,7 +40177,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorForce_GetForce(PyObject *SWIG
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleBuiltinEffectorForce_GetForce",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorForce_GetForce",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorForce, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorForce_GetForce" "', argument " "1"" of type '" "iParticleBuiltinEffectorForce const *""'"); 
@@ -40098,7 +40205,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorForce_SetRandomAcceleration(P
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleBuiltinEffectorForce_SetRandomAcceleration",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorForce_SetRandomAcceleration",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorForce, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorForce_SetRandomAcceleration" "', argument " "1"" of type '" "iParticleBuiltinEffectorForce *""'"); 
@@ -40128,7 +40235,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorForce_GetRandomAcceleration(P
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleBuiltinEffectorForce_GetRandomAcceleration",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorForce_GetRandomAcceleration",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorForce, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorForce_GetRandomAcceleration" "', argument " "1"" of type '" "iParticleBuiltinEffectorForce const *""'"); 
@@ -40149,7 +40256,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorForce_scfGetVersion(PyObject 
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iParticleBuiltinEffectorForce_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorForce_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iParticleBuiltinEffectorForce_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -40165,7 +40272,7 @@ SWIGINTERN PyObject *_wrap_delete_iParticleBuiltinEffectorForce(PyObject *SWIGUN
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iParticleBuiltinEffectorForce",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iParticleBuiltinEffectorForce",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorForce, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iParticleBuiltinEffectorForce" "', argument " "1"" of type '" "iParticleBuiltinEffectorForce *""'"); 
@@ -40182,7 +40289,7 @@ fail:
 
 SWIGINTERN PyObject *iParticleBuiltinEffectorForce_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iParticleBuiltinEffectorForce, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -40203,7 +40310,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorLinColor_AddColor(PyObject *S
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iParticleBuiltinEffectorLinColor_AddColor",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorLinColor_AddColor",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorLinColor, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorLinColor_AddColor" "', argument " "1"" of type '" "iParticleBuiltinEffectorLinColor *""'"); 
@@ -40245,7 +40352,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorLinColor_SetColor(PyObject *S
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iParticleBuiltinEffectorLinColor_SetColor",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorLinColor_SetColor",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorLinColor, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorLinColor_SetColor" "', argument " "1"" of type '" "iParticleBuiltinEffectorLinColor *""'"); 
@@ -40291,7 +40398,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorLinColor_GetColor(PyObject *S
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:iParticleBuiltinEffectorLinColor_GetColor",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorLinColor_GetColor",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorLinColor, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorLinColor_GetColor" "', argument " "1"" of type '" "iParticleBuiltinEffectorLinColor const *""'"); 
@@ -40334,7 +40441,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorLinColor_GetColorCount(PyObje
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleBuiltinEffectorLinColor_GetColorCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorLinColor_GetColorCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorLinColor, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorLinColor_GetColorCount" "', argument " "1"" of type '" "iParticleBuiltinEffectorLinColor const *""'"); 
@@ -40352,7 +40459,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorLinColor_scfGetVersion(PyObje
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iParticleBuiltinEffectorLinColor_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorLinColor_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iParticleBuiltinEffectorLinColor_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -40368,7 +40475,7 @@ SWIGINTERN PyObject *_wrap_delete_iParticleBuiltinEffectorLinColor(PyObject *SWI
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iParticleBuiltinEffectorLinColor",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iParticleBuiltinEffectorLinColor",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorLinColor, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iParticleBuiltinEffectorLinColor" "', argument " "1"" of type '" "iParticleBuiltinEffectorLinColor *""'"); 
@@ -40385,7 +40492,7 @@ fail:
 
 SWIGINTERN PyObject *iParticleBuiltinEffectorLinColor_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iParticleBuiltinEffectorLinColor, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -40401,7 +40508,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorVelocityField_SetType(PyObjec
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleBuiltinEffectorVelocityField_SetType",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorVelocityField_SetType",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorVelocityField, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorVelocityField_SetType" "', argument " "1"" of type '" "iParticleBuiltinEffectorVelocityField *""'"); 
@@ -40428,7 +40535,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorVelocityField_GetType(PyObjec
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleBuiltinEffectorVelocityField_GetType",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorVelocityField_GetType",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorVelocityField, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorVelocityField_GetType" "', argument " "1"" of type '" "iParticleBuiltinEffectorVelocityField const *""'"); 
@@ -40457,7 +40564,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorVelocityField_SetFParameter(P
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iParticleBuiltinEffectorVelocityField_SetFParameter",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorVelocityField_SetFParameter",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorVelocityField, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorVelocityField_SetFParameter" "', argument " "1"" of type '" "iParticleBuiltinEffectorVelocityField *""'"); 
@@ -40493,7 +40600,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorVelocityField_GetFParameter(P
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleBuiltinEffectorVelocityField_GetFParameter",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorVelocityField_GetFParameter",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorVelocityField, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorVelocityField_GetFParameter" "', argument " "1"" of type '" "iParticleBuiltinEffectorVelocityField const *""'"); 
@@ -40520,7 +40627,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorVelocityField_GetFParameterCo
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleBuiltinEffectorVelocityField_GetFParameterCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorVelocityField_GetFParameterCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorVelocityField, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorVelocityField_GetFParameterCount" "', argument " "1"" of type '" "iParticleBuiltinEffectorVelocityField const *""'"); 
@@ -40549,7 +40656,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorVelocityField_SetVParameter(P
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iParticleBuiltinEffectorVelocityField_SetVParameter",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorVelocityField_SetVParameter",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorVelocityField, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorVelocityField_SetVParameter" "', argument " "1"" of type '" "iParticleBuiltinEffectorVelocityField *""'"); 
@@ -40588,7 +40695,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorVelocityField_GetVParameter(P
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iParticleBuiltinEffectorVelocityField_GetVParameter",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorVelocityField_GetVParameter",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorVelocityField, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorVelocityField_GetVParameter" "', argument " "1"" of type '" "iParticleBuiltinEffectorVelocityField const *""'"); 
@@ -40615,7 +40722,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorVelocityField_GetVParameterCo
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleBuiltinEffectorVelocityField_GetVParameterCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorVelocityField_GetVParameterCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorVelocityField, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorVelocityField_GetVParameterCount" "', argument " "1"" of type '" "iParticleBuiltinEffectorVelocityField const *""'"); 
@@ -40636,7 +40743,7 @@ SWIGINTERN PyObject *_wrap_delete_iParticleBuiltinEffectorVelocityField(PyObject
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iParticleBuiltinEffectorVelocityField",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iParticleBuiltinEffectorVelocityField",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorVelocityField, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iParticleBuiltinEffectorVelocityField" "', argument " "1"" of type '" "iParticleBuiltinEffectorVelocityField *""'"); 
@@ -40653,7 +40760,7 @@ fail:
 
 SWIGINTERN PyObject *iParticleBuiltinEffectorVelocityField_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iParticleBuiltinEffectorVelocityField, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -40666,7 +40773,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorFactory_CreateForce(PyObject 
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleBuiltinEffectorFactory_CreateForce",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorFactory_CreateForce",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorFactory_CreateForce" "', argument " "1"" of type '" "iParticleBuiltinEffectorFactory const *""'"); 
@@ -40705,7 +40812,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorFactory_CreateLinColor(PyObje
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleBuiltinEffectorFactory_CreateLinColor",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorFactory_CreateLinColor",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorFactory_CreateLinColor" "', argument " "1"" of type '" "iParticleBuiltinEffectorFactory const *""'"); 
@@ -40744,7 +40851,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorFactory_CreateVelocityField(P
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iParticleBuiltinEffectorFactory_CreateVelocityField",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorFactory_CreateVelocityField",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iParticleBuiltinEffectorFactory_CreateVelocityField" "', argument " "1"" of type '" "iParticleBuiltinEffectorFactory const *""'"); 
@@ -40762,7 +40869,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorFactory_scfGetVersion(PyObjec
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iParticleBuiltinEffectorFactory_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iParticleBuiltinEffectorFactory_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iParticleBuiltinEffectorFactory_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -40778,7 +40885,7 @@ SWIGINTERN PyObject *_wrap_delete_iParticleBuiltinEffectorFactory(PyObject *SWIG
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iParticleBuiltinEffectorFactory",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iParticleBuiltinEffectorFactory",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iParticleBuiltinEffectorFactory, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iParticleBuiltinEffectorFactory" "', argument " "1"" of type '" "iParticleBuiltinEffectorFactory *""'"); 
@@ -40795,7 +40902,7 @@ fail:
 
 SWIGINTERN PyObject *iParticleBuiltinEffectorFactory_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iParticleBuiltinEffectorFactory, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -40899,6 +41006,10 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iGeneralFactoryState_GetNormalByIndex", _wrap_iGeneralFactoryState_GetNormalByIndex, METH_VARARGS, NULL},
 	 { (char *)"iGeneralFactoryState_GetTriangleByIndex", _wrap_iGeneralFactoryState_GetTriangleByIndex, METH_VARARGS, NULL},
 	 { (char *)"iGeneralFactoryState_GetColorByIndex", _wrap_iGeneralFactoryState_GetColorByIndex, METH_VARARGS, NULL},
+	 { (char *)"iGeneralFactoryState_GetVerticesAsBuffer", _wrap_iGeneralFactoryState_GetVerticesAsBuffer, METH_VARARGS, NULL},
+	 { (char *)"iGeneralFactoryState_GetNormalsAsBuffer", _wrap_iGeneralFactoryState_GetNormalsAsBuffer, METH_VARARGS, NULL},
+	 { (char *)"iGeneralFactoryState_GetColorsAsBuffer", _wrap_iGeneralFactoryState_GetColorsAsBuffer, METH_VARARGS, NULL},
+	 { (char *)"iGeneralFactoryState_GetTrianglesAsBuffer", _wrap_iGeneralFactoryState_GetTrianglesAsBuffer, METH_VARARGS, NULL},
 	 { (char *)"iGeneralFactoryState_scfGetVersion", _wrap_iGeneralFactoryState_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iGeneralFactoryState", _wrap_delete_iGeneralFactoryState, METH_VARARGS, NULL},
 	 { (char *)"iGeneralFactoryState_swigregister", iGeneralFactoryState_swigregister, METH_VARARGS, NULL},
@@ -42767,6 +42878,9 @@ static void *_p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_
 static void *_p_csArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated(void *x) {
     return (void *)((CS::Memory::CustomAllocated *)  ((csArray<int > *) x));
 }
+static void *_p_csTriangleMeshEdgeTo_p_CS__Memory__CustomAllocated(void *x) {
+    return (void *)((CS::Memory::CustomAllocated *)  ((csTriangleMeshEdge *) x));
+}
 static void *_p_iArrayChangeElementsTcsSprite2DVertex_tTo_p_iArrayReadOnlyTcsSprite2DVertex_t(void *x) {
     return (void *)((iArrayReadOnly<csSprite2DVertex > *)  ((iArrayChangeElements<csSprite2DVertex > *) x));
 }
@@ -42820,6 +42934,7 @@ static swig_type_info _swigt__p_CS__Memory__AllocatorMalloc = {"_p_CS__Memory__A
 static swig_type_info _swigt__p_CS__Memory__CustomAllocated = {"_p_CS__Memory__CustomAllocated", "CS::Memory::CustomAllocated *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t = {"_p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_csArrayTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t = {"_p_csArrayTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t", 0, 0, 0, 0, 0};
+static swig_type_info _swigt__p_csTriangleMeshEdge = {"_p_csTriangleMeshEdge", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_csArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t = {"_p_csArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_CalAnimationCallback = {"_p_CalAnimationCallback", "CalAnimationCallback *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CalCoreModel = {"_p_CalCoreModel", "CalCoreModel *", 0, 0, (void*)0, 0};
@@ -43220,6 +43335,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_csTriangle,
   &_swigt__p_csTriangleMesh,
   &_swigt__p_csTriangleMeshBox,
+  &_swigt__p_csTriangleMeshEdge,
   &_swigt__p_csTriangleMeshPointer,
   &_swigt__p_csTriangleMinMax,
   &_swigt__p_csVector2,
@@ -43479,8 +43595,9 @@ static swig_cast_info _swigc__p_CS__Graphics__RenderMeshModes[] = {  {&_swigt__p
 static swig_cast_info _swigc__p_CS__Memory__AllocatorMalloc[] = {  {&_swigt__p_CS__Memory__AllocatorMalloc, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t[] = {{&_swigt__p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csArrayTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t[] = {{&_swigt__p_csArrayTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_csTriangleMeshEdge[] = {{&_swigt__p_csTriangleMeshEdge, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t[] = {{&_swigt__p_csArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_CS__Memory__CustomAllocated[] = {  {&_swigt__p_CS__Memory__CustomAllocated, 0, 0, 0},  {&_swigt__p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_CS__Memory__CustomAllocated[] = {  {&_swigt__p_CS__Memory__CustomAllocated, 0, 0, 0},  {&_swigt__p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csTriangleMeshEdge, _p_csTriangleMeshEdgeTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CalAnimationCallback[] = {  {&_swigt__p_CalAnimationCallback, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CalCoreModel[] = {  {&_swigt__p_CalCoreModel, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CalModel[] = {  {&_swigt__p_CalModel, 0, 0, 0},{0, 0, 0, 0}};
@@ -43880,6 +43997,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_csTriangle,
   _swigc__p_csTriangleMesh,
   _swigc__p_csTriangleMeshBox,
+  _swigc__p_csTriangleMeshEdge,
   _swigc__p_csTriangleMeshPointer,
   _swigc__p_csTriangleMinMax,
   _swigc__p_csVector2,

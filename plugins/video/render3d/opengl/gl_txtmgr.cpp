@@ -59,6 +59,9 @@ csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
   /*if (G3D->ext->CS_GL_ARB_texture_float)
     G3D->ext->InitGL_ARB_half_float_pixel();*/
 
+  G3D->ext->InitGL_ARB_pixel_buffer_object();
+  hasPBO = G3D->ext->CS_GL_ARB_pixel_buffer_object;
+
 #define CS_GL_TEXTURE_FORMAT(fmt)					    \
   textureFormats.Put (#fmt, TextureFormat (fmt, true));		
 #define CS_GL_TEXTURE_FORMAT_EXT(fmt, Ext)				    \

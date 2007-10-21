@@ -2,7 +2,6 @@
 # Version 1.3.31
 #
 # Don't modify this file, modify the SWIG interface instead.
-# This file is compatible with both classic and new-style classes.
 
 import _isndsys
 import new
@@ -48,6 +47,16 @@ except AttributeError:
 del types
 
 
+def _swig_setattr_nondynamic_method(set):
+    def set_attr(self,name,value):
+        if (name == "thisown"): return self.this.own(value)
+        if hasattr(self,name) or (name == "this"):
+            set(self,name,value)
+        else:
+            raise AttributeError("You cannot add attributes to %s" % self)
+    return set_attr
+
+
 import core
 _SetSCFPointer = _isndsys._SetSCFPointer
 _GetSCFPointer = _isndsys._GetSCFPointer
@@ -58,12 +67,7 @@ CSMutableArrayHelper = core.CSMutableArrayHelper
 
 CS_SNDSYS_DATA_UNKNOWN_SIZE = _isndsys.CS_SNDSYS_DATA_UNKNOWN_SIZE
 class iSndSysData(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysData, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysData, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetFormat(*args): return _isndsys.iSndSysData_GetFormat(*args)
@@ -72,50 +76,26 @@ class iSndSysData(core.iBase):
     def CreateStream(*args): return _isndsys.iSndSysData_CreateStream(*args)
     def SetDescription(*args): return _isndsys.iSndSysData_SetDescription(*args)
     def GetDescription(*args): return _isndsys.iSndSysData_GetDescription(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _isndsys.iSndSysData_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_isndsys.iSndSysData_scfGetVersion)
+    scfGetVersion = staticmethod(_isndsys.iSndSysData_scfGetVersion)
     __swig_destroy__ = _isndsys.delete_iSndSysData
     __del__ = lambda self : None;
 iSndSysData_swigregister = _isndsys.iSndSysData_swigregister
 iSndSysData_swigregister(iSndSysData)
 iSndSysData_scfGetVersion = _isndsys.iSndSysData_scfGetVersion
 
-class iSndSysSoftwareFilter3DProperties(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysSoftwareFilter3DProperties, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysSoftwareFilter3DProperties, name)
+class iSndSysSoftwareFilter3DProperties(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["clean_buffer"] = _isndsys.iSndSysSoftwareFilter3DProperties_clean_buffer_set
-    __swig_getmethods__["clean_buffer"] = _isndsys.iSndSysSoftwareFilter3DProperties_clean_buffer_get
-    if _newclass:clean_buffer = _swig_property(_isndsys.iSndSysSoftwareFilter3DProperties_clean_buffer_get, _isndsys.iSndSysSoftwareFilter3DProperties_clean_buffer_set)
-    __swig_setmethods__["work_buffer"] = _isndsys.iSndSysSoftwareFilter3DProperties_work_buffer_set
-    __swig_getmethods__["work_buffer"] = _isndsys.iSndSysSoftwareFilter3DProperties_work_buffer_get
-    if _newclass:work_buffer = _swig_property(_isndsys.iSndSysSoftwareFilter3DProperties_work_buffer_get, _isndsys.iSndSysSoftwareFilter3DProperties_work_buffer_set)
-    __swig_setmethods__["buffer_samples"] = _isndsys.iSndSysSoftwareFilter3DProperties_buffer_samples_set
-    __swig_getmethods__["buffer_samples"] = _isndsys.iSndSysSoftwareFilter3DProperties_buffer_samples_get
-    if _newclass:buffer_samples = _swig_property(_isndsys.iSndSysSoftwareFilter3DProperties_buffer_samples_get, _isndsys.iSndSysSoftwareFilter3DProperties_buffer_samples_set)
-    __swig_setmethods__["source_parameters"] = _isndsys.iSndSysSoftwareFilter3DProperties_source_parameters_set
-    __swig_getmethods__["source_parameters"] = _isndsys.iSndSysSoftwareFilter3DProperties_source_parameters_get
-    if _newclass:source_parameters = _swig_property(_isndsys.iSndSysSoftwareFilter3DProperties_source_parameters_get, _isndsys.iSndSysSoftwareFilter3DProperties_source_parameters_set)
-    __swig_setmethods__["listener_parameters"] = _isndsys.iSndSysSoftwareFilter3DProperties_listener_parameters_set
-    __swig_getmethods__["listener_parameters"] = _isndsys.iSndSysSoftwareFilter3DProperties_listener_parameters_get
-    if _newclass:listener_parameters = _swig_property(_isndsys.iSndSysSoftwareFilter3DProperties_listener_parameters_get, _isndsys.iSndSysSoftwareFilter3DProperties_listener_parameters_set)
-    __swig_setmethods__["sound_format"] = _isndsys.iSndSysSoftwareFilter3DProperties_sound_format_set
-    __swig_getmethods__["sound_format"] = _isndsys.iSndSysSoftwareFilter3DProperties_sound_format_get
-    if _newclass:sound_format = _swig_property(_isndsys.iSndSysSoftwareFilter3DProperties_sound_format_get, _isndsys.iSndSysSoftwareFilter3DProperties_sound_format_set)
-    __swig_setmethods__["closest_speaker_distance"] = _isndsys.iSndSysSoftwareFilter3DProperties_closest_speaker_distance_set
-    __swig_getmethods__["closest_speaker_distance"] = _isndsys.iSndSysSoftwareFilter3DProperties_closest_speaker_distance_get
-    if _newclass:closest_speaker_distance = _swig_property(_isndsys.iSndSysSoftwareFilter3DProperties_closest_speaker_distance_get, _isndsys.iSndSysSoftwareFilter3DProperties_closest_speaker_distance_set)
-    __swig_setmethods__["speaker_distance"] = _isndsys.iSndSysSoftwareFilter3DProperties_speaker_distance_set
-    __swig_getmethods__["speaker_distance"] = _isndsys.iSndSysSoftwareFilter3DProperties_speaker_distance_get
-    if _newclass:speaker_distance = _swig_property(_isndsys.iSndSysSoftwareFilter3DProperties_speaker_distance_get, _isndsys.iSndSysSoftwareFilter3DProperties_speaker_distance_set)
-    __swig_setmethods__["speaker_direction_cos"] = _isndsys.iSndSysSoftwareFilter3DProperties_speaker_direction_cos_set
-    __swig_getmethods__["speaker_direction_cos"] = _isndsys.iSndSysSoftwareFilter3DProperties_speaker_direction_cos_get
-    if _newclass:speaker_direction_cos = _swig_property(_isndsys.iSndSysSoftwareFilter3DProperties_speaker_direction_cos_get, _isndsys.iSndSysSoftwareFilter3DProperties_speaker_direction_cos_set)
-    __swig_setmethods__["channel"] = _isndsys.iSndSysSoftwareFilter3DProperties_channel_set
-    __swig_getmethods__["channel"] = _isndsys.iSndSysSoftwareFilter3DProperties_channel_get
-    if _newclass:channel = _swig_property(_isndsys.iSndSysSoftwareFilter3DProperties_channel_get, _isndsys.iSndSysSoftwareFilter3DProperties_channel_set)
+    clean_buffer = _swig_property(_isndsys.iSndSysSoftwareFilter3DProperties_clean_buffer_get, _isndsys.iSndSysSoftwareFilter3DProperties_clean_buffer_set)
+    work_buffer = _swig_property(_isndsys.iSndSysSoftwareFilter3DProperties_work_buffer_get, _isndsys.iSndSysSoftwareFilter3DProperties_work_buffer_set)
+    buffer_samples = _swig_property(_isndsys.iSndSysSoftwareFilter3DProperties_buffer_samples_get, _isndsys.iSndSysSoftwareFilter3DProperties_buffer_samples_set)
+    source_parameters = _swig_property(_isndsys.iSndSysSoftwareFilter3DProperties_source_parameters_get, _isndsys.iSndSysSoftwareFilter3DProperties_source_parameters_set)
+    listener_parameters = _swig_property(_isndsys.iSndSysSoftwareFilter3DProperties_listener_parameters_get, _isndsys.iSndSysSoftwareFilter3DProperties_listener_parameters_set)
+    sound_format = _swig_property(_isndsys.iSndSysSoftwareFilter3DProperties_sound_format_get, _isndsys.iSndSysSoftwareFilter3DProperties_sound_format_set)
+    closest_speaker_distance = _swig_property(_isndsys.iSndSysSoftwareFilter3DProperties_closest_speaker_distance_get, _isndsys.iSndSysSoftwareFilter3DProperties_closest_speaker_distance_set)
+    speaker_distance = _swig_property(_isndsys.iSndSysSoftwareFilter3DProperties_speaker_distance_get, _isndsys.iSndSysSoftwareFilter3DProperties_speaker_distance_set)
+    speaker_direction_cos = _swig_property(_isndsys.iSndSysSoftwareFilter3DProperties_speaker_direction_cos_get, _isndsys.iSndSysSoftwareFilter3DProperties_speaker_direction_cos_set)
+    channel = _swig_property(_isndsys.iSndSysSoftwareFilter3DProperties_channel_get, _isndsys.iSndSysSoftwareFilter3DProperties_channel_set)
     def __init__(self, *args): 
         this = _isndsys.new_iSndSysSoftwareFilter3DProperties(*args)
         try: self.this.append(this)
@@ -126,20 +106,14 @@ iSndSysSoftwareFilter3DProperties_swigregister = _isndsys.iSndSysSoftwareFilter3
 iSndSysSoftwareFilter3DProperties_swigregister(iSndSysSoftwareFilter3DProperties)
 
 class iSndSysSoftwareFilter3D(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysSoftwareFilter3D, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysSoftwareFilter3D, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Apply(*args): return _isndsys.iSndSysSoftwareFilter3D_Apply(*args)
     def AddSubFilter(*args): return _isndsys.iSndSysSoftwareFilter3D_AddSubFilter(*args)
     def GetSubFilter(*args): return _isndsys.iSndSysSoftwareFilter3D_GetSubFilter(*args)
     def GetPtr(*args): return _isndsys.iSndSysSoftwareFilter3D_GetPtr(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _isndsys.iSndSysSoftwareFilter3D_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_isndsys.iSndSysSoftwareFilter3D_scfGetVersion)
+    scfGetVersion = staticmethod(_isndsys.iSndSysSoftwareFilter3D_scfGetVersion)
     __swig_destroy__ = _isndsys.delete_iSndSysSoftwareFilter3D
     __del__ = lambda self : None;
 iSndSysSoftwareFilter3D_swigregister = _isndsys.iSndSysSoftwareFilter3D_swigregister
@@ -147,12 +121,7 @@ iSndSysSoftwareFilter3D_swigregister(iSndSysSoftwareFilter3D)
 iSndSysSoftwareFilter3D_scfGetVersion = _isndsys.iSndSysSoftwareFilter3D_scfGetVersion
 
 class iSndSysSoftwareOutputFilter(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysSoftwareOutputFilter, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysSoftwareOutputFilter, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def FormatNotify(*args): return _isndsys.iSndSysSoftwareOutputFilter_FormatNotify(*args)
@@ -166,12 +135,7 @@ SS_FILTER_LOC_RENDEROUT = _isndsys.SS_FILTER_LOC_RENDEROUT
 SS_FILTER_LOC_SOURCEOUT = _isndsys.SS_FILTER_LOC_SOURCEOUT
 SS_FILTER_LOC_SOURCEIN = _isndsys.SS_FILTER_LOC_SOURCEIN
 class iSndSysListener(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysListener, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysListener, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetDirection(*args): return _isndsys.iSndSysListener_SetDirection(*args)
@@ -182,8 +146,7 @@ class iSndSysListener(core.iBase):
     def GetPosition(*args): return _isndsys.iSndSysListener_GetPosition(*args)
     def GetDistanceFactor(*args): return _isndsys.iSndSysListener_GetDistanceFactor(*args)
     def GetRollOffFactor(*args): return _isndsys.iSndSysListener_GetRollOffFactor(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _isndsys.iSndSysListener_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_isndsys.iSndSysListener_scfGetVersion)
+    scfGetVersion = staticmethod(_isndsys.iSndSysListener_scfGetVersion)
     __swig_destroy__ = _isndsys.delete_iSndSysListener
     __del__ = lambda self : None;
 iSndSysListener_swigregister = _isndsys.iSndSysListener_swigregister
@@ -191,17 +154,11 @@ iSndSysListener_swigregister(iSndSysListener)
 iSndSysListener_scfGetVersion = _isndsys.iSndSysListener_scfGetVersion
 
 class iSndSysLoader(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysLoader, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysLoader, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def LoadSound(*args): return _isndsys.iSndSysLoader_LoadSound(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _isndsys.iSndSysLoader_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_isndsys.iSndSysLoader_scfGetVersion)
+    scfGetVersion = staticmethod(_isndsys.iSndSysLoader_scfGetVersion)
     __swig_destroy__ = _isndsys.delete_iSndSysLoader
     __del__ = lambda self : None;
 iSndSysLoader_swigregister = _isndsys.iSndSysLoader_swigregister
@@ -209,19 +166,13 @@ iSndSysLoader_swigregister(iSndSysLoader)
 iSndSysLoader_scfGetVersion = _isndsys.iSndSysLoader_scfGetVersion
 
 class iSndSysWrapper(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysWrapper, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysWrapper, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def QueryObject(*args): return _isndsys.iSndSysWrapper_QueryObject(*args)
     def GetData(*args): return _isndsys.iSndSysWrapper_GetData(*args)
     def SetData(*args): return _isndsys.iSndSysWrapper_SetData(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _isndsys.iSndSysWrapper_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_isndsys.iSndSysWrapper_scfGetVersion)
+    scfGetVersion = staticmethod(_isndsys.iSndSysWrapper_scfGetVersion)
     __swig_destroy__ = _isndsys.delete_iSndSysWrapper
     __del__ = lambda self : None;
 iSndSysWrapper_swigregister = _isndsys.iSndSysWrapper_swigregister
@@ -229,12 +180,7 @@ iSndSysWrapper_swigregister(iSndSysWrapper)
 iSndSysWrapper_scfGetVersion = _isndsys.iSndSysWrapper_scfGetVersion
 
 class iSndSysManager(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysManager, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysManager, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def CreateSound(*args): return _isndsys.iSndSysManager_CreateSound(*args)
@@ -243,8 +189,7 @@ class iSndSysManager(core.iBase):
     def GetSoundCount(*args): return _isndsys.iSndSysManager_GetSoundCount(*args)
     def GetSound(*args): return _isndsys.iSndSysManager_GetSound(*args)
     def FindSoundByName(*args): return _isndsys.iSndSysManager_FindSoundByName(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _isndsys.iSndSysManager_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_isndsys.iSndSysManager_scfGetVersion)
+    scfGetVersion = staticmethod(_isndsys.iSndSysManager_scfGetVersion)
     __swig_destroy__ = _isndsys.delete_iSndSysManager
     __del__ = lambda self : None;
 iSndSysManager_swigregister = _isndsys.iSndSysManager_swigregister
@@ -253,12 +198,7 @@ iSndSysManager_scfGetVersion = _isndsys.iSndSysManager_scfGetVersion
 
 CS_SNDSYS_SOURCE_DISTANCE_INFINITE = _isndsys.CS_SNDSYS_SOURCE_DISTANCE_INFINITE
 class iSndSysSource(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysSource, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysSource, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetVolume(*args): return _isndsys.iSndSysSource_SetVolume(*args)
@@ -267,8 +207,7 @@ class iSndSysSource(core.iBase):
     def AddOutputFilter(*args): return _isndsys.iSndSysSource_AddOutputFilter(*args)
     def RemoveOutputFilter(*args): return _isndsys.iSndSysSource_RemoveOutputFilter(*args)
     def GetPtr(*args): return _isndsys.iSndSysSource_GetPtr(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _isndsys.iSndSysSource_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_isndsys.iSndSysSource_scfGetVersion)
+    scfGetVersion = staticmethod(_isndsys.iSndSysSource_scfGetVersion)
     __swig_destroy__ = _isndsys.delete_iSndSysSource
     __del__ = lambda self : None;
 iSndSysSource_swigregister = _isndsys.iSndSysSource_swigregister
@@ -276,12 +215,7 @@ iSndSysSource_swigregister(iSndSysSource)
 iSndSysSource_scfGetVersion = _isndsys.iSndSysSource_scfGetVersion
 
 class iSndSysSourceSoftware(iSndSysSource):
-    __swig_setmethods__ = {}
-    for _s in [iSndSysSource]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysSourceSoftware, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iSndSysSource]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysSourceSoftware, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def MergeIntoBuffer(*args): return _isndsys.iSndSysSourceSoftware_MergeIntoBuffer(*args)
@@ -292,12 +226,7 @@ iSndSysSourceSoftware_swigregister = _isndsys.iSndSysSourceSoftware_swigregister
 iSndSysSourceSoftware_swigregister(iSndSysSourceSoftware)
 
 class iSndSysSourceSoftware3D(iSndSysSourceSoftware):
-    __swig_setmethods__ = {}
-    for _s in [iSndSysSourceSoftware]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysSourceSoftware3D, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iSndSysSourceSoftware]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysSourceSoftware3D, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetPosition(*args): return _isndsys.iSndSysSourceSoftware3D_SetPosition(*args)
@@ -318,24 +247,13 @@ iSndSysSourceSoftware3D_swigregister(iSndSysSourceSoftware3D)
 CSSNDSYS_SAMPLE_LITTLE_ENDIAN = _isndsys.CSSNDSYS_SAMPLE_LITTLE_ENDIAN
 CSSNDSYS_SAMPLE_BIG_ENDIAN = _isndsys.CSSNDSYS_SAMPLE_BIG_ENDIAN
 CSSNDSYS_SAMPLE_ENDIAN_MASK = _isndsys.CSSNDSYS_SAMPLE_ENDIAN_MASK
-class csSndSysSoundFormat(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csSndSysSoundFormat, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csSndSysSoundFormat, name)
+class csSndSysSoundFormat(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["Freq"] = _isndsys.csSndSysSoundFormat_Freq_set
-    __swig_getmethods__["Freq"] = _isndsys.csSndSysSoundFormat_Freq_get
-    if _newclass:Freq = _swig_property(_isndsys.csSndSysSoundFormat_Freq_get, _isndsys.csSndSysSoundFormat_Freq_set)
-    __swig_setmethods__["Bits"] = _isndsys.csSndSysSoundFormat_Bits_set
-    __swig_getmethods__["Bits"] = _isndsys.csSndSysSoundFormat_Bits_get
-    if _newclass:Bits = _swig_property(_isndsys.csSndSysSoundFormat_Bits_get, _isndsys.csSndSysSoundFormat_Bits_set)
-    __swig_setmethods__["Channels"] = _isndsys.csSndSysSoundFormat_Channels_set
-    __swig_getmethods__["Channels"] = _isndsys.csSndSysSoundFormat_Channels_get
-    if _newclass:Channels = _swig_property(_isndsys.csSndSysSoundFormat_Channels_get, _isndsys.csSndSysSoundFormat_Channels_set)
-    __swig_setmethods__["Flags"] = _isndsys.csSndSysSoundFormat_Flags_set
-    __swig_getmethods__["Flags"] = _isndsys.csSndSysSoundFormat_Flags_get
-    if _newclass:Flags = _swig_property(_isndsys.csSndSysSoundFormat_Flags_get, _isndsys.csSndSysSoundFormat_Flags_set)
+    Freq = _swig_property(_isndsys.csSndSysSoundFormat_Freq_get, _isndsys.csSndSysSoundFormat_Freq_set)
+    Bits = _swig_property(_isndsys.csSndSysSoundFormat_Bits_get, _isndsys.csSndSysSoundFormat_Bits_set)
+    Channels = _swig_property(_isndsys.csSndSysSoundFormat_Channels_get, _isndsys.csSndSysSoundFormat_Channels_set)
+    Flags = _swig_property(_isndsys.csSndSysSoundFormat_Flags_get, _isndsys.csSndSysSoundFormat_Flags_set)
     def __init__(self, *args): 
         this = _isndsys.new_csSndSysSoundFormat(*args)
         try: self.this.append(this)
@@ -353,12 +271,7 @@ CS_SND3D_DISABLE = _isndsys.CS_SND3D_DISABLE
 CS_SND3D_RELATIVE = _isndsys.CS_SND3D_RELATIVE
 CS_SND3D_ABSOLUTE = _isndsys.CS_SND3D_ABSOLUTE
 class iSndSysStream(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysStream, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysStream, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetDescription(*args): return _isndsys.iSndSysStream_GetDescription(*args)
@@ -385,8 +298,7 @@ class iSndSysStream(core.iBase):
     def RegisterCallback(*args): return _isndsys.iSndSysStream_RegisterCallback(*args)
     def UnregisterCallback(*args): return _isndsys.iSndSysStream_UnregisterCallback(*args)
     def RegisterFrameNotification(*args): return _isndsys.iSndSysStream_RegisterFrameNotification(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _isndsys.iSndSysStream_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_isndsys.iSndSysStream_scfGetVersion)
+    scfGetVersion = staticmethod(_isndsys.iSndSysStream_scfGetVersion)
     __swig_destroy__ = _isndsys.delete_iSndSysStream
     __del__ = lambda self : None;
 iSndSysStream_swigregister = _isndsys.iSndSysStream_swigregister
@@ -396,12 +308,7 @@ CS_SNDSYS_STREAM_UNKNOWN_LENGTH = cvar.CS_SNDSYS_STREAM_UNKNOWN_LENGTH
 iSndSysStream_scfGetVersion = _isndsys.iSndSysStream_scfGetVersion
 
 class iSndSysStreamCallback(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysStreamCallback, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysStreamCallback, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def StreamLoopNotification(*args): return _isndsys.iSndSysStreamCallback_StreamLoopNotification(*args)
@@ -416,12 +323,7 @@ iSndSysStreamCallback_swigregister(iSndSysStreamCallback)
 CS_SNDSYS_SOURCE_STOPPED = _isndsys.CS_SNDSYS_SOURCE_STOPPED
 CS_SNDSYS_SOURCE_PLAYING = _isndsys.CS_SNDSYS_SOURCE_PLAYING
 class iSndSysRenderer(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysRenderer, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysRenderer, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetVolume(*args): return _isndsys.iSndSysRenderer_SetVolume(*args)
@@ -433,8 +335,7 @@ class iSndSysRenderer(core.iBase):
     def GetListener(*args): return _isndsys.iSndSysRenderer_GetListener(*args)
     def RegisterCallback(*args): return _isndsys.iSndSysRenderer_RegisterCallback(*args)
     def UnregisterCallback(*args): return _isndsys.iSndSysRenderer_UnregisterCallback(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _isndsys.iSndSysRenderer_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_isndsys.iSndSysRenderer_scfGetVersion)
+    scfGetVersion = staticmethod(_isndsys.iSndSysRenderer_scfGetVersion)
     __swig_destroy__ = _isndsys.delete_iSndSysRenderer
     __del__ = lambda self : None;
 iSndSysRenderer_swigregister = _isndsys.iSndSysRenderer_swigregister
@@ -442,12 +343,7 @@ iSndSysRenderer_swigregister(iSndSysRenderer)
 iSndSysRenderer_scfGetVersion = _isndsys.iSndSysRenderer_scfGetVersion
 
 class iSndSysRendererCallback(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysRendererCallback, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysRendererCallback, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def StreamAddNotification(*args): return _isndsys.iSndSysRendererCallback_StreamAddNotification(*args)
@@ -460,12 +356,7 @@ iSndSysRendererCallback_swigregister = _isndsys.iSndSysRendererCallback_swigregi
 iSndSysRendererCallback_swigregister(iSndSysRendererCallback)
 
 class iSndSysRendererSoftware(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysRendererSoftware, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysRendererSoftware, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def AddOutputFilter(*args): return _isndsys.iSndSysRendererSoftware_AddOutputFilter(*args)
@@ -476,20 +367,14 @@ iSndSysRendererSoftware_swigregister = _isndsys.iSndSysRendererSoftware_swigregi
 iSndSysRendererSoftware_swigregister(iSndSysRendererSoftware)
 
 class iSndSysSoftwareDriver(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysSoftwareDriver, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysSoftwareDriver, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Open(*args): return _isndsys.iSndSysSoftwareDriver_Open(*args)
     def Close(*args): return _isndsys.iSndSysSoftwareDriver_Close(*args)
     def StartThread(*args): return _isndsys.iSndSysSoftwareDriver_StartThread(*args)
     def StopThread(*args): return _isndsys.iSndSysSoftwareDriver_StopThread(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _isndsys.iSndSysSoftwareDriver_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_isndsys.iSndSysSoftwareDriver_scfGetVersion)
+    scfGetVersion = staticmethod(_isndsys.iSndSysSoftwareDriver_scfGetVersion)
     __swig_destroy__ = _isndsys.delete_iSndSysSoftwareDriver
     __del__ = lambda self : None;
 iSndSysSoftwareDriver_swigregister = _isndsys.iSndSysSoftwareDriver_swigregister

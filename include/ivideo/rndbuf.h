@@ -82,7 +82,7 @@ enum csRenderBufferLockType
   CS_BUF_LOCK_NORMAL
 };
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 namespace CS
 {
@@ -97,7 +97,7 @@ namespace CS
   }
 }
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 #define CS_BUF_LOCK_NOLOCK	CS::Deprecated::CS_BUF_LOCK_NOLOCK::value
 

@@ -661,41 +661,6 @@ void csLight::CalculateLighting (iMeshWrapper *th)
   lpi->FinalizeLighting ();
 }
 
-void csLight::AddLightTag (csStringID tag)
-{
-  uint tagNum = engine->GetLightTagNumber (tag);
-  if (tagNum >= lightTags.GetSize()) lightTags.SetSize (tagNum+1);
-  lightTags.SetBit (tagNum);
-}
-
-void csLight::RemoveTag (csStringID tag)
-{
-  uint tagNum = engine->GetLightTagNumber (tag);
-  if (tagNum >= lightTags.GetSize()) return;
-  lightTags.ClearBit (tagNum);
-}
-
-bool csLight::IsTagSet (csStringID tag)
-{
-  uint tagNum = engine->GetLightTagNumber (tag);
-  if (tagNum >= lightTags.GetSize()) return false;
-  return lightTags[tagNum];
-}
-
-size_t csLight::GetTagCount ()
-{
-  return lightTags.NumBitsSet ();
-}
-
-void csLight::GetTags (csStringID* tags)
-{
-  size_t n = lightTags.NumBitsSet ();
-  for (size_t i = 0; i < n; i++)
-  {
-    if (lightTags[i]) *tags++ = engine->GetLightTagString (i);
-  }
-}
-
 //---------------------------------------------------------------------------
 
 // --- csLightList -----------------------------------------------------------

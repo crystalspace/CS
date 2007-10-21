@@ -24,22 +24,10 @@ LinkWith docconv_static : crystalspace ;
 DOCCONV.PLUGINLIST =
   bindoc
   dsplex
-  reporter
-  null2d
-  null3d
   vfs
   xmlread
   xmltiny
   ;
-
-if $(JPEG.AVAILABLE) = "yes"
-{
-  DOCCONV.PLUGINLIST += csjpgimg ;
-}
-if $(PNG.AVAILABLE) = "yes"
-{
-  DOCCONV.PLUGINLIST += cspngimg ;
-}
 
 LinkStaticPlugins docconv_static : $(DOCCONV.PLUGINLIST) ;
 SubVariant ;

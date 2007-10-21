@@ -195,7 +195,7 @@ public:
 
 class csSpriteCal3DMeshObject;
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 class csCal3dSkeletonFactory;
 
@@ -523,6 +523,7 @@ private:
     csRef<iRenderBuffer> vertex_buffer;
     uint vertexVersion;
     csRenderMesh render_mesh;
+    csRef<iMaterialWrapper> matRef;
 
     Mesh() : vertexVersion((uint)~0) {}
   };
@@ -1027,7 +1028,7 @@ public:
 
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * Sprite Cal3D type. This is the plugin you have to use to create instances

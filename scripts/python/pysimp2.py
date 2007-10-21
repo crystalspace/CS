@@ -74,14 +74,14 @@ def CreateTheRoom(matname):
     
     # as you can see, CS_QUERY_REGISTRY() works
     # as does SCF_QUERY_INTERFACE()
-    engine = CS_QUERY_REGISTRY(object_reg, iEngine)
+    engine = object_reg.Get(iEngine)
 
     room = engine.GetSectors().FindByName("room")
     walls = engine.CreateSectorWallsMesh(room,"walls")
 
     walls_factory = walls.GetMeshObject().GetFactory()
     material=engine.GetMaterialList().FindByName(matname)
-    walls_state = SCF_QUERY_INTERFACE(walls_factory, iThingFactoryState)
+    walls_state = walls_factory.QueryInterface(iThingFactoryState)
     walls_state.AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5))
     walls_state.SetPolygonMaterial (CS_POLYRANGE_LAST, material);
     walls_state.SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
@@ -99,9 +99,9 @@ def LoadSprite():            # new stuff
     To do this we will have to create a iLoader & use it to load stuff
     """
     # get a few plugins
-    engine = CS_QUERY_REGISTRY(object_reg, iEngine)
-    g3d = CS_QUERY_REGISTRY(object_reg, iGraphics3D)
-    loader = CS_QUERY_REGISTRY(object_reg, iLoader)
+    engine = object_reg.Get(iEngine)
+    g3d = object_reg.Get(iGraphics3D)
+    loader = object_reg.Get(iLoader)
 
     # The C++ NULL is mapped to the python None
     # to play it safe we should check for our return values
@@ -127,7 +127,7 @@ def LoadSprite():            # new stuff
     m=m/5           # python doesnt support *= operator
     sprite.GetMovable().SetTransform(m)
     sprite.GetMovable().UpdateMove()
-    spstate=SCF_QUERY_INTERFACE(sprite.GetMeshObject(),iSprite3DState)
+    spstate=sprite.GetMeshObject().QueryInterface(iSprite3DState)
     spstate.SetAction("default")
     spstate.SetMixMode(CS_FX_SETALPHA_INT (100))
 

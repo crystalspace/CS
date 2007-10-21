@@ -178,9 +178,10 @@ As long as we don't call DecRef after QueryInterface, the object should end up
 with the correct reference count. That's how I understand it, anyway, but I
 know practically nothing about Python.
  ***@@@***/
+%define CS_WRAP_PTR_TYPEMAP(PtrName)
 %{
 PyObject *
-_csWrapPtr_to_Python (const csWrapPtr & wp)
+_ ## PtrName ## _to_Python (const PtrName & wp)
 {
   if (!wp.Ref.IsValid())
   {
@@ -224,6 +225,9 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
   return result;
 }
 %}
+%enddef
+
+CS_WRAP_PTR_TYPEMAP(csWrapPtr)
 
 #undef TYPEMAP_OUT_csWrapPtr
 %define TYPEMAP_OUT_csWrapPtr
@@ -232,6 +236,11 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
     $result = _csWrapPtr_to_Python($1);
   }
 %enddef
+
+%typemap(typecheck) (const char * iface, int iface_ver)
+{
+  $1 = PyObject_HasAttrString($input,"scfGetVersion");
+}
 
 %typemap(in) (const char * iface, int iface_ver) (csString className)
 {
@@ -570,6 +579,21 @@ def __iter__(self):
         yield self.Next() %}
 %enddef
 
+/*
+ * Macro for implementing buffer objects
+*/
+#undef BUFFER_RW_FUNCTIONS
+%define BUFFER_RW_FUNCTIONS(ClassName,DataFunc,CountFunc,ElmtType,BufGetter)
+%extend ClassName
+{
+    PyObject * BufGetter ()
+    {
+        return PyBuffer_FromReadWriteMemory(self-> ## DataFunc ## (),self-> ## CountFunc ## ()*sizeof( ElmtType ));
+    }
+}
+%enddef
+
+
 // csStringFast typemaps
 %typemap(out) csStringFast *
 {
@@ -586,6 +610,19 @@ def __iter__(self):
 {
    delete $1;
 }
+
+#undef DEPRECATED_METHOD
+%define DEPRECATED_METHOD(ClassName,Method,Replacement)
+%ignore ClassName ## :: ## Method ## ;
+%extend ClassName
+{
+  %pythoncode %{
+    def Method (*args):
+        print "ClassName.Method() is deprecated, use ClassName.Replacement() instead"
+        return self. ## Replacement ## (*args)
+  %}
+}
+%enddef
 
 #endif // ifndef CS_MINI_SWIG
 
