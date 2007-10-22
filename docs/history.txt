@@ -12,6 +12,9 @@ chronological order.
 	  the light ID).
 	- res made lighter2 write out sector and light name instead of the
 	  light ID for ptpdlight lightmap-light mappings.
+	- res changed lighter2 to not only support XML world files.
+	- res slightly improved lighter2's support for multiple world files:
+	  meshless worlds that only carry textures and materials now work.
 20-Oct-2007
 	- res added a method to iTextureHandle to query whether applying a
 	  blit buffer may potentially require calls into foreign code.
