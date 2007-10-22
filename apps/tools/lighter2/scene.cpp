@@ -738,6 +738,7 @@ namespace lighter
       }
     }
 
+    csSet<csString> lightNames;
     // Parse all lights (should have selector later!)
     iLightList *lightList = sector->GetLights ();
     for (int i = lightList->GetCount (); i-- > 0;)
@@ -748,6 +749,17 @@ namespace lighter
         lightList->Remove (i);
         continue;
       }
+
+      const char* lightName = light->QueryObject()->GetName ();
+      if (lightNames.Contains (lightName))
+      {
+        globalLighter->Report (
+          "A light named '%s' already exists in sector '%s'",
+          lightName, sectorName);
+        lightList->Remove (i);
+        continue;
+      }
+      lightNames.AddNoTest (lightName);
 
       bool isPD = light->GetDynamicType() == CS_LIGHT_DYNAMICTYPE_PSEUDO;
 
@@ -762,7 +774,7 @@ namespace lighter
         light->GetAttenuationConstants ());
       intLight->SetPDLight (isPD);
       intLight->SetLightID (light->GetLightID());
-      intLight->SetName (light->QueryObject()->GetName ());
+      intLight->SetName (lightName);
 
       intLight->SetRadius (light->GetCutoffDistance ());
 
@@ -1498,7 +1510,7 @@ namespace lighter
     csString filename;
     csString texname;
     csStringArray pdLightmapFiles;
-    csStringArray pdLightIDs;
+    csArray<Light*> pdLights;
     Lightmap* lm;
     bool isSolid;
     csColor solidColor;
@@ -1583,7 +1595,7 @@ namespace lighter
             globalConfig.GetLMProperties().grayPDMaps);
         }
         savetex.pdLightmapFiles.Push (textureFilename);
-        savetex.pdLightIDs.Push (lmID);
+        savetex.pdLights.Push (key);
       }
 
       texturesToSave.Push (savetex);
@@ -1714,7 +1726,10 @@ namespace lighter
           csRef<iDocumentNode> mapNode = 
             pdlightParamsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
           mapNode->SetValue ("map");
-          mapNode->SetAttribute ("lightid", textureToSave.pdLightIDs[p]);
+          mapNode->SetAttribute ("lightsector", 
+            textureToSave.pdLights[p]->GetSector()->sectorName);
+          mapNode->SetAttribute ("lightname", 
+            textureToSave.pdLights[p]->GetName());
 
           csRef<iDocumentNode> mapContents = 
             mapNode->CreateNodeBefore (CS_NODE_TEXT, 0);
