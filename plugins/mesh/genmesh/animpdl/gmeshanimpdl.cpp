@@ -24,6 +24,7 @@
 #include "csutil/util.h"
 #include "csutil/event.h"
 #include "iengine/engine.h"
+#include "iengine/sector.h"
 #include "imesh/object.h"
 #include "iutil/document.h"
 #include "iutil/eventq.h"
@@ -52,21 +53,49 @@ void GenmeshAnimationPDL::PrepareBuffer (iEngine* engine,
     bool success = false;
     ColorBuffer::MappedLight newLight;
     newLight.colors = factoryLight.colors;
-    newLight.light = engine->FindLightID (factoryLight.GetLightId());
+    if (!factoryLight.lightId->sectorName.IsEmpty()
+      && !factoryLight.lightId->lightName.IsEmpty())
+    {
+      iSector* sector = engine->FindSector (factoryLight.lightId->sectorName);
+      if (sector)
+      {
+        iLight* engLight = sector->GetLights()->FindByName (
+          factoryLight.lightId->lightName);
+        newLight.light = engLight;
+        if (!newLight.light)
+        {
+          factory->type->Report (CS_REPORTER_SEVERITY_WARNING, 
+            "Could not find light '%s' in sector '%s'", 
+            factoryLight.lightId->lightName.GetData(),
+            factoryLight.lightId->sectorName.GetData());
+        }
+      }
+      else
+      {
+        factory->type->Report (CS_REPORTER_SEVERITY_WARNING, 
+          "Could not find sector '%s' for light '%s'", 
+          factoryLight.lightId->sectorName.GetData(),
+          factoryLight.lightId->lightName.GetData());
+      }
+    }
+    else
+    {
+      newLight.light = engine->FindLightID (
+        (const char*)factoryLight.lightId->lightId);
+      if (!newLight.light)
+      {
+        csString hexId;
+        for (int i = 0; i < 16; i++)
+          hexId.AppendFmt ("%02x", factoryLight.lightId->lightId[i]);
+        factory->type->Report (CS_REPORTER_SEVERITY_WARNING, 
+          "Could not find light with ID '%s'", hexId.GetData());
+      }
+    }
     if (newLight.light)
     {
       success = true;
       newLight.light->AddAffectedLightingInfo (
         static_cast<iLightingInfo*> (this));
-    }
-    else
-    {
-      csString hexId;
-      const char* lightId = factoryLight.GetLightId();
-      for (int i = 0; i < 16; i++)
-        hexId.AppendFmt ("%02x", lightId[i]);
-      factory->type->Report (CS_REPORTER_SEVERITY_WARNING, 
-        "Could not find light with ID '%s'", hexId.GetData());
     }
     if (success)
     {
@@ -252,7 +281,7 @@ void GenmeshAnimationPDLFactory::Report (iSyntaxService* synsrv,
   va_end (arg);
 }
 
-bool GenmeshAnimationPDLFactory::HexToLightID (char* lightID, 
+bool GenmeshAnimationPDLFactory::HexToLightID (uint8* lightID, 
                                                const char* lightIDHex)
 {
   bool valid = strlen (lightIDHex) == 32;
@@ -287,7 +316,7 @@ bool GenmeshAnimationPDLFactory::HexToLightID (char* lightID,
         valid = false; 
         break;
       }
-      lightID[i] = char (v);
+      lightID[i] = v;
     }
   }
   return valid;
@@ -345,9 +374,21 @@ const char* GenmeshAnimationPDLFactory::ParseLight (ColorBuffer::MappedLight& li
                                                     iSyntaxService* synsrv,
                                                     iDocumentNode* node)
 {
+  const char* sector = node->GetAttributeValue ("lightsector");
+  const char* lightName = node->GetAttributeValue ("lightname");
+  bool hasSector = sector && *sector;
+  bool hasLightName = lightName && *lightName;
+  if ((hasSector || hasLightName) && (!hasSector || !hasLightName))
+  {
+    return "Both 'lightsector' and 'lightname' attributes need to be specified";
+  }
   const char* lightId = node->GetAttributeValue ("lightid");
-  if (!lightId)
-    return "No light ID given";
+  bool hasLightID = lightId && *lightId;
+  if (!hasSector && !hasLightName && !hasLightID)
+  {
+    return "'lightsector' and 'lightname' attributes or a 'lightid' attribute "
+      "need to be specified";
+  }
 
   light.colors = synsrv->ParseRenderBuffer (node);
   if (!light.colors)
@@ -355,10 +396,20 @@ const char* GenmeshAnimationPDLFactory::ParseLight (ColorBuffer::MappedLight& li
     return "Could not parse light colors";
   }
 
-  if (!HexToLightID (light.GetLightId(), lightId))
+  light.lightId = new ColorBuffer::MappedLight::LightIdentity;
+  if (hasSector && hasLightName)
   {
-    parseError.Format ("Invalid light ID '%s'", lightId);
-    return parseError;
+    light.lightId->sectorName = sector;
+    light.lightId->lightName = lightName;
+  }
+  else
+  {
+    if (!HexToLightID (light.lightId->lightId, lightId))
+    {
+      parseError.Format ("Invalid light ID '%s'", lightId);
+      return parseError;
+    }
+    return 0;
   }
   return 0;
 }

@@ -67,9 +67,12 @@ private:
 
     struct MappedLight
     {
-    private:
-      char* lightId;
-    public:
+      struct LightIdentity : public CS::Memory::CustomAllocated
+      {
+        csString sectorName, lightName;
+        uint8 lightId[16];
+      };
+      LightIdentity* lightId;
       csRef<iRenderBuffer> colors;
 
       MappedLight() : lightId (0) {}
@@ -77,22 +80,15 @@ private:
       {
         if (other.lightId != 0)
         {
-          lightId = (char*)cs_malloc (16);
-          memcpy (lightId, other.lightId, 16);
+          lightId = new LightIdentity (*(other.lightId));
         }
         else
           lightId = 0;
         colors = other.colors;
       }
-      ~MappedLight() { cs_free (lightId); }
+      ~MappedLight() { delete lightId; }
 
-      char* GetLightId()
-      { 
-        if (lightId == 0) lightId = (char*)cs_malloc (16);
-        return lightId; 
-      }
-      const char* GetLightId() const { return lightId; }
-      void FreeLightId() { cs_free (lightId); lightId = 0; }
+      void FreeLightId() { delete lightId; lightId = 0; }
     };
     csArray<MappedLight> lights;
     csRef<iRenderBuffer> staticColors;
@@ -103,7 +99,7 @@ private:
 
   void Report (iSyntaxService* synsrv, int severity, iDocumentNode* node, 
     const char* msg, ...);
-  bool HexToLightID (char* lightID, const char* lightIDHex);
+  bool HexToLightID (uint8* lightID, const char* lightIDHex);
   const char* ParseBuffer (iSyntaxService* synsrv,
     ColorBuffer& buffer, iDocumentNode* node);
   const char* ParseLight (ColorBuffer::MappedLight& light,

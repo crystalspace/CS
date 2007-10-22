@@ -15,6 +15,8 @@ chronological order.
 	- res changed lighter2 to not only support XML world files.
 	- res slightly improved lighter2's support for multiple world files:
 	  meshless worlds that only carry textures and materials now work.
+	- res augmented gmeshanimpdl to also support light specification by
+	  sector and light name.
 20-Oct-2007
 	- res added a method to iTextureHandle to query whether applying a
 	  blit buffer may potentially require calls into foreign code.
