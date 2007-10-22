@@ -17,6 +17,8 @@ chronological order.
 	  meshless worlds that only carry textures and materials now work.
 	- res augmented gmeshanimpdl to also support light specification by
 	  sector and light name.
+	- res made lighter2 write out sector and light name instead of the
+	  light ID for gmeshanimpdl lightmap-light mappings.
 20-Oct-2007
 	- res added a method to iTextureHandle to query whether applying a
 	  blit buffer may potentially require calls into foreign code.
