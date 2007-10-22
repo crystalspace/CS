@@ -730,6 +730,7 @@ ANT
 CSHARP_COMPILER
 CMD_GACUTIL
 CMD_NANT
+GEN_CSHARP_GLOBALS
 PKG_CONFIG
 ac_ct_PKG_CONFIG
 CONFIG_X11
@@ -14640,6 +14641,123 @@ cs_build_prop_val="$CMD_NANT"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}CMD.NANT ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin$PATH_SEPARATOR${srcdir}/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}gen-csharp-globals.sh", so it can be a program name with args.
+set dummy ${ac_tool_prefix}gen-csharp-globals.sh; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_path_GEN_CSHARP_GLOBALS+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $GEN_CSHARP_GLOBALS in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_GEN_CSHARP_GLOBALS="$GEN_CSHARP_GLOBALS" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in     ${srcdir}/bin$PATH_SEPARATOR$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin$PATH_SEPARATOR${srcdir}/bin
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_GEN_CSHARP_GLOBALS="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+GEN_CSHARP_GLOBALS=$ac_cv_path_GEN_CSHARP_GLOBALS
+if test -n "$GEN_CSHARP_GLOBALS"; then
+  { echo "$as_me:$LINENO: result: $GEN_CSHARP_GLOBALS" >&5
+echo "${ECHO_T}$GEN_CSHARP_GLOBALS" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+
+fi
+if test -z "$ac_cv_path_GEN_CSHARP_GLOBALS"; then
+  ac_pt_GEN_CSHARP_GLOBALS=$GEN_CSHARP_GLOBALS
+  # Extract the first word of "gen-csharp-globals.sh", so it can be a program name with args.
+set dummy gen-csharp-globals.sh; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_path_ac_pt_GEN_CSHARP_GLOBALS+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $ac_pt_GEN_CSHARP_GLOBALS in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_ac_pt_GEN_CSHARP_GLOBALS="$ac_pt_GEN_CSHARP_GLOBALS" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in     ${srcdir}/bin$PATH_SEPARATOR$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin$PATH_SEPARATOR${srcdir}/bin
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_ac_pt_GEN_CSHARP_GLOBALS="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+ac_pt_GEN_CSHARP_GLOBALS=$ac_cv_path_ac_pt_GEN_CSHARP_GLOBALS
+if test -n "$ac_pt_GEN_CSHARP_GLOBALS"; then
+  { echo "$as_me:$LINENO: result: $ac_pt_GEN_CSHARP_GLOBALS" >&5
+echo "${ECHO_T}$ac_pt_GEN_CSHARP_GLOBALS" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+  if test "x$ac_pt_GEN_CSHARP_GLOBALS" = x; then
+    GEN_CSHARP_GLOBALS=""
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ echo "$as_me:$LINENO: WARNING: In the future, Autoconf will not detect cross-tools
+whose name does not start with the host triplet.  If you think this
+configuration is useful to you, please write to autoconf@gnu.org." >&5
+echo "$as_me: WARNING: In the future, Autoconf will not detect cross-tools
+whose name does not start with the host triplet.  If you think this
+configuration is useful to you, please write to autoconf@gnu.org." >&2;}
+ac_tool_warned=yes ;;
+esac
+    GEN_CSHARP_GLOBALS=$ac_pt_GEN_CSHARP_GLOBALS
+  fi
+else
+  GEN_CSHARP_GLOBALS="$ac_cv_path_GEN_CSHARP_GLOBALS"
+fi
+
+cs_build_prop_val="$GEN_CSHARP_GLOBALS"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.GEN.CSHARP.GLOBALS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -82173,6 +82291,7 @@ ANT!$ANT$ac_delim
 CSHARP_COMPILER!$CSHARP_COMPILER$ac_delim
 CMD_GACUTIL!$CMD_GACUTIL$ac_delim
 CMD_NANT!$CMD_NANT$ac_delim
+GEN_CSHARP_GLOBALS!$GEN_CSHARP_GLOBALS$ac_delim
 PKG_CONFIG!$PKG_CONFIG$ac_delim
 ac_ct_PKG_CONFIG!$ac_ct_PKG_CONFIG$ac_delim
 CONFIG_X11!$CONFIG_X11$ac_delim
@@ -82253,7 +82372,6 @@ ac_ct_CONFIG_JACKASYN!$ac_ct_CONFIG_JACKASYN$ac_delim
 CONFIG_ASOUND!$CONFIG_ASOUND$ac_delim
 ac_ct_CONFIG_ASOUND!$ac_ct_CONFIG_ASOUND$ac_delim
 CONFIG_CACA!$CONFIG_CACA$ac_delim
-ac_ct_CONFIG_CACA!$ac_ct_CONFIG_CACA$ac_delim
 _ACEOF
 
   if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 97; then
@@ -82295,6 +82413,7 @@ _ACEOF
 ac_delim='%!_!# '
 for ac_last_try in false false false false false :; do
   cat >conf$$subs.sed <<_ACEOF
+ac_ct_CONFIG_CACA!$ac_ct_CONFIG_CACA$ac_delim
 CONFIG_LIBCACA!$CONFIG_LIBCACA$ac_delim
 ac_ct_CONFIG_LIBCACA!$ac_ct_CONFIG_LIBCACA$ac_delim
 TTREE!$TTREE$ac_delim
@@ -82306,7 +82425,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 9; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 10; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

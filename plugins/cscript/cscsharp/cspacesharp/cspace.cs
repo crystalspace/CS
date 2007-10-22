@@ -22,7 +22,7 @@ using System.Runtime.InteropServices;
 
 namespace CrystalSpace
 {
-  public class CS: core
+  public class cspace
   {
     // A static and global object registry
     public static iObjectRegistry theObjectRegistry = null;

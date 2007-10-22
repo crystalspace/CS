@@ -449,6 +449,10 @@ CS_EMIT_BUILD_PROPERTY([CMD.GACUTIL], [$CMD_GACUTIL])
 CS_CHECK_PROGS([CMD_NANT], [nant NAnt])
 CS_EMIT_BUILD_PROPERTY([CMD.NANT], [$CMD_NANT])
 
+CS_PATH_TOOL([GEN_CSHARP_GLOBALS], [gen-csharp-globals.sh], [],
+    [${srcdir}/bin$PATH_SEPARATOR$PATH])
+CS_EMIT_BUILD_PROPERTY([CMD.GEN.CSHARP.GLOBALS], [$GEN_CSHARP_GLOBALS])
+
 # cscsharp is experimental/testing, by default no
 AC_ARG_WITH([csharp], [AC_HELP_STRING([--with-csharp],
     [use C# scripting interface (default NO)])])

@@ -56,66 +56,107 @@ if $(CSHARP.AVAILABLE) = "yes"
   # expand it to "foo".)
   if ! $(CSPACESHARP.MODULE.PREFIX) { CSPACESHARP.MODULE.PREFIX = "" ; }
   if ! $(CSPACESHARP.MODULE.SUFFIX) { CSPACESHARP.MODULE.SUFFIX = "" ; }
-}
 
-rule CSharpMod
-{
-  local module = $(2) ;
-  local desc = $(7) ;
-
-  local sources = [ DoSourceGrist $(3) ] ;
-  local objects = [ CompileObjects $(sources) ] ;
-  local target = $(CSPACESHARP.MODULE.PREFIX)$(module)$(CSPACESHARP.MODULE.SUFFIX) ;
-
-  NotFile $(<) ;
-  Depends $(<) : $(target) ;
-  Depends bindings : $(<) ;
-  Description $(<) : $(desc) ;
-  Help $(<) : "Build the $(desc)" ;
-
-  $(<)_TARGET = $(target) ;
-  $(<)_SOURCES = $(sources) ;
-  $(<)_OBJECTS = $(objects) ;
-  LinkWith $(<) : $(5) ;
-  ExternalLibs $(<) : $(6) ;
-  CFlags $(<) : $(PLUGIN.CFLAGS) ;
-  LFlags $(<) : $(PLUGIN.LFLAGS) $(LINKLIBS) $(COMPILER.LFLAGS.KILLAT) ;
-
-  MakeLocate $(target) : [ ConcatDirs $(LOCATE.OBJECTS) $(4) ] ;
-  Depends $(target) : $(objects) ;
-  LinkPlugin $(target) : $(objects) ;
-  InstallBindingsModule $(target) : $(4) ;
-  if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
+  rule CSharpMod
   {
-    SplitDebugInfo $(target) ;
-    local debugfile = [ on $(target) GetVar DEBUG_FILE_FULL ] ;
-    cleantarget += $(debugfile) ;
-    NoCare $(debugfile) ;
-    Depends install_bindings : [ DoInstall $(debugfile) :
+    local module = $(2) ;
+    local desc = $(7) ;
+
+    local sources = [ DoSourceGrist $(3) ] ;
+    local objects = [ CompileObjects $(sources) ] ;
+    local target = $(CSPACESHARP.MODULE.PREFIX)$(module)$(CSPACESHARP.MODULE.SUFFIX) ;
+
+    NotFile $(<) ;
+    Depends $(<) : $(target) ;
+    Depends bindings : $(<) ;
+    Description $(<) : $(desc) ;
+    Help $(<) : "Build the $(desc)" ;
+
+    $(<)_TARGET = $(target) ;
+    $(<)_SOURCES = $(sources) ;
+    $(<)_OBJECTS = $(objects) ;
+    LinkWith $(<) : $(5) ;
+    ExternalLibs $(<) : $(6) ;
+    CFlags $(<) : $(PLUGIN.CFLAGS) ;
+    LFlags $(<) : $(PLUGIN.LFLAGS) $(LINKLIBS) $(COMPILER.LFLAGS.KILLAT) ;
+
+    MakeLocate $(target) : [ ConcatDirs $(LOCATE.OBJECTS) $(4) ] ;
+    Depends $(target) : $(objects) ;
+    LinkPlugin $(target) : $(objects) ;
+    InstallBindingsModule $(target) : $(4) ;
+    if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
+    {
+      SplitDebugInfo $(target) ;
+      local debugfile = [ on $(target) GetVar DEBUG_FILE_FULL ] ;
+      cleantarget += $(debugfile) ;
+      NoCare $(debugfile) ;
+      Depends install_bindings : [ DoInstall $(debugfile) :
                                   $(appdatadir) $(4) :
 				  $(INSTALL_DATA) ] ;
+    }
+
+    Always $(<)clean ;
+    NotFile $(<)clean ;
+    Clean $(<)clean : $(target) $(objects) ;
+    Depends clean : $(<)clean ;
   }
 
-  Always $(<)clean ;
-  NotFile $(<)clean ;
-  Clean $(<)clean : $(target) $(objects) ;
-  Depends clean : $(<)clean ;
-}
+  actions GCSG
+  {
+    $(CMD.GEN.CSHARP.GLOBALS) $(GCSG.NAMESPACE) $(GCSG.CLASSNAME) $(<) $(GCSG.MODULES)
+  }
 
-#---------------------
-# CSharpLib target : input files : references 
-#---------------------
+  #------------------------------------------------------------
+  # GenCSharpGlobals target : csharpdir : modules : namespace : classname
+  #------------------------------------------------------------
 
-actions CSC
-{
-   $(CMD.CSC) -target:$(3) $(4) -out:$(<) $(>)
-}
+  rule GenCSharpGlobals
+  {
+    local target = $(1) ;
+    local csharpdir = $(2) ;
+    local modules = $(3) ;
+    local namespace = $(4) ;
+    local classname = $(5) ;
 
-rule CSharpLib
-{
-  local target = $(1) ;
-  local sources = [ DoSourceGrist $(2) ] ;
+    local i ;
+    for i in $(modules)
+    {
+      local source = $(i).cs ;
 
-  CSC $(target) : $(sources) : library ;
+      if $(csharpdir)
+      {
+	SEARCH on $(source) = $(csharpdir) ;
+      }
+      else
+      {
+	SEARCH on $(source) = $(LOCATE_TARGET) ;
+      }
+      Depends  $(target) : $(source) ;
+    }
+
+    MakeLocate $(target) : $(csharpdir) ;
+    GCSG.NAMESPACE = $(namespace) ;
+    GCSG.CLASSNAME = $(classname) ;
+    GCSG.MODULES = $(modules) ;
+    GCSG $(target) ;
+  }
+
+  #---------------------
+  # CSharpLib target : input files : references 
+  #---------------------
+
+  actions CSC
+  {
+     $(CMD.CSC) -target:$(3) $(4) -out:$(<) $(>)
+  }
+
+  rule CSharpLib
+  {
+    local target = $(1) ;
+    local sources = [ DoSourceGrist $(2) ] ;
+
+    CSC $(target) : $(sources) : library ;
+  }
+
 }
 

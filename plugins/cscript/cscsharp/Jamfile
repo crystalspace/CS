@@ -23,13 +23,22 @@ if $(CSHARP.AVAILABLE) = "yes"
   local csbuildbase = $(csharpbase) ;
   local csbuildxml = csbuild.xml ;
   local cspacesharpdll = crystalspace-sharp.dll ;
+
+  local cs_globals = [ DoSourceGrist CS.cs ] ;
+  GenCSharpGlobals $(cs_globals) :
+	 $(csharpdir) :
+	 core imesh isndsys ivaria iengine cstool 
+	 ivideo imap csgfx csgeom cspace :
+	 CrystalSpace :
+	 CS ;
+
   cspacesharpdll = $(cspacesharpdll:G=csharpmod) ;
   SEARCH on $(csbuildxml) = $(SEARCH_SOURCE) ;
   Depends $(csbuildxml:G=build) : $(csbuildxml) ;
   MakeLocate $(csbuildxml:G=build) : $(csharpbase) ;
   Copy $(csbuildxml:G=build) : $(csbuildxml) ;
   Clean csharpmodclean : $(csbuildxml:G=build) ;
-  Depends $(cspacesharpdll) : $(csbuildxml:G=build) $(cs_extra:BSG=built) csharp_mods ;
+  Depends $(cspacesharpdll) : $(csbuildxml:G=build) $(cs_extra:BSG=built) $(cs_globals) csharp_mods ;
   MakeLocate $(cspacesharpdll) : $(csharpbase) ;
 	
   actions NAnt
