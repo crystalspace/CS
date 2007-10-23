@@ -80,25 +80,6 @@ namespace Implementation
       {
       }
 
-      // Wait for thread to start up
-      void Wait ()
-      {
-        ScopedLock<Mutex> lock (mutex);
-        while (!(*isRunningPtr))
-          startCondition.Wait (mutex);
-      }
-
-      void Started ()
-      {
-        ScopedLock<Mutex> lock (mutex);
-        AtomicOperations::Set (isRunningPtr, 1);
-        startCondition.NotifyOne ();
-      }
-
-    
-      Mutex mutex;
-      Condition startCondition;
-
       Runnable* runnable;
       int32* isRunningPtr;
     };
@@ -110,10 +91,8 @@ namespace Implementation
       int32* isRunningPtr = tp->isRunningPtr;
       Runnable* runnable = tp->runnable;
 
-      tp->Started ();
-
+      AtomicOperations::Set (isRunningPtr, 1);
       runnable->Run ();
-
       AtomicOperations::Set (isRunningPtr, 0);
 
       return 0;
@@ -143,11 +122,6 @@ namespace Implementation
       // and therefor needs a reinterpret_cast.
       threadHandle = reinterpret_cast<void*> (_beginthreadex (0, 0, &proxyFunc, 
         &param, 0, &threadId));
-
-      if (threadHandle == 0)
-        return;
-
-      param.Wait ();
     }
   }
 

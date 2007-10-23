@@ -41,25 +41,6 @@ namespace Implementation
       {
       }
 
-      // Wait for thread to start up
-      void Wait ()
-      {
-        ScopedLock<Mutex> lock (mutex);
-        while (!(*isRunningPtr))
-          startCondition.Wait (mutex);
-      }
-
-      void Started ()
-      {
-        ScopedLock<Mutex> lock (mutex);
-        AtomicOperations::Set (isRunningPtr, 1);
-        startCondition.NotifyOne ();
-      }
-
-    
-      Mutex mutex;
-      Condition startCondition;
-
       Runnable* runnable;
       int32* isRunningPtr;
     };
@@ -70,7 +51,7 @@ namespace Implementation
       int32* isRunningPtr = tp->isRunningPtr;
       Runnable* runnable =  tp->runnable;
 
-      tp->Started ();
+      AtomicOperations::Set (isRunningPtr, 1);
 
       runnable->Run ();
 
@@ -98,8 +79,7 @@ namespace Implementation
       pthread_attr_init(&attr);
       pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
       pthread_create(&threadHandle, &attr, proxyFunc, &param); 
-      
-      param.Wait ();
+            
     }
   }
 
