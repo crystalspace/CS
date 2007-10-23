@@ -16,44 +16,15 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifndef __CSUTIL_SCOPEDMUTEX_H__
-#define __CSUTIL_SCOPEDMUTEX_H__
+#ifndef __CSUTIL_SCOPEDLOCK_H__
+#define __CSUTIL_SCOPEDLOCK_H__
 
 /**\file
  * Scoped mutex locking
  */
 
 #include "csextern.h"
-#include "csutil/thread.h"
 
-#include "csutil/deprecated_warn_off.h"
-
-/**
- * This is a utility class for locking a Mutex. If A MutexLock class is
- * created it locks the mutex, when it is destroyed it unlocks the Mutex
- * again. So locking a mutex can happen by creating a MutexLock object on the
- * stack. The compiler will then take care that the Unlock calls will be done
- * in each case.
- * \code
- *   void Myfunc() {
- *      csScopedMutexLock lock(mymutex);
- *      do something special
- *
- *      return;
- *  }
- * \endcode
- */
-class csScopedMutexLock
-{
-public:
-  csScopedMutexLock (csMutex* newmutex)
-    : mutex(newmutex)
-  { mutex->LockWait (); }
-  ~csScopedMutexLock ()
-  { mutex->Release (); }
-
-  csMutex* mutex;
-};
 
 template<class T>
 class csScopedLock
@@ -68,7 +39,6 @@ public:
   T& lock;
 };
 
-#include "csutil/deprecated_warn_on.h"
 
 #endif
 

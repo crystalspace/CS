@@ -24,7 +24,6 @@
 #include "csutil/array.h"
 #include "csutil/plugmgr.h"
 #include "csutil/scf_implementation.h"
-#include "csutil/scopedmutexlock.h"
 #include "csutil/util.h"
 
 #include "iutil/comp.h"

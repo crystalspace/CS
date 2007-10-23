@@ -706,6 +706,8 @@ struct iFactory : public iBase
   /// Query library module name.
   virtual const char *QueryModuleName () = 0;
 };
+// Give versions to above declared classes.
+SCF_VERSION (iFactory, 0, 0, 2);
 
 //----------------------------------------------- Client-side functions -----//
 
@@ -765,7 +767,6 @@ CS_CRYSTALSPACE_EXPORT void scfRegisterStaticFactoryFunc (scfFactoryFunc,
 //---------- IMPLEMENTATION OF HELPER FUNCTIONS
 
 
-
 /**
  * Helper function around iBase::QueryInterface
  */
@@ -811,21 +812,7 @@ inline csPtr<Interface> scfCreateInstance (char const * const ClassID)
   return csPtr<Interface> (x);
 }
 
-template<class Interface>
-inline CS_DEPRECATED_METHOD_MSG ("SCF_CREATE_INSTANCE macro is deprecated")
-csPtr<Interface> SCF_CREATE_INSTANCE_is_deprecated (
-  char const * const ClassID)
-{
-  return scfCreateInstance<Interface> (ClassID);
-}
-/**
- * \deprecated Compatibility macro for scfCreateInstance function
- */
-#define SCF_CREATE_INSTANCE(ClassID,Interface) \
-  SCF_CREATE_INSTANCE_is_deprecated<Interface> (ClassID)
 
-// Give versions to above declared classes.
-SCF_VERSION (iFactory, 0, 0, 2);
 
 // A bit hacky.
 #include "csutil/reftrackeraccess.h"
