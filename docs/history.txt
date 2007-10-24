@@ -9,6 +9,8 @@ chronological order.
 23-Oct-2007
 	- caedes implemented 'new' iScript interface for cspython. Fixes
 	  trac #93.
+	- caedes fixed error message routing in cspython to send errors
+	  as reporter errors instead of warnings.
 23-Oct-2007
 	- Marten cleaned out a few remaining deprecated classes left from 
 	  pre 1.2 including the old threading subsystem.
