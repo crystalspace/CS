@@ -11,6 +11,8 @@ chronological order.
 	  trac #93.
 	- caedes fixed error message routing in cspython to send errors
 	  as reporter errors instead of warnings.
+	- caedes changed pysimp to use new iScript interface, and also changed
+	  way cspython is loaded so it can report its command line help.
 23-Oct-2007
 	- Marten cleaned out a few remaining deprecated classes left from 
 	  pre 1.2 including the old threading subsystem.
