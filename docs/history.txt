@@ -17,6 +17,7 @@ chronological order.
 	   - Added a barrier synchronization primitive.
 	   - Reimplemented the thread startup synchronization.
 	   - Removed some fallout of yesterdays cleanup of old threading.
+	- caedes removed data/varia/walktest.cam. Fixes trac #162.
 23-Oct-2007
 	- Marten cleaned out a few remaining deprecated classes left from 
 	  pre 1.2 including the old threading subsystem.
