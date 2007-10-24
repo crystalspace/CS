@@ -123,6 +123,7 @@
 #include "csutil/schedule.h"
 #include "csutil/scopeddelete.h"
 #include "csutil/scopedlock.h"
+#include "csutil/scopedmutexlock.h"
 #include "csutil/set.h"
 #include "csutil/snprintf.h"
 #include "csutil/sparse3d.h"
