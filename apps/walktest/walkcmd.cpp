@@ -255,11 +255,11 @@ bool WalkTest::LoadCamera (const char *fName)
   bool ok = true;
 #define IFFAIL(x) if (ok && !(ok = (x)))
   IFFAIL (myVFS->Exists (fName))
-    Report (CS_REPORTER_SEVERITY_ERROR,
+    Report (CS_REPORTER_SEVERITY_WARNING,
 	    "Could not open camera file '%s'!", fName);
   csRef<iDataBuffer> data;
   IFFAIL ((data = myVFS->ReadFile(fName)) != 0)
-    Report (CS_REPORTER_SEVERITY_ERROR,
+    Report (CS_REPORTER_SEVERITY_WARNING,
 	    "Could not read camera file '%s'!", fName);
   csMatrix3 m;
   csVector3 v;
@@ -281,11 +281,11 @@ bool WalkTest::LoadCamera (const char *fName)
 			   &m.m31, &m.m32, &m.m33,
 			   sector_name,
 			   &imirror))
-    Report (CS_REPORTER_SEVERITY_ERROR,
+    Report (CS_REPORTER_SEVERITY_WARNING,
 	    "Wrong format for camera file '%s'", fName);
   iSector* s = 0;
   IFFAIL ((s = Engine->GetSectors ()->FindByName (sector_name)) != 0)
-    Report (CS_REPORTER_SEVERITY_ERROR,
+    Report (CS_REPORTER_SEVERITY_WARNING,
 	    "Sector `%s' in coordinate file does not "
 	    "exist in this map!", sector_name);
   if (ok)
