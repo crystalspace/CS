@@ -568,7 +568,7 @@ void WalkTest::DrawFrame3D (int drawflags, csTicks /*current_time*/)
     iLight* dyn = dynamic_lights[i];
     extern bool HandleDynLight (iLight*, iEngine*);
     csRef<WalkDataObject> dao (
-    	CS_GET_CHILD_OBJECT (dyn->QueryObject (), WalkDataObject));
+        CS::GetChildObject<WalkDataObject>(dyn->QueryObject()));
     if (dao)
       if (HandleDynLight (dyn, Engine))
       {
