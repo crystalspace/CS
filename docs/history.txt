@@ -6,13 +6,17 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-23-Oct-2007
+24-Oct-2007
 	- caedes implemented 'new' iScript interface for cspython. Fixes
 	  trac #93.
 	- caedes fixed error message routing in cspython to send errors
 	  as reporter errors instead of warnings.
 	- caedes changed pysimp to use new iScript interface, and also changed
 	  way cspython is loaded so it can report its command line help.
+	- Marten made a number of fixes to the threading subsystem:
+	   - Added a barrier synchronization primitive.
+	   - Reimplemented the thread startup synchronization.
+	   - Removed some fallout of yesterdays cleanup of old threading.
 23-Oct-2007
 	- Marten cleaned out a few remaining deprecated classes left from 
 	  pre 1.2 including the old threading subsystem.

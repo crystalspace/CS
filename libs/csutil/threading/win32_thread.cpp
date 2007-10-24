@@ -20,6 +20,7 @@
 
 #include "csutil/threading/thread.h"
 #include "csutil/threading/win32_thread.h"
+#include "csutil/threading/barrier.h"
 #include "csutil/threading/condition.h"
 
 #include <process.h>
@@ -72,29 +73,40 @@ namespace Implementation
   namespace
   {
 
-    class ThreadStartParams
+    class ThreadStartParams : public CS::Memory::CustomAllocated
     {
     public:
-      ThreadStartParams (Runnable* runner, int32* isRunningPtr)
-        : runnable (runner), isRunningPtr (isRunningPtr)
+      ThreadStartParams (Runnable* runner, int32* isRunningPtr, 
+        Barrier* startupBarrier)
+        : runnable (runner), isRunningPtr (isRunningPtr), 
+        startupBarrier (startupBarrier)
       {
       }
 
       Runnable* runnable;
       int32* isRunningPtr;
+      Barrier* startupBarrier;
     };
 
     unsigned int __stdcall proxyFunc (void* param)
     {
+      // Extract the parameters
       ThreadStartParams* tp = static_cast<ThreadStartParams*> (param);
-
       int32* isRunningPtr = tp->isRunningPtr;
       Runnable* runnable = tp->runnable;
+      Barrier* startupBarrier = tp->startupBarrier;
 
+      // Set as running and wait for main thread to catch up
       AtomicOperations::Set (isRunningPtr, 1);
+      startupBarrier->Wait ();
+      
+      // Run      
       runnable->Run ();
+
+      // Set as non-running
       AtomicOperations::Set (isRunningPtr, 0);
 
+      
       return 0;
     }
 
@@ -115,13 +127,16 @@ namespace Implementation
   {
     if (!threadHandle)
     {
-      ThreadStartParams param (runnable, &isRunning);
+      Barrier startupBarrier (2);
+      ThreadStartParams param (runnable, &isRunning, &startupBarrier);
 
       // _beginthreadex does not always return a void*,
       // on some versions of MSVC it gives uintptr_t
       // and therefor needs a reinterpret_cast.
       threadHandle = reinterpret_cast<void*> (_beginthreadex (0, 0, &proxyFunc, 
         &param, 0, &threadId));
+
+      startupBarrier.Wait ();
     }
   }
 

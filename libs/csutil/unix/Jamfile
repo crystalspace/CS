@@ -25,9 +25,7 @@ CSUTIL.GENERIC +=
   appdir.cpp
   apppath.cpp
   appfilename.cpp
-  csprocessorcap.cpp
-  cspthrd.cpp
-  cspthrd.h
+  csprocessorcap.cpp  
   expandname.cpp
   findlib.cpp
   getopt.cpp
