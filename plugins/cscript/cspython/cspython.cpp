@@ -300,7 +300,7 @@ PyObject *csPython::FindObject(const char *url,bool do_errors)
   PyObject *py_curr = py_main;
   while (iter.HasNext())
   {
-    PyObject *py_next = PyObject_GetAttrString(py_curr,iter.Next());
+    PyObject *py_next = PyObject_GetAttrString(py_curr,const_cast<char*>(iter.Next()));
     if (!py_next)
     {
       if (do_errors)
@@ -325,7 +325,8 @@ PyObject *csPython::FindFunction(const char *url,bool do_errors)
   Py_INCREF(py_main);
   while (iter.HasNext())
   {
-    PyObject *py_next = PyObject_GetAttrString(py_curr,iter.Next());
+    PyObject *py_next = PyObject_GetAttrString(py_curr,
+		    		const_cast<char*>(iter.Next()));
     if (!py_next)
     {
       if (do_errors)
@@ -356,7 +357,7 @@ bool csPython::Store (const char *name, iScriptValue *value)
   }
   else
   {
-    result = PyObject_SetAttrString(py_main,name,Query(value)->self);
+    result = PyObject_SetAttrString(py_main,const_cast<char*>(name),Query(value)->self);
   }
   
   if (result == -1) 
@@ -392,7 +393,7 @@ bool csPython::Remove (const char *name)
   }
   else
   {
-    result = PyObject_DelAttrString(py_main,name);
+    result = PyObject_DelAttrString(py_main,const_cast<char*>(name));
   }
 
   if (result == -1) 
@@ -495,7 +496,7 @@ void* csPython::Object::GetPointer ()
 
 csPtr<iScriptValue> csPython::Object::Call (const char *name, const csRefArray<iScriptValue> &args)
 {
-  PyObject *py_func = PyObject_GetAttrString(self,name);
+  PyObject *py_func = PyObject_GetAttrString(self,const_cast<char*>(name));
   if (!py_func)
   {
     parent->ShowError();
@@ -505,7 +506,8 @@ csPtr<iScriptValue> csPython::Object::Call (const char *name, const csRefArray<i
 }
 bool csPython::Object::Set (const char *name, iScriptValue *value)
 {
-  if (PyObject_SetAttrString(self,name,parent->Query(value)->self) == -1)
+  if (PyObject_SetAttrString(self,const_cast<char*>(name),
+			  	parent->Query(value)->self) == -1)
   {
     parent->ShowError();
     return false;
@@ -515,7 +517,7 @@ bool csPython::Object::Set (const char *name, iScriptValue *value)
 }
 csPtr<iScriptValue> csPython::Object::Get (const char *name)
 {
-  PyObject *res = PyObject_GetAttrString(self,name);
+  PyObject *res = PyObject_GetAttrString(self,const_cast<char*>(name));
   if (res)
     return new Value(parent,res,false);
   else
