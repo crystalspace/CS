@@ -22,6 +22,8 @@ chronological order.
 	  instead of errors when it encounter problems.
 	- caedes replaced uses of CS_GET_CHILD_OBJECT in walktest and mazing
 	  apps by CS::GetChildObject.
+	- res fixed some 'friend' methods of csSphere and csMatrix2 lacking
+	  CS_CRYSTALSPACE_EXPORT.
 23-Oct-2007
 	- Marten cleaned out a few remaining deprecated classes left from 
 	  pre 1.2 including the old threading subsystem.
