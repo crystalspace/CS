@@ -7,6 +7,9 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 23-Oct-2007
+	- caedes implemented 'new' iScript interface for cspython. Fixes
+	  trac #93.
+23-Oct-2007
 	- Marten cleaned out a few remaining deprecated classes left from 
 	  pre 1.2 including the old threading subsystem.
 	- Marten removed a potential race & deadlock from the thread startup.
