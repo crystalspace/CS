@@ -10,6 +10,9 @@ chronological order.
 	- caedes added a bunch of const_cast to cspython to account for 
 	  incorrect prototypes in python 2.4 functions (which would lead to
 	  compile errors).
+	- Jorrit updated SimpleRoom.java so that it no longer uses the
+	  deprecated CS_QUERY_REGISTRY and SCF_QUERY_INTERFACE. Also changed
+	  it to use genmesh instead of thing for the walls.
 24-Oct-2007
 	- caedes implemented 'new' iScript interface for cspython. Fixes
 	  trac #93.
