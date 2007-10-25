@@ -21,8 +21,6 @@
   See include/bindings/cspace.i
 */
 
-#ifdef SWIGPYTHON
-
 %include "bindings/python/pyattributes.i"
 %rename(_CreateEnvironment) csInitializer::CreateEnvironment;
 %rename(_InitializeSCF) csInitializer::InitializeSCF;
@@ -420,7 +418,6 @@ CS_WRAP_PTR_TYPEMAP(csWrapPtr)
   $1 = ptr;
 }
 
-#ifndef CS_MINI_SWIG
 /*
  * Using the shadow feature allows us to define our own python code to replace
  * the automatically generated wrapper for a function.	This is also the only
@@ -593,24 +590,12 @@ def __iter__(self):
 }
 %enddef
 
+// csstring typemaps
+%include "bindings/python/csstring.i"
 
-// csStringFast typemaps
-%typemap(out) csStringFast *
-{
-        const char *res = $1->GetData();
-        $result = SWIG_FromCharPtr(res);
-}
-
-%typemap(in) csStringFast *
-{
-        $1 = new $1_basetype (PyString_AsString($input));
-}
-
-%typemap(freearg) csStringFast *
-{
-   delete $1;
-}
-
+/*
+ * Macro for handling deprecated methods
+*/
 #undef DEPRECATED_METHOD
 %define DEPRECATED_METHOD(ClassName,Method,Replacement)
 %ignore ClassName ## :: ## Method ## ;
@@ -624,6 +609,3 @@ def __iter__(self):
 }
 %enddef
 
-#endif // ifndef CS_MINI_SWIG
-
-#endif // SWIGPYTHON
