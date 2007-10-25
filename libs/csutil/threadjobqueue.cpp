@@ -20,7 +20,6 @@
 #include "cssysdef.h"
 
 #include "csgeom/math.h"
-#include "csutil/scopedmutexlock.h"
 #include "csutil/sysfunc.h"
 #include "csutil/threadjobqueue.h"
 

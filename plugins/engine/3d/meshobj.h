@@ -125,7 +125,7 @@ struct ExtraRenderMeshData
     csZBufMode      zBufMode;
 };
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * The holder class for all implementations of iMeshObject.
@@ -678,6 +678,6 @@ public:
   }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 #endif // __CS_MESHOBJ_H__

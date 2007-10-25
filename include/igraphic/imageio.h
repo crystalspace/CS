@@ -102,7 +102,9 @@ struct iImageIO : public virtual iBase
    * By default this option is disabled. If you enable it, all images will
    * be dithered both after loading and after mipmapping/scaling. This will
    * affect all truecolor->paletted image conversions.
+   * \deprecated Deprecated in 1.3. Defunct option.
    */
+  CS_DEPRECATED_METHOD_MSG("Defunct option")
   virtual void SetDithering (bool iEnable) = 0;
 
   /**

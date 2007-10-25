@@ -53,7 +53,7 @@ struct iObjectRegistry;
 struct iEngine;
 struct iMeshWrapper;
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * This class represents a particle system. It is a set of iParticles.
@@ -427,7 +427,7 @@ public:
   { part_accel[idx] = acl; }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /** @} */
 

@@ -36,7 +36,7 @@
 
 /* Workaround for deprecation warnings caused by types used as the template 
  * parameter */
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**\addtogroup util_containers
  * @{ */
@@ -81,6 +81,6 @@ public:
 
 /** @} */
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 #endif // __CS_NOBJVEC_H__

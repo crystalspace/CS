@@ -25,7 +25,7 @@
 
 #include "csutil/cfgacc.h"
 #include "csutil/scf_implementation.h"
-#include "csutil/thread.h"
+#include "csutil/threading/thread.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 
@@ -120,7 +120,7 @@ private:
   /// The OpenAL context for this renderer
   ALCcontext *m_Context;
   /// Mutex to lock the OpenAL context
-  csRef< csMutex > m_ContextLock;
+  CS::Threading::RecursiveMutex m_ContextLock;
 
   /// The unique listener object for this renderer
   csRef< SndSysListenerOpenAL > m_Listener;

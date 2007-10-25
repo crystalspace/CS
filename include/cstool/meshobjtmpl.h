@@ -60,7 +60,7 @@ struct iMaterialWrapper;
   };
 
 // For InvalidateMaterialHandles
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * This is an abstract implementation of iMeshObject. It can be used to
@@ -272,7 +272,7 @@ public:
   virtual iTerrainSystem* GetTerrainColldet () { return 0; }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * This is the abstract implementation of iMeshObjectFactory. Like

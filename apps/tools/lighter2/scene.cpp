@@ -123,6 +123,9 @@ namespace lighter
   {
     progress.SetProgress (0);
 
+    Statistics::Progress filesProgress (0, 9, &progress);
+    Statistics::Progress allProgress (0, 1, &progress);
+
     if (sceneFiles.GetSize () == 0) 
       return globalLighter->Report ("No files to load!");
 
@@ -137,9 +140,12 @@ namespace lighter
         return globalLighter->Report ("Error setting directory '%s'!", 
           sceneFiles[i].directory.GetData());
 
+      sceneFiles[i].fileName = "world";
       // Load it
-      csRef<iFile> buf = globalLighter->vfs->Open ("world", VFS_FILE_READ);
-      if (!buf) return globalLighter->Report ("Error opening file 'world'!");
+      csRef<iFile> buf = globalLighter->vfs->Open (
+        sceneFiles[i].fileName, VFS_FILE_READ);
+      if (!buf) return globalLighter->Report ("Error opening file '%s'!",
+        sceneFiles[i].fileName.GetData());
       
       csRef<iDocument> doc = globalLighter->docSystem->CreateDocument ();
       const char* error = doc->Parse (buf, true);
@@ -202,21 +208,25 @@ namespace lighter
         sceneFiles[i].sceneConfig.Initialize (cfgFile);
       }
 
-      sceneFiles[i].document = doc;
-      sceneFiles[i].rootNode = doc->GetRoot ();
+      sceneFiles[i].SetDocument (doc);
       // ChDirAuto() may have created an automount, use that...
       sceneFiles[i].directory = globalLighter->vfs->GetCwd ();
 
       // Pass it to the loader
       iBase *res;
-      if (!globalLighter->loader->Load (sceneFiles[i].rootNode, res))
+      if (!globalLighter->loader->Load (
+          sceneFiles[i].GetDocument()->GetRoot(), res))
         return globalLighter->Report ("Error loading file 'world'!");
 
       // Parses meshes from engine
-      Statistics::Progress* progEngine = progress.CreateProgress (div);
+      Statistics::Progress* progEngine = filesProgress.CreateProgress (div);
       ParseEngine (&sceneFiles[i], *progEngine);
       delete progEngine;
+
+      filesProgress.SetProgress (i * div);
     }
+
+    ParseEngineAll (allProgress);
 
     /* We have turned everything needed into our own objects which keep
        refs to the engine objects as needed. Hence instruct engine to
@@ -242,8 +252,7 @@ namespace lighter
     {
       //Traverse the DOM, save any factory we encounter
       Statistics::Progress* progFile = progress.CreateProgress (fileProgress);
-      SaveSceneFactoriesToDom (sceneFiles[i].rootNode, &sceneFiles[i],
-        *progFile);
+      SaveSceneFactoriesToDom (&sceneFiles[i], *progFile);
       delete progFile;
     }
 
@@ -266,7 +275,7 @@ namespace lighter
     {
       //Traverse the DOM, save any mesh we encounter
       Statistics::Progress* progFile = progress.CreateProgress (fileProgress);
-      SaveSceneMeshesToDom (sceneFiles[i].rootNode, &sceneFiles[i], *progFile);
+      SaveSceneMeshesToDom (&sceneFiles[i], *progFile);
       delete progFile;
     }
 
@@ -287,10 +296,10 @@ namespace lighter
     float fileProgress = 1.0f / sceneFiles.GetSize ();
     for (size_t i = 0; i < sceneFiles.GetSize (); i++)
     {
+      if (!sceneFiles[i].IsChanged()) continue;
+        
       //Change path
-      csStringArray paths;
-      paths.Push ("/lev/");
-      if (!globalLighter->vfs->ChDirAuto (sceneFiles[i].directory, &paths, 0, "world"))
+      if (!globalLighter->vfs->ChDir (sceneFiles[i].directory))
       {
         globalLighter->Report ("Error setting directory '%s'!", 
           sceneFiles[i].directory.GetData());
@@ -309,7 +318,7 @@ namespace lighter
         return false;
       }
 
-      const char *err = sceneFiles[i].document->Write (buf);
+      const char *err = sceneFiles[i].GetDocument()->Write (buf);
       if (err)
       {
         globalLighter->Report ("Error writing file '%s': %s", 
@@ -318,8 +327,7 @@ namespace lighter
       }
 
       // Release document, not needed any more.
-      sceneFiles[i].document.Invalidate();
-      sceneFiles[i].rootNode.Invalidate();
+      sceneFiles[i].SetDocument (0);
 
       progress.IncProgress (fileProgress);
     }
@@ -349,11 +357,15 @@ namespace lighter
     for (size_t i = 0; i < sceneFiles.GetSize (); i++)
     {
       Statistics::Progress* progFile = progress.CreateProgress (fileProgress);
+      if (!sceneFiles[i].IsChanged()) 
+      {
+        progFile->SetProgress (1);
+        delete progFile;
+        continue;
+      }
 
       //Change path
-      csStringArray paths;
-      paths.Push ("/lev/");
-      if (!globalLighter->vfs->ChDirAuto (sceneFiles[i].directory, &paths, 0, "world"))
+      if (!globalLighter->vfs->ChDir (sceneFiles[i].directory))
       {
         globalLighter->Report ("Error setting directory '%s'!", 
           sceneFiles[i].directory.GetData());
@@ -374,10 +386,11 @@ namespace lighter
       buf = SaveDebugData (sceneFiles[i], buf, *progFile);
 
       // ... write to 'world' ...
-      if (!globalLighter->vfs->WriteFile ("world", buf->GetData(), 
+      if (!globalLighter->vfs->WriteFile (sceneFiles[i].fileName, buf->GetData(), 
         buf->GetSize()))
       {
-        globalLighter->Report ("Error writing to 'world'!");
+        globalLighter->Report ("Error writing to '%s'!",
+          sceneFiles[i].fileName.GetData());
         return false;
       }
 
@@ -426,10 +439,10 @@ namespace lighter
     float fileProgress = 1.0f / sceneFiles.GetSize ();
     for (size_t i = 0; i < sceneFiles.GetSize (); i++)
     {
+      if (!sceneFiles[i].IsChanged()) continue;
+
       //Change path
-      csStringArray paths;
-      paths.Push ("/lev/");
-      if (!globalLighter->vfs->ChDirAuto (sceneFiles[i].directory, &paths, 0, "world"))
+      if (!globalLighter->vfs->ChDir (sceneFiles[i].directory))
       {
         globalLighter->Report ("Error setting directory '%s'!", 
           sceneFiles[i].directory.GetData());
@@ -449,6 +462,7 @@ namespace lighter
             lightmapLibraryName, err);
           return false;
         }
+        doc = EnsureChangeable (doc);
       }
       else
       {
@@ -505,9 +519,7 @@ namespace lighter
     for (size_t i = 0; i < sceneFiles.GetSize (); i++)
     {
       //Change path
-      csStringArray paths;
-      paths.Push ("/lev/");
-      if (!globalLighter->vfs->ChDirAuto (sceneFiles[i].directory, &paths, 0, "world"))
+      if (!globalLighter->vfs->ChDir (sceneFiles[i].directory))
       {
         globalLighter->Report ("Error setting directory '%s'!", 
           sceneFiles[i].directory.GetData());
@@ -611,20 +623,8 @@ namespace lighter
   {
     progress.SetProgress (0);
 
-    Statistics::Progress sectorProgress (0, 1, &progress);
-    Statistics::Progress portalProgress (0, 1, &progress);
-    Statistics::Progress lightProgress (0, 1, &progress);
-    Statistics::Progress meshProgress (0, 1, &progress);
-    
-    // Parse materials
-    iMaterialList* matList = globalLighter->engine->GetMaterialList ();
-    for (int i = 0; i < matList->GetCount (); i++)
-    {
-      ParseMaterial (matList->Get (i));
-    }
-
     // Parse sectors
-    sectorProgress.SetProgress (0);
+    /*sectorProgress.SetProgress (0);
     iSectorList *sectorList = globalLighter->engine->GetSectors ();
     float progressStep = 1.0f / sectorList->GetCount ();
     for (int i = 0; i < sectorList->GetCount (); i++)
@@ -634,35 +634,35 @@ namespace lighter
       ParseSector (fileInfo, sectorList->Get (i), *progSector);
       delete progSector;
     }
-    sectorProgress.SetProgress (1);
-
-    // Parse portals
-    portalProgress.SetProgress (0);
-    SectorOrigSectorHash::GlobalIterator sectIt = originalSectorHash.GetIterator ();
-    while (sectIt.HasNext ())
-    {
-      Sector* sector;
-      csPtrKey<iSector> srcSector;
-
-      sector = sectIt.Next (srcSector);
-      ParsePortals (srcSector, sector);
-    }
-    portalProgress.SetProgress (1);
+    sectorProgress.SetProgress (1);*/
 
     // Map mesh objects loaded from each scene file to it
-    meshProgress.SetProgress (0);
-    for (size_t i = 0; i < sceneFiles.GetSize (); i++)
-    {
-      csRef<iDocumentNode> worldNode = 
-        sceneFiles[i].rootNode->GetNode ("world");
+    iSectorList *sectorList = globalLighter->engine->GetSectors ();
+    csRef<iDocumentNode> worldNode = 
+      fileInfo->GetDocument()->GetRoot()->GetNode ("world");
 
+    if (worldNode.IsValid ())
+    {
       csRef<iDocumentNodeIterator> sectorNodeIt = 
         worldNode->GetNodes ("sector");
+      float progressStep = 1.0f / sectorNodeIt->GetEndPosition ();
       while (sectorNodeIt->HasNext())
       {
+        progress.SetProgress (
+          progressStep * sectorNodeIt->GetNextPosition ());
+
         csRef<iDocumentNode> sectorNode = sectorNodeIt->Next ();
         const char* sectorName = sectorNode->GetAttributeValue ("name");
         if (!sectorName) continue;
+
+        csRef<iSector> engSector = sectorList->FindByName (sectorName);
+        if (!engSector.IsValid ()) continue;
+
+        Statistics::Progress* progSector = 
+          progress.CreateProgress (progressStep);
+        ParseSector (fileInfo, engSector, *progSector);
+        delete progSector;
+
         const Sector* sector = sectors.Get (sectorName, (Sector*)0);
         if (!sector) continue;
 
@@ -676,11 +676,40 @@ namespace lighter
 
           Object* obj = sector->allObjects.Get (meshName, (Object*)0);
           if (!obj) continue;
-          sceneFiles[i].fileObjects.Push (obj);
+          fileInfo->fileObjects.Push (obj);
         }
       }
     }
-    meshProgress.SetProgress (1);
+
+    progress.SetProgress (1);
+    return true;
+  }
+
+  bool Scene::ParseEngineAll (Statistics::Progress& progress)
+  {
+    progress.SetProgress (0);
+
+    Statistics::Progress portalProgress (0, 1, &progress);
+
+    // Parse materials
+    iMaterialList* matList = globalLighter->engine->GetMaterialList ();
+    for (int i = 0; i < matList->GetCount (); i++)
+    {
+      ParseMaterial (matList->Get (i));
+    }
+
+    // Parse portals
+    portalProgress.SetProgress (0);
+    SectorOrigSectorHash::GlobalIterator sectIt = originalSectorHash.GetIterator ();
+    while (sectIt.HasNext ())
+    {
+      Sector* sector;
+      csPtrKey<iSector> srcSector;
+
+      sector = sectIt.Next (srcSector);
+      ParsePortals (srcSector, sector);
+    }
+    portalProgress.SetProgress (1);
 
     progress.SetProgress (1);
     return true;
@@ -738,6 +767,7 @@ namespace lighter
       }
     }
 
+    csSet<csString> lightNames;
     // Parse all lights (should have selector later!)
     iLightList *lightList = sector->GetLights ();
     for (int i = lightList->GetCount (); i-- > 0;)
@@ -748,6 +778,17 @@ namespace lighter
         lightList->Remove (i);
         continue;
       }
+
+      const char* lightName = light->QueryObject()->GetName ();
+      if (lightNames.Contains (lightName))
+      {
+        globalLighter->Report (
+          "A light named '%s' already exists in sector '%s'",
+          lightName, sectorName);
+        lightList->Remove (i);
+        continue;
+      }
+      lightNames.AddNoTest (lightName);
 
       bool isPD = light->GetDynamicType() == CS_LIGHT_DYNAMICTYPE_PSEUDO;
 
@@ -762,7 +803,7 @@ namespace lighter
         light->GetAttenuationConstants ());
       intLight->SetPDLight (isPD);
       intLight->SetLightID (light->GetLightID());
-      intLight->SetName (light->QueryObject()->GetName ());
+      intLight->SetName (lightName);
 
       intLight->SetRadius (light->GetCutoffDistance ());
 
@@ -1021,6 +1062,17 @@ namespace lighter
     return true;
   }
 
+  iDocument* Scene::LoadedFile::GetDocumentChangeable ()
+  {
+    if (!document.IsValid()) return 0;
+    if (docChangeable)
+      return document;
+
+    SetDocument (Scene::EnsureChangeable (document));
+    CS_ASSERT(docChangeable);
+    return document;
+  }
+  
   void Scene::CollectDeleteTextures (iDocumentNode* textureNode,
                                      csSet<csString>& filesToDelete)
   {
@@ -1087,14 +1139,22 @@ namespace lighter
     }
   }
 
-  void Scene::SaveSceneFactoriesToDom (iDocumentNode* r, LoadedFile* fileInfo,
+  void Scene::SaveSceneFactoriesToDom (LoadedFile* fileInfo,
                                        Statistics::Progress& progress)
   {
     progress.SetProgress (0);
 
     csSet<csString> savedFactories;
     
-    csRef <iDocumentNode> worldRoot = r->GetNode ("world");
+    csRef<iDocumentNode> rootNode = 
+      fileInfo->GetDocumentChangeable()->GetRoot();
+    csRef <iDocumentNode> worldRoot = rootNode->GetNode ("world");
+    if (!worldRoot)
+    {
+      worldRoot = rootNode->GetNode ("library");
+    }
+    if (!worldRoot) return;
+
     csRef<iDocumentNodeIterator> it = worldRoot->GetNodes ();
     float nodeStep = 1.0f / it->GetEndPosition ();
 
@@ -1133,7 +1193,7 @@ namespace lighter
     progress.SetProgress (1);
   }
 
-  void Scene::SaveSceneMeshesToDom (iDocumentNode* r, LoadedFile* fileInfo,
+  void Scene::SaveSceneMeshesToDom (LoadedFile* fileInfo,
                                     Statistics::Progress& progress)
   {
     Statistics::Progress sectorProgress (0, 90, &progress);
@@ -1147,7 +1207,9 @@ namespace lighter
     
     BuildLightmapTextureList (fileInfo, texturesToSave);
 
-    csRef <iDocumentNode> worldRoot = r->GetNode ("world");
+    csRef <iDocumentNode> worldRoot = 
+      fileInfo->GetDocumentChangeable()->GetRoot()->GetNode ("world");
+    if (!worldRoot.IsValid ()) return;
 
     sectorProgress.SetProgress (0);
     csRef<iDocumentNodeIterator> it = worldRoot->GetNodes ();
@@ -1358,6 +1420,7 @@ namespace lighter
     // Clean out debugging aid meshes (will be saved later)
     if (IsDebugMesh (name))
     {
+      fileInfo->SetChanged (true);
       return svRemoveItem;
     }
 
@@ -1382,6 +1445,7 @@ namespace lighter
       }
     }
 
+    fileInfo->SetChanged (true);
     return svSuccess;
   }
 
@@ -1419,7 +1483,10 @@ namespace lighter
     // Save the mesh
     csString name = objNode->GetAttributeValue ("name");
     if (IsDebugMesh (name))
+    {
+      fileInfo->SetChanged (true);
       return svRemoveItem;
+    }
     if (savedObjects.Contains (name))
       /* Already emitted an "ignoring duplicate mesh" earlier, so just skip 
          saving here. */
@@ -1465,6 +1532,7 @@ namespace lighter
         objNode->RemoveNode (node);
     }
 
+    fileInfo->SetChanged (true);
     return svSuccess;
   }
 
@@ -1498,7 +1566,7 @@ namespace lighter
     csString filename;
     csString texname;
     csStringArray pdLightmapFiles;
-    csStringArray pdLightIDs;
+    csArray<Light*> pdLights;
     Lightmap* lm;
     bool isSolid;
     csColor solidColor;
@@ -1583,7 +1651,7 @@ namespace lighter
             globalConfig.GetLMProperties().grayPDMaps);
         }
         savetex.pdLightmapFiles.Push (textureFilename);
-        savetex.pdLightIDs.Push (lmID);
+        savetex.pdLights.Push (key);
       }
 
       texturesToSave.Push (savetex);
@@ -1714,7 +1782,10 @@ namespace lighter
           csRef<iDocumentNode> mapNode = 
             pdlightParamsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
           mapNode->SetValue ("map");
-          mapNode->SetAttribute ("lightid", textureToSave.pdLightIDs[p]);
+          mapNode->SetAttribute ("lightsector", 
+            textureToSave.pdLights[p]->GetSector()->sectorName);
+          mapNode->SetAttribute ("lightname", 
+            textureToSave.pdLights[p]->GetName());
 
           csRef<iDocumentNode> mapContents = 
             mapNode->CreateNodeBefore (CS_NODE_TEXT, 0);
@@ -1751,9 +1822,7 @@ namespace lighter
       return csPtr<iDataBuffer> (csRef<iDataBuffer> (sourceData));
     }
 
-    csRef<iDocumentSystem> docSys;
-    docSys.AttachNew (new csTinyDocumentSystem);
-    csRef<iDocument> doc (docSys->CreateDocument ());
+    csRef<iDocument> doc (globalLighter->docSystem->CreateDocument ());
     const char* err = doc->Parse (sourceData);
     if (err != 0)
     {
@@ -1764,7 +1833,7 @@ namespace lighter
 
     float sectorProgress = 1.0f / sectors.GetSize ();
 
-    csRef<iDocument> newDoc (docSys->CreateDocument ());
+    csRef<iDocument> newDoc (globalLighter->docSystem->CreateDocument ());
     csRef<iDocumentNode> srcRoot (doc->GetRoot ());
     csRef<iDocumentNode> newRoot (newDoc->CreateRoot ());
 
@@ -1871,7 +1940,26 @@ namespace lighter
     globalLighter->vfs->PopDir ();
     return ret;
   }
-  
+
+  csRef<iDocument> Scene::EnsureChangeable (iDocument* doc)
+  {
+    int changeable = doc->Changeable ();
+    if (changeable == CS_CHANGEABLE_YES)
+      return doc;
+
+    csRef<iDocument> newDoc;
+    if (changeable == CS_CHANGEABLE_NEWROOT)
+      newDoc = doc;
+    else
+      newDoc = globalLighter->docSystem->CreateDocument ();
+
+    csRef<iDocumentNode> oldRoot = doc->GetRoot ();
+    csRef<iDocumentNode> newRoot = newDoc->CreateRoot ();
+    CS::DocSystem::CloneNode (oldRoot, newRoot);
+
+    return newDoc;
+  }
+
   //-------------------------------------------------------------------------
 
   Scene::LightingPostProcessor::LightingPostProcessor (Scene* scene) : scene (scene)

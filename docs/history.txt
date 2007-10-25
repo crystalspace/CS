@@ -6,8 +6,78 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+25-Oct-2007
+	- caedes added a bunch of const_cast to cspython to account for 
+	  incorrect prototypes in python 2.4 functions (which would lead to
+	  compile errors).
+	- Jorrit updated SimpleRoom.java so that it no longer uses the
+	  deprecated CS_QUERY_REGISTRY and SCF_QUERY_INTERFACE. Also changed
+	  it to use genmesh instead of thing for the walls.
+24-Oct-2007
+	- caedes implemented 'new' iScript interface for cspython. Fixes
+	  trac #93.
+	- caedes fixed error message routing in cspython to send errors
+	  as reporter errors instead of warnings.
+	- caedes changed pysimp to use new iScript interface, and also changed
+	  way cspython is loaded so it can report its command line help.
+	- Marten made a number of fixes to the threading subsystem:
+	   - Added a barrier synchronization primitive.
+	   - Reimplemented the thread startup synchronization.
+	   - Removed some fallout of yesterdays cleanup of old threading.
+	- caedes removed data/varia/walktest.cam. Fixes trac #162.
+	- caedes changed walktest LoadCamera command to emit warnings
+	  instead of errors when it encounter problems.
+	- caedes replaced uses of CS_GET_CHILD_OBJECT in walktest and mazing
+	  apps by CS::GetChildObject.
+	- res fixed some 'friend' methods of csSphere and csMatrix2 lacking
+	  CS_CRYSTALSPACE_EXPORT.
+23-Oct-2007
+	- Marten cleaned out a few remaining deprecated classes left from 
+	  pre 1.2 including the old threading subsystem.
+	- Marten removed a potential race & deadlock from the thread startup.
+	  This change impose a small change in (undocumented) semantics of
+	  CS::Threading::Thread::Start(), the method might now return before
+	  the thread have fully started.
+21-Oct-2007
+	- res augmented ptpdlight to also support light specification by
+	  sector and light name (which should be much more reliable than using
+	  the light ID).
+	- res made lighter2 write out sector and light name instead of the
+	  light ID for ptpdlight lightmap-light mappings.
+	- res changed lighter2 to not only support XML world files.
+	- res slightly improved lighter2's support for multiple world files:
+	  meshless worlds that only carry textures and materials now work.
+	- res augmented gmeshanimpdl to also support light specification by
+	  sector and light name.
+	- res made lighter2 write out sector and light name instead of the
+	  light ID for gmeshanimpdl lightmap-light mappings.
 20-Oct-2007
-        - Mike Gist added a compile fix for the OpenAL plugin on MSVC.
+	- res added a method to iTextureHandle to query whether applying a
+	  blit buffer may potentially require calls into foreign code.
+	- res changed the ptpdlight MMX code to do an 'emms' if applying the
+	  blit buffer potentially calls foreign code. Actually fixes some
+	  corruption experienced with ATI drivers and using glTexSubImage2D.
+	- res added support for the pixel pack/unpack buffer bindings to the
+	  GL state cache.
+	- res fixed some errors in csimagetool's getopt_long() options string.
+	- res changed the JPG loader to only return paletted images if the
+	  loaded image is grayscale; otherwise, the quantization is left to
+	  CS.
+	- res deprecated the (pretty much defunct for while now) 
+	  iImageIO::SetDithering() method.
+	- Darek updated haze docs.
+	- caedes added macros to swig bindings to allow declaring structures
+          similar to csWrapPtr in other modules.
+        - caedes added some immutable declarations in swig bindings to avoid
+	  a number of warnings.
+	- caedes polished swig jam rule by following some advice from Eric
+	  Sunshine (removed an unecessary variable, and fixed a misleading
+	  comment).
+	- res fixed a wrong order in the shader weaver type info data.
+	- res "generalized" the MSVC deprecation warning headers into 
+	  csutil/deprecation_warn_* since latest gcc also offers a mechanism 
+	  to silence deprecation warnings. 
+	- Mike Gist added a compile fix for the OpenAL plugin on MSVC.
 19-Oct-2007
 	- Vincent added comments about using iSndSysSource3D,
 	  iSndSysSource3DDirectional and iSndSysSource3DDirectionalSimple

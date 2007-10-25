@@ -87,7 +87,7 @@ struct RepMaterial
   	old_mat (o), new_mat (n) { }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * A helper class for iTriangleMesh implementations used by csThing.
@@ -555,7 +555,7 @@ public:
   virtual iTerrainSystem* GetTerrainColldet () { return 0; }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * A Thing is a set of polygons. A thing can be used for the

@@ -68,6 +68,9 @@ namespace Graphics
     return cullNormal;
   }
 
+// For RenderMeshModes::flipCulling
+#include "csutil/deprecated_warn_off.h"
+
 /**
  * Mesh render mode information. Contains the Z, mix and alpha modes to use
  * for rendering a mesh. 
@@ -106,6 +109,8 @@ struct RenderMeshModes
   /// Holder of default render buffers
   csRef<csRenderBufferHolder> buffers;
 };
+
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * Data required by the renderer to draw a mesh.

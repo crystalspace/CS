@@ -481,7 +481,10 @@ int gfxtest_main (iObjectRegistry* object_reg, int argc, char *argv[])
   programname = argv [0];
 
   int c;
-  while ((c = getopt_long (argc, argv, "8cdaAs:m:t:p:D:S:E::M:O:P:U::IhvVFTNC", long_options, 0)) != EOF)
+  /* getopt_long 101: one colon follows - required argument, 
+                      two colons - optional arg. */
+  while ((c = getopt_long (argc, argv, 
+      "8cdaAs:m:t:p:D::S::EM:O:P:U:IhvVFTNC", long_options, 0)) != EOF)
     switch (c)
     {
       case '?':

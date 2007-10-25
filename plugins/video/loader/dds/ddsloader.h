@@ -56,6 +56,9 @@ enum csDDSRawDataType
   csrawAlphaLast = csrawA8R8G8B8
 };
 
+// For SetDithering()
+#include "csutil/deprecated_warn_off.h"
+
 class csDDSImageIO : 
   public scfImplementation2<csDDSImageIO,
                             iImageIO,
@@ -82,6 +85,8 @@ private:
   csDDSRawDataType IdentifyPixelFormat (const dds::PixelFormat& pf, 
     uint& bpp);
 };
+
+#include "csutil/deprecated_warn_on.h"
 
 class csDDSImageFile : public csImageMemory
 {

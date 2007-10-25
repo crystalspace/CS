@@ -46040,7 +46040,7 @@ SWIGINTERN PyObject *_wrap_csTriangleMeshTools_PointInClosedMesh(PyObject *SWIGU
   csVector3 *arg1 = 0 ;
   csVector3 *arg2 = (csVector3 *) 0 ;
   csTriangleMinMax *arg3 = (csTriangleMinMax *) 0 ;
-  int arg4 ;
+  size_t arg4 ;
   csPlane3 *arg5 = (csPlane3 *) 0 ;
   bool result;
   void *argp1 = 0 ;
@@ -46049,7 +46049,7 @@ SWIGINTERN PyObject *_wrap_csTriangleMeshTools_PointInClosedMesh(PyObject *SWIGU
   int res2 = 0 ;
   void *argp3 = 0 ;
   int res3 = 0 ;
-  int val4 ;
+  size_t val4 ;
   int ecode4 = 0 ;
   void *argp5 = 0 ;
   int res5 = 0 ;
@@ -46078,11 +46078,11 @@ SWIGINTERN PyObject *_wrap_csTriangleMeshTools_PointInClosedMesh(PyObject *SWIGU
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "csTriangleMeshTools_PointInClosedMesh" "', argument " "3"" of type '" "csTriangleMinMax *""'"); 
   }
   arg3 = reinterpret_cast< csTriangleMinMax * >(argp3);
-  ecode4 = SWIG_AsVal_int(obj3, &val4);
+  ecode4 = SWIG_AsVal_size_t(obj3, &val4);
   if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "csTriangleMeshTools_PointInClosedMesh" "', argument " "4"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "csTriangleMeshTools_PointInClosedMesh" "', argument " "4"" of type '" "size_t""'");
   } 
-  arg4 = static_cast< int >(val4);
+  arg4 = static_cast< size_t >(val4);
   res5 = SWIG_ConvertPtr(obj4, &argp5,SWIGTYPE_p_csPlane3, 0 |  0 );
   if (!SWIG_IsOK(res5)) {
     SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "csTriangleMeshTools_PointInClosedMesh" "', argument " "5"" of type '" "csPlane3 *""'"); 
@@ -46102,7 +46102,7 @@ SWIGINTERN PyObject *_wrap_csTriangleMeshTools_LineInClosedMesh(PyObject *SWIGUN
   csVector3 *arg2 = 0 ;
   csVector3 *arg3 = (csVector3 *) 0 ;
   csTriangleMinMax *arg4 = (csTriangleMinMax *) 0 ;
-  int arg5 ;
+  size_t arg5 ;
   csPlane3 *arg6 = (csPlane3 *) 0 ;
   bool result;
   void *argp1 = 0 ;
@@ -46113,7 +46113,7 @@ SWIGINTERN PyObject *_wrap_csTriangleMeshTools_LineInClosedMesh(PyObject *SWIGUN
   int res3 = 0 ;
   void *argp4 = 0 ;
   int res4 = 0 ;
-  int val5 ;
+  size_t val5 ;
   int ecode5 = 0 ;
   void *argp6 = 0 ;
   int res6 = 0 ;
@@ -46151,11 +46151,11 @@ SWIGINTERN PyObject *_wrap_csTriangleMeshTools_LineInClosedMesh(PyObject *SWIGUN
     SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "csTriangleMeshTools_LineInClosedMesh" "', argument " "4"" of type '" "csTriangleMinMax *""'"); 
   }
   arg4 = reinterpret_cast< csTriangleMinMax * >(argp4);
-  ecode5 = SWIG_AsVal_int(obj4, &val5);
+  ecode5 = SWIG_AsVal_size_t(obj4, &val5);
   if (!SWIG_IsOK(ecode5)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "csTriangleMeshTools_LineInClosedMesh" "', argument " "5"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "csTriangleMeshTools_LineInClosedMesh" "', argument " "5"" of type '" "size_t""'");
   } 
-  arg5 = static_cast< int >(val5);
+  arg5 = static_cast< size_t >(val5);
   res6 = SWIG_ConvertPtr(obj5, &argp6,SWIGTYPE_p_csPlane3, 0 |  0 );
   if (!SWIG_IsOK(res6)) {
     SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "csTriangleMeshTools_LineInClosedMesh" "', argument " "6"" of type '" "csPlane3 *""'"); 
@@ -46174,7 +46174,7 @@ SWIGINTERN PyObject *_wrap_csTriangleMeshTools_BoxInClosedMesh(PyObject *SWIGUNU
   csBox3 *arg1 = 0 ;
   csVector3 *arg2 = (csVector3 *) 0 ;
   csTriangleMinMax *arg3 = (csTriangleMinMax *) 0 ;
-  int arg4 ;
+  size_t arg4 ;
   csPlane3 *arg5 = (csPlane3 *) 0 ;
   bool result;
   void *argp1 = 0 ;
@@ -46183,7 +46183,7 @@ SWIGINTERN PyObject *_wrap_csTriangleMeshTools_BoxInClosedMesh(PyObject *SWIGUNU
   int res2 = 0 ;
   void *argp3 = 0 ;
   int res3 = 0 ;
-  int val4 ;
+  size_t val4 ;
   int ecode4 = 0 ;
   void *argp5 = 0 ;
   int res5 = 0 ;
@@ -46212,11 +46212,11 @@ SWIGINTERN PyObject *_wrap_csTriangleMeshTools_BoxInClosedMesh(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "csTriangleMeshTools_BoxInClosedMesh" "', argument " "3"" of type '" "csTriangleMinMax *""'"); 
   }
   arg3 = reinterpret_cast< csTriangleMinMax * >(argp3);
-  ecode4 = SWIG_AsVal_int(obj3, &val4);
+  ecode4 = SWIG_AsVal_size_t(obj3, &val4);
   if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "csTriangleMeshTools_BoxInClosedMesh" "', argument " "4"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "csTriangleMeshTools_BoxInClosedMesh" "', argument " "4"" of type '" "size_t""'");
   } 
-  arg4 = static_cast< int >(val4);
+  arg4 = static_cast< size_t >(val4);
   res5 = SWIG_ConvertPtr(obj4, &argp5,SWIGTYPE_p_csPlane3, 0 |  0 );
   if (!SWIG_IsOK(res5)) {
     SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "csTriangleMeshTools_BoxInClosedMesh" "', argument " "5"" of type '" "csPlane3 *""'"); 
@@ -47557,6 +47557,9 @@ static void *_p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_
 static void *_p_csArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated(void *x) {
     return (void *)((CS::Memory::CustomAllocated *)  ((csArray<int > *) x));
 }
+static void *_p_csTriangleMeshEdgeTo_p_CS__Memory__CustomAllocated(void *x) {
+    return (void *)((CS::Memory::CustomAllocated *)  ((csTriangleMeshEdge *) x));
+}
 static void *_p_csCatmullRomSplineTo_p_csBSpline(void *x) {
     return (void *)((csBSpline *)  ((csCatmullRomSpline *) x));
 }
@@ -47909,7 +47912,7 @@ static swig_type_info *swig_type_initial[] = {
 static swig_cast_info _swigc__p_AllocatorType[] = {  {&_swigt__p_AllocatorType, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__Memory__AllocatorMalloc[] = {  {&_swigt__p_CS__Memory__AllocatorMalloc, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t[] = {{&_swigt__p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_CS__Memory__CustomAllocated[] = {  {&_swigt__p_CS__Memory__CustomAllocated, 0, 0, 0},  {&_swigt__p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_CS__Memory__CustomAllocated[] = {  {&_swigt__p_CS__Memory__CustomAllocated, 0, 0, 0},  {&_swigt__p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csTriangleMeshEdge, _p_csTriangleMeshEdgeTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__TriangleTTint_t[] = {  {&_swigt__p_csTriangleMinMax, _p_csTriangleMinMaxTo_p_CS__TriangleTTint_t, 0, 0},  {&_swigt__p_CS__TriangleTTint_t, 0, 0, 0},  {&_swigt__p_csTriangle, _p_csTriangleTo_p_CS__TriangleTTint_t, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CapacityHandlerType[] = {  {&_swigt__p_CapacityHandlerType, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_ContainedType[] = {  {&_swigt__p_ContainedType, 0, 0, 0},{0, 0, 0, 0}};

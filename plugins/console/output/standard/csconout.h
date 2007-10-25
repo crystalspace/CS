@@ -19,13 +19,13 @@
 #ifndef __CS_CSCONOUT_H__
 #define __CS_CSCONOUT_H__
 
-#include "csutil/eventnames.h"
-#include "csutil/scopedmutexlock.h"
-#include "csutil/weakref.h"
 #include "csgeom/csrect.h"
 #include "csgfx/rgbpixel.h"
-#include "iutil/eventh.h"
+#include "csutil/eventnames.h"
+#include "csutil/threading/mutex.h"
+#include "csutil/weakref.h"
 #include "iutil/comp.h"
+#include "iutil/eventh.h"
 #include "ivaria/conout.h"
 
 struct iGraphics2D;
@@ -40,10 +40,6 @@ class csConsoleOutput :
                             iConsoleOutput,
                             iComponent>
 {
-private:
-  csRef<csMutex> mutex;
-  CS_DECLARE_SYSTEM_EVENT_SHORTCUTS;
-
 public:
   csConsoleOutput (iBase *base);
   virtual ~csConsoleOutput ();
@@ -166,45 +162,7 @@ public:
   /// Implement simple extension commands.
   virtual bool PerformExtensionV (const char *iCommand, va_list);
 
-  /// iEventHandler interface
-  struct EventHandler : 
-    public scfImplementation1<EventHandler,
-                              iEventHandler>
-  {
-  private:
-    csWeakRef<csConsoleOutput> parent;
-  public:
-    EventHandler (csConsoleOutput* parent) : scfImplementationType (this),
-      parent (parent)
-    {
-    }
-    virtual ~EventHandler () { }
-    virtual bool HandleEvent (iEvent& e) 
-    { 
-      return parent ? parent->HandleEvent(e) : false; 
-    }
-    CS_EVENTHANDLER_NAMES("crystalspace.console")
-    CS_CONST_METHOD virtual const csHandlerID * GenericPrec(
-      csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,
-      csEventID e) const
-    {
-      if (e == csevSystemOpen (r2)) {
-        /* TODO : not thread-safe */
-        static csHandlerID precs[2] =
-          { r1->GetGenericID("crystalspace.graphics3d"), CS_HANDLERLIST_END };
-        return precs;
-      } else {
-        return 0;
-      }
-    }
-    CS_CONST_METHOD virtual const csHandlerID * GenericSucc(
-      csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &,
-      csEventID) const
-    { return 0; }
-    
-    CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
-  };
-  csRef<EventHandler> eventHandler;
+  
 
 private:
   void GetPosition (int &x, int &y, int &width, int &height) const;
@@ -238,6 +196,49 @@ private:
   csRGBpixel shadow_rgb;
   // The graphics2d codes for the colors
   int fg, bg, shadow;
+
+  mutable CS::Threading::RecursiveMutex mutex;
+  CS_DECLARE_SYSTEM_EVENT_SHORTCUTS;
+
+  /// iEventHandler interface
+  struct EventHandler : 
+    public scfImplementation1<EventHandler,
+    iEventHandler>
+  {
+  private:
+    csWeakRef<csConsoleOutput> parent;
+  public:
+    EventHandler (csConsoleOutput* parent) : scfImplementationType (this),
+      parent (parent)
+    {
+    }
+    virtual ~EventHandler () { }
+    virtual bool HandleEvent (iEvent& e) 
+    { 
+      return parent ? parent->HandleEvent(e) : false; 
+    }
+    CS_EVENTHANDLER_NAMES("crystalspace.console")
+      CS_CONST_METHOD virtual const csHandlerID * GenericPrec(
+      csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,
+      csEventID e) const
+    {
+      if (e == csevSystemOpen (r2)) {
+        /* TODO : not thread-safe */
+        static csHandlerID precs[2] =
+        { r1->GetGenericID("crystalspace.graphics3d"), CS_HANDLERLIST_END };
+        return precs;
+      } else {
+        return 0;
+      }
+    }
+    CS_CONST_METHOD virtual const csHandlerID * GenericSucc(
+      csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &,
+      csEventID) const
+    { return 0; }
+
+    CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
+  };
+  csRef<EventHandler> eventHandler;
 };
 
 }

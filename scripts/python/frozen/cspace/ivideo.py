@@ -493,7 +493,6 @@ class RenderMeshModes(object):
     z_buf_mode = _swig_property(_ivideo.RenderMeshModes_z_buf_mode_get, _ivideo.RenderMeshModes_z_buf_mode_set)
     mixmode = _swig_property(_ivideo.RenderMeshModes_mixmode_get, _ivideo.RenderMeshModes_mixmode_set)
     renderPrio = _swig_property(_ivideo.RenderMeshModes_renderPrio_get, _ivideo.RenderMeshModes_renderPrio_set)
-    flipCulling = _swig_property(_ivideo.RenderMeshModes_flipCulling_get, _ivideo.RenderMeshModes_flipCulling_set)
     cullMode = _swig_property(_ivideo.RenderMeshModes_cullMode_get, _ivideo.RenderMeshModes_cullMode_set)
     alphaType = _swig_property(_ivideo.RenderMeshModes_alphaType_get, _ivideo.RenderMeshModes_alphaType_set)
     buffers = _swig_property(_ivideo.RenderMeshModes_buffers_get, _ivideo.RenderMeshModes_buffers_set)
@@ -503,7 +502,7 @@ RenderMeshModes_swigregister(RenderMeshModes)
 class CoreRenderMesh(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    db_mesh_name = _swig_property(_ivideo.CoreRenderMesh_db_mesh_name_get, _ivideo.CoreRenderMesh_db_mesh_name_set)
+    db_mesh_name = _swig_property(_ivideo.CoreRenderMesh_db_mesh_name_get)
     def __init__(self, *args): 
         this = _ivideo.new_CoreRenderMesh(*args)
         try: self.this.append(this)
@@ -802,6 +801,9 @@ class iTextureHandle(core.iBase):
     blitbufRetainArea = _ivideo.iTextureHandle_blitbufRetainArea
     def QueryBlitBuffer(*args): return _ivideo.iTextureHandle_QueryBlitBuffer(*args)
     def ApplyBlitBuffer(*args): return _ivideo.iTextureHandle_ApplyBlitBuffer(*args)
+    natureIndirect = _ivideo.iTextureHandle_natureIndirect
+    natureDirect = _ivideo.iTextureHandle_natureDirect
+    def GetBufferNature(*args): return _ivideo.iTextureHandle_GetBufferNature(*args)
     scfGetVersion = staticmethod(_ivideo.iTextureHandle_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iTextureHandle
     __del__ = lambda self : None;

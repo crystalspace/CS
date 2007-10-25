@@ -24,7 +24,6 @@
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
 #include "csutil/csendian.h"
-#include "csutil/scopedmutexlock.h"
 
 #include "iutil/plugin.h"
 #include "iutil/cfgfile.h"
@@ -59,7 +58,6 @@ csSndSysRendererOpenAL::csSndSysRendererOpenAL(iBase* pParent) :
   scfImplementationType(this, pParent),
   m_Device( 0 ), m_Context( 0 )
 {
-  m_ContextLock = csMutex::Create( true );
 }
 
 csSndSysRendererOpenAL::~csSndSysRendererOpenAL()
@@ -275,7 +273,7 @@ bool csSndSysRendererOpenAL::UnregisterCallback(iSndSysRendererCallback *pCallba
  */
 bool csSndSysRendererOpenAL::LockWait()
 {
-  m_ContextLock->LockWait();
+  m_ContextLock.Lock();
 
   // Make sure the context is actually valid, and not already current.
   if (m_Context != 0 && m_Context != alcGetCurrentContext())
@@ -288,7 +286,7 @@ bool csSndSysRendererOpenAL::LockWait()
 void csSndSysRendererOpenAL::Release()
 {
   //alcMakeContextCurrent( 0 );
-  m_ContextLock->Release();
+  m_ContextLock.Unlock();
 }
 
 /*

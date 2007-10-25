@@ -29,7 +29,7 @@
 #include "iutil/strset.h"
 
 // For Clear()
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * The string set is a collection of unique strings. Each string has an ID
@@ -126,6 +126,6 @@ public:
   { return set.IsEmpty(); }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 #endif // __CS_SCFSTRSET_H__

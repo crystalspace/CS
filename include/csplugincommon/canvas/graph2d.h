@@ -50,7 +50,7 @@ struct iPluginManager;
 
 class csFontCache;
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * This is the base class for 2D canvases. Plugins should derive their 
@@ -455,7 +455,7 @@ protected:
   /** @} */
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /** @} */
 

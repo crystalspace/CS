@@ -35,7 +35,7 @@
 struct iTextureWrapper;
 struct iTextureManager;
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * A material class.
@@ -122,7 +122,7 @@ public:
   bool IsVisitRequired () const;
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * csMaterialWrapper represents a texture and its link

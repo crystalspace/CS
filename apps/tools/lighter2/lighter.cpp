@@ -188,8 +188,9 @@ namespace lighter
     if (!csInitializer::OpenApplication (objectRegistry))
       return Report ("Error opening system!");
 
-    // For now, force the use of TinyXML to be able to write
-    docSystem.AttachNew (new csTinyDocumentSystem);
+    docSystem = csQueryRegistry<iDocumentSystem> (objectRegistry);
+    if (!docSystem) 
+      docSystem.AttachNew (new csTinyDocumentSystem);
 
     progStartup.SetProgress (1);
     return true;

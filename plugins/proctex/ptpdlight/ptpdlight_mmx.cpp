@@ -113,10 +113,18 @@ static void MultiplyAddLumels (__m64* dst, size_t dstPitch,
   }
 }
 
+struct PreApplyEMMS
+{
+  void Perform (iTextureHandle* texh, uint8* buf) 
+  { 
+    if (texh->GetBufferNature (buf) == iTextureHandle::natureIndirect)
+      _m_empty(); 
+  }
+};
 
 void ProctexPDLight::Animate_MMX ()
 {
-  BlitBufHelper blitHelper (tex->GetTextureHandle ());
+  BlitBufHelper<PreApplyEMMS> blitHelper (tex->GetTextureHandle ());
 
   lightBits.Clear();
   size_t numLights = 0;
@@ -291,7 +299,6 @@ void ProctexPDLight::Animate_MMX ()
       }
     }
   }
-
   _m_empty();
 }
 

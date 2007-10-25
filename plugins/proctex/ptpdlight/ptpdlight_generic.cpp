@@ -208,7 +208,7 @@ static const MultiplyAddProc8 maProcs8[8] = {
 
 void ProctexPDLight::Animate_Generic ()
 {
-  BlitBufHelper blitHelper (tex->GetTextureHandle ());
+  BlitBufHelper<> blitHelper (tex->GetTextureHandle ());
 
   lightBits.Clear();
   for (size_t l = 0; l < lights.GetSize(); )
@@ -324,7 +324,7 @@ void ProctexPDLight::Animate_Generic ()
       Lumel* scratchPtr = scratch + 
         mapTile.tilePartY * (blitPitch / sizeof (Lumel)) +
         mapTile.tilePartX;
-      int blitPitch = (blitPitch / sizeof (Lumel)) - mapW;
+      size_t scratchPitch = (blitPitch / sizeof (Lumel)) - mapW;
 
       csRGBcolor mapMax = mapTile.maxValue;
       mapMax.red   = lutR[mapMax.red]   >> shiftR;
@@ -343,7 +343,7 @@ void ProctexPDLight::Animate_Generic ()
         const uint8* mapPtr = (uint8*)(mapTile.tilePartData);
 	  
         MultiplyAddProc8 maProc = maProcs8[safeMask];
-        maProc (scratchPtr, blitPitch, mapPtr, mapPitch,
+        maProc (scratchPtr, scratchPitch, mapPtr, mapPitch,
           mapW, lines, lutR, lutG, lutB);
       }
       else
@@ -351,7 +351,7 @@ void ProctexPDLight::Animate_Generic ()
         const Lumel* mapPtr = (Lumel*)(mapTile.tilePartData);
 	  
         MultiplyAddProc maProc = maProcs[safeMask];
-        maProc (scratchPtr, blitPitch, mapPtr, mapPitch,
+        maProc (scratchPtr, scratchPitch, mapPtr, mapPitch,
           mapW, lines, lutR, lutG, lutB);
       }
 

@@ -654,7 +654,7 @@ GLenum csGLBasicTextureHandle::GetGLTextureTarget() const
 void csGLBasicTextureHandle::EnsureUncompressed (bool keepPixels,
   TextureBlitDataFormat newTexFormat)
 {
-  if (newTexFormat == (TextureType)~0) newTexFormat = texFormat;
+  if (newTexFormat == (TextureBlitDataFormat)~0) newTexFormat = texFormat;
 
   GLenum target = GetGLTextureTarget();
   // @@@ FIXME: support more than 2D
@@ -717,6 +717,14 @@ void csGLBasicTextureHandle::ApplyBlitBuffer (uint8* buf)
   }
 }
 
+iTextureHandle::BlitBufferNature csGLBasicTextureHandle::GetBufferNature (uint8* buf)
+{
+  if (txtmgr->G3D->ext->CS_GL_ARB_pixel_buffer_object)
+    return natureDirect;
+  else
+    return natureIndirect;
+}
+
 uint8* csGLBasicTextureHandle::QueryBlitBufferGeneric (int x, int y, 
                                                        int width, int height,
                                                        size_t& pitch, 
@@ -770,26 +778,27 @@ uint8* csGLBasicTextureHandle::QueryBlitBufferPBO (int x, int y,
   if (pbo == 0)
   {
     GLuint textureFormat = (texFormat == RGBA8888) ? GL_RGBA : GL_BGRA;
+    csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB, 0);
     Precache ();
     G3D->ActivateTexture (this);
 
     G3D->ext->glGenBuffersARB (1, &pbo);
-    G3D->ext->glBindBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB, pbo);
+    csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB, pbo);
     G3D->ext->glBufferDataARB (GL_PIXEL_UNPACK_BUFFER_ARB, 
       actual_width * actual_height * 4, 0, GL_DYNAMIC_DRAW_ARB);
     pboMapped = 0;
     if ((bufFlags & iTextureHandle::blitbufRetainArea) || !isWholeImage)
     {
-      G3D->ext->glBindBufferARB (GL_PIXEL_PACK_BUFFER_ARB, pbo);
+      csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_PACK_BUFFER_ARB, pbo);
       glGetTexImage (textarget, 0, textureFormat, GL_UNSIGNED_BYTE, 0);
-      G3D->ext->glBindBufferARB (GL_PIXEL_PACK_BUFFER_ARB, 0);
+      csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_PACK_BUFFER_ARB, 0);
     }
     glTexImage2D (textarget, 0, GL_RGBA8, actual_width, actual_height, 
       0, textureFormat, GL_UNSIGNED_BYTE, 0);
   }
   else
   {
-    G3D->ext->glBindBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB, pbo);
+    csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB, pbo);
   }
   if (pboMapped == 0)
   {
@@ -799,9 +808,7 @@ uint8* csGLBasicTextureHandle::QueryBlitBufferPBO (int x, int y,
       bufAccess);
   }
   pboMapped++;
-  /* @@@ FIXME: Can prolly get rid of a number of buffer bindings by state-
-     caching them */
-  G3D->ext->glBindBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB, 0);
+  csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB, 0);
   uint8* p = (uint8*)pboMapPtr;
   p += (y * actual_width + x) * 4;
   pitch = actual_width * 4;
@@ -810,10 +817,10 @@ uint8* csGLBasicTextureHandle::QueryBlitBufferPBO (int x, int y,
 
 void csGLBasicTextureHandle::ApplyBlitBufferPBO (uint8* buf)
 { 
-  G3D->ext->glBindBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB, pbo);
   pboMapped--;
   if (pboMapped == 0)
   {
+    csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB, pbo);
     G3D->ext->glUnmapBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB);
     G3D->ActivateTexture (this);
     if (!IsWasRenderTarget())
@@ -822,12 +829,11 @@ void csGLBasicTextureHandle::ApplyBlitBufferPBO (uint8* buf)
       SetupAutoMipping();
     }
     GLuint textureFormat = (texFormat == RGBA8888) ? GL_RGBA : GL_BGRA;
-    BlitBuffer* blitBuf = blitBuffers.GetElementPointer (buf);
     glTexSubImage2D (GetGLTextureTarget(), 0, 
       0, 0, actual_width, actual_height,
       textureFormat, GL_UNSIGNED_BYTE,
       0);
-    G3D->ext->glBindBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB, 0);
+    csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB, 0);
   }
 }
 

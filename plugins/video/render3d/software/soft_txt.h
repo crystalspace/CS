@@ -90,7 +90,7 @@ public:
 };
 
 // For GetTextureTarget ()
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * csSoftwareTextureHandle represents a texture and all its mipmapped
@@ -199,9 +199,10 @@ public:
   uint8* QueryBlitBuffer (int x, int y, int width, int height,
     size_t& pitch, TextureBlitDataFormat format, uint bufFlags);
   void ApplyBlitBuffer (uint8* buf);
+  BlitBufferNature GetBufferNature (uint8* buf) { return natureDirect; }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * Software version of the texture manager. This instance of the

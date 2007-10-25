@@ -19,7 +19,7 @@
 #ifndef SNDSYS_RENDERER_OPENAL_SCOPEDLOCK_H
 #define SNDSYS_RENDERER_OPENAL_SCOPEDLOCK_H
 
-#include "csutil/scopedmutexlock.h"
+#include "csutil/scopedlock.h"
 
 #include "renderer.h"
 

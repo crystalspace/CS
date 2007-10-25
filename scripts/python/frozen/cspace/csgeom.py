@@ -1649,7 +1649,7 @@ class csTriangleMinMax(csTriangle):
 csTriangleMinMax_swigregister = _csgeom.csTriangleMinMax_swigregister
 csTriangleMinMax_swigregister(csTriangleMinMax)
 
-class csTriangleMeshEdge(object):
+class csTriangleMeshEdge(core.CustomAllocated):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     vt1 = _swig_property(_csgeom.csTriangleMeshEdge_vt1_get, _csgeom.csTriangleMeshEdge_vt1_set)

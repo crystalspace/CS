@@ -26,7 +26,7 @@
 class csTextureManagerNull;
 
 // For GetTextureTarget ()
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * csTextureHandleNull represents a texture and all its mipmapped
@@ -86,9 +86,10 @@ public:
     return (uint8*)cs_malloc (height * pitch);
   }
   void ApplyBlitBuffer (uint8* buf) { cs_free (buf); }
+  BlitBufferNature GetBufferNature (uint8* buf) { return natureDirect; }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * Software version of the texture manager. This instance of the

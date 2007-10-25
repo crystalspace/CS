@@ -84,7 +84,7 @@ public:
   }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 struct csInstance
 {
@@ -396,7 +396,7 @@ public:
   void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * Factory for general meshes.

@@ -177,7 +177,7 @@ public:
 };
 
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 struct csImposterUpdateQueue
 {
@@ -996,6 +996,6 @@ private:
   csRef<iEventHandler> weakEventHandler;
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 #endif // __CS_ENGINE_H__
