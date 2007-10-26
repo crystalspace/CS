@@ -8,6 +8,7 @@ chronological order.
 
 26-Oct-2007
 	- Darek added bindings to the documentation.
+	- caedes fixed incorrect handling of smart pointers in cspython.
 25-Oct-2007
 	- caedes added a bunch of const_cast to cspython to account for 
 	  incorrect prototypes in python 2.4 functions (which would lead to
