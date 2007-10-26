@@ -3455,8 +3455,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *CreateRoot = *cspacec::iDocument_CreateRoot;
 *GetRoot = *cspacec::iDocument_GetRoot;
 *Parse = *cspacec::iDocument_Parse;
-*Write = *cspacec::iDocument_Write;
 *Changeable = *cspacec::iDocument_Changeable;
+*Write = *cspacec::iDocument_Write;
 *scfGetVersion = *cspacec::iDocument_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -5034,6 +5034,47 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         cspacec::delete_iSndSysSource3DDoppler($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSndSysSourceSoftware3D ##############
+
+package cspace::iSndSysSourceSoftware3D;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iSndSysSourceSoftware cspace );
+%OWNER = ();
+%ITERATORS = ();
+*SetPosition = *cspacec::iSndSysSourceSoftware3D_SetPosition;
+*GetPosition = *cspacec::iSndSysSourceSoftware3D_GetPosition;
+*SetDirection = *cspacec::iSndSysSourceSoftware3D_SetDirection;
+*GetDirection = *cspacec::iSndSysSourceSoftware3D_GetDirection;
+*SetDirectionalRadiation = *cspacec::iSndSysSourceSoftware3D_SetDirectionalRadiation;
+*GetDirectionalRadiation = *cspacec::iSndSysSourceSoftware3D_GetDirectionalRadiation;
+*SetMinimumDistance = *cspacec::iSndSysSourceSoftware3D_SetMinimumDistance;
+*SetMaximumDistance = *cspacec::iSndSysSourceSoftware3D_SetMaximumDistance;
+*GetMinimumDistance = *cspacec::iSndSysSourceSoftware3D_GetMinimumDistance;
+*GetMaximumDistance = *cspacec::iSndSysSourceSoftware3D_GetMaximumDistance;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSndSysSourceSoftware3D($self);
         delete $OWNER{$self};
     }
 }

@@ -6,6 +6,13 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Oct-2007
+	- Darek added bindings to the documentation.
+	- caedes fixed incorrect handling of smart pointers in cspython.
+	- caedes fixed one memory leak in genmesh.
+	- caedes fixed RenderBufferAccessor leakwards for genmesh, spr2d, 
+	  particles and instmesh (they were missing some 
+	  CS_LEAKWARD_IMPLEMENT uses).
 25-Oct-2007
 	- caedes added a bunch of const_cast to cspython to account for 
 	  incorrect prototypes in python 2.4 functions (which would lead to
@@ -13,6 +20,14 @@ chronological order.
 	- Jorrit updated SimpleRoom.java so that it no longer uses the
 	  deprecated CS_QUERY_REGISTRY and SCF_QUERY_INTERFACE. Also changed
 	  it to use genmesh instead of thing for the walls.
+	- caedes added some macros to swig interface files for facilitating
+	  removal of csString types from scripting languages, namely
+	  TYPEMAP_STRING and TYPEMAP_STRING_PTR. Note this macros have to be
+	  implemented for each language in order to completely remove the
+	  types.
+	- caedes implemented TYPEMAP_STRING and TYPEMAP_STRING_PTR swig macros
+	  for python, thus removing csString and similar completely from the
+	  python bindings.
 24-Oct-2007
 	- caedes implemented 'new' iScript interface for cspython. Fixes
 	  trac #93.

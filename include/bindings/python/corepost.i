@@ -35,7 +35,7 @@
     for cls, intf, ident, ver in map(
         lambda x: _get_tuple(x), plugins):
       requests.Push(csPluginRequest(
-        csString(cls), csString(intf), ident, ver))
+        cls, intf, ident, ver))
     return csInitializer._RequestPlugins(reg, requests)
 
   csInitializer.RequestPlugins = staticmethod(_csInitializer_RequestPlugins)
@@ -84,13 +84,6 @@
   csColor __rmul__ (float f) const { return f * *self; }
 }
 
-// iutil/string.h
-%extend iString
-{
-  char __getitem__ (size_t i) const { return self->GetAt(i); }
-  void __setitem__ (size_t i, char c) { self->SetAt(i, c); }
-}
-
 /*
  * We introduce the following python class to serve as a pseudo-list for
  *  those cases where the C++ code returns a pointer which is actually
@@ -128,14 +121,6 @@ class CSMutableArrayHelper:
 
   # We do not implement __delitem__ because we cannot delete items.
 %}
-
-// csutil/csstring.h
-%extend csString
-{
-  char __getitem__ (size_t i) const { return self->operator[](i); }
-  void __setitem__ (size_t i, char c) { self->operator[](i) = c; }
-  void __delitem__ (size_t i) { self->DeleteAt(i); }
-}
 
 // csutil/hash.h
 %extend csHash

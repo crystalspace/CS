@@ -137,7 +137,7 @@ bool csPython::Initialize(iObjectRegistry* object_reg)
   // Inject iSCF::SCF
   csRefArray<iScriptValue> args;
   args.Push(csRef<iScriptValue>(RValue(iSCF::SCF, "iSCF *")));
-  Call("cspace.SetSCFPointer",args);
+  csRef<iScriptValue> ret = Call("cspace.SetSCFPointer",args);
 
   // Inject Object Registry
   Store("cspace.object_reg",RValue(object_reg, "iObjectRegistry *"));
@@ -468,7 +468,7 @@ const csRef<iString> csPython::Object::GetClass () const
 {
   PyObject *type = PyObject_Type(self);
   PyObject *name = PyObject_GetAttrString(type,"__name__");
-  scfString *c = new scfString(PyString_AsString(name));
+  csPtr<iString> c = new scfString(PyString_AsString(name));
   Py_DECREF(type);
   Py_DECREF(name);
   return c;
@@ -564,7 +564,7 @@ const csRef<iString> csPython::Value::GetString () const
 {
   const char* strval = PyString_AsString(self);
   if (strval)
-    return new scfString(PyString_AsString(self));
+    return csPtr<iString>(new scfString(PyString_AsString(self)));
   else
   {
     parent->ShowError();
@@ -576,7 +576,7 @@ csRef<iScriptObject> csPython::Value::GetObject () const
   if (self == Py_None)
     return 0;
   else
-    return new csPython::Object(parent,self,true);
+    return csPtr<iScriptObject>(new csPython::Object(parent,self,true));
 }
 
 /////////////////////////////////////////////////////////////////

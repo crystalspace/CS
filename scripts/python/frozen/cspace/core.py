@@ -419,56 +419,6 @@ class csStringIDSet(object):
 csStringIDSet_swigregister = _core.csStringIDSet_swigregister
 csStringIDSet_swigregister(csStringIDSet)
 
-class iString(iBase):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    def GetData(*args): return _core.iString_GetData(*args)
-    def DeleteAt(*args): return _core.iString_DeleteAt(*args)
-    def StartsWith(*args): return _core.iString_StartsWith(*args)
-    def __ne__(*args): return _core.iString___ne__(*args)
-    scfGetVersion = staticmethod(_core.iString_scfGetVersion)
-    __swig_destroy__ = _core.delete_iString
-    __del__ = lambda self : None;
-    def __getitem__(*args): return _core.iString___getitem__(*args)
-    def __setitem__(*args): return _core.iString___setitem__(*args)
-iString_swigregister = _core.iString_swigregister
-iString_swigregister(iString)
-iString_scfGetVersion = _core.iString_scfGetVersion
-
-class csStringParent(object):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _core.new_csStringParent(*args)
-        try: self.this.append(this)
-        except: self.this = this
-    __swig_destroy__ = _core.delete_csStringParent
-    __del__ = lambda self : None;
-    def assign(*args): return _core.csStringParent_assign(*args)
-    def GetData(*args): return _core.csStringParent_GetData(*args)
-    def GetCapacity(*args): return _core.csStringParent_GetCapacity(*args)
-    def ShrinkBestFit(*args): return _core.csStringParent_ShrinkBestFit(*args)
-    def Free(*args): return _core.csStringParent_Free(*args)
-    def Detach(*args): return _core.csStringParent_Detach(*args)
-csStringParent_swigregister = _core.csStringParent_swigregister
-csStringParent_swigregister(csStringParent)
-
-class csString(csStringParent):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _core.new_csString(*args)
-        try: self.this.append(this)
-        except: self.this = this
-    def __getitem__(*args): return _core.csString___getitem__(*args)
-    def __setitem__(*args): return _core.csString___setitem__(*args)
-    def __delitem__(*args): return _core.csString___delitem__(*args)
-    __swig_destroy__ = _core.delete_csString
-    __del__ = lambda self : None;
-csString_swigregister = _core.csString_swigregister
-csString_swigregister(csString)
-
 class csRefCount(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
@@ -1860,8 +1810,8 @@ class iDocument(iBase):
     def CreateRoot(*args): return _core.iDocument_CreateRoot(*args)
     def GetRoot(*args): return _core.iDocument_GetRoot(*args)
     def Parse(*args): return _core.iDocument_Parse(*args)
-    def Write(*args): return _core.iDocument_Write(*args)
     def Changeable(*args): return _core.iDocument_Changeable(*args)
+    def Write(*args): return _core.iDocument_Write(*args)
     scfGetVersion = staticmethod(_core.iDocument_scfGetVersion)
     __swig_destroy__ = _core.delete_iDocument
     __del__ = lambda self : None;
@@ -2334,7 +2284,7 @@ def _csInitializer_RequestPlugins (reg, plugins):
   for cls, intf, ident, ver in map(
       lambda x: _get_tuple(x), plugins):
     requests.Push(csPluginRequest(
-      csString(cls), csString(intf), ident, ver))
+      cls, intf, ident, ver))
   return csInitializer._RequestPlugins(reg, requests)
 
 csInitializer.RequestPlugins = staticmethod(_csInitializer_RequestPlugins)
