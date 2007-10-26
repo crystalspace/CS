@@ -10,6 +10,8 @@ chronological order.
 	- res changed the engine's portal container to use a Z value for the
 	  near plane that's more in sync with the actual value used by the
 	  renderers.
+	- res changed CS::RenderManager::RenderView to always initialize the
+	  'original camera' member when a camera is given.
 20-Oct-2007
 	- Marten fixed a few merge errors in genmesh.
 	- Marten re-enabled RECT textures for latest Nvidia drivers on Win32.

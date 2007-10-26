@@ -47,7 +47,7 @@ RenderView::RenderView (iCamera *c) :
   engine(0),
   g3d(0),
   g2d(0),
-  original_camera(0)
+  original_camera(c)
 {
   ctxt = new csRenderContext ();
   memset (ctxt, 0, sizeof (csRenderContext));
@@ -60,7 +60,7 @@ RenderView::RenderView (iCamera *c, iClipper2D *v, iGraphics3D *ig3d, iGraphics2
   engine(0),
   g3d(ig3d),
   g2d(ig2d),
-  original_camera(0)
+  original_camera(c)
 {
   ctxt = new csRenderContext ();
   memset (ctxt, 0, sizeof (csRenderContext));
@@ -104,6 +104,7 @@ RenderView::RenderView (const RenderView& other) :
   memset (ctxt, 0, sizeof (csRenderContext));
 
   ctxt->icamera.AttachNew (other.ctxt->icamera->Clone ());
+  original_camera = ctxt->icamera;
   ctxt->iview = other.ctxt->iview;	// @@@ Is this right?
   memcpy (ctxt->frustum, other.ctxt->frustum, sizeof (other.ctxt->frustum));
   memcpy (ctxt->clip_planes, other.ctxt->clip_planes,
