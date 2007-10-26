@@ -394,7 +394,7 @@ void csBugPlug::VisculCmd (const char* cmd)
   if (!visculler)
   {
     Report (CS_REPORTER_SEVERITY_NOTIFY,
-      "Bugplug is currently now tracking a visibility culler!");
+      "Bugplug is currently not tracking a visibility culler!");
     return;
   }
   csRef<iDebugHelper> dbghelp (scfQueryInterface<iDebugHelper> (visculler));
