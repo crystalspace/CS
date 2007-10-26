@@ -174,7 +174,7 @@ struct iEngineSectorCallback : public virtual iBase
  */
 struct iEngine : public virtual iBase
 {
-  SCF_INTERFACE(iEngine,3,0,2);
+  SCF_INTERFACE(iEngine,3,0,3);
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;
@@ -1332,6 +1332,9 @@ struct iEngine : public virtual iBase
   /** @} */
   
   virtual iRenderManager* GetRenderManager () = 0;
+
+  /// Fire all frame callbacks
+  virtual void FireStartFrame (iRenderView* rview) = 0;
 };
 
 /** @} */

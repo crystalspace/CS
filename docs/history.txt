@@ -12,6 +12,7 @@ chronological order.
 	  renderers.
 	- res changed CS::RenderManager::RenderView to always initialize the
 	  'original camera' member when a camera is given.
+	- res made rm_test1 fire engine frame start listeners.
 20-Oct-2007
 	- Marten fixed a few merge errors in genmesh.
 	- Marten re-enabled RECT textures for latest Nvidia drivers on Win32.

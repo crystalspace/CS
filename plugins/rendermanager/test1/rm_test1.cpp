@@ -55,10 +55,12 @@ public:
     
     iShaderManager* shaderManager = rmanager->shaderManager;
 
+    // @@@ This is somewhat "boilerplate" sector/rview setup.
+    rview->SetThisSector (sector);
     sector->CallSectorCallbacks (rview);
-
     // Make sure the clip-planes are ok
     CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext ());
+
 
     // Do the culling
     iVisibilityCuller* culler = sector->GetVisibilityCuller ();
@@ -119,6 +121,7 @@ bool RMTest1::RenderView (iView* view)
     CS::RenderManager::RenderView(view));
   view->GetEngine ()->UpdateNewFrame ();
   portalPersistent.UpdateNewFrame ();
+  view->GetEngine ()->FireStartFrame (rview);
 
   iSector* startSector = rview->GetThisSector ();
 
