@@ -255,7 +255,6 @@ class Graph(qt.QGraphicsView):
       if type(val) == list:
         arr = self.propedit.addParameter("array", key)
         for i in range(len(val)):
-          print str(i), str(val[i]), arr
           self.propedit.createItem(str(i), str(val[i]), arr)
       else:
         self.propedit.addParameter(key, str(val))
