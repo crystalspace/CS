@@ -40,6 +40,9 @@ namespace RenderManager
     {
       TextureCache texCache;
       csStringID svNameTexPortal;
+    #ifdef CS_DEBUG
+      csFrameDataHolder<csStringBase> stringHolder;
+    #endif
       
       PersistentData() : texCache (csimg2D, "rgb8", 
         CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP,
@@ -81,12 +84,12 @@ namespace RenderManager
         allPortalVerts3d.SetSize (allPortalVertices * 3);
         allPortalVertsNums.SetSize (portalCount);
 
-        /* Get clipped screen space and camera space vertices */
-        holder.portalContainer->ComputeScreenPolygons (rview, 
-          allPortalVerts2d.GetArray(), allPortalVerts3d.GetArray(), 
-          allPortalVerts2d.GetSize(), allPortalVertsNums.GetArray());
         csVector2* portalVerts2d = allPortalVerts2d.GetArray();
         csVector3* portalVerts3d = allPortalVerts3d.GetArray();
+        /* Get clipped screen space and camera space vertices */
+        holder.portalContainer->ComputeScreenPolygons (rview, 
+          portalVerts2d, portalVerts3d, 
+          allPortalVerts2d.GetSize(), allPortalVertsNums.GetArray());
 
         for (size_t pi = 0; pi < portalCount; ++pi)
         {
@@ -112,14 +115,7 @@ namespace RenderManager
 	    if (portalFlags.Check (CS_PORTAL_WARP))
 	    {
 	      iCamera *inewcam = rview->CreateNewCamera ();
-	      
-	      const csReversibleTransform& movtrans =
-		holder.meshWrapper->GetMovable()->GetFullTransform();
-	      bool mirror = inewcam->IsMirrored ();
-	      csReversibleTransform warp_wor;
-	      portal->ObjectToWorld (movtrans, warp_wor);
-	      portal->WarpSpace (warp_wor, inewcam->GetTransform (), mirror);
-	      inewcam->SetMirrored (mirror);
+              SetupWarp (inewcam, holder.meshWrapper->GetMovable(), portal);
 	    }
 	    
             typename RenderTreeType::ContextNode* portalCtx = 
@@ -148,13 +144,14 @@ namespace RenderManager
 	    ComputeVector2BoundingBox (portalVerts2d, count, screenBox);
 	    
 	    // Obtain a texture handle for the portal to render to
+            int sb_minX = int (screenBox.MinX());
+            int sb_maxY = int (screenBox.MaxY());
 	    int txt_w = int (ceil (screenBox.MaxX() - screenBox.MinX()));
 	    int txt_h = int (ceil (screenBox.MaxY() - screenBox.MinY()));
-	    csRef<iTextureHandle> tex = 
-	      persistentData.texCache.QueryUnusedTexture (txt_w, txt_h, 0);
-	      
 	    int real_w, real_h;
-	    tex->GetRendererDimensions (real_w, real_h);
+	    csRef<iTextureHandle> tex = 
+	      persistentData.texCache.QueryUnusedTexture (txt_w, txt_h, 0,
+                real_w, real_h);
 	          
 	    iCamera* cam = rview->GetCamera();
 	    // Create a new view
@@ -167,25 +164,64 @@ namespace RenderManager
 	    iCamera *inewcam = newRenderView->GetCamera();
 	    if (portalFlags.Check (CS_PORTAL_WARP))
 	    {
-	      const csReversibleTransform& movtrans =
-		holder.meshWrapper->GetMovable()->GetFullTransform();
-	      bool mirror = inewcam->IsMirrored ();
-	      csReversibleTransform warp_wor;
-	      portal->ObjectToWorld (movtrans, warp_wor);
-	      portal->WarpSpace (warp_wor, inewcam->GetTransform (), mirror);
-	      inewcam->SetMirrored (mirror);
+              SetupWarp (inewcam, holder.meshWrapper->GetMovable(), portal);
 	    }
-	    inewcam->SetPerspectiveCenter (cam->GetShiftX() - screenBox.MinX(),
-	      real_h - (screenBox.MaxY() - cam->GetShiftY()));
+	    inewcam->SetPerspectiveCenter (cam->GetShiftX() - sb_minX,
+	      real_h - (sb_maxY - cam->GetShiftY()));
+            /* Visible cracks can occur on portal borders when the geometry
+               behind the portal is supposed to fit seamlessly into geometry
+               before the portal since the rendering of the target geometry
+               may not exactly line up with the portal area on the portal 
+               texture.
+               To reduce that effect the camera position in the target sector
+               is somewhat fudged to move slightly into the target so that 
+               the rendered target sector geometry extends beyond the portal 
+               texture area. */
+            {
+              // - Find portal point with largest Z (pMZ)
+              float maxz = 0;
+              size_t maxc = 0;
+	      for (size_t c = 0; c < count; c++)
+	      {
+                float z = portalVerts3d[c].z;
+                if (z > maxz) 
+                {
+                  maxz = z;
+                  maxc = c;
+                }
+	      }
+              // - Find inverse perspective point of pMZ plus some offset (pMZ2)
+              csVector2 p (portalVerts2d[maxc]);
+              p.x += 1.5f;
+              p.y += 1.5f;
+              csVector3 pMZ2 = cam->InvPerspective (p, maxz);
+              // - d = distance pMZ, pMZ2
+              float d = sqrtf (csSquaredDist::PointPoint (portalVerts3d[maxc], pMZ2));
+              // - Get portal target plane in target world space
+              csReversibleTransform warp;
+	      if (portalFlags.Check (CS_PORTAL_WARP))
+                warp = portal->GetWarp();
+              csVector3 portalDir (warp.Other2ThisRelative (portal->GetWorldPlane().Normal()));
+              /* - Offset target camera into portal direction in target sector,
+                   amount of offset 'd' */
+              csVector3 camorg (inewcam->GetTransform().GetOrigin());
+              camorg += d * portalDir;
+              inewcam->GetTransform().SetOrigin (camorg);
+            }
 	    
 	    // Add a new context with the texture as the target
 	    // Setup simple portal
-	    newRenderView->CreateRenderContext ();
 	    newRenderView->SetLastPortal (portal);
 	    newRenderView->SetPreviousSector (sector);
-	    csBox2 clipBox (0, real_h - txt_h, txt_w, txt_h);
-            csBoxClipper newView (clipBox);
-            newRenderView->SetClipper (&newView);
+	    csBox2 clipBox (0, real_h - txt_h, txt_w, real_h);
+            csRef<iClipper2D> newView;
+            /* @@@ Consider PolyClipper?
+               A box has an advantage when the portal tex is rendered 
+               distorted: texels from outside the portal area still have a
+               good color. May not be the case with a (more exact) poly 
+               clipper. */
+            newView.AttachNew (new csBoxClipper (clipBox));
+            newRenderView->SetClipper (newView);
 
 	    typename RenderTreeType::ContextsContainer* targetContexts = 
 	      renderTree.CreateContextContainer ();
@@ -196,10 +232,9 @@ namespace RenderManager
               renderTree.CreateContext (targetContexts, newRenderView);
   
 	    // Setup the new context
-            contextFunction(renderTree, portalCtx, targetContexts, portal->GetSector (), rview);
+            contextFunction(renderTree, portalCtx, targetContexts, 
+              portal->GetSector (), newRenderView);
   
-	    newRenderView->RestoreRenderContext ();
-
 	    // Synthesize a render mesh for the portal plane
 	    iMaterialWrapper* mat = portal->GetMaterial ();
 	    csRef<csShaderVariableContext> svc;
@@ -226,8 +261,8 @@ namespace RenderManager
 	      for (size_t c = 0; c < count; c++)
 	      {
 	        float z = portalVerts3d[c].z;
-		tcoords[c].Set ((portalVerts2d[c].x - screenBox.MinX()) * xscale * z, 
-		  (screenBox.MaxY() - portalVerts2d[c].y) * yscale * z, 0, 
+		tcoords[c].Set ((portalVerts2d[c].x - sb_minX) * xscale * z, 
+		  (sb_maxY - portalVerts2d[c].y) * yscale * z, 0, 
 		  z);
 	      }
 	    }
@@ -238,7 +273,7 @@ namespace RenderManager
 	      csRenderBufferLock<uint> indices (indexBuf);
 	      for (size_t c = 0; c < count; c++)
 	      {
-	        *indices++ = c;
+	        *indices++ = uint (c);
 	      }
 	    }
 	    
@@ -252,14 +287,24 @@ namespace RenderManager
 	    csRenderMesh* rm = 
 	      renderTree.GetPersistentData().rmHolder.GetUnusedMesh (
 	        meshCreated, rview->GetCurrentFrameNumber());
-	    rm->db_mesh_name = "portal";
+          #ifdef CS_DEBUG
+            bool created;
+            csStringBase& nameStr = persistentData.stringHolder.GetUnusedData (
+              created,  rview->GetCurrentFrameNumber());
+            nameStr.Format ("[portal from %s to %s]",
+              rview->GetThisSector()->QueryObject()->GetName(),
+              portal->GetSector()->QueryObject()->GetName());
+	    rm->db_mesh_name = nameStr;
+          #else
+	    rm->db_mesh_name = "[portal]";
+          #endif
 	    rm->material = mat;
 	    rm->meshtype = CS_MESHTYPE_TRIANGLEFAN;
 	    rm->buffers = buffers;
 	    rm->z_buf_mode = CS_ZBUF_USE;
 	    rm->object2world = rview->GetCamera()->GetTransform();
 	    rm->indexstart = 0;
-	    rm->indexend = count;
+	    rm->indexend = uint (count);
 	    rm->mixmode = CS_MIXMODE_BLEND(ONE, ZERO);
 	    rm->variablecontext = svc;
 	    
@@ -300,7 +345,16 @@ namespace RenderManager
       for (size_t i = 1; i < count; i++)
         box.AddBoundingVertexSmart (verts[i]);
     }
-  
+
+    void SetupWarp (iCamera* inewcam, iMovable* movable, iPortal* portal)
+    {
+      const csReversibleTransform& movtrans = movable->GetFullTransform();
+      bool mirror = inewcam->IsMirrored ();
+      csReversibleTransform warp_wor;
+      portal->ObjectToWorld (movtrans, warp_wor);
+      portal->WarpSpace (warp_wor, inewcam->GetTransform (), mirror);
+      inewcam->SetMirrored (mirror);
+    }
   };
 
 

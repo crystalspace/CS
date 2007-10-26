@@ -92,7 +92,8 @@ namespace RenderManager
           i++;
       }
     }
-    iTextureHandle* QueryUnusedTexture (int width, int height, csTicks lifetime)
+    iTextureHandle* QueryUnusedTexture (int width, int height, csTicks lifetime,
+                                        int& real_w, int& real_h)
     {
       HeldTexture tex;
       size_t i = 0;
@@ -109,6 +110,8 @@ namespace RenderManager
 	  texAvailable.DeleteIndex (i);
           tex.deathTime = currentTime + lifetime;
           texInUse.Push (tex);
+          real_w = tw;
+          real_h = th;
           return tex.texture;
 	}
 	i++;
@@ -118,12 +121,19 @@ namespace RenderManager
         width = csFindNearestPowerOf2 (width);
         height = csFindNearestPowerOf2 (height);
       }
+      real_w = width;
+      real_h = height;
       tex.texture = g3d->GetTextureManager()->CreateTexture (
         width, height, imgtype, format, textureFlags);
       tex.texture->SetTextureClass (texClass);
       tex.deathTime = currentTime + lifetime;
       texInUse.Push (tex);
       return tex.texture;
+    }
+    iTextureHandle* QueryUnusedTexture (int width, int height, csTicks lifetime)
+    {
+      int dummyW, dummyH;
+      return QueryUnusedTexture (width, height, lifetime, dummyW, dummyH);
     }
   };
   
