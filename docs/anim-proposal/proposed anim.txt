@@ -1,0 +1,313 @@
+-----------------------------------------------
+Proposal for constraint based animation system
+-----------------------------------------------
+
+Handling transition between animations can be a tedious time consuming task, and should just be based on a few toggles and switches, and a lot of automation. On the other hand, animation is a highly dynamic and widely differing affair and so the system must be extensible and very configurable.
+
+This proposal is for such an animation system based on a tree of nodes loaded from Xml. The system has 3 layers,
+
+- Crystal Space poseable skeleton.
+- Crystal Space animation tree with blending and overwrite nodes.
+- CEL automation system for handling state switching.
+- GUI editor for previewing and editing the node tree for CEL, since Xml becomes complicated fast.
+
+Attached files:
+  animtree1.svg
+    High level overview of CEL animation layer example
+  animtree2.svg
+    Example of transitioning to an action state from motion.
+  animtree.jpg
+    Screenshot of UnrealEd animation system.
+  animation.xml
+    Xml for character motion used throughout this text.
+  animsys.cpp
+    Pseudocode showing node system sample implementation.
+
+---------------------
+Crystal Space poseable skeleton
+
+This is basically just a skeleton which is posed by the animation system and then rendered by the skeleton mesh. This can enable an upgrade of animation system in the future if needed and also helps by creating a clean interface between the 2 where there is none now.
+
+---------------------
+Crystal Space animation tree with blending and overwrite nodes
+
+An animation tree that contains 3 nodes- overwrite, blend and animations. A blend node will blend n animations accordingly to the weights. Overwrite will just do a 'blend-per-bone' and when it comes to updating the bone's transform will look downwards from the top until it finds an animation that modifies that bone and will apply it. Overwrite node is useful for an action like shooting while running. The animation nodes are the leafs in the tree and it's useless without them! :)
+
+Before doing a per bone update, the tree is flattened below all the overwrite nodes- for all the blend nodes, the root node calculates the absolute weights for all the children animations by traversing its own subtree. Overwrite nodes cannot be flattened since they potentially change their weight per bone and neither anything above them since they will be dependent on the overwrite node.
+
+    BlendLayer *forward_motion = new BlendLayer ();
+    forward_motion->AddAnimation (WalkAnim, walk_weight);
+    forward_motion->AddAnimation (RunAnim, run_weight);
+
+    BlendLayer *fall_transition = new BlendLayer ();
+    fall_transition->AddAnimation (FallAnim, fall_weight);
+    fall_transition->AddAnimation (forward_motion, motion_weight);
+
+    BlendLayer *result_layer = new BlendLayer ();
+    result_layer->AddAnimation (fall_transition, 1.0f);
+
+This is just basically a blend tree, and each animation also is ticked and maintains its own counter so it can change according to playback speed.
+
+    B
+      0.2 B
+        0.3 A
+        0.2 A
+        0.5 B
+          0.5 A
+          0.5 A
+      0.8 O
+        B
+          0.4 A
+          0.6 A
+        A
+        A
+
+  key, B = blend, O = overwrite, A = animation
+
+The sample tree above would be something like,
+
+    BlendLayer *root = new BlendLayer ();
+    root->AddAnimation (BlendAnim, 0.2f);
+    root->AddAnimation (OverwriteAnim, 0.8f);
+
+It can only be flattened at the lowest level of the overwrite node. So the lowest level which has a overwrite can only be flattened. That's this branch,
+
+      0.2 B
+        0.3 A     (a)
+        0.2 A     (b)
+        0.5 B
+          0.5 A   (c)
+          0.5 A   (d)
+
+There's 4 animations, and the weights are normalised by dividing over the sum of all the total weights in the level. So at the first level we have animation a, b and a blend node. This comes to,
+
+0.3 + 0.2 + 0.5 = 1.0
+
+The values are normalised if need be, and then any nodes that can be recursed are done so. Again the weights are first normalised and then multiplied by the parent weight to get the absolute weight in the subtree. This is how much of trees can be flattened in a pre pass of animation, but the structure must remain so that it's possible to modify the tree. Flattening is an implementation specific detail.
+
+There was another branch in the above example we didn't examine (under the overwrite node),
+
+    B
+      0.4 A
+      0.6 A
+
+But nothing else can be done to it.
+
+---------------------
+CEL automation system for handling state switching.
+
+By placing some node blocks together, it is possible to build a tree that can describe the animation tree that you should be in when the state is changed. Not only that but it can decide how it should transition to the new state. As an example say that in a game you wanted to run backwards, stand, and then run forwards. In CEL this is now described as,
+
+  pcmesh->SetAnimation ("backwards");
+
+  pcmesh->SetAnimation ("stand");
+
+  pcmesh->SetAnimation ("forwards");
+
+Polluting code and being a static system. Another problem is performing a jump and then having to check whether to play standing_jump or run_jump. In a tree system which is needed for the good animation of today this will be even worse where you have higher nodes causing a re-organisation mess in code, as well as having to jump around many places to sort everything out.
+
+The solution to that above example would be a DirectionBlend node. You add this and configure it from Xml and it switches automatically between animations.
+
+    <!-- gets the players angle automatically from linmove and blends
+          children nodes based on this angle -->
+    <node name="moving" type="DirectionBlend">
+      <!-- @@@ BREAKS THE PARAMETER MODEL WITH UNKNOWN NUMBER OF PARAMS!! -->
+      <parameter_array name="directions">
+        <item>
+          <parameter name="node" string="forward" />
+          <parameter name="angle" float="0" />
+        </item>
+        <item>
+          <parameter name="node" string="right" />
+          <parameter name="angle" float="90" />
+        </item>
+        <item>
+          <parameter name="node" string="backward" />
+          <parameter name="angle" float="180" />
+        </item>
+        <item>
+          <parameter name="node" string="left" />
+          <parameter name="angle" float="270" />
+        </item>
+      </parameter_array>
+
+      <node name="forward" type="Animation">
+        <parameter name="animation" string="RunForwards" />
+        <parameter name="loop" bool="true" />
+      </node>
+
+      <node name="left" type="Animation">
+        <parameter name="animation" string="StrafeLeft" />
+        <parameter name="loop" bool="true" />
+      </node>
+
+      <node name="right" type="Animation">
+        <parameter name="animation" string="StrafeRight" />
+        <parameter name="loop" bool="true" />
+      </node>
+
+      <node name="backward" type="Animation">
+        <parameter name="animation" string="Backwards" />
+        <parameter name="loop" bool="true" />
+      </node>
+    </node>
+
+With this kind of system, I can easily extend the animation without having to dig deep in the code or even know about the code!
+
+    <!-- gets the players angle automatically from linmove and blends
+        children nodes based on this angle -->
+    <node name="moving" type="DirectionBlend">
+      <!-- @@@ BREAKS THE PARAMETER MODEL WITH UNKNOWN NUMBER OF PARAMS!! -->
+      <parameter_array name="directions">
+        <item>
+          <parameter name="node" string="forward" />
+          <parameter name="angle" float="0" />
+        </item>
+        <item>
+          <parameter name="node" string="right" />
+          <parameter name="angle" float="90" />
+        </item>
+        <item>
+          <parameter name="node" string="backward" />
+          <parameter name="angle" float="180" />
+        </item>
+        <item>
+          <parameter name="node" string="left" />
+          <parameter name="angle" float="270" />
+        </item>
+      </parameter_array>
+
+      <!-- interpolates and blends between 2 base nodes based on linmove
+          scalar speed -->
+      <node name="forward" type="SpeedBlend">
+        <!-- @@@ BREAKS THE PARAMETER MODEL WITH UNKNOWN NUMBER OF PARAMS!! -->
+        <parameter_array name="speeds">
+          <item>
+            <parameter name="node" string="walk" />
+            <parameter name="speed" float="0.25" />
+          </item>
+          <item>
+            <parameter name="node" string="jog" />
+            <parameter name="speed" float="0.5" />
+          </item>
+          <item>
+            <parameter name="node" string="run" />
+            <parameter name="speed" float="1" />
+          </item>
+        </parameter_array>
+
+        <node name="walk" type="Animation">
+          <parameter name="animation" string="WalkForward" />
+          <parameter name="loop" bool="true" />
+        </node>
+
+        <!-- and the same for jog and run... -->
+      </node>
+
+      <!-- and the same for left, backward and right... -->
+    </node>
+
+Duplicated blocks haven't been added here for clarity, but now it is doing directional blending and then between animations based on speed. So when you go forwards at the speed of 0.3, it will blend between WalkForward and JogForward.
+
+    (curr_speed - walk_speed) / (jog_speed - walk_speed) = i_jog
+    i_walk = 1.0 - i_jog
+
+    animation = i_walk * walk + i_jog * jog
+
+Both the animations will get stretched / shrunk to the same size and forced to stay in sync. This way the percentage played of the walk anim will stay in step with the jog anim, but NOT the absolute keyframe. Each animation will have to animated with mathematical precision so that when they're all scaled to the same length, the feet must keep in step. Animators be vigilant!
+
+This moving state occurs when you start moving. Initially the character may be standing still, so there has to be some way to progress to moving motion. We handle this using states with a node type called the StateSwitcher which is just basically a node that returns a single node based on an internal property that should only be set as the result of some condition being met within another node- the user doesn't set this ever!
+
+    <node name="States" type="StateSwitcher">
+      <!-- which property it should use to select the initial state
+          * the state should never be set by the user! done internally
+          by other nodes! -->
+      <parameter name="initialstate" string="stand" />
+
+      <!-- simple standing animation for stand state -->
+      <node name="stand" type="Animation">
+        <!-- ... -->
+      </node>
+
+      <node name="moving" type="DirectionBlend">
+        <!-- ... -->
+      </node>
+    </node>
+
+Here, the unnamed StateSwitcher is delegating to other nodes based on its state. It is changed when some other node decides that some condition is met and it is time to transition to some other state. This is where the automation kicks in with a constraint system. If you imagine that any node can have any number of conditions with results when they evaluate. A condition can be checking a property, a script (usermade), whether the animation has played n times, ...
+
+condition : shooting animation plays 1 time
+result: play gunshot sound and do gunshot effect
+
+condition : dive action done from running animation
+result: transition to state running_to_dive
+
+In Xml this would look something like,
+
+    <condition type="animationplayed">
+      <!-- 0.5 means halfway through animation, so you could
+           do a sound for instance at 0.25 in walking
+           and have footsteps :) -->
+      <parameter name="number" float="1" />
+
+      <result type="playsound">
+        <parameter  name="name" string="AK47_firing" />
+      </result>
+    </condition>
+
+    <!-- this checks if jump action condition is met and then if the animation
+         has finished its cycle yet -->
+    <condition type="property">
+      <parameter name="action" string="dive" />
+
+      <condition type="animationplayed">
+        <parameter name="number" float="1" />
+
+        <!-- tell the StateSwitcher 'States' to transition to a new
+             state run_to_dive -->
+        <result type="transition">
+          <parameter name="node" string="States" />
+          <parameter name="state" string="run_to_dive" />
+          <!-- number of ticks to fade this animation out and fade the new one in -->
+          <parameter name="feather" float="125" />
+        </result>
+      </condition>
+    </condition>
+
+You would only want to perform a dive when the run cycle is finished otherwise the animations will not stay in sync, so this condition also has a nested condition which is checking for when the animation is finished together with when the dive action is started. When this is met, it will then transition to run_to_dive animation and that in turn has a condition delegating to dive state when that animation is finished. This is an example of AND conditionals.
+
+Another possibility is users making their own conditions using a script- not specialised loader is needed since the parameters are loaded in a generic form.
+
+    <!-- w00t! w00t! -->
+    <condition type="script">
+      <parameter name="behaviourlayer" string="blxml" />
+      <!-- ... suggestions? -->
+    </condition>
+    <condition type="xmlscriptstring">
+      <parameter name="script" string=" <!-- here is the xmlscript to be executed --> " />
+      <!-- ... suggestions? -->
+    </condition>
+
+The same can be said of result also. And the same with node types! The idea is you have one generic loader and then all you do is create the node type and it doesn't have to bother itself with initialisation. This makes the system greatly simplified for extensibility. Each node just returns a tuple array of (node, blend_weight) or a node array depending on whether to place an blend or overwrite node in its place.
+
+StateSwitcher, SpeedBlend and DirectionBlend are examples of system provided node types, but the user should be able to easily add their own in C++, Python, Xml, ... Same for condition and result types.
+
+---------------------
+GUI editor
+
+Unless someone knows some GNU tree for editing Xml as a tree already!? Editing this Xml system becomes tedious fast, so the best way for doing this is to have some node-tree representation where you draw the graph, connect the nodes, edit the parameters... a visual representation of the Xml. You have sliders and string text input boxes for your various parameters on the nodes, and by modifying them you get a visual representation in a 3D window.
+
+Then you can interface with them also as you would do as a user by setting some action and seeing the character jump.
+
+Hopeful roadmap:
+  - GUI editor to further experiment and find possible flaws in the idea
+  - Poseable skeleton in CS
+  - GUI editor able to modify it.
+  - CS layer tree
+  - CEL system
+
+- Inverse Kinematics
+  - Target seeking
+  - Foot placement
+
+This should be switchable and done just on the whole chain via a pass from special IK subsystem inside CS tree system. CCD is best solution since often you will only be modifying the animation a small amount.

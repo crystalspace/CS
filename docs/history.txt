@@ -7,6 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 26-Oct-2007
+	- Genjix added animation proposal documentation.
 	- Genjix added wip animation graph editor.
 12-Sep-2007
 	- Genjix added new node based interface proposal.
