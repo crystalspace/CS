@@ -18780,8 +18780,6 @@ SWIGINTERN PyObject *_wrap_iTextureManager_RegisterTexture__SWIG_0(PyObject *SWI
   int res2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
-  void *argp4 = 0 ;
-  int res4 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -18803,11 +18801,9 @@ SWIGINTERN PyObject *_wrap_iTextureManager_RegisterTexture__SWIG_0(PyObject *SWI
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iTextureManager_RegisterTexture" "', argument " "3"" of type '" "int""'");
   } 
   arg3 = static_cast< int >(val3);
-  res4 = SWIG_ConvertPtr(obj3, &argp4,SWIGTYPE_p_iString, 0 |  0 );
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iTextureManager_RegisterTexture" "', argument " "4"" of type '" "iString *""'"); 
+  {
+    arg4 = new scfString (PyString_AsString(obj3));
   }
-  arg4 = reinterpret_cast< iString * >(argp4);
   result = (arg1)->RegisterTexture(arg2,arg3,arg4);
   {
     /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
@@ -18827,8 +18823,14 @@ SWIGINTERN PyObject *_wrap_iTextureManager_RegisterTexture__SWIG_0(PyObject *SWI
         (iTextureHandle *)ref), (void *)(iTextureHandle *)ref, "iTextureHandle" " *");
     /*@SWIG@*/
   }
+  {
+    delete arg4;
+  }
   return resultobj;
 fail:
+  {
+    delete arg4;
+  }
   return NULL;
 }
 
@@ -18935,9 +18937,9 @@ SWIGINTERN PyObject *_wrap_iTextureManager_RegisterTexture(PyObject *self, PyObj
           _v = SWIG_CheckState(res);
         }
         if (_v) {
-          void *vptr = 0;
-          int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_iString, 0);
-          _v = SWIG_CheckState(res);
+          {
+            _v = PyString_Check(argv[3]);
+          }
           if (_v) {
             return _wrap_iTextureManager_RegisterTexture__SWIG_0(self, args);
           }
@@ -18975,8 +18977,6 @@ SWIGINTERN PyObject *_wrap_iTextureManager_CreateTexture__SWIG_0(PyObject *SWIGU
   int alloc5 = 0 ;
   int val6 ;
   int ecode6 = 0 ;
-  void *argp7 = 0 ;
-  int res7 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -19016,11 +19016,9 @@ SWIGINTERN PyObject *_wrap_iTextureManager_CreateTexture__SWIG_0(PyObject *SWIGU
     SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iTextureManager_CreateTexture" "', argument " "6"" of type '" "int""'");
   } 
   arg6 = static_cast< int >(val6);
-  res7 = SWIG_ConvertPtr(obj6, &argp7,SWIGTYPE_p_iString, 0 |  0 );
-  if (!SWIG_IsOK(res7)) {
-    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "iTextureManager_CreateTexture" "', argument " "7"" of type '" "iString *""'"); 
+  {
+    arg7 = new scfString (PyString_AsString(obj6));
   }
-  arg7 = reinterpret_cast< iString * >(argp7);
   result = (arg1)->CreateTexture(arg2,arg3,arg4,(char const *)arg5,arg6,arg7);
   {
     /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
@@ -19041,9 +19039,15 @@ SWIGINTERN PyObject *_wrap_iTextureManager_CreateTexture__SWIG_0(PyObject *SWIGU
     /*@SWIG@*/
   }
   if (alloc5 == SWIG_NEWOBJ) delete[] buf5;
+  {
+    delete arg7;
+  }
   return resultobj;
 fail:
   if (alloc5 == SWIG_NEWOBJ) delete[] buf5;
+  {
+    delete arg7;
+  }
   return NULL;
 }
 
@@ -19211,9 +19215,9 @@ SWIGINTERN PyObject *_wrap_iTextureManager_CreateTexture(PyObject *self, PyObjec
                 _v = SWIG_CheckState(res);
               }
               if (_v) {
-                void *vptr = 0;
-                int res = SWIG_ConvertPtr(argv[6], &vptr, SWIGTYPE_p_iString, 0);
-                _v = SWIG_CheckState(res);
+                {
+                  _v = PyString_Check(argv[6]);
+                }
                 if (_v) {
                   return _wrap_iTextureManager_CreateTexture__SWIG_0(self, args);
                 }
@@ -20506,6 +20510,7 @@ static swig_type_info _swigt__p_scfImplementation1TcsImageBase_iImage_t = {"_p_s
 static swig_type_info _swigt__p_csObject = {"_p_csObject", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iEventQueue = {"_p_iEventQueue", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iEvent = {"_p_iEvent", 0, 0, 0, 0, 0};
+static swig_type_info _swigt__p_iString = {"_p_iString", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iComponent = {"_p_iComponent", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iCommandLineParser = {"_p_iCommandLineParser", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iJoystickDriver = {"_p_iJoystickDriver", 0, 0, 0, 0, 0};
@@ -20555,7 +20560,6 @@ static swig_type_info _swigt__p_iShaderPriorityList = {"_p_iShaderPriorityList",
 static swig_type_info _swigt__p_iShaderVarStack = {"_p_iShaderVarStack", "iShaderVarStack *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iShaderVariableAccessor = {"_p_iShaderVariableAccessor", "iShaderVariableAccessor *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iShaderVariableContext = {"_p_iShaderVariableContext", "iShaderVariableContext *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_iString = {"_p_iString", "iString *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iSuperLightmap = {"_p_iSuperLightmap", "iSuperLightmap *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iTextureHandle = {"_p_iTextureHandle", "iTextureHandle *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iTextureManager = {"_p_iTextureManager", "iTextureManager *", 0, 0, (void*)0, 0};
@@ -20839,6 +20843,7 @@ static swig_cast_info _swigc__p_scfImplementation1TcsImageBase_iImage_t[] = {{&_
 static swig_cast_info _swigc__p_csObject[] = {{&_swigt__p_csObject, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iEventQueue[] = {{&_swigt__p_iEventQueue, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iEvent[] = {{&_swigt__p_iEvent, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_iString[] = {{&_swigt__p_iString, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iComponent[] = {{&_swigt__p_iComponent, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iCommandLineParser[] = {{&_swigt__p_iCommandLineParser, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iJoystickDriver[] = {{&_swigt__p_iJoystickDriver, 0, 0, 0},{0, 0, 0, 0}};
@@ -20889,7 +20894,6 @@ static swig_cast_info _swigc__p_iShaderPriorityList[] = {  {&_swigt__p_iShaderPr
 static swig_cast_info _swigc__p_iShaderVarStack[] = {  {&_swigt__p_iShaderVarStack, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iShaderVariableAccessor[] = {  {&_swigt__p_iShaderVariableAccessor, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iShaderVariableContext[] = {  {&_swigt__p_iShaderManager, _p_iShaderManagerTo_p_iShaderVariableContext, 0, 0},  {&_swigt__p_iShader, _p_iShaderTo_p_iShaderVariableContext, 0, 0},  {&_swigt__p_iMaterial, _p_iMaterialTo_p_iShaderVariableContext, 0, 0},  {&_swigt__p_iShaderVariableContext, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_iString[] = {  {&_swigt__p_iString, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iSuperLightmap[] = {  {&_swigt__p_iSuperLightmap, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iTextureHandle[] = {  {&_swigt__p_iTextureHandle, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iTextureManager[] = {  {&_swigt__p_iTextureManager, 0, 0, 0},{0, 0, 0, 0}};
