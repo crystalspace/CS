@@ -50,6 +50,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Spr2D)
 {
 
 CS_LEAKGUARD_IMPLEMENT (csSprite2DMeshObject);
+CS_LEAKGUARD_IMPLEMENT (csSprite2DMeshObject::RenderBufferAccessor);
 CS_LEAKGUARD_IMPLEMENT (csSprite2DMeshObjectFactory);
 
 csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory) :

@@ -69,6 +69,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(InstMesh)
 {
 
 CS_LEAKGUARD_IMPLEMENT (csInstmeshMeshObject);
+CS_LEAKGUARD_IMPLEMENT (csInstmeshMeshObject::RenderBufferAccessor);
 CS_LEAKGUARD_IMPLEMENT (csInstmeshMeshObjectFactory);
 
 csInstmeshMeshObject::csInstmeshMeshObject (csInstmeshMeshObjectFactory* factory) :

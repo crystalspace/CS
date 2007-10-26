@@ -10,6 +10,9 @@ chronological order.
 	- Darek added bindings to the documentation.
 	- caedes fixed incorrect handling of smart pointers in cspython.
 	- caedes fixed one memory leak in genmesh.
+	- caedes fixed RenderBufferAccessor leakwards for genmesh, spr2d, 
+	  particles and instmesh (they were missing some 
+	  CS_LEAKWARD_IMPLEMENT uses).
 25-Oct-2007
 	- caedes added a bunch of const_cast to cspython to account for 
 	  incorrect prototypes in python 2.4 functions (which would lead to
