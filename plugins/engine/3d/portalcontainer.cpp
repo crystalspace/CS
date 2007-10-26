@@ -452,6 +452,8 @@ public:
   }
 };
 
+#define Z_NEAR	    (1.0f/9.0f)
+
 template<typename Outlet>
 static bool DoPerspective (Outlet& outlet, csVector3 *source, int num_verts,
   bool mirror, const csPlane3& plane_cam)
@@ -461,7 +463,7 @@ static bool DoPerspective (Outlet& outlet, csVector3 *source, int num_verts,
   if (num_verts == 0) return false;
   outlet.MakeEmpty ();
 
-  // Classify all points as NORMAL (z>=SMALL_Z), NEAR (0<=z<SMALL_Z), or
+  // Classify all points as NORMAL (z>=Z_NEAR), NEAR (0<=z<Z_NEAR), or
   // BEHIND (z<0).  Use several processing algorithms: trivially accept if all
   // points are NORMAL, mixed process if some points are NORMAL and some
   // are not, special process if there are no NORMAL points, but some are
@@ -471,7 +473,7 @@ static bool DoPerspective (Outlet& outlet, csVector3 *source, int num_verts,
   ind = source;
   while (ind < end)
   {
-    if (ind->z >= SMALL_Z)
+    if (ind->z >= Z_NEAR)
       outlet.Add (*ind);
     else
       break;
@@ -493,7 +495,7 @@ static bool DoPerspective (Outlet& outlet, csVector3 *source, int num_verts,
   {
     while (ind < end)
     {
-      if (ind->z >= SMALL_Z)
+      if (ind->z >= Z_NEAR)
       {
         reentern = ind;
         reenter = ind - 1;
@@ -522,7 +524,7 @@ static bool DoPerspective (Outlet& outlet, csVector3 *source, int num_verts,
       // to find out on which edge it becomes NORMAL again.
       while (ind < end)
       {
-        if (ind->z >= SMALL_Z)
+        if (ind->z >= Z_NEAR)
         {
           reentern = ind;
           reenter = ind - 1;
@@ -546,7 +548,7 @@ static bool DoPerspective (Outlet& outlet, csVector3 *source, int num_verts,
       // to find out on which edge it ceases to be NORMAL.
       while (ind < end)
       {
-        if (ind->z >= SMALL_Z)
+        if (ind->z >= Z_NEAR)
           outlet.Add (*ind);
         else
         {
@@ -843,16 +845,15 @@ bool csPortalContainer::ExtraVisTest (iRenderView* rview,
 {
   Prepare ();
 
-  csRenderView* csrview = static_cast<csRenderView*>(rview);
   csSphere cam_sphere, world_sphere;
-  GetBoundingSpheres (csrview, &tr_o2c, &camera_origin, world_sphere, 
+  GetBoundingSpheres (rview, &tr_o2c, &camera_origin, world_sphere, 
     cam_sphere);
 
-  return CS::RenderViewClipper::CullBSphere (csrview->GetRenderContext (),
+  return CS::RenderViewClipper::CullBSphere (rview->GetRenderContext (),
       cam_sphere, world_sphere, clip_portal, clip_plane, clip_z_plane);
 }
   
-void csPortalContainer::GetBoundingSpheres (csRenderView* rview, 
+void csPortalContainer::GetBoundingSpheres (iRenderView* rview, 
                                             csReversibleTransform* tr_o2c,
 					    csVector3* camera_origin, 
 					    csSphere& world_sphere, 
@@ -1086,8 +1087,8 @@ class PerspectiveOutlet2D3D : public PerspectiveOutlet2D
   }
 public:
   PerspectiveOutlet2D3D (iCamera* cam, csPoly2D& dest2D, csPoly3D& dest3D) : 
-    PerspectiveOutlet2D (cam->GetFOV(), cam->GetShiftX(), cam->GetShiftY(), 
-      dest2D), dest3D (dest3D), cam (cam) {}
+    PerspectiveOutlet2D (cam->GetFOV(), cam->GetShiftX(), 
+      cam->GetShiftY(), dest2D), dest3D (dest3D), cam (cam) {}
 
   void MakeEmpty () 
   { 
@@ -1103,15 +1104,17 @@ public:
   {
     PerspectiveOutlet2D::AddVertex (x, y);
     csVector2 p (x, y);
-    dest3D.AddVertex (cam->InvPerspective (p, SMALL_Z));
+    dest3D.AddVertex (cam->InvPerspective (p, Z_NEAR));
   }
   bool ClipAgainst (iClipper2D* clipper)
   {
-    CS_ALLOC_STACK_ARRAY(csVector2, clipOut, dest.GetVertexCount());
-    CS_ALLOC_STACK_ARRAY(csVertexStatus, clipOutStatus, dest.GetVertexCount());
+    size_t clipOutputVerts = dest.GetVertexCount() + clipper->GetVertexCount();
+    CS_ALLOC_STACK_ARRAY(csVector2, clipOut, clipOutputVerts);
+    CS_ALLOC_STACK_ARRAY(csVertexStatus, clipOutStatus, clipOutputVerts);
     size_t outNum;
     uint8 clipRes = clipper->Clip (dest.GetVertices(), dest.GetVertexCount(), clipOut,
       outNum, clipOutStatus);
+    CS_ASSERT(outNum <= clipOutputVerts);
     if (clipRes == CS_CLIP_OUTSIDE) return false;
     if (clipRes == CS_CLIP_INSIDE) return true;
     
@@ -1196,12 +1199,15 @@ void csPortalContainer::ComputeScreenPolygons (iRenderView* rview,
 {
   Prepare ();
   
-  csRenderView* csrview = static_cast<csRenderView*> (rview);
   csSphere world_sphere, cam_sphere;
-  GetBoundingSpheres (csrview, 0, 0, world_sphere, cam_sphere);
+  GetBoundingSpheres (rview, 0, 0, world_sphere, cam_sphere);
   
-  CS::RenderViewClipper::CullBSphere (csrview->GetRenderContext (),
-    cam_sphere, world_sphere, clip_portal, clip_plane, clip_z_plane);
+  if (!CS::RenderViewClipper::CullBSphere (rview->GetRenderContext (),
+    cam_sphere, world_sphere, clip_portal, clip_plane, clip_z_plane))
+  {
+    memset (numVerts, 0, portals.GetSize () * sizeof (size_t));
+    return;
+  }
 
   // We assume here that ObjectToWorld has already been called.
   iCamera* camera = rview->GetCamera ();
@@ -1232,24 +1238,17 @@ void csPortalContainer::ComputeScreenPolygons (iRenderView* rview,
       csVector3 *verts;
       int num_verts;
       if (ClipToPlane ((int)i, pportal_plane, camtrans.GetOrigin (),
-	verts, num_verts))
-      {
+	  verts, num_verts)
 	// The far plane is defined negative. So if the portal is entirely
 	// in front of the far plane it is not visible. Otherwise we will render
 	// it.
-	if (!farplane ||
+        && (!farplane ||
 	  csPoly3D::Classify (*farplane, verts, num_verts) != CS_POL_FRONT)
-	{
-	  if (DoPerspective (outlet, verts, num_verts, mirrored,
-		camera_planes[i]) && outlet.ClipAgainst (rview->GetClipper ()))
-	  {
-	    outHelper.AddPoly (poly2D, poly3D);
-	  }
-	  else
-	   outHelper.AddEmpty ();
-	}
-	else
-	 outHelper.AddEmpty ();
+        && DoPerspective (outlet, verts, num_verts, mirrored,
+	  camera_planes[i]) 
+        && outlet.ClipAgainst (rview->GetClipper ()))
+      {
+        outHelper.AddPoly (poly2D, poly3D);
       }
       else
 	outHelper.AddEmpty ();

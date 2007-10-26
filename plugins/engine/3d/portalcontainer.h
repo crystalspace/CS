@@ -156,7 +156,7 @@ private:
   bool ExtraVisTest (iRenderView* rview, csReversibleTransform& tr_o2c,
   	csVector3& camera_origin);
 
-  void GetBoundingSpheres (csRenderView* rview, csReversibleTransform* tr_o2c, 
+  void GetBoundingSpheres (iRenderView* rview, csReversibleTransform* tr_o2c, 
     csVector3* camera_origin, csSphere& world_sphere, csSphere& cam_sphere);
 protected:
   /**
