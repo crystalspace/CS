@@ -82,10 +82,11 @@ Example:
 MouseAxis0
 0MouseAxis0
 1MouseButton1
-Note: first and second examples are the same 0 is default
 @end example
 
-@subsubheadingSyntax for Joystick
+Note: first and second examples are the same (0 is default).
+
+@subsubheading Syntax for Joystick
 
 @example
 [[joy number]Joystick<Axis|Button><number>
@@ -94,5 +95,6 @@ Example:
 JoystickAxis0
 0JoystickAxis0
 1JoystickButton1
-Note: first and second examples are the same 0 is default
 @end example
+
+Note: first and second examples are the same (0 is default).
