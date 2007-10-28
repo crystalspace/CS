@@ -11,6 +11,8 @@ chronological order.
 	  on the "naked" target names (e.g. 'crystalspace') instead of the
 	  link library filename (e.g. 'libcrystalspace-1.3.so') to make sure
 	  the symlinks for shared libs are created.
+	- caedes fixed leakward for shaderweaver's WeaverCompiler (was using
+	  bad class name for leakward implementation).
 26-Oct-2007
 	- Darek added bindings to the documentation.
 	- caedes fixed incorrect handling of smart pointers in cspython.
