@@ -6,6 +6,11 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+28-Oct-2007
+	- res changed the Jam LinkWith rules to add a dependency of targets
+	  on the "naked" target names (e.g. 'crystalspace') instead of the
+	  link library filename (e.g. 'libcrystalspace-1.3.so') to make sure
+	  the symlinks for shared libs are created.
 26-Oct-2007
 	- Darek added bindings to the documentation.
 	- caedes fixed incorrect handling of smart pointers in cspython.
