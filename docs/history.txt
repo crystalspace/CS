@@ -7,7 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 29-Oct-2007
 	- ronsaldo added some operators to the 2d and 3d vectors in the c#
-	  bindings, and fixed somes isuses with CS module generations.
+	  bindings, and fixed somes issues with the CS module generations.
 21-Oct-2007
 	- ronsaldo fixed somes build errors. Added %ignore QueryInterface into
 	  include/bindings/csharp/csharppre.i.
