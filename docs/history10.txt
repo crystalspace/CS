@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Oct-2007
+	- Eric Sunshine merged r28039 into 1.0 (new online doc post-processing
+	  for dev API reference).
 28-Oct-2007
 	- Eric Sunshine merged r28030 and r28033 into 1.0 (drop online doc
 	  annotations, new online doc post-processing)
