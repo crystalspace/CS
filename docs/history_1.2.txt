@@ -1,5 +1,8 @@
 1.2 branch log.
 
+29-Oct-2007
+	- Eric Sunshine merged r28039 into 1.2 (new online doc post-processing
+	  for dev API reference).
 28-Oct-2007
 	- Eric Sunshine merged r28030 and r28033 into 1.2 (drop online doc
 	  annotations, new online doc post-processing)
