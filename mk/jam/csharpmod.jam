@@ -126,12 +126,15 @@ if $(CSHARP.AVAILABLE) = "yes"
       if $(csharpdir)
       {
 	SEARCH on $(source) = $(csharpdir) ;
+        MakeLocate $(source) : $(csharpdir) ;
       }
       else
       {
 	SEARCH on $(source) = $(LOCATE_TARGET) ;
+        MakeLocate $(source) : $(LOCATE_TARGET) ;
       }
-      Depends  $(target) : $(source) ;
+      
+      Depends $(target) : $(source) ;
     }
 
     MakeLocate $(target) : $(csharpdir) ;

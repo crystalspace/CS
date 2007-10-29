@@ -17,9 +17,6 @@
 */
 
 #ifdef SWIGCSHARP
-#include <stdlib.h>
-#include <stdio.h>
-
 %csconst(1);
 
 // Fill LIST_OBJECT_FUNCTIONS to extend list interfaces.
@@ -248,7 +245,7 @@ CS_WRAP_PTR_TYPEMAP(csWrapPtr)
 #undef INTERFACE_APPLY
 #define INTERFACE_APPLY(T) %typemap(cscode) T %{ INTERFACE_EQUALS %}
 
-APPLY_FOR_EACH_INTERFACE
+APPLY_FOR_ALL_INTERFACES
 
 // ivaria/event.h
 // Swig 1.3.23 introduces support for default arguments, so it generates this
@@ -405,6 +402,8 @@ ICONFIGMANAGER_CSHARPCODE
 %rename(GetNodeType) iDocumentNode::GetType;
 %rename(GetVariableType) csShaderVariable::GetType;
 %rename(SetVariableType) csShaderVariable::SetType;
+
+%include "bindings/csharp/cshoperators.i"
 
 #endif SWIGCSHARP
 

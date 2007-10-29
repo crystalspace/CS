@@ -27,11 +27,12 @@ if $(CSHARP.AVAILABLE) = "yes"
   local cs_globals = [ DoSourceGrist CS.cs ] ;
   GenCSharpGlobals $(cs_globals) :
 	 $(csharpdir) :
-	 core imesh isndsys ivaria iengine cstool 
+	 core imesh isndsys ivaria ienginemod cstool 
 	 ivideo imap csgfx csgeom cspace :
 	 CrystalSpace :
 	 CS ;
 
+  Depends $(cs_globals) : csharp_mods ;
   cspacesharpdll = $(cspacesharpdll:G=csharpmod) ;
   SEARCH on $(csbuildxml) = $(SEARCH_SOURCE) ;
   Depends $(csbuildxml:G=build) : $(csbuildxml) ;
@@ -50,12 +51,5 @@ if $(CSHARP.AVAILABLE) = "yes"
   NAnt $(cspacesharpdll) : $(csbuildxml:G=build) ;
   Clean cspacesharpclean : $(cspacesharpdll) ;
   Depends csharpmod : $(cspacesharpdll) ;
-	
-  local cspacesharpdll_final = $(cspacesharpdll:G=cspacesharpfinal) ;
-  MakeLocate $(cspacesharpdll_final) : $(LOCATE.TARGETS) ;
-  Copy $(cspacesharpdll_final) : $(cspacesharpdll) ;
-  Depends $(cspacesharpdll_final) : $(cspacesharpdll) ;
-  Depends cspacesharpmod : $(cspacesharpdll_final) ;
-  Clean cspacesharpclean : $(cspacesharpdll_final) ;
   Depends csharpmodclean : cspacesharpclean ;
 }
