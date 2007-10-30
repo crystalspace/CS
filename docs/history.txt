@@ -6,6 +6,23 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+30-Oct-2007
+	- res fixed some implementation mistakes in csRedBlackTree, leading
+	  to violations of the RB reles in the tree, especially when deleting:
+	    - The original source for the variant implemented here uses 'nil'
+	      elements as indicators for absence of a child or parent of a
+	      tree node. The CS implementation uses 0 as 'nil', and dutifully
+	      checked some pointers for 0 before manipulating their contents.
+	      However, in the original source, 'nil' is an actual element and
+	      at a point a change is made to it's 'parent' which us expected
+	      to be reflected at another place where the parent of a possibly
+	      'nil' element is read. Fixed the code to track that special
+	      'nil parent' there.
+	    - In another part, the parent of a specific node was used
+	      repeatedly and thus cached. However, some operations done on the
+	      tree potentially change the parent of that specific node, but
+	      the cached value was not updated. Fixed as well.
+	    - In one instance a statement was just transcribed plain wrong.
 28-Oct-2007
 	- res changed the Jam LinkWith rules to add a dependency of targets
 	  on the "naked" target names (e.g. 'crystalspace') instead of the
