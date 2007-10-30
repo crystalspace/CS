@@ -674,7 +674,8 @@ namespace lighter
             csRef<iDocumentNode> lightChild =
               bufferChild->CreateNodeBefore (CS_NODE_ELEMENT, 0);
             lightChild->SetValue ("light");
-            lightChild->SetAttribute ("lightid", light->GetLightID().HexString());
+            lightChild->SetAttribute ("lightsector", light->GetSector()->sectorName);
+            lightChild->SetAttribute ("lightname", light->GetName());
 
             scene->lightmapPostProc.ApplyExposure (colors.GetArray(),
               colors.GetSize()); 

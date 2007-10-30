@@ -27,7 +27,6 @@
 #include "csextern.h"
 #include "csutil/fifo.h"
 #include "csutil/scf_implementation.h"
-#include "csutil/thread.h"
 #include "iutil/job.h"
 
 #include "csutil/threading/condition.h"

@@ -95,7 +95,7 @@ public:
    */
   static void* GetData (iObject* obj)
   {
-    csRef<WalkDataObject> d (CS_GET_CHILD_OBJECT (obj, WalkDataObject));
+    csRef<WalkDataObject> d (CS::GetChildObject<WalkDataObject> (obj));
     void *res = (d ? d->GetData () : 0);
     return res;
   }

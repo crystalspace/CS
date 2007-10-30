@@ -29,6 +29,7 @@
 #include "csutil/allocator.h"
 #include "csutil/bitarray.h"
 #include "csutil/cscolor.h"
+#include "csutil/csstring.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/flags.h"
 #include "csutil/set.h"
@@ -192,10 +193,15 @@ public:
 
     void UpdateTiles (const TileHelper& helper);
   };
+  struct LightIdentity : public CS::Memory::CustomAllocated
+  {
+    csString sectorName, lightName;
+    uint8 lightId[16];
+  };
   struct MappedLight
   {
     PDMap map;
-    char* lightId;
+    LightIdentity* lightId;
     csWeakRef<iLight> light;
 
     MappedLight (size_t tilesNum, const TileHelper& tiles, iImage* img) : 
@@ -204,13 +210,12 @@ public:
     {
       if (other.lightId != 0)
       {
-        lightId = new char[16];
-        memcpy (lightId, other.lightId, 16);
+        lightId = new LightIdentity (*(other.lightId));
       }
       else
         lightId = 0;
     }
-    ~MappedLight() { delete[] lightId; }
+    ~MappedLight() { delete lightId; }
   };
 private:
   csRef<ProctexPDLightLoader> loader;

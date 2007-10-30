@@ -46,6 +46,8 @@ CS_IMPLEMENT_PLUGIN
 CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 {
 
+  CS_LEAKGUARD_IMPLEMENT (ParticlesMeshObject::RenderBufferAccessor);
+
   SCF_IMPLEMENT_FACTORY(ParticlesMeshObjectType)
 
   //-- Object type

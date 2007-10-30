@@ -516,8 +516,8 @@ void Laser::Check ()
   	laserstart, laserend);
   if (rc.mesh)
   {
-    csRef<Adversary> adv = CS_GET_CHILD_OBJECT (
-    	rc.mesh->QueryObject (), Adversary);
+    csRef<Adversary> adv = CS::GetChildObject<Adversary> (
+    	rc.mesh->QueryObject ());
     if (adv)
     {
       // Hit!

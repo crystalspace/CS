@@ -41,12 +41,11 @@ class GlobRefs
     private GlobRefs()
     {
         iObjectRegistry objreg = CS.getTheObjectRegistry();
-        g3d = (iGraphics3D) CS.CS_QUERY_REGISTRY(objreg, iGraphics3D.class);
-	vc = (iVirtualClock) CS.CS_QUERY_REGISTRY(objreg, iVirtualClock.class);
-        kbd = (iKeyboardDriver) CS.CS_QUERY_REGISTRY(objreg,
-		iKeyboardDriver.class);
-        loader = (iLoader) CS.CS_QUERY_REGISTRY(objreg, iLoader.class);
-        engine = (iEngine) CS.CS_QUERY_REGISTRY(objreg, iEngine.class);
+        g3d = (iGraphics3D) objreg.Get (iGraphics3D.class);
+	vc = (iVirtualClock) objreg.Get (iVirtualClock.class);
+        kbd = (iKeyboardDriver) objreg.Get (iKeyboardDriver.class);
+        loader = (iLoader) objreg.Get (iLoader.class);
+        engine = (iEngine) objreg.Get (iEngine.class);
     }
 };
 
@@ -139,8 +138,8 @@ class EventHandler extends csJEventHandler
             (csKeyEventHelper.GetCookedCode(ev) == CS.CSKEY_ESC))
         {
             // escape key to quit
-            iEventQueue q = (iEventQueue) CS.CS_QUERY_REGISTRY(
-	    	CS.getTheObjectRegistry(), iEventQueue.class);
+            iEventQueue q = (iEventQueue) CS.getTheObjectRegistry().Get (
+	    	iEventQueue.class);
             if (q != null)
             {
                 q.GetEventOutlet().Broadcast(CS.csevQuit(
@@ -165,15 +164,15 @@ class SimpleRoom extends CS
     {
         iObjectRegistry object_reg = getTheObjectRegistry();
         System.out.println("getting engine");
-	iEngine engine = (iEngine) CS_QUERY_REGISTRY(object_reg, iEngine.class);
+	iEngine engine = (iEngine) object_reg.Get (iEngine.class);
         System.out.println("getting clock");
-	iVirtualClock vc = (iVirtualClock) CS_QUERY_REGISTRY(
-		object_reg, iVirtualClock.class);
+	iVirtualClock vc = (iVirtualClock) object_reg.Get (
+		iVirtualClock.class);
         System.out.println("getting loader");
-	iLoader loader = (iLoader) CS_QUERY_REGISTRY(object_reg, iLoader.class);
+	iLoader loader = (iLoader) object_reg.Get (iLoader.class);
         System.out.println("getting keyboard driver");
-        iKeyboardDriver kbd = (iKeyboardDriver) CS_QUERY_REGISTRY(
-		object_reg, iKeyboardDriver.class);
+        iKeyboardDriver kbd = (iKeyboardDriver) object_reg.Get (
+		iKeyboardDriver.class);
         System.out.println("getting texture");
 	String matname = "mystone";
 	loader.LoadTexture(matname, "/lib/stdtex/bricks.jpg",
@@ -182,24 +181,19 @@ class SimpleRoom extends CS
         engine.CreateSector("room");
         System.out.println("getting room sectors");
 	iSector room = engine.GetSectors().FindByName("room");
-        System.out.println("getting walls mesh");
-	iMeshWrapper walls = engine.CreateSectorWallsMesh(room, "walls");
-        System.out.println("getting thingstate");
-	iThingState thingstate = (iThingState) SCF_QUERY_INTERFACE(
-		walls.GetMeshObject(), iThingState.class);
-        System.out.println("getting naterial");
-	iMaterialWrapper material = engine.GetMaterialList().FindByName(matname);
-	
-        System.out.println("creating walls");
-	iThingFactoryState fact = (iThingFactoryState) SCF_QUERY_INTERFACE(
-          walls.GetMeshObject().GetFactory(), iThingFactoryState.class);
-	fact.AddInsideBox (
-	      new csVector3(-5,0,-5),
-	      new csVector3(5,20,5));
 
-	csPolygonRange CS_POLYRANGE_LAST = new csPolygonRange(-1, -1);
-	fact.SetPolygonTextureMapping(CS_POLYRANGE_LAST, 3);
-	fact.SetPolygonMaterial(CS_POLYRANGE_LAST, material);
+        System.out.println("getting walls mesh");
+	DensityTextureMapper mapper = new DensityTextureMapper(0.3f);
+	TesselatedBox box = new TesselatedBox(new csVector3 (-5, 0, -5), new csVector3 (5, 20, 5));
+	box.SetLevel (3);
+	box.SetMapper (mapper);
+	box.SetFlags (Primitives.CS_PRIMBOX_INSIDE);
+	iMeshWrapper walls = GeneralMeshBuilder.CreateFactoryAndMesh(
+	    engine, room, "walls", "walls_factory", box);
+	iGeneralMeshState mesh_state = (iGeneralMeshState) walls.GetMeshObject().QueryInterface(iGeneralMeshState.class);
+	mesh_state.SetShadowReceiving (true);
+	iMaterialWrapper material = engine.GetMaterialList().FindByName(matname);
+	walls.GetMeshObject ().SetMaterialWrapper (material);
 
         iLight light = engine.CreateLight("", new csVector3(0, 5, 0), 10f,
 		new csColor(1, 0, 0),
@@ -208,8 +202,8 @@ class SimpleRoom extends CS
 
         engine.Prepare(null);
 
-        iGraphics3D myG3D = (iGraphics3D) CS_QUERY_REGISTRY(
-		getTheObjectRegistry(), iGraphics3D.class);
+        iGraphics3D myG3D = (iGraphics3D) getTheObjectRegistry().Get (
+		iGraphics3D.class);
         view = new csView(engine, myG3D);
         view.GetCamera().SetSector(room);
         view.GetCamera().GetTransform().SetOrigin(new csVector3(0, 2, 0));
@@ -257,8 +251,8 @@ class SimpleRoom extends CS
 
 	    System.out.println("Application opened");
 	
-            iGraphics3D myG3D = (iGraphics3D) CS_QUERY_REGISTRY(
-		getTheObjectRegistry(), iGraphics3D.class);
+            iGraphics3D myG3D = (iGraphics3D) getTheObjectRegistry().Get (
+		iGraphics3D.class);
 	    iNativeWindow window = myG3D.GetDriver2D().GetNativeWindow();
 	    window.SetTitle ("Crystal Space Java Application");
 

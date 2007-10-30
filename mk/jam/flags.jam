@@ -31,15 +31,15 @@ rule LinkWith
   {
     # LibDepends for shared libs invokes LinkWith, so prevent recursion
     LibDepends $(<) : $(rawlibs) ;
-  }                           
+  }
   
   local i libs ;
   for i in $(rawlibs)
   {
     libs += [ ConstructLibraryLinkTarget $(i) : $($(i)_SHARED) ] ;
   }
-      
-  Depends $($(<)_TARGET) : $(libs) ;
+
+  Depends $($(<)_TARGET) : $(rawlibs) ;
   NEEDLIBS on $($(<)_TARGET) += $(libs) ;
   $(<).NEEDLIBS += $(rawlibs) ;
 

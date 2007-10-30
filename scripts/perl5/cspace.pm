@@ -3455,8 +3455,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *CreateRoot = *cspacec::iDocument_CreateRoot;
 *GetRoot = *cspacec::iDocument_GetRoot;
 *Parse = *cspacec::iDocument_Parse;
-*Write = *cspacec::iDocument_Write;
 *Changeable = *cspacec::iDocument_Changeable;
+*Write = *cspacec::iDocument_Write;
 *scfGetVersion = *cspacec::iDocument_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

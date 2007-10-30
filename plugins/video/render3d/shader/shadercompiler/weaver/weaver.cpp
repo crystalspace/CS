@@ -42,7 +42,7 @@ CS_IMPLEMENT_PLUGIN
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 {
 
-CS_LEAKGUARD_IMPLEMENT (csXMLShaderCompiler);
+CS_LEAKGUARD_IMPLEMENT (WeaverCompiler);
 
 //---------------------------------------------------------------------------
 
