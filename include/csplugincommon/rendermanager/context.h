@@ -39,6 +39,95 @@ namespace RenderManager
     struct PersistentData
     {
       TextureCache texCache;
+      struct PortalBuffers
+      {
+        csRef<iRenderBuffer> coordBuf;
+        csRef<iRenderBuffer> tcBuf;
+        csRef<iRenderBuffer> indexBuf;
+        csRef<csRenderBufferHolder> holder;
+      };
+      struct PortalBufferConstraint
+      {
+        typedef size_t KeyType;
+
+        static int IsLargerEqual (const PortalBuffers& b1, 
+                                  const PortalBuffers& b2)
+        {
+          size_t s1 = b1.coordBuf->GetElementCount ();
+          size_t s2 = b1.coordBuf->GetElementCount ();
+          
+          if (s1 > s2) return true;
+          return false;
+        }
+      
+        static int IsEqual (const PortalBuffers& b1, 
+                            const PortalBuffers& b2)
+        {
+          size_t s1 = b1.coordBuf->GetElementCount ();
+          size_t s2 = b1.coordBuf->GetElementCount ();
+          
+          if (s1 == s2) return true;
+          return false;
+        }
+      
+        static int IsLargerEqual(const PortalBuffers& b1, 
+                                 const KeyType& s2)
+        {
+          size_t s1 = b1.coordBuf->GetElementCount ();
+          
+          if (s1 > s2) return true;
+          return false;
+        }
+      
+        static int IsEqual(const PortalBuffers& b1, 
+                           const KeyType& s2)
+        {
+          size_t s1 = b1.coordBuf->GetElementCount ();
+          
+          if (s1 == s2) return true;
+          return false;
+        }
+      
+      };
+      CS::Utility::GenericResourceCache<PortalBuffers, csTicks,
+        PortalBufferConstraint> bufCache;
+
+      struct csBoxClipperCached : public csBoxClipper
+      {
+        PersistentData* owningPersistentData;
+
+        csBoxClipperCached (PersistentData* owningPersistentData,
+          const csBox2& box) : csBoxClipper (box), 
+          owningPersistentData (owningPersistentData)
+        { }
+
+        void operator delete (void* p, void* q)
+        {
+          csBoxClipperCached* bcc = reinterpret_cast<csBoxClipperCached*> (p);
+          bcc->owningPersistentData->FreeCachedClipper (bcc);
+        }
+        void operator delete (void* p)
+        {
+          csBoxClipperCached* bcc = reinterpret_cast<csBoxClipperCached*> (p);
+          bcc->owningPersistentData->FreeCachedClipper (bcc);
+        }
+      };
+      struct csBoxClipperCachedStore
+      {
+        uint32 bytes[sizeof(csBoxClipperCached)/sizeof(uint32)];
+      };
+      CS::Utility::GenericResourceCache<csBoxClipperCachedStore, csTicks,
+        CS::Utility::ResourceCache::SortingNone,
+        CS::Utility::ResourceCache::ReuseConditionFlagged> boxClipperCache;
+
+      void FreeCachedClipper (csBoxClipperCached* bcc)
+      {
+        CS::Utility::ResourceCache::ReuseConditionFlagged::StoredAuxiliaryInfo* 
+          reuseAux = boxClipperCache.GetReuseAuxiliary (
+            reinterpret_cast<csBoxClipperCachedStore*> (bcc));
+        reuseAux->reusable = true;
+      }
+
       csStringID svNameTexPortal;
     #ifdef CS_DEBUG
       csFrameDataHolder<csStringBase> stringHolder;
@@ -46,7 +135,13 @@ namespace RenderManager
       
       PersistentData() : texCache (csimg2D, "rgb8", 
         CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP,
-        "target", TextureCache::tcachePowerOfTwo) {}
+        "target", TextureCache::tcachePowerOfTwo)
+      {
+        bufCache.agedPurgeInterval = 5000;
+        bufCache.purgeAge = 10000;
+        boxClipperCache.agedPurgeInterval = 5000;
+        boxClipperCache.purgeAge = 10000;
+      }
       
       void Initialize (iShaderManager* shmgr, iGraphics3D* g3d)
       {
@@ -57,7 +152,10 @@ namespace RenderManager
       
       void UpdateNewFrame ()
       {
-        texCache.AdvanceFrame (csGetTicks ());
+        csTicks time = csGetTicks ();
+        texCache.AdvanceFrame (time);
+        bufCache.AdvanceTime (time);
+        boxClipperCache.AdvanceTime (time);
       }
     };
   
@@ -78,6 +176,8 @@ namespace RenderManager
       {
         typename RenderTreeType::ContextNode::PortalHolder& holder = context->allPortals[pc];
         const size_t portalCount = holder.portalContainer->GetPortalCount ();
+        CS::Graphics::RenderPriority renderPrio = 
+          holder.meshWrapper->GetRenderPriority ();
 
         size_t allPortalVertices = holder.portalContainer->GetTotalVertexCount ();
         allPortalVerts2d.SetSize (allPortalVertices * 3);
@@ -93,7 +193,7 @@ namespace RenderManager
 
         for (size_t pi = 0; pi < portalCount; ++pi)
         {
-          iPortal* portal = holder.portalContainer->GetPortal (pi);
+          iPortal* portal = holder.portalContainer->GetPortal (int (pi));
           const csFlags portalFlags (portal->GetFlags());
 
           if (IsSimplePortal (portalFlags))
@@ -220,7 +320,16 @@ namespace RenderManager
                distorted: texels from outside the portal area still have a
                good color. May not be the case with a (more exact) poly 
                clipper. */
-            newView.AttachNew (new csBoxClipper (clipBox));
+            PersistentData::csBoxClipperCachedStore* bccstore =
+              persistentData.boxClipperCache.Query ();
+            if (bccstore == 0)
+            {
+              PersistentData::csBoxClipperCachedStore dummy;
+              bccstore = persistentData.boxClipperCache.AddActive (dummy);
+            }
+            newView.AttachNew (
+              new (bccstore) PersistentData::csBoxClipperCached (
+                &persistentData, clipBox));
             newRenderView->SetClipper (newView);
 
 	    typename RenderTreeType::ContextsContainer* targetContexts = 
@@ -242,22 +351,37 @@ namespace RenderManager
 	    csRef<csShaderVariable> svTexPortal =
 	      svc->GetVariableAdd (persistentData.svNameTexPortal);
 	    svTexPortal->SetValue (tex);
+
+            PersistentData::PortalBuffers* bufs = 
+              persistentData.bufCache.Query (count);
+            if (bufs == 0)
+            {
+              PersistentData::PortalBuffers newBufs;
+	      newBufs.coordBuf = 
+	        csRenderBuffer::CreateRenderBuffer (count, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
+	      newBufs.tcBuf =
+	        csRenderBuffer::CreateRenderBuffer (count, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 4);
+	      newBufs.indexBuf =
+	        csRenderBuffer::CreateIndexRenderBuffer (count, CS_BUF_STREAM, 
+		  CS_BUFCOMP_UNSIGNED_INT, 0, count-1);
+	      newBufs.holder.AttachNew (new csRenderBufferHolder);
+              newBufs.holder->SetRenderBuffer (CS_BUFFER_INDEX, newBufs.indexBuf);
+	      newBufs.holder->SetRenderBuffer (CS_BUFFER_POSITION, newBufs.coordBuf);
+	      newBufs.holder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, newBufs.tcBuf);
+              bufs = persistentData.bufCache.AddActive (newBufs);
+            }
 	    
-	    csRef<iRenderBuffer> coordBuf = 
-	      csRenderBuffer::CreateRenderBuffer (count, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
 	    {
-	      csRenderBufferLock<csVector3> coords (coordBuf);
+	      csRenderBufferLock<csVector3> coords (bufs->coordBuf);
 	      for (size_t c = 0; c < count; c++)
 	      {
 		coords[c].Set (portalVerts3d[c]);
 	      }
 	    }
-	    csRef<iRenderBuffer> tcBuf =
-	      csRenderBuffer::CreateRenderBuffer (count, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 4);
 	    {
 	      float xscale = 1.0f / real_w;
 	      float yscale = 1.0f / real_h;
-	      csRenderBufferLock<csVector4> tcoords (tcBuf);
+	      csRenderBufferLock<csVector4> tcoords (bufs->tcBuf);
 	      for (size_t c = 0; c < count; c++)
 	      {
 	        float z = portalVerts3d[c].z;
@@ -266,23 +390,14 @@ namespace RenderManager
 		  z);
 	      }
 	    }
-	    csRef<iRenderBuffer> indexBuf =
-	      csRenderBuffer::CreateIndexRenderBuffer (count, CS_BUF_STREAM, 
-		CS_BUFCOMP_UNSIGNED_INT, 0, count-1);
 	    {
-	      csRenderBufferLock<uint> indices (indexBuf);
+	      csRenderBufferLock<uint> indices (bufs->indexBuf);
 	      for (size_t c = 0; c < count; c++)
 	      {
 	        *indices++ = uint (c);
 	      }
 	    }
-	    
-	    csRef<csRenderBufferHolder> buffers;
-	    buffers.AttachNew (new csRenderBufferHolder);
-	    buffers->SetRenderBuffer (CS_BUFFER_INDEX, indexBuf);
-	    buffers->SetRenderBuffer (CS_BUFFER_POSITION, coordBuf);
-	    buffers->SetRenderBuffer (CS_BUFFER_TEXCOORD0, tcBuf);
-	    
+    
 	    bool meshCreated;
 	    csRenderMesh* rm = 
 	      renderTree.GetPersistentData().rmHolder.GetUnusedMesh (
@@ -300,7 +415,7 @@ namespace RenderManager
           #endif
 	    rm->material = mat;
 	    rm->meshtype = CS_MESHTYPE_TRIANGLEFAN;
-	    rm->buffers = buffers;
+	    rm->buffers = bufs->holder;
 	    rm->z_buf_mode = CS_ZBUF_USE;
 	    rm->object2world = rview->GetCamera()->GetTransform();
 	    rm->indexstart = 0;
@@ -310,8 +425,7 @@ namespace RenderManager
 	    
 	    typename RenderTreeType::MeshNode::SingleMesh sm;
 	    sm.meshObjSVs = 0;
-	    // @@@ Use REAL priority
-	    renderTree.AddRenderMeshToContext (context, rm, 7, sm);
+	    renderTree.AddRenderMeshToContext (context, rm, renderPrio, sm);
 	    
 	    portalVerts2d += count;
             portalVerts3d += count;

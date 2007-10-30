@@ -33,6 +33,8 @@ chronological order.
 	  some constraint).
 	- res changed CS::RenderManager::TextureCache to utilize 
 	  CS::Utility::GenericResourceCache internally.
+	- res made the rendermanager standard portal setup utilize more 
+	  resource caches for it's portal rendering to texture related data.
 28-Oct-2007
 	- res changed the Jam LinkWith rules to add a dependency of targets
 	  on the "naked" target names (e.g. 'crystalspace') instead of the
