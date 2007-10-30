@@ -23,6 +23,14 @@ chronological order.
 	      tree potentially change the parent of that specific node, but
 	      the cached value was not updated. Fixed as well.
 	    - In one instance a statement was just transcribed plain wrong.
+	- res added CS::Utility::GenericResourceCache. This helps with the
+	  somewhat common issues that some resources used while rendering
+	  should be reused next frame, however, the desired resources have
+	  different attributes. Also, resources shouldn't be just piled up
+	  but unneeded ones should be released after some time. The generic
+	  resource cache deals with that while allowing for necessary 
+	  behaviour customization (e.g. only return a resource that satisfies
+	  some constraint).
 28-Oct-2007
 	- res changed the Jam LinkWith rules to add a dependency of targets
 	  on the "naked" target names (e.g. 'crystalspace') instead of the
