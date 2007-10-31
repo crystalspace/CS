@@ -17,6 +17,7 @@
 */
 
 #include "tri3dtest.h"
+#include "csgeom/plane3.h"
 
 using namespace std;
 using CS::Geom::Triangulate3D;
@@ -69,8 +70,33 @@ bool Tri3DTest::Application()
 	if (!OpenApplication(GetObjectRegistry()))
 		return ReportError("Error: Unable to fetch Object Registry!");
 
-	/* Old Testing Code -- Will be reinserted later
+	/* csPlane3 testing code
+
+	csVector3 norm(1, 0, 0);
+
+	csPlane3 myPlane(norm);
+
+	csVector3 p (3, 4, 16);
+	csVector3 newVector = myPlane.ProjectOnto(p);
+
+	ReportWarning("Projected vector: (%f, %f, %f)", newVector.x, newVector.y, newVector.z);
+	
+	End of csPlane3 testing code */
+
+	/* Old Testing Code -- Will be reinserted later */
 	csContour3 polygon;
+
+	csVector3 point1(1, 1, 1);
+	csVector3 point2(1, 2, 1);
+	csVector3 point3(1, 3, 1);
+	csVector3 point4 (1, 4, 1);
+
+	polygon.Insert(0, point1);
+	polygon.Insert(1, point2);
+	polygon.Insert(2, point3);
+	polygon.Insert(3, point4);
+
+	/*
 	csVector3 point1(0, 10.0, 10.0);
 	csVector3 point2(0, -10.0, 10.0);
 	csVector3 point3(0.0, -10.0, -10.0);
@@ -84,12 +110,13 @@ bool Tri3DTest::Application()
 	polygon.Insert(3, point4);
 	polygon.Insert(4, point5);
 	polygon.Insert(5, point6);
+	*/
 
 	csContour3 result_vertices;
 	csTriangleMesh result;
 
 	Triangulate3D::Process(polygon, result, report);
-	*/
+	/* End of Old testing code */
 
 	/* Testing Code for new addition to csTriangleMesh: AddTriangleMesh()
 

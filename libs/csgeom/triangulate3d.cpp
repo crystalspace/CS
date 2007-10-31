@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 #include "csgeom/triangulate3d.h"
+#include "csgeom/transfrm.h"
 
 namespace CS
 {
@@ -28,102 +29,124 @@ namespace Geom
 
 	bool Triangulate3D::Process(csContour3& polygon, csTriangleMesh& result, iReporter* report2, csContour3* holes)
 	{
+		report = report2;
 		int n = (int)polygon.GetSize();
 
 		if (n < 3)
 		{
 			return false;
 		}
-
-		report = report2;
-
-		// we first need to find which of the vertices are in the convex and
-		// reflex vertex sets
-		csContour3 reflexVerts, convexVerts;
-		csArray<size_t> potentialEarIndices;
-
-		FindVertexGroups(polygon, reflexVerts, convexVerts, potentialEarIndices);
-		csContour3 reflexVerts2(reflexVerts), convexVerts2(convexVerts);
-
-		while (!reflexVerts2.IsEmpty() || !convexVerts2.IsEmpty())
-		{
-			if (!reflexVerts2.IsEmpty())
-			{
-				csVector3 popped = reflexVerts2.Pop();
-				report->ReportWarning("crystalspace.Triangulate3D", "Reflex Vertex: (%f, %f, %f)", popped.x, popped.y, popped.z);
-			}
-			else
-			{
-				csVector3 popped = convexVerts2.Pop();
-				report->ReportWarning("crystalspace.Triangulate3D", "Convex Vertex: (%f, %f, %f)", popped.x, popped.y, popped.z);
 		
-			}
-		}
+		// first, let's establish a mapping from 3D -> 2D planar polygon
+		csContour3 planarPolygon = Triangulate3D::MapToPlanar(polygon);
 
-		report->ReportWarning("crystalspace.Triangulate3D", "Number of reflex verts: %d, Number of convex verts: %d", reflexVerts.GetSize(), convexVerts.GetSize()); 
-		while (!potentialEarIndices.IsEmpty())
-		{
-			// remove the next ear
-			int nextEar = (int)potentialEarIndices.Pop();
-
-/*  Old code to make it more like Triangulate2
-			result_vertices.Push(polygon[nextEar]);
-			result_vertices.Push(polygon[(nextEar+1)%n]);
-			result_vertices.Push(polygon[(nextEar-1)%n]);
-*/
-			// cut out the triangle around it
-			report->ReportWarning("crystalspace.Triangulate3D", "Snipping out point number %d", nextEar);
-			report->ReportWarning("crystalspace.Triangulate3D", "Snipped point is: (%d, %d, %d)", polygon[nextEar].x, polygon[nextEar].y, polygon[nextEar].z);
-			Snip(polygon, potentialEarIndices, nextEar, result);
-			n--;  // otherwise we have too many vertices in the counter
-
-			int m = -1;
-			
-			// now, for each of the neighboring vertices
-
-			while (m < 2)
-			{
-				report->ReportWarning("crystalspace.Triangulate3D", "Checking vertex %d", (nextEar+m)%n);
-				csVector3 currentVertex = polygon.Get((nextEar+m)%n);
-				csVector3 triA, triB, triC;
-
-
-				// I think this is the wrong triangle
-				triA = currentVertex;
-				triB = polygon.Get((nextEar+m+1)%n);
-				triC = polygon.Get((nextEar+m-1)%n);
-
-				// if the vertex is convex
-				if (IsConvex(polygon, (nextEar+m)%n))
-				{
-					// test to see if it is an ear by iterating over all the 
-					// reflex vertices and testing to see if they are contained within
-					// the triangle of this vertex
-					
-					size_t numRef = reflexVerts.GetSize();
-
-					for (size_t y = 0; y < numRef; y++)
-					{
-						if (IsContained(reflexVerts[y], triA, triB, triC))
-						{
-							report->ReportWarning("crystalspace.Triangulate3D", "Removing vertex %d", y);
-
-							// remove it from the reflex list
-							reflexVerts.DeleteIndex(y);
-
-							// add it to the convex list (in sorted order)
-							potentialEarIndices.InsertSorted(y);
-						}
-					}
-				}
-
-				m+=2;
-			}
-		}
-
-		return true;
+		// rotate the planar polygon so that it's axis-aligned
+		// triangulate the 2D planar polygon
+		// finally, reverse the mapping
 	}
 
+	csContour3 Triangulate3D::MapToPlanar(const csContour3& poly)
+	{
+		// we'll accomplish this by marching along the vertices of the 
+		// 3D polygon
+	
+		// this algorithm was developed with assistance from Martin Held, 
+		// the creator of Fast Industrial Strength Triangulation (FIST).
+		// for more information, take a look at:
+		// Held, M. FIST: Fast Industrial Strength Triangulation of Polygons.
+		//    Algorithmica. 30(4): 563-596, 2001.
+
+		csVector3 accumulatorNormal;
+		
+		int n = (int) poly.GetSize();
+		for (int i = 0; i < n; i++)
+		{
+			csVector3 first, second, third;
+			first = poly[(((i-1)+n)%n)];
+			second = poly[i];
+			third = poly[((i+1)%n)];
+
+			// output first second and third to verify nothing crazy is happening
+			report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.triangulate3d", "First point: %f, %f, %f", first.x, first.y, first.z);
+			report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.triangulate3d", "Second point: %f, %f, %f", second.x, second.y, second.z);	
+			report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.triangulate3d", "Third point: %f, %f, %f", third.x, third.y, third.z);
+
+
+			// compute the normals to cross product
+			//csVector3 toCross1 = first - second;
+			csVector3 toCross1 = second - first;
+			csVector3 toCross2 = third - second;
+			report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.triangulate3d", "toCross1: %f, %f, %f", toCross1.x, toCross1.y, toCross1.z);	
+			report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.triangulate3d", "toCross2: %f, %f, %f", toCross2.x, toCross2.y, toCross2.z);
+
+			csVector3 result = toCross2 % toCross1;
+			report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.triangulate3d", "Cross Product: %f, %f, %f", result.x, result.y, result.z);	
+
+			result = csVector3::Unit(result);
+			report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.triangulate3d", "Result (after unit): %f, %f, %f", result.x, result.y, result.z);	
+
+			accumulatorNormal.x += result.x;
+			accumulatorNormal.y += result.y;
+			accumulatorNormal.z += result.z;
+
+		}
+		
+		report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.triangulate3d", "accumulator normal (before unit): %f, %f, %f", accumulatorNormal.x, accumulatorNormal.y, accumulatorNormal.z);
+
+		accumulatorNormal = accumulatorNormal.Unit();
+		
+		// so now, accumulatorNormal contains the normal vector
+		// for an approximate polygon which is planar
+
+		// create a csPlane which represents this plane
+		// output the accumulator normal
+		// these also report -1#.IND - why?
+		report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.triangulate3d", "accumulator normal: %f, %f, %f", accumulatorNormal.x, accumulatorNormal.y, accumulatorNormal.z);
+
+		csPlane3 ourPlane(accumulatorNormal);
+
+		// we now need to map from our original polygon to 
+		// this new planar polygon
+		csContour3 projectedPoly;
+		for (int i = 0; i < n; i++)
+		{
+			csVector3 projected = ourPlane.ProjectOnto(poly[i]);
+			projectedPoly.Push(projected);
+		}
+
+		// now, we need to rotate the plane so that it's parallel to the
+		// xy-axis.
+		// let's find the angles we need to rotate by
+		csTransform transformation;
+		float xAngle = asin(ourPlane.Normal().x);
+		float yAngle = acos(ourPlane.Normal().y);
+		
+		// now, before rotating, we need to make sure we are at the origin
+		// this returns -1.#IND ... Why?
+		float distToOrig = ourPlane.Distance(csVector3(0, 0, 0));
+		report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.Triangulate3D", "distance to origin before: %f", distToOrig);
+		if (distToOrig > 0)
+		{
+			float transX = -(ourPlane.Normal() * distToOrig).x;
+			float transY = -(ourPlane.Normal() * distToOrig).y;
+			float transZ = -(ourPlane.Normal() * distToOrig).z;
+			
+			transformation.SetO2TTranslation(csVector3(transX, transY, transZ));
+			
+			// print out the matrix to be sure
+			csMatrix3 mat2 = transformation.GetO2T();
+			report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.Triangulate3D", "%f %f %f", mat2.Row1()[0], mat2.Row1()[1], mat2.Row1()[2]);
+			report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.Triangulate3D", "%f %f %f", mat2.Row2()[0], mat2.Row2()[1], mat2.Row2()[2]);
+			report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.Triangulate3D", "%f %f %f", mat2.Row3()[0], mat2.Row3()[1], mat2.Row3()[2]);
+			ourPlane = transformation.Other2This(ourPlane);
+		}
+
+		distToOrig = ourPlane.Distance(csVector3(0, 0, 0));
+		report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.Triangulate3D", "distance to origin after: %f", distToOrig);
+		return poly;
+	}
+
+	/*
 	bool Triangulate3D::FindVertexGroups(csContour3& poly, csContour3& reflex, csContour3& convex, csArray<size_t>& ears)
 	{
 		int length = (int)poly.GetSize();
@@ -228,6 +251,7 @@ namespace Geom
 			return false;
 		}
 	}
+*/
 
 } // namespace Geom
 } // namespace CS

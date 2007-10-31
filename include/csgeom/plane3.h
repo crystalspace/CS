@@ -193,6 +193,10 @@ public:
    */
   csVector3 FindPoint () const;
 
+	/** Project a point onto this plane
+	  */
+	csVector3 ProjectOnto(const csVector3& p);
+
   /**
    * Calculate two orthogonal points on the plane given by
    * the normal 'norm' and going through the origin. This gives an

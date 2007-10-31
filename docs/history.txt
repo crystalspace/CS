@@ -6,6 +6,18 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+31-Oct-2007
+	- jwir3 committed code which is not completely working.  It does compile,
+	  however, in the interest of committing what I do have, I wanted to make
+	  sure that everyone has access to my latest changes.  Specifically, the
+	  triangulate3D algorithm is still having difficulties finding a normal 
+	  vector to a number of points.  It is possible that the case I have tested
+	  against is somewhat pathological.  ;)
+	  
+25-Aug-2007
+	- jwir3 added a function csPlane3::ProjectOnto(csVector&), which
+	  determines the projection of a vector in 3-space onto an arbitrary
+	  plane in 3-space.  This function is utilized in CS::Geom::Triangulate3D.
 24-Aug-2007
 	- Jorrit ran gemneshify on nearly all levels in CS. All usage of
 	  thing has been eliminated.

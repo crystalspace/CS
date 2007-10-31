@@ -65,11 +65,16 @@ namespace Geom
 			static bool Process(csContour3& polygon, csTriangleMesh& result, iReporter* report2, csContour3* holes = 0);
 
 		private:
+			
+			static csContour3 MapToPlanar(const csContour3& poly);
+
+			/*
 			static bool FindVertexGroups(csContour3& poly, csContour3& reflex, csContour3& convex, csArray<size_t>& ears);
 			static bool Snip(csContour3& polygon, csArray<size_t>& ears, const size_t earPoint, csTriangleMesh& addTo);
 			static bool IsConvex(const csContour3& polygon, const int index);
 			static bool IsContained(const csVector3& testVertex, const csVector3& a, const csVector3& b, const csVector3& c);
 			static bool IsSameSide(const csVector3& p1, const csVector3& p2, const csVector3& a, const csVector3& b);
+			*/
 
 	}; /* End class Triangulate3D */
 

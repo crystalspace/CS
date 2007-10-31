@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2000 by Jorrit Tyberghein
+		ProjectOnto() written by Scott Johnson, 2007
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -57,6 +58,44 @@ csVector3 csPlane3::FindPoint () const
   {
     return csVector3 (0, 0, -DD / norm.z);
   }
+}
+
+csVector3 csPlane3::ProjectOnto(const csVector3& p)
+{
+	// make sure our normal is actually normalized
+	Normalize();
+
+	// since a plane in 3-space is infinite, the normal of the 
+	// plane gives us a directional ray from the point p to the plane
+	// we need to find the distance between p and the plane
+	// create a vector triDist which is equivalent to a vector from a point
+	// on the plane to p
+	csVector3 triDist =  p - FindPoint();
+
+	// now, the distance from p to the plane is equivalent to the absolute
+	// value of the scalar projection of triDist onto the normal of the plane
+	// equation for scalar projection of b onto a = (a . b) / norm(a)
+	// so we want (n . triDist) / norm(n)
+	float aDOTb = Normal() * triDist;
+	float distance = aDOTb / csVector3::Norm(Normal());
+	distance = abs(distance);
+
+	// finally, we need to multiply this with the normal of the plane, and
+	// add the resulting vector to our current vector, to get our projection
+	csVector3 result;
+
+	if (Classify(p) > 0)
+	{
+		result = (-distance * Normal()) + p;
+	}
+	
+	else
+	{
+		result = (distance * Normal()) + p;
+	}
+
+	return result;
+
 }
 
 #define CS_INV_SQRT2 float(0.7071067811865475244008443621048490)
