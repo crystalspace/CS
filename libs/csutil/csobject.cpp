@@ -270,7 +270,6 @@ iObject* csObject::GetChild (const char *Name) const
   for (size_t i = 0; i < Children->GetSize (); i++)
   {
     const char *ThisName = Children->Get (i)->GetName ();
-    printf("Name: %s\n", ThisName);
     if (ThisName != 0 && !strcmp (ThisName, Name))
       return Children->Get (i);
   }
