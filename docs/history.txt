@@ -12,6 +12,7 @@ chronological order.
 	  ref array in this case is wrong since it requires implementors
 	  of this callback to keep their own reference somewhere.
 	- caedes fixed memory leaks in emit iEmitFactoryState implementation.
+	- caedes fixed csShaderVariable leaks in lightiter.
 30-Oct-2007
 	- res fixed some implementation mistakes in csRedBlackTree, leading
 	  to violations of the RB reles in the tree, especially when deleting:
