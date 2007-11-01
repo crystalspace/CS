@@ -215,8 +215,6 @@ namespace CS
 	  pivot->treeRight = pivotReplace->treeLeft;
 	  if (pivotReplace->treeLeft != 0) 
             pivotReplace->treeLeft->SetParent (pivot);
-          else
-            nilParent = pivot;
           Element* pivotParent = pivot->GetParent();
           pivotReplace->SetParent (pivotParent);
 	  if (pivotParent == 0)
@@ -238,8 +236,6 @@ namespace CS
 	  pivot->treeLeft = pivotReplace->treeRight;
 	  if (pivotReplace->treeRight != 0)
             pivotReplace->treeRight->SetParent (pivot);
-          else
-            nilParent = pivot;
           Element* pivotParent = pivot->GetParent ();
           pivotReplace->SetParent (pivotParent);
 	  if (pivotParent == 0)
@@ -286,13 +282,13 @@ namespace CS
 		{
 		  // Uncle of 'node' is black, node is right child
 		  node = p;
-		  RotateLeft (node, nilParent);
+		  RotateLeft (node);
                   p = node->GetParent ();
 		}
 		// Uncle of 'node' is black, node is left child
 		p->SetColor (Black);
 		pp->SetColor (Red);
-		RotateRight (pp, nilParent);
+		RotateRight (pp);
 	      }
 	    }
 	    else
@@ -312,13 +308,13 @@ namespace CS
 		{
 		  // Uncle of 'node' is black, node is left child
 		  node = p;
-		  RotateRight (node, nilParent);
+		  RotateRight (node);
                   p = node->GetParent ();
 		}
 		// Uncle of 'node' is black, node is right child
 		p->SetColor (Black);
 		pp->SetColor (Red);
-		RotateLeft (pp, nilParent);
+		RotateLeft (pp);
 	      }
 	    }
 	  }
@@ -380,7 +376,7 @@ namespace CS
 	      {
 		w->SetColor (Black);
 		p->SetColor (Red);
-		RotateLeft (p, nilParent);
+		RotateLeft (p);
 		w = p->treeRight;
 	      }
 	      if (IsBlack (w->treeLeft) && IsBlack (w->treeRight))
@@ -394,13 +390,13 @@ namespace CS
 		{
 		  w->treeLeft->SetColor (Red);
 		  w->SetColor (Red);
-		  RotateRight (w, nilParent);
+		  RotateRight (w);
 		  w = p->treeRight;
 		}
 		w->SetColor (p->GetColor ());
 		p->SetColor (Black);
 		w->treeRight->SetColor (Black);
-		RotateLeft (p, nilParent);
+		RotateLeft (p);
 		node = root;
 	      }
 	    }
@@ -411,7 +407,7 @@ namespace CS
 	      {
 		w->SetColor (Black);
 		p->SetColor (Red);
-		RotateRight (p, nilParent);
+		RotateRight (p);
 		w = p->treeLeft;
 	      }
 	      if (IsBlack (w->treeLeft) && IsBlack (w->treeRight))
@@ -425,13 +421,13 @@ namespace CS
 		{
 		  w->treeRight->SetColor (Red);
 		  w->SetColor (Red);
-		  RotateLeft (w, nilParent);
+		  RotateLeft (w);
 		  w = p->treeLeft;
 		}
 		w->SetColor (p->GetColor ());
 		p->SetColor (Black);
 		w->treeLeft->SetColor (Black);
-		RotateRight (p, nilParent);
+		RotateRight (p);
 		node = root;
 	      }
 	    }
