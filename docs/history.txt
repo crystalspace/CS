@@ -7,7 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 01-Nov-2007
 	- ronsaldo fixed a stupid error with a missnamed operator, and added
-	  the remainings gemotrical operators to the c# bindings.
+	  the remainings geometrical operators to the c# bindings.
 	- ronsaldo added a hack to iengine.i file for deal with a portability
 	  issue.
 30-Oct-2007
