@@ -117,7 +117,7 @@ if $(CSHARP.AVAILABLE) = "yes"
        Swig $(common) $(modulecs_f) :
 	[ DoSourceGrist $(module).i ] :
 	csharp :
-	-c++ -namespace CrystalSpace -dllimport $(modulecs) -DFILE_FOR_CLASS -DPER_LANGUAGE_OPERATORS :
+	-c++ -namespace CrystalSpace -dllimport $(modulecs) -DFILE_FOR_CLASS :
 	[ ConcatDirs $(TOP) include ] 
 	[ ConcatDirs $(BUILDTOP) include ] :
 	[ ConcatDirs $(TOP) include bindings ]
