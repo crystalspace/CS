@@ -75,19 +75,25 @@ csPtr<iImage> SVGImageIO::Load (iDataBuffer* buf, int iFormat)
 
 //---------------------------------------------------------------------------
 
+struct AllocatorCS : public vgvm::MemoryAllocator
+{
+  void* Malloc (size_t size) { return cs_malloc (size); }
+  void Free (void* p) { cs_free (p); }
+  void* Realloc (void* p, size_t size) { return cs_realloc (p, size); }
+};
+
 bool SVGImage::Load (uint8* iBuffer, size_t iSize)
 {
-  /*if ((memcmp (iBuffer, BM, 2) == 0) && BISIZE(iBuffer) == WinHSize)
-    return LoadWindowsBitmap (iBuffer, iSize);*/
-
-  csString bufferStr ((char*)iBuffer, iSize);
-  
+  AllocatorCS allocator;
   CS::Utility::ScopedDelete<vgvm::cairo::CairoContext> context ( 
-    vgvm::cairo::createCairoContext (&cs_malloc, &cs_free));
+    vgvm::cairo::createCairoContext (&allocator));
     
   CS::Utility::ScopedDelete<vgvm::Program> prog (context->createProgram ());
-  if (!vgvm::svg::compileSVG (bufferStr, prog))
-    return false;
+  {
+    csString bufferStr ((char*)iBuffer, iSize);
+    if (!vgvm::svg::compileSVG (bufferStr, prog))
+      return false;
+  }
     
   uint width = 256;
   uint height = 256;
