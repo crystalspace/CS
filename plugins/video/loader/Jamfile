@@ -7,4 +7,5 @@ SubInclude TOP plugins video loader jng ;
 SubInclude TOP plugins video loader jpg ;
 SubInclude TOP plugins video loader mplex ;
 SubInclude TOP plugins video loader png ;
+SubInclude TOP plugins video loader svg ;
 SubInclude TOP plugins video loader tga ;
