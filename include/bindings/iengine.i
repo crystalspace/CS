@@ -4,6 +4,7 @@
 %module iengine
 #endif
 %import "bindings/core.i"
+%import "bindings/imesh.i" /* due to at least iMeshObject */
 %import "bindings/ivideo.i" /* due to at least csZBufMode graph3d.h */
 %{
 #include "crystalspace.h"

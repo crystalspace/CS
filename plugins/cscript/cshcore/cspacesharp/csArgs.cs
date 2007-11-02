@@ -120,7 +120,7 @@ namespace CrystalSpace.InteropServices
 	  ret.free = 1;
 	}
       }
-      catch (ApplicationException e)
+      catch
       {
 	ret.free = 0;
 	ret.version = 0;
@@ -175,7 +175,7 @@ namespace CrystalSpace.InteropServices
 	if (ibase != null)
 	  ibase.IncRef ();
       }
-      catch (ApplicationException e)
+      catch
       {
 	_obj = null;
       }

@@ -3,6 +3,7 @@
 %import "bindings/ivaria.i"
 %import "bindings/csgeom.i"
 %import "bindings/ivideo.i"
+%import "bindings/iengine.i"
 %{
 #include "crystalspace.h"
 %}

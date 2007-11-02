@@ -26,7 +26,7 @@ extract_static_procedures()
   MOD=$2
   INPUTDIR=$3
   I=0
-  egrep -e "public[	 ]+static[ 	]+[^(readonly)(const)].+[^=].+\((.+)?\)" $INPUT |
+  egrep -e "public[ ]+static[^\=]+\(.*\)" $INPUT |
   sed -e 's/{/ /g
 	  s/(/ ( /g
 	  s/)/ )/g
