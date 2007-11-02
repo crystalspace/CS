@@ -199,16 +199,31 @@ namespace lighter
 
     struct LoadedFile
     {
-      Configuration sceneConfig;
-      csRef<iDocumentNode> rootNode;
+    private:
       csRef<iDocument> document;
+      bool docChangeable;
+      bool changed;
+    public:
+      Configuration sceneConfig;
       csString levelName;
+      csString fileName;
       csString directory; //VFS name, full path
       csSet<csString> texturesToClean;
       csSet<csString> texFileNamesToDelete;
       csArray<Object*> fileObjects;
 
-      LoadedFile() : sceneConfig (globalConfig) {}
+      LoadedFile() : sceneConfig (globalConfig), changed (false) {}
+
+      void SetDocument (iDocument* doc)
+      {
+        document = doc;
+        docChangeable = doc && (doc->Changeable () == CS_CHANGEABLE_YES);
+      }
+      iDocument* GetDocument() const { return document; }
+      iDocument* GetDocumentChangeable();
+
+      bool IsChanged() const { return changed; }
+      void SetChanged (bool c) { changed = c; }
     };
 
     // All files loaded into scene
@@ -220,9 +235,9 @@ namespace lighter
     void BuildLightmapTextureList (LoadedFile* fileInfo, 
       csStringArray& texturesToSave);
     void CleanOldLightmaps (LoadedFile* fileInfo);
-    void SaveSceneFactoriesToDom (iDocumentNode* root, LoadedFile* fileInfo,
-                                  Statistics::Progress& progress);
-    void SaveSceneMeshesToDom (iDocumentNode* root, LoadedFile* fileInfo,
+    void SaveSceneFactoriesToDom (LoadedFile* fileInfo, 
+                                 Statistics::Progress& progress);
+    void SaveSceneMeshesToDom (LoadedFile* fileInfo,
                                Statistics::Progress& progress);
     bool SaveSceneLibrary (csSet<csString>& savedFactories, 
                            const char* libFile, LoadedFile* fileInfo,
@@ -253,6 +268,7 @@ namespace lighter
     
     // Load functions
     bool ParseEngine (LoadedFile* fileInfo, Statistics::Progress& progress);
+    bool ParseEngineAll (Statistics::Progress& progress);
     void ParseSector (LoadedFile* fileInfo, iSector *sector, 
       Statistics::Progress& progress);
     void ParsePortals (iSector *srcSect, Sector* sector);
@@ -276,6 +292,8 @@ namespace lighter
     iRegion* GetRegion (iObject* obj);
     bool IsObjectFromBaseDir (iObject* obj, const char* baseDir);
     bool IsFilenameFromBaseDir (const char* filename, const char* baseDir);
+
+    static csRef<iDocument> EnsureChangeable (iDocument* doc);
   };
 }
 

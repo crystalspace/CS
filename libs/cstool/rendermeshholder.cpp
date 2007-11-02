@@ -37,7 +37,7 @@ csRenderMeshHolder::csRenderMeshPtr::csRenderMeshPtr()
 }
 
 // For RenderMeshModes::flipCulling
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 csRenderMeshHolder::csRenderMeshPtr::csRenderMeshPtr (
   csRenderMeshPtr const& other)
@@ -46,7 +46,7 @@ csRenderMeshHolder::csRenderMeshPtr::csRenderMeshPtr (
   *ptr = *other.ptr;
 }
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 csRenderMeshHolder::csRenderMeshPtr::~csRenderMeshPtr()
 {

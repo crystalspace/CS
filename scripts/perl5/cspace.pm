@@ -49,6 +49,7 @@ sub this {
 
 package cspace;
 
+*SetCoreSCFPointer = *cspacec::SetCoreSCFPointer;
 *scfCompatibleVersion = *cspacec::scfCompatibleVersion;
 *scfRegisterStaticClass = *cspacec::scfRegisterStaticClass;
 *scfRegisterStaticClasses = *cspacec::scfRegisterStaticClasses;
@@ -383,10 +384,10 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *IncRef = *cspacec::iBase_IncRef;
 *DecRef = *cspacec::iBase_DecRef;
 *GetRefCount = *cspacec::iBase_GetRefCount;
-*QueryInterface = *cspacec::iBase_QueryInterface;
 *AddRefOwner = *cspacec::iBase_AddRefOwner;
 *RemoveRefOwner = *cspacec::iBase_RemoveRefOwner;
 *GetInterfaceMetadata = *cspacec::iBase_GetInterfaceMetadata;
+*QueryInterface = *cspacec::iBase_QueryInterface;
 *scfGetVersion = *cspacec::iBase_scfGetVersion;
 sub DISOWN {
     my $self = shift;
@@ -1816,6 +1817,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *ObjRemove = *cspacec::iObject_ObjRemove;
 *ObjRemoveAll = *cspacec::iObject_ObjRemoveAll;
 *ObjAddChildren = *cspacec::iObject_ObjAddChildren;
+*GetChildByName = *cspacec::iObject_GetChildByName;
 *GetIterator = *cspacec::iObject_GetIterator;
 *ObjReleaseOld = *cspacec::iObject_ObjReleaseOld;
 *AddNameChangeListener = *cspacec::iObject_AddNameChangeListener;
@@ -2892,13 +2894,13 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::iBase cspace );
 %OWNER = ();
 %ITERATORS = ();
-*LoadPlugin = *cspacec::iPluginManager_LoadPlugin;
-*QueryPlugin = *cspacec::iPluginManager_QueryPlugin;
+*LoadPluginAlways = *cspacec::iPluginManager_LoadPluginAlways;
 *UnloadPlugin = *cspacec::iPluginManager_UnloadPlugin;
 *RegisterPlugin = *cspacec::iPluginManager_RegisterPlugin;
 *GetPlugins = *cspacec::iPluginManager_GetPlugins;
 *Clear = *cspacec::iPluginManager_Clear;
 *QueryOptions = *cspacec::iPluginManager_QueryOptions;
+*LoadPlugin = *cspacec::iPluginManager_LoadPlugin;
 *scfGetVersion = *cspacec::iPluginManager_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -3453,8 +3455,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *CreateRoot = *cspacec::iDocument_CreateRoot;
 *GetRoot = *cspacec::iDocument_GetRoot;
 *Parse = *cspacec::iDocument_Parse;
-*Write = *cspacec::iDocument_Write;
 *Changeable = *cspacec::iDocument_Changeable;
+*Write = *cspacec::iDocument_Write;
 *scfGetVersion = *cspacec::iDocument_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -4026,11 +4028,11 @@ sub DESTROY {
 *ObjRemove = *cspacec::csObject_ObjRemove;
 *ObjRemoveAll = *cspacec::csObject_ObjRemoveAll;
 *ObjAddChildren = *cspacec::csObject_ObjAddChildren;
+*GetChildByName = *cspacec::csObject_GetChildByName;
 *GetIterator = *cspacec::csObject_GetIterator;
 *AddNameChangeListener = *cspacec::csObject_AddNameChangeListener;
 *RemoveNameChangeListener = *cspacec::csObject_RemoveNameChangeListener;
 *ObjReleaseOld = *cspacec::csObject_ObjReleaseOld;
-*GetChild = *cspacec::csObject_GetChild;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -8463,8 +8465,6 @@ sub DESTROY {
 *swig_mixmode_set = *cspacec::RenderMeshModes_mixmode_set;
 *swig_renderPrio_get = *cspacec::RenderMeshModes_renderPrio_get;
 *swig_renderPrio_set = *cspacec::RenderMeshModes_renderPrio_set;
-*swig_flipCulling_get = *cspacec::RenderMeshModes_flipCulling_get;
-*swig_flipCulling_set = *cspacec::RenderMeshModes_flipCulling_set;
 *swig_cullMode_get = *cspacec::RenderMeshModes_cullMode_get;
 *swig_cullMode_set = *cspacec::RenderMeshModes_cullMode_set;
 *swig_alphaType_get = *cspacec::RenderMeshModes_alphaType_get;
@@ -9140,6 +9140,9 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *blitbufRetainArea = *cspacec::iTextureHandle_blitbufRetainArea;
 *QueryBlitBuffer = *cspacec::iTextureHandle_QueryBlitBuffer;
 *ApplyBlitBuffer = *cspacec::iTextureHandle_ApplyBlitBuffer;
+*natureIndirect = *cspacec::iTextureHandle_natureIndirect;
+*natureDirect = *cspacec::iTextureHandle_natureDirect;
+*GetBufferNature = *cspacec::iTextureHandle_GetBufferNature;
 *scfGetVersion = *cspacec::iTextureHandle_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -12152,7 +12155,7 @@ sub ACQUIRE {
 
 package cspace::csTriangleMeshEdge;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace );
+@ISA = qw( cspace::CustomAllocated cspace );
 %OWNER = ();
 %ITERATORS = ();
 *swig_vt1_get = *cspacec::csTriangleMeshEdge_vt1_get;
@@ -16286,11 +16289,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *RemoveAffectedLightingInfo = *cspacec::iLight_RemoveAffectedLightingInfo;
 *Setup = *cspacec::iLight_Setup;
 *GetSVContext = *cspacec::iLight_GetSVContext;
-*AddLightTag = *cspacec::iLight_AddLightTag;
-*RemoveTag = *cspacec::iLight_RemoveTag;
-*IsTagSet = *cspacec::iLight_IsTagSet;
-*GetTagCount = *cspacec::iLight_GetTagCount;
-*GetTags = *cspacec::iLight_GetTags;
 *scfGetVersion = *cspacec::iLight_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

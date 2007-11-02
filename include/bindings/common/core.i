@@ -353,6 +353,8 @@ CS_WRAP_PTR_IMPLEMENT(csWrapPtr)
 #define LIST_OBJECT_FUNCTIONS(classname,typename)
 #define SET_OBJECT_FUNCTIONS(classname,typename)
 #define DEPRECATED_METHOD(classname,method,replacement)
+#define TYPEMAP_STRING(Type)
+#define TYPEMAP_STRING_PTR(Type,Type2)
 
 #if defined(SWIGPYTHON)
   %include "bindings/python/pythpre.i"
@@ -558,106 +560,8 @@ DEPRECATED_METHOD(iStringArray,DeleteAll,Empty);
 SET_OBJECT_FUNCTIONS(csSet<typename>,typename)
 %enddef
 SET_HELPER(csStringID)
-%ignore iString::SetCapacity;
-%ignore iString::GetCapacity;
-%ignore iString::SetGrowsBy;
-%ignore iString::GetGrowsBy;
-%ignore iString::Truncate;
-%ignore iString::Reclaim;
-%ignore iString::ShrinkBestFit;
-%ignore iString::Clear;
-%ignore iString::Empty;
-%ignore iString::Clone;
-%ignore iString::GetData (); // Non-const.
-%ignore iString::Length;
-%ignore iString::IsEmpty;
-%ignore iString::SetAt;
-%ignore iString::GetAt;
-%ignore iString::Insert;
-%ignore iString::Overwrite;
-%ignore iString::Append;
-%ignore iString::Slice;
-%ignore iString::SubString;
-%ignore iString::FindFirst;
-%ignore iString::FindLast;
-%ignore iString::Find;
-%ignore iString::ReplaceAll;
-%ignore iString::Format;
-%ignore iString::FormatV;
-%ignore iString::Replace;
-%ignore iString::Compare;
-%ignore iString::CompareNoCase;
-%ignore iString::Downcase;
-%ignore iString::Upcase;
-%ignore iString::operator+=;
-%ignore iString::operator+;
-%ignore iString::operator==;
-%ignore iString::operator [] (size_t);
-%ignore iString::operator [] (size_t) const;
-%ignore iString::operator char const*;
-%include "iutil/string.h"
 
-%ignore csStringBase;
-%ignore csStringBase::operator [] (size_t);
-%ignore csStringBase::operator [] (size_t) const;
-%ignore csString::csString (size_t);
-%ignore csString::csString (char);
-%ignore csString::csString (unsigned char);
-%ignore csString::SetCapacity;
-%ignore csString::GetCapacity;
-%ignore csString::SetGrowsBy;
-%ignore csString::GetGrowsBy;
-%ignore csString::SetGrowsExponentially;
-%ignore csString::GetGrowsExponentially;
-%ignore csString::Truncate;
-%ignore csString::Free;
-%ignore csString::Reclaim;
-%ignore csString::ShrinkBestFit;
-%ignore csString::Clear;
-%ignore csString::Empty;
-%ignore csString::SetAt;
-%ignore csString::GetAt;
-%ignore csString::DeleteAt;
-%ignore csString::Insert;
-%ignore csString::Overwrite;
-%ignore csString::Append;
-%ignore csString::AppendFmt;
-%ignore csString::AppendFmtV;
-%ignore csString::Slice;
-%ignore csString::SubString;
-%ignore csString::FindFirst;
-%ignore csString::FindLast;
-%ignore csString::Find;
-%ignore csString::ReplaceAll;
-%ignore csString::Replace;
-%ignore csString::Compare;
-%ignore csString::CompareNoCase;
-%ignore csString::Clone;
-%ignore csString::LTrim;
-%ignore csString::RTrim;
-%ignore csString::Trim;
-%ignore csString::Collapse;
-%ignore csString::Format;
-%ignore csString::FormatV;
-%ignore csString::PadLeft;
-%ignore csString::PadRight;
-%ignore csString::PadCenter;
-%ignore csString::GetData (); // Non-const.
-%ignore csString::Detach;
-%ignore csString::Upcase;
-%ignore csString::Downcase;
-%ignore csString::operator=;
-%ignore csString::operator+=;
-%ignore csString::operator+;
-%ignore csString::operator==;
-%ignore csString::operator!=;
-%ignore csString::operator [] (size_t);
-%ignore csString::operator [] (size_t) const;
-%ignore csString::operator const char*;
-%ignore operator+ (const char*, const csString&);
-%ignore operator+ (const csString&, const char*);
-%ignore operator<<;
-%include "csutil/csstring.h"
+%include "bindings/common/csstring.i"
 
 %include "csutil/refcount.h"
 
@@ -832,6 +736,17 @@ typedef int int32_t;
 %include "iutil/stringarray.h"
 ARRAY_OBJECT_FUNCTIONS(iStringArray,const char *)
 %include "iutil/document.h"
+%newobject iDocument::Write();
+/* extension that will just return the written string */
+%extend iDocument
+{
+  scfString *Write()
+  {
+     scfString *dest_str = new scfString();
+     self->Write(dest_str);
+     return dest_str;
+  }
+}
 
 %template(scfConfigFile) scfImplementation1<csConfigFile,iConfigFile >;
 %include "csutil/cfgfile.h"

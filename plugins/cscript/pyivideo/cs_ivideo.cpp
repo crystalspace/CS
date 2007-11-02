@@ -12361,59 +12361,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_RenderMeshModes_flipCulling_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
-  bool arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  bool val2 ;
-  int ecode2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_flipCulling_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_flipCulling_set" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
-  }
-  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
-  ecode2 = SWIG_AsVal_bool(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "RenderMeshModes_flipCulling_set" "', argument " "2"" of type '" "bool""'");
-  } 
-  arg2 = static_cast< bool >(val2);
-  if (arg1) (arg1)->flipCulling = arg2;
-  
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_RenderMeshModes_flipCulling_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
-  bool result;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_flipCulling_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_flipCulling_get" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
-  }
-  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
-  result = (bool) ((arg1)->flipCulling);
-  resultobj = SWIG_From_bool(static_cast< bool >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_RenderMeshModes_cullMode_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
@@ -12579,44 +12526,6 @@ SWIGINTERN PyObject *RenderMeshModes_swigregister(PyObject *SWIGUNUSEDPARM(self)
   SWIG_TypeNewClientData(SWIGTYPE_p_CS__Graphics__RenderMeshModes, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
-
-SWIGINTERN PyObject *_wrap_CoreRenderMesh_db_mesh_name_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  CS::Graphics::CoreRenderMesh *arg1 = (CS::Graphics::CoreRenderMesh *) 0 ;
-  char *arg2 = (char *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"CoreRenderMesh_db_mesh_name_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__CoreRenderMesh, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_db_mesh_name_set" "', argument " "1"" of type '" "CS::Graphics::CoreRenderMesh *""'"); 
-  }
-  arg1 = reinterpret_cast< CS::Graphics::CoreRenderMesh * >(argp1);
-  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "CoreRenderMesh_db_mesh_name_set" "', argument " "2"" of type '" "char const *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  if (arg2) {
-    size_t size = strlen(reinterpret_cast< const char * >(reinterpret_cast< const char * >(arg2))) + 1;
-    arg1->db_mesh_name = (char const *)reinterpret_cast< char* >(memcpy((new char[size]), arg2, sizeof(char)*(size)));
-  } else {
-    arg1->db_mesh_name = 0;
-  }
-  resultobj = SWIG_Py_Void();
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return resultobj;
-fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return NULL;
-}
-
 
 SWIGINTERN PyObject *_wrap_CoreRenderMesh_db_mesh_name_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
@@ -18483,6 +18392,37 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iTextureHandle_GetBufferNature(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTextureHandle *arg1 = (iTextureHandle *) 0 ;
+  uint8 *arg2 = (uint8 *) 0 ;
+  iTextureHandle::BlitBufferNature result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTextureHandle_GetBufferNature",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTextureHandle, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTextureHandle_GetBufferNature" "', argument " "1"" of type '" "iTextureHandle *""'"); 
+  }
+  arg1 = reinterpret_cast< iTextureHandle * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_uint8_t, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iTextureHandle_GetBufferNature" "', argument " "2"" of type '" "uint8 *""'"); 
+  }
+  arg2 = reinterpret_cast< uint8 * >(argp2);
+  result = (iTextureHandle::BlitBufferNature)(arg1)->GetBufferNature(arg2);
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iTextureHandle_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -18840,8 +18780,6 @@ SWIGINTERN PyObject *_wrap_iTextureManager_RegisterTexture__SWIG_0(PyObject *SWI
   int res2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
-  void *argp4 = 0 ;
-  int res4 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -18863,11 +18801,9 @@ SWIGINTERN PyObject *_wrap_iTextureManager_RegisterTexture__SWIG_0(PyObject *SWI
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iTextureManager_RegisterTexture" "', argument " "3"" of type '" "int""'");
   } 
   arg3 = static_cast< int >(val3);
-  res4 = SWIG_ConvertPtr(obj3, &argp4,SWIGTYPE_p_iString, 0 |  0 );
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iTextureManager_RegisterTexture" "', argument " "4"" of type '" "iString *""'"); 
+  {
+    arg4 = new scfString (PyString_AsString(obj3));
   }
-  arg4 = reinterpret_cast< iString * >(argp4);
   result = (arg1)->RegisterTexture(arg2,arg3,arg4);
   {
     /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
@@ -18887,8 +18823,14 @@ SWIGINTERN PyObject *_wrap_iTextureManager_RegisterTexture__SWIG_0(PyObject *SWI
         (iTextureHandle *)ref), (void *)(iTextureHandle *)ref, "iTextureHandle" " *");
     /*@SWIG@*/
   }
+  {
+    delete arg4;
+  }
   return resultobj;
 fail:
+  {
+    delete arg4;
+  }
   return NULL;
 }
 
@@ -18995,9 +18937,9 @@ SWIGINTERN PyObject *_wrap_iTextureManager_RegisterTexture(PyObject *self, PyObj
           _v = SWIG_CheckState(res);
         }
         if (_v) {
-          void *vptr = 0;
-          int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_iString, 0);
-          _v = SWIG_CheckState(res);
+          {
+            _v = PyString_Check(argv[3]);
+          }
           if (_v) {
             return _wrap_iTextureManager_RegisterTexture__SWIG_0(self, args);
           }
@@ -19035,8 +18977,6 @@ SWIGINTERN PyObject *_wrap_iTextureManager_CreateTexture__SWIG_0(PyObject *SWIGU
   int alloc5 = 0 ;
   int val6 ;
   int ecode6 = 0 ;
-  void *argp7 = 0 ;
-  int res7 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -19076,11 +19016,9 @@ SWIGINTERN PyObject *_wrap_iTextureManager_CreateTexture__SWIG_0(PyObject *SWIGU
     SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iTextureManager_CreateTexture" "', argument " "6"" of type '" "int""'");
   } 
   arg6 = static_cast< int >(val6);
-  res7 = SWIG_ConvertPtr(obj6, &argp7,SWIGTYPE_p_iString, 0 |  0 );
-  if (!SWIG_IsOK(res7)) {
-    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "iTextureManager_CreateTexture" "', argument " "7"" of type '" "iString *""'"); 
+  {
+    arg7 = new scfString (PyString_AsString(obj6));
   }
-  arg7 = reinterpret_cast< iString * >(argp7);
   result = (arg1)->CreateTexture(arg2,arg3,arg4,(char const *)arg5,arg6,arg7);
   {
     /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
@@ -19101,9 +19039,15 @@ SWIGINTERN PyObject *_wrap_iTextureManager_CreateTexture__SWIG_0(PyObject *SWIGU
     /*@SWIG@*/
   }
   if (alloc5 == SWIG_NEWOBJ) delete[] buf5;
+  {
+    delete arg7;
+  }
   return resultobj;
 fail:
   if (alloc5 == SWIG_NEWOBJ) delete[] buf5;
+  {
+    delete arg7;
+  }
   return NULL;
 }
 
@@ -19271,9 +19215,9 @@ SWIGINTERN PyObject *_wrap_iTextureManager_CreateTexture(PyObject *self, PyObjec
                 _v = SWIG_CheckState(res);
               }
               if (_v) {
-                void *vptr = 0;
-                int res = SWIG_ConvertPtr(argv[6], &vptr, SWIGTYPE_p_iString, 0);
-                _v = SWIG_CheckState(res);
+                {
+                  _v = PyString_Check(argv[6]);
+                }
                 if (_v) {
                   return _wrap_iTextureManager_CreateTexture__SWIG_0(self, args);
                 }
@@ -19956,8 +19900,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"RenderMeshModes_mixmode_get", _wrap_RenderMeshModes_mixmode_get, METH_VARARGS, NULL},
 	 { (char *)"RenderMeshModes_renderPrio_set", _wrap_RenderMeshModes_renderPrio_set, METH_VARARGS, NULL},
 	 { (char *)"RenderMeshModes_renderPrio_get", _wrap_RenderMeshModes_renderPrio_get, METH_VARARGS, NULL},
-	 { (char *)"RenderMeshModes_flipCulling_set", _wrap_RenderMeshModes_flipCulling_set, METH_VARARGS, NULL},
-	 { (char *)"RenderMeshModes_flipCulling_get", _wrap_RenderMeshModes_flipCulling_get, METH_VARARGS, NULL},
 	 { (char *)"RenderMeshModes_cullMode_set", _wrap_RenderMeshModes_cullMode_set, METH_VARARGS, NULL},
 	 { (char *)"RenderMeshModes_cullMode_get", _wrap_RenderMeshModes_cullMode_get, METH_VARARGS, NULL},
 	 { (char *)"RenderMeshModes_alphaType_set", _wrap_RenderMeshModes_alphaType_set, METH_VARARGS, NULL},
@@ -19965,7 +19907,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"RenderMeshModes_buffers_set", _wrap_RenderMeshModes_buffers_set, METH_VARARGS, NULL},
 	 { (char *)"RenderMeshModes_buffers_get", _wrap_RenderMeshModes_buffers_get, METH_VARARGS, NULL},
 	 { (char *)"RenderMeshModes_swigregister", RenderMeshModes_swigregister, METH_VARARGS, NULL},
-	 { (char *)"CoreRenderMesh_db_mesh_name_set", _wrap_CoreRenderMesh_db_mesh_name_set, METH_VARARGS, NULL},
 	 { (char *)"CoreRenderMesh_db_mesh_name_get", _wrap_CoreRenderMesh_db_mesh_name_get, METH_VARARGS, NULL},
 	 { (char *)"new_CoreRenderMesh", _wrap_new_CoreRenderMesh, METH_VARARGS, NULL},
 	 { (char *)"delete_CoreRenderMesh", _wrap_delete_CoreRenderMesh, METH_VARARGS, NULL},
@@ -20135,6 +20076,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iTextureHandle_GetTextureType", _wrap_iTextureHandle_GetTextureType, METH_VARARGS, NULL},
 	 { (char *)"iTextureHandle_QueryBlitBuffer", _wrap_iTextureHandle_QueryBlitBuffer, METH_VARARGS, NULL},
 	 { (char *)"iTextureHandle_ApplyBlitBuffer", _wrap_iTextureHandle_ApplyBlitBuffer, METH_VARARGS, NULL},
+	 { (char *)"iTextureHandle_GetBufferNature", _wrap_iTextureHandle_GetBufferNature, METH_VARARGS, NULL},
 	 { (char *)"iTextureHandle_scfGetVersion", _wrap_iTextureHandle_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iTextureHandle", _wrap_delete_iTextureHandle, METH_VARARGS, NULL},
 	 { (char *)"iTextureHandle_swigregister", iTextureHandle_swigregister, METH_VARARGS, NULL},
@@ -20568,6 +20510,7 @@ static swig_type_info _swigt__p_scfImplementation1TcsImageBase_iImage_t = {"_p_s
 static swig_type_info _swigt__p_csObject = {"_p_csObject", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iEventQueue = {"_p_iEventQueue", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iEvent = {"_p_iEvent", 0, 0, 0, 0, 0};
+static swig_type_info _swigt__p_iString = {"_p_iString", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iComponent = {"_p_iComponent", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iCommandLineParser = {"_p_iCommandLineParser", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iJoystickDriver = {"_p_iJoystickDriver", 0, 0, 0, 0, 0};
@@ -20617,7 +20560,6 @@ static swig_type_info _swigt__p_iShaderPriorityList = {"_p_iShaderPriorityList",
 static swig_type_info _swigt__p_iShaderVarStack = {"_p_iShaderVarStack", "iShaderVarStack *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iShaderVariableAccessor = {"_p_iShaderVariableAccessor", "iShaderVariableAccessor *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iShaderVariableContext = {"_p_iShaderVariableContext", "iShaderVariableContext *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_iString = {"_p_iString", "iString *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iSuperLightmap = {"_p_iSuperLightmap", "iSuperLightmap *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iTextureHandle = {"_p_iTextureHandle", "iTextureHandle *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iTextureManager = {"_p_iTextureManager", "iTextureManager *", 0, 0, (void*)0, 0};
@@ -20901,6 +20843,7 @@ static swig_cast_info _swigc__p_scfImplementation1TcsImageBase_iImage_t[] = {{&_
 static swig_cast_info _swigc__p_csObject[] = {{&_swigt__p_csObject, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iEventQueue[] = {{&_swigt__p_iEventQueue, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iEvent[] = {{&_swigt__p_iEvent, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_iString[] = {{&_swigt__p_iString, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iComponent[] = {{&_swigt__p_iComponent, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iCommandLineParser[] = {{&_swigt__p_iCommandLineParser, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iJoystickDriver[] = {{&_swigt__p_iJoystickDriver, 0, 0, 0},{0, 0, 0, 0}};
@@ -20951,7 +20894,6 @@ static swig_cast_info _swigc__p_iShaderPriorityList[] = {  {&_swigt__p_iShaderPr
 static swig_cast_info _swigc__p_iShaderVarStack[] = {  {&_swigt__p_iShaderVarStack, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iShaderVariableAccessor[] = {  {&_swigt__p_iShaderVariableAccessor, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iShaderVariableContext[] = {  {&_swigt__p_iShaderManager, _p_iShaderManagerTo_p_iShaderVariableContext, 0, 0},  {&_swigt__p_iShader, _p_iShaderTo_p_iShaderVariableContext, 0, 0},  {&_swigt__p_iMaterial, _p_iMaterialTo_p_iShaderVariableContext, 0, 0},  {&_swigt__p_iShaderVariableContext, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_iString[] = {  {&_swigt__p_iString, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iSuperLightmap[] = {  {&_swigt__p_iSuperLightmap, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iTextureHandle[] = {  {&_swigt__p_iTextureHandle, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iTextureManager[] = {  {&_swigt__p_iTextureManager, 0, 0, 0},{0, 0, 0, 0}};
@@ -21830,6 +21772,8 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "iTextureHandle_texTypeRect",SWIG_From_int(static_cast< int >(iTextureHandle::texTypeRect)));
   SWIG_Python_SetConstant(d, "iTextureHandle_blitbufReadable",SWIG_From_int(static_cast< int >(iTextureHandle::blitbufReadable)));
   SWIG_Python_SetConstant(d, "iTextureHandle_blitbufRetainArea",SWIG_From_int(static_cast< int >(iTextureHandle::blitbufRetainArea)));
+  SWIG_Python_SetConstant(d, "iTextureHandle_natureIndirect",SWIG_From_int(static_cast< int >(iTextureHandle::natureIndirect)));
+  SWIG_Python_SetConstant(d, "iTextureHandle_natureDirect",SWIG_From_int(static_cast< int >(iTextureHandle::natureDirect)));
   SWIG_Python_SetConstant(d, "CS_TEXTURE_2D",SWIG_From_int(static_cast< int >(0x00000001)));
   SWIG_Python_SetConstant(d, "CS_TEXTURE_3D",SWIG_From_int(static_cast< int >(0x00000002)));
   SWIG_Python_SetConstant(d, "CS_TEXTURE_NOMIPMAPS",SWIG_From_int(static_cast< int >(0x00000008)));

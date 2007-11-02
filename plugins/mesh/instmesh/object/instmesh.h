@@ -84,7 +84,7 @@ public:
   }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 struct csInstance
 {
@@ -375,7 +375,7 @@ public:
     public scfImplementation1<RenderBufferAccessor, iRenderBufferAccessor>
   {
   public:
-    CS_LEAKGUARD_DECLARE (eiRenderBufferAccessor);
+    CS_LEAKGUARD_DECLARE (RenderBufferAccessor);
     csWeakRef<csInstmeshMeshObject> parent;
     virtual ~RenderBufferAccessor ()
     {
@@ -391,12 +391,12 @@ public:
     }
   };
   csRef<RenderBufferAccessor> renderBufferAccessor;
-  friend class eiRenderBufferAccessor;
+  friend class RenderBufferAccessor;
 
   void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * Factory for general meshes.

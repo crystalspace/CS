@@ -34,7 +34,7 @@ struct csGradientShade;
 CS_PLUGIN_NAMESPACE_BEGIN(SyntaxService)
 {
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * This component provides services for other loaders to easily parse
@@ -188,7 +188,7 @@ public:
   { return false; }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 }
 CS_PLUGIN_NAMESPACE_END(SyntaxService)

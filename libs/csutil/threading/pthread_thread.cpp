@@ -20,6 +20,7 @@
 
 #include "csutil/threading/thread.h"
 #include "csutil/threading/pthread_thread.h"
+#include "csutil/threading/barrier.h"
 #include "csutil/threading/condition.h"
 
 
@@ -33,48 +34,37 @@ namespace Implementation
   namespace
   {
 
-    class ThreadStartParams
+    class ThreadStartParams : public CS::Memory::CustomAllocated
     {
     public:
-      ThreadStartParams (Runnable* runner, int32* isRunningPtr)
-        : runnable (runner), isRunningPtr (isRunningPtr)
+      ThreadStartParams (Runnable* runner, int32* isRunningPtr, 
+        Barrier* startupBarrier)
+        : runnable (runner), isRunningPtr (isRunningPtr), 
+        startupBarrier (startupBarrier)
       {
       }
-
-      // Wait for thread to start up
-      void Wait ()
-      {
-        ScopedLock<Mutex> lock (mutex);
-        while (!(*isRunningPtr))
-          startCondition.Wait (mutex);
-      }
-
-      void Started ()
-      {
-        ScopedLock<Mutex> lock (mutex);
-        AtomicOperations::Set (isRunningPtr, 1);
-        startCondition.NotifyOne ();
-      }
-
-    
-      Mutex mutex;
-      Condition startCondition;
 
       Runnable* runnable;
       int32* isRunningPtr;
+      Barrier* startupBarrier;
     };
 
     void* proxyFunc (void* param)
     {
+      // Extract the parameters
       ThreadStartParams* tp = static_cast<ThreadStartParams*> (param);
       int32* isRunningPtr = tp->isRunningPtr;
-      Runnable* runnable =  tp->runnable;
+      Runnable* runnable = tp->runnable;
+      Barrier* startupBarrier = tp->startupBarrier;
 
-      tp->Started ();
+      // Set as running and wait for main thread to catch up
+      AtomicOperations::Set (isRunningPtr, 1);
+      startupBarrier->Wait ();
 
+      // Run      
       runnable->Run ();
 
-      AtomicOperations::Set (isRunningPtr, 0);
+      // Set as non-running
       
       pthread_exit (0);
       return 0;
@@ -92,14 +82,15 @@ namespace Implementation
   {
     if (!IsRunning ())
     {
-      ThreadStartParams param (runnable, &isRunning);
+      Barrier startupBarrier (2);
+      ThreadStartParams param (runnable, &isRunning, &startupBarrier);
 
       pthread_attr_t attr;
       pthread_attr_init(&attr);
       pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
       pthread_create(&threadHandle, &attr, proxyFunc, &param); 
-      
-      param.Wait ();
+            
+      startupBarrier.Wait ();
     }
   }
 

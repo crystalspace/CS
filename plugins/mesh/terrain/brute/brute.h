@@ -32,7 +32,6 @@
 #include "csutil/refarr.h"
 #include "csutil/sysfunc.h"
 #include "csutil/scf_implementation.h"
-#include "csutil/thread.h"
 #include "csutil/weakref.h"
 #include "iengine/lightmgr.h"
 #include "iengine/mesh.h"
@@ -167,7 +166,7 @@ public:
   }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 class csTerrainObject : 
   public scfImplementationExt4<csTerrainObject,
@@ -569,7 +568,7 @@ public:
   virtual uint GetMixMode () const { return 0; }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
 * TerrFunc type. This is the plugin you have to use to create instances

@@ -3144,13 +3144,6 @@ SWIG_From_unsigned_SS_long  (unsigned long value)
     PyLong_FromUnsignedLong(value) : PyInt_FromLong(static_cast< long >(value)); 
 }
 
-
-SWIGINTERNINLINE PyObject *
-SWIG_From_size_t  (size_t value)
-{    
-  return SWIG_From_unsigned_SS_long  (static_cast< unsigned long >(value));
-}
-
 SWIGINTERN int iLight_scfGetVersion(){ return scfInterfaceTraits<iLight>::GetVersion(); }
 SWIGINTERN void delete_iLight(iLight *self){ if (self) self->DecRef (); }
 
@@ -3228,6 +3221,13 @@ SWIGINTERN int iLightList_scfGetVersion(){ return scfInterfaceTraits<iLightList>
 SWIGINTERN void delete_iLightList(iLightList *self){ if (self) self->DecRef (); }
 SWIGINTERN int iLightIterator_scfGetVersion(){ return scfInterfaceTraits<iLightIterator>::GetVersion(); }
 SWIGINTERN void delete_iLightIterator(iLightIterator *self){ if (self) self->DecRef (); }
+
+SWIGINTERNINLINE PyObject *
+SWIG_From_size_t  (size_t value)
+{    
+  return SWIG_From_unsigned_SS_long  (static_cast< unsigned long >(value));
+}
+
 
 SWIGINTERNINLINE int
 SWIG_AsVal_size_t (PyObject * obj, size_t *val)
@@ -5770,149 +5770,6 @@ SWIGINTERN PyObject *_wrap_iLight_GetSVContext(PyObject *SWIGUNUSEDPARM(self), P
   arg1 = reinterpret_cast< iLight * >(argp1);
   result = (iShaderVariableContext *)(arg1)->GetSVContext();
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iShaderVariableContext, 0 |  0 );
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iLight_AddLightTag(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iLight *arg1 = (iLight *) 0 ;
-  csStringID arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  unsigned long val2 ;
-  int ecode2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iLight_AddLightTag",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLight, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLight_AddLightTag" "', argument " "1"" of type '" "iLight *""'"); 
-  }
-  arg1 = reinterpret_cast< iLight * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iLight_AddLightTag" "', argument " "2"" of type '" "csStringID""'");
-  } 
-  arg2 = static_cast< csStringID >(val2);
-  (arg1)->AddLightTag(arg2);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iLight_RemoveTag(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iLight *arg1 = (iLight *) 0 ;
-  csStringID arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  unsigned long val2 ;
-  int ecode2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iLight_RemoveTag",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLight, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLight_RemoveTag" "', argument " "1"" of type '" "iLight *""'"); 
-  }
-  arg1 = reinterpret_cast< iLight * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iLight_RemoveTag" "', argument " "2"" of type '" "csStringID""'");
-  } 
-  arg2 = static_cast< csStringID >(val2);
-  (arg1)->RemoveTag(arg2);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iLight_IsTagSet(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iLight *arg1 = (iLight *) 0 ;
-  csStringID arg2 ;
-  bool result;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  unsigned long val2 ;
-  int ecode2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iLight_IsTagSet",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLight, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLight_IsTagSet" "', argument " "1"" of type '" "iLight *""'"); 
-  }
-  arg1 = reinterpret_cast< iLight * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iLight_IsTagSet" "', argument " "2"" of type '" "csStringID""'");
-  } 
-  arg2 = static_cast< csStringID >(val2);
-  result = (bool)(arg1)->IsTagSet(arg2);
-  resultobj = SWIG_From_bool(static_cast< bool >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iLight_GetTagCount(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iLight *arg1 = (iLight *) 0 ;
-  size_t result;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iLight_GetTagCount",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLight, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLight_GetTagCount" "', argument " "1"" of type '" "iLight *""'"); 
-  }
-  arg1 = reinterpret_cast< iLight * >(argp1);
-  result = (arg1)->GetTagCount();
-  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iLight_GetTags(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iLight *arg1 = (iLight *) 0 ;
-  csStringID *arg2 = (csStringID *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iLight_GetTags",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLight, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLight_GetTags" "', argument " "1"" of type '" "iLight *""'"); 
-  }
-  arg1 = reinterpret_cast< iLight * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_unsigned_long, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iLight_GetTags" "', argument " "2"" of type '" "csStringID *""'"); 
-  }
-  arg2 = reinterpret_cast< csStringID * >(argp2);
-  (arg1)->GetTags(arg2);
-  resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
   return NULL;
@@ -34405,11 +34262,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iLight_RemoveAffectedLightingInfo", _wrap_iLight_RemoveAffectedLightingInfo, METH_VARARGS, NULL},
 	 { (char *)"iLight_Setup", _wrap_iLight_Setup, METH_VARARGS, NULL},
 	 { (char *)"iLight_GetSVContext", _wrap_iLight_GetSVContext, METH_VARARGS, NULL},
-	 { (char *)"iLight_AddLightTag", _wrap_iLight_AddLightTag, METH_VARARGS, NULL},
-	 { (char *)"iLight_RemoveTag", _wrap_iLight_RemoveTag, METH_VARARGS, NULL},
-	 { (char *)"iLight_IsTagSet", _wrap_iLight_IsTagSet, METH_VARARGS, NULL},
-	 { (char *)"iLight_GetTagCount", _wrap_iLight_GetTagCount, METH_VARARGS, NULL},
-	 { (char *)"iLight_GetTags", _wrap_iLight_GetTags, METH_VARARGS, NULL},
 	 { (char *)"iLight_scfGetVersion", _wrap_iLight_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iLight", _wrap_delete_iLight, METH_VARARGS, NULL},
 	 { (char *)"iLight_swigregister", iLight_swigregister, METH_VARARGS, NULL},
@@ -35806,7 +35658,7 @@ static swig_type_info _swigt__p_uint32_t = {"_p_uint32_t", "uint32_t *|uint32 *"
 static swig_type_info _swigt__p_uint64_t = {"_p_uint64_t", "uint64_t *|uint64 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint8_t = {"_p_uint8_t", "uint8_t *|uint8 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_int = {"_p_unsigned_int", "unsigned int *|uint *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_unsigned_long = {"_p_unsigned_long", "unsigned long *|csStringID *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_unsigned_long = {"_p_unsigned_long", "unsigned long *|csEventID *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_long_long = {"_p_unsigned_long_long", "unsigned long long *|ulonglong *", 0, 0, (void*)0, 0};
 
 static swig_type_info *swig_type_initial[] = {

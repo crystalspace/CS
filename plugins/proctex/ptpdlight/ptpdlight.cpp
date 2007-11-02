@@ -21,6 +21,7 @@
 #include <limits.h>
 
 #include "iengine/engine.h"
+#include "iengine/sector.h"
 #include "ivaria/profile.h"
 #include "ivaria/reporter.h"
 
@@ -398,7 +399,43 @@ bool ProctexPDLight::PrepareAnim ()
   {
     MappedLight& light = lights[i];
     bool success = false;
-    light.light = engine->FindLightID (light.lightId);
+    if (!light.lightId->sectorName.IsEmpty()
+      && !light.lightId->lightName.IsEmpty())
+    {
+      iSector* sector = engine->FindSector (light.lightId->sectorName);
+      if (sector)
+      {
+        iLight* engLight = sector->GetLights()->FindByName (
+          light.lightId->lightName);
+        light.light = engLight;
+        if (!light.light)
+        {
+          Report (CS_REPORTER_SEVERITY_WARNING, 
+            "Could not find light '%s' in sector '%s'", 
+            light.lightId->lightName.GetData(),
+            light.lightId->sectorName.GetData());
+        }
+      }
+      else
+      {
+        Report (CS_REPORTER_SEVERITY_WARNING, 
+          "Could not find sector '%s' for light '%s'", 
+          light.lightId->sectorName.GetData(),
+          light.lightId->lightName.GetData());
+      }
+    }
+    else
+    {
+      light.light = engine->FindLightID ((const char*)light.lightId->lightId);
+      if (!light.light)
+      {
+        csString hexId;
+        for (int i = 0; i < 16; i++)
+          hexId.AppendFmt ("%02x", light.lightId->lightId[i]);
+        Report (CS_REPORTER_SEVERITY_WARNING, 
+          "Could not find light with ID '%s'", hexId.GetData());
+      }
+    }
     if (light.light)
     {
       success = true;
@@ -417,15 +454,7 @@ bool ProctexPDLight::PrepareAnim ()
         1.0f/maxValue.blue);
       lightColorStates.Put ((iLight*)light.light, colorState);
     }
-    else
-    {
-      csString hexId;
-      for (int i = 0; i < 16; i++)
-        hexId.AppendFmt ("%02x", light.lightId[i]);
-      Report (CS_REPORTER_SEVERITY_WARNING, 
-        "Could not find light with ID '%s'", hexId.GetData());
-    }
-    delete[] light.lightId; light.lightId = 0;
+    delete light.lightId; light.lightId = 0;
     if (success)
     {
       i++;

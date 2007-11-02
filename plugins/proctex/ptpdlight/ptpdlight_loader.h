@@ -28,6 +28,8 @@
 #include "csutil/scf_implementation.h"
 #include "csutil/strhash.h"
 
+struct iLoader;
+
 CS_PLUGIN_NAMESPACE_BEGIN(PTPDLight)
 {
 
@@ -82,8 +84,11 @@ public:
 protected:
   Scheduler sched;
 
+  bool ParseMap (iDocumentNode* node, ProctexPDLight* pt,
+                 iLoader* LevelLoader);
+
   void Report (int severity, iDocumentNode* node, const char* msg, ...);
-  bool HexToLightID (char* lightID, const char* lightIDHex);
+  bool HexToLightID (uint8* lightID, const char* lightIDHex);
 public:
   bool doMMX;
 

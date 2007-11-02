@@ -70,7 +70,6 @@ csConsoleOutput::csConsoleOutput (iBase *base) :
   Client = 0;
   // clear font for closedown
   object_reg = 0;
-  mutex = csMutex::Create (true);
   fg=0;
   bg=0;
   shadow=0;
@@ -147,7 +146,7 @@ bool csConsoleOutput::Initialize (iObjectRegistry *object_reg)
 
 void csConsoleOutput::Clear (bool wipe)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   if (wipe)
     // Clear the buffer
     buffer->Clear ();
@@ -164,14 +163,14 @@ void csConsoleOutput::Clear (bool wipe)
 
 void csConsoleOutput::SetBufferSize (int lines)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   buffer->SetLength (lines);
 }
 
 void csConsoleOutput::PutTextV (const char *text2, va_list args)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   size_t i;
   csString *curline = 0;
@@ -259,7 +258,7 @@ void csConsoleOutput::PutTextV (const char *text2, va_list args)
 
 const char *csConsoleOutput::GetLine (int line) const
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   return buffer->GetLine ((line == -1) ?
     (buffer->GetCurLine () - buffer->GetTopLine ()) : line)->GetData ();
 }
@@ -290,7 +289,7 @@ void csConsoleOutput::Draw2D (csRect *area)
 {
   if (!visible || !font) return;
 
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   int i, height, fh;
   csRect line, oldrgn;
   const csString *text;
@@ -488,7 +487,7 @@ void csConsoleOutput::Invalidate (csRect &area)
 
 void csConsoleOutput::SetFont (iFont *Font)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   if (font != Font)
   {
     font = Font;
@@ -504,13 +503,13 @@ void csConsoleOutput::SetFont (iFont *Font)
 
 int csConsoleOutput::GetTopLine () const
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   return buffer->GetTopLine ();
 }
 
 void csConsoleOutput::ScrollTo(int top, bool snap)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   switch (top)
   {
     case csConPageUp:
@@ -569,7 +568,7 @@ void csConsoleOutput::SetCursorPos(int x, int y)
 
 void csConsoleOutput::SetCursorPos (int iCharNo)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   if (cy>-1)
   {
     int max_x;

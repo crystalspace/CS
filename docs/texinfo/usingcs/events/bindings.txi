@@ -1,0 +1,100 @@
+@c -*-texinfo-*-
+@node Event Bindings, , Frame phase events, Event System
+@subsection Bindings
+@cindex Events, Bindings
+
+@subsubheading Syntax for keys in 'cooked' mode
+
+@example
+[[modifier]+|-<key>
+
+Example:
+Shift+Up
+Shift-Up
+Note: + - is the same thing
+@end example
+
+@subsubheading Keys
+
+@example
+a .. z
+0 .. 9
+Insert | Ins
+Delete | Del
+Home
+End
+PgUp
+PgDn
+Up
+Down
+Left
+Right
+Enter | Return
+Backspace | Back
+Tab
+Space
+F1 .. F12
+Print | PrintScrn
+Pause
+PadPlus
+PadMinus
+PadMult
+PadDiv
+Pad0
+Pad1
+Pad2
+Pad3
+Pad4
+Pad5 | Center
+Pad6
+Pad7
+Pad8
+Pad9
+PadDecimal
+PadEnter
+Plus
+Minus
+@end example
+
+@subsubheading Key modifiers
+
+@example
+Shift
+LShift
+RShift
+Alt
+LAlt
+RAlt
+Ctrl
+LCtrl
+RCtrl
+Num
+Scroll
+Caps
+@end example
+
+@subsubheading Syntax for Mouse
+
+@example
+[[mouse number]Mouse<Axis|Button><number>
+
+Example:
+MouseAxis0
+0MouseAxis0
+1MouseButton1
+@end example
+
+Note: first and second examples are the same (0 is default).
+
+@subsubheading Syntax for Joystick
+
+@example
+[[joy number]Joystick<Axis|Button><number>
+
+Example:
+JoystickAxis0
+0JoystickAxis0
+1JoystickButton1
+@end example
+
+Note: first and second examples are the same (0 is default).

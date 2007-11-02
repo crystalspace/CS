@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 
 #include "csutil/memheap.h"
-#include "csutil/scopedmutexlock.h"
+#include "csutil/scopedlock.h"
 #include "csutil/sysfunc.h"
 
 namespace CS

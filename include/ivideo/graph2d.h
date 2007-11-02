@@ -152,7 +152,7 @@ iOffscreenCanvasCallback : public virtual iBase
 };
 
 // For CreateOffscreenCanvas()
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * This is the interface for 2D renderer. The 2D renderer is responsible
@@ -450,7 +450,7 @@ struct iGraphics2D : public virtual iBase
 
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /** @} */
 

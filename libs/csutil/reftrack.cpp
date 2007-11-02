@@ -21,7 +21,6 @@
 #undef CS_REF_TRACKER
 #include "csutil/callstack.h"
 #include "csutil/scf.h"
-#include "csutil/scopedmutexlock.h"
 #include "csutil/sysfunc.h"
 
 #include "reftrack.h"

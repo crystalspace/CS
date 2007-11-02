@@ -1281,6 +1281,35 @@ CS_CHECK_LIB_WITH([mng],
 
 
 #------------------------------------------------------------------------------
+# Check for vgvm. (And it's dependencies, cairo and cairomm.)
+#------------------------------------------------------------------------------
+CS_CHECK_LIB_WITH([cairo],
+    [AC_LANG_PROGRAM(
+	[[#include <cairo.h>]],
+	[cairo_create (0)])],
+    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libcairo], [CAIRO])])
+
+CS_CHECK_LIB_WITH([cairomm-1.0],
+    [AC_LANG_PROGRAM(
+	[[#include <cairomm/cairomm.h>]],
+	[Cairo::Context c ((cairo_t*)0)])],
+    [], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libcairomm], [CAIROMM])], [],
+    [$cs_cv_libcairo_cflags],
+    [$cs_cv_libcairo_lflags],
+    [$cs_cv_libcairo_libs])
+
+CS_CHECK_LIB_WITH([vgvm],
+    [AC_LANG_PROGRAM(
+	[[#include <vgvm/vgvm.h>]],
+	[new vgvm::Program (0,0)])],
+    [], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libvgvm], [VGVM])], [],
+    [$cs_cv_libcairomm_1_0_cflags],
+    [$cs_cv_libcairomm_1_0_lflags],
+    [$cs_cv_libcairomm_1_0_libs])
+
+
+
+#------------------------------------------------------------------------------
 # Check for MikMod.  In addition to the standard installed locations, we also
 # search CS/libs/libmikmod*.
 #------------------------------------------------------------------------------

@@ -5,23 +5,124 @@ The overall history is in reverse (descending) chronological order, so that
 each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
-01-Nov-2007
+
+1-Nov-2007
+	- res added a simple (and rather unflexible) SVG loader utilizing
+	  VGVM.
 	- ronsaldo fixed a stupid error with a missnamed operator, and added
 	  the remainings geometrical operators to the c# bindings.
 	- ronsaldo added a hack to iengine.i file for deal with a portability
 	  issue.
+31-Oct-2007
+	- Jorrit made the dynamic step callback array in odedynam use
+	  a normal csRefArray instead of a csWeakRefArray. Using a weak
+	  ref array in this case is wrong since it requires implementors
+	  of this callback to keep their own reference somewhere.
+	- caedes fixed memory leaks in emit iEmitFactoryState implementation.
+	- caedes fixed csShaderVariable leaks in lightiter.
+        - Mike Gist committed a change from Marten to fix GetNamedChildObject.
 30-Oct-2007
 	- ronsaldo added more operators to the 2d and 3d vector, and also
 	  to the matrix2 and matrix3 into the c# bindings.
+	- res fixed some implementation mistakes in csRedBlackTree, leading
+	  to violations of the RB reles in the tree, especially when deleting:
+	    - The original source for the variant implemented here uses 'nil'
+	      elements as indicators for absence of a child or parent of a
+	      tree node. The CS implementation uses 0 as 'nil', and dutifully
+	      checked some pointers for 0 before manipulating their contents.
+	      However, in the original source, 'nil' is an actual element and
+	      at a point a change is made to it's 'parent' which us expected
+	      to be reflected at another place where the parent of a possibly
+	      'nil' element is read. Fixed the code to track that special
+	      'nil parent' there.
+	    - In another part, the parent of a specific node was used
+	      repeatedly and thus cached. However, some operations done on the
+	      tree potentially change the parent of that specific node, but
+	      the cached value was not updated. Fixed as well.
+	    - In one instance a statement was just transcribed plain wrong.
 29-Oct-2007
 	- ronsaldo added some operators to the 2d and 3d vectors in the c#
 	  bindings, and fixed somes issues with the CS module generations.
+28-Oct-2007
+	- res changed the Jam LinkWith rules to add a dependency of targets
+	  on the "naked" target names (e.g. 'crystalspace') instead of the
+	  link library filename (e.g. 'libcrystalspace-1.3.so') to make sure
+	  the symlinks for shared libs are created.
+	- caedes fixed leakward for shaderweaver's WeaverCompiler (was using
+	  bad class name for leakward implementation).
+	- Eric Sunshine added CS/doc/support/prepare_online_publish.sh, a
+	  script for massaging generated HTML documentation (CS manual and API
+	  reference) into a form suitable for online publication. This script
+	  is invoked as a documentation generation post-process from jobber. It
+	  presently performs the following tasks:
+	    - Renames generated .html files to .php.
+	    - Fixes up internal links to point at .php rather than .html.
+	    - Adds a "Search" field.
+26-Oct-2007
+	- Darek added bindings to the documentation.
+	- caedes fixed incorrect handling of smart pointers in cspython.
+	- caedes fixed one memory leak in genmesh.
+	- caedes fixed RenderBufferAccessor leakwards for genmesh, spr2d, 
+	  particles and instmesh (they were missing some 
+	  CS_LEAKWARD_IMPLEMENT uses).
+25-Oct-2007
+	- caedes added a bunch of const_cast to cspython to account for 
+	  incorrect prototypes in python 2.4 functions (which would lead to
+	  compile errors).
+	- Jorrit updated SimpleRoom.java so that it no longer uses the
+	  deprecated CS_QUERY_REGISTRY and SCF_QUERY_INTERFACE. Also changed
+	  it to use genmesh instead of thing for the walls.
+	- caedes added some macros to swig interface files for facilitating
+	  removal of csString types from scripting languages, namely
+	  TYPEMAP_STRING and TYPEMAP_STRING_PTR. Note this macros have to be
+	  implemented for each language in order to completely remove the
+	  types.
+	- caedes implemented TYPEMAP_STRING and TYPEMAP_STRING_PTR swig macros
+	  for python, thus removing csString and similar completely from the
+	  python bindings.
+24-Oct-2007
+	- caedes implemented 'new' iScript interface for cspython. Fixes
+	  trac #93.
+	- caedes fixed error message routing in cspython to send errors
+	  as reporter errors instead of warnings.
+	- caedes changed pysimp to use new iScript interface, and also changed
+	  way cspython is loaded so it can report its command line help.
+	- Marten made a number of fixes to the threading subsystem:
+	    - Added a barrier synchronization primitive.
+	    - Reimplemented the thread startup synchronization.
+	    - Removed some fallout of yesterdays cleanup of old threading.
+	- caedes removed data/varia/walktest.cam. Fixes trac #162.
+	- caedes changed walktest LoadCamera command to emit warnings
+	  instead of errors when it encounter problems.
+	- caedes replaced uses of CS_GET_CHILD_OBJECT in walktest and mazing
+	  apps by CS::GetChildObject.
+	- res fixed some 'friend' methods of csSphere and csMatrix2 lacking
+	  CS_CRYSTALSPACE_EXPORT.
+23-Oct-2007
+	- Marten cleaned out a few remaining deprecated classes left from 
+	  pre 1.2 including the old threading subsystem.
+	- Marten removed a potential race & deadlock from the thread startup.
+	  This change impose a small change in (undocumented) semantics of
+	  CS::Threading::Thread::Start(), the method might now return before
+	  the thread have fully started.
 21-Oct-2007
 	- ronsaldo fixed somes build errors. Added %ignore QueryInterface into
 	  include/bindings/csharp/csharppre.i.
 	- ronsaldo added a script which joins the differents modules "globals"
 	  classes into a one monolithic class which represents the crystal
 	  space globals.
+	- res augmented ptpdlight to also support light specification by
+	  sector and light name (which should be much more reliable than using
+	  the light ID).
+	- res made lighter2 write out sector and light name instead of the
+	  light ID for ptpdlight lightmap-light mappings.
+	- res changed lighter2 to not only support XML world files.
+	- res slightly improved lighter2's support for multiple world files:
+	  meshless worlds that only carry textures and materials now work.
+	- res augmented gmeshanimpdl to also support light specification by
+	  sector and light name.
+	- res made lighter2 write out sector and light name instead of the
+	  light ID for gmeshanimpdl lightmap-light mappings.
 20-Oct-2007
 	- res added a method to iTextureHandle to query whether applying a
 	  blit buffer may potentially require calls into foreign code.
@@ -45,6 +146,9 @@ chronological order.
 	  Sunshine (removed an unecessary variable, and fixed a misleading
 	  comment).
 	- res fixed a wrong order in the shader weaver type info data.
+	- res "generalized" the MSVC deprecation warning headers into 
+	  csutil/deprecation_warn_* since latest gcc also offers a mechanism 
+	  to silence deprecation warnings. 
 	- ronsaldo made compileable the modular version of the c# bindings.
 	- ronsaldo merged the trunk into the c# bindings.
 19-Oct-2007
@@ -58,15 +162,15 @@ chronological order.
 	  iBase which until now where using old cs macros. This wrapping
 	  allows to start using the real cs interface, so old methods have
 	  been deprecated. List of deprecated macros and new replacements:
-	   - CS_QUERY_REGISTRY -> ObjectRegistry->Get
-	   - CS_QUERY_REGISTRY_TAG_INTERFACE -> ObjectRegistry->Get
-	   - SCF_QUERY_INTERFACE -> iBase->QueryInterface
-	   - CS_QUERY_PLUGIN_CLASS -> iPluginManager->QueryPlugin
-	   - CS_LOAD_PLUGIN -> iPluginManager->LoadPlugin
-	   - CS_LOAD_PLUGIN_ALWAYS -> iPluginManager->LoadPluginAlways
-	   - CS_GET_CHILD_OBJECT -> iObject->GetChild
-	   - CS_GET_NAMED_CHILD_OBJECT -> iObject->GetChild
-	   - CS_GET_FIRST_NAMED_CHILD_OBJECT -> iObject->GetChildByName
+	    - CS_QUERY_REGISTRY -> ObjectRegistry->Get
+	    - CS_QUERY_REGISTRY_TAG_INTERFACE -> ObjectRegistry->Get
+	    - SCF_QUERY_INTERFACE -> iBase->QueryInterface
+	    - CS_QUERY_PLUGIN_CLASS -> iPluginManager->QueryPlugin
+	    - CS_LOAD_PLUGIN -> iPluginManager->LoadPlugin
+	    - CS_LOAD_PLUGIN_ALWAYS -> iPluginManager->LoadPluginAlways
+	    - CS_GET_CHILD_OBJECT -> iObject->GetChild
+	    - CS_GET_NAMED_CHILD_OBJECT -> iObject->GetChild
+	    - CS_GET_FIRST_NAMED_CHILD_OBJECT -> iObject->GetChildByName
 	  note some lesser used methods had to be renamed to cope with
 	  ambiguous overloading.
 	- caedes added a DEPRECATED_METHOD directive to swig interface
@@ -99,18 +203,18 @@ chronological order.
 	  multiple primitives. Also using CS::Geometry::Primitives now.
 	- Jorrit started work on instmesh and meshgen. At this point the
 	  following things are done:
-	      - Instmesh and meshgen now work nicely together without
-	        (known) bugs. Lighting works too.
-	      - If the meshes used for meshgen don't have too many
-	        polygons and density isn't too big then instmesh+meshgen
-		is a lot faster compared to genmesh+meshgen. At the
-		very least the update time (when moving around) is
-		a lot faster. However, as soon as the total number
-		of polygons gets too big then instmesh+genmesh starts
-		to get in a disadvantage. On this further optimizations
-		have to be made.
-	      - Warning: instmesh+meshgen still has a bug at exit. Seems
-	        there is some memory corruption going on.
+	    - Instmesh and meshgen now work nicely together without
+	      (known) bugs. Lighting works too.
+	    - If the meshes used for meshgen don't have too many
+	      polygons and density isn't too big then instmesh+meshgen
+	      is a lot faster compared to genmesh+meshgen. At the
+	      very least the update time (when moving around) is
+	      a lot faster. However, as soon as the total number
+	      of polygons gets too big then instmesh+genmesh starts
+	      to get in a disadvantage. On this further optimizations
+	      have to be made.
+	    - Warning: instmesh+meshgen still has a bug at exit. Seems
+	      there is some memory corruption going on.
 	- res enabled shared libraries by default on Win32 and Linux.
 	- res merged the MSVC project shared libraries support from the
 	  msvc-dlls branch.
@@ -147,7 +251,7 @@ chronological order.
 	- ronsaldo moves plugins/cscript/cscharp/cspacesharp/CS.cs into 
 	   plugins/cscript/cscharp/cspacesharp/cspace.cs.
 16-Oct-2007
-	- Mike Gist deprecated csProcessorCapability.
+        - Mike Gist deprecated csProcessorCapability.
 	- ronsaldo fixed somes issues with the c# bindings building.
 	- ronsaldo added somes folders omitted from previous comit.
 15-Oct-2007

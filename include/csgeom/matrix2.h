@@ -115,11 +115,14 @@ public:
   void Identity ();
 
   /// Add two matricies.
-  friend csMatrix2 operator+ (const csMatrix2& m1, const csMatrix2& m2);
+  friend CS_CRYSTALSPACE_EXPORT csMatrix2 operator+ (const csMatrix2& m1,
+    const csMatrix2& m2);
   /// Subtract two matricies.
-  friend csMatrix2 operator- (const csMatrix2& m1, const csMatrix2& m2);
+  friend CS_CRYSTALSPACE_EXPORT csMatrix2 operator- (const csMatrix2& m1,
+    const csMatrix2& m2);
   /// Multiply two matricies.
-  friend csMatrix2 operator* (const csMatrix2& m1, const csMatrix2& m2);
+  friend CS_CRYSTALSPACE_EXPORT csMatrix2 operator* (const csMatrix2& m1,
+    const csMatrix2& m2);
 
   /// Multiply a vector by a matrix (transform it).
   inline friend csVector2 operator* (const csMatrix2& m, const csVector2& v)
@@ -128,11 +131,14 @@ public:
   }
 
   /// Multiply a matrix and a scalar.
-  friend csMatrix2 operator* (const csMatrix2& m, float f);
+  friend CS_CRYSTALSPACE_EXPORT csMatrix2 operator* (const csMatrix2& m, 
+    float f);
   /// Multiply a matrix and a scalar.
-  friend csMatrix2 operator* (float f, const csMatrix2& m);
+  friend CS_CRYSTALSPACE_EXPORT csMatrix2 operator* (float f,
+    const csMatrix2& m);
   /// Divide a matrix by a scalar.
-  friend csMatrix2 operator/ (const csMatrix2& m, float f);
+  friend CS_CRYSTALSPACE_EXPORT csMatrix2 operator/ (const csMatrix2& m,
+    float f);
 };
 
 /** @} */

@@ -560,7 +560,7 @@ bool HandleDynLight (iLight* dyn, iEngine* engine)
 	  Sys->view->GetEngine ()->GetMeshes ()->Remove (ms->sprite);
 	}
 	csRef<WalkDataObject> ido (
-		CS_GET_CHILD_OBJECT (dyn->QueryObject (), WalkDataObject));
+		CS::GetChildObject<WalkDataObject>(dyn->QueryObject()));
         dyn->QueryObject ()->ObjRemove (ido);
         if (ms->snd)
         {
@@ -633,7 +633,7 @@ bool HandleDynLight (iLight* dyn, iEngine* engine)
 	if (es->radius < 1)
 	{
 	  csRef<WalkDataObject> ido (
-	  	CS_GET_CHILD_OBJECT (dyn->QueryObject (), WalkDataObject));
+		CS::GetChildObject<WalkDataObject>(dyn->QueryObject()));
 	  dyn->QueryObject ()->ObjRemove (ido);
 	  delete es;
 	  dyn->GetSector ()->GetLights ()->Remove (dyn);

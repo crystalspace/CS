@@ -25,7 +25,7 @@
 
 #include "csextern.h"
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * This class is used to identify capabilities in the processor such as 
@@ -249,6 +249,6 @@ end_detect:
 #endif //CS_PROCESSOR_X86
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 #endif //__CS_PROCESSORCAP_H__

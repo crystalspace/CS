@@ -324,7 +324,7 @@ void ProctexPDLight::Animate_Generic ()
       Lumel* scratchPtr = scratch + 
         mapTile.tilePartY * (blitPitch / sizeof (Lumel)) +
         mapTile.tilePartX;
-      int scratchPitch = (blitPitch / sizeof (Lumel)) - mapW;
+      size_t scratchPitch = (blitPitch / sizeof (Lumel)) - mapW;
 
       csRGBcolor mapMax = mapTile.maxValue;
       mapMax.red   = lutR[mapMax.red]   >> shiftR;

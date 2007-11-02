@@ -482,23 +482,23 @@ public:
 
   //------------------------- iEmitFactoryState implementation ----------------
   virtual csRef<iEmitFixed> CreateFixed ()
-  { return new csEmitFixed (0); }
+  { return csPtr<iEmitFixed>(new csEmitFixed (0)); }
   virtual csRef<iEmitBox> CreateBox ()
-  { return new csEmitBox (0); }
+  { return csPtr<iEmitBox>(new csEmitBox (0)); }
   virtual csRef<iEmitSphere> CreateSphere ()
-  { return new csEmitSphere (0); }
+  { return csPtr<iEmitSphere>(new csEmitSphere (0)); }
   virtual csRef<iEmitCone> CreateCone ()
-  { return new csEmitCone (0); }
+  { return csPtr<iEmitCone>(new csEmitCone (0)); }
   virtual csRef<iEmitMix> CreateMix ()
-  { return new csEmitMix (0); }
+  { return csPtr<iEmitMix>(new csEmitMix (0)); }
   virtual csRef<iEmitLine> CreateLine ()
-  { return new csEmitLine (0); }
+  { return csPtr<iEmitLine>(new csEmitLine (0)); }
   virtual csRef<iEmitCylinder> CreateCylinder ()
-  { return new csEmitCylinder (0); }
+  { return csPtr<iEmitCylinder>(new csEmitCylinder (0)); }
   virtual csRef<iEmitSphereTangent> CreateSphereTangent ()
-  { return new csEmitSphereTangent (0); }
+  { return csPtr<iEmitSphereTangent>(new csEmitSphereTangent (0)); }
   virtual csRef<iEmitCylinderTangent> CreateCylinderTangent ()
-  { return new csEmitCylinderTangent (0); }
+  { return csPtr<iEmitCylinderTangent>(new csEmitCylinderTangent (0)); }
 };
 
 /**

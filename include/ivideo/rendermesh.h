@@ -69,7 +69,7 @@ namespace Graphics
   }
 
 // For RenderMeshModes::flipCulling
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * Mesh render mode information. Contains the Z, mix and alpha modes to use
@@ -110,7 +110,7 @@ struct RenderMeshModes
   csRef<csRenderBufferHolder> buffers;
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * Data required by the renderer to draw a mesh.

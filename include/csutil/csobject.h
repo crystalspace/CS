@@ -34,7 +34,7 @@
 
 typedef csRefArray<iObject> csObjectContainer;
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * A generic csObject class. Any csObject can have any number of iObject
@@ -142,6 +142,6 @@ public:
     const char *Name = 0) const;
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 #endif // __CS_CSOBJECT_H__

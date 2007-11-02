@@ -53,7 +53,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Spr2D)
 
 class csSprite2DMeshObjectFactory;
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * Sprite 2D version of mesh object.
@@ -285,7 +285,7 @@ public:
   /** @} */
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * Factory for 2D sprites. This factory also implements iSprite2DFactoryState.
