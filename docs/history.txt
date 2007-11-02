@@ -6,6 +6,49 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+1-Nov-2007
+	- res added a simple (and rather unflexible) SVG loader utilizing
+	  VGVM.
+31-Oct-2007
+	- Jorrit made the dynamic step callback array in odedynam use
+	  a normal csRefArray instead of a csWeakRefArray. Using a weak
+	  ref array in this case is wrong since it requires implementors
+	  of this callback to keep their own reference somewhere.
+	- caedes fixed memory leaks in emit iEmitFactoryState implementation.
+	- caedes fixed csShaderVariable leaks in lightiter.
+        - Mike Gist committed a change from Marten to fix GetNamedChildObject.
+30-Oct-2007
+	- res fixed some implementation mistakes in csRedBlackTree, leading
+	  to violations of the RB reles in the tree, especially when deleting:
+	    - The original source for the variant implemented here uses 'nil'
+	      elements as indicators for absence of a child or parent of a
+	      tree node. The CS implementation uses 0 as 'nil', and dutifully
+	      checked some pointers for 0 before manipulating their contents.
+	      However, in the original source, 'nil' is an actual element and
+	      at a point a change is made to it's 'parent' which us expected
+	      to be reflected at another place where the parent of a possibly
+	      'nil' element is read. Fixed the code to track that special
+	      'nil parent' there.
+	    - In another part, the parent of a specific node was used
+	      repeatedly and thus cached. However, some operations done on the
+	      tree potentially change the parent of that specific node, but
+	      the cached value was not updated. Fixed as well.
+	    - In one instance a statement was just transcribed plain wrong.
+28-Oct-2007
+	- res changed the Jam LinkWith rules to add a dependency of targets
+	  on the "naked" target names (e.g. 'crystalspace') instead of the
+	  link library filename (e.g. 'libcrystalspace-1.3.so') to make sure
+	  the symlinks for shared libs are created.
+	- caedes fixed leakward for shaderweaver's WeaverCompiler (was using
+	  bad class name for leakward implementation).
+	- Eric Sunshine added CS/doc/support/prepare_online_publish.sh, a
+	  script for massaging generated HTML documentation (CS manual and API
+	  reference) into a form suitable for online publication. This script
+	  is invoked as a documentation generation post-process from jobber. It
+	  presently performs the following tasks:
+	    - Renames generated .html files to .php.
+	    - Fixes up internal links to point at .php rather than .html.
+	    - Adds a "Search" field.
 26-Oct-2007
 	- Darek added bindings to the documentation.
 	- caedes fixed incorrect handling of smart pointers in cspython.
@@ -36,9 +79,9 @@ chronological order.
 	- caedes changed pysimp to use new iScript interface, and also changed
 	  way cspython is loaded so it can report its command line help.
 	- Marten made a number of fixes to the threading subsystem:
-	   - Added a barrier synchronization primitive.
-	   - Reimplemented the thread startup synchronization.
-	   - Removed some fallout of yesterdays cleanup of old threading.
+	    - Added a barrier synchronization primitive.
+	    - Reimplemented the thread startup synchronization.
+	    - Removed some fallout of yesterdays cleanup of old threading.
 	- caedes removed data/varia/walktest.cam. Fixes trac #162.
 	- caedes changed walktest LoadCamera command to emit warnings
 	  instead of errors when it encounter problems.
@@ -107,15 +150,15 @@ chronological order.
 	  iBase which until now where using old cs macros. This wrapping
 	  allows to start using the real cs interface, so old methods have
 	  been deprecated. List of deprecated macros and new replacements:
-	   - CS_QUERY_REGISTRY -> ObjectRegistry->Get
-	   - CS_QUERY_REGISTRY_TAG_INTERFACE -> ObjectRegistry->Get
-	   - SCF_QUERY_INTERFACE -> iBase->QueryInterface
-	   - CS_QUERY_PLUGIN_CLASS -> iPluginManager->QueryPlugin
-	   - CS_LOAD_PLUGIN -> iPluginManager->LoadPlugin
-	   - CS_LOAD_PLUGIN_ALWAYS -> iPluginManager->LoadPluginAlways
-	   - CS_GET_CHILD_OBJECT -> iObject->GetChild
-	   - CS_GET_NAMED_CHILD_OBJECT -> iObject->GetChild
-	   - CS_GET_FIRST_NAMED_CHILD_OBJECT -> iObject->GetChildByName
+	    - CS_QUERY_REGISTRY -> ObjectRegistry->Get
+	    - CS_QUERY_REGISTRY_TAG_INTERFACE -> ObjectRegistry->Get
+	    - SCF_QUERY_INTERFACE -> iBase->QueryInterface
+	    - CS_QUERY_PLUGIN_CLASS -> iPluginManager->QueryPlugin
+	    - CS_LOAD_PLUGIN -> iPluginManager->LoadPlugin
+	    - CS_LOAD_PLUGIN_ALWAYS -> iPluginManager->LoadPluginAlways
+	    - CS_GET_CHILD_OBJECT -> iObject->GetChild
+	    - CS_GET_NAMED_CHILD_OBJECT -> iObject->GetChild
+	    - CS_GET_FIRST_NAMED_CHILD_OBJECT -> iObject->GetChildByName
 	  note some lesser used methods had to be renamed to cope with
 	  ambiguous overloading.
 	- caedes added a DEPRECATED_METHOD directive to swig interface
@@ -143,8 +186,60 @@ chronological order.
 	- caedes added tutorial4.py, on a better base for creating pure
 	  python cs apps.
 17-Oct-2007
+	- Jorrit fixed the genmesh loader so that you can now use multiple
+	  <box> and <sphere> statements to make a genmesh factory out of
+	  multiple primitives. Also using CS::Geometry::Primitives now.
+	- Jorrit started work on instmesh and meshgen. At this point the
+	  following things are done:
+	    - Instmesh and meshgen now work nicely together without
+	      (known) bugs. Lighting works too.
+	    - If the meshes used for meshgen don't have too many
+	      polygons and density isn't too big then instmesh+meshgen
+	      is a lot faster compared to genmesh+meshgen. At the
+	      very least the update time (when moving around) is
+	      a lot faster. However, as soon as the total number
+	      of polygons gets too big then instmesh+genmesh starts
+	      to get in a disadvantage. On this further optimizations
+	      have to be made.
+	    - Warning: instmesh+meshgen still has a bug at exit. Seems
+	      there is some memory corruption going on.
+	- res enabled shared libraries by default on Win32 and Linux.
+	- res merged the MSVC project shared libraries support from the
+	  msvc-dlls branch.
 	- Vincent restored iSndSysSourceSoftware3D interface for the sake of
 	  compatibility and deprecated it.
+	- res fixed msvcgen.jam to use MSVC.PREFIX.library_static instead of
+	  MSVC.PREFIX.library everywhere.
+	- res added a new interface for directly setting texture pixel data:
+	  iTextureHandle->QueryBlitBuffer()/ApplyBlitBuffer(). Instead of
+	  copying a client-provided buffer, the client writes into a renderer-
+	  provided buffer. This can save a copy (and thus give somewhat better
+	  performance) when some extensions for direct texture memory access
+	  are available (such as ARB_pixel_buffer_object).
+	- res made ptpdlight use iTextureHandle->QueryBlitBuffer()/
+	  ApplyBlitBuffer(). 
+	- res changed shared library building to place the built libraries
+	  into the top build directory and not deep within out/.
+	- caedes made python bindings use -modern swig flag. This instructs
+	  swig to use modern python features only (and generates somewhat less
+	  convoluted code).
+	- res changed docconv_static to link some unneeded plugins.
+	- res fixed an errorneous MsvcUsePCH in the cslight Jamfile.
+	- res made shared libraries built in out/.../libs again (so they're
+	  correctly picked up by cs-config), but also added a symlink for them
+	  to the top build directory (for convenience).
+	- res fixed the MSVC projects to "decorate" the object file names for
+	  the static plugin library again.
+	- res made static plugins in MSVC be put into a separate shared lib as
+	  well (like what's done when build statically with Jam now) to
+	  facilitate LGPL compliance when 3rd parties wish to link CS
+	  statically.
+	- res fixed some build errors that appeared with static plugins.
+	- res fixed the MSVC static plugins project to not contain the library
+	  building preprocessor definitions (which mess up importing when 
+	  building with DLLs).
+16-Oct-2007
+        - Mike Gist deprecated csProcessorCapability.
 14-Oct-2007
 	- Eric Sunshine renamed build variable LIB3DS.ONE_THREE_OH to
 	  LIB3DS.GENERIC_DATA_IO_CALLBACKS to better reflect its intended
