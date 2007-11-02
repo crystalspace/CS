@@ -11,6 +11,7 @@ chronological order.
 	  imports to somes swig files.
 	- ronsaldo fixed a bug with the script that joints that differents
 	  modules of the csharp bindings.
+	- ronsaldo silenced two warnings about the c# binding.
 1-Nov-2007
 	- res added a simple (and rather unflexible) SVG loader utilizing
 	  VGVM.
