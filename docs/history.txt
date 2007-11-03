@@ -17,6 +17,12 @@ chronological order.
 	  that bullet expects the include path (-I) to be set to
 	  ${installpath}/bullet and I don't know how to express that in
 	  configure.ac.
+	- res removed the setting of CS_HAVE_LIBBFD when meta info embedding
+	  was enabled and libbfd is present. This fixes build errors on MinGW
+	  in optimize mode where this preprocessor macro was set but libbfd
+	  not actually linked. The other BFD use in CS, the bfd-based plugin
+	  metadata reader, is unaffected since it doesn't make use of that
+	  macro to detect BFD presence (that's handled in the Jam file).
 1-Nov-2007
 	- res added a simple (and rather unflexible) SVG loader utilizing
 	  VGVM.
