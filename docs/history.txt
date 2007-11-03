@@ -12,6 +12,8 @@ chronological order.
 	- ronsaldo fixed a bug with the script that joints that differents
 	  modules of the csharp bindings.
 	- ronsaldo silenced two warnings about the c# binding.
+	- ronsaldo fixed a bug related with operators == and != in the c#
+	  bindings.
 1-Nov-2007
 	- res added a simple (and rather unflexible) SVG loader utilizing
 	  VGVM.

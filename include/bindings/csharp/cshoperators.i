@@ -44,13 +44,21 @@
   // Are the two vectors equal?
   public static bool operator==(csVector2 v1, csVector2 v2)
   {
-    return v1.x==v2.x && v1.y==v2.y;
+    // If one of the objects is null, then compares by reference
+    if ((object)v1 == null || (object)v2 == null)
+      return (object)v1 == (object)v2;
+    else
+      return v1.x==v2.x && v1.y==v2.y;
   }
 
   // Are the two vectors differents?
   public static bool operator!=(csVector2 v1, csVector2 v2)
   {
-    return v1.x!=v2.x || v1.y!=v2.y;
+    // If one of the objects is null, then compares by reference
+    if ((object)v1 == null || (object)v2 == null)
+      return (object)v1 != (object)v2;
+    else
+      return v1.x!=v2.x || v1.y!=v2.y;
   }
 
   // Perform the comparation between each vector member and a epsilon value
@@ -136,13 +144,21 @@ VECTOR2_CSHARP_CODE
   // Are the two vectors equal?
   public static bool operator==(csVector3 v1, csVector3 v2)
   {
-    return v1.x==v2.x && v1.y==v2.y && v1.z==v2.z;
+    // If one of the objects is null, then compares by reference
+    if ((object)v1 == null || (object)v2 == null)
+      return (object)v1 == (object)v2;
+    else
+      return v1.x==v2.x && v1.y==v2.y && v1.z==v2.z;
   }
 
   // Are the two vectors differents?
   public static bool operator!=(csVector3 v1, csVector3 v2)
   {
-    return v1.x!=v2.x || v1.y!=v2.y || v1.z!=v2.z;
+    // If one of the objects is null, then compares by reference
+    if ((object)v1 == null || (object)v2 == null)
+      return (object)v1 != (object)v2;
+    else
+      return v1.x!=v2.x || v1.y!=v2.y || v1.z!=v2.z;
   }
 
   public static bool operator<(csVector3 v, float epsilon)
@@ -209,13 +225,21 @@ VECTOR3_CSHARP_CODE
 
   public static bool operator==(csMatrix2 m1, csMatrix2 m2)
   {
-    return m1.m11 == m2.m11 && m1.m12 == m2.m12
+     // If one of the objects is null, then compares by reference
+    if ((object)m1 == null || (object)m2 == null)
+      return (object)m1 != (object)m2;
+    else
+      return m1.m11 == m2.m11 && m1.m12 == m2.m12
 	&& m1.m21 == m2.m21 && m1.m22 == m2.m22;
   }
 
   public static bool operator!=(csMatrix2 m1, csMatrix2 m2)
   {
-    return m1.m11 != m2.m11 || m1.m12 != m2.m12
+     // If one of the objects is null, then compares by reference
+    if ((object)m1 == null || (object)m2 == null)
+      return (object)m1 != (object)m2;
+    else
+      return m1.m11 != m2.m11 || m1.m12 != m2.m12
 	|| m1.m21 != m2.m21 || m1.m22 != m2.m22;
   }
 
@@ -253,14 +277,22 @@ MATRIX2_CSHARP_CODE
 
   public static bool operator==(csMatrix3 m1, csMatrix3 m2)
   {
-    return m1.m11==m2.m11 && m1.m12==m2.m12 && m1.m13==m2.m13
+     // If one of the objects is null, then compares by reference
+    if ((object)m1 == null || (object)m2 == null)
+      return (object)m1 != (object)m2;
+    else
+      return m1.m11==m2.m11 && m1.m12==m2.m12 && m1.m13==m2.m13
 	&& m1.m21==m2.m21 && m1.m22==m2.m22 && m1.m23==m2.m23
 	&& m1.m31==m2.m31 && m1.m32==m2.m32 && m1.m33==m2.m33;
   }
 
   public static bool operator!=(csMatrix3 m1, csMatrix3 m2)
   {
-    return m1.m11!=m2.m11 || m1.m12!=m2.m12 || m1.m13!=m2.m13
+     // If one of the objects is null, then compares by reference
+    if ((object)m1 == null || (object)m2 == null)
+      return (object)m1 != (object)m2;
+    else
+      return m1.m11!=m2.m11 || m1.m12!=m2.m12 || m1.m13!=m2.m13
 	|| m1.m21!=m2.m21 || m1.m22!=m2.m22 || m1.m23!=m2.m23
 	|| m1.m31!=m2.m31 || m1.m32!=m2.m32 || m1.m33!=m2.m33;
   }
@@ -505,7 +537,11 @@ QUATERNION_CSHARP_CODE
 
   public static bool operator==(csBox2 b1, csBox2 b2)
   {
-    return b1.MinX()==b2.MinX() &&
+    // If one of the objects is null, then compares by reference
+    if ((object)b1 == null || (object)b2 == null)
+      return (object)b1 != (object)b2;
+    else
+      return b1.MinX()==b2.MinX() &&
 	   b1.MinY()==b2.MinY() &&
 	   b1.MaxX()==b2.MaxX() &&
 	   b1.MaxY()==b2.MaxY();
@@ -513,7 +549,11 @@ QUATERNION_CSHARP_CODE
 
   public static bool operator!=(csBox2 b1, csBox2 b2)
   {
-    return b1.MinX()!=b2.MinX() ||
+    // If one of the objects is null, then compares by reference
+    if ((object)b1 == null || (object)b2 == null)
+      return (object)b1 != (object)b2;
+    else
+      return b1.MinX()!=b2.MinX() ||
 	   b1.MinY()!=b2.MinY() ||
 	   b1.MaxX()!=b2.MaxX() ||
 	   b1.MaxY()!=b2.MaxY();
@@ -585,7 +625,11 @@ BOX2_CSHARP_CODE
 
   public static bool operator==(csBox3 b1, csBox3 b2)
   {
-    return b1.MinX()==b2.MinX() &&
+    // If one of the objects is null, then compares by reference
+    if ((object)b1 == null || (object)b2 == null)
+      return (object)b1 != (object)b2;
+    else
+      return b1.MinX()==b2.MinX() &&
 	   b1.MinY()==b2.MinY() &&
 	   b1.MinZ()==b2.MinZ() &&
 	   b1.MaxX()==b2.MaxX() &&
@@ -595,7 +639,11 @@ BOX2_CSHARP_CODE
 
   public static bool operator!=(csBox3 b1, csBox3 b2)
   {
-    return b1.MinX()!=b2.MinX() ||
+    // If one of the objects is null, then compares by reference
+    if ((object)b1 == null || (object)b2 == null)
+      return (object)b1 != (object)b2;
+    else
+      return b1.MinX()!=b2.MinX() ||
 	   b1.MinY()!=b2.MinY() ||
 	   b1.MinZ()!=b2.MinZ() ||
 	   b1.MaxX()!=b2.MaxX() ||
