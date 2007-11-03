@@ -1400,20 +1400,19 @@ AS_IF([test $cs_cv_libode_opcode = yes],
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([bullet],
     [AC_LANG_PROGRAM([[
-    #include <BroadphaseCollision/SimpleBroadphase.h>
-    #include <CcdPhysics/CcdPhysicsController.h>
-    #include <CcdPhysics/CcdPhysicsEnvironment.h>
-    #include <CollisionDispatch/CollisionDispatcher.h>
+    #include "btBulletDynamicsCommon.h"
+    #include "btBulletCollisionCommon.h"
     ]],
-    [CollisionDispatcher d;
-    SimpleBroadphase b;
-    CcdPhysicsEnvironment* e = new CcdPhysicsEnvironment (&d, &b)])],
+    [btCollisionDispatcher* d;
+    btBroadphaseInterface* b;
+    btSequentialImpulseConstraintSolver* s;
+    btDefaultCollisionConfiguration* c;
+    btDynamicsWorld* world = new btDiscreteDynamicsWorld (d, b, s, c)])],
     [], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libbullet], [BULLET])], [],
     [], [], 
-    [-lbulletccdphysics \
-    -lbulletphysicsinterfacecommon \
-    -lbulletdynamics \
-    -lbullet])
+    [-lbulletdynamics \
+    -lbulletcollision \
+    -lbulletmath])
 
 
 

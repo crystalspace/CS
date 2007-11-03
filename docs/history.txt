@@ -6,6 +6,17 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+3-Nov-2007
+	- Jorrit added an initial port of the bullet physics plugin to the
+	  latest release of bullet (2.64). Not everything is supported yet
+	  but basic phystest using boxes and spheres works fine. Things that
+	  don't work are some parts of the collider api, joints, and body
+	  groups. Also several physics parameters like elasticity are not
+	  yet supported.
+	  Note: the configure test is currently broken. The problem is
+	  that bullet expects the include path (-I) to be set to
+	  ${installpath}/bullet and I don't know how to express that in
+	  configure.ac.
 1-Nov-2007
 	- res added a simple (and rather unflexible) SVG loader utilizing
 	  VGVM.

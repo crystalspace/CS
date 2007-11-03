@@ -762,6 +762,12 @@ CONFIG_MNG
 ac_ct_CONFIG_MNG
 CONFIG_LIBMNG
 ac_ct_CONFIG_LIBMNG
+CONFIG_CAIRO
+ac_ct_CONFIG_CAIRO
+CONFIG_CAIROMM_1_0
+ac_ct_CONFIG_CAIROMM_1_0
+CONFIG_VGVM
+ac_ct_CONFIG_VGVM
 CONFIG_MIKMOD
 ac_ct_CONFIG_MIKMOD
 CONFIG_OGG
@@ -1514,6 +1520,15 @@ Optional Packages:
                           automatically; searches dir/include, dir/lib, and
                           dir
   --with-mng=dir          specify location of libmng if not detected
+                          automatically; searches dir/include, dir/lib, and
+                          dir
+  --with-cairo=dir        specify location of libcairo if not detected
+                          automatically; searches dir/include, dir/lib, and
+                          dir
+  --with-cairomm-1.0=dir  specify location of libcairomm-1.0 if not detected
+                          automatically; searches dir/include, dir/lib, and
+                          dir
+  --with-vgvm=dir         specify location of libvgvm if not detected
                           automatically; searches dir/include, dir/lib, and
                           dir
   --with-mikmod=dir       specify location of libmikmod if not detected
@@ -39706,6 +39721,2420 @@ fi
 
 
 #------------------------------------------------------------------------------
+# Check for vgvm. (And it's dependencies, cairo and cairomm.)
+#------------------------------------------------------------------------------
+
+# Check whether --with-cairo was given.
+if test "${with_cairo+set}" = set; then
+  withval=$with_cairo;
+fi
+
+
+    # Backward compatibility: Recognize --with-libcairo as alias for --with-cairo.
+    if test -n "$with_libcairo" &&
+           test -z "$with_cairo"; then
+  with_cairo="$with_libcairo"
+fi
+
+
+    if test -z "$with_cairo"; then
+  with_cairo=yes
+fi
+
+    if test "$with_cairo" != no; then
+  # If --with-cairo value is same as cached value, then assume other
+	 # cached values are also valid; otherwise, ignore all cached values.
+	if test "$with_cairo" != "$cs_cv_with_cairo"; then
+  cs_ignore_cache=yes
+else
+  cs_ignore_cache=no
+fi
+
+
+	cs_check_lib_flags=''
+	if test $with_cairo = yes; then
+  if test "$cs_prog_pkg_config_checked" != yes; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin$PATH_SEPARATOR${srcdir}/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
+  for ac_prog in pkg-config
+  do
+    # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
+set dummy $ac_tool_prefix$ac_prog; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_prog_PKG_CONFIG+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$PKG_CONFIG"; then
+  ac_cv_prog_PKG_CONFIG="$PKG_CONFIG" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_PKG_CONFIG="$ac_tool_prefix$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+fi
+fi
+PKG_CONFIG=$ac_cv_prog_PKG_CONFIG
+if test -n "$PKG_CONFIG"; then
+  { echo "$as_me:$LINENO: result: $PKG_CONFIG" >&5
+echo "${ECHO_T}$PKG_CONFIG" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+
+    test -n "$PKG_CONFIG" && break
+  done
+fi
+if test -z "$PKG_CONFIG"; then
+  ac_ct_PKG_CONFIG=$PKG_CONFIG
+  for ac_prog in pkg-config
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_prog_ac_ct_PKG_CONFIG+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$ac_ct_PKG_CONFIG"; then
+  ac_cv_prog_ac_ct_PKG_CONFIG="$ac_ct_PKG_CONFIG" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_ac_ct_PKG_CONFIG="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+fi
+fi
+ac_ct_PKG_CONFIG=$ac_cv_prog_ac_ct_PKG_CONFIG
+if test -n "$ac_ct_PKG_CONFIG"; then
+  { echo "$as_me:$LINENO: result: $ac_ct_PKG_CONFIG" >&5
+echo "${ECHO_T}$ac_ct_PKG_CONFIG" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+
+  test -n "$ac_ct_PKG_CONFIG" && break
+done
+
+  if test "x$ac_ct_PKG_CONFIG" = x; then
+    PKG_CONFIG=""
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ echo "$as_me:$LINENO: WARNING: In the future, Autoconf will not detect cross-tools
+whose name does not start with the host triplet.  If you think this
+configuration is useful to you, please write to autoconf@gnu.org." >&5
+echo "$as_me: WARNING: In the future, Autoconf will not detect cross-tools
+whose name does not start with the host triplet.  If you think this
+configuration is useful to you, please write to autoconf@gnu.org." >&2;}
+ac_tool_warned=yes ;;
+esac
+    PKG_CONFIG=$ac_ct_PKG_CONFIG
+  fi
+fi
+
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+	cs_prog_pkg_config_checked=yes
+fi
+
+    if test -z "$cs_cv_prog_pkg_config_ok"; then
+  if test -n "$PKG_CONFIG"; then
+  if $PKG_CONFIG --atleast-pkgconfig-version=0.9.0; then
+  cs_cv_prog_pkg_config_ok=yes
+else
+  cs_cv_prog_pkg_config_ok=no
+fi
+
+else
+  cs_cv_prog_pkg_config_ok=no
+fi
+
+fi
+
+    if test $cs_cv_prog_pkg_config_ok = yes; then
+  { echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes cairo" >&5
+echo $ECHO_N "checking if $PKG_CONFIG recognizes cairo... $ECHO_C" >&6; }
+if test "${cs_cv_prog_pkg_config_cairo+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if $PKG_CONFIG --exists cairo; then
+  cs_cv_prog_pkg_config_cairo=yes
+else
+  cs_cv_prog_pkg_config_cairo=no
+fi
+
+fi
+{ echo "$as_me:$LINENO: result: $cs_cv_prog_pkg_config_cairo" >&5
+echo "${ECHO_T}$cs_cv_prog_pkg_config_cairo" >&6; }
+	if test $cs_cv_prog_pkg_config_cairo = yes; then
+  if test -z "$cs_cv_prog_pkg_config_cairo_flags"; then
+  cs_check_lib_cflag=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --cflags cairo") >&5
+  ($PKG_CONFIG --cflags cairo) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_check_lib_lflag=''
+	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs cairo") >&5
+  ($PKG_CONFIG --libs cairo) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_pkg_config_cairo_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
+fi
+
+    cs_check_lib_flags="$cs_check_lib_flags $cs_cv_prog_pkg_config_cairo_flags"
+fi
+
+fi
+
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin$PATH_SEPARATOR${srcdir}/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
+  for ac_prog in cairo-config
+  do
+    # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
+set dummy $ac_tool_prefix$ac_prog; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_prog_CONFIG_CAIRO+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$CONFIG_CAIRO"; then
+  ac_cv_prog_CONFIG_CAIRO="$CONFIG_CAIRO" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_CONFIG_CAIRO="$ac_tool_prefix$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+fi
+fi
+CONFIG_CAIRO=$ac_cv_prog_CONFIG_CAIRO
+if test -n "$CONFIG_CAIRO"; then
+  { echo "$as_me:$LINENO: result: $CONFIG_CAIRO" >&5
+echo "${ECHO_T}$CONFIG_CAIRO" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+
+    test -n "$CONFIG_CAIRO" && break
+  done
+fi
+if test -z "$CONFIG_CAIRO"; then
+  ac_ct_CONFIG_CAIRO=$CONFIG_CAIRO
+  for ac_prog in cairo-config
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_prog_ac_ct_CONFIG_CAIRO+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$ac_ct_CONFIG_CAIRO"; then
+  ac_cv_prog_ac_ct_CONFIG_CAIRO="$ac_ct_CONFIG_CAIRO" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_ac_ct_CONFIG_CAIRO="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+fi
+fi
+ac_ct_CONFIG_CAIRO=$ac_cv_prog_ac_ct_CONFIG_CAIRO
+if test -n "$ac_ct_CONFIG_CAIRO"; then
+  { echo "$as_me:$LINENO: result: $ac_ct_CONFIG_CAIRO" >&5
+echo "${ECHO_T}$ac_ct_CONFIG_CAIRO" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+
+  test -n "$ac_ct_CONFIG_CAIRO" && break
+done
+
+  if test "x$ac_ct_CONFIG_CAIRO" = x; then
+    CONFIG_CAIRO=""
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ echo "$as_me:$LINENO: WARNING: In the future, Autoconf will not detect cross-tools
+whose name does not start with the host triplet.  If you think this
+configuration is useful to you, please write to autoconf@gnu.org." >&5
+echo "$as_me: WARNING: In the future, Autoconf will not detect cross-tools
+whose name does not start with the host triplet.  If you think this
+configuration is useful to you, please write to autoconf@gnu.org." >&2;}
+ac_tool_warned=yes ;;
+esac
+    CONFIG_CAIRO=$ac_ct_CONFIG_CAIRO
+  fi
+fi
+
+    if test -n "$CONFIG_CAIRO"; then
+  if test -z "$cs_cv_prog_config_cairo_ok"; then
+  if $CONFIG_CAIRO --cflags --libs >/dev/null 2>&1; then
+  cs_cv_prog_config_cairo_ok=yes
+else
+  cs_cv_prog_config_cairo_ok=no
+fi
+
+fi
+
+	if test $cs_cv_prog_config_cairo_ok = yes; then
+  if test -z "$cs_cv_prog_config_cairo_flags"; then
+  cs_check_lib_cflag=`{ (echo "$as_me:$LINENO: \$CONFIG_CAIRO --cflags ") >&5
+  ($CONFIG_CAIRO --cflags ) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_check_lib_lflag=''
+	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_CAIRO --libs ") >&5
+  ($CONFIG_CAIRO --libs ) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_config_cairo_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
+fi
+
+    cs_check_lib_flags="$cs_check_lib_flags $cs_cv_prog_config_cairo_flags"
+fi
+
+fi
+
+
+fi
+
+
+	if test $with_cairo != yes; then
+  cs_check_lib_paths=$with_cairo
+else
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib "
+fi
+
+	for cs_lib_item in $cs_check_lib_paths
+    do
+	case $cs_lib_item in
+	    *\|*)
+    set filler `echo "$cs_lib_item" | awk 'BEGIN { FS="|" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_check_incdir=''
+else
+  if test "$1" = filler; then
+  cs_check_incdir=''
+else
+  cs_check_incdir=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_check_libdir=''
+else
+  if test "$1" = filler; then
+  cs_check_libdir=''
+else
+  cs_check_libdir=$1
+fi
+
+	shift
+fi
+
+		if test -n "$cs_check_incdir"; then
+  cs_check_lib_cflag="-I$cs_check_incdir"
+else
+  cs_check_lib_cflag=''
+fi
+
+    if test -n "$cs_check_libdir"; then
+  cs_check_lib_lflag="-L$cs_check_libdir"
+else
+  cs_check_lib_lflag=''
+fi
+
+    if test -n "cairo"; then
+  cs_check_lib_libs="-lcairo"
+	cs_check_lib_framework="-framework cairo"
+else
+  cs_check_lib_libs=''
+	cs_check_lib_framework=''
+fi
+
+    cs_check_lib_flags="$cs_check_lib_flags
+	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
+		;;
+	    *)  if test -n "$cs_lib_item/include"; then
+  cs_check_lib_cflag="-I$cs_lib_item/include"
+else
+  cs_check_lib_cflag=''
+fi
+
+    if test -n "$cs_lib_item/lib"; then
+  cs_check_lib_lflag="-L$cs_lib_item/lib"
+else
+  cs_check_lib_lflag=''
+fi
+
+    if test -n "cairo"; then
+  cs_check_lib_libs="-lcairo"
+	cs_check_lib_framework="-framework cairo"
+else
+  cs_check_lib_libs=''
+	cs_check_lib_framework=''
+fi
+
+    cs_check_lib_flags="$cs_check_lib_flags
+	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
+		if test -n "$cs_lib_item"; then
+  cs_check_lib_cflag="-I$cs_lib_item"
+else
+  cs_check_lib_cflag=''
+fi
+
+    if test -n "$cs_lib_item"; then
+  cs_check_lib_lflag="-L$cs_lib_item"
+else
+  cs_check_lib_lflag=''
+fi
+
+    if test -n "cairo"; then
+  cs_check_lib_libs="-lcairo"
+	cs_check_lib_framework="-framework cairo"
+else
+  cs_check_lib_libs=''
+	cs_check_lib_framework=''
+fi
+
+    cs_check_lib_flags="$cs_check_lib_flags
+	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
+		;;
+	esac
+    done
+
+
+	if test "$cs_ignore_cache" != yes; then
+  { echo "$as_me:$LINENO: checking for libcairo" >&5
+echo $ECHO_N "checking for libcairo... $ECHO_C" >&6; }
+if test "${cs_cv_libcairo+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in $cs_check_lib_flags
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <cairo.h>
+int
+main ()
+{
+cairo_create (0)
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  cs_build_ok=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libcairo=yes
+		cs_cv_libcairo_cflags=$cs_build_cflags
+		cs_cv_libcairo_lflags=$cs_build_lflags
+		cs_cv_libcairo_libs=$cs_build_libs
+else
+  cs_cv_libcairo=no
+fi
+
+fi
+{ echo "$as_me:$LINENO: result: $cs_cv_libcairo" >&5
+echo "${ECHO_T}$cs_cv_libcairo" >&6; }
+else
+  { echo "$as_me:$LINENO: checking for libcairo" >&5
+echo $ECHO_N "checking for libcairo... $ECHO_C" >&6; }
+	    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in $cs_check_lib_flags
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <cairo.h>
+int
+main ()
+{
+cairo_create (0)
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  cs_build_ok=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libcairo=yes
+		cs_cv_libcairo_cflags=$cs_build_cflags
+		cs_cv_libcairo_lflags=$cs_build_lflags
+		cs_cv_libcairo_libs=$cs_build_libs
+else
+  cs_cv_libcairo=no
+fi
+
+	    { echo "$as_me:$LINENO: result: $cs_cv_libcairo" >&5
+echo "${ECHO_T}$cs_cv_libcairo" >&6; }
+fi
+
+    if test $cs_cv_libcairo = yes; then
+  :
+else
+  cs_cv_libcairo_cflags=''
+	cs_cv_libcairo_lflags=''
+	cs_cv_libcairo_libs=''
+
+fi
+
+else
+  cs_cv_libcairo=no
+fi
+
+
+    cs_cv_with_cairo="$with_cairo"
+    if test "$cs_cv_libcairo" = yes; then
+  if test "$cs_cv_libcairo" = yes; then
+  cs_build_prop_val="yes"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CAIRO.AVAILABLE ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+	cs_build_prop_val="$cs_cv_libcairo_cflags"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CAIRO.CFLAGS ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+	cs_build_prop_val="$cs_cv_libcairo_lflags $cs_cv_libcairo_libs"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CAIRO.LFLAGS ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+fi
+
+fi
+
+
+
+# Check whether --with-cairomm-1.0 was given.
+if test "${with_cairomm_1_0+set}" = set; then
+  withval=$with_cairomm_1_0;
+fi
+
+
+    # Backward compatibility: Recognize --with-libcairomm-1.0 as alias for --with-cairomm-1.0.
+    if test -n "$with_libcairomm_1_0" &&
+           test -z "$with_cairomm_1_0"; then
+  with_cairomm_1_0="$with_libcairomm_1_0"
+fi
+
+
+    if test -z "$with_cairomm_1_0"; then
+  with_cairomm_1_0=yes
+fi
+
+    if test "$with_cairomm_1_0" != no; then
+  # If --with-cairomm-1.0 value is same as cached value, then assume other
+	 # cached values are also valid; otherwise, ignore all cached values.
+	if test "$with_cairomm_1_0" != "$cs_cv_with_cairomm_1_0"; then
+  cs_ignore_cache=yes
+else
+  cs_ignore_cache=no
+fi
+
+
+	cs_check_lib_flags=''
+	if test $with_cairomm_1_0 = yes; then
+  if test "$cs_prog_pkg_config_checked" != yes; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin$PATH_SEPARATOR${srcdir}/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
+  for ac_prog in pkg-config
+  do
+    # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
+set dummy $ac_tool_prefix$ac_prog; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_prog_PKG_CONFIG+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$PKG_CONFIG"; then
+  ac_cv_prog_PKG_CONFIG="$PKG_CONFIG" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_PKG_CONFIG="$ac_tool_prefix$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+fi
+fi
+PKG_CONFIG=$ac_cv_prog_PKG_CONFIG
+if test -n "$PKG_CONFIG"; then
+  { echo "$as_me:$LINENO: result: $PKG_CONFIG" >&5
+echo "${ECHO_T}$PKG_CONFIG" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+
+    test -n "$PKG_CONFIG" && break
+  done
+fi
+if test -z "$PKG_CONFIG"; then
+  ac_ct_PKG_CONFIG=$PKG_CONFIG
+  for ac_prog in pkg-config
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_prog_ac_ct_PKG_CONFIG+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$ac_ct_PKG_CONFIG"; then
+  ac_cv_prog_ac_ct_PKG_CONFIG="$ac_ct_PKG_CONFIG" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_ac_ct_PKG_CONFIG="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+fi
+fi
+ac_ct_PKG_CONFIG=$ac_cv_prog_ac_ct_PKG_CONFIG
+if test -n "$ac_ct_PKG_CONFIG"; then
+  { echo "$as_me:$LINENO: result: $ac_ct_PKG_CONFIG" >&5
+echo "${ECHO_T}$ac_ct_PKG_CONFIG" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+
+  test -n "$ac_ct_PKG_CONFIG" && break
+done
+
+  if test "x$ac_ct_PKG_CONFIG" = x; then
+    PKG_CONFIG=""
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ echo "$as_me:$LINENO: WARNING: In the future, Autoconf will not detect cross-tools
+whose name does not start with the host triplet.  If you think this
+configuration is useful to you, please write to autoconf@gnu.org." >&5
+echo "$as_me: WARNING: In the future, Autoconf will not detect cross-tools
+whose name does not start with the host triplet.  If you think this
+configuration is useful to you, please write to autoconf@gnu.org." >&2;}
+ac_tool_warned=yes ;;
+esac
+    PKG_CONFIG=$ac_ct_PKG_CONFIG
+  fi
+fi
+
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+	cs_prog_pkg_config_checked=yes
+fi
+
+    if test -z "$cs_cv_prog_pkg_config_ok"; then
+  if test -n "$PKG_CONFIG"; then
+  if $PKG_CONFIG --atleast-pkgconfig-version=0.9.0; then
+  cs_cv_prog_pkg_config_ok=yes
+else
+  cs_cv_prog_pkg_config_ok=no
+fi
+
+else
+  cs_cv_prog_pkg_config_ok=no
+fi
+
+fi
+
+    if test $cs_cv_prog_pkg_config_ok = yes; then
+  { echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes cairomm-1.0" >&5
+echo $ECHO_N "checking if $PKG_CONFIG recognizes cairomm-1.0... $ECHO_C" >&6; }
+if test "${cs_cv_prog_pkg_config_cairomm_1_0+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if $PKG_CONFIG --exists cairomm-1.0; then
+  cs_cv_prog_pkg_config_cairomm_1_0=yes
+else
+  cs_cv_prog_pkg_config_cairomm_1_0=no
+fi
+
+fi
+{ echo "$as_me:$LINENO: result: $cs_cv_prog_pkg_config_cairomm_1_0" >&5
+echo "${ECHO_T}$cs_cv_prog_pkg_config_cairomm_1_0" >&6; }
+	if test $cs_cv_prog_pkg_config_cairomm_1_0 = yes; then
+  if test -z "$cs_cv_prog_pkg_config_cairomm_1_0_flags"; then
+  cs_check_lib_cflag=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --cflags cairomm-1.0") >&5
+  ($PKG_CONFIG --cflags cairomm-1.0) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_check_lib_lflag=''
+	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs cairomm-1.0") >&5
+  ($PKG_CONFIG --libs cairomm-1.0) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_pkg_config_cairomm_1_0_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
+fi
+
+    cs_check_lib_flags="$cs_check_lib_flags $cs_cv_prog_pkg_config_cairomm_1_0_flags"
+fi
+
+fi
+
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin$PATH_SEPARATOR${srcdir}/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
+  for ac_prog in cairomm-1.0-config
+  do
+    # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
+set dummy $ac_tool_prefix$ac_prog; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_prog_CONFIG_CAIROMM_1_0+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$CONFIG_CAIROMM_1_0"; then
+  ac_cv_prog_CONFIG_CAIROMM_1_0="$CONFIG_CAIROMM_1_0" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_CONFIG_CAIROMM_1_0="$ac_tool_prefix$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+fi
+fi
+CONFIG_CAIROMM_1_0=$ac_cv_prog_CONFIG_CAIROMM_1_0
+if test -n "$CONFIG_CAIROMM_1_0"; then
+  { echo "$as_me:$LINENO: result: $CONFIG_CAIROMM_1_0" >&5
+echo "${ECHO_T}$CONFIG_CAIROMM_1_0" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+
+    test -n "$CONFIG_CAIROMM_1_0" && break
+  done
+fi
+if test -z "$CONFIG_CAIROMM_1_0"; then
+  ac_ct_CONFIG_CAIROMM_1_0=$CONFIG_CAIROMM_1_0
+  for ac_prog in cairomm-1.0-config
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_prog_ac_ct_CONFIG_CAIROMM_1_0+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$ac_ct_CONFIG_CAIROMM_1_0"; then
+  ac_cv_prog_ac_ct_CONFIG_CAIROMM_1_0="$ac_ct_CONFIG_CAIROMM_1_0" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_ac_ct_CONFIG_CAIROMM_1_0="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+fi
+fi
+ac_ct_CONFIG_CAIROMM_1_0=$ac_cv_prog_ac_ct_CONFIG_CAIROMM_1_0
+if test -n "$ac_ct_CONFIG_CAIROMM_1_0"; then
+  { echo "$as_me:$LINENO: result: $ac_ct_CONFIG_CAIROMM_1_0" >&5
+echo "${ECHO_T}$ac_ct_CONFIG_CAIROMM_1_0" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+
+  test -n "$ac_ct_CONFIG_CAIROMM_1_0" && break
+done
+
+  if test "x$ac_ct_CONFIG_CAIROMM_1_0" = x; then
+    CONFIG_CAIROMM_1_0=""
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ echo "$as_me:$LINENO: WARNING: In the future, Autoconf will not detect cross-tools
+whose name does not start with the host triplet.  If you think this
+configuration is useful to you, please write to autoconf@gnu.org." >&5
+echo "$as_me: WARNING: In the future, Autoconf will not detect cross-tools
+whose name does not start with the host triplet.  If you think this
+configuration is useful to you, please write to autoconf@gnu.org." >&2;}
+ac_tool_warned=yes ;;
+esac
+    CONFIG_CAIROMM_1_0=$ac_ct_CONFIG_CAIROMM_1_0
+  fi
+fi
+
+    if test -n "$CONFIG_CAIROMM_1_0"; then
+  if test -z "$cs_cv_prog_config_cairomm_1_0_ok"; then
+  if $CONFIG_CAIROMM_1_0 --cflags --libs >/dev/null 2>&1; then
+  cs_cv_prog_config_cairomm_1_0_ok=yes
+else
+  cs_cv_prog_config_cairomm_1_0_ok=no
+fi
+
+fi
+
+	if test $cs_cv_prog_config_cairomm_1_0_ok = yes; then
+  if test -z "$cs_cv_prog_config_cairomm_1_0_flags"; then
+  cs_check_lib_cflag=`{ (echo "$as_me:$LINENO: \$CONFIG_CAIROMM_1_0 --cflags ") >&5
+  ($CONFIG_CAIROMM_1_0 --cflags ) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_check_lib_lflag=''
+	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_CAIROMM_1_0 --libs ") >&5
+  ($CONFIG_CAIROMM_1_0 --libs ) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_config_cairomm_1_0_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
+fi
+
+    cs_check_lib_flags="$cs_check_lib_flags $cs_cv_prog_config_cairomm_1_0_flags"
+fi
+
+fi
+
+
+fi
+
+
+	if test $with_cairomm_1_0 != yes; then
+  cs_check_lib_paths=$with_cairomm_1_0
+else
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib "
+fi
+
+	for cs_lib_item in $cs_check_lib_paths
+    do
+	case $cs_lib_item in
+	    *\|*)
+    set filler `echo "$cs_lib_item" | awk 'BEGIN { FS="|" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_check_incdir=''
+else
+  if test "$1" = filler; then
+  cs_check_incdir=''
+else
+  cs_check_incdir=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_check_libdir=''
+else
+  if test "$1" = filler; then
+  cs_check_libdir=''
+else
+  cs_check_libdir=$1
+fi
+
+	shift
+fi
+
+		if test -n "$cs_check_incdir"; then
+  cs_check_lib_cflag="-I$cs_check_incdir"
+else
+  cs_check_lib_cflag=''
+fi
+
+    if test -n "$cs_check_libdir"; then
+  cs_check_lib_lflag="-L$cs_check_libdir"
+else
+  cs_check_lib_lflag=''
+fi
+
+    if test -n "cairomm-1.0"; then
+  cs_check_lib_libs="-lcairomm-1.0"
+	cs_check_lib_framework="-framework cairomm-1.0"
+else
+  cs_check_lib_libs=''
+	cs_check_lib_framework=''
+fi
+
+    cs_check_lib_flags="$cs_check_lib_flags
+	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
+		;;
+	    *)  if test -n "$cs_lib_item/include"; then
+  cs_check_lib_cflag="-I$cs_lib_item/include"
+else
+  cs_check_lib_cflag=''
+fi
+
+    if test -n "$cs_lib_item/lib"; then
+  cs_check_lib_lflag="-L$cs_lib_item/lib"
+else
+  cs_check_lib_lflag=''
+fi
+
+    if test -n "cairomm-1.0"; then
+  cs_check_lib_libs="-lcairomm-1.0"
+	cs_check_lib_framework="-framework cairomm-1.0"
+else
+  cs_check_lib_libs=''
+	cs_check_lib_framework=''
+fi
+
+    cs_check_lib_flags="$cs_check_lib_flags
+	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
+		if test -n "$cs_lib_item"; then
+  cs_check_lib_cflag="-I$cs_lib_item"
+else
+  cs_check_lib_cflag=''
+fi
+
+    if test -n "$cs_lib_item"; then
+  cs_check_lib_lflag="-L$cs_lib_item"
+else
+  cs_check_lib_lflag=''
+fi
+
+    if test -n "cairomm-1.0"; then
+  cs_check_lib_libs="-lcairomm-1.0"
+	cs_check_lib_framework="-framework cairomm-1.0"
+else
+  cs_check_lib_libs=''
+	cs_check_lib_framework=''
+fi
+
+    cs_check_lib_flags="$cs_check_lib_flags
+	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
+		;;
+	esac
+    done
+
+
+	if test "$cs_ignore_cache" != yes; then
+  { echo "$as_me:$LINENO: checking for libcairomm-1.0" >&5
+echo $ECHO_N "checking for libcairomm-1.0... $ECHO_C" >&6; }
+if test "${cs_cv_libcairomm_1_0+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+    cs_cflags_save="$CXXFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in $cs_check_lib_flags
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CXXFLAGS="$cs_cflags_test $cs_cv_libcairo_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libcairo_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libcairo_libs $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <cairomm/cairomm.h>
+int
+main ()
+{
+Cairo::Context c ((cairo_t*)0)
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  cs_build_ok=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+
+    CXXFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libcairo_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libcairo_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libcairo_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libcairomm_1_0=yes
+		cs_cv_libcairomm_1_0_cflags=$cs_build_cflags
+		cs_cv_libcairomm_1_0_lflags=$cs_build_lflags
+		cs_cv_libcairomm_1_0_libs=$cs_build_libs
+else
+  cs_cv_libcairomm_1_0=no
+fi
+
+fi
+{ echo "$as_me:$LINENO: result: $cs_cv_libcairomm_1_0" >&5
+echo "${ECHO_T}$cs_cv_libcairomm_1_0" >&6; }
+else
+  { echo "$as_me:$LINENO: checking for libcairomm-1.0" >&5
+echo $ECHO_N "checking for libcairomm-1.0... $ECHO_C" >&6; }
+	    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+    cs_cflags_save="$CXXFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in $cs_check_lib_flags
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CXXFLAGS="$cs_cflags_test $cs_cv_libcairo_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libcairo_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libcairo_libs $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <cairomm/cairomm.h>
+int
+main ()
+{
+Cairo::Context c ((cairo_t*)0)
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  cs_build_ok=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+
+    CXXFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libcairo_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libcairo_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libcairo_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libcairomm_1_0=yes
+		cs_cv_libcairomm_1_0_cflags=$cs_build_cflags
+		cs_cv_libcairomm_1_0_lflags=$cs_build_lflags
+		cs_cv_libcairomm_1_0_libs=$cs_build_libs
+else
+  cs_cv_libcairomm_1_0=no
+fi
+
+	    { echo "$as_me:$LINENO: result: $cs_cv_libcairomm_1_0" >&5
+echo "${ECHO_T}$cs_cv_libcairomm_1_0" >&6; }
+fi
+
+    if test $cs_cv_libcairomm_1_0 = yes; then
+  :
+else
+  cs_cv_libcairomm_1_0_cflags=''
+	cs_cv_libcairomm_1_0_lflags=''
+	cs_cv_libcairomm_1_0_libs=''
+
+fi
+
+else
+  cs_cv_libcairomm_1_0=no
+fi
+
+
+    cs_cv_with_cairomm_1_0="$with_cairomm_1_0"
+    if test "$cs_cv_libcairomm_1_0" = yes; then
+  if test "$cs_cv_libcairomm" = yes; then
+  cs_build_prop_val="yes"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CAIROMM.AVAILABLE ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+	cs_build_prop_val="$cs_cv_libcairomm_cflags"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CAIROMM.CFLAGS ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+	cs_build_prop_val="$cs_cv_libcairomm_lflags $cs_cv_libcairomm_libs"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CAIROMM.LFLAGS ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+fi
+
+fi
+
+
+
+# Check whether --with-vgvm was given.
+if test "${with_vgvm+set}" = set; then
+  withval=$with_vgvm;
+fi
+
+
+    # Backward compatibility: Recognize --with-libvgvm as alias for --with-vgvm.
+    if test -n "$with_libvgvm" &&
+           test -z "$with_vgvm"; then
+  with_vgvm="$with_libvgvm"
+fi
+
+
+    if test -z "$with_vgvm"; then
+  with_vgvm=yes
+fi
+
+    if test "$with_vgvm" != no; then
+  # If --with-vgvm value is same as cached value, then assume other
+	 # cached values are also valid; otherwise, ignore all cached values.
+	if test "$with_vgvm" != "$cs_cv_with_vgvm"; then
+  cs_ignore_cache=yes
+else
+  cs_ignore_cache=no
+fi
+
+
+	cs_check_lib_flags=''
+	if test $with_vgvm = yes; then
+  if test "$cs_prog_pkg_config_checked" != yes; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin$PATH_SEPARATOR${srcdir}/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
+  for ac_prog in pkg-config
+  do
+    # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
+set dummy $ac_tool_prefix$ac_prog; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_prog_PKG_CONFIG+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$PKG_CONFIG"; then
+  ac_cv_prog_PKG_CONFIG="$PKG_CONFIG" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_PKG_CONFIG="$ac_tool_prefix$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+fi
+fi
+PKG_CONFIG=$ac_cv_prog_PKG_CONFIG
+if test -n "$PKG_CONFIG"; then
+  { echo "$as_me:$LINENO: result: $PKG_CONFIG" >&5
+echo "${ECHO_T}$PKG_CONFIG" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+
+    test -n "$PKG_CONFIG" && break
+  done
+fi
+if test -z "$PKG_CONFIG"; then
+  ac_ct_PKG_CONFIG=$PKG_CONFIG
+  for ac_prog in pkg-config
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_prog_ac_ct_PKG_CONFIG+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$ac_ct_PKG_CONFIG"; then
+  ac_cv_prog_ac_ct_PKG_CONFIG="$ac_ct_PKG_CONFIG" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_ac_ct_PKG_CONFIG="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+fi
+fi
+ac_ct_PKG_CONFIG=$ac_cv_prog_ac_ct_PKG_CONFIG
+if test -n "$ac_ct_PKG_CONFIG"; then
+  { echo "$as_me:$LINENO: result: $ac_ct_PKG_CONFIG" >&5
+echo "${ECHO_T}$ac_ct_PKG_CONFIG" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+
+  test -n "$ac_ct_PKG_CONFIG" && break
+done
+
+  if test "x$ac_ct_PKG_CONFIG" = x; then
+    PKG_CONFIG=""
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ echo "$as_me:$LINENO: WARNING: In the future, Autoconf will not detect cross-tools
+whose name does not start with the host triplet.  If you think this
+configuration is useful to you, please write to autoconf@gnu.org." >&5
+echo "$as_me: WARNING: In the future, Autoconf will not detect cross-tools
+whose name does not start with the host triplet.  If you think this
+configuration is useful to you, please write to autoconf@gnu.org." >&2;}
+ac_tool_warned=yes ;;
+esac
+    PKG_CONFIG=$ac_ct_PKG_CONFIG
+  fi
+fi
+
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+	cs_prog_pkg_config_checked=yes
+fi
+
+    if test -z "$cs_cv_prog_pkg_config_ok"; then
+  if test -n "$PKG_CONFIG"; then
+  if $PKG_CONFIG --atleast-pkgconfig-version=0.9.0; then
+  cs_cv_prog_pkg_config_ok=yes
+else
+  cs_cv_prog_pkg_config_ok=no
+fi
+
+else
+  cs_cv_prog_pkg_config_ok=no
+fi
+
+fi
+
+    if test $cs_cv_prog_pkg_config_ok = yes; then
+  { echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes vgvm" >&5
+echo $ECHO_N "checking if $PKG_CONFIG recognizes vgvm... $ECHO_C" >&6; }
+if test "${cs_cv_prog_pkg_config_vgvm+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if $PKG_CONFIG --exists vgvm; then
+  cs_cv_prog_pkg_config_vgvm=yes
+else
+  cs_cv_prog_pkg_config_vgvm=no
+fi
+
+fi
+{ echo "$as_me:$LINENO: result: $cs_cv_prog_pkg_config_vgvm" >&5
+echo "${ECHO_T}$cs_cv_prog_pkg_config_vgvm" >&6; }
+	if test $cs_cv_prog_pkg_config_vgvm = yes; then
+  if test -z "$cs_cv_prog_pkg_config_vgvm_flags"; then
+  cs_check_lib_cflag=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --cflags vgvm") >&5
+  ($PKG_CONFIG --cflags vgvm) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_check_lib_lflag=''
+	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs vgvm") >&5
+  ($PKG_CONFIG --libs vgvm) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_pkg_config_vgvm_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
+fi
+
+    cs_check_lib_flags="$cs_check_lib_flags $cs_cv_prog_pkg_config_vgvm_flags"
+fi
+
+fi
+
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin$PATH_SEPARATOR${srcdir}/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
+  for ac_prog in vgvm-config
+  do
+    # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
+set dummy $ac_tool_prefix$ac_prog; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_prog_CONFIG_VGVM+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$CONFIG_VGVM"; then
+  ac_cv_prog_CONFIG_VGVM="$CONFIG_VGVM" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_CONFIG_VGVM="$ac_tool_prefix$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+fi
+fi
+CONFIG_VGVM=$ac_cv_prog_CONFIG_VGVM
+if test -n "$CONFIG_VGVM"; then
+  { echo "$as_me:$LINENO: result: $CONFIG_VGVM" >&5
+echo "${ECHO_T}$CONFIG_VGVM" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+
+    test -n "$CONFIG_VGVM" && break
+  done
+fi
+if test -z "$CONFIG_VGVM"; then
+  ac_ct_CONFIG_VGVM=$CONFIG_VGVM
+  for ac_prog in vgvm-config
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_prog_ac_ct_CONFIG_VGVM+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$ac_ct_CONFIG_VGVM"; then
+  ac_cv_prog_ac_ct_CONFIG_VGVM="$ac_ct_CONFIG_VGVM" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_ac_ct_CONFIG_VGVM="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+fi
+fi
+ac_ct_CONFIG_VGVM=$ac_cv_prog_ac_ct_CONFIG_VGVM
+if test -n "$ac_ct_CONFIG_VGVM"; then
+  { echo "$as_me:$LINENO: result: $ac_ct_CONFIG_VGVM" >&5
+echo "${ECHO_T}$ac_ct_CONFIG_VGVM" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+
+  test -n "$ac_ct_CONFIG_VGVM" && break
+done
+
+  if test "x$ac_ct_CONFIG_VGVM" = x; then
+    CONFIG_VGVM=""
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ echo "$as_me:$LINENO: WARNING: In the future, Autoconf will not detect cross-tools
+whose name does not start with the host triplet.  If you think this
+configuration is useful to you, please write to autoconf@gnu.org." >&5
+echo "$as_me: WARNING: In the future, Autoconf will not detect cross-tools
+whose name does not start with the host triplet.  If you think this
+configuration is useful to you, please write to autoconf@gnu.org." >&2;}
+ac_tool_warned=yes ;;
+esac
+    CONFIG_VGVM=$ac_ct_CONFIG_VGVM
+  fi
+fi
+
+    if test -n "$CONFIG_VGVM"; then
+  if test -z "$cs_cv_prog_config_vgvm_ok"; then
+  if $CONFIG_VGVM --cflags --libs >/dev/null 2>&1; then
+  cs_cv_prog_config_vgvm_ok=yes
+else
+  cs_cv_prog_config_vgvm_ok=no
+fi
+
+fi
+
+	if test $cs_cv_prog_config_vgvm_ok = yes; then
+  if test -z "$cs_cv_prog_config_vgvm_flags"; then
+  cs_check_lib_cflag=`{ (echo "$as_me:$LINENO: \$CONFIG_VGVM --cflags ") >&5
+  ($CONFIG_VGVM --cflags ) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_check_lib_lflag=''
+	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_VGVM --libs ") >&5
+  ($CONFIG_VGVM --libs ) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_config_vgvm_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
+fi
+
+    cs_check_lib_flags="$cs_check_lib_flags $cs_cv_prog_config_vgvm_flags"
+fi
+
+fi
+
+
+fi
+
+
+	if test $with_vgvm != yes; then
+  cs_check_lib_paths=$with_vgvm
+else
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib "
+fi
+
+	for cs_lib_item in $cs_check_lib_paths
+    do
+	case $cs_lib_item in
+	    *\|*)
+    set filler `echo "$cs_lib_item" | awk 'BEGIN { FS="|" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_check_incdir=''
+else
+  if test "$1" = filler; then
+  cs_check_incdir=''
+else
+  cs_check_incdir=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_check_libdir=''
+else
+  if test "$1" = filler; then
+  cs_check_libdir=''
+else
+  cs_check_libdir=$1
+fi
+
+	shift
+fi
+
+		if test -n "$cs_check_incdir"; then
+  cs_check_lib_cflag="-I$cs_check_incdir"
+else
+  cs_check_lib_cflag=''
+fi
+
+    if test -n "$cs_check_libdir"; then
+  cs_check_lib_lflag="-L$cs_check_libdir"
+else
+  cs_check_lib_lflag=''
+fi
+
+    if test -n "vgvm"; then
+  cs_check_lib_libs="-lvgvm"
+	cs_check_lib_framework="-framework vgvm"
+else
+  cs_check_lib_libs=''
+	cs_check_lib_framework=''
+fi
+
+    cs_check_lib_flags="$cs_check_lib_flags
+	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
+		;;
+	    *)  if test -n "$cs_lib_item/include"; then
+  cs_check_lib_cflag="-I$cs_lib_item/include"
+else
+  cs_check_lib_cflag=''
+fi
+
+    if test -n "$cs_lib_item/lib"; then
+  cs_check_lib_lflag="-L$cs_lib_item/lib"
+else
+  cs_check_lib_lflag=''
+fi
+
+    if test -n "vgvm"; then
+  cs_check_lib_libs="-lvgvm"
+	cs_check_lib_framework="-framework vgvm"
+else
+  cs_check_lib_libs=''
+	cs_check_lib_framework=''
+fi
+
+    cs_check_lib_flags="$cs_check_lib_flags
+	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
+		if test -n "$cs_lib_item"; then
+  cs_check_lib_cflag="-I$cs_lib_item"
+else
+  cs_check_lib_cflag=''
+fi
+
+    if test -n "$cs_lib_item"; then
+  cs_check_lib_lflag="-L$cs_lib_item"
+else
+  cs_check_lib_lflag=''
+fi
+
+    if test -n "vgvm"; then
+  cs_check_lib_libs="-lvgvm"
+	cs_check_lib_framework="-framework vgvm"
+else
+  cs_check_lib_libs=''
+	cs_check_lib_framework=''
+fi
+
+    cs_check_lib_flags="$cs_check_lib_flags
+	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
+		;;
+	esac
+    done
+
+
+	if test "$cs_ignore_cache" != yes; then
+  { echo "$as_me:$LINENO: checking for libvgvm" >&5
+echo $ECHO_N "checking for libvgvm... $ECHO_C" >&6; }
+if test "${cs_cv_libvgvm+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+    cs_cflags_save="$CXXFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in $cs_check_lib_flags
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CXXFLAGS="$cs_cflags_test $cs_cv_libcairomm_1_0_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libcairomm_1_0_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libcairomm_1_0_libs $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <vgvm/vgvm.h>
+int
+main ()
+{
+new vgvm::Program (0,0)
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  cs_build_ok=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+
+    CXXFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libcairomm_1_0_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libcairomm_1_0_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libcairomm_1_0_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libvgvm=yes
+		cs_cv_libvgvm_cflags=$cs_build_cflags
+		cs_cv_libvgvm_lflags=$cs_build_lflags
+		cs_cv_libvgvm_libs=$cs_build_libs
+else
+  cs_cv_libvgvm=no
+fi
+
+fi
+{ echo "$as_me:$LINENO: result: $cs_cv_libvgvm" >&5
+echo "${ECHO_T}$cs_cv_libvgvm" >&6; }
+else
+  { echo "$as_me:$LINENO: checking for libvgvm" >&5
+echo $ECHO_N "checking for libvgvm... $ECHO_C" >&6; }
+	    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+    cs_cflags_save="$CXXFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in $cs_check_lib_flags
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CXXFLAGS="$cs_cflags_test $cs_cv_libcairomm_1_0_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libcairomm_1_0_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libcairomm_1_0_libs $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <vgvm/vgvm.h>
+int
+main ()
+{
+new vgvm::Program (0,0)
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  cs_build_ok=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+
+    CXXFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libcairomm_1_0_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libcairomm_1_0_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libcairomm_1_0_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libvgvm=yes
+		cs_cv_libvgvm_cflags=$cs_build_cflags
+		cs_cv_libvgvm_lflags=$cs_build_lflags
+		cs_cv_libvgvm_libs=$cs_build_libs
+else
+  cs_cv_libvgvm=no
+fi
+
+	    { echo "$as_me:$LINENO: result: $cs_cv_libvgvm" >&5
+echo "${ECHO_T}$cs_cv_libvgvm" >&6; }
+fi
+
+    if test $cs_cv_libvgvm = yes; then
+  :
+else
+  cs_cv_libvgvm_cflags=''
+	cs_cv_libvgvm_lflags=''
+	cs_cv_libvgvm_libs=''
+
+fi
+
+else
+  cs_cv_libvgvm=no
+fi
+
+
+    cs_cv_with_vgvm="$with_vgvm"
+    if test "$cs_cv_libvgvm" = yes; then
+  if test "$cs_cv_libvgvm" = yes; then
+  cs_build_prop_val="yes"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}VGVM.AVAILABLE ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+	cs_build_prop_val="$cs_cv_libvgvm_cflags"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}VGVM.CFLAGS ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+	cs_build_prop_val="$cs_cv_libvgvm_lflags $cs_cv_libvgvm_libs"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}VGVM.LFLAGS ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+fi
+
+fi
+
+
+
+
+#------------------------------------------------------------------------------
 # Check for MikMod.  In addition to the standard installed locations, we also
 # search CS/libs/libmikmod*.
 #------------------------------------------------------------------------------
@@ -47187,10 +49616,9 @@ fi
 
 	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
-	LIBS="$cs_libs_test -lbulletccdphysics \
-    -lbulletphysicsinterfacecommon \
-    -lbulletdynamics \
-    -lbullet $cs_libs_save"
+	LIBS="$cs_libs_test -lbulletdynamics \
+    -lbulletcollision \
+    -lbulletmath $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -47198,17 +49626,17 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 
-    #include <BroadphaseCollision/SimpleBroadphase.h>
-    #include <CcdPhysics/CcdPhysicsController.h>
-    #include <CcdPhysics/CcdPhysicsEnvironment.h>
-    #include <CollisionDispatch/CollisionDispatcher.h>
+    #include "btBulletDynamicsCommon.h"
+    #include "btBulletCollisionCommon.h"
 
 int
 main ()
 {
-CollisionDispatcher d;
-    SimpleBroadphase b;
-    CcdPhysicsEnvironment* e = new CcdPhysicsEnvironment (&d, &b)
+btCollisionDispatcher* d;
+    btBroadphaseInterface* b;
+    btSequentialImpulseConstraintSolver* s;
+    btDefaultCollisionConfiguration* c;
+    btDynamicsWorld* world = new btDiscreteDynamicsWorld (d, b, s, c)
   ;
   return 0;
 }
@@ -47261,10 +49689,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     if test $cs_build_ok = yes; then
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test -lbulletccdphysics \
-    -lbulletphysicsinterfacecommon \
-    -lbulletdynamics \
-    -lbullet | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test -lbulletdynamics \
+    -lbulletcollision \
+    -lbulletmath | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libbullet=yes
 		cs_cv_libbullet_cflags=$cs_build_cflags
 		cs_cv_libbullet_lflags=$cs_build_lflags
@@ -47349,10 +49776,9 @@ fi
 
 	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
-	LIBS="$cs_libs_test -lbulletccdphysics \
-    -lbulletphysicsinterfacecommon \
-    -lbulletdynamics \
-    -lbullet $cs_libs_save"
+	LIBS="$cs_libs_test -lbulletdynamics \
+    -lbulletcollision \
+    -lbulletmath $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -47360,17 +49786,17 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 
-    #include <BroadphaseCollision/SimpleBroadphase.h>
-    #include <CcdPhysics/CcdPhysicsController.h>
-    #include <CcdPhysics/CcdPhysicsEnvironment.h>
-    #include <CollisionDispatch/CollisionDispatcher.h>
+    #include "btBulletDynamicsCommon.h"
+    #include "btBulletCollisionCommon.h"
 
 int
 main ()
 {
-CollisionDispatcher d;
-    SimpleBroadphase b;
-    CcdPhysicsEnvironment* e = new CcdPhysicsEnvironment (&d, &b)
+btCollisionDispatcher* d;
+    btBroadphaseInterface* b;
+    btSequentialImpulseConstraintSolver* s;
+    btDefaultCollisionConfiguration* c;
+    btDynamicsWorld* world = new btDiscreteDynamicsWorld (d, b, s, c)
   ;
   return 0;
 }
@@ -47423,10 +49849,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     if test $cs_build_ok = yes; then
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test -lbulletccdphysics \
-    -lbulletphysicsinterfacecommon \
-    -lbulletdynamics \
-    -lbullet | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test -lbulletdynamics \
+    -lbulletcollision \
+    -lbulletmath | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libbullet=yes
 		cs_cv_libbullet_cflags=$cs_build_cflags
 		cs_cv_libbullet_lflags=$cs_build_lflags
@@ -81988,6 +84413,12 @@ CONFIG_MNG!$CONFIG_MNG$ac_delim
 ac_ct_CONFIG_MNG!$ac_ct_CONFIG_MNG$ac_delim
 CONFIG_LIBMNG!$CONFIG_LIBMNG$ac_delim
 ac_ct_CONFIG_LIBMNG!$ac_ct_CONFIG_LIBMNG$ac_delim
+CONFIG_CAIRO!$CONFIG_CAIRO$ac_delim
+ac_ct_CONFIG_CAIRO!$ac_ct_CONFIG_CAIRO$ac_delim
+CONFIG_CAIROMM_1_0!$CONFIG_CAIROMM_1_0$ac_delim
+ac_ct_CONFIG_CAIROMM_1_0!$ac_ct_CONFIG_CAIROMM_1_0$ac_delim
+CONFIG_VGVM!$CONFIG_VGVM$ac_delim
+ac_ct_CONFIG_VGVM!$ac_ct_CONFIG_VGVM$ac_delim
 CONFIG_MIKMOD!$CONFIG_MIKMOD$ac_delim
 ac_ct_CONFIG_MIKMOD!$ac_ct_CONFIG_MIKMOD$ac_delim
 CONFIG_OGG!$CONFIG_OGG$ac_delim
@@ -82031,12 +84462,6 @@ ac_ct_CONFIG_CGGL!$ac_ct_CONFIG_CGGL$ac_delim
 CONFIG_JACKASYN!$CONFIG_JACKASYN$ac_delim
 ac_ct_CONFIG_JACKASYN!$ac_ct_CONFIG_JACKASYN$ac_delim
 CONFIG_ASOUND!$CONFIG_ASOUND$ac_delim
-ac_ct_CONFIG_ASOUND!$ac_ct_CONFIG_ASOUND$ac_delim
-CONFIG_CACA!$CONFIG_CACA$ac_delim
-ac_ct_CONFIG_CACA!$ac_ct_CONFIG_CACA$ac_delim
-CONFIG_LIBCACA!$CONFIG_LIBCACA$ac_delim
-ac_ct_CONFIG_LIBCACA!$ac_ct_CONFIG_LIBCACA$ac_delim
-TTREE!$TTREE$ac_delim
 _ACEOF
 
   if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 97; then
@@ -82078,6 +84503,12 @@ _ACEOF
 ac_delim='%!_!# '
 for ac_last_try in false false false false false :; do
   cat >conf$$subs.sed <<_ACEOF
+ac_ct_CONFIG_ASOUND!$ac_ct_CONFIG_ASOUND$ac_delim
+CONFIG_CACA!$CONFIG_CACA$ac_delim
+ac_ct_CONFIG_CACA!$ac_ct_CONFIG_CACA$ac_delim
+CONFIG_LIBCACA!$CONFIG_LIBCACA$ac_delim
+ac_ct_CONFIG_LIBCACA!$ac_ct_CONFIG_LIBCACA$ac_delim
+TTREE!$TTREE$ac_delim
 CONFIG_CPPUNIT!$CONFIG_CPPUNIT$ac_delim
 ac_ct_CONFIG_CPPUNIT!$ac_ct_CONFIG_CPPUNIT$ac_delim
 CONFIG_BFD!$CONFIG_BFD$ac_delim
@@ -82086,7 +84517,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 6; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 12; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5
