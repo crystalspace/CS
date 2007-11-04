@@ -121,12 +121,15 @@ namespace CS
         }
       }
 
-      void UnloadUnusedMaterials(iEngine* engine, csWeakRefArray<iMaterialWrapper> materials)
+      void UnloadUnusedMaterials(iEngine* engine,
+        const csWeakRefArray<iMaterialWrapper>& materials)
       {
         iRegionList *regList = engine->GetRegions();
 
-        for(uint i=0; i<materials.GetSize(); i++)
+        for(size_t i=0; i<materials.GetSize(); i++)
         {
+          if (materials[i] == 0) continue;
+
           bool inRegion = false;
           iRegion* region;
           for(int j=0; j<regList->GetCount(); j++)
@@ -146,18 +149,19 @@ namespace CS
             if(inRegion)
               region->Remove(materials.Get(i)->QueryObject());
             engine->GetMaterialList()->Remove(materials.Get(i));
-            materials.DeleteIndex(i);
-            i--;
           }
         }
       }
 
-      void UnloadUnusedTextures(iEngine* engine, csWeakRefArray<iTextureWrapper> textures)
+      void UnloadUnusedTextures(iEngine* engine,
+        const csWeakRefArray<iTextureWrapper>& textures)
       {
         iRegionList *regList = engine->GetRegions();
 
-        for(uint i=0; i<textures.GetSize(); i++)
+        for(size_t i=0; i<textures.GetSize(); i++)
         {
+          if (textures[i] == 0) continue;
+
           bool inRegion = false;
           iRegion* region;
           for(int j=0; j<regList->GetCount(); j++)
@@ -177,18 +181,19 @@ namespace CS
             if(inRegion)
               region->Remove(textures.Get(i)->QueryObject());
             engine->GetTextureList()->Remove(textures.Get(i));
-            textures.DeleteIndex(i);
-            i--;
           }
         }
       }
 
-      void UnloadUnusedFactories(iEngine* engine, csWeakRefArray<iMeshFactoryWrapper> factories)
+      void UnloadUnusedFactories(iEngine* engine,
+        const csWeakRefArray<iMeshFactoryWrapper>& factories)
       {
         iRegionList *regList = engine->GetRegions();
 
-        for(uint i=0; i<factories.GetSize(); i++)
+        for(size_t i=0; i<factories.GetSize(); i++)
         {
+          if (factories[i] == 0) continue;
+
           bool inRegion = false;
           iRegion* region;
           for(int j=0; j<regList->GetCount(); j++)
@@ -208,8 +213,6 @@ namespace CS
             if(inRegion)
               region->Remove(factories.Get(i)->QueryObject());
             engine->GetMeshFactories()->Remove(factories.Get(i));
-            factories.DeleteIndex(i);
-            i--;
           }
         }
       }

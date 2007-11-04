@@ -31,12 +31,15 @@ namespace CS
   {
     namespace UnusedResourceHelper
     {
-      void UnloadUnusedMaterials(iEngine* engine, csWeakRefArray<iMaterialWrapper> materials);
-      void UnloadUnusedTextures(iEngine* engine, csWeakRefArray<iTextureWrapper> textures);
-      void UnloadUnusedFactories(iEngine* engine, csWeakRefArray<iMeshFactoryWrapper> factories);
-      void UnloadAllUnusedMaterials(iEngine* engine);
-      void UnloadAllUnusedTextures(iEngine* engine);
-      void UnloadAllUnusedFactories(iEngine* engine);
+      void CS_CRYSTALSPACE_EXPORT UnloadUnusedMaterials(iEngine* engine,
+        const csWeakRefArray<iMaterialWrapper>& materials);
+      void CS_CRYSTALSPACE_EXPORT UnloadUnusedTextures(iEngine* engine,
+        const csWeakRefArray<iTextureWrapper>& textures);
+      void CS_CRYSTALSPACE_EXPORT UnloadUnusedFactories(iEngine* engine, 
+        const csWeakRefArray<iMeshFactoryWrapper>& factories);
+      void CS_CRYSTALSPACE_EXPORT UnloadAllUnusedMaterials(iEngine* engine);
+      void CS_CRYSTALSPACE_EXPORT UnloadAllUnusedTextures(iEngine* engine);
+      void CS_CRYSTALSPACE_EXPORT UnloadAllUnusedFactories(iEngine* engine);
     }
   }
 }

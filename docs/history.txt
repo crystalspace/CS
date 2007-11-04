@@ -19,6 +19,9 @@ chronological order.
 	- res adjusted the preprocessor definitions for lib3ds to contain
 	  LIB3DS_GENERIC_DATA_IO_CALLBACKS, needed for the version contained
 	  in the latest cs-win32libs.
+	- res marked the UnusedResourceHelper() functions with
+	  CS_CRYSTALSPACE_EXPORT, had them take const refs to arrays, and 
+	  added safeguards against 0 entries in arrays.
 3-Nov-2007
 	- Jorrit added an initial port of the bullet physics plugin to the
 	  latest release of bullet (2.64). Not everything is supported yet
