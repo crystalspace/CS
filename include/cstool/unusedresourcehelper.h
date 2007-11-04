@@ -16,8 +16,8 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __UNUSED_RESOURCE_HELPER__
-#define __UNUSED_RESOURCE_HELPER__
+#ifndef __CS_CSUTIL_UNUSED_RESOURCE_HELPER__
+#define __CS_CSUTIL_UNUSED_RESOURCE_HELPER__
 
 #include "csutil/weakrefarr.h"
 #include "iengine/engine.h"
@@ -27,18 +27,18 @@
 
 namespace CS
 {
-    namespace Utility
+  namespace Utility
+  {
+    namespace UnusedResourceHelper
     {
-        namespace UnusedResourceHelper
-        {
-            void UnloadUnusedMaterials(iEngine* engine, csWeakRefArray<iMaterialWrapper> materials);
-            void UnloadUnusedTextures(iEngine* engine, csWeakRefArray<iTextureWrapper> textures);
-            void UnloadUnusedFactories(iEngine* engine, csWeakRefArray<iMeshFactoryWrapper> factories);
-            void UnloadAllUnusedMaterials(iEngine* engine);
-            void UnloadAllUnusedTextures(iEngine* engine);
-            void UnloadAllUnusedFactories(iEngine* engine);
-        }
+      void UnloadUnusedMaterials(iEngine* engine, csWeakRefArray<iMaterialWrapper> materials);
+      void UnloadUnusedTextures(iEngine* engine, csWeakRefArray<iTextureWrapper> textures);
+      void UnloadUnusedFactories(iEngine* engine, csWeakRefArray<iMeshFactoryWrapper> factories);
+      void UnloadAllUnusedMaterials(iEngine* engine);
+      void UnloadAllUnusedTextures(iEngine* engine);
+      void UnloadAllUnusedFactories(iEngine* engine);
     }
+  }
 }
 
-#endif // __UNUSED_RESOURCE_HELPER__
+#endif // __CS_CSUTIL_UNUSED_RESOURCE_HELPER__
