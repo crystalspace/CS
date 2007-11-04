@@ -209,14 +209,6 @@ iTextureWrapper *csTextureList::NewTexture (iTextureHandle *ith)
   return tm;
 }
 
-iTextureWrapper *csTextureList::NewProxyTexture ()
-{
-    csRef<iTextureWrapper> tm;
-    tm.AttachNew (new csTextureWrapper (engine));
-    Push(tm);
-    return tm;
-}
-
 int csTextureList::GetCount () const
 {
   return (int)this->GetSize ();

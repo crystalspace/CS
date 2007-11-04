@@ -663,8 +663,8 @@ static bool TestXML (const char* b)
 
 bool csLoader::Load (iDataBuffer* buffer, const char* fname,
 	iBase*& result, iRegion* region,
-  	bool curRegOnly, bool checkDupes, bool forceLoadTextures, iStreamSource* ssource,
-	const char* override_name, iMissingLoaderData* missingdata)
+  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+	const char* override_name, iMissingLoaderData* missingdata, bool forceLoadTextures)
 {
   result = 0;
 
@@ -677,8 +677,8 @@ bool csLoader::Load (iDataBuffer* buffer, const char* fname,
     if (doc)
     {
       csRef<iDocumentNode> node = doc->GetRoot ();
-      return Load (node, result, region, curRegOnly, checkDupes, forceLoadTextures,
-          ssource, override_name, missingdata);
+      return Load (node, result, region, curRegOnly, checkDupes,
+          ssource, override_name, missingdata, forceLoadTextures);
     }
     else
     {
@@ -722,8 +722,8 @@ bool csLoader::Load (iDataBuffer* buffer, const char* fname,
 }
 
 bool csLoader::Load (const char* fname, iBase*& result, iRegion* region,
-  	bool curRegOnly, bool checkDupes, bool forceLoadTextures, iStreamSource* ssource,
-	const char* override_name, iMissingLoaderData* missingdata)
+  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+	const char* override_name, iMissingLoaderData* missingdata, bool forceLoadTextures)
 {
   result = 0;
 
@@ -737,21 +737,21 @@ bool csLoader::Load (const char* fname, iBase*& result, iRegion* region,
     return false;
   }
   
-  return Load (buf, fname, result, region, curRegOnly, checkDupes, forceLoadTextures, ssource,
-  	override_name, missingdata);
+  return Load (buf, fname, result, region, curRegOnly, checkDupes, ssource,
+  	override_name, missingdata, forceLoadTextures);
 }
 
 bool csLoader::Load (iDataBuffer* buffer, iBase*& result, iRegion* region,
-  	bool curRegOnly, bool checkDupes, bool forceLoadTextures, iStreamSource* ssource,
-	const char* override_name, iMissingLoaderData* missingdata)
+  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+	const char* override_name, iMissingLoaderData* missingdata, bool forceLoadTextures)
 {
-  return Load (buffer, 0, result, region, curRegOnly, checkDupes, forceLoadTextures, ssource,
-  	override_name, missingdata);
+  return Load (buffer, 0, result, region, curRegOnly, checkDupes, ssource,
+  	override_name, missingdata, forceLoadTextures);
 }
 
 bool csLoader::Load (iDocumentNode* node, iBase*& result, iRegion* region,
-  	bool curRegOnly, bool checkDupes, bool forceLoadTextures, iStreamSource* ssource,
-	const char* override_name, iMissingLoaderData* missingdata)
+  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+	const char* override_name, iMissingLoaderData* missingdata, bool forceLoadTextures)
 {
   result = 0;
 
@@ -901,16 +901,16 @@ bool csLoader::LoadMap (iDocumentNode* world_node, bool clearEngine,
 //---------------------------------------------------------------------------
 
 bool csLoader::LoadLibraryFile (const char* fname, iRegion* region,
-	bool curRegOnly, bool checkDupes, bool forceLoadTextures,
-    iStreamSource* ssource,	iMissingLoaderData* missingdata)
+	bool curRegOnly, bool checkDupes,iStreamSource* ssource, 
+    iMissingLoaderData* missingdata, bool forceLoadTextures)
 {
     return LoadMapLibraryFile (fname, region, curRegOnly,
-                               checkDupes, forceLoadTextures, ssource,  missingdata);
+                               checkDupes, ssource, missingdata, forceLoadTextures);
 }
 
 bool csLoader::LoadMapLibraryFile (const char* fname, iRegion* region,
-	bool curRegOnly, bool checkDupes, bool forceLoadTextures, iStreamSource* ssource,
-	iMissingLoaderData* missingdata, bool loadProxyTex)
+	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+	iMissingLoaderData* missingdata, bool forceLoadTextures, bool loadProxyTex)
 {
   csRef<iFile> buf = VFS->Open (fname, VFS_FILE_READ);
 
@@ -962,14 +962,14 @@ bool csLoader::LoadMapLibraryFile (const char* fname, iRegion* region,
 }
 
 bool csLoader::LoadLibrary (iDocumentNode* lib_node, iRegion* region,
-	bool curRegOnly, bool checkDupes, bool forceLoadTextures, iStreamSource* ssource,
-	iMissingLoaderData* missingdata)
+	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+	iMissingLoaderData* missingdata, bool forceLoadTextures)
 {
   csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
 	new StdLoaderContext (Engine, region, curRegOnly, this, checkDupes,
 	  missingdata));
 
-  return LoadLibrary (ldr_context, lib_node, ssource, missingdata);
+  return LoadLibrary (ldr_context, lib_node, ssource, missingdata, true, forceLoadTextures);
 }
 
 //---------------------------------------------------------------------------
@@ -1246,8 +1246,8 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode,
 	    iBase* result;
 	    if (!Load (filename, result, ldr_context->GetRegion (),
 	  	  ldr_context->CurrentRegionOnly (),
-		  ldr_context->CheckDupes (), false,
-		  ssource, name, missingdata))
+		  ldr_context->CheckDupes (),
+		  ssource, name, missingdata, false))
 	    {
               SyntaxService->ReportError (
 	        "crystalspace.maploader.parse.loadingmodel",
@@ -1395,7 +1395,7 @@ bool csLoader::LoadLibraryFromNode (iLoaderContext* ldr_context,
     
     bool rc = LoadMapLibraryFile (file,
 	  	  ldr_context->GetRegion (), ldr_context->CurrentRegionOnly (),
-	      dupes, false, ssource, missingdata, loadProxyTex);
+	      dupes, ssource, missingdata, false, loadProxyTex);
     if (path)
     {
       vfs->PopDir ();
@@ -1415,7 +1415,7 @@ bool csLoader::LoadLibraryFromNode (iLoaderContext* ldr_context,
     
     if (!LoadMapLibraryFile (child->GetContentsValue (),
 	  	ldr_context->GetRegion (), ldr_context->CurrentRegionOnly (),
-		ldr_context->CheckDupes (), false, ssource, missingdata, loadProxyTex))
+		ldr_context->CheckDupes (), ssource, missingdata, false, loadProxyTex))
     return false;
   }
   return true;

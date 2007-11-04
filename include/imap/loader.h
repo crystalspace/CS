@@ -133,7 +133,7 @@ struct iMissingLoaderData : public virtual iBase
  */
 struct iLoader : public virtual iBase
 {
-  SCF_INTERFACE (iLoader, 2, 1, 0);
+  SCF_INTERFACE (iLoader, 2, 2, 0);
 
   /**
    * Load an image file. The image will be loaded in the format requested by
@@ -373,9 +373,8 @@ struct iLoader : public virtual iBase
    * The application can then provide that missing data in some other way.
    */
   virtual bool LoadLibraryFile (const char* filename, iRegion* region = 0,
-  	bool curRegOnly = true, bool checkDupes = false, bool forceLoadTextures = false,
-	iStreamSource* ssource = 0,
-	iMissingLoaderData* missingdata = 0) = 0;
+  	bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+	iMissingLoaderData* missingdata = 0, bool forceLoadTextures = false) = 0;
 
   /**
    * Load library from a 'library' node.
@@ -396,9 +395,8 @@ struct iLoader : public virtual iBase
    * The application can then provide that missing data in some other way.
    */
   virtual bool LoadLibrary (iDocumentNode* lib_node, iRegion* region = 0,
-  	bool curRegOnly = true, bool checkDupes = false, bool forceLoadTextures = false,
-	iStreamSource* ssource = 0,
-	iMissingLoaderData* missingdata = 0) = 0;
+  	bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+	iMissingLoaderData* missingdata = 0, bool forceLoadTextures = false) = 0;
 
   /**
    * Load a Mesh Object Factory from a file.
@@ -458,9 +456,9 @@ struct iLoader : public virtual iBase
    * The application can then provide that missing data in some other way.
    */
   virtual bool Load (const char* fname, iBase*& result, iRegion* region = 0,
-  	bool curRegOnly = true, bool checkDupes = false, bool forceLoadTextures = false,
-	iStreamSource* ssource = 0, const char* override_name = 0,
-	iMissingLoaderData* missingdata = 0) = 0;
+  	bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    const char* override_name = 0, iMissingLoaderData* missingdata = 0,
+    bool forceLoadTextures = false) = 0;
 
   /**
    * Load a file. This is a smart function that will try to recognize
@@ -504,9 +502,9 @@ struct iLoader : public virtual iBase
    * The application can then provide that missing data in some other way.
    */
   virtual bool Load (iDataBuffer* buffer, iBase*& result, iRegion* region = 0,
-  	bool curRegOnly = true, bool checkDupes = false, bool forceLoadTextures = false,
-	iStreamSource* ssource = 0, const char* override_name = 0,
-	iMissingLoaderData* missingdata = 0) = 0;
+  	bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    const char* override_name = 0, iMissingLoaderData* missingdata = 0,
+    bool forceLoadTextures = false) = 0;
 
   /**
    * Load a node. This is a smart function that will try to recognize
@@ -549,9 +547,9 @@ struct iLoader : public virtual iBase
    * The application can then provide that missing data in some other way.
    */
   virtual bool Load (iDocumentNode* node, iBase*& result, iRegion* region = 0,
-  	bool curRegOnly = true, bool checkDupes = false, bool forceLoadTextures = false,
-	iStreamSource* ssource = 0, const char* override_name = 0,
-	iMissingLoaderData* missingdata = 0) = 0;
+  	bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    const char* override_name = 0, iMissingLoaderData* missingdata = 0,
+    bool forceLoadTextures = false) = 0;
 
   /**
    * Load a shader from a file.

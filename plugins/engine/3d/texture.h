@@ -214,11 +214,6 @@ public:
    */
   virtual iTextureWrapper *NewTexture (iTextureHandle *ith);
 
-  /**
-   * Create a proxy texture wrapper.
-   */
-  virtual iTextureWrapper *NewProxyTexture ();
-
   virtual int GetCount () const;
   virtual iTextureWrapper *Get (int n) const;
   virtual int Add (iTextureWrapper *obj);

@@ -334,7 +334,7 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
       }
       case XMLTOKEN_MATERIALPALETTE:
       {
-        csRefArray<iMaterialWrapper> pal;
+        csArray<iMaterialWrapper*> pal;
         if (!ParseMaterialPalette (child, ldr_context, pal))
         {
           synldr->ReportError ("crystalspace.terrain.object.loader",
@@ -409,7 +409,7 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
 }
 
 bool csTerrainObjectLoader::ParseMaterialPalette (iDocumentNode *node,
-       iLoaderContext *ldr_context, csRefArray<iMaterialWrapper>& palette)
+       iLoaderContext *ldr_context, csArray<iMaterialWrapper*>& palette)
 {
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -527,7 +527,7 @@ bool csTerrainObjectSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     }
     
     // Write materialpalette
-    csRefArray<iMaterialWrapper> matpalette = tmesh->GetMaterialPalette ();
+    csArray<iMaterialWrapper*> matpalette = tmesh->GetMaterialPalette ();
     csRef<iDocumentNode> matpaletteNode = 
       paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     matpaletteNode->SetValue ("materialpalette");

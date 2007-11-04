@@ -23,12 +23,11 @@
  * Terraformer interface
  */
 
-#include "csutil/refarr.h"
 #include "csutil/scf.h"
 #include "csutil/strset.h"
-#include "iengine/material.h"
 
 struct iObject;
+struct iMaterialWrapper;
 struct iTerraSampler;
 
 class csBox2;
@@ -143,7 +142,7 @@ struct iTerraSampler : public virtual iBase
    * Retrieve the material palette used by this sampler region.
    * Null entries are allowed.
    */
-  virtual const csRefArray<iMaterialWrapper> &GetMaterialPalette () = 0;
+  virtual const csArray<iMaterialWrapper*> &GetMaterialPalette () = 0;
 
   /// Retrieve the sample region specified when the sampler was created
   virtual const csBox2 &GetRegion () const = 0;

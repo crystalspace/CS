@@ -176,7 +176,7 @@ struct CoreRenderMesh
    * Material used for this mesh.
    * Used for e.g. sorting by material.
    */
-  csRef<iMaterialWrapper> material;
+  iMaterialWrapper* material;
 
   /** 
    * Transform object space -> world space.

@@ -192,7 +192,8 @@ private:
   int numindices[16];
 
   csRef<iMaterialWrapper> matwrap;
-  csRefArray<iMaterialWrapper> palette;
+  csArray<iMaterialWrapper*> palette;
+  csRefArray<iMaterialWrapper> refPalette;
   csRefArray<iImage> alphas;
   csRef<iShaderVariableContext> baseContext;
   csRefArray<iShaderVariableContext> paletteContexts;
@@ -474,9 +475,9 @@ public:
 
   /**\name iTerrainObjectState implementation
    * @{ */
-  bool SetMaterialPalette (const csRefArray<iMaterialWrapper>& pal);
-  csRefArray<iMaterialWrapper> GetMaterialPalette ();
-  const csRefArray<iMaterialWrapper> &GetMaterialPalette () const { return palette; }
+  bool SetMaterialPalette (const csArray<iMaterialWrapper*>& pal);
+  csArray<iMaterialWrapper*> GetMaterialPalette ();
+  const csArray<iMaterialWrapper*> &GetMaterialPalette () const { return palette; }
   bool SetMaterialAlphaMaps (const csArray<csArray<char> >& data, int w, int h);
   bool SetMaterialAlphaMaps (const csArray<iImage*>& maps);
   bool SetMaterialMap (const csArray<char>& data, int x, int y);

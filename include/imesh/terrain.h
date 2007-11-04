@@ -50,8 +50,8 @@ struct iTerrainObjectState : public virtual iBase
    * Set/Get the material palette, this is used to specify materials on a 
    * bytemap representing the material makeup of the terrain
    */
-  virtual bool SetMaterialPalette (const csRefArray<iMaterialWrapper>& pal) = 0;
-  virtual const csRefArray<iMaterialWrapper>& GetMaterialPalette () const = 0;
+  virtual bool SetMaterialPalette (const csArray<iMaterialWrapper*>& pal) = 0;
+  virtual const csArray<iMaterialWrapper*>& GetMaterialPalette () const = 0;
   //@}
 
   //@{

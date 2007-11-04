@@ -328,7 +328,8 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
       }
       proxyTexture proxTex;
       proxTex.filename = filename;
-      tex = Engine->GetTextureList()->NewProxyTexture();
+      iTextureHandle* texH = 0;
+      tex = Engine->GetTextureList()->NewTexture(texH);
       tex->SetTextureClass(context.GetClass());
       tex->SetFlags(context.GetFlags());
       tex->QueryObject()->SetName(txtname);
