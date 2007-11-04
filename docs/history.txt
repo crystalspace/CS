@@ -8,6 +8,8 @@ chronological order.
 
 4-Nov-2007
 	- res updated the caca canvas to work with caca 0.99.
+	- res added an empty IconsMakeWin32ICO rule override to msvcgen.jam to
+	  prevent icon file regeneration when just regenerating VC projects.
 3-Nov-2007
 	- Jorrit added an initial port of the bullet physics plugin to the
 	  latest release of bullet (2.64). Not everything is supported yet
