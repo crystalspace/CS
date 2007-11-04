@@ -17274,6 +17274,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %OWNER = ();
 %ITERATORS = ();
 *NewTexture = *cspacec::iTextureList_NewTexture;
+*NewProxyTexture = *cspacec::iTextureList_NewProxyTexture;
 *GetCount = *cspacec::iTextureList_GetCount;
 *Get = *cspacec::iTextureList_Get;
 *Add = *cspacec::iTextureList_Add;

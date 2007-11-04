@@ -7510,8 +7510,9 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile__SWIG_0(PyObject *SWIGUNUSEDP
   iRegion *arg3 = (iRegion *) 0 ;
   bool arg4 ;
   bool arg5 ;
-  iStreamSource *arg6 = (iStreamSource *) 0 ;
-  iMissingLoaderData *arg7 = (iMissingLoaderData *) 0 ;
+  bool arg6 ;
+  iStreamSource *arg7 = (iStreamSource *) 0 ;
+  iMissingLoaderData *arg8 = (iMissingLoaderData *) 0 ;
   bool result;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -7524,8 +7525,95 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile__SWIG_0(PyObject *SWIGUNUSEDP
   int ecode4 = 0 ;
   bool val5 ;
   int ecode5 = 0 ;
-  void *argp6 = 0 ;
-  int res6 = 0 ;
+  bool val6 ;
+  int ecode6 = 0 ;
+  void *argp7 = 0 ;
+  int res7 = 0 ;
+  void *argp8 = 0 ;
+  int res8 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  PyObject * obj7 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadLibraryFile",8,8,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadLibraryFile" "', argument " "1"" of type '" "iLoader *""'"); 
+  }
+  arg1 = reinterpret_cast< iLoader * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iLoader_LoadLibraryFile" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_iRegion, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iLoader_LoadLibraryFile" "', argument " "3"" of type '" "iRegion *""'"); 
+  }
+  arg3 = reinterpret_cast< iRegion * >(argp3);
+  ecode4 = SWIG_AsVal_bool(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iLoader_LoadLibraryFile" "', argument " "4"" of type '" "bool""'");
+  } 
+  arg4 = static_cast< bool >(val4);
+  ecode5 = SWIG_AsVal_bool(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iLoader_LoadLibraryFile" "', argument " "5"" of type '" "bool""'");
+  } 
+  arg5 = static_cast< bool >(val5);
+  ecode6 = SWIG_AsVal_bool(obj5, &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iLoader_LoadLibraryFile" "', argument " "6"" of type '" "bool""'");
+  } 
+  arg6 = static_cast< bool >(val6);
+  res7 = SWIG_ConvertPtr(obj6, &argp7,SWIGTYPE_p_iStreamSource, 0 |  0 );
+  if (!SWIG_IsOK(res7)) {
+    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "iLoader_LoadLibraryFile" "', argument " "7"" of type '" "iStreamSource *""'"); 
+  }
+  arg7 = reinterpret_cast< iStreamSource * >(argp7);
+  res8 = SWIG_ConvertPtr(obj7, &argp8,SWIGTYPE_p_iMissingLoaderData, 0 |  0 );
+  if (!SWIG_IsOK(res8)) {
+    SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "iLoader_LoadLibraryFile" "', argument " "8"" of type '" "iMissingLoaderData *""'"); 
+  }
+  arg8 = reinterpret_cast< iMissingLoaderData * >(argp8);
+  result = (bool)(arg1)->LoadLibraryFile((char const *)arg2,arg3,arg4,arg5,arg6,arg7,arg8);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iLoader *arg1 = (iLoader *) 0 ;
+  char *arg2 = (char *) 0 ;
+  iRegion *arg3 = (iRegion *) 0 ;
+  bool arg4 ;
+  bool arg5 ;
+  bool arg6 ;
+  iStreamSource *arg7 = (iStreamSource *) 0 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  bool val4 ;
+  int ecode4 = 0 ;
+  bool val5 ;
+  int ecode5 = 0 ;
+  bool val6 ;
+  int ecode6 = 0 ;
   void *argp7 = 0 ;
   int res7 = 0 ;
   PyObject * obj0 = 0 ;
@@ -7562,16 +7650,16 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile__SWIG_0(PyObject *SWIGUNUSEDP
     SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iLoader_LoadLibraryFile" "', argument " "5"" of type '" "bool""'");
   } 
   arg5 = static_cast< bool >(val5);
-  res6 = SWIG_ConvertPtr(obj5, &argp6,SWIGTYPE_p_iStreamSource, 0 |  0 );
-  if (!SWIG_IsOK(res6)) {
-    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "iLoader_LoadLibraryFile" "', argument " "6"" of type '" "iStreamSource *""'"); 
-  }
-  arg6 = reinterpret_cast< iStreamSource * >(argp6);
-  res7 = SWIG_ConvertPtr(obj6, &argp7,SWIGTYPE_p_iMissingLoaderData, 0 |  0 );
+  ecode6 = SWIG_AsVal_bool(obj5, &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iLoader_LoadLibraryFile" "', argument " "6"" of type '" "bool""'");
+  } 
+  arg6 = static_cast< bool >(val6);
+  res7 = SWIG_ConvertPtr(obj6, &argp7,SWIGTYPE_p_iStreamSource, 0 |  0 );
   if (!SWIG_IsOK(res7)) {
-    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "iLoader_LoadLibraryFile" "', argument " "7"" of type '" "iMissingLoaderData *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "iLoader_LoadLibraryFile" "', argument " "7"" of type '" "iStreamSource *""'"); 
   }
-  arg7 = reinterpret_cast< iMissingLoaderData * >(argp7);
+  arg7 = reinterpret_cast< iStreamSource * >(argp7);
   result = (bool)(arg1)->LoadLibraryFile((char const *)arg2,arg3,arg4,arg5,arg6,arg7);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
@@ -7582,14 +7670,14 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   char *arg2 = (char *) 0 ;
   iRegion *arg3 = (iRegion *) 0 ;
   bool arg4 ;
   bool arg5 ;
-  iStreamSource *arg6 = (iStreamSource *) 0 ;
+  bool arg6 ;
   bool result;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -7602,8 +7690,8 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile__SWIG_1(PyObject *SWIGUNUSEDP
   int ecode4 = 0 ;
   bool val5 ;
   int ecode5 = 0 ;
-  void *argp6 = 0 ;
-  int res6 = 0 ;
+  bool val6 ;
+  int ecode6 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -7637,11 +7725,11 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile__SWIG_1(PyObject *SWIGUNUSEDP
     SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iLoader_LoadLibraryFile" "', argument " "5"" of type '" "bool""'");
   } 
   arg5 = static_cast< bool >(val5);
-  res6 = SWIG_ConvertPtr(obj5, &argp6,SWIGTYPE_p_iStreamSource, 0 |  0 );
-  if (!SWIG_IsOK(res6)) {
-    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "iLoader_LoadLibraryFile" "', argument " "6"" of type '" "iStreamSource *""'"); 
-  }
-  arg6 = reinterpret_cast< iStreamSource * >(argp6);
+  ecode6 = SWIG_AsVal_bool(obj5, &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iLoader_LoadLibraryFile" "', argument " "6"" of type '" "bool""'");
+  } 
+  arg6 = static_cast< bool >(val6);
   result = (bool)(arg1)->LoadLibraryFile((char const *)arg2,arg3,arg4,arg5,arg6);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
@@ -7652,7 +7740,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile__SWIG_3(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -7713,7 +7801,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile__SWIG_3(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile__SWIG_4(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -7765,7 +7853,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile__SWIG_4(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile__SWIG_5(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -7808,7 +7896,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile__SWIG_5(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile__SWIG_6(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -7844,12 +7932,12 @@ fail:
 
 SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile(PyObject *self, PyObject *args) {
   int argc;
-  PyObject *argv[8];
+  PyObject *argv[9];
   int ii;
   
   if (!PyTuple_Check(args)) SWIG_fail;
   argc = PyObject_Length(args);
-  for (ii = 0; (ii < argc) && (ii < 7); ii++) {
+  for (ii = 0; (ii < argc) && (ii < 8); ii++) {
     argv[ii] = PyTuple_GET_ITEM(args,ii);
   }
   if (argc == 2) {
@@ -7861,7 +7949,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile(PyObject *self, PyObject *arg
       int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
       _v = SWIG_CheckState(res);
       if (_v) {
-        return _wrap_iLoader_LoadLibraryFile__SWIG_5(self, args);
+        return _wrap_iLoader_LoadLibraryFile__SWIG_6(self, args);
       }
     }
   }
@@ -7878,7 +7966,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile(PyObject *self, PyObject *arg
         int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_iRegion, 0);
         _v = SWIG_CheckState(res);
         if (_v) {
-          return _wrap_iLoader_LoadLibraryFile__SWIG_4(self, args);
+          return _wrap_iLoader_LoadLibraryFile__SWIG_5(self, args);
         }
       }
     }
@@ -7901,7 +7989,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile(PyObject *self, PyObject *arg
             _v = SWIG_CheckState(res);
           }
           if (_v) {
-            return _wrap_iLoader_LoadLibraryFile__SWIG_3(self, args);
+            return _wrap_iLoader_LoadLibraryFile__SWIG_4(self, args);
           }
         }
       }
@@ -7930,7 +8018,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile(PyObject *self, PyObject *arg
               _v = SWIG_CheckState(res);
             }
             if (_v) {
-              return _wrap_iLoader_LoadLibraryFile__SWIG_2(self, args);
+              return _wrap_iLoader_LoadLibraryFile__SWIG_3(self, args);
             }
           }
         }
@@ -7960,11 +8048,12 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile(PyObject *self, PyObject *arg
               _v = SWIG_CheckState(res);
             }
             if (_v) {
-              void *vptr = 0;
-              int res = SWIG_ConvertPtr(argv[5], &vptr, SWIGTYPE_p_iStreamSource, 0);
-              _v = SWIG_CheckState(res);
+              {
+                int res = SWIG_AsVal_bool(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
               if (_v) {
-                return _wrap_iLoader_LoadLibraryFile__SWIG_1(self, args);
+                return _wrap_iLoader_LoadLibraryFile__SWIG_2(self, args);
               }
             }
           }
@@ -7995,15 +8084,62 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile(PyObject *self, PyObject *arg
               _v = SWIG_CheckState(res);
             }
             if (_v) {
-              void *vptr = 0;
-              int res = SWIG_ConvertPtr(argv[5], &vptr, SWIGTYPE_p_iStreamSource, 0);
-              _v = SWIG_CheckState(res);
+              {
+                int res = SWIG_AsVal_bool(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
               if (_v) {
                 void *vptr = 0;
-                int res = SWIG_ConvertPtr(argv[6], &vptr, SWIGTYPE_p_iMissingLoaderData, 0);
+                int res = SWIG_ConvertPtr(argv[6], &vptr, SWIGTYPE_p_iStreamSource, 0);
                 _v = SWIG_CheckState(res);
                 if (_v) {
-                  return _wrap_iLoader_LoadLibraryFile__SWIG_0(self, args);
+                  return _wrap_iLoader_LoadLibraryFile__SWIG_1(self, args);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 8) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iLoader, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_iRegion, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          {
+            int res = SWIG_AsVal_bool(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            {
+              int res = SWIG_AsVal_bool(argv[4], NULL);
+              _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              {
+                int res = SWIG_AsVal_bool(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
+              if (_v) {
+                void *vptr = 0;
+                int res = SWIG_ConvertPtr(argv[6], &vptr, SWIGTYPE_p_iStreamSource, 0);
+                _v = SWIG_CheckState(res);
+                if (_v) {
+                  void *vptr = 0;
+                  int res = SWIG_ConvertPtr(argv[7], &vptr, SWIGTYPE_p_iMissingLoaderData, 0);
+                  _v = SWIG_CheckState(res);
+                  if (_v) {
+                    return _wrap_iLoader_LoadLibraryFile__SWIG_0(self, args);
+                  }
                 }
               }
             }
@@ -8014,7 +8150,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibraryFile(PyObject *self, PyObject *arg
   }
   
 fail:
-  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iLoader_LoadLibraryFile'.\n  Possible C/C++ prototypes are:\n    LoadLibraryFile(char const *,iRegion *,bool,bool,iStreamSource *,iMissingLoaderData *)\n    LoadLibraryFile(char const *,iRegion *,bool,bool,iStreamSource *)\n    LoadLibraryFile(char const *,iRegion *,bool,bool)\n    LoadLibraryFile(char const *,iRegion *,bool)\n    LoadLibraryFile(char const *,iRegion *)\n    LoadLibraryFile(char const *)\n");
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iLoader_LoadLibraryFile'.\n  Possible C/C++ prototypes are:\n    LoadLibraryFile(char const *,iRegion *,bool,bool,bool,iStreamSource *,iMissingLoaderData *)\n    LoadLibraryFile(char const *,iRegion *,bool,bool,bool,iStreamSource *)\n    LoadLibraryFile(char const *,iRegion *,bool,bool,bool)\n    LoadLibraryFile(char const *,iRegion *,bool,bool)\n    LoadLibraryFile(char const *,iRegion *,bool)\n    LoadLibraryFile(char const *,iRegion *)\n    LoadLibraryFile(char const *)\n");
   return NULL;
 }
 
@@ -8026,8 +8162,9 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary__SWIG_0(PyObject *SWIGUNUSEDPARM(
   iRegion *arg3 = (iRegion *) 0 ;
   bool arg4 ;
   bool arg5 ;
-  iStreamSource *arg6 = (iStreamSource *) 0 ;
-  iMissingLoaderData *arg7 = (iMissingLoaderData *) 0 ;
+  bool arg6 ;
+  iStreamSource *arg7 = (iStreamSource *) 0 ;
+  iMissingLoaderData *arg8 = (iMissingLoaderData *) 0 ;
   bool result;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -8039,8 +8176,92 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary__SWIG_0(PyObject *SWIGUNUSEDPARM(
   int ecode4 = 0 ;
   bool val5 ;
   int ecode5 = 0 ;
-  void *argp6 = 0 ;
-  int res6 = 0 ;
+  bool val6 ;
+  int ecode6 = 0 ;
+  void *argp7 = 0 ;
+  int res7 = 0 ;
+  void *argp8 = 0 ;
+  int res8 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  PyObject * obj7 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_LoadLibrary",8,8,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_LoadLibrary" "', argument " "1"" of type '" "iLoader *""'"); 
+  }
+  arg1 = reinterpret_cast< iLoader * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iDocumentNode, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iLoader_LoadLibrary" "', argument " "2"" of type '" "iDocumentNode *""'"); 
+  }
+  arg2 = reinterpret_cast< iDocumentNode * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_iRegion, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iLoader_LoadLibrary" "', argument " "3"" of type '" "iRegion *""'"); 
+  }
+  arg3 = reinterpret_cast< iRegion * >(argp3);
+  ecode4 = SWIG_AsVal_bool(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iLoader_LoadLibrary" "', argument " "4"" of type '" "bool""'");
+  } 
+  arg4 = static_cast< bool >(val4);
+  ecode5 = SWIG_AsVal_bool(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iLoader_LoadLibrary" "', argument " "5"" of type '" "bool""'");
+  } 
+  arg5 = static_cast< bool >(val5);
+  ecode6 = SWIG_AsVal_bool(obj5, &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iLoader_LoadLibrary" "', argument " "6"" of type '" "bool""'");
+  } 
+  arg6 = static_cast< bool >(val6);
+  res7 = SWIG_ConvertPtr(obj6, &argp7,SWIGTYPE_p_iStreamSource, 0 |  0 );
+  if (!SWIG_IsOK(res7)) {
+    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "iLoader_LoadLibrary" "', argument " "7"" of type '" "iStreamSource *""'"); 
+  }
+  arg7 = reinterpret_cast< iStreamSource * >(argp7);
+  res8 = SWIG_ConvertPtr(obj7, &argp8,SWIGTYPE_p_iMissingLoaderData, 0 |  0 );
+  if (!SWIG_IsOK(res8)) {
+    SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "iLoader_LoadLibrary" "', argument " "8"" of type '" "iMissingLoaderData *""'"); 
+  }
+  arg8 = reinterpret_cast< iMissingLoaderData * >(argp8);
+  result = (bool)(arg1)->LoadLibrary(arg2,arg3,arg4,arg5,arg6,arg7,arg8);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iLoader *arg1 = (iLoader *) 0 ;
+  iDocumentNode *arg2 = (iDocumentNode *) 0 ;
+  iRegion *arg3 = (iRegion *) 0 ;
+  bool arg4 ;
+  bool arg5 ;
+  bool arg6 ;
+  iStreamSource *arg7 = (iStreamSource *) 0 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  bool val4 ;
+  int ecode4 = 0 ;
+  bool val5 ;
+  int ecode5 = 0 ;
+  bool val6 ;
+  int ecode6 = 0 ;
   void *argp7 = 0 ;
   int res7 = 0 ;
   PyObject * obj0 = 0 ;
@@ -8077,16 +8298,16 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary__SWIG_0(PyObject *SWIGUNUSEDPARM(
     SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iLoader_LoadLibrary" "', argument " "5"" of type '" "bool""'");
   } 
   arg5 = static_cast< bool >(val5);
-  res6 = SWIG_ConvertPtr(obj5, &argp6,SWIGTYPE_p_iStreamSource, 0 |  0 );
-  if (!SWIG_IsOK(res6)) {
-    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "iLoader_LoadLibrary" "', argument " "6"" of type '" "iStreamSource *""'"); 
-  }
-  arg6 = reinterpret_cast< iStreamSource * >(argp6);
-  res7 = SWIG_ConvertPtr(obj6, &argp7,SWIGTYPE_p_iMissingLoaderData, 0 |  0 );
+  ecode6 = SWIG_AsVal_bool(obj5, &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iLoader_LoadLibrary" "', argument " "6"" of type '" "bool""'");
+  } 
+  arg6 = static_cast< bool >(val6);
+  res7 = SWIG_ConvertPtr(obj6, &argp7,SWIGTYPE_p_iStreamSource, 0 |  0 );
   if (!SWIG_IsOK(res7)) {
-    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "iLoader_LoadLibrary" "', argument " "7"" of type '" "iMissingLoaderData *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "iLoader_LoadLibrary" "', argument " "7"" of type '" "iStreamSource *""'"); 
   }
-  arg7 = reinterpret_cast< iMissingLoaderData * >(argp7);
+  arg7 = reinterpret_cast< iStreamSource * >(argp7);
   result = (bool)(arg1)->LoadLibrary(arg2,arg3,arg4,arg5,arg6,arg7);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
@@ -8095,14 +8316,14 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   iDocumentNode *arg2 = (iDocumentNode *) 0 ;
   iRegion *arg3 = (iRegion *) 0 ;
   bool arg4 ;
   bool arg5 ;
-  iStreamSource *arg6 = (iStreamSource *) 0 ;
+  bool arg6 ;
   bool result;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -8114,8 +8335,8 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary__SWIG_1(PyObject *SWIGUNUSEDPARM(
   int ecode4 = 0 ;
   bool val5 ;
   int ecode5 = 0 ;
-  void *argp6 = 0 ;
-  int res6 = 0 ;
+  bool val6 ;
+  int ecode6 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -8149,11 +8370,11 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary__SWIG_1(PyObject *SWIGUNUSEDPARM(
     SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iLoader_LoadLibrary" "', argument " "5"" of type '" "bool""'");
   } 
   arg5 = static_cast< bool >(val5);
-  res6 = SWIG_ConvertPtr(obj5, &argp6,SWIGTYPE_p_iStreamSource, 0 |  0 );
-  if (!SWIG_IsOK(res6)) {
-    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "iLoader_LoadLibrary" "', argument " "6"" of type '" "iStreamSource *""'"); 
-  }
-  arg6 = reinterpret_cast< iStreamSource * >(argp6);
+  ecode6 = SWIG_AsVal_bool(obj5, &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iLoader_LoadLibrary" "', argument " "6"" of type '" "bool""'");
+  } 
+  arg6 = static_cast< bool >(val6);
   result = (bool)(arg1)->LoadLibrary(arg2,arg3,arg4,arg5,arg6);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
@@ -8162,7 +8383,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary__SWIG_3(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   iDocumentNode *arg2 = (iDocumentNode *) 0 ;
@@ -8220,7 +8441,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary__SWIG_3(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary__SWIG_4(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   iDocumentNode *arg2 = (iDocumentNode *) 0 ;
@@ -8269,7 +8490,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary__SWIG_4(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary__SWIG_5(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   iDocumentNode *arg2 = (iDocumentNode *) 0 ;
@@ -8309,7 +8530,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary__SWIG_5(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary__SWIG_6(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   iDocumentNode *arg2 = (iDocumentNode *) 0 ;
@@ -8342,12 +8563,12 @@ fail:
 
 SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary(PyObject *self, PyObject *args) {
   int argc;
-  PyObject *argv[8];
+  PyObject *argv[9];
   int ii;
   
   if (!PyTuple_Check(args)) SWIG_fail;
   argc = PyObject_Length(args);
-  for (ii = 0; (ii < argc) && (ii < 7); ii++) {
+  for (ii = 0; (ii < argc) && (ii < 8); ii++) {
     argv[ii] = PyTuple_GET_ITEM(args,ii);
   }
   if (argc == 2) {
@@ -8360,7 +8581,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary(PyObject *self, PyObject *args) {
       int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iDocumentNode, 0);
       _v = SWIG_CheckState(res);
       if (_v) {
-        return _wrap_iLoader_LoadLibrary__SWIG_5(self, args);
+        return _wrap_iLoader_LoadLibrary__SWIG_6(self, args);
       }
     }
   }
@@ -8378,7 +8599,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary(PyObject *self, PyObject *args) {
         int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_iRegion, 0);
         _v = SWIG_CheckState(res);
         if (_v) {
-          return _wrap_iLoader_LoadLibrary__SWIG_4(self, args);
+          return _wrap_iLoader_LoadLibrary__SWIG_5(self, args);
         }
       }
     }
@@ -8402,7 +8623,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary(PyObject *self, PyObject *args) {
             _v = SWIG_CheckState(res);
           }
           if (_v) {
-            return _wrap_iLoader_LoadLibrary__SWIG_3(self, args);
+            return _wrap_iLoader_LoadLibrary__SWIG_4(self, args);
           }
         }
       }
@@ -8432,7 +8653,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary(PyObject *self, PyObject *args) {
               _v = SWIG_CheckState(res);
             }
             if (_v) {
-              return _wrap_iLoader_LoadLibrary__SWIG_2(self, args);
+              return _wrap_iLoader_LoadLibrary__SWIG_3(self, args);
             }
           }
         }
@@ -8463,11 +8684,12 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary(PyObject *self, PyObject *args) {
               _v = SWIG_CheckState(res);
             }
             if (_v) {
-              void *vptr = 0;
-              int res = SWIG_ConvertPtr(argv[5], &vptr, SWIGTYPE_p_iStreamSource, 0);
-              _v = SWIG_CheckState(res);
+              {
+                int res = SWIG_AsVal_bool(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
               if (_v) {
-                return _wrap_iLoader_LoadLibrary__SWIG_1(self, args);
+                return _wrap_iLoader_LoadLibrary__SWIG_2(self, args);
               }
             }
           }
@@ -8499,15 +8721,63 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary(PyObject *self, PyObject *args) {
               _v = SWIG_CheckState(res);
             }
             if (_v) {
-              void *vptr = 0;
-              int res = SWIG_ConvertPtr(argv[5], &vptr, SWIGTYPE_p_iStreamSource, 0);
-              _v = SWIG_CheckState(res);
+              {
+                int res = SWIG_AsVal_bool(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
               if (_v) {
                 void *vptr = 0;
-                int res = SWIG_ConvertPtr(argv[6], &vptr, SWIGTYPE_p_iMissingLoaderData, 0);
+                int res = SWIG_ConvertPtr(argv[6], &vptr, SWIGTYPE_p_iStreamSource, 0);
                 _v = SWIG_CheckState(res);
                 if (_v) {
-                  return _wrap_iLoader_LoadLibrary__SWIG_0(self, args);
+                  return _wrap_iLoader_LoadLibrary__SWIG_1(self, args);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 8) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iLoader, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iDocumentNode, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_iRegion, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          {
+            int res = SWIG_AsVal_bool(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            {
+              int res = SWIG_AsVal_bool(argv[4], NULL);
+              _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              {
+                int res = SWIG_AsVal_bool(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
+              if (_v) {
+                void *vptr = 0;
+                int res = SWIG_ConvertPtr(argv[6], &vptr, SWIGTYPE_p_iStreamSource, 0);
+                _v = SWIG_CheckState(res);
+                if (_v) {
+                  void *vptr = 0;
+                  int res = SWIG_ConvertPtr(argv[7], &vptr, SWIGTYPE_p_iMissingLoaderData, 0);
+                  _v = SWIG_CheckState(res);
+                  if (_v) {
+                    return _wrap_iLoader_LoadLibrary__SWIG_0(self, args);
+                  }
                 }
               }
             }
@@ -8518,7 +8788,7 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadLibrary(PyObject *self, PyObject *args) {
   }
   
 fail:
-  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iLoader_LoadLibrary'.\n  Possible C/C++ prototypes are:\n    LoadLibrary(iDocumentNode *,iRegion *,bool,bool,iStreamSource *,iMissingLoaderData *)\n    LoadLibrary(iDocumentNode *,iRegion *,bool,bool,iStreamSource *)\n    LoadLibrary(iDocumentNode *,iRegion *,bool,bool)\n    LoadLibrary(iDocumentNode *,iRegion *,bool)\n    LoadLibrary(iDocumentNode *,iRegion *)\n    LoadLibrary(iDocumentNode *)\n");
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iLoader_LoadLibrary'.\n  Possible C/C++ prototypes are:\n    LoadLibrary(iDocumentNode *,iRegion *,bool,bool,bool,iStreamSource *,iMissingLoaderData *)\n    LoadLibrary(iDocumentNode *,iRegion *,bool,bool,bool,iStreamSource *)\n    LoadLibrary(iDocumentNode *,iRegion *,bool,bool,bool)\n    LoadLibrary(iDocumentNode *,iRegion *,bool,bool)\n    LoadLibrary(iDocumentNode *,iRegion *,bool)\n    LoadLibrary(iDocumentNode *,iRegion *)\n    LoadLibrary(iDocumentNode *)\n");
   return NULL;
 }
 
@@ -8849,9 +9119,10 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_0(PyObject *SWIGUNUSEDPARM(self), 
   iRegion *arg4 = (iRegion *) 0 ;
   bool arg5 ;
   bool arg6 ;
-  iStreamSource *arg7 = (iStreamSource *) 0 ;
-  char *arg8 = (char *) 0 ;
-  iMissingLoaderData *arg9 = (iMissingLoaderData *) 0 ;
+  bool arg7 ;
+  iStreamSource *arg8 = (iStreamSource *) 0 ;
+  char *arg9 = (char *) 0 ;
+  iMissingLoaderData *arg10 = (iMissingLoaderData *) 0 ;
   bool result;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -8866,13 +9137,124 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_0(PyObject *SWIGUNUSEDPARM(self), 
   int ecode5 = 0 ;
   bool val6 ;
   int ecode6 = 0 ;
-  void *argp7 = 0 ;
-  int res7 = 0 ;
-  int res8 ;
-  char *buf8 = 0 ;
-  int alloc8 = 0 ;
-  void *argp9 = 0 ;
-  int res9 = 0 ;
+  bool val7 ;
+  int ecode7 = 0 ;
+  void *argp8 = 0 ;
+  int res8 = 0 ;
+  int res9 ;
+  char *buf9 = 0 ;
+  int alloc9 = 0 ;
+  void *argp10 = 0 ;
+  int res10 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  PyObject * obj7 = 0 ;
+  PyObject * obj8 = 0 ;
+  PyObject * obj9 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_Load",10,10,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8,&obj9)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_Load" "', argument " "1"" of type '" "iLoader *""'"); 
+  }
+  arg1 = reinterpret_cast< iLoader * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iLoader_Load" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_p_iBase,  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iLoader_Load" "', argument " "3"" of type '" "iBase *&""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iLoader_Load" "', argument " "3"" of type '" "iBase *&""'"); 
+  }
+  arg3 = reinterpret_cast< iBase ** >(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4,SWIGTYPE_p_iRegion, 0 |  0 );
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iLoader_Load" "', argument " "4"" of type '" "iRegion *""'"); 
+  }
+  arg4 = reinterpret_cast< iRegion * >(argp4);
+  ecode5 = SWIG_AsVal_bool(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iLoader_Load" "', argument " "5"" of type '" "bool""'");
+  } 
+  arg5 = static_cast< bool >(val5);
+  ecode6 = SWIG_AsVal_bool(obj5, &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iLoader_Load" "', argument " "6"" of type '" "bool""'");
+  } 
+  arg6 = static_cast< bool >(val6);
+  ecode7 = SWIG_AsVal_bool(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "iLoader_Load" "', argument " "7"" of type '" "bool""'");
+  } 
+  arg7 = static_cast< bool >(val7);
+  res8 = SWIG_ConvertPtr(obj7, &argp8,SWIGTYPE_p_iStreamSource, 0 |  0 );
+  if (!SWIG_IsOK(res8)) {
+    SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "iLoader_Load" "', argument " "8"" of type '" "iStreamSource *""'"); 
+  }
+  arg8 = reinterpret_cast< iStreamSource * >(argp8);
+  res9 = SWIG_AsCharPtrAndSize(obj8, &buf9, NULL, &alloc9);
+  if (!SWIG_IsOK(res9)) {
+    SWIG_exception_fail(SWIG_ArgError(res9), "in method '" "iLoader_Load" "', argument " "9"" of type '" "char const *""'");
+  }
+  arg9 = reinterpret_cast< char * >(buf9);
+  res10 = SWIG_ConvertPtr(obj9, &argp10,SWIGTYPE_p_iMissingLoaderData, 0 |  0 );
+  if (!SWIG_IsOK(res10)) {
+    SWIG_exception_fail(SWIG_ArgError(res10), "in method '" "iLoader_Load" "', argument " "10"" of type '" "iMissingLoaderData *""'"); 
+  }
+  arg10 = reinterpret_cast< iMissingLoaderData * >(argp10);
+  result = (bool)(arg1)->Load((char const *)arg2,*arg3,arg4,arg5,arg6,arg7,arg8,(char const *)arg9,arg10);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc9 == SWIG_NEWOBJ) delete[] buf9;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc9 == SWIG_NEWOBJ) delete[] buf9;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iLoader *arg1 = (iLoader *) 0 ;
+  char *arg2 = (char *) 0 ;
+  iBase **arg3 = 0 ;
+  iRegion *arg4 = (iRegion *) 0 ;
+  bool arg5 ;
+  bool arg6 ;
+  bool arg7 ;
+  iStreamSource *arg8 = (iStreamSource *) 0 ;
+  char *arg9 = (char *) 0 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  bool val5 ;
+  int ecode5 = 0 ;
+  bool val6 ;
+  int ecode6 = 0 ;
+  bool val7 ;
+  int ecode7 = 0 ;
+  void *argp8 = 0 ;
+  int res8 = 0 ;
+  int res9 ;
+  char *buf9 = 0 ;
+  int alloc9 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -8917,34 +9299,34 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_0(PyObject *SWIGUNUSEDPARM(self), 
     SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iLoader_Load" "', argument " "6"" of type '" "bool""'");
   } 
   arg6 = static_cast< bool >(val6);
-  res7 = SWIG_ConvertPtr(obj6, &argp7,SWIGTYPE_p_iStreamSource, 0 |  0 );
-  if (!SWIG_IsOK(res7)) {
-    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "iLoader_Load" "', argument " "7"" of type '" "iStreamSource *""'"); 
-  }
-  arg7 = reinterpret_cast< iStreamSource * >(argp7);
-  res8 = SWIG_AsCharPtrAndSize(obj7, &buf8, NULL, &alloc8);
+  ecode7 = SWIG_AsVal_bool(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "iLoader_Load" "', argument " "7"" of type '" "bool""'");
+  } 
+  arg7 = static_cast< bool >(val7);
+  res8 = SWIG_ConvertPtr(obj7, &argp8,SWIGTYPE_p_iStreamSource, 0 |  0 );
   if (!SWIG_IsOK(res8)) {
-    SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "iLoader_Load" "', argument " "8"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "iLoader_Load" "', argument " "8"" of type '" "iStreamSource *""'"); 
   }
-  arg8 = reinterpret_cast< char * >(buf8);
-  res9 = SWIG_ConvertPtr(obj8, &argp9,SWIGTYPE_p_iMissingLoaderData, 0 |  0 );
+  arg8 = reinterpret_cast< iStreamSource * >(argp8);
+  res9 = SWIG_AsCharPtrAndSize(obj8, &buf9, NULL, &alloc9);
   if (!SWIG_IsOK(res9)) {
-    SWIG_exception_fail(SWIG_ArgError(res9), "in method '" "iLoader_Load" "', argument " "9"" of type '" "iMissingLoaderData *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res9), "in method '" "iLoader_Load" "', argument " "9"" of type '" "char const *""'");
   }
-  arg9 = reinterpret_cast< iMissingLoaderData * >(argp9);
-  result = (bool)(arg1)->Load((char const *)arg2,*arg3,arg4,arg5,arg6,arg7,(char const *)arg8,arg9);
+  arg9 = reinterpret_cast< char * >(buf9);
+  result = (bool)(arg1)->Load((char const *)arg2,*arg3,arg4,arg5,arg6,arg7,arg8,(char const *)arg9);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc8 == SWIG_NEWOBJ) delete[] buf8;
+  if (alloc9 == SWIG_NEWOBJ) delete[] buf9;
   return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc8 == SWIG_NEWOBJ) delete[] buf8;
+  if (alloc9 == SWIG_NEWOBJ) delete[] buf9;
   return NULL;
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -8952,8 +9334,8 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_1(PyObject *SWIGUNUSEDPARM(self), 
   iRegion *arg4 = (iRegion *) 0 ;
   bool arg5 ;
   bool arg6 ;
-  iStreamSource *arg7 = (iStreamSource *) 0 ;
-  char *arg8 = (char *) 0 ;
+  bool arg7 ;
+  iStreamSource *arg8 = (iStreamSource *) 0 ;
   bool result;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -8968,11 +9350,10 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_1(PyObject *SWIGUNUSEDPARM(self), 
   int ecode5 = 0 ;
   bool val6 ;
   int ecode6 = 0 ;
-  void *argp7 = 0 ;
-  int res7 = 0 ;
-  int res8 ;
-  char *buf8 = 0 ;
-  int alloc8 = 0 ;
+  bool val7 ;
+  int ecode7 = 0 ;
+  void *argp8 = 0 ;
+  int res8 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -9016,29 +9397,27 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_1(PyObject *SWIGUNUSEDPARM(self), 
     SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iLoader_Load" "', argument " "6"" of type '" "bool""'");
   } 
   arg6 = static_cast< bool >(val6);
-  res7 = SWIG_ConvertPtr(obj6, &argp7,SWIGTYPE_p_iStreamSource, 0 |  0 );
-  if (!SWIG_IsOK(res7)) {
-    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "iLoader_Load" "', argument " "7"" of type '" "iStreamSource *""'"); 
-  }
-  arg7 = reinterpret_cast< iStreamSource * >(argp7);
-  res8 = SWIG_AsCharPtrAndSize(obj7, &buf8, NULL, &alloc8);
+  ecode7 = SWIG_AsVal_bool(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "iLoader_Load" "', argument " "7"" of type '" "bool""'");
+  } 
+  arg7 = static_cast< bool >(val7);
+  res8 = SWIG_ConvertPtr(obj7, &argp8,SWIGTYPE_p_iStreamSource, 0 |  0 );
   if (!SWIG_IsOK(res8)) {
-    SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "iLoader_Load" "', argument " "8"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "iLoader_Load" "', argument " "8"" of type '" "iStreamSource *""'"); 
   }
-  arg8 = reinterpret_cast< char * >(buf8);
-  result = (bool)(arg1)->Load((char const *)arg2,*arg3,arg4,arg5,arg6,arg7,(char const *)arg8);
+  arg8 = reinterpret_cast< iStreamSource * >(argp8);
+  result = (bool)(arg1)->Load((char const *)arg2,*arg3,arg4,arg5,arg6,arg7,arg8);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc8 == SWIG_NEWOBJ) delete[] buf8;
   return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc8 == SWIG_NEWOBJ) delete[] buf8;
   return NULL;
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_3(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -9046,7 +9425,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_2(PyObject *SWIGUNUSEDPARM(self), 
   iRegion *arg4 = (iRegion *) 0 ;
   bool arg5 ;
   bool arg6 ;
-  iStreamSource *arg7 = (iStreamSource *) 0 ;
+  bool arg7 ;
   bool result;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -9061,8 +9440,8 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_2(PyObject *SWIGUNUSEDPARM(self), 
   int ecode5 = 0 ;
   bool val6 ;
   int ecode6 = 0 ;
-  void *argp7 = 0 ;
-  int res7 = 0 ;
+  bool val7 ;
+  int ecode7 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -9105,11 +9484,11 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_2(PyObject *SWIGUNUSEDPARM(self), 
     SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iLoader_Load" "', argument " "6"" of type '" "bool""'");
   } 
   arg6 = static_cast< bool >(val6);
-  res7 = SWIG_ConvertPtr(obj6, &argp7,SWIGTYPE_p_iStreamSource, 0 |  0 );
-  if (!SWIG_IsOK(res7)) {
-    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "iLoader_Load" "', argument " "7"" of type '" "iStreamSource *""'"); 
-  }
-  arg7 = reinterpret_cast< iStreamSource * >(argp7);
+  ecode7 = SWIG_AsVal_bool(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "iLoader_Load" "', argument " "7"" of type '" "bool""'");
+  } 
+  arg7 = static_cast< bool >(val7);
   result = (bool)(arg1)->Load((char const *)arg2,*arg3,arg4,arg5,arg6,arg7);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
@@ -9120,7 +9499,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_3(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_4(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -9193,7 +9572,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_4(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_5(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -9257,7 +9636,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_5(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_6(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -9312,7 +9691,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_6(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_7(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -9358,7 +9737,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_7(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_8(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   iDataBuffer *arg2 = (iDataBuffer *) 0 ;
@@ -9366,9 +9745,10 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_7(PyObject *SWIGUNUSEDPARM(self), 
   iRegion *arg4 = (iRegion *) 0 ;
   bool arg5 ;
   bool arg6 ;
-  iStreamSource *arg7 = (iStreamSource *) 0 ;
-  char *arg8 = (char *) 0 ;
-  iMissingLoaderData *arg9 = (iMissingLoaderData *) 0 ;
+  bool arg7 ;
+  iStreamSource *arg8 = (iStreamSource *) 0 ;
+  char *arg9 = (char *) 0 ;
+  iMissingLoaderData *arg10 = (iMissingLoaderData *) 0 ;
   bool result;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -9382,13 +9762,121 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_7(PyObject *SWIGUNUSEDPARM(self), 
   int ecode5 = 0 ;
   bool val6 ;
   int ecode6 = 0 ;
-  void *argp7 = 0 ;
-  int res7 = 0 ;
-  int res8 ;
-  char *buf8 = 0 ;
-  int alloc8 = 0 ;
-  void *argp9 = 0 ;
-  int res9 = 0 ;
+  bool val7 ;
+  int ecode7 = 0 ;
+  void *argp8 = 0 ;
+  int res8 = 0 ;
+  int res9 ;
+  char *buf9 = 0 ;
+  int alloc9 = 0 ;
+  void *argp10 = 0 ;
+  int res10 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  PyObject * obj7 = 0 ;
+  PyObject * obj8 = 0 ;
+  PyObject * obj9 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_Load",10,10,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8,&obj9)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_Load" "', argument " "1"" of type '" "iLoader *""'"); 
+  }
+  arg1 = reinterpret_cast< iLoader * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iDataBuffer, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iLoader_Load" "', argument " "2"" of type '" "iDataBuffer *""'"); 
+  }
+  arg2 = reinterpret_cast< iDataBuffer * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_p_iBase,  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iLoader_Load" "', argument " "3"" of type '" "iBase *&""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iLoader_Load" "', argument " "3"" of type '" "iBase *&""'"); 
+  }
+  arg3 = reinterpret_cast< iBase ** >(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4,SWIGTYPE_p_iRegion, 0 |  0 );
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iLoader_Load" "', argument " "4"" of type '" "iRegion *""'"); 
+  }
+  arg4 = reinterpret_cast< iRegion * >(argp4);
+  ecode5 = SWIG_AsVal_bool(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iLoader_Load" "', argument " "5"" of type '" "bool""'");
+  } 
+  arg5 = static_cast< bool >(val5);
+  ecode6 = SWIG_AsVal_bool(obj5, &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iLoader_Load" "', argument " "6"" of type '" "bool""'");
+  } 
+  arg6 = static_cast< bool >(val6);
+  ecode7 = SWIG_AsVal_bool(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "iLoader_Load" "', argument " "7"" of type '" "bool""'");
+  } 
+  arg7 = static_cast< bool >(val7);
+  res8 = SWIG_ConvertPtr(obj7, &argp8,SWIGTYPE_p_iStreamSource, 0 |  0 );
+  if (!SWIG_IsOK(res8)) {
+    SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "iLoader_Load" "', argument " "8"" of type '" "iStreamSource *""'"); 
+  }
+  arg8 = reinterpret_cast< iStreamSource * >(argp8);
+  res9 = SWIG_AsCharPtrAndSize(obj8, &buf9, NULL, &alloc9);
+  if (!SWIG_IsOK(res9)) {
+    SWIG_exception_fail(SWIG_ArgError(res9), "in method '" "iLoader_Load" "', argument " "9"" of type '" "char const *""'");
+  }
+  arg9 = reinterpret_cast< char * >(buf9);
+  res10 = SWIG_ConvertPtr(obj9, &argp10,SWIGTYPE_p_iMissingLoaderData, 0 |  0 );
+  if (!SWIG_IsOK(res10)) {
+    SWIG_exception_fail(SWIG_ArgError(res10), "in method '" "iLoader_Load" "', argument " "10"" of type '" "iMissingLoaderData *""'"); 
+  }
+  arg10 = reinterpret_cast< iMissingLoaderData * >(argp10);
+  result = (bool)(arg1)->Load(arg2,*arg3,arg4,arg5,arg6,arg7,arg8,(char const *)arg9,arg10);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  if (alloc9 == SWIG_NEWOBJ) delete[] buf9;
+  return resultobj;
+fail:
+  if (alloc9 == SWIG_NEWOBJ) delete[] buf9;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_9(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iLoader *arg1 = (iLoader *) 0 ;
+  iDataBuffer *arg2 = (iDataBuffer *) 0 ;
+  iBase **arg3 = 0 ;
+  iRegion *arg4 = (iRegion *) 0 ;
+  bool arg5 ;
+  bool arg6 ;
+  bool arg7 ;
+  iStreamSource *arg8 = (iStreamSource *) 0 ;
+  char *arg9 = (char *) 0 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  bool val5 ;
+  int ecode5 = 0 ;
+  bool val6 ;
+  int ecode6 = 0 ;
+  bool val7 ;
+  int ecode7 = 0 ;
+  void *argp8 = 0 ;
+  int res8 = 0 ;
+  int res9 ;
+  char *buf9 = 0 ;
+  int alloc9 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -9433,32 +9921,32 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_7(PyObject *SWIGUNUSEDPARM(self), 
     SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iLoader_Load" "', argument " "6"" of type '" "bool""'");
   } 
   arg6 = static_cast< bool >(val6);
-  res7 = SWIG_ConvertPtr(obj6, &argp7,SWIGTYPE_p_iStreamSource, 0 |  0 );
-  if (!SWIG_IsOK(res7)) {
-    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "iLoader_Load" "', argument " "7"" of type '" "iStreamSource *""'"); 
-  }
-  arg7 = reinterpret_cast< iStreamSource * >(argp7);
-  res8 = SWIG_AsCharPtrAndSize(obj7, &buf8, NULL, &alloc8);
+  ecode7 = SWIG_AsVal_bool(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "iLoader_Load" "', argument " "7"" of type '" "bool""'");
+  } 
+  arg7 = static_cast< bool >(val7);
+  res8 = SWIG_ConvertPtr(obj7, &argp8,SWIGTYPE_p_iStreamSource, 0 |  0 );
   if (!SWIG_IsOK(res8)) {
-    SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "iLoader_Load" "', argument " "8"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "iLoader_Load" "', argument " "8"" of type '" "iStreamSource *""'"); 
   }
-  arg8 = reinterpret_cast< char * >(buf8);
-  res9 = SWIG_ConvertPtr(obj8, &argp9,SWIGTYPE_p_iMissingLoaderData, 0 |  0 );
+  arg8 = reinterpret_cast< iStreamSource * >(argp8);
+  res9 = SWIG_AsCharPtrAndSize(obj8, &buf9, NULL, &alloc9);
   if (!SWIG_IsOK(res9)) {
-    SWIG_exception_fail(SWIG_ArgError(res9), "in method '" "iLoader_Load" "', argument " "9"" of type '" "iMissingLoaderData *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res9), "in method '" "iLoader_Load" "', argument " "9"" of type '" "char const *""'");
   }
-  arg9 = reinterpret_cast< iMissingLoaderData * >(argp9);
-  result = (bool)(arg1)->Load(arg2,*arg3,arg4,arg5,arg6,arg7,(char const *)arg8,arg9);
+  arg9 = reinterpret_cast< char * >(buf9);
+  result = (bool)(arg1)->Load(arg2,*arg3,arg4,arg5,arg6,arg7,arg8,(char const *)arg9);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
-  if (alloc8 == SWIG_NEWOBJ) delete[] buf8;
+  if (alloc9 == SWIG_NEWOBJ) delete[] buf9;
   return resultobj;
 fail:
-  if (alloc8 == SWIG_NEWOBJ) delete[] buf8;
+  if (alloc9 == SWIG_NEWOBJ) delete[] buf9;
   return NULL;
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_8(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_10(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   iDataBuffer *arg2 = (iDataBuffer *) 0 ;
@@ -9466,8 +9954,8 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_8(PyObject *SWIGUNUSEDPARM(self), 
   iRegion *arg4 = (iRegion *) 0 ;
   bool arg5 ;
   bool arg6 ;
-  iStreamSource *arg7 = (iStreamSource *) 0 ;
-  char *arg8 = (char *) 0 ;
+  bool arg7 ;
+  iStreamSource *arg8 = (iStreamSource *) 0 ;
   bool result;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -9481,11 +9969,10 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_8(PyObject *SWIGUNUSEDPARM(self), 
   int ecode5 = 0 ;
   bool val6 ;
   int ecode6 = 0 ;
-  void *argp7 = 0 ;
-  int res7 = 0 ;
-  int res8 ;
-  char *buf8 = 0 ;
-  int alloc8 = 0 ;
+  bool val7 ;
+  int ecode7 = 0 ;
+  void *argp8 = 0 ;
+  int res8 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -9529,27 +10016,25 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_8(PyObject *SWIGUNUSEDPARM(self), 
     SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iLoader_Load" "', argument " "6"" of type '" "bool""'");
   } 
   arg6 = static_cast< bool >(val6);
-  res7 = SWIG_ConvertPtr(obj6, &argp7,SWIGTYPE_p_iStreamSource, 0 |  0 );
-  if (!SWIG_IsOK(res7)) {
-    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "iLoader_Load" "', argument " "7"" of type '" "iStreamSource *""'"); 
-  }
-  arg7 = reinterpret_cast< iStreamSource * >(argp7);
-  res8 = SWIG_AsCharPtrAndSize(obj7, &buf8, NULL, &alloc8);
+  ecode7 = SWIG_AsVal_bool(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "iLoader_Load" "', argument " "7"" of type '" "bool""'");
+  } 
+  arg7 = static_cast< bool >(val7);
+  res8 = SWIG_ConvertPtr(obj7, &argp8,SWIGTYPE_p_iStreamSource, 0 |  0 );
   if (!SWIG_IsOK(res8)) {
-    SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "iLoader_Load" "', argument " "8"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "iLoader_Load" "', argument " "8"" of type '" "iStreamSource *""'"); 
   }
-  arg8 = reinterpret_cast< char * >(buf8);
-  result = (bool)(arg1)->Load(arg2,*arg3,arg4,arg5,arg6,arg7,(char const *)arg8);
+  arg8 = reinterpret_cast< iStreamSource * >(argp8);
+  result = (bool)(arg1)->Load(arg2,*arg3,arg4,arg5,arg6,arg7,arg8);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
-  if (alloc8 == SWIG_NEWOBJ) delete[] buf8;
   return resultobj;
 fail:
-  if (alloc8 == SWIG_NEWOBJ) delete[] buf8;
   return NULL;
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_9(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_11(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   iDataBuffer *arg2 = (iDataBuffer *) 0 ;
@@ -9557,7 +10042,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_9(PyObject *SWIGUNUSEDPARM(self), 
   iRegion *arg4 = (iRegion *) 0 ;
   bool arg5 ;
   bool arg6 ;
-  iStreamSource *arg7 = (iStreamSource *) 0 ;
+  bool arg7 ;
   bool result;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -9571,8 +10056,8 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_9(PyObject *SWIGUNUSEDPARM(self), 
   int ecode5 = 0 ;
   bool val6 ;
   int ecode6 = 0 ;
-  void *argp7 = 0 ;
-  int res7 = 0 ;
+  bool val7 ;
+  int ecode7 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -9615,11 +10100,11 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_9(PyObject *SWIGUNUSEDPARM(self), 
     SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iLoader_Load" "', argument " "6"" of type '" "bool""'");
   } 
   arg6 = static_cast< bool >(val6);
-  res7 = SWIG_ConvertPtr(obj6, &argp7,SWIGTYPE_p_iStreamSource, 0 |  0 );
-  if (!SWIG_IsOK(res7)) {
-    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "iLoader_Load" "', argument " "7"" of type '" "iStreamSource *""'"); 
-  }
-  arg7 = reinterpret_cast< iStreamSource * >(argp7);
+  ecode7 = SWIG_AsVal_bool(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "iLoader_Load" "', argument " "7"" of type '" "bool""'");
+  } 
+  arg7 = static_cast< bool >(val7);
   result = (bool)(arg1)->Load(arg2,*arg3,arg4,arg5,arg6,arg7);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
@@ -9628,7 +10113,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_10(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_12(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   iDataBuffer *arg2 = (iDataBuffer *) 0 ;
@@ -9698,7 +10183,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_11(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_13(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   iDataBuffer *arg2 = (iDataBuffer *) 0 ;
@@ -9759,7 +10244,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_12(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_14(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   iDataBuffer *arg2 = (iDataBuffer *) 0 ;
@@ -9811,7 +10296,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_13(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_15(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   iDataBuffer *arg2 = (iDataBuffer *) 0 ;
@@ -9854,7 +10339,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_14(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_16(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   iDocumentNode *arg2 = (iDocumentNode *) 0 ;
@@ -9862,9 +10347,10 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_14(PyObject *SWIGUNUSEDPARM(self),
   iRegion *arg4 = (iRegion *) 0 ;
   bool arg5 ;
   bool arg6 ;
-  iStreamSource *arg7 = (iStreamSource *) 0 ;
-  char *arg8 = (char *) 0 ;
-  iMissingLoaderData *arg9 = (iMissingLoaderData *) 0 ;
+  bool arg7 ;
+  iStreamSource *arg8 = (iStreamSource *) 0 ;
+  char *arg9 = (char *) 0 ;
+  iMissingLoaderData *arg10 = (iMissingLoaderData *) 0 ;
   bool result;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -9878,13 +10364,121 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_14(PyObject *SWIGUNUSEDPARM(self),
   int ecode5 = 0 ;
   bool val6 ;
   int ecode6 = 0 ;
-  void *argp7 = 0 ;
-  int res7 = 0 ;
-  int res8 ;
-  char *buf8 = 0 ;
-  int alloc8 = 0 ;
-  void *argp9 = 0 ;
-  int res9 = 0 ;
+  bool val7 ;
+  int ecode7 = 0 ;
+  void *argp8 = 0 ;
+  int res8 = 0 ;
+  int res9 ;
+  char *buf9 = 0 ;
+  int alloc9 = 0 ;
+  void *argp10 = 0 ;
+  int res10 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  PyObject * obj7 = 0 ;
+  PyObject * obj8 = 0 ;
+  PyObject * obj9 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iLoader_Load",10,10,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8,&obj9)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iLoader, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iLoader_Load" "', argument " "1"" of type '" "iLoader *""'"); 
+  }
+  arg1 = reinterpret_cast< iLoader * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iDocumentNode, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iLoader_Load" "', argument " "2"" of type '" "iDocumentNode *""'"); 
+  }
+  arg2 = reinterpret_cast< iDocumentNode * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_p_iBase,  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iLoader_Load" "', argument " "3"" of type '" "iBase *&""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iLoader_Load" "', argument " "3"" of type '" "iBase *&""'"); 
+  }
+  arg3 = reinterpret_cast< iBase ** >(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4,SWIGTYPE_p_iRegion, 0 |  0 );
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iLoader_Load" "', argument " "4"" of type '" "iRegion *""'"); 
+  }
+  arg4 = reinterpret_cast< iRegion * >(argp4);
+  ecode5 = SWIG_AsVal_bool(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iLoader_Load" "', argument " "5"" of type '" "bool""'");
+  } 
+  arg5 = static_cast< bool >(val5);
+  ecode6 = SWIG_AsVal_bool(obj5, &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iLoader_Load" "', argument " "6"" of type '" "bool""'");
+  } 
+  arg6 = static_cast< bool >(val6);
+  ecode7 = SWIG_AsVal_bool(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "iLoader_Load" "', argument " "7"" of type '" "bool""'");
+  } 
+  arg7 = static_cast< bool >(val7);
+  res8 = SWIG_ConvertPtr(obj7, &argp8,SWIGTYPE_p_iStreamSource, 0 |  0 );
+  if (!SWIG_IsOK(res8)) {
+    SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "iLoader_Load" "', argument " "8"" of type '" "iStreamSource *""'"); 
+  }
+  arg8 = reinterpret_cast< iStreamSource * >(argp8);
+  res9 = SWIG_AsCharPtrAndSize(obj8, &buf9, NULL, &alloc9);
+  if (!SWIG_IsOK(res9)) {
+    SWIG_exception_fail(SWIG_ArgError(res9), "in method '" "iLoader_Load" "', argument " "9"" of type '" "char const *""'");
+  }
+  arg9 = reinterpret_cast< char * >(buf9);
+  res10 = SWIG_ConvertPtr(obj9, &argp10,SWIGTYPE_p_iMissingLoaderData, 0 |  0 );
+  if (!SWIG_IsOK(res10)) {
+    SWIG_exception_fail(SWIG_ArgError(res10), "in method '" "iLoader_Load" "', argument " "10"" of type '" "iMissingLoaderData *""'"); 
+  }
+  arg10 = reinterpret_cast< iMissingLoaderData * >(argp10);
+  result = (bool)(arg1)->Load(arg2,*arg3,arg4,arg5,arg6,arg7,arg8,(char const *)arg9,arg10);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  if (alloc9 == SWIG_NEWOBJ) delete[] buf9;
+  return resultobj;
+fail:
+  if (alloc9 == SWIG_NEWOBJ) delete[] buf9;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_17(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iLoader *arg1 = (iLoader *) 0 ;
+  iDocumentNode *arg2 = (iDocumentNode *) 0 ;
+  iBase **arg3 = 0 ;
+  iRegion *arg4 = (iRegion *) 0 ;
+  bool arg5 ;
+  bool arg6 ;
+  bool arg7 ;
+  iStreamSource *arg8 = (iStreamSource *) 0 ;
+  char *arg9 = (char *) 0 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  bool val5 ;
+  int ecode5 = 0 ;
+  bool val6 ;
+  int ecode6 = 0 ;
+  bool val7 ;
+  int ecode7 = 0 ;
+  void *argp8 = 0 ;
+  int res8 = 0 ;
+  int res9 ;
+  char *buf9 = 0 ;
+  int alloc9 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -9929,32 +10523,32 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_14(PyObject *SWIGUNUSEDPARM(self),
     SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iLoader_Load" "', argument " "6"" of type '" "bool""'");
   } 
   arg6 = static_cast< bool >(val6);
-  res7 = SWIG_ConvertPtr(obj6, &argp7,SWIGTYPE_p_iStreamSource, 0 |  0 );
-  if (!SWIG_IsOK(res7)) {
-    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "iLoader_Load" "', argument " "7"" of type '" "iStreamSource *""'"); 
-  }
-  arg7 = reinterpret_cast< iStreamSource * >(argp7);
-  res8 = SWIG_AsCharPtrAndSize(obj7, &buf8, NULL, &alloc8);
+  ecode7 = SWIG_AsVal_bool(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "iLoader_Load" "', argument " "7"" of type '" "bool""'");
+  } 
+  arg7 = static_cast< bool >(val7);
+  res8 = SWIG_ConvertPtr(obj7, &argp8,SWIGTYPE_p_iStreamSource, 0 |  0 );
   if (!SWIG_IsOK(res8)) {
-    SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "iLoader_Load" "', argument " "8"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "iLoader_Load" "', argument " "8"" of type '" "iStreamSource *""'"); 
   }
-  arg8 = reinterpret_cast< char * >(buf8);
-  res9 = SWIG_ConvertPtr(obj8, &argp9,SWIGTYPE_p_iMissingLoaderData, 0 |  0 );
+  arg8 = reinterpret_cast< iStreamSource * >(argp8);
+  res9 = SWIG_AsCharPtrAndSize(obj8, &buf9, NULL, &alloc9);
   if (!SWIG_IsOK(res9)) {
-    SWIG_exception_fail(SWIG_ArgError(res9), "in method '" "iLoader_Load" "', argument " "9"" of type '" "iMissingLoaderData *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res9), "in method '" "iLoader_Load" "', argument " "9"" of type '" "char const *""'");
   }
-  arg9 = reinterpret_cast< iMissingLoaderData * >(argp9);
-  result = (bool)(arg1)->Load(arg2,*arg3,arg4,arg5,arg6,arg7,(char const *)arg8,arg9);
+  arg9 = reinterpret_cast< char * >(buf9);
+  result = (bool)(arg1)->Load(arg2,*arg3,arg4,arg5,arg6,arg7,arg8,(char const *)arg9);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
-  if (alloc8 == SWIG_NEWOBJ) delete[] buf8;
+  if (alloc9 == SWIG_NEWOBJ) delete[] buf9;
   return resultobj;
 fail:
-  if (alloc8 == SWIG_NEWOBJ) delete[] buf8;
+  if (alloc9 == SWIG_NEWOBJ) delete[] buf9;
   return NULL;
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_15(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_18(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   iDocumentNode *arg2 = (iDocumentNode *) 0 ;
@@ -9962,8 +10556,8 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_15(PyObject *SWIGUNUSEDPARM(self),
   iRegion *arg4 = (iRegion *) 0 ;
   bool arg5 ;
   bool arg6 ;
-  iStreamSource *arg7 = (iStreamSource *) 0 ;
-  char *arg8 = (char *) 0 ;
+  bool arg7 ;
+  iStreamSource *arg8 = (iStreamSource *) 0 ;
   bool result;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -9977,11 +10571,10 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_15(PyObject *SWIGUNUSEDPARM(self),
   int ecode5 = 0 ;
   bool val6 ;
   int ecode6 = 0 ;
-  void *argp7 = 0 ;
-  int res7 = 0 ;
-  int res8 ;
-  char *buf8 = 0 ;
-  int alloc8 = 0 ;
+  bool val7 ;
+  int ecode7 = 0 ;
+  void *argp8 = 0 ;
+  int res8 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -10025,27 +10618,25 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_15(PyObject *SWIGUNUSEDPARM(self),
     SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iLoader_Load" "', argument " "6"" of type '" "bool""'");
   } 
   arg6 = static_cast< bool >(val6);
-  res7 = SWIG_ConvertPtr(obj6, &argp7,SWIGTYPE_p_iStreamSource, 0 |  0 );
-  if (!SWIG_IsOK(res7)) {
-    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "iLoader_Load" "', argument " "7"" of type '" "iStreamSource *""'"); 
-  }
-  arg7 = reinterpret_cast< iStreamSource * >(argp7);
-  res8 = SWIG_AsCharPtrAndSize(obj7, &buf8, NULL, &alloc8);
+  ecode7 = SWIG_AsVal_bool(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "iLoader_Load" "', argument " "7"" of type '" "bool""'");
+  } 
+  arg7 = static_cast< bool >(val7);
+  res8 = SWIG_ConvertPtr(obj7, &argp8,SWIGTYPE_p_iStreamSource, 0 |  0 );
   if (!SWIG_IsOK(res8)) {
-    SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "iLoader_Load" "', argument " "8"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "iLoader_Load" "', argument " "8"" of type '" "iStreamSource *""'"); 
   }
-  arg8 = reinterpret_cast< char * >(buf8);
-  result = (bool)(arg1)->Load(arg2,*arg3,arg4,arg5,arg6,arg7,(char const *)arg8);
+  arg8 = reinterpret_cast< iStreamSource * >(argp8);
+  result = (bool)(arg1)->Load(arg2,*arg3,arg4,arg5,arg6,arg7,arg8);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
-  if (alloc8 == SWIG_NEWOBJ) delete[] buf8;
   return resultobj;
 fail:
-  if (alloc8 == SWIG_NEWOBJ) delete[] buf8;
   return NULL;
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_16(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_19(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   iDocumentNode *arg2 = (iDocumentNode *) 0 ;
@@ -10053,7 +10644,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_16(PyObject *SWIGUNUSEDPARM(self),
   iRegion *arg4 = (iRegion *) 0 ;
   bool arg5 ;
   bool arg6 ;
-  iStreamSource *arg7 = (iStreamSource *) 0 ;
+  bool arg7 ;
   bool result;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -10067,8 +10658,8 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_16(PyObject *SWIGUNUSEDPARM(self),
   int ecode5 = 0 ;
   bool val6 ;
   int ecode6 = 0 ;
-  void *argp7 = 0 ;
-  int res7 = 0 ;
+  bool val7 ;
+  int ecode7 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -10111,11 +10702,11 @@ SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_16(PyObject *SWIGUNUSEDPARM(self),
     SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iLoader_Load" "', argument " "6"" of type '" "bool""'");
   } 
   arg6 = static_cast< bool >(val6);
-  res7 = SWIG_ConvertPtr(obj6, &argp7,SWIGTYPE_p_iStreamSource, 0 |  0 );
-  if (!SWIG_IsOK(res7)) {
-    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "iLoader_Load" "', argument " "7"" of type '" "iStreamSource *""'"); 
-  }
-  arg7 = reinterpret_cast< iStreamSource * >(argp7);
+  ecode7 = SWIG_AsVal_bool(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "iLoader_Load" "', argument " "7"" of type '" "bool""'");
+  } 
+  arg7 = static_cast< bool >(val7);
   result = (bool)(arg1)->Load(arg2,*arg3,arg4,arg5,arg6,arg7);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
@@ -10124,7 +10715,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_17(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_20(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   iDocumentNode *arg2 = (iDocumentNode *) 0 ;
@@ -10194,7 +10785,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_18(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_21(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   iDocumentNode *arg2 = (iDocumentNode *) 0 ;
@@ -10255,7 +10846,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_19(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_22(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   iDocumentNode *arg2 = (iDocumentNode *) 0 ;
@@ -10307,7 +10898,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_20(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iLoader_Load__SWIG_23(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iLoader *arg1 = (iLoader *) 0 ;
   iDocumentNode *arg2 = (iDocumentNode *) 0 ;
@@ -10352,12 +10943,12 @@ fail:
 
 SWIGINTERN PyObject *_wrap_iLoader_Load(PyObject *self, PyObject *args) {
   int argc;
-  PyObject *argv[10];
+  PyObject *argv[11];
   int ii;
   
   if (!PyTuple_Check(args)) SWIG_fail;
   argc = PyObject_Length(args);
-  for (ii = 0; (ii < argc) && (ii < 9); ii++) {
+  for (ii = 0; (ii < argc) && (ii < 10); ii++) {
     argv[ii] = PyTuple_GET_ITEM(args,ii);
   }
   if (argc == 3) {
@@ -10374,7 +10965,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load(PyObject *self, PyObject *args) {
         int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_p_iBase, 0);
         _v = SWIG_CheckState(res);
         if (_v) {
-          return _wrap_iLoader_Load__SWIG_13(self, args);
+          return _wrap_iLoader_Load__SWIG_15(self, args);
         }
       }
     }
@@ -10393,7 +10984,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load(PyObject *self, PyObject *args) {
         int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_p_iBase, 0);
         _v = SWIG_CheckState(res);
         if (_v) {
-          return _wrap_iLoader_Load__SWIG_20(self, args);
+          return _wrap_iLoader_Load__SWIG_23(self, args);
         }
       }
     }
@@ -10411,7 +11002,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load(PyObject *self, PyObject *args) {
         int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_p_iBase, 0);
         _v = SWIG_CheckState(res);
         if (_v) {
-          return _wrap_iLoader_Load__SWIG_6(self, args);
+          return _wrap_iLoader_Load__SWIG_7(self, args);
         }
       }
     }
@@ -10434,7 +11025,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load(PyObject *self, PyObject *args) {
           int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_iRegion, 0);
           _v = SWIG_CheckState(res);
           if (_v) {
-            return _wrap_iLoader_Load__SWIG_19(self, args);
+            return _wrap_iLoader_Load__SWIG_22(self, args);
           }
         }
       }
@@ -10458,7 +11049,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load(PyObject *self, PyObject *args) {
           int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_iRegion, 0);
           _v = SWIG_CheckState(res);
           if (_v) {
-            return _wrap_iLoader_Load__SWIG_12(self, args);
+            return _wrap_iLoader_Load__SWIG_14(self, args);
           }
         }
       }
@@ -10481,7 +11072,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load(PyObject *self, PyObject *args) {
           int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_iRegion, 0);
           _v = SWIG_CheckState(res);
           if (_v) {
-            return _wrap_iLoader_Load__SWIG_5(self, args);
+            return _wrap_iLoader_Load__SWIG_6(self, args);
           }
         }
       }
@@ -10510,7 +11101,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load(PyObject *self, PyObject *args) {
               _v = SWIG_CheckState(res);
             }
             if (_v) {
-              return _wrap_iLoader_Load__SWIG_18(self, args);
+              return _wrap_iLoader_Load__SWIG_21(self, args);
             }
           }
         }
@@ -10540,7 +11131,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load(PyObject *self, PyObject *args) {
               _v = SWIG_CheckState(res);
             }
             if (_v) {
-              return _wrap_iLoader_Load__SWIG_11(self, args);
+              return _wrap_iLoader_Load__SWIG_13(self, args);
             }
           }
         }
@@ -10569,7 +11160,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load(PyObject *self, PyObject *args) {
               _v = SWIG_CheckState(res);
             }
             if (_v) {
-              return _wrap_iLoader_Load__SWIG_4(self, args);
+              return _wrap_iLoader_Load__SWIG_5(self, args);
             }
           }
         }
@@ -10604,7 +11195,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load(PyObject *self, PyObject *args) {
                 _v = SWIG_CheckState(res);
               }
               if (_v) {
-                return _wrap_iLoader_Load__SWIG_10(self, args);
+                return _wrap_iLoader_Load__SWIG_12(self, args);
               }
             }
           }
@@ -10640,7 +11231,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load(PyObject *self, PyObject *args) {
                 _v = SWIG_CheckState(res);
               }
               if (_v) {
-                return _wrap_iLoader_Load__SWIG_17(self, args);
+                return _wrap_iLoader_Load__SWIG_20(self, args);
               }
             }
           }
@@ -10675,7 +11266,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load(PyObject *self, PyObject *args) {
                 _v = SWIG_CheckState(res);
               }
               if (_v) {
-                return _wrap_iLoader_Load__SWIG_3(self, args);
+                return _wrap_iLoader_Load__SWIG_4(self, args);
               }
             }
           }
@@ -10711,11 +11302,12 @@ SWIGINTERN PyObject *_wrap_iLoader_Load(PyObject *self, PyObject *args) {
                 _v = SWIG_CheckState(res);
               }
               if (_v) {
-                void *vptr = 0;
-                int res = SWIG_ConvertPtr(argv[6], &vptr, SWIGTYPE_p_iStreamSource, 0);
-                _v = SWIG_CheckState(res);
+                {
+                  int res = SWIG_AsVal_bool(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
                 if (_v) {
-                  return _wrap_iLoader_Load__SWIG_9(self, args);
+                  return _wrap_iLoader_Load__SWIG_11(self, args);
                 }
               }
             }
@@ -10752,11 +11344,12 @@ SWIGINTERN PyObject *_wrap_iLoader_Load(PyObject *self, PyObject *args) {
                 _v = SWIG_CheckState(res);
               }
               if (_v) {
-                void *vptr = 0;
-                int res = SWIG_ConvertPtr(argv[6], &vptr, SWIGTYPE_p_iStreamSource, 0);
-                _v = SWIG_CheckState(res);
+                {
+                  int res = SWIG_AsVal_bool(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
                 if (_v) {
-                  return _wrap_iLoader_Load__SWIG_16(self, args);
+                  return _wrap_iLoader_Load__SWIG_19(self, args);
                 }
               }
             }
@@ -10792,11 +11385,12 @@ SWIGINTERN PyObject *_wrap_iLoader_Load(PyObject *self, PyObject *args) {
                 _v = SWIG_CheckState(res);
               }
               if (_v) {
-                void *vptr = 0;
-                int res = SWIG_ConvertPtr(argv[6], &vptr, SWIGTYPE_p_iStreamSource, 0);
-                _v = SWIG_CheckState(res);
+                {
+                  int res = SWIG_AsVal_bool(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
                 if (_v) {
-                  return _wrap_iLoader_Load__SWIG_2(self, args);
+                  return _wrap_iLoader_Load__SWIG_3(self, args);
                 }
               }
             }
@@ -10833,14 +11427,16 @@ SWIGINTERN PyObject *_wrap_iLoader_Load(PyObject *self, PyObject *args) {
                 _v = SWIG_CheckState(res);
               }
               if (_v) {
-                void *vptr = 0;
-                int res = SWIG_ConvertPtr(argv[6], &vptr, SWIGTYPE_p_iStreamSource, 0);
-                _v = SWIG_CheckState(res);
+                {
+                  int res = SWIG_AsVal_bool(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
                 if (_v) {
-                  int res = SWIG_AsCharPtrAndSize(argv[7], 0, NULL, 0);
+                  void *vptr = 0;
+                  int res = SWIG_ConvertPtr(argv[7], &vptr, SWIGTYPE_p_iStreamSource, 0);
                   _v = SWIG_CheckState(res);
                   if (_v) {
-                    return _wrap_iLoader_Load__SWIG_15(self, args);
+                    return _wrap_iLoader_Load__SWIG_18(self, args);
                   }
                 }
               }
@@ -10878,14 +11474,16 @@ SWIGINTERN PyObject *_wrap_iLoader_Load(PyObject *self, PyObject *args) {
                 _v = SWIG_CheckState(res);
               }
               if (_v) {
-                void *vptr = 0;
-                int res = SWIG_ConvertPtr(argv[6], &vptr, SWIGTYPE_p_iStreamSource, 0);
-                _v = SWIG_CheckState(res);
+                {
+                  int res = SWIG_AsVal_bool(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
                 if (_v) {
-                  int res = SWIG_AsCharPtrAndSize(argv[7], 0, NULL, 0);
+                  void *vptr = 0;
+                  int res = SWIG_ConvertPtr(argv[7], &vptr, SWIGTYPE_p_iStreamSource, 0);
                   _v = SWIG_CheckState(res);
                   if (_v) {
-                    return _wrap_iLoader_Load__SWIG_8(self, args);
+                    return _wrap_iLoader_Load__SWIG_10(self, args);
                   }
                 }
               }
@@ -10922,14 +11520,16 @@ SWIGINTERN PyObject *_wrap_iLoader_Load(PyObject *self, PyObject *args) {
                 _v = SWIG_CheckState(res);
               }
               if (_v) {
-                void *vptr = 0;
-                int res = SWIG_ConvertPtr(argv[6], &vptr, SWIGTYPE_p_iStreamSource, 0);
-                _v = SWIG_CheckState(res);
+                {
+                  int res = SWIG_AsVal_bool(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
                 if (_v) {
-                  int res = SWIG_AsCharPtrAndSize(argv[7], 0, NULL, 0);
+                  void *vptr = 0;
+                  int res = SWIG_ConvertPtr(argv[7], &vptr, SWIGTYPE_p_iStreamSource, 0);
                   _v = SWIG_CheckState(res);
                   if (_v) {
-                    return _wrap_iLoader_Load__SWIG_1(self, args);
+                    return _wrap_iLoader_Load__SWIG_2(self, args);
                   }
                 }
               }
@@ -10967,18 +11567,19 @@ SWIGINTERN PyObject *_wrap_iLoader_Load(PyObject *self, PyObject *args) {
                 _v = SWIG_CheckState(res);
               }
               if (_v) {
-                void *vptr = 0;
-                int res = SWIG_ConvertPtr(argv[6], &vptr, SWIGTYPE_p_iStreamSource, 0);
-                _v = SWIG_CheckState(res);
+                {
+                  int res = SWIG_AsVal_bool(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
                 if (_v) {
-                  int res = SWIG_AsCharPtrAndSize(argv[7], 0, NULL, 0);
+                  void *vptr = 0;
+                  int res = SWIG_ConvertPtr(argv[7], &vptr, SWIGTYPE_p_iStreamSource, 0);
                   _v = SWIG_CheckState(res);
                   if (_v) {
-                    void *vptr = 0;
-                    int res = SWIG_ConvertPtr(argv[8], &vptr, SWIGTYPE_p_iMissingLoaderData, 0);
+                    int res = SWIG_AsCharPtrAndSize(argv[8], 0, NULL, 0);
                     _v = SWIG_CheckState(res);
                     if (_v) {
-                      return _wrap_iLoader_Load__SWIG_7(self, args);
+                      return _wrap_iLoader_Load__SWIG_9(self, args);
                     }
                   }
                 }
@@ -11017,18 +11618,19 @@ SWIGINTERN PyObject *_wrap_iLoader_Load(PyObject *self, PyObject *args) {
                 _v = SWIG_CheckState(res);
               }
               if (_v) {
-                void *vptr = 0;
-                int res = SWIG_ConvertPtr(argv[6], &vptr, SWIGTYPE_p_iStreamSource, 0);
-                _v = SWIG_CheckState(res);
+                {
+                  int res = SWIG_AsVal_bool(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
                 if (_v) {
-                  int res = SWIG_AsCharPtrAndSize(argv[7], 0, NULL, 0);
+                  void *vptr = 0;
+                  int res = SWIG_ConvertPtr(argv[7], &vptr, SWIGTYPE_p_iStreamSource, 0);
                   _v = SWIG_CheckState(res);
                   if (_v) {
-                    void *vptr = 0;
-                    int res = SWIG_ConvertPtr(argv[8], &vptr, SWIGTYPE_p_iMissingLoaderData, 0);
+                    int res = SWIG_AsCharPtrAndSize(argv[8], 0, NULL, 0);
                     _v = SWIG_CheckState(res);
                     if (_v) {
-                      return _wrap_iLoader_Load__SWIG_14(self, args);
+                      return _wrap_iLoader_Load__SWIG_17(self, args);
                     }
                   }
                 }
@@ -11066,18 +11668,186 @@ SWIGINTERN PyObject *_wrap_iLoader_Load(PyObject *self, PyObject *args) {
                 _v = SWIG_CheckState(res);
               }
               if (_v) {
-                void *vptr = 0;
-                int res = SWIG_ConvertPtr(argv[6], &vptr, SWIGTYPE_p_iStreamSource, 0);
-                _v = SWIG_CheckState(res);
+                {
+                  int res = SWIG_AsVal_bool(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
                 if (_v) {
-                  int res = SWIG_AsCharPtrAndSize(argv[7], 0, NULL, 0);
+                  void *vptr = 0;
+                  int res = SWIG_ConvertPtr(argv[7], &vptr, SWIGTYPE_p_iStreamSource, 0);
                   _v = SWIG_CheckState(res);
                   if (_v) {
-                    void *vptr = 0;
-                    int res = SWIG_ConvertPtr(argv[8], &vptr, SWIGTYPE_p_iMissingLoaderData, 0);
+                    int res = SWIG_AsCharPtrAndSize(argv[8], 0, NULL, 0);
                     _v = SWIG_CheckState(res);
                     if (_v) {
-                      return _wrap_iLoader_Load__SWIG_0(self, args);
+                      return _wrap_iLoader_Load__SWIG_1(self, args);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 10) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iLoader, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iDocumentNode, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_p_iBase, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          void *vptr = 0;
+          int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_iRegion, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            {
+              int res = SWIG_AsVal_bool(argv[4], NULL);
+              _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              {
+                int res = SWIG_AsVal_bool(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
+              if (_v) {
+                {
+                  int res = SWIG_AsVal_bool(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
+                if (_v) {
+                  void *vptr = 0;
+                  int res = SWIG_ConvertPtr(argv[7], &vptr, SWIGTYPE_p_iStreamSource, 0);
+                  _v = SWIG_CheckState(res);
+                  if (_v) {
+                    int res = SWIG_AsCharPtrAndSize(argv[8], 0, NULL, 0);
+                    _v = SWIG_CheckState(res);
+                    if (_v) {
+                      void *vptr = 0;
+                      int res = SWIG_ConvertPtr(argv[9], &vptr, SWIGTYPE_p_iMissingLoaderData, 0);
+                      _v = SWIG_CheckState(res);
+                      if (_v) {
+                        return _wrap_iLoader_Load__SWIG_16(self, args);
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 10) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iLoader, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iDataBuffer, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_p_iBase, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          void *vptr = 0;
+          int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_iRegion, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            {
+              int res = SWIG_AsVal_bool(argv[4], NULL);
+              _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              {
+                int res = SWIG_AsVal_bool(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
+              if (_v) {
+                {
+                  int res = SWIG_AsVal_bool(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
+                if (_v) {
+                  void *vptr = 0;
+                  int res = SWIG_ConvertPtr(argv[7], &vptr, SWIGTYPE_p_iStreamSource, 0);
+                  _v = SWIG_CheckState(res);
+                  if (_v) {
+                    int res = SWIG_AsCharPtrAndSize(argv[8], 0, NULL, 0);
+                    _v = SWIG_CheckState(res);
+                    if (_v) {
+                      void *vptr = 0;
+                      int res = SWIG_ConvertPtr(argv[9], &vptr, SWIGTYPE_p_iMissingLoaderData, 0);
+                      _v = SWIG_CheckState(res);
+                      if (_v) {
+                        return _wrap_iLoader_Load__SWIG_8(self, args);
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 10) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iLoader, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_p_iBase, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          void *vptr = 0;
+          int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_iRegion, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            {
+              int res = SWIG_AsVal_bool(argv[4], NULL);
+              _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              {
+                int res = SWIG_AsVal_bool(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
+              if (_v) {
+                {
+                  int res = SWIG_AsVal_bool(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
+                if (_v) {
+                  void *vptr = 0;
+                  int res = SWIG_ConvertPtr(argv[7], &vptr, SWIGTYPE_p_iStreamSource, 0);
+                  _v = SWIG_CheckState(res);
+                  if (_v) {
+                    int res = SWIG_AsCharPtrAndSize(argv[8], 0, NULL, 0);
+                    _v = SWIG_CheckState(res);
+                    if (_v) {
+                      void *vptr = 0;
+                      int res = SWIG_ConvertPtr(argv[9], &vptr, SWIGTYPE_p_iMissingLoaderData, 0);
+                      _v = SWIG_CheckState(res);
+                      if (_v) {
+                        return _wrap_iLoader_Load__SWIG_0(self, args);
+                      }
                     }
                   }
                 }
@@ -11090,7 +11860,7 @@ SWIGINTERN PyObject *_wrap_iLoader_Load(PyObject *self, PyObject *args) {
   }
   
 fail:
-  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iLoader_Load'.\n  Possible C/C++ prototypes are:\n    Load(char const *,iBase *&,iRegion *,bool,bool,iStreamSource *,char const *,iMissingLoaderData *)\n    Load(char const *,iBase *&,iRegion *,bool,bool,iStreamSource *,char const *)\n    Load(char const *,iBase *&,iRegion *,bool,bool,iStreamSource *)\n    Load(char const *,iBase *&,iRegion *,bool,bool)\n    Load(char const *,iBase *&,iRegion *,bool)\n    Load(char const *,iBase *&,iRegion *)\n    Load(char const *,iBase *&)\n    Load(iDataBuffer *,iBase *&,iRegion *,bool,bool,iStreamSource *,char const *,iMissingLoaderData *)\n    Load(iDataBuffer *,iBase *&,iRegion *,bool,bool,iStreamSource *,char const *)\n    Load(iDataBuffer *,iBase *&,iRegion *,bool,bool,iStreamSource *)\n    Load(iDataBuffer *,iBase *&,iRegion *,bool,bool)\n    Load(iDataBuffer *,iBase *&,iRegion *,bool)\n    Load(iDataBuffer *,iBase *&,iRegion *)\n    Load(iDataBuffer *,iBase *&)\n    Load(iDocumentNode *,iBase *&,iRegion *,bool,bool,iStreamSource *,char const *,iMissingLoaderData *)\n    Load(iDocumentNode *,iBase *&,iRegion *,bool,bool,iStreamSource *,char const *)\n    Load(iDocumentNode *,iBase *&,iRegion *,bool,bool,iStreamSource *)\n    Load(iDocumentNode *,iBase *&,iRegion *,bool,bool)\n    Load(iDocumentNode *,iBase *&,iRegion *,bool)\n    Load(iDocumentNode *,iBase *&,iRegion *)\n    Load(iDocumentNode *,iBase *&)\n");
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iLoader_Load'.\n  Possible C/C++ prototypes are:\n    Load(char const *,iBase *&,iRegion *,bool,bool,bool,iStreamSource *,char const *,iMissingLoaderData *)\n    Load(char const *,iBase *&,iRegion *,bool,bool,bool,iStreamSource *,char const *)\n    Load(char const *,iBase *&,iRegion *,bool,bool,bool,iStreamSource *)\n    Load(char const *,iBase *&,iRegion *,bool,bool,bool)\n    Load(char const *,iBase *&,iRegion *,bool,bool)\n    Load(char const *,iBase *&,iRegion *,bool)\n    Load(char const *,iBase *&,iRegion *)\n    Load(char const *,iBase *&)\n    Load(iDataBuffer *,iBase *&,iRegion *,bool,bool,bool,iStreamSource *,char const *,iMissingLoaderData *)\n    Load(iDataBuffer *,iBase *&,iRegion *,bool,bool,bool,iStreamSource *,char const *)\n    Load(iDataBuffer *,iBase *&,iRegion *,bool,bool,bool,iStreamSource *)\n    Load(iDataBuffer *,iBase *&,iRegion *,bool,bool,bool)\n    Load(iDataBuffer *,iBase *&,iRegion *,bool,bool)\n    Load(iDataBuffer *,iBase *&,iRegion *,bool)\n    Load(iDataBuffer *,iBase *&,iRegion *)\n    Load(iDataBuffer *,iBase *&)\n    Load(iDocumentNode *,iBase *&,iRegion *,bool,bool,bool,iStreamSource *,char const *,iMissingLoaderData *)\n    Load(iDocumentNode *,iBase *&,iRegion *,bool,bool,bool,iStreamSource *,char const *)\n    Load(iDocumentNode *,iBase *&,iRegion *,bool,bool,bool,iStreamSource *)\n    Load(iDocumentNode *,iBase *&,iRegion *,bool,bool,bool)\n    Load(iDocumentNode *,iBase *&,iRegion *,bool,bool)\n    Load(iDocumentNode *,iBase *&,iRegion *,bool)\n    Load(iDocumentNode *,iBase *&,iRegion *)\n    Load(iDocumentNode *,iBase *&)\n");
   return NULL;
 }
 
