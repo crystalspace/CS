@@ -193,6 +193,7 @@ private:
 
   csRef<iMaterialWrapper> matwrap;
   csArray<iMaterialWrapper*> palette;
+  // Used to make sure we hold refs to materials (so the ref count is correct when we look to unload).
   csRefArray<iMaterialWrapper> refPalette;
   csRefArray<iImage> alphas;
   csRef<iShaderVariableContext> baseContext;
