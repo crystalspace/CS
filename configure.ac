@@ -1797,9 +1797,19 @@ AS_IF([test $cs_host_family != windows],
 #------------------------------------------------------------------------------
 # Check for Colour Ascii Art library (libcaca).
 #------------------------------------------------------------------------------
+# NOTE: Would solely pkg-config be used for caca detection the separate cucul 
+#  test could be dropped since it would be contained in caca.
+CS_CHECK_LIB_WITH([cucul],
+    [AC_LANG_PROGRAM([[#include <cucul.h>]], [cucul_create_canvas(0,0)])],
+    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libcucul], [CUCUL])], [], [], [], [],
+    [libcucul])
+    
 CS_CHECK_LIB_WITH([caca],
-    [AC_LANG_PROGRAM([[#include <caca.h>]], [caca_init(); caca_end();])],
-    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libcaca], [LIBCACA])], [], [], [], [],
+    [AC_LANG_PROGRAM([[#include <caca.h>]], [caca_create_display(0)])],
+    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libcaca], [CACA])], [], 
+    [$cs_cv_libcucul_cflags], 
+    [$cs_cv_libcucul_lflags], 
+    [$cs_cv_libcucul_libs],
     [libcaca])
 
 

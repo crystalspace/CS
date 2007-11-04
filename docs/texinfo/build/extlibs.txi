@@ -282,7 +282,7 @@ if you have permission to do so, it is best to install the library.
 This library is used for 2D rendering in text mode.  This is optional and only
 needed for fun. libcaca can be downloaded from:
 
-@emph{Version:} 0.9 recommended
+@emph{Version:} at least 0.99beta12 required
 
 @noindent
 @uref{http://sam.zoy.org/libcaca/}
