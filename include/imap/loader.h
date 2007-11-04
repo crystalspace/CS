@@ -373,7 +373,7 @@ struct iLoader : public virtual iBase
    * The application can then provide that missing data in some other way.
    */
   virtual bool LoadLibraryFile (const char* filename, iRegion* region = 0,
-  	bool curRegOnly = true, bool checkDupes = false,
+  	bool curRegOnly = true, bool checkDupes = false, bool forceLoadTextures = false,
 	iStreamSource* ssource = 0,
 	iMissingLoaderData* missingdata = 0) = 0;
 
@@ -396,7 +396,7 @@ struct iLoader : public virtual iBase
    * The application can then provide that missing data in some other way.
    */
   virtual bool LoadLibrary (iDocumentNode* lib_node, iRegion* region = 0,
-  	bool curRegOnly = true, bool checkDupes = false,
+  	bool curRegOnly = true, bool checkDupes = false, bool forceLoadTextures = false,
 	iStreamSource* ssource = 0,
 	iMissingLoaderData* missingdata = 0) = 0;
 
@@ -458,7 +458,7 @@ struct iLoader : public virtual iBase
    * The application can then provide that missing data in some other way.
    */
   virtual bool Load (const char* fname, iBase*& result, iRegion* region = 0,
-  	bool curRegOnly = true, bool checkDupes = false,
+  	bool curRegOnly = true, bool checkDupes = false, bool forceLoadTextures = false,
 	iStreamSource* ssource = 0, const char* override_name = 0,
 	iMissingLoaderData* missingdata = 0) = 0;
 
@@ -504,7 +504,7 @@ struct iLoader : public virtual iBase
    * The application can then provide that missing data in some other way.
    */
   virtual bool Load (iDataBuffer* buffer, iBase*& result, iRegion* region = 0,
-  	bool curRegOnly = true, bool checkDupes = false,
+  	bool curRegOnly = true, bool checkDupes = false, bool forceLoadTextures = false,
 	iStreamSource* ssource = 0, const char* override_name = 0,
 	iMissingLoaderData* missingdata = 0) = 0;
 
@@ -549,7 +549,7 @@ struct iLoader : public virtual iBase
    * The application can then provide that missing data in some other way.
    */
   virtual bool Load (iDocumentNode* node, iBase*& result, iRegion* region = 0,
-  	bool curRegOnly = true, bool checkDupes = false,
+  	bool curRegOnly = true, bool checkDupes = false, bool forceLoadTextures = false,
 	iStreamSource* ssource = 0, const char* override_name = 0,
 	iMissingLoaderData* missingdata = 0) = 0;
 

@@ -92,7 +92,7 @@ private:
   csVector3 offset;
 
   /// Material palette containing all used materials
-  csArray<iMaterialWrapper*> materialPalette;
+  csRefArray<iMaterialWrapper> materialPalette;
 
   /// Cached string id for "vertices"
   csStringID stringVertices;  
@@ -272,7 +272,7 @@ public:
   virtual const int *SampleInteger (csStringID type);
 
   /// Returns the material palette
-  virtual const csArray<iMaterialWrapper*> &GetMaterialPalette ();
+  virtual const csRefArray<iMaterialWrapper> &GetMaterialPalette ();
 
   /// Returns the sample region
   virtual const csBox2 &GetRegion () const;

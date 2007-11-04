@@ -31,10 +31,10 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
 
+#include "iengine/material.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
 
-struct iMaterialWrapper;
 struct iPortalContainer;
 
 namespace CS
@@ -176,7 +176,7 @@ struct CoreRenderMesh
    * Material used for this mesh.
    * Used for e.g. sorting by material.
    */
-  iMaterialWrapper* material;
+  csRef<iMaterialWrapper> material;
 
   /** 
    * Transform object space -> world space.

@@ -97,7 +97,7 @@ private:
   csStringHash xmltokens;
 
   bool ParseMaterialPalette (iDocumentNode* node, iLoaderContext *ldr_context,
-  	csArray<iMaterialWrapper*>& palette);
+  	csRefArray<iMaterialWrapper>& palette);
 public:
   /// Constructor
   csTerrainObjectLoader (iBase*);

@@ -1867,20 +1867,20 @@ void csTerrainObject::CastShadows (iMovable* movable, iFrustumView* fview)
 }
 
 bool csTerrainObject::SetMaterialPalette (
-  const csArray<iMaterialWrapper*>& pal)
+  const csRefArray<iMaterialWrapper>& pal)
 {
   palette.SetSize (pal.GetSize ());
   paletteContexts.SetSize (pal.GetSize ());
   for (size_t i = 0; i < pal.GetSize (); i++)
   {
-    palette[i] = pal[i];
+      palette.Put(i, pal.Get(i));
     paletteContexts[i] = new csShaderVariableContext();
   }
 
   return true;
 }
 
-csArray<iMaterialWrapper*> csTerrainObject::GetMaterialPalette ()
+csRefArray<iMaterialWrapper> csTerrainObject::GetMaterialPalette ()
 {
   return palette;
 }

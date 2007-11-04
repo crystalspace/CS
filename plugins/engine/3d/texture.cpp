@@ -57,6 +57,14 @@ csTextureWrapper::csTextureWrapper (csEngine* engine, iTextureHandle *ith)
   UpdateKeyColorFromHandle ();
 }
 
+csTextureWrapper::csTextureWrapper (csEngine* engine)
+  : scfImplementationType (this), engine (engine),
+  flags(CS_TEXTURE_3D)
+{
+  keep_image = engine->csEngine::GetDefaultKeepImage();
+  texClass = 0;
+}
+
 void csTextureWrapper::SelfDestruct ()
 {
   engine->GetTextureList ()->Remove (static_cast<iTextureWrapper*>(this));
@@ -199,6 +207,14 @@ iTextureWrapper *csTextureList::NewTexture (iTextureHandle *ith)
   tm.AttachNew (new csTextureWrapper (engine, ith));
   Push (tm);
   return tm;
+}
+
+iTextureWrapper *csTextureList::NewProxyTexture ()
+{
+    csRef<iTextureWrapper> tm;
+    tm.AttachNew (new csTextureWrapper (engine));
+    Push(tm);
+    return tm;
 }
 
 int csTextureList::GetCount () const

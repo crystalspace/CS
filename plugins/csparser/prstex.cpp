@@ -318,6 +318,30 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     }
   }
 
+  csString texClass = context.GetClass();
+  // Proxy texture loading if the loader isn't specified.
+  if(txtname && type.IsEmpty())
+  {
+      if (filename.IsEmpty())
+      {
+          filename = txtname;
+      }
+      proxyTexture proxTex;
+      proxTex.filename = filename;
+      tex = Engine->GetTextureList()->NewProxyTexture();
+      tex->SetTextureClass(context.GetClass());
+      tex->SetFlags(context.GetFlags());
+      tex->QueryObject()->SetName(txtname);
+      proxTex.textureWrapper = tex;
+      proxTex.region = ldr_context->GetRegion();
+      if(proxTex.region)
+      {
+          proxTex.region->QueryObject()->ObjAdd(proxTex.textureWrapper->QueryObject());
+      }
+      proxyTextures.Push(proxTex);
+      return tex;
+  }
+
   // @@@ some more comments
   if (type.IsEmpty () && filename.IsEmpty ())
   {
@@ -643,6 +667,8 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
       return 0;
   }
   AddToRegion (ldr_context, mat->QueryObject ());
+
+  materialArray.Push(mat);
 
   return mat;
 }

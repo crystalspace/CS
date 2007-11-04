@@ -186,6 +186,11 @@ struct iTextureList : public virtual iBase
    */
   virtual iTextureWrapper *NewTexture (iTextureHandle *ith) = 0;
 
+  /**
+   * Create a proxy texture wrapper.
+   */
+  virtual iTextureWrapper *NewProxyTexture () = 0;
+
   /// Return the number of textures in this list.
   virtual int GetCount () const = 0;
 

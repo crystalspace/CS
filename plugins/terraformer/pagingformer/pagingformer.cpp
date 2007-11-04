@@ -1164,7 +1164,7 @@ const int *csPagingSampler::SampleInteger (csStringID type)
 }
 
 
-const csArray<iMaterialWrapper*> &csPagingSampler::GetMaterialPalette ()
+const csRefArray<iMaterialWrapper> &csPagingSampler::GetMaterialPalette ()
 {
   //printf("GetMaterial Sampler\n");
   // Just return the palette

@@ -1016,7 +1016,7 @@ printf("%s\n",fn.GetData());
   }
 }
 
-const csArray<iMaterialWrapper*> &csSimpleSampler::GetMaterialPalette ()
+const csRefArray<iMaterialWrapper> &csSimpleSampler::GetMaterialPalette ()
 {
   // Just return the palette
   return terraFormer->materialPalette;
