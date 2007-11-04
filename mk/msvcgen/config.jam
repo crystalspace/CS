@@ -33,6 +33,7 @@
 #------------------------------------------------------------------------------
 
 3DS.AVAILABLE = yes ;
+3DS.DEFINES = LIB3DS_GENERIC_DATA_IO_CALLBACKS ;
 3DS.LIBS = lib3ds.lib ;
 BULLET.AVAILABLE = yes ;
 BULLET.LIBS.7 = bulletcollision-vc7.lib bulletdynamics-vc7.lib bulletmath-vc7.lib ;

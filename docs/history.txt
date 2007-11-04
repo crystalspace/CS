@@ -16,6 +16,9 @@ chronological order.
           maps, but only the textures actually used by a given map to be loaded.
           Also added some unloading functions as part of this, although they can
           be used separately if wanted.
+	- res adjusted the preprocessor definitions for lib3ds to contain
+	  LIB3DS_GENERIC_DATA_IO_CALLBACKS, needed for the version contained
+	  in the latest cs-win32libs.
 3-Nov-2007
 	- Jorrit added an initial port of the bullet physics plugin to the
 	  latest release of bullet (2.64). Not everything is supported yet
