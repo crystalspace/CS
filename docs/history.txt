@@ -22,6 +22,8 @@ chronological order.
 	  always set at 0,0,0.
 	- res changed bin/autogen.sh to not remove aclocal.m4 when autoconf
 	  failed. Can be helpful for troubleshooting.
+	- res fixed a copy-and-paste error in include/Jamfile to properly
+	  filter include/csutil/scopedmutexlock.h from the master headers.
 4-Nov-2007
 	- res updated the caca canvas to work with caca 0.99.
 	- res added an empty IconsMakeWin32ICO rule override to msvcgen.jam to
