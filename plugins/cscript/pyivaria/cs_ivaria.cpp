@@ -2494,26 +2494,26 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_char swig_types[16]
 #define SWIGTYPE_p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[17]
 #define SWIGTYPE_p_csArrayTcsIntersectingTriangle_csArrayElementHandlerTcsIntersectingTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[18]
-#define SWIGTYPE_p_csBox2 swig_types[19]
-#define SWIGTYPE_p_csBox3 swig_types[20]
-#define SWIGTYPE_p_csCollisionPair swig_types[21]
-#define SWIGTYPE_p_csColor swig_types[22]
-#define SWIGTYPE_p_csColor4 swig_types[23]
-#define SWIGTYPE_p_csConfigFile swig_types[24]
-#define SWIGTYPE_p_csIntersectingTriangle swig_types[25]
-#define SWIGTYPE_p_csMatrix3 swig_types[26]
-#define SWIGTYPE_p_csObject swig_types[27]
-#define SWIGTYPE_p_csOrthoTransform swig_types[28]
-#define SWIGTYPE_p_csPlane3 swig_types[29]
-#define SWIGTYPE_p_csPoly3D swig_types[30]
-#define SWIGTYPE_p_csPtrTiEngineSequenceParameters_t swig_types[31]
-#define SWIGTYPE_p_csPtrTiParameterESM_t swig_types[32]
-#define SWIGTYPE_p_csPtrTiRigidBody_t swig_types[33]
-#define SWIGTYPE_p_csPtrTiScriptValue_t swig_types[34]
-#define SWIGTYPE_p_csPtrTiSequenceTrigger_t swig_types[35]
-#define SWIGTYPE_p_csPtrTiSequenceWrapper_t swig_types[36]
-#define SWIGTYPE_p_csRect swig_types[37]
-#define SWIGTYPE_p_csRefArrayTiMaterialWrapper_t swig_types[38]
+#define SWIGTYPE_p_csArrayTiMaterialWrapper_p_csArrayElementHandlerTiMaterialWrapper_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[19]
+#define SWIGTYPE_p_csBox2 swig_types[20]
+#define SWIGTYPE_p_csBox3 swig_types[21]
+#define SWIGTYPE_p_csCollisionPair swig_types[22]
+#define SWIGTYPE_p_csColor swig_types[23]
+#define SWIGTYPE_p_csColor4 swig_types[24]
+#define SWIGTYPE_p_csConfigFile swig_types[25]
+#define SWIGTYPE_p_csIntersectingTriangle swig_types[26]
+#define SWIGTYPE_p_csMatrix3 swig_types[27]
+#define SWIGTYPE_p_csObject swig_types[28]
+#define SWIGTYPE_p_csOrthoTransform swig_types[29]
+#define SWIGTYPE_p_csPlane3 swig_types[30]
+#define SWIGTYPE_p_csPoly3D swig_types[31]
+#define SWIGTYPE_p_csPtrTiEngineSequenceParameters_t swig_types[32]
+#define SWIGTYPE_p_csPtrTiParameterESM_t swig_types[33]
+#define SWIGTYPE_p_csPtrTiRigidBody_t swig_types[34]
+#define SWIGTYPE_p_csPtrTiScriptValue_t swig_types[35]
+#define SWIGTYPE_p_csPtrTiSequenceTrigger_t swig_types[36]
+#define SWIGTYPE_p_csPtrTiSequenceWrapper_t swig_types[37]
+#define SWIGTYPE_p_csRect swig_types[38]
 #define SWIGTYPE_p_csRefArrayTiObject_t swig_types[39]
 #define SWIGTYPE_p_csRefArrayTiScriptValue_t swig_types[40]
 #define SWIGTYPE_p_csRefTiDynamicsSystemCollider_t swig_types[41]
@@ -32195,7 +32195,7 @@ fail:
 SWIGINTERN PyObject *_wrap_iTerraSampler_GetMaterialPalette(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iTerraSampler *arg1 = (iTerraSampler *) 0 ;
-  csRefArray<iMaterialWrapper > *result = 0 ;
+  csArray<iMaterialWrapper * > *result = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
@@ -32207,10 +32207,10 @@ SWIGINTERN PyObject *_wrap_iTerraSampler_GetMaterialPalette(PyObject *SWIGUNUSED
   }
   arg1 = reinterpret_cast< iTerraSampler * >(argp1);
   {
-    csRefArray<iMaterialWrapper > const &_result_ref = (arg1)->GetMaterialPalette();
-    result = (csRefArray<iMaterialWrapper > *) &_result_ref;
+    csArray<iMaterialWrapper * > const &_result_ref = (arg1)->GetMaterialPalette();
+    result = (csArray<iMaterialWrapper * > *) &_result_ref;
   }
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csRefArrayTiMaterialWrapper_t, 0 |  0 );
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csArrayTiMaterialWrapper_p_csArrayElementHandlerTiMaterialWrapper_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -33482,6 +33482,7 @@ static swig_type_info _swigt__p_bool = {"_p_bool", "bool *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t = {"_p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t", "csArray<csImageIOFileFormatDescription const *,csArrayElementHandler<csImageIOFileFormatDescription const * >,CS::Memory::AllocatorMalloc,csArrayCapacityDefault > *|csImageIOFileFormatDescriptions *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csArrayTcsIntersectingTriangle_csArrayElementHandlerTcsIntersectingTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t = {"_p_csArrayTcsIntersectingTriangle_csArrayElementHandlerTcsIntersectingTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t", "csArray<csIntersectingTriangle > *|csArray<csIntersectingTriangle,csArrayElementHandler<csIntersectingTriangle >,CS::Memory::AllocatorMalloc,csArrayCapacityDefault > *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_csArrayTiMaterialWrapper_p_csArrayElementHandlerTiMaterialWrapper_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t = {"_p_csArrayTiMaterialWrapper_p_csArrayElementHandlerTiMaterialWrapper_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t", "csArray<iMaterialWrapper * > *|csArray<iMaterialWrapper *,csArrayElementHandler<iMaterialWrapper * >,CS::Memory::AllocatorMalloc,csArrayCapacityDefault > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csBox2 = {"_p_csBox2", "csBox2 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csBox3 = {"_p_csBox3", "csBox3 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csCollisionPair = {"_p_csCollisionPair", "csCollisionPair *", 0, 0, (void*)0, 0};
@@ -33499,7 +33500,6 @@ static swig_type_info _swigt__p_csPtrTiScriptValue_t = {"_p_csPtrTiScriptValue_t
 static swig_type_info _swigt__p_csPtrTiSequenceTrigger_t = {"_p_csPtrTiSequenceTrigger_t", "csPtr<iSequenceTrigger > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csPtrTiSequenceWrapper_t = {"_p_csPtrTiSequenceWrapper_t", "csPtr<iSequenceWrapper > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csRect = {"_p_csRect", "csRect *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_csRefArrayTiMaterialWrapper_t = {"_p_csRefArrayTiMaterialWrapper_t", "csRefArray<iMaterialWrapper > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csRefArrayTiObject_t = {"_p_csRefArrayTiObject_t", "csRefArray<iObject > *|csObjectContainer *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csRefArrayTiScriptValue_t = {"_p_csRefArrayTiScriptValue_t", "csRefArray<iScriptValue > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csRefTiDynamicsSystemCollider_t = {"_p_csRefTiDynamicsSystemCollider_t", "csRef<iDynamicsSystemCollider > *", 0, 0, (void*)0, 0};
@@ -33666,6 +33666,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_char,
   &_swigt__p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t,
   &_swigt__p_csArrayTcsIntersectingTriangle_csArrayElementHandlerTcsIntersectingTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t,
+  &_swigt__p_csArrayTiMaterialWrapper_p_csArrayElementHandlerTiMaterialWrapper_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t,
   &_swigt__p_csBox2,
   &_swigt__p_csBox3,
   &_swigt__p_csCollisionPair,
@@ -33685,7 +33686,6 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_csPtrTiSequenceTrigger_t,
   &_swigt__p_csPtrTiSequenceWrapper_t,
   &_swigt__p_csRect,
-  &_swigt__p_csRefArrayTiMaterialWrapper_t,
   &_swigt__p_csRefArrayTiObject_t,
   &_swigt__p_csRefArrayTiScriptValue_t,
   &_swigt__p_csRefTiDynamicsSystemCollider_t,
@@ -33850,6 +33850,7 @@ static swig_cast_info _swigc__p_bool[] = {  {&_swigt__p_bool, 0, 0, 0},{0, 0, 0,
 static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t[] = {  {&_swigt__p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csArrayTcsIntersectingTriangle_csArrayElementHandlerTcsIntersectingTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t[] = {  {&_swigt__p_csArrayTcsIntersectingTriangle_csArrayElementHandlerTcsIntersectingTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_csArrayTiMaterialWrapper_p_csArrayElementHandlerTiMaterialWrapper_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t[] = {  {&_swigt__p_csArrayTiMaterialWrapper_p_csArrayElementHandlerTiMaterialWrapper_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csBox2[] = {  {&_swigt__p_csBox2, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csBox3[] = {  {&_swigt__p_csBox3, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csCollisionPair[] = {  {&_swigt__p_csCollisionPair, 0, 0, 0},{0, 0, 0, 0}};
@@ -33867,7 +33868,6 @@ static swig_cast_info _swigc__p_csPtrTiScriptValue_t[] = {  {&_swigt__p_csPtrTiS
 static swig_cast_info _swigc__p_csPtrTiSequenceTrigger_t[] = {  {&_swigt__p_csPtrTiSequenceTrigger_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csPtrTiSequenceWrapper_t[] = {  {&_swigt__p_csPtrTiSequenceWrapper_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csRect[] = {  {&_swigt__p_csRect, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csRefArrayTiMaterialWrapper_t[] = {  {&_swigt__p_csRefArrayTiMaterialWrapper_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csRefArrayTiObject_t[] = {  {&_swigt__p_csRefArrayTiObject_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csRefArrayTiScriptValue_t[] = {  {&_swigt__p_csRefArrayTiScriptValue_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csRefTiDynamicsSystemCollider_t[] = {  {&_swigt__p_csRefTiDynamicsSystemCollider_t, 0, 0, 0},{0, 0, 0, 0}};
@@ -34034,6 +34034,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_char,
   _swigc__p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t,
   _swigc__p_csArrayTcsIntersectingTriangle_csArrayElementHandlerTcsIntersectingTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t,
+  _swigc__p_csArrayTiMaterialWrapper_p_csArrayElementHandlerTiMaterialWrapper_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t,
   _swigc__p_csBox2,
   _swigc__p_csBox3,
   _swigc__p_csCollisionPair,
@@ -34053,7 +34054,6 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_csPtrTiSequenceTrigger_t,
   _swigc__p_csPtrTiSequenceWrapper_t,
   _swigc__p_csRect,
-  _swigc__p_csRefArrayTiMaterialWrapper_t,
   _swigc__p_csRefArrayTiObject_t,
   _swigc__p_csRefArrayTiScriptValue_t,
   _swigc__p_csRefTiDynamicsSystemCollider_t,

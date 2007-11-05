@@ -21719,28 +21719,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iTextureList_NewProxyTexture(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iTextureList *arg1 = (iTextureList *) 0 ;
-  iTextureWrapper *result = 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iTextureList_NewProxyTexture",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTextureList, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTextureList_NewProxyTexture" "', argument " "1"" of type '" "iTextureList *""'"); 
-  }
-  arg1 = reinterpret_cast< iTextureList * >(argp1);
-  result = (iTextureWrapper *)(arg1)->NewProxyTexture();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iTextureWrapper, 0 |  0 );
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_iTextureList_GetCount(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iTextureList *arg1 = (iTextureList *) 0 ;
@@ -34636,7 +34614,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"delete_iTextureWrapper", _wrap_delete_iTextureWrapper, METH_VARARGS, NULL},
 	 { (char *)"iTextureWrapper_swigregister", iTextureWrapper_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iTextureList_NewTexture", _wrap_iTextureList_NewTexture, METH_VARARGS, NULL},
-	 { (char *)"iTextureList_NewProxyTexture", _wrap_iTextureList_NewProxyTexture, METH_VARARGS, NULL},
 	 { (char *)"iTextureList_GetCount", _wrap_iTextureList_GetCount, METH_VARARGS, NULL},
 	 { (char *)"iTextureList_Get", _wrap_iTextureList_Get, METH_VARARGS, NULL},
 	 { (char *)"iTextureList_Add", _wrap_iTextureList_Add, METH_VARARGS, NULL},

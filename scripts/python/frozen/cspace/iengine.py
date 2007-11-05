@@ -738,7 +738,6 @@ class iTextureList(core.iBase):
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def NewTexture(*args): return _iengine.iTextureList_NewTexture(*args)
-    def NewProxyTexture(*args): return _iengine.iTextureList_NewProxyTexture(*args)
     def GetCount(*args): return _iengine.iTextureList_GetCount(*args)
     def Get(*args): return _iengine.iTextureList_Get(*args)
     def Add(*args): return _iengine.iTextureList_Add(*args)
