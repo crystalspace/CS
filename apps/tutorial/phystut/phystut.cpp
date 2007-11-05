@@ -589,6 +589,12 @@ iRigidBody* Simple::CreateSphere (void)
   csEllipsoid ellips (csVector3 (0), radius);
   gmstate->GenerateSphere (ellips, 16);
 
+  // We do a hardtransform here to make sure our sphere has an artificial
+  // offset. That way we can test if the physics engine supports that.
+  csMatrix3 m;
+  csReversibleTransform t = csReversibleTransform (m, csVector3 (0, .5, 0));
+  ballFact->HardTransform (t);
+
   // Create the mesh.
   csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (ballFact, "ball", room));
 
@@ -602,7 +608,7 @@ iRigidBody* Simple::CreateSphere (void)
   rb->AttachMesh (mesh);
 
   // Create and attach a sphere collider.
-  rb->AttachColliderSphere (radius.Norm()/2, csVector3 (0), 10, 1, 0.8f);
+  rb->AttachColliderSphere (radius.Norm()/2, csVector3 (0, .5, 0), 10, 1, 0.8f);
 
   // Fling the body.
   rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 6));
