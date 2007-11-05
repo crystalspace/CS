@@ -405,5 +405,11 @@ ICONFIGMANAGER_CSHARPCODE
 
 %include "bindings/csharp/cshoperators.i"
 
+%ignore iDocument::Parse(iString *);
+%ignore iDocument::Parse(iString *, bool);
+%ignore iString::StartsWith;
+
+%include "bindings/csharp/csstring.i"
+
 #endif SWIGCSHARP
 

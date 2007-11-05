@@ -60,10 +60,23 @@ namespace CrystalSpace.InteropServices
       char[] strarray = str.ToCharArray ();
       for (int i = 0; i < length; i++)
 	  Marshal.WriteByte (ret, i, (byte) strarray[i]);
-        Marshal.WriteByte (ret, length, 0);
-        return ret;
+      Marshal.WriteByte (ret, length, 0);
+      return ret;
     }
 
+    public static string ASCII2String(IntPtr str)
+    {
+      string ret = "";
+      char chr = (char)Marshal.ReadByte(str);
+	  int ofs = 0;
+      while(chr != 0)
+	  {
+	    ret += chr;
+		ofs++;
+		Marshal.ReadByte(str, ofs);
+	  }
+	  return ret;
+    }
     // Takes a string array and return a structure with the
     // argc and argv arguments for C functions
     public static csArgs FromString (String[]args)
