@@ -222,6 +222,8 @@ csBulletDynamicsSystem::csBulletDynamicsSystem (btDynamicsWorld* world)
 
 csBulletDynamicsSystem::~csBulletDynamicsSystem ()
 {
+  bodies.DeleteAll ();
+  colliders.DeleteAll ();
   delete bullet_world;
 }
 
