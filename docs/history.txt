@@ -12,6 +12,7 @@ chronological order.
 	  AttachColliderSphere() is used and tested. In bullet this
 	  appears to work well, however in odedynam it doesn't.
 	- Jorrit fixed a crash-at-exit bug in bullet plugin.
+	- res fixed the bullet configure test to work with Bullet 2.64.
 4-Nov-2007
 	- res updated the caca canvas to work with caca 0.99.
 	- res added an empty IconsMakeWin32ICO rule override to msvcgen.jam to

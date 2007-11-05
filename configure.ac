@@ -1398,21 +1398,21 @@ AS_IF([test $cs_cv_libode_opcode = yes],
 #------------------------------------------------------------------------------
 # Check for bullet physics library.
 #------------------------------------------------------------------------------
+# Note: The pkg-config package name for Bullet 2.x is 'bullet', but the actual
+# libraries are bulletdynamics, bulletcollision and bulletmath. So note that
+# there is actually no 'bullet' library.
 CS_CHECK_LIB_WITH([bullet],
-    [AC_LANG_PROGRAM([[
-    #include "btBulletDynamicsCommon.h"
-    #include "btBulletCollisionCommon.h"
-    ]],
-    [btCollisionDispatcher* d;
-    btBroadphaseInterface* b;
-    btSequentialImpulseConstraintSolver* s;
-    btDefaultCollisionConfiguration* c;
-    btDynamicsWorld* world = new btDiscreteDynamicsWorld (d, b, s, c)])],
+    [AC_LANG_PROGRAM(
+      [[#include "btBulletDynamicsCommon.h"
+      #include "btBulletCollisionCommon.h"]],
+      [btCollisionDispatcher* d;
+      btBroadphaseInterface* b;
+      btSequentialImpulseConstraintSolver* s;
+      btDefaultCollisionConfiguration* c;
+      btDynamicsWorld* world = new btDiscreteDynamicsWorld (d, b, s, c)])],
     [], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libbullet], [BULLET])], [],
-    [], [], 
-    [-lbulletdynamics \
-    -lbulletcollision \
-    -lbulletmath])
+    [], [], [-lbulletdynamics -lbulletcollision -lbulletmath],
+    [bulletdynamics])
 
 
 
