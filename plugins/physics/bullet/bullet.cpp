@@ -21,6 +21,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgeom/transfrm.h"
 #include "csgeom/quaternion.h"
 #include "csgeom/vector3.h"
+#include "csgeom/sphere.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "imesh/genmesh.h"
@@ -378,7 +379,12 @@ void csBulletDynamicsSystem::AttachCollider (iDynamicsSystemCollider*)
 
 csRef<iDynamicsSystemCollider> csBulletDynamicsSystem::CreateCollider () 
 {
-  return 0;
+  csRef<csBulletCollider> b;
+  b.AttachNew (new csBulletCollider (this));
+
+  iDynamicsSystemCollider* ib = static_cast<iDynamicsSystemCollider*> (b);
+  colliders.Push (ib);
+  return b;
 }
 
 //-------------------- csBulletRigidBody -----------------------------------
@@ -810,9 +816,25 @@ csBulletCollider::~csBulletCollider ()
   delete shape;
 }
 
-bool csBulletCollider::CreateSphereGeometry (const csSphere&)
+bool csBulletCollider::CreateSphereGeometry (const csSphere& sphere)
 {
-  return false;
+  if (body)
+  {
+    ds->GetWorld ()->removeRigidBody (body);
+    delete body;
+  }
+  delete shape;
+  // @@@ Need to support sphere center!
+  btSphereShape* shape = new btSphereShape (sphere.GetRadius ());
+  geom_type = SPHERE_COLLIDER_GEOMETRY;
+
+  btVector3 localInertia (0, 0, 0);
+  shape->calculateLocalInertia (mass, localInertia);
+  body = new btRigidBody (mass, motionState, shape, localInertia,
+      0, 0, friction);
+  ds->GetWorld ()->addRigidBody (body);
+
+  return true;
 }
 
 bool csBulletCollider::CreatePlaneGeometry (const csPlane3&)

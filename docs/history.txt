@@ -13,6 +13,13 @@ chronological order.
 	  appears to work well, however in odedynam it doesn't.
 	- Jorrit fixed a crash-at-exit bug in bullet plugin.
 	- res fixed the bullet configure test to work with Bullet 2.64.
+	- Jorrit implemented CreateCollider() for the bullet plugin. Changed
+	  phystut so that half of the wall colliders are created using
+	  CreateCollider() while the other half are created using
+	  AttachColliderBox().
+	- Jorrit (paritally) implemented CreateSphereGeometry() for
+	  bullet colliders. The center offset is not yet supported and is
+	  always set at 0,0,0.
 4-Nov-2007
 	- res updated the caca canvas to work with caca 0.99.
 	- res added an empty IconsMakeWin32ICO rule override to msvcgen.jam to
