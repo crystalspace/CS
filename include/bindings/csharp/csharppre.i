@@ -407,18 +407,6 @@ ICONFIGMANAGER_CSHARPCODE
 // We ignore this, because we can't wrap this
 %ignore QueryInterface(scfInterfaceID iInterfaceID, int iVersion);
 
-// We Add this hack because mono develop don't shows QueryInterface
-%extend iBase
-{
-  csWrapPtr GetInterface( const char *iface, int iface_ver )
-  {
-    if (self->QueryInterface(iSCF::SCF->GetInterfaceID(iface), iface_ver))
-      return csWrapPtr (iface, iface_ver, csPtr<iBase> (self));
-    else
-      return csWrapPtr (iface, iface_ver, csPtr<iBase> (0));
-  }
-}
-
 %include "bindings/csharp/cshoperators.i"
 %include "bindings/csharp/csstring.i"
 

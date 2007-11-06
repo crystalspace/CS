@@ -1,0 +1,7 @@
+SubDir TOP scripts csharp ;
+
+CSHARP_DATAFILES = [ Wildcard *.cs *.exe *.dll ] ;
+if $(CSHARP_DATAFILES)
+{
+  InstallData $(CSHARP_DATAFILES) : bindings csharp ;
+}

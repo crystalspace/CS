@@ -6,6 +6,13 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Nov-2007
+	- ronsaldo added the missing file include/bindings/csharp/csstring.i
+	- ronsaldo removed the GetInterface method in the c# bindings, because
+	  it isn't neccesary and the QueryInterface method now appears in
+	  monodevelop.
+	- ronsaldo added a c# version of the simple room example for java under
+	  scripts/csharp.
 5-Nov-2007
 	- ronsaldo added a GetInterface method into the wrapper iBase of the
 	  c# binding because the QueryInterface method don't appear in
