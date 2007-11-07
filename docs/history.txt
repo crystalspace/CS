@@ -16,6 +16,12 @@ chronological order.
 	  iGenMeshAnimationControl1_4 if that interface is present, otherwise
 	  it will use the "old" version from iGenMeshAnimationControl.
 	- res removed the unused compile group "meshimpexp".
+	- res fixed an inconsistency in the event system where the mouse and
+	  joystick event helpers created events whose key modifier flags where
+	  specified and stored as 'uint32' whereas practically all other code
+	  treated them as 'csKeyModifiers'. Changed the helpers to take and
+	  store 'csKeyModifiers' (the old 'uint32' variants are deprecated).
+	  Should fix #84.
 5-Nov-2007
 	- Jorrit changed phystut so that it adds spheres with the
 	  center hard transformed. That way the 'offset' feature in
