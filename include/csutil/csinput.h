@@ -190,6 +190,7 @@ public:
   /// Fills in the 'cooked' key code of an event with only a 'raw' key code.
   virtual csEventError SynthesizeCooked (iEvent *);
 
+  const csKeyModifiers& GetModifiersState () const { return modifiersState; }
 };
 
 /**

@@ -22,6 +22,10 @@ chronological order.
 	  treated them as 'csKeyModifiers'. Changed the helpers to take and
 	  store 'csKeyModifiers' (the old 'uint32' variants are deprecated).
 	  Should fix #84.
+	- res added iKeyboardDriver::GetModifiersState(), returning the state
+	  of all modifiers in a csKeyModifiers structure.
+	- res fixed some uses of the now-deprecated event creation helpers
+	  taking uint32 modifier states.
 5-Nov-2007
 	- Jorrit changed phystut so that it adds spheres with the
 	  center hard transformed. That way the 'offset' feature in
