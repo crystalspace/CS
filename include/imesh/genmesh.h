@@ -465,10 +465,11 @@ struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
  * Main users of this interface:
  * - Genmesh plugin (crystalspace.mesh.object.genmesh)
  *   
+ * \sa iGenMeshAnimationControl1_4
  */
 struct iGenMeshAnimationControl : public virtual iBase
 {
-  SCF_INTERFACE(iGenMeshAnimationControl, 2, 1, 0);
+  SCF_INTERFACE(iGenMeshAnimationControl, 2, 0, 0);
 
   /// Returns true if this control animates vertices.
   virtual bool AnimatesVertices () const = 0;
@@ -480,10 +481,12 @@ struct iGenMeshAnimationControl : public virtual iBase
   virtual bool AnimatesColors () const = 0;
 
   /**
-   * General update method
+   * General update method.
+   * \remarks You can get vertex count and mesh ID by implementing the
+   *   iGenMeshAnimationControl1_4 interface. If that interface is
+   *   implemented, this method is not called.
    */
-  virtual void Update (csTicks current, int num_verts, 
-    uint32 version_id) = 0;
+  virtual void Update (csTicks current) = 0;
 
   /**
    * Given the factory vertex data, return the animated data.
@@ -534,6 +537,22 @@ struct iGenMeshAnimationControl : public virtual iBase
    */
   virtual const csColor4* UpdateColors (csTicks current,
   	const csColor4* colors, int num_colors, uint32 version_id) = 0;
+};
+
+/**
+ * Enhanced Update() for genmesh animation plugins.
+ * This interface must be implemented in addition to iGenMeshAnimationControl.
+ */
+struct iGenMeshAnimationControl1_4 : public virtual iBase
+{
+  SCF_INTERFACE(iGenMeshAnimationControl1_4, 0, 1, 0);
+
+  /**
+   * General update method.
+   * \remarks Takes precedence over iGenMeshAnimationControl::Update().
+   */
+  virtual void Update (csTicks current, int num_verts, 
+    uint32 version_id) = 0;
 };
 
 /**

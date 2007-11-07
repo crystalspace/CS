@@ -172,6 +172,7 @@ void csGenmeshMeshObject::SetAnimationControl (
 	iGenMeshAnimationControl* ac)
 {
   anim_ctrl = ac;
+  anim_ctrl2 = scfQueryInterfaceSafe<iGenMeshAnimationControl1_4> (anim_ctrl);
   if (ac)
   {
     anim_ctrl_verts = ac->AnimatesVertices ();
@@ -1001,9 +1002,11 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     	logparent, -1, false);
   }
 
-  if (anim_ctrl)
-    anim_ctrl->Update (vc->GetCurrentTicks (), factory->GetVertexCount(), 
+  if (anim_ctrl2)
+    anim_ctrl2->Update (vc->GetCurrentTicks (), factory->GetVertexCount(), 
       factory->GetShapeNumber());
+  else if (anim_ctrl)
+    anim_ctrl->Update (vc->GetCurrentTicks ());
 
   const csReversibleTransform o2wt = movable->GetFullTransform ();
   const csVector3& wo = o2wt.GetOrigin ();
