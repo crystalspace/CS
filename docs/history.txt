@@ -15,6 +15,7 @@ chronological order.
 	  method. The genmesh plugin will use the version from
 	  iGenMeshAnimationControl1_4 if that interface is present, otherwise
 	  it will use the "old" version from iGenMeshAnimationControl.
+	- res removed the unused compile group "meshimpexp".
 5-Nov-2007
 	- Jorrit changed phystut so that it adds spheres with the
 	  center hard transformed. That way the 'offset' feature in
