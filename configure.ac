@@ -1398,22 +1398,21 @@ AS_IF([test $cs_cv_libode_opcode = yes],
 #------------------------------------------------------------------------------
 # Check for bullet physics library.
 #------------------------------------------------------------------------------
+# Note: The pkg-config package name for Bullet 2.x is 'bullet', but the actual
+# libraries are bulletdynamics, bulletcollision and bulletmath. So note that
+# there is actually no 'bullet' library.
 CS_CHECK_LIB_WITH([bullet],
-    [AC_LANG_PROGRAM([[
-    #include <BroadphaseCollision/SimpleBroadphase.h>
-    #include <CcdPhysics/CcdPhysicsController.h>
-    #include <CcdPhysics/CcdPhysicsEnvironment.h>
-    #include <CollisionDispatch/CollisionDispatcher.h>
-    ]],
-    [CollisionDispatcher d;
-    SimpleBroadphase b;
-    CcdPhysicsEnvironment* e = new CcdPhysicsEnvironment (&d, &b)])],
+    [AC_LANG_PROGRAM(
+      [[#include "btBulletDynamicsCommon.h"
+      #include "btBulletCollisionCommon.h"]],
+      [btCollisionDispatcher* d;
+      btBroadphaseInterface* b;
+      btSequentialImpulseConstraintSolver* s;
+      btDefaultCollisionConfiguration* c;
+      btDynamicsWorld* world = new btDiscreteDynamicsWorld (d, b, s, c)])],
     [], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libbullet], [BULLET])], [],
-    [], [], 
-    [-lbulletccdphysics \
-    -lbulletphysicsinterfacecommon \
-    -lbulletdynamics \
-    -lbullet])
+    [], [], [-lbulletdynamics -lbulletcollision -lbulletmath],
+    [bulletdynamics])
 
 
 
@@ -1798,9 +1797,19 @@ AS_IF([test $cs_host_family != windows],
 #------------------------------------------------------------------------------
 # Check for Colour Ascii Art library (libcaca).
 #------------------------------------------------------------------------------
+# NOTE: Would solely pkg-config be used for caca detection the separate cucul 
+#  test could be dropped since it would be contained in caca.
+CS_CHECK_LIB_WITH([cucul],
+    [AC_LANG_PROGRAM([[#include <cucul.h>]], [cucul_create_canvas(0,0)])],
+    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libcucul], [CUCUL])], [], [], [], [],
+    [libcucul])
+    
 CS_CHECK_LIB_WITH([caca],
-    [AC_LANG_PROGRAM([[#include <caca.h>]], [caca_init(); caca_end();])],
-    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libcaca], [LIBCACA])], [], [], [], [],
+    [AC_LANG_PROGRAM([[#include <caca.h>]], [caca_create_display(0)])],
+    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libcaca], [CACA])], [], 
+    [$cs_cv_libcucul_cflags], 
+    [$cs_cv_libcucul_lflags], 
+    [$cs_cv_libcucul_libs],
     [libcaca])
 
 
@@ -2353,9 +2362,7 @@ AS_IF([test $enable_meta_info_embedding = yes],
 	[AS_ESCAPE([$(EMBED_META.CFLAGS)])], [+])
     CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS],
 	[AS_ESCAPE([$(EMBED_META.LFLAGS)])], [+])
-    AC_CHECK_HEADERS([elf.h], [CS_HEADER_PROPERTY([CS_HAVE_ELF_H])])
-    AS_IF([test "$cs_cv_libbfd_ok" = yes],
-	[CS_HEADER_PROPERTY([CS_HAVE_LIBBFD])])])
+    AC_CHECK_HEADERS([elf.h], [CS_HEADER_PROPERTY([CS_HAVE_ELF_H])])])
 
 
 

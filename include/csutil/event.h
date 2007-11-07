@@ -73,9 +73,6 @@ public:
   /**
    * Convert a bitmask returned by GetModifiersBits back to a csKeyModifiers
    * struct.
-   * <p>
-   * Also works for the Modifiers members of the csMouseEventData and
-   * csJoystickEventData structs, if you cast them to uint32.
    */
   static void GetModifiers (uint32 mask, csKeyModifiers& modifiers);
 };
@@ -97,16 +94,53 @@ public:
   static csEvent *NewEvent (csRef<iEventNameRegistry> &reg, 
     csTicks, csEventID name, csMouseEventType etype, int x, int y, 
     uint32 AxesChanged, uint button, bool buttonstate, uint32 buttonMask, 
-    uint32 modifiers);
+    const csKeyModifiers& modifiers);
   static csEvent *NewEvent (csRef<iEventNameRegistry> &reg, csTicks, 
     csEventID name, uint8 n, csMouseEventType etype, int x, int y, 
     uint32 axesChanged, uint button, bool buttonstate, uint32 buttonMask, 
-    uint32 modifiers);
+    const csKeyModifiers& modifiers);
   static csEvent *NewEvent (csRef<iEventNameRegistry> &reg, csTicks, 
     csEventID name, uint8 n, csMouseEventType etype, const int32 *axes, 
     uint8 numAxes, uint32 axesChanged, uint button, bool buttonstate, 
-    uint32 buttonMask, uint32 modifiers);
+    uint32 buttonMask, const csKeyModifiers& modifiers);
   //@}
+
+  // Deprecated in 1.3.
+  static CS_DEPRECATED_METHOD_MSG("Use the variant with csKeyModifiers modifiers")
+  csEvent *NewEvent (csRef<iEventNameRegistry> &reg, 
+    csTicks t, csEventID name, csMouseEventType etype, int x, int y, 
+    uint32 AxesChanged, uint button, bool buttonstate, uint32 buttonMask, 
+    uint32 modifiers)
+  {
+    csKeyModifiers m;
+    csKeyEventHelper::GetModifiers (modifiers, m);
+    return NewEvent (reg, t, name, etype, x, y, AxesChanged, button, 
+      buttonstate, buttonMask, m);
+  }
+  // Deprecated in 1.3.
+  static CS_DEPRECATED_METHOD_MSG("Use the variant with csKeyModifiers modifiers")
+  csEvent *NewEvent (csRef<iEventNameRegistry> &reg, csTicks t, 
+    csEventID name, uint8 n, csMouseEventType etype, int x, int y, 
+    uint32 axesChanged, uint button, bool buttonstate, uint32 buttonMask, 
+    uint32 modifiers)
+  {
+    csKeyModifiers m;
+    csKeyEventHelper::GetModifiers (modifiers, m);
+    return NewEvent (reg, t, name, n, etype, x, y, axesChanged, button, 
+      buttonstate, buttonMask, m);
+  }
+  // Deprecated in 1.3.
+  static CS_DEPRECATED_METHOD_MSG("Use the variant with csKeyModifiers modifiers")
+  csEvent *NewEvent (csRef<iEventNameRegistry> &reg, csTicks t, 
+    csEventID name, uint8 n, csMouseEventType etype, const int32 *axes, 
+    uint8 numAxes, uint32 axesChanged, uint button, bool buttonstate, 
+    uint32 buttonMask, uint32 modifiers)
+  {
+    csKeyModifiers m;
+    csKeyEventHelper::GetModifiers (modifiers, m);
+    return NewEvent (reg, t, name, n, etype, axes, numAxes, axesChanged,
+      button, buttonstate, buttonMask, m);
+  }
 
   /// Retrieve the event type (key up or down.)
   CS_PURE_METHOD static csMouseEventType GetEventType (const iEvent* event);
@@ -158,11 +192,34 @@ public:
   /// Create new joystick event
   static csEvent *NewEvent (csRef<iEventNameRegistry> &reg, csTicks, 
     csEventID name, int n, int x, int y, uint32 axesChanged, uint button, 
-    bool buttonState, uint32 buttonMask, uint32 modifiers);
+    bool buttonState, uint32 buttonMask, const csKeyModifiers& modifiers);
   static csEvent *NewEvent (csRef<iEventNameRegistry> &reg, csTicks, 
     csEventID name, int n, const int32* axes, uint8 numAxes, uint32 axesChanged, 
-    uint button, bool buttonState, uint32 buttonMask, uint32 modifiers);
+    uint button, bool buttonState, uint32 buttonMask, const csKeyModifiers& modifiers);
   //@}
+
+  // Deprecated in 1.3.
+  static CS_DEPRECATED_METHOD_MSG("Use the variant with csKeyModifiers modifiers")
+  csEvent *NewEvent (csRef<iEventNameRegistry> &reg, csTicks t, 
+    csEventID name, int n, int x, int y, uint32 axesChanged, uint button, 
+    bool buttonState, uint32 buttonMask, uint32 modifiers)
+  {
+    csKeyModifiers m;
+    csKeyEventHelper::GetModifiers (modifiers, m);
+    return NewEvent (reg, t, name, n, x, y, axesChanged, button, 
+      buttonState, buttonMask, m);
+  }
+  // Deprecated in 1.3.
+  static CS_DEPRECATED_METHOD_MSG("Use the variant with csKeyModifiers modifiers")
+  csEvent *NewEvent (csRef<iEventNameRegistry> &reg, csTicks t, 
+    csEventID name, int n, const int32* axes, uint8 numAxes, uint32 axesChanged, 
+    uint button, bool buttonState, uint32 buttonMask, uint32 modifiers)
+  {
+    csKeyModifiers m;
+    csKeyEventHelper::GetModifiers (modifiers, m);
+    return NewEvent (reg, t, name, n, axes, numAxes, axesChanged, button, 
+      buttonState, buttonMask, m);
+  }
 
   /// Retrieve joystick number (0, 1, 2, ...)
   CS_PURE_METHOD static uint GetNumber(const iEvent *event);

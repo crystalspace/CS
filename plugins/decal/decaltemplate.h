@@ -19,6 +19,7 @@
 #ifndef __CS_DECAL_TEMPLATE_H__
 #define __CS_DECAL_TEMPLATE_H__
 
+#include "iengine/material.h"
 #include "ivaria/decal.h"
 #include "csutil/scf_implementation.h"
 #include "csgeom/vector2.h"
@@ -29,7 +30,7 @@ class csDecalTemplate : public scfImplementation1<csDecalTemplate,
 {
 private:
   float                 timeToLive;
-  iMaterialWrapper*     material;
+  csRef<iMaterialWrapper> material;
   long                  renderPriority;
   csZBufMode            zBufMode;
   float                 polygonNormalThreshold;

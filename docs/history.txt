@@ -6,6 +6,77 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Nov-2007
+	- res re-did the change from r27846 (add some arguments to Update()):
+	  to not break compatibility with existing third-party implementations
+	  of iGenMeshAnimationControl, the change to Update() there was
+	  reverted. Instead, a new interface was added 
+	  (iGenMeshAnimationControl1_4) which holds the updated Update() 
+	  method. The genmesh plugin will use the version from
+	  iGenMeshAnimationControl1_4 if that interface is present, otherwise
+	  it will use the "old" version from iGenMeshAnimationControl.
+	- res removed the unused compile group "meshimpexp".
+	- res fixed an inconsistency in the event system where the mouse and
+	  joystick event helpers created events whose key modifier flags where
+	  specified and stored as 'uint32' whereas practically all other code
+	  treated them as 'csKeyModifiers'. Changed the helpers to take and
+	  store 'csKeyModifiers' (the old 'uint32' variants are deprecated).
+	  Should fix #84.
+	- res added iKeyboardDriver::GetModifiersState(), returning the state
+	  of all modifiers in a csKeyModifiers structure.
+	- res fixed some uses of the now-deprecated event creation helpers
+	  taking uint32 modifier states.
+5-Nov-2007
+	- Jorrit changed phystut so that it adds spheres with the
+	  center hard transformed. That way the 'offset' feature in
+	  AttachColliderSphere() is used and tested. In bullet this
+	  appears to work well, however in odedynam it doesn't.
+	- Jorrit fixed a crash-at-exit bug in bullet plugin.
+	- res fixed the bullet configure test to work with Bullet 2.64.
+	- Jorrit implemented CreateCollider() for the bullet plugin. Changed
+	  phystut so that half of the wall colliders are created using
+	  CreateCollider() while the other half are created using
+	  AttachColliderBox().
+	- Jorrit (paritally) implemented CreateSphereGeometry() for
+	  bullet colliders. The center offset is not yet supported and is
+	  always set at 0,0,0.
+	- res changed bin/autogen.sh to not remove aclocal.m4 when autoconf
+	  failed. Can be helpful for troubleshooting.
+	- res fixed a copy-and-paste error in include/Jamfile to properly
+	  filter include/csutil/scopedmutexlock.h from the master headers.
+4-Nov-2007
+	- res updated the caca canvas to work with caca 0.99.
+	- res added an empty IconsMakeWin32ICO rule override to msvcgen.jam to
+	  prevent icon file regeneration when just regenerating VC projects.
+        - Mike Gist added the concept of 'proxy textures', where textures are
+          created without an image loaded, and then fully loaded when they are
+          needed. This allows for a library of textures to be shared between
+          maps, but only the textures actually used by a given map to be loaded.
+          Also added some unloading functions as part of this, although they can
+          be used separately if wanted.
+	- res adjusted the preprocessor definitions for lib3ds to contain
+	  LIB3DS_GENERIC_DATA_IO_CALLBACKS, needed for the version contained
+	  in the latest cs-win32libs.
+	- res marked the UnusedResourceHelper() functions with
+	  CS_CRYSTALSPACE_EXPORT, had them take const refs to arrays, and 
+	  added safeguards against 0 entries in arrays.
+3-Nov-2007
+	- Jorrit added an initial port of the bullet physics plugin to the
+	  latest release of bullet (2.64). Not everything is supported yet
+	  but basic phystest using boxes and spheres works fine. Things that
+	  don't work are some parts of the collider api, joints, and body
+	  groups. Also several physics parameters like elasticity are not
+	  yet supported.
+	  Note: the configure test is currently broken. The problem is
+	  that bullet expects the include path (-I) to be set to
+	  ${installpath}/bullet and I don't know how to express that in
+	  configure.ac.
+	- res removed the setting of CS_HAVE_LIBBFD when meta info embedding
+	  was enabled and libbfd is present. This fixes build errors on MinGW
+	  in optimize mode where this preprocessor macro was set but libbfd
+	  not actually linked. The other BFD use in CS, the bfd-based plugin
+	  metadata reader, is unaffected since it doesn't make use of that
+	  macro to detect BFD presence (that's handled in the Jam file).
 1-Nov-2007
 	- res added a simple (and rather unflexible) SVG loader utilizing
 	  VGVM.

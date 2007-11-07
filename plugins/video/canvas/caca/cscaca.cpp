@@ -42,11 +42,11 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY (csGraphics2DCaca)
 
 csGraphics2DCaca::csGraphics2DCaca (iBase *iParent) : 
-  scfImplementationType (this, iParent)
+  scfImplementationType (this, iParent), cucul_canvas (0), dither (0),
+  caca_display (0)
 {
   EventOutlet = 0;
   Memory = 0;
-  caca_context = 0;
 }
 
 csGraphics2DCaca::~csGraphics2DCaca (void)
@@ -95,57 +95,67 @@ bool csGraphics2DCaca::Open ()
   config.AddConfig(object_reg, "/config/cacacanvas.cfg");
   config.AddConfig(object_reg, "/config/video.cfg");
 
-  bool overwrite = false; // overwrite existing env vars.
   if(config->KeyExists("Video.ASCII.Console.Size"))
     setenv ("CACA_GEOMETRY", 
-      config->GetStr("Video.ASCII.Console.Size", "80x24"), overwrite);
+      config->GetStr("Video.ASCII.Console.Size"), false);
   if(config->KeyExists("Video.ASCII.Console.Driver"))
     setenv ("CACA_DRIVER", 
-      config->GetStr("Video.ASCII.Console.Driver", "x11"), overwrite);
+      config->GetStr("Video.ASCII.Console.Driver", "x11"), false);
   if(config->KeyExists("Video.ASCII.Console.Font"))
     setenv ("CACA_FONT", 
-      config->GetStr("Video.ASCII.Console.Font", "fixed"), overwrite);
-  if(config->KeyExists("Video.ASCII.Console.Background"))
-    setenv ("CACA_BACKGROUND", 
-      config->GetStr("Video.ASCII.Console.Background", "solid"), overwrite);
-  if(config->KeyExists("Video.ASCII.Console.AntiAlias"))
-    setenv ("CACA_ANTIALIASING", 
-      config->GetStr("Video.ASCII.Console.AntiAlias", "prefilter"), overwrite);
-  if(config->KeyExists("Video.ASCII.Console.Dither"))
-    setenv ("CACA_DITHERING", 
-      config->GetStr("Video.ASCII.Console.Dither", "ordered4"), overwrite);
-
-  if (caca_init() != 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.graphics2d.cacacanvas",
-      "Cannot initialize libcaca.");
-    return false;
-  }
-  caca_clear();
-
+      config->GetStr("Video.ASCII.Console.Font", "fixed"), false);
+  
   Width = config->GetInt("Video.Ascii.Offscreen.Width", 320);
   Height = config->GetInt("Video.Ascii.Offscreen.Height", 240);
-  Memory = new unsigned char[ pfmt.PixelBytes*Width*Height ];
-
-  caca_context = caca_create_bitmap(Depth, Width, Height, 
+  
+  cucul_canvas = cucul_create_canvas (0, 0);
+  if (cucul_canvas == 0) return false;
+  caca_display = caca_create_display (cucul_canvas);
+  if (caca_display == 0)
+    return false;
+  cucul_clear_canvas (cucul_canvas);
+  
+  dither = cucul_create_dither (Depth, Width, Height, 
     Width*pfmt.PixelBytes, pfmt.RedMask, pfmt.GreenMask, 
     pfmt.BlueMask, pfmt.AlphaMask);
+  if (dither == 0)
+    return false;
+  if(config->KeyExists("Video.ASCII.Console.AntiAlias"))
+    cucul_set_dither_antialias (dither, 
+      config->GetStr("Video.ASCII.Console.AntiAlias"));
+  if(config->KeyExists("Video.ASCII.Console.Dither"))
+    cucul_set_dither_mode (dither, 
+      config->GetStr("Video.ASCII.Console.Dither"));
+  
+  caca_set_display_title (caca_display, win_title);
+  
+  Memory = new unsigned char[ pfmt.PixelBytes*Width*Height ];
+  
 
   return csGraphics2D::Open ();
 }
 
 void csGraphics2DCaca::Close ()
 {
-  if (!is_open) return;
-  if(caca_context) 
+  if (dither)
   {
-    caca_free_bitmap(caca_context);
-    caca_context = 0;
-    caca_end();
+    cucul_free_dither (dither);
+    dither = 0;
+  }
+  if(caca_display) 
+  {
+    caca_free_display(caca_display);
+    caca_display = 0;
+  }
+  if (cucul_canvas)
+  {
+    cucul_free_canvas (cucul_canvas);
+    cucul_canvas = 0;
   }
   if(Memory) delete[] Memory;
   Memory = 0;
+  
+  if (!is_open) return;
   csGraphics2D::Close ();
 }
 
@@ -192,54 +202,41 @@ int csGraphics2DCaca::MapKey(int raw)
 
 void csGraphics2DCaca::Print (csRect const* area)
 {
-  int sx1, sx2, sy1, sy2;
-  if (area)
-  {
-    sx1 = area->xmin;
-    sx2 = area->xmax;
-    sy1 = area->ymin;
-    sy2 = area->ymax;
-  }
-  else
-  {
-    sx1 = 0;
-    sx2 = Width;
-    sy1 = 0;
-    sy2 = Height;
-  }
-
-  caca_draw_bitmap(0, 0, caca_get_width()-1, caca_get_height()-1, 
-    caca_context, (void*)Memory);
-  caca_refresh();
+  cucul_dither_bitmap (cucul_canvas, 0, 0,
+    cucul_get_canvas_width (cucul_canvas), 
+    cucul_get_canvas_height (cucul_canvas), dither, Memory);
+  caca_refresh_display (caca_display);
 
   /* Get all events from keyboard and mouse and put them into system queue */
-  int event;
-  while ((event = caca_get_event(CACA_EVENT_ANY)) != 0)
+  caca_event_t event;
+  while (caca_get_event (caca_display, caca_event::CACA_EVENT_ANY, &event, 0))
   {
-    int evtype = event & CACA_EVENT_ANY;
-    int evrest = event & ~CACA_EVENT_ANY;
-    int mousex = caca_get_mouse_x()*Width/caca_get_width();
-    int mousey = caca_get_mouse_y()*Height/caca_get_height();
-    switch(evtype)
+    switch(event.type)
     {
-    case CACA_EVENT_KEY_PRESS:
-      EventOutlet->Key(MapKey(evrest), MapKey(evrest), true);
+    case caca_event::CACA_EVENT_KEY_PRESS:
+    case caca_event::CACA_EVENT_KEY_RELEASE:
+      {
+        utf32_char raw, cooked;
+        if (event.data.key.utf32 != 0)
+          raw = cooked = event.data.key.utf32;
+        else
+          raw = cooked = MapKey (event.data.key.ch);
+	EventOutlet->Key (raw, cooked, 
+	  (event.type == caca_event::CACA_EVENT_KEY_PRESS));
+      }
       break;
-    case CACA_EVENT_KEY_RELEASE:
-      EventOutlet->Key(MapKey(evrest), MapKey(evrest), false);
+    case caca_event::CACA_EVENT_MOUSE_PRESS:
+      EventOutlet->Mouse (event.data.mouse.button- 1, true,
+        caca_get_mouse_x (caca_display), caca_get_mouse_y (caca_display));
       break;
-    case CACA_EVENT_MOUSE_PRESS:
-      EventOutlet->Mouse(evrest - 1, true, mousex, mousey);
+    case caca_event::CACA_EVENT_MOUSE_RELEASE:
+      EventOutlet->Mouse (event.data.mouse.button - 1, false,
+        caca_get_mouse_x (caca_display), caca_get_mouse_y (caca_display));
       break;
-    case CACA_EVENT_MOUSE_RELEASE:
-      EventOutlet->Mouse(evrest - 1, false, mousex, mousey);
+    case caca_event::CACA_EVENT_MOUSE_MOTION:
+      EventOutlet->Mouse (csmbNone, false, 
+        event.data.mouse.x, event.data.mouse.y);
       break;
-    case CACA_EVENT_MOUSE_MOTION:
-      EventOutlet->Mouse(csmbNone, false, mousex, mousey);
-      break;
-    case CACA_EVENT_ANY:
-    case CACA_EVENT_NONE:
-    case CACA_EVENT_RESIZE:
     default:
       break;
     }
@@ -259,5 +256,5 @@ void csGraphics2DCaca::FinishDraw ()
 
 void csGraphics2DCaca::SetTitle(const char* title)
 {
-  caca_set_window_title(title);
+  caca_set_display_title (caca_display, title);
 }

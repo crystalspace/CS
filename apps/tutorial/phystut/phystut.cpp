@@ -589,6 +589,12 @@ iRigidBody* Simple::CreateSphere (void)
   csEllipsoid ellips (csVector3 (0), radius);
   gmstate->GenerateSphere (ellips, 16);
 
+  // We do a hardtransform here to make sure our sphere has an artificial
+  // offset. That way we can test if the physics engine supports that.
+  csMatrix3 m;
+  csReversibleTransform t = csReversibleTransform (m, csVector3 (0, .5, 0));
+  ballFact->HardTransform (t);
+
   // Create the mesh.
   csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (ballFact, "ball", room));
 
@@ -602,7 +608,7 @@ iRigidBody* Simple::CreateSphere (void)
   rb->AttachMesh (mesh);
 
   // Create and attach a sphere collider.
-  rb->AttachColliderSphere (radius.Norm()/2, csVector3 (0), 10, 1, 0.8f);
+  rb->AttachColliderSphere (radius.Norm()/2, csVector3 (0, .5, 0), 10, 1, 0.8f);
 
   // Fling the body.
   rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 6));
@@ -666,59 +672,33 @@ void Simple::CreateWalls (const csVector3& /*radius*/)
     rb->AttachColliderPlane(walls_state->GetPolygonObjectPlane(i), 10, 0, 0);
   }
 #endif
-#if 1
 
   csVector3 size (10.0f, 10.0f, 10.0f); // This should be the same size as the mesh.
   t.SetOrigin(csVector3(10.0f,0.0f,0.0f));
 
-  //FIXME: this should work same in both engines (needs finishing bullet plugin)
-  if (0/*phys_engine_id == ODE_ID*/)
-  {
-    csRef<iDynamicsSystemCollider> collider = dynSys->CreateCollider ();
-    collider->CreateBoxGeometry (size);
-    collider->SetTransform (t);
+  // Just to make sure everything works we create half of the colliders
+  // using dynsys->CreateCollider() and the other half using
+  // dynsys->AttachColliderBox().
+  csRef<iDynamicsSystemCollider> collider = dynSys->CreateCollider ();
+  collider->CreateBoxGeometry (size);
+  collider->SetTransform (t);
 
-    t.SetOrigin(csVector3(-10.0f,0.0f,0.0f));
-    collider = dynSys->CreateCollider ();
-    collider->CreateBoxGeometry (size);
-    collider->SetTransform (t);
+  t.SetOrigin(csVector3(-10.0f,0.0f,0.0f));
+  collider = dynSys->CreateCollider ();
+  collider->CreateBoxGeometry (size);
+  collider->SetTransform (t);
 
-    t.SetOrigin(csVector3(0.0f,10.0f,0.0f));
-    collider = dynSys->CreateCollider ();
-    collider->CreateBoxGeometry (size);
-    collider->SetTransform (t);
+  t.SetOrigin(csVector3(0.0f,10.0f,0.0f));
+  collider = dynSys->CreateCollider ();
+  collider->CreateBoxGeometry (size);
+  collider->SetTransform (t);
 
-    t.SetOrigin(csVector3(0.0f,-10.0f,0.0f));
-    collider = dynSys->CreateCollider ();
-    collider->CreateBoxGeometry (size);
-    collider->SetTransform (t);
-
-    t.SetOrigin(csVector3(0.0f,0.0f,10.0f));
-    collider = dynSys->CreateCollider ();
-    collider->CreateBoxGeometry (size);
-    collider->SetTransform (t);
-
-    t.SetOrigin(csVector3(0.0f,0.0f,-10.0f));
-    collider = dynSys->CreateCollider ();
-    collider->CreateBoxGeometry (size);
-    collider->SetTransform (t);
-  }else
-  {
-    dynSys->AttachColliderBox (size, t, 10, 0);
-    t.SetOrigin(csVector3(-10.0f,0.0f,0.0f));
-    dynSys->AttachColliderBox (size, t, 10, 0);
-    t.SetOrigin(csVector3(0.0f,10.0f,0.0f));
-    dynSys->AttachColliderBox (size, t, 10, 0);
-    t.SetOrigin(csVector3(0.0f,-10.0f,0.0f));
-    dynSys->AttachColliderBox (size, t, 10, 0);
-    t.SetOrigin(csVector3(0.0f,0.0f,10.0f));
-    dynSys->AttachColliderBox (size, t, 10, 0);
-    t.SetOrigin(csVector3(0.0f,0.0f,-10.0f));
-    dynSys->AttachColliderBox (size, t, 10, 0);
-  }
-
-#endif
-
+  t.SetOrigin(csVector3(0.0f,-10.0f,0.0f));
+  dynSys->AttachColliderBox (size, t, 10, 0);
+  t.SetOrigin(csVector3(0.0f,0.0f,10.0f));
+  dynSys->AttachColliderBox (size, t, 10, 0);
+  t.SetOrigin(csVector3(0.0f,0.0f,-10.0f));
+  dynSys->AttachColliderBox (size, t, 10, 0);
 }
 
 void Simple::Start ()

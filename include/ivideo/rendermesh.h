@@ -31,10 +31,10 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
 
+#include "iengine/material.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
 
-struct iMaterialWrapper;
 struct iPortalContainer;
 
 namespace CS
