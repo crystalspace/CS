@@ -2971,6 +2971,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetModifierState = *cspacec::iKeyboardDriver_GetModifierState;
 *CreateKeyComposer = *cspacec::iKeyboardDriver_CreateKeyComposer;
 *SynthesizeCooked = *cspacec::iKeyboardDriver_SynthesizeCooked;
+*GetModifiersState = *cspacec::iKeyboardDriver_GetModifiersState;
 *GetKeyState = *cspacec::iKeyboardDriver_GetKeyState;
 *scfGetVersion = *cspacec::iKeyboardDriver_scfGetVersion;
 sub DESTROY {
@@ -12568,6 +12569,38 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         cspacec::delete_iGenMeshAnimationControl($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iGenMeshAnimationControl1_4 ##############
+
+package cspace::iGenMeshAnimationControl1_4;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*Update = *cspacec::iGenMeshAnimationControl1_4_Update;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iGenMeshAnimationControl1_4($self);
         delete $OWNER{$self};
     }
 }
