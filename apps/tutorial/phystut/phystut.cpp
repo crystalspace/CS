@@ -35,6 +35,7 @@ Simple::Simple (iObjectRegistry* object_reg)
   solver=0;
   disable=false;
   remaining_delta=0;
+  do_bullet_debug = false;
 }
 
 Simple::~Simple ()
@@ -58,15 +59,16 @@ void Simple::SetupFrame ()
     view->GetCamera()->GetTransform().RotateThis (CS_VEC_TILT_UP, speed);
   if (kbd->GetKeyState (CSKEY_PGDN))
     view->GetCamera()->GetTransform().RotateThis (CS_VEC_TILT_DOWN, speed);
-  if (kbd->GetKeyState (CSKEY_UP)) {
-    //avatar->GetMovable()->MovePosition(avatar->GetMovable()->GetTransform() * CS_VEC_FORWARD * 5 * speed);
-    avatarbody->SetLinearVelocity (view->GetCamera()->GetTransform().GetT2O () * csVector3 (0, 0, 5));
+  if (kbd->GetKeyState (CSKEY_UP))
+  {
+    avatarbody->SetLinearVelocity (view->GetCamera()->GetTransform().GetT2O ()
+	* csVector3 (0, 0, 5));
   }
-  if (kbd->GetKeyState (CSKEY_DOWN)) {
-    //avatar->GetMovable()->MovePosition(avatar->GetMovable()->GetTransform() * CS_VEC_BACKWARD * 5 * speed);
-    avatarbody->SetLinearVelocity (view->GetCamera()->GetTransform().GetT2O () * csVector3 (0, 0, -5));
+  if (kbd->GetKeyState (CSKEY_DOWN))
+  {
+    avatarbody->SetLinearVelocity (view->GetCamera()->GetTransform().GetT2O ()
+	* csVector3 (0, 0, -5));
   }
-
 
   // For ODE it is recommended that all steps are done with the
   // same size. So we always will call dynamics->Step(delta) with
@@ -99,11 +101,16 @@ void Simple::SetupFrame ()
   // Write FPS and other info..
   if(!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
 
+  if (do_bullet_debug)
+  {
+    bullet_dynSys->DebugDraw (view);
+  }
 
   WriteShadow( 10, 390, g2d->FindRGB (255, 150, 100),"Physics engine: %s", 
     phys_engine_name.GetData ());
   if( speed != 0.0f)
-    WriteShadow( 10, 400, g2d->FindRGB (255, 150, 100),"FPS: %.2f",1.0f/speed);
+    WriteShadow( 10, 400, g2d->FindRGB (255, 150, 100),"FPS: %.2f",
+	1.0f/speed);
   WriteShadow( 10, 410, g2d->FindRGB (255, 150, 100),"%d Objects",objcnt);
 
   if (phys_engine_id == ODE_ID)
@@ -116,7 +123,7 @@ void Simple::SetupFrame ()
       WriteShadow( 10, 420, g2d->FindRGB (255, 150, 100),"Solver: QuickStep");
   }
 
-  if(disable)
+  if (disable)
     WriteShadow( 10, 430, g2d->FindRGB (255, 150, 100),"AutoDisable ON");
 }
 
@@ -162,10 +169,24 @@ bool Simple::HandleEvent (iEvent& ev)
 	CreateMesh ();
 	return true;
       }
+      else if (csKeyEventHelper::GetCookedCode (&ev) == '*')
+      {
+	CreateStarCollider ();
+	return true;
+      }
       else if (csKeyEventHelper::GetCookedCode (&ev) == 'j')
       {
 	CreateJointed ();
 	return true;
+      }
+      else if (csKeyEventHelper::GetCookedCode (&ev) == '?')
+      {
+        if (phys_engine_id != BULLET_ID)
+          csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+            "crystalspace.application.phystut",
+            "Debugging colliders only works for bullet!");
+	else
+	  do_bullet_debug = !do_bullet_debug;
       }
       else if (csKeyEventHelper::GetCookedCode (&ev) == 'g')
       { // Toggle gravity.
@@ -482,6 +503,10 @@ bool Simple::Initialize ()
     osys->SetContactMaxCorrectingVel (.1f);
     osys->SetContactSurfaceLayer (.0001f);
   }
+  else
+  {
+    bullet_dynSys = scfQueryInterface<iBulletDynamicSystem> (dynSys);
+  }
   CreateWalls (csVector3 (5));
 
   // Use the camera transform.
@@ -502,12 +527,12 @@ bool Simple::Initialize ()
   // csOrthoTransform tt (tmm, tvv);
   // csVector3 size (0.4f, 0.8f, 0.4f); // This should be same size as mesh.
   // avatarbody->AttachColliderBox (size, tt, 10, 1, 0.8f);
-  avatarbody->AttachColliderSphere (1.5, csVector3 (0), 10, 1, 0.8f);
+  avatarbody->AttachColliderSphere (0.8, csVector3 (0), 10, 1, 0.8f);
 
   return true;
 }
 
-iRigidBody* Simple::CreateBox (void)
+iRigidBody* Simple::CreateBox ()
 {
   objcnt++;
   // Use the camera transform.
@@ -526,7 +551,7 @@ iRigidBody* Simple::CreateBox (void)
   const csMatrix3 tm;
   const csVector3 tv (0);
   csOrthoTransform t (tm, tv);
-  csVector3 size (0.4f, 0.8f, 0.4f); // This should be the same size as the mesh.
+  csVector3 size (0.4f, 0.8f, 0.4f); // This should be the same size as the mesh
   rb->AttachColliderBox (size, t, 10, 1, 0.8f);
 
   // Fling the body.
@@ -536,7 +561,42 @@ iRigidBody* Simple::CreateBox (void)
   return rb;
 }
 
-iRigidBody* Simple::CreateMesh (void)
+bool Simple::CreateStarCollider ()
+{
+  csRef<iMeshFactoryWrapper> starFact;
+  starFact = engine->FindMeshFactory ("genstar");
+  if (!starFact)
+  {
+    iBase* rc;
+    loader->Load ("/lib/std/star.xml", rc);
+    starFact = engine->FindMeshFactory ("genstar");
+    if (!starFact)
+    {
+      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+        "crystalspace.application.phystut",
+        "Error loading 'star.xml'!");
+      return false;
+    }
+  }
+
+  // Use the camera transform.
+  csOrthoTransform tc = view->GetCamera ()->GetTransform ();
+  tc.SetOrigin (tc.This2Other (csVector3 (0, 0, 3)));
+
+  // Create the mesh.
+  csRef<iMeshWrapper> star = engine->CreateMeshWrapper (starFact, "star",
+      room);
+  star->GetMovable ()->SetTransform (tc);
+  star->GetMovable ()->UpdateMove ();
+
+  csRef<iDynamicsSystemCollider> collider = dynSys->CreateCollider ();
+  collider->CreateMeshGeometry (star);
+  collider->SetTransform (tc);
+
+  return true;
+}
+
+iRigidBody* Simple::CreateMesh ()
 {
   objcnt++;
   // Use the camera transform.
@@ -556,7 +616,13 @@ iRigidBody* Simple::CreateMesh (void)
   const csVector3 tv (0);
   csOrthoTransform t (tm, tv);
 
-  rb->AttachColliderMesh (mesh, t, 10, 1, 0.8f);
+  if (!rb->AttachColliderMesh (mesh, t, 10, 1, 0.8f))
+  {
+    // If dynamic collider meshes are not supported (like in bullet)
+    // we use a cylinder instead.
+    t.RotateThis (csVector3 (1, 0, 0), M_PI / 2.0f);
+    rb->AttachColliderCylinder (0.2, 1, t, 10, 1, 0.8f);
+  }
 
   // Fling the body.
   rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
@@ -565,7 +631,7 @@ iRigidBody* Simple::CreateMesh (void)
   return rb;
 }
 
-iRigidBody* Simple::CreateSphere (void)
+iRigidBody* Simple::CreateSphere ()
 {
   objcnt++;
   // Use the camera transform.
@@ -582,9 +648,9 @@ iRigidBody* Simple::CreateSphere (void)
     return 0;
   }
 
-  csRef<iGeneralFactoryState> gmstate = scfQueryInterface<iGeneralFactoryState> (
-  	ballFact->GetMeshObjectFactory ());
-  const float r (rand()%5/10. + .1);
+  csRef<iGeneralFactoryState> gmstate = scfQueryInterface<
+    iGeneralFactoryState> (ballFact->GetMeshObjectFactory ());
+  const float r (rand()%5/10. + .2);
   csVector3 radius (r, r, r);
   csEllipsoid ellips (csVector3 (0), radius);
   gmstate->GenerateSphere (ellips, 16);
@@ -617,7 +683,7 @@ iRigidBody* Simple::CreateSphere (void)
   return rb;
 }
 
-iJoint* Simple::CreateJointed (void)
+iJoint* Simple::CreateJointed ()
 {
   objcnt++;
   // Create and position objects.

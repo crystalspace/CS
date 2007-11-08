@@ -22,6 +22,7 @@
 #include <stdarg.h>
 #include <crystalspace.h>
 #include <ivaria/ode.h>
+#include <ivaria/bullet.h>
 
 class Simple
 {
@@ -46,9 +47,11 @@ private:
 
   csRef<iDynamics> dyn;
   csRef<iDynamicSystem> dynSys;
+  csRef<iBulletDynamicSystem> bullet_dynSys;
   csRef<iMeshFactoryWrapper> boxFact;
   csRef<iMeshFactoryWrapper> meshFact;
   csRef<iFont> courierFont;
+  bool do_bullet_debug;
 
   static bool SimpleEventHandler (iEvent& ev);
   bool HandleEvent (iEvent& ev);
@@ -57,10 +60,11 @@ private:
   void WriteShadow (int x,int y,int fg,const char *str,...);
   void Write(int x,int y,int fg,int bg,const char *str,...);
   
-  iRigidBody* CreateBox (void);
-  iRigidBody* CreateSphere (void);
-  iRigidBody* CreateMesh (void);
-  iJoint* CreateJointed (void);
+  bool CreateStarCollider ();
+  iRigidBody* CreateBox ();
+  iRigidBody* CreateSphere ();
+  iRigidBody* CreateMesh ();
+  iJoint* CreateJointed ();
   void CreateWalls (const csVector3& radius);
   csRef<iMeshWrapper> walls;
   csRef<iMeshWrapper> avatar;

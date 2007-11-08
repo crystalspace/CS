@@ -26,11 +26,13 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
 #include "csutil/weakrefarr.h"
+#include "ivaria/bullet.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Bullet)
 {
 
 class csBulletMotionState;
+class csBulletDebugDraw;
 
 /**
 * This is the implementation for a default dynamics move callback.
@@ -84,8 +86,9 @@ public:
   virtual bool Initialize (iObjectRegistry* object_reg);
 };
 
-class csBulletDynamicsSystem : public scfImplementationExt1<
-  csBulletDynamicsSystem, csObject, iDynamicSystem>
+class csBulletDynamicsSystem : public scfImplementationExt2<
+  csBulletDynamicsSystem, csObject, iDynamicSystem,
+  iBulletDynamicSystem>
 {
 private:
   btDynamicsWorld* bullet_world;
@@ -94,11 +97,21 @@ private:
   csRefArray<iDynamicsSystemCollider> colliders;
   csRef<csBulletDefaultMoveCallback> move_cb;
 
+  // For getting collision mesh data.
+  csStringID base_id;
+  csStringID colldet_id;
+
+  csBulletDebugDraw* debugDraw;
+
 public:
-  csBulletDynamicsSystem (btDynamicsWorld* world);
+  csBulletDynamicsSystem (btDynamicsWorld* world,
+      iObjectRegistry* object_reg);
   virtual ~csBulletDynamicsSystem ();
 
   btDynamicsWorld* GetWorld () const { return bullet_world; }
+
+  csStringID GetBaseID () const { return base_id; }
+  csStringID GetColldetID () const { return colldet_id; }
 
   virtual iObject *QueryObject () { return (iObject*)this; }
   virtual void SetGravity (const csVector3& v);
@@ -154,6 +167,8 @@ public:
   }
 
   btDynamicsWorld *GetBulletSys () { return bullet_world; }
+
+  virtual void DebugDraw (iView* view);
 };
 
 class csBulletRigidBody : public scfImplementationExt1<csBulletRigidBody,
@@ -271,6 +286,11 @@ class csBulletCollider : public scfImplementation1<csBulletCollider,
   float friction;
   csBulletMotionState* motionState;
   btCollisionShape* shape;
+
+  // Data we need to keep for the body so we can clean it up
+  // later.
+  btVector3* vertices;
+  int* indices;
 
 public:
   csBulletCollider (csBulletDynamicsSystem* dynsys);

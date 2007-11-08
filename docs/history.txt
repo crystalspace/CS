@@ -6,6 +6,29 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Nov-2007
+	- Jorrit did the following bullet/physics related changes:
+	    - Added support for static mesh colliders to bullet.
+	    - Dynamic rigid mesh bodies are not supported by bullet.
+	      Bullet prints a warning when this is tried and will return
+	      false.
+	    - Added new '*' key to phystut. This will add a star shaped
+	      static collider to test out static mesh colliders.
+	    - Decreased radius of the avatar sphere in phystut.
+	    - Fixed a bug in SetLinearVelocity() and SetAngularVelocity().
+	      If the object was resting then calling those functions
+	      would have no immediate effect. Fixed by calling
+	      activate() on the rigid body.
+	    - Added bullet specific iBulletDynamicSystem interface.
+	      With this interface you can get debug drawing for
+	      Bullet colliders.
+	    - Changed phystut so that with the '?' key you can now enable
+	      and disable this debugging feature for bullet.
+	    - Added implementation of AttachColliderCylinder().
+	    - Fixed a big bug in the conversion of Bullet to CS
+	      transforms. The matrix was inverted which caused objects
+	      to be positioned totally wrong. Without the debugging tool
+	      this was not always very obvious.
 7-Nov-2007
 	- res re-did the change from r27846 (add some arguments to Update()):
 	  to not break compatibility with existing third-party implementations
