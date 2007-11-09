@@ -1503,107 +1503,107 @@ Optional Packages:
   --with-perl             use Perl5 scripting interface (default NO)
   --without-python        do not use Python scripting interface
   --with-java             use Java scripting interface (default YES)
-  --with-x11=dir          specify location of libx11 if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-xext=dir         specify location of libxext if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
+  --with-x11=dir          specify additional location to search libx11 if not
+                          detected automatically; directories searched include
+                          dir/include, dir/lib, and dir
+  --with-xext=dir         specify additional location to search libxext if not
+                          detected automatically; directories searched include
+                          dir/include, dir/lib, and dir
   --with-x                use the X Window System
-  --with-xxf86vm=dir      specify location of libxxf86vm if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-xaw7=dir         specify location of libxaw7 if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
+  --with-xxf86vm=dir      specify additional location to search libxxf86vm if
+                          not detected automatically; directories searched
+                          include dir/include, dir/lib, and dir
+  --with-xaw7=dir         specify additional location to search libxaw7 if not
+                          detected automatically; directories searched include
+                          dir/include, dir/lib, and dir
   --with-mesa             use Mesa OpenGL library if available (default YES)
-  --with-z=dir            specify location of libz if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-png=dir          specify location of libpng if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-jpeg=dir         specify location of libjpeg if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-lcms=dir         specify location of liblcms if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-mng=dir          specify location of libmng if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-cairo=dir        specify location of libcairo if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-cairomm=dir      specify location of libcairomm if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-vgvm=dir         specify location of libvgvm if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-mikmod=dir       specify location of libmikmod if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-ogg=dir          specify location of libogg if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-vorbis=dir       specify location of libvorbis if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-vorbisfile=dir   specify location of libvorbisfile if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-3ds=dir          specify location of lib3ds if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-ode=dir          specify location of libode if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-bullet=dir       specify location of libbullet if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-freetype2=dir    specify location of libfreetype2 if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-cal3d=dir        specify location of libcal3d if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-sdl=dir          specify location of libsdl if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-wx=dir           specify location of libwx if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-CEGUI=dir        specify location of libCEGUI if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-GTK=dir          specify location of libGTK if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-Cg=dir           specify location of libCg if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-CgGL=dir         specify location of libCgGL if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-jackasyn=dir     specify location of libjackasyn if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-asound=dir       specify location of libasound if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-cucul=dir        specify location of libcucul if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-caca=dir         specify location of libcaca if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-cppunit=dir      specify location of libcppunit if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
-  --with-bfd=dir          specify location of libbfd if not detected
-                          automatically; searches dir/include, dir/lib, and
-                          dir
+  --with-z=dir            specify additional location to search libz if not
+                          detected automatically; directories searched include
+                          dir/include, dir/lib, and dir
+  --with-png=dir          specify additional location to search libpng if not
+                          detected automatically; directories searched include
+                          dir/include, dir/lib, and dir
+  --with-jpeg=dir         specify additional location to search libjpeg if not
+                          detected automatically; directories searched include
+                          dir/include, dir/lib, and dir
+  --with-lcms=dir         specify additional location to search liblcms if not
+                          detected automatically; directories searched include
+                          dir/include, dir/lib, and dir
+  --with-mng=dir          specify additional location to search libmng if not
+                          detected automatically; directories searched include
+                          dir/include, dir/lib, and dir
+  --with-cairo=dir        specify additional location to search libcairo if
+                          not detected automatically; directories searched
+                          include dir/include, dir/lib, and dir
+  --with-cairomm=dir      specify additional location to search libcairomm if
+                          not detected automatically; directories searched
+                          include dir/include, dir/lib, and dir
+  --with-vgvm=dir         specify additional location to search libvgvm if not
+                          detected automatically; directories searched include
+                          dir/include, dir/lib, and dir
+  --with-mikmod=dir       specify additional location to search libmikmod if
+                          not detected automatically; directories searched
+                          include dir/include, dir/lib, and dir
+  --with-ogg=dir          specify additional location to search libogg if not
+                          detected automatically; directories searched include
+                          dir/include, dir/lib, and dir
+  --with-vorbis=dir       specify additional location to search libvorbis if
+                          not detected automatically; directories searched
+                          include dir/include, dir/lib, and dir
+  --with-vorbisfile=dir   specify additional location to search libvorbisfile
+                          if not detected automatically; directories searched
+                          include dir/include, dir/lib, and dir
+  --with-3ds=dir          specify additional location to search lib3ds if not
+                          detected automatically; directories searched include
+                          dir/include, dir/lib, and dir
+  --with-ode=dir          specify additional location to search libode if not
+                          detected automatically; directories searched include
+                          dir/include, dir/lib, and dir
+  --with-bullet=dir       specify additional location to search libbullet if
+                          not detected automatically; directories searched
+                          include dir/include, dir/lib, and dir
+  --with-freetype2=dir    specify additional location to search libfreetype2
+                          if not detected automatically; directories searched
+                          include dir/include, dir/lib, and dir
+  --with-cal3d=dir        specify additional location to search libcal3d if
+                          not detected automatically; directories searched
+                          include dir/include, dir/lib, and dir
+  --with-sdl=dir          specify additional location to search libsdl if not
+                          detected automatically; directories searched include
+                          dir/include, dir/lib, and dir
+  --with-wx=dir           specify additional location to search libwx if not
+                          detected automatically; directories searched include
+                          dir/include, dir/lib, and dir
+  --with-CEGUI=dir        specify additional location to search libCEGUI if
+                          not detected automatically; directories searched
+                          include dir/include, dir/lib, and dir
+  --with-GTK=dir          specify additional location to search libGTK if not
+                          detected automatically; directories searched include
+                          dir/include, dir/lib, and dir
+  --with-Cg=dir           specify additional location to search libCg if not
+                          detected automatically; directories searched include
+                          dir/include, dir/lib, and dir
+  --with-CgGL=dir         specify additional location to search libCgGL if not
+                          detected automatically; directories searched include
+                          dir/include, dir/lib, and dir
+  --with-jackasyn=dir     specify additional location to search libjackasyn if
+                          not detected automatically; directories searched
+                          include dir/include, dir/lib, and dir
+  --with-asound=dir       specify additional location to search libasound if
+                          not detected automatically; directories searched
+                          include dir/include, dir/lib, and dir
+  --with-cucul=dir        specify additional location to search libcucul if
+                          not detected automatically; directories searched
+                          include dir/include, dir/lib, and dir
+  --with-caca=dir         specify additional location to search libcaca if not
+                          detected automatically; directories searched include
+                          dir/include, dir/lib, and dir
+  --with-cppunit=dir      specify additional location to search libcppunit if
+                          not detected automatically; directories searched
+                          include dir/include, dir/lib, and dir
+  --with-bfd=dir          specify additional location to search libbfd if not
+                          detected automatically; directories searched include
+                          dir/include, dir/lib, and dir
 
 Some influential environment variables:
   CC          C compiler command
@@ -8868,7 +8868,9 @@ done
 # users.  It saves users the bother of having to install these packages
 # manually one at a time.
 #------------------------------------------------------------------------------
-PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 
     # ensure PKGCONFIG is set since we may meddle with it
@@ -24919,7 +24921,8 @@ fi
 fi
 
     if test "$with_x11" != no; then
-  # If --with-x11 value is same as cached value, then assume other
+
+	# If --with-x11 value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_x11" != "$cs_cv_with_x11"; then
   cs_ignore_cache=yes
@@ -24928,9 +24931,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_x11 != yes; then
+  PATH="$with_x11/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_x11$PATH_SEPARATOR$with_x11/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_x11 = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -25042,8 +25055,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -25239,8 +25250,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_x11 != yes; then
@@ -25669,6 +25678,14 @@ else
 
 fi
 
+
+	PATH="$PATH_SAVE"
+	if test $with_x11 != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
+
 else
   cs_cv_libx11=no
 fi
@@ -25702,7 +25719,8 @@ fi
 fi
 
     if test "$with_xext" != no; then
-  # If --with-xext value is same as cached value, then assume other
+
+	# If --with-xext value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_xext" != "$cs_cv_with_xext"; then
   cs_ignore_cache=yes
@@ -25711,9 +25729,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_xext != yes; then
+  PATH="$with_xext/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_xext$PATH_SEPARATOR$with_xext/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_xext = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -25825,8 +25853,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -26022,8 +26048,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_xext != yes; then
@@ -26453,6 +26477,14 @@ else
 	cs_cv_libxext_libs=''
 
 fi
+
+
+	PATH="$PATH_SAVE"
+	if test $with_xext != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
 
 else
   cs_cv_libxext=no
@@ -27844,7 +27876,8 @@ fi
 fi
 
     if test "$with_xxf86vm" != no; then
-  # If --with-xxf86vm value is same as cached value, then assume other
+
+	# If --with-xxf86vm value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_xxf86vm" != "$cs_cv_with_xxf86vm"; then
   cs_ignore_cache=yes
@@ -27853,9 +27886,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_xxf86vm != yes; then
+  PATH="$with_xxf86vm/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_xxf86vm$PATH_SEPARATOR$with_xxf86vm/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_xxf86vm = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -27967,8 +28010,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -28164,7 +28205,7 @@ fi
 
 fi
 
-		if test "$cs_prog_pkg_config_checked" != yes; then
+	    if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -28276,8 +28317,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -28473,8 +28512,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_xxf86vm != yes; then
@@ -29015,6 +29052,14 @@ else
 
 fi
 
+
+	PATH="$PATH_SAVE"
+	if test $with_xxf86vm != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
+
 else
   cs_cv_libxxf86vm=no
 fi
@@ -29065,7 +29110,8 @@ fi
 fi
 
     if test "$with_xaw7" != no; then
-  # If --with-xaw7 value is same as cached value, then assume other
+
+	# If --with-xaw7 value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_xaw7" != "$cs_cv_with_xaw7"; then
   cs_ignore_cache=yes
@@ -29074,9 +29120,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_xaw7 != yes; then
+  PATH="$with_xaw7/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_xaw7$PATH_SEPARATOR$with_xaw7/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_xaw7 = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -29188,8 +29244,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -29385,7 +29439,7 @@ fi
 
 fi
 
-		if test "$cs_prog_pkg_config_checked" != yes; then
+	    if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -29497,8 +29551,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -29694,8 +29746,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_xaw7 != yes; then
@@ -30229,6 +30279,14 @@ else
 	cs_cv_libxaw7_libs=''
 
 fi
+
+
+	PATH="$PATH_SAVE"
+	if test $with_xaw7 != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
 
 else
   cs_cv_libxaw7=no
@@ -34075,7 +34133,8 @@ fi
 fi
 
     if test "$with_z" != no; then
-  # If --with-z value is same as cached value, then assume other
+
+	# If --with-z value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_z" != "$cs_cv_with_z"; then
   cs_ignore_cache=yes
@@ -34084,9 +34143,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_z != yes; then
+  PATH="$with_z/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_z$PATH_SEPARATOR$with_z/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_z = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -34198,8 +34267,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -34395,7 +34462,7 @@ fi
 
 fi
 
-		if test "$cs_prog_pkg_config_checked" != yes; then
+	    if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -34507,8 +34574,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -34704,8 +34769,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_z != yes; then
@@ -35238,6 +35301,14 @@ else
 
 fi
 
+
+	PATH="$PATH_SAVE"
+	if test $with_z != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
+
 else
   cs_cv_libz=no
 fi
@@ -35305,7 +35376,8 @@ fi
 fi
 
     if test "$with_png" != no; then
-  # If --with-png value is same as cached value, then assume other
+
+	# If --with-png value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_png" != "$cs_cv_with_png"; then
   cs_ignore_cache=yes
@@ -35314,9 +35386,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_png != yes; then
+  PATH="$with_png/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_png$PATH_SEPARATOR$with_png/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_png = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -35428,8 +35510,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -35625,7 +35705,7 @@ fi
 
 fi
 
-		if test "$cs_prog_pkg_config_checked" != yes; then
+	    if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -35737,8 +35817,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -35934,8 +36012,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_png != yes; then
@@ -36468,6 +36544,14 @@ else
 
 fi
 
+
+	PATH="$PATH_SAVE"
+	if test $with_png != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
+
 else
   cs_cv_libpng=no
 fi
@@ -36529,7 +36613,8 @@ fi
 fi
 
     if test "$with_jpeg" != no; then
-  # If --with-jpeg value is same as cached value, then assume other
+
+	# If --with-jpeg value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_jpeg" != "$cs_cv_with_jpeg"; then
   cs_ignore_cache=yes
@@ -36538,9 +36623,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_jpeg != yes; then
+  PATH="$with_jpeg/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_jpeg$PATH_SEPARATOR$with_jpeg/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_jpeg = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -36652,8 +36747,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -36849,7 +36942,7 @@ fi
 
 fi
 
-		if test "$cs_prog_pkg_config_checked" != yes; then
+	    if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -36961,8 +37054,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -37158,8 +37249,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_jpeg != yes; then
@@ -37696,6 +37785,14 @@ else
 
 fi
 
+
+	PATH="$PATH_SAVE"
+	if test $with_jpeg != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
+
 else
   cs_cv_libjpeg=no
 fi
@@ -37757,7 +37854,8 @@ fi
 fi
 
     if test "$with_lcms" != no; then
-  # If --with-lcms value is same as cached value, then assume other
+
+	# If --with-lcms value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_lcms" != "$cs_cv_with_lcms"; then
   cs_ignore_cache=yes
@@ -37766,9 +37864,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_lcms != yes; then
+  PATH="$with_lcms/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_lcms$PATH_SEPARATOR$with_lcms/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_lcms = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -37880,8 +37988,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -38077,8 +38183,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_lcms != yes; then
@@ -38507,6 +38611,14 @@ else
 
 fi
 
+
+	PATH="$PATH_SAVE"
+	if test $with_lcms != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
+
 else
   cs_cv_liblcms=no
 fi
@@ -38534,7 +38646,8 @@ fi
 fi
 
     if test "$with_mng" != no; then
-  # If --with-mng value is same as cached value, then assume other
+
+	# If --with-mng value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_mng" != "$cs_cv_with_mng"; then
   cs_ignore_cache=yes
@@ -38543,9 +38656,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_mng != yes; then
+  PATH="$with_mng/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_mng$PATH_SEPARATOR$with_mng/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_mng = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -38657,8 +38780,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -38854,7 +38975,7 @@ fi
 
 fi
 
-		if test "$cs_prog_pkg_config_checked" != yes; then
+	    if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -38966,8 +39087,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -39163,8 +39282,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_mng != yes; then
@@ -39697,6 +39814,14 @@ else
 
 fi
 
+
+	PATH="$PATH_SAVE"
+	if test $with_mng != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
+
 else
   cs_cv_libmng=no
 fi
@@ -39755,7 +39880,8 @@ fi
 fi
 
     if test "$with_cairo" != no; then
-  # If --with-cairo value is same as cached value, then assume other
+
+	# If --with-cairo value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_cairo" != "$cs_cv_with_cairo"; then
   cs_ignore_cache=yes
@@ -39764,9 +39890,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_cairo != yes; then
+  PATH="$with_cairo/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_cairo$PATH_SEPARATOR$with_cairo/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_cairo = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -39878,8 +40014,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -40075,8 +40209,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_cairo != yes; then
@@ -40505,6 +40637,14 @@ else
 
 fi
 
+
+	PATH="$PATH_SAVE"
+	if test $with_cairo != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
+
 else
   cs_cv_libcairo=no
 fi
@@ -40558,7 +40698,8 @@ fi
 fi
 
     if test "$with_cairomm" != no; then
-  # If --with-cairomm value is same as cached value, then assume other
+
+	# If --with-cairomm value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_cairomm" != "$cs_cv_with_cairomm"; then
   cs_ignore_cache=yes
@@ -40567,9 +40708,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_cairomm != yes; then
+  PATH="$with_cairomm/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_cairomm$PATH_SEPARATOR$with_cairomm/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_cairomm = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -40681,8 +40832,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -40878,7 +41027,7 @@ fi
 
 fi
 
-		if test "$cs_prog_pkg_config_checked" != yes; then
+	    if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -40990,8 +41139,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -41187,7 +41334,7 @@ fi
 
 fi
 
-		if test "$cs_prog_pkg_config_checked" != yes; then
+	    if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -41299,8 +41446,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -41496,8 +41641,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_cairomm != yes; then
@@ -42134,6 +42277,14 @@ else
 
 fi
 
+
+	PATH="$PATH_SAVE"
+	if test $with_cairomm != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
+
 else
   cs_cv_libcairomm=no
 fi
@@ -42187,7 +42338,8 @@ fi
 fi
 
     if test "$with_vgvm" != no; then
-  # If --with-vgvm value is same as cached value, then assume other
+
+	# If --with-vgvm value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_vgvm" != "$cs_cv_with_vgvm"; then
   cs_ignore_cache=yes
@@ -42196,9 +42348,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_vgvm != yes; then
+  PATH="$with_vgvm/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_vgvm$PATH_SEPARATOR$with_vgvm/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_vgvm = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -42310,8 +42472,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -42507,8 +42667,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_vgvm != yes; then
@@ -42937,6 +43095,14 @@ else
 
 fi
 
+
+	PATH="$PATH_SAVE"
+	if test $with_vgvm != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
+
 else
   cs_cv_libvgvm=no
 fi
@@ -42996,7 +43162,8 @@ fi
 fi
 
     if test "$with_mikmod" != no; then
-  # If --with-mikmod value is same as cached value, then assume other
+
+	# If --with-mikmod value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_mikmod" != "$cs_cv_with_mikmod"; then
   cs_ignore_cache=yes
@@ -43005,9 +43172,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_mikmod != yes; then
+  PATH="$with_mikmod/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_mikmod$PATH_SEPARATOR$with_mikmod/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_mikmod = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -43119,8 +43296,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -43316,8 +43491,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_mikmod != yes; then
@@ -43746,6 +43919,14 @@ else
 
 fi
 
+
+	PATH="$PATH_SAVE"
+	if test $with_mikmod != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
+
 else
   cs_cv_libmikmod=no
 fi
@@ -43805,7 +43986,8 @@ fi
 fi
 
     if test "$with_ogg" != no; then
-  # If --with-ogg value is same as cached value, then assume other
+
+	# If --with-ogg value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_ogg" != "$cs_cv_with_ogg"; then
   cs_ignore_cache=yes
@@ -43814,9 +43996,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_ogg != yes; then
+  PATH="$with_ogg/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_ogg$PATH_SEPARATOR$with_ogg/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_ogg = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -43928,8 +44120,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -44125,8 +44315,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_ogg != yes; then
@@ -44555,6 +44743,14 @@ else
 
 fi
 
+
+	PATH="$PATH_SAVE"
+	if test $with_ogg != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
+
 else
   cs_cv_libogg=no
 fi
@@ -44609,7 +44805,8 @@ fi
 fi
 
     if test "$with_vorbis" != no; then
-  # If --with-vorbis value is same as cached value, then assume other
+
+	# If --with-vorbis value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_vorbis" != "$cs_cv_with_vorbis"; then
   cs_ignore_cache=yes
@@ -44618,9 +44815,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_vorbis != yes; then
+  PATH="$with_vorbis/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_vorbis$PATH_SEPARATOR$with_vorbis/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_vorbis = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -44732,8 +44939,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -44929,8 +45134,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_vorbis != yes; then
@@ -45359,6 +45562,14 @@ else
 
 fi
 
+
+	PATH="$PATH_SAVE"
+	if test $with_vorbis != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
+
 else
   cs_cv_libvorbis=no
 fi
@@ -45415,7 +45626,8 @@ fi
 fi
 
     if test "$with_vorbisfile" != no; then
-  # If --with-vorbisfile value is same as cached value, then assume other
+
+	# If --with-vorbisfile value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_vorbisfile" != "$cs_cv_with_vorbisfile"; then
   cs_ignore_cache=yes
@@ -45424,9 +45636,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_vorbisfile != yes; then
+  PATH="$with_vorbisfile/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_vorbisfile$PATH_SEPARATOR$with_vorbisfile/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_vorbisfile = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -45538,8 +45760,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -45735,8 +45955,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_vorbisfile != yes; then
@@ -46167,6 +46385,14 @@ else
 
 fi
 
+
+	PATH="$PATH_SAVE"
+	if test $with_vorbisfile != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
+
 else
   cs_cv_libvorbisfile=no
 fi
@@ -46232,7 +46458,8 @@ fi
 fi
 
     if test "$with_3ds" != no; then
-  # If --with-3ds value is same as cached value, then assume other
+
+	# If --with-3ds value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_3ds" != "$cs_cv_with_3ds"; then
   cs_ignore_cache=yes
@@ -46241,9 +46468,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_3ds != yes; then
+  PATH="$with_3ds/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_3ds$PATH_SEPARATOR$with_3ds/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_3ds = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -46355,8 +46592,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -46552,7 +46787,7 @@ fi
 
 fi
 
-		if test "$cs_prog_pkg_config_checked" != yes; then
+	    if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -46664,8 +46899,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -46861,7 +47094,7 @@ fi
 
 fi
 
-		if test "$cs_prog_pkg_config_checked" != yes; then
+	    if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -46973,8 +47206,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -47170,8 +47401,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_3ds != yes; then
@@ -47807,6 +48036,14 @@ else
 	cs_cv_lib3ds_libs=''
 
 fi
+
+
+	PATH="$PATH_SAVE"
+	if test $with_3ds != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
 
 else
   cs_cv_lib3ds=no
@@ -48501,7 +48738,8 @@ fi
 fi
 
     if test "$with_ode" != no; then
-  # If --with-ode value is same as cached value, then assume other
+
+	# If --with-ode value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_ode" != "$cs_cv_with_ode"; then
   cs_ignore_cache=yes
@@ -48510,9 +48748,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_ode != yes; then
+  PATH="$with_ode/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_ode$PATH_SEPARATOR$with_ode/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_ode = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -48624,8 +48872,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -48821,8 +49067,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_ode != yes; then
@@ -49250,6 +49494,14 @@ else
 	cs_cv_libode_libs=''
 
 fi
+
+
+	PATH="$PATH_SAVE"
+	if test $with_ode != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
 
 else
   cs_cv_libode=no
@@ -49943,7 +50195,8 @@ fi
 fi
 
     if test "$with_bullet" != no; then
-  # If --with-bullet value is same as cached value, then assume other
+
+	# If --with-bullet value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_bullet" != "$cs_cv_with_bullet"; then
   cs_ignore_cache=yes
@@ -49952,9 +50205,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_bullet != yes; then
+  PATH="$with_bullet/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_bullet$PATH_SEPARATOR$with_bullet/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_bullet = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -50066,8 +50329,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -50263,7 +50524,7 @@ fi
 
 fi
 
-		if test "$cs_prog_pkg_config_checked" != yes; then
+	    if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -50375,8 +50636,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -50572,8 +50831,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_bullet != yes; then
@@ -51116,6 +51373,14 @@ else
 
 fi
 
+
+	PATH="$PATH_SAVE"
+	if test $with_bullet != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
+
 else
   cs_cv_libbullet=no
 fi
@@ -51559,7 +51824,8 @@ fi
 fi
 
     if test "$with_freetype2" != no; then
-  # If --with-freetype2 value is same as cached value, then assume other
+
+	# If --with-freetype2 value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_freetype2" != "$cs_cv_with_freetype2"; then
   cs_ignore_cache=yes
@@ -51568,9 +51834,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_freetype2 != yes; then
+  PATH="$with_freetype2/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_freetype2$PATH_SEPARATOR$with_freetype2/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_freetype2 = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -51682,8 +51958,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -51879,7 +52153,7 @@ fi
 
 fi
 
-		if test "$cs_prog_pkg_config_checked" != yes; then
+	    if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -51991,8 +52265,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -52188,8 +52460,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_freetype2 != yes; then
@@ -52723,6 +52993,14 @@ else
 	cs_cv_libfreetype2_libs=''
 
 fi
+
+
+	PATH="$PATH_SAVE"
+	if test $with_freetype2 != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
 
 else
   cs_cv_libfreetype2=no
@@ -53284,7 +53562,8 @@ fi
 fi
 
     if test "$with_cal3d" != no; then
-  # If --with-cal3d value is same as cached value, then assume other
+
+	# If --with-cal3d value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_cal3d" != "$cs_cv_with_cal3d"; then
   cs_ignore_cache=yes
@@ -53293,9 +53572,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_cal3d != yes; then
+  PATH="$with_cal3d/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_cal3d$PATH_SEPARATOR$with_cal3d/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_cal3d = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -53407,8 +53696,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -53604,8 +53891,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_cal3d != yes; then
@@ -54034,6 +54319,14 @@ else
 
 fi
 
+
+	PATH="$PATH_SAVE"
+	if test $with_cal3d != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
+
 else
   cs_cv_libcal3d=no
 fi
@@ -54404,7 +54697,8 @@ fi
 fi
 
     if test "$with_sdl" != no; then
-  # If --with-sdl value is same as cached value, then assume other
+
+	# If --with-sdl value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_sdl" != "$cs_cv_with_sdl"; then
   cs_ignore_cache=yes
@@ -54413,9 +54707,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_sdl != yes; then
+  PATH="$with_sdl/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_sdl$PATH_SEPARATOR$with_sdl/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_sdl = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -54527,8 +54831,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -54724,8 +55026,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_sdl != yes; then
@@ -55156,6 +55456,14 @@ else
 
 fi
 
+
+	PATH="$PATH_SAVE"
+	if test $with_sdl != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
+
 else
   cs_cv_libsdl=no
 fi
@@ -55538,7 +55846,8 @@ fi
 fi
 
     if test "$with_wx" != no; then
-  # If --with-wx value is same as cached value, then assume other
+
+	# If --with-wx value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_wx" != "$cs_cv_with_wx"; then
   cs_ignore_cache=yes
@@ -55547,9 +55856,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_wx != yes; then
+  PATH="$with_wx/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_wx$PATH_SEPARATOR$with_wx/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_wx = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -55661,8 +55980,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -55858,8 +56175,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_wx != yes; then
@@ -56302,6 +56617,14 @@ else
 
 fi
 
+
+	PATH="$PATH_SAVE"
+	if test $with_wx != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
+
 else
   cs_cv_libwx=no
 fi
@@ -56714,7 +57037,8 @@ fi
 fi
 
     if test "$with_CEGUI" != no; then
-  # If --with-CEGUI value is same as cached value, then assume other
+
+	# If --with-CEGUI value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_CEGUI" != "$cs_cv_with_CEGUI"; then
   cs_ignore_cache=yes
@@ -56723,9 +57047,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_CEGUI != yes; then
+  PATH="$with_CEGUI/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_CEGUI$PATH_SEPARATOR$with_CEGUI/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_CEGUI = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -56837,8 +57171,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -57034,7 +57366,7 @@ fi
 
 fi
 
-		if test "$cs_prog_pkg_config_checked" != yes; then
+	    if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -57146,8 +57478,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -57343,8 +57673,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_CEGUI != yes; then
@@ -57877,6 +58205,14 @@ else
 
 fi
 
+
+	PATH="$PATH_SAVE"
+	if test $with_CEGUI != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
+
 else
   cs_cv_libCEGUI=no
 fi
@@ -58255,7 +58591,8 @@ fi
 fi
 
     if test "$with_GTK" != no; then
-  # If --with-GTK value is same as cached value, then assume other
+
+	# If --with-GTK value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_GTK" != "$cs_cv_with_GTK"; then
   cs_ignore_cache=yes
@@ -58264,9 +58601,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_GTK != yes; then
+  PATH="$with_GTK/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_GTK$PATH_SEPARATOR$with_GTK/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_GTK = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -58378,8 +58725,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -58575,7 +58920,7 @@ fi
 
 fi
 
-		if test "$cs_prog_pkg_config_checked" != yes; then
+	    if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -58687,8 +59032,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -58884,8 +59227,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_GTK != yes; then
@@ -59417,6 +59758,14 @@ else
 	cs_cv_libGTK_libs=''
 
 fi
+
+
+	PATH="$PATH_SAVE"
+	if test $with_GTK != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
 
 else
   cs_cv_libGTK=no
@@ -60162,7 +60511,8 @@ fi
 fi
 
     if test "$with_Cg" != no; then
-  # If --with-Cg value is same as cached value, then assume other
+
+	# If --with-Cg value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_Cg" != "$cs_cv_with_Cg"; then
   cs_ignore_cache=yes
@@ -60171,9 +60521,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_Cg != yes; then
+  PATH="$with_Cg/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_Cg$PATH_SEPARATOR$with_Cg/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_Cg = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -60285,8 +60645,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -60482,7 +60840,7 @@ fi
 
 fi
 
-		if test "$cs_prog_pkg_config_checked" != yes; then
+	    if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -60594,8 +60952,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -60791,7 +61147,7 @@ fi
 
 fi
 
-		if test "$cs_prog_pkg_config_checked" != yes; then
+	    if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -60903,8 +61259,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -61100,8 +61454,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_Cg != yes; then
@@ -61738,6 +62090,14 @@ else
 
 fi
 
+
+	PATH="$PATH_SAVE"
+	if test $with_Cg != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
+
 else
   cs_cv_libCg=no
 fi
@@ -62083,7 +62443,8 @@ fi
 fi
 
     if test "$with_CgGL" != no; then
-  # If --with-CgGL value is same as cached value, then assume other
+
+	# If --with-CgGL value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_CgGL" != "$cs_cv_with_CgGL"; then
   cs_ignore_cache=yes
@@ -62092,9 +62453,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_CgGL != yes; then
+  PATH="$with_CgGL/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_CgGL$PATH_SEPARATOR$with_CgGL/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_CgGL = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -62206,8 +62577,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -62403,7 +62772,7 @@ fi
 
 fi
 
-		if test "$cs_prog_pkg_config_checked" != yes; then
+	    if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -62515,8 +62884,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -62712,7 +63079,7 @@ fi
 
 fi
 
-		if test "$cs_prog_pkg_config_checked" != yes; then
+	    if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -62824,8 +63191,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -63021,7 +63386,7 @@ fi
 
 fi
 
-		if test "$cs_prog_pkg_config_checked" != yes; then
+	    if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -63133,8 +63498,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -63330,7 +63693,7 @@ fi
 
 fi
 
-		if test "$cs_prog_pkg_config_checked" != yes; then
+	    if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -63442,8 +63805,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -63639,7 +64000,7 @@ fi
 
 fi
 
-		if test "$cs_prog_pkg_config_checked" != yes; then
+	    if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -63751,8 +64112,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -63948,7 +64307,7 @@ fi
 
 fi
 
-		if test "$cs_prog_pkg_config_checked" != yes; then
+	    if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -64060,8 +64419,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -64257,8 +64614,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_CgGL != yes; then
@@ -65313,6 +65668,14 @@ else
 
 fi
 
+
+	PATH="$PATH_SAVE"
+	if test $with_CgGL != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
+
 else
   cs_cv_libCgGL=no
 fi
@@ -65811,7 +66174,8 @@ fi
 fi
 
     if test "$with_jackasyn" != no; then
-  # If --with-jackasyn value is same as cached value, then assume other
+
+	# If --with-jackasyn value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_jackasyn" != "$cs_cv_with_jackasyn"; then
   cs_ignore_cache=yes
@@ -65820,9 +66184,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_jackasyn != yes; then
+  PATH="$with_jackasyn/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_jackasyn$PATH_SEPARATOR$with_jackasyn/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_jackasyn = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -65934,8 +66308,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -66131,8 +66503,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_jackasyn != yes; then
@@ -66563,6 +66933,14 @@ else
 
 fi
 
+
+	PATH="$PATH_SAVE"
+	if test $with_jackasyn != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
+
 else
   cs_cv_libjackasyn=no
 fi
@@ -66624,7 +67002,8 @@ fi
 fi
 
     if test "$with_asound" != no; then
-  # If --with-asound value is same as cached value, then assume other
+
+	# If --with-asound value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_asound" != "$cs_cv_with_asound"; then
   cs_ignore_cache=yes
@@ -66633,9 +67012,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_asound != yes; then
+  PATH="$with_asound/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_asound$PATH_SEPARATOR$with_asound/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_asound = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -66747,8 +67136,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -66944,8 +67331,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_asound != yes; then
@@ -67374,6 +67759,14 @@ else
 
 fi
 
+
+	PATH="$PATH_SAVE"
+	if test $with_asound != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
+
 else
   cs_cv_libasound=no
 fi
@@ -67436,7 +67829,8 @@ fi
 fi
 
     if test "$with_cucul" != no; then
-  # If --with-cucul value is same as cached value, then assume other
+
+	# If --with-cucul value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_cucul" != "$cs_cv_with_cucul"; then
   cs_ignore_cache=yes
@@ -67445,9 +67839,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_cucul != yes; then
+  PATH="$with_cucul/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_cucul$PATH_SEPARATOR$with_cucul/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_cucul = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -67559,8 +67963,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -67756,7 +68158,7 @@ fi
 
 fi
 
-		if test "$cs_prog_pkg_config_checked" != yes; then
+	    if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -67868,8 +68270,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -68065,8 +68465,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_cucul != yes; then
@@ -68599,6 +68997,14 @@ else
 
 fi
 
+
+	PATH="$PATH_SAVE"
+	if test $with_cucul != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
+
 else
   cs_cv_libcucul=no
 fi
@@ -68652,7 +69058,8 @@ fi
 fi
 
     if test "$with_caca" != no; then
-  # If --with-caca value is same as cached value, then assume other
+
+	# If --with-caca value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_caca" != "$cs_cv_with_caca"; then
   cs_ignore_cache=yes
@@ -68661,9 +69068,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_caca != yes; then
+  PATH="$with_caca/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_caca$PATH_SEPARATOR$with_caca/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_caca = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -68775,8 +69192,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -68972,7 +69387,7 @@ fi
 
 fi
 
-		if test "$cs_prog_pkg_config_checked" != yes; then
+	    if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -69084,8 +69499,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -69281,8 +69694,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_caca != yes; then
@@ -69814,6 +70225,14 @@ else
 	cs_cv_libcaca_libs=''
 
 fi
+
+
+	PATH="$PATH_SAVE"
+	if test $with_caca != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
 
 else
   cs_cv_libcaca=no
@@ -72120,7 +72539,8 @@ fi
 fi
 
     if test "$with_cppunit" != no; then
-  # If --with-cppunit value is same as cached value, then assume other
+
+	# If --with-cppunit value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_cppunit" != "$cs_cv_with_cppunit"; then
   cs_ignore_cache=yes
@@ -72129,9 +72549,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_cppunit != yes; then
+  PATH="$with_cppunit/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_cppunit$PATH_SEPARATOR$with_cppunit/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_cppunit = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -72243,8 +72673,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -72440,8 +72868,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_cppunit != yes; then
@@ -72869,6 +73295,14 @@ else
 	cs_cv_libcppunit_libs=''
 
 fi
+
+
+	PATH="$PATH_SAVE"
+	if test $with_cppunit != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
 
 else
   cs_cv_libcppunit=no
@@ -83101,7 +83535,8 @@ fi
 fi
 
     if test "$with_bfd" != no; then
-  # If --with-bfd value is same as cached value, then assume other
+
+	# If --with-bfd value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_bfd" != "$cs_cv_with_bfd"; then
   cs_ignore_cache=yes
@@ -83110,9 +83545,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_bfd != yes; then
+  PATH="$with_bfd/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_bfd$PATH_SEPARATOR$with_bfd/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_bfd = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -83224,8 +83669,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -83421,8 +83864,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_bfd != yes; then
@@ -83850,6 +84291,14 @@ else
 	cs_cv_libbfd_libs=''
 
 fi
+
+
+	PATH="$PATH_SAVE"
+	if test $with_bfd != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
 
 else
   cs_cv_libbfd=no
@@ -84441,7 +84890,8 @@ fi
 fi
 
     if test "$with_bfd" != no; then
-  # If --with-bfd value is same as cached value, then assume other
+
+	# If --with-bfd value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
 	if test "$with_bfd" != "$cs_cv_with_bfd"; then
   cs_ignore_cache=yes
@@ -84450,9 +84900,19 @@ else
 fi
 
 
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_bfd != yes; then
+  PATH="$with_bfd/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_bfd$PATH_SEPARATOR$with_bfd/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+
 	cs_check_lib_flags=''
-	if test $with_bfd = yes; then
-  if test "$cs_prog_pkg_config_checked" != yes; then
+	if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -84564,8 +85024,6 @@ esac
   fi
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -84761,8 +85219,6 @@ fi
 
 fi
 
-
-fi
 
 
 	if test $with_bfd != yes; then
@@ -85190,6 +85646,14 @@ else
 	cs_cv_libbfd_libs=''
 
 fi
+
+
+	PATH="$PATH_SAVE"
+	if test $with_bfd != yes; then
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
 
 else
   cs_cv_libbfd=no
