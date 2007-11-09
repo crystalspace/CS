@@ -36,6 +36,11 @@ chronological order.
 	  "cairomm-1.0" an aliases of "cairomm" in the CS_CHECK_LIB_WITH()
 	  invocation in configure.ac.  This arrangement generally is more
 	  robust anyhow, potentially requiring less future maintenance.
+	- res changed CS_CHECK_LIB_WITH to also augment the pkg-config search
+	  path and executable search path with directories derived from the
+	  user-specified location. Also changed some wording to make clear that
+	  the provided location is only search in addition to any standard
+	  directories, not instead. Addresses #276.
 8-Nov-2007
 	- Jorrit did the following bullet/physics related changes:
 	    - Added support for static mesh colliders to bullet.
