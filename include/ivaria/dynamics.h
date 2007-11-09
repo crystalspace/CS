@@ -703,7 +703,7 @@ class csReversibleTransform;
  */
 struct iDynamicsSystemCollider : public virtual iBase
 {
-  SCF_INTERFACE (iDynamicsSystemCollider, 0, 0, 1);
+  SCF_INTERFACE (iDynamicsSystemCollider, 0, 0, 2);
 
   /// Create Collider Geometry with given sphere
   virtual bool CreateSphereGeometry (const csSphere& sphere) = 0;
@@ -719,6 +719,9 @@ struct iDynamicsSystemCollider : public virtual iBase
 
   /// Create Capsule Collider Geometry.
   virtual bool CreateCapsuleGeometry (float length, float radius) = 0;
+
+  /// Create Cylinder Geometry.
+  virtual bool CreateCylinderGeometry (float length, float radius) = 0;
 
   //FIXME: This should be implememented, but it is not so obvious - it
   //should be valid also for static colliders.

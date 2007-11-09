@@ -303,6 +303,7 @@ public:
   virtual bool CreateMeshGeometry (iMeshWrapper *mesh);
   virtual bool CreateBoxGeometry (const csVector3& box_size);
   virtual bool CreateCapsuleGeometry (float length, float radius);
+  virtual bool CreateCylinderGeometry (float length, float radius);
 
   virtual void SetCollisionCallback (
     iDynamicsColliderCollisionCallback* cb);

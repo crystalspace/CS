@@ -701,7 +701,7 @@ bool csODEDynamicSystem::AttachColliderCylinder (float length, float radius,
   odec->SetElasticity (elasticity);
   odec->SetFriction (friction);
   odec->SetSoftness (softness);
-  odec->CreateCapsuleGeometry (length, radius);
+  odec->CreateCylinderGeometry (length, radius);
   odec->SetTransform (trans);
   odec->AddToSpace (spaceID);
   colliders.Push (odec);
@@ -1093,6 +1093,12 @@ bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
 
   return true;
 }
+
+bool csODECollider::CreateCylinderGeometry (float length, float radius)
+{
+  return CreateCapsuleGeometry (length, radius);
+}
+
 bool csODECollider::CreateCapsuleGeometry (float length, float radius)
 {
   csOrthoTransform transform = GetLocalTransform ();
@@ -1523,7 +1529,7 @@ bool csODERigidBody::AttachColliderCylinder (float length, float radius,
   odec->SetFriction (friction);
   odec->SetSoftness (softness);
   odec->SetDensity (density);
-  odec->CreateCapsuleGeometry (length, radius);
+  odec->CreateCylinderGeometry (length, radius);
   odec->SetTransform (trans);
   odec->AttachBody (bodyID);
   odec->AddTransformToSpace (groupID);

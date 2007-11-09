@@ -272,6 +272,10 @@ public:
   {
     return mode;
   }
+  void ClearDebug ()
+  {
+    lines.Empty ();
+  }
   void DebugDraw (iView* view)
   {
     size_t i;
@@ -287,7 +291,6 @@ public:
 	  int (l.color.green * 255), int (l.color.blue * 255));
       g3d->DrawLine (tr_w2c * l.p1, tr_w2c * l.p2, fov, color);
     }
-    lines.Empty ();
   }
 };
 
@@ -363,6 +366,7 @@ void csBulletDynamicsSystem::SetAutoDisableParams (float /*linear*/,
 
 void csBulletDynamicsSystem::Step (float stepsize)
 {
+  if (debugDraw) debugDraw->ClearDebug ();
   bullet_world->stepSimulation (stepsize);
 }
 
@@ -439,21 +443,17 @@ bool csBulletDynamicsSystem::AttachColliderCylinder (float length,
   float radius, const csOrthoTransform& trans, float friction,
   float elasticity, float softness)
 {
-#if 0
   csBulletCollider *bulletc = new csBulletCollider (this);
   bulletc->SetElasticity (elasticity);
   bulletc->SetFriction (friction);
   bulletc->SetSoftness (softness);
 
   bulletc->SetTransform (trans);
-  //@@@
-  //bulletc->CreateCylinderGeometry (size);
+  bulletc->CreateCylinderGeometry (length, radius);
   colliders.Push (bulletc);
   bulletc->DecRef ();
 
   return true;
-#endif
-  return false;
 }
 
 bool csBulletDynamicsSystem::AttachColliderBox (const csVector3 &size,
@@ -1070,6 +1070,28 @@ bool csBulletCollider::CreateBoxGeometry (const csVector3& size)
 
   btVector3 localInertia (0, 0, 0);
   //shape->calculateLocalInertia (mass, localInertia);
+  body = new btRigidBody (mass, motionState, shape, localInertia,
+      0, 0, friction);
+  ds->GetWorld ()->addRigidBody (body);
+
+  return true;
+}
+
+bool csBulletCollider::CreateCylinderGeometry (float length,
+  float radius)
+{
+  if (body)
+  {
+    ds->GetWorld ()->removeRigidBody (body);
+    delete body;
+  }
+
+  geom_type = CYLINDER_COLLIDER_GEOMETRY;
+
+  delete shape;
+  shape = new btCylinderShapeZ (btVector3 (radius, radius, length / 2.0f));
+  btVector3 localInertia (0, 0, 0);
+  shape->calculateLocalInertia (mass, localInertia);
   body = new btRigidBody (mass, motionState, shape, localInertia,
       0, 0, friction);
   ds->GetWorld ()->addRigidBody (body);

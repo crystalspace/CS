@@ -454,6 +454,7 @@ public:
   bool CreateMeshGeometry (iMeshWrapper *mesh);
   bool CreateBoxGeometry (const csVector3& box_size);
   bool CreateCapsuleGeometry (float length, float radius); 
+  bool CreateCylinderGeometry (float length, float radius); 
   bool GetBoxGeometry (csVector3& size); 
   bool GetSphereGeometry (csSphere& sphere);
   bool GetPlaneGeometry (csPlane3& box); 
