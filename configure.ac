@@ -1275,9 +1275,9 @@ CS_CHECK_LIB_WITH([vgvm],
 	[[#include <vgvm/vgvm.h>]],
 	[new vgvm::Program (0,0)])],
     [], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libvgvm], [VGVM])], [],
-    [$cs_cv_libcairomm_1_0_cflags],
-    [$cs_cv_libcairomm_1_0_lflags],
-    [$cs_cv_libcairomm_1_0_libs])
+    [$cs_cv_libcairomm_cflags],
+    [$cs_cv_libcairomm_lflags],
+    [$cs_cv_libcairomm_libs])
 
 
 
