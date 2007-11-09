@@ -1260,14 +1260,15 @@ CS_CHECK_LIB_WITH([cairo],
 	[cairo_create (0)])],
     [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libcairo], [CAIRO])])
 
-CS_CHECK_LIB_WITH([cairomm-1.0],
+CS_CHECK_LIB_WITH([cairomm],
     [AC_LANG_PROGRAM(
 	[[#include <cairomm/cairomm.h>]],
 	[Cairo::Context c ((cairo_t*)0)])],
     [], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libcairomm], [CAIROMM])], [],
     [$cs_cv_libcairo_cflags],
     [$cs_cv_libcairo_lflags],
-    [$cs_cv_libcairo_libs])
+    [$cs_cv_libcairo_libs],
+    [cairomm-1, cairomm-1.0])
 
 CS_CHECK_LIB_WITH([vgvm],
     [AC_LANG_PROGRAM(

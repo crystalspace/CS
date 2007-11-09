@@ -31,6 +31,11 @@ chronological order.
 	    - Partially implemented the joint support for fixed joints.
 	      It works slightly but the simulation seems unstable for
 	      some reason.
+	- Eric Sunshine fixed issue #408 (Autoconf 2.59 bug: "." not
+	  transformed to to "_" in shell $with_foo variable names) by making
+	  "cairomm-1.0" an aliases of "cairomm" in the CS_CHECK_LIB_WITH()
+	  invocation in configure.ac.  This arrangement generally is more
+	  robust anyhow, potentially requiring less future maintenance.
 8-Nov-2007
 	- Jorrit did the following bullet/physics related changes:
 	    - Added support for static mesh colliders to bullet.
