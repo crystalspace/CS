@@ -22,7 +22,6 @@
 #include <stdarg.h>
 #include <crystalspace.h>
 #include <ivaria/ode.h>
-#include <ivaria/bullet.h>
 
 class Simple
 {
