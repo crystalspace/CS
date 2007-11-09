@@ -31,10 +31,9 @@ Simple *simple;
 Simple::Simple (iObjectRegistry* object_reg)
 {
   Simple::object_reg = object_reg;
-  objcnt=0;
-  solver=0;
-  disable=false;
-  remaining_delta=0;
+  objcnt = 0;
+  solver = 0;
+  disable = false;
   do_bullet_debug = false;
 }
 
@@ -61,31 +60,16 @@ void Simple::SetupFrame ()
     view->GetCamera()->GetTransform().RotateThis (CS_VEC_TILT_DOWN, speed);
   if (kbd->GetKeyState (CSKEY_UP))
   {
-    avatarbody->SetLinearVelocity (view->GetCamera()->GetTransform().GetT2O ()
-	* csVector3 (0, 0, 5));
+    avatarbody->SetLinearVelocity (view->GetCamera()->GetTransform()
+	.GetT2O () * csVector3 (0, 0, 5));
   }
   if (kbd->GetKeyState (CSKEY_DOWN))
   {
-    avatarbody->SetLinearVelocity (view->GetCamera()->GetTransform().GetT2O ()
-	* csVector3 (0, 0, -5));
+    avatarbody->SetLinearVelocity (view->GetCamera()->GetTransform()
+	.GetT2O () * csVector3 (0, 0, -5));
   }
 
-  // For ODE it is recommended that all steps are done with the
-  // same size. So we always will call dynamics->Step(delta) with
-  // the constant delta. However, sometimes our elapsed time
-  // is not divisible by delta and in that case we have a small
-  // time (smaller then delta) left-over. We can't afford to drop
-  // that because then speed of physics simulation would differ
-  // depending on framerate. So we will put that remainder in
-  // remaining_delta and use that here too.
-  const float delta = 0.01f;
-  float et = remaining_delta + speed;
-  while (et >= delta)
-  {
-    dyn->Step (delta);
-    et -= delta;
-  }
-  remaining_delta = et;
+  dyn->Step (speed);
 
   view->GetCamera()->GetTransform().SetOrigin(avatar->GetMovable()
     ->GetTransform().GetOrigin());

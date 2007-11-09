@@ -19,6 +19,15 @@ chronological order.
 	      mesh. In Bullet this will use a special convex mesh primitive
 	      which is allowed to move (concave meshes cannot move
 	      in Bullet). This is untested however.
+	    - Compile fix on phystut.
+	    - Changed ODE plugin so that it now automatically handles
+	      splitting the elapsed time in fixed chunks. This code
+	      was present but for some reason disabled by default.
+	    - Removed split in fixed dynamic steps in phystut. Bullet
+	      already handles this automatically and our ode plugin
+	      also fixes this in the plugin.
+	    - Started initialial implementation of joints in the bullet
+	      plugin. Not working yet.
 8-Nov-2007
 	- Jorrit did the following bullet/physics related changes:
 	    - Added support for static mesh colliders to bullet.

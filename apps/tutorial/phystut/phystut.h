@@ -39,7 +39,6 @@ private:
   int objcnt;
   int solver;
   bool disable;
-  float remaining_delta;
 
   csString phys_engine_name;
   int  phys_engine_id;

@@ -89,8 +89,8 @@ csODEDynamics::csODEDynamics (iBase* parent) :
   erp = 0.2f;
   cfm = 1e-5f;
 
-  rateenabled = false;
-  steptime = 0.1f;
+  rateenabled = true;
+  steptime = 0.01f;
   limittime = 1.0f;
   total_elapsed = 0.0f;
 
@@ -458,8 +458,10 @@ csODEDynamicSystem::csODEDynamicSystem (iObjectRegistry* object_reg,
   lin_damp = 1.0;
   move_cb = (iDynamicsMoveCallback*)new csODEDefaultMoveCallback ();
 
-  rateenabled = false;
-  steptime = limittime = total_elapsed = 0.0;
+  rateenabled = true;
+  total_elapsed = 0.0;
+  steptime = 0.01f;
+  limittime = 1.0f;
 
   stepfast = false;
   sfiter = 10;
