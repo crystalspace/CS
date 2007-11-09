@@ -370,6 +370,7 @@ csBulletDynamicsSystem::csBulletDynamicsSystem (btDynamicsWorld* world,
 
 csBulletDynamicsSystem::~csBulletDynamicsSystem ()
 {
+  joints.DeleteAll ();
   bodies.DeleteAll ();
   colliders.DeleteAll ();
   delete bullet_world;
@@ -466,11 +467,16 @@ void csBulletDynamicsSystem::RemoveGroup (iBodyGroup*)
 
 csPtr<iJoint> csBulletDynamicsSystem::CreateJoint ()
 {
-  return 0;
+  csBulletJoint* b = new csBulletJoint (this);
+
+  iJoint* ib = static_cast<iJoint*> (b);
+  joints.Push (ib);
+  return (csPtr<iJoint>) ib;
 }
 
-void csBulletDynamicsSystem::RemoveJoint (iJoint*)
+void csBulletDynamicsSystem::RemoveJoint (iJoint* joint)
 {
+  joints.Delete (joint);
 }
 
 iDynamicsMoveCallback* csBulletDynamicsSystem::GetDefaultMoveCallback ()
@@ -1339,7 +1345,8 @@ bool csBulletCollider::IsStatic ()
 
 //------------------------ csBulletJoint ------------------------------------
 
-csBulletJoint::csBulletJoint () : scfImplementationType (this)
+csBulletJoint::csBulletJoint (csBulletDynamicsSystem* dynsys)
+  : scfImplementationType (this), ds (dynsys)
 {
   current_type = BULLET_JOINT_NONE;
   constraint = 0;
@@ -1365,21 +1372,80 @@ csBulletJoint::csBulletJoint () : scfImplementationType (this)
 
 csBulletJoint::~csBulletJoint ()
 {
-  delete constraint;
+  if (constraint)
+  {
+    ds->GetWorld ()->removeConstraint (constraint);
+    delete constraint;
+  }
 }
 
 int csBulletJoint::ComputeBestBulletJointType ()
 {
-  // @@@ TODO
+  if (trans_constraint_x && trans_constraint_y && trans_constraint_z)
+  {
+    // All translation is constrainted.
+    if (rot_constraint_x && rot_constraint_y && rot_constraint_z)
+    {
+      // All rotation is constrainted.
+      return BULLET_JOINT_6DOF;
+    }
+  }
+  else
+  {
+  }
   return BULLET_JOINT_NONE;
 }
 
 void csBulletJoint::RecreateJointIfNeeded (bool force)
 {
-  if ((!force) && ComputeBestBulletJointType () == current_type)
+  if (!bodies[0] || !bodies[1]) return;
+
+  int newtype = ComputeBestBulletJointType ();
+  if ((!force) && newtype == current_type)
     return;
 
-  // @@@ TODO
+  current_type = newtype;
+  if (constraint)
+  {
+    ds->GetWorld ()->removeConstraint (constraint);
+    delete constraint;
+    constraint = 0;
+  }
+
+  btRigidBody* body1 = static_cast<csBulletRigidBody*> ((iRigidBody*)
+      bodies[0])->GetBulletBody ();
+  btRigidBody* body2 = static_cast<csBulletRigidBody*> ((iRigidBody*)
+      bodies[1])->GetBulletBody ();
+
+  switch (current_type)
+  {
+    case BULLET_JOINT_6DOF:
+      {
+	// Currently fixed only! @@@
+	btTransform frA;
+	btTransform frB;
+	frA.setIdentity ();
+	frB.setIdentity ();
+	btGeneric6DofConstraint* dof6;
+	dof6 = new btGeneric6DofConstraint (*body1, *body2,
+	    frA, frB, true);
+	dof6->setLinearLowerLimit (btVector3 (0, 0, 0));
+	dof6->setLinearUpperLimit (btVector3 (0, 0, 0));
+	dof6->setAngularLowerLimit (btVector3 (0, 0, 0));
+	dof6->setAngularUpperLimit (btVector3 (0, 0, 0));
+	constraint = dof6;
+      }
+      break;
+
+    default:
+      // @@@ TODO
+      break;
+  }
+
+  if (constraint)
+  {
+    ds->GetWorld ()->addConstraint (constraint, false);
+  }
 }
  
 void csBulletJoint::Attach (iRigidBody* body1, iRigidBody* body2)

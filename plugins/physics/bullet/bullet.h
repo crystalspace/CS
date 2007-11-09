@@ -95,6 +95,7 @@ private:
   csVector3 gravity;
   csRefArrayObject<iRigidBody> bodies;
   csRefArray<iDynamicsSystemCollider> colliders;
+  csRefArray<iJoint> joints;
   csRef<csBulletDefaultMoveCallback> move_cb;
 
   // For getting collision mesh data.
@@ -354,6 +355,8 @@ public:
 class csBulletJoint : public scfImplementation1<csBulletJoint, iJoint>
 {
 private:
+  csBulletDynamicsSystem* ds;
+
   int current_type;	// One of BULLET_JOINT_xxx
 
   // Pointer to either btGeneric6DofContraint (in case of BULLET_JOINT_6DOF),
@@ -396,7 +399,7 @@ private:
   void RecreateJointIfNeeded (bool force = false);
 
 public:
-  csBulletJoint ();
+  csBulletJoint (csBulletDynamicsSystem* ds);
   virtual ~csBulletJoint ();
  
   virtual void Attach (iRigidBody* body1, iRigidBody* body2);

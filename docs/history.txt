@@ -28,6 +28,9 @@ chronological order.
 	      also fixes this in the plugin.
 	    - Started initialial implementation of joints in the bullet
 	      plugin. Not working yet.
+	    - Partially implemented the joint support for fixed joints.
+	      It works slightly but the simulation seems unstable for
+	      some reason.
 8-Nov-2007
 	- Jorrit did the following bullet/physics related changes:
 	    - Added support for static mesh colliders to bullet.
