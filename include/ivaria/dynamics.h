@@ -183,6 +183,24 @@ struct iDynamicSystem : public virtual iBase
   virtual iDynamicsMoveCallback* GetDefaultMoveCallback () = 0;
 
   /**
+   * Attaches a convex static collider mesh to world
+   * \param mesh the mesh to use for collision detection. This
+   * mesh must be convex.
+   * \param trans a hard transform to apply to the mesh
+   * \param friction how much friction this body has,
+   * ranges from 0 (no friction) to infinity (perfect friction)
+   * \param elasticity the "bouncyness" of this object, from 0
+   * (no bounce) to 1 (maximum bouncyness)
+   * \param softness how "squishy" this object is, in the range
+   * 0...1; small values (range of 0.00001 to 0.01) give
+   * reasonably stiff collision contacts, larger values
+   * are more "mushy"
+   */
+  virtual bool AttachColliderConvexMesh (iMeshWrapper* mesh,
+    const csOrthoTransform& trans, float friction,
+    float elasticity, float softness = 0.01f) = 0;
+
+  /**
    * Attaches a static collider mesh to world
    * \param mesh the mesh to use for collision detection
    * \param trans a hard transform to apply to the mesh
@@ -406,6 +424,26 @@ struct iRigidBody : public virtual iBase
 
   /// Returns which group a body belongs to
   virtual csRef<iBodyGroup> GetGroup (void) = 0;
+
+  /**
+   * Add a collider with a associated friction coefficient
+   * \param mesh the mesh object which will act as collider. This
+   * must be a convex mesh.
+   * \param trans a hard transform to apply to the mesh
+   * \param friction how much friction this body has,
+   * ranges from 0 (no friction) to infinity (perfect friction)
+   * \param density the density of this rigid body (used to calculate
+   * mass based on collider volume)
+   * \param elasticity the "bouncyness" of this object, from 0
+   * (no bounce) to 1 (maximum bouncyness)
+   * \param softness how "squishy" this object is, in the range
+   * 0...1; small values (range of 0.00001 to 0.01) give
+   * reasonably stiff collision contacts, larger values
+   * are more "mushy"
+   */
+  virtual bool AttachColliderConvexMesh (iMeshWrapper* mesh,
+    const csOrthoTransform& trans, float friction, float density,
+    float elasticity, float softness = 0.01f) = 0;
 
   /**
    * Add a collider with a associated friction coefficient
@@ -705,16 +743,19 @@ struct iDynamicsSystemCollider : public virtual iBase
 {
   SCF_INTERFACE (iDynamicsSystemCollider, 0, 0, 2);
 
-  /// Create Collider Geometry with given sphere
+  /// Create Collider Geometry with given sphere.
   virtual bool CreateSphereGeometry (const csSphere& sphere) = 0;
 
-  /// Create Collider Geometry with given plane
+  /// Create Collider Geometry with given plane.
   virtual bool CreatePlaneGeometry (const csPlane3& plane) = 0;
 
-  /// Create Collider Geometry with given mesh geometry
+  /// Create Collider Geometry with given convex mesh geometry.
+  virtual bool CreateConvexMeshGeometry (iMeshWrapper *mesh) = 0;
+
+  /// Create Collider Geometry with given mesh geometry.
   virtual bool CreateMeshGeometry (iMeshWrapper *mesh) = 0;
 
-  /// Create Collider Geometry with given box (given by its size)
+  /// Create Collider Geometry with given box (given by its size).
   virtual bool CreateBoxGeometry (const csVector3& box_size) = 0;
 
   /// Create Capsule Collider Geometry.

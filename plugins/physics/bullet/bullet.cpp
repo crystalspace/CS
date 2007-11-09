@@ -80,6 +80,62 @@ static btTransform CSToBullet (const csReversibleTransform& tr)
 
 //---------------------------------------------------------------------------
 
+static btTriangleIndexVertexArray* GenerateTriMeshData (iMeshWrapper* mesh,
+	int*& indices, btVector3*& vertices,
+	csStringID base_id, csStringID colldet_id)
+{
+  iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
+  csRef<iTriangleMesh> trimesh;
+  bool use_trimesh = objmodel->IsTriangleDataSet (base_id);
+  if (use_trimesh)
+  {
+    if (objmodel->IsTriangleDataSet (colldet_id))
+      trimesh = objmodel->GetTriangleData (colldet_id);
+    else
+      trimesh = objmodel->GetTriangleData (base_id);
+  }
+
+  if (!trimesh || trimesh->GetVertexCount () == 0
+      || trimesh->GetTriangleCount () == 0)
+  {
+    csFPrintf (stderr, "csBulletRigidBody: No collision polygons, triangles or vertices on %s\n",
+      mesh->QueryObject()->GetName());
+    return 0;
+  }
+
+  csTriangle *c_triangle = trimesh->GetTriangles();
+  size_t tr_num = trimesh->GetTriangleCount();
+  size_t vt_num = trimesh->GetVertexCount ();
+
+  delete[] indices;
+  indices = new int[tr_num*3];
+  int indexStride = 3 * sizeof (int);
+
+  size_t i;
+  int* id = indices;
+  for (i = 0 ; i < tr_num ; i++)
+  {
+    *id++ = c_triangle[i].a;
+    *id++ = c_triangle[i].b;
+    *id++ = c_triangle[i].c;
+  }
+
+  delete[] vertices;
+  vertices = new btVector3[vt_num];
+  csVector3 *c_vertex = trimesh->GetVertices();
+  int vertexStride = sizeof (btVector3);
+
+  for (i = 0 ; i < vt_num ; i++)
+    vertices[i].setValue (c_vertex[i].x, c_vertex[i].y, c_vertex[i].z);
+
+  btTriangleIndexVertexArray* indexVertexArrays =
+    new btTriangleIndexVertexArray (tr_num, indices, indexStride,
+	vt_num, (btScalar*) &vertices[0].x (), vertexStride);
+  return indexVertexArrays;
+}
+
+//---------------------------------------------------------------------------
+
 class csBulletMotionState : public btDefaultMotionState
 {
 private:
@@ -422,6 +478,23 @@ iDynamicsMoveCallback* csBulletDynamicsSystem::GetDefaultMoveCallback ()
   return move_cb;
 }
 
+bool csBulletDynamicsSystem::AttachColliderConvexMesh (iMeshWrapper* mesh,
+  const csOrthoTransform& trans, float friction,
+  float elasticity, float softness)
+{
+  csBulletCollider *bulletc = new csBulletCollider (this);
+  bulletc->SetElasticity (elasticity);
+  bulletc->SetFriction (friction);
+  bulletc->SetSoftness (softness);
+
+  bulletc->SetTransform (trans);
+  bulletc->CreateConvexMeshGeometry (mesh);
+  colliders.Push (bulletc);
+  bulletc->DecRef ();
+
+  return true;
+}
+
 bool csBulletDynamicsSystem::AttachColliderMesh (iMeshWrapper* mesh,
   const csOrthoTransform& trans, float friction,
   float elasticity, float softness)
@@ -525,6 +598,8 @@ csBulletRigidBody::csBulletRigidBody (csBulletDynamicsSystem* dynsys)
   trans.setIdentity ();
   motionState = new csBulletMotionState (0, trans);
   motionState->SetMoveCallback (dynsys->GetDefaultMoveCallback ());
+  vertices = 0;
+  indices = 0;
 }
 
 csBulletRigidBody::~csBulletRigidBody ()
@@ -535,6 +610,8 @@ csBulletRigidBody::~csBulletRigidBody ()
     delete body;
   }
   delete motionState;
+  delete[] vertices;
+  delete[] indices;
 }
 
 bool csBulletRigidBody::MakeStatic (void)
@@ -572,6 +649,35 @@ bool csBulletRigidBody::IsEnabled (void)
 csRef<iBodyGroup> csBulletRigidBody::GetGroup (void)
 {
   return 0;
+}
+
+bool csBulletRigidBody::AttachColliderConvexMesh (iMeshWrapper* mesh,
+  const csOrthoTransform& trans, float friction, float /*density*/,
+  float /*elasticity*/, float /*softness*/)
+{
+  if (body)
+  {
+    ds->GetWorld ()->removeRigidBody (body);
+    delete body;
+  }
+  if (!(trans.IsIdentity ()))
+    motionState->SetOffsetTransform (trans);
+
+  btTriangleIndexVertexArray* indexVertexArrays =
+    GenerateTriMeshData (mesh, indices, vertices,
+      ds->GetBaseID (), ds->GetColldetID ());
+  if (!indexVertexArrays) return false;
+
+  btConvexTriangleMeshShape* shape = new btConvexTriangleMeshShape (
+    indexVertexArrays);
+
+  btVector3 localInertia (0, 0, 0);
+  //shape->calculateLocalInertia (mass, localInertia);
+  body = new btRigidBody (mass, motionState, shape, localInertia,
+      0, 0, friction);
+  ds->GetWorld ()->addRigidBody (body);
+
+  return true;
 }
 
 bool csBulletRigidBody::AttachColliderMesh (iMeshWrapper* mesh,
@@ -984,6 +1090,33 @@ bool csBulletCollider::CreatePlaneGeometry (const csPlane3&)
   return false;
 }
 
+bool csBulletCollider::CreateConvexMeshGeometry (iMeshWrapper* mesh)
+{
+  if (body)
+  {
+    ds->GetWorld ()->removeRigidBody (body);
+    delete body;
+  }
+
+  btTriangleIndexVertexArray* indexVertexArrays =
+    GenerateTriMeshData (mesh, indices, vertices,
+      ds->GetBaseID (), ds->GetColldetID ());
+  if (!indexVertexArrays) return false;
+
+  delete shape;
+  shape = new btConvexTriangleMeshShape (indexVertexArrays);
+
+  btVector3 localInertia (0, 0, 0);
+  //shape->calculateLocalInertia (mass, localInertia);
+  body = new btRigidBody (mass, motionState, shape, localInertia,
+      0, 0, friction);
+  ds->GetWorld ()->addRigidBody (body);
+
+  geom_type = TRIMESH_COLLIDER_GEOMETRY;
+
+  return true;
+}
+
 bool csBulletCollider::CreateMeshGeometry (iMeshWrapper* mesh)
 {
   if (body)
@@ -991,56 +1124,11 @@ bool csBulletCollider::CreateMeshGeometry (iMeshWrapper* mesh)
     ds->GetWorld ()->removeRigidBody (body);
     delete body;
   }
-  //if (!(trans.IsIdentity ()))
-    //motionState->SetOffsetTransform (trans);
-
-  iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
-  csRef<iTriangleMesh> trimesh;
-  bool use_trimesh = objmodel->IsTriangleDataSet (ds->GetBaseID ());
-  if (use_trimesh)
-  {
-    if (objmodel->IsTriangleDataSet (ds->GetColldetID ()))
-      trimesh = objmodel->GetTriangleData (ds->GetColldetID ());
-    else
-      trimesh = objmodel->GetTriangleData (ds->GetBaseID ());
-  }
-
-  if (!trimesh || trimesh->GetVertexCount () == 0
-      || trimesh->GetTriangleCount () == 0)
-  {
-    csFPrintf (stderr, "csBulletRigidBody: No collision polygons, triangles or vertices on %s\n",
-      mesh->QueryObject()->GetName());
-    return false;
-  }
-
-  csTriangle *c_triangle = trimesh->GetTriangles();
-  size_t tr_num = trimesh->GetTriangleCount();
-  size_t vt_num = trimesh->GetVertexCount ();
-
-  delete[] indices;
-  indices = new int[tr_num*3];
-  int indexStride = 3 * sizeof (int);
-
-  size_t i;
-  int* id = indices;
-  for (i = 0 ; i < tr_num ; i++)
-  {
-    *id++ = c_triangle[i].a;
-    *id++ = c_triangle[i].b;
-    *id++ = c_triangle[i].c;
-  }
-
-  delete[] vertices;
-  vertices = new btVector3[vt_num];
-  csVector3 *c_vertex = trimesh->GetVertices();
-  int vertexStride = sizeof (btVector3);
-
-  for (i = 0 ; i < vt_num ; i++)
-    vertices[i].setValue (c_vertex[i].x, c_vertex[i].y, c_vertex[i].z);
 
   btTriangleIndexVertexArray* indexVertexArrays =
-    new btTriangleIndexVertexArray (tr_num, indices, indexStride,
-	vt_num, (btScalar*) &vertices[0].x (), vertexStride);
+    GenerateTriMeshData (mesh, indices, vertices,
+      ds->GetBaseID (), ds->GetColldetID ());
+  if (!indexVertexArrays) return false;
 
   delete shape;
   shape = new btBvhTriangleMeshShape (indexVertexArrays, true);

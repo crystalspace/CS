@@ -375,6 +375,12 @@ public:
 
   virtual iDynamicsMoveCallback* GetDefaultMoveCallback () { return move_cb; }
 
+  virtual bool AttachColliderConvexMesh (iMeshWrapper* mesh,
+        const csOrthoTransform& trans, float friction, float elasticity,
+	float softness)
+  {
+    return AttachColliderMesh (mesh, trans, friction, elasticity, softness);
+  }
   virtual bool AttachColliderMesh (iMeshWrapper* mesh,
         const csOrthoTransform& trans, float friction, float elasticity,
 	float softness);
@@ -451,6 +457,10 @@ public:
   
   bool CreateSphereGeometry (const csSphere& sphere);
   bool CreatePlaneGeometry (const csPlane3& plane);
+  bool CreateConvexMeshGeometry (iMeshWrapper *mesh)
+  {
+    return CreateMeshGeometry (mesh);
+  }
   bool CreateMeshGeometry (iMeshWrapper *mesh);
   bool CreateBoxGeometry (const csVector3& box_size);
   bool CreateCapsuleGeometry (float length, float radius); 
@@ -560,6 +570,13 @@ public:
   void UnsetGroup () { collision_group = 0; }
   csRef<iBodyGroup> GetGroup (void) { return collision_group; }
 
+  bool AttachColliderConvexMesh (iMeshWrapper* mesh,
+        const csOrthoTransform& trans, float friction, float density,
+        float elasticity, float softness)
+  {
+    return AttachColliderMesh (mesh, trans, friction, density,
+      elasticity, softness);
+  }
   bool AttachColliderMesh (iMeshWrapper* mesh,
         const csOrthoTransform& trans, float friction, float density,
         float elasticity, float softness);

@@ -139,6 +139,9 @@ public:
   virtual void RemoveJoint (iJoint* joint);
   virtual iDynamicsMoveCallback* GetDefaultMoveCallback ();
 
+  virtual bool AttachColliderConvexMesh (iMeshWrapper* mesh,
+    const csOrthoTransform& trans, float friction,
+    float elasticity, float softness = 0.01f);
   virtual bool AttachColliderMesh (iMeshWrapper* mesh,
     const csOrthoTransform& trans, float friction,
     float elasticity, float softness = 0.01f);
@@ -180,6 +183,11 @@ class csBulletRigidBody : public scfImplementationExt1<csBulletRigidBody,
   float mass;
   csBulletMotionState* motionState;
 
+  // Data we need to keep for the body so we can clean it up
+  // later.
+  btVector3* vertices;
+  int* indices;
+
 public: 
   csBulletRigidBody (csBulletDynamicsSystem* ds);
   virtual ~csBulletRigidBody ();
@@ -196,6 +204,10 @@ public:
   virtual bool IsEnabled (void);  
 
   virtual csRef<iBodyGroup> GetGroup (void);
+
+  virtual bool AttachColliderConvexMesh (iMeshWrapper* mesh,
+    const csOrthoTransform& trans, float friction, float density,
+    float elasticity, float softness = 0.01f);
 
   virtual bool AttachColliderMesh (iMeshWrapper* mesh,
     const csOrthoTransform& trans, float friction, float density,
@@ -300,6 +312,7 @@ public:
 
   virtual bool CreateSphereGeometry (const csSphere& sphere);
   virtual bool CreatePlaneGeometry (const csPlane3& plane);
+  virtual bool CreateConvexMeshGeometry (iMeshWrapper *mesh);
   virtual bool CreateMeshGeometry (iMeshWrapper *mesh);
   virtual bool CreateBoxGeometry (const csVector3& box_size);
   virtual bool CreateCapsuleGeometry (float length, float radius);
