@@ -9,6 +9,8 @@ chronological order.
 10-Nov-2007
 	- Vincent applied res' patch for configure OpenAL check. It was
 	  looking for alut, which is not used by CS sound system.
+	- Vincent silenced warnings about '#pragma GCC diagnostic' with
+	  GCC < 4.2.
 9-Nov-2007
 	- Jorrit did the following bullet/physics related changes:
 	    - Added iDynamicsSystemCollider->CreateCylinderGeometry().
