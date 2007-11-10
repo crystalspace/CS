@@ -1260,23 +1260,24 @@ CS_CHECK_LIB_WITH([cairo],
 	[cairo_create (0)])],
     [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libcairo], [CAIRO])])
 
-CS_CHECK_LIB_WITH([cairomm-1.0],
+CS_CHECK_LIB_WITH([cairomm],
     [AC_LANG_PROGRAM(
 	[[#include <cairomm/cairomm.h>]],
 	[Cairo::Context c ((cairo_t*)0)])],
     [], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libcairomm], [CAIROMM])], [],
     [$cs_cv_libcairo_cflags],
     [$cs_cv_libcairo_lflags],
-    [$cs_cv_libcairo_libs])
+    [$cs_cv_libcairo_libs],
+    [cairomm-1, cairomm-1.0])
 
 CS_CHECK_LIB_WITH([vgvm],
     [AC_LANG_PROGRAM(
 	[[#include <vgvm/vgvm.h>]],
 	[new vgvm::Program (0,0)])],
     [], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libvgvm], [VGVM])], [],
-    [$cs_cv_libcairomm_1_0_cflags],
-    [$cs_cv_libcairomm_1_0_lflags],
-    [$cs_cv_libcairomm_1_0_libs])
+    [$cs_cv_libcairomm_cflags],
+    [$cs_cv_libcairomm_lflags],
+    [$cs_cv_libcairomm_libs])
 
 
 
@@ -1435,18 +1436,14 @@ AC_DEFUN([CS_CHECK_LIBOPENAL],
     [AC_REQUIRE([CS_CHECK_COMMON_LIBS])
     CS_CHECK_BUILD([for OpenAL], [cs_cv_libopenal],
 	[AC_LANG_PROGRAM(
-	    [CS_AL_INCLUDE([CS_OPENAL_PATH],[AL],[alut.h])],
-	    [alutInit(0,0);])],
+	    [CS_AL_INCLUDE([CS_OPENAL_PATH],[AL],[alc.h])],
+	    [alcCreateContext (0,0);])],
 	[CS_CREATE_TUPLE([-DCS_OPENAL_PATH=OpenAL],[],[-framework OpenAL]) \
 	CS_CREATE_TUPLE([],[],[-lopenal]) \
 	CS_CREATE_TUPLE([],[],[-lopenal32]) \
-	CS_CREATE_TUPLE([],[],[-lalut -lopenal]) \
-	CS_CREATE_TUPLE([],[],[-lalut -lopenal32]) \
-	CS_CREATE_TUPLE([],[],[-lALut -lOpenAL32]) \
+	CS_CREATE_TUPLE([],[],[-lOpenAL32]) \
 	CS_CREATE_TUPLE([],[],[-lopenal -ldsound]) \
-	CS_CREATE_TUPLE([],[],[-lopenal32 -ldsound]) \
-	CS_CREATE_TUPLE([],[],[-lalut -lopenal -ldsound]) \
-	CS_CREATE_TUPLE([],[],[-lalut -lopenal32 -ldsound])], [],
+	CS_CREATE_TUPLE([],[],[-lopenal32 -ldsound])], [],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libopenal], [OPENAL])], [], [],
 	[$cs_cv_sys_pthread_cflags],
 	[$cs_cv_sys_pthread_lflags],

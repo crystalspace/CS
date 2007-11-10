@@ -27541,6 +27541,387 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_0(PyObject *SWIGUNU
   uint arg8 ;
   bool arg9 ;
   uint32 arg10 ;
+  csKeyModifiers *arg11 = 0 ;
+  csEvent *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  unsigned int val2 ;
+  int ecode2 = 0 ;
+  unsigned long val3 ;
+  int ecode3 = 0 ;
+  int val4 ;
+  int ecode4 = 0 ;
+  int val5 ;
+  int ecode5 = 0 ;
+  int val6 ;
+  int ecode6 = 0 ;
+  unsigned long val7 ;
+  int ecode7 = 0 ;
+  unsigned int val8 ;
+  int ecode8 = 0 ;
+  bool val9 ;
+  int ecode9 = 0 ;
+  unsigned long val10 ;
+  int ecode10 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  PyObject * obj7 = 0 ;
+  PyObject * obj8 = 0 ;
+  PyObject * obj9 = 0 ;
+  
+  {
+    arg11 = new csKeyModifiers();
+  }
+  if(!PyArg_UnpackTuple(args,(char *)"csMouseEventHelper_NewEvent",10,10,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8,&obj9)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csRefTiEventNameRegistry_t,  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMouseEventHelper_NewEvent" "', argument " "1"" of type '" "csRef<iEventNameRegistry > &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csMouseEventHelper_NewEvent" "', argument " "1"" of type '" "csRef<iEventNameRegistry > &""'"); 
+  }
+  arg1 = reinterpret_cast< csRef<iEventNameRegistry > * >(argp1);
+  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csMouseEventHelper_NewEvent" "', argument " "2"" of type '" "csTicks""'");
+  } 
+  arg2 = static_cast< csTicks >(val2);
+  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "csMouseEventHelper_NewEvent" "', argument " "3"" of type '" "csEventID""'");
+  } 
+  arg3 = static_cast< csEventID >(val3);
+  ecode4 = SWIG_AsVal_int(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "csMouseEventHelper_NewEvent" "', argument " "4"" of type '" "csMouseEventType""'");
+  } 
+  arg4 = static_cast< csMouseEventType >(val4);
+  ecode5 = SWIG_AsVal_int(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "csMouseEventHelper_NewEvent" "', argument " "5"" of type '" "int""'");
+  } 
+  arg5 = static_cast< int >(val5);
+  ecode6 = SWIG_AsVal_int(obj5, &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "csMouseEventHelper_NewEvent" "', argument " "6"" of type '" "int""'");
+  } 
+  arg6 = static_cast< int >(val6);
+  ecode7 = SWIG_AsVal_unsigned_SS_long(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "csMouseEventHelper_NewEvent" "', argument " "7"" of type '" "uint32""'");
+  } 
+  arg7 = static_cast< uint32 >(val7);
+  ecode8 = SWIG_AsVal_unsigned_SS_int(obj7, &val8);
+  if (!SWIG_IsOK(ecode8)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csMouseEventHelper_NewEvent" "', argument " "8"" of type '" "uint""'");
+  } 
+  arg8 = static_cast< uint >(val8);
+  ecode9 = SWIG_AsVal_bool(obj8, &val9);
+  if (!SWIG_IsOK(ecode9)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode9), "in method '" "csMouseEventHelper_NewEvent" "', argument " "9"" of type '" "bool""'");
+  } 
+  arg9 = static_cast< bool >(val9);
+  ecode10 = SWIG_AsVal_unsigned_SS_long(obj9, &val10);
+  if (!SWIG_IsOK(ecode10)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode10), "in method '" "csMouseEventHelper_NewEvent" "', argument " "10"" of type '" "uint32""'");
+  } 
+  arg10 = static_cast< uint32 >(val10);
+  result = (csEvent *)csMouseEventHelper::NewEvent(*arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,(_csKeyModifiers const &)*arg11);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csEvent, 0 |  0 );
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg11, SWIG_TypeQuery("csKeyModifiers" " *"), 1);
+  }
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csRef<iEventNameRegistry > *arg1 = 0 ;
+  csTicks arg2 ;
+  csEventID arg3 ;
+  uint8 arg4 ;
+  csMouseEventType arg5 ;
+  int arg6 ;
+  int arg7 ;
+  uint32 arg8 ;
+  uint arg9 ;
+  bool arg10 ;
+  uint32 arg11 ;
+  csKeyModifiers *arg12 = 0 ;
+  csEvent *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  unsigned int val2 ;
+  int ecode2 = 0 ;
+  unsigned long val3 ;
+  int ecode3 = 0 ;
+  void *argp4 ;
+  int res4 = 0 ;
+  int val5 ;
+  int ecode5 = 0 ;
+  int val6 ;
+  int ecode6 = 0 ;
+  int val7 ;
+  int ecode7 = 0 ;
+  unsigned long val8 ;
+  int ecode8 = 0 ;
+  unsigned int val9 ;
+  int ecode9 = 0 ;
+  bool val10 ;
+  int ecode10 = 0 ;
+  unsigned long val11 ;
+  int ecode11 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  PyObject * obj7 = 0 ;
+  PyObject * obj8 = 0 ;
+  PyObject * obj9 = 0 ;
+  PyObject * obj10 = 0 ;
+  
+  {
+    arg12 = new csKeyModifiers();
+  }
+  if(!PyArg_UnpackTuple(args,(char *)"csMouseEventHelper_NewEvent",11,11,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8,&obj9,&obj10)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csRefTiEventNameRegistry_t,  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMouseEventHelper_NewEvent" "', argument " "1"" of type '" "csRef<iEventNameRegistry > &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csMouseEventHelper_NewEvent" "', argument " "1"" of type '" "csRef<iEventNameRegistry > &""'"); 
+  }
+  arg1 = reinterpret_cast< csRef<iEventNameRegistry > * >(argp1);
+  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csMouseEventHelper_NewEvent" "', argument " "2"" of type '" "csTicks""'");
+  } 
+  arg2 = static_cast< csTicks >(val2);
+  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "csMouseEventHelper_NewEvent" "', argument " "3"" of type '" "csEventID""'");
+  } 
+  arg3 = static_cast< csEventID >(val3);
+  {
+    res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_uint8_t,  0  | 0);
+    if (!SWIG_IsOK(res4)) {
+      SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "csMouseEventHelper_NewEvent" "', argument " "4"" of type '" "uint8""'"); 
+    }  
+    if (!argp4) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csMouseEventHelper_NewEvent" "', argument " "4"" of type '" "uint8""'");
+    } else {
+      uint8 * temp = reinterpret_cast< uint8 * >(argp4);
+      arg4 = *temp;
+      if (SWIG_IsNewObj(res4)) delete temp;
+    }
+  }
+  ecode5 = SWIG_AsVal_int(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "csMouseEventHelper_NewEvent" "', argument " "5"" of type '" "csMouseEventType""'");
+  } 
+  arg5 = static_cast< csMouseEventType >(val5);
+  ecode6 = SWIG_AsVal_int(obj5, &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "csMouseEventHelper_NewEvent" "', argument " "6"" of type '" "int""'");
+  } 
+  arg6 = static_cast< int >(val6);
+  ecode7 = SWIG_AsVal_int(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "csMouseEventHelper_NewEvent" "', argument " "7"" of type '" "int""'");
+  } 
+  arg7 = static_cast< int >(val7);
+  ecode8 = SWIG_AsVal_unsigned_SS_long(obj7, &val8);
+  if (!SWIG_IsOK(ecode8)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csMouseEventHelper_NewEvent" "', argument " "8"" of type '" "uint32""'");
+  } 
+  arg8 = static_cast< uint32 >(val8);
+  ecode9 = SWIG_AsVal_unsigned_SS_int(obj8, &val9);
+  if (!SWIG_IsOK(ecode9)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode9), "in method '" "csMouseEventHelper_NewEvent" "', argument " "9"" of type '" "uint""'");
+  } 
+  arg9 = static_cast< uint >(val9);
+  ecode10 = SWIG_AsVal_bool(obj9, &val10);
+  if (!SWIG_IsOK(ecode10)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode10), "in method '" "csMouseEventHelper_NewEvent" "', argument " "10"" of type '" "bool""'");
+  } 
+  arg10 = static_cast< bool >(val10);
+  ecode11 = SWIG_AsVal_unsigned_SS_long(obj10, &val11);
+  if (!SWIG_IsOK(ecode11)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode11), "in method '" "csMouseEventHelper_NewEvent" "', argument " "11"" of type '" "uint32""'");
+  } 
+  arg11 = static_cast< uint32 >(val11);
+  result = (csEvent *)csMouseEventHelper::NewEvent(*arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,(_csKeyModifiers const &)*arg12);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csEvent, 0 |  0 );
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg12, SWIG_TypeQuery("csKeyModifiers" " *"), 1);
+  }
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csRef<iEventNameRegistry > *arg1 = 0 ;
+  csTicks arg2 ;
+  csEventID arg3 ;
+  uint8 arg4 ;
+  csMouseEventType arg5 ;
+  int32 *arg6 = (int32 *) 0 ;
+  uint8 arg7 ;
+  uint32 arg8 ;
+  uint arg9 ;
+  bool arg10 ;
+  uint32 arg11 ;
+  csKeyModifiers *arg12 = 0 ;
+  csEvent *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  unsigned int val2 ;
+  int ecode2 = 0 ;
+  unsigned long val3 ;
+  int ecode3 = 0 ;
+  void *argp4 ;
+  int res4 = 0 ;
+  int val5 ;
+  int ecode5 = 0 ;
+  void *argp6 = 0 ;
+  int res6 = 0 ;
+  void *argp7 ;
+  int res7 = 0 ;
+  unsigned long val8 ;
+  int ecode8 = 0 ;
+  unsigned int val9 ;
+  int ecode9 = 0 ;
+  bool val10 ;
+  int ecode10 = 0 ;
+  unsigned long val11 ;
+  int ecode11 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  PyObject * obj7 = 0 ;
+  PyObject * obj8 = 0 ;
+  PyObject * obj9 = 0 ;
+  PyObject * obj10 = 0 ;
+  
+  {
+    arg12 = new csKeyModifiers();
+  }
+  if(!PyArg_UnpackTuple(args,(char *)"csMouseEventHelper_NewEvent",11,11,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8,&obj9,&obj10)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csRefTiEventNameRegistry_t,  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMouseEventHelper_NewEvent" "', argument " "1"" of type '" "csRef<iEventNameRegistry > &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csMouseEventHelper_NewEvent" "', argument " "1"" of type '" "csRef<iEventNameRegistry > &""'"); 
+  }
+  arg1 = reinterpret_cast< csRef<iEventNameRegistry > * >(argp1);
+  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csMouseEventHelper_NewEvent" "', argument " "2"" of type '" "csTicks""'");
+  } 
+  arg2 = static_cast< csTicks >(val2);
+  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "csMouseEventHelper_NewEvent" "', argument " "3"" of type '" "csEventID""'");
+  } 
+  arg3 = static_cast< csEventID >(val3);
+  {
+    res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_uint8_t,  0  | 0);
+    if (!SWIG_IsOK(res4)) {
+      SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "csMouseEventHelper_NewEvent" "', argument " "4"" of type '" "uint8""'"); 
+    }  
+    if (!argp4) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csMouseEventHelper_NewEvent" "', argument " "4"" of type '" "uint8""'");
+    } else {
+      uint8 * temp = reinterpret_cast< uint8 * >(argp4);
+      arg4 = *temp;
+      if (SWIG_IsNewObj(res4)) delete temp;
+    }
+  }
+  ecode5 = SWIG_AsVal_int(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "csMouseEventHelper_NewEvent" "', argument " "5"" of type '" "csMouseEventType""'");
+  } 
+  arg5 = static_cast< csMouseEventType >(val5);
+  res6 = SWIG_ConvertPtr(obj5, &argp6,SWIGTYPE_p_int, 0 |  0 );
+  if (!SWIG_IsOK(res6)) {
+    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "csMouseEventHelper_NewEvent" "', argument " "6"" of type '" "int32 const *""'"); 
+  }
+  arg6 = reinterpret_cast< int32 * >(argp6);
+  {
+    res7 = SWIG_ConvertPtr(obj6, &argp7, SWIGTYPE_p_uint8_t,  0  | 0);
+    if (!SWIG_IsOK(res7)) {
+      SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "csMouseEventHelper_NewEvent" "', argument " "7"" of type '" "uint8""'"); 
+    }  
+    if (!argp7) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csMouseEventHelper_NewEvent" "', argument " "7"" of type '" "uint8""'");
+    } else {
+      uint8 * temp = reinterpret_cast< uint8 * >(argp7);
+      arg7 = *temp;
+      if (SWIG_IsNewObj(res7)) delete temp;
+    }
+  }
+  ecode8 = SWIG_AsVal_unsigned_SS_long(obj7, &val8);
+  if (!SWIG_IsOK(ecode8)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csMouseEventHelper_NewEvent" "', argument " "8"" of type '" "uint32""'");
+  } 
+  arg8 = static_cast< uint32 >(val8);
+  ecode9 = SWIG_AsVal_unsigned_SS_int(obj8, &val9);
+  if (!SWIG_IsOK(ecode9)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode9), "in method '" "csMouseEventHelper_NewEvent" "', argument " "9"" of type '" "uint""'");
+  } 
+  arg9 = static_cast< uint >(val9);
+  ecode10 = SWIG_AsVal_bool(obj9, &val10);
+  if (!SWIG_IsOK(ecode10)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode10), "in method '" "csMouseEventHelper_NewEvent" "', argument " "10"" of type '" "bool""'");
+  } 
+  arg10 = static_cast< bool >(val10);
+  ecode11 = SWIG_AsVal_unsigned_SS_long(obj10, &val11);
+  if (!SWIG_IsOK(ecode11)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode11), "in method '" "csMouseEventHelper_NewEvent" "', argument " "11"" of type '" "uint32""'");
+  } 
+  arg11 = static_cast< uint32 >(val11);
+  result = (csEvent *)csMouseEventHelper::NewEvent(*arg1,arg2,arg3,arg4,arg5,(int const *)arg6,arg7,arg8,arg9,arg10,arg11,(_csKeyModifiers const &)*arg12);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csEvent, 0 |  0 );
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg12, SWIG_TypeQuery("csKeyModifiers" " *"), 1);
+  }
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_3(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csRef<iEventNameRegistry > *arg1 = 0 ;
+  csTicks arg2 ;
+  csEventID arg3 ;
+  csMouseEventType arg4 ;
+  int arg5 ;
+  int arg6 ;
+  uint32 arg7 ;
+  uint arg8 ;
+  bool arg9 ;
+  uint32 arg10 ;
   uint32 arg11 ;
   csEvent *result = 0 ;
   void *argp1 = 0 ;
@@ -27644,7 +28025,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_4(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csRef<iEventNameRegistry > *arg1 = 0 ;
   csTicks arg2 ;
@@ -27776,7 +28157,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_5(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csRef<iEventNameRegistry > *arg1 = 0 ;
   csTicks arg2 ;
@@ -27926,6 +28307,200 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent(PyObject *self, PyObject 
   for (ii = 0; (ii < argc) && (ii < 12); ii++) {
     argv[ii] = PyTuple_GET_ITEM(args,ii);
   }
+  if (argc == 10) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csRefTiEventNameRegistry_t, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_unsigned_SS_int(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        {
+          int res = SWIG_AsVal_unsigned_SS_long(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          {
+            int res = SWIG_AsVal_int(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            {
+              int res = SWIG_AsVal_int(argv[4], NULL);
+              _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              {
+                int res = SWIG_AsVal_int(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
+              if (_v) {
+                {
+                  int res = SWIG_AsVal_unsigned_SS_long(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
+                if (_v) {
+                  {
+                    int res = SWIG_AsVal_unsigned_SS_int(argv[7], NULL);
+                    _v = SWIG_CheckState(res);
+                  }
+                  if (_v) {
+                    {
+                      int res = SWIG_AsVal_bool(argv[8], NULL);
+                      _v = SWIG_CheckState(res);
+                    }
+                    if (_v) {
+                      {
+                        int res = SWIG_AsVal_unsigned_SS_long(argv[9], NULL);
+                        _v = SWIG_CheckState(res);
+                      }
+                      if (_v) {
+                        return _wrap_csMouseEventHelper_NewEvent__SWIG_0(self, args);
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 11) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csRefTiEventNameRegistry_t, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_unsigned_SS_int(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        {
+          int res = SWIG_AsVal_unsigned_SS_long(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_uint8_t, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            {
+              int res = SWIG_AsVal_int(argv[4], NULL);
+              _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              void *vptr = 0;
+              int res = SWIG_ConvertPtr(argv[5], &vptr, SWIGTYPE_p_int, 0);
+              _v = SWIG_CheckState(res);
+              if (_v) {
+                int res = SWIG_ConvertPtr(argv[6], 0, SWIGTYPE_p_uint8_t, 0);
+                _v = SWIG_CheckState(res);
+                if (_v) {
+                  {
+                    int res = SWIG_AsVal_unsigned_SS_long(argv[7], NULL);
+                    _v = SWIG_CheckState(res);
+                  }
+                  if (_v) {
+                    {
+                      int res = SWIG_AsVal_unsigned_SS_int(argv[8], NULL);
+                      _v = SWIG_CheckState(res);
+                    }
+                    if (_v) {
+                      {
+                        int res = SWIG_AsVal_bool(argv[9], NULL);
+                        _v = SWIG_CheckState(res);
+                      }
+                      if (_v) {
+                        {
+                          int res = SWIG_AsVal_unsigned_SS_long(argv[10], NULL);
+                          _v = SWIG_CheckState(res);
+                        }
+                        if (_v) {
+                          return _wrap_csMouseEventHelper_NewEvent__SWIG_2(self, args);
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 11) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csRefTiEventNameRegistry_t, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_unsigned_SS_int(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        {
+          int res = SWIG_AsVal_unsigned_SS_long(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_uint8_t, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            {
+              int res = SWIG_AsVal_int(argv[4], NULL);
+              _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              {
+                int res = SWIG_AsVal_int(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
+              if (_v) {
+                {
+                  int res = SWIG_AsVal_int(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
+                if (_v) {
+                  {
+                    int res = SWIG_AsVal_unsigned_SS_long(argv[7], NULL);
+                    _v = SWIG_CheckState(res);
+                  }
+                  if (_v) {
+                    {
+                      int res = SWIG_AsVal_unsigned_SS_int(argv[8], NULL);
+                      _v = SWIG_CheckState(res);
+                    }
+                    if (_v) {
+                      {
+                        int res = SWIG_AsVal_bool(argv[9], NULL);
+                        _v = SWIG_CheckState(res);
+                      }
+                      if (_v) {
+                        {
+                          int res = SWIG_AsVal_unsigned_SS_long(argv[10], NULL);
+                          _v = SWIG_CheckState(res);
+                        }
+                        if (_v) {
+                          return _wrap_csMouseEventHelper_NewEvent__SWIG_1(self, args);
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
   if (argc == 11) {
     int _v;
     void *vptr = 0;
@@ -27982,7 +28557,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent(PyObject *self, PyObject 
                           _v = SWIG_CheckState(res);
                         }
                         if (_v) {
-                          return _wrap_csMouseEventHelper_NewEvent__SWIG_0(self, args);
+                          return _wrap_csMouseEventHelper_NewEvent__SWIG_3(self, args);
                         }
                       }
                     }
@@ -28051,7 +28626,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent(PyObject *self, PyObject 
                             _v = SWIG_CheckState(res);
                           }
                           if (_v) {
-                            return _wrap_csMouseEventHelper_NewEvent__SWIG_2(self, args);
+                            return _wrap_csMouseEventHelper_NewEvent__SWIG_5(self, args);
                           }
                         }
                       }
@@ -28124,7 +28699,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent(PyObject *self, PyObject 
                             _v = SWIG_CheckState(res);
                           }
                           if (_v) {
-                            return _wrap_csMouseEventHelper_NewEvent__SWIG_1(self, args);
+                            return _wrap_csMouseEventHelper_NewEvent__SWIG_4(self, args);
                           }
                         }
                       }
@@ -28140,7 +28715,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent(PyObject *self, PyObject 
   }
   
 fail:
-  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csMouseEventHelper_NewEvent'.\n  Possible C/C++ prototypes are:\n    NewEvent(csRef<iEventNameRegistry > &,csTicks,csEventID,csMouseEventType,int,int,uint32,uint,bool,uint32,uint32)\n    NewEvent(csRef<iEventNameRegistry > &,csTicks,csEventID,uint8,csMouseEventType,int,int,uint32,uint,bool,uint32,uint32)\n    csMouseEventHelper::NewEvent(csRef<iEventNameRegistry > &,csTicks,csEventID,uint8,csMouseEventType,int32 const *,uint8,uint32,uint,bool,uint32,uint32)\n");
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csMouseEventHelper_NewEvent'.\n  Possible C/C++ prototypes are:\n    NewEvent(csRef<iEventNameRegistry > &,csTicks,csEventID,csMouseEventType,int,int,uint32,uint,bool,uint32,csKeyModifiers const &)\n    NewEvent(csRef<iEventNameRegistry > &,csTicks,csEventID,uint8,csMouseEventType,int,int,uint32,uint,bool,uint32,csKeyModifiers const &)\n    NewEvent(csRef<iEventNameRegistry > &,csTicks,csEventID,uint8,csMouseEventType,int32 const *,uint8,uint32,uint,bool,uint32,csKeyModifiers const &)\n    NewEvent(csRef<iEventNameRegistry > &,csTicks,csEventID,csMouseEventType,int,int,uint32,uint,bool,uint32,uint32)\n    NewEvent(csRef<iEventNameRegistry > &,csTicks,csEventID,uint8,csMouseEventType,int,int,uint32,uint,bool,uint32,uint32)\n    csMouseEventHelper::NewEvent(csRef<iEventNameRegistry > &,csTicks,csEventID,uint8,csMouseEventType,int32 const *,uint8,uint32,uint,bool,uint32,uint32)\n");
   return NULL;
 }
 
@@ -28468,6 +29043,240 @@ SWIGINTERN PyObject *_wrap_csJoystickEventHelper_NewEvent__SWIG_0(PyObject *SWIG
   uint arg8 ;
   bool arg9 ;
   uint32 arg10 ;
+  csKeyModifiers *arg11 = 0 ;
+  csEvent *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  unsigned int val2 ;
+  int ecode2 = 0 ;
+  unsigned long val3 ;
+  int ecode3 = 0 ;
+  int val4 ;
+  int ecode4 = 0 ;
+  int val5 ;
+  int ecode5 = 0 ;
+  int val6 ;
+  int ecode6 = 0 ;
+  unsigned long val7 ;
+  int ecode7 = 0 ;
+  unsigned int val8 ;
+  int ecode8 = 0 ;
+  bool val9 ;
+  int ecode9 = 0 ;
+  unsigned long val10 ;
+  int ecode10 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  PyObject * obj7 = 0 ;
+  PyObject * obj8 = 0 ;
+  PyObject * obj9 = 0 ;
+  
+  {
+    arg11 = new csKeyModifiers();
+  }
+  if(!PyArg_UnpackTuple(args,(char *)"csJoystickEventHelper_NewEvent",10,10,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8,&obj9)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csRefTiEventNameRegistry_t,  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "1"" of type '" "csRef<iEventNameRegistry > &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csJoystickEventHelper_NewEvent" "', argument " "1"" of type '" "csRef<iEventNameRegistry > &""'"); 
+  }
+  arg1 = reinterpret_cast< csRef<iEventNameRegistry > * >(argp1);
+  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "2"" of type '" "csTicks""'");
+  } 
+  arg2 = static_cast< csTicks >(val2);
+  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "3"" of type '" "csEventID""'");
+  } 
+  arg3 = static_cast< csEventID >(val3);
+  ecode4 = SWIG_AsVal_int(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "4"" of type '" "int""'");
+  } 
+  arg4 = static_cast< int >(val4);
+  ecode5 = SWIG_AsVal_int(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "5"" of type '" "int""'");
+  } 
+  arg5 = static_cast< int >(val5);
+  ecode6 = SWIG_AsVal_int(obj5, &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "6"" of type '" "int""'");
+  } 
+  arg6 = static_cast< int >(val6);
+  ecode7 = SWIG_AsVal_unsigned_SS_long(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "7"" of type '" "uint32""'");
+  } 
+  arg7 = static_cast< uint32 >(val7);
+  ecode8 = SWIG_AsVal_unsigned_SS_int(obj7, &val8);
+  if (!SWIG_IsOK(ecode8)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "8"" of type '" "uint""'");
+  } 
+  arg8 = static_cast< uint >(val8);
+  ecode9 = SWIG_AsVal_bool(obj8, &val9);
+  if (!SWIG_IsOK(ecode9)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode9), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "9"" of type '" "bool""'");
+  } 
+  arg9 = static_cast< bool >(val9);
+  ecode10 = SWIG_AsVal_unsigned_SS_long(obj9, &val10);
+  if (!SWIG_IsOK(ecode10)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode10), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "10"" of type '" "uint32""'");
+  } 
+  arg10 = static_cast< uint32 >(val10);
+  result = (csEvent *)csJoystickEventHelper::NewEvent(*arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,(_csKeyModifiers const &)*arg11);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csEvent, 0 |  0 );
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg11, SWIG_TypeQuery("csKeyModifiers" " *"), 1);
+  }
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csJoystickEventHelper_NewEvent__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csRef<iEventNameRegistry > *arg1 = 0 ;
+  csTicks arg2 ;
+  csEventID arg3 ;
+  int arg4 ;
+  int32 *arg5 = (int32 *) 0 ;
+  uint8 arg6 ;
+  uint32 arg7 ;
+  uint arg8 ;
+  bool arg9 ;
+  uint32 arg10 ;
+  csKeyModifiers *arg11 = 0 ;
+  csEvent *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  unsigned int val2 ;
+  int ecode2 = 0 ;
+  unsigned long val3 ;
+  int ecode3 = 0 ;
+  int val4 ;
+  int ecode4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  void *argp6 ;
+  int res6 = 0 ;
+  unsigned long val7 ;
+  int ecode7 = 0 ;
+  unsigned int val8 ;
+  int ecode8 = 0 ;
+  bool val9 ;
+  int ecode9 = 0 ;
+  unsigned long val10 ;
+  int ecode10 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  PyObject * obj7 = 0 ;
+  PyObject * obj8 = 0 ;
+  PyObject * obj9 = 0 ;
+  
+  {
+    arg11 = new csKeyModifiers();
+  }
+  if(!PyArg_UnpackTuple(args,(char *)"csJoystickEventHelper_NewEvent",10,10,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8,&obj9)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csRefTiEventNameRegistry_t,  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "1"" of type '" "csRef<iEventNameRegistry > &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csJoystickEventHelper_NewEvent" "', argument " "1"" of type '" "csRef<iEventNameRegistry > &""'"); 
+  }
+  arg1 = reinterpret_cast< csRef<iEventNameRegistry > * >(argp1);
+  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "2"" of type '" "csTicks""'");
+  } 
+  arg2 = static_cast< csTicks >(val2);
+  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "3"" of type '" "csEventID""'");
+  } 
+  arg3 = static_cast< csEventID >(val3);
+  ecode4 = SWIG_AsVal_int(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "4"" of type '" "int""'");
+  } 
+  arg4 = static_cast< int >(val4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5,SWIGTYPE_p_int, 0 |  0 );
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "5"" of type '" "int32 const *""'"); 
+  }
+  arg5 = reinterpret_cast< int32 * >(argp5);
+  {
+    res6 = SWIG_ConvertPtr(obj5, &argp6, SWIGTYPE_p_uint8_t,  0  | 0);
+    if (!SWIG_IsOK(res6)) {
+      SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "6"" of type '" "uint8""'"); 
+    }  
+    if (!argp6) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csJoystickEventHelper_NewEvent" "', argument " "6"" of type '" "uint8""'");
+    } else {
+      uint8 * temp = reinterpret_cast< uint8 * >(argp6);
+      arg6 = *temp;
+      if (SWIG_IsNewObj(res6)) delete temp;
+    }
+  }
+  ecode7 = SWIG_AsVal_unsigned_SS_long(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "7"" of type '" "uint32""'");
+  } 
+  arg7 = static_cast< uint32 >(val7);
+  ecode8 = SWIG_AsVal_unsigned_SS_int(obj7, &val8);
+  if (!SWIG_IsOK(ecode8)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "8"" of type '" "uint""'");
+  } 
+  arg8 = static_cast< uint >(val8);
+  ecode9 = SWIG_AsVal_bool(obj8, &val9);
+  if (!SWIG_IsOK(ecode9)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode9), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "9"" of type '" "bool""'");
+  } 
+  arg9 = static_cast< bool >(val9);
+  ecode10 = SWIG_AsVal_unsigned_SS_long(obj9, &val10);
+  if (!SWIG_IsOK(ecode10)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode10), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "10"" of type '" "uint32""'");
+  } 
+  arg10 = static_cast< uint32 >(val10);
+  result = (csEvent *)csJoystickEventHelper::NewEvent(*arg1,arg2,arg3,arg4,(int const *)arg5,arg6,arg7,arg8,arg9,arg10,(_csKeyModifiers const &)*arg11);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csEvent, 0 |  0 );
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg11, SWIG_TypeQuery("csKeyModifiers" " *"), 1);
+  }
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csJoystickEventHelper_NewEvent__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csRef<iEventNameRegistry > *arg1 = 0 ;
+  csTicks arg2 ;
+  csEventID arg3 ;
+  int arg4 ;
+  int arg5 ;
+  int arg6 ;
+  uint32 arg7 ;
+  uint arg8 ;
+  bool arg9 ;
+  uint32 arg10 ;
   uint32 arg11 ;
   csEvent *result = 0 ;
   void *argp1 = 0 ;
@@ -28571,7 +29380,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csJoystickEventHelper_NewEvent__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csJoystickEventHelper_NewEvent__SWIG_3(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csRef<iEventNameRegistry > *arg1 = 0 ;
   csTicks arg2 ;
@@ -28704,6 +29513,129 @@ SWIGINTERN PyObject *_wrap_csJoystickEventHelper_NewEvent(PyObject *self, PyObje
   for (ii = 0; (ii < argc) && (ii < 11); ii++) {
     argv[ii] = PyTuple_GET_ITEM(args,ii);
   }
+  if (argc == 10) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csRefTiEventNameRegistry_t, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_unsigned_SS_int(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        {
+          int res = SWIG_AsVal_unsigned_SS_long(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          {
+            int res = SWIG_AsVal_int(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            void *vptr = 0;
+            int res = SWIG_ConvertPtr(argv[4], &vptr, SWIGTYPE_p_int, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              int res = SWIG_ConvertPtr(argv[5], 0, SWIGTYPE_p_uint8_t, 0);
+              _v = SWIG_CheckState(res);
+              if (_v) {
+                {
+                  int res = SWIG_AsVal_unsigned_SS_long(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
+                if (_v) {
+                  {
+                    int res = SWIG_AsVal_unsigned_SS_int(argv[7], NULL);
+                    _v = SWIG_CheckState(res);
+                  }
+                  if (_v) {
+                    {
+                      int res = SWIG_AsVal_bool(argv[8], NULL);
+                      _v = SWIG_CheckState(res);
+                    }
+                    if (_v) {
+                      {
+                        int res = SWIG_AsVal_unsigned_SS_long(argv[9], NULL);
+                        _v = SWIG_CheckState(res);
+                      }
+                      if (_v) {
+                        return _wrap_csJoystickEventHelper_NewEvent__SWIG_1(self, args);
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 10) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csRefTiEventNameRegistry_t, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_unsigned_SS_int(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        {
+          int res = SWIG_AsVal_unsigned_SS_long(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          {
+            int res = SWIG_AsVal_int(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            {
+              int res = SWIG_AsVal_int(argv[4], NULL);
+              _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              {
+                int res = SWIG_AsVal_int(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
+              if (_v) {
+                {
+                  int res = SWIG_AsVal_unsigned_SS_long(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
+                if (_v) {
+                  {
+                    int res = SWIG_AsVal_unsigned_SS_int(argv[7], NULL);
+                    _v = SWIG_CheckState(res);
+                  }
+                  if (_v) {
+                    {
+                      int res = SWIG_AsVal_bool(argv[8], NULL);
+                      _v = SWIG_CheckState(res);
+                    }
+                    if (_v) {
+                      {
+                        int res = SWIG_AsVal_unsigned_SS_long(argv[9], NULL);
+                        _v = SWIG_CheckState(res);
+                      }
+                      if (_v) {
+                        return _wrap_csJoystickEventHelper_NewEvent__SWIG_0(self, args);
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
   if (argc == 11) {
     int _v;
     void *vptr = 0;
@@ -28757,7 +29689,7 @@ SWIGINTERN PyObject *_wrap_csJoystickEventHelper_NewEvent(PyObject *self, PyObje
                           _v = SWIG_CheckState(res);
                         }
                         if (_v) {
-                          return _wrap_csJoystickEventHelper_NewEvent__SWIG_1(self, args);
+                          return _wrap_csJoystickEventHelper_NewEvent__SWIG_3(self, args);
                         }
                       }
                     }
@@ -28826,7 +29758,7 @@ SWIGINTERN PyObject *_wrap_csJoystickEventHelper_NewEvent(PyObject *self, PyObje
                           _v = SWIG_CheckState(res);
                         }
                         if (_v) {
-                          return _wrap_csJoystickEventHelper_NewEvent__SWIG_0(self, args);
+                          return _wrap_csJoystickEventHelper_NewEvent__SWIG_2(self, args);
                         }
                       }
                     }
@@ -28841,7 +29773,7 @@ SWIGINTERN PyObject *_wrap_csJoystickEventHelper_NewEvent(PyObject *self, PyObje
   }
   
 fail:
-  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csJoystickEventHelper_NewEvent'.\n  Possible C/C++ prototypes are:\n    NewEvent(csRef<iEventNameRegistry > &,csTicks,csEventID,int,int,int,uint32,uint,bool,uint32,uint32)\n    csJoystickEventHelper::NewEvent(csRef<iEventNameRegistry > &,csTicks,csEventID,int,int32 const *,uint8,uint32,uint,bool,uint32,uint32)\n");
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csJoystickEventHelper_NewEvent'.\n  Possible C/C++ prototypes are:\n    NewEvent(csRef<iEventNameRegistry > &,csTicks,csEventID,int,int,int,uint32,uint,bool,uint32,csKeyModifiers const &)\n    NewEvent(csRef<iEventNameRegistry > &,csTicks,csEventID,int,int32 const *,uint8,uint32,uint,bool,uint32,csKeyModifiers const &)\n    NewEvent(csRef<iEventNameRegistry > &,csTicks,csEventID,int,int,int,uint32,uint,bool,uint32,uint32)\n    csJoystickEventHelper::NewEvent(csRef<iEventNameRegistry > &,csTicks,csEventID,int,int32 const *,uint8,uint32,uint,bool,uint32,uint32)\n");
   return NULL;
 }
 
@@ -34641,6 +35573,31 @@ SWIGINTERN PyObject *_wrap_iKeyboardDriver_SynthesizeCooked(PyObject *SWIGUNUSED
   arg2 = reinterpret_cast< iEvent * >(argp2);
   result = (csEventError)(arg1)->SynthesizeCooked(arg2);
   resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iKeyboardDriver_GetModifiersState(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iKeyboardDriver *arg1 = (iKeyboardDriver *) 0 ;
+  csKeyModifiers *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iKeyboardDriver_GetModifiersState",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iKeyboardDriver, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iKeyboardDriver_GetModifiersState" "', argument " "1"" of type '" "iKeyboardDriver const *""'"); 
+  }
+  arg1 = reinterpret_cast< iKeyboardDriver * >(argp1);
+  {
+    csKeyModifiers const &_result_ref = ((iKeyboardDriver const *)arg1)->GetModifiersState();
+    result = (csKeyModifiers *) &_result_ref;
+  }
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p__csKeyModifiers, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -53048,6 +54005,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iKeyboardDriver_GetModifierState", _wrap_iKeyboardDriver_GetModifierState, METH_VARARGS, NULL},
 	 { (char *)"iKeyboardDriver_CreateKeyComposer", _wrap_iKeyboardDriver_CreateKeyComposer, METH_VARARGS, NULL},
 	 { (char *)"iKeyboardDriver_SynthesizeCooked", _wrap_iKeyboardDriver_SynthesizeCooked, METH_VARARGS, NULL},
+	 { (char *)"iKeyboardDriver_GetModifiersState", _wrap_iKeyboardDriver_GetModifiersState, METH_VARARGS, NULL},
 	 { (char *)"iKeyboardDriver_GetKeyState", _wrap_iKeyboardDriver_GetKeyState, METH_VARARGS, NULL},
 	 { (char *)"iKeyboardDriver_scfGetVersion", _wrap_iKeyboardDriver_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iKeyboardDriver", _wrap_delete_iKeyboardDriver, METH_VARARGS, NULL},
