@@ -511,7 +511,7 @@ bool Simple::Initialize ()
   // csOrthoTransform tt (tmm, tvv);
   // csVector3 size (0.4f, 0.8f, 0.4f); // This should be same size as mesh.
   // avatarbody->AttachColliderBox (size, tt, 10, 1, 0.8f);
-  avatarbody->AttachColliderSphere (0.8, csVector3 (0), 10, 1, 0.8f);
+  avatarbody->AttachColliderSphere (0.8f, csVector3 (0), 10, 1, 0.8f);
 
   return true;
 }
@@ -604,8 +604,8 @@ iRigidBody* Simple::CreateMesh ()
   {
     // If dynamic collider meshes are not supported (like in bullet)
     // we use a cylinder instead.
-    t.RotateThis (csVector3 (1, 0, 0), M_PI / 2.0f);
-    rb->AttachColliderCylinder (0.2, 1, t, 10, 1, 0.8f);
+    t.RotateThis (csVector3 (1, 0, 0), PI / 2.0f);
+    rb->AttachColliderCylinder (0.2f, 1, t, 10, 1, 0.8f);
   }
 
   // Fling the body.
