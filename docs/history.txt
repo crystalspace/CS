@@ -11,6 +11,8 @@ chronological order.
 	  namespace.
 	- res added CS::Graphics::OverlayShaderVariableContextImpl - a shader
 	  variable context that "overlays" SVs over some other given context.
+	- res changed the terrain2 plugin to make the shader variable context
+	  from the terrain cell render properties available for rendering.
 10-Nov-2007
 	- Vincent applied res' patch for configure OpenAL check. It was
 	  looking for alut, which is not used by CS sound system.
