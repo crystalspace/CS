@@ -6,6 +6,11 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-Nov-2007
+	- ronsaldo fixed somes warnings in the c# bindings.
+	- ronsaldo added Equals and GetHashCode method into
+	  bindings/csharp/csoperators.i
+	- ronsaldo fixed more types problems in the c# bindings.
 6-Nov-2007
 	- ronsaldo added the missing file include/bindings/csharp/csstring.i
 	- ronsaldo removed the GetInterface method in the c# bindings, because

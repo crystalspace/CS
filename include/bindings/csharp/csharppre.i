@@ -318,6 +318,7 @@ ICONFIGMANAGER_CSHARPCODE
 %ignore csProcTexture::SetKeyColor;
 
 //TODO: fix types bugs
+/*
 %ignore csImageBase::GetPalette;
 %ignore csPath::SetPositionVector;
 %ignore csPath::SetPositionVectors;
@@ -330,7 +331,7 @@ ICONFIGMANAGER_CSHARPCODE
 %ignore csPath::GetForwardVector;
 %ignore csPath::GetInterpolatedPosition;
 %ignore csPath::GetInterpolatedUp;
-%ignore csPath::GetInterpolatedForward;
+%ignore csPath::GetInterpolatedForward;*/
 
 %typemap(in) (const char * iface, int iface_ver)
 {
@@ -407,6 +408,7 @@ ICONFIGMANAGER_CSHARPCODE
 // We ignore this, because we can't wrap this
 %ignore QueryInterface(scfInterfaceID iInterfaceID, int iVersion);
 
+%include "bindings/csharp/csattributes.i"
 %include "bindings/csharp/cshoperators.i"
 %include "bindings/csharp/csstring.i"
 
