@@ -130,13 +130,15 @@ struct ExtraRenderMeshData
 /**
  * The holder class for all implementations of iMeshObject.
  */
-class csMeshWrapper : public scfImplementationExt5<csMeshWrapper,
-                                                   csObject,
-                                                   iMeshWrapper,
-                                                   iShaderVariableContext,
-                                                   iVisibilityObject,
-						   iSceneNode,
-						   iSelfDestruct>
+class csMeshWrapper : 
+  public scfImplementationExt5<csMeshWrapper,
+                               csObject,
+                               iMeshWrapper,
+                               scfFakeInterface<iShaderVariableContext>,
+                               iVisibilityObject,
+    		               iSceneNode,
+                               iSelfDestruct>,
+  public CS::Graphics::OverlayShaderVariableContextImpl
 {
   friend class csMovable;
   friend class csMovableSectorList;
@@ -200,9 +202,6 @@ protected:
   csRef<iSharedVariable> var_min_render_dist, var_max_render_dist;
   csRef<csLODListener> var_min_render_dist_listener;
   csRef<csLODListener> var_max_render_dist_listener;
-
-  csShaderVariableContext svcontext;
-  csRef<iShaderVariableContext> factorySVC;
 
   csEngine* engine;
 private:
@@ -325,7 +324,7 @@ public:
   virtual void SetFactory (iMeshFactoryWrapper* factory)
   {
     csMeshWrapper::factory = factory;
-    factorySVC = factory ? factory->GetSVContext() : 0;
+    SetParentContext (factory ? factory->GetSVContext() : 0);
   }
   /// Get the mesh factory.
   virtual iMeshFactoryWrapper* GetFactory () const
@@ -556,57 +555,8 @@ public:
   virtual csScreenBoxResult GetScreenBoundingBox (iCamera *camera);
 
   //--------------------- SCF stuff follows ------------------------------//
-  /**\name iShaderVariableContext implementation
-   * @{ */
-  /// Add a variable to this context
-  void AddVariable (csShaderVariable *variable)
-  { svcontext.AddVariable (variable); }
-
-  /// Get a named variable from this context
-  csShaderVariable* GetVariable (csStringID name) const
-  { 
-    csShaderVariable* sv = svcontext.GetVariable (name); 
-    if ((sv == 0) && (factorySVC.IsValid()))
-      sv = factorySVC->GetVariable (name);
-    return sv;
-  }
-
-  /// Get Array of all ShaderVariables
-  const csRefArray<csShaderVariable>& GetShaderVariables () const
-  { 
-    // @@@ Will not return factory SVs
-    return svcontext.GetShaderVariables (); 
-  }
-
-  /**
-   * Push the variables of this context onto the variable stacks
-   * supplied in the "stacks" argument
-   */
-  void PushVariables (iShaderVarStack* stacks) const
-  { 
-    if (factorySVC.IsValid()) factorySVC->PushVariables (stacks);
-    svcontext.PushVariables (stacks); 
-  }
-
-  bool IsEmpty () const 
-  {
-    return svcontext.IsEmpty() 
-      && (!factorySVC.IsValid() || factorySVC->IsEmpty());
-  }
-
-  void ReplaceVariable (csShaderVariable *variable)
-  { svcontext.ReplaceVariable (variable); }
-  void Clear () { svcontext.Clear(); }
-  
-  bool RemoveVariable (csShaderVariable* variable)
-  { 
-    // @@@ Also remove from factory?
-    return svcontext.RemoveVariable (variable); 
-  }
-  /** @} */
 
   //--------------------- iSelfDestruct implementation -------------------//
-
   virtual void SelfDestruct ();
 
   /**\name iSceneNode implementation
