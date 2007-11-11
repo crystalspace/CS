@@ -14,6 +14,7 @@ chronological order.
 	- res changed the terrain2 plugin to make the shader variable context
 	  from the terrain cell render properties available for rendering.
 	- res made the terrain2 loader load SVs into cell rendering properties.
+	- res added initial support for lightmaps to the terrain_fixed shaders.
 10-Nov-2007
 	- Vincent applied res' patch for configure OpenAL check. It was
 	  looking for alut, which is not used by CS sound system.
