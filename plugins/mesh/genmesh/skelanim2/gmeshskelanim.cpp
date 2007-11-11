@@ -172,7 +172,7 @@ void csGenmeshSkelAnimationControl::UpdateVertNormArrays (int /*num_norms*/)
 {
 }
 
-void csGenmeshSkelAnimationControl::Update (csTicks current, int, uint32)
+void csGenmeshSkelAnimationControl::Update (csTicks current)
 {
   if (last_update_time != current)
   {

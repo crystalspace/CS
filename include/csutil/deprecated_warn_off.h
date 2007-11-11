@@ -34,5 +34,7 @@
 #endif
 
 #if defined(CS_COMPILER_GCC)
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#  if (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ > 1))
+#    pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#  endif
 #endif

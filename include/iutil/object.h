@@ -198,7 +198,8 @@ namespace CS
   static inline csPtr<Interface> GetNamedChildObject (iObject* object,
                                                       const char* name)
   {
-    return scfQueryInterfaceSafe<Interface> (object->GetChild (name));
+    return scfQueryInterfaceSafe<Interface> (object->GetChild (scfInterfaceTraits<Interface>::GetID(),
+                                             scfInterfaceTraits<Interface>::GetVersion(), name));
   }
 }
 

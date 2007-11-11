@@ -185,7 +185,7 @@ void csLightIterRenderStep::Init ()
     shvar_light_0_position = shadermgr->GetVariable (posname);
     if (!shvar_light_0_position)
     {
-      shvar_light_0_position = new csShaderVariable (posname);
+      shvar_light_0_position.AttachNew(new csShaderVariable (posname));
       shvar_light_0_position->SetType (csShaderVariable::VECTOR4);
       shadermgr->AddVariable (shvar_light_0_position);
     }
@@ -193,7 +193,7 @@ void csLightIterRenderStep::Init ()
     shvar_light_0_position_world = shadermgr->GetVariable (poswname);
     if (!shvar_light_0_position_world)
     {
-      shvar_light_0_position_world = new csShaderVariable (poswname);
+      shvar_light_0_position_world.AttachNew(new csShaderVariable (poswname));
       shvar_light_0_position_world->SetType (csShaderVariable::VECTOR4);
       shadermgr->AddVariable (shvar_light_0_position_world);
     }
@@ -201,7 +201,7 @@ void csLightIterRenderStep::Init ()
     shvar_light_0_transform = shadermgr->GetVariable (trname);
     if (!shvar_light_0_transform)
     {
-      shvar_light_0_transform = new csShaderVariable (trname);
+      shvar_light_0_transform.AttachNew(new csShaderVariable (trname));
       shvar_light_0_transform->SetType (csShaderVariable::TRANSFORM);
       shadermgr->AddVariable (shvar_light_0_transform);
     }
@@ -209,7 +209,7 @@ void csLightIterRenderStep::Init ()
     shvar_light_0_transform_world = shadermgr->GetVariable (trwname);
     if (!shvar_light_0_transform_world)
     {
-      shvar_light_0_transform_world = new csShaderVariable (trwname);
+      shvar_light_0_transform_world.AttachNew(new csShaderVariable (trwname));
       shvar_light_0_transform_world->SetType (csShaderVariable::TRANSFORM);
       shadermgr->AddVariable (shvar_light_0_transform_world);
     }
@@ -217,7 +217,7 @@ void csLightIterRenderStep::Init ()
     shvar_light_0_diffuse = shadermgr->GetVariable (difname);
     if (!shvar_light_0_diffuse)
     {
-      shvar_light_0_diffuse = new csShaderVariable (difname);
+      shvar_light_0_diffuse.AttachNew(new csShaderVariable (difname));
       shvar_light_0_diffuse->SetType (csShaderVariable::VECTOR4);
       shadermgr->AddVariable (shvar_light_0_diffuse);
     }
@@ -225,7 +225,7 @@ void csLightIterRenderStep::Init ()
     shvar_light_0_specular = shadermgr->GetVariable (spcname);
     if (!shvar_light_0_specular)
     {
-      shvar_light_0_specular = new csShaderVariable (spcname);
+      shvar_light_0_specular.AttachNew(new csShaderVariable (spcname));
       shvar_light_0_specular->SetType (csShaderVariable::VECTOR4);
       shadermgr->AddVariable (shvar_light_0_specular);
     }
@@ -233,7 +233,7 @@ void csLightIterRenderStep::Init ()
     shvar_light_0_attenuation = shadermgr->GetVariable (attname);
     if (!shvar_light_0_attenuation)
     {
-      shvar_light_0_attenuation = new csShaderVariable (attname);
+      shvar_light_0_attenuation.AttachNew(new csShaderVariable (attname));
       shvar_light_0_attenuation->SetType (csShaderVariable::VECTOR4);
       shadermgr->AddVariable (shvar_light_0_attenuation);
     }
@@ -241,7 +241,7 @@ void csLightIterRenderStep::Init ()
     shvar_light_0_attenuationtex = shadermgr->GetVariable (atxname);
     if (!shvar_light_0_attenuationtex)
     {
-      shvar_light_0_attenuationtex = new csShaderVariable (atxname);
+      shvar_light_0_attenuationtex.AttachNew(new csShaderVariable (atxname));
       shvar_light_0_attenuationtex->SetType (csShaderVariable::TEXTURE);
       shadermgr->AddVariable (shvar_light_0_attenuationtex);
     }
@@ -249,7 +249,7 @@ void csLightIterRenderStep::Init ()
     shvar_light_0_inner_falloff = shadermgr->GetVariable (infallname);
     if (!shvar_light_0_inner_falloff)
     {
-      shvar_light_0_inner_falloff = new csShaderVariable (infallname);
+      shvar_light_0_inner_falloff.AttachNew(new csShaderVariable (infallname));
       shvar_light_0_inner_falloff->SetType (csShaderVariable::FLOAT);
       shadermgr->AddVariable (shvar_light_0_inner_falloff);
     }
@@ -257,7 +257,7 @@ void csLightIterRenderStep::Init ()
     shvar_light_0_outer_falloff = shadermgr->GetVariable (ofallname);
     if (!shvar_light_0_outer_falloff)
     {
-      shvar_light_0_outer_falloff = new csShaderVariable (ofallname);
+      shvar_light_0_outer_falloff.AttachNew(new csShaderVariable (ofallname));
       shvar_light_0_outer_falloff->SetType (csShaderVariable::FLOAT);
       shadermgr->AddVariable (shvar_light_0_outer_falloff);
     }
@@ -266,7 +266,7 @@ void csLightIterRenderStep::Init ()
       shadermgr->GetVariable (lightcountname));
     if (!svLightCount)
     {
-      svLightCount = new csShaderVariable (lightcountname);
+      svLightCount.AttachNew(new csShaderVariable (lightcountname));
       shadermgr->AddVariable (svLightCount);
     }
     svLightCount->SetValue (1);

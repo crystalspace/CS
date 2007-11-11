@@ -10406,6 +10406,220 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iDynamicSystem_AttachColliderConvexMesh__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iDynamicSystem *arg1 = (iDynamicSystem *) 0 ;
+  iMeshWrapper *arg2 = (iMeshWrapper *) 0 ;
+  csOrthoTransform *arg3 = 0 ;
+  float arg4 ;
+  float arg5 ;
+  float arg6 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  float val4 ;
+  int ecode4 = 0 ;
+  float val5 ;
+  int ecode5 = 0 ;
+  float val6 ;
+  int ecode6 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iDynamicSystem_AttachColliderConvexMesh",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iDynamicSystem, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iDynamicSystem_AttachColliderConvexMesh" "', argument " "1"" of type '" "iDynamicSystem *""'"); 
+  }
+  arg1 = reinterpret_cast< iDynamicSystem * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iMeshWrapper, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iDynamicSystem_AttachColliderConvexMesh" "', argument " "2"" of type '" "iMeshWrapper *""'"); 
+  }
+  arg2 = reinterpret_cast< iMeshWrapper * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csOrthoTransform,  0  | 0);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iDynamicSystem_AttachColliderConvexMesh" "', argument " "3"" of type '" "csOrthoTransform const &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDynamicSystem_AttachColliderConvexMesh" "', argument " "3"" of type '" "csOrthoTransform const &""'"); 
+  }
+  arg3 = reinterpret_cast< csOrthoTransform * >(argp3);
+  ecode4 = SWIG_AsVal_float(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iDynamicSystem_AttachColliderConvexMesh" "', argument " "4"" of type '" "float""'");
+  } 
+  arg4 = static_cast< float >(val4);
+  ecode5 = SWIG_AsVal_float(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iDynamicSystem_AttachColliderConvexMesh" "', argument " "5"" of type '" "float""'");
+  } 
+  arg5 = static_cast< float >(val5);
+  ecode6 = SWIG_AsVal_float(obj5, &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iDynamicSystem_AttachColliderConvexMesh" "', argument " "6"" of type '" "float""'");
+  } 
+  arg6 = static_cast< float >(val6);
+  result = (bool)(arg1)->AttachColliderConvexMesh(arg2,(csOrthoTransform const &)*arg3,arg4,arg5,arg6);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iDynamicSystem_AttachColliderConvexMesh__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iDynamicSystem *arg1 = (iDynamicSystem *) 0 ;
+  iMeshWrapper *arg2 = (iMeshWrapper *) 0 ;
+  csOrthoTransform *arg3 = 0 ;
+  float arg4 ;
+  float arg5 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  float val4 ;
+  int ecode4 = 0 ;
+  float val5 ;
+  int ecode5 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iDynamicSystem_AttachColliderConvexMesh",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iDynamicSystem, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iDynamicSystem_AttachColliderConvexMesh" "', argument " "1"" of type '" "iDynamicSystem *""'"); 
+  }
+  arg1 = reinterpret_cast< iDynamicSystem * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iMeshWrapper, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iDynamicSystem_AttachColliderConvexMesh" "', argument " "2"" of type '" "iMeshWrapper *""'"); 
+  }
+  arg2 = reinterpret_cast< iMeshWrapper * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csOrthoTransform,  0  | 0);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iDynamicSystem_AttachColliderConvexMesh" "', argument " "3"" of type '" "csOrthoTransform const &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDynamicSystem_AttachColliderConvexMesh" "', argument " "3"" of type '" "csOrthoTransform const &""'"); 
+  }
+  arg3 = reinterpret_cast< csOrthoTransform * >(argp3);
+  ecode4 = SWIG_AsVal_float(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iDynamicSystem_AttachColliderConvexMesh" "', argument " "4"" of type '" "float""'");
+  } 
+  arg4 = static_cast< float >(val4);
+  ecode5 = SWIG_AsVal_float(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iDynamicSystem_AttachColliderConvexMesh" "', argument " "5"" of type '" "float""'");
+  } 
+  arg5 = static_cast< float >(val5);
+  result = (bool)(arg1)->AttachColliderConvexMesh(arg2,(csOrthoTransform const &)*arg3,arg4,arg5);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iDynamicSystem_AttachColliderConvexMesh(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[7];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 6); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 5) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iDynamicSystem, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iMeshWrapper, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_csOrthoTransform, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          {
+            int res = SWIG_AsVal_float(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            {
+              int res = SWIG_AsVal_float(argv[4], NULL);
+              _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              return _wrap_iDynamicSystem_AttachColliderConvexMesh__SWIG_1(self, args);
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 6) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iDynamicSystem, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iMeshWrapper, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_csOrthoTransform, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          {
+            int res = SWIG_AsVal_float(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            {
+              int res = SWIG_AsVal_float(argv[4], NULL);
+              _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              {
+                int res = SWIG_AsVal_float(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
+              if (_v) {
+                return _wrap_iDynamicSystem_AttachColliderConvexMesh__SWIG_0(self, args);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iDynamicSystem_AttachColliderConvexMesh'.\n  Possible C/C++ prototypes are:\n    AttachColliderConvexMesh(iMeshWrapper *,csOrthoTransform const &,float,float,float)\n    AttachColliderConvexMesh(iMeshWrapper *,csOrthoTransform const &,float,float)\n");
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iDynamicSystem_AttachColliderMesh__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iDynamicSystem *arg1 = (iDynamicSystem *) 0 ;
@@ -12383,6 +12597,250 @@ SWIGINTERN PyObject *_wrap_iRigidBody_GetGroup(PyObject *SWIGUNUSEDPARM(self), P
   }
   return resultobj;
 fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iRigidBody_AttachColliderConvexMesh__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iRigidBody *arg1 = (iRigidBody *) 0 ;
+  iMeshWrapper *arg2 = (iMeshWrapper *) 0 ;
+  csOrthoTransform *arg3 = 0 ;
+  float arg4 ;
+  float arg5 ;
+  float arg6 ;
+  float arg7 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  float val4 ;
+  int ecode4 = 0 ;
+  float val5 ;
+  int ecode5 = 0 ;
+  float val6 ;
+  int ecode6 = 0 ;
+  float val7 ;
+  int ecode7 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iRigidBody_AttachColliderConvexMesh",7,7,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iRigidBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iRigidBody_AttachColliderConvexMesh" "', argument " "1"" of type '" "iRigidBody *""'"); 
+  }
+  arg1 = reinterpret_cast< iRigidBody * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iMeshWrapper, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iRigidBody_AttachColliderConvexMesh" "', argument " "2"" of type '" "iMeshWrapper *""'"); 
+  }
+  arg2 = reinterpret_cast< iMeshWrapper * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csOrthoTransform,  0  | 0);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iRigidBody_AttachColliderConvexMesh" "', argument " "3"" of type '" "csOrthoTransform const &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iRigidBody_AttachColliderConvexMesh" "', argument " "3"" of type '" "csOrthoTransform const &""'"); 
+  }
+  arg3 = reinterpret_cast< csOrthoTransform * >(argp3);
+  ecode4 = SWIG_AsVal_float(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iRigidBody_AttachColliderConvexMesh" "', argument " "4"" of type '" "float""'");
+  } 
+  arg4 = static_cast< float >(val4);
+  ecode5 = SWIG_AsVal_float(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iRigidBody_AttachColliderConvexMesh" "', argument " "5"" of type '" "float""'");
+  } 
+  arg5 = static_cast< float >(val5);
+  ecode6 = SWIG_AsVal_float(obj5, &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iRigidBody_AttachColliderConvexMesh" "', argument " "6"" of type '" "float""'");
+  } 
+  arg6 = static_cast< float >(val6);
+  ecode7 = SWIG_AsVal_float(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "iRigidBody_AttachColliderConvexMesh" "', argument " "7"" of type '" "float""'");
+  } 
+  arg7 = static_cast< float >(val7);
+  result = (bool)(arg1)->AttachColliderConvexMesh(arg2,(csOrthoTransform const &)*arg3,arg4,arg5,arg6,arg7);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iRigidBody_AttachColliderConvexMesh__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iRigidBody *arg1 = (iRigidBody *) 0 ;
+  iMeshWrapper *arg2 = (iMeshWrapper *) 0 ;
+  csOrthoTransform *arg3 = 0 ;
+  float arg4 ;
+  float arg5 ;
+  float arg6 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  float val4 ;
+  int ecode4 = 0 ;
+  float val5 ;
+  int ecode5 = 0 ;
+  float val6 ;
+  int ecode6 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iRigidBody_AttachColliderConvexMesh",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iRigidBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iRigidBody_AttachColliderConvexMesh" "', argument " "1"" of type '" "iRigidBody *""'"); 
+  }
+  arg1 = reinterpret_cast< iRigidBody * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iMeshWrapper, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iRigidBody_AttachColliderConvexMesh" "', argument " "2"" of type '" "iMeshWrapper *""'"); 
+  }
+  arg2 = reinterpret_cast< iMeshWrapper * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csOrthoTransform,  0  | 0);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iRigidBody_AttachColliderConvexMesh" "', argument " "3"" of type '" "csOrthoTransform const &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iRigidBody_AttachColliderConvexMesh" "', argument " "3"" of type '" "csOrthoTransform const &""'"); 
+  }
+  arg3 = reinterpret_cast< csOrthoTransform * >(argp3);
+  ecode4 = SWIG_AsVal_float(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iRigidBody_AttachColliderConvexMesh" "', argument " "4"" of type '" "float""'");
+  } 
+  arg4 = static_cast< float >(val4);
+  ecode5 = SWIG_AsVal_float(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iRigidBody_AttachColliderConvexMesh" "', argument " "5"" of type '" "float""'");
+  } 
+  arg5 = static_cast< float >(val5);
+  ecode6 = SWIG_AsVal_float(obj5, &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iRigidBody_AttachColliderConvexMesh" "', argument " "6"" of type '" "float""'");
+  } 
+  arg6 = static_cast< float >(val6);
+  result = (bool)(arg1)->AttachColliderConvexMesh(arg2,(csOrthoTransform const &)*arg3,arg4,arg5,arg6);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iRigidBody_AttachColliderConvexMesh(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[8];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 7); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 6) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iRigidBody, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iMeshWrapper, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_csOrthoTransform, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          {
+            int res = SWIG_AsVal_float(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            {
+              int res = SWIG_AsVal_float(argv[4], NULL);
+              _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              {
+                int res = SWIG_AsVal_float(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
+              if (_v) {
+                return _wrap_iRigidBody_AttachColliderConvexMesh__SWIG_1(self, args);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 7) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iRigidBody, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iMeshWrapper, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_csOrthoTransform, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          {
+            int res = SWIG_AsVal_float(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            {
+              int res = SWIG_AsVal_float(argv[4], NULL);
+              _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              {
+                int res = SWIG_AsVal_float(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
+              if (_v) {
+                {
+                  int res = SWIG_AsVal_float(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
+                if (_v) {
+                  return _wrap_iRigidBody_AttachColliderConvexMesh__SWIG_0(self, args);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iRigidBody_AttachColliderConvexMesh'.\n  Possible C/C++ prototypes are:\n    AttachColliderConvexMesh(iMeshWrapper *,csOrthoTransform const &,float,float,float,float)\n    AttachColliderConvexMesh(iMeshWrapper *,csOrthoTransform const &,float,float,float)\n");
   return NULL;
 }
 
@@ -15139,6 +15597,37 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iDynamicsSystemCollider_CreateConvexMeshGeometry(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iDynamicsSystemCollider *arg1 = (iDynamicsSystemCollider *) 0 ;
+  iMeshWrapper *arg2 = (iMeshWrapper *) 0 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iDynamicsSystemCollider_CreateConvexMeshGeometry",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iDynamicsSystemCollider, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iDynamicsSystemCollider_CreateConvexMeshGeometry" "', argument " "1"" of type '" "iDynamicsSystemCollider *""'"); 
+  }
+  arg1 = reinterpret_cast< iDynamicsSystemCollider * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iMeshWrapper, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iDynamicsSystemCollider_CreateConvexMeshGeometry" "', argument " "2"" of type '" "iMeshWrapper *""'"); 
+  }
+  arg2 = reinterpret_cast< iMeshWrapper * >(argp2);
+  result = (bool)(arg1)->CreateConvexMeshGeometry(arg2);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iDynamicsSystemCollider_CreateMeshGeometry(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iDynamicsSystemCollider *arg1 = (iDynamicsSystemCollider *) 0 ;
@@ -15237,6 +15726,46 @@ SWIGINTERN PyObject *_wrap_iDynamicsSystemCollider_CreateCapsuleGeometry(PyObjec
   } 
   arg3 = static_cast< float >(val3);
   result = (bool)(arg1)->CreateCapsuleGeometry(arg2,arg3);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iDynamicsSystemCollider_CreateCylinderGeometry(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iDynamicsSystemCollider *arg1 = (iDynamicsSystemCollider *) 0 ;
+  float arg2 ;
+  float arg3 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  float val2 ;
+  int ecode2 = 0 ;
+  float val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iDynamicsSystemCollider_CreateCylinderGeometry",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iDynamicsSystemCollider, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iDynamicsSystemCollider_CreateCylinderGeometry" "', argument " "1"" of type '" "iDynamicsSystemCollider *""'"); 
+  }
+  arg1 = reinterpret_cast< iDynamicsSystemCollider * >(argp1);
+  ecode2 = SWIG_AsVal_float(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iDynamicsSystemCollider_CreateCylinderGeometry" "', argument " "2"" of type '" "float""'");
+  } 
+  arg2 = static_cast< float >(val2);
+  ecode3 = SWIG_AsVal_float(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iDynamicsSystemCollider_CreateCylinderGeometry" "', argument " "3"" of type '" "float""'");
+  } 
+  arg3 = static_cast< float >(val3);
+  result = (bool)(arg1)->CreateCylinderGeometry(arg2,arg3);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -32587,6 +33116,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iDynamicSystem_CreateJoint", _wrap_iDynamicSystem_CreateJoint, METH_VARARGS, NULL},
 	 { (char *)"iDynamicSystem_RemoveJoint", _wrap_iDynamicSystem_RemoveJoint, METH_VARARGS, NULL},
 	 { (char *)"iDynamicSystem_GetDefaultMoveCallback", _wrap_iDynamicSystem_GetDefaultMoveCallback, METH_VARARGS, NULL},
+	 { (char *)"iDynamicSystem_AttachColliderConvexMesh", _wrap_iDynamicSystem_AttachColliderConvexMesh, METH_VARARGS, NULL},
 	 { (char *)"iDynamicSystem_AttachColliderMesh", _wrap_iDynamicSystem_AttachColliderMesh, METH_VARARGS, NULL},
 	 { (char *)"iDynamicSystem_AttachColliderCylinder", _wrap_iDynamicSystem_AttachColliderCylinder, METH_VARARGS, NULL},
 	 { (char *)"iDynamicSystem_AttachColliderBox", _wrap_iDynamicSystem_AttachColliderBox, METH_VARARGS, NULL},
@@ -32621,6 +33151,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iRigidBody_Enable", _wrap_iRigidBody_Enable, METH_VARARGS, NULL},
 	 { (char *)"iRigidBody_IsEnabled", _wrap_iRigidBody_IsEnabled, METH_VARARGS, NULL},
 	 { (char *)"iRigidBody_GetGroup", _wrap_iRigidBody_GetGroup, METH_VARARGS, NULL},
+	 { (char *)"iRigidBody_AttachColliderConvexMesh", _wrap_iRigidBody_AttachColliderConvexMesh, METH_VARARGS, NULL},
 	 { (char *)"iRigidBody_AttachColliderMesh", _wrap_iRigidBody_AttachColliderMesh, METH_VARARGS, NULL},
 	 { (char *)"iRigidBody_AttachColliderCylinder", _wrap_iRigidBody_AttachColliderCylinder, METH_VARARGS, NULL},
 	 { (char *)"iRigidBody_AttachColliderBox", _wrap_iRigidBody_AttachColliderBox, METH_VARARGS, NULL},
@@ -32674,9 +33205,11 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iDynamicsColliderCollisionCallback_swigregister", iDynamicsColliderCollisionCallback_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iDynamicsSystemCollider_CreateSphereGeometry", _wrap_iDynamicsSystemCollider_CreateSphereGeometry, METH_VARARGS, NULL},
 	 { (char *)"iDynamicsSystemCollider_CreatePlaneGeometry", _wrap_iDynamicsSystemCollider_CreatePlaneGeometry, METH_VARARGS, NULL},
+	 { (char *)"iDynamicsSystemCollider_CreateConvexMeshGeometry", _wrap_iDynamicsSystemCollider_CreateConvexMeshGeometry, METH_VARARGS, NULL},
 	 { (char *)"iDynamicsSystemCollider_CreateMeshGeometry", _wrap_iDynamicsSystemCollider_CreateMeshGeometry, METH_VARARGS, NULL},
 	 { (char *)"iDynamicsSystemCollider_CreateBoxGeometry", _wrap_iDynamicsSystemCollider_CreateBoxGeometry, METH_VARARGS, NULL},
 	 { (char *)"iDynamicsSystemCollider_CreateCapsuleGeometry", _wrap_iDynamicsSystemCollider_CreateCapsuleGeometry, METH_VARARGS, NULL},
+	 { (char *)"iDynamicsSystemCollider_CreateCylinderGeometry", _wrap_iDynamicsSystemCollider_CreateCylinderGeometry, METH_VARARGS, NULL},
 	 { (char *)"iDynamicsSystemCollider_SetCollisionCallback", _wrap_iDynamicsSystemCollider_SetCollisionCallback, METH_VARARGS, NULL},
 	 { (char *)"iDynamicsSystemCollider_SetFriction", _wrap_iDynamicsSystemCollider_SetFriction, METH_VARARGS, NULL},
 	 { (char *)"iDynamicsSystemCollider_SetSoftness", _wrap_iDynamicsSystemCollider_SetSoftness, METH_VARARGS, NULL},

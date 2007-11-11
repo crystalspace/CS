@@ -111,7 +111,7 @@ struct iKeyComposer : public virtual iBase
  */
 struct iKeyboardDriver : public virtual iBase
 {
-  SCF_INTERFACE(iKeyboardDriver, 2,0,0);
+  SCF_INTERFACE(iKeyboardDriver, 2,0,1);
   /**
    * Call to release all key down flags (when focus switches from application
    * window, for example).
@@ -155,6 +155,12 @@ struct iKeyboardDriver : public virtual iBase
    * modifiers.
    */
   virtual csEventError SynthesizeCooked (iEvent *) = 0;
+
+  /**
+   * Get the current state of all modifiers.
+   */
+  virtual const csKeyModifiers& GetModifiersState () const = 0;
+
 };
 
 

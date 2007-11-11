@@ -1873,8 +1873,9 @@ bool csTerrainObject::SetMaterialPalette (
   paletteContexts.SetSize (pal.GetSize ());
   for (size_t i = 0; i < pal.GetSize (); i++)
   {
-    palette[i] = pal[i];
-    paletteContexts[i] = new csShaderVariableContext();
+      palette[i] = pal[i];
+      refPalette.Put(i, pal.Get(i));
+      paletteContexts[i] = new csShaderVariableContext();
   }
 
   return true;

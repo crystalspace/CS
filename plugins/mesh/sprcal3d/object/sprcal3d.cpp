@@ -2084,6 +2084,7 @@ bool csSpriteCal3DMeshObject::AttachCoreMesh(int calCoreMeshID,
     newMesh.render_mesh.indexend += submesh->getFaceCount () * 3;
   }  
   newMesh.render_mesh.material = iMatWrapID;
+  newMesh.matRef = iMatWrapID;
   
   meshes.Push(newMesh);
   

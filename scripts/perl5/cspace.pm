@@ -2971,6 +2971,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetModifierState = *cspacec::iKeyboardDriver_GetModifierState;
 *CreateKeyComposer = *cspacec::iKeyboardDriver_CreateKeyComposer;
 *SynthesizeCooked = *cspacec::iKeyboardDriver_SynthesizeCooked;
+*GetModifiersState = *cspacec::iKeyboardDriver_GetModifiersState;
 *GetKeyState = *cspacec::iKeyboardDriver_GetKeyState;
 *scfGetVersion = *cspacec::iKeyboardDriver_scfGetVersion;
 sub DESTROY {
@@ -5891,6 +5892,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *CreateJoint = *cspacec::iDynamicSystem_CreateJoint;
 *RemoveJoint = *cspacec::iDynamicSystem_RemoveJoint;
 *GetDefaultMoveCallback = *cspacec::iDynamicSystem_GetDefaultMoveCallback;
+*AttachColliderConvexMesh = *cspacec::iDynamicSystem_AttachColliderConvexMesh;
 *AttachColliderMesh = *cspacec::iDynamicSystem_AttachColliderMesh;
 *AttachColliderCylinder = *cspacec::iDynamicSystem_AttachColliderCylinder;
 *AttachColliderBox = *cspacec::iDynamicSystem_AttachColliderBox;
@@ -6041,6 +6043,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *Enable = *cspacec::iRigidBody_Enable;
 *IsEnabled = *cspacec::iRigidBody_IsEnabled;
 *GetGroup = *cspacec::iRigidBody_GetGroup;
+*AttachColliderConvexMesh = *cspacec::iRigidBody_AttachColliderConvexMesh;
 *AttachColliderMesh = *cspacec::iRigidBody_AttachColliderMesh;
 *AttachColliderCylinder = *cspacec::iRigidBody_AttachColliderCylinder;
 *AttachColliderBox = *cspacec::iRigidBody_AttachColliderBox;
@@ -6152,9 +6155,11 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %ITERATORS = ();
 *CreateSphereGeometry = *cspacec::iDynamicsSystemCollider_CreateSphereGeometry;
 *CreatePlaneGeometry = *cspacec::iDynamicsSystemCollider_CreatePlaneGeometry;
+*CreateConvexMeshGeometry = *cspacec::iDynamicsSystemCollider_CreateConvexMeshGeometry;
 *CreateMeshGeometry = *cspacec::iDynamicsSystemCollider_CreateMeshGeometry;
 *CreateBoxGeometry = *cspacec::iDynamicsSystemCollider_CreateBoxGeometry;
 *CreateCapsuleGeometry = *cspacec::iDynamicsSystemCollider_CreateCapsuleGeometry;
+*CreateCylinderGeometry = *cspacec::iDynamicsSystemCollider_CreateCylinderGeometry;
 *SetCollisionCallback = *cspacec::iDynamicsSystemCollider_SetCollisionCallback;
 *SetFriction = *cspacec::iDynamicsSystemCollider_SetFriction;
 *SetSoftness = *cspacec::iDynamicsSystemCollider_SetSoftness;
@@ -12568,6 +12573,38 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         cspacec::delete_iGenMeshAnimationControl($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iGenMeshAnimationControl1_4 ##############
+
+package cspace::iGenMeshAnimationControl1_4;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*Update = *cspacec::iGenMeshAnimationControl1_4_Update;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iGenMeshAnimationControl1_4($self);
         delete $OWNER{$self};
     }
 }

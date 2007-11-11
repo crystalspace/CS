@@ -6,6 +6,154 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-Nov-2007
+	- Vincent applied res' patch for configure OpenAL check. It was
+	  looking for alut, which is not used by CS sound system.
+	- Vincent silenced warnings about '#pragma GCC diagnostic' with
+	  GCC < 4.2.
+	- Marten added an assert in CS::Threading::Condition::Wait to 
+	  make sure the mutex really is held when wait is called.
+	- Marten fixed a compilation error in phystut (M_PI vs PI define).
+9-Nov-2007
+	- Jorrit did the following bullet/physics related changes:
+	    - Added iDynamicsSystemCollider->CreateCylinderGeometry().
+	    - Implemented this in bullet and ODE plugins. In the ODE
+	      plugin a capsule is used.
+	    - Bullet debug mode now doesn't draw unneeded many lines in
+	      case there are multiple steps/frame. Also it no longer
+	      flickers. The debug display is stable.
+	    - Added support for convex meshes with extended iDynamics
+	      API. In ODE implementation this will just use a normal
+	      mesh. In Bullet this will use a special convex mesh primitive
+	      which is allowed to move (concave meshes cannot move
+	      in Bullet). This is untested however.
+	    - Compile fix on phystut.
+	    - Changed ODE plugin so that it now automatically handles
+	      splitting the elapsed time in fixed chunks. This code
+	      was present but for some reason disabled by default.
+	    - Removed split in fixed dynamic steps in phystut. Bullet
+	      already handles this automatically and our ode plugin
+	      also fixes this in the plugin.
+	    - Started initialial implementation of joints in the bullet
+	      plugin. Not working yet.
+	    - Partially implemented the joint support for fixed joints.
+	      It works slightly but the simulation seems unstable for
+	      some reason.
+	- Eric Sunshine fixed issue #408 (Autoconf 2.59 bug: "." not
+	  transformed to to "_" in shell $with_foo variable names) by making
+	  "cairomm-1.0" an aliases of "cairomm" in the CS_CHECK_LIB_WITH()
+	  invocation in configure.ac.  This arrangement generally is more
+	  robust anyhow, potentially requiring less future maintenance.
+	- res changed CS_CHECK_LIB_WITH to also augment the pkg-config search
+	  path and executable search path with directories derived from the
+	  user-specified location. Also changed some wording to make clear that
+	  the provided location is only search in addition to any standard
+	  directories, not instead. Addresses #276.
+8-Nov-2007
+	- Jorrit did the following bullet/physics related changes:
+	    - Added support for static mesh colliders to bullet.
+	    - Dynamic rigid mesh bodies are not supported by bullet.
+	      Bullet prints a warning when this is tried and will return
+	      false.
+	    - Added new '*' key to phystut. This will add a star shaped
+	      static collider to test out static mesh colliders.
+	    - Decreased radius of the avatar sphere in phystut.
+	    - Fixed a bug in SetLinearVelocity() and SetAngularVelocity().
+	      If the object was resting then calling those functions
+	      would have no immediate effect. Fixed by calling
+	      activate() on the rigid body.
+	    - Added bullet specific iBulletDynamicSystem interface.
+	      With this interface you can get debug drawing for
+	      Bullet colliders.
+	    - Changed phystut so that with the '?' key you can now enable
+	      and disable this debugging feature for bullet.
+	    - Added implementation of AttachColliderCylinder().
+	    - Fixed a big bug in the conversion of Bullet to CS
+	      transforms. The matrix was inverted which caused objects
+	      to be positioned totally wrong. Without the debugging tool
+	      this was not always very obvious.
+7-Nov-2007
+	- res re-did the change from r27846 (add some arguments to Update()):
+	  to not break compatibility with existing third-party implementations
+	  of iGenMeshAnimationControl, the change to Update() there was
+	  reverted. Instead, a new interface was added 
+	  (iGenMeshAnimationControl1_4) which holds the updated Update() 
+	  method. The genmesh plugin will use the version from
+	  iGenMeshAnimationControl1_4 if that interface is present, otherwise
+	  it will use the "old" version from iGenMeshAnimationControl.
+	- res removed the unused compile group "meshimpexp".
+	- res fixed an inconsistency in the event system where the mouse and
+	  joystick event helpers created events whose key modifier flags where
+	  specified and stored as 'uint32' whereas practically all other code
+	  treated them as 'csKeyModifiers'. Changed the helpers to take and
+	  store 'csKeyModifiers' (the old 'uint32' variants are deprecated).
+	  Should fix #84.
+	- res added iKeyboardDriver::GetModifiersState(), returning the state
+	  of all modifiers in a csKeyModifiers structure.
+	- res fixed some uses of the now-deprecated event creation helpers
+	  taking uint32 modifier states.
+5-Nov-2007
+	- Jorrit changed phystut so that it adds spheres with the
+	  center hard transformed. That way the 'offset' feature in
+	  AttachColliderSphere() is used and tested. In bullet this
+	  appears to work well, however in odedynam it doesn't.
+	- Jorrit fixed a crash-at-exit bug in bullet plugin.
+	- res fixed the bullet configure test to work with Bullet 2.64.
+	- Jorrit implemented CreateCollider() for the bullet plugin. Changed
+	  phystut so that half of the wall colliders are created using
+	  CreateCollider() while the other half are created using
+	  AttachColliderBox().
+	- Jorrit (paritally) implemented CreateSphereGeometry() for
+	  bullet colliders. The center offset is not yet supported and is
+	  always set at 0,0,0.
+	- res changed bin/autogen.sh to not remove aclocal.m4 when autoconf
+	  failed. Can be helpful for troubleshooting.
+	- res fixed a copy-and-paste error in include/Jamfile to properly
+	  filter include/csutil/scopedmutexlock.h from the master headers.
+4-Nov-2007
+	- res updated the caca canvas to work with caca 0.99.
+	- res added an empty IconsMakeWin32ICO rule override to msvcgen.jam to
+	  prevent icon file regeneration when just regenerating VC projects.
+        - Mike Gist added the concept of 'proxy textures', where textures are
+          created without an image loaded, and then fully loaded when they are
+          needed. This allows for a library of textures to be shared between
+          maps, but only the textures actually used by a given map to be loaded.
+          Also added some unloading functions as part of this, although they can
+          be used separately if wanted.
+	- res adjusted the preprocessor definitions for lib3ds to contain
+	  LIB3DS_GENERIC_DATA_IO_CALLBACKS, needed for the version contained
+	  in the latest cs-win32libs.
+	- res marked the UnusedResourceHelper() functions with
+	  CS_CRYSTALSPACE_EXPORT, had them take const refs to arrays, and 
+	  added safeguards against 0 entries in arrays.
+3-Nov-2007
+	- Jorrit added an initial port of the bullet physics plugin to the
+	  latest release of bullet (2.64). Not everything is supported yet
+	  but basic phystest using boxes and spheres works fine. Things that
+	  don't work are some parts of the collider api, joints, and body
+	  groups. Also several physics parameters like elasticity are not
+	  yet supported.
+	  Note: the configure test is currently broken. The problem is
+	  that bullet expects the include path (-I) to be set to
+	  ${installpath}/bullet and I don't know how to express that in
+	  configure.ac.
+	- res removed the setting of CS_HAVE_LIBBFD when meta info embedding
+	  was enabled and libbfd is present. This fixes build errors on MinGW
+	  in optimize mode where this preprocessor macro was set but libbfd
+	  not actually linked. The other BFD use in CS, the bfd-based plugin
+	  metadata reader, is unaffected since it doesn't make use of that
+	  macro to detect BFD presence (that's handled in the Jam file).
+1-Nov-2007
+	- res added a simple (and rather unflexible) SVG loader utilizing
+	  VGVM.
+31-Oct-2007
+	- Jorrit made the dynamic step callback array in odedynam use
+	  a normal csRefArray instead of a csWeakRefArray. Using a weak
+	  ref array in this case is wrong since it requires implementors
+	  of this callback to keep their own reference somewhere.
+	- caedes fixed memory leaks in emit iEmitFactoryState implementation.
+	- caedes fixed csShaderVariable leaks in lightiter.
+        - Mike Gist committed a change from Marten to fix GetNamedChildObject.
 30-Oct-2007
 	- res fixed some implementation mistakes in csRedBlackTree, leading
 	  to violations of the RB reles in the tree, especially when deleting:

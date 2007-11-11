@@ -89,8 +89,8 @@ csODEDynamics::csODEDynamics (iBase* parent) :
   erp = 0.2f;
   cfm = 1e-5f;
 
-  rateenabled = false;
-  steptime = 0.1f;
+  rateenabled = true;
+  steptime = 0.01f;
   limittime = 1.0f;
   total_elapsed = 0.0f;
 
@@ -170,7 +170,6 @@ void csODEDynamics::Step (float elapsed_time)
   total_elapsed += elapsed_time;
 
   //step callbacks
-  step_callbacks.Compact ();
   for (size_t i = 0; i < step_callbacks.GetSize (); i++)
   {
     step_callbacks[i]->Step (elapsed_time);
@@ -459,8 +458,10 @@ csODEDynamicSystem::csODEDynamicSystem (iObjectRegistry* object_reg,
   lin_damp = 1.0;
   move_cb = (iDynamicsMoveCallback*)new csODEDefaultMoveCallback ();
 
-  rateenabled = false;
-  steptime = limittime = total_elapsed = 0.0;
+  rateenabled = true;
+  total_elapsed = 0.0;
+  steptime = 0.01f;
+  limittime = 1.0f;
 
   stepfast = false;
   sfiter = 10;
@@ -702,7 +703,7 @@ bool csODEDynamicSystem::AttachColliderCylinder (float length, float radius,
   odec->SetElasticity (elasticity);
   odec->SetFriction (friction);
   odec->SetSoftness (softness);
-  odec->CreateCapsuleGeometry (length, radius);
+  odec->CreateCylinderGeometry (length, radius);
   odec->SetTransform (trans);
   odec->AddToSpace (spaceID);
   colliders.Push (odec);
@@ -1094,6 +1095,12 @@ bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
 
   return true;
 }
+
+bool csODECollider::CreateCylinderGeometry (float length, float radius)
+{
+  return CreateCapsuleGeometry (length, radius);
+}
+
 bool csODECollider::CreateCapsuleGeometry (float length, float radius)
 {
   csOrthoTransform transform = GetLocalTransform ();
@@ -1524,7 +1531,7 @@ bool csODERigidBody::AttachColliderCylinder (float length, float radius,
   odec->SetFriction (friction);
   odec->SetSoftness (softness);
   odec->SetDensity (density);
-  odec->CreateCapsuleGeometry (length, radius);
+  odec->CreateCylinderGeometry (length, radius);
   odec->SetTransform (trans);
   odec->AttachBody (bodyID);
   odec->AddTransformToSpace (groupID);
