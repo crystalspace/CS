@@ -11,6 +11,7 @@ chronological order.
 	- ronsaldo added Equals and GetHashCode method into
 	  bindings/csharp/csoperators.i
 	- ronsaldo fixed more types problems in the c# bindings.
+	- ronsaldo removed somes now unneeded ignores in the c# bindings.
 6-Nov-2007
 	- ronsaldo added the missing file include/bindings/csharp/csstring.i
 	- ronsaldo removed the GetInterface method in the c# bindings, because

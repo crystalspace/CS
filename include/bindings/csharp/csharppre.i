@@ -317,22 +317,6 @@ ICONFIGMANAGER_CSHARPCODE
 %ignore csImageBase::GetKeyColor;
 %ignore csProcTexture::SetKeyColor;
 
-//TODO: fix types bugs
-/*
-%ignore csImageBase::GetPalette;
-%ignore csPath::SetPositionVector;
-%ignore csPath::SetPositionVectors;
-%ignore csPath::SetUpVector;
-%ignore csPath::SetUpVectors;
-%ignore csPath::SetForwardVector;
-%ignore csPath::SetForwardVectors;
-%ignore csPath::GetPositionVector;
-%ignore csPath::GetUpVector;
-%ignore csPath::GetForwardVector;
-%ignore csPath::GetInterpolatedPosition;
-%ignore csPath::GetInterpolatedUp;
-%ignore csPath::GetInterpolatedForward;*/
-
 %typemap(in) (const char * iface, int iface_ver)
 {
     $1 = strdup($input.name);
