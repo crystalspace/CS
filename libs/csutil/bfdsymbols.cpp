@@ -31,8 +31,23 @@ namespace CS
     {
       this->filename = filename;
       abfd = bfd_openr (filename, 0);
-      if (!CheckValid()
-	|| !GrabSymbols())
+      bool ok = false;
+      if (CheckValid())
+      {
+        ok = GrabSymbols();
+	if (!ok)
+	{
+	  csString separateDebugInfo (bfd_follow_gnu_debuglink (abfd, 0));
+	  if (!separateDebugInfo.IsEmpty())
+	  {
+	    bfd_close (abfd);
+            abfd = bfd_openr (separateDebugInfo, 0);
+            ok = CheckValid() && GrabSymbols();
+	  }
+	}
+      }
+	
+      if (!ok)
       {
 	bfd_close (abfd);
 	abfd = 0;

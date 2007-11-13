@@ -6,6 +6,16 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+13-Nov-2007
+	- res made the following changes:
+	    - Changed the BFD callstack name resolution helper to be (mostly)
+	      platform-agnostic - a helper is still needed to provide module
+	      file names and addresses.
+	    - Added such a helper for all platforms
+	      supporting dladdr(). 
+	    - Fixed te BFD symbol handler to explicitly try to follow
+	      .gnu_debuglink when no symbols are found in the "main" file.
+	  Together, these changes fix #165.
 11-Nov-2007
 	- res moved CS::ShaderVariableContextImpl to the CS::Graphics
 	  namespace.

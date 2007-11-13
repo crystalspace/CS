@@ -164,7 +164,8 @@ AS_IF([test $ac_cv_lib_m_pow = yes || test $ac_cv_lib_m_cosf = yes],
 AS_IF([test $ac_cv_lib_mx_cosf = yes],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-lmx], [+])])
 AS_IF([test $ac_cv_lib_dl_dlopen = yes],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-ldl], [+])])
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-ldl], [+])
+    AC_CHECK_LIB([dl], [dladdr], [CS_HEADER_PROPERTY([CS_HAVE_DLADDR])])])
 AS_IF([test $ac_cv_lib_nsl_gethostbyname = yes],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-lnsl], [+])])
 
@@ -2378,13 +2379,16 @@ AS_IF([test $enable_meta_info_embedding = yes],
 AS_IF([test $cs_build_mode = debug],
     [case $host_os in
 	mingw*|cygwin*)
-	    CS_CHECK_LIBBFD([emit],
-		[CS_HEADER_PROPERTY([CS_HAVE_LIBBFD])
-		cs_debug_libbfd=yes],
-		[cs_debug_libbfd=no])
-	    ;;
-	*) cs_debug_libbfd=no ;;
+	    do_check_libbfd=yes ;;
+	*) do_check_libbfd=$ac_cv_lib_dl_dladdr ;;
     esac],
+    [do_check_libbfd=no])
+
+AS_IF([test $do_check_libbfd = yes],
+    [CS_CHECK_LIBBFD([emit],
+	[CS_HEADER_PROPERTY([CS_BFD_DEBUG_SYMBOLS])
+	cs_debug_libbfd=yes],
+	[cs_debug_libbfd=no])],
     [cs_debug_libbfd=no])
 
 
