@@ -18,6 +18,11 @@ chronological order.
 	  Together, these changes fix #165.
 	- Eric Sunshine eliminated several compilation warnings in the core
 	  library.
+	- Eric Sunshine fixed sed expression in CS/mk/autoconf/crystal.m4 to
+	  work with POSIX-compliant sed commands (such as the BSD version on
+	  Mac OS X) which recognize only the '*' regex repetition token.
+	  (Portable scripts should not use '+', '?', or '{n,m}' repetition
+	  notation.) Resolves #411.
 11-Nov-2007
 	- res moved CS::ShaderVariableContextImpl to the CS::Graphics
 	  namespace.

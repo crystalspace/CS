@@ -66,7 +66,7 @@ AC_ARG_ENABLE([cstest],
 # Split the DESIRED-VERSION into the major and minor version number 
 # components.
 cs_version_desired=m4_default([$1],[cs_min_version_default])
-sed_expr_base=[\\\([0-9]\\\+\\\)\.\\\([0-9]\\\+\\\).*]
+sed_expr_base=['\([0-9][0-9]*\)\.\([0-9][0-9]*\).*']
 cs_version_major=`echo $cs_version_desired | sed "s/$sed_expr_base/\1/"`
 cs_version_minor=`echo $cs_version_desired | sed "s/$sed_expr_base/\2/"`
 
