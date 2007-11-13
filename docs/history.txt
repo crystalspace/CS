@@ -16,6 +16,8 @@ chronological order.
 	    - Fixed te BFD symbol handler to explicitly try to follow
 	      .gnu_debuglink when no symbols are found in the "main" file.
 	  Together, these changes fix #165.
+	- Eric Sunshine eliminated several compilation warnings in the core
+	  library.
 11-Nov-2007
 	- res moved CS::ShaderVariableContextImpl to the CS::Graphics
 	  namespace.
