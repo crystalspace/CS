@@ -32,15 +32,15 @@ namespace
     {
       if (DbgHelp::SymSupportAvailable())
       {
-	symInit.Init ();
+	CS::Debug::symInit.Init ();
 	
-	base = DbgHelp::SymGetModuleBase64 (symInit.GetSymProcessHandle(),
-	  (uintptr_t)addr);
+	base = DbgHelp::SymGetModuleBase64 (
+	  CS::Debug::symInit.GetSymProcessHandle(), (uintptr_t)symAddr);
 	if (base == 0)
 	{
-	  symInit.RescanModules();
-	  base = DbgHelp::SymGetModuleBase64 (symInit.GetSymProcessHandle(),
-	    (uintptr_t)addr);
+	  CS::Debug::symInit.RescanModules();
+	  base = DbgHelp::SymGetModuleBase64 (
+	    CS::Debug::symInit.GetSymProcessHandle(), (uintptr_t)symAddr);
 	}
       }
       moduleFN[0] = 0;
