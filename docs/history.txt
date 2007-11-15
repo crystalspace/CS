@@ -27,6 +27,8 @@ chronological order.
 	  not found at configure time, and also caused makefile emulation layer
 	  creation to fail.
 	- Eric Sunshine removed the unused MikMod check from configure.ac.
+	- Eric Sunshine removed unportable shell constructs from
+	  CS/bin/autogen.sh.
 14-Nov-2007
 	- res fixed BfdModuleHelperWin32 to actually build on MinGW.
 13-Nov-2007
