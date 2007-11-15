@@ -3161,7 +3161,7 @@ bool csDynaVis::DebugCommand (const char* cmd)
     do_cull_ignore_bad_occluders = !do_cull_ignore_bad_occluders;
     csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
     	"%s ignoring of bad occluders!",
-	do_cull_clampoccluder ? "Enabled" : "Disabled");
+	do_cull_ignore_bad_occluders ? "Enabled" : "Disabled");
     return true;
   }
   else if (!strcmp (cmd, "toggle_clampoccluder"))

@@ -13,6 +13,7 @@ chronological order.
 	  not only if the actual module has not symbols - this works better on
 	  Win32 where some symbols (exported funtions, mostly) are always
 	  found in the actual module.
+	- Fixed a small bug in Dynavis with regards to debugging output.
 14-Nov-2007
 	- res fixed BfdModuleHelperWin32 to actually build on MinGW.
 13-Nov-2007
