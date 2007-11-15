@@ -1,14 +1,10 @@
 SubDir TOP apps tools vsh ;
 
 Description vsh : "Virtual Shell tool" ;
-
-Application vsh
-	: [ Wildcard *.cpp *.h ]
-	: console
-;
+Application vsh : [ Wildcard *.cpp *.h ] : console ;
 LinkWith vsh : crystalspace ;
 
-if [ Property build : projgen_version ] != 6
+if [ Property build : projgen_version ] != 6 && $(ZLIB.AVAILABLE) = yes
 {
 Description vsh_static : "Virtual Shell tool (static build)" ;
 
