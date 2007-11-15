@@ -824,7 +824,7 @@ bool csLoader::Load (iDocumentNode* node, iBase*& result, iRegion* region,
   if (libnode)
   {
     result = 0;
-    return LoadLibrary (ldr_context, libnode, ssource, missingdata, true, true);
+    return LoadLibrary (ldr_context, libnode, ssource, missingdata, true, forceLoadTextures);
   }
 
   ReportError ("crystalspace.maploader.parse",

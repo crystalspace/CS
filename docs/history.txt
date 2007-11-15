@@ -29,6 +29,9 @@ chronological order.
 	- Eric Sunshine removed the unused MikMod check from configure.ac.
 	- Eric Sunshine removed unportable shell constructs from
 	  CS/bin/autogen.sh.
+        - Mike Gist fixed a few issues with the forceLoadTextures argument
+          in some functions in csparser, which were causing incorrect default
+          behaviour (and thus breaking some backwards compatibility).
 14-Nov-2007
 	- res fixed BfdModuleHelperWin32 to actually build on MinGW.
 13-Nov-2007
