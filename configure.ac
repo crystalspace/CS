@@ -1283,22 +1283,6 @@ CS_CHECK_LIB_WITH([vgvm],
 
 
 #------------------------------------------------------------------------------
-# Check for MikMod.  In addition to the standard installed locations, we also
-# search CS/libs/libmikmod*.
-#------------------------------------------------------------------------------
-CS_CHECK_LIB_WITH([mikmod],
-    [AC_LANG_PROGRAM(
-	[[#include <mikmod.h>]],
-	[MikMod_Init("mikmodtest"); MikMod_Exit();])],
-    [$srcdir/libs/libmikmod*], [],
-    [CS_EMIT_BUILD_RESULT([cs_cv_libmikmod], [MIKMOD])], [],
-    [$cs_cv_sys_pthread_cflags],
-    [$cs_cv_sys_pthread_lflags],
-    [$cs_cv_sys_pthread_libs])
-
-
-
-#------------------------------------------------------------------------------
 # Check for Ogg/Vorbis.  In addition to the standard installed locations, we
 # also search CS/libs/libogg*, CS/libs/libvorbis.*, CS/libs/libvorbisfile*.
 #------------------------------------------------------------------------------
