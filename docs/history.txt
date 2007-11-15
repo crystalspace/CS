@@ -13,7 +13,11 @@ chronological order.
 	  not only if the actual module has not symbols - this works better on
 	  Win32 where some symbols (exported funtions, mostly) are always
 	  found in the actual module.
-	- Fixed a small bug in Dynavis with regards to debugging output.
+	- Jorrit fixed a small bug in Dynavis with regards to debugging
+	  output.
+	- Jorrit fixed a bug in dynavis where during update of an object
+	  the check for outline culling was using the old version of
+	  the goodoccluder flag.
 14-Nov-2007
 	- res fixed BfdModuleHelperWin32 to actually build on MinGW.
 13-Nov-2007
