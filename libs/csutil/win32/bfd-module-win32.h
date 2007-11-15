@@ -54,6 +54,16 @@ namespace
         if (GetModuleFileNameA ((HMODULE)(uintptr_t)base, moduleFN, 
 	   sizeof(moduleFN)/sizeof(moduleFN[0])) == 0)
 	  moduleFN[0] = 0;
+	else
+	{
+	  char* p = moduleFN;
+	  // libbfd seems to like forward slashes ...
+	  while (*p != 0)
+	  {
+	    if (*p == '\\') *p = '/';
+	    p++;
+	  }
+	}
       }
       return moduleFN;
     }

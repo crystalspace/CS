@@ -6,6 +6,9 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Nov-2007
+	- res changed BfdModuleHelperWin32 to convert backslashes in the 
+	  module name into forward slashes - libbfd wants these.
 14-Nov-2007
 	- res fixed BfdModuleHelperWin32 to actually build on MinGW.
 13-Nov-2007
