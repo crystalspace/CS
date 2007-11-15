@@ -322,25 +322,25 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
   // Proxy texture loading if the loader isn't specified.
   if(txtname && type.IsEmpty())
   {
-      if (filename.IsEmpty())
-      {
-          filename = txtname;
-      }
-      proxyTexture proxTex;
-      proxTex.filename = filename;
-      iTextureHandle* texH = 0;
-      tex = Engine->GetTextureList()->NewTexture(texH);
-      tex->SetTextureClass(context.GetClass());
-      tex->SetFlags(context.GetFlags());
-      tex->QueryObject()->SetName(txtname);
-      proxTex.textureWrapper = tex;
-      proxTex.region = ldr_context->GetRegion();
-      if(proxTex.region)
-      {
-          proxTex.region->QueryObject()->ObjAdd(proxTex.textureWrapper->QueryObject());
-      }
-      proxyTextures.Push(proxTex);
-      return tex;
+    if (filename.IsEmpty())
+    {
+      filename = txtname;
+    }
+    proxyTexture proxTex;
+    proxTex.filename = filename;
+    iTextureHandle* texH = 0;
+    tex = Engine->GetTextureList()->NewTexture(texH);
+    tex->SetTextureClass(context.GetClass());
+    tex->SetFlags(context.GetFlags());
+    tex->QueryObject()->SetName(txtname);
+    proxTex.textureWrapper = tex;
+    proxTex.region = ldr_context->GetRegion();
+    if(proxTex.region)
+    {
+      proxTex.region->QueryObject()->ObjAdd(proxTex.textureWrapper->QueryObject());
+    }
+    proxyTextures.Push(proxTex);
+    return tex;
   }
 
   // @@@ some more comments

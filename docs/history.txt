@@ -6,9 +6,68 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Nov-2007
+	- res changed BfdModuleHelperWin32 to convert backslashes in the 
+	  module name into forward slashes - libbfd wants these.
+	- res changed BfdSymbols to always use separate debug info if present,
+	  not only if the actual module has not symbols - this works better on
+	  Win32 where some symbols (exported funtions, mostly) are always
+	  found in the actual module.
+	- Jorrit fixed a small bug in Dynavis with regards to debugging
+	  output.
+	- Jorrit fixed a bug in dynavis where during update of an object
+	  the check for outline culling was using the old version of
+	  the goodoccluder flag.
+	- Jorrit changed Dynavis so that the warning if a model is not closed
+	  is not used if the model has less then 16 triangles. In that case
+	  Dynavis will not use outline culling anyway so the warning is
+	  useless.
+	- Eric Sunshine fixed bugs in several Jamfiles which referenced the
+	  target 'vfs' unconditionally. This caused Jam to abort if zlib was
+	  not found at configure time, and also caused makefile emulation layer
+	  creation to fail.
+	- Eric Sunshine removed the unused MikMod check from configure.ac.
+	- Eric Sunshine removed unportable shell constructs from
+	  CS/bin/autogen.sh.
+        - Mike Gist fixed a few issues with the forceLoadTextures argument
+          in some functions in csparser, which were causing incorrect default
+          behaviour (and thus breaking some backwards compatibility).
+14-Nov-2007
+	- res fixed BfdModuleHelperWin32 to actually build on MinGW.
+13-Nov-2007
+	- res made the following changes:
+	    - Changed the BFD callstack name resolution helper to be (mostly)
+	      platform-agnostic - a helper is still needed to provide module
+	      file names and addresses.
+	    - Added such a helper for all platforms
+	      supporting dladdr(). 
+	    - Fixed te BFD symbol handler to explicitly try to follow
+	      .gnu_debuglink when no symbols are found in the "main" file.
+	  Together, these changes fix #165.
+	- Eric Sunshine eliminated several compilation warnings in the core
+	  library.
+	- Eric Sunshine fixed sed expression in CS/mk/autoconf/crystal.m4 to
+	  work with POSIX-compliant sed commands (such as the BSD version on
+	  Mac OS X) which recognize only the '*' regex repetition token.
+	  (Portable scripts should not use '+', '?', or '{n,m}' repetition
+	  notation.) Resolves #411.
+11-Nov-2007
+	- res moved CS::ShaderVariableContextImpl to the CS::Graphics
+	  namespace.
+	- res added CS::Graphics::OverlayShaderVariableContextImpl - a shader
+	  variable context that "overlays" SVs over some other given context.
+	- res changed the terrain2 plugin to make the shader variable context
+	  from the terrain cell render properties available for rendering.
+	- res made the terrain2 loader load SVs into cell rendering properties.
+	- res added initial support for lightmaps to the terrain_fixed shaders.
 10-Nov-2007
 	- Vincent applied res' patch for configure OpenAL check. It was
 	  looking for alut, which is not used by CS sound system.
+	- Vincent silenced warnings about '#pragma GCC diagnostic' with
+	  GCC < 4.2.
+	- Marten added an assert in CS::Threading::Condition::Wait to 
+	  make sure the mutex really is held when wait is called.
+	- Marten fixed a compilation error in phystut (M_PI vs PI define).
 9-Nov-2007
 	- Jorrit did the following bullet/physics related changes:
 	    - Added iDynamicsSystemCollider->CreateCylinderGeometry().

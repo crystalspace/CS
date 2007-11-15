@@ -21,10 +21,16 @@
 #include "callstack-bfd.h"
 #include "../demangle.h"
 
-#include <windows.h>
-
-#include "csutil/win32/DbgHelpAPI.h"
-#include "syminit.h"
+#if defined(CS_PLATFORM_WIN32)
+#include "libs/csutil/win32/bfd-module-win32.h"
+typedef BfdModuleHelperWin32 BfdModuleHelper;
+#elif defined(CS_HAVE_DLADDR)
+#include "libs/csutil/generic/bfd-module-dladdr.h"
+typedef BfdModuleHelperDladdr BfdModuleHelper;
+#else
+#error BFD symbol resolution enabled but no platform-specific module support; \
+  implement or fix configure
+#endif
 
 namespace CS
 {
@@ -43,38 +49,18 @@ namespace CS
     
     BfdSymbols* CallStackNameResolverBfd::BfdForAddress (void* addr)
     {
-      if (!DbgHelp::SymSupportAvailable()) return false;
-      symInit.Init ();
-      
-      uint64 base = DbgHelp::SymGetModuleBase64 (symInit.GetSymProcessHandle(),
-	(uintptr_t)addr);
-      if (base == 0)
-      {
-	symInit.RescanModules();
-	base = DbgHelp::SymGetModuleBase64 (symInit.GetSymProcessHandle(),
-	  (uintptr_t)addr);
-      }
-      if (base == 0) return 0;
+      BfdModuleHelper modHelper (addr);
+      uint64 base = modHelper.GetBaseAddress ();
+      if (base == 0) return false;
       
       BfdSymbols* bfd = moduleBfds.Get (base, 0);
       if (bfd == 0)
       {
-	CHAR moduleFN[MAX_PATH];
-	if (GetModuleFileNameA ((HMODULE)(uintptr_t)base, moduleFN, 
-	  sizeof(moduleFN)/sizeof(moduleFN[0])) == 0)
+	const char* moduleFN = modHelper.GetFileName ();
+	if (!moduleFN || !*moduleFN)
 	  return false;
 	
-	/* Compute relocation offset */
-	uintptr_t addrOffs = 0;
-	PIMAGE_DOS_HEADER dosHeader = (PIMAGE_DOS_HEADER)(uintptr_t)base;
-	PIMAGE_NT_HEADERS NTheader = 
-	  (PIMAGE_NT_HEADERS)((uint8*)dosHeader + dosHeader->e_lfanew);
-	if (NTheader->Signature == 0x00004550) // check for PE sig
-	{
-	  uintptr_t imageBase = NTheader->OptionalHeader.ImageBase;
-	  addrOffs = imageBase - (uintptr_t)base;
-	}
-	
+	uintptr_t addrOffs = modHelper.GetAddrOffset ();
 	bfd = new BfdSymbols (moduleFN, addrOffs);
 	moduleBfds.Put (base, bfd);
       }

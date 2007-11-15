@@ -24,10 +24,14 @@ LinkWith docconv_static : crystalspace ;
 DOCCONV.PLUGINLIST =
   bindoc
   dsplex
-  vfs
   xmlread
   xmltiny
   ;
+
+if $(ZLIB.AVAILABLE) = "yes"
+{
+  DOCCONV.PLUGINLIST += vfs ;
+}
 
 LinkStaticPlugins docconv_static : $(DOCCONV.PLUGINLIST) ;
 SubVariant ;

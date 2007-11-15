@@ -72,11 +72,14 @@ WALKALL.PLUGINLIST =
   stdrep
   thing
   thingldr
-  vfs
   xmlread
   xmlshader
   ;
 
+if $(ZLIB.AVAILABLE) = "yes"
+{
+  WALKALL.PLUGINLIST += vfs ;
+}
 if $(JPEG.AVAILABLE) = "yes"
 {
   WALKALL.PLUGINLIST += csjpgimg ;

@@ -36,7 +36,7 @@ namespace CS
         for(int i=0; i<matList->GetCount(); i++)
         {
           bool inRegion = false;
-          iRegion* region;
+          iRegion* region = 0;
           for(int j=0; j<regList->GetCount(); j++)
           {
             inRegion = inRegion 
@@ -67,7 +67,7 @@ namespace CS
         for(int i=0; i<texList->GetCount(); i++)
         {
           bool inRegion = false;
-          iRegion* region;
+          iRegion* region = 0;
           for(int j=0; j<regList->GetCount(); j++)
           {
             inRegion = inRegion 
@@ -98,7 +98,7 @@ namespace CS
         for(int i=0; i<factList->GetCount(); i++)
         {
           bool inRegion = false;
-          iRegion* region;
+          iRegion* region = 0;
           for(int j=0; j<regList->GetCount(); j++)
           {
             inRegion = inRegion 
@@ -131,7 +131,7 @@ namespace CS
           if (materials[i] == 0) continue;
 
           bool inRegion = false;
-          iRegion* region;
+          iRegion* region = 0;
           for(int j=0; j<regList->GetCount(); j++)
           {
             inRegion = inRegion 
@@ -163,7 +163,7 @@ namespace CS
           if (textures[i] == 0) continue;
 
           bool inRegion = false;
-          iRegion* region;
+          iRegion* region = 0;
           for(int j=0; j<regList->GetCount(); j++)
           {
             inRegion = inRegion 
@@ -195,7 +195,7 @@ namespace CS
           if (factories[i] == 0) continue;
 
           bool inRegion = false;
-          iRegion* region;
+          iRegion* region = 0;
           for(int j=0; j<regList->GetCount(); j++)
           {
             inRegion = inRegion 
