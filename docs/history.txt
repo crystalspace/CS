@@ -9,6 +9,10 @@ chronological order.
 15-Nov-2007
 	- res changed BfdModuleHelperWin32 to convert backslashes in the 
 	  module name into forward slashes - libbfd wants these.
+	- res changed BfdSymbols to always use separate debug info if present,
+	  not only if the actual module has not symbols - this works better on
+	  Win32 where some symbols (exported funtions, mostly) are always
+	  found in the actual module.
 14-Nov-2007
 	- res fixed BfdModuleHelperWin32 to actually build on MinGW.
 13-Nov-2007
