@@ -6,6 +6,12 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+13-Nov-2007
+	- Eric Sunshine fixed sed expression in CS/mk/autoconf/crystal.m4 to
+	  work with POSIX-compliant sed commands (such as the BSD version on
+	  Mac OS X) which recognize only the '*' regex repetition token.
+	  (Portable scripts should not use '+', '?', or '{n,m}' repetition
+	  notation.) Resolves #411.
 28-Oct-2007
 	- Eric Sunshine added CS/doc/support/prepare_online_publish.sh, a
 	  script for massaging generated HTML documentation (CS manual and API

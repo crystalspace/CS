@@ -1,5 +1,8 @@
 1.2 branch log.
 
+15-Nov-2007
+	- Vincent merged r28156 into 1.2 (POSIX-compliant sed command fix in
+	  crystal.m4). This fixes #411.
 29-Oct-2007
 	- Eric Sunshine merged r28039 into 1.2 (new online doc post-processing
 	  for dev API reference).
