@@ -36,6 +36,8 @@ chronological order.
 	  when shared libs are disabled.
 	- res removed the "platform allocator" stuff (which became unnecessary
 	  when the malloc/new override was removed).
+	- res tweaked the VC projects have the same .pdb file used by compiler
+	  and linker when building shared libs.
 14-Nov-2007
 	- res fixed BfdModuleHelperWin32 to actually build on MinGW.
 13-Nov-2007

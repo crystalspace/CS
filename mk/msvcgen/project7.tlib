@@ -64,7 +64,6 @@ END -%]
 				PrecompiledHeaderFile="[% workbuild([my.doc.project.0,'.pch']) %]"
 				AssemblerListingLocation="[% workbuild([]) %]"
 				ObjectFile="[% workbuild([]) %]"
-				ProgramDataBaseFileName="[% workbuild([my.doc.rawtarget.0,'.pdb']) %]"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
 				Detect64BitPortabilityProblems="TRUE"
