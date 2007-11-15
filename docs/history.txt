@@ -32,6 +32,8 @@ chronological order.
         - Mike Gist fixed a few issues with the forceLoadTextures argument
           in some functions in csparser, which were causing incorrect default
           behaviour (and thus breaking some backwards compatibility).
+	- res fixed the static plugins linking library-side glue to also work
+	  when shared libs are disabled.
 14-Nov-2007
 	- res fixed BfdModuleHelperWin32 to actually build on MinGW.
 13-Nov-2007
