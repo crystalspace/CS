@@ -15,7 +15,7 @@ done
 
 autoconf $@
 rc=$?
-if [[ $rc ]] ; then
+if test $rc -eq 0 ; then
   rm -f $MACROFILE
 fi
 exit $rc
