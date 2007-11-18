@@ -6,6 +6,19 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Nov-2007
+	- Eric Sunshine fixed gristing problem in LibraryShared rule in
+	  library.jam which caused it to leave symbolic links laying around in
+	  top-level build directory at 'clean' time. Also added missing Clean
+	  rule invocation to Library implementation. Fixes issue #413.
+	- Eric Sunshine fixed bugs in construction of '$(libname)clean' targets
+	  in SystemLinkSharedLibrary implementations in unix.jam and win32.jam
+	  which resulted in auxilliary files created by those rules (such as
+	  .dbg and .def) to be around when those clean targets were invoked.
+	- Eric Sunshine fixed bug in SystemLinkSharedLibrary in unix.jam which
+	  caused 'clean' targets to miss generated .resp file.
+	- Eric Sunshine simplified and normalized implementation of DoSymLink
+	  actions in helper.jam.
 15-Nov-2007
 	- res changed BfdModuleHelperWin32 to convert backslashes in the 
 	  module name into forward slashes - libbfd wants these.

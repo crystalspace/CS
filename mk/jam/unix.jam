@@ -133,28 +133,35 @@ rule SystemLinkPlugin
   Clean $(<)clean : $(target) ;
 }
 
+# SystemLinkSharedLibrary barename : target : objects : linklib
 rule SystemLinkSharedLibrary
 {
-  LFlags $(<) : $(LINKLIBS) ;
-  Depends $(<) : $(>) ;
+  local barename = $(1) ;
+  local target = $(2) ;
+  local objects = $(3) ;
+  local linklib = $(4) ;
+  LFlags $(target) : $(LINKLIBS) ;
+  Depends $(target) : $(objects) ;
   if $(LINKER.RESPONSEFILES) = "yes"
   {
-    local response = $(<).resp ;
+    local response = $(target).resp ;
     MakeLocate $(response) : $(LOCATE.OBJECTS)/libs ;
-    ResponseFile $(response) : $(>) ;
-    Depends $(response) : $(>) ;
-    Depends $(<) : $(response) ;
-    LinkSharedLibraryRsp $(<) : $(response) ;
+    ResponseFile $(response) : $(objects) ;
+    Depends $(response) : $(objects) ;
+    Depends $(target) : $(response) ;
+    LinkSharedLibraryRsp $(target) : $(response) ;
+    Clean clean : $(response) ;
+    Clean $(barename)clean : $(response) ;
   }
   else
   {
-    LinkSharedLibraryFirst $(<) : $(>[1]) ;
-    LinkSharedLibraryIncremental $(<) : $(>[2-]) ;
-    LinkSharedLibraryFinal $(<) ;
+    LinkSharedLibraryFirst $(target) : $(objects[1]) ;
+    LinkSharedLibraryIncremental $(target) : $(objects[2-]) ;
+    LinkSharedLibraryFinal $(target) ;
   }
 
-  Clean clean : $(<) ;
-  Clean $(<)clean : $(<) ;
+  Clean clean : $(target) ;
+  Clean $(barename)clean : $(target) ;
 }
 
 actions LinkApplication bind NEEDLIBS bind EXTRAOBJECTS
