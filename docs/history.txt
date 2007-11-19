@@ -11,6 +11,7 @@ chronological order.
 	  CS_OPENAL_PATH preprocessor symbol when performing #includes. The
 	  value of this symbol is determined by the configure script as 'AL' on
 	  most platforms and 'OpenAL' on Mac OS X. Resolves issue #415.
+	- Eric Sunshine eliminated compilation warnings in OpenAL renderer.
 15-Nov-2007
 	- res changed BfdModuleHelperWin32 to convert backslashes in the 
 	  module name into forward slashes - libbfd wants these.

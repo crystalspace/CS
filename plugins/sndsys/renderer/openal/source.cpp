@@ -134,7 +134,7 @@ void SndSysSourceOpenAL2D::PerformUpdate ( bool ExternalUpdates )
   // Are there any empty buffers?
   ALint queuedBuffers = 0;
   alGetSourcei (m_Source, AL_BUFFERS_QUEUED, &queuedBuffers);
-  if (queuedBuffers < s_NumberOfBuffers)
+  if (queuedBuffers < static_cast<ALint>(s_NumberOfBuffers))
   {
     // Fill any emptied buffers
     do
