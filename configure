@@ -77524,8 +77524,8 @@ done
 #------------------------------------------------------------------------------
 # Check how to declare functions and types deprecated.
 #------------------------------------------------------------------------------
-{ echo "$as_me:$LINENO: checking how to declare deprecations" >&5
-echo $ECHO_N "checking how to declare deprecations... $ECHO_C" >&6; }
+{ echo "$as_me:$LINENO: checking how to declare deprecation" >&5
+echo $ECHO_N "checking how to declare deprecation... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_declare_deprecated+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -77688,8 +77688,8 @@ fi
 # Check how to declare functions and types perfectly constant (not affected by
 # any global state and always returning the same value for the same input).
 #------------------------------------------------------------------------------
-{ echo "$as_me:$LINENO: checking how to declare const functions" >&5
-echo $ECHO_N "checking how to declare const functions... $ECHO_C" >&6; }
+{ echo "$as_me:$LINENO: checking how to declare const function" >&5
+echo $ECHO_N "checking how to declare const function... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_declare_const+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -77852,8 +77852,8 @@ fi
 # Check how to declare functions and types pure (not affected by any global
 # state).
 #------------------------------------------------------------------------------
-{ echo "$as_me:$LINENO: checking how to declare pure functions" >&5
-echo $ECHO_N "checking how to declare pure functions... $ECHO_C" >&6; }
+{ echo "$as_me:$LINENO: checking how to declare pure function" >&5
+echo $ECHO_N "checking how to declare pure function... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_declare_pure+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -78015,8 +78015,8 @@ fi
 #------------------------------------------------------------------------------
 # Check if the "malloc" attribute is available.
 #------------------------------------------------------------------------------
-{ echo "$as_me:$LINENO: checking for \"malloc\" attribute" >&5
-echo $ECHO_N "checking for \"malloc\" attribute... $ECHO_C" >&6; }
+{ echo "$as_me:$LINENO: checking how to declare allocation function" >&5
+echo $ECHO_N "checking how to declare allocation function... $ECHO_C" >&6; }
 if test "${cs_cv_prog_c_attr_malloc+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
