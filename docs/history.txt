@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 18-Nov-2007
+	- Fossi fixed a null pointer error on loading imposters.
+18-Nov-2007
 	- Eric Sunshine fixed gristing problem in LibraryShared rule in
 	  library.jam which caused it to leave symbolic links laying around in
 	  top-level build directory at 'clean' time. Also added missing Clean
