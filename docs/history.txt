@@ -15,6 +15,10 @@ chronological order.
 	  __attribute__((malloc)) in configure.ac so that it is not quite so
 	  GNU-specific. Also normalized the message to match format of other
 	  similar __attribute__(()) checks.
+	- Eric Sunshine added copy-constructor to CS::Graphics::RenderMeshModes
+	  to pacify Mac OS X 4.0.1 compiler which complained about having to
+	  synthesize the method when invoked by
+	  csGLGraphics3D::DrawSimpleMesh().
 18-Nov-2007
 	- Eric Sunshine fixed gristing problem in LibraryShared rule in
 	  library.jam which caused it to leave symbolic links laying around in
