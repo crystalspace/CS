@@ -11,6 +11,10 @@ chronological order.
 	- res fixed shared library building breakage after r28177. (A
 	  reference to a parameter of the Win32 SystemLinkSharedLibrary rule
 	  wasn't updated when the parameter placement changed.)
+	- Eric Sunshine generalized "checking..." message for
+	  __attribute__((malloc)) in configure.ac so that it is not quite so
+	  GNU-specific. Also normalized the message to match format of other
+	  similar __attribute__(()) checks.
 18-Nov-2007
 	- Eric Sunshine fixed gristing problem in LibraryShared rule in
 	  library.jam which caused it to leave symbolic links laying around in
