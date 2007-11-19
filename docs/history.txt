@@ -6,8 +6,11 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-18-Nov-2007
+19-Nov-2007
 	- Fossi fixed a null pointer error on loading imposters.
+	- res fixed shared library building breakage after r28177. (A
+	  reference to a parameter of the Win32 SystemLinkSharedLibrary rule
+	  wasn't updated when the parameter placement changed.)
 18-Nov-2007
 	- Eric Sunshine fixed gristing problem in LibraryShared rule in
 	  library.jam which caused it to leave symbolic links laying around in

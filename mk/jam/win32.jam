@@ -537,7 +537,7 @@ rule SystemLinkSharedLibrary
   Depends $(barename)clean : $(def)clean ;
   
   EXPORTDEFS on $(target) = $(def) ;
-  IMPLIB on $(target) = $(3) ;
+  IMPLIB on $(target) = $(linklib) ;
   Depends $(linklib) : $(target) ;
   LinkSharedLibrary $(target) : $(lib) ;
 
