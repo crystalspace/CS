@@ -16,7 +16,12 @@
 	Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "AL/al.h"
+#include "cssysdef.h"
+#if defined(CS_OPENAL_PATH)
+#include CS_HEADER_GLOBAL(CS_OPENAL_PATH,al.h)
+#else
+#include <AL/al.h>
+#endif
 
 #include "listener.h"
 

@@ -40,8 +40,6 @@
 #include "iutil/cmdline.h"
 #include "ivaria/reporter.h"
 
-#include "AL/alc.h"
-
 #include "listener.h"
 #include "source.h"
 #include "renderer.h"

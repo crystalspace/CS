@@ -19,7 +19,11 @@
 #ifndef SNDSYS_RENDERER_OPENAL_RENDERER_H
 #define SNDSYS_RENDERER_OPENAL_RENDERER_H
 
-#include "AL/alc.h"
+#if defined(CS_OPENAL_PATH)
+#include CS_HEADER_GLOBAL(CS_OPENAL_PATH,alc.h)
+#else
+#include <AL/alc.h>
+#endif
 
 #include "cssysdef.h"
 

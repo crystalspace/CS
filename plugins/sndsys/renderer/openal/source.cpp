@@ -16,8 +16,6 @@
 	Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "AL/al.h"
-
 #include "source.h"
 #include "listener.h"
 #include "renderer.h"

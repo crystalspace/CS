@@ -24,7 +24,11 @@
 #include "csutil/cfgacc.h"
 #include "csutil/scf_implementation.h"
 
-#include "AL/al.h"
+#if defined(CS_OPENAL_PATH)
+#include CS_HEADER_GLOBAL(CS_OPENAL_PATH,al.h)
+#else
+#include <AL/al.h>
+#endif
 
 #include "isndsys/ss_source.h"
 
