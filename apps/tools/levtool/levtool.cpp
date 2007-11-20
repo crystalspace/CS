@@ -2189,6 +2189,8 @@ void LevTool::Main ()
       }
       break;
 
+    case OP_HELP:
+      break; // Pacify compiler; handled earlier outside of switch().
   }
 
   //---------------------------------------------------------------

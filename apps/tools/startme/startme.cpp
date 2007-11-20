@@ -505,7 +505,7 @@ void StartMe::LoadConfig ()
   // Retrieve demo programs informations.
   size_t i = 0;
   csString pattern;
-  while (confman->SubsectionExists (pattern.Format ("StartMe.%d.", i)))
+  while (confman->SubsectionExists (pattern.Format ("StartMe.%zd.", i)))
   {
     DemoData demo;
     demo.description = new scfString ();

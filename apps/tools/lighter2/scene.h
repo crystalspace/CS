@@ -212,7 +212,7 @@ namespace lighter
       csSet<csString> texFileNamesToDelete;
       csArray<Object*> fileObjects;
 
-      LoadedFile() : sceneConfig (globalConfig), changed (false) {}
+    LoadedFile() : changed(false), sceneConfig (globalConfig) {}
 
       void SetDocument (iDocument* doc)
       {

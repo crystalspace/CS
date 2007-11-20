@@ -293,7 +293,7 @@ csRefArray<iDocumentNode> BaseMapGen::GetMaterialNodes ()
       materials.Push(matnode);
   } // while
 
-  csPrintf ("Found %d materials...\n", materials.GetSize()); fflush (stdout);
+  csPrintf ("Found %zd materials...\n", materials.GetSize()); fflush (stdout);
 
   return materials;
 }

@@ -1115,10 +1115,10 @@ namespace lighter
       csString textureFilename;
       size_t subNum = i / realNumLMs;
       if (subNum == 0)
-        textureFilename.Format ("lightmaps/%s_%u.png",
+        textureFilename.Format ("lightmaps/%s_%zu.png",
           fileInfo->levelName.GetData(), i);
       else
-        textureFilename.Format ("lightmaps/%s_%u_d%zu.png",
+        textureFilename.Format ("lightmaps/%s_%zu_d%zu.png",
           fileInfo->levelName.GetData(), i % realNumLMs, subNum);
       lightmaps[i]->SetFilename (textureFilename);
 
@@ -1636,9 +1636,9 @@ namespace lighter
           textureFilename.Format ("lightmaps/%s_%u_%zu.png", 
             fileInfo->levelName.GetData(), i, pdlightNums.Request (lmID));
         else
-          textureFilename.Format ("lightmaps/%s_%u_%zu_d%zu.png", 
+          textureFilename.Format ("lightmaps/%s_%zu_%u_d%zu.png", 
             fileInfo->levelName.GetData(), i % realNumLMs, 
-            pdlightNums.Request (lmID), subNum);
+	      static_cast<uint>(pdlightNums.Request (lmID)), subNum);
 
         {
           // Texture file name is relative to world file
