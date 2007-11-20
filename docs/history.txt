@@ -22,6 +22,11 @@ chronological order.
 	- Eric Sunshine fixed incorrect type in declaration of
 	  csGLBasicTextureHandle::pbo, which caused compilation to break on Mac
 	  OS X.  Resolves issue #414.
+	- Eric Sunshine added configure.ac check to determine how to suppress
+	  warnings about non-virtual destructors in classes with virtual
+	  methods. CS code itself does not require such suppression, but some
+	  3rd-party libraries employed by CS publish headers which contain this
+	  fault. (Some versions of wxWidgets and cppunit are notable examples.)
 18-Nov-2007
 	- Eric Sunshine fixed gristing problem in LibraryShared rule in
 	  library.jam which caused it to leave symbolic links laying around in
