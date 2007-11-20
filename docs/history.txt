@@ -51,6 +51,7 @@ chronological order.
 	- Eric Sunshine eliminated compilation warning in sprcal3d.
 	- res copied the debug symbol collection and file upload Jam code from
 	  CSlibs.
+	- res added support for version 9 to the VC project generation.
 19-Nov-2007
 	- Fossi fixed a null pointer error on loading imposters.
 	- res fixed shared library building breakage after r28177. (A
