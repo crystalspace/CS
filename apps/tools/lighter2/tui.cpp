@@ -157,10 +157,10 @@ namespace lighter
 
   void TUI::DrawStats () const
   {
-    csPrintf (CS_ANSI_CURSOR(30,15) "% 8zd / % 8zd", globalStats.kdtree.numNodes, globalStats.kdtree.leafNodes);
-    csPrintf (CS_ANSI_CURSOR(30,16) "% 8zd / % 8.03f", globalStats.kdtree.maxDepth, 
+    csPrintf (CS_ANSI_CURSOR(30,15) "%8zu / %8zu", globalStats.kdtree.numNodes, globalStats.kdtree.leafNodes);
+    csPrintf (CS_ANSI_CURSOR(30,16) "%8zu / %8.03f", globalStats.kdtree.maxDepth, 
       (float)globalStats.kdtree.sumDepth / (float)globalStats.kdtree.leafNodes);
-    csPrintf (CS_ANSI_CURSOR(30,17) "% 8zd / % 8.03f", globalStats.kdtree.numPrimitives, 
+    csPrintf (CS_ANSI_CURSOR(30,17) "%8zu / %8.03f", globalStats.kdtree.numPrimitives, 
       (float)globalStats.kdtree.numPrimitives / (float)globalStats.kdtree.leafNodes);
     csPrintf (CS_ANSI_CURSOR(1,1));
   }
@@ -324,10 +324,10 @@ namespace lighter
       prevWasReporter = false;
       // Print KD-tree stats
       csPrintf ("\nKD-tree: \n");
-      csPrintf ("N: % 8zd / % 8zd\n", globalStats.kdtree.numNodes, globalStats.kdtree.leafNodes);
-      csPrintf ("D: % 8zd / % 8.03f\n", globalStats.kdtree.maxDepth, 
+      csPrintf ("N: %8zu / %8zu\n", globalStats.kdtree.numNodes, globalStats.kdtree.leafNodes);
+      csPrintf ("D: %8zu / %8.03f\n", globalStats.kdtree.maxDepth, 
         (float)globalStats.kdtree.sumDepth / (float)globalStats.kdtree.leafNodes);
-      csPrintf ("P: % 8zd / % 8.03f\n", globalStats.kdtree.numPrimitives, 
+      csPrintf ("P: %8zu / %8.03f\n", globalStats.kdtree.numPrimitives, 
         (float)globalStats.kdtree.numPrimitives / (float)globalStats.kdtree.leafNodes);
 
       kdLastNumNodes = globalStats.kdtree.numNodes;

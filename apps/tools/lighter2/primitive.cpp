@@ -198,9 +198,9 @@ namespace lighter
     for (uint i = fy; i < ly; ++i)
     {
       if (x < scanBuf[i].min)
-        scanBuf[i].min = x;
+        scanBuf[i].min = static_cast<uint>(x);
       if ((x+1) > scanBuf[i].max)
-        scanBuf[i].max = (x+1);
+        scanBuf[i].max = static_cast<uint>(x+1);
 
       x += slopeX;
     }

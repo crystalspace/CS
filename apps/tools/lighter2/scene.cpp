@@ -1633,8 +1633,9 @@ namespace lighter
         csString lmID (key->GetLightID ().HexString());
         csString textureFilename;
         if (subNum == 0)
-          textureFilename.Format ("lightmaps/%s_%u_%zu.png", 
-            fileInfo->levelName.GetData(), i, pdlightNums.Request (lmID));
+          textureFilename.Format ("lightmaps/%s_%u_%u.png",
+            fileInfo->levelName.GetData(), i,
+	      static_cast<uint>(pdlightNums.Request (lmID)));
         else
           textureFilename.Format ("lightmaps/%s_%zu_%u_d%zu.png", 
             fileInfo->levelName.GetData(), i % realNumLMs, 
