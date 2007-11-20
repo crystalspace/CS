@@ -26,6 +26,11 @@ chronological order.
 	  retain the documentation-based deprecation warning. If real-world
 	  experience shows that removing the compiler attribute was the wrong
 	  approach, then the un-inlining approach can instead be implemented.
+	- Eric Sunshine fixed bug in CS/plugins/cscript/Jamfile where it
+	  unconditionally referenced Python-related targets even if Python SDK
+	  was not found or was disabled explicitly, thus breaking the build in
+	  those cases (and indirectly causing makefile emulation generation to
+	  fail).
 19-Nov-2007
 	- Fossi fixed a null pointer error on loading imposters.
 	- res fixed shared library building breakage after r28177. (A
