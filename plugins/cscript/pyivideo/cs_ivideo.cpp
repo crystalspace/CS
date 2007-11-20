@@ -12167,7 +12167,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_new_RenderMeshModes(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_new_RenderMeshModes__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   CS::Graphics::RenderMeshModes *result = 0 ;
   
@@ -12176,6 +12176,59 @@ SWIGINTERN PyObject *_wrap_new_RenderMeshModes(PyObject *SWIGUNUSEDPARM(self), P
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Graphics__RenderMeshModes, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_new_RenderMeshModes__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Graphics::RenderMeshModes *arg1 = 0 ;
+  CS::Graphics::RenderMeshModes *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"new_RenderMeshModes",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_CS__Graphics__RenderMeshModes,  0  | 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_RenderMeshModes" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes const &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_RenderMeshModes" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes const &""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
+  result = (CS::Graphics::RenderMeshModes *)new CS::Graphics::RenderMeshModes((CS::Graphics::RenderMeshModes const &)*arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Graphics__RenderMeshModes, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_new_RenderMeshModes(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[2];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 1); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 0) {
+    return _wrap_new_RenderMeshModes__SWIG_0(self, args);
+  }
+  if (argc == 1) {
+    int _v;
+    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_new_RenderMeshModes__SWIG_1(self, args);
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'new_RenderMeshModes'.\n  Possible C/C++ prototypes are:\n    CS::Graphics::RenderMeshModes()\n    CS::Graphics::RenderMeshModes(CS::Graphics::RenderMeshModes const &)\n");
   return NULL;
 }
 
