@@ -19,6 +19,9 @@ chronological order.
 	  to pacify Mac OS X 4.0.1 compiler which complained about having to
 	  synthesize the method when invoked by
 	  csGLGraphics3D::DrawSimpleMesh().
+	- Eric Sunshine fixed incorrect type in declaration of
+	  csGLBasicTextureHandle::pbo, which caused compilation to break on Mac
+	  OS X.  Resolves issue #414.
 18-Nov-2007
 	- Eric Sunshine fixed gristing problem in LibraryShared rule in
 	  library.jam which caused it to leave symbolic links laying around in

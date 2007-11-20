@@ -177,7 +177,7 @@ private:
   void ApplyBlitBufferPBO (uint8* buf);
 protected:
   GLuint Handle;
-  GLhandleARB pbo;
+  GLuint pbo;
   /// Upload the texture to GL.
   void Load ();
   void Unload ();
