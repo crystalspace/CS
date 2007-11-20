@@ -324,6 +324,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
 
     void NextTri (csVector3*& clippedPersp, size_t& num)
     {
+      clippedPersp = 0;
+      num = 0;
+
       if (nearClipTri2)
       {
 	nearClipTri2 = false;

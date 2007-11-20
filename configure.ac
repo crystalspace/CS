@@ -477,6 +477,11 @@ CS_COMPILER_IGNORE_LONG_DOUBLE([C++], [cs_cv_prog_cxx_ignore_long_double],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MANDATORY],
 	[$cs_cv_prog_cxx_ignore_long_double], [+])])
 
+CS_COMPILER_IGNORE_NON_VIRTUAL_DTOR([C++],
+    [cs_cv_prog_cxx_ignore_non_virtual_dtor],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS.WARNING.NO_NON_VIRTUAL_DTOR],
+        [$cs_cv_prog_cxx_ignore_non_virtual_dtor])])
+
 
 
 #------------------------------------------------------------------------------
@@ -2200,7 +2205,7 @@ AC_CHECK_HEADERS([byteswap.h],
 #------------------------------------------------------------------------------
 # Check how to declare functions and types deprecated.
 #------------------------------------------------------------------------------
-CS_SYMBOL_QUALIFIER([how to declare deprecations],
+CS_SYMBOL_QUALIFIER([how to declare deprecation],
     [cs_cv_prog_cxx_declare_deprecated],
     [__attribute__((deprecated))], [], [C++],
     [CS_HEADER_PROPERTY([CS_ATTRIBUTE_DEPRECATED],
@@ -2212,7 +2217,7 @@ CS_SYMBOL_QUALIFIER([how to declare deprecations],
 # Check how to declare functions and types perfectly constant (not affected by
 # any global state and always returning the same value for the same input).
 #------------------------------------------------------------------------------
-CS_SYMBOL_QUALIFIER([how to declare const functions],
+CS_SYMBOL_QUALIFIER([how to declare const function],
     [cs_cv_prog_cxx_declare_const],
     [__attribute__((const))], [], [C++],
     [CS_HEADER_PROPERTY([CS_CONST_METHOD],
@@ -2224,7 +2229,7 @@ CS_SYMBOL_QUALIFIER([how to declare const functions],
 # Check how to declare functions and types pure (not affected by any global
 # state).
 #------------------------------------------------------------------------------
-CS_SYMBOL_QUALIFIER([how to declare pure functions],
+CS_SYMBOL_QUALIFIER([how to declare pure function],
     [cs_cv_prog_cxx_declare_pure],
     [__attribute__((pure))], [], [C++],
     [CS_HEADER_PROPERTY([CS_PURE_METHOD],
@@ -2235,7 +2240,7 @@ CS_SYMBOL_QUALIFIER([how to declare pure functions],
 #------------------------------------------------------------------------------
 # Check if the "malloc" attribute is available.
 #------------------------------------------------------------------------------
-CS_SYMBOL_QUALIFIER([for "malloc" attribute],
+CS_SYMBOL_QUALIFIER([how to declare allocation function],
     [cs_cv_prog_c_attr_malloc],
     [__attribute__((malloc))], [], [C])
 AS_IF([test $cs_cv_prog_c_attr_malloc != no],

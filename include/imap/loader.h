@@ -374,7 +374,7 @@ struct iLoader : public virtual iBase
    */
   virtual bool LoadLibraryFile (const char* filename, iRegion* region = 0,
   	bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
-	iMissingLoaderData* missingdata = 0, bool forceLoadTextures = false) = 0;
+	iMissingLoaderData* missingdata = 0, bool forceLoadTextures = true) = 0;
 
   /**
    * Load library from a 'library' node.
@@ -396,7 +396,7 @@ struct iLoader : public virtual iBase
    */
   virtual bool LoadLibrary (iDocumentNode* lib_node, iRegion* region = 0,
   	bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
-	iMissingLoaderData* missingdata = 0, bool forceLoadTextures = false) = 0;
+	iMissingLoaderData* missingdata = 0, bool forceLoadTextures = true) = 0;
 
   /**
    * Load a Mesh Object Factory from a file.
@@ -458,7 +458,7 @@ struct iLoader : public virtual iBase
   virtual bool Load (const char* fname, iBase*& result, iRegion* region = 0,
   	bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
-    bool forceLoadTextures = false) = 0;
+    bool forceLoadTextures = true) = 0;
 
   /**
    * Load a file. This is a smart function that will try to recognize
@@ -504,7 +504,7 @@ struct iLoader : public virtual iBase
   virtual bool Load (iDataBuffer* buffer, iBase*& result, iRegion* region = 0,
   	bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
-    bool forceLoadTextures = false) = 0;
+    bool forceLoadTextures = true) = 0;
 
   /**
    * Load a node. This is a smart function that will try to recognize
@@ -549,7 +549,7 @@ struct iLoader : public virtual iBase
   virtual bool Load (iDocumentNode* node, iBase*& result, iRegion* region = 0,
   	bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
-    bool forceLoadTextures = false) = 0;
+    bool forceLoadTextures = true) = 0;
 
   /**
    * Load a shader from a file.

@@ -6,12 +6,56 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Nov-2007
+	- Eric Sunshine eliminated compilation warnings in software renderer.
 19-Nov-2007
 	- Eric Sunshine fixed OpenAL renderer to take advantage of
 	  CS_OPENAL_PATH preprocessor symbol when performing #includes. The
 	  value of this symbol is determined by the configure script as 'AL' on
 	  most platforms and 'OpenAL' on Mac OS X. Resolves issue #415.
 	- Eric Sunshine eliminated compilation warnings in OpenAL renderer.
+	- Fossi fixed a null pointer error on loading imposters.
+	- res fixed shared library building breakage after r28177. (A
+	  reference to a parameter of the Win32 SystemLinkSharedLibrary rule
+	  wasn't updated when the parameter placement changed.)
+	- Eric Sunshine generalized "checking..." message for
+	  __attribute__((malloc)) in configure.ac so that it is not quite so
+	  GNU-specific. Also normalized the message to match format of other
+	  similar __attribute__(()) checks.
+	- Eric Sunshine added copy-constructor to CS::Graphics::RenderMeshModes
+	  to pacify Mac OS X 4.0.1 compiler which complained about having to
+	  synthesize the method when invoked by
+	  csGLGraphics3D::DrawSimpleMesh().
+	- Eric Sunshine fixed incorrect type in declaration of
+	  csGLBasicTextureHandle::pbo, which caused compilation to break on Mac
+	  OS X.  Resolves issue #414.
+	- Eric Sunshine added configure.ac check to determine how to suppress
+	  warnings about non-virtual destructors in classes with virtual
+	  methods. CS code itself does not require such suppression, but some
+	  3rd-party libraries employed by CS publish headers which contain this
+	  fault. (Some versions of wxWidgets and cppunit are notable examples.)
+	- res fixed csCommonImageFile to compile when THREADED_LOADING is
+	  disabled.
+	- Eric Sunshine generalized the non-virtual destructor warning
+	  suppression check and moved it from configure.ac to
+	  CS/mk/autoconf/warnings.m4 for use by external projects.
+	- Eric Sunshine added 'non-virtual destructor' warning suppression to
+	  plugins/video/canvas/wxgl/Jamfile to silence warnings about header
+	  problems over which we have no control (for wxWidgets shipped with
+	  Mac OS X).
+18-Nov-2007
+	- Eric Sunshine fixed gristing problem in LibraryShared rule in
+	  library.jam which caused it to leave symbolic links laying around in
+	  top-level build directory at 'clean' time. Also added missing Clean
+	  rule invocation to Library implementation. Fixes issue #413.
+	- Eric Sunshine fixed bugs in construction of '$(libname)clean' targets
+	  in SystemLinkSharedLibrary implementations in unix.jam and win32.jam
+	  which resulted in auxilliary files created by those rules (such as
+	  .dbg and .def) to be around when those clean targets were invoked.
+	- Eric Sunshine fixed bug in SystemLinkSharedLibrary in unix.jam which
+	  caused 'clean' targets to miss generated .resp file.
+	- Eric Sunshine simplified and normalized implementation of DoSymLink
+	  actions in helper.jam.
 15-Nov-2007
 	- res changed BfdModuleHelperWin32 to convert backslashes in the 
 	  module name into forward slashes - libbfd wants these.
@@ -38,6 +82,12 @@ chronological order.
         - Mike Gist fixed a few issues with the forceLoadTextures argument
           in some functions in csparser, which were causing incorrect default
           behaviour (and thus breaking some backwards compatibility).
+	- res fixed the static plugins linking library-side glue to also work
+	  when shared libs are disabled.
+	- res removed the "platform allocator" stuff (which became unnecessary
+	  when the malloc/new override was removed).
+	- res tweaked the VC projects have the same .pdb file used by compiler
+	  and linker when building shared libs.
 14-Nov-2007
 	- res fixed BfdModuleHelperWin32 to actually build on MinGW.
 13-Nov-2007

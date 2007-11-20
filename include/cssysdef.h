@@ -684,60 +684,6 @@ Type &Class::getterFunc ()                                     \
 #endif
 #include <new>
 
-/**\name Platform-specific memory allocation
- * If built with ptmalloc support, these functions can be used to explicitly
- * call the platform's default malloc/free resp. operator new/operator delete
- * implementations. Useful when interfacing with third party libraries.
- */
-//@{
-CS_DEPRECATED_METHOD_MSG("malloc override was removed; "
-  "platform_malloc() unnecessary, use normal malloc() instead")
-CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* platform_malloc (size_t n)
-{ return malloc (n); }
-CS_DEPRECATED_METHOD_MSG("malloc override was removed; "
-  "platform_free() unnecessary, use normal free() instead")
-CS_FORCEINLINE void platform_free (void* p)
-{ return free (p); }
-CS_DEPRECATED_METHOD_MSG("malloc override was removed; "
-  "platform_realloc() unnecessary, use normal realloc() instead")
-CS_FORCEINLINE void* platform_realloc (void* p, size_t n)
-{ return realloc (p, n); }
-CS_DEPRECATED_METHOD_MSG("malloc override was removed; "
-  "platform_calloc() unnecessary, use normal calloc() instead")
-CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* platform_calloc (size_t n, size_t s)
-{ return calloc (n, s); }
-
-namespace CS
-{
-  struct AllocPlatform {};
-  extern CS_CRYSTALSPACE_EXPORT const AllocPlatform allocPlatform;
-}
-/**
- * Platform-dependent operator new.
- * \remarks Won't throw an exception if allocation fails.
- */
-CS_DEPRECATED_METHOD_MSG("operator new override was removed; "
-  "using 'platform new' should be unnecessary")
-extern CS_CRYSTALSPACE_EXPORT void* operator new (size_t s, 
-  const CS::AllocPlatform&) throw();
-/**
- * Platform-dependent operator new.
- * \remarks Won't throw an exception if allocation fails.
- */
-CS_DEPRECATED_METHOD_MSG("operator new override was removed; "
-  "using 'platform new' should be unnecessary")
-extern CS_CRYSTALSPACE_EXPORT void* operator new[] (size_t s, 
-  const CS::AllocPlatform&) throw();
-CS_DEPRECATED_METHOD_MSG("operator new override was removed; "
-  "using 'platform delete' should be unnecessary")
-extern CS_CRYSTALSPACE_EXPORT void operator delete (void* p, 
-  const CS::AllocPlatform&) throw();
-CS_DEPRECATED_METHOD_MSG("operator new override was removed; "
-  "using 'platform delete' should be unnecessary")
-extern CS_CRYSTALSPACE_EXPORT void operator delete[] (void* p, 
-  const CS::AllocPlatform&) throw();
-//@}
-
 #ifndef CS_NO_PTMALLOC
 //@{
 /**\name ptmalloc memory allocation

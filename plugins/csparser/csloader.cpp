@@ -3619,9 +3619,12 @@ bool csLoader::ParseImposterSettings (iImposter* imposter,
   else
     imposter->SetImposterActive (true);
 
+  iSharedVariable *var;
+
   s = node->GetAttributeValue ("range");
-  iSharedVariable *var = Engine->GetVariableList()->FindByName (s);
-  if (!var)
+  if (s)
+    var = Engine->GetVariableList()->FindByName (s);
+  if (!s || !var)
   {
     SyntaxService->ReportError (
 	    "crystalspace.maploader.parse.meshobject",
@@ -3631,8 +3634,9 @@ bool csLoader::ParseImposterSettings (iImposter* imposter,
   imposter->SetMinDistance (var);
 
   s = node->GetAttributeValue ("tolerance");
-  var = Engine->GetVariableList ()->FindByName (s);
-  if (!var)
+  if (s)
+    var = Engine->GetVariableList ()->FindByName (s);
+  if (!s || !var)
   {
     SyntaxService->ReportError (
 	    "crystalspace.maploader.parse.meshobject", node,
@@ -3643,8 +3647,9 @@ bool csLoader::ParseImposterSettings (iImposter* imposter,
   imposter->SetRotationTolerance (var);
 
   s = node->GetAttributeValue ("camera_tolerance");
-  var = Engine->GetVariableList ()->FindByName (s);
-  if (!var)
+  if (s)
+    var = Engine->GetVariableList ()->FindByName (s);
+  if (!s || !var)
   {
     SyntaxService->ReportError (
 	    "crystalspace.maploader.parse.meshobject", node,

@@ -85,6 +85,16 @@ struct RenderMeshModes
   {
   }
 
+  RenderMeshModes (RenderMeshModes const& x) :
+    z_buf_mode (x.z_buf_mode),
+    mixmode (x.mixmode),
+    renderPrio (x.renderPrio),
+    flipCulling (x.flipCulling),
+    cullMode (x.cullMode),
+    alphaType (x.alphaType)
+  {
+  }
+
   ~RenderMeshModes () { }
 
   /// Z mode to use
