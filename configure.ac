@@ -477,6 +477,11 @@ CS_COMPILER_IGNORE_LONG_DOUBLE([C++], [cs_cv_prog_cxx_ignore_long_double],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MANDATORY],
 	[$cs_cv_prog_cxx_ignore_long_double], [+])])
 
+CS_COMPILER_IGNORE_NON_VIRTUAL_DTOR([C++],
+    [cs_cv_prog_cxx_ignore_non_virtual_dtor],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS.WARNING.NO_NON_VIRTUAL_DTOR],
+        [$cs_cv_prog_cxx_ignore_non_virtual_dtor])])
+
 
 
 #------------------------------------------------------------------------------
@@ -731,19 +736,6 @@ CS_SYMBOL_QUALIFIER([how to declare hidden visibility],
 AS_IF([test $cs_cv_prog_cxx_declare_visible_hidden != no],
     [CS_HEADER_PROPERTY([CS_VISIBILITY_HIDDEN],
 	[$cs_cv_prog_cxx_declare_visible_hidden])])
-
-
-
-#------------------------------------------------------------------------------
-# Check how to suppress "no virtual destructor" warnings emitted by more recent
-# versions of gcc when a class has virtual functions but non-virtual
-# destructor. CS itself does not require such suppression, but some 3rd-party
-# libraries referenced by CS sometimes publish headers containing this fault.
-#------------------------------------------------------------------------------
-CS_CHECK_BUILD_FLAGS([how to suppress 'non-virtual destructor' warning],
-    [cs_cv_prog_cxx_no_non_virtual_dtor],
-    [CS_CREATE_TUPLE([-Wno-non-virtual-dtor])], [C++],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS.WARNING.NON_VIRTUAL_DTOR])])
 
 
 
