@@ -88,7 +88,8 @@ struct RenderMeshModes
     renderPrio (x.renderPrio),
     flipCulling (x.flipCulling),
     cullMode (x.cullMode),
-    alphaType (x.alphaType)
+    alphaType (x.alphaType),
+    buffers (x.buffers)
   {
   }
 

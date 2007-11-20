@@ -43,6 +43,8 @@ chronological order.
           file path instead of the relative file path. Resolves #417
         - Mike Gist added some virtual allocator methods to csShaderVariable.
           Should resolve #72.
+	- Eric Sunshine fixed bug in recently added
+	  CS::Graphics::RenderMeshModes copy-constructor. Resolves issue #420.
 19-Nov-2007
 	- Fossi fixed a null pointer error on loading imposters.
 	- res fixed shared library building breakage after r28177. (A
