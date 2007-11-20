@@ -6,6 +6,8 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Nov-2007
+	- Eric Sunshine eliminated compilation warnings in software renderer.
 19-Nov-2007
 	- Fossi fixed a null pointer error on loading imposters.
 	- res fixed shared library building breakage after r28177. (A
