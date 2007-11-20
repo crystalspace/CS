@@ -104,6 +104,7 @@ namespace Implementation
                 : "eax", "ecx", "edx", "esi");
 #endif
 
+	    uint instructionBitMask = 0U;
             // Check for instruction sets and set flags.
             if((edxCapFlags & (1<<23)) != 0)
                 instructionBitMask |= MMX;
@@ -116,9 +117,6 @@ namespace Implementation
 
             return instructionBitMask;
         }
-
-    private:
-        uint instructionBitMask;
     };
 }
 
