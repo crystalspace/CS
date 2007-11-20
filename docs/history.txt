@@ -27,6 +27,8 @@ chronological order.
 	  methods. CS code itself does not require such suppression, but some
 	  3rd-party libraries employed by CS publish headers which contain this
 	  fault. (Some versions of wxWidgets and cppunit are notable examples.)
+	- res fixed csCommonImageFile to compile when THREADED_LOADING is
+	  disabled.
 18-Nov-2007
 	- Eric Sunshine fixed gristing problem in LibraryShared rule in
 	  library.jam which caused it to leave symbolic links laying around in
