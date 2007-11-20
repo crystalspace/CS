@@ -39,6 +39,8 @@ chronological order.
 	- Eric Sunshine eliminated numerous compilation warnings throughout
 	  CS/apps plus a couple apparent outright bugs in lighter2 resulting
 	  from invalid csVector3 construction.
+        - Mike Gist changed texture parsing to store the absolute (VFS)
+          file path instead of the relative file path. Resolves #417
 19-Nov-2007
 	- Fossi fixed a null pointer error on loading imposters.
 	- res fixed shared library building breakage after r28177. (A

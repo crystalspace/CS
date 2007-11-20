@@ -36,6 +36,7 @@
 #include "iutil/document.h"
 #include "iutil/objreg.h"
 #include "iutil/strset.h"
+#include "iutil/vfs.h"
 #include "ivaria/keyval.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
@@ -326,6 +327,11 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     {
       filename = txtname;
     }
+
+    // Get absolute path (on VFS) of the file.
+    csRef<iDataBuffer> absolutePath = VFS->ExpandPath(filename);
+    filename = absolutePath->GetData();
+
     proxyTexture proxTex;
     proxTex.filename = filename;
     iTextureHandle* texH = 0;
