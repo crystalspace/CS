@@ -87,7 +87,8 @@ chronological order.
 	- Eric Sunshine fixed bugs in construction of '$(libname)clean' targets
 	  in SystemLinkSharedLibrary implementations in unix.jam and win32.jam
 	  which resulted in auxilliary files created by those rules (such as
-	  .dbg and .def) to be around when those clean targets were invoked.
+	  .dbg and .def) to be left around when those clean targets were
+	  invoked.
 	- Eric Sunshine fixed bug in SystemLinkSharedLibrary in unix.jam which
 	  caused 'clean' targets to miss generated .resp file.
 	- Eric Sunshine simplified and normalized implementation of DoSymLink
