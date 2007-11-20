@@ -32,6 +32,10 @@ chronological order.
 	- Eric Sunshine generalized the non-virtual destructor warning
 	  suppression check and moved it from configure.ac to
 	  CS/mk/autoconf/warnings.m4 for use by external projects.
+	- Eric Sunshine added 'non-virtual destructor' warning suppression to
+	  plugins/video/canvas/wxgl/Jamfile to silence warnings about header
+	  problems over which we have no control (for wxWidgets shipped with
+	  Mac OS X).
 18-Nov-2007
 	- Eric Sunshine fixed gristing problem in LibraryShared rule in
 	  library.jam which caused it to leave symbolic links laying around in
