@@ -49,6 +49,8 @@ chronological order.
 	  reported by a more recent gcc. Also normalized formatting of size_t
 	  per suggestion from Frank.
 	- Eric Sunshine eliminated compilation warning in sprcal3d.
+	- res copied the debug symbol collection and file upload Jam code from
+	  CSlibs.
 19-Nov-2007
 	- Fossi fixed a null pointer error on loading imposters.
 	- res fixed shared library building breakage after r28177. (A
