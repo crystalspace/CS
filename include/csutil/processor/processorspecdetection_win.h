@@ -32,7 +32,7 @@ namespace Implementation
 
         uint CheckSupportedInstruction()
         {
-            instructionBitMask = 0;
+            uint instructionBitMask = 0U;
             // We know 64-bit processors on windows will support MMX, SSE and SSE2 instructions.
             bool plat64bit = false;
 #if defined(CS_PLATFORM_WIN32) && (CS_PROCESSOR_SIZE == 64)
@@ -51,9 +51,6 @@ namespace Implementation
 
             return instructionBitMask;
         }
-
-    private:
-        uint instructionBitMask;
     };
 }
 

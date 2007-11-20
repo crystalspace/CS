@@ -24,13 +24,13 @@
 
 csShaderVariable::csShaderVariable () :
   csRefCount (), Type (UNKNOWN), VectorValue (0), Int(0), MatrixValuePtr(0), 
-  TransformPtr (0), array(0), Name (csInvalidStringID)
+  TransformPtr (0), shaderVarArray(0), Name (csInvalidStringID)
 {
 }
 
 csShaderVariable::csShaderVariable (csStringID name) :
   csRefCount (), Type (UNKNOWN), VectorValue (0), Int(0), MatrixValuePtr(0), 
-  TransformPtr (0), array(0), Name (name)
+  TransformPtr (0), shaderVarArray(0), Name (name)
 {
 }
 
@@ -48,8 +48,8 @@ csShaderVariable& csShaderVariable::operator= (const csShaderVariable& copyFrom)
       SetValue (*copyFrom.TransformPtr);
       break;
     case ARRAY:
-      array = new csRefArray<csShaderVariable>;
-      *array = *copyFrom.array;
+      shaderVarArray = AllocateShaderVarArray();
+      *shaderVarArray = *copyFrom.shaderVarArray;
       break;
     default:
       {

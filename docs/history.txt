@@ -26,6 +26,29 @@ chronological order.
 	  retain the documentation-based deprecation warning. If real-world
 	  experience shows that removing the compiler attribute was the wrong
 	  approach, then the un-inlining approach can instead be implemented.
+	- Eric Sunshine fixed bug in CS/plugins/cscript/Jamfile where it
+	  unconditionally referenced Python-related targets even if Python SDK
+	  was not found or was disabled explicitly, thus breaking the build in
+	  those cases (and indirectly causing makefile emulation generation to
+	  fail).
+	- Eric Sunshine fixed bug in processorspecdetection_nonwin_gcc_x86.h
+	  where it referenced and returned to the caller uninitialized state.
+	- Eric Sunshine added 'non-virtual destructor' warning suppression to
+	  apps/test/wxtest/Jamfile to silence warnings about header problems
+	  over which we have no control (for wxWidgets shipped with Mac OS X).
+	- Eric Sunshine eliminated numerous compilation warnings throughout
+	  CS/apps plus a couple apparent outright bugs in lighter2 resulting
+	  from invalid csVector3 construction.
+        - Mike Gist changed texture parsing to store the absolute (VFS)
+          file path instead of the relative file path. Resolves #417
+        - Mike Gist added some virtual allocator methods to csShaderVariable.
+          Should resolve #72.
+	- Eric Sunshine fixed bug in recently added
+	  CS::Graphics::RenderMeshModes copy-constructor. Resolves issue #420.
+	- Eric Sunshine eliminated some more compilation warnings in lighter2
+	  reported by a more recent gcc. Also normalized formatting of size_t
+	  per suggestion from Frank.
+	- Eric Sunshine eliminated compilation warning in sprcal3d.
 19-Nov-2007
 	- Eric Sunshine fixed OpenAL renderer to take advantage of
 	  CS_OPENAL_PATH preprocessor symbol when performing #includes. The
@@ -69,7 +92,8 @@ chronological order.
 	- Eric Sunshine fixed bugs in construction of '$(libname)clean' targets
 	  in SystemLinkSharedLibrary implementations in unix.jam and win32.jam
 	  which resulted in auxilliary files created by those rules (such as
-	  .dbg and .def) to be around when those clean targets were invoked.
+	  .dbg and .def) to be left around when those clean targets were
+	  invoked.
 	- Eric Sunshine fixed bug in SystemLinkSharedLibrary in unix.jam which
 	  caused 'clean' targets to miss generated .resp file.
 	- Eric Sunshine simplified and normalized implementation of DoSymLink

@@ -163,7 +163,7 @@ namespace lighter
     Statistics::Progress progressPDLQueues (0, 90, &progress);
     Statistics::Progress progressOntoGlobal (0, 1, &progress);
     Statistics::Progress progressNonPDL (0, 3, &progress);
-    size_t u, updateFreq;
+    size_t u = 0, updateFreq = 0;
     float progressStep;
 
     totalAffectedPrimCount = new csArray<size_t> ();
