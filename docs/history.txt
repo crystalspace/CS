@@ -6,6 +6,8 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Nov-2007
+	- res added the msvc9 directories to jobber.cfg.
 20-Nov-2007
 	- Eric Sunshine eliminated compilation warnings in software renderer.
 	- Eric Sunshine removed the compiler-based deprecation attribute from
