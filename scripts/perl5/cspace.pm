@@ -18048,6 +18048,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *FindMeshFactory = *cspacec::iRegion_FindMeshFactory;
 *FindTexture = *cspacec::iRegion_FindTexture;
 *FindMaterial = *cspacec::iRegion_FindMaterial;
+*FindShader = *cspacec::iRegion_FindShader;
 *FindCameraPosition = *cspacec::iRegion_FindCameraPosition;
 *IsInRegion = *cspacec::iRegion_IsInRegion;
 sub DESTROY {

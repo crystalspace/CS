@@ -29782,6 +29782,40 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iRegion_FindShader(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iRegion *arg1 = (iRegion *) 0 ;
+  char *arg2 = (char *) 0 ;
+  iShader *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iRegion_FindShader",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iRegion, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iRegion_FindShader" "', argument " "1"" of type '" "iRegion *""'"); 
+  }
+  arg1 = reinterpret_cast< iRegion * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iRegion_FindShader" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  result = (iShader *)(arg1)->FindShader((char const *)arg2);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iShader, 0 |  0 );
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iRegion_FindCameraPosition(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iRegion *arg1 = (iRegion *) 0 ;
@@ -34868,6 +34902,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iRegion_FindMeshFactory", _wrap_iRegion_FindMeshFactory, METH_VARARGS, NULL},
 	 { (char *)"iRegion_FindTexture", _wrap_iRegion_FindTexture, METH_VARARGS, NULL},
 	 { (char *)"iRegion_FindMaterial", _wrap_iRegion_FindMaterial, METH_VARARGS, NULL},
+	 { (char *)"iRegion_FindShader", _wrap_iRegion_FindShader, METH_VARARGS, NULL},
 	 { (char *)"iRegion_FindCameraPosition", _wrap_iRegion_FindCameraPosition, METH_VARARGS, NULL},
 	 { (char *)"iRegion_IsInRegion", _wrap_iRegion_IsInRegion, METH_VARARGS, NULL},
 	 { (char *)"delete_iRegion", _wrap_delete_iRegion, METH_VARARGS, NULL},
@@ -35529,7 +35564,6 @@ static swig_type_info _swigt__p_iReporter = {"_p_iReporter", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_scfImplementation1TcsImageBase_iImage_t = {"_p_scfImplementation1TcsImageBase_iImage_t", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iShaderPriorityList = {"_p_iShaderPriorityList", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_csObject = {"_p_csObject", 0, 0, 0, 0, 0};
-static swig_type_info _swigt__p_iShader = {"_p_iShader", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iEventQueue = {"_p_iEventQueue", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iNativeWindow = {"_p_iNativeWindow", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iEvent = {"_p_iEvent", 0, 0, 0, 0, 0};
@@ -35628,6 +35662,7 @@ static swig_type_info _swigt__p_iSectorCallback = {"_p_iSectorCallback", "iSecto
 static swig_type_info _swigt__p_iSectorIterator = {"_p_iSectorIterator", "iSectorIterator *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iSectorList = {"_p_iSectorList", "iSectorList *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iSectorMeshCallback = {"_p_iSectorMeshCallback", "iSectorMeshCallback *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_iShader = {"_p_iShader", "iShader *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iShaderVariableContext = {"_p_iShaderVariableContext", "iShaderVariableContext *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iShadowBlockList = {"_p_iShadowBlockList", "iShadowBlockList *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iShadowCaster = {"_p_iShadowCaster", "iShadowCaster *", 0, 0, (void*)0, 0};
@@ -35980,7 +36015,6 @@ static swig_cast_info _swigc__p_iReporter[] = {{&_swigt__p_iReporter, 0, 0, 0},{
 static swig_cast_info _swigc__p_scfImplementation1TcsImageBase_iImage_t[] = {{&_swigt__p_scfImplementation1TcsImageBase_iImage_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iShaderPriorityList[] = {{&_swigt__p_iShaderPriorityList, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csObject[] = {{&_swigt__p_csObject, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_iShader[] = {{&_swigt__p_iShader, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iEventQueue[] = {{&_swigt__p_iEventQueue, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iNativeWindow[] = {{&_swigt__p_iNativeWindow, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iEvent[] = {{&_swigt__p_iEvent, 0, 0, 0},{0, 0, 0, 0}};
@@ -36080,6 +36114,7 @@ static swig_cast_info _swigc__p_iSectorCallback[] = {  {&_swigt__p_iSectorCallba
 static swig_cast_info _swigc__p_iSectorIterator[] = {  {&_swigt__p_iSectorIterator, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iSectorList[] = {  {&_swigt__p_iSectorList, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iSectorMeshCallback[] = {  {&_swigt__p_iSectorMeshCallback, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_iShader[] = {  {&_swigt__p_iShader, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iShaderVariableContext[] = {  {&_swigt__p_iShaderManager, _p_iShaderManagerTo_p_iShaderVariableContext, 0, 0},  {&_swigt__p_iShader, _p_iShaderTo_p_iShaderVariableContext, 0, 0},  {&_swigt__p_iMaterial, _p_iMaterialTo_p_iShaderVariableContext, 0, 0},  {&_swigt__p_iShaderVariableContext, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iShadowBlockList[] = {  {&_swigt__p_iShadowBlockList, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iShadowCaster[] = {  {&_swigt__p_iShadowCaster, 0, 0, 0},{0, 0, 0, 0}};
