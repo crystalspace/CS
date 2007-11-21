@@ -13,6 +13,9 @@ chronological order.
         - Mike Gist updated the proxy texture code and the
           unusedresourcehelper functions for the case where multiple regions
           hold a ref to an object.
+        - Mike Gist added a function to iRegion to find and return an iShader
+          child object and a unusedresourcehelper function to unregister
+          unused shaders in a given list.
 20-Nov-2007
 	- Eric Sunshine eliminated compilation warnings in software renderer.
 	- Eric Sunshine removed the compiler-based deprecation attribute from

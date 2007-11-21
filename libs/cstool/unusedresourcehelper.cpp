@@ -20,6 +20,7 @@
 
 #include "cstool/unusedresourcehelper.h"
 #include "iutil/object.h"
+#include "iutil/objreg.h"
 #include "iengine/region.h"
 
 namespace CS
@@ -181,6 +182,49 @@ namespace CS
               }
             }
             engine->GetMaterialList()->Remove(materials.Get(i));
+          }
+        }
+      }
+
+      void UnloadUnusedShaders(iEngine* engine,
+        const csWeakRefArray<iShader>& shaders, iObjectRegistry* object_reg)
+      {
+        iRegionList *regList = engine->GetRegions();
+
+        csRef<iShaderManager> shaderMgr (
+          csQueryRegistry<iShaderManager> (object_reg));
+
+        for(size_t i=0; i<shaders.GetSize(); i++)
+        {
+          if (shaders[i] == 0) continue;
+
+          int regionCount = 0;
+          csArray<iRegion*> regionList;
+          for(int j=0; j<regList->GetCount(); j++)
+          {
+            bool inRegion = false;
+            if(regList->Get(j)->FindShader(shaders.Get(i)->QueryObject()->GetName()))
+            {
+              inRegion = true;
+              regionCount++;
+            }
+
+            if(inRegion)
+            {
+              regionList.Push(regList->Get(j));
+            }
+          }
+
+          if(shaders.Get(i)->GetRefCount() == 1+regionCount)
+          {
+            if(regionCount)
+            {
+              for(uint k=0; k<regionList.GetSize(); k++)
+              {
+                regionList.Get(k)->Remove(shaders.Get(i)->QueryObject());
+              }
+            }
+            shaderMgr->UnregisterShader(shaders.Get(i));
           }
         }
       }

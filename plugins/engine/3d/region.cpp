@@ -209,6 +209,13 @@ iMaterialWrapper *csRegion::FindMaterial (const char *iName)
   return m;	// DecRef is ok here.
 }
 
+iShader *csRegion::FindShader (const char *iName)
+{
+  csRef<iShader> s (CS::GetNamedChildObject<iShader> (
+      this, iName));
+  return s;	// DecRef is ok here.
+}
+
 iCameraPosition *csRegion::FindCameraPosition (const char *iName)
 {
   csRef<iCameraPosition> cp (CS::GetNamedChildObject<iCameraPosition> (

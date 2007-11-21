@@ -33,6 +33,8 @@ namespace CS
     {
       void CS_CRYSTALSPACE_EXPORT UnloadUnusedMaterials(iEngine* engine,
         const csWeakRefArray<iMaterialWrapper>& materials);
+      void CS_CRYSTALSPACE_EXPORT UnloadUnusedShaders(iEngine* engine,
+        const csWeakRefArray<iShader>& shaders, iObjectRegistry* obj_reg);
       void CS_CRYSTALSPACE_EXPORT UnloadUnusedTextures(iEngine* engine,
         const csWeakRefArray<iTextureWrapper>& textures);
       void CS_CRYSTALSPACE_EXPORT UnloadUnusedFactories(iEngine* engine, 
