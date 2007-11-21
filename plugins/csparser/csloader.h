@@ -220,7 +220,6 @@ private:
   {
       csWeakRef<iTextureWrapper> textureWrapper;
       csString filename;
-      iRegion* region;
   };
 
   /// Points to proxy textures ready for processing.
