@@ -24,6 +24,7 @@
 #include "iengine/material.h"
 #include "iengine/mesh.h"
 #include "iengine/texture.h"
+#include "iutil/objreg.h"
 
 namespace CS
 {

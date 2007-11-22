@@ -20,7 +20,6 @@
 
 #include "cstool/unusedresourcehelper.h"
 #include "iutil/object.h"
-#include "iutil/objreg.h"
 #include "iengine/region.h"
 
 namespace CS
