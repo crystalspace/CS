@@ -38,16 +38,16 @@ namespace Threading
   enum ThreadPriority
   {
     /// Reduced thread priority. Useful for background tasks.
-    THREAD_PRIO_LOW,
+    THREAD_PRIO_LOW = 0,
 
     /// Normal thread priority.
-    THREAD_PRIO_NORMAL,
+    THREAD_PRIO_NORMAL = 1,
 
     /**
      * Increased thread priority. Useful for tasks that needs precedence over
      * all other.
      */
-    THREAD_PRIO_HIGH
+    THREAD_PRIO_HIGH = 2
   };
 
   /**

@@ -160,8 +160,8 @@ namespace Implementation
 
   bool ThreadBase::SetPriority (ThreadPriority prio)
   {
-    int PrioTable[] = {
-      THREAD_PRIORITY_IDLE,
+    static const int PrioTable[] = {
+      THREAD_PRIORITY_LOWEST,
       THREAD_PRIORITY_NORMAL,
       THREAD_PRIORITY_HIGHEST
     };
