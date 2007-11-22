@@ -113,6 +113,8 @@ public:
   virtual iTextureWrapper *FindTexture (const char *iName);
   /// Find a material in this region by name
   virtual iMaterialWrapper *FindMaterial (const char *iName);
+  /// Find a material in this region by name
+  virtual iShader *FindShader (const char *iName);
   /// Find a camera position in this region by name
   virtual iCameraPosition *FindCameraPosition (const char *iName);
 };

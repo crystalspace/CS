@@ -6,6 +6,16 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Nov-2007
+	- res added the msvc9 directories to jobber.cfg.
+        - Mike Gist changed object loading so that regions hold a ref to
+          the object after finding a 'duplicate'.
+        - Mike Gist updated the proxy texture code and the
+          unusedresourcehelper functions for the case where multiple regions
+          hold a ref to an object.
+        - Mike Gist added a function to iRegion to find and return an iShader
+          child object and a unusedresourcehelper function to unregister
+          unused shaders in a given list.
 20-Nov-2007
 	- Eric Sunshine eliminated compilation warnings in software renderer.
 	- Eric Sunshine removed the compiler-based deprecation attribute from
@@ -49,6 +59,9 @@ chronological order.
 	  reported by a more recent gcc. Also normalized formatting of size_t
 	  per suggestion from Frank.
 	- Eric Sunshine eliminated compilation warning in sprcal3d.
+	- res copied the debug symbol collection and file upload Jam code from
+	  CSlibs.
+	- res added support for version 9 to the VC project generation.
 19-Nov-2007
 	- Eric Sunshine fixed OpenAL renderer to take advantage of
 	  CS_OPENAL_PATH preprocessor symbol when performing #includes. The

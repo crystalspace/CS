@@ -345,29 +345,26 @@ bool csLoader::LoadProxyTextures(bool forceLoadTextures)
       continue;
     }
 
-    if(forceLoadTextures || (proxTex.textureWrapper->GetRefCount() == 2 && !proxTex.region) || proxTex.textureWrapper->GetRefCount() > 2)
+    iTextureManager *tm = G3D->GetTextureManager();
+
+    int Format = tm->GetTextureFormat ();
+    csRef<iImage> img = LoadImage (proxTex.filename, Format);
+    if (!img)
     {
-      iTextureManager *tm = G3D->GetTextureManager();
-
-      int Format = tm->GetTextureFormat ();
-      csRef<iImage> img = LoadImage (proxTex.filename, Format);
+      ReportWarning (
+        "crystalspace.maploader.parse.texture",
+        "Couldn't load image '%s', using error texture instead!",
+        proxTex.filename.GetData());
+      img = GenerateErrorTexture (32, 32);
       if (!img)
-      {
-        ReportWarning (
-            "crystalspace.maploader.parse.texture",
-            "Couldn't load image '%s', using error texture instead!",
-            proxTex.filename.GetData());
-            img = GenerateErrorTexture (32, 32);
-            if (!img)
-              return false;
-      }
-
-      proxTex.textureWrapper->QueryObject()->SetName(proxTex.textureWrapper->QueryObject()->GetName());
-      proxTex.textureWrapper->SetImageFile(img);
-      proxTex.textureWrapper->Register (tm);
-      proxyTextures.DeleteIndex(i);
-      i--;
+        return false;
     }
+
+    proxTex.textureWrapper->QueryObject()->SetName(proxTex.textureWrapper->QueryObject()->GetName());
+    proxTex.textureWrapper->SetImageFile(img);
+    proxTex.textureWrapper->Register (tm);
+    proxyTextures.DeleteIndex(i);
+    i--;
   }
 
   return true;
