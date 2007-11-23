@@ -79,7 +79,7 @@ bool csSndSysRendererOpenAL::Initialize (iObjectRegistry *obj_reg)
   // The spec says it's an ALCchar, but my headers include no such type.
   // The format is a series of strings separatrd by nulls, teminated by a
   // double null.
-  Report (CS_REPORTER_SEVERITY_DEBUG, "Retriving available devices.");
+  Report (CS_REPORTER_SEVERITY_DEBUG, "Retrieving available devices.");
   const ALCchar *devices = alcGetString (0, ALC_DEVICE_SPECIFIER);
   // Loop while there is no second null
   while (*devices != 0) {
@@ -98,7 +98,7 @@ bool csSndSysRendererOpenAL::Initialize (iObjectRegistry *obj_reg)
   const ALCchar *device = m_Config->GetStr ("SndSys.OpenALDevice", 0);
   if (device == 0) {
     // The config did not contain a device to use
-    Report (CS_REPORTER_SEVERITY_DEBUG, "No device spcified");
+    Report (CS_REPORTER_SEVERITY_DEBUG, "No device specified");
   } else {
     // Attempt to open the spcified device
     m_Device = alcOpenDevice (device);
