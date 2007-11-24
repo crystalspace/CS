@@ -6,6 +6,8 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Nov-2007
+	- Vincent merged OpenAL branch (r24357:28234) into trunk.
 22-Nov-2007
 	- Marten fixed a possible bug in threading code.
 21-Nov-2007
@@ -65,6 +67,11 @@ chronological order.
 	  CSlibs.
 	- res added support for version 9 to the VC project generation.
 19-Nov-2007
+	- Eric Sunshine fixed OpenAL renderer to take advantage of
+	  CS_OPENAL_PATH preprocessor symbol when performing #includes. The
+	  value of this symbol is determined by the configure script as 'AL' on
+	  most platforms and 'OpenAL' on Mac OS X. Resolves issue #415.
+	- Eric Sunshine eliminated compilation warnings in OpenAL renderer.
 	- Fossi fixed a null pointer error on loading imposters.
 	- res fixed shared library building breakage after r28177. (A
 	  reference to a parameter of the Win32 SystemLinkSharedLibrary rule
@@ -434,7 +441,11 @@ chronological order.
 	- res "generalized" the MSVC deprecation warning headers into 
 	  csutil/deprecation_warn_* since latest gcc also offers a mechanism 
 	  to silence deprecation warnings. 
+	- Mike Gist added a compile fix for the OpenAL plugin on MSVC.
 19-Oct-2007
+	- Vincent added comments about using iSndSysSource3D,
+	  iSndSysSource3DDirectional and iSndSysSource3DDirectionalSimple
+	  instead of deprecated iSndSysSourceSoftware3D interface.
 	- caedes fixed element size in swig iDataBuffer buffer declaration.
 	- res changed the GL texture blitting logic to make sure the texture
 	  is in the desired format even if only a partial area is changed.
@@ -501,6 +512,8 @@ chronological order.
 	- res enabled shared libraries by default on Win32 and Linux.
 	- res merged the MSVC project shared libraries support from the
 	  msvc-dlls branch.
+	- Vincent restored iSndSysSourceSoftware3D interface for the sake of
+	  compatibility and deprecated it.
 	- res fixed msvcgen.jam to use MSVC.PREFIX.library_static instead of
 	  MSVC.PREFIX.library everywhere.
 	- res added a new interface for directly setting texture pixel data:
@@ -1037,6 +1050,8 @@ chronological order.
 	  the users.
 	- Jorrit reverted r27048 (quotes for javac detection). This fixes
 	  both #377 and #378.
+	- Vincent commented explicit OSS driver for software sound renderer in
+	  OpenAL branch. Also added examples for other drivers requests.
 6-Sep-2007
 	- res applied a patch from 'sarah' to fix compiling after merging some
 	  weaver changes from render manager branch (trac #384).
@@ -1044,6 +1059,8 @@ chronological order.
 	  CS_LOAD_PLUGIN_ALWAYS, the function remains in the bindings but is
 	  deprecated now (otherwise some people might not have a chance to
 	  update).
+	- Vincent added missing trailing semicolons for some CS_ASSERT() in
+	  OpenAL renderer plugin, fixing building errors in optimized mode.
 	- Mike Gist fixed bug #351 (wxgl compilation problem).
 	- res fixed a null pointer access in null3d when null2d is not present.
 	- res changed glshader_cg to always use TinyXML to load the "coercion

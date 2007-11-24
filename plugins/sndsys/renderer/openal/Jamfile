@@ -1,0 +1,7 @@
+SubDir TOP plugins sndsys renderer openal ;
+
+Plugin sndsysopenal : [ Wildcard *.cpp *.h ] ;
+Description sndsysopenal : "OpenAL sound renderer for sndsys" ;
+LinkWith sndsysopenal : crystalspace ;
+CompileGroups sndsysopenal : sndsys ;
+ExternalLibs sndsysopenal : OPENAL ;
