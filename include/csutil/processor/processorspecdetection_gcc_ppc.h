@@ -28,16 +28,15 @@ namespace Implementation
     public:
         uint CheckSupportedInstruction()
         {
-            instructionBitMask = 0;
+	    uint instructionBitMask = 0U;
 
             if(GetAltiVecTypeAvailable() > 0)
                 instructionBitMask |= ALTIVEC;
 
             return instructionBitMask;
         }
-    private:
-        uint instructionBitMask;
 
+    private:
         // Returns 0 for scalar only, >0 for AltiVec
         int GetAltiVecTypeAvailable()
         {

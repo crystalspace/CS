@@ -595,6 +595,8 @@ actions ignore Move
 }
 
 ## SymLink target : source
+##    If symbolic links are supported, create a symbolic link from source
+##    to target, else copy source to target.
 rule SymLink
 {
   if "$(LN_S)"
@@ -603,17 +605,14 @@ rule SymLink
   }
   else
   {
-    # "Poor man's ln"
     Copy $(<) : $(>) ;
   }
 }
 
 actions DoSymLink
 {
-  cd $(<:D) > /dev/null
-  rm -f $(<)
-  $(LN_S) $(>) $(<:D=)
-  cd - > /dev/null
+  $(RM) $(<)
+  $(LN_S) $(>) $(<)
 }
 
 actions piecemeal Touch

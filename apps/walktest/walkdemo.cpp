@@ -577,11 +577,11 @@ bool HandleDynLight (iLight* dyn, iEngine* engine)
 	      	CreateSource (st);
 	    if (sndsource)
 	    {
-	      csRef<iSndSysSourceSoftware3D> sndsource3d
-		= scfQueryInterface<iSndSysSourceSoftware3D> (sndsource);
+	      csRef<iSndSysSource3D> sndsource3d
+		= scfQueryInterface<iSndSysSource3D> (sndsource);
 
 	      sndsource3d->SetPosition (v);
-	      sndsource3d->SetVolume (1.0f);
+	      sndsource->SetVolume (1.0f);
 	      st->SetLoopState (CS_SNDSYS_STREAM_DONTLOOP);
 	      st->Unpause ();
 	    }
@@ -611,10 +611,10 @@ bool HandleDynLight (iLight* dyn, iEngine* engine)
       if (ms->sprite) move_mesh (ms->sprite, s, v);
       if (Sys->mySound && ms->snd)
       {
-	csRef<iSndSysSourceSoftware3D> sndsource3d
-		= scfQueryInterface<iSndSysSourceSoftware3D> (ms->snd);
+	csRef<iSndSysSource3D> sndsource3d
+		= scfQueryInterface<iSndSysSource3D> (ms->snd);
 	sndsource3d->SetPosition (v);
-	sndsource3d->SetVolume (1.0f);
+	ms->snd->SetVolume (1.0f);
       }
       break;
     }
@@ -715,11 +715,11 @@ void fire_missile ()
     ms->snd = Sys->mySound->CreateSource (ms->snd_stream);
     if (ms->snd)
     {
-      csRef<iSndSysSourceSoftware3D> sndsource3d
-		= scfQueryInterface<iSndSysSourceSoftware3D> (ms->snd);
+      csRef<iSndSysSource3D> sndsource3d
+		= scfQueryInterface<iSndSysSource3D> (ms->snd);
 
       sndsource3d->SetPosition (pos);
-      sndsource3d->SetVolume (1.0f);
+      ms->snd->SetVolume (1.0f);
       ms->snd_stream->Unpause ();
     }
   }

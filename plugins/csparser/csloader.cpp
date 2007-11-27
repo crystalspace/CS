@@ -766,8 +766,13 @@ bool csLoader::Load (iDocumentNode* node, iBase*& result, iRegion* region,
     	meshfactnode->GetAttributeValue ("name");
     if (ldr_context->CheckDupes () && meshfactname)
     {
-      iMeshFactoryWrapper* t = Engine->FindMeshFactory (meshfactname);
-      if (t) { result = t; return true; }
+      iMeshFactoryWrapper* mfw = Engine->FindMeshFactory (meshfactname);
+      if (mfw)
+      {
+        AddToRegion (ldr_context, mfw->QueryObject ());
+        result = mfw;
+        return true;
+      }
     }
 
     csRef<iMeshFactoryWrapper> t = Engine->CreateMeshFactory (
@@ -794,20 +799,25 @@ bool csLoader::Load (iDocumentNode* node, iBase*& result, iRegion* region,
     	meshobjnode->GetAttributeValue ("name");
     if (ldr_context->CheckDupes () && meshobjname)
     {
-      iMeshWrapper* t = Engine->FindMeshObject (meshobjname);
-      if (t) { result = t; return true; }
+      iMeshWrapper* mw = Engine->FindMeshObject (meshobjname);
+      if (mw)
+      {
+        AddToRegion (ldr_context, mw->QueryObject ());
+        result = mw;
+        return true;
+      }
     }
-    csRef<iMeshWrapper> t = Engine->CreateMeshWrapper (meshobjname);
-    if (LoadMeshObject (ldr_context, t, 0, meshobjnode, ssource))
+    csRef<iMeshWrapper> mw = Engine->CreateMeshWrapper (meshobjname);
+    if (LoadMeshObject (ldr_context, mw, 0, meshobjnode, ssource))
     {
-      AddToRegion (ldr_context, t->QueryObject ());
-      result = t;
+      AddToRegion (ldr_context, mw->QueryObject ());
+      result = mw;
       return true;
     }
     else
     {
       // Error is already reported.
-      Engine->GetMeshes ()->Remove (t);
+      Engine->GetMeshes ()->Remove (mw);
       result = 0;
       return false;
     }
@@ -824,7 +834,7 @@ bool csLoader::Load (iDocumentNode* node, iBase*& result, iRegion* region,
   if (libnode)
   {
     result = 0;
-    return LoadLibrary (ldr_context, libnode, ssource, missingdata, true, true);
+    return LoadLibrary (ldr_context, libnode, ssource, missingdata, true, forceLoadTextures);
   }
 
   ReportError ("crystalspace.maploader.parse",
@@ -1261,8 +1271,12 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode,
 
 	  if (ldr_context->CheckDupes () && name)
 	  {
-	    iMeshFactoryWrapper* t = Engine->FindMeshFactory (name);
-	    if (t) break;
+	    iMeshFactoryWrapper* mfw = Engine->FindMeshFactory (name);
+	    if (mfw)
+        {
+          AddToRegion (ldr_context, mfw->QueryObject ());
+          break;
+        }
 	  }
           csRef<iMeshFactoryWrapper> t = Engine->CreateMeshFactory (name);
 	  if (!t || !LoadMeshObjectFactory (ldr_context, t, 0, child, 0,
@@ -3621,9 +3635,12 @@ bool csLoader::ParseImposterSettings (iImposter* imposter,
   else
     imposter->SetImposterActive (true);
 
+  iSharedVariable *var;
+
   s = node->GetAttributeValue ("range");
-  iSharedVariable *var = Engine->GetVariableList()->FindByName (s);
-  if (!var)
+  if (s)
+    var = Engine->GetVariableList()->FindByName (s);
+  if (!s || !var)
   {
     SyntaxService->ReportError (
 	    "crystalspace.maploader.parse.meshobject",
@@ -3633,8 +3650,9 @@ bool csLoader::ParseImposterSettings (iImposter* imposter,
   imposter->SetMinDistance (var);
 
   s = node->GetAttributeValue ("tolerance");
-  var = Engine->GetVariableList ()->FindByName (s);
-  if (!var)
+  if (s)
+    var = Engine->GetVariableList ()->FindByName (s);
+  if (!s || !var)
   {
     SyntaxService->ReportError (
 	    "crystalspace.maploader.parse.meshobject", node,
@@ -3645,8 +3663,9 @@ bool csLoader::ParseImposterSettings (iImposter* imposter,
   imposter->SetRotationTolerance (var);
 
   s = node->GetAttributeValue ("camera_tolerance");
-  var = Engine->GetVariableList ()->FindByName (s);
-  if (!var)
+  if (s)
+    var = Engine->GetVariableList ()->FindByName (s);
+  if (!s || !var)
   {
     SyntaxService->ReportError (
 	    "crystalspace.maploader.parse.meshobject", node,
@@ -5576,8 +5595,12 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
   const char* name = shaderNode->GetAttributeValue ("name");
   if (ldr_context->CheckDupes () && name)
   {
-    iShader* m = shaderMgr->GetShader (name);
-    if (m) return true;
+    iShader* shader = shaderMgr->GetShader (name);
+    if (shader)
+    {
+      AddToRegion (ldr_context, shader->QueryObject ());
+      return true;
+    }
   }
 
   const char* type = shaderNode->GetAttributeValue ("compiler");

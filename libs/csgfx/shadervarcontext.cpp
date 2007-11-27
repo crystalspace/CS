@@ -22,6 +22,8 @@
 
 namespace CS
 {
+namespace Graphics
+{
 
 ShaderVariableContextImpl::~ShaderVariableContextImpl ()
 {}
@@ -91,6 +93,7 @@ bool ShaderVariableContextImpl::RemoveVariable (csShaderVariable* variable)
   return variables.Delete (variable);
 }
 
+} // namespace Graphics
 } // namespace CS
 
 //---------------------------------------------------------------------------

@@ -71,11 +71,14 @@ LIGHTER2.PLUGINLIST =
   terrainldr
   thing
   thingldr
-  vfs
   xmlread
   xmlshader
   ;
 
+if $(ZLIB.AVAILABLE) = "yes"
+{
+  LIGHTER2.PLUGINLIST += vfs ;
+}
 if $(JPEG.AVAILABLE) = "yes"
 {
   LIGHTER2.PLUGINLIST += csjpgimg ;

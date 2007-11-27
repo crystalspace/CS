@@ -35,24 +35,32 @@ namespace CS
         iRegionList *regList = engine->GetRegions();
         for(int i=0; i<matList->GetCount(); i++)
         {
-          bool inRegion = false;
-          iRegion* region;
+          int regionCount = 0;
+          csArray<iRegion*> regionList;
           for(int j=0; j<regList->GetCount(); j++)
           {
-            inRegion = inRegion 
-              || regList->Get(j)->FindMaterial(matList->Get(i)->QueryObject()->GetName());
+            bool inRegion = false;
+            if(regList->Get(j)->FindMaterial(matList->Get(i)->QueryObject()->GetName()))
+            {
+              inRegion = true;
+              regionCount++;
+            }
+
             if(inRegion)
             {
-              region = regList->Get(j);
-              break;
+              regionList.Push(regList->Get(j));
             }
           }
 
-          if(matList->Get(i)->GetRefCount() == 1 
-            || (matList->Get(i)->GetRefCount() == 2 && inRegion))
+          if(matList->Get(i)->GetRefCount() == 1+regionCount)
           {
-            if(inRegion)
-                region->Remove(matList->Get(i)->QueryObject());
+            if(regionCount)
+            {
+              for(uint k=0; k<regionList.GetSize(); k++)
+              {
+                regionList.Get(k)->Remove(matList->Get(i)->QueryObject());
+              }
+            }
             matList->Remove(i);
             i--;
           }
@@ -66,24 +74,32 @@ namespace CS
         iRegionList *regList = engine->GetRegions();
         for(int i=0; i<texList->GetCount(); i++)
         {
-          bool inRegion = false;
-          iRegion* region;
+          int regionCount = 0;
+          csArray<iRegion*> regionList;
           for(int j=0; j<regList->GetCount(); j++)
           {
-            inRegion = inRegion 
-              || regList->Get(j)->FindTexture(texList->Get(i)->QueryObject()->GetName());
+            bool inRegion = false;
+            if(regList->Get(j)->FindTexture(texList->Get(i)->QueryObject()->GetName()))
+            {
+              inRegion = true;
+              regionCount++;
+            }
+
             if(inRegion)
             {
-              region = regList->Get(j);
-              break;
+              regionList.Push(regList->Get(j));
             }
           }
 
-          if(texList->Get(i)->GetRefCount() == 1 
-            || (texList->Get(i)->GetRefCount() == 2 && inRegion))
+          if(texList->Get(i)->GetRefCount() == 1+regionCount)
           {
-            if(inRegion)
-              region->Remove(texList->Get(i)->QueryObject());
+            if(regionCount)
+            {
+              for(uint k=0; k<regionList.GetSize(); k++)
+              {
+                regionList.Get(k)->Remove(texList->Get(i)->QueryObject());
+              }
+            }
             texList->Remove(i);
             i--;
           }
@@ -97,24 +113,32 @@ namespace CS
         iRegionList *regList = engine->GetRegions();
         for(int i=0; i<factList->GetCount(); i++)
         {
-          bool inRegion = false;
-          iRegion* region;
+          int regionCount = 0;
+          csArray<iRegion*> regionList;
           for(int j=0; j<regList->GetCount(); j++)
           {
-            inRegion = inRegion 
-              || regList->Get(j)->FindMeshFactory(factList->Get(i)->QueryObject()->GetName());
+            bool inRegion = false;
+            if(regList->Get(j)->FindMeshFactory(factList->Get(i)->QueryObject()->GetName()))
+            {
+              inRegion = true;
+              regionCount++;
+            }
+
             if(inRegion)
             {
-              region = regList->Get(j);
-              break;
+              regionList.Push(regList->Get(j));
             }
           }
 
-          if(factList->Get(i)->GetRefCount() == 1 
-            || (factList->Get(i)->GetRefCount() == 2 && inRegion))
+          if(factList->Get(i)->GetRefCount() == 1+regionCount)
           {
-            if(inRegion)
-              region->Remove(factList->Get(i)->QueryObject());
+            if(regionCount)
+            {
+              for(uint k=0; k<regionList.GetSize(); k++)
+              {
+                regionList.Get(k)->Remove(factList->Get(i)->QueryObject());
+              }
+            }
             factList->Remove(i);
             i--;
           }
@@ -130,25 +154,76 @@ namespace CS
         {
           if (materials[i] == 0) continue;
 
-          bool inRegion = false;
-          iRegion* region;
+          int regionCount = 0;
+          csArray<iRegion*> regionList;
           for(int j=0; j<regList->GetCount(); j++)
           {
-            inRegion = inRegion 
-              || regList->Get(j)->FindMaterial(materials.Get(i)->QueryObject()->GetName());
+            bool inRegion = false;
+            if(regList->Get(j)->FindMaterial(materials.Get(i)->QueryObject()->GetName()))
+            {
+              inRegion = true;
+              regionCount++;
+            }
+
             if(inRegion)
             {
-              region = regList->Get(j);
-              break;
+              regionList.Push(regList->Get(j));
             }
           }
 
-          if(materials.Get(i)->GetRefCount() == 1 
-            || (materials.Get(i)->GetRefCount() == 2 && inRegion))
+          if(materials.Get(i)->GetRefCount() == 1+regionCount)
           {
-            if(inRegion)
-              region->Remove(materials.Get(i)->QueryObject());
+            if(regionCount)
+            {
+              for(uint k=0; k<regionList.GetSize(); k++)
+              {
+                regionList.Get(k)->Remove(materials.Get(i)->QueryObject());
+              }
+            }
             engine->GetMaterialList()->Remove(materials.Get(i));
+          }
+        }
+      }
+
+      void UnloadUnusedShaders(iEngine* engine,
+        const csWeakRefArray<iShader>& shaders, iObjectRegistry* object_reg)
+      {
+        iRegionList *regList = engine->GetRegions();
+
+        csRef<iShaderManager> shaderMgr (
+          csQueryRegistry<iShaderManager> (object_reg));
+
+        for(size_t i=0; i<shaders.GetSize(); i++)
+        {
+          if (shaders[i] == 0) continue;
+
+          int regionCount = 0;
+          csArray<iRegion*> regionList;
+          for(int j=0; j<regList->GetCount(); j++)
+          {
+            bool inRegion = false;
+            if(regList->Get(j)->FindShader(shaders.Get(i)->QueryObject()->GetName()))
+            {
+              inRegion = true;
+              regionCount++;
+            }
+
+            if(inRegion)
+            {
+              regionList.Push(regList->Get(j));
+            }
+          }
+
+          if(shaders.Get(i)->GetRefCount() == 1+regionCount)
+          {
+            if(regionCount)
+            {
+              for(uint k=0; k<regionList.GetSize(); k++)
+              {
+                regionList.Get(k)->Remove(shaders.Get(i)->QueryObject());
+              }
+            }
+            shaderMgr->UnregisterShader(shaders.Get(i));
           }
         }
       }
@@ -162,24 +237,32 @@ namespace CS
         {
           if (textures[i] == 0) continue;
 
-          bool inRegion = false;
-          iRegion* region;
+          int regionCount = 0;
+          csArray<iRegion*> regionList;
           for(int j=0; j<regList->GetCount(); j++)
           {
-            inRegion = inRegion 
-              || regList->Get(j)->FindTexture(textures.Get(i)->QueryObject()->GetName());
+            bool inRegion = false;
+            if(regList->Get(j)->FindTexture(textures.Get(i)->QueryObject()->GetName()))
+            {
+              inRegion = true;
+              regionCount++;
+            }
+
             if(inRegion)
             {
-              region = regList->Get(j);
-              break;
+              regionList.Push(regList->Get(j));
             }
           }
 
-          if(textures.Get(i)->GetRefCount() == 1 
-            || (textures.Get(i)->GetRefCount() == 2 && inRegion))
+          if(textures.Get(i)->GetRefCount() == 1+regionCount)
           {
-            if(inRegion)
-              region->Remove(textures.Get(i)->QueryObject());
+            if(regionCount)
+            {
+              for(uint k=0; k<regionList.GetSize(); k++)
+              {
+                regionList.Get(k)->Remove(textures.Get(i)->QueryObject());
+              }
+            }
             engine->GetTextureList()->Remove(textures.Get(i));
           }
         }
@@ -194,24 +277,32 @@ namespace CS
         {
           if (factories[i] == 0) continue;
 
-          bool inRegion = false;
-          iRegion* region;
+          int regionCount = 0;
+          csArray<iRegion*> regionList;
           for(int j=0; j<regList->GetCount(); j++)
           {
-            inRegion = inRegion 
-              || regList->Get(j)->FindMeshFactory(factories.Get(i)->QueryObject()->GetName());
+            bool inRegion = false;
+            if(regList->Get(j)->FindMeshFactory(factories.Get(i)->QueryObject()->GetName()))
+            {
+              inRegion = true;
+              regionCount++;
+            }
+
             if(inRegion)
             {
-              region = regList->Get(j);
-              break;
+              regionList.Push(regList->Get(j));
             }
           }
 
-          if(factories.Get(i)->GetRefCount() == 1 
-            || (factories.Get(i)->GetRefCount() == 2 && inRegion))
+          if(factories.Get(i)->GetRefCount() == 1+regionCount)
           {
-            if(inRegion)
-              region->Remove(factories.Get(i)->QueryObject());
+            if(regionCount)
+            {
+              for(uint k=0; k<regionList.GetSize(); k++)
+              {
+                regionList.Get(k)->Remove(factories.Get(i)->QueryObject());
+              }
+            }
             engine->GetMeshFactories()->Remove(factories.Get(i));
           }
         }

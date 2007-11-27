@@ -33,30 +33,86 @@
 
 namespace CS
 {
-  /**
-   * Simple implementation for iShaderVariableContext.
-   * Can be inherited from for use in SCF classes. For an example,
-   * see csShaderVariableContext.
-   */
-  class CS_CRYSTALSPACE_EXPORT ShaderVariableContextImpl :
-    public virtual iShaderVariableContext
+  namespace Graphics
   {
-  protected:
-    csRefArray<csShaderVariable> variables;
-
-  public:
-    virtual ~ShaderVariableContextImpl();
-
-    const csRefArray<csShaderVariable>& GetShaderVariables () const
-    { return variables; }
-    virtual void AddVariable (csShaderVariable *variable);
-    virtual csShaderVariable* GetVariable (csStringID name) const;
-    virtual void PushVariables (csShaderVariableStack& stack) const;
-    virtual bool IsEmpty() const { return variables.GetSize () == 0; }  
-    virtual void ReplaceVariable (csShaderVariable *variable);
-    virtual void Clear () { variables.Empty(); }
-    virtual bool RemoveVariable (csShaderVariable* variable);
-  };
+    /**
+     * Simple implementation for iShaderVariableContext.
+     * Can be inherited from for use in SCF classes. For an example,
+     * see csShaderVariableContext.
+     */
+    class CS_CRYSTALSPACE_EXPORT ShaderVariableContextImpl :
+      public virtual iShaderVariableContext
+    {
+    protected:
+      csRefArray<csShaderVariable> variables;
+  
+    public:
+      virtual ~ShaderVariableContextImpl();
+  
+      const csRefArray<csShaderVariable>& GetShaderVariables () const
+      { return variables; }
+      virtual void AddVariable (csShaderVariable *variable);
+      virtual csShaderVariable* GetVariable (csStringID name) const;
+      virtual void PushVariables (iShaderVarStack* stacks) const;
+      virtual bool IsEmpty() const { return variables.GetSize () == 0; }  
+      virtual void ReplaceVariable (csShaderVariable *variable);
+      virtual void Clear () { variables.Empty(); }
+      virtual bool RemoveVariable (csShaderVariable* variable);
+    };
+    
+    /**
+     * iShaderVariableContext implementation that overlays (or merges) it's 
+     * variables over the variables of a given parent context.
+     */
+    class OverlayShaderVariableContextImpl : public ShaderVariableContextImpl
+    {
+      csRef<iShaderVariableContext> parentSVC;
+    public:
+      OverlayShaderVariableContextImpl (iShaderVariableContext* parent = 0) :
+	parentSVC (parent) {}
+	  
+      iShaderVariableContext* GetParentContext() const { return parentSVC; }
+      void SetParentContext (iShaderVariableContext* parent)
+      { parentSVC = parent; }
+  
+      void AddVariable (csShaderVariable *variable)
+      { ShaderVariableContextImpl::AddVariable (variable); }
+      csShaderVariable* GetVariable (csStringID name) const
+      { 
+	csShaderVariable* sv = ShaderVariableContextImpl::GetVariable (name); 
+	if ((sv == 0) && (parentSVC.IsValid()))
+	  sv = parentSVC->GetVariable (name);
+	return sv;
+      }
+      const csRefArray<csShaderVariable>& GetShaderVariables () const
+      { 
+	// @@@ Will not return parent SVs
+	return ShaderVariableContextImpl::GetShaderVariables (); 
+      }
+      void PushVariables (iShaderVarStack* stacks) const
+      { 
+	if (parentSVC.IsValid()) parentSVC->PushVariables (stacks);
+	ShaderVariableContextImpl::PushVariables (stacks); 
+      }
+      bool IsEmpty () const 
+      {
+	return ShaderVariableContextImpl::IsEmpty() 
+	  && (!parentSVC.IsValid() || parentSVC->IsEmpty());
+      }
+      void ReplaceVariable (csShaderVariable *variable)
+      { ShaderVariableContextImpl::ReplaceVariable (variable); }
+      void Clear () { ShaderVariableContextImpl::Clear(); }
+      bool RemoveVariable (csShaderVariable* variable)
+      { 
+	// @@@ Also remove from parent?
+	return ShaderVariableContextImpl::RemoveVariable (variable); 
+      }
+    };
+  } // namespace Graphics
+  
+  // Deprecated in 1.3
+  typedef CS_DEPRECATED_TYPE_MSG("Use Graphics::ShaderVariableContextImpl")
+    Graphics::ShaderVariableContextImpl ShaderVariableContextImpl;
 }
 
 /**
@@ -65,7 +121,7 @@ namespace CS
 class CS_CRYSTALSPACE_EXPORT csShaderVariableContext :
   public scfImplementation1<csShaderVariableContext, 
 			     scfFakeInterface<iShaderVariableContext> >,
-  public CS::ShaderVariableContextImpl
+  public CS::Graphics::ShaderVariableContextImpl
 {
 public:
   CS_LEAKGUARD_DECLARE (csShaderVariableContext);

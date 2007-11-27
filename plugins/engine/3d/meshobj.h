@@ -130,13 +130,15 @@ struct ExtraRenderMeshData
 /**
  * The holder class for all implementations of iMeshObject.
  */
-class csMeshWrapper : public scfImplementationExt5<csMeshWrapper,
-                                                   csObject,
-                                                   iMeshWrapper,
-                                                   iShaderVariableContext,
-                                                   iVisibilityObject,
-						   iSceneNode,
-						   iSelfDestruct>
+class csMeshWrapper : 
+  public scfImplementationExt5<csMeshWrapper,
+                               csObject,
+                               iMeshWrapper,
+                               scfFakeInterface<iShaderVariableContext>,
+                               iVisibilityObject,
+    		               iSceneNode,
+                               iSelfDestruct>,
+  public CS::Graphics::OverlayShaderVariableContextImpl
 {
   friend class csMovable;
   friend class csMovableSectorList;
@@ -201,8 +203,7 @@ protected:
   csRef<csLODListener> var_min_render_dist_listener;
   csRef<csLODListener> var_max_render_dist_listener;
 
-  csShaderVariableContext svcontext;
-  csRef<iShaderVariableContext> factorySVC;
+  csEngine* engine;
 private:
   /// Mesh object corresponding with this csMeshWrapper.
   csRef<iMeshObject> meshobj;
@@ -325,7 +326,7 @@ public:
   virtual void SetFactory (iMeshFactoryWrapper* factory)
   {
     csMeshWrapper::factory = factory;
-    factorySVC = factory ? factory->GetSVContext() : 0;
+    SetParentContext (factory ? factory->GetSVContext() : 0);
   }
   /// Get the mesh factory.
   virtual iMeshFactoryWrapper* GetFactory () const
@@ -558,12 +559,10 @@ public:
   virtual csScreenBoxResult GetScreenBoundingBox (iCamera *camera);
 
   //--------------------- SCF stuff follows ------------------------------//
-  /**\name iShaderVariableContext implementation
-   * @{ */
-  /// Add a variable to this context
-  void AddVariable (csShaderVariable *variable)
-  { svcontext.AddVariable (variable); }
 
+<<<<<<< .working
+<<<<<<< .working
+<<<<<<< .working
   /// Get a named variable from this context
   csShaderVariable* GetVariable (csStringID name) const
   { 
@@ -608,8 +607,13 @@ public:
   }
   /** @} */
 
+=======
+>>>>>>> .merge-right.r28235
+=======
+>>>>>>> .merge-right.r28235
+=======
+>>>>>>> .merge-right.r28235
   //--------------------- iSelfDestruct implementation -------------------//
-
   virtual void SelfDestruct ();
 
   /**\name iSceneNode implementation

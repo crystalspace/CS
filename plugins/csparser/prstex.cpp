@@ -36,6 +36,7 @@
 #include "iutil/document.h"
 #include "iutil/objreg.h"
 #include "iutil/strset.h"
+#include "iutil/vfs.h"
 #include "ivaria/keyval.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
@@ -138,7 +139,11 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
   if (ldr_context->CheckDupes ())
   {
     iTextureWrapper* t = Engine->FindTexture (txtname);
-    if (t) return t;
+    if (t)
+    {
+      AddToRegion (ldr_context, t->QueryObject ());
+      return t;
+    }
   }
 
   static bool deprecated_warned = false;
@@ -322,25 +327,26 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
   // Proxy texture loading if the loader isn't specified.
   if(txtname && type.IsEmpty())
   {
-      if (filename.IsEmpty())
-      {
-          filename = txtname;
-      }
-      proxyTexture proxTex;
-      proxTex.filename = filename;
-      iTextureHandle* texH = 0;
-      tex = Engine->GetTextureList()->NewTexture(texH);
-      tex->SetTextureClass(context.GetClass());
-      tex->SetFlags(context.GetFlags());
-      tex->QueryObject()->SetName(txtname);
-      proxTex.textureWrapper = tex;
-      proxTex.region = ldr_context->GetRegion();
-      if(proxTex.region)
-      {
-          proxTex.region->QueryObject()->ObjAdd(proxTex.textureWrapper->QueryObject());
-      }
-      proxyTextures.Push(proxTex);
-      return tex;
+    if (filename.IsEmpty())
+    {
+      filename = txtname;
+    }
+
+    // Get absolute path (on VFS) of the file.
+    csRef<iDataBuffer> absolutePath = VFS->ExpandPath(filename);
+    filename = absolutePath->GetData();
+
+    proxyTexture proxTex;
+    proxTex.filename = filename;
+    iTextureHandle* texH = 0;
+    tex = Engine->GetTextureList()->NewTexture(texH);
+    tex->SetTextureClass(context.GetClass());
+    tex->SetFlags(context.GetFlags());
+    tex->QueryObject()->SetName(txtname);
+    proxTex.textureWrapper = tex;
+    AddToRegion (ldr_context, proxTex.textureWrapper->QueryObject());
+    proxyTextures.Push(proxTex);
+    return tex;
   }
 
   // @@@ some more comments
@@ -524,7 +530,11 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
   if (ldr_context->CheckDupes ())
   {
     iMaterialWrapper* m = Engine->FindMaterial (matname);
-    if (m) return m;
+    if (m)
+    {
+      AddToRegion (ldr_context, m->QueryObject ());
+      return m;
+    }
   }
 
   iTextureWrapper* texh = 0;

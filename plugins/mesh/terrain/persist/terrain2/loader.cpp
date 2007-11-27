@@ -214,7 +214,8 @@ csPtr<iBase> csTerrain2FactoryLoader::Parse (iDocumentNode* node,
   return csPtr<iBase> (meshFactory);
 }
 
-bool csTerrain2FactoryLoader::ParseParams (csArray<ParamPair>& pairs, iDocumentNode* node)
+bool csTerrain2FactoryLoader::ParseParams (csArray<ParamPair>& pairs, 
+                                           iDocumentNode* node)
 {
   csRef<iDocumentNodeIterator> it2 = node->GetNodes ();
 
@@ -250,10 +251,58 @@ bool csTerrain2FactoryLoader::ParseParams (csArray<ParamPair>& pairs, iDocumentN
   return true;
 }
 
+bool csTerrain2FactoryLoader::ParseRenderParams (csArray<ParamPair>& pairs, 
+                                                 csRefArray<csShaderVariable>& svs,
+                                                 iLoaderContext* ldr_context,
+                                                 iDocumentNode* node)
+{
+  csRef<iDocumentNodeIterator> it2 = node->GetNodes ();
+
+  while (it2->HasNext ())
+  {
+    csRef<iDocumentNode> child2 = it2->Next ();
+
+    if (child2->GetType () != CS_NODE_ELEMENT) 
+      continue;
+
+    const char* value = child2->GetValue ();
+    csStringID id = xmltokens.Request (value);
+
+    switch (id)
+    {
+    case XMLTOKEN_PARAM:
+      {
+        ParamPair p;
+        p.name = child2->GetAttributeValue ("name");
+        p.value = child2->GetContentsValue ();
+
+        pairs.Push (p);
+        break;
+      }
+    case XMLTOKEN_SHADERVAR:
+      {
+        csRef<csShaderVariable> sv;
+        sv.AttachNew (new csShaderVariable);
+        if (!synldr->ParseShaderVar (ldr_context, child2, *sv)) return false;
+        svs.Push (sv);
+        break;
+      }
+    default:
+      {
+        synldr->ReportBadToken (child2);
+        return false;
+      }
+    }
+  }    
+
+  return true;
+}
+
 bool csTerrain2FactoryLoader::ParseCell (iDocumentNode *node, 
   iLoaderContext *ldr_ctx, iTerrainFactory *fact, const DefaultCellValues& defaults)
 {
   ParamPairArray renderParams, collParams, feederParams;
+  csRefArray<csShaderVariable> svs;
 
   csString name;
   csVector3 size = defaults.size;
@@ -314,7 +363,7 @@ bool csTerrain2FactoryLoader::ParseCell (iDocumentNode *node,
       break;
     case XMLTOKEN_RENDERPROPERTIES:
       {
-        if (!ParseParams (renderParams, child))
+        if (!ParseRenderParams (renderParams, svs, ldr_ctx, child))
           return false;
 
         break;
@@ -353,10 +402,18 @@ bool csTerrain2FactoryLoader::ParseCell (iDocumentNode *node,
     renderProperties->SetParameter (defaults.renderParams[i].name.GetDataSafe (), 
       defaults.renderParams[i].value.GetDataSafe ());
   }
+  for (size_t i = 0; i < defaults.svs.GetSize(); ++i)
+  {
+    renderProperties->AddVariable (defaults.svs[i]);
+  }
   for (size_t i = 0; i < renderParams.GetSize (); ++i)
   {
     renderProperties->SetParameter (renderParams[i].name.GetDataSafe (), 
       renderParams[i].value.GetDataSafe ());
+  }
+  for (size_t i = 0; i < svs.GetSize(); ++i)
+  {
+    renderProperties->AddVariable (svs[i]);
   }
 
   iTerrainCellCollisionProperties* colliderProperties = cell->GetCollisionProperties ();
@@ -432,7 +489,8 @@ bool csTerrain2FactoryLoader::ParseDefaultCell (iDocumentNode* node,
       break;
     case XMLTOKEN_RENDERPROPERTIES:
       {
-        if (!ParseParams (defaults.renderParams, child))
+        if (!ParseRenderParams (defaults.renderParams, defaults.svs, 
+            ldr_ctx, child))
           return false;
 
         break;

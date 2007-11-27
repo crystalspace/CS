@@ -63,6 +63,34 @@ struct iSndSysListener : public virtual iBase
   //virtual csSoundEnvironment GetEnvironment () = 0;
 };
 
+/**
+ * Extension to the iSndSysListener interface, allowing Doppler shift effects.
+ * The Doppler effect that causes sound sources the change in pitch as their
+ * relative velocities change. As an example the siren of an ambulance will
+ * increase in pitch as it approaches you, and decrease once it has passed you.
+ *
+ * @see iSndSysSource3DDoppler
+ */
+struct iSndSysListenerDoppler : public virtual iBase
+{
+  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
+  SCF_INTERFACE (iSndSysListenerDoppler, 0, 0, 2);
+
+  /// Set velocity (speed) of the listener
+  virtual void SetVelocity (const csVector3 &Velocity) = 0;
+  /// Set the Doppler factor
+  virtual void SetDopplerFactor (const float DopplerFactor) = 0;
+  /// Set the speed of sound
+  virtual void SetSpeedOfSound (const float SpeedOfSound) = 0;
+
+  /// Get velocity (speed) of th elistener
+  virtual const csVector3 &GetVelocity () = 0;
+  /// Get the Doppler factor
+  virtual float GetDopplerFactor () = 0;
+  /// Get the speed of sound
+  virtual float GetSpeedOfSound () = 0;
+};
+
 /** @} */
 
 #endif // __CS_SNDSYS_LISTENER_H__

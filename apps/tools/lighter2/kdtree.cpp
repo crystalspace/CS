@@ -147,7 +147,7 @@ namespace lighter
 
     //Best axis and side for planar
     uint bestAxis = ~0, bestSide = ~0;
-    size_t bestNLeft, bestNRight, bestNPlanar;
+    size_t bestNLeft = 0, bestNRight = 0, bestNPlanar = 0;
 
     for (uint axis = 0; axis < 3; ++axis)
     {

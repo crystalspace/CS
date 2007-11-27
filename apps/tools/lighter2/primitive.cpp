@@ -145,7 +145,7 @@ namespace lighter
 
   struct Scanline
   {
-    int min, max;
+    uint min, max;
   };
 
   void ScanConvert(Scanline* scanBuf, const csVector2& v1, const csVector2& v2, size_t vc)
@@ -197,11 +197,10 @@ namespace lighter
 
     for (uint i = fy; i < ly; ++i)
     {
-      int sx = (int)x;
-      if (sx < scanBuf[i].min)
-        scanBuf[i].min = sx;
-      if ((sx+1) > scanBuf[i].max)
-        scanBuf[i].max = (sx+1);
+      if (x < scanBuf[i].min)
+        scanBuf[i].min = static_cast<uint>(x);
+      if ((x+1) > scanBuf[i].max)
+        scanBuf[i].max = static_cast<uint>(x+1);
 
       x += slopeX;
     }
@@ -266,8 +265,8 @@ namespace lighter
     for (uint row = 0; row < maxRow; ++row)
     {
       // Get start and ends
-      int min = scanBuffer[row].min;
-      int max = scanBuffer[row].max;
+      uint min = scanBuffer[row].min;
+      uint max = scanBuffer[row].max;
 
       // Clip
       if ((max < 0) && (min >= uc)) continue;
@@ -279,7 +278,7 @@ namespace lighter
 
       size_t rowOffset = row*uc;
 
-      for (int col = min; col <= max; ++col)
+      for (uint col = min; col <= max; ++col)
       {
         float area = ComputeElementFraction (rowOffset+col);
         if (area > 0)

@@ -34,7 +34,6 @@ namespace CS
 {
   namespace Debug
   {
-  
     class CallStackNameResolverBfd : public iCallStackNameResolver,
 				      public CS::Memory::CustomAllocated
     {

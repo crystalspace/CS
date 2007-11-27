@@ -1,0 +1,5 @@
+SubDir TOP apps tests asndtest ;
+
+Description asndtest : "Advanced sound test" ;
+Application asndtest : [ Wildcard *.cpp *.h ] : noinstall ;
+LinkWith asndtest : crystalspace ;

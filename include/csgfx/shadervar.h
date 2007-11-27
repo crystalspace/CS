@@ -126,9 +126,19 @@ private:
 
   csRef<iShaderVariableAccessor> accessor;
 
-  csRefArray<csShaderVariable> *array;
+  csRefArray<csShaderVariable> *shaderVarArray;
 
   csStringID Name;
+
+  virtual csMatrix3* AllocateMatrixValuePtr(const csMatrix3 &value)
+  { return new csMatrix3 (value); }
+
+  virtual csReversibleTransform* AllocateTransformPtr(const csReversibleTransform &value)
+  { return new csReversibleTransform (value); }
+
+  virtual csRefArray<csShaderVariable>* AllocateShaderVarArray()
+  { return new csRefArray<csShaderVariable>; }
+
 public:
 
   /**
@@ -139,12 +149,12 @@ public:
   /// Construct with name.
   csShaderVariable (csStringID name);
   csShaderVariable (const csShaderVariable& other) : csRefCount(),
-    MatrixValuePtr(0), TransformPtr (0), array(0) { *this = other; }
+    MatrixValuePtr(0), TransformPtr (0), shaderVarArray(0) { *this = other; }
   virtual ~csShaderVariable ()
   {
     delete MatrixValuePtr;
     delete TransformPtr;
-    delete array;
+    delete shaderVarArray;
   }
 
   csShaderVariable& operator= (const csShaderVariable& copyFrom);
@@ -410,7 +420,7 @@ public:
     }
     else
     {
-      MatrixValuePtr = new csMatrix3 (value);
+      MatrixValuePtr = AllocateMatrixValuePtr(value);
     }
     return true;
   }
@@ -425,38 +435,38 @@ public:
     }
     else
     {
-      TransformPtr = new csReversibleTransform (value);
+      TransformPtr = AllocateTransformPtr(value);
     }
     return true;
   }
 
   void AddVariableToArray (csShaderVariable *variable)
   {
-    if (array) array->Push (variable);
+    if (shaderVarArray) shaderVarArray->Push (variable);
   }
 
   void RemoveFromArray (size_t element)
   {
-    if (array) array->DeleteIndex (element);
+    if (shaderVarArray) shaderVarArray->DeleteIndex (element);
   }
 
   /// Set the number of elements in an array variable
   void SetArraySize (size_t size)
   {
-    if (array == 0)
+    if (shaderVarArray == 0)
     {
-      array = new csRefArray<csShaderVariable>;
+      shaderVarArray = AllocateShaderVarArray();
     }
-    array->SetSize (size);
+    shaderVarArray->SetSize (size);
   }
 
   /// Get the number of elements in an array variable
   size_t GetArraySize ()
   {
-    if (array == 0)
+    if (shaderVarArray == 0)
       return 0;
     else
-      return array->GetSize ();
+      return shaderVarArray->GetSize ();
   }
 
   /**
@@ -466,9 +476,9 @@ public:
    */
   csShaderVariable *GetArrayElement (size_t element)
   {
-    if (array != 0 && element<array->GetSize ())
+    if (shaderVarArray != 0 && element<shaderVarArray->GetSize ())
     {
-      return array->Get (element);
+      return shaderVarArray->Get (element);
     }
     return 0;
   }
@@ -478,7 +488,7 @@ public:
    */
   void SetArrayElement (size_t element, csShaderVariable *variable)
   {
-    array->Put (element, variable);
+    shaderVarArray->Put (element, variable);
   }
 };
 

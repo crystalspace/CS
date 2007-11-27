@@ -861,7 +861,7 @@ public:
   /** @} */
 };
 
-#define CAL_TIME_2_CS_TIME(time) time * 1000
+#define CAL_TIME_2_CS_TIME(time) static_cast<csTicks>(time * 1000)
 #define CS_TIME_2_CAL_TIME(time) ((float)time) / 1000
 class csCal3dSkeletonAnimation;
 

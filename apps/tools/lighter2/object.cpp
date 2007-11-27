@@ -404,8 +404,6 @@ namespace lighter
   {
     if (lightPerVertex) return;
 
-    float totalArea = 0;
-
     // And fill it with data
     for (size_t i = 0; i < allPrimitives.GetSize(); i++)
     {
@@ -474,7 +472,7 @@ namespace lighter
       // Fake something up
       csVector3 right (1, 0, 0);
       if ((right * normal) > (1.0f - LITEPSILON))
-        right = (0, 1, 0);
+        right = csVector3(0, 1, 0);
       bitang = normal % right;
       tang = normal % bitang;
     }
@@ -497,7 +495,7 @@ namespace lighter
       // Fake something up
       csVector3 right (1, 0, 0);
       if ((right * normal) > (1.0f - LITEPSILON))
-        right = (0, 1, 0);
+        right = csVector3(0, 1, 0);
       bitang = normal % right;
       tang = normal % bitang;
     }

@@ -164,7 +164,8 @@ AS_IF([test $ac_cv_lib_m_pow = yes || test $ac_cv_lib_m_cosf = yes],
 AS_IF([test $ac_cv_lib_mx_cosf = yes],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-lmx], [+])])
 AS_IF([test $ac_cv_lib_dl_dlopen = yes],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-ldl], [+])])
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-ldl], [+])
+    AC_CHECK_LIB([dl], [dladdr], [CS_HEADER_PROPERTY([CS_HAVE_DLADDR])])])
 AS_IF([test $ac_cv_lib_nsl_gethostbyname = yes],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-lnsl], [+])])
 
@@ -475,6 +476,11 @@ CS_COMPILER_IGNORE_PRAGMAS([C++], [cs_cv_prog_cxx_ignore_unknown_pragmas],
 CS_COMPILER_IGNORE_LONG_DOUBLE([C++], [cs_cv_prog_cxx_ignore_long_double],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MANDATORY],
 	[$cs_cv_prog_cxx_ignore_long_double], [+])])
+
+CS_COMPILER_IGNORE_NON_VIRTUAL_DTOR([C++],
+    [cs_cv_prog_cxx_ignore_non_virtual_dtor],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS.WARNING.NO_NON_VIRTUAL_DTOR],
+        [$cs_cv_prog_cxx_ignore_non_virtual_dtor])])
 
 
 
@@ -1278,22 +1284,6 @@ CS_CHECK_LIB_WITH([vgvm],
     [$cs_cv_libcairomm_cflags],
     [$cs_cv_libcairomm_lflags],
     [$cs_cv_libcairomm_libs])
-
-
-
-#------------------------------------------------------------------------------
-# Check for MikMod.  In addition to the standard installed locations, we also
-# search CS/libs/libmikmod*.
-#------------------------------------------------------------------------------
-CS_CHECK_LIB_WITH([mikmod],
-    [AC_LANG_PROGRAM(
-	[[#include <mikmod.h>]],
-	[MikMod_Init("mikmodtest"); MikMod_Exit();])],
-    [$srcdir/libs/libmikmod*], [],
-    [CS_EMIT_BUILD_RESULT([cs_cv_libmikmod], [MIKMOD])], [],
-    [$cs_cv_sys_pthread_cflags],
-    [$cs_cv_sys_pthread_lflags],
-    [$cs_cv_sys_pthread_libs])
 
 
 
@@ -2215,7 +2205,7 @@ AC_CHECK_HEADERS([byteswap.h],
 #------------------------------------------------------------------------------
 # Check how to declare functions and types deprecated.
 #------------------------------------------------------------------------------
-CS_SYMBOL_QUALIFIER([how to declare deprecations],
+CS_SYMBOL_QUALIFIER([how to declare deprecation],
     [cs_cv_prog_cxx_declare_deprecated],
     [__attribute__((deprecated))], [], [C++],
     [CS_HEADER_PROPERTY([CS_ATTRIBUTE_DEPRECATED],
@@ -2227,7 +2217,7 @@ CS_SYMBOL_QUALIFIER([how to declare deprecations],
 # Check how to declare functions and types perfectly constant (not affected by
 # any global state and always returning the same value for the same input).
 #------------------------------------------------------------------------------
-CS_SYMBOL_QUALIFIER([how to declare const functions],
+CS_SYMBOL_QUALIFIER([how to declare const function],
     [cs_cv_prog_cxx_declare_const],
     [__attribute__((const))], [], [C++],
     [CS_HEADER_PROPERTY([CS_CONST_METHOD],
@@ -2239,7 +2229,7 @@ CS_SYMBOL_QUALIFIER([how to declare const functions],
 # Check how to declare functions and types pure (not affected by any global
 # state).
 #------------------------------------------------------------------------------
-CS_SYMBOL_QUALIFIER([how to declare pure functions],
+CS_SYMBOL_QUALIFIER([how to declare pure function],
     [cs_cv_prog_cxx_declare_pure],
     [__attribute__((pure))], [], [C++],
     [CS_HEADER_PROPERTY([CS_PURE_METHOD],
@@ -2250,7 +2240,7 @@ CS_SYMBOL_QUALIFIER([how to declare pure functions],
 #------------------------------------------------------------------------------
 # Check if the "malloc" attribute is available.
 #------------------------------------------------------------------------------
-CS_SYMBOL_QUALIFIER([for "malloc" attribute],
+CS_SYMBOL_QUALIFIER([how to declare allocation function],
     [cs_cv_prog_c_attr_malloc],
     [__attribute__((malloc))], [], [C])
 AS_IF([test $cs_cv_prog_c_attr_malloc != no],
@@ -2378,13 +2368,16 @@ AS_IF([test $enable_meta_info_embedding = yes],
 AS_IF([test $cs_build_mode = debug],
     [case $host_os in
 	mingw*|cygwin*)
-	    CS_CHECK_LIBBFD([emit],
-		[CS_HEADER_PROPERTY([CS_HAVE_LIBBFD])
-		cs_debug_libbfd=yes],
-		[cs_debug_libbfd=no])
-	    ;;
-	*) cs_debug_libbfd=no ;;
+	    do_check_libbfd=yes ;;
+	*) do_check_libbfd=$ac_cv_lib_dl_dladdr ;;
     esac],
+    [do_check_libbfd=no])
+
+AS_IF([test $do_check_libbfd = yes],
+    [CS_CHECK_LIBBFD([emit],
+	[CS_HEADER_PROPERTY([CS_BFD_DEBUG_SYMBOLS])
+	cs_debug_libbfd=yes],
+	[cs_debug_libbfd=no])],
     [cs_debug_libbfd=no])
 
 

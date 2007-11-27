@@ -48,7 +48,8 @@ static csStringID textureLodDistanceID = csInvalidStringID;
 class TerrainBBCellRenderProperties :
   public scfImplementation2<TerrainBBCellRenderProperties,
                             iTerrainCellRenderProperties,
-                            scfFakeInterface<iShaderVariableContext> >
+                            scfFakeInterface<iShaderVariableContext> >,
+  public CS::Graphics::ShaderVariableContextImpl
 {
 public:
   TerrainBBCellRenderProperties ()
@@ -58,7 +59,8 @@ public:
   }
 
   TerrainBBCellRenderProperties (const TerrainBBCellRenderProperties& other)
-    : scfImplementationType (this), visible (other.visible), 
+    : scfImplementationType (this), 
+    CS::Graphics::ShaderVariableContextImpl (other), visible (other.visible), 
     blockResolution (other.blockResolution), minSteps (other.minSteps), 
     splitDistanceCoeff (other.splitDistanceCoeff), splatDistance (other.splatDistance)
   {
@@ -134,47 +136,6 @@ public:
       new TerrainBBCellRenderProperties (*this));
   }
 
-  //-- iShaderVariableContext --
-  virtual void AddVariable (csShaderVariable *variable)
-  {
-    svContext.AddVariable (variable);
-  }
-  virtual csShaderVariable* GetVariable (csStringID name) const
-  {
-    return svContext.GetVariable (name);
-  }
-
-  virtual const csRefArray<csShaderVariable>& GetShaderVariables () const
-  {
-    return svContext.GetShaderVariables ();
-  }
-
-  virtual void PushVariables (csShaderVariableStack& stacks) const
-  {
-    svContext.PushVariables (stacks);
-  }
-
-  virtual bool IsEmpty () const
-  {
-    return svContext.IsEmpty ();
-  }
-
-  virtual void ReplaceVariable (csShaderVariable* variable)
-  {
-    svContext.ReplaceVariable (variable);
-  }
-
-  virtual void Clear()
-  {
-    svContext.Clear ();
-  }
-
-  virtual bool RemoveVariable (csShaderVariable* variable) 
-  {
-    return svContext.RemoveVariable (variable);
-  }
-
-
 private:
   // Per cell properties
   bool visible;
@@ -190,9 +151,6 @@ private:
 
   // Splatting end distance
   float splatDistance;
-
-  //@@TODO! Better handling of SVs
-  csShaderVariableContext svContext;
 };
 
 class TerrainBBSVAccessor : public scfImplementation1<TerrainBBSVAccessor,
@@ -329,6 +287,13 @@ struct TerrainBlock
   bool dataValid;
 };
 
+struct OverlaidShaderVariableContext : 
+  public scfImplementation1<OverlaidShaderVariableContext, 
+			    scfFakeInterface<iShaderVariableContext> >,
+  public CS::Graphics::OverlayShaderVariableContextImpl
+{
+  OverlaidShaderVariableContext () : scfImplementationType (this) {}
+};
 
 struct TerrainCellRData : public csRefCount
 {
@@ -352,10 +317,10 @@ struct TerrainCellRData : public csRefCount
   csBlockAllocator<TerrainBlock> terrainBlockAllocator;
 
   // Per cell base material sv context
-  csRef<csShaderVariableContext> baseLayerSVContext;
+  csRef<iShaderVariableContext> commonSVContext;
 
   // Per cell, per layer sv contexts
-  csRefArray<csShaderVariableContext> svContextArray;
+  csRefArray<OverlaidShaderVariableContext> svContextArray;
   csRefArray<iTextureHandle> alphaMapArray;
   
   // Settings
@@ -921,7 +886,7 @@ void TerrainBlock::CullRenderMeshes (iRenderView* rview, const csPlane3* cullPla
     if (j < 0)
     {
       mat = renderData->cell->GetBaseMaterial ();
-      svContext = renderData->baseLayerSVContext;
+      svContext = renderData->commonSVContext;
     }
     else
     {
@@ -961,7 +926,7 @@ TerrainCellRData::TerrainCellRData (iTerrainCell* cell,
 
   blockResolution = properties->GetBlockResolution ();
 
-  baseLayerSVContext.AttachNew (new csShaderVariableContext);
+  commonSVContext = cell->GetRenderProperties ();
   svContextArray.SetSize (renderer->GetMaterialPalette ().GetSize ());
   alphaMapArray.SetSize (renderer->GetMaterialPalette ().GetSize ());
 
@@ -978,7 +943,7 @@ TerrainCellRData::TerrainCellRData (iTerrainCell* cell,
     new csShaderVariable (textureLodDistanceID));
   lodVar->SetAccessor (svAccessor);
   
-  baseLayerSVContext->AddVariable (lodVar);
+  commonSVContext->AddVariable (lodVar);
 
   for (size_t i = 0; i < 4; ++i)
   {
@@ -1167,16 +1132,11 @@ void csTerrainBruteBlockRenderer::OnMaterialMaskUpdate (iTerrainCell* cell, size
 
     if (!data->svContextArray[materialIdx])
     {
-      csRef<csShaderVariableContext> ctx;
-      ctx.AttachNew (new csShaderVariableContext);
+      csRef<OverlaidShaderVariableContext> ctx;
+      ctx.AttachNew (new OverlaidShaderVariableContext);
+      ctx->SetParentContext (data->commonSVContext);
 
       data->svContextArray.Put (materialIdx, ctx);
-
-      csRef<csShaderVariable> lodVar; 
-      lodVar.AttachNew (new csShaderVariable (textureLodDistanceID));
-      lodVar->SetAccessor (data->svAccessor);
-
-      data->svContextArray[materialIdx]->AddVariable (lodVar);
     }
 
     if (!data->alphaMapArray[materialIdx])

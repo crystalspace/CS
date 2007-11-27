@@ -153,6 +153,21 @@ iSndSysListener_swigregister = _isndsys.iSndSysListener_swigregister
 iSndSysListener_swigregister(iSndSysListener)
 iSndSysListener_scfGetVersion = _isndsys.iSndSysListener_scfGetVersion
 
+class iSndSysListenerDoppler(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def SetVelocity(*args): return _isndsys.iSndSysListenerDoppler_SetVelocity(*args)
+    def SetDopplerFactor(*args): return _isndsys.iSndSysListenerDoppler_SetDopplerFactor(*args)
+    def SetSpeedOfSound(*args): return _isndsys.iSndSysListenerDoppler_SetSpeedOfSound(*args)
+    def GetVelocity(*args): return _isndsys.iSndSysListenerDoppler_GetVelocity(*args)
+    def GetDopplerFactor(*args): return _isndsys.iSndSysListenerDoppler_GetDopplerFactor(*args)
+    def GetSpeedOfSound(*args): return _isndsys.iSndSysListenerDoppler_GetSpeedOfSound(*args)
+    __swig_destroy__ = _isndsys.delete_iSndSysListenerDoppler
+    __del__ = lambda self : None;
+iSndSysListenerDoppler_swigregister = _isndsys.iSndSysListenerDoppler_swigregister
+iSndSysListenerDoppler_swigregister(iSndSysListenerDoppler)
+
 class iSndSysLoader(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
@@ -204,8 +219,6 @@ class iSndSysSource(core.iBase):
     def SetVolume(*args): return _isndsys.iSndSysSource_SetVolume(*args)
     def GetVolume(*args): return _isndsys.iSndSysSource_GetVolume(*args)
     def GetStream(*args): return _isndsys.iSndSysSource_GetStream(*args)
-    def AddOutputFilter(*args): return _isndsys.iSndSysSource_AddOutputFilter(*args)
-    def RemoveOutputFilter(*args): return _isndsys.iSndSysSource_RemoveOutputFilter(*args)
     def GetPtr(*args): return _isndsys.iSndSysSource_GetPtr(*args)
     scfGetVersion = staticmethod(_isndsys.iSndSysSource_scfGetVersion)
     __swig_destroy__ = _isndsys.delete_iSndSysSource
@@ -220,10 +233,77 @@ class iSndSysSourceSoftware(iSndSysSource):
     __repr__ = _swig_repr
     def MergeIntoBuffer(*args): return _isndsys.iSndSysSourceSoftware_MergeIntoBuffer(*args)
     def ProcessOutputFilters(*args): return _isndsys.iSndSysSourceSoftware_ProcessOutputFilters(*args)
+    def AddOutputFilter(*args): return _isndsys.iSndSysSourceSoftware_AddOutputFilter(*args)
+    def RemoveOutputFilter(*args): return _isndsys.iSndSysSourceSoftware_RemoveOutputFilter(*args)
     __swig_destroy__ = _isndsys.delete_iSndSysSourceSoftware
     __del__ = lambda self : None;
 iSndSysSourceSoftware_swigregister = _isndsys.iSndSysSourceSoftware_swigregister
 iSndSysSourceSoftware_swigregister(iSndSysSourceSoftware)
+
+class iSndSysSourceOpenAL(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    __swig_destroy__ = _isndsys.delete_iSndSysSourceOpenAL
+    __del__ = lambda self : None;
+iSndSysSourceOpenAL_swigregister = _isndsys.iSndSysSourceOpenAL_swigregister
+iSndSysSourceOpenAL_swigregister(iSndSysSourceOpenAL)
+
+class iSndSysSource3D(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def SetPosition(*args): return _isndsys.iSndSysSource3D_SetPosition(*args)
+    def GetPosition(*args): return _isndsys.iSndSysSource3D_GetPosition(*args)
+    def SetMinimumDistance(*args): return _isndsys.iSndSysSource3D_SetMinimumDistance(*args)
+    def SetMaximumDistance(*args): return _isndsys.iSndSysSource3D_SetMaximumDistance(*args)
+    def GetMinimumDistance(*args): return _isndsys.iSndSysSource3D_GetMinimumDistance(*args)
+    def GetMaximumDistance(*args): return _isndsys.iSndSysSource3D_GetMaximumDistance(*args)
+    __swig_destroy__ = _isndsys.delete_iSndSysSource3D
+    __del__ = lambda self : None;
+iSndSysSource3D_swigregister = _isndsys.iSndSysSource3D_swigregister
+iSndSysSource3D_swigregister(iSndSysSource3D)
+
+class iSndSysSource3DDirectionalSimple(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def SetDirection(*args): return _isndsys.iSndSysSource3DDirectionalSimple_SetDirection(*args)
+    def GetDirection(*args): return _isndsys.iSndSysSource3DDirectionalSimple_GetDirection(*args)
+    def SetDirectionalRadiation(*args): return _isndsys.iSndSysSource3DDirectionalSimple_SetDirectionalRadiation(*args)
+    def GetDirectionalRadiation(*args): return _isndsys.iSndSysSource3DDirectionalSimple_GetDirectionalRadiation(*args)
+    __swig_destroy__ = _isndsys.delete_iSndSysSource3DDirectionalSimple
+    __del__ = lambda self : None;
+iSndSysSource3DDirectionalSimple_swigregister = _isndsys.iSndSysSource3DDirectionalSimple_swigregister
+iSndSysSource3DDirectionalSimple_swigregister(iSndSysSource3DDirectionalSimple)
+
+class iSndSysSource3DDirectional(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def SetDirection(*args): return _isndsys.iSndSysSource3DDirectional_SetDirection(*args)
+    def GetDirection(*args): return _isndsys.iSndSysSource3DDirectional_GetDirection(*args)
+    def SetDirectionalRadiationInnerCone(*args): return _isndsys.iSndSysSource3DDirectional_SetDirectionalRadiationInnerCone(*args)
+    def SetDirectionalRadiationOuterCone(*args): return _isndsys.iSndSysSource3DDirectional_SetDirectionalRadiationOuterCone(*args)
+    def SetDirectionalRadiationOuterGain(*args): return _isndsys.iSndSysSource3DDirectional_SetDirectionalRadiationOuterGain(*args)
+    def GetDirectionalRadiationInnerCone(*args): return _isndsys.iSndSysSource3DDirectional_GetDirectionalRadiationInnerCone(*args)
+    def GetDirectionalRadiationOuterCone(*args): return _isndsys.iSndSysSource3DDirectional_GetDirectionalRadiationOuterCone(*args)
+    def GetDirectionalRadiationOuterGain(*args): return _isndsys.iSndSysSource3DDirectional_GetDirectionalRadiationOuterGain(*args)
+    __swig_destroy__ = _isndsys.delete_iSndSysSource3DDirectional
+    __del__ = lambda self : None;
+iSndSysSource3DDirectional_swigregister = _isndsys.iSndSysSource3DDirectional_swigregister
+iSndSysSource3DDirectional_swigregister(iSndSysSource3DDirectional)
+
+class iSndSysSource3DDoppler(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def SetVelocity(*args): return _isndsys.iSndSysSource3DDoppler_SetVelocity(*args)
+    def GetVelocity(*args): return _isndsys.iSndSysSource3DDoppler_GetVelocity(*args)
+    __swig_destroy__ = _isndsys.delete_iSndSysSource3DDoppler
+    __del__ = lambda self : None;
+iSndSysSource3DDoppler_swigregister = _isndsys.iSndSysSource3DDoppler_swigregister
+iSndSysSource3DDoppler_swigregister(iSndSysSource3DDoppler)
 
 class iSndSysSourceSoftware3D(iSndSysSourceSoftware):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -365,6 +445,17 @@ class iSndSysRendererSoftware(core.iBase):
     __del__ = lambda self : None;
 iSndSysRendererSoftware_swigregister = _isndsys.iSndSysRendererSoftware_swigregister
 iSndSysRendererSoftware_swigregister(iSndSysRendererSoftware)
+
+class iSndSysRendererOpenAL(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def LockWait(*args): return _isndsys.iSndSysRendererOpenAL_LockWait(*args)
+    def Release(*args): return _isndsys.iSndSysRendererOpenAL_Release(*args)
+    __swig_destroy__ = _isndsys.delete_iSndSysRendererOpenAL
+    __del__ = lambda self : None;
+iSndSysRendererOpenAL_swigregister = _isndsys.iSndSysRendererOpenAL_swigregister
+iSndSysRendererOpenAL_swigregister(iSndSysRendererOpenAL)
 
 class iSndSysSoftwareDriver(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')

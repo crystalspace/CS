@@ -110,10 +110,13 @@ rule PythModDepends
   }
 }
 
+if $(PYTHON.AVAILABLE) = "yes"
+{
 Description pythmod : "build all python bindings modules" ;
 PythModDepends coremod imeshmod isndsysmod ivariamod ienginemod cstoolmod
   ivideomod imapmod csgfxmod csgeommod ;
 Depends bindings : pythmod ;
+}
 
 # rule to move __init__.py file to the generated python bindings
 # folder.

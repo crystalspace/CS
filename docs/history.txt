@@ -6,6 +6,175 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Nov-2007
+	- Vincent merged OpenAL branch (r24357:28234) into trunk.
+22-Nov-2007
+	- Marten fixed a possible bug in threading code.
+21-Nov-2007
+	- res added the msvc9 directories to jobber.cfg.
+        - Mike Gist changed object loading so that regions hold a ref to
+          the object after finding a 'duplicate'.
+        - Mike Gist updated the proxy texture code and the
+          unusedresourcehelper functions for the case where multiple regions
+          hold a ref to an object.
+        - Mike Gist added a function to iRegion to find and return an iShader
+          child object and a unusedresourcehelper function to unregister
+          unused shaders in a given list.
+20-Nov-2007
+	- Eric Sunshine eliminated compilation warnings in software renderer.
+	- Eric Sunshine removed the compiler-based deprecation attribute from
+	  CS::Graphics::RenderMeshModes::flipCulling since the inline
+	  constructors references this variable and cause a Niagara of warnings
+	  to flood the build. Worse, even if external projects fix their own
+	  code to avoid this variable, they still get penalized by warnings
+	  because of the constructors (over which code external projects have
+	  no control). One way to avoid this problem would be to un-inline the
+	  constructors and then disable the deprecation warning only when
+	  compiling the implementation file containing the constructors. A
+	  potential difficulty with this approach, however, is that there is no
+	  obvious location in the CS/libs hierarchy for such an implementation
+	  file to reside.  Since it is considered very unlikely that external
+	  projects will be accessing this variable, and since un-inlining the
+	  constructors is perhaps unnecessarily complicated, the decision was
+	  made instead to remove the compiler-based deprecation attribute, but
+	  retain the documentation-based deprecation warning. If real-world
+	  experience shows that removing the compiler attribute was the wrong
+	  approach, then the un-inlining approach can instead be implemented.
+	- Eric Sunshine fixed bug in CS/plugins/cscript/Jamfile where it
+	  unconditionally referenced Python-related targets even if Python SDK
+	  was not found or was disabled explicitly, thus breaking the build in
+	  those cases (and indirectly causing makefile emulation generation to
+	  fail).
+	- Eric Sunshine fixed bug in processorspecdetection_nonwin_gcc_x86.h
+	  where it referenced and returned to the caller uninitialized state.
+	- Eric Sunshine added 'non-virtual destructor' warning suppression to
+	  apps/test/wxtest/Jamfile to silence warnings about header problems
+	  over which we have no control (for wxWidgets shipped with Mac OS X).
+	- Eric Sunshine eliminated numerous compilation warnings throughout
+	  CS/apps plus a couple apparent outright bugs in lighter2 resulting
+	  from invalid csVector3 construction.
+        - Mike Gist changed texture parsing to store the absolute (VFS)
+          file path instead of the relative file path. Resolves #417
+        - Mike Gist added some virtual allocator methods to csShaderVariable.
+          Should resolve #72.
+	- Eric Sunshine fixed bug in recently added
+	  CS::Graphics::RenderMeshModes copy-constructor. Resolves issue #420.
+	- Eric Sunshine eliminated some more compilation warnings in lighter2
+	  reported by a more recent gcc. Also normalized formatting of size_t
+	  per suggestion from Frank.
+	- Eric Sunshine eliminated compilation warning in sprcal3d.
+	- res copied the debug symbol collection and file upload Jam code from
+	  CSlibs.
+	- res added support for version 9 to the VC project generation.
+19-Nov-2007
+	- Eric Sunshine fixed OpenAL renderer to take advantage of
+	  CS_OPENAL_PATH preprocessor symbol when performing #includes. The
+	  value of this symbol is determined by the configure script as 'AL' on
+	  most platforms and 'OpenAL' on Mac OS X. Resolves issue #415.
+	- Eric Sunshine eliminated compilation warnings in OpenAL renderer.
+	- Fossi fixed a null pointer error on loading imposters.
+	- res fixed shared library building breakage after r28177. (A
+	  reference to a parameter of the Win32 SystemLinkSharedLibrary rule
+	  wasn't updated when the parameter placement changed.)
+	- Eric Sunshine generalized "checking..." message for
+	  __attribute__((malloc)) in configure.ac so that it is not quite so
+	  GNU-specific. Also normalized the message to match format of other
+	  similar __attribute__(()) checks.
+	- Eric Sunshine added copy-constructor to CS::Graphics::RenderMeshModes
+	  to pacify Mac OS X 4.0.1 compiler which complained about having to
+	  synthesize the method when invoked by
+	  csGLGraphics3D::DrawSimpleMesh().
+	- Eric Sunshine fixed incorrect type in declaration of
+	  csGLBasicTextureHandle::pbo, which caused compilation to break on Mac
+	  OS X.  Resolves issue #414.
+	- Eric Sunshine added configure.ac check to determine how to suppress
+	  warnings about non-virtual destructors in classes with virtual
+	  methods. CS code itself does not require such suppression, but some
+	  3rd-party libraries employed by CS publish headers which contain this
+	  fault. (Some versions of wxWidgets and cppunit are notable examples.)
+	- res fixed csCommonImageFile to compile when THREADED_LOADING is
+	  disabled.
+	- Eric Sunshine generalized the non-virtual destructor warning
+	  suppression check and moved it from configure.ac to
+	  CS/mk/autoconf/warnings.m4 for use by external projects.
+	- Eric Sunshine added 'non-virtual destructor' warning suppression to
+	  plugins/video/canvas/wxgl/Jamfile to silence warnings about header
+	  problems over which we have no control (for wxWidgets shipped with
+	  Mac OS X).
+18-Nov-2007
+	- Eric Sunshine fixed gristing problem in LibraryShared rule in
+	  library.jam which caused it to leave symbolic links laying around in
+	  top-level build directory at 'clean' time. Also added missing Clean
+	  rule invocation to Library implementation. Fixes issue #413.
+	- Eric Sunshine fixed bugs in construction of '$(libname)clean' targets
+	  in SystemLinkSharedLibrary implementations in unix.jam and win32.jam
+	  which resulted in auxilliary files created by those rules (such as
+	  .dbg and .def) to be left around when those clean targets were
+	  invoked.
+	- Eric Sunshine fixed bug in SystemLinkSharedLibrary in unix.jam which
+	  caused 'clean' targets to miss generated .resp file.
+	- Eric Sunshine simplified and normalized implementation of DoSymLink
+	  actions in helper.jam.
+15-Nov-2007
+	- res changed BfdModuleHelperWin32 to convert backslashes in the 
+	  module name into forward slashes - libbfd wants these.
+	- res changed BfdSymbols to always use separate debug info if present,
+	  not only if the actual module has not symbols - this works better on
+	  Win32 where some symbols (exported funtions, mostly) are always
+	  found in the actual module.
+	- Jorrit fixed a small bug in Dynavis with regards to debugging
+	  output.
+	- Jorrit fixed a bug in dynavis where during update of an object
+	  the check for outline culling was using the old version of
+	  the goodoccluder flag.
+	- Jorrit changed Dynavis so that the warning if a model is not closed
+	  is not used if the model has less then 16 triangles. In that case
+	  Dynavis will not use outline culling anyway so the warning is
+	  useless.
+	- Eric Sunshine fixed bugs in several Jamfiles which referenced the
+	  target 'vfs' unconditionally. This caused Jam to abort if zlib was
+	  not found at configure time, and also caused makefile emulation layer
+	  creation to fail.
+	- Eric Sunshine removed the unused MikMod check from configure.ac.
+	- Eric Sunshine removed unportable shell constructs from
+	  CS/bin/autogen.sh.
+        - Mike Gist fixed a few issues with the forceLoadTextures argument
+          in some functions in csparser, which were causing incorrect default
+          behaviour (and thus breaking some backwards compatibility).
+	- res fixed the static plugins linking library-side glue to also work
+	  when shared libs are disabled.
+	- res removed the "platform allocator" stuff (which became unnecessary
+	  when the malloc/new override was removed).
+	- res tweaked the VC projects have the same .pdb file used by compiler
+	  and linker when building shared libs.
+14-Nov-2007
+	- res fixed BfdModuleHelperWin32 to actually build on MinGW.
+13-Nov-2007
+	- res made the following changes:
+	    - Changed the BFD callstack name resolution helper to be (mostly)
+	      platform-agnostic - a helper is still needed to provide module
+	      file names and addresses.
+	    - Added such a helper for all platforms
+	      supporting dladdr(). 
+	    - Fixed te BFD symbol handler to explicitly try to follow
+	      .gnu_debuglink when no symbols are found in the "main" file.
+	  Together, these changes fix #165.
+	- Eric Sunshine eliminated several compilation warnings in the core
+	  library.
+	- Eric Sunshine fixed sed expression in CS/mk/autoconf/crystal.m4 to
+	  work with POSIX-compliant sed commands (such as the BSD version on
+	  Mac OS X) which recognize only the '*' regex repetition token.
+	  (Portable scripts should not use '+', '?', or '{n,m}' repetition
+	  notation.) Resolves #411.
+11-Nov-2007
+	- res moved CS::ShaderVariableContextImpl to the CS::Graphics
+	  namespace.
+	- res added CS::Graphics::OverlayShaderVariableContextImpl - a shader
+	  variable context that "overlays" SVs over some other given context.
+	- res changed the terrain2 plugin to make the shader variable context
+	  from the terrain cell render properties available for rendering.
+	- res made the terrain2 loader load SVs into cell rendering properties.
+	- res added initial support for lightmaps to the terrain_fixed shaders.
 10-Nov-2007
 	- Vincent applied res' patch for configure OpenAL check. It was
 	  looking for alut, which is not used by CS sound system.
@@ -296,7 +465,11 @@ chronological order.
 	- res "generalized" the MSVC deprecation warning headers into 
 	  csutil/deprecation_warn_* since latest gcc also offers a mechanism 
 	  to silence deprecation warnings. 
+	- Mike Gist added a compile fix for the OpenAL plugin on MSVC.
 19-Oct-2007
+	- Vincent added comments about using iSndSysSource3D,
+	  iSndSysSource3DDirectional and iSndSysSource3DDirectionalSimple
+	  instead of deprecated iSndSysSourceSoftware3D interface.
 	- caedes fixed element size in swig iDataBuffer buffer declaration.
 	- res changed the GL texture blitting logic to make sure the texture
 	  is in the desired format even if only a partial area is changed.
@@ -363,6 +536,8 @@ chronological order.
 	- res enabled shared libraries by default on Win32 and Linux.
 	- res merged the MSVC project shared libraries support from the
 	  msvc-dlls branch.
+	- Vincent restored iSndSysSourceSoftware3D interface for the sake of
+	  compatibility and deprecated it.
 	- res fixed msvcgen.jam to use MSVC.PREFIX.library_static instead of
 	  MSVC.PREFIX.library everywhere.
 	- res added a new interface for directly setting texture pixel data:
@@ -942,6 +1117,8 @@ chronological order.
 	  the users.
 	- Jorrit reverted r27048 (quotes for javac detection). This fixes
 	  both #377 and #378.
+	- Vincent commented explicit OSS driver for software sound renderer in
+	  OpenAL branch. Also added examples for other drivers requests.
 6-Sep-2007
 	- res applied a patch from 'sarah' to fix compiling after merging some
 	  weaver changes from render manager branch (trac #384).
@@ -949,6 +1126,8 @@ chronological order.
 	  CS_LOAD_PLUGIN_ALWAYS, the function remains in the bindings but is
 	  deprecated now (otherwise some people might not have a chance to
 	  update).
+	- Vincent added missing trailing semicolons for some CS_ASSERT() in
+	  OpenAL renderer plugin, fixing building errors in optimized mode.
 	- Mike Gist fixed bug #351 (wxgl compilation problem).
 	- res fixed a null pointer access in null3d when null2d is not present.
 	- res changed glshader_cg to always use TinyXML to load the "coercion

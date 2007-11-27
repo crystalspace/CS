@@ -220,7 +220,6 @@ private:
   {
       csWeakRef<iTextureWrapper> textureWrapper;
       csString filename;
-      iRegion* region;
   };
 
   /// Points to proxy textures ready for processing.
@@ -499,7 +498,7 @@ private:
    * thing templates, sounds and textures.
    */
   bool LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* node,
-  	iStreamSource* ssource, iMissingLoaderData* missingdata, bool loadProxyTex = true, bool forceLoadTextures = false);
+  	iStreamSource* ssource, iMissingLoaderData* missingdata, bool loadProxyTex = true, bool forceLoadTextures = true);
 
   /// Load map from a memory buffer
   bool LoadMap (iLoaderContext* ldr_context, iDocumentNode* world_node,
@@ -655,7 +654,7 @@ public:
 
   bool Load (iDataBuffer* buffer, const char* fname, iBase*& result,
   	iRegion* region, bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-    const char* override_name, iMissingLoaderData* missingdata, bool forceLoadTextures);
+    const char* override_name, iMissingLoaderData* missingdata, bool forceLoadTextures = true);
   virtual bool Load (const char* fname, iBase*& result, iRegion* region,
   	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
 	const char* override_name, iMissingLoaderData* missingdata, bool forceLoadTextures);
