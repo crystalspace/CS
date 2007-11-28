@@ -26,6 +26,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgeom/trimeshtools.h"
 #include "csgeom/trimesh.h"
 #include "cstool/collider.h"
+#include "csutil/cfgacc.h"
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
 #include "iengine/engine.h"
@@ -63,6 +64,117 @@ CS_IMPLEMENT_PLUGIN
 
 CS_PLUGIN_NAMESPACE_BEGIN(odedynam)
 {
+
+  static const char messageID[] = "crystalspace.dynamics.ode";
+
+class ODEMessages
+{
+  int lastSeverity;
+  const char* lastType;
+  int lastErrnum;
+  csString lastMessagePrefix;
+  size_t lastMessageCount;
+  csString lastMessage;
+
+  csTicks lastFlush;
+  
+  void FlushMessages ()
+  {
+    if (lastMessageCount == 0) return;
+
+    if (lastMessageCount > 1)
+    {
+      csReport (0, lastSeverity, messageID,
+        "ODE %s %d: %s [and %zu similar]", lastType, lastErrnum, 
+        lastMessage.GetData(), lastMessageCount-1);
+    }
+    else 
+    {
+      csReport (0, lastSeverity, messageID,
+        "ODE %s %d: %s", lastType, lastErrnum, lastMessage.GetData());
+    }
+    lastMessageCount = 0;
+  }
+
+  void OutputMessage (int severity, const char* type, int errnum,
+    const char *msg, va_list ap)
+  {
+    if (severity < 0) return;
+
+    csStringFast<256> buf;
+    buf.FormatV (msg, ap);
+    if (immediateMessages)
+    {
+      csReport (0, severity, messageID,
+        "ODE %s %d: %s", type, errnum, buf.GetData());
+      return;
+    }
+
+    size_t prefixLen = buf.FindFirst (",.");
+    if (prefixLen == (size_t)-1) prefixLen = buf.Length();
+    if (lastMessageCount > 0)
+    {
+      bool flushMessages = (severity != lastSeverity)
+        || (lastType != type)
+        || (lastErrnum != errnum)
+        || (strncmp (lastMessagePrefix, buf, prefixLen) != 0);
+      if (flushMessages) FlushMessages ();
+    }
+    
+    lastSeverity = severity;
+    lastType = type;
+    lastErrnum = errnum;
+    lastMessagePrefix.Replace (buf, prefixLen);
+    lastMessageCount++;
+    lastMessage = buf;
+  }
+
+  static void ErrorHandler (int errnum, const char *msg, va_list ap)
+  { 
+    theMessages->OutputMessage (theMessages->errorSeverity, "error", errnum, 
+      msg, ap); 
+  }
+  static void DebugHandler (int errnum, const char *msg, va_list ap)
+  { 
+    theMessages->OutputMessage (theMessages->debugSeverity, "debug message", 
+      errnum, msg, ap); 
+  }
+  static void MessageHandler (int errnum, const char *msg, va_list ap)
+  { 
+    theMessages->OutputMessage (theMessages->messageSeverity, "message", 
+      errnum, msg, ap);
+  }
+public:
+  CS_DECLARE_STATIC_CLASSVAR(theMessages, GetODEMessages, ODEMessages);
+  int errorSeverity;
+  int debugSeverity;
+  int messageSeverity;
+  bool immediateMessages;
+  int messageInterval;
+
+  ODEMessages () : lastSeverity (-1), lastType (0), lastErrnum (-1),
+    lastMessageCount (0), lastFlush (0),
+    errorSeverity (CS_REPORTER_SEVERITY_WARNING),
+    debugSeverity (CS_REPORTER_SEVERITY_NOTIFY),
+    messageSeverity (CS_REPORTER_SEVERITY_NOTIFY),
+    immediateMessages (false), messageInterval (1000)
+  {
+    dSetMessageHandler (&MessageHandler);
+    dSetDebugHandler (&DebugHandler);
+    dSetErrorHandler (&ErrorHandler);
+  }
+
+  void IntervalFlushMessages ()
+  {
+    csTicks time = csGetTicks ();
+    if (time - lastFlush < messageInterval) return;
+    FlushMessages ();
+    lastFlush = time;
+  }
+};
+
+CS_IMPLEMENT_STATIC_CLASSVAR(ODEMessages, theMessages, GetODEMessages,
+  ODEMessages, ());
 
 SCF_IMPLEMENT_FACTORY (csODEDynamics)
 
@@ -111,6 +223,29 @@ csODEDynamics::~csODEDynamics ()
   }
 }
 
+static void HandleMessageSeverity (iObjectRegistry* object_reg,
+                                   const char* sevStr,
+                                   int& severity)
+{
+  if (strcmp (sevStr, "bug") == 0)
+    severity = CS_REPORTER_SEVERITY_BUG;
+  else if (strcmp (sevStr, "error") == 0)
+    severity = CS_REPORTER_SEVERITY_ERROR;
+  else if (strcmp (sevStr, "warning") == 0)
+    severity = CS_REPORTER_SEVERITY_WARNING;
+  else if (strcmp (sevStr, "notify") == 0)
+    severity = CS_REPORTER_SEVERITY_NOTIFY;
+  else if (strcmp (sevStr, "debug") == 0)
+    severity = CS_REPORTER_SEVERITY_DEBUG;
+  else if (strcmp (sevStr, "off") == 0)
+    severity = -1;
+  else
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+      messageID, "Unknown message severity '%s'", sevStr);
+  }
+}
+
 bool csODEDynamics::Initialize (iObjectRegistry* object_reg)
 {
   csODEDynamics::object_reg = object_reg;
@@ -120,6 +255,26 @@ bool csODEDynamics::Initialize (iObjectRegistry* object_reg)
     return false;
 
   PreProcess = csevPreProcess (object_reg);
+
+  // Set up message handlers
+  csConfigAccess cfg (object_reg, "/config/odedynam.cfg");
+  ODEMessages::GetODEMessages ()->immediateMessages = 
+    cfg->GetBool ("Dynamics.ODE.MessagesImmediate", false);
+
+  if (cfg->KeyExists ("Dynamics.ODE.MessageSeverity.Debug"))
+    HandleMessageSeverity (object_reg, 
+      cfg->GetStr ("Dynamics.ODE.MessageSeverity.Debug"),
+      ODEMessages::GetODEMessages ()->debugSeverity);
+  if (cfg->KeyExists ("Dynamics.ODE.MessageSeverity.Message"))
+    HandleMessageSeverity (object_reg, 
+      cfg->GetStr ("Dynamics.ODE.MessageSeverity.Message"),
+      ODEMessages::GetODEMessages ()->messageSeverity);
+  if (cfg->KeyExists ("Dynamics.ODE.MessageSeverity.Error"))
+    HandleMessageSeverity (object_reg, 
+      cfg->GetStr ("Dynamics.ODE.MessageSeverity.Error"),
+      ODEMessages::GetODEMessages ()->errorSeverity);
+
+  messageInterval = cfg->GetInt ("Dynamics.ODE.MessageInterval");
 
   return true;
 }
@@ -437,6 +592,7 @@ bool csODEDynamics::HandleEvent (iEvent& Event)
         dJointGroupEmpty (contactjoints);
       }
     }
+    ODEMessages::GetODEMessages ()->IntervalFlushMessages ();
     return true;
   }
   return false;
