@@ -274,7 +274,8 @@ bool csODEDynamics::Initialize (iObjectRegistry* object_reg)
       cfg->GetStr ("Dynamics.ODE.MessageSeverity.Error"),
       ODEMessages::GetODEMessages ()->errorSeverity);
 
-  messageInterval = cfg->GetInt ("Dynamics.ODE.MessageInterval");
+  ODEMessages::GetODEMessages ()->messageInterval =
+    cfg->GetInt ("Dynamics.ODE.MessageInterval");
 
   return true;
 }

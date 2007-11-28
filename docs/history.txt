@@ -10,6 +10,7 @@ chronological order.
 	- res changed the ODE plugin to install custom ODE message handlers
 	  (which can make errors less annoying and reduce the output spam by
 	  buffering up multiple similar messages).
+	- Vincent fixed a build error with GCC (undeclared messageInterval).
 24-Nov-2007
 	- Vincent merged OpenAL branch (r24357:28234) into trunk.
 22-Nov-2007
