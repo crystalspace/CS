@@ -17,7 +17,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-/**\file 
+/**ile 
  * Directory master header. This header file includes all headers in a
  * subdirectory of the top Crystal Space include directory.
  */
