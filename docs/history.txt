@@ -11,6 +11,8 @@ chronological order.
 	  (which can make errors less annoying and reduce the output spam by
 	  buffering up multiple similar messages).
 	- Vincent fixed a build error with GCC (undeclared messageInterval).
+	- res made some cleanups and tweaks to relaytool: fixed a crash in
+	  the "reloc fixup" code on x86 (and maybe x86_64 as well).
 24-Nov-2007
 	- Vincent merged OpenAL branch (r24357:28234) into trunk.
 22-Nov-2007
