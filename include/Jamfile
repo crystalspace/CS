@@ -119,7 +119,7 @@ CS_MASTER_HEADER_BOILERPLATE =
 " ;
 
 CS_MASTER_HEADER_DOC_DIRECTORY =
-"/**\\file 
+"/**@file 
  * Directory master header. This header file includes all headers in a
  * subdirectory of the top Crystal Space include directory.
  */" ;
@@ -191,7 +191,7 @@ CS_MASTER_HEADERS =
       $(CS_MASTER_HEADER_REJECTS) ] ;
 
 CS_MASTER_HEADER_DOC_MASTER_MASTER =
-"/**\\file 
+"/**@file 
  * Crystal Space master header. This header file essentially causes most of 
  * the Crystal Space header files to be included, providing a convenient way 
  * to use any feature of Crystal Space without having to worry about including 

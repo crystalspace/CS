@@ -6,6 +6,18 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Nov-2007
+	- Eric Sunshine changed 'MasterHeader' rule in helper.jam so that it
+	  invokes the 'ResponseFile' rule with a delimiter of "%" rather than
+	  allowing 'ResponseFile' to use the default delimiter of "@", since
+	  "@" may legally appear in email addresses and Doxygen directives
+	  (@file, for example), both of which are likely to appear in master
+	  header boilerplate.
+	- Eric Sunshine changed CS/include/Jamfile so that it uses Doxygen
+	  directive "@file" in master header boilerplate rather than "\file"
+	  since "\file" ends up as "<formfeed>ile" when 'jam masterheaders' is
+	  invoked under the Dash shell. (This appears to be a bug in Dash
+	  single-quote treatment and has been reported.)
 28-Nov-2007
 	- res changed the ODE plugin to install custom ODE message handlers
 	  (which can make errors less annoying and reduce the output spam by
