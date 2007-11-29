@@ -6,6 +6,16 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Nov-2007
+	- Eric Sunshine fixed bug in configure.ac where CS_PLATFORM_UNIX was
+	  not emitted to csconfig.h on Mac OS X (for which both
+	  CS_PLATFORM_MACOSX and CS_PLATFORM_UNIX are supposed to be defined).
+	  This bug was introduced in r23813-r23814 on 2006/03/14 when inline
+	  host checking code was removed from configure.ac in favor of the
+	  external CS_CHECK_HOST() macro from cs_check_host.m4.  Also fixed
+	  configure.ac so that it no longer access the shell variable
+	  cs_host_macosx, which is private to (not published by)
+	  _CS_CHECK_HOST_DARWIN in cs_check_host.m4.
 13-Nov-2007
 	- Eric Sunshine fixed sed expression in CS/mk/autoconf/crystal.m4 to
 	  work with POSIX-compliant sed commands (such as the BSD version on

@@ -1,5 +1,8 @@
 1.2 branch log.
 
+29-Nov-2007
+	- Eric Sunshine merged r28246 into 1.2 (emit CS_PLATFORM_UNIX to
+	  csconfig.h on Mac OS X).
 15-Nov-2007
 	- Vincent merged r28156 into 1.2 (POSIX-compliant sed command fix in
 	  crystal.m4). This fixes #411.
