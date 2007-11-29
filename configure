@@ -11777,7 +11777,8 @@ fi
 
 
 #------------------------------------------------------------------------------
-# Determine host platform.  Recognized families: Unix, Windows, MacOS/X.
+# Determine host platform.  Recognized platforms: Unix, Windows, Mac OS X.
+# Recognized families: Unix, Windows.
 #
 # CS_CHECK_HOST
 #	Sets the shell variables cs_host_target and cs_host_family.  Client
@@ -11975,36 +11976,37 @@ fi
     cs_jamconfig_text="${cs_jamconfig_text}TARGET.OS.NORMALIZED ?= \"$cs_host_os_normalized\" ;
 "
 
-if test "x$cs_host_macosx" = "xyes"; then
-  # We assume that we always have CoreAudio available on MacOS/X.
-    cs_build_prop_val="yes"
+case $cs_host_target in
+    macosx)
+        # We assume that we always have CoreAudio available on MacOS/X.
+        cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}COREAUDIO.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
-    cs_build_prop_val="-framework CoreAudio -framework AudioToolbox"
+        cs_build_prop_val="-framework CoreAudio -framework AudioToolbox"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}COREAUDIO.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
-    cs_header_text="${cs_header_text}#define CS_PLATFORM_MACOSX
+        cs_header_text="${cs_header_text}#define CS_PLATFORM_MACOSX
 "
-else
-  case $cs_host_family in
-	windows)
-	    cs_header_text="${cs_header_text}#define CS_PLATFORM_WIN32
+        ;;
+esac
+case $cs_host_family in
+    windows)
+	cs_header_text="${cs_header_text}#define CS_PLATFORM_WIN32
 "
-	    ;;
-	unix)
-	    cs_header_text="${cs_header_text}#define CS_PLATFORM_UNIX
+	;;
+    unix)
+	cs_header_text="${cs_header_text}#define CS_PLATFORM_UNIX
 "
+        ;;
     esac
-fi
-
 cs_header_text="${cs_header_text}#define CS_PLATFORM_NAME \"$cs_host_os_normalized\"
 "
 
