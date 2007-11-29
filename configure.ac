@@ -226,7 +226,8 @@ CS_CHECK_RTLD
 
 
 #------------------------------------------------------------------------------
-# Determine host platform.  Recognized families: Unix, Windows, MacOS/X.
+# Determine host platform.  Recognized platforms: Unix, Windows, Mac OS X.
+# Recognized families: Unix, Windows.
 #
 # CS_CHECK_HOST
 #	Sets the shell variables cs_host_target and cs_host_family.  Client
@@ -234,19 +235,23 @@ CS_CHECK_RTLD
 #	CS_PLATFORM_FOO header define.
 #------------------------------------------------------------------------------
 CS_CHECK_HOST
-AS_IF([test "x$cs_host_macosx" = "xyes"],
-    [# We assume that we always have CoreAudio available on MacOS/X.
-    CS_EMIT_BUILD_PROPERTY([COREAUDIO.AVAILABLE], [yes])
-    CS_EMIT_BUILD_PROPERTY([COREAUDIO.LFLAGS],
-	[-framework CoreAudio -framework AudioToolbox])
-    CS_HEADER_PROPERTY([CS_PLATFORM_MACOSX])],
-    [case $cs_host_family in
-	windows)
-	    CS_HEADER_PROPERTY([CS_PLATFORM_WIN32])
-	    ;;
-	unix)
-	    CS_HEADER_PROPERTY([CS_PLATFORM_UNIX])
-    esac])
+case $cs_host_target in
+    macosx)
+        # We assume that we always have CoreAudio available on MacOS/X.
+        CS_EMIT_BUILD_PROPERTY([COREAUDIO.AVAILABLE], [yes])
+        CS_EMIT_BUILD_PROPERTY([COREAUDIO.LFLAGS],
+	    [-framework CoreAudio -framework AudioToolbox])
+        CS_HEADER_PROPERTY([CS_PLATFORM_MACOSX])
+        ;;
+esac
+case $cs_host_family in
+    windows)
+	CS_HEADER_PROPERTY([CS_PLATFORM_WIN32])
+	;;
+    unix)
+	CS_HEADER_PROPERTY([CS_PLATFORM_UNIX])
+        ;;
+    esac
 CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
     [AS_ESCAPE(["])$cs_host_os_normalized[]AS_ESCAPE(["])])
 
