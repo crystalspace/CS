@@ -19,6 +19,7 @@
 using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using CrystalSpace;
 
 namespace CrystalSpace.InteropServices
 {
@@ -28,8 +29,9 @@ namespace CrystalSpace.InteropServices
   {
     public int free;
     public int argc;
+    public int exename;
     public IntPtr argv;
-  }
+  };
 
   // This structure is used for P/Invoke calls, as a
   // return value for return generic interfaces pointer.
@@ -38,7 +40,7 @@ namespace CrystalSpace.InteropServices
     public IntPtr ifaceptr;
     public IntPtr ifacename;
     public int free;
-  }
+  };
 
   // This structure is used for pack the data of a interface
   public struct csInterfaceData
@@ -46,7 +48,15 @@ namespace CrystalSpace.InteropServices
     public int free;
     public int version;
     public IntPtr ifacename;
-  }
+  };
+
+  public struct csArrayPackData
+  {
+    public int count;
+    public IntPtr array;
+    public int iface;
+    public int free;
+  };
 
   public class csArgsUtils
   {
@@ -59,7 +69,7 @@ namespace CrystalSpace.InteropServices
       IntPtr ret = NativeCAlloc.Malloc (length + 1);
       char[] strarray = str.ToCharArray ();
       for (int i = 0; i < length; i++)
-	  Marshal.WriteByte (ret, i, (byte) strarray[i]);
+	Marshal.WriteByte (ret, i, (byte) strarray[i]);
       Marshal.WriteByte (ret, length, 0);
       return ret;
     }
@@ -68,14 +78,14 @@ namespace CrystalSpace.InteropServices
     {
       string ret = "";
       char chr = (char)Marshal.ReadByte(str);
-	  int ofs = 0;
+      int ofs = 0;
       while(chr != 0)
-	  {
-	    ret += chr;
-		ofs++;
-		Marshal.ReadByte(str, ofs);
-	  }
-	  return ret;
+      {
+	ret += chr;
+	ofs++;
+	Marshal.ReadByte(str, ofs);
+      }
+      return ret;
     }
     // Takes a string array and return a structure with the
     // argc and argv arguments for C functions
@@ -89,8 +99,9 @@ namespace CrystalSpace.InteropServices
 
       if (argc == 0)
       {
-	handle.argc = 0;
 	handle.free = 0;
+        handle.exename = String2ASCII(Assembly.Location);
+	handle.argc = 0;
 	handle.argv = IntPtr.Zero;
 	return handle;
       }
@@ -103,6 +114,7 @@ namespace CrystalSpace.InteropServices
       }
 
       handle.free = 1;
+      handle.exename = String2ASCII(Assembly.Location);
       handle.argc = argc;
       handle.argv = argv;
       return handle;
@@ -143,8 +155,142 @@ namespace CrystalSpace.InteropServices
       return ret;
     }
 
+
+    static internal bool IsSwigObject(object o)
+    {
+      return false;
+    }
+
+    static internal HandleRef GetSwigHandle(object o)
+    {
+      return new HandleRef(null, IntPtr.Zero);
+    }
+
+    static public csArrayPackData PackArrayData(object[] array)
+    {
+      csArrayPackData ret = new csArrayPackData();
+      int object_len = 0;
+      bool ptr = false;
+      bool iface = false;
+      bool floatv = false;
+      bool stringv = true;
+
+      if (array == null)
+      {
+	ret.count=0;
+	ret.array = IntPtr.Zero;
+	return ret;
+      }
+
+      if (array.Length <= 0)
+      {
+	ret.count=0;
+	ret.array = IntPtr.Zero;
+	return ret;
+      }
+
+      object test_obj = array[0];
+      Type array_basetype = test_obj.GetType();
+      if(array_basetype.Name == typeof(char).Name )
+      {
+	object_len = 1;
+      }
+      else if(array_basetype.Name == typeof(short).Name )
+      {
+	object_len = 2;
+      }
+      else if(array_basetype.Name == typeof(int).Name )
+      {
+	object_len = 4;
+      }
+      else if(array_basetype.Name == typeof(long).Name )
+      {
+	object_len = 8;
+      }	
+      else if(array_basetype.Name == typeof(float).Name )
+      {
+	object_len = 4;
+	floatv = true;
+      }
+      else if(array_basetype.Name == typeof(double).Name )
+      {
+	object_len = 8;
+	floatv = true;
+      }
+      else if(array_basetype.Name == typeof(string).Name )
+      {
+	object_len = 4;
+	stringv = true;
+      }
+      else if(array_basetype.Name == typeof(IntPtr).Name )
+      {
+	object_len = IntPtr.Size;
+	ptr = true;
+      }
+      else if(array_basetype.IsSubclassOf(typeof(iBase)))
+      {
+	object_len = IntPtr.Size;
+	iface = true;
+      }
+      else
+      {
+	// Find getCPtr with reflection
+	if(!IsSwigObject(array[0]))
+	{
+	  ret.count=0;
+	  ret.array = IntPtr.Zero;
+	  return ret;
+	}
+	else
+	{
+	  object_len = IntPtr.Size;
+	}
+      }
+
+      int array_len = object_len * array.Length;
+      IntPtr array_ptr = NativeCAlloc.Malloc(array_len);
+
+      for(int i = 0; i < array.Length; i++)
+      {
+	switch(object_len)
+	{
+	case 1:
+	  Marshal.WriteByte(array_ptr, i, (byte)array[i]);
+	  break;
+	case 2:
+	  Marshal.WriteInt16(array_ptr, i*2, (short)array[i]);
+	  break;
+	case 4:
+	  if(ptr)
+	    Marshal.WriteIntPtr(array_ptr, i*4, (IntPtr)array[i]);
+	  else if(stringv)
+	    Marshal.WriteIntPtr(array_ptr, i*4, String2ASCII((string)array[i]));
+	  else if(iface)
+	    Marshal.WriteIntPtr(array_ptr, i*4, iBase.getCPtr((iBase)array[i]).Handle);
+	  else if(IsSwigObject(array[i]))
+	    Marshal.WriteIntPtr(array_ptr, i*4, GetSwigHandle((iBase)array[i]).Handle);
+	  else if(floatv)
+	    Marshal.WriteInt32(array_ptr, i*4, (int)array[i]);
+	  else
+	    Marshal.WriteInt32(array_ptr, i*4, (int)array[i]);
+	  break;
+	case 8:
+	  if(floatv)
+	    Marshal.WriteInt64(array_ptr, i*8, (long)array[i]);
+	  else
+	    Marshal.WriteInt64(array_ptr, i*8, (long)array[i]);
+	  break;
+	}
+      }
+
+      ret.count = array.Length;
+      ret.array = array_ptr;
+      ret.iface = iface?1:0;
+      ret.free = 0;
+      return ret;
+    }
     // Creates an interface wrapper using the interface data packed in
-    // a structure
+		// a structure
     static public Object CreateInterface (csRetInterface iret)
     {
       Object _obj = null;

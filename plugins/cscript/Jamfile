@@ -127,11 +127,11 @@ if $(CSHARP.AVAILABLE) = "yes"
         $(csharpdir) ;
     }
     
-    CleanDir $(modulecs)clean : $(csharpdir) ;
-    Clean $(modulecs)clean : $(common) ;
-    Depends bindingsclean : $(modulecs)clean ;
-    Depends clean : $(modulecs)clean ;
-    Depends csharpmodclean : $(modulecs)clean ;
+    CleanDir cspacesharpclean : $(csharpdir) ;
+    Clean cspacesharpclean : $(common) ;
+    Depends bindingsclean : cspacesharpclean ;
+    Depends clean : cspacesharpclean ;
+    Depends csharpmodclean : cspacesharpclean ;
 
     #-------------------
     # C# module c side

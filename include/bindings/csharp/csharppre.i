@@ -78,6 +78,8 @@
   }
 }
 
+#undef LANG_FUNCTIONS
+%define LANG_FUNCTIONS
 %{
   // This structure is used for return a interface pointer to the managed code
   struct csRetInterface
@@ -93,6 +95,7 @@
   {
     int free;
     int argc;
+    const char *exename;
     const char **argv;
   };
 
@@ -105,7 +108,18 @@
     int version;
     char *name;
   };
+
+  struct csArrayPackData
+  {
+    int count;
+    void *array;
+    int iface;
+    int free;
+  };
 %}
+%enddef
+LANG_FUNCTIONS
+
 // csgeom/transfrm.h
 %ignore csTransform::operator*;
 %ignore csReversibleTransform::operator*;
@@ -348,7 +362,7 @@ ICONFIGMANAGER_CSHARPCODE
 {
   $1 = $input.argc + 1; // +1 for synthesized argv[0].
   $2 = (char **) malloc(($1 + 1) * sizeof(char *));
-  $2[0] = strdup("./cspacesharp");
+  $2[0] = strdup($input.exename);
   /* make a copy of each string */
   int i;
   for (i = 1; i < $1; i++) {
@@ -395,6 +409,10 @@ ICONFIGMANAGER_CSHARPCODE
 %include "bindings/csharp/csattributes.i"
 %include "bindings/csharp/cshoperators.i"
 %include "bindings/csharp/csstring.i"
+
+#ifndef NOT_ARRAYS
+%include "bindings/csharp/csharray.i"
+#endif
 
 #endif SWIGCSHARP
 
