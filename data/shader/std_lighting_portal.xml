@@ -1,28 +1,40 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <shader compiler="xmlshader" name="std_lighting_portal">
-  
+
   <!-- For heavy portals -->
-  <technique priority="150">
-    <pass>
-      <texture name="tex portal" destination="unit 0" />
-      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
-      <!--vp plugin="glfixed">
-        <fixedvp>
-          <constantcolor layer="0" type="vector3">1,1,0</constantcolor>
-        </fixedvp>
-      </vp>
-      <fp plugin="glfixed">
-        <fixedfp>
-          <layer>
-            <colorsource num="0" source="texture" modifier="color" />
-            <colorsource num="1" source="constant color" modifier="color" />
-            <coloroperation operation="modulate" />
-          </layer>
-        </fixedfp>
-      </fp-->
-      <!-- TODO: Fog -->
-    </pass>
-  </technique>
+  <?if vars."tex portal".texture ?>
+    <technique priority="200">
+      <pass>
+	<texture name="tex portal" destination="portal_surface" />
+	<buffer source="texture coordinate 0" destination="texture coordinate 0" />
+	<?Include snippets/fog-mappings.inc ?>
+	<vp plugin="glfixed">
+	  <fixedvp>
+	    <?Include snippets/fog-fvp.inc ?>
+	  </fixedvp>
+	</vp>
+	<fp plugin="glfixed">
+	  <fixedfp>
+	    <layer name="portal_surface">
+	      <colorsource num="0" source="texture" modifier="color"/>
+	      <alphasource num="0" source="texture" modifier="alpha"/>
+	      <coloroperation operation="replace" />
+	      <alphaoperation operation="replace" />
+	    </layer>
+	    <?Include snippets/fog-ffp.inc ?>
+	  </fixedfp>
+	</fp>
+      </pass>
+    </technique>
+
+    <technique priority="150">
+      <pass>
+	<texture name="tex portal" destination="unit 0" />
+	<buffer source="texture coordinate 0" destination="texture coordinate 0" />
+      </pass>
+      <?Include snippets/fog-pass.inc ?>
+    </technique>
+  <?endif?>
 
   <technique priority="100">
     <pass>

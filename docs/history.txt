@@ -23,6 +23,9 @@ chronological order.
 	- res updated terrainf to work with RM.
 	- res adjusted the terrainfixed shaders for the zoffset-into-shaders
 	  move.
+	- res changed the std_lighting_portal shader to support fog and to not
+	  do the "demo" multiplication of the portal surface with a color any
+	  more.
 24-Nov-2007
 	- Vincent merged OpenAL branch (r24357:28234) into trunk.
 22-Nov-2007
