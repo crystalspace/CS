@@ -14,6 +14,7 @@ chronological order.
 	- res changed the gl3d framebuffer render-to-texture backend to
 	  work better when the pattern of the render target does not quite
 	  follow the supposed "some texture, then 0 (repeat)".
+	- res made zoffset a shader setting.
 24-Nov-2007
 	- Vincent merged OpenAL branch (r24357:28234) into trunk.
 22-Nov-2007

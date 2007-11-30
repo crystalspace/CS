@@ -207,6 +207,12 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
       synldr->ParseBool(nodeFlipCulling, pass->flipCulling, false);
     }
 
+    csRef<iDocumentNode> nodeZOffset = node->GetNode ("zoffset");
+    if (nodeZOffset)
+    {
+      synldr->ParseBool (nodeZOffset, pass->zoffset, false);
+    }
+
 
     pass->wmRed = true;
     pass->wmGreen = true;
@@ -743,6 +749,7 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
     modes.mixmode = thispass->mixMode;
 
   modes.flipCulling = thispass->flipCulling;
+  modes.zoffset = thispass->zoffset;
 
   if(thispass->vp) thispass->vp->SetupState (mesh, modes, stack);
   if(thispass->fp) thispass->fp->SetupState (mesh, modes, stack);

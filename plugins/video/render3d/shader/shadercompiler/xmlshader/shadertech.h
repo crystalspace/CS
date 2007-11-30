@@ -45,8 +45,9 @@ private:
     csZBufMode zMode;
     bool overrideZmode;
     bool flipCulling;
+    bool zoffset;
 
-    shaderPass () 
+    shaderPass () : zoffset (false)
     { 
       mixMode = CS_FX_MESH;
       overrideZmode = false;
