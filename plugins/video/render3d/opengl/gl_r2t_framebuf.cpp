@@ -34,7 +34,6 @@ void csGLRender2TextureFramebuf::SetRenderTarget (iTextureHandle* handle,
 						  bool persistent,
 						  int subtexture)
 {
-  render_target = handle;
   rt_onscreen = !persistent;
   sub_texture_id = subtexture;
 
@@ -43,24 +42,37 @@ void csGLRender2TextureFramebuf::SetRenderTarget (iTextureHandle* handle,
   {
     framebufW = g2d->GetWidth();
     framebufH = g2d->GetHeight();
-    
-    render_target->GetRendererDimensions (txt_w, txt_h);
+
+    int rt_w = txt_w, rt_h = txt_h;
+    handle->GetRendererDimensions (txt_w, txt_h);
     g2d->PerformExtension ("vp_set", txt_w, txt_h);
 
-    g2d->GetClipRect (rt_old_minx, rt_old_miny, 
-      rt_old_maxx, rt_old_maxy);
-    if ((rt_old_minx != 0) || (rt_old_miny != 0)
-      || (rt_old_maxx != txt_w) || (rt_old_maxy != txt_h))
+    if (render_target == 0)
     {
-      g2d->SetClipRect (0, 0, txt_w, txt_h);
+      g2d->GetClipRect (rt_old_minx, rt_old_miny, 
+        rt_old_maxx, rt_old_maxy);
+      if ((rt_old_minx != 0) || (rt_old_miny != 0)
+        || (rt_old_maxx != txt_w) || (rt_old_maxy != txt_h))
+      {
+        g2d->SetClipRect (0, 0, txt_w, txt_h);
+      }
+    }
+    else
+    {
+      if ((rt_w != txt_w) || (rt_h != txt_h))
+        g2d->SetClipRect (0, 0, txt_w, txt_h);
     }
   }
   else
   {
-    g2d->PerformExtension ("vp_reset");
-    g2d->SetClipRect (rt_old_minx, rt_old_miny, 
-      rt_old_maxx, rt_old_maxy);
+    if (render_target != 0)
+    {
+      g2d->PerformExtension ("vp_reset");
+      g2d->SetClipRect (rt_old_minx, rt_old_miny, 
+        rt_old_maxx, rt_old_maxy);
+    }
   }
+  render_target = handle;
 }
 
 void csGLRender2TextureFramebuf::BeginDraw (int drawflags)
