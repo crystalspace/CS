@@ -9,6 +9,8 @@ chronological order.
 30-Nov-2007
 	- res changed zoffset to be enabled through a setting in
 	  RenderMeshModes and not a separate API call.
+	- res added csArrayCapacityFixedGrow<N>, a shortcut for 
+	  csArrayCapacityLinear<csArrayThresholdFixed<N> >.
 24-Nov-2007
 	- Vincent merged OpenAL branch (r24357:28234) into trunk.
 22-Nov-2007

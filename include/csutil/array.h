@@ -345,6 +345,18 @@ struct csArrayCapacityDefault :
 } ;
 
 /**
+ * Shortcut for an array capacity handler with a compile-time fixed rate of 
+ * growth
+ */
+template<int N>
+struct csArrayCapacityFixedGrow :
+  public csArrayCapacityLinear<csArrayThresholdFixed<N> >
+{
+  csArrayCapacityFixedGrow () :
+    csArrayCapacityLinear<csArrayThresholdFixed<N>> () {}
+};
+
+/**
  * This value is returned whenever an array item could not be located or does
  * not exist.
  */
