@@ -50,7 +50,7 @@ namespace RenderManager
       {
         typedef size_t KeyType;
 
-        static int IsLargerEqual (const PortalBuffers& b1, 
+        static bool IsLargerEqual (const PortalBuffers& b1, 
                                   const PortalBuffers& b2)
         {
           size_t s1 = b1.coordBuf->GetElementCount ();
@@ -60,7 +60,7 @@ namespace RenderManager
           return false;
         }
       
-        static int IsEqual (const PortalBuffers& b1, 
+        static bool IsEqual (const PortalBuffers& b1, 
                             const PortalBuffers& b2)
         {
           size_t s1 = b1.coordBuf->GetElementCount ();
@@ -70,7 +70,7 @@ namespace RenderManager
           return false;
         }
       
-        static int IsLargerEqual(const PortalBuffers& b1, 
+        static bool IsLargerEqual(const PortalBuffers& b1, 
                                  const KeyType& s2)
         {
           size_t s1 = b1.coordBuf->GetElementCount ();
@@ -79,7 +79,7 @@ namespace RenderManager
           return false;
         }
       
-        static int IsEqual(const PortalBuffers& b1, 
+        static bool IsEqual(const PortalBuffers& b1, 
                            const KeyType& s2)
         {
           size_t s1 = b1.coordBuf->GetElementCount ();
