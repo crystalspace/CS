@@ -19,6 +19,7 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_RENDERLAYERS_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_RENDERLAYERS_H__
 
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/strset.h"
 
 struct iShader;
@@ -31,9 +32,29 @@ namespace RenderManager
   class SingleRenderLayer
   {
   public:
-    SingleRenderLayer (const csStringID shaderName, iShader* defaultShader = 0)
-      : shaderName (shaderName), defaultShader (defaultShader)
+    /// Create a single render layer with a no shader type.
+    SingleRenderLayer (iShader* defaultShader = 0)
+      : defaultShader (defaultShader)
+    { }
+    /// Create a single render layer with a single shader type.
+    SingleRenderLayer (const csStringID shaderType, iShader* defaultShader = 0)
+      : defaultShader (defaultShader)
     {
+      shaderTypes.Push (shaderType);
+    }
+    /// Create a single render layer with a multiply shader type.
+    SingleRenderLayer (const csStringID* shaderTypes, size_t numTypes,
+      iShader* defaultShader = 0)
+      : defaultShader (defaultShader)
+    {
+      this->shaderTypes.SetSize (numTypes);
+      memcpy (this->shaderTypes.GetArray(), shaderTypes,
+	numTypes * sizeof (csStringID));
+    }
+    
+    void AddShaderType (csStringID shaderType)
+    {
+      shaderTypes.Push (shaderType);
     }
 
     size_t GetLayerCount () const
@@ -41,11 +62,12 @@ namespace RenderManager
       return 1;
     }
 
-    const csStringID GetShaderName (size_t layer) const
+    const csStringID* GetShaderTypes (size_t layer, size_t& num) const
     {
       CS_ASSERT(layer == 0);
-
-      return shaderName;
+      
+      num = shaderTypes.GetSize ();
+      return shaderTypes.GetArray();
     }
 
     iShader* GetDefaultShader (size_t layer) const
@@ -56,57 +78,101 @@ namespace RenderManager
     }
 
   private:
-    const csStringID shaderName;
+    csDirtyAccessArray<csStringID,
+      csArrayElementHandler<csStringID>,
+      CS::Memory::AllocatorMalloc,
+      csArrayCapacityFixedGrow<1> > shaderTypes;
     iShader* defaultShader;
   };
 
-  class MultipleRenderLayer : private CS::NonCopyable
+  class MultipleRenderLayer
   {
   public:
-    MultipleRenderLayer (size_t numLayers, const csStringID* shaderName, 
+    MultipleRenderLayer () {}
+    MultipleRenderLayer (size_t numLayers, const csStringID* shaderTypes, 
       iShader** defaultShader)
-      : numLayers (numLayers), shaderName (0), defaultShader (0)
     {
-      this->shaderName = static_cast<csStringID*> (
-        cs_malloc (sizeof(csStringID)*numLayers));
-      this->defaultShader = static_cast<iShader**> (
-        cs_malloc (sizeof(iShader*)*numLayers));
-
-      memcpy(this->shaderName, shaderName, sizeof(const csStringID)*numLayers);
-      memcpy(this->defaultShader, defaultShader, sizeof(iShader*)*numLayers);
+      layerTypes.SetSize (numLayers);
+      memcpy (layerTypes.GetArray(), shaderTypes, numLayers);
+      for (size_t l = 0; l < numLayers; l++)
+      {
+	Layer newLayer;
+	newLayer.defaultShader = defaultShader[l];
+	newLayer.firstType = l;
+	newLayer.numTypes = 1;
+	layers.Push (newLayer);
+      }
+      layers.ShrinkBestFit ();
+      layerTypes.ShrinkBestFit ();
     }
 
     ~MultipleRenderLayer ()
     {
-      cs_free (shaderName);
-      cs_free (defaultShader);
+    }
+    
+    template<typename LayerType>
+    void AddLayers (const LayerType& layers)
+    {
+      for (size_t l = 0; l < layers.GetLayerCount(); l++)
+      {
+	Layer newLayer;
+	newLayer.defaultShader = layers.GetDefaultShader (l);
+	newLayer.firstType = layerTypes.GetSize ();
+	const csStringID* copyTypes = layers.GetShaderTypes (l,
+	  newLayer.numTypes);
+	layerTypes.SetSize (newLayer.firstType + newLayer.numTypes);
+	memcpy (layerTypes.GetArray() + newLayer.firstType, copyTypes,
+	  newLayer.numTypes * sizeof (csStringID));
+	this->layers.Push (newLayer);
+      }
+      this->layers.ShrinkBestFit ();
+      layerTypes.ShrinkBestFit ();
     }
 
     size_t GetLayerCount () const
     {
-      return numLayers;
+      return layers.GetSize();
     }
 
-    const csStringID GetShaderName (size_t layer) const
+    const csStringID* GetShaderTypes (size_t layer, size_t& num) const
     {
-      CS_ASSERT(layer < numLayers);
-
-      return shaderName[layer];
+      num = layers[layer].numTypes;
+      return layerTypes.GetArray() + layers[layer].firstType;
     }
 
     iShader* GetDefaultShader (size_t layer) const
     {
-      CS_ASSERT(layer < numLayers);
-
-      return defaultShader[layer];
+      return layers[layer].defaultShader;
     }
 
   private:
-    size_t numLayers;
-    csStringID* shaderName;
-    iShader** defaultShader;
+    struct Layer
+    {
+      iShader* defaultShader;
+      size_t firstType;
+      size_t numTypes;
+    };
+    csArray<Layer> layers;
+    csDirtyAccessArray<csStringID> layerTypes;
   };
 
+  enum
+  {
+    defaultlayerNoTerrain = 1,
+    //defaultlayerNoLighting = 2
+  };
+  
+  /* @@@ TODO: Perhaps revisit naming after light support was added,
+      see how many seperate layer objects needed for base vs. lighting
+      (I[res] could imagine that light iteration needs another layer
+      object). */
+  void CS_CRYSTALSPACE_EXPORT AddDefaultBaseLayers (iObjectRegistry* objectReg,
+    MultipleRenderLayer& layers, uint flags = 0);
+  
+  /*
+  bool AddLayersFromNode (iObjectRegistry* objectReg,
+    MultipleRenderLayer& layers, iDocumentNode* node);
+  */
 }
 }
 

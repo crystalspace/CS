@@ -87,7 +87,7 @@ public:
 
     // Setup the material&mesh SVs
     {
-      StandardSVSetup<RenderTreeType, SingleRenderLayer> svSetup (
+      StandardSVSetup<RenderTreeType, MultipleRenderLayer> svSetup (
         context->svArrays, layerConfig);
       renderTree.TraverseMeshNodes (svSetup, context);
     }
@@ -130,8 +130,6 @@ bool RMTest1::RenderView (iView* view)
 
   postEffects.SetupView (view);
 
-  SingleRenderLayer renderLayer (defaultShaderName, defaultShader);
-
   // Pre-setup culling graph
   RenderTreeType renderTree (treePersistent);
   RenderTreeType::ContextsContainer* screenContexts = 
@@ -169,7 +167,7 @@ bool RMTest1::RenderView (iView* view)
   {
     view->GetContext()->SetZMode (CS_ZBUF_MESH);
 
-    ContextRender<RenderTreeType, SingleRenderLayer> render (shaderManager, renderLayer);
+    ContextRender<RenderTreeType, MultipleRenderLayer> render (shaderManager, renderLayer);
     renderTree.TraverseContextContainersReverse (render);
   }
 
@@ -181,8 +179,6 @@ bool RMTest1::RenderView (iView* view)
 bool RMTest1::HandleTarget (RenderTreeType& renderTree, csStringID svName, 
                             RenderTreeType::ContextsContainer* contexts)
 {
-  SingleRenderLayer renderLayer (defaultShaderName, defaultShader);
-
   // Prepare
   csRef<CS::RenderManager::RenderView> rview = contexts->rview;
 
@@ -195,7 +191,7 @@ bool RMTest1::HandleTarget (RenderTreeType& renderTree, csStringID svName,
     rview);
 
   // Setup
-  StandardContextSetup<RenderTreeType, SingleRenderLayer> contextSetup (this,
+  StandardContextSetup<RenderTreeType, MultipleRenderLayer> contextSetup (this,
     renderLayer);
   contextSetup (renderTree, startContext, contexts, startSector, rview);
 
@@ -214,8 +210,12 @@ bool RMTest1::Initialize(iObjectRegistry* objectReg)
 
   shaderManager = csQueryRegistry<iShaderManager> (objectReg);
   
-  defaultShaderName = stringSet->Request("standard");  
-  defaultShader = shaderManager->GetShader ("std_lighting");
+
+  /*CS::RenderManager::SingleRenderLayer renderLayer = 
+    CS::RenderManager::SingleRenderLayer (stringSet->Request("standard"),
+      shaderManager->GetShader ("std_lighting"));
+  this->renderLayer.AddLayers (renderLayer);*/
+  CS::RenderManager::AddDefaultBaseLayers (objectReg, renderLayer);
 
   csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objectReg);
   treePersistent.Initialize (shaderManager);
@@ -224,8 +224,8 @@ bool RMTest1::Initialize(iObjectRegistry* objectReg)
 
   csRef<iLoader> loader = csQueryRegistry<iLoader> (objectReg);
   
-  csRef<iShader> desatShader = loader->LoadShader ("/shader/desaturate.xml");
-  postEffects.AddLayer (desatShader);
+  /*csRef<iShader> desatShader = loader->LoadShader ("/shader/desaturate.xml");
+  postEffects.AddLayer (desatShader);*/
 
   return true;
 }

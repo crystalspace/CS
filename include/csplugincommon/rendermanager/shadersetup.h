@@ -55,8 +55,13 @@ namespace RenderManager
 
         iShader* shader = 0;
         if (rm->material)
-          shader = rm->material->GetMaterial ()->GetShader (
-          layerConfig.GetShaderName (layer));
+        {
+          size_t layerShaderNum;
+          const csStringID* layerShaders = 
+            layerConfig.GetShaderTypes (layer, layerShaderNum);
+          shader = rm->material->GetMaterial ()->GetFirstShader (layerShaders,
+            layerShaderNum);
+        }
         shaderArray[index+layerOffset] = shader ? shader : layerConfig.GetDefaultShader (layer);
       }
     }
@@ -100,7 +105,7 @@ namespace RenderManager
         svArrays.SetupSVStack (varStack, layer, index);
 
         // Get the ticket
-        iShader* shader = shaderArray[index];
+        iShader* shader = shaderArray[index+layerOffset];
         ticketArray[index+layerOffset] = shader ? shader->GetTicket (*mesh.renderMesh, varStack) : ~0;
       }
     }

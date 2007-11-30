@@ -16,7 +16,10 @@ chronological order.
 	  follow the supposed "some texture, then 0 (repeat)".
 	- res made zoffset a shader setting.
 	- res added iMaterial::GetFirstShader(): get shader for the first type
-	  from a given list of shader typesthat as a shader attached.	
+	  from a given list of shader typesthat as a shader attached.
+	- res changed the rendermanager "layers" classes to support multiple
+	  shader types per layer.
+	- res added CS::RenderManager::AddDefaultBaseLayers().
 24-Nov-2007
 	- Vincent merged OpenAL branch (r24357:28234) into trunk.
 22-Nov-2007

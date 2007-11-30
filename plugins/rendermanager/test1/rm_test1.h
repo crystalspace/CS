@@ -62,7 +62,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMTest1)
 
     typedef CS::RenderManager::RenderTree<> RenderTreeType;
     typedef StandardContextSetup<RenderTreeType, 
-      CS::RenderManager::SingleRenderLayer> ContextSetupType;
+      CS::RenderManager::MultipleRenderLayer> ContextSetupType;
     typedef CS::RenderManager::StandardPortalSetup<RenderTreeType, 
       ContextSetupType> PortalSetupType;
   protected:    
@@ -81,8 +81,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMTest1)
     csRef<iShaderManager>   shaderManager;
     csRef<iEngine>          engine;
 
-    csStringID              defaultShaderName;
-    csRef<iShader>          defaultShader;
+    CS::RenderManager::MultipleRenderLayer renderLayer;
 
     CS::RenderManager::DependentTargetManager<RenderTreeType, RMTest1> targets;
 
