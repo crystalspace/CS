@@ -5,6 +5,7 @@
     <tag>terrain_splatting</tag>
     <pass>
       <mixmode><copy /></mixmode>
+      <zoffset />
       <buffer source="texture coordinate 0" destination="texture coordinate diffuse" />
       <?if vars."tex lightmap".texture ?>
 	<buffer source="texture coordinate 0" destination="texture coordinate lightmap" />
@@ -62,6 +63,7 @@
     <tag>terrain_splatting</tag>
     <pass>
       <mixmode><copy /></mixmode>
+      <zoffset />
       <buffer source="texture coordinate 0" destination="texture coordinate diffuse" />
       <?if vars."tex lightmap".texture ?>
 	<buffer source="texture coordinate 0" destination="texture coordinate lightmap" />
@@ -115,6 +117,7 @@
     <tag>terrain_splatting</tag>
     <pass>
       <mixmode><blendop src="srcalpha" dst="zero" /></mixmode>
+      <zoffset />
       <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <?if vars."tex lightmap".texture ?>
 	<buffer source="texture coordinate 0" destination="texture coordinate 1" />
@@ -238,6 +241,7 @@
   <technique priority="200">
     <pass>
       <mixmode><copy /></mixmode>
+      <zoffset />
       <buffer source="texture coordinate 0" destination="texture coordinate diffuse" />
       <?if vars."tex lightmap".texture ?>
 	<buffer source="texture coordinate 0" destination="texture coordinate lightmap" />

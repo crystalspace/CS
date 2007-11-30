@@ -20,6 +20,9 @@ chronological order.
 	- res changed the rendermanager "layers" classes to support multiple
 	  shader types per layer.
 	- res added CS::RenderManager::AddDefaultBaseLayers().
+	- res updated terrainf to work with RM.
+	- res adjusted the terrainfixed shaders for the zoffset-into-shaders
+	  move.
 24-Nov-2007
 	- Vincent merged OpenAL branch (r24357:28234) into trunk.
 22-Nov-2007
