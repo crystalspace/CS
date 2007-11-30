@@ -104,6 +104,18 @@ iShader* csMaterial::GetShader(csStringID type)
   return shaders.Get (type, (iShader*)0);
 }
 
+iShader* csMaterial::GetFirstShader (const csStringID* types,
+                                     size_t numTypes)
+{
+  iShader* s = 0;
+  for (size_t i = 0; i < numTypes; i++)
+  {
+    s = shaders.Get (types[i], (iShader*)0);
+    if (s != 0) break;
+  }
+  return s;
+}
+
 iTextureHandle *csMaterial::GetTexture ()
 {
   iTextureWrapper* tex;

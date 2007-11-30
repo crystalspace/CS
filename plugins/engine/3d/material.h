@@ -113,6 +113,9 @@ public:
    */
   virtual iTextureHandle *GetTexture (csStringID name);
 
+  virtual iShader* GetFirstShader (const csStringID* types,
+    size_t numTypes);
+
   /** @} */
 
   /**
