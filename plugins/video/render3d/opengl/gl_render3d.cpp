@@ -1248,6 +1248,10 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
 
   if (drawflags & CSDRAW_3DGRAPHICS)
   {
+    // @@@ Jorrit: to avoid flickering I had to increase the
+    // values below and multiply them with 3.
+    // glPolygonOffset (-0.05f, -2.0f); 
+    glPolygonOffset (-0.15f, -6.0f); 
     needProjectionUpdate = true;
 
 //    object2camera.Identity ();
@@ -1272,6 +1276,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
         statecache->ActivateTU (csGLStateCache::activateImage
           | csGLStateCache::activateTexCoord);
       }
+      statecache->Disable_GL_POLYGON_OFFSET_FILL ();
 
       if (fixedFunctionForcefulEnable)
       {
@@ -1815,6 +1820,10 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   const uint mixmode = modes.mixmode;
   statecache->SetShadeModel ((mixmode & CS_FX_FLAT) ? GL_FLAT : GL_SMOOTH);
 
+  if (modes.zoffset)
+    statecache->Enable_GL_POLYGON_OFFSET_FILL ();
+  else
+    statecache->Disable_GL_POLYGON_OFFSET_FILL ();
 
   GLenum compType;
   void* bufData = //indexbuf->RenderLock (CS_GLBUF_RENDERLOCK_ELEMENTS);

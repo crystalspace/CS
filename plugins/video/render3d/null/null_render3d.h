@@ -38,6 +38,9 @@ struct iGraphics2D;
 struct iShaderManager;
 struct iBugPlug;
 
+// To silence EnableZOffset/DisableZOffset
+#include "csutil/deprecated_warn_off.h"
+
 class csNullGraphics3D : public scfImplementation2<csNullGraphics3D, 
 						   iGraphics3D,
 						   iComponent>
@@ -180,5 +183,8 @@ private:
   csPixelFormat pfmt;
   bool red_mask, green_mask, blue_mask, alpha_mask;
 };
+
+// To silence EnableZOffset/DisableZOffset
+#include "csutil/deprecated_warn_on.h"
 
 #endif // __CS_NULL_RENDER3D_H__

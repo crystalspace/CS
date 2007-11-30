@@ -966,10 +966,16 @@ struct iGraphics3D : public virtual iBase
   /// Get the z buffer write/test mode
   virtual csZBufMode GetZMode () = 0;
 
-  /// Enables offsetting of Z values
+  /**
+   * \deprecated Deprecated in 1.3.
+   */
+  CS_DEPRECATED_METHOD_MSG("Nonfunctional. Use RenderMeshModes::zoffset instead")
   virtual void EnableZOffset () = 0;
 
-  /// Disables offsetting of Z values
+  /**
+   * \deprecated Deprecated in 1.3.
+   */
+  CS_DEPRECATED_METHOD_MSG("Nonfunctional. Use RenderMeshModes::zoffset instead")
   virtual void DisableZOffset () = 0;
 
   /// Controls shadow drawing

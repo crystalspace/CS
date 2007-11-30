@@ -317,14 +317,7 @@ void csGenericRenderStep::ToggleStepSettings (iGraphics3D* g3d,
   {
     if (settings)
     {
-      if (zOffset)
-	g3d->EnableZOffset ();
       g3d->SetZMode (zmode);
-    }
-    else
-    {
-      if (zOffset)
-	g3d->DisableZOffset ();
     }
     currentSettings = settings;
   }

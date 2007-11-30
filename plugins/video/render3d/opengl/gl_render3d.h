@@ -176,6 +176,9 @@ public:
     csVector2 *iVertices, size_t iVertCount);
 };
 
+// To silence EnableZOffset/DisableZOffset
+#include "csutil/deprecated_warn_off.h"
+
 class csGLGraphics3D : public scfImplementation3<csGLGraphics3D, 
 						 iGraphics3D,
 						 iComponent,
@@ -364,12 +367,11 @@ private:
   // @@@ Jorrit: to avoid flickering I had to increase the
   // values below and multiply them with 3.
   //{ glPolygonOffset (-0.05f, -2.0f); 
-  { glPolygonOffset (-0.15f, -6.0f); 
-  statecache->Enable_GL_POLYGON_OFFSET_FILL (); }
+  {  }
 
   // Disables offsetting of Z values
   void DisableZOffset ()
-  { statecache->Disable_GL_POLYGON_OFFSET_FILL (); }
+  {  }
 
   // Debug function to visualize the stencil with the given mask.
   void DebugVisualizeStencil (uint32 mask);
@@ -766,6 +768,9 @@ public:
   virtual void Dump (iGraphics3D* /*g3d*/)
   { }
 };
+
+// To silence EnableZOffset/DisableZOffset
+#include "csutil/deprecated_warn_on.h"
 
 }
 CS_PLUGIN_NAMESPACE_END(gl3d)

@@ -78,7 +78,7 @@ struct RenderMeshModes
 {
   RenderMeshModes () : z_buf_mode ((csZBufMode)~0), mixmode (CS_FX_COPY),
     renderPrio (-1), flipCulling (false), cullMode (cullNormal),
-    alphaType (csAlphaMode::alphaNone)
+    alphaType (csAlphaMode::alphaNone), zoffset (false)
   {
   }
 
@@ -89,7 +89,8 @@ struct RenderMeshModes
     flipCulling (x.flipCulling),
     cullMode (x.cullMode),
     alphaType (x.alphaType),
-    buffers (x.buffers)
+    buffers (x.buffers),
+    zoffset (x.zoffset)
   {
   }
 
@@ -130,6 +131,9 @@ struct RenderMeshModes
 
   /// Alpha mode this mesh is drawn.
   csAlphaMode::AlphaType alphaType;
+  
+  /// Whether Z value offsetting should be enabled.
+  bool zoffset;
 
   /// Holder of default render buffers
   csRef<csRenderBufferHolder> buffers;
