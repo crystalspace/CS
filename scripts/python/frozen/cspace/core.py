@@ -1527,6 +1527,7 @@ class iKeyboardDriver(iBase):
     def GetModifierState(*args): return _core.iKeyboardDriver_GetModifierState(*args)
     def CreateKeyComposer(*args): return _core.iKeyboardDriver_CreateKeyComposer(*args)
     def SynthesizeCooked(*args): return _core.iKeyboardDriver_SynthesizeCooked(*args)
+    def GetModifiersState(*args): return _core.iKeyboardDriver_GetModifiersState(*args)
     def GetKeyState(*args): return _core.iKeyboardDriver_GetKeyState(*args)
     scfGetVersion = staticmethod(_core.iKeyboardDriver_scfGetVersion)
     __swig_destroy__ = _core.delete_iKeyboardDriver

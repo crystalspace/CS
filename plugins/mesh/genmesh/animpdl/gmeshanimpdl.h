@@ -125,8 +125,10 @@ public:
  * Genmesh animation control.
  */
 class GenmeshAnimationPDL :
-  public scfImplementation2<GenmeshAnimationPDL,
-    iGenMeshAnimationControl, iLightingInfo>
+  public scfImplementation3<GenmeshAnimationPDL,
+    iGenMeshAnimationControl, 
+    iGenMeshAnimationControl1_4, 
+    iLightingInfo>
 {
 private:
   csRef<GenmeshAnimationPDLFactory> factory;
@@ -176,6 +178,7 @@ public:
   virtual bool AnimatesTexels () const { return false; }
   virtual bool AnimatesNormals () const { return false; }
   virtual bool AnimatesColors () const { return true; }
+  virtual void Update(csTicks current) { }
   virtual void Update(csTicks current, int num_verts, uint32 version_id);
   virtual const csVector3* UpdateVertices (csTicks current,
   	const csVector3* verts, int num_verts, uint32 version_id);

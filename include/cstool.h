@@ -57,6 +57,7 @@
 #include "cstool/saverref.h"
 #include "cstool/smartfileopen.h"
 #include "cstool/uberscreenshot.h"
+#include "cstool/unusedresourcehelper.h"
 #include "cstool/userrndbuf.h"
 #include "cstool/vertexcompress.h"
 #include "cstool/vfsdirchange.h"

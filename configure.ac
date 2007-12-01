@@ -165,7 +165,8 @@ AS_IF([test $ac_cv_lib_m_pow = yes || test $ac_cv_lib_m_cosf = yes],
 AS_IF([test $ac_cv_lib_mx_cosf = yes],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-lmx], [+])])
 AS_IF([test $ac_cv_lib_dl_dlopen = yes],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-ldl], [+])])
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-ldl], [+])
+    AC_CHECK_LIB([dl], [dladdr], [CS_HEADER_PROPERTY([CS_HAVE_DLADDR])])])
 AS_IF([test $ac_cv_lib_nsl_gethostbyname = yes],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-lnsl], [+])])
 
@@ -226,7 +227,8 @@ CS_CHECK_RTLD
 
 
 #------------------------------------------------------------------------------
-# Determine host platform.  Recognized families: Unix, Windows, MacOS/X.
+# Determine host platform.  Recognized platforms: Unix, Windows, Mac OS X.
+# Recognized families: Unix, Windows.
 #
 # CS_CHECK_HOST
 #	Sets the shell variables cs_host_target and cs_host_family.  Client
@@ -234,19 +236,23 @@ CS_CHECK_RTLD
 #	CS_PLATFORM_FOO header define.
 #------------------------------------------------------------------------------
 CS_CHECK_HOST
-AS_IF([test "x$cs_host_macosx" = "xyes"],
-    [# We assume that we always have CoreAudio available on MacOS/X.
-    CS_EMIT_BUILD_PROPERTY([COREAUDIO.AVAILABLE], [yes])
-    CS_EMIT_BUILD_PROPERTY([COREAUDIO.LFLAGS],
-	[-framework CoreAudio -framework AudioToolbox])
-    CS_HEADER_PROPERTY([CS_PLATFORM_MACOSX])],
-    [case $cs_host_family in
-	windows)
-	    CS_HEADER_PROPERTY([CS_PLATFORM_WIN32])
-	    ;;
-	unix)
-	    CS_HEADER_PROPERTY([CS_PLATFORM_UNIX])
-    esac])
+case $cs_host_target in
+    macosx)
+        # We assume that we always have CoreAudio available on MacOS/X.
+        CS_EMIT_BUILD_PROPERTY([COREAUDIO.AVAILABLE], [yes])
+        CS_EMIT_BUILD_PROPERTY([COREAUDIO.LFLAGS],
+	    [-framework CoreAudio -framework AudioToolbox])
+        CS_HEADER_PROPERTY([CS_PLATFORM_MACOSX])
+        ;;
+esac
+case $cs_host_family in
+    windows)
+	CS_HEADER_PROPERTY([CS_PLATFORM_WIN32])
+	;;
+    unix)
+	CS_HEADER_PROPERTY([CS_PLATFORM_UNIX])
+        ;;
+    esac
 CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
     [AS_ESCAPE(["])$cs_host_os_normalized[]AS_ESCAPE(["])])
 
@@ -503,6 +509,11 @@ CS_COMPILER_IGNORE_PRAGMAS([C++], [cs_cv_prog_cxx_ignore_unknown_pragmas],
 CS_COMPILER_IGNORE_LONG_DOUBLE([C++], [cs_cv_prog_cxx_ignore_long_double],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MANDATORY],
 	[$cs_cv_prog_cxx_ignore_long_double], [+])])
+
+CS_COMPILER_IGNORE_NON_VIRTUAL_DTOR([C++],
+    [cs_cv_prog_cxx_ignore_non_virtual_dtor],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS.WARNING.NO_NON_VIRTUAL_DTOR],
+        [$cs_cv_prog_cxx_ignore_non_virtual_dtor])])
 
 
 
@@ -1289,39 +1300,24 @@ CS_CHECK_LIB_WITH([cairo],
 	[cairo_create (0)])],
     [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libcairo], [CAIRO])])
 
-CS_CHECK_LIB_WITH([cairomm-1.0],
+CS_CHECK_LIB_WITH([cairomm],
     [AC_LANG_PROGRAM(
 	[[#include <cairomm/cairomm.h>]],
 	[Cairo::Context c ((cairo_t*)0)])],
     [], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libcairomm], [CAIROMM])], [],
     [$cs_cv_libcairo_cflags],
     [$cs_cv_libcairo_lflags],
-    [$cs_cv_libcairo_libs])
+    [$cs_cv_libcairo_libs],
+    [cairomm-1, cairomm-1.0])
 
 CS_CHECK_LIB_WITH([vgvm],
     [AC_LANG_PROGRAM(
 	[[#include <vgvm/vgvm.h>]],
 	[new vgvm::Program (0,0)])],
     [], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libvgvm], [VGVM])], [],
-    [$cs_cv_libcairomm_1_0_cflags],
-    [$cs_cv_libcairomm_1_0_lflags],
-    [$cs_cv_libcairomm_1_0_libs])
-
-
-
-#------------------------------------------------------------------------------
-# Check for MikMod.  In addition to the standard installed locations, we also
-# search CS/libs/libmikmod*.
-#------------------------------------------------------------------------------
-CS_CHECK_LIB_WITH([mikmod],
-    [AC_LANG_PROGRAM(
-	[[#include <mikmod.h>]],
-	[MikMod_Init("mikmodtest"); MikMod_Exit();])],
-    [$srcdir/libs/libmikmod*], [],
-    [CS_EMIT_BUILD_RESULT([cs_cv_libmikmod], [MIKMOD])], [],
-    [$cs_cv_sys_pthread_cflags],
-    [$cs_cv_sys_pthread_lflags],
-    [$cs_cv_sys_pthread_libs])
+    [$cs_cv_libcairomm_cflags],
+    [$cs_cv_libcairomm_lflags],
+    [$cs_cv_libcairomm_libs])
 
 
 
@@ -1427,22 +1423,21 @@ AS_IF([test $cs_cv_libode_opcode = yes],
 #------------------------------------------------------------------------------
 # Check for bullet physics library.
 #------------------------------------------------------------------------------
+# Note: The pkg-config package name for Bullet 2.x is 'bullet', but the actual
+# libraries are bulletdynamics, bulletcollision and bulletmath. So note that
+# there is actually no 'bullet' library.
 CS_CHECK_LIB_WITH([bullet],
-    [AC_LANG_PROGRAM([[
-    #include <BroadphaseCollision/SimpleBroadphase.h>
-    #include <CcdPhysics/CcdPhysicsController.h>
-    #include <CcdPhysics/CcdPhysicsEnvironment.h>
-    #include <CollisionDispatch/CollisionDispatcher.h>
-    ]],
-    [CollisionDispatcher d;
-    SimpleBroadphase b;
-    CcdPhysicsEnvironment* e = new CcdPhysicsEnvironment (&d, &b)])],
+    [AC_LANG_PROGRAM(
+      [[#include "btBulletDynamicsCommon.h"
+      #include "btBulletCollisionCommon.h"]],
+      [btCollisionDispatcher* d;
+      btBroadphaseInterface* b;
+      btSequentialImpulseConstraintSolver* s;
+      btDefaultCollisionConfiguration* c;
+      btDynamicsWorld* world = new btDiscreteDynamicsWorld (d, b, s, c)])],
     [], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libbullet], [BULLET])], [],
-    [], [], 
-    [-lbulletccdphysics \
-    -lbulletphysicsinterfacecommon \
-    -lbulletdynamics \
-    -lbullet])
+    [], [], [-lbulletdynamics -lbulletcollision -lbulletmath],
+    [bulletdynamics])
 
 
 
@@ -1465,18 +1460,14 @@ AC_DEFUN([CS_CHECK_LIBOPENAL],
     [AC_REQUIRE([CS_CHECK_COMMON_LIBS])
     CS_CHECK_BUILD([for OpenAL], [cs_cv_libopenal],
 	[AC_LANG_PROGRAM(
-	    [CS_AL_INCLUDE([CS_OPENAL_PATH],[AL],[alut.h])],
-	    [alutInit(0,0);])],
+	    [CS_AL_INCLUDE([CS_OPENAL_PATH],[AL],[alc.h])],
+	    [alcCreateContext (0,0);])],
 	[CS_CREATE_TUPLE([-DCS_OPENAL_PATH=OpenAL],[],[-framework OpenAL]) \
 	CS_CREATE_TUPLE([],[],[-lopenal]) \
 	CS_CREATE_TUPLE([],[],[-lopenal32]) \
-	CS_CREATE_TUPLE([],[],[-lalut -lopenal]) \
-	CS_CREATE_TUPLE([],[],[-lalut -lopenal32]) \
-	CS_CREATE_TUPLE([],[],[-lALut -lOpenAL32]) \
+	CS_CREATE_TUPLE([],[],[-lOpenAL32]) \
 	CS_CREATE_TUPLE([],[],[-lopenal -ldsound]) \
-	CS_CREATE_TUPLE([],[],[-lopenal32 -ldsound]) \
-	CS_CREATE_TUPLE([],[],[-lalut -lopenal -ldsound]) \
-	CS_CREATE_TUPLE([],[],[-lalut -lopenal32 -ldsound])], [],
+	CS_CREATE_TUPLE([],[],[-lopenal32 -ldsound])], [],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libopenal], [OPENAL])], [], [],
 	[$cs_cv_sys_pthread_cflags],
 	[$cs_cv_sys_pthread_lflags],
@@ -1827,9 +1818,19 @@ AS_IF([test $cs_host_family != windows],
 #------------------------------------------------------------------------------
 # Check for Colour Ascii Art library (libcaca).
 #------------------------------------------------------------------------------
+# NOTE: Would solely pkg-config be used for caca detection the separate cucul 
+#  test could be dropped since it would be contained in caca.
+CS_CHECK_LIB_WITH([cucul],
+    [AC_LANG_PROGRAM([[#include <cucul.h>]], [cucul_create_canvas(0,0)])],
+    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libcucul], [CUCUL])], [], [], [], [],
+    [libcucul])
+    
 CS_CHECK_LIB_WITH([caca],
-    [AC_LANG_PROGRAM([[#include <caca.h>]], [caca_init(); caca_end();])],
-    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libcaca], [LIBCACA])], [], [], [], [],
+    [AC_LANG_PROGRAM([[#include <caca.h>]], [caca_create_display(0)])],
+    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libcaca], [CACA])], [], 
+    [$cs_cv_libcucul_cflags], 
+    [$cs_cv_libcucul_lflags], 
+    [$cs_cv_libcucul_libs],
     [libcaca])
 
 
@@ -2238,7 +2239,7 @@ AC_CHECK_HEADERS([byteswap.h],
 #------------------------------------------------------------------------------
 # Check how to declare functions and types deprecated.
 #------------------------------------------------------------------------------
-CS_SYMBOL_QUALIFIER([how to declare deprecations],
+CS_SYMBOL_QUALIFIER([how to declare deprecation],
     [cs_cv_prog_cxx_declare_deprecated],
     [__attribute__((deprecated))], [], [C++],
     [CS_HEADER_PROPERTY([CS_ATTRIBUTE_DEPRECATED],
@@ -2250,7 +2251,7 @@ CS_SYMBOL_QUALIFIER([how to declare deprecations],
 # Check how to declare functions and types perfectly constant (not affected by
 # any global state and always returning the same value for the same input).
 #------------------------------------------------------------------------------
-CS_SYMBOL_QUALIFIER([how to declare const functions],
+CS_SYMBOL_QUALIFIER([how to declare const function],
     [cs_cv_prog_cxx_declare_const],
     [__attribute__((const))], [], [C++],
     [CS_HEADER_PROPERTY([CS_CONST_METHOD],
@@ -2262,7 +2263,7 @@ CS_SYMBOL_QUALIFIER([how to declare const functions],
 # Check how to declare functions and types pure (not affected by any global
 # state).
 #------------------------------------------------------------------------------
-CS_SYMBOL_QUALIFIER([how to declare pure functions],
+CS_SYMBOL_QUALIFIER([how to declare pure function],
     [cs_cv_prog_cxx_declare_pure],
     [__attribute__((pure))], [], [C++],
     [CS_HEADER_PROPERTY([CS_PURE_METHOD],
@@ -2273,7 +2274,7 @@ CS_SYMBOL_QUALIFIER([how to declare pure functions],
 #------------------------------------------------------------------------------
 # Check if the "malloc" attribute is available.
 #------------------------------------------------------------------------------
-CS_SYMBOL_QUALIFIER([for "malloc" attribute],
+CS_SYMBOL_QUALIFIER([how to declare allocation function],
     [cs_cv_prog_c_attr_malloc],
     [__attribute__((malloc))], [], [C])
 AS_IF([test $cs_cv_prog_c_attr_malloc != no],
@@ -2382,9 +2383,7 @@ AS_IF([test $enable_meta_info_embedding = yes],
 	[AS_ESCAPE([$(EMBED_META.CFLAGS)])], [+])
     CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS],
 	[AS_ESCAPE([$(EMBED_META.LFLAGS)])], [+])
-    AC_CHECK_HEADERS([elf.h], [CS_HEADER_PROPERTY([CS_HAVE_ELF_H])])
-    AS_IF([test "$cs_cv_libbfd_ok" = yes],
-	[CS_HEADER_PROPERTY([CS_HAVE_LIBBFD])])])
+    AC_CHECK_HEADERS([elf.h], [CS_HEADER_PROPERTY([CS_HAVE_ELF_H])])])
 
 
 
@@ -2403,13 +2402,16 @@ AS_IF([test $enable_meta_info_embedding = yes],
 AS_IF([test $cs_build_mode = debug],
     [case $host_os in
 	mingw*|cygwin*)
-	    CS_CHECK_LIBBFD([emit],
-		[CS_HEADER_PROPERTY([CS_HAVE_LIBBFD])
-		cs_debug_libbfd=yes],
-		[cs_debug_libbfd=no])
-	    ;;
-	*) cs_debug_libbfd=no ;;
+	    do_check_libbfd=yes ;;
+	*) do_check_libbfd=$ac_cv_lib_dl_dladdr ;;
     esac],
+    [do_check_libbfd=no])
+
+AS_IF([test $do_check_libbfd = yes],
+    [CS_CHECK_LIBBFD([emit],
+	[CS_HEADER_PROPERTY([CS_BFD_DEBUG_SYMBOLS])
+	cs_debug_libbfd=yes],
+	[cs_debug_libbfd=no])],
     [cs_debug_libbfd=no])
 
 

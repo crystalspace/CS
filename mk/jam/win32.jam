@@ -492,9 +492,14 @@ rule MakeDllDefFile
   }
 }
 
+# SystemLinkSharedLibrary barename : target : objects : linklib
 rule SystemLinkSharedLibrary
 {
-  LFlags $(<) : $(LINKLIBS) ;
+  local barename = $(1) ;
+  local target = $(2) ;
+  local objects = $(3) ;
+  local linklib = $(4) ;
+  LFlags $(target) : $(LINKLIBS) ;
   
   # The "crystalspace" library is so massive that it blows Jam's command line
   # length limit when all object files are passed in at once to some command.
@@ -510,34 +515,34 @@ rule SystemLinkSharedLibrary
   # DLL. Conveniently (somewhat), all exported symbols are into a section
   # ".drectve" of an object file by gcc. After extracting these sections and
   # some postprocessing, we finally have all .DEF entries. Phew.
-  local lib = $(<).a ;
-  MakeLocate $(lib) $(lib)($(>:BS)) : $(LOCATE.OBJECTS)/libs ;
-  Depends $(lib) : $(lib)($(>:BS)) ;
+  local lib = $(target).a ;
+  MakeLocate $(lib) $(lib)($(objects:BS)) : $(LOCATE.OBJECTS)/libs ;
+  Depends $(lib) : $(lib)($(objects:BS)) ;
   local i ;
-  for i in $(>)
+  for i in $(objects)
   {
     Depends $(lib)($(i:BS)) : $(i) ;
   }
-  Archive $(lib) : $(>) ;
+  Archive $(lib) : $(objects) ;
   Ranlib $(lib) ;
-  #RmTemps $(lib) : $(>) ;
+  #RmTemps $(lib) : $(objects) ;
   
-  Depends $(<) : $(lib) ;
+  Depends $(target) : $(lib) ;
   
-  local def = $(<).def ;
-  MakeDllDefFile $(def) : $(>) ;
-  Depends $(<) : $(def) ;
+  local def = $(target).def ;
+  MakeDllDefFile $(def) : $(objects) ;
+  Depends $(target) : $(def) ;
   Clean clean : $(def) ;
-  Clean $(<)clean : $(def) ;
-  Depends $(<)clean : $(def)clean ;
+  Clean $(barename)clean : $(def) ;
+  Depends $(barename)clean : $(def)clean ;
   
-  EXPORTDEFS on $(<) = $(def) ;
-  IMPLIB on $(<) = $(3) ;
-  Depends $(3) : $(<) ;
-  LinkSharedLibrary $(<) : $(lib) ;
+  EXPORTDEFS on $(target) = $(def) ;
+  IMPLIB on $(target) = $(linklib) ;
+  Depends $(linklib) : $(target) ;
+  LinkSharedLibrary $(target) : $(lib) ;
 
   Clean clean : $(target) ;
-  Clean $(<)clean : $(target) ;
+  Clean $(barename)clean : $(target) ;
 }
 
 actions ExtractDrectve

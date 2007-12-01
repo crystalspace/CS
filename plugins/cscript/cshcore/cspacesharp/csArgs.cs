@@ -29,7 +29,7 @@ namespace CrystalSpace.InteropServices
   {
     public int free;
     public int argc;
-    public int exename;
+    public IntPtr exename;
     public IntPtr argv;
   };
 
@@ -100,7 +100,7 @@ namespace CrystalSpace.InteropServices
       if (argc == 0)
       {
 	handle.free = 0;
-        handle.exename = String2ASCII(Assembly.Location);
+        handle.exename = String2ASCII(Assembly.GetEntryAssembly().Location);
 	handle.argc = 0;
 	handle.argv = IntPtr.Zero;
 	return handle;
@@ -114,7 +114,7 @@ namespace CrystalSpace.InteropServices
       }
 
       handle.free = 1;
-      handle.exename = String2ASCII(Assembly.Location);
+      handle.exename = String2ASCII(Assembly.GetEntryAssembly().Location);
       handle.argc = argc;
       handle.argv = argv;
       return handle;

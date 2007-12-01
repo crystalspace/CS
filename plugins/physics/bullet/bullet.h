@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2001 by Jorrit Tyberghein
-Piotr Obrzut
+Copyright (C) 2007 by Jorrit Tyberghein
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -27,336 +26,426 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
 #include "csutil/weakrefarr.h"
+#include "ivaria/bullet.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Bullet)
 {
 
-/**
-* This is the implementation for the actual plugin.
-* It is responsible for creating iDynamicSystem.
-*/
-class csBulletDynamics : public scfImplementation2<csBulletDynamics, iDynamics, iComponent>
-{
-private:
-
-  iObjectRegistry* object_reg;
-  csRefArrayObject<iDynamicSystem> systems;
-  csWeakRefArray<iDynamicsStepCallback> step_callbacks;
-
-public:
-
-  csBulletDynamics (iBase *iParent);
-  virtual ~csBulletDynamics ();
-
-  csPtr<iDynamicSystem> CreateSystem ();
-
-  void RemoveSystem (iDynamicSystem* system);
-
-  void RemoveSystems ();
-
-  iDynamicSystem* FindSystem (const char *name);
-
-  void Step (float stepsize);
-
-  void AddStepCallback (iDynamicsStepCallback *callback)
-  {step_callbacks.Push (callback);}
-
-  void RemoveStepCallback (iDynamicsStepCallback *callback)
-  {step_callbacks.Delete (callback);}
-
-  // -- iComponent
-  virtual bool Initialize (iObjectRegistry* object_reg);
-
-};
-
-class csBulletDynamicsSystem : public scfImplementationExt1<csBulletDynamicsSystem, csObject, iDynamicSystem>
-{
-  CcdPhysicsEnvironment *bullet_sys;
-  csVector3 gravity;
-  csRefArrayObject<iRigidBody> bodies;
-  csRefArray<iDynamicsSystemCollider> colliders;
-
-public:
-
-  csBulletDynamicsSystem ();
-  virtual ~csBulletDynamicsSystem ();
-
-  iObject *QueryObject ()
-  {return (iObject*)this;}
-  void SetGravity (const csVector3& v);
-  const csVector3 GetGravity () const;
-  void SetLinearDampener (float d);
-  float GetLinearDampener () const;
-  void SetRollingDampener (float d);
-  float GetRollingDampener () const;
-  void EnableAutoDisable (bool enable);
-  bool AutoDisableEnabled ();
-  void SetAutoDisableParams (float linear, float angular, int steps,
-    float time);
-  void Step (float stepsize);
-
-  csPtr<iRigidBody> CreateBody ();
-  void RemoveBody (iRigidBody* body);
-  iRigidBody *FindBody (const char *name);
-  iRigidBody *GetBody (unsigned int index);
-  int GetBodysCount ();
-
-  csPtr<iBodyGroup> CreateGroup ();
-  void RemoveGroup (iBodyGroup* group);
-
-  csPtr<iJoint> CreateJoint ();
-  void RemoveJoint (iJoint* joint);
-  iDynamicsMoveCallback* GetDefaultMoveCallback ();
-
-  bool AttachColliderMesh (iMeshWrapper* mesh,
-    const csOrthoTransform& trans, float friction,
-    float elasticity, float softness = 0.01f);
-  bool AttachColliderCylinder (float length, float radius,
-    const csOrthoTransform& trans, float friction,
-    float elasticity, float softness = 0.01f);
-  bool AttachColliderBox (const csVector3 &size,
-    const csOrthoTransform& trans, float friction,
-    float elasticity, float softness = 0.01f);
-  bool AttachColliderSphere (float radius, const csVector3 &offset,
-    float friction, float elasticity, float softness = 0.01f);
-  bool AttachColliderPlane (const csPlane3 &plane, float friction,
-    float elasticity, float softness = 0.01f);
-  void DestroyColliders ()
-  {colliders.DeleteAll ();}
-  void DestroyCollider (iDynamicsSystemCollider* collider)
-  {colliders.Delete (collider);}
-  void AttachCollider (iDynamicsSystemCollider* collider);
-  csRef<iDynamicsSystemCollider> CreateCollider ();
-  csRef<iDynamicsSystemCollider> GetCollider (unsigned int index) 
-  {return csRef<iDynamicsSystemCollider> (colliders[index]);}
-  int GetColliderCount () 
-  {return (int) colliders.GetSize ();}
-
-  CcdPhysicsEnvironment *GetBulletSys () 
-  {return bullet_sys;}
-};
+class csBulletMotionState;
+class csBulletDebugDraw;
 
 /**
 * This is the implementation for a default dynamics move callback.
 * It can update mesh.
 */
-class csBulletDefaultMoveCallback : 
-  public scfImplementation1<csBulletDefaultMoveCallback, iDynamicsMoveCallback>
+class csBulletDefaultMoveCallback : public scfImplementation1<
+  csBulletDefaultMoveCallback, iDynamicsMoveCallback>
 {
 public:
-
   csBulletDefaultMoveCallback ();
   virtual ~csBulletDefaultMoveCallback ();
 
-  void Execute (iMeshWrapper* mesh, csOrthoTransform& t);
-  void Execute (csOrthoTransform& t);
-  void Execute (iLight*, csOrthoTransform&) {}
-  void Execute (iCamera*, csOrthoTransform&) {}
+  virtual void Execute (iMeshWrapper* mesh, csOrthoTransform& t);
+  virtual void Execute (csOrthoTransform& t);
+  virtual void Execute (iLight*, csOrthoTransform&) {}
+  virtual void Execute (iCamera*, csOrthoTransform&) {}
 };
 
-class	MyMotionState : public PHY_IMotionState
-
+/**
+* This is the implementation for the actual plugin.
+* It is responsible for creating iDynamicSystem.
+*/
+class csBulletDynamics : public scfImplementation2<csBulletDynamics,
+  iDynamics, iComponent>
 {
+private:
+  iObjectRegistry* object_reg;
+  csRefArrayObject<iDynamicSystem> systems;
+  csRefArray<iDynamicsStepCallback> step_callbacks;
+
+  btCollisionDispatcher* dispatcher;
+  btDefaultCollisionConfiguration* configuration;
+  btSequentialImpulseConstraintSolver* solver;
+  btBroadphaseInterface* broadphase;
+
 public:
-  MyMotionState();
+  csBulletDynamics (iBase *iParent);
+  virtual ~csBulletDynamics ();
 
-  virtual ~MyMotionState();
+  virtual csPtr<iDynamicSystem> CreateSystem ();
+  virtual void RemoveSystem (iDynamicSystem* system);
+  virtual void RemoveSystems ();
+  virtual iDynamicSystem* FindSystem (const char *name);
+  virtual void Step (float stepsize);
+  virtual void AddStepCallback (iDynamicsStepCallback *callback)
+  { step_callbacks.Push (callback); }
+  virtual void RemoveStepCallback (iDynamicsStepCallback *callback)
+  { step_callbacks.Delete (callback); }
 
-  virtual void	getWorldPosition(float& posX,float& posY,float& posZ);
-  virtual void	getWorldScaling(float& scaleX,float& scaleY,float& scaleZ);
-  virtual void	getWorldOrientation(float& quatIma0,float& quatIma1,float& quatIma2,float& quatReal);
-
-  virtual void	setWorldPosition(float posX,float posY,float posZ);
-  virtual	void	setWorldOrientation(float quatIma0,float quatIma1,float quatIma2,float quatReal);
-
-  virtual	void	calculateWorldTransformations();
-
-  SimdTransform	m_worldTransform;
-
+  //  iComponent
+  virtual bool Initialize (iObjectRegistry* object_reg);
 };
 
-class csBulletRigidBody : public scfImplementationExt1<csBulletRigidBody, csObject, iRigidBody>
+class csBulletDynamicsSystem : public scfImplementationExt2<
+  csBulletDynamicsSystem, csObject, iDynamicSystem,
+  iBulletDynamicSystem>
 {
-  CcdPhysicsController *pc; 
-  MyMotionState *ms;
-  csRef<iMeshWrapper> mesh;
-  csRef<iDynamicsMoveCallback> move_cb;
-  csBulletDynamicsSystem* ds;
+private:
+  btDynamicsWorld* bullet_world;
+  csVector3 gravity;
+  csRefArrayObject<iRigidBody> bodies;
+  csRefArray<iDynamicsSystemCollider> colliders;
+  csRefArray<iJoint> joints;
+  csRef<csBulletDefaultMoveCallback> move_cb;
 
+  // For getting collision mesh data.
+  csStringID base_id;
+  csStringID colldet_id;
+
+  csBulletDebugDraw* debugDraw;
+
+public:
+  csBulletDynamicsSystem (btDynamicsWorld* world,
+      iObjectRegistry* object_reg);
+  virtual ~csBulletDynamicsSystem ();
+
+  btDynamicsWorld* GetWorld () const { return bullet_world; }
+
+  csStringID GetBaseID () const { return base_id; }
+  csStringID GetColldetID () const { return colldet_id; }
+
+  virtual iObject *QueryObject () { return (iObject*)this; }
+  virtual void SetGravity (const csVector3& v);
+  virtual const csVector3 GetGravity () const;
+  virtual void SetLinearDampener (float d);
+  virtual float GetLinearDampener () const;
+  virtual void SetRollingDampener (float d);
+  virtual float GetRollingDampener () const;
+  virtual void EnableAutoDisable (bool enable);
+  virtual bool AutoDisableEnabled ();
+  virtual void SetAutoDisableParams (float linear, float angular, int steps,
+    float time);
+  virtual void Step (float stepsize);
+
+  virtual csPtr<iRigidBody> CreateBody ();
+  virtual void RemoveBody (iRigidBody* body);
+  virtual iRigidBody *FindBody (const char *name);
+  virtual iRigidBody *GetBody (unsigned int index);
+  virtual int GetBodysCount ();
+
+  virtual csPtr<iBodyGroup> CreateGroup ();
+  virtual void RemoveGroup (iBodyGroup* group);
+
+  virtual csPtr<iJoint> CreateJoint ();
+  virtual void RemoveJoint (iJoint* joint);
+  virtual iDynamicsMoveCallback* GetDefaultMoveCallback ();
+
+  virtual bool AttachColliderConvexMesh (iMeshWrapper* mesh,
+    const csOrthoTransform& trans, float friction,
+    float elasticity, float softness = 0.01f);
+  virtual bool AttachColliderMesh (iMeshWrapper* mesh,
+    const csOrthoTransform& trans, float friction,
+    float elasticity, float softness = 0.01f);
+  virtual bool AttachColliderCylinder (float length, float radius,
+    const csOrthoTransform& trans, float friction,
+    float elasticity, float softness = 0.01f);
+  virtual bool AttachColliderBox (const csVector3 &size,
+    const csOrthoTransform& trans, float friction,
+    float elasticity, float softness = 0.01f);
+  virtual bool AttachColliderSphere (float radius, const csVector3 &offset,
+    float friction, float elasticity, float softness = 0.01f);
+  virtual bool AttachColliderPlane (const csPlane3 &plane, float friction,
+    float elasticity, float softness = 0.01f);
+  virtual void DestroyColliders () { colliders.DeleteAll (); }
+  virtual void DestroyCollider (iDynamicsSystemCollider* collider)
+  { colliders.Delete (collider); }
+  virtual void AttachCollider (iDynamicsSystemCollider* collider);
+  virtual csRef<iDynamicsSystemCollider> CreateCollider ();
+  virtual csRef<iDynamicsSystemCollider> GetCollider (unsigned int index) 
+  {
+    return csRef<iDynamicsSystemCollider> (colliders[index]);
+  }
+  virtual int GetColliderCount () 
+  {
+    return (int) colliders.GetSize ();
+  }
+
+  btDynamicsWorld *GetBulletSys () { return bullet_world; }
+
+  virtual void DebugDraw (iView* view);
+};
+
+class csBulletRigidBody : public scfImplementationExt1<csBulletRigidBody,
+  csObject, iRigidBody>
+{
+  btRigidBody* body; 
+  csRef<iMeshWrapper> mesh;
+  csBulletDynamicsSystem* ds;
   float mass;
+  csBulletMotionState* motionState;
+
+  // Data we need to keep for the body so we can clean it up
+  // later.
+  btVector3* vertices;
+  int* indices;
 
 public: 
-
   csBulletRigidBody (csBulletDynamicsSystem* ds);
   virtual ~csBulletRigidBody ();
 
-  CcdPhysicsController *GetBulletBody () {return pc;}
+  btRigidBody* GetBulletBody () { return body; }
 
-  iObject *QueryObject (void)
-  {return (iObject*)this;}
+  virtual iObject* QueryObject (void) { return (iObject*)this; }
 
-  bool MakeStatic (void);
-  bool MakeDynamic (void);
-  bool IsStatic (void);
-  bool Disable (void);
-  bool Enable (void);
-  bool IsEnabled (void);  
+  virtual bool MakeStatic (void);
+  virtual bool MakeDynamic (void);
+  virtual bool IsStatic (void);
+  virtual bool Disable (void);
+  virtual bool Enable (void);
+  virtual bool IsEnabled (void);  
 
-  csRef<iBodyGroup> GetGroup (void);
+  virtual csRef<iBodyGroup> GetGroup (void);
 
-  bool AttachColliderMesh (iMeshWrapper* mesh,
+  virtual bool AttachColliderConvexMesh (iMeshWrapper* mesh,
     const csOrthoTransform& trans, float friction, float density,
     float elasticity, float softness = 0.01f);
 
-  bool AttachColliderCylinder (float length, float radius,
+  virtual bool AttachColliderMesh (iMeshWrapper* mesh,
     const csOrthoTransform& trans, float friction, float density,
     float elasticity, float softness = 0.01f);
 
-  bool AttachColliderBox (const csVector3 &size,
+  virtual bool AttachColliderCylinder (float length, float radius,
     const csOrthoTransform& trans, float friction, float density,
     float elasticity, float softness = 0.01f);
 
-  bool AttachColliderSphere (float radius, const csVector3 &offset,
+  virtual bool AttachColliderBox (const csVector3 &size,
+    const csOrthoTransform& trans, float friction, float density,
+    float elasticity, float softness = 0.01f);
+
+  virtual bool AttachColliderSphere (float radius, const csVector3 &offset,
     float friction, float density, float elasticity,
     float softness = 0.01f);
 
-  bool AttachColliderPlane (const csPlane3 &plane, float friction,
+  virtual bool AttachColliderPlane (const csPlane3 &plane, float friction,
     float density, float elasticity, float softness = 0.01f);
 
-  void AttachCollider (iDynamicsSystemCollider* collider);
+  virtual void AttachCollider (iDynamicsSystemCollider* collider);
 
-  void DestroyColliders ();
-  void DestroyCollider (iDynamicsSystemCollider* collider);
+  virtual void DestroyColliders ();
+  virtual void DestroyCollider (iDynamicsSystemCollider* collider);
 
-  void SetPosition (const csVector3& trans);
+  virtual void SetPosition (const csVector3& trans);
+  virtual const csVector3 GetPosition () const;
+  virtual void SetOrientation (const csMatrix3& trans);
+  virtual const csMatrix3 GetOrientation () const;
+  virtual void SetTransform (const csOrthoTransform& trans);
+  virtual const csOrthoTransform GetTransform () const;
+  virtual void SetLinearVelocity (const csVector3& vel);
+  virtual const csVector3 GetLinearVelocity () const;
+  virtual void SetAngularVelocity (const csVector3& vel);
+  virtual const csVector3 GetAngularVelocity () const;
 
-  const csVector3 GetPosition () const;
-
-  void SetOrientation (const csMatrix3& trans);
-
-  const csMatrix3 GetOrientation () const;
-
-  void SetTransform (const csOrthoTransform& trans);
-
-  const csOrthoTransform GetTransform () const;
-
-  void SetLinearVelocity (const csVector3& vel);
-
-  const csVector3 GetLinearVelocity () const;
-
-  void SetAngularVelocity (const csVector3& vel);
-
-  const csVector3 GetAngularVelocity () const;
-
-
-  void SetProperties (float mass, const csVector3& center,
+  virtual void SetProperties (float mass, const csVector3& center,
     const csMatrix3& inertia);
-
-  void GetProperties (float* mass, csVector3* center,
+  virtual void GetProperties (float* mass, csVector3* center,
     csMatrix3* inertia);
 
-  float GetMass ();
+  virtual float GetMass ();
+  virtual csVector3 GetCenter ();
+  virtual csMatrix3 GetInertia ();
 
-  csVector3 GetCenter ();
+  virtual void AdjustTotalMass (float targetmass);
 
-  csMatrix3 GetInertia ();
-
-  void AdjustTotalMass (float targetmass);
-
-  void AddForce (const csVector3& force);
-
-  void AddTorque (const csVector3& force);
-
-  void AddRelForce (const csVector3& force);
-
-  void AddRelTorque (const csVector3& force) ;
-
-  void AddForceAtPos (const csVector3& force, const csVector3& pos);
-
-  void AddForceAtRelPos (const csVector3& force,
+  virtual void AddForce (const csVector3& force);
+  virtual void AddTorque (const csVector3& force);
+  virtual void AddRelForce (const csVector3& force);
+  virtual void AddRelTorque (const csVector3& force) ;
+  virtual void AddForceAtPos (const csVector3& force, const csVector3& pos);
+  virtual void AddForceAtRelPos (const csVector3& force,
+    const csVector3& pos);
+  virtual void AddRelForceAtPos (const csVector3& force,
+    const csVector3& pos);
+  virtual void AddRelForceAtRelPos (const csVector3& force,
     const csVector3& pos);
 
-  void AddRelForceAtPos (const csVector3& force,
-    const csVector3& pos);
+  virtual const csVector3 GetForce () const;
+  virtual const csVector3 GetTorque () const;
 
-  void AddRelForceAtRelPos (const csVector3& force,
-    const csVector3& pos);
+  virtual void AttachMesh (iMeshWrapper* mesh);
+  virtual iMeshWrapper* GetAttachedMesh ();
 
-  const csVector3 GetForce () const;
+  virtual void Update ();
 
-  const csVector3 GetTorque () const;
-
-  void AttachMesh (iMeshWrapper* mesh);
-
-  void Update ();
-
-  iMeshWrapper* GetAttachedMesh ();
-
-  void SetMoveCallback (iDynamicsMoveCallback* cb);
-  void SetCollisionCallback (iDynamicsCollisionCallback* cb);
-  void Collision (iRigidBody *other, const csVector3& pos,
+  virtual void SetMoveCallback (iDynamicsMoveCallback* cb);
+  virtual void SetCollisionCallback (iDynamicsCollisionCallback* cb);
+  virtual void Collision (iRigidBody *other, const csVector3& pos,
       const csVector3& normal, float depth);
-  csRef<iDynamicsSystemCollider> GetCollider (unsigned int index);
-  int GetColliderCount ();
+  virtual csRef<iDynamicsSystemCollider> GetCollider (unsigned int index);
+  virtual int GetColliderCount ();
 
-  void AttachLight (iLight*) {};
-  iLight* GetAttachedLight () {return NULL;}
-  void AttachCamera (iCamera*) {}
-  iCamera* GetAttachedCamera (){return NULL;}
-
-protected:
-
-  void ResetShape ();
+  virtual void AttachLight (iLight*) {}
+  virtual iLight* GetAttachedLight () { return 0; }
+  virtual void AttachCamera (iCamera*) {}
+  virtual iCamera* GetAttachedCamera () { return 0; }
 };
 
-class csBulletCollider : public scfImplementation1<csBulletCollider, iDynamicsSystemCollider>
+class csBulletCollider : public scfImplementation1<csBulletCollider,
+  iDynamicsSystemCollider>
 {
-  CcdPhysicsController* pc;
+  btRigidBody* body;
   csBulletDynamicsSystem* ds;
   csColliderGeometryType geom_type;
-  MyMotionState *ms;
+  float mass;
+  float friction;
+  csBulletMotionState* motionState;
+  btCollisionShape* shape;
+
+  // Data we need to keep for the body so we can clean it up
+  // later.
+  btVector3* vertices;
+  int* indices;
 
 public:
-
   csBulletCollider (csBulletDynamicsSystem* dynsys);
   virtual ~csBulletCollider ();
 
-  CcdPhysicsController* GetBulletController () {return pc;}
+  btRigidBody* GetBulletController () { return body; }
 
-  bool CreateSphereGeometry (const csSphere& sphere);
-  bool CreatePlaneGeometry (const csPlane3& plane);
-  bool CreateMeshGeometry (iMeshWrapper *mesh);
-  bool CreateBoxGeometry (const csVector3& box_size);
-  bool CreateCapsuleGeometry (float length, float radius);
+  virtual bool CreateSphereGeometry (const csSphere& sphere);
+  virtual bool CreatePlaneGeometry (const csPlane3& plane);
+  virtual bool CreateConvexMeshGeometry (iMeshWrapper *mesh);
+  virtual bool CreateMeshGeometry (iMeshWrapper *mesh);
+  virtual bool CreateBoxGeometry (const csVector3& box_size);
+  virtual bool CreateCapsuleGeometry (float length, float radius);
+  virtual bool CreateCylinderGeometry (float length, float radius);
 
-  void SetCollisionCallback (
+  virtual void SetCollisionCallback (
     iDynamicsColliderCollisionCallback* cb);
 
-  void SetFriction (float friction);
-  void SetSoftness (float softness);
-  void SetDensity (float density);
-  void SetElasticity (float elasticity);
-  float GetFriction ();
-  float GetSoftness ();
-  float GetDensity ();
-  float GetElasticity ();
+  virtual void SetFriction (float friction);
+  virtual void SetSoftness (float softness);
+  virtual void SetDensity (float density);
+  virtual void SetElasticity (float elasticity);
+  virtual float GetFriction ();
+  virtual float GetSoftness ();
+  virtual float GetDensity ();
+  virtual float GetElasticity ();
 
-  void FillWithColliderGeometry (csRef<iGeneralFactoryState> genmesh_fact);
-  csColliderGeometryType GetGeometryType () 
-  {return geom_type;};
-  csOrthoTransform GetTransform ();
-  csOrthoTransform GetLocalTransform ();
-  void SetTransform (const csOrthoTransform& trans);
-  bool GetBoxGeometry (csVector3& size); 
-  bool GetSphereGeometry (csSphere& sphere);
-  bool GetPlaneGeometry (csPlane3& plane); 
-  bool GetCylinderGeometry (float& length, float& radius);
-  void MakeStatic ();
-  void MakeDynamic ();
-  bool IsStatic ();
+  virtual void FillWithColliderGeometry (
+      csRef<iGeneralFactoryState> genmesh_fact);
+  virtual csColliderGeometryType GetGeometryType () 
+  { return geom_type; }
+  virtual csOrthoTransform GetTransform ();
+  virtual csOrthoTransform GetLocalTransform ();
+  virtual void SetTransform (const csOrthoTransform& trans);
+  virtual bool GetBoxGeometry (csVector3& size); 
+  virtual bool GetSphereGeometry (csSphere& sphere);
+  virtual bool GetPlaneGeometry (csPlane3& plane); 
+  virtual bool GetCylinderGeometry (float& length, float& radius);
+  virtual void MakeStatic ();
+  virtual void MakeDynamic ();
+  virtual bool IsStatic ();
+};
 
-protected:
-    void ResetShape ();
+#define BULLET_JOINT_NONE 0
+#define BULLET_JOINT_HINGE 1
+#define BULLET_JOINT_POINT2POINT 2
+#define BULLET_JOINT_6DOF 3
+
+class csBulletJoint : public scfImplementation1<csBulletJoint, iJoint>
+{
+private:
+  csBulletDynamicsSystem* ds;
+
+  int current_type;	// One of BULLET_JOINT_xxx
+
+  // Pointer to either btGeneric6DofContraint (in case of BULLET_JOINT_6DOF),
+  // btHingeConstraint (BULLET_JOINT_HINGE), or btPoint2PointConstraint
+  // (BULLET_JOINT_POINT2POINT).
+  btTypedConstraint* constraint;
+
+  csRef<iRigidBody> bodies[2];
+  csOrthoTransform transform;
+
+  bool trans_constraint_x;
+  bool trans_constraint_y;
+  bool trans_constraint_z;
+  csVector3 min_dist;
+  csVector3 max_dist;
+
+  bool rot_constraint_x;
+  bool rot_constraint_y;
+  bool rot_constraint_z;
+  csVector3 min_angle;
+  csVector3 max_angle;
+
+  csVector3 bounce;
+  csVector3 desired_velocity;
+  csVector3 maxforce;
+
+  csVector3 angular_constraints_axis[2];
+
+  /**
+   * Compute the bullet joint type that best matches the current
+   * configuration.
+   */
+  int ComputeBestBulletJointType ();
+
+  /**
+   * Recreate the bullet joint if needed (if the constraint has
+   * not been created yet or the joint type changes).
+   * If 'force' is true then recreation is forced.
+   */
+  void RecreateJointIfNeeded (bool force = false);
+
+public:
+  csBulletJoint (csBulletDynamicsSystem* ds);
+  virtual ~csBulletJoint ();
+ 
+  virtual void Attach (iRigidBody* body1, iRigidBody* body2);
+  virtual csRef<iRigidBody> GetAttachedBody (int body)
+  {
+    CS_ASSERT (body >= 0 && body <= 1);
+    return bodies[body];
+  }
+
+  virtual void SetTransform (const csOrthoTransform& trans);
+  virtual csOrthoTransform GetTransform () { return transform; }
+
+  virtual void SetTransConstraints (bool x, bool y, bool z);
+  virtual bool IsXTransConstrained () { return trans_constraint_x; }
+  virtual bool IsYTransConstrained () { return trans_constraint_y; }
+  virtual bool IsZTransConstrained () { return trans_constraint_z; }
+  virtual void SetMinimumDistance (const csVector3& min) ;
+  virtual csVector3 GetMinimumDistance () { return min_dist; }
+  virtual void SetMaximumDistance (const csVector3& max);
+  virtual csVector3 GetMaximumDistance () { return max_dist; }
+
+  virtual void SetRotConstraints (bool x, bool y, bool z);
+  virtual bool IsXRotConstrained () { return rot_constraint_x; }
+  virtual bool IsYRotConstrained () { return rot_constraint_y; }
+  virtual bool IsZRotConstrained () { return rot_constraint_z; }
+
+  virtual void SetMinimumAngle (const csVector3& min);
+  virtual csVector3 GetMinimumAngle () { return min_angle; }
+  virtual void SetMaximumAngle (const csVector3& max);
+  virtual csVector3 GetMaximumAngle () { return max_angle; }
+
+  virtual void SetBounce (const csVector3& bounce);
+  virtual csVector3 GetBounce () { return bounce; }
+
+  virtual void SetDesiredVelocity (const csVector3& velocity);
+  virtual csVector3 GetDesiredVelocity () { return desired_velocity; }
+
+  virtual void SetMaxForce (const csVector3& maxForce);
+  virtual csVector3 GetMaxForce () { return maxforce; }
+
+  virtual void SetAngularConstraintAxis (const csVector3& axis, int body);
+  virtual csVector3 GetAngularConstraintAxis (int body)
+  {
+    CS_ASSERT (body >=0 && body <= 1);
+    return angular_constraints_axis[body];
+  }
 };
 
 }

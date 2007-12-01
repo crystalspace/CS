@@ -1144,6 +1144,7 @@ class iRegion(core.iBase):
     def FindMeshFactory(*args): return _iengine.iRegion_FindMeshFactory(*args)
     def FindTexture(*args): return _iengine.iRegion_FindTexture(*args)
     def FindMaterial(*args): return _iengine.iRegion_FindMaterial(*args)
+    def FindShader(*args): return _iengine.iRegion_FindShader(*args)
     def FindCameraPosition(*args): return _iengine.iRegion_FindCameraPosition(*args)
     def IsInRegion(*args): return _iengine.iRegion_IsInRegion(*args)
     __swig_destroy__ = _iengine.delete_iRegion

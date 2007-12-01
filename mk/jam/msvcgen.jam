@@ -41,7 +41,7 @@
 #
 #==============================================================================
 
-MSVCGEN_SUPPORTED_VERSIONS = 6 7 71 8 ;
+MSVCGEN_SUPPORTED_VERSIONS = 6 7 71 8 9 ;
 MSVCGEN_BUILD_ROOT ?= [ ConcatDirs $(BUILDTOP) out ] ;
 MSVCGEN_BUILD_TEMP ?= [ ConcatDirs $(MSVCGEN_BUILD_ROOT) msvcgen ] ;
 
@@ -456,7 +456,7 @@ if $(MSVC_VERSION) = 6
   MSVC_FORCE_CRLF = yes ;
   MSVC_TEMPLATE_SUFFIX = 6 ;
 }
-else if $(MSVC_VERSION) = 7 || $(MSVC_VERSION) = 71 || $(MSVC_VERSION) = 8
+else # Versions 7, 71, 8, 9 and "unknown"
 {
   SUFPRJ = vcproj ;
   SUFWSP = sln ;
@@ -476,11 +476,18 @@ else if $(MSVC_VERSION) = 7 || $(MSVC_VERSION) = 71 || $(MSVC_VERSION) = 8
   {
     MSVC_FORMATVERSION_PRJ = 8.00 ;
     MSVC_FORMATVERSION_WSP = 9.00 ;
+    MSVC_WSP_HEADERCOMMENT = "# Visual C++ Express 2005" ;
   }
-}
-else
-{
-  exit "No msvcgen support for MSVC version $(MSVC_VERSION) yet!" ;
+  else if $(MSVC_VERSION) = 9
+  {
+    MSVC_FORMATVERSION_PRJ = 9.00 ;
+    MSVC_FORMATVERSION_WSP = 10.00 ;
+    MSVC_WSP_HEADERCOMMENT = "# Visual C++ Express 2008" ;
+  }
+  else
+  {
+    exit "No msvcgen support for MSVC version $(MSVC_VERSION) yet!" ;
+  }
 }
   
 MSVC.TSUFPRJ = tproj ;
@@ -590,11 +597,13 @@ actions GenerateWin32ManifestRc
     cat > $(<) << __EOF__
 // This file is generated automatically.
 
-#if !defined(PROJECTGEN_VERSION) || (PROJECTGEN_VERSION != 8)
+#if !defined(PROJECTGEN_VERSION) || (PROJECTGEN_VERSION < 8)
 1 24 "$(MANIFEST_NAME)"
 #endif
 __EOF__
 }
+
+rule IconsMakeWin32ICO { }
 
 ## MsvcGenConfig variable [ : value ]
 ##   (See documentation above.)
@@ -636,6 +645,7 @@ rule MsvcGenWorkspace1
     "accept|$(accepts)"
     "reject|$(rejects)"
     "formatversion|$(MSVC_FORMATVERSION_WSP)"
+    "headercomment|$(MSVC_WSP_HEADERCOMMENT)"
     $(MSVCGEN_VARIABLES)
     : notfile : $(respdir) ;
   MsvcRmTemps msvcgen : $(respfile) ;

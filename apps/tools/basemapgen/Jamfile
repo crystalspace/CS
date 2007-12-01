@@ -28,10 +28,13 @@ BASEMAPGEN.PLUGINLIST =
   imgplex
   null2d
   null3d
-  vfs
   xmltiny
   ;
 
+if $(ZLIB.AVAILABLE) = "yes"
+{
+  BASEMAPGEN.PLUGINLIST += vfs ;
+}
 if $(JPEG.AVAILABLE) = "yes"
 {
   BASEMAPGEN.PLUGINLIST += csjpgimg ;

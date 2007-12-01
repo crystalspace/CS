@@ -74,11 +74,14 @@ CSLIGHT.PLUGINLIST =
   terrainldr
   thing
   thingldr
-  vfs
   xmlread
   xmlshader
   ;
 
+if $(ZLIB.AVAILABLE) = "yes"
+{
+  CSLIGHT.PLUGINLIST += vfs ;
+}
 if $(JPEG.AVAILABLE) = "yes"
 {
   CSLIGHT.PLUGINLIST += csjpgimg ;

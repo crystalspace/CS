@@ -2,7 +2,7 @@
 
 # relaytool 1.2
 # Copyright 2004-2005 Mike Hearn <mike@plan99.net>
-# Copyright 2005 Vincent B�ron <vberon@mecano.gme.usherb.ca>
+# Copyright 2005 Vincent Béron <vberon@mecano.gme.usherb.ca>
 # Copyright 2006 Psyche <psyche@ruidoabsurdo.com>
 #
 #############################################################################
@@ -40,7 +40,7 @@ outdir="."
 if [[ "$1" == "--version" ]]; then
     echo "Relaytool 1.11"
     echo "Copyright 2004 Mike Hearn"
-    echo "Copyright 2005 Vincent B�ron"
+    echo "Copyright 2005 Vincent Béron"
     echo
     echo "See $0 for license details."
     exit 1
@@ -187,6 +187,30 @@ int ${libname}_is_present __attribute__((visibility("hidden"))) = 0;
 
 static void *handle = 0;
 
+#if defined(PIC)
+  #if defined( __i386__ )
+    /* NOTE: Assumes GOT is in ebx. Probably the case since the function
+	is unlikely to be called from outside the module. */
+    #define ASM_VAR(x)      #x "@GOTOFF(%ebx)"
+    #define ASM_FUNC(x)     #x "@PLT"
+    #define ASM_FIXUPVAR(x) #x "@GOTOFF(%%ebx)"
+  #elif defined( __x86_64__ )
+    #define ASM_VAR(x)      #x "@GOTPCREL"
+    #define ASM_FUNC(x)     #x "@PLT"
+    #define ASM_FIXUPVAR(x) #x "@GOTPCREL"
+  #endif
+#endif
+
+#ifndef ASM_VAR
+  #define ASM_VAR(x)    #x
+#endif
+#ifndef ASM_FUNC
+  #define ASM_FUNC(x)   #x
+#endif
+#ifndef ASM_FIXUPVAR
+  #define ASM_FIXUPVAR(x) #x
+#endif
+
 /* 1 if present, 0 if not, 0 with warning to stderr if lib not present or symbol not found */
 int __attribute__((visibility("hidden"))) ${libname}_symbol_is_present(char *s)
 {
@@ -218,7 +242,7 @@ __attribute__((noreturn)) __attribute__((visibility("hidden"))) void _relaytool_
 #if defined( __i386__ )
     #define FIXUP_GOT_RELOC(sym, addr) \\
         asm("\tmovl %0, %%eax\n" \\
-            "\tmovl %%eax, " sym "@GOT(%%ebx)\n" : : "r" (addr));
+            "\tmovl %%eax, " ASM_FIXUPVAR (sym) "\n" : : "r" (addr));
 #elif defined( __powerpc__ )
 
     /* The PowerPC ELF ABI is a twisted nightmare. Until I figure it out,
@@ -229,7 +253,7 @@ __attribute__((noreturn)) __attribute__((visibility("hidden"))) void _relaytool_
 #elif defined( __x86_64__ )
     #define FIXUP_GOT_RELOC(sym, addr) \\
         asm("\tmovq %0, %%rax\n" \\
-            "\tmovq %%rax, " sym "@GOT(%%rbx)\n" : : "r" (addr));
+            "\tmovq %%rax, " ASM_FIXUPVAR (sym) "\n" : : "r" (addr));
 #else        
     #error Please define FIXUP_GOT_RELOC for your architecture
 #endif
@@ -267,34 +291,17 @@ cat <<EOF >>"$outfile"
     /* build function jumptable */
     while (functions[i++]) ptrs[i - 1] = dlsym( handle, functions[i - 1] );
     
+    void* symptr;
 EOF
 
     if [ "$variables" != "" ]; then echo "    /* now fixup the global offset table for variable imports */" >>"$outfile"; fi
     for s in $variables; do
-        echo "    FIXUP_GOT_RELOC( \"$s\", dlsym(handle, \"$s\") );" >>"$outfile"
+        echo "    symptr = dlsym(handle, \"$s\");" >>"$outfile"
+        echo "    FIXUP_GOT_RELOC( $s, symptr );" >>"$outfile"
     done
 
     cat <<EOF >>"$outfile"
 }
-
-#if defined(PIC)
-  #if defined( __i386__ )
-    /* NOTE: Assumes GOT is in ebx. Probably the case since the function
-	is unlikely to be called from outside the module. */
-    #define ASM_VAR(x)    #x "@GOTOFF(%ebx)"
-    #define ASM_FUNC(x)   #x "@PLT"
-  #elif defined( __x86_64__ )
-    #define ASM_VAR(x)    #x "@GOTPCREL"
-    #define ASM_FUNC(x)   #x "@PLT"
-  #endif
-#endif
-
-#ifndef ASM_VAR
-  #define ASM_VAR(x)    #x
-#endif
-#ifndef ASM_FUNC
-  #define ASM_FUNC(x)   #x
-#endif
 
 #if defined( __i386__ )
 
@@ -387,9 +394,12 @@ EOF
 }
 
 function fakerelay() {
+    # Absolute library file name
     lib="$1"
+    # Sanitized lib name (e.g. libgtk-x11-2.0.so -> libgtk_x11_2_0)
     libname=$( echo $( basename "$lib" ) | sed 's/\.so.*//' | tr '-' '_' | tr '.' '_' )
     soname=$( objdump -x "$lib" |grep SONAME | awk '{print $2}' )
+    # Stub file name
     outfile="$outdir/`basename "$soname"`.stub.c"
 
     echo -n "$outfile"
@@ -536,10 +546,6 @@ while (( i <= $# )); do
                 error could not find "$lib" in search path
             fi
         elif $found && ! $arch_ok; then
-            #echo -n "-Dlib${lib}_is_present -D\"lib${lib}_symbol_is_present(sym)=1\" $a "
-            #libname=$( echo $( basename "$lib" ) | sed 's/\.so.*//' | tr '-' '_' | tr '.' '_' )
-            #echo -n "-Dlib${libname}_is_present -Dlib${libname}_symbol_is_present(sym)=1 $a "           
-             
             # yes, so let's find its absolute filename by checking in each search path directory
             spfound=false
             for d in ${searchpath[@]}; do
@@ -550,6 +556,8 @@ while (( i <= $# )); do
                         error broken symlink "$absname"
                     fi
                     
+                    # Create a stub C source that just contains dummy 
+                    # libwhatever_... support functions
                     stubfile=$( fakerelay "$absname" )
 
                     # now we have to compile the stub

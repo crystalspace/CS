@@ -39,8 +39,11 @@ class csGraphics2DCaca : public scfImplementationExt1<csGraphics2DCaca,
   bool HardwareCursor;
   /// The event outlet
   csRef<iEventOutlet> EventOutlet;
-  /// the caca bitmap context with pixel format etc.
-  struct caca_bitmap* caca_context;
+  /// the cucul canvas
+  cucul_canvas_t* cucul_canvas;
+  cucul_dither_t* dither;
+  /// the caca display
+  caca_display_t* caca_display;
 
   /// return cooked code for raw keyboard event
   int MapKey(int raw);

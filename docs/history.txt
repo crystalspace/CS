@@ -6,17 +6,301 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+1-Dic-2007
+	- ronsaldo fixed an error with the array support.
 30-Nov-2007
 	- ronsaldo added partial array support.
 	- ronsaldo modified (argc, argv) parameters passing synthesis of argv[0]
 	  with the addition of a exename field to the value passing structure,
 	  which is produced from the managed side property Assembly.Location.
+29-Nov-2007
+	- Eric Sunshine changed 'MasterHeader' rule in helper.jam so that it
+	  invokes the 'ResponseFile' rule with a delimiter of "%" rather than
+	  allowing 'ResponseFile' to use the default delimiter of "@", since
+	  "@" may legally appear in email addresses and Doxygen directives
+	  (@file, for example), both of which are likely to appear in master
+	  header boilerplate.
+	- Eric Sunshine changed CS/include/Jamfile so that it uses Doxygen
+	  directive "@file" in master header boilerplate rather than "\file"
+	  since "\file" ends up as "<formfeed>ile" when 'jam masterheaders' is
+	  invoked under the Dash shell. (This appears to be a bug in Dash
+	  single-quote treatment and has been reported.)
+	- Eric Sunshine fixed bug in configure.ac where CS_PLATFORM_UNIX was
+	  not emitted to csconfig.h on Mac OS X (for which both
+	  CS_PLATFORM_MACOSX and CS_PLATFORM_UNIX are supposed to be defined).
+	  This bug was introduced in r23813-r23814 on 2006/03/14 when inline
+	  host checking code was removed from configure.ac in favor of the
+	  external CS_CHECK_HOST() macro from cs_check_host.m4.  Also fixed
+	  configure.ac so that it no longer access the shell variable
+	  cs_host_macosx, which is private to (not published by)
+	  _CS_CHECK_HOST_DARWIN in cs_check_host.m4.
+28-Nov-2007
+	- res changed the ODE plugin to install custom ODE message handlers
+	  (which can make errors less annoying and reduce the output spam by
+	  buffering up multiple similar messages).
+	- Vincent fixed a build error with GCC (undeclared messageInterval).
+	- res made some cleanups and tweaks to relaytool: fixed a crash in
+	  the "reloc fixup" code on x86 (and maybe x86_64 as well).
+24-Nov-2007
+	- Vincent merged OpenAL branch (r24357:28234) into trunk.
+22-Nov-2007
+	- Marten fixed a possible bug in threading code.
+21-Nov-2007
+	- res added the msvc9 directories to jobber.cfg.
+        - Mike Gist changed object loading so that regions hold a ref to
+          the object after finding a 'duplicate'.
+        - Mike Gist updated the proxy texture code and the
+          unusedresourcehelper functions for the case where multiple regions
+          hold a ref to an object.
+        - Mike Gist added a function to iRegion to find and return an iShader
+          child object and a unusedresourcehelper function to unregister
+          unused shaders in a given list.
+20-Nov-2007
+	- Eric Sunshine eliminated compilation warnings in software renderer.
+	- Eric Sunshine removed the compiler-based deprecation attribute from
+	  CS::Graphics::RenderMeshModes::flipCulling since the inline
+	  constructors references this variable and cause a Niagara of warnings
+	  to flood the build. Worse, even if external projects fix their own
+	  code to avoid this variable, they still get penalized by warnings
+	  because of the constructors (over which code external projects have
+	  no control). One way to avoid this problem would be to un-inline the
+	  constructors and then disable the deprecation warning only when
+	  compiling the implementation file containing the constructors. A
+	  potential difficulty with this approach, however, is that there is no
+	  obvious location in the CS/libs hierarchy for such an implementation
+	  file to reside.  Since it is considered very unlikely that external
+	  projects will be accessing this variable, and since un-inlining the
+	  constructors is perhaps unnecessarily complicated, the decision was
+	  made instead to remove the compiler-based deprecation attribute, but
+	  retain the documentation-based deprecation warning. If real-world
+	  experience shows that removing the compiler attribute was the wrong
+	  approach, then the un-inlining approach can instead be implemented.
+	- Eric Sunshine fixed bug in CS/plugins/cscript/Jamfile where it
+	  unconditionally referenced Python-related targets even if Python SDK
+	  was not found or was disabled explicitly, thus breaking the build in
+	  those cases (and indirectly causing makefile emulation generation to
+	  fail).
+	- Eric Sunshine fixed bug in processorspecdetection_nonwin_gcc_x86.h
+	  where it referenced and returned to the caller uninitialized state.
+	- Eric Sunshine added 'non-virtual destructor' warning suppression to
+	  apps/test/wxtest/Jamfile to silence warnings about header problems
+	  over which we have no control (for wxWidgets shipped with Mac OS X).
+	- Eric Sunshine eliminated numerous compilation warnings throughout
+	  CS/apps plus a couple apparent outright bugs in lighter2 resulting
+	  from invalid csVector3 construction.
+        - Mike Gist changed texture parsing to store the absolute (VFS)
+          file path instead of the relative file path. Resolves #417
+        - Mike Gist added some virtual allocator methods to csShaderVariable.
+          Should resolve #72.
+	- Eric Sunshine fixed bug in recently added
+	  CS::Graphics::RenderMeshModes copy-constructor. Resolves issue #420.
+	- Eric Sunshine eliminated some more compilation warnings in lighter2
+	  reported by a more recent gcc. Also normalized formatting of size_t
+	  per suggestion from Frank.
+	- Eric Sunshine eliminated compilation warning in sprcal3d.
+	- res copied the debug symbol collection and file upload Jam code from
+	  CSlibs.
+	- res added support for version 9 to the VC project generation.
+19-Nov-2007
+	- Eric Sunshine fixed OpenAL renderer to take advantage of
+	  CS_OPENAL_PATH preprocessor symbol when performing #includes. The
+	  value of this symbol is determined by the configure script as 'AL' on
+	  most platforms and 'OpenAL' on Mac OS X. Resolves issue #415.
+	- Eric Sunshine eliminated compilation warnings in OpenAL renderer.
+	- Fossi fixed a null pointer error on loading imposters.
+	- res fixed shared library building breakage after r28177. (A
+	  reference to a parameter of the Win32 SystemLinkSharedLibrary rule
+	  wasn't updated when the parameter placement changed.)
+	- Eric Sunshine generalized "checking..." message for
+	  __attribute__((malloc)) in configure.ac so that it is not quite so
+	  GNU-specific. Also normalized the message to match format of other
+	  similar __attribute__(()) checks.
+	- Eric Sunshine added copy-constructor to CS::Graphics::RenderMeshModes
+	  to pacify Mac OS X 4.0.1 compiler which complained about having to
+	  synthesize the method when invoked by
+	  csGLGraphics3D::DrawSimpleMesh().
+	- Eric Sunshine fixed incorrect type in declaration of
+	  csGLBasicTextureHandle::pbo, which caused compilation to break on Mac
+	  OS X.  Resolves issue #414.
+	- Eric Sunshine added configure.ac check to determine how to suppress
+	  warnings about non-virtual destructors in classes with virtual
+	  methods. CS code itself does not require such suppression, but some
+	  3rd-party libraries employed by CS publish headers which contain this
+	  fault. (Some versions of wxWidgets and cppunit are notable examples.)
+	- res fixed csCommonImageFile to compile when THREADED_LOADING is
+	  disabled.
+	- Eric Sunshine generalized the non-virtual destructor warning
+	  suppression check and moved it from configure.ac to
+	  CS/mk/autoconf/warnings.m4 for use by external projects.
+	- Eric Sunshine added 'non-virtual destructor' warning suppression to
+	  plugins/video/canvas/wxgl/Jamfile to silence warnings about header
+	  problems over which we have no control (for wxWidgets shipped with
+	  Mac OS X).
+18-Nov-2007
+	- Eric Sunshine fixed gristing problem in LibraryShared rule in
+	  library.jam which caused it to leave symbolic links laying around in
+	  top-level build directory at 'clean' time. Also added missing Clean
+	  rule invocation to Library implementation. Fixes issue #413.
+	- Eric Sunshine fixed bugs in construction of '$(libname)clean' targets
+	  in SystemLinkSharedLibrary implementations in unix.jam and win32.jam
+	  which resulted in auxilliary files created by those rules (such as
+	  .dbg and .def) to be left around when those clean targets were
+	  invoked.
+	- Eric Sunshine fixed bug in SystemLinkSharedLibrary in unix.jam which
+	  caused 'clean' targets to miss generated .resp file.
+	- Eric Sunshine simplified and normalized implementation of DoSymLink
+	  actions in helper.jam.
+15-Nov-2007
+	- res changed BfdModuleHelperWin32 to convert backslashes in the 
+	  module name into forward slashes - libbfd wants these.
+	- res changed BfdSymbols to always use separate debug info if present,
+	  not only if the actual module has not symbols - this works better on
+	  Win32 where some symbols (exported funtions, mostly) are always
+	  found in the actual module.
+	- Jorrit fixed a small bug in Dynavis with regards to debugging
+	  output.
+	- Jorrit fixed a bug in dynavis where during update of an object
+	  the check for outline culling was using the old version of
+	  the goodoccluder flag.
+	- Jorrit changed Dynavis so that the warning if a model is not closed
+	  is not used if the model has less then 16 triangles. In that case
+	  Dynavis will not use outline culling anyway so the warning is
+	  useless.
+	- Eric Sunshine fixed bugs in several Jamfiles which referenced the
+	  target 'vfs' unconditionally. This caused Jam to abort if zlib was
+	  not found at configure time, and also caused makefile emulation layer
+	  creation to fail.
+	- Eric Sunshine removed the unused MikMod check from configure.ac.
+	- Eric Sunshine removed unportable shell constructs from
+	  CS/bin/autogen.sh.
+        - Mike Gist fixed a few issues with the forceLoadTextures argument
+          in some functions in csparser, which were causing incorrect default
+          behaviour (and thus breaking some backwards compatibility).
+	- res fixed the static plugins linking library-side glue to also work
+	  when shared libs are disabled.
+	- res removed the "platform allocator" stuff (which became unnecessary
+	  when the malloc/new override was removed).
+	- res tweaked the VC projects have the same .pdb file used by compiler
+	  and linker when building shared libs.
+14-Nov-2007
+	- res fixed BfdModuleHelperWin32 to actually build on MinGW.
+13-Nov-2007
+	- res made the following changes:
+	    - Changed the BFD callstack name resolution helper to be (mostly)
+	      platform-agnostic - a helper is still needed to provide module
+	      file names and addresses.
+	    - Added such a helper for all platforms
+	      supporting dladdr(). 
+	    - Fixed te BFD symbol handler to explicitly try to follow
+	      .gnu_debuglink when no symbols are found in the "main" file.
+	  Together, these changes fix #165.
+	- Eric Sunshine eliminated several compilation warnings in the core
+	  library.
+	- Eric Sunshine fixed sed expression in CS/mk/autoconf/crystal.m4 to
+	  work with POSIX-compliant sed commands (such as the BSD version on
+	  Mac OS X) which recognize only the '*' regex repetition token.
+	  (Portable scripts should not use '+', '?', or '{n,m}' repetition
+	  notation.) Resolves #411.
+11-Nov-2007
+	- res moved CS::ShaderVariableContextImpl to the CS::Graphics
+	  namespace.
+	- res added CS::Graphics::OverlayShaderVariableContextImpl - a shader
+	  variable context that "overlays" SVs over some other given context.
+	- res changed the terrain2 plugin to make the shader variable context
+	  from the terrain cell render properties available for rendering.
+	- res made the terrain2 loader load SVs into cell rendering properties.
+	- res added initial support for lightmaps to the terrain_fixed shaders.
 10-Nov-2007
+	- Vincent applied res' patch for configure OpenAL check. It was
+	  looking for alut, which is not used by CS sound system.
+	- Vincent silenced warnings about '#pragma GCC diagnostic' with
+	  GCC < 4.2.
+	- Marten added an assert in CS::Threading::Condition::Wait to 
+	  make sure the mutex really is held when wait is called.
+	- Marten fixed a compilation error in phystut (M_PI vs PI define).
 	- ronsaldo fixed somes warnings in the c# bindings.
 	- ronsaldo added Equals and GetHashCode method into
 	  bindings/csharp/csoperators.i
 	- ronsaldo fixed more types problems in the c# bindings.
 	- ronsaldo removed somes now unneeded ignores in the c# bindings.
+9-Nov-2007
+	- Jorrit did the following bullet/physics related changes:
+	    - Added iDynamicsSystemCollider->CreateCylinderGeometry().
+	    - Implemented this in bullet and ODE plugins. In the ODE
+	      plugin a capsule is used.
+	    - Bullet debug mode now doesn't draw unneeded many lines in
+	      case there are multiple steps/frame. Also it no longer
+	      flickers. The debug display is stable.
+	    - Added support for convex meshes with extended iDynamics
+	      API. In ODE implementation this will just use a normal
+	      mesh. In Bullet this will use a special convex mesh primitive
+	      which is allowed to move (concave meshes cannot move
+	      in Bullet). This is untested however.
+	    - Compile fix on phystut.
+	    - Changed ODE plugin so that it now automatically handles
+	      splitting the elapsed time in fixed chunks. This code
+	      was present but for some reason disabled by default.
+	    - Removed split in fixed dynamic steps in phystut. Bullet
+	      already handles this automatically and our ode plugin
+	      also fixes this in the plugin.
+	    - Started initialial implementation of joints in the bullet
+	      plugin. Not working yet.
+	    - Partially implemented the joint support for fixed joints.
+	      It works slightly but the simulation seems unstable for
+	      some reason.
+	- Eric Sunshine fixed issue #408 (Autoconf 2.59 bug: "." not
+	  transformed to to "_" in shell $with_foo variable names) by making
+	  "cairomm-1.0" an aliases of "cairomm" in the CS_CHECK_LIB_WITH()
+	  invocation in configure.ac.  This arrangement generally is more
+	  robust anyhow, potentially requiring less future maintenance.
+	- res changed CS_CHECK_LIB_WITH to also augment the pkg-config search
+	  path and executable search path with directories derived from the
+	  user-specified location. Also changed some wording to make clear that
+	  the provided location is only search in addition to any standard
+	  directories, not instead. Addresses #276.
+8-Nov-2007
+	- Jorrit did the following bullet/physics related changes:
+	    - Added support for static mesh colliders to bullet.
+	    - Dynamic rigid mesh bodies are not supported by bullet.
+	      Bullet prints a warning when this is tried and will return
+	      false.
+	    - Added new '*' key to phystut. This will add a star shaped
+	      static collider to test out static mesh colliders.
+	    - Decreased radius of the avatar sphere in phystut.
+	    - Fixed a bug in SetLinearVelocity() and SetAngularVelocity().
+	      If the object was resting then calling those functions
+	      would have no immediate effect. Fixed by calling
+	      activate() on the rigid body.
+	    - Added bullet specific iBulletDynamicSystem interface.
+	      With this interface you can get debug drawing for
+	      Bullet colliders.
+	    - Changed phystut so that with the '?' key you can now enable
+	      and disable this debugging feature for bullet.
+	    - Added implementation of AttachColliderCylinder().
+	    - Fixed a big bug in the conversion of Bullet to CS
+	      transforms. The matrix was inverted which caused objects
+	      to be positioned totally wrong. Without the debugging tool
+	      this was not always very obvious.
+7-Nov-2007
+	- res re-did the change from r27846 (add some arguments to Update()):
+	  to not break compatibility with existing third-party implementations
+	  of iGenMeshAnimationControl, the change to Update() there was
+	  reverted. Instead, a new interface was added 
+	  (iGenMeshAnimationControl1_4) which holds the updated Update() 
+	  method. The genmesh plugin will use the version from
+	  iGenMeshAnimationControl1_4 if that interface is present, otherwise
+	  it will use the "old" version from iGenMeshAnimationControl.
+	- res removed the unused compile group "meshimpexp".
+	- res fixed an inconsistency in the event system where the mouse and
+	  joystick event helpers created events whose key modifier flags where
+	  specified and stored as 'uint32' whereas practically all other code
+	  treated them as 'csKeyModifiers'. Changed the helpers to take and
+	  store 'csKeyModifiers' (the old 'uint32' variants are deprecated).
+	  Should fix #84.
+	- res added iKeyboardDriver::GetModifiersState(), returning the state
+	  of all modifiers in a csKeyModifiers structure.
+	- res fixed some uses of the now-deprecated event creation helpers
+	  taking uint32 modifier states.
 6-Nov-2007
 	- ronsaldo added the missing file include/bindings/csharp/csstring.i
 	- ronsaldo removed the GetInterface method in the c# bindings, because
@@ -25,11 +309,62 @@ chronological order.
 	- ronsaldo added a c# version of the simple room example for java under
 	  scripts/csharp.
 5-Nov-2007
+	- Jorrit changed phystut so that it adds spheres with the
+	  center hard transformed. That way the 'offset' feature in
+	  AttachColliderSphere() is used and tested. In bullet this
+	  appears to work well, however in odedynam it doesn't.
+	- Jorrit fixed a crash-at-exit bug in bullet plugin.
+	- res fixed the bullet configure test to work with Bullet 2.64.
+	- Jorrit implemented CreateCollider() for the bullet plugin. Changed
+	  phystut so that half of the wall colliders are created using
+	  CreateCollider() while the other half are created using
+	  AttachColliderBox().
+	- Jorrit (paritally) implemented CreateSphereGeometry() for
+	  bullet colliders. The center offset is not yet supported and is
+	  always set at 0,0,0.
+	- res changed bin/autogen.sh to not remove aclocal.m4 when autoconf
+	  failed. Can be helpful for troubleshooting.
+	- res fixed a copy-and-paste error in include/Jamfile to properly
+	  filter include/csutil/scopedmutexlock.h from the master headers.
 	- ronsaldo added a GetInterface method into the wrapper iBase of the
 	  c# binding because the QueryInterface method don't appear in
 	  monodevelop.
 4-Nov-2007
+	- res updated the caca canvas to work with caca 0.99.
+	- res added an empty IconsMakeWin32ICO rule override to msvcgen.jam to
+	  prevent icon file regeneration when just regenerating VC projects.
+        - Mike Gist added the concept of 'proxy textures', where textures are
+          created without an image loaded, and then fully loaded when they are
+          needed. This allows for a library of textures to be shared between
+          maps, but only the textures actually used by a given map to be loaded.
+          Also added some unloading functions as part of this, although they can
+          be used separately if wanted.
+	- res adjusted the preprocessor definitions for lib3ds to contain
+	  LIB3DS_GENERIC_DATA_IO_CALLBACKS, needed for the version contained
+	  in the latest cs-win32libs.
+	- res marked the UnusedResourceHelper() functions with
+	  CS_CRYSTALSPACE_EXPORT, had them take const refs to arrays, and 
+	  added safeguards against 0 entries in arrays.
+
+4-Nov-2007
 	- ronsaldo added iString and csString wrapping.
+3-Nov-2007
+	- Jorrit added an initial port of the bullet physics plugin to the
+	  latest release of bullet (2.64). Not everything is supported yet
+	  but basic phystest using boxes and spheres works fine. Things that
+	  don't work are some parts of the collider api, joints, and body
+	  groups. Also several physics parameters like elasticity are not
+	  yet supported.
+	  Note: the configure test is currently broken. The problem is
+	  that bullet expects the include path (-I) to be set to
+	  ${installpath}/bullet and I don't know how to express that in
+	  configure.ac.
+	- res removed the setting of CS_HAVE_LIBBFD when meta info embedding
+	  was enabled and libbfd is present. This fixes build errors on MinGW
+	  in optimize mode where this preprocessor macro was set but libbfd
+	  not actually linked. The other BFD use in CS, the bfd-based plugin
+	  metadata reader, is unaffected since it doesn't make use of that
+	  macro to detect BFD presence (that's handled in the Jam file).
 2-Nov-2007
 	- ronsaldo fixed a error with swig type wrapping adding additional
 	  imports to somes swig files.
@@ -181,9 +516,13 @@ chronological order.
 	- res "generalized" the MSVC deprecation warning headers into 
 	  csutil/deprecation_warn_* since latest gcc also offers a mechanism 
 	  to silence deprecation warnings. 
+	- Mike Gist added a compile fix for the OpenAL plugin on MSVC.
 	- ronsaldo made compileable the modular version of the c# bindings.
 	- ronsaldo merged the trunk into the c# bindings.
 19-Oct-2007
+	- Vincent added comments about using iSndSysSource3D,
+	  iSndSysSource3DDirectional and iSndSysSource3DDirectionalSimple
+	  instead of deprecated iSndSysSourceSoftware3D interface.
 	- caedes fixed element size in swig iDataBuffer buffer declaration.
 	- res changed the GL texture blitting logic to make sure the texture
 	  is in the desired format even if only a partial area is changed.
@@ -250,6 +589,8 @@ chronological order.
 	- res enabled shared libraries by default on Win32 and Linux.
 	- res merged the MSVC project shared libraries support from the
 	  msvc-dlls branch.
+	- Vincent restored iSndSysSourceSoftware3D interface for the sake of
+	  compatibility and deprecated it.
 	- res fixed msvcgen.jam to use MSVC.PREFIX.library_static instead of
 	  MSVC.PREFIX.library everywhere.
 	- res added a new interface for directly setting texture pixel data:
@@ -810,6 +1151,8 @@ chronological order.
 	  the users.
 	- Jorrit reverted r27048 (quotes for javac detection). This fixes
 	  both #377 and #378.
+	- Vincent commented explicit OSS driver for software sound renderer in
+	  OpenAL branch. Also added examples for other drivers requests.
 6-Sep-2007
 	- res applied a patch from 'sarah' to fix compiling after merging some
 	  weaver changes from render manager branch (trac #384).
@@ -817,6 +1160,8 @@ chronological order.
 	  CS_LOAD_PLUGIN_ALWAYS, the function remains in the bindings but is
 	  deprecated now (otherwise some people might not have a chance to
 	  update).
+	- Vincent added missing trailing semicolons for some CS_ASSERT() in
+	  OpenAL renderer plugin, fixing building errors in optimized mode.
 	- Mike Gist fixed bug #351 (wxgl compilation problem).
 	- res fixed a null pointer access in null3d when null2d is not present.
 	- res changed glshader_cg to always use TinyXML to load the "coercion

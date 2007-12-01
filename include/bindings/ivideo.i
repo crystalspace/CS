@@ -1,6 +1,5 @@
 %module ivideo
 %import "bindings/core.i"
-%import "bindings/csgeom.i"
 %import "bindings/csgfx.i"
 %{
 #include "crystalspace.h"
@@ -11,4 +10,3 @@ INLINE_FUNCTIONS
 #endif
 
 %include "bindings/common/ivideo.i"
-

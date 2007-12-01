@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!-- sndsysopenal.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.sndsys.renderer.openal</name>
+        <implementation>csSndSysRendererOpenAL</implementation>
+        <description>Sound System OpenAL Renderer</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
+

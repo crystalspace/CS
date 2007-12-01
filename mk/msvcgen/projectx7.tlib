@@ -39,6 +39,13 @@
 # named "compiler_appgui_debug".
 #------------------------------------------------------------------------------
 
+# Construct a shared lib file name that contains the VC version
+[% MACRO library_dll_versuffix GET 
+  ('-' _ my.doc.packageversion.0) IF my.doc.packageversion.0 -%]
+[% MACRO library_dll_outfile(suffix) GET
+  my.doc.rawtarget.0 _ library_dll_versuffix _ '-vc' _ my.doc.msvcversion.0 _ suffix
+%]
+
 [% MACRO global_app BLOCK -%]
 			ConfigurationType="1"
 			CharacterSet="2"
@@ -94,6 +101,7 @@
 				DebugInformationFormat="3"
 				BufferSecurityCheck="FALSE"
 [% END %]
+
 [% MACRO compiler_debug BLOCK -%]
 				Optimization="0"
 				MinimalRebuild="TRUE"
@@ -102,6 +110,28 @@
 				RuntimeLibrary="3"
 [% precompiled_header -%]
 [% END %]
+
+# The default PDB file name
+[% MACRO compiler_default_pdb BLOCK -%]
+				ProgramDataBaseFileName="[% workbuild([my.doc.rawtarget.0,'.pdb']) %]"
+[% END %]
+[% MACRO compiler_appcon  GET compiler_default_pdb %]
+[% MACRO compiler_appgui  GET compiler_default_pdb %]
+[% MACRO compiler_library GET compiler_default_pdb %]
+[% MACRO compiler_plugin  GET compiler_default_pdb %]
+[% MACRO compiler_dll     GET compiler_default_pdb %]
+
+# For shared libraries, use a different PDB name (resembling the shared lib
+# file name)
+[% MACRO compiler_library_shared_release BLOCK -%]
+				ProgramDatabaseFileName="[% workbuild(library_dll_outfile('.pdb')) %]"
+[% END %]
+
+[% MACRO compiler_library_shared_debug BLOCK -%]
+[% precompiled_header -%]
+				ProgramDatabaseFileName="[% workbuild(library_dll_outfile('_d.pdb')) %]"
+[% END %]
+
 
 [% MACRO linker_release BLOCK -%]
 				LinkIncremental="1"
@@ -129,11 +159,6 @@
 [% MACRO linker_appgui_release GET linker_app(2) %]
 [% MACRO linker_appgui_debug GET linker_app(1) %]
 
-[% MACRO library_dll_versuffix GET 
-  ('-' _ my.doc.packageversion.0) IF my.doc.packageversion.0 -%]
-[% MACRO library_dll_outfile(suffix) GET
-  my.doc.rawtarget.0 _ library_dll_versuffix _ '-vc' _ my.doc.msvcversion.0 _ suffix
-%]
 [% MACRO linker_library_shared_release BLOCK -%]
                                 OutputFile="[% path([my.doc.buildroot.0, library_dll_outfile('.dll')]) %]"
 				ImportLibrary="[% worklibout %]\[% my.doc.project.0 %].lib"

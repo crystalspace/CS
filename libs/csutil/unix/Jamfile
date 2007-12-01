@@ -21,6 +21,11 @@ SubDir TOP libs csutil unix ;
   CsLibAddModule $(rejects) ;
 }
 
+if $(LIBBFD.AVAILABLE) = "yes"
+{
+  CSUTIL.GENERIC += callstack-bfd.cpp ;
+}
+
 CSUTIL.GENERIC +=
   appdir.cpp
   apppath.cpp

@@ -36,11 +36,11 @@
   CS_IMPLEMENT_STATIC_VAR(csnrDbgHelp, 
 			  CS::Debug::CallStackNameResolverDbgHelp, ())
 
-  #ifdef CS_HAVE_LIBBFD
-    #include "win32/callstack-bfd.h"
-    CS_IMPLEMENT_STATIC_VAR(csnrBfd, 
-			    CS::Debug::CallStackNameResolverBfd, ())
-  #endif
+#endif
+#ifdef CS_BFD_DEBUG_SYMBOLS
+  #include "generic/callstack-bfd.h"
+  CS_IMPLEMENT_STATIC_VAR(csnrBfd, 
+			  CS::Debug::CallStackNameResolverBfd, ())
 #endif
 
 namespace CS
@@ -61,10 +61,10 @@ static const void* const callStackCreators[] =
 
 static const void* const callStackNameResolvers[] =
 {
+#ifdef CS_BFD_DEBUG_SYMBOLS
+  (void*)&csnrBfd,
+#endif
 #ifdef CS_PLATFORM_WIN32
-  #ifdef CS_HAVE_LIBBFD
-    (void*)&csnrBfd,
-  #endif
   (void*)&csnrDbgHelp,
 #endif
 #ifdef CS_HAVE_BACKTRACE

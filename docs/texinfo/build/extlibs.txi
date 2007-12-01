@@ -78,11 +78,11 @@ location:
 
 @noindent
 @ifnottex
-@uref{http://www.crystalspace3d.org/downloads/cs-win32libs/cs-win32libs-1.3_001.exe}
+@uref{http://www.crystalspace3d.org/downloads/cs-win32libs/cs-win32libs-1.3_002.exe}
 @end ifnottex
 @iftex
 @code{http://www.crystalspace3d.org/downloads/cs-win32libs/}@*
-@code{cs-win32libs-1.3_001.exe}
+@code{cs-win32libs-1.3_002.exe}
 @end iftex
 
 @subheading zlib
@@ -282,7 +282,7 @@ if you have permission to do so, it is best to install the library.
 This library is used for 2D rendering in text mode.  This is optional and only
 needed for fun. libcaca can be downloaded from:
 
-@emph{Version:} 0.9 recommended
+@emph{Version:} at least 0.99beta12 required
 
 @noindent
 @uref{http://sam.zoy.org/libcaca/}
