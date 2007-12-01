@@ -353,7 +353,7 @@ struct csArrayCapacityFixedGrow :
   public csArrayCapacityLinear<csArrayThresholdFixed<N> >
 {
   csArrayCapacityFixedGrow () :
-    csArrayCapacityLinear<csArrayThresholdFixed<N>> () {}
+    csArrayCapacityLinear<csArrayThresholdFixed<N> > () {}
 };
 
 /**

@@ -36,9 +36,11 @@ namespace RenderManager
   class StandardPortalSetup
   {
   public:
+    typedef StandardPortalSetup<RenderTreeType, ContextSetup> ThisType;
+
     struct PersistentData
     {
-      TextureCache texCache;
+      
       struct PortalBuffers
       {
         csRef<iRenderBuffer> coordBuf;
@@ -133,6 +135,8 @@ namespace RenderManager
       csFrameDataHolder<csStringBase> stringHolder;
     #endif
       
+      TextureCache texCache;
+
       PersistentData() : texCache (csimg2D, "rgb8", 
         CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP,
         "target", TextureCache::tcachePowerOfTwo)
@@ -320,15 +324,15 @@ namespace RenderManager
                distorted: texels from outside the portal area still have a
                good color. May not be the case with a (more exact) poly 
                clipper. */
-            PersistentData::csBoxClipperCachedStore* bccstore =
-              persistentData.boxClipperCache.Query ();
+            typename ThisType::PersistentData::csBoxClipperCachedStore* bccstore;
+            bccstore = persistentData.boxClipperCache.Query ();
             if (bccstore == 0)
             {
-              PersistentData::csBoxClipperCachedStore dummy;
+              typename ThisType::PersistentData::csBoxClipperCachedStore dummy;
               bccstore = persistentData.boxClipperCache.AddActive (dummy);
             }
             newView.AttachNew (
-              new (bccstore) PersistentData::csBoxClipperCached (
+              new (bccstore) typename ThisType::PersistentData::csBoxClipperCached (
                 &persistentData, clipBox));
             newRenderView->SetClipper (newView);
 
@@ -352,11 +356,12 @@ namespace RenderManager
 	      svc->GetVariableAdd (persistentData.svNameTexPortal);
 	    svTexPortal->SetValue (tex);
 
-            PersistentData::PortalBuffers* bufs = 
+            typename ThisType::PersistentData::PortalBuffers* bufs = 
               persistentData.bufCache.Query (count);
+            
             if (bufs == 0)
             {
-              PersistentData::PortalBuffers newBufs;
+              typename ThisType::PersistentData::PortalBuffers newBufs;
 	      newBufs.coordBuf = 
 	        csRenderBuffer::CreateRenderBuffer (count, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
 	      newBufs.tcBuf =

@@ -158,7 +158,7 @@ namespace RenderManager
 
   enum
   {
-    defaultlayerNoTerrain = 1,
+    defaultlayerNoTerrain = 1
     //defaultlayerNoLighting = 2
   };
   

@@ -149,6 +149,7 @@ namespace RenderManager
 
       return newTex;
     }
+
     iTextureHandle* QueryUnusedTexture (int width, int height, csTicks lifetime)
     {
       int dummyW, dummyH;
