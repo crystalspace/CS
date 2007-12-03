@@ -383,9 +383,9 @@ protected:
     if (r == 0)
       return *((K*)&node->key);
     else if (r < 0)
-      return RecursiveFind (node->left, other);
+      return RecursiveFind (node->left, other, fallback);
     else
-      return RecursiveFind (node->right, other);
+      return RecursiveFind (node->right, other, fallback);
   }
   template<typename K2>
   K& RecursiveFind (Node* node, const K2& other, K& fallback)
@@ -395,9 +395,9 @@ protected:
     if (r == 0)
       return *((K*)&node->key);
     else if (r < 0)
-      return RecursiveFind (node->left, other);
+      return RecursiveFind (node->left, other, fallback);
     else
-      return RecursiveFind (node->right, other);
+      return RecursiveFind (node->right, other, fallback);
   }
   //@}
   /// Traverse tree.
