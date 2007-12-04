@@ -253,11 +253,31 @@ CS_WRAP_PTR_TYPEMAP(csWrapPtr)
   {
     return this.swigCPtr.GetHashCode();
   }
+%enddef
 
+#undef INTERFACE_HANDLE
+%define INTERFACE_HANDLE(modifier)
+
+  ///<comment>
+  ///Returns the C++ object pointer
+  ///</comment>
+  public modifier IntPtr Handle
+  {
+    get
+    {
+      return this.swigCPtr.Handle;
+    }
+  }
 %enddef
 
 #undef INTERFACE_APPLY
-#define INTERFACE_APPLY(T) %typemap(cscode) T %{ INTERFACE_EQUALS %}
+%define INTERFACE_APPLY(T)
+%typemap(cscode) T
+%{
+  INTERFACE_EQUALS
+  INTERFACE_HANDLE(override)
+%}
+%enddef
 
 APPLY_FOR_ALL_INTERFACES
 
@@ -276,11 +296,24 @@ public void Broadcast (int iCode) { Broadcast(iCode, new SWIGTYPE_p_intptr_t());
 %typemap(cscode) iEventOutlet
 %{
   INTERFACE_EQUALS
+  INTERFACE_HANDLE(override)
   IEVENTOUTLET_BROADCAST
 %}
 %enddef
 
 IEVENTOUTLET_CSHARPCODE
+
+#undef IBASE_CSHARPCODE
+%define IBASE_CSHAPCODE
+%typemap(cscode) iBase
+%{
+  INTERFACE_EQUALS
+  INTERFACE_HANDLE(virtual)
+%}
+
+%enddef
+
+IBASE_CSHAPCODE
 
 // iutil/cfgmgr.h
 // Swig 1.3.21 (and possibly earlier) have a bug where enums are emitted as
@@ -335,11 +368,6 @@ ICONFIGMANAGER_CSHARPCODE
 {
     $1 = strdup($input.name);
     $2 = $input.version;
-}
-
-%typemap(typecheck) (const char * iface, int iface_ver)
-{
-
 }
 
 %typemap(ctype) (const char * iface, int iface_ver) "csInterfaceData"

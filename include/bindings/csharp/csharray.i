@@ -1,7 +1,4 @@
-#undef TYPEMAP_OUT_ARRAY_BOY
-%define TYPEMAP_OUT_ARRAY_BODY(array_type, cnt, ptr, to_item)
-%enddef TYPEMAP_OUT_ARRAY_BODY(array_type, cnt, ptr, to_item)
-
+// We aren't supporting out args array, but we are supporting in args arrays
 
 #undef TYPEMAP_IN_ARRAY_BODY
 %define TYPEMAP_IN_ARRAY_BODY(array_type, cnt, ptr, to_item)

@@ -106,7 +106,7 @@ if $(CSHARP.AVAILABLE) = "yes"
     # Swig generate files for target
     #--------------------------------
     local common = [ DoSourceGrist cs_$(module).cpp ] ;
-    local csharpbase = [ ConcatDirs $(LOCATE.OBJECTS) bindings csharp ] ;
+    local csharpbase = [ ConcatDirs $(LOCATE.OBJECTS) plugins cscript cscsharp ] ;
     local csharpdir = [ ConcatDirs $(csharpbase) cspacesharp ] ;
 
     Depends $(common) : $(csharpdir:G=dir) ;

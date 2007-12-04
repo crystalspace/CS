@@ -2,7 +2,7 @@ SubDir TOP plugins cscript cscsharp ;
 
 if $(CSHARP.AVAILABLE) = "yes"
 {
-  local csharpbase = [ ConcatDirs $(LOCATE.OBJECTS) bindings csharp ] ;
+  local csharpbase = [ ConcatDirs $(LOCATE.OBJECTS) plugins cscript cscsharp ] ;
   local csharpdir = [ ConcatDirs $(csharpbase) cspacesharp ] ;
   MkDir $(csharpdir:G=dir) ;
   CleanDir cspacesharpclean : $(csharpdir) ;
@@ -50,6 +50,14 @@ if $(CSHARP.AVAILABLE) = "yes"
 	
   NAnt $(cspacesharpdll) : $(csbuildxml:G=build) ;
   Clean cspacesharpclean : $(cspacesharpdll) ;
-  Depends csharpmod : $(cspacesharpdll) ;
+
+  # Copy the .Net dll into bindings/csharp folder
+  local cspacesharpdllfinal = $(cspacesharpdll:G=cscsharpfinal) ;
+  MakeLocate cspacesharpdllfinal : [ ConcatDirs $(LOCATE.OBJECTS) bindings csharp ] ;
+  Copy $(cspacesharpdllfinal) : $(cspacesharpdll) ;
+  Depends $(cspacesharpdllfinal) : $(cspacesharpdll) ;
+  Clean cspacesharpclean : $(cspacesharpdllfinal) ;
+
+  Depends csharpmod : $(cspacesharpdllfinal) ;
   Depends csharpmodclean : cspacesharpclean ;
 }

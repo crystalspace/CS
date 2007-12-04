@@ -122,7 +122,7 @@ namespace CrystalSpace.InteropServices
 
     // Puts the interface data into a structure, which will be passed to
     // c functions.
-    static public csInterfaceData PackInterfaceData (Type iface_type)
+    public static csInterfaceData PackInterfaceData (Type iface_type)
     {
       csInterfaceData ret = new csInterfaceData ();
 
@@ -156,17 +156,37 @@ namespace CrystalSpace.InteropServices
     }
 
 
-    static internal bool IsSwigObject(object o)
+    internal static bool IsSwigObject(object o)
     {
+      Type objType = o.GetType();
+      MethodInfo[] methods = objType.GetMethods(BindingFlags.Static | BindingFlags.NonPublic);
+      foreach(MethodInfo info in methods)
+      {
+	if (info.Name == "getCPtr")
+	{
+	  return true;
+	}
+      }
       return false;
     }
 
-    static internal HandleRef GetSwigHandle(object o)
+    internal static HandleRef GetSwigHandle(object o)
     {
+      Type objType = o.GetType();
+      MethodInfo[] methods = objType.GetMethods(BindingFlags.Static | BindingFlags.NonPublic
+		                                | BindingFlags.InvokeMethod);
+
+      foreach(MethodInfo info in methods)
+      {
+	if (info.Name == "getCPtr")
+	{
+	  return new HandleRef(null, (IntPtr)info.Invoke(null,null));
+	}
+      }
       return new HandleRef(null, IntPtr.Zero);
     }
 
-    static public csArrayPackData PackArrayData(object[] array)
+    public static csArrayPackData PackArrayData(object[] array)
     {
       csArrayPackData ret = new csArrayPackData();
       int object_len = 0;
@@ -291,7 +311,7 @@ namespace CrystalSpace.InteropServices
     }
     // Creates an interface wrapper using the interface data packed in
 		// a structure
-    static public Object CreateInterface (csRetInterface iret)
+    public static Object CreateInterface (csRetInterface iret)
     {
       Object _obj = null;
       iBase ibase;
