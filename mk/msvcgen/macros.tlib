@@ -108,7 +108,7 @@ MACRO filter(x) BLOCK;
     x = x.grep(my.doc.acceptpat);
   END;
   IF my.doc.reject;
-    UNLESS my.doc.acceptpat;
+    UNLESS my.doc.rejectpat;
       my.doc.rejectpat = my.doc.reject.join('|');
     END;
     y = [];
