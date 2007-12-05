@@ -1055,19 +1055,22 @@ rule LinkStaticPlugins
   # @@@ Prefix hardcoded
   local extrafiles_prefix = $(MSVC.PREFIX.appgui)$(<) ;
   local staticuse_out ;
+  local tag ;
   if $(package)
   {
     staticuse_out = $(extrafiles_prefix)_staticuse_$(package).cpp ; 
+    tag = "_static_use_$(package)" ;
   }
   else
   {
     staticuse_out = $(extrafiles_prefix)_staticuse.cpp ;
+    tag = "_static_use" ;
   }
   
   MakeLocate $(staticuse_out) : $(outdir) ;
   SEARCH on $(staticuse_out) = $(outdir) ;
   
-  GenerateStaticPluginInstantiation $(staticuse_out) : $(plugins) ;
+  GenerateStaticPluginInstantiation $(staticuse_out) : $(plugins) : $(tag) ;
   Depends msvcgen : $(staticuse_out) ;
 
   # Build a shared lib containing the static plugins.
@@ -1085,7 +1088,6 @@ rule LinkStaticPlugins
     }
     
     # prepare source files
-    local tag = "_static_use_$(package)" ;
     if $(package)
     {
       libglue = $(extrafiles_prefix)_static_glue_lib_$(package).cpp ;
@@ -1135,6 +1137,18 @@ rule LinkStaticPlugins
       MsvcExternalLibrary $(plugin_lib_name) : $(target_ext_libs.$(mode)) : $(mode) ;
     }
     LinkWith $(plugin_lib_name) : $(target_link_with) ;
+    
+    # Nevertheless link plugin deps to actual target to make static lib builds
+    # work
+    ExternalLibs $(target) : $(target_ext_libs) ;
+    for mode in debug release
+    {
+      MsvcLFlags $(target) : 
+	[ Reverse [ RemoveDups [ Reverse $(target_lflags.$(mode)) ] ] ] : $(mode) ;
+      MsvcCFlags $(target) : $(target_cflags.$(mode)) ;
+      MsvcExternalLibrary $(target) : $(target_ext_libs.$(mode)) : $(mode) ;
+    }
+    LinkWith $(target) : $(target_link_with) ;
     
     # Add usefile to project
     ResponseFile $($(target)_PRJ_RESPFILE) : 
