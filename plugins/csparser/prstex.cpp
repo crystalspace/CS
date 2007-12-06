@@ -47,6 +47,9 @@
 #include "loadtex.h"
 #include "csloader.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(csparser)
+{
+
 #define PLUGIN_LEGACY_TEXTYPE_PREFIX  "crystalspace.texture.loader."
 
 bool csLoader::ParseMaterialList (iLoaderContext* ldr_context,
@@ -336,10 +339,10 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     csRef<iDataBuffer> absolutePath = VFS->ExpandPath(filename);
     filename = absolutePath->GetData();
 
-    proxyTexture proxTex;
-    proxTex.filename = filename;
-    iTextureHandle* texH = 0;
-    tex = Engine->GetTextureList()->NewTexture(texH);
+    ProxyTexture proxTex;
+    proxTex.img.AttachNew (new ProxyImage (this, filename));
+
+    tex = Engine->GetTextureList()->NewTexture (proxTex.img);
     tex->SetTextureClass(context.GetClass());
     tex->SetFlags(context.GetFlags());
     tex->QueryObject()->SetName(txtname);
@@ -756,3 +759,6 @@ iTextureWrapper* csLoader::ParseTexture3D (iLoaderContext* ldr_context,
 
   return tex;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(csparser)

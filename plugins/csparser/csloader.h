@@ -42,6 +42,8 @@
 #include "ivaria/engseq.h"
 #include "ivideo/graph3d.h"
 
+#include "proxyimage.h"
+
 class csReversibleTransform;
 class csColor;
 struct csRGBcolor;
@@ -85,6 +87,9 @@ struct iSequenceWrapper;
 struct iEngineSequenceParameters;
 struct iSharedVariable;
 struct iSceneNodeArray;
+
+CS_PLUGIN_NAMESPACE_BEGIN(csparser)
+{
 
 class csLoader;
 struct csLoaderPluginRec;
@@ -216,14 +221,14 @@ private:
   /// Auto regions flag
   bool autoRegions;
 
-  struct proxyTexture
+  struct ProxyTexture
   {
       csWeakRef<iTextureWrapper> textureWrapper;
-      csString filename;
+      csRef<ProxyImage> img;
   };
 
   /// Points to proxy textures ready for processing.
-  csSafeCopyArray<proxyTexture> proxyTextures;
+  csSafeCopyArray<ProxyTexture> proxyTextures;
 
   /// Points to materials created by the current map loading.
   csWeakRefArray<iMaterialWrapper> materialArray;
@@ -502,7 +507,8 @@ private:
 
   /// Load map from a memory buffer
   bool LoadMap (iLoaderContext* ldr_context, iDocumentNode* world_node,
-  	iStreamSource* ssource, iMissingLoaderData* missingdata);
+  	iStreamSource* ssource, iMissingLoaderData* missingdata, 
+	bool forceLoadTextures = false);
 
   /// Get the engine sequence manager (load it if not already present).
   iEngineSequenceManager* GetEngineSequenceManager ();
@@ -550,6 +556,7 @@ private:
   void AddChildrenToRegion (iLoaderContext* ldr_context,
     const iSceneNodeArray* children);
 
+public:
   /// Report any error.
   void ReportError (const char* id, const char* description, ...)
 	CS_GNUC_PRINTF(3,4);
@@ -571,8 +578,10 @@ private:
   	const char* description, ...)
 	CS_GNUC_PRINTF(4,5);
 
+  static csPtr<iImage> GenerateErrorTexture (int width, int height);
   csPtr<iImage> LoadImage (iDataBuffer* buf, const char* fname, int Format);
 
+private:
   // Load all proxy textures which are used.
   bool LoadProxyTextures(bool forceLoadTextures);
 
@@ -635,10 +644,12 @@ public:
 	iRegion* region, bool curRegOnly, bool checkDupes);
   virtual bool LoadMapFile (const char* filename, bool clearEngine,
 	iRegion* region, bool curRegOnly, bool checkDupes,
-	iStreamSource* ssource, iMissingLoaderData* missingdata);
+	iStreamSource* ssource, iMissingLoaderData* missingdata,
+	bool forceLoadTextures = false);
   virtual bool LoadMap (iDocumentNode* world_node, bool clearEngine,
 	iRegion* region, bool curRegOnly, bool checkDupes,
-	iStreamSource* ssource, iMissingLoaderData* missingdata);
+	iStreamSource* ssource, iMissingLoaderData* missingdata,
+	bool forceLoadTextures = false);
   virtual bool LoadMapLibraryFile (const char* filename, iRegion* region,
   	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
     iMissingLoaderData* missingdata, bool forceLoadTextures, bool loadProxyTex = true);
@@ -680,6 +691,9 @@ public:
   virtual csPtr<iMeshWrapper> LoadMeshObject (const char* fname,
   	iStreamSource* ssource);
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(csparser)
 
 #include "csutil/deprecated_warn_on.h"
 

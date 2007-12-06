@@ -89,6 +89,11 @@
 
 #include <ctype.h>
 
+CS_IMPLEMENT_PLUGIN
+
+CS_PLUGIN_NAMESPACE_BEGIN(csparser)
+{
+
 //---------------------------------------------------------------------------
 
 csLoaderStatus::csLoaderStatus () :
@@ -827,7 +832,8 @@ bool csLoader::Load (iDocumentNode* node, iBase*& result, iRegion* region,
   if (worldnode)
   {
     result = Engine;
-    return LoadMap (ldr_context, worldnode, ssource, missingdata);
+    return LoadMap (ldr_context, worldnode, ssource, missingdata,
+      forceLoadTextures);
   }
 
   csRef<iDocumentNode> libnode = node->GetNode ("library");
@@ -845,7 +851,8 @@ bool csLoader::Load (iDocumentNode* node, iBase*& result, iRegion* region,
 
 bool csLoader::LoadMapFile (const char* file, bool clearEngine,
   iRegion* region, bool curRegOnly, bool checkdupes,
-  iStreamSource* ssource, iMissingLoaderData* missingdata)
+  iStreamSource* ssource, iMissingLoaderData* missingdata, 
+  bool forceLoadTextures)
 {
   csRef<iFile> buf = VFS->Open (file, VFS_FILE_READ);
 
@@ -880,7 +887,7 @@ bool csLoader::LoadMapFile (const char* file, bool clearEngine,
     }
     
     return LoadMap (world_node, clearEngine, region, curRegOnly, checkdupes,
-    	            ssource, missingdata);
+    	            ssource, missingdata, forceLoadTextures);
   }
   else
   {
@@ -894,7 +901,8 @@ bool csLoader::LoadMapFile (const char* file, bool clearEngine,
 
 bool csLoader::LoadMap (iDocumentNode* world_node, bool clearEngine,
   iRegion* region, bool curRegOnly, bool checkdupes,
-  iStreamSource* ssource, iMissingLoaderData* missingdata)
+  iStreamSource* ssource, iMissingLoaderData* missingdata, 
+  bool forceLoadTextures)
 {
   if (clearEngine)
   {
@@ -905,7 +913,8 @@ bool csLoader::LoadMap (iDocumentNode* world_node, bool clearEngine,
 	new StdLoaderContext (Engine, region, curRegOnly, this, checkdupes,
 	  missingdata));
 
-  return LoadMap (ldr_context, world_node, ssource, missingdata);
+  return LoadMap (ldr_context, world_node, ssource, missingdata,
+    forceLoadTextures);
 }
 
 //---------------------------------------------------------------------------
@@ -1125,8 +1134,6 @@ csPtr<iMeshWrapper> csLoader::LoadMeshObject (const char* fname,
 
 SCF_IMPLEMENT_FACTORY(csLoader)
 
-CS_IMPLEMENT_PLUGIN
-
 csLoader::csLoader (iBase *p) : scfImplementationType (this, p)
 {
   object_reg = 0;
@@ -1199,7 +1206,8 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
 //--- Parsing of Engine Objects ---------------------------------------------
 
 bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode,
-                        iStreamSource* ssource, iMissingLoaderData* missingdata)
+                        iStreamSource* ssource, iMissingLoaderData* missingdata, 
+			bool forceLoadTextures)
 {
   if (!Engine)
   {
@@ -1368,7 +1376,7 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode,
       return false;
 
   // Go through the list of proxy textures and load those needed.
-  if(!LoadProxyTextures(false))
+  if(!LoadProxyTextures (forceLoadTextures))
       return false;
 
   return true;
@@ -1667,7 +1675,7 @@ bool csLoader::LoadSounds (iDocumentNode* node)
 	  }
 
 	  // New sound system.
-	  if (!SndSysLoader)
+	  if (!SndSysLoader || !SndSysManager)
 	  {
 	    //SyntaxService->ReportError (
 	        //"crystalspace.maploader.parse.sound", child,
@@ -5691,3 +5699,6 @@ bool csLoader::ParseKey (iDocumentNode* node, iObject* obj)
 
   return true;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(csparser)

@@ -133,7 +133,7 @@ struct iMissingLoaderData : public virtual iBase
  */
 struct iLoader : public virtual iBase
 {
-  SCF_INTERFACE (iLoader, 2, 2, 0);
+  SCF_INTERFACE (iLoader, 2, 3, 0);
 
   /**
    * Load an image file. The image will be loaded in the format requested by
@@ -319,7 +319,7 @@ struct iLoader : public virtual iBase
   virtual bool LoadMapFile (const char* filename, bool clearEngine = true,
 	iRegion* region = 0, bool curRegOnly = true,
 	bool checkDupes = false, iStreamSource* ssource = 0,
-	iMissingLoaderData* missingdata = 0) = 0;
+	iMissingLoaderData* missingdata = 0, bool forceLoadTextures = false) = 0;
 
   /**
    * Load a map from the given 'world' node. If 'clearEngine' is true then
@@ -352,7 +352,7 @@ struct iLoader : public virtual iBase
   virtual bool LoadMap (iDocumentNode* world_node, bool clearEngine = true,
 	iRegion* region = 0, bool curRegOnly = true,
 	bool checkDupes = false, iStreamSource* ssource = 0,
-	iMissingLoaderData* missingdata = 0) = 0;
+	iMissingLoaderData* missingdata = 0, bool forceLoadTextures = false) = 0;
 
   /**
    * Load library from a VFS file

@@ -53,6 +53,9 @@
 #include "csloader.h"
 #include "loadtex.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(csparser)
+{
+
 static void ReportError (iObjectRegistry* object_reg,
     const char* id, const char* description, ...)
 {
@@ -62,7 +65,7 @@ static void ReportError (iObjectRegistry* object_reg,
   va_end (arg);
 }
 
-static csPtr<iImage> GenerateErrorTexture (int width, int height)
+csPtr<iImage> csLoader::GenerateErrorTexture (int width, int height)
 {
   static const csRGBpixel colorTable[] = 
     {csRGBpixel (0,0,0,255), csRGBpixel (255,0,0,255),
@@ -311,7 +314,7 @@ iTextureWrapper* csLoader::LoadTexture (const char *name,
   return TexWrapper;
 }
 
-bool csLoader::LoadProxyTextures(bool forceLoadTextures)
+bool csLoader::LoadProxyTextures (bool forceLoadTextures)
 {
   if(!forceLoadTextures)
   {
@@ -319,10 +322,10 @@ bool csLoader::LoadProxyTextures(bool forceLoadTextures)
 
     for(uint i=0; i<proxyTextures.GetSize(); i++)
     {
-      proxyTexture proxTex = proxyTextures.Get(i);
+      ProxyTexture& proxTex = proxyTextures.Get(i);
       if(!proxTex.textureWrapper)
       {
-        proxyTextures.DeleteIndex(i);
+        proxyTextures.DeleteIndexFast (i);
         i--;
         continue;
       }
@@ -334,38 +337,23 @@ bool csLoader::LoadProxyTextures(bool forceLoadTextures)
   }
   materialArray.Empty();
 
-  for(uint i=0; i<proxyTextures.GetSize(); i++)
+  iTextureManager *tm = G3D->GetTextureManager();
+  size_t i = proxyTextures.GetSize();
+  while (i-- > 0)
   {
-    proxyTexture proxTex = proxyTextures.Get(i);
+    ProxyTexture& proxTex = proxyTextures.Get(i);
 
     if(!proxTex.textureWrapper)
     {
-      proxyTextures.DeleteIndex(i);
-      i--;
       continue;
     }
 
-    iTextureManager *tm = G3D->GetTextureManager();
+    csRef<iImage> img = proxTex.img->GetProxiedImage();
 
-    int Format = tm->GetTextureFormat ();
-    csRef<iImage> img = LoadImage (proxTex.filename, Format);
-    if (!img)
-    {
-      ReportWarning (
-        "crystalspace.maploader.parse.texture",
-        "Couldn't load image '%s', using error texture instead!",
-        proxTex.filename.GetData());
-      img = GenerateErrorTexture (32, 32);
-      if (!img)
-        return false;
-    }
-
-    proxTex.textureWrapper->QueryObject()->SetName(proxTex.textureWrapper->QueryObject()->GetName());
-    proxTex.textureWrapper->SetImageFile(img);
+    proxTex.textureWrapper->SetImageFile (img);
     proxTex.textureWrapper->Register (tm);
-    proxyTextures.DeleteIndex(i);
-    i--;
   }
+  proxyTextures.Empty ();
 
   return true;
 }
@@ -871,7 +859,7 @@ csPtr<iBase> csMissingTextureLoader::Parse (iDocumentNode* node,
     }
   }
  
-  csRef<iImage> image = GenerateErrorTexture (width, height);
+  csRef<iImage> image = csLoader::GenerateErrorTexture (width, height);
 
 
   csRef<iGraphics3D> G3D = csQueryRegistry<iGraphics3D> (object_reg);
@@ -900,3 +888,6 @@ csPtr<iBase> csMissingTextureLoader::Parse (iDocumentNode* node,
   TexWrapper->IncRef ();
   return csPtr<iBase> ((iBase*)TexWrapper);
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(csparser)
