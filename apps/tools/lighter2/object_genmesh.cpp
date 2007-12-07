@@ -452,6 +452,12 @@ namespace lighter
           scfQueryInterface<iMeshObject> (genMesh);
         material = mo->GetMaterialWrapper();
       }
+      if (material == 0) // If the material is still 0, get it from the factory.
+      {
+        csRef<iMeshObjectFactory> mof = 
+          meshWrapper->GetFactory()->GetMeshObjectFactory();
+        material = mof->GetMaterialWrapper();
+      }
 
       const RadMaterial* radMat = sector->scene->GetRadMaterial (material);
       if (radMat == 0) continue;
