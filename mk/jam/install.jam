@@ -28,6 +28,7 @@ appdatadir ?= [ ConcatDirs $(datadir) $(PACKAGE_NAME) ] ;
 appdocdir ?= [ ConcatDirs $(datadir) doc $(PACKAGE_NAME)-$(PACKAGE_VERSION) ] ;
 appconfdir ?= [ ConcatDirs $(sysconfdir) $(PACKAGE_NAME) ] ;
 appincdir ?= [ ConcatDirs $(includedir) $(PACKAGE_NAME) ] ;
+pkgconfigdir ?= [ ConcatDirs $(libdir) pkgconfig ] ;
 plugindir ?= [ ConcatDirs $(libdir) $(PACKAGE_NAME) ] ;
 
 rule GristInstall
@@ -105,6 +106,16 @@ rule InstallMan
         }
         Depends install_man : [ DoInstall $(i) : $(dir) ] ;
     }
+}
+
+##  InstallPkgConfig files
+##    Installs pkg-config .pc files
+rule InstallPkgConfig
+{
+  local files = [ GristInstall $(<) ] ;
+  SEARCH on $(files) = $(SUBDIR) ;
+
+  Depends install_pkgconfig : [ DoInstall $(files) : $(pkgconfigdir) ] ;
 }
 
 ##  InstallProgram files [ : directories ]
@@ -246,7 +257,8 @@ rule DoInstallFile
 #----------------------------------------------------------------------------
 
 INSTALLTARGETS = install_bin install_plugin install_lib install_include
-		 install_data install_config install_doc install_bindings ;
+		 install_data install_config install_doc install_bindings 
+		 install_pkgconfig ;
 
 Always install $(INSTALLTARGETS) ;
 NotFile install $(INSTALLTARGETS) ;

@@ -93,7 +93,7 @@ if $(CSHARP.AVAILABLE) = "yes"
   {
     local target = $(1) ;
     local module = $(2) ;
-    local modulecs = csh$(module) ;
+    local modulecs = cspace$(module)glue ;
     if $(module) = iengine
     {
       local modulecs_f = [ DoSourceGrist $(module)mod.cs ] ;

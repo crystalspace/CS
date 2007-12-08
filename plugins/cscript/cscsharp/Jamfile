@@ -53,11 +53,16 @@ if $(CSHARP.AVAILABLE) = "yes"
 
   # Copy the .Net dll into bindings/csharp folder
   local cspacesharpdllfinal = $(cspacesharpdll:G=cscsharpfinal) ;
-  MakeLocate cspacesharpdllfinal : [ ConcatDirs $(LOCATE.OBJECTS) bindings csharp ] ;
+  MakeLocate $(cspacesharpdllfinal) : [ ConcatDirs $(LOCATE.OBJECTS) bindings csharp ] ;
   Copy $(cspacesharpdllfinal) : $(cspacesharpdll) ;
   Depends $(cspacesharpdllfinal) : $(cspacesharpdll) ;
   Clean cspacesharpclean : $(cspacesharpdllfinal) ;
 
   Depends csharpmod : $(cspacesharpdllfinal) ;
   Depends csharpmodclean : cspacesharpclean ;
+
+  # Installs pkg-config file
+  InstallPkgConfig [ DoSourceGrist crystalspace-sharp.pc ] ;
+  # Installs the bindings at the Global Assembly Cache
+  InstallGAC $(cspacesharpdllfinal) : crystalspace ;
 }

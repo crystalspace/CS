@@ -370,8 +370,6 @@ AS_IF([test -n "$PERL" && test "$with_perl" != no],
 #------------------------------------------------------------------------------
 CS_CHECK_PYTHON([emit], [], [Python scripting interface])
 
-
-
 #------------------------------------------------------------------------------
 # Check if Java2 SDK is installed and which compiler and linker flags are
 # needed.  Also check if Ant build tool, which is commonly used to build Java
@@ -441,33 +439,15 @@ CS_PATH_PROGS([ANT], [ant], [], [$PATH$PATH_SEPARATOR$ANT_HOME/bin])
 CS_EMIT_BUILD_PROPERTY([ANT], [$ANT])
 
 
-#-----------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Check for the underlining cli, C# compiler and nant tool
-#-----------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
-CS_CHECK_PROGS([CSHARP_COMPILER], [mcs csc cscc])
-CS_EMIT_BUILD_PROPERTY([CSHARP.COMPILER], [$CSHARP_COMPILER])
-CS_EMIT_BUILD_PROPERTY([CMD.CSC], [$CSHARP_COMPILER])
-
-CS_CHECK_PROGS([CMD_GACUTIL], [gacutil])
-CS_EMIT_BUILD_PROPERTY([CMD.GACUTIL], [$CMD_GACUTIL])
-
-CS_CHECK_PROGS([CMD_NANT], [nant NAnt])
-CS_EMIT_BUILD_PROPERTY([CMD.NANT], [$CMD_NANT])
+CS_CHECK_DOTNET
 
 CS_PATH_TOOL([GEN_CSHARP_GLOBALS], [gen-csharp-globals.sh], [],
     [${srcdir}/bin$PATH_SEPARATOR$PATH])
 CS_EMIT_BUILD_PROPERTY([CMD.GEN.CSHARP.GLOBALS], [$GEN_CSHARP_GLOBALS])
-
-# cscsharp is experimental/testing, by default no
-AC_ARG_WITH([csharp], [AC_HELP_STRING([--with-csharp],
-    [use C# scripting interface (default NO)])])
-AS_IF([test -z "$with_csharp"], [with_csharp=no])
-
-AS_IF([test "$with_csharp" != no && test -n "$CSHARP_COMPILER" && test -n "$CMD_GACUTIL" && test "$CMD_NANT"],
-    [csharp_available=yes])
-
-CS_EMIT_BUILD_PROPERTY([CSHARP.AVAILABLE], [$csharp_available])
 
 #------------------------------------------------------------------------------
 # Check if STL is available. Although STL is not used heavily in Crystal Space,

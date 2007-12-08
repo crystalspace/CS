@@ -5,4 +5,5 @@ libdir=${exec_prefix}/lib
 Name: crystalspace-sharp
 Description: Crystal Space C# bindings.
 Version: 0.1
-Libs: -r:${libdir}/mono/crystalspace/crystalspace-sharp.dll
+Libs: -r:${libdir}/crystalspace/crystalspace-sharp.dll
+

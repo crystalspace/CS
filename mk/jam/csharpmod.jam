@@ -32,30 +32,30 @@ rule InstallCSharpMod
 
 if $(CSHARP.AVAILABLE) = "yes"
 {
-  if ! $(CSPACESHARP.MODULE.PREFIX) && ! $(CSPACESHARP.MODULE.SUFFIX)
+  if ! $(CSPACEDOTNET.MODULE.PREFIX) && ! $(CSPACEDOTNET.MODULE.SUFFIX)
   {
     switch $(TARGET.OS)
     {
       case WIN32 :
-	CSPACESHARP.MODULE.PREFIX = ;
-	CSPACESHARP.MODULE.SUFFIX = .dll ;
+	CSPACEDOTNET.MODULE.PREFIX = ;
+	CSPACEDOTNET.MODULE.SUFFIX = .dll ;
       case MACOS_X :
-	CSPACESHARP.MODULE.PREFIX = lib ;
-	CSPACESHARP.MODULE.SUFFIX = .so ;
+	CSPACEDOTNET.MODULE.PREFIX = lib ;
+	CSPACEDOTNET.MODULE.SUFFIX = .dylib ;
       case UNIX :
-	CSPACESHARP.MODULE.PREFIX = lib ;
-	CSPACESHARP.MODULE.SUFFIX = .so ;
+	CSPACEDOTNET.MODULE.PREFIX = lib ;
+	CSPACEDOTNET.MODULE.SUFFIX = .so ;
       case * :
-	CSPACESHARP.MODULE.PREFIX = lib ;
-	CSPACESHARP.MODULE.SUFFIX = .so ;
+	CSPACEDOTNET.MODULE.PREFIX = lib ;
+	CSPACEDOTNET.MODULE.SUFFIX = .so ;
     }
   }
 
   # Be wary of Jam's variable interpolation: "$(X)foo" expands to nothing if X
   # does not have a value.  (This differs from other interpolators which would
   # expand it to "foo".)
-  if ! $(CSPACESHARP.MODULE.PREFIX) { CSPACESHARP.MODULE.PREFIX = "" ; }
-  if ! $(CSPACESHARP.MODULE.SUFFIX) { CSPACESHARP.MODULE.SUFFIX = "" ; }
+  if ! $(CSPACEDOTNET.MODULE.PREFIX) { CSPACEDOTNET.MODULE.PREFIX = "" ; }
+  if ! $(CSPACEDOTNET.MODULE.SUFFIX) { CSPACEDOTNET.MODULE.SUFFIX = "" ; }
 
   rule CSharpMod
   {
@@ -64,7 +64,7 @@ if $(CSHARP.AVAILABLE) = "yes"
 
     local sources = [ DoSourceGrist $(3) ] ;
     local objects = [ CompileObjects $(sources) ] ;
-    local target = $(CSPACESHARP.MODULE.PREFIX)$(module)$(CSPACESHARP.MODULE.SUFFIX) ;
+    local target = $(CSPACEDOTNET.MODULE.PREFIX)$(module)$(CSPACEDOTNET.MODULE.SUFFIX) ;
 
     NotFile $(<) ;
     Depends $(<) : $(target) ;
@@ -83,7 +83,13 @@ if $(CSHARP.AVAILABLE) = "yes"
     MakeLocate $(target) : [ ConcatDirs $(LOCATE.OBJECTS) $(4) ] ;
     Depends $(target) : $(objects) ;
     LinkPlugin $(target) : $(objects) ;
-    InstallBindingsModule $(target) : $(4) ;
+
+    # We install it on the libdir instead of bindings dir because we need that
+    # the runtime finds it using P/Invoke, which searches the natives libraries
+    # in the system path
+
+    Depends install_bindings : [ DoInstall $(target) : $(libdir) ] ; 
+
     if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
     {
       SplitDebugInfo $(target) ;
@@ -148,6 +154,28 @@ if $(CSHARP.AVAILABLE) = "yes"
   # CSharpLib target : input files : references 
   #---------------------
 
+  switch $(DOTNET.RUNTIME)
+  {
+    case MONO :
+      actions InstallGAC1
+      {
+        $(CMD.GACUTIL) -i $(<) -package $(ASSEMBLY_PACKAGE)
+      }
+    case PNET :
+      actions InstallGAC1
+      {
+        $(CMD.GACUTIL) -if $(<)
+      }
+    case MS :
+      actions InstallGAC1
+      {
+	$(CMD.GACUTIL) /if $(<)
+      }
+    case * :
+      actions InstallGAC1
+      {
+      }
+  }
   actions CSC
   {
      $(CMD.CSC) -target:$(3) $(4) -out:$(<) $(>)
@@ -161,5 +189,16 @@ if $(CSHARP.AVAILABLE) = "yes"
     CSC $(target) : $(sources) : library ;
   }
 
+
+  #----------------------------------
+  # InstallGAC assembly : packagename
+  rule InstallGAC
+  {
+    local assembly = $(1) ;
+    local packagename = $(2) ;
+
+    ASSEMBLY_PACKAGE = $(packagename) ;
+    #Depends install_bindings : [ InstallGAC1 $(assembly) ] ;
+  }
 }
 
