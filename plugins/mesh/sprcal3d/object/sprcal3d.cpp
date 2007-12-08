@@ -1845,6 +1845,7 @@ bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
   ClearAllAnims();
   if (!vel)
   {
+    SetTimeFactor(1);
     if (default_idle_anim != -1)
     {
       AddAnimCycle(default_idle_anim,1,0);
