@@ -6,6 +6,14 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Dec-2007
+        - Mike Gist committed a patch from Trymm to fix the direction
+          animations are played. If you had been reversing some animations,
+          then the idle animations would also be played backwards unless you
+          played an animation forwards first.
+        - Mike Gist committed a patch from Kenny Graunke to correct the return
+          value of csGetPlatformConfigDir on macosx (it's now consistent across
+          all platforms).
 29-Nov-2007
 	- Eric Sunshine fixed bug in configure.ac where CS_PLATFORM_UNIX was
 	  not emitted to csconfig.h on Mac OS X (for which both
