@@ -86,7 +86,7 @@ if $(PYTHON.AVAILABLE) = "yes"
   }
 }
 
-if $(CSHARP.AVAILABLE) = "yes"
+if $(CSHARP.AVAILABLE) = "yes" && $(CMD.PERL5)
 {
   ##  CSharpBindingModule target : module name : glue : LinkWith : ExternalLibs : desc ;
   rule CSharpBindingModule
@@ -167,6 +167,7 @@ if $(CSHARP.AVAILABLE) = "yes"
     }
 
     Depends csharp_mods : $(cs_extra:BSG=built) ;
+    Depends csharp_mods : $(modulecs_f) ;
   }
 }
 

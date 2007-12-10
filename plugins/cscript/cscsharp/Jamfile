@@ -1,6 +1,6 @@
 SubDir TOP plugins cscript cscsharp ;
 
-if $(CSHARP.AVAILABLE) = "yes"
+if $(CSHARP.AVAILABLE) = "yes" && $(CMD.PERL5)
 {
   local csharpbase = [ ConcatDirs $(LOCATE.OBJECTS) plugins cscript cscsharp ] ;
   local csharpdir = [ ConcatDirs $(csharpbase) cspacesharp ] ;
@@ -24,15 +24,22 @@ if $(CSHARP.AVAILABLE) = "yes"
   local csbuildxml = csbuild.xml ;
   local cspacesharpdll = crystalspace-sharp.dll ;
 
-  local cs_globals = [ DoSourceGrist CS.cs ] ;
-  GenCSharpGlobals $(cs_globals) :
-	 $(csharpdir) :
-	 core imesh isndsys ivaria ienginemod cstool 
-	 ivideo imap csgfx csgeom cspace :
-	 CrystalSpace :
-	 CS ;
-
+  local cs_globals = CS.cs ;
+  MakeLocate $(cs_globals) : $(csharpdir) ;
   Depends $(cs_globals) : csharp_mods ;
+
+  local cs_modules_globals = core.cs imesh.cs isndsys.cs ivaria.cs 
+	ienginemod.cs cstool.cs ivideo.cs imap.cs csgfx.cs csgeom.cs
+	cspace.cs ;
+
+  for i in $(cs_modules_globals)
+  {
+    MakeLocate $(i) : $(csharpdir) ;
+  }
+
+  GenCSharpGlobals $(cs_globals) : $(cs_modules_globals) :
+	 --namespace CrystalSpace --classname CS -x GetSCFPointer -x SetSCFPointer ;
+
   cspacesharpdll = $(cspacesharpdll:G=csharpmod) ;
   SEARCH on $(csbuildxml) = $(SEARCH_SOURCE) ;
   Depends $(csbuildxml:G=build) : $(csbuildxml) ;
@@ -66,3 +73,4 @@ if $(CSHARP.AVAILABLE) = "yes"
   # Installs the bindings at the Global Assembly Cache
   InstallGAC $(cspacesharpdllfinal) : crystalspace ;
 }
+

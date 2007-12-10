@@ -6,6 +6,10 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-Dic-2007
+	- ronsaldo replaced the script that generates the file that have the
+	  C# "globals" which is CS.cs. The new script is written in perl and
+	  properly parses the command line unlike the other script.
 7-Dic-2007
 	- ronsaldo made changes into the c# bindings build system, into the
 	  configure script changing the .NET and C# related checks.

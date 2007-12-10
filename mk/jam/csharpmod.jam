@@ -1,6 +1,6 @@
 #============================================================================
 # Rules for creating csharp modules.
-# Copyright (C) 2006 by Jorrit Tyberghein
+# Copyright (C) 2007 by Jorrit Tyberghein
 #
 #    This library is free software; you can redistribute it and/or modify it
 #    under the terms of the GNU Library General Public License as published by
@@ -17,14 +17,6 @@
 #    Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 #============================================================================
-# PythMod rule
-# Can be used to create cspace python modules.
-
-rule InstallCSharpMod
-{
-  InstallBindingsModule $(1) : $(2) ;
-}
-
 
 #--------------------------------------------------------------------------------------------------
 # CSharpMod target : module name : source files : install dir : LinkWith : ExternalLibs : desc
@@ -107,49 +99,33 @@ if $(CSHARP.AVAILABLE) = "yes"
     Depends clean : $(<)clean ;
   }
 
-  actions GCSG
+  if $(CMD.PERL5)
   {
-    $(CMD.GEN.CSHARP.GLOBALS) $(GCSG.NAMESPACE) $(GCSG.CLASSNAME) $(<) $(GCSG.MODULES)
-  }
-
-  #------------------------------------------------------------
-  # GenCSharpGlobals target : csharpdir : modules : namespace : classname
-  #------------------------------------------------------------
-
-  rule GenCSharpGlobals
-  {
-    local target = $(1) ;
-    local csharpdir = $(2) ;
-    local modules = $(3) ;
-    local namespace = $(4) ;
-    local classname = $(5) ;
-
-    local i ;
-    for i in $(modules)
+    actions GCSG
     {
-      local source = $(i).cs ;
-
-      if $(csharpdir)
-      {
-	SEARCH on $(source) = $(csharpdir) ;
-        MakeLocate $(source) : $(csharpdir) ;
-      }
-      else
-      {
-	SEARCH on $(source) = $(LOCATE_TARGET) ;
-        MakeLocate $(source) : $(LOCATE_TARGET) ;
-      }
-      
-      Depends $(target) : $(source) ;
+      $(CMD.PERL5) $(CMD.GEN.CSHARP.GLOBALS) $(GCSG.FLAGS) -o $(<) $(>)
     }
 
-    MakeLocate $(target) : $(csharpdir) ;
-    GCSG.NAMESPACE = $(namespace) ;
-    GCSG.CLASSNAME = $(classname) ;
-    GCSG.MODULES = $(modules) ;
-    GCSG $(target) ;
-  }
+    #------------------------------------------------------------
+    # GenCSharpGlobals target : inputs [: flags]
+    #------------------------------------------------------------
 
+    rule GenCSharpGlobals
+    {
+      local target = $(<) ;
+      local inputs = $(2) ;
+      local flags = $(3) ;
+
+      local i ;
+      for i in $(inputs)
+      {
+        Depends $(target) : $(inputs) ;
+      }
+
+      GCSG.FLAGS = $(flags) ;
+      GCSG $(target) : $(inputs) ;
+    }
+  }
   #---------------------
   # CSharpLib target : input files : references 
   #---------------------
@@ -199,6 +175,11 @@ if $(CSHARP.AVAILABLE) = "yes"
 
     ASSEMBLY_PACKAGE = $(packagename) ;
     #Depends install_bindings : [ InstallGAC1 $(assembly) ] ;
+  }
+
+  rule InstallCSharpMod
+  {
+    InstallBindingsModule $(1) : $(2) ;
   }
 }
 
