@@ -27,16 +27,11 @@
   </block>
   
   <block location="vertexToFragment">
-    // @@@ TODO: Don't emit if not used in FP
     <varying type="normal" name="Normal" />
   </block>
   
   <block location="vertexMain">
-    vertexToFragment.Normal = Normal = vertexIn.Normal;
-  </block>
-  
-  <block location="fragmentMain">
-    Normal = vertexToFragment.Normal;
+    Normal = vertexIn.Normal;
   </block>
   
 </input>

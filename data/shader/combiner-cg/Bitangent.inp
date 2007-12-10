@@ -27,16 +27,11 @@
   </block>
   
   <block location="vertexToFragment">
-    // @@@ TODO: Don't emit if not used in FP
     <varying type="normal" name="Bitangent" />
   </block>
   
   <block location="vertexMain">
-    vertexToFragment.Bitangent = Bitangent = vertexIn.Bitangent;
+    Bitangent = vertexIn.Bitangent;
   </block>
-  
-  <block location="fragmentMain">
-    Bitangent = vertexToFragment.Bitangent;
-  </block>
-  
+   
 </input>

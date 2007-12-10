@@ -27,16 +27,11 @@
   </block>
   
   <block location="vertexToFragment">
-    // @@@ TODO: Don't emit if not used in FP
     <varying type="normal" name="Tangent" />
   </block>
   
   <block location="vertexMain">
-    vertexToFragment.Tangent = Tangent = vertexIn.Tangent;
-  </block>
-  
-  <block location="fragmentMain">
-    Tangent = vertexToFragment.Tangent;
+    Tangent = vertexIn.Tangent;
   </block>
   
 </input>

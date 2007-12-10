@@ -38,22 +38,35 @@
       </block>
     </input>
     
-    <input name="flatColor" type="rgba" default="complex"
-	condition='!vars."tex diffuse".texture'>
+    <input name="flatColor" type="rgba" default="complex">
       <block location="cg:variablemap">
         <variablemap variable="mat flatcolor" 
-	 destination="fragmentIn.flatColor" />
+	  destination="fragmentIn.flatColor" />
+        <variablemap variable="mat flatcolor" 
+	  destination="vertexIn.flatColor" />
       </block>
       
       <block location="cg:fragmentIn">
 	<uniform type="rgba" name="flatColor" />
       </block>
       
+      <block location="cg:vertexIn">
+	<uniform type="rgba" name="flatColor" />
+      </block>
+      
       <block location="cg:fragmentMain">
 	flatColor = fragmentIn.flatColor;
       </block>
+
+      <block location="cg:vertexMain">
+	flatColor = vertexIn.flatColor;
+      </block>
     </input>
       
+    <block location="cg:vertexMain">
+      surfaceColor = flatColor;
+    </block>
+    
     <block location="cg:fragmentMain">
       <?if vars."tex diffuse".texture?>
 	surfaceColor = tex2D (texDiffuse, texCoord);

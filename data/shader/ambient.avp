@@ -13,8 +13,8 @@ PARAM mvp[4]	     = { state.matrix.mvp };
 PARAM color   = program.local[0];
 #PARAM color   = { 0.3, 0.3, 0.3, 1};
 # Per vertex inputs
-ATTRIB iPos		= vertex.attrib[0];
-ATTRIB iTex0	= vertex.attrib[1];
+ATTRIB iPos		= vertex.position;
+ATTRIB iTex0	= vertex.texcoord[0];
 # Outputs
 OUTPUT oPos		= result.position;
 OUTPUT oCol0	= result.color;

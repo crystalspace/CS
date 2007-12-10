@@ -1,19 +1,29 @@
 <shader compiler="xmlshader" name="terrain_fixed_base">
-  <technique priority="300">
+  <technique priority="350">
     <tag>inverted_fog</tag>
     <tag>linear_fog</tag>
     <tag>terrain_splatting</tag>
     <pass>
       <mixmode><copy /></mixmode>
-      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
-      <buffer source="color" destination="color" />
+      <buffer source="texture coordinate 0" destination="texture coordinate diffuse" />
+      <?if vars."tex lightmap".texture ?>
+	<buffer source="texture coordinate 0" destination="texture coordinate lightmap" />
+      <?else?>
+	<buffer source="color" destination="color" />
+      <?endif?>
       <vp plugin="glfixed">
 	<fixedvp>
-	  <constantcolor layer="0" type="vector4">0,0,0,1</constantcolor>
+	  <constantcolor layer="diffuse" type="vector4">0,0,0,1</constantcolor>
+	  <?if vars."tex lightmap".texture ?>
+	    <constantcolor layer="lightmap" type="shadervar">dynamic ambient</constantcolor>
+	  <?endif?>
 	  <?Include snippets/fog-fvp.inc ?>
 	</fixedvp>
       </vp>
-      <texture name="tex diffuse" destination="unit 0" />
+      <?if vars."tex lightmap".texture ?>
+	<texture name="tex lightmap" destination="lightmap"/>
+      <?endif?>
+      <texture name="tex diffuse" destination="diffuse" />
       <?Include snippets/fog-mappings.inc ?>
       <fp plugin="glfixed">
         <fixedfp>
@@ -23,9 +33,19 @@
 	    <end type="float">0</end>
 	    <fogcolor type="vector4">0,0,0,0</fogcolor>	
 	  </fog>
-	  <layer>
+	  <layer name="lightmap">
+	    <?if vars."tex lightmap".texture ?>
+	      <colorsource num="0" source="texture" modifier="color"/>
+	      <colorsource num="1" source="constant color" modifier="color"/>
+	      <coloroperation operation="add" />
+	    <?else?>
+	      <colorsource num="0" source="primary color" modifier="color"/>
+	      <coloroperation operation="replace" />
+	    <?endif?>
+	  </layer>
+	  <layer name="diffuse">
 	    <colorsource num="0" source="texture" modifier="color"/>
-	    <colorsource num="1" source="primary color" modifier="color"/>
+	    <colorsource num="1" source="previous layer" modifier="color"/>
 	    <coloroperation operation="modulate" scale="2" />
             <alphasource num="0" source="constant color" modifier="alpha"/>
 	    <alphaoperation operation="replace"/>
@@ -35,12 +55,72 @@
       </fp>
     </pass>
   </technique>
-  <technique priority="250">
+  
+  <technique priority="300">
+    <tag>inverted_fog</tag>
+    <tag>linear_fog</tag>
     <tag>terrain_splatting</tag>
     <pass>
       <mixmode><copy /></mixmode>
+      <buffer source="texture coordinate 0" destination="texture coordinate diffuse" />
+      <?if vars."tex lightmap".texture ?>
+	<buffer source="texture coordinate 0" destination="texture coordinate lightmap" />
+      <?else?>
+	<buffer source="color" destination="color" />
+      <?endif?>
+      <vp plugin="glfixed">
+	<fixedvp>
+	  <constantcolor layer="diffuse" type="vector4">0,0,0,1</constantcolor>
+	  <?if vars."tex lightmap".texture ?>
+	    <constantcolor layer="lightmap" type="shadervar">dynamic ambient</constantcolor>
+	  <?endif?>
+	</fixedvp>
+      </vp>
+      <?if vars."tex lightmap".texture ?>
+	<texture name="tex lightmap" destination="lightmap"/>
+      <?endif?>
+      <texture name="tex diffuse" destination="diffuse" />
+      <fp plugin="glfixed">
+        <fixedfp>
+	  <fog>
+	    <mode>linear</mode>
+	    <start type="shadervar">texture lod distance</start>
+	    <end type="float">0</end>
+	    <fogcolor type="vector4">0,0,0,0</fogcolor>	
+	  </fog>
+	  <layer name="lightmap">
+	    <?if vars."tex lightmap".texture ?>
+	      <colorsource num="0" source="texture" modifier="color"/>
+	      <colorsource num="1" source="constant color" modifier="color"/>
+	      <coloroperation operation="add" />
+	    <?else?>
+	      <colorsource num="0" source="primary color" modifier="color"/>
+	      <coloroperation operation="replace" />
+	    <?endif?>
+	  </layer>
+	  <layer name="diffuse">
+	    <colorsource num="0" source="texture" modifier="color"/>
+	    <colorsource num="1" source="previous layer" modifier="color"/>
+	    <coloroperation operation="modulate" scale="2" />
+            <alphasource num="0" source="constant color" modifier="alpha"/>
+	    <alphaoperation operation="replace"/>
+	  </layer>
+        </fixedfp>
+      </fp>
+    </pass>
+    <?Include snippets/fog-pass.inc ?>    
+  </technique>
+  
+  <technique priority="250">
+    <tag>terrain_splatting</tag>
+    <pass>
+      <mixmode><blendop src="srcalpha" dst="zero" /></mixmode>
       <buffer source="texture coordinate 0" destination="texture coordinate 0" />
-      <buffer source="color" destination="color" />
+      <?if vars."tex lightmap".texture ?>
+	<buffer source="texture coordinate 0" destination="texture coordinate 1" />
+      <?else?>
+	<buffer source="color" destination="color" />
+      <?endif?>
       <vp plugin="glarb">
 	<!--
 	  Certain HW does not like the "inverted fog" trick above and does
@@ -49,6 +129,9 @@
 	 -->
 	<arbvp>
 	  <variablemap variable="texture lod distance" destination="register 0"/>
+	  <?if !vars."tex lightmap".texture ?>
+	    <variablemap variable="dynamic ambient" destination="register 1"/>
+	  <?endif?>
 	  <program><![CDATA[
 	  !!ARBvp1.0
 	  OPTION ARB_position_invariant;
@@ -61,16 +144,25 @@
 	  PARAM loddist		= program.local[0];
 	  
 	  ATTRIB iPos		= vertex.position;
+	  ]]>
+	<?if !vars."tex lightmap".texture ?>
 	  ATTRIB iCol		= vertex.color;
+	  OUTPUT oTex		= result.texcoord[0];
+	<?else?>
+	  PARAM dynamb		= program.local[1];
+	  ATTRIB iLM		= vertex.texcoord[1];
+	  OUTPUT oLM		= result.texcoord[0];
+	  OUTPUT oTex		= result.texcoord[2];
+	<?endif?>
+	  <![CDATA[
 	  ATTRIB iTex		= vertex.texcoord[0];
 	  
-	  OUTPUT oTex		= result.texcoord[0];
 	  OUTPUT oCol		= result.color;
 	  
 	  TEMP fogDense;
 	  TEMP eyeVertex;
 	  #TEMP outCol;
-	  
+
 	  # Note transforming the vertex to viewspace isn't needed -
 	  # ARB_position_invariant does this
 
@@ -87,9 +179,23 @@
 	  # Clamp
 	  MIN fogDense.z, fogDense.z, one.z;
 	  
-	  # Multiply that into color.
-	  MUL oCol.xyz, iCol, fogDense.z;
-	  MOV oCol.w, iCol.w;
+	  ]]>
+	<?if !vars."tex lightmap".texture ?>
+	  <![CDATA[
+	  # Output color RGB contains vertex color
+	  MOV oCol.xyz, iCol;
+	  ]]>
+	<?else?>
+	  <![CDATA[
+	  # Output color RGB contains dynamic ambient
+	  MOV oCol.xyz, dynamb;
+	  
+	  MOV oLM, iLM;
+	  ]]>
+	<?endif?>
+	  <![CDATA[
+	  # Output alpha contains fog density
+	  MOV oCol.w, fogDense.z;
 	  
 	  MOV oTex, iTex;
 	  
@@ -97,12 +203,25 @@
 	  ]]></program>	  
 	</arbvp>
       </vp>
-      <texture name="tex diffuse" destination="unit 0" />
+      <?if vars."tex lightmap".texture ?>
+	<texture name="tex lightmap" destination="lightmap"/>
+      <?endif?>
+      <texture name="tex diffuse" destination="diffuse" />
       <fp plugin="glfixed">
         <fixedfp>
-	  <layer>
+	  <layer name="lightmap">
+	    <?if vars."tex lightmap".texture ?>
+	      <colorsource num="0" source="texture" modifier="color"/>
+	      <colorsource num="1" source="primary color" modifier="color"/>
+	      <coloroperation operation="add" />
+	    <?else?>
+	      <colorsource num="0" source="primary color" modifier="color"/>
+	      <coloroperation operation="replace" />
+	    <?endif?>
+	  </layer>
+	  <layer name="diffuse">
 	    <colorsource num="0" source="texture" modifier="color"/>
-	    <colorsource num="1" source="primary color" modifier="color"/>
+	    <colorsource num="1" source="previous layer" modifier="color"/>
 	    <coloroperation operation="modulate" scale="2" />
             <alphasource num="0" source="primary color" modifier="alpha"/>
 	    <alphaoperation operation="replace"/>
@@ -119,19 +238,39 @@
   <technique priority="200">
     <pass>
       <mixmode><copy /></mixmode>
-      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
-      <buffer source="color" destination="color" />
+      <buffer source="texture coordinate 0" destination="texture coordinate diffuse" />
+      <?if vars."tex lightmap".texture ?>
+	<buffer source="texture coordinate 0" destination="texture coordinate lightmap" />
+      <?else?>
+	<buffer source="color" destination="color" />
+      <?endif?>
       <vp plugin="glfixed">
 	<fixedvp>
-	  <constantcolor layer="0" type="vector4">0,0,0,1</constantcolor>
+	  <constantcolor layer="diffuse" type="vector4">0,0,0,1</constantcolor>
+	  <?if vars."tex lightmap".texture ?>
+	    <constantcolor layer="lightmap" type="shadervar">dynamic ambient</constantcolor>
+	  <?endif?>
 	</fixedvp>
       </vp>
-      <texture name="tex diffuse" destination="unit 0" />
+      <?if vars."tex lightmap".texture ?>
+	<texture name="tex lightmap" destination="lightmap"/>
+      <?endif?>
+      <texture name="tex diffuse" destination="diffuse" />
       <fp plugin="glfixed">
         <fixedfp>
-	  <layer>
+	  <layer name="lightmap">
+	    <?if vars."tex lightmap".texture ?>
+	      <colorsource num="0" source="texture" modifier="color"/>
+	      <colorsource num="1" source="constant color" modifier="color"/>
+	      <coloroperation operation="add" />
+	    <?else?>
+	      <colorsource num="0" source="primary color" modifier="color"/>
+	      <coloroperation operation="replace" />
+	    <?endif?>
+	  </layer>
+	  <layer name="diffuse">
 	    <colorsource num="0" source="texture" modifier="color"/>
-	    <colorsource num="1" source="primary color" modifier="color"/>
+	    <colorsource num="1" source="previous layer" modifier="color"/>
 	    <coloroperation operation="modulate" scale="2" />
             <alphasource num="0" source="constant color" modifier="alpha"/>
 	    <alphaoperation operation="replace"/>
@@ -142,6 +281,7 @@
   </technique>
 
   <!-- Yes. Software. -->
+  <!-- @@@ FIXME: lacks lightmapping -->
   <technique priority="75">
     <pass>
       <texture name="tex diffuse" destination="unit 0" />

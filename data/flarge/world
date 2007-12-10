@@ -12504,6 +12504,7 @@
             <radius>5</radius>
             <color red="0.7" green="0.7" blue="0.8" />
         </light>
+	<!--
         <meshobj name="genMesh">
             <plugin>mesh</plugin>
             <params>
@@ -12527,12 +12528,12 @@
                     <t>11</t>
                     <material>red</material>
                 </submesh>
-                <!-- <localshadows /> -->
             </params>
             <move>
                 <v x="-1.5" y="-.7" z="14" />
             </move>
         </meshobj>
+	-->
         <meshobj name="proto">
             <plugin>proto</plugin>
             <params>

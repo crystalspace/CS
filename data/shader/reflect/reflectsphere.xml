@@ -37,27 +37,8 @@
       <snippet id="normalmap" file="/shader/snippets/surface/normalmap.xml" />
       <snippet id="reflection" file="/shader/snippets/reflect/reflect-env-camera.xml" />
       <snippet id="spheremap" file="/shader/snippets/surface/envmap-sphere.xml" />
-      <!-- @@@ FIXME?: Quite some goop to the end of just providing a float ... -->
-      <snippet id="lerp_factor">
-	<technique priority="100">
-	  <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
-    
-	  <block location="cg:variablemap">
-	    <variablemap variable="reflection opacity" 
-	      destination="fragmentIn.reflectOpacity" />
-	  </block>
-	  
-	  <block location="cg:fragmentIn">
-	    <uniform type="float" name="reflectOpacity" />
-	  </block>
-	  
-	  <block location="cg:fragmentMain">
-	    reflectOpacity = fragmentIn.reflectOpacity;
-	  </block>
-	  
-	  <output name="reflectOpacity" type="float" />
-	</technique>
-      </snippet>
+      <parameter id="lerp_factor" type="shadervar" 
+	weavertype="float">reflection opacity</parameter>
       <snippet id="lerp" file="/shader/snippets/lerp.xml" />
       
       <snippet id="apply_mixmode_alpha" file="/shader/snippets/mixmode-alpha.xml" />

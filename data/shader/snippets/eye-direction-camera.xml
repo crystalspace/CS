@@ -24,11 +24,11 @@
     <input name="position" type="position4_camera" />
     
     <block location="cg:vertexMain">
-      eyeDirectionCamera = position;
+      eyeDirectionCamera = -position;
     </block>
   
     <block location="cg:fragmentMain">
-      eyeDirectionCamera = position;
+      eyeDirectionCamera = -position;
     </block>
   
     <output name="eyeDirectionCamera" type="direction_camera" />

@@ -39,17 +39,26 @@
     </input>
     
     <block location="cg:fragmentMain">
-      <?if vars."tex normal".texture ?>
-	normal = tex2D (texNormal, texCoord).xyz*2-1;
-      <?else?>
-	normal = float3 (0, 0, 1);
-      <?endif?>
+    <?if vars."tex normal".texture ?>
+      normal = tex2D (texNormal, texCoord).xyz*2-1;
+      normal_attr_perfragment = true;
+    <?else?>
+      normal = float3 (0, 0, 1);
+      normal_attr_perfragment = false;
+    <?endif?>
     </block>
     
     <block location="cg:vertexMain">
       normal = float3 (0, 0, 1);
+    <?if vars."tex normal".texture ?>
+      normal_attr_perfragment = true;
+    <?else?>
+      normal_attr_perfragment = false;
+    <?endif?>
     </block>
     
-    <output name="normal" type="direction_tangent" />
+    <output name="normal" type="direction_tangent">
+      <attribute name="perfragment" type="bool" />
+    </output>
   </technique>
 </snippet>
