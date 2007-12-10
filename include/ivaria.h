@@ -24,6 +24,7 @@
 #include "cssysdef.h"
 #include "ivaria/bugplug.h"
 #include "ivaria/bullet.h"
+#include "ivaria/collada.h"
 #include "ivaria/collider.h"
 #include "ivaria/conin.h"
 #include "ivaria/conout.h"
