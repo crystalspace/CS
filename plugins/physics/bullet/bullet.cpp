@@ -1448,18 +1448,18 @@ void csBulletJoint::RecreateJointIfNeeded (bool force)
   }
 }
  
-void csBulletJoint::Attach (iRigidBody* body1, iRigidBody* body2)
+void csBulletJoint::Attach (iRigidBody* body1, iRigidBody* body2, bool force_update)
 {
   bodies[0] = body1;
   bodies[1] = body2;
 }
 
-void csBulletJoint::SetTransform (const csOrthoTransform& trans)
+void csBulletJoint::SetTransform (const csOrthoTransform& trans, bool force_update)
 {
   transform = trans;
 }
 
-void csBulletJoint::SetTransConstraints (bool x, bool y, bool z)
+void csBulletJoint::SetTransConstraints (bool x, bool y, bool z, bool force_update)
 {
   trans_constraint_x = x;
   trans_constraint_y = y;
@@ -1467,19 +1467,19 @@ void csBulletJoint::SetTransConstraints (bool x, bool y, bool z)
   RecreateJointIfNeeded ();
 }
 
-void csBulletJoint::SetMinimumDistance (const csVector3& min) 
+void csBulletJoint::SetMinimumDistance (const csVector3& min, bool force_update) 
 {
   min_dist = min;
   RecreateJointIfNeeded ();
 }
 
-void csBulletJoint::SetMaximumDistance (const csVector3& max)
+void csBulletJoint::SetMaximumDistance (const csVector3& max, bool force_update)
 {
   max_dist = max;
   RecreateJointIfNeeded ();
 }
 
-void csBulletJoint::SetRotConstraints (bool x, bool y, bool z)
+void csBulletJoint::SetRotConstraints (bool x, bool y, bool z, bool force_update)
 {
   rot_constraint_x = x;
   rot_constraint_y = y;
@@ -1487,38 +1487,38 @@ void csBulletJoint::SetRotConstraints (bool x, bool y, bool z)
   RecreateJointIfNeeded ();
 }
 
-void csBulletJoint::SetMinimumAngle (const csVector3& min)
+void csBulletJoint::SetMinimumAngle (const csVector3& min, bool force_update)
 {
   min_angle = min;
   RecreateJointIfNeeded ();
 }
 
-void csBulletJoint::SetMaximumAngle (const csVector3& max)
+void csBulletJoint::SetMaximumAngle (const csVector3& max, bool force_update)
 {
   max_angle = max;
   RecreateJointIfNeeded ();
 }
 
-void csBulletJoint::SetBounce (const csVector3& bounce)
+void csBulletJoint::SetBounce (const csVector3& bounce, bool force_update)
 {
   csBulletJoint::bounce = bounce;
   RecreateJointIfNeeded ();
 }
 
-void csBulletJoint::SetDesiredVelocity (const csVector3& velocity)
+void csBulletJoint::SetDesiredVelocity (const csVector3& velocity, bool force_update)
 {
   desired_velocity = velocity;
   RecreateJointIfNeeded ();
 }
 
-void csBulletJoint::SetMaxForce (const csVector3& maxForce)
+void csBulletJoint::SetMaxForce (const csVector3& maxForce, bool force_update)
 {
   maxforce = maxForce;
   RecreateJointIfNeeded ();
 }
 
 void csBulletJoint::SetAngularConstraintAxis (const csVector3& axis,
-    int body)
+    int body, bool force_update)
 {
   CS_ASSERT (body >=0 && body <= 2);
   angular_constraints_axis[body] = axis;

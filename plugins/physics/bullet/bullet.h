@@ -402,50 +402,51 @@ public:
   csBulletJoint (csBulletDynamicsSystem* ds);
   virtual ~csBulletJoint ();
  
-  virtual void Attach (iRigidBody* body1, iRigidBody* body2);
+  virtual void Attach (iRigidBody* body1, iRigidBody* body2, bool force_update = true);
   virtual csRef<iRigidBody> GetAttachedBody (int body)
   {
     CS_ASSERT (body >= 0 && body <= 1);
     return bodies[body];
   }
 
-  virtual void SetTransform (const csOrthoTransform& trans);
+  virtual void SetTransform (const csOrthoTransform& trans, bool force_update = true);
   virtual csOrthoTransform GetTransform () { return transform; }
 
-  virtual void SetTransConstraints (bool x, bool y, bool z);
+  virtual void SetTransConstraints (bool x, bool y, bool z, bool force_update = true);
   virtual bool IsXTransConstrained () { return trans_constraint_x; }
   virtual bool IsYTransConstrained () { return trans_constraint_y; }
   virtual bool IsZTransConstrained () { return trans_constraint_z; }
-  virtual void SetMinimumDistance (const csVector3& min) ;
+  virtual void SetMinimumDistance (const csVector3& min, bool force_update = true) ;
   virtual csVector3 GetMinimumDistance () { return min_dist; }
-  virtual void SetMaximumDistance (const csVector3& max);
+  virtual void SetMaximumDistance (const csVector3& max, bool force_update = true);
   virtual csVector3 GetMaximumDistance () { return max_dist; }
 
-  virtual void SetRotConstraints (bool x, bool y, bool z);
+  virtual void SetRotConstraints (bool x, bool y, bool z, bool force_update = true);
   virtual bool IsXRotConstrained () { return rot_constraint_x; }
   virtual bool IsYRotConstrained () { return rot_constraint_y; }
   virtual bool IsZRotConstrained () { return rot_constraint_z; }
 
-  virtual void SetMinimumAngle (const csVector3& min);
+  virtual void SetMinimumAngle (const csVector3& min, bool force_update = true);
   virtual csVector3 GetMinimumAngle () { return min_angle; }
-  virtual void SetMaximumAngle (const csVector3& max);
+  virtual void SetMaximumAngle (const csVector3& max, bool force_update = true);
   virtual csVector3 GetMaximumAngle () { return max_angle; }
 
-  virtual void SetBounce (const csVector3& bounce);
+  virtual void SetBounce (const csVector3& bounce, bool force_update = true);
   virtual csVector3 GetBounce () { return bounce; }
 
-  virtual void SetDesiredVelocity (const csVector3& velocity);
+  virtual void SetDesiredVelocity (const csVector3& velocity, bool force_update = true);
   virtual csVector3 GetDesiredVelocity () { return desired_velocity; }
 
-  virtual void SetMaxForce (const csVector3& maxForce);
+  virtual void SetMaxForce (const csVector3& maxForce, bool force_update = true);
   virtual csVector3 GetMaxForce () { return maxforce; }
 
-  virtual void SetAngularConstraintAxis (const csVector3& axis, int body);
+  virtual void SetAngularConstraintAxis (const csVector3& axis, int body, bool force_update = true);
   virtual csVector3 GetAngularConstraintAxis (int body)
   {
     CS_ASSERT (body >=0 && body <= 1);
     return angular_constraints_axis[body];
   }
+  virtual bool RebuildJoint () {RecreateJointIfNeeded (); return false;}
 };
 
 }

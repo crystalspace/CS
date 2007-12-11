@@ -6,6 +6,9 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Dec-2007
+        - Piotr fixed ode plugin joints behavior and added a way to reduce joints
+          rebuilding (by using RebuildJoint method manual).
 10-Dec-2007
 	- jwir3 merged changes from the collada soc branch into
 	  the trunk.
