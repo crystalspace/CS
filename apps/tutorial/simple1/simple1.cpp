@@ -202,8 +202,6 @@ bool Simple::SetupModules ()
   // First disable the lighting cache. Our app is simple enough
   // not to need this.
   engine->SetLightingCacheMode (0);
-  
-  engine->SetClearZBuf (true);
 
   // Here we create our world.
   CreateRoom();
@@ -233,7 +231,7 @@ void Simple::CreateRoom ()
   // Load the texture from the standard library.  This is located in
   // CS/data/standard.zip and mounted as /lib/std using the Virtual
   // File System (VFS) plugin.
-  if (!loader->LoadTexture ("stone", "/data/test.svg"))
+  if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
     ReportError("Error loading 'stone4' texture!");
 
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
