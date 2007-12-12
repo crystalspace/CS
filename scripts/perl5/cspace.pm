@@ -6485,6 +6485,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetMaxForce = *cspacec::iJoint_GetMaxForce;
 *SetAngularConstraintAxis = *cspacec::iJoint_SetAngularConstraintAxis;
 *GetAngularConstraintAxis = *cspacec::iJoint_GetAngularConstraintAxis;
+*RebuildJoint = *cspacec::iJoint_RebuildJoint;
 *scfGetVersion = *cspacec::iJoint_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -10613,6 +10614,7 @@ sub new {
 *Invert = *cspacec::csPlane3_Invert;
 *Normalize = *cspacec::csPlane3_Normalize;
 *FindPoint = *cspacec::csPlane3_FindPoint;
+*ProjectOnto = *cspacec::csPlane3_ProjectOnto;
 *FindOrthogonalPoints = *cspacec::csPlane3_FindOrthogonalPoints;
 *ClipPolygon = *cspacec::csPlane3_ClipPolygon;
 *Description = *cspacec::csPlane3_Description;
@@ -12047,6 +12049,7 @@ sub DESTROY {
 *AddVertex = *cspacec::csTriangleMesh_AddVertex;
 *GetVertexCount = *cspacec::csTriangleMesh_GetVertexCount;
 *AddTriangle = *cspacec::csTriangleMesh_AddTriangle;
+*AddTriangleMesh = *cspacec::csTriangleMesh_AddTriangleMesh;
 *GetTriangle = *cspacec::csTriangleMesh_GetTriangle;
 *GetTriangleCount = *cspacec::csTriangleMesh_GetTriangleCount;
 *Clear = *cspacec::csTriangleMesh_Clear;

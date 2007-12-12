@@ -58,6 +58,7 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/tri.h"
 #include "csgeom/triangulate.h"
+#include "csgeom/triangulate3d.h"
 #include "csgeom/trimesh.h"
 #include "csgeom/trimeshlod.h"
 #include "csgeom/trimeshtools.h"

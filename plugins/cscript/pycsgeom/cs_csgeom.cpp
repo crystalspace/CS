@@ -17486,6 +17486,40 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csPlane3_ProjectOnto(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csPlane3 *arg1 = (csPlane3 *) 0 ;
+  csVector3 *arg2 = 0 ;
+  csVector3 result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csPlane3_ProjectOnto",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csPlane3, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csPlane3_ProjectOnto" "', argument " "1"" of type '" "csPlane3 *""'"); 
+  }
+  arg1 = reinterpret_cast< csPlane3 * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csPlane3_ProjectOnto" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csPlane3_ProjectOnto" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  arg2 = reinterpret_cast< csVector3 * >(argp2);
+  result = (arg1)->ProjectOnto((csVector3 const &)*arg2);
+  resultobj = SWIG_NewPointerObj((new csVector3(static_cast< const csVector3& >(result))), SWIGTYPE_p_csVector3, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_csPlane3_FindOrthogonalPoints(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csVector3 *arg1 = 0 ;
@@ -41728,6 +41762,39 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csTriangleMesh_AddTriangleMesh(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csTriangleMesh *arg1 = (csTriangleMesh *) 0 ;
+  csTriangleMesh *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csTriangleMesh_AddTriangleMesh",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csTriangleMesh, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csTriangleMesh_AddTriangleMesh" "', argument " "1"" of type '" "csTriangleMesh *""'"); 
+  }
+  arg1 = reinterpret_cast< csTriangleMesh * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csTriangleMesh,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csTriangleMesh_AddTriangleMesh" "', argument " "2"" of type '" "csTriangleMesh const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csTriangleMesh_AddTriangleMesh" "', argument " "2"" of type '" "csTriangleMesh const &""'"); 
+  }
+  arg2 = reinterpret_cast< csTriangleMesh * >(argp2);
+  (arg1)->AddTriangleMesh((csTriangleMesh const &)*arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_csTriangleMesh_GetTriangles__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csTriangleMesh *arg1 = (csTriangleMesh *) 0 ;
@@ -42093,6 +42160,43 @@ SWIGINTERN PyObject *_wrap_csTriangleMesh_GetChangeNumber(PyObject *SWIGUNUSEDPA
   arg1 = reinterpret_cast< csTriangleMesh * >(argp1);
   result = ((csTriangleMesh const *)arg1)->GetChangeNumber();
   resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csTriangleMesh___iadd__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csTriangleMesh *arg1 = (csTriangleMesh *) 0 ;
+  csTriangleMesh *arg2 = 0 ;
+  csTriangleMesh *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csTriangleMesh___iadd__",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csTriangleMesh, SWIG_POINTER_DISOWN |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csTriangleMesh___iadd__" "', argument " "1"" of type '" "csTriangleMesh *""'"); 
+  }
+  arg1 = reinterpret_cast< csTriangleMesh * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csTriangleMesh,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csTriangleMesh___iadd__" "', argument " "2"" of type '" "csTriangleMesh const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csTriangleMesh___iadd__" "', argument " "2"" of type '" "csTriangleMesh const &""'"); 
+  }
+  arg2 = reinterpret_cast< csTriangleMesh * >(argp2);
+  {
+    csTriangleMesh &_result_ref = (arg1)->operator +=((csTriangleMesh const &)*arg2);
+    result = (csTriangleMesh *) &_result_ref;
+  }
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csTriangleMesh, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -46641,6 +46745,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csPlane3_Invert", _wrap_csPlane3_Invert, METH_VARARGS, NULL},
 	 { (char *)"csPlane3_Normalize", _wrap_csPlane3_Normalize, METH_VARARGS, NULL},
 	 { (char *)"csPlane3_FindPoint", _wrap_csPlane3_FindPoint, METH_VARARGS, NULL},
+	 { (char *)"csPlane3_ProjectOnto", _wrap_csPlane3_ProjectOnto, METH_VARARGS, NULL},
 	 { (char *)"csPlane3_FindOrthogonalPoints", _wrap_csPlane3_FindOrthogonalPoints, METH_VARARGS, NULL},
 	 { (char *)"csPlane3_ClipPolygon", _wrap_csPlane3_ClipPolygon, METH_VARARGS, NULL},
 	 { (char *)"csPlane3_Description", _wrap_csPlane3_Description, METH_VARARGS, NULL},
@@ -47125,6 +47230,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csTriangleMesh_GetVertexCount", _wrap_csTriangleMesh_GetVertexCount, METH_VARARGS, NULL},
 	 { (char *)"csTriangleMesh_GetVertices", _wrap_csTriangleMesh_GetVertices, METH_VARARGS, NULL},
 	 { (char *)"csTriangleMesh_AddTriangle", _wrap_csTriangleMesh_AddTriangle, METH_VARARGS, NULL},
+	 { (char *)"csTriangleMesh_AddTriangleMesh", _wrap_csTriangleMesh_AddTriangleMesh, METH_VARARGS, NULL},
 	 { (char *)"csTriangleMesh_GetTriangles", _wrap_csTriangleMesh_GetTriangles, METH_VARARGS, NULL},
 	 { (char *)"csTriangleMesh_GetTriangle", _wrap_csTriangleMesh_GetTriangle, METH_VARARGS, NULL},
 	 { (char *)"csTriangleMesh_GetTriangleCount", _wrap_csTriangleMesh_GetTriangleCount, METH_VARARGS, NULL},
@@ -47135,6 +47241,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csTriangleMesh_Unlock", _wrap_csTriangleMesh_Unlock, METH_VARARGS, NULL},
 	 { (char *)"csTriangleMesh_GetFlags", _wrap_csTriangleMesh_GetFlags, METH_VARARGS, NULL},
 	 { (char *)"csTriangleMesh_GetChangeNumber", _wrap_csTriangleMesh_GetChangeNumber, METH_VARARGS, NULL},
+	 { (char *)"csTriangleMesh___iadd__", _wrap_csTriangleMesh___iadd__, METH_VARARGS, NULL},
 	 { (char *)"csTriangleMesh_swigregister", csTriangleMesh_swigregister, METH_VARARGS, NULL},
 	 { (char *)"csTriangleVertex_pos_set", _wrap_csTriangleVertex_pos_set, METH_VARARGS, NULL},
 	 { (char *)"csTriangleVertex_pos_get", _wrap_csTriangleVertex_pos_get, METH_VARARGS, NULL},

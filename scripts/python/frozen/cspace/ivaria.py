@@ -624,6 +624,7 @@ class iJoint(core.iBase):
     def GetMaxForce(*args): return _ivaria.iJoint_GetMaxForce(*args)
     def SetAngularConstraintAxis(*args): return _ivaria.iJoint_SetAngularConstraintAxis(*args)
     def GetAngularConstraintAxis(*args): return _ivaria.iJoint_GetAngularConstraintAxis(*args)
+    def RebuildJoint(*args): return _ivaria.iJoint_RebuildJoint(*args)
     scfGetVersion = staticmethod(_ivaria.iJoint_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iJoint
     __del__ = lambda self : None;
