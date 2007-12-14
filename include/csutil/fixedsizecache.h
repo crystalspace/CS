@@ -21,12 +21,9 @@
 
 #include "csutil/metautils.h"
 #include "csutil/compileassert.h"
+#include "csutil/hashcomputer.h"
 
-// hack: work around problems caused by #defining 'new'
-#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-# undef new
-#endif
-#include <new>
+#include "csutil/custom_new_disable.h"
 
 namespace CS
 {
@@ -796,7 +793,8 @@ namespace CS
       typename T, 
       unsigned int CacheSize,
       unsigned int Associativity = 1, 
-      typename LRUPolicy = FixedSizeBestChoiceLRUPolicy>
+      typename LRUPolicy = FixedSizeBestChoiceLRUPolicy
+      typename HashFold = CS::Utility::HashFoldingFNV1>
     class FixedSizeCache
     {
     public:
@@ -821,6 +819,8 @@ namespace CS
       {
         // Find which set
         uint h = csHashComputer<K>::ComputeHash (key) & (NumberOfSets-1);
+        h = HashFold::FoldHash(h);
+
         SetType& set = sets[h];
 
         return set.Insert (key, data);
@@ -837,6 +837,8 @@ namespace CS
       {
         // Find which set
         uint h = csHashComputer<K>::ComputeHash (key) & (NumberOfSets-1);
+        h = HashFold::FoldHash(h);
+
         SetType& set = sets[h];
 
         set.Update (key, data);
@@ -852,6 +854,8 @@ namespace CS
       {
         // Find which set
         uint h = csHashComputer<K>::ComputeHash (key) & (NumberOfSets-1);
+        h = HashFold::FoldHash(h);
+
         SetType& set = sets[h];
 
         set.InsertOrUpdate (key, data);
@@ -868,6 +872,8 @@ namespace CS
       {
         // Find which set
         uint h = csHashComputer<K>::ComputeHash (key) & (NumberOfSets-1);
+        h = HashFold::FoldHash(h);
+
         SetType& set = sets[h];
 
         return set.Get (key, data);
@@ -886,8 +892,5 @@ namespace CS
 }
 
 
-#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-# define new CS_EXTENSIVE_MEMDEBUG_NEW
-#endif
-
+#include "csutil/custom_new_enable.h"
 #endif

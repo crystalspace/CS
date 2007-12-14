@@ -180,4 +180,41 @@ public:
 
 //@}
 
+namespace CS
+{
+  namespace Utility
+  {
+
+    class HashFoldingFNV1
+    {
+    public:
+      static uint32 FoldHash (uint32 input)
+      {
+        static const uint32 fnvprime = 0x1000193;
+        static const uint32 fnvoffset = 0x811C9DC5;
+
+        uint32 fold = fnvoffset;
+        for (size_t i = 0; i < 4; ++i)
+        {
+          fold = fold ^ (input & 0xFF);
+          fold *= fnvprime;
+          input >>= 8;
+        }
+        
+        return fold;
+      }
+    };
+
+    class HashFoldingNone
+    {
+    public:
+      static uint32 FoldHash (uint32 input)
+      {
+        return input;
+      }
+    };
+
+  }
+}
+
 #endif

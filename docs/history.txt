@@ -8,6 +8,8 @@ chronological order.
 
 14-Dec-2007
 	- Marten fixed msvcgen configuration for building in MSVC 9.
+	- Marten added a hash-folder routine to get stronger hashes
+	  for the cache.
 3-Dec-2007
 	- Marten moved the csHashComputer from hash.h to its own header.
 	- Marten added a fully generic templated fixed size cache class.
