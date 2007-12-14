@@ -103,7 +103,7 @@ csVector3 csPlane3::ProjectOnto(const csVector3& p)
 	// so we want (n . triDist) / norm(n)
 	float aDOTb = Normal() * triDist;
 	float distance = aDOTb / csVector3::Norm(Normal());
-	distance = abs(distance);
+	distance = fabs(distance);
 
 	// finally, we need to multiply this with the normal of the plane, and
 	// add the resulting vector to our current vector, to get our projection

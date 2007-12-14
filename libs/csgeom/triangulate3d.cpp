@@ -43,6 +43,9 @@ namespace Geom
 		// rotate the planar polygon so that it's axis-aligned
 		// triangulate the 2D planar polygon
 		// finally, reverse the mapping
+
+		// @@@FIXME: Finish implementing.
+		return true;
 	}
 
 	csContour3 Triangulate3D::MapToPlanar(const csContour3& poly)
@@ -118,8 +121,6 @@ namespace Geom
 		// xy-axis.
 		// let's find the angles we need to rotate by
 		csTransform transformation;
-		float xAngle = asin(ourPlane.Normal().x);
-		float yAngle = acos(ourPlane.Normal().y);
 		
 		// now, before rotating, we need to make sure we are at the origin
 		// this returns -1.#IND ... Why?
