@@ -348,9 +348,20 @@ struct iEngine : public virtual iBase
    *   camera viewpoint).
    * - #CS_RENDPRI_SORT_BACK2FRONT: sort objects back to front.
    *
-   * \note The default render priorities are 'sky', 'portal', 'wall', 'object' 
-   * and 'alpha' (in that priority order, where sky is rendered first and 
-   * alpha is rendered last).  Should you wish to add your own render 
+   * \note The default render priorities are:
+   * - init: 1
+   * - sky: 2
+   * - sky2: 3
+   * - portal: 4
+   * - wall: 5
+   * - wall2: 6
+   * - object: 7
+   * - object2: 8
+   * - transp: 9
+   * - alpha: 10 (uses back2front sorting for meshes)
+   * - final: 11
+   * (in that priority order, where 'init' is rendered first and 
+   * 'final' is rendered last).  Should you wish to add your own render 
    * priority, you must call ClearRenderPriorities() and re-add the 
    * default render priorities along with your own new priorities.
    */
@@ -359,9 +370,8 @@ struct iEngine : public virtual iBase
 
   /**
    * Get a render priority by name.
-   * \param name is the name you want (usually one of 'sky', 'portal',
-   * 'wall', 'object', or 'alpha' but you can define your own render
-   * priorities).
+   * \param name is the name you want (one of the standard names
+   * or your own if you have defined your own render priorities).
    * \return 0 if render priority doesn't exist.
    */
   virtual long GetRenderPriority (const char* name) const = 0;
