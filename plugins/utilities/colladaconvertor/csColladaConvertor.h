@@ -227,3 +227,4 @@ class	csColladaConvertor : public	scfImplementation2<csColladaConvertor,iCollada
 CS_PLUGIN_NAMESPACE_END(ColladaConvertor)
 
 #endif
+

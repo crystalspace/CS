@@ -1661,3 +1661,4 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 
 } /* End of ColladaConvertor namespace */
 CS_PLUGIN_NAMESPACE_END(ColladaConvertor)
+

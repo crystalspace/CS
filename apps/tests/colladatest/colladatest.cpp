@@ -187,3 +187,4 @@ int main(int argc, char** argv)
 {
 	return csApplicationRunner<ColladaTest>::Run (argc, argv);
 }
+

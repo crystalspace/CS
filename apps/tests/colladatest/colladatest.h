@@ -49,3 +49,4 @@ class ColladaTest : public csApplicationFramework, public csBaseEventHandler {
 };
 
 #endif
+

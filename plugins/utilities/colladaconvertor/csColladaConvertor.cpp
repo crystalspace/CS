@@ -764,3 +764,4 @@ bool csColladaConvertor::ConvertPhysics(iDocumentNode	*physicsSection)
 
 }
 CS_PLUGIN_NAMESPACE_END(ColladaConvertor)
+

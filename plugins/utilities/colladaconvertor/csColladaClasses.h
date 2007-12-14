@@ -335,3 +335,4 @@ class csColladaMaterial {
 CS_PLUGIN_NAMESPACE_END(ColladaConvertor)
 
 #endif
+

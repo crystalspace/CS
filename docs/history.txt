@@ -12,6 +12,8 @@ chronological order.
 	- caedes fixed pythmod jam rule to look for dbg files in the right
 	  place on install.
 	- Eric Sunshine eliminated several compilation warnings from csgeom.
+        - Scott Johnson eliminated some compilation warnings (newlines) from
+          colladaconvertor.
 13-Dec-2007
 	- caedes made a little fix on lighter2 user manual.
 8-Dec-2007
