@@ -68,7 +68,6 @@ package cspace;
 *csQueryRegistryTag = *cspacec::csQueryRegistryTag;
 *RegisterWeakListener = *cspacec::RegisterWeakListener;
 *RemoveWeakListener = *cspacec::RemoveWeakListener;
-*csHashCompute = *cspacec::csHashCompute;
 *csevMouse = *cspacec::csevMouse;
 *csevMouseOp = *cspacec::csevMouseOp;
 *csevJoystick = *cspacec::csevJoystick;
@@ -1181,6 +1180,7 @@ sub new {
 *DeleteIndex = *cspacec::csPluginRequestArray_DeleteIndex;
 *DeleteIndexFast = *cspacec::csPluginRequestArray_DeleteIndexFast;
 *DeleteRange = *cspacec::csPluginRequestArray_DeleteRange;
+*GetReverseIterator = *cspacec::csPluginRequestArray_GetReverseIterator;
 *__eq__ = *cspacec::csPluginRequestArray___eq__;
 *__ne__ = *cspacec::csPluginRequestArray___ne__;
 *GetAllocator = *cspacec::csPluginRequestArray_GetAllocator;
@@ -3806,6 +3806,7 @@ sub new {
 *DeleteIndex = *cspacec::csImageIOFileFormatDescriptions_DeleteIndex;
 *DeleteIndexFast = *cspacec::csImageIOFileFormatDescriptions_DeleteIndexFast;
 *DeleteRange = *cspacec::csImageIOFileFormatDescriptions_DeleteRange;
+*GetReverseIterator = *cspacec::csImageIOFileFormatDescriptions_GetReverseIterator;
 *__eq__ = *cspacec::csImageIOFileFormatDescriptions___eq__;
 *__ne__ = *cspacec::csImageIOFileFormatDescriptions___ne__;
 *GetAllocator = *cspacec::csImageIOFileFormatDescriptions_GetAllocator;
@@ -5724,6 +5725,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetClipper = *cspacec::iView_GetClipper;
 *Draw = *cspacec::iView_Draw;
 *SetAutoResize = *cspacec::iView_SetAutoResize;
+*GetMeshFilter = *cspacec::iView_GetMeshFilter;
 *scfGetVersion = *cspacec::iView_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -8719,6 +8721,8 @@ sub DESTROY {
 *swig_cullMode_set = *cspacec::RenderMeshModes_cullMode_set;
 *swig_alphaType_get = *cspacec::RenderMeshModes_alphaType_get;
 *swig_alphaType_set = *cspacec::RenderMeshModes_alphaType_set;
+*swig_zoffset_get = *cspacec::RenderMeshModes_zoffset_get;
+*swig_zoffset_set = *cspacec::RenderMeshModes_zoffset_set;
 *swig_buffers_get = *cspacec::RenderMeshModes_buffers_get;
 *swig_buffers_set = *cspacec::RenderMeshModes_buffers_set;
 sub DISOWN {
@@ -9071,24 +9075,34 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::iShaderVarStack ##############
+############# Class : cspace::csShaderVariableStack ##############
 
-package cspace::iShaderVarStack;
+package cspace::csShaderVariableStack;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::csShaderVariableArrayChangeAll cspace );
+@ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csShaderVariableStack(@_);
+    bless $self, $pkg if defined($self);
+}
+
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
     return unless defined $self;
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
-        cspacec::delete_iShaderVarStack($self);
+        cspacec::delete_csShaderVariableStack($self);
         delete $OWNER{$self};
     }
 }
 
+*Setup = *cspacec::csShaderVariableStack_Setup;
+*GetSize = *cspacec::csShaderVariableStack_GetSize;
+*Clear = *cspacec::csShaderVariableStack_Clear;
+*MergeFront = *cspacec::csShaderVariableStack_MergeFront;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -9167,6 +9181,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetTags = *cspacec::iShaderManager_GetTags;
 *SetActiveLights = *cspacec::iShaderManager_SetActiveLights;
 *GetActiveLights = *cspacec::iShaderManager_GetActiveLights;
+*GetSVNameStringset = *cspacec::iShaderManager_GetSVNameStringset;
 *scfGetVersion = *cspacec::iShaderManager_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -9250,6 +9265,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *TeardownPass = *cspacec::iShader_TeardownPass;
 *DeactivatePass = *cspacec::iShader_DeactivatePass;
 *GetMetadata = *cspacec::iShader_GetMetadata;
+*GetUsedShaderVars = *cspacec::iShader_GetUsedShaderVars;
 *scfGetVersion = *cspacec::iShader_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -9534,6 +9550,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetShader = *cspacec::iMaterial_GetShader;
 *GetShaders = *cspacec::iMaterial_GetShaders;
 *GetTexture = *cspacec::iMaterial_GetTexture;
+*GetFirstShader = *cspacec::iMaterial_GetFirstShader;
 *scfGetVersion = *cspacec::iMaterial_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -12286,6 +12303,7 @@ sub new {
 *DeleteIndex = *cspacec::csIntArray_DeleteIndex;
 *DeleteIndexFast = *cspacec::csIntArray_DeleteIndexFast;
 *DeleteRange = *cspacec::csIntArray_DeleteRange;
+*GetReverseIterator = *cspacec::csIntArray_GetReverseIterator;
 *__eq__ = *cspacec::csIntArray___eq__;
 *__ne__ = *cspacec::csIntArray___ne__;
 *GetAllocator = *cspacec::csIntArray_GetAllocator;
@@ -12344,6 +12362,7 @@ sub new {
 *DeleteIndex = *cspacec::csIntArrayArray_DeleteIndex;
 *DeleteIndexFast = *cspacec::csIntArrayArray_DeleteIndexFast;
 *DeleteRange = *cspacec::csIntArrayArray_DeleteRange;
+*GetReverseIterator = *cspacec::csIntArrayArray_GetReverseIterator;
 *__eq__ = *cspacec::csIntArrayArray___eq__;
 *__ne__ = *cspacec::csIntArrayArray___ne__;
 *GetAllocator = *cspacec::csIntArrayArray_GetAllocator;
@@ -14867,6 +14886,7 @@ sub new {
 *DeleteIndex = *cspacec::csCharArrayArray_DeleteIndex;
 *DeleteIndexFast = *cspacec::csCharArrayArray_DeleteIndexFast;
 *DeleteRange = *cspacec::csCharArrayArray_DeleteRange;
+*GetReverseIterator = *cspacec::csCharArrayArray_GetReverseIterator;
 *__eq__ = *cspacec::csCharArrayArray___eq__;
 *__ne__ = *cspacec::csCharArrayArray___ne__;
 *GetAllocator = *cspacec::csCharArrayArray_GetAllocator;
@@ -16984,6 +17004,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *RemoveLightVisibleCallback = *cspacec::iSector_RemoveLightVisibleCallback;
 *GetSVContext = *cspacec::iSector_GetSVContext;
 *PrecacheDraw = *cspacec::iSector_PrecacheDraw;
+*CallSectorCallbacks = *cspacec::iSector_CallSectorCallbacks;
 *scfGetVersion = *cspacec::iSector_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -17244,9 +17265,12 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetCurrentDefaultRenderloop = *cspacec::iEngine_GetCurrentDefaultRenderloop;
 *SetCurrentDefaultRenderloop = *cspacec::iEngine_SetCurrentDefaultRenderloop;
 *GetCurrentFrameNumber = *cspacec::iEngine_GetCurrentFrameNumber;
+*UpdateNewFrame = *cspacec::iEngine_UpdateNewFrame;
 *SetSaveableFlag = *cspacec::iEngine_SetSaveableFlag;
 *GetSaveableFlag = *cspacec::iEngine_GetSaveableFlag;
 *CreateLoaderContext = *cspacec::iEngine_CreateLoaderContext;
+*SetDefaultKeepImage = *cspacec::iEngine_SetDefaultKeepImage;
+*GetDefaultKeepImage = *cspacec::iEngine_GetDefaultKeepImage;
 *GetNearbyObjects = *cspacec::iEngine_GetNearbyObjects;
 *GetVisibleObjects = *cspacec::iEngine_GetVisibleObjects;
 *GetVisibleMeshes = *cspacec::iEngine_GetVisibleMeshes;
@@ -17258,8 +17282,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *RemoveDelayedRemoves = *cspacec::iEngine_RemoveDelayedRemoves;
 *DeleteAll = *cspacec::iEngine_DeleteAll;
 *ResetWorldSpecificSettings = *cspacec::iEngine_ResetWorldSpecificSettings;
-*SetDefaultKeepImage = *cspacec::iEngine_SetDefaultKeepImage;
-*GetDefaultKeepImage = *cspacec::iEngine_GetDefaultKeepImage;
+*GetRenderManager = *cspacec::iEngine_GetRenderManager;
+*FireStartFrame = *cspacec::iEngine_FireStartFrame;
 *scfGetVersion = *cspacec::iEngine_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -17989,6 +18013,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *AddMeshToStaticLOD = *cspacec::iMeshWrapper_AddMeshToStaticLOD;
 *RemoveMeshFromStaticLOD = *cspacec::iMeshWrapper_RemoveMeshFromStaticLOD;
 *GetSVContext = *cspacec::iMeshWrapper_GetSVContext;
+*GetRenderMeshes = *cspacec::iMeshWrapper_GetRenderMeshes;
 *AddExtraRenderMesh = *cspacec::iMeshWrapper_AddExtraRenderMesh;
 *GetExtraRenderMesh = *cspacec::iMeshWrapper_GetExtraRenderMesh;
 *GetExtraRenderMeshCount = *cspacec::iMeshWrapper_GetExtraRenderMeshCount;
@@ -18576,6 +18601,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *CheckFrustum = *cspacec::iPortal_CheckFrustum;
 *HitBeamPortals = *cspacec::iPortal_HitBeamPortals;
 *GetVerticesCount = *cspacec::iPortal_GetVerticesCount;
+*GetMaterial = *cspacec::iPortal_GetMaterial;
+*SetMaterial = *cspacec::iPortal_SetMaterial;
 *scfGetVersion = *cspacec::iPortal_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -18613,6 +18640,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *CreatePortal = *cspacec::iPortalContainer_CreatePortal;
 *RemovePortal = *cspacec::iPortalContainer_RemovePortal;
 *Draw = *cspacec::iPortalContainer_Draw;
+*ComputeScreenPolygons = *cspacec::iPortalContainer_ComputeScreenPolygons;
+*GetTotalVertexCount = *cspacec::iPortalContainer_GetTotalVertexCount;
 *scfGetVersion = *cspacec::iPortalContainer_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -19032,6 +19061,7 @@ sub DESTROY {
 *UpdateClipper = *cspacec::csView_UpdateClipper;
 *GetClipper = *cspacec::csView_GetClipper;
 *Draw = *cspacec::csView_Draw;
+*GetMeshFilter = *cspacec::csView_GetMeshFilter;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);

@@ -495,6 +495,7 @@ class RenderMeshModes(object):
     renderPrio = _swig_property(_ivideo.RenderMeshModes_renderPrio_get, _ivideo.RenderMeshModes_renderPrio_set)
     cullMode = _swig_property(_ivideo.RenderMeshModes_cullMode_get, _ivideo.RenderMeshModes_cullMode_set)
     alphaType = _swig_property(_ivideo.RenderMeshModes_alphaType_get, _ivideo.RenderMeshModes_alphaType_set)
+    zoffset = _swig_property(_ivideo.RenderMeshModes_zoffset_get, _ivideo.RenderMeshModes_zoffset_set)
     buffers = _swig_property(_ivideo.RenderMeshModes_buffers_get, _ivideo.RenderMeshModes_buffers_set)
 RenderMeshModes_swigregister = _ivideo.RenderMeshModes_swigregister
 RenderMeshModes_swigregister(RenderMeshModes)
@@ -637,15 +638,23 @@ iHalo_swigregister = _ivideo.iHalo_swigregister
 iHalo_swigregister(iHalo)
 iHalo_scfGetVersion = _ivideo.iHalo_scfGetVersion
 
-class iShaderVarStack(csgfx.csShaderVariableArrayChangeAll):
+class csShaderVariableStack(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    __swig_destroy__ = _ivideo.delete_iShaderVarStack
+    def __init__(self, *args): 
+        this = _ivideo.new_csShaderVariableStack(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _ivideo.delete_csShaderVariableStack
     __del__ = lambda self : None;
-iShaderVarStack_swigregister = _ivideo.iShaderVarStack_swigregister
-iShaderVarStack_swigregister(iShaderVarStack)
+    def Setup(*args): return _ivideo.csShaderVariableStack_Setup(*args)
+    def GetSize(*args): return _ivideo.csShaderVariableStack_GetSize(*args)
+    def Clear(*args): return _ivideo.csShaderVariableStack_Clear(*args)
+    def MergeFront(*args): return _ivideo.csShaderVariableStack_MergeFront(*args)
+csShaderVariableStack_swigregister = _ivideo.csShaderVariableStack_swigregister
+csShaderVariableStack_swigregister(csShaderVariableStack)
 
+csGetShaderVariableFromStack = _ivideo.csGetShaderVariableFromStack
 class iShaderVariableContext(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
@@ -664,7 +673,6 @@ class iShaderVariableContext(core.iBase):
     __del__ = lambda self : None;
 iShaderVariableContext_swigregister = _ivideo.iShaderVariableContext_swigregister
 iShaderVariableContext_swigregister(iShaderVariableContext)
-csGetShaderVariableFromStack = _ivideo.csGetShaderVariableFromStack
 iShaderVariableContext_scfGetVersion = _ivideo.iShaderVariableContext_scfGetVersion
 
 TagNeutral = _ivideo.TagNeutral
@@ -691,6 +699,7 @@ class iShaderManager(iShaderVariableContext):
     def GetTags(*args): return _ivideo.iShaderManager_GetTags(*args)
     def SetActiveLights(*args): return _ivideo.iShaderManager_SetActiveLights(*args)
     def GetActiveLights(*args): return _ivideo.iShaderManager_GetActiveLights(*args)
+    def GetSVNameStringset(*args): return _ivideo.iShaderManager_GetSVNameStringset(*args)
     scfGetVersion = staticmethod(_ivideo.iShaderManager_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iShaderManager
     __del__ = lambda self : None;
@@ -726,6 +735,7 @@ class iShader(iShaderVariableContext):
     def TeardownPass(*args): return _ivideo.iShader_TeardownPass(*args)
     def DeactivatePass(*args): return _ivideo.iShader_DeactivatePass(*args)
     def GetMetadata(*args): return _ivideo.iShader_GetMetadata(*args)
+    def GetUsedShaderVars(*args): return _ivideo.iShader_GetUsedShaderVars(*args)
     scfGetVersion = staticmethod(_ivideo.iShader_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iShader
     __del__ = lambda self : None;
@@ -869,6 +879,7 @@ class iMaterial(iShaderVariableContext):
     def GetShader(*args): return _ivideo.iMaterial_GetShader(*args)
     def GetShaders(*args): return _ivideo.iMaterial_GetShaders(*args)
     def GetTexture(*args): return _ivideo.iMaterial_GetTexture(*args)
+    def GetFirstShader(*args): return _ivideo.iMaterial_GetFirstShader(*args)
     scfGetVersion = staticmethod(_ivideo.iMaterial_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iMaterial
     __del__ = lambda self : None;

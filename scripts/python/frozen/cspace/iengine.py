@@ -396,6 +396,7 @@ class iSector(core.iBase):
     def RemoveLightVisibleCallback(*args): return _iengine.iSector_RemoveLightVisibleCallback(*args)
     def GetSVContext(*args): return _iengine.iSector_GetSVContext(*args)
     def PrecacheDraw(*args): return _iengine.iSector_PrecacheDraw(*args)
+    def CallSectorCallbacks(*args): return _iengine.iSector_CallSectorCallbacks(*args)
     scfGetVersion = staticmethod(_iengine.iSector_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iSector
     __del__ = lambda self : None;
@@ -567,9 +568,12 @@ class iEngine(core.iBase):
     def GetCurrentDefaultRenderloop(*args): return _iengine.iEngine_GetCurrentDefaultRenderloop(*args)
     def SetCurrentDefaultRenderloop(*args): return _iengine.iEngine_SetCurrentDefaultRenderloop(*args)
     def GetCurrentFrameNumber(*args): return _iengine.iEngine_GetCurrentFrameNumber(*args)
+    def UpdateNewFrame(*args): return _iengine.iEngine_UpdateNewFrame(*args)
     def SetSaveableFlag(*args): return _iengine.iEngine_SetSaveableFlag(*args)
     def GetSaveableFlag(*args): return _iengine.iEngine_GetSaveableFlag(*args)
     def CreateLoaderContext(*args): return _iengine.iEngine_CreateLoaderContext(*args)
+    def SetDefaultKeepImage(*args): return _iengine.iEngine_SetDefaultKeepImage(*args)
+    def GetDefaultKeepImage(*args): return _iengine.iEngine_GetDefaultKeepImage(*args)
     def GetNearbyObjects(*args): return _iengine.iEngine_GetNearbyObjects(*args)
     def GetVisibleObjects(*args): return _iengine.iEngine_GetVisibleObjects(*args)
     def GetVisibleMeshes(*args): return _iengine.iEngine_GetVisibleMeshes(*args)
@@ -581,8 +585,8 @@ class iEngine(core.iBase):
     def RemoveDelayedRemoves(*args): return _iengine.iEngine_RemoveDelayedRemoves(*args)
     def DeleteAll(*args): return _iengine.iEngine_DeleteAll(*args)
     def ResetWorldSpecificSettings(*args): return _iengine.iEngine_ResetWorldSpecificSettings(*args)
-    def SetDefaultKeepImage(*args): return _iengine.iEngine_SetDefaultKeepImage(*args)
-    def GetDefaultKeepImage(*args): return _iengine.iEngine_GetDefaultKeepImage(*args)
+    def GetRenderManager(*args): return _iengine.iEngine_GetRenderManager(*args)
+    def FireStartFrame(*args): return _iengine.iEngine_FireStartFrame(*args)
     scfGetVersion = staticmethod(_iengine.iEngine_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iEngine
     __del__ = lambda self : None;
@@ -968,6 +972,7 @@ class iMeshWrapper(core.iBase):
     def AddMeshToStaticLOD(*args): return _iengine.iMeshWrapper_AddMeshToStaticLOD(*args)
     def RemoveMeshFromStaticLOD(*args): return _iengine.iMeshWrapper_RemoveMeshFromStaticLOD(*args)
     def GetSVContext(*args): return _iengine.iMeshWrapper_GetSVContext(*args)
+    def GetRenderMeshes(*args): return _iengine.iMeshWrapper_GetRenderMeshes(*args)
     def AddExtraRenderMesh(*args): return _iengine.iMeshWrapper_AddExtraRenderMesh(*args)
     def GetExtraRenderMesh(*args): return _iengine.iMeshWrapper_GetExtraRenderMesh(*args)
     def GetExtraRenderMeshCount(*args): return _iengine.iMeshWrapper_GetExtraRenderMeshCount(*args)
@@ -1297,6 +1302,8 @@ class iPortal(core.iBase):
     def CheckFrustum(*args): return _iengine.iPortal_CheckFrustum(*args)
     def HitBeamPortals(*args): return _iengine.iPortal_HitBeamPortals(*args)
     def GetVerticesCount(*args): return _iengine.iPortal_GetVerticesCount(*args)
+    def GetMaterial(*args): return _iengine.iPortal_GetMaterial(*args)
+    def SetMaterial(*args): return _iengine.iPortal_SetMaterial(*args)
     scfGetVersion = staticmethod(_iengine.iPortal_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iPortal
     __del__ = lambda self : None;
@@ -1313,6 +1320,8 @@ class iPortalContainer(core.iBase):
     def CreatePortal(*args): return _iengine.iPortalContainer_CreatePortal(*args)
     def RemovePortal(*args): return _iengine.iPortalContainer_RemovePortal(*args)
     def Draw(*args): return _iengine.iPortalContainer_Draw(*args)
+    def ComputeScreenPolygons(*args): return _iengine.iPortalContainer_ComputeScreenPolygons(*args)
+    def GetTotalVertexCount(*args): return _iengine.iPortalContainer_GetTotalVertexCount(*args)
     scfGetVersion = staticmethod(_iengine.iPortalContainer_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iPortalContainer
     __del__ = lambda self : None;

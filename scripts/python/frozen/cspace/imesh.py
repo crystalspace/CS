@@ -1284,6 +1284,7 @@ class csCharArrayArray(core.CustomAllocated):
     def DeleteIndex(*args): return _imesh.csCharArrayArray_DeleteIndex(*args)
     def DeleteIndexFast(*args): return _imesh.csCharArrayArray_DeleteIndexFast(*args)
     def DeleteRange(*args): return _imesh.csCharArrayArray_DeleteRange(*args)
+    def GetReverseIterator(*args): return _imesh.csCharArrayArray_GetReverseIterator(*args)
     def __eq__(*args): return _imesh.csCharArrayArray___eq__(*args)
     def __ne__(*args): return _imesh.csCharArrayArray___ne__(*args)
     def GetAllocator(*args): return _imesh.csCharArrayArray_GetAllocator(*args)

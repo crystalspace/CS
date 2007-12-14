@@ -547,6 +547,7 @@ class csPluginRequestArray(CustomAllocated):
     def DeleteIndex(*args): return _core.csPluginRequestArray_DeleteIndex(*args)
     def DeleteIndexFast(*args): return _core.csPluginRequestArray_DeleteIndexFast(*args)
     def DeleteRange(*args): return _core.csPluginRequestArray_DeleteRange(*args)
+    def GetReverseIterator(*args): return _core.csPluginRequestArray_GetReverseIterator(*args)
     def __eq__(*args): return _core.csPluginRequestArray___eq__(*args)
     def __ne__(*args): return _core.csPluginRequestArray___ne__(*args)
     def GetAllocator(*args): return _core.csPluginRequestArray_GetAllocator(*args)
@@ -1419,7 +1420,6 @@ class iEventNameRegistry(iBase):
     __del__ = lambda self : None;
 iEventNameRegistry_swigregister = _core.iEventNameRegistry_swigregister
 iEventNameRegistry_swigregister(iEventNameRegistry)
-csHashCompute = _core.csHashCompute
 iEventNameRegistry_scfGetVersion = _core.iEventNameRegistry_scfGetVersion
 
 class csEventNameRegistry(object):
@@ -1988,6 +1988,7 @@ class csImageIOFileFormatDescriptions(CustomAllocated):
     def DeleteIndex(*args): return _core.csImageIOFileFormatDescriptions_DeleteIndex(*args)
     def DeleteIndexFast(*args): return _core.csImageIOFileFormatDescriptions_DeleteIndexFast(*args)
     def DeleteRange(*args): return _core.csImageIOFileFormatDescriptions_DeleteRange(*args)
+    def GetReverseIterator(*args): return _core.csImageIOFileFormatDescriptions_GetReverseIterator(*args)
     def __eq__(*args): return _core.csImageIOFileFormatDescriptions___eq__(*args)
     def __ne__(*args): return _core.csImageIOFileFormatDescriptions___ne__(*args)
     def GetAllocator(*args): return _core.csImageIOFileFormatDescriptions_GetAllocator(*args)
