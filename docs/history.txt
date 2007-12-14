@@ -6,6 +6,8 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Dec-2007
+	- Marten fixed msvcgen configuration for building in MSVC 9.
 3-Dec-2007
 	- Marten moved the csHashComputer from hash.h to its own header.
 	- Marten added a fully generic templated fixed size cache class.
