@@ -8,6 +8,9 @@ chronological order.
 
 14-Dec-2007
 	- Marten fixed msvcgen configuration for building in MSVC 9.
+	- caedes fixed cspace.pth generating jam code to respect DESTDIR.
+	- caedes fixed pythmod jam rule to look for dbg files in the right
+	  place on install.
 13-Dec-2007
 	- caedes made a little fix on lighter2 user manual.
 8-Dec-2007
