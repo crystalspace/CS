@@ -111,7 +111,7 @@ class	csColladaMesh	{
 		csString pluginType;  // the type of plugin we're using (default = genmeshfact)
 
 		// the offsets of the normals, positions, and texture coordinates
-		size_t vertexOffset, normalOffset, textureOffset;  
+		int vertexOffset, normalOffset, textureOffset;  
 		
 		csColladaMaterial* materials;	// the materials applied to the mesh object
 
