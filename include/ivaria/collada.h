@@ -289,3 +289,4 @@ struct iColladaConvertor : public virtual iBase
 };
 
 #endif
+

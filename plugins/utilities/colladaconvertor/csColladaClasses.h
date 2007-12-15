@@ -271,6 +271,7 @@ class csColladaEffectProfile {
 
 	public:
 		csColladaEffectProfile(iDocumentNode* profileElement, csColladaConvertor* parentObj);
+		csColladaEffectProfile(const csColladaEffectProfile& copy);
 
 		bool Process(iDocumentNode* profileElement);
 		void SetProfileType(csColladaEffectProfileType newType);
@@ -299,10 +300,13 @@ class csColladaEffect {
 
 	public:
 		csColladaEffect(iDocumentNode* effectElement, csColladaConvertor* parentObj);
+		csColladaEffect(const csColladaEffect& copy);
 		bool Process(iDocumentNode* effectElement);
 
 		//csColladaEffectProfile* GetProfile(const char* query); // probably should be csRef
 		csColladaEffectProfile* GetProfile(const char* query);
+		csColladaEffectProfile GetProfileByIndex(size_t index) { return profiles.Get(index); }
+		size_t GetNumProfiles() { return profiles.GetSize(); }
 
 		bool operator==(const csColladaEffect& compEffect);
 

@@ -1441,6 +1441,17 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 		Process(profileElement);
 	}
 
+	csColladaEffectProfile::csColladaEffectProfile(const csColladaEffectProfile& copy)
+	{
+		profileType = copy.profileType;
+		element = copy.element;
+		parent = copy.parent;
+		diffuseColor = copy.diffuseColor;
+		specularColor = copy.specularColor;
+		ambientColor = copy.ambientColor;
+		name = copy.name;
+	}
+
 	bool csColladaEffectProfile::Process(iDocumentNode* profileElement)
 	{
 		csRef<iDocumentNodeIterator> techniquesToProcess;
@@ -1524,6 +1535,22 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 	{
 		parent = parentObj;
 		Process(effectElement);
+	}
+
+	csColladaEffect::csColladaEffect(const csColladaEffect& copy)
+	{
+		element = copy.element;
+	
+		/*
+		for (size_t i = 0; i < copy.GetNumProfiles(); i++)
+		{
+			profiles.Push(copy.GetProfileByIndex(i));
+		}
+		*/
+		profiles = copy.profiles;
+
+		id = copy.id;
+		parent = copy.parent;
 	}
 
 	csColladaEffectProfile* csColladaEffect::GetProfile(const char* query)
