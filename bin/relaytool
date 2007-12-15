@@ -195,9 +195,9 @@ static void *handle = 0;
     #define ASM_FUNC(x)     #x "@PLT"
     #define ASM_FIXUPVAR(x) #x "@GOTOFF(%%ebx)"
   #elif defined( __x86_64__ )
-    #define ASM_VAR(x)      #x "@GOTPCREL"
+    #define ASM_VAR(x)      #x "@GOT(%rbx)"
     #define ASM_FUNC(x)     #x "@PLT"
-    #define ASM_FIXUPVAR(x) #x "@GOTPCREL"
+    #define ASM_FIXUPVAR(x) #x "@GOT(%%rbx)"
   #endif
 #endif
 

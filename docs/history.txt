@@ -8,6 +8,9 @@ chronological order.
 
 15-Dec-2007
 	- Marten fixed colladaconvertor to compile cleanly on gcc (mingw).
+	- Jorrit committed a work-around for bug #429 (relaytool crashes
+	  on 64-bit linux) by Marten. This is just a work-around. The
+	  ticket should not be closed yet until a real fix can be found.
 14-Dec-2007
 	- Marten fixed msvcgen configuration for building in MSVC 9.
 	- caedes fixed cspace.pth generating jam code to respect DESTDIR.
