@@ -1,19 +1,19 @@
 /*
-		Copyright	(C)	2007 by	Scott	Johnson
+Copyright (C) 2007 by Scott Johnson
 
-		This application is	free software; you can redistribute	it and/or
-		modify it	under	the	terms	of the GNU Library General Public
-		License	as published by	the	Free Software	Foundation;	either
-		version	2	of the License,	or (at your	option)	any	later	version.
+This application is free software; you can redistribute it and/or
+modify it under the terms of the GNU Library General Public
+License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later version.
 
-		This application is	distributed	in the hope	that it	will be	useful,
-		but	WITHOUT	ANY	WARRANTY;	without	even the implied warranty	of
-		MERCHANTABILITY	or FITNESS FOR A PARTICULAR	PURPOSE.	See	the	GNU
-		Library	General	Public License for more	details.
+This application is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+Library General Public License for more details.
 
-		You	should have	received a copy	of the GNU Library General Public
-		License	along	with this	application; if	not, write to	the	Free
-		Software Foundation, Inc., 675 Mass	Ave, Cambridge,	MA 02139,	USA.
+You should have received a copy of the GNU Library General Public
+License along with this application; if not, write to the Free
+Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #ifndef	_CS_COLLADA_CONVERTOR_H_
@@ -26,201 +26,200 @@
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 #include "csgeom/trimesh.h"
+#include "csColladaClasses.h"
 
-// Standard	Headers
-#include <cstdarg>
-#include <string>
-#include <sstream>
 
 CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 {
 
-/// The default type for mesh <plugin> tags
+  class csColladaEffect;
+
+  /// The default type for mesh <plugin> tags
 #define CS_COLLADA_DEFAULT_MESH_PLUGIN_TYPE "crystalspace.mesh.loader.factory.genmesh"
 
-/**	
- * This	class	implements the iColladaConvertor interface.	 It	is used	as a conversion	utility
- * between files in	the	COLLADA	digital	interchange	format,	and	Crystal	Space	Library	and/or
- * map files.
- *
- * \remarks	This class requires	writeable XML documents, and thus utilizes the TinyXML plugin.
- *		    The	TinyXML	plugin will	be loaded on initialization	of this	plugin.
- */
+  /** 
+  * This class implements the iColladaConvertor interface.  It is used as a conversion utility
+  * between files in the COLLADA digital interchange format, and Crystal Space Library and/or
+  * map files.
+  *
+  * \remarks This class requires writeable XML documents, and thus utilizes the TinyXML plugin.
+  *      The TinyXML plugin will be loaded on initialization of this plugin.
+  */
 
-class	csColladaConvertor : public	scfImplementation2<csColladaConvertor,iColladaConvertor,iComponent>
-{
-	friend class csColladaAccessor;
-	friend class csColladaMesh;
-	friend class csColladaEffect;
-	friend class csColladaEffectProfile;
-	friend class csColladaMaterial;
+  class csColladaConvertor : public scfImplementation2<csColladaConvertor,iColladaConvertor,iComponent>
+  {
+    friend class csColladaAccessor;
+    friend class csColladaMesh;
+    friend class csColladaEffect;
+    friend class csColladaEffectProfile;
+    friend class csColladaMaterial;
 
-	private:
-		
-		// =============== Conversion System Attributes ===============
+  private:
 
-		///	A	smart	pointer	to the document	system
-		iDocumentSystem* docSys;
+    // =============== Conversion System Attributes ===============
 
-		///	A	smart	pointer	to the virtual file	system
-		csRef<iVFS>	fileSys;
+    /// A smart pointer to the document system
+    iDocumentSystem* docSys;
 
-		///	Whether	or not we	have warnings	turned on.	Warnings are off by	default.
-		bool warningsOn;
+    /// A smart pointer to the virtual file system
+    csRef<iVFS> fileSys;
 
-		///	A	pointer	to the object	registry
-		iObjectRegistry* obj_reg;
+    /// Whether or not we have warnings turned on. Warnings are off by default.
+    bool warningsOn;
 
-		/// A list of COLLADA effects
-		csArray<csColladaEffect> effectsList;
-		
-		/// The last used effect id for GenerateEffectID()
-		int lastEffectId; 
+    /// A pointer to the object registry
+    iObjectRegistry* obj_reg;
+
+    /// A list of COLLADA effects
+    csArray<csColladaEffect> effectsList;
+
+    /// The last used effect id for GenerateEffectID()
+    int lastEffectId; 
 
 
-		// =============== Crystal Space Attributes	===============
+    // =============== Crystal Space Attributes ===============
 
-		///	A	smart	pointer	to the Crystal Space document	we will	be working on	in memory	
-		csRef<iDocument> csFile;
+    /// A smart pointer to the Crystal Space document we will be working on in memory 
+    csRef<iDocument> csFile;
 
-		///	A	smart	pointer	to the 'world' or	'library'	node
-		csRef<iDocumentNode> csTopNode;
+    /// A smart pointer to the 'world' or 'library' node
+    csRef<iDocumentNode> csTopNode;
 
-		///	Whether	or not the Crystal Space file	has	been loaded	and	is ready
-		bool csReady;
+    /// Whether or not the Crystal Space file has been loaded and is ready
+    bool csReady;
 
-		///	The	output file	type.	 Initially,	this is	set	to CS_FILE_NONE.
-		csColladaFileType	outputFileType;
+    /// The output file type.  Initially, this is set to CS_FILE_NONE.
+    csColladaFileType outputFileType;
 
-		// =============== COLLADA Attributes ===============
+    // =============== COLLADA Attributes ===============
 
-		///	A	smart	pointer	to the COLLADA document	we will	be working from	in memory
-		csRef<iDocument> colladaFile;
+    /// A smart pointer to the COLLADA document we will be working from in memory
+    csRef<iDocument> colladaFile;
 
-		///	Whether	or not the COLLADA file	has	been loaded	and	is ready
-		bool colladaReady;
+    /// Whether or not the COLLADA file has been loaded and is ready
+    bool colladaReady;
 
-		///	A	smart	pointer	to the <COLLADA> element
-		csRef<iDocumentNode> colladaElement;
+    /// A smart pointer to the <COLLADA> element
+    csRef<iDocumentNode> colladaElement;
 
-		/// An array of materials referenced in the COLLADA document
-		csArray<csColladaMaterial> materialsList;
+    /// An array of materials referenced in the COLLADA document
+    csArray<csColladaMaterial> materialsList;
 
-		// =============== Basic Utility Functions ===============
-	public:
-		
-		/**
-		 * Initializes the plugin.
-		 * 
-		 * \warning	This will	reload the iDocumentSystem interface so	that it	uses the TinyXML
-		 *					plugin as	an implementation.
-		 */
-		virtual	bool Initialize	(iObjectRegistry*);
-		
-		/**
-		 * \brief	Initialization routine for the output	document.
-		 *
-		 * Constructs	a	new	Crystal	Space	document.	 This	function requires	that 
-		 * SetOutputFileType(csColladaFileType filetype) has already been	called.
-		 * 
-		 * \returns	true,	if initialization	went ok; false otherwise
-		 */
-		bool InitializeCrystalSpaceDocument();
+    // =============== Basic Utility Functions ===============
+  public:
 
-	// =============== Error Reporting and Handling Functions ===============
-		/**
-		 * Report	various	things back	to the application
-		 */
-		void Report(int	severity,	const	char*	msg, ...);
+    /**
+    * Initializes the plugin.
+    * 
+    * \warning This will reload the iDocumentSystem interface so that it uses the TinyXML
+    *     plugin as an implementation.
+    */
+    virtual bool Initialize (iObjectRegistry*);
 
-		/** Outputs an array.
-		 *
-		 */
-		//void ReportArray(int severity, csArray<csVector3>& ar);
-		//void ReportArray(int severity, csArray<csVector2>& ar);
-		
-		/**
-		 * Turn	debugging	warnings on	or off.	 This	will turn	on all possible	debug	information	for	the	
-		 * plugin.	It also	will check to	verify that	files	and	data structures	conform	to specified standards.
-		 *
-		 * \param	toggle If	true,	turns	on debug warnings.
-		 * 
-		 * \notes	Debug	warnings are off by	default.
-		 */
-		void SetWarnings(bool	toggle);
+    /**
+    * \brief Initialization routine for the output document.
+    *
+    * Constructs a new Crystal Space document.  This function requires that 
+    * SetOutputFileType(csColladaFileType filetype) has already been called.
+    * 
+    * \returns true, if initialization went ok; false otherwise
+    */
+    bool InitializeCrystalSpaceDocument();
 
-		/**
-		 * Checks	for	validity of	the	file name	to see if	it conforms	to COLLADA standards.
-		 */
-		void CheckColladaFilenameValidity(const	char*	str);
+    // =============== Error Reporting and Handling Functions ===============
+    /**
+    * Report various things back to the application
+    */
+    void Report(int severity, const char* msg, ...);
 
-		/**
-		 * Checks	for	validity of	the	COLLADA	file.
-		 *
-		 * Right now,	this only	checks to	see	if the file	is valid XML.
-		 * @todo Add some	abilities	to validate	the	XML.
-		 */
-		const	char*	CheckColladaValidity(iFile *file);
-		
-		// =============== Accessor Functions =============== 
+    /** Outputs an array.
+    *
+    */
+    //void ReportArray(int severity, csArray<csVector3>& ar);
+    //void ReportArray(int severity, csArray<csVector2>& ar);
 
-		csRef<iDocument> GetCrystalDocument() { return csFile; }
-		csRef<iDocument> GetColladaDocument() { return colladaFile; }
+    /**
+    * Turn debugging warnings on or off.  This will turn on all possible debug information for the 
+    * plugin. It also will check to verify that files and data structures conform to specified standards.
+    *
+    * \param toggle If true, turns on debug warnings.
+    * 
+    * \notes Debug warnings are off by default.
+    */
+    void SetWarnings(bool toggle);
 
-		/** Get the index of the specified effect in the effects list
-		 */
-		size_t GetEffectIndex(const csColladaEffect& effect);
+    /**
+    * Checks for validity of the file name to see if it conforms to COLLADA standards.
+    */
+    void CheckColladaFilenameValidity(const char* str);
 
-		/** Get the effect at a particular index in the effects list
-		 */
-		csColladaEffect& GetEffect(size_t index);
+    /**
+    * Checks for validity of the COLLADA file.
+    *
+    * Right now, this only checks to see if the file is valid XML.
+    * @todo Add some abilities to validate the XML.
+    */
+    const char* CheckColladaValidity(iFile *file);
 
-		csColladaMaterial* FindMaterial(const char* accessorString);
+    // =============== Accessor Functions =============== 
 
-	private:
+    csRef<iDocument> GetCrystalDocument() { return csFile; }
+    csRef<iDocument> GetColladaDocument() { return colladaFile; }
 
-	 /** \brief	Returns	a	<source> element
-		*
-		*	Retrieves	a	<source> element associated	with a given element.
-		*
-		*	\param name	The	name of	the	source element (id)	to retrieve.
-		*	\param parent	The	parent node
-		*
-		*	\returns The source	element	associated with	given	element.
-		*/
-		static csRef<iDocumentNode> GetSourceElement(const	char*	name,	iDocumentNode* parent);
-	
-	public:
+    /** Get the index of the specified effect in the effects list
+    */
+    size_t GetEffectIndex(const csColladaEffect& effect);
 
-		// =============== Mutator Functions =============== 
+    /** Get the effect at a particular index in the effects list
+    */
+    csColladaEffect& GetEffect(size_t index);
 
-		virtual	const	char*	SetOutputFiletype(csColladaFileType	filetype);
-	
-		// =============== Normal Class Functions =============== 
+    csColladaMaterial* FindMaterial(const char* accessorString);
 
-		///	Constructor
-		csColladaConvertor(iBase*	parent);
+  private:
 
-		///	Destructor
-		virtual	~csColladaConvertor();
-		
-		virtual	const	char*	Load(const char	*str);
-		virtual	const	char*	Load(iString *str);	
-		virtual	const	char*	Load(iFile *file);
-		virtual	const	char*	Load(iDataBuffer *db);
-		virtual	const	char*	Write(const	char*	filepath);
-		
-		// =============== Conversion	Functions	===============
+    /** \brief Returns a <source> element
+    *
+    * Retrieves a <source> element associated with a given element.
+    *
+    * \param name The name of the source element (id) to retrieve.
+    * \param parent The parent node
+    *
+    * \returns The source element associated with given element.
+    */
+    static csRef<iDocumentNode> GetSourceElement(const char* name, iDocumentNode* parent);
 
-		virtual	const	char*	Convert();
-		virtual	bool ConvertGeometry(iDocumentNode *geometrySection);
-		virtual	bool ConvertEffects(iDocumentNode *effectsSection);
-		virtual	bool ConvertMaterials(iDocumentNode *materialsSection);
-		virtual	bool ConvertRiggingAnimation(iDocumentNode *riggingSection);
-		virtual	bool ConvertPhysics(iDocumentNode	*physicsSection);
-		virtual bool ConvertScene(iDocumentNode *camerasSection, iDocumentNode *lightsSection, iDocumentNode *visualScenesSection);
+  public:
 
-}; /* End of class csColladaConvertor */
+    // =============== Mutator Functions =============== 
+
+    virtual const char* SetOutputFiletype(csColladaFileType filetype);
+
+    // =============== Normal Class Functions =============== 
+
+    /// Constructor
+    csColladaConvertor(iBase* parent);
+
+    /// Destructor
+    virtual ~csColladaConvertor();
+
+    virtual const char* Load(const char *str);
+    virtual const char* Load(iString *str); 
+    virtual const char* Load(iFile *file);
+    virtual const char* Load(iDataBuffer *db);
+    virtual const char* Write(const char* filepath);
+
+    // =============== Conversion Functions ===============
+
+    virtual const char* Convert();
+    virtual bool ConvertGeometry(iDocumentNode *geometrySection);
+    virtual bool ConvertEffects(iDocumentNode *effectsSection);
+    virtual bool ConvertMaterials(iDocumentNode *materialsSection);
+    virtual bool ConvertRiggingAnimation(iDocumentNode *riggingSection);
+    virtual bool ConvertPhysics(iDocumentNode *physicsSection);
+    virtual bool ConvertScene(iDocumentNode *camerasSection, iDocumentNode *lightsSection, iDocumentNode *visualScenesSection);
+
+  }; /* End of class csColladaConvertor */
 
 
 } /* End of ColladaConvertor namespace */
