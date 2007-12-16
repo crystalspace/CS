@@ -99,7 +99,7 @@ rule PossiblePseudoTarget
   local i ;
   for i in $(<)
   {
-    local s = [ Match ^([A-Za-z0-9_.-]+)$ : $(i) ] ;
+    local s = [ Match ^([A-Za-z0-9][A-Za-z0-9_.-]+)$ : $(i) ] ;
     if $(s)
     {
       EmitPseudoTarget "$(DUMPTARGETS_FILE)" : $(i) ;
