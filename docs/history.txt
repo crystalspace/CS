@@ -60,6 +60,12 @@ chronological order.
 	- Marten made a few optimizations to the atomic operations on PPC
 	  and SPARC.
 	- Marten added an application for micro-benchmarking atomic operations.
+	- Marten removed CS::Threading::Mutex::IsLocked() and all users of it.
+	  The reason is that there is no way to query the current lock-status
+	  when using pthreads. The old solution by keeping an boolean
+	  variable does not work as it does not properly interact with the
+	  locking of the mutex in conditions, and is in itself cause of race 
+	  conditions.
 15-Dec-2007
 	- Marten fixed colladaconvertor to compile cleanly on gcc (mingw).
 	- Jorrit committed a work-around for bug #429 (relaytool crashes
