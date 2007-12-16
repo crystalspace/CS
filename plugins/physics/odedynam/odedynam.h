@@ -106,6 +106,7 @@ class csODECollider;
 // Helper base for classes that can contain multiple colliders
 struct ColliderContainer
 {
+  virtual ~ColliderContainer() {}
   virtual bool DoFullInertiaRecalculation () const = 0;
   virtual void RecalculateFullInertia (csODECollider* thisCol) = 0;
 };

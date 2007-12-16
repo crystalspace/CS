@@ -21,6 +21,7 @@ chronological order.
 	  would access undefined shell variable
 	  $cs_cv_prog_cxx_visibility_inlines_hidden_buggy if compiler did not
 	  respond to -fvisibility-inlines-hidden.
+	- Eric Sunshine eliminated several compilation warnings in the plugins.
 15-Dec-2007
 	- Marten fixed colladaconvertor to compile cleanly on gcc (mingw).
 	- Jorrit committed a work-around for bug #429 (relaytool crashes

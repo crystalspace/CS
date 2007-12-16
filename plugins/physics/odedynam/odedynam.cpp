@@ -150,7 +150,7 @@ public:
   int debugSeverity;
   int messageSeverity;
   bool immediateMessages;
-  int messageInterval;
+  csTicks messageInterval;
 
   ODEMessages () : lastSeverity (-1), lastType (0), lastErrnum (-1),
     lastMessageCount (0), lastFlush (0),
@@ -275,7 +275,7 @@ bool csODEDynamics::Initialize (iObjectRegistry* object_reg)
       ODEMessages::GetODEMessages ()->errorSeverity);
 
   ODEMessages::GetODEMessages ()->messageInterval =
-    cfg->GetInt ("Dynamics.ODE.MessageInterval");
+    static_cast<csTicks>(cfg->GetInt ("Dynamics.ODE.MessageInterval"));
 
   return true;
 }
