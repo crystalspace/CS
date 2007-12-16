@@ -32,8 +32,8 @@ CS::Threading::Barrier syncBarrier4Start (5);
 CS::Threading::Barrier syncBarrier2Stop (3);
 CS::Threading::Barrier syncBarrier4Stop (5);
 
-const size_t dataSize = 2*1024*1024;
-const size_t runs = 32;
+size_t dataSize = 0; 
+size_t runs = 0;
 volatile int32* dataBuffer = 0;
 
 
@@ -41,7 +41,7 @@ volatile int32* dataBuffer = 0;
 // Allocate, write & read 4MB of data
 static void CacheFlush ()
 {
-  const size_t size = 4*dataSize;
+  const size_t size = 4*1024*1024;
 
   volatile char* data = (volatile char*)cs_malloc (size);
 
@@ -86,6 +86,7 @@ static void DoSubtraction ()
     }
   }
 }
+
 
 class AddRunner2 : public CS::Threading::Runnable
 {
@@ -159,7 +160,6 @@ static void TestRegular ()
     diffTime -= csGetMicroTicks ();
     csPrintf ("%" PRId64 "\n", -diffTime);
   }
-  
 };
 
 
@@ -261,6 +261,111 @@ static void TestAtomic ()
   
 };
 
+//-- Comparison methods
+
+static void DoMultiplication ()
+{
+  for (size_t j = 0; j < runs; ++j)
+  {
+    for (size_t i = 0; i < dataSize; ++i)
+    {
+      dataBuffer[i] *= 37;
+    }
+  }
+}
+
+static void DoDivision ()
+{
+  for (size_t j = 0; j < runs; ++j)
+  {
+    for (size_t i = 0; i < dataSize; ++i)
+    {
+      dataBuffer[i] /= 83;
+    }
+  }
+}
+
+volatile uint32 global;
+
+static void DoMemoryRead ()
+{
+  for (size_t j = 0; j < runs; ++j)
+  {
+    for (size_t i = 0; i < dataSize; ++i)
+    {
+      global = dataBuffer[i];
+    }
+  }
+}
+
+static void DoFold ()
+{  
+  for (size_t j = 0; j < runs; ++j)
+  {
+    for (size_t i = 0; i < dataSize; ++i)
+    {
+      // Simple hash fold
+      uint32 fold;
+      uint32 data = dataBuffer[i];
+      fold = (data & 0xFF);
+      fold ^= ((data >> 8) & 0xFF);
+      fold ^= ((data >> 16) & 0xFF);
+      fold ^= ((data >> 24) & 0xFF);
+      global = fold;
+    }
+  }
+}
+
+static void TestCompare ()
+{
+  csPrintf ("Test comparison\n");
+  int64 diffTime;
+  // Cache flush to start with, and then between each test
+
+  // Non-threaded
+  CacheFlush ();
+  csPrintf ("Test 1: Multiplication, single threaded: ");
+  diffTime = csGetMicroTicks ();
+    DoMultiplication ();
+  diffTime -= csGetMicroTicks ();
+  csPrintf ("%" PRId64 "\n", -diffTime);
+
+  CacheFlush ();
+  csPrintf ("Test 2: Division, single threaded: ");
+  diffTime = csGetMicroTicks ();
+    DoDivision ();
+  diffTime -= csGetMicroTicks ();
+  csPrintf ("%" PRId64 "\n", -diffTime);
+
+  CacheFlush ();
+  csPrintf ("Test 3: Single memory read, single threaded: ");
+  diffTime = csGetMicroTicks ();
+    DoMemoryRead ();
+  diffTime -= csGetMicroTicks ();
+  csPrintf ("%" PRId64 "\n", -diffTime);
+
+  CacheFlush ();
+  csPrintf ("Test 4: XOR fold, single threaded: ");
+  diffTime = csGetMicroTicks ();
+    DoFold ();
+  diffTime -= csGetMicroTicks ();
+  csPrintf ("%" PRId64 "\n", -diffTime);
+}
+
+// Main runner
+static void RunTests(size_t memSize)
+{
+  dataSize = memSize / sizeof(int32);
+  runs = 1024*1024*512/dataSize;
+
+  // Allocate the data buffer to use
+  dataBuffer = (volatile int32*)cs_malloc (dataSize*4);
+
+  // Run tests  
+  TestRegular ();
+  TestAtomic ();
+  TestCompare ();
+}
 
 
 /*---------------------------------------------------------------------*
@@ -270,21 +375,25 @@ int main (int argc, char* argv[])
 {
   csPrintf ("ATOMIC OPERATIONS OVERHEAD TESTER\n");
   csPrintf ("Use optimized builds, send report of output to developer@svanfeldt.com\n\n");
-  csPrintf ("Config: %s(%d) %s %s \n", CS_PROCESSOR_NAME, CS_PROCESSOR_SIZE, 
+  csPrintf ("Config: %s(%d) %s %s \n\n", CS_PROCESSOR_NAME, CS_PROCESSOR_SIZE, 
     CS_PLATFORM_NAME, CS_COMPILER_NAME);
 
   // Just make sure this is initialized
   csGetMicroTicks ();
 
-  // Allocate the data buffer to use
-  dataBuffer = (volatile int32*)cs_malloc (dataSize*4);
+  csPrintf ("MemSize: 2kB L1 hits\n");
+  RunTests (2*1024);
+  csPrintf ("\n");
 
-  // Run tests
-  TestRegular ();
-  TestAtomic ();
-  
-  cs_free ((void*)dataBuffer);
+  csPrintf ("MemSize: 512kB L2 hits\n");
+  RunTests (512*1024);
+  csPrintf ("\n");
+
+  csPrintf ("MemSize: 32MB Memory hits\n");
+  RunTests (32*1024*1024);
+  csPrintf ("\n");
 
   return 0;
 }
+
 
