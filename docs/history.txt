@@ -57,6 +57,9 @@ chronological order.
 	  immediatelly if forceLoadTextures is true instead of at the
 	  end of the loading cycle. XML scripts in CEL need the textures
 	  before the file has been completely loaded.
+	- Marten made a few optimizations to the atomic operations on PPC
+	  and SPARC.
+	- Marten added an application for micro-benchmarking atomic operations.
 15-Dec-2007
 	- Marten fixed colladaconvertor to compile cleanly on gcc (mingw).
 	- Jorrit committed a work-around for bug #429 (relaytool crashes

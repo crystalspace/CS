@@ -80,15 +80,19 @@ namespace Threading
 
     inline static int32 Increment (int32* target, int32 incr = 1)
     {
-      //@@Potentially dangerous code, needs to be revisited
-      int32 prevValue, currValue, nextValue;
-      do 
-      {
-        currValue = *target;
-        nextValue = currValue + incr;
-        prevValue = CompareAndSet (target, nextValue, currValue);
-      } while(prevValue == currValue);
-      return nextValue;
+      int32 prev;
+
+      __asm__ __volatile__ (
+        "       lwsync \n"
+        "1:     lwarx   %0,0,%1\n"
+        "       addc    %0,%0,%2\n"
+        "       stwcx.  %0,0,%1\n"
+        "       bne-    1b\n"
+        "       isync     \n"        
+        : "=&r" (prev)
+        : "r" (target), "r" (incr)
+        : "cc", "memory");
+      return prev;
     }
 
     inline static int32 Decrement (int32* target)

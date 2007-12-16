@@ -78,7 +78,7 @@ namespace Threading
           : : : "memory"
           );
 
-        currValue = *target;
+        currValue = *reinterpret_cast<volatile int32*> (target);
         nextValue = currValue + incr;
         prevValue = CompareAndSet (target, nextValue, currValue);
       } while(prevValue == currValue);
