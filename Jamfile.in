@@ -71,8 +71,6 @@ NotFile drivers2d ;
 Depends drivers2d : canvases ;
 NotFile drivers3d ;
 Depends drivers3d : renderers ;
-NotFile nrall ;
-Depends nrall : renderall ;
 
 # Process subdirectories.  NOTE: Unfortunately, Jam rules are presently
 # order-sensitive; Library targets must be seen by Jam before Application and
