@@ -662,15 +662,15 @@ CS_EMIT_BUILD_FLAGS([how to disable function inlining],
 # manifestation of the error states that the target library needs to be built
 # with -fPIC even when it has been built using that option.  In other cases,
 # the linker complains about undefined references to various inline methods in
-# external libraries.  Furthre, on such installations, if Crystal Space is
+# external libraries.  Furthermore, on such installations, if Crystal Space is
 # built with -fvisibility-inlines-hidden, then clients linking against Crystal
 # Space also experience one of these bogus errors.  Thus far, the most reliable
 # way to detect this gcc bug is to test for the anomaly by manipulating a
 # std::basic_string<> in a test program linked with -fPIC and -shared, and then
-# avoid -fvisibility-inlines-hidden if the test program fails to
-# link. Practical experience has shown that this test is not 100% reliable for
-# all cases, but it does seem to catch most, and does a better job than
-# hard-coded platform and compiler version checks.  References:
+# avoid -fvisibility-inlines-hidden if the test program fails to link.
+# Practical experience has shown that this test is not 100% reliable for all
+# cases, but it does seem to catch most, and does a better job than hard-coded
+# platform and compiler version checks.  References:
 #
 #     http://dev.gentoo.org/~kugelfang/pappy-visibility.txt
 #     http://www.gnu.org/software/gcc/gcc-4.0/changes.html#visibility
