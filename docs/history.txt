@@ -17,6 +17,10 @@ chronological order.
 	  platform and compiler version tests, which is too often
 	  inaccurate. Hopefully, this change resolves issue #355 (and perhaps
 	  #333) for most cases.
+	- Eric Sunshine fixed problem in configure.ac where AS_IF() conditional
+	  would access undefined shell variable
+	  $cs_cv_prog_cxx_visibility_inlines_hidden_buggy if compiler did not
+	  respond to -fvisibility-inlines-hidden.
 15-Dec-2007
 	- Marten fixed colladaconvertor to compile cleanly on gcc (mingw).
 	- Jorrit committed a work-around for bug #429 (relaytool crashes
