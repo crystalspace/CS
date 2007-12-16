@@ -376,8 +376,8 @@ iMaterialWrapper* ThreadedLoaderContext::FindMaterial (const char* name)
   return 0;
 }
 
-iMaterialWrapper* ThreadedLoaderContext::FindNamedMaterial (const char* name,
-                                                            const char* filename)
+iMaterialWrapper* ThreadedLoaderContext::FindNamedMaterial (
+	const char* name, const char* filename)
 {
   iMaterialWrapper* mat = Engine->FindMaterial (name, curRegOnly ? region : 0);
   if (mat)
@@ -669,7 +669,8 @@ static bool TestXML (const char* b)
 bool csLoader::Load (iDataBuffer* buffer, const char* fname,
 	iBase*& result, iRegion* region,
   	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-	const char* override_name, iMissingLoaderData* missingdata, bool forceLoadTextures)
+	const char* override_name, iMissingLoaderData* missingdata,
+	bool forceLoadTextures)
 {
   result = 0;
 
@@ -728,7 +729,8 @@ bool csLoader::Load (iDataBuffer* buffer, const char* fname,
 
 bool csLoader::Load (const char* fname, iBase*& result, iRegion* region,
   	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-	const char* override_name, iMissingLoaderData* missingdata, bool forceLoadTextures)
+	const char* override_name, iMissingLoaderData* missingdata,
+	bool forceLoadTextures)
 {
   result = 0;
 
@@ -748,7 +750,8 @@ bool csLoader::Load (const char* fname, iBase*& result, iRegion* region,
 
 bool csLoader::Load (iDataBuffer* buffer, iBase*& result, iRegion* region,
   	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-	const char* override_name, iMissingLoaderData* missingdata, bool forceLoadTextures)
+	const char* override_name, iMissingLoaderData* missingdata,
+	bool forceLoadTextures)
 {
   return Load (buffer, 0, result, region, curRegOnly, checkDupes, ssource,
   	override_name, missingdata, forceLoadTextures);
@@ -756,7 +759,8 @@ bool csLoader::Load (iDataBuffer* buffer, iBase*& result, iRegion* region,
 
 bool csLoader::Load (iDocumentNode* node, iBase*& result, iRegion* region,
   	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-	const char* override_name, iMissingLoaderData* missingdata, bool forceLoadTextures)
+	const char* override_name, iMissingLoaderData* missingdata,
+	bool forceLoadTextures)
 {
   result = 0;
 
@@ -840,7 +844,8 @@ bool csLoader::Load (iDocumentNode* node, iBase*& result, iRegion* region,
   if (libnode)
   {
     result = 0;
-    return LoadLibrary (ldr_context, libnode, ssource, missingdata, true, forceLoadTextures);
+    return LoadLibrary (ldr_context, libnode, ssource, missingdata,
+    	true, forceLoadTextures);
   }
 
   ReportError ("crystalspace.maploader.parse",
@@ -924,12 +929,14 @@ bool csLoader::LoadLibraryFile (const char* fname, iRegion* region,
     iMissingLoaderData* missingdata, bool forceLoadTextures)
 {
     return LoadMapLibraryFile (fname, region, curRegOnly,
-                               checkDupes, ssource, missingdata, forceLoadTextures);
+                               checkDupes, ssource, missingdata,
+			       forceLoadTextures);
 }
 
 bool csLoader::LoadMapLibraryFile (const char* fname, iRegion* region,
 	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-	iMissingLoaderData* missingdata, bool forceLoadTextures, bool loadProxyTex)
+	iMissingLoaderData* missingdata, bool forceLoadTextures,
+	bool loadProxyTex)
 {
   csRef<iFile> buf = VFS->Open (fname, VFS_FILE_READ);
 
@@ -970,7 +977,8 @@ bool csLoader::LoadMapLibraryFile (const char* fname, iRegion* region,
         lib_node, "Expected 'library' token!");
       return false;
     }
-    return LoadLibrary (ldr_context, lib_node, ssource, missingdata, loadProxyTex, forceLoadTextures);
+    return LoadLibrary (ldr_context, lib_node, ssource, missingdata,
+    	loadProxyTex, forceLoadTextures);
   }
   else
   {
@@ -988,7 +996,8 @@ bool csLoader::LoadLibrary (iDocumentNode* lib_node, iRegion* region,
 	new StdLoaderContext (Engine, region, curRegOnly, this, checkDupes,
 	  missingdata));
 
-  return LoadLibrary (ldr_context, lib_node, ssource, missingdata, true, forceLoadTextures);
+  return LoadLibrary (ldr_context, lib_node, ssource, missingdata, true,
+  	forceLoadTextures);
 }
 
 //---------------------------------------------------------------------------
@@ -1206,7 +1215,8 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
 //--- Parsing of Engine Objects ---------------------------------------------
 
 bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode,
-                        iStreamSource* ssource, iMissingLoaderData* missingdata, 
+                        iStreamSource* ssource,
+			iMissingLoaderData* missingdata, 
 			bool forceLoadTextures)
 {
   if (!Engine)
@@ -1279,10 +1289,10 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode,
 	  {
 	    iMeshFactoryWrapper* mfw = Engine->FindMeshFactory (name);
 	    if (mfw)
-        {
-          AddToRegion (ldr_context, mfw->QueryObject ());
-          break;
-        }
+	    {
+	      AddToRegion (ldr_context, mfw->QueryObject ());
+	      break;
+	    }
 	  }
           csRef<iMeshFactoryWrapper> t = Engine->CreateMeshFactory (name);
 	  if (!t || !LoadMeshObjectFactory (ldr_context, t, 0, child, 0,
@@ -1319,7 +1329,7 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode,
 	  return false;
 	break;
       case XMLTOKEN_TEXTURES:
-        if (!ParseTextureList (ldr_context, child))
+        if (!ParseTextureList (ldr_context, child, forceLoadTextures))
           return false;
         break;
       case XMLTOKEN_MATERIALS:
@@ -1336,7 +1346,8 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode,
         break;
       case XMLTOKEN_LIBRARY:
       {
-	if (!LoadLibraryFromNode (ldr_context, child, ssource, missingdata, false))
+	if (!LoadLibraryFromNode (ldr_context, child, ssource, missingdata,
+		false))
 	  return false;
 	break;
       }
@@ -1437,15 +1448,16 @@ bool csLoader::LoadLibraryFromNode (iLoaderContext* ldr_context,
     
     if (!LoadMapLibraryFile (child->GetContentsValue (),
 	  	ldr_context->GetRegion (), ldr_context->CurrentRegionOnly (),
-		ldr_context->CheckDupes (), ssource, missingdata, false, loadProxyTex))
+		ldr_context->CheckDupes (), ssource, missingdata, false,
+		loadProxyTex))
     return false;
   }
   return true;
 }
 
 bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* libnode,
-	iStreamSource* ssource, iMissingLoaderData* missingdata, bool loadProxyTex,
-    bool forceLoadTextures)
+	iStreamSource* ssource, iMissingLoaderData* missingdata,
+	bool loadProxyTex, bool forceLoadTextures)
 {
   if (!Engine)
   {
@@ -1495,7 +1507,7 @@ bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* libnode,
 	break;
       case XMLTOKEN_TEXTURES:
         // Append textures to engine.
-        if (!ParseTextureList (ldr_context, child))
+        if (!ParseTextureList (ldr_context, child, forceLoadTextures))
           return false;
         break;
       case XMLTOKEN_MATERIALS:
@@ -1516,8 +1528,8 @@ bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* libnode,
         break;
       case XMLTOKEN_MESHREF:
         {
-          csRef<iMeshWrapper> mesh = LoadMeshObjectFromFactory (ldr_context, child,
-	  	ssource);
+          csRef<iMeshWrapper> mesh = LoadMeshObjectFromFactory (ldr_context,
+	  	child, ssource);
           if (!mesh)
 	  {
 	    // Error is already reported.
@@ -1606,12 +1618,15 @@ bool csLoader::LoadPlugins (iDocumentNode* node)
           loaded_plugins.NewPlugin (plugin_name, child);
           if (Engine->GetSaveableFlag ())
           {
-            const char* plugin_id = loaded_plugins.FindPluginClassID (plugin_name);
+            const char* plugin_id = loaded_plugins.FindPluginClassID (
+	    	plugin_name);
             if (plugin_id)
             {
               csRef<iPluginReference> pluginref;
-              pluginref.AttachNew (new csPluginReference (plugin_name, plugin_id));
-              object_reg->Register (pluginref, csString ("_plugref_") + plugin_id);
+              pluginref.AttachNew (new csPluginReference (plugin_name,
+	      	plugin_id));
+              object_reg->Register (pluginref,
+	      	csString ("_plugref_") + plugin_id);
             }
           }
         }
@@ -1685,7 +1700,7 @@ bool csLoader::LoadSounds (iDocumentNode* node)
           iSndSysWrapper* snd = SndSysManager->FindSoundByName (name);
           if (!snd)
 	  {	    
-              snd = LoadSoundWrapper (name, filename);
+            snd = LoadSoundWrapper (name, filename);
 	  }
           if (snd)
           {
@@ -2343,7 +2358,8 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	  {
 	    SyntaxService->ReportError (
  	        "crystalspace.maploader.parse.meshfact",
-	        child, "Error loading plugin '%s'!", child->GetContentsValue ());
+	        child, "Error loading plugin '%s'!",
+		child->GetContentsValue ());
 	    return false;
 	  }
 	  if (defaults)
@@ -2902,7 +2918,8 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       TEST_MISSING_MESH
       else
       {
-        if (recursive)//Test if recursion on children has been specified.
+	//Test if recursion on children has been specified.
+        if (recursive)
         {
           csRefArray<iMeshWrapper> meshesArray;
           CollectAllChildren (mesh, meshesArray);
@@ -2911,7 +2928,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
           {
             ConvexFlags (meshesArray[i]);
           }
-        }//if
+        }
         else
           ConvexFlags (mesh);
       }
@@ -3033,8 +3050,9 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
 #undef TEST_MISSING_MESH
 }
 
-csRef<iMeshWrapper> csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
-	iDocumentNode* node, iStreamSource* ssource)
+csRef<iMeshWrapper> csLoader::LoadMeshObjectFromFactory (
+	iLoaderContext* ldr_context, iDocumentNode* node,
+	iStreamSource* ssource)
 {
   if (!Engine) return 0;
 
@@ -3957,10 +3975,10 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
       
 	    if (Engine->GetSaveableFlag ())
 	    {
-		csRef<iAddonReference> addon;
-		addon.AttachNew (new csAddonReference (plugin_name, 0, rc));
-		object_reg->Register (addon);
-		AddToRegion (ldr_context, addon->QueryObject ());
+	      csRef<iAddonReference> addon;
+	      addon.AttachNew (new csAddonReference (plugin_name, 0, rc));
+	      object_reg->Register (addon);
+	      AddToRegion (ldr_context, addon->QueryObject ());
 	    }
 	  }
           break;
@@ -4013,11 +4031,11 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
       
 	    if (Engine->GetSaveableFlag ())
 	    {
-		csRef<iAddonReference> addon;
-		addon.AttachNew (new csAddonReference (plugin_name,
+	      csRef<iAddonReference> addon;
+	      addon.AttachNew (new csAddonReference (plugin_name,
 		  fname, ret));
-		object_reg->Register (addon);
-		AddToRegion (ldr_context, addon->QueryObject ());
+	      object_reg->Register (addon);
+	      AddToRegion (ldr_context, addon->QueryObject ());
 	    }
 	  }
           break;
@@ -4917,7 +4935,8 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
     csRef<iPortalContainer> pc = 
     	scfQueryInterface<iPortalContainer> (mesh->GetMeshObject ());
     CS_ASSERT (pc != 0);
-    portal = pc->CreatePortal (poly.GetVertices (), (int)poly.GetVertexCount ());
+    portal = pc->CreatePortal (poly.GetVertices (),
+    	(int)poly.GetVertexCount ());
     portal->SetSector (destSector);
   }
   else if (parent)

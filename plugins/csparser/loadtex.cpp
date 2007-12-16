@@ -332,11 +332,16 @@ bool csLoader::LoadProxyTextures (bool forceLoadTextures)
 
       texArray.Push(proxTex.textureWrapper);
     }
-    CS::Utility::UnusedResourceHelper::UnloadUnusedMaterials(Engine, materialArray);
+    CS::Utility::UnusedResourceHelper::UnloadUnusedMaterials(Engine,
+      materialArray);
     CS::Utility::UnusedResourceHelper::UnloadUnusedTextures(Engine, texArray);
   }
   materialArray.Empty();
 
+  // @@@ Note from Jorrit: the code below is too late for loading the
+  // textures since xml in the map itself sometimes also needs the
+  // textures already (i.e. CEL XML scripts using billboards).
+#if 0
   iTextureManager *tm = G3D->GetTextureManager();
   size_t i = proxyTextures.GetSize();
   while (i-- > 0)
@@ -353,6 +358,7 @@ bool csLoader::LoadProxyTextures (bool forceLoadTextures)
     proxTex.textureWrapper->SetImageFile (img);
     proxTex.textureWrapper->Register (tm);
   }
+#endif
   proxyTextures.Empty ();
 
   return true;

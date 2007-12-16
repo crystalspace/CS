@@ -47,6 +47,16 @@ chronological order.
 	  had been maintained for backward compatibility after the "new
 	  renderer" architecture was made the default and the old renderer
 	  retired.
+	- Jorrit changed back the default for the forceLoadTextures
+	  parameter in iLoader->LoadMap() and LoadMapFile() so that it
+	  again defaults to true. Even though this is the less desirable
+	  option since it means textures will be loaded even if they
+	  are not used in the world file, it is still better to set this
+	  parameter to true by default to avoid compatibility breaking.
+	- Jorrit also changed the loader so that textures are now loaded
+	  immediatelly if forceLoadTextures is true instead of at the
+	  end of the loading cycle. XML scripts in CEL need the textures
+	  before the file has been completely loaded.
 15-Dec-2007
 	- Marten fixed colladaconvertor to compile cleanly on gcc (mingw).
 	- Jorrit committed a work-around for bug #429 (relaytool crashes
