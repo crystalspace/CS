@@ -142,6 +142,8 @@ static void TestRegular ()
     syncBarrier2Stop.Wait (); //Wait for it to finish
     diffTime -= csGetMicroTicks ();
     csPrintf ("%" PRId64 "\n", -diffTime);
+    thread1.Wait ();
+    thread2.Wait ();
   }
 
   // Threaded, 4 threads
@@ -159,6 +161,11 @@ static void TestRegular ()
     syncBarrier4Stop.Wait (); //Wait for it to finish
     diffTime -= csGetMicroTicks ();
     csPrintf ("%" PRId64 "\n", -diffTime);
+
+    thread1.Wait ();
+    thread2.Wait ();
+    thread3.Wait ();
+    thread4.Wait ();
   }
 };
 
@@ -240,6 +247,8 @@ static void TestAtomic ()
     syncBarrier2Stop.Wait (); //Wait for it to finish
     diffTime -= csGetMicroTicks ();
     csPrintf ("%" PRId64 "\n", -diffTime);
+    thread1.Wait ();
+    thread2.Wait ();
   }
 
   // Threaded, 4 threads
@@ -257,6 +266,11 @@ static void TestAtomic ()
     syncBarrier4Stop.Wait (); //Wait for it to finish
     diffTime -= csGetMicroTicks ();
     csPrintf ("%" PRId64 "\n", -diffTime);
+
+    thread1.Wait ();
+    thread2.Wait ();
+    thread3.Wait ();
+    thread4.Wait ();
   }
   
 };
