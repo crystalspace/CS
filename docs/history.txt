@@ -27,7 +27,7 @@ chronological order.
 	  dump.jam to extract likely top-level target names from NotFile
 	  invocations. It now expects a target to begin with an alphanumeric,
 	  thus ignoring some NotFile items, such as -g3, -lfoo, etc. This
-	  resolves issues #430 as much as possible without introducing
+	  resolves issue #430 as much as possible without introducing
 	  CS-specific knowledge into this otherwise generic mechanism. Note,
 	  that since there is no way to obtain a perfect set of top-level
 	  targets from Jam, the heuristic employed by 'dumptargets' returns
