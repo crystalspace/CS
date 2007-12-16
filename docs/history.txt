@@ -7,14 +7,14 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 16-Dec-2007
-	- Eric Sunshine restored the original std::string based test which had
-	  been used originally to determine if gcc's -finline-visibility-hidden
-	  flag is buggy (as it is in numerous versions on several platforms).
-	  This test was removed in r21931 after it was discovered that there
-	  were one or two obscure platform/compiler combinations for which the
-	  test was not accurate. It seems better, however, to use a mostly
-	  accurate test (std::string) than the current check based upon
-	  hard-coded platform and compiler version tests, which is too often
+	- Eric Sunshine restored the std::string based test which had been used
+	  originally to determine if gcc's -finline-visibility-hidden flag is
+	  buggy (as it is in numerous versions on several platforms).  This
+	  test was removed in r21931 after it was discovered that there were
+	  one or two obscure platform/compiler combinations for which the test
+	  was not accurate. It seems better, however, to use a mostly accurate
+	  test (std::string) than the current check based upon hard-coded
+	  platform and compiler version tests, which is too often
 	  inaccurate. Hopefully, this change resolves issue #355 (and perhaps
 	  #333) for most cases.
 15-Dec-2007
