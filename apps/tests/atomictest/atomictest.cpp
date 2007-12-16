@@ -32,7 +32,8 @@ CS::Threading::Barrier syncBarrier4Start (5);
 CS::Threading::Barrier syncBarrier2Stop (3);
 CS::Threading::Barrier syncBarrier4Stop (5);
 
-const size_t dataSize = 8*1024*1024;
+const size_t dataSize = 2*1024*1024;
+const size_t runs = 32;
 volatile int32* dataBuffer = 0;
 
 
@@ -66,17 +67,23 @@ static void CacheFlush ()
 //--- Methods for regular operations
 static void DoAddition ()
 {
-  for (size_t i = 0; i < dataSize; ++i)
+  for (size_t j = 0; j < runs; ++j)
   {
-    dataBuffer[i] += 1;
+    for (size_t i = 0; i < dataSize; ++i)
+    {
+      dataBuffer[i] += 1;
+    }
   }
 }
 
 static void DoSubtraction ()
 {
-  for (size_t i = 0; i < dataSize; ++i)
+  for (size_t j = 0; j < runs; ++j)
   {
-    dataBuffer[i] -= 1;
+    for (size_t i = 0; i < dataSize; ++i)
+    {
+      dataBuffer[i] -= 1;
+    }
   }
 }
 
@@ -159,17 +166,23 @@ static void TestRegular ()
 //-- Methods for atomic operations
 static void DoAtomicAddition ()
 {
-  for (size_t i = 0; i < dataSize; ++i)
+  for (size_t j = 0; j < runs; ++j)
   {
-    CS::Threading::AtomicOperations::Increment ((int32*)&dataBuffer[i]);
+    for (size_t i = 0; i < dataSize; ++i)
+    {
+      CS::Threading::AtomicOperations::Increment ((int32*)&dataBuffer[i]);
+    }
   }
 }
 
 static void DoAtomicSubtraction ()
 {
-  for (size_t i = 0; i < dataSize; ++i)
+  for (size_t j = 0; j < runs; ++j)
   {
-    CS::Threading::AtomicOperations::Decrement ((int32*)&dataBuffer[i]);
+    for (size_t i = 0; i < dataSize; ++i)
+    {
+      CS::Threading::AtomicOperations::Decrement ((int32*)&dataBuffer[i]);
+    }
   }
 }
 
