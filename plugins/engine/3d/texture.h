@@ -96,8 +96,6 @@ public:
   csTextureWrapper (csEngine* engine, iImage* Image);
   /// Construct a csTextureWrapper from a pre-registered texture
   csTextureWrapper (csEngine* engine, iTextureHandle *ith);
-  /// Construct a proxy texture
-  csTextureWrapper (csEngine* engine);
   /// Copy constructor
   csTextureWrapper (const csTextureWrapper &c);
 
@@ -213,7 +211,6 @@ public:
    * The handle will be IncRefed
    */
   virtual iTextureWrapper *NewTexture (iTextureHandle *ith);
-
   virtual int GetCount () const;
   virtual iTextureWrapper *Get (int n) const;
   virtual int Add (iTextureWrapper *obj);

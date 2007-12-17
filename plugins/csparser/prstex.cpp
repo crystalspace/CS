@@ -36,7 +36,6 @@
 #include "iutil/document.h"
 #include "iutil/objreg.h"
 #include "iutil/strset.h"
-#include "iutil/vfs.h"
 #include "ivaria/keyval.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
@@ -46,9 +45,6 @@
 
 #include "loadtex.h"
 #include "csloader.h"
-
-CS_PLUGIN_NAMESPACE_BEGIN(csparser)
-{
 
 #define PLUGIN_LEGACY_TEXTYPE_PREFIX  "crystalspace.texture.loader."
 
@@ -80,7 +76,7 @@ bool csLoader::ParseMaterialList (iLoaderContext* ldr_context,
 }
 
 bool csLoader::ParseTextureList (iLoaderContext* ldr_context,
-	iDocumentNode* node, bool forceLoadTextures)
+	iDocumentNode* node)
 {
   if (!ImageLoader)
   {
@@ -115,7 +111,7 @@ bool csLoader::ParseTextureList (iLoaderContext* ldr_context,
 	  proctex_deprecated_warned = true;
 	}
       case XMLTOKEN_TEXTURE:
-        if (!ParseTexture (ldr_context, child, forceLoadTextures))
+        if (!ParseTexture (ldr_context, child))
 	        return false;
         break;
       case XMLTOKEN_CUBEMAP:
@@ -136,17 +132,13 @@ bool csLoader::ParseTextureList (iLoaderContext* ldr_context,
 }
 
 iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
-	iDocumentNode* node, bool forceLoadTextures)
+	iDocumentNode* node)
 {
   const char* txtname = node->GetAttributeValue ("name");
   if (ldr_context->CheckDupes ())
   {
     iTextureWrapper* t = Engine->FindTexture (txtname);
-    if (t)
-    {
-      AddToRegion (ldr_context, t->QueryObject ());
-      return t;
-    }
+    if (t) return t;
   }
 
   static bool deprecated_warned = false;
@@ -324,46 +316,6 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
         SyntaxService->ReportBadToken (child);
 	return 0;
     }
-  }
-
-  csString texClass = context.GetClass();
-  // Proxy texture loading if the loader isn't specified.
-  if(txtname && type.IsEmpty())
-  {
-    if (filename.IsEmpty())
-    {
-      filename = txtname;
-    }
-
-    // Get absolute path (on VFS) of the file.
-    csRef<iDataBuffer> absolutePath = VFS->ExpandPath(filename);
-    filename = absolutePath->GetData();
-
-    ProxyTexture proxTex;
-    proxTex.img.AttachNew (new ProxyImage (this, filename));
-
-    tex = Engine->GetTextureList()->NewTexture (proxTex.img);
-    tex->SetTextureClass(context.GetClass());
-    tex->SetFlags(context.GetFlags());
-    tex->QueryObject()->SetName(txtname);
-    proxTex.textureWrapper = tex;
-    AddToRegion (ldr_context, proxTex.textureWrapper->QueryObject());
-
-    // If forceLoadTextures is true we have to load the textures
-    // immediatelly.
-    if (forceLoadTextures)
-    {
-      iTextureManager *tm = G3D->GetTextureManager();
-      csRef<iImage> img = proxTex.img->GetProxiedImage();
-      proxTex.textureWrapper->SetImageFile (img);
-      proxTex.textureWrapper->Register (tm);
-    }
-    else
-    {
-      proxyTextures.Push(proxTex);
-    }
-
-    return tex;
   }
 
   // @@@ some more comments
@@ -547,11 +499,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
   if (ldr_context->CheckDupes ())
   {
     iMaterialWrapper* m = Engine->FindMaterial (matname);
-    if (m)
-    {
-      AddToRegion (ldr_context, m->QueryObject ());
-      return m;
-    }
+    if (m) return m;
   }
 
   iTextureWrapper* texh = 0;
@@ -696,8 +644,6 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
   }
   AddToRegion (ldr_context, mat->QueryObject ());
 
-  materialArray.Push(mat);
-
   return mat;
 }
 
@@ -773,6 +719,3 @@ iTextureWrapper* csLoader::ParseTexture3D (iLoaderContext* ldr_context,
 
   return tex;
 }
-
-}
-CS_PLUGIN_NAMESPACE_END(csparser)

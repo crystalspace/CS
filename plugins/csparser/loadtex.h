@@ -25,9 +25,6 @@
 #include "itexture/itexloaderctx.h"
 #include "iutil/comp.h"
 
-CS_PLUGIN_NAMESPACE_BEGIN(csparser)
-{
-
 #define PLUGIN_TEXTURELOADER_IMAGE    "crystalspace.texture.loader.image"
 #define PLUGIN_TEXTURELOADER_ANIMIMG  "crystalspace.texture.loader.animimg"
 #define PLUGIN_TEXTURELOADER_CHECKERS "crystalspace.texture.loader.checkerboard"
@@ -154,8 +151,5 @@ public:
   	iStreamSource*, iLoaderContext* ldr_context,
 	iBase* context);
 };
-
-}
-CS_PLUGIN_NAMESPACE_END(csparser)
 
 #endif

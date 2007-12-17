@@ -30,9 +30,7 @@
 #include "csgfx/imagememory.h"
 #include "csgfx/imagevolumemaker.h"
 #include "csgfx/rgbpixel.h"
-#include "csgfx/shadervar.h"
 #include "csgfx/xorpat.h"
-#include "cstool/unusedresourcehelper.h"
 #include "csutil/cscolor.h"
 #include "csutil/scfstr.h"
 #include "iengine/engine.h"
@@ -53,9 +51,6 @@
 #include "csloader.h"
 #include "loadtex.h"
 
-CS_PLUGIN_NAMESPACE_BEGIN(csparser)
-{
-
 static void ReportError (iObjectRegistry* object_reg,
     const char* id, const char* description, ...)
 {
@@ -65,7 +60,7 @@ static void ReportError (iObjectRegistry* object_reg,
   va_end (arg);
 }
 
-csPtr<iImage> csLoader::GenerateErrorTexture (int width, int height)
+static csPtr<iImage> GenerateErrorTexture (int width, int height)
 {
   static const csRGBpixel colorTable[] = 
     {csRGBpixel (0,0,0,255), csRGBpixel (255,0,0,255),
@@ -312,56 +307,6 @@ iTextureWrapper* csLoader::LoadTexture (const char *name,
   }
 
   return TexWrapper;
-}
-
-bool csLoader::LoadProxyTextures (bool forceLoadTextures)
-{
-  if(!forceLoadTextures)
-  {
-    csWeakRefArray<iTextureWrapper> texArray;
-
-    for(uint i=0; i<proxyTextures.GetSize(); i++)
-    {
-      ProxyTexture& proxTex = proxyTextures.Get(i);
-      if(!proxTex.textureWrapper)
-      {
-        proxyTextures.DeleteIndexFast (i);
-        i--;
-        continue;
-      }
-
-      texArray.Push(proxTex.textureWrapper);
-    }
-    CS::Utility::UnusedResourceHelper::UnloadUnusedMaterials(Engine,
-      materialArray);
-    CS::Utility::UnusedResourceHelper::UnloadUnusedTextures(Engine, texArray);
-  }
-  materialArray.Empty();
-
-  // @@@ Note from Jorrit: the code below is too late for loading the
-  // textures since xml in the map itself sometimes also needs the
-  // textures already (i.e. CEL XML scripts using billboards).
-#if 0
-  iTextureManager *tm = G3D->GetTextureManager();
-  size_t i = proxyTextures.GetSize();
-  while (i-- > 0)
-  {
-    ProxyTexture& proxTex = proxyTextures.Get(i);
-
-    if(!proxTex.textureWrapper)
-    {
-      continue;
-    }
-
-    csRef<iImage> img = proxTex.img->GetProxiedImage();
-
-    proxTex.textureWrapper->SetImageFile (img);
-    proxTex.textureWrapper->Register (tm);
-  }
-#endif
-  proxyTextures.Empty ();
-
-  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -865,7 +810,7 @@ csPtr<iBase> csMissingTextureLoader::Parse (iDocumentNode* node,
     }
   }
  
-  csRef<iImage> image = csLoader::GenerateErrorTexture (width, height);
+  csRef<iImage> image = GenerateErrorTexture (width, height);
 
 
   csRef<iGraphics3D> G3D = csQueryRegistry<iGraphics3D> (object_reg);
@@ -894,6 +839,3 @@ csPtr<iBase> csMissingTextureLoader::Parse (iDocumentNode* node,
   TexWrapper->IncRef ();
   return csPtr<iBase> ((iBase*)TexWrapper);
 }
-
-}
-CS_PLUGIN_NAMESPACE_END(csparser)
