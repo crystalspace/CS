@@ -305,6 +305,7 @@
       <conditions fulfill="all">
 	<regexp string="platform" pattern="Unix" />
 	<regexp string="vendor" pattern="^ATI" />
+	<comparever version="gl" relation="lt 2.1.7059" />
       </conditions>
       <applicable>
 	<usecfg>novbo</usecfg>

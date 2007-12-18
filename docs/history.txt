@@ -10,6 +10,9 @@ chronological order.
 	- Marten reverted the proxtexture implementation and related changes 
 	  meaning major parts of r28319, r28276, r28223, r28203, r28168,
 	  r28103 and r28097.
+	- Jorrit relaxed the rule on disabling VBO in gldrivers.xml. For
+	  the very first time version 2.1.7059 of the ATI drivers on Linux
+	  manages to get VBO right (and a lot of other things)!
 17-Dec-2007
 	- Marten removed the mutex locks in event queue and object registry.
 	  They indicated a thread safety where there actually is none and only
