@@ -319,7 +319,7 @@ struct iLoader : public virtual iBase
   virtual bool LoadMapFile (const char* filename, bool clearEngine = true,
 	iRegion* region = 0, bool curRegOnly = true,
 	bool checkDupes = false, iStreamSource* ssource = 0,
-	iMissingLoaderData* missingdata = 0, bool forceLoadTextures = true) = 0;
+	iMissingLoaderData* missingdata = 0, bool forceLoadTextures = false) = 0;
 
   /**
    * Load a map from the given 'world' node. If 'clearEngine' is true then
@@ -352,7 +352,7 @@ struct iLoader : public virtual iBase
   virtual bool LoadMap (iDocumentNode* world_node, bool clearEngine = true,
 	iRegion* region = 0, bool curRegOnly = true,
 	bool checkDupes = false, iStreamSource* ssource = 0,
-	iMissingLoaderData* missingdata = 0, bool forceLoadTextures = true) = 0;
+	iMissingLoaderData* missingdata = 0, bool forceLoadTextures = false) = 0;
 
   /**
    * Load library from a VFS file
