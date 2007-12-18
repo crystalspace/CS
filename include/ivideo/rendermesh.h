@@ -89,8 +89,8 @@ struct RenderMeshModes
     flipCulling (x.flipCulling),
     cullMode (x.cullMode),
     alphaType (x.alphaType),
-    buffers (x.buffers),
-    zoffset (x.zoffset)
+    zoffset (x.zoffset),
+    buffers (x.buffers)
   {
   }
 

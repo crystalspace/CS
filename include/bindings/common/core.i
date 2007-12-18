@@ -464,9 +464,11 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csArray::GetExtend;
 %ignore csArray::GetIndex;
 %ignore csArray::GetIterator;
+%ignore csArray::GetReverseIterator;
 %ignore csArray::InitRegion;
 %ignore csArray::InsertSorted;
 %ignore csArray::Iterator;
+%ignore csArray::ReverseIterator;
 %ignore csArray::Length;
 %ignore csArray::PushSmart;
 %ignore csArray::Section;
@@ -478,7 +480,6 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csArray::TransferTo;
 %ignore csArray::operator=;
 %ignore csArray::operator[];
-%ignore csArray::Iterator;
 /* The following is a bit ugly but otherwise there is no way pass the
    necessary directives to swig between template declarations.        */
 template <typename Threshold = csArrayThresholdVariable>
@@ -612,10 +613,11 @@ SET_HELPER(csStringID)
 %ignore csArray<csPluginRequest>::GetExtend;
 %ignore csArray<csPluginRequest>::GetIndex;
 %ignore csArray<csPluginRequest>::GetIterator;
+%ignore csArray<csPluginRequest>::GetReverseIterator;
 %ignore csArray<csPluginRequest>::InitRegion;
 %ignore csArray<csPluginRequest>::InsertSorted;
 %ignore csArray<csPluginRequest>::Iterator;
-%ignore csArray<csPluginRequest>::Iterator;
+%ignore csArray<csPluginRequest>::ReverseIterator;
 %ignore csArray<csPluginRequest>::PushSmart;
 %ignore csArray<csPluginRequest>::Put;
 %ignore csArray<csPluginRequest>::Section;

@@ -801,7 +801,7 @@ namespace CS
       typename T, 
       unsigned int CacheSize,
       unsigned int Associativity = 1, 
-      typename LRUPolicy = FixedSizeBestChoiceLRUPolicy
+      typename LRUPolicy = FixedSizeBestChoiceLRUPolicy,
       typename HashFold = CS::Utility::HashFoldingFNV1>
     class FixedSizeCache
     {
