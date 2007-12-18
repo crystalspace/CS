@@ -671,6 +671,14 @@ namespace CS
             0x40, 0x0
           };
 
+          static const uint8 mask[] = 
+          {
+            0xB, 0xB,
+            0x13, 0x13,
+            0x25, 0x25,
+            0x45, 0x45
+          };
+
           lruStorage = (lruStorage & ~mask[index]) | value[index];
         }
 
@@ -683,6 +691,14 @@ namespace CS
             0x2, 0x12,
             0x1, 0x21,
             0x5, 0x45
+          };
+
+          static const uint8 mask[] = 
+          {
+            0xB, 0xB,
+            0x13, 0x13,
+            0x25, 0x25,
+            0x45, 0x45
           };
 
           for (size_t i = 0; i < 8; ++i)
@@ -699,15 +715,7 @@ namespace CS
         static const uint8 mask[8];
 
         uint8 lruStorage;
-      };
-
-      const uint8 FixedSizePseudoLRU<8>::mask[8] = 
-      {
-        0xB, 0xB,
-        0x13, 0x13,
-        0x25, 0x25,
-        0x45, 0x45
-      };
+      };      
 
       /// Helper for FixedSizeBestChoiceLRUPolicy
       template<unsigned int Size>
