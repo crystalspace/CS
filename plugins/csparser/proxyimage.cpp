@@ -37,7 +37,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           "crystalspace.maploader.parse.texture",
           "Couldn't load image '%s', using error texture instead!",
           filename.GetData());
-	img = csLoader::GenerateErrorTexture (32, 32);
+        img = csLoader::GenerateErrorTexture (32, 32);
         CS_ASSERT(img);
       }
       proxiedImage = img;
