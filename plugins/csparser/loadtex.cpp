@@ -353,6 +353,10 @@ bool csLoader::LoadProxyTextures()
 
     proxTex.textureWrapper->SetImageFile (img);
     proxTex.textureWrapper->Register (tm);
+    if(proxTex.alphaType != csAlphaMode::alphaNone)
+    {
+      proxTex.textureWrapper->GetTextureHandle()->SetAlphaType(proxTex.alphaType);
+    }
   }
   proxyTextures.Empty ();
 

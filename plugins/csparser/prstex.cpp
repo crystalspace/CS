@@ -348,6 +348,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       tex->SetTextureClass(context.GetClass());
       tex->SetFlags(context.GetFlags());
       tex->QueryObject()->SetName(txtname);
+
+      proxTex.alphaType = csAlphaMode::alphaNone;
+      if(overrideAlphaType)
+      {
+        proxTex.alphaType = alphaType;
+      }
+      if(keep_image)
+        tex->SetKeepImage(true);
+      if(do_transp)
+        tex->SetKeyColor(csQint(transp.red * 255.99),
+                         csQint(transp.green * 255.99),
+                         csQint(transp.blue * 255.99));
+
       proxTex.textureWrapper = tex;
       AddToRegion (ldr_context, proxTex.textureWrapper->QueryObject());
       proxyTextures.Push(proxTex);

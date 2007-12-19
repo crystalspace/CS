@@ -11,6 +11,7 @@ chronological order.
           names, added some documentation for them and made proxy textures
           be completely optional (and not the default). You now need to specify
           when loading a map/library whether or not you want to use them.
+        - Save alphaType, keep_image and keycolour data in proxy textures.
 17-Dec-2007
 	- Marten removed the mutex locks in event queue and object registry.
 	  They indicated a thread safety where there actually is none and only

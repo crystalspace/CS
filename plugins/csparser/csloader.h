@@ -225,6 +225,7 @@ private:
   {
       csWeakRef<iTextureWrapper> textureWrapper;
       csRef<ProxyImage> img;
+      csAlphaMode::AlphaType alphaType;
   };
 
   /// Points to proxy textures ready for processing.
