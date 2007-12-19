@@ -315,11 +315,13 @@ struct iLoader : public virtual iBase
    * \param ssource is an optional stream source for faster loading.
    * \param missingdata is an optional callback in case data is missing.
    * The application can then provide that missing data in some other way.
+   * \param Set useProxyTextures to true if you're loading materials and
+   * textures from a library shared with other maps.
    */
   virtual bool LoadMapFile (const char* filename, bool clearEngine = true,
 	iRegion* region = 0, bool curRegOnly = true,
 	bool checkDupes = false, iStreamSource* ssource = 0,
-	iMissingLoaderData* missingdata = 0, bool forceLoadTextures = false) = 0;
+	iMissingLoaderData* missingdata = 0, bool useProxyTextures = false) = 0;
 
   /**
    * Load a map from the given 'world' node. If 'clearEngine' is true then
@@ -348,11 +350,13 @@ struct iLoader : public virtual iBase
    * \param ssource is an optional stream source for faster loading.
    * \param missingdata is an optional callback in case data is missing.
    * The application can then provide that missing data in some other way.
+   * \param Set useProxyTextures to true if you're loading materials and
+   * textures from a library shared with other maps.
    */
   virtual bool LoadMap (iDocumentNode* world_node, bool clearEngine = true,
 	iRegion* region = 0, bool curRegOnly = true,
 	bool checkDupes = false, iStreamSource* ssource = 0,
-	iMissingLoaderData* missingdata = 0, bool forceLoadTextures = false) = 0;
+	iMissingLoaderData* missingdata = 0, bool useProxyTextures = false) = 0;
 
   /**
    * Load library from a VFS file
@@ -371,10 +375,12 @@ struct iLoader : public virtual iBase
    * \param ssource is an optional stream source for faster loading.
    * \param missingdata is an optional callback in case data is missing.
    * The application can then provide that missing data in some other way.
+   * \param Set useProxyTextures to true if you're loading materials and
+   * textures from a library shared with other maps.
    */
   virtual bool LoadLibraryFile (const char* filename, iRegion* region = 0,
   	bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
-	iMissingLoaderData* missingdata = 0, bool forceLoadTextures = true) = 0;
+	iMissingLoaderData* missingdata = 0, bool useProxyTextures = false) = 0;
 
   /**
    * Load library from a 'library' node.
@@ -393,10 +399,12 @@ struct iLoader : public virtual iBase
    * \param ssource is an optional stream source for faster loading.
    * \param missingdata is an optional callback in case data is missing.
    * The application can then provide that missing data in some other way.
+   * \param Set useProxyTextures to true if you're loading materials and
+   * textures from a library shared with other maps.
    */
   virtual bool LoadLibrary (iDocumentNode* lib_node, iRegion* region = 0,
   	bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
-	iMissingLoaderData* missingdata = 0, bool forceLoadTextures = true) = 0;
+	iMissingLoaderData* missingdata = 0, bool useProxyTextures = false) = 0;
 
   /**
    * Load a Mesh Object Factory from a file.
@@ -454,11 +462,13 @@ struct iLoader : public virtual iBase
    * 3ds or md2 model.
    * \param missingdata is an optional callback in case data is missing.
    * The application can then provide that missing data in some other way.
+   * \param Set useProxyTextures to true if you're loading materials and
+   * textures from a library shared with other maps.
    */
   virtual bool Load (const char* fname, iBase*& result, iRegion* region = 0,
   	bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
-    bool forceLoadTextures = true) = 0;
+    bool useProxyTextures = false) = 0;
 
   /**
    * Load a file. This is a smart function that will try to recognize
@@ -500,11 +510,13 @@ struct iLoader : public virtual iBase
    * 3ds or md2 model.
    * \param missingdata is an optional callback in case data is missing.
    * The application can then provide that missing data in some other way.
+   * \param Set useProxyTextures to true if you're loading materials and
+   * textures from a library shared with other maps.
    */
   virtual bool Load (iDataBuffer* buffer, iBase*& result, iRegion* region = 0,
   	bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
-    bool forceLoadTextures = true) = 0;
+    bool useProxyTextures = false) = 0;
 
   /**
    * Load a node. This is a smart function that will try to recognize
@@ -545,11 +557,13 @@ struct iLoader : public virtual iBase
    * 3ds or md2 model.
    * \param missingdata is an optional callback in case data is missing.
    * The application can then provide that missing data in some other way.
+   * \param Set useProxyTextures to true if you're loading materials and
+   * textures from a library shared with other maps.
    */
   virtual bool Load (iDocumentNode* node, iBase*& result, iRegion* region = 0,
   	bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
-    bool forceLoadTextures = true) = 0;
+    bool useProxyTextures = false) = 0;
 
   /**
    * Load a shader from a file.

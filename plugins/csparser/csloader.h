@@ -340,7 +340,7 @@ private:
 
   /// Parse a list of textures and add them to the engine.
   bool ParseTextureList (iLoaderContext* ldr_context, iDocumentNode* node,
-  	bool forceLoadTextures);
+  	bool useProxyTextures);
   /**
    * Parse a list of materials and add them to the engine. If a prefix is
    * given, all material names will be prefixed with the corresponding string.
@@ -356,7 +356,7 @@ private:
 
   /// Parse a texture definition and add the texture to the engine
   iTextureWrapper* ParseTexture (iLoaderContext* ldr_context,
-  	iDocumentNode* node, bool forceLoadTextures);
+  	iDocumentNode* node, bool useProxyTextures);
 
   /// Parse a Cubemap texture definition and add the texture to the engine
   iTextureWrapper* ParseCubemap (iLoaderContext* ldr_context,
@@ -506,12 +506,12 @@ private:
    */
   bool LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* node,
   	iStreamSource* ssource, iMissingLoaderData* missingdata,
-	bool loadProxyTex = true, bool forceLoadTextures = true);
+	bool loadProxyTex = true, bool useProxyTextures = false);
 
   /// Load map from a memory buffer
   bool LoadMap (iLoaderContext* ldr_context, iDocumentNode* world_node,
   	iStreamSource* ssource, iMissingLoaderData* missingdata, 
-	bool forceLoadTextures = false);
+	bool useProxyTextures = false);
 
   /// Get the engine sequence manager (load it if not already present).
   iEngineSequenceManager* GetEngineSequenceManager ();
@@ -586,7 +586,7 @@ public:
 
 private:
   // Load all proxy textures which are used.
-  bool LoadProxyTextures(bool forceLoadTextures);
+  bool LoadProxyTextures();
 
 public:
   /********** iLoader implementation **********/
@@ -649,21 +649,21 @@ public:
   virtual bool LoadMapFile (const char* filename, bool clearEngine,
 	iRegion* region, bool curRegOnly, bool checkDupes,
 	iStreamSource* ssource, iMissingLoaderData* missingdata,
-	bool forceLoadTextures = false);
+	bool useProxyTextures = false);
   virtual bool LoadMap (iDocumentNode* world_node, bool clearEngine,
 	iRegion* region, bool curRegOnly, bool checkDupes,
 	iStreamSource* ssource, iMissingLoaderData* missingdata,
-	bool forceLoadTextures = false);
+	bool useProxyTextures = false);
   virtual bool LoadMapLibraryFile (const char* filename, iRegion* region,
   	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-        iMissingLoaderData* missingdata, bool forceLoadTextures,
+        iMissingLoaderData* missingdata, bool useProxyTextures,
         bool loadProxyTex = true);
   virtual bool LoadLibraryFile (const char* filename, iRegion* region,
   	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-        iMissingLoaderData* missingdata, bool forceLoadTextures);
+        iMissingLoaderData* missingdata, bool useProxyTextures);
   virtual bool LoadLibrary (iDocumentNode* lib_node, iRegion* region,
   	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-        iMissingLoaderData* missingdata, bool forceLoadTextures);
+        iMissingLoaderData* missingdata, bool useProxyTextures);
   bool LoadLibraryFromNode (iLoaderContext* ldr_context,
 	iDocumentNode* child, iStreamSource* ssource,
         iMissingLoaderData* missingdata, bool loadProxyTex = true);
@@ -671,19 +671,19 @@ public:
   bool Load (iDataBuffer* buffer, const char* fname, iBase*& result,
   	iRegion* region, bool curRegOnly, bool checkDupes,
 	iStreamSource* ssource, const char* override_name,
-	iMissingLoaderData* missingdata, bool forceLoadTextures = true);
+	iMissingLoaderData* missingdata, bool useProxyTextures = false);
   virtual bool Load (const char* fname, iBase*& result, iRegion* region,
   	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
 	const char* override_name, iMissingLoaderData* missingdata,
-	bool forceLoadTextures);
+	bool useProxyTextures);
   virtual bool Load (iDataBuffer* buffer, iBase*& result, iRegion* region,
   	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
 	const char* override_name, iMissingLoaderData* missingdata,
-	bool forceLoadTextures);
+	bool useProxyTextures);
   virtual bool Load (iDocumentNode* node, iBase*& result, iRegion* region,
   	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
 	const char* override_name, iMissingLoaderData* missingdata,
-	bool forceLoadTextures);
+	bool useProxyTextures);
 
   virtual void SetAutoRegions (bool autoRegions)
   {

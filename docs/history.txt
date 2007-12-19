@@ -6,6 +6,11 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Dec-2007
+        - Mike Gist made a few changes to proxy textures; altered some argument
+          names, added some documentation for them and made proxy textures
+          be completely optional (and not the default). You now need to specify
+          when loading a map/library whether or not you want to use them.
 17-Dec-2007
 	- Marten removed the mutex locks in event queue and object registry.
 	  They indicated a thread safety where there actually is none and only

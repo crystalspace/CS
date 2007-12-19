@@ -314,33 +314,30 @@ iTextureWrapper* csLoader::LoadTexture (const char *name,
   return TexWrapper;
 }
 
-bool csLoader::LoadProxyTextures (bool forceLoadTextures)
+bool csLoader::LoadProxyTextures()
 {
-  if(!forceLoadTextures)
+  // Remove all unused textures and materials.
+  csWeakRefArray<iTextureWrapper> texArray;
+
+  for(uint i=0; i<proxyTextures.GetSize(); i++)
   {
-    csWeakRefArray<iTextureWrapper> texArray;
-
-    for(uint i=0; i<proxyTextures.GetSize(); i++)
+    ProxyTexture& proxTex = proxyTextures.Get(i);
+    if(!proxTex.textureWrapper)
     {
-      ProxyTexture& proxTex = proxyTextures.Get(i);
-      if(!proxTex.textureWrapper)
-      {
-        proxyTextures.DeleteIndexFast (i);
-        i--;
-        continue;
-      }
-
-      texArray.Push(proxTex.textureWrapper);
+      proxyTextures.DeleteIndex(i);
+      i--;
+      continue;
     }
-    CS::Utility::UnusedResourceHelper::UnloadUnusedMaterials(Engine,
-      materialArray);
-    CS::Utility::UnusedResourceHelper::UnloadUnusedTextures(Engine, texArray);
+
+    texArray.Push(proxTex.textureWrapper);
   }
+
+  CS::Utility::UnusedResourceHelper::UnloadUnusedMaterials(Engine,
+    materialArray);
+  CS::Utility::UnusedResourceHelper::UnloadUnusedTextures(Engine, texArray);
   materialArray.Empty();
 
-  // @@@ Note from Jorrit: the code below is too late for loading the
-  // textures since xml in the map itself sometimes also needs the
-  // textures already (i.e. CEL XML scripts using billboards).
+  // Load the remaining textures.
   iTextureManager *tm = G3D->GetTextureManager();
   size_t i = proxyTextures.GetSize();
   while (i-- > 0)

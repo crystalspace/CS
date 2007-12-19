@@ -80,7 +80,7 @@ bool csLoader::ParseMaterialList (iLoaderContext* ldr_context,
 }
 
 bool csLoader::ParseTextureList (iLoaderContext* ldr_context,
-	iDocumentNode* node, bool forceLoadTextures)
+	iDocumentNode* node, bool useProxyTextures)
 {
   if (!ImageLoader)
   {
@@ -115,7 +115,7 @@ bool csLoader::ParseTextureList (iLoaderContext* ldr_context,
 	  proctex_deprecated_warned = true;
 	}
       case XMLTOKEN_TEXTURE:
-        if (!ParseTexture (ldr_context, child, forceLoadTextures))
+        if (!ParseTexture (ldr_context, child, useProxyTextures))
 	        return false;
         break;
       case XMLTOKEN_CUBEMAP:
@@ -136,7 +136,7 @@ bool csLoader::ParseTextureList (iLoaderContext* ldr_context,
 }
 
 iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
-	iDocumentNode* node, bool forceLoadTextures)
+	iDocumentNode* node, bool useProxyTextures)
 {
   const char* txtname = node->GetAttributeValue ("name");
   if (ldr_context->CheckDupes ())
@@ -327,8 +327,10 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
   }
 
   csString texClass = context.GetClass();
-  // Proxy texture loading if the loader isn't specified.
-  if(txtname && type.IsEmpty())
+
+  // Proxy texture loading if the loader isn't specified
+  // and we don't need to load them immediately.
+  if(txtname && type.IsEmpty() && useProxyTextures)
   {
     if (filename.IsEmpty())
     {
@@ -348,20 +350,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     tex->QueryObject()->SetName(txtname);
     proxTex.textureWrapper = tex;
     AddToRegion (ldr_context, proxTex.textureWrapper->QueryObject());
-
-    // If forceLoadTextures is true we have to load the textures
-    // immediatelly.
-    if (forceLoadTextures)
-    {
-      iTextureManager *tm = G3D->GetTextureManager();
-      csRef<iImage> img = proxTex.img->GetProxiedImage();
-      proxTex.textureWrapper->SetImageFile (img);
-      proxTex.textureWrapper->Register (tm);
-    }
-    else
-    {
-      proxyTextures.Push(proxTex);
-    }
+    proxyTextures.Push(proxTex);
 
     return tex;
   }
@@ -386,18 +375,18 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
       csRef<iAnimatedImage> anim = scfQueryInterface<iAnimatedImage> (image);
       if (anim && anim->IsAnimated())
       {
-	type = PLUGIN_TEXTURELOADER_ANIMIMG;
+        type = PLUGIN_TEXTURELOADER_ANIMIMG;
       }
       else
       {
-	// shortcut, no need to go through the plugin list facility
-	if (!BuiltinImageTexLoader)
-	{
-	  csImageTextureLoader* itl = new csImageTextureLoader (0);
-	  itl->Initialize (object_reg);
-	  BuiltinImageTexLoader.AttachNew (itl);
-	}
-	plugin = BuiltinImageTexLoader;
+        // shortcut, no need to go through the plugin list facility
+        if (!BuiltinImageTexLoader)
+        {
+          csImageTextureLoader* itl = new csImageTextureLoader (0);
+          itl->Initialize (object_reg);
+          BuiltinImageTexLoader.AttachNew (itl);
+        }
+        plugin = BuiltinImageTexLoader;
       }
     }
   }
