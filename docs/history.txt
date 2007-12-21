@@ -20,6 +20,7 @@ chronological order.
 	- res fixed some string-to-char* assignment warnings.
 	- res removed mipmap and interpolation renderstate changing from
 	  bugplug (both are not supported by the current renderers anyway).
+	- Sueastside fixed a compile error of walktest introduced by res.
 20-Dec-2007
 	- Vincent fixed Jamfile for OpenAL plugin to use OpenAL availability
 	  check result from configure.
