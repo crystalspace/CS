@@ -6,6 +6,13 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Dec-2007
+	- Jorrit added a -RenderLoop option to viewmesh so that you
+	  can use another renderloop. Just as:
+		viewmesh -RenderLoop=diffuse ...
+	- Jorrit extended viewmesh so that it also loads the light,
+	  light_bumpmap, ambient, reflectsphere, parallax,
+	  light_spec_bumpmap, and parallaxAtt shaders.
 20-Dec-2007
 	- Vincent fixed Jamfile for OpenAL plugin to use OpenAL availability
 	  check result from configure.
