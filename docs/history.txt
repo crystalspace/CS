@@ -14,6 +14,9 @@ chronological order.
 	  light_bumpmap, ambient, reflectsphere, parallax,
 	  light_spec_bumpmap, and parallaxAtt shaders.
 	- caedes added lightmaps folder in maps to install targets.
+	- res changed csTextureWrapper to to lazily determine an image's
+	  keycolor and not immediately when the wrapper is created or the
+	  image changed.
 20-Dec-2007
 	- Vincent fixed Jamfile for OpenAL plugin to use OpenAL availability
 	  check result from configure.

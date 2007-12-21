@@ -59,6 +59,7 @@ private:
   /// The handle as returned by iTextureManager.
   csRef<iTextureHandle> handle;
   // key color
+  bool keyColorDirty;
   int key_col_r, key_col_g, key_col_b;
   /// Texture registration flags
   int flags;
@@ -78,6 +79,7 @@ private:
     }
     else
       key_col_r = -1;
+    keyColorDirty = false;
   }
 
   // update our key color with that from the image
@@ -87,6 +89,7 @@ private:
       image->GetKeyColor( key_col_r, key_col_g, key_col_b );
     else
       key_col_r = -1;
+    keyColorDirty = false;
   }
 
 public:
@@ -124,7 +127,17 @@ public:
   void SetKeyColor (int red, int green, int blue);
   /// Query the transparent color.
   void GetKeyColor (int &red, int &green, int &blue) const
-  { red = key_col_r; green = key_col_g; blue = key_col_b; }
+  { 
+    if (keyColorDirty)
+    {
+      csTextureWrapper* thisNonConst = const_cast<csTextureWrapper*> (this);
+      if (handle != 0)
+	thisNonConst->UpdateKeyColorFromHandle();
+      else if (image != 0)
+	thisNonConst->UpdateKeyColorFromImage();
+    }
+    red = key_col_r; green = key_col_g; blue = key_col_b; 
+  }
 
   /// Set the flags which are used to register the texture
   void SetFlags (int flags) { csTextureWrapper::flags = flags; }
