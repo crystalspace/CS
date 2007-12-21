@@ -13,6 +13,7 @@ chronological order.
 	- Jorrit extended viewmesh so that it also loads the light,
 	  light_bumpmap, ambient, reflectsphere, parallax,
 	  light_spec_bumpmap, and parallaxAtt shaders.
+	- caedes added lightmaps folder in maps to install targets.
 20-Dec-2007
 	- Vincent fixed Jamfile for OpenAL plugin to use OpenAL availability
 	  check result from configure.
