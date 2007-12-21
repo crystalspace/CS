@@ -550,7 +550,7 @@ public:
   virtual void MouseClick2Handler(iEvent &Event);
   virtual void MouseClick3Handler(iEvent &Event);
 
-  void GfxWrite (int x, int y, int fg, int bg, char *str, ...);
+  void GfxWrite (int x, int y, int fg, int bg, const char *str, ...);
 
   // Bot stuff
   csPDelArray<Bot> bots;

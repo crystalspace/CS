@@ -182,12 +182,12 @@ install-arch:
 	cd CS; DESTDIR=$(CURDIR)/debian/crystalspace-dev $(MAKE) install_include
 
 	# Let's fix some things
-	chmod +x $(CURDIR)/debian/crystalspace/usr/share/crystalspace/bindings/python/tutor*.py
+	#chmod +x $(CURDIR)/debian/crystalspace/usr/share/crystalspace/bindings/python/tutor*.py
 	rm -f $(CURDIR)/debian/crystalspace/usr/share/crystalspace/data/maps/castle/license.txt
-	chmod +x $(CURDIR)/debian/crystalspace/usr/share/crystalspace/build/autoconf/config.guess
-	chmod +x $(CURDIR)/debian/crystalspace/usr/share/crystalspace/build/autoconf/config.sub
-	chmod +x $(CURDIR)/debian/crystalspace/usr/share/crystalspace/build/autoconf/install-sh
-	chmod +x $(CURDIR)/debian/crystalspace/usr/share/crystalspace/build/jamtemplate/autogen.template
+	#chmod +x $(CURDIR)/debian/crystalspace/usr/share/crystalspace/build/autoconf/config.guess
+	#chmod +x $(CURDIR)/debian/crystalspace/usr/share/crystalspace/build/autoconf/config.sub
+	#chmod +x $(CURDIR)/debian/crystalspace/usr/share/crystalspace/build/autoconf/install-sh
+	#chmod +x $(CURDIR)/debian/crystalspace/usr/share/crystalspace/build/jamtemplate/autogen.template
 	#[ ! -d $(CURDIR)/debian/crystalspace/usr/share/crystalspace/data/maps/flarge/factories ] && \
 	#	cp -r $(CURDIR)/CS/data/flarge/factories \
 	#	$(CURDIR)/debian/crystalspace/usr/share/crystalspace/data/maps/flarge 
@@ -199,8 +199,8 @@ install-arch:
 	mv $(CURDIR)/debian/crystalspace/usr/bin/startme $(CURDIR)/debian/crystalspace/usr/bin/csstartme
 
 	# Calculate ligths
-	cd $(CURDIR)/CS ; ./cslight -video=null \
-		$(CURDIR)/debian/crystalspace/usr/share/crystalspace/data/maps/flarge/
+	#cd $(CURDIR)/CS ; ./cslight -video=null \
+	#	$(CURDIR)/debian/crystalspace/usr/share/crystalspace/data/maps/flarge/
 
 	# Adding home made xpm
 	mkdir -p $(CURDIR)/debian/crystalspace/usr/share/pixmaps

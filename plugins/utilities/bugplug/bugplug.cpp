@@ -717,28 +717,6 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
     case DEBUGCMD_CACHEDUMP:
       //if (G3D) G3D->DumpCache ();
       break;
-    case DEBUGCMD_MIPMAP:
-      {
-	  if (!G3D) break;
-	  char* choices[6] = { "on", "off", "1", "2", "3", 0 };
-	  long v = G3D->GetRenderState (G3DRENDERSTATE_MIPMAPENABLE);
-	  v = (v+1)%5;
-	  G3D->SetRenderState (G3DRENDERSTATE_MIPMAPENABLE, v);
-	  Report (CS_REPORTER_SEVERITY_NOTIFY, "BugPlug set mipmap to '%s'",
-	  	choices[v]);
-	}
-	break;
-    case DEBUGCMD_INTER:
-	{
-	  if (!G3D) break;
-	  char* choices[5] = { "smart", "step32", "step16", "step8", 0 };
-	  long v = G3D->GetRenderState (G3DRENDERSTATE_INTERPOLATIONSTEP);
-	  v = (v+1)%4;
-	  G3D->SetRenderState (G3DRENDERSTATE_INTERPOLATIONSTEP, v);
-	  Report (CS_REPORTER_SEVERITY_NOTIFY, "BugPlug set interpolation to '%s'",
-	  	choices[v]);
-	}
-	break;
     case DEBUGCMD_GAMMA:
       {
 	  if (!G3D) break;
@@ -1518,7 +1496,7 @@ bool csBugPlug::HandleStartFrame (iEvent& /*event*/)
 }
 
 static void GfxWrite (iGraphics2D* g2d, iFont* font,
-	int x, int y, int fg, int bg, char *str, ...)
+	int x, int y, int fg, int bg, const char *str, ...)
 {
   va_list arg;
   csString buf;
@@ -1834,7 +1812,7 @@ bool csBugPlug::HandleFrame (iEvent& /*event*/)
       int h = fh+5*2;
       BugplugBox (G2D, x, y, w, h);
       int fgcolor = G2D->FindRGB (0, 0, 0);
-      char* msg;
+      const char* msg;
       if (process_next_key) msg = "Press a BugPlug key...";
       else msg = "Click on screen...";
       G2D->Write (fnt, x+5, y+5, fgcolor, -1, msg);
@@ -2116,8 +2094,6 @@ int csBugPlug::GetCommandCode (const char* cmdstr, csString& args)
   if (!strcmp (cmd, "ilace"))		return DEBUGCMD_ILACE;
   if (!strcmp (cmd, "mmx"))		return DEBUGCMD_MMX;
   if (!strcmp (cmd, "transp"))		return DEBUGCMD_TRANSP;
-  if (!strcmp (cmd, "mipmap"))		return DEBUGCMD_MIPMAP;
-  if (!strcmp (cmd, "inter"))		return DEBUGCMD_INTER;
   if (!strcmp (cmd, "gamma"))		return DEBUGCMD_GAMMA;
   if (!strcmp (cmd, "dblbuff"))		return DEBUGCMD_DBLBUFF;
   if (!strcmp (cmd, "dumpcam"))		return DEBUGCMD_DUMPCAM;

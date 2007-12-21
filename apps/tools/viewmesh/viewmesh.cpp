@@ -29,7 +29,9 @@
 #include "iutil/object.h"
 #include "iutil/stringarray.h"
 #include "iengine/scenenode.h"
+#include "iengine/renderloop.h"
 #include "ivideo/graph2d.h"
+#include "ivideo/material.h"
 #include "cstool/genmeshbuilder.h"
 
 // Hack: work around problems caused by #defining 'new'
@@ -222,7 +224,8 @@ void ViewMesh::ProcessFrame()
     }
   }
 
-  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
+  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS
+	| CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
     return;
 
   view->Draw ();
@@ -383,6 +386,7 @@ void ViewMesh::Help ()
   csPrintf ("  -L=<file>          Load a library file (for textures/materials)\n");
   csPrintf ("  -Scale=<ratio>     Scale the Object\n");
   csPrintf ("  -RoomSize=<units>  Radius and height (4*) of the room (default 5)\n");
+  csPrintf ("  -RenderLoop=<loop> 'standard', 'diffuse', ... (default standard)\n");
   csPrintf ("  -R=<realpath>      Real path from where to load the model\n");
   csPrintf ("  -C=<vfsdir>        Current VFS directory\n");
   csPrintf ("  <file>             Load the specified mesh object from the VFS path (meshfact or library)\n");
@@ -533,8 +537,29 @@ bool ViewMesh::Application()
   region = engine->CreateRegion ("viewmesh_region");
   reloadFilename = "";
 
-  CreateRoom();
-  CreateGui ();
+  csRef<iCommandLineParser> cmdline =
+    csQueryRegistry<iCommandLineParser> (GetObjectRegistry());
+  renderLoop = cmdline->GetOption ("RenderLoop");
+
+  if (!loader->LoadShader ("/shader/light.xml"))
+    return false;
+  if (!loader->LoadShader ("/shader/light_bumpmap.xml"))
+    return false;
+  if (!loader->LoadShader ("/shader/ambient.xml"))
+    return false;
+  if (!loader->LoadShader ("/shader/reflectsphere.xml"))
+    return false;
+  if (!loader->LoadShader ("/shader/parallax/parallax.xml"))
+    return false;
+  if (!loader->LoadShader ("/shader/parallaxAtt/parallaxAtt.xml"))
+    return false;
+  if (!loader->LoadShader ("/shader/specular/light_spec_bumpmap.xml"))
+    return false;
+
+  if (!CreateRoom())
+    return false;
+  if (!CreateGui ())
+    return false;
 
   HandleCommandLine();
 
@@ -559,12 +584,40 @@ bool ViewMesh::Application()
   return true;
 }
 
-void ViewMesh::CreateRoom ()
+bool ViewMesh::CreateRoom ()
 {
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
-    ReportError("Error loading 'stone4' texture!");
+    return ReportError("Error loading 'stone4' texture!");
 
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
+
+  if (!renderLoop.IsEmpty ())
+  {
+    iRenderLoopManager* rloopmgr = engine->GetRenderLoopManager ();
+    csString rl = "/shader/std_rloop_";
+    rl += renderLoop;
+    rl += ".xml";
+    csRef<iRenderLoop> rloop = rloopmgr->Load (rl);
+    if (!rloop)
+      return ReportError("Bad renderloop '%s'", (const char*)renderLoop);
+    if (!engine->SetCurrentDefaultRenderloop (rloop))
+      return ReportError ("Couldn't set renderloop in engine!");
+
+    if (renderLoop != "standard")
+    {
+      csRef<iStringSet> strset = csQueryRegistryTagInterface<iStringSet> (
+      	object_reg, "crystalspace.shared.stringset");
+      csRef<iShaderManager> shadermgr = csQueryRegistry<iShaderManager> (
+      	  object_reg);
+      iMaterial* mat = tm->GetMaterial ();
+      csStringID t = strset->Request ("ambient");
+      iShader* sh = shadermgr->GetShader ("ambient");
+      mat->SetShader (t, sh);
+      t = strset->Request ("diffuse");
+      sh = shadermgr->GetShader ("light");
+      mat->SetShader (t, sh);
+    }
+  }
 
   room = engine->CreateSector ("room");
 
@@ -601,9 +654,10 @@ void ViewMesh::CreateRoom ()
   light = engine->CreateLight
     (0, csVector3(0, roomsize/2, -roomsize/2), 2*roomsize, csColor(1, 1, 1));
   ll->Add (light);
+  return true;
 }
 
-void ViewMesh::CreateGui()
+bool ViewMesh::CreateGui()
 {
   // Initialize CEGUI wrapper
   cegui->Initialize ();
@@ -841,6 +895,7 @@ void ViewMesh::CreateGui()
   btn = winMgr->getWindow("StdDlg/Path");
   btn->setProperty("Text", vfs->GetCwd());
   StdDlgUpdateLists(vfs->GetCwd());
+  return true;
 }
 
 void ViewMesh::LoadSprite (const char* filename)

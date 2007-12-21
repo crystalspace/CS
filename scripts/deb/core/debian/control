@@ -6,7 +6,7 @@ Build-Depends: python-support (>= 0.4), debhelper(>= 5), nasm (>= 0.98.08-1), li
 Standards-Version: 3.7.2.2
 
 Package: crystalspace
-Architecture: any
+Architecture: i386 amd64 powerpc
 Depends: ${shlibs:Depends}, ${python:Depends}
 Suggests: crystalspace-doc, crystalspace-dev
 Description: Multiplatform 3D Game Development Kit
@@ -19,7 +19,7 @@ Description: Multiplatform 3D Game Development Kit
 
 Package: crystalspace-dev
 Section: devel
-Architecture: any
+Architecture: i386 amd64 powerpc
 Depends: crystalspace (= ${Source-Version}), libc6-dev
 Description: Multiplatform 3D Game Development Kit dev files
  Crystal Space is a free 3D game toolkit. It can be used for a variety
