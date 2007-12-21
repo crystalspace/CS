@@ -17,6 +17,9 @@ chronological order.
 	- res changed csTextureWrapper to to lazily determine an image's
 	  keycolor and not immediately when the wrapper is created or the
 	  image changed.
+	- res fixed some string-to-char* assignment warnings.
+	- res removed mipmap and interpolation renderstate changing from
+	  bugplug (both are not supported by the current renderers anyway).
 20-Dec-2007
 	- Vincent fixed Jamfile for OpenAL plugin to use OpenAL availability
 	  check result from configure.

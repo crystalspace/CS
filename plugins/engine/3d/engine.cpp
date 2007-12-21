@@ -1151,7 +1151,7 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
   current.cosinus_factor = 0;	//@@@
   current.lightmap_size = 0;	//@@@
 
-  char *reason = 0;
+  const char *reason = 0;
 
   bool do_relight = false;
   if (!(lightmapCacheMode & CS_ENGINE_CACHE_READ))
