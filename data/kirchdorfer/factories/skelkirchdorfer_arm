@@ -1,0 +1,676 @@
+<skelfact>
+  <bone name="Neck" >
+    <move>
+      <v x="0.0" y="0.0" z="0.0" />
+      <matrix>
+        <rotx>1.4011503022</rotx>
+        <rotz>6.94271617612e-08</rotz>
+        <roty>1.18923406018e-08</roty>
+      </matrix>
+    </move>
+    <bone name="Head" >
+      <move>
+        <v x="-5.45088232635e-15" y="1.93990388198e-08" z="3.03747439384" />
+        <matrix>
+          <rotx>0.333188649902</rotx>
+          <rotz>-2.01386408581e-14</rotz>
+          <roty>-7.04383388014e-08</roty>
+        </matrix>
+      </move>
+    </bone>
+  </bone>
+  <bone name="Arm.R" >
+    <move>
+      <v x="0.0" y="0.0" z="0.0" />
+      <matrix>
+        <rotx>2.01049977713e-07</rotx>
+        <rotz>-1.56286484563e-06</rotz>
+        <roty>-1.44310507622</roty>
+      </matrix>
+    </move>
+    <bone name="Claw.R" >
+      <move>
+        <v x="1.13963274373e-08" y="8.61199827407e-15" z="3.01844453812" />
+        <matrix>
+          <rotx>-2.25998683594e-07</rotx>
+          <rotz>-3.14159052306</rotz>
+          <roty>-0.263053869831</roty>
+        </matrix>
+      </move>
+    </bone>
+  </bone>
+  <bone name="Arm.L" >
+    <move>
+      <v x="0.0" y="0.0" z="0.0" />
+      <matrix>
+        <rotx>8.26110283825e-08</rotx>
+        <rotz>6.59670017587e-07</rotz>
+        <roty>1.44310494306</roty>
+      </matrix>
+    </move>
+    <bone name="Claw.L" >
+      <move>
+        <v x="4.74730965649e-09" y="-2.30350745531e-14" z="3.01844453812" />
+        <matrix>
+          <rotx>-2.37422369753e-08</rotx>
+          <rotz>6.1367616525e-07</rotz>
+          <roty>0.263053803252</roty>
+        </matrix>
+      </move>
+    </bone>
+  </bone>
+  <script name="idle" >
+    <loop/>
+    <frame duration="0.0" >
+      <bone name="Head" >
+        <move>
+          <matrix>
+            <rotx>0.613911628169</rotx>
+            <roty>-7.04383388014e-08</roty>
+            <rotz>-2.27501048122e-14</rotz>
+          </matrix>
+          <v x="8.46559614655e-16" y="9.89084369962e-10" z="3.03747415543" />
+        </move>
+      </bone>
+      <bone name="Neck" >
+        <move>
+          <matrix>
+            <rotx>1.60839696559</rotx>
+            <roty>-2.64790121833e-09</roty>
+            <rotz>7.03885351396e-08</rotz>
+          </matrix>
+          <v x="0.0" y="0.0" z="0.0" />
+        </move>
+      </bone>
+      <bone name="Claw.R" >
+        <move>
+          <matrix>
+            <rotx>-2.25998683594e-07</rotx>
+            <roty>-0.263053869831</roty>
+            <rotz>-3.14159052306</rotz>
+          </matrix>
+          <v x="1.13963274373e-08" y="8.61199827407e-15" z="3.01844453812" />
+        </move>
+      </bone>
+      <bone name="Arm.R" >
+        <move>
+          <matrix>
+            <rotx>2.01049977713e-07</rotx>
+            <roty>-1.44310507622</roty>
+            <rotz>-1.56286484563e-06</rotz>
+          </matrix>
+          <v x="0.0" y="0.0" z="0.0" />
+        </move>
+      </bone>
+      <bone name="Claw.L" >
+        <move>
+          <matrix>
+            <rotx>-2.37422369753e-08</rotx>
+            <roty>0.263053803252</roty>
+            <rotz>6.1367616525e-07</rotz>
+          </matrix>
+          <v x="4.74730965649e-09" y="-2.30350745531e-14" z="3.01844453812" />
+        </move>
+      </bone>
+      <bone name="Arm.L" >
+        <move>
+          <matrix>
+            <rotx>8.26110283825e-08</rotx>
+            <roty>1.44310494306</roty>
+            <rotz>6.59670017587e-07</rotz>
+          </matrix>
+          <v x="0.0" y="0.0" z="0.0" />
+        </move>
+      </bone>
+    </frame>
+    <frame duration="833.333333333" >
+      <bone name="Head" >
+        <move>
+          <matrix>
+            <rotx>0.430399322722</rotx>
+            <roty>-7.04383388014e-08</roty>
+            <rotz>-2.19236245491e-14</rotz>
+          </matrix>
+          <v x="4.1677468429e-15" y="-3.77813336172e-11" z="3.03747415543" />
+        </move>
+      </bone>
+      <bone name="Neck" >
+        <move>
+          <matrix>
+            <rotx>1.48862302662</rotx>
+            <roty>5.78163765381e-09</roty>
+            <rotz>7.02006463609e-08</rotz>
+          </matrix>
+          <v x="0.0" y="0.0" z="0.0" />
+        </move>
+      </bone>
+      <bone name="Claw.R" >
+        <move>
+          <matrix>
+            <rotx>-2.25998683594e-07</rotx>
+            <roty>-0.263053869831</roty>
+            <rotz>-3.14159052306</rotz>
+          </matrix>
+          <v x="1.13963274373e-08" y="8.61199827407e-15" z="3.01844453812" />
+        </move>
+      </bone>
+      <bone name="Arm.R" >
+        <move>
+          <matrix>
+            <rotx>2.01049977713e-07</rotx>
+            <roty>-1.44310507622</roty>
+            <rotz>-1.56286484563e-06</rotz>
+          </matrix>
+          <v x="0.0" y="0.0" z="0.0" />
+        </move>
+      </bone>
+      <bone name="Claw.L" >
+        <move>
+          <matrix>
+            <rotx>-2.37422369753e-08</rotx>
+            <roty>0.263053803252</roty>
+            <rotz>6.1367616525e-07</rotz>
+          </matrix>
+          <v x="4.74730965649e-09" y="-2.30350745531e-14" z="3.01844453812" />
+        </move>
+      </bone>
+      <bone name="Arm.L" >
+        <move>
+          <matrix>
+            <rotx>8.26110283825e-08</rotx>
+            <roty>1.44310494306</roty>
+            <rotz>6.59670017587e-07</rotz>
+          </matrix>
+          <v x="0.0" y="0.0" z="0.0" />
+        </move>
+      </bone>
+    </frame>
+    <frame duration="833.333333333" >
+      <bone name="Head" >
+        <move>
+          <matrix>
+            <rotx>0.613911628169</rotx>
+            <roty>-7.04383388014e-08</roty>
+            <rotz>-2.27501048122e-14</rotz>
+          </matrix>
+          <v x="8.46559614655e-16" y="9.89084369962e-10" z="3.03747415543" />
+        </move>
+      </bone>
+      <bone name="Neck" >
+        <move>
+          <matrix>
+            <rotx>1.60839696559</rotx>
+            <roty>-2.64790121833e-09</roty>
+            <rotz>7.03885351396e-08</rotz>
+          </matrix>
+          <v x="0.0" y="0.0" z="0.0" />
+        </move>
+      </bone>
+      <bone name="Claw.R" >
+        <move>
+          <matrix>
+            <rotx>-2.25998683594e-07</rotx>
+            <roty>-0.263053869831</roty>
+            <rotz>-3.14159052306</rotz>
+          </matrix>
+          <v x="1.13963274373e-08" y="8.61199827407e-15" z="3.01844453812" />
+        </move>
+      </bone>
+      <bone name="Arm.R" >
+        <move>
+          <matrix>
+            <rotx>2.01049977713e-07</rotx>
+            <roty>-1.44310507622</roty>
+            <rotz>-1.56286484563e-06</rotz>
+          </matrix>
+          <v x="0.0" y="0.0" z="0.0" />
+        </move>
+      </bone>
+      <bone name="Claw.L" >
+        <move>
+          <matrix>
+            <rotx>-2.37422369753e-08</rotx>
+            <roty>0.263053803252</roty>
+            <rotz>6.1367616525e-07</rotz>
+          </matrix>
+          <v x="4.74730965649e-09" y="-2.30350745531e-14" z="3.01844453812" />
+        </move>
+      </bone>
+      <bone name="Arm.L" >
+        <move>
+          <matrix>
+            <rotx>8.26110283825e-08</rotx>
+            <roty>1.44310494306</roty>
+            <rotz>6.59670017587e-07</rotz>
+          </matrix>
+          <v x="0.0" y="0.0" z="0.0" />
+        </move>
+      </bone>
+    </frame>
+  </script>
+  <script name="run" >
+    <loop/>
+    <frame duration="0.0" >
+      <bone name="Head" >
+        <move>
+          <matrix>
+            <rotx>0.619800676287</rotx>
+            <rotz>-2.0566504605e-14</rotz>
+            <roty>-7.04383388014e-08</roty>
+          </matrix>
+          <v x="-5.45088232635e-15" y="1.93990388198e-08" z="3.03747439384" />
+        </move>
+      </bone>
+      <bone name="Neck" >
+        <move>
+          <matrix>
+            <rotx>1.4011503022</rotx>
+            <rotz>6.94271617612e-08</rotz>
+            <roty>1.18923406018e-08</roty>
+          </matrix>
+          <v x="0.0" y="0.0" z="0.0" />
+        </move>
+      </bone>
+      <bone name="Claw.R" >
+        <move>
+          <matrix>
+            <rotx>0.90819592205</rotx>
+            <rotz>-3.03462492419</rotz>
+            <roty>-0.210803265099</roty>
+          </matrix>
+          <v x="1.10574148948e-07" y="2.56585508396e-09" z="3.0184442997" />
+        </move>
+      </bone>
+      <bone name="Arm.R" >
+        <move>
+          <matrix>
+            <rotx>0.508424516471</rotx>
+            <rotz>0.0624178338875</rotz>
+            <roty>-1.02359734999</roty>
+          </matrix>
+          <v x="0.0" y="0.0" z="0.0" />
+        </move>
+      </bone>
+      <bone name="Claw.L" >
+        <move>
+          <matrix>
+            <rotx>-0.8346833549</rotx>
+            <rotz>-0.100591297831</rotz>
+            <roty>0.218423384571</roty>
+          </matrix>
+          <v x="-8.3964074804e-08" y="-9.43027131939e-08" z="3.0184442997" />
+        </move>
+      </bone>
+      <bone name="Arm.L" >
+        <move>
+          <matrix>
+            <rotx>0.469190194791</rotx>
+            <rotz>-0.0579876154799</rotz>
+            <roty>1.86366308661</roty>
+          </matrix>
+          <v x="0.0" y="0.0" z="0.0" />
+        </move>
+      </bone>
+    </frame>
+    <frame duration="416.666666667" >
+      <bone name="Head" >
+        <move>
+          <matrix>
+            <rotx>0.619800676287</rotx>
+            <rotz>-2.0566504605e-14</rotz>
+            <roty>-7.04383388014e-08</roty>
+          </matrix>
+          <v x="-5.45088232635e-15" y="1.93990388198e-08" z="3.03747439384" />
+        </move>
+      </bone>
+      <bone name="Neck" >
+        <move>
+          <matrix>
+            <rotx>1.4011503022</rotx>
+            <rotz>6.94271617612e-08</rotz>
+            <roty>1.18923406018e-08</roty>
+          </matrix>
+          <v x="0.0" y="0.0" z="0.0" />
+        </move>
+      </bone>
+      <bone name="Claw.R" >
+        <move>
+          <matrix>
+            <rotx>0.725047138092</rotx>
+            <rotz>-3.01151720805</rotz>
+            <roty>-0.211061641659</roty>
+          </matrix>
+          <v x="-1.26738584072e-08" y="8.46023411327e-08" z="3.01844453812" />
+        </move>
+      </bone>
+      <bone name="Arm.R" >
+        <move>
+          <matrix>
+            <rotx>0.678096606759</rotx>
+            <rotz>0.122817466044</rotz>
+            <roty>-1.23610994839</roty>
+          </matrix>
+          <v x="0.0" y="0.0" z="0.0" />
+        </move>
+      </bone>
+      <bone name="Claw.L" >
+        <move>
+          <matrix>
+            <rotx>-0.8346833549</rotx>
+            <rotz>-0.100591306153</rotz>
+            <roty>0.218423367926</roty>
+          </matrix>
+          <v x="1.16192850896e-08" y="-3.82995963832e-08" z="3.01844453812" />
+        </move>
+      </bone>
+      <bone name="Arm.L" >
+        <move>
+          <matrix>
+            <rotx>0.464002356987</rotx>
+            <rotz>-0.0584435486585</rotz>
+            <roty>1.64222736724</roty>
+          </matrix>
+          <v x="0.0" y="0.0" z="0.0" />
+        </move>
+      </bone>
+    </frame>
+    <frame duration="833.333333333" >
+      <bone name="Head" >
+        <move>
+          <matrix>
+            <rotx>0.619800676287</rotx>
+            <rotz>-2.0566504605e-14</rotz>
+            <roty>-7.04383388014e-08</roty>
+          </matrix>
+          <v x="-5.45088232635e-15" y="1.93990388198e-08" z="3.03747439384" />
+        </move>
+      </bone>
+      <bone name="Neck" >
+        <move>
+          <matrix>
+            <rotx>1.4011503022</rotx>
+            <rotz>6.94271617612e-08</rotz>
+            <roty>1.18923406018e-08</roty>
+          </matrix>
+          <v x="0.0" y="0.0" z="0.0" />
+        </move>
+      </bone>
+      <bone name="Claw.R" >
+        <move>
+          <matrix>
+            <rotx>0.908195988629</rotx>
+            <rotz>-3.03462492419</rotz>
+            <roty>-0.210803281744</roty>
+          </matrix>
+          <v x="-4.15167384915e-08" y="2.33289156881e-08" z="3.01844453812" />
+        </move>
+      </bone>
+      <bone name="Arm.R" >
+        <move>
+          <matrix>
+            <rotx>0.508424483181</rotx>
+            <rotz>0.062417800598</rotz>
+            <roty>-1.90281315253</roty>
+          </matrix>
+          <v x="0.0" y="0.0" z="0.0" />
+        </move>
+      </bone>
+      <bone name="Claw.L" >
+        <move>
+          <matrix>
+            <rotx>-0.8346833549</rotx>
+            <rotz>-0.100591289508</rotz>
+            <roty>0.218423401216</roty>
+          </matrix>
+          <v x="4.93530265544e-08" y="5.74881227067e-08" z="3.01844477654" />
+        </move>
+      </bone>
+      <bone name="Arm.L" >
+        <move>
+          <matrix>
+            <rotx>0.46919026137</rotx>
+            <rotz>-0.0579876154799</rotz>
+            <roty>0.935377742032</roty>
+          </matrix>
+          <v x="0.0" y="0.0" z="0.0" />
+        </move>
+      </bone>
+    </frame>
+    <frame duration="416.666666667" >
+      <bone name="Head" >
+        <move>
+          <matrix>
+            <rotx>0.619800676287</rotx>
+            <rotz>-2.0566504605e-14</rotz>
+            <roty>-7.04383388014e-08</roty>
+          </matrix>
+          <v x="-5.45088232635e-15" y="1.93990388198e-08" z="3.03747439384" />
+        </move>
+      </bone>
+      <bone name="Neck" >
+        <move>
+          <matrix>
+            <rotx>1.4011503022</rotx>
+            <rotz>6.94271617612e-08</rotz>
+            <roty>1.18923406018e-08</roty>
+          </matrix>
+          <v x="0.0" y="0.0" z="0.0" />
+        </move>
+      </bone>
+      <bone name="Claw.R" >
+        <move>
+          <matrix>
+            <rotx>0.90819592205</rotx>
+            <rotz>-3.03462492419</rotz>
+            <roty>-0.210803265099</roty>
+          </matrix>
+          <v x="-5.03585706468e-09" y="4.28108357653e-08" z="3.0184442997" />
+        </move>
+      </bone>
+      <bone name="Arm.R" >
+        <move>
+          <matrix>
+            <rotx>0.50823699664</rotx>
+            <rotz>0.0624165772084</rotz>
+            <roty>-1.69306298455</roty>
+          </matrix>
+          <v x="0.0" y="0.0" z="0.0" />
+        </move>
+      </bone>
+      <bone name="Claw.L" >
+        <move>
+          <matrix>
+            <rotx>-0.729982907698</rotx>
+            <rotz>-0.11954648837</rotz>
+            <roty>0.215538298938</roty>
+          </matrix>
+          <v x="-4.48634978056e-08" y="-9.91734339095e-09" z="3.01844453812" />
+        </move>
+      </bone>
+      <bone name="Arm.L" >
+        <move>
+          <matrix>
+            <rotx>0.673588274508</rotx>
+            <rotz>-0.145250503618</rotz>
+            <roty>1.17722639142</roty>
+          </matrix>
+          <v x="0.0" y="0.0" z="0.0" />
+        </move>
+      </bone>
+    </frame>
+    <frame duration="833.333333333" >
+      <bone name="Head" >
+        <move>
+          <matrix>
+            <rotx>0.619800676287</rotx>
+            <rotz>-2.0566504605e-14</rotz>
+            <roty>-7.04383388014e-08</roty>
+          </matrix>
+          <v x="-5.45088232635e-15" y="1.93990388198e-08" z="3.03747439384" />
+        </move>
+      </bone>
+      <bone name="Neck" >
+        <move>
+          <matrix>
+            <rotx>1.4011503022</rotx>
+            <rotz>6.94271617612e-08</rotz>
+            <roty>1.18923406018e-08</roty>
+          </matrix>
+          <v x="0.0" y="0.0" z="0.0" />
+        </move>
+      </bone>
+      <bone name="Claw.R" >
+        <move>
+          <matrix>
+            <rotx>0.90819592205</rotx>
+            <rotz>-3.03462492419</rotz>
+            <roty>-0.210803265099</roty>
+          </matrix>
+          <v x="1.10574148948e-07" y="2.56585508396e-09" z="3.0184442997" />
+        </move>
+      </bone>
+      <bone name="Arm.R" >
+        <move>
+          <matrix>
+            <rotx>0.508424516471</rotx>
+            <rotz>0.0624178338875</rotz>
+            <roty>-1.02359734999</roty>
+          </matrix>
+          <v x="0.0" y="0.0" z="0.0" />
+        </move>
+      </bone>
+      <bone name="Claw.L" >
+        <move>
+          <matrix>
+            <rotx>-0.8346833549</rotx>
+            <rotz>-0.100591297831</rotz>
+            <roty>0.218423384571</roty>
+          </matrix>
+          <v x="-8.3964074804e-08" y="-9.43027131939e-08" z="3.0184442997" />
+        </move>
+      </bone>
+      <bone name="Arm.L" >
+        <move>
+          <matrix>
+            <rotx>0.469190194791</rotx>
+            <rotz>-0.0579876154799</rotz>
+            <roty>1.86366308661</roty>
+          </matrix>
+          <v x="0.0" y="0.0" z="0.0" />
+        </move>
+      </bone>
+    </frame>
+  </script>
+  <script name="wave" >
+    <frame duration="0.0" >
+      <bone name="Claw.L" >
+        <move>
+          <matrix>
+            <rotx>-2.37422369753e-08</rotx>
+            <rotz>6.1367616525e-07</rotz>
+            <roty>0.263053803252</roty>
+          </matrix>
+          <v x="4.74730965649e-09" y="-2.30350745531e-14" z="3.01844453812" />
+        </move>
+      </bone>
+      <bone name="Arm.L" >
+        <move>
+          <matrix>
+            <rotx>8.26110283825e-08</rotx>
+            <rotz>6.59670017587e-07</rotz>
+            <roty>1.44310494306</roty>
+          </matrix>
+          <v x="0.0" y="0.0" z="0.0" />
+        </move>
+      </bone>
+    </frame>
+    <frame duration="833.333333333" >
+      <bone name="Claw.L" >
+        <move>
+          <matrix>
+            <rotx>0.572820916762</rotx>
+            <rotz>0.0736853064362</rotz>
+            <roty>0.24134341444</roty>
+          </matrix>
+          <v x="1.79875829787e-08" y="-6.07099579497e-08" z="3.01844477654" />
+        </move>
+      </bone>
+      <bone name="Arm.L" >
+        <move>
+          <matrix>
+            <rotx>0.629318814023</rotx>
+            <rotz>-0.0754256156295</rotz>
+            <roty>1.46766421516</roty>
+          </matrix>
+          <v x="0.0" y="0.0" z="0.0" />
+        </move>
+      </bone>
+    </frame>
+    <frame duration="416.666666667" >
+      <bone name="Claw.L" >
+        <move>
+          <matrix>
+            <rotx>-0.450295998963</rotx>
+            <rotz>-0.0592067856598</rotz>
+            <roty>0.249490257241</roty>
+          </matrix>
+          <v x="1.79875829787e-08" y="-6.07099579497e-08" z="3.01844477654" />
+        </move>
+      </bone>
+      <bone name="Arm.L" >
+        <move>
+          <matrix>
+            <rotx>0.629318814023</rotx>
+            <rotz>-0.0754256156295</rotz>
+            <roty>1.46766421516</roty>
+          </matrix>
+          <v x="0.0" y="0.0" z="0.0" />
+        </move>
+      </bone>
+    </frame>
+    <frame duration="416.666666667" >
+      <bone name="Claw.L" >
+        <move>
+          <matrix>
+            <rotx>0.696887338778</rotx>
+            <rotz>0.0871934670187</rotz>
+            <roty>0.231361304108</roty>
+          </matrix>
+          <v x="1.79875829787e-08" y="-6.07099579497e-08" z="3.01844477654" />
+        </move>
+      </bone>
+      <bone name="Arm.L" >
+        <move>
+          <matrix>
+            <rotx>0.629318814023</rotx>
+            <rotz>-0.0754256156295</rotz>
+            <roty>1.46766421516</roty>
+          </matrix>
+          <v x="0.0" y="0.0" z="0.0" />
+        </move>
+      </bone>
+    </frame>
+    <frame duration="416.666666667" >
+      <bone name="Claw.L" >
+        <move>
+          <matrix>
+            <rotx>-0.355067849837</rotx>
+            <rotz>-0.0473129459452</rotz>
+            <roty>0.254563579117</roty>
+          </matrix>
+          <v x="1.79875829787e-08" y="-6.07099579497e-08" z="3.01844477654" />
+        </move>
+      </bone>
+      <bone name="Arm.L" >
+        <move>
+          <matrix>
+            <rotx>0.629318814023</rotx>
+            <rotz>-0.0754256156295</rotz>
+            <roty>1.46766421516</roty>
+          </matrix>
+          <v x="0.0" y="0.0" z="0.0" />
+        </move>
+      </bone>
+    </frame>
+  </script>
+</skelfact>

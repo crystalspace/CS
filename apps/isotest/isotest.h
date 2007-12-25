@@ -23,6 +23,7 @@
 #include "csutil/ref.h"
 #include "csgeom/vector3.h"
 #include "iutil/eventnames.h"
+#include "imesh/nskeleton.h"
 
 struct iEngine;
 struct iLoader;
@@ -32,6 +33,8 @@ struct iVirtualClock;
 struct iObjectRegistry;
 struct iEvent;
 struct iSector;
+struct iSkeleton;
+struct iSkeletonBone;
 struct iView;
 struct iMeshWrapper;
 struct iLight;
@@ -63,12 +66,31 @@ struct IsoView
 class IsoTest
 {
 private:
+  /*enum ManipulationMode
+  {
+    TRAN_GRAB = 0,
+    TRAN_ROTATE
+  } manipmode;
+  enum Axis
+  {
+    AXIS_X = 0,
+    AXIS_Y,
+    AXIS_Z
+  } transaxis;*/
+
+  int selboneid;
+  iSkeletonBone* selbone;
+  iSkeleton* skeleton;
+  Skeleton::iSkeleton* myskel;
+
   iObjectRegistry* object_reg;
   csRef<iEngine> engine;
   csRef<iLoader> loader;
   csRef<iGraphics3D> g3d;
   csRef<iKeyboardDriver> kbd;
   csRef<iVirtualClock> vc;
+  size_t last_time;
+  csRef<Skeleton::iGraveyard> skelgrave;
   iSector* room;
   csRef<iView> view;
   csRef<iMeshWrapper> actor;
@@ -98,6 +120,14 @@ private:
     const csVector3& lookat);
   /// setup an isometric view to be ready for display, call after rotating
   void SetupIsoView(IsoView& isoview);
+
+  bool LoadKwartzAnim ();
+  bool LoadKirchdorferAnim ();
+
+  /**
+   * Draw a cool looking bone like in Blender.
+   */
+  static void DrawBone (float length, iGraphics3D* g3d);
 
 public:
   IsoTest (iObjectRegistry* object_reg);
