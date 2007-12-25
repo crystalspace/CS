@@ -30,9 +30,6 @@
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "csgeom/tri.h"
-#include <ivideo/graph2d.h>
-#include <ivideo/graph3d.h>
-#include <iengine/engine.h>
 
 #include "skeleton.h"
 
@@ -113,7 +110,7 @@ size_t csSkeletonBone::FindChildIndex (iSkeletonBone *child)
 void csSkeletonBone::UpdateTransform ()
 {
   size_t scripts_len = skeleton->GetRunningScripts ().GetSize ();
-  if (!scripts_len || skeleton->IsInInitialState ())
+  if (!scripts_len || skeleton->IsInInitialState ()) 
   {
     next_transform = transform;
     return;
@@ -1113,77 +1110,6 @@ size_t csSkeleton::FindBoneIndex (const char* bonename)
   return csArrayItemNotFound;
 }
 
-void csSkeleton::DrawDebugBones (iGraphics3D* g3d) const
-{
-  for (size_t i = 0 ; i < bones.GetSize () ; i++)
-  {
-    iSkeletonBone *bone = bones[i];
-    const csReversibleTransform &rt = bones[i]->GetFullTransform ();
-    float length = 0.1f;
-    /*if (bone->GetChildrenCount () > 0)
-    {
-      iSkeletonBone *firstchild = bone->GetChild (0);
-      length = (firstchild->GetFullTransform ().GetOrigin () - rt.GetOrigin ()).Norm ();
-    }
-    DrawBone (g3d, length, rt);*/
-    for (size_t j = 0 ; j < bone->GetChildrenCount () ; j++)
-    {
-      iSkeletonBone *firstchild = bone->GetChild (j);
-      length = (firstchild->GetFullTransform ().GetOrigin () - rt.GetOrigin ()).Norm ();
-      DrawBone (g3d, length, rt);
-
-      csSimpleRenderMesh mesh;
-      mesh.object2world.Identity ();
-      csVector3 verts[2];
-      verts[0] = rt.GetOrigin ();
-      verts[1] = bone->GetChild (j)->GetFullTransform ().GetOrigin ();
-      csVector4 colours[2];
-      colours[0].Set (1, 0, 0, 1);
-      colours[1].Set (0, 0, 1, 1);
-      mesh.vertices = verts;
-      mesh.colors = colours;
-      mesh.vertexCount = 2;
-      mesh.meshtype = CS_MESHTYPE_LINES;
-      g3d->DrawSimpleMesh (mesh, 0);
-    }
-    if (bone->GetChildrenCount () <= 0)
-    {
-      DrawBone (g3d, 0.1f, rt);
-    }
-  }
-}
-
-void csSkeleton::DrawBone (iGraphics3D* g3d, float length, const csReversibleTransform &rt)
-{
-  csSimpleRenderMesh mesh;
-  mesh.object2world = rt;
-
-  float w = length/10;
-  csVector3 verts[16];
-  verts[0].Set (0, -w, -w);
-  verts[1].Set (0, w, -w);
-  verts[2].Set (0, -w, w);
-  verts[3].Set (0, w, w);
-  verts[4].Set (0, -w, -w);
-  verts[5].Set (0, -w, w);
-  verts[6].Set (0, w, -w);
-  verts[7].Set (0, w, w);
-
-  verts[8].Set (0, -w, -w);
-  verts[9].Set (length, 0, 0);
-  verts[10].Set (0, w, -w);
-  verts[11].Set (length, 0, 0);
-  verts[12].Set (0, -w, w);
-  verts[13].Set (length, 0, 0);
-  verts[14].Set (0, w, w);
-  verts[15].Set (length, 0, 0);
-
-  mesh.vertices = verts;
-  mesh.vertexCount = 16;
-  mesh.meshtype = CS_MESHTYPE_LINES;
-  g3d->DrawSimpleMesh (mesh, 0);
-}
-
 /*
 void csSkeleton::CreateRagdoll(iODEDynamicSystem *dyn_sys, csReversibleTransform & transform)
 {
@@ -1480,8 +1406,6 @@ bool csSkeletonGraveyard::Initialize (iObjectRegistry* object_reg)
   if (eq == 0) return false;
   evhandler.AttachNew (new csSkelEventHandler (this));
   eq->RegisterListener (evhandler, PreProcess);
-  g3d = csQueryRegistry<iGraphics3D> (object_reg);
-  if (!g3d) { puts ("ERORRR!"); return false;}
 
   return true;
 }

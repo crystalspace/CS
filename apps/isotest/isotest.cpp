@@ -23,7 +23,6 @@
 #include "csutil/cmdhelp.h"
 #include "csutil/cscolor.h"
 #include "csutil/event.h"
-#include "csutil/stringarray.h"
 #include "csutil/sysfunc.h"
 #include "iengine/camera.h"
 #include "iengine/campos.h"
@@ -55,8 +54,6 @@
 #include "ivideo/txtmgr.h"
 #include "imesh/genmesh.h"
 #include "imesh/gmeshskel2.h"
-#include "imesh/nskeleton.h"
-#include "imesh/skelanim.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -68,15 +65,9 @@ IsoTest *isotest;
 IsoTest::IsoTest (iObjectRegistry* object_reg)
 {
   IsoTest::object_reg = object_reg;
-  selboneid = 0;
-  selbone = 0;
-  skeleton = 0;
-  myskel = 0;
-  //manipmode = TRAN_ROTATE;
-  //transaxis = AXIS_Z;
 
   current_view = 0;
-  views[0].SetOrigOffset (csVector3 (-2, 2, -2)); // true isometric perspective.
+  views[0].SetOrigOffset (csVector3 (-4, 4, -4)); // true isometric perspective.
   views[1].SetOrigOffset (csVector3 (-9, 9, -9)); // zoomed out.
   views[2].SetOrigOffset (csVector3 (4, 3, -4)); // diablo style perspective.
   views[3].SetOrigOffset (csVector3 (0, 4, -4)); // zelda style perspective.
@@ -90,18 +81,14 @@ IsoTest::~IsoTest ()
 
 void IsoTest::SetupFrame ()
 {
-  if (!selbone)
-    selbone = skeleton->GetBone (selboneid);
-
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
 
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.0) * (0.03 * 90);
 
-  //if (kbd->GetModifierState (CSKEY_SHIFT_LEFT) 
-  //  || kbd->GetModifierState (CSKEY_SHIFT_RIGHT))
-  if (kbd->GetModifierState (CSKEY_SHIFT_RIGHT))
+  if (kbd->GetModifierState (CSKEY_SHIFT_LEFT) 
+    || kbd->GetModifierState (CSKEY_SHIFT_RIGHT))
   {
     if (kbd->GetKeyState (CSKEY_RIGHT))
       views[current_view].angle += speed*15.f;
@@ -113,7 +100,7 @@ void IsoTest::SetupFrame ()
       views[current_view].distance += 0.25f*speed;
     SetupIsoView(views[current_view]);
   }
-  else if (kbd->GetModifierState (CSKEY_SHIFT_LEFT))
+  else
   {
     float facing = 0.f; // in degrees
     bool moved = false;
@@ -157,6 +144,12 @@ void IsoTest::SetupFrame ()
       actor->GetMovable ()->SetTransform(r);
     }
     // update animation state
+    csRef<iGeneralMeshState> spstate (
+      scfQueryInterface<iGeneralMeshState> (actor->GetMeshObject ()));
+    csRef<iGenMeshSkeletonControlState> animcontrol (
+       
+      scfQueryInterface<iGenMeshSkeletonControlState> (spstate->GetAnimationControl ()));
+    iSkeleton* skeleton = animcontrol->GetSkeleton ();
     if(actor_is_walking && !moved)
     {
       skeleton->StopAll();
@@ -168,76 +161,6 @@ void IsoTest::SetupFrame ()
       skeleton->Execute("run");
     }
     actor_is_walking = moved;
-  }
-  else
-  {
-    if (kbd->GetKeyState (CSKEY_RIGHT))
-    {
-      selboneid++;
-      if (selboneid > myskel->GetChildrenCount () - 1)
-        selboneid = 0;
-    }
-    else if (kbd->GetKeyState (CSKEY_LEFT))
-    {
-      selboneid--;
-      if (selboneid < 0)
-        selboneid = myskel->GetChildrenCount () - 1;
-    }
-    else if (kbd->GetKeyState (CSKEY_UP))
-    {
-      Skeleton::iSkeleton::iBone* mybone = myskel->GetChild (selboneid);
-      csQuaternion rot (mybone->GetRotation ());
-      csVector3 axis;
-      float angle;
-      rot.GetAxisAngle (axis, angle);
-      rot.SetAxisAngle (axis, angle + 0.1f);
-      mybone->SetRotation (rot);
-    }
-    else if (kbd->GetKeyState (CSKEY_DOWN))
-    {
-      Skeleton::iSkeleton::iBone* mybone = myskel->GetChild (selboneid);
-      csQuaternion rot (mybone->GetRotation ());
-      csVector3 axis;
-      float angle;
-      rot.GetAxisAngle (axis, angle);
-      rot.SetAxisAngle (axis, angle - 0.1f);
-      mybone->SetRotation (rot);
-    }
-    /*bool moved = kbd->GetKeyState ('a');
-    if (kbd->GetKeyState (CSKEY_RIGHT))
-    {
-      selboneid++;
-      if (selboneid > skeleton->GetBonesCount () - 1)
-        selboneid = 0;
-      selbone = skeleton->GetBone (selboneid);
-    }
-    else if (kbd->GetKeyState (CSKEY_LEFT))
-    {
-      selboneid--;
-      if (selboneid < 0)
-        selboneid = skeleton->GetBonesCount () - 1;
-      selbone = skeleton->GetBone (selboneid);
-    }
-    else if (kbd->GetKeyState (CSKEY_UP))
-    {
-      csQuaternion &rot (selbone->GetQuaternion ());
-      csVector3 axis;
-      float angle;
-      rot.GetAxisAngle (axis, angle);
-      rot.SetAxisAngle (axis, angle + 0.1f);
-      csReversibleTransform &tr (selbone->GetTransform ());
-      tr.SetO2T (csMatrix3 (rot));
-    }
-    else if (kbd->GetKeyState (CSKEY_DOWN))
-    {
-      csQuaternion &rot (selbone->GetQuaternion ());
-      csVector3 axis;
-      float angle;
-      rot.GetAxisAngle (axis, angle);
-      rot.SetAxisAngle (axis, angle - 0.1f);
-      csReversibleTransform &tr (selbone->GetTransform ());
-      tr.SetO2T (csMatrix3 (rot));
-    }*/
   }
 
   // Make sure actor is constant distance above plane.
@@ -254,7 +177,7 @@ void IsoTest::SetupFrame ()
   // Move the light.
   actor_light->SetCenter (actor_pos+csVector3 (0, 2, -1));
 
-  CameraIsoLookat(view->GetCamera(), views[current_view], actor_pos);
+  CameraIsoLookat(view->GetCamera(), views[current_view], actor_pos); 
   
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
@@ -263,130 +186,21 @@ void IsoTest::SetupFrame ()
   // Tell the camera to render into the frame buffer.
   view->Draw ();
 
-  //DrawBone (1.0f, g3d);
-  //puts ("DrawDebugBones");
-  //skeleton->DrawDebugBones (g3d);
-  //myskel->Update (vc->GetCurrentTicks () - last_time);
-  last_time = vc->GetCurrentTicks ();
-  //skelgrave->Debug ();
-  myskel->DrawDebugBones (g3d);
-
-  /*bool error = false;
-  for (size_t i = 0; i < myskel->GetChildrenCount (); i++)
-  {
-    const Skeleton::iSkeleton::iBone* b = myskel->GetChild (i);
-    iSkeletonBone *bo = skeleton->GetBone (i);
-    if (!bo)
-      printf ("Erroroman skeleton is missing bone '%s'!\n", b->GetFactory ()->GetName ());
-    const csQuaternion &q (b->GetRotation ()), &q0 (bo->GetQuaternion ());
-    if (!(q.v - q0.v).IsZero () || q.w != q0.w)
-    {
-      printf ("Bones '%s' and Erroroman's bone '%s' have differing rotations!\n", b->GetFactory ()->GetName (), bo->GetName ());
-      csQuaternion q = b->GetRotation ();
-      printf ("Mine:       (%f, %f, %f, %f)\n", q.v.x, q.v.y, q.v.z, q.w);
-      q = bo->GetQuaternion ();
-      printf ("Erroromans: (%f, %f, %f, %f)\n", q.v.x, q.v.y, q.v.z, q.w);
-      error = true;
-    }
-    const csVector3 &p (b->GetPosition ()), &p0 (bo->GetTransform ().GetOrigin ());
-    if (!(p - p0).IsZero ())
-    {
-      printf ("Bones '%s' and Erroroman's bone '%s' have differing positions!\n", b->GetFactory ()->GetName (), bo->GetName ());
-      printf ("Mine:       (%f, %f, %f)\n", p.x, p.y, p.z);
-      printf ("Erroromans: (%f, %f, %f)\n", p0.x, p0.y, p0.z);
-      error = true;
-    }
-    const csReversibleTransform &t (b->GetTransform ()), &to (bo->GetFullTransform ());
-    if (!(t.GetOrigin () - to.GetOrigin ()).IsZero ())
-    {
-      printf ("Bones '%s' and Erroroman's bone '%s' have differing transform origins!\n", b->GetFactory ()->GetName (), bo->GetName ());
-      const csVector3 &d (t.GetOrigin ()), &d0 (to.GetOrigin ());
-      printf ("Mine:       (%f, %f, %f)\n", d.x, d.y, d.z);
-      printf ("Erroromans: (%f, %f, %f)\n", d0.x, d0.y, d0.z);
-      error = true;
-    }
-    if (false && t.GetO2T () != to.GetO2T ())
-    {
-      printf ("Bones '%s' and Erroroman's bone '%s' have differing transform matrices!\n", b->GetFactory ()->GetName (), bo->GetName ());
-      csQuaternion q;
-      q.SetMatrix (t.GetO2T());
-      printf ("Mine:       (%f, %f, %f, %f)\n", q.v.x, q.v.y, q.v.z, q.w);
-      q.SetMatrix (to.GetO2T());
-      printf ("Erroromans: (%f, %f, %f, %f)\n", q.v.x, q.v.y, q.v.z, q.w);
-      error = true;
-    }
-  }
-  if (error)
-    exit (-1);*/
-
   if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS))
     return;
 
   csVector2 lpos(0,0);
   lpos = view->GetCamera()->Perspective(
     view->GetCamera()->GetTransform ().Other2This(csVector3 (-4.7f, 1.0f, 5.5f)));
-
-  /*csQuaternion rot (selbone->GetQuaternion ());
-  csVector3 pos (selbone->GetTransform ().GetOrigin ());
-  csString line (selbone->GetName ());*/
-  const Skeleton::iSkeleton::iBone* mybone = myskel->GetChild (selboneid);
-  csQuaternion rot (mybone->GetRotation ());
-  csVector3 pos (mybone->GetPosition ());
-  csString line (mybone->GetFactory ()->GetName ());
-
-  line += ", ";
-  line += selboneid;
-
-  csStringArray text;
-  text.Push (line);
-
-  line = "  rx: ";
-  line += rot.v.x;
-  text.Push (line);
-
-  line = "  ry: ";
-  line += rot.v.y;
-  text.Push (line);
-
-  line = "  rz: ";
-  line += rot.v.z;
-  text.Push (line);
-
-  line = "  rw: ";
-  line += rot.w;
-  text.Push (line);
-
-  text.Push ("");
-
-  line = "  vx: ";
-  line += pos.x;
-  text.Push (line);
-
-  line = "  vy: ";
-  line += pos.y;
-  text.Push (line);
-
-  line = "  vz: ";
-  line += pos.z;
-  text.Push (line);
-
+  // display a helpful little text.
   int txtw=0, txth=0;
   font->GetMaxSize(txtw, txth);
   if(txth == -1) txth = 20;
   int white = g3d->GetDriver2D ()->FindRGB (255, 255, 255);
-  int ypos = g3d->GetDriver2D ()->GetHeight () - txth*text.GetSize () - 1;
-  for (size_t i = 0; i < text.GetSize (); i++)
-  {
-    const csString &str = text.Get (i);
-    g3d->GetDriver2D ()->Write (font, 1, ypos, white, -1, str.GetData ());
-    ypos += txth;
-  }
-
-  // display a helpful little text.
-  //g3d->GetDriver2D ()->DrawBox((int)lpos.x-2,
-  //  g3d->GetDriver2D ()->GetHeight()-(int)lpos.y-2,4,4,white);
-
-  /*g3d->GetDriver2D ()->Write (font, 1, ypos, white, -1,
+  g3d->GetDriver2D ()->DrawBox((int)lpos.x-2,
+    g3d->GetDriver2D ()->GetHeight()-(int)lpos.y-2,4,4,white);
+  int ypos = g3d->GetDriver2D ()->GetHeight () - txth*4 - 1;
+  g3d->GetDriver2D ()->Write (font, 1, ypos, white, -1, 
     "Isometric demo keys (esc to exit):");
   ypos += txth;
   g3d->GetDriver2D ()->Write (font, 1, ypos, white, -1, 
@@ -396,38 +210,7 @@ void IsoTest::SetupFrame ()
     "   shift+arrow keys: rotate/zoom camera");
   ypos += txth;
   g3d->GetDriver2D ()->Write (font, 1, ypos, white, -1, 
-    "   tab key: cycle through camera presets");*/
-}
-
-void IsoTest::DrawBone (float length, iGraphics3D* g3d)
-{
-  csSimpleRenderMesh mesh;
-  mesh.object2world.Identity();
-
-  float w = length/10;
-  csVector3 verts[16];
-  verts[0].Set (-w, 0, -w);
-  verts[1].Set (w, 0, -w);
-  verts[2].Set (-w, 0, w);
-  verts[3].Set (w, 0, w);
-  verts[4].Set (-w, 0, -w);
-  verts[5].Set (-w, 0, w);
-  verts[6].Set (w, 0, -w);
-  verts[7].Set (w, 0, w);
-
-  verts[8].Set (-w, 0, -w);
-  verts[9].Set (0, length, 0);
-  verts[10].Set (w, 0, -w);
-  verts[11].Set (0, length, 0);
-  verts[12].Set (-w, 0, w);
-  verts[13].Set (0, length, 0);
-  verts[14].Set (w, 0, w);
-  verts[15].Set (0, length, 0);
-
-  mesh.vertices = verts;
-  mesh.vertexCount = 16;
-  mesh.meshtype = CS_MESHTYPE_LINES;
-  g3d->DrawSimpleMesh (mesh, 0);
+    "   tab key: cycle through camera presets");
 }
 
 void IsoTest::FinishFrame ()
@@ -455,27 +238,13 @@ bool IsoTest::HandleEvent (iEvent& ev)
     {
       csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
       if (q)
-        q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
+	q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
       return true;
     }
     else if (c == CSKEY_TAB)
     {
       current_view++;
       if (current_view >= 4) current_view = 0;
-    }
-    else if (c == 'a')
-    {
-      csRef<iGeneralMeshState> spstate (
-        scfQueryInterface<iGeneralMeshState> (actor->GetMeshObject ()));
-      csRef<iGenMeshSkeletonControlState> animcontrol (
-        scfQueryInterface<iGenMeshSkeletonControlState> (spstate->GetAnimationControl ()));
-      iSkeleton* skeleton = animcontrol->GetSkeleton ();
-      //skeleton->StopAll();
-      skeleton->Execute("wave", 1.0f);
-    }
-    else if (c == 'q')
-    {
-      myskel->Update (30.0f);
     }
   }
 
@@ -570,7 +339,7 @@ bool IsoTest::LoadMap ()
   view->GetCamera ()->GetTransform ().SetOrigin (pos);
 
   iLightList* ll = room->GetLights ();
-  actor_light = engine->CreateLight (0, csVector3 (1, 5, -1), 5,
+  actor_light = engine->CreateLight (0, csVector3 (-3, 5, 0), 5,
     csColor (1, 1, 1));
   ll->Add (actor_light);
 
@@ -586,204 +355,41 @@ bool IsoTest::LoadMap ()
 
 bool IsoTest::CreateActor ()
 {
-  bool load_kirchdorfer = true;
-
   csRef<iVFS> vfs (csQueryRegistry<iVFS> (object_reg));
   vfs->PushDir ();
-  if (load_kirchdorfer)
+  vfs->ChDir ("/lib/kwartz");
+  if (!loader->LoadLibraryFile ("kwartz.lib"))
   {
-    vfs->ChDir ("/lib/kirchdorfer");
-    if (!loader->LoadLibraryFile ("library"))
-    {
-      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-          "crystalspace.application.isotest",
-          "Error loading kirchdorfer!");
-      return false;
-    }
-  }
-  else
-  {
-    vfs->ChDir ("/lib/kwartz");
-    if (!loader->LoadLibraryFile ("kwartz.lib"))
-    {
-      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-          "crystalspace.application.isotest",
-          "Error loading kwartz!");
-      return false;
-    }
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+        "crystalspace.application.isotest",
+        "Error loading kwartz!");
+    return false;
   }
   vfs->PopDir ();
 
-  iMeshFactoryWrapper* imeshfact;
-  if (load_kirchdorfer)
-  {
-    imeshfact = engine->FindMeshFactory ("genkirchdorfer");
-    if (!imeshfact)
-    {
-      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-          "crystalspace.application.isotest",
-          "Error finding kirchdorfer factory!");
-      return false;
-    }
-  }
-  else
-  {
-    imeshfact = engine->FindMeshFactory ("kwartz_fact");
-    if (!imeshfact)
-    {
-      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-          "crystalspace.application.isotest",
-          "Error finding kwartz factory!");
-      return false;
-    }
-  }
+  iMeshFactoryWrapper* imeshfact = engine->FindMeshFactory ("kwartz_fact");
 
   //csMatrix3 m; m.Identity ();
   //imeshfact->HardTransform (csReversibleTransform (m, csVector3 (0, -1, 0)));
 
   // Create the sprite and add it to the engine.
   actor = engine->CreateMeshWrapper (
-    imeshfact, "MySprite", room, csVector3 (1, 1, -1));
+    imeshfact, "MySprite", room, csVector3 (-3, 1, 3));
   actor->GetMovable ()->UpdateMove ();
   csRef<iGeneralMeshState> spstate (
     scfQueryInterface<iGeneralMeshState> (actor->GetMeshObject ()));
   csRef<iGenMeshSkeletonControlState> animcontrol (
      
     scfQueryInterface<iGenMeshSkeletonControlState> (spstate->GetAnimationControl ()));
-  skeleton = animcontrol->GetSkeleton ();
-  skeleton->StopAll();
-  skeleton->Execute("idle");
+  iSkeleton* skel = animcontrol->GetSkeleton ();
+  skel->StopAll();
+  skel->Execute("idle");
 
   // The following two calls are not needed since CS_ZBUF_USE and
   // Object render priority are the default but they show how you
   // can do this.
   actor->SetZBufMode (CS_ZBUF_USE);
   actor->SetRenderPriority (engine->GetObjectRenderPriority ());
-
-  Skeleton::iSkeletonFactory *s = skelgrave->CreateFactory ("amir");
-
-  /*Skeleton::iSkeletonFactory::iBoneFactory *b[3];
-  b[0] = s->CreateBoneFactory ("thigh");
-  b[1] = s->CreateBoneFactory ("shin");
-  b[2] = s->CreateBoneFactory ("foot");
-
-  b[0]->AddChild (b[1]);
-  b[1]->AddChild (b[2]);
-
-  b[0]->SetDefaultRotation (csQuaternion (1.1f, 2.1f, 3.1415926535f, 4.0f));
-  b[1]->SetDefaultRotation (csQuaternion (4.0f, 4.1f, 4.3f, 4.1001f));
-  b[2]->SetDefaultRotation (csQuaternion (6.0f, 6.1f, 6.3f, 6.1001f));
-
-  b[0]->SetDefaultPosition (csVector3 (1.9f, 2.9f, 3.999991415926535f));
-  b[1]->SetDefaultPosition (csVector3 (4.9f, 4.19f, 4.93f));
-  b[2]->SetDefaultPosition (csVector3 (6.9f, 6.19f, 6.93f));*/
-
-  // create the static root bone
-  Skeleton::iSkeletonFactory::iBoneFactory *srb;
-  if (load_kirchdorfer)
-  {
-    srb = s->CreateBoneFactory ("StaticRootBone");
-    srb->SetRotation (csQuaternion ());
-    srb->SetPosition (csVector3 (0));
-  }
-
-  iSkeletonFactory* hrf = skeleton->GetFactory ();
-  // create the bones
-  for (size_t i = 0; i < hrf->GetBonesCount (); i++)
-  {
-    iSkeletonBoneFactory* hbf = hrf->GetBone (i);
-    Skeleton::iSkeletonFactory::iBoneFactory *b = s->CreateBoneFactory (hbf->GetName ());
-    csReversibleTransform &hrt = hbf->GetTransform ();
-    csQuaternion rot_quat;
-    rot_quat.SetMatrix (hrt.GetO2T());
-    b->SetRotation (rot_quat);
-    b->SetPosition (hrt.GetOrigin ());
-  }
-  // do the parenting now we know all bones are created
-  for (size_t i = 0; i < hrf->GetBonesCount (); i++)
-  {
-    iSkeletonBoneFactory* hbf = hrf->GetBone (i);
-    Skeleton::iSkeletonFactory::iBoneFactory *b = s->FindBoneFactoryByName (hbf->GetName ());
-    // hack for making SRB
-    if (load_kirchdorfer)
-    {
-      if (!strcmp (hbf->GetName (), "Neck") || !strcmp (hbf->GetName (), "Arm.R") || !strcmp (hbf->GetName (), "Arm.L"))
-      {
-        srb->AddChild (b);
-      }
-    }
-    for (size_t j = 0; j < hbf->GetChildrenCount (); j++)
-    {
-      iSkeletonBoneFactory *hrchild = hbf->GetChild (j);
-      Skeleton::iSkeletonFactory::iBoneFactory *c = s->FindBoneFactoryByName (hrchild->GetName ());
-      b->AddChild (c);
-    }
-  }
-  s->SetRootBone (0);
-
-  myskel = skelgrave->CreateSkeleton ("taki", "amir");
-  skelgrave->Debug ();
-
-  if (load_kirchdorfer)
-  {
-    if (!LoadKirchdorferAnim ())
-      return false;
-  }
-  else
-  {
-    if (!LoadKwartzAnim ())
-      return false;
-  }
-
-  if (load_kirchdorfer)
-  {
-  csRef<Skeleton::Animation::iAnimationFactoryLayer> animfactlay = myskel->GetFactory ()->GetAnimationFactoryLayer ();
-  csRef<Skeleton::Animation::iAnimationLayer> animlay = myskel->GetAnimationLayer ();
-
-  csRef<Skeleton::Animation::iAnimationFactory> animfact_run = animfactlay->FindAnimationFactoryByName ("run");
-  csRef<Skeleton::Animation::iAnimation> anim_run = animfact_run->CreateAnimation ();
-
-  csRef<Skeleton::Animation::iAnimationFactory> animfact_idle = animfactlay->FindAnimationFactoryByName ("idle");
-  csRef<Skeleton::Animation::iAnimation> anim_idle = animfact_idle->CreateAnimation ();
-  anim_idle->SetPlayCount (-1);
-  anim_idle->SetPlaySpeed (10.0f);
-
-  csRef<Skeleton::Animation::iAnimationFactory> animfact_wave = animfactlay->FindAnimationFactoryByName ("wave");
-  csRef<Skeleton::Animation::iAnimation> anim_wave = animfact_wave->CreateAnimation ();
-
-  csRef<Skeleton::Animation::iBlendNode> blend = animlay->CreateBlendNode ();
-  csRef<Skeleton::Animation::iMixingNode> animmix;
-  animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (anim_run);
-  blend->AddNode (1.0f, animmix);
-  animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (anim_idle);
-  blend->AddNode (4.0f, animmix);
-
-  animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (blend);
-
-  csRef<Skeleton::Animation::iOverwriteNode> overwrite = animlay->CreateOverwriteNode ();
-  animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (blend);
-  overwrite->AddNode (animmix);
-  animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (anim_wave);
-  overwrite->AddNode (animmix);
-
-  animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (overwrite);
-  animlay->SetRootMixingNode (animmix);
-  }
-  else
-  {
-  csRef<Skeleton::Animation::iAnimationFactoryLayer> animfactlay = myskel->GetFactory ()->GetAnimationFactoryLayer ();
-  csRef<Skeleton::Animation::iAnimationLayer> animlay = myskel->GetAnimationLayer ();
-
-  csRef<Skeleton::Animation::iAnimationFactory> animfact_run = animfactlay->FindAnimationFactoryByName ("run");
-  csRef<Skeleton::Animation::iAnimation> anim_run = animfact_run->CreateAnimation ();
-  anim_run->SetPlaySpeed (1.0f);
-  anim_run->SetPlayCount (-1);
-
-  csRef<Skeleton::Animation::iMixingNode> animmix;
-  animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (anim_run);
-  animlay->SetRootMixingNode (animmix);
-  }
-
   return true;
 }
 
@@ -800,7 +406,6 @@ bool IsoTest::Initialize ()
 	"crystalspace.font.server.default", "iFontServer.2", 
 	  scfInterfaceTraits<iFontServer>::GetID(), 
 	  scfInterfaceTraits<iFontServer>::GetVersion(),
-	CS_REQUEST_PLUGIN("crystalspace.nskeleton.graveyard", Skeleton::iGraveyard),
 	CS_REQUEST_FONTSERVER,
 	CS_REQUEST_IMAGELOADER,
 	CS_REQUEST_LEVELLOADER,
@@ -846,16 +451,6 @@ bool IsoTest::Initialize ()
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.isotest",
 	"Can't find the virtual clock!");
-    return false;
-  }
-  last_time = vc->GetCurrentTicks ();
-
-  skelgrave = csQueryRegistry<Skeleton::iGraveyard> (object_reg);
-  if (!skelgrave)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.isotest",
-	"Can't find the graveyard!");
     return false;
   }
 

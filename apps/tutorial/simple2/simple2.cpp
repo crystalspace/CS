@@ -87,49 +87,12 @@ void Simple::ProcessFrame ()
   csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
   c->SetTransform (ot);
 
+  // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
     return;
 
   // Tell the camera to render into the frame buffer.
   view->Draw ();
-
-  DrawBone (1.0f);
-
-  if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS))
-    return;
-
-  g3d->DrawLine (csVector3 (-5, 0, -5), csVector3 (5, 20, 5), 10, 0xff0000);
-}
-
-void Simple::DrawBone (float length)
-{
-  csSimpleRenderMesh mesh;
-  mesh.object2world.Identity();
-
-  float w = length/10;
-  csVector3 verts[16];
-  verts[0].Set (-w, 0, -w);
-  verts[1].Set (w, 0, -w);
-  verts[2].Set (-w, 0, w);
-  verts[3].Set (w, 0, w);
-  verts[4].Set (-w, 0, -w);
-  verts[5].Set (-w, 0, w);
-  verts[6].Set (w, 0, -w);
-  verts[7].Set (w, 0, w);
-
-  verts[8].Set (-w, 0, -w);
-  verts[9].Set (0, length, 0);
-  verts[10].Set (w, 0, -w);
-  verts[11].Set (0, length, 0);
-  verts[12].Set (-w, 0, w);
-  verts[13].Set (0, length, 0);
-  verts[14].Set (w, 0, w);
-  verts[15].Set (0, length, 0);
-
-  mesh.vertices = verts;
-  mesh.vertexCount = 16;
-  mesh.meshtype = CS_MESHTYPE_LINES;
-  g3d->DrawSimpleMesh (mesh, 0);
 }
 
 void Simple::FinishFrame ()

@@ -81,7 +81,6 @@ public:
   void UpdateTransform();
   void FireCallback() 
   { if (cb) cb->UpdateTransform(this, next_transform); }
-  //}
 
   //------------------------------------------------------------------------
 
@@ -604,13 +603,10 @@ private:
   void UpdateBones ();
   void UpdateSockets ();
 
-  static void DrawBone (iGraphics3D* g3d, float length, const csReversibleTransform &rt);
 public:
 
   iSkeletonAnimationCallback *GetScriptCallback() 
   { return script_callback; }
-
-  void DrawDebugBones (iGraphics3D* g3d) const;
 
   bool UpdateAnimation (csTicks current);
 
@@ -757,7 +753,6 @@ class csSkeletonGraveyard :
 private:
   iObjectRegistry* object_reg;
   csRef<iVirtualClock> vc;
-  csRef<iGraphics3D> g3d;
   csRefArray<csSkeletonFactory> factories;
   csRefArray<iSkeleton> skeletons;
   csEventID PreProcess;

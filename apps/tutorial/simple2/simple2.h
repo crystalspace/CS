@@ -80,11 +80,6 @@ private:
   /// Here we will create our little, simple world.
   void CreateRoom ();
 
-  /**
-   * Draw a cool looking bone like in Blender.
-   */
-  void DrawBone (float length);
-
   /// Here we will create our sprites.
   void CreateSprites();
 
