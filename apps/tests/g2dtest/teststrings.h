@@ -7,8 +7,7 @@
 const char* quickBrownFox[] =
 {
   "The quick brown fox jumps over the lazy dog.", "English",
-  "Falsches \xC3\x9C" "ben von Xylophonmusik qu\xC3\xA4lt "
-    "jeden gr\xC3\xB6\xC3\x9F" "eren Zwerg.", "German",
+  "\xdb\x8c\xd8\xb3\xd9\x86\xd8\xa7\xd8\xb3\xdb\x8c\xd9\x86\xd8\xa7\xdb\x8c\xd9\x86", "Persian",
   "Flygande b\xC3\xA4" "ckasiner s\xC3\xB6ka strax hwila p\xC3\xA5 mjuka tuvor.",
     "Swedish",
   "P\xC5\x99\xC3\xADli\xC5\xA1 \xC5\xBElu\xC5\xA5ou\xC4\x8Dk\xC3\xBD "

@@ -1,0 +1,812 @@
+animfact = animfactlay->CreateAnimationFactory ();
+animfact->SetName ("idle");
+animchan = animfactlay->CreateAnimationFactoryChannel ();
+boneid = myskel->FindBoneIDByName ("Claw.L");
+if (boneid < 0)
+{
+  csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      "crystalspace.application.isotest",
+      "Error finding bone id for '%s'!", "Claw.L");
+  return false;
+}
+animchan->SetID (boneid);
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( -2.37422369753e-08 );
+m *= csZRotMatrix3 ( 6.1367616525e-07 );
+m *= csYRotMatrix3 ( 0.263053803252 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (0.000000f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (4.7473096564900001e-09, -2.30350745531e-14, 3.0184445381199998) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( -2.37422369753e-08 );
+m *= csZRotMatrix3 ( 6.1367616525e-07 );
+m *= csYRotMatrix3 ( 0.263053803252 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (833.333333f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (4.7473096564900001e-09, -2.30350745531e-14, 3.0184445381199998) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( -2.37422369753e-08 );
+m *= csZRotMatrix3 ( 6.1367616525e-07 );
+m *= csYRotMatrix3 ( 0.263053803252 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (1666.666667f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (4.7473096564900001e-09, -2.30350745531e-14, 3.0184445381199998) ));
+}
+animfact->AddChannel (animchan);
+animfact->SetAnimationLength ( 1666.66666667 );
+animchan = animfactlay->CreateAnimationFactoryChannel ();
+boneid = myskel->FindBoneIDByName ("Head");
+if (boneid < 0)
+{
+  csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      "crystalspace.application.isotest",
+      "Error finding bone id for '%s'!", "Head");
+  return false;
+}
+animchan->SetID (boneid);
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 0.613911628169 );
+m *= csZRotMatrix3 ( -2.27501048122e-14 );
+m *= csYRotMatrix3 ( -7.04383388014e-08 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (0.000000f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (8.4655961465500003e-16, 9.8908436996200003e-10, 3.03747415543) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 0.430399322722 );
+m *= csZRotMatrix3 ( -2.19236245491e-14 );
+m *= csYRotMatrix3 ( -7.04383388014e-08 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (833.333333f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (4.1677468428999999e-15, -3.7781333617199998e-11, 3.03747415543) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 0.613911628169 );
+m *= csZRotMatrix3 ( -2.27501048122e-14 );
+m *= csYRotMatrix3 ( -7.04383388014e-08 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (1666.666667f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (8.4655961465500003e-16, 9.8908436996200003e-10, 3.03747415543) ));
+}
+animfact->AddChannel (animchan);
+animfact->SetAnimationLength ( 1666.66666667 );
+animchan = animfactlay->CreateAnimationFactoryChannel ();
+boneid = myskel->FindBoneIDByName ("Neck");
+if (boneid < 0)
+{
+  csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      "crystalspace.application.isotest",
+      "Error finding bone id for '%s'!", "Neck");
+  return false;
+}
+animchan->SetID (boneid);
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 1.60839696559 );
+m *= csZRotMatrix3 ( 7.03885351396e-08 );
+m *= csYRotMatrix3 ( -2.64790121833e-09 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (0.000000f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (0.0, 0.0, 0.0) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 1.48862302662 );
+m *= csZRotMatrix3 ( 7.02006463609e-08 );
+m *= csYRotMatrix3 ( 5.78163765381e-09 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (833.333333f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (0.0, 0.0, 0.0) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 1.60839696559 );
+m *= csZRotMatrix3 ( 7.03885351396e-08 );
+m *= csYRotMatrix3 ( -2.64790121833e-09 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (1666.666667f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (0.0, 0.0, 0.0) ));
+}
+animfact->AddChannel (animchan);
+animfact->SetAnimationLength ( 1666.66666667 );
+animchan = animfactlay->CreateAnimationFactoryChannel ();
+boneid = myskel->FindBoneIDByName ("Arm.R");
+if (boneid < 0)
+{
+  csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      "crystalspace.application.isotest",
+      "Error finding bone id for '%s'!", "Arm.R");
+  return false;
+}
+animchan->SetID (boneid);
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 2.01049977713e-07 );
+m *= csZRotMatrix3 ( -1.56286484563e-06 );
+m *= csYRotMatrix3 ( -1.44310507622 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (0.000000f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (0.0, 0.0, 0.0) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 2.01049977713e-07 );
+m *= csZRotMatrix3 ( -1.56286484563e-06 );
+m *= csYRotMatrix3 ( -1.44310507622 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (833.333333f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (0.0, 0.0, 0.0) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 2.01049977713e-07 );
+m *= csZRotMatrix3 ( -1.56286484563e-06 );
+m *= csYRotMatrix3 ( -1.44310507622 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (1666.666667f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (0.0, 0.0, 0.0) ));
+}
+animfact->AddChannel (animchan);
+animfact->SetAnimationLength ( 1666.66666667 );
+animchan = animfactlay->CreateAnimationFactoryChannel ();
+boneid = myskel->FindBoneIDByName ("Arm.L");
+if (boneid < 0)
+{
+  csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      "crystalspace.application.isotest",
+      "Error finding bone id for '%s'!", "Arm.L");
+  return false;
+}
+animchan->SetID (boneid);
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 8.26110283825e-08 );
+m *= csZRotMatrix3 ( 6.59670017587e-07 );
+m *= csYRotMatrix3 ( 1.44310494306 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (0.000000f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (0.0, 0.0, 0.0) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 8.26110283825e-08 );
+m *= csZRotMatrix3 ( 6.59670017587e-07 );
+m *= csYRotMatrix3 ( 1.44310494306 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (833.333333f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (0.0, 0.0, 0.0) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 8.26110283825e-08 );
+m *= csZRotMatrix3 ( 6.59670017587e-07 );
+m *= csYRotMatrix3 ( 1.44310494306 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (1666.666667f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (0.0, 0.0, 0.0) ));
+}
+animfact->AddChannel (animchan);
+animfact->SetAnimationLength ( 1666.66666667 );
+animchan = animfactlay->CreateAnimationFactoryChannel ();
+boneid = myskel->FindBoneIDByName ("Claw.R");
+if (boneid < 0)
+{
+  csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      "crystalspace.application.isotest",
+      "Error finding bone id for '%s'!", "Claw.R");
+  return false;
+}
+animchan->SetID (boneid);
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( -2.25998683594e-07 );
+m *= csZRotMatrix3 ( -3.14159052306 );
+m *= csYRotMatrix3 ( -0.263053869831 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (0.000000f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (1.1396327437299999e-08, 8.6119982740700007e-15, 3.0184445381199998) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( -2.25998683594e-07 );
+m *= csZRotMatrix3 ( -3.14159052306 );
+m *= csYRotMatrix3 ( -0.263053869831 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (833.333333f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (1.1396327437299999e-08, 8.6119982740700007e-15, 3.0184445381199998) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( -2.25998683594e-07 );
+m *= csZRotMatrix3 ( -3.14159052306 );
+m *= csYRotMatrix3 ( -0.263053869831 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (1666.666667f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (1.1396327437299999e-08, 8.6119982740700007e-15, 3.0184445381199998) ));
+}
+animfact->AddChannel (animchan);
+animfact->SetAnimationLength ( 1666.66666667 );
+animfact = animfactlay->CreateAnimationFactory ();
+animfact->SetName ("run");
+animchan = animfactlay->CreateAnimationFactoryChannel ();
+boneid = myskel->FindBoneIDByName ("Claw.L");
+if (boneid < 0)
+{
+  csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      "crystalspace.application.isotest",
+      "Error finding bone id for '%s'!", "Claw.L");
+  return false;
+}
+animchan->SetID (boneid);
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( -0.8346833549 );
+m *= csZRotMatrix3 ( -0.100591297831 );
+m *= csYRotMatrix3 ( 0.218423384571 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (0.000000f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (-8.3964074803999995e-08, -9.4302713193900002e-08, 3.0184442997000001) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( -0.8346833549 );
+m *= csZRotMatrix3 ( -0.100591306153 );
+m *= csYRotMatrix3 ( 0.218423367926 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (416.666667f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (1.16192850896e-08, -3.8299596383199997e-08, 3.0184445381199998) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( -0.8346833549 );
+m *= csZRotMatrix3 ( -0.100591289508 );
+m *= csYRotMatrix3 ( 0.218423401216 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (1250.000000f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (4.9353026554399998e-08, 5.74881227067e-08, 3.01844477654) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( -0.729982907698 );
+m *= csZRotMatrix3 ( -0.11954648837 );
+m *= csYRotMatrix3 ( 0.215538298938 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (1666.666667f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (-4.4863497805599999e-08, -9.9173433909499996e-09, 3.0184445381199998) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( -0.8346833549 );
+m *= csZRotMatrix3 ( -0.100591297831 );
+m *= csYRotMatrix3 ( 0.218423384571 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (2500.000000f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (-8.3964074803999995e-08, -9.4302713193900002e-08, 3.0184442997000001) ));
+}
+animfact->AddChannel (animchan);
+animfact->SetAnimationLength ( 2500.0 );
+animchan = animfactlay->CreateAnimationFactoryChannel ();
+boneid = myskel->FindBoneIDByName ("Head");
+if (boneid < 0)
+{
+  csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      "crystalspace.application.isotest",
+      "Error finding bone id for '%s'!", "Head");
+  return false;
+}
+animchan->SetID (boneid);
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 0.619800676287 );
+m *= csZRotMatrix3 ( -2.0566504605e-14 );
+m *= csYRotMatrix3 ( -7.04383388014e-08 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (0.000000f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (-5.4508823263500001e-15, 1.93990388198e-08, 3.0374743938400002) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 0.619800676287 );
+m *= csZRotMatrix3 ( -2.0566504605e-14 );
+m *= csYRotMatrix3 ( -7.04383388014e-08 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (416.666667f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (-5.4508823263500001e-15, 1.93990388198e-08, 3.0374743938400002) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 0.619800676287 );
+m *= csZRotMatrix3 ( -2.0566504605e-14 );
+m *= csYRotMatrix3 ( -7.04383388014e-08 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (1250.000000f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (-5.4508823263500001e-15, 1.93990388198e-08, 3.0374743938400002) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 0.619800676287 );
+m *= csZRotMatrix3 ( -2.0566504605e-14 );
+m *= csYRotMatrix3 ( -7.04383388014e-08 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (1666.666667f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (-5.4508823263500001e-15, 1.93990388198e-08, 3.0374743938400002) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 0.619800676287 );
+m *= csZRotMatrix3 ( -2.0566504605e-14 );
+m *= csYRotMatrix3 ( -7.04383388014e-08 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (2500.000000f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (-5.4508823263500001e-15, 1.93990388198e-08, 3.0374743938400002) ));
+}
+animfact->AddChannel (animchan);
+animfact->SetAnimationLength ( 2500.0 );
+animchan = animfactlay->CreateAnimationFactoryChannel ();
+boneid = myskel->FindBoneIDByName ("Neck");
+if (boneid < 0)
+{
+  csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      "crystalspace.application.isotest",
+      "Error finding bone id for '%s'!", "Neck");
+  return false;
+}
+animchan->SetID (boneid);
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 1.4011503022 );
+m *= csZRotMatrix3 ( 6.94271617612e-08 );
+m *= csYRotMatrix3 ( 1.18923406018e-08 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (0.000000f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (0.0, 0.0, 0.0) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 1.4011503022 );
+m *= csZRotMatrix3 ( 6.94271617612e-08 );
+m *= csYRotMatrix3 ( 1.18923406018e-08 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (416.666667f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (0.0, 0.0, 0.0) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 1.4011503022 );
+m *= csZRotMatrix3 ( 6.94271617612e-08 );
+m *= csYRotMatrix3 ( 1.18923406018e-08 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (1250.000000f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (0.0, 0.0, 0.0) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 1.4011503022 );
+m *= csZRotMatrix3 ( 6.94271617612e-08 );
+m *= csYRotMatrix3 ( 1.18923406018e-08 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (1666.666667f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (0.0, 0.0, 0.0) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 1.4011503022 );
+m *= csZRotMatrix3 ( 6.94271617612e-08 );
+m *= csYRotMatrix3 ( 1.18923406018e-08 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (2500.000000f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (0.0, 0.0, 0.0) ));
+}
+animfact->AddChannel (animchan);
+animfact->SetAnimationLength ( 2500.0 );
+animchan = animfactlay->CreateAnimationFactoryChannel ();
+boneid = myskel->FindBoneIDByName ("Arm.R");
+if (boneid < 0)
+{
+  csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      "crystalspace.application.isotest",
+      "Error finding bone id for '%s'!", "Arm.R");
+  return false;
+}
+animchan->SetID (boneid);
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 0.508424516471 );
+m *= csZRotMatrix3 ( 0.0624178338875 );
+m *= csYRotMatrix3 ( -1.02359734999 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (0.000000f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (0.0, 0.0, 0.0) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 0.678096606759 );
+m *= csZRotMatrix3 ( 0.122817466044 );
+m *= csYRotMatrix3 ( -1.23610994839 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (416.666667f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (0.0, 0.0, 0.0) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 0.508424483181 );
+m *= csZRotMatrix3 ( 0.062417800598 );
+m *= csYRotMatrix3 ( -1.90281315253 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (1250.000000f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (0.0, 0.0, 0.0) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 0.50823699664 );
+m *= csZRotMatrix3 ( 0.0624165772084 );
+m *= csYRotMatrix3 ( -1.69306298455 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (1666.666667f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (0.0, 0.0, 0.0) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 0.508424516471 );
+m *= csZRotMatrix3 ( 0.0624178338875 );
+m *= csYRotMatrix3 ( -1.02359734999 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (2500.000000f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (0.0, 0.0, 0.0) ));
+}
+animfact->AddChannel (animchan);
+animfact->SetAnimationLength ( 2500.0 );
+animchan = animfactlay->CreateAnimationFactoryChannel ();
+boneid = myskel->FindBoneIDByName ("Arm.L");
+if (boneid < 0)
+{
+  csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      "crystalspace.application.isotest",
+      "Error finding bone id for '%s'!", "Arm.L");
+  return false;
+}
+animchan->SetID (boneid);
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 0.469190194791 );
+m *= csZRotMatrix3 ( -0.0579876154799 );
+m *= csYRotMatrix3 ( 1.86366308661 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (0.000000f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (0.0, 0.0, 0.0) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 0.464002356987 );
+m *= csZRotMatrix3 ( -0.0584435486585 );
+m *= csYRotMatrix3 ( 1.64222736724 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (416.666667f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (0.0, 0.0, 0.0) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 0.46919026137 );
+m *= csZRotMatrix3 ( -0.0579876154799 );
+m *= csYRotMatrix3 ( 0.935377742032 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (1250.000000f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (0.0, 0.0, 0.0) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 0.673588274508 );
+m *= csZRotMatrix3 ( -0.145250503618 );
+m *= csYRotMatrix3 ( 1.17722639142 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (1666.666667f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (0.0, 0.0, 0.0) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 0.469190194791 );
+m *= csZRotMatrix3 ( -0.0579876154799 );
+m *= csYRotMatrix3 ( 1.86366308661 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (2500.000000f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (0.0, 0.0, 0.0) ));
+}
+animfact->AddChannel (animchan);
+animfact->SetAnimationLength ( 2500.0 );
+animchan = animfactlay->CreateAnimationFactoryChannel ();
+boneid = myskel->FindBoneIDByName ("Claw.R");
+if (boneid < 0)
+{
+  csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      "crystalspace.application.isotest",
+      "Error finding bone id for '%s'!", "Claw.R");
+  return false;
+}
+animchan->SetID (boneid);
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 0.90819592205 );
+m *= csZRotMatrix3 ( -3.03462492419 );
+m *= csYRotMatrix3 ( -0.210803265099 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (0.000000f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (1.10574148948e-07, 2.5658550839599999e-09, 3.0184442997000001) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 0.725047138092 );
+m *= csZRotMatrix3 ( -3.01151720805 );
+m *= csYRotMatrix3 ( -0.211061641659 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (416.666667f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (-1.2673858407199999e-08, 8.4602341132700005e-08, 3.0184445381199998) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 0.908195988629 );
+m *= csZRotMatrix3 ( -3.03462492419 );
+m *= csYRotMatrix3 ( -0.210803281744 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (1250.000000f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (-4.1516738491500003e-08, 2.3328915688099999e-08, 3.0184445381199998) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 0.90819592205 );
+m *= csZRotMatrix3 ( -3.03462492419 );
+m *= csYRotMatrix3 ( -0.210803265099 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (1666.666667f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (-5.0358570646800003e-09, 4.2810835765300001e-08, 3.0184442997000001) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 0.90819592205 );
+m *= csZRotMatrix3 ( -3.03462492419 );
+m *= csYRotMatrix3 ( -0.210803265099 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (2500.000000f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (1.10574148948e-07, 2.5658550839599999e-09, 3.0184442997000001) ));
+}
+animfact->AddChannel (animchan);
+animfact->SetAnimationLength ( 2500.0 );
+animfact = animfactlay->CreateAnimationFactory ();
+animfact->SetName ("wave");
+animchan = animfactlay->CreateAnimationFactoryChannel ();
+boneid = myskel->FindBoneIDByName ("Claw.L");
+if (boneid < 0)
+{
+  csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      "crystalspace.application.isotest",
+      "Error finding bone id for '%s'!", "Claw.L");
+  return false;
+}
+animchan->SetID (boneid);
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( -2.37422369753e-08 );
+m *= csZRotMatrix3 ( 6.1367616525e-07 );
+m *= csYRotMatrix3 ( 0.263053803252 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (0.000000f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (4.7473096564900001e-09, -2.30350745531e-14, 3.0184445381199998) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 0.572820916762 );
+m *= csZRotMatrix3 ( 0.0736853064362 );
+m *= csYRotMatrix3 ( 0.24134341444 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (833.333333f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (1.7987582978700001e-08, -6.0709957949700006e-08, 3.01844477654) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( -0.450295998963 );
+m *= csZRotMatrix3 ( -0.0592067856598 );
+m *= csYRotMatrix3 ( 0.249490257241 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (1250.000000f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (1.7987582978700001e-08, -6.0709957949700006e-08, 3.01844477654) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 0.696887338778 );
+m *= csZRotMatrix3 ( 0.0871934670187 );
+m *= csYRotMatrix3 ( 0.231361304108 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (1666.666667f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (1.7987582978700001e-08, -6.0709957949700006e-08, 3.01844477654) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( -0.355067849837 );
+m *= csZRotMatrix3 ( -0.0473129459452 );
+m *= csYRotMatrix3 ( 0.254563579117 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (2083.333333f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (1.7987582978700001e-08, -6.0709957949700006e-08, 3.01844477654) ));
+}
+animfact->AddChannel (animchan);
+animfact->SetAnimationLength ( 2083.33333333 );
+animchan = animfactlay->CreateAnimationFactoryChannel ();
+boneid = myskel->FindBoneIDByName ("Arm.L");
+if (boneid < 0)
+{
+  csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      "crystalspace.application.isotest",
+      "Error finding bone id for '%s'!", "Arm.L");
+  return false;
+}
+animchan->SetID (boneid);
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 8.26110283825e-08 );
+m *= csZRotMatrix3 ( 6.59670017587e-07 );
+m *= csYRotMatrix3 ( 1.44310494306 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (0.000000f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (0.0, 0.0, 0.0) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 0.629318814023 );
+m *= csZRotMatrix3 ( -0.0754256156295 );
+m *= csYRotMatrix3 ( 1.46766421516 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (833.333333f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (0.0, 0.0, 0.0) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 0.629318814023 );
+m *= csZRotMatrix3 ( -0.0754256156295 );
+m *= csYRotMatrix3 ( 1.46766421516 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (1250.000000f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (0.0, 0.0, 0.0) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 0.629318814023 );
+m *= csZRotMatrix3 ( -0.0754256156295 );
+m *= csYRotMatrix3 ( 1.46766421516 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (1666.666667f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (0.0, 0.0, 0.0) ));
+}
+{
+csMatrix3 m;
+m *= csXRotMatrix3 ( 0.629318814023 );
+m *= csZRotMatrix3 ( -0.0754256156295 );
+m *= csYRotMatrix3 ( 1.46766421516 );
+csQuaternion q;
+q.SetMatrix (m);
+animchan->AddKeyframe (2083.333333f, csTuple2<csQuaternion, csVector3> (
+  q,
+  csVector3 (0.0, 0.0, 0.0) ));
+}
+animfact->AddChannel (animchan);
+animfact->SetAnimationLength ( 2083.33333333 );

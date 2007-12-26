@@ -61,7 +61,9 @@ class csReversibleTransform;
  */
 struct iSkeletonBone : public virtual iBase
 {
-  SCF_INTERFACE (iSkeletonBone, 1, 0, 1);
+  SCF_INTERFACE (iSkeletonBone, 1, 0, 3);
+
+  virtual csQuaternion & GetQuaternion () = 0;
 
   /**
    * Get name of the bone.
@@ -422,6 +424,11 @@ struct iSkeletonAnimationInstance : public virtual iBase
 struct iSkeleton : public virtual iBase
 {
   SCF_INTERFACE (iSkeleton, 1, 0, 0);
+
+  /**
+   * Debug function to draw the bones.
+   */
+  virtual void DrawDebugBones (iGraphics3D* g3d) const = 0;
 
   /**
    * Get skeleton name.
@@ -939,4 +946,4 @@ struct iSkeletonGraveyard : public virtual iBase
   virtual void RemoveSkeleton (iSkeleton* skeleton) = 0;
 };
 
-#endif //__CS_ISKELETON_H__
+#endif //__CS_ISKELETO_H__

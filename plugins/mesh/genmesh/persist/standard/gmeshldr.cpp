@@ -32,6 +32,7 @@
 #include "csutil/scanstr.h"
 #include "csutil/sysfunc.h"
 #include "csutil/stringreader.h"
+#include "csutil/xmltiny.h"
 
 #include "iengine/engine.h"
 #include "iengine/material.h"
@@ -46,6 +47,7 @@
 #include "iutil/object.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
+#include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
@@ -735,6 +737,30 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	  }
 	}
         break;
+      case XMLTOKEN_SKELFILE:
+      {
+        csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
+        const char* filename = child->GetContentsValue ();
+        puts (filename);
+        csRef<iDataBuffer> buf (vfs->ReadFile(filename));
+        if (buf && buf->GetSize())
+        {
+          csRef<iDocument> doc;
+
+          const char* b = **buf;
+          const char* error = 0;
+          while (*b == ' ' || *b == '\n' || *b == '\t') b++;
+          if (*b == '<')
+          {
+            csRef<iDocumentSystem> xml (csQueryRegistry<iDocumentSystem> (object_reg));
+            if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
+            doc = xml->CreateDocument ();
+            error = doc->Parse (buf);
+            //csRef<iDocumentNode> root (doc->GetRoot ());
+          }
+        }
+        break;
+      }
       case XMLTOKEN_ANIMCONTROL:
         {
 	  const char* pluginname = child->GetAttributeValue ("plugin");
