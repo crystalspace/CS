@@ -6679,6 +6679,426 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iStandardReporterListener_SetStandardOutput(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iStandardReporterListener *arg1 = (iStandardReporterListener *) 0 ;
+  int arg2 ;
+  bool arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  bool val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iStandardReporterListener_SetStandardOutput",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iStandardReporterListener, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iStandardReporterListener_SetStandardOutput" "', argument " "1"" of type '" "iStandardReporterListener *""'"); 
+  }
+  arg1 = reinterpret_cast< iStandardReporterListener * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iStandardReporterListener_SetStandardOutput" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  ecode3 = SWIG_AsVal_bool(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iStandardReporterListener_SetStandardOutput" "', argument " "3"" of type '" "bool""'");
+  } 
+  arg3 = static_cast< bool >(val3);
+  (arg1)->SetStandardOutput(arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iStandardReporterListener_IsStandardOutput(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iStandardReporterListener *arg1 = (iStandardReporterListener *) 0 ;
+  int arg2 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iStandardReporterListener_IsStandardOutput",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iStandardReporterListener, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iStandardReporterListener_IsStandardOutput" "', argument " "1"" of type '" "iStandardReporterListener *""'"); 
+  }
+  arg1 = reinterpret_cast< iStandardReporterListener * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iStandardReporterListener_IsStandardOutput" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  result = (bool)(arg1)->IsStandardOutput(arg2);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iStandardReporterListener_SetStandardError(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iStandardReporterListener *arg1 = (iStandardReporterListener *) 0 ;
+  int arg2 ;
+  bool arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  bool val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iStandardReporterListener_SetStandardError",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iStandardReporterListener, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iStandardReporterListener_SetStandardError" "', argument " "1"" of type '" "iStandardReporterListener *""'"); 
+  }
+  arg1 = reinterpret_cast< iStandardReporterListener * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iStandardReporterListener_SetStandardError" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  ecode3 = SWIG_AsVal_bool(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iStandardReporterListener_SetStandardError" "', argument " "3"" of type '" "bool""'");
+  } 
+  arg3 = static_cast< bool >(val3);
+  (arg1)->SetStandardError(arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iStandardReporterListener_IsStandardError(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iStandardReporterListener *arg1 = (iStandardReporterListener *) 0 ;
+  int arg2 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iStandardReporterListener_IsStandardError",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iStandardReporterListener, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iStandardReporterListener_IsStandardError" "', argument " "1"" of type '" "iStandardReporterListener *""'"); 
+  }
+  arg1 = reinterpret_cast< iStandardReporterListener * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iStandardReporterListener_IsStandardError" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  result = (bool)(arg1)->IsStandardError(arg2);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iStandardReporterListener_SetConsoleOutput(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iStandardReporterListener *arg1 = (iStandardReporterListener *) 0 ;
+  int arg2 ;
+  bool arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  bool val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iStandardReporterListener_SetConsoleOutput",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iStandardReporterListener, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iStandardReporterListener_SetConsoleOutput" "', argument " "1"" of type '" "iStandardReporterListener *""'"); 
+  }
+  arg1 = reinterpret_cast< iStandardReporterListener * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iStandardReporterListener_SetConsoleOutput" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  ecode3 = SWIG_AsVal_bool(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iStandardReporterListener_SetConsoleOutput" "', argument " "3"" of type '" "bool""'");
+  } 
+  arg3 = static_cast< bool >(val3);
+  (arg1)->SetConsoleOutput(arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iStandardReporterListener_IsConsoleOutput(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iStandardReporterListener *arg1 = (iStandardReporterListener *) 0 ;
+  int arg2 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iStandardReporterListener_IsConsoleOutput",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iStandardReporterListener, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iStandardReporterListener_IsConsoleOutput" "', argument " "1"" of type '" "iStandardReporterListener *""'"); 
+  }
+  arg1 = reinterpret_cast< iStandardReporterListener * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iStandardReporterListener_IsConsoleOutput" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  result = (bool)(arg1)->IsConsoleOutput(arg2);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iStandardReporterListener_SetAlertOutput(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iStandardReporterListener *arg1 = (iStandardReporterListener *) 0 ;
+  int arg2 ;
+  bool arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  bool val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iStandardReporterListener_SetAlertOutput",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iStandardReporterListener, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iStandardReporterListener_SetAlertOutput" "', argument " "1"" of type '" "iStandardReporterListener *""'"); 
+  }
+  arg1 = reinterpret_cast< iStandardReporterListener * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iStandardReporterListener_SetAlertOutput" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  ecode3 = SWIG_AsVal_bool(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iStandardReporterListener_SetAlertOutput" "', argument " "3"" of type '" "bool""'");
+  } 
+  arg3 = static_cast< bool >(val3);
+  (arg1)->SetAlertOutput(arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iStandardReporterListener_IsAlertOutput(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iStandardReporterListener *arg1 = (iStandardReporterListener *) 0 ;
+  int arg2 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iStandardReporterListener_IsAlertOutput",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iStandardReporterListener, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iStandardReporterListener_IsAlertOutput" "', argument " "1"" of type '" "iStandardReporterListener *""'"); 
+  }
+  arg1 = reinterpret_cast< iStandardReporterListener * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iStandardReporterListener_IsAlertOutput" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  result = (bool)(arg1)->IsAlertOutput(arg2);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iStandardReporterListener_SetDebugOutput(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iStandardReporterListener *arg1 = (iStandardReporterListener *) 0 ;
+  int arg2 ;
+  bool arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  bool val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iStandardReporterListener_SetDebugOutput",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iStandardReporterListener, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iStandardReporterListener_SetDebugOutput" "', argument " "1"" of type '" "iStandardReporterListener *""'"); 
+  }
+  arg1 = reinterpret_cast< iStandardReporterListener * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iStandardReporterListener_SetDebugOutput" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  ecode3 = SWIG_AsVal_bool(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iStandardReporterListener_SetDebugOutput" "', argument " "3"" of type '" "bool""'");
+  } 
+  arg3 = static_cast< bool >(val3);
+  (arg1)->SetDebugOutput(arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iStandardReporterListener_IsDebugOutput(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iStandardReporterListener *arg1 = (iStandardReporterListener *) 0 ;
+  int arg2 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iStandardReporterListener_IsDebugOutput",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iStandardReporterListener, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iStandardReporterListener_IsDebugOutput" "', argument " "1"" of type '" "iStandardReporterListener *""'"); 
+  }
+  arg1 = reinterpret_cast< iStandardReporterListener * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iStandardReporterListener_IsDebugOutput" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  result = (bool)(arg1)->IsDebugOutput(arg2);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iStandardReporterListener_SetPopupOutput(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iStandardReporterListener *arg1 = (iStandardReporterListener *) 0 ;
+  int arg2 ;
+  bool arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  bool val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iStandardReporterListener_SetPopupOutput",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iStandardReporterListener, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iStandardReporterListener_SetPopupOutput" "', argument " "1"" of type '" "iStandardReporterListener *""'"); 
+  }
+  arg1 = reinterpret_cast< iStandardReporterListener * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iStandardReporterListener_SetPopupOutput" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  ecode3 = SWIG_AsVal_bool(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iStandardReporterListener_SetPopupOutput" "', argument " "3"" of type '" "bool""'");
+  } 
+  arg3 = static_cast< bool >(val3);
+  (arg1)->SetPopupOutput(arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iStandardReporterListener_IsPopupOutput(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iStandardReporterListener *arg1 = (iStandardReporterListener *) 0 ;
+  int arg2 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iStandardReporterListener_IsPopupOutput",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iStandardReporterListener, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iStandardReporterListener_IsPopupOutput" "', argument " "1"" of type '" "iStandardReporterListener *""'"); 
+  }
+  arg1 = reinterpret_cast< iStandardReporterListener * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iStandardReporterListener_IsPopupOutput" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  result = (bool)(arg1)->IsPopupOutput(arg2);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iStandardReporterListener_RemoveMessages(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iStandardReporterListener *arg1 = (iStandardReporterListener *) 0 ;
@@ -34225,6 +34645,18 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iStandardReporterListener_SetDebugFile", _wrap_iStandardReporterListener_SetDebugFile, METH_VARARGS, NULL},
 	 { (char *)"iStandardReporterListener_SetDefaults", _wrap_iStandardReporterListener_SetDefaults, METH_VARARGS, NULL},
 	 { (char *)"iStandardReporterListener_SetMessageDestination", _wrap_iStandardReporterListener_SetMessageDestination, METH_VARARGS, NULL},
+	 { (char *)"iStandardReporterListener_SetStandardOutput", _wrap_iStandardReporterListener_SetStandardOutput, METH_VARARGS, NULL},
+	 { (char *)"iStandardReporterListener_IsStandardOutput", _wrap_iStandardReporterListener_IsStandardOutput, METH_VARARGS, NULL},
+	 { (char *)"iStandardReporterListener_SetStandardError", _wrap_iStandardReporterListener_SetStandardError, METH_VARARGS, NULL},
+	 { (char *)"iStandardReporterListener_IsStandardError", _wrap_iStandardReporterListener_IsStandardError, METH_VARARGS, NULL},
+	 { (char *)"iStandardReporterListener_SetConsoleOutput", _wrap_iStandardReporterListener_SetConsoleOutput, METH_VARARGS, NULL},
+	 { (char *)"iStandardReporterListener_IsConsoleOutput", _wrap_iStandardReporterListener_IsConsoleOutput, METH_VARARGS, NULL},
+	 { (char *)"iStandardReporterListener_SetAlertOutput", _wrap_iStandardReporterListener_SetAlertOutput, METH_VARARGS, NULL},
+	 { (char *)"iStandardReporterListener_IsAlertOutput", _wrap_iStandardReporterListener_IsAlertOutput, METH_VARARGS, NULL},
+	 { (char *)"iStandardReporterListener_SetDebugOutput", _wrap_iStandardReporterListener_SetDebugOutput, METH_VARARGS, NULL},
+	 { (char *)"iStandardReporterListener_IsDebugOutput", _wrap_iStandardReporterListener_IsDebugOutput, METH_VARARGS, NULL},
+	 { (char *)"iStandardReporterListener_SetPopupOutput", _wrap_iStandardReporterListener_SetPopupOutput, METH_VARARGS, NULL},
+	 { (char *)"iStandardReporterListener_IsPopupOutput", _wrap_iStandardReporterListener_IsPopupOutput, METH_VARARGS, NULL},
 	 { (char *)"iStandardReporterListener_RemoveMessages", _wrap_iStandardReporterListener_RemoveMessages, METH_VARARGS, NULL},
 	 { (char *)"iStandardReporterListener_ShowMessageID", _wrap_iStandardReporterListener_ShowMessageID, METH_VARARGS, NULL},
 	 { (char *)"iStandardReporterListener_GetDebugFile", _wrap_iStandardReporterListener_GetDebugFile, METH_VARARGS, NULL},

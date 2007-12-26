@@ -10,11 +10,11 @@ useful debugging tools and also some useful tools for taking screenshots,
 displaying framerate and so on.
 
 @menu
-* Using BugPlug:: Using BugPlug
-* Controlling BugPlug:: Controlling BugPlug
-* Basic Tools:: Basic Tools
-* Working with Meshes:: Working with Meshes
-* Various Tools:: Various Tools
+* Using BugPlug::
+* Controlling BugPlug::
+* Basic Tools::
+* Working with Meshes::
+* Various Tools::
 @end menu
 
 @node Using BugPlug, Controlling BugPlug, BugPlug, BugPlug
