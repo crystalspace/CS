@@ -24,6 +24,14 @@ chronological order.
 	    - Added some cross-references to the new BugPlug documentation.
 	- Jorrit blindly implemented the new MinimumElapsedTicks setting
 	  for MacOS/X.
+	- Jorrit did several documentation updates:
+	    - Removed the obsolete radiosity settings from the engine
+	      configuration chatper.
+	    - Mentioned the new -RenderLoop option in the viewmesh
+	      documentation.
+	    - Updated the ODE documentation to indicate that ODE plugin
+	      now automatically uses fixed stepsize.
+	    - Added (initial) documentation for Bullet.
 24-Dec-2007
 	- Jorrit added support for a new System.MinimumElapsedTicks setting
 	  to data/config/system.cfg. With this setting you can control

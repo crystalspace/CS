@@ -26,6 +26,9 @@ Scale the loaded object with the given factor.
 @item @samp{-RoomSize}
 The model is loaded in a room. With this option you can change the
 size of that room. By default the size is 5.
+@item @samp{-RenderLoop}
+Use another renderloop. By default the standard renderloop is used but you
+can also use @samp{diffuse} or @samp{shadowed}.
 @end itemize
 
 And then there is an optional filename parameter. Here is an example on how
