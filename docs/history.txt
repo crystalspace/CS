@@ -32,6 +32,11 @@ chronological order.
 	    - Updated the ODE documentation to indicate that ODE plugin
 	      now automatically uses fixed stepsize.
 	    - Added (initial) documentation for Bullet.
+	- res slimmed down the general gcc x86 processor specs detection to
+	  only do what's needed to get the desired flags. Works around a crash
+	  in optimize mode with gcc 4.2.2 apparently related to the removed
+	  code.
+	- res un-inlined the general gcc x86 processor specs detection.
 24-Dec-2007
 	- Jorrit added support for a new System.MinimumElapsedTicks setting
 	  to data/config/system.cfg. With this setting you can control
