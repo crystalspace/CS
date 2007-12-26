@@ -37,6 +37,7 @@ chronological order.
 	  in optimize mode with gcc 4.2.2 apparently related to the removed
 	  code.
 	- res un-inlined the general gcc x86 processor specs detection.
+	- res added gmeshanimpdl to the walktest plugins list.
 24-Dec-2007
 	- Jorrit added support for a new System.MinimumElapsedTicks setting
 	  to data/config/system.cfg. With this setting you can control

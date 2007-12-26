@@ -43,6 +43,7 @@ WALKALL.PLUGINLIST =
   frustvis
   genmesh
   gmeshanim
+  gmeshanimpdl
   gmeshldr
   gmeshskelanim2
   skeleton
