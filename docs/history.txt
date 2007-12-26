@@ -38,6 +38,9 @@ chronological order.
 	  code.
 	- res un-inlined the general gcc x86 processor specs detection.
 	- res added gmeshanimpdl to the walktest plugins list.
+	- res added light-object bounding sphere culling to lighter2 so only
+	  lights that can affect and object are computed for it. Can give a
+	  speedup, depending on the map.
 24-Dec-2007
 	- Jorrit added support for a new System.MinimumElapsedTicks setting
 	  to data/config/system.cfg. With this setting you can control
