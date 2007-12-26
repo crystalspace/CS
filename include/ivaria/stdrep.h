@@ -40,7 +40,7 @@ struct iReporter;
  */
 struct iStandardReporterListener : public virtual iBase
 {
-  SCF_INTERFACE (iStandardReporterListener, 1, 0, 0);
+  SCF_INTERFACE (iStandardReporterListener, 1, 1, 0);
 
   /// Set the output console to use.
   virtual void SetOutputConsole (iConsoleOutput* console) = 0;
