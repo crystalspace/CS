@@ -236,6 +236,7 @@ private:
   csRef<iVirtualClock> vc;
   csRef<iFont> fnt;
   csRef<iStringSet> stringSet;
+  csRef<iStandardReporterListener> stdrep;
   bool initialized;
   csConfigAccess config;
   /**

@@ -71,6 +71,36 @@ struct iStandardReporterListener : public virtual iBase
   	bool do_stdout, bool do_stderr, bool do_console,
 	bool do_alert, bool do_debug, bool do_popup = false) = 0;
 
+  /// Disable/enable standard output for the given severity.
+  virtual void SetStandardOutput (int severity, bool en) = 0;
+  /// Return the state of output to standard output for the given severity.
+  virtual bool IsStandardOutput (int severity) = 0;
+
+  /// Disable/enable standard error for the given severity.
+  virtual void SetStandardError (int severity, bool en) = 0;
+  /// Return the state of output to standard error for the given severity.
+  virtual bool IsStandardError (int severity) = 0;
+
+  /// Disable/enable console output for the given severity.
+  virtual void SetConsoleOutput (int severity, bool en) = 0;
+  /// Return the state of output to console for the given severity.
+  virtual bool IsConsoleOutput (int severity) = 0;
+
+  /// Disable/enable alert output for the given severity.
+  virtual void SetAlertOutput (int severity, bool en) = 0;
+  /// Return the state of output to alert for the given severity.
+  virtual bool IsAlertOutput (int severity) = 0;
+
+  /// Disable/enable debug output for the given severity.
+  virtual void SetDebugOutput (int severity, bool en) = 0;
+  /// Return the state of output to debug for the given severity.
+  virtual bool IsDebugOutput (int severity) = 0;
+
+  /// Disable/enable popup output for the given severity.
+  virtual void SetPopupOutput (int severity, bool en) = 0;
+  /// Return the state of output to popup for the given severity.
+  virtual bool IsPopupOutput (int severity) = 0;
+
   /**
    * Control if this reporter listener should remove messages of a certain
    * severity. By default all messages are removed.
