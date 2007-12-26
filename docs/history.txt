@@ -16,6 +16,12 @@ chronological order.
 	  severity level to print to stdout for the output of the BugPlug
 	  commands. That way you can see output of BugPlug commands even
 	  in optimize mode.
+	- Jorrit did several documentation updates:
+	    - Added documentation for the new MinimumElapsedTicks
+	      configuration setting.
+	    - Removed documentation for the offscreen software renderer.
+	    - Added some specific documentation on BugPlug.
+	    - Added some cross-references to the new BugPlug documentation.
 24-Dec-2007
 	- Jorrit added support for a new System.MinimumElapsedTicks setting
 	  to data/config/system.cfg. With this setting you can control

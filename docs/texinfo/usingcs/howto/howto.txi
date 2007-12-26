@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO, , Making Own Projects, Using Crystal Space
+@node HOWTO, , BugPlug, Using Crystal Space
 @section HOWTO
 @cindex Tutorial, HOWTO
 

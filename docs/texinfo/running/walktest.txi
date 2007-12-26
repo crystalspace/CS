@@ -731,7 +731,7 @@ work, depending on the current state of the engine code.
 
 @table @code
 @item bugplug
-Load bugplug plugin.  This is documented elsewhere.
+Load bugplug plugin.  @xref{BugPlug}.
 
 @item cls
 Clear the text from the console.
