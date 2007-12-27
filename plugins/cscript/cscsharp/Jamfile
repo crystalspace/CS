@@ -29,8 +29,7 @@ if $(CSHARP.AVAILABLE) = "yes" && $(CMD.PERL5)
   Depends $(cs_globals) : csharp_mods ;
 
   local cs_modules_globals = core.cs imesh.cs isndsys.cs ivaria.cs 
-	ienginemod.cs cstool.cs ivideo.cs imap.cs csgfx.cs csgeom.cs
-	cspace.cs ;
+	ienginemod.cs cstool.cs ivideo.cs imap.cs csgfx.cs csgeom.cs ;
 
   for i in $(cs_modules_globals)
   {
@@ -38,7 +37,8 @@ if $(CSHARP.AVAILABLE) = "yes" && $(CMD.PERL5)
   }
 
   GenCSharpGlobals $(cs_globals) : $(cs_modules_globals) :
-	 --namespace CrystalSpace --classname CS -x GetSCFPointer -x SetSCFPointer ;
+	 --namespace CrystalSpace --classname CS -x GetSCFPointer
+	 -x SetSCFPointer -m public -b cspace ;
 
   cspacesharpdll = $(cspacesharpdll:G=csharpmod) ;
   SEARCH on $(csbuildxml) = $(SEARCH_SOURCE) ;

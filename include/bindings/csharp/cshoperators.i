@@ -41,37 +41,22 @@
     return new csVector2(v.x/s, v.y/s);
   }
 
-  // Are the two vectors equal?
-  public new static bool Equals(object vo1, object vo2)
-  {
-    if(!(vo1 is csVector2) || !(vo2 is csVector2))
-      return false;
- 
-    csVector2 v1 = (csVector2)vo1;
-    csVector2 v2 = (csVector2)vo2;
-
-    // If one of the objects is null, then compares by reference
-    if (vo1 == null || vo2 == null)
-      return vo1 == vo2;
-    else
-      return v1.x==v2.x && v1.y==v2.y;
-  }
-
-  public new static int GetHashCode(object vo)
-  {
-    // This probably isn't the best form for calculate the hash code
-    csVector2 v = (csVector2) vo;
-    return (int)((v.x.GetHashCode() & 0xff00ff) | ((v.y.GetHashCode() & 0xff00ff)<<8));
-  }
-
   public override bool Equals(object o)
   {
-    return csVector2.Equals(this, o);
+    if(!(o is csVector2))
+      return false;
+ 
+    csVector2 v2 = (csVector2)o;
+
+    // If one of the objects is null, then compares by reference
+    return x==v2.x && y==v2.y;
   }
 
   public override int GetHashCode()
   {
-    return csVector2.GetHashCode(this);
+    // This probably isn't the best form for calculate the hash code
+    csVector2 v = this;
+    return (int)((v.x.GetHashCode() & 0xff00ff) | ((v.y.GetHashCode() & 0xff00ff)<<8));
   }
 
   public static bool operator==(csVector2 v1, csVector2 v2)
@@ -174,37 +159,23 @@ VECTOR2_CSHARP_CODE
     return new csVector3(v.x/s, v.y/s, v.z/s);
   }
 
-  // Are the two vectors equal?
-  public new static bool Equals(object vo1, object vo2)
-  {
-    if(!(vo1 is csVector3) || !(vo2 is csVector3))
-      return false;
- 
-    csVector3 v1 = (csVector3)vo1;
-    csVector3 v2 = (csVector3)vo2;
-
-    // If one of the objects is null, then compares by reference
-    if (vo1 == null || vo2 == null)
-      return vo1 == vo2;
-    else
-      return v1.x==v2.x && v1.y==v2.y;
-  }
-
   public override bool Equals(object o)
   {
-    return csVector3.Equals(this, o);
+    if(!(o is csVector3))
+      return false;
+ 
+    csVector3 v2 = (csVector3)o;
+
+    // If one of the objects is null, then compares by reference
+    return x==v2.x && y==v2.y && z==v2.z;
   }
 
   public override int GetHashCode()
   {
-    return csVector3.GetHashCode(this);
-  }
+    csVector3 v = this;
 
-  public new static int GetHashCode(object vo)
-  {
     // This probably isn't the best form for calculate the hash code
-    csVector3 v = (csVector3)vo;
-    return (int)((v.x.GetHashCode() & 0xfff) | ((v.y.GetHashCode() & 0xfff)<<12) | (v.y.GetHashCode() &0xff000000));
+	return (int)((v.x.GetHashCode() & 0xfff) | ((v.y.GetHashCode() & 0xfff)<<12) | (v.y.GetHashCode() &0xff000000));
   }
 
   // Are the two vectors equal?
@@ -289,37 +260,26 @@ VECTOR3_CSHARP_CODE
 			 m.m21 / s, m.m22 / s);
   }
 
-  public new static bool Equals(object mo1, object mo2)
-  {
-    if(!(mo1 is csMatrix2) || !(mo2 is csMatrix2))
-      return false;
-    csMatrix2 m1 = (csMatrix2) mo1;
-    csMatrix2 m2 = (csMatrix2) mo2;
-
-     // If one of the objects is null, then compares by reference
-    if (mo1 == null || mo2 == null)
-      return mo1 != mo2;
-    else
-      return m1.m11 == m2.m11 && m1.m12 == m2.m12
-	&& m1.m21 == m2.m21 && m1.m22 == m2.m22;
-  }
-
-  public new static int GetHashCode(object mo)
-  {
-    csMatrix3 m = (csMatrix3) mo;
-
-    return (int)((m.m11.GetHashCode()&0x000000ff) | (m.m12.GetHashCode()&0x0000ff00) 
-	 | (m.m21.GetHashCode()&0x00ff0000) | (m.m22.GetHashCode()&0xff000000));
-  }
-
   public override bool Equals(object o)
   {
-    return csMatrix2.Equals(this, o);
+    if(!(o is csMatrix2) || o == null)
+      return false;
+    csMatrix2 m1 = this;
+    csMatrix2 m2 = (csMatrix2) o;
+
+     // If one of the objects is null, then compares by reference
+    if (o == null)
+      return false;
+    return m1.m11 == m2.m11 && m1.m12 == m2.m12
+	&& m1.m21 == m2.m21 && m1.m22 == m2.m22;
   }
 
   public override int GetHashCode()
   {
-    return csMatrix2.GetHashCode(this);
+    csMatrix2 m = this;
+
+    return (int)((m.m11.GetHashCode()&0x000000ff) | (m.m12.GetHashCode()&0x0000ff00) 
+	 | (m.m21.GetHashCode()&0x00ff0000) | (m.m22.GetHashCode()&0xff000000));
   }
 
   public static bool operator==(csMatrix2 m1, csMatrix2 m2)
@@ -374,39 +334,26 @@ MATRIX2_CSHARP_CODE
 			 m1.m31 - m2.m31, m1.m32 - m2.m32, m1.m33 - m2.m33);
   }
 
-  public new static bool Equals(object mo1, object mo2)
+  public override bool Equals(object o)
   {
-    if(!(mo1 is csMatrix3) || !(mo2 is csMatrix3))
+    if(!(o is csMatrix3) || o == null)
       return false;
-    csMatrix3 m1 = (csMatrix3) mo1;
-    csMatrix3 m2 = (csMatrix3) mo2;
+    csMatrix3 m1 = this;
+    csMatrix3 m2 = (csMatrix3)o;
 
-     // If one of the objects is null, then compares by reference
-    if (mo1 == null || mo2 == null)
-      return mo1 == mo2;
-    else
-      return m1.m11==m2.m11 && m1.m12==m2.m12 && m1.m13==m2.m13
+    // If one of the objects is null, then compares by reference
+    return m1.m11==m2.m11 && m1.m12==m2.m12 && m1.m13==m2.m13
 	&& m1.m21==m2.m21 && m1.m22==m2.m22 && m1.m23==m2.m23
 	&& m1.m31==m2.m31 && m1.m32==m2.m32 && m1.m33==m2.m33;
   }
 
-  public new static int GetHashCode(object mo)
+  public override int GetHashCode()
   {
-    csMatrix3 m = (csMatrix3) mo;
+    csMatrix3 m = this;
 
     return (int)((m.m11.GetHashCode()&0x0000000f) | (m.m12.GetHashCode()&0x000000f0) | (m.m13.GetHashCode()&0x00000f00) 
 	 | (m.m21.GetHashCode()&0x0000f000) | (m.m22.GetHashCode()&0x0000f000) | (m.m23.GetHashCode()&0x000f0000)
 	 | (m.m31.GetHashCode()&0x00f00000) | (m.m32.GetHashCode()&0x0f000000) | (m.m33.GetHashCode()&0xf0000000));
-  }
-
-  public override bool Equals(object o)
-  {
-    return csMatrix3.Equals(this, o);
-  }
-
-  public override int GetHashCode()
-  {
-    return csMatrix3.GetHashCode(this);
   }
 
   public static bool operator==(csMatrix3 m1, csMatrix3 m2)
@@ -702,38 +649,25 @@ QUATERNION_CSHARP_CODE
 		      Math.Min(b1.MaxY(), b2.MaxY()));
   }
 
-  public new static bool Equals(object bo1, object bo2)
+  public override bool Equals(object o)
   {
-    if(!(bo1 is csBox2) || !(bo2 is csBox2))
+    if(!(o is csBox2) || o == null)
       return false;
-    csBox2 b1 = (csBox2) bo1;
-    csBox2 b2 = (csBox2) bo2;
 
-    // If one of the objects is null, then compares by reference
-    if ((object)b1 == null || (object)b2 == null)
-      return b1 != b2;
-    else
-      return b1.MinX()==b2.MinX() &&
+    csBox2 b1 = this;
+    csBox2 b2 = (csBox2) o;
+
+    return b1.MinX()==b2.MinX() &&
 	   b1.MinY()==b2.MinY() &&
 	   b1.MaxX()==b2.MaxX() &&
 	   b1.MaxY()==b2.MaxY();
   }
 
-  public new static int GetHashCode(object bo)
-  {
-    csBox2 b = (csBox2) bo;
-
-    return (int)((b.BoxMin.GetHashCode()&0x0000ffff) |(b.BoxMax.GetHashCode()&0xffff0000));
-  }
-
-  public override bool Equals(object o)
-  {
-    return csBox2.Equals(this, o);
-  }
-
   public override int GetHashCode()
   {
-    return csBox2.GetHashCode(this);
+    csBox2 b = (csBox2) this;
+
+    return (int)((b.BoxMin.GetHashCode()&0x0000ffff) |(b.BoxMax.GetHashCode()&0xffff0000));
   }
 
   public static bool operator==(csBox2 b1, csBox2 b2)
@@ -828,38 +762,25 @@ BOX2_CSHARP_CODE
     }
   }
 
-  public new static bool Equals(object bo1, object bo2)
+  public override bool Equals(object o)
   {
-    if(!(bo1 is csBox3) || !(bo2 is csBox3))
+    if(!(o is csBox3) || o == null)
       return false;
-    csBox3 b1 = (csBox3) bo1;
-    csBox3 b2 = (csBox3) bo2;
 
-    // If one of the objects is null, then compares by reference
-    if (bo1 == null || bo2 == null)
-      return bo1 != bo2;
-    else
-      return b1.MinX()==b2.MinX() &&
+    csBox3 b1 = this;
+    csBox3 b2 = (csBox3) o;
+
+    return b1.MinX()==b2.MinX() &&
 	   b1.MinY()==b2.MinY() &&
 	   b1.MaxX()==b2.MaxX() &&
 	   b1.MaxY()==b2.MaxY();
   }
 
-  public new static int GetHashCode(object bo)
-  {
-    csBox3 b = (csBox3) bo;
-
-    return (int)((b.BoxMin.GetHashCode()&0x0000ffff) |(b.BoxMax.GetHashCode()&0xffff0000));
-  }
-
-  public override bool Equals(object o)
-  {
-    return csBox3.Equals(this, o);
-  }
-
   public override int GetHashCode()
   {
-    return csBox3.GetHashCode(this);
+    csBox3 b = (csBox3) this;
+
+    return (int)((b.BoxMin.GetHashCode()&0x0000ffff) |(b.BoxMax.GetHashCode()&0xffff0000));
   }
 
   public static csBox3 operator+(csBox3 b1, csBox3 b2)

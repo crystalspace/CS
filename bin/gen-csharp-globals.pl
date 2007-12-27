@@ -30,10 +30,13 @@ my $Namespace = "Dummy";
 my $Verbose = 0;
 my $AppName = "C# Global Class Generator";
 my $AppFileName = "gen-csharp-globals.pl";
+my $Modifier = "internal";
+my $BaseClass = 0;
 my $CurrentClass;
 my $OutputFile;
 my @ExcludeList;
 my @InputFiles;
+my @Attributes;
 my @UsingNamespace = ("System");
 
 # Prints the help information
@@ -57,6 +60,12 @@ Options:
   --namespace               The namespace that will contain the generated class
   -u
   --using-namespace         Additionals using namespaces
+  -m
+  --modifier                The class modifier. By default is set to "internal"
+  -a
+  --attribute               Class attribute. By default there aren't any attributes
+  -b
+  --baseclass               The base class of the generated one
 NOTE: The output file is required
 EOT
 }
@@ -127,6 +136,21 @@ sub ParseCommandLine
       $i++;
       push(@UsingNamespace, $ARGV[$i]);
     }
+    elsif($ARGV[$i] eq '-m' || $ARGV[$i] eq '--modifier')
+    {
+      $i++;
+      $Modifier = $ARGV[$i];
+    }
+    elsif($ARGV[$i] eq '-a' || $ARGV[$i] eq '--attribute')
+    {
+      $i++;
+      push(@Attributes, $ARGV[$i]);
+    }
+    elsif($ARGV[$i] eq '-b' || $ARGV[$i] eq '--baseclass')
+    {
+      $i++;
+      $BaseClass = $ARGV[$i];
+    }
     else
     {
       push(@InputFiles, $ARGV[$i]);
@@ -138,6 +162,8 @@ sub ParseCommandLine
 sub WriteHeader
 {
   my $namespace;
+  my $attrnum;
+  my $i;
 
   # Write license
   print OUTPUTFILE <<"EOL";
@@ -186,9 +212,35 @@ EOL
   }
   print OUTPUTFILE "\n";
 
+  # Write namespace
   print OUTPUTFILE "namespace $Namespace\n";
   print OUTPUTFILE "{\n";
-  print OUTPUTFILE "\tclass $ClassName\n";
+
+  # Write attributes if there are available
+  if($attrnum > 0)
+  {
+    print OUTPUTFILE "[";
+    for($i = 0; $i < $attrnum; $i++)
+    {
+      print OUTPUTFILE $Attributes[$i];
+      if($i+1 < $attrnum )
+      {
+	print OUTPUTFILE "\n";
+      }
+    }
+    print OUTPUTFILE "]\n";
+  }
+
+  # Write class header
+  print OUTPUTFILE "\t$Modifier class $ClassName";
+  if($BaseClass)
+  {
+    print OUTPUTFILE ": $BaseClass\n";
+  }
+  else
+  {
+    print OUTPUTFILE "\n";
+  }
   print OUTPUTFILE "\t{\n";
 }
 
@@ -282,6 +334,7 @@ sub OutputFunction
 sub OutputStaticConstant
 {
   my $line;
+
   $line = $_[0];
   $line =~ s/;.*$//;
   $line =~ s/[ \t]+/ /g;
@@ -302,12 +355,45 @@ sub OutputConstant
   print OUTPUTFILE "\t\t$line;\n";
 }
 
+sub OutputStaticVariable
+{
+  my $line;
+  my @tokens;
+  my $type;
+  my $name;
+
+  $line = $_[0];
+  $line =~ s/;.*$//;
+  $line =~ s/[ \t]+/ /g;
+  $line =~ s/^[ \t]*//;
+
+  @tokens = split(/ /, $line);
+  $type = $tokens[2];
+  $name = $tokens[3];
+
+  # Outputs a static get and set property
+  print OUTPUTFILE "\n";
+  print OUTPUTFILE "\t\tpublic static $name\n";
+  print OUTPUTFILE "\t\t{\n";
+  print OUTPUTFILE "\t\t\tget\n";
+  print OUTPUTFILE "\t\t\t{\n";
+  print OUTPUTFILE "\t\t\t\treturn $CurrentClass.$name;\n";
+  print OUTPUTFILE "\t\t\t}\n";
+  print OUTPUTFILE "\n";
+  print OUTPUTFILE "\t\t\tset\n";
+  print OUTPUTFILE "\t\t\t{\n";
+  print OUTPUTFILE "\t\t\t\t$CurrentClass.$name = value;\n";
+  print OUTPUTFILE "\t\t\t}\n";
+  print OUTPUTFILE "\t\t}\n";
+  print OUTPUTFILE "\n";
+}
+
 sub IsStaticFunction
 {
   my $line;
   $line = $_[0];
   $line =~ s/[ \t]+/ /g;
-  return $line =~ m/^ ?public static [A-Za-z_]+ [A-Za-z_]+ ?\(.*\).*$/ ;
+  return $line =~ m/^ ?public static [A-Za-z_]+ [A-Za-z_][A-Za-z0-9_]* ?\(.*\).*$/ ;
 }
 
 sub IsConstant
@@ -316,7 +402,7 @@ sub IsConstant
   $line = $_[0];
   $line =~ s/=/ = /;
   $line =~ s/[ \t]+/ /g;
-  return $line =~ m/^ ?public const [A-Za-z_]+ [A-Za-z_]+ =.+;.*$/ ;
+  return $line =~ m/^ ?public const [A-Za-z_]+ [A-Za-z_][A-Za-z0-9_]* =.+;.*$/ ;
 }
 
 sub IsClass
@@ -332,7 +418,16 @@ sub IsStaticConstant
   $line = $_[0];
   $line =~ s/=/ = /;
   $line =~ s/[ \t]+/ /g;
-  return $line =~ m/^ ?public static readonly [A-Za-z_]+ [A-Za-z_]+ =.+;.*$/ ;
+  return $line =~ m/^ ?public static readonly [A-Za-z_]+ [A-Za-z_][A-Za-z0-9_]* =.+;.*$/ ;
+}
+
+sub IsStaticVariable
+{
+  my $line;
+  $line = $_[0];
+  $line =~ s/=/ = /;
+  $line =~ s/[ \t]+/ /g;
+  return $line =~ m/^ ?public static [A-Za-z_]+ [A-Za-z_][A-Za-z0-9_]* =.+;.*$/ ;
 }
 
 sub Generate
@@ -353,8 +448,9 @@ sub Generate
       if(IsClass $line)
       {
 	$CurrentClass = $line;
-	$CurrentClass =~ s/^[ \t]*(public[ \t]+)?class[ \t]//;
-	$CurrentClass =~ s/[ \t]*(:[^{]+)?{?$//;
+	$CurrentClass =~ s/[ \t]+/ /g;
+	$CurrentClass =~ s/^ ?(public )?class //;
+	$CurrentClass =~ s/ ?(:[^{]+)?{?$//;
 	PrintVerbose "Parsing class \"$CurrentClass\"\n";
 	&WriteClassComment;
       }
@@ -365,6 +461,10 @@ sub Generate
       elsif(IsStaticConstant $line)
       {
 	OutputStaticConstant $line;
+      }
+      elsif(IsStaticVariable $line)
+      {
+	OutputStaticVariable $line;
       }
       elsif(IsConstant $line)
       {
