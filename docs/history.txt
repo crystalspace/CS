@@ -6,6 +6,8 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Dec-2007
+	- Genjix added needed kirchdorfer skeleton object.
 25-Dec-2007
 	- Genjix added skeleton branch code.
 24-Dec-2007
