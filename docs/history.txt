@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 28-Dec-2007
+    - philwyett added a build tip for unix that reduces build time
+      on dual core processors.
 	- caedes fixed castle-tex.zip being incorrectly added to vfs.cfg
 	  template, and thus impossible to find on install.
 26-Dec-2007
