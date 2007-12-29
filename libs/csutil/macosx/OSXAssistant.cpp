@@ -132,6 +132,11 @@ void OSXAssistant::init_runmode()
 //-----------------------------------------------------------------------------
 void OSXAssistant::start_event_loop()
 {
+  // Fetch the minimal elapsed ticks per second.
+  csConfigAccess cfgacc (registry, "/config/system.cfg");
+  min_elapsed = (csTicks) cfgacc->GetInt (
+    "System.MinimumElapsedTicks", 0);
+
   csConfigAccess macosx_config(registry, "/config/macosx.cfg", true,
     iConfigManager::PriorityMin);
   init_menu(macosx_config);
@@ -159,7 +164,15 @@ void OSXAssistant::advance_state()
     c->Advance();
   csRef <iEventQueue> q = get_event_queue();
   if (q.IsValid())
+  {
+    csTicks previous = csGetTicks ();
     q->Process();
+
+    // Limit fps.
+    csTicks elapsed = csGetTicks () - previous;
+    if (elapsed < min_elapsed)
+      csSleep (min_elapsed - elapsed);
+  }
   if (!continue_running())
     OSXDelegate_stop_event_loop(controller);
 }
@@ -323,8 +336,9 @@ bool csPlatformStartup(iObjectRegistry* r)
 {
   csPrintf("Crystal Space for " CS_PLATFORM_NAME " " CS_VERSION "\nPorted to "
     CS_PLATFORM_NAME " by Eric Sunshine <sunshine@sunshineco.com>\n\n");
-  csRef<iOSXAssistant> a = csPtr<iOSXAssistant>(new OSXAssistant(r));
+  csRef<iOSXAssistant> a = csPtr<iOSXAssistant>(new OSXAssistant (r));
   r->Register(a, "iOSXAssistant");
+
   return true;
 }
 

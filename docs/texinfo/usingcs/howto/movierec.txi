@@ -29,12 +29,13 @@ You can also use the movie recorder with an existing binary without any
 recompilation.  Just place the movie recorder plugin in the application's
 library directory.
 
-Like the BugPlug plugin, the movie recorder can be loaded and manipulated
-explicitly by an application or it can be loaded transparently into any
-application automatically.  To load it transparently for all applications, you
-add a setting to your user-specific, application-neutral configuration
-(@pxref{Config Domains}).  To do this, in the @samp{CrystalSpace.Global}
-configuration domain, give the setting @samp{System.Plugins.iMovieRecorder} the
+Like the BugPlug plugin (@pxref{BugPlug}), the movie recorder can be loaded
+and manipulated explicitly by an application or it can be loaded transparently
+into any application automatically.  To load it transparently for all
+applications, you add a setting to your user-specific, application-neutral
+configuration (@pxref{Config Domains}).  To do this, in the
+@samp{CrystalSpace.Global} configuration domain, give the setting
+@samp{System.Plugins.iMovieRecorder} the
 value @samp{crystalspace.utilities.movierecorder}.  To find out how to do this
 for your particular platform, see the platform-specific intructions for
 manipulating configuration information (@pxref{Config PerUser}).  The movie

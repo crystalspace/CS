@@ -55,7 +55,7 @@ or use in configuration files are listed below.
 @table @code
 @item iVFS
 The virtual file system.  Presently, there is only one @sc{vfs} implementation,
-and it is named @samp{crystalspace.kernel.vfs}.
+and it is named @samp{crystalspace.kernel.vfs}. @xref{VFS}.
 
 @item iGraphics3D
 A 3D renderer.  Some possible values include
@@ -64,17 +64,19 @@ A 3D renderer.  Some possible values include
 @item crystalspace.graphics3d.software
 Uses the platform-specific 2D canvas to perform 3D graphics operations.
 
-@item crystalspace.graphics3d.software.offscreen
-This is a variant of the software renderer that renders to a buffer in memory,
-not to the screen.
-
 @item crystalspace.graphics3d.opengl
 Uses OpenGL for 3D output, and by this takes advantage of hardware
 acceleration. Requires installed OpenGL run-time libraries.
 @end table
+
+@item iBugPlug
+A useful debugging plugin. Can also show frames per second. There is
+only one implementation and it is named @samp{crystalspace.utilities.bugplug}.
+@xref{BugPlug}.
 @end table
 
 @subsubheading Other Low-Level Configuration Options
+@cindex maximum framerate
 
 Apart from the list of plug-in modules, the following keys are recognized:
 
@@ -82,4 +84,12 @@ Apart from the list of plug-in modules, the following keys are recognized:
 @item System.UserConfig = true
 Specifies whether or not user-specific configuration information should be
 used and maintained. @xref{Config PerUser}.
+@item System.MinimumElapsedTicks = 0
+This option controls the minimum elapsed ticks that the default runloop
+will use every frame. By default this is set to 0 which means that there
+is no minimum but if you (for example) set this to 20 then this means that
+framerate will be limited to 50 fps maximum since every frame will take
+at least 20 milliseconds. Using this setting can relieve some load from the
+cpu.
 @end table
+
