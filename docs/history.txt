@@ -7,8 +7,10 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 28-Dec-2007
-    - philwyett added a build tip for unix that reduces build time
-      on dual core processors.
+	- res updated the docs for the new cs-win32libs release.
+28-Dec-2007
+	- philwyett added a build tip for unix that reduces build time
+	  on dual core processors.
 	- caedes fixed castle-tex.zip being incorrectly added to vfs.cfg
 	  template, and thus impossible to find on install.
 26-Dec-2007
