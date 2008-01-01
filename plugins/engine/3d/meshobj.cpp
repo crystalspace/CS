@@ -1130,10 +1130,8 @@ void csMeshWrapper::GetFullBBox (csBox3& box)
 
 void csMeshWrapper::PlaceMesh ()
 {
-printf ("PlaceMesh:1\n"); fflush (stdout);
   iSectorList *movable_sectors = movable.GetSectors ();
   if (movable_sectors->GetCount () == 0) return ; // Do nothing
-printf ("PlaceMesh:2\n"); fflush (stdout);
   csSphere sphere;
   float radius;
   GetObjectModel ()->GetRadius (radius, sphere.GetCenter ());
