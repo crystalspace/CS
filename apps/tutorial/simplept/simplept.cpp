@@ -297,6 +297,8 @@ bool Simple::Initialize ()
   csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
     	"crystalspace.application.simplept",
   	"Simple Procedural Texture Crystal Space Application version 0.1.");
+  	
+  font = g3d->GetDriver2D()->GetFontServer()->LoadFont (CSFONT_LARGE, 10);
 
   // First disable the lighting cache. Our app is simple enough
   // not to need this.
@@ -409,6 +411,12 @@ bool Simple::HandleEvent (iEvent& Event)
       q->GetEventOutlet()->Broadcast (csevQuit(object_reg));
     return true;
   }
+  else if ((Event.Name == csevKeyboardUp(object_reg)) && 
+    (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_SPACE))
+  {
+    ProcTexture->CycleTarget ();
+    return true;
+  }
 
   return false;
 }
@@ -451,6 +459,20 @@ void Simple::SetupFrame ()
 void Simple::FinishFrame ()
 {
   g3d->FinishDraw ();
+  
+  g3d->BeginDraw(CSDRAW_2DGRAPHICS);
+  int fontHeight = font->GetTextHeight();
+  int y = g3d->GetDriver2D()->GetHeight() - fontHeight;
+  int white = g3d->GetDriver2D()->FindRGB (255, 255, 255);
+  g3d->GetDriver2D()->Write (font, 0, y, white, -1,
+    csString().Format ("SPACE to cycle formats: %s",
+    ProcTexture->GetAvailableFormats()));
+  y -= fontHeight;
+  g3d->GetDriver2D()->Write (font, 0, y, white, -1,
+    csString().Format ("current target: %s",
+    ProcTexture->GetCurrentTarget()));
+  g3d->FinishDraw ();
+  
   g3d->Print (0);
 }
 

@@ -306,7 +306,7 @@ namespace CS
      */
     uint GetComponentMask () const;
   };
-
+  
   /**
    * Texture format string parser routines.
    */

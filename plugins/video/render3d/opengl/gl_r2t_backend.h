@@ -21,6 +21,9 @@
 #define __CS_GL_R2T_BACKEND_H__
 
 #include "csgeom/csrect.h"
+#include "csutil/ref.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/texture.h"
 
 struct iTextureHandle;
 
@@ -34,12 +37,41 @@ class csGLRender2TextureBackend
 {
 protected:
   csGLGraphics3D* G3D;
+  
+  struct RTAttachment
+  {
+    csRef<iTextureHandle> texture;
+    bool persistent;
+    int subtexture;
+    
+    void Clear()
+    {
+      texture.Invalidate ();
+    }
+    bool IsValid()
+    {
+      return texture.IsValid();
+    }
+    void Set (iTextureHandle* handle, bool persistent,
+      int subtexture)
+    {
+      this->texture = handle;
+      this->persistent = persistent;
+      this->subtexture = subtexture;
+    }
+  };
 public:
   csGLRender2TextureBackend (csGLGraphics3D* G3D);
   virtual ~csGLRender2TextureBackend();
 
-  virtual void SetRenderTarget (iTextureHandle* handle, bool persistent,
-  	int subtexture) = 0;
+  virtual bool SetRenderTarget (iTextureHandle* handle, bool persistent,
+  	int subtexture, csRenderTargetAttachment attachment) = 0;
+  virtual void UnsetRenderTargets() = 0;
+  virtual bool CanSetRenderTarget (const char* format,
+    csRenderTargetAttachment attachment) = 0;
+  virtual iTextureHandle* GetRenderTarget (csRenderTargetAttachment attachment,
+    int* subtexture) const = 0;
+  
   virtual void BeginDraw (int drawflags) = 0;
   virtual void SetupProjection () = 0;
   virtual void FinishDraw () = 0;

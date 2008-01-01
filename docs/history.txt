@@ -14,6 +14,10 @@ chronological order.
 	  GetObjectSphere() function. This speeds the function up and makes
 	  it also more correct (although it increases the chance of adding
 	  too many sectors).
+	- res augmented the render target API to allow "attachments" (to
+	  support rendering depth instead of color data to textures or, later,
+	  multiple render targets) and better querying if a texture format can
+	  be rendered to.
 31-Dec-2007
 	- Jorrit set Video.OpenGL.StencilThreshold to 1 instead of 50. That
 	  basically means that stencil clipping will always be used for

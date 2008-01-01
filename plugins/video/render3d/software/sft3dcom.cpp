@@ -30,6 +30,7 @@
 #include "csgeom/polyclip.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/tri.h"
+#include "csgfx/textureformatstrings.h"
 #include "cstool/rbuflock.h"
 #include "csutil/cscolor.h"
 #include "csutil/event.h"
@@ -629,7 +630,7 @@ void csSoftwareGraphics3DCommon::FinishDraw ()
         }
       }
     
-      SetRenderTarget (0, false, 0);
+      UnsetRenderTargets();
       if (oldIlaceMode != -1) do_interlaced = oldIlaceMode;
     }
   }
@@ -758,10 +759,13 @@ float csSoftwareGraphics3DCommon::GetZBuffValue (int x, int y)
   return 16777216.0 / float (zbf);
 }
 
-void csSoftwareGraphics3DCommon::SetRenderTarget (iTextureHandle* handle,
+bool csSoftwareGraphics3DCommon::SetRenderTarget (iTextureHandle* handle,
 	bool persistent,
-	int subtexture)
+	int subtexture,
+	csRenderTargetAttachment attachment)
 {
+  if (attachment != rtaColor0) return false;
+
   render_target = handle;
   rt_onscreen = !persistent;
   rt_cliprectset = false;
@@ -795,6 +799,23 @@ void csSoftwareGraphics3DCommon::SetRenderTarget (iTextureHandle* handle,
 
     SetDimensions (G2D->GetWidth(), G2D->GetHeight());
   }
+  
+  return true;
+}
+  
+bool csSoftwareGraphics3DCommon::CanSetRenderTarget (const char* format,
+  csRenderTargetAttachment attachment)
+{
+  if (attachment != rtaColor0) return false;
+  
+  CS::StructuredTextureFormat texfmt (CS::TextureFormatStrings::ConvertStructured (format));
+  uint fmtcomp = texfmt.GetComponentMask();
+  
+  if (((fmtcomp & CS::StructuredTextureFormat::compRGB) != 0)
+      && ((fmtcomp & ~CS::StructuredTextureFormat::compRGBA) == 0))
+    return true;
+    
+  return false;
 }
 
 void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
