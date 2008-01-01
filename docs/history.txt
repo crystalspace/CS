@@ -6,6 +6,14 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+1-Jan-2008
+	- Jorrit added iPortal->GetObjectSphere() and GetWorldSphere().
+	  With these two functions you can get the bounding sphere (in world
+	  and object space) of the portal.
+	- Jorrit fixed iMeshWrapper->PlaceMesh() so that it uses the new
+	  GetObjectSphere() function. This speeds the function up and makes
+	  it also more correct (although it increases the chance of adding
+	  too many sectors).
 31-Dec-2007
 	- Jorrit set Video.OpenGL.StencilThreshold to 1 instead of 50. That
 	  basically means that stencil clipping will always be used for
