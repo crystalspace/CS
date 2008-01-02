@@ -20,23 +20,25 @@
 
 #ifndef CS_MINI_SWIG
 
-%ignore _csSharpEventHandler::_HandleEvent;
-%ignore _csSharpEventHandler::_Connect;
-%ignore _csSharpEventHandler::m_handler;
+%ignore csSharpEventHandlerWrap::_HandleEvent;
+%ignore csSharpEventHandlerWrap::_Connect;
+%ignore csSharpEventHandlerWrap::m_handler;
 %ignore EventHandler_t;
 
-%template(scfSharpEventHandler) scfImplementation1<_csSharpEventHandler, iEventHandler>;
+%typemap(csclassmodifiers) scfSharpEventHandler "public abstract class";
+
+%template(scfSharpEventHandler) scfImplementation1<csSharpEventHandlerWrap, iEventHandler>;
 %inline %{
   typedef int (*EventHandler_t)(void *ev);
 
-  struct _csSharpEventHandler: public scfImplementation1<_csSharpEventHandler,
+  struct csSharpEventHandlerWrap: public scfImplementation1<csSharpEventHandlerWrap,
 							iEventHandler>
   {
-    _csSharpEventHandler(): scfImplementationType(this)
+    csSharpEventHandlerWrap(): scfImplementationType(this)
     {
     }
 
-    virtual ~_csSharpEventHandler()
+    virtual ~csSharpEventHandlerWrap()
     {
     }
 		
@@ -70,7 +72,7 @@
 %}
 
 %pragma(csharp) imclasscode=%{
-  //We declare this delegate in cspacePINVOKE for callbacks
+  //We declare this delegate in corePINVOKE for callbacks
   public delegate int EventHandler_t(IntPtr eventHandler);
 
   [DllImport("$dllimport", EntryPoint="ConnectSharpEventHandler")]
@@ -99,7 +101,7 @@
   void ConnectSharpEventHandler(void *self, EventHandler_t handler)
   {
     if(self!=NULL)
-      ((_csSharpEventHandler*)self)->_Connect(handler);
+      ((csSharpEventHandlerWrap*)self)->_Connect(handler);
   }
 
   void *csMalloc(int size)

@@ -38,7 +38,7 @@ if $(CSHARP.AVAILABLE) = "yes" && $(CMD.PERL5)
 
   GenCSharpGlobals $(cs_globals) : $(cs_modules_globals) :
 	 --namespace CrystalSpace --classname CS -x GetSCFPointer
-	 -x SetSCFPointer -m public -b cspace ;
+	 -x SetSCFPointer -x RegisterWeakListener -m public -b cspace ;
 
   cspacesharpdll = $(cspacesharpdll:G=csharpmod) ;
   SEARCH on $(csbuildxml) = $(SEARCH_SOURCE) ;

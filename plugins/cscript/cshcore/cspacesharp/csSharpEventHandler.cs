@@ -21,7 +21,7 @@ using System.Reflection;
 
 namespace CrystalSpace
 {
-  public abstract class csSharpEventHandler:_csSharpEventHandler
+  public abstract class csSharpEventHandler: csSharpEventHandlerWrap
   {
     public csSharpEventHandler ()
     {
@@ -44,7 +44,7 @@ namespace CrystalSpace
       if (HandleEventInfo.DeclaringType.IsSubclassOf (baseType))
       {
 	m_eventHandler += new corePINVOKE.EventHandler_t (Base_HandleEvent);
-	corePINVOKE.ConnectSharpEventHandler (_csSharpEventHandler.
+	corePINVOKE.ConnectSharpEventHandler (csSharpEventHandlerWrap.
 						getCPtr (this).Handle,
 						m_eventHandler);
       }

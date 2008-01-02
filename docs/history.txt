@@ -6,6 +6,10 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+2-Jan-2007
+	- ronsaldo made the c# bindings CLS compliant.
+	- ronsaldo adapted the c# SimpleRoom example into the new version of the
+	  bindings
 27-Dic-2007
 	- ronsaldo added more parameters to the c# globals script generator,
 	  and fixed somes mistakes related with the c# Equals and GetHashCode

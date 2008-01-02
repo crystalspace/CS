@@ -81,8 +81,8 @@ namespace SimpleRoom
     protected csView view;
     protected iKeyboardDriver kbd;
     protected iVirtualClock vc;
-    protected uint evPreProcess;
-    protected uint evFinalProcess;
+    protected long evPreProcess;
+    protected long evFinalProcess;
 				
     public EventHandler(csView v)
     {
@@ -97,8 +97,8 @@ namespace SimpleRoom
 		
     protected void SetupFrame()
     {
-      uint elapsed_time = vc.GetElapsedTicks();
-      uint current_time = vc.GetCurrentTicks();
+      long elapsed_time = vc.GetElapsedTicks();
+      long current_time = vc.GetCurrentTicks();
 		
       //Now rotate the camera according to the keyboard state
       float speed = (float)((elapsed_time / 1000.0f) * (0.03 * 20));
@@ -141,7 +141,7 @@ namespace SimpleRoom
 	csKeyEventType eventType = csKeyEventHelper.GetEventType(ev);
 	if( eventType == csKeyEventType.csKeyEventTypeDown)
 	{
-	  uint eventCode = csKeyEventHelper.GetCookedCode(ev);
+	  long eventCode = csKeyEventHelper.GetCookedCode(ev);
 	  if (eventCode == CS.CSKEY_ESC)
 	  {
 	    //escape key to quit

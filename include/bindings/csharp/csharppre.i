@@ -69,6 +69,8 @@
 %ignore operator|=;
 %ignore operator^=;
 
+%ignore iDataBuffer::operator*;
+
 // cstool/initapp.h
 %extend csPluginRequest
 {
@@ -77,6 +79,21 @@
     return new csPluginRequest(cls, intf, iSCF::SCF->GetInterfaceID(intf), 0);
   }
 }
+
+// Rename don't work, so extend csInitializer
+%extend csInitializer
+{
+  static bool RequestThePlugins(iObjectRegistry *reg, csArray<csPluginRequest> const& plg)
+  {
+    return csInitializer::RequestPlugins(reg, plg);
+  }
+
+  static bool SetupTheEventHandler(iObjectRegistry *reg, iEventHandler *handler, const csEventID events[])
+  {
+    return csInitializer::SetupEventHandler(reg, handler, events);
+  }
+}
+
 
 #undef LANG_FUNCTIONS
 %define LANG_FUNCTIONS
@@ -315,6 +332,56 @@ IEVENTOUTLET_CSHARPCODE
 
 IBASE_CSHAPCODE
 
+#undef BUFFER_RW_FUNCTIONS
+%define BUFFER_RW_FUNCTIONS(ClassName,DataFunc,CountFunc,ElmtType,BufGetter)
+%extend ClassName
+{
+    void BufGetter ## _Write(ElmtType item, int index)
+    {
+      if(index >= self-> ## CountFunc ## ())
+	printf(#BufGetter"_Write: writting using a invalid index of %d\n", index);
+
+      self-> ## DataFunc ## ()[index] = item;
+    }
+
+    ElmtType BufGetter ##_Read(int index)
+    {
+      if(index >= self-> ## CountFunc ## ())
+	printf(#BufGetter"_Read: reading using a invalid index of %d\n", index);
+
+      return self-> ## DataFunc ## ()[index];
+    }
+}
+%enddef
+
+%define IDATABUFFER_INDEXER
+
+  public char this[int index]
+  {
+    get
+    {
+      return AsBuffer_Read(index);
+    }
+
+    set
+    {
+      AsBuffer_Write(value, index);
+    }
+  }
+
+%enddef
+
+%define IDATABUFFER_CSHARPCODE
+%typemap(cscode) iDataBuffer
+%{
+  INTERFACE_EQUALS
+  INTERFACE_HANDLE(override)
+  IDATABUFFER_INDEXER
+%}
+%enddef
+
+IDATABUFFER_CSHARPCODE
+
 // iutil/cfgmgr.h
 // Swig 1.3.21 (and possibly earlier) have a bug where enums are emitted as
 // illegal C# code:
@@ -417,6 +484,8 @@ ICONFIGMANAGER_CSHARPCODE
 %typemap(cstype) (int argc, char const * const argv []) "String[]"
 %typemap(csin) (int argc, char const * const argv []) "CrystalSpace.InteropServices.csArgsUtils.FromString($csinput)"
 
+%apply unsigned long * INOUT { csStringID &name };
+
 // Rename somes methods
 %rename(GetJointType) iODEJointState::GetType;
 %rename(GetVFType) iParticleBuiltinEffectorVelocityField::GetType;
@@ -434,6 +503,7 @@ ICONFIGMANAGER_CSHARPCODE
 // We ignore this, because we can't wrap this
 %ignore QueryInterface(scfInterfaceID iInterfaceID, int iVersion);
 
+%include "bindings/csharp/clscompliant.i"
 %include "bindings/csharp/csattributes.i"
 %include "bindings/csharp/cshoperators.i"
 %include "bindings/csharp/csstring.i"

@@ -116,17 +116,22 @@ namespace CrystalSpace
       return CS_REQUEST_PLUGIN("crystalspace.console.output.standard",
       "iConsoleOutput");
     }
-		
+
+    public static SWIGTYPE_p_csHandlerID RegisterWeakListener(iEventQueue q, iEventHandler listener, long ename, SWIGTYPE_p_csRefTiEventHandler_t handler)
+    {
+      return core.RegisterWeakListener(q, listener, (uint)ename, handler);
+    }
+
     //Miscellaneous constants
-    public const uint VFS_FILE_UNCOMPRESSED = 0x80000000;
-    public const uint CS_ZBUF_MESH     = 0x80000000;
-    public const uint CS_ZBUF_MESH2    = 0x80000001;
-    public const uint CS_MIXMODE_TYPE_MESH = 0x80000000;
-    public const uint CS_MIXMODE_TYPE_MASK = 0xc0000000;
-    public const uint CS_FX_MESH = 0x80000000;
-    public const uint CS_FX_MASK_MIXMODE = 0xf0ff0000;
-    public const uint CS_LIGHT_ACTIVE_HALO = 0x80000000;
-    public const uint CS_IMGFMT_INVALID = 0x80000000;
+    public const long VFS_FILE_UNCOMPRESSED = 0x80000000;
+    public const long CS_ZBUF_MESH     = 0x80000000;
+    public const long CS_ZBUF_MESH2    = 0x80000001;
+    public const long CS_MIXMODE_TYPE_MESH = 0x80000000;
+    public const long CS_MIXMODE_TYPE_MASK = 0xc0000000;
+    public const long CS_FX_MESH = 0x80000000;
+    public const long CS_FX_MASK_MIXMODE = 0xf0ff0000;
+    public const long CS_LIGHT_ACTIVE_HALO = 0x80000000;
+    public const long CS_IMGFMT_INVALID = 0x80000000;
     public const double CS_BOUNDINGBOX_MAXVALUE = 1000000000.0;
     public const char CSKEY_BACKSPACE = '\b';
 
@@ -143,6 +148,63 @@ namespace CrystalSpace
     public static csVector3 CS_VEC_TILT_LEFT = new csVector3(0,0,1);
     public static csVector3 CS_VEC_TILT_UP = new csVector3(-1,0,0);
     public static csVector3 CS_VEC_TILT_DOWN = new csVector3(1,0,0);
+
+    // This constants were renamed because we need CLS compliants names. The
+    // 1 prefix means upper case, and the 0 prefix means lower case
+     public const int CS_BOX_CORNER_0x0y = 0;
+     public const int CS_BOX_CORNER_0x1Y = 1;
+     public const int CS_BOX_CORNER_1X0y = 2;
+     public const int CS_BOX_CORNER_1X1Y = 3;
+
+     public const int CS_BOX_EDGE_0x0y_1X0y = 0;
+     public const int CS_BOX_EDGE_1X0y_0x0y = 1;
+     public const int CS_BOX_EDGE_1X0y_1X1Y = 2;
+     public const int CS_BOX_EDGE_1X1Y_1X0y = 3;
+     public const int CS_BOX_EDGE_1X1Y_0x1Y = 4;
+     public const int CS_BOX_EDGE_0x1Y_1X1Y = 5;
+     public const int CS_BOX_EDGE_0x1Y_0x0y = 6;
+     public const int CS_BOX_EDGE_0x0y_0x1Y = 7;
+
+     public const int CS_BOX_CORNER_0x0y0z = 0;
+     public const int CS_BOX_CORNER_0x0y1Z = 1;
+     public const int CS_BOX_CORNER_0x1Y0z = 2;
+     public const int CS_BOX_CORNER_0x1Y1Z = 3;
+     public const int CS_BOX_CORNER_1X0y0z = 4;
+     public const int CS_BOX_CORNER_1X0y1Z = 5;
+     public const int CS_BOX_CORNER_1X1Y0z = 6;
+     public const int CS_BOX_CORNER_1X1Y1Z = 7;
+
+     public const int CS_BOX_SIDE_0x = 0;
+     public const int CS_BOX_SIDE_1X = 1;
+     public const int CS_BOX_SIDE_0y = 2;
+     public const int CS_BOX_SIDE_1Y = 3;
+     public const int CS_BOX_SIDE_0z = 4;
+     public const int CS_BOX_SIDE_1Z = 5;
+
+     public const int CS_BOX_EDGE_1X0y0z_0x0y0z = 0;
+     public const int CS_BOX_EDGE_0x0y0z_1X0y0z = 1;
+     public const int CS_BOX_EDGE_0x0y0z_0x1Y0z = 2;
+     public const int CS_BOX_EDGE_0x1Y0z_0x0y0z = 3;
+     public const int CS_BOX_EDGE_0x1Y0z_1X1Y0z = 4;
+     public const int CS_BOX_EDGE_1X1Y0z_0x1Y0z = 5;
+     public const int CS_BOX_EDGE_1X1Y0z_1X0y0z = 6;
+     public const int CS_BOX_EDGE_1X0y0z_1X1Y0z = 7;
+     public const int CS_BOX_EDGE_1X0y0z_1X0y1Z = 8;
+     public const int CS_BOX_EDGE_1X0y1Z_1X0y0z = 9;
+     public const int CS_BOX_EDGE_1X0y1Z_1X1Y1Z = 10;
+     public const int CS_BOX_EDGE_1X1Y1Z_1X0y1Z = 11;
+     public const int CS_BOX_EDGE_1X1Y1Z_1X1Y0z = 12;
+     public const int CS_BOX_EDGE_1X1Y0z_1X1Y1Z = 13;
+     public const int CS_BOX_EDGE_1X1Y1Z_0x1Y1Z = 14;
+     public const int CS_BOX_EDGE_0x1Y1Z_1X1Y1Z = 15;
+     public const int CS_BOX_EDGE_0x1Y1Z_0x1Y0z = 16;
+     public const int CS_BOX_EDGE_0x1Y0z_0x1Y1Z = 17;
+     public const int CS_BOX_EDGE_0x1Y1Z_0x0y1Z = 18;
+     public const int CS_BOX_EDGE_0x0y1Z_0x1Y1Z = 19;
+     public const int CS_BOX_EDGE_0x0y1Z_0x0y0z = 20;
+     public const int CS_BOX_EDGE_0x0y0z_0x0y1Z = 21;
+     public const int CS_BOX_EDGE_0x0y1Z_1X0y1Z = 22;
+     public const int CS_BOX_EDGE_1X0y1Z_0x0y1Z = 23;
   };
 }; //namespace CrystalSpace
 

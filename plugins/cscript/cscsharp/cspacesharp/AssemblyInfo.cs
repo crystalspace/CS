@@ -16,6 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 		
+using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -27,6 +28,9 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyCulture("neutral")]
 // Use the crystal space version
 [assembly: AssemblyVersion("1.3.0.0")]
+
+// Common Language Specification compliant
+[assembly: CLSCompliant(true)]
 
 // Assembly key file for strong name signing
 [assembly: AssemblyKeyName("crystalspace-sharp.key")]
