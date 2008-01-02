@@ -8572,7 +8572,9 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetPerspectiveAspect = *cspacec::iGraphics3D_SetPerspectiveAspect;
 *GetPerspectiveAspect = *cspacec::iGraphics3D_GetPerspectiveAspect;
 *SetRenderTarget = *cspacec::iGraphics3D_SetRenderTarget;
+*CanSetRenderTarget = *cspacec::iGraphics3D_CanSetRenderTarget;
 *GetRenderTarget = *cspacec::iGraphics3D_GetRenderTarget;
+*UnsetRenderTargets = *cspacec::iGraphics3D_UnsetRenderTargets;
 *BeginDraw = *cspacec::iGraphics3D_BeginDraw;
 *FinishDraw = *cspacec::iGraphics3D_FinishDraw;
 *Print = *cspacec::iGraphics3D_Print;
@@ -18563,6 +18565,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetVertexIndicesCount = *cspacec::iPortal_GetVertexIndicesCount;
 *GetObjectPlane = *cspacec::iPortal_GetObjectPlane;
 *GetWorldPlane = *cspacec::iPortal_GetWorldPlane;
+*GetObjectSphere = *cspacec::iPortal_GetObjectSphere;
+*GetWorldSphere = *cspacec::iPortal_GetWorldSphere;
 *ComputeCameraPlane = *cspacec::iPortal_ComputeCameraPlane;
 *PointOnPolygon = *cspacec::iPortal_PointOnPolygon;
 *SetSector = *cspacec::iPortal_SetSector;
@@ -20195,6 +20199,8 @@ sub csSimpleMeshScreenspace () { $cspacec::csSimpleMeshScreenspace }
 sub CS_OPENPORTAL_ZFILL () { $cspacec::CS_OPENPORTAL_ZFILL }
 sub CS_OPENPORTAL_MIRROR () { $cspacec::CS_OPENPORTAL_MIRROR }
 sub CS_OPENPORTAL_FLOAT () { $cspacec::CS_OPENPORTAL_FLOAT }
+sub rtaDepth () { $cspacec::rtaDepth }
+sub rtaColor0 () { $cspacec::rtaColor0 }
 sub csmcNone () { $cspacec::csmcNone }
 sub csmcArrow () { $cspacec::csmcArrow }
 sub csmcLens () { $cspacec::csmcLens }

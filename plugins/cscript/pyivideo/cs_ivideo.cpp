@@ -9657,6 +9657,65 @@ SWIGINTERN PyObject *_wrap_iGraphics3D_SetRenderTarget__SWIG_0(PyObject *SWIGUNU
   iTextureHandle *arg2 = (iTextureHandle *) 0 ;
   bool arg3 ;
   int arg4 ;
+  csRenderTargetAttachment arg5 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  bool val3 ;
+  int ecode3 = 0 ;
+  int val4 ;
+  int ecode4 = 0 ;
+  int val5 ;
+  int ecode5 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGraphics3D_SetRenderTarget",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGraphics3D, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGraphics3D_SetRenderTarget" "', argument " "1"" of type '" "iGraphics3D *""'"); 
+  }
+  arg1 = reinterpret_cast< iGraphics3D * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iTextureHandle, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iGraphics3D_SetRenderTarget" "', argument " "2"" of type '" "iTextureHandle *""'"); 
+  }
+  arg2 = reinterpret_cast< iTextureHandle * >(argp2);
+  ecode3 = SWIG_AsVal_bool(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iGraphics3D_SetRenderTarget" "', argument " "3"" of type '" "bool""'");
+  } 
+  arg3 = static_cast< bool >(val3);
+  ecode4 = SWIG_AsVal_int(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iGraphics3D_SetRenderTarget" "', argument " "4"" of type '" "int""'");
+  } 
+  arg4 = static_cast< int >(val4);
+  ecode5 = SWIG_AsVal_int(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iGraphics3D_SetRenderTarget" "', argument " "5"" of type '" "csRenderTargetAttachment""'");
+  } 
+  arg5 = static_cast< csRenderTargetAttachment >(val5);
+  result = (bool)(arg1)->SetRenderTarget(arg2,arg3,arg4,arg5);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGraphics3D_SetRenderTarget__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGraphics3D *arg1 = (iGraphics3D *) 0 ;
+  iTextureHandle *arg2 = (iTextureHandle *) 0 ;
+  bool arg3 ;
+  int arg4 ;
+  bool result;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -9691,19 +9750,20 @@ SWIGINTERN PyObject *_wrap_iGraphics3D_SetRenderTarget__SWIG_0(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iGraphics3D_SetRenderTarget" "', argument " "4"" of type '" "int""'");
   } 
   arg4 = static_cast< int >(val4);
-  (arg1)->SetRenderTarget(arg2,arg3,arg4);
-  resultobj = SWIG_Py_Void();
+  result = (bool)(arg1)->SetRenderTarget(arg2,arg3,arg4);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
   return NULL;
 }
 
 
-SWIGINTERN PyObject *_wrap_iGraphics3D_SetRenderTarget__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iGraphics3D_SetRenderTarget__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iGraphics3D *arg1 = (iGraphics3D *) 0 ;
   iTextureHandle *arg2 = (iTextureHandle *) 0 ;
   bool arg3 ;
+  bool result;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -9730,18 +9790,19 @@ SWIGINTERN PyObject *_wrap_iGraphics3D_SetRenderTarget__SWIG_1(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iGraphics3D_SetRenderTarget" "', argument " "3"" of type '" "bool""'");
   } 
   arg3 = static_cast< bool >(val3);
-  (arg1)->SetRenderTarget(arg2,arg3);
-  resultobj = SWIG_Py_Void();
+  result = (bool)(arg1)->SetRenderTarget(arg2,arg3);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
   return NULL;
 }
 
 
-SWIGINTERN PyObject *_wrap_iGraphics3D_SetRenderTarget__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iGraphics3D_SetRenderTarget__SWIG_3(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iGraphics3D *arg1 = (iGraphics3D *) 0 ;
   iTextureHandle *arg2 = (iTextureHandle *) 0 ;
+  bool result;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -9760,8 +9821,8 @@ SWIGINTERN PyObject *_wrap_iGraphics3D_SetRenderTarget__SWIG_2(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iGraphics3D_SetRenderTarget" "', argument " "2"" of type '" "iTextureHandle *""'"); 
   }
   arg2 = reinterpret_cast< iTextureHandle * >(argp2);
-  (arg1)->SetRenderTarget(arg2);
-  resultobj = SWIG_Py_Void();
+  result = (bool)(arg1)->SetRenderTarget(arg2);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
   return NULL;
@@ -9770,12 +9831,12 @@ fail:
 
 SWIGINTERN PyObject *_wrap_iGraphics3D_SetRenderTarget(PyObject *self, PyObject *args) {
   int argc;
-  PyObject *argv[5];
+  PyObject *argv[6];
   int ii;
   
   if (!PyTuple_Check(args)) SWIG_fail;
   argc = PyObject_Length(args);
-  for (ii = 0; (ii < argc) && (ii < 4); ii++) {
+  for (ii = 0; (ii < argc) && (ii < 5); ii++) {
     argv[ii] = PyTuple_GET_ITEM(args,ii);
   }
   if (argc == 2) {
@@ -9788,7 +9849,7 @@ SWIGINTERN PyObject *_wrap_iGraphics3D_SetRenderTarget(PyObject *self, PyObject 
       int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iTextureHandle, 0);
       _v = SWIG_CheckState(res);
       if (_v) {
-        return _wrap_iGraphics3D_SetRenderTarget__SWIG_2(self, args);
+        return _wrap_iGraphics3D_SetRenderTarget__SWIG_3(self, args);
       }
     }
   }
@@ -9807,7 +9868,7 @@ SWIGINTERN PyObject *_wrap_iGraphics3D_SetRenderTarget(PyObject *self, PyObject 
           _v = SWIG_CheckState(res);
         }
         if (_v) {
-          return _wrap_iGraphics3D_SetRenderTarget__SWIG_1(self, args);
+          return _wrap_iGraphics3D_SetRenderTarget__SWIG_2(self, args);
         }
       }
     }
@@ -9832,7 +9893,39 @@ SWIGINTERN PyObject *_wrap_iGraphics3D_SetRenderTarget(PyObject *self, PyObject 
             _v = SWIG_CheckState(res);
           }
           if (_v) {
-            return _wrap_iGraphics3D_SetRenderTarget__SWIG_0(self, args);
+            return _wrap_iGraphics3D_SetRenderTarget__SWIG_1(self, args);
+          }
+        }
+      }
+    }
+  }
+  if (argc == 5) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iGraphics3D, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iTextureHandle, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        {
+          int res = SWIG_AsVal_bool(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          {
+            int res = SWIG_AsVal_int(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            {
+              int res = SWIG_AsVal_int(argv[4], NULL);
+              _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              return _wrap_iGraphics3D_SetRenderTarget__SWIG_0(self, args);
+            }
           }
         }
       }
@@ -9840,12 +9933,209 @@ SWIGINTERN PyObject *_wrap_iGraphics3D_SetRenderTarget(PyObject *self, PyObject 
   }
   
 fail:
-  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iGraphics3D_SetRenderTarget'.\n  Possible C/C++ prototypes are:\n    SetRenderTarget(iTextureHandle *,bool,int)\n    SetRenderTarget(iTextureHandle *,bool)\n    SetRenderTarget(iTextureHandle *)\n");
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iGraphics3D_SetRenderTarget'.\n  Possible C/C++ prototypes are:\n    SetRenderTarget(iTextureHandle *,bool,int,csRenderTargetAttachment)\n    SetRenderTarget(iTextureHandle *,bool,int)\n    SetRenderTarget(iTextureHandle *,bool)\n    SetRenderTarget(iTextureHandle *)\n");
   return NULL;
 }
 
 
-SWIGINTERN PyObject *_wrap_iGraphics3D_GetRenderTarget(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iGraphics3D_CanSetRenderTarget__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGraphics3D *arg1 = (iGraphics3D *) 0 ;
+  char *arg2 = (char *) 0 ;
+  csRenderTargetAttachment arg3 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGraphics3D_CanSetRenderTarget",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGraphics3D, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGraphics3D_CanSetRenderTarget" "', argument " "1"" of type '" "iGraphics3D *""'"); 
+  }
+  arg1 = reinterpret_cast< iGraphics3D * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iGraphics3D_CanSetRenderTarget" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iGraphics3D_CanSetRenderTarget" "', argument " "3"" of type '" "csRenderTargetAttachment""'");
+  } 
+  arg3 = static_cast< csRenderTargetAttachment >(val3);
+  result = (bool)(arg1)->CanSetRenderTarget((char const *)arg2,arg3);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGraphics3D_CanSetRenderTarget__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGraphics3D *arg1 = (iGraphics3D *) 0 ;
+  char *arg2 = (char *) 0 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGraphics3D_CanSetRenderTarget",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGraphics3D, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGraphics3D_CanSetRenderTarget" "', argument " "1"" of type '" "iGraphics3D *""'"); 
+  }
+  arg1 = reinterpret_cast< iGraphics3D * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iGraphics3D_CanSetRenderTarget" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  result = (bool)(arg1)->CanSetRenderTarget((char const *)arg2);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGraphics3D_CanSetRenderTarget(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[4];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 3); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iGraphics3D, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_iGraphics3D_CanSetRenderTarget__SWIG_1(self, args);
+      }
+    }
+  }
+  if (argc == 3) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iGraphics3D, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        {
+          int res = SWIG_AsVal_int(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          return _wrap_iGraphics3D_CanSetRenderTarget__SWIG_0(self, args);
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iGraphics3D_CanSetRenderTarget'.\n  Possible C/C++ prototypes are:\n    CanSetRenderTarget(char const *,csRenderTargetAttachment)\n    CanSetRenderTarget(char const *)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGraphics3D_GetRenderTarget__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGraphics3D *arg1 = (iGraphics3D *) 0 ;
+  csRenderTargetAttachment arg2 ;
+  int *arg3 = (int *) 0 ;
+  iTextureHandle *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGraphics3D_GetRenderTarget",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGraphics3D, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGraphics3D_GetRenderTarget" "', argument " "1"" of type '" "iGraphics3D const *""'"); 
+  }
+  arg1 = reinterpret_cast< iGraphics3D * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iGraphics3D_GetRenderTarget" "', argument " "2"" of type '" "csRenderTargetAttachment""'");
+  } 
+  arg2 = static_cast< csRenderTargetAttachment >(val2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_int, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iGraphics3D_GetRenderTarget" "', argument " "3"" of type '" "int *""'"); 
+  }
+  arg3 = reinterpret_cast< int * >(argp3);
+  result = (iTextureHandle *)((iGraphics3D const *)arg1)->GetRenderTarget(arg2,arg3);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iTextureHandle, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGraphics3D_GetRenderTarget__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGraphics3D *arg1 = (iGraphics3D *) 0 ;
+  csRenderTargetAttachment arg2 ;
+  iTextureHandle *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGraphics3D_GetRenderTarget",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGraphics3D, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGraphics3D_GetRenderTarget" "', argument " "1"" of type '" "iGraphics3D const *""'"); 
+  }
+  arg1 = reinterpret_cast< iGraphics3D * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iGraphics3D_GetRenderTarget" "', argument " "2"" of type '" "csRenderTargetAttachment""'");
+  } 
+  arg2 = static_cast< csRenderTargetAttachment >(val2);
+  result = (iTextureHandle *)((iGraphics3D const *)arg1)->GetRenderTarget(arg2);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iTextureHandle, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGraphics3D_GetRenderTarget__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iGraphics3D *arg1 = (iGraphics3D *) 0 ;
   iTextureHandle *result = 0 ;
@@ -9861,6 +10151,88 @@ SWIGINTERN PyObject *_wrap_iGraphics3D_GetRenderTarget(PyObject *SWIGUNUSEDPARM(
   arg1 = reinterpret_cast< iGraphics3D * >(argp1);
   result = (iTextureHandle *)((iGraphics3D const *)arg1)->GetRenderTarget();
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iTextureHandle, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGraphics3D_GetRenderTarget(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[4];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 3); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 1) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iGraphics3D, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_iGraphics3D_GetRenderTarget__SWIG_2(self, args);
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iGraphics3D, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_int(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        return _wrap_iGraphics3D_GetRenderTarget__SWIG_1(self, args);
+      }
+    }
+  }
+  if (argc == 3) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iGraphics3D, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_int(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_int, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          return _wrap_iGraphics3D_GetRenderTarget__SWIG_0(self, args);
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iGraphics3D_GetRenderTarget'.\n  Possible C/C++ prototypes are:\n    GetRenderTarget(csRenderTargetAttachment,int *)\n    GetRenderTarget(csRenderTargetAttachment)\n    GetRenderTarget()\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGraphics3D_UnsetRenderTargets(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGraphics3D *arg1 = (iGraphics3D *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGraphics3D_UnsetRenderTargets",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGraphics3D, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGraphics3D_UnsetRenderTargets" "', argument " "1"" of type '" "iGraphics3D *""'"); 
+  }
+  arg1 = reinterpret_cast< iGraphics3D * >(argp1);
+  (arg1)->UnsetRenderTargets();
+  resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
   return NULL;
@@ -19898,7 +20270,9 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iGraphics3D_SetPerspectiveAspect", _wrap_iGraphics3D_SetPerspectiveAspect, METH_VARARGS, NULL},
 	 { (char *)"iGraphics3D_GetPerspectiveAspect", _wrap_iGraphics3D_GetPerspectiveAspect, METH_VARARGS, NULL},
 	 { (char *)"iGraphics3D_SetRenderTarget", _wrap_iGraphics3D_SetRenderTarget, METH_VARARGS, NULL},
+	 { (char *)"iGraphics3D_CanSetRenderTarget", _wrap_iGraphics3D_CanSetRenderTarget, METH_VARARGS, NULL},
 	 { (char *)"iGraphics3D_GetRenderTarget", _wrap_iGraphics3D_GetRenderTarget, METH_VARARGS, NULL},
+	 { (char *)"iGraphics3D_UnsetRenderTargets", _wrap_iGraphics3D_UnsetRenderTargets, METH_VARARGS, NULL},
 	 { (char *)"iGraphics3D_BeginDraw", _wrap_iGraphics3D_BeginDraw, METH_VARARGS, NULL},
 	 { (char *)"iGraphics3D_FinishDraw", _wrap_iGraphics3D_FinishDraw, METH_VARARGS, NULL},
 	 { (char *)"iGraphics3D_Print", _wrap_iGraphics3D_Print, METH_VARARGS, NULL},
@@ -21779,6 +22153,8 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "CS_OPENPORTAL_ZFILL",SWIG_From_int(static_cast< int >(CS_OPENPORTAL_ZFILL)));
   SWIG_Python_SetConstant(d, "CS_OPENPORTAL_MIRROR",SWIG_From_int(static_cast< int >(CS_OPENPORTAL_MIRROR)));
   SWIG_Python_SetConstant(d, "CS_OPENPORTAL_FLOAT",SWIG_From_int(static_cast< int >(CS_OPENPORTAL_FLOAT)));
+  SWIG_Python_SetConstant(d, "rtaDepth",SWIG_From_int(static_cast< int >(rtaDepth)));
+  SWIG_Python_SetConstant(d, "rtaColor0",SWIG_From_int(static_cast< int >(rtaColor0)));
   SWIG_Python_SetConstant(d, "csmcNone",SWIG_From_int(static_cast< int >(csmcNone)));
   SWIG_Python_SetConstant(d, "csmcArrow",SWIG_From_int(static_cast< int >(csmcArrow)));
   SWIG_Python_SetConstant(d, "csmcLens",SWIG_From_int(static_cast< int >(csmcLens)));
