@@ -22,6 +22,7 @@
     
     <input name="inputColor" type="rgba" />
     <input file="/shader/snippets/primaryColor.inp" private="yes"/>
+    <input file="/shader/snippets/primaryColor.inp" private="yes"/>
     
     <block location="cg:fragmentMain">
       outputColor.rgb = inputColor.rgb;

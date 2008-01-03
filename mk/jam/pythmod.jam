@@ -79,6 +79,7 @@ rule PythMod
     if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
     {
       local debugfile = [ SplitDebugInfo $(module) ] ;
+      MakeLocate $(debugfile) : [ ConcatDirs $(LOCATE.OBJECTS) $(4) ] ;
       cleantarget += $(debugfile) ;
       NoCare $(debugfile) ;
       Depends install_bindings :

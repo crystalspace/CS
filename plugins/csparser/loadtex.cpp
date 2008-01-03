@@ -30,9 +30,7 @@
 #include "csgfx/imagememory.h"
 #include "csgfx/imagevolumemaker.h"
 #include "csgfx/rgbpixel.h"
-#include "csgfx/shadervar.h"
 #include "csgfx/xorpat.h"
-#include "cstool/unusedresourcehelper.h"
 #include "csutil/cscolor.h"
 #include "csutil/scfstr.h"
 #include "iengine/engine.h"
@@ -309,65 +307,6 @@ iTextureWrapper* csLoader::LoadTexture (const char *name,
   }
 
   return TexWrapper;
-}
-
-bool csLoader::LoadProxyTextures(bool forceLoadTextures)
-{
-  if(!forceLoadTextures)
-  {
-    csWeakRefArray<iTextureWrapper> texArray;
-
-    for(uint i=0; i<proxyTextures.GetSize(); i++)
-    {
-      proxyTexture proxTex = proxyTextures.Get(i);
-      if(!proxTex.textureWrapper)
-      {
-        proxyTextures.DeleteIndex(i);
-        i--;
-        continue;
-      }
-
-      texArray.Push(proxTex.textureWrapper);
-    }
-    CS::Utility::UnusedResourceHelper::UnloadUnusedMaterials(Engine, materialArray);
-    CS::Utility::UnusedResourceHelper::UnloadUnusedTextures(Engine, texArray);
-  }
-  materialArray.Empty();
-
-  for(uint i=0; i<proxyTextures.GetSize(); i++)
-  {
-    proxyTexture proxTex = proxyTextures.Get(i);
-
-    if(!proxTex.textureWrapper)
-    {
-      proxyTextures.DeleteIndex(i);
-      i--;
-      continue;
-    }
-
-    iTextureManager *tm = G3D->GetTextureManager();
-
-    int Format = tm->GetTextureFormat ();
-    csRef<iImage> img = LoadImage (proxTex.filename, Format);
-    if (!img)
-    {
-      ReportWarning (
-        "crystalspace.maploader.parse.texture",
-        "Couldn't load image '%s', using error texture instead!",
-        proxTex.filename.GetData());
-      img = GenerateErrorTexture (32, 32);
-      if (!img)
-        return false;
-    }
-
-    proxTex.textureWrapper->QueryObject()->SetName(proxTex.textureWrapper->QueryObject()->GetName());
-    proxTex.textureWrapper->SetImageFile(img);
-    proxTex.textureWrapper->Register (tm);
-    proxyTextures.DeleteIndex(i);
-    i--;
-  }
-
-  return true;
 }
 
 //----------------------------------------------------------------------------

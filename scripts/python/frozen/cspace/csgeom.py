@@ -595,6 +595,7 @@ class csPlane3(object):
     def Invert(*args): return _csgeom.csPlane3_Invert(*args)
     def Normalize(*args): return _csgeom.csPlane3_Normalize(*args)
     def FindPoint(*args): return _csgeom.csPlane3_FindPoint(*args)
+    def ProjectOnto(*args): return _csgeom.csPlane3_ProjectOnto(*args)
     FindOrthogonalPoints = staticmethod(_csgeom.csPlane3_FindOrthogonalPoints)
     def ClipPolygon(*args): return _csgeom.csPlane3_ClipPolygon(*args)
     def Description(*args): return _csgeom.csPlane3_Description(*args)
@@ -1459,6 +1460,7 @@ class csTriangleMesh(pycsTriangleMesh):
     def GetVertexCount(*args): return _csgeom.csTriangleMesh_GetVertexCount(*args)
     def GetVertices(*args): return _csgeom.csTriangleMesh_GetVertices(*args)
     def AddTriangle(*args): return _csgeom.csTriangleMesh_AddTriangle(*args)
+    def AddTriangleMesh(*args): return _csgeom.csTriangleMesh_AddTriangleMesh(*args)
     def GetTriangles(*args): return _csgeom.csTriangleMesh_GetTriangles(*args)
     def GetTriangle(*args): return _csgeom.csTriangleMesh_GetTriangle(*args)
     def GetTriangleCount(*args): return _csgeom.csTriangleMesh_GetTriangleCount(*args)
@@ -1469,6 +1471,7 @@ class csTriangleMesh(pycsTriangleMesh):
     def Unlock(*args): return _csgeom.csTriangleMesh_Unlock(*args)
     def GetFlags(*args): return _csgeom.csTriangleMesh_GetFlags(*args)
     def GetChangeNumber(*args): return _csgeom.csTriangleMesh_GetChangeNumber(*args)
+    def __iadd__(*args): return _csgeom.csTriangleMesh___iadd__(*args)
 csTriangleMesh_swigregister = _csgeom.csTriangleMesh_swigregister
 csTriangleMesh_swigregister(csTriangleMesh)
 

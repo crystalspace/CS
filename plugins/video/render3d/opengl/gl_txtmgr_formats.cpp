@@ -43,6 +43,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 void csGLTextureManager::InitFormats ()
 {
   G3D->ext->InitGL_EXT_abgr ();
+  G3D->ext->InitGL_EXT_packed_depth_stencil ();
+  G3D->ext->InitGL_ARB_depth_texture ();
 
   if (G3D->ext->CS_GL_EXT_texture_compression_s3tc)
   {
@@ -192,6 +194,37 @@ static const csGLTextureManager::FormatTemplate formatsALumfloat[] = {
   {{0, 0, 0, 0}, -1, 0}
 };
 
+enum
+{
+  fmtDepth16 = 0,
+  fmtDepth24,
+  fmtDepthStencil24_8,
+  fmtDepth32,
+  
+  fmtDepthNum
+};
+
+static const GLenum targetDepth[fmtDepthNum] = {
+  GL_DEPTH_COMPONENT16_ARB, GL_DEPTH_COMPONENT24_ARB, 
+  GL_DEPTH24_STENCIL8_EXT, GL_DEPTH_COMPONENT32_ARB
+};
+
+static const csGLTextureManager::FormatTemplate formatsDepth[] = {
+  {{16, 0,  0,  0}, fmtDepth16, GL_UNSIGNED_SHORT},
+  {{32, 0,  0,  0}, fmtDepth32, GL_UNSIGNED_INT},
+  {{0, 0, 0, 0}, -1, 0}
+};
+
+static const csGLTextureManager::FormatTemplate formatsDepthJunk[] = {
+  {{24, 8,  0,  0}, fmtDepth24, GL_UNSIGNED_INT_24_8_EXT},
+  {{0, 0, 0, 0}, -1, 0}
+};
+
+static const csGLTextureManager::FormatTemplate formatsDepthStencil[] = {
+  {{24, 8,  0,  0}, fmtDepthStencil24_8, GL_UNSIGNED_INT_24_8_EXT},
+  {{0, 0, 0, 0}, -1, 0}
+};
+
 // Check if a format/type combo is supported by the available extensions
 bool csGLTextureManager::FormatSupported (GLenum srcFormat, GLenum srcType)
 {
@@ -211,6 +244,16 @@ bool csGLTextureManager::FormatSupported (GLenum srcFormat, GLenum srcType)
     return false;
   if ((srcType == GL_HALF_FLOAT_ARB) 
     && !G3D->ext->CS_GL_ARB_half_float_pixel) 
+    return false;
+    
+  if (((srcType == GL_UNSIGNED_INT_24_8_EXT)
+      || (srcFormat == GL_DEPTH24_STENCIL8_EXT))
+    && !G3D->ext->CS_GL_EXT_packed_depth_stencil)
+    return false;
+  if (((srcFormat == GL_DEPTH_COMPONENT16_ARB)
+      || (srcFormat == GL_DEPTH_COMPONENT24_ARB)
+      || (srcFormat == GL_DEPTH_COMPONENT32_ARB))
+    && !G3D->ext->CS_GL_ARB_depth_texture)
     return false;
 
   return true;
@@ -434,6 +477,24 @@ bool csGLTextureManager::DetermineIntegerFormat (
       sourceFormat = GL_LUMINANCE_ALPHA;
       compCount = 2;
       targetTable = targetALum;
+      break;
+    case ORDER('d',0,0,0):
+      formats = formatsDepth;
+      sourceFormat = GL_DEPTH_COMPONENT;
+      compCount = 1;
+      targetTable = targetDepth;
+      break;
+    case ORDER('d','x',0,0):
+      formats = formatsDepthJunk;
+      sourceFormat = GL_DEPTH_COMPONENT;
+      compCount = 1;
+      targetTable = targetDepth;
+      break;
+    case ORDER('d','s',0,0):
+      formats = formatsDepthStencil;
+      sourceFormat = GL_DEPTH_STENCIL_EXT;
+      compCount = 1;
+      targetTable = targetDepth;
       break;
   }
 

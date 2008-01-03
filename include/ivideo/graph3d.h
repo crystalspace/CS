@@ -717,6 +717,18 @@ struct csSimpleRenderMesh
 };
 
 /**
+ * Render target attachment - selects which result of the rasterization gets
+ * output to the given texture when setting a render target.
+ */
+enum csRenderTargetAttachment
+{
+  /// Depth
+  rtaDepth,
+  /// Color
+  rtaColor0
+};
+
+/**
  * This is the standard 3D graphics interface.
  * All 3D graphics rasterizer servers for Crystal Space should implement this
  * interface, as well as the iGraphics2D interface.  The standard
@@ -732,7 +744,7 @@ struct csSimpleRenderMesh
  */
 struct iGraphics3D : public virtual iBase
 {
-  SCF_INTERFACE(iGraphics3D, 2, 1, 1);
+  SCF_INTERFACE(iGraphics3D, 2, 2, 0);
   
   /// Open the 3D graphics display.
   virtual bool Open () = 0;
@@ -794,28 +806,58 @@ struct iGraphics3D : public virtual iBase
   virtual float GetPerspectiveAspect () const = 0;
  
   /**
-   * Set the target of rendering. If this is 0 then the target will
-   * be the main screen. Otherwise it is a texture. After calling
-   * g3d->FinishDraw() the target will automatically be reset to 0 (main
-   * screen). Note that on some implementions rendering on a texture
-   * will overwrite the screen. So you should only do this BEFORE you
-   * start rendering your frame.
-   * <p>
+   * Set the target of rendering for a certain rasterization result.
+   * If all result attachments have a 0 target rendering is performed to the
+   * framebuffer (ie main screen). If at least one texture is attached
+   * rendering is performed off-screen to the given texture(s).
+   * After calling FinishDraw() the targets will automatically be unset. 
+   * Note that on some implementions rendering on a texture
+   * will overwrite the framebuffer contents. So you should only do this 
+   * BEFORE you start rendering your frame.
+   *
    * \param persistent If this is true then the current contents of the texture
-   * will be copied on screen before drawing occurs (in the first
-   * call to BeginDraw). Otherwise it is assumed that you fully render
-   * the texture.
+   *   will be preserved when drawing occurs (in the first call to BeginDraw). 
+   *   Otherwise it is assumed that you fully render the texture - untouched 
+   *   parts may be undefined. Using persistence may incur a performance
+   *   penalty so it's recommended to avoid this flag.
    * \param subtexture this specifies the subtexture index if the texture
-   * is a cubemap. It is in the range 0 to 5.
+   *   is a cubemap or volume texture. It is in the range 0 to 5 for cubemaps
+   *   (\sa iTextureHandle::CS_TEXTURE_CUBE_POS_X et al) or the depth index
+   *   for volume textures.
+   * \param attachment Specifies to what result of the rasterization the
+   *   texture should be attached to.
+   * \returns Whether setting the render target was successful. Reasons for
+   *   failure can include:
+   *   - The hardware or driver does not support the given attachment with
+   *     the given texture or not at all.
+   *   - The dimensions of the various attachments don't match.
+   * \sa UnsetRenderTargets
    */
-  virtual void SetRenderTarget (iTextureHandle* handle,
+  virtual bool SetRenderTarget (iTextureHandle* handle,
 	bool persistent = false,
-	int subtexture = 0) = 0;
+	int subtexture = 0,
+	csRenderTargetAttachment attachment = rtaColor0) = 0;
+	
+  /**
+   * Check if a texture with the given format can be set as a render target for
+   * the given attachment.
+   * \remarks Texture formats may be reported as supported even though textures
+   *   with that format can't be created.
+   */
+  virtual bool CanSetRenderTarget (const char* format,
+    csRenderTargetAttachment attachment = rtaColor0) = 0;
 
   /**
    * Get the current render target (0 for screen).
+   * \param attachment The attachment for which to return the render target.
+   * \param subtexture Optionally returns the subtexture index.
    */
-  virtual iTextureHandle* GetRenderTarget () const = 0;
+  virtual iTextureHandle* GetRenderTarget (
+    csRenderTargetAttachment attachment = rtaColor0,
+    int* subtexture = 0) const = 0;
+  
+  /// Clear render targets for all rasterization result attachments.
+  virtual void UnsetRenderTargets() = 0;
 
   /// Start a new frame (see CSDRAW_XXX bit flags)
   virtual bool BeginDraw (int DrawFlags) = 0;

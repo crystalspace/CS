@@ -206,10 +206,13 @@ rule PythModDepends
   }
 }
 
+if $(PYTHON.AVAILABLE) = "yes"
+{
 Description pythmod : "build all python bindings modules" ;
 PythModDepends coremod imeshmod isndsysmod ivariamod ienginemod cstoolmod
   ivideomod imapmod csgfxmod csgeommod ;
 Depends bindings : pythmod ;
+}
 
 NotFile csharp_mods ;
 
@@ -257,7 +260,7 @@ actions CspacePthGen bind PACKAGEPATH
 rule InstallCspacePth
 {
   local cspace_pth = cspace.pth ;
-  MakeLocate $(cspace_pth) : [ ConcatDirs $(libdir) python$(PYTHON.VERSION) site-packages ] ;
+  MakeLocate $(cspace_pth) : [ ConcatDirs $(DESTDIR) $(libdir) python$(PYTHON.VERSION) site-packages ] ;
   local destdir = [ ConcatDirs $(appdatadir) bindings python ] ;
   NotFile $(destdir) ;
   PACKAGEPATH on $(cspace_pth) = $(destdir) ;

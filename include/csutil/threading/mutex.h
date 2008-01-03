@@ -100,13 +100,6 @@ namespace Threading
       BaseMutex::Unlock ();
     }
 
-    /**
-     * Query lock status.
-     */
-    bool IsLocked ()
-    {
-      return BaseMutex::IsLocked ();
-    }
   protected:
     friend class ConditionBase;
   };
@@ -151,14 +144,11 @@ namespace Threading
 
     ~ScopedLock ()
     {
-      if (lockObj.IsLocked ())
-      {
-        lockObj.Unlock ();
-      }
+      lockObj.Unlock ();
     }
 
   private:
-    T& lockObj;
+    T& lockObj;    
   };
 
   // Standard lock

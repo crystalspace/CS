@@ -329,8 +329,6 @@ private:
   // For debugging: inhibit all drawing of meshes till next frame.
   bool debug_inhibit_draw;
 
-  /// Current render target.
-  csRef<iTextureHandle> render_target;
   csGLRender2TextureBackend* r2tbackend;
 
   /// Should we use special buffertype (VBO) or just system memory
@@ -589,11 +587,10 @@ public:
   virtual void SetWorldToCamera (const csReversibleTransform& w2c);
   virtual const csReversibleTransform& GetWorldToCamera () { return world2camera; }
 
-  /// Set the current render target (0 for screen).
-  virtual void SetRenderTarget (iTextureHandle* handle,
-	  bool persistent = false,
-	  int subtexture = 0)
-  {
+  uint currentAttachments;
+  bool SetRenderTarget (iTextureHandle* handle, bool persistent = false,
+    int subtexture = 0, csRenderTargetAttachment attachment = rtaColor0);
+  /*{
     render_target = handle;
     r2tbackend->SetRenderTarget (handle, persistent, subtexture);
 
@@ -602,13 +599,18 @@ public:
     viewwidth = G2D->GetWidth();
     viewheight = G2D->GetHeight();
     needViewportUpdate = true;
-  }
-
-  /// Get the current render target (0 for screen).
+  }*/
+  bool CanSetRenderTarget (const char* format,
+    csRenderTargetAttachment attachment = rtaColor0);
+  iTextureHandle* GetRenderTarget (
+    csRenderTargetAttachment attachment = rtaColor0,
+    int* subtexture = 0) const;
+  void UnsetRenderTargets();
+  /*/// Get the current render target (0 for screen).
   virtual iTextureHandle* GetRenderTarget () const
   {
     return render_target;
-  }
+  }*/
 
   /// Begin drawing in the renderer
   bool BeginDraw (int drawflags);

@@ -17,7 +17,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-/**\file 
+/**@file 
  * Directory master header. This header file includes all headers in a
  * subdirectory of the top Crystal Space include directory.
  */
@@ -58,6 +58,7 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/tri.h"
 #include "csgeom/triangulate.h"
+#include "csgeom/triangulate3d.h"
 #include "csgeom/trimesh.h"
 #include "csgeom/trimeshlod.h"
 #include "csgeom/trimeshtools.h"

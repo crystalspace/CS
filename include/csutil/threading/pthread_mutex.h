@@ -40,7 +40,6 @@ namespace Implementation
     void Initialize ()
     {
       pthread_mutex_init (&mutex, 0);
-      isLocked = false;
     }
 
     void Destroy ()
@@ -48,23 +47,16 @@ namespace Implementation
       pthread_mutex_destroy (&mutex);
     }
     
-    bool IsLocked ()
-    {
-      return isLocked;
-    }
-
     bool Lock ()
     {
       int status = pthread_mutex_lock (&mutex);
-      isLocked = (status == 0);
-      return isLocked;
+      return status == 0;
     }
 
     bool TryLock ()
     {
       int status = pthread_mutex_trylock (&mutex);
-      isLocked = (status == 0);
-      return isLocked;
+      return status == 0;
     }
 
     void Unlock ()
@@ -76,7 +68,6 @@ namespace Implementation
     friend class ConditionBase;
 
     pthread_mutex_t mutex;
-    bool isLocked;
   };
 
 
@@ -116,20 +107,6 @@ namespace Implementation
     {
       MutexBase::Destroy ();
       pthread_cond_destroy (&unlockedCond);
-    }
-
-    bool IsLocked ()
-    {
-      bool ret = false;
-      MutexBase::Lock ();
-      
-      if (validID && recursionCount > 0)
-      {
-        ret = true;
-      }
-
-      MutexBase::Unlock ();
-      return ret;
     }
 
     bool Lock ()

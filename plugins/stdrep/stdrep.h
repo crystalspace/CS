@@ -113,6 +113,19 @@ public:
   virtual void SetMessageDestination (int severity,
   	bool do_stdout, bool do_stderr, bool do_console,
 	bool do_alert, bool do_debug, bool do_popup = false);
+  virtual void SetStandardOutput (int severity, bool en);
+  virtual bool IsStandardOutput (int severity);
+  virtual void SetStandardError (int severity, bool en);
+  virtual bool IsStandardError (int severity);
+  virtual void SetConsoleOutput (int severity, bool en);
+  virtual bool IsConsoleOutput (int severity);
+  virtual void SetAlertOutput (int severity, bool en);
+  virtual bool IsAlertOutput (int severity);
+  virtual void SetDebugOutput (int severity, bool en);
+  virtual bool IsDebugOutput (int severity);
+  virtual void SetPopupOutput (int severity, bool en);
+  virtual bool IsPopupOutput (int severity);
+
   virtual void RemoveMessages (int severity, bool remove);
   virtual void ShowMessageID (int severity, bool showid);
   virtual const char* GetDebugFile ();

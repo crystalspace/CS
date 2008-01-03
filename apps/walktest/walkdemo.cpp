@@ -358,7 +358,7 @@ void add_particles_fountain (iSector* sector, char* matname, int num,
 // Demo particle system (explosion).
 //===========================================================================
 void add_particles_explosion (iSector* sector, iEngine* engine,
-	const csVector3& center, char* matname)
+	const csVector3& center, const char* matname)
 {
   // First check if the material exists.
   iMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterialList ()->

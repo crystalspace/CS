@@ -189,5 +189,5 @@ maximum angle between two surface normals (in degrees) at which the
 surfaces are still considered coplanar. 
 
 @itemize @bullet
-@item Can be set globally: @code{normalsthreshold}.
+@item Can be set globally: @code{normalstolerance}.
 @end itemize

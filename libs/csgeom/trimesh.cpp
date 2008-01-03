@@ -64,6 +64,37 @@ void csTriangleMesh::AddTriangle (int a, int b, int c)
   triangles.Push (t);
 }
 
+void csTriangleMesh::AddTriangleMesh(const csTriangleMesh& tm)
+{
+	// retrieve the old size - size before any insertion
+	size_t oldSize = GetVertexCount();
+
+	// get vertices first
+	size_t vertexCount = tm.GetVertexCount();
+	const csVector3* verts = tm.GetVertices();
+	for (size_t i = 0; i < vertexCount; i++)
+	{
+		AddVertex(verts[i]);
+	}
+
+	size_t triCount = tm.GetTriangleCount();
+	const csTriangle* trisToAdd = tm.GetTriangles();
+
+	// for each of the indexes in each triangle, we
+	// will need to add oldSize to it
+	for (size_t i = 0; i < triCount; i++)
+	{
+		csTriangle oneToAdd = trisToAdd[i];
+		AddTriangle((int)(oneToAdd[0] + oldSize), (int)(oneToAdd[1] + oldSize), (int)(oneToAdd[2] + oldSize));
+	}
+}
+
+csTriangleMesh& csTriangleMesh::operator+=(const csTriangleMesh& tm)
+{
+	AddTriangleMesh(tm);
+	return *this;
+}
+
 //---------------------------------------------------------------------------
 
 void csTriangleVertex::AddTriangle (size_t idx)

@@ -299,13 +299,14 @@ namespace CS
      * // Succeeds
      * if (format.GetComponentMask() == CS::StructuredTextureFormat::compRGB)
      * { ... }
-     * // Would also succeed for formatString = "bgr8", or even wierd formats like 
-     * // "gbr4", and more
+     * // Would also succeed for formatString = "bgr8" or even wierd formats like 
+     * // "gbr4" and more, but not if an additional component such as alpha is
+     * // present.
      * \endcode
      */
     uint GetComponentMask () const;
   };
-
+  
   /**
    * Texture format string parser routines.
    */
