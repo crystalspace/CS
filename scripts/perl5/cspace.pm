@@ -1180,7 +1180,6 @@ sub new {
 *DeleteIndex = *cspacec::csPluginRequestArray_DeleteIndex;
 *DeleteIndexFast = *cspacec::csPluginRequestArray_DeleteIndexFast;
 *DeleteRange = *cspacec::csPluginRequestArray_DeleteRange;
-*GetReverseIterator = *cspacec::csPluginRequestArray_GetReverseIterator;
 *__eq__ = *cspacec::csPluginRequestArray___eq__;
 *__ne__ = *cspacec::csPluginRequestArray___ne__;
 *GetAllocator = *cspacec::csPluginRequestArray_GetAllocator;
@@ -3806,7 +3805,6 @@ sub new {
 *DeleteIndex = *cspacec::csImageIOFileFormatDescriptions_DeleteIndex;
 *DeleteIndexFast = *cspacec::csImageIOFileFormatDescriptions_DeleteIndexFast;
 *DeleteRange = *cspacec::csImageIOFileFormatDescriptions_DeleteRange;
-*GetReverseIterator = *cspacec::csImageIOFileFormatDescriptions_GetReverseIterator;
 *__eq__ = *cspacec::csImageIOFileFormatDescriptions___eq__;
 *__ne__ = *cspacec::csImageIOFileFormatDescriptions___ne__;
 *GetAllocator = *cspacec::csImageIOFileFormatDescriptions_GetAllocator;
@@ -12303,7 +12301,6 @@ sub new {
 *DeleteIndex = *cspacec::csIntArray_DeleteIndex;
 *DeleteIndexFast = *cspacec::csIntArray_DeleteIndexFast;
 *DeleteRange = *cspacec::csIntArray_DeleteRange;
-*GetReverseIterator = *cspacec::csIntArray_GetReverseIterator;
 *__eq__ = *cspacec::csIntArray___eq__;
 *__ne__ = *cspacec::csIntArray___ne__;
 *GetAllocator = *cspacec::csIntArray_GetAllocator;
@@ -12362,7 +12359,6 @@ sub new {
 *DeleteIndex = *cspacec::csIntArrayArray_DeleteIndex;
 *DeleteIndexFast = *cspacec::csIntArrayArray_DeleteIndexFast;
 *DeleteRange = *cspacec::csIntArrayArray_DeleteRange;
-*GetReverseIterator = *cspacec::csIntArrayArray_GetReverseIterator;
 *__eq__ = *cspacec::csIntArrayArray___eq__;
 *__ne__ = *cspacec::csIntArrayArray___ne__;
 *GetAllocator = *cspacec::csIntArrayArray_GetAllocator;
@@ -14886,7 +14882,6 @@ sub new {
 *DeleteIndex = *cspacec::csCharArrayArray_DeleteIndex;
 *DeleteIndexFast = *cspacec::csCharArrayArray_DeleteIndexFast;
 *DeleteRange = *cspacec::csCharArrayArray_DeleteRange;
-*GetReverseIterator = *cspacec::csCharArrayArray_GetReverseIterator;
 *__eq__ = *cspacec::csCharArrayArray___eq__;
 *__ne__ = *cspacec::csCharArrayArray___ne__;
 *GetAllocator = *cspacec::csCharArrayArray_GetAllocator;
