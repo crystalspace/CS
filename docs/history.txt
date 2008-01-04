@@ -10,6 +10,8 @@ chronological order.
 	- Vincent fixed a crasher in csbench: PerformShaderTest() still queried
 	  iThingState for walls mesh after CreateRoom() was changed to use
 	  genmesh.
+	- caedes added a macro called CALLBACK_INTERFACE_HDR to python swig
+	  files to help in declaring director classes for scf interfaces.
 1-Jan-2008
 	- Jorrit added iPortal->GetObjectSphere() and GetWorldSphere().
 	  With these two functions you can get the bounding sphere (in world
