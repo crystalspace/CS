@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2007 by Marten Svanfeldt
+    Copyright (C) 2007-2008 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,14 +16,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_CONTEXT_H__
-#define __CS_CSPLUGINCOMMON_RENDERMANAGER_CONTEXT_H__
+#ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_PORTALSETUP_H__
+#define __CS_CSPLUGINCOMMON_RENDERMANAGER_PORTALSETUP_H__
 
 #include "iengine/sector.h"
 
-#include "csplugincommon/rendermanager/render.h"
 #include "csplugincommon/rendermanager/renderview.h"
-#include "csplugincommon/rendermanager/standardsorter.h"
 #include "csplugincommon/rendermanager/svsetup.h"
 #include "csplugincommon/rendermanager/texturecache.h"
 #include "csutil/sysfunc.h"
@@ -32,15 +30,27 @@ namespace CS
 {
 namespace RenderManager
 {
+  /**
+   * Standard setup functor for portals.
+   * The standard setup will classify portals into simple and heavy portals
+   * respectively where simple portals can be rendered directly without clipping
+   * while heavy portals requires render-to-texture.
+   */
   template<typename RenderTreeType, typename ContextSetup>
   class StandardPortalSetup
   {
   public:
     typedef StandardPortalSetup<RenderTreeType, ContextSetup> ThisType;
 
+    /**
+     * Persistent data to be stored/cached between frames
+     */
     struct PersistentData
     {
       
+      /**
+       * Cache structure for portal render buffers
+       */
       struct PortalBuffers
       {
         csRef<iRenderBuffer> coordBuf;
@@ -48,6 +58,10 @@ namespace RenderManager
         csRef<iRenderBuffer> indexBuf;
         csRef<csRenderBufferHolder> holder;
       };
+
+      /**
+       * GenericCache-constraints for PortalBuffer caching
+       */
       struct PortalBufferConstraint
       {
         typedef size_t KeyType;
@@ -94,6 +108,9 @@ namespace RenderManager
       CS::Utility::GenericResourceCache<PortalBuffers, csTicks,
         PortalBufferConstraint> bufCache;
 
+      /**
+       * Cache-helper for box clipper caching
+       */
       struct csBoxClipperCached : public csBoxClipper
       {
         PersistentData* owningPersistentData;
@@ -163,22 +180,39 @@ namespace RenderManager
       }
     };
   
+    /**
+     * Data that needs to be passed between portal setup steps by the
+     * context setup function.
+     */
+    struct ContextSetupData
+    {
+      typename RenderTreeType::ContextNode* lastSimplePortalCtx;
+
+      ContextSetupData (typename RenderTreeType::ContextNode* last = 0)
+        : lastSimplePortalCtx (last)
+      {}
+    };
+
     StandardPortalSetup (PersistentData& persistentData, ContextSetup& cfun)
       : persistentData (persistentData), contextFunction (cfun)
     {}
 
-    void operator() (RenderTreeType& renderTree, 
-      typename RenderTreeType::ContextNode* context, 
-      typename RenderTreeType::ContextsContainer* container, 
-      iSector* sector, CS::RenderManager::RenderView* rview)
+    /**
+     * Setup all portals within given context
+     */
+    void operator() (typename RenderTreeType::ContextNode& context, 
+      ContextSetupData& setupData)
     {
+      RenderView* rview = context.renderView;
+      RenderTreeType& renderTree = context.owner;
+
       csDirtyAccessArray<csVector2> allPortalVerts2d (64);
       csDirtyAccessArray<csVector3> allPortalVerts3d (64);
       csDirtyAccessArray<size_t> allPortalVertsNums;
       // Handle all portals
-      for (size_t pc = 0; pc < context->allPortals.GetSize (); ++pc)
+      for (size_t pc = 0; pc < context.allPortals.GetSize (); ++pc)
       {
-        typename RenderTreeType::ContextNode::PortalHolder& holder = context->allPortals[pc];
+        typename RenderTreeType::ContextNode::PortalHolder& holder = context.allPortals[pc];
         const size_t portalCount = holder.portalContainer->GetPortalCount ();
         CS::Graphics::RenderPriority renderPrio = 
           holder.meshWrapper->GetRenderPriority ();
@@ -212,7 +246,8 @@ namespace RenderManager
             // Setup simple portal
             rview->CreateRenderContext ();
             rview->SetLastPortal (portal);
-            rview->SetPreviousSector (sector);
+            rview->SetPreviousSector (rview->GetThisSector ());
+            rview->SetThisSector (portal->GetSector ());
             csPolygonClipper newView (portalVerts2d, count);
             rview->SetClipper (&newView);
 
@@ -223,10 +258,15 @@ namespace RenderManager
 	    }
 	    
             typename RenderTreeType::ContextNode* portalCtx = 
-              renderTree.CreateContext (container, rview);
+              renderTree.CreateContext (rview, setupData.lastSimplePortalCtx);
+            setupData.lastSimplePortalCtx = portalCtx;
+            
+            // Copy the target from last portal
+            portalCtx->renderTarget = context.renderTarget;
+            portalCtx->subtexture = context.subtexture;
 
             // Setup the new context
-            contextFunction(renderTree, portalCtx, container, portal->GetSector (), rview);
+            contextFunction (*portalCtx, setupData);
 
             rview->RestoreRenderContext ();
             portalVerts2d += count;
@@ -316,7 +356,8 @@ namespace RenderManager
 	    // Add a new context with the texture as the target
 	    // Setup simple portal
 	    newRenderView->SetLastPortal (portal);
-	    newRenderView->SetPreviousSector (sector);
+            newRenderView->SetPreviousSector (rview->GetThisSector ());
+            newRenderView->SetThisSector (portal->GetSector ());
 	    csBox2 clipBox (0, real_h - txt_h, txt_w, real_h);
             csRef<iClipper2D> newView;
             /* @@@ Consider PolyClipper?
@@ -336,17 +377,13 @@ namespace RenderManager
                 &persistentData, clipBox));
             newRenderView->SetClipper (newView);
 
-	    typename RenderTreeType::ContextsContainer* targetContexts = 
-	      renderTree.CreateContextContainer ();
-	    targetContexts->renderTarget = tex;
-	    targetContexts->rview = newRenderView;
-    
             typename RenderTreeType::ContextNode* portalCtx = 
-              renderTree.CreateContext (targetContexts, newRenderView);
+              renderTree.CreateContext (newRenderView);
+            portalCtx->renderTarget = tex;
   
 	    // Setup the new context
-            contextFunction(renderTree, portalCtx, targetContexts, 
-              portal->GetSector (), newRenderView);
+            ContextSetupData newSetup (portalCtx);
+            contextFunction (*portalCtx, newSetup);
   
 	    // Synthesize a render mesh for the portal plane
 	    iMaterialWrapper* mat = portal->GetMaterial ();
@@ -430,7 +467,8 @@ namespace RenderManager
 	    
 	    typename RenderTreeType::MeshNode::SingleMesh sm;
 	    sm.meshObjSVs = 0;
-	    renderTree.AddRenderMeshToContext (context, rm, renderPrio, sm);
+
+            AddRenderMeshToContext<RenderTreeType> (context, rm, renderPrio, sm);
 	    
 	    portalVerts2d += count;
             portalVerts3d += count;
@@ -474,103 +512,7 @@ namespace RenderManager
       portal->WarpSpace (warp_wor, inewcam->GetTransform (), mirror);
       inewcam->SetMirrored (mirror);
     }
-  };
-
-
-  
-  template<typename RenderTreeType>
-  class SetupRenderTarget
-  {
-  public:
-    SetupRenderTarget (typename RenderTreeType::ContextsContainer* contexts,
-      iGraphics3D* g3d)
-    {
-      g3d->SetRenderTarget (contexts->renderTarget, false,
-        contexts->subtexture);
-    }
-  };
-    
-  template<typename RenderTreeType, typename LayerConfigType>
-  class ContextRender
-  {
-  public:
-    ContextRender (iShaderManager* shaderManager, 
-      const LayerConfigType& layerConfig)
-      : shaderManager (shaderManager), layerConfig (layerConfig)
-    {
-    }
-  
-    void operator() (typename RenderTreeType::ContextsContainer* contexts, 
-      RenderTreeType& tree)
-    {
-      RenderView* rview = contexts->rview;
-      iGraphics3D* g3d = rview->GetGraphics3D ();
-      int drawFlags = rview->GetEngine ()->GetBeginDrawFlags ();
-      iCamera* cam = rview->GetCamera();
-      iClipper2D* clipper = rview->GetClipper ();
-      
-      drawFlags |= CSDRAW_3DGRAPHICS /*| CSDRAW_CLEARSCREEN*/;
-
-      SetupRenderTarget<RenderTreeType> setupTarget (contexts, g3d);
-      g3d->SetPerspectiveCenter (int (cam->GetShiftX ()), 
-        int (cam->GetShiftY ()));
-      g3d->SetPerspectiveAspect (cam->GetFOV ());
-      g3d->SetClipper (clipper, CS_CLIPPER_TOPLEVEL);
-      
-      BeginFinishDrawScope bd (g3d, drawFlags);
-
-      g3d->SetWorldToCamera (cam->GetTransform ().GetInverse ());
-
-      for (size_t layer = 0; layer < layerConfig.GetLayerCount (); ++layer)
-      {
-        ContextCB cb (*this, g3d, layer);
-        tree.TraverseContextsReverse (contexts, cb);
-      }
-    }
-  
-  private:
-    template<typename Fn>
-    struct MeshNodeCB
-    {
-      MeshNodeCB(Fn& meshNodeFunction, typename RenderTreeType::ContextNode* node, RenderTreeType& tree)
-	: meshNodeFunction (meshNodeFunction), node (node), tree (tree)
-      {}
-  
-      void operator() (const typename RenderTreeType::TreeTraitsType::MeshNodeKeyType& key, 
-	typename RenderTreeType::MeshNode* meshNode)
-      {
-	meshNodeFunction (key, meshNode, *node, tree);
-      }
-  
-      Fn& meshNodeFunction;
-      typename RenderTreeType::ContextNode* node;
-      RenderTreeType& tree;
-    };
-
-    struct ContextCB
-    {
-      ContextRender& parent;
-      iGraphics3D* g3d;
-      size_t layer;
-
-      ContextCB (ContextRender& parent, iGraphics3D* g3d, size_t layer) 
-        : parent (parent), g3d (g3d), layer (layer)
-      {}
-
-      void operator() (typename RenderTreeType::ContextNode* node, 
-        RenderTreeType& tree)
-      {
-        SimpleRender<RenderTreeType> render (g3d, 
-          parent.shaderManager->GetShaderVariableStack (), layer);
-    
-        MeshNodeCB<SimpleRender<RenderTreeType> > cb (render, node, tree);
-        node->meshNodes.TraverseInOrder (cb);
-      }
-    };
-
-    iShaderManager* shaderManager;
-    const LayerConfigType& layerConfig;
-  };
+  };  
 
 } // namespace RenderManager
 } // namespace CS

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2007 by Marten Svanfeldt
+    Copyright (C) 2007-2008 by Marten Svanfeldt
 	      (C) 2007 by Frank Richter
 
     This library is free software; you can redistribute it and/or
@@ -20,16 +20,19 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_DEPENDENTTARGET_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_DEPENDENTTARGET_H__
 
-#include "csutil/fifo.h"
-#include "iengine/rendermanager.h"
+#include "csplugincommon/rendermanager/operations.h"
 #include "csplugincommon/rendermanager/rendertree.h"
 #include "csplugincommon/rendermanager/shadersetup.h"
+#include "csplugincommon/rendermanager/svtraverse.h"
+#include "csutil/fifo.h"
+#include "csutil/set.h"
 
 namespace CS
 {
 namespace RenderManager
 {
 
+#if 0
   /**
    * Traverse all the shader variables used in a certain render context.
    */
@@ -170,14 +173,33 @@ namespace RenderManager
     };
   };
 
-  template<typename Tree, typename TargetHandler>
+#endif
+
+  /**
+   * 
+   */
+  template<typename RenderTree, typename TargetHandler>
   class DependentTargetManager
   {
   public:
+    /**
+     * 
+     */
+    struct TargetSettings
+    {
+      csStringID svName;
+      iView* view;
+      iTextureHandle* target;
+      int targetSubTexture;      
+    };
+
     DependentTargetManager (TargetHandler& targetHandler)
       : targetHandler (targetHandler)
     {}
 
+    /**
+     * 
+     */
     void RegisterRenderTarget (iTextureHandle* target, 
       iView* view, int subtexture = 0, uint flags = 0)
     {
@@ -205,6 +227,10 @@ namespace RenderManager
         targetInfo->views.PutUnique (subtexture, newView);
       }
     }
+
+    /**
+     * 
+     */
     void UnregisterRenderTarget (iTextureHandle* target,
       int subtexture = 0)
     {
@@ -224,6 +250,9 @@ namespace RenderManager
       }
     }
 
+    /**
+     * 
+     */
     void PrepareQueues (iShaderManager* shaderManager)
     {
       size_t numSVs = shaderManager->GetSVNameStringset()->GetSize();
@@ -234,36 +263,62 @@ namespace RenderManager
       targetQueue.DeleteAll ();
     }
 
+    /**
+     * 
+     */
     template<typename LayerConfigType>
-    void EnqueueTargetsInContext (typename Tree::ContextsContainer* contexts,
-      Tree& renderTree, iShaderManager* shaderManager, const LayerConfigType& layerConfig)
+    void EnqueueTargets (RenderTree& renderTree, iShaderManager* shaderManager, 
+      const LayerConfigType& layerConfig,
+      csSet<typename RenderTree::ContextNode*>& contextsTested)
     {
-      TargetTraverser texTraverse (*this, renderTree);
-      TraverseAllTextures<Tree, TargetTraverser, LayerConfigType> traverseAllTextures (
-        texTraverse,  shaderManager, names, layerConfig);
-      renderTree.TraverseContexts (contexts, traverseAllTextures);
+      // Setup callbacks for SVs and mesh nodes
+      NewTargetFn newTarget (*this, renderTree);
+      typedef TraverseUsedSVs<RenderTree, LayerConfigType, NewTargetFn> MeshTraverseType;
+      MeshTraverseType svTraverser
+        (newTarget, layerConfig, shaderManager->GetSVNameStringset ()->GetSize ());
+
+      // Just traverse each context once
+      Implementation::OnceOperationBlockRef<typename RenderTree::ContextNode*> 
+        opBlock (contextsTested);
+
+      // Helper for traversing all contexts within tree
+      Implementation::MeshContextTraverser<
+        typename RenderTree::ContextNode,
+        MeshTraverseType, 
+        Implementation::NoOperationBlock<typename RenderTree::MeshNode*>
+      > contextTraverse (svTraverser, Implementation::NoOperationBlock<typename RenderTree::MeshNode*> ());
+
+      // And do the iteration
+      ForEachContext (renderTree, contextTraverse, opBlock);
     }
 
+    /**
+     * 
+     */
     bool HaveMoreTargets() const
     {
       return targetQueue.GetSize () > 0;
     }
 
-    void GetNextTarget (csStringID& svName, typename Tree::ContextsContainer* &contexts)
+    /**
+     * 
+     */
+    void GetNextTarget (TargetSettings& settings)
     {
-      TargetQueueEntry entry = targetQueue.PopTop ();
-
-      svName = entry.targetSVName;
-      contexts = entry.contexts;
+      settings = targetQueue.PopTop ();
     }
 
+    /**
+     * 
+     */
     void PostCleanupQueues ()
     {
       oneTimeTargets.DeleteAll ();
       targetQueue.DeleteAll ();
     }
   private:
-    typedef DependentTargetManager<Tree, TargetHandler> DependentTargetManagerType;
+    typedef DependentTargetManager<RenderTree, TargetHandler> DependentTargetManagerType;
+    
     /* FIXME: better handle multiple views per target
 	      'flags' per subtexture seems odd */
     struct RenderTargetInfo
@@ -309,12 +364,6 @@ namespace RenderManager
       csArray<iTextureHandle*> set;
     };
     
-    struct TargetQueueEntry
-    {
-      typename Tree::ContextsContainer* contexts;
-      csStringID targetSVName;
-    };
-
     // 
     TargetHandler& targetHandler;
 
@@ -324,16 +373,22 @@ namespace RenderManager
     HandledTargetsSet handledTargets;
 
     // Queue of contexts to setup
-    csFIFO<TargetQueueEntry> targetQueue;
+    csFIFO<TargetSettings> targetQueue;
 
-    struct TargetTraverser
+    struct NewTargetFn
     {
-      TargetTraverser (DependentTargetManagerType& parent, Tree& renderTree)
+      NewTargetFn (DependentTargetManagerType& parent, RenderTree& renderTree)
         : parent (parent), renderTree (renderTree)
       {}
 
-      void operator() (csStringID name, csShaderVariable* sv, iTextureHandle *textureHandle)
+      void operator() (csStringID name, csShaderVariable* sv)
       {
+        if (sv->GetType() != csShaderVariable::TEXTURE)
+          return;
+        
+        iTextureHandle* textureHandle;
+        sv->GetValue (textureHandle);
+
         iView* localView = 0;
         bool handleTarget = false;
 
@@ -383,28 +438,21 @@ namespace RenderManager
       {
         if (!targetView) return;
 
-        // Setup a rendering view
         targetView->UpdateClipper ();
-        csRef<CS::RenderManager::RenderView> rview;
-        rview.AttachNew (new (renderTree.GetPersistentData().renderViewPool)
-          RenderView (targetView));
 
-	typename Tree::ContextsContainer* targetContexts = 
-	  renderTree.CreateContextContainer ();
-	targetContexts->renderTarget = texh;
-	targetContexts->subtexture = subtexture;
-	targetContexts->rview = rview;
+        // Setup a target info struct
+        TargetSettings settings;
+        settings.svName = svName;
+        settings.target = texh;
+        settings.targetSubTexture = subtexture;
+        settings.view = targetView;        
 
-        TargetQueueEntry e;
-        e.contexts = targetContexts;
-        e.targetSVName = svName;
-	
-        parent.targetQueue.Push (e);
+        parent.targetQueue.Push (settings);        
       }
 
 
       DependentTargetManager& parent;
-      Tree& renderTree;
+      RenderTree& renderTree;
     };
 
     friend struct TargetTraverser;

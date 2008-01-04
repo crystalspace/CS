@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2000 by Andrew Kirmse
+                  2008 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -31,10 +32,13 @@
  */
 
 #include "csextern.h"
-#include "allocator.h"
-#include "bitops.h"
-#include "comparator.h"
-#include "hash.h"
+#include "csutil/allocator.h"
+#include "csutil/bitops.h"
+#include "csutil/comparator.h"
+#include "csutil/hash.h"
+
+#include "csutil/metautils.h"
+#include "csutil/compileassert.h"
 
 #if defined(CS_COMPILER_MSVC) && (CS_PROCESSOR_SIZE == 64)
 /* long is 32 bit even on 64-bit MSVC, so use uint64 to utilize a storage in
@@ -137,9 +141,13 @@ protected:
 
   enum
   {
-    cellSize    = csBitArrayDefaultInlineBits,
-    cellCount   = (InlinedBits + (cellSize-1)) / cellSize
+    cellSize    = csBitArrayDefaultInlineBits,            // This _have_ to be PO2
+    cellCount   = (InlinedBits + (cellSize-1)) / cellSize,
+    
+    cellMask    = (cellSize - 1),
+    cellShift   = CS::Meta::Log2<cellSize>::value
   };
+  CS_COMPILE_ASSERT(CS::Meta::IsLog2<cellSize>::value);
 
   struct Storage : public Allocator
   {
@@ -162,13 +170,13 @@ protected:
   /// Get the GetStore()[] index for a given bit number.
   static size_t GetIndex (size_t bit_num)
   {
-    return bit_num / cellSize;
+    return bit_num >> cellShift;
   }
 
   /// Get the offset within GetStore()[GetIndex()] for a given bit number.
   static size_t GetOffset (size_t bit_num)
   {
-    return bit_num % cellSize;
+    return bit_num & cellMask;
   }
 
   /// Return whether the inline or heap store is used
@@ -614,6 +622,92 @@ public:
   /// Return the full backing-store.
   csBitArrayStorageType* GetArrayBits() { return GetStore(); }
   const csBitArrayStorageType* GetArrayBits() const { return GetStore(); }
+  //@}
+
+  //@{
+  /**
+   * 
+   */
+  class SetBitIterator
+  {
+  public:
+    SetBitIterator (const SetBitIterator& other)
+      : bitArray (other.bitArray), pos (other.pos), offset (other.offset),
+      cachedStore (other.cachedStore)
+    {}
+
+    /// 
+    size_t Next ()
+    {
+      while (offset < 8*sizeof(csBitArrayStorageType))
+      {        
+        if ((cachedStore & 0x1) != 0)
+        {
+          const size_t result = (pos-1)*sizeof(csBitArrayStorageType)*8 + offset;
+
+          ++offset;
+          cachedStore >>= 1;
+          if (!cachedStore)
+            GetNextCacheItem ();
+
+          return result;
+        }        
+        else
+        {
+          ++offset;
+          cachedStore >>= 1;
+          if (!cachedStore)
+            GetNextCacheItem ();
+        }
+      }
+      CS_ASSERT_MSG ("Invalid iteration", false);
+      return 0;
+    }
+
+    ///
+    bool HasNext () const
+    {
+      return cachedStore != 0;
+    }
+
+    ///
+    void Reset ()
+    {
+      pos = 0;
+      GetNextCacheItem ();
+    }
+
+  protected:
+    SetBitIterator (const ThisType& bitArray)
+      : bitArray (bitArray), pos (0), offset (0)
+    {
+      Reset ();
+    }
+
+    friend class csBitArrayTweakable<InlinedBits, Allocator>;
+
+    void GetNextCacheItem ()
+    {
+      offset = 0;
+      while (pos < bitArray.mLength)
+      {
+        cachedStore = bitArray.GetStore ()[pos++];
+        if (cachedStore)
+          return;
+      }
+      cachedStore = 0;
+    }
+
+    const ThisType& bitArray;
+    csBitArrayStorageType cachedStore;
+    size_t pos, offset;    
+  };
+  friend class SetBitIterator;
+
+  SetBitIterator GetSetBitIterator () const
+  {
+    return SetBitIterator (*this);
+  }
   //@}
 };
 

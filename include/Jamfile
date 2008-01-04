@@ -16,10 +16,11 @@ Recurse InstallHeader : .h .i .inc .fun .tok ;
 # they are specialized polymorphic files intended for inclusion several times
 # under different contexts.
 CS_MASTER_HEADER_REJECTS =
-  [ Wildcard [ ConcatDirs csplugincommon directx ] : *.h ]
-  [ Wildcard [ ConcatDirs csplugincommon macosx  ] : *.h ]
-  [ Wildcard [ ConcatDirs csplugincommon opengl  ] : *.h ]
-  [ Wildcard [ ConcatDirs csplugincommon win32   ] : *.h ]
+  [ Wildcard [ ConcatDirs csplugincommon directx       ] : *.h ]
+  [ Wildcard [ ConcatDirs csplugincommon macosx        ] : *.h ]
+  [ Wildcard [ ConcatDirs csplugincommon opengl        ] : *.h ]
+  [ Wildcard [ ConcatDirs csplugincommon win32         ] : *.h ]
+  [ Wildcard [ ConcatDirs csplugincommon rendermanager ] : *.h ]
   [ ConcatDirs cstool   tokenlist.h  ]
   [ ConcatDirs csutil   archive.h    ]
   [ ConcatDirs csutil   csosdefs.h   ]

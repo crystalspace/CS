@@ -27,8 +27,11 @@ namespace CS
 {
 namespace RenderManager
 {
-  namespace TextureCacheImpl
+  namespace Implementation
   {
+    /**
+     * Helper for generic resource cache storing texture handles.
+     */
     struct TextureSizeConstraint
     {
       struct KeyType
@@ -43,7 +46,7 @@ namespace RenderManager
         t1->GetRendererDimensions (tw1, th1);
         t2->GetRendererDimensions (tw2, th2);
         
-        if ((tw1 > tw2) && (th1 > th2)) return true;
+        if ((tw1 >= tw2) && (th1 >= th2)) return true;
         return false;
       }
     
@@ -64,7 +67,7 @@ namespace RenderManager
         int tw1, th1;
         t1->GetRendererDimensions (tw1, th1);
         
-        if ((tw1 > t2.w) && (th1 > t2.h)) return true;
+        if ((tw1 >= t2.w) && (th1 >= t2.h)) return true;
         return false;
       }
     
@@ -79,20 +82,13 @@ namespace RenderManager
       }
     
     };
-  } // namespace TextureCacheImpl
+  } // namespace Implementation
 
+  /**
+   * Generic cache for caching precreated textures
+   */
   class TextureCache
-  {
-    csRef<iGraphics3D> g3d;
-
-    CS::Utility::GenericResourceCache<csRef<iTextureHandle>,
-      csTicks, TextureCacheImpl::TextureSizeConstraint> backend;
-  
-    csImageType imgtype;
-    const char* format;
-    int textureFlags;
-    const char* texClass;
-    uint options;
+  {    
   public:
     enum
     {
@@ -109,23 +105,36 @@ namespace RenderManager
       backend.purgeAge = 10000;
     }
       
-    void SetG3D (iGraphics3D* g3d) { this->g3d = g3d; }
+    void SetG3D (iGraphics3D* g3d) 
+    {
+      this->g3d = g3d; 
+    }
     
+    /**
+     * Remove all textures in the cache
+     */
     void Clear ()
     {
       backend.Clear ();
     }
+
     void AdvanceFrame (csTicks currentTime)
     {
       backend.AdvanceTime (currentTime);
     }
+
+    /**
+     * Get a texture with size that is at least width x height.
+     * The real size of the texture acquired is stored in real_w/real_h.
+     */
     iTextureHandle* QueryUnusedTexture (int width, int height, csTicks lifetime,
                                         int& real_w, int& real_h)
     {
-      TextureCacheImpl::TextureSizeConstraint::KeyType queryKey;
+      Implementation::TextureSizeConstraint::KeyType queryKey;
       queryKey.w = width; queryKey.h = height;
       csRef<iTextureHandle>* tex = backend.Query (queryKey, 
         (options & tcacheExactSizeMatch));
+
       if (tex != 0)
       {
         (*tex)->GetRendererDimensions (real_w, real_h);
@@ -150,11 +159,26 @@ namespace RenderManager
       return newTex;
     }
 
+    /**
+     * Get a texture with size that is at least width x height.     
+     */
     iTextureHandle* QueryUnusedTexture (int width, int height, csTicks lifetime)
     {
       int dummyW, dummyH;
       return QueryUnusedTexture (width, height, lifetime, dummyW, dummyH);
     }
+
+  private:
+    csRef<iGraphics3D> g3d;
+
+    CS::Utility::GenericResourceCache<csRef<iTextureHandle>,
+      csTicks, Implementation::TextureSizeConstraint> backend;
+
+    csImageType imgtype;
+    const char* format;
+    int textureFlags;
+    const char* texClass;
+    uint options;
   };
   
 } // namespace RenderManager

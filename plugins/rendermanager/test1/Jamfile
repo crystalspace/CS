@@ -2,7 +2,8 @@ SubDir TOP plugins rendermanager test1 ;
 
 Description rm_test1 : "Rendermanager Test1" ;
 
-Plugin rm_test1
-	: [ Wildcard *.cpp *.h ]
+Plugin rm_test1 : 
+  [ Wildcard *.cpp *.h ]
+  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) $(DOTDOT) include csplugincommon rendermanager ] : *.h ]
 ;
 LinkWith rm_test1 : crystalspace ;

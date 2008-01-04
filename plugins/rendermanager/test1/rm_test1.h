@@ -22,7 +22,6 @@
 #include "csutil/scf_implementation.h"
 #include "iutil/comp.h"
 #include "iengine/rendermanager.h"
-#include "csplugincommon.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(RMTest1)
 {
@@ -61,16 +60,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMTest1)
     }
 
     typedef CS::RenderManager::RenderTree<> RenderTreeType;
+
     typedef StandardContextSetup<RenderTreeType, 
       CS::RenderManager::MultipleRenderLayer> ContextSetupType;
+
     typedef CS::RenderManager::StandardPortalSetup<RenderTreeType, 
       ContextSetupType> PortalSetupType;
-  protected:    
 
-    bool HandleTarget (RenderTreeType& renderTree, csStringID svName, 
-      RenderTreeType::ContextsContainer* contexts);
+    typedef CS::RenderManager::DependentTargetManager<RenderTreeType, RMTest1>
+      TargetManagerType;
 
-  public:
+  public:    
+
+    bool HandleTarget (RenderTreeType& renderTree, 
+      const TargetManagerType::TargetSettings& settings);
+
     RenderTreeType::PersistentData treePersistent;
     PortalSetupType::PersistentData portalPersistent;
 
@@ -83,12 +87,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMTest1)
 
     CS::RenderManager::MultipleRenderLayer renderLayer;
 
-    CS::RenderManager::DependentTargetManager<RenderTreeType, RMTest1> targets;
-
-  };
-
+    TargetManagerType targets;
+    csSet<typename RenderTreeType::ContextNode*> contextsScannedForTargets;
+  };  
 
 }
 CS_PLUGIN_NAMESPACE_END(RMTest1)
+
+template<>
+class csHashComputer<CS_PLUGIN_NAMESPACE_NAME(RMTest1)::RMTest1::RenderTreeType::ContextNode*> : 
+  public csHashComputerIntegral<CS_PLUGIN_NAMESPACE_NAME(RMTest1)::RMTest1::RenderTreeType::ContextNode*> 
+{};
 
 #endif

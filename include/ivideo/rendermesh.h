@@ -60,186 +60,190 @@ namespace Graphics
   {
     switch (cullMode)
     {
-      case cullNormal:   return cullFlipped;
-      case cullFlipped:  return cullNormal;
-      case cullDisabled: return cullDisabled;
+      case cullNormal:
+        return cullFlipped;
+      case cullFlipped:
+        return cullNormal;
+      case cullDisabled: 
+        return cullDisabled;
     }
     // Should not happen ...
     return cullNormal;
   }
 
-/**
- * Mesh render mode information. Contains the Z, mix and alpha modes to use
- * for rendering a mesh. 
- * \remarks Is separate from CS::Graphics::CoreRenderMesh to allow preprocessing steps 
- *  to modify the mode data. 
- */
-struct RenderMeshModes
-{
-  RenderMeshModes () : z_buf_mode ((csZBufMode)~0), mixmode (CS_FX_COPY),
-    renderPrio (-1), flipCulling (false), cullMode (cullNormal),
-    alphaType (csAlphaMode::alphaNone), zoffset (false)
+  /**
+   * Mesh render mode information. Contains the Z, mix and alpha modes to use
+   * for rendering a mesh. 
+   * \remarks Is separate from CS::Graphics::CoreRenderMesh to allow preprocessing steps 
+   *  to modify the mode data. 
+   */
+  struct RenderMeshModes
   {
-  }
+    RenderMeshModes () : z_buf_mode ((csZBufMode)~0), mixmode (CS_FX_COPY),
+      renderPrio (-1), flipCulling (false), cullMode (cullNormal),
+      alphaType (csAlphaMode::alphaNone), zoffset (false)
+    {
+    }
 
-  RenderMeshModes (RenderMeshModes const& x) :
-    z_buf_mode (x.z_buf_mode),
-    mixmode (x.mixmode),
-    renderPrio (x.renderPrio),
-    flipCulling (x.flipCulling),
-    cullMode (x.cullMode),
-    alphaType (x.alphaType),
-    zoffset (x.zoffset),
-    buffers (x.buffers)
+    RenderMeshModes (RenderMeshModes const& x) :
+      z_buf_mode (x.z_buf_mode),
+      mixmode (x.mixmode),
+      renderPrio (x.renderPrio),
+      flipCulling (x.flipCulling),
+      cullMode (x.cullMode),
+      alphaType (x.alphaType),
+      zoffset (x.zoffset),
+      buffers (x.buffers)
+    {
+    }
+
+    ~RenderMeshModes () { }
+
+    /// Z mode to use
+    csZBufMode z_buf_mode;
+
+    /// mixmode to use
+    uint mixmode;
+    
+    /// Mesh render priority
+    RenderPriority renderPrio;
+
+    // Deprecated in 1.3.
+    // ***NOTE*** Though deprecated, actual compiler-based deprecation is not
+    // presently enabled since the inline constructors references this variable
+    // and cause a Niagara of warnings to flood the build. Worse, even if
+    // external projects fix their own code to avoid this variable, they still
+    // get penalized by warnings because of the constructors (over which code
+    // external projects have no control). One way to avoid this problem would be
+    // to un-inline the constructors and then disable the deprecation warning
+    // only when compiling the implementation file containing the constructors. A
+    // potential difficulty with this approach, however, is that there is no
+    // obvious location in the CS/libs hierarchy for such an implementation file
+    // to reside.  Since it is considered very unlikely that external projects
+    // will be accessing this variable, and since un-inlining the constructors is
+    // perhaps unnecessarily complicated, the decision was made instead to remove
+    // the compiler-based deprecation attribute, but retain the
+    // documentation-based deprecation warning. If real-world experience shows
+    // that removing the compiler attribute was the wrong approach, then the
+    // un-inlining approach can instead be implemented.
+    // CS_DEPRECATED_VAR_MSG("Use cullMode instead", bool flipCulling );
+    bool flipCulling;
+    
+    /// Mesh culling mode
+    MeshCullMode cullMode;
+
+    /// Alpha mode this mesh is drawn.
+    csAlphaMode::AlphaType alphaType;
+    
+    /// Whether Z value offsetting should be enabled.
+    bool zoffset;
+
+    /// Holder of default render buffers
+    csRef<csRenderBufferHolder> buffers;
+  };
+
+  /**
+   * Data required by the renderer to draw a mesh.
+   */
+  struct CoreRenderMesh
   {
-  }
+    /**
+     * To make debugging easier we add the name of the mesh object
+     * here in debug mode.
+     */
+    const char* db_mesh_name;
 
-  ~RenderMeshModes () { }
+    CoreRenderMesh () : db_mesh_name ("<unknown>"), clip_portal (0), 
+      clip_plane (0), clip_z_plane (0), do_mirror (false), indexstart (0), 
+      indexend (0)
+    {
+    }
 
-  /// Z mode to use
-  csZBufMode z_buf_mode;
+    ~CoreRenderMesh () {}
 
-  /// mixmode to use
-  uint mixmode;
-  
-  /// Mesh render priority
-  RenderPriority renderPrio;
+    /// Clipping parameter
+    int clip_portal;
 
-  // Deprecated in 1.3.
-  // ***NOTE*** Though deprecated, actual compiler-based deprecation is not
-  // presently enabled since the inline constructors references this variable
-  // and cause a Niagara of warnings to flood the build. Worse, even if
-  // external projects fix their own code to avoid this variable, they still
-  // get penalized by warnings because of the constructors (over which code
-  // external projects have no control). One way to avoid this problem would be
-  // to un-inline the constructors and then disable the deprecation warning
-  // only when compiling the implementation file containing the constructors. A
-  // potential difficulty with this approach, however, is that there is no
-  // obvious location in the CS/libs hierarchy for such an implementation file
-  // to reside.  Since it is considered very unlikely that external projects
-  // will be accessing this variable, and since un-inlining the constructors is
-  // perhaps unnecessarily complicated, the decision was made instead to remove
-  // the compiler-based deprecation attribute, but retain the
-  // documentation-based deprecation warning. If real-world experience shows
-  // that removing the compiler attribute was the wrong approach, then the
-  // un-inlining approach can instead be implemented.
-  // CS_DEPRECATED_VAR_MSG("Use cullMode instead", bool flipCulling );
-  bool flipCulling;
-  
-  /// Mesh culling mode
-  MeshCullMode cullMode;
+    /// Clipping parameter
+    int clip_plane;
 
-  /// Alpha mode this mesh is drawn.
-  csAlphaMode::AlphaType alphaType;
-  
-  /// Whether Z value offsetting should be enabled.
-  bool zoffset;
+    /// Clipping parameter
+    int clip_z_plane;
 
-  /// Holder of default render buffers
-  csRef<csRenderBufferHolder> buffers;
-};
+    // @@@ FIXME: should prolly be handled by component managing rendering
+    /**
+     * Mirror mode - whether the mesh should be mirrored.
+     * Essentially toggles between back- and front-face culling. 
+     * It should be set to \p true if \a object2camera contains a negative
+     * scaling. Basically, in almost any case it should be set to the camera's
+     * mirror mode.
+     *
+     * \code
+     * iCamera* camera;
+     * csRenderMesh myMesh;
+     *   ...
+     * myMesh.object2camera = camera->GetTransform () / 
+     *   movable->GetFullTransform ();
+     * myMesh.do_mirror = camera->IsMirrored ();
+     * \endcode
+     */
+    bool do_mirror;
 
-/**
- * Data required by the renderer to draw a mesh.
- */
-struct CoreRenderMesh
-{
+    /// Mesh type
+    csRenderMeshType meshtype;
+
+    /** @{ */
+    /**
+     * Start and end of the range of indices to use. The indices are
+     * used in the range from \a indexstart (inclusive) to \a indexend
+     * (exclusive): indexstart <= n < indexend
+     */
+    unsigned int indexstart;
+    unsigned int indexend;
+    /** @} */
+
+    /**
+     * Material used for this mesh.
+     * Used for e.g. sorting by material.
+     */
+    iMaterialWrapper* material;
+
+    /** 
+     * Transform object space -> world space.
+     * \remarks 'this' space is object space, 'other' space is world space
+     */
+    csReversibleTransform object2world;
+  };
+
   /**
-   * To make debugging easier we add the name of the mesh object
-   * here in debug mode.
+   * Mesh data as returned by mesh plugins. Contains both the data needed for
+   * rendering as well as some additional data for preprocessing.
    */
-  const char* db_mesh_name;
-
-  CoreRenderMesh () : db_mesh_name ("<unknown>"), clip_portal (0), 
-    clip_plane (0), clip_z_plane (0), do_mirror (false), indexstart (0), 
-    indexend (0)
+  struct RenderMesh : public CoreRenderMesh, public RenderMeshModes
   {
-  }
+    RenderMesh () : geometryInstance (0), portal (0)
+    {
+    }
 
-  ~CoreRenderMesh () {}
+    ~RenderMesh () {}
 
-  /// Clipping parameter
-  int clip_portal;
+    /**
+     * Some unique ID for the geometry used to render this mesh.
+     * Used for sorting purposes, and is allowed to be 0, although
+     * that means non-optimal mesh sorting at rendering.
+     */
+    void *geometryInstance;
 
-  /// Clipping parameter
-  int clip_plane;
+    /// Pointer to a portalcontainer, if there is any
+    iPortalContainer* portal;
 
-  /// Clipping parameter
-  int clip_z_plane;
+    /// \todo Document me!
+    csRef<iShaderVariableContext> variablecontext;
 
-  // @@@ FIXME: should prolly be handled by component managing rendering
-  /**
-   * Mirror mode - whether the mesh should be mirrored.
-   * Essentially toggles between back- and front-face culling. 
-   * It should be set to \p true if \a object2camera contains a negative
-   * scaling. Basically, in almost any case it should be set to the camera's
-   * mirror mode.
-   *
-   * \code
-   * iCamera* camera;
-   * csRenderMesh myMesh;
-   *   ...
-   * myMesh.object2camera = camera->GetTransform () / 
-   *   movable->GetFullTransform ();
-   * myMesh.do_mirror = camera->IsMirrored ();
-   * \endcode
-   */
-  bool do_mirror;
+    /// Worldspace origin of the mesh
+    csVector3 worldspace_origin;
+  };
 
-  /// Mesh type
-  csRenderMeshType meshtype;
-
-  /** @{ */
-  /**
-   * Start and end of the range of indices to use. The indices are
-   * used in the range from \a indexstart (inclusive) to \a indexend
-   * (exclusive): indexstart <= n < indexend
-   */
-  unsigned int indexstart;
-  unsigned int indexend;
-  /** @} */
-
-  /**
-   * Material used for this mesh.
-   * Used for e.g. sorting by material.
-   */
-  iMaterialWrapper* material;
-
-  /** 
-   * Transform object space -> world space.
-   * \remarks 'this' space is object space, 'other' space is world space
-   */
-  csReversibleTransform object2world;
-};
-
-/**
- * Mesh data as returned by mesh plugins. Contains both the data needed for
- * rendering as well as some additional data for preprocessing.
- */
-struct RenderMesh : public CoreRenderMesh, public RenderMeshModes
-{
-  RenderMesh () : geometryInstance (0), portal (0)
-  {
-  }
-
-  ~RenderMesh () {}
-
-  /**
-   * Some unique ID for the geometry used to render this mesh.
-   * Used for sorting purposes, and is allowed to be 0, although
-   * that means non-optimal mesh sorting at rendering.
-   */
-  void *geometryInstance;
-
-  /// Pointer to a portalcontainer, if there is any
-  iPortalContainer* portal;
-
-  /// \todo Document me!
-  csRef<iShaderVariableContext> variablecontext;
-
-  /// Worldspace origin of the mesh
-  csVector3 worldspace_origin;
-};
 } // namespace Graphics
 } // namespace CS
 

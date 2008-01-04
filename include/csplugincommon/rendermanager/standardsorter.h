@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2007 by Marten Svanfeldt
+    Copyright (C) 2007-2008 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -19,7 +19,8 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_STANDARDSOTER_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_STANDARDSOTER_H__
 
-#include "iengine/camera.h"
+#include "csplugincommon/rendermanager/operations.h"
+
 #include "ivideo/rendermesh.h"
 #include "csgeom/vector3.h"
 
@@ -28,12 +29,17 @@ namespace CS
 namespace RenderManager
 {
 
+  /**
+   * Standard rendermesh sorter.
+   * Sorts mesh nodes depending on their render priority, either 
+   * back2front/front2back or based on material and factories.
+   */
   template<typename Tree>
-  class StandardMeshSorter
+  class StandardMeshSorter    
   {
   public:
-    StandardMeshSorter (iEngine* engine, iCamera* camera)
-      : engine (engine)
+    StandardMeshSorter (iEngine* engine)
+      : engine (engine), cameraOrigin (0,0,0)
     {
       // Build table of sorting options
       renderPriorityCount = engine->GetRenderPriorityCount ();
@@ -42,9 +48,7 @@ namespace RenderManager
       for (int i = 0; i < renderPriorityCount; ++i)
       {       
         sortingTypeTable[i] = -1;
-      }
-
-      cameraOrigin = camera->GetTransform ().GetOrigin ();
+      }      
     }
 
     ~StandardMeshSorter ()
@@ -52,8 +56,16 @@ namespace RenderManager
       delete[] sortingTypeTable;
     }
 
-    void operator()(const typename Tree::TreeTraitsType::MeshNodeKeyType& key, 
-      typename Tree::MeshNode* meshNode, typename Tree::ContextNode& contextNode, Tree& tree)
+    /// Set the camera location to be used for b2f/f2b sorting
+    void SetupCameraLocation (const csVector3& vec)
+    {
+      cameraOrigin = vec;
+    }
+
+    /**
+     * Sort given mesh node
+     */
+    void operator()(typename Tree::MeshNode* meshNode)
     {
       // Get the render priority for node
       int renderPrio = meshNode->priority;
@@ -83,11 +95,13 @@ namespace RenderManager
         CS_ASSERT_MSG("Invalid sorting mode!", 0);
       }
     }
-
     
 
   private:
 
+    /**
+     * Sorter functor doing normal sorting
+     */
     class NormalSorter
     {
     public:
@@ -109,6 +123,11 @@ namespace RenderManager
 
     };
 
+    /**
+     * Sorter function sorting based on distance between render mesh and
+     * camera origin.
+     * Scale factor is used to be able to invert sorting.
+     */
     class DistanceSorter : NormalSorter
     {
     public:
@@ -156,6 +175,13 @@ namespace RenderManager
     int* sortingTypeTable;
     iEngine* engine;
     csVector3 cameraOrigin;
+  };
+  
+  /// The sorter is currently non-parallel safe due to how the caching is implemented.
+  template<typename RenderTree>  
+  struct OperationTraits<StandardMeshSorter<RenderTree> >
+  {
+    typedef OperationUnordered Ordering;
   };
 
 }

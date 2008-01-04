@@ -1,6 +1,6 @@
 /*
-    Copyright (C)2007 by Marten Svanfeldt
-                 1998-2001 by Jorrit Tyberghein
+    Copyright (C) 2007-2008 by Marten Svanfeldt
+                  1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public

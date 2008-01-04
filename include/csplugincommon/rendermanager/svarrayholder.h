@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2007 by Marten Svanfeldt
+    Copyright (C) 2007-2008 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -26,6 +26,17 @@ namespace CS
 namespace RenderManager
 {
 
+  /**
+   * Holder for SV arrays
+   *
+   * Keeps a continuous array of pointers to SVs kept in three layers
+   * - Layers, where each layer is a rendering layer
+   * - Sets, each set corresponds normally to one rendermesh
+   * - Names, one for each SV
+   *
+   * The 3d array is flattened into a 1d one and indexed as:
+   * index = (layer*numSets + set)*numSVs + SV
+   */
   class SVArrayHolder
   {
   public:
@@ -63,6 +74,9 @@ namespace RenderManager
       return *this;
     }
 
+    /**
+     * Initialize storage for SVs
+     */
     void Setup (size_t numLayers, size_t numSVNames, size_t numSets)
     {
       this->numLayers = numLayers;
@@ -74,6 +88,10 @@ namespace RenderManager
       memset (svArray, 0, arraySize);
     }
 
+    /**
+     * Setup an SV stack for direct access to given layer and set within SV
+     * array
+     */
     void SetupSVStack (csShaderVariableStack& stack, size_t layer, size_t set)
     {
       CS_ASSERT (layer < numLayers);
@@ -82,6 +100,10 @@ namespace RenderManager
       stack.Setup (svArray + (layer*numSets + set)*numSVNames, numSVNames);
     }
 
+    /**
+     * Replicate the pointers from one set to a number or all the other sets within
+     * the layer
+     */
     void ReplicateSet (size_t layer, size_t from, size_t start, size_t end = (size_t)-1)
     {
       if (numSets == 1)
@@ -96,11 +118,16 @@ namespace RenderManager
 
       size_t layerStart = layer*numSets*numSVNames;
 
-      for (size_t i = start; i <= end; i++)
+      for (size_t i = start; i <= end; ++i)
+      {
         memcpy (svArray + layerStart + i*numSVNames, svArray + layerStart + from*numSVNames,
           sizeof(csShaderVariable*)*numSVNames);
+      }
     }
 
+    /**
+     * Replicate layer zero into all other layers
+     */
     void ReplicateLayerZero ()
     {
       if (numLayers == 1)

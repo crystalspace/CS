@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2007 by Marten Svanfeldt
+    Copyright (C) 2007-2008 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,6 +20,7 @@
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_SVSETUP_H__
 
 #include "csplugincommon/rendermanager/rendertree.h"
+#include "csplugincommon/rendermanager/operations.h"
 
 class csShaderVariable;
 
@@ -28,86 +29,108 @@ namespace CS
 namespace RenderManager
 {
 
-  template<typename Tree, typename LayerConfigType>
-  class StandardSVSetup : public NumberedMeshTraverser<Tree, StandardSVSetup<Tree, LayerConfigType> >
+  /**
+   * Standard shader variable stack setup functor.
+   * Assumes that the contextLocalId in each mesh is set.
+   */
+  template<typename RenderTree, typename LayerConfigType>
+  class StandardSVSetup
   {
   public:
-    typedef NumberedMeshTraverser<Tree, StandardSVSetup<Tree, LayerConfigType> > BaseType;
 
     StandardSVSetup (SVArrayHolder& svArrays, 
-      const LayerConfigType& layerConfig) : BaseType (*this), 
-      svArrays (svArrays), layerConfig (layerConfig)
+      const LayerConfigType& layerConfig) 
+      : svArrays (svArrays), layerConfig (layerConfig)
     {
-    }
+    }  
 
-    // Need to unhide this one
-    using BaseType::operator();
-
-    void operator() (typename Tree::MeshNode* node,
-      const typename Tree::MeshNode::SingleMesh& mesh, size_t index,
-      typename Tree::ContextNode& ctxNode, const Tree& tree)
+    void operator() (typename RenderTree::MeshNode* node)
     {
-      csRenderMesh* rm = mesh.renderMesh;
-
       csShaderVariableStack localStack;
 
-      for (size_t layer = 0; layer < layerConfig.GetLayerCount (); ++layer)
-      {
-        svArrays.SetupSVStack (localStack, layer, index);
+      // @@TODO: keep the sv-name around in a better way
+      static size_t svO2wName = node->owner.owner.GetPersistentData().svObjectToWorldName;
 
-        // Push all contexts here @@TODO: get more of them
-        localStack[tree.GetPersistentData().svObjectToWorldName] = mesh.svObjectToWorld;
-        if (rm->material)
-          rm->material->GetMaterial ()->PushVariables (localStack);
-        if (rm->variablecontext)
-          rm->variablecontext->PushVariables (localStack);
-	if (mesh.meshObjSVs)
-          mesh.meshObjSVs->PushVariables (localStack);
+      for (size_t i = 0; i < node->meshes.GetSize (); ++i)
+      {
+        typename RenderTree::MeshNode::SingleMesh& mesh = node->meshes[i];
+
+        csRenderMesh* rm = mesh.renderMesh;
+        for (size_t layer = 0; layer < layerConfig.GetLayerCount (); ++layer)
+        {
+          svArrays.SetupSVStack (localStack, layer, mesh.contextLocalId);
+
+          // Push all contexts here 
+          // @@TODO: get more of them        
+          localStack[svO2wName] = mesh.svObjectToWorld;
+          if (rm->material)
+            rm->material->GetMaterial ()->PushVariables (localStack);
+          if (rm->variablecontext)
+            rm->variablecontext->PushVariables (localStack);
+          if (mesh.meshObjSVs)
+            mesh.meshObjSVs->PushVariables (localStack);
+        }
       }
+      
     }
 
   private:
     SVArrayHolder& svArrays;
     const LayerConfigType& layerConfig;
+  };  
+
+  template<typename RenderTree, typename LayerConfigType>
+  struct OperationTraits<StandardSVSetup<RenderTree, LayerConfigType> >
+  {
+    typedef OperationUnordered Ordering;
   };
 
-  template<typename Tree, typename LayerConfigType>
-  class ShaderSVSetup : public NumberedMeshTraverser<Tree, ShaderSVSetup<Tree, LayerConfigType> >
+  
+  /**
+   * Standard shader variable stack setup functor for setting up shader variables
+   * from given shader and ticket arrays.
+   * Assumes that the contextLocalId in each mesh is set.
+   */
+  template<typename RenderTree, typename LayerConfigType>
+  class ShaderSVSetup
   {
-  public:
-    typedef NumberedMeshTraverser<Tree, ShaderSVSetup<Tree, LayerConfigType> > BaseType;
+  public:    
     typedef csArray<iShader*> ShaderArrayType;
 
     ShaderSVSetup (SVArrayHolder& svArrays, const ShaderArrayType& shaderArray,
       const LayerConfigType& layerConfig)
-      : BaseType (*this), svArrays (svArrays), shaderArray (shaderArray),
+      : svArrays (svArrays), shaderArray (shaderArray),
       layerConfig (layerConfig)
     {
       tempStack.Setup (svArrays.GetNumSVNames ());
     }
 
-    // Need to unhide this one
-    using BaseType::operator();
-
-    void operator() (typename Tree::MeshNode* node, 
-      const typename Tree::MeshNode::SingleMesh& mesh, size_t index,
-      typename Tree::ContextNode& ctxNode, const Tree& tree)
+    void operator() (typename RenderTree::MeshNode* node)
     {
-      for (size_t layer = 0; layer < layerConfig.GetLayerCount (); ++layer)
-      {
-        size_t layerOffset = layer*ctxNode.totalRenderMeshes;
-  
-        tempStack.Clear ();
+      const size_t totalMeshes = node->owner.totalRenderMeshes;
 
-        iShader* shader = shaderArray[index+layerOffset];
-        if (shader) 
+      for (size_t i = 0; i < node->meshes.GetSize (); ++i)
+      {
+        typename RenderTree::MeshNode::SingleMesh& mesh = node->meshes[i];
+
+        csRenderMesh* rm = mesh.renderMesh;
+
+        for (size_t layer = 0; layer < layerConfig.GetLayerCount (); ++layer)
         {
-          shader->PushVariables (tempStack);
-        
-          // Back-merge it onto the real one
-          csShaderVariableStack localStack;
-          svArrays.SetupSVStack (localStack, layer, index);
-          localStack.MergeFront (tempStack);
+          size_t layerOffset = layer*totalMeshes;
+    
+          tempStack.Clear ();
+
+          iShader* shader = shaderArray[mesh.contextLocalId+layerOffset];
+          if (shader) 
+          {
+            shader->PushVariables (tempStack);
+          
+            // Back-merge it onto the real one
+            csShaderVariableStack localStack;
+            svArrays.SetupSVStack (localStack, layer, mesh.contextLocalId);
+            localStack.MergeFront (tempStack);
+          }
         }
       }
     }
@@ -119,14 +142,25 @@ namespace RenderManager
     const LayerConfigType& layerConfig;
   };
 
-  template<typename Tree, typename LayerConfigType>
-  void SetupStandardSVs (LayerConfigType& layerConfig,
-    typename Tree::ContextNode& context, 
+  template<typename RenderTree, typename LayerConfigType>
+  struct OperationTraits<ShaderSVSetup<RenderTree, LayerConfigType> >
+  {
+    typedef OperationUnordered Ordering;
+  };
+
+
+  /**
+   * 
+   */
+  template<typename ContextNode, typename LayerConfigType>
+  void SetupStandardSVs (ContextNode& context, LayerConfigType& layerConfig,
     iShaderManager* shaderManager, iSector* sector)
   {
     // Setup SV arrays
-    context.svArrays.Setup (layerConfig.GetLayerCount(), 
-      shaderManager->GetSVNameStringset ()->GetSize (), context.totalRenderMeshes);
+    context.svArrays.Setup (
+      layerConfig.GetLayerCount(), 
+      shaderManager->GetSVNameStringset ()->GetSize (),
+      context.totalRenderMeshes);
       
     if (context.totalRenderMeshes == 0) return;
 

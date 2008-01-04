@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2007 by Marten Svanfeldt
+    Copyright (C) 2007-2008 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -34,6 +34,12 @@ namespace RenderManager
 {
 
 
+  /**
+   * Helper for "simple" post effects usage in render manager.
+   * Provides a simple way to render the screen to a texture and then use
+   * a number of full screen passes with settable shader to get the desired
+   * effect.
+   */
   class CS_CRYSTALSPACE_EXPORT PostEffectManager
   {
   public:

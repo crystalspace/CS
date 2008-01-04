@@ -205,6 +205,16 @@ public:
   }
 
   /**
+   * Allocate a new object. 
+   * The one-argument constructor of \a T is invoked. 
+   */
+  template<typename A1>
+  T* Alloc (A1& a1)
+  {
+    return new (superclass::Alloc()) T (a1);
+  }
+
+  /**
    * Deallocate an object. It is safe to provide a null pointer.
    * \param p Pointer to deallocate.
    */

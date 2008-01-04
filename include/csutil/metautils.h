@@ -125,11 +125,21 @@ namespace CS
       static const unsigned int value = 0;
     };
 
+    /// Meta-programming IsLog2 function
     template<size_t R>
     struct IsLog2
     {
-      static const bool value = !(R & (R - 1)) && R;
+      static const bool value = (!(R & (R - 1)) && R);
     };
+
+    /// Helper class for inheriting from a type thats potentially void
+    template<typename T>
+    struct EBOptHelper : public T
+    {};
+
+    template<>
+    struct EBOptHelper<void>
+    {};
   }
 }
 

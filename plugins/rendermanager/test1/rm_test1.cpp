@@ -18,13 +18,22 @@
 
 #include "crystalspace.h"
 
-#include "csutil/compositefunctor.h"
+#include "csplugincommon/rendermanager/rendertree.h"
+#include "csplugincommon/rendermanager/renderlayers.h"
+#include "csplugincommon/rendermanager/viscull.h"
+#include "csplugincommon/rendermanager/operations.h"
+#include "csplugincommon/rendermanager/standardsorter.h"
+#include "csplugincommon/rendermanager/svsetup.h"
+#include "csplugincommon/rendermanager/shadersetup.h"
+#include "csplugincommon/rendermanager/render.h"
+#include "csplugincommon/rendermanager/posteffects.h"
+#include "csplugincommon/rendermanager/portalsetup.h"
+#include "csplugincommon/rendermanager/dependenttarget.h"
 
 #include "rm_test1.h"
 
 CS_IMPLEMENT_PLUGIN
 
-//using namespace CS::Plugin::RMTest1;
 using namespace CS::RenderManager;
 
 CS_PLUGIN_NAMESPACE_BEGIN(RMTest1)
@@ -32,11 +41,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMTest1)
 
 SCF_IMPLEMENT_FACTORY(RMTest1)
 
+
 template<typename RenderTreeType, typename LayerConfigType>
 class StandardContextSetup
 {
 public:
   typedef StandardContextSetup<RenderTreeType, LayerConfigType> ThisType;
+  typedef StandardPortalSetup<RenderTreeType, ThisType> PortalSetupType;
 
   StandardContextSetup (RMTest1* rmanager, const LayerConfigType& layerConfig)
     : rmanager (rmanager), layerConfig (layerConfig),
@@ -45,11 +56,13 @@ public:
 
   }
 
-  void operator() (RenderTreeType& renderTree, 
-    typename RenderTreeType::ContextNode* context, 
-    typename RenderTreeType::ContextsContainer* container, 
-    iSector* sector, CS::RenderManager::RenderView* rview)
+  void operator() (typename RenderTreeType::ContextNode& context,
+    typename PortalSetupType::ContextSetupData& portalSetupData)
   {
+    RenderTreeType& renderTree = context.owner;
+    CS::RenderManager::RenderView* rview = context.renderView;
+    iSector* sector = rview->GetThisSector ();
+
     // @@@ FIXME: Of course, don't hardcode.
     if (recurseCount > 30) return;
     
@@ -61,40 +74,46 @@ public:
     // Make sure the clip-planes are ok
     CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext ());
 
-
     // Do the culling
     iVisibilityCuller* culler = sector->GetVisibilityCuller ();
-    renderTree.Viscull (container, context, rview, culler);
+    Viscull<RenderTreeType> (context, rview, culler);
+
 
     // Set up all portals
     {
       recurseCount++;
-      StandardPortalSetup<RenderTreeType, ThisType> portalSetup (
-        rmanager->portalPersistent, *this);
-      portalSetup (renderTree, context, container, sector, rview);
+      PortalSetupType portalSetup (rmanager->portalPersistent, *this);      
+      portalSetup (context, portalSetupData);
       recurseCount--;
     }
     
     // Sort the mesh lists  
     {
-      StandardMeshSorter<RenderTreeType> mySorter (rview->GetEngine (), rview->GetCamera ());
-      renderTree.TraverseMeshNodes (mySorter, context);
+      StandardMeshSorter<RenderTreeType> mySorter (rview->GetEngine ());
+      mySorter.SetupCameraLocation (rview->GetCamera ()->GetTransform ().GetOrigin ());
+      ForEachMeshNode (context, mySorter);
+    }
+
+    // After sorting, assign in-context per-mesh indices
+    {
+      SingleMeshContextNumbering<RenderTreeType> numbering;
+      ForEachMeshNode (context, numbering);
     }
 
     // Setup the SV arrays
     // Push the default stuff
-    SetupStandardSVs<RenderTreeType> (layerConfig, *context, shaderManager, sector);
+    SetupStandardSVs (context, layerConfig, shaderManager, sector);
 
     // Setup the material&mesh SVs
     {
       StandardSVSetup<RenderTreeType, MultipleRenderLayer> svSetup (
-        context->svArrays, layerConfig);
-      renderTree.TraverseMeshNodes (svSetup, context);
+        context.svArrays, layerConfig);
+
+      ForEachMeshNode (context, svSetup);
     }
 
     // Setup shaders and tickets
-    SetupStandarShaderAndTicket (renderTree, *context, shaderManager, 
-      layerConfig);
+    SetupStandarShaderAndTicket (context, shaderManager, layerConfig);
   }
 
 
@@ -107,7 +126,7 @@ private:
 
 
 RMTest1::RMTest1 (iBase* parent)
-: scfImplementationType (this, parent), targets (*this)
+  : scfImplementationType (this, parent), targets (*this)
 {
 
 }
@@ -119,9 +138,11 @@ bool RMTest1::RenderView (iView* view)
   csRef<CS::RenderManager::RenderView> rview;
   rview.AttachNew (new (treePersistent.renderViewPool) 
     CS::RenderManager::RenderView(view));
-  view->GetEngine ()->UpdateNewFrame ();
-  portalPersistent.UpdateNewFrame ();
+  view->GetEngine ()->UpdateNewFrame ();  
   view->GetEngine ()->FireStartFrame (rview);
+
+  contextsScannedForTargets.Empty ();
+  portalPersistent.UpdateNewFrame ();
 
   iSector* startSector = rview->GetThisSector ();
 
@@ -132,33 +153,28 @@ bool RMTest1::RenderView (iView* view)
 
   // Pre-setup culling graph
   RenderTreeType renderTree (treePersistent);
-  RenderTreeType::ContextsContainer* screenContexts = 
-    renderTree.CreateContextContainer ();
-  screenContexts->rview = rview;
-  screenContexts->renderTarget = postEffects.GetScreenTarget ();
 
-  RenderTreeType::ContextNode* startContext = renderTree.CreateContext (screenContexts,
-    rview);
+  RenderTreeType::ContextNode* startContext = renderTree.CreateContext (rview);
+  startContext->renderTarget = postEffects.GetScreenTarget ();
 
   // Setup the main context
   {
-    //StandardContextSetup<RenderTreeType, SingleRenderLayer>
-    ContextSetupType contextSetup (this, 
-      renderLayer);
-    contextSetup (renderTree, startContext, screenContexts, startSector, rview);
+    ContextSetupType contextSetup (this, renderLayer);
+    ContextSetupType::PortalSetupType::ContextSetupData portalData (startContext);
+
+    contextSetup (*startContext, portalData);
   
     targets.PrepareQueues (shaderManager);
-    targets.EnqueueTargetsInContext (screenContexts, renderTree, shaderManager, renderLayer);  
+    targets.EnqueueTargets (renderTree, shaderManager, renderLayer, contextsScannedForTargets);  
   }
 
   // Setup all dependent targets
   while (targets.HaveMoreTargets ())
   {
-    csStringID svName;
-    RenderTreeType::ContextsContainer* contexts;
-    targets.GetNextTarget (svName, contexts);
+    TargetManagerType::TargetSettings ts;
+    targets.GetNextTarget (ts);
 
-    HandleTarget (renderTree, svName, contexts);    
+    HandleTarget (renderTree, ts);
   }
 
 
@@ -167,8 +183,9 @@ bool RMTest1::RenderView (iView* view)
   {
     view->GetContext()->SetZMode (CS_ZBUF_MESH);
 
-    ContextRender<RenderTreeType, MultipleRenderLayer> render (shaderManager, renderLayer);
-    renderTree.TraverseContextContainersReverse (render);
+    SimpleTreeRenderer<RenderTreeType, MultipleRenderLayer> render (rview->GetGraphics3D (),
+      shaderManager, renderLayer);
+    ForEachContextReverse (renderTree, render);
   }
 
   postEffects.DrawPostEffects ();
@@ -176,29 +193,34 @@ bool RMTest1::RenderView (iView* view)
   return true;
 }
 
-bool RMTest1::HandleTarget (RenderTreeType& renderTree, csStringID svName, 
-                            RenderTreeType::ContextsContainer* contexts)
+
+bool RMTest1::HandleTarget (RenderTreeType& renderTree,
+                            const TargetManagerType::TargetSettings& settings)
 {
   // Prepare
-  csRef<CS::RenderManager::RenderView> rview = contexts->rview;
+  csRef<CS::RenderManager::RenderView> rview;
+  rview.AttachNew (new (treePersistent.renderViewPool) 
+    CS::RenderManager::RenderView(settings.view));
 
   iSector* startSector = rview->GetThisSector ();
 
   if (!startSector)
     return false;
 
-  RenderTreeType::ContextNode* startContext = renderTree.CreateContext (contexts,
-    rview);
+  RenderTreeType::ContextNode* startContext = renderTree.CreateContext (rview);
+  startContext->renderTarget = settings.target;
+  startContext->subtexture = settings.targetSubTexture;
 
-  // Setup
-  StandardContextSetup<RenderTreeType, MultipleRenderLayer> contextSetup (this,
-    renderLayer);
-  contextSetup (renderTree, startContext, contexts, startSector, rview);
+  ContextSetupType contextSetup (this, renderLayer);
+  ContextSetupType::PortalSetupType::ContextSetupData portalData (startContext);
 
-  targets.EnqueueTargetsInContext (contexts, renderTree, shaderManager, renderLayer);
+  contextSetup (*startContext, portalData);
+  
+  targets.EnqueueTargets (renderTree, shaderManager, renderLayer, contextsScannedForTargets);
 
   return true;
 }
+
 
 bool RMTest1::Initialize(iObjectRegistry* objectReg)
 {
@@ -210,7 +232,6 @@ bool RMTest1::Initialize(iObjectRegistry* objectReg)
 
   shaderManager = csQueryRegistry<iShaderManager> (objectReg);
   
-
   /*CS::RenderManager::SingleRenderLayer renderLayer = 
     CS::RenderManager::SingleRenderLayer (stringSet->Request("standard"),
       shaderManager->GetShader ("std_lighting"));
@@ -220,11 +241,11 @@ bool RMTest1::Initialize(iObjectRegistry* objectReg)
   csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objectReg);
   treePersistent.Initialize (shaderManager);
   postEffects.Initialize (objectReg);
+  
   portalPersistent.Initialize (shaderManager, g3d);
 
-  csRef<iLoader> loader = csQueryRegistry<iLoader> (objectReg);
-  
-  /*csRef<iShader> desatShader = loader->LoadShader ("/shader/desaturate.xml");
+  /*csRef<iLoader> loader = csQueryRegistry<iLoader> (objectReg);  
+  csRef<iShader> desatShader = loader->LoadShader ("/shader/desaturate.xml");
   postEffects.AddLayer (desatShader);*/
 
   return true;

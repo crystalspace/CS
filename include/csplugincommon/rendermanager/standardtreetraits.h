@@ -29,19 +29,13 @@
 
 namespace CS
 {
-  //TODO: Move these to general location
-  struct TrueType
-  {
-    static const bool Value = true;
-  };
 
-  struct FalseType
-  {
-    static const bool Value = false;
-  };
 
 namespace RenderManager
 {
+  /**
+   * Standard traits for customizing the render tree class.
+   */
   class RenderTreeStandardTraits
   {
   public:
@@ -55,29 +49,16 @@ namespace RenderManager
 
     // Any extra data that should be defined for each context node
     struct ContextNodeExtraDataType
-    {
-      // The SVs themselves
-      SVArrayHolder svArrays;
-
-      // Arrays of per-mesh shader and ticket info
-      csArray<iShader*> shaderArray;
-      csArray<size_t> ticketArray;
+    {     
     };
     
     struct ContextsContainerExtraDataType
-    {
-      iTextureHandle* renderTarget;
-      int subtexture;
-      
-      ContextsContainerExtraDataType() : renderTarget (0), subtexture (0)
-      {}
+    {            
     };
 
-    // Any extra data per mesh in a mesh node
+    // Any extra data per mesh in a single mesh 
     struct MeshExtraDataType
-    {
-      iShaderVariableContext* meshObjSVs;
-      csRef<csShaderVariable> svObjectToWorld;
+    {      
     };
 
     // The data type to use as node key for mesh nodes
@@ -127,7 +108,7 @@ namespace RenderManager
 }
 }
 
-
+// Make sure the size matches so that we can use the comparison hack below
 CS_COMPILE_ASSERT(sizeof(CS::RenderManager::RenderTreeStandardTraits::MeshNodeKeyType) == sizeof(int8));
 
 template<>

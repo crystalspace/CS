@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2007 by Marten Svanfeldt
+    Copyright (C) 2007-2008 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -28,7 +28,18 @@ namespace CS
 {
 namespace RenderManager
 {
+  /*\file
+   *
+   * Provide render layer implementations.
+   * All implementations must at least supply:
+   *  - size_t GetLayerCount () const
+   *  - const csStringID* GetShaderTypes (size_t layer, size_t& num) const
+   *  - iShader* GetDefaultShader (size_t layer) const
+   */
 
+  /**
+   * Render layer implementation for a single render layer.
+   */
   class SingleRenderLayer
   {
   public:
@@ -48,8 +59,8 @@ namespace RenderManager
       : defaultShader (defaultShader)
     {
       this->shaderTypes.SetSize (numTypes);
-      memcpy (this->shaderTypes.GetArray(), shaderTypes,
-	numTypes * sizeof (csStringID));
+      for (size_t i = 0; i < numTypes; ++i)
+        this->shaderTypes[i] = shaderTypes[i];
     }
     
     void AddShaderType (csStringID shaderType)
@@ -85,6 +96,9 @@ namespace RenderManager
     iShader* defaultShader;
   };
 
+  /**
+   * Render layer implementation providing multiple render layers
+   */
   class MultipleRenderLayer
   {
   public:
@@ -92,10 +106,11 @@ namespace RenderManager
     MultipleRenderLayer (size_t numLayers, const csStringID* shaderTypes, 
       iShader** defaultShader)
     {
-      layerTypes.SetSize (numLayers);
-      memcpy (layerTypes.GetArray(), shaderTypes, numLayers);
+      layerTypes.SetSize (numLayers);      
       for (size_t l = 0; l < numLayers; l++)
       {
+        layerTypes[l] = shaderTypes[l];
+
 	Layer newLayer;
 	newLayer.defaultShader = defaultShader[l];
 	newLayer.firstType = l;
@@ -121,8 +136,10 @@ namespace RenderManager
 	const csStringID* copyTypes = layers.GetShaderTypes (l,
 	  newLayer.numTypes);
 	layerTypes.SetSize (newLayer.firstType + newLayer.numTypes);
-	memcpy (layerTypes.GetArray() + newLayer.firstType, copyTypes,
-	  newLayer.numTypes * sizeof (csStringID));
+
+        for (size_t i = 0; i < newLayer.numTypes; ++i)
+          layerTypes[i + newLayer.firstType] = copyTypes[i];
+
 	this->layers.Push (newLayer);
       }
       this->layers.ShrinkBestFit ();
@@ -169,10 +186,6 @@ namespace RenderManager
   void CS_CRYSTALSPACE_EXPORT AddDefaultBaseLayers (iObjectRegistry* objectReg,
     MultipleRenderLayer& layers, uint flags = 0);
   
-  /*
-  bool AddLayersFromNode (iObjectRegistry* objectReg,
-    MultipleRenderLayer& layers, iDocumentNode* node);
-  */
 }
 }
 

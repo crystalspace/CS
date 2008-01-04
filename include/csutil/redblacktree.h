@@ -332,7 +332,7 @@ protected:
       return LocateNode (node->right, key);
   }
   /// Return smallest node with a key greater than 'node's.
-  Node* Successor (Node* node) const
+  static Node* Successor (const Node* node)
   {
     Node* succ;
     if (node->right != 0)
@@ -343,6 +343,24 @@ protected:
     }
     Node* y = node->GetParent();
     while ((y != 0) && (node == y->right))
+    {
+      node = y;
+      y = y->GetParent();
+    }
+    return y;
+  }
+  /// Return largest node with a key smaller than 'node's.
+  static Node* Predecessor (const Node* node)
+  {
+    Node* pred;
+    if (node->left != 0)
+    {
+      succ = node->left;
+      while (succ->right != 0) succ = succ->right;
+      return succ;
+    }
+    Node* y = node->GetParent();
+    while ((y != 0) && (node == y->left))
     {
       node = y;
       y = y->GetParent();
@@ -521,6 +539,90 @@ public:
     if (root != 0) RecursiveTraverseInOrder (root, callback);
   }
   //@}
+
+  //@{
+  /// Const iterator for tree
+  class ConstIterator
+  {
+  public:
+    /// Returns a boolean indicating whether or not the tree has more elements.
+    bool HasNext () const
+    {
+      return currentNode != 0;
+    }
+
+    /// Get the next element's value.
+    const K& Next ()
+    {
+      const K& ret = *((const K*)&currentNode->key);
+      currentNode = Successor (currentNode);
+      return ret;
+    }
+
+  protected:
+    friend class csRedBlackTree;
+    ConstIterator (const csRedBlackTree<K>* tree)
+      : currentNode (tree->root)
+    {
+      while (currentNode && currentNode->left != 0)
+        currentNode = currentNode->left;
+    }
+
+  private:
+    const typename csRedBlackTree<K>::Node *currentNode;
+  };
+  friend class ConstIterator;
+
+  /// Const reverse iterator for tree
+  class ConstReverseIterator
+  {
+  public:
+    /// Returns a boolean indicating whether or not the tree has more elements.
+    bool HasNext () const
+    {
+      return currentNode != 0;
+    }
+
+    /// Get the next element's value.
+    const K& Next ()
+    {
+      const K& ret = *((const K*)&currentNode->key);
+      currentNode = Predecessor (currentNode);
+      return ret;
+    }
+
+  protected:
+    friend class csRedBlackTree;
+    ConstReverseIterator (const csRedBlackTree<K>* tree)
+      : currentNode (tree->root)
+    {
+      while (currentNode && currentNode->right != 0)
+        currentNode = currentNode->right;
+    }
+
+  private:
+    const typename csRedBlackTree<K>::Node *currentNode;
+  };
+  friend class ConstIterator;
+
+  /**
+   * Get an iterator for iterating over the entire tree
+   */
+  ConstIterator GetIterator ()
+  {
+    return ConstIterator (this);
+  }
+
+  /**
+   * Get an iterator for iterating over the entire tree
+   */
+  ConstReverseIterator GetReverseIterator ()
+  {
+    return ConstReverseIterator (this);
+  }
+
+
+  //@}
 };
 
 /**
@@ -649,6 +751,202 @@ public:
   {
     TraverseCB<CB> traverser (callback);
     supahclass::TraverseInOrder (traverser);
+  }
+  //@}
+
+  //@{
+  /// Const iterator for map
+  class ConstIterator
+  {
+  public:
+    /// Returns a boolean indicating whether or not the map has more elements.
+    bool HasNext () const
+    {
+      return currentNode != 0;
+    }
+
+    /// Get the next element's value.
+    const T& Next (K& key)
+    {
+      const csRedBlackTreePayload<K, T>& d = *((const csRedBlackTreePayload<K, T>*)&currentNode->key);
+      currentNode = Successor (currentNode);
+      key = d.GetKey ();
+      return d.GetValue ();
+    }
+
+    /// Get the next element's value.
+    const T& Next ()
+    {
+      const csRedBlackTreePayload<K, T>& d = *((const csRedBlackTreePayload<K, T>*)&currentNode->key);
+      currentNode = Successor (currentNode);      
+      return d.GetValue ();
+    }
+
+  protected:
+    friend class csRedBlackTreeMap;
+    ConstIterator (const csRedBlackTreeMap<K, T>* tree)
+      : currentNode (tree->root)
+    {
+      while (currentNode && currentNode->left != 0)
+        currentNode = currentNode->left;
+    }
+
+  private:
+    const typename csRedBlackTreeMap<K, T>::Node *currentNode;
+  };
+  friend class ConstIterator;
+
+  /// Iterator for map
+  class Iterator
+  {
+  public:
+    /// Returns a boolean indicating whether or not the map has more elements.
+    bool HasNext () const
+    {
+      return currentNode != 0;
+    }
+
+    /// Get the next element's value.
+    T& Next (K& key)
+    {
+      csRedBlackTreePayload<K, T>& d = *((csRedBlackTreePayload<K, T>*)&currentNode->key);
+      currentNode = Successor (currentNode);
+      key = d.GetKey ();
+      return d.GetValue ();
+    }
+
+    T& Next ()
+    {
+      csRedBlackTreePayload<K, T>& d = *((csRedBlackTreePayload<K, T>*)&currentNode->key);
+      currentNode = Successor (currentNode);
+      return d.GetValue ();
+    }
+
+  protected:
+    friend class csRedBlackTreeMap;
+    Iterator (csRedBlackTreeMap<K, T>* tree)
+      : currentNode (tree->root)
+    {
+      while (currentNode && currentNode->left != 0)
+        currentNode = currentNode->left;
+    }
+
+  private:
+    typename csRedBlackTreeMap<K, T>::Node *currentNode;
+  };
+  friend class Iterator;
+
+  /// Const reverse iterator for map
+  class ConstReverseIterator
+  {
+  public:
+    /// Returns a boolean indicating whether or not the map has more elements.
+    bool HasNext () const
+    {
+      return currentNode != 0;
+    }
+
+    /// Get the next element's value.
+    const T& Next (K& key)
+    {
+      const csRedBlackTreePayload<K, T>& d = *((const csRedBlackTreePayload<K, T>*)&currentNode->key);
+      currentNode = Predecessor (currentNode);
+      key = d.GetKey ();
+      return d.GetValue ();
+    }
+
+    /// Get the next element's value.
+    const T& Next ()
+    {
+      const csRedBlackTreePayload<K, T>& d = *((const csRedBlackTreePayload<K, T>*)&currentNode->key);
+      currentNode = Predecessor (currentNode);      
+      return d.GetValue ();
+    }
+
+  protected:
+    friend class csRedBlackTreeMap;
+    ConstReverseIterator (const csRedBlackTreeMap<K, T>* tree)
+      : currentNode (tree->root)
+    {
+      while (currentNode->right != 0)
+        currentNode = currentNode->right;
+    }
+
+  private:
+    const typename csRedBlackTreeMap<K, T>::Node *currentNode;
+  };
+  friend class ConstReverseIterator;
+
+  /// Reverse iterator for map
+  class ReverseIterator
+  {
+  public:
+    /// Returns a boolean indicating whether or not the map has more elements.
+    bool HasNext () const
+    {
+      return currentNode != 0;
+    }
+
+    /// Get the next element's value.
+    T& Next (K& key)
+    {
+      csRedBlackTreePayload<K, T>& d = *((csRedBlackTreePayload<K, T>*)&currentNode->key);
+      currentNode = Predecessor (currentNode);
+      key = d.GetKey ();
+      return d.GetValue ();
+    }
+
+    T& Next ()
+    {
+      csRedBlackTreePayload<K, T>& d = *((csRedBlackTreePayload<K, T>*)&currentNode->key);
+      currentNode = Predecessor (currentNode);
+      return d.GetValue ();
+    }
+
+  protected:
+    friend class csRedBlackTreeMap;
+    ReverseIterator (csRedBlackTreeMap<K, T>* tree)
+      : currentNode (tree->root)
+    {
+      while (currentNode && currentNode->right != 0)
+        currentNode = currentNode->right;
+    }
+
+  private:
+    typename csRedBlackTreeMap<K, T>::Node *currentNode;
+  };
+  friend class ReverseIterator;
+
+  /**
+   * Get an iterator for iterating over the entire map
+   */
+  ConstIterator GetIterator () const
+  {
+    return ConstIterator (this);
+  }
+
+  /**
+   * Get an iterator for iterating over the entire map
+   */
+  Iterator GetIterator ()
+  {
+    return Iterator (this);
+  }
+
+  /**
+   * Get an iterator for iterating over the entire map
+   */
+  ConstReverseIterator GetReverseIterator () const
+  {
+    return ConstReverseIterator (this);
+  }
+
+  /**
+   * Get an iterator for iterating over the entire map
+   */
+  ReverseIterator GetReverseIterator ()
+  {
+    return ReverseIterator (this);
   }
   //@}
 };
