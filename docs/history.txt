@@ -6,6 +6,18 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-Jan-2008
+	- Marten did a big number of changes to the RM:
+	   - Removed the render manager headers from the global headers
+	     to help build speed.
+	   - Cleaned up and documented all the classes.
+	   - Reworked how mesh node and context node iteration are done
+	     adding free function helpers.
+	   - Removed ContextContainers.
+	- Marten added an iterator to csBitArray to quickly traverse over
+	  set bit indices.
+	- Added forward and backward iterators for csRedBlackTree and
+	  csRedBlackMap.
 14-Dec-2007
 	- Marten fixed msvcgen configuration for building in MSVC 9.
 	- Marten added a hash-folder routine to get stronger hashes
