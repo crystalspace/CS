@@ -254,8 +254,14 @@ namespace lighter
     float lightPdf, cosineTerm = 0;
     csVector3 lightVec;
 
-    csColor lightColor = light->SampleLight (point, normal, 0, 0, lightVec, 
-      lightPdf, visTester, lightSampler);
+    const bool isDelta = true; //light->IsDeltaLight (); no support for area lights yet
+
+    float lightSamples[2] = {0};
+    if (!isDelta)
+      lightSampler.GetNext (lightSamples);
+
+    csColor lightColor = light->SampleLight (point, normal, lightSamples[0],
+      lightSamples[1], lightVec, lightPdf, visTester);
 
     if (lightPdf > 0.0f && !lightColor.IsBlack () &&
       (cosineTerm = normal * lightVec) > 0)
@@ -276,7 +282,7 @@ namespace lighter
       else if (occlusion == VisibilityTester::occlPartial)
         lightColor *= visTester.GetFilterColor ();
 
-      if (light->IsDeltaLight ())
+      if (isDelta)
         return lightColor * fabsf (cosineTerm) / lightPdf;
       else
         // Properly handle area sources! See pbrt page 732

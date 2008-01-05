@@ -21,6 +21,10 @@ chronological order.
 	  suggested by the name). Should fix #440.
 	- Marten removed the unit test application and deprecated the unit
 	  test method in iDebugHelper.
+	- Marten redid the ligther2 optimization to play better with future
+	  implementation of area lights.
+	- Marten fixed a bug in lighter2 whereby lights through portals wouldn't
+	  work at all.
 4-Jan-2008
 	- Vincent fixed a crasher in csbench: PerformShaderTest() still queried
 	  iThingState for walls mesh after CreateRoom() was changed to use

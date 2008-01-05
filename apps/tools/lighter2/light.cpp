@@ -203,7 +203,7 @@ namespace lighter
 
   csColor PointLight::SampleLight (const csVector3& point, const csVector3& n,
     float u1, float u2, csVector3& lightVec, float& pdf, VisibilityTester& vistest,
-    SamplerSequence<2>& lightSampler, const csPlane3* visLimitPlane)
+    const csPlane3* visLimitPlane)
   {
     csSegment3 visSegment (position, point);
 
@@ -250,6 +250,7 @@ namespace lighter
     SetColor (parent->GetColor ());
     SetLightID ((const char*)parent->GetLightID ().data);
     lightFrustum = frustum;
+    boundingSphere = transform.Other2This (parentLight->GetBoundingSphere ());
 
     csPlane3 bp (portalPlane);
     bp.DD -= bp.norm * lightFrustum.GetOrigin ();
@@ -263,7 +264,7 @@ namespace lighter
 
   csColor ProxyLight::SampleLight (const csVector3& point, const csVector3& n,
     float u1, float u2, csVector3& lightVec, float& pdf, VisibilityTester& vistest,
-    SamplerSequence<2>& lightSampler, const csPlane3* visLimitPlane)
+    const csPlane3* visLimitPlane)
   {
     // Setup clipped visibility ray
     const csVector3 lightPos = GetLightSamplePosition (u1, u2);
@@ -289,7 +290,7 @@ namespace lighter
     transformedPlane = proxyTransform.Other2This (portalPlane);
 
     const csColor parentLight = parent->SampleLight (point, n, u1, u2, 
-      parentLightVec, pdf, vistest, lightSampler, &transformedPlane);
+      parentLightVec, pdf, vistest, &transformedPlane);
     lightVec = proxyTransform.Other2ThisRelative (parentLightVec);
 
     return parentLight;
