@@ -11,6 +11,7 @@ chronological order.
           with idle animations in sprcal3d. Characters will no longer play the
           idle animation in situations like when in the middle of a fight, and
           all idle animations will be played at random.
+	- Marten fixed a warning in terrain.
 4-Jan-2008
 	- Vincent fixed a crasher in csbench: PerformShaderTest() still queried
 	  iThingState for walls mesh after CreateRoom() was changed to use
