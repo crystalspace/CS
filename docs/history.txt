@@ -19,6 +19,8 @@ chronological order.
 	  libs/csutil/processor/processorspecdetection_nonwin_gcc_x86.cpp to
 	  not compile the contents of that file on Win32 at all (as also
 	  suggested by the name). Should fix #440.
+	- Marten removed the unit test application and deprecated the unit
+	  test method in iDebugHelper.
 4-Jan-2008
 	- Vincent fixed a crasher in csbench: PerformShaderTest() still queried
 	  iThingState for walls mesh after CreateRoom() was changed to use
