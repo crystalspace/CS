@@ -6,6 +6,11 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+5-Jan-2008
+        - Mike Gist committed a patch from Trymm which corrects a few problems
+          with idle animations in sprcal3d. Characters will no longer play the
+          idle animation in situations like when in the middle of a fight, and
+          all idle animations will be played at random.
 4-Jan-2008
 	- Vincent fixed a crasher in csbench: PerformShaderTest() still queried
 	  iThingState for walls mesh after CreateRoom() was changed to use

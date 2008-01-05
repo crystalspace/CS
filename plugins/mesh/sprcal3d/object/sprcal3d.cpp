@@ -864,6 +864,7 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
   // set the material set of the whole model
   vis_cb = 0;
   is_idling = false;
+  idle_override_interval = 0;
 
   meshVersion = 0;
   bboxVersion = (uint)-1;
@@ -1609,10 +1610,11 @@ bool csSpriteCal3DMeshObject::Advance (csTicks current_time)
   if (is_idling) // check for override and play if time
   {
     idle_override_interval -= delta;
-    if (idle_override_interval <= 0)
+    if ((idle_override_interval <= 0) && (default_idle_anim != -1))
     {
+      csRandomGen rng;
+      SetIdleOverrides(&rng,default_idle_anim);
       SetAnimAction(factory->anims[idle_action]->name,.25,.25);
-      idle_override_interval = 20;
     }
   }
   meshVersion++;
@@ -1810,8 +1812,6 @@ void csSpriteCal3DMeshObject::SetIdleOverrides(csRandomGen *rng,int which)
 {
   csCal3DAnimation *anim = factory->anims[which];
 
-  is_idling = true;
-
   // Determine interval till next override.
   idle_override_interval = rng->Get(anim->max_interval - anim->min_interval)
     + anim->min_interval;
@@ -1836,6 +1836,9 @@ void csSpriteCal3DMeshObject::SetIdleOverrides(csRandomGen *rng,int which)
 void csSpriteCal3DMeshObject::SetDefaultIdleAnim(const char *name)
 {
     default_idle_anim = FindAnim(name);
+    float max_interval(factory->anims[default_idle_anim]->max_interval);
+    if(idle_override_interval > max_interval)
+      idle_override_interval = max_interval; 
 }
 
 bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
@@ -1845,6 +1848,7 @@ bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
   ClearAllAnims();
   if (!vel)
   {
+    is_idling = true;
     SetTimeFactor(1);
     if (default_idle_anim != -1)
     {
