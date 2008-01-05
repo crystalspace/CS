@@ -3106,7 +3106,7 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
   }
   iBase * ibase = (iBase *)wp.Ref;
   void * ptr = ibase->QueryInterface(iSCF::SCF->GetInterfaceID(wp.Type), wp.Version);
-//  ibase->DecRef(); // Undo IncRef from QueryInterface
+  // ibase->DecRef(); // Undo IncRef from QueryInterface
 
   // This is a bit tricky: We want the generated Python 'result' object
   // to own one reference to the wrapped object, so we want to call
