@@ -13,6 +13,8 @@ chronological order.
           all idle animations will be played at random.
 	- Marten fixed a warning in terrain.
 	- Marten added svn:ignore property on mk\msvc9 directory.
+	- Marten made an optimization to lighter2, cutting out code taking 7%
+	  of total runtime.
 4-Jan-2008
 	- Vincent fixed a crasher in csbench: PerformShaderTest() still queried
 	  iThingState for walls mesh after CreateRoom() was changed to use

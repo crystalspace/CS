@@ -254,11 +254,8 @@ namespace lighter
     float lightPdf, cosineTerm = 0;
     csVector3 lightVec;
 
-    float lightSamples[2];
-    lightSampler.GetNext (lightSamples);
-
-    csColor lightColor = light->SampleLight (point, normal, lightSamples[0],
-      lightSamples[1], lightVec, lightPdf, visTester);
+    csColor lightColor = light->SampleLight (point, normal, 0, 0, lightVec, 
+      lightPdf, visTester, lightSampler);
 
     if (lightPdf > 0.0f && !lightColor.IsBlack () &&
       (cosineTerm = normal * lightVec) > 0)

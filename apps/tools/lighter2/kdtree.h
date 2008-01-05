@@ -225,7 +225,7 @@ namespace lighter
     enum
     {
       TRAVERSAL_COST = 1,
-      INTERSECTION_CONST = 6,
+      INTERSECTION_CONST = 5,
       MAX_DEPTH = 60,
       PRIMS_PER_LEAF = 4,
       NODE_SIZE_EPSILON = 1000 //*1e-9

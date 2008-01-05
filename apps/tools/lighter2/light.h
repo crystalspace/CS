@@ -21,6 +21,7 @@
 
 #include "lighter.h"
 #include "raytracer.h"
+#include "sampler.h"
 
 namespace lighter
 {
@@ -111,7 +112,7 @@ namespace lighter
      */
     virtual csColor SampleLight (const csVector3& point, const csVector3& n,
       float u1, float u2, csVector3& lightVec, float& pdf, VisibilityTester& vistest,
-      const csPlane3* visLimitPlane = 0) = 0;
+      SamplerSequence<2>& lightSampler, const csPlane3* visLimitPlane = 0) = 0;
 
     /**
      * Return light power over S2 sphere
@@ -250,7 +251,7 @@ namespace lighter
 
     virtual csColor SampleLight (const csVector3& point, const csVector3& n,
       float u1, float u2, csVector3& lightVec, float& pdf, VisibilityTester& vistest,
-      const csPlane3* visLimitPlane = 0);
+      SamplerSequence<2>& lightSampler, const csPlane3* visLimitPlane = 0);
 
     /**
      * Return light power over S2 sphere
@@ -284,7 +285,7 @@ namespace lighter
 
     virtual csColor SampleLight (const csVector3& point, const csVector3& n,
       float u1, float u2, csVector3& lightVec, float& pdf, VisibilityTester& vistest,
-      const csPlane3* visLimitPlane = 0);
+      SamplerSequence<2>& lightSampler, const csPlane3* visLimitPlane = 0);
 
     /**
      * Return light power over S2 sphere
