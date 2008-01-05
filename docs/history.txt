@@ -15,6 +15,10 @@ chronological order.
 	- Marten added svn:ignore property on mk\msvc9 directory.
 	- Marten made an optimization to lighter2, cutting out code taking 7%
 	  of total runtime.
+	- res fixed the preprocessor condition in 
+	  libs/csutil/processor/processorspecdetection_nonwin_gcc_x86.cpp to
+	  not compile the contents of that file on Win32 at all (as also
+	  suggested by the name). Should fix #440.
 4-Jan-2008
 	- Vincent fixed a crasher in csbench: PerformShaderTest() still queried
 	  iThingState for walls mesh after CreateRoom() was changed to use
