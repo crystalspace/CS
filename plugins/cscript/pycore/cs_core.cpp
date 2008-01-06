@@ -56287,11 +56287,10 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "SCF_VERBOSE_PLUGIN_REGISTER",SWIG_From_int(static_cast< int >(SCF_VERBOSE_PLUGIN_REGISTER)));
   SWIG_Python_SetConstant(d, "SCF_VERBOSE_CLASS_REGISTER",SWIG_From_int(static_cast< int >(SCF_VERBOSE_CLASS_REGISTER)));
   SWIG_Python_SetConstant(d, "SCF_VERBOSE_ALL",SWIG_From_int(static_cast< int >(SCF_VERBOSE_ALL)));
-  SWIG_Python_SetConstant(d, "CS_DBGHELP_UNITTEST",SWIG_From_int(static_cast< int >(1)));
-  SWIG_Python_SetConstant(d, "CS_DBGHELP_BENCHMARK",SWIG_From_int(static_cast< int >(2)));
-  SWIG_Python_SetConstant(d, "CS_DBGHELP_TXTDUMP",SWIG_From_int(static_cast< int >(4)));
-  SWIG_Python_SetConstant(d, "CS_DBGHELP_GFXDUMP",SWIG_From_int(static_cast< int >(8)));
-  SWIG_Python_SetConstant(d, "CS_DBGHELP_STATETEST",SWIG_From_int(static_cast< int >(16)));
+  SWIG_Python_SetConstant(d, "CS_DBGHELP_BENCHMARK",SWIG_From_int(static_cast< int >(CS_DBGHELP_BENCHMARK)));
+  SWIG_Python_SetConstant(d, "CS_DBGHELP_TXTDUMP",SWIG_From_int(static_cast< int >(CS_DBGHELP_TXTDUMP)));
+  SWIG_Python_SetConstant(d, "CS_DBGHELP_GFXDUMP",SWIG_From_int(static_cast< int >(CS_DBGHELP_GFXDUMP)));
+  SWIG_Python_SetConstant(d, "CS_DBGHELP_STATETEST",SWIG_From_int(static_cast< int >(CS_DBGHELP_STATETEST)));
   SWIG_Python_SetConstant(d, "MAX_OUTPUT_VERTICES",SWIG_From_int(static_cast< int >(64)));
   SWIG_Python_SetConstant(d, "CS_CLIP_OUTSIDE",SWIG_From_int(static_cast< int >(CS_CLIP_OUTSIDE)));
   SWIG_Python_SetConstant(d, "CS_CLIP_CLIPPED",SWIG_From_int(static_cast< int >(CS_CLIP_CLIPPED)));
