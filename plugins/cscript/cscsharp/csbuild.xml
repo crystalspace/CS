@@ -11,14 +11,14 @@
 
     <property name="src.basedir" value="." />
     <property name="lib.dir" value="." />
-    <property name="cspacesharp.out" value="crystalspace-sharp.dll" />
+    <property name="cspacedotnet.out" value="crystalspace-dotnet.dll" />
 
     <description>${description}</description>
 
     <target name="build" description="compiles crystal space sharp">
-        <csc target="library" output="${cspacesharp.out}" debug="${debug}">
+        <csc target="library" output="${cspacedotnet.out}" debug="${debug}">
             <sources>
-                <include name="${src.basedir}/cspacesharp/*.cs" />
+                <include name="${src.basedir}/cspacedotnet/*.cs" />
             </sources>
         </csc>
     </target>
@@ -27,6 +27,6 @@
     <target name="clean" description="Clean up" depends="cleanBuild" />
 
     <target name="cleanBuild">
-	<delete file="${cspacesharp.out}" />
+	<delete file="${cspacedotnet.out}" />
     </target>
 </project>

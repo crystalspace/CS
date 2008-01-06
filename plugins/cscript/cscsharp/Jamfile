@@ -3,11 +3,11 @@ SubDir TOP plugins cscript cscsharp ;
 if $(CSHARP.AVAILABLE) = "yes" && $(CMD.PERL5)
 {
   local csharpbase = [ ConcatDirs $(LOCATE.OBJECTS) plugins cscript cscsharp ] ;
-  local csharpdir = [ ConcatDirs $(csharpbase) cspacesharp ] ;
+  local csharpdir = [ ConcatDirs $(csharpbase) cspacedotnet ] ;
   MkDir $(csharpdir:G=dir) ;
   CleanDir cspacesharpclean : $(csharpdir) ;
 
-  local cs_extra = [ Wildcard [ ConcatDirs cspacesharp ] : *.cs *.key ] ;
+  local cs_extra = [ Wildcard [ ConcatDirs cspacedotnet ] : *.cs *.key ] ;
   SEARCH on $(cs_extra) = $(SEARCH_SOURCE) ;
   MakeLocate $(cs_extra:BSG=built) : $(csharpdir) ;
   Depends $(cs_extra:BSG=built) : $(csharpdir:G=dir) ;
@@ -22,7 +22,7 @@ if $(CSHARP.AVAILABLE) = "yes" && $(CMD.PERL5)
 	
   local csbuildbase = $(csharpbase) ;
   local csbuildxml = csbuild.xml ;
-  local cspacesharpdll = crystalspace-sharp.dll ;
+  local cspacesharpdll = crystalspace-dotnet.dll ;
 
   local cs_globals = CS.cs ;
   MakeLocate $(cs_globals) : $(csharpdir) ;
@@ -52,9 +52,9 @@ if $(CSHARP.AVAILABLE) = "yes" && $(CMD.PERL5)
   actions NAnt
   {
     $(CSPACESHARP.NANT_PREPARE)
-    "$(CMD.NANT)" -quiet -emacs -D:build.compiler.emacs=true -buildfile:$(>)
+    "$(CMD.NANT)" -quiet -emacs -D:build.compiler.emacs=true $(CSPACESHARP.NANT.FLAGS) -buildfile:$(>)
   }
-	
+
   NAnt $(cspacesharpdll) : $(csbuildxml:G=build) ;
   Clean cspacesharpclean : $(cspacesharpdll) ;
 
@@ -69,8 +69,14 @@ if $(CSHARP.AVAILABLE) = "yes" && $(CMD.PERL5)
   Depends csharpmodclean : cspacesharpclean ;
 
   # Installs pkg-config file
-  InstallPkgConfig [ DoSourceGrist crystalspace-sharp.pc ] ;
+  InstallBindingsModule $(cspacesharpdllfinal) : bindings csharp ;
+
+  # TODO: Generate the .pc dynamically
+  InstallBindingsPkgConfig [ DoSourceGrist crystalspace-dotnet.pc ] ;
+
   # Installs the bindings at the Global Assembly Cache
-  InstallGAC $(cspacesharpdllfinal) : crystalspace ;
+  # TODO: this is useful when the API is stable, and also is needed to change the api
+  #InstallGAC $(cspacesharpdllfinal) : crystalspace ;
+
 }
 

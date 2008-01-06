@@ -6,6 +6,11 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Jan-2008
+	- ronsaldo renamed the output of the c#, crystalspace-sharp.dll into
+	  crystalspace-dotnet.dll.
+	- ronsaldo made changes into the installation of the c# bindings. The
+	  bindings are installed like the other bindings.
 2-Jan-2008
 	- ronsaldo made the c# bindings CLS compliant.
 	- ronsaldo adapted the c# SimpleRoom example into the new version of the

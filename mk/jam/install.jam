@@ -109,7 +109,7 @@ rule InstallMan
 }
 
 ##  InstallPkgConfig files
-##    Installs pkg-config .pc files
+##    Installs a pkg-config .pc files
 rule InstallPkgConfig
 {
   local files = [ GristInstall $(<) ] ;
@@ -117,6 +117,17 @@ rule InstallPkgConfig
 
   Depends install_pkgconfig : [ DoInstall $(files) : $(pkgconfigdir) ] ;
 }
+
+##  InstallBindingsPkgConfig files
+##    Installs a pkg-config .pc files, it depends from install_bindings
+rule InstallBindingsPkgConfig
+{
+  local files = [ GristInstall $(<) ] ;
+  SEARCH on $(files) = $(SUBDIR) ;
+
+  Depends install_bindings : [ DoInstall $(files) : $(pkgconfigdir) ] ;
+}
+
 
 ##  InstallProgram files [ : directories ]
 ##    Installs program files (executable or shell script). This is a

@@ -76,11 +76,7 @@ if $(CSHARP.AVAILABLE) = "yes"
     Depends $(target) : $(objects) ;
     LinkPlugin $(target) : $(objects) ;
 
-    # We install it on the libdir instead of bindings dir because we need that
-    # the runtime finds it using P/Invoke, which searches the natives libraries
-    # in the system path
-
-    Depends install_bindings : [ DoInstall $(target) : $(libdir) ] ; 
+    InstallBindingsModule $(target) : $(4) ;
 
     if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
     {
@@ -88,9 +84,8 @@ if $(CSHARP.AVAILABLE) = "yes"
       local debugfile = [ on $(target) GetVar DEBUG_FILE_FULL ] ;
       cleantarget += $(debugfile) ;
       NoCare $(debugfile) ;
-      Depends install_bindings : [ DoInstall $(debugfile) :
-                                  $(appdatadir) $(4) :
-				  $(INSTALL_DATA) ] ;
+      Depends install_bindings :
+		 [ DoInstall $(debugfile) : $(appdatadir) $(4) : $(INSTALL_DATA) ] ;
     }
 
     Always $(<)clean ;
@@ -152,6 +147,7 @@ if $(CSHARP.AVAILABLE) = "yes"
       {
       }
   }
+  
   actions CSC
   {
      $(CMD.CSC) -target:$(3) $(4) -out:$(<) $(>)
@@ -174,7 +170,7 @@ if $(CSHARP.AVAILABLE) = "yes"
     local packagename = $(2) ;
 
     ASSEMBLY_PACKAGE = $(packagename) ;
-    #Depends install_bindings : [ InstallGAC1 $(assembly) ] ;
+    Depends install_bindings : [ InstallGAC1 $(assembly) ] ;
   }
 
   rule InstallCSharpMod

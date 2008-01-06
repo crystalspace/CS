@@ -107,7 +107,7 @@ if $(CSHARP.AVAILABLE) = "yes" && $(CMD.PERL5)
     #--------------------------------
     local common = [ DoSourceGrist cs_$(module).cpp ] ;
     local csharpbase = [ ConcatDirs $(LOCATE.OBJECTS) plugins cscript cscsharp ] ;
-    local csharpdir = [ ConcatDirs $(csharpbase) cspacesharp ] ;
+    local csharpdir = [ ConcatDirs $(csharpbase) cspacedotnet ] ;
 
     Depends $(common) : $(csharpdir:G=dir) ;
     MkDir $(csharpdir:G=dir) ;
@@ -133,6 +133,8 @@ if $(CSHARP.AVAILABLE) = "yes" && $(CMD.PERL5)
     Depends clean : cspacesharpclean ;
     Depends csharpmodclean : cspacesharpclean ;
 
+    Depends $(target) : $(modulecs_f) ;
+
     #-------------------
     # C# module c side
     #-------------------
@@ -154,7 +156,7 @@ if $(CSHARP.AVAILABLE) = "yes" && $(CMD.PERL5)
     #----------------------------
     # Prepare the C# module.
     #----------------------------
-    local cs_extra = [ Wildcard [ ConcatDirs cspacesharp ] : *.cs ] ;
+    local cs_extra = [ Wildcard [ ConcatDirs cspacedotnet ] : *.cs ] ;
     SEARCH on $(cs_extra) = $(SEARCH_SOURCE) ;
     MakeLocate $(cs_extra:BSG=built) : $(csharpdir) ;
     Clean $(modulecs)clean : $(cs_extra:BSG=built) ;
@@ -226,10 +228,13 @@ rule CSharpModDepends
   }
 }
 
+if $(CSHARP.AVAILABLE) = "yes" && $(CMD.PERL5)
+{
 Description csharpmod : "build all the c# bindings modules" ;
 CSharpModDepends coresharp imeshsharp isndsyssharp ivariasharp ienginesharp 
   cstoolsharp ivideosharp imapsharp csgfxsharp csgeomsharp ;
 Depends bindings : csharpmod ;
+}
 
 # rule to move __init__.py file to the generated python bindings
 # folder.
