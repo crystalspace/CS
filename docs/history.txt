@@ -8,6 +8,9 @@ chronological order.
 
 6-Jan-2008
 	- Marten fixed a bug in lighter2 related to light through portals.
+	- Vincent added '-sndfile' commandline option to allow setting the
+	  sound file to use in 'sndtest' and 'asndtest'. Also added sound and
+	  stream format information display.
 5-Jan-2008
         - Mike Gist committed a patch from Trymm which corrects a few problems
           with idle animations in sprcal3d. Characters will no longer play the

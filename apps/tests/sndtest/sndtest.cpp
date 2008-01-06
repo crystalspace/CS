@@ -76,9 +76,8 @@ void SndTest::ProcessFrame ()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
-  // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.0) * (0.06 * 20);
-
+  // Now rotate the sound source around the camera/listener
   cur_angle += speed;
   csVector3 sndpos = GetSoundPos (cur_angle);
   sndsource3d->SetPosition (sndpos);
@@ -153,25 +152,52 @@ bool SndTest::CreateSprites ()
 
 bool SndTest::LoadSound ()
 {
-  const char* fname = "/lib/std/loopbzzt.wav";
+  csRef<iCommandLineParser> cmdline (
+        csQueryRegistry<iCommandLineParser> (GetObjectRegistry ()));
+
+  csString fname = cmdline->GetOption ("sndfile");
+  if (fname.IsEmpty ())
+  {
+    fname = "/lib/std/loopbzzt.wav";
+    printf("You can override sound file using -sndfile option (VFS path)\n");
+  }
+  printf("Sound file  : %s\n", fname.GetData ());
+
   csRef<iVFS> vfs = csQueryRegistry<iVFS> (GetObjectRegistry ());
 
-  csRef<iDataBuffer> soundbuf = vfs->ReadFile (fname);
+  csRef<iDataBuffer> soundbuf = vfs->ReadFile (fname.GetData ());
   if (!soundbuf)
-    return ReportError ("Can't load file '%s'!", fname);
+    return ReportError ("Can't load file '%s'!", fname.GetData ());
 
   csRef<iSndSysData> snddata = sndloader->LoadSound (soundbuf);
   if (!snddata)
-    return ReportError ("Can't load sound '%s'!", fname);
+    return ReportError ("Can't load sound '%s'!", fname.GetData ());
+
+  const csSndSysSoundFormat* format = snddata->GetFormat ();
+  printf("=== iSndSysData format informations ===\n");
+  printf("Format      : %d bits, %d channel(s), %d Hz\n",
+        format->Bits, format->Channels, format->Freq);
+  printf("Sample Size : %d bytes, %d frames\n", snddata->GetDataSize (),
+        snddata->GetFrameCount ());
+  printf("Description : %s\n", snddata->GetDescription ());
+  fflush(stdout);
 
   csRef<iSndSysStream> sndstream = sndrenderer->CreateStream (snddata,
   	CS_SND3D_ABSOLUTE);
   if (!sndstream)
-    return ReportError ("Can't create stream for '%s'!", fname);
+    return ReportError ("Can't create stream for '%s'!", fname.GetData ());
+
+  const csSndSysSoundFormat* rformat = sndstream->GetRenderedFormat ();
+  printf("=== iSndSysStream format informations ===\n");
+  printf("Format      : %d bits, %d channel(s), %d Hz\n",
+        rformat->Bits, rformat->Channels, rformat->Freq);
+  printf("Stream Size : %d frames\n", sndstream->GetFrameCount ());
+  printf("Description : %s\n", sndstream->GetDescription ());
+  fflush(stdout);
 
   sndsource = sndrenderer->CreateSource (sndstream);
   if (!sndsource)
-    return ReportError ("Can't create source for '%s'!", fname);
+    return ReportError ("Can't create source for '%s'!", fname.GetData ());
   sndsource3d = scfQueryInterface<iSndSysSource3D> (sndsource);
 
   sndsource3d->SetPosition (GetSoundPos (0));
