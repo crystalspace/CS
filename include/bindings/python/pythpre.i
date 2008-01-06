@@ -250,8 +250,8 @@ CS_WRAP_PTR_TYPEMAP(csWrapPtr)
   $2 = PyInt_AsLong(pyver);
   Py_XDECREF(pyver);
 }
-
-%typemap(in) (int argc, char const * const argv[])
+%define TYPEMAP_ARGC_ARGV(Arg1,Arg2)
+%typemap(in) (Arg1,Arg2)
 {
   if (!PyList_Check($input))
   {
@@ -279,6 +279,8 @@ CS_WRAP_PTR_TYPEMAP(csWrapPtr)
 {
   delete [] $2;
 }
+%enddef
+TYPEMAP_ARGC_ARGV(int argc, char const * const argv[])
 
 %typemap(in) (const char * description, ...)
 {
