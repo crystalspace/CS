@@ -346,7 +346,7 @@ PyObject *csPython::FindFunction(const char *url,bool do_errors)
 bool csPython::Store (const char *name, iScriptValue *value)
 {
   int result;
-  char *last_dot = strrchr(name,'.');
+  const char *last_dot = strrchr(name,'.');
   if (last_dot)
   {
     // variable is inside some hierachy
