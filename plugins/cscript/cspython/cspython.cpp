@@ -382,7 +382,7 @@ csPtr<iScriptValue> csPython::Retrieve (const char *name)
 bool csPython::Remove (const char *name) 
 {
   int result;
-  char *last_dot = strrchr(name,'.');
+  const char *last_dot = strrchr(name,'.');
   if (last_dot)
   {
     // variable is inside some hierachy
