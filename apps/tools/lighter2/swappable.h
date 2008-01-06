@@ -149,7 +149,8 @@ namespace lighter
 
   /**
    * Base implementation for a swappable object. Also supports nested
-   * locking. */
+   * locking. 
+   */
   class Swappable : public iSwappable
   {
     mutable uint lockCount;

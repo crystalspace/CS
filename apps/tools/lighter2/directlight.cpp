@@ -28,14 +28,6 @@ namespace lighter
 {
   //-------------------------------------------------------------------------
 
-/*  static const float ElementQuadrantConstants[][2] =
-  {
-    {-0.25f, -0.25f},
-    {-0.25f,  0.25f},
-    { 0.25f, -0.25f},
-    { 0.25f,  0.25f}
-  };*/
-
   DirectLighting::DirectLighting (const csVector3& tangentSpaceNorm, 
     size_t subLightmapNum) : tangentSpaceNorm (tangentSpaceNorm),
     fancyTangentSpaceNorm (!(tangentSpaceNorm - csVector3 (0, 0, 1)).IsZero ()),

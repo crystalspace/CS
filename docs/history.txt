@@ -16,6 +16,7 @@ chronological order.
 	- caedes added swig output typemaps for EventData structs in GetData
 	  functions in the different EventHelper classes.
 	- caedes fixed a constness problem in cspython.
+	- Marten made a couple of cosmetic fixes in ligher2.
 5-Jan-2008
         - Mike Gist committed a patch from Trymm which corrects a few problems
           with idle animations in sprcal3d. Characters will no longer play the

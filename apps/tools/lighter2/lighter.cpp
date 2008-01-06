@@ -405,6 +405,8 @@ namespace lighter
 
     progFinished.SetProgress (1);
 
+    globalTUI.FinishDraw ();
+
     return true;  
   }
 
