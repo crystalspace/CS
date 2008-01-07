@@ -353,7 +353,7 @@ bool csPython::Store (const char *name, iScriptValue *value)
     const csString url(name,last_dot-name);
     PyObject *py_curr = FindObject(url);
     if (!py_curr) return false;
-    result = PyObject_SetAttrString(py_curr,last_dot+1,Query(value)->self);
+    result = PyObject_SetAttrString(py_curr,const_cast<char*>(last_dot+1),Query(value)->self);
   }
   else
   {
@@ -389,7 +389,7 @@ bool csPython::Remove (const char *name)
     const csString url(name,last_dot-name);
     PyObject *py_curr = FindObject(url);
     if (!py_curr) return false;
-    result = PyObject_DelAttrString(py_curr,last_dot+1);
+    result = PyObject_DelAttrString(py_curr,const_cast<char*>(last_dot+1));
   }
   else
   {
