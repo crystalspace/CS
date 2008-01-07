@@ -10,6 +10,9 @@ chronological order.
 	- res fixed a constness mismatch in cspython.cpp occuring with 
 	  Python 2.4 (and probably older) caused that surfaced after r28415
 	  and r28416.
+	- Vincent fixed a bug which prevented OGG files to be played when
+	  using OpenAL. Also commented unused stuff in OpenAL renderer, and
+	  added OpenAL specific kvp in sound.cfg.
 6-Jan-2008
 	- Marten fixed a bug in lighter2 related to light through portals.
 	- Vincent added '-sndfile' commandline option to allow setting the

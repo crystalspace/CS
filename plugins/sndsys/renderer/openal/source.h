@@ -117,8 +117,8 @@ private:
   ALenum m_Format;
   /// The sampling rate of the stream
   ALuint m_SampleRate;
-  /// The number of bytes per sample in the stream
-  size_t m_BytesPerSample;
+  // The number of bytes per sample in the stream
+  //size_t m_BytesPerSample; // (vk) unused
 
   /// Helper function to fill an OpenAL buffer with data.
   bool FillBuffer (ALuint buffer);
