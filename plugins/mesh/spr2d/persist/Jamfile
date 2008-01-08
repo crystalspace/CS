@@ -1,3 +1,0 @@
-SubDir TOP plugins mesh spr2d persist ;
-
-SubInclude TOP plugins mesh spr2d persist standard ;

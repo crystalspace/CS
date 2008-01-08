@@ -1,7 +1,0 @@
-SubDir TOP plugins engine renderloop loader ;
-
-Description rendloop_loader : "render loop loader" ;
-Plugin rendloop_loader : [ Wildcard *.cpp *.h ] ;
-Includes rlloader.h : $(SUBDIR)/rlloader.tok ;
-LinkWith rendloop_loader : crystalspace ;
-CompileGroups rendloop_loader : renderall ;

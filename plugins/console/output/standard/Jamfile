@@ -1,8 +1,0 @@
-SubDir TOP plugins console output standard ;
-
-Description csconout : "standard output console" ;
-
-Plugin csconout
-	: [ Wildcard *.cpp *.h ]
-;
-LinkWith csconout : crystalspace ;

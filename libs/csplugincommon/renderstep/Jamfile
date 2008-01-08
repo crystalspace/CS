@@ -1,3 +1,0 @@
-SubDir TOP libs csplugincommon renderstep ;
-
-CsLibAddModule ;

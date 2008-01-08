@@ -1,6 +1,0 @@
-SubDir TOP plugins cscript pyivaria ;
-
-if $(PYTHON.AVAILABLE) = "yes"
-{
-  PyBindingModule ivariamod : ivaria : ivariamod.cpp : : : "ivaria cs Python module" ;
-}

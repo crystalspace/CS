@@ -1,6 +1,0 @@
-SubDir TOP plugins cscript pyimesh ;
-
-if $(PYTHON.AVAILABLE) = "yes"
-{
-  PyBindingModule imeshmod : imesh : imeshmod.cpp : : : "imesh cs Python module" ;
-}

@@ -1,3 +1,0 @@
-SubDir TOP mk jam ;
-
-InstallData [ Wildcard *.jam ] : build jam ;

@@ -1,6 +1,0 @@
-SubDir TOP apps tests eventtest ;
-
-Description eventtest : "event tester" ;
-Application eventtest : [ Wildcard *.cpp *.h ] : noinstall ;
-LinkWith eventtest : crystalspace ;
-

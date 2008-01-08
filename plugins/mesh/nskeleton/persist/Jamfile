@@ -1,3 +1,0 @@
-SubDir TOP plugins mesh nskeleton persist ;
-
-#SubInclude TOP plugins mesh nskeleton persist standard ;
