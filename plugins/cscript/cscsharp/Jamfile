@@ -59,7 +59,7 @@ if $(CSHARP.AVAILABLE) = "yes" && $(CMD.PERL5)
   Clean cspacesharpclean : $(cspacesharpdll) ;
 
   # Copy the .Net dll into bindings/csharp folder
-  local cspacesharpdllfinal = $(cspacesharpdll:G=cscsharpfinal) ;
+  local cspacesharpdllfinal = $(cspacesharpdll:G=csdotnetfinal) ;
   MakeLocate $(cspacesharpdllfinal) : [ ConcatDirs $(LOCATE.OBJECTS) bindings csharp ] ;
   Copy $(cspacesharpdllfinal) : $(cspacesharpdll) ;
   Depends $(cspacesharpdllfinal) : $(cspacesharpdll) ;
@@ -67,6 +67,18 @@ if $(CSHARP.AVAILABLE) = "yes" && $(CMD.PERL5)
 
   Depends csharpmod : $(cspacesharpdllfinal) ;
   Depends csharpmodclean : cspacesharpclean ;
+
+  # Copy the .config into the bindings/csharp folder
+  local configdotnet = crystalspace-dotnet.config ;
+  SEARCH on $(configdotnet) = $(SEARCH_SOURCE) ;
+  local configdotnetfinal = $(configdotnet:G=csdotnetfinal) ;
+  MakeLocate $(configdotnetfinal) : [ ConcatDirs $(LOCATE.OBJECTS) bindings csharp ] ;
+  Copy $(configdotnetfinal) : $(configdotnet) ;
+  Depends $(configdotnetfinal) : $(configdotnet) ;
+  Clean cspacesharpclean : $(configdotnetfinal) ;
+
+  Depends csharpmod : $(configdotnetfinal) ;
+
 
   # Installs pkg-config file
   InstallBindingsModule $(cspacesharpdllfinal) : bindings csharp ;
