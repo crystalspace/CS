@@ -40,6 +40,8 @@ namespace lighter
 
   void SwapManager::RegisterSwappable (iSwappable* obj)
   {
+    CS::Threading::MutexScopedLock lock (swapMutex);
+
     CS_ASSERT(swapCache.Get (obj, 0) == 0);
     SwapEntry* e = entryAlloc.Alloc();
     e->obj = obj;
@@ -49,17 +51,20 @@ namespace lighter
   }
 
   void SwapManager::UnregisterSwappable (iSwappable* obj)
-  {
+  {    
+    CS::Threading::MutexScopedLock lock (swapMutex);
+
     SwapEntry* e = swapCache.Get (obj, 0);
     CS_ASSERT(e != 0);
     swapCache.Delete (obj, e);
-
+   
     if (!SwapIn (e))
     { 
       csPrintfErr ("Error swapping in data for %p\n", obj);
       // Not nice but...
       abort();
     }
+
     unlockedCacheEntries.Delete (e);
     if (e->lastSize != (size_t)~0)
       currentCacheSize -= e->lastSize;
@@ -72,11 +77,15 @@ namespace lighter
 
   void SwapManager::Lock (iSwappable* obj)
   {
-    SwapEntry* e = swapCache.Get (obj, 0);
-    CS_ASSERT(e != 0);
-    unlockedCacheEntries.Delete (e);
+    SwapEntry* e = 0;
+    {
+      CS::Threading::MutexScopedLock lock (swapMutex);
+      e = swapCache.Get (obj, 0);
+      CS_ASSERT(e != 0);
+      unlockedCacheEntries.Delete (e);
 
-    AccountEntrySize (e);
+      AccountEntrySize (e);
+    }
 
     if (currentCacheSize > maxCacheSize)
     {
@@ -93,6 +102,8 @@ namespace lighter
 
   void SwapManager::Unlock (iSwappable* obj)
   {
+    CS::Threading::MutexScopedLock lock (swapMutex);
+
     SwapEntry* e = swapCache.Get (obj, 0);
     CS_ASSERT(e != 0);
     unlockedCacheEntries.Add (e);
@@ -101,6 +112,8 @@ namespace lighter
 
   void SwapManager::UpdateSize (iSwappable* obj)
   {
+    CS::Threading::MutexScopedLock lock (swapMutex);
+
     SwapEntry* e = swapCache.Get (obj, 0);
     CS_ASSERT(e != 0);
     if (e->swapStatus == e->swappedIn)
@@ -116,8 +129,13 @@ namespace lighter
 
   bool SwapManager::SwapOut (SwapEntry* e)
   {
-    // If nothing to swap out, nothing to do
-    if (e->swapStatus != SwapEntry::swappedIn) return true;
+    // If nothing to swap out, nothing to do    
+    int32 oldStatus = 
+      CS::Threading::AtomicOperations::CompareAndSet (
+      &e->swapStatus, SwapEntry::swapping, SwapEntry::swappedIn);
+
+    if (oldStatus != SwapEntry::swappedIn)
+      return true;
 
     csString tmpFileName = GetFileName (e->obj);
 
@@ -191,21 +209,31 @@ namespace lighter
       e->swapStatus = SwapEntry::swappedOutEmpty;
 
     // Mark it as swapped out too..
-    unlockedCacheEntries.Delete (e);
-    
-    currentCacheSize -= e->lastSize;
+    {
+      CS::Threading::MutexScopedLock lock (swapMutex);
+      unlockedCacheEntries.Delete (e);    
+      currentCacheSize -= e->lastSize;
+    }
 
     return true;
   }
 
   bool SwapManager::SwapIn (SwapEntry* e)
   {
-    if (e->swapStatus == SwapEntry::swappedIn) return true;
+    // MT Note: Not supported trying to both swap out and in an entry at same time
+    // Double in or double out is however supported.
 
-    if (e->swapStatus == SwapEntry::swappedOutEmpty)
+    // Set it to swapped in atomic
+    int32 oldStatus = 
+      CS::Threading::AtomicOperations::Set (&e->swapStatus, SwapEntry::swappedIn);
+    
+    if (oldStatus == SwapEntry::swappedIn ||
+      oldStatus == SwapEntry::swapping) 
+      return true;
+
+    if (oldStatus == SwapEntry::swappedOutEmpty)
     {
-      e->obj->SwapIn (0, 0);
-      e->swapStatus = SwapEntry::swappedIn;
+      e->obj->SwapIn (0, 0);      
       return true;
     }
 
@@ -276,7 +304,11 @@ namespace lighter
     e->obj->SwapIn (swapData, swapSize);
     e->swapStatus = SwapEntry::swappedIn;
     e->lastSize = swapSize;
-    currentCacheSize += e->lastSize;
+
+    {
+      CS::Threading::MutexScopedLock lock (swapMutex);
+      currentCacheSize += e->lastSize;
+    }    
 
     return true;
   }
@@ -284,23 +316,26 @@ namespace lighter
   void SwapManager::FreeMemory (size_t desiredAmount)
   {
     // Walk through the unlocked set of entries, swap them out until we have enough free memory
-    size_t targetSize = currentCacheSize - desiredAmount;
-
     csArray<SwapEntry*> sortedList;
 
-    UnlockedEntriesType::GlobalIterator git = unlockedCacheEntries.GetIterator ();
-    while (git.HasNext ())
     {
-      SwapEntry* e = git.Next ();
-      sortedList.InsertSorted (e, SwapEntryAgeCompare);
+      CS::Threading::MutexScopedLock lock (swapMutex);
+
+      UnlockedEntriesType::GlobalIterator git = unlockedCacheEntries.GetIterator ();
+      while (git.HasNext ())
+      {
+        SwapEntry* e = git.Next ();
+        AccountEntrySize (e);
+        sortedList.InsertSorted (e, SwapEntryAgeCompare);
+      }
     }
 
+    size_t targetSize = currentCacheSize - desiredAmount;
+    
     csArray<SwapEntry*>::Iterator sit = sortedList.GetIterator ();
     while ((targetSize < currentCacheSize) && sit.HasNext ())
     {
-      SwapEntry* e = sit.Next ();
-
-      AccountEntrySize (e);
+      SwapEntry* e = sit.Next ();      
 
       if (!SwapOut (e))
       { 

@@ -20,6 +20,8 @@
 #define __SWAPPABLE_H__
 
 #include "lighter.h"
+#include "csutil/threading/mutex.h"
+#include "csutil/threading/atomicops.h"
 
 namespace lighter
 {
@@ -77,10 +79,13 @@ namespace lighter
       iSwappable* obj;
       enum
       {
-        swappedOut,
-        swappedOutEmpty,
-        swappedIn
-      } swapStatus;
+        swappedOut = 0,
+        swappedOutEmpty = 1,
+        swappedIn = 2,
+        swapping = 3
+      };
+
+      int32 swapStatus;
       size_t lastUnlockTime;
       size_t lastSize;
     };
@@ -118,6 +123,8 @@ namespace lighter
     //Statistics for house-keeping
     size_t maxCacheSize, currentCacheSize;
     size_t currentUnlockTime;
+
+    CS::Threading::Mutex swapMutex;
 
     void AccountEntrySize (SwapEntry* e)
     {
