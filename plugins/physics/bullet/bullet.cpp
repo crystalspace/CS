@@ -1424,8 +1424,17 @@ void csBulletJoint::RecreateJointIfNeeded (bool force)
 	// Currently fixed only! @@@
 	btTransform frA;
 	btTransform frB;
+
+        // Compute an arbitrary joint-point in between
+        btVector3 jointPoint = (body1->getWorldTransform ().getOrigin () +
+          body2->getWorldTransform ().getOrigin ()) * 0.5f;
+
 	frA.setIdentity ();
 	frB.setIdentity ();
+
+        frA.setOrigin (body1->getWorldTransform ().invXform (jointPoint));
+        frB.setOrigin (body2->getWorldTransform ().invXform (jointPoint));
+
 	btGeneric6DofConstraint* dof6;
 	dof6 = new btGeneric6DofConstraint (*body1, *body2,
 	    frA, frB, true);
@@ -1444,7 +1453,7 @@ void csBulletJoint::RecreateJointIfNeeded (bool force)
 
   if (constraint)
   {
-    ds->GetWorld ()->addConstraint (constraint, false);
+    ds->GetWorld ()->addConstraint (constraint, true);
   }
 }
  

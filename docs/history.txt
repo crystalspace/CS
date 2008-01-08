@@ -16,6 +16,8 @@ chronological order.
 	- Marten made a few cosmetic fixes to lighter2.
 	- Marten started to convert lighter2 to be able to take advantage
 	  of multi-processor/core configurations.
+	- Marten made a number of fixes to bullet plugin and phystut 
+	  application, fixing creation of sphere and joints.
 7-Jan-2008
 	- res fixed a constness mismatch in cspython.cpp occuring with 
 	  Python 2.4 (and probably older) caused that surfaced after r28415
