@@ -32,7 +32,7 @@ namespace Threading
   ThreadedJobQueue::ThreadedJobQueue (size_t numWorkers)
     : scfImplementationType (this), 
     numWorkerThreads (csMin<size_t> (MAX_WORKER_THREADS, numWorkers)), 
-    shutdownQueue (false)
+    shutdownQueue (false), outstandingJobs (0)
   {
     // Start up the threads
     for (size_t i = 0; i < numWorkerThreads; ++i)
@@ -71,6 +71,7 @@ namespace Threading
 
     MutexScopedLock lock (jobMutex);
     jobQueue.Push (job);
+    CS::Threading::AtomicOperations::Increment (&outstandingJobs);
     newJob.NotifyOne ();
   }
 
@@ -87,6 +88,7 @@ namespace Threading
     if (jobUnqued)
     {
       job->Run ();
+      CS::Threading::AtomicOperations::Decrement (&outstandingJobs);
       return;
     }
 
@@ -152,6 +154,12 @@ namespace Threading
 
     }
   }
+  
+  bool ThreadedJobQueue::IsFinished ()
+  {
+    int32 c = CS::Threading::AtomicOperations::Read (&outstandingJobs);
+    return c == 0;
+  }
 
   ThreadedJobQueue::QueueRunnable::QueueRunnable (ThreadedJobQueue* queue, 
     ThreadState* ts)
@@ -183,6 +191,7 @@ namespace Threading
       if (threadState->currentJob)
       {
         threadState->currentJob->Run ();
+        CS::Threading::AtomicOperations::Decrement (&(ownerQueue->outstandingJobs));
       }
 
       // Clean up

@@ -124,6 +124,7 @@
 #include "csutil/scopeddelete.h"
 #include "csutil/scopedlock.h"
 #include "csutil/set.h"
+#include "csutil/simplejobqueue.h"
 #include "csutil/snprintf.h"
 #include "csutil/sparse3d.h"
 #include "csutil/spinlock.h"
