@@ -1862,9 +1862,10 @@ bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
     {
       if (factory->anims[i]->type == iSpriteCal3DState::C3D_ANIM_TYPE_IDLE)
       {
+        default_idle_anim = i;
         AddAnimCycle(i,1,0);
-    if (rng)
-      SetIdleOverrides(rng,i);
+        if (rng)
+          SetIdleOverrides(rng,i);
         return true;
       }
     }
