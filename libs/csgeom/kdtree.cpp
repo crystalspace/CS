@@ -964,6 +964,7 @@ struct Debug_TraverseData
   int num_bbox_pointers;
 };
 
+#ifdef DEBUG_TRAVERSE_FUNC_UNUSED
 static bool Debug_TraverseFunc (csKDTree* treenode, void* userdata,
         uint32 cur_timestamp, uint32&)
 {
@@ -995,6 +996,7 @@ static bool Debug_TraverseFunc (csKDTree* treenode, void* userdata,
 
   return true;
 }
+#endif
 
 
 static bool Debug_TraverseFuncBenchmark (csKDTree* treenode, void*,
