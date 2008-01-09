@@ -80,7 +80,8 @@ void SndTest::ProcessFrame ()
   // Now rotate the sound source around the camera/listener
   cur_angle += speed;
   csVector3 sndpos = GetSoundPos (cur_angle);
-  sndsource3d->SetPosition (sndpos);
+  if (sndsource3d)
+    sndsource3d->SetPosition (sndpos);
   sprite->GetMovable ()->GetTransform ().SetOrigin (sndpos);
   sprite->GetMovable ()->UpdateMove ();
 
@@ -183,12 +184,12 @@ bool SndTest::LoadSound ()
   fflush(stdout);
 
   csRef<iSndSysStream> sndstream = sndrenderer->CreateStream (snddata,
-  	CS_SND3D_ABSOLUTE);
+        cmdline->GetBoolOption("no3d") ? CS_SND3D_DISABLE : CS_SND3D_ABSOLUTE);
   if (!sndstream)
     return ReportError ("Can't create stream for '%s'!", fname.GetData ());
 
   const csSndSysSoundFormat* rformat = sndstream->GetRenderedFormat ();
-  printf("=== iSndSysStream format informations ===\n");
+  printf("=== iSndSysStream \"rendered\" format informations ===\n");
   printf("Format      : %d bits, %d channel(s), %d Hz\n",
         rformat->Bits, rformat->Channels, rformat->Freq);
   printf("Stream Size : %d frames\n", sndstream->GetFrameCount ());
@@ -199,8 +200,8 @@ bool SndTest::LoadSound ()
   if (!sndsource)
     return ReportError ("Can't create source for '%s'!", fname.GetData ());
   sndsource3d = scfQueryInterface<iSndSysSource3D> (sndsource);
-
-  sndsource3d->SetPosition (GetSoundPos (0));
+  if (sndsource3d)
+    sndsource3d->SetPosition (GetSoundPos (0));
   sndsource->SetVolume (1.0f);
 
   sndstream->SetLoopState (CS_SNDSYS_STREAM_LOOP);
