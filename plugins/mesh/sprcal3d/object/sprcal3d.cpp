@@ -880,6 +880,7 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
   meshVersion = 0;
   bboxVersion = (uint)-1;
   default_idle_anim = -1;
+  idle_action = -1;
   last_locked_anim = -1;
 
   do_update = -1;
@@ -1691,8 +1692,6 @@ void csSpriteCal3DMeshObject::ClearAllAnims()
     last_locked_anim = -1;
     is_idling = false;
   }
-  if ( idle_action != -1 )
-    calModel.getMixer()->removeAction(idle_action);
 }
 
 bool csSpriteCal3DMeshObject::SetAnimCycle(const char *name, float weight)
@@ -1905,6 +1904,18 @@ bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
   }
 
   is_idling = false;
+
+  // Remove idle-animation that should not be played while moving too fast:
+  if( idle_action != -1)
+  {
+    /* Default value for max_vel is 0 if it is not set in the cal3d file.
+       Ideally, we would just test for (max_vel < vel). However, this would
+       break expected behaviour for old .cal3d files, and hence require
+       additional explanation. */
+    if( (factory->anims[idle_action]->max_velocity) && (factory->anims[idle_action]->max_velocity < vel))
+      calModel.getMixer()->removeAction(idle_action);
+  }
+
   // first look for animations with a base velocity that exactly matches
   bool found_match = false;
   for (i=0; i<count; i++)
