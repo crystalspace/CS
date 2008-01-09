@@ -44,11 +44,9 @@ AC_PROG_CXXCPP
 CS_EMIT_BUILD_PROPERTY([CMD.C++CPP], [$CXXCPP])
 
 AS_IF([test $ac_compiler_gnu = yes],
-    [cs_compiler_name=GCC CS_HEADER_PROPERTY([CS_COMPILER_GCC])],
-    [cs_compiler_name="AS_TR_CPP([$CXX])"])
-CS_EMIT_BUILD_PROPERTY([COMPILER.TYPE], [$cs_compiler_name])
+    [CS_HEADER_PROPERTY([CS_COMPILER_GCC])])
 CS_HEADER_PROPERTY([CS_COMPILER_NAME],
-    [AS_ESCAPE(["])$cs_compiler_name[]AS_ESCAPE(["])])
+    [AS_ESCAPE(["])$cs_compiler_name_cxx[]AS_ESCAPE(["])])
 
 
 
