@@ -27,6 +27,16 @@ namespace CS
 {
 namespace RenderManager
 {
+  // Forward declare the functions
+
+  template<typename RenderTree>
+  void AddRenderMeshToContext (typename RenderTree::ContextNode& context, 
+    csRenderMesh* rm, CS::Graphics::RenderPriority renderPrio,
+    typename RenderTree::MeshNode::SingleMesh& singleMeshTemplate);
+
+  template<typename RenderTree>
+  bool Viscull (typename RenderTree::ContextNode& context, RenderView* rw, 
+    iVisibilityCuller* culler);
 
   namespace Implementation
   {
@@ -139,7 +149,7 @@ namespace RenderManager
       // Get a new one
       meshNode = tree.CreateMeshNode (context, meshKey);
 
-      typename RenderTree::TreeTraitsType::SetupMeshNode(*meshNode, renderPrio, *rm);
+      RenderTree::TreeTraitsType::SetupMeshNode(*meshNode, renderPrio, *rm);
       context.meshNodes.Put (meshKey, meshNode);
     }
 

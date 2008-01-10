@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2005 by Jorrit Tyberghein
               (C) 2005 by Frank Richter
+              (C) 2007-2008 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -355,9 +356,9 @@ protected:
     Node* pred;
     if (node->left != 0)
     {
-      succ = node->left;
-      while (succ->right != 0) succ = succ->right;
-      return succ;
+      pred = node->left;
+      while (pred->right != 0) pred = pred->right;
+      return pred;
     }
     Node* y = node->GetParent();
     while ((y != 0) && (node == y->left))
@@ -603,7 +604,7 @@ public:
   private:
     const typename csRedBlackTree<K>::Node *currentNode;
   };
-  friend class ConstIterator;
+  friend class ConstReverseIterator;
 
   /**
    * Get an iterator for iterating over the entire tree

@@ -112,9 +112,7 @@ namespace RenderManager
       for (size_t i = 0; i < node->meshes.GetSize (); ++i)
       {
         typename RenderTree::MeshNode::SingleMesh& mesh = node->meshes[i];
-
-        csRenderMesh* rm = mesh.renderMesh;
-
+        
         for (size_t layer = 0; layer < layerConfig.GetLayerCount (); ++layer)
         {
           size_t layerOffset = layer*totalMeshes;

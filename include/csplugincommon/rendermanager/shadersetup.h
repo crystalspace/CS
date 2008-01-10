@@ -160,7 +160,7 @@ namespace RenderManager
    * Setup the standard shader, shader SV and ticket
    */
   template<typename ContextNodeType, typename LayerConfigType>
-  void SetupStandarShaderAndTicket (typename ContextNodeType& context, 
+  void SetupStandarShaderAndTicket (ContextNodeType& context, 
     iShaderManager* shaderManager,
     const LayerConfigType& layerConfig)
   {
@@ -169,7 +169,7 @@ namespace RenderManager
 
     // Shader, sv and ticket setup
     typedef typename ContextNodeType::TreeType Tree;
-    typedef typename StandardSATSetupTypes<Tree, LayerConfigType> TypeHelper;
+    typedef StandardSATSetupTypes<Tree, LayerConfigType> TypeHelper;
     
     typename TypeHelper::ShaderSetupType 
       shaderSetup (context.shaderArray, layerConfig);

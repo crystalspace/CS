@@ -59,7 +59,6 @@ public:
   void operator() (typename RenderTreeType::ContextNode& context,
     typename PortalSetupType::ContextSetupData& portalSetupData)
   {
-    RenderTreeType& renderTree = context.owner;
     CS::RenderManager::RenderView* rview = context.renderView;
     iSector* sector = rview->GetThisSector ();
 

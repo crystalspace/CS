@@ -76,7 +76,7 @@ namespace RenderManager
       case CS_RENDPRI_SORT_NONE:
         {
           NormalSorter sorter;
-          meshNode->meshes.Sort (sorter);
+          meshNode->meshes.SortStable (sorter); // Use a stable sort to keep some b2f
         }
         break;
       case CS_RENDPRI_SORT_BACK2FRONT:

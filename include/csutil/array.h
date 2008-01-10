@@ -916,6 +916,15 @@ public:
   }
 
   /**
+   * Sort array using a binary predicate and a stable sorting algorithm
+   */
+  template<typename Pred>
+  void SortStable (Pred& pred)
+  {
+    std::stable_sort (root.p, root.p + GetSize (), pred);
+  }
+
+  /**
    * Clear entire array, releasing all allocated memory.
    */
   void DeleteAll ()

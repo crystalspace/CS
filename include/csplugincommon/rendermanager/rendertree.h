@@ -48,7 +48,7 @@ namespace RenderManager
     //---- Type definitions
     typedef TreeTraits TreeTraitsType;
     typedef RenderTree<TreeTraitsType> ThisType;
-    typedef RenderTree<TreeTraitsType> TreeType;
+    typedef RenderTree<TreeTraitsType> RealTreeType;
 
     //---- Internal types
     typedef csRedBlackTreeMap<typename TreeTraitsType::MeshNodeKeyType, MeshNode*> MeshNodeTreeType;
@@ -108,7 +108,7 @@ namespace RenderManager
       };
 
       //-- Types
-      typedef TreeType TreeType;
+      typedef RealTreeType TreeType;
       typedef typename TreeType::ContextNode ContextNodeType;
 
       //-- Some local types
@@ -147,7 +147,7 @@ namespace RenderManager
       };
 
       //-- Types
-      typedef TreeType TreeType;
+      typedef RealTreeType TreeType;
 
       // Owner
       TreeType& owner;

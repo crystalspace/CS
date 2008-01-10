@@ -88,7 +88,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMTest1)
     CS::RenderManager::MultipleRenderLayer renderLayer;
 
     TargetManagerType targets;
-    csSet<typename RenderTreeType::ContextNode*> contextsScannedForTargets;
+    csSet<RenderTreeType::ContextNode*> contextsScannedForTargets;
   };  
 
 }

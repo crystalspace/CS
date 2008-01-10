@@ -110,10 +110,11 @@ namespace RenderManager
 
     /**
      * Helper for dispatching the actual function call in ForEach methods below.
-     * Split into two-level hierarchy to avoid partial specialization
+     * Split into two-level hierarchy to avoid partial specialization when that is needed     
      */
+#if defined (CS_COMPILER_MSVC) && _MSC_VER < 1310
     template<typename Fn, typename OperationBlock>
-    struct OperationCallers
+    struct OperationCallerWorkAround
     {
 
       /**
@@ -214,13 +215,118 @@ namespace RenderManager
 
 
     };
+
+    template<typename Fn, typename OperationBlock, typename Type>
+    struct OperationCaller : 
+      public OperationCallerWorkAround<Fn, OperationBlock>::OperationCaller<Type>
+    {
+      OperationCaller (Fn& fn, OperationBlock& block)
+        : OperationCallerWorkAround<Fn, OperationBlock>::OperationCaller<Type> (fn, block)
+      {}
+    };
+#else
+    /**
+     * Empty, not doing anything with unrecognized tag...
+     */
+    template<typename Fn, typename OperationBlock, typename Type>
+    struct OperationCaller
+    {};
+
+    /**
+     * Executor for unordered calls
+     */
+    template<typename Fn, typename OperationBlock>
+    struct OperationCaller<Fn, OperationBlock, OperationUnordered>
+    {
+      OperationCaller (Fn& fn, OperationBlock& block)
+        : function (fn), block (block)
+      {}
+
+      template<typename ObjectType>
+      void operator() (const ObjectType& context)
+      {
+        if (!block (context))
+          function (context);
+      }
+
+      Fn& function;
+      OperationBlock block;
+    };
+
+    /**
+     * Executor for numbered calls
+     */
+    template<typename Fn, typename OperationBlock>
+    struct OperationCaller<Fn, OperationBlock, OperationNumbered>
+    {
+      OperationCaller (Fn& fn, OperationBlock& block)
+        : function (fn), block (block), index (0)
+      {}
+
+      template<typename ObjectType>
+      void operator() (const ObjectType& context)
+      {          
+        if (!block (context))
+          function (index, context);
+        index++;
+      }
+
+      Fn& function;
+      OperationBlock block;
+      size_t index;
+    };
+
+    /**
+     * Executor for unordered calls
+     */
+    template<typename Fn, typename OperationBlock>
+    struct OperationCaller<Fn, OperationBlock, OperationUnorderedParallel>
+    {
+      OperationCaller (Fn& fn, OperationBlock& block)
+        : function (fn), block (block)
+      {}
+
+      template<typename ObjectType>
+      void operator() (const ObjectType& context)
+      {
+        if (!block (context))
+          function (context);
+      }
+
+      Fn& function;
+      OperationBlock block;
+    };
+
+    /**
+     * Executor for numbered calls
+     */
+    template<typename Fn, typename OperationBlock>
+    struct OperationCaller<Fn, OperationBlock, OperationNumberedParallel>
+    {
+      OperationCaller (Fn& fn, OperationBlock& block)
+        : function (fn), block (block), index (0)
+      {}
+
+      template<typename ObjectType>
+      void operator() (const ObjectType& context)
+      {          
+        if (!block (context))
+          function (index, context);
+        index++;
+      }
+
+      Fn& function;
+      OperationBlock block;
+      size_t index;
+    };
+
+#endif
     
     // Helper lookups.. oh god save me from this code...
     template<typename Traits1, typename Traits2>
     struct OperationTraitsCombiner
     {
       // Invalid combination
-      CS_COMPILE_ASSERT(false);
     };
 
     template<>
@@ -321,12 +427,13 @@ namespace RenderManager
     // Iterate over all contexts, calling the functor for each one
     typename RenderTree::ContextNodeArrayIteratorType it = tree.GetContextIterator ();
 
+    Implementation::NoOperationBlock<typename RenderTree::ContextNode*> noBlock;
     // Helper object for calling function
-    Implementation::OperationCallers<
+    Implementation::OperationCaller<
       Fn, 
-      Implementation::NoOperationBlock<typename RenderTree::ContextNode*> 
-    >::OperationCaller<typename OperationTraits<Fn>::Ordering> 
-      caller (fn, Implementation::NoOperationBlock<typename RenderTree::ContextNode*> ());
+      Implementation::NoOperationBlock<typename RenderTree::ContextNode*>,
+      typename OperationTraits<Fn>::Ordering
+    > caller (fn, noBlock);
 
     while (it.HasNext ())
     {
@@ -348,10 +455,11 @@ namespace RenderManager
     typename RenderTree::ContextNodeArrayIteratorType it = tree.GetContextIterator ();
 
     // Helper object for calling function
-    Implementation::OperationCallers<
+    Implementation::OperationCaller<
       Fn, 
-      Blocker
-    >::OperationCaller<typename OperationTraits<Fn>::Ordering> caller (fn, block);
+      Blocker,
+      typename OperationTraits<Fn>::Ordering
+    > caller (fn, block);
 
     while (it.HasNext ())
     {
@@ -372,12 +480,13 @@ namespace RenderManager
     // Iterate over all contexts, calling the functor for each one
     typename RenderTree::ContextNodeArrayReverseIteratorType it = tree.GetReverseContextIterator ();
 
+    Implementation::NoOperationBlock<typename RenderTree::ContextNode*> noBlock;
     // Helper object for calling function
-    Implementation::OperationCallers<
+    Implementation::OperationCaller<
       Fn, 
-      Implementation::NoOperationBlock<typename RenderTree::ContextNode*> 
-    >::OperationCaller<typename OperationTraits<Fn>::Ordering> 
-      caller (fn, Implementation::NoOperationBlock<typename RenderTree::ContextNode*>());
+      Implementation::NoOperationBlock<typename RenderTree::ContextNode*>,
+      typename OperationTraits<Fn>::Ordering
+    > caller (fn, noBlock);
 
     while (it.HasNext ())
     {
@@ -399,10 +508,11 @@ namespace RenderManager
     typename RenderTree::ContextNodeArrayIteratorType it = tree.GetReverseContextIterator ();
 
     // Helper object for calling function
-    Implementation::OperationCallers<
+    Implementation::OperationCaller<
       Fn, 
-      Blocker
-    >::OperationCaller<typename OperationTraits<Fn>::Ordering> caller (fn, block);
+      Blocker,
+      typename OperationTraits<Fn>::Ordering
+    > caller (fn, block);
 
     while (it.HasNext ())
     {
@@ -425,12 +535,13 @@ namespace RenderManager
   {
     typename ContextType::TreeType::MeshNodeTreeIteratorType it = context.meshNodes.GetIterator ();
 
+    Implementation::NoOperationBlock<typename ContextType::TreeType::MeshNode*> noBlock;
     // Helper object for calling function
-    Implementation::OperationCallers<
+    Implementation::OperationCaller<
       Fn, 
-      Implementation::NoOperationBlock<typename ContextType::TreeType::MeshNode*>
-    >::OperationCaller<typename OperationTraits<Fn>::Ordering> 
-      caller (fn, Implementation::NoOperationBlock<typename ContextType::TreeType::MeshNode*>());
+      Implementation::NoOperationBlock<typename ContextType::TreeType::MeshNode*>,
+      typename OperationTraits<Fn>::Ordering
+    > caller (fn, noBlock);
 
     while (it.HasNext ())
     {
@@ -451,10 +562,11 @@ namespace RenderManager
     typename ContextType::TreeType::MeshNodeTreeIteratorType it = context.meshNodes.GetIterator ();
 
     // Helper object for calling function
-    Implementation::OperationCallers<
+    Implementation::OperationCaller<
       Fn, 
-      Blocker
-    >::OperationCaller<typename OperationTraits<Fn>::Ordering> caller (fn, blocker);
+      Blocker,
+      typename OperationTraits<Fn>::Ordering
+    > caller (fn, blocker);
 
     while (it.HasNext ())
     {
@@ -474,12 +586,13 @@ namespace RenderManager
   {
     typename ContextType::TreeType::MeshNodeTreeIteratorType it = context.meshNodes.GetReverseIterator ();
 
+    Implementation::NoOperationBlock<typename ContextType::TreeType::MeshNode*> noBlock;
     // Helper object for calling function
-    Implementation::OperationCallers<
+    Implementation::OperationCaller<
       Fn, 
-      Implementation::NoOperationBlock<typename ContextType::TreeType::MeshNode*>
-    >::OperationCaller<typename OperationTraits<Fn>::Ordering> 
-      caller (fn, Implementation::NoOperationBlock<typename ContextType::TreeType::MeshNode*>());
+      Implementation::NoOperationBlock<typename ContextType::TreeType::MeshNode*>,
+      typename OperationTraits<Fn>::Ordering
+    > caller (fn, noBlock);
 
     while (it.HasNext ())
     {
@@ -500,10 +613,11 @@ namespace RenderManager
     typename ContextType::TreeType::MeshNodeTreeIteratorType it = context.meshNodes.GetReverseIterator ();
 
     // Helper object for calling function
-    Implementation::OperationCallers<
+    Implementation::OperationCaller<
       Fn, 
-      Blocker
-    >::OperationCaller<typename OperationTraits<Fn>::Ordering> caller (fn, blocker);
+      Blocker,
+      typename OperationTraits<Fn>::Ordering
+    > caller (fn, blocker);
 
     while (it.HasNext ())
     {

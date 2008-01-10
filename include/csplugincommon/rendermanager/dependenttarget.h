@@ -32,149 +32,6 @@ namespace CS
 namespace RenderManager
 {
 
-#if 0
-  /**
-   * Traverse all the shader variables used in a certain render context.
-   */
-  template<typename Tree, typename Fn, typename LayerConfigType,
-    typename BitArray = csBitArray>
-  class TraverseAllUsedSVs
-  {    
-  public:
-    TraverseAllUsedSVs (Fn& function, iShaderManager* shaderManager,
-      BitArray& nameStorage, const LayerConfigType& layerConfig) 
-      : shaderManager (shaderManager), function (function), 
-      nameStorage (nameStorage), layerConfig (layerConfig)
-    {}
-
-    void operator() (typename Tree::ContextNode* contextNode, Tree& tree)
-    {
-      for (size_t layer = 0; layer < layerConfig.GetLayerCount (); ++layer)
-      {
-        FnMeshTraverser traverse (shaderManager, function, nameStorage, layer);
-        tree.TraverseMeshNodes (traverse, contextNode);
-      }
-    }
-
-  private:
-    iShaderManager* shaderManager;
-    Fn& function;
-    BitArray& nameStorage;
-    const LayerConfigType& layerConfig;
-
-    /**
-    * The actual workhorse: for each mesh in the context construct the SV
-    * stack. Then go over that stack, using the known used shader vars, and
-    * call Fn.
-    */
-    struct FnMeshTraverser : 
-      public NumberedMeshTraverser<Tree, FnMeshTraverser>
-    {
-      typedef NumberedMeshTraverser<Tree, FnMeshTraverser> BaseType;
-
-      iShaderManager* shaderManager;
-      Fn& function;
-      BitArray& names;
-      size_t layer;
-
-      FnMeshTraverser (iShaderManager* shaderManager, Fn& function, 
-        BitArray& names, size_t layer) 
-        : BaseType (*this), shaderManager (shaderManager), 
-        function (function), names (names), layer (layer)
-      {
-      }
-
-      void operator() (const typename Tree::TreeTraitsType::MeshNodeKeyType& key,
-        typename Tree::MeshNode* node, typename Tree::ContextNode& ctxNode, Tree& tree)
-      {
-        lastShader = 0;
-        lastTicket = (size_t)~0;
-
-        BaseType::operator() (key, node, ctxNode, tree);
-      }
-
-      void operator() (typename Tree::MeshNode* node,
-        const typename Tree::MeshNode::SingleMesh& mesh, size_t index,
-        typename Tree::ContextNode& ctxNode, const Tree& tree)
-      {
-        size_t layerOffset = ctxNode.totalRenderMeshes * layer;
-
-        iShader* shader = ctxNode.shaderArray[index+layerOffset];
-        if (!shader) return;
-        size_t ticket = ctxNode.ticketArray[index+layerOffset];
-
-        if ((shader != lastShader) || (ticket != lastTicket))
-        {
-          names.Clear();
-          shader->GetUsedShaderVars (ticket, names);
-        }
-
-        csShaderVariableStack varStack;        
-        ctxNode.svArrays.SetupSVStack (varStack, layer, index);
-
-        size_t name = csMin (names.GetSize(), varStack.GetSize());
-        while (name-- > 0)
-        {
-          if (names.IsBitSet (name))
-          {
-            csShaderVariable* sv = varStack[name];
-            if (sv != 0) 
-              function ((csStringID)name, sv);
-          }
-        }
-      }
-
-      iShader* lastShader;
-      size_t lastTicket;
-    };
-  };
-
-  template<typename Tree, typename Fn, typename LayerConfigType, typename BitArray = csBitArray>
-  class TraverseAllTextures
-  {
-  public:
-    TraverseAllTextures (Fn& function, iShaderManager* shaderManager, 
-      BitArray& names, const LayerConfigType& layerConfig) 
-    : function (function), shaderManager (shaderManager),
-      names (names), layerConfig (layerConfig)
-    {}
-
-    void operator() (typename Tree::ContextNode* contextNode, Tree& tree)
-    {
-      FnShaderVarTraverser svTraverser (function);
-      TraverseAllUsedSVs<Tree, FnShaderVarTraverser, LayerConfigType, BitArray> 
-        traverseSVs (svTraverser, shaderManager, names, layerConfig);
-      traverseSVs (contextNode, tree);
-    }
-
-  private:
-    Fn& function;
-    iShaderManager* shaderManager;
-    BitArray& names;
-    const LayerConfigType& layerConfig;
-
-    struct FnShaderVarTraverser
-    {
-      Fn& function;
-
-      FnShaderVarTraverser (Fn& function) : function (function)
-      {
-      }
-
-      void operator() (csStringID name, csShaderVariable* sv)
-      {
-        if (sv->GetType() == csShaderVariable::TEXTURE)
-        {
-          iTextureHandle* texh;
-          sv->GetValue (texh);
-          function (name, sv, texh);
-        }
-      }
-    };
-  };
-
-#endif
-
   /**
    * 
    */
@@ -281,12 +138,14 @@ namespace RenderManager
       Implementation::OnceOperationBlockRef<typename RenderTree::ContextNode*> 
         opBlock (contextsTested);
 
+      Implementation::NoOperationBlock<typename RenderTree::MeshNode*> meshNoBlock;
+
       // Helper for traversing all contexts within tree
       Implementation::MeshContextTraverser<
         typename RenderTree::ContextNode,
         MeshTraverseType, 
         Implementation::NoOperationBlock<typename RenderTree::MeshNode*>
-      > contextTraverse (svTraverser, Implementation::NoOperationBlock<typename RenderTree::MeshNode*> ());
+      > contextTraverse (svTraverser, meshNoBlock);
 
       // And do the iteration
       ForEachContext (renderTree, contextTraverse, opBlock);

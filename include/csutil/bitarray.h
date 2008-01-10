@@ -679,7 +679,7 @@ public:
 
   protected:
     SetBitIterator (const ThisType& bitArray)
-      : bitArray (bitArray), pos (0), offset (0)
+      : bitArray (bitArray), pos (0), offset (0), cachedStore (0)
     {
       Reset ();
     }
@@ -699,8 +699,8 @@ public:
     }
 
     const ThisType& bitArray;
-    csBitArrayStorageType cachedStore;
-    size_t pos, offset;    
+    size_t pos, offset;
+    csBitArrayStorageType cachedStore;    
   };
   friend class SetBitIterator;
 
