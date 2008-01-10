@@ -193,7 +193,7 @@ AC_DEFUN([_CS_WARNING_SUPPRESS_MSG],
 
 
 #------------------------------------------------------------------------------
-# _CS_WARNING_CACHE_VAR(CACHE-VAR, [LANGUAGE], DEFAULT-CACHE-VAR-SUFFIX)
+# _CS_WARNING_CACHE_VAR([CACHE-VAR], [LANGUAGE], DEFAULT-CACHE-VAR-SUFFIX)
 #	Helper macro which returns the client-supplied cache variable name or
 #	composes one from LANGUAGE and DEFAULT-CACHE-VAR-SUFFIX if not
 #	provided.  LANGUAGE typically is `C' or `C++' (defaulting to `C' if not
