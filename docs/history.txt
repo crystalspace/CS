@@ -19,6 +19,24 @@ chronological order.
 	  CS_EMITTER_OPTIONAL() in emit.m4.
 	- Eric Sunshine made minor clarifications to macro documentation in
 	  emit.m4.
+	- Eric Sunshine added new Autoconf macros CS_TR_SH_Lang(),
+	  CS_TR_SH_lang(), and CS_TR_SH_LANG() to language.m4. These macros are
+	  similar to AS_TR_SH(), but convert "+" in ARG to "x" rather than "p"
+	  since "x" is more suitable in a context dealing with programming
+	  languages. For instance, CS_TR_SH_Lang([C++]) becomes "Cxx", rather
+	  than the less idiomatic "Cpp" as would be the case with AS_TR_SH().
+	  These macros are useful for composing shell variable names pertaining
+	  to a particular language. For instance, if the language upon which a
+	  macro operates is in $1, then the macro may compose a shell variable
+	  name using CS_TR_SH_lang([cs_cv_prog_$1_feature]).  CS_TR_SH_Lang()
+	  performs no case-folding of its input. CS_TR_SH_lang() folds the
+	  input to lowercase.  CS_TR_SH_LANG() folds the input to uppercase.
+	- Eric Sunshine added new Autoconf macro CS_LANG_RESOLVE() to
+	  language.m4.  This macro is a convenience tool for other macros which
+	  optionally accept a language specifier. It returns the input language
+	  specifier if non-empty, otherwise the specified fallback language.
+	  If the fallback is not provided, then the language is assumed to be
+	  "C".
 9-Jan-2008
 	- Mike Gist committed a patch from Trymm for sprcal3d to keep
 	  compatibility with cal3d files which aren't updated for the recent
