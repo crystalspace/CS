@@ -1,7 +1,15 @@
 SubDir TOP plugins cscript cscsharp ;
 
-if $(CSHARP.AVAILABLE) = "yes" && $(CMD.PERL5)
+if $(CSHARP.AVAILABLE) = "yes" && $(CMD.PERL5)  && $(CMD.SWIG)
 {
+
+  if $(TARGET.OS) = WIN32 && $(MSYSTEM)
+  {
+    CSPACESHARP.NANT_PREPARE = "
+	export PKG_CONFIG_PATH=
+	" ;
+  }
+
   local csharpbase = [ ConcatDirs $(LOCATE.OBJECTS) plugins cscript cscsharp ] ;
   local csharpdir = [ ConcatDirs $(csharpbase) cspacedotnet ] ;
   MkDir $(csharpdir:G=dir) ;

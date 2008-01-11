@@ -98,18 +98,18 @@
     void csFree(void *ptr);
   }
 
-  void ConnectSharpEventHandler(void *self, EventHandler_t handler)
+  SWIGEXPORT void ConnectSharpEventHandler(void *self, EventHandler_t handler)
   {
     if(self!=NULL)
       ((csSharpEventHandlerWrap*)self)->_Connect(handler);
   }
 
-  void *csMalloc(int size)
+  SWIGEXPORT void *csMalloc(int size)
   {
     return malloc(size);
   }
 
-  void csFree(void *ptr)
+  SWIGEXPORT void csFree(void *ptr)
   {
     free(ptr);
   }

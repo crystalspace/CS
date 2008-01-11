@@ -86,7 +86,7 @@ if $(PYTHON.AVAILABLE) = "yes"
   }
 }
 
-if $(CSHARP.AVAILABLE) = "yes" && $(CMD.PERL5)
+if $(CSHARP.AVAILABLE) = "yes" && $(CMD.PERL5)  && $(CMD.SWIG)
 {
   ##  CSharpBindingModule target : module name : glue : LinkWith : ExternalLibs : desc ;
   rule CSharpBindingModule
