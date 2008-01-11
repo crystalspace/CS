@@ -645,45 +645,27 @@ CS_EMIT_BUILD_FLAGS([how to disable function inlining],
 
 
 #------------------------------------------------------------------------------
-# Check if "hidden" visibilty for inline functions is supported.
+# Check how to declare symbol visibility.
 #------------------------------------------------------------------------------
-CS_VISIBILITY_INLINES_HIDDEN(
+CS_VISIBILITY_FLAG_INLINES_HIDDEN(
     [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS],
 	[$cs_prog_cxx_visibility_inlines_hidden], [+])])
 
-
-
-#------------------------------------------------------------------------------
-# Check how to set default symbol visibility, and how to override the setting
-# in code.
-#------------------------------------------------------------------------------
-CS_CHECK_BUILD_FLAGS([for "hidden" symbol visibility flag],
-    [cs_cv_prog_cc_visibility_hidden],
-    [CS_CREATE_TUPLE([-fvisibility=hidden])])
-AS_IF([test -n "$cs_cv_prog_cc_visibility_hidden"],
+CS_VISIBILITY_FLAG_HIDDEN([C], [],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], 
-	[$cs_cv_prog_cc_visibility_hidden], [+])])
+	[$cs_cv_prog_c_visibility_hidden], [+])])
 
-CS_CHECK_BUILD_FLAGS([for "default" symbol visibility flag],
-    [cs_cv_prog_cc_visibility_default],
-    [CS_CREATE_TUPLE([-fvisibility=default])])
-AS_IF([test -n "$cs_cv_prog_cc_visibility_default"],
+CS_VISIBILITY_FLAG_DEFAULT([C], [],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.VISIBILITY_DEFAULT], 
-	[$cs_cv_prog_cc_visibility_default])])
+	[$cs_cv_prog_c_visibility_default])])
 
-CS_SYMBOL_QUALIFIER([how to declare default visibility],
-    [cs_cv_prog_cxx_declare_visible_def],
-    [__attribute__((visibility("default")))], [], [C++])
-AS_IF([test $cs_cv_prog_cxx_declare_visible_def != no],
-    [CS_HEADER_PROPERTY([CS_VISIBILITY_DEFAULT],
-	[$cs_cv_prog_cxx_declare_visible_def])])
-
-CS_SYMBOL_QUALIFIER([how to declare hidden visibility],
-    [cs_cv_prog_cxx_declare_visible_hidden],
-    [__attribute__((visibility("hidden")))], [], [C++])
-AS_IF([test $cs_cv_prog_cxx_declare_visible_hidden != no],
+CS_VISIBILITY_DECLARE_HIDDEN([C++], [],
     [CS_HEADER_PROPERTY([CS_VISIBILITY_HIDDEN],
-	[$cs_cv_prog_cxx_declare_visible_hidden])])
+	[$cs_cv_prog_cxx_declare_visibility_hidden])])
+
+CS_VISIBILITY_DECLARE_DEFAULT([C++], [],
+    [CS_HEADER_PROPERTY([CS_VISIBILITY_DEFAULT],
+	[$cs_cv_prog_cxx_declare_visibility_default])])
 
 
 
