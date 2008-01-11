@@ -127,15 +127,6 @@ There are different ways how lighting is applied to objects. @xref{Lighting}.
 (@code{iSceneNode}). A scene node is a generic representation of an
 object in a hierarchy. Currently mesh objects and lights are scene nodes.
 
-@subsubheading Collection Objects
-@cindex collection objects
-@cindex @code{iCollection}
-
-(@code{iCollection}). These are simply groups of other objects.
-Do not confuse them with hierarchical objects or with regions. Crystal Space
-itself does not use them but you can use
-them for your own purposes in your application.
-
 @subsubheading Regions
 @cindex region
 @cindex dynamic loading

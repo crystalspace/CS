@@ -62,11 +62,6 @@ in this list, will not be visible. Note that children of hierarchical
 mesh objects are not in this list.
 
 @item
-@code{collections}: Class @samp{csCollection}, interface @samp{iCollection}. A
-collection is a simple container for other objects (meshes, lights, etc.).
-This can be useful for scripts.
-
-@item
 @code{camera_positions}: Class @samp{csCameraPosition}, interface
 @samp{iCameraPosition}. If you define start positions in your map file, then
 they will be placed into this list.
