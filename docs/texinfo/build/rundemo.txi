@@ -16,11 +16,25 @@ files are generally placed in the @file{CS/data} directory, but this not
 required.  Please note that the map @sc{zip} files should @emph{not} be
 unpacked.  Crystal Space can read these files directly.
 
+On @sc{gnu} Linux:
+
+If you see the following error @samp{error while loading shared libraries:
+libcrystalspace-1.x.so: cannot open shared object file: No such file or
+directory}
+
+Crystal Space now creates and uses shared libraries. Inorder to run the demo
+applications you need to export the @emph{LD_LIBRARY_PATH} to where the Crystal
+Space root folder is currently located e.g.
+
+@example
+export LD_LIBRARY_PATH=/home/me/CS_latest
+@end example
+
 In the following examples we will run @samp{walktest}, the quintessential
 Crystal Space demonstration program in various ways.
 
 When running @samp{walktest} for the first time we must update it's lightmaps.
- This is accomplished by adding @samp{-relight} to the command line.
+This is accomplished by adding @samp{-relight} to the command line.
 
 On Windows:
 
