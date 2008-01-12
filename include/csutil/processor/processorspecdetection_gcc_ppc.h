@@ -19,7 +19,19 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __PROCESSORSPECDETECTION_GCC_PPC_H__
 #define __PROCESSORSPECDETECTION_GCC_PPC_H__
 
+#ifdef CS_PLATFORM_MACOSX
 #include <sys/sysctl.h>
+#else
+
+#include <signal.h>
+int altivec = 1;
+
+void handle_sigill(int sig)
+{
+  altivec = 0;
+}
+
+#endif
 
 namespace Implementation
 {
@@ -37,18 +49,28 @@ namespace Implementation
         }
 
     private:
-        // Returns 0 for scalar only, >0 for AltiVec
+        // Returns 0 for scalar only, and >0 for AltiVec
         int GetAltiVecTypeAvailable()
         {
-
+            int hasAltiVec = 0;
+            
+            // Do it the nice way if we use OSX.
+#ifdef CS_PLATFORM_MACOSX
             int sels[2] = { CTL_HW, HW_VECTORUNIT };
-            int vType = 0; // 0 == scalar only
-            size_t length = sizeof(vType);
-            int error = sysctl(sels, 2, &vType, &length, NULL, 0);
+            int altivec = 0;
+            size_t length = sizeof(altivec);
+            int error = sysctl(sels, 2, &altivec, &length, NULL, 0);
 
-            if( 0 == error ) return vType;
-
-            return 0;
+            if(!error)
+              hasAltiVec = altivec;
+#else
+            // We try it this way instead :-)
+            signal(SIGILL, handle_sigill);
+            asm volatile("dssall");
+            signal(SIGILL, SIG_DFL);
+            hasAltiVec = altivec;
+#endif
+            return hasAltiVec;
         }
 
     };
