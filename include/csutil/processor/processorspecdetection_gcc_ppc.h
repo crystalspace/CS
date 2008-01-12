@@ -24,7 +24,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #else
 
 #include <signal.h>
-int altivec = 1;
+static int altivec = 1;
 
 void handle_sigill(int sig)
 {
