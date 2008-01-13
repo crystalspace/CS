@@ -75,7 +75,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       int intVal;
       float floatVal;
       bool boolVal;
-      csStringID svName;
+      CS::StringIDValue svName;
       csConditionID operation;
     };
     CondOperand ()

@@ -352,7 +352,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(VProc_std)
     if (numLights > 0)
     {
       int lightsActive = 0;
-      csStringID id;
+      CS::ShaderVarStringID id;
       id = shaderPlugin->lsvCache.GetDefaultSVId (
         csLightShaderVarCache::varLightCount);
       csShaderVariable* sv;
@@ -543,13 +543,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(VProc_std)
     size_t lightNum, const csShaderVariableStack& stack, 
     const csReversibleTransform& object2world)
   {
-    csStringID idLightPosObj = shaderPlugin->lsvCache.GetLightSVId (
+    CS::ShaderVarStringID idLightPosObj = shaderPlugin->lsvCache.GetLightSVId (
       lightNum, csLightShaderVarCache::lightPosition);
     if ((stack.GetSize () <= idLightPosObj)
       || (stack[idLightPosObj] == 0))
     {
-      csStringID idLightPosWorld = shaderPlugin->lsvCache.GetLightSVId (
-        lightNum, csLightShaderVarCache::lightPositionWorld);
+      CS::ShaderVarStringID idLightPosWorld =
+        shaderPlugin->lsvCache.GetLightSVId (
+          lightNum, csLightShaderVarCache::lightPositionWorld);
       csShaderVariable* sv;
       csVector3 lightPosWorld;
       if ((stack.GetSize () > idLightPosWorld) 

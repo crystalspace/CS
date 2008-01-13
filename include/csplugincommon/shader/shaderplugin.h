@@ -35,11 +35,11 @@
 struct csShaderVarMapping
 {
   /// Shader variable name
-  csStringID name;
+  CS::ShaderVarStringID name;
   /// Destination
   csString destination;
-  csShaderVarMapping (csStringID n, const char* d)
-    : name(n), destination(d) {}
+  csShaderVarMapping (CS::ShaderVarStringID n, const char* d) : name(n),
+    destination(d) {}
 };
 
 

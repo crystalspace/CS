@@ -102,7 +102,7 @@ private:
   csRef<csShaderVariable> shvar_light_0_inner_falloff;
   csRef<csShaderVariable> shvar_light_0_outer_falloff;
 
-  csStringID trw_inv_name;
+  CS::ShaderVarStringID trw_inv_name;
 
 
   csRef<iShaderManager> shadermgr;

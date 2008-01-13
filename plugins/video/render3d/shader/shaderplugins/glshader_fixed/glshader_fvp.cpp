@@ -741,8 +741,8 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
     return false;
 
   do_lighting = false;
-  ambientvar = csInvalidStringID;
-  primcolvar = csInvalidStringID;
+  ambientvar = CS::InvalidShaderVarStringID;
+  primcolvar = CS::InvalidShaderVarStringID;
   string_world2camera = stringsSvName->Request ("world2camera transform");
   string_object2world = stringsSvName->Request ("object2world transform");
 

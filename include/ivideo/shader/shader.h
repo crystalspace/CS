@@ -155,11 +155,12 @@ private:
 /**
  * Helper function to retrieve a single value from a shader variable stack.
  */
-static inline csShaderVariable* csGetShaderVariableFromStack 
-  (const csShaderVariableStack& stack, const csStringID &name)
+static inline csShaderVariable* csGetShaderVariableFromStack (
+  const csShaderVariableStack& stack,
+  const CS::ShaderVarStringID &name)
 {
-  if ((name != csInvalidStringID) &&
-      (name < (csStringID)stack.GetSize ()))
+  if ((name != CS::InvalidShaderVarStringID)
+    && (size_t (name) < stack.GetSize ()))
   {
     return stack[name];
   }
@@ -183,10 +184,10 @@ struct iShaderVariableContext : public virtual iBase
   virtual void AddVariable (csShaderVariable *variable) = 0;
   
   /// Get a named variable from this context
-  virtual csShaderVariable* GetVariable (csStringID name) const = 0;
+  virtual csShaderVariable* GetVariable (CS::ShaderVarStringID name) const = 0;
 
   /// Like GetVariable(), but it also adds it if doesn't exist already.
-  csShaderVariable* GetVariableAdd (csStringID name)
+  csShaderVariable* GetVariableAdd (CS::ShaderVarStringID name)
   {
     csShaderVariable* sv;
     sv = GetVariable (name);
@@ -335,7 +336,7 @@ struct iShaderManager : public virtual iShaderVariableContext
   /**
    * Get the stringset used for shader variable names
    */
-  virtual iStringSet* GetSVNameStringset () const = 0;
+  virtual iShaderVarStringSet* GetSVNameStringset () const = 0;
 };
 
 /**

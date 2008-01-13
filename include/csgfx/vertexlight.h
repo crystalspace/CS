@@ -72,7 +72,7 @@ struct csLightProperties
   csLightProperties (size_t lightNum, csLightShaderVarCache& svcache,
     const csShaderVariableStack& stack)
   {
-    csStringID id;
+    CS::ShaderVarStringID id;
     csShaderVariable* sv;
 
     id = svcache.GetLightSVId (lightNum, 

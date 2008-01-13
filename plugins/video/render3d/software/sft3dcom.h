@@ -213,9 +213,9 @@ protected:
   /// DrawFlags on last BeginDraw ()
   int DrawMode;
 
-  csRef<iStringSet> strings;
-  csStringID string_world2camera;
-  csStringID string_indices;
+  csRef<iShaderVarStringSet> strings;
+  CS::ShaderVarStringID string_world2camera;
+  CS::ShaderVarStringID string_indices;
 
   csRef<iShaderManager> shadermgr;
 
@@ -317,7 +317,7 @@ public:
    */
   virtual bool Initialize (iObjectRegistry*);
 
-  iStringSet* GetStrings () const { return strings; }
+  iShaderVarStringSet* GetStrings () const { return strings; }
 
   /**
    * Open or close our interface.

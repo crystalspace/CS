@@ -350,10 +350,10 @@ protected:
   {
     struct Entry
     {
-      csStringID n;
+      CS::ShaderVarStringID n;
       ValuesWrapper v;
 
-      inline operator csStringID() const { return n; }
+      inline operator CS::StringIDValue() const { return n; }
     };
     typedef csArray<Entry, csArrayElementHandler<Entry>,
       TempHeapAlloc,
@@ -364,10 +364,10 @@ protected:
     {
       return _array;
     }
-    inline ValuesWrapper& GetExtend (csStringID n) 
+    inline ValuesWrapper& GetExtend (CS::ShaderVarStringID n) 
     { 
       size_t candidate;
-      size_t index = _array.FindSortedKey (csArrayCmp<Entry, csStringID> (n),
+      size_t index = _array.FindSortedKey (csArrayCmp<Entry, CS::StringIDValue> (n),
         &candidate);
       if (index != csArrayItemNotFound) return _array[index].v;
       Entry newEntry;
@@ -378,21 +378,21 @@ protected:
     inline size_t GetSize () const { return _array.GetSize (); }
     inline ValuesWrapper& GetIndex (size_t n) { return _array.Get (n).v; }
     inline const ValuesWrapper& GetIndex (size_t n) const { return _array.Get (n).v; }
-    inline csStringID GetIndexName (size_t n) const { return _array.Get (n).n; }
-    inline const ValuesWrapper& Get (csStringID n) const 
+    inline CS::ShaderVarStringID GetIndexName (size_t n) const { return _array.Get (n).n; }
+    inline const ValuesWrapper& Get (CS::ShaderVarStringID n) const 
     { 
-      size_t index = _array.FindSortedKey (csArrayCmp<Entry, csStringID> (n));
+      size_t index = _array.FindSortedKey (csArrayCmp<Entry, CS::StringIDValue> (n));
       return _array[index].v;
     }
-    inline bool Has (csStringID n) const
+    inline bool Has (CS::ShaderVarStringID n) const
     { 
-      size_t index = _array.FindSortedKey (csArrayCmp<Entry, csStringID> (n));
+      size_t index = _array.FindSortedKey (csArrayCmp<Entry, CS::StringIDValue> (n));
       return index != csArrayItemNotFound;
     }
     inline const Entry& operator[] (size_t n) const { return _array[n]; }
-    inline void Delete (csStringID n)
+    inline void Delete (CS::ShaderVarStringID n)
     {
-      size_t index = _array.FindSortedKey (csArrayCmp<Entry, csStringID> (n));
+      size_t index = _array.FindSortedKey (csArrayCmp<Entry, CS::StringIDValue> (n));
       _array.DeleteIndex (index);
     }
     inline void DeleteIndex (size_t index) { _array.DeleteIndex (index); }
@@ -437,13 +437,13 @@ public:
   {
   }
 
-  Values* GetValues (csStringID variable)
+  Values* GetValues (CS::ShaderVarStringID variable)
   {
     csRef<Values>& vals = possibleValues->GetExtend (variable);
     if (!vals) vals.AttachNew (ValAlloc().Alloc());
     return vals;
   }
-  const Values* GetValues (csStringID variable) const
+  const Values* GetValues (CS::ShaderVarStringID variable) const
   {
     const Values* vals = 0;
     if (possibleValues->Has (variable))
@@ -471,7 +471,7 @@ public:
     const ValuesArray& pvB = *b.possibleValues;
     for (size_t n = 0; n < nva.GetSize(); )
     {
-      csStringID name = nva[n].n;
+      CS::ShaderVarStringID name = nva[n].n;
       if (pvB.Has (name))
       {
         const Values* entry = pvB.Get (name);
@@ -493,7 +493,7 @@ public:
 class csConditionEvaluator
 {
   /// Used to resolve SV names.
-  csRef<iStringSet> strings;
+  csRef<iShaderVarStringSet> strings;
 
   csConditionID nextConditionID;
   csHashReversible<csConditionID, CondOperation> conditions;
@@ -571,7 +571,7 @@ public:
   template<typename Evaluator>
   typename Evaluator::EvalResult Evaluate (Evaluator& eval, csConditionID condition);
 
-  csConditionEvaluator (iStringSet* strings, 
+  csConditionEvaluator (iShaderVarStringSet* strings, 
     const csConditionConstants& constants);
 
   /// Convert expression into internal representation.

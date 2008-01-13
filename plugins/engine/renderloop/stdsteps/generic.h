@@ -104,7 +104,8 @@ private:
   bool zOffset;
   bool portalTraversal;
   csZBufMode zmode;
-  csRef<iStringSet> strings, stringsSvName;
+  csRef<iStringSet> strings;
+  csRef<iShaderVarStringSet> stringsSvName;
   csWeakRef<iShaderManager> shaderManager;
   iObjectRegistry *objreg;
   csRef<iShader> defShader;
@@ -124,10 +125,10 @@ private:
   /* @@@ Ugly. */
   csArray<csStringID> disableDefaultTypes;
 
-  static csStringID fogplane_name;
-  static csStringID string_object2world;
-  static csStringID light_0_type;
-  static csStringID light_ambient;
+  static CS::ShaderVarStringID fogplane_name;
+  static CS::ShaderVarStringID string_object2world;
+  static CS::ShaderVarStringID light_0_type;
+  static CS::ShaderVarStringID light_ambient;
 
 public:
   csGenericRenderStep (iObjectRegistry* object_reg);

@@ -80,7 +80,7 @@ namespace RenderManager
       csBlockAllocator<ContextNode> contextNodeAllocator;      
       
 
-      csStringID svObjectToWorldName;
+      CS::ShaderVarStringID svObjectToWorldName;
     
       RenderView::Pool renderViewPool;
       csRenderMeshHolder rmHolder;           

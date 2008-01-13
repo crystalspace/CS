@@ -153,17 +153,17 @@ private:
   iObjectRegistry* object_reg;
   csRef<iGraphics2D> G2D;
   csRef<iShaderManager> shadermgr;
-  csRef<iStringSet> strings;
+  csRef<iShaderVarStringSet> strings;
   csWeakRef<iBugPlug> bugplug;
   csRef<csTextureManagerNull> txtmgr;
 
   csConfigAccess config;
 
-  csStringID string_vertices;
-  csStringID string_texture_coordinates;
-  csStringID string_normals;
-  csStringID string_colors;
-  csStringID string_indices;
+  CS::ShaderVarStringID string_vertices;
+  CS::ShaderVarStringID string_texture_coordinates;
+  CS::ShaderVarStringID string_normals;
+  CS::ShaderVarStringID string_colors;
+  CS::ShaderVarStringID string_indices;
 
   csGraphics3DCaps Caps;
   int w, h;

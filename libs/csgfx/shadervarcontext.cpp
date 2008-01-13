@@ -30,15 +30,17 @@ ShaderVariableContextImpl::~ShaderVariableContextImpl ()
 
 namespace
 {
-class SvVarArrayCmp : public csArrayCmp<csShaderVariable*, csStringID>
+class SvVarArrayCmp : public csArrayCmp<csShaderVariable*, 
+                                        CS::ShaderVarStringID>
 {
-  static int SvKeyCompare (csShaderVariable* const& r, csStringID const& k)
+  static int SvKeyCompare (csShaderVariable* const& r,
+			   CS::ShaderVarStringID const& k)
   { 
     return r->GetName() - k;
   }
 public:
-  SvVarArrayCmp (csStringID key) : 
-    csArrayCmp<csShaderVariable*, csStringID> (key, SvKeyCompare)
+  SvVarArrayCmp (CS::ShaderVarStringID key) : 
+    csArrayCmp<csShaderVariable*, CS::ShaderVarStringID> (key, SvKeyCompare)
   {
   }
 };
@@ -59,7 +61,7 @@ void ShaderVariableContextImpl::AddVariable (csShaderVariable *variable)
 }
 
 csShaderVariable* ShaderVariableContextImpl::GetVariable (
-  csStringID name) const 
+  ShaderVarStringID name) const 
 {
   size_t index = variables.FindSortedKey (SvVarArrayCmp (name));
   if (index != csArrayItemNotFound)
@@ -72,7 +74,7 @@ void ShaderVariableContextImpl::PushVariables (
 {
   for (size_t i=0; i<variables.GetSize (); ++i)
   {
-    csStringID name = variables[i]->GetName ();
+    ShaderVarStringID name = variables[i]->GetName ();
     CS_ASSERT_MSG("Shader variable stack is invalid!", name < stack.GetSize ());
     stack[name] = variables[i];
   }

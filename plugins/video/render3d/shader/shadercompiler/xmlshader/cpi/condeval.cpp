@@ -125,7 +125,7 @@ CS_IMPLEMENT_STATIC_CLASSVAR(Variables, def,
 CS_IMPLEMENT_STATIC_CLASSVAR_REF(Variables::CowBlockAllocator, 
   allocator, Allocator, Variables::CowBlockAllocator::BlockAlloc, (256));
 
-csConditionEvaluator::csConditionEvaluator (iStringSet* strings, 
+csConditionEvaluator::csConditionEvaluator (iShaderVarStringSet* strings, 
     const csConditionConstants& constants) :
     strings(strings), nextConditionID(0), constants(constants)
 {

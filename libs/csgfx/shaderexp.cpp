@@ -172,7 +172,7 @@ static const char* const typeNames[TYPE_LAST] = {
   "!accum"
 };
 
-struct cons 
+struct cons : public CS::Memory::CustomAllocated
 {
   csShaderExpression::oper_arg car;
   cons * cdr; // That's all it can be
@@ -273,7 +273,7 @@ void csShaderExpression::EvalError (const char* message, ...) const
   va_end (args);
 }
 
-csShaderVariable* csShaderExpression::ResolveVar (csStringID name)
+csShaderVariable* csShaderExpression::ResolveVar (CS::ShaderVarStringID name)
 {
   if (!stack) return 0;
   return csGetShaderVariableFromStack (*stack, name);
@@ -284,7 +284,7 @@ bool csShaderExpression::Parse(iDocumentNode * node)
   errorMsg.Empty();
   cons * head = new cons;
 
-  strset = csQueryRegistryTagInterface<iStringSet> (
+  strset = csQueryRegistryTagInterface<iShaderVarStringSet> (
     obj_reg, "crystalspace.shader.variablenameset");
   if (!strset) 
   {
@@ -2067,7 +2067,7 @@ void csShaderExpression::print_cons(const cons * head) const
       break;
 
     case TYPE_OPER:
-      csPrintf ("%s", GetOperName ((csStringID)cell->car.oper));
+      csPrintf ("%s", GetOperName (cell->car.oper));
       break;
 
     case TYPE_NUMBER:
@@ -2203,7 +2203,7 @@ void csShaderExpression::print_result(const oper_arg & arg) const {
       break;
       
     case TYPE_VARIABLE:
-      csPrintf ("#<VARIABLEREF \"%s\">", strset->Request(arg.var));
+      csPrintf ("#<VARIABLEREF \"%s\">", strset->Request (arg.var));
       break;
       
     case TYPE_ACCUM:
@@ -2216,13 +2216,13 @@ void csShaderExpression::print_result(const oper_arg & arg) const {
   
 }
 
-const char* csShaderExpression::GetTypeName (csStringID id)
+const char* csShaderExpression::GetTypeName (unsigned int id)
 {
   CS_ASSERT (id < TYPE_LAST);
   return typeNames[id];
 }
 
-const char* csShaderExpression::GetOperName (csStringID id)
+const char* csShaderExpression::GetOperName (unsigned int id)
 {
   CS_ASSERT (id < OP_LAST);
   return opNames[id];
@@ -2232,7 +2232,7 @@ struct TokenTabEntry
 {
   const char* token;
   size_t tokenLen;
-  csStringID id;
+  CS::StringIDValue id;
 };
 
 static csStringID GetTokenID (const TokenTabEntry* tokenTab,

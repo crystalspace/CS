@@ -273,17 +273,17 @@ private:
   csGraphics3DCaps rendercaps;
   GLint maxNpotsTexSize;
 
-  csRef<iStringSet> strings;
+  csRef<iShaderVarStringSet> strings;
 
-  csStringID string_vertices;
-  csStringID string_texture_coordinates;
-  csStringID string_normals;
-  csStringID string_colors;
-  csStringID string_indices;
-  csStringID string_point_radius;
-  csStringID string_point_scale;
-  csStringID string_texture_diffuse;
-  csStringID string_world2camera;
+  CS::ShaderVarStringID string_vertices;
+  CS::ShaderVarStringID string_texture_coordinates;
+  CS::ShaderVarStringID string_normals;
+  CS::ShaderVarStringID string_colors;
+  CS::ShaderVarStringID string_indices;
+  CS::ShaderVarStringID string_point_radius;
+  CS::ShaderVarStringID string_point_scale;
+  CS::ShaderVarStringID string_texture_diffuse;
+  CS::ShaderVarStringID string_world2camera;
 
   csConfigAccess config;
 
@@ -485,7 +485,7 @@ public:
   csGLGraphics3D (iBase *parent);
   virtual ~csGLGraphics3D ();
 
-  iStringSet* GetStrings () { return strings; }
+  iShaderVarStringSet* GetStrings () { return strings; }
   static void OutputMarkerString (const char* function, const wchar_t* file,
     int line, const char* message);
   static void OutputMarkerString (const char* function, const wchar_t* file,

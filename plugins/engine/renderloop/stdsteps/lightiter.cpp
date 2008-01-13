@@ -163,19 +163,20 @@ void csLightIterRenderStep::Init ()
 
     g3d = csQueryRegistry<iGraphics3D> (object_reg);
 
-    csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
-      object_reg, "crystalspace.shader.variablenameset");
+    csRef<iShaderVarStringSet> strings =
+      csQueryRegistryTagInterface<iShaderVarStringSet> (
+        object_reg, "crystalspace.shader.variablenameset");
 
-    csStringID posname = strings->Request ("light 0 position");
-    csStringID poswname = strings->Request ("light 0 position world");
-    csStringID trname = strings->Request ("light 0 transform");
-    csStringID trwname = strings->Request ("light 0 transform world");
-    csStringID difname = strings->Request ("light 0 diffuse");
-    csStringID spcname = strings->Request ("light 0 specular");
-    csStringID attname = strings->Request ("light 0 attenuation");
-    csStringID atxname = strings->Request ("light 0 attenuationtex");
-    csStringID infallname = strings->Request ("light 0 inner falloff");
-    csStringID ofallname = strings->Request ("light 0 outer falloff");
+    CS::ShaderVarStringID posname = strings->Request ("light 0 position");
+    CS::ShaderVarStringID poswname = strings->Request ("light 0 position world");
+    CS::ShaderVarStringID trname = strings->Request ("light 0 transform");
+    CS::ShaderVarStringID trwname = strings->Request ("light 0 transform world");
+    CS::ShaderVarStringID difname = strings->Request ("light 0 diffuse");
+    CS::ShaderVarStringID spcname = strings->Request ("light 0 specular");
+    CS::ShaderVarStringID attname = strings->Request ("light 0 attenuation");
+    CS::ShaderVarStringID atxname = strings->Request ("light 0 attenuationtex");
+    CS::ShaderVarStringID infallname = strings->Request ("light 0 inner falloff");
+    CS::ShaderVarStringID ofallname = strings->Request ("light 0 outer falloff");
     trw_inv_name = strings->Request ("light 0 transform inverse world");
     CS::ShaderVarName lightcountname (strings, "light count");
 

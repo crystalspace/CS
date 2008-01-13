@@ -80,7 +80,7 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
 
   InitTokenTable (xmltokens);
 
-  strings = csQueryRegistryTagInterface<iStringSet> (
+  strings = csQueryRegistryTagInterface<iShaderVarStringSet> (
     object_reg, "crystalspace.shader.variablenameset");
 
   return true;
@@ -1208,7 +1208,7 @@ bool csTextSyntaxService::ParseShaderVar (iLoaderContext* ldr_context,
         {
           csRef<iDocumentNode> varNode = varNodes->Next ();
           csRef<csShaderVariable> elementVar = 
-            csPtr<csShaderVariable> (new csShaderVariable (csInvalidStringID));
+            csPtr<csShaderVariable> (new csShaderVariable (CS::InvalidShaderVarStringID));
           var.SetArrayElement (varCount, elementVar);
           ParseShaderVar (ldr_context, varNode, *elementVar);
           varCount++;
@@ -1258,7 +1258,7 @@ csRef<iShaderVariableAccessor> csTextSyntaxService::ParseShaderVarExpr (
     return 0;
   }
   csRef<csShaderVariable> var;
-  var.AttachNew (new csShaderVariable (csInvalidStringID));
+  var.AttachNew (new csShaderVariable (CS::InvalidShaderVarStringID));
   csRef<csShaderExpressionAccessor> acc;
   acc.AttachNew (new csShaderExpressionAccessor (object_reg, expression));
   return acc;

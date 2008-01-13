@@ -84,7 +84,7 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
 
   strings = csQueryRegistryTagInterface<iStringSet> (
     object_reg, "crystalspace.shared.stringset");
-  stringsSvName = csQueryRegistryTagInterface<iStringSet> (
+  stringsSvName = csQueryRegistryTagInterface<iShaderVarStringSet> (
     object_reg, "crystalspace.shader.variablenameset");
 
   g3d = csQueryRegistry<iGraphics3D> (object_reg);

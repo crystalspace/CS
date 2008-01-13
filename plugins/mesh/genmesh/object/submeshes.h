@@ -246,7 +246,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
       return parentSubMesh->SubMesh::GetBack2Front ();
     }
 
-    virtual csShaderVariable* GetVariable (csStringID name) const
+    virtual csShaderVariable* GetVariable (CS::ShaderVarStringID name) const
     {
       csShaderVariable* var = 
         CS::ShaderVariableContextImpl::GetVariable (name);

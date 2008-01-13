@@ -103,7 +103,7 @@ public:
 
   void AddVariable (csShaderVariable *variable)
   { }
-  csShaderVariable* GetVariable (csStringID name) const
+  csShaderVariable* GetVariable (CS::ShaderVarStringID name) const
   { 
     csShaderVariable* sv = context1->GetVariable (name); 
     if (sv == 0)
@@ -176,7 +176,7 @@ private:
   csArray<LegacySubmesh> legacySubmeshes;
 
   csUserRenderBufferManager userBuffers;
-  csArray<csStringID> user_buffer_names;
+  csArray<CS::ShaderVarStringID> user_buffer_names;
 
   csGenmeshMeshObjectFactory* factory;
   iMeshWrapper* logparent;
@@ -462,7 +462,7 @@ public:
   csDirtyAccessArray<csTriangle> mesh_triangles;
 
   csWeakRef<iGraphics3D> g3d;
-  csRef<iStringSet> svstrings;
+  csRef<iShaderVarStringSet> svstrings;
 
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;
@@ -473,7 +473,7 @@ public:
   csRef<iRenderBuffer> tangent_buffer;
   
   csUserRenderBufferManager userBuffers;
-  csArray<csStringID> user_buffer_names;
+  csArray<CS::ShaderVarStringID> user_buffer_names;
 
   SubMeshesContainer subMeshes;
 
@@ -624,11 +624,11 @@ public:
   /**
    * Get the string ID's for the anonymous buffers
    */
-  const csArray<csStringID>& GetUserBufferNames ()
+  const csArray<CS::ShaderVarStringID>& GetUserBufferNames ()
   { return user_buffer_names; }
   const csUserRenderBufferManager& GetUserBuffers()
   { return userBuffers; }
-  iStringSet* GetSVStrings()
+  iShaderVarStringSet* GetSVStrings()
   { return svstrings; }
 
   void ClearSubMeshes ();

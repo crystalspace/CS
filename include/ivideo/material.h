@@ -81,7 +81,7 @@ struct iMaterial : public virtual iShaderVariableContext
   /**
    * Get a texture from the material.
    */
-  virtual iTextureHandle* GetTexture (csStringID name) = 0;
+  virtual iTextureHandle* GetTexture (CS::ShaderVarStringID name) = 0;
 
   /**
    * Get shader for the first type from \a types that as a shader attached.

@@ -8,6 +8,14 @@ chronological order.
 
 13-Jan-2008
 	- res updated the mk/jam/ build files with the versions from trunk.
+	- res changed how string IDs are typed. Instead of a simple alias for
+	  unsigned longs they're now a wrapper struct around the actual ID
+	  value. Furthermore, the IDs and string set classes/interfaces have 
+	  a template parameter "tag" identifying the usage of the string ID -
+	  currently, "general" and "shader var". The tag is used to detect
+	  when IDs from differently tagged string sets are mixed (which is
+	  usually an error). To maintain source compatibility, assigning IDs
+	  with different tags still works, but emits a deprecation warning.
 10-Jan-2008
 	- Marten fixed RM branch compilation on gcc (MinGW tested).
 4-Jan-2008

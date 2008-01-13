@@ -77,7 +77,7 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
 {
   iSyntaxService* synldr = parent->compiler->synldr;
   iStringSet* strings = parent->compiler->strings;
-  iStringSet* stringsSvName = parent->compiler->stringsSvName;
+  iShaderVarStringSet* stringsSvName = parent->compiler->stringsSvName;
 
   //Load shadervar block
   csRef<iDocumentNode> varNode = node->GetNode(
@@ -340,7 +340,7 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
 	if (cname == 0)
 	  cname = source;
 
-        csStringID varID = stringsSvName->Request (cname);
+        CS::ShaderVarStringID varID = stringsSvName->Request (cname);
         pass->custommapping_id.Push (varID);
         //pass->bufferGeneric[pass->bufferCount] = CS_VATTRIB_IS_GENERIC (attrib);
 
@@ -364,7 +364,7 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
 	{
 	  pass->custommapping_attrib.Push (attrib);
 	  pass->custommapping_buffer.Push (sourceName);
-          pass->custommapping_id.Push (csInvalidStringID);
+          pass->custommapping_id.Push (CS::InvalidShaderVarStringID);
 	  /* Those buffers are mapped by default to some specific vattribs; 
 	   * since they are now to be mapped to some generic vattrib,
 	   * turn off the default map. */
@@ -409,7 +409,8 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
       }
 
       if (texUnit < 0) continue;
-      csStringID varID = stringsSvName->Request (mapping->GetAttributeValue("name"));
+      CS::ShaderVarStringID varID =
+        stringsSvName->Request (mapping->GetAttributeValue("name"));
       pass->textureID[texUnit] = varID;
 
       pass->textureCount = MAX(pass->textureCount, texUnit + 1);
@@ -699,7 +700,7 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   int j;
   for (j = 0; j < thispass->textureCount; j++)
   {
-    if (thispass->textureID[j] < (csStringID)stack.GetSize ())
+    if (size_t (thispass->textureID[j]) < stack.GetSize ())
     {
       csShaderVariable* var = 0;
       var = csGetShaderVariableFromStack (stack, thispass->textureID[j]);
@@ -783,16 +784,16 @@ void csXMLShaderTech::GetUsedShaderVars (csBitArray& bits) const
 
     for (size_t i = 0; i < thispass->custommapping_attrib.GetSize (); i++)
     {
-      csStringID id = thispass->custommapping_id[i];
-      if ((id != csInvalidStringID) && (bits.GetSize() > id))
+      CS::ShaderVarStringID id = thispass->custommapping_id[i];
+      if ((id != CS::InvalidShaderVarStringID) && (bits.GetSize() > id))
       {
         bits.SetBit (id);
       }
     }
     for (int j = 0; j < thispass->textureCount; j++)
     {
-      csStringID id = thispass->textureID[j];
-      if ((id != csInvalidStringID) && (bits.GetSize() > id))
+      CS::ShaderVarStringID id = thispass->textureID[j];
+      if ((id != CS::InvalidShaderVarStringID) && (bits.GetSize() > id))
       {
         bits.SetBit (id);
       }

@@ -1190,7 +1190,7 @@ void csSector::UpdateFogSVs ()
 
 void csSector::SetupSVNames()
 {
-  if (SVNames().dynamicAmbient == csInvalidStringID)
+  if ((CS::ShaderVarStringID)(SVNames().dynamicAmbient) == CS::InvalidShaderVarStringID)
   {
     SVNames().dynamicAmbient = CS::ShaderVarName (engine->svNameStringSet,
       "dynamic ambient");

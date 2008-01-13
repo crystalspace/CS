@@ -52,7 +52,7 @@ namespace CS
       const csRefArray<csShaderVariable>& GetShaderVariables () const
       { return variables; }
       virtual void AddVariable (csShaderVariable *variable);
-      virtual csShaderVariable* GetVariable (csStringID name) const;
+      virtual csShaderVariable* GetVariable (ShaderVarStringID name) const;
       virtual void PushVariables (csShaderVariableStack& stacks) const;
       virtual bool IsEmpty() const { return variables.GetSize () == 0; }  
       virtual void ReplaceVariable (csShaderVariable *variable);
@@ -77,7 +77,7 @@ namespace CS
   
       void AddVariable (csShaderVariable *variable)
       { ShaderVariableContextImpl::AddVariable (variable); }
-      csShaderVariable* GetVariable (csStringID name) const
+      csShaderVariable* GetVariable (ShaderVarStringID name) const
       { 
 	csShaderVariable* sv = ShaderVariableContextImpl::GetVariable (name); 
 	if ((sv == 0) && (parentSVC.IsValid()))

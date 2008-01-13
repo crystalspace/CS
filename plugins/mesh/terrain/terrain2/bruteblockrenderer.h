@@ -88,7 +88,7 @@ public:
     return emptyPalette;
   }
 
-  inline iStringSet* GetStringSet ()
+  inline iShaderVarStringSet* GetStringSet ()
   {
     return stringSet;
   }
@@ -103,7 +103,7 @@ private:
 
   iObjectRegistry* objectRegistry;
   csRef<iGraphics3D> graph3d;
-  csRef<iStringSet> stringSet;
+  csRef<iShaderVarStringSet> stringSet;
 
   const csTerrainMaterialPalette* materialPalette;
   csTerrainMaterialPalette emptyPalette;  

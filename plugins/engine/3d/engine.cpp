@@ -580,7 +580,7 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
   globalStringSet = csQueryRegistryTagInterface<iStringSet> (
       objectRegistry, "crystalspace.shared.stringset");
 
-  svNameStringSet = csQueryRegistryTagInterface<iStringSet> (
+  svNameStringSet = csQueryRegistryTagInterface<iShaderVarStringSet> (
     objectRegistry, "crystalspace.shader.variablenameset");
 
   colldet_id = globalStringSet->Request ("colldet");

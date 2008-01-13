@@ -643,7 +643,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
   if (col_set)
   {
     csShaderVariable* flatSV = material->GetVariableAdd (
-      stringSet->Request (CS_MATERIAL_VARNAME_FLATCOLOR));
+      stringSetSvName->Request (CS_MATERIAL_VARNAME_FLATCOLOR));
     flatSV->SetValue (col);
   }
 

@@ -24,11 +24,11 @@
 
 csShaderVariable::csShaderVariable () :
   csRefCount (), Type (UNKNOWN), VectorValue (0), Int(0), MatrixValuePtr(0), 
-  TransformPtr (0), shaderVarArray(0), Name (csInvalidStringID)
+  TransformPtr (0), shaderVarArray(0), Name (CS::InvalidShaderVarStringID)
 {
 }
 
-csShaderVariable::csShaderVariable (csStringID name) :
+csShaderVariable::csShaderVariable (CS::ShaderVarStringID name) :
   csRefCount (), Type (UNKNOWN), VectorValue (0), Int(0), MatrixValuePtr(0), 
   TransformPtr (0), shaderVarArray(0), Name (name)
 {

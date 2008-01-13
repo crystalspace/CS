@@ -63,7 +63,7 @@ private:
   csRef<iVirtualClock> vc;
   csRef<iTextureManager> txtmgr;
   csRef<iStringSet> strings;
-  csRef<iStringSet> stringsSvName;
+  csRef<iShaderVarStringSet> stringsSvName;
   csRef<iEventHandler> weakEventHandler;
 
   bool do_verbose;
@@ -169,7 +169,7 @@ public:
     return activeLights;
   }
 
-  virtual iStringSet* GetSVNameStringset () const
+  virtual iShaderVarStringSet* GetSVNameStringset () const
   {
     return stringsSvName;
   }

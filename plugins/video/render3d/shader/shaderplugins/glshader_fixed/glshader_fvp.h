@@ -58,7 +58,7 @@ public:
 
     TexMatrixOp (float def)
     { 
-      param.var.AttachNew (new csShaderVariable (csInvalidStringID));
+      param.var.AttachNew (new csShaderVariable (CS::InvalidShaderVarStringID));
       param.var->SetValue (def);
     }
   };
@@ -96,9 +96,9 @@ private:
 
   csGLStateCache* statecache;  
 
-  csStringID ambientvar;
-  csStringID string_world2camera;
-  csStringID string_object2world;
+  CS::ShaderVarStringID ambientvar;
+  CS::ShaderVarStringID string_world2camera;
+  CS::ShaderVarStringID string_object2world;
   csArray<LightingEntry> lights;
   bool do_lighting;
   GLenum colorMaterial;
@@ -115,16 +115,17 @@ private:
     ProgramParam constcolor;
     csArray<TexMatrixOp> texMatrixOps;
     
-    csStringID fogplane;
-    csStringID fogdensity;
+    CS::ShaderVarStringID fogplane;
+    CS::ShaderVarStringID fogdensity;
 
-    layerentry () : texgen(TEXGEN_NONE), fogplane (csInvalidStringID),
-      fogdensity (csInvalidStringID) {}
+    layerentry () : texgen(TEXGEN_NONE), 
+      fogplane (CS::InvalidShaderVarStringID),
+      fogdensity (CS::InvalidShaderVarStringID) {}
   };
 
   csArray<layerentry> layers;
 
-  csStringID primcolvar;
+  CS::ShaderVarStringID primcolvar;
 
   bool validProgram;
 

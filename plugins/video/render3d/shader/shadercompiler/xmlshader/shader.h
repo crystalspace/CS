@@ -315,7 +315,7 @@ public:
   }
 
   /// Get a named variable from this context
-  csShaderVariable* GetVariable (csStringID name) const
+  csShaderVariable* GetVariable (CS::ShaderVarStringID name) const
   { 
     if (useFallbackContext)
       return fallbackShader->GetVariable (name);

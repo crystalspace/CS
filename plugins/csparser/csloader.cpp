@@ -1192,7 +1192,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
 
   stringSet = csQueryRegistryTagInterface<iStringSet> (
     object_reg, "crystalspace.shared.stringset");
-  stringSetSvName = csQueryRegistryTagInterface<iStringSet> (
+  stringSetSvName = csQueryRegistryTagInterface<iShaderVarStringSet> (
     object_reg, "crystalspace.shader.variablenameset");
 
   return true;

@@ -49,6 +49,27 @@ struct csShaderVariableWrapper;
 
 class csShaderVariable;
 
+namespace CS
+{
+  namespace StringSetTag
+  {
+    struct ShaderVar;
+  } // namespace StringSetTag
+  
+  /// String ID for shader variable name
+  typedef StringID<StringSetTag::ShaderVar> ShaderVarStringID;
+  /// Invalid shader variable name
+  ShaderVarStringID const InvalidShaderVarStringID =
+    InvalidStringID<StringSetTag::ShaderVar> ();
+} // namespace CS
+
+/// String set for shader variable names
+struct iShaderVarStringSet :
+  public iStringSetBase<CS::StringSetTag::ShaderVar>
+{
+  CS_ISTRINGSSET_SCF_VERSION(iShaderVarStringSet);
+};
+
 /**\addtogroup gfx3d
  * @{ */
 
@@ -128,7 +149,7 @@ private:
 
   csRefArray<csShaderVariable> *shaderVarArray;
 
-  csStringID Name;
+  CS::ShaderVarStringID Name;
 
   virtual csMatrix3* AllocateMatrixValuePtr(const csMatrix3 &value)
   { return new csMatrix3 (value); }
@@ -147,9 +168,10 @@ public:
    */
   csShaderVariable ();
   /// Construct with name.
-  csShaderVariable (csStringID name);
+  csShaderVariable (CS::ShaderVarStringID name);
   csShaderVariable (const csShaderVariable& other) : csRefCount(),
-    MatrixValuePtr(0), TransformPtr (0), shaderVarArray(0) { *this = other; }
+    MatrixValuePtr(0), TransformPtr (0), shaderVarArray(0), Name (0)
+    { *this = other; }
   virtual ~csShaderVariable ()
   {
     delete MatrixValuePtr;
@@ -178,10 +200,12 @@ public:
    * \warning Changing the name of a variable while it's in use can cause 
    *    inexpected behaviour.
    */
-  void SetName (csStringID newName) { Name = newName; }
+  void SetName (CS::ShaderVarStringID newName)
+  { Name = newName; }
   
   /// Get the name of the variable
-  csStringID GetName () const { return Name; }
+  CS::ShaderVarStringID GetName () const
+  { return Name; }
 
   /// Retrieve an int
   bool GetValue (int& value)
@@ -497,13 +521,13 @@ namespace CS
   /// Helper class to obtain an ID for a shader variable.
   struct ShaderVarName
   {
-    csStringID name;
+    ShaderVarStringID name;
     
-    ShaderVarName() : name (csInvalidStringID) {}
-    ShaderVarName (iStringSet* strings, const char* name) 
-    { this->name = strings->Request (name); }
+    ShaderVarName() : name (InvalidShaderVarStringID) {}
+    ShaderVarName (iStringSetBase<StringSetTag::ShaderVar>* strings,
+      const char* name) : name (strings->Request (name)) { }
     
-    operator csStringID () const { return name; }
+    operator ShaderVarStringID () const { return name; }
   };
   
 } // namespace CS

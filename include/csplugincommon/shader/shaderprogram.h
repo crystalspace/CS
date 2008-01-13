@@ -73,7 +73,7 @@ protected:
 protected:
   iObjectRegistry* objectReg;
   csRef<iSyntaxService> synsrv;
-  csRef<iStringSet> stringsSvName;
+  csRef<iShaderVarStringSet> stringsSvName;
 
 public:
   /**
@@ -102,20 +102,21 @@ public:
     bool valid;
     
     // Name of SV to use (if any)
-    csStringID name;
+    CS::ShaderVarStringID name;
     // Reference to const value shadervar
     csRef<csShaderVariable> var;
 
-    ProgramParam() : valid (false), name(csInvalidStringID) { }
+    ProgramParam() : valid (false), name (CS::InvalidShaderVarStringID) { }
   };
 
   class CS_CRYSTALSPACE_EXPORT ProgramParamParser
   {
     iSyntaxService* synsrv;
-    iStringSet* stringsSvName;
+    iShaderVarStringSet* stringsSvName;
   public:
-    ProgramParamParser (iSyntaxService* synsrv, iStringSet* stringsSvName) :
-        synsrv (synsrv), stringsSvName (stringsSvName) {}
+    ProgramParamParser (iSyntaxService* synsrv,
+      iShaderVarStringSet* stringsSvName) : synsrv (synsrv),
+      stringsSvName (stringsSvName) {}
 
     /**
      * Parse program parameter node.
@@ -148,7 +149,7 @@ protected:
     ProgramParam mappingParam;
     intptr_t userVal;
 
-    VariableMapEntry (csStringID s, const char* d) : 
+    VariableMapEntry (CS::ShaderVarStringID s, const char* d) :
       csShaderVarMapping (s, d)
     { 
       userVal = 0;
@@ -166,9 +167,9 @@ protected:
   /// Variable mappings
   csArray<VariableMapEntry> variablemap;
 
-  void TryAddUsedShaderVarName (csStringID name, csBitArray& bits) const
+  void TryAddUsedShaderVarName (CS::ShaderVarStringID name, csBitArray& bits) const
   {
-    if (name != csInvalidStringID)
+    if (name != CS::InvalidShaderVarStringID)
     {
       if (bits.GetSize() > name) bits.SetBit (name);
     }

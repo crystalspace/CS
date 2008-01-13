@@ -53,7 +53,7 @@ public:
     union 
     {
       float num;
-      csStringID var;
+      CS::StringIDValue var;
       
       // Illegal outside of a cons cell
       int oper;
@@ -80,7 +80,7 @@ private:
   /// Variables used for evaluation
   csShaderVariableStack* stack;
   /// String set for producing String IDs
-  csRef<iStringSet> strset;
+  csRef<iShaderVarStringSet> strset;
   /// Compiled array of opcodes for evaluation
   oper_array opcodes;
   /**
@@ -201,17 +201,17 @@ private:
   /// Dump the result of an operation
   void print_result(const oper_arg &) const;
 
-  /*inline*/static const char * GetTypeName (csStringID id)/* const*/;
+  /*inline*/static const char * GetTypeName (unsigned int id)/* const*/;
   /*{
     return xmltypes.Request(id);
   }*/
-  static const char* GetOperName (csStringID id);
+  static const char* GetOperName (unsigned int id);
   static csStringID GetCommonTokenOp (const char* token);
   static csStringID GetXmlTokenOp (const char* token);
   static csStringID GetSexpTokenOp (const char* token);
   static csStringID GetXmlType (const char* token);
 
-  csShaderVariable* ResolveVar (csStringID name);
+  csShaderVariable* ResolveVar (CS::ShaderVarStringID name);
 
   mutable csString errorMsg;
   void ParseError (const char* message, ...) const;

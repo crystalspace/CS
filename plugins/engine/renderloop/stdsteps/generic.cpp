@@ -152,10 +152,10 @@ csPtr<iRenderStep> csGenericRenderStepFactory::Create ()
 
 //---------------------------------------------------------------------------
 
-csStringID csGenericRenderStep::fogplane_name;
-csStringID csGenericRenderStep::string_object2world;
-csStringID csGenericRenderStep::light_0_type;
-csStringID csGenericRenderStep::light_ambient;
+CS::ShaderVarStringID csGenericRenderStep::fogplane_name;
+CS::ShaderVarStringID csGenericRenderStep::string_object2world;
+CS::ShaderVarStringID csGenericRenderStep::light_0_type;
+CS::ShaderVarStringID csGenericRenderStep::light_ambient;
 
 csGenericRenderStep::csGenericRenderStep (
   iObjectRegistry* object_reg) :
@@ -165,7 +165,7 @@ csGenericRenderStep::csGenericRenderStep (
 
   strings = csQueryRegistryTagInterface<iStringSet> 
     (object_reg, "crystalspace.shared.stringset");
-  stringsSvName = csQueryRegistryTagInterface<iStringSet> 
+  stringsSvName = csQueryRegistryTagInterface<iShaderVarStringSet> 
     (object_reg, "crystalspace.shader.variablenameset");
   shaderManager = csQueryRegistry<iShaderManager> (object_reg);
 

@@ -69,12 +69,12 @@ private:
     // default mapping, index is csVertexAttrib (16 first), value is
     // csRenderBufferName
     csRenderBufferName defaultMappings[STREAMMAX];
-    csArray<csStringID> custommapping_id;
+    csArray<CS::ShaderVarStringID> custommapping_id;
     csDirtyAccessArray<csVertexAttrib> custommapping_attrib;
     csArray<csRenderBufferName> custommapping_buffer;
 
     // texture mappings
-    csStringID textureID[TEXTUREMAX];
+    CS::ShaderVarStringID textureID[TEXTUREMAX];
     int textureCount;
 
     // programs

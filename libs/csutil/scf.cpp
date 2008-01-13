@@ -159,7 +159,7 @@ public:
 
 class scfSharedLibrary;
 
-static class csStringSet* libraryNames = 0; 
+static csStringSet* libraryNames = 0; 
 static char const* get_library_name(csStringID s)
 { return s != csInvalidStringID ? libraryNames->Request(s) : "{none}"; }
 
@@ -1222,7 +1222,7 @@ bool csSCF::ClassRegistered (const char *iClassID)
 char const* csSCF::GetInterfaceName (scfInterfaceID i) const
 {
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
-  return InterfaceRegistry.Request(i);
+  return InterfaceRegistry.Request (i);
 }
 
 scfInterfaceID csSCF::GetInterfaceID (const char *iInterface)

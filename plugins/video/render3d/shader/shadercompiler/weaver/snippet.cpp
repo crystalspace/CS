@@ -682,7 +682,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     }
 
     csShaderProgram::ProgramParamParser paramParser (compiler->synldr,
-      compiler->strings);
+      compiler->svstrings);
     csShaderProgram::ProgramParam param;
     if (!paramParser.ParseProgramParam (node, param, 
       csShaderProgram::ParamVector | csShaderProgram::ParamShaderExp)) return;
@@ -751,7 +751,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         return;
       }
       combinerLoader->GenerateSVInputBlocks (techNode, "c", 
-        compiler->strings->Request (param.name), weaverType, "output", id);
+        compiler->svstrings->Request (param.name), weaverType, "output", id);
     }
 
     {

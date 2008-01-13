@@ -1945,8 +1945,8 @@ bool csTerrainObject::SetCurrentMaterialAlphaMaps (
 
   csRef<iGraphics3D> g3d = 
     csQueryRegistry<iGraphics3D> (object_reg);
-  csRef<iStringSet> stringsSvName = 
-    csQueryRegistryTagInterface<iStringSet>
+  csRef<iShaderVarStringSet> stringsSvName = 
+    csQueryRegistryTagInterface<iShaderVarStringSet>
     (object_reg, "crystalspace.shader.variablenameset");
   csRef<iTextureManager> mgr = g3d->GetTextureManager ();
 
@@ -2159,8 +2159,8 @@ bool csTerrainObject::SetCurrentMaterialMap (const csArray<char>& data,
 
   csRef<iGraphics3D> g3d = 
     csQueryRegistry<iGraphics3D> (object_reg);
-  csRef<iStringSet> stringsSvName = 
-    csQueryRegistryTagInterface<iStringSet>
+  csRef<iShaderVarStringSet> stringsSvName = 
+    csQueryRegistryTagInterface<iShaderVarStringSet>
     (object_reg, "crystalspace.shader.variablenameset");
   iTextureManager* mgr = g3d->GetTextureManager ();
 

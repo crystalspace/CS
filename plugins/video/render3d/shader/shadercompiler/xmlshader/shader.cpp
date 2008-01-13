@@ -431,7 +431,7 @@ public:
   {
     wrappedSVC.AddVariable (variable);
   }
-  virtual csShaderVariable* GetVariable (csStringID name) const
+  virtual csShaderVariable* GetVariable (CS::ShaderVarStringID name) const
   { return wrappedSVC.GetVariable (name); }
   virtual const csRefArray<csShaderVariable>& GetShaderVariables () const
   { return wrappedSVC.GetShaderVariables (); }  

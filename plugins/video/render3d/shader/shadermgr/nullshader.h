@@ -77,7 +77,7 @@ public:
   /**\name iShaderVariableContext implementation
    * @{ */
   void AddVariable (csShaderVariable *) { }
-  csShaderVariable* GetVariable (csStringID) const { return 0; }
+  csShaderVariable* GetVariable (CS::ShaderVarStringID) const { return 0; }
   const csRefArray<csShaderVariable>& GetShaderVariables () const
   { return dummySVs; }
   void PushVariables (csShaderVariableStack&) const { }

@@ -86,7 +86,8 @@ public:
 
   //Standard vars
   iObjectRegistry* objectreg;
-  csRef<iStringSet> strings, stringsSvName;
+  csRef<iStringSet> strings;
+  csRef<iShaderVarStringSet> stringsSvName;
   csWeakRef<iGraphics3D> g3d;
   csRef<iSyntaxService> synldr;
   csRef<iVFS> vfs;

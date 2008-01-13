@@ -25,17 +25,18 @@
 
 void csLightShaderVarCache::ClearDefVars ()
 {
-  for (size_t n = 0; n < _varCount; n++) defaultVars[n] = csInvalidStringID;
+  for (size_t n = 0; n < _varCount; n++)
+    defaultVars[n] = CS::InvalidShaderVarStringID;
 }
 
-void csLightShaderVarCache::SetStrings (iStringSet* strings)
+void csLightShaderVarCache::SetStrings (iShaderVarStringSet* strings)
 {
   lightSVIdCache.DeleteAll ();
   ClearDefVars();
   this->strings = strings;
 }
   
-csStringID csLightShaderVarCache::GetLightSVId (size_t num, LightProperty prop)
+CS::ShaderVarStringID csLightShaderVarCache::GetLightSVId (size_t num, LightProperty prop)
 {
   static const char* const svSuffixes[_lightCount] = {
     "diffuse",
@@ -56,7 +57,7 @@ csStringID csLightShaderVarCache::GetLightSVId (size_t num, LightProperty prop)
     "attenuation mode"
   };
 
-  if (!strings.IsValid()) return csInvalidStringID;
+  if (!strings.IsValid()) return CS::InvalidShaderVarStringID;
   
   if (num >= lightSVIdCache.GetSize())
   {
@@ -77,14 +78,14 @@ csStringID csLightShaderVarCache::GetLightSVId (size_t num, LightProperty prop)
   return lightSVIdCache[num].ids[prop];
 }
 
-csStringID csLightShaderVarCache::GetDefaultSVId (DefaultSV var)
+CS::ShaderVarStringID csLightShaderVarCache::GetDefaultSVId (DefaultSV var)
 {
   static const char* const svNames[_varCount] = {
     "light ambient",
     "light count"
   };
   
-  if (!strings.IsValid()) return csInvalidStringID;
+  if (!strings.IsValid()) return CS::InvalidShaderVarStringID;
 
   if (defaultVars[var] == csInvalidStringID)
   {

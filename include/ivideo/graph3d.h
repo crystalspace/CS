@@ -465,8 +465,11 @@ struct csAlphaMode
   {
     /// Alpha mode to use when autoAlphaMode is \p false
     AlphaType alphaType;
-    /// Texture to retrieve the alpha mode from when autoAlphaMode is \p true
-    csStringID autoModeTexture;
+    /** 
+     * String ID for texture to retrieve the alpha mode from when autoAlphaMode
+     * is \p true
+     */
+    CS::StringIDValue autoModeTexture;
   };
 };
 /** @} */

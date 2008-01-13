@@ -136,7 +136,7 @@ public:
     realShader->AddVariable (variable);
   }
 
-  csShaderVariable* GetVariable (csStringID name) const
+  csShaderVariable* GetVariable (CS::ShaderVarStringID name) const
   { 
     return realShader->GetVariable (name);
   }

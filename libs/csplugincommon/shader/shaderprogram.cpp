@@ -41,7 +41,7 @@ csShaderProgram::csShaderProgram (iObjectRegistry* objectReg)
 
   csShaderProgram::objectReg = objectReg;
   synsrv = csQueryRegistry<iSyntaxService> (objectReg);
-  stringsSvName = csQueryRegistryTagInterface<iStringSet> 
+  stringsSvName = csQueryRegistryTagInterface<iShaderVarStringSet> 
     (objectReg, "crystalspace.shader.variablenameset");
   
   csRef<iVerbosityManager> verbosemgr (
@@ -71,7 +71,7 @@ bool csShaderProgram::ProgramParamParser::ParseProgramParam (
 
   // Var for static data
   csRef<csShaderVariable> var;
-  var.AttachNew (new csShaderVariable (csInvalidStringID));
+  var.AttachNew (new csShaderVariable (CS::InvalidShaderVarStringID));
 
   ProgramParamType paramType = ParamInvalid;
   if (strcmp (type, "shadervar") == 0)
@@ -301,7 +301,7 @@ bool csShaderProgram::ParseCommon (iDocumentNode* child)
 	if (!varname)
 	{
 	  // "New style" variable mapping
-	  VariableMapEntry vme (csInvalidStringID, destname);
+	  VariableMapEntry vme (CS::InvalidShaderVarStringID, destname);
 	  if (!ParseProgramParam (child, vme.mappingParam,
 	    ParamFloat | ParamVector2 | ParamVector3 | ParamVector4))
 	    return false;

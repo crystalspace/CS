@@ -104,17 +104,17 @@ private:
   csRenderBufferName skinnedBiTangentOutputBuffer;
   ProgramParam shininessParam;
 
-  csStringID bones_indices_name;
-  csStringID bones_weights_name;
-  csStringID bones_name;
+  CS::ShaderVarStringID bones_indices_name;
+  CS::ShaderVarStringID bones_weights_name;
+  CS::ShaderVarStringID bones_name;
 
   struct BufferName
   {
     csRenderBufferName defaultName;
-    csStringID userName;
+    CS::ShaderVarStringID userName;
 
     BufferName (csRenderBufferName name = CS_BUFFER_NONE) : 
-    defaultName (name), userName (csInvalidStringID) {}
+    defaultName (name), userName (CS::InvalidShaderVarStringID) {}
   };
   BufferName positionBuffer;
   BufferName normalBuffer;

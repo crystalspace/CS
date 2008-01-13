@@ -131,7 +131,7 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
 
   strings = csQueryRegistryTagInterface<iStringSet> (
     objectreg, "crystalspace.shared.stringset");
-  stringsSvName = csQueryRegistryTagInterface<iStringSet> (
+  stringsSvName = csQueryRegistryTagInterface<iShaderVarStringSet> (
     objectreg, "crystalspace.shader.variablenameset");
 
   {

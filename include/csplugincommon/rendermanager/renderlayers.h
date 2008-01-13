@@ -78,7 +78,7 @@ namespace RenderManager
       CS_ASSERT(layer == 0);
       
       num = shaderTypes.GetSize ();
-      return shaderTypes.GetArray();
+      return reinterpret_cast<const csStringID*> (shaderTypes.GetArray());
     }
 
     iShader* GetDefaultShader (size_t layer) const
@@ -89,8 +89,8 @@ namespace RenderManager
     }
 
   private:
-    csDirtyAccessArray<csStringID,
-      csArrayElementHandler<csStringID>,
+    csDirtyAccessArray<StringIDValue,
+      csArrayElementHandler<StringIDValue>,
       CS::Memory::AllocatorMalloc,
       csArrayCapacityFixedGrow<1> > shaderTypes;
     iShader* defaultShader;
@@ -154,7 +154,8 @@ namespace RenderManager
     const csStringID* GetShaderTypes (size_t layer, size_t& num) const
     {
       num = layers[layer].numTypes;
-      return layerTypes.GetArray() + layers[layer].firstType;
+      return reinterpret_cast<const csStringID*> (
+        layerTypes.GetArray() + layers[layer].firstType);
     }
 
     iShader* GetDefaultShader (size_t layer) const
@@ -170,7 +171,7 @@ namespace RenderManager
       size_t numTypes;
     };
     csArray<Layer> layers;
-    csDirtyAccessArray<csStringID> layerTypes;
+    csDirtyAccessArray<StringIDValue> layerTypes;
   };
 
   enum

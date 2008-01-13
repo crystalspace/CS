@@ -772,7 +772,7 @@ public:
   /// The global string set
   csRef<iStringSet> globalStringSet;
   /// The shader variable name string set
-  csRef<iStringSet> svNameStringSet;
+  csRef<iShaderVarStringSet> svNameStringSet;
   /// The 3D driver
   csRef<iGraphics3D> G3D;
   /// Pointer to the shader manager
@@ -782,8 +782,8 @@ public:
   csRef<iVirtualClock> virtualClock;
 
   /// Store engine shadervar names
-  csStringID id_creation_time;
-  csStringID svTexEnvironmentName;
+  CS::ShaderVarStringID id_creation_time;
+  CS::ShaderVarStringID svTexEnvironmentName;
 
   csRef<iRenderManager> renderManager;
   EnvTex::Holder envTexHolder;

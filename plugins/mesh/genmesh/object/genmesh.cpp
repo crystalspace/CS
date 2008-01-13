@@ -543,12 +543,12 @@ void csGenmeshMeshObject::SetupShaderVariableContext ()
   uint bufferMask = (uint)CS_BUFFER_ALL_MASK;
 
   size_t i;
-  iStringSet* strings = factory->GetSVStrings();
-  const csArray<csStringID>& factoryUBNs = factory->GetUserBufferNames();
+  iShaderVarStringSet* strings = factory->GetSVStrings();
+  const csArray<CS::ShaderVarStringID>& factoryUBNs = factory->GetUserBufferNames();
   // Set up factorys user buffers...
   for (i = 0; i < factoryUBNs.GetSize (); i++)
   {
-    const csStringID userBuf = factoryUBNs.Get(i);
+    const CS::ShaderVarStringID userBuf = factoryUBNs.Get(i);
     const char* bufName = strings->Request (userBuf);
     csRenderBufferName userName = 
       csRenderBuffer::GetBufferNameFromDescr (bufName);
@@ -567,7 +567,7 @@ void csGenmeshMeshObject::SetupShaderVariableContext ()
   // Set up meshs user buffers...
   for (i = 0; i < user_buffer_names.GetSize (); i++)
   {
-    const csStringID userBuf = user_buffer_names.Get(i);
+    const CS::ShaderVarStringID userBuf = user_buffer_names.Get(i);
     const char* bufName = strings->Request (userBuf);
     csRenderBufferName userName = 
       csRenderBuffer::GetBufferNameFromDescr (bufName);
@@ -1566,7 +1566,7 @@ iGeneralMeshSubMesh* csGenmeshMeshObject::FindSubMesh (const char* name) const
 bool csGenmeshMeshObject::AddRenderBuffer (const char *name,
 					   iRenderBuffer* buffer)
 {
-  csStringID bufID = factory->GetSVStrings()->Request (name);
+  CS::ShaderVarStringID bufID = factory->GetSVStrings()->Request (name);
   if (userBuffers.AddRenderBuffer (bufID, buffer))
   {
     user_buffer_names.Push (bufID);
@@ -1578,7 +1578,7 @@ bool csGenmeshMeshObject::AddRenderBuffer (const char *name,
 
 bool csGenmeshMeshObject::RemoveRenderBuffer (const char *name)
 {
-  csStringID bufID = factory->GetSVStrings()->Request (name);
+  CS::ShaderVarStringID bufID = factory->GetSVStrings()->Request (name);
   if (userBuffers.RemoveRenderBuffer (bufID))
   {
     user_buffer_names.Delete (bufID);
@@ -1590,7 +1590,7 @@ bool csGenmeshMeshObject::RemoveRenderBuffer (const char *name)
 
 iRenderBuffer* csGenmeshMeshObject::GetRenderBuffer (int index)
 {
-  csStringID bufID = user_buffer_names[index];
+  CS::ShaderVarStringID bufID = user_buffer_names[index];
   return userBuffers.GetRenderBuffer (bufID);
 }
 
@@ -1604,7 +1604,7 @@ csRef<iString> csGenmeshMeshObject::GetRenderBufferName (int index) const
 
 iRenderBuffer* csGenmeshMeshObject::GetRenderBuffer (const char* name)
 {
-  csStringID bufID = factory->GetSVStrings()->Request (name);
+  CS::ShaderVarStringID bufID = factory->GetSVStrings()->Request (name);
   iRenderBuffer* buf = userBuffers.GetRenderBuffer (bufID);
   if (buf != 0) return 0;
 
@@ -1640,7 +1640,7 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (
   back2front_tree = 0;
 
   g3d = csQueryRegistry<iGraphics3D> (object_reg);
-  svstrings = csQueryRegistryTagInterface<iStringSet>
+  svstrings = csQueryRegistryTagInterface<iShaderVarStringSet>
     (object_reg, "crystalspace.shader.variablenameset");
 
   mesh_vertices_dirty_flag = false;
@@ -2264,7 +2264,7 @@ void csGenmeshMeshObjectFactory::GenerateBox (const csBox3& box)
 bool csGenmeshMeshObjectFactory::AddRenderBuffer (const char *name,
 						  iRenderBuffer* buffer)
 {
-  csStringID bufID = svstrings->Request (name);
+  CS::ShaderVarStringID bufID = svstrings->Request (name);
   if (userBuffers.AddRenderBuffer (bufID, buffer))
   {
     user_buffer_names.Push (bufID);
@@ -2276,7 +2276,7 @@ bool csGenmeshMeshObjectFactory::AddRenderBuffer (const char *name,
 
 bool csGenmeshMeshObjectFactory::RemoveRenderBuffer (const char *name)
 {
-  csStringID bufID = svstrings->Request (name);
+  CS::ShaderVarStringID bufID = svstrings->Request (name);
   if (userBuffers.RemoveRenderBuffer (bufID))
   {
     user_buffer_names.Delete (bufID);
@@ -2288,7 +2288,7 @@ bool csGenmeshMeshObjectFactory::RemoveRenderBuffer (const char *name)
 
 iRenderBuffer* csGenmeshMeshObjectFactory::GetRenderBuffer (int index)
 {
-  csStringID bufID = user_buffer_names[index];
+  CS::ShaderVarStringID bufID = user_buffer_names[index];
   return userBuffers.GetRenderBuffer (bufID);
 }
 
@@ -2301,7 +2301,7 @@ csRef<iString> csGenmeshMeshObjectFactory::GetRenderBufferName (int index) const
 
 iRenderBuffer* csGenmeshMeshObjectFactory::GetRenderBuffer (const char* name)
 {
-  csStringID bufID = svstrings->Request (name);
+  CS::ShaderVarStringID bufID = svstrings->Request (name);
   iRenderBuffer* buf = userBuffers.GetRenderBuffer (bufID);
   if (buf != 0) return buf;
 

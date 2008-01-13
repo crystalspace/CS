@@ -41,6 +41,7 @@
 #include "iutil/plugin.h"
 #include "ivaria/engseq.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/shader/shader.h"
 
 class csReversibleTransform;
 class csColor;
@@ -205,7 +206,8 @@ private:
   /// Pointer to the engine sequencer (optional module).
   csRef<iEngineSequenceManager> eseqmgr;
   /// Shared string set
-  csRef<iStringSet> stringSet, stringSetSvName;
+  csRef<iStringSet> stringSet;
+  csRef<iShaderVarStringSet> stringSetSvName;
 
   /// Pointer to built-in image texture loader.
   csRef<iLoaderPlugin> BuiltinImageTexLoader;

@@ -147,7 +147,7 @@ namespace RenderManager
         reuseAux->reusable = true;
       }
 
-      csStringID svNameTexPortal;
+      CS::ShaderVarStringID svNameTexPortal;
     #ifdef CS_DEBUG
       csFrameDataHolder<csStringBase> stringHolder;
     #endif

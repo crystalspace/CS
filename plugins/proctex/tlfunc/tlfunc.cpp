@@ -182,8 +182,9 @@ csPtr<iBase> csFuncTexLoader::Parse (iDocumentNode* node,
 
     if (exprNode)
     {
-      csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
-	object_reg, "crystalspace.shader.variablenameset");
+      csRef<iShaderVarStringSet> strings =
+        csQueryRegistryTagInterface<iShaderVarStringSet> (
+	 object_reg, "crystalspace.shader.variablenameset");
 
       csShaderExpression expr (object_reg);
       
@@ -202,7 +203,7 @@ csPtr<iBase> csFuncTexLoader::Parse (iDocumentNode* node,
         context->PushVariables (stack);
 
 	csRef<csShaderVariable> result;
-	result.AttachNew (new csShaderVariable (csInvalidStringID));
+	result.AttachNew (new csShaderVariable (CS::InvalidShaderVarStringID));
 	result->SetType (csShaderVariable::VECTOR4);
 	for (int y = 0; y < h; y++)
 	{
