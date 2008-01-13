@@ -343,7 +343,7 @@ rule MasterHeader
     "#include \"$(files)\""
     $(boilerpost)
     "#endif /* $(protect) */"
-    : notfile ;
+    : notfile : : "%" ;
   Depends masterheaders : $(target) ;
   Clean cleanmasterheaders : $(target) ;
   Clean clean : cleanmasterheaders ;

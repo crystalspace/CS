@@ -23,16 +23,21 @@
 rule SplitDebugInfo
 {
   local binary = $(1) ;
+  local dbgfile = $(binary:S=.dbg:G=$(binary:G)) ;
+  local dir = [ on $(binary) GetVar LOCATE ] ;
+  MakeLocate $(dbgfile) : $(dir) ;
+  DEBUG_FILE on $(binary) = [ ConcatDirs $(dir) $(dbgfile:G=) ] ;
   DoSplitDebugInfo $(binary) ;
-  return $(binary).dbg ;
+  Clean clean : $(dbgfile) ;
+  return $(dbgfile) ;
 }
 
 actions DoSplitDebugInfo
 {
-  $(CMD.OBJCOPY) --only-keep-debug $(<) $(<).dbg
+  $(CMD.OBJCOPY) --only-keep-debug $(<) $(DEBUG_FILE)
   $(CMD.OBJCOPY) --strip-unneeded $(<)
-  $(CMD.OBJCOPY) --add-gnu-debuglink=$(<).dbg $(<)
-  if [ "$(CHMOD)" ] ; then $(CHMOD) a-x $(<).dbg ; fi
+  $(CMD.OBJCOPY) --add-gnu-debuglink=$(DEBUG_FILE) $(<)
+  test -n "$(CHMOD)" && $(CHMOD) a-x $(DEBUG_FILE)
 }
 
 DEBUGINFOTOOLS.DUMP_SYMS.WIN32 ?= "$(TOP)/bin/dump_syms.exe" ;
