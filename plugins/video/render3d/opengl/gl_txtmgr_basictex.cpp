@@ -370,20 +370,30 @@ void csGLBasicTextureHandle::Blit (int x, int y, int width,
   glTexSubImage2D (textarget, 0, x, y, 
       width, height,
       textureFormat, GL_UNSIGNED_BYTE, data);
-  //SetNeedMips (true);
+  RegenerateMipmaps();
 }
 
 void csGLBasicTextureHandle::SetupAutoMipping()
 {
   // Set up mipmap generation
   if ((!(texFlags.Get() & CS_TEXTURE_NOMIPMAPS))
-    /*&& (!G3D->ext->CS_GL_EXT_framebuffer_object)*/)
+    && (!G3D->ext->CS_GL_EXT_framebuffer_object))
   {
     if (G3D->ext->CS_GL_SGIS_generate_mipmap)
       glTexParameteri (GetGLTextureTarget(), GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
     else
       glTexParameteri  (GetGLTextureTarget(), GL_TEXTURE_MIN_FILTER,
 	txtmgr->rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
+  }
+}
+
+void csGLBasicTextureHandle::RegenerateMipmaps()
+{
+  if ((!(texFlags.Get() & CS_TEXTURE_NOMIPMAPS))
+    && (G3D->ext->CS_GL_EXT_framebuffer_object))
+  {
+    G3D->ActivateTexture (this);
+    G3D->ext->glGenerateMipmapEXT (GetGLTextureTarget());
   }
 }
 
@@ -621,14 +631,6 @@ void csGLBasicTextureHandle::UpdateTexture ()
 GLuint csGLBasicTextureHandle::GetHandle ()
 {
   Precache ();
-  if ((!(texFlags.Get() & CS_TEXTURE_NOMIPMAPS))
-    && (G3D->ext->CS_GL_EXT_framebuffer_object)
-    && IsNeedMips())
-  {
-    G3D->statecache->SetTexture (GL_TEXTURE_2D, Handle);
-    G3D->ext->glGenerateMipmapEXT (GL_TEXTURE_2D);
-    SetNeedMips (false);
-  }
   return Handle;
 }
 

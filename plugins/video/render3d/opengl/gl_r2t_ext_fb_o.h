@@ -98,6 +98,7 @@ class csGLRender2TextureEXTfbo : public csGLRender2TextureFramebuf
   FBOWrapper& GetFBO (int w, int h);
   void PurgeFBOs ();
   const char* FBStatusStr (GLenum status);
+  void RegenerateTargetMipmaps (RTAttachment& target);
 public:
   csGLRender2TextureEXTfbo (csGLGraphics3D* G3D);
   virtual ~csGLRender2TextureEXTfbo();

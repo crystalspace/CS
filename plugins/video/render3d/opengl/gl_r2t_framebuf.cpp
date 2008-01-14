@@ -288,8 +288,8 @@ void csGLRender2TextureFramebuf::GrabFramebuffer (const RTAttachment& target,
 	  0, 0, 0, 0, 0, txt_w, txt_h);
       else
 	glCopyTexImage2D (textarget, 0, internalFormat, 0, 0, txt_w, txt_h, 0);
-      tex_mm->SetNeedMips (true);
     }
+    tex_mm->RegenerateMipmaps();
   }
 }
 

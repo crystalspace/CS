@@ -113,13 +113,12 @@ protected:
     flagPrepared = 1 << 30, 
     flagForeignHandle = 1 << 29,
     flagWasRenderTarget = 1 << 28,
-    flagNeedMips = 1 << 27,
 
     // Flags below are used by csGLTextureHandle
     /// Does it have a keycolor?
-    flagTransp = 1 << 26,
+    flagTransp = 1 << 27,
     /// Is the color valid?
-    flagTranspSet = 1 << 25,
+    flagTranspSet = 1 << 26,
 
     flagLast,
     /// Mask to get only the "public" flags
@@ -199,8 +198,6 @@ public:
   {
     texFlags.SetBool (flagWasRenderTarget, b);
   }
-  bool IsNeedMips() const { return texFlags.Check (flagNeedMips); }
-  void SetNeedMips (bool b) { texFlags.SetBool (flagNeedMips, b); }
 
   /// Create a texture with given dimensions
   csGLBasicTextureHandle (int width, int height, int depth,
@@ -281,6 +278,7 @@ public:
   virtual void Blit (int x, int y, int width, int height,
     unsigned char const* data, TextureBlitDataFormat format = RGBA8888);
   void SetupAutoMipping();
+  void RegenerateMipmaps();
 
   /// Get the texture target
   virtual int GetTextureTarget () const { return int (texType); }
