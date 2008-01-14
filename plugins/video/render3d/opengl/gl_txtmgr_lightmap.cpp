@@ -47,7 +47,7 @@ CS_IMPLEMENT_STATIC_VAR (GetRLMAlloc, csRLMAlloc, ())
 
 void csGLRendererLightmap::DecRef ()
 {
-  csRefTrackerAccess::TrackDecRef (GetSCFObject(), scfRefCount);
+  csRefTrackerAccess::TrackDecRef (scfObject, scfRefCount);
   scfRefCount--;							
   if (scfRefCount == 0)							
   {									
@@ -122,7 +122,7 @@ void csGLRendererLightmap::SetLightCellSize (int size)
 
 void csGLSuperLightmap::DecRef ()
 {
-  csRefTrackerAccess::TrackDecRef (GetSCFObject(), scfRefCount);
+  csRefTrackerAccess::TrackDecRef (scfObject, scfRefCount);
   scfRefCount--;							
   if (scfRefCount == 0)							
   {
