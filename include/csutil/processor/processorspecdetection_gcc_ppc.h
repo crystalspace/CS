@@ -19,38 +19,16 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __PROCESSORSPECDETECTION_GCC_PPC_H__
 #define __PROCESSORSPECDETECTION_GCC_PPC_H__
 
-#include <sys/sysctl.h>
-
 namespace Implementation
 {
-    class DetectInstructionsGCCPPC
+    class CS_CRYSTALSPACE_EXPORT DetectInstructionsGCCPPC
     {
     public:
-        uint CheckSupportedInstruction()
-        {
-	    uint instructionBitMask = 0U;
-
-            if(GetAltiVecTypeAvailable() > 0)
-                instructionBitMask |= ALTIVEC;
-
-            return instructionBitMask;
-        }
+      uint CheckSupportedInstruction();
 
     private:
-        // Returns 0 for scalar only, >0 for AltiVec
-        int GetAltiVecTypeAvailable()
-        {
-
-            int sels[2] = { CTL_HW, HW_VECTORUNIT };
-            int vType = 0; // 0 == scalar only
-            size_t length = sizeof(vType);
-            int error = sysctl(sels, 2, &vType, &length, NULL, 0);
-
-            if( 0 == error ) return vType;
-
-            return 0;
-        }
-
+      // Returns 0 for scalar only, and >0 for AltiVec
+      int GetAltiVecTypeAvailable();
     };
 }
 

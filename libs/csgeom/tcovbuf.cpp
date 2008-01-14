@@ -2795,43 +2795,6 @@ void csTiledCoverageBuffer::Debug_Dump (iGraphics3D* g3d, int /*zoom*/)
   }
 }
 
-#define COV_ASSERT(test,msg) \
-  if (!(test)) \
-  { \
-    str.Format("csTiledCoverageBuffer failure (%d,%s): %s\n", int(__LINE__), \
-    	#msg, #test); \
-    return csPtr<iString> (rc); \
-  }
-
-csPtr<iString> csTiledCoverageBuffer::Debug_UnitTest ()
-{
-  Setup (640, 480);
-
-  scfString* rc = new scfString ();
-  csString& str = rc->GetCsString ();
-
-  csVector2 poly[4];
-  //csCoverageTile* t;
-  //iString* s;
-
-  Initialize ();
-  COV_ASSERT (TestPoint (csVector2 (100, 100), 5) == true, "tp");
-  poly[0].Set (50, 50);
-  poly[1].Set (600, 50);
-  poly[2].Set (600, 430);
-  poly[3].Set (50, 430);
-  csBox2Int modified_bbox;
-  InsertPolygon (poly, 4, 10.0, modified_bbox);
-  COV_ASSERT (TestPoint (csVector2 (100, 100), 5) == true, "tp");
-  COV_ASSERT (TestPoint (csVector2 (100, 100), 15) == false, "tp");
-  COV_ASSERT (TestPoint (csVector2 (599, 100), 5) == true, "tp");
-  COV_ASSERT (TestPoint (csVector2 (599, 100), 15) == false, "tp");
-  COV_ASSERT (TestPoint (csVector2 (601, 100), 5) == true, "tp");
-  COV_ASSERT (TestPoint (csVector2 (601, 100), 15) == true, "tp");
-
-  rc->DecRef ();
-  return 0;
-}
 
 csTicks csTiledCoverageBuffer::Debug_Benchmark (int /*num_iterations*/)
 {

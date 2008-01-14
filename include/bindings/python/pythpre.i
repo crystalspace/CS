@@ -188,7 +188,7 @@ _ ## PtrName ## _to_Python (const PtrName & wp)
   }
   iBase * ibase = (iBase *)wp.Ref;
   void * ptr = ibase->QueryInterface(iSCF::SCF->GetInterfaceID(wp.Type), wp.Version);
-//  ibase->DecRef(); // Undo IncRef from QueryInterface
+  // ibase->DecRef(); // Undo IncRef from QueryInterface
 
   // This is a bit tricky: We want the generated Python 'result' object
   // to own one reference to the wrapped object, so we want to call
@@ -250,8 +250,8 @@ CS_WRAP_PTR_TYPEMAP(csWrapPtr)
   $2 = PyInt_AsLong(pyver);
   Py_XDECREF(pyver);
 }
-
-%typemap(in) (int argc, char const * const argv[])
+%define TYPEMAP_ARGC_ARGV(Arg1,Arg2)
+%typemap(in) (Arg1,Arg2)
 {
   if (!PyList_Check($input))
   {
@@ -279,6 +279,8 @@ CS_WRAP_PTR_TYPEMAP(csWrapPtr)
 {
   delete [] $2;
 }
+%enddef
+TYPEMAP_ARGC_ARGV(int argc, char const * const argv[])
 
 %typemap(in) (const char * description, ...)
 {
@@ -607,5 +609,22 @@ def __iter__(self):
         return self. ## Replacement ## (*args)
   %}
 }
+%enddef
+
+# Callback helper template to help declaring director stuff for ibase classes.
+# Intended for use by cspace module or other scf using libs.
+%define CALLBACK_INTERFACE_HDR(Class,Interface)
+
+%template (swig ## Class) scfImplementation1<Class, Interface>;
+
+%feature("director") Class;
+%feature("nodirector") Class::IncRef;
+%feature("nodirector") Class::DecRef;
+%feature("nodirector") Class::GetRefCount;
+%feature("nodirector") Class::AddRefOwner;
+%feature("nodirector") Class::RemoveRefOwner;
+%feature("nodirector") Class::QueryInterface;
+%feature("nodirector") Class::GetInterfaceMetadata;
+
 %enddef
 

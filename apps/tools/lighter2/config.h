@@ -40,6 +40,8 @@ namespace lighter
       bool doDirectLight;
       // HL2-style directional LMs
       bool directionalLMs;
+      // Number of threads to use for multicore parts
+      uint numThreads;
     };
 
     // Lightmap and lightmap layout properties

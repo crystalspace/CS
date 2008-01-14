@@ -21,7 +21,8 @@
 // Uncomment to render to a float texture
 //#define FLOAT_TEXTURE
 
-csEngineProcTex::csEngineProcTex() : csProcTexture ()
+csEngineProcTex::csEngineProcTex() : csProcTexture (),
+  currentTarget (0), renderTargetState (true)
 {
   mat_w = 256;
   mat_h = 256;
@@ -40,27 +41,72 @@ bool csEngineProcTex::LoadLevel ()
   csRef<iLoader> loader = csQueryRegistry<iLoader> (object_reg);
   // load a map file to display
   vfs->PushDir ();
-  vfs->ChDir ("/lev/flarge/");
+  vfs->ChDir ("/lev/partsys/");
   bool Success = (loader->LoadMapFile ("world", false));
   vfs->PopDir ();
   if (!Success) return false;
   return true;
 }
 
+struct TargetToUse
+{
+  csRenderTargetAttachment attachment;
+  const char* format;
+};
+static const TargetToUse targetsToUse[] = {
+  {rtaColor0, "rgb8"},
+  {rtaColor0, "rgb16_f"},
+  {rtaDepth,  "d32"}
+};
+
+static const char* AttachmentToStr (csRenderTargetAttachment a)
+{
+  switch(a)
+  {
+  case rtaColor0: return "color0";
+  case rtaDepth:  return "depth";
+  default: return 0;
+  }
+}
+
 iTextureWrapper* csEngineProcTex::CreateTexture (iObjectRegistry* object_reg)
 {
-  iTextureWrapper* tex;
+  iTextureWrapper* tex = 0;
 
   csRef<iEngine> engine (csQueryRegistry<iEngine> (object_reg));
-  csRef<iTextureHandle> texHandle = 
-    g3d->GetTextureManager()->CreateTexture (mat_w, mat_h, csimg2D, 
-#ifdef FLOAT_TEXTURE
-    "rgb16_f",
-#else
-    "rgb8",
-#endif
-    CS_TEXTURE_3D | texFlags);
-  tex = engine->GetTextureList()->NewTexture (texHandle);
+  
+  for (size_t n = 0; n < sizeof(targetsToUse)/sizeof(targetsToUse[0]); n++)
+  {
+    if (!g3d->CanSetRenderTarget (targetsToUse[n].format,
+      targetsToUse[n].attachment))
+    {
+      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+	  "crystalspace.application.simplept",
+	  "Format unsupported: %s(%s)", targetsToUse[n].format,
+          AttachmentToStr (targetsToUse[n].attachment));
+      continue;
+    }
+      
+    csRef<iTextureHandle> texHandle = 
+      g3d->GetTextureManager()->CreateTexture (mat_w, mat_h, csimg2D, 
+        targetsToUse[n].format, CS_TEXTURE_3D | texFlags);
+    if (!texHandle) continue;
+    
+    Target target;
+    target.texh = texHandle;
+    target.format = targetsToUse[n].format;
+    target.attachment = targetsToUse[n].attachment;
+    targets.Push (target);
+    
+    availableFormatsStr.AppendFmt ("%s ", target.format);
+    
+    if (!tex)
+    {
+      tex = engine->GetTextureList()->NewTexture (texHandle);
+      currentTargetStr.Format ("%s(%s)", AttachmentToStr (target.attachment),
+        target.format);
+    }
+  }
 
   return tex;
 }
@@ -75,7 +121,8 @@ bool csEngineProcTex::PrepareAnim ()
 
 void csEngineProcTex::Animate (csTicks CurrentTime)
 {
-  g3d->SetRenderTarget (tex->GetTextureHandle ());
+  renderTargetState = g3d->SetRenderTarget (targets[currentTarget].texh,
+    false, 0, targets[currentTarget].attachment);
 
   if (!View.IsValid())
   {
@@ -109,3 +156,11 @@ void csEngineProcTex::Animate (csTicks CurrentTime)
   Engine->SetContext (oldContext);
 }
 
+void csEngineProcTex::CycleTarget()
+{
+  currentTarget = (currentTarget + 1) % targets.GetSize();
+  const Target& target = targets[currentTarget];
+  currentTargetStr.Format ("%s(%s)", AttachmentToStr (target.attachment),
+    target.format);
+  tex->SetTextureHandle (targets[currentTarget].texh);
+}

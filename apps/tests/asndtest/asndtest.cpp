@@ -58,21 +58,47 @@ void ASndTest::CreateWorld ()
   csRef<iLight> light;
   iLightList* ll = world->GetLights ();
 
-  // Load the sound from the standard library
-  const char* fname = "/lib/std/loopbzzt.wav";
-  csRef<iDataBuffer> soundbuf = vfs->ReadFile (fname);
+  csRef<iCommandLineParser> cmdline (
+        csQueryRegistry<iCommandLineParser> (GetObjectRegistry ()));
+
+  csString fname = cmdline->GetOption ("sndfile");
+  if (fname.IsEmpty ())
+  {
+    fname = "/lib/std/loopbzzt.wav";
+    printf("You can override sound file using -sndfile option (VFS path)\n");
+  }
+  printf("Sound file  : %s\n", fname.GetData ());
+
+  csRef<iDataBuffer> soundbuf = vfs->ReadFile (fname.GetData ());
   if (!soundbuf)
-    ReportError ("Can't load file '%s'!", fname);
+    ReportError ("Can't load file '%s'!", fname.GetData ());
 
   // Interpret the sound
   csRef<iSndSysData> snddata = sndloader->LoadSound (soundbuf);
   if (!snddata)
-    ReportError ("Can't load sound '%s'!", fname);
+    ReportError ("Can't load sound '%s'!", fname.GetData ());
+
+  const csSndSysSoundFormat* format = snddata->GetFormat ();
+  printf("=== iSndSysData format informations ===\n");
+  printf("Format      : %d bits, %d channel(s), %d Hz\n",
+        format->Bits, format->Channels, format->Freq);
+  printf("Sample Size : %d bytes, %d frames\n", snddata->GetDataSize (),
+        snddata->GetFrameCount ());
+  printf("Description : %s\n", snddata->GetDescription ());
+  fflush(stdout);
 
   // Create a stream for the sound
   csRef<iSndSysStream> sndstream = sndrenderer->CreateStream (snddata, CS_SND3D_ABSOLUTE);
   if (!sndstream)
-    ReportError ("Can't create stream for '%s'!", fname);
+    ReportError ("Can't create stream for '%s'!", fname.GetData ());
+
+  const csSndSysSoundFormat* rformat = sndstream->GetRenderedFormat ();
+  printf("=== iSndSysStream format informations ===\n");
+  printf("Format      : %d bits, %d channel(s), %d Hz\n",
+        rformat->Bits, rformat->Channels, rformat->Freq);
+  printf("Stream Size : %d frames\n", sndstream->GetFrameCount ());
+  printf("Description : %s\n", sndstream->GetDescription ());
+  fflush(stdout);
 
   // Make the stream loop and play (unpaused)
   sndstream->SetLoopState (CS_SNDSYS_STREAM_LOOP);

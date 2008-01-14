@@ -34,6 +34,7 @@ namespace lighter
     //Setup defaults
     lighterProperties.doDirectLight = true;
     lighterProperties.directionalLMs = false;
+    lighterProperties.numThreads = 1;
 
     lmProperties.lmDensity = 4.0f;
     lmProperties.maxLightmapU = 1024;
@@ -56,17 +57,16 @@ namespace lighter
       lighterProperties.doDirectLight);
     lighterProperties.directionalLMs = cfgFile->GetBool ("lighter2.BumpLMs", 
       lighterProperties.directionalLMs);
-
+    lighterProperties.numThreads = cfgFile->GetInt ("lighter2.NumThreads", 
+      lighterProperties.numThreads);
 
     lmProperties.lmDensity = cfgFile->GetFloat ("lighter2.lmDensity", 
       lmProperties.lmDensity);
-
     lmProperties.maxLightmapU = cfgFile->GetInt ("lighter2.maxLightmapU", 
       lmProperties.maxLightmapU);
     lmProperties.maxLightmapV = cfgFile->GetInt ("lighter2.maxLightmapV", 
       lmProperties.maxLightmapV);
    
-
     lmProperties.blackThreshold = cfgFile->GetFloat ("lighter2.blackThreshold", 
       lmProperties.blackThreshold);
     lmProperties.blackThreshold = csMax (lmProperties.blackThreshold,
@@ -79,7 +79,6 @@ namespace lighter
 
     lmProperties.grayPDMaps = cfgFile->GetBool ("lighter2.grayPDMaps", 
       lmProperties.grayPDMaps);
-
 
     debugProperties.rayDebugRE =
       cfgFile->GetStr ("lighter2.debugOcclusionRays");

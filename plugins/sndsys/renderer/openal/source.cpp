@@ -57,8 +57,8 @@ SndSysSourceOpenAL2D::SndSysSourceOpenAL2D (csRef<iSndSysStream> stream, csSndSy
     else
       m_Format = AL_FORMAT_STEREO16;
 
-  // Claculate the number of bytes per frame
-  m_BytesPerSample = m_Stream->GetRenderedFormat()->Bits / 8 * m_Stream->GetRenderedFormat()->Channels;
+  // Calculate the number of bytes per frame
+  //m_BytesPerSample = m_Stream->GetRenderedFormat()->Bits / 8 * m_Stream->GetRenderedFormat()->Channels; // (vk) unused
 
   // Save the sample rate locally
   m_SampleRate = m_Stream->GetRenderedFormat()->Freq;

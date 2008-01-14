@@ -34,6 +34,7 @@ class csPlane3;
 class csReversibleTransform;
 class csTransform;
 class csVector3;
+class csSphere;
 
 struct iFrustumView;
 struct iMeshWrapper;
@@ -156,7 +157,7 @@ struct iPortalCallback : public virtual iBase
  */
 struct iPortal : public virtual iBase
 {
-  SCF_INTERFACE(iPortal, 2,0,0);
+  SCF_INTERFACE(iPortal, 2,0,1);
 
   /// Set the name of this portal.
   virtual void SetName (const char* name) = 0;
@@ -198,6 +199,18 @@ struct iPortal : public virtual iBase
    * Get the world space plane of this portal.
    */
   virtual const csPlane3& GetWorldPlane () = 0;
+
+  /**
+   * Get a sphere representing the object space bounding sphere
+   * of this portal.
+   */
+  virtual const csSphere& GetObjectSphere () = 0;
+
+  /**
+   * Get a sphere representing the world space bounding sphere
+   * of this portal.
+   */
+  virtual const csSphere& GetWorldSphere () = 0;
 
   /**
    * Calculate the camera space plane for this portal.

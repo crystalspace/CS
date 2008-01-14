@@ -18,7 +18,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "cssysdef.h"
 
-#if defined(CS_COMPILER_GCC) && defined(CS_PROCESSOR_X86)
+#if defined(CS_COMPILER_GCC) && defined(CS_PROCESSOR_X86) && !defined(CS_PLATFORM_WIN32)
 #include "csutil/processorspecdetection.h"
 
 namespace CS
@@ -102,4 +102,4 @@ namespace CS
   } // namespace Platform
 } // namespace CS
 
-#endif // defined(CS_COMPILER_GCC) && defined(CS_PROCESSOR_X86)
+#endif // defined(CS_COMPILER_GCC) && defined(CS_PROCESSOR_X86) && !defined(CS_PLATFORM_WIN32)

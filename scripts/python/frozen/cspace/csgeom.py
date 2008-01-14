@@ -839,24 +839,6 @@ csIntersect3_BoxBox = _csgeom.csIntersect3_BoxBox
 csIntersect3_FrustumFrustum = _csgeom.csIntersect3_FrustumFrustum
 csIntersect3_TriangleTriangle = _csgeom.csIntersect3_TriangleTriangle
 
-class csGeomDebugHelper(object):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _csgeom.new_csGeomDebugHelper(*args)
-        try: self.this.append(this)
-        except: self.this = this
-    __swig_destroy__ = _csgeom.delete_csGeomDebugHelper
-    __del__ = lambda self : None;
-    def GetSupportedTests(*args): return _csgeom.csGeomDebugHelper_GetSupportedTests(*args)
-    def UnitTest(*args): return _csgeom.csGeomDebugHelper_UnitTest(*args)
-    def StateTest(*args): return _csgeom.csGeomDebugHelper_StateTest(*args)
-    def Benchmark(*args): return _csgeom.csGeomDebugHelper_Benchmark(*args)
-    def Dump(*args): return _csgeom.csGeomDebugHelper_Dump(*args)
-    def DebugCommand(*args): return _csgeom.csGeomDebugHelper_DebugCommand(*args)
-csGeomDebugHelper_swigregister = _csgeom.csGeomDebugHelper_swigregister
-csGeomDebugHelper_swigregister(csGeomDebugHelper)
-
 CS_POL_SAME_PLANE = _csgeom.CS_POL_SAME_PLANE
 CS_POL_FRONT = _csgeom.CS_POL_FRONT
 CS_POL_BACK = _csgeom.CS_POL_BACK

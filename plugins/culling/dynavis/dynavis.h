@@ -363,7 +363,7 @@ public:
 
   virtual int GetSupportedTests () const
   {
-    return CS_DBGHELP_UNITTEST | CS_DBGHELP_TXTDUMP |
+    return CS_DBGHELP_TXTDUMP |
       CS_DBGHELP_STATETEST | CS_DBGHELP_BENCHMARK |
       CS_DBGHELP_GFXDUMP;
   }

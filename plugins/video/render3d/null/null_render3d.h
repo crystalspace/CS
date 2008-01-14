@@ -81,8 +81,15 @@ public:
   void GetPerspectiveCenter (int& x, int& y) const { x = cx, y = cy; }
   void SetPerspectiveAspect (float aspect) { a = aspect; }
   float GetPerspectiveAspect () const { return a; }
-  void SetRenderTarget (iTextureHandle* handle, bool persistent = false, int subtexture = 0);
-  iTextureHandle* GetRenderTarget () const;
+  
+  bool SetRenderTarget (iTextureHandle* handle,	bool persistent = false,
+    int subtexture = 0,	csRenderTargetAttachment attachment = rtaColor0);
+  bool CanSetRenderTarget (const char* format,
+    csRenderTargetAttachment attachment = rtaColor0);
+  iTextureHandle* GetRenderTarget (csRenderTargetAttachment attachment = rtaColor0,
+    int* subtexture = 0) const;
+  void UnsetRenderTargets();
+  
   bool BeginDraw (int DrawFlags);
   void FinishDraw ();
   int GetCurrentDrawFlags() const
@@ -179,6 +186,10 @@ private:
 
   csPixelFormat pfmt;
   bool red_mask, green_mask, blue_mask, alpha_mask;
+  
+  enum { numTargets = 2 };
+  csRef<iTextureHandle> render_targets[numTargets];
+  int rt_subtex[numTargets];
 };
 
 #endif // __CS_NULL_RENDER3D_H__

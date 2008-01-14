@@ -6,9 +6,187 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Jan-2008
+	- Mike Gist committed a patch from Trymm to fix a crash in sprcal3d.
+11-Jan-2008
+	- Vincent removed mentions of iCollection throughout the project.
+	- philwyett added reference to exporting LD_LIBRARY_PATH to allow demo
+	  applications to run without error on Linux. I also updated some basic
+	  info for contacting me etc.
+	- Mike Gist enhanced the runtime check for AltiVec to work on linux.
+10-Jan-2008
+	- Eric Sunshine fixed a couple bugs in macro CS_EMIT_BUILD_PROPERTY()
+	  in emit.m4 which manifested when the client passed a non-empty
+	  EMPTY-OKAY argument. (1) It incorrectly unconditionally employed the
+	  CS_JAMCONFIG_PROPERTY() emitter rather than respecting the EMITTER
+	  argument and only employing CS_JAMCONFIG_PROPERTY() as a
+	  fallback. (2) It neglected to pass the optional UNCONDITIONAL
+	  argument along to the emitter.
+	 - Eric Sunshine added "default" as an alias for the existing tokens
+	  "emit" and "yes" for the EMITTER argument of macro
+	  CS_EMITTER_OPTIONAL() in emit.m4.
+	- Eric Sunshine made minor clarifications to macro documentation in
+	  emit.m4.
+	- Eric Sunshine added new Autoconf macros CS_TR_SH_Lang(),
+	  CS_TR_SH_lang(), and CS_TR_SH_LANG() to language.m4. These macros are
+	  similar to AS_TR_SH(), but convert "+" in its argument to "x" rather
+	  than "p" since "x" is more suitable in a context dealing with
+	  programming languages. For instance, CS_TR_SH_Lang([C++]) becomes
+	  "Cxx", rather than the less idiomatic "Cpp" as would be the case with
+	  AS_TR_SH().  These macros are useful for composing shell variable
+	  names pertaining to a particular language. For instance, if the
+	  language upon which a macro operates is in $1, then the macro may
+	  compose a shell variable name using
+	  CS_TR_SH_lang([cs_cv_prog_$1_feature]).  CS_TR_SH_Lang() performs no
+	  case-folding of its input. CS_TR_SH_lang() folds the input to
+	  lowercase.  CS_TR_SH_LANG() folds the input to uppercase.
+	- Eric Sunshine added new Autoconf macro CS_LANG_RESOLVE() to
+	  language.m4.  This macro is a convenience tool for other macros which
+	  optionally accept a language specifier. It returns the input language
+	  specifier if non-empty, otherwise the specified fallback language.
+	  If the fallback is not provided, then the language is assumed to be
+	  "C".
+	- Eric Sunshine updated macro CS_BUILD_IFELSE() in checkbuild.m4 to
+	  take advantage of the new CS_TR_SH_LANG() and CS_LANG_RESOLVE()
+	  macros.  Also retired the somewhat ugly public CS_LANG_CFLAGS macro
+	  (although a somewhat similar private helper macro, _CS_LANG_CFLAGS(),
+	  is still employed by CS_BUILD_IFELSE()).
+	- Eric Sunshine updated the various CS_COMPILER_WARNING_FOO() macros in
+	  warnings.m4 to take advantage of the new CS_TR_SH_lang() and
+	  CS_LANG_RESOLVE() macros.
+	- Eric Sunshine improved the various CS_COMPILER_WARNING_FOO() macros
+	  in warnings.m4 by having them compose proper cache variables
+	  incorporating the language name (such as "cs_cv_prog_cxx_foo") rather
+	  than employing the too-general static name "cs_cv_prog_compiler_foo"
+	  in the case that the client fails to provide an explicit cache
+	  variable name.
+	- Eric Sunshine re-factored the various CS_COMPILER_WARNING_FOO()
+	  macros in warnings.m4 by introducing new helpers
+	  _CS_WARNING_SUPPRESS_MSG() and _CS_WARNING_CACHE_VAR() which avoid
+	  similar code in each of the CS_COMPILER_WARNING_FOO() macros.
+	- Eric Sunshine promoted the C++ STL check from an inline configure.ac
+	  test to a stand-alone re-usable macro CS_CHECK_STL() in checkstl.m4
+	  so that it can be employed by external projects and other Autoconf
+	  macros.
+	- Eric Sunshine promoted the complicated -fvisibility-inline-hiddens
+	  check from an inline configure.ac test to a stand-alone re-usable
+	  macro CS_VISIBILITY_INLINES_HIDDEN() in visibility.m4 so that it can
+	  be employed by external projects.
+	- Eric Sunshine upgraded CS_VISIBILITY_INLINES_HIDDEN() in
+	  visibility.m4 so that it explicitly promotes compilation warnings to
+	  errors in case the compiler neglects to return an error code when the
+	  switch under consideration is not recognized.
+	- Eric Sunshine promoted the checks for compiler switch and in-code
+	  delcaration of symbol visibility from inline configure.ac tests to
+	  stand-alone re-usable macros in visibility.m4. The new macros are
+	  CS_VISIBILITY_FLAG_HIDDEN(), CS_VISIBILITY_FLAG_DEFAULT(),
+	  CS_VISIBILITY_DECLARE_HIDDEN(), and CS_VISIBILITY_DECLARE_DEFAULT().
+	  Performed a good deal of re-factoring and simplification of these
+	  checks in order to lower maintenance costs.  For consistency, also
+	  renamed CS_VISIBILITY_INLINES_HIDDEN() to
+	  CS_VISIBILITY_FLAG_INLINES_HIDDEN().
+	- Eric Sunshine upgraded the symbol visibility compiler flag checks in
+	  visibility.m4 so that they promote compiler warnings to errors.  This
+	  should resolve problem experienced by Andres Freund during
+	  cross-compiling on Linux for Windows where configure was under the
+	  impression that -fvisibility=hidden was usable since the compiler
+	  issued only a warning and otherwise ignored the flag.
+9-Jan-2008
+	- Mike Gist committed a patch from Trymm for sprcal3d to keep
+	  compatibility with cal3d files which aren't updated for the recent
+	  changes. Those now use the old bugged behavior instead of not working
+	  at all.
+	- Eric Sunshine upgraded mk/autoconf/compiler.m4 so that the macros
+	  CS_PROG_CC() and CS_PROG_CXX() also publish the shell variable names
+	  cs_compiler_name_c and cs_compiler_name_cxx, respectively.
+	  Furthermore, these macros now emit build properties COMPILER.C.TYPE
+	  and COMPILER.CXX.TYPE (and, as an historic anomaly, COMPILER.TYPE) to
+	  Jamconfig. These changes ensure that the compiler's type/name is
+	  published for all CS Jam-based projects (rather than only for CS
+	  itself).  This fixes problem where mk/jam/win32.jam's
+	  ConstructSharedLibraryTarget rule, which depends upon the compiler
+	  type/name information, failed in external CS-based projects.
+	- Vincent added '-no3d' command line option to sndtest, to set the
+	  sound stream in CS_SND3D_DISABLE mode. Useful for investigating a bug
+	  with playback of stereo OGG files with OpenAL renderer in that mode.
+8-Jan-2008
+	- Mike Gist committed a patch from Trymm for sprcal3d which fixes the
+	  problems with characters not walking properly for the first couple of
+	  seconds after movement has been initiated.
+	- Marten added a non-threaded job queue.
+	- Marten added the ability to query a job queue if all enqueued jobs
+	  are run.
+	- Marten made a few cosmetic fixes to lighter2.
+	- Marten started to convert lighter2 to be able to take advantage
+	  of multi-processor/core configurations.
+	- Marten made a number of fixes to bullet plugin and phystut 
+	  application, fixing creation of sphere and joints.
+7-Jan-2008
+	- res fixed a constness mismatch in cspython.cpp occuring with 
+	  Python 2.4 (and probably older) caused that surfaced after r28415
+	  and r28416.
+	- Vincent fixed a bug which prevented OGG files to be played when
+	  using OpenAL. Also commented unused stuff in OpenAL renderer, and
+	  added OpenAL specific kvp in sound.cfg.
+6-Jan-2008
+	- Marten fixed a bug in lighter2 related to light through portals.
+	- Vincent added '-sndfile' commandline option to allow setting the
+	  sound file to use in 'sndtest' and 'asndtest'. Also added sound and
+	  stream format information display.
+	- caedes added swig template to help declaring typemaps for argc-argv
+	  style parameter lists for functions.
+	- caedes added swig output typemaps for EventData structs in GetData
+	  functions in the different EventHelper classes.
+	- caedes fixed a constness problem in cspython.
+	- Marten made a couple of cosmetic fixes in ligher2.
+5-Jan-2008
+	- Mike Gist committed a patch from Trymm which corrects a few problems
+	  with idle animations in sprcal3d. Characters will no longer play the
+	  idle animation in situations like when in the middle of a fight, and
+	  all idle animations will be played at random.
+	- Marten fixed a warning in terrain.
+	- Marten added svn:ignore property on mk\msvc9 directory.
+	- Marten made an optimization to lighter2, cutting out code taking 7%
+	  of total runtime.
+	- res fixed the preprocessor condition in 
+	  libs/csutil/processor/processorspecdetection_nonwin_gcc_x86.cpp to
+	  not compile the contents of that file on Win32 at all (as also
+	  suggested by the name). Should fix #440.
+	- Marten removed the unit test application and deprecated the unit
+	  test method in iDebugHelper.
+	- Marten redid the ligther2 optimization to play better with future
+	  implementation of area lights.
+	- Marten fixed a bug in lighter2 whereby lights through portals wouldn't
+	  work at all.
+4-Jan-2008
+	- Vincent fixed a crasher in csbench: PerformShaderTest() still queried
+	  iThingState for walls mesh after CreateRoom() was changed to use
+	  genmesh.
+	- caedes added a macro called CALLBACK_INTERFACE_HDR to python swig
+	  files to help in declaring director classes for scf interfaces.
+1-Jan-2008
+	- Jorrit added iPortal->GetObjectSphere() and GetWorldSphere().
+	  With these two functions you can get the bounding sphere (in world
+	  and object space) of the portal.
+	- Jorrit fixed iMeshWrapper->PlaceMesh() so that it uses the new
+	  GetObjectSphere() function. This speeds the function up and makes
+	  it also more correct (although it increases the chance of adding
+	  too many sectors).
+	- res augmented the render target API to allow "attachments" (to
+	  support rendering depth instead of color data to textures or, later,
+	  multiple render targets) and better querying if a texture format can
+	  be rendered to.
+31-Dec-2007
+	- Jorrit set Video.OpenGL.StencilThreshold to 1 instead of 50. That
+	  basically means that stencil clipping will always be used for
+	  portals instead of plane clipping. We never did conclusive
+	  benchmarks on what is better here but at least on Intel Graphics
+	  plane clipping is not working properly causing lots of artifacts
+	  in portal heavy levels like flarge.
 28-Dec-2007
-    - philwyett added a build tip for unix that reduces build time
-      on dual core processors.
+	- res updated the docs for the new cs-win32libs release.
+	- philwyett added a build tip for unix that reduces build time
+	  on dual core processors.
 	- caedes fixed castle-tex.zip being incorrectly added to vfs.cfg
 	  template, and thus impossible to find on install.
 26-Dec-2007
@@ -58,7 +236,7 @@ chronological order.
 21-Dec-2007
 	- Jorrit added a -RenderLoop option to viewmesh so that you
 	  can use another renderloop. Just as:
-		viewmesh -RenderLoop=diffuse ...
+	    viewmesh -RenderLoop=diffuse ...
 	- Jorrit extended viewmesh so that it also loads the light,
 	  light_bumpmap, ambient, reflectsphere, parallax,
 	  light_spec_bumpmap, and parallaxAtt shaders.

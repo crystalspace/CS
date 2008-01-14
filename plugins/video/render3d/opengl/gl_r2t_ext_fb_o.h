@@ -30,19 +30,30 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 
 class csGLRender2TextureEXTfbo : public csGLRender2TextureFramebuf
 {
+  RTAttachment& GetAttachment (csRenderTargetAttachment attachment)
+  {
+    switch (attachment)
+    {
+    case rtaDepth:
+      return depthTarget;
+    case rtaColor0:
+    default:
+      return colorTarget;
+    }
+  }
+
   class FBOWrapper
   {
     csGLExtensionManager* ext;
     int fb_w, fb_h;
   public:
     GLuint framebuffer, depthRB, stencilRB;
-    iTextureHandle* txthandle;
     uint lastUsedFrame;
 
     FBOWrapper (csGLExtensionManager* ext) : ext (ext), framebuffer (0), depthRB (0), 
-      stencilRB (0), txthandle (0) { }
+      stencilRB (0) { }
     FBOWrapper (const FBOWrapper& other) : ext (other.ext), framebuffer (0), 
-      depthRB (0), stencilRB (0), txthandle (0)
+      depthRB (0), stencilRB (0)
     {
       // Only allow copying of un-setup wrappers
       CS_ASSERT (other.framebuffer == 0);
@@ -66,9 +77,11 @@ class csGLRender2TextureEXTfbo : public csGLRender2TextureFramebuf
     void UnattachDrawBuffer ();
   };
 
-  bool enableFBO;
+  bool enableFBO : 1;
+  FBOWrapper* currentFBO;
   GLenum depthStorage, stencilStorage;
 
+  // @@@ TODO: probably better to manage render buffers separately from complete FBOs
   typedef csFixedSizeAllocator<csList<FBOWrapper>::allocSize> FBOListAlloc;
   typedef csList<FBOWrapper, FBOListAlloc> FBOListType;
   FBOListType allocatedFBOs;
@@ -89,9 +102,14 @@ public:
   csGLRender2TextureEXTfbo (csGLGraphics3D* G3D);
   virtual ~csGLRender2TextureEXTfbo();
 
-  virtual void SetRenderTarget (iTextureHandle* handle, bool persistent,
-  	int subtexture);
-  virtual void FinishDraw ();
+  bool SetRenderTarget (iTextureHandle* handle, bool persistent,
+    int subtexture, csRenderTargetAttachment attachment);
+  void UnsetRenderTargets();
+  /* @@@ TODO: Implement using actual framebuffer object
+  bool CanSetRenderTarget (const char* format, csRenderTargetAttachment attachment);*/
+  //iTextureHandle* GetRenderTarget (csRenderTargetAttachment attachment, int* subtexture) const;
+  
+  void FinishDraw ();
 
   virtual bool HasStencil() { return stencilStorage != 0; }
 };

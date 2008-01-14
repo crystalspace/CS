@@ -3106,7 +3106,7 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
   }
   iBase * ibase = (iBase *)wp.Ref;
   void * ptr = ibase->QueryInterface(iSCF::SCF->GetInterfaceID(wp.Type), wp.Version);
-//  ibase->DecRef(); // Undo IncRef from QueryInterface
+  // ibase->DecRef(); // Undo IncRef from QueryInterface
 
   // This is a bit tricky: We want the generated Python 'result' object
   // to own one reference to the wrapped object, so we want to call
@@ -27325,27 +27325,22 @@ SWIGINTERN PyObject *_wrap_csKeyEventHelper_GetEventData(PyObject *SWIGUNUSEDPAR
   bool result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"csKeyEventHelper_GetEventData",2,2,&obj0,&obj1)) SWIG_fail;
+  {
+    arg2 = new csKeyEventData();
+  }
+  if(!PyArg_UnpackTuple(args,(char *)"csKeyEventHelper_GetEventData",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iEvent, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csKeyEventHelper_GetEventData" "', argument " "1"" of type '" "iEvent const *""'"); 
   }
   arg1 = reinterpret_cast< iEvent * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csKeyEventData,  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csKeyEventHelper_GetEventData" "', argument " "2"" of type '" "csKeyEventData &""'"); 
-  }
-  if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csKeyEventHelper_GetEventData" "', argument " "2"" of type '" "csKeyEventData &""'"); 
-  }
-  arg2 = reinterpret_cast< csKeyEventData * >(argp2);
   result = (bool)csKeyEventHelper::GetEventData((iEvent const *)arg1,*arg2);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg2, SWIG_TypeQuery("csKeyEventData" " *"), 1);
+  }
   return resultobj;
 fail:
   return NULL;
@@ -28962,27 +28957,22 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_GetEventData(PyObject *SWIGUNUSEDP
   bool result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"csMouseEventHelper_GetEventData",2,2,&obj0,&obj1)) SWIG_fail;
+  {
+    arg2 = new csMouseEventData();
+  }
+  if(!PyArg_UnpackTuple(args,(char *)"csMouseEventHelper_GetEventData",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iEvent, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMouseEventHelper_GetEventData" "', argument " "1"" of type '" "iEvent const *""'"); 
   }
   arg1 = reinterpret_cast< iEvent * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csMouseEventData,  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csMouseEventHelper_GetEventData" "', argument " "2"" of type '" "csMouseEventData &""'"); 
-  }
-  if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csMouseEventHelper_GetEventData" "', argument " "2"" of type '" "csMouseEventData &""'"); 
-  }
-  arg2 = reinterpret_cast< csMouseEventData * >(argp2);
   result = (bool)csMouseEventHelper::GetEventData((iEvent const *)arg1,*arg2);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg2, SWIG_TypeQuery("csMouseEventData" " *"), 1);
+  }
   return resultobj;
 fail:
   return NULL;
@@ -29954,27 +29944,22 @@ SWIGINTERN PyObject *_wrap_csJoystickEventHelper_GetEventData(PyObject *SWIGUNUS
   bool result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"csJoystickEventHelper_GetEventData",2,2,&obj0,&obj1)) SWIG_fail;
+  {
+    arg2 = new csJoystickEventData();
+  }
+  if(!PyArg_UnpackTuple(args,(char *)"csJoystickEventHelper_GetEventData",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iEvent, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csJoystickEventHelper_GetEventData" "', argument " "1"" of type '" "iEvent const *""'"); 
   }
   arg1 = reinterpret_cast< iEvent * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csJoystickEventData,  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csJoystickEventHelper_GetEventData" "', argument " "2"" of type '" "csJoystickEventData &""'"); 
-  }
-  if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csJoystickEventHelper_GetEventData" "', argument " "2"" of type '" "csJoystickEventData &""'"); 
-  }
-  arg2 = reinterpret_cast< csJoystickEventData * >(argp2);
   result = (bool)csJoystickEventHelper::GetEventData((iEvent const *)arg1,*arg2);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg2, SWIG_TypeQuery("csJoystickEventData" " *"), 1);
+  }
   return resultobj;
 fail:
   return NULL;
@@ -30340,27 +30325,22 @@ SWIGINTERN PyObject *_wrap_csCommandEventHelper_GetEventData(PyObject *SWIGUNUSE
   bool result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"csCommandEventHelper_GetEventData",2,2,&obj0,&obj1)) SWIG_fail;
+  {
+    arg2 = new csCommandEventData();
+  }
+  if(!PyArg_UnpackTuple(args,(char *)"csCommandEventHelper_GetEventData",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iEvent, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csCommandEventHelper_GetEventData" "', argument " "1"" of type '" "iEvent const *""'"); 
   }
   arg1 = reinterpret_cast< iEvent * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csCommandEventData,  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csCommandEventHelper_GetEventData" "', argument " "2"" of type '" "csCommandEventData &""'"); 
-  }
-  if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csCommandEventHelper_GetEventData" "', argument " "2"" of type '" "csCommandEventData &""'"); 
-  }
-  arg2 = reinterpret_cast< csCommandEventData * >(argp2);
   result = (bool)csCommandEventHelper::GetEventData((iEvent const *)arg1,*arg2);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg2, SWIG_TypeQuery("csCommandEventData" " *"), 1);
+  }
   return resultobj;
 fail:
   return NULL;
@@ -56287,11 +56267,10 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "SCF_VERBOSE_PLUGIN_REGISTER",SWIG_From_int(static_cast< int >(SCF_VERBOSE_PLUGIN_REGISTER)));
   SWIG_Python_SetConstant(d, "SCF_VERBOSE_CLASS_REGISTER",SWIG_From_int(static_cast< int >(SCF_VERBOSE_CLASS_REGISTER)));
   SWIG_Python_SetConstant(d, "SCF_VERBOSE_ALL",SWIG_From_int(static_cast< int >(SCF_VERBOSE_ALL)));
-  SWIG_Python_SetConstant(d, "CS_DBGHELP_UNITTEST",SWIG_From_int(static_cast< int >(1)));
-  SWIG_Python_SetConstant(d, "CS_DBGHELP_BENCHMARK",SWIG_From_int(static_cast< int >(2)));
-  SWIG_Python_SetConstant(d, "CS_DBGHELP_TXTDUMP",SWIG_From_int(static_cast< int >(4)));
-  SWIG_Python_SetConstant(d, "CS_DBGHELP_GFXDUMP",SWIG_From_int(static_cast< int >(8)));
-  SWIG_Python_SetConstant(d, "CS_DBGHELP_STATETEST",SWIG_From_int(static_cast< int >(16)));
+  SWIG_Python_SetConstant(d, "CS_DBGHELP_BENCHMARK",SWIG_From_int(static_cast< int >(CS_DBGHELP_BENCHMARK)));
+  SWIG_Python_SetConstant(d, "CS_DBGHELP_TXTDUMP",SWIG_From_int(static_cast< int >(CS_DBGHELP_TXTDUMP)));
+  SWIG_Python_SetConstant(d, "CS_DBGHELP_GFXDUMP",SWIG_From_int(static_cast< int >(CS_DBGHELP_GFXDUMP)));
+  SWIG_Python_SetConstant(d, "CS_DBGHELP_STATETEST",SWIG_From_int(static_cast< int >(CS_DBGHELP_STATETEST)));
   SWIG_Python_SetConstant(d, "MAX_OUTPUT_VERTICES",SWIG_From_int(static_cast< int >(64)));
   SWIG_Python_SetConstant(d, "CS_CLIP_OUTSIDE",SWIG_From_int(static_cast< int >(CS_CLIP_OUTSIDE)));
   SWIG_Python_SetConstant(d, "CS_CLIP_CLIPPED",SWIG_From_int(static_cast< int >(CS_CLIP_CLIPPED)));

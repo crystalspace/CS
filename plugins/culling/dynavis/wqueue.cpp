@@ -27,8 +27,7 @@
 
 //---------------------------------------------------------------------------
 
-csWriteQueue::csWriteQueue () :
-  scfImplementationType (this)
+csWriteQueue::csWriteQueue ()
 {
   free_elements = 0;
   queue_min = 0;
@@ -170,12 +169,3 @@ void* csWriteQueue::Fetch (const csBox2& /*box*/, float depth, float& out_depth)
   }
   return 0;
 }
-
-csPtr<iString> csWriteQueue::UnitTest ()
-{
-  scfString* rc = new scfString ();
-
-  rc->DecRef ();
-  return 0;
-}
-

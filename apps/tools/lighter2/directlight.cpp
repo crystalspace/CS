@@ -28,14 +28,6 @@ namespace lighter
 {
   //-------------------------------------------------------------------------
 
-/*  static const float ElementQuadrantConstants[][2] =
-  {
-    {-0.25f, -0.25f},
-    {-0.25f,  0.25f},
-    { 0.25f, -0.25f},
-    { 0.25f,  0.25f}
-  };*/
-
   DirectLighting::DirectLighting (const csVector3& tangentSpaceNorm, 
     size_t subLightmapNum) : tangentSpaceNorm (tangentSpaceNorm),
     fancyTangentSpaceNorm (!(tangentSpaceNorm - csVector3 (0, 0, 1)).IsZero ()),
@@ -254,8 +246,11 @@ namespace lighter
     float lightPdf, cosineTerm = 0;
     csVector3 lightVec;
 
-    float lightSamples[2];
-    lightSampler.GetNext (lightSamples);
+    const bool isDelta = true; //light->IsDeltaLight (); no support for area lights yet
+
+    float lightSamples[2] = {0};
+    if (!isDelta)
+      lightSampler.GetNext (lightSamples);
 
     csColor lightColor = light->SampleLight (point, normal, lightSamples[0],
       lightSamples[1], lightVec, lightPdf, visTester);
@@ -279,7 +274,7 @@ namespace lighter
       else if (occlusion == VisibilityTester::occlPartial)
         lightColor *= visTester.GetFilterColor ();
 
-      if (light->IsDeltaLight ())
+      if (isDelta)
         return lightColor * fabsf (cosineTerm) / lightPdf;
       else
         // Properly handle area sources! See pbrt page 732

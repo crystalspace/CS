@@ -179,11 +179,22 @@ void csPortalContainer::Prepare ()
     size_t j;
     csArray<int>& vidx = prt->GetVertexIndices ();
     csPoly3D poly;
+    csBox3 box;
+    box.StartBoundingBox ();
     for (j = 0 ; j < vidx.GetSize () ; j++)
     {
       if (vt) vidx[j] = (int)vt[vidx[j]].new_idx;
       poly.AddVertex (vertices[vidx[j]]);
+      box.AddBoundingVertex (vertices[vidx[j]]);
     }
+    float max_sqradius = 0;
+    csVector3 center = box.GetCenter ();
+    for (j = 0 ; j < vidx.GetSize () ; j++)
+    {
+      float sqdist = csSquaredDist::PointPoint (center, vertices[vidx[j]]);
+      if (sqdist > max_sqradius) max_sqradius = sqdist;
+    }
+    prt->object_sphere = csSphere (center, csQsqrt (max_sqradius));
     prt->SetObjectPlane (poly.ComputePlane ());
   }
   delete[] vt;
@@ -248,6 +259,7 @@ void csPortalContainer::ObjectToWorld (const csMovable& movable,
       csPortal* prt = portals[i];
       csPlane3 wp (prt->GetIntObjectPlane ());
       prt->SetWorldPlane (wp);
+      prt->world_sphere = prt->object_sphere;
     }
   }
   else
@@ -262,6 +274,9 @@ void csPortalContainer::ObjectToWorld (const csMovable& movable,
       movtrans.This2Other (prt->GetIntObjectPlane (), world_vec, p);
       p.Normalize ();
       prt->SetWorldPlane (p);
+      prt->world_sphere = csSphere (
+	  movtrans.This2Other (prt->object_sphere.GetCenter ()),
+	  prt->object_sphere.GetRadius ());
     }
   }
 }
