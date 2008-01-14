@@ -8,6 +8,7 @@ chronological order.
 
 14-Jan-2008
 	- Mike Gist committed a patch from Trymm to fix a crash in sprcal3d.
+	- res re-enabled PBO on ATI (latest driver fixes found issues).
 11-Jan-2008
 	- Vincent removed mentions of iCollection throughout the project.
 	- philwyett added reference to exporting LD_LIBRARY_PATH to allow demo
