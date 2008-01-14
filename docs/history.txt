@@ -12,6 +12,8 @@ chronological order.
 	- res temporarily disabled FBO since it's currently broken.
 	- res merged r27437 from rendermanager branch to trunk (use
 	  glGenerateMipmaps in gl3d).
+	- Vincent blindly changed a constant in OpenAL renderer, which seems
+	  to fix the "play too fast" issue with stereo OGG files.
 11-Jan-2008
 	- Vincent removed mentions of iCollection throughout the project.
 	- philwyett added reference to exporting LD_LIBRARY_PATH to allow demo
