@@ -1837,9 +1837,12 @@ void csSpriteCal3DMeshObject::SetIdleOverrides(csRandomGen *rng,int which)
 void csSpriteCal3DMeshObject::SetDefaultIdleAnim(const char *name)
 {
     default_idle_anim = FindAnim(name);
-    float max_interval(factory->anims[default_idle_anim]->max_interval);
-    if(idle_override_interval > max_interval)
-      idle_override_interval = max_interval; 
+    if( default_idle_anim != -1 )
+    {
+      float max_interval(factory->anims[default_idle_anim]->max_interval);
+      if(idle_override_interval > max_interval)
+        idle_override_interval = max_interval;
+    }
 }
 
 bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
@@ -1891,8 +1894,11 @@ bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
        Ideally, we would just test for (max_vel < vel). However, this would
        break expected behaviour for old .cal3d files, and hence require
        additional explanation. */
-    if( (factory->anims[idle_action]->max_velocity) && (factory->anims[idle_action]->max_velocity < vel))
+    if((factory->anims[idle_action]->max_velocity) && (factory->anims[idle_action]->max_velocity < vel))
+    {
       calModel.getMixer()->removeAction(idle_action);
+      idle_action = -1;
+    }
   }
 
   // first look for animations with a base velocity that exactly matches
