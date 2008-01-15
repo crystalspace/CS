@@ -9,6 +9,9 @@ chronological order.
 15-Jan-2008
 	- res merged r27442 from rendermanager branch to trunk (cubemap
 	  support with fbo render-to-texture).
+	- res merged r27667 from rendermanager branch to trunk (better support
+	  for textures exceeding the framebuffer dimensions in framebuffer r2t
+	  backend).
 14-Jan-2008
 	- Mike Gist committed a patch from Trymm to fix a crash in sprcal3d.
 	- res re-enabled PBO on ATI (latest driver fixes found issues).
@@ -1352,6 +1355,8 @@ chronological order.
 	  (that is, they're dynamically loaded, allowing graceful handling
 	  of inavailability).
 	- res changed the xwindow plugin to have the Xaw library relayed.
+	- res made the GL framebuffer render-to-texture support work slightly
+	  better with textures larger than the framebuffer.
 15-Sep-2007
 	- caedes added swig module post files for java and perl.
 	- res fixed a crash in the GL driver DB when <comparever> was used
