@@ -7,9 +7,20 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 15-Jan-2008
-      - Mike Gist got animated textures working with proxy textures.
+	- res merged r27442 from rendermanager branch to trunk (cubemap
+	  support with fbo render-to-texture).
+	- res merged r27667 from rendermanager branch to trunk (better support
+	  for textures exceeding the framebuffer dimensions in framebuffer r2t
+	  backend).
+	- Mike Gist got animated textures working with proxy textures.
 14-Jan-2008
 	- Mike Gist committed a patch from Trymm to fix a crash in sprcal3d.
+	- res re-enabled PBO on ATI (latest driver fixes found issues).
+	- res temporarily disabled FBO since it's currently broken.
+	- res merged r27437 from rendermanager branch to trunk (use
+	  glGenerateMipmaps in gl3d).
+	- Vincent blindly changed a constant in OpenAL renderer, which seems
+	  to fix the "play too fast" issue with stereo OGG files.
 11-Jan-2008
 	- Vincent removed mentions of iCollection throughout the project.
 	- philwyett added reference to exporting LD_LIBRARY_PATH to allow demo
@@ -1347,6 +1358,8 @@ chronological order.
 	  (that is, they're dynamically loaded, allowing graceful handling
 	  of inavailability).
 	- res changed the xwindow plugin to have the Xaw library relayed.
+	- res made the GL framebuffer render-to-texture support work slightly
+	  better with textures larger than the framebuffer.
 15-Sep-2007
 	- caedes added swig module post files for java and perl.
 	- res fixed a crash in the GL driver DB when <comparever> was used
@@ -1611,6 +1624,10 @@ chronological order.
 	  This prevented decals from working on levels treated with
 	  lighter2.
 	- Jorrit fixed a crash bug in lighter2.
+	- res fixed cubemap support in the gl3d fbo render-to-texture path.
+15-Aug-2007
+	- res made the gl3d texture blit and render to texture stuff use
+	  glGenerateMipmap, if available,
 14-Aug-2007
 	- Jorrit added iEngine->CreateGenMesh() and
 	  iEngine->CreateGenMeshFactory() (alternative to the current
