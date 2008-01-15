@@ -290,6 +290,35 @@ void csGLRender2TextureEXTfbo::RegenerateTargetMipmaps (RTAttachment& target)
   }
 }
 
+void csGLRender2TextureEXTfbo::FramebufferTexture (GLenum target, GLenum attachment, 
+						   GLenum textarget, GLuint texHandle,
+						   int subtexture)
+{
+  switch (textarget)
+  {
+    case GL_TEXTURE_1D:
+      G3D->ext->glFramebufferTexture1DEXT (target,
+        attachment, GL_TEXTURE_1D, texHandle, 0);
+      break;
+    case GL_TEXTURE_2D:
+    case GL_TEXTURE_RECTANGLE_ARB:
+      G3D->ext->glFramebufferTexture2DEXT (target, 
+        attachment, textarget, texHandle, 0);
+      break;
+    case GL_TEXTURE_CUBE_MAP:
+      G3D->ext->glFramebufferTexture2DEXT (target, 
+        attachment, 
+        GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + subtexture, 
+        texHandle, 0);
+      break;
+    case GL_TEXTURE_3D:
+      G3D->ext->glFramebufferTexture3DEXT (target, 
+        attachment, textarget, texHandle, 0,
+        subtexture);
+      break;
+  }
+}
+
 bool csGLRender2TextureEXTfbo::SetRenderTarget (iTextureHandle* handle, 
                                                 bool persistent,
                                                 int subtexture,
@@ -339,10 +368,9 @@ bool csGLRender2TextureEXTfbo::SetRenderTarget (iTextureHandle* handle,
       G3D->statecache->SetTexture (GL_TEXTURE_2D, 0);
     }
 
-    // FIXME: Support cube map faces, rect textures etc. at some point
     // @@@ TODO: investigate if it's worth to cache attachments
-    G3D->ext->glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, 
-      fbattachment, GL_TEXTURE_2D, tex_mm->GetHandle(), 0);
+    FramebufferTexture (GL_FRAMEBUFFER_EXT, fbattachment, 
+      tex_mm->GetGLTextureTarget(),  tex_mm->GetHandle(), subtexture);
     
     GLenum fbStatus = G3D->ext->glCheckFramebufferStatusEXT (
       GL_FRAMEBUFFER_EXT);
@@ -355,8 +383,8 @@ bool csGLRender2TextureEXTfbo::SetRenderTarget (iTextureHandle* handle,
 	  "framebuffer status: %s - falling back to backbuffer", 
 	  FBStatusStr (fbStatus));
 	  
-      G3D->ext->glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, 
-	fbattachment, GL_TEXTURE_2D, 0, 0);
+      FramebufferTexture (GL_FRAMEBUFFER_EXT, fbattachment, 
+	tex_mm->GetGLTextureTarget(),  0, 0);
       return false;
     }
     
