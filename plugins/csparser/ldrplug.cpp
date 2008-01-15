@@ -23,6 +23,9 @@
 #include "iutil/document.h"
 #include "iutil/objreg.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(csparser)
+{
+
 struct csLoaderPluginRec
 {
   csString ShortName;
@@ -205,3 +208,5 @@ void csLoader::csLoadedPluginVector::NewPlugin
   }
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(csparser)

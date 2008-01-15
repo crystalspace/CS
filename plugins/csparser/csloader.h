@@ -25,8 +25,10 @@
 #include "csgeom/quaternion.h"
 #include "csutil/array.h"
 #include "csutil/csstring.h"
+#include "csutil/cscolor.h"
 #include "csutil/hash.h"
 #include "csutil/refarr.h"
+#include "csutil/weakrefarr.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/threading/thread.h"
 #include "csutil/strhash.h"
@@ -40,6 +42,8 @@
 #include "iutil/plugin.h"
 #include "ivaria/engseq.h"
 #include "ivideo/graph3d.h"
+
+#include "proxyimage.h"
 
 class csReversibleTransform;
 class csColor;
@@ -84,6 +88,9 @@ struct iSequenceWrapper;
 struct iEngineSequenceParameters;
 struct iSharedVariable;
 struct iSceneNodeArray;
+
+CS_PLUGIN_NAMESPACE_BEGIN(csparser)
+{
 
 class csLoader;
 struct csLoaderPluginRec;
@@ -214,6 +221,27 @@ private:
 
   /// Auto regions flag
   bool autoRegions;
+
+  struct ProxyKeyColour
+  {
+    bool do_transp;
+    csColor colours;
+  };
+
+  struct ProxyTexture
+  {
+    csWeakRef<iTextureWrapper> textureWrapper;
+    csRef<ProxyImage> img;
+    csAlphaMode::AlphaType alphaType;
+    bool always_animate;
+    ProxyKeyColour keyColour;
+  };
+
+  /// Points to proxy textures ready for processing.
+  csSafeCopyArray<ProxyTexture> proxyTextures;
+
+  /// Points to materials created by the current map loading.
+  csWeakRefArray<iMaterialWrapper> materialArray;
   
   //Returns in the 'meshesArray' array all the meshes encountered walking thru
   //the hierarchy of meshes starting from 'meshWrapper'.
@@ -321,7 +349,8 @@ private:
 	iEngineSequenceParameters* base_params);
 
   /// Parse a list of textures and add them to the engine.
-  bool ParseTextureList (iLoaderContext* ldr_context, iDocumentNode* node);
+  bool ParseTextureList (iLoaderContext* ldr_context, iDocumentNode* node,
+  	bool useProxyTextures);
   /**
    * Parse a list of materials and add them to the engine. If a prefix is
    * given, all material names will be prefixed with the corresponding string.
@@ -337,7 +366,7 @@ private:
 
   /// Parse a texture definition and add the texture to the engine
   iTextureWrapper* ParseTexture (iLoaderContext* ldr_context,
-  	iDocumentNode* node);
+  	iDocumentNode* node, bool useProxyTextures);
 
   /// Parse a Cubemap texture definition and add the texture to the engine
   iTextureWrapper* ParseCubemap (iLoaderContext* ldr_context,
@@ -392,7 +421,8 @@ private:
   bool ParseShaderList (iLoaderContext* ldr_context, iDocumentNode* node);
   bool ParseShader (iLoaderContext* ldr_context, iDocumentNode* node,
     iShaderManager* shaderMgr);
-  virtual csRef<iShader> LoadShader (const char* filename, bool registerShader = true);
+  virtual csRef<iShader> LoadShader (const char* filename,
+    bool registerShader = true);
 
   /**
    * Load a LOD control object.
@@ -485,11 +515,13 @@ private:
    * thing templates, sounds and textures.
    */
   bool LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* node,
-  	iStreamSource* ssource, iMissingLoaderData* missingdata);
+  	iStreamSource* ssource, iMissingLoaderData* missingdata,
+	bool loadProxyTex = true, bool useProxyTextures = false);
 
   /// Load map from a memory buffer
   bool LoadMap (iLoaderContext* ldr_context, iDocumentNode* world_node,
-  	iStreamSource* ssource, iMissingLoaderData* missingdata);
+  	iStreamSource* ssource, iMissingLoaderData* missingdata, 
+	bool useProxyTextures = false);
 
   /// Get the engine sequence manager (load it if not already present).
   iEngineSequenceManager* GetEngineSequenceManager ();
@@ -537,6 +569,7 @@ private:
   void AddChildrenToRegion (iLoaderContext* ldr_context,
     const iSceneNodeArray* children);
 
+public:
   /// Report any error.
   void ReportError (const char* id, const char* description, ...)
 	CS_GNUC_PRINTF(3,4);
@@ -558,7 +591,12 @@ private:
   	const char* description, ...)
 	CS_GNUC_PRINTF(4,5);
 
+  static csPtr<iImage> GenerateErrorTexture (int width, int height);
   csPtr<iImage> LoadImage (iDataBuffer* buf, const char* fname, int Format);
+
+private:
+  // Load all proxy textures which are used.
+  bool LoadProxyTextures();
 
 public:
   /********** iLoader implementation **********/
@@ -613,44 +651,49 @@ public:
   virtual csPtr<iSndSysData> LoadSoundSysData (const char *fname);
   virtual csPtr<iSndSysStream> LoadSoundStream (const char *fname,
   	int mode3d);
-  virtual iSndSysWrapper* LoadSoundWrapper (const char *name, const char *fname);
+  virtual iSndSysWrapper* LoadSoundWrapper (const char *name,
+  	const char *fname);
 
   virtual csPtr<iLoaderStatus> ThreadedLoadMapFile (const char* filename,
 	iRegion* region, bool curRegOnly, bool checkDupes);
-  virtual bool LoadMapFile (const char* filename, bool clearEngine = true,
-	iRegion* region = 0, bool curRegOnly = true,
-	bool checkDupes = false, iStreamSource* ssource = 0,
-	iMissingLoaderData* missingdata = 0, bool forceLoadTextures = true);
-  virtual bool LoadMap (iDocumentNode* world_node, bool clearEngine = true,
-	iRegion* region = 0, bool curRegOnly = true,
-	bool checkDupes = false, iStreamSource* ssource = 0,
-	iMissingLoaderData* missingdata = 0, bool forceLoadTextures = true);
-  virtual bool LoadLibraryFile (const char* filename, iRegion* region = 0,
-  	bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
-	iMissingLoaderData* missingdata = 0, bool forceLoadTextures = true);
-  virtual bool LoadLibrary (iDocumentNode* lib_node, iRegion* region = 0,
-  	bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
-	iMissingLoaderData* missingdata = 0, bool forceLoadTextures = true);
+  virtual bool LoadMapFile (const char* filename, bool clearEngine,
+	iRegion* region, bool curRegOnly, bool checkDupes,
+	iStreamSource* ssource, iMissingLoaderData* missingdata,
+	bool useProxyTextures = false);
+  virtual bool LoadMap (iDocumentNode* world_node, bool clearEngine,
+	iRegion* region, bool curRegOnly, bool checkDupes,
+	iStreamSource* ssource, iMissingLoaderData* missingdata,
+	bool useProxyTextures = false);
+  virtual bool LoadMapLibraryFile (const char* filename, iRegion* region,
+  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+        iMissingLoaderData* missingdata, bool useProxyTextures,
+        bool loadProxyTex = true);
+  virtual bool LoadLibraryFile (const char* filename, iRegion* region,
+  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+        iMissingLoaderData* missingdata, bool useProxyTextures);
+  virtual bool LoadLibrary (iDocumentNode* lib_node, iRegion* region,
+  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+        iMissingLoaderData* missingdata, bool useProxyTextures);
   bool LoadLibraryFromNode (iLoaderContext* ldr_context,
-	iDocumentNode* child,
-	iStreamSource* ssource, iMissingLoaderData* missingdata);
+	iDocumentNode* child, iStreamSource* ssource,
+        iMissingLoaderData* missingdata, bool loadProxyTex = true);
 
   bool Load (iDataBuffer* buffer, const char* fname, iBase*& result,
   	iRegion* region, bool curRegOnly, bool checkDupes,
 	iStreamSource* ssource, const char* override_name,
-	iMissingLoaderData* missingdata, bool forceLoadTextures = true);
+	iMissingLoaderData* missingdata, bool useProxyTextures = false);
   virtual bool Load (const char* fname, iBase*& result, iRegion* region,
   	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-	const char* override_name, iMissingLoaderData* missingdata, 
-        bool forceLoadTextures);
+	const char* override_name, iMissingLoaderData* missingdata,
+	bool useProxyTextures);
   virtual bool Load (iDataBuffer* buffer, iBase*& result, iRegion* region,
   	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-        const char* override_name, iMissingLoaderData* missingdata, 
-        bool forceLoadTextures);
+	const char* override_name, iMissingLoaderData* missingdata,
+	bool useProxyTextures);
   virtual bool Load (iDocumentNode* node, iBase*& result, iRegion* region,
   	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-        const char* override_name, iMissingLoaderData* missingdata, 
-        bool forceLoadTextures);
+	const char* override_name, iMissingLoaderData* missingdata,
+	bool useProxyTextures);
 
   virtual void SetAutoRegions (bool autoRegions)
   {
@@ -667,6 +710,9 @@ public:
   virtual csPtr<iMeshWrapper> LoadMeshObject (const char* fname,
   	iStreamSource* ssource);
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(csparser)
 
 #include "csutil/deprecated_warn_on.h"
 

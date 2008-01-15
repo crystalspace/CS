@@ -39,6 +39,9 @@
 #include "iutil/objreg.h"
 #include "ivaria/sequence.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(csparser)
+{
+
 static iSequenceWrapper* FindSequence (iEngineSequenceManager* eseqmgr,
 		const char* name)
 {
@@ -675,7 +678,8 @@ iSequenceWrapper* csLoader::CreateSequence (iDocumentNode* node)
   // LoadSequences() already checked for the presence of the engine
   // sequence manager.
 
-  iSequenceWrapper* sequence = ::CreateSequence (
+  iSequenceWrapper* sequence = 
+    CS_PLUGIN_NAMESPACE_NAME(csparser)::CreateSequence (
 	GetEngineSequenceManager (), seqname);
   if (!sequence)
   {
@@ -1353,3 +1357,6 @@ iSharedVariable *csLoader::FindSharedVariable(const char *colvar,
     }
     return 0;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(csparser)

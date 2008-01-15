@@ -12,6 +12,7 @@ chronological order.
 	- res merged r27667 from rendermanager branch to trunk (better support
 	  for textures exceeding the framebuffer dimensions in framebuffer r2t
 	  backend).
+	- Mike Gist got animated textures working with proxy textures.
 14-Jan-2008
 	- Mike Gist committed a patch from Trymm to fix a crash in sprcal3d.
 	- res re-enabled PBO on ATI (latest driver fixes found issues).
@@ -266,12 +267,14 @@ chronological order.
 19-Dec-2007
 	- caedes added castle-tex.zip to install targets.
 18-Dec-2007
-	- Marten reverted the proxtexture implementation and related changes 
-	  meaning major parts of r28319, r28276, r28223, r28203, r28168,
-	  r28103 and r28097.
 	- Jorrit relaxed the rule on disabling VBO in gldrivers.xml. For
 	  the very first time version 2.1.7059 of the ATI drivers on Linux
 	  manages to get VBO right (and a lot of other things)!
+        - Mike Gist made a few changes to proxy textures; altered some argument
+          names, added some documentation for them and made proxy textures
+          be completely optional (and not the default). You now need to specify
+          when loading a map/library whether or not you want to use them.
+        - Save alphaType, keep_image and keycolour data in proxy textures.
 17-Dec-2007
 	- Marten removed the mutex locks in event queue and object registry.
 	  They indicated a thread safety where there actually is none and only
