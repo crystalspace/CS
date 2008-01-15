@@ -25,6 +25,7 @@
 #include "csgeom/quaternion.h"
 #include "csutil/array.h"
 #include "csutil/csstring.h"
+#include "csutil/cscolor.h"
 #include "csutil/hash.h"
 #include "csutil/refarr.h"
 #include "csutil/weakrefarr.h"
@@ -221,11 +222,19 @@ private:
   /// Auto regions flag
   bool autoRegions;
 
+  struct ProxyKeyColour
+  {
+    bool do_transp;
+    csColor colours;
+  };
+
   struct ProxyTexture
   {
-      csWeakRef<iTextureWrapper> textureWrapper;
-      csRef<ProxyImage> img;
-      csAlphaMode::AlphaType alphaType;
+    csWeakRef<iTextureWrapper> textureWrapper;
+    csRef<ProxyImage> img;
+    csAlphaMode::AlphaType alphaType;
+    bool always_animate;
+    ProxyKeyColour keyColour;
   };
 
   /// Points to proxy textures ready for processing.

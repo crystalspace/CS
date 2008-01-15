@@ -343,6 +343,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
       ProxyTexture proxTex;
       proxTex.img.AttachNew (new ProxyImage (this, filename));
+      proxTex.always_animate = always_animate;
 
       tex = Engine->GetTextureList()->NewTexture (proxTex.img);
       tex->SetTextureClass(context.GetClass());
@@ -354,12 +355,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       {
         proxTex.alphaType = alphaType;
       }
+
       if(keep_image)
         tex->SetKeepImage(true);
+
+      proxTex.keyColour.do_transp = do_transp;
       if(do_transp)
-        tex->SetKeyColor(csQint(transp.red * 255.99),
-                         csQint(transp.green * 255.99),
-                         csQint(transp.blue * 255.99));
+      {
+        proxTex.keyColour.colours = transp;
+      }
 
       proxTex.textureWrapper = tex;
       AddToRegion (ldr_context, proxTex.textureWrapper->QueryObject());

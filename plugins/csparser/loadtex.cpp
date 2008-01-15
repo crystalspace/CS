@@ -25,6 +25,7 @@
 
 #include "ivideo/graph3d.h"
 
+#include "csqint.h"
 #include "csgeom/math.h"
 #include "csgfx/imagecubemapmaker.h"
 #include "csgfx/imagememory.h"
@@ -39,9 +40,11 @@
 #include "iengine/material.h"
 #include "iengine/region.h"
 #include "iengine/texture.h"
+#include "igraphic/animimg.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
 #include "imap/reader.h"
+#include "itexture/iproctex.h"
 #include "iutil/databuff.h"
 #include "iutil/document.h"
 #include "iutil/object.h"
@@ -351,8 +354,51 @@ bool csLoader::LoadProxyTextures()
 
     csRef<iImage> img = proxTex.img->GetProxiedImage();
 
-    proxTex.textureWrapper->SetImageFile (img);
-    proxTex.textureWrapper->Register (tm);
+    csRef<iAnimatedImage> anim = scfQueryInterface<iAnimatedImage>(img);
+    if (anim && anim->IsAnimated())
+    {
+      iLoaderPlugin* plugin = NULL;
+      iBinaryLoaderPlugin* Binplug = NULL;
+      iDocumentNode* defaults = NULL;
+
+      loaded_plugins.FindPlugin(PLUGIN_TEXTURELOADER_ANIMIMG, plugin, Binplug, defaults);
+      if(plugin)
+      {
+        TextureLoaderContext context(proxTex.textureWrapper->QueryObject()->GetName());
+        context.SetClass(proxTex.textureWrapper->GetTextureClass());
+        context.SetFlags(proxTex.textureWrapper->GetFlags());
+        context.SetImage(img);
+
+        csRef<iBase> b = plugin->Parse(0, 0, 0, static_cast<iBase*>(&context));
+        if (b)
+        {
+          csWeakRef<iTextureWrapper> newTex = scfQueryInterface<iTextureWrapper>(b);
+          newTex->QueryObject()->SetName(proxTex.textureWrapper->QueryObject()->GetName());
+          newTex->SetTextureClass(context.GetClass());
+
+          proxTex.textureWrapper->SetTextureHandle(newTex->GetTextureHandle());
+          proxTex.textureWrapper->SetUseCallback(newTex->GetUseCallback());
+
+          csRef<iProcTexture> ipt = scfQueryInterface<iProcTexture> (proxTex.textureWrapper);
+          if(ipt)
+            ipt->SetAlwaysAnimate (proxTex.always_animate);
+        }
+      }
+
+    }
+    else
+    {
+      proxTex.textureWrapper->SetImageFile (img);
+      proxTex.textureWrapper->Register (tm);
+    }
+
+    if(proxTex.keyColour.do_transp)
+    {
+      proxTex.textureWrapper->SetKeyColor(csQint(proxTex.keyColour.colours.red * 255.99),
+        csQint(proxTex.keyColour.colours.green * 255.99),
+        csQint(proxTex.keyColour.colours.blue * 255.99));
+    }
+
     if(proxTex.alphaType != csAlphaMode::alphaNone)
     {
       proxTex.textureWrapper->GetTextureHandle()->SetAlphaType(proxTex.alphaType);
