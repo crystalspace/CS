@@ -35,6 +35,8 @@
 
 // Control if we want to use preprocessed file or run generation each time
 #define SCF_IMPLGEN_PREPROCESSED
+// Track some simple SCF-related stats
+//#define SCF_TRACK_STATS
 
 #ifndef CS_TYPENAME
   #ifdef CS_REF_TRACKER
@@ -121,6 +123,31 @@ public:
   };
 };
 
+/// Various helpers for scfImplementation
+class CS_CRYSTALSPACE_EXPORT scfImplementationHelper
+{
+protected:
+  enum
+  {
+    scfstatTotal,
+    scfstatParented,
+    scfstatWeakreffed,
+    scfstatMetadata,
+    scfstatIncRef,
+    scfstatDecRef,
+
+    scfstatsNum
+  };
+  static uint64 stats[scfstatsNum];
+
+  CS_FORCEINLINE void BumpStat (int stat)
+  {
+#ifdef SCF_TRACK_STATS
+    stats[stat]++;
+#endif
+  }
+};
+
 /**
  * Baseclass for the SCF implementation templates.
  * Provides common methods such as reference counting and handling of
@@ -128,6 +155,7 @@ public:
  */
 template<class Class>
 class scfImplementation : public virtual iBase,
+  public scfImplementationHelper,
   public CS::Memory::CustomAllocated
 {
 public:
@@ -139,6 +167,8 @@ public:
       scfRefCount (1), scfParent (parent), scfWeakRefOwners (0), 
       metadataList (0)
   {
+    BumpStat (scfstatTotal);
+    if (scfParent) BumpStat (scfstatParented);
     csRefTrackerAccess::TrackConstruction (object);
     if (scfParent) scfParent->IncRef ();
   }
@@ -189,6 +219,7 @@ public:
       if (scfParent) scfParent->DecRef();
       delete GetSCFObject();
     }
+    BumpStat (scfstatDecRef);
   }
 
   virtual void IncRef ()
@@ -197,6 +228,7 @@ public:
       scfRefCount != 0);
     csRefTrackerAccess::TrackIncRef (GetSCFObject(), scfRefCount);
     scfRefCount++;
+    BumpStat (scfstatIncRef);
   }
 
   virtual int GetRefCount ()
@@ -207,7 +239,10 @@ public:
   virtual void AddRefOwner (void** ref_owner)
   {
     if (!this->scfWeakRefOwners)
+    {
       scfWeakRefOwners = new WeakRefOwnerArray (0);
+      BumpStat (scfstatWeakreffed);
+    }
     scfWeakRefOwners->InsertSorted (ref_owner);
   }
 
@@ -227,6 +262,7 @@ public:
   {
     if (!metadataList)
     {
+      BumpStat (scfstatMetadata);
       // Need to set it up, do so
       AllocMetadata (GetInterfaceMetadataCount ());
       FillInterfaceMetadata (0);
