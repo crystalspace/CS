@@ -78,9 +78,11 @@ namespace RenderManager
             if (name >= lastName)
               break;
 
+            CS::ShaderVarStringID varName ((CS::StringIDValue)name);
+
             csShaderVariable* sv = varStack[name];
             if (sv != 0) 
-              fn ((csStringID)name, sv);
+              fn (varName, sv);
           }
           
         }

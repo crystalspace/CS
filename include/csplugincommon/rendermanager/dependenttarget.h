@@ -44,7 +44,7 @@ namespace RenderManager
      */
     struct TargetSettings
     {
-      csStringID svName;
+      CS::ShaderVarStringID svName;
       iView* view;
       iTextureHandle* target;
       int targetSubTexture;      
@@ -240,7 +240,7 @@ namespace RenderManager
         : parent (parent), renderTree (renderTree)
       {}
 
-      void operator() (csStringID name, csShaderVariable* sv)
+      void operator() (CS::ShaderVarStringID name, csShaderVariable* sv)
       {
         if (sv->GetType() != csShaderVariable::TEXTURE)
           return;
@@ -293,7 +293,7 @@ namespace RenderManager
 
 
       void HandleView (iView* targetView,
-        iTextureHandle* texh, int subtexture, csStringID svName)
+        iTextureHandle* texh, int subtexture, CS::ShaderVarStringID svName)
       {
         if (!targetView) return;
 

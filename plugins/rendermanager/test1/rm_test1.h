@@ -53,7 +53,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMTest1)
     virtual bool Initialize (iObjectRegistry*);
 
     // Target manager handler
-    bool HandleTargetSetup (csStringID svName, csShaderVariable* sv, 
+    bool HandleTargetSetup (CS::ShaderVarStringID svName, csShaderVariable* sv, 
       iTextureHandle* textureHandle, iView*& localView)
     {
       return false;

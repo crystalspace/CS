@@ -65,7 +65,7 @@ namespace RenderManager
     
     void AddShaderType (csStringID shaderType)
     {
-      shaderTypes.Push (shaderType);
+      shaderTypes.Push (static_cast<StringIDValue> (shaderType));
     }
 
     size_t GetLayerCount () const
@@ -89,10 +89,11 @@ namespace RenderManager
     }
 
   private:
-    csDirtyAccessArray<StringIDValue,
+    /*csDirtyAccessArray<StringIDValue,
       csArrayElementHandler<StringIDValue>,
       CS::Memory::AllocatorMalloc,
-      csArrayCapacityFixedGrow<1> > shaderTypes;
+      csArrayCapacityFixedGrow<1> > shaderTypes;*/
+    csDirtyAccessArray<StringIDValue> shaderTypes;
     iShader* defaultShader;
   };
 
