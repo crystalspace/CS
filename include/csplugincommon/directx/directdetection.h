@@ -77,8 +77,8 @@ public:
   bool CheckDevices();
   bool CheckDevices2D();
 
-  void ReportResult (int severity, char *str, HRESULT hRes);
-  void SystemFatalError (char *str, HRESULT hRes);
+  void ReportResult (int severity, const char *str, HRESULT hRes);
+  void SystemFatalError (const char *str, HRESULT hRes);
 
   /// List of devices
   csArray<DirectDetectionDevice> Devices; 
