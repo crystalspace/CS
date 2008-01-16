@@ -25,7 +25,7 @@
  */
 
 #include "csutil/fixedsizeallocator.h"
-
+#include "csutil/metautils.h"
 #include "csutil/custom_new_disable.h"
 
 /**\addtogroup util_memory
@@ -105,6 +105,30 @@ public:
 };
 
 /**
+ * 
+ */
+struct csBlockAllocatorSizeObject
+{
+  template<typename T>
+  struct Size
+  {
+    static const unsigned int value = sizeof(T);
+  };
+};
+
+/**
+ * 
+ */
+template<unsigned int Alignment>
+struct csBlockAllocatorSizeObjectAlign
+{
+  template<typename T>
+  struct Size
+  {
+    static const unsigned int value = CS::Meta::AlignSize<T, Alignment>::value;
+  };
+};
+/**
  * This class implements a memory allocator which can efficiently allocate
  * objects that all have the same size. It has no memory overhead per
  * allocation (unless the objects are smaller than sizeof(void*) bytes) and is
@@ -125,12 +149,17 @@ public:
  * \sa csMemoryPool
  */
 template <class T,
-  class Allocator = CS::Memory::AllocatorMalloc, 
-  class ObjectDispose = csBlockAllocatorDisposeDelete<T> >
-class csBlockAllocator : public csFixedSizeAllocator<sizeof (T), Allocator>
+  typename Allocator = CS::Memory::AllocatorMalloc, 
+  typename ObjectDispose = csBlockAllocatorDisposeDelete<T>,
+  typename SizeComputer = csBlockAllocatorSizeObject
+>
+class csBlockAllocator : 
+  public csFixedSizeAllocator<
+    SizeComputer::Size<T>::value, 
+    Allocator>
 {
 public:
-  typedef csBlockAllocator<T, Allocator> ThisType;
+  typedef csBlockAllocator<T, Allocator, SizeComputer> ThisType;
   typedef T ValueType;
   typedef Allocator AllocatorType;
 

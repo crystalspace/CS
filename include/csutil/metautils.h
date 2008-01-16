@@ -23,8 +23,7 @@
 namespace CS
 {
   namespace Meta
-  {
-   
+  {   
     namespace Implementation
     {
 
@@ -70,6 +69,16 @@ namespace CS
     struct AlignmentOf
     {
       static const unsigned int value = Implementation::AlignmentOfImpl<T>::value;
+    };
+
+    /**
+     * Return the smallest size bigger than size of T aligned to given alignment.
+     * Alignment should be a power of two.
+     */
+    template<typename T, unsigned int Alignment>
+    struct AlignSize
+    {
+      static const unsigned int value = (sizeof(T) + (Alignment - 1)) & ~(Alignment-1);
     };
 
     /**

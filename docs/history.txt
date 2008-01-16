@@ -8,6 +8,9 @@ chronological order.
 
 16-Jan-2008
 	- Marten updated some code to work after the recent string ID change.
+	- Marten added a very empty AABB-tree.
+	- Marten did a few changes to the block allocator to allow it to 
+	  allocate aligned objects.
 13-Jan-2008
 	- res updated the mk/jam/ build files with the versions from trunk.
 	- res changed how string IDs are typed. Instead of a simple alias for
