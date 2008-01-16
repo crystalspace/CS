@@ -160,7 +160,7 @@ const char* csBdAttr::GetValueStr (csBinaryDocument* doc) const
 
 void csBinaryDocAttribute::DecRef ()
 {
-  csRefTrackerAccess::TrackDecRef (scfObject, scfRefCount);
+  csRefTrackerAccess::TrackDecRef (GetSCFObject(), scfRefCount);
   if (scfRefCount == 1)
   {
     // Not needed atm
@@ -790,7 +790,7 @@ uint csBdNode::ctNum ()
 
 void csBinaryDocNode::DecRef ()
 {
-  csRefTrackerAccess::TrackDecRef (scfObject, scfRefCount);
+  csRefTrackerAccess::TrackDecRef (GetSCFObject(), scfRefCount);
   if (scfRefCount == 1)
   {
     // Not needed atm

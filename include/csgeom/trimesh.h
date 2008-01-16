@@ -164,7 +164,7 @@ public:
  * A convenience triangle mesh implementation that represents a cube.
  */
 class CS_CRYSTALSPACE_EXPORT csTriangleMeshBox :
-  public virtual scfImplementation1<csTriangleMeshBox,iTriangleMesh>
+  public scfImplementation1<csTriangleMeshBox,iTriangleMesh>
 {
 private:
   csVector3 vertices[8];
@@ -234,7 +234,7 @@ public:
  * this class is still in use.
  */
 class CS_CRYSTALSPACE_EXPORT csTriangleMeshPointer :
-  public virtual scfImplementation1<csTriangleMeshPointer,iTriangleMesh>
+  public scfImplementation1<csTriangleMeshPointer,iTriangleMesh>
 {
 private:
   csVector3* vertices;

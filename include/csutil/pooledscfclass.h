@@ -141,11 +141,11 @@ public:
   /// DecRef() implementation that returns the object to the pool.
   void DecRef ()
   {
-    csRefTrackerAccess::TrackDecRef (this->scfObject, this->scfRefCount);
+    csRefTrackerAccess::TrackDecRef (this->GetSCFObject(), this->scfRefCount);
     this->scfRefCount--;
     if (this->scfRefCount == 0)
     {
-      delete this->scfObject;
+      delete this->GetSCFObject();
     }
   }
 

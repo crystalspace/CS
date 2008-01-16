@@ -1946,7 +1946,7 @@ void csGenmeshMeshObjectFactory::Compress ()
 }
 
 class csTriangleMeshGenMesh :
-  public virtual scfImplementation1<csTriangleMeshGenMesh,iTriangleMesh>
+  public scfImplementation1<csTriangleMeshGenMesh,iTriangleMesh>
 {
 private:
   csGenmeshMeshObjectFactory* factory;
