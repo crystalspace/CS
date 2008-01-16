@@ -54,6 +54,7 @@ for debugging maps if you don't want to spend time relighting them first.
 This is a general commandline option with which you can load any plugin
 into your application. One common option is to use this for loading
 the @samp{bugplug} debugging plugin like this: @samp{-plugin=bugplug}.
+@xref{BugPlug}.
 
 @item -cfgset=@dots{}
 With this commandline option you can set a configuration option on

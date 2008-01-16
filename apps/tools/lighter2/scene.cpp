@@ -624,17 +624,6 @@ namespace lighter
     progress.SetProgress (0);
 
     // Parse sectors
-    /*sectorProgress.SetProgress (0);
-    iSectorList *sectorList = globalLighter->engine->GetSectors ();
-    float progressStep = 1.0f / sectorList->GetCount ();
-    for (int i = 0; i < sectorList->GetCount (); i++)
-    {
-      Statistics::Progress* progSector = 
-        sectorProgress.CreateProgress (progressStep);
-      ParseSector (fileInfo, sectorList->Get (i), *progSector);
-      delete progSector;
-    }
-    sectorProgress.SetProgress (1);*/
 
     // Map mesh objects loaded from each scene file to it
     iSectorList *sectorList = globalLighter->engine->GetSectors ();

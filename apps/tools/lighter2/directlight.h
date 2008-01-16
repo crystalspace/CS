@@ -166,13 +166,16 @@ namespace lighter
     csVector3 ComputeElementNormal (ElementProxy element,
       const csVector3& pt) const;
     csVector3 ComputeVertexNormal (Object* obj, size_t index) const;
+    
+    void ComputeAffectingLights (Object* obj);
 
     // Data...
     csVector3 tangentSpaceNorm;
     bool fancyTangentSpaceNorm;
     size_t subLightmapNum;
     PVLPointShader pvlPointShader;
-    LMElementShader lmElementShader;    
+    LMElementShader lmElementShader;
+    csBitArray affectingLights;
   };
 }
 

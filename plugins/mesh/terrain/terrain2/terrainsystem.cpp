@@ -227,7 +227,7 @@ csTerrainColliderCollideSegmentResult csTerrainSystem::CollideSegment (
 
     csVector3 isect;
 
-    if (csIntersect3::ClipSegmentBox (seg, box, use_ray) >= 0)
+    if (csIntersect3::ClipSegmentBox (seg, box, use_ray))
     {
       rc = cells[i]->CollideSegment (seg.End (), seg.Start ());
       if (rc.hit)

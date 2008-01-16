@@ -346,14 +346,14 @@ PyObject *csPython::FindFunction(const char *url,bool do_errors)
 bool csPython::Store (const char *name, iScriptValue *value)
 {
   int result;
-  char *last_dot = strrchr(name,'.');
+  const char *last_dot = strrchr(name,'.');
   if (last_dot)
   {
     // variable is inside some hierachy
     const csString url(name,last_dot-name);
     PyObject *py_curr = FindObject(url);
     if (!py_curr) return false;
-    result = PyObject_SetAttrString(py_curr,last_dot+1,Query(value)->self);
+    result = PyObject_SetAttrString(py_curr,const_cast<char*>(last_dot+1),Query(value)->self);
   }
   else
   {
@@ -382,14 +382,14 @@ csPtr<iScriptValue> csPython::Retrieve (const char *name)
 bool csPython::Remove (const char *name) 
 {
   int result;
-  char *last_dot = strrchr(name,'.');
+  const char *last_dot = strrchr(name,'.');
   if (last_dot)
   {
     // variable is inside some hierachy
     const csString url(name,last_dot-name);
     PyObject *py_curr = FindObject(url);
     if (!py_curr) return false;
-    result = PyObject_DelAttrString(py_curr,last_dot+1);
+    result = PyObject_DelAttrString(py_curr,const_cast<char*>(last_dot+1));
   }
   else
   {

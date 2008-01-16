@@ -39,6 +39,13 @@ namespace lighter
       csColor c;
       c.Set (srcPtr->red * ub2f, srcPtr->green * ub2f, srcPtr->blue * ub2f);
       float a = srcPtr->alpha * ub2f;
+      /* The filter image contains the color value the light passing through
+         the texture is modulated with.
+         When alpha goes toward 0, modulation should go toward white (pass light
+         through).
+         When alpha goes toward 1, modulation should go toward black (shadow).
+         In between, the color also influences the light modulation.
+       */
       c *= (1-a);
       c = csLerp (csColor (1, 1, 1), c, a);
       *dstPtr++ = c;

@@ -28,14 +28,6 @@ namespace lighter
 {
   //-------------------------------------------------------------------------
 
-/*  static const float ElementQuadrantConstants[][2] =
-  {
-    {-0.25f, -0.25f},
-    {-0.25f,  0.25f},
-    { 0.25f, -0.25f},
-    { 0.25f,  0.25f}
-  };*/
-
   DirectLighting::DirectLighting (const csVector3& tangentSpaceNorm, 
     size_t subLightmapNum) : tangentSpaceNorm (tangentSpaceNorm),
     fancyTangentSpaceNorm (!(tangentSpaceNorm - csVector3 (0, 0, 1)).IsZero ()),
@@ -63,6 +55,8 @@ namespace lighter
 
     for (size_t i = 0; i < allLights.GetSize (); ++i)
     {
+      if (!affectingLights.IsBitSet (i)) continue;
+
       float rndValues[2];
       lightSampler.GetNext (rndValues);
 
@@ -79,7 +73,6 @@ namespace lighter
   {
     SamplerSequence<3> lightSampler (sampler);
 
-    csColor res (0);
     const LightRefArray& allLights = sector->allNonPDLights;
 
     // Select random light
@@ -87,6 +80,7 @@ namespace lighter
     lightSampler.GetNext (rndValues);
 
     size_t lightIdx = (size_t) floorf (allLights.GetSize () * rndValues[2]);
+    if (!affectingLights.IsBitSet (lightIdx)) return csColor (0);
 
     return ShadeLight (allLights[lightIdx], obj, point, normal, sampler) * 
       allLights.GetSize ();
@@ -153,6 +147,7 @@ namespace lighter
     csColor res (0);
     for (size_t i = 0; i < allLights.GetSize (); ++i)
     {
+      if (!lighting.affectingLights.IsBitSet (i)) continue;
       res += lighting.ShadeLight (allLights[i], obj, point,
         normal, lightSampler, shadowIgnorePrimitive, fullIgnore);
     }
@@ -178,6 +173,7 @@ namespace lighter
     lightSampler.GetNext (rndValues);
     size_t lightIdx = (size_t) floorf (allLights.GetSize () * rndValues[2]);
 
+    if (!lighting.affectingLights.IsBitSet (lightIdx)) return csColor (0);
     return lighting.ShadeLight (allLights[lightIdx], obj, point,
       normal, sampler, shadowIgnorePrimitive, fullIgnore);
   }
@@ -250,8 +246,11 @@ namespace lighter
     float lightPdf, cosineTerm = 0;
     csVector3 lightVec;
 
-    float lightSamples[2];
-    lightSampler.GetNext (lightSamples);
+    const bool isDelta = true; //light->IsDeltaLight (); no support for area lights yet
+
+    float lightSamples[2] = {0};
+    if (!isDelta)
+      lightSampler.GetNext (lightSamples);
 
     csColor lightColor = light->SampleLight (point, normal, lightSamples[0],
       lightSamples[1], lightVec, lightPdf, visTester);
@@ -275,7 +274,7 @@ namespace lighter
       else if (occlusion == VisibilityTester::occlPartial)
         lightColor *= visTester.GetFilterColor ();
 
-      if (light->IsDeltaLight ())
+      if (isDelta)
         return lightColor * fabsf (cosineTerm) / lightPdf;
       else
         // Properly handle area sources! See pbrt page 732
@@ -292,6 +291,8 @@ namespace lighter
   {
     progress.SetProgress (0);
     size_t totalElements = 0;
+    
+    affectingLights.SetSize (sector->allNonPDLights.GetSize ());
 
     // Sum up total amount of elements for progress display purposes
     ObjectHash::GlobalIterator giter = sector->allObjects.GetIterator ();
@@ -331,6 +332,7 @@ namespace lighter
 
       if (!obj->GetFlags ().Check (OBJECT_FLAG_NOLIGHT))
       {
+        ComputeAffectingLights (obj);
         if (obj->lightPerVertex)
           ShadePerVertex (sector, obj, masterSampler, progressState);
         else
@@ -513,4 +515,15 @@ namespace lighter
       return obj->GetVertexData().normals[index];
   }
   
+  void DirectLighting::ComputeAffectingLights (Object* obj)
+  {
+    Sector* sector = obj->GetSector();
+    
+    for (size_t i = 0; i < sector->allNonPDLights.GetSize(); i++)
+    {
+      Light* light = sector->allNonPDLights[i];
+      affectingLights.Set (i,
+        light->GetBoundingSphere().TestIntersect (obj->GetBoundingSphere()));
+    }
+  }
 }

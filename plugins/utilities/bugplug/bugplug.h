@@ -103,8 +103,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(BugPlug)
 #define DEBUGCMD_ILACE		1011	// Enable interlacing
 #define DEBUGCMD_MMX		1012	// Enable MMX
 #define DEBUGCMD_TRANSP		1013	// Enable transparent mode
-#define DEBUGCMD_MIPMAP		1014	// Set mipmapping mode
-#define DEBUGCMD_INTER		1015	// Set interpolation mode
 #define DEBUGCMD_GAMMA		1016	// Set gamma
 #define DEBUGCMD_DBLBUFF	1017	// Set double buffering (G2D)
 #define DEBUGCMD_DUMPCAM	1018	// Dump the camera
@@ -238,6 +236,7 @@ private:
   csRef<iVirtualClock> vc;
   csRef<iFont> fnt;
   csRef<iStringSet> stringSet, stringSetSvName;
+  csRef<iStandardReporterListener> stdrep;
   bool initialized;
   csConfigAccess config;
   /**

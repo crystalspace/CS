@@ -50,6 +50,9 @@ namespace lighter
     /// Redraw the TUI
     void Redraw (int drawFlags = TUI_DRAW_ALL);
 
+    /// Finish drawing
+    void FinishDraw ();
+
     /// iReporterListener
     virtual bool Report (iReporter* reporter, int severity, const char* msgId,
       const char* description);
@@ -76,6 +79,7 @@ namespace lighter
 
     //Update simple output, if anything to update
     void DrawSimple ();
+    void DrawSimpleEnd ();
 
     // Reporting stuff
     csString messageBuffer[4];

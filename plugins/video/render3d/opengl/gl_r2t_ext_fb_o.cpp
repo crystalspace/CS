@@ -119,8 +119,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
   //-------------------------------------------------------------------------
 
   csGLRender2TextureEXTfbo::csGLRender2TextureEXTfbo (csGLGraphics3D* G3D) :
-    csGLRender2TextureFramebuf (G3D), enableFBO (true), allocatedFBOs (FBOListAlloc (8)), 
-    frameNum (0), lastFBOPurge (0) 
+    csGLRender2TextureFramebuf (G3D), enableFBO (true),
+    currentFBO (0), allocatedFBOs (FBOListAlloc (8)), frameNum (0), lastFBOPurge (0) 
   {
     FBOWrapper testFBO (G3D->ext);
     GLenum fbStatus = GL_FRAMEBUFFER_UNSUPPORTED_EXT;
@@ -278,94 +278,137 @@ const char* csGLRender2TextureEXTfbo::FBStatusStr (GLenum status)
   }
 }
 
-void csGLRender2TextureEXTfbo::SetRenderTarget (iTextureHandle* handle, 
+void csGLRender2TextureEXTfbo::RegenerateTargetMipmaps (RTAttachment& target)
+{
+  if (!target.texture) return;
+
+  csGLBasicTextureHandle* tex_mm = 
+    static_cast<csGLBasicTextureHandle*> (target.texture->GetPrivateObject ());
+  if (!(tex_mm->GetFlags() & CS_TEXTURE_NOMIPMAPS))
+  {
+    tex_mm->RegenerateMipmaps();
+  }
+}
+
+void csGLRender2TextureEXTfbo::FramebufferTexture (GLenum target, GLenum attachment, 
+						   GLenum textarget, GLuint texHandle,
+						   int subtexture)
+{
+  switch (textarget)
+  {
+    case GL_TEXTURE_1D:
+      G3D->ext->glFramebufferTexture1DEXT (target,
+        attachment, GL_TEXTURE_1D, texHandle, 0);
+      break;
+    case GL_TEXTURE_2D:
+    case GL_TEXTURE_RECTANGLE_ARB:
+      G3D->ext->glFramebufferTexture2DEXT (target, 
+        attachment, textarget, texHandle, 0);
+      break;
+    case GL_TEXTURE_CUBE_MAP:
+      G3D->ext->glFramebufferTexture2DEXT (target, 
+        attachment, 
+        GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + subtexture, 
+        texHandle, 0);
+      break;
+    case GL_TEXTURE_3D:
+      G3D->ext->glFramebufferTexture3DEXT (target, 
+        attachment, textarget, texHandle, 0,
+        subtexture);
+      break;
+  }
+}
+
+bool csGLRender2TextureEXTfbo::SetRenderTarget (iTextureHandle* handle, 
                                                 bool persistent,
-                                                int subtexture)
+                                                int subtexture,
+                                                csRenderTargetAttachment attachment)
 {
   if (enableFBO)
   {
-    if (handle == 0)
-    {
-      G3D->ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
-      //glReadBuffer (GL_BACK);
-    }
-    else
+    if (currentFBO == 0)
     {
       handle->GetRendererDimensions (txt_w, txt_h);
-      csGLBasicTextureHandle* tex_mm = 
-        static_cast<csGLBasicTextureHandle*> (handle->GetPrivateObject ());
-      if (!tex_mm->IsWasRenderTarget())
-      {
-        tex_mm->SetupAutoMipping();
-        tex_mm->SetWasRenderTarget (true);
-        G3D->statecache->SetTexture (GL_TEXTURE_2D, tex_mm->GetHandle());
-	// FIXME: Take persistence into account?
-        tex_mm->EnsureUncompressed (false);
-        G3D->statecache->SetTexture (GL_TEXTURE_2D, 0);
-      }
-
-      FBOWrapper& fbo = GetFBO (txt_w, txt_h);
-
-      if ((fbo.txthandle != handle) || (fbo.subtex != subtexture))
-      {
-        fbo.txthandle = handle;
-        fbo.subtex = subtexture;
-
-        //glReadBuffer (GL_NONE);
-        G3D->ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, fbo.framebuffer);
-
-	// FIXME: Support cube map faces, rect textures etc. at some point
-        GLenum textarget = tex_mm->GetGLTextureTarget();
-        switch (textarget)
-        {
-          case GL_TEXTURE_1D:
-            G3D->ext->glFramebufferTexture1DEXT (GL_FRAMEBUFFER_EXT,
-              GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_1D, tex_mm->GetHandle(), 0);
-            break;
-          case GL_TEXTURE_2D:
-          case GL_TEXTURE_RECTANGLE_ARB:
-            G3D->ext->glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, 
-              GL_COLOR_ATTACHMENT0_EXT, textarget, tex_mm->GetHandle(), 0);
-            break;
-          case GL_TEXTURE_CUBE_MAP:
-            G3D->ext->glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, 
-              GL_COLOR_ATTACHMENT0_EXT, 
-              GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + subtexture, 
-              tex_mm->GetHandle(), 0);
-            break;
-          case GL_TEXTURE_3D:
-            G3D->ext->glFramebufferTexture3DEXT (GL_FRAMEBUFFER_EXT, 
-              GL_COLOR_ATTACHMENT0_EXT, textarget, tex_mm->GetHandle(), 0,
-              subtexture);
-            break;
-        }
-
-        GLenum fbStatus = G3D->ext->glCheckFramebufferStatusEXT (
-          GL_FRAMEBUFFER_EXT);
-        if (fbStatus != GL_FRAMEBUFFER_COMPLETE_EXT)
-        {
-          G3D->ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
-          enableFBO = false;
-          //glReadBuffer (GL_BACK);
-          if (G3D->verbose)
-            G3D->Report (CS_REPORTER_SEVERITY_WARNING, 
-              "framebuffer status: %s - falling back to backbuffer", 
-              FBStatusStr (fbStatus));
-          allocatedFBOs.DeleteAll ();
-        }
-      }
-      else
-      {
-	// The framebuffer should still be set up for txthandle
-        G3D->ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, fbo.framebuffer);
-      }
-      fbo.lastUsedFrame = frameNum;
+      currentFBO = &GetFBO (txt_w, txt_h);
+      Set2DViewport ();
+      currentFBO->lastUsedFrame = frameNum;
+      //glReadBuffer (GL_NONE);
+      G3D->ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, currentFBO->framebuffer);
     }
+    
+    GLenum fbattachment;
+    GLenum internalFormat;
+    RTAttachment* fbAttach;
+    switch (attachment)
+    {
+    case rtaColor0:
+      fbattachment = GL_COLOR_ATTACHMENT0_EXT;
+      internalFormat = GL_RGBA;
+      fbAttach = &colorTarget;
+      break;
+    case rtaDepth:
+      fbattachment = GL_DEPTH_ATTACHMENT_EXT;
+      internalFormat = GL_DEPTH_COMPONENT;
+      fbAttach = &depthTarget;
+      break;
+    default:
+      return false;
+    }
+    
+    csGLBasicTextureHandle* tex_mm = 
+      static_cast<csGLBasicTextureHandle*> (handle->GetPrivateObject ());
+    if (!tex_mm->IsWasRenderTarget())
+    {
+      tex_mm->SetupAutoMipping();
+      tex_mm->SetWasRenderTarget (true);
+      G3D->statecache->SetTexture (GL_TEXTURE_2D, tex_mm->GetHandle());
+      // FIXME: Take persistence into account?
+      glTexImage2D (GL_TEXTURE_2D, 0, internalFormat, txt_w, txt_h, 
+	0, internalFormat, GL_UNSIGNED_BYTE, 0);
+      G3D->statecache->SetTexture (GL_TEXTURE_2D, 0);
+    }
+
+    // @@@ TODO: investigate if it's worth to cache attachments
+    FramebufferTexture (GL_FRAMEBUFFER_EXT, fbattachment, 
+      tex_mm->GetGLTextureTarget(),  tex_mm->GetHandle(), subtexture);
+    
+    GLenum fbStatus = G3D->ext->glCheckFramebufferStatusEXT (
+      GL_FRAMEBUFFER_EXT);
+    if (fbStatus != GL_FRAMEBUFFER_COMPLETE_EXT)
+    {
+      //G3D->ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
+      //glReadBuffer (GL_BACK);
+      if (G3D->verbose)
+	G3D->Report (CS_REPORTER_SEVERITY_WARNING, 
+	  "framebuffer status: %s - falling back to backbuffer", 
+	  FBStatusStr (fbStatus));
+	  
+      FramebufferTexture (GL_FRAMEBUFFER_EXT, fbattachment, 
+	tex_mm->GetGLTextureTarget(),  0, 0);
+      return false;
+    }
+    
+    fbAttach->texture = handle;
+    fbAttach->subtexture = subtexture;
+    return true;
   }
-  if (enableFBO)
-    csGLRender2TextureFramebuf::SetRenderTarget (handle, false, subtexture);
   else
-    csGLRender2TextureFramebuf::SetRenderTarget (handle, persistent, subtexture);
+    return csGLRender2TextureFramebuf::SetRenderTarget (handle, persistent,
+      subtexture, attachment);
+}
+
+void csGLRender2TextureEXTfbo::UnsetRenderTargets ()
+{
+  if (enableFBO)
+  {
+    G3D->ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
+    //glReadBuffer (GL_BACK);
+    currentFBO = 0;
+    colorTarget.Clear();
+    depthTarget.Clear();
+  }
+  else
+    csGLRender2TextureFramebuf::UnsetRenderTargets ();
 }
 
 void csGLRender2TextureEXTfbo::FinishDraw ()
@@ -376,12 +419,8 @@ void csGLRender2TextureEXTfbo::FinishDraw ()
   csGLRender2TextureFramebuf::FinishDraw();
   //G3D->ext->glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
-  csGLBasicTextureHandle* tex_mm = 
-    static_cast<csGLBasicTextureHandle*> (render_target->GetPrivateObject ());
-  if (!(tex_mm->GetFlags() & CS_TEXTURE_NOMIPMAPS))
-  {
-    tex_mm->RegenerateMipmaps();
-  }
+  RegenerateTargetMipmaps (colorTarget);
+  RegenerateTargetMipmaps (depthTarget);
 
   frameNum++;
   if (frameNum >= lastFBOPurge+fboPurgeAfter)

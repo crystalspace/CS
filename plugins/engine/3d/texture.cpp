@@ -35,7 +35,7 @@ csTextureWrapper::csTextureWrapper (csEngine* engine, iImage *Image)
   image = Image;
   keep_image = engine->csEngine::GetDefaultKeepImage();
   texClass = 0;
-  UpdateKeyColorFromImage ();
+  keyColorDirty = true;
 }
 
 csTextureWrapper::csTextureWrapper (csEngine* engine, iTextureHandle *ith) 
@@ -54,7 +54,7 @@ csTextureWrapper::csTextureWrapper (csEngine* engine, iTextureHandle *ith)
     flags = 0;
   }
 
-  UpdateKeyColorFromHandle ();
+  keyColorDirty = true;
 }
 
 csTextureWrapper::csTextureWrapper (csEngine* engine)
@@ -82,7 +82,7 @@ csTextureWrapper::csTextureWrapper (const csTextureWrapper &t) :
   else
     texClass = 0;
 
-  UpdateKeyColorFromImage ();
+  keyColorDirty = true;
 }
 
 csTextureWrapper::~csTextureWrapper ()
@@ -96,7 +96,7 @@ void csTextureWrapper::SetImageFile (iImage *Image)
   image = Image;
 
   if (image)
-    UpdateKeyColorFromImage ();
+    keyColorDirty = true;
 }
 
 void csTextureWrapper::SetTextureHandle (iTextureHandle *tex)
@@ -106,7 +106,7 @@ void csTextureWrapper::SetTextureHandle (iTextureHandle *tex)
   handle = tex;
 
   flags = handle->GetFlags ();
-  UpdateKeyColorFromHandle ();
+  keyColorDirty = true;
 }
 
 void csTextureWrapper::SetKeyColor (int red, int green, int blue)
@@ -119,6 +119,7 @@ void csTextureWrapper::SetKeyColor (int red, int green, int blue)
   key_col_r = red;
   key_col_g = green;
   key_col_b = blue;
+  keyColorDirty = false;
 }
 
 void csTextureWrapper::Register (iTextureManager *txtmgr)
@@ -150,6 +151,8 @@ void csTextureWrapper::Register (iTextureManager *txtmgr)
   handle = txtmgr->RegisterTexture (image, flags, fail_reason);
   if (handle)
   {
+    if (keyColorDirty)
+      UpdateKeyColorFromHandle ();
     SetKeyColor (key_col_r, key_col_g, key_col_b);
     handle->SetTextureClass (texClass);
     delete[] texClass; texClass = 0; 

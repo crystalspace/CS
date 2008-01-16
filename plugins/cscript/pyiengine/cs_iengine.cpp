@@ -32124,6 +32124,56 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iPortal_GetObjectSphere(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iPortal *arg1 = (iPortal *) 0 ;
+  csSphere *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iPortal_GetObjectSphere",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iPortal, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iPortal_GetObjectSphere" "', argument " "1"" of type '" "iPortal *""'"); 
+  }
+  arg1 = reinterpret_cast< iPortal * >(argp1);
+  {
+    csSphere const &_result_ref = (arg1)->GetObjectSphere();
+    result = (csSphere *) &_result_ref;
+  }
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csSphere, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iPortal_GetWorldSphere(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iPortal *arg1 = (iPortal *) 0 ;
+  csSphere *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iPortal_GetWorldSphere",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iPortal, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iPortal_GetWorldSphere" "', argument " "1"" of type '" "iPortal *""'"); 
+  }
+  arg1 = reinterpret_cast< iPortal * >(argp1);
+  {
+    csSphere const &_result_ref = (arg1)->GetWorldSphere();
+    result = (csSphere *) &_result_ref;
+  }
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csSphere, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iPortal_ComputeCameraPlane(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iPortal *arg1 = (iPortal *) 0 ;
@@ -35260,6 +35310,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iPortal_GetVertexIndicesCount", _wrap_iPortal_GetVertexIndicesCount, METH_VARARGS, NULL},
 	 { (char *)"iPortal_GetObjectPlane", _wrap_iPortal_GetObjectPlane, METH_VARARGS, NULL},
 	 { (char *)"iPortal_GetWorldPlane", _wrap_iPortal_GetWorldPlane, METH_VARARGS, NULL},
+	 { (char *)"iPortal_GetObjectSphere", _wrap_iPortal_GetObjectSphere, METH_VARARGS, NULL},
+	 { (char *)"iPortal_GetWorldSphere", _wrap_iPortal_GetWorldSphere, METH_VARARGS, NULL},
 	 { (char *)"iPortal_ComputeCameraPlane", _wrap_iPortal_ComputeCameraPlane, METH_VARARGS, NULL},
 	 { (char *)"iPortal_PointOnPolygon", _wrap_iPortal_PointOnPolygon, METH_VARARGS, NULL},
 	 { (char *)"iPortal_SetSector", _wrap_iPortal_SetSector, METH_VARARGS, NULL},

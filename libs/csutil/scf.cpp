@@ -584,8 +584,8 @@ void* csSCF::QueryInterface (scfInterfaceID iInterfaceID,
   if (iInterfaceID == scfInterfaceTraits<iSCF>::GetID () &&
     scfCompatibleVersion (iVersion, scfInterfaceTraits<iSCF>::GetVersion ()))
   {
-    scfObject->IncRef ();
-    return static_cast<iSCF*> (scfObject);
+    GetSCFObject()->IncRef ();
+    return static_cast<iSCF*> (GetSCFObject());
   }
 #ifdef CS_REF_TRACKER
   if (refTracker)

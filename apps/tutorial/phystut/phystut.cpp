@@ -658,7 +658,7 @@ iRigidBody* Simple::CreateSphere ()
   rb->AttachMesh (mesh);
 
   // Create and attach a sphere collider.
-  rb->AttachColliderSphere (radius.Norm()/2, csVector3 (0, .5, 0), 10, 1, 0.8f);
+  rb->AttachColliderSphere (r, csVector3 (0, .5, 0), 10, 1, 0.8f);
 
   // Fling the body.
   rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 6));

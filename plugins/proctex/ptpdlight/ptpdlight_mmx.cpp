@@ -169,7 +169,6 @@ void ProctexPDLight::Animate_MMX ()
   for (size_t i = 0; i < lights.GetSize(); i++)
   {
     if (!lightBits.IsBitSet (i)) continue;
-    MappedLight& light = lights[i];
 
     lightFactors[l] = _mm_set_pi16 (0,
       lightFactors_ui16[l*3+0],

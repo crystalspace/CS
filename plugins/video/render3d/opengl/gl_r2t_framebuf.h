@@ -31,8 +31,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 class csGLRender2TextureFramebuf : public csGLRender2TextureBackend
 {
 protected:
-  /// Current render target.
-  csRef<iTextureHandle> render_target;
+  //@{
+  /// Current render targets.
+  RTAttachment colorTarget;
+  RTAttachment depthTarget;
+  bool targetsSet;
+  //@}
   /// If true then the current render target has been put on screen.
   bool rt_onscreen;
   /// Old clip rect to restore after rendering on a proc texture.
@@ -42,15 +46,19 @@ protected:
   /// Framebuffer dimensions
   int framebufW, framebufH;
 
-  int sub_texture_id;
   csDirtyAccessArray<uint8> pixelScratch;
+  void Set2DViewport ();
+  void GrabFramebuffer (const RTAttachment& target, GLenum internalFormat);
 public:
   csGLRender2TextureFramebuf (csGLGraphics3D* G3D) 
-    : csGLRender2TextureBackend (G3D) { }
+    : csGLRender2TextureBackend (G3D), targetsSet (false), 
+      rt_onscreen (false) { }
 
-  virtual void SetRenderTarget (iTextureHandle* handle, 
-	  bool persistent,
-	  int subtexture);
+  bool SetRenderTarget (iTextureHandle* handle, bool persistent,
+    int subtexture, csRenderTargetAttachment attachment);
+  void UnsetRenderTargets();
+  bool CanSetRenderTarget (const char* format, csRenderTargetAttachment attachment);
+  iTextureHandle* GetRenderTarget (csRenderTargetAttachment attachment, int* subtexture) const;
 
   virtual void BeginDraw (int drawflags);
   virtual void SetupProjection ();

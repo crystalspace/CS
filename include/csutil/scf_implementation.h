@@ -136,8 +136,8 @@ public:
    * Will be called from scfImplementation(Ext)N constructor
    */
   scfImplementation (Class *object, iBase *parent = 0) :
-      scfObject (object), scfRefCount (1), scfParent (parent), 
-        scfWeakRefOwners (0), metadataList (0)
+      scfRefCount (1), scfParent (parent), scfWeakRefOwners (0), 
+      metadataList (0)
   {
     csRefTrackerAccess::TrackConstruction (object);
     if (scfParent) scfParent->IncRef ();
@@ -162,7 +162,7 @@ public:
   // Cleanup
   virtual ~scfImplementation()
   {
-    csRefTrackerAccess::TrackDestruction (scfObject, scfRefCount);
+    csRefTrackerAccess::TrackDestruction (GetSCFObject(), scfRefCount);
     scfRemoveRefOwners ();
     CleanupMetadata ();
   }
@@ -181,13 +181,13 @@ public:
   {
     CS_ASSERT_MSG("Refcount decremented for destroyed object", 
       scfRefCount != 0);
-    csRefTrackerAccess::TrackDecRef (scfObject, scfRefCount);
+    csRefTrackerAccess::TrackDecRef (GetSCFObject(), scfRefCount);
     scfRefCount--;
     if (scfRefCount == 0)
     {
       scfRemoveRefOwners ();
       if (scfParent) scfParent->DecRef();
-      delete scfObject;
+      delete GetSCFObject();
     }
   }
 
@@ -195,7 +195,7 @@ public:
   {
     CS_ASSERT_MSG("Refcount incremented from inside dtor", 
       scfRefCount != 0);
-    csRefTrackerAccess::TrackIncRef (scfObject, scfRefCount);
+    csRefTrackerAccess::TrackIncRef (GetSCFObject(), scfRefCount);
     scfRefCount++;
   }
 
@@ -236,7 +236,8 @@ public:
   }
 
 protected:
-  Class *scfObject;
+  Class* GetSCFObject() { return static_cast<Class*> (this); }
+  const Class* GetSCFObject() const { return static_cast<const Class*> (this); }
 
   int scfRefCount;
   iBase *scfParent;
@@ -269,8 +270,8 @@ protected:
     if (iInterfaceID == scfInterfaceTraits<iBase>::GetID () &&
       scfCompatibleVersion (iVersion, scfInterfaceTraits<iBase>::GetVersion ()))
     {
-      scfObject->IncRef ();
-      return static_cast<iBase*> (scfObject);
+      GetSCFObject()->IncRef ();
+      return static_cast<iBase*> (GetSCFObject());
     }
 
     // For embedded interfaces

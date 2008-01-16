@@ -1274,6 +1274,8 @@ class iPortal(core.iBase):
     def GetVertexIndicesCount(*args): return _iengine.iPortal_GetVertexIndicesCount(*args)
     def GetObjectPlane(*args): return _iengine.iPortal_GetObjectPlane(*args)
     def GetWorldPlane(*args): return _iengine.iPortal_GetWorldPlane(*args)
+    def GetObjectSphere(*args): return _iengine.iPortal_GetObjectSphere(*args)
+    def GetWorldSphere(*args): return _iengine.iPortal_GetWorldSphere(*args)
     def ComputeCameraPlane(*args): return _iengine.iPortal_ComputeCameraPlane(*args)
     def PointOnPolygon(*args): return _iengine.iPortal_PointOnPolygon(*args)
     def SetSector(*args): return _iengine.iPortal_SetSector(*args)

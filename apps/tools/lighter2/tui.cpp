@@ -82,6 +82,14 @@ namespace lighter
     fflush (stdout);
   }
 
+  void TUI::FinishDraw ()
+  {
+    if (simpleMode)
+    {
+      DrawSimpleEnd ();
+    }
+  }
+
   static const char* TUI_SEVERITY_TEXT[] = 
   {
     CS_ANSI_FK CS_ANSI_BW "B" CS_ANSI_RST " ",
@@ -133,18 +141,18 @@ namespace lighter
     csPrintf ("| Part progress:                                                              |\n");
     csPrintf ("|                                                                             |\n");
     csPrintf ("|-----------------------------------------------------------------------------|\n");
-    csPrintf ("| RayCore  | Settings   | Scene Stats                                         |\n");
-    csPrintf ("| Time:    | [ ] DL     | Sectors:                                            |\n");
-    csPrintf ("|          | [ ] GI     |                                                     |\n");
-    csPrintf ("| Rays:    | [ ] LMs    | Objects:                                            |\n");
-    csPrintf ("|          | [ ] AO     |                                                     |\n");
-    csPrintf ("| Rays/s:  | PLM:       | Lightmaps:                                          |\n");
+    csPrintf ("| Rays:    | Settings   | Scene Stats                                         |\n");
+    csPrintf ("|          | [ ] DL     | S:                                                  |\n");
+    csPrintf ("|          | [ ] GI     | O:                                                  |\n");
+    csPrintf ("|          | [ ] LMs    | L:                                                  |\n");
+    csPrintf ("|          | [ ] AO     | LM:                                                 |\n");
+    csPrintf ("|          | PLM:       |                                                     |\n");
     csPrintf ("|          |            |                                                     |\n");
     csPrintf ("|          | ALM:       | KD-stats                                            |\n");
     csPrintf ("|          |            | N:                                                  |\n");
-    csPrintf ("|          | Tu/u:      | D:                                                  |\n");
+    csPrintf ("|          | Density:   | D:                                                  |\n");
     csPrintf ("|          |            | P:                                                  |\n");
-    csPrintf ("|          | Tv/v:      |                                                     |\n");
+    csPrintf ("|          |            |                                                     |\n");
     csPrintf ("|          |            |                                                     |\n");
     csPrintf ("|- CS Messages ---------------------------------------------------------------|\n");
     csPrintf ("|                                                                             |\n");
@@ -175,65 +183,26 @@ namespace lighter
     csPrintf (CS_ANSI_CURSOR(14,13) "%#4.2g", globalConfig.GetDIProperties ().pointLightMultiplier);
     csPrintf (CS_ANSI_CURSOR(14,15) "%#4.2g", globalConfig.GetDIProperties ().areaLightMultiplier);
 
-    /* @@@ FIXME: We don't need to display the same value twice, one as If Tu/u 
-                  and once as Tv/v ... */
     csPrintf (CS_ANSI_CURSOR(14,17) "%#4.2g", globalConfig.GetLMProperties ().lmDensity);
-    csPrintf (CS_ANSI_CURSOR(14,19) "%#4.2g", globalConfig.GetLMProperties ().lmDensity);
 
     csPrintf (CS_ANSI_CURSOR(1,1));
   }
 
   void TUI::DrawRayCore () const
   {
-    // Time
-    csString unit ("us");
-    uint64 time = globalStats.raytracer.usRaytracing;
-
-    if (time > CONST_UINT64(1000000))
-    {
-      time /= CONST_UINT64(1000000);
-      unit = "s ";
-    }
-    else if (time > CONST_UINT64(1000))
-    {
-      time /= CONST_UINT64(1000);
-      unit = "ms";
-    }
-
-    csPrintf (CS_ANSI_CURSOR(3,9) "%6" PRIu64 " %s", time, unit.GetDataSafe ());
-
     // Rays
     const char* siConv[] = {" ", "K", "M", "G", "T"};
 
     uint64 rays = globalStats.raytracer.numRays;
     int prefix = 0;
     
-    while (rays > CONST_UINT64(10000) && prefix < 5)
+    while (rays > CONST_UINT64(99999) && prefix < 5)
     {
       rays /= CONST_UINT64(1000);
       prefix++;
     }
 
-    csPrintf (CS_ANSI_CURSOR(3,11) "%6" PRIu64 " %s", rays, siConv[prefix]);
-
-    // Rays per second
-    if (globalStats.raytracer.usRaytracing < 10)
-      return; 
-
-    uint64 raysPerS = (globalStats.raytracer.numRays*CONST_UINT64(1000000)) / (globalStats.raytracer.usRaytracing);
-    uint64 raysPerSfraction = raysPerS - (raysPerS / CONST_UINT64(1000))*CONST_UINT64(1000);
-    raysPerSfraction *= CONST_UINT64(1000);
-
-    prefix = 0;
-    while (raysPerS > CONST_UINT64(10000) && prefix < 5)
-    {
-      raysPerS /= CONST_UINT64(1000);
-      raysPerSfraction /= CONST_UINT64(1000);
-      prefix++;
-    }
-
-    csPrintf (CS_ANSI_CURSOR(2,13) "%2" PRIu64 ".%03" PRIu64 " %s", raysPerS, raysPerSfraction, siConv[prefix]);
-    csPrintf (CS_ANSI_CURSOR(1,1));
+    csPrintf (CS_ANSI_CURSOR(3,8) "%6" PRIu64 " %s", rays, siConv[prefix]);
   }
 
   void TUI::DrawProgress () const
@@ -318,21 +287,6 @@ namespace lighter
 
   void TUI::DrawSimple ()
   {
-    // Check if kd-tree haven't been printed but now have been created
-    if (globalStats.kdtree.numNodes != kdLastNumNodes)
-    {
-      prevWasReporter = false;
-      // Print KD-tree stats
-      csPrintf ("\nKD-tree: \n");
-      csPrintf ("N: %8zu / %8zu\n", globalStats.kdtree.numNodes, globalStats.kdtree.leafNodes);
-      csPrintf ("D: %8zu / %8.03f\n", globalStats.kdtree.maxDepth, 
-        (float)globalStats.kdtree.sumDepth / (float)globalStats.kdtree.leafNodes);
-      csPrintf ("P: %8zu / %8.03f\n", globalStats.kdtree.numPrimitives, 
-        (float)globalStats.kdtree.numPrimitives / (float)globalStats.kdtree.leafNodes);
-
-      kdLastNumNodes = globalStats.kdtree.numNodes;
-    }
-
     const char* lt = (const char*)lastTask;
     const char* tn = globalStats.progress.GetTaskName ();
     if ((lt == 0 && tn != 0) || (lt != 0 && lastTask != tn))
@@ -357,4 +311,18 @@ namespace lighter
       }
     }
   }
+
+  void TUI::DrawSimpleEnd ()
+  {
+    // Print KD-tree stats
+    csPrintf ("\nKD-tree: \n");
+    csPrintf ("N: %8zu / %8zu\n", globalStats.kdtree.numNodes, globalStats.kdtree.leafNodes);
+    csPrintf ("D: %8zu / %8.03f\n", globalStats.kdtree.maxDepth, 
+      (float)globalStats.kdtree.sumDepth / (float)globalStats.kdtree.leafNodes);
+    csPrintf ("P: %8zu / %8.03f\n", globalStats.kdtree.numPrimitives, 
+      (float)globalStats.kdtree.numPrimitives / (float)globalStats.kdtree.leafNodes);
+
+    kdLastNumNodes = globalStats.kdtree.numNodes;
+  }
+
 }

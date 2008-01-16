@@ -699,6 +699,15 @@ APPLY_TYPEMAP_ARGOUT_PTR(csKeyModifiers,csKeyModifiers& modifiers)
    (trips compilation on msvc) */
 typedef int int32_t;
 
+TYPEMAP_ARGOUT_PTR(csKeyEventData)
+APPLY_TYPEMAP_ARGOUT_PTR(csKeyEventData,csKeyEventData& data)
+TYPEMAP_ARGOUT_PTR(csMouseEventData)
+APPLY_TYPEMAP_ARGOUT_PTR(csMouseEventData,csMouseEventData& data)
+TYPEMAP_ARGOUT_PTR(csJoystickEventData)
+APPLY_TYPEMAP_ARGOUT_PTR(csJoystickEventData,csJoystickEventData& data)
+TYPEMAP_ARGOUT_PTR(csCommandEventData)
+APPLY_TYPEMAP_ARGOUT_PTR(csCommandEventData,csCommandEventData& data)
+
 %include "csutil/event.h"
 %extend iEvent {
 	csEventError RetrieveString(const char *name, char *&v)
@@ -706,7 +715,6 @@ typedef int int32_t;
 		return self->Retrieve(name,(const char *&)v);
 	}
 }
-
 
 %include "iutil/evdefs.h"
 %include "iutil/eventq.h"

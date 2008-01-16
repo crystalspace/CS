@@ -5674,6 +5674,18 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetDebugFile = *cspacec::iStandardReporterListener_SetDebugFile;
 *SetDefaults = *cspacec::iStandardReporterListener_SetDefaults;
 *SetMessageDestination = *cspacec::iStandardReporterListener_SetMessageDestination;
+*SetStandardOutput = *cspacec::iStandardReporterListener_SetStandardOutput;
+*IsStandardOutput = *cspacec::iStandardReporterListener_IsStandardOutput;
+*SetStandardError = *cspacec::iStandardReporterListener_SetStandardError;
+*IsStandardError = *cspacec::iStandardReporterListener_IsStandardError;
+*SetConsoleOutput = *cspacec::iStandardReporterListener_SetConsoleOutput;
+*IsConsoleOutput = *cspacec::iStandardReporterListener_IsConsoleOutput;
+*SetAlertOutput = *cspacec::iStandardReporterListener_SetAlertOutput;
+*IsAlertOutput = *cspacec::iStandardReporterListener_IsAlertOutput;
+*SetDebugOutput = *cspacec::iStandardReporterListener_SetDebugOutput;
+*IsDebugOutput = *cspacec::iStandardReporterListener_IsDebugOutput;
+*SetPopupOutput = *cspacec::iStandardReporterListener_SetPopupOutput;
+*IsPopupOutput = *cspacec::iStandardReporterListener_IsPopupOutput;
 *RemoveMessages = *cspacec::iStandardReporterListener_RemoveMessages;
 *ShowMessageID = *cspacec::iStandardReporterListener_ShowMessageID;
 *GetDebugFile = *cspacec::iStandardReporterListener_GetDebugFile;
@@ -6485,6 +6497,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetMaxForce = *cspacec::iJoint_GetMaxForce;
 *SetAngularConstraintAxis = *cspacec::iJoint_SetAngularConstraintAxis;
 *GetAngularConstraintAxis = *cspacec::iJoint_GetAngularConstraintAxis;
+*RebuildJoint = *cspacec::iJoint_RebuildJoint;
 *scfGetVersion = *cspacec::iJoint_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -8559,7 +8572,9 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetPerspectiveAspect = *cspacec::iGraphics3D_SetPerspectiveAspect;
 *GetPerspectiveAspect = *cspacec::iGraphics3D_GetPerspectiveAspect;
 *SetRenderTarget = *cspacec::iGraphics3D_SetRenderTarget;
+*CanSetRenderTarget = *cspacec::iGraphics3D_CanSetRenderTarget;
 *GetRenderTarget = *cspacec::iGraphics3D_GetRenderTarget;
+*UnsetRenderTargets = *cspacec::iGraphics3D_UnsetRenderTargets;
 *BeginDraw = *cspacec::iGraphics3D_BeginDraw;
 *FinishDraw = *cspacec::iGraphics3D_FinishDraw;
 *Print = *cspacec::iGraphics3D_Print;
@@ -10628,6 +10643,7 @@ sub new {
 *Invert = *cspacec::csPlane3_Invert;
 *Normalize = *cspacec::csPlane3_Normalize;
 *FindPoint = *cspacec::csPlane3_FindPoint;
+*ProjectOnto = *cspacec::csPlane3_ProjectOnto;
 *FindOrthogonalPoints = *cspacec::csPlane3_FindOrthogonalPoints;
 *ClipPolygon = *cspacec::csPlane3_ClipPolygon;
 *Description = *cspacec::csPlane3_Description;
@@ -10980,49 +10996,6 @@ sub DESTROY {
     }
 }
 
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::csGeomDebugHelper ##############
-
-package cspace::csGeomDebugHelper;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace );
-%OWNER = ();
-%ITERATORS = ();
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_csGeomDebugHelper(@_);
-    bless $self, $pkg if defined($self);
-}
-
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_csGeomDebugHelper($self);
-        delete $OWNER{$self};
-    }
-}
-
-*GetSupportedTests = *cspacec::csGeomDebugHelper_GetSupportedTests;
-*UnitTest = *cspacec::csGeomDebugHelper_UnitTest;
-*StateTest = *cspacec::csGeomDebugHelper_StateTest;
-*Benchmark = *cspacec::csGeomDebugHelper_Benchmark;
-*Dump = *cspacec::csGeomDebugHelper_Dump;
-*DebugCommand = *cspacec::csGeomDebugHelper_DebugCommand;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -12062,6 +12035,7 @@ sub DESTROY {
 *AddVertex = *cspacec::csTriangleMesh_AddVertex;
 *GetVertexCount = *cspacec::csTriangleMesh_GetVertexCount;
 *AddTriangle = *cspacec::csTriangleMesh_AddTriangle;
+*AddTriangleMesh = *cspacec::csTriangleMesh_AddTriangleMesh;
 *GetTriangle = *cspacec::csTriangleMesh_GetTriangle;
 *GetTriangleCount = *cspacec::csTriangleMesh_GetTriangleCount;
 *Clear = *cspacec::csTriangleMesh_Clear;
@@ -18568,6 +18542,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetVertexIndicesCount = *cspacec::iPortal_GetVertexIndicesCount;
 *GetObjectPlane = *cspacec::iPortal_GetObjectPlane;
 *GetWorldPlane = *cspacec::iPortal_GetWorldPlane;
+*GetObjectSphere = *cspacec::iPortal_GetObjectSphere;
+*GetWorldSphere = *cspacec::iPortal_GetWorldSphere;
 *ComputeCameraPlane = *cspacec::iPortal_ComputeCameraPlane;
 *PointOnPolygon = *cspacec::iPortal_PointOnPolygon;
 *SetSector = *cspacec::iPortal_SetSector;
@@ -19878,7 +19854,6 @@ sub SCF_VERBOSE_PLUGIN_LOAD () { $cspacec::SCF_VERBOSE_PLUGIN_LOAD }
 sub SCF_VERBOSE_PLUGIN_REGISTER () { $cspacec::SCF_VERBOSE_PLUGIN_REGISTER }
 sub SCF_VERBOSE_CLASS_REGISTER () { $cspacec::SCF_VERBOSE_CLASS_REGISTER }
 sub SCF_VERBOSE_ALL () { $cspacec::SCF_VERBOSE_ALL }
-sub CS_DBGHELP_UNITTEST () { $cspacec::CS_DBGHELP_UNITTEST }
 sub CS_DBGHELP_BENCHMARK () { $cspacec::CS_DBGHELP_BENCHMARK }
 sub CS_DBGHELP_TXTDUMP () { $cspacec::CS_DBGHELP_TXTDUMP }
 sub CS_DBGHELP_GFXDUMP () { $cspacec::CS_DBGHELP_GFXDUMP }
@@ -20205,6 +20180,8 @@ sub csSimpleMeshScreenspace () { $cspacec::csSimpleMeshScreenspace }
 sub CS_OPENPORTAL_ZFILL () { $cspacec::CS_OPENPORTAL_ZFILL }
 sub CS_OPENPORTAL_MIRROR () { $cspacec::CS_OPENPORTAL_MIRROR }
 sub CS_OPENPORTAL_FLOAT () { $cspacec::CS_OPENPORTAL_FLOAT }
+sub rtaDepth () { $cspacec::rtaDepth }
+sub rtaColor0 () { $cspacec::rtaColor0 }
 sub csmcNone () { $cspacec::csmcNone }
 sub csmcArrow () { $cspacec::csmcArrow }
 sub csmcLens () { $cspacec::csmcLens }

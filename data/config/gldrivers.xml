@@ -23,6 +23,22 @@
     
     The rules are evaluated in the order they appear in the database.
   -->
+
+<!--
+    IMPORTANT: PLEASE COMMENT RULES
+    
+    When you add or change a tweak please make sure to add a small comment
+    on that change above the rule! (If there's no comment yet, add one ;)
+    The comment should include the date, who discovered the issue(or tweak),
+    the hardware it happened on, platform, and driver version (practically
+    all that information can be cut from CS --verbose=-scf output); when 
+    adding a new tweak spend a few words on the issue that is worked around.
+    These comments are currently the closest thing to a "database" of HW/driver
+    issues we have; without them we'd quickly lose track of why certain tweaks
+    were introduced and it'd be much harder to determine whether a certain
+    tweak could be disabled for e.g. newer drivers. So please _always_ update
+    the comments!
+  -->
 <gldriverdb>
   <configs>
     <config name="brokenstencil">
@@ -305,6 +321,7 @@
       <conditions fulfill="all">
 	<regexp string="platform" pattern="Unix" />
 	<regexp string="vendor" pattern="^ATI" />
+	<comparever version="gl" relation="lt 2.1.7059" />
       </conditions>
       <applicable>
 	<usecfg>novbo</usecfg>
@@ -612,10 +629,14 @@
 		    When setting texture data with ARB_pixel_buffer_object,
 		    the first 512 lines of the texture are repeted every
 		    512 lines (in other words, data past line 512 is invalid).
+      * 2008-01-14: RADEON 9700 PRO x86/MMX/3DNow!/SSE, Win32, 
+                    OpenGL 2.1.7169, GL driver: atioglxx.dll 6.14.10.7169
+		    Issue has been fixed.
       -->
     <rule description="ATI: Disable broken pixel buffer objects">
       <conditions>
 	<regexp string="vendor" pattern="^ATI" />
+	<comparever version="gl" relation="lt 2.1.7169" />
       </conditions>
       <applicable>
 	<usecfg>nopbo</usecfg>

@@ -76,6 +76,7 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   csRef<iVFS> vfs;
   csRef<iView> view;
   csRef<iCEGUI> cegui;
+  csString renderLoop;
   iSector* room;
   int x,y;
 
@@ -118,8 +119,8 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   static void Help ();
   void HandleCommandLine();
 
-  void CreateRoom ();
-  void CreateGui ();
+  bool CreateRoom ();
+  bool CreateGui ();
   void LoadLibrary(const char* file);
   void LoadTexture(const char* file, const char* name);
   void LoadSprite (const char* file);

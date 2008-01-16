@@ -176,9 +176,6 @@ public:
     csVector2 *iVertices, size_t iVertCount);
 };
 
-// To silence EnableZOffset/DisableZOffset
-#include "csutil/deprecated_warn_off.h"
-
 class csGLGraphics3D : public scfImplementation3<csGLGraphics3D, 
 						 iGraphics3D,
 						 iComponent,
@@ -273,17 +270,17 @@ private:
   csGraphics3DCaps rendercaps;
   GLint maxNpotsTexSize;
 
-  csRef<iShaderVarStringSet> strings;
+  csRef<iStringSet> strings;
 
-  CS::ShaderVarStringID string_vertices;
-  CS::ShaderVarStringID string_texture_coordinates;
-  CS::ShaderVarStringID string_normals;
-  CS::ShaderVarStringID string_colors;
-  CS::ShaderVarStringID string_indices;
-  CS::ShaderVarStringID string_point_radius;
-  CS::ShaderVarStringID string_point_scale;
-  CS::ShaderVarStringID string_texture_diffuse;
-  CS::ShaderVarStringID string_world2camera;
+  csStringID string_vertices;
+  csStringID string_texture_coordinates;
+  csStringID string_normals;
+  csStringID string_colors;
+  csStringID string_indices;
+  csStringID string_point_radius;
+  csStringID string_point_scale;
+  csStringID string_texture_diffuse;
+  csStringID string_world2camera;
 
   csConfigAccess config;
 
@@ -332,9 +329,6 @@ private:
   // For debugging: inhibit all drawing of meshes till next frame.
   bool debug_inhibit_draw;
 
-  /// Current render target.
-  csRef<iTextureHandle> render_target;
-  int rt_subtex;
   csGLRender2TextureBackend* r2tbackend;
 
   /// Should we use special buffertype (VBO) or just system memory
@@ -367,11 +361,12 @@ private:
   // @@@ Jorrit: to avoid flickering I had to increase the
   // values below and multiply them with 3.
   //{ glPolygonOffset (-0.05f, -2.0f); 
-  {  }
+  { glPolygonOffset (-0.15f, -6.0f); 
+  statecache->Enable_GL_POLYGON_OFFSET_FILL (); }
 
   // Disables offsetting of Z values
   void DisableZOffset ()
-  {  }
+  { statecache->Disable_GL_POLYGON_OFFSET_FILL (); }
 
   // Debug function to visualize the stencil with the given mask.
   void DebugVisualizeStencil (uint32 mask);
@@ -418,15 +413,17 @@ private:
     GLenum& compGLType);
   void RenderRelease (iRenderBuffer* buffer);
 
-  struct ImageUnit : public CS::Memory::CustomAllocated
-  {
-    bool enabled;
-    GLuint target;    
-    
-    ImageUnit (): enabled (false), target (0) {}
-  };
-  GLint numImageUnits;
-  ImageUnit* imageUnits;
+/*  iRenderBuffer* vertattrib[16]; // @@@ Hardcoded max number of attributes
+  bool vertattribenabled[16]; // @@@ Hardcoded max number of attributes
+  bool vertattribenabled100[16]; // @@@ Hardcoded max number of attributes (for conventional)
+ */ //iTextureHandle* texunit[16]; // @@@ Hardcoded max number of units
+  bool texunitenabled[16]; // @@@ Hardcoded max number of units
+  GLuint texunittarget[16]; // @@@ Hardcoded max number of units
+  csRef<csGLBasicTextureHandle> needNPOTSfixup[16]; // @@@ Hardcoded max number of units
+  /// Array of buffers used for NPOTS texture coord fixup
+  csArray<csRef<iRenderBuffer> > npotsFixupScrap;
+  /// Whether an NPOTS scrap is attached to a TC bufer
+  bool npotsStatus[16];
   /// Whether the alpha channel of the color buffer should be scaled.
   bool needColorFixup;
   /// Amount to scale alpha channel of color buffer
@@ -447,6 +444,7 @@ private:
   void ApplyBufferChanges();
   //@}
 
+  csRef<iRenderBuffer> DoNPOTSFixup (iRenderBuffer* buffer, int unit);
   csRef<iRenderBuffer> DoColorFixup (iRenderBuffer* buffer);
 
   // Minimal float depth(z) difference to store
@@ -485,7 +483,7 @@ public:
   csGLGraphics3D (iBase *parent);
   virtual ~csGLGraphics3D ();
 
-  iShaderVarStringSet* GetStrings () { return strings; }
+  iStringSet* GetStrings () { return strings; }
   static void OutputMarkerString (const char* function, const wchar_t* file,
     int line, const char* message);
   static void OutputMarkerString (const char* function, const wchar_t* file,
@@ -589,14 +587,11 @@ public:
   virtual void SetWorldToCamera (const csReversibleTransform& w2c);
   virtual const csReversibleTransform& GetWorldToCamera () { return world2camera; }
 
-  /// Set the current render target (0 for screen).
-  virtual void SetRenderTarget (iTextureHandle* handle,
-	  bool persistent = false,
-	  int subtexture = 0)
-  {
-    if ((render_target == handle) && (rt_subtex == subtexture)) return;
+  uint currentAttachments;
+  bool SetRenderTarget (iTextureHandle* handle, bool persistent = false,
+    int subtexture = 0, csRenderTargetAttachment attachment = rtaColor0);
+  /*{
     render_target = handle;
-    rt_subtex = subtexture;
     r2tbackend->SetRenderTarget (handle, persistent, subtexture);
 
     int hasRenderTarget = (handle != 0) ? 1 : 0;
@@ -604,14 +599,18 @@ public:
     viewwidth = G2D->GetWidth();
     viewheight = G2D->GetHeight();
     needViewportUpdate = true;
-    hasOld2dClip = false;
-  }
-
-  /// Get the current render target (0 for screen).
+  }*/
+  bool CanSetRenderTarget (const char* format,
+    csRenderTargetAttachment attachment = rtaColor0);
+  iTextureHandle* GetRenderTarget (
+    csRenderTargetAttachment attachment = rtaColor0,
+    int* subtexture = 0) const;
+  void UnsetRenderTargets();
+  /*/// Get the current render target (0 for screen).
   virtual iTextureHandle* GetRenderTarget () const
   {
     return render_target;
-  }
+  }*/
 
   /// Begin drawing in the renderer
   bool BeginDraw (int drawflags);
@@ -626,7 +625,7 @@ public:
   /// Drawroutine. Only way to draw stuff
   void DrawMesh (const CS::Graphics::CoreRenderMesh* mymesh,
     const CS::Graphics::RenderMeshModes& modes,
-    const csShaderVariableStack& stack);
+    const iShaderVarStack* stacks);
 
   /// Draw a 2D sprite
   virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy,
@@ -768,9 +767,6 @@ public:
   virtual void Dump (iGraphics3D* /*g3d*/)
   { }
 };
-
-// To silence EnableZOffset/DisableZOffset
-#include "csutil/deprecated_warn_on.h"
 
 }
 CS_PLUGIN_NAMESPACE_END(gl3d)

@@ -79,7 +79,7 @@ SCF_IMPLEMENT_FACTORY (csGLGraphics3D)
 
 csGLGraphics3D::csGLGraphics3D (iBase *parent) : 
   scfImplementationType (this, parent), isOpen (false), imageUnits (0), 
-  wantToSwap (false), delayClearFlags (0)
+  wantToSwap (false), delayClearFlags (0), currentAttachments (0)
 {
   verbose = false;
   frustum_valid = false;
@@ -92,8 +92,6 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent) :
   stencilclipnum = 0;
   clip_planes_enabled = false;
   hasOld2dClip = false;
-
-  render_target = 0;
 
   current_drawflags = 0;
   current_shadow_state = 0;
@@ -695,7 +693,7 @@ void csGLGraphics3D::SetupProjection ()
 
   statecache->SetMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
-  if (render_target)
+  if (currentAttachments != 0)
     r2tbackend->SetupProjection();
   else
   {
@@ -1179,6 +1177,61 @@ void csGLGraphics3D::Close ()
     G2D->Close ();
 }
 
+bool csGLGraphics3D::SetRenderTarget (iTextureHandle* handle, bool persistent,
+                                      int subtexture,
+                                      csRenderTargetAttachment attachment)
+{
+  uint newAttachments = currentAttachments;
+  if (handle != 0)
+    newAttachments |= (1 << attachment);
+  else
+    newAttachments &= ~(1 << attachment);
+  
+  if (newAttachments == 0)
+  {
+    r2tbackend->UnsetRenderTargets();
+  }
+  else
+  {
+    if ((handle != 0)
+        && !r2tbackend->SetRenderTarget (handle, persistent, subtexture,
+      attachment)) return false; 
+  }
+  
+  if ((newAttachments != 0) != (currentAttachments != 0))
+  {
+    int hasRenderTarget = (newAttachments != 0) ? 1 : 0;
+    G2D->PerformExtension ("userendertarget", hasRenderTarget);
+    viewwidth = G2D->GetWidth();
+    viewheight = G2D->GetHeight();
+    needViewportUpdate = true;
+  }
+  currentAttachments = newAttachments;
+  return true;
+}
+
+bool csGLGraphics3D::CanSetRenderTarget (const char* format,
+                                         csRenderTargetAttachment attachment)
+{
+  return r2tbackend->CanSetRenderTarget (format, attachment);
+}
+
+iTextureHandle* csGLGraphics3D::GetRenderTarget (csRenderTargetAttachment attachment,
+                                                 int* subtexture) const
+{
+  return r2tbackend->GetRenderTarget (attachment, subtexture);
+}
+
+void csGLGraphics3D::UnsetRenderTargets()
+{
+  r2tbackend->UnsetRenderTargets();
+  
+  G2D->PerformExtension ("userendertarget", 0);
+  viewwidth = G2D->GetWidth();
+  viewheight = G2D->GetHeight();
+  needViewportUpdate = true;
+}
+
 bool csGLGraphics3D::BeginDraw (int drawflags)
 {
   (void)drawflagNames; // Pacify compiler when CS_DEBUG not defined.
@@ -1243,7 +1296,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
   /* Note: this function relies on the canvas and/or the R2T backend to setup
    * matrices etc. So be careful when changing stuff. */
 
-  if (render_target)
+  if (currentAttachments != 0)
     r2tbackend->BeginDraw (drawflags); 
 
   if (drawflags & CSDRAW_3DGRAPHICS)
@@ -1314,10 +1367,11 @@ void csGLGraphics3D::FinishDraw ()
 
   DeactivateBuffers (0, 0);
 
-  if (render_target)
+  if (currentAttachments != 0)
   {
     r2tbackend->FinishDraw();
-    SetRenderTarget (0);
+    UnsetRenderTargets();
+    currentAttachments = 0;
   }
   
   current_drawflags = 0;
@@ -2115,7 +2169,7 @@ void csGLGraphics3D::ClosePortal ()
     
     GLenum oldcullface;
     statecache->GetCullFace (oldcullface);
-    if (render_target)
+    if (currentAttachments != 0)
     {
       r2tbackend->SetupClipPortalDrawing ();
       statecache->SetCullFace (mirror?GL_FRONT:GL_BACK);
@@ -2582,7 +2636,7 @@ void csGLGraphics3D::SetupClipPortals ()
   glLoadIdentity ();
   //We should call render_target->SetupClipPortalDrawing just one time
   //because next call will flip modelview matrix again
-  if (render_target)
+  if (currentAttachments != 0)
     r2tbackend->SetupClipPortalDrawing ();
   
   GLboolean wmRed, wmGreen, wmBlue, wmAlpha;
@@ -2621,7 +2675,7 @@ void csGLGraphics3D::SetupClipPortals ()
       if (ffps < ffpnz)
       {
         //clear stencil of ffps
-        if (render_target)
+        if (currentAttachments != 0)
         	statecache->SetCullFace (IsPortalMirrored(ffps)?GL_FRONT:GL_BACK);
         else 
           statecache->SetCullFace (IsPortalMirrored(ffps)?GL_BACK:GL_FRONT);
@@ -2640,7 +2694,7 @@ void csGLGraphics3D::SetupClipPortals ()
     if (ffps == csArrayItemNotFound)
     {
       //make s-fill of ffpnz
-      if (render_target) 
+      if (currentAttachments != 0) 
         statecache->SetCullFace (IsPortalMirrored(ffpnz)?GL_FRONT:GL_BACK);
       else 
         statecache->SetCullFace (IsPortalMirrored(ffpnz)?GL_BACK:GL_FRONT);
@@ -2656,7 +2710,7 @@ void csGLGraphics3D::SetupClipPortals ()
       ffps = ffpnz;
     }
     //perform z-clear finally
-    if (render_target) 
+    if (currentAttachments != 0) 
       statecache->SetCullFace (IsPortalMirrored(ffpnz)?GL_FRONT:GL_BACK);
     else 
       statecache->SetCullFace (IsPortalMirrored(ffpnz)?GL_BACK:GL_FRONT);
@@ -2705,7 +2759,7 @@ void csGLGraphics3D::SetupClipPortals ()
     if (ffps != csArrayItemNotFound)
     {
       //clear previous s-fill
-      if (render_target) 
+      if (currentAttachments != 0) 
         statecache->SetCullFace (IsPortalMirrored(ffps)?GL_FRONT:GL_BACK);
       else 
         statecache->SetCullFace (IsPortalMirrored(ffps)?GL_BACK:GL_FRONT);
@@ -2722,7 +2776,7 @@ void csGLGraphics3D::SetupClipPortals ()
       ffps = csArrayItemNotFound;
     }
     //perform s-fill finally
-    if (render_target)
+    if (currentAttachments != 0)
       statecache->SetCullFace (IsPortalMirrored(cfp)?GL_FRONT:GL_BACK);
     else 
       statecache->SetCullFace (IsPortalMirrored(cfp)?GL_BACK:GL_FRONT);
@@ -2805,7 +2859,7 @@ void csGLGraphics3D::SetClipper (iClipper2D* clipper, int cliptype)
       (int)floorf (scissorbox.MinY ()), 
       (int)ceilf (scissorbox.MaxX ()), 
       (int)ceilf (scissorbox.MaxY ()));
-    if (render_target)
+    if (currentAttachments != 0)
       r2tbackend->SetClipRect (scissorRect);
     else
       glScissor (scissorRect.xmin, scissorRect.ymin, scissorRect.Width(),

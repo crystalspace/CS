@@ -43,10 +43,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(SyntaxService)
  * the textual representation.
  */
 class csTextSyntaxService : 
-  public scfImplementation3<csTextSyntaxService,
+  public scfImplementation2<csTextSyntaxService,
                             iSyntaxService,
-                            iComponent,
-                            iDebugHelper>
+                            iComponent>
 {
 protected:
   iObjectRegistry* object_reg;
@@ -170,23 +169,6 @@ public:
   virtual void ReportBadToken (iDocumentNode* badtokennode);
   virtual void Report (const char* msgid, int severity, 
 	iDocumentNode* errornode, const char* msg, ...);
-
-public:
-  // Debugging functions.
-  csPtr<iString> UnitTest ();
-
-  virtual int GetSupportedTests () const
-  { return CS_DBGHELP_UNITTEST; }
-  virtual csPtr<iString> StateTest ()
-  { return 0; }
-  virtual csTicks Benchmark (int /*num_iterations*/)
-  { return 0; }
-  virtual csPtr<iString> Dump ()
-  { return 0; }
-  virtual void Dump (iGraphics3D* /*g3d*/)
-  { }
-  virtual bool DebugCommand (const char* /*cmd*/)
-  { return false; }
 };
 
 #include "csutil/deprecated_warn_on.h"

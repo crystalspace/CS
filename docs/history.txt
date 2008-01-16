@@ -7,12 +7,30 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 16-Jan-2008
+	- res removed the scfObject field(s) from scfImplementation*. The
+	  address of the actual implementation class can be computed at
+	  runtime and doesn't have to be stored in an instance. This saves
+	  a pointer (or more for "extension" implementations) per SCF object.
 	- Marten updated some code to work after the recent string ID change.
 	- Marten added a very empty AABB-tree.
 	- Marten did a few changes to the block allocator to allow it to 
 	  allocate aligned objects.
+15-Jan-2008
+	- res merged r27442 from rendermanager branch to trunk (cubemap
+	  support with fbo render-to-texture).
+	- res merged r27667 from rendermanager branch to trunk (better support
+	  for textures exceeding the framebuffer dimensions in framebuffer r2t
+	  backend).
+	- Mike Gist got animated textures working with proxy textures.
+14-Jan-2008
+	- Mike Gist committed a patch from Trymm to fix a crash in sprcal3d.
+	- res re-enabled PBO on ATI (latest driver fixes found issues).
+	- res temporarily disabled FBO since it's currently broken.
+	- res merged r27437 from rendermanager branch to trunk (use
+	  glGenerateMipmaps in gl3d).
+	- Vincent blindly changed a constant in OpenAL renderer, which seems
+	  to fix the "play too fast" issue with stereo OGG files.
 13-Jan-2008
-	- res updated the mk/jam/ build files with the versions from trunk.
 	- res changed how string IDs are typed. Instead of a simple alias for
 	  unsigned longs they're now a wrapper struct around the actual ID
 	  value. Furthermore, the IDs and string set classes/interfaces have 
@@ -21,9 +39,163 @@ chronological order.
 	  when IDs from differently tagged string sets are mixed (which is
 	  usually an error). To maintain source compatibility, assigning IDs
 	  with different tags still works, but emits a deprecation warning.
+11-Jan-2008
+	- Vincent removed mentions of iCollection throughout the project.
+	- philwyett added reference to exporting LD_LIBRARY_PATH to allow demo
+	  applications to run without error on Linux. I also updated some basic
+	  info for contacting me etc.
+	- Mike Gist enhanced the runtime check for AltiVec to work on linux.
 10-Jan-2008
+	- Eric Sunshine fixed a couple bugs in macro CS_EMIT_BUILD_PROPERTY()
+	  in emit.m4 which manifested when the client passed a non-empty
+	  EMPTY-OKAY argument. (1) It incorrectly unconditionally employed the
+	  CS_JAMCONFIG_PROPERTY() emitter rather than respecting the EMITTER
+	  argument and only employing CS_JAMCONFIG_PROPERTY() as a
+	  fallback. (2) It neglected to pass the optional UNCONDITIONAL
+	  argument along to the emitter.
+	 - Eric Sunshine added "default" as an alias for the existing tokens
+	  "emit" and "yes" for the EMITTER argument of macro
+	  CS_EMITTER_OPTIONAL() in emit.m4.
+	- Eric Sunshine made minor clarifications to macro documentation in
+	  emit.m4.
+	- Eric Sunshine added new Autoconf macros CS_TR_SH_Lang(),
+	  CS_TR_SH_lang(), and CS_TR_SH_LANG() to language.m4. These macros are
+	  similar to AS_TR_SH(), but convert "+" in its argument to "x" rather
+	  than "p" since "x" is more suitable in a context dealing with
+	  programming languages. For instance, CS_TR_SH_Lang([C++]) becomes
+	  "Cxx", rather than the less idiomatic "Cpp" as would be the case with
+	  AS_TR_SH().  These macros are useful for composing shell variable
+	  names pertaining to a particular language. For instance, if the
+	  language upon which a macro operates is in $1, then the macro may
+	  compose a shell variable name using
+	  CS_TR_SH_lang([cs_cv_prog_$1_feature]).  CS_TR_SH_Lang() performs no
+	  case-folding of its input. CS_TR_SH_lang() folds the input to
+	  lowercase.  CS_TR_SH_LANG() folds the input to uppercase.
+	- Eric Sunshine added new Autoconf macro CS_LANG_RESOLVE() to
+	  language.m4.  This macro is a convenience tool for other macros which
+	  optionally accept a language specifier. It returns the input language
+	  specifier if non-empty, otherwise the specified fallback language.
+	  If the fallback is not provided, then the language is assumed to be
+	  "C".
+	- Eric Sunshine updated macro CS_BUILD_IFELSE() in checkbuild.m4 to
+	  take advantage of the new CS_TR_SH_LANG() and CS_LANG_RESOLVE()
+	  macros.  Also retired the somewhat ugly public CS_LANG_CFLAGS macro
+	  (although a somewhat similar private helper macro, _CS_LANG_CFLAGS(),
+	  is still employed by CS_BUILD_IFELSE()).
+	- Eric Sunshine updated the various CS_COMPILER_WARNING_FOO() macros in
+	  warnings.m4 to take advantage of the new CS_TR_SH_lang() and
+	  CS_LANG_RESOLVE() macros.
+	- Eric Sunshine improved the various CS_COMPILER_WARNING_FOO() macros
+	  in warnings.m4 by having them compose proper cache variables
+	  incorporating the language name (such as "cs_cv_prog_cxx_foo") rather
+	  than employing the too-general static name "cs_cv_prog_compiler_foo"
+	  in the case that the client fails to provide an explicit cache
+	  variable name.
+	- Eric Sunshine re-factored the various CS_COMPILER_WARNING_FOO()
+	  macros in warnings.m4 by introducing new helpers
+	  _CS_WARNING_SUPPRESS_MSG() and _CS_WARNING_CACHE_VAR() which avoid
+	  similar code in each of the CS_COMPILER_WARNING_FOO() macros.
+	- Eric Sunshine promoted the C++ STL check from an inline configure.ac
+	  test to a stand-alone re-usable macro CS_CHECK_STL() in checkstl.m4
+	  so that it can be employed by external projects and other Autoconf
+	  macros.
+	- Eric Sunshine promoted the complicated -fvisibility-inline-hiddens
+	  check from an inline configure.ac test to a stand-alone re-usable
+	  macro CS_VISIBILITY_INLINES_HIDDEN() in visibility.m4 so that it can
+	  be employed by external projects.
+	- Eric Sunshine upgraded CS_VISIBILITY_INLINES_HIDDEN() in
+	  visibility.m4 so that it explicitly promotes compilation warnings to
+	  errors in case the compiler neglects to return an error code when the
+	  switch under consideration is not recognized.
+	- Eric Sunshine promoted the checks for compiler switch and in-code
+	  delcaration of symbol visibility from inline configure.ac tests to
+	  stand-alone re-usable macros in visibility.m4. The new macros are
+	  CS_VISIBILITY_FLAG_HIDDEN(), CS_VISIBILITY_FLAG_DEFAULT(),
+	  CS_VISIBILITY_DECLARE_HIDDEN(), and CS_VISIBILITY_DECLARE_DEFAULT().
+	  Performed a good deal of re-factoring and simplification of these
+	  checks in order to lower maintenance costs.  For consistency, also
+	  renamed CS_VISIBILITY_INLINES_HIDDEN() to
+	  CS_VISIBILITY_FLAG_INLINES_HIDDEN().
+	- Eric Sunshine upgraded the symbol visibility compiler flag checks in
+	  visibility.m4 so that they promote compiler warnings to errors.  This
+	  should resolve problem experienced by Andres Freund during
+	  cross-compiling on Linux for Windows where configure was under the
+	  impression that -fvisibility=hidden was usable since the compiler
+	  issued only a warning and otherwise ignored the flag.
 	- Marten fixed RM branch compilation on gcc (MinGW tested).
+9-Jan-2008
+	- Mike Gist committed a patch from Trymm for sprcal3d to keep
+	  compatibility with cal3d files which aren't updated for the recent
+	  changes. Those now use the old bugged behavior instead of not working
+	  at all.
+	- Eric Sunshine upgraded mk/autoconf/compiler.m4 so that the macros
+	  CS_PROG_CC() and CS_PROG_CXX() also publish the shell variable names
+	  cs_compiler_name_c and cs_compiler_name_cxx, respectively.
+	  Furthermore, these macros now emit build properties COMPILER.C.TYPE
+	  and COMPILER.CXX.TYPE (and, as an historic anomaly, COMPILER.TYPE) to
+	  Jamconfig. These changes ensure that the compiler's type/name is
+	  published for all CS Jam-based projects (rather than only for CS
+	  itself).  This fixes problem where mk/jam/win32.jam's
+	  ConstructSharedLibraryTarget rule, which depends upon the compiler
+	  type/name information, failed in external CS-based projects.
+	- Vincent added '-no3d' command line option to sndtest, to set the
+	  sound stream in CS_SND3D_DISABLE mode. Useful for investigating a bug
+	  with playback of stereo OGG files with OpenAL renderer in that mode.
+8-Jan-2008
+	- Mike Gist committed a patch from Trymm for sprcal3d which fixes the
+	  problems with characters not walking properly for the first couple of
+	  seconds after movement has been initiated.
+	- Marten added a non-threaded job queue.
+	- Marten added the ability to query a job queue if all enqueued jobs
+	  are run.
+	- Marten made a few cosmetic fixes to lighter2.
+	- Marten started to convert lighter2 to be able to take advantage
+	  of multi-processor/core configurations.
+	- Marten made a number of fixes to bullet plugin and phystut 
+	  application, fixing creation of sphere and joints.
+7-Jan-2008
+	- res fixed a constness mismatch in cspython.cpp occuring with 
+	  Python 2.4 (and probably older) caused that surfaced after r28415
+	  and r28416.
+	- Vincent fixed a bug which prevented OGG files to be played when
+	  using OpenAL. Also commented unused stuff in OpenAL renderer, and
+	  added OpenAL specific kvp in sound.cfg.
+6-Jan-2008
+	- Marten fixed a bug in lighter2 related to light through portals.
+	- Vincent added '-sndfile' commandline option to allow setting the
+	  sound file to use in 'sndtest' and 'asndtest'. Also added sound and
+	  stream format information display.
+	- caedes added swig template to help declaring typemaps for argc-argv
+	  style parameter lists for functions.
+	- caedes added swig output typemaps for EventData structs in GetData
+	  functions in the different EventHelper classes.
+	- caedes fixed a constness problem in cspython.
+	- Marten made a couple of cosmetic fixes in ligher2.
+5-Jan-2008
+	- Mike Gist committed a patch from Trymm which corrects a few problems
+	  with idle animations in sprcal3d. Characters will no longer play the
+	  idle animation in situations like when in the middle of a fight, and
+	  all idle animations will be played at random.
+	- Marten fixed a warning in terrain.
+	- Marten added svn:ignore property on mk\msvc9 directory.
+	- Marten made an optimization to lighter2, cutting out code taking 7%
+	  of total runtime.
+	- res fixed the preprocessor condition in 
+	  libs/csutil/processor/processorspecdetection_nonwin_gcc_x86.cpp to
+	  not compile the contents of that file on Win32 at all (as also
+	  suggested by the name). Should fix #440.
+	- Marten removed the unit test application and deprecated the unit
+	  test method in iDebugHelper.
+	- Marten redid the ligther2 optimization to play better with future
+	  implementation of area lights.
+	- Marten fixed a bug in lighter2 whereby lights through portals wouldn't
+	  work at all.
 4-Jan-2008
+	- Vincent fixed a crasher in csbench: PerformShaderTest() still queried
+	  iThingState for walls mesh after CreateRoom() was changed to use
+	  genmesh.
+	- caedes added a macro called CALLBACK_INTERFACE_HDR to python swig
+	  files to help in declaring director classes for scf interfaces.
 	- Marten did a big number of changes to the RM:
 	   - Removed the render manager headers from the global headers
 	     to help build speed.
@@ -35,10 +207,205 @@ chronological order.
 	  set bit indices.
 	- Added forward and backward iterators for csRedBlackTree and
 	  csRedBlackMap.
+1-Jan-2008
+	- Jorrit added iPortal->GetObjectSphere() and GetWorldSphere().
+	  With these two functions you can get the bounding sphere (in world
+	  and object space) of the portal.
+	- Jorrit fixed iMeshWrapper->PlaceMesh() so that it uses the new
+	  GetObjectSphere() function. This speeds the function up and makes
+	  it also more correct (although it increases the chance of adding
+	  too many sectors).
+	- res augmented the render target API to allow "attachments" (to
+	  support rendering depth instead of color data to textures or, later,
+	  multiple render targets) and better querying if a texture format can
+	  be rendered to.
+31-Dec-2007
+	- Jorrit set Video.OpenGL.StencilThreshold to 1 instead of 50. That
+	  basically means that stencil clipping will always be used for
+	  portals instead of plane clipping. We never did conclusive
+	  benchmarks on what is better here but at least on Intel Graphics
+	  plane clipping is not working properly causing lots of artifacts
+	  in portal heavy levels like flarge.
+28-Dec-2007
+	- res updated the docs for the new cs-win32libs release.
+	- philwyett added a build tip for unix that reduces build time
+	  on dual core processors.
+	- caedes fixed castle-tex.zip being incorrectly added to vfs.cfg
+	  template, and thus impossible to find on install.
+26-Dec-2007
+	- Jorrit added new methods to iStandardReporterListener so that
+	  you can set and query the individual output settings for every
+	  severity.
+	- Jorrit changed BugPlug to use severity DEBUG instead of
+	  NOTIFY.
+	- Jorrit changed BugPlug to temporarily force output of DEBUG
+	  severity level to print to stdout for the output of the BugPlug
+	  commands. That way you can see output of BugPlug commands even
+	  in optimize mode.
+	- Jorrit did several documentation updates:
+	    - Added documentation for the new MinimumElapsedTicks
+	      configuration setting.
+	    - Removed documentation for the offscreen software renderer.
+	    - Added some specific documentation on BugPlug.
+	    - Added some cross-references to the new BugPlug documentation.
+	- Jorrit blindly implemented the new MinimumElapsedTicks setting
+	  for MacOS/X.
+	- Jorrit did several documentation updates:
+	    - Removed the obsolete radiosity settings from the engine
+	      configuration chatper.
+	    - Mentioned the new -RenderLoop option in the viewmesh
+	      documentation.
+	    - Updated the ODE documentation to indicate that ODE plugin
+	      now automatically uses fixed stepsize.
+	    - Added (initial) documentation for Bullet.
+	- res slimmed down the general gcc x86 processor specs detection to
+	  only do what's needed to get the desired flags. Works around a crash
+	  in optimize mode with gcc 4.2.2 apparently related to the removed
+	  code.
+	- res un-inlined the general gcc x86 processor specs detection.
+	- res added gmeshanimpdl to the walktest plugins list.
+	- res added light-object bounding sphere culling to lighter2 so only
+	  lights that can affect and object are computed for it. Can give a
+	  speedup, depending on the map.
+24-Dec-2007
+	- Jorrit added support for a new System.MinimumElapsedTicks setting
+	  to data/config/system.cfg. With this setting you can control
+	  the minimum amount of time that each iteration in the runloop
+	  should spend. Using this you can limit framerate and lower cpu
+	  usage of Crystal Space. By default this setting is set to 0 which
+	  means no fps limiting will occur.
+22-Dec-2007
+	- res added support for depth textures to gl3d's CreateTexture().
+21-Dec-2007
+	- Jorrit added a -RenderLoop option to viewmesh so that you
+	  can use another renderloop. Just as:
+	    viewmesh -RenderLoop=diffuse ...
+	- Jorrit extended viewmesh so that it also loads the light,
+	  light_bumpmap, ambient, reflectsphere, parallax,
+	  light_spec_bumpmap, and parallaxAtt shaders.
+	- caedes added lightmaps folder in maps to install targets.
+	- res changed csTextureWrapper to to lazily determine an image's
+	  keycolor and not immediately when the wrapper is created or the
+	  image changed.
+	- res fixed some string-to-char* assignment warnings.
+	- res removed mipmap and interpolation renderstate changing from
+	  bugplug (both are not supported by the current renderers anyway).
+	- Sueastside fixed a compile error of walktest introduced by res.
+20-Dec-2007
+	- Vincent fixed Jamfile for OpenAL plugin to use OpenAL availability
+	  check result from configure.
+19-Dec-2007
+	- caedes added castle-tex.zip to install targets.
+18-Dec-2007
+	- Jorrit relaxed the rule on disabling VBO in gldrivers.xml. For
+	  the very first time version 2.1.7059 of the ATI drivers on Linux
+	  manages to get VBO right (and a lot of other things)!
+        - Mike Gist made a few changes to proxy textures; altered some argument
+          names, added some documentation for them and made proxy textures
+          be completely optional (and not the default). You now need to specify
+          when loading a map/library whether or not you want to use them.
+        - Save alphaType, keep_image and keycolour data in proxy textures.
+17-Dec-2007
+	- Marten removed the mutex locks in event queue and object registry.
+	  They indicated a thread safety where there actually is none and only
+	  resulted in useless overhead.
+16-Dec-2007
+	- Eric Sunshine restored the std::string based test which had been used
+	  originally to determine if gcc's -finline-visibility-hidden flag is
+	  buggy (as it is in numerous versions on several platforms).  This
+	  test was removed in r21931 after it was discovered that there were
+	  one or two obscure platform/compiler combinations for which the test
+	  was not accurate. It seems better, however, to use a mostly accurate
+	  test (std::string) than the current check based upon hard-coded
+	  platform and compiler version tests, which is too often
+	  inaccurate. Hopefully, this change resolves issue #355 (and perhaps
+	  #333) for most cases.
+	- Eric Sunshine fixed problem in configure.ac where AS_IF() conditional
+	  would access undefined shell variable
+	  $cs_cv_prog_cxx_visibility_inlines_hidden_buggy if compiler did not
+	  respond to -fvisibility-inlines-hidden.
+	- Eric Sunshine eliminated several compilation warnings in the plugins.
+	- Eric Sunshine eliminated several compilation warnings in the apps.
+	- Eric Sunshine refined the heuristic used by the 'dumptarget' rule in
+	  dump.jam to extract likely top-level target names from NotFile
+	  invocations. It now expects a target to begin with an alphanumeric,
+	  thus ignoring some NotFile items, such as -g3, -lfoo, etc. This
+	  resolves issue #430 as much as possible without introducing
+	  CS-specific knowledge into this otherwise generic mechanism. Note,
+	  that since there is no way to obtain a perfect set of top-level
+	  targets from Jam, the heuristic employed by 'dumptargets' returns
+	  only an approximation. It errs on the side of dumping too many
+	  potential targets by observing invocations of NotFile (which happens
+	  to be invoked for most of the top-level target names), rather than
+	  erring in the other direction and missing real top-level targets.
+	  NotFile is also used for other purposes, such as optionally telling
+	  the ResponseFile rule that the items to be written to the file do not
+	  represent actual files, thus the heuristic can be fooled if such
+	  items look like they might be viable top-level target names. Also
+	  modified the GeneratePluginLibraryGlueLib rule in static.jam slightly
+	  to avoid having CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION
+	  appear as a top-level target, but this is a case of treating the
+	  symptom and is not a robust resolution.
+	- Eric Sunshine removed the long-deprecated 'nrall' Jam target which
+	  had been maintained for backward compatibility after the "new
+	  renderer" architecture was made the default and the old renderer
+	  retired.
+	- Jorrit changed back the default for the forceLoadTextures
+	  parameter in iLoader->LoadMap() and LoadMapFile() so that it
+	  again defaults to true. Even though this is the less desirable
+	  option since it means textures will be loaded even if they
+	  are not used in the world file, it is still better to set this
+	  parameter to true by default to avoid compatibility breaking.
+	- Jorrit also changed the loader so that textures are now loaded
+	  immediatelly if forceLoadTextures is true instead of at the
+	  end of the loading cycle. XML scripts in CEL need the textures
+	  before the file has been completely loaded.
+	- Marten made a few optimizations to the atomic operations on PPC
+	  and SPARC.
+	- Marten added an application for micro-benchmarking atomic operations.
+	- Marten removed CS::Threading::Mutex::IsLocked() and all users of it.
+	  The reason is that there is no way to query the current lock-status
+	  when using pthreads. The old solution by keeping an boolean
+	  variable does not work as it does not properly interact with the
+	  locking of the mutex in conditions, and is in itself cause of race 
+	  conditions.
+15-Dec-2007
+	- Marten fixed colladaconvertor to compile cleanly on gcc (mingw).
+	- Jorrit committed a work-around for bug #429 (relaytool crashes
+	  on 64-bit linux) by Marten. This is just a work-around. The
+	  ticket should not be closed yet until a real fix can be found.
+	- Eric Sunshine fixed several problems with SplitDebugInfo rule in
+	  debuginfo.jam which were responsible for bugs #365, #433, and #434.
+	  These problems were caused by r28216 which accidentally reverted
+	  fixes applied to SplitDebugInfo in r27911.
 14-Dec-2007
 	- Marten fixed msvcgen configuration for building in MSVC 9.
 	- Marten added a hash-folder routine to get stronger hashes
 	  for the cache.
+13-Dec-2007
+	- caedes made a little fix on lighter2 user manual.
+8-Dec-2007
+        - Mike Gist committed a patch from Trymm to fix the direction
+          animations are played. If you had been reversing some animations,
+          then the idle animations would also be played backwards unless you
+          played an animation forwards first.
+        - Mike Gist committed a patch from Kenny Graunke to correct the return
+          value of csGetPlatformConfigDir on macosx (it's now consistent across
+          all platforms).
+
+7-Dec-2007
+	- Sueastside fixed "partial" shadows in lighter2, this bug
+	  occurred when no material was explicitly set on the object.
+
+6-Dec-2007
+	- res made the following changes to csloader:
+	    - Added 'forceLoadTextures' parameter to LoadMapFile.
+	    - Changed proxy texture loading to utilize "proxy images". These
+	      will load the image when first needed. That way proxy textures
+	      can also be used before they're loaded.
+5-Dec-2007
+        - Mike Gist committed a patch from res to fix linking of static apps
+          in MSVC.
 3-Dec-2007
 	- Marten moved the csHashComputer from hash.h to its own header.
 	- Marten added a fully generic templated fixed size cache class.
@@ -65,6 +432,40 @@ chronological order.
 	- res changed the std_lighting_portal shader to support fog and to not
 	  do the "demo" multiplication of the portal surface with a color any
 	  more.
+	- caedes fixed cspace.pth generating jam code to respect DESTDIR.
+	- caedes fixed pythmod jam rule to look for dbg files in the right
+	  place on install.
+	- Eric Sunshine eliminated several compilation warnings from csgeom.
+        - Scott Johnson eliminated some compilation warnings (newlines) from
+          colladaconvertor.
+29-Nov-2007
+	- Eric Sunshine changed 'MasterHeader' rule in helper.jam so that it
+	  invokes the 'ResponseFile' rule with a delimiter of "%" rather than
+	  allowing 'ResponseFile' to use the default delimiter of "@", since
+	  "@" may legally appear in email addresses and Doxygen directives
+	  (@file, for example), both of which are likely to appear in master
+	  header boilerplate.
+	- Eric Sunshine changed CS/include/Jamfile so that it uses Doxygen
+	  directive "@file" in master header boilerplate rather than "\file"
+	  since "\file" ends up as "<formfeed>ile" when 'jam masterheaders' is
+	  invoked under the Dash shell. (This appears to be a bug in Dash
+	  single-quote treatment and has been reported.)
+	- Eric Sunshine fixed bug in configure.ac where CS_PLATFORM_UNIX was
+	  not emitted to csconfig.h on Mac OS X (for which both
+	  CS_PLATFORM_MACOSX and CS_PLATFORM_UNIX are supposed to be defined).
+	  This bug was introduced in r23813-r23814 on 2006/03/14 when inline
+	  host checking code was removed from configure.ac in favor of the
+	  external CS_CHECK_HOST() macro from cs_check_host.m4.  Also fixed
+	  configure.ac so that it no longer access the shell variable
+	  cs_host_macosx, which is private to (not published by)
+	  _CS_CHECK_HOST_DARWIN in cs_check_host.m4.
+28-Nov-2007
+	- res changed the ODE plugin to install custom ODE message handlers
+	  (which can make errors less annoying and reduce the output spam by
+	  buffering up multiple similar messages).
+	- Vincent fixed a build error with GCC (undeclared messageInterval).
+	- res made some cleanups and tweaks to relaytool: fixed a crash in
+	  the "reloc fixup" code on x86 (and maybe x86_64 as well).
 24-Nov-2007
 	- Vincent merged OpenAL branch (r24357:28234) into trunk.
 22-Nov-2007
@@ -1059,6 +1460,8 @@ chronological order.
 	  addition to screen space coordinates for all portals.
 	- res added some initial support for "heavy" (render-to-texture)
 	  portals.
+	- res made the GL framebuffer render-to-texture support work slightly
+	  better with textures larger than the framebuffer.
 15-Sep-2007
 	- caedes added swig module post files for java and perl.
 	- res fixed a crash in the GL driver DB when <comparever> was used
@@ -1106,7 +1509,6 @@ chronological order.
 12-Sep-2007
 	- Jorrit merged the CS AI branch into trunk (basically only a small
 	  change in PriorityQueue).
-<<<<<<< .working
 11-Sep-2007
 	- Marten fixed a small error regarding deprecation warnings in thing.
 	- Marten made a number of improvements to the RM:
@@ -1116,8 +1518,6 @@ chronological order.
 	   - Handle the case of a single mesh.
 	   - Implemented proper distance sorting.
 	   - Made the sorting table be lazy evaluation.
-=======
-11-Sep-2007
 	- caedes fixed setting of pythonpath inside cspython for new build 
 	  location.
 	- caedes fixed some problems in swig interface files related to
@@ -1132,7 +1532,6 @@ chronological order.
 	    - cleaned up some old commented code.
 	- caedes modified cspython to set SCF pointer in python modules
 	  using the new SetSCFPointer function.
->>>>>>> .merge-right.r27812
 8-Sep-2007
 	- res fixed a crash in bezier plugin caused by a rendermanager-only
 	  change accidentally slipping in.
@@ -1384,6 +1783,7 @@ chronological order.
 	  This prevented decals from working on levels treated with
 	  lighter2.
 	- Jorrit fixed a crash bug in lighter2.
+	- res fixed cubemap support in the gl3d fbo render-to-texture path.
 15-Aug-2007
 	- res made CS::RenderManager::RenderView dllexported.
 	- res fixed an uninitialized struct member in glshader_fixed.
@@ -1394,6 +1794,8 @@ chronological order.
 	- res added a support for "render target dependencies": a texture and
 	  a view can be registered with the render manager which then takes
 	  care of rendering that view to the texture, if needed.
+	- res made the gl3d texture blit and render to texture stuff use
+	  glGenerateMipmap, if available,
 14-Aug-2007
 	- res added the ability to query the shader variables used for a given
 	  ticket from a shader.
@@ -1475,13 +1877,10 @@ chronological order.
 1-Aug-2007
 	- Jorrit fixed an initialization error in gmeshskelanim2 that could
 	  cause crashes at exit. This fixes #367.
-<<<<<<< .working
 31-Jul-2007
 	- Marten made the RM stuff compile on gcc.
-=======
 30-Jul-2007
         - Mike Gist fixed a few warnings.
->>>>>>> .merge-right.r27881
 29-Jul-2007
 	- res made the CEL jobber import crystalspace_staticplugins_msvc.jam
 	  from CS before generating VC projects.

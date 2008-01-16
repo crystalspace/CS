@@ -26,14 +26,14 @@
 
 namespace lighter
 {
-  class Scene;
-  class Sector;
+  class ElementAreasAlloc;
   class Light_old;
+  class LightmapUVFactoryLayouter;
   class Primitive;
   class Raytracer;
+  class Scene;
+  class Sector;
   class SwapManager;
-  
-  class ElementAreasAlloc;
 
   class Lighter : public csRefCount
   {
@@ -64,9 +64,11 @@ namespace lighter
     csRef<iConfigManager> configMgr;
     iObjectRegistry *objectRegistry;
     csRef<iShaderVarStringSet> svStrings;
+    csRef<iJobQueue> jobManager;
 
     SwapManager* swapManager;
     RayDebugHelper rayDebug;
+
   protected:
     // Cleanup and prepare for shutdown
     void CleanUp ();
@@ -74,11 +76,33 @@ namespace lighter
     // Parse the commandline and load any files specified
     bool LoadFiles (Statistics::Progress& progress);
 
+    // Calculate lightmapping
+    void CalculateLightmaps ();
+
+    // Initialize objects after LM construction
+    void InitializeObjects ();
+
+    // Prepare for lighting
+    void PrepareLighting ();
+
+    // Build per-sector KD-tree
+    void BuildKDTrees ();
+
+    // Shoot direct lighting
+    void DoDirectLighting ();
+
+    // Post-process all lightmaps
+    void PostprocessLightmaps ();
+
+    // Load configuration from config file & command line
     void LoadConfiguration ();
 
-    void CommandLineHelp () const;
+    // Print command line help
+    void CommandLineHelp () const;    
 
     Scene *scene;
+
+    csRef<LightmapUVFactoryLayouter> uvLayout;
 
     Statistics::Progress progStartup;
     Statistics::Progress progLoadFiles;

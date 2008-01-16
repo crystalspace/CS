@@ -1181,19 +1181,9 @@ void csMeshWrapper::PlaceMesh ()
       iSector *dest_sector = portal->GetSector ();
       if (movable_sectors->Find (dest_sector) == -1)
       {
-        const csPlane3 &pl = portal->GetWorldPlane ();
-
-        float sqdist = csSquaredDist::PointPlane (sphere.GetCenter (), pl);
-        if (sqdist <= max_sq_radius)
-        {
-          // Plane of portal is close enough.
-          // If N is the normal of the portal plane then we
-          // can use that to calculate the point on the portal plane.
-          csVector3 testpoint = sphere.GetCenter () + pl.Normal () * csQsqrt (
-                  sqdist);
-          if (portal->PointOnPolygon (testpoint))
-            movable_sectors->Add (dest_sector);
-        }
+	const csSphere& portal_sphere = portal->GetWorldSphere ();
+	if (portal_sphere.TestIntersect (sphere))
+          movable_sectors->Add (dest_sector);
       }
     }
   }

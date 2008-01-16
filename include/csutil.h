@@ -17,7 +17,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-/**\file 
+/**@file 
  * Directory master header. This header file includes all headers in a
  * subdirectory of the top Crystal Space include directory.
  */
@@ -129,6 +129,7 @@
 #include "csutil/scopeddelete.h"
 #include "csutil/scopedlock.h"
 #include "csutil/set.h"
+#include "csutil/simplejobqueue.h"
 #include "csutil/snprintf.h"
 #include "csutil/sparse3d.h"
 #include "csutil/spinlock.h"

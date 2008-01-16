@@ -381,6 +381,8 @@ class csSimpleRenderMesh(object):
 csSimpleRenderMesh_swigregister = _ivideo.csSimpleRenderMesh_swigregister
 csSimpleRenderMesh_swigregister(csSimpleRenderMesh)
 
+rtaDepth = _ivideo.rtaDepth
+rtaColor0 = _ivideo.rtaColor0
 class iGraphics3D(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
@@ -398,7 +400,9 @@ class iGraphics3D(core.iBase):
     def SetPerspectiveAspect(*args): return _ivideo.iGraphics3D_SetPerspectiveAspect(*args)
     def GetPerspectiveAspect(*args): return _ivideo.iGraphics3D_GetPerspectiveAspect(*args)
     def SetRenderTarget(*args): return _ivideo.iGraphics3D_SetRenderTarget(*args)
+    def CanSetRenderTarget(*args): return _ivideo.iGraphics3D_CanSetRenderTarget(*args)
     def GetRenderTarget(*args): return _ivideo.iGraphics3D_GetRenderTarget(*args)
+    def UnsetRenderTargets(*args): return _ivideo.iGraphics3D_UnsetRenderTargets(*args)
     def BeginDraw(*args): return _ivideo.iGraphics3D_BeginDraw(*args)
     def FinishDraw(*args): return _ivideo.iGraphics3D_FinishDraw(*args)
     def Print(*args): return _ivideo.iGraphics3D_Print(*args)

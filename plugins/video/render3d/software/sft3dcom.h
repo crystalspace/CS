@@ -451,9 +451,18 @@ public:
 
   /// Get the vertex buffer manager.
 
-  virtual void SetRenderTarget (iTextureHandle* handle, bool persistent,
-  	int subtexture);
-  virtual iTextureHandle* GetRenderTarget () const { return render_target; }
+  bool SetRenderTarget (iTextureHandle* handle, bool persistent,
+  	int subtexture, csRenderTargetAttachment attachment);
+  bool CanSetRenderTarget (const char* format,
+    csRenderTargetAttachment attachment = rtaColor0);
+  iTextureHandle* GetRenderTarget (csRenderTargetAttachment attachment,
+    int* subtexture) const
+  { 
+    if (attachment != rtaColor0) return 0;
+    if (subtexture) *subtexture = 0;
+    return render_target; 
+  }
+  void UnsetRenderTargets() { SetRenderTarget (0, false, 0, rtaColor0); }
 
   /// Get Z-buffer value at given X,Y position
   virtual float GetZBuffValue (int x, int y);

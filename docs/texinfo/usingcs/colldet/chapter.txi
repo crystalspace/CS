@@ -7,9 +7,11 @@ Everything about collision detection and physics.
 
 @menu
 * Basic Collision Detection::
+* Physics Bullet:: Physics using Bullet
 * Physics ODE:: Physics using ODE
 @end menu
 
 @importss{usingcs,colldet,basic.txi}
+@importss{usingcs,colldet,bullet.txi}
 @importss{usingcs,colldet,ode.txi}
 

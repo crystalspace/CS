@@ -523,6 +523,78 @@ void csReporterListener::SetMessageDestination (int severity,
   dest_popup[severity] = do_popup;
 }
 
+void csReporterListener::SetStandardOutput (int severity, bool en)
+{
+  CS_ASSERT (severity >= 0 && severity <= 4);
+  dest_stdout[severity] = en;
+}
+
+bool csReporterListener::IsStandardOutput (int severity)
+{
+  CS_ASSERT (severity >= 0 && severity <= 4);
+  return dest_stdout[severity];
+}
+
+void csReporterListener::SetStandardError (int severity, bool en)
+{
+  CS_ASSERT (severity >= 0 && severity <= 4);
+  dest_stderr[severity] = en;
+}
+
+bool csReporterListener::IsStandardError (int severity)
+{
+  CS_ASSERT (severity >= 0 && severity <= 4);
+  return dest_stderr[severity];
+}
+
+void csReporterListener::SetConsoleOutput (int severity, bool en)
+{
+  CS_ASSERT (severity >= 0 && severity <= 4);
+  dest_console[severity] = en;
+}
+
+bool csReporterListener::IsConsoleOutput (int severity)
+{
+  CS_ASSERT (severity >= 0 && severity <= 4);
+  return dest_console[severity];
+}
+
+void csReporterListener::SetAlertOutput (int severity, bool en)
+{
+  CS_ASSERT (severity >= 0 && severity <= 4);
+  dest_alert[severity] = en;
+}
+
+bool csReporterListener::IsAlertOutput (int severity)
+{
+  CS_ASSERT (severity >= 0 && severity <= 4);
+  return dest_alert[severity];
+}
+
+void csReporterListener::SetDebugOutput (int severity, bool en)
+{
+  CS_ASSERT (severity >= 0 && severity <= 4);
+  dest_debug[severity] = en;
+}
+
+bool csReporterListener::IsDebugOutput (int severity)
+{
+  CS_ASSERT (severity >= 0 && severity <= 4);
+  return dest_debug[severity];
+}
+
+void csReporterListener::SetPopupOutput (int severity, bool en)
+{
+  CS_ASSERT (severity >= 0 && severity <= 4);
+  dest_popup[severity] = en;
+}
+
+bool csReporterListener::IsPopupOutput (int severity)
+{
+  CS_ASSERT (severity >= 0 && severity <= 4);
+  return dest_popup[severity];
+}
+
 void csReporterListener::RemoveMessages (int severity, bool remove)
 {
   CS_ASSERT (severity >= 0 && severity <= 4);

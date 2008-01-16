@@ -21,6 +21,7 @@
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/cfgacc.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
 #include "iutil/eventq.h"
@@ -84,11 +85,23 @@ bool csDefaultRunLoop (iObjectRegistry* r)
   eh.AttachNew (new csDefaultQuitEventHandler (r));
   q->RegisterListener(eh, eh->Quit);
 
+  // Fetch the minimal elapsed ticks per second.
+  csConfigAccess cfgacc (r, "/config/system.cfg");
+  csTicks min_elapsed = (csTicks) cfgacc->GetInt (
+    "System.MinimumElapsedTicks", 0);
+
   while (!eh->ShouldShutdown())
   {
     if (vc)
       vc->Advance();
+
+    csTicks previous = csGetTicks ();
     q->Process();
+
+    // Limit fps.
+    csTicks elapsed = csGetTicks () - previous;
+    if (elapsed < min_elapsed)
+      csSleep (min_elapsed - elapsed);
   }
 
   q->RemoveListener (eh);

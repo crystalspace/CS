@@ -26,6 +26,7 @@
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/weakref.h"
 #include "csgeom/transfrm.h"
+#include "csgeom/sphere.h"
 #include "csutil/scf_implementation.h"
 #include "iengine/material.h"
 #include "iengine/sector.h"
@@ -60,6 +61,10 @@ private:
   csPlane3 object_plane;
   /// World plane.
   csPlane3 world_plane;
+  /// Object space sphere.
+  csSphere object_sphere;
+  /// World space sphere.
+  csSphere world_sphere;
   /// Name.
   char* name;
 
@@ -135,6 +140,8 @@ public:
 
   virtual const csPlane3& GetObjectPlane () { return object_plane; }
   virtual const csPlane3& GetWorldPlane ();
+  virtual const csSphere& GetObjectSphere () { return object_sphere; }
+  virtual const csSphere& GetWorldSphere ();
   virtual void ComputeCameraPlane (const csReversibleTransform& t,
   	csPlane3& camplane);
   virtual bool PointOnPolygon (const csVector3& point);

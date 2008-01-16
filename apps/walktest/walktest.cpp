@@ -419,7 +419,7 @@ void WalkTest::DrawFrameDebug3D ()
   }
 }
 
-void WalkTest::GfxWrite (int x, int y, int fg, int bg, char *str, ...)
+void WalkTest::GfxWrite (int x, int y, int fg, int bg, const char *str, ...)
 {
   va_list arg;
   csString buf;
