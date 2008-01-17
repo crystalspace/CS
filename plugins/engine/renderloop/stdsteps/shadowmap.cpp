@@ -187,11 +187,9 @@ csShadowmapRenderStep::csShadowmapRenderStep (
   scfImplementationType (this)
 {
   g3d = csQueryRegistry<iGraphics3D> (object_reg);
-  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> 
+  csRef<iShaderVarStringSet> strings = csQueryRegistryTagInterface<iShaderVarStringSet> 
     (object_reg, "crystalspace.shader.variablenameset");
   csShadowmapRenderStep::object_reg = object_reg;
-  bones_name = strings->Request("bones");
-  shader_name = strings->Request("distance_animated");
   depth_cubemap_name = strings->Request("cubemap depth");
   engine = csQueryRegistry<iEngine> (object_reg);
   context = 0;
