@@ -762,50 +762,6 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::csStringSet ##############
-
-package cspace::csStringSet;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace );
-%OWNER = ();
-%ITERATORS = ();
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_csStringSet(@_);
-    bless $self, $pkg if defined($self);
-}
-
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_csStringSet($self);
-        delete $OWNER{$self};
-    }
-}
-
-*Request = *cspacec::csStringSet_Request;
-*Contains = *cspacec::csStringSet_Contains;
-*Delete = *cspacec::csStringSet_Delete;
-*Empty = *cspacec::csStringSet_Empty;
-*Clear = *cspacec::csStringSet_Clear;
-*GetSize = *cspacec::csStringSet_GetSize;
-*IsEmpty = *cspacec::csStringSet_IsEmpty;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
 ############# Class : cspace::csStringIDSet ##############
 
 package cspace::csStringIDSet;
@@ -1888,16 +1844,9 @@ sub ACQUIRE {
 
 package cspace::iStringSet;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
-*Request = *cspacec::iStringSet_Request;
-*Contains = *cspacec::iStringSet_Contains;
-*Delete = *cspacec::iStringSet_Delete;
-*Empty = *cspacec::iStringSet_Empty;
-*Clear = *cspacec::iStringSet_Clear;
-*GetSize = *cspacec::iStringSet_GetSize;
-*IsEmpty = *cspacec::iStringSet_IsEmpty;
 *scfGetVersion = *cspacec::iStringSet_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -7734,6 +7683,43 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         cspacec::delete_csRGBpixel($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iShaderVarStringSet ##############
+
+package cspace::iShaderVarStringSet;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_iShaderVarStringSet(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iShaderVarStringSet($self);
         delete $OWNER{$self};
     }
 }
@@ -20414,6 +20400,7 @@ tie %__Primitives_quadTable_hash,"cspace::csVector2", $cspacec::Primitives_quadT
 $Primitives_quadTable= \%__Primitives_quadTable_hash;
 bless $Primitives_quadTable, cspace::csVector2;
 *CS_SNDSYS_STREAM_UNKNOWN_LENGTH = *cspacec::CS_SNDSYS_STREAM_UNKNOWN_LENGTH;
+*InvalidShaderVarStringID = *cspacec::InvalidShaderVarStringID;
 
   use Carp;
 

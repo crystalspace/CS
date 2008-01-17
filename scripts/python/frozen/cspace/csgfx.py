@@ -118,6 +118,20 @@ B_COEF = _csgfx.B_COEF
 R_COEF_SQ = _csgfx.R_COEF_SQ
 G_COEF_SQ = _csgfx.G_COEF_SQ
 B_COEF_SQ = _csgfx.B_COEF_SQ
+class iShaderVarStringSet(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _csgfx.new_iShaderVarStringSet(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _csgfx.delete_iShaderVarStringSet
+    __del__ = lambda self : None;
+iShaderVarStringSet_swigregister = _csgfx.iShaderVarStringSet_swigregister
+iShaderVarStringSet_swigregister(iShaderVarStringSet)
+cvar = _csgfx.cvar
+InvalidShaderVarStringID = cvar.InvalidShaderVarStringID
+
 class iShaderVariableAccessor(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"

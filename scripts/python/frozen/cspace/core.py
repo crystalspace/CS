@@ -370,29 +370,6 @@ class csFlags(object):
 csFlags_swigregister = _core.csFlags_swigregister
 csFlags_swigregister(csFlags)
 
-class csStringSet(object):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _core.new_csStringSet(*args)
-        try: self.this.append(this)
-        except: self.this = this
-    __swig_destroy__ = _core.delete_csStringSet
-    __del__ = lambda self : None;
-    def assign(*args): return _core.csStringSet_assign(*args)
-    def Request(*args): return _core.csStringSet_Request(*args)
-    def Contains(*args): return _core.csStringSet_Contains(*args)
-    def Delete(*args): return _core.csStringSet_Delete(*args)
-    def Empty(*args): return _core.csStringSet_Empty(*args)
-    def GetSize(*args): return _core.csStringSet_GetSize(*args)
-    def IsEmpty(*args): return _core.csStringSet_IsEmpty(*args)
-    def Clear (*args):
-        print "csStringSet.Clear() is deprecated, use csStringSet.Empty() instead"
-        return self.Empty(*args)
-
-csStringSet_swigregister = _core.csStringSet_swigregister
-csStringSet_swigregister(csStringSet)
-
 class csStringIDSet(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
@@ -912,23 +889,15 @@ iObjectIterator_swigregister = _core.iObjectIterator_swigregister
 iObjectIterator_swigregister(iObjectIterator)
 iObjectIterator_scfGetVersion = _core.iObjectIterator_scfGetVersion
 
-class iStringSet(iBase):
+class iStringSet(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def Request(*args): return _core.iStringSet_Request(*args)
-    def Contains(*args): return _core.iStringSet_Contains(*args)
-    def Delete(*args): return _core.iStringSet_Delete(*args)
-    def Empty(*args): return _core.iStringSet_Empty(*args)
-    def Clear(*args): return _core.iStringSet_Clear(*args)
-    def GetSize(*args): return _core.iStringSet_GetSize(*args)
-    def IsEmpty(*args): return _core.iStringSet_IsEmpty(*args)
     scfGetVersion = staticmethod(_core.iStringSet_scfGetVersion)
     __swig_destroy__ = _core.delete_iStringSet
     __del__ = lambda self : None;
 iStringSet_swigregister = _core.iStringSet_swigregister
 iStringSet_swigregister(iStringSet)
-csInvalidStringID = cvar.csInvalidStringID
 iStringSet_scfGetVersion = _core.iStringSet_scfGetVersion
 
 class iObjectRegistry(iBase):
@@ -944,6 +913,7 @@ class iObjectRegistry(iBase):
     __del__ = lambda self : None;
 iObjectRegistry_swigregister = _core.iObjectRegistry_swigregister
 iObjectRegistry_swigregister(iObjectRegistry)
+csInvalidStringID = cvar.csInvalidStringID
 iObjectRegistry_scfGetVersion = _core.iObjectRegistry_scfGetVersion
 
 class iObjectRegistryIterator(iBase):
