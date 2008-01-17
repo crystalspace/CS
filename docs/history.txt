@@ -6,6 +6,8 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+16-Jan-2008
+	- ronsaldo made changes into the c# bindings interface of iFile.
 11-Jan-2008
 	- ronsaldo made changes for the building of the c# bindings under
 	  MinSys.

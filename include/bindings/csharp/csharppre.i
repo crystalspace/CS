@@ -70,6 +70,8 @@
 %ignore operator^=;
 
 %ignore iDataBuffer::operator*;
+%ignore iFile::Read;
+%ignore iFile::Write;
 
 // cstool/initapp.h
 %extend csPluginRequest
@@ -94,6 +96,23 @@
   }
 }
 
+%extend iFile
+{
+  int ReadByte()
+  {
+    char buf = 0;
+    
+    self->Read(&buf, 1);
+    return (int)buf;
+  }
+
+  void WriteByte(int byte)
+  {
+    char buf = (char) byte;
+
+    self->Write(&buf, 1);
+  }
+}
 
 #undef LANG_FUNCTIONS
 %define LANG_FUNCTIONS
@@ -502,6 +521,20 @@ ICONFIGMANAGER_CSHARPCODE
 
 // We ignore this, because we can't wrap this
 %ignore QueryInterface(scfInterfaceID iInterfaceID, int iVersion);
+
+
+%typemap(cscode) iFile
+%{
+  public long Read(byte[] buffer, int offset, long size)
+  {
+    return CrystalSpace.InteropServices.FileIO.Read(this, buffer, offset, size);
+  }
+
+  public long Write(byte[] buffer, int offset, long size)
+  {
+    return CrystalSpace.InteropServices.FileIO.Write(this, buffer, offset, size);
+  }
+%}
 
 %include "bindings/csharp/clscompliant.i"
 %include "bindings/csharp/csattributes.i"

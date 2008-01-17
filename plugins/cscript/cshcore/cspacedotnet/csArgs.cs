@@ -25,6 +25,7 @@ namespace CrystalSpace.InteropServices
 {
   // This structure holds the data for be passed for 
   // an (int argc, char *argv) wrapped style method
+  [StructLayout(LayoutKind.Sequential)]
   public struct csArgs
   {
     public int free;
@@ -35,6 +36,7 @@ namespace CrystalSpace.InteropServices
 
   // This structure is used for P/Invoke calls, as a
   // return value for return generic interfaces pointer.
+  [StructLayout(LayoutKind.Sequential)]
   public struct csRetInterface
   {
     public IntPtr ifaceptr;
@@ -43,6 +45,7 @@ namespace CrystalSpace.InteropServices
   };
 
   // This structure is used for pack the data of a interface
+  [StructLayout(LayoutKind.Sequential)]
   public struct csInterfaceData
   {
     public int free;
@@ -50,6 +53,7 @@ namespace CrystalSpace.InteropServices
     public IntPtr ifacename;
   };
 
+  [StructLayout(LayoutKind.Sequential)]
   public struct csArrayPackData
   {
     public int count;

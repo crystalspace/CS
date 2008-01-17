@@ -83,6 +83,12 @@
 
   [DllImport("$dllimport", EntryPoint="csFree")]
   public static extern void csFree(IntPtr ptr);
+
+  [DllImport("$dllimport", EntryPoint="csReadFile")]
+  public static extern CrystalSpace.InteropServices.FileBuffer csReadFile(IntPtr file, uint size);
+
+  [DllImport("$dllimport", EntryPoint="csWriteFile")]
+  public static extern long csWriteFile(IntPtr file, IntPtr buffer, uint size);
 %}
 
 #ifdef USE_DIRECTORS
@@ -113,6 +119,26 @@
   {
     free(ptr);
   }
+
+  typedef struct FileBuffer
+  {
+    char *buffer;
+    long readed;
+  };
+
+  SWIGEXPORT FileBuffer csReadFile(void* fileptr, unsigned int size)
+  {
+    FileBuffer ret;
+    ret.buffer = (char*)malloc(size);
+    ret.readed = ((iFile*)fileptr)->Read(ret.buffer, size);
+    return ret;
+  }
+
+  SWIGEXPORT long csWriteFile(void *fileptr, void *buffer, unsigned int size)
+  {
+    return ((iFile*)fileptr)->Write((const char *)buffer, size);;
+  }
+  
 %}
 
 #endif //CS_MINI_SWIG
