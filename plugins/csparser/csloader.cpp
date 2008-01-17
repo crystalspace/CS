@@ -1387,8 +1387,11 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode,
       return false;
 
   // Go through the list of proxy textures and load those needed.
-  if(!LoadProxyTextures())
+  if(useProxyTextures)
+  {
+    if(!LoadProxyTextures())
       return false;
+  }
 
   return true;
 }
@@ -1592,7 +1595,7 @@ bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* libnode,
     if (!LoadTriggers (ldr_context, triggers))
       return false;
 
-  if(loadProxyTex)
+  if(useProxyTextures && loadProxyTex)
   {
       if(!LoadProxyTextures())
           return false;

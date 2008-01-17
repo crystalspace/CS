@@ -9,6 +9,8 @@ chronological order.
 17-Jan-2008
 	- Marten reverted r28423 as it introduce a arbitrary and hardcoded
 	  constant at a place where there should be no such thing.
+        - Mike Gist added checks for the LoadProxyTextures() function. It now
+          isn't called when we're not using proxy textures.
 16-Jan-2008
 	- res removed the scfObject field(s) from scfImplementation*. The
 	  address of the actual implementation class can be computed at
