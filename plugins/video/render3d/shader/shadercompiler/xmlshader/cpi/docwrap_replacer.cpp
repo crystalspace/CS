@@ -181,8 +181,6 @@ void csReplacerDocumentAttribute::DecRef ()
   scfRefCount--;
   if (scfRefCount == 0)
   {
-    scfRemoveRefOwners ();
-    if (scfParent) scfParent->DecRef();
     ReplacerAttrAlloc()->Free (this);
   }
 }

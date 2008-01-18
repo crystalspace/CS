@@ -181,7 +181,7 @@ protected:
   virtual void FillInterfaceMetadata (size_t n)
   {
 
-    FillInterfaceMetadataIf<I1> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I1> (scfAuxData->metadataList->metadata, n++);
     scfImplementation<Class>::FillInterfaceMetadata (n);
   }
 
@@ -296,10 +296,10 @@ protected:
   virtual void FillInterfaceMetadata (size_t n)
   {
 
-    FillInterfaceMetadataIf<I1> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I1> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I2> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I2> (scfAuxData->metadataList->metadata, n++);
     scfImplementation<Class>::FillInterfaceMetadata (n);
   }
 
@@ -423,13 +423,13 @@ protected:
   virtual void FillInterfaceMetadata (size_t n)
   {
 
-    FillInterfaceMetadataIf<I1> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I1> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I2> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I2> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I3> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I3> (scfAuxData->metadataList->metadata, n++);
     scfImplementation<Class>::FillInterfaceMetadata (n);
   }
 
@@ -562,16 +562,16 @@ protected:
   virtual void FillInterfaceMetadata (size_t n)
   {
 
-    FillInterfaceMetadataIf<I1> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I1> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I2> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I2> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I3> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I3> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I4> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I4> (scfAuxData->metadataList->metadata, n++);
     scfImplementation<Class>::FillInterfaceMetadata (n);
   }
 
@@ -713,19 +713,19 @@ protected:
   virtual void FillInterfaceMetadata (size_t n)
   {
 
-    FillInterfaceMetadataIf<I1> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I1> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I2> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I2> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I3> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I3> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I4> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I4> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I5> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I5> (scfAuxData->metadataList->metadata, n++);
     scfImplementation<Class>::FillInterfaceMetadata (n);
   }
 
@@ -876,22 +876,22 @@ protected:
   virtual void FillInterfaceMetadata (size_t n)
   {
 
-    FillInterfaceMetadataIf<I1> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I1> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I2> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I2> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I3> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I3> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I4> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I4> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I5> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I5> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I6> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I6> (scfAuxData->metadataList->metadata, n++);
     scfImplementation<Class>::FillInterfaceMetadata (n);
   }
 
@@ -1051,25 +1051,25 @@ protected:
   virtual void FillInterfaceMetadata (size_t n)
   {
 
-    FillInterfaceMetadataIf<I1> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I1> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I2> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I2> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I3> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I3> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I4> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I4> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I5> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I5> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I6> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I6> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I7> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I7> (scfAuxData->metadataList->metadata, n++);
     scfImplementation<Class>::FillInterfaceMetadata (n);
   }
 
@@ -1420,7 +1420,7 @@ protected:
   virtual void FillInterfaceMetadata (size_t n)
   {
 
-    FillInterfaceMetadataIf<I1> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I1> (scfAuxData->metadataList->metadata, n++);
     Super::FillInterfaceMetadata (n);
   }
 
@@ -1588,10 +1588,10 @@ protected:
   virtual void FillInterfaceMetadata (size_t n)
   {
 
-    FillInterfaceMetadataIf<I1> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I1> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I2> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I2> (scfAuxData->metadataList->metadata, n++);
     Super::FillInterfaceMetadata (n);
   }
 
@@ -1768,13 +1768,13 @@ protected:
   virtual void FillInterfaceMetadata (size_t n)
   {
 
-    FillInterfaceMetadataIf<I1> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I1> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I2> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I2> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I3> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I3> (scfAuxData->metadataList->metadata, n++);
     Super::FillInterfaceMetadata (n);
   }
 
@@ -1960,16 +1960,16 @@ protected:
   virtual void FillInterfaceMetadata (size_t n)
   {
 
-    FillInterfaceMetadataIf<I1> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I1> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I2> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I2> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I3> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I3> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I4> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I4> (scfAuxData->metadataList->metadata, n++);
     Super::FillInterfaceMetadata (n);
   }
 
@@ -2164,19 +2164,19 @@ protected:
   virtual void FillInterfaceMetadata (size_t n)
   {
 
-    FillInterfaceMetadataIf<I1> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I1> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I2> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I2> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I3> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I3> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I4> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I4> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I5> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I5> (scfAuxData->metadataList->metadata, n++);
     Super::FillInterfaceMetadata (n);
   }
 
@@ -2380,22 +2380,22 @@ protected:
   virtual void FillInterfaceMetadata (size_t n)
   {
 
-    FillInterfaceMetadataIf<I1> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I1> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I2> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I2> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I3> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I3> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I4> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I4> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I5> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I5> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I6> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I6> (scfAuxData->metadataList->metadata, n++);
     Super::FillInterfaceMetadata (n);
   }
 
@@ -2608,25 +2608,25 @@ protected:
   virtual void FillInterfaceMetadata (size_t n)
   {
 
-    FillInterfaceMetadataIf<I1> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I1> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I2> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I2> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I3> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I3> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I4> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I4> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I5> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I5> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I6> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I6> (scfAuxData->metadataList->metadata, n++);
 
 
-    FillInterfaceMetadataIf<I7> (this->metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I7> (scfAuxData->metadataList->metadata, n++);
     Super::FillInterfaceMetadata (n);
   }
 

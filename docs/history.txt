@@ -17,6 +17,11 @@ chronological order.
 	  if a value isn't given, FormatMessage() actually returns an error.
 	  Ignoring inserts returns the message inclusive inserts - which is
 	  still better than an obscure error code.
+	- res changed scfImplementation<> to store "auxiliary data" (such as
+	  weak reference owners, metadata, SCF parent) in a separate structure
+	  instead of the class instance: only a fraction of all objects use
+	  one of these features, so this externalization should save a couple
+	  bytes of memory.
 17-Jan-2008
 	- Marten reverted r28423 as it introduce a arbitrary and hardcoded
 	  constant at a place where there should be no such thing.

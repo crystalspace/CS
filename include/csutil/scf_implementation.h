@@ -146,6 +146,38 @@ protected:
     stats[stat]++;
 #endif
   }
+
+  typedef csArray<void**,
+    csArrayElementHandler<void**>,
+    CS::Memory::AllocatorMalloc,
+    csArrayCapacityLinear<csArrayThresholdFixed<4> > > WeakRefOwnerArray;
+  struct ScfImplAuxData : public CS::Memory::CustomAllocated
+  {
+    iBase *scfParent;
+    WeakRefOwnerArray* scfWeakRefOwners;
+    scfInterfaceMetadataList* metadataList;
+
+    ScfImplAuxData () : scfParent (0), scfWeakRefOwners (0), metadataList (0) {}
+  };
+  ScfImplAuxData* scfAuxData;
+
+  CS_FORCEINLINE bool HasAuxData() const { return scfAuxData != 0; }
+  void EnsureAuxData();
+  void FreeAuxData();
+
+  //-- Metadata handling
+  void AllocMetadata (size_t numEntries);
+  void CleanupMetadata ();
+
+  void scfRemoveRefOwners ();
+
+  iBase* GetSCFParent() const { return HasAuxData() ? scfAuxData->scfParent : 0; }
+
+  // Some virtual helpers for the metadata registry
+  virtual size_t GetInterfaceMetadataCount () const;
+
+  scfImplementationHelper() : scfAuxData (0) {}
+  ~scfImplementationHelper() { if (HasAuxData()) FreeAuxData(); }
 };
 
 /**
@@ -164,13 +196,17 @@ public:
    * Will be called from scfImplementation(Ext)N constructor
    */
   scfImplementation (Class *object, iBase *parent = 0) :
-      scfRefCount (1), scfParent (parent), scfWeakRefOwners (0), 
-      metadataList (0)
+      scfRefCount (1)
   {
     BumpStat (scfstatTotal);
-    if (scfParent) BumpStat (scfstatParented);
+    if (parent) BumpStat (scfstatParented);
     csRefTrackerAccess::TrackConstruction (object);
-    if (scfParent) scfParent->IncRef ();
+    if (parent) 
+    {
+      EnsureAuxData();
+      scfAuxData->scfParent = parent;
+      parent->IncRef ();
+    }
   }
 
   /**
@@ -193,8 +229,13 @@ public:
   virtual ~scfImplementation()
   {
     csRefTrackerAccess::TrackDestruction (GetSCFObject(), scfRefCount);
-    scfRemoveRefOwners ();
-    CleanupMetadata ();
+    if (HasAuxData())
+    {
+      scfRemoveRefOwners ();
+      CleanupMetadata ();
+      iBase *scfParent = scfAuxData->scfParent;
+      if (scfParent) scfParent->DecRef();
+    }
   }
 
   /**
@@ -215,8 +256,6 @@ public:
     scfRefCount--;
     if (scfRefCount == 0)
     {
-      scfRemoveRefOwners ();
-      if (scfParent) scfParent->DecRef();
       delete GetSCFObject();
     }
     BumpStat (scfstatDecRef);
@@ -238,16 +277,20 @@ public:
 
   virtual void AddRefOwner (void** ref_owner)
   {
-    if (!this->scfWeakRefOwners)
+    EnsureAuxData();
+    if (!scfAuxData->scfWeakRefOwners)
     {
-      scfWeakRefOwners = new WeakRefOwnerArray (0);
+      scfAuxData->scfWeakRefOwners = new WeakRefOwnerArray (0);
       BumpStat (scfstatWeakreffed);
     }
-    scfWeakRefOwners->InsertSorted (ref_owner);
+    scfAuxData->scfWeakRefOwners->InsertSorted (ref_owner);
   }
 
   virtual void RemoveRefOwner (void** ref_owner)
   {
+    if (!HasAuxData()) return;
+
+    WeakRefOwnerArray* scfWeakRefOwners = scfAuxData->scfWeakRefOwners;
     if (!scfWeakRefOwners)
       return;
 
@@ -260,7 +303,8 @@ public:
 
   virtual scfInterfaceMetadataList* GetInterfaceMetadata ()
   {
-    if (!metadataList)
+    EnsureAuxData();
+    if (!scfAuxData->metadataList)
     {
       BumpStat (scfstatMetadata);
       // Need to set it up, do so
@@ -268,7 +312,7 @@ public:
       FillInterfaceMetadata (0);
     }
 
-    return metadataList;
+    return scfAuxData->metadataList;
   }
 
 protected:
@@ -276,28 +320,6 @@ protected:
   const Class* GetSCFObject() const { return static_cast<const Class*> (this); }
 
   int scfRefCount;
-  iBase *scfParent;
-  typedef csArray<void**,
-    csArrayElementHandler<void**>,
-    CS::Memory::AllocatorMalloc,
-    csArrayCapacityLinear<csArrayThresholdFixed<4> > > WeakRefOwnerArray;
-  WeakRefOwnerArray* scfWeakRefOwners;
-
-  scfInterfaceMetadataList* metadataList;
-
-  void scfRemoveRefOwners ()
-  {
-    if (!scfWeakRefOwners)
-      return;
-
-    for (size_t i = 0; i < scfWeakRefOwners->GetSize (); i++)
-    {
-      void** p = (*scfWeakRefOwners)[i];
-      *p = 0;
-    }
-    delete scfWeakRefOwners;
-    scfWeakRefOwners = 0;
-  }
 
   void *QueryInterface (scfInterfaceID iInterfaceID,
                         scfInterfaceVersion iVersion)
@@ -311,45 +333,17 @@ protected:
     }
 
     // For embedded interfaces
-    if (scfParent)
-      return scfParent->QueryInterface (iInterfaceID, iVersion);
+    if (HasAuxData() && scfAuxData->scfParent)
+      return scfAuxData->scfParent->QueryInterface (iInterfaceID, iVersion);
 
     return 0;
   }
 
 
-  //-- Metadata handling
-  void AllocMetadata (size_t numEntries)
-  {
-    CleanupMetadata ();
-
-    uint8* ptr = (uint8*)cs_malloc (sizeof (scfInterfaceMetadataList) + 
-                                    sizeof (scfInterfaceMetadata)*numEntries);
-
-    metadataList = (scfInterfaceMetadataList*)ptr;
-
-    metadataList->metadata = (scfInterfaceMetadata*)(ptr + sizeof (scfInterfaceMetadataList));
-    metadataList->metadataCount = numEntries;
-  }
-
-  void CleanupMetadata ()
-  {
-    if (metadataList)
-    {
-      cs_free (metadataList);
-      metadataList = 0;
-    }
-  }
-
-  // Some virtual helpers for the metadata registry
-  virtual size_t GetInterfaceMetadataCount () const
-  {
-    return 1;
-  }
-
   // Fill in interface metadata in the metadata table, starting at offset N
   virtual void FillInterfaceMetadata (size_t n)
   {
+    scfInterfaceMetadataList* metadataList = scfAuxData->metadataList;
     if (!metadataList)
       return;
 
