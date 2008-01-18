@@ -11,6 +11,12 @@ chronological order.
 	  nev7n.
 	- res changed the xmlread plugin to use scfImplementationPooled<> to
 	  pool nodes (instead of a "custom" implementation).
+	- res tweaked cswinGetErrorMessage() to return messages with "inserts
+	  ignored": some Windows messages have "inserts" (similar to printf
+	  formatting specifiers) that insert values into the message; however,
+	  if a value isn't given, FormatMessage() actually returns an error.
+	  Ignoring inserts returns the message inclusive inserts - which is
+	  still better than an obscure error code.
 17-Jan-2008
 	- Marten reverted r28423 as it introduce a arbitrary and hardcoded
 	  constant at a place where there should be no such thing.
