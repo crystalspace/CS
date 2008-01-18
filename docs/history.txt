@@ -9,6 +9,8 @@ chronological order.
 18-Jan-2008
 	- res committed an update to the MSVC 7+ external project HOWTO from
 	  nev7n.
+	- res changed the xmlread plugin to use scfImplementationPooled<> to
+	  pool nodes (instead of a "custom" implementation).
 17-Jan-2008
 	- Marten reverted r28423 as it introduce a arbitrary and hardcoded
 	  constant at a place where there should be no such thing.
