@@ -187,12 +187,12 @@ void csXmlReadNode::DecRef ()
   /* In case we're freed the doc's node pool will be accessed; to make sure
      it's valid keep a ref to the doc while we're (potentially) destructed */
   doc->csXmlReadDocument::IncRef();
-  scfImplementationPooled::DecRef();
+  scfPooledImplementationType::DecRef();
   doc->csXmlReadDocument::DecRef();
 }
 
 csXmlReadNode::csXmlReadNode () :
-  scfImplementationPooled(this), node (0), node_children (0)
+  scfPooledImplementationType(this), node (0), node_children (0)
 {
   GetDoc()->IncRef();
 }
@@ -401,7 +401,7 @@ bool csXmlReadNode::GetAttributeValueAsBool (const char* name,bool defaultvalue)
 //------------------------------------------------------------------------
 
 csXmlReadDocument::csXmlReadDocument (csXmlReadDocumentSystem* sys) :
-  scfImplementationType(this), sys (sys), root (0)
+  scfImplementationType(this), root (0), sys (sys)
 {
 }
 
