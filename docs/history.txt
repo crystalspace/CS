@@ -6,6 +6,11 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-Jan-2008
+	- res changed the gl3d framebuffer render-to-texture backend to not
+	  use hardcoded internal formats when turning textures into render
+	  targets but a format depending on the actual format of the texture
+	  and the bit depth of the framebuffer.
 18-Jan-2008
 	- res committed an update to the MSVC 7+ external project HOWTO from
 	  nev7n.
