@@ -176,30 +176,30 @@ size_t csXmlReadNodeIterator::GetEndPosition ()
 
 //------------------------------------------------------------------------
 
-void csXmlReadNode::DecRef ()
-{
-  CS_ASSERT_MSG("Refcount decremented for destroyed object", 
-    scfRefCount != 0);
-  csRefTrackerAccess::TrackDecRef (GetSCFObject(), scfRefCount);
-  scfRefCount--;
-  if (scfRefCount == 0)
-  {
-    scfRemoveRefOwners ();
-    if (scfParent) scfParent->DecRef();
-    doc->Free (this);
-  }
+csXmlReadDocument* csXmlReadNode::GetDoc()
+{ 
+  return static_cast<csXmlReadDocument*> (scfPool); 
 }
 
-csXmlReadNode::csXmlReadNode (csXmlReadDocument* doc) :
-  scfImplementationType(this)
+void csXmlReadNode::DecRef ()
 {
-  node = 0;
-  node_children = 0;
-  csXmlReadNode::doc = doc;	// Increase reference.
+  csXmlReadDocument* doc = GetDoc();
+  /* In case we're freed the doc's node pool will be accessed; to make sure
+     it's valid keep a ref to the doc while we're (potentially) destructed */
+  doc->csXmlReadDocument::IncRef();
+  scfPooledImplementationType::DecRef();
+  doc->csXmlReadDocument::DecRef();
+}
+
+csXmlReadNode::csXmlReadNode () :
+  scfPooledImplementationType(this), node (0), node_children (0)
+{
+  GetDoc()->IncRef();
 }
 
 csXmlReadNode::~csXmlReadNode ()
 {
+  GetDoc()->DecRef();
 }
 
 csRef<iDocumentNode> csXmlReadNode::GetParent ()
@@ -214,7 +214,7 @@ csRef<iDocumentNode> csXmlReadNode::GetParent ()
   else
   {
     if (!node->Parent ()) return child;
-    child = csPtr<iDocumentNode> (doc->Alloc (node->Parent (), false));
+    child = csPtr<iDocumentNode> (GetDoc()->Alloc (node->Parent (), false));
     return child;
   }
   
@@ -261,7 +261,7 @@ csRef<iDocumentNodeIterator> csXmlReadNode::GetNodes ()
 {
   csRef<iDocumentNodeIterator> it;
   it = csPtr<iDocumentNodeIterator> (new csXmlReadNodeIterator (
-  	doc, use_contents_value ? 0 : node_children, 0));
+  	GetDoc(), use_contents_value ? 0 : node_children, 0));
   return it;
 }
 
@@ -269,7 +269,7 @@ csRef<iDocumentNodeIterator> csXmlReadNode::GetNodes (const char* value)
 {
   csRef<iDocumentNodeIterator> it;
   it = csPtr<iDocumentNodeIterator> (new csXmlReadNodeIterator (
-  	doc, use_contents_value ? 0 : node_children, value));
+  	GetDoc(), use_contents_value ? 0 : node_children, value));
   return it;
 }
 
@@ -279,7 +279,7 @@ csRef<iDocumentNode> csXmlReadNode::GetNode (const char* value)
   csRef<iDocumentNode> child;
   TrDocumentNode* c = node_children->FirstChild (value);
   if (!c) return child;
-  child = csPtr<iDocumentNode> (doc->Alloc (c, false));
+  child = csPtr<iDocumentNode> (GetDoc()->Alloc (c, false));
   return child;
 }
 
@@ -401,23 +401,13 @@ bool csXmlReadNode::GetAttributeValueAsBool (const char* name,bool defaultvalue)
 //------------------------------------------------------------------------
 
 csXmlReadDocument::csXmlReadDocument (csXmlReadDocumentSystem* sys) :
-  scfImplementationType(this)
+  scfImplementationType(this), root (0), sys (sys)
 {
-  csXmlReadDocument::sys = sys;	// Increase ref.
-  pool = 0;
-  root = 0;
 }
 
 csXmlReadDocument::~csXmlReadDocument ()
 {
   Clear ();
-  while (pool)
-  {
-    csXmlReadNode* n = pool->next_pool;
-    // The 'sys' member in pool should be 0 here.
-    delete pool;
-    pool = n;
-  }
 }
 
 void csXmlReadDocument::Clear ()
@@ -501,19 +491,7 @@ const char* csXmlReadDocument::ParseInPlace (char* buf, bool collapse)
 
 csXmlReadNode* csXmlReadDocument::Alloc ()
 {
-  if (pool)
-  {
-    csXmlReadNode* n = pool;
-    pool = n->next_pool;
-    n->scfRefCount = 1;
-    n->doc = this;	// Incref.
-    return n;
-  }
-  else
-  {
-    csXmlReadNode* n = new csXmlReadNode (this);
-    return n;
-  }
+  return new (*this) csXmlReadNode ();
 }
 
 csXmlReadNode* csXmlReadDocument::Alloc (TrDocumentNode* node,
@@ -522,13 +500,6 @@ csXmlReadNode* csXmlReadDocument::Alloc (TrDocumentNode* node,
   csXmlReadNode* n = Alloc ();
   n->SetTiNode (node, use_contents_value);
   return n;
-}
-
-void csXmlReadDocument::Free (csXmlReadNode* n)
-{
-  n->next_pool = pool;
-  pool = n;
-  n->doc = 0;	// Free ref.
 }
 
 //------------------------------------------------------------------------
