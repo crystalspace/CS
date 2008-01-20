@@ -28,38 +28,35 @@ if (!csInitializer::RequestPlugins(object_reg,
   CS_REQUEST_END))
 @dots{}
 
-csRef<iLoader> loader = csQueryRegistry<iLoader> (object_reg);
-csRef<iSndSysRenderer> sndrdr =
-  csQueryRegistry<iSndSysRenderer> (object_reg);
-if (sndrdr)
-@{
-  iSndSysWrapper* w_boom = loader->LoadSoundWrapper (
-    <sound name>, <sound file>, CS_SND3D_DISABLE);
-  if (w_boom)
-  @{
-    csRef<iSoundSource> sndsrc =
-      w_boom->GetSound()->CreateSource(w_boom->GetStream());
-    w_boom->GetStream ()->SetLoopState (CS_SNDSYS_STREAM_DONTLOOP);
-    w_boom->GetStream ()->Unpause();
-  @}
-@}
+  csRef<iSndSysRenderer> sndrenderer = csQueryRegistry<iSndSysRenderer> (GetObjectRegistry());
+  if (!sndrenderer) return ReportError("Failed to locate Sound renderer!"); 
+  
+  csRef<iSndSysWrapper> w_boom = loader->LoadSoundWrapper("buzz","/lib/std/loopbzzt.wav");
+  if(!w_boom) ReportError("No Wrapper");
+
+  csRef<iSndSysData> snddata = w_boom->GetData();
+  if(!snddata) ReportError("No Sound Data");
+
+  csRef<iSndSysStream> sndstream = sndrenderer->CreateStream (snddata, CS_SND3D_ABSOLUTE);
+
+  if(!sndstream) ReportError("No Stream");
+  
+  sndstream->SetLoopState (CS_SNDSYS_STREAM_DONTLOOP);
+  sndstream->Unpause ();
+  
+  csRef<iSndSysSource> sndsrc = sndrenderer->CreateSource (sndstream);
+  if(!sndsrc)ReportError("No Source");
+
+   sndsrc->SetVolume( 1.0 );
 @end example
 
 @subsubheading Looping Background Music
 
-Here is how you can play a looping sound:
+Here is how you can specify a looping sound:
 
 @example
-csRef<iSndSysRenderer> sndrdr =
-  csQueryRegistry<iSndSysRenderer> (object_reg);
-if (sndrdr)
-@{
-  iSndSysWrapper* w_music = loader->LoadSoundWrapper (
-    <sound name>, <sound file>, CS_SND3D_DISABLE);
-  if (w_music)
-  @{
-    w_music->GetStream ()->SetLoopState (CS_SNDSYS_STREAM_LOOP);
-    w_music->GetStream ()->Unpause();
-  @}
-@}
+@dots()
+  sndstream->SetLoopState (CS_SNDSYS_STREAM_DONTLOOP);
+  sndstream->Unpause ();
+@dots()
 @end example
