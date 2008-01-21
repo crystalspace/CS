@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 20-Jan-2008
+	- Ross B updated sound docs to use a reference to iLoader instead of
+	  iSndSysLoader.
 	- Ross B updated old sound documentation to be relevant again.
 	- caedes added swig declaration for scfImplementation3 template.
 19-Jan-2008
