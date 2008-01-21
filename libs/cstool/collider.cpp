@@ -27,6 +27,7 @@
 
 #include "cstool/collider.h"
 #include "iengine/camera.h"
+#include "iengine/collection.h"
 #include "iengine/engine.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
@@ -306,8 +307,25 @@ void csColliderHelper::InitializeCollisionWrappers (iCollideSystem* colsys,
   for (i = 0 ; i < meshes->GetCount () ; i++)
   {
     iMeshWrapper* sp = meshes->Get (i);
-    if (region && !region->IsInRegion (sp->QueryObject ())) continue;
-    InitializeCollisionWrapper (colsys, sp);
+    if(region && !region->IsInRegion(sp->QueryObject())) continue;
+      InitializeCollisionWrapper (colsys, sp);
+  }
+}
+
+void csColliderHelper::InitializeCollisionWrappers (iCollideSystem* colsys,
+  	iEngine* engine, iCollection* collection)
+{
+  // Initialize all mesh objects for collision detection.
+  int i;
+  iMeshList* meshes = engine->GetMeshes ();
+  for (i = 0 ; i < meshes->GetCount () ; i++)
+  {
+    iMeshWrapper* sp = meshes->Get(i);
+    csRef<iMeshWrapper> inCollection = CS::GetNamedChildObject<iMeshWrapper>(collection->QueryObject(), sp->QueryObject()->GetName());
+    if(collection && inCollection)
+    {
+      InitializeCollisionWrapper (colsys, sp);
+    }
   }
 }
 

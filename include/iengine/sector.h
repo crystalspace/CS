@@ -511,7 +511,7 @@ struct iSectorList : public virtual iBase
   virtual void RemoveAll () = 0;
 
   /// Find a sector and return its index.
-  virtual int Find (iSector *obj) const = 0;
+  virtual int Find (const iSector *obj) const = 0;
 
   /// Find a sector by name.
   virtual iSector *FindByName (const char *Name) const = 0;

@@ -726,7 +726,7 @@ public:
       (csSpriteCal3DSocket*)sockets[f] : (csSpriteCal3DSocket*)0;
   }
 
-  bool SetMaterial(const char *mesh_name,iMaterialWrapper *mat);
+  bool SetMaterial(const char *mesh_name, iMaterialWrapper *mat);
 
   float GetAnimationTime()
   {

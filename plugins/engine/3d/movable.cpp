@@ -83,9 +83,9 @@ void csMovableSectorList::RemoveAll ()
   movable->ClearSectors ();
 }
 
-int csMovableSectorList::Find (iSector *obj) const
+int csMovableSectorList::Find (const iSector *obj) const
 {
-  return (int)csRefArrayObject<iSector>::Find (obj);
+  return (int)csRefArrayObject<iSector>::Find (const_cast<iSector*>(obj));
 }
 
 iSector *csMovableSectorList::FindByName (const char *Name) const

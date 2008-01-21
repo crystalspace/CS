@@ -52,6 +52,7 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
+#include "plugins/engine/3d/collection.h"
 #include "plugins/engine/3d/halo.h"
 #include "plugins/engine/3d/meshobj.h"
 #include "plugins/engine/3d/meshfact.h"
@@ -436,12 +437,25 @@ public:
   
   virtual iRegionList* GetRegions ();
 
+  // -- Collection handling
+
+  virtual iCollection* CreateCollection(const char* name);
+
+  virtual iCollection* GetCollection(const char* name);
+
+  virtual iCollection* GetDefaultCollection();
+
+  virtual void RemoveCollection(const char* name);
+
   //-- Camera handling
 
   virtual csPtr<iCamera> CreateCamera ();
 
   virtual iCameraPosition* FindCameraPosition (const char* name,
   	iRegion* region = 0);
+
+  virtual iCameraPosition* FindCameraPosition (const char* name,
+  	iCollection* collection = 0);
 
   virtual iCameraPositionList* GetCameraPositions ()
   { return &cameraPositions; }
@@ -492,7 +506,8 @@ public:
   virtual iRenderView* GetTopLevelClipper () const
   { return (iRenderView*)topLevelClipper; }
 
-  virtual void PrecacheDraw (iRegion* region = 0);
+  virtual void PrecacheDraw (iRegion* region);
+  virtual void PrecacheDraw (iCollection* collection = 0);
   virtual void Draw (iCamera* c, iClipper2D* clipper, iMeshWrapper* mesh = 0);
 
   virtual void SetContext (iTextureHandle* ctxt);
@@ -730,6 +745,19 @@ private:
   void FireStartFrame (iRenderView* rview);
 
   /**
+   * Split a name into optional 'collection/name' format.
+   * This function returns the pointer to the real name of the object.
+   * The 'collection' variable will contain the collection is one is given.
+   * If a collection was given but none could be found this function returns
+   * 0 (this is an error).<br>
+   * If '*' was given as a collection name then all collection are searched EVEN if
+   * the the FindXxx() routine is called for a specific collection only. i.e.
+   * this forces the search to be global. In this case 'global' will be set
+   * to true.
+   */
+  char* SplitCollectionName (const char* name, iCollection*& collection, bool& global);
+
+  /**
    * Split a name into optional 'region/name' format.
    * This function returns the pointer to the real name of the object.
    * The 'region' variable will contain the region is one is given.
@@ -739,7 +767,9 @@ private:
    * the the FindXxx() routine is called for a specific region only. i.e.
    * this forces the search to be global. In this case 'global' will be set
    * to true.
+   * \deprecate Regions are deprecated. Use Collections instead. Deprecated in 1.3.
    */
+  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
   char* SplitRegionName (const char* name, iRegion*& region, bool& global);
 
   // Precache a single mesh
@@ -845,6 +875,8 @@ private:
   csPDelArray<csLightHalo> halos;
   /// The list of all regions currently loaded.
   csRegionList regions;
+  /// The hash of all collections currently existing.
+  csHash<csCollection*, csString> collections;
 
   /// Sector callbacks.
   csRefArray<iEngineSectorCallback> sectorCallbacks;

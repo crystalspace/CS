@@ -573,7 +573,7 @@ struct iSpriteCal3DState : public virtual iBase
   /** @} */
 
   /// Change the material on a named submesh.  Returns true if successful.
-  virtual bool SetMaterial(const char *mesh_name,iMaterialWrapper *mat) = 0;
+  virtual bool SetMaterial(const char *mesh_name, iMaterialWrapper *mat) = 0;
 
   /**\name Time
    * @{ */

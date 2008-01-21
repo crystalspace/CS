@@ -48,7 +48,9 @@ struct iShader;
  * Main ways to get pointers to this interface:
  * - iEngine::CreateRegion()
  */
-struct iRegion : public virtual iBase
+struct
+//CS_DEPRECATED_TYPE_MSG ("iRegion is deprecated. Use iCollection instead")
+iRegion : public virtual iBase
 {
   SCF_INTERFACE(iRegion, 2,2,0);
   /// Get the iObject for this region.
@@ -122,7 +124,9 @@ struct iRegion : public virtual iBase
  * Main ways to get pointers to this interface:
  * - iEngine::GetRegions()
  */
-struct iRegionList : public virtual iBase
+struct
+//CS_DEPRECATED_TYPE_MSG ("iRegionList is deprecated. Use Collections instead")
+iRegionList : public virtual iBase
 {
   SCF_INTERFACE(iRegionList, 2,0,0);
   /// Return the number of regions in this list.

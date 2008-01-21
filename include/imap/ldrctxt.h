@@ -26,6 +26,7 @@
 
 /**\addtogroup loadsave
  * @{ */
+struct iCollection;
 struct iMaterialWrapper;
 struct iMeshFactoryWrapper;
 struct iMeshWrapper;
@@ -50,7 +51,7 @@ struct iShader;
  */
 struct iLoaderContext : public virtual iBase
 {
-  SCF_INTERFACE(iLoaderContext,2,0,0);
+  SCF_INTERFACE(iLoaderContext,2,2,0);
   /// Find a sector.
   virtual iSector* FindSector (const char* name) = 0;
   
@@ -104,6 +105,18 @@ struct iLoaderContext : public virtual iBase
    * 0 otherwise. If not 0 then all objects will be created in the region.
    */
   virtual iRegion* GetRegion () const = 0;
+
+  /**
+   * Return a collection if we only want to load in that collection.
+   * 0 otherwise. If not 0 then all objects will be created in the collection.
+   */
+  virtual iCollection* GetCollection () const = 0;
+
+  /**
+   * Returns the type of objects we wish to guarantee to be kept in a collection.
+   * Useful for preloading textures etc. before they're used.
+   */
+  virtual uint GetKeepFlags() const = 0;
 
   /**
    * Return true if we only want to look for objects in the region

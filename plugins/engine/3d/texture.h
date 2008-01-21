@@ -210,7 +210,7 @@ public:
 class csTextureList : 
   public scfImplementation1<csTextureList,
                             iTextureList>,
-  public csRefArrayObject<iTextureWrapper>
+  public csWeakRefArrayObject<iTextureWrapper>
 {
   csEngine* engine;
 public:

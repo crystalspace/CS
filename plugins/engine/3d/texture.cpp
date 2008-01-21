@@ -188,7 +188,7 @@ const char* csTextureWrapper::GetTextureClass ()
 //------------------------------------------------------- csTextureList -----//
 
 csTextureList::csTextureList (csEngine* engine) : scfImplementationType (this),
-  csRefArrayObject<iTextureWrapper> (16, 16), engine (engine)
+  csWeakRefArrayObject<iTextureWrapper> (16, 16), engine (engine)
 {
 }
 
@@ -198,16 +198,14 @@ csTextureList::~csTextureList()
 
 iTextureWrapper *csTextureList::NewTexture (iImage *image)
 {
-  csRef<iTextureWrapper> tm;
-  tm.AttachNew (new csTextureWrapper (engine, image));
+  iTextureWrapper* tm = new csTextureWrapper(engine, image);
   Push (tm);
   return tm;
 }
 
 iTextureWrapper *csTextureList::NewTexture (iTextureHandle *ith)
 {
-  csRef<iTextureWrapper> tm;
-  tm.AttachNew (new csTextureWrapper (engine, ith));
+  iTextureWrapper* tm = new csTextureWrapper(engine, ith);
   Push (tm);
   return tm;
 }
@@ -219,7 +217,7 @@ int csTextureList::GetCount () const
 
 iTextureWrapper *csTextureList::Get (int n) const
 {
-  return csRefArrayObject<iTextureWrapper>::Get (n);
+  return csWeakRefArrayObject<iTextureWrapper>::Get (n);
 }
 
 int csTextureList::Add (iTextureWrapper *obj)
@@ -244,10 +242,10 @@ void csTextureList::RemoveAll ()
 
 int csTextureList::Find (iTextureWrapper *obj) const
 {
-  return (int)csRefArrayObject<iTextureWrapper>::Find (obj);
+  return (int)csWeakRefArrayObject<iTextureWrapper>::Find (obj);
 }
 
 iTextureWrapper *csTextureList::FindByName (const char *Name) const
 {
-  return csRefArrayObject<iTextureWrapper>::FindByName (Name);
+  return csWeakRefArrayObject<iTextureWrapper>::FindByName (Name);
 }

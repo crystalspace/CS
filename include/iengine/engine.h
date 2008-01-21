@@ -43,6 +43,7 @@ struct iCamera;
 struct iCameraPosition;
 struct iCameraPositionList;
 struct iClipper2D;
+struct iCollection;
 struct iDataBuffer;
 struct iFrustumView;
 struct iLight;
@@ -173,7 +174,7 @@ struct iEngineSectorCallback : public virtual iBase
  */
 struct iEngine : public virtual iBase
 {
-  SCF_INTERFACE(iEngine,2,1,1);
+  SCF_INTERFACE(iEngine,2,2,0);
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;
@@ -936,6 +937,16 @@ struct iEngine : public virtual iBase
   /// Get the list of all regions
   virtual iRegionList* GetRegions () = 0;
 
+  // -- Collection handling
+
+  virtual iCollection* CreateCollection(const char* name) = 0;
+
+  virtual iCollection* GetCollection(const char* name) = 0;
+
+  virtual iCollection* GetDefaultCollection() = 0;
+
+  virtual void RemoveCollection(const char* name) = 0;
+
   /** @} */
   
   /**\name Camera handling
@@ -949,6 +960,21 @@ struct iEngine : public virtual iBase
 
   /**
    * Find the given camera position. The name can be a normal
+   * name. In that case this function will look in all collections
+   * except if collection is not 0 in which case it will only
+   * look in that collection.
+   * If the name is specified as 'collection/objectname' then
+   * this function will only look in the specified region and return
+   * 0 if that region doesn't contain the object or the region
+   * doesn't exist. In this case the region parameter is ignored.
+   * \param name the engine name of the desired camera position
+   * \param collection if specified, search only this collection (also see note above)
+   */
+  virtual iCameraPosition* FindCameraPosition (const char* name,
+  	iCollection* collection = 0) = 0;
+
+  /**
+   * Find the given camera position. The name can be a normal
    * name. In that case this function will look in all regions
    * except if region is not 0 in which case it will only
    * look in that region.
@@ -958,9 +984,11 @@ struct iEngine : public virtual iBase
    * doesn't exist. In this case the region parameter is ignored.
    * \param name the engine name of the desired camera position
    * \param region if specified, search only this region (also see note above)
+   * \deprecate Regions are deprecated. Use Collections instead. Deprecated in 1.3.
    */
+  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
   virtual iCameraPosition* FindCameraPosition (const char* name,
-  	iRegion* region = 0) = 0;
+  	iRegion* region) = 0;
 
   /// Get the list of camera positions.
   virtual iCameraPositionList* GetCameraPositions () = 0;
@@ -1106,8 +1134,20 @@ struct iEngine : public virtual iBase
    * caches and stuff.
    * \param region is an optional region. If given then only objects
    *        in that region will be precached.
+   * \deprecate Regions are deprecated. Use Collections instead. Deprecated in 1.3.
    */
-  virtual void PrecacheDraw (iRegion* region = 0) = 0;
+  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
+  virtual void PrecacheDraw (iRegion* region) = 0;
+
+  /**
+   * This function precaches all meshes by calling GetRenderMeshes()
+   * on them. By doing this the level will run smoother if you walk
+   * through it because all meshes will have had a chance to update
+   * caches and stuff.
+   * \param region is an optional region. If given then only objects
+   *        in that region will be precached.
+   */
+  virtual void PrecacheDraw(iCollection* collection = 0) = 0;
 
   /**
    * Draw the 3D world given a camera and a clipper. Note that

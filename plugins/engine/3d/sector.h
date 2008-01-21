@@ -598,7 +598,7 @@ public:
   virtual bool Remove (iSector *obj);
   virtual bool Remove (int n);
   virtual void RemoveAll ();
-  virtual int Find (iSector *obj) const;
+  virtual int Find (const iSector *obj) const;
   virtual iSector *FindByName (const char *Name) const;
 };
 

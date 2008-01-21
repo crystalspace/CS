@@ -1279,9 +1279,9 @@ void csSectorList::RemoveAll ()
   sectors_hash.DeleteAll ();
 }
 
-int csSectorList::Find (iSector *obj) const
+int csSectorList::Find (const iSector *obj) const
 {
-  return (int)list.Find (obj);
+  return (int)list.Find (const_cast<iSector*>(obj));
 }
 
 iSector *csSectorList::FindByName (const char *Name) const

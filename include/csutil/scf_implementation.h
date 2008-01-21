@@ -177,7 +177,7 @@ protected:
   virtual size_t GetInterfaceMetadataCount () const;
 
   scfImplementationHelper() : scfAuxData (0) {}
-  ~scfImplementationHelper() { if (HasAuxData()) FreeAuxData(); }
+  virtual ~scfImplementationHelper() { if (HasAuxData()) FreeAuxData(); }
 };
 
 /**
