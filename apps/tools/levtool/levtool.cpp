@@ -30,30 +30,16 @@
 #include "iutil/cmdline.h"
 #include "iutil/document.h"
 #include "cstool/initapp.h"
+#include "cstool/smartfileopen.h"
 #include "ivaria/reporter.h"
 #include "iutil/databuff.h"
 
 #include "levtool.h"
+#include "fixpolymesh.h"
 
 //-----------------------------------------------------------------------------
 
 CS_IMPLEMENT_APPLICATION
-
-//-----------------------------------------------------------------------------
-
-#define OP_HELP 0
-#define OP_LIST 1
-#define OP_DYNAVIS 2
-#define OP_VALIDATE 3
-#define OP_SPLITUNIT 4
-#define OP_SPLITGEOM 5
-#define OP_COMPRESS 7
-#define OP_ANALYZE 8
-#define OP_FLAGCLEAR 10
-#define OP_FLAGGOOD 11
-#define OP_FLAGBAD 12
-#define OP_TRANSLATE 13
-#define OP_PLANES 14
 
 //-----------------------------------------------------------------------------
 
@@ -1349,7 +1335,7 @@ void LevTool::CloneAndMovePlanes (iDocument* doc, iDocument* newdoc)
 static int cnt;
 
 void LevTool::CloneAndChangeFlags (iDocumentNode* node, iDocumentNode* newnode,
-  	int op, int minsize, int maxsize, int minpoly, int maxpoly,
+  	Operation op, int minsize, int maxsize, int minpoly, int maxpoly,
 	float global_area)
 {
   const char* parentvalue = node->GetValue ();
@@ -1446,7 +1432,7 @@ void LevTool::CloneAndChangeFlags (iDocumentNode* node, iDocumentNode* newnode,
 }
 
 void LevTool::CloneAndChangeFlags (iDocument* doc, iDocument* newdoc,
-  	int op, int minsize, int maxsize, int minpoly, int maxpoly,
+  	Operation op, int minsize, int maxsize, int minpoly, int maxpoly,
 	float global_area)
 {
   csRef<iDocumentNode> root = doc->GetRoot ();
@@ -1638,7 +1624,7 @@ void LevTool::Main ()
   csRef<iPluginManager> plugin_mgr = 
     csQueryRegistry<iPluginManager> (object_reg);
 
-  int op = OP_HELP;
+  Operation op = OP_HELP;
 
   if (cmdline->GetOption ("inds") || cmdline->GetOption ("outds"))
     op = OP_TRANSLATE;
@@ -1654,6 +1640,7 @@ void LevTool::Main ()
   if (cmdline->GetOption ("flaggood")) op = OP_FLAGGOOD;
   if (cmdline->GetOption ("flagbad")) op = OP_FLAGBAD;
   if (cmdline->GetOption ("planes")) op = OP_PLANES;
+  if (cmdline->GetOption ("fixpolymesh")) op = OP_FIXPOLYMESH;
   if (cmdline->GetOption ("help")) op = OP_HELP;
 
   if (op == OP_HELP)
@@ -1704,6 +1691,8 @@ void LevTool::Main ()
     csPrintf ("     -maxpoly=<number>: max number of polygons (default 1000000000).\n");
     csPrintf ("  -planes:\n");          
     csPrintf ("     Move all 'addon' planes to the polygons that use them.\n");
+    csPrintf ("  -fixpolymesh:\n");       
+    csPrintf ("     Fix maps using <polymesh>es by replacing these with <trimesh>es.\n");
     csPrintf ("  -inds=<plugin>:\n");       
     csPrintf ("     Document system plugin for reading world.\n");
     csPrintf ("  -outds=<plugin>:\n");       
@@ -1799,23 +1788,21 @@ void LevTool::Main ()
   }
 
   csString filename;
-  if (strstr (val, ".zip"))
+  csRef<iDataBuffer> buf;
   {
-    vfs->Mount ("/tmp/levtool_data", val);
-    filename = "/tmp/levtool_data/world";
+    const char* actualFilename;
+    csRef<iFile> file (CS::Utility::SmartFileOpen (vfs, val, "world", 
+      &actualFilename));
+    if (!file.IsValid ())
+    {
+      ReportError ("Could not open a '%s' file at given path '%s'.", 
+        actualFilename, val);
+      return;
+    }
+    buf = file->GetAllData ();
+    filename = actualFilename;
   }
-  else
-  {
-    filename = val;
-  }
-
-  csRef<iDataBuffer> buf = vfs->ReadFile (filename);
-  if (!buf || !buf->GetSize ())
-  {
-    ReportError ("File '%s' does not exist!", (const char*)filename);
-    return;
-  }
-
+  
   // Make backup.
   switch (op)
   {
@@ -1871,9 +1858,6 @@ void LevTool::Main ()
     newsys = (csPtr<iDocumentSystem> (
       new csTinyDocumentSystem ()));
   }
-
-  csRef<iDocumentNode> root = doc->GetRoot ();
-  csRef<iDocumentNode> worldnode = root->GetNode ("world");
 
   switch (op)
   {
@@ -2193,6 +2177,29 @@ void LevTool::Main ()
 	vfs->Sync();
       }
       break;
+
+    case OP_FIXPOLYMESH:
+      {
+	Report (CS_REPORTER_SEVERITY_NOTIFY, "Fixing <polymesh>es...");
+	csRef<iDocumentNode> root = doc->GetRoot ();
+	csRef<iDocument> newdoc = newsys->CreateDocument ();
+	csRef<iDocumentNode> newroot = newdoc->CreateRoot ();
+	CloneNode (root, newroot);
+        root = 0;
+	doc = 0;
+
+        FixPolyMesh fixer;
+        fixer.Fix (newroot);
+
+        error = newdoc->Write (vfs, filename);
+	if (error != 0)
+	{
+	  ReportError ("Error writing '%s': %s!", (const char*)filename, error);
+	  return;
+	}
+      }
+      break;
+
   }
 
   //---------------------------------------------------------------

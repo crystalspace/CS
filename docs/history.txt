@@ -151,6 +151,13 @@ chronological order.
 	- Jorrit fixed a bug in genmesh. Decals didn't work on submeshes.
 	  This prevented decals from working on levels treated with
 	  lighter2.
+11-Aug-2007
+	- res added CS::Utility::SmartFileOpen() - a function for the somewhat
+	  common task to open a world file from a path that could denote any
+	  of: a plain filename, directory or .zip archive.
+	- res added an option to levtool to fix <polymesh> tags (by replacing
+	  them with <trimesh> tags).
+	- res made levtool use CS::Utility::SmartFileOpen().
 8-Aug-2007
 	- res added a missing initialization to csConsoleOutput. Should 
 	  address trac #368.
