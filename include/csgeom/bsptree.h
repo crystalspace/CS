@@ -22,6 +22,7 @@
 #include "csextern.h"
 
 #include "csgeom/plane3.h"
+#include "csgfx/trianglestream.h"
 #include "csutil/array.h"
 #include "csutil/blockallocator.h"
 #include "csutil/dirtyaccessarray.h"
@@ -42,7 +43,7 @@ struct csTriangle;
  * This tree will not split triangles. If a triangle needs to be split
  * then it will be put in the two nodes.
  */
-class CS_CRYSTALSPACE_EXPORT csBSPTree
+class CS_CRYSTALSPACE_EXPORT csBSPTree : public CS::Memory::CustomAllocated
 {
 private:
   CS_DECLARE_STATIC_CLASSVAR_REF(b2fArray, B2fArray, csDirtyAccessArray<int>)
@@ -54,10 +55,10 @@ private:
   csArray<int> splitters;
 
   size_t FindBestSplitter (csTriangle* triangles, csPlane3* planes,
-	int num_triangles, csVector3* vertices,
+	int num_triangles, const csVector3* vertices,
 	const csArray<int>& triidx);
   void Build (csTriangle* triangles, csPlane3* planes,
-	int num_triangles, csVector3* vertices,
+	int num_triangles, const csVector3* vertices,
 	const csArray<int>& triidx);
   void Back2Front (const csVector3& pos, csDirtyAccessArray<int>& arr,
   	csSet<int>& used_indices);
@@ -70,11 +71,14 @@ public:
   /// Clear the BSP-tree.
   void Clear ();
 
+  //@{
   /**
    * Build the BSP tree given the set of triangles.
    */
   void Build (csTriangle* triangles, int num_triangles,
-  	csVector3* vertices);
+    const csVector3* vertices);
+  void Build (CS::TriangleIndicesStream<int>& triangles, const csVector3* vertices);
+  //@}
 
   /**
    * Traverse the tree from back to front. This will return an array

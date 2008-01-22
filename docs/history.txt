@@ -127,6 +127,9 @@ chronological order.
 	  the CS manual, and removed copyright notices for a couple people
 	  whose work is no longer present in the manual. Also fixed a couple
 	  Texinfo mark-up errors in perl.txi.
+	- res tweaked csBSPTree to not use EPSILON for triangle classification
+	  against planes; this fixes overzealous classification of triangles
+	  as coplanar.
 13-Sep-2007
 	- res added a "glvendor" version that can be used by the GL driver DB.
 	- res tweaked the GL driver DB to work around apparent font corruption
