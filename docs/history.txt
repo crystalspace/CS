@@ -131,9 +131,14 @@ chronological order.
 	- res added a "glvendor" version that can be used by the GL driver DB.
 	- res tweaked the GL driver DB to work around apparent font corruption
 	  with Mesa 6.5.2 (all drivers).
+8-Sep-2007
+	- res fixed a crash in bezier plugin caused by a rendermanager-only
+	  change accidentally slipping in.
 7-Sep-2007
 	- Jorrit reverted r27161 (quotes for javac detection). This fixes
 	  both #377 and #378.
+	- res fixed the bezier mesh sometimes returning incompletely setup
+	  render meshes.
 6-Sep-2007
 	- Mike Gist fixed bug #351 (wxgl compilation problem).
 	- res fixed a null pointer access in null3d when null2d is not present.
