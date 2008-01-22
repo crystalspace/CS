@@ -190,6 +190,8 @@ chronological order.
 	- Eric Sunshine rewrote the plugin loader for Mac OS X to fully employ
 	  the "two-level" namespace dynamic-library model introduced in OSX
 	  10.1. The deprecated "flat" namespace model is no longer supported.
+	- Marten removed the only usage we had of dynamic_cast and fixed 
+	  trac #192.
 19-Jul-2007
 	- Eric Sunshine eliminated several compilation and deprecation warnings
 	  on Mac OS X.
