@@ -11,6 +11,8 @@
 	  and -fixpolymesh option for levtool).
 	- Vincent merged r27584 and r27602 (bezier mesh fix).
 	- Vincent merged r27646 into 1.2 (csBSPTree tweak).
+	- Vincent rolled back r27646, which broke the build since it requires
+	  r27645. Also, it breaks binary compat.
 21-Jan-2008
 	- Ross B merged r28512 into 1.2 (Updated Sound Documentation)
 	- Ross B Merged r28519 into 1.2 (Changes to sound documentation)
