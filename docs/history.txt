@@ -196,6 +196,8 @@ chronological order.
 	- Eric Sunshine removed some outdated entries from vfs.cfg and
 	  vfs.cfg.template which referred to items moved to CSEXTRA.
 18-Jul-2007
+	- res changed the default CS_PLUGINDIR and CS_CONFIGDIR values used
+	  by libs/unix/instpath.cpp to contain version numbers.
 	- res changed the cs-config wrapper to emit a better error message
 	  when no cs-config-* scripts are found. Also, the directory from
 	  which the wrapper was started is now searched as well.
