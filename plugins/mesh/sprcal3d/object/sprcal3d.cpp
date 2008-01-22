@@ -885,6 +885,8 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
   idle_action = -1;
   last_locked_anim = -1;
 
+  cyclic_blend_factor = 0.0f;
+
   do_update = -1;
   updateanim_sqdistance1 = 10*10;
   updateanim_skip1 = 5;  // Skip every 5 frames.
@@ -1675,7 +1677,9 @@ int csSpriteCal3DMeshObject::FindAnim(const char *name)
 void csSpriteCal3DMeshObject::ClearAllAnims()
 {
   while (active_anims.GetSize ())
-    ClearAnimCyclePos ((int)(active_anims.GetSize () - 1), 0);
+  {
+    ClearAnimCyclePos ((int)(active_anims.GetSize () - 1), cyclic_blend_factor);
+  }
 
   if (last_locked_anim != -1)
   {
@@ -1688,13 +1692,13 @@ void csSpriteCal3DMeshObject::ClearAllAnims()
 bool csSpriteCal3DMeshObject::SetAnimCycle(const char *name, float weight)
 {
   ClearAllAnims();
-  return AddAnimCycle(name, weight, 0);
+  return AddAnimCycle(name, weight, cyclic_blend_factor);
 }
 
 bool csSpriteCal3DMeshObject::SetAnimCycle(int idx, float weight)
 {
   ClearAllAnims();
-  return AddAnimCycle(idx, weight, 0);
+  return AddAnimCycle(idx, weight, cyclic_blend_factor);
 }
 
 bool csSpriteCal3DMeshObject::AddAnimCycle(const char *name, float weight,
@@ -2242,6 +2246,11 @@ void csSpriteCal3DMeshObject::SetTimeFactor(float timeFactor)
 float csSpriteCal3DMeshObject::GetTimeFactor()
 {
   return calModel.getMixer()->getTimeFactor();
+}
+
+void csSpriteCal3DMeshObject::SetCyclicBlendFactor(float factor)
+{
+  cyclic_blend_factor = factor;
 }
 
 iShaderVariableContext* csSpriteCal3DMeshObject::GetCoreMeshShaderVarContext (

@@ -419,6 +419,7 @@ private:
   int  default_idle_anim,last_locked_anim;
   float idle_override_interval;
   int   idle_action;
+  float cyclic_blend_factor;
 
   csRef<csCal3dSkeleton> skeleton;
 
@@ -688,6 +689,7 @@ public:
   void SetLOD(float lod);
   void SetTimeFactor(float timeFactor);
   float GetTimeFactor();
+  void SetCyclicBlendFactor(float factor);
 
   bool AttachCoreMesh(const char *meshname);
 
