@@ -198,6 +198,12 @@ chronological order.
 18-Jul-2007
 	- res changed the default CS_PLUGINDIR and CS_CONFIGDIR values used
 	  by libs/unix/instpath.cpp to contain version numbers.
+	- res fixed the cs-csconfig-X.Y scripts to use the right CRYSTAL_x_y
+	  variable (due a bug in the Jam code it currently used CRYSTAL_x_x).
+	- Andres really made the python wrapper work (escape regex meta chars)
+	  and fixes the longstanding, though propably harmless, typo in 
+	  checkpython.m4. Also corrects CS_CHECK_TOOL into CS_CHECK_TOOLS 
+	  (thanks to Eric).
 	- res changed the cs-config wrapper to emit a better error message
 	  when no cs-config-* scripts are found. Also, the directory from
 	  which the wrapper was started is now searched as well.
@@ -205,10 +211,6 @@ chronological order.
 	  wrapper with a custom (but portable) function, as suggested by Eric.
 	  Also made the "no cs-config-* ..." error message output to stderr
 	  instead of stdout.
-	- Andres really made the python wrapper work (escape regex meta chars)
-	  and fixes the longstanding, though propably harmless, typo in 
-	  checkpython.m4. Also corrects CS_CHECK_TOOL into CS_CHECK_TOOLS 
-	  (thanks to Eric).
 16-Jul-2007
 	- Jorrit fixed two problems in csSpline as reported by valgrind.
 	- Andres changed the python detection code to look for a 
