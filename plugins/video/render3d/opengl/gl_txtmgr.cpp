@@ -39,7 +39,7 @@ static const csGLTextureClassSettings defaultSettings =
 csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
         iGraphics2D* iG2D, iConfigFile *config,
         csGLGraphics3D *iG3D) : 
-  scfImplementationType (this), textures (16, 16)
+  scfImplementationType (this), textures (16, 16), compactTextures (false)
 {
   csGLTextureManager::object_reg = object_reg;
 
@@ -96,11 +96,11 @@ csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
 
   read_config (config);
   InitFormats ();
-  Clear ();
 }
 
 csGLTextureManager::~csGLTextureManager()
 {
+  Clear ();
 }
 
 void csGLTextureManager::read_config (iConfigFile *config)
@@ -255,10 +255,12 @@ void csGLTextureManager::Clear()
     csGLBasicTextureHandle* tex = textures[i];
     if (tex != 0) tex->Clear ();
   }
+  textures.DeleteAll ();
   for (i = 0; i < superLMs.GetSize (); i++)
   {
     superLMs[i]->DeleteTexture();
   }
+  superLMs.DeleteAll ();
 }
 
 void csGLTextureManager::UnsetTexture (GLenum target, GLuint texture)
@@ -317,6 +319,7 @@ csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImage *image,
   }
 
   csGLTextureHandle *txt = new csGLTextureHandle (image, flags, G3D);
+  CompactTextures ();
   textures.Push(txt);
   return csPtr<iTextureHandle> (txt);
 }
@@ -348,14 +351,25 @@ csPtr<iTextureHandle> csGLTextureManager::CreateTexture (int w, int h,
     return 0;
   }
 
+  CompactTextures ();
   textures.Push(txt);
   return csPtr<iTextureHandle> (txt);
 }
 
-void csGLTextureManager::UnregisterTexture (csGLBasicTextureHandle* handle)
+void csGLTextureManager::CompactTextures ()
 {
-  size_t const idx = textures.Find (handle);
-  if (idx != csArrayItemNotFound) textures.DeleteIndexFast (idx);
+  if (!compactTextures) return;
+    
+  size_t i = 0;
+  while (i < textures.GetSize ())
+  {
+    if (textures[i] == 0)
+      textures.DeleteIndexFast (i);
+    else
+      i++;
+  }
+  
+  compactTextures = false;
 }
 
 int csGLTextureManager::GetTextureFormat ()

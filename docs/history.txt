@@ -81,6 +81,11 @@ chronological order.
 	  array capacity, not size. (This works better when the vertex buffer
 	  is "presized" and shrunk again, needed when AddVertex() is to be 
 	  used.)
+	- res tweaked the gl3d texture manager to not remove a texture from
+	  the texture array immediately when the texture is freed: the array
+	  is a weak ref one anyway, 0 items are now weeded out lazily. This
+	  makes texture removal slightly more efficient due the saving of an
+	  array search.
 01-Oct-2007
         - Mike Gist reversed the loops in csSector::UnlinkObjects() to avoid
           meshes being skipped if sl->Remove() removes a mesh object from the

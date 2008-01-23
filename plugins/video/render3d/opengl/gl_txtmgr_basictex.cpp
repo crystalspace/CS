@@ -110,7 +110,7 @@ csGLBasicTextureHandle::csGLBasicTextureHandle (
 csGLBasicTextureHandle::~csGLBasicTextureHandle()
 {
   Clear ();
-  txtmgr->UnregisterTexture (this);
+  txtmgr->MarkTexturesDirty ();
 }
 
 bool csGLBasicTextureHandle::SynthesizeUploadData (

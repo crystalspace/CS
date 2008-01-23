@@ -62,6 +62,7 @@ private:
   typedef csWeakRefArray<csGLBasicTextureHandle> csTexVector;
   /// List of textures.
   csTexVector textures;
+  bool compactTextures;
 
   csStringSet textureClassIDs;
   csHash<csGLTextureClassSettings, csStringID> textureClasses;
@@ -83,6 +84,7 @@ private:
   csHash<TextureStorageFormat, csString> specialFormats;
   void InitFormats ();
   bool FormatSupported (GLenum srcFormat, GLenum srcType);
+  void CompactTextures ();
 public:
   CS_LEAKGUARD_DECLARE (csGLTextureManager);
 
@@ -152,7 +154,7 @@ public:
   virtual csPtr<iTextureHandle> CreateTexture (int w, int h,
       csImageType imagetype, const char* format, int flags,
       iString* fail_reason = 0);
-  void UnregisterTexture (csGLBasicTextureHandle* handle);
+  void MarkTexturesDirty () { compactTextures = true; }
 
   /**
    * Query the basic format of textures that can be registered with this

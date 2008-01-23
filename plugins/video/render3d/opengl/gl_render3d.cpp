@@ -1157,11 +1157,6 @@ void csGLGraphics3D::Close ()
   if (drawPixmapAFP)
     ext->glDeleteProgramsARB (1, &drawPixmapProgram);
 
-  if (txtmgr)
-  {
-    txtmgr->Clear ();
-    //delete txtmgr; txtmgr = 0;
-  }
   txtmgr = 0;
   shadermgr = 0;
   delete r2tbackend; r2tbackend = 0;
