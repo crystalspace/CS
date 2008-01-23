@@ -457,7 +457,7 @@ while (( i <= $# )); do
     a="${!i}"
     
     if [ "${a:0:2}" == "-L" ]; then
-        searchpath[${#searchpath}]="${a:2}"
+        searchpath[${#searchpath[@]}]="${a:2}"
         echo -n "$a " # copy to stdout
 
     elif [ "$a" == "--replace-all-libs" ]; then
