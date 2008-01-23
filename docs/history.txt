@@ -22,6 +22,11 @@ chronological order.
 	  with idle animations in sprcal3d. Characters will no longer play the
 	  idle animation in situations like when in the middle of a fight, and
 	  all idle animations will be played at random.
+28-Dec-2007
+	- caedes fixed castle-tex.zip being incorrectly added to vfs.cfg
+	  template, and thus impossible to find on install.
+19-Dec-2007
+	- caedes added castle-tex.zip to install targets.
 8-Dec-2007
         - Mike Gist committed a patch from Trymm to fix the direction
           animations are played. If you had been reversing some animations,
@@ -69,6 +74,12 @@ chronological order.
 	  added benefit future performance for collision detection will
 	  no longer be degraded as the cache size for OPCODE will remain
 	  small.
+	- caedes changed castle license to by-sa. Xotic agreed some time ago
+	  to have a license similar to cs so as to not complicate
+	  distribution, but seems we forgot to update the licenses
+	  appropriately. He still agrees that we can use the license more
+	  appropriate for cs (last time we agreed on by-sa, so thats what it
+	  is now).
 04-Oct-2007
 	- andres added a VarFileInfo Block to the resources for win32
 	  dlls/executables as they are invalid without and especially
@@ -76,6 +87,12 @@ chronological order.
 	- andres made the search for the CS installation in the registry not to
 	  look at the version agnostic version before the version aware bit in
 	  registry
+	- res moved the castle textures to their own .zip file: notably, their
+	  license (CC-by-nc) differs from the other textures' one (not 
+	  separately specified, presumably LGPL). Separating the textures
+	  reduces the risk that the castle textures are mistaken as being 
+	  under the LGPL and makes it easier for clients to not distribute
+	  them should they find the license inacceptable.
 03-Oct-2007
 	- res changed genmesh's "lazy" color allocation to use the vertex 
 	  array capacity, not size. (This works better when the vertex buffer

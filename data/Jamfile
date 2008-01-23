@@ -1,6 +1,7 @@
 SubDir TOP data ;
 
 InstallData
+  castle-tex.zip
   fancycon.zip
   standard.zip
   startme.zip

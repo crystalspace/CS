@@ -5,6 +5,8 @@
 	- Vincent merged r27779 into 1.2 (genmesh lazy color allocation fix).
 	- Vincent merged r27780 and r27797 into 1.2 (gl3d texture manager
 	  tweak).
+	- Vincent merged r27813, r27832, r28339 and r28368 into 1.2 (castle
+	  textures split, licensing).
 22-Jan-2008
 	- Vincent merged r27236:27237 and r27240 into 1.2 (Python
 	  crossbuilding improvements).
