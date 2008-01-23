@@ -61,6 +61,9 @@ chronological order.
 	    - Fixes up internal links to point at .php rather than .html.
 	    - Adds a "Search" field.
 13-Oct-2007
+	- res fixed a bug in DDS cubemap saving (checked for wrong subimage
+	  count).
+	- res made the DDS saver support DXT w/ cubemaps.
 	- Mike Gist added matRef to Mesh (cal3d) to increase the refCount on
 	  materials used by that mesh. This fixes a problem where the ref count
 	  on some materials was incorrect.

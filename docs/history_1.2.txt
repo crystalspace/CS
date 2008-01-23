@@ -10,6 +10,7 @@
 	- Vincent merged r27826 into 1.2 (xmlshader conditionals fix).
 	- Vincent merged r27843 into 1.2 (relocate old history entries to
 	  history.old).
+	- Vincent merged r27898 into 1.2 (DDS cubemap saving fix).
 22-Jan-2008
 	- Vincent merged r27236:27237 and r27240 into 1.2 (Python
 	  crossbuilding improvements).
