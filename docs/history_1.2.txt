@@ -1,5 +1,7 @@
 1.2 branch log.
 
+23-Jan-2008
+	- Vincent merged r27744 into 1.2 (shader fixes).
 22-Jan-2008
 	- Vincent merged r27236:27237 and r27240 into 1.2 (Python
 	  crossbuilding improvements).

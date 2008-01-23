@@ -86,6 +86,14 @@ chronological order.
 	  duplication bug in FindNamedMaterial().
 	- Vincent fixed a <comparever> entry in gldriver.xml.
         - Mike Gist fixed a crash in csMeshFactoryList::Remove().
+	- caedes made some shader changes:
+	  - fixed vertexlight.cgvp for undeclared matrix and incorrect
+	    attenuation.
+	  - fixed ambient.avp binding texture coordinates incorrectly.
+	  - made std_character2.xml use only software skinning (added
+	    soft-skinning.inc snippet).
+	  - added a fallback for character_bump2.xml for cards with no
+	    pixel processor.
 25-Sep-2007
 	- res fixed lighter2 to conserve used "single color" lightmaps when 
 	  cleaning "old" lightmaps.
