@@ -76,6 +76,11 @@ chronological order.
 	- andres made the search for the CS installation in the registry not to
 	  look at the version agnostic version before the version aware bit in
 	  registry
+03-Oct-2007
+	- res changed genmesh's "lazy" color allocation to use the vertex 
+	  array capacity, not size. (This works better when the vertex buffer
+	  is "presized" and shrunk again, needed when AddVertex() is to be 
+	  used.)
 01-Oct-2007
         - Mike Gist reversed the loops in csSector::UnlinkObjects() to avoid
           meshes being skipped if sl->Remove() removes a mesh object from the

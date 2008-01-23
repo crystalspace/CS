@@ -2,6 +2,7 @@
 
 23-Jan-2008
 	- Vincent merged r27744 into 1.2 (shader fixes).
+	- Vincent merged r27779 into 1.2 (genmesh lazy color allocation fix).
 22-Jan-2008
 	- Vincent merged r27236:27237 and r27240 into 1.2 (Python
 	  crossbuilding improvements).

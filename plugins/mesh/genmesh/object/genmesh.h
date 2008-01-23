@@ -585,7 +585,7 @@ public:
   {
     if (ensureValid && (mesh_colors.GetSize() == 0))
     {
-      mesh_colors.SetCapacity (mesh_vertices.GetSize());
+      mesh_colors.SetCapacity (mesh_vertices.Capacity());
       mesh_colors.SetSize (mesh_vertices.GetSize(), csColor4 (0, 0, 0, 1));
     }
     return mesh_colors.GetArray();
