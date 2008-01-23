@@ -22386,6 +22386,36 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iSpriteCal3DState_SetCyclicBlendFactor(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iSpriteCal3DState *arg1 = (iSpriteCal3DState *) 0 ;
+  float arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  float val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DState_SetCyclicBlendFactor",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DState, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DState_SetCyclicBlendFactor" "', argument " "1"" of type '" "iSpriteCal3DState *""'"); 
+  }
+  arg1 = reinterpret_cast< iSpriteCal3DState * >(argp1);
+  ecode2 = SWIG_AsVal_float(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSpriteCal3DState_SetCyclicBlendFactor" "', argument " "2"" of type '" "float""'");
+  } 
+  arg2 = static_cast< float >(val2);
+  (arg1)->SetCyclicBlendFactor(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iSpriteCal3DState_SetLOD(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iSpriteCal3DState *arg1 = (iSpriteCal3DState *) 0 ;
@@ -41559,6 +41589,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSpriteCal3DState_SetAnimAction", _wrap_iSpriteCal3DState_SetAnimAction, METH_VARARGS, NULL},
 	 { (char *)"iSpriteCal3DState_SetVelocity", _wrap_iSpriteCal3DState_SetVelocity, METH_VARARGS, NULL},
 	 { (char *)"iSpriteCal3DState_SetDefaultIdleAnim", _wrap_iSpriteCal3DState_SetDefaultIdleAnim, METH_VARARGS, NULL},
+	 { (char *)"iSpriteCal3DState_SetCyclicBlendFactor", _wrap_iSpriteCal3DState_SetCyclicBlendFactor, METH_VARARGS, NULL},
 	 { (char *)"iSpriteCal3DState_SetLOD", _wrap_iSpriteCal3DState_SetLOD, METH_VARARGS, NULL},
 	 { (char *)"iSpriteCal3DState_AttachCoreMesh", _wrap_iSpriteCal3DState_AttachCoreMesh, METH_VARARGS, NULL},
 	 { (char *)"iSpriteCal3DState_DetachCoreMesh", _wrap_iSpriteCal3DState_DetachCoreMesh, METH_VARARGS, NULL},

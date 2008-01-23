@@ -1022,6 +1022,7 @@ class iSpriteCal3DState(core.iBase):
     def SetAnimAction(*args): return _imesh.iSpriteCal3DState_SetAnimAction(*args)
     def SetVelocity(*args): return _imesh.iSpriteCal3DState_SetVelocity(*args)
     def SetDefaultIdleAnim(*args): return _imesh.iSpriteCal3DState_SetDefaultIdleAnim(*args)
+    def SetCyclicBlendFactor(*args): return _imesh.iSpriteCal3DState_SetCyclicBlendFactor(*args)
     def SetLOD(*args): return _imesh.iSpriteCal3DState_SetLOD(*args)
     def AttachCoreMesh(*args): return _imesh.iSpriteCal3DState_AttachCoreMesh(*args)
     def DetachCoreMesh(*args): return _imesh.iSpriteCal3DState_DetachCoreMesh(*args)

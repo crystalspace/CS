@@ -14354,6 +14354,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetAnimAction = *cspacec::iSpriteCal3DState_SetAnimAction;
 *SetVelocity = *cspacec::iSpriteCal3DState_SetVelocity;
 *SetDefaultIdleAnim = *cspacec::iSpriteCal3DState_SetDefaultIdleAnim;
+*SetCyclicBlendFactor = *cspacec::iSpriteCal3DState_SetCyclicBlendFactor;
 *SetLOD = *cspacec::iSpriteCal3DState_SetLOD;
 *AttachCoreMesh = *cspacec::iSpriteCal3DState_AttachCoreMesh;
 *DetachCoreMesh = *cspacec::iSpriteCal3DState_DetachCoreMesh;
