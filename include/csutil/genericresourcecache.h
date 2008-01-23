@@ -117,13 +117,19 @@ namespace CS
      */
     template<typename T,
       typename _TimeType = uint, 
-      typename ResourceSorting = ResourceCache::SortingNone,
-      typename ReuseCondition = ResourceCache::ReuseConditionAfterTime<_TimeType> >
+      typename _ResourceSorting = ResourceCache::SortingNone,
+      typename _ReuseCondition = ResourceCache::ReuseConditionAfterTime<_TimeType> >
     class GenericResourceCache
     {
-    public:
+    public:      
       typedef _TimeType TimeType;
+      typedef _ResourceSorting ResourceSorting;
+      typedef _ReuseCondition ReuseCondition;      
+      
     protected:
+      typedef typename ReuseCondition::AddParameter ReuseConditionAddParameter;
+      typedef typename ResourceSorting::KeyType ResourceSortingKeyType;
+
       template<typename Super>
       struct DataStorage : public CS::Memory::CustomAllocatedDerived<Super>
       {
@@ -201,7 +207,7 @@ namespace CS
 	  }
 	  else
 	  {
-	    bool gte = ResourceSorting::IsLargerEqual (el->data, node->data);
+	    bool gte = (ResourceSorting::IsLargerEqual (el->data, node->data) != 0);
 	    if (gte)
 	      RecursiveInsert (node, node->treeRight, el);
 	    else
@@ -259,7 +265,7 @@ namespace CS
 	/// Fix up the RB tree after an insert.
 	void InsertFixup (Element* node)
 	{
-          Element* nilParent = 0;
+          //Element* nilParent = 0;
 	  Element* p;
           while (((p = node->GetParent ()) != 0) && IsRed (p))
 	  {
@@ -727,8 +733,8 @@ namespace CS
       TimeType GetCurrentTime() const { return currentTime; }
 
       /// Query a resource. Returns 0 if none is available.
-      T* Query (const typename ResourceSorting::KeyType& key = 
-	ResourceSorting::KeyType(), bool exact = false)
+      T* Query (const ResourceSortingKeyType& key = 
+	ResourceSortingKeyType(), bool exact = false)
       {
 	Element* el;
 	if (exact)
@@ -748,9 +754,8 @@ namespace CS
        * Add a resource as currently active. (But will be reused once 
        * possible.)
        */
-      T* AddActive (const T& value, 
-	const typename ReuseCondition::AddParameter& reuseParam = 
-	  ReuseCondition::AddParameter ())
+      T* AddActive (const T& value, const ReuseConditionAddParameter& reuseParam = 
+	  ReuseConditionAddParameter ())
       {
 	Element* el = new Element (value, 
           typename ReuseCondition::StoredAuxiliaryInfo (*this, reuseParam));
