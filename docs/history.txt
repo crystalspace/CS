@@ -9,6 +9,7 @@ chronological order.
 23-Jan-2008
 	- res fixed a bug in relaytool where building the libraries search array
 	  was broken.
+	- caedes fixed vertexlight.cgvp not getting installed.
 22-Jan-2008
 	- Mike Gist committed a patch from Trymm which adds a method to set
 	  blending time for cyclic animations in cal3d.
