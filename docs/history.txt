@@ -80,6 +80,10 @@ chronological order.
 	  appropriately. He still agrees that we can use the license more
 	  appropriate for cs (last time we agreed on by-sa, so thats what it
 	  is now).
+	- res fixed a bug in xmlshader where conditional constructs like
+	  'elsif ... else ... endif' would result in document data to be
+	  internally assigned to the wrong block (and hence cause invalid
+	  output).
 04-Oct-2007
 	- andres added a VarFileInfo Block to the resources for win32
 	  dlls/executables as they are invalid without and especially
