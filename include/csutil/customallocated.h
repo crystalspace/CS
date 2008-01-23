@@ -19,6 +19,8 @@
 #ifndef __CS_CSUTIL_CUSTOMALLOCATED_H__
 #define __CS_CSUTIL_CUSTOMALLOCATED_H__
 
+#include "csutil/custom_new_disable.h"
+
 /**\file
  * Base class to allocate subclasses with cs_malloc().
  */
@@ -30,6 +32,16 @@ namespace CS
     /**
      * Class that overrides operator new/operator delete/etc. 
      * with implementations using cs_malloc()/cs_free().
+     * \remarks To outfit a class that also derives from another class with
+     *   custom allocation don't use multiple inheritance, use 
+     *   CustomAllocatedDerived<> instead.
+     *
+     *   The reason is that the CustomAllocated instance contained in the 
+     *   derived class may take up some memory (in order to have a distinct 
+     *   address in memory), memory which is otherwise unused and wasted.
+     *   CustomAllocatedDerived<> works around that as it is a base class
+     *   and can thus be empty; derivation is supported through templating.
+     *   (For details see http://www.cantrip.org/emptyopt.html .)
      */
     class CustomAllocated
     {
@@ -77,7 +89,68 @@ namespace CS
       CS_FORCEINLINE void operator delete(void*, void*) throw() { }
       CS_FORCEINLINE void operator delete[](void*, void*) throw() { }
     };
+    
+    /**
+     * Class that overrides operator new/operator delete/etc. 
+     * with implementations using cs_malloc()/cs_free().
+     * \remarks Use this class when you want to add custom allocation to a
+     *   a class that derives from some other class(es). See the 
+     *   CustomAllocator remarks section for the explanation.
+     */
+    template<typename T>
+    class CustomAllocatedDerived : public T
+    {
+    public:
+      CustomAllocatedDerived () {}
+      template<typename A>
+      CustomAllocatedDerived (const A& a) : T (a) {}
+
+      // Potentially throwing versions
+    #ifndef CS_NO_EXCEPTIONS
+      CS_FORCEINLINE void* operator new (size_t s) throw (std::bad_alloc)
+      { 
+	void* p = cs_malloc (s);
+	if (!p) throw std::bad_alloc();
+	return p;
+      }
+      CS_FORCEINLINE void* operator new[] (size_t s) throw (std::bad_alloc)
+      { 
+	void* p = cs_malloc (s);
+	if (!p) throw std::bad_alloc();
+	return p;
+      }
+    #else
+      CS_FORCEINLINE void* operator new (size_t s) throw ()
+      { return cs_malloc (s); }
+      CS_FORCEINLINE void* operator new[] (size_t s) throw ()
+      { return cs_malloc (s); }
+    #endif
+      
+      CS_FORCEINLINE void operator delete (void* p) throw()
+      { cs_free (p); }
+      CS_FORCEINLINE void operator delete[] (void* p) throw()
+      { cs_free (p); }
+      
+      // Nothrow versions
+      CS_FORCEINLINE void* operator new (size_t s, const std::nothrow_t&) throw()
+      { return cs_malloc (s); }
+      CS_FORCEINLINE void* operator new[] (size_t s, const std::nothrow_t&) throw()
+      { return cs_malloc (s); }
+      CS_FORCEINLINE void operator delete (void* p, const std::nothrow_t&) throw()
+      { cs_free (p); }
+      CS_FORCEINLINE void operator delete[] (void* p, const std::nothrow_t&) throw()
+      { cs_free (p); }
+      
+      // Placement versions
+      CS_FORCEINLINE void* operator new(size_t /*s*/, void* p) throw() { return p; }
+      CS_FORCEINLINE void* operator new[](size_t /*s*/, void* p) throw() { return p; }
+
+      CS_FORCEINLINE void operator delete(void*, void*) throw() { }
+      CS_FORCEINLINE void operator delete[](void*, void*) throw() { }
+    };
   } // namespace Memory
 } // namespace CS
+
+#include "csutil/custom_new_enable.h"
 
 #endif // __CS_CSUTIL_CUSTOMALLOCATED_H__
