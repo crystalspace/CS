@@ -27,6 +27,9 @@ chronological order.
 	  template, and thus impossible to find on install.
 19-Dec-2007
 	- caedes added castle-tex.zip to install targets.
+14-Dec-2007
+	- caedes fixed pythmod jam rule to look for dbg files in the right
+	  place on install.
 8-Dec-2007
         - Mike Gist committed a patch from Trymm to fix the direction
           animations are played. If you had been reversing some animations,
