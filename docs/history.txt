@@ -60,6 +60,13 @@ chronological order.
 	    - Renames generated .html files to .php.
 	    - Fixes up internal links to point at .php rather than .html.
 	    - Adds a "Search" field.
+	- Eric Sunshine fixed 'using independent target "nohelp"' warning
+	  emitted by Jam when building cs-config.
+    	- Eric Sunshine fixed cs-config/Jamfile so that cs-config gets removed
+	  upon 'jam clean' and 'jam distclean'.
+	- Eric Sunshine re-added 'cs-configclean' Jam target which got lost
+	  when versioned cs-config-x.y functionality was added to
+	  cs-config/Jamfile.
 13-Oct-2007
 	- res fixed a bug in DDS cubemap saving (checked for wrong subimage
 	  count).
