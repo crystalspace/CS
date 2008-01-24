@@ -6,6 +6,8 @@
 	  SplitDebugInfo in strip.jam).
 	- Vincent partially merged r28293 into 1.2 (fix for dbg file install
 	  in PythMod jam rule).
+	- Vincent merged r28007 into 1.2 (csSphere and csMatrix2 friend
+	  fixes).
 23-Jan-2008
 	- Vincent merged r27744 into 1.2 (shader fixes).
 	- Vincent merged r27779 into 1.2 (genmesh lazy color allocation fix).
