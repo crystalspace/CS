@@ -6,6 +6,7 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 25-Jan-2008
+	- Ross B cleaned up updated HowTo example.
 	- Ross B updated the HOWTO: Clicking on Objects for misc API changes.
 24-Jan-2008
 	- caedes patched relaytool so it doesn't redirect to /dev/tty, as it 
