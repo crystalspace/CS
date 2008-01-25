@@ -106,7 +106,8 @@ protected:
   {
     Node* pivotReplace = pivot->right;
     pivot->right = pivotReplace->left;
-    if (pivotReplace->left != 0) pivotReplace->left->SetParent (pivot);
+    if (pivotReplace->left != 0)
+      pivotReplace->left->SetParent (pivot);
     pivotReplace->SetParent (pivot->GetParent());
     if (pivot->GetParent() == 0)
       root = pivotReplace;
@@ -125,7 +126,8 @@ protected:
   {
     Node* pivotReplace = pivot->left;
     pivot->left = pivotReplace->right;
-    pivotReplace->right->SetParent (pivot);
+    if (pivotReplace->right != 0)
+      pivotReplace->right->SetParent (pivot);
     pivotReplace->SetParent (pivot->GetParent());
     if (pivot->GetParent() == 0)
       root = pivotReplace;
@@ -171,6 +173,7 @@ protected:
 	    // Uncle of 'node' is black, node is right child
 	    node = p;
 	    RotateLeft (node);
+	    p = node->GetParent ();
 	  }
 	  // Uncle of 'node' is black, node is left child
 	  p->SetColor (Black);
@@ -196,6 +199,7 @@ protected:
 	    // Uncle of 'node' is black, node is left child
 	    node = p;
 	    RotateRight (node);
+	    p = node->GetParent ();
 	  }
 	  // Uncle of 'node' is black, node is right child
 	  p->SetColor (Black);
@@ -219,7 +223,11 @@ protected:
       x = y->left;
     else
       x = y->right;
-    if (x != 0) x->SetParent (y->GetParent());
+    Node* nilParent = 0;
+    if (x != 0) 
+      x->SetParent (y->GetParent());
+    else
+      nilParent = y->GetParent();
     if (y->GetParent() == 0)
       root = x;
     else
@@ -236,15 +244,15 @@ protected:
       new ((K*)&node->key) K (*((K*)&y->key));
     }
     if (y->GetColor() == Black)
-      DeleteFixup (node);
+      DeleteFixup (x, nilParent);
     nodeAlloc.Free (y);
   }
   /// Fix up the RB tree after a deletion.
-  void DeleteFixup (Node* node)
+  void DeleteFixup (Node* node, Node* nilParent)
   {
     while ((node != root) && IsBlack (node))
     {
-      Node* p = node->GetParent();
+      Node* p = node ? node->GetParent() : nilParent;
       if (node == p->left)
       {
 	Node* w = p->right;
@@ -308,7 +316,7 @@ protected:
 	}
       }
     }
-    node->SetColor (Black);
+    if (node != 0) node->SetColor (Black);
   }
   /// Find the node for a key.
   Node* LocateNode (Node* node, const K& key) const
