@@ -196,6 +196,9 @@ LANG_FUNCTIONS
   {
     IntPtr _retptr = $imcall;
     $excode;
+    if(_retptr == IntPtr.Zero)
+      return null;
+
     T _ret = new T(_retptr, false);
     return _ret;
   }
@@ -216,6 +219,8 @@ LANG_FUNCTIONS
   {
     IntPtr _retptr = $imcall;
     $excode;
+    if(_retptr == IntPtr.Zero)
+      return null;
     T _ret = new T(_retptr, false);
     return _ret;
   }

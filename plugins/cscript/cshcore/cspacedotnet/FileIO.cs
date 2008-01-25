@@ -5,11 +5,12 @@ using CrystalSpace;
 
 namespace CrystalSpace.InteropServices
 {
-  [StructLayout(LayoutKind.Sequential)]
+  [StructLayout(LayoutKind.Sequential),
+   CLSCompliant(false)]
   public struct FileBuffer
   {
     public IntPtr buffer;
-    public long readed;
+    public uint readed;
   }
 
   public class FileIO
@@ -21,9 +22,9 @@ namespace CrystalSpace.InteropServices
       for(int i=0; i < size;i++)
         Marshal.WriteByte(cbuf, i, buffer[i + offset]);
 
-      long ret = corePINVOKE.csWriteFile(iFile.getCPtr(self).Handle, cbuf, (uint)size);
+      uint ret = corePINVOKE.csWriteFile(iFile.getCPtr(self).Handle, cbuf, (uint)size);
       NativeCAlloc.Free(cbuf);
-      return ret;
+      return (long)ret;
     }
 
     public static long Read(iFile self, byte[] buffer, int offset, long size)
@@ -34,7 +35,7 @@ namespace CrystalSpace.InteropServices
         buffer[i + offset] = Marshal.ReadByte(ret.buffer, i);
 
       NativeCAlloc.Free(ret.buffer);
-      return ret.readed;
+      return (long)ret.readed;
     }
   };
 

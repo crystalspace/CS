@@ -88,7 +88,7 @@
   public static extern CrystalSpace.InteropServices.FileBuffer csReadFile(IntPtr file, uint size);
 
   [DllImport("$dllimport", EntryPoint="csWriteFile")]
-  public static extern long csWriteFile(IntPtr file, IntPtr buffer, uint size);
+  public static extern uint csWriteFile(IntPtr file, IntPtr buffer, uint size);
 %}
 
 #ifdef USE_DIRECTORS
@@ -98,10 +98,18 @@
 #endif //USE_DIRECTORS
 
 %{
+  typedef struct FileBuffer
+  {
+    char *buffer;
+    unsigned int readed;
+  };
+
   extern "C"{
     void ConnectSharpEventHandler(void *self, EventHandler_t handler);
     void *csMalloc(int size);
     void csFree(void *ptr);
+    FileBuffer csReadFile(void* fileptr, unsigned int size);
+    unsigned int csWriteFile(void *fileptr, void *buffer, unsigned int size);
   }
 
   SWIGEXPORT void ConnectSharpEventHandler(void *self, EventHandler_t handler)
@@ -120,23 +128,17 @@
     free(ptr);
   }
 
-  typedef struct FileBuffer
-  {
-    char *buffer;
-    long readed;
-  };
-
   SWIGEXPORT FileBuffer csReadFile(void* fileptr, unsigned int size)
   {
     FileBuffer ret;
     ret.buffer = (char*)malloc(size);
-    ret.readed = ((iFile*)fileptr)->Read(ret.buffer, size);
+    ret.readed = (unsigned int)((iFile*)fileptr)->Read(ret.buffer, size);
     return ret;
   }
 
-  SWIGEXPORT long csWriteFile(void *fileptr, void *buffer, unsigned int size)
+  SWIGEXPORT unsigned int csWriteFile(void *fileptr, void *buffer, unsigned int size)
   {
-    return ((iFile*)fileptr)->Write((const char *)buffer, size);;
+    return (unsigned int)((iFile*)fileptr)->Write((const char *)buffer, size);;
   }
   
 %}
