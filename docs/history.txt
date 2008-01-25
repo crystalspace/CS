@@ -76,6 +76,9 @@ chronological order.
 	  where not removed by any of the Jam 'clean' targets.
 26-Oct-2007
 	- caedes fixed one memory leak in genmesh.
+	- caedes fixed RenderBufferAccessor leakwards for genmesh, spr2d, 
+	  particles and instmesh (they were missing some 
+	  CS_LEAKWARD_IMPLEMENT uses).
 24-Oct-2007
 	- res fixed some 'friend' methods of csSphere and csMatrix2 lacking
 	  CS_CRYSTALSPACE_EXPORT.

@@ -402,7 +402,7 @@ public:
     public scfImplementation1<RenderBufferAccessor, iRenderBufferAccessor>
   {
   public:
-    CS_LEAKGUARD_DECLARE (eiRenderBufferAccessor);
+    CS_LEAKGUARD_DECLARE (RenderBufferAccessor);
     csWeakRef<csGenmeshMeshObject> parent;
     virtual ~RenderBufferAccessor () { }
     RenderBufferAccessor (csGenmeshMeshObject* parent)
@@ -417,7 +417,7 @@ public:
     }
   };
   csRef<RenderBufferAccessor> renderBufferAccessor;
-  friend class eiRenderBufferAccessor;
+  friend class RenderBufferAccessor;
 
   void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
 
@@ -439,7 +439,7 @@ public:
     }
   };
   csRef<ShaderVariableAccessor> shaderVariableAccessor;
-  friend class eiShaderVariableAccessor;
+  friend class ShaderVariableAccessor;
 
   void PreGetShaderVariableValue (csShaderVariable* variable);
 };
@@ -827,7 +827,7 @@ public:
     public scfImplementation1<RenderBufferAccessor, iRenderBufferAccessor>
   {
   public:
-    CS_LEAKGUARD_DECLARE (eiRenderBufferAccessor);
+    CS_LEAKGUARD_DECLARE (RenderBufferAccessor);
     csWeakRef<csGenmeshMeshObjectFactory> parent;
     virtual ~RenderBufferAccessor ()
     {

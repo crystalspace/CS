@@ -2,6 +2,7 @@
 
 25-Jan-2008
 	- Vincent merged r28017 into 1.2 (GM leak fix).
+	- Vincent merged r28018 into 1.2 (leak guard fixes).
 24-Jan-2008
 	- Vincent merged r27908 into 1.2 (cs-config Jamfile fixes).
 	- Vincent merged r27583 and r27911:27913 into 1.2 (fix problems with
