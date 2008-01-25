@@ -54,6 +54,11 @@ chronological order.
 	  Mac OS X) which recognize only the '*' regex repetition token.
 	  (Portable scripts should not use '+', '?', or '{n,m}' repetition
 	  notation.) Resolves #411.
+31-Oct-2007
+	- Jorrit made the dynamic step callback array in odedynam use
+	  a normal csRefArray instead of a csWeakRefArray. Using a weak
+	  ref array in this case is wrong since it requires implementors
+	  of this callback to keep their own reference somewhere.
 30-Oct-2007
 	- res fixed some implementation mistakes in csRedBlackTree, leading
 	  to violations of the RB reles in the tree, especially when deleting:

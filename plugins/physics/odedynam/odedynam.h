@@ -139,7 +139,7 @@ private:
   float total_elapsed;
   csRefArrayObject<iODEFrameUpdateCallback> updates;
 
-  csWeakRefArray<iDynamicsStepCallback> step_callbacks;
+  csRefArray<iDynamicsStepCallback> step_callbacks;
 
   bool stepfast;
   int sfiter;
