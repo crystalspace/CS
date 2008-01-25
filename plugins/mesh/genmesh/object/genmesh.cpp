@@ -785,6 +785,7 @@ void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
       }
     }
   }
+  shadowIt->DecRef();
 }
 
 void csGenmeshMeshObject::UpdateLightingOne (

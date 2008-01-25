@@ -74,6 +74,8 @@ chronological order.
 	  strip.jam which caused it to be somewhat dysfunctional. An obvious
 	  manifestation of these problems was that the generated .dbg files
 	  where not removed by any of the Jam 'clean' targets.
+26-Oct-2007
+	- caedes fixed one memory leak in genmesh.
 24-Oct-2007
 	- res fixed some 'friend' methods of csSphere and csMatrix2 lacking
 	  CS_CRYSTALSPACE_EXPORT.
