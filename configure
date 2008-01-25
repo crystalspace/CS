@@ -75080,11 +75080,6 @@ fi
 
 done
 
-    if test "$cs_cv_libbfd_ok" = yes; then
-  cs_header_text="${cs_header_text}#define CS_HAVE_LIBBFD
-"
-fi
-
 fi
 
 

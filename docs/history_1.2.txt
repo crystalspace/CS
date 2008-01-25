@@ -6,6 +6,7 @@
 	- Vincent merged r28045 into 1.2 (RB tree fixes).
 	- Vincent merged r28050:28051 into 1.2 (odedynam fix).
 	- Vincent merged r28052:28053 into 1.2 (leak fixes).
+	- Vincent merged r28083 into 1.2 (CS_HAVE_LIBBFD wrongly set).
 24-Jan-2008
 	- Vincent merged r27908 into 1.2 (cs-config Jamfile fixes).
 	- Vincent merged r27583 and r27911:27913 into 1.2 (fix problems with

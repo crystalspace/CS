@@ -54,6 +54,13 @@ chronological order.
 	  Mac OS X) which recognize only the '*' regex repetition token.
 	  (Portable scripts should not use '+', '?', or '{n,m}' repetition
 	  notation.) Resolves #411.
+3-Nov-2007
+	- res removed the setting of CS_HAVE_LIBBFD when meta info embedding
+	  was enabled and libbfd is present. This fixes build errors on MinGW
+	  in optimize mode where this preprocessor macro was set but libbfd
+	  not actually linked. The other BFD use in CS, the bfd-based plugin
+	  metadata reader, is unaffected since it doesn't make use of that
+	  macro to detect BFD presence (that's handled in the Jam file).
 31-Oct-2007
 	- Jorrit made the dynamic step callback array in odedynam use
 	  a normal csRefArray instead of a csWeakRefArray. Using a weak

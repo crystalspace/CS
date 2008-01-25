@@ -2269,9 +2269,7 @@ AS_IF([test $enable_meta_info_embedding = yes],
 	[AS_ESCAPE([$(EMBED_META.CFLAGS)])], [+])
     CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS],
 	[AS_ESCAPE([$(EMBED_META.LFLAGS)])], [+])
-    AC_CHECK_HEADERS([elf.h], [CS_HEADER_PROPERTY([CS_HAVE_ELF_H])])
-    AS_IF([test "$cs_cv_libbfd_ok" = yes],
-	[CS_HEADER_PROPERTY([CS_HAVE_LIBBFD])])])
+    AC_CHECK_HEADERS([elf.h], [CS_HEADER_PROPERTY([CS_HAVE_ELF_H])])])
 
 
 
