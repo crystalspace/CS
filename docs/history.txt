@@ -54,6 +54,9 @@ chronological order.
 	  Mac OS X) which recognize only the '*' regex repetition token.
 	  (Portable scripts should not use '+', '?', or '{n,m}' repetition
 	  notation.) Resolves #411.
+4-Nov-2007
+	- res added an empty IconsMakeWin32ICO rule override to msvcgen.jam to
+	  prevent icon file regeneration when just regenerating VC projects.
 3-Nov-2007
 	- res removed the setting of CS_HAVE_LIBBFD when meta info embedding
 	  was enabled and libbfd is present. This fixes build errors on MinGW

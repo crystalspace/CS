@@ -1,5 +1,7 @@
 1.2 branch log.
 
+26-Jan-2008
+	- Vincent merged r28094 (empty IconsMakeWin32ICO Jam rule).
 25-Jan-2008
 	- Vincent merged r28017 into 1.2 (GM leak fix).
 	- Vincent merged r28018 into 1.2 (leak guard fixes).

@@ -573,6 +573,8 @@ actions GenerateWin32ManifestRc
 __EOF__
 }
 
+rule IconsMakeWin32ICO { }
+
 ## MsvcGenConfig variable [ : value ]
 ##   (See documentation above.)
 rule MsvcGenConfig1
