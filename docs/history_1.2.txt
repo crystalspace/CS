@@ -46,6 +46,8 @@
 	  now re-usable via visibility.m4).
 	- Vincent merged r28498 into 1.2 (cswinGetErrorMessage improvement).
 	- Vincent merged r28505 into 1.2 (sprcal3d fixes).
+	- Vincent merged r28541 into 1.2 (fixed vertexlight.cgvp not getting
+	  installed).
 25-Jan-2008
 	- Vincent merged r28017 into 1.2 (GM leak fix).
 	- Vincent merged r28018 into 1.2 (leak guard fixes).
