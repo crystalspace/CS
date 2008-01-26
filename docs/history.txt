@@ -62,6 +62,10 @@ chronological order.
 	  to avoid having CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION
 	  appear as a top-level target, but this is a case of treating the
 	  symptom and is not a robust resolution.
+	- Eric Sunshine removed the long-deprecated 'nrall' Jam target which
+	  had been maintained for backward compatibility after the "new
+	  renderer" architecture was made the default and the old renderer
+	  retired.
 14-Dec-2007
 	- caedes fixed pythmod jam rule to look for dbg files in the right
 	  place on install.
