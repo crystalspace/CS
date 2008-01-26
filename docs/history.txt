@@ -58,6 +58,10 @@ chronological order.
 	  is not used if the model has less then 16 triangles. In that case
 	  Dynavis will not use outline culling anyway so the warning is
 	  useless.
+	- Eric Sunshine fixed bugs in several Jamfiles which referenced the
+	  target 'vfs' unconditionally. This caused Jam to abort if zlib was
+	  not found at configure time, and also caused makefile emulation layer
+	  creation to fail.
 13-Nov-2007
 	- Eric Sunshine fixed sed expression in CS/mk/autoconf/crystal.m4 to
 	  work with POSIX-compliant sed commands (such as the BSD version on
