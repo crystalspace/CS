@@ -42,6 +42,26 @@ chronological order.
 	  would access undefined shell variable
 	  $cs_cv_prog_cxx_visibility_inlines_hidden_buggy if compiler did not
 	  respond to -fvisibility-inlines-hidden.
+	- Eric Sunshine refined the heuristic used by the 'dumptarget' rule in
+	  dump.jam to extract likely top-level target names from NotFile
+	  invocations. It now expects a target to begin with an alphanumeric,
+	  thus ignoring some NotFile items, such as -g3, -lfoo, etc. This
+	  resolves issue #430 as much as possible without introducing
+	  CS-specific knowledge into this otherwise generic mechanism. Note,
+	  that since there is no way to obtain a perfect set of top-level
+	  targets from Jam, the heuristic employed by 'dumptargets' returns
+	  only an approximation. It errs on the side of dumping too many
+	  potential targets by observing invocations of NotFile (which happens
+	  to be invoked for most of the top-level target names), rather than
+	  erring in the other direction and missing real top-level targets.
+	  NotFile is also used for other purposes, such as optionally telling
+	  the ResponseFile rule that the items to be written to the file do not
+	  represent actual files, thus the heuristic can be fooled if such
+	  items look like they might be viable top-level target names. Also
+	  modified the GeneratePluginLibraryGlueLib rule in static.jam slightly
+	  to avoid having CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION
+	  appear as a top-level target, but this is a case of treating the
+	  symptom and is not a robust resolution.
 14-Dec-2007
 	- caedes fixed pythmod jam rule to look for dbg files in the right
 	  place on install.
