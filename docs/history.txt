@@ -39,6 +39,17 @@ chronological order.
           value of csGetPlatformConfigDir on macosx (it's now consistent across
           all platforms).
 29-Nov-2007
+	- Eric Sunshine changed 'MasterHeader' rule in helper.jam so that it
+	  invokes the 'ResponseFile' rule with a delimiter of "%" rather than
+	  allowing 'ResponseFile' to use the default delimiter of "@", since
+	  "@" may legally appear in email addresses and Doxygen directives
+	  (@file, for example), both of which are likely to appear in master
+	  header boilerplate.
+	- Eric Sunshine changed CS/include/Jamfile so that it uses Doxygen
+	  directive "@file" in master header boilerplate rather than "\file"
+	  since "\file" ends up as "<formfeed>ile" when 'jam masterheaders' is
+	  invoked under the Dash shell. (This appears to be a bug in Dash
+	  single-quote treatment and has been reported.)
 	- Eric Sunshine fixed bug in configure.ac where CS_PLATFORM_UNIX was
 	  not emitted to csconfig.h on Mac OS X (for which both
 	  CS_PLATFORM_MACOSX and CS_PLATFORM_UNIX are supposed to be defined).
