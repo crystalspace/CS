@@ -409,12 +409,7 @@ CS_EMIT_BUILD_PROPERTY([ANT], [$ANT])
 # a few plugin modules take advantage of it, so they need to know if it is
 # available.
 #------------------------------------------------------------------------------
-CS_CHECK_BUILD([for STL], [cs_cv_libstl],
-    [AC_LANG_PROGRAM(
-	[[#include <map>
-	#include <string>]],
-	[[std::map<std::string,int> m; m.begin();]])],
-    [], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libstl], [STL])])
+CS_CHECK_STL([CS_EMIT_BUILD_RESULT([cs_cv_libstl], [STL])])
 
 
 
