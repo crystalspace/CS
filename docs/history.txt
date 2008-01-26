@@ -27,6 +27,21 @@ chronological order.
 	  template, and thus impossible to find on install.
 19-Dec-2007
 	- caedes added castle-tex.zip to install targets.
+16-Dec-2007
+	- Eric Sunshine restored the std::string based test which had been used
+	  originally to determine if gcc's -finline-visibility-hidden flag is
+	  buggy (as it is in numerous versions on several platforms).  This
+	  test was removed in r21931 after it was discovered that there were
+	  one or two obscure platform/compiler combinations for which the test
+	  was not accurate. It seems better, however, to use a mostly accurate
+	  test (std::string) than the current check based upon hard-coded
+	  platform and compiler version tests, which is too often
+	  inaccurate. Hopefully, this change resolves issue #355 (and perhaps
+	  #333) for most cases.
+	- Eric Sunshine fixed problem in configure.ac where AS_IF() conditional
+	  would access undefined shell variable
+	  $cs_cv_prog_cxx_visibility_inlines_hidden_buggy if compiler did not
+	  respond to -fvisibility-inlines-hidden.
 14-Dec-2007
 	- caedes fixed pythmod jam rule to look for dbg files in the right
 	  place on install.

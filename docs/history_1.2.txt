@@ -21,6 +21,8 @@
 	- Vincent merged r28245 into 1.2 (master-header fixes to avoid \file
 	  becoming {formfeed}ile under Dash).
 	- Vincent merged r28290 into 1.2 (docs tweak).
+	- Vincent merged r28306 and r28308:28310 into 1.2 (again use
+	  std::string to check for buggy -fvisibility-inlines-hidden).
 25-Jan-2008
 	- Vincent merged r28017 into 1.2 (GM leak fix).
 	- Vincent merged r28018 into 1.2 (leak guard fixes).

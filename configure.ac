@@ -621,18 +621,21 @@ CS_EMIT_BUILD_FLAGS([how to disable function inlining],
 #
 # IMPLEMENTATION NOTES
 #
-# There is an obscure bug in gcc 3.4.x and at least up to 4.1.1 where
-# -fvisibility-inlines-hidden on AMD64 in combination with -fPIC and -shared
-# flags causes the linker to fail with a bogus error stating that the target
-# library needs to be built with -fPIC even when it has been built using that
-# option. On such installations, if Crystal Space is built with
-# -fvisibility-inlines-hidden, then clients liking against Crystal Space
-# experience this bogus error.  Normally, we would test for this anomaly by
-# manipulating a std::basic_string<> in a test program, and avoid
-# -fvisibility-inlines-hidden if the test program fails to link, however,
-# practical experience has shown that this test is not 100% reliable for all
-# such installations. Instead, for simplicity, we disable this flag presently
-# for gcc on AMD64.  References:
+# There is a bug in gcc 3.4.x and at least up to 4.1.x where
+# -fvisibility-inlines-hidden on several architectures in combination with
+# -fPIC and -shared flags causes the linker to fail with a bogus errors. One
+# manifestation of the error states that the target library needs to be built
+# with -fPIC even when it has been built using that option.  In other cases,
+# the linker complains about undefined references to various inline methods in
+# external libraries.  Furthermore, on such installations, if Crystal Space is
+# built with -fvisibility-inlines-hidden, then clients linking against Crystal
+# Space also experience one of these bogus errors.  Thus far, the most reliable
+# way to detect this gcc bug is to test for the anomaly by manipulating a
+# std::basic_string<> in a test program linked with -fPIC and -shared, and then
+# avoid -fvisibility-inlines-hidden if the test program fails to link.
+# Practical experience has shown that this test is not 100% reliable for all
+# cases, but it does seem to catch most, and does a better job than hard-coded
+# platform and compiler version checks.  References:
 #
 #     http://dev.gentoo.org/~kugelfang/pappy-visibility.txt
 #     http://www.gnu.org/software/gcc/gcc-4.0/changes.html#visibility
@@ -655,23 +658,28 @@ CS_CHECK_BUILD_FLAGS([for inline visibility flag],
     [CS_CREATE_TUPLE([-fvisibility-inlines-hidden])],[C++])
 
 AS_IF([test -n "$cs_cv_prog_cxx_visibility_inlines_hidden"],
-    [# The test below can be uncommented and adjusted once a non-buggy gcc 
-    # version is found.
-    #CS_CHECK_PROG_VERSION([g++], [$CXX --version], [4.1], [9.9|.9],
-    #   [cs_cv_gxx_version_buggy=no],
-    #   [cs_cv_gxx_version_buggy=yes])
-    AC_CACHE_CHECK([if $cs_cv_prog_cxx_visibility_inlines_hidden is buggy],
+    [AC_CACHE_CHECK([if $cs_cv_prog_cxx_visibility_inlines_hidden is buggy],
 	[cs_cv_prog_cxx_visibility_inlines_hidden_buggy],
-	[AS_IF([test $ac_compiler_gnu = yes],
-	    [AS_IF([test $host_cpu = x86_64 || test x$cs_host_macosx = xyes], 
-		[cs_cv_prog_cxx_visibility_inlines_hidden_buggy=yes],
-		[cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])],
-	    [cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])])],
-    [cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])
-
-AS_IF([test $cs_cv_prog_cxx_visibility_inlines_hidden_buggy != yes],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS],
-	[$cs_cv_prog_cxx_visibility_inlines_hidden], [+])])
+	[AS_IF([test $ac_compiler_gnu = yes && test $cs_cv_libstl = yes],
+	    [AS_IF([test x$cs_host_macosx = xyes],
+                [cs_cv_prog_cxx_visibility_inlines_hidden_buggy=yes],
+		[CS_BUILD_IFELSE(
+		    [AC_LANG_PROGRAM(
+			[[#include <string>]],
+			[std::string s; s = "";])],
+		    [CS_CREATE_TUPLE(
+                        [$cs_cv_prog_cxx_visibility_inlines_hidden \
+			$cs_cv_prog_cxx_pic], [$cs_cv_prog_link_shared])],
+		    [C++],
+		    [cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no],
+		    [cs_cv_prog_cxx_visibility_inlines_hidden_buggy=yes],
+		    [$cs_cv_libstl_cflags],
+		    [$cs_cv_libstl_lflags],
+		    [$cs_cv_libstl_libs])])],
+            [cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])])
+    AS_IF([test $cs_cv_prog_cxx_visibility_inlines_hidden_buggy != yes],
+        [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS],
+	    [$cs_cv_prog_cxx_visibility_inlines_hidden], [+])])])
 
 
 
