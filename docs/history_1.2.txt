@@ -42,6 +42,8 @@
 	  visibility.m4).
 	- Vincent merged r28447 into 1.2 (-fvisibility-inlines-hidden check
 	  employs -Werror if available).
+	- Vincent merged r28451 into 1.2 (remaining symbol visibility checks
+	  now re-usable via visibility.m4).
 25-Jan-2008
 	- Vincent merged r28017 into 1.2 (GM leak fix).
 	- Vincent merged r28018 into 1.2 (leak guard fixes).

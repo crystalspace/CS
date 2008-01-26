@@ -20,13 +20,13 @@
 AC_PREREQ([2.56])
 
 #------------------------------------------------------------------------------
-# CS_VISIBILITY_INLINES_HIDDEN([ACTION-IF-SUPPORTED],
-#                              [ACTION-IF-NOT-SUPPORTED])
+# CS_VISIBILITY_FLAG_INLINES_HIDDEN([ACTION-IF-SUPPORTED],
+#                                   [ACTION-IF-NOT-SUPPORTED])
 #
 # Check if "hidden" visibilty for C++ inline functions is supported. If it is
 # supported, then the appropriate compiler switch is assigned to the shell
 # variable cs_prog_cxx_visibility_inlines_hidden and ACTION-IF-SUPPORTED is
-# inovked, otherwise the shell variable is cleared and ACTION-IF-NOT-SUPPORTED
+# invoked, otherwise the shell variable is cleared and ACTION-IF-NOT-SUPPORTED
 # is invoked.
 #
 # IMPLEMENTATION NOTES
@@ -63,7 +63,7 @@ AC_PREREQ([2.56])
 #        (__TEXT,__textcoal_nt) from section (__TEXT,__text) relocation
 #        entry (1))
 #------------------------------------------------------------------------------
-AC_DEFUN([CS_VISIBILITY_INLINES_HIDDEN],
+AC_DEFUN([CS_VISIBILITY_FLAG_INLINES_HIDDEN],
 [AC_REQUIRE([_CS_VISIBILITY_PREPARE])
 AC_REQUIRE([CS_CHECK_HOST])
 AC_REQUIRE([CS_CHECK_STL])
@@ -99,6 +99,105 @@ AS_IF([test -n "$cs_prog_cxx_visibility_inlines_hidden"],
     	[cs_prog_cxx_visibility_inlines_hidden=''])])
 
 AS_IF([test -n "$cs_prog_cxx_visibility_inlines_hidden"], [$1], [$2])])
+
+
+
+#------------------------------------------------------------------------------
+# CS_VISIBILITY_FLAG_HIDDEN([LANGUAGE], [CACHE-VAR], [ACTION-IF-SUPPORTED],
+#		[ACTION-IF-NOT-SUPPORTED])
+#	Check if setting default symbol visibilty to "hidden" is supported.  If
+#	so, then the appropriate compiler switch is assigned to CACHE-VAR, or
+#	to cs_cv_prog_{language}_visibility_hidden if CACHE-VAR is omitted, and
+#	ACTION-IF-SUPPORTED is invoked. Otherwise, the cache variable is
+#	cleared and ACTION-IF-NOT-SUPPORTED is invoked.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_VISIBILITY_FLAG_HIDDEN],
+[_CS_CHECK_VISIBILITY([hidden], [$1], [$2], [$3], [$4])])
+
+
+
+#------------------------------------------------------------------------------
+# CS_VISIBILITY_FLAG_DEFAULT([LANGUAGE], [CACHE-VAR], [ACTION-IF-SUPPORTED],
+#		[ACTION-IF-NOT-SUPPORTED])
+#	Check if setting default symbol visibilty to "default" is supported.
+#	If so, then the appropriate compiler switch is assigned to CACHE-VAR,
+#	or to cs_cv_prog_{language}_visibility_default if CACHE-VAR is omitted,
+#	and ACTION-IF-SUPPORTED is invoked. Otherwise, the cache variable is
+#	cleared and ACTION-IF-NOT-SUPPORTED is invoked.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_VISIBILITY_FLAG_DEFAULT],
+[_CS_CHECK_VISIBILITY([default], [$1], [$2], [$3], [$4])])
+
+
+
+#------------------------------------------------------------------------------
+# _CS_CHECK_VISIBILITY(VISIBILITY, [LANGUAGE], [CACHE-VAR],
+#		[ACTION-IF-SUPPORTED], [ACTION-IF-NOT-SUPPORTED])
+#	Support macro for CS_VISIBILITY_FLAG_HIDDEN and
+#	CS_VISIBILITY_FLAG_DEFAULT which performs the described functionality.
+#------------------------------------------------------------------------------
+AC_DEFUN([_CS_CHECK_VISIBILITY],
+[AC_REQUIRE([_CS_VISIBILITY_PREPARE])
+CS_CHECK_BUILD_FLAGS([for $1 symbol visibility flag],
+    [_CS_VISIBILITY_CACHE_VAR([$3], [$2], [visibility_$1])],
+    [CS_CREATE_TUPLE([-fvisibility=$1])], [$2], [$4], [$5],
+    [$CS_TR_SH_lang([cs_cv_prog_]CS_LANG_RESOLVE([$2])[_enable_errors])])])
+
+
+
+#------------------------------------------------------------------------------
+# CS_VISIBILITY_DECLARE_HIDDEN([LANGUAGE], [CACHE-VAR],
+#		[ACTION-IF-SUPPORTED], [ACTION-IF-NOT-SUPPORTED])
+#	Check if declaring a symbol's visibilty as "hidden" directly in the
+#	code is supported.  If so, then the appropriate language-specific
+#	symbol qualifier is assigned to CACHE-VAR, or to
+#	cs_cv_prog_{language}_declare_visibility_hidden if CACHE-VAR is
+#	omitted, and ACTION-IF-SUPPORTED is invoked. Otherwise, the cache
+#	variable is cleared and ACTION-IF-NOT-SUPPORTED is invoked.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_VISIBILITY_DECLARE_HIDDEN],
+[_CS_CHECK_VISIBILITY_DECLARE([hidden], [$1], [$2], [$3], [$4])])
+
+
+
+#------------------------------------------------------------------------------
+# CS_VISIBILITY_DECLARE_DEFAULT([LANGUAGE], [CACHE-VAR],
+#		[ACTION-IF-SUPPORTED], [ACTION-IF-NOT-SUPPORTED])
+#	Check if declaring a symbol's visibilty as "default" directly in the
+#	code is supported.  If so, then the appropriate language-specific
+#	symbol qualifier is assigned to CACHE-VAR, or to
+#	cs_cv_prog_{language}_declare_visibility_default if CACHE-VAR is
+#	omitted, and ACTION-IF-SUPPORTED is invoked. Otherwise, the cache
+#	variable is cleared and ACTION-IF-NOT-SUPPORTED is invoked.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_VISIBILITY_DECLARE_DEFAULT],
+[_CS_CHECK_VISIBILITY_DECLARE([default], [$1], [$2], [$3], [$4])])
+
+
+
+#------------------------------------------------------------------------------
+# _CS_CHECK_VISIBILITY_DECLARE(VISIBILITY, [LANGUAGE], [CACHE-VAR],
+#		[ACTION-IF-SUPPORTED], [ACTION-IF-NOT-SUPPORTED])
+#	Support macro for CS_VISIBILITY_DECLARE_HIDDEN and
+#	CS_VISIBILITY_DECLARE_DEFAULT which performs the described
+#	functionality.
+#------------------------------------------------------------------------------
+AC_DEFUN([_CS_CHECK_VISIBILITY_DECLARE],
+[CS_SYMBOL_QUALIFIER([how to declare $1 visibility],
+    [_CS_VISIBILITY_CACHE_VAR([$3], [$2], [declare_visibility_$1])],
+    [__attribute__((visibility("$1")))], [], [$2], [$4], [$5])])
+
+
+
+#------------------------------------------------------------------------------
+# _CS_WARNING_CACHE_VAR([CACHE-VAR], [LANGUAGE], DEFAULT-CACHE-VAR-SUFFIX)
+#	Helper macro which returns the client-supplied cache variable name or
+#	composes one from LANGUAGE and DEFAULT-CACHE-VAR-SUFFIX if not
+#	provided.  LANGUAGE typically is `C' or `C++' (defaulting to `C' if not
+#	provided).
+#------------------------------------------------------------------------------
+AC_DEFUN([_CS_VISIBILITY_CACHE_VAR],
+[m4_default([$1], [CS_TR_SH_lang([cs_cv_prog_]CS_LANG_RESOLVE([$2])[_$3])])])
 
 
 
