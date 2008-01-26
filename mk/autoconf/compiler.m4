@@ -1,5 +1,6 @@
 # compiler.m4                                                  -*- Autoconf -*-
 #=============================================================================
+# Copyright (C)2003-2007 by Eric Sunshine <sunshine@sunshineco.com>
 # Copyright (C)2003 by Matze Braun <matze@braunis.de>
 #
 #    This library is free software; you can redistribute it and/or modify it
@@ -25,8 +26,9 @@
 #       Detects the C compiler.  Also takes care of the CFLAGS, CPPFLAGS and CC
 #       environment variables.  This will filter out all -g and -O from the
 #       CFLAGS variable because Autoconf's -g and -O defaults are not always
-#       desired.  This will also set the CMD.CC and COMPILER.CFLAGS variables
-#       in Jamconfig
+#       desired.  This will also set the CMD.CC, COMPILER.CFLAGS,
+#       COMPILER.C.TYPE, and (as an historic anomaly) COMPILER.TYPE variables
+#       in Jamconfig.  The shell variable cs_compiler_name_c is also exported.
 #-----------------------------------------------------------------------------
 AC_DEFUN([CS_PROG_CC],[
     CFLAGS="$CFLAGS" # Filter undesired flags
@@ -34,6 +36,7 @@ AC_DEFUN([CS_PROG_CC],[
     AS_IF([test -n "$CC"],[
 	CS_EMIT_BUILD_PROPERTY([CMD.CC], [$CC])
 	CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$CPPFLAGS $CFLAGS], [+])
+	_CS_COMPILER_NAME([$CC], [C], [$ac_compiler_gnu])
 	
 	# Check if compiler recognizes -pipe directive.
 	CS_EMIT_BUILD_FLAGS([if $CC accepts -pipe], [cs_cv_prog_cc_pipe],
@@ -46,16 +49,17 @@ AC_DEFUN([CS_PROG_CC],[
 #       Detects the C++ compiler.  Also takes care of the CXXFLAGS, CPPFLAGS
 #       and CXX environment variables.  This will filter out all -g and -O from
 #       the CXXFLAGS variable because Autoconf's -g and -O defaults are not
-#       always desired.  This will also set the CMD.C++ and COMPILER.C++FLAGS
-#       variables in Jamconfig
+#       always desired.  This will also set the CMD.C++, COMPILER.C++FLAGS,
+#       COMPILER.C++.TYPE, and (as an historic anomaly) COMPILER.TYPE variables
+#       in Jamconfig. The shell variable cs_compiler_name_cxx is also exported.
 #-----------------------------------------------------------------------------
 AC_DEFUN([CS_PROG_CXX],[
     CXXFLAGS="$CXXFLAGS" # Filter undesired flags
     AC_PROG_CXX
     AS_IF([test -n "$CXX"],[
 	CS_EMIT_BUILD_PROPERTY([CMD.C++], [$CXX])
-
 	CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS], [$CPPFLAGS $CXXFLAGS], [+])
+	_CS_COMPILER_NAME([$CXX], [C++], [$ac_compiler_gnu])
 
         # Check if compiler can be instructed to produce position-independent-code
         # (PIC).  This feature is required by some platforms when building plugin
@@ -65,6 +69,50 @@ AC_DEFUN([CS_PROG_CXX],[
 		[$cs_cv_prog_cxx_pic])])
     ])
 ])
+
+#-----------------------------------------------------------------------------
+# _CS_COMPILER_NAME(COMPILER, LANGUAGE, [IS_GNU])
+#	Attempt to glean COMPILER's name and export it as shell variable
+#	cs_compiler_name_{language} and as build properties
+#	COMPILER.LANGUAGE.TYPE and (as an historic anomaly) COMPILER.TYPE.
+#	LANGUAGE is typically either C or C++ and specifies the compiler's
+#	language.  If provided, IS_GNU should be 'yes' or 'no', and is employed
+#	as a hint when determining the compiler's name. The output of this
+#	macro is perhaps useful for display purposes, but should not generally
+#	be used for decision making since name-gleaning is unreliable.  For
+#	decision-making, it is better to perform actual compiler tests rather
+#	than basing a decision upon the compiler's name.
+#
+# *IMPLEMENTATION NOTES*
+#
+#	Since there is no obvious generic way to determine a compiler's name,
+#	this implementation emits "GCC" if IS_GNU is 'yes', otherwise it
+#	attempts to fashion a name by invoking AS_TR_CPP(COMPILER), but this is
+#	only a very rough and unreliable approximation of the compiler's name.
+#	For instance, if a user configures the project with a non-GNU compiler
+#	by setting the environment variable CXX="ccache c++comp -blazing-fast",
+#	then the gleaned compiler name will be CCACHE_CPPCOMP__BLAZING_FAST
+#	rather than "C++COMP" or "CXXCOMP" as one might expect.
+#
+#	When fashioning the shell variable name cs_compiler_name_{language},
+#	"+" in LANGUAGE is replaced with "x", rather than with "p" as would be
+#	the case normally when AS_TR_SH() is employed. The use of "x", however,
+#	is more sensible in this context, since a language of "C++" translates
+#	to "cxx", which is the expected variable name in the context of
+#	compilers.
+#-----------------------------------------------------------------------------
+AC_DEFUN([_CS_COMPILER_NAME],
+    [AS_IF([test "m4_default([$3],[no])" = yes],
+        [_CS_COMPILER_NAME_SH([$2])=GCC],
+        [_CS_COMPILER_NAME_SH([$2])=AS_TR_CPP([$1])])
+    CS_EMIT_BUILD_PROPERTY([COMPILER.$2.TYPE], [$_CS_COMPILER_NAME_SH([$2])])
+    CS_EMIT_BUILD_PROPERTY([COMPILER.TYPE], [$_CS_COMPILER_NAME_SH([$2])],
+        [], [], [], [Y])])
+
+AC_DEFUN([_CS_COMPILER_NAME_SH],
+    [cs_compiler_name_[]AS_TR_SH(m4_translit([$1],[+A-Z],[xa-z]))])
+
+
 
 #-----------------------------------------------------------------------------
 # CS_PROG_LINK
