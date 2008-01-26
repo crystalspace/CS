@@ -507,9 +507,6 @@ void csDynaVis::UpdateObject (csVisibilityObjectWrapper* visobj_wrap)
   iVisibilityObject* visobj = visobj_wrap->visobj;
   iMovable* movable = visobj->GetMovable ();
   model_mgr->CheckObjectModel (visobj_wrap->model, visobj_wrap->mesh);
-  visobj_wrap->use_outline_filler = (visobj_wrap->hint_closed
-  	|| visobj_wrap->model->CanUseOutlineFiller ())
-	&& !visobj_wrap->hint_goodoccluder;
 
   if (visobj_wrap->model->IsEmptyObject ())
   {
@@ -523,6 +520,10 @@ void csDynaVis::UpdateObject (csVisibilityObjectWrapper* visobj_wrap)
     visobj_wrap->hint_goodoccluder = visobj->GetCullerFlags ().Check (
   	CS_CULLER_HINT_GOODOCCLUDER);
   }
+
+  visobj_wrap->use_outline_filler = (visobj_wrap->hint_closed
+  	|| visobj_wrap->model->CanUseOutlineFiller ())
+	&& !visobj_wrap->hint_goodoccluder;
 
   csBox3 bbox;
   visobj_wrap->full_transform_identity = movable->IsFullTransformIdentity ();
@@ -3404,7 +3405,7 @@ bool csDynaVis::DebugCommand (const char* cmd)
     do_cull_ignore_bad_occluders = !do_cull_ignore_bad_occluders;
     csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
     	"%s ignoring of bad occluders!",
-	do_cull_clampoccluder ? "Enabled" : "Disabled");
+	do_cull_ignore_bad_occluders ? "Enabled" : "Disabled");
     return true;
   }
   else if (!strcmp (cmd, "toggle_clampoccluder"))

@@ -48,6 +48,16 @@ chronological order.
 	  configure.ac so that it no longer access the shell variable
 	  cs_host_macosx, which is private to (not published by)
 	  _CS_CHECK_HOST_DARWIN in cs_check_host.m4.
+15-Nov-2007
+	- Jorrit fixed a small bug in Dynavis with regards to debugging
+	  output.
+	- Jorrit fixed a bug in dynavis where during update of an object
+	  the check for outline culling was using the old version of
+	  the goodoccluder flag.
+	- Jorrit changed Dynavis so that the warning if a model is not closed
+	  is not used if the model has less then 16 triangles. In that case
+	  Dynavis will not use outline culling anyway so the warning is
+	  useless.
 13-Nov-2007
 	- Eric Sunshine fixed sed expression in CS/mk/autoconf/crystal.m4 to
 	  work with POSIX-compliant sed commands (such as the BSD version on

@@ -289,13 +289,13 @@ bool csObjectModelManager::CheckObjectModel (csDynavisObjectModel* model,
       {
         model->use_outline_filler = false;
       }
-
-      // Here we scan all edges and see if there are edges that have only
-      // one adjacent polygon. If we find such an edge then we will not use
-      // outline based culling for this object. This is not good as it will
-      // slow down culling so you should try to avoid this situation in levels.
-      if (model->use_outline_filler)
+      else if (model->use_outline_filler)
       {
+        // Here we scan all edges and see if there are edges that have only
+        // one adjacent polygon. If we find such an edge then we will not use
+        // outline based culling for this object. This is not good as it will
+        // slow down culling so you should try to avoid this situation in levels.
+
         size_t i;
         for (i = 0 ; i < model->num_edges ; i++)
           if (model->tri_edges[i].tri2 == -1)
