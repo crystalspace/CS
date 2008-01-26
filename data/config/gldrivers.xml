@@ -291,11 +291,14 @@
 		    drivers and also states other sources would attribute a
 		    generally poor performance to ATI Linux drivers.
 		    @@@ Whether only certain version(s) are affected is unknown.
+      * 2007-12-17: Jorrit reports Linux ATI drivers version 2.1.7059 finally
+		    get VBO right.
       -->
     <rule description="Disable VBO for GNU/Linux ATI drivers">
       <conditions fulfill="all">
 	<regexp string="platform" pattern="Unix" />
 	<regexp string="vendor" pattern="^ATI" />
+	<comparever version="gl" relation="lt 2.1.7059" />
       </conditions>
       <applicable>
 	<usecfg>novbo</usecfg>

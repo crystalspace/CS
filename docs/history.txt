@@ -27,6 +27,10 @@ chronological order.
 	  template, and thus impossible to find on install.
 19-Dec-2007
 	- caedes added castle-tex.zip to install targets.
+18-Dec-2007
+	- Jorrit relaxed the rule on disabling VBO in gldrivers.xml. For
+	  the very first time version 2.1.7059 of the ATI drivers on Linux
+	  manages to get VBO right (and a lot of other things)!
 16-Dec-2007
 	- Eric Sunshine restored the std::string based test which had been used
 	  originally to determine if gcc's -finline-visibility-hidden flag is
