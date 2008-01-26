@@ -56,6 +56,9 @@ chronological order.
 	  fault. (Some versions of wxWidgets and cppunit are notable examples.)
 	- res fixed csCommonImageFile to compile when THREADED_LOADING is
 	  disabled.
+	- Eric Sunshine generalized the non-virtual destructor warning
+	  suppression check and moved it from configure.ac to
+	  CS/mk/autoconf/warnings.m4 for use by external projects.
 15-Nov-2007
 	- Jorrit fixed a small bug in Dynavis with regards to debugging
 	  output.
