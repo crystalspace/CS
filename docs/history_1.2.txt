@@ -5,6 +5,8 @@
 	- Vincent merged r28118 into 1.2 (remove meshimpexp compile group).
 	- Vincent merged r28119 into 1.2 (fix for #84, mouse and joystick
 	  event helpers not using csKeyModifiers).
+	- Vincent merged r28134 into 1.2 (fix for #276, augment pkg-config
+	  path with user-specified dir).
 25-Jan-2008
 	- Vincent merged r28017 into 1.2 (GM leak fix).
 	- Vincent merged r28018 into 1.2 (leak guard fixes).

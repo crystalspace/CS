@@ -54,6 +54,12 @@ chronological order.
 	  Mac OS X) which recognize only the '*' regex repetition token.
 	  (Portable scripts should not use '+', '?', or '{n,m}' repetition
 	  notation.) Resolves #411.
+9-Nov-2007
+	- res changed CS_CHECK_LIB_WITH to also augment the pkg-config search
+	  path and executable search path with directories derived from the
+	  user-specified location. Also changed some wording to make clear that
+	  the provided location is only search in addition to any standard
+	  directories, not instead. Addresses #276.
 7-Nov-2007
 	- res removed the unused compile group "meshimpexp".
 	- res fixed an inconsistency in the event system where the mouse and
