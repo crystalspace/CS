@@ -64,15 +64,16 @@ AC_PREREQ([2.56])
 #        entry (1))
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_VISIBILITY_INLINES_HIDDEN],
-[AC_REQUIRE([CS_CHECK_HOST])
+[AC_REQUIRE([_CS_VISIBILITY_PREPARE])
+AC_REQUIRE([CS_CHECK_HOST])
 AC_REQUIRE([CS_CHECK_STL])
 CS_COMPILER_PIC([C++], [cs_cv_prog_cxx_pic])
 
 CS_CHECK_BUILD_FLAGS([for inline visibility flag],
     [cs_cv_prog_cxx_visibility_inlines_hidden],
-    [CS_CREATE_TUPLE([-fvisibility-inlines-hidden])], [C++])
-cs_prog_cxx_visibility_inlines_hidden=\
-$cs_cv_prog_cxx_visibility_inlines_hidden
+    [CS_CREATE_TUPLE([-fvisibility-inlines-hidden])], [C++], [], [],
+    [$cs_cv_prog_cxx_enable_errors])
+cs_prog_cxx_visibility_inlines_hidden=$cs_cv_prog_cxx_visibility_inlines_hidden
 
 AS_IF([test -n "$cs_prog_cxx_visibility_inlines_hidden"],
     [AC_CACHE_CHECK([if $cs_prog_cxx_visibility_inlines_hidden is buggy],
@@ -98,3 +99,12 @@ AS_IF([test -n "$cs_prog_cxx_visibility_inlines_hidden"],
     	[cs_prog_cxx_visibility_inlines_hidden=''])])
 
 AS_IF([test -n "$cs_prog_cxx_visibility_inlines_hidden"], [$1], [$2])])
+
+
+
+#------------------------------------------------------------------------------
+# _CS_VISIBILITY_PREPARE
+#------------------------------------------------------------------------------
+AC_DEFUN([_CS_VISIBILITY_PREPARE],
+[CS_COMPILER_ERRORS([C])
+CS_COMPILER_ERRORS([C++])])
