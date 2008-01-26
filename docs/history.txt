@@ -54,6 +54,8 @@ chronological order.
 	  Mac OS X) which recognize only the '*' regex repetition token.
 	  (Portable scripts should not use '+', '?', or '{n,m}' repetition
 	  notation.) Resolves #411.
+7-Nov-2007
+	- res removed the unused compile group "meshimpexp".
 4-Nov-2007
 	- res added an empty IconsMakeWin32ICO rule override to msvcgen.jam to
 	  prevent icon file regeneration when just regenerating VC projects.
