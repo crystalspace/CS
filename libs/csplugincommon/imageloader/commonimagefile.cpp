@@ -160,7 +160,9 @@ void csCommonImageFile::MakeImageData() const
 #else
   if (currentLoader)
   {
-    currentLoader->ApplyTo (this);
+    // Ugly ugly ugly so we can call ApplyTo()...
+    csImageMemory* thisNonConst = const_cast<csCommonImageFile*> (this);
+    currentLoader->ApplyTo (thisNonConst);
     currentLoader = 0;
   }
 #endif

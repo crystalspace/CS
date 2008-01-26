@@ -54,6 +54,8 @@ chronological order.
 	  methods. CS code itself does not require such suppression, but some
 	  3rd-party libraries employed by CS publish headers which contain this
 	  fault. (Some versions of wxWidgets and cppunit are notable examples.)
+	- res fixed csCommonImageFile to compile when THREADED_LOADING is
+	  disabled.
 15-Nov-2007
 	- Jorrit fixed a small bug in Dynavis with regards to debugging
 	  output.

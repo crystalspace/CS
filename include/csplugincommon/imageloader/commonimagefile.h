@@ -168,7 +168,8 @@ protected:
   /// Reference to job queue.
   mutable csRef<iJobQueue> jobQueue;
 #else
-  csRef<iImageFileLoader> currentLoader;
+  // This is mutable so MakeImageData() can be called.
+  mutable csRef<iImageFileLoader> currentLoader;
 #endif
   iObjectRegistry* object_reg;
 
