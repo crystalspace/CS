@@ -62,6 +62,7 @@ chronological order.
 	  target 'vfs' unconditionally. This caused Jam to abort if zlib was
 	  not found at configure time, and also caused makefile emulation layer
 	  creation to fail.
+	- Eric Sunshine removed the unused MikMod check from configure.ac.
 13-Nov-2007
 	- Eric Sunshine fixed sed expression in CS/mk/autoconf/crystal.m4 to
 	  work with POSIX-compliant sed commands (such as the BSD version on
