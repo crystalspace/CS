@@ -721,7 +721,9 @@ void csCal3dSkeletonFactory::SetSkeleton (CalCoreModel *model)
   std::vector<CalCoreBone*> bvect = core_skeleton->getVectorCoreBone ();
   for (size_t i = 0; i < bvect.size (); i++)
   {
-    bones_factories.Push (new csCal3dSkeletonBoneFactory (bvect[i], this));
+    csRef<csCal3dSkeletonBoneFactory> newFact;
+    newFact.AttachNew (new csCal3dSkeletonBoneFactory (bvect[i], this));
+    bones_factories.Push (newFact);
   }
 
   //now we can setup parents and childres
@@ -766,6 +768,17 @@ iSkeletonAnimation *csCal3dSkeletonFactory::FindAnimation (const char *name)
     return animations[idx];
   return 0;
 }
+
+iSkeletonBoneFactory* csCal3dSkeletonFactory::GetBone (size_t i)
+{ 
+  return bones_factories[i];
+}
+
+iSkeletonAnimation* csCal3dSkeletonFactory::GetAnimation (size_t idx)
+{ 
+  return animations[idx];
+}
+
 //---------------------------csCal3dSkeletonBoneFactory---------------------------
 
 csCal3dSkeletonBoneFactory::csCal3dSkeletonBoneFactory (CalCoreBone *core_bone,

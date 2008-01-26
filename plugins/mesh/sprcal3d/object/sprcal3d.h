@@ -816,7 +816,7 @@ public:
   iSkeletonBoneFactory *FindBone (const char *name);
   size_t FindBoneIndex (const char *name);
   size_t GetBonesCount () const {return bones_factories.GetSize ();}
-  iSkeletonBoneFactory *GetBone (size_t i) {return (iSkeletonBoneFactory*)bones_factories[i];}
+  iSkeletonBoneFactory *GetBone (size_t i);
   iSkeletonGraveyard *GetGraveyard  () {return 0;}
   iSkeletonSocketFactory *CreateSocket(const char *name, iSkeletonBoneFactory *bone) {return 0;}
   iSkeletonSocketFactory *FindSocket(const char *name) {return 0;}
@@ -824,7 +824,7 @@ public:
   void RemoveSocket (int i) {;}
   size_t GetSocketsCount () {return 0;}   
   size_t GetAnimationsCount () {return animations.GetSize ();}
-  iSkeletonAnimation *GetAnimation (size_t idx) {return (iSkeletonAnimation *)animations[idx];}
+  iSkeletonAnimation *GetAnimation (size_t idx);
   /** @} */
 };
 
