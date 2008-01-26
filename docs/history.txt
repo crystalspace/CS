@@ -48,6 +48,9 @@ chronological order.
 	  configure.ac so that it no longer access the shell variable
 	  cs_host_macosx, which is private to (not published by)
 	  _CS_CHECK_HOST_DARWIN in cs_check_host.m4.
+	- Eric Sunshine added 'non-virtual destructor' warning suppression to
+	  apps/test/wxtest/Jamfile to silence warnings about header problems
+	  over which we have no control (for wxWidgets shipped with Mac OS X).
 19-Nov-2007
 	- Eric Sunshine added configure.ac check to determine how to suppress
 	  warnings about non-virtual destructors in classes with virtual
@@ -59,6 +62,10 @@ chronological order.
 	- Eric Sunshine generalized the non-virtual destructor warning
 	  suppression check and moved it from configure.ac to
 	  CS/mk/autoconf/warnings.m4 for use by external projects.
+	- Eric Sunshine added 'non-virtual destructor' warning suppression to
+	  plugins/video/canvas/wxgl/Jamfile to silence warnings about header
+	  problems over which we have no control (for wxWidgets shipped with
+	  Mac OS X).
 15-Nov-2007
 	- Jorrit fixed a small bug in Dynavis with regards to debugging
 	  output.

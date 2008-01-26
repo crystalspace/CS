@@ -16,6 +16,8 @@
 	- Vincent merged r28189 into 1.2 (csCommonImageFile compile fix).
 	- Vincent merged r28190 into 1.2 (non-virtual destructor warning check
 	  now re-usable via warnings.m4).
+	- Vincent merged r28192 and r28201 into 1.2 (apply non-virtual
+	  destructor warning suppression to some 3rd-party code).
 25-Jan-2008
 	- Vincent merged r28017 into 1.2 (GM leak fix).
 	- Vincent merged r28018 into 1.2 (leak guard fixes).
