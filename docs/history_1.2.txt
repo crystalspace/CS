@@ -30,6 +30,7 @@
 	- Vincent merged r28331 and r28511 into 1.2 (driver DB tweak).
 	- Vincent merged r28437 into 1.2 (compiler.m4 exports
 	  COMPILER.FOO.TYPE for win32.jam).
+	- Vincent merged r28440 into 1.2 (emit.m4 fixes).
 25-Jan-2008
 	- Vincent merged r28017 into 1.2 (GM leak fix).
 	- Vincent merged r28018 into 1.2 (leak guard fixes).
