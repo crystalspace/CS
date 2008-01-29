@@ -23,11 +23,11 @@
 /**\file
  * Texture handle interface
  */
- 
+
 /**
  * \addtogroup gfx3d
  * @{ */
- 
+
 #include "csutil/scf_interface.h"
 #include "cstypes.h"
 #include "ivideo/graph3d.h"
@@ -50,7 +50,7 @@ struct iGraphics3D;
  */
 struct iTextureHandle : public virtual iBase
 {
-  SCF_INTERFACE(iTextureHandle, 3,0,3);
+  SCF_INTERFACE(iTextureHandle, 4,0,3);
   /// Retrieve the flags set for this texture
   virtual int GetFlags () const = 0;
 
@@ -68,9 +68,9 @@ struct iTextureHandle : public virtual iBase
 
   /**
    * Get the dimensions the renderer uses for this texture.
-   * In most cases this corresponds to the size that was used to create this 
-   * texture, but some renderers have texture size limitations (like power 
-   * of two) and in that case the size returned here will be the corrected 
+   * In most cases this corresponds to the size that was used to create this
+   * texture, but some renderers have texture size limitations (like power
+   * of two) and in that case the size returned here will be the corrected
    * size.
    * You can get the original image size with GetOriginalDimensions().
    * \return Whether the renderer-used dimensions could be determined.
@@ -89,26 +89,26 @@ struct iTextureHandle : public virtual iBase
   // CHANGED TO ADD SUPPORT FOR CUBEMAPS AND 3D TEXTURES
   // done by Phil Aumayr (phil@rarebyte.com)
   enum //CS_DEPRECATED_TYPE
-  { 
-    CS_TEX_IMG_1D = 0, 
-    CS_TEX_IMG_2D, 
-    CS_TEX_IMG_3D, 
+  {
+    CS_TEX_IMG_1D = 0,
+    CS_TEX_IMG_2D,
+    CS_TEX_IMG_3D,
     CS_TEX_IMG_CUBEMAP,
     CS_TEX_IMG_RECT
   };
   /**
    * Texture Depth Indices are used for Cubemap interface
    */
-  enum { CS_TEXTURE_CUBE_POS_X = 0, CS_TEXTURE_CUBE_NEG_X, 
+  enum { CS_TEXTURE_CUBE_POS_X = 0, CS_TEXTURE_CUBE_NEG_X,
          CS_TEXTURE_CUBE_POS_Y, CS_TEXTURE_CUBE_NEG_Y,
          CS_TEXTURE_CUBE_POS_Z, CS_TEXTURE_CUBE_NEG_Z };
 
 
   /**
    * Get the dimensions the renderer uses for this texture.
-   * In most cases this corresponds to the size that was used to create this 
-   * texture, but some renderers have texture size limitations (like power 
-   * of two) and in that case the size returned here will be the corrected 
+   * In most cases this corresponds to the size that was used to create this
+   * texture, but some renderers have texture size limitations (like power
+   * of two) and in that case the size returned here will be the corrected
    * size.
    * You can get the original image size with GetOriginalDimensions().
    * \return Whether the renderer-used dimensions could be determined.
@@ -125,7 +125,7 @@ struct iTextureHandle : public virtual iBase
   virtual void GetOriginalDimensions (int& mw, int& mh, int &md) = 0;
 
   /**
-   * Get the texture target. Note the texture target is determined by the 
+   * Get the texture target. Note the texture target is determined by the
    * image from which the texture was created and possibly the texture flags.
    * \deprecated Deprecated in 1.3. Use GetTextureType() instead
    */
@@ -145,7 +145,7 @@ struct iTextureHandle : public virtual iBase
    * Blit a memory block to this texture. Format of the image is determined
    * by the \a format parameter. Row by row.
    * \remarks If the specified target rectangle exceeds the texture dimensions
-   *   the Blit() call may have no effect. It's the responsibility of the 
+   *   the Blit() call may have no effect. It's the responsibility of the
    *   caller to ensure that the rectangle lies completely inside the texture.
    */
   virtual void Blit (int x, int y, int width, int height,
@@ -179,13 +179,18 @@ struct iTextureHandle : public virtual iBase
   virtual void Precache () = 0;
 
   /**
+   * Check if this texture has already been precached.
+   */
+  virtual bool IsPrecached () = 0;
+
+  /**
    * Set the "class" of this texture.
    * A texture class is used to set some characteristics on how a texture is
    * handled at runtime. For example, graphics hardware usually offers texture
    * compression, but it can cause a loss of quality and precision and thus
    * may not be desireable for all data. In this case, a class can be set on
    * the texture that instructs the renderer to not apply texture compression.
-   * \remarks Not all renderers may support texture classes. 
+   * \remarks Not all renderers may support texture classes.
    * \sa GetTextureClass
    */
   virtual void SetTextureClass (const char* className) = 0;
@@ -202,7 +207,7 @@ struct iTextureHandle : public virtual iBase
    * be overridden with this method.
    */
   virtual void SetAlphaType (csAlphaMode::AlphaType alphaType) = 0;
-  
+
   /// Possible texture types
   enum TextureType
   {
@@ -217,10 +222,10 @@ struct iTextureHandle : public virtual iBase
     /// Rectangle texture
     texTypeRect
   };
-  
+
   /**
-   * Get the texture type (2D, 3D, cube map, RECT texture ...). Note that the 
-   * texture type is determined by the image from which the texture was 
+   * Get the texture type (2D, 3D, cube map, RECT texture ...). Note that the
+   * texture type is determined by the image from which the texture was
    * created and possibly the texture flags.
    */
   virtual TextureType GetTextureType() const = 0;
@@ -237,11 +242,11 @@ struct iTextureHandle : public virtual iBase
      */
     blitbufRetainArea = 2
   };
-  
+
   /**
    * Query a buffer for blitting.
    * \par Multiple areas
-   * If multiple areas of the texture are to be updated, call 
+   * If multiple areas of the texture are to be updated, call
    * QueryBlitBuffer () for a new area before you call ApplyBlitBuffer () for
    * the prior one. That is, the order of calls should be like:
    * \code
@@ -267,7 +272,7 @@ struct iTextureHandle : public virtual iBase
   enum BlitBufferNature
   {
     /**
-     * The returned buffer is an intermediate buffer which is applied only 
+     * The returned buffer is an intermediate buffer which is applied only
      * indirectly, possibly with a call to a foreign module.
      * This information is mostly useful in cases where some state has to be
      * set before a foreign call could possibly occur. An examples for such
@@ -276,7 +281,7 @@ struct iTextureHandle : public virtual iBase
      */
     natureIndirect = 0,
     /**
-     * The returned buffer is actually a direct pointer to the texture 
+     * The returned buffer is actually a direct pointer to the texture
      * storage.
      */
     natureDirect = 1
