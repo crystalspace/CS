@@ -9392,6 +9392,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetAlphaMap = *cspacec::iTextureHandle_GetAlphaMap;
 *GetAlphaType = *cspacec::iTextureHandle_GetAlphaType;
 *Precache = *cspacec::iTextureHandle_Precache;
+*IsPrecached = *cspacec::iTextureHandle_IsPrecached;
 *SetTextureClass = *cspacec::iTextureHandle_SetTextureClass;
 *GetTextureClass = *cspacec::iTextureHandle_GetTextureClass;
 *SetAlphaType = *cspacec::iTextureHandle_SetAlphaType;

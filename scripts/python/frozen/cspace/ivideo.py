@@ -792,6 +792,7 @@ class iTextureHandle(core.iBase):
     def GetAlphaMap(*args): return _ivideo.iTextureHandle_GetAlphaMap(*args)
     def GetAlphaType(*args): return _ivideo.iTextureHandle_GetAlphaType(*args)
     def Precache(*args): return _ivideo.iTextureHandle_Precache(*args)
+    def IsPrecached(*args): return _ivideo.iTextureHandle_IsPrecached(*args)
     def SetTextureClass(*args): return _ivideo.iTextureHandle_SetTextureClass(*args)
     def GetTextureClass(*args): return _ivideo.iTextureHandle_GetTextureClass(*args)
     def SetAlphaType(*args): return _ivideo.iTextureHandle_SetAlphaType(*args)
