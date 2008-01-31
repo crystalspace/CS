@@ -1,5 +1,8 @@
 1.2 branch log.
 
+31-Jan-2008
+	- Vincent rolled back r28119 from 1.2 (which was merged in r28567)
+	  since it's not binary compatible.
 28-Jan-2008
 	- Vincent merged r28522 into 1.2 (copy/paste error in sound docs).
 26-Jan-2008

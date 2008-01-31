@@ -247,12 +247,6 @@ chronological order.
 	  directories, not instead. Addresses #276.
 7-Nov-2007
 	- res removed the unused compile group "meshimpexp".
-	- res fixed an inconsistency in the event system where the mouse and
-	  joystick event helpers created events whose key modifier flags where
-	  specified and stored as 'uint32' whereas practically all other code
-	  treated them as 'csKeyModifiers'. Changed the helpers to take and
-	  store 'csKeyModifiers' (the old 'uint32' variants are deprecated).
-	  Should fix #84.
 4-Nov-2007
 	- res added an empty IconsMakeWin32ICO rule override to msvcgen.jam to
 	  prevent icon file regeneration when just regenerating VC projects.
