@@ -685,10 +685,16 @@ class csPrintfFormatter
 		param.vSzT = va_arg (args, size_t);
 		break;
 	      case typeShort:
-		param.vInt = (short)(va_arg (args, int));
+		if (currentFormat.conversion == convInt)
+		  param.vInt = (short)(va_arg (args, int));
+		else
+		  param.vInt = (unsigned short)(va_arg (args, int));
 		break;
 	      case typeChar:
-		param.vInt = (char)(va_arg (args, int));
+		if (currentFormat.conversion == convInt)
+		  param.vInt = (char)(va_arg (args, int));
+		else
+		  param.vInt = (unsigned char)(va_arg (args, int));
 		break;
 	      default:
 		param.vInt = va_arg (args, int);
