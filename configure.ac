@@ -1207,12 +1207,17 @@ AS_IF([test $cs_cv_lib3ds = yes],
 	[], [], [CS_EMIT_BUILD_RESULT([cs_cv_lib3ds], [3DS])], [], [],
 	[$cs_cv_lib3ds_cflags], [$cs_cv_lib3ds_lflags], [$cs_cv_lib3ds_libs])
 	AS_IF([test $cs_cv_lib3ds_recent = yes],
-	    [CS_CHECK_BUILD([if lib3ds version is >= 1.3.0], [cs_cv_lib3ds_1_3],
+	    [CS_CHECK_BUILD([for generic lib3ds data I/O callbacks],
+	    [cs_cv_lib3ds_1_3],
 	    [AC_LANG_PROGRAM([[#include <lib3ds/io.h>
-	        size_t DataReadFunc (void *self, void *buffer, size_t size) {}]],
+	        size_t DataReadFunc (void *self, void *buffer, size_t n) {}]],
 	        [lib3ds_io_new (0, 0, 0, 0, DataReadFunc, 0)])],
-	    [], [C++], [CS_EMIT_BUILD_PROPERTY([LIB3DS.ONE_THREE_OH], [yes])], [], [],
-	    [$cs_cv_lib3ds_cflags], [$cs_cv_lib3ds_lflags], [$cs_cv_lib3ds_libs])])])
+	    [], [C++],
+	    [CS_EMIT_BUILD_PROPERTY([LIB3DS.GENERIC_DATA_IO_CALLBACKS],[yes])],
+	    [], [],
+	    [$cs_cv_lib3ds_cflags],
+	    [$cs_cv_lib3ds_lflags],
+	    [$cs_cv_lib3ds_libs])])])
 
 
 
@@ -1451,7 +1456,8 @@ AS_IF([test $cs_cv_libwx = yes],
 	    #endif
 	    #include "wx/glcanvas.h"
 	    ]],
-	    [wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY, wxPoint()); glVertex3f(0,0,0)])],
+	    [wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY, wxPoint());
+	    glVertex3f(0,0,0)])],
 	[CS_CREATE_TUPLE(
 	    [$cs_cv_libwx_cflags],
 	    [$cs_cv_libwx_lflags],

@@ -42896,8 +42896,8 @@ fi
 
 	if test $cs_cv_lib3ds_recent = yes; then
   if test "" != yes; then
-  echo "$as_me:$LINENO: checking if lib3ds version is >= 1.3.0" >&5
-echo $ECHO_N "checking if lib3ds version is >= 1.3.0... $ECHO_C" >&6
+  echo "$as_me:$LINENO: checking for generic lib3ds data I/O callbacks" >&5
+echo $ECHO_N "checking for generic lib3ds data I/O callbacks... $ECHO_C" >&6
 if test "${cs_cv_lib3ds_1_3+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -42979,7 +42979,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <lib3ds/io.h>
-	        size_t DataReadFunc (void *self, void *buffer, size_t size) {}
+	        size_t DataReadFunc (void *self, void *buffer, size_t n) {}
 int
 main ()
 {
@@ -43051,8 +43051,8 @@ fi
 echo "$as_me:$LINENO: result: $cs_cv_lib3ds_1_3" >&5
 echo "${ECHO_T}$cs_cv_lib3ds_1_3" >&6
 else
-  echo "$as_me:$LINENO: checking if lib3ds version is >= 1.3.0" >&5
-echo $ECHO_N "checking if lib3ds version is >= 1.3.0... $ECHO_C" >&6
+  echo "$as_me:$LINENO: checking for generic lib3ds data I/O callbacks" >&5
+echo $ECHO_N "checking for generic lib3ds data I/O callbacks... $ECHO_C" >&6
 	    ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -43131,7 +43131,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <lib3ds/io.h>
-	        size_t DataReadFunc (void *self, void *buffer, size_t size) {}
+	        size_t DataReadFunc (void *self, void *buffer, size_t n) {}
 int
 main ()
 {
@@ -43207,7 +43207,7 @@ fi
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}LIB3DS.ONE_THREE_OH ?= \"$cs_build_prop_val\" ;
+  cs_jamconfig_text="${cs_jamconfig_text}LIB3DS.GENERIC_DATA_IO_CALLBACKS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -50654,7 +50654,8 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY, wxPoint()); glVertex3f(0,0,0)
+wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY, wxPoint());
+	    glVertex3f(0,0,0)
   ;
   return 0;
 }
@@ -50815,7 +50816,8 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY, wxPoint()); glVertex3f(0,0,0)
+wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY, wxPoint());
+	    glVertex3f(0,0,0)
   ;
   return 0;
 }
