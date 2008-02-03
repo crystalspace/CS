@@ -6,6 +6,8 @@
 	- Vincent merged r27906 into 1.2 (lib3ds configuration cleanup).
 	- Vincent merged r28112 and r28165:28166 into 1.2 (remove unportable
 	  shell constructs from autogen.sh).
+	- Vincent merged r28177 and r28180 into 1.2 (Jam clean rule fixes and
+	  symbolic-link simplification).
 31-Jan-2008
 	- Vincent rolled back r28119 from 1.2 (which was merged in r28567)
 	  since it's not binary compatible.

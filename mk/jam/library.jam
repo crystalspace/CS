@@ -110,6 +110,7 @@ rule Library
   Always $(<)clean ;
   NotFile $(<)clean ;
   Clean $(<)clean : $(objects) $($(<)_CLEANEXTRA) ;
+  Clean clean : $(objects) $($(<)_CLEANEXTRA) ;
 
   if ! [ IsElem nohelp : $(options) ]
   {
@@ -229,7 +230,8 @@ rule LibraryStatic
 # LibraryShared libname : sources : options : decoratedtarget
 rule LibraryShared
 {
-  local objects = $(>) ;
+  local libname = $(1) ;
+  local objects = $(2) ;
   local options = $(3) ;
   local target = $(4) ;
   local linklib = [ ConstructSharedLibraryLinkLib $(<) : $(options) ] ;
@@ -257,15 +259,15 @@ rule LibraryShared
     # Add to global library list
     if [ IsElem optional : $(options) ]
     {
-      INSTALLEDLIBS_OPTIONAL += $(<) ;
+      INSTALLEDLIBS_OPTIONAL += $(libname) ;
     }
     else
     {
-      INSTALLEDLIBS += $(<) ;
+      INSTALLEDLIBS += $(libname) ;
     }
   }
 
-  Depends $(<) : $(linklib) ;
+  Depends $(libname) : $(linklib) ;
   MakeLocate $(linklib) : $(LOCATE.OBJECTS)/libs ;
   SEARCH on $(linklib) = $(LOCATE.OBJECTS)/libs ;
   if $(linklib) != $(target)
@@ -275,18 +277,18 @@ rule LibraryShared
     SEARCH on $(target) = $(BUILDTOP) ;
   }
   Depends $(target) : $(objects) ;
-  $(<)_CLEANEXTRA += $(target) ;
+  $(libname)_CLEANEXTRA += $(target) ;
   Depends $(target) : $(deplibs) ;
     
-  CFlags $(<) : [ FDefines CS_$(<:U)_LIB  ] ;
-  LFlags $(<) : $(LINKLIBS) ;
+  CFlags $(libname) : [ FDefines CS_$(libname:U)_LIB  ] ;
+  LFlags $(libname) : $(LINKLIBS) ;
     
-  SystemLinkSharedLibrary $(target) : $(objects) $(deplibs) : $(linklib) ;
+  SystemLinkSharedLibrary $(libname) : $(target) : $(objects) $(deplibs) : $(linklib) ;
   
   if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
   {
     local debugfile = [ SplitDebugInfo $(target) ] ;
-    $(<)_CLEANEXTRA += $(debugfile) ;
+    $(libname)_CLEANEXTRA += $(debugfile) ;
     if ! [ IsElem noinstall : $(options) ]
     {
       NoCare $(debugfile) ;

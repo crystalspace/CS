@@ -208,6 +208,9 @@ chronological order.
 	  apps/test/wxtest/Jamfile to silence warnings about header problems
 	  over which we have no control (for wxWidgets shipped with Mac OS X).
 19-Nov-2007
+	- res fixed shared library building breakage after r28177. (A
+	  reference to a parameter of the Win32 SystemLinkSharedLibrary rule
+	  wasn't updated when the parameter placement changed.)
 	- Eric Sunshine added configure.ac check to determine how to suppress
 	  warnings about non-virtual destructors in classes with virtual
 	  methods. CS code itself does not require such suppression, but some
@@ -222,6 +225,19 @@ chronological order.
 	  plugins/video/canvas/wxgl/Jamfile to silence warnings about header
 	  problems over which we have no control (for wxWidgets shipped with
 	  Mac OS X).
+18-Nov-2007
+	- Eric Sunshine fixed gristing problem in LibraryShared rule in
+	  library.jam which caused it to leave symbolic links laying around in
+	  top-level build directory at 'clean' time. Also added missing Clean
+	  rule invocation to Library implementation. Fixes issue #413.
+	- Eric Sunshine fixed bugs in construction of '$(libname)clean' targets
+	  in SystemLinkSharedLibrary implementations in unix.jam and win32.jam
+	  which resulted in auxilliary files created by those rules (such as
+	  .dbg and .def) to be around when those clean targets were invoked.
+	- Eric Sunshine fixed bug in SystemLinkSharedLibrary in unix.jam which
+	  caused 'clean' targets to miss generated .resp file.
+	- Eric Sunshine simplified and normalized implementation of DoSymLink
+	  actions in helper.jam.
 15-Nov-2007
 	- Jorrit fixed a small bug in Dynavis with regards to debugging
 	  output.
