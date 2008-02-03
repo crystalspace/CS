@@ -237,6 +237,8 @@ chronological order.
 	  not found at configure time, and also caused makefile emulation layer
 	  creation to fail.
 	- Eric Sunshine removed the unused MikMod check from configure.ac.
+	- Eric Sunshine removed unportable shell constructs from
+	  CS/bin/autogen.sh.
 13-Nov-2007
 	- Eric Sunshine fixed sed expression in CS/mk/autoconf/crystal.m4 to
 	  work with POSIX-compliant sed commands (such as the BSD version on
@@ -251,6 +253,8 @@ chronological order.
 	  directories, not instead. Addresses #276.
 7-Nov-2007
 	- res removed the unused compile group "meshimpexp".
+	- res changed bin/autogen.sh to not remove aclocal.m4 when autoconf
+	  failed. Can be helpful for troubleshooting.
 4-Nov-2007
 	- res added an empty IconsMakeWin32ICO rule override to msvcgen.jam to
 	  prevent icon file regeneration when just regenerating VC projects.
