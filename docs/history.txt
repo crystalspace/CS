@@ -6,6 +6,9 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-Feb-2008
+	- Sueastside added an optional parameter to ThreadedJobQueue's constructor
+	  to set the thread's priority.
 2-Feb-2008
 	- res fixed "short" (h) and "short short" (hh) handling to only cast
 	  to a signed char/short when formatting to a decimal integer; cast to
