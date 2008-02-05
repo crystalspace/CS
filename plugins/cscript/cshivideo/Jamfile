@@ -1,6 +1,6 @@
 SubDir TOP plugins cscript cshivideo ;
 
-if $(CSHARP.AVAILABLE) = "yes"
+if $(CSHARP.AVAILABLE) = "yes" && $(CMD.PERL5)  && $(CMD.SWIG)
 {
   CSharpBindingModule ivideosharp : ivideo : ivideomod.cpp : : : "ivideo cs C# module" ;
 }

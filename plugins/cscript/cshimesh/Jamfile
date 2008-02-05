@@ -1,6 +1,6 @@
 SubDir TOP plugins cscript cshimesh ;
 
-if $(CSHARP.AVAILABLE) = "yes"
+if $(CSHARP.AVAILABLE) = "yes" && $(CMD.PERL5)  && $(CMD.SWIG)
 {
   CSharpBindingModule imeshsharp : imesh : imeshmod.cpp : : : "imesh cs C# module" ;
 }

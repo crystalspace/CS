@@ -161,6 +161,23 @@ if $(CSHARP.AVAILABLE) = "yes"
     CSC $(target) : $(sources) : library ;
   }
 
+  actions SN
+  {
+    $(CMD.SN) -R $(>)
+  }
+
+  #----------------------------------
+  # SignAssembly signed : assembly : keypair
+  rule SignAssembly
+  {
+    local assembly = $(2) ;
+    local keypair = $(3) ;
+
+    NotFile $(<) ;
+    Depends $(<) : $(assembly) $(keypair) ;
+    SN $(<) : $(assembly) $(keypair) ;
+    Always $(<) ;
+  }
 
   #----------------------------------
   # InstallGAC assembly : packagename

@@ -66,11 +66,17 @@ if $(CSHARP.AVAILABLE) = "yes" && $(CMD.PERL5)  && $(CMD.SWIG)
   NAnt $(cspacesharpdll) : $(csbuildxml:G=build) ;
   Clean cspacesharpclean : $(cspacesharpdll) ;
 
+  # Sign the assembly
+  local keypair = crystalspace-dotnet.snk ;
+  SEARCH on $(keypair) = $(SEARCH_SOURCE) ;
+  SignAssembly cspacedotnet-sign : $(cspacesharpdll) : $(keypair) ;
+
   # Copy the .Net dll into bindings/csharp folder
   local cspacesharpdllfinal = $(cspacesharpdll:G=csdotnetfinal) ;
   MakeLocate $(cspacesharpdllfinal) : [ ConcatDirs $(LOCATE.OBJECTS) bindings csharp ] ;
   Copy $(cspacesharpdllfinal) : $(cspacesharpdll) ;
   Depends $(cspacesharpdllfinal) : $(cspacesharpdll) ;
+  Depends $(cspacesharpdllfinal) : cspacedotnet-sign ;
   Clean cspacesharpclean : $(cspacesharpdllfinal) ;
 
   Depends csharpmod : $(cspacesharpdllfinal) ;

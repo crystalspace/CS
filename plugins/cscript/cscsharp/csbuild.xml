@@ -12,11 +12,13 @@
     <property name="src.basedir" value="." />
     <property name="lib.dir" value="." />
     <property name="cspacedotnet.out" value="crystalspace-dotnet.dll" />
+    <property name="src.keyfile" value="${src.basedir}/cspacedotnet/crystalspace-dotnet.key" />
 
     <description>${description}</description>
 
     <target name="build" description="compiles crystal space sharp">
-        <csc target="library" output="${cspacedotnet.out}" debug="${debug}">
+        <csc target="library" output="${cspacedotnet.out}" debug="${debug}"
+	     keyfile="${src.keyfile}">
             <sources>
                 <include name="${src.basedir}/cspacedotnet/*.cs" />
             </sources>

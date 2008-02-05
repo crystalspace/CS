@@ -1,6 +1,6 @@
 SubDir TOP plugins cscript cshcstool ;
 
-if $(CSHARP.AVAILABLE) = "yes"
+if $(CSHARP.AVAILABLE) = "yes" && $(CMD.PERL5)  && $(CMD.SWIG)
 {
   CSharpBindingModule cstoolsharp : cstool : cstoolmod.cpp : : : "cstool cs C# module" ;
 }

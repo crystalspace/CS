@@ -1,6 +1,6 @@
 SubDir TOP plugins cscript cshcsgfx ;
 
-if $(CSHARP.AVAILABLE) = "yes"
+if $(CSHARP.AVAILABLE) = "yes"  && $(CMD.PERL5)  && $(CMD.SWIG)
 {
   CSharpBindingModule csgfxsharp : csgfx : csgfxmod.cpp : : : "csgfx cs C# module" ;
 }

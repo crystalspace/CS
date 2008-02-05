@@ -12,7 +12,7 @@ AC_PREREQ([2.56])
 # cs_version_number
 #	Keep this value synchronized with CS/include/csver.h,
 #	CS/docs/texinfo/version.txi, CS/mk/autoconf/crystal.m4,
-#	and and plugins/cscript/cscsharp/cspacesharp/AssemblyInfo.cs
+#	and plugins/cscript/cscsharp/cspacesharp/AssemblyInfo.cs
 #------------------------------------------------------------------------------
 m4_define([cs_version_number], [1.3])
 

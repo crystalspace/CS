@@ -33,4 +33,5 @@ using System.Runtime.CompilerServices;
 [assembly: CLSCompliant(true)]
 
 // Assembly key file for strong name signing
-[assembly: AssemblyKeyName("crystalspace-sharp.key")]
+[assembly: AssemblyDelaySign(true)]
+[assembly: AssemblyKeyName("")]

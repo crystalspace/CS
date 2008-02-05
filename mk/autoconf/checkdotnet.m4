@@ -44,6 +44,14 @@ AC_DEFUN([CS_CHECK_NANT],
      CS_EMIT_BUILD_PROPERTY([CMD.NANT], [$CMD_NANT])])
 
 #------------------------------------------------------------------------------
+# CS_CHECK_SN
+#	Checks for the sn .Net tool
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_CHECK_SN],
+	[CS_CHECK_PROGS([CMD_SN], [sn])
+	 CS_EMIT_BUILD_PROPERTY([CMD.SN], [$CMD_SN])])
+
+#------------------------------------------------------------------------------
 # CS_CHECK_CSHARP_COMPILER
 #	This is a placeholder for a repetitive code
 #------------------------------------------------------------------------------
@@ -108,6 +116,7 @@ AC_DEFUN([CS_CHECK_DOTNET],
     CS_CHECK_CSHARP_COMPILERS
     CS_CHECK_GACUTIL
     CS_CHECK_NANT
+	CS_CHECK_SN
 
     CS_CHECK_DOTNET_RUNTIME([$with_dotnet])
 
@@ -117,6 +126,8 @@ AC_DEFUN([CS_CHECK_DOTNET],
     AS_IF([test -z "$CMD_NANT"],
 	[csharp_available="no"])
 
+	AS_IF([test -z "$CMD_SN"],
+	[csharp_available="no"])
     AC_MSG_CHECKING([if the .NET tools are usable])
     AC_MSG_RESULT([$csharp_available])
 
