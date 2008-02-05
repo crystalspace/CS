@@ -261,6 +261,11 @@ namespace RenderManager
           ForEachMeshNode (*context, meshRender);
         }
       }
+      /* @@@ FIXME: When switching from RT to screen with a clipper set
+         the clip rect gets wrong (stays at RT size). This workaround ensures
+         that no "old" clip rect is stored which is restored later.
+         Should really be fixed in the renderer. */
+      g3d->SetClipper (0, CS_CLIPPER_TOPLEVEL);
 
       contextStack.Empty ();
     }

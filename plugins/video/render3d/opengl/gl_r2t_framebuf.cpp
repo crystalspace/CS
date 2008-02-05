@@ -58,6 +58,7 @@ bool csGLRender2TextureFramebuf::SetRenderTarget (iTextureHandle* handle,
   {
   case rtaColor0:
     target = &colorTarget;
+    rt_onscreen = !persistent;
     break;
   case rtaDepth:
     // @@@ FIXME: Perhaps investigate how to draw to the depth buffer

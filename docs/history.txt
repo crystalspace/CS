@@ -17,6 +17,7 @@ chronological order.
 	  SV names string set.
 	- res fixed the haze plugin and common texture manager using a wrong 
 	  tag for retrieving the SV names string set.
+	- res fixed the R2T using a wrong 2D clip rect.
 17-Jan-2008
 	- Marten fixed a number of post-merge problems.
 16-Jan-2008

@@ -1205,7 +1205,6 @@ bool csGLGraphics3D::SetRenderTarget (iTextureHandle* handle, bool persistent,
     viewwidth = G2D->GetWidth();
     viewheight = G2D->GetHeight();
     needViewportUpdate = true;
-    hasOld2dClip = true;
   }
   currentAttachments = newAttachments;
   return true;
