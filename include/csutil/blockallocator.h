@@ -151,20 +151,20 @@ struct csBlockAllocatorSizeObjectAlign
 template <class T,
   typename Allocator = CS::Memory::AllocatorMalloc, 
   typename ObjectDispose = csBlockAllocatorDisposeDelete<T>,
-  typename SizeComputer = csBlockAllocatorSizeObject
+  typename SizeComputerSize = csBlockAllocatorSizeObject::Size<T>
 >
 class csBlockAllocator : 
   public csFixedSizeAllocator<
-    SizeComputer::Size<T>::value, 
+    SizeComputerSize::value,
     Allocator>
 {
 public:
-  typedef csBlockAllocator<T, Allocator, SizeComputer> ThisType;
+  typedef csBlockAllocator<T, Allocator, SizeComputerSize> ThisType;
   typedef T ValueType;
   typedef Allocator AllocatorType;
 
 protected:
-  typedef csFixedSizeAllocator<sizeof (T), Allocator> superclass;
+  typedef csFixedSizeAllocator<SizeComputerSize::value, Allocator> superclass;
 private:
   void* Alloc (size_t /*n*/) { return 0; }                       // Illegal
   void* Alloc (void* /*p*/, size_t /*newSize*/) { return 0; }   // Illegal
@@ -180,7 +180,7 @@ public:
    *   elements, though allocated, will remain unused (until you add more
    *   elements).
    *
-   * \remarks If use use csBlockAllocator as a convenient and lightweight
+   * \remarks If you use csBlockAllocator as a convenient and lightweight
    *   garbage collection facility (for which it is well-suited), and expect it
    *   to dispose of allocated objects when the pool itself is destroyed, then
    *   set \c warn_unfreed to false. On the other hand, if you use

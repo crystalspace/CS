@@ -9,6 +9,8 @@ chronological order.
 5-Feb-2008
 	- res fixed csInitializer::CreateStringSet() registering the SV names
 	  set with the wrong IF.
+	- res added a workaround to make blockallocator.h compile with gcc 4.1
+	  again.
 17-Jan-2008
 	- Marten fixed a number of post-merge problems.
 16-Jan-2008
