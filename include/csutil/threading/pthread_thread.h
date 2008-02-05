@@ -54,7 +54,7 @@ namespace Implementation
 
     static ThreadID GetThreadID ();
 
-    ThreadPriority GetPriority ()
+    ThreadPriority GetPriority () const
     {
       return priority;
     }
