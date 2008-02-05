@@ -114,7 +114,8 @@ namespace Implementation
 
 
   ThreadBase::ThreadBase (Runnable* runnable)
-    : runnable (runnable), threadHandle (0), threadId (0), isRunning (0)
+    : runnable (runnable), threadHandle (0), threadId (0), isRunning (0), 
+    priority (THREAD_PRIO_NORMAL)
   {
   }
 

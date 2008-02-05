@@ -74,7 +74,7 @@ namespace Implementation
 
 
   ThreadBase::ThreadBase (Runnable* runnable)
-    : runnable (runnable), isRunning (0)
+    : runnable (runnable), isRunning (0), priority (THREAD_PRIO_NORMAL)
   {
   }
 
