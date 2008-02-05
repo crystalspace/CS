@@ -223,7 +223,7 @@ bool RMTest1::HandleTarget (RenderTreeType& renderTree,
 
 bool RMTest1::Initialize(iObjectRegistry* objectReg)
 {
-  svNameStringSet = csQueryRegistryTagInterface<iStringSet> (objectReg,
+  svNameStringSet = csQueryRegistryTagInterface<iShaderVarStringSet> (objectReg,
     "crystalspace.shader.variablenameset");
 
   stringSet = csQueryRegistryTagInterface<iStringSet> (objectReg,
