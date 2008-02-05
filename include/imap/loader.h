@@ -182,7 +182,7 @@ struct iLoader : public virtual iBase
   virtual iTextureWrapper* LoadTexture (const char *Name,
     const char *FileName,	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
     bool reg = true, bool create_material = true,	bool free_image = true,
-    iBase* regionOrCollecton = 0, uint keepFlags = KEEP_USED) = 0;
+    iBase* regionOrCollecton = 0, uint keepFlags = KEEP_ALL) = 0;
 
   CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
     virtual iTextureWrapper* LoadTextureRegion (const char *Name,
@@ -193,7 +193,7 @@ struct iLoader : public virtual iBase
   virtual iTextureWrapper* LoadTextureCollection (const char *Name,
     const char *FileName,	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
     bool reg = true, bool create_material = true,	bool free_image = true,
-    iCollection* collection = 0, uint keepFlags = KEEP_USED) = 0;
+    iCollection* collection = 0, uint keepFlags = KEEP_ALL) = 0;
 
   /**
   * Load an image file. The image will be loaded in the format requested by
@@ -303,20 +303,20 @@ struct iLoader : public virtual iBase
     iBase* regionOrCollection = 0, bool curRegOnly = true,
     bool checkDupes = false, iStreamSource* ssource = 0,
     iMissingLoaderData* missingdata = 0, bool useProxyTextures = false,
-    uint keepFlags = KEEP_USED) = 0;
+    uint keepFlags = KEEP_ALL) = 0;
 
   CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
     virtual bool LoadMapFileRegion (const char* filename, bool clearEngine = true,
     iRegion* region = 0, bool curRegOnly = true,
     bool checkDupes = false, iStreamSource* ssource = 0,
     iMissingLoaderData* missingdata = 0, bool useProxyTextures = false,
-    uint keepFlags = KEEP_USED) = 0;
+    uint keepFlags = KEEP_ALL) = 0;
 
   virtual bool LoadMapFileCollection (const char* filename, bool clearEngine = true,
     iCollection* collection = 0, bool curRegOnly = true,
     bool checkDupes = false, iStreamSource* ssource = 0,
     iMissingLoaderData* missingdata = 0, bool useProxyTextures = false,
-    uint keepFlags = KEEP_USED) = 0;
+    uint keepFlags = KEEP_ALL) = 0;
 
   /**
   * Load a map from the given 'world' node. If 'clearEngine' is true then
@@ -352,20 +352,20 @@ struct iLoader : public virtual iBase
     iBase* regionOrCollection = 0, bool curRegOnly = true,
     bool checkDupes = false, iStreamSource* ssource = 0,
     iMissingLoaderData* missingdata = 0, bool useProxyTextures = false,
-    uint keepFlags = KEEP_USED) = 0;
+    uint keepFlags = KEEP_ALL) = 0;
 
   CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
     virtual bool LoadMapRegion (iDocumentNode* world_node, bool clearEngine = true,
     iRegion* region = 0, bool curRegOnly = true,
     bool checkDupes = false, iStreamSource* ssource = 0,
     iMissingLoaderData* missingdata = 0, bool useProxyTextures = false,
-    uint keepFlags = KEEP_USED) = 0;
+    uint keepFlags = KEEP_ALL) = 0;
 
   virtual bool LoadMapCollection (iDocumentNode* world_node, bool clearEngine = true,
     iCollection* collection = 0, bool curRegOnly = true,
     bool checkDupes = false, iStreamSource* ssource = 0,
     iMissingLoaderData* missingdata = 0, bool useProxyTextures = false,
-    uint keepFlags = KEEP_USED) = 0;
+    uint keepFlags = KEEP_ALL) = 0;
 
   /**
   * Load library from a VFS file
@@ -390,18 +390,18 @@ struct iLoader : public virtual iBase
   virtual bool LoadLibraryFile (const char* filename, iBase* regionOrCollection = 0,
     bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     iMissingLoaderData* missingdata = 0, bool useProxyTextures = false,
-    uint keepFlags = KEEP_USED) = 0;
+    uint keepFlags = KEEP_ALL) = 0;
 
   CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
     virtual bool LoadLibraryFileRegion (const char* filename, iRegion* region,
     bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     iMissingLoaderData* missingdata = 0, bool useProxyTextures = false,
-    uint keepFlags = KEEP_USED) = 0;
+    uint keepFlags = KEEP_ALL) = 0;
 
   virtual bool LoadLibraryFileCollection (const char* filename, iCollection* collection = 0,
     bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     iMissingLoaderData* missingdata = 0, bool useProxyTextures = false,
-    uint keepFlags = KEEP_USED) = 0;
+    uint keepFlags = KEEP_ALL) = 0;
 
   /**
   * Load library from a 'library' node.
@@ -426,18 +426,18 @@ struct iLoader : public virtual iBase
   virtual bool LoadLibrary (iDocumentNode* lib_node, iBase* regionOrCollection = 0,
     bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     iMissingLoaderData* missingdata = 0, bool useProxyTextures = false,
-    uint keepFlags = KEEP_USED) = 0;
+    uint keepFlags = KEEP_ALL) = 0;
 
   CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
     virtual bool LoadLibraryRegion (iDocumentNode* lib_node, iRegion* region,
     bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     iMissingLoaderData* missingdata = 0, bool useProxyTextures = false,
-    uint keepFlags = KEEP_USED) = 0;
+    uint keepFlags = KEEP_ALL) = 0;
 
   virtual bool LoadLibraryCollection (iDocumentNode* lib_node, iCollection* collection = 0,
     bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     iMissingLoaderData* missingdata = 0, bool useProxyTextures = false,
-    uint keepFlags = KEEP_USED) = 0;
+    uint keepFlags = KEEP_ALL) = 0;
 
   /**
   * Load a Mesh Object Factory from a file.
@@ -501,18 +501,18 @@ struct iLoader : public virtual iBase
   virtual bool Load (const char* fname, iBase*& result, iBase* regionOrCollection = 0,
     bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
-    bool useProxyTextures = false, uint keepFlags = KEEP_USED) = 0;
+    bool useProxyTextures = false, uint keepFlags = KEEP_ALL) = 0;
 
   CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
     virtual bool LoadRegion (const char* fname, iBase*& result, iRegion* region,
     bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
-    bool useProxyTextures = false, uint keepFlags = KEEP_USED) = 0;
+    bool useProxyTextures = false, uint keepFlags = KEEP_ALL) = 0;
 
   virtual bool LoadCollection (const char* fname, iBase*& result, iCollection* collection = 0,
     bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
-    bool useProxyTextures = false, uint keepFlags = KEEP_USED) = 0;
+    bool useProxyTextures = false, uint keepFlags = KEEP_ALL) = 0;
 
   /**
   * Load a file. This is a smart function that will try to recognize
@@ -560,18 +560,18 @@ struct iLoader : public virtual iBase
   virtual bool Load (iDataBuffer* buffer, iBase*& result, iBase* regionOrCollection = 0,
     bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
-    bool useProxyTextures = false, uint keepFlags = KEEP_USED) = 0;
+    bool useProxyTextures = false, uint keepFlags = KEEP_ALL) = 0;
 
   CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
     virtual bool LoadRegion (iDataBuffer* buffer, iBase*& result, iRegion* region,
     bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
-    bool useProxyTextures = false, uint keepFlags = KEEP_USED) = 0;
+    bool useProxyTextures = false, uint keepFlags = KEEP_ALL) = 0;
 
   virtual bool LoadCollection (iDataBuffer* buffer, iBase*& result, iCollection* collection = 0,
     bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
-    bool useProxyTextures = false, uint keepFlags = KEEP_USED) = 0;
+    bool useProxyTextures = false, uint keepFlags = KEEP_ALL) = 0;
 
   /**
   * Load a node. This is a smart function that will try to recognize
@@ -618,18 +618,18 @@ struct iLoader : public virtual iBase
   virtual bool Load (iDocumentNode* node, iBase*& result, iBase* regionOrCollection = 0,
     bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
-    bool useProxyTextures = false, uint keepFlags = KEEP_USED) = 0;
+    bool useProxyTextures = false, uint keepFlags = KEEP_ALL) = 0;
 
   CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
     virtual bool LoadRegion (iDocumentNode* node, iBase*& result, iRegion* region,
     bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
-    bool useProxyTextures = false, uint keepFlags = KEEP_USED) = 0;
+    bool useProxyTextures = false, uint keepFlags = KEEP_ALL) = 0;
 
   virtual bool LoadCollection (iDocumentNode* node, iBase*& result, iCollection* collection = 0,
     bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
-    bool useProxyTextures = false, uint keepFlags = KEEP_USED) = 0;
+    bool useProxyTextures = false, uint keepFlags = KEEP_ALL) = 0;
 
   /**
   * Load a shader from a file.

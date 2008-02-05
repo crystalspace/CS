@@ -600,7 +600,7 @@ public:
     const char *fname, int Flags = CS_TEXTURE_3D,
     iTextureManager *tm = 0, bool reg = true,
     bool create_material = true, bool free_image = true,
-    iBase* regionOrCollection = 0, uint keepFlags = KEEP_USED);
+    iBase* regionOrCollection = 0, uint keepFlags = KEEP_ALL);
   virtual iTextureWrapper* LoadTextureRegion (const char *name,
     const char *fname, int Flags = CS_TEXTURE_3D,
     iTextureManager *tm = 0, bool reg = true,
@@ -610,7 +610,7 @@ public:
     const char *fname, int Flags = CS_TEXTURE_3D,
     iTextureManager *tm = 0, bool reg = true,
     bool create_material = true, bool free_image = true,
-    iCollection* collection = 0, uint keepFlags = KEEP_USED);
+    iCollection* collection = 0, uint keepFlags = KEEP_ALL);
 
 
   virtual csPtr<iSndSysData> LoadSoundSysData (const char *fname);
@@ -650,15 +650,15 @@ public:
   virtual bool LoadMapLibraryFile (const char* filename, iBase* regionOrCollection,
     bool curRegOnly, bool checkDupes, iStreamSource* ssource,
     iMissingLoaderData* missingdata, bool useProxyTextures,
-    bool loadProxyTex = true, uint keepFlags = KEEP_USED);
+    bool loadProxyTex = true, uint keepFlags = KEEP_ALL);
   virtual bool LoadMapLibraryFileRegion (const char* filename, iRegion* region,
     bool curRegOnly, bool checkDupes, iStreamSource* ssource,
     iMissingLoaderData* missingdata, bool useProxyTextures,
-    bool loadProxyTex = true, uint keepFlags = KEEP_USED);
+    bool loadProxyTex = true, uint keepFlags = KEEP_ALL);
   virtual bool LoadMapLibraryFileCollection (const char* filename, iCollection* collection,
     bool curRegOnly, bool checkDupes, iStreamSource* ssource,
     iMissingLoaderData* missingdata, bool useProxyTextures,
-    bool loadProxyTex = true, uint keepFlags = KEEP_USED);
+    bool loadProxyTex = true, uint keepFlags = KEEP_ALL);
 
 
   virtual bool LoadLibraryFile (const char* filename, iBase* regionOrCollection,
@@ -691,16 +691,16 @@ public:
   bool Load (iDataBuffer* buffer, const char* fname, iBase*& result,
   	iBase* regionOrCollection, bool curRegOnly, bool checkDupes,
 	iStreamSource* ssource, const char* override_name,
-	iMissingLoaderData* missingdata, bool useProxyTextures = false, uint keepFlags = KEEP_USED);
+	iMissingLoaderData* missingdata, bool useProxyTextures = false, uint keepFlags = KEEP_ALL);
   CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
   bool LoadRegion (iDataBuffer* buffer, const char* fname, iBase*& result,
   	iRegion* region, bool curRegOnly, bool checkDupes,
 	iStreamSource* ssource, const char* override_name,
-	iMissingLoaderData* missingdata, bool useProxyTextures = false, uint keepFlags = KEEP_USED);
+	iMissingLoaderData* missingdata, bool useProxyTextures = false, uint keepFlags = KEEP_ALL);
   bool LoadCollection (iDataBuffer* buffer, const char* fname, iBase*& result,
   	iCollection* collection, bool curRegOnly, bool checkDupes,
 	iStreamSource* ssource, const char* override_name,
-	iMissingLoaderData* missingdata, bool useProxyTextures = false, uint keepFlags = KEEP_USED);
+	iMissingLoaderData* missingdata, bool useProxyTextures = false, uint keepFlags = KEEP_ALL);
 
 
   virtual bool Load (const char* fname, iBase*& result, iBase* regionOrCollection,

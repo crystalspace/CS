@@ -456,7 +456,6 @@ bool csLoader::LoadProxyTextures()
             ipt->SetAlwaysAnimate (proxTex.always_animate);
         }
       }
-
     }
     else
     {
