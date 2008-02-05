@@ -181,17 +181,8 @@ namespace Threading
      * \return true if the priority was successfully set.
      */
     bool SetPriority (ThreadPriority prio)
-    {
-      if (prio == priority)
-        return true;
-
-      bool result;
-      result = ThreadBase::SetPriority (prio);
-      
-      if (result)
-        priority = priority;
-
-      return result;
+    {      
+      return ThreadBase::SetPriority (prio);          
     }
 
     /**
@@ -199,7 +190,7 @@ namespace Threading
      */
     ThreadPriority GetPriority () const
     {
-      return priority;
+      return ThreadBase::GetPriority ();
     }
 
     /**
@@ -231,9 +222,6 @@ namespace Threading
     {
       return ThreadBase::GetThreadID ();
     }
-
-  private:
-    ThreadPriority priority;
   };
 
 

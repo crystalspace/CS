@@ -8,6 +8,7 @@ chronological order.
 
 5-Feb-2008
 	- Sueastside undid his ThreadedJobQueue change since it broke on linux.
+	- Marten redid some of the handling of thread priorities to be more robust.
 4-Feb-2008
 	- Sueastside added an optional parameter to ThreadedJobQueue's constructor
 	  to set the thread's priority.
