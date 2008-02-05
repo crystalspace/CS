@@ -257,6 +257,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	while (inputIt->HasNext())
 	{
 	  const Snippet::Technique::Input& inp = inputIt->Next();
+	  // Sanity
+	  if (node.inputLinks.Contains (inp.name))
+	  {
+            if (compiler->do_verbose)
+              compiler->Report (CS_REPORTER_SEVERITY_WARNING,
+                inp.node, "Duplicate input named '%s' of snippet '%s'",
+                inp.name.GetData(), node.tech->snippetName);
+            continue;
+	  }
 
 	  const Snippet::Technique* sourceTech;
           const Snippet::Technique::Output* output;
@@ -351,12 +360,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       	    
                     node.inputLinks.Put (inp.name, linkFromName);
 
-                    // There's now a dependency on the node providing prevInput.
-                    TechniqueGraph::Connection conn;
-                    conn.from = prevInput->node->tech;
-                    conn.to = node.tech;
-                    conn.weak = true;
-                    newConnections.Push (conn);
+		    /* Previous node == this node can happen if one node
+                       uses the same input tag twice */
+		    if (prevInput->node->tech != node.tech)
+		    {
+                      // There's now a dependency on the node providing prevInput.
+                      TechniqueGraph::Connection conn;
+                      conn.from = prevInput->node->tech;
+                      conn.to = node.tech;
+                      conn.weak = true;
+                      newConnections.Push (conn);
+		    }
                   }
                   else
                   {

@@ -837,6 +837,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     connections.Push (conn);
     inTechniques.Delete (conn.to);
     outTechniques.Delete (conn.from);
+    CS_ASSERT(conn.to != conn.from);
   }
 
   void TechniqueGraph::RemoveConnection (const Connection& conn)

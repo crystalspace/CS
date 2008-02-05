@@ -11,6 +11,8 @@ chronological order.
 	  set with the wrong IF.
 	- res added a workaround to make blockallocator.h compile with gcc 4.1
 	  again.
+	- res fixed an infinite loop in shaderweaver when the same input tag
+	  was used multiple times by the same technique.
 17-Jan-2008
 	- Marten fixed a number of post-merge problems.
 16-Jan-2008
