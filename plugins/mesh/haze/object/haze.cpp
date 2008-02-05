@@ -429,8 +429,8 @@ csHazeMeshObject::csHazeMeshObject (csHazeMeshObjectFactory* factory) :
     layers.Push(p);
   }
 
-  csRef<iStringSet> strings;
-  strings = csQueryRegistryTagInterface<iStringSet>
+  csRef<iShaderVarStringSet> strings;
+  strings = csQueryRegistryTagInterface<iShaderVarStringSet>
     (factory->object_reg, "crystalspace.shader.variablenameset");
 
   if ((vertex_name == csInvalidStringID) ||
