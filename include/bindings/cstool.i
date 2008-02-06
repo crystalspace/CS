@@ -14,4 +14,3 @@ INLINE_FUNCTIONS
 
 %include "bindings/common/cstool.i"
 #endif //_SW_CSTOOL_I_
-

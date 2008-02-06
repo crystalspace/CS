@@ -75,7 +75,7 @@ public:
   {
     CS_ASSERT_MSG("Refcount decremented for destroyed object", 
       scfRefCount != 0);
-    csRefTrackerAccess::TrackDecRef (scfObject, scfRefCount);
+    csRefTrackerAccess::TrackDecRef (GetSCFObject(), scfRefCount);
     scfRefCount--;
     if (scfRefCount == 0)
     {

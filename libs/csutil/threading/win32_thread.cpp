@@ -114,7 +114,8 @@ namespace Implementation
 
 
   ThreadBase::ThreadBase (Runnable* runnable)
-    : runnable (runnable), threadHandle (0), threadId (0), isRunning (0)
+    : runnable (runnable), threadHandle (0), threadId (0), isRunning (0), 
+    priority (THREAD_PRIO_NORMAL)
   {
   }
 
@@ -137,6 +138,9 @@ namespace Implementation
         &param, 0, &threadId));
 
       startupBarrier.Wait ();
+
+      // Set priority to make sure its updated if we set it before starting
+      SetPriority (priority);
     }
   }
 
@@ -165,8 +169,18 @@ namespace Implementation
       THREAD_PRIORITY_NORMAL,
       THREAD_PRIORITY_HIGHEST
     };
+   
+    int res = 1;
 
-    int res = SetThreadPriority (threadHandle, PrioTable[prio]);
+    if (threadHandle)
+    {
+      res = SetThreadPriority (threadHandle, PrioTable[prio]);
+    }    
+
+    if (res != 0)
+    {
+      priority = prio;
+    }
 
     return res != 0;
   }

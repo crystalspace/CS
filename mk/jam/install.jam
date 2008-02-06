@@ -107,7 +107,6 @@ rule InstallMan
         Depends install_man : [ DoInstall $(i) : $(dir) ] ;
     }
 }
-
 ##  InstallPkgConfig files
 ##    Installs a pkg-config .pc files
 rule InstallPkgConfig

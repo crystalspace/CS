@@ -12,4 +12,3 @@ INLINE_FUNCTIONS
 
 %include "bindings/common/csgeom.i"
 #endif //_SW_CSGEOM_I_
-

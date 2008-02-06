@@ -2515,138 +2515,136 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_csEllipsoid swig_types[37]
 #define SWIGTYPE_p_csFlags swig_types[38]
 #define SWIGTYPE_p_csFrustum swig_types[39]
-#define SWIGTYPE_p_csGeomDebugHelper swig_types[40]
-#define SWIGTYPE_p_csIntersect2 swig_types[41]
-#define SWIGTYPE_p_csIntersect3 swig_types[42]
-#define SWIGTYPE_p_csMath2 swig_types[43]
-#define SWIGTYPE_p_csMath3 swig_types[44]
-#define SWIGTYPE_p_csMatrix2 swig_types[45]
-#define SWIGTYPE_p_csMatrix3 swig_types[46]
-#define SWIGTYPE_p_csObject swig_types[47]
-#define SWIGTYPE_p_csOrthoTransform swig_types[48]
-#define SWIGTYPE_p_csPath swig_types[49]
-#define SWIGTYPE_p_csPlane2 swig_types[50]
-#define SWIGTYPE_p_csPlane3 swig_types[51]
-#define SWIGTYPE_p_csPoly2D swig_types[52]
-#define SWIGTYPE_p_csPoly2DFactory swig_types[53]
-#define SWIGTYPE_p_csPoly3D swig_types[54]
-#define SWIGTYPE_p_csPtrTcsFrustum_t swig_types[55]
-#define SWIGTYPE_p_csQuaternion swig_types[56]
-#define SWIGTYPE_p_csRect swig_types[57]
-#define SWIGTYPE_p_csRectRegion swig_types[58]
-#define SWIGTYPE_p_csRefArrayTiObject_t swig_types[59]
-#define SWIGTYPE_p_csReversibleTransform swig_types[60]
-#define SWIGTYPE_p_csSegment2 swig_types[61]
-#define SWIGTYPE_p_csSegment3 swig_types[62]
-#define SWIGTYPE_p_csSphere swig_types[63]
-#define SWIGTYPE_p_csSpline swig_types[64]
-#define SWIGTYPE_p_csSquaredDist swig_types[65]
-#define SWIGTYPE_p_csTransform swig_types[66]
-#define SWIGTYPE_p_csTriangle swig_types[67]
-#define SWIGTYPE_p_csTriangleMesh swig_types[68]
-#define SWIGTYPE_p_csTriangleMeshBox swig_types[69]
-#define SWIGTYPE_p_csTriangleMeshEdge swig_types[70]
-#define SWIGTYPE_p_csTriangleMeshPointer swig_types[71]
-#define SWIGTYPE_p_csTriangleMeshTools swig_types[72]
-#define SWIGTYPE_p_csTriangleMinMax swig_types[73]
-#define SWIGTYPE_p_csTriangleVertex swig_types[74]
-#define SWIGTYPE_p_csTriangleVertices swig_types[75]
-#define SWIGTYPE_p_csVector2 swig_types[76]
-#define SWIGTYPE_p_csVector3 swig_types[77]
-#define SWIGTYPE_p_csVector3Array swig_types[78]
-#define SWIGTYPE_p_csVector4 swig_types[79]
-#define SWIGTYPE_p_csVector4TTfloat_t swig_types[80]
-#define SWIGTYPE_p_csVertexStatus swig_types[81]
-#define SWIGTYPE_p_csXRotMatrix3 swig_types[82]
-#define SWIGTYPE_p_csXScaleMatrix3 swig_types[83]
-#define SWIGTYPE_p_csYRotMatrix3 swig_types[84]
-#define SWIGTYPE_p_csYScaleMatrix3 swig_types[85]
-#define SWIGTYPE_p_csZRotMatrix3 swig_types[86]
-#define SWIGTYPE_p_csZScaleMatrix3 swig_types[87]
-#define SWIGTYPE_p_float swig_types[88]
-#define SWIGTYPE_p_iAnimatedImage swig_types[89]
-#define SWIGTYPE_p_iArrayChangeAllTcsVector3_t swig_types[90]
-#define SWIGTYPE_p_iArrayChangeElementsTcsVector3_t swig_types[91]
-#define SWIGTYPE_p_iArrayReadOnlyTcsVector3_t swig_types[92]
-#define SWIGTYPE_p_iBase swig_types[93]
-#define SWIGTYPE_p_iCacheManager swig_types[94]
-#define SWIGTYPE_p_iClipper2D swig_types[95]
-#define SWIGTYPE_p_iCommandLineParser swig_types[96]
-#define SWIGTYPE_p_iComponent swig_types[97]
-#define SWIGTYPE_p_iConfigFile swig_types[98]
-#define SWIGTYPE_p_iConfigIterator swig_types[99]
-#define SWIGTYPE_p_iConfigManager swig_types[100]
-#define SWIGTYPE_p_iDataBuffer swig_types[101]
-#define SWIGTYPE_p_iDebugHelper swig_types[102]
-#define SWIGTYPE_p_iDocument swig_types[103]
-#define SWIGTYPE_p_iDocumentAttribute swig_types[104]
-#define SWIGTYPE_p_iDocumentAttributeIterator swig_types[105]
-#define SWIGTYPE_p_iDocumentNode swig_types[106]
-#define SWIGTYPE_p_iDocumentNodeIterator swig_types[107]
-#define SWIGTYPE_p_iDocumentSystem swig_types[108]
-#define SWIGTYPE_p_iEvent swig_types[109]
-#define SWIGTYPE_p_iEventAttributeIterator swig_types[110]
-#define SWIGTYPE_p_iEventCord swig_types[111]
-#define SWIGTYPE_p_iEventHandler swig_types[112]
-#define SWIGTYPE_p_iEventNameRegistry swig_types[113]
-#define SWIGTYPE_p_iEventOutlet swig_types[114]
-#define SWIGTYPE_p_iEventPlug swig_types[115]
-#define SWIGTYPE_p_iEventQueue swig_types[116]
-#define SWIGTYPE_p_iFactory swig_types[117]
-#define SWIGTYPE_p_iFile swig_types[118]
-#define SWIGTYPE_p_iGraphics3D swig_types[119]
-#define SWIGTYPE_p_iImage swig_types[120]
-#define SWIGTYPE_p_iImageIO swig_types[121]
-#define SWIGTYPE_p_iJoystickDriver swig_types[122]
-#define SWIGTYPE_p_iKeyComposer swig_types[123]
-#define SWIGTYPE_p_iKeyboardDriver swig_types[124]
-#define SWIGTYPE_p_iMouseDriver swig_types[125]
-#define SWIGTYPE_p_iObject swig_types[126]
-#define SWIGTYPE_p_iObjectIterator swig_types[127]
-#define SWIGTYPE_p_iObjectNameChangeListener swig_types[128]
-#define SWIGTYPE_p_iObjectRegistry swig_types[129]
-#define SWIGTYPE_p_iObjectRegistryIterator swig_types[130]
-#define SWIGTYPE_p_iPath swig_types[131]
-#define SWIGTYPE_p_iPluginIterator swig_types[132]
-#define SWIGTYPE_p_iPluginManager swig_types[133]
-#define SWIGTYPE_p_iProcTexture swig_types[134]
-#define SWIGTYPE_p_iReporter swig_types[135]
-#define SWIGTYPE_p_iReporterIterator swig_types[136]
-#define SWIGTYPE_p_iReporterListener swig_types[137]
-#define SWIGTYPE_p_iSCF swig_types[138]
-#define SWIGTYPE_p_iString swig_types[139]
-#define SWIGTYPE_p_iStringArray swig_types[140]
-#define SWIGTYPE_p_iStringSet swig_types[141]
-#define SWIGTYPE_p_iTriangleMesh swig_types[142]
-#define SWIGTYPE_p_iVFS swig_types[143]
-#define SWIGTYPE_p_iVirtualClock swig_types[144]
-#define SWIGTYPE_p_int swig_types[145]
-#define SWIGTYPE_p_int16_t swig_types[146]
-#define SWIGTYPE_p_int64_t swig_types[147]
-#define SWIGTYPE_p_int8_t swig_types[148]
-#define SWIGTYPE_p_long_long swig_types[149]
-#define SWIGTYPE_p_p_csPlane3 swig_types[150]
-#define SWIGTYPE_p_p_csTriangleMinMax swig_types[151]
-#define SWIGTYPE_p_p_csVector3 swig_types[152]
-#define SWIGTYPE_p_p_void swig_types[153]
-#define SWIGTYPE_p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[154]
-#define SWIGTYPE_p_scfImplementation1TcsObject_iObject_t swig_types[155]
-#define SWIGTYPE_p_scfImplementation1TcsPath_iPath_t swig_types[156]
-#define SWIGTYPE_p_scfImplementation1TcsTriangleMeshBox_iTriangleMesh_t swig_types[157]
-#define SWIGTYPE_p_scfImplementation1TcsTriangleMeshPointer_iTriangleMesh_t swig_types[158]
-#define SWIGTYPE_p_scfImplementation1TcsTriangleMesh_iTriangleMesh_t swig_types[159]
-#define SWIGTYPE_p_scfInterfaceMetadataList swig_types[160]
-#define SWIGTYPE_p_size_t swig_types[161]
-#define SWIGTYPE_p_uint16_t swig_types[162]
-#define SWIGTYPE_p_uint32_t swig_types[163]
-#define SWIGTYPE_p_uint64_t swig_types[164]
-#define SWIGTYPE_p_uint8_t swig_types[165]
-#define SWIGTYPE_p_unsigned_int swig_types[166]
-#define SWIGTYPE_p_unsigned_long swig_types[167]
-#define SWIGTYPE_p_unsigned_long_long swig_types[168]
-#define SWIGTYPE_p_void swig_types[169]
-static swig_type_info *swig_types[171];
-static swig_module_info swig_module = {swig_types, 170, 0, 0, 0, 0};
+#define SWIGTYPE_p_csIntersect2 swig_types[40]
+#define SWIGTYPE_p_csIntersect3 swig_types[41]
+#define SWIGTYPE_p_csMath2 swig_types[42]
+#define SWIGTYPE_p_csMath3 swig_types[43]
+#define SWIGTYPE_p_csMatrix2 swig_types[44]
+#define SWIGTYPE_p_csMatrix3 swig_types[45]
+#define SWIGTYPE_p_csObject swig_types[46]
+#define SWIGTYPE_p_csOrthoTransform swig_types[47]
+#define SWIGTYPE_p_csPath swig_types[48]
+#define SWIGTYPE_p_csPlane2 swig_types[49]
+#define SWIGTYPE_p_csPlane3 swig_types[50]
+#define SWIGTYPE_p_csPoly2D swig_types[51]
+#define SWIGTYPE_p_csPoly2DFactory swig_types[52]
+#define SWIGTYPE_p_csPoly3D swig_types[53]
+#define SWIGTYPE_p_csPtrTcsFrustum_t swig_types[54]
+#define SWIGTYPE_p_csQuaternion swig_types[55]
+#define SWIGTYPE_p_csRect swig_types[56]
+#define SWIGTYPE_p_csRectRegion swig_types[57]
+#define SWIGTYPE_p_csRefArrayTiObject_t swig_types[58]
+#define SWIGTYPE_p_csReversibleTransform swig_types[59]
+#define SWIGTYPE_p_csSegment2 swig_types[60]
+#define SWIGTYPE_p_csSegment3 swig_types[61]
+#define SWIGTYPE_p_csSphere swig_types[62]
+#define SWIGTYPE_p_csSpline swig_types[63]
+#define SWIGTYPE_p_csSquaredDist swig_types[64]
+#define SWIGTYPE_p_csTransform swig_types[65]
+#define SWIGTYPE_p_csTriangle swig_types[66]
+#define SWIGTYPE_p_csTriangleMesh swig_types[67]
+#define SWIGTYPE_p_csTriangleMeshBox swig_types[68]
+#define SWIGTYPE_p_csTriangleMeshEdge swig_types[69]
+#define SWIGTYPE_p_csTriangleMeshPointer swig_types[70]
+#define SWIGTYPE_p_csTriangleMeshTools swig_types[71]
+#define SWIGTYPE_p_csTriangleMinMax swig_types[72]
+#define SWIGTYPE_p_csTriangleVertex swig_types[73]
+#define SWIGTYPE_p_csTriangleVertices swig_types[74]
+#define SWIGTYPE_p_csVector2 swig_types[75]
+#define SWIGTYPE_p_csVector3 swig_types[76]
+#define SWIGTYPE_p_csVector3Array swig_types[77]
+#define SWIGTYPE_p_csVector4 swig_types[78]
+#define SWIGTYPE_p_csVector4TTfloat_t swig_types[79]
+#define SWIGTYPE_p_csVertexStatus swig_types[80]
+#define SWIGTYPE_p_csXRotMatrix3 swig_types[81]
+#define SWIGTYPE_p_csXScaleMatrix3 swig_types[82]
+#define SWIGTYPE_p_csYRotMatrix3 swig_types[83]
+#define SWIGTYPE_p_csYScaleMatrix3 swig_types[84]
+#define SWIGTYPE_p_csZRotMatrix3 swig_types[85]
+#define SWIGTYPE_p_csZScaleMatrix3 swig_types[86]
+#define SWIGTYPE_p_float swig_types[87]
+#define SWIGTYPE_p_iAnimatedImage swig_types[88]
+#define SWIGTYPE_p_iArrayChangeAllTcsVector3_t swig_types[89]
+#define SWIGTYPE_p_iArrayChangeElementsTcsVector3_t swig_types[90]
+#define SWIGTYPE_p_iArrayReadOnlyTcsVector3_t swig_types[91]
+#define SWIGTYPE_p_iBase swig_types[92]
+#define SWIGTYPE_p_iCacheManager swig_types[93]
+#define SWIGTYPE_p_iClipper2D swig_types[94]
+#define SWIGTYPE_p_iCommandLineParser swig_types[95]
+#define SWIGTYPE_p_iComponent swig_types[96]
+#define SWIGTYPE_p_iConfigFile swig_types[97]
+#define SWIGTYPE_p_iConfigIterator swig_types[98]
+#define SWIGTYPE_p_iConfigManager swig_types[99]
+#define SWIGTYPE_p_iDataBuffer swig_types[100]
+#define SWIGTYPE_p_iDebugHelper swig_types[101]
+#define SWIGTYPE_p_iDocument swig_types[102]
+#define SWIGTYPE_p_iDocumentAttribute swig_types[103]
+#define SWIGTYPE_p_iDocumentAttributeIterator swig_types[104]
+#define SWIGTYPE_p_iDocumentNode swig_types[105]
+#define SWIGTYPE_p_iDocumentNodeIterator swig_types[106]
+#define SWIGTYPE_p_iDocumentSystem swig_types[107]
+#define SWIGTYPE_p_iEvent swig_types[108]
+#define SWIGTYPE_p_iEventAttributeIterator swig_types[109]
+#define SWIGTYPE_p_iEventCord swig_types[110]
+#define SWIGTYPE_p_iEventHandler swig_types[111]
+#define SWIGTYPE_p_iEventNameRegistry swig_types[112]
+#define SWIGTYPE_p_iEventOutlet swig_types[113]
+#define SWIGTYPE_p_iEventPlug swig_types[114]
+#define SWIGTYPE_p_iEventQueue swig_types[115]
+#define SWIGTYPE_p_iFactory swig_types[116]
+#define SWIGTYPE_p_iFile swig_types[117]
+#define SWIGTYPE_p_iImage swig_types[118]
+#define SWIGTYPE_p_iImageIO swig_types[119]
+#define SWIGTYPE_p_iJoystickDriver swig_types[120]
+#define SWIGTYPE_p_iKeyComposer swig_types[121]
+#define SWIGTYPE_p_iKeyboardDriver swig_types[122]
+#define SWIGTYPE_p_iMouseDriver swig_types[123]
+#define SWIGTYPE_p_iObject swig_types[124]
+#define SWIGTYPE_p_iObjectIterator swig_types[125]
+#define SWIGTYPE_p_iObjectNameChangeListener swig_types[126]
+#define SWIGTYPE_p_iObjectRegistry swig_types[127]
+#define SWIGTYPE_p_iObjectRegistryIterator swig_types[128]
+#define SWIGTYPE_p_iPath swig_types[129]
+#define SWIGTYPE_p_iPluginIterator swig_types[130]
+#define SWIGTYPE_p_iPluginManager swig_types[131]
+#define SWIGTYPE_p_iProcTexture swig_types[132]
+#define SWIGTYPE_p_iReporter swig_types[133]
+#define SWIGTYPE_p_iReporterIterator swig_types[134]
+#define SWIGTYPE_p_iReporterListener swig_types[135]
+#define SWIGTYPE_p_iSCF swig_types[136]
+#define SWIGTYPE_p_iString swig_types[137]
+#define SWIGTYPE_p_iStringArray swig_types[138]
+#define SWIGTYPE_p_iStringSet swig_types[139]
+#define SWIGTYPE_p_iTriangleMesh swig_types[140]
+#define SWIGTYPE_p_iVFS swig_types[141]
+#define SWIGTYPE_p_iVirtualClock swig_types[142]
+#define SWIGTYPE_p_int swig_types[143]
+#define SWIGTYPE_p_int16_t swig_types[144]
+#define SWIGTYPE_p_int64_t swig_types[145]
+#define SWIGTYPE_p_int8_t swig_types[146]
+#define SWIGTYPE_p_long_long swig_types[147]
+#define SWIGTYPE_p_p_csPlane3 swig_types[148]
+#define SWIGTYPE_p_p_csTriangleMinMax swig_types[149]
+#define SWIGTYPE_p_p_csVector3 swig_types[150]
+#define SWIGTYPE_p_p_void swig_types[151]
+#define SWIGTYPE_p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[152]
+#define SWIGTYPE_p_scfImplementation1TcsObject_iObject_t swig_types[153]
+#define SWIGTYPE_p_scfImplementation1TcsPath_iPath_t swig_types[154]
+#define SWIGTYPE_p_scfImplementation1TcsTriangleMeshBox_iTriangleMesh_t swig_types[155]
+#define SWIGTYPE_p_scfImplementation1TcsTriangleMeshPointer_iTriangleMesh_t swig_types[156]
+#define SWIGTYPE_p_scfImplementation1TcsTriangleMesh_iTriangleMesh_t swig_types[157]
+#define SWIGTYPE_p_scfInterfaceMetadataList swig_types[158]
+#define SWIGTYPE_p_size_t swig_types[159]
+#define SWIGTYPE_p_uint16_t swig_types[160]
+#define SWIGTYPE_p_uint32_t swig_types[161]
+#define SWIGTYPE_p_uint64_t swig_types[162]
+#define SWIGTYPE_p_uint8_t swig_types[163]
+#define SWIGTYPE_p_unsigned_int swig_types[164]
+#define SWIGTYPE_p_unsigned_long swig_types[165]
+#define SWIGTYPE_p_unsigned_long_long swig_types[166]
+#define SWIGTYPE_p_void swig_types[167]
+static swig_type_info *swig_types[169];
+static swig_module_info swig_module = {swig_types, 168, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -3125,81 +3123,6 @@ SWIGINTERN csPlane3 &csPlane3_operator_Sm__Se_(csPlane3 *self,csTransform const 
 SWIGINTERN csPlane3 &csPlane3_operator_Sd__Se_(csPlane3 *self,csReversibleTransform const &t){ return *self /= t; }
 SWIGINTERN csPlane3 csPlane3_operator_Sd_(csPlane3 *self,csReversibleTransform const &t){ return *self / t; }
 SWIGINTERN csVector2 &csPoly2D___getitem__(csPoly2D *self,int i){ return self->operator[](i); }
-
-SWIGINTERNINLINE PyObject *
-SWIG_From_unsigned_SS_int  (unsigned int value)
-{    
-  return SWIG_From_unsigned_SS_long  (value);
-}
-
-
-SWIGINTERN swig_type_info*
-SWIG_pchar_descriptor(void)
-{
-  static int init = 0;
-  static swig_type_info* info = 0;
-  if (!init) {
-    info = SWIG_TypeQuery("_p_char");
-    init = 1;
-  }
-  return info;
-}
-
-
-SWIGINTERN int
-SWIG_AsCharPtrAndSize(PyObject *obj, char** cptr, size_t* psize, int *alloc)
-{
-  if (PyString_Check(obj)) {
-    char *cstr; Py_ssize_t len;
-    PyString_AsStringAndSize(obj, &cstr, &len);
-    if (cptr)  {
-      if (alloc) {
-	/* 
-	   In python the user should not be able to modify the inner
-	   string representation. To warranty that, if you define
-	   SWIG_PYTHON_SAFE_CSTRINGS, a new/copy of the python string
-	   buffer is always returned.
-
-	   The default behavior is just to return the pointer value,
-	   so, be careful.
-	*/ 
-#if defined(SWIG_PYTHON_SAFE_CSTRINGS)
-	if (*alloc != SWIG_OLDOBJ) 
-#else
-	if (*alloc == SWIG_NEWOBJ) 
-#endif
-	  {
-	    *cptr = reinterpret_cast< char* >(memcpy((new char[len + 1]), cstr, sizeof(char)*(len + 1)));
-	    *alloc = SWIG_NEWOBJ;
-	  }
-	else {
-	  *cptr = cstr;
-	  *alloc = SWIG_OLDOBJ;
-	}
-      } else {
-	*cptr = PyString_AsString(obj);
-      }
-    }
-    if (psize) *psize = len + 1;
-    return SWIG_OK;
-  } else {
-    swig_type_info* pchar_descriptor = SWIG_pchar_descriptor();
-    if (pchar_descriptor) {
-      void* vptr = 0;
-      if (SWIG_ConvertPtr(obj, &vptr, pchar_descriptor, 0) == SWIG_OK) {
-	if (cptr) *cptr = (char *) vptr;
-	if (psize) *psize = vptr ? (strlen((char *)vptr) + 1) : 0;
-	if (alloc) *alloc = SWIG_OLDOBJ;
-	return SWIG_OK;
-      }
-    }
-  }
-  return SWIG_TypeError;
-}
-
-
-
-
 SWIGINTERN csVector3 &csPoly3D___getitem__(csPoly3D *self,int i){ return self->operator[](i); }
 SWIGINTERN int csTriangle___getitem__(csTriangle const *self,int i){ return self->operator[](i); }
 SWIGINTERN void csTriangle___setitem__(csTriangle *self,int i,int v){ self->operator[](i) = v; }
@@ -24310,322 +24233,6 @@ SWIGINTERN PyObject *csIntersect3_swigregister(PyObject *SWIGUNUSEDPARM(self), P
   PyObject *obj;
   if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_csIntersect3, SWIG_NewClientData(obj));
-  return SWIG_Py_Void();
-}
-
-SWIGINTERN PyObject *_wrap_new_csGeomDebugHelper(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csGeomDebugHelper *result = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"new_csGeomDebugHelper",0,0)) SWIG_fail;
-  result = (csGeomDebugHelper *)new csGeomDebugHelper();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csGeomDebugHelper, SWIG_POINTER_NEW |  0 );
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_delete_csGeomDebugHelper(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csGeomDebugHelper *arg1 = (csGeomDebugHelper *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"delete_csGeomDebugHelper",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csGeomDebugHelper, SWIG_POINTER_DISOWN |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_csGeomDebugHelper" "', argument " "1"" of type '" "csGeomDebugHelper *""'"); 
-  }
-  arg1 = reinterpret_cast< csGeomDebugHelper * >(argp1);
-  delete arg1;
-  
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csGeomDebugHelper_GetSupportedTests(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csGeomDebugHelper *arg1 = (csGeomDebugHelper *) 0 ;
-  int result;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csGeomDebugHelper_GetSupportedTests",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csGeomDebugHelper, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csGeomDebugHelper_GetSupportedTests" "', argument " "1"" of type '" "csGeomDebugHelper const *""'"); 
-  }
-  arg1 = reinterpret_cast< csGeomDebugHelper * >(argp1);
-  result = (int)((csGeomDebugHelper const *)arg1)->GetSupportedTests();
-  resultobj = SWIG_From_int(static_cast< int >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csGeomDebugHelper_UnitTest(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csGeomDebugHelper *arg1 = (csGeomDebugHelper *) 0 ;
-  SwigValueWrapper<csPtr<iString > > result;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csGeomDebugHelper_UnitTest",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csGeomDebugHelper, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csGeomDebugHelper_UnitTest" "', argument " "1"" of type '" "csGeomDebugHelper *""'"); 
-  }
-  arg1 = reinterpret_cast< csGeomDebugHelper * >(argp1);
-  result = (arg1)->UnitTest();
-  {
-    /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
-    csRef<iString> ref((csPtr<iString>&)result); /* explicit cast */
-    /*const csRef<iBase> ref = csRef<iBase>((iString *)ref1);
-      if (!ref.IsValid())
-      {
-        Py_INCREF(Py_None);
-        resultobj = Py_None;
-      }
-      else
-      {
-        ref->IncRef();
-        resultobj = SWIG_NewPointerObj((void *)(iString *)ref1, SWIG_TypeQuery("iString" " *"), 1);
-      }*/
-    resultobj = _csRef_to_Python(csRef<iBase>(
-        (iString *)ref), (void *)(iString *)ref, "iString" " *");
-    /*@SWIG@*/
-  }
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csGeomDebugHelper_StateTest(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csGeomDebugHelper *arg1 = (csGeomDebugHelper *) 0 ;
-  SwigValueWrapper<csPtr<iString > > result;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csGeomDebugHelper_StateTest",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csGeomDebugHelper, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csGeomDebugHelper_StateTest" "', argument " "1"" of type '" "csGeomDebugHelper *""'"); 
-  }
-  arg1 = reinterpret_cast< csGeomDebugHelper * >(argp1);
-  result = (arg1)->StateTest();
-  {
-    /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
-    csRef<iString> ref((csPtr<iString>&)result); /* explicit cast */
-    /*const csRef<iBase> ref = csRef<iBase>((iString *)ref1);
-      if (!ref.IsValid())
-      {
-        Py_INCREF(Py_None);
-        resultobj = Py_None;
-      }
-      else
-      {
-        ref->IncRef();
-        resultobj = SWIG_NewPointerObj((void *)(iString *)ref1, SWIG_TypeQuery("iString" " *"), 1);
-      }*/
-    resultobj = _csRef_to_Python(csRef<iBase>(
-        (iString *)ref), (void *)(iString *)ref, "iString" " *");
-    /*@SWIG@*/
-  }
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csGeomDebugHelper_Benchmark(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csGeomDebugHelper *arg1 = (csGeomDebugHelper *) 0 ;
-  int arg2 ;
-  csTicks result;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int val2 ;
-  int ecode2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csGeomDebugHelper_Benchmark",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csGeomDebugHelper, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csGeomDebugHelper_Benchmark" "', argument " "1"" of type '" "csGeomDebugHelper *""'"); 
-  }
-  arg1 = reinterpret_cast< csGeomDebugHelper * >(argp1);
-  ecode2 = SWIG_AsVal_int(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csGeomDebugHelper_Benchmark" "', argument " "2"" of type '" "int""'");
-  } 
-  arg2 = static_cast< int >(val2);
-  result = (csTicks)(arg1)->Benchmark(arg2);
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csGeomDebugHelper_Dump__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csGeomDebugHelper *arg1 = (csGeomDebugHelper *) 0 ;
-  SwigValueWrapper<csPtr<iString > > result;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csGeomDebugHelper_Dump",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csGeomDebugHelper, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csGeomDebugHelper_Dump" "', argument " "1"" of type '" "csGeomDebugHelper *""'"); 
-  }
-  arg1 = reinterpret_cast< csGeomDebugHelper * >(argp1);
-  result = (arg1)->Dump();
-  {
-    /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
-    csRef<iString> ref((csPtr<iString>&)result); /* explicit cast */
-    /*const csRef<iBase> ref = csRef<iBase>((iString *)ref1);
-      if (!ref.IsValid())
-      {
-        Py_INCREF(Py_None);
-        resultobj = Py_None;
-      }
-      else
-      {
-        ref->IncRef();
-        resultobj = SWIG_NewPointerObj((void *)(iString *)ref1, SWIG_TypeQuery("iString" " *"), 1);
-      }*/
-    resultobj = _csRef_to_Python(csRef<iBase>(
-        (iString *)ref), (void *)(iString *)ref, "iString" " *");
-    /*@SWIG@*/
-  }
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csGeomDebugHelper_Dump__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csGeomDebugHelper *arg1 = (csGeomDebugHelper *) 0 ;
-  iGraphics3D *arg2 = (iGraphics3D *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csGeomDebugHelper_Dump",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csGeomDebugHelper, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csGeomDebugHelper_Dump" "', argument " "1"" of type '" "csGeomDebugHelper *""'"); 
-  }
-  arg1 = reinterpret_cast< csGeomDebugHelper * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iGraphics3D, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csGeomDebugHelper_Dump" "', argument " "2"" of type '" "iGraphics3D *""'"); 
-  }
-  arg2 = reinterpret_cast< iGraphics3D * >(argp2);
-  (arg1)->Dump(arg2);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csGeomDebugHelper_Dump(PyObject *self, PyObject *args) {
-  int argc;
-  PyObject *argv[3];
-  int ii;
-  
-  if (!PyTuple_Check(args)) SWIG_fail;
-  argc = PyObject_Length(args);
-  for (ii = 0; (ii < argc) && (ii < 2); ii++) {
-    argv[ii] = PyTuple_GET_ITEM(args,ii);
-  }
-  if (argc == 1) {
-    int _v;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csGeomDebugHelper, 0);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      return _wrap_csGeomDebugHelper_Dump__SWIG_0(self, args);
-    }
-  }
-  if (argc == 2) {
-    int _v;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csGeomDebugHelper, 0);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      void *vptr = 0;
-      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iGraphics3D, 0);
-      _v = SWIG_CheckState(res);
-      if (_v) {
-        return _wrap_csGeomDebugHelper_Dump__SWIG_1(self, args);
-      }
-    }
-  }
-  
-fail:
-  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csGeomDebugHelper_Dump'.\n  Possible C/C++ prototypes are:\n    Dump()\n    Dump(iGraphics3D *)\n");
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csGeomDebugHelper_DebugCommand(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csGeomDebugHelper *arg1 = (csGeomDebugHelper *) 0 ;
-  char *arg2 = (char *) 0 ;
-  bool result;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csGeomDebugHelper_DebugCommand",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csGeomDebugHelper, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csGeomDebugHelper_DebugCommand" "', argument " "1"" of type '" "csGeomDebugHelper *""'"); 
-  }
-  arg1 = reinterpret_cast< csGeomDebugHelper * >(argp1);
-  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csGeomDebugHelper_DebugCommand" "', argument " "2"" of type '" "char const *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  result = (bool)(arg1)->DebugCommand((char const *)arg2);
-  resultobj = SWIG_From_bool(static_cast< bool >(result));
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return resultobj;
-fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *csGeomDebugHelper_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *obj;
-  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
-  SWIG_TypeNewClientData(SWIGTYPE_p_csGeomDebugHelper, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
 
@@ -46855,15 +46462,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"new_csIntersect3", _wrap_new_csIntersect3, METH_VARARGS, NULL},
 	 { (char *)"delete_csIntersect3", _wrap_delete_csIntersect3, METH_VARARGS, NULL},
 	 { (char *)"csIntersect3_swigregister", csIntersect3_swigregister, METH_VARARGS, NULL},
-	 { (char *)"new_csGeomDebugHelper", _wrap_new_csGeomDebugHelper, METH_VARARGS, NULL},
-	 { (char *)"delete_csGeomDebugHelper", _wrap_delete_csGeomDebugHelper, METH_VARARGS, NULL},
-	 { (char *)"csGeomDebugHelper_GetSupportedTests", _wrap_csGeomDebugHelper_GetSupportedTests, METH_VARARGS, NULL},
-	 { (char *)"csGeomDebugHelper_UnitTest", _wrap_csGeomDebugHelper_UnitTest, METH_VARARGS, NULL},
-	 { (char *)"csGeomDebugHelper_StateTest", _wrap_csGeomDebugHelper_StateTest, METH_VARARGS, NULL},
-	 { (char *)"csGeomDebugHelper_Benchmark", _wrap_csGeomDebugHelper_Benchmark, METH_VARARGS, NULL},
-	 { (char *)"csGeomDebugHelper_Dump", _wrap_csGeomDebugHelper_Dump, METH_VARARGS, NULL},
-	 { (char *)"csGeomDebugHelper_DebugCommand", _wrap_csGeomDebugHelper_DebugCommand, METH_VARARGS, NULL},
-	 { (char *)"csGeomDebugHelper_swigregister", csGeomDebugHelper_swigregister, METH_VARARGS, NULL},
 	 { (char *)"new_csPoly3D", _wrap_new_csPoly3D, METH_VARARGS, NULL},
 	 { (char *)"delete_csPoly3D", _wrap_delete_csPoly3D, METH_VARARGS, NULL},
 	 { (char *)"csPoly3D_MakeEmpty", _wrap_csPoly3D_MakeEmpty, METH_VARARGS, NULL},
@@ -47729,7 +47327,6 @@ static swig_type_info _swigt__p_csDVector3 = {"_p_csDVector3", "csDVector3 *", 0
 static swig_type_info _swigt__p_csEllipsoid = {"_p_csEllipsoid", "csEllipsoid *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csFlags = {"_p_csFlags", "csFlags *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csFrustum = {"_p_csFrustum", "csFrustum *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_csGeomDebugHelper = {"_p_csGeomDebugHelper", "csGeomDebugHelper *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csIntersect2 = {"_p_csIntersect2", "csIntersect2 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csIntersect3 = {"_p_csIntersect3", "csIntersect3 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csMath2 = {"_p_csMath2", "csMath2 *", 0, 0, (void*)0, 0};
@@ -47833,7 +47430,6 @@ static swig_type_info _swigt__p_iPluginManager = {"_p_iPluginManager", 0, 0, 0, 
 static swig_type_info _swigt__p_iCacheManager = {"_p_iCacheManager", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iConfigManager = {"_p_iConfigManager", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iClipper2D = {"_p_iClipper2D", "iClipper2D *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_iGraphics3D = {"_p_iGraphics3D", "iGraphics3D *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iPath = {"_p_iPath", "iPath *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iSCF = {"_p_iSCF", "iSCF *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iTriangleMesh = {"_p_iTriangleMesh", "iTriangleMesh *", 0, 0, (void*)0, 0};
@@ -47902,7 +47498,6 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_csEllipsoid,
   &_swigt__p_csFlags,
   &_swigt__p_csFrustum,
-  &_swigt__p_csGeomDebugHelper,
   &_swigt__p_csIntersect2,
   &_swigt__p_csIntersect3,
   &_swigt__p_csMath2,
@@ -47981,7 +47576,6 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_iEventQueue,
   &_swigt__p_iFactory,
   &_swigt__p_iFile,
-  &_swigt__p_iGraphics3D,
   &_swigt__p_iImage,
   &_swigt__p_iImageIO,
   &_swigt__p_iJoystickDriver,
@@ -48073,7 +47667,6 @@ static swig_cast_info _swigc__p_csDVector3[] = {  {&_swigt__p_csDVector3, 0, 0, 
 static swig_cast_info _swigc__p_csEllipsoid[] = {  {&_swigt__p_csEllipsoid, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csFlags[] = {  {&_swigt__p_csFlags, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csFrustum[] = {  {&_swigt__p_csFrustum, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csGeomDebugHelper[] = {  {&_swigt__p_csGeomDebugHelper, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csIntersect2[] = {  {&_swigt__p_csIntersect2, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csIntersect3[] = {  {&_swigt__p_csIntersect3, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csMath2[] = {  {&_swigt__p_csMath2, 0, 0, 0},{0, 0, 0, 0}};
@@ -48177,7 +47770,6 @@ static swig_cast_info _swigc__p_iCacheManager[] = {{&_swigt__p_iCacheManager, 0,
 static swig_cast_info _swigc__p_iConfigManager[] = {{&_swigt__p_iConfigManager, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iBase[] = {  {&_swigt__p_iFile, _p_iFileTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1TcsObject_iObject_t, _p_scfImplementation1TcsObject_iObject_tTo_p_iBase, 0, 0},  {&_swigt__p_iEventOutlet, _p_iEventOutletTo_p_iBase, 0, 0},  {&_swigt__p_iKeyComposer, _p_iKeyComposerTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1TcsTriangleMeshBox_iTriangleMesh_t, _p_scfImplementation1TcsTriangleMeshBox_iTriangleMesh_tTo_p_iBase, 0, 0},  {&_swigt__p_iImageIO, _p_iImageIOTo_p_iBase, 0, 0},  {&_swigt__p_iImage, _p_iImageTo_p_iBase, 0, 0},  {&_swigt__p_iStringArray, _p_iStringArrayTo_p_iBase, 0, 0},  {&_swigt__p_iFactory, _p_iFactoryTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1TcsPath_iPath_t, _p_scfImplementation1TcsPath_iPath_tTo_p_iBase, 0, 0},  {&_swigt__p_iBase, 0, 0, 0},  {&_swigt__p_iObjectRegistry, _p_iObjectRegistryTo_p_iBase, 0, 0},  {&_swigt__p_iEventNameRegistry, _p_iEventNameRegistryTo_p_iBase, 0, 0},  {&_swigt__p_iDocument, _p_iDocumentTo_p_iBase, 0, 0},  {&_swigt__p_csTriangleMeshPointer, _p_csTriangleMeshPointerTo_p_iBase, 0, 0},  {&_swigt__p_iEventQueue, _p_iEventQueueTo_p_iBase, 0, 0},  {&_swigt__p_iKeyboardDriver, _p_iKeyboardDriverTo_p_iBase, 0, 0},  {&_swigt__p_iObjectNameChangeListener, _p_iObjectNameChangeListenerTo_p_iBase, 0, 0},  {&_swigt__p_iReporterListener, _p_iReporterListenerTo_p_iBase, 0, 0},  {&_swigt__p_iEvent, _p_iEventTo_p_iBase, 0, 0},  {&_swigt__p_iReporter, _p_iReporterTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentSystem, _p_iDocumentSystemTo_p_iBase, 0, 0},  {&_swigt__p_iAnimatedImage, _p_iAnimatedImageTo_p_iBase, 0, 0},  {&_swigt__p_iPluginIterator, _p_iPluginIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iEventAttributeIterator, _p_iEventAttributeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iObjectRegistryIterator, _p_iObjectRegistryIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iObjectIterator, _p_iObjectIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iReporterIterator, _p_iReporterIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iConfigIterator, _p_iConfigIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iArrayReadOnlyTcsVector3_t, _p_iArrayReadOnlyTcsVector3_tTo_p_iBase, 0, 0},  {&_swigt__p_iArrayChangeElementsTcsVector3_t, _p_iArrayChangeElementsTcsVector3_tTo_p_iBase, 0, 0},  {&_swigt__p_iArrayChangeAllTcsVector3_t, _p_iArrayChangeAllTcsVector3_tTo_p_iBase, 0, 0},  {&_swigt__p_iClipper2D, _p_iClipper2DTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentAttributeIterator, _p_iDocumentAttributeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentNodeIterator, _p_iDocumentNodeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1TcsTriangleMeshPointer_iTriangleMesh_t, _p_scfImplementation1TcsTriangleMeshPointer_iTriangleMesh_tTo_p_iBase, 0, 0},  {&_swigt__p_iCommandLineParser, _p_iCommandLineParserTo_p_iBase, 0, 0},  {&_swigt__p_iDataBuffer, _p_iDataBufferTo_p_iBase, 0, 0},  {&_swigt__p_iEventHandler, _p_iEventHandlerTo_p_iBase, 0, 0},  {&_swigt__p_iProcTexture, _p_iProcTextureTo_p_iBase, 0, 0},  {&_swigt__p_iVFS, _p_iVFSTo_p_iBase, 0, 0},  {&_swigt__p_iComponent, _p_iComponentTo_p_iBase, 0, 0},  {&_swigt__p_iSCF, _p_iSCFTo_p_iBase, 0, 0},  {&_swigt__p_iMouseDriver, _p_iMouseDriverTo_p_iBase, 0, 0},  {&_swigt__p_iJoystickDriver, _p_iJoystickDriverTo_p_iBase, 0, 0},  {&_swigt__p_csPath, _p_csPathTo_p_iBase, 0, 0},  {&_swigt__p_iConfigFile, _p_iConfigFileTo_p_iBase, 0, 0},  {&_swigt__p_csConfigFile, _p_csConfigFileTo_p_iBase, 0, 0},  {&_swigt__p_iEventPlug, _p_iEventPlugTo_p_iBase, 0, 0},  {&_swigt__p_iObject, _p_iObjectTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentAttribute, _p_iDocumentAttributeTo_p_iBase, 0, 0},  {&_swigt__p_csObject, _p_csObjectTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentNode, _p_iDocumentNodeTo_p_iBase, 0, 0},  {&_swigt__p_csTriangleMeshBox, _p_csTriangleMeshBoxTo_p_iBase, 0, 0},  {&_swigt__p_iString, _p_iStringTo_p_iBase, 0, 0},  {&_swigt__p_iPath, _p_iPathTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1TcsConfigFile_iConfigFile_t, _p_scfImplementation1TcsConfigFile_iConfigFile_tTo_p_iBase, 0, 0},  {&_swigt__p_iStringSet, _p_iStringSetTo_p_iBase, 0, 0},  {&_swigt__p_iVirtualClock, _p_iVirtualClockTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1TcsTriangleMesh_iTriangleMesh_t, _p_scfImplementation1TcsTriangleMesh_iTriangleMesh_tTo_p_iBase, 0, 0},  {&_swigt__p_csTriangleMesh, _p_csTriangleMeshTo_p_iBase, 0, 0},  {&_swigt__p_iTriangleMesh, _p_iTriangleMeshTo_p_iBase, 0, 0},  {&_swigt__p_iDebugHelper, _p_iDebugHelperTo_p_iBase, 0, 0},  {&_swigt__p_iEventCord, _p_iEventCordTo_p_iBase, 0, 0},  {&_swigt__p_iPluginManager, _p_iPluginManagerTo_p_iBase, 0, 0},  {&_swigt__p_iCacheManager, _p_iCacheManagerTo_p_iBase, 0, 0},  {&_swigt__p_iConfigManager, _p_iConfigManagerTo_p_iBase, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iClipper2D[] = {  {&_swigt__p_iClipper2D, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_iGraphics3D[] = {  {&_swigt__p_iGraphics3D, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iPath[] = {  {&_swigt__p_iPath, 0, 0, 0},  {&_swigt__p_scfImplementation1TcsPath_iPath_t, _p_scfImplementation1TcsPath_iPath_tTo_p_iPath, 0, 0},  {&_swigt__p_csPath, _p_csPathTo_p_iPath, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iSCF[] = {  {&_swigt__p_iSCF, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iTriangleMesh[] = {  {&_swigt__p_scfImplementation1TcsTriangleMeshPointer_iTriangleMesh_t, _p_scfImplementation1TcsTriangleMeshPointer_iTriangleMesh_tTo_p_iTriangleMesh, 0, 0},  {&_swigt__p_csTriangleMeshPointer, _p_csTriangleMeshPointerTo_p_iTriangleMesh, 0, 0},  {&_swigt__p_scfImplementation1TcsTriangleMeshBox_iTriangleMesh_t, _p_scfImplementation1TcsTriangleMeshBox_iTriangleMesh_tTo_p_iTriangleMesh, 0, 0},  {&_swigt__p_csTriangleMeshBox, _p_csTriangleMeshBoxTo_p_iTriangleMesh, 0, 0},  {&_swigt__p_iTriangleMesh, 0, 0, 0},  {&_swigt__p_scfImplementation1TcsTriangleMesh_iTriangleMesh_t, _p_scfImplementation1TcsTriangleMesh_iTriangleMesh_tTo_p_iTriangleMesh, 0, 0},  {&_swigt__p_csTriangleMesh, _p_csTriangleMeshTo_p_iTriangleMesh, 0, 0},{0, 0, 0, 0}};
@@ -48246,7 +47838,6 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_csEllipsoid,
   _swigc__p_csFlags,
   _swigc__p_csFrustum,
-  _swigc__p_csGeomDebugHelper,
   _swigc__p_csIntersect2,
   _swigc__p_csIntersect3,
   _swigc__p_csMath2,
@@ -48325,7 +47916,6 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_iEventQueue,
   _swigc__p_iFactory,
   _swigc__p_iFile,
-  _swigc__p_iGraphics3D,
   _swigc__p_iImage,
   _swigc__p_iImageIO,
   _swigc__p_iJoystickDriver,

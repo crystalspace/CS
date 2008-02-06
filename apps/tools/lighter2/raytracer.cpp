@@ -34,7 +34,6 @@ namespace lighter
     memset (hash, 0, sizeof (HashEntry) * HASH_SIZE);
   }
 
-
   MailboxHash::~MailboxHash ()
   {
     CS::Memory::AlignedFree (hash);

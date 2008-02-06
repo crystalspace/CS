@@ -14,3 +14,4 @@ INLINE_FUNCTIONS
 
 %include "bindings/common/imap.i"
 #endif //_SW_IMAP_I_
+

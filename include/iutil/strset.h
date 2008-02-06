@@ -86,7 +86,7 @@ struct iStringSet : public virtual iBase
   /**
    * Check if the set contains a string with a particular ID.
    * \remarks This is rigidly equivalent to
-   *   <tt>return Request(id) != NULL</tt>, but more idomatic.
+   *   <tt>return Request(id) != NULL</tt>, but more idiomatic.
    */
   virtual bool Contains(csStringID) const = 0;
 

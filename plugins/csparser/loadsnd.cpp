@@ -31,6 +31,9 @@
 #include "isndsys/ss_data.h"
 #include "isndsys/ss_stream.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(csparser)
+{
+
 csPtr<iSndSysData> csLoader::LoadSoundSysData (const char* filename)
 {
   if (!VFS || !SndSysLoader)
@@ -97,3 +100,5 @@ iSndSysWrapper* csLoader::LoadSoundWrapper (const char* name, const char* fname)
   return wrapper;
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(csparser)

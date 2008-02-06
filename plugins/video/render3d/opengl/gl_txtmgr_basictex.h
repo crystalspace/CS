@@ -47,7 +47,7 @@ struct TextureStorageFormat
   /// Format in which to store the texture ('internalformat' in GL spec)
   GLenum targetFormat;
   /**
-   * Whether the format is compressed. Accompanying "source format" 
+   * Whether the format is compressed. Accompanying "source format"
    * information is only valid for uncompressed textures.
    */
   bool isCompressed;
@@ -55,7 +55,7 @@ struct TextureStorageFormat
   /// Init with default values
   TextureStorageFormat () : targetFormat (0), isCompressed (false) {}
   /// Init with given format
-  TextureStorageFormat (GLenum targetFormat, bool compressed) : 
+  TextureStorageFormat (GLenum targetFormat, bool compressed) :
     targetFormat (targetFormat), isCompressed (compressed) {}
 };
 
@@ -69,7 +69,7 @@ struct TextureSourceFormat
   /// Init with default values
   TextureSourceFormat () : format (0), type (0) {}
   /// Init for uncompressed texture
-  TextureSourceFormat (GLenum format, GLenum type) : 
+  TextureSourceFormat (GLenum format, GLenum type) :
     format (format), type (type) {}
 };
 
@@ -93,7 +93,7 @@ struct csGLTextureClassSettings;
 #include "csutil/deprecated_warn_off.h"
 
 class csGLBasicTextureHandle :
-  public scfImplementation1<csGLBasicTextureHandle, 
+  public scfImplementation1<csGLBasicTextureHandle,
 			    iTextureHandle>
 {
 protected:
@@ -109,17 +109,16 @@ protected:
   /// Private texture flags
   enum
   {
-    flagTexupdateNeeded = 1 << 31, 
-    flagPrepared = 1 << 30, 
+    flagTexupdateNeeded = 1 << 31,
+    flagPrepared = 1 << 30,
     flagForeignHandle = 1 << 29,
     flagWasRenderTarget = 1 << 28,
-    flagNeedMips = 1 << 27,
 
     // Flags below are used by csGLTextureHandle
     /// Does it have a keycolor?
-    flagTransp = 1 << 26,
+    flagTransp = 1 << 27,
     /// Is the color valid?
-    flagTranspSet = 1 << 25,
+    flagTranspSet = 1 << 26,
 
     flagLast,
     /// Mask to get only the "public" flags
@@ -147,7 +146,7 @@ protected:
   GLenum DetermineTargetFormat (GLenum defFormat, bool allowCompress,
     const char* rawFormat, bool& compressedTarget);
 
-  static void ComputeNewPo2ImageSize (int texFlags, 
+  static void ComputeNewPo2ImageSize (int texFlags,
     int orig_width, int orig_height, int orig_depth,
     int& newwidth, int& newheight, int& newdepth,
     int max_tex_size);
@@ -156,7 +155,7 @@ protected:
   void FreshUploadData ();
 private:
   void AdjustSizePo2 ();
-    
+
   struct BlitBuffer
   {
     int x;
@@ -199,8 +198,6 @@ public:
   {
     texFlags.SetBool (flagWasRenderTarget, b);
   }
-  bool IsNeedMips() const { return texFlags.Check (flagNeedMips); }
-  void SetNeedMips (bool b) { texFlags.SetBool (flagNeedMips, b); }
 
   /// Create a texture with given dimensions
   csGLBasicTextureHandle (int width, int height, int depth,
@@ -211,7 +208,7 @@ public:
   virtual ~csGLBasicTextureHandle ();
 
   /**
-   * Synthesize empty upload data structures for textures of the format 
+   * Synthesize empty upload data structures for textures of the format
    * \a format. */
   bool SynthesizeUploadData (const CS::StructuredTextureFormat& format,
     iString* fail_reason);
@@ -253,7 +250,7 @@ public:
   /**
    * Texture Depth Indices are used for Cubemap interface
    */
-  //enum { CS_TEXTURE_CUBE_POS_X = 0, CS_TEXTURE_CUBE_NEG_X, 
+  //enum { CS_TEXTURE_CUBE_POS_X = 0, CS_TEXTURE_CUBE_NEG_X,
   //       CS_TEXTURE_CUBE_POS_Y, CS_TEXTURE_CUBE_NEG_Y,
   //       CS_TEXTURE_CUBE_POS_Z, CS_TEXTURE_CUBE_NEG_Z };
 
@@ -281,6 +278,7 @@ public:
   virtual void Blit (int x, int y, int width, int height,
     unsigned char const* data, TextureBlitDataFormat format = RGBA8888);
   void SetupAutoMipping();
+  void RegenerateMipmaps();
 
   /// Get the texture target
   virtual int GetTextureTarget () const { return int (texType); }
@@ -304,6 +302,7 @@ public:
   { this->alphaType = alphaType; }
 
   virtual void Precache ();
+  virtual bool IsPrecached () { return Handle != 0; }
 
   virtual void SetTextureClass (const char* className);
   virtual const char* GetTextureClass ();
@@ -331,7 +330,7 @@ public:
    * incur a hefty performance penalty (due the performed compression of the
    * changed texels), so for texture intended for such use it's a good idea
    * to make sure the internal format is not compressed.
-   * \param keepPixels Whether to keep the existing pixel data should be 
+   * \param keepPixels Whether to keep the existing pixel data should be
    *   preserved.
    * \param newTexFormat New texture format the texture should have.
    * \remarks The texture handle must be bound properly before this method

@@ -695,22 +695,20 @@ public:
    */
   int StatusNoDepth ();
 
-  // Debugging functions.
-  csPtr<iString> Debug_UnitTest ();
+  // Debugging functions.  
   csTicks Debug_Benchmark (int num_iterations);
   void Debug_Dump (iGraphics3D* g3d, int zoom = 1);
   csPtr<iString> Debug_Dump ();
 
   virtual int GetSupportedTests () const
   {
-    return CS_DBGHELP_UNITTEST |
-           CS_DBGHELP_BENCHMARK |
+    return CS_DBGHELP_BENCHMARK |
            CS_DBGHELP_GFXDUMP |
            CS_DBGHELP_TXTDUMP;
   }
   virtual csPtr<iString> UnitTest ()
   {
-    return Debug_UnitTest ();
+    return 0;
   }
   virtual csPtr<iString> StateTest ()
   {

@@ -43,7 +43,8 @@ AC_DEFUN([CS_EMIT_BUILD_PROPERTY],
     [cs_build_prop_val="$2"
     cs_build_prop_val=CS_TRIM([$cs_build_prop_val])
     m4_ifval([$4],
-	[CS_JAMCONFIG_PROPERTY([$1], [$cs_build_prop_val], [$3])],
+	[m4_default([$5],CS_JAMCONFIG_PROPERTY)(
+            [$1], [$cs_build_prop_val], [$3], [$6])],
 	AS_IF([test -n "$cs_build_prop_val"],
 	    [m4_default([$5],[CS_JAMCONFIG_PROPERTY])(
 		[$1], [$cs_build_prop_val], [$3], [$6])]))])
@@ -79,19 +80,19 @@ AC_DEFUN([CS_EMIT_BUILD_RESULT],
 #                     [ACTION-IF-NOT-RECOGNIZED], [EMITTER])
 #	A convenience wrapper for CS_CHECK_BUILD_FLAGS() which also records the
 #	results via CS_EMIT_BUILD_PROPERTY().  Checks if the compiler or linker
-#	recognizes a command-line option.  MESSAGE is the "checking" message.
-#	CACHE-VAR is the shell cache variable which receives the flag
-#	recognized by the compiler or linker, or "no" if the flag was not
-#	recognized.  FLAGS is a whitespace- delimited list of build tuples
-#	created with CS_CREATE_TUPLE().  Each tuple from FLAGS is attempted in
-#	order until one is found which is recognized by the compiler.  After
-#	that, no further flags are checked.  LANGUAGE is typically either C or
-#	C++ and specifies which compiler to use for the test.  If LANGUAGE is
-#	omitted, C is used.  EMITTER-KEY is the name to pass as the emitter's
-#	"key" argument if a usable flag is encountered.  If APPEND is not the
-#	empty string, then the discovered flag is appended to the existing
-#	value of the EMITTER-KEY.  If the command-line option was recognized,
-#	then ACTION-IF-RECOGNIZED is invoked, otherwise
+#	recognizes one of a list of command-line options.  MESSAGE is the
+#	"checking" message.  CACHE-VAR is the shell cache variable which
+#	receives the flag recognized by the compiler or linker, or "no" if the
+#	flag was not recognized.  FLAGS is a whitespace-delimited list of build
+#	tuples created with CS_CREATE_TUPLE().  Each tuple from FLAGS is
+#	attempted in order until one is found which is recognized by the
+#	compiler.  After that, no further flags are checked.  LANGUAGE is
+#	typically either C or C++ and specifies which compiler to use for the
+#	test.  If LANGUAGE is omitted, C is used.  EMITTER-KEY is the name to
+#	pass as the emitter's "key" argument if a usable flag is encountered.
+#	If APPEND is not the empty string, then the discovered flag is appended
+#	to the existing value of the EMITTER-KEY.  If the command-line option
+#	was recognized, then ACTION-IF-RECOGNIZED is invoked, otherwise
 #	ACTION-IF-NOT-RECOGNIZED is invoked.  EMITTER is a macro name, such as
 #	CS_JAMCONFIG_PROPERTY or CS_MAKEFILE_PROPERTY, which performs the
 #	actual task of emitting the KEY/VALUE tuple; it should also accept
@@ -119,15 +120,16 @@ AC_DEFUN([CS_EMIT_BUILD_FLAGS],
 #
 #	- If EMITTER is omitted, then CS_NULL_EMITTER is returned, effectively
 #	  disabling output by the CS_EMIT_FOO() macro.
-#	- If EMITTER is the literal string "emit" or "yes", then it returns an
-#	  empty string, which signals to the CS_EMIT_FOO() macro that is should
-#	  use its default emitter.
+#	- If EMITTER is the literal string "default", "emit", or "yes", then it
+#	  returns an empty string, which signals to the CS_EMIT_FOO() macro
+#	  that is should use its default emitter.
 #	- Any other value for EMITTER is passed along as-is to the
 #	  CS_EMIT_FOO() macro.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_EMITTER_OPTIONAL],
     [m4_case([$1],
 	[], [[CS_NULL_EMITTER]],
+	[default], [],
 	[emit], [],
 	[yes], [],
 	[[$1]])])
@@ -137,7 +139,8 @@ AC_DEFUN([CS_EMITTER_OPTIONAL],
 #------------------------------------------------------------------------------
 # CS_NULL_EMITTER(KEY, VALUE, [APPEND])
 #	A do-nothing emitter suitable for use as the EMITTER argument of one of
-#	the CS_EMIT_FOO() macros.
+#	the CS_EMIT_FOO() macros. Useful for cases when you are interested only
+#	in the result of a check but not any emitter side-effects.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_NULL_EMITTER], [:
 ])

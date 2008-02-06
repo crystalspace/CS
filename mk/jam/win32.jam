@@ -245,7 +245,7 @@ rule ConstructStaticLibraryTarget
 rule ConstructSharedLibraryTarget
 {
   local libbase = [ LibraryBaseName $(<) ] ;
-  return $(libbase)-$(COMPILER.TYPE).dll ;
+  return $(libbase)-$(COMPILER.C++.TYPE).dll ;
 }
 rule ConstructSharedLibraryLinkLib
 {

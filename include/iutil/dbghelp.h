@@ -32,26 +32,17 @@ struct iGraphics3D;
 
 /**\name iDebugHelper implementation support flags
  * @{ */
-/**
- * supports UnitTest().
- */
-#define CS_DBGHELP_UNITTEST 1
-/**
- * supports Benchmark().
- */
-#define CS_DBGHELP_BENCHMARK 2
-/**
- *  supports non graphical Dump().
- */
-#define CS_DBGHELP_TXTDUMP 4
-/**
- * supports graphical Dump().
- */
-#define CS_DBGHELP_GFXDUMP 8
-/**
- supports StateTest().
- */
-#define CS_DBGHELP_STATETEST 16
+enum 
+{
+  /// Supports Benchmark()
+  CS_DBGHELP_BENCHMARK = 0x1,
+  /// Supports non graphical Dump().
+  CS_DBGHELP_TXTDUMP = 0x2,
+  /// Supports graphical Dump().
+  CS_DBGHELP_GFXDUMP = 0x4,
+  /// Supports StateTest().
+  CS_DBGHELP_STATETEST = 0x8
+};
 /** @} */
 
 /**
@@ -78,7 +69,9 @@ struct iDebugHelper : public virtual iBase
    * of the given module. This function returns 0 if the test succeeded.
    * Otherwise an iString  is returned containing some information about
    * the errors. DecRef() this returned string after using it.
+   * \deprecate Use the external unit testing framework instead. Deprecated in 1.3.
    */
+  CS_DEPRECATED_METHOD_MSG("Use the external unit testing framework instead.")
   virtual csPtr<iString> UnitTest () = 0;
 
   /**

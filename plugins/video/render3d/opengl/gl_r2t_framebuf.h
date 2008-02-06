@@ -27,6 +27,8 @@
 CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 {
 
+class csGLBasicTextureHandle;
+
 /// Render2texture backend using the framebuffer
 class csGLRender2TextureFramebuf : public csGLRender2TextureBackend
 {
@@ -43,10 +45,23 @@ protected:
   int rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy;
   /// Render target dimensions
   int txt_w, txt_h;
+  /// Framebuffer dimensions
+  int framebufW, framebufH;
+
+  enum InternalFormatClass { ifColor, ifDepth };
+  /**
+   * Return a GL internal texture format that has the same basic components as
+   * the internal format of the texture but with a precision of the components
+   * that matches the framebuffer precision as closely as possible.
+   */
+  static GLenum GetInternalFormat (InternalFormatClass fmtClass,
+    csGLBasicTextureHandle* tex);
+  static GLenum GetInternalFormatColor (GLenum texInternalFormat);
+  static GLenum GetInternalFormatDepth (GLenum texInternalFormat);
 
   csDirtyAccessArray<uint8> pixelScratch;
   void Set2DViewport ();
-  void GrabFramebuffer (const RTAttachment& target, GLenum internalFormat);
+  void GrabFramebuffer (const RTAttachment& target, InternalFormatClass fmtClass);
 public:
   csGLRender2TextureFramebuf (csGLGraphics3D* G3D) 
     : csGLRender2TextureBackend (G3D), targetsSet (false), 

@@ -316,6 +316,8 @@
 		    drivers and also states other sources would attribute a
 		    generally poor performance to ATI Linux drivers.
 		    @@@ Whether only certain version(s) are affected is unknown.
+      * 2007-12-17: Jorrit reports Linux ATI drivers version 2.1.7059 finally
+		    get VBO right.
       -->
     <rule description="Disable VBO for GNU/Linux ATI drivers">
       <conditions fulfill="all">
@@ -622,10 +624,14 @@
 		    When setting texture data with ARB_pixel_buffer_object,
 		    the first 512 lines of the texture are repeted every
 		    512 lines (in other words, data past line 512 is invalid).
+      * 2008-01-14: RADEON 9700 PRO x86/MMX/3DNow!/SSE, Win32, 
+                    OpenGL 2.1.7169, GL driver: atioglxx.dll 6.14.10.7169
+		    Issue has been fixed.
       -->
     <rule description="ATI: Disable broken pixel buffer objects">
       <conditions>
 	<regexp string="vendor" pattern="^ATI" />
+	<comparever version="gl" relation="lt 2.1.7169" />
       </conditions>
       <applicable>
 	<usecfg>nopbo</usecfg>

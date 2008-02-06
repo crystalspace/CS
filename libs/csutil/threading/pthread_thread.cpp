@@ -74,7 +74,7 @@ namespace Implementation
 
 
   ThreadBase::ThreadBase (Runnable* runnable)
-    : runnable (runnable), isRunning (0)
+    : runnable (runnable), isRunning (0), priority (THREAD_PRIO_NORMAL)
   {
   }
 
@@ -91,6 +91,9 @@ namespace Implementation
       pthread_create(&threadHandle, &attr, proxyFunc, &param); 
             
       startupBarrier.Wait ();
+
+      // Set priority to make sure its updated if we set it before starting
+      SetPriority (priority);
     }
   }
 
@@ -113,38 +116,40 @@ namespace Implementation
 
   bool ThreadBase::SetPriority (ThreadPriority prio)
   {
-    int res;
-    struct sched_param SchedulerProperties;
+    int res = 1;
+    
+    if (IsRunning ())
+    {    
+      struct sched_param SchedulerProperties;
 
-    // Clear the properties initially
-    memset(&SchedulerProperties, 0, sizeof (struct sched_param));
+      // Clear the properties initially
+      memset(&SchedulerProperties, 0, sizeof (struct sched_param));
 
-    // Map the CS thread priority identifier to an appropriate platform specific identifier
-    //  or fail if this mapping is not possible.
-    switch(prio)
-    {
-    case THREAD_PRIO_LOW:
-      // Posix Pthreads does not guarantee support for any compatible priority,
-      //  so we'll default to NORMAL
-    case THREAD_PRIO_NORMAL:
-      SchedulerProperties.sched_priority = sched_get_priority_max (SCHED_OTHER);
-      res = pthread_setschedparam (threadHandle, SCHED_OTHER, &SchedulerProperties);
+      // Map the CS thread priority identifier to an appropriate platform specific identifier
+      //  or fail if this mapping is not possible.
+      switch(prio)
+      {
+      case THREAD_PRIO_LOW:
+        // Posix Pthreads does not guarantee support for any compatible priority,
+        //  so we'll default to NORMAL
+      case THREAD_PRIO_NORMAL:
+        SchedulerProperties.sched_priority = sched_get_priority_max (SCHED_OTHER);
+        res = pthread_setschedparam (threadHandle, SCHED_OTHER, &SchedulerProperties);
+        break;
 
-      if (res != 0)
-        return false;
-
-      return true;
-    case THREAD_PRIO_HIGH:
-      SchedulerProperties.sched_priority = sched_get_priority_max (SCHED_RR) - 1;
-      res = pthread_setschedparam (threadHandle, SCHED_RR, &SchedulerProperties);
-
-      if (res != 0)
-        return false;
-
-      return true;
+      case THREAD_PRIO_HIGH:
+        SchedulerProperties.sched_priority = sched_get_priority_max (SCHED_RR) - 1;
+        res = pthread_setschedparam (threadHandle, SCHED_RR, &SchedulerProperties);
+        break;
+      }
     }
 
-    return false;
+    if (res != 0)
+    {
+      priority = prio;
+    }
+
+    return res != 0;
   }
 
   void ThreadBase::Wait () const

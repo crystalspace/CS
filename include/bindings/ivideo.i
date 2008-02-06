@@ -14,4 +14,3 @@ INLINE_FUNCTIONS
 
 %include "bindings/common/ivideo.i"
 #endif //_IVIDEO_I_
-

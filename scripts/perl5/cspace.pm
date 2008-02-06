@@ -9392,6 +9392,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetAlphaMap = *cspacec::iTextureHandle_GetAlphaMap;
 *GetAlphaType = *cspacec::iTextureHandle_GetAlphaType;
 *Precache = *cspacec::iTextureHandle_Precache;
+*IsPrecached = *cspacec::iTextureHandle_IsPrecached;
 *SetTextureClass = *cspacec::iTextureHandle_SetTextureClass;
 *GetTextureClass = *cspacec::iTextureHandle_GetTextureClass;
 *SetAlphaType = *cspacec::iTextureHandle_SetAlphaType;
@@ -10981,49 +10982,6 @@ sub DESTROY {
     }
 }
 
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::csGeomDebugHelper ##############
-
-package cspace::csGeomDebugHelper;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace );
-%OWNER = ();
-%ITERATORS = ();
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_csGeomDebugHelper(@_);
-    bless $self, $pkg if defined($self);
-}
-
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_csGeomDebugHelper($self);
-        delete $OWNER{$self};
-    }
-}
-
-*GetSupportedTests = *cspacec::csGeomDebugHelper_GetSupportedTests;
-*UnitTest = *cspacec::csGeomDebugHelper_UnitTest;
-*StateTest = *cspacec::csGeomDebugHelper_StateTest;
-*Benchmark = *cspacec::csGeomDebugHelper_Benchmark;
-*Dump = *cspacec::csGeomDebugHelper_Dump;
-*DebugCommand = *cspacec::csGeomDebugHelper_DebugCommand;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -14397,6 +14355,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetAnimAction = *cspacec::iSpriteCal3DState_SetAnimAction;
 *SetVelocity = *cspacec::iSpriteCal3DState_SetVelocity;
 *SetDefaultIdleAnim = *cspacec::iSpriteCal3DState_SetDefaultIdleAnim;
+*SetCyclicBlendFactor = *cspacec::iSpriteCal3DState_SetCyclicBlendFactor;
 *SetLOD = *cspacec::iSpriteCal3DState_SetLOD;
 *AttachCoreMesh = *cspacec::iSpriteCal3DState_AttachCoreMesh;
 *DetachCoreMesh = *cspacec::iSpriteCal3DState_DetachCoreMesh;
@@ -19872,7 +19831,6 @@ sub SCF_VERBOSE_PLUGIN_LOAD () { $cspacec::SCF_VERBOSE_PLUGIN_LOAD }
 sub SCF_VERBOSE_PLUGIN_REGISTER () { $cspacec::SCF_VERBOSE_PLUGIN_REGISTER }
 sub SCF_VERBOSE_CLASS_REGISTER () { $cspacec::SCF_VERBOSE_CLASS_REGISTER }
 sub SCF_VERBOSE_ALL () { $cspacec::SCF_VERBOSE_ALL }
-sub CS_DBGHELP_UNITTEST () { $cspacec::CS_DBGHELP_UNITTEST }
 sub CS_DBGHELP_BENCHMARK () { $cspacec::CS_DBGHELP_BENCHMARK }
 sub CS_DBGHELP_TXTDUMP () { $cspacec::CS_DBGHELP_TXTDUMP }
 sub CS_DBGHELP_GFXDUMP () { $cspacec::CS_DBGHELP_GFXDUMP }

@@ -7,27 +7,257 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 5-Feb-2008
+	- Sueastside undid his ThreadedJobQueue change since it broke on linux.
+	- Marten redid some of the handling of thread priorities to be more robust.
+	- Sueastside redid his ThreadedJobQueue, should work now after Marten's changes.
 	- ronsaldo fixed issues in the c# jamfiles, and fixed a strong name
 	  signing related issues.
+4-Feb-2008
+	- Sueastside added an optional parameter to ThreadedJobQueue's constructor
+	  to set the thread's priority.
+2-Feb-2008
+	- res fixed "short" (h) and "short short" (hh) handling to only cast
+	  to a signed char/short when formatting to a decimal integer; cast to
+	  unsigned otherwise.
+	- Sueastside added XWindow clipboard event support. Rolenun made me do it!
+29-Jan-2008
+	- Sueastside added IsPrecached() to iTextureHandle.
 24-Jan-2008
+	- caedes patched relaytool so it doesn't redirect to /dev/tty, as it 
+	  doesn't exist in some situations.
+	- Ross B cleaned up updated HowTo example.
+	- Ross B updated the HOWTO: Clicking on Objects for misc API changes.
+	- caedes fixed previous relaytool change to remove uneeded echo.
 	- ronsaldo fixed issues in the c# bindings interface of iFile, and also
 	  anothers issues that impede the building of the bindings on win32
 	  that was intoduced with the additionals %imports on the .i files.
+23-Jan-2008
+	- res fixed a bug in relaytool where building the libraries search array
+	  was broken.
+	- caedes fixed vertexlight.cgvp not getting installed.
+22-Jan-2008
+	- Mike Gist committed a patch from Trymm which adds a method to set
+	  blending time for cyclic animations in cal3d.
+20-Jan-2008
+	- Ross B updated sound docs to use a reference to iLoader instead of
+	  iSndSysLoader.
+	- Ross B updated old sound documentation to be relevant again.
+	- caedes added swig declaration for scfImplementation3 template.
+19-Jan-2008
+	- res changed the gl3d framebuffer render-to-texture backend to not
+	  use hardcoded internal formats when turning textures into render
+	  targets but a format depending on the actual format of the texture
+	  and the bit depth of the framebuffer.
+	- res fixed some wrong casts and a leak in sprcal3d.
+	- Marten fixed (probably) atomic operations on 64-bit PPC.
+18-Jan-2008
+	- res committed an update to the MSVC 7+ external project HOWTO from
+	  nev7n.
+	- res changed the xmlread plugin to use scfImplementationPooled<> to
+	  pool nodes (instead of a "custom" implementation).
+	- res tweaked cswinGetErrorMessage() to return messages with "inserts
+	  ignored": some Windows messages have "inserts" (similar to printf
+	  formatting specifiers) that insert values into the message; however,
+	  if a value isn't given, FormatMessage() actually returns an error.
+	  Ignoring inserts returns the message inclusive inserts - which is
+	  still better than an obscure error code.
+	- res changed scfImplementation<> to store "auxiliary data" (such as
+	  weak reference owners, metadata, SCF parent) in a separate structure
+	  instead of the class instance: only a fraction of all objects use
+	  one of these features, so this externalization should save a couple
+	  bytes of memory.
+17-Jan-2008
+	- Marten reverted r28423 as it introduce a arbitrary and hardcoded
+	  constant at a place where there should be no such thing.
+        - Mike Gist added checks for the LoadProxyTextures() function. It now
+          isn't called when we're not using proxy textures.
 16-Jan-2008
+	- res removed the scfObject field(s) from scfImplementation*. The
+	  address of the actual implementation class can be computed at
+	  runtime and doesn't have to be stored in an instance. This saves
+	  a pointer (or more for "extension" implementations) per SCF object.
+	- res added some simple SCF class stats.
 	- ronsaldo made changes into the c# bindings interface of iFile.
+15-Jan-2008
+	- res merged r27442 from rendermanager branch to trunk (cubemap
+	  support with fbo render-to-texture).
+	- res merged r27667 from rendermanager branch to trunk (better support
+	  for textures exceeding the framebuffer dimensions in framebuffer r2t
+	  backend).
+	- Mike Gist got animated textures working with proxy textures.
+14-Jan-2008
+	- Mike Gist committed a patch from Trymm to fix a crash in sprcal3d.
+	- res re-enabled PBO on ATI (latest driver fixes found issues).
+	- res temporarily disabled FBO since it's currently broken.
+	- res merged r27437 from rendermanager branch to trunk (use
+	  glGenerateMipmaps in gl3d).
+	- Vincent blindly changed a constant in OpenAL renderer, which seems
+	  to fix the "play too fast" issue with stereo OGG files.
 11-Jan-2008
+	- Vincent removed mentions of iCollection throughout the project.
+	- philwyett added reference to exporting LD_LIBRARY_PATH to allow demo
+	  applications to run without error on Linux. I also updated some basic
+	  info for contacting me etc.
+	- Mike Gist enhanced the runtime check for AltiVec to work on linux.
 	- ronsaldo made changes for the building of the c# bindings under
 	  MinSys.
 10-Jan-2008
+	- Eric Sunshine fixed a couple bugs in macro CS_EMIT_BUILD_PROPERTY()
+	  in emit.m4 which manifested when the client passed a non-empty
+	  EMPTY-OKAY argument. (1) It incorrectly unconditionally employed the
+	  CS_JAMCONFIG_PROPERTY() emitter rather than respecting the EMITTER
+	  argument and only employing CS_JAMCONFIG_PROPERTY() as a
+	  fallback. (2) It neglected to pass the optional UNCONDITIONAL
+	  argument along to the emitter.
+	 - Eric Sunshine added "default" as an alias for the existing tokens
+	  "emit" and "yes" for the EMITTER argument of macro
+	  CS_EMITTER_OPTIONAL() in emit.m4.
+	- Eric Sunshine made minor clarifications to macro documentation in
+	  emit.m4.
+	- Eric Sunshine added new Autoconf macros CS_TR_SH_Lang(),
+	  CS_TR_SH_lang(), and CS_TR_SH_LANG() to language.m4. These macros are
+	  similar to AS_TR_SH(), but convert "+" in its argument to "x" rather
+	  than "p" since "x" is more suitable in a context dealing with
+	  programming languages. For instance, CS_TR_SH_Lang([C++]) becomes
+	  "Cxx", rather than the less idiomatic "Cpp" as would be the case with
+	  AS_TR_SH().  These macros are useful for composing shell variable
+	  names pertaining to a particular language. For instance, if the
+	  language upon which a macro operates is in $1, then the macro may
+	  compose a shell variable name using
+	  CS_TR_SH_lang([cs_cv_prog_$1_feature]).  CS_TR_SH_Lang() performs no
+	  case-folding of its input. CS_TR_SH_lang() folds the input to
+	  lowercase.  CS_TR_SH_LANG() folds the input to uppercase.
+	- Eric Sunshine added new Autoconf macro CS_LANG_RESOLVE() to
+	  language.m4.  This macro is a convenience tool for other macros which
+	  optionally accept a language specifier. It returns the input language
+	  specifier if non-empty, otherwise the specified fallback language.
+	  If the fallback is not provided, then the language is assumed to be
+	  "C".
+	- Eric Sunshine updated macro CS_BUILD_IFELSE() in checkbuild.m4 to
+	  take advantage of the new CS_TR_SH_LANG() and CS_LANG_RESOLVE()
+	  macros.  Also retired the somewhat ugly public CS_LANG_CFLAGS macro
+	  (although a somewhat similar private helper macro, _CS_LANG_CFLAGS(),
+	  is still employed by CS_BUILD_IFELSE()).
+	- Eric Sunshine updated the various CS_COMPILER_WARNING_FOO() macros in
+	  warnings.m4 to take advantage of the new CS_TR_SH_lang() and
+	  CS_LANG_RESOLVE() macros.
+	- Eric Sunshine improved the various CS_COMPILER_WARNING_FOO() macros
+	  in warnings.m4 by having them compose proper cache variables
+	  incorporating the language name (such as "cs_cv_prog_cxx_foo") rather
+	  than employing the too-general static name "cs_cv_prog_compiler_foo"
+	  in the case that the client fails to provide an explicit cache
+	  variable name.
+	- Eric Sunshine re-factored the various CS_COMPILER_WARNING_FOO()
+	  macros in warnings.m4 by introducing new helpers
+	  _CS_WARNING_SUPPRESS_MSG() and _CS_WARNING_CACHE_VAR() which avoid
+	  similar code in each of the CS_COMPILER_WARNING_FOO() macros.
+	- Eric Sunshine promoted the C++ STL check from an inline configure.ac
+	  test to a stand-alone re-usable macro CS_CHECK_STL() in checkstl.m4
+	  so that it can be employed by external projects and other Autoconf
+	  macros.
+	- Eric Sunshine promoted the complicated -fvisibility-inline-hiddens
+	  check from an inline configure.ac test to a stand-alone re-usable
+	  macro CS_VISIBILITY_INLINES_HIDDEN() in visibility.m4 so that it can
+	  be employed by external projects.
+	- Eric Sunshine upgraded CS_VISIBILITY_INLINES_HIDDEN() in
+	  visibility.m4 so that it explicitly promotes compilation warnings to
+	  errors in case the compiler neglects to return an error code when the
+	  switch under consideration is not recognized.
+	- Eric Sunshine promoted the checks for compiler switch and in-code
+	  delcaration of symbol visibility from inline configure.ac tests to
+	  stand-alone re-usable macros in visibility.m4. The new macros are
+	  CS_VISIBILITY_FLAG_HIDDEN(), CS_VISIBILITY_FLAG_DEFAULT(),
+	  CS_VISIBILITY_DECLARE_HIDDEN(), and CS_VISIBILITY_DECLARE_DEFAULT().
+	  Performed a good deal of re-factoring and simplification of these
+	  checks in order to lower maintenance costs.  For consistency, also
+	  renamed CS_VISIBILITY_INLINES_HIDDEN() to
+	  CS_VISIBILITY_FLAG_INLINES_HIDDEN().
+	- Eric Sunshine upgraded the symbol visibility compiler flag checks in
+	  visibility.m4 so that they promote compiler warnings to errors.  This
+	  should resolve problem experienced by Andres Freund during
+	  cross-compiling on Linux for Windows where configure was under the
+	  impression that -fvisibility=hidden was usable since the compiler
+	  issued only a warning and otherwise ignored the flag.
 	- ronsaldo added the .config file for th c# bindings.
+9-Jan-2008
+	- Mike Gist committed a patch from Trymm for sprcal3d to keep
+	  compatibility with cal3d files which aren't updated for the recent
+	  changes. Those now use the old bugged behavior instead of not working
+	  at all.
+	- Eric Sunshine upgraded mk/autoconf/compiler.m4 so that the macros
+	  CS_PROG_CC() and CS_PROG_CXX() also publish the shell variable names
+	  cs_compiler_name_c and cs_compiler_name_cxx, respectively.
+	  Furthermore, these macros now emit build properties COMPILER.C.TYPE
+	  and COMPILER.CXX.TYPE (and, as an historic anomaly, COMPILER.TYPE) to
+	  Jamconfig. These changes ensure that the compiler's type/name is
+	  published for all CS Jam-based projects (rather than only for CS
+	  itself).  This fixes problem where mk/jam/win32.jam's
+	  ConstructSharedLibraryTarget rule, which depends upon the compiler
+	  type/name information, failed in external CS-based projects.
+	- Vincent added '-no3d' command line option to sndtest, to set the
+	  sound stream in CS_SND3D_DISABLE mode. Useful for investigating a bug
+	  with playback of stereo OGG files with OpenAL renderer in that mode.
 8-Jan-2008
+	- Mike Gist committed a patch from Trymm for sprcal3d which fixes the
+	  problems with characters not walking properly for the first couple of
+	  seconds after movement has been initiated.
+	- Marten added a non-threaded job queue.
+	- Marten added the ability to query a job queue if all enqueued jobs
+	  are run.
+	- Marten made a few cosmetic fixes to lighter2.
+	- Marten started to convert lighter2 to be able to take advantage
+	  of multi-processor/core configurations.
+	- Marten made a number of fixes to bullet plugin and phystut 
+	  application, fixing creation of sphere and joints.
 	- ronsaldo made changes into the dll import of the c# bindings, now it
 	  uses win32 dlls names, and mono dllmaps under linux.
+7-Jan-2008
+	- res fixed a constness mismatch in cspython.cpp occuring with 
+	  Python 2.4 (and probably older) caused that surfaced after r28415
+	  and r28416.
+	- Vincent fixed a bug which prevented OGG files to be played when
+	  using OpenAL. Also commented unused stuff in OpenAL renderer, and
+	  added OpenAL specific kvp in sound.cfg.
 6-Jan-2008
+	- Marten fixed a bug in lighter2 related to light through portals.
+	- Vincent added '-sndfile' commandline option to allow setting the
+	  sound file to use in 'sndtest' and 'asndtest'. Also added sound and
+	  stream format information display.
+	- caedes added swig template to help declaring typemaps for argc-argv
+	  style parameter lists for functions.
+	- caedes added swig output typemaps for EventData structs in GetData
+	  functions in the different EventHelper classes.
+	- caedes fixed a constness problem in cspython.
+	- Marten made a couple of cosmetic fixes in ligher2.
 	- ronsaldo renamed the output of the c#, crystalspace-sharp.dll into
 	  crystalspace-dotnet.dll.
 	- ronsaldo made changes into the installation of the c# bindings. The
 	  bindings are installed like the other bindings.
+5-Jan-2008
+	- Mike Gist committed a patch from Trymm which corrects a few problems
+	  with idle animations in sprcal3d. Characters will no longer play the
+	  idle animation in situations like when in the middle of a fight, and
+	  all idle animations will be played at random.
+	- Marten fixed a warning in terrain.
+	- Marten added svn:ignore property on mk\msvc9 directory.
+	- Marten made an optimization to lighter2, cutting out code taking 7%
+	  of total runtime.
+	- res fixed the preprocessor condition in 
+	  libs/csutil/processor/processorspecdetection_nonwin_gcc_x86.cpp to
+	  not compile the contents of that file on Win32 at all (as also
+	  suggested by the name). Should fix #440.
+	- Marten removed the unit test application and deprecated the unit
+	  test method in iDebugHelper.
+	- Marten redid the ligther2 optimization to play better with future
+	  implementation of area lights.
+	- Marten fixed a bug in lighter2 whereby lights through portals wouldn't
+	  work at all.
+4-Jan-2008
+	- Vincent fixed a crasher in csbench: PerformShaderTest() still queried
+	  iThingState for walls mesh after CreateRoom() was changed to use
+	  genmesh.
+	- caedes added a macro called CALLBACK_INTERFACE_HDR to python swig
+	  files to help in declaring director classes for scf interfaces.
 2-Jan-2008
 	- ronsaldo made the c# bindings CLS compliant.
 	- ronsaldo adapted the c# SimpleRoom example into the new version of the
@@ -108,7 +338,7 @@ chronological order.
 21-Dec-2007
 	- Jorrit added a -RenderLoop option to viewmesh so that you
 	  can use another renderloop. Just as:
-		viewmesh -RenderLoop=diffuse ...
+	    viewmesh -RenderLoop=diffuse ...
 	- Jorrit extended viewmesh so that it also loads the light,
 	  light_bumpmap, ambient, reflectsphere, parallax,
 	  light_spec_bumpmap, and parallaxAtt shaders.
@@ -126,12 +356,14 @@ chronological order.
 19-Dec-2007
 	- caedes added castle-tex.zip to install targets.
 18-Dec-2007
-	- Marten reverted the proxtexture implementation and related changes 
-	  meaning major parts of r28319, r28276, r28223, r28203, r28168,
-	  r28103 and r28097.
 	- Jorrit relaxed the rule on disabling VBO in gldrivers.xml. For
 	  the very first time version 2.1.7059 of the ATI drivers on Linux
 	  manages to get VBO right (and a lot of other things)!
+        - Mike Gist made a few changes to proxy textures; altered some argument
+          names, added some documentation for them and made proxy textures
+          be completely optional (and not the default). You now need to specify
+          when loading a map/library whether or not you want to use them.
+        - Save alphaType, keep_image and keycolour data in proxy textures.
 17-Dec-2007
 	- Marten removed the mutex locks in event queue and object registry.
 	  They indicated a thread safety where there actually is none and only
@@ -645,6 +877,14 @@ chronological order.
 	      tree potentially change the parent of that specific node, but
 	      the cached value was not updated. Fixed as well.
 	    - In one instance a statement was just transcribed plain wrong.
+	- res added CS::Utility::GenericResourceCache. This helps with the
+	  somewhat common issues that some resources used while rendering
+	  should be reused next frame, however, the desired resources have
+	  different attributes. Also, resources shouldn't be just piled up
+	  but unneeded ones should be released after some time. The generic
+	  resource cache deals with that while allowing for necessary 
+	  behaviour customization (e.g. only return a resource that satisfies
+	  some constraint).
 29-Oct-2007
 	- ronsaldo added some operators to the 2d and 3d vectors in the c#
 	  bindings, and fixed somes issues with the CS module generations.
@@ -1297,6 +1537,8 @@ chronological order.
 	  (that is, they're dynamically loaded, allowing graceful handling
 	  of inavailability).
 	- res changed the xwindow plugin to have the Xaw library relayed.
+	- res made the GL framebuffer render-to-texture support work slightly
+	  better with textures larger than the framebuffer.
 15-Sep-2007
 	- caedes added swig module post files for java and perl.
 	- res fixed a crash in the GL driver DB when <comparever> was used
@@ -1561,6 +1803,10 @@ chronological order.
 	  This prevented decals from working on levels treated with
 	  lighter2.
 	- Jorrit fixed a crash bug in lighter2.
+	- res fixed cubemap support in the gl3d fbo render-to-texture path.
+15-Aug-2007
+	- res made the gl3d texture blit and render to texture stuff use
+	  glGenerateMipmap, if available,
 14-Aug-2007
 	- Jorrit added iEngine->CreateGenMesh() and
 	  iEngine->CreateGenMeshFactory() (alternative to the current

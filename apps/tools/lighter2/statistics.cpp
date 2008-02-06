@@ -36,9 +36,7 @@ namespace lighter
   void Statistics::Progress::SetProgress (float progress, const char* task)
   {
     this->progress = progress;
-    /*globalStats.progress.SetProgress (taskName, 
-      subProgressStart + progress * subProgressAmount,
-      progress);*/
+
     if (parent != 0)
     {
       csString displayTask (taskName);
@@ -80,9 +78,7 @@ namespace lighter
 
   void Statistics::Progress::SetTaskName (const char* taskName)
   {
-    this->taskName = taskName;
-    //SetProgress (progress);
-    //globalStats.progress.SetTaskName (this->taskName);
+    this->taskName = taskName;    
   }
 
   Statistics::Progress* Statistics::Progress::CreateProgress (float amount, 

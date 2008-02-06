@@ -17,4 +17,3 @@ INLINE_FUNCTIONS
 
 %include "bindings/common/imesh.i"
 #endif //_SW_IMESH_I_
-

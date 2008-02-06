@@ -47,7 +47,23 @@ namespace Threading
 
     inline static void* Set (void** target, void* value)
     {
+#if CS_PROCESSOR_SIZE == 32
       return (void*)Set ((int32*)target, (int32)value);
+#elif CS_PROCESSOR_SIZE == 64
+      __asm__ __volatile__
+        (
+        "       lwsync \n"
+        "1:     ldarx   %0,0,%2 \n"
+        "       dcbt     0,%2 \n"
+        "       stdcx.  %3,0,%2 \n"
+        "       bne-    1b\n"
+        "       isync \n"
+        : "=&r" (value), "=m" (*(unsigned int *)target)
+        : "r" (target), "r" (value), "m" (*(unsigned int *)target)
+        : "cc", "memory"
+        );
+      return value;
+#endif
     }
 
     inline static int32 CompareAndSet (int32* target, int32 value,
@@ -74,8 +90,27 @@ namespace Threading
     inline static void* CompareAndSet (void** target, void* value,
       void* comparand)
     {
+#if CS_PROCESSOR_SIZE == 32
       return (void*)CompareAndSet ((int32*)target, (int32)value, 
         (int32)comparand);
+#elif CS_PROCESSOR_SIZE == 64
+      void* prev;
+
+      __asm__ __volatile__ (
+        "       lwsync \n"
+        "1:     ldarx   %0,0,%2\n"
+        "       cmpd    0,%0,%3\n"
+        "       bne-    2f\n"
+        "       dcbt     0,%2 \n"
+        "       stdcx.  %4,0,%2\n"
+        "       bne-    1b\n"
+        "       isync     \n"
+        "2:"
+        : "=&r" (prev), "=m" (*target)
+        : "r" (target), "r" (comparand), "r" (value), "m" (*target)
+        : "cc", "memory");
+      return prev;
+#endif
     }
 
     inline static int32 Increment (int32* target, int32 incr = 1)

@@ -46,14 +46,17 @@ struct iJob : public virtual iBase
  */
 struct iJobQueue : public virtual iBase
 {
-  SCF_INTERFACE(iJobQueue, 2,0,0);
+  SCF_INTERFACE(iJobQueue, 2,1,0);
+  
   /// Add a job to the queue.
   virtual void Enqueue (iJob* job) = 0;
+  
   /**
    * Check if a job is still in the queue. If yes, remove it from the queue
    * and run it immediately.
    */
   virtual void PullAndRun (iJob* job) = 0;
+  
   /**
    * Remove a job from the queue.
    * If the job is currently running and \a waitIfCurrent is true, wait until
@@ -61,6 +64,11 @@ struct iJobQueue : public virtual iBase
    * reference to the job object.
    */
   virtual void Unqueue (iJob* job, bool waitIfCurrent = true) = 0;
+
+  /**
+   * Return true if all enqueued jobs are finished.
+   */
+  virtual bool IsFinished () = 0;
 };
 
 #endif // __CS_IUTIL_JOB_H__

@@ -13,3 +13,4 @@ INLINE_FUNCTIONS
 
 %include "bindings/common/ivaria.i"
 #endif //_IVARIA_I_
+

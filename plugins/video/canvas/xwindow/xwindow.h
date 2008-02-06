@@ -77,6 +77,8 @@ class csXWindow :
   /// Dimensions
   int wm_width, wm_height;
 
+  XEvent storedEvent;
+
   // "WM_DELETE_WINDOW" atom
   Atom wm_delete_window;
 
@@ -124,6 +126,8 @@ public:
   virtual void SetTitle (const char* title);
   virtual void SetCanvas (iGraphics2D *canvas);
 
+  virtual XEvent GetStoredEvent()
+  { return storedEvent; }
   virtual Display *GetDisplay ()
   { return dpy; }
   virtual int GetScreen ()

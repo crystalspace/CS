@@ -20,4 +20,3 @@ INLINE_FUNCTIONS
 %include "bindings/common/iengine.i"
 
 #endif //_SW_IENGINE_I_
-

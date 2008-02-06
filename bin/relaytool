@@ -457,7 +457,7 @@ while (( i <= $# )); do
     a="${!i}"
     
     if [ "${a:0:2}" == "-L" ]; then
-        searchpath[${#searchpath}]="${a:2}"
+        searchpath[${#searchpath[@]}]="${a:2}"
         echo -n "$a " # copy to stdout
 
     elif [ "$a" == "--replace-all-libs" ]; then
@@ -531,7 +531,8 @@ while (( i <= $# )); do
                         stubobj=$( echo "$stubfile" | sed 's/\.c$/\.o/' )
 			# remove -include flags from CFLAGS, if any
 			CFLAGS=$( echo $CFLAGS | sed 's/-include .*\.h//g' )
-                        ${CC:-gcc} ${CFLAGS} -fPIC -DPIC -c -o "$stubobj" "$stubfile" 2>/dev/tty
+                        # ${CC:-gcc} ${CFLAGS} -fPIC -DPIC -c -o "$stubobj" "$stubfile" 2>/dev/tty
+			${CC:-gcc} ${CFLAGS} -fPIC -DPIC -c -o "$stubobj" "$stubfile"
                         echo -n "$stubobj "
                     fi
 
@@ -565,7 +566,8 @@ while (( i <= $# )); do
                         stubobj=$( echo "$stubfile" | sed 's/\.c$/\.o/' )
 			# remove -include flags from CFLAGS, if any
 			CFLAGS=$( echo $CFLAGS | sed 's/-include .*\.h//g' )
-                        ${CC:-gcc} ${CFLAGS} -fPIC -DPIC -c -o "$stubobj" "$stubfile" 2>/dev/tty
+                        # ${CC:-gcc} ${CFLAGS} -fPIC -DPIC -c -o "$stubobj" "$stubfile" 2>/dev/tty
+			${CC:-gcc} ${CFLAGS} -fPIC -DPIC -c -o "$stubobj" "$stubfile"
                         echo -n "$stubobj "
                     fi
 

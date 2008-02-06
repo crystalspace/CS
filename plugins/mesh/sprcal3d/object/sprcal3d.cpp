@@ -716,7 +716,9 @@ void csCal3dSkeletonFactory::SetSkeleton (CalCoreModel *model)
   std::vector<CalCoreBone*> bvect = core_skeleton->getVectorCoreBone ();
   for (size_t i = 0; i < bvect.size (); i++)
   {
-    bones_factories.Push (new csCal3dSkeletonBoneFactory (bvect[i], this));
+    csRef<csCal3dSkeletonBoneFactory> newFact;
+    newFact.AttachNew (new csCal3dSkeletonBoneFactory (bvect[i], this));
+    bones_factories.Push (newFact);
   }
 
   //now we can setup parents and childres
@@ -761,6 +763,17 @@ iSkeletonAnimation *csCal3dSkeletonFactory::FindAnimation (const char *name)
     return animations[idx];
   return 0;
 }
+
+iSkeletonBoneFactory* csCal3dSkeletonFactory::GetBone (size_t i)
+{ 
+  return bones_factories[i];
+}
+
+iSkeletonAnimation* csCal3dSkeletonFactory::GetAnimation (size_t idx)
+{ 
+  return animations[idx];
+}
+
 //---------------------------csCal3dSkeletonBoneFactory---------------------------
 
 csCal3dSkeletonBoneFactory::csCal3dSkeletonBoneFactory (CalCoreBone *core_bone,
@@ -864,11 +877,15 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
   // set the material set of the whole model
   vis_cb = 0;
   is_idling = false;
+  idle_override_interval = 0;
 
   meshVersion = 0;
   bboxVersion = (uint)-1;
   default_idle_anim = -1;
+  idle_action = -1;
   last_locked_anim = -1;
+
+  cyclic_blend_factor = 0.0f;
 
   do_update = -1;
   updateanim_sqdistance1 = 10*10;
@@ -1609,10 +1626,11 @@ bool csSpriteCal3DMeshObject::Advance (csTicks current_time)
   if (is_idling) // check for override and play if time
   {
     idle_override_interval -= delta;
-    if (idle_override_interval <= 0)
+    if ((idle_override_interval <= 0) && (default_idle_anim != -1))
     {
+      csRandomGen rng;
+      SetIdleOverrides(&rng,default_idle_anim);
       SetAnimAction(factory->anims[idle_action]->name,.25,.25);
-      idle_override_interval = 20;
     }
   }
   meshVersion++;
@@ -1659,7 +1677,9 @@ int csSpriteCal3DMeshObject::FindAnim(const char *name)
 void csSpriteCal3DMeshObject::ClearAllAnims()
 {
   while (active_anims.GetSize ())
-    ClearAnimCyclePos ((int)(active_anims.GetSize () - 1), 0);
+  {
+    ClearAnimCyclePos ((int)(active_anims.GetSize () - 1), cyclic_blend_factor);
+  }
 
   if (last_locked_anim != -1)
   {
@@ -1672,13 +1692,13 @@ void csSpriteCal3DMeshObject::ClearAllAnims()
 bool csSpriteCal3DMeshObject::SetAnimCycle(const char *name, float weight)
 {
   ClearAllAnims();
-  return AddAnimCycle(name, weight, 0);
+  return AddAnimCycle(name, weight, cyclic_blend_factor);
 }
 
 bool csSpriteCal3DMeshObject::SetAnimCycle(int idx, float weight)
 {
   ClearAllAnims();
-  return AddAnimCycle(idx, weight, 0);
+  return AddAnimCycle(idx, weight, cyclic_blend_factor);
 }
 
 bool csSpriteCal3DMeshObject::AddAnimCycle(const char *name, float weight,
@@ -1810,8 +1830,6 @@ void csSpriteCal3DMeshObject::SetIdleOverrides(csRandomGen *rng,int which)
 {
   csCal3DAnimation *anim = factory->anims[which];
 
-  is_idling = true;
-
   // Determine interval till next override.
   idle_override_interval = rng->Get(anim->max_interval - anim->min_interval)
     + anim->min_interval;
@@ -1836,6 +1854,12 @@ void csSpriteCal3DMeshObject::SetIdleOverrides(csRandomGen *rng,int which)
 void csSpriteCal3DMeshObject::SetDefaultIdleAnim(const char *name)
 {
     default_idle_anim = FindAnim(name);
+    if( default_idle_anim != -1 )
+    {
+      float max_interval(factory->anims[default_idle_anim]->max_interval);
+      if(idle_override_interval > max_interval)
+        idle_override_interval = max_interval;
+    }
 }
 
 bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
@@ -1845,6 +1869,7 @@ bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
   ClearAllAnims();
   if (!vel)
   {
+    is_idling = true;
     SetTimeFactor(1);
     if (default_idle_anim != -1)
     {
@@ -1857,9 +1882,10 @@ bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
     {
       if (factory->anims[i]->type == iSpriteCal3DState::C3D_ANIM_TYPE_IDLE)
       {
+        default_idle_anim = i;
         AddAnimCycle(i,1,0);
-    if (rng)
-      SetIdleOverrides(rng,i);
+        if (rng)
+          SetIdleOverrides(rng,i);
         return true;
       }
     }
@@ -1877,6 +1903,21 @@ bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
   }
 
   is_idling = false;
+
+  // Remove idle-animation that should not be played while moving too fast:
+  if( idle_action != -1)
+  {
+    /* Default value for max_vel is 0 if it is not set in the cal3d file.
+       Ideally, we would just test for (max_vel < vel). However, this would
+       break expected behaviour for old .cal3d files, and hence require
+       additional explanation. */
+    if((factory->anims[idle_action]->max_velocity) && (factory->anims[idle_action]->max_velocity < vel))
+    {
+      calModel.getMixer()->removeAction(idle_action);
+      idle_action = -1;
+    }
+  }
+
   // first look for animations with a base velocity that exactly matches
   bool found_match = false;
   for (i=0; i<count; i++)
@@ -2205,6 +2246,11 @@ void csSpriteCal3DMeshObject::SetTimeFactor(float timeFactor)
 float csSpriteCal3DMeshObject::GetTimeFactor()
 {
   return calModel.getMixer()->getTimeFactor();
+}
+
+void csSpriteCal3DMeshObject::SetCyclicBlendFactor(float factor)
+{
+  cyclic_blend_factor = factor;
 }
 
 iShaderVariableContext* csSpriteCal3DMeshObject::GetCoreMeshShaderVarContext (

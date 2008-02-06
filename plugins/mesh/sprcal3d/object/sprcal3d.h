@@ -419,6 +419,7 @@ private:
   int  default_idle_anim,last_locked_anim;
   float idle_override_interval;
   int   idle_action;
+  float cyclic_blend_factor;
 
   csRef<csCal3dSkeleton> skeleton;
 
@@ -688,6 +689,7 @@ public:
   void SetLOD(float lod);
   void SetTimeFactor(float timeFactor);
   float GetTimeFactor();
+  void SetCyclicBlendFactor(float factor);
 
   bool AttachCoreMesh(const char *meshname);
 
@@ -812,7 +814,7 @@ public:
   iSkeletonBoneFactory *FindBone (const char *name);
   size_t FindBoneIndex (const char *name);
   size_t GetBonesCount () const {return bones_factories.GetSize ();}
-  iSkeletonBoneFactory *GetBone (size_t i) {return (iSkeletonBoneFactory*)bones_factories[i];}
+  iSkeletonBoneFactory *GetBone (size_t i);
   iSkeletonGraveyard *GetGraveyard  () {return 0;}
   iSkeletonSocketFactory *CreateSocket(const char *name, iSkeletonBoneFactory *bone) {return 0;}
   iSkeletonSocketFactory *FindSocket(const char *name) {return 0;}
@@ -820,7 +822,7 @@ public:
   void RemoveSocket (int i) {;}
   size_t GetSocketsCount () {return 0;}   
   size_t GetAnimationsCount () {return animations.GetSize ();}
-  iSkeletonAnimation *GetAnimation (size_t idx) {return (iSkeletonAnimation *)animations[idx];}
+  iSkeletonAnimation *GetAnimation (size_t idx);
   /** @} */
 };
 

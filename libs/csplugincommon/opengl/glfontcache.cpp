@@ -125,7 +125,7 @@ void csGLFontCache::Setup()
       textMethod = 1;
     else
       textMethod = 2;
-    static const char* textMethodStr[4] =
+    static const char* const textMethodStr[4] =
       {"Multitexturing",
        "GL_BLEND texenv with GL_INTENSITY texture",
        "GL_MODULATE, two-pass",
@@ -529,7 +529,7 @@ void csGLFontCache::FlushArrays ()
     statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     statecache->Enable_GL_BLEND ();
 
-    static float envTransparent[4] = {1.0f, 1.0f, 1.0f, 0.0f};
+    static const float envTransparent[4] = {1.0f, 1.0f, 1.0f, 0.0f};
     if (afpText)
       G2D->ext.glProgramLocalParameter4fvARB (GL_FRAGMENT_PROGRAM_ARB, 0, 
         envTransparent);

@@ -2666,32 +2666,6 @@ void csDynaVis::CastShadows (iFrustumView* fview)
 
 csPtr<iString> csDynaVis::UnitTest ()
 {
-  csKDTree* kdtree = new csKDTree ();
-  csRef<iDebugHelper> dbghelp (scfQueryInterface<iDebugHelper> (kdtree));
-  if (dbghelp)
-  {
-    csRef<iString> rc (dbghelp->UnitTest ());
-    if (rc)
-    {
-      kdtree->DecRef();
-      return csPtr<iString> (rc);
-    }
-  }
-  kdtree->DecRef();
-
-  csTiledCoverageBuffer* tcovbuf = new csTiledCoverageBuffer (640, 480);
-  dbghelp = scfQueryInterface<iDebugHelper> (tcovbuf);
-  if (dbghelp)
-  {
-    csRef<iString> rc (dbghelp->UnitTest ());
-    if (rc)
-    {
-      tcovbuf->DecRef();
-      return csPtr<iString> (rc);
-    }
-  }
-  tcovbuf->DecRef();
-
   return 0;
 }
 

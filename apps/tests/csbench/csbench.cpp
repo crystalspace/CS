@@ -477,14 +477,12 @@ void CsBench::PerformShaderTest (const char* shaderPath, const char* shtype,
 
   csRef<iShaderPriorityList> prilist = shcom->GetPriorities (shadernode);
   size_t i;
-  iMaterialWrapper* oldmat = material;
+
   //csRef<iMeshWrapper> walls (engine->FindMeshObject ("walls"));
   //csRef<iMeshWrapper> walls (
     //view->GetCamera()->GetSector()->GetMeshes()->FindByName ("walls"));
   csRef<iMeshWrapper> walls (engine->FindMeshObject (
     view->GetCamera()->GetSector()->QueryObject()->GetName()));
-  csRef<iThingState> ws =
-    scfQueryInterface<iThingState> (walls->GetMeshObject ());
   for (i = 0 ; i < prilist->GetCount () ; i++)
   {
     int pri = prilist->GetPriority (i);
@@ -504,7 +502,7 @@ void CsBench::PerformShaderTest (const char* shaderPath, const char* shtype,
       iMaterialWrapper* mat = engine->GetMaterialList ()->NewMaterial (
       	matinput, 0);
       mesh->SetMaterialWrapper (mat);
-      ws->ReplaceMaterial (oldmat, mat);
+      walls->GetMeshObject ()->SetMaterialWrapper (mat);
 
       csString name;
       name.Format ("%s_%d", shader->QueryObject()->GetName(), pri);
@@ -512,7 +510,6 @@ void CsBench::PerformShaderTest (const char* shaderPath, const char* shtype,
       description.Format ("Shader %s with priority %d", 
 	shader->QueryObject()->GetName(), pri);
       BenchMark (name, description, CSDRAW_CLEARZBUFFER);
-      ws->ClearReplacedMaterials();
     }
   }
 }

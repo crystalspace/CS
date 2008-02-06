@@ -250,9 +250,10 @@ namespace lighter
     SetColor (parent->GetColor ());
     SetLightID ((const char*)parent->GetLightID ().data);
     lightFrustum = frustum;
+    boundingSphere = transform.Other2This (parentLight->GetBoundingSphere ());
 
     csPlane3 bp (portalPlane);
-    bp.DD -= bp.norm * lightFrustum.GetOrigin ();
+    bp.DD += bp.norm * lightFrustum.GetOrigin ();
     bp.Invert ();
     lightFrustum.SetBackPlane (bp);
   }
