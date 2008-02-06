@@ -1,0 +1,35 @@
+<library>
+  <plugins>
+    <plugin name="armaturefact">crystalspace.mesh.loader.factory.armature</plugin>
+    <plugin name="genmesh">crystalspace.mesh.loader.genmesh</plugin>
+    <plugin name="genmeshfact">crystalspace.mesh.loader.factory.genmesh</plugin>
+  </plugins>
+  <shaders>
+    <!--<shader>
+      <file>/shader/character/std_character2.xml</file>
+    </shader>-->
+    <shader><file>/shader/character/std_character2.xml</file></shader>
+    <shader><file>/shader/character/character2.xml</file></shader>
+    <shader><file>/shader/character/character_bump2.xml</file></shader>
+  </shaders>
+  <textures>
+    <texture name="kirchdorfer.jpg">
+      <file>textures/kirchdorfer.jpg</file>
+    </texture>
+  </textures>
+  <materials>
+    <!--<material name="skelmat_kirchdorfer.jpg">
+      <texture>kirchdorfer.jpg</texture>
+      <shader type="standard">std_character2</shader>
+    </material>-->
+	<material name="skelmat_kirchdorfer.jpg">
+		<texture>kirchdorfer.jpg</texture>
+		<shadervar name="tex normal" type="texture">/lib/standard/normalmap.png</shadervar>
+		<shadervar name="specular" type="vector4">0.3, 0.3, 0.3, 0</shadervar>
+		<shader type="standard">std_character2</shader>
+		<shader type="ambient">character2</shader>
+		<shader type="diffuse">character_bump2</shader>
+	</material>
+  </materials>
+  <library>factories/genkirchdorfer</library>
+</library>
