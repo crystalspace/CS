@@ -1,0 +1,355 @@
+@c -*-texinfo-*-
+@node Console General, Console Boolean, Console, Console
+@subsubsection General commands
+
+General commands, in contrast to other commands, DO something instead of
+changing a variable. How the argument is interpreted depends on the command.
+
+The following general commands are available:
+
+@table @code
+@item quit
+Terminate the application.
+
+@item help
+Give a short list of all commands.
+
+@item activate
+Activate the object that is right in front of you (@emph{obsolete}).
+
+@item action
+Activate the object that is right in front of you. This command
+will use the WalkTest entity system. Currently it only works for
+opening doors that use the cmd_Door key.
+
+@item perftest
+Run a performance test on the current position.
+The default number of runs is 100 but you can change it
+with an optional argument.
+
+@item coordsave
+Save the current position to the @file{coord} file.
+
+@item coordload
+Restore the position from the @file{coord} file. Note that the position
+will always be restored but the orientation of the camera will only be
+restored if @samp{move3d} is set.
+
+@item hi
+Hilight the named polygon in the current sector. If the polygon is not
+found hilighting is disabled. This command is useful for debugging.
+
+@item exec
+Start a script containing console commands. Every line in this script is
+performed one line at a time at every new frame. The console automatically
+closes after executing a successful @samp{exec} command.
+
+@item coordset
+Set the coordinate of the camera to the given sector and location. Example:
+@samp{coordset room,0,0,0} to restore the position of the camera to the
+starting point.
+
+@item cls
+Clear all messages from the console window.
+
+@item facenorth
+Face the camera to the north.
+
+@item facesouth
+Face the camera to the south.
+
+@item facewest
+Face the camera to the west.
+
+@item faceeast
+Face the camera to the east.
+
+@item facedown
+Face the camera down.
+
+@item faceup
+Face the camera up.
+
+@item cmessage
+Write the specified message to the console.
+
+@item dmessage
+Write the specified message to @file{debug.txt}.
+
+@item dnl
+Write a newline to @file{debug.txt}.
+
+@item version
+Write the current version to the console.
+
+@item about
+Write the current version to the console in a more verbose format.
+
+@item addlight
+Add a dynamic light at the position of the camera. With no arguments the
+color of this dynamic light will be random and the light will move up and
+down slightly. But you can also say @samp{addlight r,g,b,radius,st} for a
+more controlled light. The @samp{st} flag can be 0 or 1. If 1 things will
+also cast shadows.
+
+@item dellight
+Delete the last added dynamic light.
+
+@item dellights
+Delete all dynamic lights.
+
+@item picklight
+@emph{Broken}.
+
+@item droplight
+@emph{Broken}.
+
+@item fire
+Fire a missile in the direction that you are looking. The missile will
+explode when it hits a wall.
+
+@item debug1
+Debug command. The function of this command is undefined but it serves as a
+place-holder for some debugging functionality. A particular version of
+Crystal Space may assign some action to this command but another version
+may remove this action again.
+
+@item debug2
+Debug command. The function of this command is undefined but it serves as a
+place-holder for some debugging functionality. A particular version of
+Crystal Space may assign some action to this command but another version
+may remove this action again.
+
+@item extension
+Perform the specified system specific extension.  Currently the X11 port is
+the only port that has extensions (@samp{sim_pal}, @samp{sim_grey}, and
+@samp{sim_332}).  They are used when simulating 15/16-bit display mode on a
+8-bit display.
+
+@item bind
+Bind a key to a command.  The given key can be anything like @key{alt-c},
+@key{shift-pgdn}, @key{home}, @key{ctrl-space}, @dots{}.  The command can be
+anything that you can execute in the console.  If you only give a key this
+command will show the current command that is bound to that key.  If you give
+no parameters then all current key-bindings will be listed.  Note that if you
+bind a key which has already been bound then the old key-binding will be
+removed.
+
+@item snd_play @var{file}
+Play the given @file{@var{file}.wav} file (currently only has effect on
+Windows) as an @dfn{ephemeral} sound.
+
+@item s_fog
+If no arguments are given this command will show the fog settings for the
+current sector. Otherwise you can set the fog level for this sector. Syntax
+is @samp{s_fog r,g,b,density}.
+
+@item turn
+Turn around (so that the camera looks the other way). This command only
+works if @samp{move3d} is enabled.
+
+@item jump
+Jump upwards. Only works if the gravity system is enabled.
+
+@item step_forward
+Move forwards. Uses gravity system if @samp{move3d} is disabled.
+
+@item step_backward
+Move backwards. Uses gravity system if @samp{move3d} is disabled.
+
+@item strafe_left
+Move left. Uses gravity system if @samp{move3d} is disabled.
+
+@item strafe_right
+Move right. Uses gravity system if @samp{move3d} is disabled.
+
+@item look_up
+Look up. Uses gravity system if @samp{move3d} is disabled.
+
+@item look_down
+Look down. Uses gravity system if @samp{move3d} is disabled.
+
+@item rotate_left
+Rotate player left. Uses gravity system if @samp{move3d} is disabled.
+
+@item rotate_right
+Rotate player right. Uses gravity system if @samp{move3d} is disabled.
+
+@item i_forward @var{slow},@var{fast}
+@itemx i_backward @var{slow},@var{fast}
+@itemx i_left @var{slow},@var{fast}
+@itemx i_right @var{slow},@var{fast}
+@itemx i_up @var{slow},@var{fast}
+@itemx i_down @var{slow},@var{fast}
+Move.  The first argument is 0 or 1.  If 1 we will move @emph{very} slowly
+(for debugging).  The second argument is 0 or 1.  If 1 we will move very fast.
+This command only works if @samp{move3d} is enabled.
+
+@item i_rotleftc @var{slow},@var{fast}
+@itemx i_rotleftw @var{slow},@var{fast}
+@itemx i_rotrightc @var{slow},@var{fast}
+@itemx i_rotrightw @var{slow},@var{fast}
+Rotate left or right.  The @samp{c} versions rotate along the camera axis.
+The @samp{w} version along the world axis.  The first argument is 0 or 1.  If
+1 we will move @emph{very} slowly (for debugging).  The second argument is 0
+or 1.  If 1 we will move very fast.  This command only works if @samp{move3d}
+is enabled.
+
+@item i_rotleftx @var{slow},@var{fast}
+@itemx i_rotleftz @var{slow},@var{fast}
+@itemx i_rotrightx @var{slow},@var{fast}
+@itemx i_rotrightz @var{slow},@var{fast}
+Rotate the camera. The first argument is 0 or 1. If 1 we will move @emph{very}
+slowly (for debugging). The second argument is 0 or 1. If 1 we will move very
+fast. This command only works if @samp{move3d} is enabled.
+
+@item addbot
+Add a sprite that moves randomly through the map.
+
+@item delbot
+Remove the last added bot.
+
+@item loadmesh @var{file},@var{template},@var{texture}
+Load a mesh from a model file (currently @sc{3ds} version 3 and @sc{md2} are
+supported) and add it as a mesh factory.  Later you can use
+@samp{addmesh} to really add the mesh visually.  Parameters are
+@var{file}, @var{template}, @var{texture}.  The texture should be one which is
+already loaded in memory.  This is a current limitation.  The filename
+represents a file within the @sc{vfs} directory hierarchy.
+
+@item addmesh @var{sname},@var{tname},@var{size}
+Add a mesh from a factory already in memory.  @var{sname} is the name of
+the mesh.  @var{tname} is the name of a mesh factory which has to be
+loaded in memory (either from @file{standard.zip} or from the level).  The
+@var{size} is a scale factor for the mesh.  The mesh is put at the current
+location.
+
+@item delmesh @var{name}
+Delete a mesh from the world with the given name.
+
+@item listactions @var{name}
+Lists the actions of a sprite.  @var{name} is the name of the sprite for which
+you want to list the actions.
+
+@item setaction @var{spritename},@var{action}
+Sets the action of the specified sprite.  @var{spritename} is the name of the
+sprite which you want to list the actions of.  @var{action} is the name of the
+action which you want the sprite to use.
+
+@item listmeshes
+Lists all of the mesh objects in the world.
+
+@item rain @var{texture},@var{nparticles},@var{speed}
+Add a particle system simulating rain.  The three parameter for this command
+are the texture to use for the particles (@file{raindrop.png} is good), the
+number of particles and the speed (in meter per second).  The default number
+of particles is 500 and the default speed is 2.  All parameters are optional.
+
+@item snow @var{texture},@var{nparticles},@var{speed}
+Add a particle system simulating rain.  The three parameter for this command
+are the texture to use for the particles (@file{snow.jpg} is good), the number
+of particles and the speed (in meter per second).  The default number of
+particles is 500 and the default speed is 0.3.  All parameters are optional.
+
+@item fountain @var{texture},@var{nparticles}
+Add a particle system simulating a fountain.  The two parameter for this
+command are the texture to use for the particles and the number of particles.
+The default number of particles is 50.
+
+@item flame @var{texture},@var{nparticles}
+Add a particle system simulating a flame.  The two parameter for this command
+are the texture to use for the particles and the number of particles.  The
+default number of particles is 50.
+
+@item explosion @var{texture}
+Add a particle system simulating an explosion.  The parameter for this command
+is the texture to use for the particles.
+
+@item spiral @var{texture}
+Add a particle system simulating an spiral.  The parameter for this command is
+the texture to use for the particles.  Experimental!
+
+@item portal @var{level}
+Create a new region with the given name and load the same named level
+into that region. Then create a portal on the spot you are standing to
+the start position of the new level and back.
+
+@item fs_inter @var{amount},@var{length}
+Toggle a fullscreen interference mode.
+
+@item fs_red
+Toggle a fullscreen fade-to-red effect.
+
+@item fs_green
+Toggle a fullscreen fade-to-green effect.
+
+@item fs_blue
+Toggle a fullscreen fade-to-blue effect.
+
+@item fs_whiteout
+Toggle a fullscreen fade-to-white effect.
+
+@item fs_fadecol @var{r},@var{g},@var{b}
+Toggle a fullscreen fade-to-color effect.
+
+@item fs_fadetxt @var{material}
+Toggle a fullscreen fade-to-material effect. The material should be
+the name of a loaded material (use 'spark' for a good example).
+
+@item fs_shadevert @var{topr},@var{topg},@var{topb},@var{botr},@var{botg},@var{botb}
+Toggle a fullscreen shading effect which is added to the 3D view using
+add-blending-mode.
+
+@item clrlights
+Clear all pseudo-dynamic lights in the world to black.
+
+@item setlight @var{r},@var{g},@var{b}
+Set the color for the selected pseudo-dynamic light to @var{r}, @var{g},
+@var{b}.
+
+@item record
+Start/stop recording camera movement. If you have a previous recording in
+memory then a the new camera movements will be appended.
+
+@item clrrec
+Clear a recording.
+
+@item loadrec @var{file}
+Load a recording from @sc{vfs} path @file{/tmp/@var{file}} where @var{file}
+is the argument specified with the @samp{loadrec} command.  If @var{file} is
+not specified, then it looks for a file named @file{/tmp/record}.  Note that
+a recording is only valid when played in the same (or @emph{very} similar)
+world.
+
+@item saverec @var{file}
+Save a recording to @sc{vfs} path @file{/tmp/@var{file}} where @var{file} is
+the argument specified with the @samp{saverec} command.  If @var{file} is not
+specified then the recording is saved with the name @file{/tmp/record}.
+
+@item play
+Play a recording loaded with @samp{loadrec} (if there is one).  Note that a
+recording is only valid when played in the same (or @emph{very} similar)
+level.
+
+@item play @var{file}
+This outputs summary statistics for the demo played to @file{@var{file}.rps}.
+The @file{.rps} extension stands for @dfn{Recorded Performance Statistics}.
+
+@item play res, @var{x}, @var{file}
+The @samp{res} option stands for @dfn{resolution} and tells WalkTest to record
+statistics every @var{x} frames and output the summary to
+@file{@var{file}.rps}.
+
+@item play break, @var{x}
+The @samp{break} option, when WalkTest is compiled in debug mode, will trip
+off a signal trap frame number @var{x}.  This is useful once you take note of
+the frame number of something interesting in an @file{.rps} file.
+
+@item recsubperf @var{file}
+Once a recording has begun this command is used to record the statistics of a
+subsection of the demo and is reported as such in the output
+@file{@var{file}.rps} when played back.  To finish the subsection call the
+command again without an argument.  @samp{recsubperf} stands for @dfn{record
+subsection performance}.
+
+@end table

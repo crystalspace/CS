@@ -1,0 +1,11 @@
+SubDir TOP plugins mesh terrain persist standard ;
+
+Description terrainldr : "CLOD Terrain object loader" ;
+
+Plugin terrainldr
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith terrainldr : crystalspace ;
+
+CompileGroups terrainldr :  meshes ;
+

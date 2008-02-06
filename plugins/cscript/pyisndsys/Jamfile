@@ -1,0 +1,6 @@
+SubDir TOP plugins cscript pyisndsys ;
+
+if $(PYTHON.AVAILABLE) = "yes"
+{
+  PyBindingModule isndsysmod : isndsys : isndsysmod.cpp : : : "isndsys cs Python module" ;
+}

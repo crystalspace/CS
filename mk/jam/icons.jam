@@ -1,0 +1,177 @@
+if $(CMD.RSVG) != ""
+{
+  ## IconsFromSVG iconname
+  ##   Generate multiple PNG images suitable for icon use from an SVG file.
+  ##   The source SVG file is expected to have the name 
+  ##   icons-src/scalable/<iconname>.svg. The result files are named
+  ##   the icons/<size>/<iconname>.png for multiple common icon sizes as
+  ##   'size'.
+  ##   Images for certain sizes can be specified as 
+  ##   icons-src/<size>/<iconname>.png files; these are preferred over the
+  ##   automatically generated ones.
+  ##   The actual conversion is done when the "generateicons" target is
+  ##   invoked.
+  rule IconsFromSVG
+  {
+    local icon = $(1) ;
+    local iconfile = $(icon).svg ;
+    local svgscalabledir = [ ConcatDirs $(TOP) $(SUBDIR) icons-src scalable ] ;
+    local svgsource = $(iconfile:G=$(svgscalabledir)) ;
+    LOCATE on $(svgsource) = $(svgscalabledir) ;
+    SEARCH on $(svgsource) = $(svgscalabledir) ;
+    
+    NotFile generateicons ;
+    
+    local size ;
+    # Icon sizes to generate/use:
+    # 16 - Windows small icon (Window menu, start menu)
+    # 22 - Small icon for KDE and GNOME menus
+    # 24 - Small icon for GNOME file lists(*)
+    # 32 - Normal icon for Windows
+    # 48 - Large icon for Windows XP
+    # 128 - MacOS/X, some Windows Explorer alternatives use that(**)
+    # 256 - Windows Vista icon(**)
+    #
+    # * - Can be generated from 22x22 pics by adding a border.
+    # ** - Cause icon files to be really large. Vista supports PNG compression
+    #      in icons and uses it for the 256x256 versions. Problem: resource
+    #      compilers don't support that yet.
+    for size in 16 22 32 48
+    {
+      local pngdir = [ ConcatDirs $(SUBDIR) icons $(size) ] ;
+      local pngfile = $(icon:G=$(pngdir)).png ;
+      MakeLocate $(pngfile) : $(pngdir) ;
+      
+      SIZE on $(pngfile) = $(size) ;
+      Depends $(pngfile) : $(svgsource) ;
+      CreateIcon $(pngfile) : $(svgsource) ;
+      
+      Depends generateicons : $(pngfile) ;
+      Always $(pngfile) ;
+    }
+    
+    # size 24 icons are a special case, see above
+    local pngdir = [ ConcatDirs $(SUBDIR) icons 24 ] ;
+    local pngfile = $(icon:G=$(pngdir)).png ;
+    if $(CMD.CONVERT) != ""
+    {
+      MakeLocate $(pngfile) : $(pngdir) ;
+      Depends $(pngfile) : $(svgsource) ;
+      CreateIcon24 $(pngfile) : $(svgsource) ;
+      
+      Depends generateicons : $(pngfile) ;
+      Always $(pngfile) ;
+    }
+    else
+    {
+      Echo "ImageMagick not available, $(pngfile) not regenerated" ;
+    }
+  }
+  
+  actions CreateIcon
+  {
+    SIZEDICONSSRC=`dirname $(>)`/../$(SIZE)
+    ICONBASE=`basename $(>) .svg`
+    if [ -e $SIZEDICONSSRC/$ICONBASE.png ] ; then
+      $(CP) $SIZEDICONSSRC/$ICONBASE.png $(<)
+    elif [ -e $SIZEDICONSSRC/$ICONBASE.svg ] ; then
+      $(CMD.RSVG) -f png -w $(SIZE) -h $(SIZE)  $SIZEDICONSSRC/$ICONBASE.svg $(<)
+    else
+      $(CMD.RSVG) -f png -w $(SIZE) -h $(SIZE)  $(>) $(<)
+    fi
+  }
+  
+  actions CreateIcon24
+  {
+    SIZEDICONSSRC=`dirname $(>)`/../24
+    ICONBASE=`basename $(>) .svg`
+    GENSIZEDICONSSRC=`dirname $(<)`/../22
+    if [ -e $SIZEDICONSSRC/$ICONBASE.png ] ; then
+      $(CP) $SIZEDICONSSRC/$ICONBASE.png $(<)
+    elif [ -e $SIZEDICONSSRC/$ICONBASE.svg ] ; then
+      $(CMD.RSVG) -f png -w 24 -h 24  $SIZEDICONSSRC/$ICONBASE.svg $(<)
+    else
+      $(CMD.CONVERT) -bordercolor Transparent -border 1x1 $GENSIZEDICONSSRC/$ICONBASE.png $(<)
+    fi
+  }
+}
+else
+{
+  rule IconsFromSVG { }
+}
+
+if $(CMD.ICOTOOL) != ""
+{
+  ## IconsMakeWin32ICO filename : iconname
+  ##   Generate a Win32 ICO file from multiple PNG images, such as those
+  ##   produced by IconsFromSVG.
+  ##   The source images are expected to have the names
+  ##   icons/<size>/<iconname>.png for multiple common icon sizes as
+  ##   'size' (currently 16, 32 and 48).
+  ##   The ICO will also include 256 color images that are generated from
+  ##   the (presumably RGBA) source PNGs and stored as 
+  ##   icons/<size>/<iconname>_8.png. 
+  ##   Color-reduced images for certain sizes can be specified as 
+  ##   icons-src/<size>/<iconname>_8.png files; these are preferred over the
+  ##   automatically reduced ones.
+  ##   The actual conversion is done when the "generateicons" target is
+  ##   invoked.
+  rule IconsMakeWin32ICO
+  { 
+    local icofile = $(1) ;
+    local icon = $(2) ;
+    
+    local size icons ;
+    for size in 16 32 48
+    {
+      local pngdir = [ ConcatDirs $(SUBDIR) icons $(size) ] ;
+      local pngtempdir = [ ConcatDirs $(BUILDTOP) out iconstmp $(SUBDIR) $(size) ] ;
+      local pngsrcdir = [ ConcatDirs $(SUBDIR) icons-src $(size) ] ;
+      local pngfile = $(icon:G=$(pngdir)).png ;
+      local lowfile = $(icon:G=$(pngtempdir))_8.png ;
+      NoCare $(pngfile) ;
+      icons += "$(pngfile)" ;
+      if $(CMD.CONVERT) != ""
+      {
+	MakeLocate $(lowfile) : $(pngtempdir) ;
+        SIZE on $(lowfile) = $(size) ;
+	
+	ReduceColorDepth $(lowfile) : $(pngfile) ;
+	Always $(lowfile) ;
+        icons += "$(lowfile)" ;
+      }
+    }
+    
+    MakeLocate $(icofile) : $(SUBDIR) ;
+    Depends $(icofile) : $(icons) ;
+    IcoTool $(icofile) : $(icons) ;
+    Depends generateicons : $(icofile) ;
+  }
+  
+  actions ReduceColorDepth
+  {
+    ICONSSRC=`dirname $(>)`/../../icons-src/$(SIZE)
+    ICONBASE=`basename $(>) .png`
+    if [ -e $ICONSSRC/\${ICONBASE}_8.png ] ; then
+      $(CP) $ICONSSRC/\${ICONBASE}_8.png $(<)
+    else
+      # Makes transparency binary and reduces colors to 256-
+      $(CMD.CONVERT) $(>) \( +clone -fx a +matte -monochrome \) -compose CopyOpacity -composite -colors 256 -dither $(<)
+    fi
+  }
+  
+  actions IcoTool
+  {
+    SOURCES=
+    for i in $(>) ; do
+      if [ -a $i ] ; then
+        SOURCES="$SOURCES $i"
+      fi
+    done
+    $(CMD.ICOTOOL) -c -o $(<) $SOURCES
+  }
+}
+else
+{
+  rule IconsMakeWin32ICO { }
+}

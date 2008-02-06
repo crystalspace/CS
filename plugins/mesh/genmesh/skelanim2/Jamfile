@@ -1,0 +1,11 @@
+SubDir TOP plugins mesh genmesh skelanim2 ;
+
+Description gmeshskelanim2: "General mesh skeletal animation 2 plugin" ;
+
+Plugin gmeshskelanim2
+	: [ Wildcard *.cpp *.h ]
+;
+Includes gmeshskelanim.h : $(SUBDIR)/gmeshskelanim.tok ;
+LinkWith gmeshskelanim2 : crystalspace ;
+
+CompileGroups gmeshskelanim2 :  meshes ;

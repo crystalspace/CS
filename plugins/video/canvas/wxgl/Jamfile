@@ -1,0 +1,13 @@
+SubDir TOP plugins video canvas wxgl ;
+
+if $(WX.AVAILABLE) = "yes" && $(GL.AVAILABLE) = "yes"
+{
+Description wxgl : "wxWidgets OpenGL 2D driver" ;
+Plugin wxgl : [ Wildcard *.c *.cc *.cpp *.C *.m *.mm *.M *.h ] ;
+LinkWith wxgl : crystalspace_opengl crystalspace ;
+CFlags wxgl :
+  $(COMPILER.C++FLAGS.STRICTALIASING.DISABLE)
+  $(COMPILER.C++FLAGS.WARNING.NO_NON_VIRTUAL_DTOR) ;
+ExternalLibs wxgl : WX GL ;
+CompileGroups wxgl : canvases openglcanvas ;
+}

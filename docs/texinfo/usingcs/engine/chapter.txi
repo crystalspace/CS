@@ -1,0 +1,33 @@
+@c -*-texinfo-*-
+@node Engine, MeshObject, Game Data, Using Crystal Space
+@section The 3D Engine
+@cindex engine
+
+Everything about the 3D Engine. The core of Crystal Space.
+
+@menu
+* World Components:: Components of a World
+* Renderloops::
+* HOWTO Render Priorities:: Render Priorities and Objects in Sectors
+* Portal Engine::
+* Cameras and Matrices::
+* HOWTO Camera Movement:: Camera Movement
+* Space Warping::
+* Visibility Culling:: Visibility Culling In Detail
+* Dynamic Worlds::
+* Level of Detail::
+* Decals::
+@end menu
+
+@importss{usingcs,engine,worldcmp.txi}
+@importss{usingcs,engine,renderloop.txi}
+@importss{usingcs,engine,rendpri.txi}
+@importss{usingcs,engine,portals.txi}
+@importss{usingcs,engine,camera.txi}
+@importss{usingcs,engine,cammove.txi}
+@importss{usingcs,engine,warping.txi}
+@importss{usingcs,engine,viscull.txi}
+@importss{usingcs,engine,dynworld.txi}
+@importss{usingcs,engine,lod.txi}
+@importss{usingcs,engine,decals.txi}
+

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- xext86vm.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.window.x.extf86vm</name>
+        <implementation>csXExtF86VM</implementation>
+        <description>X-Window extension video mode plugin</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

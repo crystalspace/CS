@@ -1,0 +1,38 @@
+SubDir TOP data ;
+
+InstallData
+  castle-tex.zip
+  fancycon.zip
+  standard.zip
+  startme.zip
+  teapot.zip
+  kwartz.zip
+  ttf-dejavu.zip
+  ttf-vera.zip
+  unifont.zip 
+  : data ;
+
+maps =
+  isomap
+  parallaxtest
+  particles
+  partsys
+  r3dtest
+  stenciltest
+  terrain
+  terrainf ;
+for map in $(maps)
+{
+  local files =
+    [ Wildcard $(map) : *.lib *.jpg *.png *.map *.tga *.dds *.spr world ] ;
+  InstallData $(files) : data maps $(map) ;
+  InstallData [ Wildcard $(map) lightmaps : *.png ] : data maps $(map) lightmaps ;
+}
+
+SubInclude TOP data castle ;
+SubInclude TOP data ceguitest ;
+SubInclude TOP data config ;
+SubInclude TOP data cube ;
+SubInclude TOP data flarge ;
+SubInclude TOP data shader ;
+SubInclude TOP data varia ;

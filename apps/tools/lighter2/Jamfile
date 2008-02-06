@@ -1,0 +1,106 @@
+SubDir TOP apps tools lighter2 ;
+
+Description lighter2 : "New Renderer Lightmap Calculator, take 2" ;
+ApplicationIcon win32 : lighter2 : lighter.ico ;
+Application lighter2 : [ Wildcard *.cpp *.h ] : console ;
+MsvcUsePCH lighter2 : common.h ;
+LinkWith lighter2 : crystalspace ;
+
+if [ Property build : projgen_version ] != 6
+{
+
+Description lighter2_static : "New Renderer Lightmap Calculator, take 2 (static build)" ;
+
+SubVariant static ;
+
+ApplicationIcon win32 : lighter2_static : lighter.ico ;
+Application lighter2_static : [ Wildcard *.cpp *.h ] :
+  console independent noinstall nohelp ;
+CFlags lighter2_static : [ FDefines CS_STATIC_LINKED ] : nostatic ;
+LinkWith lighter2_static : crystalspace ;
+
+LIGHTER2.PLUGINLIST =
+  bezier
+  bezierldr
+  csbmpimg
+  csddsimg
+  csgifimg
+  csopcode
+  csparser
+  cssynldr
+  dsplex
+  particles
+  particlesldr
+  ptpdlight
+  emit
+  emitldr
+  engine
+  genmesh
+  gmeshanim
+  gmeshldr
+  gmeshskelanim2
+  skeleton
+  skelldr
+  vproc_std
+  haze
+  hazeldr
+  imgplex
+  null2d
+  null3d
+  nullmesh
+  protomesh
+  protomeshldr
+  rendloop_loader
+  rendstep_std
+  rendstep_stencil
+  reporter
+  sequence
+  shadermgr
+  shaderweaver
+  simpleformer
+  simpleformerldr
+  sndmanager
+  sndsysnull
+  spr2d
+  spr2dldr
+  spr3d
+  spr3dldr
+  stdpt
+  stdrep
+  bruteblock
+  terrainldr
+  thing
+  thingldr
+  xmlread
+  xmlshader
+  ;
+
+if $(ZLIB.AVAILABLE) = "yes"
+{
+  LIGHTER2.PLUGINLIST += vfs ;
+}
+if $(JPEG.AVAILABLE) = "yes"
+{
+  LIGHTER2.PLUGINLIST += csjpgimg ;
+}
+if $(PNG.AVAILABLE) = "yes"
+{
+  LIGHTER2.PLUGINLIST += cspngimg ;
+}
+if $(CAL3D.AVAILABLE) = "yes"
+{
+  ;LIGHTER2.PLUGINLIST += sprcal3d sprcal3dldr ;
+}
+if $(GL.AVAILABLE) = "yes"
+{
+  LIGHTER2.PLUGINLIST += glshader_arb glshader_fixed ;
+  if $(CG.AVAILABLE) = "yes" { LIGHTER2.PLUGINLIST += glshader_cg ; }
+}
+else
+{
+  LIGHTER2.PLUGINLIST += softshader ;
+}
+
+LinkStaticPlugins lighter2_static : $(LIGHTER2.PLUGINLIST) ;
+SubVariant ;
+}

@@ -1,0 +1,56 @@
+@c -*-texinfo-*-
+@node Console Value, Console Multi-Choice, Console Boolean, Console
+@subsubsection Value Commands
+
+A value command has some value associated with it. Typing the command without
+arguments will show the current value. Just type the value after the command
+to change it. Using a @samp{++} or @samp{--} operator before the value will
+increase or decrease the value with the given amount. Example (@code{gamma}
+command doesn't exist, this is only an example):
+
+@itemize @bullet
+@item
+@samp{gamma}: show current gamma value
+
+@item
+@samp{gamma 1.5}: set gamma to 1.5
+
+@item
+@samp{gamma ++0.05}: increase gamma with 0.05
+
+@item
+@samp{gamma --0.05}: decrease gamma with 0.05
+@end itemize
+
+The following value commands are available:
+
+@table @code
+@item db_maxpol
+Set/get the maximum number of polygons that is drawn every frame. Normally
+this is set to a very high number so that this maximum is never reached
+(2000000000 polygons every frame should suit everyone's need for the near
+future :-)  You can reduce this number for debugging purposes. In
+combination with @samp{fclear} and binding keys to @samp{db_maxpol ++1} and
+@samp{db_maxpol --1} you can get the effect of drawing one polygon at a time.
+
+@item db_procpol
+Set/get the maximum number of polygons that is considered by the culling
+routines every frame. Normally this is set to a very high number so that
+this maximum is never reached (2000000000 polygons every frame should suit
+everyone's need for the near future :-)  You can reduce this number for
+debugging purposes.
+
+@item p_alpha
+Change the alpha transparency for a selected portal. You can select a
+portal by clicking on it (only if it already has alpha transparency) or
+else by using the @samp{hi} command. Legal values for p_alpha are between 0
+and 100.
+
+@item snd_volume
+Change the master volume. Value between 0 and 1.
+
+@item lod
+Change the global LOD setting for sprite. 1 is full detail, 0 is no detail
+at all (i.e. you will not see the sprite). -1 is disabled. Any value
+between 0 and 1 is legal. Default is 1.
+@end table

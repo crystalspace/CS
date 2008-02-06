@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- glx2d.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphics2d.glx</name>
+        <implementation>csGraphics2DGLX</implementation>
+        <description>Crystal Space 2D driver for OpenGL using GL/X</description>
+        <requires>
+          <class>crystalspace.font.server.</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>

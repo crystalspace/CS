@@ -1,0 +1,119 @@
+SubDir TOP libs ;
+
+CSLIB.SOURCES = ;
+CSLIB.TESTS = ;
+CSLIB.ROOT = $(SUBDIR_TOKENS) ;
+CSLIB.DECLARED = no ;
+
+## CsLibAddTestDirs dirs, reparent
+##   Convenience rule for use by subdirectories of this directory and their
+##   children.  Adds a list of test directories within the child directory to
+##   the list of directories containing unit tests for the master
+##   crystalspace.lib target.  `reparent' is a list of tokens representing the
+##   relative path from this directory down to the child directory.
+rule CsLibAddTestDirs
+{
+  local dirs = $(1) ;
+  local reparent = [ ConcatDirs $(2) ] ;
+  CSLIB.TESTS += $(dirs:R=$(reparent)) ;
+}
+
+## CsLibAddFiles files, reparent
+##   Convenience rule for use by subdirectories of this directory and their
+##   children.  Adds raw filenames from `files' to the master crystalspace.lib
+##   target.  `reparent' is a list of tokens representing the relative path
+##   from this directory down to the child directory.
+rule CsLibAddFiles
+{
+  local files = $(1) ;
+  local reparent = [ ConcatDirs $(2) ] ;
+  CSLIB.SOURCES += $(files:R=$(reparent)) ;
+}
+
+## CsLibAddWild patterns, reparent, [ rejects ]
+##   Convenience rule for use by subdirectories of this directory and their
+##   children.  Performs a wildcard for sources on behalf of the directory.
+##   Adds all discovered files to the master crystalspace.lib target.
+##   `patterns' is a list of wildcard patterns to fuel the search.  `reparent'
+##   is a list of tokens representing the relative path from this directory
+##   down to the child directory.  `rejects' is a list of files (rooted at this
+##   directory) which should not be given citizenship in crystalspace.lib.
+rule CsLibAddWild
+{
+  local patterns = $(1) ;
+  local reparent = $(2) ;
+  local rejects = $(3) ;
+
+  local files = [ Wildcard $(patterns) ] ;
+  if $(rejects)
+  {
+    files = [ Filter $(files) : $(rejects) ] ;
+  }
+  CsLibAddFiles $(files) : $(reparent) ;
+}
+
+## CsLibAddModule [ rejects ]
+##   Convenience rule for use by subdirectories of this directory and their
+##   children.  Performs a wildcard for sources on behalf of the directory, and
+##   for a like-named directory in the public header tree. Adds all discovered
+##   files to the master crystalspace.lib target. Most child directories can
+##   simply invoke this rule with no arguments in order to become citizens of
+##   crystalspace.lib. `rejects' is a list of files (rooted at this directory)
+##   which should not be given citizenship in crystalspace.lib. If the child
+##   directory contains a unit-testing subdirectory named `t/', then it is
+##   incorporated into the unit tests for the master crystalspace.lib.
+rule CsLibAddModule
+{
+  local rejects = $(1) ;
+  local modname = [ StripCommon $(SUBDIR_TOKENS) : $(CSLIB.ROOT) ] ;
+  local incbase = $(DOTDOT) include $(modname) ;
+  local srcpat = *.c *.cc *.cpp *.cxx *.C *.m *.mm *.M ;
+  local incpat = *.h *.hpp *.hxx *.H ;
+
+  CsLibAddWild $(srcpat) $(incpat) : $(modname) : $(rejects) ;
+  CsLibAddTestDirs t : $(modname) ;
+
+  local oldsubdir = $(SUBDIR_TOKENS) ;
+  SubDir TOP include $(modname) ;
+  CsLibAddWild $(incpat) : $(incbase) : $(rejects) ;
+  SubDir TOP $(oldsubdir) ;
+}
+
+SubInclude TOP libs csutil ;
+SubInclude TOP libs csgeom ;
+SubInclude TOP libs csgfx ;
+SubInclude TOP libs cstool ;
+SubInclude TOP libs csplugincommon ;
+
+SubDir TOP libs ;
+
+if [ Property build : projgen ] = msvc
+{
+  IncludeDir  $(CSLIB.ROOT) csutil ptmalloc sysdeps win32 : crystalspace ;
+}
+
+Description crystalspace : "Crystal Space library" ;
+Library crystalspace : $(CSLIB.SOURCES) : shared notest ;
+UnitTest crystalspace : $(CSLIB.TESTS) ;
+CFlags crystalspace : [ FDefines CS_CRYSTALSPACE_LIB ] ;
+MsvcDefine crystalspace : CS_CRYSTALSPACE_LIB $(CSLIB.MSVC_DEFINES) ;
+if $(CSLIB.CFLAGS)
+{
+  CFlags crystalspace : $(CSLIB.CFLAGS) ;
+}
+if $(CSLIB.DEPENDS)
+{
+  LibDepends crystalspace : $(CSLIB.DEPENDS) ;
+}
+if $(CSLIB.EXTERNAL_LIBS)
+{
+  ExternalLibs crystalspace : $(CSLIB.EXTERNAL_LIBS) ;
+}
+
+# NOTE: Currently shared libs require that the "Library" statements appear in
+# depedency order (ie when Y depends on X, the directory for X must be stated
+# before Y's). Certain subdirectories of crystalspace depend upon the main
+# Crystal Space library built above.
+CSLIB.DECLARED = yes ;
+
+SubInclude TOP libs csplugincommon ;

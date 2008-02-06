@@ -1,0 +1,4 @@
+SubDir TOP plugins mesh genmesh persist ;
+
+SubInclude TOP plugins mesh genmesh persist standard ;
+SubInclude TOP plugins mesh genmesh persist gmesh3ds ;

@@ -1,0 +1,17 @@
+SubDir TOP libs csutil ptmalloc ;
+
+CSLIB.CFLAGS += [ FIncludes [ ConcatDirs $(SUBDIR) ] ] ;
+if $(TARGET.OS) != "WIN32"
+{
+  CSLIB.CFLAGS += [ FIncludes [ ConcatDirs $(SUBDIR) sysdeps pthread ] ] ;
+}
+else
+{
+  CSLIB.CFLAGS += [ FIncludes [ ConcatDirs $(SUBDIR) sysdeps win32 ] ] ;
+}
+if [ Property build : projgen ] != msvc && $(PTHREAD.ATFORK.AVAILABLE) = "no"
+{
+  CSLIB.CFLAGS += [ FDefines HAVE_NO_PTHREAD_ATFORK ] ;
+}
+
+CsLibAddWild *.c : csutil ptmalloc ;

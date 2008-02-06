@@ -1,0 +1,374 @@
+The Big 1.0 TODO List:
+
+Every bug is classified with a few modifiers to indicate the bad effect they
+have on CS.  The following modifiers can be given:
+
+	- V: visual effect. This means that solving this bug
+	  or implementing this feature would improve how the engine looks.
+	- S: stability. This bug causes loss of stability.
+	  Solving this bug will cause CS to be more stable.
+	- F: feature. This means some feature isn't implemented properly
+	  or implementation is missing completely.
+	- O: organization and other. An organizational change or something
+	  else.
+	- **: bug or feature has been fixed or implemented.
+	- --: bug or feature no longer relevant as module/application in
+	  question have been dropped, or is total broken and should be
+	  removed.
+
+A number after the character indicates priority (1=low, 2=medium, 3=high)
+
+Bugs and features (highest priority items first):
+HIGH:
+	[F3] Implement visibility culling (for occlusion) for bezier meshes.
+	[S3] Very poor OpenGL/performance on MacOS/X and possibly other
+	     platforms.  dfryer@uvic.ca reports that his OpenGL profiler says
+	     that 95% of the time is spent in DrawArrays().  He further reports
+	     that he narrowed down the problem to a particular pass in
+	     DrawPolygonSingleTexture().  Apparently the lightmap pass (do_lm)
+	     is choking up the system.  Without the lightmap pass, he says
+	     performance is excellent.  Jorrit suspects that this might be
+	     caused by texture swapping.
+	     Note by Jorrit: DrawPolygonMesh seems to help a lot.
+	     Unfortunatelly this function is still buggy (fog is not
+	     implemented and some transparency effects don't seem to be
+	     working).
+	[**] Some canvases still clip improperly as shown by the clipping tests
+	     in g2dtest.  The Windows OpenGL canvas is one such canvas.
+	     Possibly, the MacOS/X canvases are also flawed.  Same is true for
+	     xwindows and glx2d canvas.  As Jorrit says probably the test and
+	     not the canvas is broken as clipping semantics changed recently.
+	     Eric responds: The clipping tests in g2dtest were added after the
+	     semantics changed.  The tests were added specifically to test if
+	     canvases were respecting the new semantics.
+	     [Bug 747985]
+	[S3] Line drawing in software renderer is not stable (overwriting
+	     memory).  This shows with BugPlug and also with AWS in some cases.
+	     Is this related to incorrect clipping?  (See above item.)
+	     [Bug 747988]
+	[**] There are still some unreleased instances of SCF classes.
+	     Update: When talking about walktest this only true in the flarge
+	     map.  Problem is probably the hierarchical mesh factory there.
+	     [Bug 747995]
+	[V3] Investigate if LOD for sprites is still working.
+	[S3] Investigate if there are any more memory leaks after unloading a
+	     level and if so fix them.  This can most easily be done by using
+	     the debug graph in CS.  To enable this just edit
+	     include/csutil/debug.h and remove the comment ('//') right before
+	     the define of CS_USE_GRAPHDEBUG.  Then recompile.
+	[V3] Static lighting no longer goes through space-warping portals.
+	     [Bug 748001]
+	[V3] Investigate bugs related to the walktest 'portal' command and to
+	     portals in general.  (For example: [Bug 473597]) There also seem
+	     to be several clipping bugs still.
+	[F3] Support space warping portals for GetNearbyObjects(), for
+	     PlaceMesh() and for lighting.
+	[F2] Convert emit particle system to the more efficient particle
+	     system that is in use by rain and fountain (single mesh).
+	[F2] Add the ability to define geometry in the spr2d factory and
+	     not only in the instance.
+	[F2] Add the ability to define geometry in the ball mesh factory and
+	     not only in the instance.
+	[S2] Using either renderer, go to the main hall in flarge and add a
+	     light with shift-L.  The framerate immediately drops to between
+	     0.5 and 1.5 fps (on my computer) when facing into the room (not at
+	     a blank wall) and stays low until the light is removed (shift-1).
+	     (optimize mode)
+	     Note by Jorrit: this will most likely not be fixed soon as it is
+	     a rather fundamental problem.
+	[--] simplecloth crashes consistently at startup dereferencing address
+	     0x0884 when run with the software renderer.  The program seems to
+	     run correctly with the OpenGL renderer.  (optimize mode) Matze
+	     Braun <matze@braunis.de> further reports that the bounding box of
+	     the cloth mesh is invalid and it always crashs at exit for him.
+	     Charles James Leonardo Quarra Cappiello <charsquarra@hotmail.com>
+	     further reports that MatzeB fixed the simplecloth crash at exit,
+	     but the fix is not yet in CVS.  Dan Mahoney
+	     <domahoneyii@users.sourceforget.net> reports that the crash is on
+	     line 95 of scanp2.inc. [Bug 747983] Module dropped.
+	[--] Cloth plugin has a culling problem.  If any corner of the cloth's
+	     bbox is above the top border of the screen, then the entire cloth
+	     is culled.  Charles James Leonardo Quarra Cappiello
+	     <charsquarra@hotmail.com> wonders if this problem arose when the
+	     old culler was removed. Matze: This is probably a duplicate
+	     because this is probably caused because of the wrong bounding
+	     box. [Bug 725406] Module dropped.
+	[V2] Investigate various visible artifacts in the mazedex level.  It
+	     appears that most of these have to do with the halos and only
+	     appear with OpenGL.  One artifact appears to be Z-fighting (with
+	     OpenGL alone) and this occurs if you look into the reflecting
+	     table.
+	[V2] The software renderer implementation of DrawTriangleMesh is still
+	     missing a few clipping features.  In general it would be nice to
+	     investigate the use of the OpenGL clipping routines for software
+	     too.
+	     [Bug 430207]
+	[F1] Implement/fix the saver framework and cssaver plugin.
+	[F1] Add a new ORIENTCAMERA keyword so that a mesh object will always
+	     be oriented towards the camera (a bit similar to the current
+	     CAMERA keyword).
+	[F1] Re-implement locking in csEventQueue using csMutex rather than the
+	     fallible spin-lock which is presently in use.  Ditto for
+	     csEventCord.
+	[--] perftest used to print a message at the bottom of the window
+	     briefly describing each test.  These messages are no longer
+	     present.
+	     [Bug 747981] Application removed.
+	[--] tbtut crashes after moving a bit in software mode.  Also, the
+	     program seems very incomplete.  Matze Braun <matze@braunis.de>
+	     reports: "I always start the app move 2 or 3 seconds forward
+	     (already at this point I get strangely culled polygons which
+	     aren't there in opengl mode) then I turn right, work a little bit
+	     and it crashes." Jorrit reports that valgrind indicates problems
+	     with this program.  Matthew Sieker <msieker@siekersoft.com>
+	     reports: "I've noticed a problem with tbtut running with the
+	     software renderer.  If you just go forward for just a bit (holding
+	     down the up arrow for a few seconds), it suddenly locks up."
+	     Application removed.
+	[--] NetTut doesn't parse it's commandline (one always get an error
+	     message no matter what is entered at the command line).
+		Usage:  ./nettut [server/client] [tcp/udp] [hostname*] [port]
+		 * - specify hostname only if you are using client mode.
+	     [Bug 747994] (Network support dropped.)
+	[--] NetMantest or the netmanager plugin leaks. (Networking support
+	     dropped.)
+	[O1] Implement 3-bit outline renderer in Dynavis.
+	[O1] Implement better kd-tree balancing in Dynavis.
+	[--] Walktest + newsky: it appears that there are some visibility
+	     culling problems in some rare cases.  Solution: try to find a spot
+	     that doesn't work right and remember with 'C'.  Later on you can
+	     go back to that position with 'c' (after including debug info).
+	     Here's a cam file for it:
+		--snip--
+		419.985 37.1595 375.409
+		-.94714 0 -.320818
+		0 1 0
+		.320818 0 -.94714
+		"room"
+		0
+		--snap--
+	     [Bug 748002] Module terrfunc dropped.
+	[--] Fix radiosity so that it works again.  Radiosity is currently
+	     disabled because several things had been rewritten and the
+	     radiosity code was left behind.  To fix this we need to have a way
+	     to iterate over all polygons.  This is not hard.  Harder will be
+	     the fact that the lighting system has changed.  It now works with
+	     the shadow bitmaps.
+	     [Bug 429283] Will not be fixed. Radiosity is broken beyond repair
+	     and needs total rewrite.
+	[--] Investigate if skeletal sprites work nicely with the visibility
+	     culling system.  Major problem is that calculating a bounding box
+	     for a skeletal sprite is not easy.  We have to find an efficient
+	     way to do this, especially when the transforms change.
+	     [Bug 204194] (No longer relevant)
+	[--] Lighting for skeletal sprites is not good.  The problem is that
+	     normals are precalculated for the 'base mesh'.  When the mesh
+	     later animates (using the transforms) the normals will not change.
+	     A solution is perhaps to transform the normals with the
+	     hierarchical transform.  But this will not work correctly for
+	     vertices that are connected to triangles that have vertices from
+	     other limbs.
+	     [Bug 493454] (Skeletal sprite support removed from spr3d)
+	[**] Investigate clipping bug in OpenGL.
+	     [Bug 430214]
+	[V1] In OpenGL adjacent polygons do not match nicely. Especially if
+	     you clear the background every frame you can easily notice gaps
+	     between polygons.
+	     [Bug 430601]
+	[F1] When mounting a real directory on a VFS path you need to do:
+	        Mount ("this/is/a/dir$/", "/lib/whatever");
+	     That is, the last '/' has to be preceeded with '$'.  This needs to
+	     be fixed.
+	     [Bug 747998]
+	[F1] Support lights for GetNearbyObjects().
+	[**] Mark polygons as being visible, used for shadow casting, used for
+	     culling, used for collision detection, ... (more general system).
+	[**] Implement splatting in Dynavis.
+	[**]  The frame around the fancy console looks "strange" (Matze's
+	     phrasing). With software renderer the border looks ok but with
+	     OpenGL it is simply not there.
+	     Philipp Aumayr thinks he fixed this :)
+	     [Bug 748166]
+	[**] Light with explosion particle system is not correctly positioned.
+	     The question is if this light is a desired feature.
+	     Note: fixed by removing feature.
+	     [Bug 231392]
+	[**] CAMERA entity bug and vis culling causes bizarre HOM effects and
+	     disappearing/reappearing stars in csdemo.  Also probably affects
+	     other programs and maps, in which sudden and drastic pops in
+	     rendering occur.
+	[**] Using software renderer, go to the room in flarge with the
+	     spinning blocks and rings.  Add a light with shift-L.  The
+	     software renderer immediately crashes while trying to dereference
+	     a null pointer.  (optimize mode)
+	[**] Blocks crashes at exit time dereferencing a garbage pointer
+	     (sometimes null, sometimes not).  To reproduce: 1) Launch.  2)
+	     Start new game.  3) Press ESC to get back to menu.  4) Select Quit
+	     item.  5) Crash.  Note that this crash occurs randomly.  (optimize
+	     mode)
+	[**] In walktest, if you fire a rocket and manually delete its dynamic
+	     light, walktest crashes when the rocket later tries to delete the
+	     light itself.  To reproduce: a) Launch walktest.  b) Fire a
+	     rocket.  c) While the rocket is still in flight or still
+	     exploding, press shift-1.  to delete the dynamic light.  d) Wait
+	     momentarily for the rocket to delete its own light.  e) Crash.
+	     (optimize mode)
+	     [Bug 747978]
+	[**] walktest crashes randomly at exit time if a static light is added
+	     using either renderer.  To reproduce: 1) Launch walktest with
+	     flarge.  2) Go to main hall.  3) Add a light (shift-L).  4) Quit
+	     (press Q).  5) Crash (7 out of 10 times).  (optimize mode)
+	[**] About 50% of the rockets fired in walktest fail to collide with a
+	     wall; and instead pass right through the wall.  Consequently, the
+	     rocket object is never removed from the world, nor is its dynamic
+	     light removed. (optimize mode)
+	[**] With OpenGL the lightmaps are not mapped correctly.  This is very
+	     visible if you have two adjacent polygons which have a different
+	     size and a shadow going over those two polygons (in dmburg this
+	     situation occurs a few times).  In that case the shadows on both
+	     polygons will not match exactly.  Fixing this bug for real
+	     probably requires a change of the lightmap format (to make then
+	     one lumel bigger both horizontally as vertically).  While this is
+	     relatively easy to do for static lightmaps the dynamic lightmaps
+	     might be more problematic.  Also this may require a big change in
+	     the software renderer...  Rather complicated bug.  But an
+	     important one to fix.
+	     [Bug 405964]
+	[**] Fix the problem with adding -lutil for more recent versions of
+	     python.  This should be automatic and not manual.
+	[**] Shoot a missile in hole in flarge.  The walls of the hole become
+	     lit ok then but revert to full bright after missile particles have
+	     disappeared.  Only with OpenGL.
+	[**] Fade effect no longer works in OpenGL (visible in csdemo and F5
+	     key in walktest).  May be related to the fact that a material
+	     without texture is used and this has recently changed.
+	[**] It seems that pseudo-dynamic lighting is not working correctly.
+	     In flarge you can see that near the stairs some polygons are not
+	     updated when the dynamic light changes intensity/color.
+	[**] Investigate if PlaceMesh() works correctly.  I suspect it doesn't.
+	     May be related to bug [Bug 471637].
+	[**] Bug with models seen through portals [Bug 471638].
+	[**] In isometric engine (isotest) + OpenGL some of the mesh objects
+	     (like the particle systems) are clipped wrong to the floor.  This
+	     is a very hard bug.  We have been hunting this bug for ages.
+	     Z-buffer accuracy problems have been suspected but this is
+	     probably not right because the problem arises on cards with 32-bit
+	     Z-buffer too.
+	[**] Lighting is not cached for gouraud shaded polygons.
+	     [Bug 202780]
+	[**] Problem with keycolor + zbuffer:
+	     When a texture with keycolor transparency is rendered the software
+	     and hardware renderers currently behave differently.  With
+	     software the z-buffer is only updated at those positions where the
+	     texture is actually drawn.  This is very nice of course since that
+	     means you can essentially draw the keycolor texture using Z-buffer
+	     and objects drawn behind it will be correct.  However this doesn't
+	     work with hardware.  With hardware the Z-buffer is updated for the
+	     entire polygon regardsless of the key-color value.  I'm not sure
+	     if it is actually possible to do otherwise with hardware.  If not
+	     then the engine will have to solve this by sorting such polygons
+	     from back to front in relation to other objects in the same
+	     sector.
+	     [Bug 409067]
+	[**] Mesh objects outside the global bounding box of an infinite sector
+	     will not be visible.  There is a work-around for this bug which is
+	     why this bug is not that bad.  You can easily add small dummy
+	     geometry very far away to make the bounding box work.  Problem is
+	     that this dummy geometry has to be part of the static mesh!
+	     [Bug 216698]
+	[**] One of the halos in flarge seems to disappear in some cases with
+	     OpenGL.
+	[**] Restoration of dllwrap uses $* which gets eaten by cs-config.
+	     Need to figure out some way to prevent $* from being eaten.  The
+	     technique for protecting $@ does not seem to work for $*.
+	[**] Add the ability to get different kinds of polygon meshes from
+	     objects: lower-lod version for culling, version for collision
+	     detection, version for lighting (casting shadows), ...
+	[**] Remove old octree based culler when Dynavis is ok and levtool can
+	     convert to Dynavis levels.
+	[**] cs2xml crashes when trying to convert castle.zip.  (optimize mode)
+	     (note by Jorrit: cannot reproduce).
+	[**] levtool fails to convert castle.zip (after it has been converted
+		with cs2xml)  Matze: Please clarify this item.
+	[**] unittest crashes and/or hangs:
+		./unittest -video=software
+		...
+		plugins/culling/dynavis/tcovbuf.cpp:707:
+			failed assertion 'w_shift >= 0'
+		Trace/Breakpoint ausgelst
+	     [Bug 747989]
+	[**] Starting walktest with infinite renderer leads to direct crash
+	     (infinte renderer is removed now)
+	[**] simpvs crashes immediately at startup dereferencing a null
+	     pointer.  (optimize mode)
+	[**] cswseng crashes dereferencing a null pointer.  To reproduce: 1)
+	     Launch cswseng.  2) Press "New View".  3) Press "Quit".  4) Crash.
+	     (optimize and debug mode)
+	[**] cswstest crashes with dereference of null pointer.  To reproduce:
+	     1) Launch cswstest.  2) Open Grid test window.  3) Close Grid test
+	     window (or quit app).  4) Crash. (optimize and debug mode)
+	[**] mottest crashes dereferencing a null pointer.  To reproduce: 1)
+	     Launch mottest.  2) Press ESC.  3) Crash.
+	     (optimize and debug mode)  Also reported in Bugs tracker as
+	     670281.
+	[**] OpenGL renderer crashes dereferencing null pointer if font manager
+	     is not present.  To reproduce: 1) Launch netmtst with OpenGL
+	     renderer: ./netmtst -video=opengl.  2) Crash.
+	[**] perftest crashes dereferencing a null pointer when using OpenGL.
+	     To reproduce: 1) Launch perftest with OpenGL.  2) Press space-bar
+	     several times.  3) Crash.  (optimize and debug mode)
+	     [Bug 747980]
+
+API and Small Feature Additions:
+	[F2] Ability to close portals in map loader.
+	[F2] Support iPolygonMesh (for collision detection) in more mesh
+	     objects (like ball, cube, ...).
+	[F2] Change key code and virtual key in keyboard event to use Unicode.
+	[F1] Translate point on polygon to texture space/object space
+	     coordinates (for selection). This is useful for Quark++.
+	[V1] Support lighting of a thing mesh for lights in multiple sectors
+	     (and going through portals).
+	     i.e. iSector->ShineLights(iMeshWrapper).
+	[**]  Automatic generation of lightmap cache names using MD5 checksum
+	     of geometry.  This is important for dynamic loading/reloading of
+	     worlds.
+	[**] Add iCamera::SetFarPlane().
+
+Global Additions and Stuff:
+	[S2] There are still a few places where we need to use the reporter for
+	     reporting error conditions.
+	[F1] [OPTIONAL] Direct3D8 Renderer.
+	[O1] Split of CS module in CS and CSextra.  Applications like Blocks
+	     will then move to CSextra.
+	[F1] [OPTIONAL] Configuration setup tool so that it is possible to
+	     edit config files with a GUI?
+	[**] Remove Squawk after implementing a multi-view demo in WalkTest.
+
+Documentation Updates:
+	- More simple HOWTO's like:
+	    - Loading a mesh for the 3DS plugin.
+	    - Creating a dynamic light.
+	    - Howto make an explosion.
+	    - For every plugin: a simple example on how to use it.
+	    - More sophisticated tutorial about portals and space warping.
+	    - csAnimationTemplate and csAnimatedPixmap.
+	- Document event system.
+	- Update the 'Configuration Files Section'.
+	- Write docs and/or HOWTO on the Python and other scripting plugins.
+	- Write doc on the heightmap texture generation utility.
+	- Write doc on how to create your own mesh object plugins.
+	- Write HOWTO on plugin creation in general.
+	- Complete docs on metaballs mesh object.
+	- Complete docs on haze mesh object.
+	- Tutorial on isometric engine.
+	- HOWTO on how to work with regions and load/unload parts of a map
+	  (dynamic loading/unloading).
+	- HOWTO on sound.
+	- Complete update of map format documentation.
+	- HOWTO on KEY and NODE system for game specific purposes (i.e.
+	  triggers, scripts, and things like that).
+	- HOWTO on HUD.
+	- Go over the API documentation (doxygen comments) and see if they can
+	  be improved.
+	- Complete the features lists.
+

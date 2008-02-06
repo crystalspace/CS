@@ -1,0 +1,38 @@
+@c -*-texinfo-*-
+@node Frame phase events, Event Bindings, Event Subscription, Event System
+@subsection Frame phase events
+@cindex Events, Frame phases
+
+To handle events during different points of frame processing, handlers of
+@samp{csevFrame} can use simple helper macros to classify themselves as
+belonging to any of six ``phases'' of frame creation.
+
+@itemize @bullet
+@item
+@emph{Logic} - game logic to be performed before any rendering is done.
+Use the @samp{CS_EVENTHANDLER_PHASE_LOGIC(x)} macro.
+@item
+@emph{3D} - rendering of the 3D view, after the logic phase and before
+the 2D phase.  Use the @samp{CS_EVENTHANDLER_PHASE_3D(x)} macro.
+@item
+@emph{2D} - rendering of 2D overlays; after the 3D phase and before
+the console phase.  Use the @samp{CS_EVENTHANDLER_PHASE_2D(x)} macro.
+@item
+@emph{Console} - used primarily by the Crystal Entity Layer
+(@sc{cel}), after the 2D phase and before the Debug phase.  Use the
+@samp{CS_EVENTHANDLER_PHASE_CONSOLE(x)} macro.
+@item
+@emph{Debug} - used primarily by the @samp{bugplug} plugin, after the
+console phase and before the frame phase.  Use the
+@samp{CS_EVENTHANDLER_PHASE_DEBUG(x)} macro.
+@item
+@emph{Frame} - final rendering to the screen, after the debug phase.
+Use the @samp{CS_EVENTHANDLER_PHASE_FRAME(x)} macro.
+@end itemize
+
+These macros, included in the declaration of an event handler class,
+provide all of the naming and constraint methods to make instances of
+that handler class schedule their subscriptions to @samp{csevFrame}
+within the appropriate phase.  (You will not be able to use these macros
+if you need to subscribe the handler to events besides @samp{csevFrame}
+and apply ordering constraints for those events.)

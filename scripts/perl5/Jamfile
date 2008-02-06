@@ -1,0 +1,11 @@
+SubDir TOP scripts perl5 ;
+
+PERL5_DATAFILES = [ Wildcard *.pm *.pl ] ;
+
+# cspace.pm is the responsibility of csscript/csperl5/Jamfile.
+PERL5_DATAFILES = [ Filter $(PERL5_DATAFILES) : cspace.pm ] ;
+
+if $(PERL5_DATAFILES)
+{
+  InstallData $(PERL5_DATAFILES) : bindings perl5 ;
+}

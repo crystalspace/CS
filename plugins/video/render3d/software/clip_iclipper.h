@@ -1,0 +1,230 @@
+/*
+    Copyright (C) 2005 by Jorrit Tyberghein
+              (C) 2005 by Frank Richter
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#ifndef __CS_SOFT3D_CLIP_ICLIPPER_H__
+#define __CS_SOFT3D_CLIP_ICLIPPER_H__
+
+#include "csgeom/box.h"
+#include "igeom/clip2d.h"
+
+#include "clipper.h"
+
+//#define CLIP_DEBUG
+
+CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
+{
+
+class ClipMeatiClipper
+{
+  iClipper2D* clipper;
+  size_t maxClipVertices;
+
+  CS_FORCEINLINE size_t CopyTri (const csTriangle& tri, 
+    VertexOutputPersp& voutPersp, 
+    const VerticesLTN* inBuffers, VerticesLTN* outBuffers)
+  {
+    voutPersp.Copy (tri.a);
+    voutPersp.Copy (tri.b);
+    voutPersp.Copy (tri.c);
+    const float* inData = inBuffers->GetData();
+    size_t stride = inBuffers->GetStride();
+    outBuffers->AddVertex (inData + tri.a * stride);
+    outBuffers->AddVertex (inData + tri.b * stride);
+    outBuffers->AddVertex (inData + tri.c * stride);
+    return 3;
+  }
+  CS_FORCEINLINE 
+  static void MinMax3 (const float a, const float b, const float c, 
+                       float& min, float& max)
+  {
+    if (a < b)
+    {
+      min = csMin (a, c);
+      max = csMax (b, c);
+    }
+    else
+    {
+      min = csMin (b, c);
+      max = csMax (a, c);
+    }
+  }
+public:
+  void Init (iClipper2D* clipper, size_t maxClipVertices)
+  {
+    this->clipper = clipper;
+    this->maxClipVertices = maxClipVertices;
+  }
+
+  size_t DoClip (const csTriangle& tri, const csVector3* inPersp,
+    VertexOutputPersp& voutPersp, 
+    const VerticesLTN* inBuffers, VerticesLTN* outBuffers
+    )
+  {
+    if (!clipper)
+      return CopyTri (tri, voutPersp, inBuffers, outBuffers);
+
+    const csVector3 v[3] = 
+    {
+      inPersp[tri.a],
+      inPersp[tri.b],
+      inPersp[tri.c],
+    };
+    const int Tri[3] = {tri.a, tri.b, tri.c};
+
+    csVector2 inpoly[3];
+    for (int j = 0; j < 3; j++)
+      inpoly[j].Set (v[j].x, v[j].y);
+    CS_ALLOC_STACK_ARRAY(csVector2, outPoly, maxClipVertices);
+    CS_ALLOC_STACK_ARRAY(csVertexStatus, outStatus, maxClipVertices);
+    size_t outNum;
+
+    float minx, maxx, miny, maxy;
+    MinMax3 (v[0].x, v[1].x, v[2].x, minx, maxx);
+    MinMax3 (v[0].y, v[1].y, v[2].y, miny, maxy);
+    csBox2 bbox (minx, miny, maxx, maxy);
+
+    int boxClassify = clipper->ClassifyBox (bbox);
+    if (boxClassify == -1)
+      return 0;
+    else if (boxClassify == 1)
+      return CopyTri (tri, /*buffersMask, voutPersp, vout*/
+      voutPersp, inBuffers, outBuffers);
+
+    uint clip_result = clipper->Clip (inpoly, 3, outPoly, outNum, outStatus);
+    CS_ASSERT(outNum <= maxClipVertices);
+
+    if (clip_result == CS_CLIP_OUTSIDE) return 0;
+    if (clip_result == CS_CLIP_INSIDE)
+      return CopyTri (tri, voutPersp, inBuffers, outBuffers);
+
+    const float* inData = inBuffers->GetData();
+    size_t stride = inBuffers->GetStride();
+
+    CS_ALLOC_STACK_ARRAY(float, outV, stride);
+
+    for (size_t i = 0 ; i < outNum; i++)
+    {
+      switch (outStatus[i].Type)
+      {
+	case CS_VERTEX_ORIGINAL:
+	  {
+	    const size_t vt = Tri[outStatus[i].Vertex];
+	    csVector3 vn (outPoly[i].x, outPoly[i].y,
+	      v[outStatus[i].Vertex].z);
+	    voutPersp.Write (vn);
+            outBuffers->AddVertex (inData + vt * stride);
+          }
+	  break;
+	case CS_VERTEX_ONEDGE:
+	  {
+	    const size_t outVt = outStatus[i].Vertex;
+	    const size_t vt = Tri[outVt];
+	    const size_t vt2 = Tri[(outVt >= 2) ? 0 : outVt + 1];
+	    const float t = outStatus[i].Pos;
+
+	    csVector3 vn;
+	    voutPersp.LerpTo (&vn, vt, vt2, t);
+
+#ifdef CLIP_DEBUG
+	    if ((ABS(vn.x - outPoly[i].x) > EPSILON)
+	      || (ABS(vn.y - outPoly[i].y) > EPSILON))
+	      CS_DEBUG_BREAK;
+#endif
+
+	    vn.x = outPoly[i].x;
+	    vn.y = outPoly[i].y;
+	    voutPersp.Write (vn);
+
+            inBuffers->LerpTo (outV, vt, vt2, t);
+            outBuffers->AddVertex (outV);
+            break;
+	  }
+	case CS_VERTEX_INSIDE:
+	  {
+	    float x = outPoly[i].x;
+	    float y = outPoly[i].y;
+	    size_t edge1 [2], edge2 [2];
+	    // Determine edges from which to interpolate the vertex data
+	    if ((fabs(v[0].y - v[1].y) > EPSILON) 
+              && ((y >= v[0].y && y <= v[1].y)
+              || (y <= v[0].y && y >= v[1].y)))
+	    {
+	      edge1[0] = 0;
+	      edge1[1] = 1;
+	      if ((fabsf(v[1].y - v[2].y) > EPSILON) 
+                && ((y >= v[1].y && y <= v[2].y)
+                || (y <= v[1].y && y >= v[2].y)))
+	      {
+		edge2[0] = 1;
+		edge2[1] = 2;
+	      }
+	      else
+	      {
+		edge2[0] = 0;
+		edge2[1] = 2;
+	      }
+	    }
+	    else
+	    {
+	      edge1[0] = 1;
+	      edge1[1] = 2;
+	      edge2[0] = 0;
+	      edge2[1] = 2;
+	    }
+	    const csVector3& A = v[edge1 [0]];
+	    const csVector3& B = v[edge1 [1]];
+	    const csVector3& C = v[edge2 [0]];
+	    const csVector3& D = v[edge2 [1]];
+	    // Coefficients
+	    const float t1 = (y - A.y) / (B.y - A.y);
+	    const float t2 = (y - C.y) / (D.y - C.y);
+	    const float x1 = A.x + t1 * (B.x - A.x);
+	    const float x2 = C.x + t2 * (D.x - C.x);
+	    const float dx = (x2 - x1);
+	    const float t = dx ? ((x - x1) / dx) : 0.0f;
+
+	    const int vt11 = Tri[edge1[0]];
+	    const int vt12 = Tri[edge1[1]];
+	    const int vt21 = Tri[edge2[0]];
+	    const int vt22 = Tri[edge2[1]];
+
+	    csVector3 vn;
+	    voutPersp.Lerp3To (&vn, vt11, vt12, t1,
+	      vt21, vt22, t2, t);
+	    vn.x = x;
+	    vn.y = y;
+	    voutPersp.Write (vn);
+
+            inBuffers->Lerp3To (outV, vt11, vt12, t1, vt21, vt22, t2, t);
+            outBuffers->AddVertex (outV);
+          }
+	  break;
+	default:
+	  CS_ASSERT(false);
+      }
+    }
+
+    return outNum;
+  }
+};
+
+}
+CS_PLUGIN_NAMESPACE_END(Soft3D)
+
+#endif // __CS_SOFT3D_CLIP_ICLIPPER_H__

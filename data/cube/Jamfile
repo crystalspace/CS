@@ -1,0 +1,3 @@
+SubDir TOP data cube ;
+
+InstallData [ Wildcard *.jpg ] : data cube ;

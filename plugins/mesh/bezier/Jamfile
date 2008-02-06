@@ -1,0 +1,4 @@
+SubDir TOP plugins mesh bezier ;
+
+SubInclude TOP plugins mesh bezier object ;
+SubInclude TOP plugins mesh bezier persist ;

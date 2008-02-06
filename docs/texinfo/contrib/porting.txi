@@ -1,0 +1,23 @@
+@c -*-texinfo-*-
+@node Porting, , SVN Guide, Contributing
+@section Porting to a New Platform
+@cindex Porting
+
+This section provides information useful to developers who wish to port
+Crystal Space to new platforms.
+
+Before undertaking the job of porting Crystal Space to a new platform one
+should, at least marginally, familiarize one's self with the various modules
+which comprise the package. A good way to gain such an overview is to read
+the Chapter about the internal structure of Crystal Space (@pxref{Internals}),
+as well as the chapter about using Crystal Space (@pxref{Using Crystal Space}).
+
+Once you have gained an overview of structure of Crystal Space, the first step
+in porting is to check the file @file{include/types.h} and see if it conforms
+to your system.  This file defines various types and constants which may need
+to be customized for a particular platform.  If you have a system with
+uncommon sizes for integers (for example 32-bit @samp{short} values) then you
+may need to adjust the definitions contained within this file.  However, for
+most platforms this file may be used as-is.
+
+@emph{FIXME}: Flesh out the remainder of this discussion.

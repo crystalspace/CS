@@ -1,0 +1,8 @@
+SubDir TOP plugins mesh protomesh persist standard ;
+
+Description protomeshldr : "Proto mesh object loader" ;
+Plugin protomeshldr : [ Wildcard *.cpp *.h ] ;
+Includes protomeshldr.h : $(SUBDIR)/protomesh_factory.tok ;
+Includes protomeshldr.h : $(SUBDIR)/protomesh_meshobject.tok ;
+LinkWith protomeshldr : crystalspace ;
+CompileGroups protomeshldr : meshes ;

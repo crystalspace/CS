@@ -1,0 +1,196 @@
+<world>
+    <textures>
+        <texture name="tree">
+            <file>/lib/stdtex/tree.gif</file>
+        </texture>
+        <texture name="oldmetal.gif">
+            <file>/lib/stdtex/oldmetal.jpg</file>
+        </texture>
+        <texture name="parket.gif">
+            <file>/lib/stdtex/parket.jpg</file>
+        </texture>
+        <texture name="asphalt.gif">
+            <file>/lib/stdtex/asphalt.jpg</file>
+        </texture>
+        <texture name="mosaic.gif">
+            <file>/lib/stdtex/mosaic.jpg</file>
+        </texture>
+        <texture name="mosholes.gif">
+            <file>/lib/stdtex/mosholes.png</file>
+        </texture>
+        <texture name="bricks.gif">
+            <file>/lib/stdtex/bricks.jpg</file>
+        </texture>
+        <texture name="oldbrick.gif">
+            <file>/lib/stdtex/oldbrick.jpg</file>
+        </texture>
+        <texture name="window.gif">
+            <file>/lib/stdtex/window.jpg</file>
+        </texture>
+        <texture name="red.gif">
+            <file>/lib/stdtex/red.jpg</file>
+        </texture>
+        <texture name="green.gif">
+            <file>/lib/stdtex/green.jpg</file>
+        </texture>
+        <texture name="blue.gif">
+            <file>/lib/stdtex/blue.jpg</file>
+        </texture>
+        <texture name="yellow.gif">
+            <file>/lib/stdtex/yellow.jpg</file>
+        </texture>
+        <texture name="sky.gif">
+            <file>/lib/stdtex/sky.jpg</file>
+        </texture>
+        <texture name="misty.gif">
+            <file>/lib/stdtex/misty.jpg</file>
+        </texture>
+        <texture name="raindrop">
+            <file>/lib/std/raindrop.png</file>
+        </texture>
+        <texture name="snow">
+            <file>/lib/std/snow.jpg</file>
+        </texture>
+        <texture name="spark">
+            <file>/lib/std/spark.png</file>
+        </texture>
+        <texture name="white.gif">
+            <file>/lib/std/white.gif</file>
+        </texture>
+        <texture name="flare_center">
+            <file>/lib/stdtex/flare_center.jpg</file>
+        </texture>
+        <texture name="flare_spark1">
+            <file>/lib/stdtex/flare_rbow.jpg</file>
+        </texture>
+        <texture name="flare_spark2">
+            <file>/lib/stdtex/flare_purp.jpg</file>
+        </texture>
+        <texture name="flare_spark3">
+            <file>/lib/stdtex/flare_picir.jpg</file>
+        </texture>
+        <texture name="flare_spark4">
+            <file>/lib/stdtex/flare_grcir.jpg</file>
+        </texture>
+        <texture name="flare_spark5">
+            <file>/lib/stdtex/flare_pink.jpg</file>
+        </texture>
+        <texture name="blobby.jpg">
+            <file>/lib/stdtex/blobby.jpg</file>
+        </texture>
+        <proctex name="fire">
+            <type>fire</type>
+        </proctex>
+        <proctex name="water">
+            <type>water</type>
+        </proctex>
+        <proctex name="dots">
+            <type>dots</type>
+        </proctex>
+        <proctex name="plasma">
+            <type>plasma</type>
+        </proctex>
+        <texture name="billboard">
+            <file>/lib/std/cslogods.png</file>
+        </texture>
+        <texture name="seagull">
+            <file>/lib/std/seagull.gif</file>
+        </texture>
+    </textures>
+    <materials>
+        <material name="tree">
+            <texture>tree</texture>
+        </material>
+        <material name="snow">
+            <texture>snow</texture>
+        </material>
+        <material name="spark">
+            <texture>spark</texture>
+        </material>
+        <material name="mosholes">
+            <texture>mosholes.gif</texture>
+        </material>
+        <material name="robot">
+            <texture>oldmetal.gif</texture>
+        </material>
+        <material name="robotMulti">
+            <texture>oldmetal.gif</texture>
+            <layer>
+                <texture>spark</texture>
+                <scale u="20" v="20" />
+                <mixmode>
+                    <multiply />
+                    <tiling />
+                </mixmode>
+            </layer>
+        </material>
+        <material name="raindrop">
+            <texture>raindrop</texture>
+        </material>
+        <material name="white">
+            <texture>white.gif</texture>
+        </material>
+        <material name="bricks">
+            <texture>bricks.gif</texture>
+            <layer>
+                <texture>spark</texture>
+                <scale u="10" v="10" />
+                <mixmode>
+                    <alpha>0.74902</alpha>
+                    <tiling />
+                </mixmode>
+            </layer>
+        </material>
+        <material name="mosaic">
+            <texture>mosaic.gif</texture>
+        </material>
+        <material name="oldmetal">
+            <texture>oldmetal.gif</texture>
+        </material>
+        <material name="parket">
+            <texture>parket.gif</texture>
+        </material>
+        <material name="asphalt">
+            <texture>asphalt.gif</texture>
+        </material>
+        <material name="mosholes">
+            <texture>mosholes.gif</texture>
+        </material>
+        <material name="oldbrick">
+            <texture>oldbrick.gif</texture>
+        </material>
+        <material name="window">
+            <texture>window.gif</texture>
+        </material>
+        <material name="red">
+            <texture>red.gif</texture>
+        </material>
+        <material name="green">
+            <texture>green.gif</texture>
+        </material>
+        <material name="blue">
+            <texture>blue.gif</texture>
+        </material>
+        <material name="yellow">
+            <texture>yellow.gif</texture>
+        </material>
+        <material name="sky">
+            <texture>sky.gif</texture>
+        </material>
+        <material name="misty">
+            <texture>misty.gif</texture>
+        </material>
+        <material name="blobby">
+            <texture>blobby.jpg</texture>
+        </material>
+        <material name="billboard">
+            <texture>billboard</texture>
+        </material>
+        <material name="green_color">
+            <color red="0" green="1" blue="0" />
+        </material>
+        <material name="seagull">
+            <texture>seagull</texture>
+        </material>
+    </materials>
+</world>

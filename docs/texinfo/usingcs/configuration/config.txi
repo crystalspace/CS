@@ -1,0 +1,33 @@
+@c -*-texinfo-*-
+@node Configuration File, Config Domains, Common Command Line Options, Options
+@subsection Configuration File
+@cindex Configuration File
+
+Many applications have an accompanying configuration file which describes
+configuration options specific to that application.  Similarly, plug-in
+modules can have configuration files.  Configuration files are named with the
+file extension @file{.cfg} and are typically located within the @sc{vfs}
+virtual directory @file{/config/} (@pxref{VFS}) which is often mounted at the
+physical location @file{CS/data/config} for Crystal Space sample applications.
+
+The format of these files is simple. They consist of a number of @dfn{keys},
+each of which consists of a name, a @dfn{value} and an optional comment.  Key
+names contain dots to create a pseudo-hierarchy, similar to a file system; for
+example: @samp{Video.OpenGL.EnableDither}.  This should be interpreted as the
+@samp{EnableDither} option in the sub-section @samp{OpenGL.}, which resides in
+section @samp{Video.} (note that the dots are part of the key name).
+
+The file itself looks something like this:
+
+@example
+; This is the comment for the first batch of keys.
+Section.Keyname = Value
+; Comments may be
+; several lines long
+; The option 'Section.TestOption' (below) has no attached comment.
+Video.OpenGL.EnableDither = true
+Section.TestOption = false
+; Comments at the end of the file do not belong to any configuration
+; key. When a config file is loaded and saved again later this
+; end-of-file comment is retained at the end of the file.
+@end example

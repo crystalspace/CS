@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- odedynam.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.dynamics.ode</name>
+        <implementation>csODEDynamics</implementation>
+        <description>ODE physics</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

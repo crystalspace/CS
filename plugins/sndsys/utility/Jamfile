@@ -1,0 +1,4 @@
+SubDir TOP plugins sndsys utility ;
+
+SubInclude TOP plugins sndsys utility eventrecorder ;
+

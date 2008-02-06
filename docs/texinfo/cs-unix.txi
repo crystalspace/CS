@@ -1,0 +1,4 @@
+\input texinfo
+@include unixdef.txi
+@import{cs.txi}
+@bye

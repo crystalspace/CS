@@ -1,0 +1,11 @@
+SubDir TOP plugins mesh spr3d object ;
+
+Description spr3d : "3D Sprite mesh object plugin" ;
+
+Plugin spr3d
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith spr3d : crystalspace ;
+
+CompileGroups spr3d :  meshes ;
+

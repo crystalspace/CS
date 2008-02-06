@@ -1,0 +1,5 @@
+SubDir TOP plugins font server ;
+
+SubInclude TOP plugins font server csfont ;
+SubInclude TOP plugins font server fontplex ;
+SubInclude TOP plugins font server freefnt2 ;

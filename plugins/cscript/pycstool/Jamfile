@@ -1,0 +1,6 @@
+SubDir TOP plugins cscript pycstool ;
+
+if $(PYTHON.AVAILABLE) = "yes"
+{
+  PyBindingModule cstoolmod : cstool : cstoolmod.cpp : : : "cstool cs Python module" ;
+}

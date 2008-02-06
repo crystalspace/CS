@@ -1,0 +1,6 @@
+Comparing walktest between NR and OR:
+
+	- The NR still has portal clipping portals in some situations.
+	- Make shaders compatible with csObject/iRegion.
+	- Working loaders for all new features (partially done).
+	- Shadows (needs fixing).

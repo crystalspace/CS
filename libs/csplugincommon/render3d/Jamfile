@@ -1,0 +1,3 @@
+SubDir TOP libs csplugincommon render3d ;
+
+CsLibAddModule ;

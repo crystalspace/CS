@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- dynavis.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.culling.dynavis</name>
+        <implementation>csDynaVis</implementation>
+        <description>Dynamic Visibility System</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

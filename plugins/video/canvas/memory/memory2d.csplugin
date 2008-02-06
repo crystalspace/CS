@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- memory2d.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphics2d.memory</name>
+        <implementation>csGraphicsMemory</implementation>
+        <description>Crystal Space Memory-Only 2D Canvas</description>
+        <requires>
+          <class>crystalspace.font.server.</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>

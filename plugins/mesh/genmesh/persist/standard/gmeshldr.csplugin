@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!-- gmeshldr.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.loader.factory.genmesh</name>
+        <implementation>csGeneralFactoryLoader</implementation>
+        <description>Crystal Space General Mesh Factory Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.loader.genmesh</name>
+        <implementation>csGeneralMeshLoader</implementation>
+        <description>Crystal Space General Mesh Mesh Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.factory.genmesh</name>
+        <implementation>csGeneralFactorySaver</implementation>
+        <description>Crystal Space General Mesh Factory Saver</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.genmesh</name>
+        <implementation>csGeneralMeshSaver</implementation>
+        <description>Crystal Space General Mesh Mesh Saver</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

@@ -1,0 +1,4 @@
+SubDir TOP plugins mesh thing ;
+
+SubInclude TOP plugins mesh thing object ;
+SubInclude TOP plugins mesh thing persist ;

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- null2d.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphics2d.null</name>
+        <implementation>csGraphics2DNull</implementation>
+        <description>Null 2D graphics driver for Crystal Space</description>
+        <requires>
+          <class>crystalspace.font.server.</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>

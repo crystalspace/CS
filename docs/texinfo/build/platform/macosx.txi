@@ -1,0 +1,465 @@
+@c -*-texinfo-*-
+
+@node MacOS/X, , Cygwin, Platform Instructions
+@subsection MacOS/X
+@cindex MacOS/X
+
+@emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.  Copyright
+@copyright{} 1999, 2000, 2001, 2002, 2003, 2004 by Eric Sunshine.  Last updated
+18 September 2004.}
+
+Crystal Space was ported to MacOS/X by Eric Sunshine.  If you have questions or
+comments about this port, please contact Eric Sunshine at
+@email{sunshine@@sunshineco.com}.  Matt Reda added OpenGL, CoreGraphics, and
+CoreAudio drivers to the MacOS/X port.  If you have questions or comments about
+these drivers, please contact Matt Reda at @email{mreda@@mac.com} or Eric
+Sunshine.
+
+This section contains configuration, compilation, installation, and usage
+instructions for the MacOS/X port of Crystal Space.  The MacOS/X port of
+Crystal Space is built atop Apple's @dfn{Cocoa} technology which Apple
+inherited from NeXT and then enhanced.  This port is the progeny of the earlier
+NextStep, OpenStep, and MacOS/X Server 1.0 (Rhapsody) ports of Crystal Space by
+Eric Sunshine.
+
+Comprehensive and detailed implementation information about the MacOS/X port is
+also available (@pxref{MacOS/X Details}).
+
+If you have downloaded a binary-only package of Crystal Space for MacOS/X, you
+may want to skip over the following sections explaining how to build Crystal
+Space, and jump directly to the section explaining how to run the applications
+(@pxref{MacOS/X Running Programs}).
+
+@menu
+* MacOS/X Libraries:: Library Prerequisites
+* MacOS/X Resources:: Resources
+* MacOS/X Building:: Building
+* MacOS/X Running Programs:: Using Crystal Space
+@end menu
+
+@node MacOS/X Libraries, MacOS/X Resources, MacOS/X, MacOS/X
+@subsubsection Library Prerequisites
+
+In addition to obtaining the project source code (@pxref{Where to Get}), you
+may also want to download and compile several support libraries used for image
+manipulation (@pxref{External Libraries}).  The libraries @samp{libpng} and
+@samp{libjpeg}, which are present on many Unix installations, are absent from
+MacOS/X.  The optional @samp{libmng} is less common.
+
+One way to procure these libraries is to install them with Fink, which is a
+tool for installing pre-built Unix and Unix-like tools and resources on
+MacOS/X.
+
+@noindent
+@uref{http://fink.sourceforge.net/}
+
+Alternately, the libraries can be built manually.  You can download the
+required external library source code packages from their canonical download
+sites (@pxref{External Libraries}).
+
+If you have permission to do so, it is best to install the @sc{jpeg}, @sc{png},
+and @sc{mng} libraries in standard locations by following the installation
+instructions for each package (for example @samp{make install}).  In some
+cases, these libraries may already be present on your computer if you installed
+them separately (via Fink, for instance) or if they were installed by default.
+(For example, @sc{zlib}, which is also required by Crystal Space, is already
+pre-installed on MacOS/X.)
+
+If you do not have permission to install these libraries, you can still build
+Crystal Space by unpacking each external library into the @file{CS/libs}
+directory and building them there.  For example:
+
+@example
+cd CS/libs
+gnutar xfz libpng*.tar.gz
+gnutar xfz jpegsrc*.tar.gz
+gnutar xfz libmng*.tar.gz
+@end example
+
+@noindent
+The libraries can be built as follows:
+
+@example
+cd CS/libs/libpng*
+make -f scripts/makefile.macosx libpng.a
+
+cd ../*jpeg*
+sh ./configure
+make libjpeg.a
+
+cd ../libmng*
+sh ./configure
+make libmng.a
+@end example
+
+@node MacOS/X Resources, MacOS/X Building, MacOS/X Libraries, MacOS/X
+@subsubsection Resources
+
+The standard library archive, @file{standard.zip} and the standard texture
+archive, @file{stdtex.zip} are included with the Crystal Space package within
+the @file{CS/data} directory.  These files contain resources which are used by
+several Crystal Space demonstration programs.  Do not unpack these files;
+Crystal Space uses them as-is.
+
+You will also need to have at least one @dfn{map} file in order to use the
+Crystal Space demonstration program, WalkTest.  Typically map files should be
+placed within the @file{CS/data} directory.  As with other Crystal Space
+resources, map files are actually compressed archives which are used directly
+by the engine, thus you should not unpack these archives.
+
+The most commonly used map file is @file{flarge} since it demonstrates many of
+the special features of the engine rather than focusing on merely one or two
+areas.  This map is typically distributed as part of the Crystal Space package
+and can be found in the @file{CS/data/flarge} directory.  You can download
+additional example map files from the @file{maps} subdirectory of each release
+of Crystal Space at the download site:
+
+@noindent
+@uref{http://www.crystalspace3d.org/support/release/}
+
+@noindent
+Be sure to place the map files into the @file{CS/data} directory.
+
+@node MacOS/X Building, MacOS/X Running Programs, MacOS/X Resources, MacOS/X
+@subsubsection Building
+
+Once you have obtained the latest Crystal Space source code package
+(@pxref{Where to Get}) and have installed or prepared the supporting libraries
+(@pxref{MacOS/X Libraries}), unpack the source code archive into a convenient
+directory as shown below.  A description of the directory hierarchy which is
+created when you unpack the source code archive is available,
+@ref{Directory Hierarchy}.  A description of the files specific to the MacOS/X
+port is also available, @ref{MacOS/X Details}.
+
+@example
+gnutar xfz @var{CS-package-name}.tgz
+@end example
+
+A note of caution: Take care when obtaining the Crystal Space source code to
+ensure that the line-terminators are in Unix format (a single linefeed should
+terminate each line).  This is an especially important consideration when
+transporting the code from Windows to MacOS/X.  Although many MacOS/X tools
+deal gracefully with Windows line-terminators (a carriage-return follwed by a
+linefeed), not all tools do so, and may emit apparently inexplicable error
+messages when encountering files with Windows line-terminators.  The official
+distributions of Crystal Space, including the stable releases and the @sc{svn}
+snapshots, are packaged with Unix line-terminators, which are acceptable on all
+supported platforms.  These virgin packages themselves can be transported
+between Windows and MacOS/X safely
+
+Crystal Space can be built from the command-line (Terminal.app) using either
+@file{make} or Jam (@pxref{GettingJam}).  Both tools work equally well.  In the
+examples below, wherever @samp{make -k} is used, you can instead substitute
+@file{jam} if you so desire.  @emph{Note}: Apple ships a very old and
+highly modified version of Jam with MacOS/X which is unsuitable for building
+Crystal Space.  If this is the only Jam which you have installed, then just
+build Crystal Space using @file{make}.  Alternately, you may download and
+install a more recent version of Jam (@pxref{GettingJam}). Jam might also be
+available via Fink (though it was not at the time of this writing).
+
+The Crystal Space project consists of a number of components and example
+programs.  The following commands are all issued from within the top level
+Crystal Space source code directory named @file{CS}.
+
+To begin building Crystal Space, first configure the project for MacOS/X by
+typing the following command from within the root @file{CS} directory:
+
+@example
+./configure
+@end example
+
+At configuration time, you can also specify where Crystal Space should be
+installed.  By default, it is installed in several subdirectories of
+@file{/usr/local}:
+
+@example
+/usr/local/bin
+/usr/local/etc/crystalspace
+/usr/local/include/crystalspace
+/usr/local/lib
+/usr/local/lib/crystalspace
+/usr/local/share/crystalspace
+/usr/local/share/docs/crystalspace-x.xx
+@end example
+
+You can, however, specify a different location if desired.  This setting is
+remembered and automatically applied later when you install the project.  For
+example:
+
+@example
+./configure --prefix=/Library/CrystalSpace
+@end example
+
+If you plan to work on Crystal Space itself, as opposed to utilizing Crystal
+Space for your own project, you might want to configure Crystal Space to be
+built in debug mode:
+
+@example
+./configure --enable-debug
+@end example
+
+For a full list of configuration options, type:
+
+@example
+./configure --help
+@end example
+
+If the Crystal Space source directory is read-only, if it is shared between
+several developers, or if you simply dislike building a project within its
+source tree, you can instead configure and build from a different directory.
+For instance:
+
+@example
+mkdir $HOME/builddir
+cd $HOME/builddir
+/path/to/CS/configure --enable-debug
+@end example
+
+Once the project has been configured, you can begin building the Crystal Space
+demonstration programs.  Alternately, if you are interested in building only
+certain components of the system, such as drivers or libraries, then you can do
+that instead.
+
+To see a list of all targets which can be built, type:
+
+@example
+make help
+@end example
+
+The simplest way to build the entire package, including all applications,
+drivers, and plug-in modules is to invoke the makefile target @samp{all}:
+
+@example
+make -k all
+@end example
+
+Alternately, if you are using Jam:
+
+@example
+jam all
+@end example
+
+This can be a fairly time consuming operation.  If you would like to be more
+selective and only build the necessary plug-in modules and a subset of the
+available applications, you can invoke their targets individually.
+
+For example, to build all plug-in modules, you could invoke this command:
+
+@example
+make -k plugins  # @r{Builds all plug-in modules.}
+@end example
+
+To build only the WalkTest application and the plug-in modules which it most
+commonly requires use the following target:
+
+@example
+make walkall  # @r{Builds WalkTest and most required plug-ins}
+@end example
+
+For finer control over which applications and plugins are built, you can invoke
+their targets directly.  For instance:
+
+@example
+make walktest  # @r{Builds @code{walktest}, the map exploration program}
+make glosx2d   # @r{Builds @code{glosx2d}, the MacOS/X OpenGL 2D driver}
+make gl3d      # @r{Builds @code{gl3d}, the OpenGL renderer}
+@end example
+
+All programs require at least some plug-in modules to be present, so be sure to
+build those, as well, by invoking the @samp{plugins} makefile target as
+illustrated above if you have not already invoked the @samp{all} target.
+
+Once you have built the project, you will probably want to install it as a
+@dfn{software development kit} (@sc{sdk}).  The installation phase installs
+everything needed to create your own programs using Crystal Space.  Some
+resources, such as demonstration applications and certain data files are not
+installed since they are not required for development.  Installing the @sc{sdk}
+is optional, though recommended.  If you simply wish to run the example
+programs, then you need not invoke the installation phase.
+
+By default, Crystal Space is installed in subdirectories of @file{/usr/local},
+however you can specify a different location when you configure the project, as
+explained above.  Installation can be performed with the following command:
+
+@example
+make install
+@end example
+
+Once you have installed the project, you can release disk space used by the
+build process:
+
+@example
+make distclean
+@end example
+
+@node MacOS/X Running Programs, , MacOS/X Building, MacOS/X
+@subsubsection Using Crystal Space
+
+Crystal Space programs can be run directly from the command-line or from the
+Finder.  If you plan to launch programs by double-clicking on them in the
+Finder, then you must tell them where to find the resources which they require
+to run.  This is accomplished by storing the path to the root of the Crystal
+Space directory in the MacOS/X @emph{defaults} database under the name
+@samp{CrystalSpaceRoot}.  It is most useful to configure this setting in the
+@emph{global} defaults domain.  Depending upon your needs, you can set this to
+point at either the installed Crystal Space @sc{sdk} or to the development
+directory where you built the project; either location works.
+
+For example, if you have installed Crystal Space at the default location, then
+you can tell programs where to find their resources by invoking the following
+configuration command from the command-line:
+
+@example
+defaults write NSGlobalDomain CrystalSpaceRoot "/usr/local"
+@end example
+
+If necessary, it is possible to configure @samp{CrystalSpaceRoot} for a
+particular application.  If you do so, this setting will override the global
+setting.  For example:
+
+@example
+defaults write walktest CrystalSpaceRoot "$HOME/CS"
+@end example
+
+It is also possible to instruct Crystal Space applications to ignore the value
+of @samp{CrystalSpaceRoot} by assigning the @samp{CrystalSpaceRootIgnore}
+option a value of @samp{Yes}.  This is most useful when you would like to have
+a particular application ignore the value of @samp{CrystalSpaceRoot} set in the
+global domain.  For example:
+
+@example
+defaults write walktest CrystalSpaceRootIgnore "Yes"
+@end example
+
+Before attempting to run any of the Crystal Space sample applications, ensure
+that the files @file{standard.zip} and @file{stdtex.zip} reside in
+@file{CS/data} or in the @file{data} directory where Crystal Space is
+installed.  These files contain resources and textures which are used by
+several of the example programs and map files.
+
+You need to have one or more @dfn{map} files in order to run WalkTest.  These
+are the files which contain the maps and rooms which you can explore with
+WalkTest.  The most commonly used example map file is @file{flarge}.
+
+You may need adjust the ambient lighting which the engine applies when it
+lights the maps.  This may be necessary if you find that the scenes appears too
+dark.  You can do this by setting ambient lighting values via the following
+configuration commands from the command-line.  The default value for these
+settings is 20.  If that is too dark for you, try using a higher value.
+For example:
+
+@example
+defaults write CrystalSpace.Global Engine.Lighting.Ambient.Red 50
+defaults write CrystalSpace.Global Engine.Lighting.Ambient.Green 50
+defaults write CrystalSpace.Global Engine.Lighting.Ambient.Blue 50
+@end example
+
+If you want ambient lighting to apply to only a single application, or if you
+want to override the global setting with an application-specific setting,
+replace @samp{CrystalSpace.Global} in the above commands with
+@samp{CrystalSpace.Application} where @samp{Application} is the name of the
+application (for example, @samp{CrystalSpace.Walktest}).
+
+@strong{Important}: The first time you explore a map after changing the ambient
+white value, you should run WalkTest with the @samp{--relight} option.  This
+causes Crystal Space to recalculate the lighting information in the map in
+order to take advantage of the new ambient light value.  Note, however, that
+relighting a map may be time consuming, particularly for certain sizable maps,
+so be patient.
+
+As a general rule, you may find it useful to specify the @samp{--relight}
+option with newly downloaded maps, or at any other time that the lighting in a
+map seems somehow to be incorrect.
+
+To specify options when running programs, you must invoke the programs from the
+command-line, however the need to specify command-line options is rare, so this
+should not prove much of an inconvenience.
+
+To run WalkTest with a particular map (for instance, @file{flarge}) for the
+very first time, for example, type:
+
+@example
+./walktest.app/Contents/MacOS/walktest --relight flarge
+@end example
+
+Subsequent uses of the map file do not require @samp{--relight}, in which case
+you can type:
+
+@example
+./walktest.app/Contents/MacOS/walktest flarge
+@end example
+
+Once invoked, you will be able to explore the map file (@file{flarge}) by using
+the navigation controls (@pxref{Walktest Movement}).  To explore a different
+map, substitute its name in place of @samp{flarge}.
+
+If you would like to explore a map other than @samp{flarge} without having to
+type it on the command-line, you can add the following setting to the MacOS/X
+defaults database.  This will allow you to explore different maps even when
+launching WalkTest from the Finder.  For example, to explore a map named
+@samp{castle}, set the following default value:
+
+@example
+defaults write CrystalSpace.Walktest Walktest.Settings.WorldFile castle
+@end example
+
+Other interesting applications, such as csDemo, also come with
+Crystal Space.
+
+By default, Crystal Space renders the 3D scenes with the OpenGL renderer.  Some
+versions of the MacOS/X operating system ship with OpenGL drivers which do not
+not perform particularly well with the Crystal Space OpenGL renderer, and this
+problem could result in poor frame rates.  Consequently, you may want to
+configure Crystal Space to instead use the software renderer.  There are two
+ways to enable the software renderer.  First, you may instruct a program to use
+software renderer from the command-line:
+
+@example
+./walktest.app/Contents/MacOS/walktest --video=software flarge
+@end example
+
+Second, you can enable the software renderer on a permanent basis for all
+applications by setting the following default.  Once you have applied this
+setting, you no longer need to specify @samp{--video=software} on the
+command-line.
+
+@example
+defaults write CrystalSpace.Global System.Plugins.iGraphics3D \
+  crystalspace.graphics3d.software
+@end example
+
+Crystal Space renders 3D scenes in a window by default, however you can
+instruct the applications to use @dfn{full-screen} mode with the @samp{--fs}
+command-line option.  For example:
+
+@example
+./walktest.app/Contents/MacOS/walktest --fs flarge
+@end example
+
+Alternately, if you prefer to launch programs from the Finder, you can install
+the following default setting to enable full-screen mode for all Crystal Space
+applications:
+
+@example
+defaults write CrystalSpace.Global Video.FullScreen yes
+@end example
+
+It is also possible to enable full-screen mode selectively only for certain
+applications.  For example, to enable full-screen mode only for CsDemo
+by default, you could apply this default setting:
+
+@example
+defaults write CrystalSpace.csdemo Video.FullScreen yes
+@end example
+
+On the MacOS/X, Crystal Space will pause execution when the window is
+de-activated, and resume execution when the window is re-activated.  Paused
+state is indicated by the text ``[Paused]'' in the title of the window.  If you
+wish to disable this behavior, and allow programs to run even when the window
+is not active, apply this setting to your defaults database:
+
+@example
+defaults write CrystalSpace.Global System.RunWhenNotFocused yes
+@end example
+
+You can also use the command-line option @samp{--alwaysruns}.

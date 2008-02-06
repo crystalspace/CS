@@ -1,0 +1,5 @@
+The libcaca, a colour asciiart library, is available here:
+
+http://sam.zoy.org/libcaca/
+
+The configuration options reside in the data/config/cacacanvas.cfg file.

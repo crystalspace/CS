@@ -1,0 +1,5 @@
+SubDir TOP plugins mesh spr3d persist ;
+
+SubInclude TOP plugins mesh spr3d persist binary ;
+SubInclude TOP plugins mesh spr3d persist standard ;
+SubInclude TOP plugins mesh spr3d persist spr3md2 ;

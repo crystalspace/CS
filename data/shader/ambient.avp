@@ -1,0 +1,39 @@
+<arbvp>
+
+<variablemap variable="light ambient" destination="register 0"/>
+
+<program>
+<![CDATA[
+!!ARBvp1.0
+#---------------------------------------
+# Simple Vertex Lighting Program
+#---------------------------------------
+#Parameter definition
+PARAM mvp[4]	     = { state.matrix.mvp };
+PARAM color   = program.local[0];
+#PARAM color   = { 0.3, 0.3, 0.3, 1};
+# Per vertex inputs
+ATTRIB iPos		= vertex.position;
+ATTRIB iTex0	= vertex.texcoord[0];
+# Outputs
+OUTPUT oPos		= result.position;
+OUTPUT oCol0	= result.color;
+OUTPUT oTex0	= result.texcoord;
+# Temporaries
+
+#Transform vertex to viewspace
+DP4 oPos.x, mvp[0], iPos;
+DP4 oPos.y, mvp[1], iPos;
+DP4 oPos.z, mvp[2], iPos;
+DP4 oPos.w, mvp[3], iPos;
+
+#Just pass on texture-coordinate
+MOV oTex0, iTex0;
+
+#Set color
+MOV oCol0, color;
+
+END
+]]>
+</program>
+</arbvp>

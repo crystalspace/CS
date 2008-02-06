@@ -1,0 +1,26 @@
+@c -*-texinfo-*-
+@node Blender, 3DSMax, Simple Map Example, Working with Engine Content
+@section Making Levels and Models in Blender
+@cindex Blender
+@cindex blend2cs
+@cindex blender2crystal
+
+Blender is one of the most popular free 3D modellers available and it is
+supported very well by Crystal Space. You can find Blender here:
+
+@url{http://www.blender3d.org}
+
+@subheading Making Levels and Models
+
+For making levels and models you can use the very powerful
+@samp{blender2crystal} exporter. This is an exporter that integrates
+nicely with Blender (with a full GUI). You can download it (and read the
+manual) from:
+
+@url{http://b2cs.delcorp.org/index.php/Main_Page}
+
+@subheading Making Cal3D Models
+
+Models of type Cal3d (@pxref{MeshObject SprCal3D}) can be converted from
+Blender using the Cal3d exporter that is included with Blender.
+

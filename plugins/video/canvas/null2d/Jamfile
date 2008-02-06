@@ -1,0 +1,11 @@
+SubDir TOP plugins video canvas null2d ;
+
+Description null2d : "null 2D driver" ;
+
+Plugin null2d
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith null2d : crystalspace ;
+
+CompileGroups null2d :  canvases ;
+

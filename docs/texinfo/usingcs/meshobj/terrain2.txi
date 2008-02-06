@@ -1,0 +1,272 @@
+@c -*-texinfo-*-
+@node MeshObject Terrain2, MeshObject Particles, MeshObject TerrFunc, MeshObject
+@subsection Terrain2 Mesh Object
+@cindex MeshObject
+@cindex Terrain Engine
+@cindex @code{iMeshObject}
+@cindex @code{iMeshObjectFactory}
+@cindex @code{iMeshObjectType}
+@cindex @code{iTerrainDataFeeder}
+@cindex @code{iTerrainCollider}
+@cindex @code{iTerrainRenderer}
+@cindex @code{iTerrainSystem}
+@cindex @code{iTerrainCell}
+@cindex @code{iTerrainFactory}
+
+@emph{Written by M@aa{}rten Svanfeldt, 
+@email{developer@@svanfeldt.com}.}
+
+
+@samp{Terrain2} is a terrain/landscape mesh object made for rendering large outdoor
+areas. The landscape is represented as a heightmap defining the height of points
+in a fixed grid and the heights can either (normally) be statically defined
+by for example a texture or generated at runtime to accomodate changes in the
+landscape.
+
+@subsubheading Basic Structure
+
+The following @sc{scf} class names are used (for @code{csLoadPlugin}):
+
+@itemize @bullet
+@item
+Type plugin: @samp{crystalspace.mesh.object.terrain2}
+@item
+Loader plugin: @samp{crystalspace.mesh.loader.terrain2}
+@item
+Factory loader plugin: @samp{crystalspace.mesh.loader.factory.terrain2}
+@item
+Bruteblock renderer plugin: @samp{crystalspace.mesh.object.terrain2.bruteblockrenderer}
+@item
+Simple data feeder plugin: @samp{crystalspace.mesh.object.terrain2.simpledatafeeder}
+Threaded data feeder plugin: @samp{crystalspace.mesh.object.terrain2.threadeddatafeeder}
+@item
+Default collision detection plugin: @samp{crystalspace.mesh.object.terrain2.collider}
+@end itemize
+
+@menu
+* MeshObject Terrain2 General:: General description
+* MeshObject Terrain2 XML:: XML format
+@end menu
+
+@node MeshObject Terrain2 General, MeshObject Terrain2 XML, MeshObject Terrain2, MeshObject Terrain2
+@subsubsection General description
+
+To facilitate future improvements the plugin is split into several smaller 
+and communicating components
+
+@itemize @bullet
+@item
+Terrain system - defines cells, keeps track of loaded data, dispatch request
+to the collision, rendering and data feeder parts.
+@item
+Data feeder - provide height data on demand by either loading it from disk or
+generating it by for example fractal algorithms.
+@item
+Renderer - converts height data into triangles and feeds them into the rendering
+pipeline, providing LoD, culling etc.
+@item
+Collision system - do collision detection between height data and rays, segments 
+and triangles.
+@end itemize
+ 
+At current there are two implementations of data feeder, one renderer and one
+collision system.
+
+@subsubheading Terrain System
+
+The terrain system is the central part in @samp{terrain2} plugin as it contains
+definitions of cells as well as holding all other parts together.
+
+The main component in the terrain system is the @samp{cell}. Each cell within a
+terrain system is a self contained area of the 2d map that contains its own 
+height map, material map, renderer-, feeder- and collision-settings.  The 
+self-contained aspect is also related to that the cell is the unit used for paging 
+(on-demand loading and unloading) of terrain data.
+
+Each cell is defined by a small set of properties
+
+@multitable @columnfractions .4 .6
+@item Setting @tab Description
+@item gridsize
+@tab Number of height points in each direction. Should be one more than power of
+two (2^n+1) such as 129,257,1025. @emph{CAUTION: For time being the grid must be
+square}.
+
+@item position
+@tab 3D offset in XZ-plane of cell relative to mesh center. 
+See more under coordinate systems
+
+@item size
+@tab 3D size of cell in CS units. Defines the xz size as well as the max height
+scale.
+
+@item heightdata
+@tab Array of height data for each gridpoint, ordered left to right, top to bottom.
+Other geometric properties of the landscape such as normal direction and tangent
+plane is derived from the height data.
+@end multitable
+
+
+@subsubheading Coordinate system
+
+One important point to remember when dealing with terrain2 is the coordinate
+spaces it use. There are two major coordinat spaces to keep track of, namely
+@samp{heightmap space} and @samp{model space}. 
+
+Heightmap space is the 2D coordinate space in which the heightmap is specified, 
+it has (0,0) in upper left corner of heightmap and x increase to the right while
+y increase down. Most operations on cell level, such as 
+@samp{iTerrainCell::GetNormal()} and @samp{iTerrainCell::GetHeight()} operates
+on coordinates in heightmap space.
+
+The second coordinate space is the 3d model space, which is the normal per 
+mesh-object coordinate space that all meshes in CS have. The transform between 
+model space and world space is defined by the iMovable of the mesh wrapper. All
+rendering is in model space as well as some mesh global APIs such as HitBeam.
+
+The transform between heightmap space and model space have a fixed orientation
+(rotation) while the linear components are set via the per cell size and offset.
+
+@ifnotinfo
+@picturess{usingcs,meshobj,terrain2coordspace}
+@end ifnotinfo
+
+@subsubheading Renderer
+The renderer plugin is the most obviously visible plugin. It takes the terrain
+height data and transforms it into a list of triangles for rendering and in the
+process does such things as mesh simplifcation (LOD algorithms).
+
+In the current codebase of CS there is just one implementation of the rendering
+plugin which is based on the "bruteblock" algorithm. Bruteblock works by dividing
+the full cell grid into four quadrants, then continuing to subdivide those until
+either the lowest subdivision level is reached or the LOD algorithm determins
+there should be no more subdivisions.
+
+Bruteblock accepts a number of named parameters to control the LOD behaviour
+
+@multitable @columnfractions .3 .7
+@item Parameter @tab Description
+@item block resolution 
+@tab Block resolution in number of gridpoints. Should be power of two, other
+values are rounded down. Default value is 16.
+@item lod splitcoeff
+@tab Coefficient used in the calculation of per block lod level. Can approximatly
+be interpreted as the distance to split in number of block-widths. Default value
+is 16.
+@item splat distance
+@tab Distance where to switch from material splatting to basemap rendering.
+Passed on to the shader via the @samp{texture lod distance} shader variable.
+Default value is 200.
+@end multitable
+
+@subsubheading Data feeders
+
+The data feeder is responsible for loading and pre-loading of terrain height
+and material map data. There are two implementations, the simple and the threaded
+data feeders. They both utilize the same loading code and properties however
+the threaded feeder have the ability to preload data in the background at the
+cost of some overhead and higher memory usage.
+
+The feeders take three parameters
+
+@multitable @columnfractions .3 .7
+@item Parameter @tab Description
+@item heightmap source
+@tab File name of the heightmap data.
+@item heightmap format
+@tab Data format in the heightmap source. Possible values are @sc{image}, 
+@sc{raw8}, @sc{raw16le}, @sc{raw16be}, @sc{raw32le}, @sc{raw32be}, @sc{rawfloatle},
+@sc{rawfloatbe}. The number specify the bit width, le/be little endian or big
+endian. Default value is @sc{image} which means the data is a image to be loaded
+by the normal image loaders (such as a png image). @emph{When loading a raw format
+map, make sure to use the right format as no data validation is done. Invalid data
+can cause your application to crash.}
+@item materialmap source
+@tab File name of the material map data.
+@item offset
+@tab Height offset value to add to height values after loading.
+@end multitable
+
+@subsubheading Collision plugin
+
+The collision plugin is responsible for doing collision detection between the
+height map and triangles or segments/rays. There are currently just a single
+implementation which use a variant of the digital differential algorithm to
+compute the intersection points directly without having to triangulate the terrain.
+The collision plugin have no properties.
+
+
+@node MeshObject Terrain2 XML, , MeshObject Terrain2 General, MeshObject Terrain2
+@subsubsection XML format
+
+The main way to use the terrain2 plugin is via its syntax in the worldfiles.
+
+@subsubheading Terrain factory XML syntax
+The majority of the settings are specified on a per factory level. The factory
+loader recognize the following tags.
+
+@table @code
+@item <renderer>pluginname</renderer>
+Set the renderer plugin to use. Must be specified if rendering is desired.
+@item <collider>pluginname</collider>
+Set the collision detection plugin to use. Must be specified for collision detection
+to work.
+@item <feeder>pluginname</feeder>
+Set feeder plugin to use.
+@item <cells>...</cells>
+Container for cells and per cell settings. See below for details.
+@item <maxloadedcells>number</maxloadedcells>
+Set the maximum number of cells to be loaded at any given time.
+@item <autopreload>yes/no</autopreload>
+Set if terrain should automatically preload cells which are outside view but
+can be expected to come into view shortly.
+@item <virtualviewdistance>factor</virtualviewdistance>
+Set enlargement factor for the virtual view used for automatic preloading.
+@end table
+
+
+The @code{<cells>} container contains definition of default settings as well
+as setting for individual cells. The @code{<celldefault>} accept the same
+settings as the @code{<cell>} except for the position and name tags.
+
+@table @code
+@item <name>cellname</name>
+Set cell name for future reference.
+@item <size x="" y="" z="" />
+Set cell size in model space.
+@item <position x="" y="" />
+Set the offset in the heightmap to model space transform.
+@item <gridsize width="" height="" />
+Set the size of the heightmap
+@item <materialmapsize width="" height="" />
+Set desired size of the material map data.
+@item <basematerial>materialname</basematerial>
+Set the material to use for the base rendering pass in the renderer.
+@item <materialmappersistent>yes/no</materialmappersistent>
+Control if the material map should be persistent or not. A persistent material 
+map allow you to modify it after loading but also results in increased memory
+usage.
+@item <renderproperties><param name="">value</param>...</renderproperties>
+Set one or more named parameters in the renderer. See the documentation for
+the renderer in use for a list of parameters and their values.
+@item <colliderproperties><param name="">value</param>...</colliderproperties>
+Set one or more named parameters in the collider. See the documentation for
+the collider in use for a list of parameters and their values.
+@item <feederproperties><param name="">value</param>...</feederproperties>
+Set one or more named parameters in the data feeder. See the documentation for
+the data feeder in use for a list of parameters and their values.
+@end table
+
+
+@subsubheading Terrain object XML syntax
+
+The terrain2 object loader is very simple and accept only two tags
+
+@table @code
+@item <factory>factoryname</factory>
+Set the terrain2 factory to use.
+@item <materialpalette><material>materialname</material>..</materialpalette>
+Set the materialpalette to use for rendering. The material palette is a list
+of materials numbered in the order specified in the xml tag. The number corresponds
+to the index in the materialmap.
+@end table

@@ -1,0 +1,6 @@
+SubDir TOP plugins cscript pyimap ;
+
+if $(PYTHON.AVAILABLE) = "yes"
+{
+  PyBindingModule imapmod : imap : imapmod.cpp : : : "imap cs Python module" ;
+}

@@ -1,0 +1,5 @@
+SubDir TOP plugins sndsys renderer ;
+
+SubInclude TOP plugins sndsys renderer software ;
+SubInclude TOP plugins sndsys renderer openal ;
+

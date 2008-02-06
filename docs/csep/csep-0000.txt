@@ -1,0 +1,33 @@
+CSEP: 0
+Title: Index of Crystal Space 3D Enhancement Proposals (CSEPs) 
+Version: $Revision$
+Last-changed: $Date$
+Author: Marten Svanfeldt
+Status: Active
+Type: Informational
+Created: 2005-07-17
+
+Index by Category
+
+     num  title                                             owner
+     ---  -----                                             -----
+
+ Meta-CSEPs (CSEPs about CSEPs or Process)
+ I     0  Index of Crystal Space 3D Enhancement Proposals   Svanfeldt
+ I     1  CSEP Guidelines                                   Svanfeldt
+ 
+ New proposals
+ P    10  Templated implementation of SCF                   Svanfeldt, Adams
+ 
+Key
+
+    I - Informational CSEP
+    P - Proposal CSEP
+    A - Accepted proposal
+    R - Rejected proposal
+    D - Deferred proposal
+    F - Final proposal
+    
+Copyright
+
+  This document has been placed in the public domain.

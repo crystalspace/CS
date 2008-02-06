@@ -1,0 +1,51 @@
+@c -*-texinfo-*-
+@node DocGuide, Feature List, UsingForProject, CS Introduction
+@section A Guide to This Documentation
+
+In this section we guide you through some of the more useful sections of
+the documentation related to creating your own project using Crystal
+Space.  This guide can help you find the information you want more
+quickly, but it is recommended that you scan through the entire
+documentation (just browsing the table of contents should be enough) so
+that you have a better idea of what is explained where.
+
+One of the most useful sections for creating your own project is of
+course the tutorial section (@pxref{Tutorials}). Here you will find
+tutorials which can help you to write your own Crystal Space game along
+with the very important introductory tutorial
+(@pxref{The Basics}). You should certainly read this if you want to
+have a good idea on some of the basic concepts of Crystal Space.
+
+Additionally, the tutorial section contains the @sc{howto} section
+(@pxref{HOWTO}).  The @sc{howto}s are small documents explaining how to
+deal with specific issues. They usually contain example code. Most of the
+@sc{howto}s are related to dealing with the Crystal Space
+engine (like collision detection, mesh lighting and animation, mesh
+movement, loading a map, etc), but there are others, such as those which
+explain how you can set up your own application outside of the Crystal Space
+application tree, one for Unix or Unix-like environments (such as Msys/Mingw or
+Cygwin) and another for Microsoft Visual C++.
+
+The section of the manual that talks about the engine (@pxref{Engine})
+is very important. If you want to know how the 3D engine works
+internally (which is important if you want to build your own 3D worlds)
+then you should read the section explaining the world components
+(@pxref{World Components}) and the section explaining portals
+(@pxref{Portal Engine}). There is a @sc{howto} about render
+priorities (@pxref{HOWTO Render Priorities}) which should assist greatly
+in that area. 
+
+The section about the Map File Parser (@pxref{Map Loader}) is useful if
+you want to create your map files manually.
+
+Reading the mesh object section (@pxref{MeshObject}) is also recommended.
+Mesh objects are objects that represent geometry in Crystal Space. If
+you want to display something in your world you will have to know how to
+use them.  The tutorials and @sc{howto}s contain information about mesh
+objects but this section contains the complete documentation.
+
+If you want to know more about how to build optimal maps for Crystal Space
+then you should take a look at @ref{Map Creation}. This section explains
+how you should partition your world in sectors, what kind of objects you
+can use, how to effectively use the visibility cullers and other techniques
+you should know when creating your maps for Crystal Space.

@@ -1,0 +1,271 @@
+@c -*-texinfo-*-
+
+@node MacOS/X Details, , Platform Details, Platform Details
+@subsection MacOS/X
+@cindex MacOS/X Details
+
+@emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.  Copyright
+@copyright{} 1999, 2000, 2001, 2002 by Eric Sunshine.  Last updated
+2 May 2004.}
+
+Crystal Space was ported to MacOS/X by Eric Sunshine.  If you have questions or
+comments about this port, please contact Eric Sunshine at
+@email{sunshine@@sunshineco.com}.  Matt Reda added OpenGL, CoreGraphics, and
+CoreAudio drivers to the MacOS/X port.  If you have questions or comments about
+these drivers, please contact Matt Reda at @email{mreda@@mac.com} or Eric
+Sunshine.
+
+This section contains comprehensive and detailed implementation information
+about the MacOS/X port of Crystal Space.  Configuration, compilation,
+installation, and usage instructions are also available, @ref{MacOS/X}.
+
+@menu
+* MacOS/X Contents:: Contents
+* MacOS/X Run-Loop:: Run-Loop
+* MacOS/X Dynamic Linking:: Dynamic Linking
+@end menu
+
+@node MacOS/X Contents, MacOS/X Run-Loop, MacOS/X Details, MacOS/X Details
+@subsubsection Contents
+@cindex MacOS/X Contents
+
+The root components of the MacOS/X port of Crystal Space are contained within
+these directories:
+
+@itemize @bullet
+@item @code{CS/libs/csutil/macosx}
+@item @code{CS/plugins/sound/driver/coreaudio}
+@item @code{CS/plugins/video/canvas/macosx/common}
+@item @code{CS/plugins/video/canvas/macosx/coregraphics}
+@item @code{CS/plugins/video/canvas/macosx/opengl}
+@end itemize
+
+Functionally, this port is comprised of two types of platform-specific modules:
+
+@itemize @bullet
+@item
+The core components which provide low-level platform-specific functionality to
+the Crystal Space engine.  These files and resources are located in
+@file{CS/libs/csutil/macosx}.
+
+@item
+The platform-specific audio and video driver modules.  The files and resources
+comprising audio and video plugins reside in the appropriate subdirectories of
+@file{CS/plugins}, as indicated above.
+@end itemize
+
+The core components provide low-level, platform-specific functionality which
+Crystal Space requires.  This includes interfaces to the underlying operating
+system as well as higher-level event-loop processing as provided by Cocoa's
+@samp{NSApplication} class.  The files comprising this module are:
+
+@table @code
+@item OSXAssistant.h
+Two files share this name.  The first file resides in
+@file{CS/include/csutil/macosx} and declares the abstract @samp{iOSXAssistant}
+interface.  This interface declares methods which may be useful to canvases, as
+well as methods which are used by the Objective-C application delegate.  The
+second file resides in @file{CS/libs/csutil/macosx} and declares
+@samp{OSXAssistant} which is a concrete subclass implementing the
+@samp{iOSXAssistant} interface.
+
+@item OSXAssistant.cpp
+Concrete implementation of the @samp{iOSXAssistant} interface.
+
+@item OSXDelegate.m
+@itemx OSXDelegate.h
+Implements an Objective-C application delegate.  It is responsible for handling
+application-wide Cocoa events and provides convenience facilities for event
+interpretation on behalf of plugin modules such as 2D drivers which are the
+focus of keyboard and mouse events.
+
+@item OSXLoadLibrary.m
+@itemx OSXLoadLibrary.h
+Functions which provide dynamic linking facilities of plugin modules.
+
+@item OSXDynamicLibrary.cpp
+A thin C++ wrapper over the Objective-C plugin loading facilities.  The
+interface between the C++ and Objective-C facilities is implemented via a
+pure-C bridge, thus allowing Crystal Space's C++ Shared Class Facility
+(@pxref{SCF}) to successfully load plugin modules via the Objective-C dynamic
+linking facility.
+
+@item OSXMenu.m
+@itemx OSXMenu.h
+A utility which generates the application's main menu from information
+contained in a configuration file (@file{CS/data/macosx.cfg}).
+
+@item OSXConfigFile.cpp
+@itemx OSXConfigFile.h
+A thin pure-C wrapper over Crystal Space's C++ configuration file class.  This
+wrapper allows the Objective-C @file{OSXMenu} implementation to utilize the
+C++ configuration class.
+
+@item OSXTime.cpp
+Platform-specific implementation of @code{csGetTicks()} and @code{csSleep()}.
+
+@item OSXUsername.m
+Platform-specific functionality for retrieving the username of the logged-in
+user.
+
+@item OSXGetUsername.cpp
+@itemx OSXGetUsername.h
+Implementation of Crystal Space's @code{csGetUsername()} function.  This is a
+C++ cover over the functionality provided by @file{OSXUsername.m}.
+
+@item OSXInstPath.m
+Platform-specific functionality for retrieving and interpreting the
+configuration option @samp{CrystalSpaceRoot}.
+
+@item OSXInstallPath.cpp
+@itemx OSXInstallPath.h
+Implementation of Crystal Space's @code{csGetInstallPath()} function.  This is
+a C++ cover over @file{OSXInstPath.m}, and also provides additional
+functionality (such as checking the @samp{CRYSTAL} environment variable).
+
+@item csosdefs.h
+Platform-specific definition of operating system services which allows Crystal
+Space to access such services in a uniform manner from platform to platform.
+Located in @file{CS/include/csutil/macosx}.
+
+@item macosx.cfg
+A configuration file which defines platform-specific settings such as the menu
+layout appropriate for the application.  This file is actually located in the
+@file{CS/data/config} directory which is typically mounted at the virtual
+location @file{/config/} (@pxref{VFS}).
+@end table
+
+@node MacOS/X Run-Loop, MacOS/X Dynamic Linking, MacOS/X Contents, MacOS/X Details
+@subsubsection Run-Loop
+@cindex MacOS/X Run-Loop
+
+The typical Crystal Space application assumes that the programmer has full
+control over the application's run-loop.  For many platforms to which Crystal
+Space has been ported, this is not a problem since the main run-loop is
+generally implemented in this fashion:
+
+@example
+bool csDefaultRunLoop(iObjectRegistry*)
+@{
+  while (!shutdown)
+    event_queue->Process();
+@}
+@end example
+
+With Cocoa, on the other hand, the main run-loop is not accessible to the
+programmer and is essentially a black-box.  A simple-minded implementation of
+the above functionality for Cocoa might look like this:
+
+@example
+bool csDefaultRunLoop(iObjectRegistry*)
+@{
+  [NSApp run];
+@}
+@end example
+
+This code launches the Cocoa run-loop but does not address the problem of
+periodically processing Crystal Space's event queue.  To solve this problem
+@samp{OSXDelegate} artificially injects @dfn{application-defined} events into
+the Cocoa event queue and then triggers an invocation of
+@code{iEventQueue::Process()} for each such received event.  A single
+application-defined event is injected into the event queue in order to begin
+the process, and then an event is injected into the queue after each invocation
+of @code{iEventQueue::Process()}.
+
+Note that @code{csDefaultRunLoop()} is provided as a convenience for
+applications which do not otherwise supply their own run-loop.  Existing Cocoa
+applications which already employ the @code{NSApplication}'s black-box run-loop
+should not invoke @code{csDefaultRunLoop()}; but should instead arrange to have
+@code{iEventQueue::Process()} invoked on a periodic basis via some other
+mechanism.
+
+@node MacOS/X Dynamic Linking, , MacOS/X Run-Loop, MacOS/X Details
+@subsubsection Dynamic Linking
+@cindex MacOS/X Dynamic Linking
+
+On most platforms, symbols are private to a plugin module unless explicitly
+exported.  However, on MacOS/X, symbols in plugin modules are typically public
+by default.  Prior to MacOS/X 10.1, symbols in plugins existed in a @dfn{flat
+namespace} shared by the application and all plugin modules.  This means that
+it was possible for symbols defined in one plugin to conflict with those
+defined in the application or in other plugins.  As of MacOS/X 10.1, Apple
+introduced the concept of @dfn{two-level namespace}, in which symbols for a
+plugin exist within that plugin's own namespace, thus eliminating the problem
+of symbolic conflicts between plugins and the application, or plugins and other
+plugins.
+
+On other platforms, where plugin symbols are private by default, plugin modules
+are themselves link against any required static libraries in order to satisfy
+external symbolic references.  Historically, this differed from pre-10.1
+MacOS/X in which it was customary to link the application against any libraries
+which might have been required by plugin modules, rather than linking the
+plugin modules, themselves, against the libraries.  There are a couple problems
+with this older approach.
+
+@itemize @bullet
+@item
+It is not always possible to know ahead of time which static libraries will be
+required by a set of plugin modules since those modules may come from
+independent sources.  Thus, it is neither practical nor always possible to
+link the application against the correct set of static libraries.  As a
+corollary, this often means having to add special cases to otherwise general
+makefiles in order to specify an extended set of static libraries when invoking
+the static linker to build the application's executable image.
+
+@item
+Even though an application may be linked against a static library for the
+purpose of making that library available to a plugin module, often the
+application itself makes no reference to symbols within the library.  In order
+to force the linker to actually incorporate the library into the application
+some artificial mechanism for forcing references to symbols within the library
+must be invented.  Often this involves employing special switches when
+invoking the linker or manually faking hard symbolic references within the
+source code itself.
+
+@item
+It is highly fragile and often problematic since even a small change to the
+external symbolic references of a plugin module may require that the
+application be relinked against a different set of static libraries.
+@end itemize
+
+The approach used by other platforms, where plugin modules are linked directly
+against any static libraries which they require, has several advantages.
+
+@itemize @bullet
+@item
+Plugin modules are self-contained since external symbolic references have
+already been satisfied, thus there is no need for the application to attempt to
+satisfy those references.
+
+@item
+An application needs to be linked only against the set of libraries which it
+requires.  There is no need to try to fathom the set of libraries which
+@emph{might} one day be required by plugin modules.  As a corollary there is
+no need to invent artificial mechanisms for forcing libraries to be linked into
+the application which are not required by the application itself.
+
+@item
+It is much more robust since a change in the symbolic requirements of any
+given plugin module will not require re-linking of the application against
+a new set of libraries.
+@end itemize
+
+Prior to the introduction of two-level namespaces with MacOS/X 10.1, in order
+to avoid the fragility of flat namespaces, and in order to avoid having to
+invent special case solutions to work around these problems, the MacOS/X port
+of Crystal Space emulated the model of dynamic linking used on other platforms.
+This was accomplished by linking plugin modules against the static libraries
+which they require, rather than linking those libraries into the application.
+
+The one major pitfall which makes employment of this approach difficult in a
+flat namespace, is that of symbolic conflicts where the same symbol is defined
+in more than one place.  This problem can occur, for instance, when more than
+one plugin module links with the same static library, and when both a plugin
+module and the application link against the same static library.  To work
+around this problem, the MacOS/X port takes advantage of @sc{dyld}'s
+@samp{NSLinkEditErrorHandlers} which allows the loader to ignore duplicate
+symbols at load time.
+
+Although this special manual symbol management is not required with two-level
+namespaces, the functionality is nevertheless retained for backward
+compatibility with older MacOS/X releases.

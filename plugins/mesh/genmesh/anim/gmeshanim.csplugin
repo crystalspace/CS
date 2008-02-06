@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- gmeshanim.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.anim.genmesh</name>
+        <implementation>csGenmeshAnimationControlType</implementation>
+        <description>Crystal Space General Mesh Animation Control</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
