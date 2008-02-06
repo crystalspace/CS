@@ -107,26 +107,19 @@ public:
 /**
  * 
  */
+template<typename T>
 struct csBlockAllocatorSizeObject
 {
-  template<typename T>
-  struct Size
-  {
-    static const unsigned int value = sizeof(T);
-  };
+  static const unsigned int value = sizeof(T);
 };
 
 /**
  * 
  */
-template<unsigned int Alignment>
+template<typename T, unsigned int Alignment>
 struct csBlockAllocatorSizeObjectAlign
 {
-  template<typename T>
-  struct Size
-  {
-    static const unsigned int value = CS::Meta::AlignSize<T, Alignment>::value;
-  };
+  static const unsigned int value = CS::Meta::AlignSize<T, Alignment>::value;
 };
 /**
  * This class implements a memory allocator which can efficiently allocate
@@ -151,21 +144,20 @@ struct csBlockAllocatorSizeObjectAlign
 template <class T,
   typename Allocator = CS::Memory::AllocatorMalloc, 
   typename ObjectDispose = csBlockAllocatorDisposeDelete<T>,
-  typename SizeComputer = csBlockAllocatorSizeObject
+  typename SizeComputer = csBlockAllocatorSizeObject<T>
 >
 class csBlockAllocator : 
   public csFixedSizeAllocator<
-    SizeComputer::Size<T>::value,
+    SizeComputer::value,
     Allocator>
 {
 public:
-  typedef typename SizeComputer::Size<T> SizeComputerSize;
   typedef csBlockAllocator<T, Allocator, ObjectDispose, SizeComputer> ThisType;
   typedef T ValueType;
   typedef Allocator AllocatorType;
 
 protected:
-  typedef csFixedSizeAllocator<SizeComputerSize::value, Allocator> superclass;
+  typedef csFixedSizeAllocator<SizeComputer::value, Allocator> superclass;
 
 private:
   void* Alloc (size_t /*n*/) { return 0; }                       // Illegal

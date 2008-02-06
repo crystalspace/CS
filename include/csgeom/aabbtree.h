@@ -56,7 +56,8 @@ namespace Geometry //@@Right?
     AABBTree ()
       : rootNode (0)
     {
-      rootNode = AllocNode (true);
+      rootNode = AllocNode ();
+      rootNode->SetLeaf (true);
     }
 
     ///
@@ -96,7 +97,8 @@ namespace Geometry //@@Right?
       DeleteNodeRecursive (rootNode);
 
       // New root
-      rootNode = AllocNode (true);
+      rootNode = AllocNode ();
+      rootNode->SetLeaf (true);
 
       // Build
       BuildTree (rootNode, objects, 0, objects.GetSize ());
@@ -271,8 +273,10 @@ namespace Geometry //@@Right?
             std::sort (oldNodeI, oldNodeI+oldNodeCount+1, sorter);
           }
         
-          Node* node1 = AllocNode (true);
-          Node* node2 = AllocNode (true);
+          Node* node1 = AllocNode ();
+          node1->SetLeaf (true);
+          Node* node2 = AllocNode ();
+          node2->SetLeaf (true);
 
           // Assign first
           {
@@ -511,7 +515,7 @@ namespace Geometry //@@Right?
       else
       {
         // Very dumb, sort by center, split at median
-        const size_t axis = node->GetBBox ().GetSize ().DominantAxis ();
+        const size_t axis = root->GetBBox ().GetSize ().DominantAxis ();
 
         {
           ObjectTypeSortByCenter sorter (axis);
@@ -520,8 +524,8 @@ namespace Geometry //@@Right?
 
           const size_t median = objectStart + numObjects / 2;
 
-          Node* left = AllocNode (false);
-          Node* right = AllocNode (false);
+          Node* left = AllocNode ();
+          Node* right = AllocNode ();
 
           root->SetChild1 (left);
           root->SetChild2 (right);
@@ -716,9 +720,9 @@ namespace Geometry //@@Right?
     /**
      * 
      */
-    Node* AllocNode (bool leaf)
+    Node* AllocNode ()
     {
-      return nodeAllocator.Alloc<const bool> (leaf);
+      return nodeAllocator.Alloc ();
     }
     
     /**
@@ -742,7 +746,7 @@ namespace Geometry //@@Right?
       Node, 
       CS::Memory::AllocatorAlign<32>,
       csBlockAllocatorDisposeDelete<Node>,
-      csBlockAllocatorSizeObjectAlign<32>
+      csBlockAllocatorSizeObjectAlign<Node, 32>
     > NodeAllocatorType;
 
     ///
@@ -764,8 +768,8 @@ namespace Geometry //@@Right?
   class AABBTree<ObjectType, objectsPerLeaf>::Node
   {
   public:
-    Node (bool isLeaf = false)
-      : typeAndFlags (isLeaf ? AABB_NODE_LEAF : AABB_NODE_INNER), leafObjCount (0)  
+    Node ()
+      : typeAndFlags (AABB_NODE_INNER), leafObjCount (0)  
     {
       children[0] = children[1] = 0;
     }
@@ -803,7 +807,7 @@ namespace Geometry //@@Right?
     void SetFlags (uint newFlags)
     {
       typeAndFlags = (typeAndFlags & ~AABB_NODE_FLAG_MASK) | 
-        (newFlags << AABB_NODE_FLAG_SHFT);
+        (newFlags << AABB_NODE_FLAG_SHIFT);
     }
 
     ///
