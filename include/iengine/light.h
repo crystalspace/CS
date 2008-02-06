@@ -34,6 +34,7 @@
 class csColor;
 class csFlags;
 class csVector3;
+class csBox3;
 
 struct iLight;
 struct iLightingInfo;
@@ -230,7 +231,7 @@ struct iLightCallback : public virtual iBase
  */
 struct iLight : public virtual iBase
 {
-  SCF_INTERFACE(iLight,2,0,0);
+  SCF_INTERFACE(iLight,2,0,1);
   /// Get the id of this light. This is a 16-byte MD5.
   virtual const char* GetLightID () = 0;
 
@@ -249,17 +250,29 @@ struct iLight : public virtual iBase
   /**
    * Get the position of this light (local transformation relative
    * to whatever parent it has).
+   * \deprecate Deprecated in RM. Use GetMovable() and the iMovable interface
    */
+  CS_DEPRECATED_METHOD_MSG("Deprecated. Use GetMovable() and the iMovable interface.")
   virtual const csVector3& GetCenter () const = 0;
   /**
    * Get the position of this light. This function correctly takes
    * care of the optional parents of this light.
+   * \deprecate Deprecated in RM. Use GetMovable() and the iMovable interface
    */
+  CS_DEPRECATED_METHOD_MSG("Deprecated. Use GetMovable() and the iMovable interface.")
   virtual const csVector3 GetFullCenter () const = 0;
-  /// Set the position of this light.
+  /**
+   * Set the position of this light.
+   * \deprecate Deprecated in RM. Use GetMovable() and the iMovable interface
+   */ 
+  CS_DEPRECATED_METHOD_MSG("Deprecated. Use GetMovable() and the iMovable interface.")
   virtual void SetCenter (const csVector3& pos) = 0;
 
-  /// Get the sector for this light.
+  /**
+   * Get the sector for this light.
+   * \deprecate Deprecated in RM. Use GetMovable() and the iMovable interface
+   */
+  CS_DEPRECATED_METHOD_MSG("Deprecated. Use GetMovable() and the iMovable interface.")
   virtual iSector *GetSector () = 0;
 
   /// Get the movable for this light.
@@ -413,6 +426,11 @@ struct iLight : public virtual iBase
    * Get the shader variable context of the light.
    */
   virtual iShaderVariableContext* GetSVContext() = 0;
+
+  /**
+   * Get the bounding box of the light (the bounds define the influence area).
+   */
+  virtual const csBox3& GetLocalBBox () const = 0;
 };
 
 /**

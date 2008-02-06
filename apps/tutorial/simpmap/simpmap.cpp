@@ -18,6 +18,29 @@
 
 #include "simpmap.h"
 
+#include "csgeom/aabbtree.h"
+
+csRandomVectorGen vgen;
+
+struct MyObject
+{
+  MyObject ()
+  {
+    myBB.StartBoundingBox ();
+    myBB.SetSize (vgen.Get ());
+    myBB.SetCenter (vgen.Get ()*10);    
+  }
+
+  const csBox3& GetBBox () const
+  {
+    return myBB;
+  }
+
+  csBox3 myBB;
+};
+
+CS::Geometry::AABBTree<MyObject, 2> tree;
+
 CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
@@ -25,6 +48,16 @@ CS_IMPLEMENT_APPLICATION
 Simple::Simple ()
 {
   SetApplicationName ("CrystalSpace.SimpleMap");
+
+  
+  csPDelArray<MyObject> objects;
+
+  for (int i = 0; i < 10; ++i)
+  {
+    MyObject* o = new MyObject;
+    objects.Push (o);
+    tree.AddObject (o);
+  }  
 }
 
 Simple::~Simple ()
@@ -251,7 +284,7 @@ bool Simple::LoadMap ()
 {
   // Set VFS current directory to the level we want to load.
   csRef<iVFS> VFS (csQueryRegistry<iVFS> (GetObjectRegistry ()));
-  VFS->ChDir ("/lev/parallaxtest");
+  VFS->ChDir ("/lev/partsys");
   //VFS->ChDir ("/lev/part");
   // Load the level file which is called 'world'.
   if (!loader->LoadMapFile ("world"))

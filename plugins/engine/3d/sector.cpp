@@ -1,6 +1,6 @@
 /*
     Copyright (C) 1998-2001 by Jorrit Tyberghein
-              (C) 2004 by Marten Svanfeldt
+              (C) 2004-2008 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,7 +20,6 @@
 #include "cssysdef.h"
 #include "csqint.h"
 #include "csqsqrt.h"
-#include "csgeom/kdtree.h"
 #include "csutil/csppulse.h"
 #include "csutil/csstring.h"
 #include "cstool/csview.h"
@@ -47,53 +46,6 @@
 #include "plugins/engine/3d/meshgen.h"
 #include "plugins/engine/3d/meshobj.h"
 
-//---------------------------------------------------------------------------
-csSectorLightList::csSectorLightList ()
-{
-  sector = 0;
-  kdtree = new csKDTree ();
-}
-
-csSectorLightList::~csSectorLightList ()
-{
-  RemoveAll ();
-  delete kdtree;
-}
-
-void csSectorLightList::PrepareLight (iLight* item)
-{
-  csLight* clight = ((csLight*)item)->GetPrivateObject ();
-  csLightList::PrepareLight (item);
-
-  clight->SetSector ((iSector*)sector);
-
-  const csVector3& center = item->GetCenter ();
-  float radius = item->GetCutoffDistance ();
-  csBox3 lightbox (center - csVector3 (radius), center + csVector3 (radius));
-  csKDTreeChild* childnode = kdtree->AddObject (lightbox, (void*)item);
-
-  clight->SetChildNode (childnode);
-  if (sector->use_lightculling)
-  {
-    sector->RegisterLightToCuller (clight);
-  }
-
-}
-
-void csSectorLightList::FreeLight (iLight* item)
-{
-
-  csLight* clight = ((csLight*)item)->GetPrivateObject ();
-  clight->SetSector (0);
-  kdtree->RemoveObject (clight->GetChildNode ());
-
-  csLightList::FreeLight (item);
-  if (sector->use_lightculling)
-  {
-    sector->UnregisterLightToCuller (clight);
-  }
-}
-
 //--------------------------------------------------------------------------
 
 csSectorMeshList::csSectorMeshList () : csMeshList (64, 128)
@@ -115,22 +67,56 @@ void csSectorMeshList::FreeMesh (iMeshWrapper* item)
   csMeshList::FreeMesh (item);
 }
 
+//--------------------------------------------------------------------------
+
+
+csSectorLightList::csSectorLightList (csSector* isect)
+  : sector (isect)
+{
+}
+
+csSectorLightList::~csSectorLightList ()
+{
+  RemoveAll ();
+}
+
+void csSectorLightList::PrepareLight (iLight* item)
+{
+  csLight* clight = static_cast<csLight*> (item);
+  csLightList::PrepareLight (item);
+
+  clight->SetSector (sector);
+
+  lightTree.AddObject (clight);
+}
+
+void csSectorLightList::FreeLight (iLight* item)
+{
+  csLight* clight = static_cast<csLight*> (item);
+  clight->SetSector (0); 
+  lightTree.RemoveObject (clight);
+}
+
+void csSectorLightList::UpdateLightBounds (csLight* light, const csBox3& oldBox)
+{
+  lightTree.MoveObject (light, oldBox);
+}
+
 //---------------------------------------------------------------------------
 
 csSector::csSector (csEngine *engine) :
-  scfImplementationType (this), engine (engine)
+  scfImplementationType (this), engine (engine),
+  lights (this)
 {
   drawBusy = 0;
   dynamicAmbientLightColor.Set (0,0,0);
   dynamicAmbientLightVersion = (uint)~0;
   meshes.SetSector (this);
   //portal_containers.SetSector (this);
-  lights.SetSector (this);
   currentVisibilityNumber = 0;
   renderloop = 0;
-  use_lightculling = false;
+
   single_mesh = 0;
-  relevant_lights_dirty = true;
 
   SetupSVNames();
   svDynamicAmbient.AttachNew (new csShaderVariable (SVNames().dynamicAmbient));
@@ -151,74 +137,12 @@ csSector::csSector (csEngine *engine) :
 
 csSector::~csSector ()
 {
-  CleanupLSI ();
   lights.RemoveAll ();
 }
 
 void csSector::SelfDestruct ()
 {
   engine->GetSectors ()->Remove ((iSector*)this);
-}
-
-void csSector::RegisterLightToCuller (csLight* light)
-{
-  light->UseAsCullingObject ();
-  csRef<iVisibilityObject> vo = 
-        scfQueryInterface<iVisibilityObject> (light);
-  culler->RegisterVisObject (vo);
-}
-
-void csSector::UnregisterLightToCuller (csLight* light)
-{
-  csRef<iVisibilityObject> vo = 
-        scfQueryInterface<iVisibilityObject> (light);
-  culler->UnregisterVisObject (vo);
-  light->StopUsingAsCullingObject ();
-}
-
-void csSector::SetLightCulling (bool enable)
-{
-  if (enable == use_lightculling) return;
-  use_lightculling = enable;
-  int i;
-  if (use_lightculling)
-  {
-    for (i = 0; i < lights.GetCount (); i++)
-    {
-      iLight* l = lights.Get (i);
-      csLight* clight = ((csLight*)l)->GetPrivateObject ();
-      RegisterLightToCuller (clight);
-    }
-  }
-  else
-  {
-    for (i = 0; i < lights.GetCount (); i++)
-    {
-      iLight* l = lights.Get (i);
-      csLight* clight = ((csLight*)l)->GetPrivateObject ();
-      UnregisterLightToCuller (clight);
-    }
-  }
-}
-
-void csSector::AddLightVisibleCallback (iLightVisibleCallback* cb)
-{
-  lightVisibleCallbackList.Push (cb);
-}
-
-void csSector::RemoveLightVisibleCallback (iLightVisibleCallback* cb)
-{
-  lightVisibleCallbackList.Delete (cb);
-}
-
-void csSector::FireLightVisibleCallbacks (iLight* light)
-{
-  size_t i = lightVisibleCallbackList.GetSize ();
-  while (i > 0)
-  {
-    i--;
-    lightVisibleCallbackList[i]->LightVisible ((iSector*)this, light);
-  }
 }
 
 void csSector::UnlinkObjects ()
@@ -373,16 +297,6 @@ void csSector::PrecacheDraw ()
 bool csSector::SetVisibilityCullerPlugin (const char *plugname,
 	iDocumentNode* culler_params)
 {
-  if (use_lightculling)
-  {
-    int i;
-    for (i = 0; i < lights.GetCount (); i++)
-    {
-      iLight* l = lights.Get (i);
-      csLight* clight = ((csLight*)l)->GetPrivateObject ();
-      UnregisterLightToCuller (clight);
-    }
-  }
 
   culler = 0;
 
@@ -417,15 +331,7 @@ bool csSector::SetVisibilityCullerPlugin (const char *plugname,
     m->GetMovable ()->UpdateMove ();
     RegisterEntireMeshToCuller (m);
   }
-  if (use_lightculling)
-  {
-    for (i = 0; i < lights.GetCount (); i++)
-    {
-      iLight* l = lights.Get (i);
-      csLight* clight = ((csLight*)l)->GetPrivateObject ();
-      RegisterLightToCuller (clight);
-    }
-  }
+
   return true;
 }
 
@@ -1089,53 +995,6 @@ void csSector::CalculateSectorBBox (csBox3 &bbox, bool do_meshes) const
   }
 }
 
-void csSector::CleanupLSI ()
-{
-  csLightSectorInfluences::GlobalIterator it = influences.GetIterator ();
-  while (it.HasNext ())
-  {
-    csLightSectorInfluence* inf = it.Next ();
-    ((csLight*)inf->light)->RemoveLSI (inf);
-  }
-  influences.Empty ();
-  relevant_lights_dirty = true;
-}
-
-void csSector::AddLSI (csLightSectorInfluence* inf)
-{
-  influences.Add (inf);
-  relevant_lights_dirty = true;
-}
-
-void csSector::RemoveLSI (csLightSectorInfluence* inf)
-{
-  influences.Delete (inf);
-  relevant_lights_dirty = true;
-}
-
-const csArray<iLightSectorInfluence*>& csSector::GetRelevantLights (
-  	int maxLights, bool desireSorting)
-{
-  if (relevant_lights_dirty)
-  {
-    if (maxLights != -1)
-      relevant_lights.SetSize (maxLights);
-    relevant_lights.Empty ();
-    csLightSectorInfluences::GlobalIterator it = influences.GetIterator ();
-    size_t cnt = 0;
-    while (it.HasNext ())
-    {
-      csLightSectorInfluence* inf = it.Next ();
-      relevant_lights.Push (inf);
-      cnt++;
-      if (maxLights != -1 && cnt >= (size_t)maxLights)
-	break;
-    }
-
-    relevant_lights_dirty = false;
-  }
-  return relevant_lights;
-}
 
 //---------------------------------------------------------------------------
 
@@ -1205,6 +1064,12 @@ void csSector::SetupSVNames()
     SVNames().fogDensity = CS::ShaderVarName (engine->svNameStringSet,
       "fog density");
   }
+}
+
+void csSector::UpdateLightBounds (csLight* light, 
+                                  const csBox3& oldBox)
+{
+  lights.UpdateLightBounds (light, oldBox);
 }
 
 //---------------------------------------------------------------------------

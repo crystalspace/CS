@@ -835,7 +835,7 @@ Rules for color calculation:
 */
 
 void csGenmeshMeshObject::UpdateLighting (
-    const csArray<iLightSectorInfluence*>& lights,
+    const csSafeCopyArray<csLightInfluence>& lights,
     iMovable* movable)
 {
   int i;
@@ -938,7 +938,10 @@ void csGenmeshMeshObject::UpdateLighting (
       int num_lights = (int)lights.GetSize ();
       for (int l = 0 ; l < num_lights ; l++)
       {
-        iLight* li = lights[l]->GetLight ();
+        iLight* li = lights[l].light;
+        if (!li)
+          continue;
+
         li->AddAffectedLightingInfo (this);
         affecting_lights.Add (li);
         UpdateLightingOne (trans, li);
@@ -998,8 +1001,10 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
   if (!do_manual_colors && !do_shadow_rec && factory->light_mgr)
   {
     // Remember relevant lights for later.
-    relevant_lights = factory->light_mgr->GetRelevantLights (
-    	logparent, -1, false);
+    scfArrayWrap<iLightInfluenceArray, csSafeCopyArray<csLightInfluence> > 
+      relevantLightsWrap (relevant_lights); //Yes, know, its on the stack...
+
+    factory->light_mgr->GetRelevantLights (logparent, &relevantLightsWrap, -1);
   }
 
   if (anim_ctrl2)

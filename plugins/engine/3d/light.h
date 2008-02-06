@@ -20,6 +20,7 @@
 #define __CS_LIGHT_H__
 
 #include "csgeom/transfrm.h"
+#include "csgeom/box.h"
 #include "cstool/objmodel.h"
 #include "csutil/cscolor.h"
 #include "csutil/csobject.h"
@@ -40,11 +41,9 @@
 #include "iengine/viscull.h"
 #include "csgfx/shadervarcontext.h"
 
-
 class csLightMap;
 class csPolygon3D;
 class csCurve;
-class csKDTreeChild;
 struct iMeshWrapper;
 struct iLightingInfo;
 struct iSector;
@@ -83,33 +82,7 @@ public:
   virtual iTerrainSystem* GetTerrainColldet () { return 0; }
 };
 
-#include "csutil/deprecated_warn_on.h"
 
-/**
- * Class that represents the influence that a certain light
- * has on a sector.
- */
-class csLightSectorInfluence : public scfImplementation1<
-			       csLightSectorInfluence,
-			       iLightSectorInfluence>
-{
-public:
-  iSector* sector;	// Weak ref@@@?
-  iLight* light;	// Weak ref@@@?
-  // Influence frustum. Or infinite if point light
-  // and in starting sector.
-  csRef<csFrustum> frustum;
-
-  csLightSectorInfluence () : scfImplementationType (this) { }
-  virtual ~csLightSectorInfluence () { }
-  virtual iSector* GetSector () const { return sector; }
-  virtual iLight* GetLight () const { return light; }
-  virtual const csFrustum* GetFrustum () const { return frustum; }
-};
-
-typedef csSet<csRef<csLightSectorInfluence> > csLightSectorInfluences;
-
-#include "csutil/deprecated_warn_off.h"
 
 /**
  * Superclass of all positional lights.
@@ -117,10 +90,9 @@ typedef csSet<csRef<csLightSectorInfluence> > csLightSectorInfluences;
  * and a radius.
  */
 class csLight : 
-  public scfImplementationExt5<csLight,
+  public scfImplementationExt4<csLight,
                                csObject,
-                               iLight,
-                               iVisibilityObject,
+                               iLight,                               
                                scfFakeInterface<iShaderVariableContext>,
 			       iSceneNode,
 			       iSelfDestruct>,
@@ -128,14 +100,11 @@ class csLight :
 {
 private:
   /// ID for this light (16-byte MD5).
-  char* light_id;
-
-  /// Childnode representing this light in the sector light list kdtree.
-  csKDTreeChild* childnode;
-
+  char* light_id;  
+  
 protected:
   /// Movable for the light
-  csMovable movable;
+  mutable csMovable movable;
 
   /// Color.
   csColor color;
@@ -195,17 +164,7 @@ protected:
   /// Compute attenuation vector from current attenuation mode.
   void CalculateAttenuationVector ();
 
-  /// For the culler.
-  csFlags culler_flags;
-  csRef<csLightObjectModel> object_model;
-  // The following counter keeps track of how many sectors would like to have
-  // this light as a vis culling object.
-  int sectors_wanting_visculling;
-
-  void UpdateViscullMesh ();
-
-  /// List of light/sector influences.
-  csLightSectorInfluences influences;
+  csBox3 lightBoundingBox, worldBoundingBox;
 
   csEngine* engine;
 public:
@@ -232,15 +191,6 @@ public:
   csLightDynamicType GetDynamicType () const { return dynamicType; }
 
   /**
-   * Another sector wants to use this light as a culling object.
-   */
-  void UseAsCullingObject ();
-  /**
-   * A sector no longer wants to use this light as a culling object.
-   */
-  void StopUsingAsCullingObject ();
-
-  /**
    * Shine this light on all polygons visible from the light.
    * This routine will update the lightmaps of all polygons or
    * update the vertex colors if gouraud shading is used.
@@ -257,26 +207,6 @@ public:
    * Currently only works on thing meshes.
    */
   void CalculateLighting (iMeshWrapper* mesh);
-
-  // Functions related to light/sector influence.
-  void RemoveLSI (csLightSectorInfluence* inf);
-  void CleanupLSI ();
-  void FindLSI (csLightSectorInfluence* inf);
-  void FindLSI ();
-
-  /**
-   * Set the kdtree child node used by this light (in the kdtree
-   * that is maintained by the sector light list).
-   */
-  void SetChildNode (csKDTreeChild* childnode)
-  {
-    csLight::childnode = childnode;
-  }
-
-  /**
-   * Get the kdtree child node.
-   */
-  csKDTreeChild* GetChildNode () const { return childnode; }
 
   /// Get the ID of this light.
   const char* GetLightID () { return GenerateUniqueID (); }
@@ -433,7 +363,6 @@ public:
   {
     directionalCutoffRadius = radius;
     lightnr++;
-    UpdateViscullMesh ();
   }
 
   /**
@@ -474,7 +403,6 @@ public:
   void SetType (csLightType type)
   {
     this->type = type;
-    UpdateViscullMesh ();
   }
 
   virtual iShaderVariableContext* GetSVContext()
@@ -537,14 +465,14 @@ public:
   virtual iObject *QueryObject() { return this; }
   virtual iSceneNode* QuerySceneNode () { return this; }
   csLight* GetPrivateObject () { return this; }
-  //------------------- iVisibilityObject interface -----------------------
-  virtual iMovable *GetMovable () const { return (iMovable*)&movable; }
-  virtual iMeshWrapper* GetMeshWrapper () const { return 0; }
-  virtual iObjectModel* GetObjectModel () { return object_model; }
-  virtual csFlags& GetCullerFlags () { return culler_flags; }
-
+  
   /**\name iSceneNode implementation
    * @{ */
+  virtual iMovable* GetMovable () const
+  {
+    return &movable;
+  }
+
   virtual void SetParent (iSceneNode* parent)
   {
     csSceneNode::SetParent ((iSceneNode*)this, parent, &movable);
@@ -594,6 +522,14 @@ public:
     CalculateLighting ();
   }
 
+  virtual const csBox3& GetLocalBBox () const
+  {
+    return lightBoundingBox;
+  }
+
+  csBox3 GetBBox () const;
+
+  void UpdateBBox ();
 };
 
 #include "csutil/deprecated_warn_on.h"

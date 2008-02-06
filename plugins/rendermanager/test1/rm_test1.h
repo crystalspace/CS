@@ -80,10 +80,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMTest1)
 
     CS::RenderManager::PostEffectManager       postEffects;
 
-    csRef<iShaderVarStringSet> svNameStringSet;
-    csRef<iStringSet>       stringSet;
-    csRef<iShaderManager>   shaderManager;
-    csRef<iEngine>          engine;
+    csRef<iShaderVarStringSet>  svNameStringSet;
+    csRef<iStringSet>           stringSet;
+    csRef<iShaderManager>       shaderManager;
+    csRef<iEngine>              engine;
 
     CS::RenderManager::MultipleRenderLayer renderLayer;
 

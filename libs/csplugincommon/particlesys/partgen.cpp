@@ -28,6 +28,7 @@
 #include "csplugincommon/particlesys/partgen.h"
 #include "cstool/rbuflock.h"
 #include "cstool/rviewclipper.h"
+#include "csutil/scfarray.h"
 
 #include "imesh/object.h"
 #include "iengine/camera.h"
@@ -287,9 +288,12 @@ bool csParticleSystem::PreGetRenderMeshes (iRenderView*, iMovable* movable,
 
   if (light_mgr)
   {
-    const csArray<iLightSectorInfluence*>& relevant_lights = light_mgr
-    	->GetRelevantLights (logparent, -1, false);
-    UpdateLighting (relevant_lights, movable);
+    csSafeCopyArray<csLightInfluence> lightInfluences;
+    scfArrayWrap<iLightInfluenceArray, csSafeCopyArray<csLightInfluence> > 
+      relevantLights (lightInfluences); //Yes, know, its on the stack...
+
+    light_mgr->GetRelevantLights (logparent, &relevantLights, -1);
+    UpdateLighting (lightInfluences, movable);
   }
 
   return true;
@@ -416,7 +420,7 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
 }
 
 void csParticleSystem::UpdateLighting (
-    const csArray<iLightSectorInfluence*>& lights,
+    const csSafeCopyArray<csLightInfluence>& lights,
     iMovable* movable)
 {
   SetupObject ();

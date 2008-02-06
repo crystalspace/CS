@@ -32,43 +32,8 @@
 #include "sector.h"
 #include "portal.h"
 
-//float csLight::influenceIntensityFraction = 256;
 #define HUGE_RADIUS 100000000
 
-
-void csLight::UpdateViscullMesh ()
-{
-  if (!object_model) return;
-
-  // Update the 'viscull_mesh' data so that it roughly
-  // represents a shape that corresponds with the shape of the
-  // 'influence-object'. The influence-object is a sphere in case of a
-  // point light (with the influence radius as the radius) and a capped cone
-  // in case of a spot light. The geometry specified here should be at
-  // least as big as that shape (for example, a box in case of a point light
-  // would be fine).
-  csRef<iTriangleMesh> m;
-  switch (type)
-  {
-    case CS_LIGHT_POINTLIGHT:
-      {
-        object_model->box.Set (
-		-cutoffDistance, -cutoffDistance, -cutoffDistance,
-		cutoffDistance, cutoffDistance, cutoffDistance);
-        m.AttachNew (new csTriangleMeshBox (object_model->box));
-	object_model->radius = cutoffDistance;
-      }
-      break;
-    case CS_LIGHT_DIRECTIONAL:
-      // @@@ TODO
-      break;
-    case CS_LIGHT_SPOTLIGHT:
-      // @@@ TODO
-      break;
-  }
-  object_model->SetTriangleData (engine->viscull_id, m);
-  object_model->ShapeChanged ();
-}
 
 csLight::csLight (csEngine* engine,
   float x, float y, float z,
@@ -91,9 +56,8 @@ csLight::csLight (csEngine* engine,
 
   //if (ABS (cutoffDistance) < SMALL_EPSILON)
   //  CalculateInfluenceRadius ();
-  CalculateAttenuationVector();
-
-  sectors_wanting_visculling = 0;
+  CalculateAttenuationVector ();
+  UpdateBBox ();
 }
 
 csLight::~csLight ()
@@ -103,8 +67,6 @@ csLight::~csLight ()
   size_t j;
   for (j = 0 ; j < children.GetSize () ; j++)
     children[j]->SetParent (0);
-
-  CleanupLSI ();
 
   int i = (int)light_cb_vector.GetSize ()-1;
   while (i >= 0)
@@ -134,25 +96,6 @@ void csLight::SelfDestruct ()
     GetSector ()->GetLights ()->Remove ((iLight*)this);
 }
 
-void csLight::UseAsCullingObject ()
-{
-  sectors_wanting_visculling++;
-  if (!object_model)
-  {
-    object_model.AttachNew (new csLightObjectModel ());
-    UpdateViscullMesh ();
-  }
-}
-
-void csLight::StopUsingAsCullingObject ()
-{
-  CS_ASSERT (sectors_wanting_visculling > 0);
-  sectors_wanting_visculling--;
-  if (sectors_wanting_visculling <= 0)
-  {
-    object_model = 0;
-  }
-}
 
 void csLight::AddAffectedLightingInfo (iLightingInfo* li)
 {
@@ -165,126 +108,6 @@ void csLight::RemoveAffectedLightingInfo (iLightingInfo* li)
 {
   csRef<iLightingInfo> p(li);
   lightinginfos.Delete (p);
-}
-
-void csLight::RemoveLSI (csLightSectorInfluence* inf)
-{
-  influences.Delete (inf);
-}
-
-void csLight::CleanupLSI ()
-{
-  csLightSectorInfluences::GlobalIterator it = influences.GetIterator ();
-  while (it.HasNext ())
-  {
-    csLightSectorInfluence* inf = it.Next ();
-    ((csSector*)inf->sector)->RemoveLSI (inf);
-  }
-  influences.Empty ();
-}
-
-void csLight::FindLSI ()
-{
-  CleanupLSI ();
-
-  iSector* sector = GetFullSector ();
-  if (!sector) return;
-  const csVector3 center = GetFullCenter ();
-
-  csLightSectorInfluence* inf = new csLightSectorInfluence ();
-  inf->sector = sector;
-  inf->light = (iLight*)this;
-  inf->frustum.AttachNew (new csFrustum (center));
-  influences.Add (inf);
-  inf->DecRef ();
-  ((csSector*)sector)->AddLSI (inf);
-
-  if (type == CS_LIGHT_SPOTLIGHT)
-  {
-    // @@@ TODO: calculate frustum for spot light.
-  }
-  else if (type == CS_LIGHT_DIRECTIONAL)
-  {
-    // @@@ TODO: is this right for directional?
-    inf->frustum->MakeInfinite ();
-  }
-  else if (type == CS_LIGHT_POINTLIGHT)
-  {
-    inf->frustum->MakeInfinite ();
-  }
-
-  FindLSI (inf);
-}
-
-void csLight::FindLSI (csLightSectorInfluence* inf)
-{
-  iSector* sector = inf->sector;
-  if (!sector) return;
-  const csVector3& center = inf->frustum->GetOrigin ();
-  float sq_cutoff = cutoffDistance * cutoffDistance;
-
-  // Find all portals that are in the influence radius around
-  // the light center.
-  const csSet<csPtrKey<iMeshWrapper> >& portals = sector->GetPortalMeshes ();
-  csSet<csPtrKey<iMeshWrapper> >::GlobalIterator it = portals.GetIterator ();
-  while (it.HasNext ())
-  {
-    iMeshWrapper* portal_mesh = it.Next ();
-    iPortalContainer* pc = portal_mesh->GetPortalContainer ();
-    int i;
-    for (i = 0 ; i < pc->GetPortalCount () ; i++)
-    {
-      iPortal* portal = pc->GetPortal (i);
-      const csVector3* world_vertices = portal->GetWorldVertices ();
-      const csPlane3& wor_plane = portal->GetWorldPlane ();
-      // Can we see the portal?
-      if (wor_plane.Classify (center) < -0.001)
-      {
-	// @@@ Consider having a simpler version that looks
-	// at center of portal instead of trying to calculate distance
-	// to portal polygon?
-        csVector3 poly[100];	//@@@ HARDCODE
-        int k;
-	int* idx = portal->GetVertexIndices ();
-        for (k = 0 ; k < portal->GetVertexIndicesCount () ; k++)
-        {
-          poly[k] = world_vertices[idx[k]];
-        }
-        float sqdist_portal = csSquaredDist::PointPoly (
-                  center, poly, portal->GetVertexIndicesCount (),
-                  wor_plane);
-        if (sqdist_portal <= sq_cutoff)
-        {
-	  portal->CompleteSector (0);
-	  if (portal->GetSector ())
-	  {
-	    // Check if in frustum.
-	    csRef<csFrustum> new_frustum = inf->frustum->Intersect (
-	        poly, portal->GetVertexIndicesCount ());
-	    if (new_frustum && !new_frustum->IsEmpty ())
-	    {
-	      new_frustum->SetBackPlane (wor_plane);
-	      if (portal->GetFlags ().Check (CS_PORTAL_WARP))
-	      {
-	        csReversibleTransform warp_wor;
-	        portal->ObjectToWorld (
-		  portal_mesh->GetMovable ()->GetFullTransform (), warp_wor);
-	        new_frustum->Transform (&warp_wor);
-	      }
-	      csLightSectorInfluence* newinf = new csLightSectorInfluence ();
-	      newinf->sector = portal->GetSector ();
-	      newinf->light = (iLight*)this;
-	      newinf->frustum = new_frustum;
-	      influences.Add (newinf);
-	      newinf->DecRef ();
-	      ((csSector*)portal->GetSector ())->AddLSI (newinf);
-	      FindLSI (newinf);
-	    }
-	  }
-	}
-      }
-    }
-  }
 }
 
 const char* csLight::GenerateUniqueID ()
@@ -377,8 +200,10 @@ float csLight::GetBrightnessAtDistance (float d) const
 {
   switch (attenuation)
   {
-    case CS_ATTN_NONE:      return 1;
-    case CS_ATTN_LINEAR:    return 1 - d / attenuationConstants.x;
+    case CS_ATTN_NONE:      
+      return 1;
+    case CS_ATTN_LINEAR:    
+      return csClamp (1.0f - d / attenuationConstants.x, 1.0f, 0.0f);
     case CS_ATTN_INVERSE:
       if (d < SMALL_EPSILON) d = SMALL_EPSILON;
       return 1 / d;
@@ -419,7 +244,22 @@ void csLight::CalculateAttenuationVector ()
 
 void csLight::OnSetPosition ()
 {
-  FindLSI ();
+  // Update the AABB
+  {
+    const csBox3 oldBox = worldBoundingBox;
+    UpdateBBox ();
+    
+    iSectorList* list = movable.csMovable::GetSectors ();
+    if (list)
+    {
+      for (size_t i = 0; i < list->GetCount (); ++i)
+      {
+        csSector* sect = static_cast<csSector*> (list->Get (i));
+        sect->UpdateLightBounds (this, oldBox);
+      }      
+    }    
+  }
+
   csVector3 pos = GetFullCenter ();
   size_t i = light_cb_vector.GetSize ();
   while (i-- > 0)
@@ -509,15 +349,31 @@ void csLight::SetAttenuationConstants (const csVector3& attenv)
 void csLight::SetCutoffDistance (float radius)
 {
   if (radius <= 0) return;
+  cutoffDistance = radius;
+
+  // Update the AABB
+  {
+    const csBox3 oldBox = worldBoundingBox;
+    UpdateBBox ();
+    
+    iSectorList* list = movable.csMovable::GetSectors ();
+    if (list)
+    {
+      for (size_t i = 0; i < list->GetCount (); ++i)
+      {
+        csSector* sect = static_cast<csSector*> (list->Get (i));
+        sect->UpdateLightBounds (this, oldBox);
+      }      
+    }
+  }
+
   size_t i = light_cb_vector.GetSize ();
   while (i-- > 0)
   {
     iLightCallback* cb = light_cb_vector[i];
     cb->OnRadiusChange (this, radius);
   }
-  lightnr++;
-  cutoffDistance = radius;
-  UpdateViscullMesh ();
+  lightnr++;  
 }
 
 iCrossHalo *csLight::CreateCrossHalo (float intensity, float cross)
@@ -563,9 +419,6 @@ static void object_light_func (iMeshWrapper *mesh, iFrustumView *lview,
   iShadowReceiver* receiver = mesh->GetShadowReceiver ();
   if (receiver)
     receiver->CastShadows (mesh->GetMovable (), lview);
-
-  csMeshWrapper* cmw = (csMeshWrapper*)mesh;
-  cmw->InvalidateRelevantLights ();
 }
 
 iSector* csLight::GetFullSector ()
@@ -626,9 +479,7 @@ void csLight::CalculateLighting ()
       iShadowReceiver* receiver = m->GetShadowReceiver ();
       if (receiver)
       {
-        receiver->CastShadows (m->GetMovable (), &lview);
-        csMeshWrapper* cmw = (csMeshWrapper*)m;
-        cmw->InvalidateRelevantLights ();
+        receiver->CastShadows (m->GetMovable (), &lview);        
       }
     }
   }
@@ -659,6 +510,36 @@ void csLight::CalculateLighting (iMeshWrapper *th)
   lview.CallObjectFunction (th, true);
 
   lpi->FinalizeLighting ();
+}
+
+csBox3 csLight::GetBBox () const
+{
+  return worldBoundingBox;
+}
+
+void csLight::UpdateBBox ()
+{
+  switch (type)
+  {
+  case CS_LIGHT_POINTLIGHT:
+    {
+      lightBoundingBox.SetSize (csVector3 (cutoffDistance));
+      lightBoundingBox.SetCenter (csVector3 (0));
+      break;
+    }
+  case CS_LIGHT_DIRECTIONAL:
+    {
+      //@@TODO: Implement
+      break;
+    }
+  case CS_LIGHT_SPOTLIGHT:
+    {
+      //@@TODO: Implement
+      break;
+    }
+  }
+
+  worldBoundingBox = movable.GetFullTransform ().This2Other (lightBoundingBox);
 }
 
 //---------------------------------------------------------------------------

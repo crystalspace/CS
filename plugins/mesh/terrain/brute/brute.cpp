@@ -1644,10 +1644,20 @@ void csTerrainObject::PrepareLighting ()
 {
   if (!staticlighting && pFactory->light_mgr)
   {
-    const csArray<iLightSectorInfluence*>& relevant_lights = pFactory->light_mgr
-      ->GetRelevantLights (logparent, -1, false);
-    for (size_t i = 0; i < relevant_lights.GetSize (); i++)
-      affecting_lights.Add (relevant_lights[i]->GetLight ());
+    csSafeCopyArray<csLightInfluence> lightInfluences;
+    scfArrayWrap<iLightInfluenceArray, csSafeCopyArray<csLightInfluence> > 
+      relevantLights (lightInfluences); //Yes, know, its on the stack...
+
+    pFactory->light_mgr->GetRelevantLights (logparent, &relevantLights, -1);
+
+    for (size_t i = 0; i < lightInfluences.GetSize (); i++)
+    {
+      iLight* li = lightInfluences[i].light;
+      if (!li)
+        continue;
+
+      affecting_lights.Add (li);
+    }
   }
 }
 

@@ -8,6 +8,9 @@ chronological order.
 
 6-Feb-2008
 	- Marten did some more iStringSet->iShaderVarStringSet fixes.
+	- Marten started to rework the way lights are queried from the engine.
+	  Removed the LSI system and instead added an AABB-tree per sector for
+	  fast queries.
 5-Feb-2008
 	- res fixed csInitializer::CreateStringSet() registering the SV names
 	  set with the wrong IF.

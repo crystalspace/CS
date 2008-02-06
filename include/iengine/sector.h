@@ -32,6 +32,7 @@
 #include "csutil/scf.h"
 #include "csutil/set.h"
 #include "csgeom/vector3.h"
+#include "csgeom/aabbtree.h"
 
 struct iMeshWrapper;
 struct iMeshGenerator;
@@ -39,7 +40,6 @@ struct iMeshList;
 struct iLightList;
 struct iLight;
 struct iVisibilityCuller;
-struct iLightSectorInfluence;
 
 struct iObject;
 
@@ -55,6 +55,7 @@ class csBox3;
 class csRenderMeshList;
 class csReversibleTransform;
 class csVector3;
+
 
 enum csFogMode
 {

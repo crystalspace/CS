@@ -25,6 +25,7 @@
 #include "csgfx/imagememory.h"
 #include "cstool/rviewclipper.h"
 #include "csutil/cscolor.h"
+#include "csutil/scfarray.h"
 #include "iengine/camera.h"
 #include "iengine/light.h"
 #include "iengine/material.h"
@@ -294,18 +295,23 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
 
   // @@@ This code is ignoring dynamic lights. Perhaps we need a better
   // way to represent those.
-  //iLightList* lights = sector->GetLights();
-  //int nlights = lights->GetCount();
-  const csArray<iLightSectorInfluence*>& lights = lightmgr->GetRelevantLights (sector,
-      -1, false);
-  size_t nlights = lights.GetSize ();
+  csSafeCopyArray<csLightInfluence> lightInfluences;
+  scfArrayWrap<iLightInfluenceArray, csSafeCopyArray<csLightInfluence> > 
+    relevantLights (lightInfluences); //Yes, know, its on the stack...
+
+  lightmgr->GetRelevantLights (sector, &relevantLights, -1);
+
+  size_t nlights = lightInfluences.GetSize ();
 
   csArray<iLight*> lightList (16);
 
   while (nlights-- > 0)
   {
     //iLight* light = lights->Get (nlights);
-    iLight* light = lights.Get (nlights)->GetLight ();
+    iLight* light = lightInfluences.Get (nlights).light;
+    if (!light)
+      continue;
+
     const csVector3 lightPos = light->GetMovable ()->GetFullPosition ();
 
     /* 

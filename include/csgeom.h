@@ -22,7 +22,7 @@
  * subdirectory of the top Crystal Space include directory.
  */
 #include "cssysdef.h"
-#include "csgeom/aabbtree.h"
+//#include "csgeom/aabbtree.h"
 #include "csgeom/box.h"
 #include "csgeom/bsptree.h"
 #include "csgeom/chainhull2d.h"

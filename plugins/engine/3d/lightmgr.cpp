@@ -32,23 +32,137 @@ csLightManager::~csLightManager ()
 {
 }
 
-const csArray<iLightSectorInfluence*>& csLightManager::GetRelevantLights (
-	iMeshWrapper* mw,
-	int maxLights, bool desireSorting)
+void csLightManager::GetRelevantLights (iMeshWrapper* meshObject, 
+    iLightInfluenceArray* lightArray, int maxLights, uint flags)
 {
-  if (!mw) return nolights;
-  csMeshWrapper* cmw = (csMeshWrapper*)mw;
-  return cmw->GetRelevantLights (maxLights, desireSorting);
+  const csBox3& meshBox = meshObject->GetWorldBoundingBox ();
+  iSectorList* sectors = meshObject->GetMovable ()->GetSectors ();
+  if (sectors && sectors->GetCount() > 0)
+  {
+    GetRelevantLights (sectors->Get (0), meshBox, lightArray, maxLights, flags);
+  }
 }
 
-const csArray<iLightSectorInfluence*>& csLightManager::GetRelevantLights (
-	iSector* sector,
-	int maxLights, bool desireSorting)
+void csLightManager::GetRelevantLights (iMeshWrapper* meshObject, 
+  iLightInfluenceCallback* lightCallback, int maxLights, 
+  uint flags)
 {
-  if (!sector) return nolights;
-  csSector* csector = (csSector*)sector;
-  return csector->GetRelevantLights (maxLights, desireSorting);
+  const csBox3& meshBox = meshObject->GetWorldBoundingBox ();
+  iSectorList* sectors = meshObject->GetMovable ()->GetSectors ();
+  if (sectors && sectors->GetCount() > 0)
+  {
+    GetRelevantLights (sectors->Get (0), meshBox, lightCallback, maxLights, flags);
+  }
 }
+
+
+void csLightManager::GetRelevantLights (iSector* sector, 
+  iLightInfluenceArray* lightArray, int maxLights, 
+  uint flags)
+{
+  const csBox3 bigBox;  
+  GetRelevantLights (sector, bigBox, lightArray, maxLights, flags);
+}
+
+void csLightManager::GetRelevantLights (iSector* sector, 
+  iLightInfluenceCallback* lightCallback, int maxLights, 
+  uint flags)
+{
+  const csBox3 bigBox;  
+  GetRelevantLights (sector, bigBox, lightCallback, maxLights, flags);
+}
+
+struct IntersectInnerBBox
+{
+  IntersectInnerBBox (const csBox3& box)
+    : testBox (box)
+  {}
+
+  bool operator() (const csSectorLightList::LightAABBTree::Node* node)
+  {
+    return testBox.TestIntersect (node->GetBBox ());
+  }
+
+  const csBox3& testBox;
+};
+
+struct LightCollectArray
+{
+  LightCollectArray (const csBox3& box, iLightInfluenceArray* lightArray)
+    : testBox (box), lightArray (lightArray)
+  {}
+
+  void operator() (const csSectorLightList::LightAABBTree::Node* node)
+  {
+    if (!testBox.TestIntersect (node->GetBBox ()))
+      return;
+
+    for (size_t i = 0; i < node->GetObjectCount (); ++i)
+    {
+      csLightInfluence newInfluence;
+      newInfluence.light = node->GetLeafData (i);
+      lightArray->Push (newInfluence);
+    }
+  }
+
+  const csBox3& testBox;
+  iLightInfluenceArray* lightArray;
+};
+
+struct LightCollectCallback
+{
+  LightCollectCallback (const csBox3& box, iLightInfluenceCallback* lightCallback)
+    : testBox (box), lightCallback (lightCallback)
+  {}
+
+  void operator() (const csSectorLightList::LightAABBTree::Node* node)
+  {
+    if (!testBox.TestIntersect (node->GetBBox ()))
+      return;
+
+    for (size_t i = 0; i < node->GetObjectCount (); ++i)
+    {
+      csLightInfluence newInfluence;
+      newInfluence.light = node->GetLeafData (i);
+      lightCallback->LightInfluence (newInfluence);
+    }
+  }
+
+  const csBox3& testBox;
+  iLightInfluenceCallback* lightCallback;
+};
+
+
+void csLightManager::GetRelevantLights (iSector* sector, const csBox3& boundingBox,
+  iLightInfluenceArray* lightArray, int maxLights, 
+  uint flags)
+{
+  iLightList* llist = sector->GetLights ();
+  csSectorLightList* sectorLightList = static_cast<csSectorLightList*> (llist);
+
+  // Get the primary lights from same sector
+  const csSectorLightList::LightAABBTree& aabbTree = sectorLightList->GetLightAABBTree ();
+  IntersectInnerBBox inner (boundingBox);
+  LightCollectArray leaf (boundingBox, lightArray);
+  aabbTree.Traverse (inner, leaf);
+
+  //@@TODO: Implement cross-sector lookups
+}
+
+void csLightManager::GetRelevantLights (iSector* sector, const csBox3& boundingBox,
+  iLightInfluenceCallback* lightCallback, int maxLights, 
+  uint flags)
+{
+  iLightList* llist = sector->GetLights ();
+  csSectorLightList* sectorLightList = static_cast<csSectorLightList*> (llist);
+
+  // Get the primary lights from same sector
+  const csSectorLightList::LightAABBTree& aabbTree = sectorLightList->GetLightAABBTree ();
+  IntersectInnerBBox inner (boundingBox);
+  LightCollectCallback leaf (boundingBox, lightCallback);
+  aabbTree.Traverse (inner, leaf);
+}
+
 
 // ---------------------------------------------------------------------------
 

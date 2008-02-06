@@ -112,13 +112,6 @@ public:
   virtual iMeshWrapper *FindByName (const char *Name) const;
 };
 
-struct LSIAndDist
-{
-  csLightSectorInfluence* lsi;
-  // An indication of how powerful this light affects the object.
-  // Higher values mean more influence.
-  float influence;
-};
 
 struct ExtraRenderMeshData
 {
@@ -241,28 +234,6 @@ private:
   csZBufMode zbufMode;
 
   csImposterMesh *imposter_mesh;
-
-  /**
-   * Array of lights affecting this mesh object. This is calculated
-   * by the csLightManager class.
-   */
-  csDirtyAccessArray<iLightSectorInfluence*> relevant_lights;
-#define MAX_INF_LIGHTS 100
-  static LSIAndDist relevant_lights_cache[MAX_INF_LIGHTS];
-
-  // This is a mirror of 'relevant_lights' which we use to detect if
-  // a light has been removed or changed. It is only used in case we
-  // are not updating all the time (if CS_LIGHTINGUPDATE_ALWAYSUPDATE is
-  // not set).
-  struct LightRef
-  {
-    csWeakRef<iLightSectorInfluence> lsi;
-    uint32 light_nr;
-  };
-  csSafeCopyArray<LightRef> relevant_lights_ref;
-  bool relevant_lights_valid;
-  size_t relevant_lights_max;
-  csFlags relevant_lights_flags;
 
   // In case the mesh has CS_ENTITY_NOCLIP set then this will
   // contain the value of the last frame number and camera pointer.
@@ -419,17 +390,7 @@ public:
     return draw_cb_vector.Get (idx);
   }
 
-  virtual void SetLightingUpdate (int flags, int num_lights);
-
-  /**
-   * Get the array of relevant lights for this object.
-   */
-  const csArray<iLightSectorInfluence*>& GetRelevantLights (
-  	int maxLights, bool desireSorting);
-  /**
-   * Forcibly invalidate relevant lights.
-   */
-  void InvalidateRelevantLights () { relevant_lights_valid = false; }
+  virtual void SetLightingUpdate (int flags, int num_lights){}
 
   /**
    * Draw this mesh object given a camera transformation.

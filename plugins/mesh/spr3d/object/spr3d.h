@@ -1077,7 +1077,7 @@ private:
   /**
    * Update the lighting on this sprite.
    */
-  void UpdateLighting (const csArray<iLightSectorInfluence*>& lights,
+  void UpdateLighting (const csSafeCopyArray<csLightInfluence>& lights,
       iMovable* movable);
 
   /**
@@ -1085,7 +1085,7 @@ private:
    * the distance between the light and every vertex.
    * This version can use tweening of the normals and vertices
    */
-  void UpdateLightingHQ (const csArray<iLightSectorInfluence*>& lights,
+  void UpdateLightingHQ (const csSafeCopyArray<csLightInfluence>& lights,
       iMovable* movable);
 
   /**
@@ -1093,7 +1093,7 @@ private:
    * calculates the distance once (from the center of the sprite.)
    * This method can use tweening of the normals.
    */
-  void UpdateLightingLQ (const csArray<iLightSectorInfluence*>& lights,
+  void UpdateLightingLQ (const csSafeCopyArray<csLightInfluence>& lights,
       iMovable* movable);
 
   /**
@@ -1101,7 +1101,7 @@ private:
    * calculates the distance once (from the center of the sprite.)
    * This version can NOT use any tweening.
    */
-  void UpdateLightingFast (const csArray<iLightSectorInfluence*>& lights,
+  void UpdateLightingFast (const csSafeCopyArray<csLightInfluence>& lights,
       iMovable* movable);
 
   /**

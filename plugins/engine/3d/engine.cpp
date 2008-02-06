@@ -2001,51 +2001,6 @@ static int compare_light (const void *p1, const void *p2)
 // in csEngine so that it will be freed later.
 static csLightArray *light_array = 0;
 
-static bool FindLightPos_Front2Back (csKDTree* treenode,
-	void* userdata, uint32 cur_timestamp, uint32&)
-{
-  csVector3 pos = *(csVector3*)userdata;
-
-  const csBox3& node_bbox = treenode->GetNodeBBox ();
-
-  // In the first part of this test we are going to test if the
-  // position is inside the node. If not then we don't need to continue.
-  if (!node_bbox.In (pos))
-  {
-    return false;
-  }
-
-  treenode->Distribute ();
-
-  int num_objects;
-  csKDTreeChild** objects;
-  num_objects = treenode->GetObjectCount ();
-  objects = treenode->GetObjects ();
-
-  int i;
-  for (i = 0 ; i < num_objects ; i++)
-  {
-    if (objects[i]->timestamp != cur_timestamp)
-    {
-      objects[i]->timestamp = cur_timestamp;
-      // First test the bounding box of the object.
-      const csBox3& obj_bbox = objects[i]->GetBBox ();
-
-      if (obj_bbox.In (pos))
-      {
-        iLight* light = (iLight*)objects[i]->GetObject ();
-	float sqdist = csSquaredDist::PointPoint (pos,
-		light->GetMovable ()->GetFullPosition ());
-	if (sqdist < csSquare(light->GetCutoffDistance ()))
-	{
-	  light_array->AddLight (light, sqdist);
-	}
-      }
-    }
-  }
-  return true;
-}
-
 static bool FindLightBox_Front2Back (csKDTree* treenode,
 	void* userdata, uint32 cur_timestamp, uint32&)
 {
@@ -2092,6 +2047,90 @@ static bool FindLightBox_Front2Back (csKDTree* treenode,
   return true;
 }
 
+struct LightCollectPoint
+{
+  LightCollectPoint (csLightArray* lightArray, const csVector3& pos)
+    : lightArray (lightArray), pos (pos)
+  {}
+
+  void operator() (const csSectorLightList::LightAABBTree::Node* node)
+  {
+    if (!node->GetBBox ().In (pos))
+      return;
+
+    for (size_t i = 0; i < node->GetObjectCount (); ++i)
+    {
+      csLight* light = node->GetLeafData (i);
+      
+      float sqdist = csSquaredDist::PointPoint (pos,
+        light->GetMovable ()->GetFullPosition ());
+      if (sqdist < csSquare(light->GetCutoffDistance ()))
+      {
+        lightArray->AddLight (light, sqdist);
+      }
+    }
+  }
+
+  csLightArray* lightArray;
+  const csVector3& pos;
+};
+
+struct LightCollectInnerPoint
+{
+  LightCollectInnerPoint (const csVector3& pos)
+    : pos (pos)
+  {}
+
+  bool operator() (const csSectorLightList::LightAABBTree::Node* node)
+  {
+    return node->GetBBox ().In (pos);
+  }
+
+  const csVector3& pos;
+};
+
+struct LightCollectBox
+{
+  LightCollectBox (csLightArray* lightArray, const csBox3& box)
+    : lightArray (lightArray), box (box)
+  {}
+
+  void operator() (const csSectorLightList::LightAABBTree::Node* node)
+  {
+    if (!node->GetBBox ().TestIntersect (box))
+      return;
+
+    for (size_t i = 0; i < node->GetObjectCount (); ++i)
+    {
+      csLight* light = node->GetLeafData (i);
+      csVector3 light_pos = light->GetMovable ()->GetFullPosition ();
+      csBox3 b (box.Min () - light_pos, box.Max () - light_pos);
+      float sqdist = b.SquaredOriginDist ();
+      if (sqdist < csSquare (light->GetCutoffDistance ()))
+      {
+        lightArray->AddLight (light, sqdist);
+      }
+    }
+  }
+
+  csLightArray* lightArray;
+  const csBox3& box;
+};
+
+struct LightCollectInnerBox
+{
+  LightCollectInnerBox (const csBox3& box)
+    : box (box)
+  {}
+
+  bool operator() (const csSectorLightList::LightAABBTree::Node* node)
+  {
+    return node->GetBBox ().TestIntersect (box);
+  }
+
+  const csBox3& box;
+};
+
 
 int csEngine::GetNearbyLights (
   iSector *sector,
@@ -2109,10 +2148,11 @@ int csEngine::GetNearbyLights (
   }
 
   light_array->Reset ();
-
-  csKDTree* kdtree = ((csSector*)sector)->GetLightKDTree ();
-  csVector3 position = pos;
-  kdtree->Front2Back (pos, FindLightPos_Front2Back, &position, 0);
+  
+  const csSectorLightList::LightAABBTree& tree = (static_cast<csSector*> (sector))->GetLightAABBTree ();
+  LightCollectPoint collector (light_array, pos);
+  LightCollectInnerPoint inner (pos);
+  tree.TraverseOut (inner, collector, pos);
 
   if (light_array->num_lights <= max_num_lights)
   {
@@ -2155,9 +2195,10 @@ int csEngine::GetNearbyLights (
 
   light_array->Reset ();
 
-  csKDTree* kdtree = ((csSector*)sector)->GetLightKDTree ();
-  csBox3 bbox = box;
-  kdtree->Front2Back (box.Min (), FindLightBox_Front2Back, &bbox, 0);
+  const csSectorLightList::LightAABBTree& tree = (static_cast<csSector*> (sector))->GetLightAABBTree ();
+  LightCollectBox collector (light_array, box);
+  LightCollectInnerBox inner (box);
+  tree.Traverse (inner, collector);
 
   if (light_array->num_lights <= max_num_lights)
   {

@@ -151,20 +151,22 @@ struct csBlockAllocatorSizeObjectAlign
 template <class T,
   typename Allocator = CS::Memory::AllocatorMalloc, 
   typename ObjectDispose = csBlockAllocatorDisposeDelete<T>,
-  typename SizeComputerSize = csBlockAllocatorSizeObject::Size<T>
+  typename SizeComputer = csBlockAllocatorSizeObject
 >
 class csBlockAllocator : 
   public csFixedSizeAllocator<
-    SizeComputerSize::value,
+    SizeComputer::Size<T>::value,
     Allocator>
 {
 public:
-  typedef csBlockAllocator<T, Allocator, SizeComputerSize> ThisType;
+  typedef typename SizeComputer::Size<T> SizeComputerSize;
+  typedef csBlockAllocator<T, Allocator, ObjectDispose, SizeComputer> ThisType;
   typedef T ValueType;
   typedef Allocator AllocatorType;
 
 protected:
   typedef csFixedSizeAllocator<SizeComputerSize::value, Allocator> superclass;
+
 private:
   void* Alloc (size_t /*n*/) { return 0; }                       // Illegal
   void* Alloc (void* /*p*/, size_t /*newSize*/) { return 0; }   // Illegal
