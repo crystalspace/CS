@@ -238,7 +238,7 @@ bool csBugPlug::Initialize (iObjectRegistry *object_reg)
 
   stringSet = csQueryRegistryTagInterface<iStringSet> (object_reg,
     "crystalspace.shared.stringset");
-  stringSetSvName = csQueryRegistryTagInterface<iStringSet> (object_reg,
+  stringSetSvName = csQueryRegistryTagInterface<iShaderVarStringSet> (object_reg,
     "crystalspace.shader.variablenameset");
   return true;
 }

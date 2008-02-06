@@ -710,7 +710,7 @@ bool csShaderGLPS1_NV::LoadProgramStringToGL ()
   {
     const csPSConstant& constant = constants.Get (i);
 
-    constantRegs[constant.reg].var.AttachNew (new csShaderVariable (csInvalidStringID));
+    constantRegs[constant.reg].var.AttachNew (new csShaderVariable (CS::InvalidShaderVarStringID));
     constantRegs[constant.reg].var->SetValue (constant.value);
     constantRegs[constant.reg].valid = true;
   }

@@ -121,7 +121,7 @@ public:
    */
   bool Delete(char const* s)
   {
-    csStringID const id = registry.Request(s);
+    CS::StringID<Tag> const id = registry.Request(s);
     bool const ok = (id != csInvalidStringID);
     if (ok)
     {

@@ -108,7 +108,7 @@ public:
    */
   StringID<Tag> Request (const char* s) const
   {
-    return registry.Get(s, csInvalidStringID);
+    return registry.Get(s, CS::InvalidStringID<Tag> ());
   }
 
   /**

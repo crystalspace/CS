@@ -330,7 +330,7 @@ bool CsBench::Initialize (int argc, const char* const argv[],
   strings = csQueryRegistryTagInterface<iStringSet> 
     (object_reg, "crystalspace.shared.stringset");
   if (!strings) return ReportError ("No string set!");
-  stringsSvName = csQueryRegistryTagInterface<iStringSet> 
+  stringsSvName = csQueryRegistryTagInterface<iShaderVarStringSet> 
     (object_reg, "crystalspace.shader.variablenameset");
   if (!stringsSvName) return ReportError ("No string set!");
 
