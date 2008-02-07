@@ -86,15 +86,6 @@ bool csGLRender2TextureFramebuf::SetRenderTarget (iTextureHandle* handle,
   target->Set (handle, persistent, subtexture);
 
   return true;
-/*  if (handle)
-  {
-  }
-  else
-  {
-    G3D->GetDriver2D()->PerformExtension ("vp_reset");
-    G3D->GetDriver2D()->SetClipRect (rt_old_minx, rt_old_miny, 
-      rt_old_maxx, rt_old_maxy);
-  }*/
 }
 
 void csGLRender2TextureFramebuf::UnsetRenderTargets()
@@ -219,14 +210,174 @@ void csGLRender2TextureFramebuf::SetupProjection ()
   G3D->SetGlOrtho (true);
 }
 
-void csGLRender2TextureFramebuf::GrabFramebuffer (const RTAttachment& target, 
-                                                  GLenum internalFormat)
+GLenum csGLRender2TextureFramebuf::GetInternalFormat (
+  InternalFormatClass fmtClass, csGLBasicTextureHandle* tex)
+{
+  GLenum textarget = tex->GetGLTextureTarget();
+  GLenum glInternalFormat;
+  glGetTexLevelParameteriv ((textarget == GL_TEXTURE_CUBE_MAP) 
+      ? GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB : textarget, 
+    0, GL_TEXTURE_INTERNAL_FORMAT, (GLint*)&glInternalFormat);
+
+  switch (fmtClass)
+  {
+  default:
+  case ifColor:
+    return GetInternalFormatColor (glInternalFormat);
+  case ifDepth:
+    return GetInternalFormatDepth (glInternalFormat);
+  }
+}
+
+struct InternalFormatForDepth
+{
+  int components[4];
+  GLenum format;
+};
+
+static GLenum MatchFormatDepth (const InternalFormatForDepth formats[],
+				size_t formatNum,
+				GLenum comp0, GLenum comp1, GLenum comp2, 
+				GLenum comp3, GLenum fallback)
+{
+  GLint depths[4] = {0, 0, 0, 0};
+  int compNum = 0;
+  if (comp0 != 0)
+  {
+    compNum = 1;
+    glGetIntegerv (comp0, &depths[0]);
+    if (comp1 != 0)
+    {
+      compNum = 2;
+      glGetIntegerv (comp1, &depths[1]);
+      if (comp2 != 0)
+      {
+	compNum = 3;
+	glGetIntegerv (comp2, &depths[2]);
+	if (comp3 != 0)
+	{
+	  compNum = 4;
+	  glGetIntegerv (comp3, &depths[3]);
+	}
+      }
+    }
+  }
+
+  for (size_t f = 0; f < formatNum; f++)
+  {
+    int c;
+    for (c = 0; c < compNum; c++)
+    {
+      if (formats[f].components[c] < depths[c]) break;
+    }
+    if (c >= compNum)
+      return formats[f].format;
+  }
+
+  return fallback;
+}
+
+GLenum csGLRender2TextureFramebuf::GetInternalFormatColor (
+  GLenum texInternalFormat)
+{
+  switch (texInternalFormat)
+  {
+  case GL_RGB4:
+  case GL_RGB5:
+  case GL_RGB8:
+  case GL_RGB10:
+  case GL_RGB12:
+  case GL_RGB16:
+  case GL_RGB16F_ARB:
+  case GL_RGB32F_ARB:
+  default:
+    {
+      static const InternalFormatForDepth rgbFormats[] = {
+	{{ 4,  4,  4, 0}, GL_RGB4},
+	{{ 5,  5,  5, 0}, GL_RGB5},
+	{{ 8,  8,  8, 0}, GL_RGB8},
+	{{10, 10, 10, 0}, GL_RGB10},
+	{{12, 12, 12, 0}, GL_RGB12},
+	{{16, 16, 16, 0}, GL_RGB16}
+      };
+      return MatchFormatDepth (rgbFormats, 
+	sizeof (rgbFormats) / sizeof (rgbFormats[0]),
+	GL_RED_BITS, GL_GREEN_BITS, GL_BLUE_BITS, 0,
+	GL_RGB8);
+    }
+    break;
+  case GL_RGBA2:
+  case GL_RGBA4:
+  case GL_RGB5_A1:
+  case GL_RGBA8:
+  case GL_RGB10_A2:
+  case GL_RGBA12:
+  case GL_RGBA16:
+  case GL_RGBA16F_ARB:
+  case GL_RGBA32F_ARB:
+    {
+      static const InternalFormatForDepth rgbaFormats[] = {
+	{{ 2,  2,  4,  2}, GL_RGBA2},
+	{{ 4,  4,  4,  4}, GL_RGBA4},
+	{{ 5,  5,  5,  1}, GL_RGB5_A1},
+	{{ 8,  8,  8,  8}, GL_RGBA8},
+	{{10, 10, 10,  2}, GL_RGB10_A2},
+	{{12, 12, 12, 12}, GL_RGBA12},
+	{{16, 16, 16, 16}, GL_RGBA16}
+      };
+      return MatchFormatDepth (rgbaFormats, 
+	sizeof (rgbaFormats) / sizeof (rgbaFormats[0]),
+	GL_RED_BITS, GL_GREEN_BITS, GL_BLUE_BITS, GL_ALPHA_BITS,
+	GL_RGBA8);
+    }
+    break;
+  }
+}
+
+GLenum csGLRender2TextureFramebuf::GetInternalFormatDepth (
+  GLenum texInternalFormat)
+{
+  switch (texInternalFormat)
+  {
+  case GL_DEPTH_COMPONENT16:
+  case GL_DEPTH_COMPONENT24:
+  case GL_DEPTH_COMPONENT32:
+  default:
+    {
+      static const InternalFormatForDepth depthFormats[] = {
+	{{16, 0, 0, 0}, GL_DEPTH_COMPONENT16},
+	{{24, 0, 0, 0}, GL_DEPTH_COMPONENT24},
+	{{32, 0, 0, 0}, GL_DEPTH_COMPONENT32},
+      };
+      return MatchFormatDepth (depthFormats, 
+	sizeof (depthFormats) / sizeof (depthFormats[0]),
+	GL_DEPTH_BITS, 0, 0, 0,	GL_DEPTH_COMPONENT24);
+    }
+    break;
+  case GL_DEPTH24_STENCIL8_EXT:
+    {
+      static const InternalFormatForDepth depthStencilFormats[] = {
+	{{24, 8, 0, 0}, GL_DEPTH24_STENCIL8_EXT},
+      };
+      return MatchFormatDepth (depthStencilFormats, 
+	sizeof (depthStencilFormats) / sizeof (depthStencilFormats[0]),
+	GL_DEPTH_BITS, GL_STENCIL_BITS, 0, 0, GL_DEPTH24_STENCIL8_EXT);
+    }
+    break;
+  }
+}
+
+void csGLRender2TextureFramebuf::GrabFramebuffer (const RTAttachment& target,
+						  InternalFormatClass fmtClass)
 {
   csGLBasicTextureHandle* tex_mm = 
     static_cast<csGLBasicTextureHandle*> (target.texture->GetPrivateObject ());
   tex_mm->Precache ();
   // Texture is in tha cache, update texture directly.
   G3D->ActivateTexture (tex_mm);
+
+  GLenum internalFormat = 0;
+
   /* Texture has a keycolor - so we need to deal specially with it
     * to make sure the keycolor gets transparent. */
   if (tex_mm->GetKeyColor ())
@@ -257,6 +408,8 @@ void csGLRender2TextureFramebuf::GrabFramebuffer (const RTAttachment& target,
     // Make some necessary adjustments.
     if (!tex_mm->IsWasRenderTarget())
     {
+      internalFormat = GetInternalFormat (fmtClass, tex_mm);
+
       tex_mm->SetupAutoMipping();
       tex_mm->SetWasRenderTarget (true);
       tex_mm->texFormat = iTextureHandle::RGBA8888;
@@ -280,17 +433,20 @@ void csGLRender2TextureFramebuf::GrabFramebuffer (const RTAttachment& target,
       if (handle_subtexture)
 	glCopyTexSubImage2D (
 	  GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + target.subtexture,
-	  0, 0, 0, 0, 0, G3D->GetWidth(), G3D->GetHeight());
+	  0, 0, 0, 0, 0, csMin (txt_w, framebufW), csMin (txt_h, framebufH));
       else
 	glCopyTexSubImage2D (textarget, 0, 0, 0, 0, 0, 
-	  csMin (txt_w, framebufW), csMin (txt_h, framebufH) );
+	  csMin (txt_w, framebufW), csMin (txt_h, framebufH));
     }
     else
     {
+      if (internalFormat == 0)
+	glGetTexLevelParameteriv ((textarget == GL_TEXTURE_CUBE_MAP) 
+	    ? GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB : textarget, 
+	  0, GL_TEXTURE_INTERNAL_FORMAT, (GLint*)&internalFormat);
       if (handle_subtexture)
-	glCopyTexSubImage2D (
-	  GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + target.subtexture,
-	  0, 0, 0, 0, 0, txt_w, txt_h);
+	glCopyTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + target.subtexture, 
+	  0, internalFormat, 0, 0, txt_w, txt_h, 0);
       else
 	glCopyTexImage2D (textarget, 0, internalFormat, 0, 0, txt_w, txt_h, 0);
     }
@@ -306,8 +462,8 @@ void csGLRender2TextureFramebuf::FinishDraw ()
 
   if (rt_onscreen)
   {
-    if (colorTarget.IsValid()) GrabFramebuffer (colorTarget, GL_RGBA);
-    if (depthTarget.IsValid()) GrabFramebuffer (depthTarget, GL_DEPTH_COMPONENT);
+    if (colorTarget.IsValid()) GrabFramebuffer (colorTarget, ifColor);
+    if (depthTarget.IsValid()) GrabFramebuffer (depthTarget, ifDepth);
     rt_onscreen = false;
   }
 }

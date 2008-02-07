@@ -59,7 +59,7 @@
 # define _strdup strdup
 #endif
 
-void DirectDetection::ReportResult (int severity, char *str, HRESULT hRes)
+void DirectDetection::ReportResult (int severity, const char *str, HRESULT hRes)
 {
   csReport (object_reg, severity, "crystalspace.canvas.ddraw.directdetection", 
     "%s\nError: %s [%s]", 
@@ -67,7 +67,7 @@ void DirectDetection::ReportResult (int severity, char *str, HRESULT hRes)
     csDirectXError::GetErrorSymbol (hRes));
 }
 
-void DirectDetection::SystemFatalError (char *str, HRESULT hRes)
+void DirectDetection::SystemFatalError (const char *str, HRESULT hRes)
 {
   ReportResult (CS_REPORTER_SEVERITY_ERROR,
     str, hRes);

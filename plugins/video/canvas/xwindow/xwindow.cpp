@@ -781,6 +781,18 @@ bool csXWindow::HandleEvent (iEvent &Event)
       case MapNotify:
 	EventOutlet->Broadcast (csevCanvasExposed (name_reg, Canvas), 0);
 	break;
+      case SelectionRequest:
+        storedEvent = event;
+        EventOutlet->Broadcast (csEventNameRegistry::GetID(name_reg, "crystalspace.xwindow.clipboard.selection.request"));
+        break;
+      case SelectionNotify:
+        storedEvent = event;
+        EventOutlet->Broadcast (csEventNameRegistry::GetID(name_reg, "crystalspace.xwindow.clipboard.selection.notify"));
+        break;
+      case SelectionClear:
+        storedEvent = event;
+        EventOutlet->Broadcast (csEventNameRegistry::GetID(name_reg, "crystalspace.xwindow.clipboard.selection.clear"));
+        break;
       default:
         break;
     }

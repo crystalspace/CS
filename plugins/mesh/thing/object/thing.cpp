@@ -886,7 +886,7 @@ int csThingStatic::IntersectSegmentIndex (
 
 csPtr<csThingStatic> csThingStatic::CloneStatic ()
 {
-  csThingStatic* clone = new csThingStatic (scfParent, thing_type);
+  csThingStatic* clone = new csThingStatic (GetSCFParent (), thing_type);
   clone->flags.SetAll (GetFlags ().Get ());
   clone->SetSmoothed (IsSmoothed());
   clone->obj_bbox = obj_bbox;

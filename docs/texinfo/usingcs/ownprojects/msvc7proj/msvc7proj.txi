@@ -1,16 +1,16 @@
 @c -*-texinfo-*-
-@node HOWTO Creating External MSVC 7 Application, HOWTO Creating External Application Using KDevelop, HOWTO CS Project, Making Own Projects
-@subsection Creating an External @sc{msvc} 7, 7.1 or 8 Application
+@node HOWTO Creating External MSVC Application, HOWTO Creating External Application Using KDevelop, HOWTO CS Project, Making Own Projects
+@subsection Creating an External @sc{msvc} 7, 7.1, 8 or 9 Application
 @cindex MSVC, external projects
 
 @noindent
 Originally written by Philip Wyett @email{philipwyett@@blueyonder.co.uk}.
 @noindent
-@emph{Last updated 20 January 2006.}
+@emph{Last updated January 2008.}
 
 This @sc{howto} is a step by step guide for creating a basic Crystal Space
-application with @sc{msvc} 7 (@sc{.net} 2002), 7.1 (@sc{.net} 2003) or
-8 (@sc{.net} 2005) outside the Crystal Space source tree. 
+application with @sc{msvc} 7 (@sc{.net} 2002), 7.1 (@sc{.net} 2003), 8 (@sc{.net} 2005) or
+9 (@sc{.net} 2008) outside the Crystal Space source tree. 
 
 @emph{Note:} This text was initially written with only @sc{msvc} 7 in mind, 
 consequently, the screenshots are from that version. However, its successors, 
@@ -153,16 +153,16 @@ to where the debug libs are located.  In the @emph{Show directories} for drop
 down menu, now select @emph{Library files}.  Follow the same browse and
 selection procedure as you used when adding the @file{include} path, adding the
 following paths - adjusting for where you have Crystal Space located on your
-system as well as the @sc{msvc} version number you compiled with. Here it was
-version 7; for versions 7.1 you need to use 
-@file{out\release71\libs\} and @file{out\debug71\libs\}, likewise for version 
-8 you need @file{out\release8\libs\} and @file{out\debug8\libs\}.
+system as well as the @sc{msvc} version number you compiled with. For version 
+7.1 you need to use @file{out\release71\libs\} and @file{out\debug71\libs\}, 
+likewise for version 8 you need @file{out\release8\libs\} and @file{out\debug8\libs\}.
 
+For version 9 use:-
 @noindent
-@file{CS\out\release7\libs\}@*
-@file{CS\out\debug7\libs\}
+@file{CS\out\release9\libs\}@*
+@file{CS\out\debug9\libs\}
 
-See image below for an example of this set.
+See image below for an example of this set for version 7.
 
 @ifnotinfo
 @picturesss{usingcs,ownprojects,msvc7proj,snap9}
@@ -172,15 +172,20 @@ Once done, click on the @emph{OK} button and return to the @sc{msvc ide}.
 
 @subsubheading Step 4 - Setting Preprocessor Definitions in @sc{msvc}.
 
-Crystal Space essentially has three preprocessor definitions which MUST be set
-in-order to successfully compile and link your application.  They are
-@samp{CS_WIN32_CSCONFIG}, which is added whether the build is release or debug.
-@samp{__CRYSTAL_SPACE__}, which is also set whether the build is release or
-debug.  And finally @samp{CS_RELEASE} or @samp{CS_DEBUG}, which is added as you
-may guess @samp{CS_RELEASE} in the settings for release builds and
-@samp{CS_DEBUG} in the settings for debug builds.
+Crystal Space essentially has some preprocessor definitions which MUST be set
+in-order to successfully compile and link your application.  They are:
+@itemize @bullet
+@item @samp{CS_WIN32_CSCONFIG}
+@item @samp{__CRYSTAL_SPACE__}
+@item @samp{CS_BUILD_SHARED_LIBS} if Crystal Space was built ``with DLLs''
+(the default)
+@item @samp{CS_RELEASE} or @samp{CS_DEBUG}
+@end itemize
 
-To set the preprocessor definitions for your project.  Select your project in
+As you would expect @samp{CS_RELEASE} should be set for release builds and
+@samp{CS_DEBUG} should be set for debug builds.
+
+To set the preprocessor definitions for your project first select your project in
 the @emph{Workspace} window.  See area highlighted in blue in the image below.
 Now, from the @emph{Project} menu select @emph{Properties}.  Alternatively, you
 can right click on the highlighted area in the @emph{Workspace} and then click
@@ -199,7 +204,8 @@ the @emph{Properties} dialog box, which can be seen in the image below.
 
 Open the C/C++ folder and select @emph{Preprocessor}.  Insert the appropriate
 definitions in the @emph{Preprocessor Definitions} text box i.e.  for a debug
-build @samp{CS_WIN32_CSCONFIG}, @samp{__CRYSTAL_SPACE__} and @samp{CS_DEBUG},
+build with Crystal Space built with DLLs 
+@samp{CS_WIN32_CSCONFIG;__CRYSTAL_SPACE__;CS_BUILD_SHARED_LIBS;CS_DEBUG},
 making sure to separate with semi-colons.  Alternatively, you can click the
 elipsis (@dots{}) button to pull up an easier view.  An example of the ones
 entered for a debug build can be seen in the image below.
@@ -208,9 +214,11 @@ entered for a debug build can be seen in the image below.
 @picturesss{usingcs,ownprojects,msvc7proj,snap11}
 @end ifnotinfo
 
-Open the C/C++ folder and select @emph{Preprocessor}.  Insert the appropriate
-definitions in the @emph{Preprocessor Definitions} text box i.e.  for a release
-build @samp{CS_WIN32_CSCONFIG}, @samp{__CRYSTAL_SPACE__} and @samp{CS_RELEASE},
+Now do similar for the release configuration.  Open the C/C++ folder and select 
+@emph{Preprocessor}.  Insert the appropriate definitions in the 
+@emph{Preprocessor Definitions} text box i.e.  for a release build with 
+Crystal Space built with DLLs 
+@samp{CS_WIN32_CSCONFIG;__CRYSTAL_SPACE__;CS_BUILD_SHARED_LIBS;CS_RELEASE},
 making sure to separate with semi-colons.  Alternatively, you can click the
 elipsis (@dots{}) button to pull up an easier view.  An example the ones
 entered for a release build can be seen in the image below.

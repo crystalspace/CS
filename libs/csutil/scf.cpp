@@ -940,9 +940,29 @@ void csSCF::RegisterClassesInt(char const* pluginPath, iDocumentNode* scfnode,
   }
 }
 
+uint64 scfImplementationHelper::stats[scfImplementationHelper::scfstatsNum];
+
+class scfImplementationHelperXS : public scfImplementationHelper
+{
+public:
+  static void DumpStats ()
+  {
+#ifdef SCF_TRACK_STATS
+    csPrintf ("Total SCF objects created: %llu\n", stats[scfstatTotal]);
+    csPrintf (" SCF-parented:             %llu\n", stats[scfstatParented]);
+    csPrintf (" Weak-Referenced:          %llu\n", stats[scfstatWeakreffed]);
+    csPrintf (" Metadata requested:       %llu\n", stats[scfstatMetadata]);
+    csPrintf ("\n");
+    csPrintf ("IncRef calls:              %llu\n", stats[scfstatIncRef]);
+    csPrintf ("DecRef calls:              %llu\n", stats[scfstatDecRef]);
+#endif
+  }
+};
+
 void csSCF::Finish ()
 {
   delete this;
+  scfImplementationHelperXS::DumpStats();
 }
 
 iBase *csSCF::CreateInstance (const char *iClassID)

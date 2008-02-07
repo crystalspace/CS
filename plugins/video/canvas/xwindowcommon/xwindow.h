@@ -57,6 +57,7 @@ struct iXWindow : public virtual iBase
   virtual int GetScreen () = 0;
   virtual Window GetWindow () = 0;
   virtual GC GetGC () = 0;
+  virtual XEvent GetStoredEvent() = 0;
 
   virtual void SetVisualInfo (XVisualInfo *xvis) = 0;
   virtual void SetColormap (Colormap cmap) = 0;

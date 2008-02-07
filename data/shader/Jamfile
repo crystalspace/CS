@@ -1,6 +1,6 @@
 SubDir TOP data shader ;
 
-InstallData [ Wildcard *.afp *.avp *.fvp *.xml ] : data shader ;
+InstallData [ Wildcard *.afp *.avp *.fvp *.xml *.cgvp ] : data shader ;
 
 SubInclude TOP data shader character ;
 SubInclude TOP data shader combiner-cg ;

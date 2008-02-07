@@ -18664,6 +18664,28 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iTextureHandle_IsPrecached(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTextureHandle *arg1 = (iTextureHandle *) 0 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTextureHandle_IsPrecached",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTextureHandle, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTextureHandle_IsPrecached" "', argument " "1"" of type '" "iTextureHandle *""'"); 
+  }
+  arg1 = reinterpret_cast< iTextureHandle * >(argp1);
+  result = (bool)(arg1)->IsPrecached();
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iTextureHandle_SetTextureClass(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iTextureHandle *arg1 = (iTextureHandle *) 0 ;
@@ -20938,6 +20960,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iTextureHandle_GetAlphaMap", _wrap_iTextureHandle_GetAlphaMap, METH_VARARGS, NULL},
 	 { (char *)"iTextureHandle_GetAlphaType", _wrap_iTextureHandle_GetAlphaType, METH_VARARGS, NULL},
 	 { (char *)"iTextureHandle_Precache", _wrap_iTextureHandle_Precache, METH_VARARGS, NULL},
+	 { (char *)"iTextureHandle_IsPrecached", _wrap_iTextureHandle_IsPrecached, METH_VARARGS, NULL},
 	 { (char *)"iTextureHandle_SetTextureClass", _wrap_iTextureHandle_SetTextureClass, METH_VARARGS, NULL},
 	 { (char *)"iTextureHandle_GetTextureClass", _wrap_iTextureHandle_GetTextureClass, METH_VARARGS, NULL},
 	 { (char *)"iTextureHandle_SetAlphaType", _wrap_iTextureHandle_SetAlphaType, METH_VARARGS, NULL},

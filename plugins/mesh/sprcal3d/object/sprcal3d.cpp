@@ -717,7 +717,9 @@ void csCal3dSkeletonFactory::SetSkeleton (CalCoreModel *model)
   std::vector<CalCoreBone*> bvect = core_skeleton->getVectorCoreBone ();
   for (size_t i = 0; i < bvect.size (); i++)
   {
-    bones_factories.Push (new csCal3dSkeletonBoneFactory (bvect[i], this));
+    csRef<csCal3dSkeletonBoneFactory> newFact;
+    newFact.AttachNew (new csCal3dSkeletonBoneFactory (bvect[i], this));
+    bones_factories.Push (newFact);
   }
 
   //now we can setup parents and childres
@@ -762,6 +764,17 @@ iSkeletonAnimation *csCal3dSkeletonFactory::FindAnimation (const char *name)
     return animations[idx];
   return 0;
 }
+
+iSkeletonBoneFactory* csCal3dSkeletonFactory::GetBone (size_t i)
+{ 
+  return bones_factories[i];
+}
+
+iSkeletonAnimation* csCal3dSkeletonFactory::GetAnimation (size_t idx)
+{ 
+  return animations[idx];
+}
+
 //---------------------------csCal3dSkeletonBoneFactory---------------------------
 
 csCal3dSkeletonBoneFactory::csCal3dSkeletonBoneFactory (CalCoreBone *core_bone,
@@ -869,6 +882,8 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
   default_idle_anim = -1;
   idle_action = -1;
   last_locked_anim = -1;
+
+  cyclic_blend_factor = 0.0f;
 
   do_update = -1;
   updateanim_sqdistance1 = 10*10;
@@ -1663,7 +1678,9 @@ int csSpriteCal3DMeshObject::FindAnim(const char *name)
 void csSpriteCal3DMeshObject::ClearAllAnims()
 {
   while (active_anims.GetSize ())
-    ClearAnimCyclePos ((int)(active_anims.GetSize () - 1), 0.1f);
+  {
+    ClearAnimCyclePos ((int)(active_anims.GetSize () - 1), cyclic_blend_factor);
+  }
 
   if (last_locked_anim != -1)
   {
@@ -1676,13 +1693,13 @@ void csSpriteCal3DMeshObject::ClearAllAnims()
 bool csSpriteCal3DMeshObject::SetAnimCycle(const char *name, float weight)
 {
   ClearAllAnims();
-  return AddAnimCycle(name, weight, 0.1f);
+  return AddAnimCycle(name, weight, cyclic_blend_factor);
 }
 
 bool csSpriteCal3DMeshObject::SetAnimCycle(int idx, float weight)
 {
   ClearAllAnims();
-  return AddAnimCycle(idx, weight, 0.1f);
+  return AddAnimCycle(idx, weight, cyclic_blend_factor);
 }
 
 bool csSpriteCal3DMeshObject::AddAnimCycle(const char *name, float weight,
@@ -2230,6 +2247,11 @@ void csSpriteCal3DMeshObject::SetTimeFactor(float timeFactor)
 float csSpriteCal3DMeshObject::GetTimeFactor()
 {
   return calModel.getMixer()->getTimeFactor();
+}
+
+void csSpriteCal3DMeshObject::SetCyclicBlendFactor(float factor)
+{
+  cyclic_blend_factor = factor;
 }
 
 iShaderVariableContext* csSpriteCal3DMeshObject::GetCoreMeshShaderVarContext (
