@@ -46,7 +46,7 @@ namespace Geometry //@@Right?
       AABB_NODE_TYPE_MASK = 0x1,
 
       AABB_NODE_FLAG_SHIFT = 0x08,
-      AABB_NODE_FLAG_MASK = 0xFF00,      
+      AABB_NODE_FLAG_MASK = 0xFF00
     };
 
     ///
