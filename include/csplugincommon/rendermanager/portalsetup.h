@@ -468,7 +468,7 @@ namespace RenderManager
 	    typename RenderTreeType::MeshNode::SingleMesh sm;
 	    sm.meshObjSVs = 0;
 
-            AddRenderMeshToContext<RenderTreeType> (context, rm, renderPrio, sm);
+            context.AddRenderMesh (rm, renderPrio, sm);
 	    
 	    portalVerts2d += count;
             portalVerts3d += count;

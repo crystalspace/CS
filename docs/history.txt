@@ -6,6 +6,9 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Feb-2008
+	- res moved CS::RenderManager::AddRenderMeshToContext() into the render
+	  tree context class.
 6-Feb-2008
 	- Marten did some more iStringSet->iShaderVarStringSet fixes.
 	- Marten started to rework the way lights are queried from the engine.

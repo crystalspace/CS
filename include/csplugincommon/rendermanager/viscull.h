@@ -30,11 +30,6 @@ namespace RenderManager
   // Forward declare the functions
 
   template<typename RenderTree>
-  void AddRenderMeshToContext (typename RenderTree::ContextNode& context, 
-    csRenderMesh* rm, CS::Graphics::RenderPriority renderPrio,
-    typename RenderTree::MeshNode::SingleMesh& singleMeshTemplate);
-
-  template<typename RenderTree>
   bool Viscull (typename RenderTree::ContextNode& context, RenderView* rw, 
     iVisibilityCuller* culler);
 
@@ -100,8 +95,8 @@ namespace RenderManager
             }
             else
             {
-              AddRenderMeshToContext<RenderTreeType> (context, rm, renderPrio, sm);
-            }            
+              context.AddRenderMesh (rm, renderPrio, sm);
+            }
           }
         }
       }
@@ -127,45 +122,6 @@ namespace RenderManager
     culler->VisTest (rw, &cb);
 
     return true;
-  }
-
-  /**
-   * Add a rendermesh to context, putting it in the right meshnode etc.
-   */
-  template<typename RenderTree>
-  void AddRenderMeshToContext (typename RenderTree::ContextNode& context, 
-    csRenderMesh* rm, CS::Graphics::RenderPriority renderPrio,
-    typename RenderTree::MeshNode::SingleMesh& singleMeshTemplate)
-  {
-    typename RenderTree::TreeTraitsType::MeshNodeKeyType meshKey = 
-      RenderTree::TreeTraitsType::GetMeshNodeKey (renderPrio, *rm);
-    
-    RenderTree& tree = context.owner;
-
-    // Get the mesh node
-    typename RenderTree::MeshNode* meshNode = context.meshNodes.Get (meshKey, 0);
-    if (!meshNode)
-    {
-      // Get a new one
-      meshNode = tree.CreateMeshNode (context, meshKey);
-
-      RenderTree::TreeTraitsType::SetupMeshNode(*meshNode, renderPrio, *rm);
-      context.meshNodes.Put (meshKey, meshNode);
-    }
-
-    csRef<csShaderVariable> svObjectToWorld;
-    svObjectToWorld.AttachNew (new csShaderVariable (
-      tree.GetPersistentData ().svObjectToWorldName));
-    svObjectToWorld->SetValue (rm->object2world);
-
-    typename RenderTree::MeshNode::SingleMesh sm (singleMeshTemplate);
-    sm.renderMesh = rm;
-    sm.svObjectToWorld = svObjectToWorld;
-    if (rm->z_buf_mode != (csZBufMode)~0) 
-      sm.zmode = rm->z_buf_mode;
-
-    meshNode->meshes.Push (sm);
-    context.totalRenderMeshes++;
   }
  
 }

@@ -83,7 +83,7 @@ namespace RenderManager
       CS::ShaderVarStringID svObjectToWorldName;
     
       RenderView::Pool renderViewPool;
-      csRenderMeshHolder rmHolder;           
+      csRenderMeshHolder rmHolder;
     };
 
     /**
@@ -177,6 +177,42 @@ namespace RenderManager
       ContextNode(TreeType& owner) 
         : owner (owner), renderTarget (0), subtexture (0), totalRenderMeshes (0) 
       {}
+      
+      /**
+       * Add a rendermesh to context, putting it in the right meshnode etc.
+       */
+      void AddRenderMesh (csRenderMesh* rm, 
+			  CS::Graphics::RenderPriority renderPrio,
+			  typename MeshNode::SingleMesh& singleMeshTemplate)
+      {
+	typename TreeTraits::MeshNodeKeyType meshKey = 
+	  TreeTraits::GetMeshNodeKey (renderPrio, *rm);
+	
+	// Get the mesh node
+	MeshNode* meshNode = meshNodes.Get (meshKey, 0);
+	if (!meshNode)
+	{
+	  // Get a new one
+	  meshNode = owner.CreateMeshNode (*this, meshKey);
+    
+	  RenderTree::TreeTraitsType::SetupMeshNode(*meshNode, renderPrio, *rm);
+	  meshNodes.Put (meshKey, meshNode);
+	}
+    
+	csRef<csShaderVariable> svObjectToWorld;
+	svObjectToWorld.AttachNew (new csShaderVariable (
+	  owner.GetPersistentData ().svObjectToWorldName));
+	svObjectToWorld->SetValue (rm->object2world);
+    
+	typename MeshNode::SingleMesh sm (singleMeshTemplate);
+	sm.renderMesh = rm;
+	sm.svObjectToWorld = svObjectToWorld;
+	if (rm->z_buf_mode != (csZBufMode)~0) 
+	  sm.zmode = rm->z_buf_mode;
+    
+	meshNode->meshes.Push (sm);
+	totalRenderMeshes++;
+      }
     };
 
 
@@ -252,7 +288,7 @@ namespace RenderManager
     MeshNode* CreateMeshNode (ContextNode& context, 
       const typename TreeTraitsType::MeshNodeKeyType& key)
     {
-      MeshNode* newNode = persistentData.meshNodeAllocator.Alloc (context);      
+      MeshNode* newNode = persistentData.meshNodeAllocator.Alloc (context);
       newNode->key = key;
     
       return newNode;
