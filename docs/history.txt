@@ -10,6 +10,7 @@ chronological order.
 	- res added a way to iLightManager to get lights not via a callback or
 	  SCF array but by filling a specified buffer (to avoid vcall
 	  overhead).
+	- res changed the shader metadata to be ticket-independent.
 8-Feb-2008
 	- res moved CS::RenderManager::AddRenderMeshToContext() into the render
 	  tree context class.

@@ -117,6 +117,11 @@ public:
     return realShader->GetMetadata (ticket);
   }
 
+  virtual const csShaderMetadata& GetMetadata () const
+  {
+    return realShader->GetMetadata ();
+  }
+
   virtual void GetUsedShaderVars (size_t ticket, csBitArray& bits) const
   {
     realShader->GetUsedShaderVars (ticket, bits);

@@ -71,6 +71,8 @@ public:
   virtual bool DeactivatePass (size_t) { return false; }
   virtual const csShaderMetadata& GetMetadata (size_t) const
   { return allShaderMeta; }
+  virtual const csShaderMetadata& GetMetadata () const
+  { return allShaderMeta; }
   virtual void GetUsedShaderVars (size_t ticket, csBitArray& bits) const
   { }
 

@@ -134,13 +134,24 @@ public:
       memset (varArray, 0, sizeof(csShaderVariable*)*size);
   }
 
-  /// Merge one stack onto the front of this one
+  /// Merge one stack onto the "front" of this one
   void MergeFront (const csShaderVariableStack& other)
   {
     CS_ASSERT(other.size >= size);
     for (size_t i = 0; i < size; ++i)
     {
       if (!varArray[i])
+        varArray[i] = other.varArray[i];
+    }
+  }
+
+  /// Merge one stack onto the "back" of this one
+  void MergeBack (const csShaderVariableStack& other)
+  {
+    CS_ASSERT(other.size >= size);
+    for (size_t i = 0; i < size; ++i)
+    {
+      if (other.varArray[i])
         varArray[i] = other.varArray[i];
     }
   }
@@ -349,7 +360,7 @@ struct iShaderManager : public virtual iShaderVariableContext
 struct csShaderMetadata
 {
   /// Descriptive string
-  char *description;
+  const char *description;
 
   /**
    * Number of lights this shader can process in a pass. 
@@ -370,7 +381,7 @@ struct csShaderMetadata
  */
 struct iShader : public virtual iShaderVariableContext
 {
-  SCF_INTERFACE(iShader, 3, 2, 0);
+  SCF_INTERFACE(iShader, 3, 2, 1);
 
   /// Query the object.
   virtual iObject* QueryObject () = 0;
@@ -414,7 +425,11 @@ struct iShader : public virtual iShaderVariableContext
   /// Completly deactivate a pass
   virtual bool DeactivatePass (size_t ticket) = 0;
 
-  /// Get shader metadata
+  /** 
+   * Get shader metadata
+   * \deprecated Deprecated in 1.3. Metadata is now same for all tickets
+   */
+  CS_DEPRECATED_METHOD_MSG("Metadata is now same for all tickets")
   virtual const csShaderMetadata& GetMetadata (size_t ticket) const = 0;
   
   /**
@@ -430,6 +445,9 @@ struct iShader : public virtual iShaderVariableContext
    *   caller to do so.
    */
   virtual void GetUsedShaderVars (size_t ticket, csBitArray& bits) const = 0;
+  
+  /// Get shader metadata
+  virtual const csShaderMetadata& GetMetadata () const = 0;
 };
 
 

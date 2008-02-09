@@ -117,9 +117,6 @@ private:
   bool do_verbose;
   csString fail_reason;
 
-  // metadata
-  csShaderMetadata metadata;
-
   // load one pass, return false if it fails
   bool LoadPass (iDocumentNode *node, shaderPass *pass, size_t variant);
   // load a shaderdefinition block

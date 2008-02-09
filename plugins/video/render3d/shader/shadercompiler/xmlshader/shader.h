@@ -268,15 +268,12 @@ public:
   /// Get shader metadata
   virtual const csShaderMetadata& GetMetadata (size_t ticket) const
   {
-    if (IsFallbackTicket (ticket))
-      return fallbackShader->GetMetadata (GetFallbackTicket (ticket));
+    return GetMetadata();
+  }
 
-    csXMLShaderTech* tech;
-    if ((ticket != csArrayItemNotFound)
-      && ((tech = variants[ticket].tech) != 0))
-      return tech->metadata;
-    else
-      return allShaderMeta;
+  virtual const csShaderMetadata& GetMetadata () const
+  {
+    return allShaderMeta;
   }
 
   virtual void GetUsedShaderVars (size_t ticket, csBitArray& bits) const
@@ -380,7 +377,7 @@ public:
   /// Set object description
   void SetDescription (const char *desc)
   {
-    cs_free (allShaderMeta.description);
+    cs_free (const_cast<char*> (allShaderMeta.description));
     allShaderMeta.description = CS::StrDup (desc);
   }
 

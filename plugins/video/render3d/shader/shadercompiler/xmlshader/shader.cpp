@@ -25,6 +25,7 @@
 #include "ivaria/reporter.h"
 #include "ivideo/rendermesh.h"
 
+#include "csutil/documenthelper.h"
 #include "csutil/scfarray.h"
 #include "csutil/xmltiny.h"
 
@@ -275,6 +276,8 @@ csXMLShader::csXMLShader (csXMLShaderCompiler* compiler,
   g3d = compiler->g3d;
   csXMLShader::forcepriority = forcepriority;
   useFallbackContext = false;
+  
+  allShaderMeta.numberOfLights = source->GetAttributeValueAsInt ("lights");
 
   shadermgr = csQueryRegistry<iShaderManager> (compiler->objectreg);
   CS_ASSERT (shadermgr); // Should be present - loads us, after all
@@ -353,7 +356,7 @@ csXMLShader::~csXMLShader ()
   cs_free (filename);
   delete resolver;
   cs_free (vfsStartDir);
-  cs_free (allShaderMeta.description);
+  cs_free (const_cast<char*> (allShaderMeta.description));
 }
 
 void csXMLShader::SelfDestruct ()
@@ -457,25 +460,6 @@ void csXMLShader::ParseGlobalSVs (iLoaderContext* ldr_context,
   resolver->SetEvalParams (0, 0);
 }
 
-static void CloneNode (iDocumentNode* from, iDocumentNode* to)
-{
-  to->SetValue (from->GetValue ());
-  csRef<iDocumentNodeIterator> it = from->GetNodes ();
-  while (it->HasNext ())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    csRef<iDocumentNode> child_clone = to->CreateNodeBefore (
-    	child->GetType (), 0);
-    CloneNode (child, child_clone);
-  }
-  csRef<iDocumentAttributeIterator> atit = from->GetAttributes ();
-  while (atit->HasNext ())
-  {
-    csRef<iDocumentAttribute> attr = atit->Next ();
-    to->SetAttribute (attr->GetName (), attr->GetValue ());
-  }
-}
-
 size_t csXMLShader::GetTicket (const csRenderMeshModes& modes, 
 			       const csShaderVariableStack& stack)
 {
@@ -494,7 +478,7 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	csRef<iDocumentSystem> docsys;
 	docsys.AttachNew (new csTinyDocumentSystem);
 	csRef<iDocument> newdoc = docsys->CreateDocument();
-	CloneNode (shaderSource, newdoc->CreateRoot());
+	CS::DocSystem::CloneNode (shaderSource, newdoc->CreateRoot());
 	newdoc->Write (compiler->vfs, csString().Format ("/tmp/shader/%s_%zu.xml",
 	  GetName(), vi));
       }
@@ -666,7 +650,7 @@ csRef<iDocumentNode> csXMLShader::LoadProgramFile (const char* filename,
     csRef<iDocumentSystem> docsys;
     docsys.AttachNew (new csTinyDocumentSystem);
     csRef<iDocument> newdoc = docsys->CreateDocument();
-    CloneNode (programNode, newdoc->CreateRoot());
+    CS::DocSystem::CloneNode (programNode, newdoc->CreateRoot());
     newdoc->Write (compiler->vfs, csString().Format ("/tmp/shader/%s_%zu.xml",
       dumpFN.GetData(), variant));
   }
