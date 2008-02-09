@@ -108,7 +108,8 @@ struct iLightInfluenceCallback : public virtual iBase
  */
 struct iLightManager : public virtual iBase
 {
-  SCF_INTERFACE(iLightManager,3,0,0);
+  SCF_INTERFACE(iLightManager,3,0,1);
+
   /**
    * Return all 'relevant' light that hit this object. Depending on 
    * implementation in the engine this can simply mean a list of all lights 
@@ -208,6 +209,25 @@ struct iLightManager : public virtual iBase
    */
   virtual void GetRelevantLights (iSector* sector, const csBox3& boundingBox,
     iLightInfluenceCallback* lightCallback, int maxLights, 
+    uint flags = CS_LIGHTQUERY_GET_ALL) = 0;
+
+
+  /**
+   * Return all 'relevant' light that hit this object. Depending on 
+   * implementation in the engine this can simply mean a list of all lights 
+   * that affect the object or it can be a list of the N most relevant lights 
+   * (with N a parameter set by the user on that object).
+   * \param meshObject The mesh wrapper.
+   * \param boundingBox The bounding box to be used when querying lights.
+   * \param lightArray The array to fill with the relevant lights. It must be
+   *   large enought to take at least maxLights light influences!
+   * \param maxLights The maximum number of lights that you (as
+   *   the caller of this function) are interested in.
+   * \param flags Flags provided by csLightQueryFlags.
+   * \return The number of lights written into \a lightArray.
+   */
+  virtual size_t GetRelevantLights (iSector* sector, 
+    const csBox3& boundingBox, csLightInfluence* lightArray, size_t maxLights,
     uint flags = CS_LIGHTQUERY_GET_ALL) = 0;
 };
 

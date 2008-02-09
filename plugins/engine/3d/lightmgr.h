@@ -53,6 +53,10 @@ public:
   virtual void GetRelevantLights (iSector* sector, const csBox3& boundingBox,
     iLightInfluenceCallback* lightCallback, int maxLights, 
     uint flags);
+
+  virtual size_t GetRelevantLights (iSector* sector, 
+    const csBox3& boundingBox, csLightInfluence* lightArray, size_t maxLights,
+    uint flags);
 };
 
 /**

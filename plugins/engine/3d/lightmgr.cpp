@@ -163,6 +163,50 @@ void csLightManager::GetRelevantLights (iSector* sector, const csBox3& boundingB
   aabbTree.Traverse (inner, leaf);
 }
 
-
 // ---------------------------------------------------------------------------
+
+struct LightCollectArrayPtr
+{
+  LightCollectArrayPtr (const csBox3& box, csLightInfluence* arr, size_t max)
+    : testBox (box), arr (arr), max (max), num (0)
+  {}
+
+  void operator() (const csSectorLightList::LightAABBTree::Node* node)
+  {
+    if (!testBox.TestIntersect (node->GetBBox ()))
+      return;
+
+    for (size_t i = 0; i < node->GetObjectCount (); ++i)
+    {
+      csLightInfluence newInfluence;
+      newInfluence.light = node->GetLeafData (i);
+      if (num < max) arr[num++] = newInfluence;
+    }
+  }
+
+  const csBox3& testBox;
+  csLightInfluence* arr;
+  size_t max;
+  size_t num;
+};
+
+
+size_t csLightManager::GetRelevantLights (iSector* sector, 
+                                          const csBox3& boundingBox, 
+                                          csLightInfluence* lightArray, 
+                                          size_t maxLights, uint flags)
+{
+  iLightList* llist = sector->GetLights ();
+  csSectorLightList* sectorLightList = static_cast<csSectorLightList*> (llist);
+
+  // Get the primary lights from same sector
+  const csSectorLightList::LightAABBTree& aabbTree = sectorLightList->GetLightAABBTree ();
+  IntersectInnerBBox inner (boundingBox);
+  LightCollectArrayPtr leaf (boundingBox, lightArray, maxLights);
+  aabbTree.Traverse (inner, leaf);
+
+  //@@TODO: Implement cross-sector lookups
+  
+  return leaf.num;
+}
 
