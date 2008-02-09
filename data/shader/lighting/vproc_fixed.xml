@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?> 
-<shader compiler="xmlshader" name="lighting_vproc_fixed">
+<!-- 'lights' must match with TheTechniques invocation below -->
+<shader compiler="xmlshader" name="lighting_vproc_fixed" lights="4">
   <shadervars>
     <shadervar type="vector3" name="mat specular">1,1,1</shadervar>
   </shadervars>
@@ -118,76 +119,76 @@
     </layer>
   <?Endtemplate?>
 
+  <?Template TheTechniques N ?>
+    <!-- Tech with separate specular -->
+    <technique priority="$N$50">
+      <pass>
+	<?if vars."tex diffuse".texture ?>
+	  <texture name="tex diffuse" destination="diffuse" />
+	  <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+	<?else?>
+	  <!-- need to bind at least some texture -->
+	  <texture name="standardtex white" destination="diffuse" />
+	<?endif?>
+	<buffer source="normal" destination="normal" />
+	<buffer source="color" destination="color" />
+	<vp plugin="glfixed">
+	  <fixedvp>
+	    <?FVPcommon $N$ ?>
+	    <!-- specular is separate, so no downscaling -->
+	    <matspecular type="shadervar">mat specular</matspecular>
+	    <!--matspecular type="float">1</matspecular-->
+	  </fixedvp>
+	</vp>
+	<vproc plugin="vproc_std">
+	  <vproc_std>
+	    <?VPROCcommon $N$ ?>
+	  </vproc_std>
+	</vproc>
+	<fp plugin="glfixed">
+	  <fixedfp>
+	    <?FFPcommon?>
+	  </fixedfp>
+	</fp>
+      </pass>
+    </technique>
+    <!-- Tech without separate specular -->
+    <technique priority="$N$00">
+      <pass>
+	<?if vars."tex diffuse".texture ?>
+	  <texture name="tex diffuse" destination="diffuse" />
+	  <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+	<?else?>
+	  <!-- need to bind at least some texture -->
+	  <texture name="standardtex white" destination="diffuse" />
+	<?endif?>
+	<buffer source="normal" destination="normal" />
+	<buffer source="color" destination="color" />
+	<vp plugin="glfixed">
+	  <fixedvp>
+	    <?FVPcommon $N$ ?>
+	    <!-- specular is not separate, downscale as well -->
+	    <matspecular type="expr">
+	      <sexp>(* "mat specular" 0.5)</sexp>
+	    </matspecular>
+	  </fixedvp>
+	</vp>
+	<vproc plugin="vproc_std">
+	  <vproc_std>
+	    <?VPROCcommon $N$ ?>
+	  </vproc_std>
+	</vproc>
+	<fp plugin="glfixed">
+	  <fixedfp>
+	    <?FFPcommon?>
+	  </fixedfp>
+	</fp>
+      </pass>
+    </technique>
+  <?Endtemplate?>
+  
   <?! "Dumbed down" to 4 for now to keep loading/processing time down ?>
-  <?Generate N 4 1 ?>
-    <?if vars."light count".int &gt;= $N$ ?>
-      <!-- Tech with separate specular -->
-      <technique priority="$N$50" lights="$N$">
-	<pass>
-	  <?if vars."tex diffuse".texture ?>
-	    <texture name="tex diffuse" destination="diffuse" />
-	    <buffer source="texture coordinate 0" destination="texture coordinate 0" />
-	  <?else?>
-	    <!-- need to bind at least some texture -->
-	    <texture name="standardtex white" destination="diffuse" />
-	  <?endif?>
-	  <buffer source="normal" destination="normal" />
-	  <buffer source="color" destination="color" />
-	  <vp plugin="glfixed">
-	    <fixedvp>
-	      <?FVPcommon $N$ ?>
-	      <!-- specular is separate, so no downscaling -->
-	      <matspecular type="shadervar">mat specular</matspecular>
-	      <!--matspecular type="float">1</matspecular-->
-	    </fixedvp>
-	  </vp>
-	  <vproc plugin="vproc_std">
-	    <vproc_std>
-	      <?VPROCcommon $N$ ?>
-	    </vproc_std>
-	  </vproc>
-	  <fp plugin="glfixed">
-	    <fixedfp>
-	      <?FFPcommon?>
-	    </fixedfp>
-	  </fp>
-	</pass>
-      </technique>
-      <!-- Tech without separate specular -->
-      <technique priority="$N$00" lights="$N$">
-	<pass>
-	  <?if vars."tex diffuse".texture ?>
-	    <texture name="tex diffuse" destination="diffuse" />
-	    <buffer source="texture coordinate 0" destination="texture coordinate 0" />
-	  <?else?>
-	    <!-- need to bind at least some texture -->
-	    <texture name="standardtex white" destination="diffuse" />
-	  <?endif?>
-	  <buffer source="normal" destination="normal" />
-	  <buffer source="color" destination="color" />
-	  <vp plugin="glfixed">
-	    <fixedvp>
-	      <?FVPcommon $N$ ?>
-	      <!-- specular is not separate, downscale as well -->
-	      <matspecular type="expr">
-		<sexp>(* "mat specular" 0.5)</sexp>
-	      </matspecular>
-	    </fixedvp>
-	  </vp>
-	  <vproc plugin="vproc_std">
-	    <vproc_std>
-	      <?VPROCcommon $N$ ?>
-	    </vproc_std>
-	  </vproc>
-	  <fp plugin="glfixed">
-	    <fixedfp>
-	      <?FFPcommon?>
-	    </fixedfp>
-	  </fp>
-	</pass>
-      </technique>
-    <?endif?>
-  <?Endgenerate?>
+  <?TheTechniques 4 ?>
   
   <fallbackshader name="lighting_vproc" file="/shader/lighting/vproc.xml" />
 </shader>
