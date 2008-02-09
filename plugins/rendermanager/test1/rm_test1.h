@@ -70,6 +70,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMTest1)
     typedef CS::RenderManager::DependentTargetManager<RenderTreeType, RMTest1>
       TargetManagerType;
 
+    typedef CS::RenderManager::LightSetup<RenderTreeType, 
+      CS::RenderManager::MultipleRenderLayer> LightSetupType;
+
   public:    
 
     bool HandleTarget (RenderTreeType& renderTree, 
@@ -77,6 +80,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMTest1)
 
     RenderTreeType::PersistentData treePersistent;
     PortalSetupType::PersistentData portalPersistent;
+    LightSetupType::PersistentData lightPersistent;
 
     CS::RenderManager::PostEffectManager       postEffects;
 
@@ -84,6 +88,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMTest1)
     csRef<iStringSet>           stringSet;
     csRef<iShaderManager>       shaderManager;
     csRef<iEngine>              engine;
+    csRef<iLightManager>        lightManager;
 
     CS::RenderManager::MultipleRenderLayer renderLayer;
 

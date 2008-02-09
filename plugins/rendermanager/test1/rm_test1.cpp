@@ -18,17 +18,18 @@
 
 #include "crystalspace.h"
 
-#include "csplugincommon/rendermanager/rendertree.h"
-#include "csplugincommon/rendermanager/renderlayers.h"
-#include "csplugincommon/rendermanager/viscull.h"
+#include "csplugincommon/rendermanager/dependenttarget.h"
+#include "csplugincommon/rendermanager/lightsetup.h"
 #include "csplugincommon/rendermanager/operations.h"
+#include "csplugincommon/rendermanager/portalsetup.h"
+#include "csplugincommon/rendermanager/posteffects.h"
+#include "csplugincommon/rendermanager/render.h"
+#include "csplugincommon/rendermanager/renderlayers.h"
+#include "csplugincommon/rendermanager/rendertree.h"
+#include "csplugincommon/rendermanager/shadersetup.h"
 #include "csplugincommon/rendermanager/standardsorter.h"
 #include "csplugincommon/rendermanager/svsetup.h"
-#include "csplugincommon/rendermanager/shadersetup.h"
-#include "csplugincommon/rendermanager/render.h"
-#include "csplugincommon/rendermanager/posteffects.h"
-#include "csplugincommon/rendermanager/portalsetup.h"
-#include "csplugincommon/rendermanager/dependenttarget.h"
+#include "csplugincommon/rendermanager/viscull.h"
 
 #include "rm_test1.h"
 
@@ -109,6 +110,14 @@ public:
         context.svArrays, layerConfig);
 
       ForEachMeshNode (context, svSetup);
+    }
+
+    {
+      LightSetup<RenderTreeType, MultipleRenderLayer> lightSetup (
+        rmanager->lightPersistent, rmanager->lightManager,
+        context.svArrays, layerConfig);
+
+      ForEachMeshNode (context, lightSetup);
     }
 
     // Setup shaders and tickets
@@ -228,20 +237,37 @@ bool RMTest1::Initialize(iObjectRegistry* objectReg)
 
   stringSet = csQueryRegistryTagInterface<iStringSet> (objectReg,
     "crystalspace.shared.stringset");
+    
+  csRef<iLoader> loader (csQueryRegistry<iLoader> (objectReg));
+  if (!loader->LoadShader ("/shader/lighting/vproc_fixed.xml"))
+  {
+    csReport (objectReg, CS_REPORTER_SEVERITY_WARNING,
+      "crystalspace.rendermanager.test1",
+      "Could not load lighting_vproc_fixed shader");
+  }
 
   shaderManager = csQueryRegistry<iShaderManager> (objectReg);
+  
+  lightManager = csQueryRegistry<iLightManager> (objectReg);
   
   /*CS::RenderManager::SingleRenderLayer renderLayer = 
     CS::RenderManager::SingleRenderLayer (stringSet->Request("standard"),
       shaderManager->GetShader ("std_lighting"));
   this->renderLayer.AddLayers (renderLayer);*/
-  CS::RenderManager::AddDefaultBaseLayers (objectReg, renderLayer);
+  
+  //CS::RenderManager::AddDefaultBaseLayers (objectReg, renderLayer);
 
+  CS::RenderManager::SingleRenderLayer lightLayer = 
+    CS::RenderManager::SingleRenderLayer (stringSet->Request("standard"),
+      shaderManager->GetShader ("lighting_vproc_fixed"));
+  this->renderLayer.AddLayers (lightLayer);
+  
   csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objectReg);
   treePersistent.Initialize (shaderManager);
   postEffects.Initialize (objectReg);
   
   portalPersistent.Initialize (shaderManager, g3d);
+  lightPersistent.Initialize (svNameStringSet);
 
   /*csRef<iLoader> loader = csQueryRegistry<iLoader> (objectReg);  
   csRef<iShader> desatShader = loader->LoadShader ("/shader/desaturate.xml");

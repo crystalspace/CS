@@ -75,6 +75,7 @@ namespace RenderManager
           typename RenderTreeType::MeshNode::SingleMesh sm;
           sm.meshObjSVs = imesh->GetSVContext();
           sm.zmode = zmode;
+          sm.bbox = imesh->GetWorldBoundingBox(); // @@@ Use RM bbox
 
           // Add it to the appropriate meshnode
           for (int i = 0; i < numMeshes; ++i)

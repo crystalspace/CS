@@ -103,6 +103,7 @@ namespace RenderManager
         csZBufMode zmode;
         iShaderVariableContext* meshObjSVs;
         csRef<csShaderVariable> svObjectToWorld;
+        csBox3 bbox;
 
         size_t contextLocalId;
       };
@@ -157,6 +158,7 @@ namespace RenderManager
       iTextureHandle* renderTarget;
       int subtexture;
       csReversibleTransform cameraTransform;
+      iSector* sector;
 
       // A sub-tree of mesh nodes
       MeshNodeTreeType meshNodes;
@@ -240,6 +242,7 @@ namespace RenderManager
       ContextNode* newCtx = persistentData.contextNodeAllocator.Alloc (*this);
       newCtx->renderView = rw;
       newCtx->cameraTransform = rw->GetCamera ()->GetTransform ();
+      newCtx->sector = rw->GetThisSector();
 
       if (insertAfter)
       {

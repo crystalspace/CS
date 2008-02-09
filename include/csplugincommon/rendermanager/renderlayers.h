@@ -44,19 +44,20 @@ namespace RenderManager
   {
   public:
     /// Create a single render layer with a no shader type.
-    SingleRenderLayer (iShader* defaultShader = 0)
-      : defaultShader (defaultShader)
+    SingleRenderLayer (iShader* defaultShader = 0, size_t maxLights = 0)
+      : defaultShader (defaultShader), maxLights (maxLights)
     { }
     /// Create a single render layer with a single shader type.
-    SingleRenderLayer (const csStringID shaderType, iShader* defaultShader = 0)
-      : defaultShader (defaultShader)
+    SingleRenderLayer (const csStringID shaderType, iShader* defaultShader = 0,
+        size_t maxLights = 0)
+      : defaultShader (defaultShader), maxLights (maxLights)
     {
       shaderTypes.Push (shaderType);
     }
     /// Create a single render layer with a multiply shader type.
     SingleRenderLayer (const csStringID* shaderTypes, size_t numTypes,
-      iShader* defaultShader = 0)
-      : defaultShader (defaultShader)
+      iShader* defaultShader = 0, size_t maxLights = 0)
+      : defaultShader (defaultShader), maxLights (maxLights)
     {
       this->shaderTypes.SetSize (numTypes);
       for (size_t i = 0; i < numTypes; ++i)
@@ -87,6 +88,14 @@ namespace RenderManager
 
       return defaultShader;
     }
+    
+    size_t GetMaxLights (size_t layer) const
+    {
+      CS_ASSERT(layer == 0);
+
+      const csShaderMetadata& shaderMeta = defaultShader->GetMetadata();
+      return shaderMeta.numberOfLights /*maxLights*/;
+    }
 
   private:
     /*csDirtyAccessArray<StringIDValue,
@@ -94,7 +103,8 @@ namespace RenderManager
       CS::Memory::AllocatorMalloc,
       csArrayCapacityFixedGrow<1> > shaderTypes;*/
     csDirtyAccessArray<StringIDValue> shaderTypes;
-    iShader* defaultShader;
+    csRef<iShader> defaultShader;
+    size_t maxLights;
   };
 
   /**
@@ -105,7 +115,7 @@ namespace RenderManager
   public:
     MultipleRenderLayer () {}
     MultipleRenderLayer (size_t numLayers, const csStringID* shaderTypes, 
-      iShader** defaultShader)
+      iShader** defaultShader, size_t* maxLights = 0)
     {
       layerTypes.SetSize (numLayers);      
       for (size_t l = 0; l < numLayers; l++)
@@ -114,6 +124,7 @@ namespace RenderManager
 
 	Layer newLayer;
 	newLayer.defaultShader = defaultShader[l];
+	newLayer.maxLights = maxLights ? maxLights[l] : 0;
 	newLayer.firstType = l;
 	newLayer.numTypes = 1;
 	layers.Push (newLayer);
@@ -133,6 +144,7 @@ namespace RenderManager
       {
 	Layer newLayer;
 	newLayer.defaultShader = layers.GetDefaultShader (l);
+	newLayer.maxLights = layers.GetMaxLights (l);
 	newLayer.firstType = layerTypes.GetSize ();
 	const csStringID* copyTypes = layers.GetShaderTypes (l,
 	  newLayer.numTypes);
@@ -163,11 +175,17 @@ namespace RenderManager
     {
       return layers[layer].defaultShader;
     }
+    
+    size_t GetMaxLights (size_t layer) const
+    {
+      return layers[layer].maxLights;
+    }
 
   private:
     struct Layer
     {
-      iShader* defaultShader;
+      csRef<iShader> defaultShader;
+      size_t maxLights;
       size_t firstType;
       size_t numTypes;
     };
