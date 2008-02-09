@@ -13,6 +13,7 @@ chronological order.
 	- res changed the shader metadata to be ticket-independent.
 	- res made a first stab at a lighting setup rendermanager step.
 	- res updated the vproc_fixed shader for the shader metadat changes.
+	- res revived the simplelights to use it as a lighting test.
 8-Feb-2008
 	- res moved CS::RenderManager::AddRenderMeshToContext() into the render
 	  tree context class.
