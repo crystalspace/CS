@@ -20,6 +20,10 @@ chronological order.
 	  constant. Thus, the default capacity handler was changed to have
 	  a compile-time constant grow rate. The instances where custom rates
 	  are used were updated to also use compile-time constant rates.
+	- caedes added swig template declaration for 
+          iStringSetBase<CS::StringSetTag::ShaderVar> as otherwise swig
+	  can't trace inheritance, doesn't see it's a virtual interface, and
+	  tries to create a constructor which breaks compilation.
 9-Feb-2008
 	- res added a way to iLightManager to get lights not via a callback or
 	  SCF array but by filling a specified buffer (to avoid vcall
