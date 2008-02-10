@@ -6,6 +6,9 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-Feb-2008
+	- PK applied the patch from Rolenun in Ticket #450. Closes #450.
+
 5-Feb-2008
 	- Sueastside undid his ThreadedJobQueue change since it broke on linux.
 	- Marten redid some of the handling of thread priorities to be more robust.
