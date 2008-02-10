@@ -91,7 +91,20 @@ namespace RenderManager
       PersistentData () : influences (0), numInfluences (0) {}
       ~PersistentData() { delete[] influences; }
       
-      void Initialize (iShaderVarStringSet* strings) { svNames.SetStrings (strings); }
+      void Initialize (iShaderVarStringSet* strings)
+      {
+	svNames.SetStrings (strings);
+
+        /* Generate light SV IDs - that way, space for them will be reserved
+         * when shader stacks are set up */
+        for (size_t l = 0; l < 4; l++)
+        {
+          for (int p = 0; p < csLightShaderVarCache::_lightCount; p++)
+          {
+            svNames.GetLightSVId (l, csLightShaderVarCache::LightProperty (p));
+          }
+        }
+      }
       
       void ReserveInfluences (size_t num)
       {

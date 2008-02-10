@@ -9,6 +9,9 @@ chronological order.
 10-Feb-2008
 	- res, in a nod to the technical advances of the 21st century,
 	  increased the default resolution to 1024x768 from 640x480.
+	- res made the RM light setup step "pregenerate" the light SV names
+	  so they'll count towards the amount of known SVs and thus space for
+	  them is reserved when SV stacks are set up.
 9-Feb-2008
 	- res added a way to iLightManager to get lights not via a callback or
 	  SCF array but by filling a specified buffer (to avoid vcall
