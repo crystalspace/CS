@@ -360,7 +360,7 @@ class scfClassRegistry : public csPDelArray<scfFactory>
 {
   typedef csPDelArray<scfFactory> superclass;
 public:
-  scfClassRegistry () : superclass(16, 16) {}
+  scfClassRegistry () : superclass(16) {}
   static int CompareClass (scfFactory* const& Item, char const* const& key)
   { return strcmp (Item->ClassID, key); }
   size_t FindClass(char const* name, bool assume_sorted = false) const

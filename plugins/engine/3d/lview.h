@@ -140,7 +140,8 @@ class csShadowBlock : public scfImplementation1<csShadowBlock,
 
 private:
   csShadowBlock* next, * prev;
-  csRefArray<csShadowFrustum> shadows;
+  csRefArray<csShadowFrustum, CS::Container::ArrayAllocDefault,
+    csArrayCapacityFixedGrow<30> > shadows;
   uint32 shadow_region;
   csBox3 bbox;  // The bbox (in light space) for all shadows in this block.
   bool bbox_valid;  // If true bbox is valid.
@@ -149,8 +150,7 @@ private:
 
 public:
   /// Create a new empty list.
-  csShadowBlock (uint32 region = (uint32)~0, int max_shadows = 30,
-    int delta = 30);
+  csShadowBlock (uint32 region = (uint32)~0, int max_shadows = 30);
 
   /// Destroy the list and release all shadow references.
   virtual ~csShadowBlock ();

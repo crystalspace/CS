@@ -60,7 +60,8 @@ class csMeshWrapper;
 class csMeshList : public scfImplementation1<csMeshList, iMeshList>
 {
 private:
-  csRefArrayObject<iMeshWrapper> list;
+  csRefArrayObject<iMeshWrapper, CS::Container::ArrayAllocDefault,
+    csArrayCapacityVariableGrow> list;
   csHash<iMeshWrapper*, csString> meshes_hash;
 
   class NameChangeListener : public scfImplementation1<NameChangeListener,

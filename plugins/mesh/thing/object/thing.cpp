@@ -147,7 +147,7 @@ CS::ShaderVarStringID csThingStatic::texLightmapName = CS::InvalidShaderVarStrin
 csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
   scfImplementationType (this, parent),
   last_range (0, -1),
-  static_polygons (32, 64)
+  static_polygons (32)
 {
   csThingStatic::thing_type = thing_type;
   static_polygons.SetThingType (thing_type);
@@ -1608,7 +1608,7 @@ void csThingStatic::LightmapTexAccessor::PreGetValue (csShaderVariable *variable
 
 csThing::csThing (iBase *parent, csThingStatic* static_data) :
   scfImplementationType (this, parent),
-  polygons(32, 64)
+  polygons(32)
 {
   csThing::static_data = static_data;
   polygons.SetThingType (static_data->thing_type);

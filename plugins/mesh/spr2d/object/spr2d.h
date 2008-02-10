@@ -299,7 +299,7 @@ protected:
   class animVector : public csArray<csSprite2DUVAnimation*>
   {
   public:
-    animVector () : csArray<csSprite2DUVAnimation*> (8, 16){}
+    animVector () : csArray<csSprite2DUVAnimation*> (8){}
     static int CompareKey (csSprite2DUVAnimation* const& item,
 			   char const* const& key)
     {

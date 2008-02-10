@@ -41,7 +41,8 @@ private:
 
   csRef<iDocumentSystem> defaultDocSys;
   csRefArray<iDocumentSystem> orderedlist;
-  csRefArray<iDocumentSystem> autolist;
+  csRefArray<iDocumentSystem, CS::Container::ArrayAllocDefault,
+    csArrayCapacityFixedGrow<1> > autolist;
   csStringArray classlist;
   csRef<iPluginManager> plugin_mgr;
 

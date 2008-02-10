@@ -183,7 +183,10 @@ class csDynaVis :
 {
 public:
   // List of objects to iterate over (after VisTest()).
-  csArray<iVisibilityObject*> vistest_objects;
+  typedef csArray<iVisibilityObject*, csArrayElementHandler<iVisibilityObject*>,
+    CS::Container::ArrayAllocDefault, csArrayCapacityFixedGrow<256> >
+    VistestObjectsArray;
+  VistestObjectsArray vistest_objects;
   bool vistest_objects_inuse;	// If true the vector is in use.
 
 private:
@@ -199,12 +202,16 @@ private:
   // those go off to infinity.
   csBox3 kdtree_box;
   csTiledCoverageBuffer* tcovbuf;
-  csArray<csVisibilityObjectWrapper*> visobj_vector;
+  csArray<csVisibilityObjectWrapper*,
+    csArrayElementHandler<csVisibilityObjectWrapper*>,
+    CS::Container::ArrayAllocDefault, 
+    csArrayCapacityFixedGrow<256> > visobj_vector;
   csObjectModelManager* model_mgr;
   csWriteQueue* write_queue;
 
   // List of occluders that were used this frame.
-  csArray<csOccluderInfo> occluder_info;
+  csArray<csOccluderInfo, csArrayElementHandler<csOccluderInfo>,
+    CS::Container::ArrayAllocDefault, csArrayCapacityFixedGrow<128> > occluder_info;
 
   int scr_width, scr_height;	// Screen dimensions.
   int reduce_buf;

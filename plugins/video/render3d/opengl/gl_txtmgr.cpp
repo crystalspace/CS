@@ -39,7 +39,7 @@ static const csGLTextureClassSettings defaultSettings =
 csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
         iGraphics2D* iG2D, iConfigFile *config,
         csGLGraphics3D *iG3D) : 
-  scfImplementationType (this), textures (16, 16), compactTextures (false)
+  scfImplementationType (this), textures (16), compactTextures (false)
 {
   csGLTextureManager::object_reg = object_reg;
 

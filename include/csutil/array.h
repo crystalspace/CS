@@ -333,16 +333,18 @@ public:
 // Alias for csArrayCapacityLinear<csArrayThresholdVariable> to keep
 // SWIG generated Java classes (and thus filenames) short enough for Windows.
 // Note that a typedef wont work because SWIG would expand it.
-struct csArrayCapacityDefault :
+struct csArrayCapacityVariableGrow :
   public csArrayCapacityLinear<csArrayThresholdVariable>
 {
-  csArrayCapacityDefault () :
+  csArrayCapacityVariableGrow () :
     csArrayCapacityLinear<csArrayThresholdVariable> () {}
-  csArrayCapacityDefault (const csArrayThresholdVariable& threshold) :
+  csArrayCapacityVariableGrow (const csArrayThresholdVariable& threshold) :
     csArrayCapacityLinear<csArrayThresholdVariable> (threshold) {}
-  csArrayCapacityDefault (const size_t x) :
+  csArrayCapacityVariableGrow (const size_t x) :
     csArrayCapacityLinear<csArrayThresholdVariable> (x) {}
 } ;
+// @@@ Deprecate? Name is non-descriptive/misleading
+typedef csArrayCapacityVariableGrow csArrayCapacityDefault;
 
 /**
  * Shortcut for an array capacity handler with a compile-time fixed rate of 
@@ -355,6 +357,15 @@ struct csArrayCapacityFixedGrow :
   csArrayCapacityFixedGrow () :
     csArrayCapacityLinear<csArrayThresholdFixed<N> > () {}
 };
+
+namespace CS
+{
+  namespace Container
+  {
+    typedef CS::Memory::AllocatorMalloc ArrayAllocDefault;
+    typedef csArrayCapacityFixedGrow<16> ArrayCapacityDefault;
+  } // namespace Container
+} // namespace CS
 
 /**
  * This value is returned whenever an array item could not be located or does
@@ -372,8 +383,8 @@ const size_t csArrayItemNotFound = (size_t)-1;
  */
 template <class T,
 	class ElementHandler = csArrayElementHandler<T>,
-        class MemoryAllocator = CS::Memory::AllocatorMalloc,
-        class CapacityHandler = csArrayCapacityDefault>
+        class MemoryAllocator = CS::Container::ArrayAllocDefault,
+        class CapacityHandler = CS::Container::ArrayCapacityDefault>
 class csArray : public CS::Memory::CustomAllocated
 {
 public:
@@ -1289,18 +1300,23 @@ public:
  * safe-copy in case of reallocation of the array. Useful for weak
  * references.
  */
-template <class T>
+template <class T, 
+          class Allocator = CS::Memory::AllocatorMalloc,
+          class CapacityHandler = CS::Container::ArrayCapacityDefault>
 class csSafeCopyArray
 	: public csArray<T,
-		csArraySafeCopyElementHandler<T> >
+		csArraySafeCopyElementHandler<T>,
+		Allocator, CapacityHandler>
 {
 public:
   /**
    * Initialize object to hold initially \c limit elements, and increase
    * storage by \c threshold each time the upper bound is exceeded.
    */
-  csSafeCopyArray (size_t limit = 0, size_t threshold = 0)
-  	: csArray<T, csArraySafeCopyElementHandler<T> > (limit, threshold)
+  csSafeCopyArray (size_t limit = 0,
+    const CapacityHandler& ch = CapacityHandler())
+  	: csArray<T, csArraySafeCopyElementHandler<T>, Allocator, 
+  	          CapacityHandler> (limit, ch)
   {
   }
 };

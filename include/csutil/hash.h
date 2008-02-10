@@ -111,7 +111,7 @@ protected:
     Element (const Element &other) : key (other.key), value (other.value) {}
   };
   typedef csArray<Element, csArrayElementHandler<Element>,
-    ArrayMemoryAlloc> ElementArray;
+    ArrayMemoryAlloc, csArrayCapacityDefault> ElementArray;
   csArray<ElementArray, csArrayElementHandler<ElementArray>,
     ArrayMemoryAlloc> Elements;
 

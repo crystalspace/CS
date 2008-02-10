@@ -376,7 +376,7 @@ void csStencilShadowCacheEntry::UpdateBuffers ()
 //---------------------------------------------------------------------------
 
 csStencilShadowStep::csStencilShadowStep (csStencilShadowType* type) :  
-  scfImplementationType (this), shadowMeshes (0, 128)
+  scfImplementationType (this), shadowMeshes (0)
 {
   csStencilShadowStep::type = type;
   enableShadows = false;

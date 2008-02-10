@@ -137,7 +137,9 @@ private:
   bool enableShadows;
   csRefArray<iLightRenderStep> steps;
 
-  csArray<iMeshWrapper*> shadowMeshes;
+  csArray<iMeshWrapper*, csArrayElementHandler<iMeshWrapper*>,
+    CS::Container::ArrayAllocDefault, csArrayCapacityFixedGrow<128> >
+    shadowMeshes;
   csHash< csRef<csStencilShadowCacheEntry>, csPtrKey<iMeshWrapper> > 
     shadowcache;
 

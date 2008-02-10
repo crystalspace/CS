@@ -44,8 +44,8 @@
  */
 template <class T,
 	  class ElementHandler = csArrayElementHandler<T>,
-          class MemoryAllocator = CS::Memory::AllocatorMalloc,
-          class CapacityHandler = csArrayCapacityDefault>
+          class MemoryAllocator = CS::Container::ArrayAllocDefault,
+          class CapacityHandler = CS::Container::ArrayCapacityDefault>
 class csDirtyAccessArray : 
   public csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>
 {
@@ -102,15 +102,20 @@ public:
  * when the reference count of the array drops to 0, it's contents are deleted
  * (however, not the array object itself).
  */
-template <class T, class ElementHandler = csArrayElementHandler<T> >
+template <class T, class ElementHandler = csArrayElementHandler<T>,
+          class MemoryAllocator = CS::Container::ArrayAllocDefault,
+          class CapacityHandler = CS::Container::ArrayCapacityDefault>
 class csDirtyAccessArrayRefCounted : 
-  public csDirtyAccessArray<T, ElementHandler>
+  public csDirtyAccessArray<T, ElementHandler, MemoryAllocator, 
+                            CapacityHandler>
 {
 private:
   int RefCount;
 public:
-  csDirtyAccessArrayRefCounted (int ilimit = 0, int ithreshold = 0) : 
-    csDirtyAccessArray<T, ElementHandler> (ilimit, ithreshold), RefCount (0)
+  csDirtyAccessArrayRefCounted (int ilimit = 0,
+    const CapacityHandler& ch = CapacityHandler())
+    : csDirtyAccessArray<T, ElementHandler, MemoryAllocator, 
+                         CapacityHandler> (ilimit, ch), RefCount (0)
   { }
 
   /// Reference counting.

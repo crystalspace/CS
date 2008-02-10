@@ -13,6 +13,13 @@ chronological order.
 	  so they'll count towards the amount of known SVs and thus space for
 	  them is reserved when SV stacks are set up.
 	- res did a quick crash fix in the render layers.
+	- res changed the default capacity handler for csArray<>s: previously,
+	  the grow rate of an array would be stored in the object itself.
+	  However, in a lot of cases the default rate was simply used. In
+	  practically all instances of custom rates it is compile-time
+	  constant. Thus, the default capacity handler was changed to have
+	  a compile-time constant grow rate. The instances where custom rates
+	  are used were updated to also use compile-time constant rates.
 9-Feb-2008
 	- res added a way to iLightManager to get lights not via a callback or
 	  SCF array but by filling a specified buffer (to avoid vcall

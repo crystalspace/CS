@@ -82,7 +82,10 @@ class csFrustumVis :
 {
 public:
   // List of objects to iterate over (after VisTest()).
-  csArray<iVisibilityObject*> vistest_objects;
+  typedef csArray<iVisibilityObject*, csArrayElementHandler<iVisibilityObject*>,
+    CS::Container::ArrayAllocDefault, csArrayCapacityFixedGrow<256> >
+    VistestObjectsArray;
+  VistestObjectsArray vistest_objects;
   bool vistest_objects_inuse;	// If true the vector is in use.
 
 private:
@@ -94,7 +97,8 @@ private:
   // This puts an upper limit of all boxes in the kdtree itself because
   // those go off to infinity.
   csBox3 kdtree_box;
-  csRefArray<csFrustVisObjectWrapper> visobj_vector;
+  csRefArray<csFrustVisObjectWrapper, CS::Container::ArrayAllocDefault, 
+    csArrayCapacityFixedGrow<256> > visobj_vector;
   int scr_width, scr_height;	// Screen dimensions.
   uint32 current_vistest_nr;
 

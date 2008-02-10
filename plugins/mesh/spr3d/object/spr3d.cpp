@@ -90,7 +90,7 @@ void csSpriteFrame::SetName (char const* n)
 //--------------------------------------------------------------------------
 
 csSpriteAction2::csSpriteAction2() : scfImplementationType (this), 
-  frames (8, 8), delays (8, 8)
+  frames (8), delays (8)
 {
   SetReverseAction (false);
 }
@@ -154,8 +154,8 @@ void csSprite3DMeshObjectFactory::Report (int severity, const char* msg, ...)
 
 csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (
 	iMeshObjectType* pParent, iObjectRegistry* object_reg) :
-  scfImplementationType (this, pParent), texels (8, 8), vertices (8, 8), 
-  normals (8, 8)
+  scfImplementationType (this, pParent), texels (8), vertices (8), 
+  normals (8)
 {
   csSprite3DMeshObjectType* type = static_cast<csSprite3DMeshObjectType*> (
       pParent);

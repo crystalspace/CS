@@ -75,12 +75,12 @@ class csDynVisObjIt :
   public scfImplementation1<csDynVisObjIt, iVisibilityObjectIterator>
 {
 private:
-  csArray<iVisibilityObject*>* vector;
+  csDynaVis::VistestObjectsArray* vector;
   size_t position;
   bool* vistest_objects_inuse;
 
 public:
-  csDynVisObjIt (csArray<iVisibilityObject*>* vector,
+  csDynVisObjIt (csDynaVis::VistestObjectsArray* vector,
     bool* vistest_objects_inuse) :
     scfImplementationType (this)
   {
@@ -198,10 +198,10 @@ int csDynaVis::badoccluder_maxsweepcount = 50;
 
 csDynaVis::csDynaVis (iBase *iParent) :
   scfImplementationType (this, iParent),
-  vistest_objects (256, 256),
+  vistest_objects (256),
   visobj_wrappers (1000),
-  visobj_vector (256, 256),
-  occluder_info (128, 128),
+  visobj_vector (256),
+  occluder_info (128),
   update_queue (151, 59)
 {
   object_reg = 0;
@@ -1096,7 +1096,7 @@ void csDynaVis::UpdateCoverageBufferOutline (csVisibilityObjectWrapper* obj)
       if (outline_info.outline_verts[j])
       {
         csVector3 cam = trans.Other2This (verts[j]);
-        csPrintf ("  V%d: (%g,%g,%g / %g,%g,%g)\n",
+        csPrintf ("  V%zu: (%g,%g,%g / %g,%g,%g)\n",
 	  j,
 	  //tr_verts[j].x, tr_verts[j].y,
 	  verts[j].x, verts[j].y, verts[j].z,
@@ -1107,7 +1107,7 @@ void csDynaVis::UpdateCoverageBufferOutline (csVisibilityObjectWrapper* obj)
     {
       int vt1 = outline_info.outline_edges[j*2+0];
       int vt2 = outline_info.outline_edges[j*2+1];
-      csPrintf ("  E%d: %d-%d\n", j, vt1, vt2);
+      csPrintf ("  E%zu: %d-%d\n", j, vt1, vt2);
     }
 
     csRef<iString> str = tcovbuf->Dump ();
@@ -1929,7 +1929,7 @@ struct VisTestPlanes_Front2BackData
 {
   uint32 current_vistest_nr;
   uint32 current_visnr;
-  csArray<iVisibilityObject*>* vistest_objects;
+  csDynaVis::VistestObjectsArray* vistest_objects;
 
   // During VisTest() we use the current frustum as five planes.
   // Associated with this frustum we also have a clip mask which
@@ -2002,12 +2002,12 @@ csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (csPlane3* planes,
   UpdateObjects ();
   current_vistest_nr++;
 
-  csArray<iVisibilityObject*>* v;
+  VistestObjectsArray* v;
   if (vistest_objects_inuse)
   {
     // Vector is already in use by another iterator. Allocate a new vector
     // here.
-    v = new csArray<iVisibilityObject*> (256, 256);
+    v = new VistestObjectsArray (256);
   }
   else
   {
@@ -2052,7 +2052,7 @@ struct VisTestBox_Front2BackData
 {
   uint32 current_vistestnr;
   csBox3 box;
-  csArray<iVisibilityObject*>* vistest_objects;
+  csDynaVis::VistestObjectsArray* vistest_objects;
 };
 
 static bool VisTestBox_Front2Back (csKDTree* treenode, void* userdata,
@@ -2103,12 +2103,12 @@ csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (const csBox3& box)
   UpdateObjects ();
   current_vistest_nr++;
 
-  csArray<iVisibilityObject*>* v;
+  VistestObjectsArray* v;
   if (vistest_objects_inuse)
   {
     // Vector is already in use by another iterator. Allocate a new vector
     // here.
-    v = new csArray<iVisibilityObject*> ();
+    v = new VistestObjectsArray ();
   }
   else
   {
@@ -2135,7 +2135,7 @@ struct VisTestSphere_Front2BackData
   uint32 current_vistestnr;
   csVector3 pos;
   float sqradius;
-  csArray<iVisibilityObject*>* vistest_objects;
+  csDynaVis::VistestObjectsArray* vistest_objects;
 
   iVisibilityCullerListener* viscallback;
 };
@@ -2196,12 +2196,12 @@ csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (const csSphere& sphere)
   UpdateObjects ();
   current_vistest_nr++;
 
-  csArray<iVisibilityObject*>* v;
+  VistestObjectsArray* v;
   if (vistest_objects_inuse)
   {
     // Vector is already in use by another iterator. Allocate a new vector
     // here.
-    v = new csArray<iVisibilityObject*> ();
+    v = new VistestObjectsArray ();
   }
   else
   {
@@ -2247,7 +2247,7 @@ struct IntersectSegment_Front2BackData
   float r;
   iMeshWrapper* mesh;
   int polygon_idx;
-  csArray<iVisibilityObject*>* vector;	// If not-null we need all objects.
+  csDynaVis::VistestObjectsArray* vector;	// If not-null we need all objects.
   bool accurate;
 };
 
@@ -2448,7 +2448,7 @@ csPtr<iVisibilityObjectIterator> csDynaVis::IntersectSegment (
   data.r = 10000000000.;
   data.mesh = 0;
   data.polygon_idx = -1;
-  data.vector = new csArray<iVisibilityObject*> ();
+  data.vector = new csDynaVis::VistestObjectsArray ();
   data.accurate = accurate;
   kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data, 0);
 
@@ -2463,7 +2463,7 @@ csPtr<iVisibilityObjectIterator> csDynaVis::IntersectSegmentSloppy (
   current_vistest_nr++;
   IntersectSegment_Front2BackData data;
   data.seg.Set (start, end);
-  data.vector = new csArray<iVisibilityObject*> ();
+  data.vector = new csDynaVis::VistestObjectsArray ();
   kdtree->Front2Back (start, IntersectSegmentSloppy_Front2Back,
   	(void*)&data, 0);
 

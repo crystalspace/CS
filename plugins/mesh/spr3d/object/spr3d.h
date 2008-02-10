@@ -242,8 +242,10 @@ public:
 private:
   csString name;
   bool reverse_action;
-  csArray<csSpriteFrame*> frames;
-  csArray<int> delays;
+  csArray<csSpriteFrame*, csArrayElementHandler<csSpriteFrame*>,
+    CS::Container::ArrayAllocDefault, csArrayCapacityFixedGrow<8> > frames;
+  csArray<int, csArrayElementHandler<int>,
+    CS::Container::ArrayAllocDefault, csArrayCapacityFixedGrow<8> > delays;
   csArray<float> displacements;
 };
 
@@ -366,11 +368,14 @@ private:
   /// The base mesh is also the texture alignment mesh.
   csTriangleMesh* texel_mesh;
   /// The array of texels
-  csPDelArray<csPoly2D> texels;
+  csPDelArray<csPoly2D, 
+    CS::Container::ArrayAllocDefault, csArrayCapacityFixedGrow<8> > texels;
   /// The vertices
-  csPDelArray<csPoly3D> vertices;
+  csPDelArray<csPoly3D, 
+    CS::Container::ArrayAllocDefault, csArrayCapacityFixedGrow<8> > vertices;
   /// The normals
-  csPDelArray<csPoly3D> normals;
+  csPDelArray<csPoly3D, 
+    CS::Container::ArrayAllocDefault, csArrayCapacityFixedGrow<8> > normals;
 
   csFlags flags;
 

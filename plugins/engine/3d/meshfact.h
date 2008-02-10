@@ -61,7 +61,8 @@ class csMeshFactoryList : public scfImplementation1<csMeshFactoryList,
 	iMeshFactoryList>
 {
 private:
-  csRefArrayObject<iMeshFactoryWrapper> list;
+  csRefArrayObject<iMeshFactoryWrapper, CS::Container::ArrayAllocDefault,
+    csArrayCapacityFixedGrow<64> > list;
   csHash<iMeshFactoryWrapper*, csString>
   	factories_hash;
 
