@@ -93,6 +93,7 @@ namespace RenderManager
     {
       CS_ASSERT(layer == 0);
 
+      if (!defaultShader) return maxLights;
       const csShaderMetadata& shaderMeta = defaultShader->GetMetadata();
       return shaderMeta.numberOfLights /*maxLights*/;
     }
