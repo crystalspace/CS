@@ -1,0 +1,10 @@
+SubDir TOP plugins mesh nskeleton object ;
+
+Description nskeleton : "Skeleton object plugin" ;
+
+Plugin nskeleton
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith nskeleton : crystalspace ;
+
+CompileGroups nskeleton :  meshes ;

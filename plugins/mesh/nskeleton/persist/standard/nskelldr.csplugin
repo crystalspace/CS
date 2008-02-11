@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- nskelldr.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.nskeleton.graveyard.loader</name>
+        <implementation>Loader</implementation>
+        <description>Crystal Space General Skeleton Factory Loader</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
