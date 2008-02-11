@@ -8,20 +8,25 @@ chronological order.
 
 11-Feb-2008
 	- Genjix commented csGeomDebug swig line.
+        - Jorrit fixed the python plugin so that parameters of type
+          'uint8' are now also recognized from Python.
 10-Feb-2008
 	- PK applied the patch from Rolenun in Ticket #450. Closes #450.
 5-Feb-2008
 	- Sueastside undid his ThreadedJobQueue change since it broke on linux.
-	- Marten redid some of the handling of thread priorities to be more robust.
-	- Sueastside redid his ThreadedJobQueue, should work now after Marten's changes.
+	- Marten redid some of the handling of thread priorities to be more
+          robust.
+	- Sueastside redid his ThreadedJobQueue, should work now after
+          Marten's changes.
 4-Feb-2008
-	- Sueastside added an optional parameter to ThreadedJobQueue's constructor
-	  to set the thread's priority.
+	- Sueastside added an optional parameter to ThreadedJobQueue's
+          constructor to set the thread's priority.
 2-Feb-2008
 	- res fixed "short" (h) and "short short" (hh) handling to only cast
 	  to a signed char/short when formatting to a decimal integer; cast to
 	  unsigned otherwise.
-	- Sueastside added XWindow clipboard event support. Rolenun made me do it!
+	- Sueastside added XWindow clipboard event support. Rolenun made me do
+          it!
 29-Jan-2008
 	- Sueastside added IsPrecached() to iTextureHandle.
 24-Jan-2008
