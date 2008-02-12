@@ -14,6 +14,10 @@ chronological order.
 	- res put some pixel store settings into the state cache and made
 	  methods that use pixel data (such as texture uploading) set these
 	  settings.
+	- caedes added some config options to cspython.
+	  - CsPython.Path.: to add vfs paths to pythonpath.
+	  - CsPython.Module.: to load modules on csPython::Initialize.
+	  this will allow defining python classes as scf classes and much more.
 11-Feb-2008
 	- Genjix commented csGeomDebug swig line.
         - Jorrit fixed the python plugin so that parameters of type
