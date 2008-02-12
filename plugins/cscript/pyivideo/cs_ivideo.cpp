@@ -2633,15 +2633,14 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_uint16_t swig_types[155]
 #define SWIGTYPE_p_uint32_t swig_types[156]
 #define SWIGTYPE_p_uint64_t swig_types[157]
-#define SWIGTYPE_p_uint8_t swig_types[158]
-#define SWIGTYPE_p_unsigned_char swig_types[159]
-#define SWIGTYPE_p_unsigned_int swig_types[160]
-#define SWIGTYPE_p_unsigned_long swig_types[161]
-#define SWIGTYPE_p_unsigned_long_long swig_types[162]
-#define SWIGTYPE_p_void swig_types[163]
-#define SWIGTYPE_p_wchar_t swig_types[164]
-static swig_type_info *swig_types[166];
-static swig_module_info swig_module = {swig_types, 165, 0, 0, 0, 0};
+#define SWIGTYPE_p_unsigned_char swig_types[158]
+#define SWIGTYPE_p_unsigned_int swig_types[159]
+#define SWIGTYPE_p_unsigned_long swig_types[160]
+#define SWIGTYPE_p_unsigned_long_long swig_types[161]
+#define SWIGTYPE_p_void swig_types[162]
+#define SWIGTYPE_p_wchar_t swig_types[163]
+static swig_type_info *swig_types[165];
+static swig_module_info swig_module = {swig_types, 164, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -3205,6 +3204,22 @@ SWIGINTERN void csSimpleRenderMesh_SetWithGenmeshFactory(csSimpleRenderMesh *sel
     self->indexCount = factory->GetTriangleCount()*3;
     self->texcoords = factory->GetTexels();
   }
+
+SWIGINTERN int
+SWIG_AsVal_unsigned_SS_char (PyObject * obj, unsigned char *val)
+{
+  unsigned long v;
+  int res = SWIG_AsVal_unsigned_SS_long (obj, &v);
+  if (SWIG_IsOK(res)) {
+    if ((v > UCHAR_MAX)) {
+      return SWIG_OverflowError;
+    } else {
+      if (val) *val = static_cast< unsigned char >(v);
+    }
+  }  
+  return res;
+}
+
 
 SWIGINTERNINLINE int
 SWIG_AsVal_size_t (PyObject * obj, size_t *val)
@@ -6069,19 +6084,19 @@ SWIGINTERN PyObject *_wrap_iGraphics2D_GetPixel__SWIG_0(PyObject *SWIGUNUSEDPARM
     resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_unsigned_SS_char((*arg4)));
   } else {
     int new_flags = SWIG_IsNewObj(res4) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg4), SWIGTYPE_p_uint8_t, new_flags));
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg4), SWIGTYPE_p_unsigned_char, new_flags));
   }
   if (SWIG_IsTmpObj(res5)) {
     resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_unsigned_SS_char((*arg5)));
   } else {
     int new_flags = SWIG_IsNewObj(res5) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg5), SWIGTYPE_p_uint8_t, new_flags));
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg5), SWIGTYPE_p_unsigned_char, new_flags));
   }
   if (SWIG_IsTmpObj(res6)) {
     resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_unsigned_SS_char((*arg6)));
   } else {
     int new_flags = SWIG_IsNewObj(res6) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg6), SWIGTYPE_p_uint8_t, new_flags));
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg6), SWIGTYPE_p_unsigned_char, new_flags));
   }
   return resultobj;
 fail:
@@ -6136,7 +6151,7 @@ SWIGINTERN PyObject *_wrap_iGraphics2D_GetPixel__SWIG_1(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iGraphics2D_GetPixel" "', argument " "3"" of type '" "int""'");
   } 
   arg3 = static_cast< int >(val3);
-  res7 = SWIG_ConvertPtr(obj3, &argp7, SWIGTYPE_p_uint8_t,  0 );
+  res7 = SWIG_ConvertPtr(obj3, &argp7, SWIGTYPE_p_unsigned_char,  0 );
   if (!SWIG_IsOK(res7)) {
     SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "iGraphics2D_GetPixel" "', argument " "7"" of type '" "uint8 &""'"); 
   }
@@ -6150,19 +6165,19 @@ SWIGINTERN PyObject *_wrap_iGraphics2D_GetPixel__SWIG_1(PyObject *SWIGUNUSEDPARM
     resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_unsigned_SS_char((*arg4)));
   } else {
     int new_flags = SWIG_IsNewObj(res4) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg4), SWIGTYPE_p_uint8_t, new_flags));
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg4), SWIGTYPE_p_unsigned_char, new_flags));
   }
   if (SWIG_IsTmpObj(res5)) {
     resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_unsigned_SS_char((*arg5)));
   } else {
     int new_flags = SWIG_IsNewObj(res5) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg5), SWIGTYPE_p_uint8_t, new_flags));
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg5), SWIGTYPE_p_unsigned_char, new_flags));
   }
   if (SWIG_IsTmpObj(res6)) {
     resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_unsigned_SS_char((*arg6)));
   } else {
     int new_flags = SWIG_IsNewObj(res6) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg6), SWIGTYPE_p_uint8_t, new_flags));
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg6), SWIGTYPE_p_unsigned_char, new_flags));
   }
   return resultobj;
 fail:
@@ -6218,7 +6233,7 @@ SWIGINTERN PyObject *_wrap_iGraphics2D_GetPixel(PyObject *self, PyObject *args) 
         }
         if (_v) {
           void *vptr = 0;
-          int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_uint8_t, 0);
+          int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_unsigned_char, 0);
           _v = SWIG_CheckState(res);
           if (_v) {
             return _wrap_iGraphics2D_GetPixel__SWIG_1(self, args);
@@ -10529,8 +10544,8 @@ SWIGINTERN PyObject *_wrap_iGraphics3D_DrawPixmap__SWIG_0(PyObject *SWIGUNUSEDPA
   int ecode9 = 0 ;
   int val10 ;
   int ecode10 = 0 ;
-  void *argp11 ;
-  int res11 = 0 ;
+  unsigned char val11 ;
+  int ecode11 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -10594,19 +10609,11 @@ SWIGINTERN PyObject *_wrap_iGraphics3D_DrawPixmap__SWIG_0(PyObject *SWIGUNUSEDPA
     SWIG_exception_fail(SWIG_ArgError(ecode10), "in method '" "iGraphics3D_DrawPixmap" "', argument " "10"" of type '" "int""'");
   } 
   arg10 = static_cast< int >(val10);
-  {
-    res11 = SWIG_ConvertPtr(obj10, &argp11, SWIGTYPE_p_uint8_t,  0  | 0);
-    if (!SWIG_IsOK(res11)) {
-      SWIG_exception_fail(SWIG_ArgError(res11), "in method '" "iGraphics3D_DrawPixmap" "', argument " "11"" of type '" "uint8""'"); 
-    }  
-    if (!argp11) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iGraphics3D_DrawPixmap" "', argument " "11"" of type '" "uint8""'");
-    } else {
-      uint8 * temp = reinterpret_cast< uint8 * >(argp11);
-      arg11 = *temp;
-      if (SWIG_IsNewObj(res11)) delete temp;
-    }
-  }
+  ecode11 = SWIG_AsVal_unsigned_SS_char(obj10, &val11);
+  if (!SWIG_IsOK(ecode11)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode11), "in method '" "iGraphics3D_DrawPixmap" "', argument " "11"" of type '" "uint8""'");
+  } 
+  arg11 = static_cast< uint8 >(val11);
   (arg1)->DrawPixmap(arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -10839,8 +10846,10 @@ SWIGINTERN PyObject *_wrap_iGraphics3D_DrawPixmap(PyObject *self, PyObject *args
                         _v = SWIG_CheckState(res);
                       }
                       if (_v) {
-                        int res = SWIG_ConvertPtr(argv[10], 0, SWIGTYPE_p_uint8_t, 0);
-                        _v = SWIG_CheckState(res);
+                        {
+                          int res = SWIG_AsVal_unsigned_SS_char(argv[10], NULL);
+                          _v = SWIG_CheckState(res);
+                        }
                         if (_v) {
                           return _wrap_iGraphics3D_DrawPixmap__SWIG_0(self, args);
                         }
@@ -17463,12 +17472,12 @@ SWIGINTERN PyObject *_wrap_iTextureHandle_SetKeyColor__SWIG_1(PyObject *SWIGUNUS
   uint8 arg4 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
-  void *argp3 ;
-  int res3 = 0 ;
-  void *argp4 ;
-  int res4 = 0 ;
+  unsigned char val2 ;
+  int ecode2 = 0 ;
+  unsigned char val3 ;
+  int ecode3 = 0 ;
+  unsigned char val4 ;
+  int ecode4 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -17480,45 +17489,21 @@ SWIGINTERN PyObject *_wrap_iTextureHandle_SetKeyColor__SWIG_1(PyObject *SWIGUNUS
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTextureHandle_SetKeyColor" "', argument " "1"" of type '" "iTextureHandle *""'"); 
   }
   arg1 = reinterpret_cast< iTextureHandle * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_uint8_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iTextureHandle_SetKeyColor" "', argument " "2"" of type '" "uint8""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iTextureHandle_SetKeyColor" "', argument " "2"" of type '" "uint8""'");
-    } else {
-      uint8 * temp = reinterpret_cast< uint8 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
-  {
-    res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_uint8_t,  0  | 0);
-    if (!SWIG_IsOK(res3)) {
-      SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iTextureHandle_SetKeyColor" "', argument " "3"" of type '" "uint8""'"); 
-    }  
-    if (!argp3) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iTextureHandle_SetKeyColor" "', argument " "3"" of type '" "uint8""'");
-    } else {
-      uint8 * temp = reinterpret_cast< uint8 * >(argp3);
-      arg3 = *temp;
-      if (SWIG_IsNewObj(res3)) delete temp;
-    }
-  }
-  {
-    res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_uint8_t,  0  | 0);
-    if (!SWIG_IsOK(res4)) {
-      SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iTextureHandle_SetKeyColor" "', argument " "4"" of type '" "uint8""'"); 
-    }  
-    if (!argp4) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iTextureHandle_SetKeyColor" "', argument " "4"" of type '" "uint8""'");
-    } else {
-      uint8 * temp = reinterpret_cast< uint8 * >(argp4);
-      arg4 = *temp;
-      if (SWIG_IsNewObj(res4)) delete temp;
-    }
-  }
+  ecode2 = SWIG_AsVal_unsigned_SS_char(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iTextureHandle_SetKeyColor" "', argument " "2"" of type '" "uint8""'");
+  } 
+  arg2 = static_cast< uint8 >(val2);
+  ecode3 = SWIG_AsVal_unsigned_SS_char(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iTextureHandle_SetKeyColor" "', argument " "3"" of type '" "uint8""'");
+  } 
+  arg3 = static_cast< uint8 >(val3);
+  ecode4 = SWIG_AsVal_unsigned_SS_char(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iTextureHandle_SetKeyColor" "', argument " "4"" of type '" "uint8""'");
+  } 
+  arg4 = static_cast< uint8 >(val4);
   (arg1)->SetKeyColor(arg2,arg3,arg4);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -17558,14 +17543,20 @@ SWIGINTERN PyObject *_wrap_iTextureHandle_SetKeyColor(PyObject *self, PyObject *
     int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iTextureHandle, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_uint8_t, 0);
-      _v = SWIG_CheckState(res);
-      if (_v) {
-        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_uint8_t, 0);
+      {
+        int res = SWIG_AsVal_unsigned_SS_char(argv[1], NULL);
         _v = SWIG_CheckState(res);
-        if (_v) {
-          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_uint8_t, 0);
+      }
+      if (_v) {
+        {
+          int res = SWIG_AsVal_unsigned_SS_char(argv[2], NULL);
           _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          {
+            int res = SWIG_AsVal_unsigned_SS_char(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
           if (_v) {
             return _wrap_iTextureHandle_SetKeyColor__SWIG_1(self, args);
           }
@@ -17633,19 +17624,19 @@ SWIGINTERN PyObject *_wrap_iTextureHandle_GetKeyColor(PyObject *SWIGUNUSEDPARM(s
     resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_unsigned_SS_char((*arg2)));
   } else {
     int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_uint8_t, new_flags));
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_unsigned_char, new_flags));
   }
   if (SWIG_IsTmpObj(res3)) {
     resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_unsigned_SS_char((*arg3)));
   } else {
     int new_flags = SWIG_IsNewObj(res3) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg3), SWIGTYPE_p_uint8_t, new_flags));
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg3), SWIGTYPE_p_unsigned_char, new_flags));
   }
   if (SWIG_IsTmpObj(res4)) {
     resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_unsigned_SS_char((*arg4)));
   } else {
     int new_flags = SWIG_IsNewObj(res4) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg4), SWIGTYPE_p_uint8_t, new_flags));
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg4), SWIGTYPE_p_unsigned_char, new_flags));
   }
   return resultobj;
 fail:
@@ -18504,7 +18495,7 @@ SWIGINTERN PyObject *_wrap_iTextureHandle_QueryBlitBuffer__SWIG_0(PyObject *SWIG
   } 
   arg8 = static_cast< uint >(val8);
   result = (uint8 *)(arg1)->QueryBlitBuffer(arg2,arg3,arg4,arg5,*arg6,arg7,arg8);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_uint8_t, 0 |  0 );
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_unsigned_char, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -18583,7 +18574,7 @@ SWIGINTERN PyObject *_wrap_iTextureHandle_QueryBlitBuffer__SWIG_1(PyObject *SWIG
   } 
   arg7 = static_cast< iTextureHandle::TextureBlitDataFormat >(val7);
   result = (uint8 *)(arg1)->QueryBlitBuffer(arg2,arg3,arg4,arg5,*arg6,arg7);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_uint8_t, 0 |  0 );
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_unsigned_char, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -18653,7 +18644,7 @@ SWIGINTERN PyObject *_wrap_iTextureHandle_QueryBlitBuffer__SWIG_2(PyObject *SWIG
   }
   arg6 = reinterpret_cast< size_t * >(argp6);
   result = (uint8 *)(arg1)->QueryBlitBuffer(arg2,arg3,arg4,arg5,*arg6);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_uint8_t, 0 |  0 );
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_unsigned_char, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -18826,7 +18817,7 @@ SWIGINTERN PyObject *_wrap_iTextureHandle_ApplyBlitBuffer(PyObject *SWIGUNUSEDPA
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTextureHandle_ApplyBlitBuffer" "', argument " "1"" of type '" "iTextureHandle *""'"); 
   }
   arg1 = reinterpret_cast< iTextureHandle * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_uint8_t, 0 |  0 );
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_unsigned_char, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iTextureHandle_ApplyBlitBuffer" "', argument " "2"" of type '" "uint8 *""'"); 
   }
@@ -18857,7 +18848,7 @@ SWIGINTERN PyObject *_wrap_iTextureHandle_GetBufferNature(PyObject *SWIGUNUSEDPA
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTextureHandle_GetBufferNature" "', argument " "1"" of type '" "iTextureHandle *""'"); 
   }
   arg1 = reinterpret_cast< iTextureHandle * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_uint8_t, 0 |  0 );
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_unsigned_char, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iTextureHandle_GetBufferNature" "', argument " "2"" of type '" "uint8 *""'"); 
   }
@@ -21024,8 +21015,7 @@ static swig_type_info _swigt__p_size_t = {"_p_size_t", "size_t *", 0, 0, (void*)
 static swig_type_info _swigt__p_uint16_t = {"_p_uint16_t", "uint16_t *|uint16 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint32_t = {"_p_uint32_t", "uint32_t *|uint32 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint64_t = {"_p_uint64_t", "uint64_t *|uint64 *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_uint8_t = {"_p_uint8_t", "uint8_t *|uint8 *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_unsigned_char = {"_p_unsigned_char", "unsigned char *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_unsigned_char = {"_p_unsigned_char", "unsigned char *|uint8 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_int = {"_p_unsigned_int", "unsigned int *|uint *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_long = {"_p_unsigned_long", "unsigned long *|csEventID *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_long_long = {"_p_unsigned_long_long", "unsigned long long *|ulonglong *", 0, 0, (void*)0, 0};
@@ -21191,7 +21181,6 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_uint16_t,
   &_swigt__p_uint32_t,
   &_swigt__p_uint64_t,
-  &_swigt__p_uint8_t,
   &_swigt__p_unsigned_char,
   &_swigt__p_unsigned_int,
   &_swigt__p_unsigned_long,
@@ -21358,7 +21347,6 @@ static swig_cast_info _swigc__p_size_t[] = {  {&_swigt__p_size_t, 0, 0, 0},{0, 0
 static swig_cast_info _swigc__p_uint16_t[] = {  {&_swigt__p_uint16_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint32_t[] = {  {&_swigt__p_uint32_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint64_t[] = {  {&_swigt__p_uint64_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_uint8_t[] = {  {&_swigt__p_uint8_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_unsigned_char[] = {  {&_swigt__p_unsigned_char, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_unsigned_int[] = {  {&_swigt__p_unsigned_int, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_unsigned_long[] = {  {&_swigt__p_unsigned_long, 0, 0, 0},{0, 0, 0, 0}};
@@ -21525,7 +21513,6 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_uint16_t,
   _swigc__p_uint32_t,
   _swigc__p_uint64_t,
-  _swigc__p_uint8_t,
   _swigc__p_unsigned_char,
   _swigc__p_unsigned_int,
   _swigc__p_unsigned_long,
