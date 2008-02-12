@@ -949,7 +949,6 @@ bool csGLGraphics3D::Open ()
   txtmgr.AttachNew (new csGLTextureManager (
     object_reg, GetDriver2D (), config, this));
 
-  glClearDepth (0.0);
   statecache->Enable_GL_CULL_FACE ();
   statecache->SetCullFace (GL_FRONT);
 
@@ -1279,6 +1278,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
       	| GL_COLOR_BUFFER_BIT;
     else
       clearMask = GL_DEPTH_BUFFER_BIT | stencilFlag;
+    glClearDepth (0.0); // @@@ Never really changes
   }
   else if (drawflags & CSDRAW_CLEARSCREEN)
     clearMask = GL_COLOR_BUFFER_BIT;

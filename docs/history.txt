@@ -18,6 +18,8 @@ chronological order.
 	  - CsPython.Path.: to add vfs paths to pythonpath.
 	  - CsPython.Module.: to load modules on csPython::Initialize.
 	  this will allow defining python classes as scf classes and much more.
+	- res made the GL depth clear value be re-set every frame (needed in
+	  embedding scenarios).
 11-Feb-2008
 	- Genjix commented csGeomDebug swig line.
         - Jorrit fixed the python plugin so that parameters of type
