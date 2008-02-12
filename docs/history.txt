@@ -11,6 +11,9 @@ chronological order.
 	  allow command passthrough to the real c++ PerformExtension.
 	- res fixed the state cache texture unit iteration to only iterate
 	  over the available texture units and not all up to CS_GL_MAX_LAYER.
+	- res put some pixel store settings into the state cache and made
+	  methods that use pixel data (such as texture uploading) set these
+	  settings.
 11-Feb-2008
 	- Genjix commented csGeomDebug swig line.
         - Jorrit fixed the python plugin so that parameters of type

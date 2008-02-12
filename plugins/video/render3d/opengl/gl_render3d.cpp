@@ -3278,7 +3278,6 @@ csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB,
     rgbaPtr += (Width - iWidth) * 4;
   }
 
-  glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
   // Create handle
   glGenTextures (1, &halohandle);
   // Activate handle

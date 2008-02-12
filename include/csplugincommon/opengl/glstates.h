@@ -403,6 +403,10 @@ public:
   GLenum blend_destinationRGB;
   GLenum blend_sourceA;
   GLenum blend_destinationA;
+  
+  // Pixel storage
+  GLint pixelUnpackAlignment;
+  bool pixelUnpackSwapBytes;
 
   // Standardized caches
   DECLARE_CACHED_BOOL (GL_DEPTH_TEST)
@@ -644,6 +648,11 @@ public:
       parameter_scpointer = 0;
       enabled_GL_COLOR_SUM_EXT = false;
     }
+    
+    glGetIntegerv (GL_UNPACK_ALIGNMENT, &pixelUnpackAlignment);
+    GLint v;
+    glGetIntegerv (GL_UNPACK_SWAP_BYTES, &v);
+    pixelUnpackSwapBytes = v != 0;
   }
 };
 
@@ -845,7 +854,8 @@ public:
     return currentContext->currentBufferID[index];
   }
 
-  // Blend functions
+  /**\name Blend functions
+   * @{ */
   void SetBlendFunc (GLenum blend_source, GLenum blend_destination, 
 		      bool forced = false)
   {
@@ -899,6 +909,31 @@ public:
     blend_sourceA = currentContext->blend_sourceA;
     blend_destinationA = currentContext->blend_destinationA;
   }
+  /** @} */
+  
+  /**\name Pixel storage
+   * @{ */
+  GLint GetPixelUnpackAlignment ()
+  { return currentContext->pixelUnpackAlignment; }
+  void SetPixelUnpackAlignment (GLint alignment)
+  {
+    if (alignment != currentContext->pixelUnpackAlignment)
+    {
+      glPixelStorei (GL_UNPACK_ALIGNMENT, alignment);
+      currentContext->pixelUnpackAlignment = alignment;
+    }
+  }
+  bool GetPixelUnpackSwapBytes ()
+  { return currentContext->pixelUnpackSwapBytes; }
+  void SetPixelUnpackSwapBytes (GLint swap)
+  {
+    if (swap != currentContext->pixelUnpackSwapBytes)
+    {
+      glPixelStorei (GL_UNPACK_SWAP_BYTES, (GLint)swap);
+      currentContext->pixelUnpackSwapBytes = swap;
+    }
+  }
+  /** @} */
 };
 
 #undef IMPLEMENT_CACHED_BOOL

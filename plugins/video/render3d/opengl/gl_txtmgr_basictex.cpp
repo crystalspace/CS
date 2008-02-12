@@ -335,6 +335,8 @@ void csGLBasicTextureHandle::Blit (int x, int y, int width,
   if ((textarget != GL_TEXTURE_2D) && (textarget != GL_TEXTURE_RECTANGLE_ARB))
     return;
 
+  txtmgr->SetupPixelStore ();
+
   // Activate the texture.
   Precache ();
   G3D->ActivateTexture (this);
@@ -414,6 +416,8 @@ void csGLBasicTextureHandle::Load ()
   const GLint minFilter = textureMinFilters[texFilter];
   const GLint wrapMode = 
     (texFlags.Check (CS_TEXTURE_CLAMP)) ? GL_CLAMP_TO_EDGE : GL_REPEAT;
+
+  txtmgr->SetupPixelStore ();
 
   if (texType == texType1D)
   {
@@ -672,6 +676,8 @@ void csGLBasicTextureHandle::EnsureUncompressed (bool keepPixels,
   }
   if (!doConvert) return;
 
+  txtmgr->SetupPixelStore ();
+
   GLuint textureFormat = (newTexFormat == RGBA8888) ? GL_RGBA : GL_BGRA;
   uint8* pixelData = 0;
   /* @@@ FIXME: This really should use the actual internal (base?) format and 
@@ -709,6 +715,8 @@ uint8* csGLBasicTextureHandle::QueryBlitBuffer (int x, int y,
 
 void csGLBasicTextureHandle::ApplyBlitBuffer (uint8* buf)
 { 
+  txtmgr->SetupPixelStore ();
+
   if (txtmgr->G3D->ext->CS_GL_ARB_pixel_buffer_object)
   {
     ApplyBlitBufferPBO (buf);
@@ -843,6 +851,8 @@ csPtr<iImage> csGLBasicTextureHandle::Dump ()
 {
   // @@@ hmm... or just return an empty image?
   if (GetHandle () == (GLuint)~0) return 0;
+
+  txtmgr->SetupPixelStore ();
 
   GLint tw, th;
   csGLGraphics3D::statecache->SetTexture (GL_TEXTURE_2D, GetHandle ());

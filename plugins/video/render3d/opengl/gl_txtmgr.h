@@ -162,6 +162,8 @@ public:
   {
     return textureClassIDs.Request (classID);
   }
+  
+  void SetupPixelStore();
 
   /**
    * Helper function to make sure a texture isn't selected on any TU.
