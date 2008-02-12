@@ -31,6 +31,7 @@
 #endif
 
 #include "csextern_gl.h"
+#include "csgeom/math.h"
 #include "glextmanager.h"
 
 /**\addtogroup plugincommon
@@ -461,7 +462,10 @@ public:
   }
 
 
-  /// Init cache
+  /** 
+   * Init cache. Does both retrieval of current GL state as well as setting
+   * some states to known values.
+   */
   void InitCache()
   {
     int i;
@@ -513,9 +517,15 @@ public:
     enabled_GL_TEXTURE_GEN_Q = (glIsEnabled (GL_TEXTURE_GEN_Q) == GL_TRUE);
     enabled_GL_FOG = (glIsEnabled (GL_FOG) == GL_TRUE);
 
+    memset (boundtexture, 0, CS_GL_MAX_LAYER * sizeof (GLuint));
+    currentUnit = 0;
+    memset (activeUnit, 0, sizeof (activeUnit));
     if (extmgr->CS_GL_ARB_multitexture)
     {
-      for (i = 0 ; i < CS_GL_MAX_LAYER; i++)
+      GLint texUnits;
+      glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &texUnits);
+    
+      for (i = csMin (texUnits, CS_GL_MAX_LAYER); i-- > 0; )
       {
         extmgr->glActiveTextureARB (GL_TEXTURE0_ARB + i);
         extmgr->glClientActiveTextureARB (GL_TEXTURE0_ARB + i);
@@ -576,15 +586,6 @@ public:
     else
       enabled_GL_SECONDARY_COLOR_ARRAY_EXT = false;
     enabled_GL_NORMAL_ARRAY = (glIsEnabled (GL_NORMAL_ARRAY) == GL_TRUE);
-
-    if (extmgr->CS_GL_ARB_multitexture)
-    {
-      extmgr->glActiveTextureARB (GL_TEXTURE0_ARB);
-      extmgr->glClientActiveTextureARB (GL_TEXTURE0_ARB);
-    }
-    memset (boundtexture, 0, CS_GL_MAX_LAYER * sizeof (GLuint));
-    currentUnit = 0;
-    memset (activeUnit, 0, sizeof (activeUnit));
 
     memset (currentBufferID, 0, sizeof (currentBufferID));
     {

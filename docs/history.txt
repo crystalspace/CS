@@ -9,6 +9,8 @@ chronological order.
 12-Feb-2008
 	- caedes fixed python override of Graphics2D::PerformExtension to
 	  allow command passthrough to the real c++ PerformExtension.
+	- res fixed the state cache texture unit iteration to only iterate
+	  over the available texture units and not all up to CS_GL_MAX_LAYER.
 11-Feb-2008
 	- Genjix commented csGeomDebug swig line.
         - Jorrit fixed the python plugin so that parameters of type
