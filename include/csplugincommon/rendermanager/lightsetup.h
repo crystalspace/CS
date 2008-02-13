@@ -52,8 +52,6 @@ namespace RenderManager
 
     void operator() (typename RenderTree::MeshNode* node)
     {
-      persist.svKeeper.Empty();
-      
       for (size_t i = 0; i < node->meshes.GetSize (); ++i)
       {
         typename RenderTree::MeshNode::SingleMesh& mesh = node->meshes[i];
@@ -115,6 +113,10 @@ namespace RenderManager
       void Initialize (iShaderVarStringSet* strings)
       {
 	svNames.SetStrings (strings);
+      }
+      void UpdateNewFrame ()
+      {
+        svKeeper.Empty();
       }
       
       void ReserveInfluences (size_t num)

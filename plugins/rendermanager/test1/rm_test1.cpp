@@ -151,6 +151,7 @@ bool RMTest1::RenderView (iView* view)
 
   contextsScannedForTargets.Empty ();
   portalPersistent.UpdateNewFrame ();
+  lightPersistent.UpdateNewFrame ();
 
   iSector* startSector = rview->GetThisSector ();
 
