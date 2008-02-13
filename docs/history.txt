@@ -54,6 +54,7 @@ chronological order.
 	  were used.
 	- res undid the wrong removal of the light SV name cache from the RM
 	  light setup step.
+	- res updated the vproc_std plugin for the latest changes.
 12-Feb-2008
 	- caedes fixed python override of Graphics2D::PerformExtension to
 	  allow command passthrough to the real c++ PerformExtension.

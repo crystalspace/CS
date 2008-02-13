@@ -124,10 +124,6 @@ private:
 
   csBitArray disableMask;
 
-  void FixupLightWorldPos (csLightProperties& light, size_t lightNum,
-    const csShaderVariableStack& stack, 
-    const csReversibleTransform& object2world);
-
   bool ParseLightMixMode (iDocumentNode* child, LightMixmode& mixmode);
   bool ParseBufferName (iDocumentNode* child, BufferName& name);
   iRenderBuffer* GetBuffer (const BufferName& name,

@@ -412,8 +412,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(VProc_std)
           if ((disableMask.GetSize() <= lightNum) 
             || !disableMask.IsBitSet (lightNum))
           {
-            csLightProperties light (lightNum, shaderPlugin->lsvCache, stack);
-            FixupLightWorldPos (light, lightNum, stack, mesh->object2world);
+            csLightProperties light (lightNum, shaderPlugin->lsvCache, stack,
+              mesh->object2world);
             iVertexLightCalculator *calc = 
               shaderPlugin->GetLightCalculator (light, useAttenuation);
             calc->CalculateLighting (light, eyePosObject, shininess, elementCount, 
@@ -431,8 +431,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(VProc_std)
               continue;
             }
 
-            csLightProperties light (i, shaderPlugin->lsvCache, stack);
-            FixupLightWorldPos (light, i, stack, mesh->object2world);
+            csLightProperties light (i, shaderPlugin->lsvCache, stack,
+              mesh->object2world);
             iVertexLightCalculator *calc = 
               shaderPlugin->GetLightCalculator (light, useAttenuation);
 
@@ -536,29 +536,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(VProc_std)
           modes.buffers->GetAccessorMask() & ~(1 << specularOutputBuffer));
         modes.buffers->SetRenderBuffer (specularOutputBuffer, specBuf);
       }
-    }
-  }
-
-  void csVProcStandardProgram::FixupLightWorldPos (csLightProperties& light, 
-    size_t lightNum, const csShaderVariableStack& stack, 
-    const csReversibleTransform& object2world)
-  {
-    CS::ShaderVarStringID idLightPosObj = shaderPlugin->lsvCache.GetLightSVId (
-      lightNum, csLightShaderVarCache::lightPosition);
-    if ((stack.GetSize () <= idLightPosObj)
-      || (stack[idLightPosObj] == 0))
-    {
-      CS::ShaderVarStringID idLightPosWorld =
-        shaderPlugin->lsvCache.GetLightSVId (
-          lightNum, csLightShaderVarCache::lightPositionWorld);
-      csShaderVariable* sv;
-      csVector3 lightPosWorld;
-      if ((stack.GetSize () > idLightPosWorld) 
-        && ((sv = stack[idLightPosWorld]) != 0))
-        sv->GetValue (lightPosWorld);
-      else
-        lightPosWorld.Set (0, 0, 0);
-      light.posObject = object2world.Other2This (lightPosWorld);
     }
   }
 
