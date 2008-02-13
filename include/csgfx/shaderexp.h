@@ -29,6 +29,7 @@
 #include "csutil/array.h"
 #include "csutil/leakguard.h"
 #include "csgeom/vector4.h"
+#include "csgfx/shadervarnameparser.h"
 #include "ivideo/shader/shader.h"
 
 struct iObjectRegistry;
@@ -50,10 +51,15 @@ public:
   { 
     uint8 type;
     
+    struct SvVarValue
+    {
+      CS::StringIDValue id;
+      size_t* indices;
+    };
     union 
     {
       float num;
-      CS::StringIDValue var;
+      SvVarValue var;
       
       // Illegal outside of a cons cell
       int oper;
@@ -81,6 +87,8 @@ private:
   csShaderVariableStack* stack;
   /// String set for producing String IDs
   csRef<iShaderVarStringSet> strset;
+  /// Storage for SV sub-indices
+  csMemoryPool svIndicesScratch;
   /// Compiled array of opcodes for evaluation
   oper_array opcodes;
   /**
@@ -211,7 +219,9 @@ private:
   static csStringID GetSexpTokenOp (const char* token);
   static csStringID GetXmlType (const char* token);
 
-  csShaderVariable* ResolveVar (CS::ShaderVarStringID name);
+  /// Helper to allocate a number of SV sub-indices from the mem pool
+  size_t* AllocSVIndices (const CS::Graphics::ShaderVarNameParser& parser);
+  csShaderVariable* ResolveVar (const oper_arg::SvVarValue& var);
 
   mutable csString errorMsg;
   void ParseError (const char* message, ...) const;

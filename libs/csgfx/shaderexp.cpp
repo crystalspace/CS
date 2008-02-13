@@ -34,6 +34,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "csgfx/shaderexp.h"
 #include "csgfx/shadervar.h"
+#include "csgfx/shadervararrayhelper.h"
 #include "ivideo/shader/shader.h"
 
 #if defined(CS_DEBUG)
@@ -244,7 +245,7 @@ static const op_args_info optimize_arg_table[] =
 CS_LEAKGUARD_IMPLEMENT (csShaderExpression);
 
 csShaderExpression::csShaderExpression(iObjectRegistry * objr) :
-  stack (0), accstack_max (0)
+  stack (0), svIndicesScratch (32), accstack_max (0)
 {
   obj_reg = objr;
 
@@ -273,10 +274,32 @@ void csShaderExpression::EvalError (const char* message, ...) const
   va_end (args);
 }
 
-csShaderVariable* csShaderExpression::ResolveVar (CS::ShaderVarStringID name)
+size_t* csShaderExpression::AllocSVIndices (
+  const CS::Graphics::ShaderVarNameParser& parser)
+{
+  const size_t num = parser.GetIndexNum();
+  if (num == 0) return 0;
+  
+  size_t* mem = (size_t*)svIndicesScratch.Alloc ((num+1) * sizeof (size_t));
+  size_t* p = mem;
+  
+  *p++ = num;
+  for (size_t n = 0; n < num; n++)
+    *p++ = parser.GetIndexValue (n);
+  return mem;
+}
+
+csShaderVariable* csShaderExpression::ResolveVar (const oper_arg::SvVarValue& var)
 {
   if (!stack) return 0;
-  return csGetShaderVariableFromStack (*stack, name);
+  csShaderVariable* sv = csGetShaderVariableFromStack (*stack, var.id);
+  if ((sv != 0) && (var.indices != 0))
+  {
+    sv = CS::Graphics::ShaderVarArrayHelper::GetArrayItem (sv,
+      var.indices + 1, *var.indices,
+      CS::Graphics::ShaderVarArrayHelper::maFail);
+  }
+  return sv;
 }
 
 bool csShaderExpression::Parse(iDocumentNode * node)
@@ -806,8 +829,8 @@ bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg arg2, oper_
     csShaderVariable* var = ResolveVar (arg1.var);
     if (!var)
     {
-      EvalError ("Cannot resolve variable name %s in symbol table.", 
-        strset->Request(arg1.var));
+      EvalError ("Cannot resolve variable name '%s' in symbol table.", 
+        strset->Request (arg1.var.id));
 
       return false;
     }
@@ -825,8 +848,8 @@ bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg arg2, oper_
     csShaderVariable * var = ResolveVar (arg2.var);
     if (!var)
     {
-      EvalError ("Cannot resolve variable name %s in symbol table.", 
-        strset->Request(arg2.var));
+      EvalError ("Cannot resolve variable name '%s' in symbol table.", 
+        strset->Request (arg2.var.id));
 
       return false;
     }
@@ -868,7 +891,7 @@ bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg & output)
     if (!var)
     {
       EvalError ("Cannot resolve variable name '%s' in symbol table.", 
-        strset->Request(arg1.var));
+        strset->Request (arg1.var.id));
 
       return false;
     }
@@ -1692,7 +1715,9 @@ bool csShaderExpression::parse_sexp_atom (const char *& text, cons * head) {
     tmp2[size] = 0;
 
     head->car.type = TYPE_VARIABLE;
-    head->car.var = strset->Request (tmp2);
+    CS::Graphics::ShaderVarNameParser nameParse (tmp2);
+    head->car.var.id = strset->Request (nameParse.GetShaderVarName());
+    head->car.var.indices = AllocSVIndices (nameParse);
 
     text = tmp;
     if (quoted) text++;
@@ -1774,8 +1799,11 @@ bool csShaderExpression::parse_xml_atom(oper_arg & arg, csStringID type, const c
     } break;
 
   case TYPE_VARIABLE:
-    arg.var = strset->Request(val_str);
-
+    {
+      CS::Graphics::ShaderVarNameParser nameParse (val_str);
+      arg.var.id = strset->Request (nameParse.GetShaderVarName());
+      arg.var.indices = AllocSVIndices (nameParse);
+    }
     break;
 
   default:
@@ -2089,7 +2117,7 @@ void csShaderExpression::print_cons(const cons * head) const
       break;
 
     case TYPE_VARIABLE:
-      csPrintf (" \"%s\"", strset->Request(cell->car.var));
+      csPrintf (" \"%s\"", strset->Request (cell->car.var.id));
       break;
 
     default:
@@ -2133,7 +2161,7 @@ void csShaderExpression::print_ops(const oper_array & ops) const
         break;
 
       case TYPE_VARIABLE:
-        csPrintf (" %s", strset->Request(op.arg1.var));
+        csPrintf (" %s", strset->Request(op.arg1.var.id));
         break;
 
       case TYPE_ACCUM:
@@ -2167,7 +2195,7 @@ void csShaderExpression::print_ops(const oper_array & ops) const
         break;
 
       case TYPE_VARIABLE:
-        csPrintf (",%s", strset->Request(op.arg2.var));
+        csPrintf (",%s", strset->Request(op.arg2.var.id));
         break;
 
       case TYPE_ACCUM:
@@ -2203,7 +2231,7 @@ void csShaderExpression::print_result(const oper_arg & arg) const {
       break;
       
     case TYPE_VARIABLE:
-      csPrintf ("#<VARIABLEREF \"%s\">", strset->Request (arg.var));
+      csPrintf ("#<VARIABLEREF \"%s\">", strset->Request (arg.var.id));
       break;
       
     case TYPE_ACCUM:

@@ -24,6 +24,7 @@ chronological order.
 	- res added some helpers to deal with SV arrays. One simplifies
 	  parsing names with indices such as "myshadervar[23]", the other
 	  provides a convenient method to access nested arrays.
+	- res made SV expressions support SV names with indices.
 12-Feb-2008
 	- caedes fixed python override of Graphics2D::PerformExtension to
 	  allow command passthrough to the real c++ PerformExtension.
