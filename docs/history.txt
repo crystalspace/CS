@@ -47,6 +47,7 @@ chronological order.
 	  should be able to compute all other spaces with only little effort).
 	- res updated vertexlight.h's csLightProperties to only use world space
 	  coords.
+	- res made csShaderVariableStack copyable.
 12-Feb-2008
 	- caedes fixed python override of Graphics2D::PerformExtension to
 	  allow command passthrough to the real c++ PerformExtension.

@@ -60,13 +60,33 @@ struct iShaderManager;
  * A "shader variable stack".
  * Stores a list of shader variables, indexed by it's name.
  */
-class csShaderVariableStack : public CS::NonCopyable
+class csShaderVariableStack
 {
 public:
   /// Construct an empty stack
   csShaderVariableStack ()
     : varArray (0), size (0), ownArray (false)
   {}
+
+  /**
+   * Copies from another stack.
+   * If the other stack was created from a preallocated array, the new stack
+   * points to that same array. If the other stack used internal storage the
+   * new stack will allocate it's own internal array and copy over the contents.
+   */
+  csShaderVariableStack (const csShaderVariableStack& other)
+    : size (other.size), ownArray (false)
+  {
+    if (other.ownArray)
+    {
+      Setup (size);
+      memcpy (varArray, other.varArray, size * sizeof (csShaderVariable*));
+    }
+    else
+    {
+      varArray = other.varArray;
+    }
+  }
 
   /// Construct a stack from a preallocated array of shader variables
   csShaderVariableStack (csShaderVariable** va, size_t size)
@@ -94,7 +114,7 @@ public:
       ownArray = true;
 
       memset (varArray, 0, size * sizeof(csShaderVariable*));
-    }    
+    }
   }
 
   /// Initialize stack with external storage
@@ -106,6 +126,17 @@ public:
     varArray = stack;
     csShaderVariableStack::size = size;
     ownArray = false;
+  }
+
+  /// Make a local copy if the array was preallocated.
+  void MakeOwnArray ()
+  {
+    if (ownArray) return;
+    csShaderVariable** newArray =
+      (csShaderVariable**)cs_malloc (size * sizeof(csShaderVariable*));
+    memcpy (newArray, varArray, size * sizeof(csShaderVariable*));
+    varArray = newArray;
+    ownArray = true;
   }
 
   /// Get the number of variable slots in the stack
