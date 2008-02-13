@@ -17,6 +17,8 @@ chronological order.
 	- res fixed a copy and paste bug in xmlshader which could result in
 	  some conditions being wrongly determined to be "always true" or
 	  "always false".
+	- res changed csApplicationFramework::SetApplicationName() to take
+	  a const char* instead of a char*.
 12-Feb-2008
 	- caedes fixed python override of Graphics2D::PerformExtension to
 	  allow command passthrough to the real c++ PerformExtension.
