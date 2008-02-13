@@ -28,6 +28,8 @@
 #include "csutil/memheap.h"
 #include "csutil/ptrwrap.h"
 #include "csgeom/math.h"
+#include "csgfx/shadervararrayhelper.h"
+#include "csgfx/shadervarnameparser.h"
 #include "iutil/strset.h"
 #include "ivideo/shader/shader.h"
 
@@ -330,11 +332,13 @@ protected:
   {
     csRef<Values> values;
   public:
+    csArray<ValuesWrapper> subValues;
+
     operator const Values* () const 
     { 
       return values; 
     }
-    operator csRef<Values>& () 
+    csRef<Values>& AsRef() 
     { 
       if (values.IsValid() && (values->GetRefCount() > 1))
       {
@@ -343,6 +347,11 @@ protected:
         values.AttachNew (newVals);
       }
       return values; 
+    }
+    operator csRef<Values>& () { return AsRef(); }
+    operator Values* ()
+    { 
+      return AsRef(); 
     }
   };
 
@@ -424,6 +433,18 @@ protected:
     }
   };
   ValuesArrayWrapper possibleValues;
+  
+  static void MergeValuesInto (ValuesWrapper& dst, const ValuesWrapper& src)
+  {
+    *dst |= *src;
+    size_t numIndices = csMin (dst.subValues.GetSize(), src.subValues.GetSize());
+    for (size_t s = 0; s < numIndices; s++)
+    {
+      MergeValuesInto (dst.subValues[s], src.subValues[s]);
+    }
+    while (dst.subValues.GetSize() > numIndices)
+      dst.subValues.DeleteIndexFast (numIndices);
+  }
 public:
   Variables () : possibleValues (ValuesArray ()) {}
   Variables (const Variables& other) : possibleValues (other.possibleValues)
@@ -437,19 +458,39 @@ public:
   {
   }
 
-  Values* GetValues (CS::ShaderVarStringID variable)
+  Values* GetValues (CS::ShaderVarStringID variable,
+                     size_t numIndices, const size_t* indices)
   {
-    csRef<Values>& vals = possibleValues->GetExtend (variable);
-    if (!vals) vals.AttachNew (ValAlloc().Alloc());
-    return vals;
+    const size_t* ip = indices;
+    ValuesWrapper* vals = &(possibleValues->GetExtend (variable));
+    do
+    {
+      if (!vals->AsRef().IsValid()) vals->AsRef().AttachNew (ValAlloc().Alloc());
+      if (numIndices > 0)
+        vals = &(vals->subValues.GetExtend (*ip++));
+    }
+    while (numIndices-- > 0);
+    return vals->AsRef();
   }
-  const Values* GetValues (CS::ShaderVarStringID variable) const
+  const Values* GetValues (CS::ShaderVarStringID variable,
+                           size_t numIndices, const size_t* indices) const
   {
-    const Values* vals = 0;
+    const size_t* ip = indices;
+    const ValuesWrapper* vals = 0;
     if (possibleValues->Has (variable))
-      vals = possibleValues->Get (variable);
-    if (vals != 0)
-      return vals;
+    {
+      vals = &(possibleValues->Get (variable));
+      while ((vals != 0) && (numIndices-- > 0))
+      {
+	const ValuesWrapper* newVals = 0;
+	size_t subInd = *ip++;
+	if (vals->subValues.GetSize() > subInd)
+	  newVals = &(vals->subValues.Get (subInd));
+	vals = newVals;
+      }
+    }
+    if ((vals != 0) && (*vals != 0))
+      return *vals;
     else
       return Def();
   }
@@ -474,9 +515,10 @@ public:
       CS::ShaderVarStringID name = nva[n].n;
       if (pvB.Has (name))
       {
-        const Values* entry = pvB.Get (name);
-        csRef<Values>& vw = nva.GetIndex (n);
-        *vw |= *entry;
+        const ValuesWrapper& entry = pvB.Get (name);
+        ValuesWrapper& vw = nva.GetIndex (n);
+        //*vw |= *entry;
+        MergeValuesInto (vw, entry);
         n++;
       }
       else
@@ -501,6 +543,9 @@ class csConditionEvaluator
   // Evaluation cache
   MyBitArrayMalloc condChecked;
   MyBitArrayMalloc condResult;
+  
+  csMemoryPool scratch;
+  size_t* AllocSVIndices (const CS::Graphics::ShaderVarNameParser& parser);
 
   // Constants
   const csConditionConstants& constants;
@@ -566,6 +611,23 @@ class csConditionEvaluator
     { return Boolean (a) && Boolean (b); }
     EvalResult LogicOr (const CondOperand& a, const CondOperand& b)
     { return Boolean (a) || Boolean (b); }
+    
+   private:
+    csShaderVariable* GetShaderVar (const CondOperand& operand)
+    {
+      csShaderVariable* sv = 0;
+      if (stack && stack->GetSize () > operand.svLocation.svName)
+      {
+	sv = (*stack)[operand.svLocation.svName];
+	if (sv && operand.svLocation.indices != 0)
+	{
+	  sv = CS::Graphics::ShaderVarArrayHelper::GetArrayItem (sv,
+	    operand.svLocation.indices + 1, *operand.svLocation.indices,
+	    CS::Graphics::ShaderVarArrayHelper::maFail);
+	}
+      }
+      return sv;
+    }
   };
 public:
   template<typename Evaluator>

@@ -26,6 +26,9 @@ chronological order.
 	  provides a convenient method to access nested arrays.
 	- res made SV expressions support SV names with indices.
 	- res made csShaderProgram::ProgramParam support SV names with indices.
+	- res changed the light SV name cache to also support names without
+	  light numbers.
+	- res made the xmlshader compiler support SV names with indices.
 12-Feb-2008
 	- caedes fixed python override of Graphics2D::PerformExtension to
 	  allow command passthrough to the real c++ PerformExtension.

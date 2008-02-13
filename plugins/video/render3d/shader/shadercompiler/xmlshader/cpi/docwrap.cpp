@@ -357,7 +357,17 @@ void ConditionTree::DumpNode (csString& out, const Node* node, int level)
     out += '\n';
     out += indent;
     out += ' ';
-    out.AppendFmt ("condition %zu", node->condition);
+    switch (node->condition)
+    {
+      case csCondAlwaysTrue:
+	out.Append ("condition \"always true\"");
+	break;
+      case csCondAlwaysFalse:
+	out.Append ("condition \"always false\"");
+	break;
+      default:
+        out.AppendFmt ("condition %zu", node->condition);
+    }
     out += '\n';
     DumpNode (out, node->branches[0], level+1);
     DumpNode (out, node->branches[1], level+1);
@@ -384,9 +394,7 @@ void csWrappedDocumentNode::WrappedChild::operator delete (void* p)
   ChildAlloc()->Free (p);
 }
 
-#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-# define new CS_EXTENSIVE_MEMDEBUG_NEW
-#endif
+#include "csutil/custom_new_enable.h"
 
 //---------------------------------------------------------------------------
 
@@ -1831,7 +1839,17 @@ void csWrappedDocumentNodeFactory::DumpCondition (size_t id,
 {
   if (currentOut)
   {
-    currentOut->AppendFmt ("condition %zu = '", id);
+    switch (id)
+    {
+      case csCondAlwaysTrue:
+	currentOut->AppendFmt ("condition \"always true\" = '");
+	break;
+      case csCondAlwaysFalse:
+	currentOut->AppendFmt ("condition \"always false\" = '");
+	break;
+      default:
+        currentOut->AppendFmt ("condition %zu = '", id);
+    }
     currentOut->Append (condStr, condLen);
     currentOut->Append ("'\n");
   }
