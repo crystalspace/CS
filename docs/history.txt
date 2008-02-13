@@ -21,6 +21,9 @@ chronological order.
 	- res changed csShaderVariable::SetArraySize() to set the SV type to
 	  ARRAY (analogue to the other Set* functions which also set the
 	  type).
+	- res added some helpers to deal with SV arrays. One simplifies
+	  parsing names with indices such as "myshadervar[23]", the other
+	  provides a convenient method to access nested arrays.
 12-Feb-2008
 	- caedes fixed python override of Graphics2D::PerformExtension to
 	  allow command passthrough to the real c++ PerformExtension.
