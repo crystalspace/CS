@@ -11,9 +11,9 @@
 	- other lights if they are not attenuated LINEAR
 	Further, CS spotlights dont exactly map to GL ones...
 	So for now, GL fixed function spots look slightly off. ?>
-    <?if ((vars."light $N$ type".int == consts.CS_LIGHT_DIRECTIONAL)
-	&& (vars."light $N$ attenuation mode".int == consts.CS_ATTN_NONE)) 
-      || (vars."light $N$ attenuation mode".int != consts.CS_ATTN_LINEAR) ?>
+    <?if ((vars."light type[$N$]".int == consts.CS_LIGHT_DIRECTIONAL)
+	&& (vars."light attenuation mode[$N$]".int == consts.CS_ATTN_NONE)) 
+	|| (vars."light attenuation mode[$N$]".int != consts.CS_ATTN_LINEAR) ?>
   <?Endtemplate?>
 
   <?Template ifNotGLSupportsLight N?>
@@ -22,10 +22,10 @@
   <?Endtemplate?>
   
   <?Template HandleLightFVP LightCount N?>
-    <?if $LightCount$ &gt; $N$ ?>
+    <?if (vars."light count".int &gt; $N$) && ($LightCount$ &gt; $N$) ?>
       <?ifGLSupportsLight $N$ ?>
 	<light num="$N$">
-	  <?if (vars."light $N$ type".int == consts.CS_LIGHT_DIRECTIONAL)?>
+	  <?if (vars."light type[$N$]".int == consts.CS_LIGHT_DIRECTIONAL)?>
 	    <?! Generate position for directional light ?>
 	    <position type="expression">
 	      <!-- small subtlety: GL spec says light coordinates are in
@@ -35,22 +35,22 @@
 		   CS sets up transforms. -->
 	      <sexp>
 		(* (make-vector 
-		     (elt1 "light $N$ direction world")
-		     (elt2 "light $N$ direction world")
-		     (elt3 "light $N$ direction world")
+		     (elt1 "light direction world[$N$]")
+		     (elt2 "light direction world[$N$]")
+		     (elt3 "light direction world[$N$]")
 		     0)
 		   -1)
 	      </sexp>
 	    </position>
 	    <!--attenuation type="vector3">1,0,0</attenuation-->
-	  <?elsif (vars."light $N$ type".int == consts.CS_LIGHT_SPOTLIGHT)?>
+	  <?elsif (vars."light type[$N$]".int == consts.CS_LIGHT_SPOTLIGHT)?>
 	    <spotcutoff type="expression">
 	      <!-- CS falloff is cosine of angle, GL wants angle -->
-	      <sexp>(* (arccos (min 1 "light $N$ outer falloff") ) 57.295779513082320876798154814105)</sexp>
+	      <sexp>(* (arccos (min 1 "light outer falloff[$N$]") ) 57.295779513082320876798154814105)</sexp>
 	      <!-- 57.295... = 180/PI -->
 	    </spotcutoff>
 	  <?endif?>
-	  <?if (vars."light $N$ type".int != consts.CS_LIGHT_SPOTLIGHT)?>
+	  <?if (vars."light type[$N$]".int != consts.CS_LIGHT_SPOTLIGHT)?>
 	    <!-- Override any falloff of the light -->
 	    <spotcutoff type="float">180</spotcutoff>
 	  <?endif?>
@@ -60,10 +60,12 @@
   <?Endtemplate?>
   
   <?Template HandleLightVProc LightCount N?>
-    <?if $LightCount$ &gt; $N$ ?>
+    <?if (vars."light count".int &gt; $N$) && ($LightCount$ &gt; $N$) ?>
       <?!ifGLSupportsLight $N$ ?>
 	<enablelight num="$N$">no</enablelight>
       <?!endif?>
+    <?else?>
+      <enablelight num="$N$">no</enablelight>
     <?endif?>
   <?Endtemplate?>
   
@@ -98,7 +100,7 @@
          for the specular part... [res] -->
     <colormixmode>none</colormixmode>
     <finalfactor type="float">0.5</finalfactor>
-    <lights>$N$</lights>
+    <lights>8</lights>
     <?Generate L 0 7 ?>
       <?HandleLightVProc $N$ $$L$$ ?>
     <?Endgenerate?>
