@@ -44,13 +44,22 @@ public:
     lightDiffuse = 0,
     /// Specular color
     lightSpecular,
-    /// Position (object space)
+    /**
+     * Position (object space)
+     * \deprecated Deprecated in 1.3.
+     */
     lightPosition,
-    /// Position (camera space)
+    /**
+     * Position (camera space)
+     * \deprecated Deprecated in 1.3.
+     */
     lightPositionCamera,
     /// Position (world space)
     lightPositionWorld,
-    /// Transform (camera space)
+    /**
+     * Transform (camera space)
+     * \deprecated Deprecated in 1.3.
+     */
     lightTransformCamera,
     /// Transform (world space)
     lightTransformWorld,
@@ -58,9 +67,15 @@ public:
     lightAttenuation,
     /// Attenuation texture
     lightAttenuationTex,
-    /// Direction (object space)
+    /**
+     * Direction (object space)
+     * \deprecated Deprecated in 1.3.
+     */
     lightDirection,
-    /// Direction (camera space)
+    /**
+     * Direction (camera space)
+     * \deprecated Deprecated in 1.3.
+     */
     lightDirectionCamera,
     /// Direction (world space)
     lightDirectionWorld,

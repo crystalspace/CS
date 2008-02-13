@@ -43,6 +43,8 @@ chronological order.
 	  SV in the destination SV stack when there's actually a variable to
 	  merge into.
 	- res made lights provide the light SVs in their own SV context.
+	- res deprecated all light SVs in other spaces than world (shaders etc.
+	  should be able to compute all other spaces with only little effort).
 12-Feb-2008
 	- caedes fixed python override of Graphics2D::PerformExtension to
 	  allow command passthrough to the real c++ PerformExtension.
