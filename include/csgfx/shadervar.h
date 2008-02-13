@@ -477,6 +477,7 @@ public:
   /// Set the number of elements in an array variable
   void SetArraySize (size_t size)
   {
+    Type = ARRAY;
     if (shaderVarArray == 0)
     {
       shaderVarArray = AllocateShaderVarArray();

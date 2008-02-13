@@ -18,6 +18,9 @@ chronological order.
 	  some conditions being wrongly determined to be "always true" or
 	  "always false".
 	- res did some more iStringSet->iShaderVarStringSet fixes in apps.
+	- res changed csShaderVariable::SetArraySize() to set the SV type to
+	  ARRAY (analogue to the other Set* functions which also set the
+	  type).
 12-Feb-2008
 	- caedes fixed python override of Graphics2D::PerformExtension to
 	  allow command passthrough to the real c++ PerformExtension.
