@@ -41,6 +41,16 @@
  */
 struct csLightProperties
 {
+protected:
+  csShaderVariable* LookupSVArrayItem (const csShaderVariableStack& stack,
+    CS::ShaderVarStringID id, size_t index)
+  {
+    csShaderVariable* sv;
+    if ((stack.GetSize () > id) && ((sv = stack[id]) != 0))
+      return sv->GetArrayElement (index);
+    return 0;
+  }
+public:
   /// Attenuation coefficients (for CLQ attenuation)
   csVector3 attenuationConsts;
   /// Light position (object space)
@@ -70,60 +80,59 @@ struct csLightProperties
    * variables.
    */
   csLightProperties (size_t lightNum, csLightShaderVarCache& svcache,
-    const csShaderVariableStack& stack)
+    const csShaderVariableStack& stack,
+    const csReversibleTransform& objectToWorld = csReversibleTransform ())
   {
     CS::ShaderVarStringID id;
     csShaderVariable* sv;
+    csVector3 tmp;
 
-    id = svcache.GetLightSVId (lightNum, 
-      csLightShaderVarCache::lightAttenuation);
-    if ((stack.GetSize () > id) && ((sv = stack[id]) != 0))
+    id = svcache.GetLightSVId (csLightShaderVarCache::lightAttenuation);
+    if (((sv = LookupSVArrayItem (stack, id, lightNum)) != 0))
       sv->GetValue (attenuationConsts);
 
-    id = svcache.GetLightSVId (lightNum, 
-      csLightShaderVarCache::lightPosition);
-    if ((stack.GetSize () > id) && ((sv = stack[id]) != 0))
-      sv->GetValue (posObject);
+    id = svcache.GetLightSVId (csLightShaderVarCache::lightPositionWorld);
+    if (((sv = LookupSVArrayItem (stack, id, lightNum)) != 0))
+    {
+      sv->GetValue (tmp);
+      posObject = objectToWorld.Other2This (tmp);
+    }
 
-    id = svcache.GetLightSVId (lightNum, 
-      csLightShaderVarCache::lightDirection);
-    if ((stack.GetSize () > id) && ((sv = stack[id]) != 0))
-      sv->GetValue (dirObject);
+    id = svcache.GetLightSVId (csLightShaderVarCache::lightDirectionWorld);
+    if (((sv = LookupSVArrayItem (stack, id, lightNum)) != 0))
+    {
+      sv->GetValue (tmp);
+      dirObject = objectToWorld.Other2ThisRelative (tmp);
+    }
 
-    id = svcache.GetLightSVId (lightNum, 
-      csLightShaderVarCache::lightDiffuse);
-    if ((stack.GetSize () > id) && ((sv = stack[id]) != 0))
+    id = svcache.GetLightSVId (csLightShaderVarCache::lightDiffuse);
+    if (((sv = LookupSVArrayItem (stack, id, lightNum)) != 0))
       sv->GetValue (color);
 
-    id = svcache.GetLightSVId (lightNum, 
-      csLightShaderVarCache::lightInnerFalloff);
-    if ((stack.GetSize () > id) && ((sv = stack[id]) != 0))
+    id = svcache.GetLightSVId (csLightShaderVarCache::lightInnerFalloff);
+    if (((sv = LookupSVArrayItem (stack, id, lightNum)) != 0))
       sv->GetValue (spotFalloffInner);
 
-    id = svcache.GetLightSVId (lightNum, 
-      csLightShaderVarCache::lightOuterFalloff);
-    if ((stack.GetSize () > id) && ((sv = stack[id]) != 0))
+    id = svcache.GetLightSVId (csLightShaderVarCache::lightOuterFalloff);
+    if (((sv = LookupSVArrayItem (stack, id, lightNum)) != 0))
       sv->GetValue (spotFalloffOuter);
 
     int t = CS_LIGHT_POINTLIGHT;
-    id = svcache.GetLightSVId (lightNum, 
-      csLightShaderVarCache::lightType);
-    if ((stack.GetSize () > id) && ((sv = stack[id]) != 0))
+    id = svcache.GetLightSVId (csLightShaderVarCache::lightType);
+    if (((sv = LookupSVArrayItem (stack, id, lightNum)) != 0))
       sv->GetValue (t);
     type = (csLightType)t;
 
     t = CS_ATTN_NONE;
-    id = svcache.GetLightSVId (lightNum, 
-      csLightShaderVarCache::lightAttenuationMode);
-    if ((stack.GetSize () > id) && ((sv = stack[id]) != 0))
+    id = svcache.GetLightSVId (csLightShaderVarCache::lightAttenuationMode);
+    if (((sv = LookupSVArrayItem (stack, id, lightNum)) != 0))
       sv->GetValue (t);
     attenuationMode = (csLightAttenuationMode)t;
   
-    id = svcache.GetLightSVId (lightNum, 
-      csLightShaderVarCache::lightSpecular);
-    if ((stack.GetSize () > id) && ((sv = stack[id]) != 0))
+    id = svcache.GetLightSVId (csLightShaderVarCache::lightSpecular);
+    if (((sv = LookupSVArrayItem (stack, id, lightNum)) != 0))
       sv->GetValue (specular);
-}
+  }
 };
 
 /**
