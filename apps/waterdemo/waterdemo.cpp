@@ -440,8 +440,8 @@ bool csWaterDemo::Initialize ()
     csQueryRegistryTagInterface<iStringSet> 
     (object_reg, "crystalspace.shared.stringset");
 
-  csRef<iStringSet> stringsSvName = 
-    csQueryRegistryTagInterface<iStringSet> 
+  csRef<iShaderVarStringSet> stringsSvName = 
+    csQueryRegistryTagInterface<iShaderVarStringSet> 
     (object_reg, "crystalspace.shader.variablenameset");
 
   //get a custom renderloop
