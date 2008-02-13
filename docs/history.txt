@@ -48,6 +48,8 @@ chronological order.
 	- res updated vertexlight.h's csLightProperties to only use world space
 	  coords.
 	- res made csShaderVariableStack copyable.
+	- res changed the RM light setup step to use the light's own SVs with
+	  light info.
 12-Feb-2008
 	- caedes fixed python override of Graphics2D::PerformExtension to
 	  allow command passthrough to the real c++ PerformExtension.

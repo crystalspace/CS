@@ -267,7 +267,6 @@ bool RMTest1::Initialize(iObjectRegistry* objectReg)
   postEffects.Initialize (objectReg);
   
   portalPersistent.Initialize (shaderManager, g3d);
-  lightPersistent.Initialize (svNameStringSet);
 
   /*csRef<iLoader> loader = csQueryRegistry<iLoader> (objectReg);  
   csRef<iShader> desatShader = loader->LoadShader ("/shader/desaturate.xml");

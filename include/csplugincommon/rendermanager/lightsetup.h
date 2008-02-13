@@ -52,13 +52,11 @@ namespace RenderManager
 
     void operator() (typename RenderTree::MeshNode* node)
     {
-      csReversibleTransform& camTransR = node->owner.cameraTransform;
+      persist.svKeeper.Empty();
       
       for (size_t i = 0; i < node->meshes.GetSize (); ++i)
       {
         typename RenderTree::MeshNode::SingleMesh& mesh = node->meshes[i];
-        csReversibleTransform objT;
-        mesh.svObjectToWorld->GetValue (objT);
         
 	for (size_t layer = 0; layer < layerConfig.GetLayerCount (); ++layer)
         {
@@ -69,24 +67,29 @@ namespace RenderManager
           const size_t numLights = lightmgr->GetRelevantLights (node->owner.sector,
             mesh.bbox, persist.influences, numRelevantLights);
 	
-	  csShaderVariableStack lightSVs;
-	  lightSVs.Setup (svArrays.GetNumSVNames ());
-          csShaderVariable* lightNum =
-            new csShaderVariable (persist.svNames.GetDefaultSVId (
+	  csShaderVariableStack localStack;
+	  svArrays.SetupSVStack (localStack, layer, mesh.contextLocalId);
+
+          csRef<csShaderVariable> lightNum = persist.svAlloc.Alloc();
+          lightNum->SetName (persist.svNames.GetDefaultSVId (
               csLightShaderVarCache::varLightCount));
           lightNum->SetValue ((int)numLights);
-          lightSVs[lightNum->GetName()] = lightNum;
+          localStack[lightNum->GetName()] = lightNum;
+          persist.svKeeper.Push (lightNum);
 
 	  for (size_t l = numLights; l-- > 0; )
 	  {
-            csShaderVariableStack thisLightSVs;
-	    thisLightSVs.Setup (svArrays.GetNumSVNames ());
-	    SetLightSVs (thisLightSVs, persist.influences[l].light, camTransR, objT);
-            MergeAsArrayItems (lightSVs, thisLightSVs, l);
+            const csRefArray<csShaderVariable>** thisLightSVs =
+              persist.lightDataCache.GetElementPointer (persist.influences[l].light);
+            if (thisLightSVs == 0)
+            {
+              thisLightSVs = &persist.lightDataCache.Put (
+                persist.influences[l].light, 
+                &(persist.influences[l].light->GetSVContext()->GetShaderVariables()));
+            }
+
+            MergeAsArrayItems (localStack, **thisLightSVs, l);
 	  }
-	  csShaderVariableStack localStack;
-	  svArrays.SetupSVStack (localStack, layer, mesh.contextLocalId);
-	  localStack.MergeBack (lightSVs);
 	}
       }
     }
@@ -96,20 +99,17 @@ namespace RenderManager
       csLightInfluence* influences;
       size_t numInfluences;
       csLightShaderVarCache svNames;
+      csHash<const csRefArray<csShaderVariable>*, csPtrKey<iLight> > lightDataCache;
+      csShaderVarBlockAlloc<> svAlloc;
+      /* A number of SVs have to be kept alive even past the expiration
+       * of the actual step */
+      csRefArray<csShaderVariable> svKeeper;
       
       PersistentData () : influences (0), numInfluences (0) {}
-      ~PersistentData() { delete[] influences; }
-      
-      void Initialize (iShaderVarStringSet* strings)
+      ~PersistentData()
       {
-	svNames.SetStrings (strings);
-
-        /* Generate light SV IDs - that way, space for them will be reserved
-         * when shader stacks are set up */
-	for (int p = 0; p < csLightShaderVarCache::_lightCount; p++)
-	{
-	  svNames.GetLightSVId (csLightShaderVarCache::LightProperty (p));
-	}
+        delete[] influences; 
+        if (lcb.IsValid()) lcb->parent = 0;
       }
       
       void ReserveInfluences (size_t num)
@@ -122,136 +122,71 @@ namespace RenderManager
           // @@@ Shrink later?
         }
       }
+
+      iLightCallback* GetLightCallback()
+      {
+        if (!lcb.IsValid()) lcb.AttachNew (new LightCallback (this));
+        return lcb;
+      }
+    protected:
+      class LightCallback : public scfImplementation1<LightCallback, 
+                                                      iLightCallback>
+      {
+      public:
+        PersistentData* parent;
+
+        LightCallback (PersistentData* parent)
+          : scfImplementation1<LightCallback, iLightCallback> (this),
+            parent (parent) {}
+
+	void OnColorChange (iLight* light, const csColor& newcolor) { }
+	void OnPositionChange (iLight* light, const csVector3& newpos) { }
+	void OnSectorChange (iLight* light, iSector* newsector) { }
+	void OnRadiusChange (iLight* light, float newradius) { }
+	void OnDestroy (iLight* light)
+        {
+          if (parent != 0)
+          {
+            parent->lightDataCache.DeleteAll (light);
+          }
+        }
+	void OnAttenuationChange (iLight* light, int newatt) { }
+      };
+      csRef<LightCallback> lcb;
     };
   private:
     PersistentData& persist;
     iLightManager* lightmgr;
     SVArrayHolder& svArrays; 
     const LayerConfigType& layerConfig;
-    csRefArray<csShaderVariable> svKeeper;
     
     csShaderVariable* GetNewSV (csShaderVariableStack& stack, CS::ShaderVarStringID name)
     {
-      csShaderVariable* sv = new csShaderVariable (name);
-      svKeeper.Push (sv);
+      //if ((name < stack.GetSize()) && stack[name]) return stack[name];
+
+      csRef<csShaderVariable> sv (persist.svAlloc.Alloc());
+      sv->SetName (name);
+      persist.svKeeper.Push (sv);
       if (name < stack.GetSize()) stack[name] = sv;
       return sv;
     }
     
-    void SetLightSVs (csShaderVariableStack& stack, 
-		      iLight* light, 
-		      const csReversibleTransform& camTransR,
-		      const csReversibleTransform &objT)
-    {
-      csLightShaderVarCache& lsvCache = persist.svNames;
-    
-      // @@@ FIXME: probably use arrays for light SVs
-      // Light TF, this == object, other == world
-      const csReversibleTransform& lightT = 
-	light->GetMovable ()->GetFullTransform ();
-    
-      csRef<csShaderVariable> sv;
-      sv = GetNewSV (stack, lsvCache.GetLightSVId (
-	 csLightShaderVarCache::lightDiffuse));
-      const csColor& color = light->GetColor ();
-      sv->SetValue (csVector3 (color.red, color.green, color.blue));
-    
-      sv = GetNewSV (stack, lsvCache.GetLightSVId (
-	  csLightShaderVarCache::lightSpecular));
-      const csColor& specular = light->GetSpecularColor ();
-      sv->SetValue (csVector3 (specular.red, specular.green, specular.blue));
-    
-    
-      const csVector3& lightPosW = lightT.GetOrigin();
-      sv = GetNewSV (stack, lsvCache.GetLightSVId (
-	  csLightShaderVarCache::lightPositionCamera));
-      sv->SetValue (lightPosW * camTransR);
-    
-      sv = GetNewSV (stack, lsvCache.GetLightSVId (
-	  csLightShaderVarCache::lightPosition));
-      sv->SetValue (objT.Other2This (lightPosW));
-    
-      sv = GetNewSV (stack, lsvCache.GetLightSVId (
-	  csLightShaderVarCache::lightPositionWorld));
-      sv->SetValue (lightPosW);
-    
-    
-      //const csVector3 lightDirW = 
-	//lightT.This2OtherRelative (light->GetDirection ());
-      // @@@ Jorrit: check the following! Untested!
-      const csVector3 lightDirW = 
-	lightT.This2OtherRelative (csVector3 (0, 0, 1));
-    
-      if (!lightDirW.IsZero())
-      {
-	sv = GetNewSV (stack, lsvCache.GetLightSVId (
-	    csLightShaderVarCache::lightDirectionWorld));
-	sv->SetValue (lightDirW.Unit());
-    
-	sv = GetNewSV (stack, lsvCache.GetLightSVId (
-	    csLightShaderVarCache::lightDirection));
-	sv->SetValue (objT.Other2ThisRelative (lightDirW).Unit());
-    
-	sv = GetNewSV (stack, lsvCache.GetLightSVId (
-	    csLightShaderVarCache::lightDirectionCamera));
-	sv->SetValue (camTransR.Other2ThisRelative (lightDirW).Unit());
-      }
-    
-    
-      float falloffInner, falloffOuter;
-      light->GetSpotLightFalloff (falloffInner, falloffOuter);
-    
-      sv = GetNewSV (stack, lsvCache.GetLightSVId (
-	  csLightShaderVarCache::lightInnerFalloff));
-      sv->SetValue (falloffInner);
-    
-      sv = GetNewSV (stack, lsvCache.GetLightSVId (
-	  csLightShaderVarCache::lightOuterFalloff));
-      sv->SetValue (falloffOuter);
-    
-    
-      sv = GetNewSV (stack, lsvCache.GetLightSVId (
-	  csLightShaderVarCache::lightAttenuation));
-      csLightAttenuationMode attnMode = light->GetAttenuationMode ();
-      if (attnMode == CS_ATTN_LINEAR)
-      {
-	float r = light->GetAttenuationConstants ().x;
-	sv->SetValue (csVector3(r, 1/r, 0));
-      }
-      else
-      {
-	sv->SetValue (light->GetAttenuationConstants ());
-      }
-    
-      sv = GetNewSV (stack, lsvCache.GetLightSVId (
-	  csLightShaderVarCache::lightAttenuationMode));
-      sv->SetValue ((int)attnMode);
-    
-      sv = GetNewSV (stack, lsvCache.GetLightSVId (
-	  csLightShaderVarCache::lightType));
-      sv->SetValue ((int)light->GetType());
-    
-      sv = GetNewSV (stack, lsvCache.GetLightSVId (
-	  csLightShaderVarCache::lightAttenuationTex));
-      //sv->SetAccessor (GetLightAccessor (light));
-      /*if (!attTex.IsValid())
-	attTex = GetAttenuationTexture (attnMode);
-      sv->SetValue (attTex);*/
-    }
-
     void MergeAsArrayItems (csShaderVariableStack& dst, 
-      const csShaderVariableStack& src, size_t num)
+      const csRefArray<csShaderVariable>& allVars, size_t index)
     {
-      for (size_t v = 0; v < src.GetSize(); v++)
+      for (size_t v = 0; v < allVars.GetSize(); v++)
       {
-        csShaderVariable*& dstVar = dst[v];
-        if (src[v] == 0) continue;
+        csShaderVariable* sv = allVars[v];
+        CS::ShaderVarStringID name = sv->GetName();
+        
+        if (name >= dst.GetSize()) break;
+        csShaderVariable*& dstVar = dst[name];
 
-        if (dstVar == 0) dstVar = new csShaderVariable (v);
+        if (dstVar == 0) dstVar = new csShaderVariable (name);
         if ((dstVar->GetType() != csShaderVariable::UNKNOWN)
           && (dstVar->GetType() != csShaderVariable::ARRAY)) continue;
-        dstVar->SetArraySize (csMax (num+1, dstVar->GetArraySize()));
-        dstVar->SetArrayElement (num, src[v]);
+        dstVar->SetArraySize (csMax (index+1, dstVar->GetArraySize()));
+        dstVar->SetArrayElement (index, sv);
       }
     }
   };
