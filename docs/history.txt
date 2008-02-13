@@ -25,6 +25,8 @@ chronological order.
 	- caedes fixed phystut jamfile so it will get built if either bullet
 	  or ode are available (before it would be built only depending on
 	  whether ode was available).
+	- caedes enhanced phystut to report its own command line options on
+	  '--help' besides crystalspace options.
 12-Feb-2008
 	- caedes fixed python override of Graphics2D::PerformExtension to
 	  allow command passthrough to the real c++ PerformExtension.

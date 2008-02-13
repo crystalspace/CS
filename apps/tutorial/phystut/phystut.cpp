@@ -267,6 +267,10 @@ bool Simple::Initialize ()
   // Check for commandline help.
   if (csCommandLineHelper::CheckHelp (object_reg))
   {
+    csPrintf ("Usage: phystut [OPTIONS]\n");
+    csPrintf ("Physics tutorial for crystalspace\n\n");
+    csPrintf ("Options for phystut:\n");
+    csPrintf ("  -phys_engine:      specify which physics plugin to use\n");
     csCommandLineHelper::Help (object_reg);
     return false;
   }
