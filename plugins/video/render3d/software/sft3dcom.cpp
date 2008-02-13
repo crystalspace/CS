@@ -766,9 +766,7 @@ bool csSoftwareGraphics3DCommon::SetRenderTarget (iTextureHandle* handle,
 {
   if (attachment != rtaColor0) return false;
 
-  render_target = handle;
   rt_onscreen = !persistent;
-  rt_cliprectset = false;
 
   if (handle)
   {
@@ -781,25 +779,32 @@ bool csSoftwareGraphics3DCommon::SetRenderTarget (iTextureHandle* handle,
     tex_mm->flags |= CS_TEXTURE_NOMIPMAPS;
     tex_mm->DeleteMipmaps ();
 
-    GetDriver2D()->GetClipRect (rt_old_minx, rt_old_miny, 
-      rt_old_maxx, rt_old_maxy);
-    if ((rt_old_minx != 0) && (rt_old_miny != 0)
-      && (rt_old_maxx != txt_w) && (rt_old_maxy != txt_h))
+    if (render_target == 0)
     {
-      GetDriver2D()->SetClipRect (0, 0, txt_w, txt_h);
+      GetDriver2D()->GetClipRect (rt_old_minx, rt_old_miny, 
+	rt_old_maxx, rt_old_maxy);
+      if ((rt_old_minx != 0) && (rt_old_miny != 0)
+	&& (rt_old_maxx != txt_w) && (rt_old_maxy != txt_h))
+      {
+	GetDriver2D()->SetClipRect (0, 0, txt_w, txt_h);
+      }
     }
 
     SetDimensions (txt_w, txt_h);
   }
   else
   {
-    GetDriver2D()->PerformExtension ("vp_reset");
-    GetDriver2D()->SetClipRect (rt_old_minx, rt_old_miny, 
-      rt_old_maxx, rt_old_maxy);
-
-    SetDimensions (G2D->GetWidth(), G2D->GetHeight());
+    if (render_target != 0)
+    {
+      GetDriver2D()->PerformExtension ("vp_reset");
+      GetDriver2D()->SetClipRect (rt_old_minx, rt_old_miny, 
+	rt_old_maxx, rt_old_maxy);
+  
+      SetDimensions (G2D->GetWidth(), G2D->GetHeight());
+    }
   }
   
+  render_target = handle;
   return true;
 }
   

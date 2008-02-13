@@ -27,6 +27,8 @@ chronological order.
 	  whether ode was available).
 	- caedes enhanced phystut to report its own command line options on
 	  '--help' besides crystalspace options.
+	- res fixed setting of the '0' render target in soft3d when no render
+	  target is set.
 12-Feb-2008
 	- caedes fixed python override of Graphics2D::PerformExtension to
 	  allow command passthrough to the real c++ PerformExtension.
