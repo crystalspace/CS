@@ -14,6 +14,9 @@ chronological order.
           new versions that return an instance of csLoadResult.
 	- res changed the font cache to set the pixel storage through the
 	  state cache as well.
+	- res fixed a copy and paste bug in xmlshader which could result in
+	  some conditions being wrongly determined to be "always true" or
+	  "always false".
 12-Feb-2008
 	- caedes fixed python override of Graphics2D::PerformExtension to
 	  allow command passthrough to the real c++ PerformExtension.
