@@ -446,6 +446,21 @@
 	<usecfg>disableMipmapGeneration</usecfg>
       </applicable>
     </rule>
+
+    <!-- Texture compression is broken on this card under OSX. As a result
+         the OSX distribution of Planeshift to disable texture compression
+         by default for all.
+    -->
+    <rule description="Intel GMA 950 on OSX">
+      <conditions>
+	<regexp string="renderer" pattern="^Intel GMA 950" />
+	<regexp string="platform" pattern="MacOS/X" />
+      </conditions>
+      <applicable>
+	<usecfg>disableTC</usecfg>
+      </applicable>
+    </rule>
+
     
     <rule description="ATI: Can't handle GL_BLEND texenv for GL_INTENSITY textures">
       <conditions>
