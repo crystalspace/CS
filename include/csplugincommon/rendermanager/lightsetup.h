@@ -112,6 +112,11 @@ namespace RenderManager
         if (lcb.IsValid()) lcb->parent = 0;
       }
       
+      void Initialize (iShaderVarStringSet* strings)
+      {
+	svNames.SetStrings (strings);
+      }
+      
       void ReserveInfluences (size_t num)
       {
         if (num > numInfluences)

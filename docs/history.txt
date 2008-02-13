@@ -52,6 +52,8 @@ chronological order.
 	  light info.
 	- res fixed a crash in xmlshader when not all indices of arrayed SVs
 	  were used.
+	- res undid the wrong removal of the light SV name cache from the RM
+	  light setup step.
 12-Feb-2008
 	- caedes fixed python override of Graphics2D::PerformExtension to
 	  allow command passthrough to the real c++ PerformExtension.
