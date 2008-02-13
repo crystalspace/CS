@@ -32,6 +32,8 @@ chronological order.
 	- res switched the glshader_fixed plugin to use light SV names without
 	  arrays and instead access the data for a specific light through
 	  an array item.
+	- res switched the RM light setup step to use SV arrays for multiple
+	  light data instead of numbered SV names.
 12-Feb-2008
 	- caedes fixed python override of Graphics2D::PerformExtension to
 	  allow command passthrough to the real c++ PerformExtension.
