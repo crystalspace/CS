@@ -329,7 +329,7 @@ public:
   }
 
   /**
-   * h["key"] shorthand notation for h.GetElementPoint ("key")
+   * h["key"] shorthand notation for h.GetElementPointer ("key")
    */
   T* operator[] (const K& key)
   {
