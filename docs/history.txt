@@ -39,6 +39,9 @@ chronological order.
 	- res removed the hardcoded layer number from the GL state cache.
 	  Instead, layer-specific data is stored in dynamically allocated
 	  arrays, sized to the actuall number of texture resp. image units.
+	- res fixed "array merging" in the light setup step to only create an
+	  SV in the destination SV stack when there's actually a variable to
+	  merge into.
 12-Feb-2008
 	- caedes fixed python override of Graphics2D::PerformExtension to
 	  allow command passthrough to the real c++ PerformExtension.

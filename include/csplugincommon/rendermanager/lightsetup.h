@@ -245,6 +245,7 @@ namespace RenderManager
       for (size_t v = 0; v < src.GetSize(); v++)
       {
         csShaderVariable*& dstVar = dst[v];
+        if (src[v] == 0) continue;
 
         if (dstVar == 0) dstVar = new csShaderVariable (v);
         if ((dstVar->GetType() != csShaderVariable::UNKNOWN)
