@@ -421,6 +421,7 @@ private:
   };
   GLint numImageUnits;
   ImageUnit* imageUnits;
+  GLint numTCUnits;
 
   /// Whether the alpha channel of the color buffer should be scaled.
   bool needColorFixup;

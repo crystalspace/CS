@@ -946,12 +946,11 @@ bool csGLGraphics3D::Open ()
 
   statecache->SetStencilMask (stencil_shadow_mask);
 
-  if (ext->CS_GL_ARB_fragment_program)
-    glGetIntegerv (GL_MAX_TEXTURE_IMAGE_UNITS_ARB, &numImageUnits);
-  else if (ext->CS_GL_ARB_multitexture)
-    glGetIntegerv (GL_MAX_TEXTURE_UNITS_ARB, &numImageUnits);
+  numImageUnits = statecache->GetNumImageUnits();
+  if (ext->CS_GL_ARB_multitexture)
+    glGetIntegerv (GL_MAX_TEXTURE_UNITS_ARB, &numTCUnits);
   else
-    numImageUnits = 1;
+    numTCUnits = 1;
   imageUnits = new ImageUnit[numImageUnits];
   if (verbose)
     Report (CS_REPORTER_SEVERITY_NOTIFY, 
@@ -1508,7 +1507,7 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
       statecache->Disable_GL_SECONDARY_COLOR_ARRAY_EXT ();
     if (ext->CS_GL_ARB_multitexture)
     {
-      for (i = CS_GL_MAX_LAYER; i-- > 0;)
+      for (i = numTCUnits; i-- > 0;)
       {
         statecache->SetCurrentTU (i);
         statecache->Disable_GL_TEXTURE_COORD_ARRAY ();

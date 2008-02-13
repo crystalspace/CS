@@ -36,6 +36,9 @@ chronological order.
 	  light data instead of numbered SV names.
 	- res updated the vproc_fixed shader to use array SVs instead of
 	  numbered SV names.
+	- res removed the hardcoded layer number from the GL state cache.
+	  Instead, layer-specific data is stored in dynamically allocated
+	  arrays, sized to the actuall number of texture resp. image units.
 12-Feb-2008
 	- caedes fixed python override of Graphics2D::PerformExtension to
 	  allow command passthrough to the real c++ PerformExtension.
