@@ -123,7 +123,7 @@ static void trimwhite (char*& s)
   }
 }
 
-static bool get2args (char *command, char *args, char *&arg1, char *&arg2,
+static bool get2args (const char *command, char *args, char *&arg1, char *&arg2,
   bool req2nd = true)
 {
   if (!args)

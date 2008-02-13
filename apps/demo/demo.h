@@ -81,7 +81,7 @@ public:
 
 private:
   void GfxWrite (int x, int y, int fg, int bg, const char *str, ...);
-  void FileWrite (iFile* file, char *str, ...);
+  void FileWrite (iFile* file, const char *str, ...);
 
   void DrawEditInfo ();
 

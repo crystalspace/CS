@@ -46,7 +46,7 @@
 
 CS_IMPLEMENT_APPLICATION
 
-char *programversion = "0.0.1";
+const char *programversion = "0.0.1";
 char *programname;
 csRef<iImageIO> ImageLoader;
 

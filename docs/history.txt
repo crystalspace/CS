@@ -19,6 +19,7 @@ chronological order.
 	  "always false".
 	- res changed csApplicationFramework::SetApplicationName() to take
 	  a const char* instead of a char*.
+	- res made some char* -> const char* in apps.
 12-Feb-2008
 	- caedes fixed python override of Graphics2D::PerformExtension to
 	  allow command passthrough to the real c++ PerformExtension.
