@@ -178,7 +178,7 @@ bool SndTest::LoadSound ()
   printf("=== iSndSysData format informations ===\n");
   printf("Format      : %d bits, %d channel(s), %d Hz\n",
         format->Bits, format->Channels, format->Freq);
-  printf("Sample Size : %d bytes, %d frames\n", snddata->GetDataSize (),
+  printf("Sample Size : %zu bytes, %zu frames\n", snddata->GetDataSize (),
         snddata->GetFrameCount ());
   printf("Description : %s\n", snddata->GetDescription ());
   fflush(stdout);
@@ -192,7 +192,7 @@ bool SndTest::LoadSound ()
   printf("=== iSndSysStream \"rendered\" format informations ===\n");
   printf("Format      : %d bits, %d channel(s), %d Hz\n",
         rformat->Bits, rformat->Channels, rformat->Freq);
-  printf("Stream Size : %d frames\n", sndstream->GetFrameCount ());
+  printf("Stream Size : %zu frames\n", sndstream->GetFrameCount ());
   printf("Description : %s\n", sndstream->GetDescription ());
   fflush(stdout);
 

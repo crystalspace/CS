@@ -86,7 +86,6 @@ namespace genmeshify
       }
       else
       {
-        iBase* result;
 	csLoadResult rc;
 	rc = app->loader->Load (root);
         if (!rc.success) return false;

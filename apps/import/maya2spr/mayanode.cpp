@@ -1167,7 +1167,7 @@ bool NodeAnimCurveTL::LoadAttr(MayaInputFile& file)
 
 bool NodeAnimCurveTL::LoadCurveAttr(MayaInputFile& file)
 {
-  char *coords = "xyz";
+  const char *coords = "xyz";
   csPrintf("Processing %d frame anim curve for %c coord of vertex %d.\n",frames,coords[coord],index);
 
   csString tok;

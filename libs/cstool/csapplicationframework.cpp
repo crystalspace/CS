@@ -27,7 +27,7 @@
 // Static 
 iObjectRegistry* csApplicationFramework::object_reg = 0;
 csApplicationFramework* csApplicationFramework::m_Ptr = 0;
-char* csApplicationFramework::m_ApplicationStringName = 0;
+const char* csApplicationFramework::m_ApplicationStringName = 0;
 const char* csApplicationFramework::m_FoundationStringName =
   "crystalspace.libcsappframe";
 
