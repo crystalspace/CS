@@ -10,6 +10,8 @@ chronological order.
         - Jorrit deprecated the Load() functions in iLoader that accept a
           iBase* result return parameter. Instead there are now three
           new versions that return an instance of csLoadResult.
+	- res changed the font cache to set the pixel storage through the
+	  state cache as well.
 12-Feb-2008
 	- caedes fixed python override of Graphics2D::PerformExtension to
 	  allow command passthrough to the real c++ PerformExtension.
