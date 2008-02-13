@@ -1,5 +1,7 @@
 1.2 branch log.
 
+13-Feb-2008
+	- varslot+res merged r28662, r28663 into 1.2 (gldriver.xml updates).
 3-Feb-2008
 	- Vincent merged r28601 into 1.2 (fix for #449, "short" (h) and
 	  "short short" (hh) formatting).
