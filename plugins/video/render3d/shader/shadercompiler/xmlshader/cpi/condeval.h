@@ -436,6 +436,14 @@ protected:
   
   static void MergeValuesInto (ValuesWrapper& dst, const ValuesWrapper& src)
   {
+     // Subarrays may not have all items defined.
+    if (dst == 0) return;
+    if (src == 0)
+    {
+      dst.AsRef().Invalidate();
+      return;
+    }
+    
     *dst |= *src;
     size_t numIndices = csMin (dst.subValues.GetSize(), src.subValues.GetSize());
     for (size_t s = 0; s < numIndices; s++)
