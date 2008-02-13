@@ -776,8 +776,8 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
 	      if (!entry.params[i].valid && (defaultParamNames[i] != propNone))
 	      {
 		entry.params[i].name = 
-		  shaderPlug->lsvCache.GetLightSVId (entry.lightnum,
-		  defaultParamNames[i]);
+		  shaderPlug->lsvCache.GetLightSVId (defaultParamNames[i]);
+		entry.params[i].indices.Push (entry.lightnum);
 		entry.params[i].valid = true;
 	      }
 	    }

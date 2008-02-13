@@ -29,6 +29,9 @@ chronological order.
 	- res changed the light SV name cache to also support names without
 	  light numbers.
 	- res made the xmlshader compiler support SV names with indices.
+	- res switched the glshader_fixed plugin to use light SV names without
+	  arrays and instead access the data for a specific light through
+	  an array item.
 12-Feb-2008
 	- caedes fixed python override of Graphics2D::PerformExtension to
 	  allow command passthrough to the real c++ PerformExtension.
