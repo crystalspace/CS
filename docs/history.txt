@@ -6,6 +6,10 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+13-Feb-2008
+        - Jorrit deprecated the Load() functions in iLoader that accept a
+          iBase* result return parameter. Instead there are now three
+          new versions that return an instance of csLoadResult.
 12-Feb-2008
 	- caedes fixed python override of Graphics2D::PerformExtension to
 	  allow command passthrough to the real c++ PerformExtension.

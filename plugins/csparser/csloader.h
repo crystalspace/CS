@@ -678,22 +678,53 @@ public:
 	iDocumentNode* child, iStreamSource* ssource,
         iMissingLoaderData* missingdata, bool loadProxyTex = true);
 
-  bool Load (iDataBuffer* buffer, const char* fname, iBase*& result,
+  csLoadResult Load (iDataBuffer* buffer, const char* fname,
   	iRegion* region, bool curRegOnly, bool checkDupes,
 	iStreamSource* ssource, const char* override_name,
 	iMissingLoaderData* missingdata, bool useProxyTextures = false);
+  virtual csLoadResult Load (const char* fname, iRegion* region,
+  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+	const char* override_name, iMissingLoaderData* missingdata,
+	bool useProxyTextures);
+  virtual csLoadResult Load (iDataBuffer* buffer, iRegion* region,
+  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+	const char* override_name, iMissingLoaderData* missingdata,
+	bool useProxyTextures);
+  virtual csLoadResult Load (iDocumentNode* node, iRegion* region,
+  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+	const char* override_name, iMissingLoaderData* missingdata,
+	bool useProxyTextures);
+
   virtual bool Load (const char* fname, iBase*& result, iRegion* region,
   	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
 	const char* override_name, iMissingLoaderData* missingdata,
-	bool useProxyTextures);
+	bool useProxyTextures)
+  {
+    csLoadResult rc = Load (fname, region, curRegOnly, checkDupes,
+        ssource, override_name, missingdata, useProxyTextures);
+    result = rc.result;
+    return rc.success;
+  }
   virtual bool Load (iDataBuffer* buffer, iBase*& result, iRegion* region,
   	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
 	const char* override_name, iMissingLoaderData* missingdata,
-	bool useProxyTextures);
+	bool useProxyTextures)
+  {
+    csLoadResult rc = Load (buffer, region, curRegOnly, checkDupes,
+        ssource, override_name, missingdata, useProxyTextures);
+    result = rc.result;
+    return rc.success;
+  }
   virtual bool Load (iDocumentNode* node, iBase*& result, iRegion* region,
   	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
 	const char* override_name, iMissingLoaderData* missingdata,
-	bool useProxyTextures);
+	bool useProxyTextures)
+  {
+    csLoadResult rc = Load (node, region, curRegOnly, checkDupes,
+        ssource, override_name, missingdata, useProxyTextures);
+    result = rc.result;
+    return rc.success;
+  }
 
   virtual void SetAutoRegions (bool autoRegions)
   {

@@ -203,7 +203,8 @@ public:
   csGLBasicTextureHandle (int width, int height, int depth,
     csImageType imagetype, int flags, csGLGraphics3D *iG3D);
   /// Create from existing handle
-  csGLBasicTextureHandle (csGLGraphics3D *iG3D, TextureType texType, GLuint Handle);
+  csGLBasicTextureHandle (csGLGraphics3D *iG3D, TextureType texType,
+      GLuint Handle);
 
   virtual ~csGLBasicTextureHandle ();
 

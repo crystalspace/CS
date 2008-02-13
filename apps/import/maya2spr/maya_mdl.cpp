@@ -1,8 +1,8 @@
 /*
   Crystal Space Maya .ma Convertor
   Copyright (C) 2002 by Keith Fulton <keith@paqrat.com>
-    (loosely based on "mdl2spr" by Nathaniel Saint Martin <noote@bigfoot.com>
-                     and Eric Sunshine <sunshine@sunshineco.com>)
+  (loosely based on "mdl2spr" by Nathaniel Saint Martin <noote@bigfoot.com>
+           and Eric Sunshine <sunshine@sunshineco.com>)
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -58,112 +58,112 @@ Maya4Model::~Maya4Model()
 
 void Maya4Model::Clear()
 {
-    animnode = 0;
-    meshnode = 0;
-    filenode = 0;
+  animnode = 0;
+  meshnode = 0;
+  filenode = 0;
 }
 
 bool Maya4Model::ReadMAFile(const char* mdlfile)
 {
-    clearError();
+  clearError();
 
-    if (mdlfile == 0 || strlen(mdlfile) == 0)
-        return setError("MA filename is 0");
+  if (mdlfile == 0 || strlen(mdlfile) == 0)
+    return setError("MA filename is 0");
 
-    MayaInputFile file(mdlfile);
+  MayaInputFile file(mdlfile);
 
-    if (!file.IsValid())
-        return setError("MA filename is 0");
+  if (!file.IsValid())
+    return setError("MA filename is 0");
 
-    while (!file.EndOfFile())
+  while (!file.EndOfFile())
+  {
+    csString   tok;
+    file.GetToken(tok);
+
+    if (tok == "createNode")
     {
-        csString   tok;
-        file.GetToken(tok);
-
-        if (tok == "createNode")
-        {
-            if (!CreateNode(file,tree))
-            {
-                this->setError(file.GetError() );
-                break;
-            }
-        }
+      if (!CreateNode(file,tree))
+      {
+        this->setError(file.GetError() );
+        break;
+      }
     }
+  }
 
-    // If file has loaded with no anim curves, create a default 0 anim curve
-    if (!animnode)
-    {
+  // If file has loaded with no anim curves, create a default 0 anim curve
+  if (!animnode)
+  {
 	csPrintf("Creating default animcurveTL...\n");
-        animnode = new NodeAnimCurveTL(meshnode->CountVertices()); // position paths for each vertex
+    animnode = new NodeAnimCurveTL(meshnode->CountVertices()); // position paths for each vertex
 	animnode->CreateDefault();
-    }
-    return true;
+  }
+  return true;
 }
 
 bool Maya4Model::CreateNode(MayaInputFile& file,DAGNode& tree)
 {
-    DAGNode *newnode=0;
-    static int countanims = 0;
-    static int vertices = 0;
+  DAGNode *newnode=0;
+  static int countanims = 0;
+  static int vertices = 0;
 
-    csString tok;
-    file.GetToken(tok);
+  csString tok;
+  file.GetToken(tok);
 
-    if (tok == "transform")
-        newnode = new NodeTransform;        // positioning of mesh
-    else if (tok == "mesh")
-    {
+  if (tok == "transform")
+    newnode = new NodeTransform;    // positioning of mesh
+  else if (tok == "mesh")
+  {
 	csPrintf("Mesh will be translated by (%1.2f,%1.2f,%1.2f)...\n",translate.x,translate.y,translate.z);
 	csPrintf("Mesh will be scaled by (%1.2f,%1.2f,%1.2f)...\n",scale.x,scale.y,scale.z);
-        meshnode = new NodeMesh(translate,scale); // vertices, edges, polys
-        newnode = meshnode;
-    }
-    else if (tok == "file")
-    {
-        filenode = new NodeFile;            // texture
-        newnode  = filenode;
-    }
-    else if (tok == "animCurveTL")
-    {
-        if (!animnode)
-            animnode = new NodeAnimCurveTL(vertices); // position paths for each vertex
-        countanims++;
-        newnode = animnode;  // reuse existing if already there
-    }
-    else
-        return true;
+    meshnode = new NodeMesh(translate,scale); // vertices, edges, polys
+    newnode = meshnode;
+  }
+  else if (tok == "file")
+  {
+    filenode = new NodeFile;      // texture
+    newnode  = filenode;
+  }
+  else if (tok == "animCurveTL")
+  {
+    if (!animnode)
+      animnode = new NodeAnimCurveTL(vertices); // position paths for each vertex
+    countanims++;
+    newnode = animnode;  // reuse existing if already there
+  }
+  else
+    return true;
 
-    if (!newnode->Load(file))
-        return false;
+  if (!newnode->Load(file))
+    return false;
 
-    static DAGNode *where=0;             // Use last specified parent if none specified
+  static DAGNode *where=0;       // Use last specified parent if none specified
 
-    if (newnode == animnode && countanims>1)
-        return true;        // don't add more than once
+  if (newnode == animnode && countanims>1)
+    return true;    // don't add more than once
 
-    if (newnode->IsType("NodeMesh"))
-    {
-        NodeMesh *mesh = (NodeMesh *)newnode;
-        vertices = mesh->CountVertices();
-    }
-    else if (newnode->IsType("NodeTransform"))
-    {
+  if (newnode->IsType("NodeMesh"))
+  {
+    NodeMesh *mesh = (NodeMesh *)newnode;
+    vertices = mesh->CountVertices();
+  }
+  else if (newnode->IsType("NodeTransform"))
+  {
 	NodeTransform *tr = (NodeTransform *)newnode;
 	tr->GetTransform(translate);
 	tr->GetScale(scale);
-    }
+  }
 
-    if (newnode->Parent())
-        where = tree.Find(newnode->Parent());
+  if (newnode->Parent())
+    where = tree.Find(newnode->Parent());
 
-    if (where)
-    {
-        where->AddChild(newnode);
-    }
-    else
-        tree.AddChild(newnode);  // add to top level of graph if no parent node
+  if (where)
+  {
+    where->AddChild(newnode);
+  }
+  else
+    tree.AddChild(newnode);  // add to top level of graph if no parent node
 
-    return true;
+  return true;
 }
 
 
@@ -181,8 +181,8 @@ bool Maya4Model::WriteSPR(const char* spritename, csArray<Animation*>& anims)
 
   if (spritename == 0 || strlen(spritename) == 0)
   {
-    csFPrintf(stderr, "Unable to save: 0 sprite name\n");
-    return false;
+  csFPrintf(stderr, "Unable to save: 0 sprite name\n");
+  return false;
   }
 
   csPrintf("Writing out SPR file: %s\n",spritename);
@@ -190,67 +190,67 @@ bool Maya4Model::WriteSPR(const char* spritename, csArray<Animation*>& anims)
   f = fopen(spritename, "w");
   if (!f)
   {
-      csFPrintf(stderr,"Unable to open file (%s) to write out CS sprite.\n",spritename);
+    csFPrintf(stderr,"Unable to open file (%s) to write out CS sprite.\n",spritename);
   }
 
-    csFPrintf(f,"<meshfact>\n");
-    csFPrintf(f,"   <plugin>crystalspace.mesh.loader.factory.sprite.3d</plugin>\n");
-    csFPrintf(f,"   <params>\n");
+  csFPrintf(f,"<meshfact>\n");
+  csFPrintf(f,"   <plugin>crystalspace.mesh.loader.factory.sprite.3d</plugin>\n");
+  csFPrintf(f,"   <params>\n");
+  
+  if (filenode)
+    filenode->Write(f);
+  else
+	csFPrintf(f,"    <material>no_maya_material</material>\n");
+
+  for (int frame=0; frame<((animnode)?animnode->GetFrames():1); frame++)
+  {
+    csPrintf("Processing frame %d...\n",frame+1);
+
+    if (frame>0)
+      meshnode->ClearCS();
+
+    // Move vertices for each frame
+    meshnode->ApplyAnimDeltas(animnode,frame);
+
+    // Fixups must be done on a frame by frame basis
+    meshnode->FixupUniqueVertexMappings();
+
+    csFPrintf(f,"    <frame name=\"f%d\">\n",frame+1);
+    meshnode->WriteVertices(f);
+    csFPrintf(f,"    </frame>\n");
+  }
+
+  // Now write out animation actions
+  if (!anims.GetSize())
+  {
+    setError("At least one action animation is required.");  
+    return false;
+  }
+
+  size_t i;
+  for (i=0;i<anims.GetSize ();i++)
+  {
+    Animation* anim = anims[i];
     
-    if (filenode)
-        filenode->Write(f);
-    else
-	csFPrintf(f,"      <material>no_maya_material</material>\n");
-
-    for (int frame=0; frame<((animnode)?animnode->GetFrames():1); frame++)
-    {
-        csPrintf("Processing frame %d...\n",frame+1);
-
-        if (frame>0)
-            meshnode->ClearCS();
-
-        // Move vertices for each frame
-        meshnode->ApplyAnimDeltas(animnode,frame);
-
-        // Fixups must be done on a frame by frame basis
-        meshnode->FixupUniqueVertexMappings();
-
-        csFPrintf(f,"      <frame name=\"f%d\">\n",frame+1);
-        meshnode->WriteVertices(f);
-        csFPrintf(f,"      </frame>\n");
-    }
-
-    // Now write out animation actions
-    if (!anims.GetSize())
-    {
-      setError("At least one action animation is required.");    
-      return false;
-    }
-
-    size_t i;
-    for (i=0;i<anims.GetSize ();i++)
-    {
-      Animation* anim = anims[i];
-      
-        int stop,start = anim->startframe;
-        csString name = anim->name;
+    int stop,start = anim->startframe;
+    csString name = anim->name;
 	int frame_duration = anim->duration;
 	Animation *curr_anim = anim;
 
-        csPrintf("Writing out Animation %s\n",(const char *)name);
+    csPrintf("Writing out Animation %s\n",(const char *)name);
 
-        if (i != anims.GetSize ()-1)
-            stop = anim->startframe-1;
-        else
-            stop = (animnode)?animnode->GetFrames():start;
+    if (i != anims.GetSize ()-1)
+      stop = anim->startframe-1;
+    else
+      stop = (animnode)?animnode->GetFrames():start;
 	
 	if (stop>start)
-	    frame_duration /= (stop-start);
+	  frame_duration /= (stop-start);
 	else
-	    frame_duration = 1000;
+	  frame_duration = 1000;
 
 	if (!frame_duration)
-	    frame_duration = 67; // default is 15 fps.
+	  frame_duration = 67; // default is 15 fps.
 
 	// now determine displacement to use
 	DisplacementGroup disg;
@@ -261,52 +261,52 @@ bool Maya4Model::WriteSPR(const char* spritename, csArray<Animation*>& anims)
 	DisplacementGroup &dg = (curr_anim->displacements.GetSize ())? curr_anim->displacements[0] : disg;
 	int displacementnum = 1;
 
-        csFPrintf(f,"     <action name=\"%s\">\n",(const char *)name);
+    csFPrintf(f,"   <action name=\"%s\">\n",(const char *)name);
 
-        for (int i=start; i<=stop; i++)
-        {
-	    if (i<dg.startframe || i>dg.stopframe)
-	    {
-                csFPrintf(f,"       <f name=\"f%d\" delay=\"%d\" />\n",i,frame_duration);
-	    }
-	    else
-	    {
+    for (int i=start; i<=stop; i++)
+    {
+	  if (i<dg.startframe || i>dg.stopframe)
+	  {
+        csFPrintf(f,"     <f name=\"f%d\" delay=\"%d\" />\n",i,frame_duration);
+	  }
+	  else
+	  {
 		int frame2 = (i+1>stop)?start:i+1;
 		float displacement = meshnode->GetDisplacement(animnode, i-1,
-		    frame2-1, dg.vertex);
-		csFPrintf(f,"       <f name=\"f%d\" displacement=\"%f\" />\n",i,displacement);
+		  frame2-1, dg.vertex);
+		csFPrintf(f,"     <f name=\"f%d\" displacement=\"%f\" />\n",i,displacement);
 		if (i==dg.stopframe) // get next displacement group
 		{
-		    dg = curr_anim->displacements[displacementnum++];
+		  dg = curr_anim->displacements[displacementnum++];
 		}
-	    }
-        }
-
-        csFPrintf(f,"     </action>\n");
+	  }
     }
 
-    csPrintf("Writing out Triangles.\n");
+    csFPrintf(f,"   </action>\n");
+  }
 
-    // Now write out all triangles
-    meshnode->WriteTriangles(f);
+  csPrintf("Writing out Triangles.\n");
+
+  // Now write out all triangles
+  meshnode->WriteTriangles(f);
+  
+  // Now write out sockets
+  for (i=0;i<sockets.GetSize ();i++)
+  {
+    Animation* socket = sockets[i];
     
-    // Now write out sockets
-    for (i=0;i<sockets.GetSize ();i++)
-    {
-      Animation* socket = sockets[i];
-      
-      csString name = socket->name;
-      int      tri  = socket->startframe; // really triangle #
+    csString name = socket->name;
+    int    tri  = socket->startframe; // really triangle #
 
-      csPrintf("Writing out Socket %s Tri %d\n",(const char *)name,tri);
+    csPrintf("Writing out Socket %s Tri %d\n",(const char *)name,tri);
 
-      csFPrintf(f,"     <socket name=\"%s\" tri=\"%d\" />\n",(const char *)name, tri);
-    }
+    csFPrintf(f,"   <socket name=\"%s\" tri=\"%d\" />\n",(const char *)name, tri);
+  }
 
-    // Wrap up the file
-    csFPrintf(f,"    </params>\n</meshfact>\n");
+  // Wrap up the file
+  csFPrintf(f,"  </params>\n</meshfact>\n");
 
-    fclose(f);
+  fclose(f);
 
-    return true;
+  return true;
 }

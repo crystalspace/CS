@@ -666,24 +666,26 @@ static bool TestXML (const char* b)
   }
 }
 
-bool csLoader::Load (iDataBuffer* buffer, const char* fname,
-	iBase*& result, iRegion* region,
-  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+csLoadResult csLoader::Load (iDataBuffer* buffer, const char* fname,
+	iRegion* region, bool curRegOnly, bool checkDupes,
+        iStreamSource* ssource,
 	const char* override_name, iMissingLoaderData* missingdata,
 	bool useProxyTextures)
 {
-  result = 0;
+  csLoadResult rc;
+  rc.success = false;
+  rc.result = 0;
 
   if (TestXML (buffer->GetData ()))
   {
     csRef<iDocument> doc;
     bool er = LoadStructuredDoc (fname, buffer, doc);
-    if (!er) return false;
+    if (!er) return rc;
 
     if (doc)
     {
       csRef<iDocumentNode> node = doc->GetRoot ();
-      return Load (node, result, region, curRegOnly, checkDupes,
+      return Load (node, region, curRegOnly, checkDupes,
           ssource, override_name, missingdata, useProxyTextures);
     }
     else
@@ -692,7 +694,7 @@ bool csLoader::Load (iDataBuffer* buffer, const char* fname,
         fname
 	  ? "File does not appear to be correct XML file (%s)!"
 	  : "Buffer does not appear to be correct XML!", fname);
-      return false;
+      return rc;
     }
   }
   else
@@ -713,9 +715,10 @@ bool csLoader::Load (iDataBuffer* buffer, const char* fname,
         iMeshFactoryWrapper* ff = l->Load (
 		override_name ? override_name :
 		fname ? fname : "__model__", buffer);
-	if (!ff) return false;
-	result = ff;
-	return true;
+	if (!ff) return rc;
+	rc.result = ff;
+        rc.success = true;
+	return rc;
       }
     }
     ReportError ("crystalspace.maploader.parse",
@@ -724,16 +727,14 @@ bool csLoader::Load (iDataBuffer* buffer, const char* fname,
 	  : "Model buffer not recognized!", fname);
   }
 
-  return false;
+  return rc;
 }
 
-bool csLoader::Load (const char* fname, iBase*& result, iRegion* region,
+csLoadResult csLoader::Load (const char* fname, iRegion* region,
   	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
 	const char* override_name, iMissingLoaderData* missingdata,
 	bool useProxyTextures)
 {
-  result = 0;
-
   csRef<iDataBuffer> buf = VFS->ReadFile (fname);
 
   if (!buf)
@@ -741,28 +742,33 @@ bool csLoader::Load (const char* fname, iBase*& result, iRegion* region,
     ReportError (
 	      "crystalspace.maploader.parse",
     	      "Could not open map file '%s' on VFS!", fname);
-    return false;
+    csLoadResult rc;
+    rc.success = false;
+    rc.result = 0;
+    return rc;
   }
   
-  return Load (buf, fname, result, region, curRegOnly, checkDupes, ssource,
+  return Load (buf, fname, region, curRegOnly, checkDupes, ssource,
   	override_name, missingdata, useProxyTextures);
 }
 
-bool csLoader::Load (iDataBuffer* buffer, iBase*& result, iRegion* region,
+csLoadResult csLoader::Load (iDataBuffer* buffer, iRegion* region,
   	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
 	const char* override_name, iMissingLoaderData* missingdata,
 	bool useProxyTextures)
 {
-  return Load (buffer, 0, result, region, curRegOnly, checkDupes, ssource,
+  return Load (buffer, 0, region, curRegOnly, checkDupes, ssource,
   	override_name, missingdata, useProxyTextures);
 }
 
-bool csLoader::Load (iDocumentNode* node, iBase*& result, iRegion* region,
+csLoadResult csLoader::Load (iDocumentNode* node, iRegion* region,
   	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
 	const char* override_name, iMissingLoaderData* missingdata,
 	bool useProxyTextures)
 {
-  result = 0;
+  csLoadResult rc;
+  rc.success = false;
+  rc.result = 0;
 
   csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
 	new StdLoaderContext (Engine, region, curRegOnly, this, checkDupes,
@@ -779,8 +785,9 @@ bool csLoader::Load (iDocumentNode* node, iBase*& result, iRegion* region,
       if (mfw)
       {
         AddToRegion (ldr_context, mfw->QueryObject ());
-        result = mfw;
-        return true;
+        rc.result = mfw;
+        rc.success = true;
+        return rc;
       }
     }
 
@@ -789,15 +796,15 @@ bool csLoader::Load (iDocumentNode* node, iBase*& result, iRegion* region,
     if (LoadMeshObjectFactory (ldr_context, t, 0, meshfactnode, 0, ssource))
     {
       AddToRegion (ldr_context, t->QueryObject ());
-      result = t;
-      return true;
+      rc.result = t;
+      rc.success = true;
+      return rc;
     }
     else
     {
       // Error is already reported.
       Engine->GetMeshFactories ()->Remove (t);
-      result = 0;
-      return false;
+      return rc;
     }
   }
 
@@ -812,46 +819,50 @@ bool csLoader::Load (iDocumentNode* node, iBase*& result, iRegion* region,
       if (mw)
       {
         AddToRegion (ldr_context, mw->QueryObject ());
-        result = mw;
-        return true;
+        rc.result = mw;
+        rc.success = true;
+        return rc;
       }
     }
     csRef<iMeshWrapper> mw = Engine->CreateMeshWrapper (meshobjname);
     if (LoadMeshObject (ldr_context, mw, 0, meshobjnode, ssource))
     {
       AddToRegion (ldr_context, mw->QueryObject ());
-      result = mw;
-      return true;
+      rc.result = mw;
+      rc.success = true;
+      return rc;
     }
     else
     {
       // Error is already reported.
       Engine->GetMeshes ()->Remove (mw);
-      result = 0;
-      return false;
+      return rc;
     }
   }
 
   csRef<iDocumentNode> worldnode = node->GetNode ("world");
   if (worldnode)
   {
-    result = Engine;
-    return LoadMap (ldr_context, worldnode, ssource, missingdata,
+    rc.result = Engine;
+    rc.success = LoadMap (ldr_context, worldnode, ssource, missingdata,
       useProxyTextures);
+    if (!rc.success) rc.result = 0;
+    return rc;
   }
 
   csRef<iDocumentNode> libnode = node->GetNode ("library");
   if (libnode)
   {
-    result = 0;
-    return LoadLibrary (ldr_context, libnode, ssource, missingdata,
+    rc.result = 0;
+    rc.success = LoadLibrary (ldr_context, libnode, ssource, missingdata,
     	true, useProxyTextures);
+    return rc;
   }
 
   ReportError ("crystalspace.maploader.parse",
     "File doesn't seem to be a world, library, meshfact, or meshobj file!");
 
-  return false;
+  return rc;
 }
 
 bool csLoader::LoadMapFile (const char* file, bool clearEngine,
@@ -1271,11 +1282,11 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode,
 	  if (attr_file)
 	  {
 	    const char* filename = attr_file->GetValue ();
-	    iBase* result;
-	    if (!Load (filename, result, ldr_context->GetRegion (),
+            csLoadResult rc = Load (filename, ldr_context->GetRegion (),
 	  	  ldr_context->CurrentRegionOnly (),
 		  ldr_context->CheckDupes (),
-		  ssource, name, missingdata, false))
+		  ssource, name, missingdata, false);
+	    if (!rc.success)
 	    {
               SyntaxService->ReportError (
 	        "crystalspace.maploader.parse.loadingmodel",

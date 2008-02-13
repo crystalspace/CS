@@ -129,11 +129,29 @@ struct iMissingLoaderData : public virtual iBase
 };
 
 /**
+ * Return structure for the iLoader->Load() routines.
+ */
+struct csLoadResult
+{
+  /// True if loading was succesful
+  bool success;
+  /**
+   * The object that was loaded. Depending on the file you load this
+   * can be anything like:
+   * - 'world' file: in that case 'result' will be set to the engine.
+   * - 'library' file: 'result' will be 0.
+   * - 'meshfact' file: 'result' will be the mesh factory wrapper.
+   * - 'meshobj' file: 'result' will be the mesh wrapper.
+   */
+  iBase* result;
+};
+
+/**
  * This interface represents the map loader.
  */
 struct iLoader : public virtual iBase
 {
-  SCF_INTERFACE (iLoader, 2, 3, 0);
+  SCF_INTERFACE (iLoader, 2, 3, 1);
 
   /**
    * Load an image file. The image will be loaded in the format requested by
@@ -379,7 +397,8 @@ struct iLoader : public virtual iBase
    * textures from a library shared with other maps.
    */
   virtual bool LoadLibraryFile (const char* filename, iRegion* region = 0,
-  	bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+  	bool curRegOnly = true, bool checkDupes = false,
+        iStreamSource* ssource = 0,
 	iMissingLoaderData* missingdata = 0, bool useProxyTextures = false) = 0;
 
   /**
@@ -403,7 +422,8 @@ struct iLoader : public virtual iBase
    * textures from a library shared with other maps.
    */
   virtual bool LoadLibrary (iDocumentNode* lib_node, iRegion* region = 0,
-  	bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+  	bool curRegOnly = true, bool checkDupes = false,
+        iStreamSource* ssource = 0,
 	iMissingLoaderData* missingdata = 0, bool useProxyTextures = false) = 0;
 
   /**
@@ -465,8 +485,8 @@ struct iLoader : public virtual iBase
    * \param Set useProxyTextures to true if you're loading materials and
    * textures from a library shared with other maps.
    */
-  virtual bool Load (const char* fname, iBase*& result, iRegion* region = 0,
-  	bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+  virtual csLoadResult Load (const char* fname, iRegion* region = 0,
+    bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
     bool useProxyTextures = false) = 0;
 
@@ -513,8 +533,8 @@ struct iLoader : public virtual iBase
    * \param Set useProxyTextures to true if you're loading materials and
    * textures from a library shared with other maps.
    */
-  virtual bool Load (iDataBuffer* buffer, iBase*& result, iRegion* region = 0,
-  	bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+  virtual csLoadResult Load (iDataBuffer* buffer, iRegion* region = 0,
+    bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
     bool useProxyTextures = false) = 0;
 
@@ -560,8 +580,41 @@ struct iLoader : public virtual iBase
    * \param Set useProxyTextures to true if you're loading materials and
    * textures from a library shared with other maps.
    */
+  virtual csLoadResult Load (iDocumentNode* node, iRegion* region = 0,
+    bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    const char* override_name = 0, iMissingLoaderData* missingdata = 0,
+    bool useProxyTextures = false) = 0;
+
+  /**
+   * Load a file.
+   * \deprecated Deprecated in 1.3. Use the iLoader::Load() that returns
+   * a csLoadResult object instead.
+   */
+  CS_DEPRECATED_METHOD_MSG("Use iLoader::Load() returning csLoadResult isntead")
+  virtual bool Load (const char* fname, iBase*& result, iRegion* region = 0,
+    bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    const char* override_name = 0, iMissingLoaderData* missingdata = 0,
+    bool useProxyTextures = false) = 0;
+
+  /**
+   * Load a file.
+   * \deprecated Deprecated in 1.3. Use the iLoader::Load() that returns
+   * a csLoadResult object instead.
+   */
+  CS_DEPRECATED_METHOD_MSG("Use iLoader::Load() returning csLoadResult isntead")
+  virtual bool Load (iDataBuffer* buffer, iBase*& result, iRegion* region = 0,
+    bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    const char* override_name = 0, iMissingLoaderData* missingdata = 0,
+    bool useProxyTextures = false) = 0;
+
+  /**
+   * Load a node.
+   * \deprecated Deprecated in 1.3. Use the iLoader::Load() that returns
+   * a csLoadResult object instead.
+   */
+  CS_DEPRECATED_METHOD_MSG("Use iLoader::Load() returning csLoadResult isntead")
   virtual bool Load (iDocumentNode* node, iBase*& result, iRegion* region = 0,
-  	bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
     bool useProxyTextures = false) = 0;
 

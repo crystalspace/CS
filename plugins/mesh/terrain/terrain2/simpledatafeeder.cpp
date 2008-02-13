@@ -49,7 +49,8 @@ csTerrainSimpleDataFeeder::~csTerrainSimpleDataFeeder ()
 
 csPtr<iTerrainCellFeederProperties> csTerrainSimpleDataFeeder::CreateProperties ()
 {
-  return csPtr<iTerrainCellFeederProperties> (new csTerrainSimpleDataFeederProperties);
+  return csPtr<iTerrainCellFeederProperties> (
+      new csTerrainSimpleDataFeederProperties);
 }
 
 bool csTerrainSimpleDataFeeder::PreLoad (iTerrainCell* cell)
