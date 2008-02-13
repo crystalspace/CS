@@ -42,6 +42,7 @@ chronological order.
 	- res fixed "array merging" in the light setup step to only create an
 	  SV in the destination SV stack when there's actually a variable to
 	  merge into.
+	- res made lights provide the light SVs in their own SV context.
 12-Feb-2008
 	- caedes fixed python override of Graphics2D::PerformExtension to
 	  allow command passthrough to the real c++ PerformExtension.

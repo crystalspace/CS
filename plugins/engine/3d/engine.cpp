@@ -1418,6 +1418,14 @@ void csEngine::StartEngine ()
   DeleteAll ();
   id_creation_time = svNameStringSet->Request("mesh creation time");
   svTexEnvironmentName = svNameStringSet->Request("tex environment");
+
+  lightSvNames.SetStrings (svNameStringSet);
+  /* Generate light SV IDs - that way, space for them will be reserved
+   * when shader stacks are set up */
+  for (int p = 0; p < csLightShaderVarCache::_lightCount; p++)
+  {
+    lightSvNames.GetLightSVId (csLightShaderVarCache::LightProperty (p));
+  }
 }
 
 void csEngine::PrecacheMesh (iMeshWrapper* s, iRenderView* rview)

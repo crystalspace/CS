@@ -21,6 +21,8 @@
 
 #include "csgeom/transfrm.h"
 #include "csgeom/box.h"
+#include "csgfx/lightsvcache.h"
+#include "csgfx/shadervarcontext.h"
 #include "cstool/objmodel.h"
 #include "csutil/cscolor.h"
 #include "csutil/csobject.h"
@@ -39,7 +41,6 @@
 #include "iengine/light.h"
 #include "iengine/lightmgr.h"
 #include "iengine/viscull.h"
-#include "csgfx/shadervarcontext.h"
 
 class csLightMap;
 class csPolygon3D;
@@ -167,6 +168,8 @@ protected:
   csBox3 lightBoundingBox, worldBoundingBox;
 
   csEngine* engine;
+  
+  csShaderVariable* GetPropertySV (csLightShaderVarCache::LightProperty prop);
 public:
   /// Set of flags
   csFlags flags;
@@ -292,7 +295,11 @@ public:
   { return specularColor; }
   /// Set the specular color of this light.
   void SetSpecularColor (const csColor& col) 
-  { userSpecular = true; specularColor = col; }
+  {
+    userSpecular = true; 
+    specularColor = col; 
+    GetPropertySV (csLightShaderVarCache::lightSpecular)->SetValue (col);
+  }
 
   /**
    * Return the associated halo
@@ -373,6 +380,8 @@ public:
     spotlightFalloffInner = inner;
     spotlightFalloffOuter = outer;
     lightnr++;
+    GetPropertySV (csLightShaderVarCache::lightInnerFalloff)->SetValue (inner);
+    GetPropertySV (csLightShaderVarCache::lightOuterFalloff)->SetValue (outer);
   }
 
   /**
@@ -403,6 +412,7 @@ public:
   void SetType (csLightType type)
   {
     this->type = type;
+    GetPropertySV (csLightShaderVarCache::lightType)->SetValue (type);
   }
 
   virtual iShaderVariableContext* GetSVContext()

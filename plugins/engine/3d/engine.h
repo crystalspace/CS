@@ -823,6 +823,8 @@ public:
   // \todo move back to private and make accessible
   csRef<iShader> defaultShader;
 
+  /// Shader variable names for light SVs
+  csLightShaderVarCache lightSvNames;
 private:
 
   // -- PRIVATE MEMBERS

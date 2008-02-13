@@ -40,16 +40,20 @@ csLight::csLight (csEngine* engine,
   float d,
   float red, float green, float blue,
   csLightDynamicType dyntype) :
-    scfImplementationType (this), light_id (0), color (red, green, blue),
-    specularColor (red, green, blue), userSpecular (false),
-    halo (0), dynamicType (dyntype), type (CS_LIGHT_POINTLIGHT), 
-    attenuation (CS_ATTN_LINEAR), cutoffDistance (d),
-    directionalCutoffRadius (d), spotlightFalloffInner (0),
-    spotlightFalloffOuter (1), lightnr (0), engine (engine)
+    scfImplementationType (this), light_id (0),
+    userSpecular (false), halo (0), dynamicType (dyntype), 
+    cutoffDistance (d), directionalCutoffRadius (d), 
+    lightnr (0), engine (engine)
 {
   //movable.scfParent = (iBase*)(csObject*)this; //@@MS: Look at this?
   movable.SetLight (this);
-  movable.SetPosition (csVector3 (x,y,z));
+  
+  // Call setters explicitly since they also set SVs
+  csLight::SetCenter (csVector3 (x,y,z));
+  csLight::SetColor (csColor (red, green, blue));
+  csLight::SetType (CS_LIGHT_POINTLIGHT);
+  csLight::SetAttenuationMode (CS_ATTN_LINEAR);
+  csLight::SetSpotLightFalloff (0, 1);
 
   SetName ("__light__");
 
@@ -88,6 +92,13 @@ csLight::~csLight ()
     linfo->LightDisconnect (this);
   }
   lightinginfos.DeleteAll ();
+}
+  
+csShaderVariable* csLight::GetPropertySV (
+  csLightShaderVarCache::LightProperty prop)
+{
+  return CS::ShaderVariableContextImpl::GetVariableAdd (
+    engine->lightSvNames.GetLightSVId (prop));
 }
 
 void csLight::SelfDestruct ()
@@ -236,10 +247,11 @@ void csLight::CalculateAttenuationVector ()
       break;
     case CS_ATTN_CLQ:
       /* Nothing to do */
-      break;
     default:
-      ;
+      return;
   }
+  GetPropertySV (csLightShaderVarCache::lightAttenuation)->SetValue (
+    attenuationConstants);
 }
 
 void csLight::OnSetPosition ()
@@ -252,7 +264,7 @@ void csLight::OnSetPosition ()
     iSectorList* list = movable.csMovable::GetSectors ();
     if (list)
     {
-      for (size_t i = 0; i < list->GetCount (); ++i)
+      for (int i = 0; i < list->GetCount (); ++i)
       {
         csSector* sect = static_cast<csSector*> (list->Get (i));
         sect->UpdateLightBounds (this, oldBox);
@@ -268,6 +280,24 @@ void csLight::OnSetPosition ()
     cb->OnPositionChange (this, pos);
   }
 
+  GetPropertySV (csLightShaderVarCache::lightPositionWorld)->SetValue (pos);
+  const csReversibleTransform& lightT = 
+    movable.csMovable::GetFullTransform ();
+  GetPropertySV (csLightShaderVarCache::lightTransformWorld)->SetValue (
+    lightT);
+      
+  const csVector3 lightDirW = 
+    lightT.This2OtherRelative (csVector3 (0, 0, 1));
+  if (!lightDirW.IsZero())
+  {
+    GetPropertySV (csLightShaderVarCache::lightDirectionWorld)->SetValue (
+      lightDirW.Unit());
+  }
+  else
+  {
+    GetPropertySV (csLightShaderVarCache::lightDirectionWorld)->SetValue (
+      csVector3 (0));
+  }
   lightnr++;
 }
 
@@ -293,7 +323,12 @@ void csLight::SetColor (const csColor& col)
   }
 
   color = col; 
-  if (!userSpecular) specularColor = col;
+  GetPropertySV (csLightShaderVarCache::lightDiffuse)->SetValue (col);
+  if (!userSpecular)
+  {
+    specularColor = col;
+    GetPropertySV (csLightShaderVarCache::lightSpecular)->SetValue (col);
+  }
   lightnr++;
 
   LightingInfo::GlobalIterator it(lightinginfos.GetIterator());
@@ -321,6 +356,7 @@ void csLight::SetAttenuationMode (csLightAttenuationMode a)
 
   attenuation = a;
   CalculateAttenuationVector();
+  GetPropertySV (csLightShaderVarCache::lightAttenuationMode)->SetValue (a);
 
   size_t i = light_cb_vector.GetSize ();
   while (i-- > 0)
@@ -337,6 +373,7 @@ void csLight::SetAttenuationConstants (const csVector3& attenv)
   attenuationvec.Set (attenv);
   influenceValid = false;*/
   attenuationConstants = attenv;
+  GetPropertySV (csLightShaderVarCache::lightAttenuation)->SetValue (attenv);
 
   size_t i = light_cb_vector.GetSize ();
   while (i-- > 0)
@@ -359,7 +396,7 @@ void csLight::SetCutoffDistance (float radius)
     iSectorList* list = movable.csMovable::GetSectors ();
     if (list)
     {
-      for (size_t i = 0; i < list->GetCount (); ++i)
+      for (int i = 0; i < list->GetCount (); ++i)
       {
         csSector* sect = static_cast<csSector*> (list->Get (i));
         sect->UpdateLightBounds (this, oldBox);
@@ -521,20 +558,14 @@ void csLight::UpdateBBox ()
 {
   switch (type)
   {
+  case CS_LIGHT_DIRECTIONAL:
+      //@@TODO: Implement
+  case CS_LIGHT_SPOTLIGHT:
+      //@@TODO: Implement
   case CS_LIGHT_POINTLIGHT:
     {
       lightBoundingBox.SetSize (csVector3 (cutoffDistance));
       lightBoundingBox.SetCenter (csVector3 (0));
-      break;
-    }
-  case CS_LIGHT_DIRECTIONAL:
-    {
-      //@@TODO: Implement
-      break;
-    }
-  case CS_LIGHT_SPOTLIGHT:
-    {
-      //@@TODO: Implement
       break;
     }
   }
