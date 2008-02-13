@@ -42,13 +42,7 @@ csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
   scfImplementationType (this), textures (16), compactTextures (false)
 {
   csGLTextureManager::object_reg = object_reg;
-
-  glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
-#ifndef CS_LITTLE_ENDIAN
-  // The texture format stuff generally assumes little endian
-  glPixelStorei (GL_UNPACK_SWAP_BYTES, 1);
-#endif
-
+  
   G3D = iG3D;
   max_tex_size = G3D->GetMaxTextureSize ();
 
@@ -267,6 +261,16 @@ void csGLTextureManager::Clear()
     superLMs[i]->DeleteTexture();
   }
   superLMs.DeleteAll ();
+}
+
+void csGLTextureManager::SetupPixelStore()
+{
+  // @@@ These never really change.
+  G3D->statecache->SetPixelUnpackAlignment (1);
+#ifndef CS_LITTLE_ENDIAN
+  // The texture format stuff generally assumes little endian
+  G3D->statecache->SetPixelSwapBytes (true);
+#endif
 }
 
 void csGLTextureManager::UnsetTexture (GLenum target, GLuint texture)

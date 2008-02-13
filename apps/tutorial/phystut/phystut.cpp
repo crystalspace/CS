@@ -551,8 +551,7 @@ bool Simple::CreateStarCollider ()
   starFact = engine->FindMeshFactory ("genstar");
   if (!starFact)
   {
-    iBase* rc;
-    loader->Load ("/lib/std/star.xml", rc);
+    loader->Load ("/lib/std/star.xml");
     starFact = engine->FindMeshFactory ("genstar");
     if (!starFact)
     {
@@ -653,7 +652,7 @@ iRigidBody* Simple::CreateSphere ()
 
   // Create a body and attach the mesh.
   csRef<iRigidBody> rb = dynSys->CreateBody ();
-  rb->SetProperties (radius.Norm()/2, csVector3 (0), csMatrix3 ());
+  rb->SetProperties (r, csVector3 (0), csMatrix3 ());
   rb->SetPosition (tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 1));
   rb->AttachMesh (mesh);
 

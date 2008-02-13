@@ -253,16 +253,16 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::csArrayCapacityDefault ##############
+############# Class : cspace::csArrayCapacityVariableGrow ##############
 
-package cspace::csArrayCapacityDefault;
+package cspace::csArrayCapacityVariableGrow;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::csArrayThresholdVariableCapacityLinear cspace );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
     my $pkg = shift;
-    my $self = cspacec::new_csArrayCapacityDefault(@_);
+    my $self = cspacec::new_csArrayCapacityVariableGrow(@_);
     bless $self, $pkg if defined($self);
 }
 
@@ -272,7 +272,7 @@ sub DESTROY {
     return unless defined $self;
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
-        cspacec::delete_csArrayCapacityDefault($self);
+        cspacec::delete_csArrayCapacityVariableGrow($self);
         delete $OWNER{$self};
     }
 }
@@ -4257,6 +4257,47 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csLoadResult ##############
+
+package cspace::csLoadResult;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_success_get = *cspacec::csLoadResult_success_get;
+*swig_success_set = *cspacec::csLoadResult_success_set;
+*swig_result_get = *cspacec::csLoadResult_result_get;
+*swig_result_set = *cspacec::csLoadResult_result_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csLoadResult(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csLoadResult($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iLoader ##############
 
 package cspace::iLoader;
@@ -7588,6 +7629,44 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iShaderVarStringSetBase ##############
+
+package cspace::iShaderVarStringSetBase;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*Request = *cspacec::iShaderVarStringSetBase_Request;
+*Contains = *cspacec::iShaderVarStringSetBase_Contains;
+*Delete = *cspacec::iShaderVarStringSetBase_Delete;
+*Empty = *cspacec::iShaderVarStringSetBase_Empty;
+*Clear = *cspacec::iShaderVarStringSetBase_Clear;
+*GetSize = *cspacec::iShaderVarStringSetBase_GetSize;
+*IsEmpty = *cspacec::iShaderVarStringSetBase_IsEmpty;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iShaderVarStringSetBase($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csRGBcolor ##############
 
 package cspace::csRGBcolor;
@@ -7704,15 +7783,9 @@ sub ACQUIRE {
 
 package cspace::iShaderVarStringSet;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace );
+@ISA = qw( cspace::iShaderVarStringSetBase cspace );
 %OWNER = ();
 %ITERATORS = ();
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_iShaderVarStringSet(@_);
-    bless $self, $pkg if defined($self);
-}
-
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -9102,6 +9175,7 @@ sub DESTROY {
 *GetSize = *cspacec::csShaderVariableStack_GetSize;
 *Clear = *cspacec::csShaderVariableStack_Clear;
 *MergeFront = *cspacec::csShaderVariableStack_MergeFront;
+*MergeBack = *cspacec::csShaderVariableStack_MergeBack;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -9263,8 +9337,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetupPass = *cspacec::iShader_SetupPass;
 *TeardownPass = *cspacec::iShader_TeardownPass;
 *DeactivatePass = *cspacec::iShader_DeactivatePass;
-*GetMetadata = *cspacec::iShader_GetMetadata;
 *GetUsedShaderVars = *cspacec::iShader_GetUsedShaderVars;
+*GetMetadata = *cspacec::iShader_GetMetadata;
 *scfGetVersion = *cspacec::iShader_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -10041,9 +10115,11 @@ sub new {
 *Row1 = *cspacec::csMatrix3_Row1;
 *Row2 = *cspacec::csMatrix3_Row2;
 *Row3 = *cspacec::csMatrix3_Row3;
+*Row = *cspacec::csMatrix3_Row;
 *Col1 = *cspacec::csMatrix3_Col1;
 *Col2 = *cspacec::csMatrix3_Col2;
 *Col3 = *cspacec::csMatrix3_Col3;
+*Col = *cspacec::csMatrix3_Col;
 *Set = *cspacec::csMatrix3_Set;
 *__neg__ = *cspacec::csMatrix3___neg__;
 *Transpose = *cspacec::csMatrix3_Transpose;
@@ -16548,6 +16624,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *RemoveAffectedLightingInfo = *cspacec::iLight_RemoveAffectedLightingInfo;
 *Setup = *cspacec::iLight_Setup;
 *GetSVContext = *cspacec::iLight_GetSVContext;
+*GetLocalBBox = *cspacec::iLight_GetLocalBBox;
 *scfGetVersion = *cspacec::iLight_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

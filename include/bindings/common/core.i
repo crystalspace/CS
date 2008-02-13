@@ -171,6 +171,8 @@
 #include "crystalspace.h"
 %}
 
+typedef unsigned char uint8;
+
 %include "bindings/common/allinterfaces.i"
 
 /* All this functions will are redefined later to always return

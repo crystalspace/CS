@@ -65,6 +65,22 @@ if not "core" in dir():
 core.AddSCFLink(_SetSCFPointer)
 CSMutableArrayHelper = core.CSMutableArrayHelper
 
+class iShaderVarStringSetBase(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def Request(*args): return _csgfx.iShaderVarStringSetBase_Request(*args)
+    def Contains(*args): return _csgfx.iShaderVarStringSetBase_Contains(*args)
+    def Delete(*args): return _csgfx.iShaderVarStringSetBase_Delete(*args)
+    def Empty(*args): return _csgfx.iShaderVarStringSetBase_Empty(*args)
+    def Clear(*args): return _csgfx.iShaderVarStringSetBase_Clear(*args)
+    def GetSize(*args): return _csgfx.iShaderVarStringSetBase_GetSize(*args)
+    def IsEmpty(*args): return _csgfx.iShaderVarStringSetBase_IsEmpty(*args)
+    __swig_destroy__ = _csgfx.delete_iShaderVarStringSetBase
+    __del__ = lambda self : None;
+iShaderVarStringSetBase_swigregister = _csgfx.iShaderVarStringSetBase_swigregister
+iShaderVarStringSetBase_swigregister(iShaderVarStringSetBase)
+
 class csRGBcolor(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
@@ -118,13 +134,10 @@ B_COEF = _csgfx.B_COEF
 R_COEF_SQ = _csgfx.R_COEF_SQ
 G_COEF_SQ = _csgfx.G_COEF_SQ
 B_COEF_SQ = _csgfx.B_COEF_SQ
-class iShaderVarStringSet(object):
+class iShaderVarStringSet(iShaderVarStringSetBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _csgfx.new_iShaderVarStringSet(*args)
-        try: self.this.append(this)
-        except: self.this = this
     __swig_destroy__ = _csgfx.delete_iShaderVarStringSet
     __del__ = lambda self : None;
 iShaderVarStringSet_swigregister = _csgfx.iShaderVarStringSet_swigregister

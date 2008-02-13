@@ -655,6 +655,7 @@ class csShaderVariableStack(object):
     def GetSize(*args): return _ivideo.csShaderVariableStack_GetSize(*args)
     def Clear(*args): return _ivideo.csShaderVariableStack_Clear(*args)
     def MergeFront(*args): return _ivideo.csShaderVariableStack_MergeFront(*args)
+    def MergeBack(*args): return _ivideo.csShaderVariableStack_MergeBack(*args)
 csShaderVariableStack_swigregister = _ivideo.csShaderVariableStack_swigregister
 csShaderVariableStack_swigregister(csShaderVariableStack)
 
@@ -738,8 +739,8 @@ class iShader(iShaderVariableContext):
     def SetupPass(*args): return _ivideo.iShader_SetupPass(*args)
     def TeardownPass(*args): return _ivideo.iShader_TeardownPass(*args)
     def DeactivatePass(*args): return _ivideo.iShader_DeactivatePass(*args)
-    def GetMetadata(*args): return _ivideo.iShader_GetMetadata(*args)
     def GetUsedShaderVars(*args): return _ivideo.iShader_GetUsedShaderVars(*args)
+    def GetMetadata(*args): return _ivideo.iShader_GetMetadata(*args)
     scfGetVersion = staticmethod(_ivideo.iShader_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iShader
     __del__ = lambda self : None;

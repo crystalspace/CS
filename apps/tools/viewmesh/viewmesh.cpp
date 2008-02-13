@@ -951,16 +951,15 @@ void ViewMesh::LoadSprite (const char* filename)
     meshTx = meshTy = meshTz = 0;
   }
 
-  iBase* result;
   printf ("Loading model '%s' from vfs dir '%s'\n",
 		  filename, vfs->GetCwd ()); fflush (stdout);
-  bool rc = loader->Load (filename, result, region, false, true);
+  csLoadResult rc = loader->Load (filename, region, false, true);
 
-  if (!rc)
+  if (!rc.success)
     return;
 
   csRef<iMeshFactoryWrapper> wrap;
-  if (result == 0)
+  if (rc.result == 0)
   {
     // Library file. Find the first factory in our region.
     iMeshFactoryList* factories = engine->GetMeshFactories ();
@@ -977,7 +976,7 @@ void ViewMesh::LoadSprite (const char* filename)
   }
   else
   {
-    wrap = scfQueryInterface<iMeshFactoryWrapper> (result);
+    wrap = scfQueryInterface<iMeshFactoryWrapper> (rc.result);
   }
 
   if (!wrap) return;
@@ -1128,15 +1127,14 @@ void ViewMesh::AttachMesh (const char* file)
     }
   }
 
-  iBase* result;
   iRegion* region = engine->CreateRegion ("viewmesh_region");
-  bool rc = loader->Load (file, result, region, false, true);
+  csLoadResult rc = loader->Load (file, region, false, true);
 
-  if (!rc)
+  if (!rc.success)
     return;
 
   csRef<iMeshFactoryWrapper> factory;
-  if (result == 0)
+  if (rc.result == 0)
   {
     // Library file. Find the first factory in our region.
     iMeshFactoryList* factories = engine->GetMeshFactories ();
@@ -1153,7 +1151,7 @@ void ViewMesh::AttachMesh (const char* file)
   }
   else
   {
-    factory = scfQueryInterface<iMeshFactoryWrapper> (result);
+    factory = scfQueryInterface<iMeshFactoryWrapper> (rc.result);
   }
 
   if (!factory) return;

@@ -67,7 +67,7 @@ public K, public J, public J2
    if you need to use any of these delete the warnfilter and add the
    necessary %template directive. */
 %warnfilter(401) csView; 		// iView
-%warnfilter(401) csGeomDebugHelper;  	// iDebugHelper
+//%warnfilter(401) csGeomDebugHelper;  	// iDebugHelper
 %warnfilter(401) csEventNameRegistry; 	// iEventNameRegistry
 %warnfilter(401) csTinyDocumentSystem; 	// iDocumentSystem
 

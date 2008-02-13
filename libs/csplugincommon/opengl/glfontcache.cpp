@@ -396,7 +396,7 @@ void csGLFontCache::CopyGlyphData (iFont* /*font*/, utf32_char /*glyph*/, size_t
   {
     statecache->SetTexture (GL_TEXTURE_2D, textures[tex].handle);
 
-    glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
+    statecache->SetPixelUnpackAlignment (1);
 
     uint8* intData = new uint8[MAX((texRect.Width () * texRect.Height ()),
       (bmetrics.width * bmetrics.height))];

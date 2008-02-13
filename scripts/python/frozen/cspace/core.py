@@ -116,17 +116,17 @@ class csArrayThresholdVariableCapacityLinear(csArrayThresholdVariable):
 csArrayThresholdVariableCapacityLinear_swigregister = _core.csArrayThresholdVariableCapacityLinear_swigregister
 csArrayThresholdVariableCapacityLinear_swigregister(csArrayThresholdVariableCapacityLinear)
 
-class csArrayCapacityDefault(csArrayThresholdVariableCapacityLinear):
+class csArrayCapacityVariableGrow(csArrayThresholdVariableCapacityLinear):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
-        this = _core.new_csArrayCapacityDefault(*args)
+        this = _core.new_csArrayCapacityVariableGrow(*args)
         try: self.this.append(this)
         except: self.this = this
-    __swig_destroy__ = _core.delete_csArrayCapacityDefault
+    __swig_destroy__ = _core.delete_csArrayCapacityVariableGrow
     __del__ = lambda self : None;
-csArrayCapacityDefault_swigregister = _core.csArrayCapacityDefault_swigregister
-csArrayCapacityDefault_swigregister(csArrayCapacityDefault)
+csArrayCapacityVariableGrow_swigregister = _core.csArrayCapacityVariableGrow_swigregister
+csArrayCapacityVariableGrow_swigregister(csArrayCapacityVariableGrow)
 
 SetCoreSCFPointer = _core.SetCoreSCFPointer
 scfCompatibleVersion = _core.scfCompatibleVersion

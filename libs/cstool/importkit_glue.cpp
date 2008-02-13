@@ -113,8 +113,8 @@ namespace Utility
 	if (error != 0)
 	  return false;
 
-	iBase* result;
-	if (!loader->Load (doc->GetRoot(), result, loadRegion))
+	csLoadResult rc = loader->Load (doc->GetRoot(), loadRegion);
+	if (!rc.success)
 	  return false;
       }
 

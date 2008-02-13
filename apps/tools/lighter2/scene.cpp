@@ -213,9 +213,9 @@ namespace lighter
       sceneFiles[i].directory = globalLighter->vfs->GetCwd ();
 
       // Pass it to the loader
-      iBase *res;
-      if (!globalLighter->loader->Load (
-          sceneFiles[i].GetDocument()->GetRoot(), res))
+      csLoadResult rc;
+      rc = globalLighter->loader->Load (sceneFiles[i].GetDocument()->GetRoot());
+      if (!rc.success)
         return globalLighter->Report ("Error loading file 'world'!");
 
       // Parses meshes from engine

@@ -198,6 +198,7 @@ class iLight(core.iBase):
     def RemoveAffectedLightingInfo(*args): return _iengine.iLight_RemoveAffectedLightingInfo(*args)
     def Setup(*args): return _iengine.iLight_Setup(*args)
     def GetSVContext(*args): return _iengine.iLight_GetSVContext(*args)
+    def GetLocalBBox(*args): return _iengine.iLight_GetLocalBBox(*args)
     scfGetVersion = staticmethod(_iengine.iLight_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iLight
     __del__ = lambda self : None;

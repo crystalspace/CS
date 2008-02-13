@@ -96,7 +96,8 @@ void csTerrainCell::SetLoadState(LoadState state)
           if (materialMapPersistent)
             materialmap.SetSize (materialMapWidth * materialMapHeight, 0);
          
-          loadState = terrain->GetFeeder ()->PreLoad (this) ? PreLoaded : NotLoaded;
+          loadState = terrain->GetFeeder ()->PreLoad (this)
+	    ? PreLoaded : NotLoaded;
 
           if (loadState == PreLoaded)
           {
@@ -112,7 +113,8 @@ void csTerrainCell::SetLoadState(LoadState state)
           if (materialMapPersistent)
             materialmap.SetSize (materialMapWidth * materialMapHeight, 0);
 
-          loadState = terrain->GetFeeder ()->Load (this) ? Loaded : NotLoaded;
+          loadState = terrain->GetFeeder ()->Load (this)
+	    ? Loaded : NotLoaded;
 
           if (loadState == Loaded)
           {

@@ -144,7 +144,8 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
     if (!fileSys.IsValid())
     {
-      Report(CS_REPORTER_SEVERITY_WARNING, "Unable to access file system.  File not loaded.");
+      Report(CS_REPORTER_SEVERITY_WARNING,
+	  "Unable to access file system.  File not loaded.");
       return "Unable to access file system";
     }
 
@@ -176,7 +177,8 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
     if (!fileSys.IsValid())
     {
-      Report(CS_REPORTER_SEVERITY_WARNING, "Unable to access file system.  File not loaded.");
+      Report(CS_REPORTER_SEVERITY_WARNING,
+	  "Unable to access file system.  File not loaded.");
       return "Unable to access file system";
     }
 
@@ -210,7 +212,8 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     rootNode = rootNode->GetNode("COLLADA");
     if (!rootNode.IsValid())
     {
-      Report(CS_REPORTER_SEVERITY_ERROR, "Error: Unable to find COLLADA node.  File not loaded.");
+      Report(CS_REPORTER_SEVERITY_ERROR,
+	  "Error: Unable to find COLLADA node.  File not loaded.");
       return "Unable to find COLLADA node";
     }
 
@@ -228,7 +231,8 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     rootNode = rootNode->GetNode("COLLADA");
     if (!rootNode.IsValid())
     {
-      Report(CS_REPORTER_SEVERITY_ERROR, "Error: Unable to find COLLADA node.  File not loaded.");
+      Report(CS_REPORTER_SEVERITY_ERROR,
+	  "Error: Unable to find COLLADA node.  File not loaded.");
       return "Unable to find COLLADA node";
     }  
 
@@ -247,7 +251,8 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     {
       if (warningsOn)
       {
-        Report(CS_REPORTER_SEVERITY_WARNING, "Warning: Crystal Space document not ready for writing.");
+        Report(CS_REPORTER_SEVERITY_WARNING,
+	    "Warning: Crystal Space document not ready for writing.");
       }
 
       return "Crystal Space document not ready for writing";
