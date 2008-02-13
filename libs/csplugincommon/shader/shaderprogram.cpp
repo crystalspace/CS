@@ -85,7 +85,13 @@ bool csShaderProgram::ProgramParamParser::ParseProgramParam (
 	"Node has no contents");
       return false;
     }
-    param.name = stringsSvName->Request (value);
+    
+    CS::Graphics::ShaderVarNameParser nameParse (value);
+    param.name = stringsSvName->Request (nameParse.GetShaderVarName());
+    for (size_t n; n < nameParse.GetIndexNum(); n++)
+    {
+      param.indices.Push (nameParse.GetIndexValue (n));
+    }
     param.valid = true;
     return true;
   }

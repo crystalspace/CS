@@ -25,7 +25,9 @@
  */
 
 #include "csextern.h"
+#include "csgfx/shadervararrayhelper.h"
 #include "csutil/array.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/leakguard.h"
 #include "csutil/ref.h"
 #include "csutil/scf_implementation.h"
@@ -103,6 +105,9 @@ public:
     
     // Name of SV to use (if any)
     CS::ShaderVarStringID name;
+    csDirtyAccessArray<size_t, csArrayElementHandler<size_t>,
+      CS::Memory::LocalBufferAllocator<size_t, 2,
+	CS::Memory::AllocatorMalloc, true> > indices;
     // Reference to const value shadervar
     csRef<csShaderVariable> var;
 
@@ -215,20 +220,34 @@ protected:
 
   //@{
   /**
+   * Resolve the SV of a ProgramParam
+   */
+  inline csShaderVariable* GetParamSV (const csShaderVariableStack& stack, 
+    const ProgramParam &param)
+  {
+    csShaderVariable* var = 0;
+  
+    var = csGetShaderVariableFromStack (stack, param.name);
+    if (var)
+      var = CS::Graphics::ShaderVarArrayHelper::GetArrayItem (var,
+        param.indices.GetArray(), param.indices.GetSize(),
+        CS::Graphics::ShaderVarArrayHelper::maFail);
+    if (!var)
+      var = param.var;
+  
+    return var;
+  }
+  /**
    * Query the value of a ProgramParam variable by reading the constant or
    * resolving the shader variable.
    */
   inline csVector4 GetParamVectorVal (const csShaderVariableStack& stack, 
     const ProgramParam &param, const csVector4& defVal)
   {
-    csRef<csShaderVariable> var;
-  
-    var = csGetShaderVariableFromStack (stack, param.name);
-    if (!var.IsValid ())
-      var = param.var;
-  
+    csShaderVariable* var (GetParamSV (stack, param));
+    
     // If var is null now we have no const nor any passed value, ignore it
-    if (!var.IsValid ())
+    if (!var)
       return defVal;
   
     csVector4 v;
@@ -238,14 +257,10 @@ protected:
   inline csReversibleTransform GetParamTransformVal (const csShaderVariableStack& stack, 
     const ProgramParam &param, const csReversibleTransform& defVal)
   {
-    csRef<csShaderVariable> var;
-  
-    var = csGetShaderVariableFromStack (stack, param.name);
-    if (!var.IsValid ())
-      var = param.var;
-  
+    csShaderVariable* var (GetParamSV (stack, param));
+    
     // If var is null now we have no const nor any passed value, ignore it
-    if (!var.IsValid ())
+    if (!var)
       return defVal;
   
     csReversibleTransform t;
@@ -255,14 +270,10 @@ protected:
   inline float GetParamFloatVal (const csShaderVariableStack& stack, 
     const ProgramParam &param, float defVal)
   {
-    csRef<csShaderVariable> var;
-  
-    var = csGetShaderVariableFromStack (stack, param.name);
-    if (!var.IsValid ())
-      var = param.var;
-  
+    csShaderVariable* var (GetParamSV (stack, param));
+    
     // If var is null now we have no const nor any passed value, ignore it
-    if (!var.IsValid ())
+    if (!var)
       return defVal;
   
     float f;
