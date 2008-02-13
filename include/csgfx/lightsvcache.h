@@ -97,6 +97,8 @@ private:
   csRef<iShaderVarStringSet> strings;
   CS::ShaderVarStringID defaultVars[_varCount];
   
+  CS::ShaderVarStringID lightSVIdCache_unnumbered[_lightCount];
+  
   void ClearDefVars ();
 public:
   /**
@@ -120,8 +122,19 @@ public:
    * \param prop Light property for which a variable name is to be retrieved.
    * \return Name of the relevant variable, csInvalidStringID in case of an
    *   error.
+   * \deprecated Deprecated in 1.3. Use shader var arrays instead.
    */
   CS::ShaderVarStringID GetLightSVId (size_t num, LightProperty prop);
+    
+  /**
+   * Obtain the name for for a lighting-relevant shader variable.
+   * A caching scheme is used to avoid having to re-request a name from the
+   * given string set every time one is needed.
+   * \param prop Light property for which a variable name is to be retrieved.
+   * \return Name of the relevant variable, csInvalidStringID in case of an
+   *   error.
+   */
+  CS::ShaderVarStringID GetLightSVId (LightProperty prop);
     
   /** 
    * Obtain the name for for a lighting-relevant shader variable whose name
