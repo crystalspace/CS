@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 13-Feb-2008
+	-varslot added a rule to work around known issue with texture compression
+	  and Intel graphics card under OSX.
         - Jorrit deprecated the Load() functions in iLoader that accept a
           iBase* result return parameter. Instead there are now three
           new versions that return an instance of csLoadResult.
