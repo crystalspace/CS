@@ -67,6 +67,7 @@ chronological order.
 	  '--help' besides crystalspace options.
 	- res fixed setting of the '0' render target in soft3d when no render
 	  target is set.
+	- Marten fixed a typo in csBox3 transformation.
 12-Feb-2008
 	- caedes fixed python override of Graphics2D::PerformExtension to
 	  allow command passthrough to the real c++ PerformExtension.

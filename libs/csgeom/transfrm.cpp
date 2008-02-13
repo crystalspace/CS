@@ -155,7 +155,7 @@ csBox3 csTransform::Other2This (const csBox3& box) const
       for (size_t j = 0; j < 3; ++j)
       {
         float a = col[j] * minA[j];
-        float b = col[j] * minA[j];
+        float b = col[j] * maxA[j];
         if (a < b)
         {
           minB[i] += a;
@@ -330,7 +330,7 @@ csBox3 csReversibleTransform::This2Other (const csBox3 &box) const
       for (size_t j = 0; j < 3; ++j)
       {
         float a = col[j] * minA[j];
-        float b = col[j] * minA[j];
+        float b = col[j] * maxA[j];
         if (a < b)
         {
           minB[i] += a;
