@@ -9,6 +9,9 @@ chronological order.
 13-Feb-2008
 	-varslot added a rule to work around known issue with texture compression
 	  and Intel graphics card under OSX.
+	- res fixed a copy and paste bug in xmlshader which could result in
+	  some conditions being wrongly determined to be "always true" or
+	  "always false".
 2-Feb-2008
 	- res fixed "short" (h) and "short short" (hh) handling to only cast
 	  to a signed char/short when formatting to a decimal integer; cast to

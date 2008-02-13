@@ -2,6 +2,7 @@
 
 13-Feb-2008
 	- varslot+res merged r28662, r28663 into 1.2 (gldriver.xml updates).
+	- res merged r28664 into 1.2 (xmlshader conditions fix).
 3-Feb-2008
 	- Vincent merged r28601 into 1.2 (fix for #449, "short" (h) and
 	  "short short" (hh) formatting).

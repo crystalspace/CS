@@ -240,7 +240,7 @@ csConditionID csConditionEvaluator::FindOptimizedCondition (
     || (newOp.right.operation == csCondAlwaysTrue)))
   {
     newOp.right.type = operandBoolean;
-    newOp.right.boolVal = newOp.left.operation == csCondAlwaysTrue;
+    newOp.right.boolVal = newOp.right.operation == csCondAlwaysTrue;
   }
   if ((newOp.left.type >= operandFloat) 
     && (newOp.left.type < operandSV)
