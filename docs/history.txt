@@ -22,6 +22,9 @@ chronological order.
 	- res made some char* -> const char* in apps.
 	- caedes fixed bullet plugin to be compatible with bullet 2.66 while
 	  maintaining backwards compatibility.
+	- caedes fixed phystut jamfile so it will get built if either bullet
+	  or ode are available (before it would be built only depending on
+	  whether ode was available).
 12-Feb-2008
 	- caedes fixed python override of Graphics2D::PerformExtension to
 	  allow command passthrough to the real c++ PerformExtension.
