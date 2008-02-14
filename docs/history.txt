@@ -7,7 +7,6 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 14-Feb-2008
-	- Sueastside added 'portals' loading to iLoader::Load().
         - Jorrit added csgfx/imagemanipulate.h to the python bindings.
         - Jorrit added csImageManipulate.TransformColor() and
           Gray() tools.
@@ -22,6 +21,8 @@ chronological order.
 	  the Luminance() function for better grayscale.
 	- res fixed the xmlshader plugin to not assert on some more complex
 	  conditions.
+	- Sueastside added 'portals' loading to iLoader::Load().
+	- Sueastside reverted r2706 and reapplied only the 'operandOperation's.
 13-Feb-2008
 	- varslot added a rule to work around known issue with texture
 	  compression and Intel graphics card under OSX.
