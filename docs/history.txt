@@ -7,6 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 14-Feb-2008
+	- Sueastside added 'portals' loading to iLoader::Load().
         - Jorrit added csgfx/imagemanipulate.h to the python bindings.
         - Jorrit added csImageManipulate.TransformColor() and
           Gray() tools.
