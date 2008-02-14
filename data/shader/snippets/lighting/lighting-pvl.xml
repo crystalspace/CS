@@ -28,14 +28,14 @@
     </block>
     
     <block location="cg:variablemap">
-      <?Lighting_Variablemaps fragment?>
+      <?Lighting_Variablemaps vertex?>
     </block>
     
     <block location="cg:definitions">
       <?Include /shader/snippets/lighting/lightfuncs.cginc ?>
     </block>
     
-    <block location="cg:fragmentIn">
+    <block location="cg:vertexIn">
       <!-- @@@ The Cg combiner process the <uniform ... /> tags *before*
            xmlshader - so we can't use includes, templates here. Pity -->
       <uniform type="position4_world" name="lightPosWorld[8]" />
@@ -46,13 +46,13 @@
       <uniform type="float" name="lightFalloffOuter[8]" />
     </block>
     
-    <block location="cg:vertexMain">
-      diffuseColor = float3(0);
-      specularColor = float3(0);
+    <block location="cg:vertexToFragment">
+      <varying type="rgb" name="diffuseColor" />
+      <varying type="rgb" name="specularColor" />
     </block>
     
-    <block location="cg:fragmentMain">
-      <?Lighting_Compute fragment?>
+    <block location="cg:vertexMain">
+      <?Lighting_Compute vertex?>
     </block>
     
     <output name="diffuseColor" type="rgb" />

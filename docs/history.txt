@@ -37,6 +37,7 @@ chronological order.
 	  is opened, not created. This is now necessary as the state cache
 	  does some ext initialization on its own, which is only possible after
 	  the canvas opened and the ext manager is set up.
+	- res added a PVL lighting weaver step.
 13-Feb-2008
 	- varslot added a rule to work around known issue with texture
 	  compression and Intel graphics card under OSX.
