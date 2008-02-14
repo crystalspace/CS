@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?> 
-<shader compiler="xmlshader" name="lighting_vproc">
+<shader compiler="xmlshader" name="lighting_vproc" lights="8">
+    <shadervars>
+      <shadervar type="vector3" name="mat specular">1,1,1</shadervar>
+      <shadervar type="float" name="mat shininess">32</shadervar>
+    </shadervars>
 
     <!-- Compute all lights with vproc_std (ie software per-vertex) -->
     <technique priority="200" lights="2147483647">

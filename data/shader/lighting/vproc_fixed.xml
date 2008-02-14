@@ -3,6 +3,7 @@
 <shader compiler="xmlshader" name="lighting_vproc_fixed" lights="4">
   <shadervars>
     <shadervar type="vector3" name="mat specular">1,1,1</shadervar>
+    <shadervar type="float" name="mat shininess">32</shadervar>
   </shadervars>
 
   <?Template ifGLSupportsLight N?>
@@ -19,6 +20,13 @@
   <?Template ifNotGLSupportsLight N?>
     <?ifGLSupportsLight $N$?>
     <?else?>
+  <?Endtemplate?>
+  
+  <?Template elsifNotGLSupportsLight N?>
+    <?! should obviously be in sync with the stuff above ?>
+    <?elsif !(((vars."light type[$N$]".int == consts.CS_LIGHT_DIRECTIONAL)
+	&& (vars."light attenuation mode[$N$]".int == consts.CS_ATTN_NONE)) 
+	|| (vars."light attenuation mode[$N$]".int != consts.CS_ATTN_LINEAR)) ?>
   <?Endtemplate?>
   
   <?Template HandleLightFVP LightCount N?>
@@ -61,9 +69,9 @@
   
   <?Template HandleLightVProc LightCount N?>
     <?if (vars."light count".int &gt; $N$) && ($LightCount$ &gt; $N$) ?>
-      <?!ifGLSupportsLight $N$ ?>
+      <?ifGLSupportsLight $N$ ?>
 	<enablelight num="$N$">no</enablelight>
-      <?!endif?>
+      <?endif?>
     <?else?>
       <enablelight num="$N$">no</enablelight>
     <?endif?>
@@ -79,7 +87,6 @@
     <matambient type="vector3">0.5,0.5,0.5</matambient>
     <matdiffuse type="vector3">0.5,0.5,0.5</matdiffuse>
     <matspecularexp type="shadervar">mat shininess</matspecularexp>
-    <separatespecular/>
     <?Generate L 0 7 ?>
       <?HandleLightFVP $N$ $$L$$ ?>
     <?Endgenerate?>
@@ -95,9 +102,6 @@
       <colorbuffer>color unlit</colorbuffer>
     <?endif?>
     -->
-    <!-- @@@ FIXME: Support software specular
-         Unfortunately, the only way I see is to uglily use a 2nd pass
-         for the specular part... [res] -->
     <colormixmode>none</colormixmode>
     <finalfactor type="float">0.5</finalfactor>
     <lights>8</lights>
@@ -137,6 +141,7 @@
 	<vp plugin="glfixed">
 	  <fixedvp>
 	    <?FVPcommon $N$ ?>
+	    <separatespecular/>
 	    <!-- specular is separate, so no downscaling -->
 	    <matspecular type="shadervar">mat specular</matspecular>
 	    <!--matspecular type="float">1</matspecular-->
@@ -153,6 +158,41 @@
 	  </fixedfp>
 	</fp>
       </pass>
+      <?if false ?>
+      <?Generate L 0 7 ?>
+        <?! This is an obtuse way to formulate "if one light is not GL-supported ?>
+	<?elsifNotGLSupportsLight $L$ ?>
+	<pass>
+	  <mixmode><add /></mixmode>
+	  <!-- need to bind at least some texture -->
+	  <texture name="standardtex white" destination="diffuse" />
+	  <buffer source="generic 0" destination="color" />
+	  <vproc plugin="vproc_std">
+	    <vproc_std>
+	      <lightmixmode>add</lightmixmode>
+	      <lights>2147483647</lights>
+	      <diffuse>no</diffuse>
+	      <specular buffer="generic 0" />
+	      <specularexp type="shadervar">mat shininess</specularexp>
+	      <lights>8</lights>
+	      <?Generate L 0 7 ?>
+		<?HandleLightVProc $N$ $$L$$ ?>
+	      <?Endgenerate?>
+	    </vproc_std>
+	  </vproc>
+	  <fp plugin="glfixed">
+	    <fixedfp>
+	      <layer name="specular">
+		<colorsource num="0" source="primary color" modifier="color"/>
+		<coloroperation operation="replace" />
+		<alphasource num="0" source="primary color" modifier="alpha"/>
+		<alphaoperation operation="replace" />
+	      </layer>
+	    </fixedfp>
+	  </fp>
+	</pass>
+	<?Endgenerate?>
+      <?endif?>
     </technique>
     <!-- Tech without separate specular -->
     <technique priority="$N$00">
@@ -178,6 +218,7 @@
 	<vproc plugin="vproc_std">
 	  <vproc_std>
 	    <?VPROCcommon $N$ ?>
+	    <specularondiffuse />
 	  </vproc_std>
 	</vproc>
 	<fp plugin="glfixed">
