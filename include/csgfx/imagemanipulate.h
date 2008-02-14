@@ -30,6 +30,7 @@
 
 #include "csextern.h"
 #include "igraphic/image.h"
+#include "csutil/cscolor.h"
 
 /**
  * Helper class to manipulate iImage objects.
@@ -77,6 +78,23 @@ public:
    */
   static csRef<iImage> Sharpen (iImage* source, int strength, 
     csRGBpixel* transp = 0);
+
+  /**
+   * Do color manipulation on the image data and return a new image.
+   * This function works for RGBA and paletted images. Since the mult
+   * and add parameters are 4-colors you can also manipulate the alpha
+   * channel using this function.
+   * \param mult is a 4-color indicating a multiplier to use for the colors.
+   * \param add is a 4-color indicating an adder to use for the colors.
+   */
+  static csRef<iImage> TransformColor (iImage* source,
+      const csColor4& mult, const csColor4& add);
+
+  /**
+   * Create a new grayscale version of the given image.
+   * This function works for RGBA and paletted images.
+   */
+  static csRef<iImage> Gray (iImage* source);
 };
 
 /** @} */

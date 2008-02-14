@@ -321,6 +321,118 @@ csRef<iImage> csImageManipulate::Mipmap (iImage* source, int steps,
     return Mipmap2D (source, steps, transp);
 }
 
+static csRGBpixel TransformOneColor (const csRGBpixel& s, const csColor4& mult,
+    const csColor4& add)
+{
+  float r = float (s.red) * mult.red + add.red;
+  if (r < 0) r = 0; else if (r > 255) r = 255;
+  float g = float (s.green) * mult.green + add.green;
+  if (g < 0) g = 0; else if (g > 255) g = 255;
+  float b = float (s.blue) * mult.blue + add.blue;
+  if (b < 0) b = 0; else if (b > 255) b = 255;
+  float a = float (s.alpha) * mult.alpha + add.alpha;
+  if (a < 0) a = 0; else if (a > 255) a = 255;
+  csRGBpixel p;
+  p.red = (uint8)r;
+  p.green = (uint8)g;
+  p.blue = (uint8)b;
+  p.alpha = (uint8)a;
+  return p;
+}
+
+csRef<iImage> csImageManipulate::TransformColor (iImage* source,
+    const csColor4& mult, const csColor4& add)
+{
+  const int Width = source->GetWidth();
+  const int Height = source->GetHeight();
+
+  csRef<csImageMemory> nimg;
+
+  const csRGBpixel* src;
+  csRGBpixel* dst;
+
+  size_t i;
+
+  switch (source->GetFormat() & CS_IMGFMT_MASK)
+  {
+    case CS_IMGFMT_NONE:
+      return 0; // Not supported.
+    case CS_IMGFMT_PALETTED8:
+      {
+        nimg.AttachNew (new csImageMemory (source));
+        src = source->GetPalette ();
+        dst = nimg->GetPalettePtr ();
+        for (i = 0 ; i < 256 ; i++)
+	  *dst++ = TransformOneColor (*src++, mult, add);
+      }
+      break;
+    case CS_IMGFMT_TRUECOLOR:
+      {
+        nimg.AttachNew (new csImageMemory (Width, Height, source->GetFormat()));
+	csRGBpixel* mipmap = new csRGBpixel [Width * Height];
+        src = (const csRGBpixel*)source->GetImageData ();
+        dst = mipmap;
+        for (i = 0 ; i < size_t (Width * Height) ; i++)
+	  *dst++ = TransformOneColor (*src++, mult, add);
+        nimg->ConvertFromRGBA (mipmap);
+      }
+      break;
+  }
+
+  return nimg;
+}
+
+static csRGBpixel GrayColor (const csRGBpixel& s)
+{
+  int sum = int(s.red)+int(s.green)+int(s.blue);
+  csRGBpixel p;
+  p.red = sum / 3;
+  p.green = sum / 3;
+  p.blue = sum / 3;
+  p.alpha = s.alpha;
+  return p;
+}
+
+csRef<iImage> csImageManipulate::Gray (iImage* source)
+{
+  const int Width = source->GetWidth();
+  const int Height = source->GetHeight();
+
+  csRef<csImageMemory> nimg;
+
+  const csRGBpixel* src;
+  csRGBpixel* dst;
+  size_t i;
+
+  switch (source->GetFormat() & CS_IMGFMT_MASK)
+  {
+    case CS_IMGFMT_NONE:
+      return 0; // Not supported.
+    case CS_IMGFMT_PALETTED8:
+      {
+        nimg.AttachNew (new csImageMemory (source));
+        src = source->GetPalette ();
+        dst = nimg->GetPalettePtr ();
+        for (i = 0 ; i < 256 ; i++)
+	  *dst++ = GrayColor (*src++);
+      }
+      break;
+    case CS_IMGFMT_TRUECOLOR:
+      {
+        nimg.AttachNew (new csImageMemory (Width, Height, source->GetFormat()));
+	csRGBpixel* mipmap = new csRGBpixel [Width * Height];
+        src = (const csRGBpixel*)source->GetImageData ();
+        dst = mipmap;
+        for (i = 0 ; i < size_t (Width * Height) ; i++)
+	  *dst++ = GrayColor (*src++);
+        nimg->ConvertFromRGBA (mipmap);
+      }
+      break;
+  }
+
+  return nimg;
+}
+
 csRef<iImage> csImageManipulate::Blur (iImage* source, csRGBpixel* transp)
 {
   const int Width = source->GetWidth();
