@@ -32,6 +32,7 @@ chronological order.
 	- res tweaked the default specular values of the vproc_fixed and vproc
 	  shaders.
 	- res added support for float3x3 arrays to the Cg shader plugin.
+	- res added a first dynamic lighting weaver step + shader.
 13-Feb-2008
 	- varslot added a rule to work around known issue with texture
 	  compression and Intel graphics card under OSX.
