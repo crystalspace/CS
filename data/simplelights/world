@@ -16045,12 +16045,12 @@
         <light name="Lamp.002">
             <center x="5.56838" y="2.73355e-006" z="-4.76654" />
             <color red="0" green="1" blue="0" />
-            <radius>20</radius>
+            <radius>200</radius>
             <type>spot</type>
             <move>
                 <matrix>
                     <lookat>
-                        <to x="0" y="-0.707" z="0.707" />
+                        <to x="-7" y="-6" z="7" />
                     </lookat>
                 </matrix>
             </move>
@@ -16092,7 +16092,7 @@
             </move>
         </meshobj>
     </sector>
-    <sequences>
+    <!--sequences>
         <sequence name="animlight">
             <args>
                 <arg name="light" />
@@ -16117,5 +16117,5 @@
                 <light name="light" light="Lamp" />
             </fire>
         </trigger>
-    </triggers>
+    </triggers-->
 </world>
