@@ -470,7 +470,30 @@ class csVertexLightCalculator : public iVertexLightCalculator
   {
     OpMul (csColor& d, const csColor& x) { d *= x; }
   };
-  template<typename Op, int zeroDest, int diffuse, int specular>
+  
+  template<typename T, bool B>
+  class ConditionalAlloc
+  {
+    uint32 _data[(sizeof(T) + sizeof(uint32) - 1) / sizeof(uint32)];
+  public:
+    template<typename P1>
+    ConditionalAlloc (const P1& a)
+    {
+      if (B) new (&_data) T (a);
+    }
+    ~ConditionalAlloc()
+    {
+      if (B) GetObject().~T();
+    }
+  
+    T& GetObject()
+    {
+      CS_ASSERT(B);
+      return *(reinterpret_cast<T*> (&_data));
+    }
+  };
+  
+  template<typename Op, bool zeroDest, bool diffuse, bool specular>
   void CalculateLightingODS (const csLightProperties& light,
     const csVector3& eyePos, float shininess,
     size_t numvert, iRenderBuffer* vb, iRenderBuffer* nb, 
@@ -483,7 +506,8 @@ class csVertexLightCalculator : public iVertexLightCalculator
     csVertexListWalker<float, csVector3> vbLock (vb, 3);
     csVertexListWalker<float, csVector3> nbLock (nb, 3);
     csRenderBufferLock<csColor, iRenderBuffer*> color (litColor);
-    csRenderBufferLock<csColor, iRenderBuffer*> spec (specColor);
+    ConditionalAlloc<csRenderBufferLock<csColor, iRenderBuffer*>,
+      specular> spec (specColor);
 
     for (size_t i = 0; i < numvert; i++)
     {
@@ -502,7 +526,7 @@ class csVertexLightCalculator : public iVertexLightCalculator
 	  csVector3 halfvec = pv.LightDirection() * pv.LightInvDistance();
 	  halfvec += vertToEye.Unit();
 	  float specDP = halfvec.Unit() * n;
-          Op op (spec[i], pow (specDP, shininess) * light.specular * pv.Attenuation());
+          Op op (spec.GetObject()[i], pow (specDP, shininess) * light.specular * pv.Attenuation());
         }
       }
       else if (zeroDest)
@@ -514,37 +538,37 @@ class csVertexLightCalculator : public iVertexLightCalculator
 	}
         if (specular)
         {
-          Op op (spec[i],  nullColor);
+          Op op (spec.GetObject()[i],  nullColor);
 	}
       }
       ++vbLock; ++nbLock;
     }
   }
-  template<typename Op, int zeroDest, int diffuse>
+  template<typename Op, bool zeroDest, bool diffuse>
   void CalculateLightingOD (const csLightProperties& light,
     const csVector3& eyePos, float shininess,
     size_t numvert, iRenderBuffer* vb, iRenderBuffer* nb, 
     iRenderBuffer* litColor, iRenderBuffer* specColor) const
   {
     if (specColor != 0)
-      CalculateLightingODS<Op, zeroDest, diffuse, 1> (light, eyePos, shininess,
-        numvert, vb, nb, litColor, specColor);
+      CalculateLightingODS<Op, zeroDest, diffuse, true> (light, eyePos,
+        shininess, numvert, vb, nb, litColor, specColor);
     else
-      CalculateLightingODS<Op, zeroDest, diffuse, 0> (light, eyePos, shininess,
-        numvert, vb, nb, litColor, specColor);
+      CalculateLightingODS<Op, zeroDest, diffuse, false> (light, eyePos,
+        shininess, numvert, vb, nb, litColor, specColor);
   }
-  template<typename Op, int zeroDest>
+  template<typename Op, bool zeroDest>
   void CalculateLightingO (const csLightProperties& light,
     const csVector3& eyePos, float shininess,
     size_t numvert, iRenderBuffer* vb, iRenderBuffer* nb, 
     iRenderBuffer* litColor, iRenderBuffer* specColor) const
   {
     if (litColor != 0)
-      CalculateLightingOD<Op, zeroDest, 1> (light, eyePos, shininess, numvert, 
-        vb, nb, litColor, specColor);
+      CalculateLightingOD<Op, zeroDest, true> (light, eyePos, shininess,
+        numvert, vb, nb, litColor, specColor);
     else
-      CalculateLightingOD<Op, zeroDest, 0> (light, eyePos, shininess, numvert, 
-        vb, nb, litColor, specColor);
+      CalculateLightingOD<Op, zeroDest, false> (light, eyePos, shininess,
+        numvert, vb, nb, litColor, specColor);
   }
 public:
   virtual void CalculateLighting (const csLightProperties& light,
@@ -552,7 +576,7 @@ public:
     size_t numvert, iRenderBuffer* vb, iRenderBuffer* nb, 
     iRenderBuffer* litColor, iRenderBuffer* specColor = 0) const
   {
-    CalculateLightingO<OpAssign, 1> (light, eyePos, shininess, 
+    CalculateLightingO<OpAssign, true> (light, eyePos, shininess, 
       numvert, vb, nb, litColor, specColor);
   }
 
@@ -561,8 +585,8 @@ public:
     size_t numvert, iRenderBuffer* vb, iRenderBuffer* nb, 
     iRenderBuffer* litColor, iRenderBuffer* specColor = 0) const
   {
-    CalculateLightingO<OpAdd, 0> (light, eyePos, shininess, numvert, vb, nb, 
-      litColor, specColor);
+    CalculateLightingO<OpAdd, false> (light, eyePos, shininess, numvert, 
+      vb, nb, litColor, specColor);
   }
 
   virtual void CalculateLightingMul (const csLightProperties& light,
@@ -570,8 +594,8 @@ public:
     size_t numvert, iRenderBuffer* vb, iRenderBuffer* nb, 
     iRenderBuffer* litColor, iRenderBuffer* specColor = 0) const
   {
-    CalculateLightingO<OpMul, 0> (light, eyePos, shininess, numvert, vb, nb, 
-      litColor, specColor);
+    CalculateLightingO<OpMul, false> (light, eyePos, shininess, numvert,
+      vb, nb, litColor, specColor);
   }
 };
 
