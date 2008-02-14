@@ -4309,6 +4309,47 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csLoadResult ##############
+
+package cspace::csLoadResult;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_success_get = *cspacec::csLoadResult_success_get;
+*swig_success_set = *cspacec::csLoadResult_success_set;
+*swig_result_get = *cspacec::csLoadResult_result_get;
+*swig_result_set = *cspacec::csLoadResult_result_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csLoadResult(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csLoadResult($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iLoader ##############
 
 package cspace::iLoader;

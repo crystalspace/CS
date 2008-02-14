@@ -92,6 +92,20 @@ class iMissingLoaderData(core.iBase):
 iMissingLoaderData_swigregister = _imap.iMissingLoaderData_swigregister
 iMissingLoaderData_swigregister(iMissingLoaderData)
 
+class csLoadResult(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    success = _swig_property(_imap.csLoadResult_success_get, _imap.csLoadResult_success_set)
+    result = _swig_property(_imap.csLoadResult_result_get, _imap.csLoadResult_result_set)
+    def __init__(self, *args): 
+        this = _imap.new_csLoadResult(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _imap.delete_csLoadResult
+    __del__ = lambda self : None;
+csLoadResult_swigregister = _imap.csLoadResult_swigregister
+csLoadResult_swigregister(csLoadResult)
+
 class iLoader(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
