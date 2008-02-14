@@ -17,6 +17,8 @@ chronological order.
           MacBook, and should address bugtracker ticket #205. Note:
           sound.cfg is not loaded by the CoreAudio driver, and should
           maybe also be fixed.
+	- Jorrit changed the new csImageManipulate.Gray() to use
+	  the Luminance() function for better grayscale.
 	- res fixed the xmlshader plugin to not assert on some more complex
 	  conditions.
 13-Feb-2008
