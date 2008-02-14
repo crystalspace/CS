@@ -88,10 +88,12 @@ private:
   };
   LightMixmode lightMixMode;
   LightMixmode colorMixMode;
+  bool specularOnDiffuse;
 
   ProgramParam finalLightFactor;
   size_t numLights;
   bool useAttenuation;
+  bool doDiffuse;
   bool doSpecular;
   bool doVertexSkinning;
   bool doNormalSkinning;

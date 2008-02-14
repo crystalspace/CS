@@ -40,7 +40,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(VProc_std)
     : scfImplementationType (this, plug->objreg), shaderPlugin (plug), 
     lightMixMode (LIGHTMIXMODE_NONE), 
     colorMixMode (LIGHTMIXMODE_NONE), 
-    numLights (0), useAttenuation (true), doSpecular (false),
+    specularOnDiffuse (false), 
+    numLights (0), useAttenuation (true), doDiffuse (true), doSpecular (false),
     doVertexSkinning (false), doNormalSkinning (false), 
     doTangentSkinning (false), doBiTangentSkinning (false),
     specularOutputBuffer (CS_BUFFER_NONE),
@@ -382,9 +383,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(VProc_std)
 
       //copy output
       size_t elementCount = vbuf->GetElementCount ();
-      csRef<iRenderBuffer> clbuf = 
-        csRenderBuffer::CreateRenderBuffer (elementCount, CS_BUF_STREAM,
-        CS_BUFCOMP_FLOAT, hasAlpha ? 4 : 3);
+      csRef<iRenderBuffer> clbuf;
+      if (doDiffuse)
+      {
+        clbuf = csRenderBuffer::CreateRenderBuffer (elementCount, CS_BUF_STREAM,
+          CS_BUFCOMP_FLOAT, hasAlpha ? 4 : 3);
+        // @@@ FIXME: should probably get rid of the multiple locking/unlocking...
+        csRenderBufferLock<float> tmpColor (clbuf);
+        memset (tmpColor, 0, sizeof(float) * (hasAlpha?4:3) * elementCount);
+      }
       csRef<iRenderBuffer> specBuf;
       if (doSpecular)
       {
@@ -394,13 +401,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(VProc_std)
         memset (tmpColor, 0, sizeof(csColor) * elementCount);
       }
       float shininess = GetParamFloatVal (stack, shininessParam, 0.0f);
-
-      // tempdata
-      {
-        // @@@ FIXME: should probably get rid of the multiple locking/unlocking...
-        csRenderBufferLock<float> tmpColor (clbuf);
-        memset (tmpColor, 0, sizeof(float) * (hasAlpha?4:3) * elementCount);
-      }
 
       if (lightsActive > 0)
       {
@@ -459,7 +459,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(VProc_std)
 
       }
 
-      if (cbuf) 
+      if (doDiffuse && cbuf)
       {
         switch (colorMixMode)
         {
@@ -509,22 +509,34 @@ CS_PLUGIN_NAMESPACE_BEGIN(VProc_std)
         default:
           CS_ASSERT (false);
         }
-      }
-
-      float finalLightFactorReal = GetParamFloatVal (stack, finalLightFactor,
-        1.0f);
-      {
-        csRenderBufferLock<csColor> tmpColor (clbuf);
-        for (size_t i = 0; i < elementCount; i++)
+        if (doSpecular && specularOnDiffuse)
         {
-          tmpColor[i] *= finalLightFactorReal;
+	  csRenderBufferLock<csColor> tmpColor (clbuf);
+	  csRenderBufferLock<csColor> tmpColor2 (specBuf);
+	  for (size_t i = 0; i < elementCount; i++)
+	  {
+	    tmpColor[i] += tmpColor2[i];
+	  }
         }
       }
 
-      modes.buffers->SetAccessor (modes.buffers->GetAccessor(),
-        modes.buffers->GetAccessorMask() & ~CS_BUFFER_COLOR_MASK);
-      modes.buffers->SetRenderBuffer (CS_BUFFER_COLOR, clbuf);
-      if (doSpecular)
+      float finalLightFactorReal = GetParamFloatVal (stack, finalLightFactor,
+	1.0f);
+      if (doDiffuse)
+      {
+	{
+	  csRenderBufferLock<csColor> tmpColor (clbuf);
+	  for (size_t i = 0; i < elementCount; i++)
+	  {
+	    tmpColor[i] *= finalLightFactorReal;
+	  }
+	}
+  
+	modes.buffers->SetAccessor (modes.buffers->GetAccessor(),
+	  modes.buffers->GetAccessorMask() & ~CS_BUFFER_COLOR_MASK);
+	modes.buffers->SetRenderBuffer (CS_BUFFER_COLOR, clbuf);
+      }
+      if (doSpecular && !specularOnDiffuse)
       {
         csRenderBufferLock<csColor> tmpColor (specBuf);
         for (size_t i = 0; i < elementCount; i++)
@@ -660,6 +672,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(VProc_std)
             }
             break;
           }
+        case XMLTOKEN_DIFFUSE:
+          {
+            if (!synsrv->ParseBool (child, doDiffuse, true))
+              return false;
+          }
+          break;
         case XMLTOKEN_SPECULAR:
           {
             if (!synsrv->ParseBool (child, doSpecular, true))
@@ -685,6 +703,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(VProc_std)
           if (!ParseProgramParam (child, shininessParam,
             ParamFloat | ParamShaderExp))
             return false;
+          break;
+        case XMLTOKEN_SPECULARONDIFFUSE:
+          {
+            if (!synsrv->ParseBool (child, specularOnDiffuse, true))
+              return false;
+          }
           break;
         case XMLTOKEN_SKINNED_POSITION:
           {
