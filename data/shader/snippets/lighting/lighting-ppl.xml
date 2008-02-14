@@ -1,0 +1,98 @@
+<!--
+  Copyright (C) 2008 by Frank Richter
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<snippet>
+  <technique priority="100">
+    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+    
+    <input name="position" type="position4_world" />
+    <!-- Surface normal -->
+    <input name="normal" type="normal_world" />
+    
+    <block location="cg:variablemap">
+      <!-- Cg shader plugin magic makes arrays work -->
+      <variablemap variable="light position world" 
+		   destination="fragmentIn.lightPosWorld" />
+      <variablemap variable="light diffuse" 
+		   destination="fragmentIn.lightColorDiffuse" />
+      <variablemap variable="light attenuation" 
+		   destination="fragmentIn.lightAttenuationVec" />
+      <variablemap variable="light direction world" 
+		   destination="fragmentIn.lightDir" />
+      <variablemap variable="light inner falloff" 
+		   destination="fragmentIn.lightFalloffInner" />
+    </block>
+    
+    <block location="cg:definitions">
+      <?Include /shader/snippets/lighting/lightfuncs.cginc ?>
+    </block>
+    
+    <block location="cg:fragmentIn">
+      <uniform type="position4_world" name="lightPosWorld[8]" />
+      <uniform type="rgb" name="lightColorDiffuse[8]" />
+      <uniform type="float3" name="lightAttenuationVec[8]" />
+      <uniform type="float3" name="lightDir[8]" />
+      <uniform type="float" name="lightFalloffInner[8]" />
+      <uniform type="float" name="lightFalloffOuter[8]" />
+    </block>
+    
+    <block location="cg:vertexMain">
+      diffuseColor = float3(0);
+      specularColor = float3(0);
+    </block>
+    
+    <block location="cg:fragmentMain">
+      diffuseColor = float3(0);
+      <?Generate N 0 4 ?>
+        <?if (vars."light count".int &gt; $N$)?>
+	{
+	  float3 surfToLight = (fragmentIn.lightPosWorld[$N$] - position).xyz;
+	  float lightDistSq = dot (surfToLight, surfToLight);
+	  float lightDist = sqrt (lightDistSq);
+	  surfToLight /= lightDistSq;
+	  float diffuse = 0;
+	  float attn = 1;
+	  <?if vars."light attenuation mode[$N$]".int == consts.CS_ATTN_LINEAR ?>
+	  attn = Attenuation_Linear (lightDist, fragmentIn.lightAttenuationVec[$N$].x);
+	  <?else?>
+	  // Everything else can be mapped to CLQ attn
+	  attn = Attenuation_CLQ (lightDist, fragmentIn.lightAttenuationVec[$N$]);
+	  <?endif?>
+	  <?if vars."light type[$N$]".int == consts.CS_LIGHT_DIRECTIONAL ?>
+	  float3 lightDir = normalize (fragmentIn.lightDir[$N$]);
+	  diffuse = Light_Directional (normal, lightDir);
+	  <?elsif vars."light type[$N$]".int == consts.CS_LIGHT_SPOTLIGHT ?>
+	  float3 lightDir = normalize (fragmentIn.lightDir[$N$]);
+	  diffuse = Light_Spot (normal, normalize (surfToLight),
+	    lightDir,
+	    fragmentIn.lightFalloffInner[$N$],
+	    fragmentIn.lightFalloffOuter[$N$]);
+	  <?else?>
+	  <?! Assume point light ?>
+	  diffuse = Light_Point (normal, normalize (surfToLight));
+	  <?endif?>
+	  diffuseColor += fragmentIn.lightColorDiffuse[$N$] * diffuse * attn;
+	}
+        <?endif?>
+      <?Endgenerate?>
+      specularColor = float3(0);
+    </block>
+    
+    <output name="diffuseColor" type="rgb" />
+    <output name="specularColor" type="rgb" />
+  </technique>
+</snippet>

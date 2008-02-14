@@ -240,7 +240,7 @@ bool RMTest1::Initialize(iObjectRegistry* objectReg)
     "crystalspace.shared.stringset");
     
   csRef<iLoader> loader (csQueryRegistry<iLoader> (objectReg));
-  if (!loader->LoadShader ("/shader/lighting/vproc_fixed.xml"))
+  if (!loader->LoadShader ("/shader/lighting/lighting_default.xml"))
   {
     csReport (objectReg, CS_REPORTER_SEVERITY_WARNING,
       "crystalspace.rendermanager.test1",
@@ -260,7 +260,7 @@ bool RMTest1::Initialize(iObjectRegistry* objectReg)
 
   CS::RenderManager::SingleRenderLayer lightLayer = 
     CS::RenderManager::SingleRenderLayer (stringSet->Request("standard"),
-      shaderManager->GetShader ("lighting_vproc_fixed"));
+      shaderManager->GetShader ("lighting_default"));
   this->renderLayer.AddLayers (lightLayer);
   
   csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objectReg);
