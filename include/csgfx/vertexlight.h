@@ -505,7 +505,8 @@ class csVertexLightCalculator : public iVertexLightCalculator
     LightProc lighter (light);
     csVertexListWalker<float, csVector3> vbLock (vb, 3);
     csVertexListWalker<float, csVector3> nbLock (nb, 3);
-    csRenderBufferLock<csColor, iRenderBuffer*> color (litColor);
+    ConditionalAlloc<csRenderBufferLock<csColor, iRenderBuffer*>,
+      diffuse> color (litColor);
     ConditionalAlloc<csRenderBufferLock<csColor, iRenderBuffer*>,
       specular> spec (specColor);
 
@@ -518,7 +519,7 @@ class csVertexLightCalculator : public iVertexLightCalculator
       {
         if (diffuse)
         {
-          Op op (color[i], pv.DiffuseAttenuated() * light.color);
+          Op op (color.GetObject()[i], pv.DiffuseAttenuated() * light.color);
         }
         if (specular)
         {
@@ -534,7 +535,7 @@ class csVertexLightCalculator : public iVertexLightCalculator
         csColor nullColor (0.0f, 0.0f, 0.0f);
         if (diffuse)
         {
-          Op op (color[i], nullColor);
+          Op op (color.GetObject()[i], nullColor);
 	}
         if (specular)
         {
