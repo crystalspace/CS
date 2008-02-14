@@ -45,7 +45,7 @@
 	float diffuse = 0;
 	float attn = 1;
 	<?if vars."light attenuation mode[$N$]".int == consts.CS_ATTN_LINEAR ?>
-	attn = Attenuation_Linear (lightDist, $PROG$In.lightAttenuationVec[$$N$$].x);
+	attn = Attenuation_Linear (lightDist, 1 / $PROG$In.lightAttenuationVec[$$N$$].x);
 	<?else?>
 	// Everything else can be mapped to CLQ attn
 	attn = Attenuation_CLQ (lightDist, $PROG$In.lightAttenuationVec[$$N$$]);
