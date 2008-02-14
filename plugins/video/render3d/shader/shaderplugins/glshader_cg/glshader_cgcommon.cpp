@@ -255,6 +255,68 @@ void csShaderGLCGCommon::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
                 cgGLSetParameterArray4f (param, 0, numElements, tmpArr);
               }
               break;
+            case CG_FLOAT3x3:
+              {
+                if (var->GetType () == csShaderVariable::MATRIX)
+                {
+                  csMatrix3 m;
+                  for (idx = 0; idx < numElements; idx++)
+                  {
+                    csShaderVariable *element =
+                      var->GetArrayElement (idx);
+                    if (element != 0 && element->GetValue (m))
+                    {
+                      CS::PluginCommon::MakeGLMatrix3x3 (m, &tmpArr[9*idx]);
+                    }
+                  }
+                  cgGLSetMatrixParameterArrayfc (param, 0, numElements, tmpArr);
+                }
+                else if (var->GetType () == csShaderVariable::TRANSFORM)
+                {
+                  csReversibleTransform t;
+                  for (idx = 0; idx < numElements; idx++)
+                  {
+                    csShaderVariable *element =
+                      var->GetArrayElement (idx);
+                    if (element != 0 && element->GetValue (t))
+                    {
+                      CS::PluginCommon::MakeGLMatrix3x3 (t.GetO2T(), &tmpArr[9*idx]);
+                    }
+                  }
+                  cgGLSetMatrixParameterArrayfc (param, 0, numElements, tmpArr);
+                }
+                else if (var->GetType () == csShaderVariable::ARRAY)
+                {
+
+                  for (uint idx = 0; idx < numElements; idx++)
+                  {
+                    csShaderVariable *element =
+                      var->GetArrayElement (idx);
+                    if (element->GetArraySize () < 3 || 
+                      element->GetType () != csShaderVariable::ARRAY)
+                      continue;
+                    for (uint idrow = 0; idrow < 3; idrow++)
+                    {
+                      csShaderVariable *mat_el =
+                        element->GetArrayElement (idx);
+                      csVector4 v;
+
+                      if (element != 0 && mat_el->GetValue (v))
+                      {
+                        tmpArr[9*idx + idrow] = v[0]; 
+                        tmpArr[9*idx + idrow + 3] = v[1];
+                        tmpArr[9*idx + idrow + 3] = v[2];
+                      }
+                    }
+                  }
+                  cgGLSetMatrixParameterArrayfc (param, 0, numElements, tmpArr);
+                }
+                else
+                {
+                  CS_ASSERT_MSG("Can't convert all SV contents to FLOAT3x3 (yet)", false);
+                }
+              }
+              break;
             case CG_FLOAT4x4:
               {
                 if (var->GetType () == csShaderVariable::MATRIX)
@@ -350,7 +412,8 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
       csString param (unusedParams[i]);
       for (size_t j = 0; j < param.Length(); j++)
       {
-        if (param[j] == '.') param[j] = '_';
+        if ((param[j] == '.') || (param[j] == '[') || (param[j] == ']'))
+          param[j] = '_';
       }
       augmentedProgramStr.AppendFmt ("#define PARAM_%s_UNUSED\n",
         param.GetData());
