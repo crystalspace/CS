@@ -11,6 +11,8 @@ ARRAY_CHANGE_ALL_TEMPLATE_PTR(csShaderVariable)
 %template(csImageMemoryBase) scfImplementationExt0<csImageMemory, csImageBase>;
 %include "csgfx/imagememory.h"
 
+%include "csgfx/imagemanipulate.h"
+
 /* POST */
 #ifndef SWIGIMPORTED
 #undef APPLY_FOR_ALL_INTERFACES_POST

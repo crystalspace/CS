@@ -11,6 +11,18 @@ chronological order.
 	  buffer was provided.
 	- res made the engine also "reserve" name IDs the "general" lighting
 	  shader vars.
+        - Jorrit added csgfx/imagemanipulate.h to the python bindings.
+        - Jorrit added csImageManipulate.TransformColor() and
+          Gray() tools.
+	- varslot added code to the CoreAudio driver for dealing
+          with sound hardware that cannot handle the desired buffer
+          size. Successively redusing the buffer size we arrive at a
+          sound buffer that can be used. This fixes sound problem on e.g.
+          MacBook, and should address bugtracker ticket #205. Note:
+          sound.cfg is not loaded by the CoreAudio driver, and should
+          maybe also be fixed.
+	- res fixed the xmlshader plugin to not assert on some more complex
+	  conditions.
 13-Feb-2008
 	- varslot added a rule to work around known issue with texture
 	  compression and Intel graphics card under OSX.
