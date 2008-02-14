@@ -1426,6 +1426,10 @@ void csEngine::StartEngine ()
   {
     lightSvNames.GetLightSVId (csLightShaderVarCache::LightProperty (p));
   }
+  for (int p = 0; p < csLightShaderVarCache::_varCount; p++)
+  {
+    lightSvNames.GetDefaultSVId (csLightShaderVarCache::DefaultSV (p));
+  }
 }
 
 void csEngine::PrecacheMesh (iMeshWrapper* s, iRenderView* rview)
