@@ -276,6 +276,7 @@ void csGLTextureManager::SetupPixelStore()
 void csGLTextureManager::UnsetTexture (GLenum target, GLuint texture)
 {
   csGLStateCache* statecache = csGLGraphics3D::statecache;
+  if (!statecache) return;
 
   if (csGLGraphics3D::ext->CS_GL_ARB_multitexture)
   {

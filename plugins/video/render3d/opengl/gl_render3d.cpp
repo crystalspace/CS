@@ -1173,6 +1173,7 @@ void csGLGraphics3D::Close ()
 
   if (G2D)
     G2D->Close ();
+  statecache = 0;
 }
 
 bool csGLGraphics3D::SetRenderTarget (iTextureHandle* handle, bool persistent,
