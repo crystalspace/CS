@@ -360,12 +360,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(VProc_std)
         sv->GetValue (lightsActive);
 
       iRenderBuffer *vbuf = doVertexSkinning && skin_updated ? 
-        modes.buffers->GetRenderBuffer (skinnedPositionOutputBuffer):
-      GetBuffer (positionBuffer, modes, stack);
+        modes.buffers->GetRenderBuffer (skinnedPositionOutputBuffer) :
+        GetBuffer (positionBuffer, modes, stack);
 
       iRenderBuffer *nbuf = doNormalSkinning && skin_updated ? 
-        modes.buffers->GetRenderBuffer (skinnedNormalOutputBuffer):
-      GetBuffer (normalBuffer, modes, stack);
+        modes.buffers->GetRenderBuffer (skinnedNormalOutputBuffer) :
+        GetBuffer (normalBuffer, modes, stack);
 
       iRenderBuffer *cbuf = GetBuffer (colorBuffer, modes, stack);
 
