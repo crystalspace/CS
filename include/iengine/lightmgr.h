@@ -108,7 +108,7 @@ struct iLightInfluenceCallback : public virtual iBase
  */
 struct iLightManager : public virtual iBase
 {
-  SCF_INTERFACE(iLightManager,3,0,1);
+  SCF_INTERFACE(iLightManager,4,0,0);
 
   /**
    * Return all 'relevant' light that hit this object. Depending on 
@@ -211,6 +211,10 @@ struct iLightManager : public virtual iBase
     iLightInfluenceCallback* lightCallback, int maxLights, 
     uint flags = CS_LIGHTQUERY_GET_ALL) = 0;
 
+  /**
+   * Free a light influence array earlier allocated by 
+   */
+  virtual void FreeInfluenceArray (csLightInfluence* Array) = 0;
 
   /**
    * Return all 'relevant' light that hit this object. Depending on 
@@ -219,15 +223,49 @@ struct iLightManager : public virtual iBase
    * (with N a parameter set by the user on that object).
    * \param meshObject The mesh wrapper.
    * \param boundingBox The bounding box to be used when querying lights.
-   * \param lightArray The array to fill with the relevant lights. It must be
-   *   large enought to take at least maxLights light influences!
+   * \param lightArray Returns a pointer to an arry with the influences of the
+   *   relevant lights. Must be freed with FreeInfluenceArray() after use.
+   * \param numLights The number of lights returned in \a lightArray.
    * \param maxLights The maximum number of lights that you (as
    *   the caller of this function) are interested in.
    * \param flags Flags provided by csLightQueryFlags.
-   * \return The number of lights written into \a lightArray.
    */
-  virtual size_t GetRelevantLights (iSector* sector, 
-    const csBox3& boundingBox, csLightInfluence* lightArray, size_t maxLights,
+  virtual void GetRelevantLights (iMeshWrapper* meshObject, 
+    csLightInfluence*& lightArray, size_t& numLights, 
+    size_t maxLights = (size_t)~0,
+    uint flags = CS_LIGHTQUERY_GET_ALL) = 0;
+  
+  /**
+   * Return all 'relevant' lights for a given sector.
+   * \param sector is the sector to check for.
+   * \param boundingBox The bounding box to be used when querying lights.
+   * \param lightArray Returns a pointer to an arry with the influences of the
+   *   relevant lights. Must be freed with FreeInfluenceArray() after use.
+   * \param numLights The number of lights returned in \a lightArray.
+   * \param maxLights The maximum number of lights that you (as
+   *   the caller of this function) are interested in.
+   * \param flags Flags provided by csLightQueryFlags.
+   */
+  virtual void GetRelevantLights (iSector* sector, 
+    csLightInfluence*& lightArray, 
+    size_t& numLights, size_t maxLights = (size_t)~0,
+    uint flags = CS_LIGHTQUERY_GET_ALL) = 0;
+  
+  /**
+   * Return all 'relevant' lights that intersects a giving bounding box within
+   * a specified sector.
+   * \param sector is the sector to check for.
+   * \param boundingBox The bounding box to be used when querying lights.
+   * \param lightArray Returns a pointer to an arry with the influences of the
+   *   relevant lights. Must be freed with FreeInfluenceArray() after use.
+   * \param numLights The number of lights returned in \a lightArray.
+   * \param maxLights The maximum number of lights that you (as
+   *   the caller of this function) are interested in.
+   * \param flags Flags provided by csLightQueryFlags.
+   */
+  virtual void GetRelevantLights (iSector* sector, 
+    const csBox3& boundingBox, csLightInfluence*& lightArray, 
+    size_t& numLights, size_t maxLights = (size_t)~0,
     uint flags = CS_LIGHTQUERY_GET_ALL) = 0;
 };
 

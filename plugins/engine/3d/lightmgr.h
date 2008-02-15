@@ -54,14 +54,21 @@ public:
     iLightInfluenceCallback* lightCallback, int maxLights, 
     uint flags);
 
-  virtual size_t GetRelevantLights (iSector* sector, 
-    const csBox3& boundingBox, csLightInfluence* lightArray, size_t maxLights,
-    uint flags);
-};
+  virtual void FreeInfluenceArray (csLightInfluence* Array);
 
-/**
- * 
- */
+  virtual void GetRelevantLights (iMeshWrapper* meshObject, 
+    csLightInfluence*& lightArray, size_t& numLights, 
+    size_t maxLights = (size_t)~0,
+    uint flags = CS_LIGHTQUERY_GET_ALL);
+  virtual void GetRelevantLights (iSector* sector, 
+    csLightInfluence*& lightArray, 
+    size_t& numLights, size_t maxLights = (size_t)~0,
+    uint flags = CS_LIGHTQUERY_GET_ALL);
+  virtual void GetRelevantLights (iSector* sector, 
+    const csBox3& boundingBox, csLightInfluence*& lightArray, 
+    size_t& numLights, size_t maxLights = (size_t)~0,
+    uint flags = CS_LIGHTQUERY_GET_ALL);
+};
 
 #endif // __CS_CSENGINE_LIGHTMGR_H__
 

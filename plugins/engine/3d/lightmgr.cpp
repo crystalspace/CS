@@ -165,10 +165,31 @@ void csLightManager::GetRelevantLights (iSector* sector, const csBox3& boundingB
 
 // ---------------------------------------------------------------------------
 
+void csLightManager::FreeInfluenceArray (csLightInfluence* Array)
+{
+  cs_free (Array);
+}
+
+template<typename T>
+class csDirtyAccessArrayDetach : 
+  public csDirtyAccessArray<T, csArrayElementHandler<T>,
+                            CS::Memory::AllocatorMalloc>
+{
+public:
+  T* Detach()
+  {
+    T* p = this->GetArray();
+    this->SetData (0);
+    return p;
+  }
+};
+
+typedef csDirtyAccessArrayDetach<csLightInfluence> LightInfluenceArray;
+
 struct LightCollectArrayPtr
 {
-  LightCollectArrayPtr (const csBox3& box, csLightInfluence* arr, size_t max)
-    : testBox (box), arr (arr), max (max), num (0)
+  LightCollectArrayPtr (const csBox3& box, LightInfluenceArray& arr, size_t max)
+    : testBox (box), arr (arr), max (max)
   {}
 
   void operator() (const csSectorLightList::LightAABBTree::Node* node)
@@ -178,23 +199,40 @@ struct LightCollectArrayPtr
 
     for (size_t i = 0; i < node->GetObjectCount (); ++i)
     {
-      csLightInfluence newInfluence;
-      newInfluence.light = node->GetLeafData (i);
-      if (num < max) arr[num++] = newInfluence;
+      if (arr.GetSize() < max)
+      {
+        csLightInfluence newInfluence;
+        newInfluence.light = node->GetLeafData (i);
+        arr.Push (newInfluence);
+      }
     }
   }
 
   const csBox3& testBox;
-  csLightInfluence* arr;
+  LightInfluenceArray& arr;
   size_t max;
-  size_t num;
 };
 
 
-size_t csLightManager::GetRelevantLights (iSector* sector, 
-                                          const csBox3& boundingBox, 
-                                          csLightInfluence* lightArray, 
-                                          size_t maxLights, uint flags)
+void csLightManager::GetRelevantLights (iMeshWrapper* meshObject,
+                                        csLightInfluence*& lightArray, 
+                                        size_t& numLights, 
+                                        size_t maxLights, uint flags)
+{
+  const csBox3& meshBox = meshObject->GetWorldBoundingBox ();
+  iSectorList* sectors = meshObject->GetMovable ()->GetSectors ();
+  if (sectors && sectors->GetCount() > 0)
+  {
+    csLightManager::GetRelevantLights (sectors->Get (0), meshBox, lightArray,
+      numLights, maxLights, flags);
+  }
+}
+
+void csLightManager::GetRelevantLights (iSector* sector, 
+                                        const csBox3& boundingBox, 
+                                        csLightInfluence*& lightArray, 
+                                        size_t& numLights, 
+                                        size_t maxLights, uint flags)
 {
   iLightList* llist = sector->GetLights ();
   csSectorLightList* sectorLightList = static_cast<csSectorLightList*> (llist);
@@ -202,11 +240,24 @@ size_t csLightManager::GetRelevantLights (iSector* sector,
   // Get the primary lights from same sector
   const csSectorLightList::LightAABBTree& aabbTree = sectorLightList->GetLightAABBTree ();
   IntersectInnerBBox inner (boundingBox);
-  LightCollectArrayPtr leaf (boundingBox, lightArray, maxLights);
+  LightInfluenceArray tmpLightArray;
+  LightCollectArrayPtr leaf (boundingBox, tmpLightArray, maxLights);
   aabbTree.Traverse (inner, leaf);
 
   //@@TODO: Implement cross-sector lookups
-  
-  return leaf.num;
+  numLights = tmpLightArray.GetSize();
+  if (numLights > 0)
+    lightArray = tmpLightArray.Detach();
+  else
+    lightArray = 0;
 }
-
+  
+void csLightManager::GetRelevantLights (iSector* sector, 
+                                        csLightInfluence*& lightArray, 
+                                        size_t& numLights, 
+                                        size_t maxLights, uint flags)
+{
+  const csBox3 bigBox;  
+  csLightManager::GetRelevantLights (sector, bigBox, lightArray, numLights,
+    maxLights, flags);
+}

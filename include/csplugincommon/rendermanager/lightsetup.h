@@ -46,8 +46,14 @@ namespace RenderManager
     LightSetup (PersistentData& persist, iLightManager* lightmgr,
       SVArrayHolder& svArrays, const LayerConfigType& layerConfig)
       : persist (persist), lightmgr (lightmgr), svArrays (svArrays),
-        layerConfig (layerConfig)
+        layerConfig (layerConfig), allMaxLights (0)
     {
+      for (size_t layer = 0; layer < layerConfig.GetLayerCount (); ++layer)
+      {
+	const size_t layerMax = layerConfig.GetMaxLightNum (layer);
+	// Max lights can be ~0, so need to avoid overflow
+	allMaxLights += csMin (layerMax, ((size_t)~0) - allMaxLights);
+      }
     }
 
     void operator() (typename RenderTree::MeshNode* node)
@@ -55,15 +61,20 @@ namespace RenderManager
       for (size_t i = 0; i < node->meshes.GetSize (); ++i)
       {
         typename RenderTree::MeshNode::SingleMesh& mesh = node->meshes[i];
+
+        size_t numLights;
+        csLightInfluence* influences;
+	lightmgr->GetRelevantLights (node->owner.sector,
+	  mesh.bbox, influences, numLights, allMaxLights);
+	if (numLights == 0) continue; // Not much to do ...
         
+        size_t lightOffset = 0;
 	for (size_t layer = 0; layer < layerConfig.GetLayerCount (); ++layer)
         {
-          const size_t numRelevantLights = layerConfig.GetMaxLights (layer);
-          if (numRelevantLights == 0) continue;
-          
-          persist.ReserveInfluences (numRelevantLights);
-          const size_t numLights = lightmgr->GetRelevantLights (node->owner.sector,
-            mesh.bbox, persist.influences, numRelevantLights);
+          size_t layerLights =  csMin (layerConfig.GetMaxLightNum (layer),
+            numLights - lightOffset);
+          if (layerLights == 0) continue;
+          csLightInfluence* currentInfluences = influences + lightOffset;
 	
 	  csShaderVariableStack localStack;
 	  svArrays.SetupSVStack (localStack, layer, mesh.contextLocalId);
@@ -75,27 +86,28 @@ namespace RenderManager
           localStack[lightNum->GetName()] = lightNum;
           persist.svKeeper.Push (lightNum);
 
-	  for (size_t l = numLights; l-- > 0; )
+	  for (size_t l = layerLights; l-- > 0; )
 	  {
             const csRefArray<csShaderVariable>** thisLightSVs =
-              persist.lightDataCache.GetElementPointer (persist.influences[l].light);
+              persist.lightDataCache.GetElementPointer (currentInfluences[l].light);
             if (thisLightSVs == 0)
             {
               thisLightSVs = &persist.lightDataCache.Put (
-                persist.influences[l].light, 
-                &(persist.influences[l].light->GetSVContext()->GetShaderVariables()));
+                currentInfluences[l].light, 
+                &(currentInfluences[l].light->GetSVContext()->GetShaderVariables()));
             }
 
             MergeAsArrayItems (localStack, **thisLightSVs, l);
 	  }
+          lightOffset += layerLights;
 	}
+
+        lightmgr->FreeInfluenceArray (influences);
       }
     }
     
     struct PersistentData
     {
-      csLightInfluence* influences;
-      size_t numInfluences;
       csLightShaderVarCache svNames;
       csHash<const csRefArray<csShaderVariable>*, csPtrKey<iLight> > lightDataCache;
       csShaderVarBlockAlloc<> svAlloc;
@@ -103,10 +115,8 @@ namespace RenderManager
        * of the actual step */
       csRefArray<csShaderVariable> svKeeper;
       
-      PersistentData () : influences (0), numInfluences (0) {}
       ~PersistentData()
       {
-        delete[] influences; 
         if (lcb.IsValid()) lcb->parent = 0;
       }
       
@@ -119,17 +129,6 @@ namespace RenderManager
         svKeeper.Empty();
       }
       
-      void ReserveInfluences (size_t num)
-      {
-        if (num > numInfluences)
-        {
-          delete[] influences;
-          influences = new csLightInfluence[num];
-          numInfluences = num;
-          // @@@ Shrink later?
-        }
-      }
-
       iLightCallback* GetLightCallback()
       {
         if (!lcb.IsValid()) lcb.AttachNew (new LightCallback (this));
@@ -166,6 +165,7 @@ namespace RenderManager
     iLightManager* lightmgr;
     SVArrayHolder& svArrays; 
     const LayerConfigType& layerConfig;
+    size_t allMaxLights;
     
     csShaderVariable* GetNewSV (csShaderVariableStack& stack, CS::ShaderVarStringID name)
     {

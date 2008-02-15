@@ -44,20 +44,25 @@ namespace RenderManager
   {
   public:
     /// Create a single render layer with a no shader type.
-    SingleRenderLayer (iShader* defaultShader = 0, size_t maxLights = 0)
-      : defaultShader (defaultShader), maxLights (maxLights)
+    SingleRenderLayer (iShader* defaultShader = 0,
+      size_t maxLightPasses = 1, size_t maxLights = ~0)
+      : defaultShader (defaultShader), maxLightPasses (maxLightPasses), 
+        maxLights (maxLights)
     { }
     /// Create a single render layer with a single shader type.
     SingleRenderLayer (const csStringID shaderType, iShader* defaultShader = 0,
-        size_t maxLights = 0)
-      : defaultShader (defaultShader), maxLights (maxLights)
+        size_t maxLightPasses = 1, size_t maxLights = ~0)
+      : defaultShader (defaultShader), maxLightPasses (maxLightPasses),
+        maxLights (maxLights)
     {
       shaderTypes.Push (shaderType);
     }
     /// Create a single render layer with a multiply shader type.
     SingleRenderLayer (const csStringID* shaderTypes, size_t numTypes,
-      iShader* defaultShader = 0, size_t maxLights = 0)
-      : defaultShader (defaultShader), maxLights (maxLights)
+      iShader* defaultShader = 0,
+      size_t maxLightPasses = 1, size_t maxLights = ~0)
+      : defaultShader (defaultShader), maxLightPasses (maxLightPasses), 
+        maxLights (maxLights)
     {
       this->shaderTypes.SetSize (numTypes);
       for (size_t i = 0; i < numTypes; ++i)
@@ -89,13 +94,18 @@ namespace RenderManager
       return defaultShader;
     }
     
-    size_t GetMaxLights (size_t layer) const
+    size_t GetMaxLightNum (size_t layer) const
     {
       CS_ASSERT(layer == 0);
 
-      if (!defaultShader) return maxLights;
-      const csShaderMetadata& shaderMeta = defaultShader->GetMetadata();
-      return shaderMeta.numberOfLights /*maxLights*/;
+      return maxLights;
+    }
+
+    size_t GetMaxLightPasses (size_t layer) const
+    {
+      CS_ASSERT(layer == 0);
+
+      return maxLightPasses;
     }
 
   private:
@@ -105,6 +115,7 @@ namespace RenderManager
       csArrayCapacityFixedGrow<1> > shaderTypes;*/
     csDirtyAccessArray<StringIDValue> shaderTypes;
     csRef<iShader> defaultShader;
+    size_t maxLightPasses;
     size_t maxLights;
   };
 
@@ -116,7 +127,8 @@ namespace RenderManager
   public:
     MultipleRenderLayer () {}
     MultipleRenderLayer (size_t numLayers, const csStringID* shaderTypes, 
-      iShader** defaultShader, size_t* maxLights = 0)
+      iShader** defaultShader, 
+      size_t* maxLightPasses = 0, size_t* maxLights = 0)
     {
       layerTypes.SetSize (numLayers);      
       for (size_t l = 0; l < numLayers; l++)
@@ -125,7 +137,8 @@ namespace RenderManager
 
 	Layer newLayer;
 	newLayer.defaultShader = defaultShader[l];
-	newLayer.maxLights = maxLights ? maxLights[l] : 0;
+	newLayer.maxLightPasses = maxLightPasses ? maxLightPasses[l] : 1;
+	newLayer.maxLights = maxLights ? maxLights[l] : ~0;
 	newLayer.firstType = l;
 	newLayer.numTypes = 1;
 	layers.Push (newLayer);
@@ -145,7 +158,8 @@ namespace RenderManager
       {
 	Layer newLayer;
 	newLayer.defaultShader = layers.GetDefaultShader (l);
-	newLayer.maxLights = layers.GetMaxLights (l);
+	newLayer.maxLightPasses = layers.GetMaxLightPasses (l);
+	newLayer.maxLights = layers.GetMaxLightNum (l);
 	newLayer.firstType = layerTypes.GetSize ();
 	const csStringID* copyTypes = layers.GetShaderTypes (l,
 	  newLayer.numTypes);
@@ -177,15 +191,25 @@ namespace RenderManager
       return layers[layer].defaultShader;
     }
     
-    size_t GetMaxLights (size_t layer) const
+    size_t GetMaxLightNum (size_t layer) const
     {
+      CS_ASSERT(layer == 0);
+
       return layers[layer].maxLights;
+    }
+
+    size_t GetMaxLightPasses (size_t layer) const
+    {
+      CS_ASSERT(layer == 0);
+
+      return layers[layer].maxLightPasses;
     }
 
   private:
     struct Layer
     {
       csRef<iShader> defaultShader;
+      size_t maxLightPasses;
       size_t maxLights;
       size_t firstType;
       size_t numTypes;
