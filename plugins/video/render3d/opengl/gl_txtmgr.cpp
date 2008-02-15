@@ -269,7 +269,7 @@ void csGLTextureManager::SetupPixelStore()
   G3D->statecache->SetPixelUnpackAlignment (1);
 #ifndef CS_LITTLE_ENDIAN
   // The texture format stuff generally assumes little endian
-  G3D->statecache->SetPixelSwapBytes (true);
+  G3D->statecache->SetPixelUnpackSwapBytes (true);
 #endif
 }
 
