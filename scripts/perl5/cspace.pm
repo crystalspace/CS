@@ -8168,6 +8168,50 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csImageManipulate ##############
+
+package cspace::csImageManipulate;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*Rescale = *cspacec::csImageManipulate_Rescale;
+*Mipmap = *cspacec::csImageManipulate_Mipmap;
+*Blur = *cspacec::csImageManipulate_Blur;
+*Crop = *cspacec::csImageManipulate_Crop;
+*Sharpen = *cspacec::csImageManipulate_Sharpen;
+*TransformColor = *cspacec::csImageManipulate_TransformColor;
+*Gray = *cspacec::csImageManipulate_Gray;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csImageManipulate(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csImageManipulate($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csPixelCoord ##############
 
 package cspace::csPixelCoord;
