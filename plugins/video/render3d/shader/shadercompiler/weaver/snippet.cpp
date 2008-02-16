@@ -60,12 +60,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 
   Snippet::Snippet (WeaverCompiler* compiler, iDocumentNode* node, 
                     const char* name, bool topLevel) : compiler (compiler), 
-    xmltokens (compiler->xmltokens), name (name), isCompound (false)
+    xmltokens (compiler->xmltokens), name (name), isCompound (false),
+    passForward (false)
   {
     bool okay = true;
     if (topLevel)
     {
       isCompound = true;
+      passForward = true;
       LoadCompoundTechnique (node);
     }
     else
@@ -523,7 +525,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
           }
           break;
         default:
-          compiler->synldr->ReportBadToken (child);
+          if (passForward)
+          {
+            passForwardedNodes.Push (child);
+          }
+          else
+            compiler->synldr->ReportBadToken (child);
       }
     }
     

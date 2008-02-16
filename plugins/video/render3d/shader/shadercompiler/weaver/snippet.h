@@ -180,6 +180,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     Technique* LoadLibraryTechnique (WeaverCompiler* compiler,
       iDocumentNode* node, const Technique::CombinerPlugin& combiner) const;
     Technique* CreatePassthrough (const char* varName, const char* type) const;
+    
+    const csRefArray<iDocumentNode>& GetPassForwardedNodes() const
+    { return passForwardedNodes; }
   private:
     WeaverCompiler* compiler;
     csStringHash& xmltokens;
@@ -187,6 +190,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     typedef csPDelArray<Technique> TechniqueArray;
     TechniqueArray techniques;
     bool isCompound;
+    bool passForward;
+    csRefArray<iDocumentNode> passForwardedNodes;
     
     void LoadAtomTechniques (iDocumentNode* node);
     void LoadAtomTechnique (iDocumentNode* node);

@@ -102,7 +102,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	    techniqueNode->CreateNodeBefore (CS_NODE_ELEMENT);
 	  passNode->SetValue ("pass");
 	  
-	  if (!SynthesizeTechnique (passNode, outerSnippets[g], graph))
+	  Snippet* snippet = outerSnippets[g];
+	  csRefArray<iDocumentNode> passForwardedNodes =
+	    snippet->GetPassForwardedNodes();
+	  for (size_t n = 0; n < passForwardedNodes.GetSize(); n++)
+	  {
+	    iDocumentNode* srcNode = passForwardedNodes[n];
+	    csRef<iDocumentNode> dstNode =
+	      passNode->CreateNodeBefore (srcNode->GetType());
+	    CS::DocSystem::CloneNode (srcNode, dstNode);
+	  }
+	  if (!SynthesizeTechnique (passNode, snippet, graph))
             techniqueNode->RemoveNode (passNode);
           else
             aPassSucceeded = true;
