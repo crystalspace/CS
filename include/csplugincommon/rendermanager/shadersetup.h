@@ -152,22 +152,21 @@ namespace RenderManager
     typedef ShaderSVSetup<RenderTree, LayerConfigType> ShaderSVSetupType;
     typedef TicketSetup<RenderTree, LayerConfigType> TicketSetupType;
 
-    typedef CS::Meta::CompositeFunctorType3<ShaderSetupType, ShaderSVSetupType, 
-      TicketSetupType> CombinedFunctorType;
+    typedef CS::Meta::CompositeFunctorType2<ShaderSetupType,
+      ShaderSVSetupType>CombinedFunctorType;
   };
 
   /**
-   * Setup the standard shader, shader SV and ticket
+   * Setup the standard shader and shader SV
    */
   template<typename ContextNodeType, typename LayerConfigType>
-  void SetupStandarShaderAndTicket (ContextNodeType& context, 
+  void SetupStandardShader (ContextNodeType& context, 
     iShaderManager* shaderManager,
     const LayerConfigType& layerConfig)
   {
     context.shaderArray.SetSize (context.totalRenderMeshes*layerConfig.GetLayerCount ());
-    context.ticketArray.SetSize (context.totalRenderMeshes*layerConfig.GetLayerCount ());
 
-    // Shader, sv and ticket setup
+    // Shader and sv setup
     typedef typename ContextNodeType::TreeType Tree;
     typedef StandardSATSetupTypes<Tree, LayerConfigType> TypeHelper;
     
@@ -177,15 +176,32 @@ namespace RenderManager
     typename TypeHelper::ShaderSVSetupType 
       shaderSVSetup (context.svArrays, context.shaderArray, layerConfig);
          
+    // Do the two operations sequentially after each other
+    typename TypeHelper::CombinedFunctorType 
+      combFunctor (CS::Meta::CompositeFunctor (shaderSetup, shaderSVSetup));
+
+    ForEachMeshNode (context, combFunctor);
+  }
+
+  /**
+   * Setup the shader ticket. 
+   * Must be done after shader and shader SV (usually SetupStandardShader()).
+   */
+  template<typename ContextNodeType, typename LayerConfigType>
+  void SetupStandardTicket (ContextNodeType& context, 
+    iShaderManager* shaderManager,
+    const LayerConfigType& layerConfig)
+  {
+    context.ticketArray.SetSize (context.totalRenderMeshes*layerConfig.GetLayerCount ());
+
+    typedef typename ContextNodeType::TreeType Tree;
+    typedef StandardSATSetupTypes<Tree, LayerConfigType> TypeHelper;
+    
     typename TypeHelper::TicketSetupType 
       ticketSetup (context.svArrays, shaderManager->GetShaderVariableStack (),
         context.shaderArray, context.ticketArray, layerConfig);
 
-    // Do the three operations sequentially after each other
-    typename TypeHelper::CombinedFunctorType 
-      combFunctor (CS::Meta::CompositeFunctor (shaderSetup, shaderSVSetup, ticketSetup));
-
-    ForEachMeshNode (context, combFunctor);
+    ForEachMeshNode (context, ticketSetup);
   }
 
   typedef csDirtyAccessArray<csStringID> ShaderVariableNameArray;

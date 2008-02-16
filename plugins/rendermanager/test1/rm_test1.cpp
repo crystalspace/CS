@@ -112,16 +112,17 @@ public:
       ForEachMeshNode (context, svSetup);
     }
 
-    {
-      LightSetup<RenderTreeType, MultipleRenderLayer> lightSetup (
-        rmanager->lightPersistent, rmanager->lightManager,
-        context.svArrays, layerConfig);
+    SetupStandardShader (context, shaderManager, layerConfig);
 
-      ForEachMeshNode (context, lightSetup);
-    }
+    LightSetup<RenderTreeType, MultipleRenderLayer> lightSetup (
+      rmanager->lightPersistent, rmanager->lightManager,
+      context.svArrays, layerConfig);
+
+    ForEachMeshNode (context, lightSetup);
 
     // Setup shaders and tickets
-    SetupStandarShaderAndTicket (context, shaderManager, layerConfig);
+    SetupStandardTicket (context, shaderManager,
+      lightSetup.GetPostLightingLayers());
   }
 
 

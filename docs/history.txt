@@ -12,6 +12,10 @@ chronological order.
 	  e.g. specify mixmodes.
 	- res fixed the shader weaver to forward non-ELEMENT nodes below "pass"
 	  as well. This makes using conditions there possible.
+	- res made it possible to dynamically insert render layers into the
+	  RM render tree.
+	- res added "layer duplication" to the RM light setup in case a layer
+	  is set to render more lights than the shader used can actually handle.
 15-Feb-2008
 	- res replaced the "buffer fill" light manager method with method(s)
 	  that return a pointer to a buffer (which has to be freed later). This

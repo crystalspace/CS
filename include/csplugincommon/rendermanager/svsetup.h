@@ -154,13 +154,13 @@ namespace RenderManager
   void SetupStandardSVs (ContextNode& context, LayerConfigType& layerConfig,
     iShaderManager* shaderManager, iSector* sector)
   {
+    if (context.totalRenderMeshes == 0) return;
+
     // Setup SV arrays
     context.svArrays.Setup (
       layerConfig.GetLayerCount(), 
       shaderManager->GetSVNameStringset ()->GetSize (),
       context.totalRenderMeshes);
-      
-    if (context.totalRenderMeshes == 0) return;
 
     // Push the default stuff
     csShaderVariableStack& svStack = shaderManager->GetShaderVariableStack ();

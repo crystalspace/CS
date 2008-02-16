@@ -20,6 +20,12 @@
 <shader compiler="shaderweaver" name="lighting_default" lights="4">
   <technique priority="100">
     <pass>
+      <?if vars."pass num".int == 0 ?>
+        <!-- First pass: blend with copy -->
+      <?else?>
+        <!-- Later pass: blend with add -->
+        <mixmode><add /></mixmode>
+      <?endif?>
       <!-- Combiner to use for this particular pass.
 	   Techniques Referenced snippets must only utilize the same 
 	   combiner with compatible options specified. If a technique

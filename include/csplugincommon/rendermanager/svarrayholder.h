@@ -41,35 +41,47 @@ namespace RenderManager
   {
   public:
     SVArrayHolder (size_t numLayers = 1, size_t numSVNames = 0, size_t numSets = 0)
-      : numLayers (numLayers), numSVNames (numSVNames), numSets (numSets), svArray (0)
+      : numLayers (numLayers), numSVNames (numSVNames), numSets (numSets), svArray (0),
+        memAllocSetUp (false)
     {
       if (numSVNames && numSets && numLayers)
         Setup (numLayers, numSVNames, numSets);
     }
 
     SVArrayHolder (const SVArrayHolder& other)
-      : svArray (0)
+      : svArray (0), memAllocSetUp (false)
     {
       *this = other;
     }
 
     ~SVArrayHolder ()
     {
-      cs_free (svArray);
+      if (memAllocSetUp) GetMemAlloc().~csMemoryPool();
     }
 
     SVArrayHolder& operator= (const SVArrayHolder& other)
     {
-      cs_free (svArray);
+      if (memAllocSetUp) GetMemAlloc().~csMemoryPool();
 
       numLayers = other.numLayers;
       numSVNames = other.numSVNames;
       numSets = other.numSets;
 
-      const size_t arraySize = sizeof(csShaderVariable*)*numLayers*numSVNames*numSets;
-      svArray = static_cast<csShaderVariable**> (cs_malloc (arraySize));
+      const size_t sliceSVs = numSVNames*numSets;
+      const size_t sliceSize = sizeof(csShaderVariable*)*sliceSVs;
+      new (&memAlloc) csMemoryPool (sliceSize * 4);
+      memAllocSetUp = true;
 
-      memcpy (svArray, other.svArray, arraySize);
+      csShaderVariable** superSlice = reinterpret_cast<csShaderVariable**> (
+        GetMemAlloc().Alloc (numLayers * sliceSize));
+
+      for (size_t l = 0; l < numLayers; l++)
+      {
+        csShaderVariable** slice = superSlice + l * sliceSVs;
+        svArray.Push (slice);
+        memcpy (slice, other.svArray[l], sliceSize);
+      }
+      svArray.ShrinkBestFit();
 
       return *this;
     }
@@ -83,9 +95,22 @@ namespace RenderManager
       this->numSVNames = numSVNames;
       this->numSets = numSets;
 
-      const size_t arraySize = sizeof(csShaderVariable*)*numLayers*numSVNames*numSets;
-      svArray = static_cast<csShaderVariable**> (cs_malloc (arraySize));
-      memset (svArray, 0, arraySize);
+      const size_t sliceSVs = numSVNames*numSets;
+      const size_t sliceSize = sizeof(csShaderVariable*)*sliceSVs;
+      new (&memAlloc) csMemoryPool (sliceSize * 4);
+      memAllocSetUp = true;
+
+      csShaderVariable** superSlice = reinterpret_cast<csShaderVariable**> (
+        GetMemAlloc().Alloc (numLayers * sliceSize));
+      memset (superSlice, 0, numLayers * sliceSize);
+
+      for (size_t l = 0; l < numLayers; l++)
+      {
+        csShaderVariable** slice = superSlice + l * sliceSVs;
+        svArray.Push (slice);
+      }
+      svArray.ShrinkBestFit();
+
     }
 
     /**
@@ -97,7 +122,7 @@ namespace RenderManager
       CS_ASSERT (layer < numLayers);
       CS_ASSERT (set < numSets);
 
-      stack.Setup (svArray + (layer*numSets + set)*numSVNames, numSVNames);
+      stack.Setup (svArray[layer] + set*numSVNames, numSVNames);
     }
 
     /**
@@ -116,11 +141,10 @@ namespace RenderManager
       CS_ASSERT (from < numSets && start < numSets && end < numSets);
       CS_ASSERT (from < start || from > end);
 
-      size_t layerStart = layer*numSets*numSVNames;
-
       for (size_t i = start; i <= end; ++i)
       {
-        memcpy (svArray + layerStart + i*numSVNames, svArray + layerStart + from*numSVNames,
+        memcpy (svArray[layer] + i*numSVNames, 
+          svArray[layer] + from*numSVNames,
           sizeof(csShaderVariable*)*numSVNames);
       }
     }
@@ -137,8 +161,31 @@ namespace RenderManager
 
       for (size_t layer = 1; layer < numLayers; ++layer)
       {
-        memcpy (svArray + layer*layerSize, svArray, sizeof(csShaderVariable*)*layerSize);
+        memcpy (svArray[layer], svArray[0], sizeof(csShaderVariable*)*layerSize);
       }
+    }
+
+    /**
+     * Replicate a layer zero into some other layer
+     */
+    void ReplicateLayer (size_t from, size_t to)
+    {
+      size_t layerSize = numSets*numSVNames;
+
+      memcpy (svArray[to], svArray[from], sizeof(csShaderVariable*)*layerSize);
+    }
+
+    void InsertLayer (size_t after, size_t replicateFrom = 0)
+    {
+      const size_t sliceSize = sizeof(csShaderVariable*)*numSVNames*numSets;
+
+      csShaderVariable** slice = reinterpret_cast<csShaderVariable**> (
+        GetMemAlloc().Alloc (sliceSize));
+      svArray.Insert (after+1, slice);
+
+      memcpy (slice, svArray[replicateFrom], sliceSize);
+
+      numLayers++;
     }
 
     size_t GetNumSVNames () const
@@ -154,8 +201,14 @@ namespace RenderManager
   private:
     size_t numLayers;
     size_t numSVNames;
-    size_t numSets;    
-    csShaderVariable** svArray;
+    size_t numSets;
+    csArray<csShaderVariable**> svArray;
+
+    csMemoryPool& GetMemAlloc()
+    { return *(reinterpret_cast<csMemoryPool*> (memAlloc)); }
+
+    uint memAlloc[(sizeof(csMemoryPool) + sizeof (uint) - 1) / sizeof (uint)];
+    bool memAllocSetUp;
   };
 
 

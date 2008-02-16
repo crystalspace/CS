@@ -170,7 +170,7 @@ namespace RenderManager
       SVArrayHolder svArrays;
 
       // Arrays of per-mesh shader and ticket info
-      csArray<iShader*> shaderArray;
+      csDirtyAccessArray<iShader*> shaderArray;
       csArray<size_t> ticketArray;
 
       // Total number of render meshes within the context, just for statistics
@@ -214,6 +214,29 @@ namespace RenderManager
     
 	meshNode->meshes.Push (sm);
 	totalRenderMeshes++;
+      }
+
+      void InsertLayer (size_t after)
+      {
+        const size_t layerCount = shaderArray.GetSize() / totalRenderMeshes;
+        shaderArray.SetSize (shaderArray.GetSize() + totalRenderMeshes);
+        const size_t layerOffset = after * totalRenderMeshes;
+        memmove (shaderArray.GetArray() + layerOffset + 1,
+          shaderArray.GetArray() + layerOffset,
+          totalRenderMeshes * (layerCount - after) * sizeof(csShaderVariable*));
+        const size_t layerOffsetNew = (after + 1) * totalRenderMeshes;
+        memset (shaderArray.GetArray() + layerOffsetNew, 0,
+          totalRenderMeshes * sizeof(csShaderVariable*));
+
+        svArrays.InsertLayer (after);
+      }
+
+      void CopyLayerShader (size_t meshId, size_t fromLayer, size_t toLayer)
+      {
+        const size_t fromLayerOffset = fromLayer * totalRenderMeshes;
+        const size_t toLayerOffset = toLayer * totalRenderMeshes;
+        shaderArray[toLayerOffset + meshId] =
+          shaderArray[fromLayerOffset + meshId];
       }
     };
 
