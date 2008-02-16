@@ -499,7 +499,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     while (nodes->HasNext ())
     {
       csRef<iDocumentNode> child = nodes->Next ();
-      if (child->GetType() != CS_NODE_ELEMENT) continue;
+      if (child->GetType() != CS_NODE_ELEMENT)
+      {
+        if (passForward) passForwardedNodes.Push (child);
+        continue;
+      }
       
       csStringID id = xmltokens.Request (child->GetValue());
       switch (id)
@@ -526,9 +530,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
           break;
         default:
           if (passForward)
-          {
             passForwardedNodes.Push (child);
-          }
           else
             compiler->synldr->ReportBadToken (child);
       }

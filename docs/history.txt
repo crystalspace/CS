@@ -10,6 +10,8 @@ chronological order.
 	- res augmented the shader weaver plugin to "forward" unknown nodes
 	  below <pass> into the generated shader. This makes it possible to
 	  e.g. specify mixmodes.
+	- res fixed the shader weaver to forward non-ELEMENT nodes below "pass"
+	  as well. This makes using conditions there possible.
 15-Feb-2008
 	- res replaced the "buffer fill" light manager method with method(s)
 	  that return a pointer to a buffer (which has to be freed later). This
