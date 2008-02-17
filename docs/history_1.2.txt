@@ -1,5 +1,7 @@
 1.2 branch log.
 
+17-Feb-2008
+	- Vincent merged r28700 into 1.2 (fix for #205, CoreAudio driver fix).
 13-Feb-2008
 	- varslot+res merged r28662, r28663 into 1.2 (gldriver.xml updates).
 	- res merged r28664 into 1.2 (xmlshader conditions fix).
