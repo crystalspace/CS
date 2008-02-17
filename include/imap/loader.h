@@ -143,6 +143,8 @@ struct csLoadResult
    * - 'meshfact' file: 'result' will be the mesh factory wrapper.
    * - 'meshobj' file: 'result' will be the mesh wrapper.
    * - 'portals' file: 'result' will be the portal's mesh wrapper.
+   * - 'light' file: 'result' will be the light. 
+   * Note! In case of a light call DecRef() after you added it to a sector.
    * Note! Use scfQueryInterface on 'result' to detect what type was loaded.
    */
   iBase* result;
@@ -454,6 +456,7 @@ struct iLoader : public virtual iBase
    * - 'meshobj' file: 'result' will be the mesh wrapper.
    * - 3ds/md2 models: 'result' will be the mesh factory wrapper.
    * - 'portals' file: 'result' will be the portal's mesh wrapper.
+   * - 'light' file: 'result' will be the light.
    *
    * Returns csLoadResult.
    * <br>
@@ -501,6 +504,7 @@ struct iLoader : public virtual iBase
    * - 'meshobj' file: 'result' will be the mesh wrapper.
    * - 3ds/md2 models: 'result' will be the mesh factory wrapper.
    * - 'portals' file: 'result' will be the portal's mesh wrapper.
+   * - 'light' file: 'result' will be the light.
    *
    * Returns csLoadResult.
    * <br>
@@ -547,6 +551,7 @@ struct iLoader : public virtual iBase
    * - 'meshfact' node: 'result' will be the mesh factory wrapper.
    * - 'meshobj' node: 'result' will be the mesh wrapper.
    * - 'portals' file: 'result' will be the portal's mesh wrapper.
+   * - 'light' file: 'result' will be the light.
    *
    * Returns csLoadResult.
    * <br>
