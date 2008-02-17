@@ -10,6 +10,9 @@ chronological order.
         - Sueastside added 'light' loading to iLoader::Load().
 	- Sueastside removed an assert in ParsePortal(), it's perfectly
 	  valid to not specify a sector for a portal imo.
+	- Andres wrapped a variable declaration using a type out of a C header
+	  inside extern "C" as it seems that at least mingw doesnt contain a
+	  #ifdef __cplusplus at the proper place.
 15-Feb-2008
         - Darek fixed PowerPC problem with gl_txtmgr.
 14-Feb-2008
