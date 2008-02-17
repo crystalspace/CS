@@ -13,6 +13,8 @@ chronological order.
 	- Andres wrapped a variable declaration using a type out of a C header
 	  inside extern "C" as it seems that at least mingw doesnt contain a
 	  #ifdef __cplusplus at the proper place.
+	- Andres made startme work even if there are spaces in the path to the
+	  called applications.
 15-Feb-2008
         - Darek fixed PowerPC problem with gl_txtmgr.
 14-Feb-2008
