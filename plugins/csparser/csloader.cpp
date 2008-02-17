@@ -5021,7 +5021,6 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
   }
   else
   {
-    CS_ASSERT (sourceSector != 0);
     mesh = Engine->CreatePortal (
   	  container_name ? container_name : name,
   	  sourceSector, csVector3 (0), destSector,
