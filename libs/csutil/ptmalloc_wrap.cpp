@@ -172,8 +172,6 @@ void* ptcalloc (size_t n, size_t s)
 #endif
 }
 
-#if defined(CS_PLATFORM_WIN32)
-
 /* Cygwin has funny issues with atexit() that ptmalloc seems to tickle.
  * So within ptmalloc we use our own single-use implementation of atexit()
  * when on Cygwin.  Note that use of a static variable could lead to incorrect
@@ -183,7 +181,9 @@ void* ptcalloc (size_t n, size_t s)
  *
  * With the MSVC runtime (ie MSVC itself and MingW), the catch is that 
  * atexit() functions are called before global static objects are destroyed. 
- * So tweak the destruction order here as well.
+ *
+ * On Linux this seems to be the case as well, so generally tweak the 
+ * destruction order here.
  *
  * !!! WARNING !!!
  * This is fragile.  If some other part of the application tries to set a
@@ -230,4 +230,3 @@ extern "C" int cs_atexit(void(*func)(void))
   CS::ptmalloc_::atexitHandler.Set (func);
   return 0;
 }
-#endif

@@ -9,6 +9,9 @@ chronological order.
 18-Feb-2008
 	- caedes fixed lights not updating attenuation vector after changing
 	  the cutoff distance.
+	- res committed the patch from trac #185 ("Enable atexit tweak for 
+	  all platforms") to work around crashes on exit with static profile
+	  builds.
 17-Feb-2008
         - Sueastside added 'light' loading to iLoader::Load().
 	- Sueastside removed an assert in ParsePortal(), it's perfectly
