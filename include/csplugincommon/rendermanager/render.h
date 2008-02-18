@@ -83,7 +83,7 @@ namespace RenderManager
    * Render mesh nodes within one context.
    * Does not handle setting render targets or camera transform.
    */
-  template<typename RenderTree, typename LayerConfigType>
+  template<typename RenderTree>
   class SimpleContextRender
   {
   public:
@@ -173,8 +173,8 @@ namespace RenderManager
     size_t currentLayer;
   };
 
-  template<typename RenderTree, typename LayerConfigType>
-  struct OperationTraits<SimpleContextRender<RenderTree, LayerConfigType> >
+  template<typename RenderTree>
+  struct OperationTraits<SimpleContextRender<RenderTree> >
   {
     typedef OperationUnordered Ordering;
   };
@@ -183,14 +183,13 @@ namespace RenderManager
    * Renderer for multiple contexts, grouping them by render target and
    * rendering all layers of each context to same target.
    */
-  template<typename RenderTree, typename LayerConfigType>
+  template<typename RenderTree>
   class SimpleTreeRenderer
   {
   public:
-    SimpleTreeRenderer (iGraphics3D* g3di, iShaderManager* shaderMgri, 
-      const LayerConfigType& layers)
+    SimpleTreeRenderer (iGraphics3D* g3di, iShaderManager* shaderMgri)
       : targetSetup (g3di), meshRender (g3di, shaderMgri),
-      g3d (g3di), shaderMgr (shaderMgri), layers (layers),
+      g3d (g3di), shaderMgr (shaderMgri), 
       lastTarget (0), lastSubtexture (0)
     {}   
 
@@ -249,7 +248,7 @@ namespace RenderManager
       BeginFinishDrawScope bd (g3d, drawFlags);      
 
       // Render all mesh nodes in context
-      for (size_t layer = 0; layer < layers.GetLayerCount (); ++layer)
+      for (size_t layer = 0; layer < context->svArrays.GetNumLayers(); ++layer)
       {
         meshRender.SetLayer (layer);
 
@@ -278,11 +277,10 @@ namespace RenderManager
     }
 
     ContextTargetSetup<typename RenderTree::ContextNode> targetSetup;
-    SimpleContextRender<RenderTree, LayerConfigType> meshRender;
+    SimpleContextRender<RenderTree> meshRender;
 
     iGraphics3D* g3d;
     iShaderManager* shaderMgr;
-    const LayerConfigType& layers;
 
     iTextureHandle* lastTarget;
     int lastSubtexture;
@@ -290,8 +288,8 @@ namespace RenderManager
     csArray<typename RenderTree::ContextNode*> contextStack;
   };
 
-  template<typename RenderTree, typename LayerConfigType>
-  struct OperationTraits<SimpleTreeRenderer<RenderTree, LayerConfigType> >
+  template<typename RenderTree>
+  struct OperationTraits<SimpleTreeRenderer<RenderTree> >
   {
     typedef OperationNumbered Ordering;
   };

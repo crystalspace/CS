@@ -40,6 +40,14 @@ namespace RenderManager
   template<typename RenderTree, typename LayerConfigType>
   class LightSetup
   {
+    struct IndexLightTypePair
+    {
+      size_t index;
+      csLightType type;
+
+      bool operator<(const IndexLightTypePair& other) const
+      { return type < other.type; }
+    };
   public:
     struct PersistentData;
     typedef csArray<iShader*> ShaderArrayType;
@@ -103,64 +111,138 @@ namespace RenderManager
             node->owner.shaderArray[layerOffset + mesh.contextLocalId];
           if (!shaderToUse) continue;
 
-          UpdateMetadata (shaderToUse);
-          size_t neededLayers = (layerLights 
-            + lastMetadata.numberOfLights - 1) / lastMetadata.numberOfLights;
-          neededLayers = csMin (neededLayers, layerConfig.GetMaxLightPasses (layer));
-
-	  if (neededLayers > newLayerCounts[layer])
-	  {
-            // We need to insert new layers
-
-            // How many?
-            size_t insertLayerNum = neededLayers - newLayerCounts[layer];
-            // The actual insertion
-            for (size_t n = newLayerCounts[layer]; n < neededLayers; n++)
-	      node->owner.InsertLayer (newLayerIndices[layer] + n - 1);
-            // Update indices for in new index table
-	    for (size_t l = layer+1; l < layerConfig.GetLayerCount (); l++)
-	      newLayerIndices[l] += insertLayerNum;
-	    newLayerCounts[layer] += insertLayerNum;
-	  }
-
-	  csShaderVariableStack localStack;
-          for (size_t n = 0; n < neededLayers; n++)
+          // Sort lights by type
+          persist.lightTypeScratch.Empty();
+          for (size_t l = 0; l < layerLights; l++)
           {
-            if (n > 0)
-            {
-              /* The first layer will have the shader to use set;
-               * subsequent ones don't */
-              node->owner.CopyLayerShader (mesh.contextLocalId,
-                newLayerIndices[layer], newLayerIndices[layer] + n);
-            }
-	    svArrays.SetupSVStack (localStack, 
-              newLayerIndices[layer] + n,
-              mesh.contextLocalId);
-    
-            csShaderVariable* lightNum = CreateVarOnStack (
-              persist.svNames.GetDefaultSVId (
-                csLightShaderVarCache::varLightCount), localStack);
-	    lightNum->SetValue ((int)numLights);
-
-            csShaderVariable* passNum = CreateVarOnStack (
-              persist.svPassNum, localStack);
-	    passNum->SetValue ((int)n);
-    
-	    for (size_t l = layerLights; l-- > 0; )
-	    {
-	      const csRefArray<csShaderVariable>** thisLightSVs =
-		persist.lightDataCache.GetElementPointer (currentInfluences[l].light);
-	      if (thisLightSVs == 0)
-	      {
-		thisLightSVs = &persist.lightDataCache.Put (
-		  currentInfluences[l].light, 
-		  &(currentInfluences[l].light->GetSVContext()->GetShaderVariables()));
-	      }
-    
-	      MergeAsArrayItems (localStack, **thisLightSVs, l);
-	    }
-            lightOffset += layerLights;
+            IndexLightTypePair iltp;
+            iltp.index = l;
+            iltp.type = currentInfluences[l].light->GetType();
+            persist.lightTypeScratch.Push (iltp);
           }
+          persist.lightTypeScratch.Sort();
+
+          UpdateMetadata (shaderToUse);
+          if (lastMetadata.numberOfLights == 0) continue;
+
+          // Set up layers
+          size_t firstLight = 0;
+          size_t remainingLights = layerLights;
+          size_t totalLayers = 0;
+          while (firstLight < layerLights)
+          {
+            csLightType lightType = persist.lightTypeScratch[firstLight].type;
+            size_t num = 1;
+            for (; num < remainingLights; num++)
+            {
+              if (persist.lightTypeScratch[firstLight + num].type != lightType)
+                break;
+            }
+            /* We have a subset of the lights that are of the same type.
+             * Check the size of it against the shader limit */
+            size_t thisPassLayers = (num 
+	      + lastMetadata.numberOfLights - 1) / lastMetadata.numberOfLights;
+	    thisPassLayers = csMin (thisPassLayers, layerConfig.GetMaxLightPasses (layer));
+            size_t neededLayers = totalLayers + thisPassLayers;
+
+	    if (neededLayers > newLayerCounts[layer])
+	    {
+	      // We need to insert new layers
+  
+	      // How many?
+	      size_t insertLayerNum = neededLayers - newLayerCounts[layer];
+	      // The actual insertion
+	      for (size_t n = newLayerCounts[layer]; n < neededLayers; n++)
+              {
+		node->owner.InsertLayer (newLayerIndices[layer] + n - 1);
+                newLayers.InsertLayer (newLayerIndices[layer] + n - 1, layer);
+              }
+	      // Update indices for in new index table
+	      for (size_t l = layer+1; l < layerConfig.GetLayerCount (); l++)
+		newLayerIndices[l] += insertLayerNum;
+	      newLayerCounts[layer] += insertLayerNum;
+	    }
+
+            firstLight += num;
+            remainingLights -= num;
+            totalLayers = neededLayers;
+          }
+
+          // Now render lights for each light type
+          firstLight = 0;
+          remainingLights = layerLights;
+          totalLayers = 0;
+          while (firstLight < layerLights)
+          {
+            csLightType lightType = persist.lightTypeScratch[firstLight].type;
+            size_t num = 1;
+            for (; num < remainingLights; num++)
+            {
+              if (persist.lightTypeScratch[firstLight + num].type != lightType)
+                break;
+            }
+            /* We have a subset of the lights that are of the same type.
+             * Check the size of it against the shader limit */
+            size_t thisPassLayers = (num 
+	      + lastMetadata.numberOfLights - 1) / lastMetadata.numberOfLights;
+	    thisPassLayers = csMin (thisPassLayers, layerConfig.GetMaxLightPasses (layer));
+            size_t neededLayers = totalLayers + thisPassLayers;
+
+	    csShaderVariableStack localStack;
+	    for (size_t n = 0; n < thisPassLayers; n++)
+	    {
+	      if ((totalLayers != 0) || (n > 0))
+	      {
+		/* The first layer will have the shader to use set;
+		 * subsequent ones don't */
+		node->owner.CopyLayerShader (mesh.contextLocalId,
+		  newLayerIndices[layer], 
+                  newLayerIndices[layer] + totalLayers + n);
+	      }
+	      svArrays.SetupSVStack (localStack, 
+		newLayerIndices[layer] + n + totalLayers,
+		mesh.contextLocalId);
+      
+              size_t thisNum = csMin (num,
+                layerConfig.GetMaxLightNum (layer));
+	      csShaderVariable* lightNum = CreateVarOnStack (
+		persist.svNames.GetDefaultSVId (
+		  csLightShaderVarCache::varLightCount), localStack);
+	      lightNum->SetValue ((int)thisNum);
+  
+	      csShaderVariable* passNum = CreateVarOnStack (
+		persist.svPassNum, localStack);
+	      passNum->SetValue ((int)(n + totalLayers));
+      
+	      csShaderVariable* lightTypeSV = CreateVarOnStack (
+                persist.svNames.GetLightSVId (
+                  csLightShaderVarCache::lightType), localStack);
+	      lightTypeSV->SetValue ((int)(lightType));
+      
+	      for (size_t l = thisNum; l-- > 0; )
+              //for (size_t l = 0; l < thisNum; l++)
+	      {
+                iLight* light =
+                  currentInfluences[
+                    persist.lightTypeScratch[firstLight + l].index].light;
+		const csRefArray<csShaderVariable>** thisLightSVs =
+		  persist.lightDataCache.GetElementPointer (light);
+		if (thisLightSVs == 0)
+		{
+		  thisLightSVs = &persist.lightDataCache.Put (
+		    light, &(light->GetSVContext()->GetShaderVariables()));
+		}
+      
+		MergeAsArrayItems (localStack, **thisLightSVs, l);
+	      }
+              num -= thisNum;
+              firstLight += thisNum;
+              remainingLights -= thisNum;
+	    }
+
+            totalLayers = neededLayers;
+          }
+	  lightOffset += layerLights;
 	}
 
         lightmgr->FreeInfluenceArray (influences);
@@ -176,6 +258,10 @@ namespace RenderManager
       const LayerConfigType& GetOriginalLayers() const
       {
         return layerConfig;
+      }
+      void InsertLayer (size_t after, size_t oldLayer)
+      {
+        layerMap.Insert (after+1, oldLayer);
       }
     public:
       PostLightingLayers (const LayerConfigType& layerConfig)
@@ -226,6 +312,7 @@ namespace RenderManager
       /* A number of SVs have to be kept alive even past the expiration
        * of the actual step */
       csRefArray<csShaderVariable> svKeeper;
+      csArray<IndexLightTypePair> lightTypeScratch;
       
       ~PersistentData()
       {

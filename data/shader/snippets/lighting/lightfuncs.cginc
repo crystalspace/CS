@@ -41,22 +41,11 @@ float Attenuation_CLQ (float d, float3 coeff)
 }
 
 
-float Light_Point (float3 surfNorm, float3 surfToLight)
-{
-  return max (dot (surfToLight, surfNorm), 0);
-}
-
-float Light_Directional (float3 surfNorm, float3 lightDir)
-{
-  return max (dot (-lightDir, surfNorm), 0);
-}
-
 float Light_Spot (float3 surfNorm, float3 surfToLight, 
                   float3 lightDir, float falloffInner, float falloffOuter)
 {
-  float dp = dot (surfToLight, surfNorm);
   float a = smoothstep (falloffOuter, falloffInner, -dot (surfToLight, lightDir));
-  return max (dp * a, 0);
+  return max (a, 0);
 }
 
 #endif // __LIGHTFUNCS_CG_INC__

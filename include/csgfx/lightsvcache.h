@@ -65,7 +65,10 @@ public:
     lightTransformWorld,
     /// Attenuation vector
     lightAttenuation,
-    /// Attenuation texture
+    /**
+     * Attenuation texture
+     * \deprecated Deprecated in 1.3.
+     */
     lightAttenuationTex,
     /**
      * Direction (object space)

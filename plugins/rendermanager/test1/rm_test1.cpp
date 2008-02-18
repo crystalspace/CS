@@ -193,8 +193,8 @@ bool RMTest1::RenderView (iView* view)
   {
     view->GetContext()->SetZMode (CS_ZBUF_MESH);
 
-    SimpleTreeRenderer<RenderTreeType, MultipleRenderLayer> render (rview->GetGraphics3D (),
-      shaderManager, renderLayer);
+    SimpleTreeRenderer<RenderTreeType> render (rview->GetGraphics3D (),
+      shaderManager);
     ForEachContextReverse (renderTree, render);
   }
 

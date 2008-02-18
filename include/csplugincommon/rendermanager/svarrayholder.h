@@ -166,7 +166,7 @@ namespace RenderManager
     }
 
     /**
-     * Replicate a layer zero into some other layer
+     * Replicate a layer into some other layer
      */
     void ReplicateLayer (size_t from, size_t to)
     {

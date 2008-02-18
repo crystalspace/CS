@@ -96,11 +96,12 @@ namespace RenderManager
   {
   public:    
     typedef csArray<iShader*> ShaderArrayType;
+    typedef csArray<size_t> TicketArrayType;
 
     ShaderSVSetup (SVArrayHolder& svArrays, const ShaderArrayType& shaderArray,
-      const LayerConfigType& layerConfig)
+      const TicketArrayType& tickets, const LayerConfigType& layerConfig)
       : svArrays (svArrays), shaderArray (shaderArray),
-      layerConfig (layerConfig)
+      ticketArray (tickets), layerConfig (layerConfig)
     {
       tempStack.Setup (svArrays.GetNumSVNames ());
     }
@@ -122,7 +123,8 @@ namespace RenderManager
           iShader* shader = shaderArray[mesh.contextLocalId+layerOffset];
           if (shader) 
           {
-            shader->PushVariables (tempStack);
+            shader->PushShaderVariables (tempStack,
+              ticketArray[mesh.contextLocalId+layerOffset]);
           
             // Back-merge it onto the real one
             csShaderVariableStack localStack;
@@ -136,6 +138,7 @@ namespace RenderManager
   private:
     SVArrayHolder& svArrays; 
     const ShaderArrayType& shaderArray;
+    const TicketArrayType& ticketArray;
     csShaderVariableStack tempStack;
     const LayerConfigType& layerConfig;
   };

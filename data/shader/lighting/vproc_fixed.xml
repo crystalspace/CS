@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <!-- 'lights' must match with TheTechniques invocation below -->
-<shader compiler="xmlshader" name="lighting_vproc_fixed" lights="4">
+<shader compiler="xmlshader" name="lighting_vproc_fixed" lights="8">
   <shadervars>
     <shadervar type="vector3" name="mat specular">1,1,1</shadervar>
     <shadervar type="float" name="mat shininess">32</shadervar>
@@ -12,9 +12,9 @@
 	- other lights if they are not attenuated LINEAR
 	Further, CS spotlights dont exactly map to GL ones...
 	So for now, GL fixed function spots look slightly off. ?>
-    <?if ((vars."light type[$N$]".int == consts.CS_LIGHT_DIRECTIONAL)
-	&& (vars."light attenuation mode[$N$]".int == consts.CS_ATTN_NONE)) 
-	|| (vars."light attenuation mode[$N$]".int != consts.CS_ATTN_LINEAR) ?>
+    <?if ((vars."light type".int == consts.CS_LIGHT_DIRECTIONAL)
+	&& (vars."light attenuation mode".int == consts.CS_ATTN_NONE)) 
+	|| (vars."light attenuation mode".int != consts.CS_ATTN_LINEAR) ?>
   <?Endtemplate?>
 
   <?Template ifNotGLSupportsLight N?>
@@ -24,16 +24,16 @@
   
   <?Template elsifNotGLSupportsLight N?>
     <?! should obviously be in sync with the stuff above ?>
-    <?elsif !(((vars."light type[$N$]".int == consts.CS_LIGHT_DIRECTIONAL)
-	&& (vars."light attenuation mode[$N$]".int == consts.CS_ATTN_NONE)) 
-	|| (vars."light attenuation mode[$N$]".int != consts.CS_ATTN_LINEAR)) ?>
+    <?elsif !(((vars."light type".int == consts.CS_LIGHT_DIRECTIONAL)
+	&& (vars."light attenuation mode".int == consts.CS_ATTN_NONE)) 
+	|| (vars."light attenuation mode".int != consts.CS_ATTN_LINEAR)) ?>
   <?Endtemplate?>
   
   <?Template HandleLightFVP LightCount N?>
     <?if (vars."light count".int &gt; $N$) && ($LightCount$ &gt; $N$) ?>
       <?ifGLSupportsLight $N$ ?>
 	<light num="$N$">
-	  <?if (vars."light type[$N$]".int == consts.CS_LIGHT_DIRECTIONAL)?>
+	  <?if (vars."light type".int == consts.CS_LIGHT_DIRECTIONAL)?>
 	    <?! Generate position for directional light ?>
 	    <position type="expression">
 	      <!-- small subtlety: GL spec says light coordinates are in
@@ -51,14 +51,14 @@
 	      </sexp>
 	    </position>
 	    <!--attenuation type="vector3">1,0,0</attenuation-->
-	  <?elsif (vars."light type[$N$]".int == consts.CS_LIGHT_SPOTLIGHT)?>
+	  <?elsif (vars."light type".int == consts.CS_LIGHT_SPOTLIGHT)?>
 	    <spotcutoff type="expression">
 	      <!-- CS falloff is cosine of angle, GL wants angle -->
 	      <sexp>(* (arccos (min 1 "light outer falloff[$N$]") ) 57.295779513082320876798154814105)</sexp>
 	      <!-- 57.295... = 180/PI -->
 	    </spotcutoff>
 	  <?endif?>
-	  <?if (vars."light type[$N$]".int != consts.CS_LIGHT_SPOTLIGHT)?>
+	  <?if (vars."light type".int != consts.CS_LIGHT_SPOTLIGHT)?>
 	    <!-- Override any falloff of the light -->
 	    <spotcutoff type="float">180</spotcutoff>
 	  <?endif?>
@@ -129,6 +129,12 @@
     <!-- Tech with separate specular -->
     <technique priority="$N$50">
       <pass>
+	<?if vars."pass number".int == 0 ?>
+	  <!-- First pass: blend with copy -->
+	<?else?>
+	  <!-- Later pass: blend with add -->
+	  <mixmode><add /></mixmode>
+	<?endif?>
 	<?if vars."tex diffuse".texture ?>
 	  <texture name="tex diffuse" destination="diffuse" />
 	  <buffer source="texture coordinate 0" destination="texture coordinate 0" />
@@ -197,6 +203,12 @@
     <!-- Tech without separate specular -->
     <technique priority="$N$00">
       <pass>
+	<?if vars."pass number".int == 0 ?>
+	  <!-- First pass: blend with copy -->
+	<?else?>
+	  <!-- Later pass: blend with add -->
+	  <mixmode><add /></mixmode>
+	<?endif?>
 	<?if vars."tex diffuse".texture ?>
 	  <texture name="tex diffuse" destination="diffuse" />
 	  <buffer source="texture coordinate 0" destination="texture coordinate 0" />
@@ -230,8 +242,7 @@
     </technique>
   <?Endtemplate?>
   
-  <?! "Dumbed down" to 4 for now to keep loading/processing time down ?>
-  <?TheTechniques 4 ?>
+  <?TheTechniques 8 ?>
   
   <fallbackshader name="lighting_vproc" file="/shader/lighting/vproc.xml" />
 </shader>

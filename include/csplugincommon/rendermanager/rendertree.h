@@ -220,15 +220,14 @@ namespace RenderManager
       {
         const size_t layerCount = shaderArray.GetSize() / totalRenderMeshes;
         shaderArray.SetSize (shaderArray.GetSize() + totalRenderMeshes);
-        const size_t layerOffset = after * totalRenderMeshes;
-        memmove (shaderArray.GetArray() + layerOffset + 1,
-          shaderArray.GetArray() + layerOffset,
-          totalRenderMeshes * (layerCount - after) * sizeof(csShaderVariable*));
         const size_t layerOffsetNew = (after + 1) * totalRenderMeshes;
+        memmove (shaderArray.GetArray() + layerOffsetNew + totalRenderMeshes,
+          shaderArray.GetArray() + layerOffsetNew,
+          totalRenderMeshes * (layerCount - after - 1) * sizeof(csShaderVariable*));
         memset (shaderArray.GetArray() + layerOffsetNew, 0,
           totalRenderMeshes * sizeof(csShaderVariable*));
 
-        svArrays.InsertLayer (after);
+        svArrays.InsertLayer (after, after);
       }
 
       void CopyLayerShader (size_t meshId, size_t fromLayer, size_t toLayer)

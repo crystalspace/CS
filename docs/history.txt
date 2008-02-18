@@ -22,6 +22,10 @@ chronological order.
 	    * Added support for INT parameters.
 	    * Improved error reporting (now shows source line that gives an
 	      error).
+	- res changed the RM light setup to now group lights by light type
+	  and only render lights of the same light type together. The intention
+	  is to simplify shaders by not having to check the light type for
+	  every light.
 16-Feb-2008
 	- res augmented the shader weaver plugin to "forward" unknown nodes
 	  below <pass> into the generated shader. This makes it possible to

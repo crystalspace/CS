@@ -412,7 +412,6 @@ public:
   void SetType (csLightType type)
   {
     this->type = type;
-    GetPropertySV (csLightShaderVarCache::lightType)->SetValue (type);
   }
 
   virtual iShaderVariableContext* GetSVContext()

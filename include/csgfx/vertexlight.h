@@ -50,6 +50,14 @@ protected:
       return sv->GetArrayElement (index);
     return 0;
   }
+  csShaderVariable* LookupSV (const csShaderVariableStack& stack,
+    CS::ShaderVarStringID id)
+  {
+    csShaderVariable* sv;
+    if (stack.GetSize () > id)
+      sv = stack[id];
+    return sv;
+  }
 public:
   /// Attenuation coefficients (for CLQ attenuation)
   csVector3 attenuationConsts;
@@ -119,7 +127,7 @@ public:
 
     int t = CS_LIGHT_POINTLIGHT;
     id = svcache.GetLightSVId (csLightShaderVarCache::lightType);
-    if (((sv = LookupSVArrayItem (stack, id, lightNum)) != 0))
+    if (((sv = LookupSV (stack, id)) != 0))
       sv->GetValue (t);
     type = (csLightType)t;
 

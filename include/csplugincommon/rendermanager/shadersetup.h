@@ -152,12 +152,12 @@ namespace RenderManager
     typedef ShaderSVSetup<RenderTree, LayerConfigType> ShaderSVSetupType;
     typedef TicketSetup<RenderTree, LayerConfigType> TicketSetupType;
 
-    typedef CS::Meta::CompositeFunctorType2<ShaderSetupType,
+    typedef CS::Meta::CompositeFunctorType2<TicketSetupType,
       ShaderSVSetupType>CombinedFunctorType;
   };
 
   /**
-   * Setup the standard shader and shader SV
+   * Setup the standard shader
    */
   template<typename ContextNodeType, typename LayerConfigType>
   void SetupStandardShader (ContextNodeType& context, 
@@ -166,26 +166,19 @@ namespace RenderManager
   {
     context.shaderArray.SetSize (context.totalRenderMeshes*layerConfig.GetLayerCount ());
 
-    // Shader and sv setup
+    // Shader setup
     typedef typename ContextNodeType::TreeType Tree;
     typedef StandardSATSetupTypes<Tree, LayerConfigType> TypeHelper;
     
     typename TypeHelper::ShaderSetupType 
       shaderSetup (context.shaderArray, layerConfig);
 
-    typename TypeHelper::ShaderSVSetupType 
-      shaderSVSetup (context.svArrays, context.shaderArray, layerConfig);
-         
-    // Do the two operations sequentially after each other
-    typename TypeHelper::CombinedFunctorType 
-      combFunctor (CS::Meta::CompositeFunctor (shaderSetup, shaderSVSetup));
-
-    ForEachMeshNode (context, combFunctor);
+    ForEachMeshNode (context, shaderSetup);
   }
 
   /**
-   * Setup the shader ticket. 
-   * Must be done after shader and shader SV (usually SetupStandardShader()).
+   * Setup the shader ticket and shader Vs.
+   * Must be done after shader (usually SetupStandardShader()).
    */
   template<typename ContextNodeType, typename LayerConfigType>
   void SetupStandardTicket (ContextNodeType& context, 
@@ -197,11 +190,22 @@ namespace RenderManager
     typedef typename ContextNodeType::TreeType Tree;
     typedef StandardSATSetupTypes<Tree, LayerConfigType> TypeHelper;
     
+    /* Ticket and shader SV setup
+     * Note that SVs have to be set up *after* the tickets - otherwise SVs
+     * from fallbacks won't work */
     typename TypeHelper::TicketSetupType 
       ticketSetup (context.svArrays, shaderManager->GetShaderVariableStack (),
         context.shaderArray, context.ticketArray, layerConfig);
 
-    ForEachMeshNode (context, ticketSetup);
+    typename TypeHelper::ShaderSVSetupType 
+      shaderSVSetup (context.svArrays, context.shaderArray, 
+      context.ticketArray, layerConfig);
+         
+    // Do the two operations sequentially after each other
+    typename TypeHelper::CombinedFunctorType 
+      combFunctor (CS::Meta::CompositeFunctor (ticketSetup, shaderSVSetup));
+
+    ForEachMeshNode (context, combFunctor);
   }
 
   typedef csDirtyAccessArray<csStringID> ShaderVariableNameArray;

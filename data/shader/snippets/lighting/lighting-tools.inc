@@ -21,10 +21,14 @@
   
   <?Template Lighting_Variablemaps PROG?>
     <!-- Cg shader plugin magic makes arrays work -->
+    <variablemap variable="light count" 
+		  destination="$PROG$In.lightCount" />
     <variablemap variable="light position world" 
 		  destination="$PROG$In.lightPosWorld" />
     <variablemap variable="light diffuse" 
 		  destination="$PROG$In.lightColorDiffuse" />
+    <variablemap variable="light specular" 
+		 destination="$PROG$In.lightColorSpecular" />
     <variablemap variable="light attenuation" 
 		  destination="$PROG$In.lightAttenuationVec" />
     <variablemap variable="light direction world" 
@@ -33,41 +37,50 @@
 		  destination="$PROG$In.lightFalloffInner" />
   <?Endtemplate?>
     
-  <?Template Lighting_Compute PROG?>
+  <?Template Lighting_Compute PROG LightNum?>
     diffuseColor = float3(0);
-    <?Generate N 0 4 ?>
-      <?if (vars."light count".int &gt; $$N$$)?>
-      {
-	float3 surfToLight = ($PROG$In.lightPosWorld[$$N$$] - position).xyz;
-	float lightDistSq = dot (surfToLight, surfToLight);
-	float lightDist = sqrt (lightDistSq);
-	surfToLight /= lightDistSq;
-	float diffuse = 0;
-	float attn = 1;
-	<?if vars."light attenuation mode[$N$]".int == consts.CS_ATTN_LINEAR ?>
-	attn = Attenuation_Linear (lightDist, 1 / $PROG$In.lightAttenuationVec[$$N$$].x);
-	<?else?>
-	// Everything else can be mapped to CLQ attn
-	attn = Attenuation_CLQ (lightDist, $PROG$In.lightAttenuationVec[$$N$$]);
-	<?endif?>
-	<?if vars."light type[$N$]".int == consts.CS_LIGHT_DIRECTIONAL ?>
-	float3 lightDir = normalize ($PROG$In.lightDir[$$N$$]);
-	diffuse = Light_Directional (normal, lightDir);
-	<?elsif vars."light type[$N$]".int == consts.CS_LIGHT_SPOTLIGHT ?>
-	float3 lightDir = normalize ($PROG$In.lightDir[$$N$$]);
-	diffuse = Light_Spot (normal, normalize (surfToLight),
-	  lightDir,
-	  $PROG$In.lightFalloffInner[$$N$$],
-	  $PROG$In.lightFalloffOuter[$$N$$]);
-	<?else?>
-	<?! Assume point light ?>
-	diffuse = Light_Point (normal, normalize (surfToLight));
-	<?endif?>
-	diffuseColor += $PROG$In.lightColorDiffuse[$$N$$] * diffuse * attn;
-      }
-      <?endif?>
-    <?Endgenerate?>
     specularColor = float3(0);
+    <![CDATA[
+    for (int l = 0; l < $LightNum$; l++)
+    {
+      if (l >= $PROG$In.lightCount) break;
+    
+      int i = l + lightOffset;
+      float3 surfToLight = ($PROG$In.lightPosWorld[i] - position).xyz;
+      float lightDist = length (surfToLight);
+      surfToLight = normalize (surfToLight);
+    ]]>
+    
+      float spot = 1;
+      float3 L;
+      <?if vars."light type".int == consts.CS_LIGHT_DIRECTIONAL ?>
+      L = -normalize ($PROG$In.lightDir[i]);
+      <?elsif vars."light type".int == consts.CS_LIGHT_SPOTLIGHT ?>
+      L = surfToLight;
+      spot = Light_Spot (normal, L,
+        normalize ($PROG$In.lightDir[i]),
+        $PROG$In.lightFalloffInner[i],
+        $PROG$In.lightFalloffOuter[i]);
+      <?else?>
+      <?! Assume point light ?>
+      L = surfToLight;
+      <?endif?>
+      float3 H = 0.5 * (surfToLight - normalize (eyeToSurf));
+      
+      float4 lightCoeff = lit (dot (normal, L), dot (normal, H),
+        32);
+      
+      float4 lightAttenuationVec = $PROG$In.lightAttenuationVec[i];
+      float attn;
+      float attnRadius = lightAttenuationVec.w;
+      if (attnRadius > 0)
+        attn = Attenuation_Linear (lightDist, 1 / attnRadius);
+      else
+        attn = Attenuation_CLQ (lightDist, lightAttenuationVec.xyz);
+      
+      diffuseColor += $PROG$In.lightColorDiffuse[i] * lightCoeff.y * spot * attn;
+      specularColor += $PROG$In.lightColorSpecular[i] * lightCoeff.z * spot * attn;
+    }
   <?Endtemplate?>
     
   <?SEndIf?>
