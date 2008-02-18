@@ -517,6 +517,8 @@ void csLight::SetCutoffDistance (float radius)
   }
   lightnr++;
   cutoffDistance = radius;
+
+  CalculateAttenuationVector();
   UpdateViscullMesh ();
 }
 
