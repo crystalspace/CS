@@ -1,5 +1,8 @@
 1.2 branch log.
 
+18-Feb-2008
+	- Vincent merged r28737 into 1.2 (fix for light attenuation vector
+	  update after cutoff distance change).
 17-Feb-2008
 	- Vincent merged r28700 into 1.2 (fix for #205, CoreAudio driver fix).
 13-Feb-2008
