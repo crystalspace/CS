@@ -126,6 +126,11 @@ public:
   {
     realShader->GetUsedShaderVars (ticket, bits);
   }
+  
+  void PushShaderVariables (csShaderVariableStack& s, size_t t) const
+  {
+    realShader->PushShaderVariables (s, t);
+  }
 
   friend class csXMLShaderCompiler;
 

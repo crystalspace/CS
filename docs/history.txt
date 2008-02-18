@@ -11,6 +11,11 @@ chronological order.
 	  first three components are still the CLQ coefficient; however, the
 	  radius (as used by linear attenuation) is now stored in component
 	  4.
+	- res added a method to iShader to push SVs for a specific ticket -
+	  this is actually the only way to get the correct SVs for a shader
+	  since the fallback shader can only be considered when a ticket is
+	  given (as whether the fallback shader is used differs from\
+	  variation to variation of a shader).
 16-Feb-2008
 	- res augmented the shader weaver plugin to "forward" unknown nodes
 	  below <pass> into the generated shader. This makes it possible to

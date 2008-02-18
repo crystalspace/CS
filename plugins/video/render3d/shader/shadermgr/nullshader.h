@@ -75,6 +75,7 @@ public:
   { return allShaderMeta; }
   virtual void GetUsedShaderVars (size_t ticket, csBitArray& bits) const
   { }
+  void PushShaderVariables (csShaderVariableStack&, size_t) const { }
 
   /**\name iShaderVariableContext implementation
    * @{ */

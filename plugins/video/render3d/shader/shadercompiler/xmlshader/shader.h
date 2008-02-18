@@ -327,6 +327,16 @@ public:
     return GetUsedSVContext().GetShaderVariables(); 
   }
 
+  void PushShaderVariables (csShaderVariableStack& s, size_t t) const
+  {
+    if (IsFallbackTicket (t))
+    {
+      fallbackShader->PushVariables (s);
+      return;
+    }
+    GetUsedSVContext().PushVariables (s);
+  }
+
   /**
    * Push the variables of this context onto the variable stacks
    * supplied in the "stacks" argument

@@ -412,7 +412,7 @@ struct csShaderMetadata
  */
 struct iShader : public virtual iShaderVariableContext
 {
-  SCF_INTERFACE(iShader, 3, 2, 1);
+  SCF_INTERFACE(iShader, 3, 2, 2);
 
   /// Query the object.
   virtual iObject* QueryObject () = 0;
@@ -479,6 +479,13 @@ struct iShader : public virtual iShaderVariableContext
   
   /// Get shader metadata
   virtual const csShaderMetadata& GetMetadata () const = 0;
+
+  /**
+   * Push the variables of this shader onto the variable stack
+   * supplied in the "stack" argument
+   */
+  virtual void PushShaderVariables (csShaderVariableStack& stack,
+    size_t ticket) const = 0;  
 };
 
 
