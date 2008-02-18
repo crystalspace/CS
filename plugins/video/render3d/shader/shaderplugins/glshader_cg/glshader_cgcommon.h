@@ -73,6 +73,7 @@ protected:
   void WriteAdditionalDumpInfo (const char* description, const char* content);
   virtual const char* GetProgramType() = 0;
   void CollectUnusedParameters ();
+  void SetParameterValue (CGparameter param, csShaderVariable* var);
 public:
   CS_LEAKGUARD_DECLARE (csShaderGLCGCommon);
 
