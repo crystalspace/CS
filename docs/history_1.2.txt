@@ -6,6 +6,8 @@
 	- Vincent merged r28738 into 1.2 (fix for #185, "Enable atexit tweak
 	  for all platforms") to work around crashes on exit with static
 	  profile builds.
+	- Vincent merged r28731 into 1.2 (startme fix for spaces in paths to
+	  the called applications).
 17-Feb-2008
 	- Vincent merged r28700 into 1.2 (fix for #205, CoreAudio driver fix).
 13-Feb-2008

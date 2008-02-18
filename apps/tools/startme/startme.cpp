@@ -250,9 +250,9 @@ bool StartMe::OnMouseDown (iEvent& /*event*/)
     csRef<iCommandLineParser> cmdline =
         csQueryRegistry<iCommandLineParser> (GetObjectRegistry());
     csString appdir = cmdline->GetAppDir ();
-    system (appdir << CS_PATH_SEPARATOR <<
+    system (csString("\"") << appdir << CS_PATH_SEPARATOR <<
         csInstallationPathsHelper::GetAppFilename (
-            demos[description_selected].exec) << " " << 
+            demos[description_selected].exec) << "\" " << 
         demos[description_selected].args);
 
     LeaveDescriptionMode ();
