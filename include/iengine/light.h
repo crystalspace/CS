@@ -34,6 +34,7 @@
 class csColor;
 class csFlags;
 class csVector3;
+class csVector4;
 class csBox3;
 
 struct iLight;
@@ -231,7 +232,7 @@ struct iLightCallback : public virtual iBase
  */
 struct iLight : public virtual iBase
 {
-  SCF_INTERFACE(iLight,2,0,1);
+  SCF_INTERFACE(iLight,3,0,0);
   /// Get the id of this light. This is a 16-byte MD5.
   virtual const char* GetLightID () = 0;
 
@@ -313,12 +314,12 @@ struct iLight : public virtual iBase
    * Set attenuation constants
    * \sa csLightAttenuationMode
    */
-  virtual void SetAttenuationConstants (const csVector3& constants) = 0;
+  virtual void SetAttenuationConstants (const csVector4& constants) = 0;
   /**
    * Get attenuation constants
    * \sa csLightAttenuationMode
    */
-  virtual const csVector3 &GetAttenuationConstants () const = 0;
+  virtual const csVector4 &GetAttenuationConstants () const = 0;
 
   /**
    * Get the the maximum distance at which the light is guranteed to shine. 

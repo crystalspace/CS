@@ -438,7 +438,7 @@ csPtr<iTextureHandle> csLightIterRenderStep::GetAttenuationTexture (
 }
 
 csPtr<iTextureHandle> csLightIterRenderStep::GetAttenuationTexture (
-  const csVector3& attnVec)
+  const csVector4& attnVec)
 {
   if (attnVec.z != 0)
     return GetAttenuationTexture (CS_ATTN_REALISTIC);
@@ -507,7 +507,7 @@ void csLightIterRenderStep::LightSVAccessor::PreGetValue (
     //CreateTexture ();
     if (attnType == CS_ATTN_CLQ)
     {
-      const csVector3& attnVec = light->GetAttenuationConstants ();
+      const csVector4& attnVec = light->GetAttenuationConstants ();
       attTex = parent->GetAttenuationTexture (attnVec);
     }
     else

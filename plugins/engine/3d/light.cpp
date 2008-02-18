@@ -186,7 +186,7 @@ float csLight::GetLuminanceAtSquaredDistance (float sqdist) const
       bright = 1;
       break;
     case CS_ATTN_LINEAR:
-      bright = 1 - sqrt (sqdist) / attenuationConstants.x;
+      bright = 1 - sqrt (sqdist) / attenuationConstants.w;
       break;
     case CS_ATTN_INVERSE:
       {
@@ -214,7 +214,7 @@ float csLight::GetBrightnessAtDistance (float d) const
     case CS_ATTN_NONE:      
       return 1;
     case CS_ATTN_LINEAR:    
-      return csClamp (1.0f - d / attenuationConstants.x, 1.0f, 0.0f);
+      return csClamp (1.0f - d / attenuationConstants.w, 1.0f, 0.0f);
     case CS_ATTN_INVERSE:
       if (d < SMALL_EPSILON) d = SMALL_EPSILON;
       return 1 / d;
@@ -233,17 +233,17 @@ void csLight::CalculateAttenuationVector ()
   switch (attenuation)
   {
     case CS_ATTN_NONE:
-      attenuationConstants.Set (1, 0, 0);
+      attenuationConstants.Set (1, 0, 0, 0);
       break;
     case CS_ATTN_LINEAR:    
       // @@@ FIXME: cutoff distance != radius, really
-      attenuationConstants.Set (cutoffDistance, 0, 0);
+      attenuationConstants.Set (0, 0, 0, cutoffDistance);
       break;
     case CS_ATTN_INVERSE:
-      attenuationConstants.Set (0, 1, 0);
+      attenuationConstants.Set (0, 1, 0, 0);
       break;
     case CS_ATTN_REALISTIC:
-      attenuationConstants.Set (0, 0, 1);
+      attenuationConstants.Set (0, 0, 1, 0);
       break;
     case CS_ATTN_CLQ:
       /* Nothing to do */
@@ -366,14 +366,15 @@ void csLight::SetAttenuationMode (csLightAttenuationMode a)
   }
 }
 
-void csLight::SetAttenuationConstants (const csVector3& attenv)
+void csLight::SetAttenuationConstants (const csVector4& attenv)
 {
   //@@TODO : Implement!
   /*attenuation = CS_ATTN_CLQ;
   attenuationvec.Set (attenv);
   influenceValid = false;*/
   attenuationConstants = attenv;
-  GetPropertySV (csLightShaderVarCache::lightAttenuation)->SetValue (attenv);
+  GetPropertySV (csLightShaderVarCache::lightAttenuation)->SetValue (
+    attenuationConstants);
 
   size_t i = light_cb_vector.GetSize ();
   while (i-- > 0)

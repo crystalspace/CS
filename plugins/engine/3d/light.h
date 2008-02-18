@@ -129,7 +129,7 @@ protected:
   /// Attenuation type
   csLightAttenuationMode attenuation;
   /// Attenuation constants
-  csVector3 attenuationConstants;
+  csVector4 attenuationConstants;
 
   /// The distance where the light have any effect at all
   float cutoffDistance; 
@@ -328,12 +328,12 @@ public:
   * Set attenuation constants
   * \sa csLightAttenuationMode
   */
-  void SetAttenuationConstants (const csVector3& constants);
+  void SetAttenuationConstants (const csVector4& constants);
   /**
   * Get attenuation constants
   * \sa csLightAttenuationMode
   */
-  const csVector3 &GetAttenuationConstants () const
+  const csVector4 &GetAttenuationConstants () const
   { return attenuationConstants; }
 
   /**

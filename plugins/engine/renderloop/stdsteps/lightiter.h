@@ -161,7 +161,7 @@ public:
   virtual size_t GetStepCount () const;
 
   csPtr<iTextureHandle> GetAttenuationTexture (int attnType);
-  csPtr<iTextureHandle> GetAttenuationTexture (const csVector3& attnVec);
+  csPtr<iTextureHandle> GetAttenuationTexture (const csVector4& attnVec);
 };
 
 
