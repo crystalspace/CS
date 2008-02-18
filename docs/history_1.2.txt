@@ -3,6 +3,9 @@
 18-Feb-2008
 	- Vincent merged r28737 into 1.2 (fix for light attenuation vector
 	  update after cutoff distance change).
+	- Vincent merged r28738 into 1.2 (fix for #185, "Enable atexit tweak
+	  for all platforms") to work around crashes on exit with static
+	  profile builds.
 17-Feb-2008
 	- Vincent merged r28700 into 1.2 (fix for #205, CoreAudio driver fix).
 13-Feb-2008
