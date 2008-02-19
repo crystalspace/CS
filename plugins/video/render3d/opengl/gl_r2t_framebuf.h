@@ -41,12 +41,9 @@ protected:
   //@}
   /// If true then the current render target has been put on screen.
   bool rt_onscreen;
-  /// Old clip rect to restore after rendering on a proc texture.
-  int rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy;
   /// Render target dimensions
   int txt_w, txt_h;
-  /// Framebuffer dimensions
-  int framebufW, framebufH;
+  R2TViewportHelper viewportHelper;
 
   enum InternalFormatClass { ifColor, ifDepth };
   /**
@@ -60,16 +57,21 @@ protected:
   static GLenum GetInternalFormatDepth (GLenum texInternalFormat);
 
   csDirtyAccessArray<uint8> pixelScratch;
-  void Set2DViewport ();
   void GrabFramebuffer (const RTAttachment& target, InternalFormatClass fmtClass);
 public:
   csGLRender2TextureFramebuf (csGLGraphics3D* G3D) 
     : csGLRender2TextureBackend (G3D), targetsSet (false), 
       rt_onscreen (false) { }
+  bool Status() { return true; }
 
   bool SetRenderTarget (iTextureHandle* handle, bool persistent,
     int subtexture, csRenderTargetAttachment attachment);
   void UnsetRenderTargets();
+  bool ValidateRenderTargets ()
+  {
+    // @@@ Should really return 'false' if SetRenderTarget() failed earlier
+    return true;
+  }
   bool CanSetRenderTarget (const char* format, csRenderTargetAttachment attachment);
   iTextureHandle* GetRenderTarget (csRenderTargetAttachment attachment, int* subtexture) const;
 

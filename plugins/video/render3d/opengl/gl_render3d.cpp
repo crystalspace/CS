@@ -1076,9 +1076,11 @@ bool csGLGraphics3D::Open ()
     r2tBackendStr = "EXT_framebuffer_object";
     r2tbackend = new csGLRender2TextureEXTfbo (this);
   }
-  else
+  
+  if ((r2tbackend == 0) || !r2tbackend->Status())
   {
     r2tBackendStr = "framebuffer";
+    delete r2tbackend;
     r2tbackend = new csGLRender2TextureFramebuf (this);
   }
   
@@ -1207,6 +1209,11 @@ bool csGLGraphics3D::SetRenderTarget (iTextureHandle* handle, bool persistent,
   return true;
 }
 
+bool csGLGraphics3D::ValidateRenderTargets ()
+{
+  return r2tbackend->ValidateRenderTargets ();
+}
+
 bool csGLGraphics3D::CanSetRenderTarget (const char* format,
                                          csRenderTargetAttachment attachment)
 {
@@ -1278,7 +1285,6 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
       	| GL_COLOR_BUFFER_BIT;
     else
       clearMask = GL_DEPTH_BUFFER_BIT | stencilFlag;
-    glClearDepth (0.0); // @@@ Never really changes
   }
   else if (drawflags & CSDRAW_CLEARSCREEN)
     clearMask = GL_COLOR_BUFFER_BIT;
@@ -1391,6 +1397,8 @@ void csGLGraphics3D::Print (csRect const* area)
     SwapIfNeeded();
   }
   G2D->Print (area);
+
+  r2tbackend->NextFrame();
 }
 
 void csGLGraphics3D::DrawLine (const csVector3 & v1, const csVector3 & v2,

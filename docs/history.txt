@@ -17,6 +17,14 @@ chronological order.
 	   - The reuse condition now gets a pointer to the data to be reused
 	     when querying whether an element can be reused.
 	   - Added a method to allow delaying the freeing of an element.
+	- res rewrote significant parts of the gl3d fbo render to texture
+	  backend. 
+	- res added iGraphics3D::ValidateRenderTarget(). This is used to check
+	  that the current set of render targets is supported by the hardware.
+	- res dropped the fallback of the FBO render backend to the framebuffer
+	  one - it rather complicated things. Further, the cases were that
+	  fallback would be needed indicate either CS or application bugs which
+	  should rather be fixed instead of causing the fallback to be used.	
 18-Feb-2008
 	- caedes fixed lights not updating attenuation vector after changing
 	  the cutoff distance.
