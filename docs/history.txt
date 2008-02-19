@@ -25,6 +25,16 @@ chronological order.
 	  one - it rather complicated things. Further, the cases were that
 	  fallback would be needed indicate either CS or application bugs which
 	  should rather be fixed instead of causing the fallback to be used.	
+	- Eric Sunshine augmented CS_VISIBILITY_FLAG_INLINES_HIDDEN() check in
+	  mk/autoconf/visibility.m4 with an additional test in order to address
+	  anomaly when cross compiling from Linux to Windows using the
+	  i586-mingw32msvc-g++ compiler. In this case, during actual
+	  compilation of certain templates, the compiler annoyingly complains
+	  that the "visibility attribute is not supported in this
+	  configuration", despite the fact that the -fvisibility-inlines-hidden
+	  option is otherwise silently accepted by the compiler. Thanks to
+	  Andres Freund for supplying a code snippet which triggers the
+	  problem.
 18-Feb-2008
 	- caedes fixed lights not updating attenuation vector after changing
 	  the cutoff distance.
