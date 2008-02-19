@@ -64,15 +64,24 @@ namespace CS
 	{
           /// Time after which the resource can be reused
 	  TimeType timeToDie;
+	  TimeType lifeTime;
 	  
 	  template<typename ResourceCacheType>
 	  StoredAuxiliaryInfo (const ResourceCacheType& cache, 
 	    const AddParameter& param) : 
-	    timeToDie (cache.GetCurrentTime() + param.lifeTime)
+	    lifeTime (param.lifeTime)
 	  {}
 
+          /// Called when the resource turns "active"
 	  template<typename ResourceCacheType>
-	  bool IsReusable (const ResourceCacheType& cache)
+	  void MarkActive (const ResourceCacheType& cache)
+	  {
+	    timeToDie = cache.GetCurrentTime() + lifeTime;
+	  }
+
+	  template<typename ResourceCacheType>
+	  bool IsReusable (const ResourceCacheType& cache,
+	    const typename ResourceCacheType::CachedType& data)
 	  {
 	    return cache.GetCurrentTime() > timeToDie;
 	  }
@@ -98,8 +107,14 @@ namespace CS
 	    const AddParameter& param) : reusable (false)
 	  {}
 
+          /// Called when the resource turns "active"
 	  template<typename ResourceCacheType>
-	  bool IsReusable (const ResourceCacheType& cache)
+	  void MarkActive (const ResourceCacheType& cache)
+	  { }
+
+	  template<typename ResourceCacheType>
+	  bool IsReusable (const ResourceCacheType& cache,
+	    const typename ResourceCacheType::CachedType& data)
 	  {
 	    return reusable;
 	  }
@@ -121,7 +136,8 @@ namespace CS
       typename _ReuseCondition = ResourceCache::ReuseConditionAfterTime<_TimeType> >
     class GenericResourceCache
     {
-    public:      
+    public:
+      typedef T CachedType;
       typedef _TimeType TimeType;
       typedef _ResourceSorting ResourceSorting;
       typedef _ReuseCondition ReuseCondition;      
@@ -138,6 +154,15 @@ namespace CS
 	template<typename A>
 	DataStorage (const T& data, const A& a) : 
           CS::Memory::CustomAllocatedDerived<Super> (a), data (data) {}
+
+	static DataStorage* CastFromData (T* data)
+	{
+	  DataStorage* p = 0;
+	  const size_t dataOffset = size_t (&(p->data));
+
+	  return reinterpret_cast<DataStorage*> (
+	    reinterpret_cast<char*> (data) - dataOffset);
+	}
       };
       enum NodeColor { Black = 0, Red = 1 };
       struct Element : 
@@ -207,7 +232,7 @@ namespace CS
 	  }
 	  else
 	  {
-	    bool gte = (ResourceSorting::IsLargerEqual (el->data, node->data) != 0);
+	    bool gte = (ResourceSorting::IsLargerEqual (node->data, el->data) != 0);
 	    if (gte)
 	      RecursiveInsert (node, node->treeRight, el);
 	    else
@@ -333,9 +358,9 @@ namespace CS
 	  if (ResourceSorting::IsEqual (node->data, key))
 	    return node;
 	  else if (ResourceSorting::IsLargerEqual (node->data, key))
-	    return RecursiveFindSmallestGreaterEqual (node->treeRight, key);
+	    return RecursiveFind (node->treeRight, key);
 	  else 
-	    return RecursiveFindSmallestGreaterEqual (node->treeLeft, key);
+	    return RecursiveFind (node->treeLeft, key);
 	}
 	Element* RecursiveFindSmallestGreaterEqual (Element* node, 
           const typename ResourceSorting::KeyType& key) const
@@ -722,7 +747,7 @@ namespace CS
 	while (active != 0)
 	{
 	  Element* next = active->listNext;
-	  if (active->IsReusable (*this))
+	  if (active->IsReusable (*this, active->data))
 	  {
 	    activeResources.Delete (active);
 	    availableResources.Insert (active);
@@ -746,6 +771,8 @@ namespace CS
 	  availableResources.Delete (el);
 	  activeResources.PushFront (el);
 	  el->lastTimeUsed = currentTime;
+	  static_cast<typename ReuseCondition::StoredAuxiliaryInfo*> (el)->
+	    MarkActive (*this);
 	  return &(el->data);
 	}
 	return 0;
@@ -760,8 +787,25 @@ namespace CS
 	Element* el = new Element (value, 
           typename ReuseCondition::StoredAuxiliaryInfo (*this, reuseParam));
         el->lastTimeUsed = currentTime;
+	static_cast<typename ReuseCondition::StoredAuxiliaryInfo*> (el)->
+	  MarkActive (*this);
 	activeResources.PushFront (el);
         return &(el->data);
+      }
+
+      /**
+       * Change the last used time of a resource to the current time. Can be
+       * used to prevent resources which are tracked as "available" from
+       * being purged.
+       * \warning Never, ever, ever pass a resource which did *not* came from
+       *  the instance of the cache you call this method on. Not heeding this
+       *  warning will result in memory corruption.
+       */
+      void NudgeLastUsedTime (T* data)
+      {
+	Element* el = static_cast<Element*> (
+	  DataStorage<typename ReuseCondition::StoredAuxiliaryInfo>::CastFromData (data));
+	el->lastTimeUsed = currentTime;
       }
 
       /**

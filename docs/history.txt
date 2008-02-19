@@ -9,6 +9,14 @@ chronological order.
 19-Feb-2008
 	- res added CS::Utility::FastRefCount<> for ref counting with less
 	  overhead than csRefCount (but not quite as general).
+	- res made the following changes to the generic resource cache:
+	   - Fixed an inverted comparison in the RB tree.
+	   - Fixed exact search to search exactly on all recursion steps.
+	   - Added a method to update the "reuse auxiliary data" when an
+	     element is marked as active.
+	   - The reuse condition now gets a pointer to the data to be reused
+	     when querying whether an element can be reused.
+	   - Added a method to allow delaying the freeing of an element.
 18-Feb-2008
 	- caedes fixed lights not updating attenuation vector after changing
 	  the cutoff distance.
