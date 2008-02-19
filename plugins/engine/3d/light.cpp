@@ -414,7 +414,6 @@ void csLight::SetCutoffDistance (float radius)
   cutoffDistance = radius;
 
   CalculateAttenuationVector();
-  UpdateViscullMesh ();
 }
 
 iCrossHalo *csLight::CreateCrossHalo (float intensity, float cross)
