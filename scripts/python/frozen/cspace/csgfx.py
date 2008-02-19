@@ -338,5 +338,31 @@ class csImageMemory(csImageMemoryBase):
 csImageMemory_swigregister = _csgfx.csImageMemory_swigregister
 csImageMemory_swigregister(csImageMemory)
 
+class csImageManipulate(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    Rescale = staticmethod(_csgfx.csImageManipulate_Rescale)
+    Mipmap = staticmethod(_csgfx.csImageManipulate_Mipmap)
+    Blur = staticmethod(_csgfx.csImageManipulate_Blur)
+    Crop = staticmethod(_csgfx.csImageManipulate_Crop)
+    Sharpen = staticmethod(_csgfx.csImageManipulate_Sharpen)
+    TransformColor = staticmethod(_csgfx.csImageManipulate_TransformColor)
+    Gray = staticmethod(_csgfx.csImageManipulate_Gray)
+    def __init__(self, *args): 
+        this = _csgfx.new_csImageManipulate(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _csgfx.delete_csImageManipulate
+    __del__ = lambda self : None;
+csImageManipulate_swigregister = _csgfx.csImageManipulate_swigregister
+csImageManipulate_swigregister(csImageManipulate)
+csImageManipulate_Rescale = _csgfx.csImageManipulate_Rescale
+csImageManipulate_Mipmap = _csgfx.csImageManipulate_Mipmap
+csImageManipulate_Blur = _csgfx.csImageManipulate_Blur
+csImageManipulate_Crop = _csgfx.csImageManipulate_Crop
+csImageManipulate_Sharpen = _csgfx.csImageManipulate_Sharpen
+csImageManipulate_TransformColor = _csgfx.csImageManipulate_TransformColor
+csImageManipulate_Gray = _csgfx.csImageManipulate_Gray
+
 
 

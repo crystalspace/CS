@@ -6,6 +6,35 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-Feb-2008
+	- res added CS::Utility::FastRefCount<> for ref counting with less
+	  overhead than csRefCount (but not quite as general).
+	- res made the following changes to the generic resource cache:
+	    - Fixed an inverted comparison in the RB tree.
+	    - Fixed exact search to search exactly on all recursion steps.
+	    - Added a method to update the "reuse auxiliary data" when an
+	      element is marked as active.
+	    - The reuse condition now gets a pointer to the data to be reused
+	      when querying whether an element can be reused.
+	    - Added a method to allow delaying the freeing of an element.
+	- res rewrote significant parts of the gl3d fbo render to texture
+	  backend. 
+	- res added iGraphics3D::ValidateRenderTarget(). This is used to check
+	  that the current set of render targets is supported by the hardware.
+	- res dropped the fallback of the FBO render backend to the framebuffer
+	  one - it rather complicated things. Further, the cases were that
+	  fallback would be needed indicate either CS or application bugs which
+	  should rather be fixed instead of causing the fallback to be used.	
+	- Eric Sunshine augmented CS_VISIBILITY_FLAG_INLINES_HIDDEN() check in
+	  mk/autoconf/visibility.m4 with an additional test in order to address
+	  anomaly when cross compiling from Linux to Windows using the
+	  i586-mingw32msvc-g++ compiler. In this case, during actual
+	  compilation of certain templates, the compiler annoyingly complains
+	  that the "visibility attribute is not supported in this
+	  configuration", despite the fact that the -fvisibility-inlines-hidden
+	  option is otherwise silently accepted by the compiler. Thanks to
+	  Andres Freund for supplying a code snippet which triggers the
+	  problem.
 18-Feb-2008
 	- res changed the light attenuation vector to be 4-component: the
 	  first three components are still the CLQ coefficient; however, the
@@ -26,6 +55,20 @@ chronological order.
 	  and only render lights of the same light type together. The intention
 	  is to simplify shaders by not having to check the light type for
 	  every light.
+	- caedes fixed lights not updating attenuation vector after changing
+	  the cutoff distance.
+	- res committed the patch from trac #185 ("Enable atexit tweak for 
+	  all platforms") to work around crashes on exit with static profile
+	  builds.
+17-Feb-2008
+        - Sueastside added 'light' loading to iLoader::Load().
+	- Sueastside removed an assert in ParsePortal(), it's perfectly
+	  valid to not specify a sector for a portal imo.
+	- Andres wrapped a variable declaration using a type out of a C header
+	  inside extern "C" as it seems that at least mingw doesnt contain a
+	  #ifdef __cplusplus at the proper place.
+	- Andres made startme work even if there are spaces in the path to the
+	  called applications.
 16-Feb-2008
 	- res augmented the shader weaver plugin to "forward" unknown nodes
 	  below <pass> into the generated shader. This makes it possible to
@@ -37,6 +80,7 @@ chronological order.
 	- res added "layer duplication" to the RM light setup in case a layer
 	  is set to render more lights than the shader used can actually handle.
 15-Feb-2008
+        - Darek fixed PowerPC problem with gl_txtmgr.
 	- res replaced the "buffer fill" light manager method with method(s)
 	  that return a pointer to a buffer (which has to be freed later). This
 	  is a compromise between avoiding a callback call for each light
@@ -47,6 +91,7 @@ chronological order.
 	  buffer was provided.
 	- res made the engine also "reserve" name IDs the "general" lighting
 	  shader vars.
+	- Sueastside added 'portals' loading to iLoader::Load().
         - Jorrit added csgfx/imagemanipulate.h to the python bindings.
         - Jorrit added csImageManipulate.TransformColor() and
           Gray() tools.
@@ -57,6 +102,8 @@ chronological order.
           MacBook, and should address bugtracker ticket #205. Note:
           sound.cfg is not loaded by the CoreAudio driver, and should
           maybe also be fixed.
+	- Jorrit changed the new csImageManipulate.Gray() to use
+	  the Luminance() function for better grayscale.
 	- res fixed the xmlshader plugin to not assert on some more complex
 	  conditions.
 	- res fixed csVertexLightCalculator to work again when no diffuse
@@ -147,9 +194,9 @@ chronological order.
 	  methods that use pixel data (such as texture uploading) set these
 	  settings.
 	- caedes added some config options to cspython.
-	  - CsPython.Path.: to add vfs paths to pythonpath.
-	  - CsPython.Module.: to load modules on csPython::Initialize.
-	  this will allow defining python classes as scf classes and much more.
+	    - CsPython.Path.: to add vfs paths to pythonpath.
+	    - CsPython.Module.: to load modules on csPython::Initialize.  this
+	      will allow defining python classes as scf classes and much more.
 	- res made the GL depth clear value be re-set every frame (needed in
 	  embedding scenarios).
 11-Feb-2008
@@ -226,8 +273,8 @@ chronological order.
 	- Ross B updated the HOWTO: Clicking on Objects for misc API changes.
 	- caedes fixed previous relaytool change to remove uneeded echo.
 23-Jan-2008
-	- res fixed a bug in relaytool where building the libraries search array
-	  was broken.
+	- res fixed a bug in relaytool where building the libraries search
+	  array was broken.
 	- caedes fixed vertexlight.cgvp not getting installed.
 22-Jan-2008
 	- Mike Gist committed a patch from Trymm which adds a method to set

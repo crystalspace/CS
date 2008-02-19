@@ -859,8 +859,65 @@ csLoadResult csLoader::Load (iDocumentNode* node, iRegion* region,
     return rc;
   }
 
+  csRef<iDocumentNode> portalsnode = node->GetNode ("portals");
+  if (portalsnode)
+  {
+    const char* portalsname = override_name ? override_name :
+    	portalsnode->GetAttributeValue ("name");
+    if (ldr_context->CheckDupes () && portalsname)
+    {
+      iMeshWrapper* mw = Engine->FindMeshObject (portalsname);
+      if (mw)
+      {
+        csRef<iPortalContainer> pc = 
+          scfQueryInterface<iPortalContainer>(mw->GetMeshObject ());
+        if (pc)
+        {
+          AddToRegion (ldr_context, mw->QueryObject ());
+          rc.result = mw;
+          rc.success = true;
+          return rc;
+        }
+      }
+    }
+    if (ParsePortals (ldr_context, portalsnode, 0, 0, ssource))
+    {
+      iMeshWrapper* mw = ldr_context->GetRegion ()->FindMeshObject(portalsname);
+      if (mw)
+      {
+        mw->QueryObject()->SetName(portalsname);
+        rc.result = mw;
+        rc.success = true;
+        return rc;
+      }
+    }
+
+    rc.result = 0;
+    rc.success = false;
+    return rc;
+  }
+
+  csRef<iDocumentNode> lightnode = node->GetNode ("light");
+  if (lightnode)
+  {
+    const char* lightname = override_name ? override_name :
+    	lightnode->GetAttributeValue ("name");
+    iLight* light = ParseStatlight (ldr_context, lightnode);
+    if (light)
+    {
+      light->QueryObject()->SetName(lightname);
+      rc.result = light;
+      rc.success = true;
+      return rc;
+    }
+
+    rc.result = 0;
+    rc.success = false;
+    return rc;
+  }
+
   ReportError ("crystalspace.maploader.parse",
-    "File doesn't seem to be a world, library, meshfact, or meshobj file!");
+    "File doesn't seem to be a world, library, meshfact, meshobj, portals or light file!");
 
   return rc;
 }
@@ -4966,7 +5023,6 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
   }
   else
   {
-    CS_ASSERT (sourceSector != 0);
     mesh = Engine->CreatePortal (
   	  container_name ? container_name : name,
   	  sourceSector, csVector3 (0), destSector,

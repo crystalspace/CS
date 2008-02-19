@@ -8675,6 +8675,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetPerspectiveAspect = *cspacec::iGraphics3D_SetPerspectiveAspect;
 *GetPerspectiveAspect = *cspacec::iGraphics3D_GetPerspectiveAspect;
 *SetRenderTarget = *cspacec::iGraphics3D_SetRenderTarget;
+*ValidateRenderTargets = *cspacec::iGraphics3D_ValidateRenderTargets;
 *CanSetRenderTarget = *cspacec::iGraphics3D_CanSetRenderTarget;
 *GetRenderTarget = *cspacec::iGraphics3D_GetRenderTarget;
 *UnsetRenderTargets = *cspacec::iGraphics3D_UnsetRenderTargets;
@@ -9384,6 +9385,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *DeactivatePass = *cspacec::iShader_DeactivatePass;
 *GetUsedShaderVars = *cspacec::iShader_GetUsedShaderVars;
 *GetMetadata = *cspacec::iShader_GetMetadata;
+*PushShaderVariables = *cspacec::iShader_PushShaderVariables;
 *scfGetVersion = *cspacec::iShader_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -20292,6 +20294,7 @@ sub CS_OPENPORTAL_MIRROR () { $cspacec::CS_OPENPORTAL_MIRROR }
 sub CS_OPENPORTAL_FLOAT () { $cspacec::CS_OPENPORTAL_FLOAT }
 sub rtaDepth () { $cspacec::rtaDepth }
 sub rtaColor0 () { $cspacec::rtaColor0 }
+sub rtaNumAttachments () { $cspacec::rtaNumAttachments }
 sub csmcNone () { $cspacec::csmcNone }
 sub csmcArrow () { $cspacec::csmcArrow }
 sub csmcLens () { $cspacec::csmcLens }

@@ -728,7 +728,10 @@ enum csRenderTargetAttachment
   /// Depth
   rtaDepth,
   /// Color
-  rtaColor0
+  rtaColor0,
+
+  /// Number of supported attachments
+  rtaNumAttachments
 };
 
 /**
@@ -747,7 +750,7 @@ enum csRenderTargetAttachment
  */
 struct iGraphics3D : public virtual iBase
 {
-  SCF_INTERFACE(iGraphics3D, 2, 2, 0);
+  SCF_INTERFACE(iGraphics3D, 3, 0, 0);
   
   /// Open the 3D graphics display.
   virtual bool Open () = 0;
@@ -829,17 +832,26 @@ struct iGraphics3D : public virtual iBase
    *   for volume textures.
    * \param attachment Specifies to what result of the rasterization the
    *   texture should be attached to.
-   * \returns Whether setting the render target was successful. Reasons for
-   *   failure can include:
-   *   - The hardware or driver does not support the given attachment with
-   *     the given texture or not at all.
-   *   - The dimensions of the various attachments don't match.
+   * \returns Whether setting the render target was successful. However, even
+   *   if 'true' is returned, it may be possible that rendering to the eventual
+   *   set of render targets is \em not possible. Only if ValidateRenderTargets
+   *   returns 'true' the set of targets can really be used as a render target.
    * \sa UnsetRenderTargets
    */
   virtual bool SetRenderTarget (iTextureHandle* handle,
 	bool persistent = false,
 	int subtexture = 0,
 	csRenderTargetAttachment attachment = rtaColor0) = 0;
+
+  /**
+   * Check if the current set of render targets is valid.
+   * \returns Whether the current set of render targets is valid and useable. 
+   *   Reasons for invalidity/unusability can include:
+   *   - The hardware or driver does not support the given attachment with
+   *     the given texture or not at all.
+   *   - The dimensions of the various attachments don't match.
+   */
+  virtual bool ValidateRenderTargets () = 0;
 	
   /**
    * Check if a texture with the given format can be set as a render target for

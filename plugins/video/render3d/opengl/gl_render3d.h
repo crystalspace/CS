@@ -588,7 +588,7 @@ public:
   uint currentAttachments;
   bool SetRenderTarget (iTextureHandle* handle, bool persistent = false,
     int subtexture = 0, csRenderTargetAttachment attachment = rtaColor0);
-
+  bool ValidateRenderTargets ();
   bool CanSetRenderTarget (const char* format,
     csRenderTargetAttachment attachment = rtaColor0);
   iTextureHandle* GetRenderTarget (

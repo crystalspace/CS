@@ -142,6 +142,10 @@ struct csLoadResult
    * - 'library' file: 'result' will be 0.
    * - 'meshfact' file: 'result' will be the mesh factory wrapper.
    * - 'meshobj' file: 'result' will be the mesh wrapper.
+   * - 'portals' file: 'result' will be the portal's mesh wrapper.
+   * - 'light' file: 'result' will be the light. 
+   * Note! In case of a light call DecRef() after you added it to a sector.
+   * Note! Use scfQueryInterface on 'result' to detect what type was loaded.
    */
   iBase* result;
 };
@@ -451,20 +455,20 @@ struct iLoader : public virtual iBase
    * - 'meshfact' file: 'result' will be the mesh factory wrapper.
    * - 'meshobj' file: 'result' will be the mesh wrapper.
    * - 3ds/md2 models: 'result' will be the mesh factory wrapper.
+   * - 'portals' file: 'result' will be the portal's mesh wrapper.
+   * - 'light' file: 'result' will be the light.
    *
-   * Returns false on failure.
+   * Returns csLoadResult.
    * <br>
    * Note! In case a world file is loaded this function will NOT
    * clear the engine!
    * <br>
    * Note! In case a mesh factory or mesh object is loaded this function
-   * will not actually do anything checkDupes is true and the mesh or
+   * will not actually do anything if checkDupes is true and the mesh or
    * factory is already in memory (with that name). This function will
    * still return true in that case and set 'result' to the correct object.
    * <br>
-   * Note! Use scfQueryInterface on 'result' to detect what type was loaded.
    * \param fname is a VFS filename for the XML file.
-   * \param result will be set to the loaded result (see above).
    * \param region is 0 by default which means that all loaded objects are not
    * added to any region. If you give a region here then all loaded objects
    * will be added to that region.
@@ -499,20 +503,20 @@ struct iLoader : public virtual iBase
    * - 'meshfact' file: 'result' will be the mesh factory wrapper.
    * - 'meshobj' file: 'result' will be the mesh wrapper.
    * - 3ds/md2 models: 'result' will be the mesh factory wrapper.
+   * - 'portals' file: 'result' will be the portal's mesh wrapper.
+   * - 'light' file: 'result' will be the light.
    *
-   * Returns false on failure.
+   * Returns csLoadResult.
    * <br>
    * Note! In case a world file is loaded this function will NOT
    * clear the engine!
    * <br>
    * Note! In case a mesh factory or mesh object is loaded this function
-   * will not actually do anything checkDupes is true and the mesh or
+   * will not actually do anything if checkDupes is true and the mesh or
    * factory is already in memory (with that name). This function will
    * still return true in that case and set 'result' to the correct object.
    * <br>
-   * Note! Use scfQueryInterface on 'result' to detect what type was loaded.
    * \param buffer is a buffer for the model contents.
-   * \param result will be set to the loaded result (see above).
    * \param region is 0 by default which means that all loaded objects are not
    * added to any region. If you give a region here then all loaded objects
    * will be added to that region.
@@ -546,20 +550,20 @@ struct iLoader : public virtual iBase
    * - 'library' node: 'result' will be 0.
    * - 'meshfact' node: 'result' will be the mesh factory wrapper.
    * - 'meshobj' node: 'result' will be the mesh wrapper.
+   * - 'portals' file: 'result' will be the portal's mesh wrapper.
+   * - 'light' file: 'result' will be the light.
    *
-   * Returns false on failure.
+   * Returns csLoadResult.
    * <br>
    * Note! In case a world node is loaded this function will NOT
    * clear the engine!
    * <br>
    * Note! In case a mesh factory or mesh object is loaded this function
-   * will not actually do anything checkDupes is true and the mesh or
+   * will not actually do anything if checkDupes is true and the mesh or
    * factory is already in memory (with that name). This function will
    * still return true in that case and set 'result' to the correct object.
    * <br>
-   * Note! Use scfQueryInterface on 'result' to detect what type was loaded.
    * \param node is the node from which to read.
-   * \param result will be set to the loaded result (see above).
    * \param region is 0 by default which means that all loaded objects are not
    * added to any region. If you give a region here then all loaded objects
    * will be added to that region.
@@ -590,7 +594,7 @@ struct iLoader : public virtual iBase
    * \deprecated Deprecated in 1.3. Use the iLoader::Load() that returns
    * a csLoadResult object instead.
    */
-  CS_DEPRECATED_METHOD_MSG("Use iLoader::Load() returning csLoadResult isntead")
+  CS_DEPRECATED_METHOD_MSG("Use iLoader::Load() returning csLoadResult instead")
   virtual bool Load (const char* fname, iBase*& result, iRegion* region = 0,
     bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
@@ -601,7 +605,7 @@ struct iLoader : public virtual iBase
    * \deprecated Deprecated in 1.3. Use the iLoader::Load() that returns
    * a csLoadResult object instead.
    */
-  CS_DEPRECATED_METHOD_MSG("Use iLoader::Load() returning csLoadResult isntead")
+  CS_DEPRECATED_METHOD_MSG("Use iLoader::Load() returning csLoadResult instead")
   virtual bool Load (iDataBuffer* buffer, iBase*& result, iRegion* region = 0,
     bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
@@ -612,7 +616,7 @@ struct iLoader : public virtual iBase
    * \deprecated Deprecated in 1.3. Use the iLoader::Load() that returns
    * a csLoadResult object instead.
    */
-  CS_DEPRECATED_METHOD_MSG("Use iLoader::Load() returning csLoadResult isntead")
+  CS_DEPRECATED_METHOD_MSG("Use iLoader::Load() returning csLoadResult instead")
   virtual bool Load (iDocumentNode* node, iBase*& result, iRegion* region = 0,
     bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,

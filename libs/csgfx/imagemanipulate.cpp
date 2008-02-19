@@ -384,11 +384,8 @@ csRef<iImage> csImageManipulate::TransformColor (iImage* source,
 
 static csRGBpixel GrayColor (const csRGBpixel& s)
 {
-  int sum = int(s.red)+int(s.green)+int(s.blue);
-  csRGBpixel p;
-  p.red = sum / 3;
-  p.green = sum / 3;
-  p.blue = sum / 3;
+  unsigned char lum = s.Luminance ();
+  csRGBpixel p = csRGBpixel (lum, lum, lum);
   p.alpha = s.alpha;
   return p;
 }

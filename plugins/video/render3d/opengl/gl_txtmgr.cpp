@@ -42,6 +42,7 @@ csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
   scfImplementationType (this), textures (16), compactTextures (false)
 {
   csGLTextureManager::object_reg = object_reg;
+
   
   G3D = iG3D;
   max_tex_size = G3D->GetMaxTextureSize ();
@@ -115,6 +116,8 @@ void csGLTextureManager::read_config (iConfigFile *config)
     ("Video.OpenGL.DisableRECTTextureCompression", false);
   enableNonPowerOfTwo2DTextures = config->GetBool
     ("Video.OpenGL.EnableNonPowerOfTwo2DTextures", false);
+  disableGenerateMipmap = config->GetBool
+    ("Video.OpenGL.DisableGenerateMipmap", false);
   
   const char* filterModeStr = config->GetStr (
     "Video.OpenGL.TextureFilter", "trilinear");
@@ -269,7 +272,7 @@ void csGLTextureManager::SetupPixelStore()
   G3D->statecache->SetPixelUnpackAlignment (1);
 #ifndef CS_LITTLE_ENDIAN
   // The texture format stuff generally assumes little endian
-  G3D->statecache->SetPixelSwapBytes (true);
+  G3D->statecache->SetPixelUnpackSwapBytes (true);
 #endif
 }
 

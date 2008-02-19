@@ -121,6 +121,8 @@ protected:
   csRef<iTextureHandle> render_target;
   /// If true then the current render target has been put on screen.
   bool rt_onscreen;
+  /// If true then we have set the old clip rect.
+  bool rt_cliprectset;
   /// Old clip rect to restore after rendering on a proc texture.
   int rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy;
   int oldIlaceMode;
@@ -451,6 +453,7 @@ public:
 
   bool SetRenderTarget (iTextureHandle* handle, bool persistent,
   	int subtexture, csRenderTargetAttachment attachment);
+  bool ValidateRenderTargets() { return true; }
   bool CanSetRenderTarget (const char* format,
     csRenderTargetAttachment attachment = rtaColor0);
   iTextureHandle* GetRenderTarget (csRenderTargetAttachment attachment,

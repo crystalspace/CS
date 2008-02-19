@@ -30,24 +30,6 @@
 CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 {
 
-void csGLRender2TextureFramebuf::Set2DViewport ()
-{
-  iGraphics2D* g2d = G3D->GetDriver2D();
-    
-  framebufW = g2d->GetWidth();
-  framebufH = g2d->GetHeight();
-
-  g2d->PerformExtension ("vp_set", txt_w, txt_h);
-
-  g2d->GetClipRect (rt_old_minx, rt_old_miny, 
-    rt_old_maxx, rt_old_maxy);
-  if ((rt_old_minx != 0) || (rt_old_miny != 0)
-    || (rt_old_maxx != txt_w) || (rt_old_maxy != txt_h))
-  {
-    g2d->SetClipRect (0, 0, txt_w, txt_h);
-  }
-}
-
 bool csGLRender2TextureFramebuf::SetRenderTarget (iTextureHandle* handle, 
 						  bool persistent,
 						  int subtexture,
@@ -74,7 +56,7 @@ bool csGLRender2TextureFramebuf::SetRenderTarget (iTextureHandle* handle,
   if (!targetsSet)
   {
     txt_w = targetW; txt_h = targetH;
-    Set2DViewport ();
+    viewportHelper.Set2DViewport (G3D, txt_w, txt_h);
     targetsSet = true;
   }
   else
@@ -92,9 +74,7 @@ void csGLRender2TextureFramebuf::UnsetRenderTargets()
 {
   if (targetsSet)
   {
-    G3D->GetDriver2D()->PerformExtension ("vp_reset");
-    G3D->GetDriver2D()->SetClipRect (rt_old_minx, rt_old_miny, 
-      rt_old_maxx, rt_old_maxy);
+    viewportHelper.Reset2DViewport (G3D);
     targetsSet = false;
   }
   colorTarget.Clear();
@@ -131,6 +111,8 @@ bool csGLRender2TextureFramebuf::CanSetRenderTarget (const char* format,
         return true;
     }
     break;
+  default:
+    break;
   }
   return false;
 }
@@ -147,6 +129,8 @@ iTextureHandle* csGLRender2TextureFramebuf::GetRenderTarget (csRenderTargetAttac
   case rtaColor0:
     target = &colorTarget;
     break;
+  default:
+    return 0;
   }
   if (target == 0) return 0;
   if (subtexture) *subtexture = target->subtexture;
@@ -403,7 +387,8 @@ void csGLRender2TextureFramebuf::GrabFramebuffer (const RTAttachment& target,
     bool handle_subtexture = (textarget == GL_TEXTURE_CUBE_MAP);
     /* Reportedly, some drivers crash if using CopyTexImage on a texture
       * size larger than the framebuffer. Use CopyTexSubImage then. */
-    bool needSubImage = (txt_w > framebufW) || (txt_h > framebufH);
+    bool needSubImage = (txt_w > viewportHelper.GetOriginalFramebufferWidth()) 
+      || (txt_h > viewportHelper.GetOriginalFramebufferHeight());
     // Texture was not used as a render target before.
     // Make some necessary adjustments.
     if (!tex_mm->IsWasRenderTarget())
@@ -433,10 +418,13 @@ void csGLRender2TextureFramebuf::GrabFramebuffer (const RTAttachment& target,
       if (handle_subtexture)
 	glCopyTexSubImage2D (
 	  GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + target.subtexture,
-	  0, 0, 0, 0, 0, csMin (txt_w, framebufW), csMin (txt_h, framebufH));
+	  0, 0, 0, 0, 0, 
+	  csMin (txt_w, viewportHelper.GetOriginalFramebufferWidth()), 
+	  csMin (txt_h, viewportHelper.GetOriginalFramebufferHeight()));
       else
 	glCopyTexSubImage2D (textarget, 0, 0, 0, 0, 0, 
-	  csMin (txt_w, framebufW), csMin (txt_h, framebufH));
+	  csMin (txt_w, viewportHelper.GetOriginalFramebufferWidth()),
+	  csMin (txt_h, viewportHelper.GetOriginalFramebufferHeight()));
     }
     else
     {

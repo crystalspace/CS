@@ -387,7 +387,6 @@ void csLight::SetAttenuationConstants (const csVector4& attenv)
 void csLight::SetCutoffDistance (float radius)
 {
   if (radius <= 0) return;
-  cutoffDistance = radius;
 
   // Update the AABB
   {
@@ -411,7 +410,11 @@ void csLight::SetCutoffDistance (float radius)
     iLightCallback* cb = light_cb_vector[i];
     cb->OnRadiusChange (this, radius);
   }
-  lightnr++;  
+  lightnr++;
+  cutoffDistance = radius;
+
+  CalculateAttenuationVector();
+  UpdateViscullMesh ();
 }
 
 iCrossHalo *csLight::CreateCrossHalo (float intensity, float cross)
