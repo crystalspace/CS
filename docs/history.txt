@@ -10,13 +10,13 @@ chronological order.
 	- res added CS::Utility::FastRefCount<> for ref counting with less
 	  overhead than csRefCount (but not quite as general).
 	- res made the following changes to the generic resource cache:
-	   - Fixed an inverted comparison in the RB tree.
-	   - Fixed exact search to search exactly on all recursion steps.
-	   - Added a method to update the "reuse auxiliary data" when an
-	     element is marked as active.
-	   - The reuse condition now gets a pointer to the data to be reused
-	     when querying whether an element can be reused.
-	   - Added a method to allow delaying the freeing of an element.
+	    - Fixed an inverted comparison in the RB tree.
+	    - Fixed exact search to search exactly on all recursion steps.
+	    - Added a method to update the "reuse auxiliary data" when an
+	      element is marked as active.
+	    - The reuse condition now gets a pointer to the data to be reused
+	      when querying whether an element can be reused.
+	    - Added a method to allow delaying the freeing of an element.
 	- res rewrote significant parts of the gl3d fbo render to texture
 	  backend. 
 	- res added iGraphics3D::ValidateRenderTarget(). This is used to check
@@ -91,9 +91,9 @@ chronological order.
 	  methods that use pixel data (such as texture uploading) set these
 	  settings.
 	- caedes added some config options to cspython.
-	  - CsPython.Path.: to add vfs paths to pythonpath.
-	  - CsPython.Module.: to load modules on csPython::Initialize.
-	  this will allow defining python classes as scf classes and much more.
+	    - CsPython.Path.: to add vfs paths to pythonpath.
+	    - CsPython.Module.: to load modules on csPython::Initialize.  this
+	      will allow defining python classes as scf classes and much more.
 	- res made the GL depth clear value be re-set every frame (needed in
 	  embedding scenarios).
 11-Feb-2008
@@ -126,8 +126,8 @@ chronological order.
 	- Ross B updated the HOWTO: Clicking on Objects for misc API changes.
 	- caedes fixed previous relaytool change to remove uneeded echo.
 23-Jan-2008
-	- res fixed a bug in relaytool where building the libraries search array
-	  was broken.
+	- res fixed a bug in relaytool where building the libraries search
+	  array was broken.
 	- caedes fixed vertexlight.cgvp not getting installed.
 22-Jan-2008
 	- Mike Gist committed a patch from Trymm which adds a method to set
