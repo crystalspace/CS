@@ -171,7 +171,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 
       fbStatus = ext->glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
     }
-    void ClearAttachments ();
 
     int GetWidth() const { return fbSize.width; }
     int GetHeight() const { return fbSize.height; }
@@ -266,19 +265,52 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 	template<typename ResourceCacheType>
 	StoredAuxiliaryInfo (const ResourceCacheType& cache, 
 	  const AddParameter& param) {}
-	  
-	template<typename ResourceCacheType>
-	void MarkActive (const ResourceCacheType& cache)
-	{ }
-
-	template<typename ResourceCacheType>
-	bool IsReusable (const ResourceCacheType& cache,
-	  const typename ResourceCacheType::CachedType& data)
-	{
-	  //return data->GetRefCount() == 1;
-	  return true;
-	}
       };
+      
+      template<typename ResourceCacheType>
+      void MarkActive (const ResourceCacheType& cache,
+	  StoredAuxiliaryInfo& elementInfo)
+      { }
+
+      template<typename ResourceCacheType>
+      bool IsReusable (const ResourceCacheType& cache,
+	StoredAuxiliaryInfo& elementInfo,
+	const typename ResourceCacheType::CachedType& data)
+      {
+	return true;
+      }
+    };
+  } // namespace CacheReuse
+
+
+  namespace CachePurge
+  {
+    class RenderBuffer
+    {
+    public:
+      struct AddParameter
+      {
+        AddParameter () {}
+      };
+      struct StoredAuxiliaryInfo
+      {
+	template<typename ResourceCacheType>
+	StoredAuxiliaryInfo (const ResourceCacheType& cache, 
+	  const AddParameter& param) {}
+      };
+      
+      template<typename ResourceCacheType>
+      void MarkActive (const ResourceCacheType& cache,
+	  StoredAuxiliaryInfo& elementInfo)
+      { }
+
+      template<typename ResourceCacheType>
+      bool IsPurgeable (const ResourceCacheType& cache,
+	StoredAuxiliaryInfo& elementInfo,
+	const typename ResourceCacheType::CachedType& data)
+      {
+	return data->GetRefCount() == 1;
+      }
     };
   } // namespace CacheReuse
 
@@ -292,7 +324,8 @@ class csGLRender2TextureEXTfbo : public csGLRender2TextureBackend
 
   // @@@ TODO: probably better to manage render buffers separately from complete FBOs
   typedef CS::Utility::GenericResourceCache<csRef<RenderBufferWrapper>,
-    uint, CacheSorting::RenderBuffer, CacheReuse::RenderBuffer> RBCache;
+    uint, CacheSorting::RenderBuffer, CacheReuse::RenderBuffer,
+    CachePurge::RenderBuffer> RBCache;
   RBCache depthRBCache, stencilRBCache;
   CS::Utility::GenericResourceCache<FBOWrapper,
     uint, CacheSorting::FrameBuffer> fboCache;

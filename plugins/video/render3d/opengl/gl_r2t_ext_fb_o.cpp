@@ -153,19 +153,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 
   void FBOWrapper::SetRBAttachment (GLenum attachment, RenderBufferWrapper* rb)
   {
+    if (rb == 0) return;
     CS_ASSERT(boundFBO == framebuffer);
 
-    GLuint rbo = rb ? rb->GetBuffer() : 0;
     ext->glFramebufferRenderbufferEXT (GL_FRAMEBUFFER_EXT,
-      attachment, GL_RENDERBUFFER_EXT, rbo);
-  }
-
-  void FBOWrapper::ClearAttachments ()
-  {
-    SetRBAttachment (GL_DEPTH_ATTACHMENT_EXT, 0);
-    SetRBAttachment (GL_STENCIL_ATTACHMENT_EXT, 0);
-    depthRB = 0;
-    stencilRB = 0;
+      attachment, GL_RENDERBUFFER_EXT, rb->GetBuffer());
   }
 
   void FBOWrapper::Bind ()
@@ -449,6 +441,8 @@ void csGLRender2TextureEXTfbo::GetDepthStencilRBs (const Dimensions& fbSize,
       cachedBuffer = depthRBCache.AddActive (newRB);
     }
     depthRB = *cachedBuffer;
+    // Put buffer back right away so it can be used by the next FBO
+    depthRBCache.SetAvailable (cachedBuffer);
   }
   else
   {
@@ -469,6 +463,8 @@ void csGLRender2TextureEXTfbo::GetDepthStencilRBs (const Dimensions& fbSize,
 	cachedBuffer = stencilRBCache.AddActive (newRB);
       }
       stencilRB = *cachedBuffer;
+      // Put buffer back right away so it can be used by the next FBO
+      stencilRBCache.SetAvailable (cachedBuffer);
     }
   }
   else
@@ -520,8 +516,6 @@ void csGLRender2TextureEXTfbo::SelectCurrentFBO ()
       if (G3D->verbose)
 	G3D->Report (CS_REPORTER_SEVERITY_WARNING, 
 	  "framebuffer object status: %s", FBStatusStr (currentFBO->GetStatus()));
-
-      currentFBO->ClearAttachments();
     }
   }
   else

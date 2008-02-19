@@ -71,22 +71,23 @@ namespace CS
 	    const AddParameter& param) : 
 	    lifeTime (param.lifeTime)
 	  {}
-
-          /// Called when the resource turns "active"
-	  template<typename ResourceCacheType>
-	  void MarkActive (const ResourceCacheType& cache)
-	  {
-	    timeToDie = cache.GetCurrentTime() + lifeTime;
-	  }
-
-	  template<typename ResourceCacheType>
-	  bool IsReusable (const ResourceCacheType& cache,
-	    const typename ResourceCacheType::CachedType& data)
-	  {
-	    return cache.GetCurrentTime() > timeToDie;
-	  }
 	};
 	
+	/// Called when the resource turns "active"
+	template<typename ResourceCacheType>
+	void MarkActive (const ResourceCacheType& cache,
+	  StoredAuxiliaryInfo& elementInfo)
+	{
+	  elementInfo.timeToDie = cache.GetCurrentTime() + elementInfo.lifeTime;
+	}
+
+	template<typename ResourceCacheType>
+	bool IsReusable (const ResourceCacheType& cache,
+	  const StoredAuxiliaryInfo& elementInfo,
+	  const typename ResourceCacheType::CachedType& data)
+	{
+	  return cache.GetCurrentTime() > elementInfo.timeToDie;
+	}
       };
 
       /// Reuse condition: a resource is reused after being flagged as such
@@ -106,21 +107,73 @@ namespace CS
 	  StoredAuxiliaryInfo (const ResourceCacheType& cache, 
 	    const AddParameter& param) : reusable (false)
 	  {}
-
-          /// Called when the resource turns "active"
-	  template<typename ResourceCacheType>
-	  void MarkActive (const ResourceCacheType& cache)
-	  { }
-
-	  template<typename ResourceCacheType>
-	  bool IsReusable (const ResourceCacheType& cache,
-	    const typename ResourceCacheType::CachedType& data)
-	  {
-	    return reusable;
-	  }
 	};
 	
+	
+	/// Called when the resource turns "active"
+	template<typename ResourceCacheType>
+	void MarkActive (const ResourceCacheType& cache,
+	  StoredAuxiliaryInfo& elementInfo)
+	{
+	  // Reset flag
+	  elementInfo.reusable = false;
+	}
+
+	template<typename ResourceCacheType>
+	bool IsReusable (const ResourceCacheType& cache,
+	  const StoredAuxiliaryInfo& elementInfo,
+	  const typename ResourceCacheType::CachedType& data)
+	{
+	  return elementInfo.reusable;
+	}
       };
+      
+      /**
+       * Purge condition: a resource is purged after a certain time has passed
+       */
+      template<typename TimeType = uint>
+      class PurgeConditionAfterTime
+      {
+	/**
+	  * Time interval since last use after which a resource is considered
+	  * "aged" and may be purged
+	  */
+	TimeType purgeAge;
+      public:
+	struct AddParameter
+	{
+	  AddParameter () {}
+	};
+	struct StoredAuxiliaryInfo
+	{
+	  TimeType lastTimeUsed;
+	  
+	  template<typename ResourceCacheType>
+	  StoredAuxiliaryInfo (const ResourceCacheType& cache, 
+	    const AddParameter& param) {}
+	};
+	
+	PurgeConditionAfterTime (TimeType purgeAge = 60)
+	  : purgeAge (purgeAge) {}
+	
+	/// Called when the resource turns "active"
+	template<typename ResourceCacheType>
+	void MarkActive (const ResourceCacheType& cache,
+	  StoredAuxiliaryInfo& elementInfo)
+	{
+	  elementInfo.lastTimeUsed = cache.GetCurrentTime();
+	}
+
+	template<typename ResourceCacheType>
+	bool IsPurgeable (const ResourceCacheType& cache,
+	  const StoredAuxiliaryInfo& elementInfo,
+	  const typename ResourceCacheType::CachedType& data)
+	{
+	  return (cache.GetCurrentTime() > 
+	    elementInfo.lastTimeUsed + purgeAge);
+	}
+      };
+
     } // namespace ResourceCache
     
     /**
@@ -133,18 +186,23 @@ namespace CS
     template<typename T,
       typename _TimeType = uint, 
       typename _ResourceSorting = ResourceCache::SortingNone,
-      typename _ReuseCondition = ResourceCache::ReuseConditionAfterTime<_TimeType> >
+      typename _ReuseCondition = ResourceCache::ReuseConditionAfterTime<_TimeType>,
+      typename _PurgeCondition = ResourceCache::PurgeConditionAfterTime<_TimeType> >
     class GenericResourceCache
     {
     public:
       typedef T CachedType;
       typedef _TimeType TimeType;
       typedef _ResourceSorting ResourceSorting;
-      typedef _ReuseCondition ReuseCondition;      
+      typedef _ReuseCondition ReuseCondition;
+      typedef _PurgeCondition PurgeCondition;
       
     protected:
-      typedef typename ReuseCondition::AddParameter ReuseConditionAddParameter;
       typedef typename ResourceSorting::KeyType ResourceSortingKeyType;
+      typedef typename ReuseCondition::AddParameter ReuseConditionAddParameter;
+      typedef typename ReuseCondition::StoredAuxiliaryInfo ReuseConditionAuxiliary;
+      typedef typename PurgeCondition::AddParameter PurgeConditionAddParameter;
+      typedef typename PurgeCondition::StoredAuxiliaryInfo PurgeConditionAuxiliary;
 
       template<typename Super>
       struct DataStorage : public CS::Memory::CustomAllocatedDerived<Super>
@@ -165,8 +223,7 @@ namespace CS
 	}
       };
       enum NodeColor { Black = 0, Red = 1 };
-      struct Element : 
-	public DataStorage<typename ReuseCondition::StoredAuxiliaryInfo>
+      struct Element : public DataStorage<ReuseConditionAuxiliary>
       {
 	union
 	{
@@ -178,34 +235,51 @@ namespace CS
 	  Element* treeRight;
 	  Element* listNext;
 	};
-	Element* treeParent;
-	TimeType lastTimeUsed;
+	struct TreeParentWrapper : public PurgeConditionAuxiliary
+	{
+	  Element* p;
+	  
+	  TreeParentWrapper (const PurgeConditionAuxiliary& purgeAux)
+	    : PurgeConditionAuxiliary (purgeAux) {}
+	} treeParent;
 	
 	Element (const T& data,
-	  const typename ReuseCondition::StoredAuxiliaryInfo& reuseAux) : 
-	  DataStorage<typename ReuseCondition::StoredAuxiliaryInfo> (data, reuseAux)
+	  const ReuseConditionAuxiliary& reuseAux,
+	  const PurgeConditionAuxiliary& purgeAux)
+	  : DataStorage<ReuseConditionAuxiliary> (data, reuseAux),
+	    treeParent (purgeAux)
 	{
 	  treeLeft = 0;
 	  treeRight = 0;
-	  treeParent = 0;
+	  treeParent.p = 0;
 	}
 	
         inline Element* GetParent() const
-        { return (Element*)((uintptr_t)treeParent & (uintptr_t)~1); }
+        { return (Element*)((uintptr_t)treeParent.p & (uintptr_t)~1); }
         void SetParent(Element* p)
-        { treeParent = (Element*)(((uintptr_t)p & (uintptr_t)~1) | (uint)GetColor()); }
+        { treeParent.p = (Element*)(((uintptr_t)p & (uintptr_t)~1) | (uint)GetColor()); }
 
 	NodeColor GetColor() const
 	{ // Expression split over two statements to pacify some broken gcc's which
 	  // barf saying "can't convert Node* to NodeColor".
-	  uintptr_t const v = ((uintptr_t)treeParent & 1); 
+	  uintptr_t const v = ((uintptr_t)treeParent.p & 1); 
 	  return (NodeColor)v;
 	}
 	void SetColor (NodeColor color)
 	{ 
-	  treeParent = (Element*)(((uintptr_t)treeParent & (uintptr_t)~1) 
+	  treeParent.p = (Element*)(((uintptr_t)treeParent.p & (uintptr_t)~1) 
 	    | (uint)color); 
 	}
+	
+	ReuseConditionAuxiliary& GetReuseAuxiliary()
+	{ return *(static_cast<ReuseConditionAuxiliary*> (this)); }
+	const ReuseConditionAuxiliary& GetReuseAuxiliary() const
+	{ return *(static_cast<const ReuseConditionAuxiliary*> (this)); }
+	
+	PurgeConditionAuxiliary& GetPurgeAuxiliary()
+	{ return *(static_cast<PurgeConditionAuxiliary*> (&treeParent)); }
+	const PurgeConditionAuxiliary& GetPurgeAuxiliary() const
+	{ return *(static_cast<const PurgeConditionAuxiliary*> (&treeParent)); }
       };
       
       /// Tree of 'Element's.
@@ -474,6 +548,7 @@ namespace CS
 	void Destroy ()
 	{
 	  RecursiveFree (root);
+	  root = 0;
 	}
 	
 	void Insert (Element* el)
@@ -660,9 +735,21 @@ namespace CS
       };
       
       // Tree of available resources
-      ElementTree availableResources;
+      struct AvailableResourcesWrapper : public ReuseCondition
+      {
+        ElementTree v;
+        
+        AvailableResourcesWrapper (const ReuseCondition& other)
+          : ReuseCondition (other) { }
+      } availableResources;
       // List of active resources
-      ElementList activeResources;
+      struct ActiveResourcesWrapper : public PurgeCondition
+      {
+        ElementList v;
+        
+        ActiveResourcesWrapper (const PurgeCondition& other)
+          : PurgeCondition (other) { }
+      } activeResources;
       
       TimeType currentTime;
       /**
@@ -671,6 +758,11 @@ namespace CS
       TimeType nextPurgeAged;
       /// Whether a "clear" is pending.
       bool clearReq;
+      
+      ReuseCondition& GetReuseCondition()
+      { return *(static_cast<ReuseCondition*> (&availableResources)); }
+      PurgeCondition& GetPurgeCondition()
+      { return *(static_cast<PurgeCondition*> (&activeResources)); }
       
       void RecursivePurgeAged (Element* el)
       {
@@ -681,24 +773,21 @@ namespace CS
 	RecursivePurgeAged (l);
 	RecursivePurgeAged (r);
 	
-	if (currentTime > el->lastTimeUsed + purgeAge)
+	if (GetPurgeCondition().IsPurgeable (*this, el->GetPurgeAuxiliary(),
+	  el->data))
 	{
-	  availableResources.Delete (el);
+	  availableResources.v.Delete (el);
 	  delete el;
 	}
       }
     public:
       /// Interval for the aged resource scan
       TimeType agedPurgeInterval;
-      /**
-       * Time interval since last use after which a resource is considered
-       * "aged" and may be purged
-       */
-      TimeType purgeAge;
     
-      GenericResourceCache() : currentTime (0), nextPurgeAged (0),
-	clearReq (false), agedPurgeInterval (60),
-	purgeAge (agedPurgeInterval)
+      GenericResourceCache (const ReuseCondition& reuse = ReuseCondition(),
+        const PurgeCondition& purge = PurgeCondition()) : availableResources (reuse),
+        activeResources (purge), currentTime (0), nextPurgeAged (0),
+	clearReq (false), agedPurgeInterval (60)
       {
       }
       
@@ -715,8 +804,8 @@ namespace CS
       {
 	if (instaClear)
 	{
-	  availableResources.Destroy ();
-	  activeResources.Destroy ();
+	  availableResources.v.Destroy ();
+	  activeResources.v.Destroy ();
 	  clearReq = false;
 	}
 	else
@@ -739,18 +828,19 @@ namespace CS
 	
 	if (time >= nextPurgeAged)
 	{
-	  RecursivePurgeAged (availableResources.root);
+	  RecursivePurgeAged (availableResources.v.root);
 	  nextPurgeAged = time + agedPurgeInterval;
 	}
 	
-	Element* active = activeResources.head;
+	Element* active = activeResources.v.head;
 	while (active != 0)
 	{
 	  Element* next = active->listNext;
-	  if (active->IsReusable (*this, active->data))
+	  if (GetReuseCondition().IsReusable (*this,
+	    active->GetReuseAuxiliary(), active->data))
 	  {
-	    activeResources.Delete (active);
-	    availableResources.Insert (active);
+	    activeResources.v.Delete (active);
+	    availableResources.v.Insert (active);
 	  }
 	  active = next;
 	}
@@ -763,16 +853,15 @@ namespace CS
       {
 	Element* el;
 	if (exact)
-	  el = availableResources.Find (key);
+	  el = availableResources.v.Find (key);
 	else
-	  el = availableResources.FindSmallestGreaterEqual (key);
+	  el = availableResources.v.FindSmallestGreaterEqual (key);
 	if (el != 0)
 	{
-	  availableResources.Delete (el);
-	  activeResources.PushFront (el);
-	  el->lastTimeUsed = currentTime;
-	  static_cast<typename ReuseCondition::StoredAuxiliaryInfo*> (el)->
-	    MarkActive (*this);
+	  availableResources.v.Delete (el);
+	  activeResources.v.PushFront (el);
+	  GetPurgeCondition().MarkActive (*this, el->GetPurgeAuxiliary());
+	  GetReuseCondition().MarkActive (*this, el->GetReuseAuxiliary());
 	  return &(el->data);
 	}
 	return 0;
@@ -781,15 +870,16 @@ namespace CS
        * Add a resource as currently active. (But will be reused once 
        * possible.)
        */
-      T* AddActive (const T& value, const ReuseConditionAddParameter& reuseParam = 
-	  ReuseConditionAddParameter ())
+      T* AddActive (const T& value,
+        const ReuseConditionAddParameter& reuseParam = ReuseConditionAddParameter (),
+        const PurgeConditionAddParameter& purgeParam = PurgeConditionAddParameter ())
       {
 	Element* el = new Element (value, 
-          typename ReuseCondition::StoredAuxiliaryInfo (*this, reuseParam));
-        el->lastTimeUsed = currentTime;
-	static_cast<typename ReuseCondition::StoredAuxiliaryInfo*> (el)->
-	  MarkActive (*this);
-	activeResources.PushFront (el);
+          ReuseConditionAuxiliary (*this, reuseParam),
+          PurgeConditionAuxiliary (*this, purgeParam));
+        GetPurgeCondition().MarkActive (*this, el->GetPurgeAuxiliary());
+        GetReuseCondition().MarkActive (*this, el->GetReuseAuxiliary());
+	activeResources.v.PushFront (el);
         return &(el->data);
       }
 
@@ -808,6 +898,38 @@ namespace CS
 	el->lastTimeUsed = currentTime;
       }
 
+
+      /**
+       * Manually mark a resource that is currently "active" as "available".
+       * \warning Never, ever, ever pass a resource which did *not* came from
+       *  the instance of the cache you call this method on. Not heeding this
+       *  warning will result in memory corruption.
+       */
+      void SetAvailable (T* data)
+      {
+	Element* el = static_cast<Element*> (
+	  DataStorage<ReuseConditionAuxiliary>::CastFromData (data));
+	  
+      #ifdef CS_DEBUG
+        // Sanity check
+        bool found = false;
+        Element* currentActive = activeResources.v.head;
+        while (currentActive != 0)
+        {
+          if (currentActive == el)
+          {
+            found = true;
+            break;
+          }
+          currentActive = currentActive->listNext;
+        }
+        CS_ASSERT_MSG("Resource is not in 'active' set", found);
+      #endif
+        
+        activeResources.v.Delete (el);
+        availableResources.v.Insert (el);
+      }
+      
       /**
        * Request the auxiliary information data of the reuse condition
        * mixin for a cache entry.
@@ -816,6 +938,19 @@ namespace CS
         T* entry)
       {
         typedef DataStorage<typename ReuseCondition::StoredAuxiliaryInfo> DS;
+        DS* ds = 0;
+        const size_t dataOffs = (uintptr_t)&(ds->data);
+        return reinterpret_cast<DS*> ((char*)entry - dataOffs);
+      }
+      
+      /**
+       * Request the auxiliary information data of the purge condition
+       * mixin for a cache entry.
+       */
+      typename PurgeCondition::StoredAuxiliaryInfo* GetPurgeAuxiliary (
+        T* entry)
+      {
+        typedef DataStorage<typename PurgeCondition::StoredAuxiliaryInfo> DS;
         DS* ds = 0;
         const size_t dataOffs = (uintptr_t)&(ds->data);
         return reinterpret_cast<DS*> ((char*)entry - dataOffs);

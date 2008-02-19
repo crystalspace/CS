@@ -24,7 +24,20 @@ chronological order.
 	- res dropped the fallback of the FBO render backend to the framebuffer
 	  one - it rather complicated things. Further, the cases were that
 	  fallback would be needed indicate either CS or application bugs which
-	  should rather be fixed instead of causing the fallback to be used.	
+	  should rather be fixed instead of causing the fallback to be used.
+	- res changed the way reuse conditions are implemented in the generic
+	  resource cache: instead of only per-element instances of user
+	  specific data there is now also a per-cache instance which actually
+	  controls whether an element can be reused. This is useful if the
+	  decision is based on some data which is the same for all elements
+	  anyway.
+	- res added "purge conditions" to the generic resource cache,
+	  controlling when an element is purged (ie freed).
+	- res changed the gl3d FBO backend to more aggressively reuse render
+	  buffers for depth and stencil data since different FBOs can share
+	  these.
+	- res rearranged csLight::SetCutoffDistance() to do most changes to
+	  the members before firing the callback.
 	- Eric Sunshine augmented CS_VISIBILITY_FLAG_INLINES_HIDDEN() check in
 	  mk/autoconf/visibility.m4 with an additional test in order to address
 	  anomaly when cross compiling from Linux to Windows using the
