@@ -9942,6 +9942,28 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iGraphics3D_ValidateRenderTargets(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGraphics3D *arg1 = (iGraphics3D *) 0 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGraphics3D_ValidateRenderTargets",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGraphics3D, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGraphics3D_ValidateRenderTargets" "', argument " "1"" of type '" "iGraphics3D *""'"); 
+  }
+  arg1 = reinterpret_cast< iGraphics3D * >(argp1);
+  result = (bool)(arg1)->ValidateRenderTargets();
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iGraphics3D_CanSetRenderTarget__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iGraphics3D *arg1 = (iGraphics3D *) 0 ;
@@ -20272,6 +20294,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iGraphics3D_SetPerspectiveAspect", _wrap_iGraphics3D_SetPerspectiveAspect, METH_VARARGS, NULL},
 	 { (char *)"iGraphics3D_GetPerspectiveAspect", _wrap_iGraphics3D_GetPerspectiveAspect, METH_VARARGS, NULL},
 	 { (char *)"iGraphics3D_SetRenderTarget", _wrap_iGraphics3D_SetRenderTarget, METH_VARARGS, NULL},
+	 { (char *)"iGraphics3D_ValidateRenderTargets", _wrap_iGraphics3D_ValidateRenderTargets, METH_VARARGS, NULL},
 	 { (char *)"iGraphics3D_CanSetRenderTarget", _wrap_iGraphics3D_CanSetRenderTarget, METH_VARARGS, NULL},
 	 { (char *)"iGraphics3D_GetRenderTarget", _wrap_iGraphics3D_GetRenderTarget, METH_VARARGS, NULL},
 	 { (char *)"iGraphics3D_UnsetRenderTargets", _wrap_iGraphics3D_UnsetRenderTargets, METH_VARARGS, NULL},
@@ -22154,6 +22177,7 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "CS_OPENPORTAL_FLOAT",SWIG_From_int(static_cast< int >(CS_OPENPORTAL_FLOAT)));
   SWIG_Python_SetConstant(d, "rtaDepth",SWIG_From_int(static_cast< int >(rtaDepth)));
   SWIG_Python_SetConstant(d, "rtaColor0",SWIG_From_int(static_cast< int >(rtaColor0)));
+  SWIG_Python_SetConstant(d, "rtaNumAttachments",SWIG_From_int(static_cast< int >(rtaNumAttachments)));
   SWIG_Python_SetConstant(d, "csmcNone",SWIG_From_int(static_cast< int >(csmcNone)));
   SWIG_Python_SetConstant(d, "csmcArrow",SWIG_From_int(static_cast< int >(csmcArrow)));
   SWIG_Python_SetConstant(d, "csmcLens",SWIG_From_int(static_cast< int >(csmcLens)));
