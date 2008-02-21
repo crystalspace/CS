@@ -524,7 +524,14 @@ int gfxtest_main (iObjectRegistry* object_reg, int argc, char *argv[])
         break;
       case 'S':
         opt.outputmode = 0;
-	if (optarg) sscanf (optarg, "%s", output_name);
+	if (optarg)
+	  sscanf (optarg, "%s", output_name);
+	else if ((optind < argc) && (*argv[optind] != '-') && (*argv[optind] != '+'))
+	{
+	  // Optional argument after -S
+	  sscanf (argv[optind], "%s", output_name);
+	  optind++;
+	}
 	break;
       case 'M':
 	if (optarg && sscanf (optarg, "%s", output_mime) != 1)
