@@ -1,5 +1,8 @@
 1.2 branch log.
 
+21-Feb-2008
+	- Vincent merged r28746 into 1.2 (detect i586-mingw32msvc-g++
+	  cross-compile problem with -fvisibility-inlines-hidden).
 18-Feb-2008
 	- Vincent merged r28737 into 1.2 (fix for light attenuation vector
 	  update after cutoff distance change).

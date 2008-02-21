@@ -62,6 +62,14 @@ AC_PREREQ([2.56])
 #        reference for -dynamic code (reference to a coalesced section
 #        (__TEXT,__textcoal_nt) from section (__TEXT,__text) relocation
 #        entry (1))
+#
+# An additional issue arises when cross-compiling from Linux to Windows using
+# the i586-mingw32msvc-g++ compiler. In this case, during actual compilation of
+# certain templates, the compiler annoyingly complains that the "visibility
+# attribute is not supported in this configuration", despite the fact that the
+# -fvisibility-inlines-hidden option is otherwise silently accepted by the
+# compiler.  A simple test case involving a templated inline method is employed
+# to detect this anomaly.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_VISIBILITY_FLAG_INLINES_HIDDEN],
 [AC_REQUIRE([_CS_VISIBILITY_PREPARE])
@@ -69,12 +77,32 @@ AC_REQUIRE([CS_CHECK_HOST])
 AC_REQUIRE([CS_CHECK_STL])
 CS_COMPILER_PIC([C++], [cs_cv_prog_cxx_pic])
 
+# Check if compiler recognizes an option to set inline visibility to hidden.
 CS_CHECK_BUILD_FLAGS([for inline visibility flag],
     [cs_cv_prog_cxx_visibility_inlines_hidden],
     [CS_CREATE_TUPLE([-fvisibility-inlines-hidden])], [C++], [], [],
     [$cs_cv_prog_cxx_enable_errors])
 cs_prog_cxx_visibility_inlines_hidden=$cs_cv_prog_cxx_visibility_inlines_hidden
 
+# Check if compiler silently accepts option but later complains that
+# "visibility attribute is not supported in this configuration".
+AS_IF([test -n "$cs_prog_cxx_visibility_inlines_hidden"],
+    [CS_CHECK_BUILD(
+        [if configuration supports $cs_prog_cxx_visibility_inlines_hidden],
+        [cs_cv_prog_cxx_visibility_inlines_hidden_supported],
+        [AC_LANG_PROGRAM(
+            [template <typename T> struct X { inline void f() {} };],
+            [X<int>().f();])],
+        [], [C++],
+        [cs_cv_prog_cxx_visibility_inlines_hidden_supported=yes],
+        [cs_cv_prog_cxx_visibility_inlines_hidden_supported=no],
+        [],
+        [$cs_prog_cxx_visibility_inlines_hidden \
+        $cs_cv_prog_cxx_enable_errors])
+    AS_IF([test $cs_cv_prog_cxx_visibility_inlines_hidden_supported != yes],
+        [cs_prog_cxx_visibility_inlines_hidden=''])])
+
+# Check if hidden visibility handling is buggy.
 AS_IF([test -n "$cs_prog_cxx_visibility_inlines_hidden"],
     [AC_CACHE_CHECK([if $cs_prog_cxx_visibility_inlines_hidden is buggy],
 	[cs_cv_prog_cxx_visibility_inlines_hidden_buggy],
