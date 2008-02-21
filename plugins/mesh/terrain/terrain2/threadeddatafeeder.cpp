@@ -66,7 +66,8 @@ struct ThreadedFeederData : public csRefCount
 class ThreadedFeederJob : public scfImplementation1<ThreadedFeederJob, iJob>
 {
 public:
-  ThreadedFeederJob (ThreadedFeederData* data, iLoader* loader, iObjectRegistry* reg)
+  ThreadedFeederJob (ThreadedFeederData* data, iLoader* loader,
+      iObjectRegistry* reg)
     : scfImplementationType (this), data (data), loader (loader), objReg (reg)
   {
 
@@ -87,8 +88,8 @@ public:
       data->heightScale, data->offset);
 
 
-    csRef<iImage> material = loader->LoadImage (data->materialmapSource.GetDataSafe (),
-      CS_IMGFMT_PALETTED8);
+    csRef<iImage> material = loader->LoadImage (
+	data->materialmapSource.GetDataSafe (), CS_IMGFMT_PALETTED8);
 
     if (!material) return;
 

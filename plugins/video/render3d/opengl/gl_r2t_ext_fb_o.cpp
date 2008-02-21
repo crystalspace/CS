@@ -28,101 +28,162 @@
 CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 {
 
-  void csGLRender2TextureEXTfbo::FBOWrapper::Setup (int w, int h, 
-                                                    GLenum depthStorage, 
-                                                    GLenum stencilStorage)
+  void RenderBufferWrapper::Setup (int w, int h, GLenum storage)
   {
-    FreeBuffers();
-
-    fb_w = w; fb_h = h;
-
-    ext->glGenFramebuffersEXT (1, &framebuffer);
-    ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer);
-
-    if (depthStorage != 0)
-    {
-      ext->glGenRenderbuffersEXT (1, &depthRB);
-      ext->glBindRenderbufferEXT (GL_RENDERBUFFER_EXT, depthRB);
-      ext->glRenderbufferStorageEXT (GL_RENDERBUFFER_EXT, 
-        depthStorage, w, h);
-
-      // initialize depth renderbuffer
-      ext->glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, 
-        GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, depthRB);
-    }
-
-
-    if (stencilStorage != 0)
-    {
-      if (stencilStorage != depthStorage)
-      {
-        ext->glGenRenderbuffersEXT (1, &stencilRB);
-        ext->glBindRenderbufferEXT (GL_RENDERBUFFER_EXT, stencilRB);
-        ext->glRenderbufferStorageEXT (GL_RENDERBUFFER_EXT, 
-          stencilStorage , w, h);
-      }
-      else
-        stencilRB = depthRB;
-
-      // initialize stencil renderbuffer
-      ext->glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, 
-        GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, stencilRB);
-    }
+    ext->glGenRenderbuffersEXT (1, &buffer);
+    ext->glBindRenderbufferEXT (GL_RENDERBUFFER_EXT, buffer);
+    ext->glRenderbufferStorageEXT (GL_RENDERBUFFER_EXT, 
+      storage, w, h);
+    bufSize.width = w;
+    bufSize.height = h;
   }
 
-  void csGLRender2TextureEXTfbo::FBOWrapper::FreeBuffers()
+  void RenderBufferWrapper::Free()
   {
-    GLint currentFB;
-    glGetIntegerv (GL_FRAMEBUFFER_BINDING_EXT, &currentFB);
-    if (currentFB == (GLint)framebuffer)
-      ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
+    ext->glDeleteRenderbuffersEXT (1, &buffer);
+  }
 
-    if (depthRB != 0)
+  //-------------------------------------------------------------------------
+
+  static unsigned int HashCompute (char const* s, size_t n, uint startHash)
+  {
+    unsigned int h = startHash;
+    const char* end = s + n;
+    for(const char* c = s; c != end; ++c)
+      h = ((h << 5) + h) + *c;
+
+    return h;
+  }
+
+  void R2TAttachmentGroup::ComputeHash()
+  {
+    hash = 0;
+    for (int a = 0; a < rtaNumAttachments; a++)
     {
-      if (depthRB != stencilRB)
-        ext->glDeleteRenderbuffersEXT (1, &depthRB);
-      depthRB = 0;
+      hash = HashCompute ((char const*)(attachments + a), 
+	sizeof (csGLRender2TextureBackend::RTAttachment), hash);
     }
-    if (stencilRB != 0)
-    {
-      ext->glDeleteRenderbuffersEXT (1, &stencilRB);
-      stencilRB = 0;
-    }
+  #ifdef CS_DEBUG
+    hashComputed = true;
+  #endif
+  }
+
+  //-------------------------------------------------------------------------
+
+  void FBOWrapper::FreeBuffers()
+  {
+    depthRB = 0;
+    stencilRB = 0;
+
     if (framebuffer != 0)
     {
+  #ifdef CS_DEBUG
+      GLint currentFB;
+      glGetIntegerv (GL_FRAMEBUFFER_BINDING_EXT, &currentFB);
+      CS_ASSERT_MSG("Unbind frame buffer before freeing it",
+	currentFB != (GLint)framebuffer);
+  #endif
+
       ext->glDeleteFramebuffersEXT (1, &framebuffer);
       framebuffer = 0;
     }
   }
-    
-  GLuint csGLRender2TextureEXTfbo::FBOWrapper::AttachDrawBuffer ()
+
+#ifdef CS_DEBUG
+  static GLuint boundFBO;
+#endif
+
+  void FBOWrapper::Complete2 (bool& needsDepth, bool& needsStencil)
   {
-    GLuint buf;
+    CS_ASSERT(boundFBO == framebuffer);
 
-    ext->glGenRenderbuffersEXT (1, &buf);
-    ext->glBindRenderbufferEXT (GL_RENDERBUFFER_EXT, buf);
-    ext->glRenderbufferStorageEXT (GL_RENDERBUFFER_EXT, 
-      GL_RGBA8, fb_w, fb_h);
+    const R2TAttachmentGroup& attachments = this->attachments;
+    // Bind textures
+    static const GLenum fbAttachments[rtaNumAttachments] = 
+    {
+      GL_DEPTH_ATTACHMENT_EXT, GL_COLOR_ATTACHMENT0_EXT
+    };
+    for (int a = 0; a < rtaNumAttachments; a++)
+    {
+      const csGLRender2TextureBackend::RTAttachment& attachment =
+	attachments.GetAttachment (csRenderTargetAttachment(a));
+      if (!attachment.IsValid()) continue;
 
-    ext->glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, 
-      GL_COLOR_ATTACHMENT0_EXT, GL_RENDERBUFFER_EXT, buf);
+      csGLBasicTextureHandle* tex_mm = static_cast<csGLBasicTextureHandle*> (
+	attachment.texture->GetPrivateObject ());
+      const GLenum texTarget = tex_mm->GetGLTextureTarget();
+      const GLuint texHandle = tex_mm->GetHandle();
+      switch (texTarget)
+      {
+	case GL_TEXTURE_1D:
+	  ext->glFramebufferTexture1DEXT (GL_FRAMEBUFFER_EXT,
+	    fbAttachments[a], GL_TEXTURE_1D, texHandle, 0);
+	  break;
+	case GL_TEXTURE_2D:
+	case GL_TEXTURE_RECTANGLE_ARB:
+	  ext->glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, 
+	    fbAttachments[a], texTarget, texHandle, 0);
+	  break;
+	case GL_TEXTURE_CUBE_MAP:
+	  ext->glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, 
+	    fbAttachments[a], 
+	    GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + attachment.subtexture, 
+	    texHandle, 0);
+	  break;
+	case GL_TEXTURE_3D:
+	  ext->glFramebufferTexture3DEXT (GL_FRAMEBUFFER_EXT, 
+	    fbAttachments[a], texTarget, texHandle, 0,
+	    attachment.subtexture);
+	  break;
+      }
+    }
 
-    return buf;
+    bool hasColor = attachments.GetAttachment (rtaColor0).IsValid();
+    bool hasDepth = attachments.GetAttachment (rtaDepth).IsValid();
+    // Check if we need to attach depth+stencil buffers
+    needsDepth = needsStencil = !hasDepth;
+
+    if (!hasColor)
+    {
+      // Disable color drawing
+      glDrawBuffer (GL_NONE);
+      glReadBuffer (GL_NONE);
+    }
   }
 
-  void csGLRender2TextureEXTfbo::FBOWrapper::UnattachDrawBuffer ()
+  void FBOWrapper::SetRBAttachment (GLenum attachment, RenderBufferWrapper* rb)
   {
-    ext->glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, 
-      GL_COLOR_ATTACHMENT0_EXT, GL_RENDERBUFFER_EXT, 0);
+    if (rb == 0) return;
+    CS_ASSERT(boundFBO == framebuffer);
+
+    ext->glFramebufferRenderbufferEXT (GL_FRAMEBUFFER_EXT,
+      attachment, GL_RENDERBUFFER_EXT, rb->GetBuffer());
+  }
+
+  void FBOWrapper::Bind ()
+  {
+    if (framebuffer == 0)
+      ext->glGenFramebuffersEXT (1, &framebuffer);
+    ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer);
+  #ifdef CS_DEBUG
+    boundFBO = framebuffer;
+  #endif
+  }
+
+  void FBOWrapper::Unbind ()
+  {
+    ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
+  #ifdef CS_DEBUG
+    boundFBO = 0;
+  #endif
   }
 
   //-------------------------------------------------------------------------
 
   csGLRender2TextureEXTfbo::csGLRender2TextureEXTfbo (csGLGraphics3D* G3D) :
-    csGLRender2TextureFramebuf (G3D), enableFBO (true),
-    currentFBO (0), allocatedFBOs (FBOListAlloc (8)), frameNum (0), lastFBOPurge (0) 
+    csGLRender2TextureBackend (G3D), enableFBO (true), currentFBO (0), 
+    viewportSet (false), frameNum (0)
   {
-    FBOWrapper testFBO (G3D->ext);
     GLenum fbStatus = GL_FRAMEBUFFER_UNSUPPORTED_EXT;
 
     /* Try to determine a working depth, and if available, stencil buffer 
@@ -137,12 +198,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
       depthStorage = GL_DEPTH_STENCIL_EXT;
       stencilStorage = GL_DEPTH_STENCIL_EXT;
 
-      testFBO.Setup (256, 256, depthStorage, stencilStorage);
-      GLuint drawBuffer = testFBO.AttachDrawBuffer ();
-      fbStatus = G3D->ext->glCheckFramebufferStatusEXT (
-        GL_FRAMEBUFFER_EXT);
-      testFBO.UnattachDrawBuffer ();
-      G3D->ext->glDeleteRenderbuffersEXT (1, &drawBuffer);
+      FBOWrapper testFBO (G3D->ext, 256, 256);
+      testFBO.Bind();
+      testFBO.Complete (*this);
+      fbStatus = testFBO.GetStatus();
+      testFBO.Unbind();
+      depthRBCache.Clear (true); stencilRBCache.Clear (true);
     }
 
     /* Try separate depth and stencil attachments */
@@ -151,12 +212,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
       depthStorage = GL_DEPTH_COMPONENT;
       stencilStorage = GL_STENCIL_INDEX;
 
-      testFBO.Setup (256, 256, depthStorage, stencilStorage);
-      GLuint drawBuffer = testFBO.AttachDrawBuffer ();
-      fbStatus = G3D->ext->glCheckFramebufferStatusEXT (
-        GL_FRAMEBUFFER_EXT);
-      testFBO.UnattachDrawBuffer ();
-      G3D->ext->glDeleteRenderbuffersEXT (1, &drawBuffer);
+      FBOWrapper testFBO (G3D->ext, 256, 256);
+      testFBO.Bind();
+      testFBO.Complete (*this);
+      fbStatus = G3D->ext->glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
+      testFBO.Unbind();
+      depthRBCache.Clear (true); stencilRBCache.Clear (true);
     }
 
     /* At least ATI Catalyst 6.8 (2006-09-08) does not support separate depth
@@ -166,12 +227,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
       depthStorage = GL_DEPTH_COMPONENT;
       stencilStorage = 0;
 
-      testFBO.Setup (256, 256, depthStorage, stencilStorage);
-      GLuint drawBuffer = testFBO.AttachDrawBuffer ();
-      fbStatus = G3D->ext->glCheckFramebufferStatusEXT (
-        GL_FRAMEBUFFER_EXT);
-      testFBO.UnattachDrawBuffer ();
-      G3D->ext->glDeleteRenderbuffersEXT (1, &drawBuffer);
+      FBOWrapper testFBO (G3D->ext, 256, 256);
+      testFBO.Bind();
+      testFBO.Complete (*this);
+      fbStatus = G3D->ext->glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
+      testFBO.Unbind();
+      depthRBCache.Clear (true); stencilRBCache.Clear (true);
     }
 
     /* Still no dice? Poor. */
@@ -199,50 +260,267 @@ csGLRender2TextureEXTfbo::~csGLRender2TextureEXTfbo()
 {
 }
 
-csGLRender2TextureEXTfbo::FBOWrapper& csGLRender2TextureEXTfbo::GetFBO (
-  int w, int h)
+bool csGLRender2TextureEXTfbo::SetRenderTarget (iTextureHandle* handle, 
+                                                bool persistent,
+                                                int subtexture,
+                                                csRenderTargetAttachment attachment)
 {
-  FBOListType::Iterator it (allocatedFBOs);
-  while (it.HasNext())
+  csGLBasicTextureHandle* tex_mm = 
+    static_cast<csGLBasicTextureHandle*> (handle->GetPrivateObject ());
+  if (!tex_mm->IsWasRenderTarget())
   {
-    FBOWrapper& wrap = it.Next ();
-    if ((wrap.GetWidth() == w) && (wrap.GetHeight() == h))
-    {
-      allocatedFBOs.MoveToFront (it);
-      return wrap;
-    }
+    tex_mm->SetupAutoMipping();
+    tex_mm->SetWasRenderTarget (true);
   }
 
-  it = allocatedFBOs.PushFront (FBOWrapper (G3D->ext));
-  FBOWrapper& wrap = it.FetchCurrent ();
-  /* FIXME: Generic format sufficient? Or better pick some sized 
-   *  format based on the current depth buffer depth or so? 
-   *  Might also need a loop or so to test different formats until
-   *  the framebuffer validates. */
-  wrap.Setup (w, h, depthStorage, stencilStorage);
-  return wrap;
+  if (!viewportSet)
+  {
+    int txt_w, txt_h;
+    tex_mm->GetRendererDimensions (txt_w, txt_h);
+    viewportHelper.Set2DViewport (G3D, txt_w, txt_h);
+    viewportSet = true;
+  }
+
+  // @@@ Here, some initial validity checks could be made (e.g. dimension)
+  currentAttachments.GetAttachment (attachment).Set (handle, persistent, 
+    subtexture);
+  return true;
 }
 
-void csGLRender2TextureEXTfbo::PurgeFBOs ()
+void csGLRender2TextureEXTfbo::UnsetRenderTargets ()
 {
-  bool doPurge = false;
-  FBOListType::Iterator it (allocatedFBOs);
-  while (it.HasNext())
+  for (int a = 0; a < rtaNumAttachments; a++)
   {
-    FBOWrapper& wrap = it.Next ();
-    if (frameNum - wrap.lastUsedFrame >= fboMinPurgeAge)
-    {
-      doPurge = true;
-      break;
-    }
+    const csGLRender2TextureBackend::RTAttachment& attachment =
+	currentAttachments.GetAttachment (csRenderTargetAttachment(a));
+    if (!attachment.IsValid()) continue;
+
+    RegenerateTargetMipmaps (attachment);
   }
 
-  if (doPurge)
+  currentAttachments.Clear();
+  currentFBO = 0;
+  if (viewportSet) viewportHelper.Reset2DViewport (G3D);
+  viewportSet = false;
+}
+
+bool csGLRender2TextureEXTfbo::ValidateRenderTargets ()
+{
+  SelectCurrentFBO ();
+  if (!currentFBO) return false;
+
+  return (currentFBO->GetStatus() == GL_FRAMEBUFFER_COMPLETE_EXT);
+}
+
+bool csGLRender2TextureEXTfbo::CanSetRenderTarget (const char* format, 
+                                                   csRenderTargetAttachment attachment)
+{
+  /* @@@ TODO: Implement using actual framebuffer object */
+  CS::StructuredTextureFormat texfmt (CS::TextureFormatStrings::ConvertStructured (format));
+  uint fmtcomp = texfmt.GetComponentMask();
+  
+  switch (attachment)
   {
-    while (it.HasCurrent())
+  case rtaDepth:
     {
-      allocatedFBOs.Delete (it);
+      // Support only depth-stencil formats
+      if ((fmtcomp & ~CS::StructuredTextureFormat::compDepthStencil) != 0)
+        return false;
+      // Require D
+      if ((fmtcomp & CS::StructuredTextureFormat::compD) == 0)
+        return false;
+      // Make sure stencil is available, if requested
+      if (((fmtcomp & CS::StructuredTextureFormat::compS) != 0)
+          && !HasStencil())
+        return false;
+      return true;
     }
+    break;
+  case rtaColor0:
+    {
+      if (((fmtcomp & CS::StructuredTextureFormat::compRGB) != 0)
+          && ((fmtcomp & ~CS::StructuredTextureFormat::compRGBA) == 0))
+        return true;
+    }
+    break;
+  default:
+    break;
+  }
+  return false;
+}
+
+iTextureHandle* csGLRender2TextureEXTfbo::GetRenderTarget (csRenderTargetAttachment attachment,
+                                                           int* subtexture) const
+{
+  const csGLRender2TextureBackend::RTAttachment& rtAttachment =
+    currentAttachments.GetAttachment (attachment);
+  if (subtexture) *subtexture = rtAttachment.subtexture;
+  return rtAttachment.texture;
+}
+
+void csGLRender2TextureEXTfbo::BeginDraw (int drawflags)
+{
+  GLRENDER3D_OUTPUT_STRING_MARKER((" "));
+
+  /* Note: the renderer relies on this function to setup
+   * matrices etc. So be careful when changing stuff. */
+
+  G3D->GetDriver2D()->PerformExtension ("glflushtext");
+  if (drawflags & CSDRAW_3DGRAPHICS)
+  {
+  }
+  else if (drawflags & CSDRAW_2DGRAPHICS)
+  {
+    /*
+      Render target: draw everything flipped.
+    */
+    G3D->statecache->SetMatrixMode (GL_PROJECTION);
+    glLoadIdentity ();
+    G3D->SetGlOrtho (true);
+  }
+  G3D->statecache->SetCullFace (GL_BACK);
+
+  SelectCurrentFBO ();
+}
+
+void csGLRender2TextureEXTfbo::SetupProjection ()
+{
+  GLRENDER3D_OUTPUT_LOCATION_MARKER;
+  G3D->SetGlOrtho (true);
+}
+
+void csGLRender2TextureEXTfbo::FinishDraw ()
+{
+  GLRENDER3D_OUTPUT_LOCATION_MARKER;
+
+  currentFBO->Unbind();
+  G3D->statecache->SetCullFace (GL_FRONT);
+}
+
+void csGLRender2TextureEXTfbo::SetClipRect (const csRect& clipRect)
+{
+  SelectCurrentFBO ();
+
+  GLRENDER3D_OUTPUT_LOCATION_MARKER;
+  glScissor (clipRect.xmin, currentFBO->GetHeight() - clipRect.ymax, 
+    clipRect.Width(), clipRect.Height());
+}
+
+void csGLRender2TextureEXTfbo::SetupClipPortalDrawing ()
+{
+  GLRENDER3D_OUTPUT_LOCATION_MARKER;
+  G3D->statecache->SetMatrixMode (GL_MODELVIEW);
+  glScalef (1, -1, 1);
+}
+
+void csGLRender2TextureEXTfbo::NextFrame()
+{
+  frameNum++;
+
+  fboCache.AdvanceTime (frameNum);
+  depthRBCache.AdvanceTime (frameNum);
+  stencilRBCache.AdvanceTime (frameNum);
+}
+
+void csGLRender2TextureEXTfbo::GetDepthStencilRBs (const Dimensions& fbSize, 
+						   bool needsDepth, 
+						   csRef<RenderBufferWrapper>& depthRB, 
+						   bool needsStencil,
+						   csRef<RenderBufferWrapper>& stencilRB)
+{
+  csRef<RenderBufferWrapper> newRB;
+  csRef<RenderBufferWrapper>* cachedBuffer;
+
+  if (needsDepth)
+  {
+    cachedBuffer = depthRBCache.Query (fbSize, true);
+    if (cachedBuffer == 0)
+    {
+      newRB.AttachNew (new RenderBufferWrapper (G3D->ext));
+      newRB->Setup (fbSize.width, fbSize.height, depthStorage);
+      cachedBuffer = depthRBCache.AddActive (newRB);
+    }
+    depthRB = *cachedBuffer;
+    // Put buffer back right away so it can be used by the next FBO
+    depthRBCache.SetAvailable (cachedBuffer);
+  }
+  else
+  {
+    depthRB = 0;
+  }
+
+  if (needsStencil)
+  {
+    if ((stencilStorage == depthStorage) && depthRB.IsValid())
+      stencilRB = depthRB;
+    else
+    {
+      cachedBuffer = stencilRBCache.Query (fbSize, true);
+      if (cachedBuffer == 0)
+      {
+	newRB.AttachNew (new RenderBufferWrapper (G3D->ext));
+	newRB->Setup (fbSize.width, fbSize.height, stencilStorage);
+	cachedBuffer = stencilRBCache.AddActive (newRB);
+      }
+      stencilRB = *cachedBuffer;
+      // Put buffer back right away so it can be used by the next FBO
+      stencilRBCache.SetAvailable (cachedBuffer);
+    }
+  }
+  else
+  {
+    stencilRB = 0;
+  }
+}
+
+void csGLRender2TextureEXTfbo::RegenerateTargetMipmaps (const RTAttachment& target)
+{
+  if (!target.texture) return;
+
+  csGLBasicTextureHandle* tex_mm = 
+    static_cast<csGLBasicTextureHandle*> (target.texture->GetPrivateObject ());
+  if (!(tex_mm->GetFlags() & CS_TEXTURE_NOMIPMAPS))
+  {
+    tex_mm->RegenerateMipmaps();
+  }
+}
+  
+void csGLRender2TextureEXTfbo::SelectCurrentFBO ()
+{
+  if (currentFBO != 0) return;
+
+  currentAttachments.ComputeHash();
+  currentFBO = fboCache.Query (currentAttachments, true);
+  if (currentFBO == 0)
+  {
+    // @@@ We can prolly get away with FB dimensions entirely
+    Dimensions dim;
+
+    for (int a = 0; a < rtaNumAttachments; a++)
+    {
+      const csGLRender2TextureBackend::RTAttachment& attachment =
+	currentAttachments.GetAttachment (csRenderTargetAttachment(a));
+      if (!attachment.IsValid()) continue;
+
+      attachment.texture->GetRendererDimensions (dim.width, dim.height);
+      break;
+    }
+
+    currentFBO = fboCache.AddActive (FBOWrapper (G3D->ext, dim.width, dim.height));
+    currentFBO->attachments = currentAttachments;
+    currentFBO->attachments.ComputeHash ();
+    currentFBO->Bind ();
+    currentFBO->Complete (*this);
+    if (currentFBO->GetStatus() != GL_FRAMEBUFFER_COMPLETE_EXT)
+    {
+      if (G3D->verbose)
+	G3D->Report (CS_REPORTER_SEVERITY_WARNING, 
+	  "framebuffer object status: %s", FBStatusStr (currentFBO->GetStatus()));
+    }
+  }
+  else
+  {
+    currentFBO->Bind ();
   }
 }
 
@@ -275,158 +553,6 @@ const char* csGLRender2TextureEXTfbo::FBStatusStr (GLenum status)
 	fboMsg.Format ("unknown %lx", (unsigned long)status);
 	return fboMsg;
       }
-  }
-}
-
-void csGLRender2TextureEXTfbo::RegenerateTargetMipmaps (RTAttachment& target)
-{
-  if (!target.texture) return;
-
-  csGLBasicTextureHandle* tex_mm = 
-    static_cast<csGLBasicTextureHandle*> (target.texture->GetPrivateObject ());
-  if (!(tex_mm->GetFlags() & CS_TEXTURE_NOMIPMAPS))
-  {
-    tex_mm->RegenerateMipmaps();
-  }
-}
-
-void csGLRender2TextureEXTfbo::FramebufferTexture (GLenum target, GLenum attachment, 
-						   GLenum textarget, GLuint texHandle,
-						   int subtexture)
-{
-  switch (textarget)
-  {
-    case GL_TEXTURE_1D:
-      G3D->ext->glFramebufferTexture1DEXT (target,
-        attachment, GL_TEXTURE_1D, texHandle, 0);
-      break;
-    case GL_TEXTURE_2D:
-    case GL_TEXTURE_RECTANGLE_ARB:
-      G3D->ext->glFramebufferTexture2DEXT (target, 
-        attachment, textarget, texHandle, 0);
-      break;
-    case GL_TEXTURE_CUBE_MAP:
-      G3D->ext->glFramebufferTexture2DEXT (target, 
-        attachment, 
-        GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + subtexture, 
-        texHandle, 0);
-      break;
-    case GL_TEXTURE_3D:
-      G3D->ext->glFramebufferTexture3DEXT (target, 
-        attachment, textarget, texHandle, 0,
-        subtexture);
-      break;
-  }
-}
-
-bool csGLRender2TextureEXTfbo::SetRenderTarget (iTextureHandle* handle, 
-                                                bool persistent,
-                                                int subtexture,
-                                                csRenderTargetAttachment attachment)
-{
-  if (enableFBO)
-  {
-    if (currentFBO == 0)
-    {
-      handle->GetRendererDimensions (txt_w, txt_h);
-      currentFBO = &GetFBO (txt_w, txt_h);
-      Set2DViewport ();
-      currentFBO->lastUsedFrame = frameNum;
-      //glReadBuffer (GL_NONE);
-      G3D->ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, currentFBO->framebuffer);
-    }
-    
-    GLenum fbattachment;
-    GLenum internalFormat;
-    RTAttachment* fbAttach;
-    switch (attachment)
-    {
-    case rtaColor0:
-      fbattachment = GL_COLOR_ATTACHMENT0_EXT;
-      internalFormat = GL_RGBA;
-      fbAttach = &colorTarget;
-      break;
-    case rtaDepth:
-      fbattachment = GL_DEPTH_ATTACHMENT_EXT;
-      internalFormat = GL_DEPTH_COMPONENT;
-      fbAttach = &depthTarget;
-      break;
-    default:
-      return false;
-    }
-    
-    csGLBasicTextureHandle* tex_mm = 
-      static_cast<csGLBasicTextureHandle*> (handle->GetPrivateObject ());
-    if (!tex_mm->IsWasRenderTarget())
-    {
-      tex_mm->SetupAutoMipping();
-      tex_mm->SetWasRenderTarget (true);
-      G3D->statecache->SetTexture (GL_TEXTURE_2D, tex_mm->GetHandle());
-      // FIXME: Take persistence into account?
-      glTexImage2D (GL_TEXTURE_2D, 0, internalFormat, txt_w, txt_h, 
-	0, internalFormat, GL_UNSIGNED_BYTE, 0);
-      G3D->statecache->SetTexture (GL_TEXTURE_2D, 0);
-    }
-
-    // @@@ TODO: investigate if it's worth to cache attachments
-    FramebufferTexture (GL_FRAMEBUFFER_EXT, fbattachment, 
-      tex_mm->GetGLTextureTarget(),  tex_mm->GetHandle(), subtexture);
-    
-    GLenum fbStatus = G3D->ext->glCheckFramebufferStatusEXT (
-      GL_FRAMEBUFFER_EXT);
-    if (fbStatus != GL_FRAMEBUFFER_COMPLETE_EXT)
-    {
-      //G3D->ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
-      //glReadBuffer (GL_BACK);
-      if (G3D->verbose)
-	G3D->Report (CS_REPORTER_SEVERITY_WARNING, 
-	  "framebuffer status: %s - falling back to backbuffer", 
-	  FBStatusStr (fbStatus));
-	  
-      FramebufferTexture (GL_FRAMEBUFFER_EXT, fbattachment, 
-	tex_mm->GetGLTextureTarget(),  0, 0);
-      return false;
-    }
-    
-    fbAttach->texture = handle;
-    fbAttach->subtexture = subtexture;
-    return true;
-  }
-  else
-    return csGLRender2TextureFramebuf::SetRenderTarget (handle, persistent,
-      subtexture, attachment);
-}
-
-void csGLRender2TextureEXTfbo::UnsetRenderTargets ()
-{
-  if (enableFBO)
-  {
-    G3D->ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
-    //glReadBuffer (GL_BACK);
-    currentFBO = 0;
-    colorTarget.Clear();
-    depthTarget.Clear();
-  }
-  else
-    csGLRender2TextureFramebuf::UnsetRenderTargets ();
-}
-
-void csGLRender2TextureEXTfbo::FinishDraw ()
-{
-  if (enableFBO)
-    rt_onscreen = false;
-
-  csGLRender2TextureFramebuf::FinishDraw();
-  //G3D->ext->glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-
-  RegenerateTargetMipmaps (colorTarget);
-  RegenerateTargetMipmaps (depthTarget);
-
-  frameNum++;
-  if (frameNum >= lastFBOPurge+fboPurgeAfter)
-  {
-    PurgeFBOs ();
-    lastFBOPurge = frameNum;
   }
 }
 

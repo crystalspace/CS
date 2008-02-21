@@ -21,7 +21,7 @@
 
 #include "csplugincommon/canvas/graph2d.h"
 #include "iutil/event.h"
-#include "plugins/video/canvas/xwindowcommon/xwindow.h"
+#include "ivaria/xwindow.h"
 #include "plugins/video/canvas/xwindowcommon/xextshm.h"
 
 #ifndef XK_MISCELLANY

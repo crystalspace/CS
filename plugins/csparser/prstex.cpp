@@ -26,7 +26,6 @@
 #include "csutil/array.h"
 #include "csutil/cscolor.h"
 #include "csutil/scanstr.h"
-#include "iengine/collection.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
 #include "iengine/region.h"
@@ -145,21 +144,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       iTextureWrapper* t = Engine->FindTexture (txtname);
       if (t)
       {
-        if(ldr_context->GetKeepFlags() == KEEP_ALL)
-        {
-          if(ldr_context->GetCollection())
-          {
-            ldr_context->GetCollection()->Add(t->QueryObject());
-          }
-          else
-          {
-            Engine->GetDefaultCollection()->Add(t->QueryObject());
-          }
-        }
-        if(ldr_context->GetRegion())
-        {
-          AddToRegion (ldr_context, t->QueryObject ());
-        }
+        AddToRegion (ldr_context, t->QueryObject ());
         return t;
       }
     }
@@ -380,25 +365,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         proxTex.keyColour.colours = transp;
       }
 
-      if(ldr_context->GetKeepFlags() == KEEP_ALL)
-      {
-        if(ldr_context->GetCollection())
-        {
-          ldr_context->GetCollection()->Add(tex->QueryObject());
-        }
-        else
-        {
-          Engine->GetDefaultCollection()->Add(tex->QueryObject());
-        }
-      }
-      if(ldr_context->GetRegion())
-      {
-        AddToRegion (ldr_context, tex->QueryObject());
-      }
-      Engine->GetCollection(LOADING_COLLECTION)->Add(tex->QueryObject());
-
       proxTex.textureWrapper = tex;
-
+      AddToRegion (ldr_context, proxTex.textureWrapper->QueryObject());
       proxyTextures.Push(proxTex);
 
       return tex;
@@ -559,23 +527,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       csRef<iProcTexture> ipt = scfQueryInterface<iProcTexture> (tex);
       if (ipt)
         ipt->SetAlwaysAnimate (always_animate);
-
-      if(ldr_context->GetKeepFlags() == KEEP_ALL)
-      {
-        if(ldr_context->GetCollection())
-        {
-          ldr_context->GetCollection()->Add(tex->QueryObject());
-        }
-        else
-        {
-          Engine->GetDefaultCollection()->Add(tex->QueryObject());
-        }
-      }
-      if(ldr_context->GetRegion())
-      {
-        AddToRegion (ldr_context, tex->QueryObject ());
-      }
-      Engine->GetCollection(LOADING_COLLECTION)->Add(tex->QueryObject());
+      AddToRegion (ldr_context, tex->QueryObject ());
 
       size_t i;
       for (i = 0 ; i < key_nodes.GetSize () ; i++)
@@ -601,23 +553,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     if (ldr_context->CheckDupes ())
     {
       iMaterialWrapper* m = Engine->FindMaterial (matname);
-      if(m)
+      if (m)
       {
-        if(ldr_context->GetKeepFlags() == KEEP_ALL)
-        {
-          if(ldr_context->GetCollection())
-          {
-            ldr_context->GetCollection()->Add(m->QueryObject());
-          }
-          else
-          {
-            Engine->GetDefaultCollection()->Add(m->QueryObject());
-          }
-        }
-        if(ldr_context->GetRegion())
-        {
-          AddToRegion (ldr_context, m->QueryObject ());
-        }
+        AddToRegion (ldr_context, m->QueryObject ());
         return m;
       }
     }
@@ -762,23 +700,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       if (!ParseKey (key_nodes[i], mat->QueryObject()))
         return 0;
     }
-
-    if(ldr_context->GetKeepFlags() == KEEP_ALL)
-    {
-      if(ldr_context->GetCollection())
-      {
-        ldr_context->GetCollection()->Add(mat->QueryObject());
-      }
-      else
-      {
-        Engine->GetDefaultCollection()->Add(mat->QueryObject());
-      }
-    }
-    if(ldr_context->GetRegion())
-    {
-      AddToRegion (ldr_context, mat->QueryObject ());
-    }
-    Engine->GetCollection(LOADING_COLLECTION)->Add(mat->QueryObject());
+    AddToRegion (ldr_context, mat->QueryObject ());
 
     materialArray.Push(mat);
 
@@ -814,24 +736,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     if (tex)
     {
       tex->QueryObject ()->SetName (txtname);
-
-      if(ldr_context->GetKeepFlags() == KEEP_ALL)
-      {
-        if(ldr_context->GetCollection())
-        {
-          ldr_context->GetCollection()->Add(tex->QueryObject());
-        }
-        else
-        {
-          Engine->GetDefaultCollection()->Add(tex->QueryObject());
-        }
-      }
-      if(ldr_context->GetRegion())
-      {
-        AddToRegion (ldr_context, tex->QueryObject ());
-      }
-      Engine->GetCollection(LOADING_COLLECTION)->Add(tex->QueryObject());
-      
+      AddToRegion (ldr_context, tex->QueryObject ());
       iTextureManager* tm = G3D ? G3D->GetTextureManager() : 0;
       if (tm) tex->Register (tm);
     }
@@ -867,24 +772,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     if (tex)
     {
       tex->QueryObject ()->SetName (txtname);
-      
-      if(ldr_context->GetKeepFlags() == KEEP_ALL)
-      {
-        if(ldr_context->GetCollection())
-        {
-          ldr_context->GetCollection()->Add(tex->QueryObject());
-        }
-        else
-        {
-          Engine->GetDefaultCollection()->Add(tex->QueryObject());
-        }
-      }
-      if(ldr_context->GetRegion())
-      {
-        AddToRegion (ldr_context, tex->QueryObject ());
-      }
-      Engine->GetCollection(LOADING_COLLECTION)->Add(tex->QueryObject());
-
+      AddToRegion (ldr_context, tex->QueryObject ());
       iTextureManager* tm = G3D ? G3D->GetTextureManager() : 0;
       if (tm) tex->Register (tm);
     }

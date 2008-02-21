@@ -25,6 +25,7 @@
 #include <stdio.h>
 
 #include "cssysdef.h"
+#include "csutil/cfgmgr.h"
 #include "csutil/sysfunc.h"
 #include "csutil/syspath.h"
 #include "csutil/csstring.h"
@@ -149,6 +150,69 @@ bool csPython::Initialize(iObjectRegistry* object_reg)
   csRef<iEventQueue> queue = csQueryRegistry<iEventQueue> (object_reg);
   if (queue.IsValid())
     queue->RegisterListener(this, csevCommandLineHelp(object_reg));
+  // load further python modules from config file keys.
+  LoadConfig();
+  return true;
+}
+
+void csPython::LoadConfig()
+{
+  csRef<iConfigManager> config;
+  config = csQueryRegistry<iConfigManager> (object_reg);
+
+  // Parse Module Paths in config
+  csRef<iConfigIterator>  it = config->Enumerate("CsPython.Path");
+  while (it->Next())
+  {
+    if (!AddVfsPythonPath(it->GetStr()))
+    {
+      Print(true,it->GetStr()+csString(" could not be added to pythonpath."));
+    }
+  }
+
+  // Parse Modules in config
+  it = config->Enumerate("CsPython.Module");
+  while (it->Next())
+  {
+    if (!LoadModule(it->GetStr()))
+    {
+      Print(true,it->GetStr()+csString(" could not be imported."));
+    }
+  }
+}
+
+bool csPython::AddRealPythonPath(csString &path,const char *subpath)
+{
+  csString cmd;
+  if (subpath)
+    cmd << "sys.path.append('" << path_append(path, subpath) << "')\n";
+  else
+    cmd << "sys.path.append('" << path << "')\n";
+  if (cmd.IsEmpty() || !RunText (cmd)) return false;
+  return true;
+}
+
+bool csPython::AddVfsPythonPath(const char *vfspath,const char *subpath)
+{
+  csString cmd;
+  csRef<iVFS> vfs(csQueryRegistry<iVFS> (object_reg));
+  if (vfs.IsValid())
+  {
+    if (!vfs->Exists(vfspath))
+      return false;
+    csRef<iStringArray> paths(vfs->GetRealMountPaths(vfspath));
+    if (!paths->GetSize())
+    {
+      csRef<iDataBuffer> databuf = vfs->GetRealPath(vfspath);
+      csString path = databuf->GetData();
+      return AddRealPythonPath(path, subpath);
+    }
+    for (size_t i = 0, n = paths->GetSize(); i < n; i++)
+    {
+      csString path = paths->Get(i);
+      return AddRealPythonPath(path, subpath);
+    }
+  }
   return true;
 }
 
@@ -157,22 +221,15 @@ bool csPython::AugmentPythonPath()
   if (!LoadModule ("sys")) return false;
 
   // Add /scripts vfs path to pythonpath
-  csString cmd;
-  csRef<iVFS> vfs(csQueryRegistry<iVFS> (object_reg));
-  if (vfs.IsValid())
-  {
-    csRef<iStringArray> paths(vfs->GetRealMountPaths("/scripts"));
-    for (size_t i = 0, n = paths->GetSize(); i < n; i++)
-    {
-      csString path = paths->Get(i);
-      cmd << "sys.path.append('" << path_append(path, "python") << "')\n";
-    }
-  }
+  AddVfsPythonPath("/scripts","python");
 
   // Add cs python scripts folder to pythonpath
   csString cfg(csGetConfigPath());
-  cmd << "sys.path.append('" << path_append(cfg, "scripts/python") << "')\n";
-  if (!RunText (cmd)) return false;
+  if (!AddRealPythonPath(cfg,"scripts/python"))
+  {
+    Print(true,"cs scripts folder could not be added to pythonpath.");
+    return false;
+  }
   return true;
 }
 

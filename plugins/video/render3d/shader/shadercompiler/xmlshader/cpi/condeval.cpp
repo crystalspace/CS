@@ -240,7 +240,7 @@ csConditionID csConditionEvaluator::FindOptimizedCondition (
     || (newOp.right.operation == csCondAlwaysTrue)))
   {
     newOp.right.type = operandBoolean;
-    newOp.right.boolVal = newOp.left.operation == csCondAlwaysTrue;
+    newOp.right.boolVal = newOp.right.operation == csCondAlwaysTrue;
   }
   if ((newOp.left.type >= operandFloat) 
     && (newOp.left.type < operandSV)
@@ -1549,6 +1549,19 @@ EvaluatorShadervarValuesSimple::BoolType EvaluatorShadervarValuesSimple::Boolean
 {
   switch (operand.type)
   {
+    case operandOperation:
+      {
+        ValueSet& vs = CreateValue();
+        Logic3 result (evaluator.Evaluate (*this, operand.operation));
+        switch (result.state)
+        {
+        case Logic3::Truth: vs = 1.0f; break;
+        case Logic3::Lie:   vs = 0.0f; break;
+        default:
+          vs = boolMask;
+        }
+        return ValueSetWrapper (vs);
+      }
     case operandBoolean:
       {
         ValueSet& vs = CreateValue();
@@ -1893,6 +1906,30 @@ EvaluatorShadervarValues::BoolType EvaluatorShadervarValues::Boolean (
 {
   switch (operand.type)
   {
+    case operandOperation:
+    {
+      /* Don't use the local trueVars/falseVars since the condition
+      checking may change them to something which is not correct for
+      the whole condition. */
+      Variables trueVars;
+      Variables falseVars;
+      Logic3 result (evaluator.CheckConditionResults (operand.operation,
+        vars, trueVars, falseVars));
+
+      ValueSet& vs = CreateValue();
+      ValueSet& vsTrue = CreateValue();
+      ValueSet& vsFalse = CreateValue();
+      switch (result.state)
+      {
+      case Logic3::Truth: vs = 1.0f; break;
+      case Logic3::Lie:   vs = 0.0f; break;
+      default:
+        vs = boolMask;
+        vsTrue = 1.0f;
+        vsFalse = 0.0f;
+      }
+      return JanusValueSet (vs, vsTrue, vsFalse);
+    }
     case operandBoolean:
       {
         ValueSet& vs = CreateValue();

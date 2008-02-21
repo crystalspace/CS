@@ -453,6 +453,7 @@ public:
 
   bool SetRenderTarget (iTextureHandle* handle, bool persistent,
   	int subtexture, csRenderTargetAttachment attachment);
+  bool ValidateRenderTargets() { return true; }
   bool CanSetRenderTarget (const char* format,
     csRenderTargetAttachment attachment = rtaColor0);
   iTextureHandle* GetRenderTarget (csRenderTargetAttachment attachment,

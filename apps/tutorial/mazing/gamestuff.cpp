@@ -102,7 +102,7 @@ bool Maze::CreateWallOrPortal (iGeneralFactoryState* factory_state,
 }
 
 bool Maze::CreateRoom (iMaterialWrapper* wall_material,
-	int x, int y, int z, char* portals)
+	int x, int y, int z, const char* portals)
 {
   iSector* room = GetSector (x, y, z);
 

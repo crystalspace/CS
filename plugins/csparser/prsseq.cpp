@@ -24,7 +24,6 @@
 #include "csutil/cscolor.h"
 #include "csutil/scanstr.h"
 #include "csutil/scf.h"
-#include "iengine/collection.h"
 #include "iengine/engine.h"
 #include "iengine/light.h"
 #include "iengine/material.h"
@@ -152,28 +151,14 @@ csPtr<iParameterESM> csLoader::ResolveOperationParameter (
 	value = ldr_context->FindSector (parname);
         break;
       case PARTYPE_TRIGGER:
-        value = FindTrigger (GetEngineSequenceManager (), parname);
-        if (!value)
-        {
-          iSequenceTrigger* trig = CreateTrigger (
-            GetEngineSequenceManager (), parname);
-          if(ldr_context->GetRegion())
-          {
-            AddToRegion (ldr_context, trig->QueryObject ());
-          }
-          else if(ldr_context->GetKeepFlags() == KEEP_ALL)
-          {
-            if(ldr_context->GetCollection())
-            {
-              ldr_context->GetCollection()->Add(trig->QueryObject());
-            }
-            else
-            {
-              Engine->GetDefaultCollection()->Add(trig->QueryObject());
-            }
-          }
-          value = trig;
-        }
+	value = FindTrigger (GetEngineSequenceManager (), parname);
+	if (!value)
+	{
+	  iSequenceTrigger* trig = CreateTrigger (
+	  	GetEngineSequenceManager (), parname);
+	  AddToRegion (ldr_context, trig->QueryObject ());
+	  value = trig;
+	}
         break;
       case PARTYPE_SEQUENCE:
 	value = FindSequence (GetEngineSequenceManager (), parname);
@@ -481,21 +466,7 @@ iSequenceTrigger* csLoader::LoadTrigger (iLoaderContext* ldr_context,
   if (!trigger)
   {
     trigger = CreateTrigger (GetEngineSequenceManager (), trigname);
-    if(ldr_context->GetRegion())
-    {
-      AddToRegion (ldr_context, trigger->QueryObject ());
-    }
-    else if(ldr_context->GetKeepFlags() == KEEP_ALL)
-    {
-      if(ldr_context->GetCollection())
-      {
-        ldr_context->GetCollection()->Add(trigger->QueryObject());
-      }
-      else
-      {
-        Engine->GetDefaultCollection()->Add(trigger->QueryObject());
-      }
-    }
+    AddToRegion (ldr_context, trigger->QueryObject ());
   }
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -1338,30 +1309,16 @@ bool csLoader::LoadSequences (iLoaderContext* ldr_context, iDocumentNode* node)
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
-    case XMLTOKEN_SEQUENCE:
-      {
-        iSequenceWrapper* sequence = CreateSequence (child);
-        if (!sequence) return false;
-        if(ldr_context->GetRegion())
+      case XMLTOKEN_SEQUENCE:
         {
-          AddToRegion (ldr_context, sequence->QueryObject ());
-        }
-        else if(ldr_context->GetKeepFlags() == KEEP_ALL)
-        {
-          if(ldr_context->GetCollection())
-          {
-            ldr_context->GetCollection()->Add(sequence->QueryObject());
-          }
-          else
-          {
-            Engine->GetDefaultCollection()->Add(sequence->QueryObject());
-          }
-        }
-      }
-      break;
-    default:
-      SyntaxService->ReportBadToken (child);
-      return false;
+          iSequenceWrapper* sequence = CreateSequence (child);
+          if (!sequence) return false;
+	  AddToRegion (ldr_context, sequence->QueryObject ());
+	}
+        break;
+      default:
+        SyntaxService->ReportBadToken (child);
+	return false;
     }
   }
 

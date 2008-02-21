@@ -80,8 +80,6 @@
 
 CS_IMPLEMENT_PLUGIN
 
-#define DEFAULT_COLLECTION "defaultCollection"
-
 bool csEngine::doVerbose = false;
 
 //---------------------------------------------------------------------------
@@ -655,9 +653,6 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
   csLightManager* light_mgr = new csLightManager ();
   objectRegistry->Register (light_mgr, "iLightManager");
   light_mgr->DecRef ();
-
-  // Create the default collection.
-  CreateCollection(DEFAULT_COLLECTION);
 
   return true;
 }
@@ -1461,48 +1456,6 @@ void csEngine::PrecacheDraw (iRegion* region)
   }
 }
 
-void csEngine::PrecacheDraw (iCollection* collection)
-{
-  currentFrameNumber++;
-
-  csRef<iCamera> c = CreateCamera ();
-  csRef<iClipper2D> view;
-  view.AttachNew (new csBoxClipper (0.0, 0.0, float (G3D->GetWidth ()),
-  	float (G3D->GetHeight ())));
-
-  csRenderView rview (c, view, G3D, G2D);
-  StartDraw (c, view, rview);
-
-  int sn;
-  for (sn = 0; sn < meshes.GetCount (); sn++)
-  {
-    iMeshWrapper *s = meshes.Get (sn);
-    if(!collection || collection->QueryObject()->GetChild(s->QueryObject()->GetName()))
-      PrecacheMesh (s, &rview);
-  }
-
-  for (sn = 0 ; sn < sectors.GetCount () ; sn++)
-  {
-    iSector* s = sectors.Get (sn);
-    if(!collection || collection->QueryObject()->GetChild(s->QueryObject()->GetName()))
-      s->PrecacheDraw ();
-  }
-
-  size_t i;
-  for (i = 0 ; i < textures->GetSize () ; i++)
-  {
-    iTextureWrapper* txt = textures->Get ((int)i);
-    if (txt->GetTextureHandle ())
-    {
-      csRef<iTextureWrapper> txtRef(CS::GetChildObject<iTextureWrapper>(txt->QueryObject()));
-      if (!collection || txtRef)
-      {
-	      txt->GetTextureHandle ()->Precache ();
-      }
-    }
-  }
-}
-
 void csEngine::StartDraw (iCamera *c, iClipper2D* /*view*/, csRenderView &rview)
 {
   rview.SetEngine (this);
@@ -1789,27 +1742,6 @@ void csEngine::ControlMeshes ()
   }
 }
 
-char* csEngine::SplitCollectionName (const char* name, iCollection*& collection,
-	bool& global)
-{
-  collection = 0;
-  global = false;
-
-  char* p = (char*)strchr (name, '/');
-  if (!p) return (char*)name;
-  if (*name == '*' && *(name+1) == '/')
-  {
-    global = true;
-    return p+1;
-  }
-
-  *p = 0;
-  collection = GetCollection(name);
-  *p = '/';
-  if (!collection) return 0;
-  return p+1;
-}
-
 char* csEngine::SplitRegionName (const char* name, iRegion*& region,
 	bool& global)
 {
@@ -1919,24 +1851,6 @@ iMeshFactoryWrapper* csEngine::FindMeshFactory (const char* name,
   else
     fact = GetMeshFactories ()->FindByName (n);
   return fact;
-}
-
-iCameraPosition* csEngine::FindCameraPosition (const char* name,
-	iCollection* collect)
-{
-  iCollection* collection;
-  bool global;
-  char* n = SplitCollectionName (name, collection, global);
-  if (!n) return 0;
-
-  csRef<iCameraPosition> campos;
-  if (collection)
-    campos = CS::GetNamedChildObject<iCameraPosition>(collection->QueryObject(), n);
-  else if (!global && collect)
-    campos = CS::GetNamedChildObject<iCameraPosition>(collect->QueryObject(), n);
-  else
-    campos = GetCameraPositions ()->FindByName (n);
-  return campos;
 }
 
 iCameraPosition* csEngine::FindCameraPosition (const char* name,
@@ -2867,28 +2781,6 @@ iSector *csEngine::CreateSector (const char *name)
   return sector;
 }
 
-iCollection* csEngine::CreateCollection(const char *name)
-{
-  iCollection* collection = GetCollection(name);
-  if(!collection)
-  {
-    csCollection* collect = new csCollection();
-    collect->SetName(name);
-    collections.Put(name, collect);
-    collection = dynamic_cast<iCollection*>(collect);
-  }
-  return collection;
-}
-
-void csEngine::RemoveCollection(const char *name)
-{
-  csCollection* collect = collections.Get(name, NULL);
-  if(collect)
-  {
-    collections.Delete(name, collections.Get(name, collect));
-  }
-}
-
 void csEngine::AddEngineFrameCallback (iEngineFrameCallback* cb)
 {
   frameCallbacks.Push (cb);
@@ -2968,16 +2860,6 @@ iSharedVariableList *csEngine::GetVariableList () const
 iRegionList *csEngine::GetRegions ()
 {
   return &regions;
-}
-
-iCollection* csEngine::GetCollection(const char *name)
-{
-  return dynamic_cast<iCollection*>(collections.Get(name, NULL));
-}
-
-iCollection* csEngine::GetDefaultCollection()
-{
-  return dynamic_cast<iCollection*>(collections.Get(DEFAULT_COLLECTION, NULL));
 }
 
 csPtr<iCamera> csEngine::CreateCamera ()
@@ -3065,17 +2947,11 @@ class EngineLoaderContext : public scfImplementation1<EngineLoaderContext,
 {
 private:
   csEngine* Engine;
-  iCollection* collection;
   iRegion* region;
   bool curRegOnly;
-  uint keepFlags;
 
 public:
-  EngineLoaderContext (csEngine* Engine, iBase* regionOrCollection, bool curRegOnly);
-
-  void InitRegion(iRegion* region);
-  void InitCollection(iCollection* collection);
-
+  EngineLoaderContext (csEngine* Engine, iRegion* region, bool curRegOnly);
   virtual ~EngineLoaderContext ();
 
   virtual iSector* FindSector (const char* name);
@@ -3091,39 +2967,15 @@ public:
   virtual iShader* FindShader (const char* name);
   virtual bool CheckDupes () const { return false; }
   virtual iRegion* GetRegion () const { return region; }
-  virtual iCollection* GetCollection () const { return collection; }
-  virtual uint GetKeepFlags() const { return keepFlags; }
   virtual bool CurrentRegionOnly () const { return curRegOnly; }
 };
 
 
 EngineLoaderContext::EngineLoaderContext (csEngine* Engine,
-	iBase* regionOrCollection, bool curRegOnly)
-  : scfImplementationType (this), Engine (Engine),
-  curRegOnly (curRegOnly), keepFlags (0)
+	iRegion* region, bool curRegOnly)
+  : scfImplementationType (this), Engine (Engine), region (region),
+  curRegOnly (curRegOnly)
 {
-  csRef<iRegion> region (scfQueryInterfaceSafe<iRegion> (regionOrCollection));
-  if(region)
-  {
-    InitRegion(region); 
-  }
-  else
-  {
-    csRef<iCollection> collection (scfQueryInterfaceSafe<iCollection> (regionOrCollection));
-    InitCollection(collection); 
-  }
-}
-
-void EngineLoaderContext::InitRegion(iRegion* region)
-{
-  EngineLoaderContext::region = region;
-  EngineLoaderContext::collection = NULL;  
-}
-
-void EngineLoaderContext::InitCollection(iCollection *collection)
-{
-  EngineLoaderContext::collection = collection;
-  EngineLoaderContext::region = NULL;
 }
 
 EngineLoaderContext::~EngineLoaderContext ()

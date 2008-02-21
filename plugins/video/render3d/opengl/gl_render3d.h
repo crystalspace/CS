@@ -590,16 +590,7 @@ public:
   uint currentAttachments;
   bool SetRenderTarget (iTextureHandle* handle, bool persistent = false,
     int subtexture = 0, csRenderTargetAttachment attachment = rtaColor0);
-  /*{
-    render_target = handle;
-    r2tbackend->SetRenderTarget (handle, persistent, subtexture);
-
-    int hasRenderTarget = (handle != 0) ? 1 : 0;
-    G2D->PerformExtension ("userendertarget", hasRenderTarget);
-    viewwidth = G2D->GetWidth();
-    viewheight = G2D->GetHeight();
-    needViewportUpdate = true;
-  }*/
+  bool ValidateRenderTargets ();
   bool CanSetRenderTarget (const char* format,
     csRenderTargetAttachment attachment = rtaColor0);
   iTextureHandle* GetRenderTarget (

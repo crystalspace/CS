@@ -142,6 +142,8 @@ public:
   bool enableNonPowerOfTwo2DTextures;
 
   bool hasPBO;
+  /// Some drivers seem to ignore glGenerateMipmap calls
+  bool disableGenerateMipmap;
 
   csGLTextureManager (iObjectRegistry* object_reg,
         iGraphics2D* iG2D, iConfigFile *config,
@@ -162,6 +164,8 @@ public:
   {
     return textureClassIDs.Request (classID);
   }
+  
+  void SetupPixelStore();
 
   /**
    * Helper function to make sure a texture isn't selected on any TU.

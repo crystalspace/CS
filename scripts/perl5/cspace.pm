@@ -4309,6 +4309,47 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csLoadResult ##############
+
+package cspace::csLoadResult;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_success_get = *cspacec::csLoadResult_success_get;
+*swig_success_set = *cspacec::csLoadResult_success_set;
+*swig_result_get = *cspacec::csLoadResult_result_get;
+*swig_result_set = *cspacec::csLoadResult_result_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csLoadResult(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csLoadResult($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iLoader ##############
 
 package cspace::iLoader;
@@ -8127,6 +8168,50 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csImageManipulate ##############
+
+package cspace::csImageManipulate;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*Rescale = *cspacec::csImageManipulate_Rescale;
+*Mipmap = *cspacec::csImageManipulate_Mipmap;
+*Blur = *cspacec::csImageManipulate_Blur;
+*Crop = *cspacec::csImageManipulate_Crop;
+*Sharpen = *cspacec::csImageManipulate_Sharpen;
+*TransformColor = *cspacec::csImageManipulate_TransformColor;
+*Gray = *cspacec::csImageManipulate_Gray;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csImageManipulate(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csImageManipulate($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csPixelCoord ##############
 
 package cspace::csPixelCoord;
@@ -8572,6 +8657,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetPerspectiveAspect = *cspacec::iGraphics3D_SetPerspectiveAspect;
 *GetPerspectiveAspect = *cspacec::iGraphics3D_GetPerspectiveAspect;
 *SetRenderTarget = *cspacec::iGraphics3D_SetRenderTarget;
+*ValidateRenderTargets = *cspacec::iGraphics3D_ValidateRenderTargets;
 *CanSetRenderTarget = *cspacec::iGraphics3D_CanSetRenderTarget;
 *GetRenderTarget = *cspacec::iGraphics3D_GetRenderTarget;
 *UnsetRenderTargets = *cspacec::iGraphics3D_UnsetRenderTargets;
@@ -9392,6 +9478,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetAlphaMap = *cspacec::iTextureHandle_GetAlphaMap;
 *GetAlphaType = *cspacec::iTextureHandle_GetAlphaType;
 *Precache = *cspacec::iTextureHandle_Precache;
+*IsPrecached = *cspacec::iTextureHandle_IsPrecached;
 *SetTextureClass = *cspacec::iTextureHandle_SetTextureClass;
 *GetTextureClass = *cspacec::iTextureHandle_GetTextureClass;
 *SetAlphaType = *cspacec::iTextureHandle_SetAlphaType;
@@ -14354,6 +14441,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetAnimAction = *cspacec::iSpriteCal3DState_SetAnimAction;
 *SetVelocity = *cspacec::iSpriteCal3DState_SetVelocity;
 *SetDefaultIdleAnim = *cspacec::iSpriteCal3DState_SetDefaultIdleAnim;
+*SetCyclicBlendFactor = *cspacec::iSpriteCal3DState_SetCyclicBlendFactor;
 *SetLOD = *cspacec::iSpriteCal3DState_SetLOD;
 *AttachCoreMesh = *cspacec::iSpriteCal3DState_AttachCoreMesh;
 *DetachCoreMesh = *cspacec::iSpriteCal3DState_DetachCoreMesh;
@@ -20157,6 +20245,7 @@ sub CS_OPENPORTAL_MIRROR () { $cspacec::CS_OPENPORTAL_MIRROR }
 sub CS_OPENPORTAL_FLOAT () { $cspacec::CS_OPENPORTAL_FLOAT }
 sub rtaDepth () { $cspacec::rtaDepth }
 sub rtaColor0 () { $cspacec::rtaColor0 }
+sub rtaNumAttachments () { $cspacec::rtaNumAttachments }
 sub csmcNone () { $cspacec::csmcNone }
 sub csmcArrow () { $cspacec::csmcArrow }
 sub csmcLens () { $cspacec::csmcLens }

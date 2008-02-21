@@ -221,7 +221,8 @@ void csMaterialList::NameChanged (iObject* object, const char* oldname,
 iMaterialWrapper *csMaterialList::NewMaterial (iMaterial *material,
 	const char* name)
 {
-  iMaterialWrapper* tm = new csMaterialWrapper(this, material);
+  csRef<iMaterialWrapper> tm;
+  tm.AttachNew (new csMaterialWrapper (this, material));
   tm->QueryObject ()->SetName (name);
   if (name)
     mat_hash.Put (name, tm);

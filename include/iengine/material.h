@@ -133,7 +133,7 @@ struct iMaterialEngine : public virtual iBase
  */
 struct iMaterialList : public virtual iBase
 {
-  SCF_INTERFACE (iMaterialList, 2, 0, 0);
+  SCF_INTERFACE (iMaterialList, 1, 0, 0);
 
   /// Create a new material.
   virtual iMaterialWrapper* NewMaterial (iMaterial* material,

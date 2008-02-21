@@ -39,6 +39,11 @@ template <class T,class K,class J> class scfImplementation2 : public K, public J
 	SWIG_SCF_IMPL(scfImplementation2)
 };
 
+template <class T,class I1,class I2,class I3> class scfImplementation3 : public I1, public I2, public I3
+{
+	SWIG_SCF_IMPL(scfImplementation3)
+};
+
 template <class T,class K> class scfImplementationExt0 : public K
 {
 	SWIG_SCF_IMPL(scfImplementationExt0)
@@ -62,7 +67,7 @@ public K, public J, public J2
    if you need to use any of these delete the warnfilter and add the
    necessary %template directive. */
 %warnfilter(401) csView; 		// iView
-%warnfilter(401) csGeomDebugHelper;  	// iDebugHelper
+//%warnfilter(401) csGeomDebugHelper;  	// iDebugHelper
 %warnfilter(401) csEventNameRegistry; 	// iEventNameRegistry
 %warnfilter(401) csTinyDocumentSystem; 	// iDocumentSystem
 

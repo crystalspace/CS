@@ -131,7 +131,7 @@ int InputFile::ReadLine(csString &str)
         return x;
 }
 
-csString& InputFile::ReadWord(char *pCharList,int iWantTrailingSpace)
+csString& InputFile::ReadWord(const char *pCharList,int iWantTrailingSpace)
 {
     int ch='a';
 

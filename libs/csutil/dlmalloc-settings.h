@@ -38,7 +38,6 @@
 #pragma optimize("gty", on)
 #endif
 
-#if defined(__CYGWIN__) || defined(_WIN32)
 /* Cygwin has funny issues with atexit() that ptmalloc seems to tickle.
  * So within ptmalloc we use our own single-use implementation of atexit()
  * when on Cygwin.  
@@ -46,11 +45,13 @@
  * With the MSVC runtime(ie MSVC itself and MingW), the catch is that 
  * atexit() functions are called before global static objects are destroyed.
  *
+ * On Linux it also seems that sometimes atexit() is called before global static
+ * objects are destroyed.
+ *
  * See cs_atexit in libs/csutil/ptmalloc_wrap.cpp.
  */
 extern int cs_atexit(void(*func)(void));
 
 #define atexit cs_atexit
-#endif
 
 #endif // __CS_CSUTIL_DLMALLOC_SETTINGS_H__

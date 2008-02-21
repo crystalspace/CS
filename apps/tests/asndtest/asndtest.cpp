@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2001 by Søren Bøg
+    Copyright (C) 2001 by SÃ¸ren BÃ¸g
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -82,7 +82,7 @@ void ASndTest::CreateWorld ()
   printf("=== iSndSysData format informations ===\n");
   printf("Format      : %d bits, %d channel(s), %d Hz\n",
         format->Bits, format->Channels, format->Freq);
-  printf("Sample Size : %d bytes, %d frames\n", snddata->GetDataSize (),
+  printf("Sample Size : %zu bytes, %zu frames\n", snddata->GetDataSize (),
         snddata->GetFrameCount ());
   printf("Description : %s\n", snddata->GetDescription ());
   fflush(stdout);
@@ -96,7 +96,7 @@ void ASndTest::CreateWorld ()
   printf("=== iSndSysStream format informations ===\n");
   printf("Format      : %d bits, %d channel(s), %d Hz\n",
         rformat->Bits, rformat->Channels, rformat->Freq);
-  printf("Stream Size : %d frames\n", sndstream->GetFrameCount ());
+  printf("Stream Size : %zu frames\n", sndstream->GetFrameCount ());
   printf("Description : %s\n", sndstream->GetDescription ());
   fflush(stdout);
 

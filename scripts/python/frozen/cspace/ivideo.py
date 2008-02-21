@@ -383,6 +383,7 @@ csSimpleRenderMesh_swigregister(csSimpleRenderMesh)
 
 rtaDepth = _ivideo.rtaDepth
 rtaColor0 = _ivideo.rtaColor0
+rtaNumAttachments = _ivideo.rtaNumAttachments
 class iGraphics3D(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
@@ -400,6 +401,7 @@ class iGraphics3D(core.iBase):
     def SetPerspectiveAspect(*args): return _ivideo.iGraphics3D_SetPerspectiveAspect(*args)
     def GetPerspectiveAspect(*args): return _ivideo.iGraphics3D_GetPerspectiveAspect(*args)
     def SetRenderTarget(*args): return _ivideo.iGraphics3D_SetRenderTarget(*args)
+    def ValidateRenderTargets(*args): return _ivideo.iGraphics3D_ValidateRenderTargets(*args)
     def CanSetRenderTarget(*args): return _ivideo.iGraphics3D_CanSetRenderTarget(*args)
     def GetRenderTarget(*args): return _ivideo.iGraphics3D_GetRenderTarget(*args)
     def UnsetRenderTargets(*args): return _ivideo.iGraphics3D_UnsetRenderTargets(*args)
@@ -792,6 +794,7 @@ class iTextureHandle(core.iBase):
     def GetAlphaMap(*args): return _ivideo.iTextureHandle_GetAlphaMap(*args)
     def GetAlphaType(*args): return _ivideo.iTextureHandle_GetAlphaType(*args)
     def Precache(*args): return _ivideo.iTextureHandle_Precache(*args)
+    def IsPrecached(*args): return _ivideo.iTextureHandle_IsPrecached(*args)
     def SetTextureClass(*args): return _ivideo.iTextureHandle_SetTextureClass(*args)
     def GetTextureClass(*args): return _ivideo.iTextureHandle_GetTextureClass(*args)
     def SetAlphaType(*args): return _ivideo.iTextureHandle_SetAlphaType(*args)

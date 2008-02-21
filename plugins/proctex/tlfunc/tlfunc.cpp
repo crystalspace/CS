@@ -190,7 +190,8 @@ csPtr<iBase> csFuncTexLoader::Parse (iDocumentNode* node,
       csRef<iShaderVariableContext> context;
       context.AttachNew (new csShaderVariableContext ());
       csRef<csShaderVariable> currentPos;
-      currentPos.AttachNew (new csShaderVariable (strings->Request ("position")));
+      currentPos.AttachNew (new csShaderVariable (
+	    strings->Request ("position")));
       context->AddVariable (currentPos);
       
       csRef<iShaderVarStack> stacks;

@@ -35,7 +35,6 @@
 #include "ivaria/collider.h"
 
 struct iCamera;
-struct iCollection;
 struct iCollider;
 struct iCollideSystem;
 struct iEngine;
@@ -219,19 +218,9 @@ public:
    * Initialize collision detection (i.e. create csColliderWrapper) for
    * all objects in the engine. If the optional region is given only
    * the objects from that region will be initialized.
-   * \deprecate Regions are deprecated. Use Collections instead. Deprecated in 1.3.
    */
-  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
   static void InitializeCollisionWrappers (iCollideSystem* colsys,
   	iEngine* engine, iRegion* region = 0);
-
-  /**
-   * Initialize collision detection (i.e. create csColliderWrapper) for
-   * all objects in the engine. If the optional region is given only
-   * the objects from that region will be initialized.
-   */
-  static void InitializeCollisionWrappers (iCollideSystem* colsys,
-  	iEngine* engine, iCollection* collection = 0);
 
   /**
    * Test collision between one collider and an array of colliders.

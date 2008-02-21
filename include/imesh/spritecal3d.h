@@ -362,7 +362,7 @@ struct iSkeleton;
  */
 struct iSpriteCal3DState : public virtual iBase
 {
-  SCF_INTERFACE (iSpriteCal3DState, 2, 0, 0);
+  SCF_INTERFACE (iSpriteCal3DState, 2, 1, 0);
 
   /**\name Animation management
    * @{ */
@@ -493,6 +493,13 @@ struct iSpriteCal3DState : public virtual iBase
    * This function sets the name to use when SetVelocity(0) is called.
    */
   virtual void SetDefaultIdleAnim(const char *name) = 0;
+
+  /**
+   * Sets the amount of blending when shifting to a new cyclic animation
+   * using functions such as SetVelocity().
+   */
+  virtual void SetCyclicBlendFactor(float factor) = 0;
+
   /** @} */
 
   /**\name LOD
@@ -573,7 +580,7 @@ struct iSpriteCal3DState : public virtual iBase
   /** @} */
 
   /// Change the material on a named submesh.  Returns true if successful.
-  virtual bool SetMaterial(const char *mesh_name, iMaterialWrapper *mat) = 0;
+  virtual bool SetMaterial(const char *mesh_name,iMaterialWrapper *mat) = 0;
 
   /**\name Time
    * @{ */

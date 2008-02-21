@@ -6,24 +6,173 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-05-Feb-2008
-        - Mike Gist made compatibility changes so regions, and load calls
-          which don't specify either a region or collection still work.
-          Also some formatting corrections.
-21-Jan-2008
-        - Mike Gist wrote an initial implementation of iCollection and started
-          to deprecate iRegion. Right now iCollection is semi-working,
-          textures seem to be loading right and unloaded via refcounting
-          correctly (for the few cases I've tried anyway). Most things
-          are still broken for iCollection though. Lots to do.
-        - Mike Gist removed the not implemented threaded loader code from
-          csparser.
+21-Feb-2008
+	- res fixed csimagetool to correctly get the optional argument for
+	  the save option.
+	- res restored r28657 which got accidentally lost in r28744.
+20-Feb-2008
+	- res fixed the FBO render target backend setting bogus viewports.
+19-Feb-2008
+	- res added CS::Utility::FastRefCount<> for ref counting with less
+	  overhead than csRefCount (but not quite as general).
+	- res made the following changes to the generic resource cache:
+	    - Fixed an inverted comparison in the RB tree.
+	    - Fixed exact search to search exactly on all recursion steps.
+	    - Added a method to update the "reuse auxiliary data" when an
+	      element is marked as active.
+	    - The reuse condition now gets a pointer to the data to be reused
+	      when querying whether an element can be reused.
+	    - Added a method to allow delaying the freeing of an element.
+	- res rewrote significant parts of the gl3d fbo render to texture
+	  backend. 
+	- res added iGraphics3D::ValidateRenderTarget(). This is used to check
+	  that the current set of render targets is supported by the hardware.
+	- res dropped the fallback of the FBO render backend to the framebuffer
+	  one - it rather complicated things. Further, the cases were that
+	  fallback would be needed indicate either CS or application bugs which
+	  should rather be fixed instead of causing the fallback to be used.
+	- res changed the way reuse conditions are implemented in the generic
+	  resource cache: instead of only per-element instances of user
+	  specific data there is now also a per-cache instance which actually
+	  controls whether an element can be reused. This is useful if the
+	  decision is based on some data which is the same for all elements
+	  anyway.
+	- res added "purge conditions" to the generic resource cache,
+	  controlling when an element is purged (ie freed).
+	- res changed the gl3d FBO backend to more aggressively reuse render
+	  buffers for depth and stencil data since different FBOs can share
+	  these.
+	- res rearranged csLight::SetCutoffDistance() to do most changes to
+	  the members before firing the callback.
+	- Eric Sunshine augmented CS_VISIBILITY_FLAG_INLINES_HIDDEN() check in
+	  mk/autoconf/visibility.m4 with an additional test in order to address
+	  anomaly when cross compiling from Linux to Windows using the
+	  i586-mingw32msvc-g++ compiler. In this case, during actual
+	  compilation of certain templates, the compiler annoyingly complains
+	  that the "visibility attribute is not supported in this
+	  configuration", despite the fact that the -fvisibility-inlines-hidden
+	  option is otherwise silently accepted by the compiler. Thanks to
+	  Andres Freund for supplying a code snippet which triggers the
+	  problem.
+18-Feb-2008
+	- caedes fixed lights not updating attenuation vector after changing
+	  the cutoff distance.
+	- res committed the patch from trac #185 ("Enable atexit tweak for 
+	  all platforms") to work around crashes on exit with static profile
+	  builds.
+17-Feb-2008
+        - Sueastside added 'light' loading to iLoader::Load().
+	- Sueastside removed an assert in ParsePortal(), it's perfectly
+	  valid to not specify a sector for a portal imo.
+	- Andres wrapped a variable declaration using a type out of a C header
+	  inside extern "C" as it seems that at least mingw doesnt contain a
+	  #ifdef __cplusplus at the proper place.
+	- Andres made startme work even if there are spaces in the path to the
+	  called applications.
+15-Feb-2008
+        - Darek fixed PowerPC problem with gl_txtmgr.
+14-Feb-2008
+        - Jorrit added csgfx/imagemanipulate.h to the python bindings.
+        - Jorrit added csImageManipulate.TransformColor() and
+          Gray() tools.
+	- varslot added code to the CoreAudio driver for dealing
+          with sound hardware that cannot handle the desired buffer
+          size. Successively redusing the buffer size we arrive at a
+          sound buffer that can be used. This fixes sound problem on e.g.
+          MacBook, and should address bugtracker ticket #205. Note:
+          sound.cfg is not loaded by the CoreAudio driver, and should
+          maybe also be fixed.
+	- Jorrit changed the new csImageManipulate.Gray() to use
+	  the Luminance() function for better grayscale.
+	- res fixed the xmlshader plugin to not assert on some more complex
+	  conditions.
+	- Sueastside added 'portals' loading to iLoader::Load().
+	- Sueastside reverted r2706 and reapplied only the 'operandOperation's.
+13-Feb-2008
+	- varslot added a rule to work around known issue with texture
+	  compression and Intel graphics card under OSX.
+        - Jorrit deprecated the Load() functions in iLoader that accept a
+          iBase* result return parameter. Instead there are now three
+          new versions that return an instance of csLoadResult.
+	- res changed the font cache to set the pixel storage through the
+	  state cache as well.
+	- res fixed a copy and paste bug in xmlshader which could result in
+	  some conditions being wrongly determined to be "always true" or
+	  "always false".
+	- res changed csApplicationFramework::SetApplicationName() to take
+	  a const char* instead of a char*.
+	- res made some char* -> const char* in apps.
+	- caedes fixed bullet plugin to be compatible with bullet 2.66 while
+	  maintaining backwards compatibility.
+	- caedes fixed phystut jamfile so it will get built if either bullet
+	  or ode are available (before it would be built only depending on
+	  whether ode was available).
+	- caedes enhanced phystut to report its own command line options on
+	  '--help' besides crystalspace options.
+	- res fixed setting of the '0' render target in soft3d when no render
+	  target is set.
+12-Feb-2008
+	- caedes fixed python override of Graphics2D::PerformExtension to
+	  allow command passthrough to the real c++ PerformExtension.
+	- res fixed the state cache texture unit iteration to only iterate
+	  over the available texture units and not all up to CS_GL_MAX_LAYER.
+	- res put some pixel store settings into the state cache and made
+	  methods that use pixel data (such as texture uploading) set these
+	  settings.
+	- caedes added some config options to cspython.
+	    - CsPython.Path.: to add vfs paths to pythonpath.
+	    - CsPython.Module.: to load modules on csPython::Initialize.  this
+	      will allow defining python classes as scf classes and much more.
+	- res made the GL depth clear value be re-set every frame (needed in
+	  embedding scenarios).
+11-Feb-2008
+	- Genjix commented csGeomDebug swig line.
+        - Jorrit fixed the python plugin so that parameters of type
+          'uint8' are now also recognized from Python.
+10-Feb-2008
+	- PK applied the patch from Rolenun in Ticket #450. Closes #450.
+5-Feb-2008
+	- Sueastside undid his ThreadedJobQueue change since it broke on linux.
+	- Marten redid some of the handling of thread priorities to be more
+          robust.
+	- Sueastside redid his ThreadedJobQueue, should work now after
+          Marten's changes.
+4-Feb-2008
+	- Sueastside added an optional parameter to ThreadedJobQueue's
+          constructor to set the thread's priority.
+2-Feb-2008
+	- res fixed "short" (h) and "short short" (hh) handling to only cast
+	  to a signed char/short when formatting to a decimal integer; cast to
+	  unsigned otherwise.
+	- Sueastside added XWindow clipboard event support. Rolenun made me do
+          it!
+29-Jan-2008
+	- Sueastside added IsPrecached() to iTextureHandle.
+24-Jan-2008
+	- caedes patched relaytool so it doesn't redirect to /dev/tty, as it 
+	  doesn't exist in some situations.
+	- Ross B cleaned up updated HowTo example.
+	- Ross B updated the HOWTO: Clicking on Objects for misc API changes.
+	- caedes fixed previous relaytool change to remove uneeded echo.
+23-Jan-2008
+	- res fixed a bug in relaytool where building the libraries search
+	  array was broken.
+	- caedes fixed vertexlight.cgvp not getting installed.
+22-Jan-2008
+	- Mike Gist committed a patch from Trymm which adds a method to set
+	  blending time for cyclic animations in cal3d.
+20-Jan-2008
+	- Ross B updated sound docs to use a reference to iLoader instead of
+	  iSndSysLoader.
+	- Ross B updated old sound documentation to be relevant again.
+	- caedes added swig declaration for scfImplementation3 template.
 19-Jan-2008
 	- res changed the gl3d framebuffer render-to-texture backend to not
 	  use hardcoded internal formats when turning textures into render
 	  targets but a format depending on the actual format of the texture
 	  and the bit depth of the framebuffer.
 	- res fixed some wrong casts and a leak in sprcal3d.
+	- Marten fixed (probably) atomic operations on 64-bit PPC.
 18-Jan-2008
 	- res committed an update to the MSVC 7+ external project HOWTO from
 	  nev7n.
@@ -785,6 +934,14 @@ chronological order.
 	      tree potentially change the parent of that specific node, but
 	      the cached value was not updated. Fixed as well.
 	    - In one instance a statement was just transcribed plain wrong.
+	- res added CS::Utility::GenericResourceCache. This helps with the
+	  somewhat common issues that some resources used while rendering
+	  should be reused next frame, however, the desired resources have
+	  different attributes. Also, resources shouldn't be just piled up
+	  but unneeded ones should be released after some time. The generic
+	  resource cache deals with that while allowing for necessary 
+	  behaviour customization (e.g. only return a resource that satisfies
+	  some constraint).
 28-Oct-2007
 	- res changed the Jam LinkWith rules to add a dependency of targets
 	  on the "naked" target names (e.g. 'crystalspace') instead of the

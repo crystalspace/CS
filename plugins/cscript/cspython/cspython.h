@@ -78,7 +78,7 @@ protected:
     bool GetBool () const;
     const csRef<iString> GetString () const;
     csRef<iScriptObject> GetObject () const;
-  };
+  }; // csPython::Value
 
   class Object : public scfImplementationExt1<csPython::Object, csScriptObjectCommon, csPythonObject>
   {
@@ -107,7 +107,7 @@ protected:
 
     bool Set (const char *name, iScriptValue *value);
     csPtr<iScriptValue> Get (const char *name);
-  };
+  }; // csPython::Object
 
   friend class Value;
   friend class Object;
@@ -124,7 +124,14 @@ protected:
   // increfed PyObject
   PyObject *FindFunction(const char *url, bool do_errors=true);
   void Test();
+  // Augment pythonpath with cspython specific paths
   bool AugmentPythonPath();
+  // Add a vfs path to pythonpath, with an optional subpath to search for
+  bool AddVfsPythonPath(const char *vfspath, const char *subpath=0);
+  // Add a real path to pythonpath, with an optional subpath to search for
+  bool AddRealPythonPath(csString &path, const char *subpath=0);
+  // Load configuration options
+  void LoadConfig();
 public:
   csPython(iBase *iParent);
   virtual ~csPython();
