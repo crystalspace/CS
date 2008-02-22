@@ -432,6 +432,8 @@ struct iLoader : public virtual iBase
   * \param collection is 0 by default which means that all loaded objects are
   * either added to the default collection or not added to any collection,
   * depending on the value of the keepFlags argument.
+  * \param searchCollectionOnly is true by default which means that it will only
+  * find materials/factories/... from current collection if that is given.
   * \param checkDupes if true then materials, textures,
   * and mesh factories will only be loaded if they don't already exist
   * in the entire engine (ignoring regions). By default this is false because
@@ -447,8 +449,8 @@ struct iLoader : public virtual iBase
   * actually need (a world file loading from a shared library of textures for example).
   */
   virtual bool LoadMapFileCollection (const char* filename, bool clearEngine = true,
-    iCollection* collection = 0, bool checkDupes = false, iStreamSource* ssource = 0,
-    iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL) = 0;
+    iCollection* collection = 0, bool searchCollectionOnly = true, bool checkDupes = false,
+    iStreamSource* ssource = 0, iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL) = 0;
 
   /**
   * Load a map from the given 'world' node. If 'clearEngine' is true then
@@ -463,6 +465,8 @@ struct iLoader : public virtual iBase
   * \param collection is 0 by default which means that all loaded objects are
   * either added to the default collection or not added to any collection,
   * depending on the value of the keepFlags argument.
+  * \param searchCollectionOnly is true by default which means that it will only
+  * find materials/factories/... from current collection if that is given.
   * \param checkDupes if true then materials, textures,
   * and mesh factories will only be loaded if they don't already exist
   * in the entire engine (ignoring regions). By default this is false because
@@ -478,8 +482,8 @@ struct iLoader : public virtual iBase
   * actually need (a world file loading from a shared library of textures for example).
   */
   virtual bool LoadMapCollection (iDocumentNode* world_node, bool clearEngine = true,
-    iCollection* collection = 0, bool checkDupes = false, iStreamSource* ssource = 0,
-    iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL) = 0;
+    iCollection* collection = 0, bool searchCollectionOnly = true, bool checkDupes = false,
+    iStreamSource* ssource = 0, iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL) = 0;
 
   /**
   * Load library from a VFS file
@@ -487,8 +491,8 @@ struct iLoader : public virtual iBase
   * \param collection is 0 by default which means that all loaded objects are
   * either added to the default collection or not added to any collection,
   * depending on the value of the keepFlags argument.
-  * \param curRegOnly is true by default which means that it will only
-  * find materials/factories/... from current region if that is given.
+  * \param searchCollectionOnly is true by default which means that it will only
+  * find materials/factories/... from current collection if that is given.
   * \param checkDupes if true then materials, textures,
   * and mesh factories will only be loaded if they don't already exist
   * in the entire engine (ignoring regions). By default this is false because
@@ -504,7 +508,7 @@ struct iLoader : public virtual iBase
   * actually need (a world file loading from a shared library of textures for example).
   */
   virtual bool LoadLibraryFile (const char* filename, iCollection* collection = 0,
-    bool checkDupes = false, iStreamSource* ssource = 0,
+    bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL) = 0;
 
   /**
@@ -513,6 +517,8 @@ struct iLoader : public virtual iBase
   * \param collection is 0 by default which means that all loaded objects are
   * either added to the default collection or not added to any collection,
   * depending on the value of the keepFlags argument.
+  * \param searchCollectionOnly is true by default which means that it will only
+  * find materials/factories/... from current collection if that is given.
   * \param checkDupes if true then materials, textures,
   * and mesh factories will only be loaded if they don't already exist
   * in the entire engine (ignoring regions). By default this is false because
@@ -528,7 +534,7 @@ struct iLoader : public virtual iBase
   * actually need (a world file loading from a shared library of textures for example).
   */
   virtual bool LoadLibrary (iDocumentNode* lib_node, iCollection* collection = 0,
-    bool checkDupes = false, iStreamSource* ssource = 0,
+    bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL) = 0;
 
   /**
@@ -557,6 +563,8 @@ struct iLoader : public virtual iBase
   * \param collection is 0 by default which means that all loaded objects are
   * either added to the default collection or not added to any collection,
   * depending on the value of the keepFlags argument.
+  * \param searchCollectionOnly is true by default which means that it will only
+  * find materials/factories/... from current collection if that is given.
   * \param checkDupes if true then materials, textures,
   * and mesh factories will only be loaded if they don't already exist
   * in the entire engine (ignoring regions). By default this is false because
@@ -575,7 +583,7 @@ struct iLoader : public virtual iBase
   * actually need (a world file loading from a shared library of textures for example).
   */
   virtual csLoadResult Load (const char* fname, iCollection* collection = 0,
-    bool checkDupes = false, iStreamSource* ssource = 0,
+    bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
     uint keepFlags = KEEP_ALL) = 0;
 
@@ -605,6 +613,8 @@ struct iLoader : public virtual iBase
   * \param collection is 0 by default which means that all loaded objects are
   * either added to the default collection or not added to any collection,
   * depending on the value of the keepFlags argument.
+  * \param searchCollectionOnly is true by default which means that it will only
+  * find materials/factories/... from current collection if that is given.
   * \param checkDupes if true then materials, textures,
   * and mesh factories will only be loaded if they don't already exist
   * in the entire engine (ignoring regions). By default this is false because
@@ -623,7 +633,7 @@ struct iLoader : public virtual iBase
   * actually need (a world file loading from a shared library of textures for example).
   */
   virtual csLoadResult Load (iDataBuffer* buffer, iCollection* collection = 0,
-    bool checkDupes = false, iStreamSource* ssource = 0,
+    bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
     uint keepFlags = KEEP_ALL) = 0;
 
@@ -652,6 +662,8 @@ struct iLoader : public virtual iBase
   * \param collection is 0 by default which means that all loaded objects are
   * either added to the default collection or not added to any collection,
   * depending on the value of the keepFlags argument.
+  * \param searchCollectionOnly is true by default which means that it will only
+  * find materials/factories/... from current collection if that is given.
   * \param checkDupes if true then materials, textures,
   * and mesh factories will only be loaded if they don't already exist
   * in the entire engine (ignoring regions). By default this is false because
@@ -670,8 +682,8 @@ struct iLoader : public virtual iBase
   * actually need (a world file loading from a shared library of textures for example).
   */
   virtual csLoadResult Load (iDocumentNode* node, iCollection* collection = 0,
-    bool checkDupes = false, iStreamSource* ssource = 0, const char* override_name = 0,
-    iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL) = 0;
+    bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    const char* override_name = 0, iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL) = 0;
 
   /////////////////////////// Regions ///////////////////////////
 
