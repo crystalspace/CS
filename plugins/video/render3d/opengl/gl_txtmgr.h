@@ -203,6 +203,8 @@ public:
 
   /// Dump all SLMs to image files.
   void DumpSuperLightmaps (iVFS* VFS, iImageIO* iio, const char* dir);
+  
+  void DumpTextures (iVFS* VFS, iImageIO* iio, const char* dir);
 };
 
 }

@@ -3613,6 +3613,33 @@ bool csGLGraphics3D::DebugCommand (const char* cmdstr)
 
     return true;
   }
+  else if (strcasecmp (cmd, "dump_textures") == 0)
+  {
+    csRef<iImageIO> imgsaver = csQueryRegistry<iImageIO> (object_reg);
+    if (!imgsaver)
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING,
+	      "Could not get image saver.");
+      return false;
+    }
+
+    csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
+    if (!vfs)
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING, 
+	      "Could not get VFS.");
+      return false;
+    }
+
+    if (txtmgr)
+    {
+      const char* dir = 
+	  ((param != 0) && (*param != 0)) ? param : "/tmp/textures/";
+      txtmgr->DumpTextures (vfs, imgsaver, dir);
+    }
+
+    return true;
+  }
   else if (strcasecmp (cmd, "dump_vbostat") == 0)
   {
     if (vboManager) vboManager->DumpStats ();

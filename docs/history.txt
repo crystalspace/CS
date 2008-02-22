@@ -9,6 +9,7 @@ chronological order.
 22-Feb-2008
 	- Vincent changed sndsys files license headers to LGPL following
 	  Andrew Mann agreement.
+	- res added a "dump textures" debug command to gl3d.
 21-Feb-2008
 	- res fixed csimagetool to correctly get the optional argument for
 	  the save option.
