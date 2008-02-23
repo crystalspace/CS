@@ -1,5 +1,6 @@
 SubDir TOP plugins mesh ;
 
+SubInclude TOP plugins mesh animesh ;
 SubInclude TOP plugins mesh bezier ;
 SubInclude TOP plugins mesh emit ;
 SubInclude TOP plugins mesh genmesh ;

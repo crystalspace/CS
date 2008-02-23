@@ -10,6 +10,7 @@ chronological order.
 	- Marten started work on new animated mesh:
 	    - Added later-to-be-used csDualQuaternion.
 	    - Wrote interface definitions for mesh and skeleton.
+	- Marten added plugin stub for new animated mesh.
 21-Feb-2008
 	- res fixed csimagetool to correctly get the optional argument for
 	  the save option.
