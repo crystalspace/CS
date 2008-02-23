@@ -8,6 +8,7 @@ chronological order.
 
 23-Feb-2008
 	- caedes added ivaria/sequence.h to scripting bindings.
+	- caedes added csgeom/obb.h to scripting bindings.
 22-Feb-2008
 	- Vincent changed sndsys files license headers to LGPL following
 	  Andrew Mann agreement.
