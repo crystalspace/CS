@@ -144,6 +144,10 @@
 /*  INTERFACE_APPLY(iReporter)
   INTERFACE_APPLY(iReporterIterator)
   INTERFACE_APPLY(iReporterListener)*/
+  INTERFACE_APPLY(iSequence)
+  INTERFACE_APPLY(iSequenceCondition)
+  INTERFACE_APPLY(iSequenceManager)
+  INTERFACE_APPLY(iSequenceOperation)
   INTERFACE_APPLY(iSimpleFormerState)
   INTERFACE_APPLY(iStandardReporterListener)
   INTERFACE_APPLY(iEngineSequenceManager)

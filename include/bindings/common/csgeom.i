@@ -182,6 +182,8 @@ namespace CS
 %ignore csBox3::operator> (const csBox3& box1, const csBox3& box2);
 %ignore csBox3::operator< (const csVector3& point, const csBox3& box);
 %include "csgeom/box.h"
+%ignore csOBB::Diameter;
+%include "csgeom/obb.h"
 
 %ignore csSegment2::Start (); // Non-const.
 %ignore csSegment2::End ();   // Non-const.

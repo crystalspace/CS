@@ -7,10 +7,16 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 23-Feb-2008
+	- caedes added ivaria/sequence.h to scripting bindings.
+	- caedes added csgeom/obb.h to scripting bindings.
 	- Marten started work on new animated mesh:
 	    - Added later-to-be-used csDualQuaternion.
 	    - Wrote interface definitions for mesh and skeleton.
 	- Marten added plugin stub for new animated mesh.
+22-Feb-2008
+	- Vincent changed sndsys files license headers to LGPL following
+	  Andrew Mann agreement.
+	- res added a "dump textures" debug command to gl3d.
 21-Feb-2008
 	- res fixed csimagetool to correctly get the optional argument for
 	  the save option.
