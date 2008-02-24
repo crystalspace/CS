@@ -25,6 +25,11 @@
 
 struct iRenderBuffer;
 
+struct iAnimatedMeshFactory;
+struct iAnimatedMeshFactorySubMesh;
+struct iAnimatedMesh;
+struct iAnimatedMeshSubMesh;
+struct iAnimatedMeshMorphTarget;
 
 /**\file
  * Animated mesh interface files
@@ -164,7 +169,7 @@ struct iAnimatedMeshFactory : public virtual iBase
   /**
    * Get the bone influences.
    */
-  csAnimatedMeshBoneInfluence* GetBoneInfluences () = 0;
+  virtual csAnimatedMeshBoneInfluence* GetBoneInfluences () = 0;
 
   /** @} */
 

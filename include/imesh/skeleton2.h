@@ -20,6 +20,9 @@
 #define __CS_IMESH_SKELETON2_H__
 
 #include "csutil/scf_interface.h"
+#include "csutil/ref.h"
+#include "csutil/refcount.h"
+#include "csutil/bitarray.h"
 
 class csQuaternion;
 class csVector3;
@@ -76,7 +79,6 @@ struct iSkeletonSystem2 : public virtual iBase
    * Create a new empty skeleton factory
    */
   virtual csPtr<iSkeletonFactory2> CreateSkeletonFactory () = 0;
-
 
   /**
    * Create a new skeletal animation factory
@@ -485,6 +487,12 @@ struct iSkeletonAnimation2 : public iSkeletonAnimationNode2
   virtual void Reset () = 0;
 
   /**
+   * Get the current playback position
+   */
+  virtual float GetPlaybackPosition () const = 0;
+
+
+  /**
    * Set the playback position to specific time.
    */
   virtual void SetPlaybackPosition (float time) = 0;
@@ -492,7 +500,7 @@ struct iSkeletonAnimation2 : public iSkeletonAnimationNode2
   /**
    * Get the factory from which this instance was created.
    */
-  virtual iSkeletonAnimationFactory2* GetFactory () = 0;
+  virtual iSkeletonAnimationFactory2* GetAnimationFactory () = 0;
 };
 
 /**
@@ -517,7 +525,7 @@ struct iSkeletonBlendNodeFactory2 : public iSkeletonAnimationNodeFactory2
    * Get specific node
    * \param node node index
    */
-  virtual iSkeletonAnimationNode2* GetNode (uint node) = 0;
+  virtual iSkeletonAnimationNodeFactory2* GetNode (uint node) = 0;
 
   /**
    * Get number of nodes
@@ -528,7 +536,7 @@ struct iSkeletonBlendNodeFactory2 : public iSkeletonAnimationNodeFactory2
    * Remove all ndoes
    */
   virtual void ClearNodes () = 0;
-}
+};
 
 
 /**
