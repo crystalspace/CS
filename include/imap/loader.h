@@ -49,8 +49,8 @@ struct iSndSysWrapper;
 struct iSndSysStream;
 
 // The keep type flags for collections.
-#define KEEP_USED 0x001
-#define KEEP_ALL  0x002
+#define KEEP_ALL  0
+#define KEEP_USED 1
 
 /**
 * This callback is called when the loader can't find some material,
@@ -299,7 +299,7 @@ struct iLoader : public virtual iBase
   virtual inline iTextureWrapper* LoadTexture (const char *Name,
     const char *FileName, int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
     bool reg = true, bool create_material = true, bool free_image = true,
-    iBase* regionOrCollection = 0) = 0;
+    iBase* regionOrCollection = 0, uint keepFlags = KEEP_ALL) = 0;
 
   /**
   * Load a map file. If 'clearEngine' is true then the current contents
@@ -341,8 +341,7 @@ struct iLoader : public virtual iBase
   virtual inline bool LoadMapFile (const char* filename, bool clearEngine = true,
     iBase* regionOrCollection = 0, bool curRegOnly = true,
     bool checkDupes = false, iStreamSource* ssource = 0,
-    iMissingLoaderData* missingdata = 0, bool useProxyTextures = false,
-    uint keepFlags = KEEP_ALL) = 0;
+    iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL) = 0;
 
   /**
   * Load a map from the given 'world' node. If 'clearEngine' is true then
@@ -383,7 +382,207 @@ struct iLoader : public virtual iBase
   virtual inline bool LoadMap (iDocumentNode* world_node, bool clearEngine = true,
     iBase* regionOrCollection = 0, bool curRegOnly = true,
     bool checkDupes = false, iStreamSource* ssource = 0,
-    iMissingLoaderData* missingdata = 0, bool useProxyTextures = false,
+    iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL) = 0;
+
+    /**
+  * Load library from a VFS file
+  * \param filename is a VFS filename for the XML file.
+  * \param collection is 0 by default which means that all loaded objects are
+  * either added to the default collection or not added to any collection,
+  * depending on the value of the keepFlags argument.
+  * \param searchCollectionOnly is true by default which means that it will only
+  * find materials/factories/... from current collection if that is given.
+  * \param checkDupes if true then materials, textures,
+  * and mesh factories will only be loaded if they don't already exist
+  * in the entire engine (ignoring regions). By default this is false because
+  * it is very legal for different world files to have different objects
+  * with the same name. Only use checkDupes == true if you know that your
+  * objects have unique names accross all world files.
+  * \param ssource is an optional stream source for faster loading.
+  * \param missingdata is an optional callback in case data is missing.
+  * The application can then provide that missing data in some other way.
+  * \param keepFlags Use these to define whether or not you wish to guarantee
+  * that all loaded resources are kept (default to KEEP_ALL). KEEP_USED is useful
+  * when you are loading from a shared library containing more resources than you
+  * actually need (a world file loading from a shared library of textures for example).
+  */
+  virtual bool LoadLibraryFile (const char* filename, iBase* regionOrCollection = 0,
+    bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL) = 0;
+
+  /**
+  * Load library from a 'library' node.
+  * \param lib_node is the 'library' node from an XML document.
+  * \param collection is 0 by default which means that all loaded objects are
+  * either added to the default collection or not added to any collection,
+  * depending on the value of the keepFlags argument.
+  * \param searchCollectionOnly is true by default which means that it will only
+  * find materials/factories/... from current collection if that is given.
+  * \param checkDupes if true then materials, textures,
+  * and mesh factories will only be loaded if they don't already exist
+  * in the entire engine (ignoring regions). By default this is false because
+  * it is very legal for different world files to have different objects
+  * with the same name. Only use checkDupes == true if you know that your
+  * objects have unique names accross all world files.
+  * \param ssource is an optional stream source for faster loading.
+  * \param missingdata is an optional callback in case data is missing.
+  * The application can then provide that missing data in some other way.
+  * \param keepFlags Use these to define whether or not you wish to guarantee
+  * that all loaded resources are kept (default to KEEP_ALL). KEEP_USED is useful
+  * when you are loading from a shared library containing more resources than you
+  * actually need (a world file loading from a shared library of textures for example).
+  */
+  virtual bool LoadLibrary (iDocumentNode* lib_node, iBase* regionOrCollection = 0,
+    bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL) = 0;
+
+  /**
+  * Load a file. This is a smart function that will try to recognize
+  * what kind of file it is. It recognizes the following types of
+  * files:
+  * - 'world' file: in that case 'result' will be set to the engine.
+  * - 'library' file: 'result' will be 0.
+  * - 'meshfact' file: 'result' will be the mesh factory wrapper.
+  * - 'meshobj' file: 'result' will be the mesh wrapper.
+  * - 3ds/md2 models: 'result' will be the mesh factory wrapper.
+  * - 'portals' file: 'result' will be the portal's mesh wrapper.
+  * - 'light' file: 'result' will be the light.
+  *
+  * Returns csLoadResult.
+  * <br>
+  * Note! In case a world file is loaded this function will NOT
+  * clear the engine!
+  * <br>
+  * Note! In case a mesh factory or mesh object is loaded this function
+  * will not actually do anything if checkDupes is true and the mesh or
+  * factory is already in memory (with that name). This function will
+  * still return true in that case and set 'result' to the correct object.
+  * <br>
+  * \param fname is a VFS filename for the XML file.
+  * \param collection is 0 by default which means that all loaded objects are
+  * either added to the default collection or not added to any collection,
+  * depending on the value of the keepFlags argument.
+  * \param searchCollectionOnly is true by default which means that it will only
+  * find materials/factories/... from current collection if that is given.
+  * \param checkDupes if true then materials, textures,
+  * and mesh factories will only be loaded if they don't already exist
+  * in the entire engine (ignoring regions). By default this is false because
+  * it is very legal for different world files to have different objects
+  * with the same name. Only use checkDupes == true if you know that your
+  * objects have unique names accross all world files.
+  * \param ssource is an optional stream source for faster loading.
+  * \param override_name if this is given the the name of the loaded object
+  * will be set to that. This only works in case of meshfact, meshobj, and
+  * 3ds or md2 model.
+  * \param missingdata is an optional callback in case data is missing.
+  * The application can then provide that missing data in some other way.
+  * \param keepFlags Use these to define whether or not you wish to guarantee
+  * that all loaded resources are kept (default to KEEP_ALL). KEEP_USED is useful
+  * when you are loading from a shared library containing more resources than you
+  * actually need (a world file loading from a shared library of textures for example).
+  */
+  virtual csLoadResult Load (const char* fname, iBase* regionOrCollection = 0,
+    bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    const char* override_name = 0, iMissingLoaderData* missingdata = 0,
+    uint keepFlags = KEEP_ALL) = 0;
+
+  /**
+  * Load a file. This is a smart function that will try to recognize
+  * what kind of file it is. It recognizes the following types of
+  * files:
+  * - 'world' file: in that case 'result' will be set to the engine.
+  * - 'library' file: 'result' will be 0.
+  * - 'meshfact' file: 'result' will be the mesh factory wrapper.
+  * - 'meshobj' file: 'result' will be the mesh wrapper.
+  * - 3ds/md2 models: 'result' will be the mesh factory wrapper.
+  * - 'portals' file: 'result' will be the portal's mesh wrapper.
+  * - 'light' file: 'result' will be the light.
+  *
+  * Returns csLoadResult.
+  * <br>
+  * Note! In case a world file is loaded this function will NOT
+  * clear the engine!
+  * <br>
+  * Note! In case a mesh factory or mesh object is loaded this function
+  * will not actually do anything if checkDupes is true and the mesh or
+  * factory is already in memory (with that name). This function will
+  * still return true in that case and set 'result' to the correct object.
+  * <br>
+  * \param buffer is a buffer for the model contents.
+  * \param collection is 0 by default which means that all loaded objects are
+  * either added to the default collection or not added to any collection,
+  * depending on the value of the keepFlags argument.
+  * \param searchCollectionOnly is true by default which means that it will only
+  * find materials/factories/... from current collection if that is given.
+  * \param checkDupes if true then materials, textures,
+  * and mesh factories will only be loaded if they don't already exist
+  * in the entire engine (ignoring regions). By default this is false because
+  * it is very legal for different world files to have different objects
+  * with the same name. Only use checkDupes == true if you know that your
+  * objects have unique names accross all world files.
+  * \param ssource is an optional stream source for faster loading.
+  * \param override_name if this is given the the name of the loaded object
+  * will be set to that. This only works in case of meshfact, meshobj, and
+  * 3ds or md2 model.
+  * \param missingdata is an optional callback in case data is missing.
+  * The application can then provide that missing data in some other way.
+  * \param keepFlags Use these to define whether or not you wish to guarantee
+  * that all loaded resources are kept (default to KEEP_ALL). KEEP_USED is useful
+  * when you are loading from a shared library containing more resources than you
+  * actually need (a world file loading from a shared library of textures for example).
+  */
+  virtual csLoadResult Load (iDataBuffer* buffer, iBase* regionOrCollection = 0,
+    bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    const char* override_name = 0, iMissingLoaderData* missingdata = 0,
+    uint keepFlags = KEEP_ALL) = 0;
+
+  /**
+  * Load a node. This is a smart function that will try to recognize
+  * what kind of node it is. It recognizes the following types of
+  * nodes:
+  * - 'world' node: in that case 'result' will be set to the engine.
+  * - 'library' node: 'result' will be 0.
+  * - 'meshfact' node: 'result' will be the mesh factory wrapper.
+  * - 'meshobj' node: 'result' will be the mesh wrapper.
+  * - 'portals' file: 'result' will be the portal's mesh wrapper.
+  * - 'light' file: 'result' will be the light.
+  *
+  * Returns csLoadResult.
+  * <br>
+  * Note! In case a world node is loaded this function will NOT
+  * clear the engine!
+  * <br>
+  * Note! In case a mesh factory or mesh object is loaded this function
+  * will not actually do anything if checkDupes is true and the mesh or
+  * factory is already in memory (with that name). This function will
+  * still return true in that case and set 'result' to the correct object.
+  * <br>
+  * \param node is the node from which to read.
+  * \param collection is 0 by default which means that all loaded objects are
+  * either added to the default collection or not added to any collection,
+  * depending on the value of the keepFlags argument.
+  * \param searchCollectionOnly is true by default which means that it will only
+  * find materials/factories/... from current collection if that is given.
+  * \param checkDupes if true then materials, textures,
+  * and mesh factories will only be loaded if they don't already exist
+  * in the entire engine (ignoring regions). By default this is false because
+  * it is very legal for different world files to have different objects
+  * with the same name. Only use checkDupes == true if you know that your
+  * objects have unique names accross all world files.
+  * \param ssource is an optional stream source for faster loading.
+  * \param override_name if this is given the the name of the loaded object
+  * will be set to that. This only works in case of meshfact, meshobj, and
+  * 3ds or md2 model.
+  * \param missingdata is an optional callback in case data is missing.
+  * The application can then provide that missing data in some other way.
+  * \param keepFlags Use these to define whether or not you wish to guarantee
+  * that all loaded resources are kept (default to KEEP_ALL). KEEP_USED is useful
+  * when you are loading from a shared library containing more resources than you
+  * actually need (a world file loading from a shared library of textures for example).
+  */
+  virtual csLoadResult Load (iDocumentNode* node, iBase* regionOrCollection = 0,
+    bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    const char* override_name = 0, iMissingLoaderData* missingdata = 0,
     uint keepFlags = KEEP_ALL) = 0;
 
   /////////////////////////// Collections ///////////////////////////
@@ -417,7 +616,7 @@ struct iLoader : public virtual iBase
   virtual iTextureWrapper* LoadTextureCollection (const char *Name,
     const char *FileName, int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
     bool reg = true, bool create_material = true, bool free_image = true,
-    iCollection* collection = 0) = 0;
+    iCollection* collection = 0, uint keepFlags = KEEP_ALL) = 0;
 
   /**
   * Load a map file. If 'clearEngine' is true then the current contents
@@ -507,7 +706,7 @@ struct iLoader : public virtual iBase
   * when you are loading from a shared library containing more resources than you
   * actually need (a world file loading from a shared library of textures for example).
   */
-  virtual bool LoadLibraryFile (const char* filename, iCollection* collection = 0,
+  virtual bool LoadLibraryFileCollection (const char* filename, iCollection* collection = 0,
     bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL) = 0;
 
@@ -533,7 +732,7 @@ struct iLoader : public virtual iBase
   * when you are loading from a shared library containing more resources than you
   * actually need (a world file loading from a shared library of textures for example).
   */
-  virtual bool LoadLibrary (iDocumentNode* lib_node, iCollection* collection = 0,
+  virtual bool LoadLibraryCollection (iDocumentNode* lib_node, iCollection* collection = 0,
     bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL) = 0;
 
@@ -582,7 +781,7 @@ struct iLoader : public virtual iBase
   * when you are loading from a shared library containing more resources than you
   * actually need (a world file loading from a shared library of textures for example).
   */
-  virtual csLoadResult Load (const char* fname, iCollection* collection = 0,
+  virtual csLoadResult LoadCollection (const char* fname, iCollection* collection = 0,
     bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
     uint keepFlags = KEEP_ALL) = 0;
@@ -632,7 +831,7 @@ struct iLoader : public virtual iBase
   * when you are loading from a shared library containing more resources than you
   * actually need (a world file loading from a shared library of textures for example).
   */
-  virtual csLoadResult Load (iDataBuffer* buffer, iCollection* collection = 0,
+  virtual csLoadResult LoadCollection (iDataBuffer* buffer, iCollection* collection = 0,
     bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
     uint keepFlags = KEEP_ALL) = 0;
@@ -681,11 +880,13 @@ struct iLoader : public virtual iBase
   * when you are loading from a shared library containing more resources than you
   * actually need (a world file loading from a shared library of textures for example).
   */
-  virtual csLoadResult Load (iDocumentNode* node, iCollection* collection = 0,
+  virtual csLoadResult LoadCollection (iDocumentNode* node, iCollection* collection = 0,
     bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL) = 0;
 
   /////////////////////////// Regions ///////////////////////////
+
+#include "csutil/deprecated_warn_off.h"
 
   /**
   * Load a texture as with LoadTexture() above and register it with the
@@ -755,7 +956,7 @@ struct iLoader : public virtual iBase
     virtual bool LoadMapFileRegion (const char* filename, bool clearEngine = true,
     iRegion* region = 0, bool curRegOnly = true,
     bool checkDupes = false, iStreamSource* ssource = 0,
-    iMissingLoaderData* missingdata = 0, bool useProxyTextures = false) = 0;
+    iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL) = 0;
 
   /**
   * Load a map from the given 'world' node. If 'clearEngine' is true then
@@ -792,7 +993,7 @@ struct iLoader : public virtual iBase
     virtual bool LoadMapRegion (iDocumentNode* world_node, bool clearEngine = true,
     iRegion* region = 0, bool curRegOnly = true,
     bool checkDupes = false, iStreamSource* ssource = 0,
-    iMissingLoaderData* missingdata = 0, bool useProxyTextures = false) = 0;
+    iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL) = 0;
 
   /**
   * Load library from a VFS file
@@ -816,10 +1017,10 @@ struct iLoader : public virtual iBase
   * \deprecated Deprecated in 1.3. Use the iCollections instead.
   */
   CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
-    virtual bool LoadLibraryFile (const char* filename, iRegion* region,
+    virtual bool LoadLibraryFileRegion (const char* filename, iRegion* region,
     bool curRegOnly = true, bool checkDupes = false,
     iStreamSource* ssource = 0,
-    iMissingLoaderData* missingdata = 0, bool useProxyTextures = false) = 0;
+    iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL) = 0;
 
   /**
   * Load library from a 'library' node.
@@ -843,10 +1044,10 @@ struct iLoader : public virtual iBase
   * \deprecated Deprecated in 1.3. Use the iCollections instead.
   */
   CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
-    virtual bool LoadLibrary (iDocumentNode* lib_node, iRegion* region,
+    virtual bool LoadLibraryRegion (iDocumentNode* lib_node, iRegion* region,
     bool curRegOnly = true, bool checkDupes = false,
     iStreamSource* ssource = 0,
-    iMissingLoaderData* missingdata = 0, bool useProxyTextures = false) = 0;
+    iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL) = 0;
 
   /**
   * Load a file. This is a smart function that will try to recognize
@@ -893,10 +1094,10 @@ struct iLoader : public virtual iBase
   * \deprecated Deprecated in 1.3. Use the iCollections instead.
   */
   CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
-    virtual csLoadResult Load (const char* fname, iRegion* region,
+    virtual csLoadResult LoadRegion (const char* fname, iRegion* region,
     bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
-    bool useProxyTextures = false) = 0;
+    uint keepFlags = KEEP_ALL) = 0;
 
   /**
   * Load a file. This is a smart function that will try to recognize
@@ -943,10 +1144,10 @@ struct iLoader : public virtual iBase
   * \deprecated Deprecated in 1.3. Use the iCollections instead.
   */
   CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
-    virtual csLoadResult Load (iDataBuffer* buffer, iRegion* region,
+    virtual csLoadResult LoadRegion (iDataBuffer* buffer, iRegion* region,
     bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
-    bool useProxyTextures = false) = 0;
+    uint keepFlags = KEEP_ALL) = 0;
 
   /**
   * Load a node. This is a smart function that will try to recognize
@@ -992,10 +1193,10 @@ struct iLoader : public virtual iBase
   * \deprecated Deprecated in 1.3. Use the iCollections instead.
   */
   CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
-    virtual csLoadResult Load (iDocumentNode* node, iRegion* region,
+    virtual csLoadResult LoadRegion (iDocumentNode* node, iRegion* region,
     bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
-    bool useProxyTextures = false) = 0;
+    uint keepFlags = KEEP_ALL) = 0;
 
   /**
   * Load a file.
@@ -1006,7 +1207,7 @@ struct iLoader : public virtual iBase
     virtual bool Load (const char* fname, iBase*& result, iRegion* region = 0,
     bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
-    bool useProxyTextures = false) = 0;
+    uint keepFlags = KEEP_ALL) = 0;
 
   /**
   * Load a file.
@@ -1017,7 +1218,7 @@ struct iLoader : public virtual iBase
     virtual bool Load (iDataBuffer* buffer, iBase*& result, iRegion* region = 0,
     bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
-    bool useProxyTextures = false) = 0;
+    uint keepFlags = KEEP_ALL) = 0;
 
   /**
   * Load a node.
@@ -1028,7 +1229,9 @@ struct iLoader : public virtual iBase
     virtual bool Load (iDocumentNode* node, iBase*& result, iRegion* region = 0,
     bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
-    bool useProxyTextures = false) = 0;
+    uint keepFlags = KEEP_ALL) = 0;
+
+#include "csutil/deprecated_warn_on.h"
 
   /**
   * Set whether to load each file into a separate region.

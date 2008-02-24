@@ -22,6 +22,8 @@
 #include "iutil/object.h"
 #include "iengine/region.h"
 
+#include "csutil/deprecated_warn_off.h"
+
 namespace CS
 {
   namespace Utility
@@ -310,3 +312,5 @@ namespace CS
     }
   }
 }
+
+#include "csutil/deprecated_warn_on.h"

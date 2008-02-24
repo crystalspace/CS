@@ -26,6 +26,7 @@
 #include "csgeom/trimesh.h"
 
 #include "cstool/collider.h"
+#include "iengine/collection.h"
 #include "iengine/camera.h"
 #include "iengine/engine.h"
 #include "iengine/mesh.h"
@@ -297,7 +298,40 @@ csColliderWrapper* csColliderHelper::InitializeCollisionWrapper (
   return cw;
 }
 
-void csColliderHelper::InitializeCollisionWrappers (iCollideSystem* colsys,
+#include "csutil/deprecated_warn_off.h"
+
+void csColliderHelper::InitializeCollisionWrappers(iCollideSystem* colsys,
+  	iEngine* engine, iBase* base)
+{
+  csRef<iRegion> region (scfQueryInterfaceSafe<iRegion>(base));
+  if(region)
+  {
+    return InitializeCollisionWrappersRegion(colsys, engine, region);
+  }
+  else
+  {
+    csRef<iCollection> collection (scfQueryInterfaceSafe<iCollection>(base));
+    return InitializeCollisionWrappersCollection(colsys, engine, collection);
+  }
+}
+
+void csColliderHelper::InitializeCollisionWrappersCollection(iCollideSystem* colsys,
+  	iEngine* engine, iCollection* collection)
+{
+  // Initialize all mesh objects for collision detection.
+  int i;
+  iMeshList* meshes = engine->GetMeshes ();
+  for (i = 0 ; i < meshes->GetCount () ; i++)
+  {
+    iMeshWrapper* sp = meshes->Get (i);
+    if (collection && collection->IsParentOf(sp->QueryObject ()))
+    {
+      InitializeCollisionWrapper (colsys, sp);
+    }
+  }
+}
+
+void csColliderHelper::InitializeCollisionWrappersRegion (iCollideSystem* colsys,
   	iEngine* engine, iRegion* region)
 {
   // Initialize all mesh objects for collision detection.
@@ -310,6 +344,8 @@ void csColliderHelper::InitializeCollisionWrappers (iCollideSystem* colsys,
     InitializeCollisionWrapper (colsys, sp);
   }
 }
+
+#include "csutil/deprecated_warn_on.h"
 
 bool csColliderHelper::CollideArray (
 	iCollideSystem* colsys,

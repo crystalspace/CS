@@ -67,12 +67,68 @@ public:
   inline void ReleaseAllObjects() { ObjRemoveAll(); }
 
   /**
-   * Returns a pointer to the object if inside the collection.
+   * Returns true if this collection is the parent of the object passed.
    */
-  template<class Type>
-  inline csPtr<Type> Contains(const char* name)
+  inline bool IsParentOf(iObject* obj) { return this == obj->GetObjectParent(); }
+
+  /**
+   * Looks to see if this collection contains the sector. If so,
+   * it returns the sector.
+   */
+  inline iSector* FindSector(const char *name)
   {
-      return CS::GetNamedChildObject<Type>(this, name);
+    csRef<iSector> s (CS::GetNamedChildObject<iSector>(this, name));
+    return s;
+  }
+
+  /**
+   * Looks to see if this collection contains the sector. If so,
+   * it returns the sector.
+   */
+  inline iMeshWrapper* FindMeshObject(const char *name)
+  {
+    csRef<iMeshWrapper> mw (CS::GetNamedChildObject<iMeshWrapper>(this, name));
+    return mw;
+  }
+
+  /**
+   * Looks to see if this collection contains the mesh factory. If so,
+   * it returns the mesh factory.
+   */
+  inline iMeshFactoryWrapper* FindMeshFactory (const char *name)
+  {
+    csRef<iMeshFactoryWrapper> mfw (CS::GetNamedChildObject<iMeshFactoryWrapper>(this, name));
+    return mfw;
+  }
+
+  /**
+   * Looks to see if this collection contains the texture. If so,
+   * it returns the texture.
+   */
+  inline iTextureWrapper* FindTexture(const char *name)
+  {
+    csRef<iTextureWrapper> tw (CS::GetNamedChildObject<iTextureWrapper>(this, name));
+    return tw;
+  }
+
+  /**
+   * Looks to see if this collection contains the material. If so,
+   * it returns the material.
+   */
+  inline iMaterialWrapper* FindMaterial(const char *name)
+  {
+    csRef<iMaterialWrapper> mw (CS::GetNamedChildObject<iMaterialWrapper>(this, name));
+    return mw;
+  }
+
+  /**
+   * Looks to see if this collection contains the shader. If so,
+   * it returns the shader.
+   */
+  inline iShader* FindShader (const char *name)
+  {
+    csRef<iShader> s (CS::GetNamedChildObject<iShader>(this, name));
+    return s;
   }
 };
 

@@ -21,13 +21,19 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "csutil/scf.h"
 
+struct iMaterialWrapper;
+struct iMeshWrapper;
+struct iMeshFactoryWrapper;
 struct iObject;
+struct iSector;
+struct iTextureWrapper;
+struct iShader;
 
 /**
  * A collection is used to store related objects in a simple structure
  * to guarentee that they won't be freed by the engine. The engine has
  * a default collection where all iObjects are placed unless explicitly
- * placed in another collectino.
+ * placed in another collection.
  */
 
 struct iCollection : public virtual iBase
@@ -55,10 +61,45 @@ struct iCollection : public virtual iBase
   virtual void ReleaseAllObjects() = 0;
 
   /**
-   * Returns a pointer to the object if inside the collection.
+   * Returns true if this collection is the parent of the object passed.
    */
-  template<class Type>
-  csPtr<Type> Contains(const char* name) = 0;
+  virtual bool IsParentOf(iObject* obj) = 0;
+
+  /**
+   * Looks to see if this collection contains the sector. If so,
+   * it returns the sector.
+   */
+  virtual iSector* FindSector(const char *name) = 0;
+  
+  /**
+   * Looks to see if this collection contains the sector. If so,
+   * it returns the sector.
+   */
+  virtual iMeshWrapper* FindMeshObject(const char *name) = 0;
+
+  /**
+   * Looks to see if this collection contains the mesh factory. If so,
+   * it returns the mesh factory.
+   */
+  virtual iMeshFactoryWrapper* FindMeshFactory (const char *name) = 0;
+
+  /**
+   * Looks to see if this collection contains the texture. If so,
+   * it returns the texture.
+   */
+  virtual iTextureWrapper* FindTexture(const char *name) = 0;
+
+  /**
+   * Looks to see if this collection contains the material. If so,
+   * it returns the material.
+   */
+  virtual iMaterialWrapper* FindMaterial(const char *name) = 0;
+
+  /**
+   * Looks to see if this collection contains the shader. If so,
+   * it returns the shader.
+   */
+  virtual iShader* FindShader(const char *name) = 0;
 };
 
 #endif // __IENGINE_COLLECTION_H__

@@ -43,6 +43,7 @@ struct iCamera;
 struct iCameraPosition;
 struct iCameraPositionList;
 struct iClipper2D;
+struct iCollection;
 struct iDataBuffer;
 struct iFrustumView;
 struct iLight;
@@ -173,7 +174,7 @@ struct iEngineSectorCallback : public virtual iBase
  */
 struct iEngine : public virtual iBase
 {
-  SCF_INTERFACE(iEngine,2,1,1);
+  SCF_INTERFACE(iEngine, 3, 0, 0);
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;
@@ -437,8 +438,16 @@ struct iEngine : public virtual iBase
    * \param name the engine name of the desired material
    * \param region if specified, search only this region (also see note above)
    */
+
   virtual iMaterialWrapper* FindMaterial (const char* name,
-  	iRegion* region = 0) = 0;
+  	iBase* base = 0) = 0;
+
+  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
+  virtual iMaterialWrapper* FindMaterialRegion (const char* name,
+  	iRegion* region) = 0;
+
+  virtual iMaterialWrapper* FindMaterialCollection (const char* name,
+  	iCollection* collection = 0) = 0;
 
   /** @} */
   
@@ -499,7 +508,14 @@ struct iEngine : public virtual iBase
    * \param region if specified, search only this region (also see note above)
    */
   virtual iTextureWrapper* FindTexture (const char* name,
-  	iRegion* region = 0) = 0;
+  	iBase* base = 0) = 0;
+
+  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
+  virtual iTextureWrapper* FindTextureRegion (const char* name,
+  	iRegion* region) = 0;
+
+  virtual iTextureWrapper* FindTextureCollection (const char* name,
+  	iCollection* collection = 0) = 0;
 
   /** @} */
   
@@ -550,7 +566,10 @@ struct iEngine : public virtual iBase
    * \param region only iterate over the lights in this region
    * (otherwise iterate over all lights)
    */
-  virtual csPtr<iLightIterator> GetLightIterator (iRegion* region = 0) = 0;
+  virtual csPtr<iLightIterator> GetLightIterator (iBase* base = 0) = 0;
+  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
+  virtual csPtr<iLightIterator> GetLightIteratorRegion (iRegion* region) = 0;
+  virtual csPtr<iLightIterator> GetLightIteratorCollection (iCollection* collection = 0) = 0;
 
   /**
    * Remove a light and update all lightmaps. This function only works
@@ -627,9 +646,28 @@ struct iEngine : public virtual iBase
    * doesn't exist. In this case the region parameter is ignored.
    * \param name the engine name of the desired sector
    * \param region if specified, search only this region (also see note above)
-   */
+   * \deprecated Deprecated in 1.3. Use the iCollections instead.
+  */
   virtual iSector* FindSector (const char* name,
-  	iRegion* region = 0) = 0;
+  	iBase* base = 0) = 0;
+  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
+  virtual iSector* FindSectorRegion (const char* name,
+  	iRegion* region) = 0;
+
+  /**
+   * Find the given sector. The name can be a normal
+   * name. In that case this function will look in all collection
+   * except if collection is not 0 in which case it will only
+   * look in that collection.
+   * If the name is specified as 'collectionname/objectname' then
+   * this function will only look in the specified region and return
+   * 0 if that region doesn't contain the object or the collection
+   * doesn't exist. In this case the collection parameter is ignored.
+   * \param name the engine name of the desired sector
+   * \param collection if specified, search only this collection (also see note above)
+   */
+  virtual iSector* FindSectorCollection (const char* name,
+  	iCollection* collection = 0) = 0;
 
   /**
    * This routine returns an iterator to iterate over all nearby sectors.
@@ -842,8 +880,16 @@ struct iEngine : public virtual iBase
    * \param name the engine name of the desired mesh
    * \param region if specified, search only this region (also see note above)
    */
+
   virtual iMeshWrapper* FindMeshObject (const char* name,
-  	iRegion* region = 0) = 0;
+  	iBase* base = 0) = 0;
+
+  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
+  virtual iMeshWrapper* FindMeshObjectRegion (const char* name,
+  	iRegion* region) = 0;
+
+  virtual iMeshWrapper* FindMeshObjectCollection (const char* name,
+  	iCollection* collection = 0) = 0;
 
   /**
    * Sometimes a mesh wants to destruct itself (for example
@@ -915,7 +961,14 @@ struct iEngine : public virtual iBase
    * \param region if specified, search only this region (also see note above)
    */
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name,
-  	iRegion* region = 0) = 0;
+  	iBase* base = 0) = 0;
+
+  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
+  virtual iMeshFactoryWrapper* FindMeshFactoryRegion (const char* name,
+  	iRegion* region) = 0;
+
+  virtual iMeshFactoryWrapper* FindMeshFactoryCollection (const char* name,
+  	iCollection* collection = 0) = 0;
 
   /// Get the list of mesh factories
   virtual iMeshFactoryList* GetMeshFactories () = 0;
@@ -935,6 +988,19 @@ struct iEngine : public virtual iBase
   virtual iRegion* CreateRegion (const char* name) = 0;
   /// Get the list of all regions
   virtual iRegionList* GetRegions () = 0;
+
+  /**\name Collection handling
+   * @{ */
+
+  virtual iCollection* CreateCollection(const char* name) = 0;
+
+  virtual iCollection* GetCollection(const char* name) = 0;
+
+  virtual iCollection* GetDefaultCollection() = 0;
+
+  virtual void RemoveCollection(const char* name) = 0;
+
+  virtual void RemoveAllCollections() = 0;
 
   /** @} */
   
@@ -1104,10 +1170,21 @@ struct iEngine : public virtual iBase
    * on them. By doing this the level will run smoother if you walk
    * through it because all meshes will have had a chance to update
    * caches and stuff.
+   * \param collection is an optional collection. If given then only objects
+   *        in that collection will be precached.
+   */
+  virtual void PrecacheDraw (iBase* base = 0) = 0;
+  virtual void PrecacheDrawCollection (iCollection* collection = 0) = 0;
+
+  /**
+   * This function precaches all meshes by calling GetRenderMeshes()
+   * on them. By doing this the level will run smoother if you walk
+   * through it because all meshes will have had a chance to update
+   * caches and stuff.
    * \param region is an optional region. If given then only objects
    *        in that region will be precached.
    */
-  virtual void PrecacheDraw (iRegion* region = 0) = 0;
+  virtual void PrecacheDrawRegion (iRegion* region) = 0;
 
   /**
    * Draw the 3D world given a camera and a clipper. Note that
@@ -1194,7 +1271,7 @@ struct iEngine : public virtual iBase
    * Assign to a csRef.
    */
   virtual csPtr<iLoaderContext> CreateLoaderContext (
-  	iRegion* region = 0, bool curRegOnly = true) = 0;
+  	iBase* base = 0, bool curRegOnly = true) = 0;
 
   /** @} */
   

@@ -121,7 +121,7 @@ class csSequenceWrapper : public scfImplementationExt2<csSequenceWrapper,
 {
 private:
   csRef<iSequence> sequence;
-  csEngineSequenceManager* eseqmgr;
+  csRef<csEngineSequenceManager> eseqmgr;
   csRef<csEngineSequenceParameters> params;
   uint sequence_id;
 
