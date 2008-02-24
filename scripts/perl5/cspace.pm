@@ -7413,6 +7413,205 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iSequenceOperation ##############
+
+package cspace::iSequenceOperation;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*Do = *cspacec::iSequenceOperation_Do;
+*CleanupSequences = *cspacec::iSequenceOperation_CleanupSequences;
+*scfGetVersion = *cspacec::iSequenceOperation_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSequenceOperation($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSequenceCondition ##############
+
+package cspace::iSequenceCondition;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*Condition = *cspacec::iSequenceCondition_Condition;
+*scfGetVersion = *cspacec::iSequenceCondition_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSequenceCondition($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csSequenceOp ##############
+
+package cspace::csSequenceOp;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_next_get = *cspacec::csSequenceOp_next_get;
+*swig_next_set = *cspacec::csSequenceOp_next_set;
+*swig_prev_get = *cspacec::csSequenceOp_prev_get;
+*swig_prev_set = *cspacec::csSequenceOp_prev_set;
+*swig_time_get = *cspacec::csSequenceOp_time_get;
+*swig_time_set = *cspacec::csSequenceOp_time_set;
+*swig_params_get = *cspacec::csSequenceOp_params_get;
+*swig_params_set = *cspacec::csSequenceOp_params_set;
+*swig_operation_get = *cspacec::csSequenceOp_operation_get;
+*swig_operation_set = *cspacec::csSequenceOp_operation_set;
+*swig_sequence_id_get = *cspacec::csSequenceOp_sequence_id_get;
+*swig_sequence_id_set = *cspacec::csSequenceOp_sequence_id_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csSequenceOp(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csSequenceOp($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSequence ##############
+
+package cspace::iSequence;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*GetFirstSequence = *cspacec::iSequence_GetFirstSequence;
+*AddOperation = *cspacec::iSequence_AddOperation;
+*AddRunSequence = *cspacec::iSequence_AddRunSequence;
+*AddCondition = *cspacec::iSequence_AddCondition;
+*AddLoop = *cspacec::iSequence_AddLoop;
+*Clear = *cspacec::iSequence_Clear;
+*IsEmpty = *cspacec::iSequence_IsEmpty;
+*scfGetVersion = *cspacec::iSequence_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSequence($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSequenceManager ##############
+
+package cspace::iSequenceManager;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*Clear = *cspacec::iSequenceManager_Clear;
+*IsEmpty = *cspacec::iSequenceManager_IsEmpty;
+*Suspend = *cspacec::iSequenceManager_Suspend;
+*Resume = *cspacec::iSequenceManager_Resume;
+*IsSuspended = *cspacec::iSequenceManager_IsSuspended;
+*TimeWarp = *cspacec::iSequenceManager_TimeWarp;
+*GetMainTime = *cspacec::iSequenceManager_GetMainTime;
+*GetDeltaTime = *cspacec::iSequenceManager_GetDeltaTime;
+*NewSequence = *cspacec::iSequenceManager_NewSequence;
+*RunSequence = *cspacec::iSequenceManager_RunSequence;
+*DestroySequenceOperations = *cspacec::iSequenceManager_DestroySequenceOperations;
+*GetUniqueID = *cspacec::iSequenceManager_GetUniqueID;
+*scfGetVersion = *cspacec::iSequenceManager_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSequenceManager($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iScriptValue ##############
 
 package cspace::iScriptValue;
@@ -11841,6 +12040,89 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         cspacec::delete_csBox3($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csOBB ##############
+
+package cspace::csOBB;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::csBox3 cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csOBB(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*AddBoundingVertex = *cspacec::csOBB_AddBoundingVertex;
+*GetCorner = *cspacec::csOBB_GetCorner;
+*GetMatrix = *cspacec::csOBB_GetMatrix;
+*Volume = *cspacec::csOBB_Volume;
+*FindOBB = *cspacec::csOBB_FindOBB;
+*FindOBBAccurate = *cspacec::csOBB_FindOBBAccurate;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csOBB($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csOBBFrozen ##############
+
+package cspace::csOBBFrozen;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*Copy = *cspacec::csOBBFrozen_Copy;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csOBBFrozen(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*GetCorner = *cspacec::csOBBFrozen_GetCorner;
+*ProjectOBB = *cspacec::csOBBFrozen_ProjectOBB;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csOBBFrozen($self);
         delete $OWNER{$self};
     }
 }

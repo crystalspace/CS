@@ -1103,6 +1103,90 @@ iMapNode_swigregister = _ivaria.iMapNode_swigregister
 iMapNode_swigregister(iMapNode)
 iMapNode_scfGetVersion = _ivaria.iMapNode_scfGetVersion
 
+class iSequenceOperation(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def Do(*args): return _ivaria.iSequenceOperation_Do(*args)
+    def CleanupSequences(*args): return _ivaria.iSequenceOperation_CleanupSequences(*args)
+    scfGetVersion = staticmethod(_ivaria.iSequenceOperation_scfGetVersion)
+    __swig_destroy__ = _ivaria.delete_iSequenceOperation
+    __del__ = lambda self : None;
+iSequenceOperation_swigregister = _ivaria.iSequenceOperation_swigregister
+iSequenceOperation_swigregister(iSequenceOperation)
+iSequenceOperation_scfGetVersion = _ivaria.iSequenceOperation_scfGetVersion
+
+class iSequenceCondition(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def Condition(*args): return _ivaria.iSequenceCondition_Condition(*args)
+    scfGetVersion = staticmethod(_ivaria.iSequenceCondition_scfGetVersion)
+    __swig_destroy__ = _ivaria.delete_iSequenceCondition
+    __del__ = lambda self : None;
+iSequenceCondition_swigregister = _ivaria.iSequenceCondition_swigregister
+iSequenceCondition_swigregister(iSequenceCondition)
+iSequenceCondition_scfGetVersion = _ivaria.iSequenceCondition_scfGetVersion
+
+class csSequenceOp(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    next = _swig_property(_ivaria.csSequenceOp_next_get, _ivaria.csSequenceOp_next_set)
+    prev = _swig_property(_ivaria.csSequenceOp_prev_get, _ivaria.csSequenceOp_prev_set)
+    time = _swig_property(_ivaria.csSequenceOp_time_get, _ivaria.csSequenceOp_time_set)
+    params = _swig_property(_ivaria.csSequenceOp_params_get, _ivaria.csSequenceOp_params_set)
+    operation = _swig_property(_ivaria.csSequenceOp_operation_get, _ivaria.csSequenceOp_operation_set)
+    sequence_id = _swig_property(_ivaria.csSequenceOp_sequence_id_get, _ivaria.csSequenceOp_sequence_id_set)
+    def __init__(self, *args): 
+        this = _ivaria.new_csSequenceOp(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _ivaria.delete_csSequenceOp
+    __del__ = lambda self : None;
+csSequenceOp_swigregister = _ivaria.csSequenceOp_swigregister
+csSequenceOp_swigregister(csSequenceOp)
+
+class iSequence(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetFirstSequence(*args): return _ivaria.iSequence_GetFirstSequence(*args)
+    def AddOperation(*args): return _ivaria.iSequence_AddOperation(*args)
+    def AddRunSequence(*args): return _ivaria.iSequence_AddRunSequence(*args)
+    def AddCondition(*args): return _ivaria.iSequence_AddCondition(*args)
+    def AddLoop(*args): return _ivaria.iSequence_AddLoop(*args)
+    def Clear(*args): return _ivaria.iSequence_Clear(*args)
+    def IsEmpty(*args): return _ivaria.iSequence_IsEmpty(*args)
+    scfGetVersion = staticmethod(_ivaria.iSequence_scfGetVersion)
+    __swig_destroy__ = _ivaria.delete_iSequence
+    __del__ = lambda self : None;
+iSequence_swigregister = _ivaria.iSequence_swigregister
+iSequence_swigregister(iSequence)
+iSequence_scfGetVersion = _ivaria.iSequence_scfGetVersion
+
+class iSequenceManager(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def Clear(*args): return _ivaria.iSequenceManager_Clear(*args)
+    def IsEmpty(*args): return _ivaria.iSequenceManager_IsEmpty(*args)
+    def Suspend(*args): return _ivaria.iSequenceManager_Suspend(*args)
+    def Resume(*args): return _ivaria.iSequenceManager_Resume(*args)
+    def IsSuspended(*args): return _ivaria.iSequenceManager_IsSuspended(*args)
+    def TimeWarp(*args): return _ivaria.iSequenceManager_TimeWarp(*args)
+    def GetMainTime(*args): return _ivaria.iSequenceManager_GetMainTime(*args)
+    def GetDeltaTime(*args): return _ivaria.iSequenceManager_GetDeltaTime(*args)
+    def NewSequence(*args): return _ivaria.iSequenceManager_NewSequence(*args)
+    def RunSequence(*args): return _ivaria.iSequenceManager_RunSequence(*args)
+    def DestroySequenceOperations(*args): return _ivaria.iSequenceManager_DestroySequenceOperations(*args)
+    def GetUniqueID(*args): return _ivaria.iSequenceManager_GetUniqueID(*args)
+    scfGetVersion = staticmethod(_ivaria.iSequenceManager_scfGetVersion)
+    __swig_destroy__ = _ivaria.delete_iSequenceManager
+    __del__ = lambda self : None;
+iSequenceManager_swigregister = _ivaria.iSequenceManager_swigregister
+iSequenceManager_swigregister(iSequenceManager)
+iSequenceManager_scfGetVersion = _ivaria.iSequenceManager_scfGetVersion
+
 class iScriptValue(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
