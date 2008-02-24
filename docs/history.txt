@@ -11,6 +11,7 @@ chronological order.
 	  should be able to replace iRegion in the state that it's in.
 	  The next job is to make the changes needed elsewhere to gain
 	  the benefits that collections bring.
+	- Mike Gist added csWeakRefArrayObject.
 22-Feb-2008
 	- Mike Gist merged iLoaderCollection with iLoader, and formatted
 	  iLoader better.
