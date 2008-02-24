@@ -130,6 +130,16 @@ public:
     csRef<iShader> s (CS::GetNamedChildObject<iShader>(this, name));
     return s;
   }
+
+  /**
+   * Looks to see if this collection contains the camera position. If so,
+   * it returns the camera position.
+   */
+  inline iCameraPosition* FindCameraPosition(const char *name)
+  {
+    csRef<iCameraPosition> cp (CS::GetNamedChildObject<iCameraPosition>(this, name));
+    return cp;
+  }
 };
 
 #endif // __COLLECTION_H__

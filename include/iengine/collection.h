@@ -21,6 +21,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "csutil/scf.h"
 
+struct iCameraPosition;
 struct iMaterialWrapper;
 struct iMeshWrapper;
 struct iMeshFactoryWrapper;
@@ -100,6 +101,12 @@ struct iCollection : public virtual iBase
    * it returns the shader.
    */
   virtual iShader* FindShader(const char *name) = 0;
+
+  /**
+   * Looks to see if this collection contains the camera position. If so,
+   * it returns the camera position.
+   */
+  virtual iCameraPosition* FindCameraPosition(const char *name) = 0;
 };
 
 #endif // __IENGINE_COLLECTION_H__

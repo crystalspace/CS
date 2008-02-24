@@ -28,6 +28,7 @@
 
 #include "csextern.h"
 #include "csutil/refarr.h"
+#include "csutil/weakrefarr.h"
 #include "iutil/object.h"
 
 /**\file 

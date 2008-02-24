@@ -2127,6 +2127,21 @@ iMeshFactoryWrapper* csEngine::FindMeshFactoryCollection (const char* name,
 }
 
 iCameraPosition* csEngine::FindCameraPosition (const char* name,
+	iBase* base)
+{
+  csRef<iRegion> region (scfQueryInterfaceSafe<iRegion>(base));
+  if(region)
+  {
+    return FindCameraPositionRegion(name, region);
+  }
+  else
+  {
+    csRef<iCollection> collection (scfQueryInterfaceSafe<iCollection>(base));
+    return FindCameraPositionCollection(name, collection);
+  }
+}
+
+iCameraPosition* csEngine::FindCameraPositionRegion (const char* name,
 	iRegion* reg)
 {
   iRegion* region;
@@ -2139,6 +2154,24 @@ iCameraPosition* csEngine::FindCameraPosition (const char* name,
     campos = region->FindCameraPosition (n);
   else if (!global && reg)
     campos = reg->FindCameraPosition (n);
+  else
+    campos = GetCameraPositions ()->FindByName (n);
+  return campos;
+}
+
+iCameraPosition* csEngine::FindCameraPositionCollection (const char* name,
+	iCollection* col)
+{
+  iCollection* collection;
+  bool global;
+  char* n = SplitCollectionName (name, collection, global);
+  if (!n) return 0;
+
+  iCameraPosition* campos;
+  if (collection)
+    campos = collection->FindCameraPosition (n);
+  else if (!global && col)
+    campos = col->FindCameraPosition (n);
   else
     campos = GetCameraPositions ()->FindByName (n);
   return campos;

@@ -32,6 +32,7 @@
 
 #include "csgeom/vector3.h"
 
+#include "iengine/collection.h"
 #include "iengine/light.h"
 
 class csBox3;
@@ -43,7 +44,6 @@ struct iCamera;
 struct iCameraPosition;
 struct iCameraPositionList;
 struct iClipper2D;
-struct iCollection;
 struct iDataBuffer;
 struct iFrustumView;
 struct iLight;
@@ -428,15 +428,15 @@ struct iEngine : public virtual iBase
 
   /**
    * Find the given material. The name can be a normal
-   * name. In that case this function will look in all regions
-   * except if region is not 0 in which case it will only
-   * look in that region.
-   * If the name is specified as 'regionname/objectname' then
-   * this function will only look in the specified region and return
-   * 0 if that region doesn't contain the object or the region
-   * doesn't exist. In this case the region parameter is ignored.
+   * name. In that case this function will look in all collection
+   * except if collection is not 0 in which case it will only
+   * look in that collection.
+   * If the name is specified as 'collectionname/objectname' then
+   * this function will only look in the specified collection and return
+   * 0 if that collection doesn't contain the object or the collection
+   * doesn't exist. In this case the collection parameter is ignored.
    * \param name the engine name of the desired material
-   * \param region if specified, search only this region (also see note above)
+   * \param collection if specified, search only this collection (also see note above)
    */
 
   virtual iMaterialWrapper* FindMaterial (const char* name,
@@ -497,15 +497,15 @@ struct iEngine : public virtual iBase
 
   /**
    * Find the given texture. The name can be a normal
-   * name. In that case this function will look in all regions
-   * except if region is not 0 in which case it will only
-   * look in that region.
-   * If the name is specified as 'regionname/objectname' then
-   * this function will only look in the specified region and return
-   * 0 if that region doesn't contain the object or the region
-   * doesn't exist. In this case the region parameter is ignored.
+   * name. In that case this function will look in all collections
+   * except if collection is not 0 in which case it will only
+   * look in that collection.
+   * If the name is specified as 'collectionname/objectname' then
+   * this function will only look in the specified collection and return
+   * 0 if that collection doesn't contain the object or the collection
+   * doesn't exist. In this case the collection parameter is ignored.
    * \param name the engine name of the desired texture
-   * \param region if specified, search only this region (also see note above)
+   * \param collection if specified, search only this collection (also see note above)
    */
   virtual iTextureWrapper* FindTexture (const char* name,
   	iBase* base = 0) = 0;
@@ -563,7 +563,7 @@ struct iEngine : public virtual iBase
   /**
    * Create an iterator to iterate over all static lights of the engine.
    * Assign to a csRef.
-   * \param region only iterate over the lights in this region
+   * \param collection only iterate over the lights in this collection
    * (otherwise iterate over all lights)
    */
   virtual csPtr<iLightIterator> GetLightIterator (iBase* base = 0) = 0;
@@ -637,25 +637,6 @@ struct iEngine : public virtual iBase
 
   /**
    * Find the given sector. The name can be a normal
-   * name. In that case this function will look in all regions
-   * except if region is not 0 in which case it will only
-   * look in that region.
-   * If the name is specified as 'regionname/objectname' then
-   * this function will only look in the specified region and return
-   * 0 if that region doesn't contain the object or the region
-   * doesn't exist. In this case the region parameter is ignored.
-   * \param name the engine name of the desired sector
-   * \param region if specified, search only this region (also see note above)
-   * \deprecated Deprecated in 1.3. Use the iCollections instead.
-  */
-  virtual iSector* FindSector (const char* name,
-  	iBase* base = 0) = 0;
-  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
-  virtual iSector* FindSectorRegion (const char* name,
-  	iRegion* region) = 0;
-
-  /**
-   * Find the given sector. The name can be a normal
    * name. In that case this function will look in all collection
    * except if collection is not 0 in which case it will only
    * look in that collection.
@@ -666,6 +647,11 @@ struct iEngine : public virtual iBase
    * \param name the engine name of the desired sector
    * \param collection if specified, search only this collection (also see note above)
    */
+  virtual iSector* FindSector (const char* name,
+  	iBase* base = 0) = 0;
+  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
+  virtual iSector* FindSectorRegion (const char* name,
+  	iRegion* region) = 0;
   virtual iSector* FindSectorCollection (const char* name,
   	iCollection* collection = 0) = 0;
 
@@ -870,15 +856,15 @@ struct iEngine : public virtual iBase
 
   /**
    * Find the given mesh object. The name can be a normal
-   * name. In that case this function will look in all regions
-   * except if region is not 0 in which case it will only
-   * look in that region.
-   * If the name is specified as 'regionname/objectname' then
-   * this function will only look in the specified region and return
-   * 0 if that region doesn't contain the object or the region
-   * doesn't exist. In this case the region parameter is ignored.
+   * name. In that case this function will look in all collections
+   * except if collection is not 0 in which case it will only
+   * look in that collection.
+   * If the name is specified as 'collectionname/objectname' then
+   * this function will only look in the specified collection and return
+   * 0 if that collection doesn't contain the object or the collection
+   * doesn't exist. In this case the collection parameter is ignored.
    * \param name the engine name of the desired mesh
-   * \param region if specified, search only this region (also see note above)
+   * \param collection if specified, search only this collection (also see note above)
    */
 
   virtual iMeshWrapper* FindMeshObject (const char* name,
@@ -950,15 +936,15 @@ struct iEngine : public virtual iBase
 
   /**
    * Find the given mesh factory. The name can be a normal
-   * name. In that case this function will look in all regions
-   * except if region is not 0 in which case it will only
-   * look in that region.
-   * If the name is specified as 'regionname/objectname' then
-   * this function will only look in the specified region and return
-   * 0 if that region doesn't contain the object or the region
-   * doesn't exist. In this case the region parameter is ignored.
+   * name. In that case this function will look in all collections
+   * except if collection is not 0 in which case it will only
+   * look in that collection.
+   * If the name is specified as 'collectionname/objectname' then
+   * this function will only look in the specified collection and return
+   * 0 if that collection doesn't contain the object or the collection
+   * doesn't exist. In this case the collection parameter is ignored.
    * \param name the engine name of the desired mesh factory
-   * \param region if specified, search only this region (also see note above)
+   * \param collection if specified, search only this collection (also see note above)
    */
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name,
   	iBase* base = 0) = 0;
@@ -1015,18 +1001,26 @@ struct iEngine : public virtual iBase
 
   /**
    * Find the given camera position. The name can be a normal
-   * name. In that case this function will look in all regions
-   * except if region is not 0 in which case it will only
-   * look in that region.
-   * If the name is specified as 'regionname/objectname' then
-   * this function will only look in the specified region and return
-   * 0 if that region doesn't contain the object or the region
-   * doesn't exist. In this case the region parameter is ignored.
+   * name. In that case this function will look in all collection
+   * except if collection is not 0 in which case it will only
+   * look in that collection.
+   * If the name is specified as 'collectionname/objectname' then
+   * this function will only look in the specified collection and return
+   * 0 if that collection doesn't contain the object or the collection
+   * doesn't exist. In this case the collection parameter is ignored.
    * \param name the engine name of the desired camera position
-   * \param region if specified, search only this region (also see note above)
+   * \param collection if specified, search only this collection (also see note above)
    */
+
   virtual iCameraPosition* FindCameraPosition (const char* name,
-  	iRegion* region = 0) = 0;
+    iBase* base = 0) = 0;
+
+  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
+  virtual iCameraPosition* FindCameraPositionRegion (const char* name,
+  	iRegion* region) = 0;
+
+  virtual iCameraPosition* FindCameraPositionCollection (const char* name,
+  	iCollection* collection = 0) = 0;
 
   /// Get the list of camera positions.
   virtual iCameraPositionList* GetCameraPositions () = 0;
@@ -1265,7 +1259,7 @@ struct iEngine : public virtual iBase
   /**
    * Create a loader context that you can give to loader plugins.
    * It will basically allow loader plugins to find materials.
-   * \param region optional loader region
+   * \param base optional loader region or collection
    * \param curRegOnly if region is valid and and curRegOnly is true 
    * then only that region will be searched. 
    * Assign to a csRef.

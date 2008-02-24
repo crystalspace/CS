@@ -501,7 +501,13 @@ public:
   virtual csPtr<iCamera> CreateCamera ();
 
   virtual iCameraPosition* FindCameraPosition (const char* name,
-  	iRegion* region = 0);
+    iBase* base = 0);
+
+  virtual iCameraPosition* FindCameraPositionRegion (const char* name,
+  	iRegion* region);
+
+  virtual iCameraPosition* FindCameraPositionCollection (const char* name,
+  	iCollection* collection = 0);
 
   virtual iCameraPositionList* GetCameraPositions ()
   { return &cameraPositions; }
