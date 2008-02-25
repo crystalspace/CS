@@ -9,6 +9,7 @@ chronological order.
 25-Feb-2008
 	- res fixed csHash<>::Iterator to work correctly with a custom
 	  allocator for the hash.
+	- Happy Birthday Sueastside! Oh and I fixed a crash in basemapgen.
 24-Feb-2008
 	- Vincent updated a bunch of URLs and FAQ entries in the manual.
 23-Feb-2008
