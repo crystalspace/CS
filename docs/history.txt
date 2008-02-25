@@ -10,6 +10,11 @@ chronological order.
 	- res fixed csHash<>::Iterator to work correctly with a custom
 	  allocator for the hash.
 	- Happy Birthday Sueastside! Oh and I fixed a crash in basemapgen.
+	- Eric Sunshine fixed bug in mk/autoconf/checkpython.m4 introduced by
+	  r25656 which resulted in the literal string
+	  "$cs_cv_pybase_lflags_base" being used, rather than the interpolation
+	  of that shell variable, in build attempts when detecting the Python
+	  link library. This should resolve issue #455.
 24-Feb-2008
 	- Vincent updated a bunch of URLs and FAQ entries in the manual.
 23-Feb-2008
