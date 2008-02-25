@@ -13505,7 +13505,7 @@ fi
   cs_cv_pybase_lflags_base="$cs_cv_pybase_lflags_base -L$cs_cv_pybase_syslib"
 fi
 
-	    cs_cv_pybase_lflags_ext='$cs_cv_pybase_lflags_base'
+	    cs_cv_pybase_lflags_ext="$cs_cv_pybase_lflags_base"
 	    if test -d "$cs_cv_pybase_syslib/config"; then
   cs_cv_pybase_lflags_ext="$cs_cv_pybase_lflags_ext -L$cs_cv_pybase_syslib/config"
 fi
