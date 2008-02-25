@@ -6,6 +6,9 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+25-Feb-2008
+	- res fixed csHash<>::Iterator to work correctly with a custom
+	  allocator for the hash.
 24-Feb-2008
 	- Vincent updated a bunch of URLs and FAQ entries in the manual.
 23-Feb-2008

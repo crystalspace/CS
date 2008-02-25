@@ -686,7 +686,7 @@ public:
   class GlobalIterator
   {
   private:
-    csHash<T, K> *hash;
+    csHash<T, K, ArrayMemoryAlloc> *hash;
     size_t bucket, size, element;
 
     void Zero () { bucket = element = 0; }
@@ -713,14 +713,14 @@ public:
     }
 
   protected:
-    GlobalIterator (csHash<T, K> *hash0) : hash (hash0) 
+    GlobalIterator (csHash<T, K, ArrayMemoryAlloc> *hash0) : hash (hash0) 
     { 
       Zero (); 
       Init (); 
       FindItem ();
     }
 
-    friend class csHash<T, K>;
+    friend class csHash<T, K, ArrayMemoryAlloc>;
   public:
     /// Copy constructor.
     GlobalIterator (const GlobalIterator &o) :
@@ -799,7 +799,7 @@ public:
   class ConstIterator
   {
   private:
-    const csHash<T, K>* hash;
+    const csHash<T, K, ArrayMemoryAlloc>* hash;
     const K key;
     size_t bucket, size, element;
 
@@ -812,14 +812,14 @@ public:
     }
 
   protected:
-    ConstIterator (const csHash<T, K>* hash0, const K& key0) :
+    ConstIterator (const csHash<T, K, ArrayMemoryAlloc>* hash0, const K& key0) :
       hash(hash0),
       key(key0), 
       bucket(csHashComputer<K>::ComputeHash (key) % hash->Modulo),
       size((hash->Elements.GetSize() > 0) ? hash->Elements[bucket].GetSize () : 0)
       { Reset (); }
 
-    friend class csHash<T, K>;
+    friend class csHash<T, K, ArrayMemoryAlloc>;
   public:
     /// Copy constructor.
     ConstIterator (const ConstIterator &o) :
