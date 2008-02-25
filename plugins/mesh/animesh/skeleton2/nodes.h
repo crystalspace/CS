@@ -44,7 +44,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual void ClearNodes ();
 
     //-- iSkeletonAnimationNodeFactory2
-    virtual csPtr<iSkeletonAnimationNode2> CreateInstance ();
+    virtual csPtr<iSkeletonAnimationNode2> CreateInstance (iSkeleton2*);
 
   private:
   };

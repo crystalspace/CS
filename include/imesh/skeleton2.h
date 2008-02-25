@@ -23,6 +23,7 @@
 #include "csutil/ref.h"
 #include "csutil/refcount.h"
 #include "csutil/bitarray.h"
+#include "csgeom/dualquaternion.h"
 
 class csQuaternion;
 class csVector3;
@@ -31,7 +32,6 @@ class csVector3;
  * Skeleton2 interface files
  */
 
-class csDualQuaternion;
 struct iSceneNode;
 
 
@@ -66,24 +66,38 @@ typedef unsigned int ChannelID;
 /// Identifier for keyframes within animation channel
 typedef unsigned int KeyFrameID;
 
+///
+static const BoneID InvalidBoneID = (BoneID)~0;
+
 
 /**
  * Skeletal system base object, representing the entire skeletal and
  * skeletal animation system.
  */
-struct iSkeletonSystem2 : public virtual iBase
+struct iSkeletonManager2 : public virtual iBase
 {
-  SCF_INTERFACE(iSkeletonSystem2, 1, 0, 0);
+  SCF_INTERFACE(iSkeletonManager2, 1, 0, 0);
 
   /**
    * Create a new empty skeleton factory
    */
-  virtual csPtr<iSkeletonFactory2> CreateSkeletonFactory () = 0;
+  virtual iSkeletonFactory2* CreateSkeletonFactory (const char* name) = 0;
+
+  /**
+   * Find an already created skeleton factory
+   */
+  virtual iSkeletonFactory2* FindSkeletonFactory (const char* name) = 0;
+
+  /**
+   * Remove all skeleton factories
+   */
+  virtual void ClearSkeletonFactories () = 0;
+
 
   /**
    * Create a new skeletal animation factory
    */
-  virtual csPtr<iSkeletonAnimationFactory2> CreateAnimationNodeFactory () = 0;
+  virtual csPtr<iSkeletonAnimationFactory2> CreateAnimationFactory () = 0;
 
   /**
    * Create a new blend node factory
@@ -114,7 +128,7 @@ struct iSkeletonFactory2 : public virtual iBase
    * \param parent bone id of parent or ~0 for no parent which creates a top
    * level bone
    */
-  virtual BoneID CreateBone (BoneID parent = (BoneID)~0) = 0;
+  virtual BoneID CreateBone (BoneID parent = InvalidBoneID) = 0;
 
   /**
    * Remove a bone from skeleton. Any bones having the removed bone as parent
@@ -285,6 +299,11 @@ struct iSkeleton2 : public virtual iBase
   virtual void RecreateAnimationTree () = 0;
 
   /**
+   * Recreate the skeleton structure from the factory
+   */
+  virtual void RecreateSkeleton () = 0;
+
+  /**
    * Update the skeleton
    */
   virtual void UpdateSkeleton (float dt) = 0;
@@ -303,7 +322,10 @@ public:
   {}
 
   //
-  virtual inline ~csSkeletalState2 (){}
+  virtual inline ~csSkeletalState2 ()
+  {
+    delete[] boneQuats;
+  }
 
   /**
    * 
@@ -311,6 +333,14 @@ public:
   inline csDualQuaternion* GetDualQuaternions () const 
   {
     return boneQuats;
+  }
+
+  /**
+   * 
+   */
+  inline const csDualQuaternion& GetDualQuaternion (size_t i) const
+  {
+    return boneQuats[i];
   }
 
   /**
@@ -337,6 +367,19 @@ public:
     return numberOfBones;
   }
 
+  /**
+   * 
+   */
+  inline void Setup (size_t numBones)
+  {
+    if (boneQuats)
+      delete[] boneQuats;
+
+    bitSet.SetSize (numBones);
+    boneQuats = new csDualQuaternion [numBones];
+    numberOfBones = numberOfBones;
+  }
+
 protected:
   csBitArray bitSet;
   csDualQuaternion* boneQuats;  
@@ -360,7 +403,7 @@ struct iSkeletonAnimationNodeFactory2 : public virtual iBase
   /**
    * Create the contained node
    */
-  virtual csPtr<iSkeletonAnimationNode2> CreateInstance () = 0;
+  virtual csPtr<iSkeletonAnimationNode2> CreateInstance (iSkeleton2* skeleton) = 0;
 };
 
 /**

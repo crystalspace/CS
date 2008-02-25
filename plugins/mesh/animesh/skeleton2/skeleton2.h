@@ -22,27 +22,38 @@
 #include "csutil/scf_implementation.h"
 #include "imesh/skeleton2.h"
 #include "iutil/comp.h"
+#include "csutil/array.h"
+#include "csgeom/vector3.h"
+#include "csgeom/quaternion.h"
+#include "csutil/hash.h"
+#include "csutil/csstring.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 {
 
   class SkeletonSystem : public scfImplementation2<SkeletonSystem, 
-                                                   iSkeletonSystem2,
+                                                   iSkeletonManager2,
                                                    iComponent>
   {
   public:
     SkeletonSystem (iBase* parent);
 
-    //-- iSkeletonSystem2
-    virtual csPtr<iSkeletonFactory2> CreateSkeletonFactory ();
-    virtual csPtr<iSkeletonAnimationFactory2> CreateAnimationNodeFactory ();
+    //-- iSkeletonManager2
+    virtual iSkeletonFactory2* CreateSkeletonFactory (const char* name);
+    virtual iSkeletonFactory2* FindSkeletonFactory (const char* name);
+    virtual void ClearSkeletonFactories ();
+
+    virtual csPtr<iSkeletonAnimationFactory2> CreateAnimationFactory ();
     virtual csPtr<iSkeletonBlendNodeFactory2> CreateBlendNodeFactory ();
 
     //-- iComponent
     virtual bool Initialize (iObjectRegistry*);
   
   private:
+    csHash<csRef<iSkeletonFactory2>, csString> factoryHash;
   };
+
+
 
 
   class SkeletonFactory : public scfImplementation1<SkeletonFactory,
@@ -52,7 +63,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     SkeletonFactory ();
 
     //-- iSkeletonFactory2
-    virtual BoneID CreateBone (BoneID parent = (BoneID)~0);
+    virtual BoneID CreateBone (BoneID parent = InvalidBoneID);
     virtual void RemoveBone (BoneID bone);
     virtual BoneID GetBoneParent (BoneID bone) const;
     virtual bool HasBone (BoneID bone) const;
@@ -73,14 +84,50 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     virtual void SetAnimationRoot (iSkeletonAnimationNodeFactory2* fact);
 
-  private:
+    //-- "Private"
+    inline const csArray<size_t>& GetOrderList () const
+    {
+      return boneOrderList;
+    }
+
+    void UpdateCachedTransforms ();
+    void UpdateOrderList ();
+
+  private:    
+
+    struct Bone
+    {      
+      BoneID parent;
+      bool created;
+      
+      // Bone space transform
+      csVector3 boneOffset;
+      csQuaternion boneRotation;
+
+      // Cached absolute transforms
+      csVector3 absOffset;
+      csQuaternion absRotation;
+
+      Bone () 
+        : parent (~0), created (false)
+      {}
+    };
+
+    csArray<Bone> allBones;
+    csArray<size_t> boneOrderList;
+    csRef<iSkeletonAnimationNodeFactory2> animationRoot;    
+
+    bool cachedTransformsDirty;
+    bool orderListDirty;
+
+    friend class Skeleton;
   };
 
 
   class Skeleton : public scfImplementation1<Skeleton, iSkeleton2>
   {
   public:
-    Skeleton ();
+    Skeleton (SkeletonFactory* factory);
 
 
     //-- iSkeleton2
@@ -107,9 +154,42 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     virtual void RecreateAnimationTree ();
 
+    virtual void RecreateSkeleton ();
+
     virtual void UpdateSkeleton (float dt);
 
   private:
+    void RecreateSkeletonP ();
+    void RecreateAnimationTreeP ();
+    void UpdateCachedTransforms ();
+
+    struct Bone
+    {      
+      BoneID parent;
+      bool created;
+
+      // Bone space transform
+      csVector3 boneOffset;
+      csQuaternion boneRotation;
+
+      // Cached absolute transforms
+      csVector3 absOffset;
+      csQuaternion absRotation;
+
+      // Cached bind-space transforms
+      csVector3 bindOffset;
+      csQuaternion bindRotation;
+
+      Bone () 
+        : parent (~0), created (false)
+      {}
+    };
+
+    csArray<Bone> allBones;
+
+    SkeletonFactory* factory;
+    csRef<iSkeletonAnimationNode2> animationRoot;
+    bool cachedTransformsDirty;
   };
 
 }

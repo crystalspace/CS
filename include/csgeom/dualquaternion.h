@@ -43,32 +43,32 @@ typedef csTuple2<float, float> csDualNumber;
  * q = q0 + e*qe where e is the dual identity element (e^2 = 0)
  * For the background, read "Preliminary Sketch of Biquaternions" [W Clifford, 1873]
  */
-class CS_CRYSTALSPACE_EXPORT csDualQuaternion
+class csDualQuaternion
 {
 public:
   // Constructors
 
   /// Initialize with identity
-  csDualQuaternion ()
+  inline csDualQuaternion ()
   {}
 
   /// Initialize with given values.
-  csDualQuaternion (const csQuaternion& real, const csQuaternion& dual)
+  inline csDualQuaternion (const csQuaternion& real, const csQuaternion& dual)
     : real (real), dual (dual)
   {}
 
   /// Construct from quaternion (pure rotation)
-  csDualQuaternion (const csQuaternion& real)
+  inline csDualQuaternion (const csQuaternion& real)
     : real (real)
   {}
 
   /// Construct from quaternion and a vector
-  csDualQuaternion (const csQuaternion& real, const csVector3& translation)
+  inline csDualQuaternion (const csQuaternion& real, const csVector3& translation)
     : real (real), dual (translation/2.0f, 0)
   {}
 
   /// Copy-constructor
-  csDualQuaternion (const csDualQuaternion& q)
+  inline csDualQuaternion (const csDualQuaternion& q)
     : real (q.real), dual (q.dual)
   {}
 
@@ -199,7 +199,7 @@ public:
     csDualQuaternion result (real*lenRealInv, dual*lenRealInv);
     csQuaternion r (result.real);
 
-    r *= result.real.Dot (result.dual);
+    r = r * result.real.Dot (result.dual);
     result.dual -= r;
 
     return result;
@@ -228,14 +228,12 @@ public:
 
     csQuaternion a (real.GetConjugate ());
     csQuaternion b (a);
-
-    a *= dual;
-    a *= 2;
+    a *= dual;    
 
     b *= vQ;
     b *= real;
      
-    a += b;
+    a = a*2 + b;
     return a.v;    
   }
 

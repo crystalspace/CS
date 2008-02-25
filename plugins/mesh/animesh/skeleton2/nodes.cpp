@@ -48,7 +48,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   {
   }
 
-  csPtr<iSkeletonAnimationNode2> BlendNodeFactory::CreateInstance ()
+  csPtr<iSkeletonAnimationNode2> BlendNodeFactory::CreateInstance (iSkeleton2*)
   {
     return 0;
   }

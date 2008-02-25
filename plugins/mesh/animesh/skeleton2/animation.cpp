@@ -53,7 +53,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   {
   }
 
-  csPtr<iSkeletonAnimationNode2> AnimationFactory::CreateInstance ()
+  csPtr<iSkeletonAnimationNode2> AnimationFactory::CreateInstance (iSkeleton2*)
   {
     return 0;
   }
