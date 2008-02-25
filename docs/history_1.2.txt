@@ -1,5 +1,8 @@
 1.2 branch log.
 
+25-Feb-2008
+	- Vincent merged r28788 into 1.2 (basemapgen fix).
+	  Happy Birthday Sueastside !
 24-Feb-2008
 	- Vincent merged r28782 into 1.2 (URLs and FAQ updates in the manual).
 22-Feb-2008
