@@ -22,6 +22,7 @@
 
 #include "csutil/scf_implementation.h"
 #include "imesh/skeleton2.h"
+#include "csutil/parray.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 {
@@ -37,23 +38,55 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     //-- iSkeletonAnimationFactory2
     virtual ChannelID AddChannel (BoneID bone);
 
+    virtual ChannelID FindChannel (BoneID bone) const;
+
     virtual void AddKeyFrame (ChannelID channel, float time, 
       const csDualQuaternion& key);
 
-    virtual unsigned int GetKeyFrameCount (ChannelID channel) const;
+    virtual size_t GetKeyFrameCount (ChannelID channel) const;
 
     virtual void GetKeyFrame (ChannelID channel, KeyFrameID keyframe, BoneID& bone,
       float& time, csDualQuaternion& key);  
 
     virtual void GetTwoKeyFrames (ChannelID channel, float time, BoneID& bone,
-      float& timeBefore, csDualQuaternion& before, 
-      float& timeAfter, csDualQuaternion& after);
+      float& timeBefore, csDualQuaternion& beforeDQ, 
+      float& timeAfter, csDualQuaternion& afterDQ);
 
     //-- iSkeletonAnimationNodeFactory2
     virtual csPtr<iSkeletonAnimationNode2> CreateInstance (iSkeleton2*);
 
+    //-- "Private"
+    void BlendState (csSkeletalState2* state, float baseWeight, float position, bool cycle);
+    inline float GetDuration () const
+    {
+      return duration;
+    }
+
   private:
 
+    struct KeyFrame
+    {
+      float time;
+      csDualQuaternion key;
+    };
+
+    static int KeyFrameCompare (KeyFrame const& k1, KeyFrame const& k2);
+    static int KeyFrameTimeCompare (KeyFrame const& k, float const& t);
+
+    struct AnimationChannel
+    {
+      BoneID bone;
+
+      csArray<KeyFrame> keyFrames;
+
+      AnimationChannel (BoneID bone)
+        : bone (bone)
+      {}
+    };
+
+    csPDelArray<AnimationChannel> channels;
+
+    float duration;
   };
 
 
@@ -63,7 +96,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
                               scfFakeInterface<iSkeletonAnimationNode2> >
   {
   public:
-    Animation ();
+    Animation (AnimationFactory* factory);
 
     //-- iSkeletonAnimation2
     virtual void PlayOnce (float speed = 1.0f);
@@ -84,7 +117,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual iSkeletonAnimationNodeFactory2* GetFactory () const;
 
   private:
-
+    AnimationFactory* factory;
+    
+    float playbackPosition, playSpeed;
+    bool isPlaying, isPlayingCyclic;
   };
                               
 

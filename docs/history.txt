@@ -8,6 +8,7 @@ chronological order.
 
 25-Feb-2008
 	- Marten implemented Skeleton & SkeletonFactory.
+	- Marten implemented basic skeletal animation playback.
 24-Feb-2008
 	- Marten added code stubs for the animated mesh and skeleton2.
 23-Feb-2008

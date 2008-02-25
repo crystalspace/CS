@@ -69,6 +69,9 @@ typedef unsigned int KeyFrameID;
 ///
 static const BoneID InvalidBoneID = (BoneID)~0;
 
+///
+static const ChannelID InvalidChannelID = (ChannelID)~0;
+
 
 /**
  * Skeletal system base object, representing the entire skeletal and
@@ -343,6 +346,11 @@ public:
     return boneQuats[i];
   }
 
+  inline csDualQuaternion& GetDualQuaternion (size_t i) 
+  {
+    return boneQuats[i];
+  }
+
   /**
    * 
    */
@@ -457,6 +465,11 @@ struct iSkeletonAnimationFactory2 : public iSkeletonAnimationNodeFactory2
   virtual ChannelID AddChannel (BoneID bone) = 0;
 
   /**
+   * Find the channel associated with a specific bone, if any.
+   */
+  virtual ChannelID FindChannel (BoneID bone) const = 0;
+
+  /**
    * Add a key frame at given time within channel.
    * \param channel channel id
    * \param time key frame time
@@ -469,7 +482,7 @@ struct iSkeletonAnimationFactory2 : public iSkeletonAnimationNodeFactory2
    * Get total number of key frames in channel.
    * \param channel channel id
    */
-  virtual unsigned int GetKeyFrameCount (ChannelID channel) const = 0;
+  virtual size_t GetKeyFrameCount (ChannelID channel) const = 0;
 
   /**
    * Get a specific key frame within channel.
