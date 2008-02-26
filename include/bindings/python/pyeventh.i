@@ -21,6 +21,20 @@
 #ifndef CS_MICRO_SWIG
 
 #ifndef SWIGIMPORTED
+
+%template (csPyEventPlugParent) scfImplementation1<csPyEventPlug, iEventPlug>;
+
+%inline %{
+  struct csPyEventPlug : public scfImplementation1<csPyEventPlug,iEventPlug>
+  {
+    csPyEventPlug () : scfImplementationType(this) { }
+    virtual ~csPyEventPlug () { }
+    virtual unsigned GetPotentiallyConflictingEvents () { return CSEVTYPE_Joystick|CSEVTYPE_Mouse|CSEVTYPE_Keyboard; }
+    virtual unsigned QueryEventPriority (unsigned) { return 110; }
+  };
+%}
+
+
 %template (csPyEventHandlerParent) scfImplementation1<_csPyEventHandler, iEventHandler>;
 %inline %{
 
