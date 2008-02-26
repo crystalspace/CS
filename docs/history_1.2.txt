@@ -1,5 +1,7 @@
 1.2 branch log.
 
+26-Feb-2008
+	- Vincent merged r28790 into 1.2 (fix for #455, python detection fix).
 25-Feb-2008
 	- Vincent merged r28788 into 1.2 (basemapgen fix).
 	  Happy Birthday Sueastside !
