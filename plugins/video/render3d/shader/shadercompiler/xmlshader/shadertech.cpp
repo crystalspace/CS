@@ -408,9 +408,12 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
       }
 
       if (texUnit < 0) continue;
-      CS::ShaderVarStringID varID =
-        stringsSvName->Request (mapping->GetAttributeValue("name"));
-      pass->textureID[texUnit] = varID;
+      CS::Graphics::ShaderVarNameParser parser (
+        mapping->GetAttributeValue("name"));
+      pass->textures[texUnit].id = stringsSvName->Request (
+        parser.GetShaderVarName ());
+      parser.FillArrayWithIndices (
+        pass->textures[texUnit].indices);
 
       pass->textureCount = MAX(pass->textureCount, texUnit + 1);
     }
@@ -695,10 +698,15 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   int j;
   for (j = 0; j < thispass->textureCount; j++)
   {
-    if (size_t (thispass->textureID[j]) < stack.GetSize ())
+    if (size_t (thispass->textures[j].id) < stack.GetSize ())
     {
       csShaderVariable* var = 0;
-      var = csGetShaderVariableFromStack (stack, thispass->textureID[j]);
+      var = csGetShaderVariableFromStack (stack, thispass->textures[j].id);
+      if (var != 0)
+        var = CS::Graphics::ShaderVarArrayHelper::GetArrayItem (var, 
+          thispass->textures[j].indices.GetArray(),
+          thispass->textures[j].indices.GetSize(),
+          CS::Graphics::ShaderVarArrayHelper::maFail);
       if (var)
       {
         iTextureWrapper* wrap;
@@ -787,7 +795,7 @@ void csXMLShaderTech::GetUsedShaderVars (csBitArray& bits) const
     }
     for (int j = 0; j < thispass->textureCount; j++)
     {
-      CS::ShaderVarStringID id = thispass->textureID[j];
+      CS::ShaderVarStringID id = thispass->textures[j].id;
       if ((id != CS::InvalidShaderVarStringID) && (bits.GetSize() > id))
       {
         bits.SetBit (id);

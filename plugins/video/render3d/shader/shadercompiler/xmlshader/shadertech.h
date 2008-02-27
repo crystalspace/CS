@@ -74,7 +74,14 @@ private:
     csArray<csRenderBufferName> custommapping_buffer;
 
     // texture mappings
-    CS::ShaderVarStringID textureID[TEXTUREMAX];
+    struct TextureMapping
+    {
+      CS::ShaderVarStringID id;
+      csDirtyAccessArray<size_t, csArrayElementHandler<size_t>,
+	CS::Memory::LocalBufferAllocator<size_t, 2,
+	  CS::Memory::AllocatorMalloc, true> > indices;
+    };
+    TextureMapping textures[TEXTUREMAX];
     int textureCount;
 
     // programs
