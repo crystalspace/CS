@@ -34,20 +34,22 @@ namespace CS
 {
   namespace Debug
   {
-    class CallStackNameResolverBfd : public iCallStackNameResolver,
-				      public CS::Memory::CustomAllocated
+    class CallStackNameResolverBfd :
+      public CallstackAllocatedDerived<iCallStackNameResolver>
     {
-      csHash<BfdSymbols*, uint64> moduleBfds;
+      typedef csHash<BfdSymbols*, uint64,
+        CS::Memory::AllocatorMallocPlatform> ModulesHash;
+      ModulesHash moduleBfds;
       
       BfdSymbols* BfdForAddress (void* addr);
     public:
       virtual ~CallStackNameResolverBfd();
     
-      virtual bool GetAddressSymbol (void* addr, csString& sym);
+      virtual bool GetAddressSymbol (void* addr, char*& sym);
       virtual void* OpenParamSymbols (void* addr);
-      virtual bool GetParamName (void* handle, size_t paramNum, csString& sym);
+      virtual bool GetParamName (void* handle, size_t paramNum, char*& sym);
       virtual void FreeParamSymbols (void* handle);
-      virtual bool GetLineNumber (void* addr, csString& lineAndFile);
+      virtual bool GetLineNumber (void* addr, char*& lineAndFile);
     };
   
   } // namespace Debug

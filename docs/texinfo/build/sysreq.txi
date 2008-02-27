@@ -29,7 +29,7 @@ scripting language you use.
 downloaded from:
 
 @noindent
-@uref{http://www.crystalspace3d.org/tikiwiki/tiki-index.php?page=Download}
+@uref{http://www.crystalspace3d.org/main/Download}
 
 The release includes all of the source code, some pre-generated documentation,
 and a few example data files.  Alternately, you can download the latest

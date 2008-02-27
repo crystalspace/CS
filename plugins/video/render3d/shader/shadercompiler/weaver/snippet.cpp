@@ -287,25 +287,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     if (child->GetAttributeValueAsBool ("forcenomerge"))
       newInput.noMerge = true;
 
-    csRef<iDocumentNode> inputNode;
-
-    const char* filename = child->GetAttributeValue ("file");
-    if (filename != 0)
-    {
-      csRef<iDocumentNode> rootNode = 
-        compiler->LoadDocumentFromFile (filename, child);
-      if (!rootNode.IsValid()) return 0;
-    
-      inputNode = rootNode->GetNode ("input");
-      if (!inputNode.IsValid())
-      {
-	compiler->Report (CS_REPORTER_SEVERITY_WARNING,
-	  "Expected 'input' node in file '%s'", filename);
-	return false;
-      }
-    }
-    else
-      inputNode = child;
+    csRef<iDocumentNode> inputNode = GetNodeOrFromFile (child, "input",
+      compiler);
+    if (!inputNode.IsValid()) return false;
 
     newInput.node = inputNode;
     newInput.name = inputNode->GetAttributeValue ("name");
@@ -453,11 +437,37 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         newBlock.combinerName = defaultCombinerName;
         newBlock.location = location;
       }
-      newBlock.node = child;
+      newBlock.node = GetNodeOrFromFile (child, "block", compiler);
+      if (!newBlock.node) return false;
       
       blocks.Push (newBlock);
     }
     return true;
+  }
+  
+  csRef<iDocumentNode> Snippet::GetNodeOrFromFile (iDocumentNode* node,
+      const char* rootName, WeaverCompiler* compiler,
+      csString* outFilename)
+  {
+    const char* filename = node->GetAttributeValue ("file");
+    if (filename != 0)
+    {
+      csRef<iDocumentNode> rootNode = 
+	  compiler->LoadDocumentFromFile (filename, node);
+      if (!rootNode.IsValid()) return 0;
+    
+      csRef<iDocumentNode> fileNode = rootNode->GetNode (rootName);
+      if (!fileNode.IsValid())
+      {
+	compiler->Report (CS_REPORTER_SEVERITY_WARNING,
+          "Expected '%s' node in file '%s'", rootName, filename);
+	return 0;
+      }
+      if (outFilename != 0) *outFilename = filename;
+      return fileNode;
+    }
+    else
+      return node;
   }
   
   int Snippet::CompareTechnique (Technique* const& t1, 
@@ -547,32 +557,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  "Duplicate snippet id '%s'", id);
 	return;
     }
-      
-    csRef<iDocumentNode> snippetNode;
-    const char* filename = node->GetAttributeValue ("file");
-    if (filename != 0)
-    {
-      csRef<iDocumentNode> rootNode = 
-        compiler->LoadDocumentFromFile (filename, node);
-      if (!rootNode.IsValid()) return;
     
-      snippetNode = rootNode->GetNode ("snippet");
-      if (!snippetNode.IsValid())
-      {
-	compiler->Report (CS_REPORTER_SEVERITY_WARNING,
-	  "Expected 'snippet' node in file '%s'", filename);
-	return;
-      }
-    }
-    else
-      snippetNode = node;
+    csString filename;
+    csRef<iDocumentNode> snippetNode = GetNodeOrFromFile (node, "snippet",
+      compiler, &filename);
+    if (!snippetNode.IsValid()) return;
       
     csString snippetName;
     if (!name.IsEmpty ())
     {
       snippetName.AppendFmt ("%s<%d> -> ",  name.GetData(), tech.priority);
     }
-    snippetName += id ? id : filename;
+    snippetName += id ? id : filename.GetData();
     Snippet* newSnippet = new Snippet (compiler, snippetNode, 
       snippetName);
     tech.AddSnippet (id, newSnippet);

@@ -636,7 +636,11 @@ void BaseMapGen::BuildAlphaMapsFromMatMap (const ImageMap& matmap,
   {
     unsigned int layerNum = *matmapPtr++;
 
-    if (layerNum > mat_layers.GetSize()) continue;
+    if (layerNum > (mat_layers.GetSize() - 1))
+    {
+      printf("E: No such layer %d !\n", layerNum);
+      continue;
+    }
     MaterialLayer& layer = mat_layers[layerNum];
 
     if (layer.alphaMap == 0)

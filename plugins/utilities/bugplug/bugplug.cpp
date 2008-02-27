@@ -406,7 +406,7 @@ void csBugPlug::VisculCmd (const char* cmd)
   if (!visculler)
   {
     Report (CS_REPORTER_SEVERITY_DEBUG,
-      "Bugplug is currently now tracking a visibility culler!");
+      "Bugplug is currently not tracking a visibility culler!");
     return;
   }
   csRef<iDebugHelper> dbghelp (scfQueryInterface<iDebugHelper> (visculler));
@@ -1696,6 +1696,7 @@ bool csBugPlug::HandleFrame (iEvent& /*event*/)
             csRenderBufferLock<csVector3> positions (bufPos, CS_BUF_LOCK_READ);
             csRenderBufferLock<csVector3> normals (bufNorm, CS_BUF_LOCK_READ);
 
+          #include "csutil/custom_new_disable.h"
             const size_t bufLockSize = sizeof (csRenderBufferLock<csVector3>);
             uint8 tangLockStore[bufLockSize * 2];
             csRenderBufferLock<csVector3>* tangents = 0;
@@ -1712,6 +1713,7 @@ bool csBugPlug::HandleFrame (iEvent& /*event*/)
               new (bitangents) csRenderBufferLock<csVector3> (bufBitang, 
                 CS_BUF_LOCK_READ);
             }
+          #include "csutil/custom_new_enable.h"
 
             CS::TriangleIndicesStream<size_t> tris (bufIndex, rmeshes[n]->meshtype,
               rmeshes[n]->indexstart, rmeshes[n]->indexend);

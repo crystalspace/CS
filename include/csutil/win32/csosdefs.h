@@ -289,6 +289,7 @@
 #if defined (CS_COMPILER_MSVC)
 #  define strcasecmp _stricmp
 #  define strncasecmp _strnicmp
+#  define snprintf _snprintf
 #endif
 
 #if defined (CS_COMPILER_MSVC)

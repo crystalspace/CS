@@ -87,7 +87,7 @@ AC_DEFUN([CS_CHECK_PYTHON],
 	    cs_cv_pybase_lflags_base=''
 	    _CS_CHECK_PYTHON_LIBDIR([cs_cv_pybase_lflags_base],
 		[cs_cv_pybase_syslib])
-	    cs_cv_pybase_lflags_ext='$cs_cv_pybase_lflags_base'
+	    cs_cv_pybase_lflags_ext="$cs_cv_pybase_lflags_base"
 	    _CS_CHECK_PYTHON_LIBDIR([cs_cv_pybase_lflags_ext],
 		[cs_cv_pybase_syslib], [config])
 	    _CS_CHECK_PYTHON_LIBDIR([cs_cv_pybase_sysprefix_lflags],

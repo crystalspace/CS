@@ -16,6 +16,7 @@ ARRAY_CHANGE_ALL_TEMPLATE(csCollisionPair)
 %include "ivaria/engseq.h"
 %include "ivaria/movierecorder.h"
 %include "ivaria/mapnode.h"
+%include "ivaria/sequence.h"
 
 %rename(IntCall) *::Call(const char*, int&, const char*, ...);
 %rename(FloatCall) *::Call(const char*, float&, const char*, ...);

@@ -495,6 +495,34 @@ namespace CS
         Allocator (alloc), p (p) {}
     };
 
+    /**
+     * Memory allocator using the platform's default allocation functions
+     * (malloc, free etc.)
+     */
+    class AllocatorMallocPlatform
+    {
+    public:
+      /// Allocate a block of memory of size \p n.
+      CS_ATTRIBUTE_MALLOC void* Alloc (const size_t n)
+      {
+	return malloc (n);
+      }
+      /// Free the block \p p.
+      void Free (void* p)
+      {
+	free (p);
+      }
+      /// Resize the allocated block \p p to size \p newSize.
+      void* Realloc (void* p, size_t newSize)
+      {
+	return realloc (p, newSize);
+      }
+      /// Set the information used for memory tracking.
+      void SetMemTrackerInfo (const char* info)
+      {
+	(void)info;
+      }
+    };
   } // namespace Memory
 } // namespace CS
 

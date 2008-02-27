@@ -34,11 +34,10 @@ information, please visit the Related Projects page:
 
 @noindent
 @ifnottex
-@uref{http://www.crystalspace3d.org/tikiwiki/tiki-directory_browse.php?parent=1}
+@uref{http://www.crystalspace3d.org/main/Projects_Using_CS}
 @end ifnottex
 @iftex
-@code{http://www.crystalspace3d.org/tikiwiki/tiki-index.php?}@*
-@code{page=Related+Projects}
+@code{http://www.crystalspace3d.org/main/Projects_Using_CS}
 @end iftex
 
 Crystal Space includes both a hardware (OpenGL) and software 3D
