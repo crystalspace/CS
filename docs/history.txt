@@ -6,6 +6,8 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+27-Feb-2008
+	- res added a (still very bare) class for 4x4 matrices.
 26-Feb-2008
 	- caedes added csPyEventPlug to python bindings. This class allows to
 	  create python iEventPlugs. Also added iEventPlug and iEventOutlet
