@@ -6,6 +6,14 @@ SubDir TOP libs csutil win32 ;
   {
     rejects += bfd-module-win32.h ;
   }
+  if $(ZLIB.AVAILABLE) != "yes"
+  {
+    rejects += minidump.cpp ;
+  }
+  else
+  {
+    CSLIB.EXTERNAL_LIBS += ZLIB ;
+  }
 
   CsLibAddModule $(rejects) ;
 }
