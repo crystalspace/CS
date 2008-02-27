@@ -28,20 +28,22 @@ namespace Debug
 {
 
 /// Call stack creator utilizing backtrace()
-class CallStackCreatorBacktrace : public iCallStackCreator
+class CallStackCreatorBacktrace :
+  public CallstackAllocatedDerived<iCallStackCreator>
 {
-  virtual bool CreateCallStack (csDirtyAccessArray<CallStackEntry>& entries,
-    csDirtyAccessArray<uintptr_t>& params, bool fast);
+  virtual bool CreateCallStack (CallStackEntriesArray& entries, 
+    CallStackParamsArray& params, bool fast);
 };
 
 /// Call stack name resolver utilizing backtrace_symbols()
-class CallStackNameResolverBacktrace : public iCallStackNameResolver
+class CallStackNameResolverBacktrace :
+  public CallstackAllocatedDerived<iCallStackNameResolver>
 {
-  virtual bool GetAddressSymbol (void* addr, csString& sym);
+  virtual bool GetAddressSymbol (void* addr, char*& sym);
   virtual void* OpenParamSymbols (void* addr);
-  virtual bool GetParamName (void* handle, size_t paramNum, csString& sym);
+  virtual bool GetParamName (void* handle, size_t paramNum, char*& sym);
   virtual void FreeParamSymbols (void* handle);
-  virtual bool GetLineNumber (void* addr, csString& lineAndFile);
+  virtual bool GetLineNumber (void* addr, char*& lineAndFile);
 };
 
 } // namespace Debug

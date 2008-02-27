@@ -11,6 +11,9 @@ chronological order.
 	- res changed the libcrystalspace Jamfiles to exclude some files that
 	  rely on zlib when zlib is not available.
 	- res added an allocator using the platform's malloc().
+	- res changed the callstack creation to use platform memory allocation
+	  instead of CS' allocation system. The motivation is to make them
+	  useful for debugging CS' allocation system itself.
 26-Feb-2008
 	- caedes added csPyEventPlug to python bindings. This class allows to
 	  create python iEventPlugs. Also added iEventPlug and iEventOutlet
