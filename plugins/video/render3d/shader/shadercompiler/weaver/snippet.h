@@ -209,6 +209,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     static bool ReadBlocks (WeaverCompiler* compiler, iDocumentNode* node,
       csArray<Technique::Block>& blocks, const char* defaultCombinerName = 0);
     
+    static csRef<iDocumentNode> GetNodeOrFromFile (iDocumentNode* node,
+      const char* rootName, WeaverCompiler* compiler,
+      csString* outFilename = 0);
+    
     static int CompareTechnique (Technique* const&, Technique* const&);
     
     void LoadCompoundTechniques (iDocumentNode* node, bool topLevel);
