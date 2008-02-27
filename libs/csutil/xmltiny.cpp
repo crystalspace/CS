@@ -630,10 +630,14 @@ int csTinyXmlDocument::Changeable ()
   return CS_CHANGEABLE_YES;
 }
 
+#include "csutil/custom_new_disable.h"
+
 csTinyXmlNode* csTinyXmlDocument::Alloc ()
 {
   return new (pool) csTinyXmlNode (this);
 }
+
+#include "csutil/custom_new_enable.h"
 
 csTinyXmlNode* csTinyXmlDocument::Alloc (TiDocumentNode* node)
 {

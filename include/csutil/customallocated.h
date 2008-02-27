@@ -88,6 +88,17 @@ namespace CS
 
       CS_FORCEINLINE void operator delete(void*, void*) throw() { }
       CS_FORCEINLINE void operator delete[](void*, void*) throw() { }
+    
+    #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+      CS_FORCEINLINE void* operator new (size_t s, void*, int)
+      { return cs_malloc (s); }
+      CS_FORCEINLINE void operator delete (void* p, void*, int)
+      { cs_free (p); }
+      CS_FORCEINLINE void* operator new[] (size_t s,  void*, int)
+      { return cs_malloc (s); }
+      CS_FORCEINLINE void operator delete[] (void* p, void*, int)
+      { cs_free (p); }
+    #endif
     };
     
     /**
@@ -147,6 +158,17 @@ namespace CS
 
       CS_FORCEINLINE void operator delete(void*, void*) throw() { }
       CS_FORCEINLINE void operator delete[](void*, void*) throw() { }
+    
+    #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+      CS_FORCEINLINE void* operator new (size_t s, void*, int)
+      { return cs_malloc (s); }
+      CS_FORCEINLINE void operator delete (void* p, void*, int)
+      { cs_free (p); }
+      CS_FORCEINLINE void* operator new[] (size_t s,  void*, int)
+      { return cs_malloc (s); }
+      CS_FORCEINLINE void operator delete[] (void* p, void*, int)
+      { cs_free (p); }
+    #endif
     };
   } // namespace Memory
 } // namespace CS
