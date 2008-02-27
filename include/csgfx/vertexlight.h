@@ -479,6 +479,8 @@ class csVertexLightCalculator : public iVertexLightCalculator
     OpMul (csColor& d, const csColor& x) { d *= x; }
   };
   
+#include "csutil/custom_new_disable.h"
+
   template<typename T, bool B>
   class ConditionalAlloc
   {
@@ -501,6 +503,8 @@ class csVertexLightCalculator : public iVertexLightCalculator
     }
   };
   
+#include "csutil/custom_new_enable.h"
+
   template<typename Op, bool zeroDest, bool diffuse, bool specular>
   void CalculateLightingODS (const csLightProperties& light,
     const csVector3& eyePos, float shininess,

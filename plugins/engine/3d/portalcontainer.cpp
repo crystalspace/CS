@@ -890,7 +890,9 @@ void csPortalContainer::GetBoundingSpheres (iRenderView* rview,
   uint8 local_t2c[sizeof(csReversibleTransform)];
   if (tr_o2c == 0) 
   {
+#include "csutil/custom_new_disable.h"
     tr_o2c = new (local_t2c) csReversibleTransform;
+#include "csutil/custom_new_enable.h"
   }
   *tr_o2c = camtrans;
   if (!movable_identity)

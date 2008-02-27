@@ -69,7 +69,9 @@ namespace RenderManager
 
       const size_t sliceSVs = numSVNames*numSets;
       const size_t sliceSize = sizeof(csShaderVariable*)*sliceSVs;
+#include "csutil/custom_new_disable.h"
       new (&memAlloc) csMemoryPool (sliceSize * 4);
+#include "csutil/custom_new_enable.h"
       memAllocSetUp = true;
 
       csShaderVariable** superSlice = reinterpret_cast<csShaderVariable**> (
@@ -97,7 +99,9 @@ namespace RenderManager
 
       const size_t sliceSVs = numSVNames*numSets;
       const size_t sliceSize = sizeof(csShaderVariable*)*sliceSVs;
+#include "csutil/custom_new_disable.h"
       new (&memAlloc) csMemoryPool (sliceSize * 4);
+#include "csutil/custom_new_enable.h"
       memAllocSetUp = true;
 
       csShaderVariable** superSlice = reinterpret_cast<csShaderVariable**> (

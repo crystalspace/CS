@@ -25,7 +25,10 @@
  * Generic Array Template
  */
 
+#include "csutil/custom_new_disable.h"
 #include <algorithm>
+#include "csutil/custom_new_enable.h"
+
 #include "csutil/allocator.h"
 #include "csutil/comparator.h"
 #include "csutil/customallocated.h"
