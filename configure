@@ -1484,6 +1484,9 @@ Optional Features:
   --enable-extensive-memory-debugger
                           enable the extensive memory debugger which catches
                           common memory management mistakes (default NO)
+  --enable-checking-allocations
+                          make allocations by default 'checking" if the
+                          extensive memory debugger is enabled (default NO)
   --enable-memory-tracker enable the memory tracker which checks memory usage
                           per source file (default NO)
   --enable-ref-tracker    enable the reference tracker which dumps information
@@ -13505,7 +13508,7 @@ fi
   cs_cv_pybase_lflags_base="$cs_cv_pybase_lflags_base -L$cs_cv_pybase_syslib"
 fi
 
-	    cs_cv_pybase_lflags_ext='$cs_cv_pybase_lflags_base'
+	    cs_cv_pybase_lflags_ext="$cs_cv_pybase_lflags_base"
 	    if test -d "$cs_cv_pybase_syslib/config"; then
   cs_cv_pybase_lflags_ext="$cs_cv_pybase_lflags_ext -L$cs_cv_pybase_syslib/config"
 fi
@@ -86556,6 +86559,38 @@ fi
 if test $enable_extensive_memory_debugger = yes; then
   cs_header_text="${cs_header_text}#define CS_EXTENSIVE_MEMDEBUG
 "
+fi
+
+
+
+
+#------------------------------------------------------------------------------
+# Determine if checking allocations should be enabled.
+#------------------------------------------------------------------------------
+if test $enable_extensive_memory_debugger = yes; then
+  { echo "$as_me:$LINENO: checking whether to use checking allocations" >&5
+echo $ECHO_N "checking whether to use checking allocations... $ECHO_C" >&6; }
+    # Check whether --enable-checking-allocations was given.
+if test "${enable_checking_allocations+set}" = set; then
+  enableval=$enable_checking_allocations;
+else
+  enable_checking_allocations=no
+fi
+
+    { echo "$as_me:$LINENO: result: $enable_checking_allocations" >&5
+echo "${ECHO_T}$enable_checking_allocations" >&6; }
+    cs_build_prop_val="$enable_checking_allocations"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CHECKING_ALLOCATIONS ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+    if test $enable_checking_allocations = yes; then
+  cs_header_text="${cs_header_text}#define CS_CHECKING_ALLOCATIONS
+"
+fi
+
 fi
 
 

@@ -1320,6 +1320,39 @@ csBox3_swigregister = _csgeom.csBox3_swigregister
 csBox3_swigregister(csBox3)
 csBox3_OtherSide = _csgeom.csBox3_OtherSide
 
+class csOBB(csBox3):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _csgeom.new_csOBB(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def AddBoundingVertex(*args): return _csgeom.csOBB_AddBoundingVertex(*args)
+    def GetCorner(*args): return _csgeom.csOBB_GetCorner(*args)
+    def GetMatrix(*args): return _csgeom.csOBB_GetMatrix(*args)
+    def Volume(*args): return _csgeom.csOBB_Volume(*args)
+    def FindOBB(*args): return _csgeom.csOBB_FindOBB(*args)
+    def FindOBBAccurate(*args): return _csgeom.csOBB_FindOBBAccurate(*args)
+    __swig_destroy__ = _csgeom.delete_csOBB
+    __del__ = lambda self : None;
+csOBB_swigregister = _csgeom.csOBB_swigregister
+csOBB_swigregister(csOBB)
+
+class csOBBFrozen(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    def Copy(*args): return _csgeom.csOBBFrozen_Copy(*args)
+    def __init__(self, *args): 
+        this = _csgeom.new_csOBBFrozen(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def GetCorner(*args): return _csgeom.csOBBFrozen_GetCorner(*args)
+    def ProjectOBB(*args): return _csgeom.csOBBFrozen_ProjectOBB(*args)
+    __swig_destroy__ = _csgeom.delete_csOBBFrozen
+    __del__ = lambda self : None;
+csOBBFrozen_swigregister = _csgeom.csOBBFrozen_swigregister
+csOBBFrozen_swigregister(csOBBFrozen)
+
 class csSegment2(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr

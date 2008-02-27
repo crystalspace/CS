@@ -1100,10 +1100,12 @@ class iEventPlug(iBase):
     def GetPotentiallyConflictingEvents(*args): return _core.iEventPlug_GetPotentiallyConflictingEvents(*args)
     def QueryEventPriority(*args): return _core.iEventPlug_QueryEventPriority(*args)
     def EnableEvents(*args): return _core.iEventPlug_EnableEvents(*args)
+    scfGetVersion = staticmethod(_core.iEventPlug_scfGetVersion)
     __swig_destroy__ = _core.delete_iEventPlug
     __del__ = lambda self : None;
 iEventPlug_swigregister = _core.iEventPlug_swigregister
 iEventPlug_swigregister(iEventPlug)
+iEventPlug_scfGetVersion = _core.iEventPlug_scfGetVersion
 
 class iEventOutlet(iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -1116,10 +1118,12 @@ class iEventOutlet(iBase):
     def Joystick(*args): return _core.iEventOutlet_Joystick(*args)
     def Broadcast(*args): return _core.iEventOutlet_Broadcast(*args)
     def ImmediateBroadcast(*args): return _core.iEventOutlet_ImmediateBroadcast(*args)
+    scfGetVersion = staticmethod(_core.iEventOutlet_scfGetVersion)
     __swig_destroy__ = _core.delete_iEventOutlet
     __del__ = lambda self : None;
 iEventOutlet_swigregister = _core.iEventOutlet_swigregister
 iEventOutlet_swigregister(iEventOutlet)
+iEventOutlet_scfGetVersion = _core.iEventOutlet_scfGetVersion
 
 class iEventCord(iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -2166,6 +2170,34 @@ CS_LOAD_PLUGIN = _core.CS_LOAD_PLUGIN
 CS_GET_CHILD_OBJECT = _core.CS_GET_CHILD_OBJECT
 CS_GET_NAMED_CHILD_OBJECT = _core.CS_GET_NAMED_CHILD_OBJECT
 CS_GET_FIRST_NAMED_CHILD_OBJECT = _core.CS_GET_FIRST_NAMED_CHILD_OBJECT
+class csPyEventPlugParent(iEventPlug):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def IncRef(*args): return _core.csPyEventPlugParent_IncRef(*args)
+    def DecRef(*args): return _core.csPyEventPlugParent_DecRef(*args)
+    def GetRefCount(*args): return _core.csPyEventPlugParent_GetRefCount(*args)
+    def QueryInterface(*args): return _core.csPyEventPlugParent_QueryInterface(*args)
+    def AddRefOwner(*args): return _core.csPyEventPlugParent_AddRefOwner(*args)
+    def RemoveRefOwner(*args): return _core.csPyEventPlugParent_RemoveRefOwner(*args)
+    def GetInterfaceMetadata(*args): return _core.csPyEventPlugParent_GetInterfaceMetadata(*args)
+csPyEventPlugParent_swigregister = _core.csPyEventPlugParent_swigregister
+csPyEventPlugParent_swigregister(csPyEventPlugParent)
+
+class csPyEventPlug(csPyEventPlugParent):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _core.new_csPyEventPlug(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _core.delete_csPyEventPlug
+    __del__ = lambda self : None;
+    def GetPotentiallyConflictingEvents(*args): return _core.csPyEventPlug_GetPotentiallyConflictingEvents(*args)
+    def QueryEventPriority(*args): return _core.csPyEventPlug_QueryEventPriority(*args)
+csPyEventPlug_swigregister = _core.csPyEventPlug_swigregister
+csPyEventPlug_swigregister(csPyEventPlug)
+
 class csPyEventHandlerParent(iEventHandler):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"

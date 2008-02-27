@@ -2345,6 +2345,24 @@ AS_IF([test $enable_extensive_memory_debugger = yes],
 
 
 #------------------------------------------------------------------------------
+# Determine if checking allocations should be enabled.
+#------------------------------------------------------------------------------
+AS_IF([test $enable_extensive_memory_debugger = yes],
+    [AC_MSG_CHECKING([whether to use checking allocations])
+    AC_ARG_ENABLE([checking-allocations],
+	[AC_HELP_STRING([--enable-checking-allocations],
+	    [make allocations by default 'checking" if the extensive memory
+	    debugger is enabled (default NO)])],
+	[], [enable_checking_allocations=no])
+    AC_MSG_RESULT([$enable_checking_allocations])
+    CS_EMIT_BUILD_PROPERTY([CHECKING_ALLOCATIONS],
+	[$enable_checking_allocations])
+    AS_IF([test $enable_checking_allocations = yes],
+	[CS_HEADER_PROPERTY([CS_CHECKING_ALLOCATIONS])])])
+
+
+
+#------------------------------------------------------------------------------
 # Determine if memory tracker should be enabled.
 #------------------------------------------------------------------------------
 AC_MSG_CHECKING([whether to use memory tracker])

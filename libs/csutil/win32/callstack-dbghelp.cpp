@@ -49,6 +49,9 @@ namespace Debug
 #define MEASURE_INTERMEDIATE
 #endif
 
+typedef csArray<csString, csArrayElementHandler<csString>,
+  CS::Memory::AllocatorMallocPlatform> StringsArray;
+  
 static void PrintError (const char* format, ...)
 {
   csPrintfErr ("wincallstack: ");
@@ -61,7 +64,7 @@ static void PrintError (const char* format, ...)
 
 struct SymCallbackCountInfo
 {
-  csDirtyAccessArray<uintptr_t>* params;
+  CallStackParamsArray* params;
   uint8* paramOffset;
   size_t count;
 };
@@ -82,7 +85,7 @@ static BOOL CALLBACK EnumSymCallbackCount (SYMBOL_INFO* pSymInfo,
 }
 
 static size_t GetParams (const STACKFRAME64& frame, 
-                         csDirtyAccessArray<uintptr_t>& params)
+			 CallStackParamsArray& params)
 {
   MEASURE_FUNCTION;
 
@@ -135,8 +138,8 @@ static size_t GetParams (const STACKFRAME64& frame,
 
 static bool CreateCallStack (HANDLE hProc, HANDLE hThread, CONTEXT& context,
                              int skip, bool fast,
-                             csDirtyAccessArray<CallStackEntry>& entries, 
-                             csDirtyAccessArray<uintptr_t>& params)
+			     CallStackEntriesArray& entries,
+	                     CallStackParamsArray& params)
 {
   MEASURE_FUNCTION;
   if (!DbgHelp::SymSupportAvailable()) return false;
@@ -294,8 +297,8 @@ static CurrentThreadContextHelper contextHelper;
   /* Only called on non-VC, when we still need the ugly 2nd thread method to
    * avoid the debugger catching the exception. */
 static bool CreateCallStackThreaded (int skip, bool fast,
-                                     csDirtyAccessArray<CallStackEntry>& entries, 
-                                     csDirtyAccessArray<uintptr_t>& params)
+                                     CallStackEntriesArray& entries, 
+                                     CallStackParamsArray& params)
 {
   const int currentContextSkip = 
 #ifdef AVOID_CONTEXT_IN_KERNEL
@@ -406,13 +409,13 @@ struct ExceptionFilterParams
 {
   int skip;
   bool fast;
-  csDirtyAccessArray<CallStackEntry>& entries;
-  csDirtyAccessArray<uintptr_t>& params;
+  CallStackEntriesArray& entries;
+  CallStackParamsArray& params;
   bool result;
 
   ExceptionFilterParams (int skip, bool fast,
-    csDirtyAccessArray<CallStackEntry>& entries,
-    csDirtyAccessArray<uintptr_t>& params) : skip (skip), fast (fast),
+    CallStackEntriesArray& entries,
+    CallStackParamsArray& params) : skip (skip), fast (fast),
     entries (entries), params (params), result (false) {}
 };
 
@@ -441,8 +444,8 @@ static LONG WINAPI ExceptionFilter (struct _EXCEPTION_POINTERS* ExceptionInfo)
  * exception to get to the exception handler... but a bit quicker than the "use
  * 2nd thread" method. */
 static bool CreateCallStackExcept (int skip, bool fast,
-                                   csDirtyAccessArray<CallStackEntry>& entries,
-                                   csDirtyAccessArray<uintptr_t>& params)
+				   CallStackEntriesArray& entries,
+                                   CallStackParamsArray& params)
 {
   ExceptStackSection.Enter();
     
@@ -475,8 +478,8 @@ static bool CreateCallStackExcept (int skip, bool fast,
 typedef BOOL (WINAPI* PFNISDEBUGGERPRESENT)();
 
 bool CallStackCreatorDbgHelp::CreateCallStack (
-  csDirtyAccessArray<CallStackEntry>& entries, 
-  csDirtyAccessArray<uintptr_t>& params, bool fast)
+  CallStackEntriesArray& entries, 
+  CallStackParamsArray& params, bool fast)
 {
   static PFNISDEBUGGERPRESENT IsDebuggerPresent = 0;
   static HMODULE hKernel32 = 0;
@@ -499,7 +502,7 @@ bool CallStackCreatorDbgHelp::CreateCallStack (
 }
 
 bool CallStackNameResolverDbgHelp::GetAddressSymbol (void* addr, 
-  csString& str)
+  char*& str)
 {
   static const int MaxSymbolLen = 512;
   static const int symbolInfoSize = 
@@ -532,17 +535,26 @@ bool CallStackNameResolverDbgHelp::GetAddressSymbol (void* addr,
   DbgHelp::SymGetModuleInfoW64 (symInit.GetSymProcessHandle (),
     (uintptr_t)addr, &module);
 
+  const wchar_t* imgName =
+      (module.ImageName[0] != 0) ? module.ImageName : L"<unknown>";
+  static const char formatWithSymbol[] = "[%p] (%ls)%s+0x%" CS_PRIx64;
+  static const char formatWithoutSymbol[] = "[%p] (%ls)<unknown>";
   if (symbolInfo->Name[0] != 0)
   {
-    str.Format ("[%p] (%ls)%s+0x%" CS_PRIx64,
-      addr,
-      (module.ImageName[0] != 0) ? module.ImageName : L"<unknown>",
+    size_t strSize = sizeof (formatWithSymbol) + 18 + wcslen (imgName)
+	+ strlen (symbolInfo->Name) + 16 + 1;
+    CS_ALLOC_STACK_ARRAY(char, buf, strSize);
+    snprintf (buf, strSize, formatWithSymbol, addr, imgName,
       symbolInfo->Name, displace);
+    str = strdup (buf);
   }
   else
   {
-    str.Format ("[%p] (%ls)<unknown>", addr,
-      (module.ImageName[0] != 0) ? module.ImageName : L"<unknown>");
+    size_t strSize = sizeof (formatWithoutSymbol) + 18 
+	+ wcslen (imgName) + 1;
+    CS_ALLOC_STACK_ARRAY(char, buf, strSize);
+    snprintf (buf, strSize, formatWithoutSymbol, addr, imgName);
+    str = strdup (buf);
   }
 
   return true;
@@ -553,7 +565,7 @@ static BOOL CALLBACK EnumSymCallbackNames (SYMBOL_INFO* pSymInfo,
 {
   if ((pSymInfo->Flags & SYMFLAG_PARAMETER) != 0)
   {
-    csArray<csString>* info = (csArray<csString>*)UserContext;
+    StringsArray* info = (StringsArray*)UserContext;
 
     info->Push (pSymInfo->Name);
   }
@@ -582,7 +594,7 @@ void* CallStackNameResolverDbgHelp::OpenParamSymbols (void* addr)
   }
   if (result)
   {
-    csArray<csString>* names = new csArray<csString>;
+    StringsArray* names = new StringsArray;
     if (DbgHelp::SymEnumSymbols (symInit.GetSymProcessHandle (), 
       0
       /*DbgHelp::SymGetModuleBase64(GetCurrentProcess(),frame.AddrPC.Offset)*/,
@@ -601,21 +613,21 @@ void* CallStackNameResolverDbgHelp::OpenParamSymbols (void* addr)
 }
 #include "csutil/custom_new_enable.h"
 
-bool CallStackNameResolverDbgHelp::GetParamName (void* h, size_t n, csString& str)
+bool CallStackNameResolverDbgHelp::GetParamName (void* h, size_t n, char*& str)
 {
-  csArray<csString>* names = (csArray<csString>*)h;
+  StringsArray* names = (StringsArray*)h;
   if (n >=  names->GetSize ()) return false;
-  str = names->Get (n);
+  str = strdup (names->Get (n));
   return true;
 }
 
 void CallStackNameResolverDbgHelp::FreeParamSymbols (void* h)
 {
-  csArray<csString>* names = (csArray<csString>*)h;
+  StringsArray* names = (StringsArray*)h;
   delete names;
 }
 
-bool CallStackNameResolverDbgHelp::GetLineNumber (void* addr, csString& str)
+bool CallStackNameResolverDbgHelp::GetLineNumber (void* addr, char*& str)
 {
   if (DbgHelp::SymGetLineFromAddrW64)
   {
@@ -626,7 +638,11 @@ bool CallStackNameResolverDbgHelp::GetLineNumber (void* addr, csString& str)
     if (DbgHelp::SymGetLineFromAddrW64 (symInit.GetSymProcessHandle (), 
       (uintptr_t)addr, &displacement, &line))
     {
-      str.Format ("%ls:%" PRIu32, line.FileName, (uint32)line.LineNumber);
+      size_t bufSize = wcslen (line.FileName) + 1 + 16 + 1;
+      CS_ALLOC_STACK_ARRAY(char, buf, bufSize);
+      snprintf (buf, bufSize, "%ls:%" PRIu32, line.FileName,
+        (uint32)line.LineNumber);
+      str = strdup (buf);
       return true;
     }
   }
@@ -639,7 +655,11 @@ bool CallStackNameResolverDbgHelp::GetLineNumber (void* addr, csString& str)
     if (DbgHelp::SymGetLineFromAddr64 (symInit.GetSymProcessHandle (), 
       (uintptr_t)addr, &displacement, &line))
     {
-      str.Format ("%s:%" PRIu32, line.FileName, (uint32)line.LineNumber);
+      size_t bufSize = strlen (line.FileName) + 1 + 16 + 1;
+      CS_ALLOC_STACK_ARRAY(char, buf, bufSize);
+      snprintf (buf, bufSize, "%s:%" PRIu32, line.FileName,
+        (uint32)line.LineNumber);
+      str = strdup (buf);
       return true;
     }
   }

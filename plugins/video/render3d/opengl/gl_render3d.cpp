@@ -1287,6 +1287,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
       	| GL_COLOR_BUFFER_BIT;
     else
       clearMask = GL_DEPTH_BUFFER_BIT | stencilFlag;
+    glClearDepth (0.0); // @@@ Never really changes 
   }
   else if (drawflags & CSDRAW_CLEARSCREEN)
     clearMask = GL_COLOR_BUFFER_BIT;
@@ -3526,6 +3527,33 @@ bool csGLGraphics3D::DebugCommand (const char* cmdstr)
     const char* dir = 
       ((param != 0) && (*param != 0)) ? param : "/tmp/zbufdump/";
     DumpZBuffer (dir);
+
+    return true;
+  }
+  else if (strcasecmp (cmd, "dump_textures") == 0)
+  {
+    csRef<iImageIO> imgsaver = csQueryRegistry<iImageIO> (object_reg);
+    if (!imgsaver)
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING,
+	      "Could not get image saver.");
+      return false;
+    }
+
+    csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
+    if (!vfs)
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING, 
+	      "Could not get VFS.");
+      return false;
+    }
+
+    if (txtmgr)
+    {
+      const char* dir = 
+	  ((param != 0) && (*param != 0)) ? param : "/tmp/textures/";
+      txtmgr->DumpTextures (vfs, imgsaver, dir);
+    }
 
     return true;
   }

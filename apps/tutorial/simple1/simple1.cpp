@@ -166,7 +166,8 @@ bool Simple::Application()
   if (!OpenApplication(GetObjectRegistry()))
     return ReportError("Error opening system!");
 
-  if (SetupModules()) {
+  if (SetupModules())
+  {
     // This calls the default runloop. This will basically just keep
     // broadcasting process events to keep the game going.
     Run();

@@ -439,5 +439,40 @@ void csGLTextureManager::DumpSuperLightmaps (iVFS* VFS, iImageIO* iio,
   }
 }
 
+void csGLTextureManager::DumpTextures (iVFS* VFS, iImageIO* iio, 
+				       const char* dir)
+{
+  csString outfn;
+  for (size_t i = 0; i < textures.GetSize (); i++)
+  {
+    if (!textures[i]) continue;
+    
+    csRef<iImage> img = textures[i]->Dump ();
+    if (img)
+    {
+      csRef<iDataBuffer> buf = iio->Save (img, "image/png");
+      if (!buf)
+      {
+	G3D->Report (CS_REPORTER_SEVERITY_WARNING,
+		     "Could not save texture.");
+      }
+      else
+      {
+	outfn.Format ("%s%zu.png", dir, i);
+	if (!VFS->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
+	{
+	  G3D->Report (CS_REPORTER_SEVERITY_WARNING,
+		       "Could not write to %s.", outfn.GetData ());
+	}
+	else
+	{
+	  G3D->Report (CS_REPORTER_SEVERITY_NOTIFY,
+		       "Dumped texture to %s", outfn.GetData ());
+	}
+      }
+    }
+  }
+}
+
 }
 CS_PLUGIN_NAMESPACE_END(gl3d)

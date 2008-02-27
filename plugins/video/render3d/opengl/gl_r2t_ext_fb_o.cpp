@@ -300,7 +300,7 @@ void csGLRender2TextureEXTfbo::UnsetRenderTargets ()
 
   currentAttachments.Clear();
   currentFBO = 0;
-  viewportHelper.Reset2DViewport (G3D);
+  if (viewportSet) viewportHelper.Reset2DViewport (G3D);
   viewportSet = false;
 }
 
