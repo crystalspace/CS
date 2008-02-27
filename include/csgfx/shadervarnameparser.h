@@ -59,6 +59,14 @@ namespace CS
       size_t GetIndexNum() const { return indices.GetSize(); }
       /// Get the nth index value. Index 0 is leftmost.
       size_t GetIndexValue (size_t index) const { return indices[index]; }
+      
+      /// Fill some array with the indices
+      template<typename ArrayType>
+      void FillArrayWithIndices (ArrayType& arr) const
+      {
+        for (size_t i = 0; i < indices.GetSize(); i++)
+          arr.Push (indices[i]);
+      }
     };
   } // namespace Graphics
 } // namespace CS
