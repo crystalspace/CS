@@ -27,8 +27,10 @@
 #include "csColladaConvertor.h"
 #include "csColladaClasses.h"
 
+#include "csutil/custom_new_disable.h"
 #include <string>
 #include <sstream>
+#include "csutil/custom_new_enable.h"
 
 using std::string;
 using std::stringstream;

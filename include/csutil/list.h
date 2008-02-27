@@ -339,6 +339,8 @@ inline void csList<T, MemoryAllocator>::DeleteAll ()
   head.p = tail = 0;
 }
 
+#include "csutil/custom_new_disable.h"
+
 /// Add one item last in the list
 template <class T, class MemoryAllocator>
 inline typename csList<T, MemoryAllocator>::Iterator 
@@ -399,6 +401,8 @@ inline void csList<T, MemoryAllocator>::InsertBefore (Iterator &it,
     el->prev->next = newEl;
   el->prev = newEl;
 }
+
+#include "csutil/custom_new_enable.h"
 
 template <class T, class MemoryAllocator>
 inline void csList<T, MemoryAllocator>::MoveAfter (const Iterator &it, 

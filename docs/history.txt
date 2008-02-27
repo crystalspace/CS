@@ -23,6 +23,9 @@ chronological order.
 	  and attach callstacks from their allocation.
 	- res changed the gl3d depth texture dumping to dump 32-bit depths into
 	  RGBA instead of greyscale.
+	- res added some custom new enabling/disabling in various places.
+	- res changed CS::Memory::CustomAllocated to contain the memdebug
+	  versions of new and delete.
 26-Feb-2008
 	- caedes added csPyEventPlug to python bindings. This class allows to
 	  create python iEventPlugs. Also added iEventPlug and iEventOutlet

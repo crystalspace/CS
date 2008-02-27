@@ -481,6 +481,7 @@ public:
   CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
 
+#include "csutil/custom_new_disable.h"
 
 void csEngine::AddImposterToUpdateQueue (csImposterProcTex* imptex,
       iRenderView* rview)
@@ -500,6 +501,8 @@ void csEngine::AddImposterToUpdateQueue (csImposterProcTex* imptex,
   csImposterUpdateQueue* q = imposterUpdateQueue.GetElementPointer (camnr);
   q->queue.Push (csWeakRef<csImposterProcTex> (imptex));
 }
+
+#include "csutil/custom_new_enable.h"
 
 void csEngine::HandleImposters ()
 {
@@ -1512,6 +1515,8 @@ void csEngine::StartDraw (iCamera *c, iClipper2D* /*view*/, csRenderView &rview)
   rview.SetFrustum (leftx, rightx, topy, boty);
 }
 
+#include "csutil/custom_new_disable.h"
+
 void csEngine::Draw (iCamera *c, iClipper2D *view, iMeshWrapper* mesh)
 {
   if (bugplug)
@@ -1554,6 +1559,8 @@ void csEngine::Draw (iCamera *c, iClipper2D *view, iMeshWrapper* mesh)
   }
   G3D->SetClipper (0, CS_CLIPPER_NONE);
 }
+
+#include "csutil/custom_new_enable.h"
 
 csPtr<iRenderLoop> csEngine::CreateDefaultRenderLoop ()
 {
