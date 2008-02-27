@@ -14,6 +14,13 @@ chronological order.
 	- res changed the callstack creation to use platform memory allocation
 	  instead of CS' allocation system. The motivation is to make them
 	  useful for debugging CS' allocation system itself.
+	- res changed the way debug memory allocations are handled: now,
+	  functions for different levels of debugging are provided (always -
+	  so you can have some plugins use the more extensive facilities
+	  while others aren't). cs_malloc() maps to these different functions
+	  based on the compile time settings.
+	- res added a facility to memory debugging to track allocated blocks
+	  and attach callstacks from their allocation.
 26-Feb-2008
 	- caedes added csPyEventPlug to python bindings. This class allows to
 	  create python iEventPlugs. Also added iEventPlug and iEventOutlet

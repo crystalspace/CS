@@ -643,21 +643,37 @@ void operator delete[] (void* p)
 
 #ifdef CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
 #undef new
-void* operator new (size_t s, void*, int)
+CS_CRYSTALSPACE_EXPORT void* operator new (size_t s, void* f, int l)
 {
-  return (void*)cs_malloc (s);
+#ifdef CS_CHECKING_ALLOCATIONS
+  return ptmalloc_checking (s);
+#else
+  return ptmalloc_located (s);
+#endif
 }
-void* operator new[] (size_t s, void*, int)
+CS_CRYSTALSPACE_EXPORT void* operator new[] (size_t s, void* f, int l)
 {
-  return (void*)cs_malloc (s);
+#ifdef CS_CHECKING_ALLOCATIONS
+  return ptmalloc_checking (s);
+#else
+  return ptmalloc_located (s);
+#endif
 }
-void operator delete (void* p)
+CS_CRYSTALSPACE_EXPORT void operator delete (void* p)
 {
-  if (p) cs_free (p);
+#ifdef CS_CHECKING_ALLOCATIONS
+  return ptfree_checking (p);
+#else
+  return ptfree_located (p);
+#endif
 }
-void operator delete[] (void* p)
+CS_CRYSTALSPACE_EXPORT void operator delete[] (void* p)
 {
-  if (p) cs_free (p);
+#ifdef CS_CHECKING_ALLOCATIONS
+  return ptfree_checking (p);
+#else
+  return ptfree_located (p);
+#endif
 }
 #endif  // CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
 
