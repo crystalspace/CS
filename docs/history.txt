@@ -32,6 +32,9 @@ chronological order.
 	  bindings.
 	- res fixed the Cg shader plugin to properly set program parameters
 	  which are arrays of matrices.
+	- res fixed a bug in xmlshader where a 'Generate' would mix up the
+	  nodes from the actual block to be replicated and the last template
+	  specified in the output.
 26-Feb-2008
 	- caedes added csPyEventPlug to python bindings. This class allows to
 	  create python iEventPlugs. Also added iEventPlug and iEventOutlet

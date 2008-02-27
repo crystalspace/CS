@@ -1425,6 +1425,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
                     state->generateStart = start;
                     state->generateEnd = end;
                     state->generateStep = step;
+                    state->templ = Template();
                   }
                 }
               }
