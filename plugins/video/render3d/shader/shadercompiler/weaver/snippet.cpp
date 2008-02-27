@@ -439,7 +439,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         newBlock.combinerName = defaultCombinerName;
         newBlock.location = location;
       }
-      newBlock.node = GetNodeOrFromFile (child, "file", compiler);
+      newBlock.node = GetNodeOrFromFile (child, "block", compiler);
+      if (!newBlock.node) return false;
       
       blocks.Push (newBlock);
     }
