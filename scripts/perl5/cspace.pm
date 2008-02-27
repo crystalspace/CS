@@ -2335,6 +2335,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetPotentiallyConflictingEvents = *cspacec::iEventPlug_GetPotentiallyConflictingEvents;
 *QueryEventPriority = *cspacec::iEventPlug_QueryEventPriority;
 *EnableEvents = *cspacec::iEventPlug_EnableEvents;
+*scfGetVersion = *cspacec::iEventPlug_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -2373,6 +2374,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *Joystick = *cspacec::iEventOutlet_Joystick;
 *Broadcast = *cspacec::iEventOutlet_Broadcast;
 *ImmediateBroadcast = *cspacec::iEventOutlet_ImmediateBroadcast;
+*scfGetVersion = *cspacec::iEventOutlet_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});

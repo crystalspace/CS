@@ -2534,9 +2534,9 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_csPluginRequest swig_types[56]
 #define SWIGTYPE_p_csPrimitives swig_types[57]
 #define SWIGTYPE_p_csPtrTiBase_t swig_types[58]
-#define SWIGTYPE_p_csPtrTiEventOutlet_t swig_types[59]
-#define SWIGTYPE_p_csPtrTiKeyComposer_t swig_types[60]
-#define SWIGTYPE_p_csPtrTiObjectRegistryIterator_t swig_types[61]
+#define SWIGTYPE_p_csPtrTiKeyComposer_t swig_types[59]
+#define SWIGTYPE_p_csPtrTiObjectRegistryIterator_t swig_types[60]
+#define SWIGTYPE_p_csPyEventPlug swig_types[61]
 #define SWIGTYPE_p_csRGBpixel swig_types[62]
 #define SWIGTYPE_p_csRadixSorter swig_types[63]
 #define SWIGTYPE_p_csRect swig_types[64]
@@ -2568,146 +2568,149 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_f_p_iBase__p__csPyEventHandler swig_types[90]
 #define SWIGTYPE_p_f_p_iBase__p_csConfigFile swig_types[91]
 #define SWIGTYPE_p_f_p_iBase__p_csObject swig_types[92]
-#define SWIGTYPE_p_f_p_iBase__p_iAnimatedImage swig_types[93]
-#define SWIGTYPE_p_f_p_iBase__p_iBase swig_types[94]
-#define SWIGTYPE_p_f_p_iBase__p_iCacheManager swig_types[95]
-#define SWIGTYPE_p_f_p_iBase__p_iClipper2D swig_types[96]
-#define SWIGTYPE_p_f_p_iBase__p_iCommandLineParser swig_types[97]
-#define SWIGTYPE_p_f_p_iBase__p_iComponent swig_types[98]
-#define SWIGTYPE_p_f_p_iBase__p_iConfigFile swig_types[99]
-#define SWIGTYPE_p_f_p_iBase__p_iConfigIterator swig_types[100]
-#define SWIGTYPE_p_f_p_iBase__p_iConfigManager swig_types[101]
-#define SWIGTYPE_p_f_p_iBase__p_iDataBuffer swig_types[102]
-#define SWIGTYPE_p_f_p_iBase__p_iDebugHelper swig_types[103]
-#define SWIGTYPE_p_f_p_iBase__p_iDocument swig_types[104]
-#define SWIGTYPE_p_f_p_iBase__p_iDocumentAttribute swig_types[105]
-#define SWIGTYPE_p_f_p_iBase__p_iDocumentAttributeIterator swig_types[106]
-#define SWIGTYPE_p_f_p_iBase__p_iDocumentNode swig_types[107]
-#define SWIGTYPE_p_f_p_iBase__p_iDocumentNodeIterator swig_types[108]
-#define SWIGTYPE_p_f_p_iBase__p_iDocumentSystem swig_types[109]
-#define SWIGTYPE_p_f_p_iBase__p_iEvent swig_types[110]
-#define SWIGTYPE_p_f_p_iBase__p_iEventAttributeIterator swig_types[111]
-#define SWIGTYPE_p_f_p_iBase__p_iEventCord swig_types[112]
-#define SWIGTYPE_p_f_p_iBase__p_iEventHandler swig_types[113]
-#define SWIGTYPE_p_f_p_iBase__p_iEventNameRegistry swig_types[114]
-#define SWIGTYPE_p_f_p_iBase__p_iEventOutlet swig_types[115]
-#define SWIGTYPE_p_f_p_iBase__p_iEventPlug swig_types[116]
-#define SWIGTYPE_p_f_p_iBase__p_iEventQueue swig_types[117]
-#define SWIGTYPE_p_f_p_iBase__p_iFactory swig_types[118]
-#define SWIGTYPE_p_f_p_iBase__p_iFile swig_types[119]
-#define SWIGTYPE_p_f_p_iBase__p_iImage swig_types[120]
-#define SWIGTYPE_p_f_p_iBase__p_iImageIO swig_types[121]
-#define SWIGTYPE_p_f_p_iBase__p_iJoystickDriver swig_types[122]
-#define SWIGTYPE_p_f_p_iBase__p_iKeyComposer swig_types[123]
-#define SWIGTYPE_p_f_p_iBase__p_iKeyboardDriver swig_types[124]
-#define SWIGTYPE_p_f_p_iBase__p_iMouseDriver swig_types[125]
-#define SWIGTYPE_p_f_p_iBase__p_iObject swig_types[126]
-#define SWIGTYPE_p_f_p_iBase__p_iObjectIterator swig_types[127]
-#define SWIGTYPE_p_f_p_iBase__p_iObjectNameChangeListener swig_types[128]
-#define SWIGTYPE_p_f_p_iBase__p_iObjectRegistry swig_types[129]
-#define SWIGTYPE_p_f_p_iBase__p_iObjectRegistryIterator swig_types[130]
-#define SWIGTYPE_p_f_p_iBase__p_iPath swig_types[131]
-#define SWIGTYPE_p_f_p_iBase__p_iPluginIterator swig_types[132]
-#define SWIGTYPE_p_f_p_iBase__p_iPluginManager swig_types[133]
-#define SWIGTYPE_p_f_p_iBase__p_iProcTexture swig_types[134]
-#define SWIGTYPE_p_f_p_iBase__p_iReporter swig_types[135]
-#define SWIGTYPE_p_f_p_iBase__p_iReporterIterator swig_types[136]
-#define SWIGTYPE_p_f_p_iBase__p_iReporterListener swig_types[137]
-#define SWIGTYPE_p_f_p_iBase__p_iSCF swig_types[138]
-#define SWIGTYPE_p_f_p_iBase__p_iString swig_types[139]
-#define SWIGTYPE_p_f_p_iBase__p_iStringArray swig_types[140]
-#define SWIGTYPE_p_f_p_iBase__p_iStringSet swig_types[141]
-#define SWIGTYPE_p_f_p_iBase__p_iTriangleMesh swig_types[142]
-#define SWIGTYPE_p_f_p_iBase__p_iVFS swig_types[143]
-#define SWIGTYPE_p_f_p_iBase__p_iVirtualClock swig_types[144]
-#define SWIGTYPE_p_f_p_iBase__p_scfImplementation1T_csPyEventHandler_iEventHandler_t swig_types[145]
-#define SWIGTYPE_p_f_p_iBase__p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[146]
-#define SWIGTYPE_p_f_p_iBase__p_scfImplementation1TcsObject_iObject_t swig_types[147]
-#define SWIGTYPE_p_f_p_iBase__p_scfImplementation1TcsPath_iPath_t swig_types[148]
-#define SWIGTYPE_p_float swig_types[149]
-#define SWIGTYPE_p_iAnimatedImage swig_types[150]
-#define SWIGTYPE_p_iBase swig_types[151]
-#define SWIGTYPE_p_iCacheManager swig_types[152]
-#define SWIGTYPE_p_iClipper2D swig_types[153]
-#define SWIGTYPE_p_iCommandLineParser swig_types[154]
-#define SWIGTYPE_p_iComponent swig_types[155]
-#define SWIGTYPE_p_iConfigFile swig_types[156]
-#define SWIGTYPE_p_iConfigIterator swig_types[157]
-#define SWIGTYPE_p_iConfigManager swig_types[158]
-#define SWIGTYPE_p_iDataBuffer swig_types[159]
-#define SWIGTYPE_p_iDebugHelper swig_types[160]
-#define SWIGTYPE_p_iDocument swig_types[161]
-#define SWIGTYPE_p_iDocumentAttribute swig_types[162]
-#define SWIGTYPE_p_iDocumentAttributeIterator swig_types[163]
-#define SWIGTYPE_p_iDocumentNode swig_types[164]
-#define SWIGTYPE_p_iDocumentNodeIterator swig_types[165]
-#define SWIGTYPE_p_iDocumentSystem swig_types[166]
-#define SWIGTYPE_p_iEvent swig_types[167]
-#define SWIGTYPE_p_iEventAttributeIterator swig_types[168]
-#define SWIGTYPE_p_iEventCord swig_types[169]
-#define SWIGTYPE_p_iEventHandler swig_types[170]
-#define SWIGTYPE_p_iEventNameRegistry swig_types[171]
-#define SWIGTYPE_p_iEventOutlet swig_types[172]
-#define SWIGTYPE_p_iEventPlug swig_types[173]
-#define SWIGTYPE_p_iEventQueue swig_types[174]
-#define SWIGTYPE_p_iFactory swig_types[175]
-#define SWIGTYPE_p_iFile swig_types[176]
-#define SWIGTYPE_p_iGraphics2D swig_types[177]
-#define SWIGTYPE_p_iGraphics3D swig_types[178]
-#define SWIGTYPE_p_iImage swig_types[179]
-#define SWIGTYPE_p_iImageIO swig_types[180]
-#define SWIGTYPE_p_iJoystickDriver swig_types[181]
-#define SWIGTYPE_p_iKeyComposer swig_types[182]
-#define SWIGTYPE_p_iKeyboardDriver swig_types[183]
-#define SWIGTYPE_p_iMouseDriver swig_types[184]
-#define SWIGTYPE_p_iObject swig_types[185]
-#define SWIGTYPE_p_iObjectIterator swig_types[186]
-#define SWIGTYPE_p_iObjectNameChangeListener swig_types[187]
-#define SWIGTYPE_p_iObjectRegistry swig_types[188]
-#define SWIGTYPE_p_iObjectRegistryIterator swig_types[189]
-#define SWIGTYPE_p_iPath swig_types[190]
-#define SWIGTYPE_p_iPluginIterator swig_types[191]
-#define SWIGTYPE_p_iPluginManager swig_types[192]
-#define SWIGTYPE_p_iProcTexture swig_types[193]
-#define SWIGTYPE_p_iReporter swig_types[194]
-#define SWIGTYPE_p_iReporterIterator swig_types[195]
-#define SWIGTYPE_p_iReporterListener swig_types[196]
-#define SWIGTYPE_p_iSCF swig_types[197]
-#define SWIGTYPE_p_iString swig_types[198]
-#define SWIGTYPE_p_iStringArray swig_types[199]
-#define SWIGTYPE_p_iStringSet swig_types[200]
-#define SWIGTYPE_p_iTextureFactory swig_types[201]
-#define SWIGTYPE_p_iTriangleMesh swig_types[202]
-#define SWIGTYPE_p_iVFS swig_types[203]
-#define SWIGTYPE_p_iVerbosityManager swig_types[204]
-#define SWIGTYPE_p_iVirtualClock swig_types[205]
-#define SWIGTYPE_p_int swig_types[206]
-#define SWIGTYPE_p_int16_t swig_types[207]
-#define SWIGTYPE_p_int64_t swig_types[208]
-#define SWIGTYPE_p_int8_t swig_types[209]
-#define SWIGTYPE_p_intptr_t swig_types[210]
-#define SWIGTYPE_p_long_long swig_types[211]
-#define SWIGTYPE_p_p_char swig_types[212]
-#define SWIGTYPE_p_p_csImageIOFileFormatDescription swig_types[213]
-#define SWIGTYPE_p_p_void swig_types[214]
-#define SWIGTYPE_p_scfImplementation1T_csPyEventHandler_iEventHandler_t swig_types[215]
-#define SWIGTYPE_p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[216]
-#define SWIGTYPE_p_scfImplementation1TcsObject_iObject_t swig_types[217]
-#define SWIGTYPE_p_scfImplementation1TcsPath_iPath_t swig_types[218]
-#define SWIGTYPE_p_scfInterfaceMetadata swig_types[219]
-#define SWIGTYPE_p_scfInterfaceMetadataList swig_types[220]
-#define SWIGTYPE_p_size_t swig_types[221]
-#define SWIGTYPE_p_uint16_t swig_types[222]
-#define SWIGTYPE_p_uint32_t swig_types[223]
-#define SWIGTYPE_p_uint64_t swig_types[224]
-#define SWIGTYPE_p_unsigned_char swig_types[225]
-#define SWIGTYPE_p_unsigned_int swig_types[226]
-#define SWIGTYPE_p_unsigned_long swig_types[227]
-#define SWIGTYPE_p_unsigned_long_long swig_types[228]
-#define SWIGTYPE_p_utf32_char swig_types[229]
-#define SWIGTYPE_p_void swig_types[230]
-static swig_type_info *swig_types[232];
-static swig_module_info swig_module = {swig_types, 231, 0, 0, 0, 0};
+#define SWIGTYPE_p_f_p_iBase__p_csPyEventPlug swig_types[93]
+#define SWIGTYPE_p_f_p_iBase__p_iAnimatedImage swig_types[94]
+#define SWIGTYPE_p_f_p_iBase__p_iBase swig_types[95]
+#define SWIGTYPE_p_f_p_iBase__p_iCacheManager swig_types[96]
+#define SWIGTYPE_p_f_p_iBase__p_iClipper2D swig_types[97]
+#define SWIGTYPE_p_f_p_iBase__p_iCommandLineParser swig_types[98]
+#define SWIGTYPE_p_f_p_iBase__p_iComponent swig_types[99]
+#define SWIGTYPE_p_f_p_iBase__p_iConfigFile swig_types[100]
+#define SWIGTYPE_p_f_p_iBase__p_iConfigIterator swig_types[101]
+#define SWIGTYPE_p_f_p_iBase__p_iConfigManager swig_types[102]
+#define SWIGTYPE_p_f_p_iBase__p_iDataBuffer swig_types[103]
+#define SWIGTYPE_p_f_p_iBase__p_iDebugHelper swig_types[104]
+#define SWIGTYPE_p_f_p_iBase__p_iDocument swig_types[105]
+#define SWIGTYPE_p_f_p_iBase__p_iDocumentAttribute swig_types[106]
+#define SWIGTYPE_p_f_p_iBase__p_iDocumentAttributeIterator swig_types[107]
+#define SWIGTYPE_p_f_p_iBase__p_iDocumentNode swig_types[108]
+#define SWIGTYPE_p_f_p_iBase__p_iDocumentNodeIterator swig_types[109]
+#define SWIGTYPE_p_f_p_iBase__p_iDocumentSystem swig_types[110]
+#define SWIGTYPE_p_f_p_iBase__p_iEvent swig_types[111]
+#define SWIGTYPE_p_f_p_iBase__p_iEventAttributeIterator swig_types[112]
+#define SWIGTYPE_p_f_p_iBase__p_iEventCord swig_types[113]
+#define SWIGTYPE_p_f_p_iBase__p_iEventHandler swig_types[114]
+#define SWIGTYPE_p_f_p_iBase__p_iEventNameRegistry swig_types[115]
+#define SWIGTYPE_p_f_p_iBase__p_iEventOutlet swig_types[116]
+#define SWIGTYPE_p_f_p_iBase__p_iEventPlug swig_types[117]
+#define SWIGTYPE_p_f_p_iBase__p_iEventQueue swig_types[118]
+#define SWIGTYPE_p_f_p_iBase__p_iFactory swig_types[119]
+#define SWIGTYPE_p_f_p_iBase__p_iFile swig_types[120]
+#define SWIGTYPE_p_f_p_iBase__p_iImage swig_types[121]
+#define SWIGTYPE_p_f_p_iBase__p_iImageIO swig_types[122]
+#define SWIGTYPE_p_f_p_iBase__p_iJoystickDriver swig_types[123]
+#define SWIGTYPE_p_f_p_iBase__p_iKeyComposer swig_types[124]
+#define SWIGTYPE_p_f_p_iBase__p_iKeyboardDriver swig_types[125]
+#define SWIGTYPE_p_f_p_iBase__p_iMouseDriver swig_types[126]
+#define SWIGTYPE_p_f_p_iBase__p_iObject swig_types[127]
+#define SWIGTYPE_p_f_p_iBase__p_iObjectIterator swig_types[128]
+#define SWIGTYPE_p_f_p_iBase__p_iObjectNameChangeListener swig_types[129]
+#define SWIGTYPE_p_f_p_iBase__p_iObjectRegistry swig_types[130]
+#define SWIGTYPE_p_f_p_iBase__p_iObjectRegistryIterator swig_types[131]
+#define SWIGTYPE_p_f_p_iBase__p_iPath swig_types[132]
+#define SWIGTYPE_p_f_p_iBase__p_iPluginIterator swig_types[133]
+#define SWIGTYPE_p_f_p_iBase__p_iPluginManager swig_types[134]
+#define SWIGTYPE_p_f_p_iBase__p_iProcTexture swig_types[135]
+#define SWIGTYPE_p_f_p_iBase__p_iReporter swig_types[136]
+#define SWIGTYPE_p_f_p_iBase__p_iReporterIterator swig_types[137]
+#define SWIGTYPE_p_f_p_iBase__p_iReporterListener swig_types[138]
+#define SWIGTYPE_p_f_p_iBase__p_iSCF swig_types[139]
+#define SWIGTYPE_p_f_p_iBase__p_iString swig_types[140]
+#define SWIGTYPE_p_f_p_iBase__p_iStringArray swig_types[141]
+#define SWIGTYPE_p_f_p_iBase__p_iStringSet swig_types[142]
+#define SWIGTYPE_p_f_p_iBase__p_iTriangleMesh swig_types[143]
+#define SWIGTYPE_p_f_p_iBase__p_iVFS swig_types[144]
+#define SWIGTYPE_p_f_p_iBase__p_iVirtualClock swig_types[145]
+#define SWIGTYPE_p_f_p_iBase__p_scfImplementation1T_csPyEventHandler_iEventHandler_t swig_types[146]
+#define SWIGTYPE_p_f_p_iBase__p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[147]
+#define SWIGTYPE_p_f_p_iBase__p_scfImplementation1TcsObject_iObject_t swig_types[148]
+#define SWIGTYPE_p_f_p_iBase__p_scfImplementation1TcsPath_iPath_t swig_types[149]
+#define SWIGTYPE_p_f_p_iBase__p_scfImplementation1TcsPyEventPlug_iEventPlug_t swig_types[150]
+#define SWIGTYPE_p_float swig_types[151]
+#define SWIGTYPE_p_iAnimatedImage swig_types[152]
+#define SWIGTYPE_p_iBase swig_types[153]
+#define SWIGTYPE_p_iCacheManager swig_types[154]
+#define SWIGTYPE_p_iClipper2D swig_types[155]
+#define SWIGTYPE_p_iCommandLineParser swig_types[156]
+#define SWIGTYPE_p_iComponent swig_types[157]
+#define SWIGTYPE_p_iConfigFile swig_types[158]
+#define SWIGTYPE_p_iConfigIterator swig_types[159]
+#define SWIGTYPE_p_iConfigManager swig_types[160]
+#define SWIGTYPE_p_iDataBuffer swig_types[161]
+#define SWIGTYPE_p_iDebugHelper swig_types[162]
+#define SWIGTYPE_p_iDocument swig_types[163]
+#define SWIGTYPE_p_iDocumentAttribute swig_types[164]
+#define SWIGTYPE_p_iDocumentAttributeIterator swig_types[165]
+#define SWIGTYPE_p_iDocumentNode swig_types[166]
+#define SWIGTYPE_p_iDocumentNodeIterator swig_types[167]
+#define SWIGTYPE_p_iDocumentSystem swig_types[168]
+#define SWIGTYPE_p_iEvent swig_types[169]
+#define SWIGTYPE_p_iEventAttributeIterator swig_types[170]
+#define SWIGTYPE_p_iEventCord swig_types[171]
+#define SWIGTYPE_p_iEventHandler swig_types[172]
+#define SWIGTYPE_p_iEventNameRegistry swig_types[173]
+#define SWIGTYPE_p_iEventOutlet swig_types[174]
+#define SWIGTYPE_p_iEventPlug swig_types[175]
+#define SWIGTYPE_p_iEventQueue swig_types[176]
+#define SWIGTYPE_p_iFactory swig_types[177]
+#define SWIGTYPE_p_iFile swig_types[178]
+#define SWIGTYPE_p_iGraphics2D swig_types[179]
+#define SWIGTYPE_p_iGraphics3D swig_types[180]
+#define SWIGTYPE_p_iImage swig_types[181]
+#define SWIGTYPE_p_iImageIO swig_types[182]
+#define SWIGTYPE_p_iJoystickDriver swig_types[183]
+#define SWIGTYPE_p_iKeyComposer swig_types[184]
+#define SWIGTYPE_p_iKeyboardDriver swig_types[185]
+#define SWIGTYPE_p_iMouseDriver swig_types[186]
+#define SWIGTYPE_p_iObject swig_types[187]
+#define SWIGTYPE_p_iObjectIterator swig_types[188]
+#define SWIGTYPE_p_iObjectNameChangeListener swig_types[189]
+#define SWIGTYPE_p_iObjectRegistry swig_types[190]
+#define SWIGTYPE_p_iObjectRegistryIterator swig_types[191]
+#define SWIGTYPE_p_iPath swig_types[192]
+#define SWIGTYPE_p_iPluginIterator swig_types[193]
+#define SWIGTYPE_p_iPluginManager swig_types[194]
+#define SWIGTYPE_p_iProcTexture swig_types[195]
+#define SWIGTYPE_p_iReporter swig_types[196]
+#define SWIGTYPE_p_iReporterIterator swig_types[197]
+#define SWIGTYPE_p_iReporterListener swig_types[198]
+#define SWIGTYPE_p_iSCF swig_types[199]
+#define SWIGTYPE_p_iString swig_types[200]
+#define SWIGTYPE_p_iStringArray swig_types[201]
+#define SWIGTYPE_p_iStringSet swig_types[202]
+#define SWIGTYPE_p_iTextureFactory swig_types[203]
+#define SWIGTYPE_p_iTriangleMesh swig_types[204]
+#define SWIGTYPE_p_iVFS swig_types[205]
+#define SWIGTYPE_p_iVerbosityManager swig_types[206]
+#define SWIGTYPE_p_iVirtualClock swig_types[207]
+#define SWIGTYPE_p_int swig_types[208]
+#define SWIGTYPE_p_int16_t swig_types[209]
+#define SWIGTYPE_p_int64_t swig_types[210]
+#define SWIGTYPE_p_int8_t swig_types[211]
+#define SWIGTYPE_p_intptr_t swig_types[212]
+#define SWIGTYPE_p_long_long swig_types[213]
+#define SWIGTYPE_p_p_char swig_types[214]
+#define SWIGTYPE_p_p_csImageIOFileFormatDescription swig_types[215]
+#define SWIGTYPE_p_p_void swig_types[216]
+#define SWIGTYPE_p_scfImplementation1T_csPyEventHandler_iEventHandler_t swig_types[217]
+#define SWIGTYPE_p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[218]
+#define SWIGTYPE_p_scfImplementation1TcsObject_iObject_t swig_types[219]
+#define SWIGTYPE_p_scfImplementation1TcsPath_iPath_t swig_types[220]
+#define SWIGTYPE_p_scfImplementation1TcsPyEventPlug_iEventPlug_t swig_types[221]
+#define SWIGTYPE_p_scfInterfaceMetadata swig_types[222]
+#define SWIGTYPE_p_scfInterfaceMetadataList swig_types[223]
+#define SWIGTYPE_p_size_t swig_types[224]
+#define SWIGTYPE_p_uint16_t swig_types[225]
+#define SWIGTYPE_p_uint32_t swig_types[226]
+#define SWIGTYPE_p_uint64_t swig_types[227]
+#define SWIGTYPE_p_unsigned_char swig_types[228]
+#define SWIGTYPE_p_unsigned_int swig_types[229]
+#define SWIGTYPE_p_unsigned_long swig_types[230]
+#define SWIGTYPE_p_unsigned_long_long swig_types[231]
+#define SWIGTYPE_p_utf32_char swig_types[232]
+#define SWIGTYPE_p_void swig_types[233]
+static swig_type_info *swig_types[235];
+static swig_module_info swig_module = {swig_types, 234, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -3393,6 +3396,10 @@ SWIGINTERN csEventError iEvent_RetrieveString(iEvent *self,char const *name,char
 	}
 SWIGINTERN int iEvent_scfGetVersion(){ return scfInterfaceTraits<iEvent>::GetVersion(); }
 SWIGINTERN void delete_iEvent(iEvent *self){ if (self) self->DecRef (); }
+SWIGINTERN int iEventPlug_scfGetVersion(){ return scfInterfaceTraits<iEventPlug>::GetVersion(); }
+SWIGINTERN void delete_iEventPlug(iEventPlug *self){ if (self) self->DecRef (); }
+SWIGINTERN int iEventOutlet_scfGetVersion(){ return scfInterfaceTraits<iEventOutlet>::GetVersion(); }
+SWIGINTERN void delete_iEventOutlet(iEventOutlet *self){ if (self) self->DecRef (); }
 SWIGINTERN unsigned int csKeyModifiers___getitem__(csKeyModifiers const *self,size_t i){
       if (i<csKeyModifierTypeLast)
           return self->modifiers[i];
@@ -3598,6 +3605,15 @@ object->GetChild instead\n");
   return csWrapPtr (iface, iface_ver, csRef<iBase> (
     obj->GetChild(iSCF::SCF->GetInterfaceID (iface), iface_ver, name, true)));
 }
+
+
+  struct csPyEventPlug : public scfImplementation1<csPyEventPlug,iEventPlug>
+  {
+    csPyEventPlug () : scfImplementationType(this) { }
+    virtual ~csPyEventPlug () { }
+    virtual unsigned GetPotentiallyConflictingEvents () { return CSEVTYPE_Joystick|CSEVTYPE_Mouse|CSEVTYPE_Keyboard; }
+    virtual unsigned QueryEventPriority (unsigned) { return 110; }
+  };
 
 
 
@@ -26392,6 +26408,19 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iEventPlug_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  int result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iEventPlug_scfGetVersion",0,0)) SWIG_fail;
+  result = (int)iEventPlug_scfGetVersion();
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_delete_iEventPlug(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iEventPlug *arg1 = (iEventPlug *) 0 ;
@@ -26405,7 +26434,7 @@ SWIGINTERN PyObject *_wrap_delete_iEventPlug(PyObject *SWIGUNUSEDPARM(self), PyO
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iEventPlug" "', argument " "1"" of type '" "iEventPlug *""'"); 
   }
   arg1 = reinterpret_cast< iEventPlug * >(argp1);
-  delete arg1;
+  delete_iEventPlug(arg1);
   
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -26970,6 +26999,19 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iEventOutlet_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  int result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iEventOutlet_scfGetVersion",0,0)) SWIG_fail;
+  result = (int)iEventOutlet_scfGetVersion();
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_delete_iEventOutlet(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iEventOutlet *arg1 = (iEventOutlet *) 0 ;
@@ -26983,7 +27025,7 @@ SWIGINTERN PyObject *_wrap_delete_iEventOutlet(PyObject *SWIGUNUSEDPARM(self), P
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iEventOutlet" "', argument " "1"" of type '" "iEventOutlet *""'"); 
   }
   arg1 = reinterpret_cast< iEventOutlet * >(argp1);
-  delete arg1;
+  delete_iEventOutlet(arg1);
   
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -31357,7 +31399,24 @@ SWIGINTERN PyObject *_wrap_iEventQueue_CreateEventOutlet(PyObject *SWIGUNUSEDPAR
   }
   arg2 = reinterpret_cast< iEventPlug * >(argp2);
   result = (arg1)->CreateEventOutlet(arg2);
-  resultobj = SWIG_NewPointerObj((new csPtr<iEventOutlet >(static_cast< const csPtr<iEventOutlet >& >(result))), SWIGTYPE_p_csPtrTiEventOutlet_t, SWIG_POINTER_OWN |  0 );
+  {
+    /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
+    csRef<iEventOutlet> ref((csPtr<iEventOutlet>&)result); /* explicit cast */
+    /*const csRef<iBase> ref = csRef<iBase>((iEventOutlet *)ref1);
+      if (!ref.IsValid())
+      {
+        Py_INCREF(Py_None);
+        resultobj = Py_None;
+      }
+      else
+      {
+        ref->IncRef();
+        resultobj = SWIG_NewPointerObj((void *)(iEventOutlet *)ref1, SWIG_TypeQuery("iEventOutlet" " *"), 1);
+      }*/
+    resultobj = _csRef_to_Python(csRef<iBase>(
+        (iEventOutlet *)ref), (void *)(iEventOutlet *)ref, "iEventOutlet" " *");
+    /*@SWIG@*/
+  }
   return resultobj;
 fail:
   return NULL;
@@ -52609,6 +52668,294 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csPyEventPlugParent_IncRef(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  scfImplementation1<csPyEventPlug,iEventPlug > *arg1 = (scfImplementation1<csPyEventPlug,iEventPlug > *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csPyEventPlugParent_IncRef",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_scfImplementation1TcsPyEventPlug_iEventPlug_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csPyEventPlugParent_IncRef" "', argument " "1"" of type '" "scfImplementation1<csPyEventPlug,iEventPlug > *""'"); 
+  }
+  arg1 = reinterpret_cast< scfImplementation1<csPyEventPlug,iEventPlug > * >(argp1);
+  (arg1)->IncRef();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csPyEventPlugParent_DecRef(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  scfImplementation1<csPyEventPlug,iEventPlug > *arg1 = (scfImplementation1<csPyEventPlug,iEventPlug > *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csPyEventPlugParent_DecRef",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_scfImplementation1TcsPyEventPlug_iEventPlug_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csPyEventPlugParent_DecRef" "', argument " "1"" of type '" "scfImplementation1<csPyEventPlug,iEventPlug > *""'"); 
+  }
+  arg1 = reinterpret_cast< scfImplementation1<csPyEventPlug,iEventPlug > * >(argp1);
+  (arg1)->DecRef();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csPyEventPlugParent_GetRefCount(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  scfImplementation1<csPyEventPlug,iEventPlug > *arg1 = (scfImplementation1<csPyEventPlug,iEventPlug > *) 0 ;
+  int result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csPyEventPlugParent_GetRefCount",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_scfImplementation1TcsPyEventPlug_iEventPlug_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csPyEventPlugParent_GetRefCount" "', argument " "1"" of type '" "scfImplementation1<csPyEventPlug,iEventPlug > *""'"); 
+  }
+  arg1 = reinterpret_cast< scfImplementation1<csPyEventPlug,iEventPlug > * >(argp1);
+  result = (int)(arg1)->GetRefCount();
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csPyEventPlugParent_QueryInterface(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  scfImplementation1<csPyEventPlug,iEventPlug > *arg1 = (scfImplementation1<csPyEventPlug,iEventPlug > *) 0 ;
+  scfInterfaceID arg2 ;
+  int arg3 ;
+  void *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  unsigned long val2 ;
+  int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csPyEventPlugParent_QueryInterface",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_scfImplementation1TcsPyEventPlug_iEventPlug_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csPyEventPlugParent_QueryInterface" "', argument " "1"" of type '" "scfImplementation1<csPyEventPlug,iEventPlug > *""'"); 
+  }
+  arg1 = reinterpret_cast< scfImplementation1<csPyEventPlug,iEventPlug > * >(argp1);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csPyEventPlugParent_QueryInterface" "', argument " "2"" of type '" "scfInterfaceID""'");
+  } 
+  arg2 = static_cast< scfInterfaceID >(val2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "csPyEventPlugParent_QueryInterface" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
+  result = (void *)(arg1)->QueryInterface(arg2,arg3);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csPyEventPlugParent_AddRefOwner(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  scfImplementation1<csPyEventPlug,iEventPlug > *arg1 = (scfImplementation1<csPyEventPlug,iEventPlug > *) 0 ;
+  void **arg2 = (void **) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csPyEventPlugParent_AddRefOwner",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_scfImplementation1TcsPyEventPlug_iEventPlug_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csPyEventPlugParent_AddRefOwner" "', argument " "1"" of type '" "scfImplementation1<csPyEventPlug,iEventPlug > *""'"); 
+  }
+  arg1 = reinterpret_cast< scfImplementation1<csPyEventPlug,iEventPlug > * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_p_void, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csPyEventPlugParent_AddRefOwner" "', argument " "2"" of type '" "void **""'"); 
+  }
+  arg2 = reinterpret_cast< void ** >(argp2);
+  (arg1)->AddRefOwner(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csPyEventPlugParent_RemoveRefOwner(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  scfImplementation1<csPyEventPlug,iEventPlug > *arg1 = (scfImplementation1<csPyEventPlug,iEventPlug > *) 0 ;
+  void **arg2 = (void **) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csPyEventPlugParent_RemoveRefOwner",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_scfImplementation1TcsPyEventPlug_iEventPlug_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csPyEventPlugParent_RemoveRefOwner" "', argument " "1"" of type '" "scfImplementation1<csPyEventPlug,iEventPlug > *""'"); 
+  }
+  arg1 = reinterpret_cast< scfImplementation1<csPyEventPlug,iEventPlug > * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_p_void, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csPyEventPlugParent_RemoveRefOwner" "', argument " "2"" of type '" "void **""'"); 
+  }
+  arg2 = reinterpret_cast< void ** >(argp2);
+  (arg1)->RemoveRefOwner(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csPyEventPlugParent_GetInterfaceMetadata(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  scfImplementation1<csPyEventPlug,iEventPlug > *arg1 = (scfImplementation1<csPyEventPlug,iEventPlug > *) 0 ;
+  scfInterfaceMetadataList *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csPyEventPlugParent_GetInterfaceMetadata",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_scfImplementation1TcsPyEventPlug_iEventPlug_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csPyEventPlugParent_GetInterfaceMetadata" "', argument " "1"" of type '" "scfImplementation1<csPyEventPlug,iEventPlug > *""'"); 
+  }
+  arg1 = reinterpret_cast< scfImplementation1<csPyEventPlug,iEventPlug > * >(argp1);
+  result = (scfInterfaceMetadataList *)(arg1)->GetInterfaceMetadata();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_scfInterfaceMetadataList, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *csPyEventPlugParent_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *obj;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
+  SWIG_TypeNewClientData(SWIGTYPE_p_scfImplementation1TcsPyEventPlug_iEventPlug_t, SWIG_NewClientData(obj));
+  return SWIG_Py_Void();
+}
+
+SWIGINTERN PyObject *_wrap_new_csPyEventPlug(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csPyEventPlug *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"new_csPyEventPlug",0,0)) SWIG_fail;
+  result = (csPyEventPlug *)new csPyEventPlug();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csPyEventPlug, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_delete_csPyEventPlug(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csPyEventPlug *arg1 = (csPyEventPlug *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"delete_csPyEventPlug",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csPyEventPlug, SWIG_POINTER_DISOWN |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_csPyEventPlug" "', argument " "1"" of type '" "csPyEventPlug *""'"); 
+  }
+  arg1 = reinterpret_cast< csPyEventPlug * >(argp1);
+  delete arg1;
+  
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csPyEventPlug_GetPotentiallyConflictingEvents(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csPyEventPlug *arg1 = (csPyEventPlug *) 0 ;
+  unsigned int result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csPyEventPlug_GetPotentiallyConflictingEvents",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csPyEventPlug, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csPyEventPlug_GetPotentiallyConflictingEvents" "', argument " "1"" of type '" "csPyEventPlug *""'"); 
+  }
+  arg1 = reinterpret_cast< csPyEventPlug * >(argp1);
+  result = (unsigned int)(arg1)->GetPotentiallyConflictingEvents();
+  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csPyEventPlug_QueryEventPriority(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csPyEventPlug *arg1 = (csPyEventPlug *) 0 ;
+  unsigned int arg2 ;
+  unsigned int result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  unsigned int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csPyEventPlug_QueryEventPriority",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csPyEventPlug, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csPyEventPlug_QueryEventPriority" "', argument " "1"" of type '" "csPyEventPlug *""'"); 
+  }
+  arg1 = reinterpret_cast< csPyEventPlug * >(argp1);
+  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csPyEventPlug_QueryEventPriority" "', argument " "2"" of type '" "unsigned int""'");
+  } 
+  arg2 = static_cast< unsigned int >(val2);
+  result = (unsigned int)(arg1)->QueryEventPriority(arg2);
+  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *csPyEventPlug_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *obj;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
+  SWIG_TypeNewClientData(SWIGTYPE_p_csPyEventPlug, SWIG_NewClientData(obj));
+  return SWIG_Py_Void();
+}
+
 SWIGINTERN PyObject *_wrap_csPyEventHandlerParent_IncRef(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   scfImplementation1<_csPyEventHandler,iEventHandler > *arg1 = (scfImplementation1<_csPyEventHandler,iEventHandler > *) 0 ;
@@ -53773,6 +54120,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iEventPlug_GetPotentiallyConflictingEvents", _wrap_iEventPlug_GetPotentiallyConflictingEvents, METH_VARARGS, NULL},
 	 { (char *)"iEventPlug_QueryEventPriority", _wrap_iEventPlug_QueryEventPriority, METH_VARARGS, NULL},
 	 { (char *)"iEventPlug_EnableEvents", _wrap_iEventPlug_EnableEvents, METH_VARARGS, NULL},
+	 { (char *)"iEventPlug_scfGetVersion", _wrap_iEventPlug_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iEventPlug", _wrap_delete_iEventPlug, METH_VARARGS, NULL},
 	 { (char *)"iEventPlug_swigregister", iEventPlug_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iEventOutlet_CreateEvent", _wrap_iEventOutlet_CreateEvent, METH_VARARGS, NULL},
@@ -53782,6 +54130,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iEventOutlet_Joystick", _wrap_iEventOutlet_Joystick, METH_VARARGS, NULL},
 	 { (char *)"iEventOutlet_Broadcast", _wrap_iEventOutlet_Broadcast, METH_VARARGS, NULL},
 	 { (char *)"iEventOutlet_ImmediateBroadcast", _wrap_iEventOutlet_ImmediateBroadcast, METH_VARARGS, NULL},
+	 { (char *)"iEventOutlet_scfGetVersion", _wrap_iEventOutlet_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iEventOutlet", _wrap_delete_iEventOutlet, METH_VARARGS, NULL},
 	 { (char *)"iEventOutlet_swigregister", iEventOutlet_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iEventCord_Insert", _wrap_iEventCord_Insert, METH_VARARGS, NULL},
@@ -54300,6 +54649,19 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"CS_GET_CHILD_OBJECT", _wrap_CS_GET_CHILD_OBJECT, METH_VARARGS, NULL},
 	 { (char *)"CS_GET_NAMED_CHILD_OBJECT", _wrap_CS_GET_NAMED_CHILD_OBJECT, METH_VARARGS, NULL},
 	 { (char *)"CS_GET_FIRST_NAMED_CHILD_OBJECT", _wrap_CS_GET_FIRST_NAMED_CHILD_OBJECT, METH_VARARGS, NULL},
+	 { (char *)"csPyEventPlugParent_IncRef", _wrap_csPyEventPlugParent_IncRef, METH_VARARGS, NULL},
+	 { (char *)"csPyEventPlugParent_DecRef", _wrap_csPyEventPlugParent_DecRef, METH_VARARGS, NULL},
+	 { (char *)"csPyEventPlugParent_GetRefCount", _wrap_csPyEventPlugParent_GetRefCount, METH_VARARGS, NULL},
+	 { (char *)"csPyEventPlugParent_QueryInterface", _wrap_csPyEventPlugParent_QueryInterface, METH_VARARGS, NULL},
+	 { (char *)"csPyEventPlugParent_AddRefOwner", _wrap_csPyEventPlugParent_AddRefOwner, METH_VARARGS, NULL},
+	 { (char *)"csPyEventPlugParent_RemoveRefOwner", _wrap_csPyEventPlugParent_RemoveRefOwner, METH_VARARGS, NULL},
+	 { (char *)"csPyEventPlugParent_GetInterfaceMetadata", _wrap_csPyEventPlugParent_GetInterfaceMetadata, METH_VARARGS, NULL},
+	 { (char *)"csPyEventPlugParent_swigregister", csPyEventPlugParent_swigregister, METH_VARARGS, NULL},
+	 { (char *)"new_csPyEventPlug", _wrap_new_csPyEventPlug, METH_VARARGS, NULL},
+	 { (char *)"delete_csPyEventPlug", _wrap_delete_csPyEventPlug, METH_VARARGS, NULL},
+	 { (char *)"csPyEventPlug_GetPotentiallyConflictingEvents", _wrap_csPyEventPlug_GetPotentiallyConflictingEvents, METH_VARARGS, NULL},
+	 { (char *)"csPyEventPlug_QueryEventPriority", _wrap_csPyEventPlug_QueryEventPriority, METH_VARARGS, NULL},
+	 { (char *)"csPyEventPlug_swigregister", csPyEventPlug_swigregister, METH_VARARGS, NULL},
 	 { (char *)"csPyEventHandlerParent_IncRef", _wrap_csPyEventHandlerParent_IncRef, METH_VARARGS, NULL},
 	 { (char *)"csPyEventHandlerParent_DecRef", _wrap_csPyEventHandlerParent_DecRef, METH_VARARGS, NULL},
 	 { (char *)"csPyEventHandlerParent_GetRefCount", _wrap_csPyEventHandlerParent_GetRefCount, METH_VARARGS, NULL},
@@ -54326,6 +54688,12 @@ static PyMethodDef SwigMethods[] = {
 
 /* -------- TYPE CONVERSION AND EQUIVALENCE RULES (BEGIN) -------- */
 
+static void *_p_csPyEventPlugTo_p_iEventPlug(void *x) {
+    return (void *)((iEventPlug *) (scfImplementation1<csPyEventPlug,iEventPlug > *) ((csPyEventPlug *) x));
+}
+static void *_p_scfImplementation1TcsPyEventPlug_iEventPlug_tTo_p_iEventPlug(void *x) {
+    return (void *)((iEventPlug *)  ((scfImplementation1<csPyEventPlug,iEventPlug > *) x));
+}
 static void *_p_csStringTo_p_csStringFastT36_t(void *x) {
     return (void *)((csStringFast<36 > *)  ((csString *) x));
 }
@@ -54449,6 +54817,9 @@ static void *_p_iDocumentAttributeIteratorTo_p_iBase(void *x) {
 static void *_p_iDocumentNodeIteratorTo_p_iBase(void *x) {
     return (void *)((iBase *)  ((iDocumentNodeIterator *) x));
 }
+static void *_p_scfImplementation1TcsPyEventPlug_iEventPlug_tTo_p_iBase(void *x) {
+    return (void *)((iBase *) (iEventPlug *) ((scfImplementation1<csPyEventPlug,iEventPlug > *) x));
+}
 static void *_p_iCommandLineParserTo_p_iBase(void *x) {
     return (void *)((iBase *)  ((iCommandLineParser *) x));
 }
@@ -54496,6 +54867,9 @@ static void *_p_scfImplementation1TcsConfigFile_iConfigFile_tTo_p_iBase(void *x)
 }
 static void *_p_csObjectTo_p_iBase(void *x) {
     return (void *)((iBase *) (iObject *)(scfImplementation1<csObject,iObject > *) ((csObject *) x));
+}
+static void *_p_csPyEventPlugTo_p_iBase(void *x) {
+    return (void *)((iBase *) (iEventPlug *)(scfImplementation1<csPyEventPlug,iEventPlug > *) ((csPyEventPlug *) x));
 }
 static void *_p_iDocumentNodeTo_p_iBase(void *x) {
     return (void *)((iBase *)  ((iDocumentNode *) x));
@@ -54623,6 +54997,9 @@ static void *_p_f_p_iBase__p_iDocumentAttributeIteratorTo_p_f_p_iBase__p_iBase(v
 static void *_p_f_p_iBase__p_iDocumentNodeIteratorTo_p_f_p_iBase__p_iBase(void *x) {
     return (void *)((iBase *(*)(iBase *))  ((iDocumentNodeIterator *(*)(iBase *)) x));
 }
+static void *_p_f_p_iBase__p_scfImplementation1TcsPyEventPlug_iEventPlug_tTo_p_f_p_iBase__p_iBase(void *x) {
+    return (void *)((iBase *(*)(iBase *)) (iEventPlug *) ((scfImplementation1<csPyEventPlug,iEventPlug > *(*)(iBase *)) x));
+}
 static void *_p_f_p_iBase__p_iCommandLineParserTo_p_f_p_iBase__p_iBase(void *x) {
     return (void *)((iBase *(*)(iBase *))  ((iCommandLineParser *(*)(iBase *)) x));
 }
@@ -54670,6 +55047,9 @@ static void *_p_f_p_iBase__p_scfImplementation1TcsConfigFile_iConfigFile_tTo_p_f
 }
 static void *_p_f_p_iBase__p_csObjectTo_p_f_p_iBase__p_iBase(void *x) {
     return (void *)((iBase *(*)(iBase *)) (iObject *)(scfImplementation1<csObject,iObject > *) ((csObject *(*)(iBase *)) x));
+}
+static void *_p_f_p_iBase__p_csPyEventPlugTo_p_f_p_iBase__p_iBase(void *x) {
+    return (void *)((iBase *(*)(iBase *)) (iEventPlug *)(scfImplementation1<csPyEventPlug,iEventPlug > *) ((csPyEventPlug *(*)(iBase *)) x));
 }
 static void *_p_f_p_iBase__p_iDocumentNodeTo_p_f_p_iBase__p_iBase(void *x) {
     return (void *)((iBase *(*)(iBase *))  ((iDocumentNode *(*)(iBase *)) x));
@@ -54730,6 +55110,9 @@ static void *_p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHan
 }
 static void *_p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated(void *x) {
     return (void *)((CS::Memory::CustomAllocated *)  ((csArray<csPluginRequest > *) x));
+}
+static void *_p_csPyEventPlugTo_p_scfImplementation1TcsPyEventPlug_iEventPlug_t(void *x) {
+    return (void *)((scfImplementation1<csPyEventPlug,iEventPlug > *)  ((csPyEventPlug *) x));
 }
 static void *_p_csArrayCapacityDefaultTo_p_csArrayThresholdVariable(void *x) {
     return (void *)((csArrayThresholdVariable *) (csArrayCapacityLinear<csArrayThresholdVariable > *) ((csArrayCapacityDefault *) x));
@@ -54802,9 +55185,9 @@ static swig_type_info _swigt__p_csObject = {"_p_csObject", "csObject *", 0, 0, (
 static swig_type_info _swigt__p_csPluginRequest = {"_p_csPluginRequest", "csPluginRequest *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csPrimitives = {"_p_csPrimitives", "csPrimitives *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csPtrTiBase_t = {"_p_csPtrTiBase_t", "csPtr<iBase > *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_csPtrTiEventOutlet_t = {"_p_csPtrTiEventOutlet_t", "csPtr<iEventOutlet > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csPtrTiKeyComposer_t = {"_p_csPtrTiKeyComposer_t", "csPtr<iKeyComposer > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csPtrTiObjectRegistryIterator_t = {"_p_csPtrTiObjectRegistryIterator_t", "csPtr<iObjectRegistryIterator > *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_csPyEventPlug = {"_p_csPyEventPlug", "csPyEventPlug *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csRGBpixel = {"_p_csRGBpixel", "csRGBpixel *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csRadixSorter = {"_p_csRadixSorter", "csRadixSorter *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csRect = {"_p_csRect", "csRect *", 0, 0, (void*)0, 0};
@@ -54851,6 +55234,7 @@ static swig_type_info _swigt__p_f_p_iBase__p_iKeyboardDriver = {"_p_f_p_iBase__p
 static swig_type_info _swigt__p_f_p_iBase__p_iObjectNameChangeListener = {"_p_f_p_iBase__p_iObjectNameChangeListener", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_f_p_iBase__p_iReporterListener = {"_p_f_p_iBase__p_iReporterListener", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_f_p_iBase__p_iEvent = {"_p_f_p_iBase__p_iEvent", 0, 0, 0, 0, 0};
+static swig_type_info _swigt__p_f_p_iBase__p_scfImplementation1TcsPyEventPlug_iEventPlug_t = {"_p_f_p_iBase__p_scfImplementation1TcsPyEventPlug_iEventPlug_t", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_f_p_iBase__p_iReporter = {"_p_f_p_iBase__p_iReporter", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_f_p_iBase__p_iDocumentSystem = {"_p_f_p_iBase__p_iDocumentSystem", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_f_p_iBase__p_scfImplementation1T_csPyEventHandler_iEventHandler_t = {"_p_f_p_iBase__p_scfImplementation1T_csPyEventHandler_iEventHandler_t", 0, 0, 0, 0, 0};
@@ -54866,8 +55250,8 @@ static swig_type_info _swigt__p_f_p_iBase__p_iDocumentNodeIterator = {"_p_f_p_iB
 static swig_type_info _swigt__p_f_p_iBase__p_iClipper2D = {"_p_f_p_iBase__p_iClipper2D", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_f_p_iBase__p_iCommandLineParser = {"_p_f_p_iBase__p_iCommandLineParser", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_f_p_iBase__p_iDataBuffer = {"_p_f_p_iBase__p_iDataBuffer", 0, 0, 0, 0, 0};
-static swig_type_info _swigt__p_f_p_iBase__p_iProcTexture = {"_p_f_p_iBase__p_iProcTexture", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_f_p_iBase__p_iEventHandler = {"_p_f_p_iBase__p_iEventHandler", 0, 0, 0, 0, 0};
+static swig_type_info _swigt__p_f_p_iBase__p_iProcTexture = {"_p_f_p_iBase__p_iProcTexture", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_f_p_iBase__p__csPyEventHandler = {"_p_f_p_iBase__p__csPyEventHandler", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_f_p_iBase__p_iVFS = {"_p_f_p_iBase__p_iVFS", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_f_p_iBase__p_iComponent = {"_p_f_p_iBase__p_iComponent", 0, 0, 0, 0, 0};
@@ -54880,6 +55264,7 @@ static swig_type_info _swigt__p_f_p_iBase__p_iEventPlug = {"_p_f_p_iBase__p_iEve
 static swig_type_info _swigt__p_f_p_iBase__p_iObject = {"_p_f_p_iBase__p_iObject", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_f_p_iBase__p_iDocumentAttribute = {"_p_f_p_iBase__p_iDocumentAttribute", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_f_p_iBase__p_csObject = {"_p_f_p_iBase__p_csObject", 0, 0, 0, 0, 0};
+static swig_type_info _swigt__p_f_p_iBase__p_csPyEventPlug = {"_p_f_p_iBase__p_csPyEventPlug", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_f_p_iBase__p_iDocumentNode = {"_p_f_p_iBase__p_iDocumentNode", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_f_p_iBase__p_iString = {"_p_f_p_iBase__p_iString", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_f_p_iBase__p_iPath = {"_p_f_p_iBase__p_iPath", 0, 0, 0, 0, 0};
@@ -54962,6 +55347,7 @@ static swig_type_info _swigt__p_scfImplementation1T_csPyEventHandler_iEventHandl
 static swig_type_info _swigt__p_scfImplementation1TcsConfigFile_iConfigFile_t = {"_p_scfImplementation1TcsConfigFile_iConfigFile_t", "scfImplementation1<csConfigFile,iConfigFile > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_scfImplementation1TcsObject_iObject_t = {"_p_scfImplementation1TcsObject_iObject_t", "scfImplementation1<csObject,iObject > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_scfImplementation1TcsPath_iPath_t = {"_p_scfImplementation1TcsPath_iPath_t", "scfImplementation1<csPath,iPath > *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_scfImplementation1TcsPyEventPlug_iEventPlug_t = {"_p_scfImplementation1TcsPyEventPlug_iEventPlug_t", "scfImplementation1<csPyEventPlug,iEventPlug > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_scfInterfaceMetadata = {"_p_scfInterfaceMetadata", "scfInterfaceMetadata *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_scfInterfaceMetadataList = {"_p_scfInterfaceMetadataList", "scfInterfaceMetadataList *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_size_t = {"_p_size_t", "size_t *", 0, 0, (void*)0, 0};
@@ -55035,9 +55421,9 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_csPluginRequest,
   &_swigt__p_csPrimitives,
   &_swigt__p_csPtrTiBase_t,
-  &_swigt__p_csPtrTiEventOutlet_t,
   &_swigt__p_csPtrTiKeyComposer_t,
   &_swigt__p_csPtrTiObjectRegistryIterator_t,
+  &_swigt__p_csPyEventPlug,
   &_swigt__p_csRGBpixel,
   &_swigt__p_csRadixSorter,
   &_swigt__p_csRect,
@@ -55069,6 +55455,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_f_p_iBase__p__csPyEventHandler,
   &_swigt__p_f_p_iBase__p_csConfigFile,
   &_swigt__p_f_p_iBase__p_csObject,
+  &_swigt__p_f_p_iBase__p_csPyEventPlug,
   &_swigt__p_f_p_iBase__p_iAnimatedImage,
   &_swigt__p_f_p_iBase__p_iBase,
   &_swigt__p_f_p_iBase__p_iCacheManager,
@@ -55125,6 +55512,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_f_p_iBase__p_scfImplementation1TcsConfigFile_iConfigFile_t,
   &_swigt__p_f_p_iBase__p_scfImplementation1TcsObject_iObject_t,
   &_swigt__p_f_p_iBase__p_scfImplementation1TcsPath_iPath_t,
+  &_swigt__p_f_p_iBase__p_scfImplementation1TcsPyEventPlug_iEventPlug_t,
   &_swigt__p_float,
   &_swigt__p_iAnimatedImage,
   &_swigt__p_iBase,
@@ -55195,6 +55583,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_scfImplementation1TcsConfigFile_iConfigFile_t,
   &_swigt__p_scfImplementation1TcsObject_iObject_t,
   &_swigt__p_scfImplementation1TcsPath_iPath_t,
+  &_swigt__p_scfImplementation1TcsPyEventPlug_iEventPlug_t,
   &_swigt__p_scfInterfaceMetadata,
   &_swigt__p_scfInterfaceMetadataList,
   &_swigt__p_size_t,
@@ -55268,9 +55657,9 @@ static swig_cast_info _swigc__p_csObject[] = {  {&_swigt__p_csObject, 0, 0, 0},{
 static swig_cast_info _swigc__p_csPluginRequest[] = {  {&_swigt__p_csPluginRequest, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csPrimitives[] = {  {&_swigt__p_csPrimitives, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csPtrTiBase_t[] = {  {&_swigt__p_csPtrTiBase_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csPtrTiEventOutlet_t[] = {  {&_swigt__p_csPtrTiEventOutlet_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csPtrTiKeyComposer_t[] = {  {&_swigt__p_csPtrTiKeyComposer_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csPtrTiObjectRegistryIterator_t[] = {  {&_swigt__p_csPtrTiObjectRegistryIterator_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_csPyEventPlug[] = {  {&_swigt__p_csPyEventPlug, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csRGBpixel[] = {  {&_swigt__p_csRGBpixel, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csRadixSorter[] = {  {&_swigt__p_csRadixSorter, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csRect[] = {  {&_swigt__p_csRect, 0, 0, 0},{0, 0, 0, 0}};
@@ -55316,6 +55705,7 @@ static swig_cast_info _swigc__p_f_p_iBase__p_iKeyboardDriver[] = {{&_swigt__p_f_
 static swig_cast_info _swigc__p_f_p_iBase__p_iObjectNameChangeListener[] = {{&_swigt__p_f_p_iBase__p_iObjectNameChangeListener, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_f_p_iBase__p_iReporterListener[] = {{&_swigt__p_f_p_iBase__p_iReporterListener, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_f_p_iBase__p_iEvent[] = {{&_swigt__p_f_p_iBase__p_iEvent, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_f_p_iBase__p_scfImplementation1TcsPyEventPlug_iEventPlug_t[] = {{&_swigt__p_f_p_iBase__p_scfImplementation1TcsPyEventPlug_iEventPlug_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_f_p_iBase__p_iReporter[] = {{&_swigt__p_f_p_iBase__p_iReporter, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_f_p_iBase__p_iDocumentSystem[] = {{&_swigt__p_f_p_iBase__p_iDocumentSystem, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_f_p_iBase__p_scfImplementation1T_csPyEventHandler_iEventHandler_t[] = {{&_swigt__p_f_p_iBase__p_scfImplementation1T_csPyEventHandler_iEventHandler_t, 0, 0, 0},{0, 0, 0, 0}};
@@ -55331,8 +55721,8 @@ static swig_cast_info _swigc__p_f_p_iBase__p_iDocumentNodeIterator[] = {{&_swigt
 static swig_cast_info _swigc__p_f_p_iBase__p_iClipper2D[] = {{&_swigt__p_f_p_iBase__p_iClipper2D, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_f_p_iBase__p_iCommandLineParser[] = {{&_swigt__p_f_p_iBase__p_iCommandLineParser, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_f_p_iBase__p_iDataBuffer[] = {{&_swigt__p_f_p_iBase__p_iDataBuffer, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_f_p_iBase__p_iProcTexture[] = {{&_swigt__p_f_p_iBase__p_iProcTexture, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_f_p_iBase__p_iEventHandler[] = {{&_swigt__p_f_p_iBase__p_iEventHandler, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_f_p_iBase__p_iProcTexture[] = {{&_swigt__p_f_p_iBase__p_iProcTexture, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_f_p_iBase__p__csPyEventHandler[] = {{&_swigt__p_f_p_iBase__p__csPyEventHandler, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_f_p_iBase__p_iVFS[] = {{&_swigt__p_f_p_iBase__p_iVFS, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_f_p_iBase__p_iComponent[] = {{&_swigt__p_f_p_iBase__p_iComponent, 0, 0, 0},{0, 0, 0, 0}};
@@ -55345,6 +55735,7 @@ static swig_cast_info _swigc__p_f_p_iBase__p_iEventPlug[] = {{&_swigt__p_f_p_iBa
 static swig_cast_info _swigc__p_f_p_iBase__p_iObject[] = {{&_swigt__p_f_p_iBase__p_iObject, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_f_p_iBase__p_iDocumentAttribute[] = {{&_swigt__p_f_p_iBase__p_iDocumentAttribute, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_f_p_iBase__p_csObject[] = {{&_swigt__p_f_p_iBase__p_csObject, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_f_p_iBase__p_csPyEventPlug[] = {{&_swigt__p_f_p_iBase__p_csPyEventPlug, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_f_p_iBase__p_iDocumentNode[] = {{&_swigt__p_f_p_iBase__p_iDocumentNode, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_f_p_iBase__p_iString[] = {{&_swigt__p_f_p_iBase__p_iString, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_f_p_iBase__p_iPath[] = {{&_swigt__p_f_p_iBase__p_iPath, 0, 0, 0},{0, 0, 0, 0}};
@@ -55357,11 +55748,11 @@ static swig_cast_info _swigc__p_f_p_iBase__p_iEventCord[] = {{&_swigt__p_f_p_iBa
 static swig_cast_info _swigc__p_f_p_iBase__p_iPluginManager[] = {{&_swigt__p_f_p_iBase__p_iPluginManager, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_f_p_iBase__p_iCacheManager[] = {{&_swigt__p_f_p_iBase__p_iCacheManager, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_f_p_iBase__p_iConfigManager[] = {{&_swigt__p_f_p_iBase__p_iConfigManager, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_f_p_iBase__p_iBase[] = {  {&_swigt__p_f_p_iBase__p_iFile, _p_f_p_iBase__p_iFileTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iEventOutlet, _p_f_p_iBase__p_iEventOutletTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iKeyComposer, _p_f_p_iBase__p_iKeyComposerTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_scfImplementation1TcsConfigFile_iConfigFile_t, _p_f_p_iBase__p_scfImplementation1TcsConfigFile_iConfigFile_tTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iImageIO, _p_f_p_iBase__p_iImageIOTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iImage, _p_f_p_iBase__p_iImageTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iStringArray, _p_f_p_iBase__p_iStringArrayTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iFactory, _p_f_p_iBase__p_iFactoryTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_scfImplementation1TcsPath_iPath_t, _p_f_p_iBase__p_scfImplementation1TcsPath_iPath_tTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iBase, 0, 0, 0},  {&_swigt__p_f_p_iBase__p_iEventNameRegistry, _p_f_p_iBase__p_iEventNameRegistryTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iObjectRegistry, _p_f_p_iBase__p_iObjectRegistryTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iDocument, _p_f_p_iBase__p_iDocumentTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iEventQueue, _p_f_p_iBase__p_iEventQueueTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iKeyboardDriver, _p_f_p_iBase__p_iKeyboardDriverTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iObjectNameChangeListener, _p_f_p_iBase__p_iObjectNameChangeListenerTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iReporterListener, _p_f_p_iBase__p_iReporterListenerTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iEvent, _p_f_p_iBase__p_iEventTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iReporter, _p_f_p_iBase__p_iReporterTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iDocumentSystem, _p_f_p_iBase__p_iDocumentSystemTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_scfImplementation1T_csPyEventHandler_iEventHandler_t, _p_f_p_iBase__p_scfImplementation1T_csPyEventHandler_iEventHandler_tTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iAnimatedImage, _p_f_p_iBase__p_iAnimatedImageTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iPluginIterator, _p_f_p_iBase__p_iPluginIteratorTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iEventAttributeIterator, _p_f_p_iBase__p_iEventAttributeIteratorTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iObjectRegistryIterator, _p_f_p_iBase__p_iObjectRegistryIteratorTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iObjectIterator, _p_f_p_iBase__p_iObjectIteratorTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iReporterIterator, _p_f_p_iBase__p_iReporterIteratorTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iConfigIterator, _p_f_p_iBase__p_iConfigIteratorTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iDocumentAttributeIterator, _p_f_p_iBase__p_iDocumentAttributeIteratorTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iDocumentNodeIterator, _p_f_p_iBase__p_iDocumentNodeIteratorTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iClipper2D, _p_f_p_iBase__p_iClipper2DTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iCommandLineParser, _p_f_p_iBase__p_iCommandLineParserTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iDataBuffer, _p_f_p_iBase__p_iDataBufferTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iProcTexture, _p_f_p_iBase__p_iProcTextureTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iEventHandler, _p_f_p_iBase__p_iEventHandlerTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p__csPyEventHandler, _p_f_p_iBase__p__csPyEventHandlerTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iVFS, _p_f_p_iBase__p_iVFSTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iComponent, _p_f_p_iBase__p_iComponentTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iSCF, _p_f_p_iBase__p_iSCFTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iMouseDriver, _p_f_p_iBase__p_iMouseDriverTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iJoystickDriver, _p_f_p_iBase__p_iJoystickDriverTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iConfigFile, _p_f_p_iBase__p_iConfigFileTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_csConfigFile, _p_f_p_iBase__p_csConfigFileTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iEventPlug, _p_f_p_iBase__p_iEventPlugTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iObject, _p_f_p_iBase__p_iObjectTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iDocumentAttribute, _p_f_p_iBase__p_iDocumentAttributeTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_csObject, _p_f_p_iBase__p_csObjectTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iDocumentNode, _p_f_p_iBase__p_iDocumentNodeTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iString, _p_f_p_iBase__p_iStringTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iPath, _p_f_p_iBase__p_iPathTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iStringSet, _p_f_p_iBase__p_iStringSetTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_scfImplementation1TcsObject_iObject_t, _p_f_p_iBase__p_scfImplementation1TcsObject_iObject_tTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iVirtualClock, _p_f_p_iBase__p_iVirtualClockTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iTriangleMesh, _p_f_p_iBase__p_iTriangleMeshTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iDebugHelper, _p_f_p_iBase__p_iDebugHelperTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iEventCord, _p_f_p_iBase__p_iEventCordTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iPluginManager, _p_f_p_iBase__p_iPluginManagerTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iCacheManager, _p_f_p_iBase__p_iCacheManagerTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iConfigManager, _p_f_p_iBase__p_iConfigManagerTo_p_f_p_iBase__p_iBase, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_f_p_iBase__p_iBase[] = {  {&_swigt__p_f_p_iBase__p_iFile, _p_f_p_iBase__p_iFileTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iEventOutlet, _p_f_p_iBase__p_iEventOutletTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iKeyComposer, _p_f_p_iBase__p_iKeyComposerTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_scfImplementation1TcsConfigFile_iConfigFile_t, _p_f_p_iBase__p_scfImplementation1TcsConfigFile_iConfigFile_tTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iImageIO, _p_f_p_iBase__p_iImageIOTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iImage, _p_f_p_iBase__p_iImageTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iStringArray, _p_f_p_iBase__p_iStringArrayTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iFactory, _p_f_p_iBase__p_iFactoryTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_scfImplementation1TcsPath_iPath_t, _p_f_p_iBase__p_scfImplementation1TcsPath_iPath_tTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iBase, 0, 0, 0},  {&_swigt__p_f_p_iBase__p_iEventNameRegistry, _p_f_p_iBase__p_iEventNameRegistryTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iObjectRegistry, _p_f_p_iBase__p_iObjectRegistryTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iDocument, _p_f_p_iBase__p_iDocumentTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iEventQueue, _p_f_p_iBase__p_iEventQueueTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iKeyboardDriver, _p_f_p_iBase__p_iKeyboardDriverTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iObjectNameChangeListener, _p_f_p_iBase__p_iObjectNameChangeListenerTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iReporterListener, _p_f_p_iBase__p_iReporterListenerTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iEvent, _p_f_p_iBase__p_iEventTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_scfImplementation1TcsPyEventPlug_iEventPlug_t, _p_f_p_iBase__p_scfImplementation1TcsPyEventPlug_iEventPlug_tTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iReporter, _p_f_p_iBase__p_iReporterTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iDocumentSystem, _p_f_p_iBase__p_iDocumentSystemTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_scfImplementation1T_csPyEventHandler_iEventHandler_t, _p_f_p_iBase__p_scfImplementation1T_csPyEventHandler_iEventHandler_tTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iAnimatedImage, _p_f_p_iBase__p_iAnimatedImageTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iPluginIterator, _p_f_p_iBase__p_iPluginIteratorTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iEventAttributeIterator, _p_f_p_iBase__p_iEventAttributeIteratorTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iObjectRegistryIterator, _p_f_p_iBase__p_iObjectRegistryIteratorTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iObjectIterator, _p_f_p_iBase__p_iObjectIteratorTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iReporterIterator, _p_f_p_iBase__p_iReporterIteratorTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iConfigIterator, _p_f_p_iBase__p_iConfigIteratorTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iDocumentAttributeIterator, _p_f_p_iBase__p_iDocumentAttributeIteratorTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iDocumentNodeIterator, _p_f_p_iBase__p_iDocumentNodeIteratorTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iClipper2D, _p_f_p_iBase__p_iClipper2DTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iCommandLineParser, _p_f_p_iBase__p_iCommandLineParserTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iDataBuffer, _p_f_p_iBase__p_iDataBufferTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iEventHandler, _p_f_p_iBase__p_iEventHandlerTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iProcTexture, _p_f_p_iBase__p_iProcTextureTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p__csPyEventHandler, _p_f_p_iBase__p__csPyEventHandlerTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iVFS, _p_f_p_iBase__p_iVFSTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iComponent, _p_f_p_iBase__p_iComponentTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iSCF, _p_f_p_iBase__p_iSCFTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iMouseDriver, _p_f_p_iBase__p_iMouseDriverTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iJoystickDriver, _p_f_p_iBase__p_iJoystickDriverTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iConfigFile, _p_f_p_iBase__p_iConfigFileTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_csConfigFile, _p_f_p_iBase__p_csConfigFileTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iEventPlug, _p_f_p_iBase__p_iEventPlugTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iObject, _p_f_p_iBase__p_iObjectTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iDocumentAttribute, _p_f_p_iBase__p_iDocumentAttributeTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_csObject, _p_f_p_iBase__p_csObjectTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_csPyEventPlug, _p_f_p_iBase__p_csPyEventPlugTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iDocumentNode, _p_f_p_iBase__p_iDocumentNodeTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iString, _p_f_p_iBase__p_iStringTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iPath, _p_f_p_iBase__p_iPathTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iStringSet, _p_f_p_iBase__p_iStringSetTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_scfImplementation1TcsObject_iObject_t, _p_f_p_iBase__p_scfImplementation1TcsObject_iObject_tTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iVirtualClock, _p_f_p_iBase__p_iVirtualClockTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iTriangleMesh, _p_f_p_iBase__p_iTriangleMeshTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iDebugHelper, _p_f_p_iBase__p_iDebugHelperTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iEventCord, _p_f_p_iBase__p_iEventCordTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iPluginManager, _p_f_p_iBase__p_iPluginManagerTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iCacheManager, _p_f_p_iBase__p_iCacheManagerTo_p_f_p_iBase__p_iBase, 0, 0},  {&_swigt__p_f_p_iBase__p_iConfigManager, _p_f_p_iBase__p_iConfigManagerTo_p_f_p_iBase__p_iBase, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_float[] = {  {&_swigt__p_float, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iAnimatedImage[] = {  {&_swigt__p_iAnimatedImage, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iString[] = {{&_swigt__p_iString, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_iBase[] = {  {&_swigt__p_iFile, _p_iFileTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1TcsObject_iObject_t, _p_scfImplementation1TcsObject_iObject_tTo_p_iBase, 0, 0},  {&_swigt__p_iEventOutlet, _p_iEventOutletTo_p_iBase, 0, 0},  {&_swigt__p_iKeyComposer, _p_iKeyComposerTo_p_iBase, 0, 0},  {&_swigt__p_iImageIO, _p_iImageIOTo_p_iBase, 0, 0},  {&_swigt__p_iImage, _p_iImageTo_p_iBase, 0, 0},  {&_swigt__p_iStringArray, _p_iStringArrayTo_p_iBase, 0, 0},  {&_swigt__p_iFactory, _p_iFactoryTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1TcsPath_iPath_t, _p_scfImplementation1TcsPath_iPath_tTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1T_csPyEventHandler_iEventHandler_t, _p_scfImplementation1T_csPyEventHandler_iEventHandler_tTo_p_iBase, 0, 0},  {&_swigt__p_iBase, 0, 0, 0},  {&_swigt__p_iEventNameRegistry, _p_iEventNameRegistryTo_p_iBase, 0, 0},  {&_swigt__p_iObjectRegistry, _p_iObjectRegistryTo_p_iBase, 0, 0},  {&_swigt__p_iDocument, _p_iDocumentTo_p_iBase, 0, 0},  {&_swigt__p_iEventQueue, _p_iEventQueueTo_p_iBase, 0, 0},  {&_swigt__p_iKeyboardDriver, _p_iKeyboardDriverTo_p_iBase, 0, 0},  {&_swigt__p_iObjectNameChangeListener, _p_iObjectNameChangeListenerTo_p_iBase, 0, 0},  {&_swigt__p_iReporterListener, _p_iReporterListenerTo_p_iBase, 0, 0},  {&_swigt__p_iEvent, _p_iEventTo_p_iBase, 0, 0},  {&_swigt__p_iReporter, _p_iReporterTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentSystem, _p_iDocumentSystemTo_p_iBase, 0, 0},  {&_swigt__p_iAnimatedImage, _p_iAnimatedImageTo_p_iBase, 0, 0},  {&_swigt__p_iPluginIterator, _p_iPluginIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iEventAttributeIterator, _p_iEventAttributeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iObjectRegistryIterator, _p_iObjectRegistryIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iObjectIterator, _p_iObjectIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iReporterIterator, _p_iReporterIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iConfigIterator, _p_iConfigIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentAttributeIterator, _p_iDocumentAttributeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentNodeIterator, _p_iDocumentNodeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iClipper2D, _p_iClipper2DTo_p_iBase, 0, 0},  {&_swigt__p_iCommandLineParser, _p_iCommandLineParserTo_p_iBase, 0, 0},  {&_swigt__p_iDataBuffer, _p_iDataBufferTo_p_iBase, 0, 0},  {&_swigt__p__csPyEventHandler, _p__csPyEventHandlerTo_p_iBase, 0, 0},  {&_swigt__p_iProcTexture, _p_iProcTextureTo_p_iBase, 0, 0},  {&_swigt__p_iEventHandler, _p_iEventHandlerTo_p_iBase, 0, 0},  {&_swigt__p_iVFS, _p_iVFSTo_p_iBase, 0, 0},  {&_swigt__p_iComponent, _p_iComponentTo_p_iBase, 0, 0},  {&_swigt__p_iSCF, _p_iSCFTo_p_iBase, 0, 0},  {&_swigt__p_iMouseDriver, _p_iMouseDriverTo_p_iBase, 0, 0},  {&_swigt__p_iJoystickDriver, _p_iJoystickDriverTo_p_iBase, 0, 0},  {&_swigt__p_iConfigFile, _p_iConfigFileTo_p_iBase, 0, 0},  {&_swigt__p_csConfigFile, _p_csConfigFileTo_p_iBase, 0, 0},  {&_swigt__p_csObject, _p_csObjectTo_p_iBase, 0, 0},  {&_swigt__p_iEventPlug, _p_iEventPlugTo_p_iBase, 0, 0},  {&_swigt__p_iObject, _p_iObjectTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentAttribute, _p_iDocumentAttributeTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentNode, _p_iDocumentNodeTo_p_iBase, 0, 0},  {&_swigt__p_iString, _p_iStringTo_p_iBase, 0, 0},  {&_swigt__p_iPath, _p_iPathTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1TcsConfigFile_iConfigFile_t, _p_scfImplementation1TcsConfigFile_iConfigFile_tTo_p_iBase, 0, 0},  {&_swigt__p_iStringSet, _p_iStringSetTo_p_iBase, 0, 0},  {&_swigt__p_iVirtualClock, _p_iVirtualClockTo_p_iBase, 0, 0},  {&_swigt__p_iTriangleMesh, _p_iTriangleMeshTo_p_iBase, 0, 0},  {&_swigt__p_iDebugHelper, _p_iDebugHelperTo_p_iBase, 0, 0},  {&_swigt__p_iConfigManager, _p_iConfigManagerTo_p_iBase, 0, 0},  {&_swigt__p_iEventCord, _p_iEventCordTo_p_iBase, 0, 0},  {&_swigt__p_iPluginManager, _p_iPluginManagerTo_p_iBase, 0, 0},  {&_swigt__p_iCacheManager, _p_iCacheManagerTo_p_iBase, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_iBase[] = {  {&_swigt__p_iFile, _p_iFileTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1TcsObject_iObject_t, _p_scfImplementation1TcsObject_iObject_tTo_p_iBase, 0, 0},  {&_swigt__p_iEventOutlet, _p_iEventOutletTo_p_iBase, 0, 0},  {&_swigt__p_iKeyComposer, _p_iKeyComposerTo_p_iBase, 0, 0},  {&_swigt__p_iImageIO, _p_iImageIOTo_p_iBase, 0, 0},  {&_swigt__p_iImage, _p_iImageTo_p_iBase, 0, 0},  {&_swigt__p_iStringArray, _p_iStringArrayTo_p_iBase, 0, 0},  {&_swigt__p_iFactory, _p_iFactoryTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1TcsPath_iPath_t, _p_scfImplementation1TcsPath_iPath_tTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1T_csPyEventHandler_iEventHandler_t, _p_scfImplementation1T_csPyEventHandler_iEventHandler_tTo_p_iBase, 0, 0},  {&_swigt__p_iBase, 0, 0, 0},  {&_swigt__p_iEventNameRegistry, _p_iEventNameRegistryTo_p_iBase, 0, 0},  {&_swigt__p_iObjectRegistry, _p_iObjectRegistryTo_p_iBase, 0, 0},  {&_swigt__p_iDocument, _p_iDocumentTo_p_iBase, 0, 0},  {&_swigt__p_iEventQueue, _p_iEventQueueTo_p_iBase, 0, 0},  {&_swigt__p_iKeyboardDriver, _p_iKeyboardDriverTo_p_iBase, 0, 0},  {&_swigt__p_iObjectNameChangeListener, _p_iObjectNameChangeListenerTo_p_iBase, 0, 0},  {&_swigt__p_iReporterListener, _p_iReporterListenerTo_p_iBase, 0, 0},  {&_swigt__p_iEvent, _p_iEventTo_p_iBase, 0, 0},  {&_swigt__p_iReporter, _p_iReporterTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentSystem, _p_iDocumentSystemTo_p_iBase, 0, 0},  {&_swigt__p_iAnimatedImage, _p_iAnimatedImageTo_p_iBase, 0, 0},  {&_swigt__p_iPluginIterator, _p_iPluginIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iEventAttributeIterator, _p_iEventAttributeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iObjectRegistryIterator, _p_iObjectRegistryIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iObjectIterator, _p_iObjectIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iReporterIterator, _p_iReporterIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iConfigIterator, _p_iConfigIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentAttributeIterator, _p_iDocumentAttributeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentNodeIterator, _p_iDocumentNodeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iClipper2D, _p_iClipper2DTo_p_iBase, 0, 0},  {&_swigt__p_iCommandLineParser, _p_iCommandLineParserTo_p_iBase, 0, 0},  {&_swigt__p_iDataBuffer, _p_iDataBufferTo_p_iBase, 0, 0},  {&_swigt__p__csPyEventHandler, _p__csPyEventHandlerTo_p_iBase, 0, 0},  {&_swigt__p_iEventHandler, _p_iEventHandlerTo_p_iBase, 0, 0},  {&_swigt__p_iProcTexture, _p_iProcTextureTo_p_iBase, 0, 0},  {&_swigt__p_iVFS, _p_iVFSTo_p_iBase, 0, 0},  {&_swigt__p_iComponent, _p_iComponentTo_p_iBase, 0, 0},  {&_swigt__p_iSCF, _p_iSCFTo_p_iBase, 0, 0},  {&_swigt__p_iMouseDriver, _p_iMouseDriverTo_p_iBase, 0, 0},  {&_swigt__p_iJoystickDriver, _p_iJoystickDriverTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1TcsPyEventPlug_iEventPlug_t, _p_scfImplementation1TcsPyEventPlug_iEventPlug_tTo_p_iBase, 0, 0},  {&_swigt__p_iConfigFile, _p_iConfigFileTo_p_iBase, 0, 0},  {&_swigt__p_csConfigFile, _p_csConfigFileTo_p_iBase, 0, 0},  {&_swigt__p_csObject, _p_csObjectTo_p_iBase, 0, 0},  {&_swigt__p_csPyEventPlug, _p_csPyEventPlugTo_p_iBase, 0, 0},  {&_swigt__p_iEventPlug, _p_iEventPlugTo_p_iBase, 0, 0},  {&_swigt__p_iObject, _p_iObjectTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentAttribute, _p_iDocumentAttributeTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentNode, _p_iDocumentNodeTo_p_iBase, 0, 0},  {&_swigt__p_iString, _p_iStringTo_p_iBase, 0, 0},  {&_swigt__p_iPath, _p_iPathTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1TcsConfigFile_iConfigFile_t, _p_scfImplementation1TcsConfigFile_iConfigFile_tTo_p_iBase, 0, 0},  {&_swigt__p_iStringSet, _p_iStringSetTo_p_iBase, 0, 0},  {&_swigt__p_iVirtualClock, _p_iVirtualClockTo_p_iBase, 0, 0},  {&_swigt__p_iTriangleMesh, _p_iTriangleMeshTo_p_iBase, 0, 0},  {&_swigt__p_iDebugHelper, _p_iDebugHelperTo_p_iBase, 0, 0},  {&_swigt__p_iConfigManager, _p_iConfigManagerTo_p_iBase, 0, 0},  {&_swigt__p_iEventCord, _p_iEventCordTo_p_iBase, 0, 0},  {&_swigt__p_iPluginManager, _p_iPluginManagerTo_p_iBase, 0, 0},  {&_swigt__p_iCacheManager, _p_iCacheManagerTo_p_iBase, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iCacheManager[] = {  {&_swigt__p_iCacheManager, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iClipper2D[] = {  {&_swigt__p_iClipper2D, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iCommandLineParser[] = {  {&_swigt__p_iCommandLineParser, 0, 0, 0},{0, 0, 0, 0}};
@@ -55383,7 +55774,7 @@ static swig_cast_info _swigc__p_iEventCord[] = {  {&_swigt__p_iEventCord, 0, 0, 
 static swig_cast_info _swigc__p_iEventHandler[] = {  {&_swigt__p_iEventHandler, 0, 0, 0},  {&_swigt__p_scfImplementation1T_csPyEventHandler_iEventHandler_t, _p_scfImplementation1T_csPyEventHandler_iEventHandler_tTo_p_iEventHandler, 0, 0},  {&_swigt__p__csPyEventHandler, _p__csPyEventHandlerTo_p_iEventHandler, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iEventNameRegistry[] = {  {&_swigt__p_iEventNameRegistry, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iEventOutlet[] = {  {&_swigt__p_iEventOutlet, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_iEventPlug[] = {  {&_swigt__p_iEventPlug, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_iEventPlug[] = {  {&_swigt__p_iEventPlug, 0, 0, 0},  {&_swigt__p_csPyEventPlug, _p_csPyEventPlugTo_p_iEventPlug, 0, 0},  {&_swigt__p_scfImplementation1TcsPyEventPlug_iEventPlug_t, _p_scfImplementation1TcsPyEventPlug_iEventPlug_tTo_p_iEventPlug, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iEventQueue[] = {  {&_swigt__p_iEventQueue, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iFactory[] = {  {&_swigt__p_iFactory, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iFile[] = {  {&_swigt__p_iFile, 0, 0, 0},{0, 0, 0, 0}};
@@ -55428,6 +55819,7 @@ static swig_cast_info _swigc__p_scfImplementation1T_csPyEventHandler_iEventHandl
 static swig_cast_info _swigc__p_scfImplementation1TcsConfigFile_iConfigFile_t[] = {  {&_swigt__p_scfImplementation1TcsConfigFile_iConfigFile_t, 0, 0, 0},  {&_swigt__p_csConfigFile, _p_csConfigFileTo_p_scfImplementation1TcsConfigFile_iConfigFile_t, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_scfImplementation1TcsObject_iObject_t[] = {  {&_swigt__p_csObject, _p_csObjectTo_p_scfImplementation1TcsObject_iObject_t, 0, 0},  {&_swigt__p_scfImplementation1TcsObject_iObject_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_scfImplementation1TcsPath_iPath_t[] = {  {&_swigt__p_scfImplementation1TcsPath_iPath_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_scfImplementation1TcsPyEventPlug_iEventPlug_t[] = {  {&_swigt__p_csPyEventPlug, _p_csPyEventPlugTo_p_scfImplementation1TcsPyEventPlug_iEventPlug_t, 0, 0},  {&_swigt__p_scfImplementation1TcsPyEventPlug_iEventPlug_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_scfInterfaceMetadata[] = {  {&_swigt__p_scfInterfaceMetadata, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_scfInterfaceMetadataList[] = {  {&_swigt__p_scfInterfaceMetadataList, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_size_t[] = {  {&_swigt__p_size_t, 0, 0, 0},{0, 0, 0, 0}};
@@ -55501,9 +55893,9 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_csPluginRequest,
   _swigc__p_csPrimitives,
   _swigc__p_csPtrTiBase_t,
-  _swigc__p_csPtrTiEventOutlet_t,
   _swigc__p_csPtrTiKeyComposer_t,
   _swigc__p_csPtrTiObjectRegistryIterator_t,
+  _swigc__p_csPyEventPlug,
   _swigc__p_csRGBpixel,
   _swigc__p_csRadixSorter,
   _swigc__p_csRect,
@@ -55535,6 +55927,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_f_p_iBase__p__csPyEventHandler,
   _swigc__p_f_p_iBase__p_csConfigFile,
   _swigc__p_f_p_iBase__p_csObject,
+  _swigc__p_f_p_iBase__p_csPyEventPlug,
   _swigc__p_f_p_iBase__p_iAnimatedImage,
   _swigc__p_f_p_iBase__p_iBase,
   _swigc__p_f_p_iBase__p_iCacheManager,
@@ -55591,6 +55984,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_f_p_iBase__p_scfImplementation1TcsConfigFile_iConfigFile_t,
   _swigc__p_f_p_iBase__p_scfImplementation1TcsObject_iObject_t,
   _swigc__p_f_p_iBase__p_scfImplementation1TcsPath_iPath_t,
+  _swigc__p_f_p_iBase__p_scfImplementation1TcsPyEventPlug_iEventPlug_t,
   _swigc__p_float,
   _swigc__p_iAnimatedImage,
   _swigc__p_iBase,
@@ -55661,6 +56055,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_scfImplementation1TcsConfigFile_iConfigFile_t,
   _swigc__p_scfImplementation1TcsObject_iObject_t,
   _swigc__p_scfImplementation1TcsPath_iPath_t,
+  _swigc__p_scfImplementation1TcsPyEventPlug_iEventPlug_t,
   _swigc__p_scfInterfaceMetadata,
   _swigc__p_scfInterfaceMetadataList,
   _swigc__p_size_t,
