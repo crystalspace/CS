@@ -13,7 +13,7 @@ section (see later) contains more technical questions.
 More @sc{faq}s can also be found online in the Crystal Space Wiki:@*
 
 @noindent
-@uref{http://www.crystalspace3d.org/tikiwiki/tiki-list_faqs.php}
+@uref{http://www.crystalspace3d.org/main/FAQ}
 
 @itemize @bullet
 @item
@@ -23,7 +23,7 @@ More @sc{faq}s can also be found online in the Crystal Space Wiki:@*
 Crystal Space home page, and from the Crystal Space download site:
 
 @noindent
-@uref{http://www.crystalspace3d.org/support/release/}
+@uref{http://www.crystalspace3d.org/downloads/release/}
 
 @noindent
 You can also access the bleeding-edge developmental version.
@@ -189,18 +189,6 @@ nVidia cards only have accelerated stencil in 24/32-bit color mode and
 not in 16-bit mode.
 
 @item
-@strong{Q}: Should I use the new renderer or the old renderer architecture?
-
-@strong{A}: Crystal Space is currently in the process of moving from the
-old renderer architecture to a new one. The new renderer supports advanced
-OpenGL features like shaders, stencil shadows, and a lot more but it is still
-in an experimental stage (although we feel it is already working rather well).
-Basically we recommend using the new renderer architecture unless
-it doesn't work for you (in which case we like to hear a report), you need
-the software renderer, or you require another feature of the new renderer
-that we don't support yet (like one of the missing meshes, fog, @dots{}).
-
-@item
 @strong{Q}: I want to create textures for Crystal Space.  What palette should I
 use?  How big should I create the textures?  What format can I use?
 
@@ -232,10 +220,9 @@ representing a computer keyboard.
 @strong{Q}: How can I actually make 3D models and maps for use in Crystal
 Space?
 
-@strong{A1}: For maps and objects using either @samp{genmesh} or @samp{thing}
-(i.e. non-animated) you can use Blender (@uref{http://www.blender3d.org/})
-together with Blend2CS
-(@uref{http://projects.blender.org/projects/blend2cs/}).  Blend2CS works
+@strong{A1}: You can use Blender (@uref{http://www.blender3d.org/})
+together with blender2crystal
+(aka. b2cs, @uref{http://b2cs.delcorp.org/}).  blender2crystal works
 very well and is fully supported by the Crystal Space project.  Using this
 convertor you can make complete maps with support for portals and much more.
 
@@ -254,7 +241,7 @@ PlaneShift project (@uref{http://www.planeshift.it}). There is a tutorial
 on this exporter at:
 
 @noindent
-@uref{http://lww.demon-host.com/html/guide/}
+@uref{http://www.crystalspace3d.org/docs/online/maxexporter/}
 
 @strong{A4}: For animated models using Cal3D you can also use
 3dsMax.  There is a tutorial on this subject at:

@@ -6,10 +6,46 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+27-Feb-2008
+	- res added a (still very bare) class for 4x4 matrices.
+	- res changed the libcrystalspace Jamfiles to exclude some files that
+	  rely on zlib when zlib is not available.
+	- res added an allocator using the platform's malloc().
+	- res changed the callstack creation to use platform memory allocation
+	  instead of CS' allocation system. The motivation is to make them
+	  useful for debugging CS' allocation system itself.
+	- res changed the way debug memory allocations are handled: now,
+	  functions for different levels of debugging are provided (always -
+	  so you can have some plugins use the more extensive facilities
+	  while others aren't). cs_malloc() maps to these different functions
+	  based on the compile time settings.
+	- res added a facility to memory debugging to track allocated blocks
+	  and attach callstacks from their allocation.
+	- res changed the gl3d depth texture dumping to dump 32-bit depths into
+	  RGBA instead of greyscale.
+	- res added some custom new enabling/disabling in various places.
+	- res changed CS::Memory::CustomAllocated to contain the memdebug
+	  versions of new and delete.
+	- res fixed a bug in xmlshader where a 'Generate' would mix up the
+	  nodes from the actual block to be replicated and the last template
+	  specified in the output.
+26-Feb-2008
+	- caedes added csPyEventPlug to python bindings. This class allows to
+	  create python iEventPlugs. Also added iEventPlug and iEventOutlet
+	  to interface list.
 25-Feb-2008
+	- res fixed csHash<>::Iterator to work correctly with a custom
+	  allocator for the hash.
+	- Happy Birthday Sueastside! Oh and I fixed a crash in basemapgen.
+	- Eric Sunshine fixed bug in mk/autoconf/checkpython.m4 introduced by
+	  r25656 which resulted in the literal string
+	  "$cs_cv_pybase_lflags_base" being used, rather than the interpolation
+	  of that shell variable, in build attempts when detecting the Python
+	  link library. This should resolve issue #455.
 	- Marten implemented Skeleton & SkeletonFactory.
 	- Marten implemented basic skeletal animation playback.
 24-Feb-2008
+	- Vincent updated a bunch of URLs and FAQ entries in the manual.
 	- Marten added code stubs for the animated mesh and skeleton2.
 23-Feb-2008
 	- caedes added ivaria/sequence.h to scripting bindings.

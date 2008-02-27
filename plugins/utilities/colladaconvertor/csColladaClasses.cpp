@@ -27,9 +27,13 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csColladaClasses.h"
 #include "csColladaConvertor.h"
 
+#include "csutil/custom_new_disable.h"
+
 // Standard Headers
 #include <string>
 #include <sstream>
+
+#include "csutil/custom_new_enable.h"
 
 using std::string;
 using std::stringstream;
