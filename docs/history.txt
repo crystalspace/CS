@@ -30,6 +30,8 @@ chronological order.
 	  fill arrays of arbitrary type.
 	- res updated xmlshader to support SV array indices in texture
 	  bindings.
+	- res fixed the Cg shader plugin to properly set program parameters
+	  which are arrays of matrices.
 26-Feb-2008
 	- caedes added csPyEventPlug to python bindings. This class allows to
 	  create python iEventPlugs. Also added iEventPlug and iEventOutlet
