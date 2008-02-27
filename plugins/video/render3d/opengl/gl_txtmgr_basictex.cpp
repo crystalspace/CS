@@ -866,34 +866,24 @@ csPtr<iImage> csGLBasicTextureHandle::Dump ()
       ? GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB : textarget, 
       0, GL_TEXTURE_DEPTH_SIZE, &depthSize);
   
+  uint8* data = new uint8[tw * th * 4];
+  
   if (depthSize > 0)
   {
     // Depth texture
-    uint8* data = new uint8[tw * th];
-    glGetTexImage (textarget, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, data);
-  
-    csRGBpixel* pal = new csRGBpixel[256];
-    for (int i = 0; i < 256; i++) pal[i].Set (i, i, i);
-    csImageMemory* lmimg = 
-	new csImageMemory (tw, th,
-			   data, true, 
-                           CS_IMGFMT_PALETTED8, pal);
-  
-    return csPtr<iImage> (lmimg);
+    glGetTexImage (textarget, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, data);
   }
   else
   {
     // Color texture
-    uint8* data = new uint8[tw * th * 4];
     glGetTexImage (textarget, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-  
-    csImageMemory* lmimg = 
-      new csImageMemory (tw, th,
-      data, true, 
-      CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA);
-  
-    return csPtr<iImage> (lmimg);
   }
+  csImageMemory* lmimg = 
+      new csImageMemory (tw, th,
+			 data, true, 
+    CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA);
+  
+  return csPtr<iImage> (lmimg);
 }
 
 }
