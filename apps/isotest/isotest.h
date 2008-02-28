@@ -24,6 +24,7 @@
 #include "csgeom/vector3.h"
 #include "iutil/eventnames.h"
 #include "imesh/nskeleton.h"
+#include "imesh/skelanim.h"
 
 struct iEngine;
 struct iLoader;
@@ -82,6 +83,19 @@ private:
   iSkeletonBone* selbone;
   iSkeleton* skeleton;
   Skeleton::iSkeleton* myskel;
+
+  csRef<Skeleton::Animation::iAnimation> anim_punch;
+  csRef<Skeleton::Animation::iBlendNode> blend;
+  size_t walkid, standid;
+
+  enum
+  {
+    STAND = 0,
+    WALK,
+    STAND_WALK,
+    WALK_STAND
+  } feather;
+  float feather_duration;
 
   iObjectRegistry* object_reg;
   csRef<iEngine> engine;

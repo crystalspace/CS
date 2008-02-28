@@ -124,8 +124,8 @@ Animation::Animation (csRef<iAnimationFactory> fact)
 }
 void Animation::Tick (float amount)
 {
-  timeline += amount * playspeed;
-  printf ("%f\n", timeline);
+  if (playcount != 0)
+    timeline += amount * playspeed;
 }
 void Animation::ReadChannels (Frame &frame)
 {
@@ -173,7 +173,7 @@ void BlendNode::Tick (float amount)
     iMixingNode* node = it.Next ();
     if (!node->IsActive ())
     {
-      nodes.Delete (node);
+      //nodes.Delete (node);
       continue;
     }
     node->Tick (amount);
@@ -184,8 +184,12 @@ void BlendNode::ReadChannels (Frame &result_frame)
   csArray<Frame> nodes_frames;
   for (csRefArray<iMixingNode>::Iterator it = nodes.GetIterator ();
     it.HasNext (); )
+  //for (size_t i = 0; i < nodes.GetSize (); i++)
   {
     iMixingNode* node = it.Next ();
+    /*iMixingNode* node = nodes.Get (i);
+    if (blend_weights.Get (i) < EPSILON)
+      continue;*/
     Frame frame;
     node->ReadChannels (frame);
     nodes_frames.Push (frame);
@@ -220,10 +224,15 @@ void BlendNode::ReadChannels (Frame &result_frame)
     result_frame.PutUnique (id, in);
   }
 }
-void BlendNode::AddNode (float weight, csRef<iMixingNode> node)
+size_t BlendNode::AddNode (float weight, csRef<iMixingNode> node)
 {
   nodes.Push (node);
   blend_weights.Push (weight);
+  return nodes.GetSize () - 1;
+}
+void BlendNode::SetWeight (size_t i, float weight)
+{
+  blend_weights[i] = weight;
 }
 bool BlendNode::IsActive () const
 {
@@ -241,7 +250,8 @@ void OverwriteNode::Tick (float amount)
     iMixingNode* node = it.Next ();
     if (!node->IsActive ())
     {
-      nodes.Delete (node);
+      // should this be allowed?
+      //nodes.Delete (node);
       continue;
     }
     node->Tick (amount);
@@ -256,9 +266,10 @@ void OverwriteNode::ReadChannels (Frame &frame)
     node->ReadChannels (frame);
   }
 }
-void OverwriteNode::AddNode (csRef<iMixingNode> node)
+size_t OverwriteNode::AddNode (csRef<iMixingNode> node)
 {
   nodes.Push (node);
+  return nodes.GetSize () - 1;
 }
 bool OverwriteNode::IsActive () const
 {

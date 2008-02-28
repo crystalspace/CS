@@ -54,6 +54,8 @@ public:
       keyframes.GetIterator (); it.HasNext (); )
     {
       const csTuple2<float, Keyframe> &keyf = it.Next ();
+      if (keyf.first < EPSILON)
+        continue;
       float keyf_weight = keyf.first,
         keyfw = keyf_weight / (keyf_weight + accum_weight);
       accum_weight += keyf_weight;

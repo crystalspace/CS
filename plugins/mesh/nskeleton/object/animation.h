@@ -91,7 +91,8 @@ public:
   BlendNode ();
   void Tick (float amount);
   void ReadChannels (Frame &result_frame);
-  void AddNode (float weight, csRef<iMixingNode> node);
+  size_t AddNode (float weight, csRef<iMixingNode> node);
+  void SetWeight (size_t i, float weight);
   bool IsActive () const;
 private:
   csRefArray<iMixingNode> nodes;
@@ -105,7 +106,7 @@ public:
   OverwriteNode ();
   void Tick (float amount);
   void ReadChannels (Frame &frame);
-  void AddNode (csRef<iMixingNode> node);
+  size_t AddNode (csRef<iMixingNode> node);
   bool IsActive () const;
 private:
   csRefArray<iMixingNode> nodes;

@@ -256,11 +256,10 @@ def export_armature(file,armature_obj,object_prop,global_keys):
 			file.write('    <channel name="'+bonename+'">\n')
 			for key in allkeys:
 				Blender.Set('curframe',int(key))
-				print key
 				time=key-keytime
 				fps=24.0
 				keytime=key
-				cstime = (key/fps)*1000.0
+				cstime = ((key - allkeys[0])/fps)*1000.0
 				file.write('      <frame time="'+str(int(cstime))+'">\n')
 				if bonename == "Object":
 					continue

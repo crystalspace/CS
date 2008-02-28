@@ -75,6 +75,9 @@ IsoTest::IsoTest (iObjectRegistry* object_reg)
   //manipmode = TRAN_ROTATE;
   //transaxis = AXIS_Z;
 
+  feather = STAND;
+  feather_duration = 0.0f;
+
   current_view = 0;
   views[0].SetOrigOffset (csVector3 (-2, 2, -2)); // true isometric perspective.
   views[1].SetOrigOffset (csVector3 (-9, 9, -9)); // zoomed out.
@@ -203,6 +206,26 @@ void IsoTest::SetupFrame ()
       rot.SetAxisAngle (axis, angle - 0.1f);
       mybone->SetRotation (rot);
     }
+
+    if (kbd->GetKeyState ('w'))
+    {
+      if (feather != WALK)
+      {
+        feather = STAND_WALK;
+      }
+    }
+    else
+    {
+      if (feather != STAND)
+      {
+        feather = WALK_STAND;
+      }
+    }
+
+    if (kbd->GetKeyState ('p'))
+    {
+      anim_punch->SetPlayCount (1);
+    }
     /*bool moved = kbd->GetKeyState ('a');
     if (kbd->GetKeyState (CSKEY_RIGHT))
     {
@@ -238,6 +261,47 @@ void IsoTest::SetupFrame ()
       csReversibleTransform &tr (selbone->GetTransform ());
       tr.SetO2T (csMatrix3 (rot));
     }*/
+  }
+
+  if (feather == STAND_WALK || feather == WALK_STAND)
+  {
+    feather_duration += 10;
+  }
+  switch (feather)
+  {
+    case (STAND):
+      puts ("standing...");
+      break;
+    case (WALK):
+      puts ("walking...");
+      break;
+    case (STAND_WALK):
+      puts ("standing -> walking");
+      blend->SetWeight (walkid, feather_duration / 200.0f);
+      blend->SetWeight (standid, 1 - (feather_duration / 200.0f));
+      if (feather_duration > 200)
+      {
+        blend->SetWeight (walkid, 1.0f);
+        blend->SetWeight (standid, 0.0f);
+        feather = WALK;
+        feather_duration = 0.0f;
+      }
+      break;
+    case (WALK_STAND):
+      puts ("walking -> standing");
+      blend->SetWeight (standid, feather_duration / 200.0f);
+      blend->SetWeight (walkid, 1 - (feather_duration / 200.0f));
+      if (feather_duration > 200)
+      {
+        blend->SetWeight (standid, 1.0f);
+        blend->SetWeight (walkid, 0.0f);
+        feather = STAND;
+        feather_duration = 0.0f;
+      }
+      break;
+    default:
+      puts ("wtf? what piece of shit establishment is this?");
+      break;
   }
 
   // Make sure actor is constant distance above plane.
@@ -743,11 +807,32 @@ bool IsoTest::CreateActor ()
   csRef<Skeleton::Animation::iAnimationFactoryLayer> animfactlay = myskel->GetFactory ()->GetAnimationFactoryLayer ();
   csRef<Skeleton::Animation::iAnimationLayer> animlay = myskel->GetAnimationLayer ();
 
+  csRef<Skeleton::Animation::iAnimationFactory> animfact_stand = animfactlay->FindAnimationFactoryByName ("stand");
+  csRef<Skeleton::Animation::iAnimation> anim_stand = animfact_stand->CreateAnimation ();
+  anim_stand->SetPlayCount (-1);
+
   csRef<Skeleton::Animation::iAnimationFactory> animfact_walk = animfactlay->FindAnimationFactoryByName ("walk");
   csRef<Skeleton::Animation::iAnimation> anim_walk = animfact_walk->CreateAnimation ();
   anim_walk->SetPlayCount (-1);
 
-  csRef<Skeleton::Animation::iMixingNode> animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (anim_walk);
+  blend = animlay->CreateBlendNode ();
+  csRef<Skeleton::Animation::iMixingNode> animmix;
+  animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (anim_stand);
+  standid = blend->AddNode (1.0f, animmix);
+  animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (anim_walk);
+  walkid = blend->AddNode (0.0f, animmix);
+
+  csRef<Skeleton::Animation::iAnimationFactory> animfact_punch = animfactlay->FindAnimationFactoryByName ("punch");
+  anim_punch = animfact_punch->CreateAnimation ();
+  anim_punch->SetPlayCount (0);
+
+  csRef<Skeleton::Animation::iOverwriteNode> overwrite = animlay->CreateOverwriteNode ();
+  animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (blend);
+  overwrite->AddNode (animmix);
+  animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (anim_punch);
+  overwrite->AddNode (animmix);
+
+  animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (overwrite);
   animlay->SetRootMixingNode (animmix);
 
   /*csRef<Skeleton::Animation::iAnimationFactory> animfact_run = animfactlay->FindAnimationFactoryByName ("jump");

@@ -81,7 +81,8 @@ struct iBlendNode : public virtual iBase
   SCF_INTERFACE (iBlendNode, 0, 0, 1);
   virtual void Tick (float amount) = 0;
   virtual void ReadChannels (Frame &frame) = 0;
-  virtual void AddNode (float weight, csRef<iMixingNode> node) = 0;
+  virtual size_t AddNode (float weight, csRef<iMixingNode> node) = 0;
+  virtual void SetWeight (size_t i, float weight) = 0;
 };
 
 struct iOverwriteNode : public virtual iBase
@@ -89,7 +90,7 @@ struct iOverwriteNode : public virtual iBase
   SCF_INTERFACE (iOverwriteNode, 0, 0, 1);
   virtual void Tick (float amount) = 0;
   virtual void ReadChannels (Frame &frame) = 0;
-  virtual void AddNode (csRef<iMixingNode> node) = 0;
+  virtual size_t AddNode (csRef<iMixingNode> node) = 0;
 };
 
 struct iAnimationLayer : public virtual iBase
