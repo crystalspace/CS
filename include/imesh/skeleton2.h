@@ -578,6 +578,11 @@ struct iSkeletonBlendNodeFactory2 : public iSkeletonAnimationNodeFactory2
   virtual void SetNodeWeight (uint node, float weight) = 0;
 
   /**
+   * Normalize the node weights so that the sum is 1
+   */
+  virtual void NormalizeWeights () = 0;
+
+  /**
    * Get specific node
    * \param node node index
    */
@@ -606,6 +611,11 @@ struct iSkeletonBlendNode2 : public iSkeletonAnimationNode2
    * Set the blend weight for a specific node
    */
   virtual void SetNodeWeight (uint node, float weight) = 0;
+
+  /**
+   * Normalize the node weights so that the sum is 1
+   */
+  virtual void NormalizeWeights () = 0;
 };
 
 

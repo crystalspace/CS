@@ -245,7 +245,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   void Animation::BlendState (csSkeletalState2* state, float baseWeight)
   {
-    factory->BlendState (state, baseWeight, playbackPosition, false);
+    factory->BlendState (state, baseWeight, playbackPosition, isPlayingCyclic);
   }
 
   void Animation::TickAnimation (float dt)

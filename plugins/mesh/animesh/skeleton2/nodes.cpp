@@ -28,58 +28,121 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   void BlendNodeFactory::AddNode (iSkeletonAnimationNodeFactory2* node, float weight)
   {
+    subFactories.Push (node);
+    weightList.Push (weight);
   }
 
   void BlendNodeFactory::SetNodeWeight (uint node, float weight)
   {
+    CS_ASSERT(node < weightList.GetSize ());
+    weightList[node] = weight;
+  }
+
+  void BlendNodeFactory::NormalizeWeights ()
+  {
+    float weightSum = 0;
+
+    for (size_t i = 0; i < weightList.GetSize (); ++i)
+    {
+      weightSum += weightList[i];
+    }
+
+    for (size_t i = 0; i < weightList.GetSize (); ++i)
+    {
+      weightList[i] /= weightSum;
+    }
   }
 
   iSkeletonAnimationNodeFactory2* BlendNodeFactory::GetNode (uint node)
   {
-    return 0;
+    CS_ASSERT(node < subFactories.GetSize ());
+    return subFactories[node];
   }
 
   uint BlendNodeFactory::GetNodeCount () const
   {
-    return 0;
+    return subFactories.GetSize ();
   }
 
   void BlendNodeFactory::ClearNodes ()
   {
+    subFactories.DeleteAll ();
+    weightList.DeleteAll ();
   }
 
-  csPtr<iSkeletonAnimationNode2> BlendNodeFactory::CreateInstance (iSkeleton2*)
+  csPtr<iSkeletonAnimationNode2> BlendNodeFactory::CreateInstance (iSkeleton2* s)
   {
-    return 0;
+    return new BlendNode (this, s);
   }
 
 
 
-  BlendNode::BlendNode ()
-    : scfImplementationType (this)
+  BlendNode::BlendNode (BlendNodeFactory* factory, iSkeleton2* skeleton)
+    : scfImplementationType (this, factory), factory (factory)
   {
+    weightList = factory->weightList;
+    for (size_t i = 0; i < factory->subFactories.GetSize (); ++i)
+    {
+      csRef<iSkeletonAnimationNode2> node = 
+        factory->subFactories[i]->CreateInstance (skeleton);
+      subNodes.Push (node);
+    }
   }
 
   void BlendNode::SetNodeWeight (uint node, float weight)
   {
+    CS_ASSERT(node < weightList.GetSize ());
+    weightList[node] = weight;
+  }
+
+  void BlendNode::NormalizeWeights ()
+  {
+    float weightSum = 0;
+
+    for (size_t i = 0; i < weightList.GetSize (); ++i)
+    {
+      weightSum += weightList[i];
+    }
+
+    for (size_t i = 0; i < weightList.GetSize (); ++i)
+    {
+      weightList[i] /= weightSum;
+    }
   }
 
   void BlendNode::BlendState (csSkeletalState2* state, float baseWeight)
   {
+    for (size_t i = 0; i < subNodes.GetSize (); ++i)
+    {
+      float nodeWeight = baseWeight * weightList[i];
+      subNodes[i]->BlendState (state, nodeWeight);
+    }
   }
 
   void BlendNode::TickAnimation (float dt)
   {
+    for (size_t i = 0; i < subNodes.GetSize (); ++i)
+    {
+      subNodes[i]->TickAnimation (dt);
+    }
   }
 
   bool BlendNode::IsActive () const
   {
+    for (size_t i = 0; i < subNodes.GetSize (); ++i)
+    {
+      if (subNodes[i]->IsActive ())
+      {
+        return true;
+      }
+    }
+
     return false;
   }
 
   iSkeletonAnimationNodeFactory2* BlendNode::GetFactory () const
   {
-    return 0;
+    return factory;
   }
 
 
