@@ -134,6 +134,8 @@ public:
   iAnimationFactory* CreateAnimationFactory ();
   csPtr<iChannel> CreateAnimationFactoryChannel ();
   iAnimationFactory* FindAnimationFactoryByName (const char* name);
+
+  void Debug ();
 private:
   csRefArray<AnimationFactory> animfacts;
 };

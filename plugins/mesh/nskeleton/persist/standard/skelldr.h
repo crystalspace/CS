@@ -64,6 +64,7 @@ private:
   csRef<iReporter> reporter;
   csRef<iSyntaxService> synldr;
   csStringHash xmltokens;
+  size_t currbone;
 };
 
 }

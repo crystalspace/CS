@@ -222,6 +222,14 @@ int Skeleton::FindBoneIDByName (const char* name) const
   }
   return -1;
 }
+size_t Skeleton::GetBoneCount ()
+{
+  return bones.GetSize ();
+}
+::Skeleton::iSkeleton::iBone* Skeleton::GetBone (size_t i)
+{
+  return &bones[i];
+}
 
 ::Skeleton::iSkeletonFactory* Skeleton::GetFactory () const
 {
@@ -234,6 +242,10 @@ int Skeleton::FindBoneIDByName (const char* name) const
 
 BoneFactory::BoneFactory (const char* name)
   : name (name), parent (0)
+{
+}
+BoneFactory::BoneFactory ()
+  : parent (0)
 {
 }
 
@@ -262,6 +274,12 @@ void BoneFactory::SetName (const char* n)
 const char* BoneFactory::GetName () const
 {
   return name;
+}
+
+void SkeletonFactory::SetNumberOfBones (size_t n)
+{
+  bones.SetSize (n);
+  bones.ShrinkBestFit ();
 }
 
 void BoneFactory::SetParent (::Skeleton::iSkeletonFactory::iBoneFactory* p)
@@ -359,12 +377,6 @@ int SkeletonFactory::FindBoneFactoryIDByName (const char* name) const
       return i;
   }
   return -1;
-}
-::Skeleton::iSkeletonFactory::iBoneFactory*
-  SkeletonFactory::CreateBoneFactory (const char* name)
-{
-  bones.Push (BoneFactory (name));
-  return &bones.Top ();
 }
 size_t SkeletonFactory::GetBoneFactoryCount ()
 {
@@ -494,6 +506,7 @@ void SkeletonFactory::Debug ()
     BoneFactory &bf = it.Next ();
     //bf.Debug ();
   }
+  animation_factory_layer->Debug ();
 }
 
 /// @@ GENJIX @@

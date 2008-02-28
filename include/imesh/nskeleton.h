@@ -21,6 +21,7 @@
 
 #include "csgeom/quaternion.h"
 #include "csgeom/transfrm.h"
+#include "csutil/refcount.h"
 #include "csutil/scf_interface.h"
 
 struct iGraphics3D;
@@ -62,14 +63,16 @@ struct iSkeletonFactory : public virtual iBase
     virtual iBoneFactory* GetParent () = 0;
 
     virtual void AddChild (iBoneFactory* child) = 0;
+    virtual const size_t GetChildrenCount () const = 0;
 
     /// @@ GENJIX @@
     virtual void Debug () = 0;
   };
 
+  virtual void SetNumberOfBones (size_t n) = 0;
+
   virtual iBoneFactory* FindBoneFactoryByName (const char* name) = 0;
   virtual int FindBoneFactoryIDByName (const char* name) const = 0;
-  virtual iBoneFactory* CreateBoneFactory (const char* name) = 0;
   virtual size_t GetBoneFactoryCount () = 0;
   virtual iBoneFactory* GetBoneFactory (size_t i) = 0;
 
@@ -119,6 +122,8 @@ struct iSkeleton : public virtual iBase
 
   virtual iBone* FindBoneByName (const char* name) = 0;
   virtual int FindBoneIDByName (const char* name) const = 0;
+  virtual size_t GetBoneCount () = 0;
+  virtual iBone* GetBone (size_t i) = 0;
 
   virtual iSkeletonFactory* GetFactory () const = 0;
   virtual Animation::iAnimationLayer* GetAnimationLayer () = 0;

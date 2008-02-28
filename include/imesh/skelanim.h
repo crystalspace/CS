@@ -109,6 +109,9 @@ struct iAnimationFactoryLayer : public virtual iBase
   virtual iAnimationFactory* CreateAnimationFactory () = 0;
   virtual csPtr<iChannel> CreateAnimationFactoryChannel () = 0;
   virtual iAnimationFactory* FindAnimationFactoryByName (const char* name) = 0;
+
+  /// @@ GENJIX @@
+  virtual void Debug () = 0;
 };
 
 }

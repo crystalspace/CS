@@ -93,6 +93,8 @@ public:
 
   iBone* FindBoneByName (const char* name);
   int FindBoneIDByName (const char* name) const;
+  size_t GetBoneCount ();
+  iBone* GetBone (size_t i);
 
   ::Skeleton::iSkeletonFactory* GetFactory () const;
   ::Skeleton::Animation::iAnimationLayer* GetAnimationLayer ();
@@ -112,6 +114,7 @@ class BoneFactory : public ::Skeleton::iSkeletonFactory::iBoneFactory
 {
 public:
   BoneFactory (const char* name);
+  BoneFactory ();
 
   void SetRotation (const csQuaternion &rot);
   const csQuaternion &GetRotation ();
@@ -151,6 +154,8 @@ public:
 
   void SetName (const char* name);
   const char* GetName ();
+
+  void SetNumberOfBones (size_t n);
 
   iBoneFactory* FindBoneFactoryByName (const char* name);
   int FindBoneFactoryIDByName (const char* name) const;

@@ -875,7 +875,8 @@
   <e c0="1" c1="0" c2="0" c3="0" />
   <e c0="1" c1="0" c2="0" c3="0" />
 </renderbuffer>
-<skelfile>factories/kirchdorfer.xml</skelfile>
+<!--<skelfile>factories/kirchdorfer.xml</skelfile>-->
+<skelfile>factories/human.xml</skelfile>
 <animcontrol plugin="crystalspace.mesh.anim.skeleton2">
   <skelfile>factories/skelkirchdorfer_arm</skelfile>
   <use_bones>

@@ -724,7 +724,7 @@ bool IsoTest::CreateActor ()
   }
   s->SetRootBone (0);
 #endif
-  myskel = skelgrave->CreateSkeleton ("taki", "amir");
+  myskel = skelgrave->CreateSkeleton ("amir", "human");
   skelgrave->Debug ();
 
 /*  if (load_kirchdorfer)
@@ -743,15 +743,22 @@ bool IsoTest::CreateActor ()
   csRef<Skeleton::Animation::iAnimationFactoryLayer> animfactlay = myskel->GetFactory ()->GetAnimationFactoryLayer ();
   csRef<Skeleton::Animation::iAnimationLayer> animlay = myskel->GetAnimationLayer ();
 
-  csRef<Skeleton::Animation::iAnimationFactory> animfact_run = animfactlay->FindAnimationFactoryByName ("run");
+  csRef<Skeleton::Animation::iAnimationFactory> animfact_walk = animfactlay->FindAnimationFactoryByName ("walk");
+  csRef<Skeleton::Animation::iAnimation> anim_walk = animfact_walk->CreateAnimation ();
+  anim_walk->SetPlayCount (-1);
+
+  csRef<Skeleton::Animation::iMixingNode> animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (anim_walk);
+  animlay->SetRootMixingNode (animmix);
+
+  /*csRef<Skeleton::Animation::iAnimationFactory> animfact_run = animfactlay->FindAnimationFactoryByName ("jump");
   csRef<Skeleton::Animation::iAnimation> anim_run = animfact_run->CreateAnimation ();
 
-  csRef<Skeleton::Animation::iAnimationFactory> animfact_idle = animfactlay->FindAnimationFactoryByName ("idle");
+  csRef<Skeleton::Animation::iAnimationFactory> animfact_idle = animfactlay->FindAnimationFactoryByName ("stand");
   csRef<Skeleton::Animation::iAnimation> anim_idle = animfact_idle->CreateAnimation ();
   anim_idle->SetPlayCount (-1);
   anim_idle->SetPlaySpeed (10.0f);
 
-  csRef<Skeleton::Animation::iAnimationFactory> animfact_wave = animfactlay->FindAnimationFactoryByName ("wave");
+  csRef<Skeleton::Animation::iAnimationFactory> animfact_wave = animfactlay->FindAnimationFactoryByName ("walk");
   csRef<Skeleton::Animation::iAnimation> anim_wave = animfact_wave->CreateAnimation ();
 
   csRef<Skeleton::Animation::iBlendNode> blend = animlay->CreateBlendNode ();
@@ -770,7 +777,7 @@ bool IsoTest::CreateActor ()
   overwrite->AddNode (animmix);
 
   animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (overwrite);
-  animlay->SetRootMixingNode (animmix);
+  animlay->SetRootMixingNode (animmix);*/
   }
   else
   {

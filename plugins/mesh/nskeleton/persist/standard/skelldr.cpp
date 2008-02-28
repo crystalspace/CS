@@ -94,9 +94,17 @@ bool Loader::ParseBone (iDocumentNode* node,
   ::Skeleton::iSkeletonFactory* skelfact,
   ::Skeleton::iSkeletonFactory::iBoneFactory* parent)
 {
+  if (!parent)  // the root bone!
+  {
+    int size = node->GetAttributeValueAsInt ("numbones");
+    skelfact->SetNumberOfBones (size);
+  }
+
   const char* bonename = node->GetAttributeValue ("name");
   ::Skeleton::iSkeletonFactory::iBoneFactory* bone =
-      skelfact->CreateBoneFactory (bonename);
+      skelfact->GetBoneFactory (currbone);
+  bone->SetName (bonename);
+  currbone++;
   csQuaternion rot;
   csVector3 pos (0);
 
@@ -259,6 +267,7 @@ csPtr<iBase> Loader::Parse (iDocumentNode* node,
   }
   ::Skeleton::iSkeletonFactory *skelfact = skelgrave->CreateFactory (fact_name);
   bool bones_loaded = false;
+  currbone = 0;
 
   csRef<iDocumentNodeIterator> it = skelfact_node->GetNodes ();
   while (it->HasNext ())
@@ -286,7 +295,6 @@ csPtr<iBase> Loader::Parse (iDocumentNode* node,
         break;
     }
   }
-
   skelfact->IncRef ();
   return csPtr<iBase> ((iBase*)skelfact);
 }

@@ -125,6 +125,7 @@ Animation::Animation (csRef<iAnimationFactory> fact)
 void Animation::Tick (float amount)
 {
   timeline += amount * playspeed;
+  printf ("%f\n", timeline);
 }
 void Animation::ReadChannels (Frame &frame)
 {
@@ -333,6 +334,17 @@ iAnimationFactory* AnimationFactoryLayer::FindAnimationFactoryByName (
       return animfact;
   }
   return 0;
+}
+
+void AnimationFactoryLayer::Debug ()
+{
+  puts ("AnimationFactoryLayer");
+  for (csRefArray<AnimationFactory>::Iterator it = animfacts.GetIterator ();
+    it.HasNext (); )
+  {
+    AnimationFactory* animfact = it.Next ();
+    printf ("  Animation: %s\n", animfact->GetName ());
+  }
 }
 
 }
