@@ -12,6 +12,8 @@ chronological order.
 	- Marten added a member to csShaderVariable for accessor specific data.
 	- Marten implemented the basic functionality in the animesh factory
 	  and object.
+	- Marten extended iSyntaxService with a way to parse data into
+	  an already created iRenderBuffer.
 28-Feb-2008
 	- Marten implemented the Blend animation node.
 27-Feb-2008

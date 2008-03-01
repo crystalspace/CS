@@ -311,6 +311,276 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
   return buffer;
 }
 
+bool csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node, iRenderBuffer* buffer)
+{
+  static const char* msgid = "crystalspace.syntax.renderbuffer";
+
+  const char* filename = node->GetAttributeValue ("file");
+  if (filename != 0)
+  {
+    csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
+    csRef<iDataBuffer> data = vfs->ReadFile (filename, false);
+    if (!data.IsValid())
+    {
+      ReportError (msgid, node, "could not read from '%s'", filename);
+      return false;
+    }
+    //return ReadRenderBuffer (data, KeepSaveInfo() ? filename : 0);
+    //@@TODO: Implement
+    return false;
+  }
+
+  const char* componentType = node->GetAttributeValue ("type");
+  if (componentType == 0)
+  {
+    ReportError (msgid, node, "no 'type' attribute");
+    return false;
+  }  
+
+  int componentNum = node->GetAttributeValueAsInt ("components");
+  if (componentNum <= 0)
+  {
+    ReportError (msgid, node, "bogus 'components' attribute: %d", componentNum);
+    return false;
+  }
+  if (componentNum != buffer->GetComponentCount ())
+  {
+    ReportError (msgid, node, "'components' attribute %d does not match expected %d", 
+      componentNum, buffer->GetComponentCount ());
+    return false;
+  }
+
+  bool indexBuf = false;
+  {
+    const char* index = node->GetAttributeValue("indices");
+    if (index && *index)
+    {
+      indexBuf = ((strcmp (index, "yes") == 0)
+        || (strcmp (index, "true") == 0)
+        || (strcmp (index, "on") == 0));
+    }
+  }
+
+  if (indexBuf && (componentNum != 1))
+  {
+    ReportError (msgid, node, "index buffers are required to have 1 component", componentNum);
+    return false;
+  }
+  if (indexBuf != buffer->IsIndexBuffer ())
+  {
+    ReportError (msgid, node, "wrong buffer type, expected %s buffer", 
+      buffer->IsIndexBuffer () ? "index" : "normal");
+    return false;
+  }  
+
+  const char* err;
+  if ((strcmp (componentType, "int") == 0) 
+    || (strcmp (componentType, "i") == 0))
+  {
+    csDirtyAccessArray<int> buf;
+    err = BufferParser<vhInt>::Parse (node, componentNum, buf);
+
+    if (buffer->GetComponentType () != CS_BUFCOMP_INT)
+    {
+      ReportError (msgid, node, "component type %s does not match expected %s",
+        componentType, "int");
+      return false;
+    }
+
+
+    if (err == 0)
+    {
+      if (buf.GetSize () > buffer->GetElementCount ()*componentNum)
+      {
+        ReportError (msgid, node, "too many elements: %d", buf.GetSize ());
+        return false;
+      }
+
+      buffer->CopyInto (buf.GetArray (), buf.GetSize ()/componentNum);
+    }
+  }
+  else if ((strcmp (componentType, "uint") == 0) 
+    || (strcmp (componentType, "ui") == 0))
+  {
+    csDirtyAccessArray<uint> buf;
+    err = BufferParser<vhInt>::Parse (node, componentNum, buf);
+    
+    if (buffer->GetComponentType () != CS_BUFCOMP_UNSIGNED_INT)
+    {
+      ReportError (msgid, node, "component type %s does not match expected %s",
+        componentType, "uint");
+      return false;
+    }
+
+    if (err == 0)
+    {
+      if (buf.GetSize () > buffer->GetElementCount ()*componentNum)
+      {
+        ReportError (msgid, node, "too many elements: %d", buf.GetSize ());
+        return false;
+      }
+
+      buffer->CopyInto (buf.GetArray (), buf.GetSize ()/componentNum);
+    }
+  }
+  else if ((strcmp (componentType, "byte") == 0) 
+    || (strcmp (componentType, "b") == 0))
+  {
+    csDirtyAccessArray<char> buf;
+    err = BufferParser<vhInt>::Parse (node, componentNum, buf);
+    
+    if (buffer->GetComponentType () != CS_BUFCOMP_BYTE)
+    {
+      ReportError (msgid, node, "component type %s does not match expected %s",
+        componentType, "byte");
+      return false;
+    }
+
+    if (err == 0)
+    {
+      if (buf.GetSize () > buffer->GetElementCount ()*componentNum)
+      {
+        ReportError (msgid, node, "too many elements: %d", buf.GetSize ());
+        return false;
+      }
+
+      buffer->CopyInto (buf.GetArray (), buf.GetSize ()/componentNum);
+    }
+  }
+  else if ((strcmp (componentType, "ubyte") == 0) 
+    || (strcmp (componentType, "ub") == 0))
+  {
+    csDirtyAccessArray<unsigned char> buf;
+    err = BufferParser<vhInt>::Parse (node, componentNum, buf);
+    
+    if (buffer->GetComponentType () != CS_BUFCOMP_UNSIGNED_BYTE)
+    {
+      ReportError (msgid, node, "component type %s does not match expected %s",
+        componentType, "ubyte");
+      return false;
+    }
+
+    if (err == 0)
+    {
+      if (buf.GetSize () > buffer->GetElementCount ()*componentNum)
+      {
+        ReportError (msgid, node, "too many elements: %d", buf.GetSize ());
+        return false;
+      }
+
+      buffer->CopyInto (buf.GetArray (), buf.GetSize ()/componentNum);
+    }
+  }
+  else if ((strcmp (componentType, "short") == 0) 
+    || (strcmp (componentType, "s") == 0))
+  {
+    csDirtyAccessArray<short> buf;
+    err = BufferParser<vhInt>::Parse (node, componentNum, buf);
+    
+    if (buffer->GetComponentType () != CS_BUFCOMP_SHORT)
+    {
+      ReportError (msgid, node, "component type %s does not match expected %s",
+        componentType, "short");
+      return false;
+    }
+
+    if (err == 0)
+    {
+      if (buf.GetSize () > buffer->GetElementCount ()*componentNum)
+      {
+        ReportError (msgid, node, "too many elements: %d", buf.GetSize ());
+        return false;
+      }
+
+      buffer->CopyInto (buf.GetArray (), buf.GetSize ()/componentNum);
+    }
+  }
+  else if ((strcmp (componentType, "ushort") == 0) 
+    || (strcmp (componentType, "us") == 0))
+  {
+    csDirtyAccessArray<unsigned short> buf;
+    err = BufferParser<vhInt>::Parse (node, componentNum, buf);
+    
+    if (buffer->GetComponentType () != CS_BUFCOMP_UNSIGNED_SHORT)
+    {
+      ReportError (msgid, node, "component type %s does not match expected %s",
+        componentType, "ushort");
+      return false;
+    }
+
+    if (err == 0)
+    {
+      if (buf.GetSize () > buffer->GetElementCount ()*componentNum)
+      {
+        ReportError (msgid, node, "too many elements: %d", buf.GetSize ());
+        return false;
+      }
+
+      buffer->CopyInto (buf.GetArray (), buf.GetSize ()/componentNum);
+    }
+  }
+  else if ((strcmp (componentType, "float") == 0) 
+    || (strcmp (componentType, "f") == 0))
+  {
+    csDirtyAccessArray<float> buf;
+    err = BufferParser<vhFloat>::Parse (node, componentNum, buf);
+    
+    if (buffer->GetComponentType () != CS_BUFCOMP_FLOAT)
+    {
+      ReportError (msgid, node, "component type %s does not match expected %s",
+        componentType, "float");
+      return false;
+    }
+
+    if (err == 0)
+    {
+      if (buf.GetSize () > buffer->GetElementCount ()*componentNum)
+      {
+        ReportError (msgid, node, "too many elements: %d", buf.GetSize ());
+        return false;
+      }
+
+      buffer->CopyInto (buf.GetArray (), buf.GetSize ()/componentNum);
+    }
+  }
+  else if ((strcmp (componentType, "double") == 0) 
+    || (strcmp (componentType, "d") == 0))
+  {
+    csDirtyAccessArray<double> buf;
+    err = BufferParser<vhFloat>::Parse (node, componentNum, buf);
+    
+    if (buffer->GetComponentType () != CS_BUFCOMP_DOUBLE)
+    {
+      ReportError (msgid, node, "component type %s does not match expected %s",
+        componentType, "double");
+      return false;
+    }
+
+    if (err == 0)
+    {
+      if (buf.GetSize () > buffer->GetElementCount ()*componentNum)
+      {
+        ReportError (msgid, node, "too many elements: %d", buf.GetSize ());
+        return false;
+      }
+
+      buffer->CopyInto (buf.GetArray (), buf.GetSize ()/componentNum);
+    }
+  }
+  else
+  {
+    ReportError (msgid, node, "unknown value for 'type': %s", componentType);
+    return 0;
+  }
+  if (err != 0)
+  {
+    ReportError (msgid, node, "%s", err);
+    return 0;
+  }
+
+  return true;
+}
+
 
 bool csTextSyntaxService::WriteRenderBuffer (iDocumentNode* node, iRenderBuffer* buffer)
 {
