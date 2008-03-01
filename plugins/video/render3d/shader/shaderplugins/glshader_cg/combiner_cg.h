@@ -218,6 +218,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       DocNodeCgAppender& appender);
     void AppendProgramInput_V2FDecl (const Snippet& snippet, 
       DocNodeCgAppender& appender);
+    void AppendProgramInput_V2FLocals (const Snippet& snippet, 
+      DocNodeCgAppender& appender);
     void AppendProgramInput_V2FVP (const Snippet& snippet, 
       DocNodeCgAppender& appender);
     void AppendProgramInput_V2FFP (const Snippet& snippet, 
@@ -230,6 +232,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     const char* MakeComment (const char* s);
     void AppendSnippetMap (const csHash<csString, csString>& map, 
       DocNodeCgAppender& appender);
+      
+    void SplitOffArrayCount (csString& name, int& count);
     
     class DocNodeCgAppender
     {
