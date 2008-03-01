@@ -205,7 +205,7 @@ struct iEngineSequenceParameters : public virtual iBase
  */
 struct iSequenceWrapper : public virtual iBase
 {
-  SCF_INTERFACE (iSequenceWrapper, 0, 3, 0);
+  SCF_INTERFACE (iSequenceWrapper, 1, 0, 0);
   /**
    * Query iObject that is implemented by the sequence manager.
    */
@@ -439,13 +439,14 @@ struct iSequenceWrapper : public virtual iBase
    * \param duration is the duration time of the rotate. The rotate will
    * start at relative time 'time' and will take 'duration' milliseconds
    * to go from current orientation to destination orientation.
+   * \param relative specifies whether the rotation is relative or absolute.
    */
   virtual void AddOperationRotateDuration (csTicks time, iParameterESM* mesh,
   		int axis1, float tot_angle1,
 		int axis2, float tot_angle2,
 		int axis3, float tot_angle3,
 		const csVector3& offset,
-		csTicks duration) = 0;
+		csTicks duration, bool relative = false) = 0;
 
   /**
    * Operation: move object (mesh or light) during some time. After the time

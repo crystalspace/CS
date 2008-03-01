@@ -306,12 +306,21 @@ Move the specified object from the current position to the
 specified position in the given time (duration).  Parameters are
 @samp{mesh}, @samp{duration}, @samp{x}, @samp{y} and @samp{z}.
 
+@item movelight
+Exactly like @samp{move} operation, but working on lights. Accepts 
+@samp{light} parameter with the light name.
+
 @item rotate
 Rotate the specified object from the current orientation
 to the new orientation in the given time (duration).  Parameters are
-@samp{mesh} and @samp{duration}.  As children you can specify rotation
+@samp{mesh}, @samp{duration} and optionally @samp{relative} to make the 
+operation relative.  As children you can specify rotation
 matrix and vector using @samp{rotx}, @samp{roty}, @samp{rotz} and
 @samp{v}.
+
+@item rotatelight
+Exactly like @samp{rotate} operation, but working on lights. Accepts 
+@samp{light} parameter with the light name.
 
 @item material
 Change the material on some object.  Parameters are
