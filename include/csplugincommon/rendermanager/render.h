@@ -72,7 +72,9 @@ namespace RenderManager
     void operator() (const ContextType& context)
     {
       g3d->FinishDraw ();
-      g3d->SetRenderTarget (context.renderTarget, false, context.subtexture);
+      for (int a = 0; a < rtaNumAttachments; a++)
+        g3d->SetRenderTarget (context.renderTargets[a].texHandle, false,
+          context.renderTargets[a].subtexture, csRenderTargetAttachment (a));
     }
 
   private:
@@ -189,9 +191,11 @@ namespace RenderManager
   public:
     SimpleTreeRenderer (iGraphics3D* g3di, iShaderManager* shaderMgri)
       : targetSetup (g3di), meshRender (g3di, shaderMgri),
-      g3d (g3di), shaderMgr (shaderMgri), 
-      lastTarget (0), lastSubtexture (0)
-    {}   
+      g3d (g3di), shaderMgr (shaderMgri)
+    {
+      memset (lastTarget, 0, sizeof (lastTarget));
+      memset (lastSubtexture, 0, sizeof (lastSubtexture));
+    }
 
     ~SimpleTreeRenderer ()
     {
@@ -206,8 +210,11 @@ namespace RenderManager
       {
         // New context, render out the old ones
         RenderContextStack ();
-        lastTarget = context->renderTarget;
-        lastSubtexture = context->subtexture;
+        for (int a = 0; a < rtaNumAttachments; a++)
+        {
+          lastTarget[a] = context->renderTargets[a].texHandle;
+          lastSubtexture[a] = context->renderTargets[a].subtexture;
+        }
       }
 
       // Push the context
@@ -272,8 +279,13 @@ namespace RenderManager
 
     bool IsNew (const typename RenderTree::ContextNode& context)
     {
-      return lastTarget != context.renderTarget ||
-        lastSubtexture != context.subtexture;
+      for (int a = 0; a < rtaNumAttachments; a++)
+      {
+        if ((lastTarget[a] != context.renderTargets[a].texHandle)
+	    || (lastSubtexture[a] != context.renderTargets[a].subtexture))
+          return true;
+      }
+      return false;
     }
 
     ContextTargetSetup<typename RenderTree::ContextNode> targetSetup;
@@ -282,8 +294,8 @@ namespace RenderManager
     iGraphics3D* g3d;
     iShaderManager* shaderMgr;
 
-    iTextureHandle* lastTarget;
-    int lastSubtexture;
+    iTextureHandle* lastTarget[rtaNumAttachments];
+    int lastSubtexture[rtaNumAttachments];
 
     csArray<typename RenderTree::ContextNode*> contextStack;
   };

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2007-2008 by Marten Svanfeldt
+    Copyright (C) 2008 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -55,9 +55,14 @@ namespace RenderManager
       }
     }
 
-    size_t GetNewLayerIndex (size_t layer, size_t subLayer)
+    size_t GetNewLayerIndex (size_t layer, size_t subLayer) const
     {
       return persist.newLayerIndices[layer] + subLayer;
+    }
+
+    size_t GetSubLayerCount (size_t layer) const
+    {
+      return persist.newLayerCounts[layer];
     }
 
     void Ensure (size_t layer, size_t neededSubLayers,
@@ -138,6 +143,91 @@ namespace RenderManager
     PersistentData& persist;
   };
 
+  /**
+   * Helper class to deal with shader variables setup for lighting
+   */
+  class LightingVariablesHelper
+  {
+  public:
+    struct PersistentData
+    {
+      csShaderVarBlockAlloc<csBlockAllocatorDisposeLeaky<csShaderVariable> >
+	  svAlloc;
+      /* A number of SVs have to be kept alive even past the expiration
+      * of the actual step */
+      csRefArray<csShaderVariable> svKeeper;
+      
+      void UpdateNewFrame ()
+      {
+	svKeeper.Empty();
+      }
+    };
+    
+    LightingVariablesHelper (PersistentData& persist) : persist (persist) {}
+    
+    /**
+     * Merge a shader variable into a stack as an item of a shader variable.
+     * The variable in the destination stack with the name of \a sv is an
+     * array variable or does not exist gets the array item with the index
+     * \a index set to \a sv.
+     * \return Whether the destination stack was large enough to contain
+     *   \a sv.
+     */
+    bool MergeAsArrayItem (csShaderVariableStack& dst, 
+			   csShaderVariable* sv, size_t index)
+    {
+      CS::ShaderVarStringID name = sv->GetName();
+      
+      if (name >= dst.GetSize()) return false;
+      csShaderVariable*& dstVar = dst[name];
+
+      if (dstVar == 0) dstVar = new csShaderVariable (name);
+      if ((dstVar->GetType() != csShaderVariable::UNKNOWN)
+	   && (dstVar->GetType() != csShaderVariable::ARRAY)) return true;
+      dstVar->SetArraySize (csMax (index+1, dstVar->GetArraySize()));
+      dstVar->SetArrayElement (index, sv);
+      return true;
+    }
+
+    /**
+     * Merge an array of shader variables into a stack as items of a shader
+     * variables.
+     * \sa MergeAsArrayItem
+     */
+    void MergeAsArrayItems (csShaderVariableStack& dst, 
+			    const csRefArray<csShaderVariable>& allVars, size_t index)
+    {
+      for (size_t v = 0; v < allVars.GetSize(); v++)
+      {
+	if (!MergeAsArrayItem (dst, allVars[v], index)) break;
+      }
+    }
+
+    /// Create a shader variable which is only valid for this frame.
+    csShaderVariable* CreateTempSV (CS::ShaderVarStringID name =
+	CS::InvalidShaderVarStringID)
+    {
+      csRef<csShaderVariable> var = persist.svAlloc.Alloc();
+      var->SetName (name);
+      persist.svKeeper.Push (var);
+      return var;
+    }
+
+    /**
+     * Create a temporary shader variable (using CreateTempSV) and put it onto
+     * \a stack.
+     */
+    csShaderVariable* CreateVarOnStack (CS::ShaderVarStringID name,
+					csShaderVariableStack& stack)
+    {
+      csShaderVariable* var = CreateTempSV (name);
+      stack[name] = var;
+      return var;
+    }
+  protected:
+    PersistentData& persist;
+  };
+
   template<typename RenderTree, typename LayerConfigType>
   class ShadowNone
   {
@@ -146,45 +236,14 @@ namespace RenderManager
       const csRefArray<csShaderVariable>* shaderVars;
     };
 
-    void MergeAsArrayItems (csShaderVariableStack& dst, 
-      const csRefArray<csShaderVariable>& allVars, size_t index)
-    {
-      for (size_t v = 0; v < allVars.GetSize(); v++)
-      {
-        csShaderVariable* sv = allVars[v];
-        CS::ShaderVarStringID name = sv->GetName();
-        
-        if (name >= dst.GetSize()) break;
-        csShaderVariable*& dstVar = dst[name];
-
-        if (dstVar == 0) dstVar = new csShaderVariable (name);
-        if ((dstVar->GetType() != csShaderVariable::UNKNOWN)
-          && (dstVar->GetType() != csShaderVariable::ARRAY)) continue;
-        dstVar->SetArraySize (csMax (index+1, dstVar->GetArraySize()));
-        dstVar->SetArrayElement (index, sv);
-      }
-    }
-
-    csShaderVariable* CreateVarOnStack (CS::ShaderVarStringID name,
-                                        csShaderVariableStack& stack)
-    {
-      csRef<csShaderVariable> var = persist.svAlloc.Alloc();
-      var->SetName (name);
-      stack[name] = var;
-      persist.svKeeper.Push (var);
-      return var;
-    }
   public:
 
     struct PersistentData
     {
       csLightShaderVarCache svNames;
       CS::ShaderVarStringID svPassNum;
-      csShaderVarBlockAlloc<> svAlloc;
-      /* A number of SVs have to be kept alive even past the expiration
-       * of the actual step */
-      csRefArray<csShaderVariable> svKeeper;
       LightingSorter::PersistentData lightSorterPersist;
+      LightingVariablesHelper::PersistentData varsHelperPersist;
       csHash<CachedLightData, csPtrKey<iLight> > lightDataCache;
 
       ~PersistentData()
@@ -192,14 +251,15 @@ namespace RenderManager
         if (lcb.IsValid()) lcb->parent = 0;
       }
       
-      void Initialize (iShaderVarStringSet* strings)
+      void Initialize (iShaderManager* shaderManager)
       {
+	iShaderVarStringSet* strings = shaderManager->GetSVNameStringset();
 	svNames.SetStrings (strings);
         svPassNum = strings->Request ("pass number");
       }
       void UpdateNewFrame ()
       {
-        svKeeper.Empty();
+        varsHelperPersist.UpdateNewFrame();
       }
 
       iLightCallback* GetLightCallback()
@@ -235,7 +295,7 @@ namespace RenderManager
     };
 
     ShadowNone (PersistentData& persist,
-      const LayerConfigType& layerConfig) 
+      const LayerConfigType& layerConfig, RenderTree&) 
       : persist (persist), layerConfig (layerConfig), lastShader (0) { }
 
     template<typename LayerHelper>
@@ -246,6 +306,7 @@ namespace RenderManager
     {
       LightingSorter sortedLights (persist.lightSorterPersist, influenceLights,
         numLights);
+      LightingVariablesHelper lightVarsHelper (persist.varsHelperPersist);
 
       /* Get the shader since the number of passes for that layer depend
 	* on it */
@@ -323,16 +384,16 @@ namespace RenderManager
   
 	  size_t thisNum = csMin (num,
 	    layerConfig.GetMaxLightNum (layer));
-	  csShaderVariable* lightNum = CreateVarOnStack (
+	  csShaderVariable* lightNum = lightVarsHelper.CreateVarOnStack (
 	    persist.svNames.GetDefaultSVId (
 	      csLightShaderVarCache::varLightCount), localStack);
 	  lightNum->SetValue ((int)thisNum);
 
-	  csShaderVariable* passNum = CreateVarOnStack (
+	  csShaderVariable* passNum = lightVarsHelper.CreateVarOnStack (
 	    persist.svPassNum, localStack);
 	  passNum->SetValue ((int)(n + totalLayers));
   
-	  csShaderVariable* lightTypeSV = CreateVarOnStack (
+	  csShaderVariable* lightTypeSV = lightVarsHelper.CreateVarOnStack (
 	    persist.svNames.GetLightSVId (
 	      csLightShaderVarCache::lightType), localStack);
 	  lightTypeSV->SetValue ((int)(lightType));
@@ -352,7 +413,8 @@ namespace RenderManager
 		light, newCacheData);
 	    }
   
-	    MergeAsArrayItems (localStack, *(thisLightSVs->shaderVars), l);
+	    lightVarsHelper.MergeAsArrayItems (localStack,
+              *(thisLightSVs->shaderVars), l);
 	  }
 	  num -= thisNum;
 	  firstLight += thisNum;
@@ -419,7 +481,8 @@ namespace RenderManager
       LayerHelper<RenderTree, LayerConfigType,
         PostLightingLayers> layerHelper (persist.layerPersist, layerConfig,
         newLayers);
-      ShadowHandler shadows (persist.shadowPersist, layerConfig);
+      ShadowHandler shadows (persist.shadowPersist, layerConfig,
+        node->owner.owner);
 
       for (size_t i = 0; i < node->meshes.GetSize (); ++i)
       {
@@ -511,9 +574,9 @@ namespace RenderManager
       typename LayerHelper<RenderTree, LayerConfigType,
         PostLightingLayers>::PersistentData layerPersist;
       
-      void Initialize (iShaderVarStringSet* strings)
+      void Initialize (iShaderManager* shaderManager)
       {
-        shadowPersist.Initialize (strings);
+	shadowPersist.Initialize (shaderManager);
       }
       void UpdateNewFrame ()
       {

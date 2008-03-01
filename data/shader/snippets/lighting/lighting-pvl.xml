@@ -43,18 +43,10 @@
 	  <?Include /shader/snippets/lighting/lightfuncs.cginc ?>
 	</block>
 	
-	<block location="cg:vertexIn">
-	  <!-- @@@ The Cg combiner process the <uniform ... /> tags *before*
-	        xmlshader - so we can't use includes, templates here. Pity -->
-	  <uniform type="position4_world" name="lightPosWorld[8]" />
-	  <uniform type="rgb" name="lightColorDiffuse[8]" />
-	  <uniform type="rgb" name="lightColorSpecular[8]" />
-	  <uniform type="float4" name="lightAttenuationVec[8]" />
-	  <uniform type="float3" name="lightDir[8]" />
-	  <uniform type="float" name="lightFalloffInner[8]" />
-	  <uniform type="float" name="lightFalloffOuter[8]" />
-	  <uniform type="int" name="lightCount" />
-	</block>
+	<!-- @@@ The Cg combiner process the <uniform ... /> tags *before*
+	         xmlshader - so we can't use includes, templates here. Pity -->
+	<block location="cg:vertexIn"
+	       file="/shader/snippets/lighting/lighting-cg-input.block" />
 	
 	<block location="cg:vertexToFragment">
 	  <varying type="rgb" name="diffuseColor" />
@@ -62,7 +54,7 @@
 	</block>
 	
 	<block location="cg:vertexMain">
-	  <?Lighting_Compute vertex 8?>
+	  <?Lighting_Compute vertex 8 None?>
 	</block>
 	
 	<output name="diffuseColor" type="rgb" />

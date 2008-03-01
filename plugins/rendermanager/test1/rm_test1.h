@@ -71,7 +71,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMTest1)
       TargetManagerType;
 
     typedef CS::RenderManager::LightSetup<RenderTreeType, 
-      CS::RenderManager::MultipleRenderLayer> LightSetupType;
+      CS::RenderManager::MultipleRenderLayer,
+      CS::RenderManager::ShadowShadowmap<RenderTreeType,
+        CS::RenderManager::MultipleRenderLayer> > LightSetupType;
 
   public:    
 

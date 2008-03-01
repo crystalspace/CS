@@ -133,7 +133,7 @@ namespace RenderManager
       };
       struct csBoxClipperCachedStore
       {
-        uint32 bytes[sizeof(csBoxClipperCached)/sizeof(uint32)];
+        uint bytes[(sizeof(csBoxClipperCached) + sizeof (uint) - 1)/sizeof(uint)];
       };
       CS::Utility::GenericResourceCache<csBoxClipperCachedStore, csTicks,
         CS::Utility::ResourceCache::SortingNone,
@@ -154,14 +154,17 @@ namespace RenderManager
       
       TextureCache texCache;
 
-      PersistentData() : texCache (csimg2D, "rgb8", 
-        CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP,
-        "target", TextureCache::tcachePowerOfTwo)
+      PersistentData() : 
+        bufCache (CS::Utility::ResourceCache::ReuseConditionAfterTime<uint> (),
+          CS::Utility::ResourceCache::PurgeConditionAfterTime<uint> (10000)),
+        boxClipperCache (CS::Utility::ResourceCache::ReuseConditionFlagged (),
+          CS::Utility::ResourceCache::PurgeConditionAfterTime<uint> (10000)),
+        texCache (csimg2D, "rgb8", 
+          CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP,
+          "target", TextureCache::tcachePowerOfTwo)
       {
         bufCache.agedPurgeInterval = 5000;
-        bufCache.purgeAge = 10000;
         boxClipperCache.agedPurgeInterval = 5000;
-        boxClipperCache.purgeAge = 10000;
       }
       
       void Initialize (iShaderManager* shmgr, iGraphics3D* g3d)
@@ -262,8 +265,8 @@ namespace RenderManager
             setupData.lastSimplePortalCtx = portalCtx;
             
             // Copy the target from last portal
-            portalCtx->renderTarget = context.renderTarget;
-            portalCtx->subtexture = context.subtexture;
+	    for (int a = 0; a < rtaNumAttachments; a++)
+	      portalCtx->renderTargets[a] = context.renderTargets[a];
 
             // Setup the new context
             contextFunction (*portalCtx, setupData);
@@ -300,9 +303,11 @@ namespace RenderManager
 	    iCamera* cam = rview->GetCamera();
 	    // Create a new view
 	    csRef<CS::RenderManager::RenderView> newRenderView;
+#include "csutil/custom_new_disable.h"
 	    newRenderView.AttachNew (
 	      new (renderTree.GetPersistentData().renderViewPool) RenderView (
 	        cam->Clone(), 0, rview->GetGraphics3D(), rview->GetGraphics2D()));
+#include "csutil/custom_new_enable.h"
 	    newRenderView->SetEngine (rview->GetEngine ());
 	    
 	    iCamera *inewcam = newRenderView->GetCamera();
@@ -372,14 +377,16 @@ namespace RenderManager
               typename ThisType::PersistentData::csBoxClipperCachedStore dummy;
               bccstore = persistentData.boxClipperCache.AddActive (dummy);
             }
+#include "csutil/custom_new_disable.h"
             newView.AttachNew (
               new (bccstore) typename ThisType::PersistentData::csBoxClipperCached (
                 &persistentData, clipBox));
+#include "csutil/custom_new_enable.h"
             newRenderView->SetClipper (newView);
 
             typename RenderTreeType::ContextNode* portalCtx = 
               renderTree.CreateContext (newRenderView);
-            portalCtx->renderTarget = tex;
+            portalCtx->renderTargets[rtaColor0].texHandle = tex;
   
 	    // Setup the new context
             ContextSetupData newSetup (portalCtx);

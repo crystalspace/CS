@@ -38,7 +38,7 @@
       <snippet id="parallax" file="/shader/surface/parallax.xml" />
       <snippet id="normalmap" file="/shader/snippets/surface/normalmap.xml" />
       <snippet id="surface" file="/shader/surface/surface-classic.xml" />
-      <snippet id="lighting" file="/shader/snippets/lighting/lighting-ppl.xml" />
+      <snippet id="lighting" file="/shader/snippets/lighting/lighting-ppl-shadowmap.xml" />
       <snippet id="mod_light_surf" file="/shader/snippets/modulate.xml" />
       <!--snippet id="add_specular" file="/shader/snippets/add.xml" /-->
       <snippet id="glow" file="/shader/lighting/glow.xml" />

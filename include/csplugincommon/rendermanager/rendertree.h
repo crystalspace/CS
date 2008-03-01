@@ -77,7 +77,7 @@ namespace RenderManager
       }
 
       csBlockAllocator<MeshNode> meshNodeAllocator;
-      csBlockAllocator<ContextNode> contextNodeAllocator;      
+      csBlockAllocator<ContextNode> contextNodeAllocator;
       
 
       CS::ShaderVarStringID svObjectToWorldName;
@@ -155,8 +155,14 @@ namespace RenderManager
 
       // Target data
       csRef<RenderView> renderView;
-      iTextureHandle* renderTarget;
-      int subtexture;
+      struct TargetTexture
+      {
+        iTextureHandle* texHandle;
+        int subtexture;
+
+        TargetTexture() : texHandle (0), subtexture (0) {}
+      };
+      TargetTexture renderTargets[rtaNumAttachments];
       csReversibleTransform cameraTransform;
       iSector* sector;
 
@@ -173,11 +179,13 @@ namespace RenderManager
       csDirtyAccessArray<iShader*> shaderArray;
       csArray<size_t> ticketArray;
 
+      csArray<int> stencilState; // @@@ Needed by stencil shadows
+
       // Total number of render meshes within the context, just for statistics
       size_t totalRenderMeshes;
       
       ContextNode(TreeType& owner) 
-        : owner (owner), renderTarget (0), subtexture (0), totalRenderMeshes (0) 
+        : owner (owner), totalRenderMeshes (0) 
       {}
       
       /**

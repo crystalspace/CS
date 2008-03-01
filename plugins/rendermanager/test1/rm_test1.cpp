@@ -27,6 +27,7 @@
 #include "csplugincommon/rendermanager/renderlayers.h"
 #include "csplugincommon/rendermanager/rendertree.h"
 #include "csplugincommon/rendermanager/shadersetup.h"
+#include "csplugincommon/rendermanager/shadow_shadowmap.h"
 #include "csplugincommon/rendermanager/standardsorter.h"
 #include "csplugincommon/rendermanager/svsetup.h"
 #include "csplugincommon/rendermanager/viscull.h"
@@ -114,7 +115,7 @@ public:
 
     SetupStandardShader (context, shaderManager, layerConfig);
 
-    LightSetup<RenderTreeType, MultipleRenderLayer> lightSetup (
+    RMTest1::LightSetupType lightSetup (
       rmanager->lightPersistent, rmanager->lightManager,
       context.svArrays, layerConfig);
 
@@ -145,8 +146,10 @@ bool RMTest1::RenderView (iView* view)
   // Setup a rendering view
   view->UpdateClipper ();
   csRef<CS::RenderManager::RenderView> rview;
+#include "csutil/custom_new_disable.h"
   rview.AttachNew (new (treePersistent.renderViewPool) 
     CS::RenderManager::RenderView(view));
+#include "csutil/custom_new_enable.h"
   view->GetEngine ()->UpdateNewFrame ();  
   view->GetEngine ()->FireStartFrame (rview);
 
@@ -165,7 +168,7 @@ bool RMTest1::RenderView (iView* view)
   RenderTreeType renderTree (treePersistent);
 
   RenderTreeType::ContextNode* startContext = renderTree.CreateContext (rview);
-  startContext->renderTarget = postEffects.GetScreenTarget ();
+  startContext->renderTargets[rtaColor0].texHandle = postEffects.GetScreenTarget ();
 
   // Setup the main context
   {
@@ -209,8 +212,10 @@ bool RMTest1::HandleTarget (RenderTreeType& renderTree,
 {
   // Prepare
   csRef<CS::RenderManager::RenderView> rview;
+#include "csutil/custom_new_disable.h"
   rview.AttachNew (new (treePersistent.renderViewPool) 
     CS::RenderManager::RenderView(settings.view));
+#include "csutil/custom_new_enable.h"
 
   iSector* startSector = rview->GetThisSector ();
 
@@ -218,8 +223,8 @@ bool RMTest1::HandleTarget (RenderTreeType& renderTree,
     return false;
 
   RenderTreeType::ContextNode* startContext = renderTree.CreateContext (rview);
-  startContext->renderTarget = settings.target;
-  startContext->subtexture = settings.targetSubTexture;
+  startContext->renderTargets[rtaColor0].texHandle = settings.target;
+  startContext->renderTargets[rtaColor0].subtexture = settings.targetSubTexture;
 
   ContextSetupType contextSetup (this, renderLayer);
   ContextSetupType::PortalSetupType::ContextSetupData portalData (startContext);
@@ -240,14 +245,6 @@ bool RMTest1::Initialize(iObjectRegistry* objectReg)
   stringSet = csQueryRegistryTagInterface<iStringSet> (objectReg,
     "crystalspace.shared.stringset");
     
-  csRef<iLoader> loader (csQueryRegistry<iLoader> (objectReg));
-  if (!loader->LoadShader ("/shader/lighting/lighting_default.xml"))
-  {
-    csReport (objectReg, CS_REPORTER_SEVERITY_WARNING,
-      "crystalspace.rendermanager.test1",
-      "Could not load lighting_vproc_fixed shader");
-  }
-
   shaderManager = csQueryRegistry<iShaderManager> (objectReg);
   
   lightManager = csQueryRegistry<iLightManager> (objectReg);
@@ -259,17 +256,34 @@ bool RMTest1::Initialize(iObjectRegistry* objectReg)
   
   //CS::RenderManager::AddDefaultBaseLayers (objectReg, renderLayer);
 
+  csRef<iLoader> loader (csQueryRegistry<iLoader> (objectReg));
+  if (!loader->LoadShader ("/shader/lighting/lighting_default.xml"))
+  {
+    csReport (objectReg, CS_REPORTER_SEVERITY_WARNING,
+      "crystalspace.rendermanager.test1",
+      "Could not load lighting_vproc_fixed shader");
+  }
+
   CS::RenderManager::SingleRenderLayer lightLayer = 
     CS::RenderManager::SingleRenderLayer (stringSet->Request("standard"),
       shaderManager->GetShader ("lighting_default"));
   this->renderLayer.AddLayers (lightLayer);
+
+/*
+  CS::RenderManager::SingleRenderLayer ambientLayer = 
+    CS::RenderManager::SingleRenderLayer (stringSet->Request("ambient"));
+  this->renderLayer.AddLayers (ambientLayer);
+  CS::RenderManager::SingleRenderLayer diffuseLayer = 
+    CS::RenderManager::SingleRenderLayer (stringSet->Request("diffuse"));
+  this->renderLayer.AddLayers (diffuseLayer);
+*/
   
   csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objectReg);
   treePersistent.Initialize (shaderManager);
   postEffects.Initialize (objectReg);
   
   portalPersistent.Initialize (shaderManager, g3d);
-  lightPersistent.Initialize (svNameStringSet);
+  lightPersistent.Initialize (shaderManager);
 
   /*csRef<iLoader> loader = csQueryRegistry<iLoader> (objectReg);  
   csRef<iShader> desatShader = loader->LoadShader ("/shader/desaturate.xml");

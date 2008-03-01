@@ -14,6 +14,7 @@ chronological order.
 	- res made the engine also set the "inverse light transform" SV.
 	- res changed the 'glow' weaver snippet to declare vertex-to-fragment
 	  vars with XML.
+	- res added a first implementation of shadow mapping.
 27-Feb-2008
 	- res added a (still very bare) class for 4x4 matrices.
 	- res changed the libcrystalspace Jamfiles to exclude some files that

@@ -220,8 +220,8 @@ namespace RenderManager
 
   enum
   {
-    defaultlayerNoTerrain = 1
-    //defaultlayerNoLighting = 2
+    defaultlayerNoTerrain = 1,
+    defaultlayerNoLighting = 2
   };
   
   /* @@@ TODO: Perhaps revisit naming after light support was added,
