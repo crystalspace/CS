@@ -1,6 +1,6 @@
 SubDir TOP plugins physics loader ;
 
-if $(ODE.AVAILABLE) = "yes" 
+if $(ODE.AVAILABLE) = "yes" || $(BULLET.AVAILABLE) = "yes"
 {
 Description physldr : "Physics Loader plugin" ;
 

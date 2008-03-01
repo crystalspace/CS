@@ -6,7 +6,15 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-1-Mar-2008
+01-Mar-2008
+	- caedes added support for relative rotation operations to the
+	  sequence manager.
+	- caedes added docs for movelight and rotatelight operations to
+	  the sequence manager manual section.
+	- caedes changed the physldr jamfile so it gets built also if only
+	  bullet is available.
+	- caedes explained the concept of relative rotation operation a bit
+	  clearer in the manual.
 	- Marten reduced the size of csShaderVariable a bit by joining
 	  a couple of members into a union.
 	- Marten added a member to csShaderVariable for accessor specific data.
