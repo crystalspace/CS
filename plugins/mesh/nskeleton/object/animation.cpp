@@ -36,38 +36,49 @@ void Channel::AddKeyframe (float t, const Keyframe &k)
 }
 Keyframe Channel::ReadValue (float i) const
 {
+  // we're going to find the closest times on both sides of i
   float close_lower = i, close_higher = i;
+  // these are the keyframes for the times
   Keyframe low, up;
+  // loop through available keyframes in this channel
   for (csHash<Keyframe, float>::ConstGlobalIterator it =
     keyframes.GetIterator (); it.HasNext (); )
   {
     float timekey;
     const Keyframe &key = it.Next (timekey);
-    if (timekey == i)
+    // we have perfect match. return this keyframe.
+    if (ABS(timekey - i) < SMALL_EPSILON)
       return key;
     else if (timekey < i)
     {
-      if (close_lower == i || timekey > close_lower)
+      // if our lower bound value matches the time we seek (hasn't been set yet)
+      //   OR we found a closer value to i
+      if (ABS(close_lower - i) < SMALL_EPSILON || timekey > close_lower)
       {
+        // set the lower time value and corresponding keyframe
         close_lower = timekey;
         low = key;
       }
     }
     else if (timekey > i)
     {
-      if (close_higher == i || timekey < close_higher)
+      // if our upper bound value matches the time we seek (hasn't been set yet)
+      //   OR we found a closer value to i
+      if (ABS(close_higher - i) < SMALL_EPSILON || timekey < close_higher)
       {
+        // set the upper time value and corresponding keyframe
         close_higher = timekey;
         up = key;
       }
     }
   }
 
-  if (close_lower == i)
+  // why does this sexy code stop the ghosts?
+  if (ABS(close_lower - i) < SMALL_EPSILON)
     return up;
-  else if (close_higher == i)
+  else if (ABS(close_higher - i) < SMALL_EPSILON)
     return low;
-  return
+  return  // intarpolate!
     csInterpolator<Keyframe>::Linear (i, close_lower, low, close_higher, up);
 }
 void Channel::SetID (size_t id)
@@ -101,6 +112,7 @@ void AnimationFactory::AddChannel (csRef<iChannel> channel)
 }
 void AnimationFactory::ReadChannels (float time, Frame &frame) const
 {
+  // aggregate all the channels output into a frame and return taht
   for (csRefArray<iChannel>::ConstIterator it =
     channels.GetIterator (); it.HasNext (); )
   {
@@ -122,22 +134,33 @@ Animation::Animation (csRef<iAnimationFactory> fact)
   playcount (1)
 {
 }
+const char* Animation::GetName () const
+{
+  return fact->GetName ();
+}
 void Animation::Tick (float amount)
 {
-  if (playcount != 0)
+  // if animation is playing
+  if (playcount != 0) // tick!
     timeline += amount * playspeed;
 }
 void Animation::ReadChannels (Frame &frame)
 {
+  // do nothing if animation isn't playing
   if (!playcount)
     return;
+  // this is an empty shell, so request channels
+  // from the factory :P
   fact->ReadChannels (timeline, frame);
+
+  // reset timeline if it's gone past end of animation
   if (timeline > fact->GetAnimationLength ())
   {
     timeline = 0;
     if (playcount > 0)
       playcount--;
   }
+  // for backwards playback
   else if (timeline < 0)
   {
     timeline = fact->GetAnimationLength ();
@@ -175,6 +198,7 @@ BlendNode::BlendNode () : scfImplementationType (this)
 }
 void BlendNode::Tick (float amount)
 {
+  // tick all the child nodes. should end with the animations (leaf) ticking.
   for (csRefArray<iMixingNode>::Iterator it = nodes.GetIterator ();
     it.HasNext (); )
   {
@@ -187,10 +211,9 @@ void BlendNode::Tick (float amount)
     node->Tick (amount);
   }
 }
-void BlendNode::ReadChannels (Frame &result_frame)
+void BlendNode::CalculateFramesAndChannels (csArray<Frame> &nodes_frames, csArray<size_t> &channel_ids)
 {
-  // read all the frames from all the child nodes
-  csArray<Frame> nodes_frames;
+  // loop through all child nodes and add their output in a list
   for (csRefArray<iMixingNode>::Iterator it = nodes.GetIterator ();
     it.HasNext (); )
   {
@@ -199,8 +222,7 @@ void BlendNode::ReadChannels (Frame &result_frame)
     node->ReadChannels (frame);
     nodes_frames.Push (frame);
   }
-  // comprehensive list of all channel ids used
-  csArray<size_t> channel_ids;
+  // now go through that list and build another list of all the existing channels
   for (csArray<Frame>::Iterator it = nodes_frames.GetIterator (); it.HasNext (); )
   {
     const Frame &frame = it.Next ();
@@ -210,23 +232,33 @@ void BlendNode::ReadChannels (Frame &result_frame)
       size_t id;
       it.Next (id);
       if (channel_ids.Find (id) == csArrayItemNotFound)
-        channel_ids.Push (id);
+        channel_ids.Push (id);  // 404 - add to our list
     }
   }
+}
+void BlendNode::ReadChannels (Frame &result_frame)
+{
+  // read all the frames from all the child nodes
+  csArray<Frame> nodes_frames;
+  // comprehensive list of all channel ids used
+  csArray<size_t> channel_ids;
+  CalculateFramesAndChannels (nodes_frames, channel_ids);
   // go through each channel id
   for (csArray<size_t>::Iterator it = channel_ids.GetIterator ();
     it.HasNext (); )
   {
     const size_t id = it.Next ();
+    // the intarpolatar likes to have weights with keyframes
     csArray<csTuple2<float, Keyframe> > keys;
-    // find this channel in each frame and add it to the list
+    // find this channel in each frame and add it to keys
     for (size_t i = 0; i < nodes_frames.GetSize (); i++)
     {
       const Frame &frame = nodes_frames.Get (i);
       const Keyframe* keyf = frame.GetElementPointer (id);
-      if (keyf)
+      if (keyf)  // it exists! - intarpolatar can handle non normalised weights
         keys.Push (csTuple2<float, Keyframe> (blend_weights.Get (i), *keyf));
     }
+    // now calculate the snapshot for this channel and add it to the output
     const Keyframe &in = csInterpolator<Keyframe>::Linear (keys);
     result_frame.PutUnique (id, in);
   }
@@ -237,7 +269,7 @@ size_t BlendNode::AddNode (float weight, csRef<iMixingNode> node)
     weight = 0.0f;
   nodes.Push (node);
   blend_weights.Push (weight);
-  return nodes.GetSize () - 1;
+  return nodes.GetSize () - 1;    // return position of newly added child
 }
 void BlendNode::SetWeight (size_t i, float weight)
 {
@@ -247,53 +279,38 @@ void BlendNode::SetWeight (size_t i, float weight)
 }
 bool BlendNode::IsActive () const
 {
-  return true;
+  return true;    // always active
 }
 
 void AccumulateNode::ReadChannels (Frame &result_frame)
 {
-  // list of frames from all nodes
+  // read all the frames from all the child nodes
   csArray<Frame> nodes_frames;
-  for (csRefArray<iMixingNode>::Iterator it = nodes.GetIterator ();
-    it.HasNext (); )
-  {
-    iMixingNode* node = it.Next ();
-    Frame frame;
-    node->ReadChannels (frame);
-    nodes_frames.Push (frame);
-  }
-  // comprehensive channel list used in all frames
+  // comprehensive list of all channel ids used
   csArray<size_t> channel_ids;
-  for (csArray<Frame>::Iterator it = nodes_frames.GetIterator (); it.HasNext (); )
-  {
-    const Frame &frame = it.Next ();
-    for (Frame::ConstGlobalIterator it = frame.GetIterator ();
-      it.HasNext (); )
-    {
-      size_t id;
-      it.Next (id);
-      if (channel_ids.Find (id) == csArrayItemNotFound)
-        channel_ids.Push (id);
-    }
-  }
+  CalculateFramesAndChannels (nodes_frames, channel_ids);
   // for each channel...
   for (csArray<size_t>::Iterator it = channel_ids.GetIterator ();
     it.HasNext (); )
   {
     const size_t id = it.Next ();
+    // the intarpolatar likes to have weights with keyframes
     csArray<csTuple2<float, Keyframe> > keys;
-    csArray<float> cumul_weights;
-    // find this channel in each frame and add it to the list
+    // this node works on cumulative weight so we need to keep track of that
+    float cumul_weights = 0.0f;
+    // find this channel in each frame and add it to keys
+    // go from top as last added node is strongest
     for (int i = nodes_frames.GetSize () - 1; i >= 0; i--)
     {
       const Frame &frame = nodes_frames.Get (i);
       const Keyframe* keyf = frame.GetElementPointer (id);
       if (keyf)
       {
+        // a bit of arithmetic.
         float w = blend_weights.Get (i),
-          excess = 1.0f - SumWeights (cumul_weights),
+          excess = 1.0f - cumul_weights,
           flat_w = w * excess;
-        cumul_weights.Push (flat_w);
+        cumul_weights += flat_w;
         keys.Push (csTuple2<float, Keyframe> (flat_w, *keyf));
       }
     }
@@ -301,68 +318,19 @@ void AccumulateNode::ReadChannels (Frame &result_frame)
     result_frame.PutUnique (id, in);
   }
 }
-float AccumulateNode::SumWeights (const csArray<float> &weights)
-{
-  float sum = 0.0f;
-  for (csArray<float>::ConstIterator it = weights.GetIterator (); it.HasNext () ; )
-  {
-    sum += it.Next ();
-  }
-  return sum;
-}
 
 size_t AccumulateNode::AddNode (float weight, csRef<iMixingNode> node)
 {
+  // if we don't clamp the upper then life gets a bit difficult...
   if (weight > 1.0f)
     weight = 1.0f;
-  else if (weight < 0.0f)
-    weight = 0.0f;
-  nodes.Push (node);
-  blend_weights.Push (weight);
-  return nodes.GetSize () - 1;
+  return BlendNode::AddNode (weight, node);
 }
 void AccumulateNode::SetWeight (size_t i, float weight)
 {
-  if (weight < 0.0f)
-    weight = 0.0f;
-  blend_weights[i] = weight;
-}
-
-OverwriteNode::OverwriteNode () : scfImplementationType (this)
-{
-}
-void OverwriteNode::Tick (float amount)
-{
-  for (csRefArray<iMixingNode>::Iterator it = nodes.GetIterator ();
-    it.HasNext (); )
-  {
-    iMixingNode* node = it.Next ();
-    if (!node->IsActive ())
-    {
-      // should this be allowed?
-      //nodes.Delete (node);
-      continue;
-    }
-    node->Tick (amount);
-  }
-}
-void OverwriteNode::ReadChannels (Frame &frame)
-{
-  for (csRefArray<iMixingNode>::Iterator it = nodes.GetIterator ();
-    it.HasNext (); )
-  {
-    iMixingNode* node = it.Next ();
-    node->ReadChannels (frame);
-  }
-}
-size_t OverwriteNode::AddNode (csRef<iMixingNode> node)
-{
-  nodes.Push (node);
-  return nodes.GetSize () - 1;
-}
-bool OverwriteNode::IsActive () const
-{
-  return true;
+  if (weight > 1.0f)
+    weight = 1.0f;
+  BlendNode::SetWeight (i, weight);
 }
 
 AnimationLayer::AnimationLayer () : scfImplementationType (this)
@@ -379,11 +347,13 @@ void AnimationLayer::SetRootMixingNode (csRef<iMixingNode> root)
 void AnimationLayer::UpdateSkeleton (Skeleton::iSkeleton *s, float delta_time)
 {
   // blaa!
-  if (mix_node)
-    mix_node->Tick (delta_time);
+  if (!mix_node)
+    return;
   if (!s)
     return;
+  mix_node->Tick (delta_time);
   Frame frame;
+  // read output and apply it to the skeleton
   mix_node->ReadChannels (frame);
   for (size_t i = 0; i < s->GetChildrenCount (); i++)
   {
@@ -408,10 +378,6 @@ csPtr<iBlendNode> AnimationLayer::CreateAccumulateNode ()
 {
   return new AccumulateNode ();
 }
-csPtr<iOverwriteNode> AnimationLayer::CreateOverwriteNode ()
-{
-  return new OverwriteNode ();
-}
 
 AnimationFactoryLayer::AnimationFactoryLayer () : scfImplementationType (this)
 {
@@ -430,6 +396,7 @@ csPtr<iChannel> AnimationFactoryLayer::CreateAnimationFactoryChannel ()
 iAnimationFactory* AnimationFactoryLayer::FindAnimationFactoryByName (
   const char* name)
 {
+  // loop through animation factories until we find what we want
   for (csRefArray<AnimationFactory>::Iterator it = animfacts.GetIterator ();
     it.HasNext (); )
   {

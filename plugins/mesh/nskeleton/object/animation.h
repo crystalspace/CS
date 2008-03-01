@@ -67,10 +67,11 @@ private:
   float animlength;
 };
 
-class Animation : public scfImplementation2<Animation, iMixingNode, iAnimation>
+class Animation : public scfImplementation1<Animation, iAnimation>
 {
 public:
   Animation (csRef<iAnimationFactory> fact);
+  const char* GetName () const;
   void Tick (float amount);
   void ReadChannels (Frame &frame);
   void SetPlaySpeed (float speed);
@@ -87,7 +88,7 @@ private:
 };
 
 class BlendNode
-  : public scfImplementation2<BlendNode, iMixingNode, iBlendNode>
+  : public scfImplementation1<BlendNode, iBlendNode>
 {
 public:
   BlendNode ();
@@ -97,8 +98,10 @@ public:
   void SetWeight (size_t i, float weight);
   bool IsActive () const;
 protected:
-  csRefArray<iMixingNode> nodes;
+  void CalculateFramesAndChannels (csArray<Frame> &nodes_frames, csArray<size_t> &channel_ids);
   csArray<float> blend_weights;
+private:
+  csRefArray<iMixingNode> nodes;
 };
 
 class AccumulateNode
@@ -108,21 +111,6 @@ public:
   void ReadChannels (Frame &result_frame);
   size_t AddNode (float weight, csRef<iMixingNode> node);
   void SetWeight (size_t i, float weight);
-private:
-  float SumWeights (const csArray<float> &weights);
-};
-
-class OverwriteNode
-  : public scfImplementation2<OverwriteNode, iMixingNode, iOverwriteNode>
-{
-public:
-  OverwriteNode ();
-  void Tick (float amount);
-  void ReadChannels (Frame &frame);
-  size_t AddNode (csRef<iMixingNode> node);
-  bool IsActive () const;
-private:
-  csRefArray<iMixingNode> nodes;
 };
 
 class AnimationLayer
@@ -136,7 +124,6 @@ public:
 
   csPtr<iBlendNode> CreateBlendNode ();
   csPtr<iBlendNode> CreateAccumulateNode ();
-  csPtr<iOverwriteNode> CreateOverwriteNode ();
 private:
   csRef<iMixingNode> mix_node;
 };

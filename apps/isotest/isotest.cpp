@@ -180,7 +180,7 @@ void IsoTest::SetupFrame ()
     if (kbd->GetKeyState (CSKEY_RIGHT))
     {
       selboneid++;
-      if (selboneid > myskel->GetChildrenCount () - 1)
+      if (selboneid > int(myskel->GetChildrenCount () - 1))
         selboneid = 0;
     }
     else if (kbd->GetKeyState (CSKEY_LEFT))
@@ -287,9 +287,11 @@ void IsoTest::SetupFrame ()
     }*/
   }
 
+  size_t timenow = vc->GetCurrentTicks (), delta = timenow - last_time;
+  last_time = timenow;
   if (feather == STAND_WALK || feather == WALK_STAND)
   {
-    feather_duration += 10;
+    feather_duration += delta;
   }
   switch (feather)
   {
@@ -326,7 +328,7 @@ void IsoTest::SetupFrame ()
 
   float timeuntilend = anim_punch->GetAnimationLength () * 1 - anim_punch->GetTimeline ();
   //printf ("endtime %f %f\n", timeuntilend, pfeather_duration);
-  if (timeuntilend <= 512 && pfeather != STAND && pfeather != WALK_STAND)
+  if (timeuntilend < 210 && pfeather != STAND && pfeather != WALK_STAND)
   {
     //puts ("DEACTIVATING NOW!");
         //blpen->SetWeight (otherid, 1.0f);
@@ -336,7 +338,7 @@ void IsoTest::SetupFrame ()
   }
   if (pfeather == STAND_WALK || pfeather == WALK_STAND)
   {
-    pfeather_duration += 10;
+    pfeather_duration += delta;
   }
   switch (pfeather)
   {
@@ -402,7 +404,7 @@ void IsoTest::SetupFrame ()
   //puts ("DrawDebugBones");
   //skeleton->DrawDebugBones (g3d);
   //myskel->Update (vc->GetCurrentTicks () - last_time);
-  last_time = vc->GetCurrentTicks ();
+  //last_time = vc->GetCurrentTicks ();
   //skelgrave->Debug ();
   myskel->DrawDebugBones (g3d);
 
@@ -887,11 +889,11 @@ bool IsoTest::CreateActor ()
   anim_walk->SetPlayCount (-1);
 
   blend = animlay->CreateBlendNode ();
-  csRef<Skeleton::Animation::iMixingNode> animmix;
-  animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (anim_stand);
-  standid = blend->AddNode (1.0f, animmix);
-  animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (anim_walk);
-  walkid = blend->AddNode (0.0f, animmix);
+  //csRef<Skeleton::Animation::iMixingNode> animmix;
+  //animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (anim_stand);
+  standid = blend->AddNode (1.0f, anim_stand);
+  //animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (anim_walk);
+  walkid = blend->AddNode (0.0f, anim_walk);
 
   csRef<Skeleton::Animation::iAnimationFactory> animfact_punch = animfactlay->FindAnimationFactoryByName ("punch");
   anim_punch = animfact_punch->CreateAnimation ();
@@ -899,13 +901,13 @@ bool IsoTest::CreateActor ()
 
   csRef<Skeleton::Animation::iBlendNode> overwrite = animlay->CreateAccumulateNode ();
   blpen = overwrite;
-  animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (blend);
-  otherid = overwrite->AddNode (1.0f, animmix);
-  animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (anim_punch);
-  punchid = overwrite->AddNode (0.0f, animmix);
+  //animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (blend);
+  otherid = overwrite->AddNode (1.0f, blend);
+  //animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (anim_punch);
+  punchid = overwrite->AddNode (0.0f, anim_punch);
 
-  animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (overwrite);
-  animlay->SetRootMixingNode (animmix);
+  //animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (overwrite);
+  animlay->SetRootMixingNode (overwrite);
 
   /*csRef<Skeleton::Animation::iAnimationFactory> animfact_run = animfactlay->FindAnimationFactoryByName ("jump");
   csRef<Skeleton::Animation::iAnimation> anim_run = animfact_run->CreateAnimation ();

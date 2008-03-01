@@ -58,17 +58,6 @@ struct iAnimationFactory : public virtual iBase
   virtual void SetAnimationLength (float length) = 0;
   virtual float GetAnimationLength () const = 0;
 };
-struct iAnimation : public virtual iBase
-{
-  SCF_INTERFACE (iAnimation, 0, 0, 1);
-  virtual void Tick (float amount) = 0;
-  virtual void ReadChannels (Frame &frame) = 0;
-  virtual void SetPlaySpeed (float speed) = 0;
-  virtual void SetPlayCount (int count) = 0;
-  virtual int GetPlayCount () const = 0;
-  virtual float GetAnimationLength () const = 0;
-  virtual float GetTimeline () const = 0;
-};
 
 struct iMixingNode : public virtual iBase
 {
@@ -78,21 +67,25 @@ struct iMixingNode : public virtual iBase
   virtual bool IsActive () const = 0;
 };
 
-struct iBlendNode : public virtual iBase
+struct iAnimation : public virtual iMixingNode
+{
+  SCF_INTERFACE (iAnimation, 0, 0, 1);
+  virtual const char* GetName () const = 0;
+  virtual void Tick (float amount) = 0;
+  virtual void ReadChannels (Frame &frame) = 0;
+  virtual void SetPlaySpeed (float speed) = 0;
+  virtual void SetPlayCount (int count) = 0;
+  virtual int GetPlayCount () const = 0;
+  virtual float GetAnimationLength () const = 0;
+  virtual float GetTimeline () const = 0;
+};
+struct iBlendNode : public virtual iMixingNode
 {
   SCF_INTERFACE (iBlendNode, 0, 0, 1);
   virtual void Tick (float amount) = 0;
   virtual void ReadChannels (Frame &frame) = 0;
   virtual size_t AddNode (float weight, csRef<iMixingNode> node) = 0;
   virtual void SetWeight (size_t i, float weight) = 0;
-};
-
-struct iOverwriteNode : public virtual iBase
-{
-  SCF_INTERFACE (iOverwriteNode, 0, 0, 1);
-  virtual void Tick (float amount) = 0;
-  virtual void ReadChannels (Frame &frame) = 0;
-  virtual size_t AddNode (csRef<iMixingNode> node) = 0;
 };
 
 struct iAnimationLayer : public virtual iBase
@@ -104,7 +97,6 @@ struct iAnimationLayer : public virtual iBase
 
   virtual csPtr<iBlendNode> CreateBlendNode () = 0;
   virtual csPtr<iBlendNode> CreateAccumulateNode () = 0;
-  virtual csPtr<iOverwriteNode> CreateOverwriteNode () = 0;
 };
 
 struct iAnimationFactoryLayer : public virtual iBase

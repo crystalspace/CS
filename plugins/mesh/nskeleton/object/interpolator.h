@@ -38,6 +38,7 @@ template <>
 class csInterpolator<Keyframe>
 {
 public:
+  // interpolate between 2 given keyframes
   static Keyframe Linear (float i, float ta, const Keyframe &a, float tb,
     const Keyframe &b)
   {
@@ -45,6 +46,7 @@ public:
       a.first.SLerp (b.first, (i - ta) / (tb - ta)),
       csInterpolator <csVector3>::Linear (i, ta, a.second, tb, b.second));
   }
+  // interpolate an array of keyframes according to weights
   static Keyframe Linear (const csArray<csTuple2 <float, Keyframe> > &keyframes)
   {
     Keyframe result;
@@ -54,6 +56,7 @@ public:
       keyframes.GetIterator (); it.HasNext (); )
     {
       const csTuple2<float, Keyframe> &keyf = it.Next ();
+      // skip neglibable weights
       if (keyf.first < EPSILON)
         continue;
       float keyf_weight = keyf.first,
@@ -66,4 +69,4 @@ public:
   }
 };
 
-#endif // __CS_NSKELETONANIMATION_H__
+#endif // __CS_INTERPOLATOR_H__
