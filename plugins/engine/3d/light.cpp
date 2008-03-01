@@ -285,6 +285,8 @@ void csLight::OnSetPosition ()
     movable.csMovable::GetFullTransform ();
   GetPropertySV (csLightShaderVarCache::lightTransformWorld)->SetValue (
     lightT);
+  GetPropertySV (csLightShaderVarCache::lightTransformWorldInverse)->SetValue (
+    lightT.GetInverse());
       
   const csVector3 lightDirW = 
     lightT.This2OtherRelative (csVector3 (0, 0, 1));

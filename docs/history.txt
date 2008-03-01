@@ -11,6 +11,7 @@ chronological order.
 	  fragment data. This means v2f data doesn't have to be declared as an
 	  input or output to work.
 	- res added some new light SV names.
+	- res made the engine also set the "inverse light transform" SV.
 27-Feb-2008
 	- res added a (still very bare) class for 4x4 matrices.
 	- res changed the libcrystalspace Jamfiles to exclude some files that
