@@ -435,11 +435,14 @@ struct iSequenceWrapper : public virtual iBase
    * \param axis3 is the third rotation axis (-1, 0, 1, or 2).
    * \param tot_angle3 is the total angle to rotate around axis3.
    * \param offset is added to the rotation transformation so you can
-   * rotate an object around a center different from 0,0,0.
+   * rotate an object around a center different from 0,0,0. This parameter
+   * is not used for relative rotation as the rotation will be around
+   * object center then.
    * \param duration is the duration time of the rotate. The rotate will
    * start at relative time 'time' and will take 'duration' milliseconds
    * to go from current orientation to destination orientation.
-   * \param relative specifies whether the rotation is relative or absolute.
+   * \param relative specifies whether the rotation is relative to the
+   * object position.
    */
   virtual void AddOperationRotateDuration (csTicks time, iParameterESM* mesh,
   		int axis1, float tot_angle1,

@@ -313,9 +313,10 @@ Exactly like @samp{move} operation, but working on lights. Accepts
 @item rotate
 Rotate the specified object from the current orientation
 to the new orientation in the given time (duration).  Parameters are
-@samp{mesh}, @samp{duration} and optionally @samp{relative} to make the 
-operation relative.  As children you can specify rotation
-matrix and vector using @samp{rotx}, @samp{roty}, @samp{rotz} and
+@samp{mesh}, @samp{duration}, optionally @samp{relative} to make the 
+operation relative to the object center, otherwise the pivot
+point with be the @samp{v} parameter. As children you can specify
+rotation matrix and vector using @samp{rotx}, @samp{roty}, @samp{rotz} and
 @samp{v}.
 
 @item rotatelight

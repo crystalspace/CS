@@ -13,6 +13,8 @@ chronological order.
 	  the sequence manager manual section.
 	- caedes changed the physldr jamfile so it gets built also if only
 	  bullet is available.
+	- caedes explained the concept of relative rotation operation a bit
+	  clearer in the manual.
 27-Feb-2008
 	- res added a (still very bare) class for 4x4 matrices.
 	- res changed the libcrystalspace Jamfiles to exclude some files that
