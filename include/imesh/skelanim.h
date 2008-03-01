@@ -66,6 +66,8 @@ struct iAnimation : public virtual iBase
   virtual void SetPlaySpeed (float speed) = 0;
   virtual void SetPlayCount (int count) = 0;
   virtual int GetPlayCount () const = 0;
+  virtual float GetAnimationLength () const = 0;
+  virtual float GetTimeline () const = 0;
 };
 
 struct iMixingNode : public virtual iBase
@@ -101,6 +103,7 @@ struct iAnimationLayer : public virtual iBase
   virtual void UpdateSkeleton (Skeleton::iSkeleton *s, float delta_time) = 0;
 
   virtual csPtr<iBlendNode> CreateBlendNode () = 0;
+  virtual csPtr<iBlendNode> CreateAccumulateNode () = 0;
   virtual csPtr<iOverwriteNode> CreateOverwriteNode () = 0;
 };
 

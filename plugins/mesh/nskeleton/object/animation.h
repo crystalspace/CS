@@ -76,6 +76,8 @@ public:
   void SetPlaySpeed (float speed);
   void SetPlayCount (int count);
   int GetPlayCount () const;
+  float GetAnimationLength () const;
+  float GetTimeline () const;
   bool IsActive () const;
 private:
   csRef<iAnimationFactory> fact;
@@ -94,9 +96,20 @@ public:
   size_t AddNode (float weight, csRef<iMixingNode> node);
   void SetWeight (size_t i, float weight);
   bool IsActive () const;
-private:
+protected:
   csRefArray<iMixingNode> nodes;
   csArray<float> blend_weights;
+};
+
+class AccumulateNode
+  : public BlendNode
+{
+public:
+  void ReadChannels (Frame &result_frame);
+  size_t AddNode (float weight, csRef<iMixingNode> node);
+  void SetWeight (size_t i, float weight);
+private:
+  float SumWeights (const csArray<float> &weights);
 };
 
 class OverwriteNode
@@ -122,6 +135,7 @@ public:
   void UpdateSkeleton (Skeleton::iSkeleton *s, float delta_time);
 
   csPtr<iBlendNode> CreateBlendNode ();
+  csPtr<iBlendNode> CreateAccumulateNode ();
   csPtr<iOverwriteNode> CreateOverwriteNode ();
 private:
   csRef<iMixingNode> mix_node;

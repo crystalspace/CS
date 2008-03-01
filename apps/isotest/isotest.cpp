@@ -76,7 +76,9 @@ IsoTest::IsoTest (iObjectRegistry* object_reg)
   //transaxis = AXIS_Z;
 
   feather = STAND;
+  pfeather = STAND;
   feather_duration = 0.0f;
+  pfeather_duration = 0.0f;
 
   current_view = 0;
   views[0].SetOrigOffset (csVector3 (-2, 2, -2)); // true isometric perspective.
@@ -93,6 +95,7 @@ IsoTest::~IsoTest ()
 
 void IsoTest::SetupFrame ()
 {
+  static float currweight = 0.0f;
   if (!selbone)
     selbone = skeleton->GetBone (selboneid);
 
@@ -188,23 +191,28 @@ void IsoTest::SetupFrame ()
     }
     else if (kbd->GetKeyState (CSKEY_UP))
     {
-      Skeleton::iSkeleton::iBone* mybone = myskel->GetChild (selboneid);
+      currweight += 0.01;
+      printf ("currweight: %f\n", currweight);
+      blpen->SetWeight (punchid, currweight);
+      /*Skeleton::iSkeleton::iBone* mybone = myskel->GetChild (selboneid);
       csQuaternion rot (mybone->GetRotation ());
       csVector3 axis;
       float angle;
       rot.GetAxisAngle (axis, angle);
       rot.SetAxisAngle (axis, angle + 0.1f);
-      mybone->SetRotation (rot);
+      mybone->SetRotation (rot);*/
     }
     else if (kbd->GetKeyState (CSKEY_DOWN))
     {
-      Skeleton::iSkeleton::iBone* mybone = myskel->GetChild (selboneid);
+      currweight -= 0.01;
+      blpen->SetWeight (punchid, currweight);
+      /*Skeleton::iSkeleton::iBone* mybone = myskel->GetChild (selboneid);
       csQuaternion rot (mybone->GetRotation ());
       csVector3 axis;
       float angle;
       rot.GetAxisAngle (axis, angle);
       rot.SetAxisAngle (axis, angle - 0.1f);
-      mybone->SetRotation (rot);
+      mybone->SetRotation (rot);*/
     }
 
     if (kbd->GetKeyState ('w'))
@@ -224,8 +232,24 @@ void IsoTest::SetupFrame ()
 
     if (kbd->GetKeyState ('p'))
     {
-      anim_punch->SetPlayCount (1);
+      if (pfeather != WALK)
+      {
+        pfeather = STAND_WALK;
+        anim_punch->SetPlayCount (1);
+      }
     }
+    /*else
+    {
+      if (pfeather != STAND)
+      {
+        pfeather = WALK_STAND;
+      }
+    }*/
+
+    /*if (kbd->GetKeyState ('p'))
+    {
+      anim_punch->SetPlayCount (1);
+    }*/
     /*bool moved = kbd->GetKeyState ('a');
     if (kbd->GetKeyState (CSKEY_RIGHT))
     {
@@ -270,13 +294,10 @@ void IsoTest::SetupFrame ()
   switch (feather)
   {
     case (STAND):
-      puts ("standing...");
       break;
     case (WALK):
-      puts ("walking...");
       break;
     case (STAND_WALK):
-      puts ("standing -> walking");
       blend->SetWeight (walkid, feather_duration / 200.0f);
       blend->SetWeight (standid, 1 - (feather_duration / 200.0f));
       if (feather_duration > 200)
@@ -288,7 +309,6 @@ void IsoTest::SetupFrame ()
       }
       break;
     case (WALK_STAND):
-      puts ("walking -> standing");
       blend->SetWeight (standid, feather_duration / 200.0f);
       blend->SetWeight (walkid, 1 - (feather_duration / 200.0f));
       if (feather_duration > 200)
@@ -297,6 +317,57 @@ void IsoTest::SetupFrame ()
         blend->SetWeight (walkid, 0.0f);
         feather = STAND;
         feather_duration = 0.0f;
+      }
+      break;
+    default:
+      puts ("wtf? what piece of shit establishment is this?");
+      break;
+  }
+
+  float timeuntilend = anim_punch->GetAnimationLength () * 1 - anim_punch->GetTimeline ();
+  //printf ("endtime %f %f\n", timeuntilend, pfeather_duration);
+  if (timeuntilend <= 512 && pfeather != STAND && pfeather != WALK_STAND)
+  {
+    //puts ("DEACTIVATING NOW!");
+        //blpen->SetWeight (otherid, 1.0f);
+        //blpen->SetWeight (punchid, 0.0f);
+        pfeather = WALK_STAND;
+        pfeather_duration = 0.0f;
+  }
+  if (pfeather == STAND_WALK || pfeather == WALK_STAND)
+  {
+    pfeather_duration += 10;
+  }
+  switch (pfeather)
+  {
+    case (STAND):
+      //puts ("nothing...");
+      break;
+    case (WALK):
+      //puts ("punching...");
+      break;
+    case (STAND_WALK):
+      //puts (" -> punch");
+      blpen->SetWeight (punchid, pfeather_duration / 200.0f);
+      //blpen->SetWeight (otherid, 1 - (pfeather_duration / 200.0f));
+      if (pfeather_duration > 200)
+      {
+        blpen->SetWeight (punchid, 1.0f);
+        //blpen->SetWeight (otherid, 0.0f);
+        pfeather = WALK;
+        pfeather_duration = 0.0f;
+      }
+      break;
+    case (WALK_STAND):
+      //puts ("punch ->");
+      //blpen->SetWeight (otherid, pfeather_duration / 200.0f);
+      blpen->SetWeight (punchid, 1 - (pfeather_duration / 200.0f));
+      if (pfeather_duration > 200)
+      {
+        //blpen->SetWeight (otherid, 1.0f);
+        blpen->SetWeight (punchid, 0.0f);
+        pfeather = STAND;
+        pfeather_duration = 0.0f;
       }
       break;
     default:
@@ -826,11 +897,12 @@ bool IsoTest::CreateActor ()
   anim_punch = animfact_punch->CreateAnimation ();
   anim_punch->SetPlayCount (0);
 
-  csRef<Skeleton::Animation::iOverwriteNode> overwrite = animlay->CreateOverwriteNode ();
+  csRef<Skeleton::Animation::iBlendNode> overwrite = animlay->CreateAccumulateNode ();
+  blpen = overwrite;
   animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (blend);
-  overwrite->AddNode (animmix);
+  otherid = overwrite->AddNode (1.0f, animmix);
   animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (anim_punch);
-  overwrite->AddNode (animmix);
+  punchid = overwrite->AddNode (0.0f, animmix);
 
   animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (overwrite);
   animlay->SetRootMixingNode (animmix);

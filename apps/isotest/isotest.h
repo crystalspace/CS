@@ -85,8 +85,8 @@ private:
   Skeleton::iSkeleton* myskel;
 
   csRef<Skeleton::Animation::iAnimation> anim_punch;
-  csRef<Skeleton::Animation::iBlendNode> blend;
-  size_t walkid, standid;
+  csRef<Skeleton::Animation::iBlendNode> blend, blpen;
+  size_t walkid, standid, punchid, otherid;
 
   enum
   {
@@ -94,8 +94,9 @@ private:
     WALK,
     STAND_WALK,
     WALK_STAND
-  } feather;
+  } feather, pfeather;
   float feather_duration;
+  float pfeather_duration;
 
   iObjectRegistry* object_reg;
   csRef<iEngine> engine;

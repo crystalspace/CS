@@ -157,6 +157,14 @@ int Animation::GetPlayCount () const
 {
   return playcount;
 }
+float Animation::GetAnimationLength () const
+{
+  return fact->GetAnimationLength ();
+}
+float Animation::GetTimeline () const
+{
+  return timeline;
+}
 bool Animation::IsActive () const
 {
   return playcount != 0;
@@ -181,19 +189,17 @@ void BlendNode::Tick (float amount)
 }
 void BlendNode::ReadChannels (Frame &result_frame)
 {
+  // read all the frames from all the child nodes
   csArray<Frame> nodes_frames;
   for (csRefArray<iMixingNode>::Iterator it = nodes.GetIterator ();
     it.HasNext (); )
-  //for (size_t i = 0; i < nodes.GetSize (); i++)
   {
     iMixingNode* node = it.Next ();
-    /*iMixingNode* node = nodes.Get (i);
-    if (blend_weights.Get (i) < EPSILON)
-      continue;*/
     Frame frame;
     node->ReadChannels (frame);
     nodes_frames.Push (frame);
   }
+  // comprehensive list of all channel ids used
   csArray<size_t> channel_ids;
   for (csArray<Frame>::Iterator it = nodes_frames.GetIterator (); it.HasNext (); )
   {
@@ -207,6 +213,7 @@ void BlendNode::ReadChannels (Frame &result_frame)
         channel_ids.Push (id);
     }
   }
+  // go through each channel id
   for (csArray<size_t>::Iterator it = channel_ids.GetIterator ();
     it.HasNext (); )
   {
@@ -226,17 +233,99 @@ void BlendNode::ReadChannels (Frame &result_frame)
 }
 size_t BlendNode::AddNode (float weight, csRef<iMixingNode> node)
 {
+  if (weight < 0.0f)
+    weight = 0.0f;
   nodes.Push (node);
   blend_weights.Push (weight);
   return nodes.GetSize () - 1;
 }
 void BlendNode::SetWeight (size_t i, float weight)
 {
+  if (weight < 0.0f)
+    weight = 0.0f;
   blend_weights[i] = weight;
 }
 bool BlendNode::IsActive () const
 {
   return true;
+}
+
+void AccumulateNode::ReadChannels (Frame &result_frame)
+{
+  // list of frames from all nodes
+  csArray<Frame> nodes_frames;
+  for (csRefArray<iMixingNode>::Iterator it = nodes.GetIterator ();
+    it.HasNext (); )
+  {
+    iMixingNode* node = it.Next ();
+    Frame frame;
+    node->ReadChannels (frame);
+    nodes_frames.Push (frame);
+  }
+  // comprehensive channel list used in all frames
+  csArray<size_t> channel_ids;
+  for (csArray<Frame>::Iterator it = nodes_frames.GetIterator (); it.HasNext (); )
+  {
+    const Frame &frame = it.Next ();
+    for (Frame::ConstGlobalIterator it = frame.GetIterator ();
+      it.HasNext (); )
+    {
+      size_t id;
+      it.Next (id);
+      if (channel_ids.Find (id) == csArrayItemNotFound)
+        channel_ids.Push (id);
+    }
+  }
+  // for each channel...
+  for (csArray<size_t>::Iterator it = channel_ids.GetIterator ();
+    it.HasNext (); )
+  {
+    const size_t id = it.Next ();
+    csArray<csTuple2<float, Keyframe> > keys;
+    csArray<float> cumul_weights;
+    // find this channel in each frame and add it to the list
+    for (int i = nodes_frames.GetSize () - 1; i >= 0; i--)
+    {
+      const Frame &frame = nodes_frames.Get (i);
+      const Keyframe* keyf = frame.GetElementPointer (id);
+      if (keyf)
+      {
+        float w = blend_weights.Get (i),
+          excess = 1.0f - SumWeights (cumul_weights),
+          flat_w = w * excess;
+        cumul_weights.Push (flat_w);
+        keys.Push (csTuple2<float, Keyframe> (flat_w, *keyf));
+      }
+    }
+    const Keyframe &in = csInterpolator<Keyframe>::Linear (keys);
+    result_frame.PutUnique (id, in);
+  }
+}
+float AccumulateNode::SumWeights (const csArray<float> &weights)
+{
+  float sum = 0.0f;
+  for (csArray<float>::ConstIterator it = weights.GetIterator (); it.HasNext () ; )
+  {
+    sum += it.Next ();
+  }
+  return sum;
+}
+
+size_t AccumulateNode::AddNode (float weight, csRef<iMixingNode> node)
+{
+  if (weight > 1.0f)
+    weight = 1.0f;
+  else if (weight < 0.0f)
+    weight = 0.0f;
+  nodes.Push (node);
+  blend_weights.Push (weight);
+  return nodes.GetSize () - 1;
+}
+void AccumulateNode::SetWeight (size_t i, float weight)
+{
+  if (weight < 0.0f)
+    weight = 0.0f;
+  blend_weights[i] = weight;
 }
 
 OverwriteNode::OverwriteNode () : scfImplementationType (this)
@@ -314,6 +403,10 @@ void AnimationLayer::UpdateSkeleton (Skeleton::iSkeleton *s, float delta_time)
 csPtr<iBlendNode> AnimationLayer::CreateBlendNode ()
 {
   return new BlendNode ();
+}
+csPtr<iBlendNode> AnimationLayer::CreateAccumulateNode ()
+{
+  return new AccumulateNode ();
 }
 csPtr<iOverwriteNode> AnimationLayer::CreateOverwriteNode ()
 {
