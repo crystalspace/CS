@@ -11,6 +11,8 @@ chronological order.
 	  sequence manager.
 	- caedes added docs for movelight and rotatelight operations to
 	  the sequence manager manual section.
+	- caedes changed the physldr jamfile so it gets built also if only
+	  bullet is available.
 27-Feb-2008
 	- res added a (still very bare) class for 4x4 matrices.
 	- res changed the libcrystalspace Jamfiles to exclude some files that
