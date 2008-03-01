@@ -68,9 +68,23 @@ struct iAnimatedMeshFactory : public virtual iBase
 
   /**
    * Create a new submesh.
+   * This creates a submesh that use the normal per-vertex bone influence mappings.
+   * The newly created submesh will use all bones.
    * \param indices Index buffer to use for the newly created submesh.
    */
   virtual iAnimatedMeshFactorySubMesh* CreateSubMesh (iRenderBuffer* indices) = 0;
+
+  /**
+   * Create a new submesh.
+   * This creates a submesh which have several triangle sets<->bone mapping pairs.
+   * Such a submesh is useful when you want to limit the number of bones per
+   * batch rendered.
+   * \param indices Array of index buffers to use per part
+   * \param boneIndices Array of indices of bones to use for bone mappings
+   */
+  virtual iAnimatedMeshFactorySubMesh* CreateSubMesh (
+    const csArray<iRenderBuffer*>& indices, 
+    const csArray<csArray<unsigned int> >& boneIndices) = 0;
 
   /**
    * Get a submesh by index.
@@ -168,8 +182,19 @@ struct iAnimatedMeshFactory : public virtual iBase
 
   /**
    * Get the bone influences.
+   * You must call Invalidate() after modifying it.
    */
   virtual csAnimatedMeshBoneInfluence* GetBoneInfluences () = 0;
+
+  /**
+   * Set the max number of bones per render mesh
+   */
+  virtual void SetMaxBonesPerBatch (uint count) = 0;
+
+  /**
+   * Get the max number of bones per render mesh
+   */
+  virtual uint GetMaxBonesPerBatch () const = 0;
 
   /** @} */
 
@@ -204,13 +229,17 @@ struct iAnimatedMeshFactorySubMesh : public virtual iBase
   /**
    * Get the index buffer for this submesh. Defines a triangle list.
    */
-  virtual iRenderBuffer* GetIndices () const = 0;
+  virtual iRenderBuffer* GetIndices (size_t set) = 0;
 
   /**
-   * Get the number of triangles 
+   * Get the number of index sets 
    */
-  virtual uint GetTriangleCount () const = 0;
+  virtual uint GetIndexSetCount () const = 0;
 
+  /**
+   * Get the bone indices used by a given index set
+   */
+  virtual const csArray<unsigned int>& GetBoneIndices (size_t set) = 0;
   
 };
 

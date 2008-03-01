@@ -19,15 +19,20 @@
 #ifndef __CS_ANIMESH_H__
 #define __CS_ANIMESH_H__
 
+#include "csgfx/shadervarcontext.h"
+#include "cstool/rendermeshholder.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/flags.h"
+#include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
 #include "imesh/animesh.h"
 #include "imesh/object.h"
 #include "iutil/comp.h"
 
-
 CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 {
+
+  class FactorySubmesh;
 
   class AnimeshObjectType : 
     public scfImplementation2<AnimeshObjectType, 
@@ -51,10 +56,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
                               iMeshObjectFactory>
   {
   public:
-    AnimeshObjectFactory ();
+    AnimeshObjectFactory (AnimeshObjectType* objType);
 
     //-- iAnimatedMeshFactory
     virtual iAnimatedMeshFactorySubMesh* CreateSubMesh (iRenderBuffer* indices);
+    virtual iAnimatedMeshFactorySubMesh* CreateSubMesh (
+      const csArray<iRenderBuffer*>& indices, 
+      const csArray<csArray<unsigned int> >& boneIndices);
     virtual iAnimatedMeshFactorySubMesh* GetSubMesh (size_t index) const;
     virtual size_t GetSubMeshCount () const;
     virtual void DeleteSubMesh (iAnimatedMeshFactorySubMesh* mesh);
@@ -73,6 +81,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     virtual void SetBoneInfluencesPerVertex (uint num);
     virtual uint GetBoneInfluencesPerVertex () const;
     virtual csAnimatedMeshBoneInfluence* GetBoneInfluences ();
+    virtual void SetMaxBonesPerBatch (uint count);
+    virtual uint GetMaxBonesPerBatch () const;
 
     virtual iAnimatedMeshMorphTarget* CreateMorphTarget ();
     virtual iAnimatedMeshMorphTarget* GetMorphTarget (uint target);
@@ -101,10 +111,82 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     virtual void SetMixMode (uint mode);
     virtual uint GetMixMode () const;
+  
+  private: 
 
-  private:
+    // required but stupid stuff..
+    AnimeshObjectType* objectType;
+    iMeshFactoryWrapper* logParent;
     csFlags factoryFlags;
+    uint mixMode;
+
+    // Main data storage...
+    uint vertexCount;
+    csRef<iRenderBuffer> vertexBuffer;
+    csRef<iRenderBuffer> texcoordBuffer;
+    csRef<iRenderBuffer> normalBuffer;
+    csRef<iRenderBuffer> tangentBuffer;
+    csRef<iRenderBuffer> binormalBuffer;
+    csRef<iRenderBuffer> colorBuffer;
+    csDirtyAccessArray<csAnimatedMeshBoneInfluence> boneInfluences;
+    csRef<iRenderBuffer> masterBWBuffer;
+    csRef<iRenderBuffer> boneWeightAndIndexBuffer[2];
+
+    // Submeshes
+    csRefArray<FactorySubmesh> submeshes;
+
+    uint bonesPerBatch;
+
+    friend class AnimeshObject;
   };
+
+  class FactorySubmesh : 
+    public scfImplementation1<FactorySubmesh, 
+                              iAnimatedMeshFactorySubMesh>
+  {
+  public:
+    FactorySubmesh ()
+      : scfImplementationType (this)
+    {}
+
+    virtual iRenderBuffer* GetIndices (size_t set)
+    {
+      return indexBuffers[set];
+    }
+
+    virtual uint GetIndexSetCount () const
+    {
+      return indexBuffers.GetSize ();
+    }
+
+    virtual const csArray<unsigned int>& GetBoneIndices (size_t set)
+    {
+      static const csArray<unsigned int> noBI;
+      if (boneMapping.GetSize () > 0)
+      {
+        return boneMapping[set].boneRemappingTable;
+      }
+      else
+      {
+        return noBI;
+      }
+    }
+
+    csRefArray<iRenderBuffer> indexBuffers;
+    csRefArray<csRenderBufferHolder> bufferHolders;
+
+    // For every subpart(index buffer), hold:
+    //  the "real" bone index to use for "virtual" bone index i
+    // When using remappings, have these two RBs...
+    struct RemappedBones
+    {
+      csArray<unsigned int> boneRemappingTable;
+      csRef<iRenderBuffer> masterBWBuffer;
+      csRef<iRenderBuffer> boneWeightAndIndexBuffer[2];
+    };
+    csArray<RemappedBones> boneMapping;
+  };
+
 
 
   class AnimeshObject :
@@ -113,7 +195,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
                               iMeshObject>
   {
   public:
-    AnimeshObject ();
+    AnimeshObject (AnimeshObjectFactory* factory);
 
     //-- iAnimatedMesh
     virtual void SetSkeleton (iSkeleton2* skeleton);
@@ -171,10 +253,59 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     virtual void BuildDecal(const csVector3* pos, float decalRadius,
       iDecalBuilder* decalBuilder);
 
-  private:
 
+    //
+    void SetupSubmeshes ();
+
+  private:
+    class Submesh : 
+      public scfImplementation2<Submesh, 
+                                iAnimatedMeshSubMesh, 
+                                iShaderVariableAccessor>
+    {
+    public:
+      Submesh (AnimeshObject* meshObject, iAnimatedMeshFactorySubMesh* factorySubmesh)
+        : scfImplementationType (this), meshObject (meshObject),
+        factorySubmesh (factorySubmesh), isRendering (true)
+      {}
+
+      virtual iAnimatedMeshFactorySubMesh* GetFactorySubMesh ()
+      {
+        return factorySubmesh;
+      }
+
+      virtual void SetRendering (bool doRender)
+      {
+        isRendering = doRender;
+      }
+
+      virtual bool IsRendering () const
+      {
+        return isRendering;
+      }
+
+      virtual void PreGetValue (csShaderVariable *variable);
+
+      AnimeshObject* meshObject;
+      iAnimatedMeshFactorySubMesh* factorySubmesh;
+      bool isRendering;
+
+      csRefArray<csShaderVariableContext> svContexts;
+    };    
+
+    AnimeshObjectFactory* factory;
+    iMeshWrapper* logParent;
+    iMaterialWrapper* material;
+    uint mixMode;
     csFlags meshObjectFlags;
 
+    iSkeleton2* skeleton;
+    csTicks lastTick;
+
+    csRenderMeshHolder rmHolder;
+    csDirtyAccessArray<CS::Graphics::RenderMesh*> renderMeshList;
+
+    csRefArray<Submesh> submeshes;
   };
 
 }

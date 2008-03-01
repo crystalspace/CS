@@ -6,6 +6,12 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+1-Mar-2008
+	- Marten reduced the size of csShaderVariable a bit by joining
+	  a couple of members into a union.
+	- Marten added a member to csShaderVariable for accessor specific data.
+	- Marten implemented the basic functionality in the animesh factory
+	  and object.
 28-Feb-2008
 	- Marten implemented the Blend animation node.
 27-Feb-2008
