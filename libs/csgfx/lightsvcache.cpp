@@ -49,6 +49,7 @@ namespace
     "position world",
     "transform",
     "transform world",
+    "transform world inverse",
     "attenuation",
     "attenuationtex",
     "direction object",
@@ -57,7 +58,9 @@ namespace
     "inner falloff",
     "outer falloff",
     "type",
-    "attenuation mode"
+    "attenuation mode",
+    "shadow map",
+    "shadow map projection"
   };
 }
 

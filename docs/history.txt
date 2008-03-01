@@ -10,6 +10,7 @@ chronological order.
 	- res changed the Cg weaver combiner to create locals for vertex-to-
 	  fragment data. This means v2f data doesn't have to be declared as an
 	  input or output to work.
+	- res added some new light SV names.
 27-Feb-2008
 	- res added a (still very bare) class for 4x4 matrices.
 	- res changed the libcrystalspace Jamfiles to exclude some files that
