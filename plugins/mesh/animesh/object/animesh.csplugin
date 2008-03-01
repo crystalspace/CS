@@ -5,7 +5,7 @@
     <classes>
       <class>
         <name>crystalspace.mesh.object.animesh</name>
-        <implementation>csAnimatedMeshObjectType</implementation>
+        <implementation>AnimeshObjectType</implementation>
         <description>Crystal Space Animated Mesh Type</description>
       </class>
     </classes>

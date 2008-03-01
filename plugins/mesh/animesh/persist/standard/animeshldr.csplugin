@@ -5,22 +5,22 @@
     <classes>
       <class>
         <name>crystalspace.mesh.loader.factory.animesh</name>
-        <implementation>csProtoFactoryLoader</implementation>
+        <implementation>AnimeshFactoryLoader</implementation>
         <description>Crystal Space Animated Mesh Factory Loader</description>
       </class>
       <class>
         <name>crystalspace.mesh.loader.animesh</name>
-        <implementation>csProtoMeshLoader</implementation>
+        <implementation>AnimeshObjectLoader</implementation>
         <description>Crystal Space Animated Mesh Mesh Loader</description>
       </class>
       <class>
         <name>crystalspace.mesh.saver.factory.animesh</name>
-        <implementation>csProtoFactorySaver</implementation>
+        <implementation>AnimeshFactorySaver</implementation>
         <description>Crystal Space Animated Mesh Factory Saver</description>
       </class>
       <class>
         <name>crystalspace.mesh.saver.animesh</name>
-        <implementation>csProtoMeshSaver</implementation>
+        <implementation>AnimeshObjectSaver</implementation>
         <description>Crystal Space Animated Mesh Mesh Saver</description>
       </class>
     </classes>

@@ -81,8 +81,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
 
   AnimeshObjectFactory::AnimeshObjectFactory (AnimeshObjectType* objType)
-    : scfImplementationType (this), objectType (objType), logParent (0), vertexCount (0),
-    bonesPerBatch (~0)
+    : scfImplementationType (this), objectType (objType), logParent (0), material (0),
+    vertexCount (0), bonesPerBatch (~0)
   {
   }
 
@@ -281,8 +281,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
 
     // Setup the bone weight & index buffers for cases not covered above
-    masterBWBuffer->CopyInto (boneInfluences.GetArray (), 0/*?*/);
+    masterBWBuffer->CopyInto (boneInfluences.GetArray (), vertexCount);
     
+    // Fix the bb
+    factoryBB.StartBoundingBox ();
+    csRenderBufferLock<csVector3> vbuf (vertexBuffer);
+    for (size_t i = 0; i < vertexCount; ++i)
+    {
+      factoryBB.AddBoundingVertex (*vbuf++);
+    }
   }
 
   void AnimeshObjectFactory::SetBoneInfluencesPerVertex (uint num)
@@ -375,12 +382,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   bool AnimeshObjectFactory::SetMaterialWrapper (iMaterialWrapper* material)
   {
-    return false;
+    this->material = material;
+    return true;
   }
 
   iMaterialWrapper* AnimeshObjectFactory::GetMaterialWrapper () const
   {
-    return 0;
+    return material;
   }
 
   void AnimeshObjectFactory::SetMixMode (uint mode)
@@ -398,7 +406,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   AnimeshObject::AnimeshObject (AnimeshObjectFactory* factory)
     : scfImplementationType (this), factory (factory), logParent (0),
-    mixMode (0), skeleton (0)
+    material (0), mixMode (0), skeleton (0)
   {
     SetupSubmeshes ();
   }
@@ -459,14 +467,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     
     
     // Fetch the material
-    if (!material)
+    iMaterialWrapper* mat = material;
+    if (!mat)
+      mat = factory->material;
+
+    if (!mat)
     {
       csPrintf ("INTERNAL ERROR: mesh used without material!\n");
       return 0;
     }
 
-    if (material->IsVisitRequired ()) 
-      material->Visit ();
+    if (mat->IsVisitRequired ()) 
+      mat->Visit ();
 
     uint frameNum = rview->GetCurrentFrameNumber ();
 
@@ -493,7 +505,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         meshPtr->meshtype = CS_MESHTYPE_TRIANGLES;
         meshPtr->indexstart = 0;
         meshPtr->indexend = (unsigned int)fsm->indexBuffers[j]->GetElementCount ();
-        meshPtr->material = material;
+        meshPtr->material = mat;
 
         meshPtr->mixmode = mixMode;
         meshPtr->buffers = fsm->bufferHolders[j];
@@ -568,7 +580,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   iObjectModel* AnimeshObject::GetObjectModel ()
   {
-    return 0;
+    return this;
   }
 
   bool AnimeshObject::SetColor (const csColor& color)
@@ -615,6 +627,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   {
   }
 
+  const csBox3& AnimeshObject::GetObjectBoundingBox ()
+  {
+    return factory->factoryBB; //@@TODO: later
+  }
+  
+  void AnimeshObject::SetObjectBoundingBox (const csBox3& bbox)
+  {
+    //??
+  }
+
+  void AnimeshObject::GetRadius (float& radius, csVector3& center)
+  {
+    center = factory->factoryBB.GetCenter ();
+    radius = factory->factoryBB.GetSize ().Norm ();
+  }
+
   void AnimeshObject::SetupSubmeshes ()
   {
     submeshes.DeleteAll ();
@@ -625,6 +653,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
       csRef<Submesh> sm; 
       sm.AttachNew (new Submesh (this, fsm));
+      submeshes.Push (sm);
 
       bool subsm = fsm->boneMapping.GetSize () > 0;
 

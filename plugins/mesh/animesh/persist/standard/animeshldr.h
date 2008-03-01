@@ -49,6 +49,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
   private: 
     iObjectRegistry* object_reg;
 
+    csRef<iSyntaxService> synldr;  
+
     csStringHash xmltokens;
 #define CS_TOKEN_ITEM_FILE \
   "plugins/mesh/animesh/persist/standard/animesh_factory.tok"
@@ -92,6 +94,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
 
   private: 
     iObjectRegistry* object_reg;
+    csRef<iSyntaxService> synldr;
 
     csStringHash xmltokens;
 #define CS_TOKEN_ITEM_FILE \

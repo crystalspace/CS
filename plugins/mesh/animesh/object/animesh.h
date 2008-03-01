@@ -28,6 +28,8 @@
 #include "imesh/animesh.h"
 #include "imesh/object.h"
 #include "iutil/comp.h"
+#include "csgeom/box.h"
+#include "cstool/objmodel.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 {
@@ -117,8 +119,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     // required but stupid stuff..
     AnimeshObjectType* objectType;
     iMeshFactoryWrapper* logParent;
+    iMaterialWrapper* material;
     csFlags factoryFlags;
     uint mixMode;
+    csBox3 factoryBB;
 
     // Main data storage...
     uint vertexCount;
@@ -190,9 +194,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
 
   class AnimeshObject :
-    public scfImplementation2<AnimeshObject,
-                              iAnimatedMesh,
-                              iMeshObject>
+    public scfImplementationExt2<AnimeshObject,
+                                 csObjectModel,
+                                 iAnimatedMesh,
+                                 iMeshObject>
   {
   public:
     AnimeshObject (AnimeshObjectFactory* factory);
@@ -253,6 +258,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     virtual void BuildDecal(const csVector3* pos, float decalRadius,
       iDecalBuilder* decalBuilder);
 
+    //-- iObjectModel
+    virtual const csBox3& GetObjectBoundingBox ();
+    virtual void SetObjectBoundingBox (const csBox3& bbox);
+    virtual void GetRadius (float& radius, csVector3& center);
 
     //
     void SetupSubmeshes ();

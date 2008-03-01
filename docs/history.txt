@@ -14,6 +14,7 @@ chronological order.
 	  and object.
 	- Marten extended iSyntaxService with a way to parse data into
 	  an already created iRenderBuffer.
+	- Marten implemented initial loader for animesh.
 28-Feb-2008
 	- Marten implemented the Blend animation node.
 27-Feb-2008
