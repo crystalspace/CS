@@ -88,13 +88,10 @@ private:
   int playcount;
 };
 
-class BlendNode
-  : public scfImplementation1<BlendNode, iBlendNode>
+class MixingBase
 {
 public:
-  BlendNode ();
   void Tick (float amount);
-  void ReadChannels (Frame &result_frame);
   size_t AddNode (float weight, csRef<iMixingNode> node);
   void SetWeight (size_t i, float weight);
   bool IsActive () const;
@@ -104,14 +101,31 @@ protected:
 private:
   csRefArray<iMixingNode> nodes;
 };
-
-class AccumulateNode
-  : public BlendNode
+class BlendNode
+  : public MixingBase, public scfImplementation1<BlendNode, iBlendNode>
 {
 public:
+  BlendNode ();
+  void ReadChannels (Frame &result_frame);
+
+  // these just delegate to MixingBase base class because C++ is thick
+  void Tick (float amount);
+  size_t AddNode (float weight, csRef<iMixingNode> node);
+  void SetWeight (size_t i, float weight);
+  bool IsActive () const;
+};
+
+class AccumulateNode
+  : public MixingBase, public scfImplementation1<AccumulateNode, iAccumulateNode>
+{
+public:
+  AccumulateNode ();
   void ReadChannels (Frame &result_frame);
   size_t AddNode (float weight, csRef<iMixingNode> node);
   void SetWeight (size_t i, float weight);
+
+  void Tick (float amount);
+  bool IsActive () const;
 };
 
 class AnimationLayer
@@ -124,7 +138,7 @@ public:
   void UpdateSkeleton (Skeleton::iSkeleton *s, float delta_time);
 
   csPtr<iBlendNode> CreateBlendNode ();
-  csPtr<iBlendNode> CreateAccumulateNode ();
+  csPtr<iAccumulateNode> CreateAccumulateNode ();
 private:
   csRef<iMixingNode> mix_node;
 };

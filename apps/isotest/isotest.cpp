@@ -903,7 +903,7 @@ bool IsoTest::CreateActor ()
   anim_punch->SetPlayCount (0);
   //anim_punch->SetPlaySpeed (0.1f);
 
-  csRef<Skeleton::Animation::iBlendNode> overwrite = animlay->CreateAccumulateNode ();
+  csRef<Skeleton::Animation::iAccumulateNode> overwrite = animlay->CreateAccumulateNode ();
   blpen = overwrite;
   //animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (blend);
   otherid = overwrite->AddNode (1.0f, blend);

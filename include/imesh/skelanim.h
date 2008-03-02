@@ -88,6 +88,14 @@ struct iBlendNode : public virtual iMixingNode
   virtual size_t AddNode (float weight, csRef<iMixingNode> node) = 0;
   virtual void SetWeight (size_t i, float weight) = 0;
 };
+struct iAccumulateNode : public virtual iMixingNode
+{
+  SCF_INTERFACE (iAccumulateNode, 0, 0, 1);
+  virtual void Tick (float amount) = 0;
+  virtual void ReadChannels (Frame &frame) = 0;
+  virtual size_t AddNode (float weight, csRef<iMixingNode> node) = 0;
+  virtual void SetWeight (size_t i, float weight) = 0;
+};
 
 struct iAnimationLayer : public virtual iBase
 {
@@ -97,7 +105,7 @@ struct iAnimationLayer : public virtual iBase
   virtual void UpdateSkeleton (Skeleton::iSkeleton *s, float delta_time) = 0;
 
   virtual csPtr<iBlendNode> CreateBlendNode () = 0;
-  virtual csPtr<iBlendNode> CreateAccumulateNode () = 0;
+  virtual csPtr<iAccumulateNode> CreateAccumulateNode () = 0;
 };
 
 struct iAnimationFactoryLayer : public virtual iBase

@@ -85,7 +85,8 @@ private:
   Skeleton::iSkeleton* myskel;
 
   csRef<Skeleton::Animation::iAnimation> anim_punch;
-  csRef<Skeleton::Animation::iBlendNode> blend, blpen;
+  csRef<Skeleton::Animation::iBlendNode> blend;
+  csRef<Skeleton::Animation::iAccumulateNode> blpen;
   size_t walkid, standid, punchid, otherid;
 
   enum

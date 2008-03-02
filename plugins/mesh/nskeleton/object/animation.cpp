@@ -197,10 +197,7 @@ bool Animation::IsActive () const
   return playcount != 0;
 }
 
-BlendNode::BlendNode () : scfImplementationType (this)
-{
-}
-void BlendNode::Tick (float amount)
+void MixingBase::Tick (float amount)
 {
   // tick all the child nodes. should end with the animations (leaf) ticking.
   for (csRefArray<iMixingNode>::Iterator it = nodes.GetIterator ();
@@ -215,7 +212,7 @@ void BlendNode::Tick (float amount)
     node->Tick (amount);
   }
 }
-void BlendNode::CalculateFramesAndChannels (csArray<Frame> &nodes_frames, csArray<size_t> &channel_ids)
+void MixingBase::CalculateFramesAndChannels (csArray<Frame> &nodes_frames, csArray<size_t> &channel_ids)
 {
   // loop through all child nodes and add their output in a list
   for (csRefArray<iMixingNode>::Iterator it = nodes.GetIterator ();
@@ -239,6 +236,28 @@ void BlendNode::CalculateFramesAndChannels (csArray<Frame> &nodes_frames, csArra
         channel_ids.Push (id);  // 404 - add to our list
     }
   }
+}
+size_t MixingBase::AddNode (float weight, csRef<iMixingNode> node)
+{
+  if (weight < 0.0f)
+    weight = 0.0f;
+  nodes.Push (node);
+  blend_weights.Push (weight);
+  return nodes.GetSize () - 1;    // return position of newly added child
+}
+void MixingBase::SetWeight (size_t i, float weight)
+{
+  if (weight < 0.0f)
+    weight = 0.0f;
+  blend_weights[i] = weight;
+}
+bool MixingBase::IsActive () const
+{
+  return true;    // always active
+}
+
+BlendNode::BlendNode () : scfImplementationType (this)
+{
 }
 void BlendNode::ReadChannels (Frame &result_frame)
 {
@@ -267,25 +286,26 @@ void BlendNode::ReadChannels (Frame &result_frame)
     result_frame.PutUnique (id, in);
   }
 }
+void BlendNode::Tick (float amount)
+{
+  MixingBase::Tick (amount);
+}
 size_t BlendNode::AddNode (float weight, csRef<iMixingNode> node)
 {
-  if (weight < 0.0f)
-    weight = 0.0f;
-  nodes.Push (node);
-  blend_weights.Push (weight);
-  return nodes.GetSize () - 1;    // return position of newly added child
+  return MixingBase::AddNode (weight, node);
 }
 void BlendNode::SetWeight (size_t i, float weight)
 {
-  if (weight < 0.0f)
-    weight = 0.0f;
-  blend_weights[i] = weight;
+  MixingBase::SetWeight (i, weight);
 }
 bool BlendNode::IsActive () const
 {
-  return true;    // always active
+  return MixingBase::IsActive ();
 }
 
+AccumulateNode::AccumulateNode () : scfImplementationType (this)
+{
+}
 void AccumulateNode::ReadChannels (Frame &result_frame)
 {
   // read all the frames from all the child nodes
@@ -328,13 +348,22 @@ size_t AccumulateNode::AddNode (float weight, csRef<iMixingNode> node)
   // if we don't clamp the upper then life gets a bit difficult...
   if (weight > 1.0f)
     weight = 1.0f;
-  return BlendNode::AddNode (weight, node);
+  return MixingBase::AddNode (weight, node);
 }
 void AccumulateNode::SetWeight (size_t i, float weight)
 {
   if (weight > 1.0f)
     weight = 1.0f;
-  BlendNode::SetWeight (i, weight);
+  MixingBase::SetWeight (i, weight);
+}
+
+void AccumulateNode::Tick (float amount)
+{
+  MixingBase::Tick (amount);
+}
+bool AccumulateNode::IsActive () const
+{
+  return MixingBase::IsActive ();
 }
 
 AnimationLayer::AnimationLayer () : scfImplementationType (this)
@@ -378,7 +407,7 @@ csPtr<iBlendNode> AnimationLayer::CreateBlendNode ()
 {
   return new BlendNode ();
 }
-csPtr<iBlendNode> AnimationLayer::CreateAccumulateNode ()
+csPtr<iAccumulateNode> AnimationLayer::CreateAccumulateNode ()
 {
   return new AccumulateNode ();
 }
