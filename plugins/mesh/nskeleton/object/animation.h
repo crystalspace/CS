@@ -67,7 +67,7 @@ private:
   float animlength;
 };
 
-class Animation : public scfImplementation1<Animation, iAnimation>
+class Animation : public scfImplementation2<Animation, iAnimation, scfFakeInterface<iMixingNode> >
 {
 public:
   Animation (csRef<iAnimationFactory> fact);
@@ -102,7 +102,7 @@ private:
   csRefArray<iMixingNode> nodes;
 };
 class BlendNode
-  : public MixingBase, public scfImplementation1<BlendNode, iBlendNode>
+  : public MixingBase, public scfImplementation2<BlendNode, iBlendNode, scfFakeInterface<iMixingNode> >
 {
 public:
   BlendNode ();
@@ -116,7 +116,7 @@ public:
 };
 
 class AccumulateNode
-  : public MixingBase, public scfImplementation1<AccumulateNode, iAccumulateNode>
+  : public MixingBase, public scfImplementation2<AccumulateNode, iAccumulateNode, scfFakeInterface<iMixingNode> >
 {
 public:
   AccumulateNode ();
