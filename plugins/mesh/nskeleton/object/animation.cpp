@@ -172,6 +172,10 @@ void Animation::SetPlaySpeed (float speed)
 {
   playspeed = speed;
 }
+float Animation::GetPlaySpeed ()
+{
+  return playspeed;
+}
 void Animation::SetPlayCount (int count)
 {
   playcount = count;

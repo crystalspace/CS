@@ -232,9 +232,10 @@ void IsoTest::SetupFrame ()
 
     if (kbd->GetKeyState ('p'))
     {
-      if (pfeather != WALK)
+      if (pfeather == STAND)
       {
         pfeather = STAND_WALK;
+        pfeather_duration = 0.0f;
         anim_punch->SetPlayCount (1);
       }
     }
@@ -326,9 +327,9 @@ void IsoTest::SetupFrame ()
       break;
   }
 
-  float timeuntilend = anim_punch->GetAnimationLength () * 1 - anim_punch->GetTimeline ();
+  float timeuntilend = anim_punch->GetAnimationLength () - anim_punch->GetTimeline ();
   //printf ("endtime %f %f\n", timeuntilend, pfeather_duration);
-  if (timeuntilend < 210 && pfeather != STAND && pfeather != WALK_STAND)
+  if (timeuntilend <= 200 && pfeather != STAND && pfeather != WALK_STAND)
   {
     //puts ("DEACTIVATING NOW!");
         //blpen->SetWeight (otherid, 1.0f);
@@ -338,7 +339,7 @@ void IsoTest::SetupFrame ()
   }
   if (pfeather == STAND_WALK || pfeather == WALK_STAND)
   {
-    pfeather_duration += delta;
+    pfeather_duration += delta * anim_punch->GetPlaySpeed ();
   }
   switch (pfeather)
   {
@@ -354,6 +355,7 @@ void IsoTest::SetupFrame ()
       //blpen->SetWeight (otherid, 1 - (pfeather_duration / 200.0f));
       if (pfeather_duration > 200)
       {
+        //puts ("faseout");
         blpen->SetWeight (punchid, 1.0f);
         //blpen->SetWeight (otherid, 0.0f);
         pfeather = WALK;
@@ -366,6 +368,7 @@ void IsoTest::SetupFrame ()
       blpen->SetWeight (punchid, 1 - (pfeather_duration / 200.0f));
       if (pfeather_duration > 200)
       {
+        //puts ("faseout");
         //blpen->SetWeight (otherid, 1.0f);
         blpen->SetWeight (punchid, 0.0f);
         pfeather = STAND;
@@ -898,6 +901,7 @@ bool IsoTest::CreateActor ()
   csRef<Skeleton::Animation::iAnimationFactory> animfact_punch = animfactlay->FindAnimationFactoryByName ("punch");
   anim_punch = animfact_punch->CreateAnimation ();
   anim_punch->SetPlayCount (0);
+  //anim_punch->SetPlaySpeed (0.1f);
 
   csRef<Skeleton::Animation::iBlendNode> overwrite = animlay->CreateAccumulateNode ();
   blpen = overwrite;

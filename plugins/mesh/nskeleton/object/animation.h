@@ -75,6 +75,7 @@ public:
   void Tick (float amount);
   void ReadChannels (Frame &frame);
   void SetPlaySpeed (float speed);
+  float GetPlaySpeed ();
   void SetPlayCount (int count);
   int GetPlayCount () const;
   float GetAnimationLength () const;

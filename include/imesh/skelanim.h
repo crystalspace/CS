@@ -74,6 +74,7 @@ struct iAnimation : public virtual iMixingNode
   virtual void Tick (float amount) = 0;
   virtual void ReadChannels (Frame &frame) = 0;
   virtual void SetPlaySpeed (float speed) = 0;
+  virtual float GetPlaySpeed () = 0;
   virtual void SetPlayCount (int count) = 0;
   virtual int GetPlayCount () const = 0;
   virtual float GetAnimationLength () const = 0;
