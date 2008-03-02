@@ -1,0 +1,127 @@
+digraph doesitreallymatter
+{
+  Output [label="Output [Blend]"]
+  Stand [label="Stand [Switcher]"]
+  Idle1 [shape=box, style=filled, color=red, label="Idle1"]
+  Idle2 [shape=box, style=filled, color=red, label="Idle2"]
+  IdleN [shape=box, style=filled, color=red, label="Idle...N"]
+  Stand2Motion [shape=box, style=filled, color=red, label="Stand to Motion"]
+  Motion2Stand [shape=box, style=filled, color=red, label="Motion to Stand"]
+  Motion [label="Motion [Blend]"]
+  StrafeLeft [label="StrafeLeft [Blend]"]
+  StrafeRight [label="StrafeRight [Blend]"]
+  MoveForward [label="MoveForward [Blend]"]
+  MoveBack [label="MoveBack [Blend]"]
+  RunLeft [shape=box, style=filled, color=red, label="RunLeft"]
+  RunRight [shape=box, style=filled, color=red, label="RunRight"]
+  RunBack [shape=box, style=filled, color=red, label="RunBack"]
+  RunForward [shape=box, style=filled, color=red, label="RunForward"]
+  WalkLeft [shape=box, style=filled, color=red, label="WalkLeft"]
+  WalkRight [shape=box, style=filled, color=red, label="WalkRight"]
+  WalkBack [shape=box, style=filled, color=red, label="WalkBack"]
+  WalkForward [shape=box, style=filled, color=red, label="WalkForward"]
+
+  Output -> Stand
+  Output -> Motion
+  Output -> Stand2Motion
+  Output -> Motion2Stand
+  Stand -> Idle1
+  Stand -> Idle2
+  Stand -> IdleN
+  Motion -> StrafeLeft
+  Motion -> StrafeRight
+  Motion -> MoveForward
+  Motion -> MoveBack
+  StrafeLeft -> RunLeft
+  StrafeRight -> RunRight
+  MoveForward -> RunForward
+  MoveBack -> RunBack
+  StrafeLeft -> WalkLeft
+  StrafeRight -> WalkRight
+  MoveForward -> WalkForward
+  MoveBack -> WalkBack
+}
+
+/*digraph family
+{
+        ElderSon [label="Elder Son"]
+        YoungerSon [label="Younger Son"]
+
+        PizzaHut [label="Pizza Hut"]
+        McDonalds [label="McDonald's"]
+
+        Food -> PizzaHut
+        Food -> McDonalds
+        Father -> PizzaHut
+        Mom -> McDonalds
+        ElderSon -> McDonalds
+        YoungerSon -> McDonalds
+        Father -> Mom -> ElderSon -> YoungerSon
+
+}*/
+/*digraph family1
+{
+        Father [shape=Msquare, color=blue]
+        Mother [shape=box, style=filled, color=pink, height=0.7]
+        ElderSon [label="Elder Son", style=filled, color=green, width=1.5]
+        YoungerSon [label="Younger Son", shape=egg, color=Turquoise]
+
+        PizzaHut [label="Pizza Hut"]
+        McDonalds [label="McDonald's"]
+
+        Food -> PizzaHut
+        Food -> McDonalds
+        YoungerSon -> McDonalds
+        Father -> PizzaHut
+        Mother -> McDonalds
+        ElderSon -> McDonalds
+
+        edge [color = red]; /* denotes the family hierarchy /
+        Father -> Mother -> ElderSon -> YoungerSon
+}*/
+/*digraph family2
+{
+        Father [shape=Msquare, color=blue]
+        Mother [shape=box, style=filled, color=pink, height=0.7]
+        ElderSon [label="Elder Son", style=filled, color=green, width=1.5]
+        YoungerSon [label="Younger Son", shape=egg, color=Turquoise]
+
+        PizzaHut [label="Pizza Hut"]
+        McDonalds [label="McDonald's"]
+
+        subgraph cluster_relatives /*to describe entire group as single entity/
+        {
+                style = filled; /* defines the entire group /
+                color = greenyellow
+                label = "Relatives"
+
+                UncleA [shape=plaintext]
+                AuntB [shape=plaintext]
+        }
+
+        Food -> PizzaHut
+        Food -> McDonalds
+        YoungerSon -> McDonalds
+        Father -> PizzaHut
+        Mother -> McDonalds
+        ElderSon -> McDonalds
+
+        UncleA -> PizzaHut
+        AuntB -> McDonalds
+
+        subgraph cluster_friends
+        {
+                style = filled; /* defines the entire group /
+                color = burlywood
+                label = "Friends"
+
+                FriendA [shape=plaintext]
+                NeighbourB [shape=plaintext]
+        }
+
+        Father -> FriendA [label="prefers pizza hut", fontcolor=darkgreen, fontsize=8]
+        Mother -> NeighbourB [label="prefers pizza hut", fontcolor=darkgreen, fontsize=8]
+
+        edge [color = red]; /* denotes the family hierarchy /
+        Father -> Mother -> ElderSon -> YoungerSon
+}*/

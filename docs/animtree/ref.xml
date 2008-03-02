@@ -1,0 +1,61 @@
+<skeletonfactory>
+  <bone name="Neck">
+    <position x="0.0" y="0.0" z="0.0"/>
+    <rotation x="1.0" y="6.8" z="1.8" w="1.0" />
+
+    <bone name="Blaa">
+      <position x="0.0" y="0.0" z="0.0"/>
+      <rotation x="1.0" y="6.8" z="1.8" w="1.0" />
+    </bone>
+  </bone>
+
+  <animation name="idle">
+    <channel bone="Neck">
+      <frame time="0">
+        <position x="0.0" y="0.0" z="0.0"/>
+        <rotation x="1.0" y="6.8" z="1.8" w="1.0" />
+      </frame>
+      <frame time="10">
+        <position x="0.0" y="0.0" z="0.0"/>
+        <rotation x="1.0" y="6.8" z="1.8" w="1.0" />
+      </frame>
+      <frame time="30">
+        <position x="0.0" y="0.0" z="0.0"/>
+        <rotation x="1.0" y="6.8" z="1.8" w="1.0" />
+      </frame>
+    </channel>
+
+    <channel name="Claw.R">
+      <frame time="0">
+        <position x="0.0" y="0.0" z="0.0"/>
+        <rotation x="1.0" y="6.8" z="1.8" w="1.0" />
+      </frame>
+    </channel>
+  </animation>
+
+  <animation name="run">
+  </animation>
+
+  <animationfromfile loadondemand="false">/path/to/file</animationfromfile>
+
+  <output-node>
+    <ik chain="foot" handle="IK_Foot">
+      <switcher default="0">
+        <animation>idle</animation>
+
+        <overwrite>
+          <child on="false">
+            <animation>shoot</animation>
+          </child>
+
+          <child>
+            <blend handle="motionblend">
+              <animation>run</animation>
+              <animation>walk</animation>
+            </blend>
+          </child>
+        </overwrite>
+      </switcher>
+    </ik>
+  </output-node>
+</skeletonfactory>

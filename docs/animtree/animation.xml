@@ -1,0 +1,96 @@
+<animation>
+  <node name="States" type="StateSwitcher">
+    <!-- which property it should use to select the initial state
+         * the state can never be set by the user! done internally
+           by other nodes! -->
+    <parameter name="initialstate" string="stand" />
+
+    <!-- simple standing animation for stand state -->
+    <node name="stand" type="Animation">
+      <parameter name="animation" string="Stand" />
+      <parameter name="loop" bool="true" />
+
+      <condition type="property">
+        <parameter name="name" string="speed" />
+        <!-- if the minimum value of this property is 0.01, then it passes -->
+        <parameter name="min" int="0.01" />
+
+        <!-- what happens if this condition evaluates, not necessarily
+             always will you just switch states.
+             For example you may play gunshot sound at end of shoot anim.-->
+        <result type="transition">
+          <parameter name="node" string="States" />
+          <parameter name="state" string="moving" />
+          <!-- number of ticks to fade this animation out and fade the new one in -->
+          <parameter name="feather" float="125" />
+        </result>
+      </condition>
+    </node>
+
+    <!-- gets the players angle automatically from linmove and blends
+         children nodes based on this angle -->
+    <node name="moving" type="DirectionBlend">
+      <!-- @@@ BREAKS THE PARAMETER MODEL WITH UNKNOWN NUMBER OF PARAMS!! -->
+      <parameter_array name="directions">
+        <item>
+          <parameter name="node" string="forward" />
+          <parameter name="angle" float="0" />
+        </item>
+        <item>
+          <parameter name="node" string="right" />
+          <parameter name="angle" float="90" />
+        </item>
+        <item>
+          <parameter name="node" string="backward" />
+          <parameter name="angle" float="180" />
+        </item>
+        <item>
+          <parameter name="node" string="left" />
+          <parameter name="angle" float="270" />
+        </item>
+      </parameter_array>
+
+      <!-- interpolates and blends between 2 base nodes based on linmove
+           scalar speed -->
+      <node name="forward" type="SpeedBlend">
+        <!-- @@@ BREAKS THE PARAMETER MODEL WITH UNKNOWN NUMBER OF PARAMS!! -->
+        <parameter_array name="speeds">
+          <item>
+            <parameter name="node" string="walk" />
+            <parameter name="speed" float="0.25" />
+          </item>
+          <item>
+            <parameter name="node" string="jog" />
+            <parameter name="speed" float="0.5" />
+          </item>
+          <item>
+            <parameter name="node" string="run" />
+            <parameter name="speed" float="1" />
+          </item>
+        </parameter_array>
+
+        <node name="walk" type="Animation">
+          <parameter name="animation" string="WalkForward" />
+          <parameter name="loop" bool="true" />
+        </node>
+
+        <!-- and the same for jog and run... -->
+      </node>
+
+      <!-- and the same for left, backward and right... -->
+
+      <!-- handle the transition to stand state -->
+      <condition type="property">
+        <parameter name="name" string="speed" />
+        <parameter name="max" int="0.01" />
+
+        <result type="transition">
+          <parameter name="node" string="States" />
+          <parameter name="state" string="stand" />
+          <!-- number of ticks to fade this animation out and fade the new one in -->
+          <parameter name="feather" float="125" />
+        </result>
+      </condition>
+    </node>
+  </node>
+</animation>
