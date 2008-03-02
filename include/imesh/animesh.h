@@ -107,11 +107,6 @@ struct iAnimatedMeshFactory : public virtual iBase
    * @{ */
 
   /**
-   * Set the number of vertices in the mesh
-   */
-  virtual void SetVertexCount (uint count) = 0;
-
-  /**
    * Get the number of vertices in the mesh
    */
   virtual uint GetVertexCount () const = 0;
@@ -124,11 +119,26 @@ struct iAnimatedMeshFactory : public virtual iBase
   virtual iRenderBuffer* GetVertices () = 0;
 
   /**
-   * Get a pointer to the buffer specifying vertices.
+   * Set the render buffer to use for vertices.
+   * The buffer must contain at least three components per elements and its
+   * length will specify the number of vertices within the mesh.
+   * \returns false if the buffer doesn't follow required specifications
+   */
+  virtual bool SetVertices (iRenderBuffer* renderBuffer) = 0;
+
+  /**
+   * Get a pointer to the buffer specifying texture coordinates.
    * The buffer is at least as many entries as specified by the vertex count.
    * You must call Invalidate() after modifying it.
    */
   virtual iRenderBuffer* GetTexCoords () = 0;
+
+  /**
+   * Set the render buffer to use for texture coordinates.
+   * Must hold at least as many elements as the vertex buffer.
+   * \returns false if the buffer doesn't follow required specifications
+   */
+  virtual bool SetTexCoords (iRenderBuffer* renderBuffer) = 0;
 
   /**
    * Get a pointer to the buffer specifying vertex normals.
@@ -138,11 +148,25 @@ struct iAnimatedMeshFactory : public virtual iBase
   virtual iRenderBuffer* GetNormals () = 0;
 
   /**
+   * Set the render buffer to use for normals.   
+   * Must hold at least as many elements as the vertex buffer.
+   * \returns false if the buffer doesn't follow required specifications
+   */
+  virtual bool SetNormals (iRenderBuffer* renderBuffer) = 0;
+
+  /**
    * Get a pointer to the buffer specifying vertex tangents.
    * The buffer is at least as many entries as specified by the vertex count.
    * You must call Invalidate() after modifying it.
    */
   virtual iRenderBuffer* GetTangents () = 0;
+
+  /**
+   * Set the render buffer to use for tangents.   
+   * Must hold at least as many elements as the vertex buffer.
+   * \returns false if the buffer doesn't follow required specifications
+   */
+  virtual bool SetTangents (iRenderBuffer* renderBuffer) = 0;
 
   /**
    * Get a pointer to the buffer specifying vertex binormals.
@@ -152,11 +176,25 @@ struct iAnimatedMeshFactory : public virtual iBase
   virtual iRenderBuffer* GetBinormals () = 0;
 
   /**
+   * Set the render buffer to use for binormals.   
+   * Must hold at least as many elements as the vertex buffer.
+   * \returns false if the buffer doesn't follow required specifications
+   */
+  virtual bool SetBinormals (iRenderBuffer* renderBuffer) = 0;
+
+  /**
    * Get a pointer to the buffer specifying vertex color.
    * The buffer is at least as many entries as specified by the vertex count.
    * You must call Invalidate() after modifying it.
    */
   virtual iRenderBuffer* GetColors () = 0;
+
+  /**
+   * Set the render buffer to use for vertex color.   
+   * Must hold at least as many elements as the vertex buffer.
+   * \returns false if the buffer doesn't follow required specifications
+   */
+  virtual bool SetColors (iRenderBuffer* renderBuffer) = 0;
 
   /**
    * Update the mesh after modifying its geometry
@@ -185,16 +223,6 @@ struct iAnimatedMeshFactory : public virtual iBase
    * You must call Invalidate() after modifying it.
    */
   virtual csAnimatedMeshBoneInfluence* GetBoneInfluences () = 0;
-
-  /**
-   * Set the max number of bones per render mesh
-   */
-  virtual void SetMaxBonesPerBatch (uint count) = 0;
-
-  /**
-   * Get the max number of bones per render mesh
-   */
-  virtual uint GetMaxBonesPerBatch () const = 0;
 
   /** @} */
 

@@ -82,7 +82,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   AnimeshObjectFactory::AnimeshObjectFactory (AnimeshObjectType* objType)
     : scfImplementationType (this), objectType (objType), logParent (0), material (0),
-    vertexCount (0), bonesPerBatch (~0)
+    vertexCount (0)
   {
   }
 
@@ -140,48 +140,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     Invalidate ();
   }
 
-  void AnimeshObjectFactory::SetVertexCount (uint count)
-  {
-    if (count != vertexCount)
-    {
-      vertexCount = count;
-
-      // Recreate the buffers
-      vertexBuffer = csRenderBuffer::CreateRenderBuffer (vertexCount, CS_BUF_STATIC, 
-        CS_BUFCOMP_FLOAT, 3);
-
-      texcoordBuffer = csRenderBuffer::CreateRenderBuffer (vertexCount, CS_BUF_STATIC, 
-        CS_BUFCOMP_FLOAT, 2);
-
-      normalBuffer = csRenderBuffer::CreateRenderBuffer (vertexCount, CS_BUF_STATIC, 
-        CS_BUFCOMP_FLOAT, 3);
-
-      tangentBuffer = csRenderBuffer::CreateRenderBuffer (vertexCount, CS_BUF_STATIC, 
-        CS_BUFCOMP_FLOAT, 3);
-
-      binormalBuffer = csRenderBuffer::CreateRenderBuffer (vertexCount, CS_BUF_STATIC, 
-        CS_BUFCOMP_FLOAT, 3);
-
-      colorBuffer = csRenderBuffer::CreateRenderBuffer (vertexCount, CS_BUF_STATIC, 
-        CS_BUFCOMP_FLOAT, 4);  
-
-      // Reallocate the bone influence table
-      boneInfluences.DeleteAll ();
-      boneInfluences.SetSize (count*4);
-
-      static csInterleavedSubBufferOptions bufSettings[] = 
-      {
-        {CS_BUFCOMP_UNSIGNED_INT, 0},
-        {CS_BUFCOMP_FLOAT, 0}
-      };
-
-      bufSettings[0].componentCount = bufSettings[1].componentCount = 4;//@@TODO
-
-      masterBWBuffer = csRenderBuffer::CreateInterleavedRenderBuffers (
-        vertexCount, CS_BUF_STATIC, 2, bufSettings, boneWeightAndIndexBuffer);
-    }
-  }
-
   uint AnimeshObjectFactory::GetVertexCount () const
   {
     return vertexCount;
@@ -192,9 +150,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return vertexBuffer;
   }
 
+  bool AnimeshObjectFactory::SetVertices (iRenderBuffer *renderBuffer)
+  {
+    if (renderBuffer->GetComponentCount () < 3)
+      return false;
+
+    vertexBuffer = renderBuffer;
+    vertexCount = vertexBuffer->GetElementCount ();
+    return true;
+  }
+
   iRenderBuffer* AnimeshObjectFactory::GetTexCoords ()
   {
     return texcoordBuffer;
+  }
+
+  bool AnimeshObjectFactory::SetTexCoords (iRenderBuffer *renderBuffer)
+  {
+    if (renderBuffer->GetElementCount () < vertexCount)
+      return false;
+
+    texcoordBuffer = renderBuffer;    
+    return true;
   }
 
   iRenderBuffer* AnimeshObjectFactory::GetNormals ()
@@ -202,9 +179,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return normalBuffer;
   }
 
+  bool AnimeshObjectFactory::SetNormals (iRenderBuffer *renderBuffer)
+  {
+    if (renderBuffer->GetElementCount () < vertexCount)
+      return false;
+
+    normalBuffer = renderBuffer;    
+    return true;
+  }
+
   iRenderBuffer* AnimeshObjectFactory::GetTangents ()
   {
     return tangentBuffer;
+  }
+
+  bool AnimeshObjectFactory::SetTangents (iRenderBuffer *renderBuffer)
+  {
+    if (renderBuffer->GetElementCount () < vertexCount)
+      return false;
+
+    tangentBuffer = renderBuffer;    
+    return true;
   }
 
   iRenderBuffer* AnimeshObjectFactory::GetBinormals ()
@@ -212,13 +207,40 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return binormalBuffer;
   }
 
+  bool AnimeshObjectFactory::SetBinormals (iRenderBuffer *renderBuffer)
+  {
+    if (renderBuffer->GetElementCount () < vertexCount)
+      return false;
+
+    binormalBuffer = renderBuffer;    
+    return true;
+  }
+
   iRenderBuffer* AnimeshObjectFactory::GetColors ()
   {
     return colorBuffer;
   }
 
+  bool AnimeshObjectFactory::SetColors (iRenderBuffer *renderBuffer)
+  {
+    if (renderBuffer->GetElementCount () < vertexCount)
+      return false;
+
+    colorBuffer = renderBuffer;    
+    return true;
+  }
+
   void AnimeshObjectFactory::Invalidate ()
   {
+    // Create the weight & influence renderbuffers
+    static csInterleavedSubBufferOptions bufSettings[] = 
+    {
+      {CS_BUFCOMP_UNSIGNED_INT, 0},
+      {CS_BUFCOMP_FLOAT, 0}
+    };
+
+    bufSettings[0].componentCount = bufSettings[1].componentCount = 4;//@@TODO
+
     // Traverse the submeshes, in cases where there is a remapping, create
     // remapped bone influence tables
 
@@ -237,16 +259,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         {
           mappingHash.PutUnique (bm.boneRemappingTable[i], i);
         }
-
-        // Create the weight & influence renderbuffers
-        static csInterleavedSubBufferOptions bufSettings[] = 
-        {
-          {CS_BUFCOMP_UNSIGNED_INT, 0},
-          {CS_BUFCOMP_FLOAT, 0}
-        };
-
-        bufSettings[0].componentCount = bufSettings[1].componentCount = 4;//@@TODO
-
+       
         bm.masterBWBuffer = csRenderBuffer::CreateInterleavedRenderBuffers (
           vertexCount, CS_BUF_STATIC, 2, bufSettings, bm.boneWeightAndIndexBuffer);
 
@@ -281,14 +294,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
 
     // Setup the bone weight & index buffers for cases not covered above
-    masterBWBuffer->CopyInto (boneInfluences.GetArray (), vertexCount);
+    masterBWBuffer = csRenderBuffer::CreateInterleavedRenderBuffers (
+      vertexCount, CS_BUF_STATIC, 2, bufSettings, boneWeightAndIndexBuffer);
+    masterBWBuffer->CopyInto (boneInfluences.GetArray (), 
+      csMin(vertexCount, boneInfluences.GetSize ()/4));
     
     // Fix the bb
     factoryBB.StartBoundingBox ();
-    csRenderBufferLock<csVector3> vbuf (vertexBuffer);
+    csVertexListWalker<csVector3> vbuf (vertexBuffer);
     for (size_t i = 0; i < vertexCount; ++i)
     {
-      factoryBB.AddBoundingVertex (*vbuf++);
+      factoryBB.AddBoundingVertex (*vbuf);
+      ++vbuf;
     }
   }
 
@@ -305,16 +322,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   csAnimatedMeshBoneInfluence* AnimeshObjectFactory::GetBoneInfluences ()
   {
     return boneInfluences.GetArray ();
-  }
-
-  void AnimeshObjectFactory::SetMaxBonesPerBatch (uint count)
-  {
-    bonesPerBatch = count;
-  }
-
-  uint AnimeshObjectFactory::GetMaxBonesPerBatch () const
-  {
-    return bonesPerBatch;
   }
 
   iAnimatedMeshMorphTarget* AnimeshObjectFactory::CreateMorphTarget ()

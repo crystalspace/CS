@@ -104,71 +104,71 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
             return 0;
           fact->SetMixMode (mm);
         }
-        break;
-      case XMLTOKEN_VERTEXCOUNT:
-        {
-          int numv = child->GetContentsValueAsInt ();
-          amfact->SetVertexCount (numv);
-        }
-        break;
+        break;      
       case XMLTOKEN_VERTEX:
         {
-          iRenderBuffer* rb = amfact->GetVertices ();
-          if (!synldr->ParseRenderBuffer (child, rb))
+          csRef<iRenderBuffer> rb = synldr->ParseRenderBuffer (child);
+          if (!rb)
           {
             synldr->ReportError (msgid, child, "Could not parse render buffer!");
             return 0;
           }
+          amfact->SetVertices (rb);
         }
         break;
       case XMLTOKEN_TEXCOORD:
         {
-          iRenderBuffer* rb = amfact->GetTexCoords ();
-          if (!synldr->ParseRenderBuffer (child, rb))
+          csRef<iRenderBuffer> rb = synldr->ParseRenderBuffer (child);
+          if (!rb)
           {
             synldr->ReportError (msgid, child, "Could not parse render buffer!");
             return 0;
           }
+          amfact->SetTexCoords (rb);
         }
         break;
       case XMLTOKEN_NORMAL:
         {
-          iRenderBuffer* rb = amfact->GetNormals ();
-          if (!synldr->ParseRenderBuffer (child, rb))
+          csRef<iRenderBuffer> rb = synldr->ParseRenderBuffer (child);
+          if (!rb)
           {
             synldr->ReportError (msgid, child, "Could not parse render buffer!");
             return 0;
           }
+          amfact->SetNormals (rb);
         }
         break;
       case XMLTOKEN_TANGENT:
         {
-          iRenderBuffer* rb = amfact->GetTangents ();
-          if (!synldr->ParseRenderBuffer (child, rb))
+          csRef<iRenderBuffer> rb = synldr->ParseRenderBuffer (child);
+          if (!rb)
           {
             synldr->ReportError (msgid, child, "Could not parse render buffer!");
             return 0;
           }
+          amfact->SetTangents (rb);
         }
         break;
       case XMLTOKEN_BINORMAL:
         {
-          iRenderBuffer* rb = amfact->GetBinormals ();
-          if (!synldr->ParseRenderBuffer (child, rb))
+          csRef<iRenderBuffer> rb = synldr->ParseRenderBuffer (child);
+          if (!rb)
           {
             synldr->ReportError (msgid, child, "Could not parse render buffer!");
             return 0;
           }
+          amfact->SetBinormals (rb);
         }
         break;
       case XMLTOKEN_COLOR:
         {
-          iRenderBuffer* rb = amfact->GetColors ();
-          if (!synldr->ParseRenderBuffer (child, rb))
+          csRef<iRenderBuffer> rb = synldr->ParseRenderBuffer (child);
+          if (!rb)
           {
             synldr->ReportError (msgid, child, "Could not parse render buffer!");
             return 0;
           }
+          amfact->SetColors (rb);
         }
         break;
       case XMLTOKEN_SUBMESH:

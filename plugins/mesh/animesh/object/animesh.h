@@ -69,22 +69,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     virtual size_t GetSubMeshCount () const;
     virtual void DeleteSubMesh (iAnimatedMeshFactorySubMesh* mesh);
 
-    virtual void SetVertexCount (uint count);
     virtual uint GetVertexCount () const;
 
     virtual iRenderBuffer* GetVertices ();
+    virtual bool SetVertices (iRenderBuffer* renderBuffer);
     virtual iRenderBuffer* GetTexCoords ();
+    virtual bool SetTexCoords (iRenderBuffer* renderBuffer);
     virtual iRenderBuffer* GetNormals ();
+    virtual bool SetNormals (iRenderBuffer* renderBuffer);
     virtual iRenderBuffer* GetTangents ();
+    virtual bool SetTangents (iRenderBuffer* renderBuffer);
     virtual iRenderBuffer* GetBinormals ();
+    virtual bool SetBinormals (iRenderBuffer* renderBuffer);
     virtual iRenderBuffer* GetColors ();
+    virtual bool SetColors (iRenderBuffer* renderBuffer);
+
     virtual void Invalidate ();
 
     virtual void SetBoneInfluencesPerVertex (uint num);
     virtual uint GetBoneInfluencesPerVertex () const;
     virtual csAnimatedMeshBoneInfluence* GetBoneInfluences ();
-    virtual void SetMaxBonesPerBatch (uint count);
-    virtual uint GetMaxBonesPerBatch () const;
 
     virtual iAnimatedMeshMorphTarget* CreateMorphTarget ();
     virtual iAnimatedMeshMorphTarget* GetMorphTarget (uint target);
@@ -138,8 +142,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     // Submeshes
     csRefArray<FactorySubmesh> submeshes;
-
-    uint bonesPerBatch;
 
     friend class AnimeshObject;
   };
