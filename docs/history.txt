@@ -8,7 +8,7 @@ chronological order.
 
 2-Mar-2008
 	- Marten changed the way render buffers are handled in animesh
-	  slightly. Removed SetVertexCount from API and <vertexcunt>
+	  slightly. Removed SetVertexCount from API and <vertexcount>
 	  from file format.
 1-Mar-2008
 	- caedes added support for relative rotation operations to the
