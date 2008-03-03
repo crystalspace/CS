@@ -9,6 +9,7 @@ chronological order.
 03-Mar-2008
 	- res fixed some pointer formatting with unsigned longs recently
 	  introduced.
+	- res removed an int cast from csperl5. Should fix trac #394.
 01-Mar-2008
 	- caedes added support for relative rotation operations to the
 	  sequence manager.
