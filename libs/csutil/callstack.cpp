@@ -120,7 +120,7 @@ bool CallStackImpl::GetFunctionName (size_t num, char*& str)
   
   // Return at least the address...
   char buf[CS_PROCESSOR_SIZE/4 + 5];
-  snprintf (buf, sizeof (buf), "[0x%lx]", (unsigned long)(entries[num].address));
+  snprintf (buf, sizeof (buf), "[%p]", entries[num].address);
   str = strdup (buf);
   return true;
 }
