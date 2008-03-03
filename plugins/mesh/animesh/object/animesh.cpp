@@ -30,6 +30,7 @@
 #include "ivideo/rendermesh.h"
 #include "iutil/strset.h"
 #include "csutil/objreg.h"
+#include "imesh/skeleton2.h"
 
 #include "animesh.h"
 
@@ -45,6 +46,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   static csStringID svNameBoneIndex = csInvalidStringID;
   static csStringID svNameBoneWeight = csInvalidStringID;
   static csStringID svNameBoneTransforms = csInvalidStringID;
+
+  static csStringID svNameBoneTransformsReal = csInvalidStringID;
+  static csStringID svNameBoneTransformsDual = csInvalidStringID;
 
 
   SCF_IMPLEMENT_FACTORY(AnimeshObjectType);
@@ -72,6 +76,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     svNameBoneIndex = strset->Request ("bone index");
     svNameBoneWeight = strset->Request ("bone weight");
     svNameBoneTransforms = strset->Request ("bone transform");
+
+    svNameBoneTransforms = strset->Request ("bone transform real");
+    svNameBoneTransforms = strset->Request ("bone transform dual");
 
 
     return true;
@@ -157,6 +164,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     vertexBuffer = renderBuffer;
     vertexCount = vertexBuffer->GetElementCount ();
+
+    //Update the number of bone influences
+    boneInfluences.SetSize (vertexCount*4);//@@TODO handle
+
     return true;
   }
 
@@ -549,6 +560,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       {
         root->TickAnimation ((current_time - lastTick) / 1000.0f);
       }
+
+      // Copy the skeletal state into our buffers
+      UpdateLocalBoneTransforms ();
     }
     lastTick = current_time;
   }
@@ -694,11 +708,104 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
           sv->SetValue (fsm->boneMapping[j].boneWeightAndIndexBuffer[1]);
         else        
           sv->SetValue (factory->boneWeightAndIndexBuffer[1]);
-
-        sv = svContext->GetVariableAdd (svNameBoneTransforms);
-        sv->SetAccessor (sm, j);
+        
+        if (subsm)
+        {          
+          sv = svContext->GetVariableAdd (svNameBoneTransforms);          
+          sm->boneTransformArray.Push (sv);
+        }
+        else
+        {
+          if (!boneTransformArray)
+          {
+            boneTransformArray.AttachNew (new csShaderVariable(svNameBoneTransforms));
+          }
+          svContext->AddVariable (boneTransformArray);
+        }
 
         sm->svContexts.Push (svContext);
+      }
+
+    }
+  }
+
+
+  void AnimeshObject::UpdateLocalBoneTransforms ()
+  {
+    if (!skeleton)
+      return; // nothing to update
+
+    lastSkeletonState = skeleton->GetStateBindSpace ();
+
+    if (boneTransformArray)
+    {
+      // Update the global one
+      boneTransformArray->SetArraySize (lastSkeletonState->GetBoneCount ()*2);
+      
+      csRef<csShaderVariable> sv;
+      for (size_t i = 0, j = 0; i < lastSkeletonState->GetBoneCount (); ++i, j+=2)
+      {
+        const csDualQuaternion& dq = lastSkeletonState->GetDualQuaternion (i);
+
+        sv = boneTransformArray->GetArrayElement (j);
+        if (!sv)
+        {
+          sv.AttachNew (new csShaderVariable (svNameBoneTransformsReal));
+          boneTransformArray->SetArrayElement (j, sv);
+        }
+        sv->SetValue (dq.real);
+
+        sv = boneTransformArray->GetArrayElement (j+1);
+        if (!sv)
+        {
+          sv.AttachNew (new csShaderVariable (svNameBoneTransformsDual));
+          boneTransformArray->SetArrayElement (j+1, sv);
+        }
+        sv->SetValue (dq.dual);
+      }
+    }
+
+    // Iterate all submeshes...
+    for (size_t i = 0; i < submeshes.GetSize (); ++i)
+    {
+      Submesh* sm = submeshes[i];
+      FactorySubmesh* fsm = sm->factorySubmesh;
+      
+      if (!sm->isRendering || sm->boneTransformArray.GetSize () == 0)
+        continue;
+      
+      // Iterate over index-buffers
+      for (size_t j = 0; j < sm->boneTransformArray.GetSize (); ++j)
+      {
+        csShaderVariable* boneTransformArray = sm->boneTransformArray[j];
+        const FactorySubmesh::RemappedBones& remap = fsm->boneMapping[j];
+
+        boneTransformArray->SetArraySize (remap.boneRemappingTable.GetSize ());
+
+        csRef<csShaderVariable> sv;
+        for (size_t bi = 0, k = 0; bi < remap.boneRemappingTable.GetSize (); ++bi, k+=2)
+        {
+          unsigned int realBi = remap.boneRemappingTable[bi];
+
+          // bi is the "virtual" bone index, realBi the real one
+          const csDualQuaternion& dq = lastSkeletonState->GetDualQuaternion (realBi);
+
+          sv = boneTransformArray->GetArrayElement (k);
+          if (!sv)
+          {
+            sv.AttachNew (new csShaderVariable (svNameBoneTransformsReal));
+            boneTransformArray->SetArrayElement (k, sv);
+          }
+          sv->SetValue (dq.real);
+
+          sv = boneTransformArray->GetArrayElement (k+1);
+          if (!sv)
+          {
+            sv.AttachNew (new csShaderVariable (svNameBoneTransformsDual));
+            boneTransformArray->SetArrayElement (k+1, sv);
+          }
+          sv->SetValue (dq.dual);
+        }
       }
 
     }

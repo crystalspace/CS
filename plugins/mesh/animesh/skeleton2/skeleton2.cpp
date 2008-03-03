@@ -40,7 +40,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   iSkeletonFactory2* SkeletonSystem::CreateSkeletonFactory (const char* name)
   {
     // Check name uniqueness
-
     csRef<iSkeletonFactory2> newFact = csPtr<iSkeletonFactory2> (new SkeletonFactory);
 
     return factoryHash.PutUnique (name, newFact);
@@ -53,7 +52,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   void SkeletonSystem::ClearSkeletonFactories ()
   {
-    factoryHash.Empty ();
+    factoryHash.DeleteAll ();
+  }
+
+  void SkeletonSystem::RegisterAnimationTree (iSkeletonAnimationNodeFactory2* node, const char* name)
+  {
+    animTreeHash.PutUnique (name, node);
+  }
+
+  iSkeletonAnimationNodeFactory2* SkeletonSystem::FindAnimationTree (const char* name)
+  {
+    return animTreeHash.Get (name, 0);
+  }
+
+  void SkeletonSystem::ClearAnimationTrees ()
+  {
+    animTreeHash.DeleteAll ();
   }
 
   csPtr<iSkeletonAnimationFactory2> SkeletonSystem::CreateAnimationFactory ()
@@ -414,6 +428,70 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     SetTransformAbsSpace (bone, newAbsRot, newAbsOffset);
   }
 
+  csPtr<csSkeletalState2> Skeleton::GetStateAbsSpace ()
+  {
+    UpdateCachedTransforms ();
+
+    // Use a pool for these...
+    csRef<csSkeletalState2> currState;
+    currState.AttachNew (new csSkeletalState2);
+    currState->Setup (allBones.GetSize ());
+
+    for (size_t i = 0; i < allBones.GetSize (); ++i)
+    {
+      if (allBones[i].created)
+      {
+        currState->GetDualQuaternion (i) = 
+          csDualQuaternion (allBones[i].absRotation, allBones[i].absOffset);
+        currState->SetQuatUsed (i);
+      }
+    }
+
+    return csPtr<csSkeletalState2> (currState);
+  }
+
+  csPtr<csSkeletalState2> Skeleton::GetStateBoneSpace ()
+  {
+    // Use a pool for these...
+    csRef<csSkeletalState2> currState;
+    currState.AttachNew (new csSkeletalState2);
+    currState->Setup (allBones.GetSize ());
+
+    for (size_t i = 0; i < allBones.GetSize (); ++i)
+    {
+      if (allBones[i].created)
+      {
+        currState->GetDualQuaternion (i) = 
+          csDualQuaternion (allBones[i].boneRotation, allBones[i].boneOffset);
+        currState->SetQuatUsed (i);
+      }
+    }
+
+    return csPtr<csSkeletalState2> (currState);
+  }
+
+  csPtr<csSkeletalState2> Skeleton::GetStateBindSpace ()
+  {
+    UpdateCachedTransforms ();
+
+    // Use a pool for these...
+    csRef<csSkeletalState2> currState;
+    currState.AttachNew (new csSkeletalState2);
+    currState->Setup (allBones.GetSize ());
+
+    for (size_t i = 0; i < allBones.GetSize (); ++i)
+    {
+      if (allBones[i].created)
+      {
+        currState->GetDualQuaternion (i) = 
+          csDualQuaternion (allBones[i].bindRotation, allBones[i].bindOffset);
+        currState->SetQuatUsed (i);
+      }
+    }
+
+    return csPtr<csSkeletalState2> (currState);
+  }
+
   iSkeletonFactory2* Skeleton::GetFactory () const
   {
     return factory;
@@ -446,7 +524,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     //
     {
+      // Use a pool for these...
       csRef<csSkeletalState2> finalState;
+      finalState.AttachNew (new csSkeletalState2);
       finalState->Setup (allBones.GetSize ());
 
       animationRoot->BlendState (finalState);

@@ -267,6 +267,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     //
     void SetupSubmeshes ();
+    void UpdateLocalBoneTransforms ();
 
   private:
     class Submesh : 
@@ -275,7 +276,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
                                 iShaderVariableAccessor>
     {
     public:
-      Submesh (AnimeshObject* meshObject, iAnimatedMeshFactorySubMesh* factorySubmesh)
+      Submesh (AnimeshObject* meshObject, FactorySubmesh* factorySubmesh)
         : scfImplementationType (this), meshObject (meshObject),
         factorySubmesh (factorySubmesh), isRendering (true)
       {}
@@ -298,10 +299,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       virtual void PreGetValue (csShaderVariable *variable);
 
       AnimeshObject* meshObject;
-      iAnimatedMeshFactorySubMesh* factorySubmesh;
+      FactorySubmesh* factorySubmesh;
       bool isRendering;
 
       csRefArray<csShaderVariableContext> svContexts;
+      csRefArray<csShaderVariable> boneTransformArray;
     };    
 
     AnimeshObjectFactory* factory;
@@ -312,6 +314,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     iSkeleton2* skeleton;
     csTicks lastTick;
+
+    // Hold the bone transforms
+    csRef<csShaderVariable> boneTransformArray;
+    csRef<csSkeletalState2> lastSkeletonState;
 
     csRenderMeshHolder rmHolder;
     csDirtyAccessArray<CS::Graphics::RenderMesh*> renderMeshList;

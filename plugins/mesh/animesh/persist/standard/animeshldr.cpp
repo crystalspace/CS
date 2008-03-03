@@ -171,6 +171,48 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           amfact->SetColors (rb);
         }
         break;
+      case XMLTOKEN_BONEINFLUENCES:
+        {
+          int wantedPerVertex = child->GetAttributeValueAsInt ("bonespervertex");
+          if (!wantedPerVertex)
+            amfact->SetBoneInfluencesPerVertex (wantedPerVertex);
+
+          int realPerVertex = amfact->GetBoneInfluencesPerVertex ();
+          int numVerts = amfact->GetVertexCount ();
+          int currInfl = 0;
+
+          csAnimatedMeshBoneInfluence* bi = amfact->GetBoneInfluences ();
+
+          csRef<iDocumentNodeIterator> it = child->GetNodes ();
+          while (it->HasNext ())
+          {
+            csRef<iDocumentNode> child2 = it->Next ();
+            if (child2->GetType () != CS_NODE_ELEMENT) continue;
+            const char* value = child2->GetValue ();
+            csStringID id = xmltokens.Request (value);
+            switch (id)
+            {
+            case XMLTOKEN_BI:
+              {
+                if (currInfl > numVerts*realPerVertex)
+                {
+                  synldr->ReportError (msgid, child, 
+                    "Too many bone vertex influences %d, expected %d", currInfl, numVerts*realPerVertex);
+                  return 0;
+                }
+
+                bi[currInfl].bone = child2->GetAttributeValueAsInt("bone");
+                bi[currInfl].influenceWeight = child2->GetAttributeValueAsFloat ("weight");
+                currInfl++;
+              }
+              break;
+            default:
+              synldr->ReportBadToken (child2);
+              return 0;
+            }
+          }
+        }
+        break;
       case XMLTOKEN_SUBMESH:
         {
           // Handle submesh

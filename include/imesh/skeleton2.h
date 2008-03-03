@@ -98,6 +98,22 @@ struct iSkeletonManager2 : public virtual iBase
 
 
   /**
+   * Register a named animation hierarchy
+   */
+  virtual void RegisterAnimationTree (iSkeletonAnimationNodeFactory2* node, const char* name) = 0;
+
+  /**
+   * Get an animation hierarchy by name
+   */
+  virtual iSkeletonAnimationNodeFactory2* FindAnimationTree (const char* name) = 0;
+
+  /**
+   * Remove all registered animation hierarchies
+   */
+  virtual void ClearAnimationTrees () = 0;
+
+
+  /**
    * Create a new skeletal animation factory
    */
   virtual csPtr<iSkeletonAnimationFactory2> CreateAnimationFactory () = 0;
@@ -283,6 +299,21 @@ struct iSkeleton2 : public virtual iBase
   virtual void SetTransformBindSpace (BoneID bone, const csQuaternion& rot, 
     const csVector3& offset) = 0;
   
+  /**
+   * Get the entire skeleton state (all transforms) in absolute space
+   */
+  virtual csPtr<csSkeletalState2> GetStateAbsSpace () = 0;
+
+  /**
+   * Get the entire skeleton state (all transforms) in bone space
+   */
+  virtual csPtr<csSkeletalState2> GetStateBoneSpace () = 0;
+
+  /**
+   * Get the entire skeleton state (all transforms) in bind space
+   */
+  virtual csPtr<csSkeletalState2> GetStateBindSpace () = 0;
+
   /** @} */
 
   /**
@@ -310,6 +341,8 @@ struct iSkeleton2 : public virtual iBase
    * Update the skeleton
    */
   virtual void UpdateSkeleton (float dt) = 0;
+
+
 };
 
 /**
@@ -476,7 +509,7 @@ struct iSkeletonAnimationFactory2 : public iSkeletonAnimationNodeFactory2
    * \param key key frame data
    */
   virtual void AddKeyFrame (ChannelID channel, float time, 
-    const csDualQuaternion& key) = 0;
+    const csQuaternion& rotation, const csVector3& offset) = 0;
   
   /**
    * Get total number of key frames in channel.
@@ -493,7 +526,7 @@ struct iSkeletonAnimationFactory2 : public iSkeletonAnimationNodeFactory2
    * \param key key frame data
    */
   virtual void GetKeyFrame (ChannelID channel, KeyFrameID keyframe, BoneID& bone,
-    float& time, csDualQuaternion& key) = 0;  
+    float& time, csQuaternion& rotation, csVector3& offset) = 0;  
 
   /**
    * Get the two key frames on "either side" of time.
@@ -506,8 +539,8 @@ struct iSkeletonAnimationFactory2 : public iSkeletonAnimationNodeFactory2
    * \param after key frame data after given time
    */
   virtual void GetTwoKeyFrames (ChannelID channel, float time, BoneID& bone,
-    float& timeBefore, csDualQuaternion& before, 
-    float& timeAfter, csDualQuaternion& after) = 0;
+    float& timeBefore, csQuaternion& beforeRot, csVector3& beforeOffset,
+    float& timeAfter, csQuaternion& afterRot, csVector3& afterOffset) = 0;
 
 };
 

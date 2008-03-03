@@ -41,16 +41,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual ChannelID FindChannel (BoneID bone) const;
 
     virtual void AddKeyFrame (ChannelID channel, float time, 
-      const csDualQuaternion& key);
+      const csQuaternion& rotation, const csVector3& offset);
 
     virtual size_t GetKeyFrameCount (ChannelID channel) const;
 
     virtual void GetKeyFrame (ChannelID channel, KeyFrameID keyframe, BoneID& bone,
-      float& time, csDualQuaternion& key);  
+      float& time, csQuaternion& rotation, csVector3& offset);  
 
     virtual void GetTwoKeyFrames (ChannelID channel, float time, BoneID& bone,
-      float& timeBefore, csDualQuaternion& beforeDQ, 
-      float& timeAfter, csDualQuaternion& afterDQ);
+      float& timeBefore, csQuaternion& beforeRot, csVector3& beforeOffset,
+      float& timeAfter, csQuaternion& afterRot, csVector3& afterOffset);
 
     //-- iSkeletonAnimationNodeFactory2
     virtual csPtr<iSkeletonAnimationNode2> CreateInstance (iSkeleton2*);
@@ -67,7 +67,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     struct KeyFrame
     {
       float time;
-      csDualQuaternion key;
+      csQuaternion rotation;
+      csVector3 offset;
     };
 
     static int KeyFrameCompare (KeyFrame const& k1, KeyFrame const& k2);

@@ -6,6 +6,15 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+3-Mar-2008
+	- Marten made a number of enhancements to skeleton2 and animesh:
+	   - Changed the animation interface so that data is handled
+	     as quaternion+vector instead of a dual quaternion.
+	   - Added methods to register an animation tree for later
+	     retrieval.
+	   - Added a loader for skeleton2 and animation hierarchies.
+	   - Added code to animesh to setup the SVs with bone transforms.
+	   - Added loading of bone/vertex influences.
 2-Mar-2008
 	- Marten changed the way render buffers are handled in animesh
 	  slightly. Removed SetVertexCount from API and <vertexcount>

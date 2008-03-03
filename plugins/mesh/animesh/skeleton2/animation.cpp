@@ -57,7 +57,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   }
 
   void AnimationFactory::AddKeyFrame (ChannelID channel, float time, 
-    const csDualQuaternion& key)
+    const csQuaternion& rotation, const csVector3& offset)
   {
     CS_ASSERT(channel < channels.GetSize ());
 
@@ -65,7 +65,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     
     KeyFrame k;
     k.time = time;
-    k.key = key;
+    k.rotation = rotation;
+    k.offset = offset;
 
     if (time > duration)
       duration = time;
@@ -81,7 +82,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   }
 
   void AnimationFactory::GetKeyFrame (ChannelID channel, KeyFrameID keyframe, BoneID& bone,
-    float& time, csDualQuaternion& key)
+    float& time, csQuaternion& rotation, csVector3& offset)
   {
     CS_ASSERT(channel < channels.GetSize ());
 
@@ -92,11 +93,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     const KeyFrame& k = ch->keyFrames[keyframe];
     bone = ch->bone;
     time = k.time;
-    key = k.key;
+    rotation = k.rotation;
+    offset = k.offset;
   }
 
   void AnimationFactory::GetTwoKeyFrames (ChannelID channel, float time, BoneID& bone,
-    float& timeBefore, csDualQuaternion& beforeDQ, float& timeAfter, csDualQuaternion& afterDQ)
+    float& timeBefore, csQuaternion& beforeRot, csVector3& beforeOffset,
+    float& timeAfter, csQuaternion& afterRot, csVector3& afterOffset)
   {
     CS_ASSERT(channel < channels.GetSize ());
 
@@ -125,9 +128,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     bone = ch->bone;
     timeBefore = k1.time;
-    beforeDQ = k1.key;
+    beforeRot = k1.rotation;
+    beforeOffset = k1.offset;
+
     timeAfter = k2.time;
-    afterDQ = k2.key;
+    afterRot = k2.rotation;
+    afterOffset = k2.offset;
   }
 
   csPtr<iSkeletonAnimationNode2> AnimationFactory::CreateInstance (iSkeleton2*)
@@ -180,8 +186,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
       // Blend together
       csDualQuaternion& dq = state->GetDualQuaternion (channel->bone);
-      dq += k1.key * (t * baseWeight);
-      dq += k2.key * ((1-t) * baseWeight);
+      const csDualQuaternion dq1 (k1.rotation, k1.offset);
+      const csDualQuaternion dq2 (k2.rotation, k2.offset);
+
+      dq += dq1 * (t * baseWeight);
+      dq += dq2 * ((1-t) * baseWeight);
 
       state->SetQuatUsed (channel->bone);
     }
