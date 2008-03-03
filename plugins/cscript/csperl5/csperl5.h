@@ -202,6 +202,8 @@ public:
 
   csPtr<iScriptValue> RValue (int v)
   { return csPtr<iScriptValue> (new Value (this, newSViv (v), false)); }
+  csPtr<iScriptValue> RValue (void* v)
+  { return csPtr<iScriptValue> (new Value (this, newSViv (INT2PTR(PTRV, v)), false)); }
   csPtr<iScriptValue> RValue (float v)
   { return csPtr<iScriptValue> (new Value (this, newSVnv (v), false)); }
   csPtr<iScriptValue> RValue (double v)

@@ -148,8 +148,8 @@ namespace
     {
       const AllocatedBlock& block = allocatedPointers[i];
       
-      fprintf (f, ">>> 0x%lx %lu\n", 
-        (unsigned long)block.address, (unsigned long)block.size);
+      fprintf (f, ">>> %p %lu\n", 
+        block.address, (unsigned long)block.size);
       block.stack->Print (f);
       fflush (f);
     }
@@ -178,7 +178,7 @@ namespace
 	  fclose (out);
 	}
       
-	fprintf (stderr, "Call stack @ 0x%lx:\n", (unsigned long)stack);
+	fprintf (stderr, "Call stack @ %p:\n", stack);
 	fflush (stderr);
 	stack->Print (stderr);
 	fflush (stderr);
@@ -367,8 +367,8 @@ namespace
       if (index == csArrayItemNotFound)
       {
         fprintf (stderr, 
-          "MALLOC ISSUE: pointer 0x%lx not allocated with ptmalloc_located\n",
-          (unsigned long)P);
+          "MALLOC ISSUE: pointer 0x%p not allocated with ptmalloc_located\n",
+          P);
         fflush (stderr);
       }
       else
@@ -461,8 +461,8 @@ namespace
       if (index == csArrayItemNotFound)
       {
         fprintf (stderr, 
-          "MALLOC ISSUE: pointer 0x%lx not allocated with ptmalloc_located\n",
-          (unsigned long)P);
+          "MALLOC ISSUE: pointer %p not allocated with ptmalloc_located\n",
+          P);
         fflush (stderr);
       }
       else
