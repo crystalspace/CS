@@ -122,7 +122,7 @@ void StdLoaderContext::StdLoaderContextCollection (iEngine* Engine,
   StdLoaderContext::collection = collection;
   StdLoaderContext::region = NULL;
   StdLoaderContext::searchCollectionOnly = searchCollectionOnly;
-  StdLoaderContext::curRegOnly = NULL;
+  StdLoaderContext::curRegOnly = false;
   StdLoaderContext::loader = loader;
   StdLoaderContext::checkDupes = checkDupes;
   StdLoaderContext::missingdata = missingdata;
@@ -1161,12 +1161,12 @@ void StdLoaderContext::StdLoaderContextRegion (iEngine* Engine,
   StdLoaderContext::Engine = Engine;
   StdLoaderContext::collection = NULL;
   StdLoaderContext::region = region;
-  StdLoaderContext::searchCollectionOnly = NULL;
+  StdLoaderContext::searchCollectionOnly = false;
   StdLoaderContext::curRegOnly = curRegOnly;
   StdLoaderContext::loader = loader;
   StdLoaderContext::checkDupes = checkDupes;
   StdLoaderContext::missingdata = missingdata;
-  StdLoaderContext::keepFlags = NULL;
+  StdLoaderContext::keepFlags = KEEP_ALL;
 }
 
 //---------------------------------------------------------------------------
