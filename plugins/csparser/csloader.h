@@ -606,6 +606,7 @@ public:
 
   virtual csPtr<iMeshFactoryWrapper> LoadMeshObjectFactory (const char* fname,
     iStreamSource* ssource);
+
   virtual csPtr<iMeshWrapper> LoadMeshObject (const char* fname,
     iStreamSource* ssource);
 
