@@ -36,6 +36,7 @@
 #include "cstool/unusedresourcehelper.h"
 #include "csutil/cscolor.h"
 #include "csutil/scfstr.h"
+#include "iengine/collection.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
 #include "iengine/region.h"
@@ -278,7 +279,85 @@ csPtr<iTextureHandle> csLoader::LoadTexture (const char *fname, int Flags,
   return csPtr<iTextureHandle> (TexHandle);
 }
 
-iTextureWrapper* csLoader::LoadTexture (const char *name,
+iTextureWrapper* csLoader::LoadTexture (const char *name, const char *fname, int Flags,
+                              iTextureManager *tm, bool reg, bool create_material, bool free_image,
+                              iBase* base, uint keepFlags)
+{
+  csRef<iRegion> region (scfQueryInterfaceSafe<iRegion>(base));
+  if(region)
+  {
+    return LoadTextureRegion(name, fname, Flags, tm, reg, create_material, free_image,
+                             region);
+  }
+  else
+  {
+    csRef<iCollection> collection (scfQueryInterfaceSafe<iCollection>(base));
+    return LoadTextureCollection(name, fname, Flags, tm, reg, create_material, free_image,
+                                 collection, keepFlags);
+  }
+}
+
+iTextureWrapper* csLoader::LoadTextureCollection (const char *name,
+	const char *fname, int Flags, iTextureManager *tm, bool reg,
+	bool create_material, bool free_image, iCollection* collection,
+  uint keepFlags)
+{
+  if (!Engine)
+    return 0;
+
+  csRef<iImage> img;
+  if (!tm && G3D) tm = G3D->GetTextureManager();
+  csRef<iTextureHandle> TexHandle = LoadTexture (fname, Flags, tm, &img);
+  if (!TexHandle)
+    return 0;
+
+  iTextureWrapper *TexWrapper =
+    Engine->GetTextureList ()->NewTexture(TexHandle);
+  TexWrapper->QueryObject ()->SetName (name);
+  TexWrapper->SetImageFile(img);
+  if(keepFlags == KEEP_ALL)
+  {
+    if(collection)
+    {
+      collection->Add(TexWrapper->QueryObject());
+    }
+    else
+    {
+      Engine->GetDefaultCollection()->Add(TexWrapper->QueryObject());
+    }
+  }
+
+  iMaterialWrapper* matwrap = 0;
+  if (create_material)
+  {
+    csRef<iMaterial> material (Engine->CreateBaseMaterial (TexWrapper));
+    matwrap = Engine->GetMaterialList ()->NewMaterial (material, name);
+    if(keepFlags == KEEP_ALL)
+    {
+      if(collection)
+      {
+        collection->Add(matwrap->QueryObject());
+      }
+      else
+      {
+        Engine->GetDefaultCollection()->Add(TexWrapper->QueryObject());
+      }
+    }
+  }
+
+  if (reg && tm)
+  {
+    // If we already have a texture handle then we don't register again.
+    if (!TexWrapper->GetTextureHandle ())
+      TexWrapper->Register (tm);
+    if (free_image)
+      TexWrapper->SetImageFile (0);
+  }
+
+  return TexWrapper;
+}
+
+iTextureWrapper* csLoader::LoadTextureRegion (const char *name,
 	const char *fname, int Flags, iTextureManager *tm, bool reg,
 	bool create_material, bool free_image, iRegion* region)
 {

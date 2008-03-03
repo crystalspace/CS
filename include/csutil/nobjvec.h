@@ -28,6 +28,7 @@
 
 #include "csextern.h"
 #include "csutil/refarr.h"
+#include "csutil/weakrefarr.h"
 #include "iutil/object.h"
 
 /**\file 
@@ -53,6 +54,46 @@ class csRefArrayObject : public csRefArray<T>
 public:
   csRefArrayObject (int ilimit = 0, int ithreshold = 0)
   	: csRefArray<T> (ilimit, ithreshold)
+  {
+  }
+
+  size_t GetIndexByName (const char* name) const
+  {
+    size_t i;
+    for (i = 0 ; i < this->GetSize () ; i++) // see *1*
+    {
+      T* o = (*this)[i];
+      const char* n = o->QueryObject ()->GetName ();
+      if (n && !strcmp (n, name))
+        return i;
+    }
+    return csArrayItemNotFound;
+  }
+
+  T* FindByName (const char* name) const
+  {
+    size_t i = GetIndexByName (name);
+    if (i != csArrayItemNotFound)
+      return (*this)[i];
+    else
+      return 0;
+  }
+};
+
+/** @} */
+
+/**
+ * This class implements a typed array that does not keep track
+ * of reference count and is able to find by name. Assumes
+ * the types used for this implement QueryObject() to get the iObject
+ * that has GetName().
+ */
+template <class T>
+class csWeakRefArrayObject : public csWeakRefArray<T>
+{
+public:
+  csWeakRefArrayObject (int ilimit = 0, int ithreshold = 0)
+  	: csWeakRefArray<T> (ilimit, ithreshold)
   {
   }
 
