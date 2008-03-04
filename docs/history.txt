@@ -44,6 +44,7 @@ chronological order.
 	- res added a helper method to set some assumed GL states. Useful for
 	  embedding.
 	- res added iRenderLoopManager::UnregisterAll().
+	- res fixed a hardcoded image unit count in gl3d.
 03-Mar-2008
 	- res fixed some pointer formatting with unsigned longs recently
 	  introduced.

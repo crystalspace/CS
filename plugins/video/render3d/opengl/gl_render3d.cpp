@@ -1252,7 +1252,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
   debug_inhibit_draw = false;
 
   int i = 0;
-  for (i = 15; i >= 0; i--)
+  for (i = numImageUnits; i-- > 0;)
     DeactivateTexture (i);
 
   // if 2D graphics is not locked, lock it
