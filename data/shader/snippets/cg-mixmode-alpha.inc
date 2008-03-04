@@ -18,21 +18,33 @@
 -->
 <include>
 
-<?CgUseShared primaryColor ?>
-<?CgUseShared primaryColorV2F?>
 
 <?Template MixmodeAlpha_Code?>
 #ifndef __CS_CG_MIXMODE_ALPHA_INC__
 #define __CS_CG_MIXMODE_ALPHA_INC__
 
+struct Frag_MixmodeAlpha
+{
+  uniform float alpha;
+};
+Frag_MixmodeAlpha mixmodeAlphaFrag;
+
 float GetMixmodeAlpha()
 {
-  return primaryColor.a;
+  return mixmodeAlphaFrag.alpha;
 }
 
 #endif // __CS_CG_MIXMODE_ALPHA_INC__
 <?Endtemplate?>
 
 <?CgAddSnippet MixmodeAlpha_Code?>
+
+<?BeginGlue MixmodeAlpha?>
+  <?Template VariableMap_MixmodeAlpha ?>
+    <variablemap variable="mixmode alpha" 
+      destination="mixmodeAlphaFrag.alpha" />
+  <?Endtemplate?>
+  <?AddToList ProgramMappings VariableMap_MixmodeAlpha ?>
+<?EndGlue?>
 
 </include>

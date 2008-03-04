@@ -29,6 +29,7 @@
 #include "csgeom/csrect.h"
 #include "csgeom/math.h"
 #include "csplugincommon/canvas/scrshot.h"
+#include "csplugincommon/opengl/assumedstate.h"
 #include "csplugincommon/opengl/glcommon2d.h"
 #include "csplugincommon/opengl/glstates.h"
 #include "csutil/xmltiny.h"
@@ -77,10 +78,6 @@ bool csGraphics2DGLCommon::Initialize (iObjectRegistry *object_reg)
 
   ext.Initialize (object_reg, this);
 
-  statecache = new csGLStateCache (&ext);
-  statecontext = new csGLStateCacheContext (&ext);
-  statecache->SetContext (statecontext);
-
   multiFavorQuality = config->GetBool ("Video.OpenGL.MultisampleFavorQuality");
 
   return true;
@@ -90,7 +87,6 @@ csGraphics2DGLCommon::~csGraphics2DGLCommon ()
 {
   Close ();
   
-  delete statecache;
   delete[] screen_shot;
 
   while (ssPool)
@@ -105,10 +101,13 @@ bool csGraphics2DGLCommon::Open ()
 {
   if (is_open) return true;
 
-  statecontext->InitCache();
-
   ext.Open ();
   OpenDriverDB ();
+
+  statecache = new csGLStateCache (&ext);
+  statecontext = new csGLStateCacheContext (&ext);
+  statecache->SetContext (statecontext);
+  statecontext->InitCache();
 
   // initialize font cache object
   csGLFontCache* GLFontCache = new csGLFontCache (this);
@@ -228,8 +227,8 @@ bool csGraphics2DGLCommon::Open ()
 
   GLFontCache->Setup();
 
+  CS::PluginCommon::GL::SetAssumedState (statecache);
   glClearColor (0., 0., 0., 0.);
-  glClearDepth (-1.0);
 
   statecache->SetMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
@@ -243,6 +242,8 @@ bool csGraphics2DGLCommon::Open ()
 void csGraphics2DGLCommon::Close ()
 {
   if (!is_open) return;
+  delete statecontext; statecontext = 0;
+  delete statecache; statecache = 0;
   ext.Close ();
   driverdb.Close ();
   csGraphics2D::Close ();

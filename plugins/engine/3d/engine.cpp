@@ -3358,7 +3358,7 @@ void EngineLoaderContext::InitRegion(iRegion* region, bool curRegOnly)
   EngineLoaderContext::region = region;
   EngineLoaderContext::curRegOnly = curRegOnly;
   EngineLoaderContext::collection = NULL;  
-  EngineLoaderContext::searchCollectionOnly = NULL; 
+  EngineLoaderContext::searchCollectionOnly = false; 
 }
 
 void EngineLoaderContext::InitCollection(iCollection *collection, bool searchCollectionOnly)
@@ -3366,7 +3366,7 @@ void EngineLoaderContext::InitCollection(iCollection *collection, bool searchCol
   EngineLoaderContext::collection = collection;
   EngineLoaderContext::searchCollectionOnly = searchCollectionOnly;
   EngineLoaderContext::region = NULL;
-  EngineLoaderContext::curRegOnly = NULL;
+  EngineLoaderContext::curRegOnly = false;
 }
 
 EngineLoaderContext::~EngineLoaderContext ()
@@ -3461,7 +3461,8 @@ iTextureWrapper* EngineLoaderContext::FindNamedTexture (const char* name,
 
 iShader* EngineLoaderContext::FindShader (const char* name)
 {
-  if((!curRegOnly || !region) && (!searchCollectionOnly || !collection))
+  if(((!curRegOnly || !region) && (!searchCollectionOnly || !collection))
+    || (name && *name == '*')) // Always look up builtin shaders globally
     return Engine->shaderManager->GetShader (name);
 
   const csRefArray<iShader>& shaders = 

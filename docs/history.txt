@@ -6,6 +6,58 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+04-Mar-2008
+        - Piotr did few behavior fixes for ode joints (attaching bodies
+          in the right time and added better way of checking if amotor is 
+          necessary).
+	- caedes added support for CS_REQUEST_PLUGIN_TAG to python bindings.
+	- res made the following changes to csRedBlackTree:
+	    - Copied Iterators from RM branch.
+	    - Made it possible to insert multiple keys with the same value.
+	    - Key copying is now done by an assignment, not in-place
+	      construction.
+	    - Added methods to find the smallest key greater or equal to some
+	      other key.
+	    - Added deletion of key pointed to by an iterator.
+	- res changed GenericResourceCache to use "stock" csList<> and
+	  csRedBlackTree<> instead of a customized variant. While possibly
+	  slightly slower it seems to be more stable and reliable.
+	- res added Alloc() overloads to csBlockAllocator<> for more
+	  constructor arguments.
+	- res added a method to csList<> to remove a specified item.
+	- res changed gl3d to signal a "frame advancement" to the r2t backend
+	  upon a frame event (which is really sent once a frame) instead of
+	  in Print() (which can actually be called many times a frame).
+	- res changed the way the collection vs regions variants in the iLoader
+	  interface are distinguished: instead of Load* methods (which takes
+	  an iBase* and distinguishes via QI), Load*Region and Load*Collection
+	  methods (taking iRegion* and iCollection*) methods only have
+	  overloaded Load* methods, taking an iRegion* and iCollection*:
+	  there's no need to distinguish dynamically if there are ever only
+	  two choices, it's less overhead and removes an ambiguity with the
+	  backwards compatibility Load() methods.
+	- res added a hack to the iLoader interface to keep source
+	  compatibility with code that used to pass '0' for regions.
+	- res fixed an int cast in the Perl bindings.
+	- res added determination of the number of texture coordinate sets
+	  to the GL state cache.
+	- res added a helper method to set some assumed GL states. Useful for
+	  embedding.
+	- res added iRenderLoopManager::UnregisterAll().
+	- res fixed a hardcoded image unit count in gl3d.
+	- Sueastside fixed a crash in csloader.
+	- res changed iLoaderContext::FindShader() implementations to always
+	  search for builtin shaders (names starting with '*') globally: this
+	  makes it possible to use these shaders with "collection only"
+	  loading even though they have not been manually added to the
+	  used collection.
+	- Mike Gist reverted functionality breakage in AddToRegionOrCollection
+	  added in r28882. We don't want to always store everything in a region
+	  or collection (e.g. when KEEP_USED is set).
+	- res changed how mixmode alpha is passed around: instead of implicitly
+	  by the renderer through the vertex color it's now passed through a
+	  shader var ("mixmode alpha") and it's the responsibility of the
+	  shader to make use of that information.
 03-Mar-2008
 	- res fixed some pointer formatting with unsigned longs recently
 	  introduced.
@@ -159,6 +211,10 @@ chronological order.
 	  conditions.
 	- Sueastside added 'portals' loading to iLoader::Load().
 	- Sueastside reverted r2706 and reapplied only the 'operandOperation's.
+	- res changed the OpenGL state cache to be constructed when the canvas
+	  is opened, not created. This is now necessary as the state cache
+	  does some ext initialization on its own, which is only possible after
+	  the canvas opened and the ext manager is set up.
 13-Feb-2008
 	- varslot added a rule to work around known issue with texture
 	  compression and Intel graphics card under OSX.
@@ -182,6 +238,9 @@ chronological order.
 	  '--help' besides crystalspace options.
 	- res fixed setting of the '0' render target in soft3d when no render
 	  target is set.
+	- res removed the hardcoded layer number from the GL state cache.
+	  Instead, layer-specific data is stored in dynamically allocated
+	  arrays, sized to the actuall number of texture resp. image units.
 12-Feb-2008
 	- caedes fixed python override of Graphics2D::PerformExtension to
 	  allow command passthrough to the real c++ PerformExtension.

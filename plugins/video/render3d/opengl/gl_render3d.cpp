@@ -104,11 +104,6 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent) :
   broken_stencil = false;
 
   unsigned int i;
-  for (i=0; i<16; i++)
-  {
-    texunittarget[i] = 0;
-    texunitenabled[i] = false;
-  }
   for (i = 0; i < CS_VATTRIB_SPECIFIC_LAST+1; i++)
   {
     scrapMapping[i] = CS_BUFFER_NONE;
@@ -129,8 +124,6 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent) :
   cliptype = CS_CLIPPER_NONE;
 
   r2tbackend = 0;
-
-  memset (npotsStatus, 0, sizeof (npotsStatus));
 }
 
 csGLGraphics3D::~csGLGraphics3D()
@@ -954,14 +947,20 @@ bool csGLGraphics3D::Open ()
 
   statecache->SetStencilMask (stencil_shadow_mask);
 
+  numImageUnits = statecache->GetNumImageUnits();
+  numTCUnits = statecache->GetNumTexCoords();
+  imageUnits = new ImageUnit[numImageUnits];
+  if (verbose)
+    Report (CS_REPORTER_SEVERITY_NOTIFY, 
+      "Available texture image units: %d texture coordinate units: %d",
+      numImageUnits, numTCUnits);
+
   // Set up texture LOD bias.
   if (ext->CS_GL_EXT_texture_lod_bias)
   {
     if (ext->CS_GL_ARB_multitexture)
     {
-      GLint texUnits;
-      glGetIntegerv (GL_MAX_TEXTURE_UNITS_ARB, &texUnits);
-      for (int u = texUnits - 1; u >= 0; u--)
+      for (int u = numImageUnits - 1; u >= 0; u--)
       {
         statecache->SetCurrentTU (u);
         statecache->ActivateTU (csGLStateCache::activateTexEnv);
@@ -1174,6 +1173,7 @@ void csGLGraphics3D::Close ()
 
   if (G2D)
     G2D->Close ();
+  statecache = 0;
 }
 
 bool csGLGraphics3D::SetRenderTarget (iTextureHandle* handle, bool persistent,
@@ -1252,7 +1252,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
   debug_inhibit_draw = false;
 
   int i = 0;
-  for (i = 15; i >= 0; i--)
+  for (i = numImageUnits; i-- > 0;)
     DeactivateTexture (i);
 
   // if 2D graphics is not locked, lock it
@@ -1285,7 +1285,6 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
       	| GL_COLOR_BUFFER_BIT;
     else
       clearMask = GL_DEPTH_BUFFER_BIT | stencilFlag;
-    glClearDepth (0.0); // @@@ Never really changes 
   }
   else if (drawflags & CSDRAW_CLEARSCREEN)
     clearMask = GL_COLOR_BUFFER_BIT;
@@ -1307,6 +1306,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
   if (drawflags & CSDRAW_3DGRAPHICS)
   {
     needProjectionUpdate = true;
+    glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
 
 //    object2camera.Identity ();
     //@@@ TODO FIX
@@ -1398,8 +1398,6 @@ void csGLGraphics3D::Print (csRect const* area)
     SwapIfNeeded();
   }
   G2D->Print (area);
-
-  r2tbackend->NextFrame();
 }
 
 void csGLGraphics3D::DrawLine (const csVector3 & v1, const csVector3 & v2,
@@ -1510,7 +1508,7 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
       statecache->Disable_GL_SECONDARY_COLOR_ARRAY_EXT ();
     if (ext->CS_GL_ARB_multitexture)
     {
-      for (i = CS_GL_MAX_LAYER; i-- > 0;)
+      for (i = numTCUnits; i-- > 0;)
       {
         statecache->SetCurrentTU (i);
         statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
@@ -1530,10 +1528,10 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
       if (b) RenderRelease (b);// b->RenderRelease ();
       if (i >= CS_VATTRIB_TEXCOORD0 && i <= CS_VATTRIB_TEXCOORD7)
       {
-        if (npotsStatus[i-CS_VATTRIB_TEXCOORD0])
+	if (imageUnits[i-CS_VATTRIB_TEXCOORD0].npotsStatus)
         {
           npotsFixupScrap.Push (b);
-          npotsStatus[i-CS_VATTRIB_TEXCOORD0] = false;
+	  imageUnits[i-CS_VATTRIB_TEXCOORD0].npotsStatus = false;
         }
       }
       spec_renderBuffers[i] = 0;
@@ -1602,9 +1600,9 @@ bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
   texunittarget[unit] = gltxthandle->target;*/
   bool doNPOTS = (gltxthandle->texType == iTextureHandle::texTypeRect);
   if (doNPOTS && (unit < 8))
-    needNPOTSfixup[unit] = gltxthandle;
+    imageUnits[unit].needNPOTSfixup = gltxthandle;
   else
-    needNPOTSfixup[unit] = 0;
+    imageUnits[unit].needNPOTSfixup = 0;
   return true;
 }
 
@@ -1641,9 +1639,9 @@ void csGLGraphics3D::DeactivateTexture (int unit)
   statecache->Disable_GL_TEXTURE_3D ();
   statecache->Disable_GL_TEXTURE_CUBE_MAP ();
   statecache->Disable_GL_TEXTURE_RECTANGLE_ARB ();
-  needNPOTSfixup[unit] = 0;
+  imageUnits[unit].needNPOTSfixup = 0;
 
-  texunitenabled[unit] = false;
+  imageUnits[unit].enabled = false;
 }
 
 void csGLGraphics3D::SetTextureState (int* units, iTextureHandle** textures,
@@ -1918,10 +1916,6 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       }*/
     }
 
-    float alpha = 1.0f;
-    if (mixmode & CS_FX_MASK_ALPHA)
-      alpha = 1.0f - (float)(mixmode & CS_FX_MASK_ALPHA) / 255.0f;
-    glColor4f (1.0f, 1.0f, 1.0f, alpha);
     glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
       (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
       compType, 
@@ -2294,16 +2288,16 @@ void csGLGraphics3D::ApplyBufferChanges()
         if (att >= CS_VATTRIB_TEXCOORD0 && att <= CS_VATTRIB_TEXCOORD7)
         {
           unsigned int unit = att - CS_VATTRIB_TEXCOORD0;
-          if (npotsStatus[unit])
+	  if (imageUnits[unit].needNPOTSfixup)
           {
             npotsFixupScrap.Push (spec_renderBuffers[att-CS_VATTRIB_SPECIFIC_FIRST]);
             AssignSpecBuffer (att-CS_VATTRIB_SPECIFIC_FIRST, 0);
-            npotsStatus[unit] = false;
+	    imageUnits[unit].npotsStatus = false;
           }
-          if (needNPOTSfixup[unit].IsValid())
+          if (imageUnits[unit].needNPOTSfixup.IsValid())
           {
             buffer = bufferRef = DoNPOTSFixup (buffer, unit);
-            npotsStatus[unit] = true;
+	    imageUnits[unit].npotsStatus = true;
           }
         }
         AssignSpecBuffer (att-CS_VATTRIB_SPECIFIC_FIRST, buffer);
@@ -2397,10 +2391,10 @@ void csGLGraphics3D::ApplyBufferChanges()
             statecache->SetCurrentTU (unit);
           }
           statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
-          if (npotsStatus[unit])
+	  if (imageUnits[unit].npotsStatus)
           {
             npotsFixupScrap.Push (spec_renderBuffers[att - CS_VATTRIB_SPECIFIC_FIRST]);
-            npotsStatus[unit] = false;
+	    imageUnits[unit].npotsStatus = false;
           }
         }
         else if (CS_VATTRIB_IS_GENERIC(att))
@@ -2473,8 +2467,8 @@ csRef<iRenderBuffer> csGLGraphics3D::DoNPOTSFixup (iRenderBuffer* buffer, int un
   }
 
   const int componentScale[] = {
-    needNPOTSfixup[unit]->actual_width, 
-    needNPOTSfixup[unit]->actual_height,
+    imageUnits[unit].needNPOTSfixup->actual_width, 
+    imageUnits[unit].needNPOTSfixup->actual_height,
     1, 1};
 
   switch (scrapBuf->GetComponentType())
@@ -3472,11 +3466,12 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
 
   SystemOpen = csevSystemOpen(object_reg);
   SystemClose = csevSystemClose(object_reg);
+  Frame = csevFrame(object_reg);
 
   csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
   if (q)
   {
-    csEventID events[] = { SystemOpen, SystemClose, 
+    csEventID events[] = { SystemOpen, SystemClose, Frame,
 			    CS_EVENTLIST_END };
     q->RegisterListener (scfiEventHandler, events);
   }
@@ -3557,6 +3552,10 @@ bool csGLGraphics3D::HandleEvent (iEvent& Event)
     asp_center_x = w/2;
     asp_center_y = h/2;
     return true;
+  }
+  else if (Event.Name == Frame)
+  {
+    r2tbackend->NextFrame();
   }
   return false;
 }

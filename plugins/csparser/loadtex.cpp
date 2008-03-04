@@ -279,25 +279,7 @@ csPtr<iTextureHandle> csLoader::LoadTexture (const char *fname, int Flags,
   return csPtr<iTextureHandle> (TexHandle);
 }
 
-iTextureWrapper* csLoader::LoadTexture (const char *name, const char *fname, int Flags,
-                              iTextureManager *tm, bool reg, bool create_material, bool free_image,
-                              iBase* base, uint keepFlags)
-{
-  csRef<iRegion> region (scfQueryInterfaceSafe<iRegion>(base));
-  if(region)
-  {
-    return LoadTextureRegion(name, fname, Flags, tm, reg, create_material, free_image,
-                             region);
-  }
-  else
-  {
-    csRef<iCollection> collection (scfQueryInterfaceSafe<iCollection>(base));
-    return LoadTextureCollection(name, fname, Flags, tm, reg, create_material, free_image,
-                                 collection, keepFlags);
-  }
-}
-
-iTextureWrapper* csLoader::LoadTextureCollection (const char *name,
+iTextureWrapper* csLoader::LoadTexture (const char *name,
 	const char *fname, int Flags, iTextureManager *tm, bool reg,
 	bool create_material, bool free_image, iCollection* collection,
   uint keepFlags)
@@ -357,7 +339,7 @@ iTextureWrapper* csLoader::LoadTextureCollection (const char *name,
   return TexWrapper;
 }
 
-iTextureWrapper* csLoader::LoadTextureRegion (const char *name,
+iTextureWrapper* csLoader::LoadTexture (const char *name,
 	const char *fname, int Flags, iTextureManager *tm, bool reg,
 	bool create_material, bool free_image, iRegion* region)
 {

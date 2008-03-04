@@ -117,10 +117,6 @@ public:
  *   has a default (zero-argument) constructor. Alloc() uses this constructor
  *   to initialize each vended object.
  *
- * \remarks Defining the macro CS_BLOCKALLOC_DEBUG will cause freed objects to
- *   be overwritten with '0xfb' bytes. This can be useful to track use of
- *   already freed objects, as they can be more easily recognized (as some
- *   members will be likely bogus.)
  * \sa csArray
  * \sa csMemoryPool
  */
@@ -191,6 +187,26 @@ public:
   T* Alloc ()
   {
     return new (superclass::Alloc()) T;
+  }
+
+  /**
+   * Allocate a new object. 
+   * The two-argument constructor of \a T is invoked. 
+   */
+  template<typename A1, typename A2>
+  T* Alloc (A1& a1, A2& a2)
+  {
+    return new (superclass::Alloc()) T (a1, a2);
+  }
+
+  /**
+   * Allocate a new object. 
+   * The three-argument constructor of \a T is invoked. 
+   */
+  template<typename A1, typename A2, typename A3>
+  T* Alloc (A1& a1, A2& a2, A3& a3)
+  {
+    return new (superclass::Alloc()) T (a1, a2, a3);
   }
 
   /**
