@@ -95,6 +95,9 @@ public:
   size_t AddNode (float weight, csRef<iMixingNode> node);
   void SetWeight (size_t i, float weight);
   bool IsActive () const;
+  size_t FindNode (csRef<iMixingNode> node) const;
+  size_t GetNodeCount () const;
+  float GetWeight (size_t i) const;
 protected:
   void CalculateFramesAndChannels (csArray<Frame> &nodes_frames, csArray<size_t> &channel_ids);
   csArray<float> blend_weights;
@@ -113,6 +116,9 @@ public:
   size_t AddNode (float weight, csRef<iMixingNode> node);
   void SetWeight (size_t i, float weight);
   bool IsActive () const;
+  size_t FindNode (csRef<iMixingNode> node) const;
+  size_t GetNodeCount () const;
+  float GetWeight (size_t i) const;
 };
 
 class AccumulateNode
@@ -126,6 +132,9 @@ public:
 
   void Tick (float amount);
   bool IsActive () const;
+  size_t FindNode (csRef<iMixingNode> node) const;
+  size_t GetNodeCount () const;
+  float GetWeight (size_t i) const;
 };
 
 class AnimationLayer

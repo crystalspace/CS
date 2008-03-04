@@ -255,6 +255,25 @@ bool MixingBase::IsActive () const
 {
   return true;    // always active
 }
+size_t MixingBase::FindNode (csRef<iMixingNode> node) const
+{
+  for (size_t i = 0; i < nodes.GetSize (); i++)
+  {
+    if (nodes.Get (i) == node)
+      return i;
+  }
+  return UINT_MAX;
+}
+size_t MixingBase::GetNodeCount () const
+{
+  return nodes.GetSize ();
+}
+float MixingBase::GetWeight (size_t i) const
+{
+  if (i >= blend_weights.GetSize ())
+    return -1;
+  return blend_weights.Get (i);
+}
 
 BlendNode::BlendNode () : scfImplementationType (this)
 {
@@ -301,6 +320,18 @@ void BlendNode::SetWeight (size_t i, float weight)
 bool BlendNode::IsActive () const
 {
   return MixingBase::IsActive ();
+}
+size_t BlendNode::FindNode (csRef<iMixingNode> node) const
+{
+  return MixingBase::FindNode (node);
+}
+size_t BlendNode::GetNodeCount () const
+{
+  return MixingBase::GetNodeCount ();
+}
+float BlendNode::GetWeight (size_t i) const
+{
+  return MixingBase::GetWeight (i);
 }
 
 AccumulateNode::AccumulateNode () : scfImplementationType (this)
@@ -364,6 +395,18 @@ void AccumulateNode::Tick (float amount)
 bool AccumulateNode::IsActive () const
 {
   return MixingBase::IsActive ();
+}
+size_t AccumulateNode::FindNode (csRef<iMixingNode> node) const
+{
+  return MixingBase::FindNode (node);
+}
+size_t AccumulateNode::GetNodeCount () const
+{
+  return MixingBase::GetNodeCount ();
+}
+float AccumulateNode::GetWeight (size_t i) const
+{
+  return MixingBase::GetWeight (i);
 }
 
 AnimationLayer::AnimationLayer () : scfImplementationType (this)

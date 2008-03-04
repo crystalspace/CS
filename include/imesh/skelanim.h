@@ -87,6 +87,9 @@ struct iBlendNode : public virtual iMixingNode
   virtual void ReadChannels (Frame &frame) = 0;
   virtual size_t AddNode (float weight, csRef<iMixingNode> node) = 0;
   virtual void SetWeight (size_t i, float weight) = 0;
+  virtual size_t FindNode (csRef<iMixingNode> node) const = 0;
+  virtual size_t GetNodeCount () const = 0;
+  virtual float GetWeight (size_t i) const = 0;
 };
 struct iAccumulateNode : public virtual iMixingNode
 {
@@ -95,6 +98,9 @@ struct iAccumulateNode : public virtual iMixingNode
   virtual void ReadChannels (Frame &frame) = 0;
   virtual size_t AddNode (float weight, csRef<iMixingNode> node) = 0;
   virtual void SetWeight (size_t i, float weight) = 0;
+  virtual size_t FindNode (csRef<iMixingNode> node) const = 0;
+  virtual size_t GetNodeCount () const = 0;
+  virtual float GetWeight (size_t i) const = 0;
 };
 
 struct iAnimationLayer : public virtual iBase
