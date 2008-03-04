@@ -295,7 +295,7 @@ namespace CS
 	  RBTraverser (csBlockAllocator<Element>& elementAlloc) :
 	    elementAlloc (elementAlloc) {}
 	  
-	  void operator() (Element* el)
+	  void Process (Element* el)
 	  {
 	    elementAlloc.Free (el);
 	  }
@@ -360,7 +360,7 @@ namespace CS
 	SearchDataTraverser (T* entry, Element*& ret) 
 	  : entry (entry), ret (ret) {}
 	
-        bool operator() (Element* el)
+        bool Process (Element* el)
 	{
 	  if (&(el->data) == entry)
 	  {
@@ -430,30 +430,6 @@ namespace CS
 	  clearReq = true;
       }
       
-    protected:
-      class PurgeTraverser
-      {
-	csArray<ElementWrapper>& purgeList;
-	PurgeCondition& purgeCnd;
-	GenericResourceCache& cache;
-	
-      public:
-	PurgeTraverser (csArray<ElementWrapper>& purgeList,
-			PurgeCondition& purgeCnd,
-			GenericResourceCache& cache) 
-	  : purgeList (purgeList), purgeCnd (purgeCnd), cache (cache) {}
-      
-	void operator() (ElementWrapper el)
-	{
-	  if (purgeCnd.IsPurgeable (cache, el->GetPurgeAuxiliary(),
-	      el->data))
-	  {
-	    purgeList.Push (el);
-	  }
-	}
-      };
-    
-    public:
       /**
        * Advance the time kept by the cache. Determines what resources
        * can be reused or even freed.
