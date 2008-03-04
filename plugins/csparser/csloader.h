@@ -42,7 +42,6 @@
 #include "iutil/plugin.h"
 #include "ivaria/engseq.h"
 #include "ivideo/graph3d.h"
-#include "ivideo/shader/shader.h"
 
 #include "proxyimage.h"
 
@@ -51,7 +50,7 @@ class csColor;
 struct csRGBcolor;
 
 struct iImageIO;
-struct iRegion;
+struct iCollection;
 struct iObjectModel;
 struct iSndSysLoader;
 struct iSndSysManager;
@@ -104,15 +103,23 @@ class StdLoaderContext : public scfImplementation1<StdLoaderContext,
 {
 private:
   iEngine* Engine;
-  iRegion* region;
+  iCollection* collection;
+  bool searchCollectionOnly;
   csLoader* loader;
   csRef<iMissingLoaderData> missingdata;
   bool checkDupes;
+  uint keepFlags;
+
+  iRegion* region;
   bool curRegOnly;
 
 public:
-  StdLoaderContext (iEngine* Engine, iRegion* region, bool curRegOnly,
+  StdLoaderContext(iEngine* Engine, iBase* base, bool colRegOnly,
+    csLoader* loader, bool checkDupes, iMissingLoaderData* missingdata, uint keepFlags = 0);
+  void StdLoaderContextRegion(iEngine* Engine, iRegion* region, bool curRegOnly,
     csLoader* loader, bool checkDupes, iMissingLoaderData* missingdata);
+  void StdLoaderContextCollection(iEngine* Engine, iCollection* collection, bool searchCollectionOnly,
+    csLoader* loader, bool checkDupes, iMissingLoaderData* missingdata, uint keepFlags);
   virtual ~StdLoaderContext ();
 
   virtual iSector* FindSector (const char* name);
@@ -129,66 +136,12 @@ public:
   virtual bool CheckDupes () const { return checkDupes; }
   virtual iRegion* GetRegion () const { return region; }
   virtual bool CurrentRegionOnly () const { return curRegOnly; }
+  virtual iCollection* GetCollection() const { return collection; }
+  virtual bool CurrentCollectionOnly() const { return searchCollectionOnly; }
+  virtual uint GetKeepFlags() const { return keepFlags; }
 };
 
-/*
- * Context class for the threaded loader.
- */
-class ThreadedLoaderContext :
-  public scfImplementation1<ThreadedLoaderContext, iLoaderContext>
-{
-private:
-  iEngine* Engine;
-  iRegion* region;
-  csLoader* loader;
-  bool checkDupes;
-  bool curRegOnly;
-  csRefArray<iSector> sectors;
-  csRefArray<iMaterialWrapper> materials;
-  csRefArray<iTextureWrapper> textures;
-  csRefArray<iMeshFactoryWrapper> factories;
-  csRefArray<iMeshWrapper> meshes;
-  csRefArray<iLight> lights;
 
-public:
-  ThreadedLoaderContext (iEngine* Engine, iRegion* region, bool curRegOnly,
-    csLoader* loader, bool checkDupes);
-  virtual ~ThreadedLoaderContext ();
-
-  virtual iSector* FindSector (const char* name);
-  virtual iMaterialWrapper* FindMaterial (const char* name);
-  virtual iMaterialWrapper* FindNamedMaterial (const char* name,
-  	const char *filename);
-  virtual iMeshFactoryWrapper* FindMeshFactory (const char* name);
-  virtual iMeshWrapper* FindMeshObject (const char* name);
-  virtual iTextureWrapper* FindTexture (const char* name);
-  virtual iTextureWrapper* FindNamedTexture (const char* name,
-  	const char *filename);
-  virtual iLight* FindLight (const char *name);
-  virtual iShader* FindShader (const char *name);
-  virtual bool CheckDupes () const { return checkDupes; }
-  virtual iRegion* GetRegion () const { return region; }
-  virtual bool CurrentRegionOnly () const { return curRegOnly; }
-};
-
-/**
- * Status class for the threaded loader.
- */
-class csLoaderStatus :
-  public scfImplementation1<csLoaderStatus, iLoaderStatus>
-{
-private:
-  //csRef<csMutex> mutex;
-  bool ready;
-  bool error;
-
-public:
-  csLoaderStatus ();
-  virtual ~csLoaderStatus ();
-
-  virtual bool IsReady () { return ready; }
-  virtual bool IsError () { return error; }
-};
 
 #include "csutil/deprecated_warn_off.h"
 
@@ -200,7 +153,6 @@ class csLoader : public scfImplementation2<csLoader,
                                            iComponent>
 {
   friend class StdLoaderContext;
-  friend class ThreadedLoaderContext;
 private:
   csStringHash xmltokens;
 #define CS_TOKEN_ITEM_FILE "plugins/csparser/csloader.tok"
@@ -213,7 +165,6 @@ private:
   csRef<iEngineSequenceManager> eseqmgr;
   /// Shared string set
   csRef<iStringSet> stringSet;
-  csRef<iShaderVarStringSet> stringSetSvName;
 
   /// Pointer to built-in image texture loader.
   csRef<iLoaderPlugin> BuiltinImageTexLoader;
@@ -351,8 +302,7 @@ private:
 	iEngineSequenceParameters* base_params);
 
   /// Parse a list of textures and add them to the engine.
-  bool ParseTextureList (iLoaderContext* ldr_context, iDocumentNode* node,
-  	bool useProxyTextures);
+  bool ParseTextureList (iLoaderContext* ldr_context, iDocumentNode* node);
   /**
    * Parse a list of materials and add them to the engine. If a prefix is
    * given, all material names will be prefixed with the corresponding string.
@@ -368,7 +318,7 @@ private:
 
   /// Parse a texture definition and add the texture to the engine
   iTextureWrapper* ParseTexture (iLoaderContext* ldr_context,
-  	iDocumentNode* node, bool useProxyTextures);
+  	iDocumentNode* node);
 
   /// Parse a Cubemap texture definition and add the texture to the engine
   iTextureWrapper* ParseCubemap (iLoaderContext* ldr_context,
@@ -518,12 +468,11 @@ private:
    */
   bool LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* node,
   	iStreamSource* ssource, iMissingLoaderData* missingdata,
-	bool loadProxyTex = true, bool useProxyTextures = false);
+	bool loadProxyTex = true);
 
   /// Load map from a memory buffer
   bool LoadMap (iLoaderContext* ldr_context, iDocumentNode* world_node,
-  	iStreamSource* ssource, iMissingLoaderData* missingdata, 
-	bool useProxyTextures = false);
+  	iStreamSource* ssource, iMissingLoaderData* missingdata);
 
   /// Get the engine sequence manager (load it if not already present).
   iEngineSequenceManager* GetEngineSequenceManager ();
@@ -563,7 +512,8 @@ private:
    * Add the given object to the region in the context (if there is
    * such a region).
    */
-  void AddToRegion (iLoaderContext* ldr_context, iObject* obj);
+  void AddToRegionOrCollection (iLoaderContext* ldr_context, iObject* obj,
+                                bool alwaysKeep = false);
 
   /**
    * Add children to the region.
@@ -630,118 +580,227 @@ public:
   // initialize the plug-in
   virtual bool Initialize(iObjectRegistry *object_reg);
 
-  virtual csPtr<iImage> LoadImage (iDataBuffer* buf, int Format);
-  virtual csPtr<iTextureHandle> LoadTexture (iDataBuffer* buf,
-	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
-	csRef<iImage>* img=0);
-  virtual iTextureWrapper* LoadTexture (const char *name,
-  	iDataBuffer* buf,
-	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
-	bool reg = true, bool create_material = true,
-	bool free_image = true);
+  /////////////////////////// Generic ///////////////////////////
 
+  virtual csPtr<iImage> LoadImage (iDataBuffer* buf, int Format);
   virtual csPtr<iImage> LoadImage (const char *fname, int Format);
+
+  virtual csPtr<iTextureHandle> LoadTexture (iDataBuffer* buf,
+      int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
+      csRef<iImage>* img=0);
+
+  virtual iTextureWrapper* LoadTexture (const char *name, iDataBuffer* buf,
+      int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0, bool reg = true,
+      bool create_material = true, bool free_image = true);
+
   virtual csPtr<iTextureHandle> LoadTexture (const char* fname,
-	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
-	csRef<iImage>* img=0);
-  virtual iTextureWrapper* LoadTexture (const char *name,
-  	const char *fname,
-	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
-	bool reg = true, bool create_material = true,
-	bool free_image = true, iRegion* region = 0);
+    int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
+    csRef<iImage>* img=0);
 
   virtual csPtr<iSndSysData> LoadSoundSysData (const char *fname);
-  virtual csPtr<iSndSysStream> LoadSoundStream (const char *fname,
-  	int mode3d);
-  virtual iSndSysWrapper* LoadSoundWrapper (const char *name,
-  	const char *fname);
+  virtual csPtr<iSndSysStream> LoadSoundStream (const char *fname, int mode3d);
+  virtual iSndSysWrapper* LoadSoundWrapper (const char *name, const char *fname);
 
-  virtual csPtr<iLoaderStatus> ThreadedLoadMapFile (const char* filename,
-	iRegion* region, bool curRegOnly, bool checkDupes);
+  bool LoadLibraryFromNode (iLoaderContext* ldr_context, iDocumentNode* child,
+    iStreamSource* ssource, iMissingLoaderData* missingdata, bool loadProxyTex = true);
+
+  virtual csPtr<iMeshFactoryWrapper> LoadMeshObjectFactory (const char* fname,
+    iStreamSource* ssource);
+
+  virtual csPtr<iMeshWrapper> LoadMeshObject (const char* fname,
+    iStreamSource* ssource);
+
+  virtual iTextureWrapper* LoadTexture (const char *name,
+    const char *fname, int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
+    bool reg = true, bool create_material = true, bool free_image = true,
+    iBase* base = 0, uint keepFlags = KEEP_ALL);
+
   virtual bool LoadMapFile (const char* filename, bool clearEngine,
-	iRegion* region, bool curRegOnly, bool checkDupes,
-	iStreamSource* ssource, iMissingLoaderData* missingdata,
-	bool useProxyTextures = false);
+    iBase* base, bool colRegOnly, bool checkDupes,
+    iStreamSource* ssource, iMissingLoaderData* missingdata,
+    uint keepFlags = KEEP_ALL);
+
   virtual bool LoadMap (iDocumentNode* world_node, bool clearEngine,
-	iRegion* region, bool curRegOnly, bool checkDupes,
-	iStreamSource* ssource, iMissingLoaderData* missingdata,
-	bool useProxyTextures = false);
-  virtual bool LoadMapLibraryFile (const char* filename, iRegion* region,
-  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-        iMissingLoaderData* missingdata, bool useProxyTextures,
-        bool loadProxyTex = true);
-  virtual bool LoadLibraryFile (const char* filename, iRegion* region,
-  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-        iMissingLoaderData* missingdata, bool useProxyTextures);
-  virtual bool LoadLibrary (iDocumentNode* lib_node, iRegion* region,
-  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-        iMissingLoaderData* missingdata, bool useProxyTextures);
-  bool LoadLibraryFromNode (iLoaderContext* ldr_context,
-	iDocumentNode* child, iStreamSource* ssource,
-        iMissingLoaderData* missingdata, bool loadProxyTex = true);
+    iBase* base, bool colRegOnly, bool checkDupes,
+    iStreamSource* ssource, iMissingLoaderData* missingdata,
+    uint keepFlags = KEEP_ALL);
+
+  virtual bool LoadMapLibraryFile (const char* filename, iBase* base,
+      bool colRegOnly, bool checkDupes, iStreamSource* ssource,
+      iMissingLoaderData* missingdata, uint keepFlags = KEEP_ALL,
+      bool loadProxyTex = true);
+
+  virtual bool LoadLibraryFile (const char* filename, iBase* base = 0,
+    bool colRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL);
+
+  virtual bool LoadLibrary (iDocumentNode* lib_node, iBase* base = 0,
+    bool colRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL);
 
   csLoadResult Load (iDataBuffer* buffer, const char* fname,
-  	iRegion* region, bool curRegOnly, bool checkDupes,
-	iStreamSource* ssource, const char* override_name,
-	iMissingLoaderData* missingdata, bool useProxyTextures = false);
-  virtual csLoadResult Load (const char* fname, iRegion* region,
-  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-	const char* override_name, iMissingLoaderData* missingdata,
-	bool useProxyTextures);
-  virtual csLoadResult Load (iDataBuffer* buffer, iRegion* region,
-  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-	const char* override_name, iMissingLoaderData* missingdata,
-	bool useProxyTextures);
-  virtual csLoadResult Load (iDocumentNode* node, iRegion* region,
-  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-	const char* override_name, iMissingLoaderData* missingdata,
-	bool useProxyTextures);
+      iBase* base, bool colRegOnly, bool checkDupes,
+      iStreamSource* ssource, const char* override_name,
+      iMissingLoaderData* missingdata, uint keepFlags = KEEP_ALL);
+
+  virtual csLoadResult Load (const char* fname, iBase* base = 0,
+    bool colRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    const char* override_name = 0, iMissingLoaderData* missingdata = 0,
+    uint keepFlags = KEEP_ALL);
+
+  virtual csLoadResult Load (iDataBuffer* buffer, iBase* base = 0,
+    bool colRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    const char* override_name = 0, iMissingLoaderData* missingdata = 0,
+    uint keepFlags = KEEP_ALL);
+
+  virtual csLoadResult Load (iDocumentNode* node, iBase* base = 0,
+    bool colRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    const char* override_name = 0, iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL);
+
+  /////////////////////////// Collections ///////////////////////////
+
+  virtual iTextureWrapper* LoadTextureCollection (const char *Name,
+    const char *FileName, int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
+    bool reg = true, bool create_material = true, bool free_image = true,
+    iCollection* collection = 0, uint keepFlags = KEEP_ALL);
+
+  virtual bool LoadMapFileCollection (const char* filename, bool clearEngine = true,
+    iCollection* collection = 0, bool searchCollectionOnly = true, bool checkDupes = false,
+    iStreamSource* ssource = 0, iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL);
+
+  virtual bool LoadMapCollection (iDocumentNode* world_node, bool clearEngine = true,
+    iCollection* collection = 0, bool searchCollectionOnly = true, bool checkDupes = false,
+    iStreamSource* ssource = 0, iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL);
+
+  virtual bool LoadMapLibraryFileCollection (const char* filename, iCollection* collection,
+      bool searchCollectionOnly, bool checkDupes, iStreamSource* ssource,
+      iMissingLoaderData* missingdata, uint keepFlags = KEEP_ALL,
+      bool loadProxyTex = true);
+
+  virtual bool LoadLibraryFileCollection (const char* filename, iCollection* collection = 0,
+    bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL);
+
+  virtual bool LoadLibraryCollection (iDocumentNode* lib_node, iCollection* collection = 0,
+    bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL);
+
+  csLoadResult LoadCollection (iDataBuffer* buffer, const char* fname,
+      iCollection* collection, bool searchCollectionOnly, bool checkDupes,
+      iStreamSource* ssource, const char* override_name,
+      iMissingLoaderData* missingdata, uint keepFlags = KEEP_ALL);
+
+  virtual csLoadResult LoadCollection (const char* fname, iCollection* collection = 0,
+    bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    const char* override_name = 0, iMissingLoaderData* missingdata = 0,
+    uint keepFlags = KEEP_ALL);
+
+  virtual csLoadResult LoadCollection (iDataBuffer* buffer, iCollection* collection = 0,
+    bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    const char* override_name = 0, iMissingLoaderData* missingdata = 0,
+    uint keepFlags = KEEP_ALL);
+
+  virtual csLoadResult LoadCollection (iDocumentNode* node, iCollection* collection = 0,
+    bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    const char* override_name = 0, iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL);
+
+  /////////////////////////// Regions ///////////////////////////
+
+  virtual iTextureWrapper* LoadTextureRegion (const char *name,
+      const char *fname, int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
+      bool reg = true, bool create_material = true, bool free_image = true,
+      iRegion* region = 0);
+
+  virtual bool LoadMapFileRegion (const char* filename, bool clearEngine,
+      iRegion* region, bool curRegOnly, bool checkDupes,
+      iStreamSource* ssource, iMissingLoaderData* missingdata,
+      uint keepFlags = KEEP_ALL);
+
+  virtual bool LoadMapRegion (iDocumentNode* world_node, bool clearEngine,
+      iRegion* region, bool curRegOnly, bool checkDupes,
+      iStreamSource* ssource, iMissingLoaderData* missingdata,
+      uint keepFlags = KEEP_ALL);
+
+  virtual bool LoadMapLibraryFileRegion (const char* filename, iRegion* region,
+      bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+      iMissingLoaderData* missingdata, uint keepFlags,
+      bool loadProxyTex);
+
+  virtual bool LoadLibraryFileRegion (const char* filename, iRegion* region,
+      bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+      iMissingLoaderData* missingdata, uint keepFlags = KEEP_ALL);
+
+  virtual bool LoadLibraryRegion (iDocumentNode* lib_node, iRegion* region,
+      bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+      iMissingLoaderData* missingdata, uint keepFlags = KEEP_ALL);
+
+
+  csLoadResult LoadRegion (iDataBuffer* buffer, const char* fname,
+      iRegion* region, bool curRegOnly, bool checkDupes,
+      iStreamSource* ssource, const char* override_name,
+      iMissingLoaderData* missingdata, uint keepFlags = KEEP_ALL);
+
+  virtual csLoadResult LoadRegion (const char* fname, iRegion* region,
+      bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+      const char* override_name, iMissingLoaderData* missingdata,
+      uint keepFlags = KEEP_ALL);
+
+  virtual csLoadResult LoadRegion (iDataBuffer* buffer, iRegion* region,
+      bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+      const char* override_name, iMissingLoaderData* missingdata,
+      uint keepFlags = KEEP_ALL);
+
+  virtual csLoadResult LoadRegion (iDocumentNode* node, iRegion* region,
+      bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+      const char* override_name, iMissingLoaderData* missingdata,
+      uint keepFlags = KEEP_ALL);
+
+  /// Deprecated
 
   virtual bool Load (const char* fname, iBase*& result, iRegion* region,
-  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-	const char* override_name, iMissingLoaderData* missingdata,
-	bool useProxyTextures)
+      bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+      const char* override_name, iMissingLoaderData* missingdata,
+      uint keepFlags = KEEP_ALL)
   {
-    csLoadResult rc = Load (fname, region, curRegOnly, checkDupes,
-        ssource, override_name, missingdata, useProxyTextures);
-    result = rc.result;
-    return rc.success;
+      csLoadResult rc = LoadRegion (fname, region, curRegOnly, checkDupes,
+          ssource, override_name, missingdata, keepFlags);
+      result = rc.result;
+      return rc.success;
   }
+
   virtual bool Load (iDataBuffer* buffer, iBase*& result, iRegion* region,
-  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-	const char* override_name, iMissingLoaderData* missingdata,
-	bool useProxyTextures)
+      bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+      const char* override_name, iMissingLoaderData* missingdata,
+      uint keepFlags = KEEP_ALL)
   {
-    csLoadResult rc = Load (buffer, region, curRegOnly, checkDupes,
-        ssource, override_name, missingdata, useProxyTextures);
-    result = rc.result;
-    return rc.success;
+      csLoadResult rc = LoadRegion (buffer, region, curRegOnly, checkDupes,
+          ssource, override_name, missingdata, keepFlags);
+      result = rc.result;
+      return rc.success;
   }
+
   virtual bool Load (iDocumentNode* node, iBase*& result, iRegion* region,
-  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-	const char* override_name, iMissingLoaderData* missingdata,
-	bool useProxyTextures)
+      bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+      const char* override_name, iMissingLoaderData* missingdata,
+      uint keepFlags = KEEP_ALL)
   {
-    csLoadResult rc = Load (node, region, curRegOnly, checkDupes,
-        ssource, override_name, missingdata, useProxyTextures);
-    result = rc.result;
-    return rc.success;
+      csLoadResult rc = LoadRegion (node, region, curRegOnly, checkDupes,
+          ssource, override_name, missingdata, keepFlags);
+      result = rc.result;
+      return rc.success;
   }
+
+  ///
 
   virtual void SetAutoRegions (bool autoRegions)
   {
-    csLoader::autoRegions = autoRegions;
+      csLoader::autoRegions = autoRegions;
   }
-  
+
   virtual bool GetAutoRegions ()
   {
-    return autoRegions;
+      return autoRegions;
   }
-  
-  virtual csPtr<iMeshFactoryWrapper> LoadMeshObjectFactory (const char* fname,
-  	iStreamSource* ssource);
-  virtual csPtr<iMeshWrapper> LoadMeshObject (const char* fname,
-  	iStreamSource* ssource);
 };
 
 }

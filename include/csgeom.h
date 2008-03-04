@@ -37,6 +37,7 @@
 #include "csgeom/math3d_d.h"
 #include "csgeom/matrix2.h"
 #include "csgeom/matrix3.h"
+#include "csgeom/matrix4.h"
 #include "csgeom/obb.h"
 #include "csgeom/odesolver.h"
 #include "csgeom/path.h"

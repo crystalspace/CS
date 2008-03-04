@@ -65,17 +65,8 @@ if not "core" in dir():
 core.AddSCFLink(_SetSCFPointer)
 CSMutableArrayHelper = core.CSMutableArrayHelper
 
-class iLoaderStatus(core.iBase):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    def IsReady(*args): return _imap.iLoaderStatus_IsReady(*args)
-    def IsError(*args): return _imap.iLoaderStatus_IsError(*args)
-    __swig_destroy__ = _imap.delete_iLoaderStatus
-    __del__ = lambda self : None;
-iLoaderStatus_swigregister = _imap.iLoaderStatus_swigregister
-iLoaderStatus_swigregister(iLoaderStatus)
-
+KEEP_ALL = _imap.KEEP_ALL
+KEEP_USED = _imap.KEEP_USED
 class iMissingLoaderData(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
@@ -110,20 +101,31 @@ class iLoader(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def LoadImage(*args): return _imap.iLoader_LoadImage(*args)
-    def LoadTexture(*args): return _imap.iLoader_LoadTexture(*args)
     def LoadSoundSysData(*args): return _imap.iLoader_LoadSoundSysData(*args)
     def LoadSoundStream(*args): return _imap.iLoader_LoadSoundStream(*args)
     def LoadSoundWrapper(*args): return _imap.iLoader_LoadSoundWrapper(*args)
-    def ThreadedLoadMapFile(*args): return _imap.iLoader_ThreadedLoadMapFile(*args)
+    def LoadImage(*args): return _imap.iLoader_LoadImage(*args)
+    def LoadMeshObjectFactory(*args): return _imap.iLoader_LoadMeshObjectFactory(*args)
+    def LoadMeshObject(*args): return _imap.iLoader_LoadMeshObject(*args)
+    def LoadShader(*args): return _imap.iLoader_LoadShader(*args)
+    def LoadTexture(*args): return _imap.iLoader_LoadTexture(*args)
     def LoadMapFile(*args): return _imap.iLoader_LoadMapFile(*args)
     def LoadMap(*args): return _imap.iLoader_LoadMap(*args)
     def LoadLibraryFile(*args): return _imap.iLoader_LoadLibraryFile(*args)
     def LoadLibrary(*args): return _imap.iLoader_LoadLibrary(*args)
-    def LoadMeshObjectFactory(*args): return _imap.iLoader_LoadMeshObjectFactory(*args)
-    def LoadMeshObject(*args): return _imap.iLoader_LoadMeshObject(*args)
+    def LoadTextureCollection(*args): return _imap.iLoader_LoadTextureCollection(*args)
+    def LoadMapFileCollection(*args): return _imap.iLoader_LoadMapFileCollection(*args)
+    def LoadMapCollection(*args): return _imap.iLoader_LoadMapCollection(*args)
+    def LoadLibraryFileCollection(*args): return _imap.iLoader_LoadLibraryFileCollection(*args)
+    def LoadLibraryCollection(*args): return _imap.iLoader_LoadLibraryCollection(*args)
+    def LoadCollection(*args): return _imap.iLoader_LoadCollection(*args)
+    def LoadTextureRegion(*args): return _imap.iLoader_LoadTextureRegion(*args)
+    def LoadMapFileRegion(*args): return _imap.iLoader_LoadMapFileRegion(*args)
+    def LoadMapRegion(*args): return _imap.iLoader_LoadMapRegion(*args)
+    def LoadLibraryFileRegion(*args): return _imap.iLoader_LoadLibraryFileRegion(*args)
+    def LoadLibraryRegion(*args): return _imap.iLoader_LoadLibraryRegion(*args)
+    def LoadRegion(*args): return _imap.iLoader_LoadRegion(*args)
     def Load(*args): return _imap.iLoader_Load(*args)
-    def LoadShader(*args): return _imap.iLoader_LoadShader(*args)
     def SetAutoRegions(*args): return _imap.iLoader_SetAutoRegions(*args)
     def GetAutoRegions(*args): return _imap.iLoader_GetAutoRegions(*args)
     scfGetVersion = staticmethod(_imap.iLoader_scfGetVersion)

@@ -4188,39 +4188,6 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::iLoaderStatus ##############
-
-package cspace::iLoaderStatus;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iBase cspace );
-%OWNER = ();
-%ITERATORS = ();
-*IsReady = *cspacec::iLoaderStatus_IsReady;
-*IsError = *cspacec::iLoaderStatus_IsError;
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_iLoaderStatus($self);
-        delete $OWNER{$self};
-    }
-}
-
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
 ############# Class : cspace::iMissingLoaderData ##############
 
 package cspace::iMissingLoaderData;
@@ -4307,20 +4274,31 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::iBase cspace );
 %OWNER = ();
 %ITERATORS = ();
-*LoadImage = *cspacec::iLoader_LoadImage;
-*LoadTexture = *cspacec::iLoader_LoadTexture;
 *LoadSoundSysData = *cspacec::iLoader_LoadSoundSysData;
 *LoadSoundStream = *cspacec::iLoader_LoadSoundStream;
 *LoadSoundWrapper = *cspacec::iLoader_LoadSoundWrapper;
-*ThreadedLoadMapFile = *cspacec::iLoader_ThreadedLoadMapFile;
+*LoadImage = *cspacec::iLoader_LoadImage;
+*LoadMeshObjectFactory = *cspacec::iLoader_LoadMeshObjectFactory;
+*LoadMeshObject = *cspacec::iLoader_LoadMeshObject;
+*LoadShader = *cspacec::iLoader_LoadShader;
+*LoadTexture = *cspacec::iLoader_LoadTexture;
 *LoadMapFile = *cspacec::iLoader_LoadMapFile;
 *LoadMap = *cspacec::iLoader_LoadMap;
 *LoadLibraryFile = *cspacec::iLoader_LoadLibraryFile;
 *LoadLibrary = *cspacec::iLoader_LoadLibrary;
-*LoadMeshObjectFactory = *cspacec::iLoader_LoadMeshObjectFactory;
-*LoadMeshObject = *cspacec::iLoader_LoadMeshObject;
+*LoadTextureCollection = *cspacec::iLoader_LoadTextureCollection;
+*LoadMapFileCollection = *cspacec::iLoader_LoadMapFileCollection;
+*LoadMapCollection = *cspacec::iLoader_LoadMapCollection;
+*LoadLibraryFileCollection = *cspacec::iLoader_LoadLibraryFileCollection;
+*LoadLibraryCollection = *cspacec::iLoader_LoadLibraryCollection;
+*LoadCollection = *cspacec::iLoader_LoadCollection;
+*LoadTextureRegion = *cspacec::iLoader_LoadTextureRegion;
+*LoadMapFileRegion = *cspacec::iLoader_LoadMapFileRegion;
+*LoadMapRegion = *cspacec::iLoader_LoadMapRegion;
+*LoadLibraryFileRegion = *cspacec::iLoader_LoadLibraryFileRegion;
+*LoadLibraryRegion = *cspacec::iLoader_LoadLibraryRegion;
+*LoadRegion = *cspacec::iLoader_LoadRegion;
 *Load = *cspacec::iLoader_Load;
-*LoadShader = *cspacec::iLoader_LoadShader;
 *SetAutoRegions = *cspacec::iLoader_SetAutoRegions;
 *GetAutoRegions = *cspacec::iLoader_GetAutoRegions;
 *scfGetVersion = *cspacec::iLoader_scfGetVersion;
@@ -17572,15 +17550,21 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *CreateMaterial = *cspacec::iEngine_CreateMaterial;
 *GetMaterialList = *cspacec::iEngine_GetMaterialList;
 *FindMaterial = *cspacec::iEngine_FindMaterial;
+*FindMaterialRegion = *cspacec::iEngine_FindMaterialRegion;
+*FindMaterialCollection = *cspacec::iEngine_FindMaterialCollection;
 *CreateTexture = *cspacec::iEngine_CreateTexture;
 *CreateBlackTexture = *cspacec::iEngine_CreateBlackTexture;
 *GetTextureFormat = *cspacec::iEngine_GetTextureFormat;
 *GetTextureList = *cspacec::iEngine_GetTextureList;
 *FindTexture = *cspacec::iEngine_FindTexture;
+*FindTextureRegion = *cspacec::iEngine_FindTextureRegion;
+*FindTextureCollection = *cspacec::iEngine_FindTextureCollection;
 *CreateLight = *cspacec::iEngine_CreateLight;
 *FindLight = *cspacec::iEngine_FindLight;
 *FindLightID = *cspacec::iEngine_FindLightID;
 *GetLightIterator = *cspacec::iEngine_GetLightIterator;
+*GetLightIteratorRegion = *cspacec::iEngine_GetLightIteratorRegion;
+*GetLightIteratorCollection = *cspacec::iEngine_GetLightIteratorCollection;
 *RemoveLight = *cspacec::iEngine_RemoveLight;
 *SetAmbientLight = *cspacec::iEngine_SetAmbientLight;
 *GetAmbientLight = *cspacec::iEngine_GetAmbientLight;
@@ -17589,6 +17573,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *CreateSector = *cspacec::iEngine_CreateSector;
 *GetSectors = *cspacec::iEngine_GetSectors;
 *FindSector = *cspacec::iEngine_FindSector;
+*FindSectorRegion = *cspacec::iEngine_FindSectorRegion;
+*FindSectorCollection = *cspacec::iEngine_FindSectorCollection;
 *GetNearbySectors = *cspacec::iEngine_GetNearbySectors;
 *AddEngineFrameCallback = *cspacec::iEngine_AddEngineFrameCallback;
 *RemoveEngineFrameCallback = *cspacec::iEngine_RemoveEngineFrameCallback;
@@ -17602,15 +17588,26 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetNearbyMeshes = *cspacec::iEngine_GetNearbyMeshes;
 *GetMeshes = *cspacec::iEngine_GetMeshes;
 *FindMeshObject = *cspacec::iEngine_FindMeshObject;
+*FindMeshObjectRegion = *cspacec::iEngine_FindMeshObjectRegion;
+*FindMeshObjectCollection = *cspacec::iEngine_FindMeshObjectCollection;
 *WantToDie = *cspacec::iEngine_WantToDie;
 *CreateMeshFactory = *cspacec::iEngine_CreateMeshFactory;
 *LoadMeshFactory = *cspacec::iEngine_LoadMeshFactory;
 *FindMeshFactory = *cspacec::iEngine_FindMeshFactory;
+*FindMeshFactoryRegion = *cspacec::iEngine_FindMeshFactoryRegion;
+*FindMeshFactoryCollection = *cspacec::iEngine_FindMeshFactoryCollection;
 *GetMeshFactories = *cspacec::iEngine_GetMeshFactories;
 *CreateRegion = *cspacec::iEngine_CreateRegion;
 *GetRegions = *cspacec::iEngine_GetRegions;
+*CreateCollection = *cspacec::iEngine_CreateCollection;
+*GetCollection = *cspacec::iEngine_GetCollection;
+*GetDefaultCollection = *cspacec::iEngine_GetDefaultCollection;
+*RemoveCollection = *cspacec::iEngine_RemoveCollection;
+*RemoveAllCollections = *cspacec::iEngine_RemoveAllCollections;
 *CreateCamera = *cspacec::iEngine_CreateCamera;
 *FindCameraPosition = *cspacec::iEngine_FindCameraPosition;
+*FindCameraPositionRegion = *cspacec::iEngine_FindCameraPositionRegion;
+*FindCameraPositionCollection = *cspacec::iEngine_FindCameraPositionCollection;
 *GetCameraPositions = *cspacec::iEngine_GetCameraPositions;
 *CreatePortal = *cspacec::iEngine_CreatePortal;
 *CreatePortalContainer = *cspacec::iEngine_CreatePortalContainer;
@@ -17623,6 +17620,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetBeginDrawFlags = *cspacec::iEngine_GetBeginDrawFlags;
 *GetTopLevelClipper = *cspacec::iEngine_GetTopLevelClipper;
 *PrecacheDraw = *cspacec::iEngine_PrecacheDraw;
+*PrecacheDrawCollection = *cspacec::iEngine_PrecacheDrawCollection;
+*PrecacheDrawRegion = *cspacec::iEngine_PrecacheDrawRegion;
 *Draw = *cspacec::iEngine_Draw;
 *SetContext = *cspacec::iEngine_SetContext;
 *GetContext = *cspacec::iEngine_GetContext;
@@ -19302,6 +19301,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %ITERATORS = ();
 *InitializeCollisionWrapper = *cspacec::csColliderHelper_InitializeCollisionWrapper;
 *InitializeCollisionWrappers = *cspacec::csColliderHelper_InitializeCollisionWrappers;
+*InitializeCollisionWrappersCollection = *cspacec::csColliderHelper_InitializeCollisionWrappersCollection;
+*InitializeCollisionWrappersRegion = *cspacec::csColliderHelper_InitializeCollisionWrappersRegion;
 *CollideArray = *cspacec::csColliderHelper_CollideArray;
 *CollidePath = *cspacec::csColliderHelper_CollidePath;
 *TraceBeam = *cspacec::csColliderHelper_TraceBeam;
@@ -20399,6 +20400,8 @@ sub csimg3D () { $cspacec::csimg3D }
 sub csimgCube () { $cspacec::csimgCube }
 sub CS_IMAGEIO_LOAD () { $cspacec::CS_IMAGEIO_LOAD }
 sub CS_IMAGEIO_SAVE () { $cspacec::CS_IMAGEIO_SAVE }
+sub KEEP_ALL () { $cspacec::KEEP_ALL }
+sub KEEP_USED () { $cspacec::KEEP_USED }
 sub CS_SNDSYS_DATA_UNKNOWN_SIZE () { $cspacec::CS_SNDSYS_DATA_UNKNOWN_SIZE }
 sub SS_FILTER_LOC_RENDEROUT () { $cspacec::SS_FILTER_LOC_RENDEROUT }
 sub SS_FILTER_LOC_SOURCEOUT () { $cspacec::SS_FILTER_LOC_SOURCEOUT }

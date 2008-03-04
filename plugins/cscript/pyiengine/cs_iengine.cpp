@@ -136,7 +136,17 @@ private:
     #ifndef DEBUG_PYTHON
     #undef _DEBUG
     #endif
-    #include <Python.h>
+
+    #ifndef __STDC_CONSTANT_MACROS
+    #define __STDC_CONSTANT_MACROS
+    #endif
+    #ifndef __STDC_LIMIT_MACROS
+    #define __STDC_LIMIT_MACROS
+    #endif
+    #ifndef DEBUG_PYTHON
+    #undef _DEBUG
+    #endif
+        #include <Python.h>
 
 /* -----------------------------------------------------------------------------
  * swigrun.swg

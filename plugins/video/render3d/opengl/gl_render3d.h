@@ -198,6 +198,7 @@ private:
   csEventID SystemOpen;
   csEventID SystemClose;
   csEventID CanvasResize;
+  csEventID Frame;
 
   csWeakRef<iBugPlug> bugplug;
 

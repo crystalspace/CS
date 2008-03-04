@@ -121,7 +121,7 @@ class csSequenceWrapper : public scfImplementationExt2<csSequenceWrapper,
 {
 private:
   csRef<iSequence> sequence;
-  csEngineSequenceManager* eseqmgr;
+  csRef<csEngineSequenceManager> eseqmgr;
   csRef<csEngineSequenceParameters> params;
   uint sequence_id;
 
@@ -181,7 +181,7 @@ public:
 		int axis2, float tot_angle2,
 		int axis3, float tot_angle3,
 		const csVector3& offset,
-		csTicks duration);
+		csTicks duration, bool relative);
   virtual void AddOperationMoveDuration (csTicks time, iParameterESM* mesh,
 		const csVector3& offset,
 		csTicks duration);

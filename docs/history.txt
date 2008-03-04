@@ -6,7 +6,41 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-1-Mar-2008
+04-Mar-2008
+        - Piotr did few behavior fixes for ode joints (attaching bodies
+          in the right time and added better way of checking if amotor is 
+          necessary).
+	- caedes added support for CS_REQUEST_PLUGIN_TAG to python bindings.
+	- res made the following changes to csRedBlackTree:
+	    - Copied Iterators from RM branch.
+	    - Made it possible to insert multiple keys with the same value.
+	    - Key copying is now done by an assignment, not in-place
+	      construction.
+	    - Added methods to find the smallest key greater or equal to some
+	      other key.
+	    - Added deletion of key pointed to by an iterator.
+	- res changed GenericResourceCache to use "stock" csList<> and
+	  csRedBlackTree<> instead of a customized variant. While possibly
+	  slightly slower it seems to be more stable and reliable.
+	- res added Alloc() overloads to csBlockAllocator<> for more
+	  constructor arguments.
+	- res added a method to csList<> to remove a specified item.
+	- res changed gl3d to signal a "frame advancement" to the r2t backend
+	  upon a frame event (which is really sent once a frame) instead of
+	  in Print() (which can actually be called many times a frame).
+03-Mar-2008
+	- res fixed some pointer formatting with unsigned longs recently
+	  introduced.
+	- res removed an int cast from csperl5. Should fix trac #394.
+01-Mar-2008
+	- caedes added support for relative rotation operations to the
+	  sequence manager.
+	- caedes added docs for movelight and rotatelight operations to
+	  the sequence manager manual section.
+	- caedes changed the physldr jamfile so it gets built also if only
+	  bullet is available.
+	- caedes explained the concept of relative rotation operation a bit
+	  clearer in the manual.
 	- res changed the Cg weaver combiner to create locals for vertex-to-
 	  fragment data. This means v2f data doesn't have to be declared as an
 	  input or output to work.
@@ -46,6 +80,7 @@ chronological order.
 	  specified in the output.
 	- res made shaderweaver <block> elements loadable from an external
 	  file.
+	- Marten fixed the usage of snprintf/_snprintf for MSVC.
 26-Feb-2008
 	- caedes added csPyEventPlug to python bindings. This class allows to
 	  create python iEventPlugs. Also added iEventPlug and iEventOutlet
@@ -64,10 +99,21 @@ chronological order.
 23-Feb-2008
 	- caedes added ivaria/sequence.h to scripting bindings.
 	- caedes added csgeom/obb.h to scripting bindings.
+	- Mike Gist implemented most of the collections code. It now
+	  should be able to replace iRegion in the state that it's in.
+	  The next job is to make the changes needed elsewhere to gain
+	  the benefits that collections bring.
+	- Mike Gist added csWeakRefArrayObject.
+22-Feb-2008
+	- Mike Gist merged iLoaderCollection with iLoader, and formatted
+	  iLoader better.
 22-Feb-2008
 	- Vincent changed sndsys files license headers to LGPL following
 	  Andrew Mann agreement.
 	- res added a "dump textures" debug command to gl3d.
+21-Feb-2008
+	- Mike Gist added the iCollection and iLoaderCollection interfaces,
+	  and csCollection.
 21-Feb-2008
 	- res fixed csimagetool to correctly get the optional argument for
 	  the save option.

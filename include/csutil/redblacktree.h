@@ -94,9 +94,7 @@ protected:
     else
     {
       int r = csComparator<K, K>::Compare (key, *((K*)&node->key));
-      if (r == 0)
-	return 0;
-      else if (r < 0)
+      if (r < 0)
 	return RecursiveInsert (node, node->left, key);
       else
 	return RecursiveInsert (node, node->right, key);
@@ -175,6 +173,7 @@ protected:
 	    node = p;
 	    RotateLeft (node);
 	    p = node->GetParent ();
+	    pp = p->GetParent();
 	  }
 	  // Uncle of 'node' is black, node is left child
 	  p->SetColor (Black);
@@ -201,6 +200,7 @@ protected:
 	    node = p;
 	    RotateRight (node);
 	    p = node->GetParent ();
+	    pp = p->GetParent();
 	  }
 	  // Uncle of 'node' is black, node is right child
 	  p->SetColor (Black);
@@ -241,8 +241,7 @@ protected:
     if (y != node)
     {
       // Copy key
-      ((K*)&node->key)->~K();
-      new ((K*)&node->key) K (*((K*)&y->key));
+      *((K*)&node->key) = *((K*)&y->key);
     }
     if (y->GetColor() == Black)
       DeleteFixup (x, nilParent);
@@ -262,6 +261,7 @@ protected:
 	  w->SetColor (Black);
 	  p->SetColor (Red);
 	  RotateLeft (p);
+	  p = node ? node->GetParent() : nilParent;
 	  w = p->right;
 	}
 	if (IsBlack (w->left) && IsBlack (w->right))
@@ -276,6 +276,7 @@ protected:
 	    w->left->SetColor (Red);
 	    w->SetColor (Red);
 	    RotateRight (w);
+	    p = node ? node->GetParent() : nilParent;
 	    w = p->right;
 	  }
 	  w->SetColor (p->GetColor ());
@@ -293,6 +294,7 @@ protected:
 	  w->SetColor (Black);
 	  p->SetColor (Red);
 	  RotateRight (p);
+	  p = node ? node->GetParent() : nilParent;
 	  w = p->left;
 	}
 	if (IsBlack (w->left) && IsBlack (w->right))
@@ -307,6 +309,7 @@ protected:
 	    w->right->SetColor (Red);
 	    w->SetColor (Red);
 	    RotateLeft (w);
+	    p = node ? node->GetParent() : nilParent;
 	    w = p->left;
 	  }
 	  w->SetColor (p->GetColor ());
@@ -324,7 +327,7 @@ protected:
   {
     if (node == 0) return 0;
       
-    int r = csComparator<K, K>::Compare (key, node->key);
+    int r = csComparator<K, K>::Compare (key, *((K*)&node->key));
     if (r == 0) 
       return node;
     else if (r < 0)
@@ -378,9 +381,9 @@ protected:
     if (r == 0)
       return ((K*)&node->key);
     else if (r < 0)
-      return RecursiveFind (node->left, other);
+      return RecursiveFind<K2> (node->left, other);
     else
-      return RecursiveFind (node->right, other);
+      return RecursiveFind<K2> (node->right, other);
   }
   template<typename K2>
   K* RecursiveFind (Node* node, const K2& other)
@@ -390,9 +393,9 @@ protected:
     if (r == 0)
       return ((K*)&node->key);
     else if (r < 0)
-      return RecursiveFind (node->left, other);
+      return RecursiveFind<K2> (node->left, other);
     else
-      return RecursiveFind (node->right, other);
+      return RecursiveFind<K2> (node->right, other);
   }
   template<typename K2>
   const K& RecursiveFind (Node* node, const K2& other, const K& fallback) const
@@ -402,9 +405,9 @@ protected:
     if (r == 0)
       return *((K*)&node->key);
     else if (r < 0)
-      return RecursiveFind (node->left, other, fallback);
+      return RecursiveFind<K2> (node->left, other, fallback);
     else
-      return RecursiveFind (node->right, other, fallback);
+      return RecursiveFind<K2> (node->right, other, fallback);
   }
   template<typename K2>
   K& RecursiveFind (Node* node, const K2& other, K& fallback)
@@ -419,6 +422,47 @@ protected:
       return RecursiveFind (node->right, other, fallback);
   }
   //@}
+  
+  //@{
+  /// Locate key that is equal to 'other'.
+  template<typename K2>
+  const K* RecursiveFindSGE (Node* node, const K2& other) const
+  {
+    if (node == 0) return 0;
+    int r = csComparator<K2, K>::Compare (other, *((K*)&node->key));
+    if (r == 0)
+      return ((K*)&node->key);
+    if (r < 0)
+    {
+      const K* x = RecursiveFindSGE<K2> (node->left, other);
+      /* This node is currently the smallest known greater or equal to
+       * 'other', so return that if a search in the left subtree does
+       * not give a result */
+      return x ? x : ((K*)&node->key);
+    }
+    else
+      return RecursiveFindSGE<K2> (node->right, other);
+  }
+  template<typename K2>
+  const K& RecursiveFindSGE (Node* node, const K2& other, const K& fallback) const
+  {
+    if (node == 0) return 0;
+    int r = csComparator<K2, K>::Compare (other, *((K*)&node->key));
+    if (r == 0)
+      return *((K*)&node->key);
+    if (r < 0)
+    {
+      const K& x = RecursiveFindSGE<K2> (node->left, other);
+      /* This node is currently the smallest known greater or equal to
+       * 'other', so return that if a search in the left subtree does
+       * not give a result */
+      return x ? x : *((K*)&node->key);
+    }
+    else
+      return RecursiveFindSGE<K2> (node->right, other);
+  }
+  //@}
+  
   /// Traverse tree.
   template <typename CB>
   void RecursiveTraverseInOrder (Node* node, CB& callback) const
@@ -433,12 +477,12 @@ protected:
   template<typename K2>
   K* Find (const K2& other)
   {
-    return RecursiveFind (root, other);
+    return RecursiveFind<K2> (root, other);
   }
   template<typename K2>
   K& Find (const K2& other, K& fallback)
   {
-    return RecursiveFind (root, other, fallback);
+    return RecursiveFind<K2> (root, other, fallback);
   }
   //@}
 
@@ -508,16 +552,31 @@ public:
   bool Contains (const K& key) const { return In (key); }
   
   //@{
-  /// Locate key that is equal to 'other'
+  /// Locate key that is equal to \a other
   template<typename K2>
   const K* Find (const K2& other) const
   {
-    return RecursiveFind (root, other);
+    return RecursiveFind<K2> (root, other);
   }
   template<typename K2>
   const K& Find (const K2& other, const K& fallback) const
   {
-    return RecursiveFind (root, other, fallback);
+    return RecursiveFind<K2>  (root, other, fallback);
+  }
+  //@}
+  
+  //@{
+  /// Locate smallest key greater or equal to \a other
+  template<typename K2>
+  const K* FindSmallestGreaterEqual (const K2& other) const
+  {
+    return RecursiveFindSGE<K2> (root, other);
+  }
+  template<typename K2>
+  const K& FindSmallestGreaterEqual (const K2& other, 
+                                     const K& fallback) const
+  {
+    return RecursiveFindSGE<K2>  (root, other, fallback);
   }
   //@}
   
@@ -609,7 +668,7 @@ public:
   /**
    * Get an iterator for iterating over the entire tree
    */
-  ConstIterator GetIterator ()
+  ConstIterator GetIterator () const
   {
     return ConstIterator (this);
   }
@@ -622,6 +681,105 @@ public:
     return ConstReverseIterator (this);
   }
 
+  //@{
+  /// Const iterator for tree
+  class Iterator
+  {
+  public:
+    /// Returns a boolean indicating whether or not the tree has more elements.
+    bool HasNext () const
+    {
+      return currentNode != 0;
+    }
+
+    /// Get the next element's value without advancing the iterator.
+    const K& PeekNext ()
+    {
+      const K& ret = *((const K*)&currentNode->key);
+      return ret;
+    }
+
+    /// Get the next element's value.
+    const K& Next ()
+    {
+      const K& ret = *((const K*)&currentNode->key);
+      currentNode = Successor (currentNode);
+      return ret;
+    }
+
+  protected:
+    friend class csRedBlackTree;
+    Iterator (csRedBlackTree<K>* tree) : currentNode (tree->root)
+    {
+      while (currentNode && currentNode->left != 0)
+        currentNode = currentNode->left;
+    }
+
+  private:
+    typename csRedBlackTree<K>::Node *currentNode;
+  };
+  friend class Iterator;
+
+  /**
+   * Get an iterator for iterating over the entire tree
+   */
+  Iterator GetIterator ()
+  {
+    return Iterator (this);
+  }
+  
+  /**
+   * Delete the 'next' element pointed at by the iterator.
+   * \remarks Will repoint the iterator to the following element.
+   */
+  void Delete (Iterator& it)
+  {
+    Node* n = it.currentNode;
+    if (n == 0) return;
+    Node* p = n->GetParent();
+    int oldSide = -1;
+    Node* oldRootLeft;
+    if (p != 0)
+    {
+      if (n == p->left)
+        oldSide = 0;
+      else
+      {
+        CS_ASSERT(n == p->right);
+        oldSide = 1;
+      }
+    }
+    else
+    {
+      // Deleting root
+      oldRootLeft = n->left;
+    }
+    DeleteNode (n);
+    
+    Node* newNode = 0;
+    if (p == 0)
+    {
+      // Deleted root: successor is new root
+      if (root == oldRootLeft)
+        newNode = root ? root->right : 0;
+      else
+        newNode = root;
+    }
+    else
+    {
+      if (oldSide == 0)
+      {
+	// Deleted node was left side: successor node is parent
+	newNode = p;
+      }
+      else if (oldSide == 1)
+      {
+	// Deleted node was right side: successor is right node of parent
+	newNode = p->right;
+      }
+    }
+    it.currentNode = newNode;
+  }
 
   //@}
 };
