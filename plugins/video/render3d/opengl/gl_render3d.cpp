@@ -1285,7 +1285,6 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
       	| GL_COLOR_BUFFER_BIT;
     else
       clearMask = GL_DEPTH_BUFFER_BIT | stencilFlag;
-    glClearDepth (0.0); // @@@ Never really changes 
   }
   else if (drawflags & CSDRAW_CLEARSCREEN)
     clearMask = GL_COLOR_BUFFER_BIT;

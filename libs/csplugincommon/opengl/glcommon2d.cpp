@@ -29,6 +29,7 @@
 #include "csgeom/csrect.h"
 #include "csgeom/math.h"
 #include "csplugincommon/canvas/scrshot.h"
+#include "csplugincommon/opengl/assumedstate.h"
 #include "csplugincommon/opengl/glcommon2d.h"
 #include "csplugincommon/opengl/glstates.h"
 #include "csutil/xmltiny.h"
@@ -226,8 +227,8 @@ bool csGraphics2DGLCommon::Open ()
 
   GLFontCache->Setup();
 
+  CS::PluginCommon::GL::SetAssumedState (statecache);
   glClearColor (0., 0., 0., 0.);
-  glClearDepth (-1.0);
 
   statecache->SetMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
