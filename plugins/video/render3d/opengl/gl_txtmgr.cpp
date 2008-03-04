@@ -279,11 +279,12 @@ void csGLTextureManager::SetupPixelStore()
 void csGLTextureManager::UnsetTexture (GLenum target, GLuint texture)
 {
   csGLStateCache* statecache = csGLGraphics3D::statecache;
+  if (!statecache) return;
 
   if (csGLGraphics3D::ext->CS_GL_ARB_multitexture)
   {
     int oldTU = -1;
-    for (int u = 0; u < CS_GL_MAX_LAYER; u++)
+    for (int u = 0; u < statecache->GetNumImageUnits(); u++)
     {
       if (statecache->GetTexture (target, u) == texture)
       {

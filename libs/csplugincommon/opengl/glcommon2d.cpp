@@ -77,10 +77,6 @@ bool csGraphics2DGLCommon::Initialize (iObjectRegistry *object_reg)
 
   ext.Initialize (object_reg, this);
 
-  statecache = new csGLStateCache (&ext);
-  statecontext = new csGLStateCacheContext (&ext);
-  statecache->SetContext (statecontext);
-
   multiFavorQuality = config->GetBool ("Video.OpenGL.MultisampleFavorQuality");
 
   return true;
@@ -90,7 +86,6 @@ csGraphics2DGLCommon::~csGraphics2DGLCommon ()
 {
   Close ();
   
-  delete statecache;
   delete[] screen_shot;
 
   while (ssPool)
@@ -105,10 +100,13 @@ bool csGraphics2DGLCommon::Open ()
 {
   if (is_open) return true;
 
-  statecontext->InitCache();
-
   ext.Open ();
   OpenDriverDB ();
+
+  statecache = new csGLStateCache (&ext);
+  statecontext = new csGLStateCacheContext (&ext);
+  statecache->SetContext (statecontext);
+  statecontext->InitCache();
 
   // initialize font cache object
   csGLFontCache* GLFontCache = new csGLFontCache (this);
@@ -243,6 +241,8 @@ bool csGraphics2DGLCommon::Open ()
 void csGraphics2DGLCommon::Close ()
 {
   if (!is_open) return;
+  delete statecontext; statecontext = 0;
+  delete statecache; statecache = 0;
   ext.Close ();
   driverdb.Close ();
   csGraphics2D::Close ();

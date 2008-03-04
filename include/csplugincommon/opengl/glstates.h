@@ -64,14 +64,8 @@
     return currentContext->enabled_##name; \
   }
 
-/**
- * Maximum number of texture coord sets resp. image units the state manager
- * can keep track of.
- */
-#define CS_GL_MAX_LAYER 16
-
 #define DECLARE_CACHED_BOOL_CURRENTLAYER(name) \
-  bool enabled_##name[CS_GL_MAX_LAYER];
+  AutoArray<bool> enabled_##name;
 
 #define IMPLEMENT_CACHED_BOOL_CURRENTLAYER(name)                              \
   void Enable_##name ()                                                       \
@@ -220,7 +214,7 @@
   }
 
 #define DECLARE_CACHED_CLIENT_STATE_LAYER(name)	                              \
-  bool enabled_##name[CS_GL_MAX_LAYER];
+  AutoArray<bool> enabled_##name;
 
 #define IMPLEMENT_CACHED_CLIENT_STATE_LAYER(name)	                      \
   void Enable_##name ()                                                       \
@@ -250,7 +244,7 @@
   }
 
 #define DECLARE_CACHED_PARAMETER_1_LAYER(func, name, type1, param1) \
-  type1 parameter_##param1[CS_GL_MAX_LAYER];
+  AutoArray<type1> parameter_##param1;
 
 #define IMPLEMENT_CACHED_PARAMETER_1_LAYER(func, name, type1, param1) \
   void Set##name (type1 param1, bool forced = false) \
@@ -271,8 +265,8 @@
 
 #define DECLARE_CACHED_PARAMETER_2_LAYER(func, name, type1, param1, \
   type2, param2) \
-  type1 parameter_##param1[CS_GL_MAX_LAYER]; \
-  type2 parameter_##param2[CS_GL_MAX_LAYER];
+  AutoArray<type1> parameter_##param1; \
+  AutoArray<type2> parameter_##param2;
 
 #define IMPLEMENT_CACHED_PARAMETER_2_LAYER(func, name, type1, param1, \
   type2, param2) \
@@ -298,9 +292,9 @@
 
 #define DECLARE_CACHED_PARAMETER_3_LAYER(func, name, type1, param1, \
   type2, param2, type3, param3) \
-  type1 parameter_##param1[CS_GL_MAX_LAYER]; \
-  type2 parameter_##param2[CS_GL_MAX_LAYER]; \
-  type3 parameter_##param3[CS_GL_MAX_LAYER];
+  AutoArray<type1> parameter_##param1; \
+  AutoArray<type2> parameter_##param2; \
+  AutoArray<type3> parameter_##param3;
 
 
 #define IMPLEMENT_CACHED_PARAMETER_3_LAYER(func, name, type1, param1, \
@@ -333,10 +327,10 @@
 
 #define DECLARE_CACHED_PARAMETER_4_LAYER(func, name, type1, param1,           \
   type2, param2, type3, param3, type4, param4)                                \
-  type1 parameter_##param1[CS_GL_MAX_LAYER];                                  \
-  type2 parameter_##param2[CS_GL_MAX_LAYER];                                  \
-  type3 parameter_##param3[CS_GL_MAX_LAYER];                                  \
-  type4 parameter_##param4[CS_GL_MAX_LAYER];
+  AutoArray<type1> parameter_##param1;                                        \
+  AutoArray<type2> parameter_##param2;                                        \
+  AutoArray<type3> parameter_##param3;                                        \
+  AutoArray<type4> parameter_##param4;
 
 #define IMPLEMENT_CACHED_PARAMETER_4_LAYER(func, name, type1, param1,         \
     type2, param2, type3, param3, type4, param4)                              \
@@ -372,11 +366,33 @@
 
 class csGLStateCacheContext
 {
+  template<typename T>
+  struct AutoArray
+  {
+    T* p;
+    
+    AutoArray() : p (0) {}
+    ~AutoArray()
+    {
+      delete[] p;
+    }
+    void Setup (size_t n)
+    {
+      CS_ASSERT (p == 0);
+      p = new T[n];
+    }
+    
+    T& operator[] (size_t idx)
+    {
+      return p[idx];
+    }
+  };
 public:
   csGLExtensionManager* extmgr;
 
   // Special caches
-  GLuint boundtexture[CS_GL_MAX_LAYER]; // 32 max texture layers
+  AutoArray<GLuint> boundtexture;
+  GLint numImageUnits;
   int currentUnit;
   int activeUnit[2];
   enum
@@ -463,8 +479,30 @@ public:
   csGLStateCacheContext (csGLExtensionManager* extmgr)
   {
     csGLStateCacheContext::extmgr = extmgr;
+  
+    // Need to init exts here b/c we need the image units count
+    extmgr->InitGL_ARB_multitexture ();
+    extmgr->InitGL_ARB_fragment_program ();
+    
+    if (extmgr->CS_GL_ARB_fragment_program)
+      glGetIntegerv (GL_MAX_TEXTURE_IMAGE_UNITS_ARB, &numImageUnits);
+    else if (extmgr->CS_GL_ARB_multitexture)
+      glGetIntegerv (GL_MAX_TEXTURE_UNITS_ARB, &numImageUnits);
+    else
+      numImageUnits = 1;
+    
+    boundtexture.Setup (numImageUnits);
+    enabled_GL_TEXTURE_1D.Setup (numImageUnits);
+    enabled_GL_TEXTURE_2D.Setup (numImageUnits);
+    enabled_GL_TEXTURE_3D.Setup (numImageUnits);
+    enabled_GL_TEXTURE_CUBE_MAP.Setup (numImageUnits);
+    enabled_GL_TEXTURE_RECTANGLE_ARB.Setup (numImageUnits);
+    enabled_GL_TEXTURE_COORD_ARRAY.Setup (numImageUnits);
+    parameter_tsize.Setup (numImageUnits);
+    parameter_ttype.Setup (numImageUnits);
+    parameter_tstride.Setup (numImageUnits);
+    parameter_tpointer.Setup (numImageUnits);
   }
-
 
   /** 
    * Init cache. Does both retrieval of current GL state as well as setting
@@ -521,15 +559,12 @@ public:
     enabled_GL_TEXTURE_GEN_Q = (glIsEnabled (GL_TEXTURE_GEN_Q) == GL_TRUE);
     enabled_GL_FOG = (glIsEnabled (GL_FOG) == GL_TRUE);
 
-    memset (boundtexture, 0, CS_GL_MAX_LAYER * sizeof (GLuint));
+    memset (boundtexture.p, 0, numImageUnits * sizeof (GLuint));
     currentUnit = 0;
     memset (activeUnit, 0, sizeof (activeUnit));
     if (extmgr->CS_GL_ARB_multitexture)
     {
-      GLint texUnits;
-      glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &texUnits);
-    
-      for (i = csMin (texUnits, CS_GL_MAX_LAYER); i-- > 0; )
+      for (i = numImageUnits; i-- > 0; )
       {
         extmgr->glActiveTextureARB (GL_TEXTURE0_ARB + i);
         extmgr->glClientActiveTextureARB (GL_TEXTURE0_ARB + i);
@@ -567,7 +602,7 @@ public:
       glGetIntegerv (GL_TEXTURE_COORD_ARRAY_STRIDE, (GLint*)&parameter_tstride[0]);
       glGetIntegerv (GL_TEXTURE_COORD_ARRAY_TYPE, (GLint*)&parameter_ttype[0]);
       glGetPointerv (GL_TEXTURE_COORD_ARRAY_POINTER, &parameter_tpointer[0]);
-      for (i = 1 ; i < CS_GL_MAX_LAYER; i++)
+      for (i = 1 ; i < numImageUnits; i++)
       {
         enabled_GL_TEXTURE_1D[i] = enabled_GL_TEXTURE_1D[0];
         enabled_GL_TEXTURE_2D[i] = enabled_GL_TEXTURE_2D[0];
@@ -837,7 +872,8 @@ public:
         currentContext->parameter_vpointer = (GLvoid*)~0; 
         currentContext->parameter_npointer = (GLvoid*)~0;
         currentContext->parameter_cpointer = (GLvoid*)~0;
-        memset(&currentContext->parameter_tpointer, ~0, sizeof(GLvoid*)*CS_GL_MAX_LAYER);
+        memset(currentContext->parameter_tpointer.p, ~0,
+          sizeof(GLvoid*)*currentContext->numImageUnits);
       }
     }
   }
@@ -934,6 +970,8 @@ public:
     }
   }
   /** @} */
+  
+  GLint GetNumImageUnits() const { return currentContext->numImageUnits; }
 };
 
 #undef IMPLEMENT_CACHED_BOOL
