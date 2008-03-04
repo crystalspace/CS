@@ -28,6 +28,9 @@ chronological order.
 	- res changed gl3d to signal a "frame advancement" to the r2t backend
 	  upon a frame event (which is really sent once a frame) instead of
 	  in Print() (which can actually be called many times a frame).
+	- res made the shadow map code reuse shadow maps for lights (which
+	  is obviously much more efficient than creating a map for each
+	  light/mesh combo...).
 03-Mar-2008
 	- res fixed some pointer formatting with unsigned longs recently
 	  introduced.

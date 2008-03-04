@@ -38,9 +38,91 @@ namespace RenderManager
   template<typename RenderTree, typename LayerConfigType>
   class ShadowShadowmap
   {
+    class ShadowMapData
+    {
+      csShaderVariable* shadowMapSV;
+      csShaderVariable* shadowMapProjectSV;
+      csRef<CS::RenderManager::RenderView> newRenderView;
+    public:
+      csShaderVariable* GetMapShaderVar() const
+      { return shadowMapSV; }
+      csShaderVariable* GetProjectionShaderVar() const
+      { return shadowMapProjectSV; }
+      CS::RenderManager::RenderView* GetNewRenderView() const
+      { return newRenderView; }
+
+      void Setup (RenderView::Pool& renderViewPool,
+                  CS::RenderManager::RenderView* rview,
+                  iLight* light, iTextureHandle* shadowTex, 
+                  csShaderVariable* shadowMapSV,
+                  csShaderVariable* shadowMapProjectSV,
+                  LightingVariablesHelper& lightVarsHelper)
+      {
+        this->shadowMapSV = shadowMapSV;
+        this->shadowMapProjectSV = shadowMapProjectSV;
+
+        // Set up a shadow map view for light
+#include "csutil/custom_new_disable.h"
+	newRenderView.AttachNew (
+	  new (renderViewPool) RenderView (*rview));
+#include "csutil/custom_new_enable.h"
+	newRenderView->SetEngine (rview->GetEngine ());
+	newRenderView->SetThisSector (rview->GetThisSector ());
+	iCamera* shadowViewCam = newRenderView->CreateNewCamera();
+	shadowViewCam->SetTransform (light->GetMovable()->GetFullTransform ());
+	shadowViewCam->SetPerspectiveCenter (128, 128);
+	shadowViewCam->SetFOVAngle (shadowViewCam->GetFOVAngle(), 256);
+	csBox2 clipBox (0, 0, 256, 256);
+	csRef<iClipper2D> newView;
+	newView.AttachNew (new csBoxClipper (clipBox));
+	newRenderView->SetClipper (newView);
+
+	shadowMapSV->SetValue (shadowTex);
+
+	{
+	  // Construct the projection matrix the same way gl3d does
+	  CS::Math::Matrix4 Mortho (
+	    2.0f/256,         0,       0,           -1.0f,
+		  0,    -2.0f/256,       0,           1.0f,
+		  0,         0, -2.0f/11.0f, -9.0f/11.0f,
+		  0,         0,       0,               1);
+
+	  CS::Math::Matrix4 Mtranslate (
+	    1, 0, 0, 128,
+	    0, 1, 0, 128,
+	    0, 0, 1,    0,
+	    0, 0, 0,    1);
+
+	  float invAspect = 1.0f/shadowViewCam->GetFOV();
+	  CS::Math::Matrix4 Mprojection (
+	    1, 0, 0, 0,
+	    0, 1, 0, 0,
+	    0, 0, 0, -invAspect,
+	    0, 0, invAspect, 0);
+
+	  CS::Math::Matrix4 Mfinal =
+	    (Mortho * Mtranslate) * Mprojection;
+
+	  shadowMapProjectSV->SetArraySize (4);
+	  for (int i = 0; i < 4; i++)
+	  {
+	    csShaderVariable* item = lightVarsHelper.CreateTempSV (
+	      CS::InvalidShaderVarStringID);
+	    item->SetValue (Mfinal.Row (i));
+	    shadowMapProjectSV->SetArrayElement (i, item);
+	  }
+        }
+      }
+    };
+
     struct CachedLightData
     {
       const csRefArray<csShaderVariable>* shaderVars;
+
+      ShadowMapData shadowMapData;
+      uint shadowMapCreateFrame;
+
+      CachedLightData() : shadowMapCreateFrame (~0) {}
     };
 
     class ShadowmapContextSetup
@@ -110,6 +192,7 @@ namespace RenderManager
 
     struct PersistentData
     {
+      uint frameNum;
       csLightShaderVarCache svNames;
       CS::ShaderVarStringID svPassNum;
       LightingSorter::PersistentData lightSorterPersist;
@@ -119,7 +202,7 @@ namespace RenderManager
 
       TextureCache texCache;
 
-      PersistentData() :
+      PersistentData() : frameNum (0),
         texCache (csimg2D, "d32", 
           CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP,
           "shadowmap", TextureCache::tcachePowerOfTwo)
@@ -140,6 +223,7 @@ namespace RenderManager
       }
       void UpdateNewFrame ()
       {
+        frameNum++;
         csTicks time = csGetTicks ();
         texCache.AdvanceFrame (time);
       }
@@ -188,6 +272,8 @@ namespace RenderManager
       typename RenderTree::MeshNode::SingleMesh& mesh,
       typename RenderTree::MeshNode* node)
     {
+      persist.texCache.SetG3D (node->owner.renderView->GetGraphics3D()); // @@@ Not here.
+
       LightingSorter sortedLights (persist.lightSorterPersist, influenceLights,
         numLights);
       LightingVariablesHelper lightVarsHelper (persist.lightVarsPersist);
@@ -285,42 +371,19 @@ namespace RenderManager
 	  for (size_t l = thisNum; l-- > 0; )
 	  {
 	    iLight* light = sortedLights.GetLight (firstLight + l);
-	    CachedLightData* thisLightSVs =
+	    CachedLightData* thisLightCacheData =
 	      persist.lightDataCache.GetElementPointer (light);
-	    if (thisLightSVs == 0)
+	    if (thisLightCacheData == 0)
 	    {
               CachedLightData newCacheData;
               newCacheData.shaderVars =
                 &(light->GetSVContext()->GetShaderVariables());
-	      thisLightSVs = &persist.lightDataCache.Put (
+	      thisLightCacheData = &persist.lightDataCache.Put (
 		light, newCacheData);
 	    }
 	    lightVarsHelper.MergeAsArrayItems (localStack, 
-              *(thisLightSVs->shaderVars), l);
+              *(thisLightCacheData->shaderVars), l);
   
-            // Set up a shadow map view for light
-            CS::RenderManager::RenderView* rview =
-              node->owner.renderView;
-            persist.texCache.SetG3D (rview->GetGraphics3D()); // @@@ Not here.
-	    csRef<CS::RenderManager::RenderView> newRenderView;
-#include "csutil/custom_new_disable.h"
-	    newRenderView.AttachNew (
-	      new (renderTree.GetPersistentData().renderViewPool) RenderView (
-	        *rview));
-#include "csutil/custom_new_enable.h"
-	    newRenderView->SetEngine (rview->GetEngine ());
-            newRenderView->SetThisSector (rview->GetThisSector ());
-            iCamera* shadowViewCam = newRenderView->CreateNewCamera();
-            shadowViewCam->SetTransform (light->GetMovable()->GetFullTransform ());
-            //shadowViewCam->GetTransform().SetOrigin (light->GetMovable()->GetFullPosition ());
-            //shadowViewCam->GetTransform().LookAt (csVector3 (0, 0, 1), csVector3 (0, -1, 0));
-	    shadowViewCam->SetPerspectiveCenter (128, 128);
-            shadowViewCam->SetFOVAngle (shadowViewCam->GetFOVAngle(), 256);
-	    csBox2 clipBox (0, 0, 256, 256);
-            csRef<iClipper2D> newView;
-            newView.AttachNew (new csBoxClipper (clipBox));
-            newRenderView->SetClipper (newView);
-
             csShaderVariable* lightTransInvSV = lightVarsHelper.CreateTempSV (
               persist.svNames.GetLightSVId (
 	        csLightShaderVarCache::lightTransformWorldInverse));
@@ -328,61 +391,36 @@ namespace RenderManager
             lightVarsHelper.MergeAsArrayItem (localStack, lightTransInvSV, l);
 
             // Add shadow map texture SV
-            iTextureHandle* shadowTex =
-              persist.texCache.QueryUnusedTexture (256, 256, 0);
-            csShaderVariable* shadowMapSV = lightVarsHelper.CreateTempSV (
-              persist.svNames.GetLightSVId (
-	        csLightShaderVarCache::lightShadowMap));
-            shadowMapSV->SetValue (shadowTex);
-            lightVarsHelper.MergeAsArrayItem (localStack, shadowMapSV, l);
-
+            if (thisLightCacheData->shadowMapCreateFrame != persist.frameNum)
             {
-              // Construct the projection matrix the same way gl3d does
-              CS::Math::Matrix4 Mortho (
-                2.0f/256,         0,       0,           -1.0f,
-                     0,    -2.0f/256,       0,           1.0f,
-                     0,         0, -2.0f/11.0f, -9.0f/11.0f,
-                     0,         0,       0,               1);
-
-              CS::Math::Matrix4 Mtranslate (
-                1, 0, 0, 128,
-                0, 1, 0, 128,
-                0, 0, 1,    0,
-                0, 0, 0,    1);
-
-              float invAspect = /*256.0f*/1.0f/shadowViewCam->GetFOV();
-              CS::Math::Matrix4 Mprojection (
-                1, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 0, 0, -invAspect,
-                0, 0, invAspect, 0);
-
-              CS::Math::Matrix4 Mfinal =
-                (Mortho * Mtranslate) * Mprojection;
-
-	      csShaderVariable* shadowMapProjectSV =
+              iTextureHandle* shadowTex =
+                persist.texCache.QueryUnusedTexture (256, 256, 0);
+              thisLightCacheData->shadowMapData.Setup (
+                renderTree.GetPersistentData().renderViewPool,
+                node->owner.renderView, light, shadowTex,
                 lightVarsHelper.CreateTempSV (persist.svNames.GetLightSVId (
-	          csLightShaderVarCache::lightShadowMapProjection));
-	      shadowMapProjectSV->SetArraySize (4);
-	      for (int i = 0; i < 4; i++)
-	      {
-		csShaderVariable* item = lightVarsHelper.CreateTempSV (
-		  CS::InvalidShaderVarStringID);
-                item->SetValue (Mfinal.Row (i));
-                shadowMapProjectSV->SetArrayElement (i, item);
-	      }
-              lightVarsHelper.MergeAsArrayItem (localStack, shadowMapProjectSV, l);
-            }
+                  csLightShaderVarCache::lightShadowMap)),
+                lightVarsHelper.CreateTempSV (persist.svNames.GetLightSVId (
+	          csLightShaderVarCache::lightShadowMapProjection)),
+                lightVarsHelper);
+              thisLightCacheData->shadowMapCreateFrame = persist.frameNum;
 
-            // Create a new context for shadow map w/ computed view
-            typename RenderTree::ContextNode* shadowMapCtx = 
-              renderTree.CreateContext (newRenderView);
-            shadowMapCtx->renderTargets[rtaDepth].texHandle = shadowTex;
+	      // Create a new context for shadow map w/ computed view
+	      typename RenderTree::ContextNode* shadowMapCtx = 
+		renderTree.CreateContext (
+                  thisLightCacheData->shadowMapData.GetNewRenderView());
+	      shadowMapCtx->renderTargets[rtaDepth].texHandle = shadowTex;
+    
+	      // Setup the new context
+	      ShadowmapContextSetup contextFunction (layerConfig,
+		persist.shaderManager);
+	      contextFunction (*shadowMapCtx);
   
-	    // Setup the new context
-            ShadowmapContextSetup contextFunction (layerConfig,
-              persist.shaderManager);
-            contextFunction (*shadowMapCtx);
+            }
+	    lightVarsHelper.MergeAsArrayItem (localStack, 
+	      thisLightCacheData->shadowMapData.GetMapShaderVar(), l);
+	    lightVarsHelper.MergeAsArrayItem (localStack,
+	      thisLightCacheData->shadowMapData.GetProjectionShaderVar(), l);
 
 	  }
 	  num -= thisNum;
