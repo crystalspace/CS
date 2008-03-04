@@ -24,6 +24,7 @@ chronological order.
 	  slightly slower it seems to be more stable and reliable.
 	- res added Alloc() overloads to csBlockAllocator<> for more
 	  constructor arguments.
+	- res added a method to csList<> to remove a specified item.
 03-Mar-2008
 	- res fixed some pointer formatting with unsigned longs recently
 	  introduced.

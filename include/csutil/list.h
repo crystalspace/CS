@@ -256,6 +256,25 @@ public:
 
   /// Remove specific item by iterator.
   void Delete (Iterator& it);
+  
+  /**
+   * Remove specified item.
+   * \remarks Slow!
+   */
+  bool Delete (const T& item)
+  {
+    ListElement* e = head.p;
+    while (e != 0)
+    {
+      if (e->data == item)
+      {
+	Delete (e);
+	return true;
+      }
+      e = e->next;
+    }
+    return false;
+  }
 
   /// Empty an list.
   void DeleteAll();
