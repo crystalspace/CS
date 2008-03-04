@@ -347,15 +347,7 @@ chronological order.
 	  '--help' besides crystalspace options.
 	- res fixed setting of the '0' render target in soft3d when no render
 	  target is set.
-<<<<<<< .working
 	- Marten fixed a typo in csBox3 transformation.
-	- res fixed the RM light setup to only empty the "SV keeper" every
-	  frame. Before it was emptied too often and SVs freed to early.
-=======
-	- res removed the hardcoded layer number from the GL state cache.
-	  Instead, layer-specific data is stored in dynamically allocated
-	  arrays, sized to the actuall number of texture resp. image units.
->>>>>>> .merge-right.r28883
 12-Feb-2008
 	- caedes fixed python override of Graphics2D::PerformExtension to
 	  allow command passthrough to the real c++ PerformExtension.
