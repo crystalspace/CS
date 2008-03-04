@@ -11,6 +11,14 @@ chronological order.
           in the right time and added better way of checking if amotor is 
           necessary).
 	- caedes added support for CS_REQUEST_PLUGIN_TAG to python bindings.
+	- res made the following changes to csRedBlackTree:
+	    - Copied Iterators from RM branch.
+	    - Made it possible to insert multiple keys with the same value.
+	    - Key copying is now done by an assignment, not in-place
+	      construction.
+	    - Added methods to find the smallest key greater or equal to some
+	      other key.
+	    - Added deletion of key pointed to by an iterator.
 03-Mar-2008
 	- res fixed some pointer formatting with unsigned longs recently
 	  introduced.
