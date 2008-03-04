@@ -329,7 +329,8 @@ iShader* StdLoaderContext::FindShader (const char *name)
   if (!shaderMgr)
     return 0;
 
-  if ((!curRegOnly || !region) && (!searchCollectionOnly || !collection))
+  if (((!curRegOnly || !region) && (!searchCollectionOnly || !collection))
+    || (name && *name == '*')) // Always look up builtin shaders globally
   {
     iShader* shader = shaderMgr->GetShader (name);
     if (!shader && missingdata)
@@ -597,176 +598,9 @@ static bool TestXML (const char* b)
   }
 }
 
-//--------------------------- Generic ---------------------------------------
-
-bool csLoader::LoadMapFile (const char* filename, bool clearEngine,
-                            iBase* base, bool colRegOnly, bool checkDupes,
-                            iStreamSource* ssource, iMissingLoaderData* missingdata,
-                            uint keepFlags)
-{
-  csRef<iRegion> region (scfQueryInterfaceSafe<iRegion>(base));
-  if(region)
-  {
-    return LoadMapFileRegion(filename, clearEngine, region, colRegOnly, checkDupes, ssource,
-      missingdata, keepFlags);
-  }
-  else
-  {
-    csRef<iCollection> collection (scfQueryInterfaceSafe<iCollection>(base));
-    return LoadMapFileCollection(filename, clearEngine, collection, colRegOnly, checkDupes, ssource,
-                                 missingdata, keepFlags);
-  }
-}
-
-bool csLoader::LoadMap (iDocumentNode* world_node, bool clearEngine,
-                        iBase* base, bool colRegOnly, bool checkDupes,
-                        iStreamSource* ssource, iMissingLoaderData* missingdata,
-                        uint keepFlags)
-{
-  csRef<iRegion> region (scfQueryInterfaceSafe<iRegion>(base));
-  if(region)
-  {
-    return LoadMapRegion(world_node, clearEngine, region, colRegOnly, checkDupes, ssource,
-      missingdata, keepFlags);
-  }
-  else
-  {
-    csRef<iCollection> collection (scfQueryInterfaceSafe<iCollection>(base));
-    return LoadMapCollection(world_node, clearEngine, collection, colRegOnly, checkDupes, ssource,
-      missingdata, keepFlags);
-  }
-}
-
-bool csLoader::LoadMapLibraryFile (const char* filename, iBase* base,
-                                   bool colRegOnly, bool checkDupes, iStreamSource* ssource,
-                                   iMissingLoaderData* missingdata, uint keepFlags, bool loadProxyTex)
-{
-  csRef<iRegion> region (scfQueryInterfaceSafe<iRegion>(base));
-  if(region)
-  {
-    return LoadMapLibraryFileRegion(filename, region, colRegOnly, checkDupes, ssource,
-      missingdata, keepFlags, loadProxyTex);
-  }
-  else
-  {
-    csRef<iCollection> collection (scfQueryInterfaceSafe<iCollection>(base));
-    return LoadMapLibraryFileCollection(filename, collection, colRegOnly, checkDupes, ssource,
-      missingdata, keepFlags, loadProxyTex);
-  }
-}
-
-bool csLoader::LoadLibraryFile (const char* filename, iBase* base,
-                                bool colRegOnly, bool checkDupes, iStreamSource* ssource,
-                                iMissingLoaderData* missingdata, uint keepFlags)
-{
-  csRef<iRegion> region (scfQueryInterfaceSafe<iRegion>(base));
-  if(region)
-  {
-    return LoadLibraryFileRegion(filename, region, colRegOnly, checkDupes, ssource,
-      missingdata, keepFlags);
-  }
-  else
-  {
-    csRef<iCollection> collection (scfQueryInterfaceSafe<iCollection>(base));
-    return LoadLibraryFileCollection(filename, collection, colRegOnly, checkDupes, ssource,
-      missingdata, keepFlags);
-  }
-}
-
-bool csLoader::LoadLibrary (iDocumentNode* lib_node, iBase* base,
-                            bool colRegOnly, bool checkDupes, iStreamSource* ssource,
-                            iMissingLoaderData* missingdata, uint keepFlags)
-{
-  csRef<iRegion> region (scfQueryInterfaceSafe<iRegion>(base));
-  if(region)
-  {
-    return LoadLibraryRegion(lib_node, region, colRegOnly, checkDupes, ssource,
-      missingdata, keepFlags);
-  }
-  else
-  {
-    csRef<iCollection> collection (scfQueryInterfaceSafe<iCollection>(base));
-    return LoadLibraryCollection(lib_node, collection, colRegOnly, checkDupes, ssource,
-      missingdata, keepFlags);
-  }
-}
-
-csLoadResult csLoader::Load (iDataBuffer* buffer, const char* fname,
-                             iBase* base, bool colRegOnly, bool checkDupes,
-                             iStreamSource* ssource, const char* override_name,
-                             iMissingLoaderData* missingdata, uint keepFlags)
-{
-  csRef<iRegion> region (scfQueryInterfaceSafe<iRegion>(base));
-  if(region)
-  {
-    return LoadRegion(buffer, fname, region, colRegOnly, checkDupes, ssource,
-               override_name, missingdata, keepFlags);
-  }
-  else
-  {
-    csRef<iCollection> collection (scfQueryInterfaceSafe<iCollection>(base));
-    return LoadCollection(buffer, fname, collection, colRegOnly, checkDupes, ssource,
-                   override_name, missingdata, keepFlags);
-  }
-}
-
-csLoadResult csLoader::Load (const char* fname, iBase* base, bool colRegOnly,
-                             bool checkDupes, iStreamSource* ssource, const char* override_name,
-                             iMissingLoaderData* missingdata, uint keepFlags)
-{
-  csRef<iRegion> region (scfQueryInterfaceSafe<iRegion>(base));
-  if(region)
-  {
-    return LoadRegion(fname, region, colRegOnly, checkDupes, ssource,
-               override_name, missingdata, keepFlags);
-  }
-  else
-  {
-    csRef<iCollection> collection (scfQueryInterfaceSafe<iCollection>(base));
-    return LoadCollection(fname, collection, colRegOnly, checkDupes, ssource,
-                   override_name, missingdata, keepFlags);
-  }
-}
-
-csLoadResult csLoader::Load (iDataBuffer* buffer, iBase* base, bool colRegOnly,
-                             bool checkDupes, iStreamSource* ssource, const char* override_name,
-                             iMissingLoaderData* missingdata, uint keepFlags)
-{
-  csRef<iRegion> region (scfQueryInterfaceSafe<iRegion>(base));
-  if(region)
-  {
-    return LoadRegion(buffer, region, colRegOnly, checkDupes, ssource,
-      override_name, missingdata, keepFlags);
-  }
-  else
-  {
-    csRef<iCollection> collection (scfQueryInterfaceSafe<iCollection>(base));
-    return LoadCollection(buffer, collection, colRegOnly, checkDupes, ssource,
-      override_name, missingdata, keepFlags);
-  }
-}
-
-csLoadResult csLoader::Load (iDocumentNode* node, iBase* base,
-                             bool colRegOnly, bool checkDupes, iStreamSource* ssource,
-                             const char* override_name, iMissingLoaderData* missingdata, uint keepFlags)
-{
-  csRef<iRegion> region (scfQueryInterfaceSafe<iRegion>(base));
-  if(region)
-  {
-    return LoadRegion(node, region, colRegOnly, checkDupes, ssource,
-      override_name, missingdata, keepFlags);
-  }
-  else
-  {
-    csRef<iCollection> collection (scfQueryInterfaceSafe<iCollection>(base));
-    return LoadCollection(node, collection, colRegOnly, checkDupes, ssource,
-      override_name, missingdata, keepFlags);
-  }
-}
-
 //--------------------------- Collections -----------------------------------
 
-csLoadResult csLoader::LoadCollection (iDataBuffer* buffer, const char* fname,
+csLoadResult csLoader::Load (iDataBuffer* buffer, const char* fname,
 	iCollection* collection, bool searchCollectionOnly, bool checkDupes,
   iStreamSource* ssource, const char* override_name, iMissingLoaderData* missingdata,
   uint keepFlags)
@@ -829,7 +663,7 @@ csLoadResult csLoader::LoadCollection (iDataBuffer* buffer, const char* fname,
   return rc;
 }
 
-csLoadResult csLoader::LoadCollection (const char* fname, iCollection* collection,
+csLoadResult csLoader::Load (const char* fname, iCollection* collection,
   	bool searchCollectionOnly, bool checkDupes, iStreamSource* ssource,
 	const char* override_name, iMissingLoaderData* missingdata, uint keepFlags)
 {
@@ -850,7 +684,7 @@ csLoadResult csLoader::LoadCollection (const char* fname, iCollection* collectio
   	override_name, missingdata, keepFlags);
 }
 
-csLoadResult csLoader::LoadCollection (iDataBuffer* buffer, iCollection* collection,
+csLoadResult csLoader::Load (iDataBuffer* buffer, iCollection* collection,
   	bool searchCollectionOnly, bool checkDupes, iStreamSource* ssource,
 	const char* override_name, iMissingLoaderData* missingdata, uint keepFlags)
 {
@@ -858,7 +692,7 @@ csLoadResult csLoader::LoadCollection (iDataBuffer* buffer, iCollection* collect
   	override_name, missingdata, keepFlags);
 }
 
-csLoadResult csLoader::LoadCollection (iDocumentNode* node, iCollection* collection,
+csLoadResult csLoader::Load (iDocumentNode* node, iCollection* collection,
   	bool searchCollectionOnly, bool checkDupes, iStreamSource* ssource,
 	const char* override_name, iMissingLoaderData* missingdata, uint keepFlags)
 {
@@ -976,7 +810,10 @@ csLoadResult csLoader::LoadCollection (iDocumentNode* node, iCollection* collect
     }
     if (ParsePortals (ldr_context, portalsnode, 0, 0, ssource))
     {
-      iMeshWrapper* mw = ldr_context->GetRegion ()->FindMeshObject(portalsname);
+      iMeshWrapper* mw = 0;
+      if (ldr_context->GetCollection())
+        mw = ldr_context->GetCollection()->FindMeshObject(portalsname);
+
       if (mw)
       {
         mw->QueryObject()->SetName(portalsname);
@@ -1016,7 +853,7 @@ csLoadResult csLoader::LoadCollection (iDocumentNode* node, iCollection* collect
   return rc;
 }
 
-bool csLoader::LoadMapFileCollection (const char* file, bool clearEngine,
+bool csLoader::LoadMapFile (const char* file, bool clearEngine,
   iCollection* collection, bool searchCollectionOnly, bool checkdupes,
   iStreamSource* ssource, iMissingLoaderData* missingdata, uint keepFlags)
 {
@@ -1065,7 +902,7 @@ bool csLoader::LoadMapFileCollection (const char* file, bool clearEngine,
   return true;
 }
 
-bool csLoader::LoadMapCollection (iDocumentNode* world_node, bool clearEngine,
+bool csLoader::LoadMap (iDocumentNode* world_node, bool clearEngine,
   iCollection* collection, bool searchCollectionOnly, bool checkdupes,
   iStreamSource* ssource, iMissingLoaderData* missingdata, uint keepFlags)
 {
@@ -1083,7 +920,7 @@ bool csLoader::LoadMapCollection (iDocumentNode* world_node, bool clearEngine,
 
 //---------------------------------------------------------------------------
 
-bool csLoader::LoadLibraryFileCollection (const char* fname, iCollection* collection,
+bool csLoader::LoadLibraryFile (const char* fname, iCollection* collection,
 	bool searchCollectionOnly, bool checkDupes,iStreamSource* ssource, 
     iMissingLoaderData* missingdata, uint keepFlags)
 {
@@ -1092,7 +929,7 @@ bool csLoader::LoadLibraryFileCollection (const char* fname, iCollection* collec
 			                         keepFlags);
 }
 
-bool csLoader::LoadMapLibraryFileCollection (const char* fname, iCollection* collection,
+bool csLoader::LoadMapLibraryFile (const char* fname, iCollection* collection,
 	bool searchCollectionOnly, bool checkDupes, iStreamSource* ssource, iMissingLoaderData* missingdata,
   uint keepFlags, bool loadProxyTex)
 {
@@ -1141,7 +978,7 @@ bool csLoader::LoadMapLibraryFileCollection (const char* fname, iCollection* col
   return false;
 }
 
-bool csLoader::LoadLibraryCollection (iDocumentNode* lib_node, iCollection* collection,
+bool csLoader::LoadLibrary (iDocumentNode* lib_node, iCollection* collection,
     bool searchCollectionOnly, bool checkDupes, iStreamSource* ssource,
 	iMissingLoaderData* missingdata, uint keepFlags)
 {
@@ -1171,10 +1008,9 @@ void StdLoaderContext::StdLoaderContextRegion (iEngine* Engine,
 
 //---------------------------------------------------------------------------
 
-csLoadResult csLoader::LoadRegion (iDataBuffer* buffer, const char* fname,
+csLoadResult csLoader::Load (iDataBuffer* buffer, const char* fname,
 	iRegion* region, bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-	const char* override_name, iMissingLoaderData* missingdata,
-	uint keepFlags)
+	const char* override_name, iMissingLoaderData* missingdata)
 {
   csLoadResult rc;
   rc.success = false;
@@ -1190,7 +1026,7 @@ csLoadResult csLoader::LoadRegion (iDataBuffer* buffer, const char* fname,
     {
       csRef<iDocumentNode> node = doc->GetRoot ();
       return Load (node, region, curRegOnly, checkDupes,
-          ssource, override_name, missingdata, keepFlags);
+          ssource, override_name, missingdata);
     }
     else
     {
@@ -1234,10 +1070,9 @@ csLoadResult csLoader::LoadRegion (iDataBuffer* buffer, const char* fname,
   return rc;
 }
 
-csLoadResult csLoader::LoadRegion (const char* fname, iRegion* region,
+csLoadResult csLoader::Load (const char* fname, iRegion* region,
   	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-	const char* override_name, iMissingLoaderData* missingdata,
-	uint keepFlags)
+	const char* override_name, iMissingLoaderData* missingdata)
 {
   csRef<iDataBuffer> buf = VFS->ReadFile (fname);
 
@@ -1253,22 +1088,20 @@ csLoadResult csLoader::LoadRegion (const char* fname, iRegion* region,
   }
   
   return Load (buf, fname, region, curRegOnly, checkDupes, ssource,
-  	override_name, missingdata, keepFlags);
+  	override_name, missingdata);
 }
 
-csLoadResult csLoader::LoadRegion (iDataBuffer* buffer, iRegion* region,
+csLoadResult csLoader::Load (iDataBuffer* buffer, iRegion* region,
   	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-	const char* override_name, iMissingLoaderData* missingdata,
-	uint keepFlags)
+	const char* override_name, iMissingLoaderData* missingdata)
 {
   return Load (buffer, 0, region, curRegOnly, checkDupes, ssource,
-  	override_name, missingdata, keepFlags);
+  	override_name, missingdata);
 }
 
-csLoadResult csLoader::LoadRegion (iDocumentNode* node, iRegion* region,
+csLoadResult csLoader::Load (iDocumentNode* node, iRegion* region,
   	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-	const char* override_name, iMissingLoaderData* missingdata,
-	uint keepFlags)
+	const char* override_name, iMissingLoaderData* missingdata)
 {
   csLoadResult rc;
   rc.success = false;
@@ -1384,7 +1217,12 @@ csLoadResult csLoader::LoadRegion (iDocumentNode* node, iRegion* region,
     }
     if (ParsePortals (ldr_context, portalsnode, 0, 0, ssource))
     {
-      iMeshWrapper* mw = ldr_context->GetRegion ()->FindMeshObject(portalsname);
+      iMeshWrapper* mw = 0;
+      if(ldr_context->GetCollection())
+      {
+        mw = ldr_context->GetCollection ()->FindMeshObject(portalsname);
+      }
+
       if (mw)
       {
         mw->QueryObject()->SetName(portalsname);
@@ -1424,10 +1262,9 @@ csLoadResult csLoader::LoadRegion (iDocumentNode* node, iRegion* region,
   return rc;
 }
 
-bool csLoader::LoadMapFileRegion (const char* file, bool clearEngine,
+bool csLoader::LoadMapFile (const char* file, bool clearEngine,
   iRegion* region, bool curRegOnly, bool checkdupes,
-  iStreamSource* ssource, iMissingLoaderData* missingdata, 
-  uint keepFlags)
+  iStreamSource* ssource, iMissingLoaderData* missingdata)
 {
   csRef<iFile> buf = VFS->Open (file, VFS_FILE_READ);
 
@@ -1462,7 +1299,7 @@ bool csLoader::LoadMapFileRegion (const char* file, bool clearEngine,
     }
     
     return LoadMap (world_node, clearEngine, region, curRegOnly, checkdupes,
-    	            ssource, missingdata, keepFlags);
+    	            ssource, missingdata);
   }
   else
   {
@@ -1474,10 +1311,9 @@ bool csLoader::LoadMapFileRegion (const char* file, bool clearEngine,
   return true;
 }
 
-bool csLoader::LoadMapRegion (iDocumentNode* world_node, bool clearEngine,
+bool csLoader::LoadMap (iDocumentNode* world_node, bool clearEngine,
   iRegion* region, bool curRegOnly, bool checkdupes,
-  iStreamSource* ssource, iMissingLoaderData* missingdata, 
-  uint keepFlags)
+  iStreamSource* ssource, iMissingLoaderData* missingdata)
 {
   if (clearEngine)
   {
@@ -1493,17 +1329,17 @@ bool csLoader::LoadMapRegion (iDocumentNode* world_node, bool clearEngine,
 
 //---------------------------------------------------------------------------
 
-bool csLoader::LoadLibraryFileRegion (const char* fname, iRegion* region,
+bool csLoader::LoadLibraryFile (const char* fname, iRegion* region,
 	bool curRegOnly, bool checkDupes,iStreamSource* ssource, 
-    iMissingLoaderData* missingdata, uint keepFlags)
+    iMissingLoaderData* missingdata)
 {
     return LoadMapLibraryFile (fname, region, curRegOnly, checkDupes,
-                               ssource, missingdata, keepFlags);
+                               ssource, missingdata);
 }
 
-bool csLoader::LoadMapLibraryFileRegion (const char* fname, iRegion* region,
+bool csLoader::LoadMapLibraryFile (const char* fname, iRegion* region,
 	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-	iMissingLoaderData* missingdata, uint keepFlags, bool loadProxyTex)
+	iMissingLoaderData* missingdata, bool loadProxyTex)
 {
   csRef<iFile> buf = VFS->Open (fname, VFS_FILE_READ);
 
@@ -1554,9 +1390,9 @@ bool csLoader::LoadMapLibraryFileRegion (const char* fname, iRegion* region,
   return false;
 }
 
-bool csLoader::LoadLibraryRegion (iDocumentNode* lib_node, iRegion* region,
+bool csLoader::LoadLibrary (iDocumentNode* lib_node, iRegion* region,
 	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-	iMissingLoaderData* missingdata, uint keepFlags)
+	iMissingLoaderData* missingdata)
 {
   csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
 	new StdLoaderContext (Engine, region, curRegOnly, this, checkDupes,
@@ -1570,20 +1406,19 @@ bool csLoader::LoadLibraryRegion (iDocumentNode* lib_node, iRegion* region,
 void csLoader::AddToRegionOrCollection(iLoaderContext* ldr_context, iObject* obj,
                                        bool alwaysKeep)
 {
+  bool keep = (ldr_context->GetKeepFlags() == KEEP_ALL || alwaysKeep);
+
   if(ldr_context->GetRegion())
   {
     ldr_context->GetRegion()->QueryObject()->ObjAdd(obj);
   }
-  else if(ldr_context->GetKeepFlags() == KEEP_ALL || alwaysKeep)
+  else if(ldr_context->GetCollection() && !keep)
   {
-    if(ldr_context->GetCollection())
-    {
-      ldr_context->GetCollection()->Add(obj);
-    }
-    else
-    {
-      Engine->GetDefaultCollection()->Add(obj);
-    }
+    ldr_context->GetCollection()->Add(obj);
+  }
+  else
+  {
+    Engine->GetDefaultCollection()->Add(obj);
   }
 }
 
@@ -1787,8 +1622,6 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
 
   stringSet = csQueryRegistryTagInterface<iStringSet> (
     object_reg, "crystalspace.shared.stringset");
-  stringSetSvName = csQueryRegistryTagInterface<iShaderVarStringSet> (
-    object_reg, "crystalspace.shader.variablenameset");
 
   return true;
 }
@@ -1853,7 +1686,7 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode,
             csLoadResult rc = Load (filename, ldr_context->GetRegion (),
 	  	  ldr_context->CurrentRegionOnly (),
 		  ldr_context->CheckDupes (),
-		  ssource, name, missingdata, false);
+		  ssource, name, missingdata);
 	    if (!rc.success)
 	    {
               SyntaxService->ReportError (
@@ -2010,7 +1843,7 @@ bool csLoader::LoadLibraryFromNode (iLoaderContext* ldr_context,
     
     bool rc = LoadMapLibraryFile (file,
 	  	  ldr_context->GetRegion (), ldr_context->CurrentRegionOnly (),
-	      dupes, ssource, missingdata, false, loadProxyTex);
+	      dupes, ssource, missingdata, loadProxyTex);
     if (path)
     {
       vfs->PopDir ();
@@ -2030,7 +1863,7 @@ bool csLoader::LoadLibraryFromNode (iLoaderContext* ldr_context,
     
     if (!LoadMapLibraryFile (child->GetContentsValue (),
 	  	ldr_context->GetRegion (), ldr_context->CurrentRegionOnly (),
-		ldr_context->CheckDupes (), ssource, missingdata, false,
+		ldr_context->CheckDupes (), ssource, missingdata, 
 		loadProxyTex))
     return false;
   }
@@ -3611,8 +3444,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
         //create a new variable
         const char* varname = child->GetAttributeValue ("name");
 	csRef<csShaderVariable> var;
-	var.AttachNew (new csShaderVariable (
-          stringSetSvName->Request (varname)));
+	var.AttachNew (new csShaderVariable (stringSet->Request (varname)));
 	if (!SyntaxService->ParseShaderVar (ldr_context, child, *var))
         {
 	  SyntaxService->ReportError (
@@ -5249,8 +5081,7 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
 	{
 	  const char* varname = child->GetAttributeValue ("name");
 	  csRef<csShaderVariable> var;
-	  var.AttachNew (new csShaderVariable (
-            stringSetSvName->Request (varname)));
+	  var.AttachNew (new csShaderVariable (stringSet->Request (varname)));
 	  if (!SyntaxService->ParseShaderVar (ldr_context, child, *var))
 	  {
 	    SyntaxService->ReportError (

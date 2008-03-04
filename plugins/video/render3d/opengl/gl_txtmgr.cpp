@@ -266,16 +266,6 @@ void csGLTextureManager::Clear()
   superLMs.DeleteAll ();
 }
 
-void csGLTextureManager::SetupPixelStore()
-{
-  // @@@ These never really change.
-  G3D->statecache->SetPixelUnpackAlignment (1);
-#ifndef CS_LITTLE_ENDIAN
-  // The texture format stuff generally assumes little endian
-  G3D->statecache->SetPixelUnpackSwapBytes (true);
-#endif
-}
-
 void csGLTextureManager::UnsetTexture (GLenum target, GLuint texture)
 {
   csGLStateCache* statecache = csGLGraphics3D::statecache;

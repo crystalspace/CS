@@ -91,7 +91,13 @@ struct iLoaderContext : public virtual iBase
   /// Find a light
   virtual iLight* FindLight (const char* name) = 0;
 
-  /// Find a shader.
+  /**
+   * Find a shader.
+   * \remarks Implementations should treat shader names starting with a '*'
+   *   in a special way: These are "built-in" shaders and should be searched 
+   *   globally even if only the current collection is supposed to be looked
+   *   up.
+   */
   virtual iShader* FindShader (const char* name) = 0;
 
   /**

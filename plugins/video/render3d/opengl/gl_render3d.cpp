@@ -947,14 +947,12 @@ bool csGLGraphics3D::Open ()
   statecache->SetStencilMask (stencil_shadow_mask);
 
   numImageUnits = statecache->GetNumImageUnits();
-  if (ext->CS_GL_ARB_multitexture)
-    glGetIntegerv (GL_MAX_TEXTURE_UNITS_ARB, &numTCUnits);
-  else
-    numTCUnits = 1;
+  numTCUnits = statecache->GetNumTexCoords();
   imageUnits = new ImageUnit[numImageUnits];
   if (verbose)
     Report (CS_REPORTER_SEVERITY_NOTIFY, 
-      "Available texture image units: %d", numImageUnits);
+      "Available texture image units: %d texture coordinate units: %d",
+      numImageUnits, numTCUnits);
 
   // Set up texture LOD bias.
   if (ext->CS_GL_EXT_texture_lod_bias)
@@ -1254,7 +1252,11 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
   debug_inhibit_draw = false;
 
   int i = 0;
+<<<<<<< .working
   for (i = numImageUnits-1; i >= 0; i--)
+=======
+  for (i = numImageUnits; i-- > 0;)
+>>>>>>> .merge-right.r28883
     DeactivateTexture (i);
 
   // if 2D graphics is not locked, lock it
@@ -1287,7 +1289,6 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
       	| GL_COLOR_BUFFER_BIT;
     else
       clearMask = GL_DEPTH_BUFFER_BIT | stencilFlag;
-    glClearDepth (0.0); // @@@ Never really changes 
   }
   else if (drawflags & CSDRAW_CLEARSCREEN)
     clearMask = GL_COLOR_BUFFER_BIT;
@@ -1532,7 +1533,20 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
     for (i = 0; i < CS_VATTRIB_SPECIFIC_LAST-CS_VATTRIB_SPECIFIC_FIRST+1; i++)
     {
       iRenderBuffer *b = spec_renderBuffers[i];
+<<<<<<< .working
       if (b) RenderRelease (b);// b->RenderRelease ();      
+=======
+      if (b) RenderRelease (b);// b->RenderRelease ();
+      if (i >= CS_VATTRIB_TEXCOORD0 && i <= CS_VATTRIB_TEXCOORD7)
+      {
+	if (imageUnits[i-CS_VATTRIB_TEXCOORD0].npotsStatus)
+        {
+          npotsFixupScrap.Push (b);
+	  imageUnits[i-CS_VATTRIB_TEXCOORD0].npotsStatus = false;
+        }
+      }
+      spec_renderBuffers[i] = 0;
+>>>>>>> .merge-right.r28883
     }
     for (i = 0; i < CS_VATTRIB_GENERIC_LAST-CS_VATTRIB_GENERIC_FIRST+1; i++)
     {
@@ -1596,7 +1610,15 @@ bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
   }
   /*texunitenabled[unit] = true;
   texunittarget[unit] = gltxthandle->target;*/
+<<<<<<< .working
   
+=======
+  bool doNPOTS = (gltxthandle->texType == iTextureHandle::texTypeRect);
+  if (doNPOTS && (unit < 8))
+    imageUnits[unit].needNPOTSfixup = gltxthandle;
+  else
+    imageUnits[unit].needNPOTSfixup = 0;
+>>>>>>> .merge-right.r28883
   return true;
 }
 
@@ -1632,7 +1654,12 @@ void csGLGraphics3D::DeactivateTexture (int unit)
   statecache->Disable_GL_TEXTURE_2D ();
   statecache->Disable_GL_TEXTURE_3D ();
   statecache->Disable_GL_TEXTURE_CUBE_MAP ();
+<<<<<<< .working
   statecache->Disable_GL_TEXTURE_RECTANGLE_ARB ();  
+=======
+  statecache->Disable_GL_TEXTURE_RECTANGLE_ARB ();
+  imageUnits[unit].needNPOTSfixup = 0;
+>>>>>>> .merge-right.r28883
 
   imageUnits[unit].enabled = false;
 }
@@ -2284,8 +2311,30 @@ void csGLGraphics3D::ApplyBufferChanges()
 
       if (CS_VATTRIB_IS_GENERIC (att)) 
         AssignGenericBuffer (att-CS_VATTRIB_GENERIC_FIRST, buffer);
+<<<<<<< .working
       else               
         AssignSpecBuffer (att-CS_VATTRIB_SPECIFIC_FIRST, buffer);      
+=======
+      else 
+      {
+        if (att >= CS_VATTRIB_TEXCOORD0 && att <= CS_VATTRIB_TEXCOORD7)
+        {
+          unsigned int unit = att - CS_VATTRIB_TEXCOORD0;
+	  if (imageUnits[unit].needNPOTSfixup)
+          {
+            npotsFixupScrap.Push (spec_renderBuffers[att-CS_VATTRIB_SPECIFIC_FIRST]);
+            AssignSpecBuffer (att-CS_VATTRIB_SPECIFIC_FIRST, 0);
+	    imageUnits[unit].npotsStatus = false;
+          }
+          if (imageUnits[unit].needNPOTSfixup.IsValid())
+          {
+            buffer = bufferRef = DoNPOTSFixup (buffer, unit);
+	    imageUnits[unit].npotsStatus = true;
+          }
+        }
+        AssignSpecBuffer (att-CS_VATTRIB_SPECIFIC_FIRST, buffer);
+      }
+>>>>>>> .merge-right.r28883
 
       GLenum compType;
       void *data =
@@ -2375,6 +2424,14 @@ void csGLGraphics3D::ApplyBufferChanges()
             statecache->SetCurrentTU (unit);
           }
           statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
+<<<<<<< .working
+=======
+	  if (imageUnits[unit].npotsStatus)
+          {
+            npotsFixupScrap.Push (spec_renderBuffers[att - CS_VATTRIB_SPECIFIC_FIRST]);
+	    imageUnits[unit].npotsStatus = false;
+          }
+>>>>>>> .merge-right.r28883
         }
         else if (CS_VATTRIB_IS_GENERIC(att))
         {
@@ -2432,6 +2489,68 @@ static void DoFixup (iRenderBuffer* src, T* dest, const T2 scales[],
   }
 }
 
+<<<<<<< .working
+=======
+csRef<iRenderBuffer> csGLGraphics3D::DoNPOTSFixup (iRenderBuffer* buffer, int unit)
+{
+  csRef<iRenderBuffer> scrapBuf;
+  if (npotsFixupScrap.GetSize () > 0) scrapBuf = npotsFixupScrap.Pop();
+  if (!scrapBuf.IsValid()
+    || (scrapBuf->GetElementCount() < buffer->GetElementCount())
+    || (scrapBuf->GetComponentCount() != buffer->GetComponentCount())
+    || (scrapBuf->GetComponentType() != buffer->GetComponentType()))
+  {
+    scrapBuf = csRenderBuffer::CreateRenderBuffer (buffer->GetElementCount(),
+      CS_BUF_STREAM, buffer->GetComponentType(), buffer->GetComponentCount());
+  }
+
+  const int componentScale[] = {
+    imageUnits[unit].needNPOTSfixup->actual_width, 
+    imageUnits[unit].needNPOTSfixup->actual_height,
+    1, 1};
+
+  switch (scrapBuf->GetComponentType())
+  {
+    case CS_BUFCOMP_BYTE:
+      DoFixup (buffer, csRenderBufferLock<char> (scrapBuf).Lock(),
+        componentScale);
+      break;
+    case CS_BUFCOMP_UNSIGNED_BYTE:
+      DoFixup (buffer, csRenderBufferLock<unsigned char> (scrapBuf).Lock(),
+        componentScale);
+      break;
+    case CS_BUFCOMP_SHORT:
+      DoFixup (buffer, csRenderBufferLock<short> (scrapBuf).Lock(),
+        componentScale);
+      break;
+    case CS_BUFCOMP_UNSIGNED_SHORT:
+      DoFixup (buffer, csRenderBufferLock<unsigned short> (scrapBuf).Lock(),
+        componentScale);
+      break;
+    case CS_BUFCOMP_INT:
+      DoFixup (buffer, csRenderBufferLock<int> (scrapBuf).Lock(),
+        componentScale);
+      break;
+    case CS_BUFCOMP_UNSIGNED_INT:
+      DoFixup (buffer, csRenderBufferLock<unsigned int> (scrapBuf).Lock(),
+        componentScale);
+      break;
+    case CS_BUFCOMP_FLOAT:
+      DoFixup (buffer, csRenderBufferLock<float> (scrapBuf).Lock(),
+        componentScale);
+      break;
+    case CS_BUFCOMP_DOUBLE:
+      DoFixup (buffer, csRenderBufferLock<double> (scrapBuf).Lock(),
+        componentScale);
+      break;
+    default:
+      CS_ASSERT(false); // Should never happen.
+      break;
+  }
+  return scrapBuf;
+}
+
+>>>>>>> .merge-right.r28883
 csRef<iRenderBuffer> csGLGraphics3D::DoColorFixup (iRenderBuffer* buffer)
 {
   if (!colorScrap.IsValid()
