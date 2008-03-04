@@ -329,7 +329,8 @@ iShader* StdLoaderContext::FindShader (const char *name)
   if (!shaderMgr)
     return 0;
 
-  if ((!curRegOnly || !region) && (!searchCollectionOnly || !collection))
+  if (((!curRegOnly || !region) && (!searchCollectionOnly || !collection))
+    || (name && *name == '*')) // Always look up builtin shaders globally
   {
     iShader* shader = shaderMgr->GetShader (name);
     if (!shader && missingdata)

@@ -46,6 +46,11 @@ chronological order.
 	- res added iRenderLoopManager::UnregisterAll().
 	- res fixed a hardcoded image unit count in gl3d.
 	- Sueastside fixed a crash in csloader.
+	- res changed iLoaderContext::FindShader() implementations to always
+	  search for builtin shaders (names starting with '*') globally: this
+	  makes it possible to use these shaders with "collection only"
+	  loading even though they have not been manually added to the
+	  used collection.
 03-Mar-2008
 	- res fixed some pointer formatting with unsigned longs recently
 	  introduced.

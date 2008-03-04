@@ -3461,7 +3461,8 @@ iTextureWrapper* EngineLoaderContext::FindNamedTexture (const char* name,
 
 iShader* EngineLoaderContext::FindShader (const char* name)
 {
-  if((!curRegOnly || !region) && (!searchCollectionOnly || !collection))
+  if(((!curRegOnly || !region) && (!searchCollectionOnly || !collection))
+    || (name && *name == '*')) // Always look up builtin shaders globally
     return Engine->shaderManager->GetShader (name);
 
   const csRefArray<iShader>& shaders = 
