@@ -167,7 +167,7 @@ bool Demo::LoadDemoFile (const char* demofile)
   // This can fail, but we don't care :-)
   loader->LoadLibraryFile ("library");
 
-  if (!loader->LoadMapFile ("world", false, (iCollection*)0, true))
+  if (!loader->LoadMapFile ("world", false, 0, true))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "There was an error loading world!");
     exit (0);

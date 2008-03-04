@@ -36,6 +36,8 @@ chronological order.
 	  there's no need to distinguish dynamically if there are ever only
 	  two choices, it's less overhead and removes an ambiguity with the
 	  backwards compatibility Load() methods.
+	- res added a hack to the iLoader interface to keep source
+	  compatibility with code that used to pass '0' for regions.
 03-Mar-2008
 	- res fixed some pointer formatting with unsigned longs recently
 	  introduced.

@@ -306,6 +306,16 @@ struct iLoader : public virtual iBase
     const char *FileName, int Flags, iTextureManager *tm,
     bool reg, bool create_material, bool free_image,
     iRegion* region) = 0;
+  /* Hack to ensure source compatibility when a 0 collection/region is used.
+   * Remove with region variant. */
+  CS_FORCEINLINE iTextureWrapper* LoadTexture (const char *Name,
+    const char *FileName, int Flags, iTextureManager *tm,
+    bool reg, bool create_material, bool free_image,
+    int dummy)
+  { 
+    return LoadTexture (Name, FileName, Flags, tm, reg, create_material,
+      free_image, (iCollection*)0); 
+  }
   //@}
 
   //@}
@@ -355,6 +365,16 @@ struct iLoader : public virtual iBase
     iRegion* region, bool curRegOnly = true,
     bool checkDupes = false, iStreamSource* ssource = 0,
     iMissingLoaderData* missingdata = 0) = 0;
+  /* Hack to ensure source compatibility when a 0 collection/region is used.
+   * Remove with region variant. */
+  CS_FORCEINLINE bool LoadMapFile (const char* filename, bool clearEngine,
+    int dummy, bool curRegOnly = true,
+    bool checkDupes = false, iStreamSource* ssource = 0,
+    iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL)
+  { 
+    return LoadMapFile (filename, clearEngine, (iCollection*)0, curRegOnly,
+			checkDupes, ssource, missingdata, keepFlags); 
+  }
   //@}
   
   //@{
@@ -403,6 +423,16 @@ struct iLoader : public virtual iBase
     iRegion* region, bool curRegOnly = true,
     bool checkDupes = false, iStreamSource* ssource = 0,
     iMissingLoaderData* missingdata = 0) = 0;
+  /* Hack to ensure source compatibility when a 0 collection/region is used.
+   * Remove with region variant. */
+  CS_FORCEINLINE bool LoadMap (iDocumentNode* world_node, bool clearEngine,
+    int dummy, bool curRegOnly = true,
+    bool checkDupes = false, iStreamSource* ssource = 0,
+    iMissingLoaderData* missingdata = 0)
+  { 
+    return LoadMap (world_node, clearEngine, (iCollection*)0, curRegOnly,
+		    checkDupes, ssource, missingdata);
+  }
   //@}
 
   //@{
@@ -435,6 +465,15 @@ struct iLoader : public virtual iBase
   virtual bool LoadLibraryFile (const char* filename, iRegion* region,
     bool searchregionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     iMissingLoaderData* missingdata = 0) = 0;
+  /* Hack to ensure source compatibility when a 0 collection/region is used.
+   * Remove with region variant. */
+  CS_FORCEINLINE bool LoadLibraryFile (const char* filename, int dummy,
+    bool searchregionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    iMissingLoaderData* missingdata = 0)
+  { 
+    return LoadLibraryFile (filename, (iCollection*)0, searchregionOnly, 
+			    checkDupes, ssource, missingdata);
+  }
   //@}
 
   //@{
@@ -467,6 +506,15 @@ struct iLoader : public virtual iBase
   virtual bool LoadLibrary (iDocumentNode* lib_node, iRegion* region,
     bool searchRegionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     iMissingLoaderData* missingdata = 0) = 0;
+  /* Hack to ensure source compatibility when a 0 collection/region is used.
+   * Remove with region variant. */
+  CS_FORCEINLINE bool LoadLibrary (iDocumentNode* lib_node, int dummy,
+    bool searchRegionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    iMissingLoaderData* missingdata = 0)
+  { 
+    return LoadLibrary (lib_node, (iCollection*)0, searchRegionOnly, 
+			checkDupes, ssource, missingdata); 
+  }
   //@)
 
   //@{
@@ -523,6 +571,15 @@ struct iLoader : public virtual iBase
   virtual csLoadResult Load (const char* fname, iRegion* region,
     bool searchRegionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0) = 0;
+  /* Hack to ensure source compatibility when a 0 collection/region is used.
+   * Remove with region variant. */
+  CS_FORCEINLINE csLoadResult Load (const char* fname, int dummy,
+    bool searchRegionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    const char* override_name = 0, iMissingLoaderData* missingdata = 0)
+  { 
+    return Load (fname, (iCollection*)0, searchRegionOnly, checkDupes, ssource,
+		 override_name, missingdata);
+  }
   //@}
 
   //@{
@@ -579,6 +636,15 @@ struct iLoader : public virtual iBase
   virtual csLoadResult Load (iDataBuffer* buffer, iRegion* region,
     bool searchRegionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0) = 0;
+  /* Hack to ensure source compatibility when a 0 collection/region is used.
+   * Remove with region variant. */
+  CS_FORCEINLINE csLoadResult Load (iDataBuffer* buffer, int dummy,
+    bool searchRegionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    const char* override_name = 0, iMissingLoaderData* missingdata = 0)
+  { 
+    return Load (buffer, (iCollection*)0, searchRegionOnly, checkDupes,
+		 ssource, override_name, missingdata); 
+  }
   //@}
 
   //@{
@@ -634,6 +700,15 @@ struct iLoader : public virtual iBase
   virtual csLoadResult Load (iDocumentNode* node, iRegion* region,
     bool searchRegionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0) = 0;
+  /* Hack to ensure source compatibility when a 0 collection/region is used.
+   * Remove with region variant. */
+  CS_FORCEINLINE csLoadResult Load (iDocumentNode* node, int dummy,
+    bool searchRegionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    const char* override_name = 0, iMissingLoaderData* missingdata = 0)
+  { 
+    return Load (node, (iCollection*)0, searchRegionOnly, checkDupes, ssource,
+		 override_name, missingdata);
+  }
   //@}
 
   /**
