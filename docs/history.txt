@@ -25,6 +25,9 @@ chronological order.
 	- res added Alloc() overloads to csBlockAllocator<> for more
 	  constructor arguments.
 	- res added a method to csList<> to remove a specified item.
+	- res changed gl3d to signal a "frame advancement" to the r2t backend
+	  upon a frame event (which is really sent once a frame) instead of
+	  in Print() (which can actually be called many times a frame).
 03-Mar-2008
 	- res fixed some pointer formatting with unsigned longs recently
 	  introduced.
