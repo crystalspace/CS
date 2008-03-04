@@ -468,7 +468,7 @@ protected:
   void RecursiveTraverseInOrder (Node* node, CB& callback) const
   {
     if (node->left != 0) RecursiveTraverseInOrder (node->left, callback);
-    callback(*((K*)&node->key));
+    callback (*((K*)&node->key));
     if (node->right != 0) RecursiveTraverseInOrder (node->right, callback);
   }
 
