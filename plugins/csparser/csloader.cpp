@@ -1406,19 +1406,20 @@ bool csLoader::LoadLibrary (iDocumentNode* lib_node, iRegion* region,
 void csLoader::AddToRegionOrCollection(iLoaderContext* ldr_context, iObject* obj,
                                        bool alwaysKeep)
 {
-  bool keep = (ldr_context->GetKeepFlags() == KEEP_ALL || alwaysKeep);
-
   if(ldr_context->GetRegion())
   {
     ldr_context->GetRegion()->QueryObject()->ObjAdd(obj);
   }
-  else if(ldr_context->GetCollection() && !keep)
+  else if(ldr_context->GetKeepFlags() == KEEP_ALL || alwaysKeep)
   {
-    ldr_context->GetCollection()->Add(obj);
-  }
-  else
-  {
-    Engine->GetDefaultCollection()->Add(obj);
+    if(ldr_context->GetCollection())
+    {
+      ldr_context->GetCollection()->Add(obj);
+    }
+    else
+    {
+      Engine->GetDefaultCollection()->Add(obj);
+    }
   }
 }
 

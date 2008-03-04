@@ -754,6 +754,14 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
 
   modes.flipCulling = thispass->flipCulling;
   modes.zoffset = thispass->zoffset;
+  
+  float alpha = 1.0f;
+  if (modes.mixmode & CS_FX_MASK_ALPHA)
+  {
+    alpha = 1.0f - (float)(modes.mixmode & CS_FX_MASK_ALPHA) / 255.0f;
+  }
+  parent->shadermgr->GetVariableAdd (
+    parent->compiler->string_mixmode_alpha)->SetValue (alpha);
 
   if(thispass->vp) thispass->vp->SetupState (mesh, modes, stack);
   if(thispass->fp) thispass->fp->SetupState (mesh, modes, stack);

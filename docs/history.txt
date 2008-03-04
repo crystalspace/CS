@@ -54,6 +54,13 @@ chronological order.
 	  makes it possible to use these shaders with "collection only"
 	  loading even though they have not been manually added to the
 	  used collection.
+	- Mike Gist reverted functionality breakage in AddToRegionOrCollection
+	  added in r28882. We don't want to always store everything in a region
+	  or collection (e.g. when KEEP_USED is set).
+	- res changed how mixmode alpha is passed around: instead of implicitly
+	  by the renderer through the vertex color it's now passed through a
+	  shader var ("mixmode alpha") and it's the responsibility of the
+	  shader to make use of that information.
 03-Mar-2008
 	- res fixed some pointer formatting with unsigned longs recently
 	  introduced.

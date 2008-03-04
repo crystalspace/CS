@@ -1314,6 +1314,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
     // glPolygonOffset (-0.05f, -2.0f); 
     glPolygonOffset (-0.15f, -6.0f); 
     needProjectionUpdate = true;
+    glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
 
 //    object2camera.Identity ();
     //@@@ TODO FIX
@@ -1940,10 +1941,6 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       }*/
     }
 
-    float alpha = 1.0f;
-    if (mixmode & CS_FX_MASK_ALPHA)
-      alpha = 1.0f - (float)(mixmode & CS_FX_MASK_ALPHA) / 255.0f;
-    glColor4f (1.0f, 1.0f, 1.0f, alpha);
     glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
       (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
       compType, 
