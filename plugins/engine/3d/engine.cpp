@@ -3358,7 +3358,7 @@ void EngineLoaderContext::InitRegion(iRegion* region, bool curRegOnly)
   EngineLoaderContext::region = region;
   EngineLoaderContext::curRegOnly = curRegOnly;
   EngineLoaderContext::collection = NULL;  
-  EngineLoaderContext::searchCollectionOnly = NULL; 
+  EngineLoaderContext::searchCollectionOnly = false; 
 }
 
 void EngineLoaderContext::InitCollection(iCollection *collection, bool searchCollectionOnly)
@@ -3366,7 +3366,7 @@ void EngineLoaderContext::InitCollection(iCollection *collection, bool searchCol
   EngineLoaderContext::collection = collection;
   EngineLoaderContext::searchCollectionOnly = searchCollectionOnly;
   EngineLoaderContext::region = NULL;
-  EngineLoaderContext::curRegOnly = NULL;
+  EngineLoaderContext::curRegOnly = false;
 }
 
 EngineLoaderContext::~EngineLoaderContext ()
