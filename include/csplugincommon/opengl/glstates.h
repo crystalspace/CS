@@ -886,7 +886,7 @@ public:
         currentContext->parameter_npointer = (GLvoid*)~0;
         currentContext->parameter_cpointer = (GLvoid*)~0;
         memset(currentContext->parameter_tpointer.p, ~0,
-          sizeof(GLvoid*)*currentContext->numImageUnits);
+          sizeof(GLvoid*)*currentContext->numTexCoords);
       }
     }
   }
