@@ -774,7 +774,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
                 return 0;
               }
             }
-            ldr_plg->Parse(doc->GetRoot (), 0, 0, 0);
+            csRef<iBase> silly = ldr_plg->Parse(doc->GetRoot (), 0, 0, 0);
           }
         }
         break;
