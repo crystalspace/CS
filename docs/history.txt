@@ -10,6 +10,7 @@ chronological order.
         - Piotr did few behavior fixes for ode joints (attaching bodies
           in the right time and added better way of checking if amotor is 
           necessary).
+	- caedes added support for CS_REQUEST_PLUGIN_TAG to python bindings.
 03-Mar-2008
 	- res fixed some pointer formatting with unsigned longs recently
 	  introduced.
