@@ -19,6 +19,9 @@ chronological order.
 	    - Added methods to find the smallest key greater or equal to some
 	      other key.
 	    - Added deletion of key pointed to by an iterator.
+	- res changed GenericResourceCache to use "stock" csList<> and
+	  csRedBlackTree<> instead of a customized variant. While possibly
+	  slightly slower it seems to be more stable and reliable.
 03-Mar-2008
 	- res fixed some pointer formatting with unsigned longs recently
 	  introduced.
