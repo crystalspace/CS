@@ -45,6 +45,7 @@ chronological order.
 	  embedding.
 	- res added iRenderLoopManager::UnregisterAll().
 	- res fixed a hardcoded image unit count in gl3d.
+	- Sueastside fixed a crash in csloader.
 03-Mar-2008
 	- res fixed some pointer formatting with unsigned longs recently
 	  introduced.

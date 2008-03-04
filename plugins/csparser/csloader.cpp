@@ -809,7 +809,10 @@ csLoadResult csLoader::Load (iDocumentNode* node, iCollection* collection,
     }
     if (ParsePortals (ldr_context, portalsnode, 0, 0, ssource))
     {
-      iMeshWrapper* mw = ldr_context->GetRegion ()->FindMeshObject(portalsname);
+      iMeshWrapper* mw = 0;
+      if (ldr_context->GetCollection())
+        mw = ldr_context->GetCollection()->FindMeshObject(portalsname);
+
       if (mw)
       {
         mw->QueryObject()->SetName(portalsname);
@@ -1213,7 +1216,12 @@ csLoadResult csLoader::Load (iDocumentNode* node, iRegion* region,
     }
     if (ParsePortals (ldr_context, portalsnode, 0, 0, ssource))
     {
-      iMeshWrapper* mw = ldr_context->GetRegion ()->FindMeshObject(portalsname);
+      iMeshWrapper* mw = 0;
+      if(ldr_context->GetCollection())
+      {
+        mw = ldr_context->GetCollection ()->FindMeshObject(portalsname);
+      }
+
       if (mw)
       {
         mw->QueryObject()->SetName(portalsname);
@@ -1397,20 +1405,19 @@ bool csLoader::LoadLibrary (iDocumentNode* lib_node, iRegion* region,
 void csLoader::AddToRegionOrCollection(iLoaderContext* ldr_context, iObject* obj,
                                        bool alwaysKeep)
 {
+  bool keep = (ldr_context->GetKeepFlags() == KEEP_ALL || alwaysKeep);
+
   if(ldr_context->GetRegion())
   {
     ldr_context->GetRegion()->QueryObject()->ObjAdd(obj);
   }
-  else if(ldr_context->GetKeepFlags() == KEEP_ALL || alwaysKeep)
+  else if(ldr_context->GetCollection() && !keep)
   {
-    if(ldr_context->GetCollection())
-    {
-      ldr_context->GetCollection()->Add(obj);
-    }
-    else
-    {
-      Engine->GetDefaultCollection()->Add(obj);
-    }
+    ldr_context->GetCollection()->Add(obj);
+  }
+  else
+  {
+    Engine->GetDefaultCollection()->Add(obj);
   }
 }
 
