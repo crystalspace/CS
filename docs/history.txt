@@ -28,6 +28,14 @@ chronological order.
 	- res changed gl3d to signal a "frame advancement" to the r2t backend
 	  upon a frame event (which is really sent once a frame) instead of
 	  in Print() (which can actually be called many times a frame).
+	- res changed the way the collection vs regions variants in the iLoader
+	  interface are distinguished: instead of Load* methods (which takes
+	  an iBase* and distinguishes via QI), Load*Region and Load*Collection
+	  methods (taking iRegion* and iCollection*) methods only have
+	  overloaded Load* methods, taking an iRegion* and iCollection*:
+	  there's no need to distinguish dynamically if there are ever only
+	  two choices, it's less overhead and removes an ambiguity with the
+	  backwards compatibility Load() methods.
 03-Mar-2008
 	- res fixed some pointer formatting with unsigned longs recently
 	  introduced.
