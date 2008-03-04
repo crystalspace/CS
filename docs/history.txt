@@ -43,6 +43,7 @@ chronological order.
 	  to the GL state cache.
 	- res added a helper method to set some assumed GL states. Useful for
 	  embedding.
+	- res added iRenderLoopManager::UnregisterAll().
 03-Mar-2008
 	- res fixed some pointer formatting with unsigned longs recently
 	  introduced.

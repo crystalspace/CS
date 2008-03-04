@@ -73,7 +73,8 @@ public:
 class csRenderLoopManager : public scfImplementation1<csRenderLoopManager,
                                                       iRenderLoopManager>
 {
-  csHashReversible<csRef<iRenderLoop>, const char*> loops;
+  typedef csHashReversible<csRef<iRenderLoop>, const char*> LoopsHash;
+  LoopsHash loops;
   csStringSet strings;
 
   csEngine* engine;
@@ -93,6 +94,8 @@ public:
    * Load a renderloop from VFS file named \p file.
    */
   virtual csPtr<iRenderLoop> Load (const char* fileName);
+  
+  void UnregisterAll (bool evenDefault);
 };
 
 #endif
