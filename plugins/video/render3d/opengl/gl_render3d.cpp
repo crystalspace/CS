@@ -948,14 +948,12 @@ bool csGLGraphics3D::Open ()
   statecache->SetStencilMask (stencil_shadow_mask);
 
   numImageUnits = statecache->GetNumImageUnits();
-  if (ext->CS_GL_ARB_multitexture)
-    glGetIntegerv (GL_MAX_TEXTURE_UNITS_ARB, &numTCUnits);
-  else
-    numTCUnits = 1;
+  numTCUnits = statecache->GetNumTexCoords();
   imageUnits = new ImageUnit[numImageUnits];
   if (verbose)
     Report (CS_REPORTER_SEVERITY_NOTIFY, 
-      "Available texture image units: %d", numImageUnits);
+      "Available texture image units: %d texture coordinate units: %d",
+      numImageUnits, numTCUnits);
 
   // Set up texture LOD bias.
   if (ext->CS_GL_EXT_texture_lod_bias)

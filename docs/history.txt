@@ -39,6 +39,8 @@ chronological order.
 	- res added a hack to the iLoader interface to keep source
 	  compatibility with code that used to pass '0' for regions.
 	- res fixed an int cast in the Perl bindings.
+	- res added determination of the number of texture coordinate sets
+	  to the GL state cache.
 03-Mar-2008
 	- res fixed some pointer formatting with unsigned longs recently
 	  introduced.

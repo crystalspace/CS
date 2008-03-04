@@ -393,6 +393,7 @@ public:
   // Special caches
   AutoArray<GLuint> boundtexture;
   GLint numImageUnits;
+  GLint numTexCoords;
   int currentUnit;
   int activeUnit[2];
   enum
@@ -485,11 +486,19 @@ public:
     extmgr->InitGL_ARB_fragment_program ();
     
     if (extmgr->CS_GL_ARB_fragment_program)
+    {
       glGetIntegerv (GL_MAX_TEXTURE_IMAGE_UNITS_ARB, &numImageUnits);
+      glGetIntegerv (GL_MAX_TEXTURE_COORDS_ARB, &numTexCoords);
+    }
     else if (extmgr->CS_GL_ARB_multitexture)
+    {
       glGetIntegerv (GL_MAX_TEXTURE_UNITS_ARB, &numImageUnits);
+      numTexCoords = numImageUnits;
+    }
     else
-      numImageUnits = 1;
+    {
+      numTexCoords = numImageUnits = 1;
+    }
     
     boundtexture.Setup (numImageUnits);
     enabled_GL_TEXTURE_1D.Setup (numImageUnits);
@@ -497,11 +506,12 @@ public:
     enabled_GL_TEXTURE_3D.Setup (numImageUnits);
     enabled_GL_TEXTURE_CUBE_MAP.Setup (numImageUnits);
     enabled_GL_TEXTURE_RECTANGLE_ARB.Setup (numImageUnits);
-    enabled_GL_TEXTURE_COORD_ARRAY.Setup (numImageUnits);
-    parameter_tsize.Setup (numImageUnits);
-    parameter_ttype.Setup (numImageUnits);
-    parameter_tstride.Setup (numImageUnits);
-    parameter_tpointer.Setup (numImageUnits);
+    
+    enabled_GL_TEXTURE_COORD_ARRAY.Setup (numTexCoords);
+    parameter_tsize.Setup (numTexCoords);
+    parameter_ttype.Setup (numTexCoords);
+    parameter_tstride.Setup (numTexCoords);
+    parameter_tpointer.Setup (numTexCoords);
   }
 
   /** 
@@ -567,18 +577,21 @@ public:
       for (i = numImageUnits; i-- > 0; )
       {
         extmgr->glActiveTextureARB (GL_TEXTURE0_ARB + i);
-        extmgr->glClientActiveTextureARB (GL_TEXTURE0_ARB + i);
         enabled_GL_TEXTURE_1D[i] = (glIsEnabled (GL_TEXTURE_1D) == GL_TRUE);
         enabled_GL_TEXTURE_2D[i] = (glIsEnabled (GL_TEXTURE_2D) == GL_TRUE);
         enabled_GL_TEXTURE_3D[i] = (glIsEnabled (GL_TEXTURE_3D) == GL_TRUE);
         enabled_GL_TEXTURE_CUBE_MAP[i] = (glIsEnabled (GL_TEXTURE_CUBE_MAP) == GL_TRUE);
-        enabled_GL_TEXTURE_COORD_ARRAY[i] = (glIsEnabled (GL_TEXTURE_COORD_ARRAY) == GL_TRUE);
 	if (extmgr->CS_GL_ARB_texture_rectangle
 	  || extmgr->CS_GL_EXT_texture_rectangle
 	  || extmgr->CS_GL_NV_texture_rectangle)
 	  enabled_GL_TEXTURE_RECTANGLE_ARB[i] = (glIsEnabled (GL_TEXTURE_RECTANGLE_ARB) == GL_TRUE);
 	else
 	  enabled_GL_TEXTURE_RECTANGLE_ARB[i] = false;
+      }
+      for (i = numTexCoords; i-- > 0; )
+      {
+        extmgr->glClientActiveTextureARB (GL_TEXTURE0_ARB + i);
+        enabled_GL_TEXTURE_COORD_ARRAY[i] = (glIsEnabled (GL_TEXTURE_COORD_ARRAY) == GL_TRUE);
         glGetIntegerv (GL_TEXTURE_COORD_ARRAY_SIZE, (GLint*)&parameter_tsize[i]);
         glGetIntegerv (GL_TEXTURE_COORD_ARRAY_STRIDE, (GLint*)&parameter_tstride[i]);
         glGetIntegerv (GL_TEXTURE_COORD_ARRAY_TYPE, (GLint*)&parameter_ttype[i]);
@@ -971,7 +984,10 @@ public:
   }
   /** @} */
   
+  /// Query the number of texture image units supported by OpenGL
   GLint GetNumImageUnits() const { return currentContext->numImageUnits; }
+  /// Query the number of texture coordinate sets supported by OpenGL
+  GLint GetNumTexCoords() const { return currentContext->numTexCoords; }
 };
 
 #undef IMPLEMENT_CACHED_BOOL
