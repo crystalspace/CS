@@ -84,6 +84,8 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
 
   strings = csQueryRegistryTagInterface<iStringSet> (
     object_reg, "crystalspace.shared.stringset");
+  
+  string_mixmode_alpha = strings->Request ("mixmode alpha");
 
   g3d = csQueryRegistry<iGraphics3D> (object_reg);
   vfs = csQueryRegistry<iVFS> (object_reg);
