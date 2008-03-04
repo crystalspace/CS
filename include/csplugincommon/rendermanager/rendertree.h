@@ -291,7 +291,7 @@ namespace RenderManager
     /**
      * Destroy a context and return it to the allocation pool.
      */
-    void DestoryContext (ContextNode* context)
+    void DestroyContext (ContextNode* context)
     {
       CS_ASSERT(contexts.Find (context) != csArrayItemNotFound);
       contexts.Delete (context);
