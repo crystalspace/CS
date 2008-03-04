@@ -22,6 +22,8 @@ chronological order.
 	- res changed GenericResourceCache to use "stock" csList<> and
 	  csRedBlackTree<> instead of a customized variant. While possibly
 	  slightly slower it seems to be more stable and reliable.
+	- res added Alloc() overloads to csBlockAllocator<> for more
+	  constructor arguments.
 03-Mar-2008
 	- res fixed some pointer formatting with unsigned longs recently
 	  introduced.
