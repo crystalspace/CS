@@ -92,6 +92,8 @@ struct iSceneNodeArray;
 CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 {
 
+#define LOADING_COLLECTION "Loading"
+
 class csLoader;
 struct csLoaderPluginRec;
 

@@ -6,6 +6,11 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+05-Mar-2008
+	- Mike Gist added a loading collection. It's used to hold temporary
+	  references to objects during loading to give other objects a chance
+	  to hold references if they use that object in some way. These temp
+        references are released at the end of the load.
 04-Mar-2008
         - Piotr did few behavior fixes for ode joints (attaching bodies
           in the right time and added better way of checking if amotor is 

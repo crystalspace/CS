@@ -1567,6 +1567,7 @@ csLoader::csLoader (iBase *p) : scfImplementationType (this, p)
 
 csLoader::~csLoader()
 {
+  Engine->RemoveCollection(LOADING_COLLECTION);
   loaded_plugins.DeleteAll ();
 }
 
@@ -1623,6 +1624,9 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
 
   stringSet = csQueryRegistryTagInterface<iStringSet> (
     object_reg, "crystalspace.shared.stringset");
+
+  // Create collection to hold a reference to objects while loading.
+  Engine->CreateCollection(LOADING_COLLECTION);
 
   return true;
 }
@@ -1805,6 +1809,9 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode,
     if(!LoadProxyTextures())
       return false;
   }
+
+  // We've finished loading, so release all temp references on objects.
+  Engine->GetCollection(LOADING_COLLECTION)->ReleaseAllObjects();
 
   return true;
 }
@@ -2012,6 +2019,9 @@ bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* libnode,
       if(!LoadProxyTextures())
           return false;
   }
+
+  // We've finished loading, so release all temp references on objects.
+  Engine->GetCollection(LOADING_COLLECTION)->ReleaseAllObjects();
 
   return true;
 }
