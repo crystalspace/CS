@@ -8,6 +8,9 @@ chronological order.
 
 05-Mar-2008
 	- res patched relaytool to avoid a crash on x86_64.
+	- Vincent applied Guillaume Libersat's patch for #457,
+	  csInputDefinition::ParseKey() wasn't returning false for non
+	  keyboard input definitions.
 04-Mar-2008
         - Piotr did few behavior fixes for ode joints (attaching bodies
           in the right time and added better way of checking if amotor is 
