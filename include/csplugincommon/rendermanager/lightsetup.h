@@ -19,8 +19,11 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_LIGHTSETUP_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_LIGHTSETUP_H__
 
+#include "iengine/lightmgr.h"
 #include "ivideo/shader/shader.h"
 
+#include "csgfx/lightsvcache.h"
+#include "csgfx/shadervarblockalloc.h"
 #include "csplugincommon/rendermanager/operations.h"
 #include "csplugincommon/rendermanager/rendertree.h"
 
@@ -92,7 +95,7 @@ namespace RenderManager
     NewLayersType& newLayers;
   };
 
-  class LightingSorter
+  class CS_CRYSTALSPACE_EXPORT LightingSorter
   {
     struct IndexLightTypePair
     {
@@ -109,21 +112,7 @@ namespace RenderManager
     };
 
     LightingSorter (PersistentData& persist,
-      csLightInfluence* influenceLights, size_t numLights)
-      : persist (persist)
-    {
-      // Sort lights by type
-      persist.lightTypeScratch.Empty();
-      for (size_t l = 0; l < numLights; l++)
-      {
-	IndexLightTypePair iltp;
-	//iltp.index = l;
-        iltp.light = influenceLights[l].light;
-	iltp.type = influenceLights[l].light->GetType();
-	persist.lightTypeScratch.Push (iltp);
-      }
-      persist.lightTypeScratch.Sort();
-    }
+      csLightInfluence* influenceLights, size_t numLights);
 
     size_t GetSize() const
     {
@@ -146,7 +135,7 @@ namespace RenderManager
   /**
    * Helper class to deal with shader variables setup for lighting
    */
-  class LightingVariablesHelper
+  class CS_CRYSTALSPACE_EXPORT LightingVariablesHelper
   {
   public:
     struct PersistentData
@@ -174,20 +163,7 @@ namespace RenderManager
      *   \a sv.
      */
     bool MergeAsArrayItem (csShaderVariableStack& dst, 
-			   csShaderVariable* sv, size_t index)
-    {
-      CS::ShaderVarStringID name = sv->GetName();
-      
-      if (name >= dst.GetSize()) return false;
-      csShaderVariable*& dstVar = dst[name];
-
-      if (dstVar == 0) dstVar = new csShaderVariable (name);
-      if ((dstVar->GetType() != csShaderVariable::UNKNOWN)
-	   && (dstVar->GetType() != csShaderVariable::ARRAY)) return true;
-      dstVar->SetArraySize (csMax (index+1, dstVar->GetArraySize()));
-      dstVar->SetArrayElement (index, sv);
-      return true;
-    }
+      csShaderVariable* sv, size_t index);
 
     /**
      * Merge an array of shader variables into a stack as items of a shader
@@ -195,35 +171,18 @@ namespace RenderManager
      * \sa MergeAsArrayItem
      */
     void MergeAsArrayItems (csShaderVariableStack& dst, 
-			    const csRefArray<csShaderVariable>& allVars, size_t index)
-    {
-      for (size_t v = 0; v < allVars.GetSize(); v++)
-      {
-	if (!MergeAsArrayItem (dst, allVars[v], index)) break;
-      }
-    }
+      const csRefArray<csShaderVariable>& allVars, size_t index);
 
     /// Create a shader variable which is only valid for this frame.
     csShaderVariable* CreateTempSV (CS::ShaderVarStringID name =
-	CS::InvalidShaderVarStringID)
-    {
-      csRef<csShaderVariable> var = persist.svAlloc.Alloc();
-      var->SetName (name);
-      persist.svKeeper.Push (var);
-      return var;
-    }
+      CS::InvalidShaderVarStringID);
 
     /**
      * Create a temporary shader variable (using CreateTempSV) and put it onto
      * \a stack.
      */
     csShaderVariable* CreateVarOnStack (CS::ShaderVarStringID name,
-					csShaderVariableStack& stack)
-    {
-      csShaderVariable* var = CreateTempSV (name);
-      stack[name] = var;
-      return var;
-    }
+      csShaderVariableStack& stack);
   protected:
     PersistentData& persist;
   };
