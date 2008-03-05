@@ -198,6 +198,7 @@ private:
   csEventID SystemOpen;
   csEventID SystemClose;
   csEventID CanvasResize;
+  csEventID Frame;
 
   csWeakRef<iBugPlug> bugplug;
 
@@ -413,17 +414,22 @@ private:
     GLenum& compGLType);
   void RenderRelease (iRenderBuffer* buffer);
 
-/*  iRenderBuffer* vertattrib[16]; // @@@ Hardcoded max number of attributes
-  bool vertattribenabled[16]; // @@@ Hardcoded max number of attributes
-  bool vertattribenabled100[16]; // @@@ Hardcoded max number of attributes (for conventional)
- */ //iTextureHandle* texunit[16]; // @@@ Hardcoded max number of units
-  bool texunitenabled[16]; // @@@ Hardcoded max number of units
-  GLuint texunittarget[16]; // @@@ Hardcoded max number of units
-  csRef<csGLBasicTextureHandle> needNPOTSfixup[16]; // @@@ Hardcoded max number of units
+  struct ImageUnit : public CS::Memory::CustomAllocated
+  {
+    bool enabled;
+    GLuint target;
+    
+    csRef<csGLBasicTextureHandle> needNPOTSfixup;
+    bool npotsStatus;
+    
+    ImageUnit (): enabled (false), target (0), npotsStatus (false) {}
+  };
+  GLint numImageUnits;
+  ImageUnit* imageUnits;
+  GLint numTCUnits;
   /// Array of buffers used for NPOTS texture coord fixup
   csArray<csRef<iRenderBuffer> > npotsFixupScrap;
-  /// Whether an NPOTS scrap is attached to a TC bufer
-  bool npotsStatus[16];
+
   /// Whether the alpha channel of the color buffer should be scaled.
   bool needColorFixup;
   /// Amount to scale alpha channel of color buffer

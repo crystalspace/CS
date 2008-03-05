@@ -130,7 +130,7 @@
     if (! SWIG_IsOK (err))
       croak ("Failed to access pointer from wrapped object");
 
-    XSRETURN_IV ((int) ptr);
+    XSRETURN_IV ((PTRV) ptr);
   }
 %}
 

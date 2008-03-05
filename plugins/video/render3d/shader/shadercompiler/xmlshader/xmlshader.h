@@ -93,6 +93,8 @@ public:
   csWrappedDocumentNodeFactory* wrapperFact;
   /// Condition constants
   csConditionConstants condConstants;
+  
+  csStringID string_mixmode_alpha;
 
 #define CS_TOKEN_ITEM_FILE \
   "plugins/video/render3d/shader/shadercompiler/xmlshader/xmlshader.tok"

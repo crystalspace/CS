@@ -88,7 +88,7 @@ namespace CS
 	if (!function) return false;
 	char* tmp = CS::Debug::Demangle (function);
         char buf[512];
-        snprintf (buf, sizeof (buf), "[0x%lx] (%s)%s", (unsigned long)addr,
+        snprintf (buf, sizeof (buf), "[%p] (%s)%s", addr,
           bfd->GetFileName(), tmp);
         sym = strdup (buf);
         free (tmp);

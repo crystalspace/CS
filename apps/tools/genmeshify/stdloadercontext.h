@@ -29,33 +29,39 @@ namespace genmeshify
    * Context class for the standard loader.
    */
   class StdLoaderContext : public scfImplementation1<StdLoaderContext,
-			   iLoaderContext>
+    iLoaderContext>
   {
   private:
+
     App* app;
     iEngine* Engine;
     iRegion* region;
     bool checkDupes;
+    iCollection* collection;
 
   public:
-    StdLoaderContext (App* app, iEngine* Engine, iRegion* region, 
-      bool checkDupes = false);
+    StdLoaderContext (App* app, iEngine* Engine, iBase* base, bool checkDupes = false);
+    void InitRegion(iRegion* region);
+    void InitCollection(iCollection* collection);
     virtual ~StdLoaderContext ();
 
     virtual iSector* FindSector (const char* name);
     virtual iMaterialWrapper* FindMaterial (const char* name);
     virtual iMaterialWrapper* FindNamedMaterial (const char* name,
-        const char *filename);
+      const char *filename);
     virtual iMeshFactoryWrapper* FindMeshFactory (const char* name);
     virtual iMeshWrapper* FindMeshObject (const char* name);
     virtual iTextureWrapper* FindTexture (const char* name);
     virtual iTextureWrapper* FindNamedTexture (const char* name,
-        const char *filename);
+      const char *filename);
     virtual iLight* FindLight (const char *name);
     virtual iShader* FindShader (const char *name);
     virtual bool CheckDupes () const { return checkDupes; }
     virtual iRegion* GetRegion () const { return region; }
     virtual bool CurrentRegionOnly () const { return false; }
+    virtual iCollection* GetCollection() const { return collection; }
+    virtual bool CurrentCollectionOnly() const { return false; }
+    virtual uint GetKeepFlags() const { return 0; }
   };
 
 } // namespace genmeshify

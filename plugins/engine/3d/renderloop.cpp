@@ -174,6 +174,37 @@ bool csRenderLoopManager::Unregister (iRenderLoop* loop)
   loops.Delete (key, loop);
   return true;
 }
+  
+struct LoopNamePair
+{
+  const char* n;
+  iRenderLoop* l;
+    
+  LoopNamePair (const char* n, iRenderLoop* l) : n (n), l (l) {}
+};
+
+void csRenderLoopManager::UnregisterAll (bool evenDefault)
+{
+  if (evenDefault)
+  {
+    loops.DeleteAll();
+    return;
+  }
+  
+  LoopsHash::ConstGlobalIterator it (
+    const_cast<const LoopsHash*> (&loops)->GetIterator());
+  csArray<LoopNamePair> deleteList;
+  deleteList.SetCapacity (loops.GetSize());
+  while (it.HasNext())
+  {
+    const char* name;
+    iRenderLoop* loop = it.Next (name);
+    if (strcmp (name, CS_DEFAULT_RENDERLOOP_NAME) != 0)
+      deleteList.Push (LoopNamePair (name, loop));
+  }
+  for (size_t i = 0; i < deleteList.GetSize(); i++)
+    loops.Delete (deleteList[i].n, deleteList[i].l);
+}
 
 csPtr<iRenderLoop> csRenderLoopManager::Load (const char* fileName)
 {

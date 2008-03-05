@@ -156,7 +156,7 @@ csPtr<iParameterESM> csLoader::ResolveOperationParameter (
 	{
 	  iSequenceTrigger* trig = CreateTrigger (
 	  	GetEngineSequenceManager (), parname);
-	  AddToRegion (ldr_context, trig->QueryObject ());
+	  AddToRegionOrCollection (ldr_context, trig->QueryObject ());
 	  value = trig;
 	}
         break;
@@ -466,7 +466,7 @@ iSequenceTrigger* csLoader::LoadTrigger (iLoaderContext* ldr_context,
   if (!trigger)
   {
     trigger = CreateTrigger (GetEngineSequenceManager (), trigname);
-    AddToRegion (ldr_context, trigger->QueryObject ());
+    AddToRegionOrCollection (ldr_context, trigger->QueryObject ());
   }
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -1314,7 +1314,7 @@ bool csLoader::LoadSequences (iLoaderContext* ldr_context, iDocumentNode* node)
         {
           iSequenceWrapper* sequence = CreateSequence (child);
           if (!sequence) return false;
-	  AddToRegion (ldr_context, sequence->QueryObject ());
+	  AddToRegionOrCollection (ldr_context, sequence->QueryObject ());
 	}
         break;
       default:

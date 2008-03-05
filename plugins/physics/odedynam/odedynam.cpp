@@ -2705,6 +2705,7 @@ csVector3 csODEJoint::GetMaximumAngle ()
 void csODEJoint::BuildHinge ()
 {
   jointID = dJointCreateHinge (dynsys->GetWorldID(), 0);
+  dJointAttach (jointID, bodyID[0], bodyID[1]);
   csVector3 pos = transform.GetOrigin();
   dJointSetHingeAnchor (jointID, pos.x, pos.y, pos.z);
   csMatrix3 rot = transform.GetO2T();
@@ -2729,6 +2730,7 @@ void csODEJoint::BuildHinge ()
 void csODEJoint::BuildHinge2 ()
 {
   jointID = dJointCreateHinge2 (dynsys->GetWorldID(), 0);
+  dJointAttach (jointID, bodyID[0], bodyID[1]);
   csVector3 pos = transform.GetOrigin();
   dJointSetHinge2Anchor (jointID, pos.x, pos.y, pos.z);
   csMatrix3 rot = transform.GetO2T();
@@ -2760,6 +2762,7 @@ void csODEJoint::BuildHinge2 ()
 void csODEJoint::BuildSlider ()
 {
   jointID = dJointCreateSlider (dynsys->GetWorldID(), 0);
+  dJointAttach (jointID, bodyID[0], bodyID[1]);
   csMatrix3 rot = transform.GetO2T();
   csVector3 axis;
   if (transConstraint[0])
@@ -2781,12 +2784,14 @@ void csODEJoint::BuildSlider ()
 void csODEJoint::BuildBall ()
 {
   jointID = dJointCreateBall (dynsys->GetWorldID(), 0);
+  dJointAttach (jointID, bodyID[0], bodyID[1]);
   csVector3 pos = transform.GetOrigin();
   dJointSetBallAnchor (jointID, pos.x, pos.y, pos.z);
 }
 void csODEJoint::BuildAMotor ()
 {
   motor_jointID = dJointCreateAMotor (dynsys->GetWorldID(), 0);
+  dJointAttach (motor_jointID, bodyID[0], bodyID[1]);
   csMatrix3 rot = transform.GetO2T ();
 
   dJointSetAMotorMode (motor_jointID, dAMotorEuler);
@@ -2863,11 +2868,13 @@ void csODEJoint::ApplyJointProperty (dJointID joint, int parameter, const csVect
     //axis 1 is steering, I may need to check that later though.
     dJointSetHinge2Param (jointID, parameter, values.x);
     dJointSetHinge2Param (jointID, parameter + dParamGroup, values.y);
+    break;
     //dParamXi = dParamX + dParamGroup * (i-1)
   case dJointTypeAMotor:       
     dJointSetAMotorParam (motor_jointID, parameter, values.x);
     //We use only euler mode, se we only need to setup parameter for 2 axes
     dJointSetAMotorParam (motor_jointID, parameter + 2*dParamGroup, values.z);
+    break;
   default:
     //case dJointTypeAMotor:     // not supported here
     //case dJointTypeUniversal:  // not sure if that's supported in here
@@ -2904,6 +2911,9 @@ void csODEJoint::Clear ()
     jointID = 0;
   }
 }
+
+#define IS_ANGLE_CONSTRAINTED(min, max) (min < max && (min != 3.14f && max != 3.14f))
+
 bool csODEJoint::RebuildJoint ()
 {
   if (!(bodyID[0] || bodyID[1]) && is_dirty)
@@ -2924,31 +2934,28 @@ bool csODEJoint::RebuildJoint ()
     {
     case 0:
       jointID = dJointCreateFixed (dynsys->GetWorldID(), 0);
-      dJointAttach (jointID, bodyID[0], bodyID[1]);
       SetMotorsParams (jointID);
       dJointSetFixed (jointID);
       break;
     case 1:
       BuildHinge ();
-      dJointAttach (jointID, bodyID[0], bodyID[1]);
       SetMotorsParams (jointID);
       break;
     case 2:
       BuildHinge2 ();
       SetMotorsParams (jointID);
-      dJointAttach (jointID, bodyID[0], bodyID[1]);
       break;
     case 3:
       BuildBall ();
-      dJointAttach (jointID, bodyID[0], bodyID[1]);
-      if (max_angle.x > min_angle.x || max_angle.y > min_angle.y || max_angle.z > min_angle.z )
+      if (IS_ANGLE_CONSTRAINTED (min_angle.x, max_angle.x) || 
+        IS_ANGLE_CONSTRAINTED (min_angle.y, max_angle.y) ||
+        IS_ANGLE_CONSTRAINTED (min_angle.z, max_angle.z))
       {
         BuildAMotor ();
-        dJointAttach (motor_jointID, bodyID[0], bodyID[1]);
         SetMotorsParams (motor_jointID);  
       }
-      break;
     }
+    return true;
   }
   else if (rotcount == 0)
   {
@@ -2958,7 +2965,6 @@ bool csODEJoint::RebuildJoint ()
     case 1:
       BuildSlider ();
       SetMotorsParams (jointID);
-      dJointAttach (jointID, bodyID[0], bodyID[1]);
       return true;
     case 2:
       break;

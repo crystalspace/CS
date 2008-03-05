@@ -80,7 +80,6 @@ csGLRendererLightmap::~csGLRendererLightmap ()
 
     csGLGraphics3D::statecache->SetTexture (
       GL_TEXTURE_2D, slm->texHandle);
-    slm->txtmgr->SetupPixelStore ();
 
     glTexSubImage2D (GL_TEXTURE_2D, 0, rect.xmin, rect.ymin, 
       rect.Width (), rect.Height (),
@@ -104,7 +103,6 @@ void csGLRendererLightmap::SetData (csRGBcolor* data)
 
   csGLGraphics3D::statecache->SetTexture (
     GL_TEXTURE_2D, slm->texHandle);
-  slm->txtmgr->SetupPixelStore ();
 
   const uint8* packed = csPackRGB::PackRGBcolorToRGB (data,
     rect.Width () * rect.Height ());
@@ -195,7 +193,6 @@ void csGLSuperLightmap::CreateTexture ()
       }
     }
 #endif
-    txtmgr->SetupPixelStore ();
     glTexImage2D (GL_TEXTURE_2D, 0, GL_RGB8, w, h, 0, 
       GL_RGB, GL_UNSIGNED_BYTE, data);
     delete[] data;
@@ -248,8 +245,6 @@ csPtr<iImage> csGLSuperLightmap::Dump ()
   // @@@ hmm... or just return an empty image?
   if (texHandle == (GLuint)~0) return 0;
     
-  txtmgr->SetupPixelStore ();
-
   GLint tw, th;
   csGLGraphics3D::statecache->SetTexture (GL_TEXTURE_2D, texHandle);
 
