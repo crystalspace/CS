@@ -58,6 +58,8 @@ chronological order.
 	  by the renderer through the vertex color it's now passed through a
 	  shader var ("mixmode alpha") and it's the responsibility of the
 	  shader to make use of that information.
+	- res removed the arbvp1 workaround from std_lighting.xml since it
+	  shouldn't be needed any more after r28886 (mixmode alpha through SV).
 03-Mar-2008
 	- res fixed some pointer formatting with unsigned longs recently
 	  introduced.
