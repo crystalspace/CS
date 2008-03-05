@@ -81,6 +81,7 @@ public:
   float GetAnimationLength () const;
   float GetTimeline () const;
   bool IsActive () const;
+  float TimeUntilFinish () const;
 private:
   csRef<iAnimationFactory> fact;
   float timeline;
@@ -95,7 +96,8 @@ public:
   size_t AddNode (float weight, csRef<iMixingNode> node);
   void SetWeight (size_t i, float weight);
   bool IsActive () const;
-  size_t FindNode (csRef<iMixingNode> node) const;
+  float TimeUntilFinish () const;
+  size_t FindNodeIndex (csRef<iMixingNode> node) const;
   size_t GetNodeCount () const;
   float GetWeight (size_t i) const;
 protected:
@@ -116,7 +118,8 @@ public:
   size_t AddNode (float weight, csRef<iMixingNode> node);
   void SetWeight (size_t i, float weight);
   bool IsActive () const;
-  size_t FindNode (csRef<iMixingNode> node) const;
+  float TimeUntilFinish () const;
+  size_t FindNodeIndex (csRef<iMixingNode> node) const;
   size_t GetNodeCount () const;
   float GetWeight (size_t i) const;
 };
@@ -132,7 +135,8 @@ public:
 
   void Tick (float amount);
   bool IsActive () const;
-  size_t FindNode (csRef<iMixingNode> node) const;
+  float TimeUntilFinish () const;
+  size_t FindNodeIndex (csRef<iMixingNode> node) const;
   size_t GetNodeCount () const;
   float GetWeight (size_t i) const;
 };

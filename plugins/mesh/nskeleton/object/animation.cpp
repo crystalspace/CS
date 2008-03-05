@@ -196,17 +196,23 @@ bool Animation::IsActive () const
 {
   return playcount != 0;
 }
+float Animation::TimeUntilFinish () const
+{
+  if (!playcount)
+  {
+    printf ("'%s' n: %i len: %f t: %f\n", fact->GetName (), playcount, fact->GetAnimationLength (), timeline);
+  }
+  return playcount < 0 ? FLT_MAX : (fact->GetAnimationLength () - timeline) * playcount;
+}
 
 void MixingBase::Tick (float amount)
 {
   // tick all the child nodes. should end with the animations (leaf) ticking.
-  for (csRefArray<iMixingNode>::Iterator it = nodes.GetIterator ();
-    it.HasNext (); )
+  for (size_t i = 0; i < nodes.GetSize (); i++)
   {
-    iMixingNode* node = it.Next ();
-    if (!node->IsActive ())
+    iMixingNode* node = nodes.Get (i);
+    if (blend_weights.Get (i) < EPSILON)
     {
-      //nodes.Delete (node);
       continue;
     }
     node->Tick (amount);
@@ -253,9 +259,28 @@ void MixingBase::SetWeight (size_t i, float weight)
 }
 bool MixingBase::IsActive () const
 {
-  return true;    // always active
+  for (size_t i = 0; i < nodes.GetSize (); i++)
+  {
+    const iMixingNode* node = nodes.Get (i);
+    if (!node->IsActive () && blend_weights.Get (i) > EPSILON)
+      return false;
+  }
+  return true;
 }
-size_t MixingBase::FindNode (csRef<iMixingNode> node) const
+float MixingBase::TimeUntilFinish () const
+{
+  float highest_time = 0.0f;
+  for (csRefArray<iMixingNode>::ConstIterator it = nodes.GetIterator ();
+    it.HasNext (); )
+  {
+    const iMixingNode* node = it.Next ();
+    float finti = node->TimeUntilFinish ();
+    if (finti > highest_time)
+      highest_time = finti;
+  }
+  return highest_time;
+}
+size_t MixingBase::FindNodeIndex (csRef<iMixingNode> node) const
 {
   for (size_t i = 0; i < nodes.GetSize (); i++)
   {
@@ -321,9 +346,13 @@ bool BlendNode::IsActive () const
 {
   return MixingBase::IsActive ();
 }
-size_t BlendNode::FindNode (csRef<iMixingNode> node) const
+float BlendNode::TimeUntilFinish () const
 {
-  return MixingBase::FindNode (node);
+  return MixingBase::TimeUntilFinish ();
+}
+size_t BlendNode::FindNodeIndex (csRef<iMixingNode> node) const
+{
+  return MixingBase::FindNodeIndex (node);
 }
 size_t BlendNode::GetNodeCount () const
 {
@@ -396,9 +425,13 @@ bool AccumulateNode::IsActive () const
 {
   return MixingBase::IsActive ();
 }
-size_t AccumulateNode::FindNode (csRef<iMixingNode> node) const
+float AccumulateNode::TimeUntilFinish () const
 {
-  return MixingBase::FindNode (node);
+  return MixingBase::TimeUntilFinish ();
+}
+size_t AccumulateNode::FindNodeIndex (csRef<iMixingNode> node) const
+{
+  return MixingBase::FindNodeIndex (node);
 }
 size_t AccumulateNode::GetNodeCount () const
 {
