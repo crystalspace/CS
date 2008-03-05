@@ -6,6 +6,11 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+05-Mar-2008
+	- Vincent applied Guillaume Libersat's patch for #457,
+	  csInputDefinition::ParseKey() wasn't returning false for non
+	  keyboard input definitions.
+25-Feb-2008
 	- Happy Birthday Sueastside! Oh and I fixed a crash in basemapgen.
 	- Eric Sunshine fixed bug in mk/autoconf/checkpython.m4 introduced by
 	  r25656 which resulted in the literal string
