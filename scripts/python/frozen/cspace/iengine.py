@@ -1380,6 +1380,7 @@ class iRenderLoopManager(core.iBase):
     def GetName(*args): return _iengine.iRenderLoopManager_GetName(*args)
     def Unregister(*args): return _iengine.iRenderLoopManager_Unregister(*args)
     def Load(*args): return _iengine.iRenderLoopManager_Load(*args)
+    def UnregisterAll(*args): return _iengine.iRenderLoopManager_UnregisterAll(*args)
     scfGetVersion = staticmethod(_iengine.iRenderLoopManager_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iRenderLoopManager
     __del__ = lambda self : None;
