@@ -198,10 +198,6 @@ bool Animation::IsActive () const
 }
 float Animation::TimeUntilFinish () const
 {
-  if (!playcount)
-  {
-    printf ("'%s' n: %i len: %f t: %f\n", fact->GetName (), playcount, fact->GetAnimationLength (), timeline);
-  }
   return playcount < 0 ? FLT_MAX : (fact->GetAnimationLength () - timeline) * playcount;
 }
 
