@@ -368,11 +368,11 @@ void IsoTest::SetupFrame ()
       blpen->SetWeight (punchid, 1 - (pfeather_duration / 200.0f));
       if (pfeather_duration > 200)
       {
-        //puts ("faseout");
         //blpen->SetWeight (otherid, 1.0f);
-        blpen->SetWeight (punchid, 0.0f);
-        pfeather = STAND;
-        pfeather_duration = 0.0f;
+          blpen->SetWeight (punchid, 0.0f);
+          pfeather = STAND;
+          pfeather_duration = 0.0f;
+        anim_punch->Reset ();
       }
       break;
     default:
@@ -892,55 +892,19 @@ bool IsoTest::CreateActor ()
   anim_walk->SetPlayCount (-1);
 
   blend = animlay->CreateBlendNode ();
-  //csRef<Skeleton::Animation::iMixingNode> animmix;
-  //animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (anim_stand);
   standid = blend->AddNode (1.0f, anim_stand);
-  //animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (anim_walk);
   walkid = blend->AddNode (0.0f, anim_walk);
 
   csRef<Skeleton::Animation::iAnimationFactory> animfact_punch = animfactlay->FindAnimationFactoryByName ("punch");
   anim_punch = animfact_punch->CreateAnimation ();
   anim_punch->SetPlayCount (0);
-  //anim_punch->SetPlaySpeed (0.1f);
 
   csRef<Skeleton::Animation::iAccumulateNode> overwrite = animlay->CreateAccumulateNode ();
   blpen = overwrite;
-  //animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (blend);
   otherid = overwrite->AddNode (1.0f, blend);
-  //animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (anim_punch);
   punchid = overwrite->AddNode (0.0f, anim_punch);
 
-  //animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (overwrite);
   animlay->SetRootMixingNode (overwrite);
-
-  /*csRef<Skeleton::Animation::iAnimationFactory> animfact_run = animfactlay->FindAnimationFactoryByName ("jump");
-  csRef<Skeleton::Animation::iAnimation> anim_run = animfact_run->CreateAnimation ();
-
-  csRef<Skeleton::Animation::iAnimationFactory> animfact_idle = animfactlay->FindAnimationFactoryByName ("stand");
-  csRef<Skeleton::Animation::iAnimation> anim_idle = animfact_idle->CreateAnimation ();
-  anim_idle->SetPlayCount (-1);
-  anim_idle->SetPlaySpeed (10.0f);
-
-  csRef<Skeleton::Animation::iAnimationFactory> animfact_wave = animfactlay->FindAnimationFactoryByName ("walk");
-  csRef<Skeleton::Animation::iAnimation> anim_wave = animfact_wave->CreateAnimation ();
-
-  csRef<Skeleton::Animation::iBlendNode> blend = animlay->CreateBlendNode ();
-  csRef<Skeleton::Animation::iMixingNode> animmix;
-  animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (anim_run);
-  blend->AddNode (1.0f, animmix);
-  animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (anim_idle);
-  blend->AddNode (4.0f, animmix);
-
-  animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (blend);
-
-  csRef<Skeleton::Animation::iOverwriteNode> overwrite = animlay->CreateOverwriteNode ();
-  animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (blend);
-  overwrite->AddNode (animmix);
-  animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (anim_wave);
-  overwrite->AddNode (animmix);
-
-  animmix = scfQueryInterface<Skeleton::Animation::iMixingNode> (overwrite);
-  animlay->SetRootMixingNode (animmix);*/
   }
   else
   {

@@ -192,6 +192,10 @@ float Animation::GetTimeline () const
 {
   return timeline;
 }
+void Animation::Reset ()
+{
+  timeline = 0.0f;
+}
 bool Animation::IsActive () const
 {
   return playcount != 0;

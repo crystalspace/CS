@@ -80,6 +80,7 @@ struct iAnimation : public virtual iMixingNode
   virtual int GetPlayCount () const = 0;
   virtual float GetAnimationLength () const = 0;
   virtual float GetTimeline () const = 0;
+  virtual void Reset () = 0;
 };
 struct iBlendNode : public virtual iMixingNode
 {

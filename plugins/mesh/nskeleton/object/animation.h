@@ -80,6 +80,7 @@ public:
   int GetPlayCount () const;
   float GetAnimationLength () const;
   float GetTimeline () const;
+  void Reset ();
   bool IsActive () const;
   float TimeUntilFinish () const;
 private:
