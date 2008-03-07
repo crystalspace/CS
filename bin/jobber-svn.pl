@@ -312,7 +312,7 @@ my @jobber_archivers = ($ARCHIVER_BZIP2, $ARCHIVER_GZIP, $ARCHIVER_ZIP);
 my %jobber_properties = ();
 
 # SVN binary name
-my $jobber_svn_command = '/home/crystal/CS/bin/svnwrapper';
+my $jobber_svn_command = '/usr/bin/svn';
 
 my $CONFIG_FILE = undef;
 my $TESTING = undef;
