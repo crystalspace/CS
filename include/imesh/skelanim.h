@@ -37,7 +37,7 @@ namespace Animation
 struct iAnimation;
 
 typedef csTuple2<csQuaternion, csVector3> Keyframe;
-typedef csHash<Keyframe, size_t> Frame;
+typedef csArray<csTuple2<size_t, Keyframe> > Frame;
 
 struct iChannel : public virtual iBase
 {
@@ -87,20 +87,18 @@ struct iBlendNode : public virtual iMixingNode
   SCF_INTERFACE (iBlendNode, 0, 0, 1);
   virtual void Tick (float amount) = 0;
   virtual void ReadChannels (Frame &frame) = 0;
-  virtual size_t AddNode (float weight, csRef<iMixingNode> node) = 0;
+  virtual size_t AddNode (float weight, iMixingNode* node) = 0;
   virtual void SetWeight (size_t i, float weight) = 0;
-  virtual size_t FindNodeIndex (csRef<iMixingNode> node) const = 0;
+  virtual size_t FindNodeIndex (iMixingNode* node) const = 0;
   virtual size_t GetNodeCount () const = 0;
   virtual float GetWeight (size_t i) const = 0;
 };
 struct iAccumulateNode : public virtual iMixingNode
 {
   SCF_INTERFACE (iAccumulateNode, 0, 0, 1);
-  virtual void Tick (float amount) = 0;
-  virtual void ReadChannels (Frame &frame) = 0;
-  virtual size_t AddNode (float weight, csRef<iMixingNode> node) = 0;
+  virtual size_t AddNode (float weight, iMixingNode* node) = 0;
   virtual void SetWeight (size_t i, float weight) = 0;
-  virtual size_t FindNodeIndex (csRef<iMixingNode> node) const = 0;
+  virtual size_t FindNodeIndex (iMixingNode* node) const = 0;
   virtual size_t GetNodeCount () const = 0;
   virtual float GetWeight (size_t i) const = 0;
 };
@@ -108,8 +106,8 @@ struct iAccumulateNode : public virtual iMixingNode
 struct iAnimationLayer : public virtual iBase
 {
   SCF_INTERFACE (iAnimationLayer, 0, 0, 1);
-  virtual csRef<iMixingNode> GetRootMixingNode () = 0;
-  virtual void SetRootMixingNode (csRef<iMixingNode> root) = 0;
+  virtual iMixingNode* GetRootMixingNode () = 0;
+  virtual void SetRootMixingNode (iMixingNode* root) = 0;
   virtual void UpdateSkeleton (Skeleton::iSkeleton *s, float delta_time) = 0;
 
   virtual csPtr<iBlendNode> CreateBlendNode () = 0;

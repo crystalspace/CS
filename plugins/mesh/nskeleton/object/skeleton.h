@@ -150,7 +150,7 @@ class SkeletonFactory :
 public:
   SkeletonFactory (const char* name);
 
-  ::Skeleton::iSkeleton* CreateSkeleton (const char* name);
+  csPtr< ::Skeleton::iSkeleton> CreateSkeleton (const char* name);
 
   void SetName (const char* name);
   const char* GetName ();

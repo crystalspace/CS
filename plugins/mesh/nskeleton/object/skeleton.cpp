@@ -313,7 +313,7 @@ SkeletonFactory::SkeletonFactory (const char* name)
     new SkeletonAnimation::AnimationFactoryLayer ());
 }
 
-::Skeleton::iSkeleton* SkeletonFactory::CreateSkeleton (const char* name)
+csPtr< ::Skeleton::iSkeleton> SkeletonFactory::CreateSkeleton (const char* name)
 {
   Skeleton* skel = new Skeleton (name);
   skel->fact = this;
@@ -346,7 +346,7 @@ SkeletonFactory::SkeletonFactory (const char* name)
       child->SetParent (&bone);
     }
   }
-  return skel;
+  return csPtr< ::Skeleton::iSkeleton> (skel);
 }
 
 void SkeletonFactory::SetName (const char* n)
@@ -446,9 +446,9 @@ bool Graveyard::Initialize (iObjectRegistry* obj_reg)
   ::Skeleton::iSkeletonFactory* fact = FindFactory (factname);
   if (!fact)
     return 0;
-  csRef<Skeleton> skel;
-  skel.AttachNew (static_cast<Skeleton*>(fact->CreateSkeleton (name)));
-  skeletons.Push (skel);
+  csRef< ::Skeleton::iSkeleton> skel (fact->CreateSkeleton (name));
+  // dereference underlying pointer and cast
+  skeletons.Push (static_cast<Skeleton*>((::Skeleton::iSkeleton*)skel));
   return skel;
 }
 

@@ -21,6 +21,7 @@
 
 #include "csgeom/quaternion.h"
 #include "csgeom/transfrm.h"
+#include "csutil/ref.h"
 #include "csutil/refcount.h"
 #include "csutil/scf_interface.h"
 
@@ -41,7 +42,7 @@ struct iSkeletonFactory : public virtual iBase
 {
   SCF_INTERFACE (iSkeletonFactory, 0, 0, 1);
 
-  virtual iSkeleton* CreateSkeleton (const char* name) = 0;
+  virtual csPtr<iSkeleton> CreateSkeleton (const char* name) = 0;
 
   virtual void SetName (const char* name) = 0;
   virtual const char* GetName () = 0;

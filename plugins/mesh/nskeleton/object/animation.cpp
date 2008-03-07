@@ -117,7 +117,8 @@ void AnimationFactory::ReadChannels (float time, Frame &frame) const
     channels.GetIterator (); it.HasNext (); )
   {
     const iChannel* channel = it.Next ();
-    frame.PutUnique (channel->GetID (), channel->ReadValue (time));
+    frame.Push (csTuple2<size_t, Keyframe> (channel->GetID (), channel->ReadValue (time)));
+    //frame.PutUnique (channel->GetID (), channel->ReadValue (time));
   }
 }
 void AnimationFactory::SetAnimationLength (float length)
@@ -233,17 +234,14 @@ void MixingBase::CalculateFramesAndChannels (csArray<Frame> &nodes_frames, csArr
   for (csArray<Frame>::Iterator it = nodes_frames.GetIterator (); it.HasNext (); )
   {
     const Frame &frame = it.Next ();
-    for (Frame::ConstGlobalIterator it = frame.GetIterator ();
+    for (Frame::ConstIterator it = frame.GetIterator ();
       it.HasNext (); )
     {
-      size_t id;
-      it.Next (id);
-      if (channel_ids.Find (id) == csArrayItemNotFound)
-        channel_ids.Push (id);  // 404 - add to our list
+      channel_ids.PushSmart (it.Next ().first);  // add to our list if not already present
     }
   }
 }
-size_t MixingBase::AddNode (float weight, csRef<iMixingNode> node)
+size_t MixingBase::AddNode (float weight, iMixingNode* node)
 {
   if (weight < 0.0f)
     weight = 0.0f;
@@ -280,7 +278,7 @@ float MixingBase::TimeUntilFinish () const
   }
   return highest_time;
 }
-size_t MixingBase::FindNodeIndex (csRef<iMixingNode> node) const
+size_t MixingBase::FindNodeIndex (iMixingNode* node) const
 {
   for (size_t i = 0; i < nodes.GetSize (); i++)
   {
@@ -321,20 +319,27 @@ void BlendNode::ReadChannels (Frame &result_frame)
     for (size_t i = 0; i < nodes_frames.GetSize (); i++)
     {
       const Frame &frame = nodes_frames.Get (i);
-      const Keyframe* keyf = frame.GetElementPointer (id);
-      if (keyf)  // it exists! - intarpolatar can handle non normalised weights
-        keys.Push (csTuple2<float, Keyframe> (blend_weights.Get (i), *keyf));
+      //const Keyframe* keyf = frame.GetElementPointer (id);
+      //if (keyf)  // it exists! - intarpolatar can handle non normalised weights
+      //  keys.Push (csTuple2<float, Keyframe> (blend_weights.Get (i), *keyf));
+      // do linear search for the id in the frame
+      for (Frame::ConstIterator it = frame.GetIterator (); it.HasNext ();)
+      {
+        const csTuple2<size_t, Keyframe> &keyf = it.Next ();
+        if (keyf.first == id)   // found, so push to the stack
+          keys.Push (csTuple2<float, Keyframe> (blend_weights.Get (i), keyf.second));
+      }
     }
     // now calculate the snapshot for this channel and add it to the output
     const Keyframe &in = csInterpolator<Keyframe>::Linear (keys);
-    result_frame.PutUnique (id, in);
+    result_frame.Push (csTuple2<size_t, Keyframe> (id, in));
   }
 }
 void BlendNode::Tick (float amount)
 {
   MixingBase::Tick (amount);
 }
-size_t BlendNode::AddNode (float weight, csRef<iMixingNode> node)
+size_t BlendNode::AddNode (float weight, iMixingNode* node)
 {
   return MixingBase::AddNode (weight, node);
 }
@@ -350,7 +355,7 @@ float BlendNode::TimeUntilFinish () const
 {
   return MixingBase::TimeUntilFinish ();
 }
-size_t BlendNode::FindNodeIndex (csRef<iMixingNode> node) const
+size_t BlendNode::FindNodeIndex (iMixingNode* node) const
 {
   return MixingBase::FindNodeIndex (node);
 }
@@ -387,7 +392,7 @@ void AccumulateNode::ReadChannels (Frame &result_frame)
     for (int i = nodes_frames.GetSize () - 1; i >= 0; i--)
     {
       const Frame &frame = nodes_frames.Get (i);
-      const Keyframe* keyf = frame.GetElementPointer (id);
+      /*const Keyframe* keyf = frame.GetElementPointer (id);
       if (keyf)
       {
         // a bit of arithmetic.
@@ -396,14 +401,28 @@ void AccumulateNode::ReadChannels (Frame &result_frame)
           flat_w = w * excess;
         cumul_weights += flat_w;
         keys.Push (csTuple2<float, Keyframe> (flat_w, *keyf));
+      }*/
+      // do linear search for the id in the frame
+      for (Frame::ConstIterator it = frame.GetIterator (); it.HasNext ();)
+      {
+        const csTuple2<size_t, Keyframe> &keyf = it.Next ();
+        if (keyf.first == id)   // found, so push to the stack
+        {
+          // a bit of arithmetic.
+          float w = blend_weights.Get (i),
+            excess = 1.0f - cumul_weights,
+            flat_w = w * excess;
+          cumul_weights += flat_w;
+          keys.Push (csTuple2<float, Keyframe> (flat_w, keyf.second));
+        }
       }
     }
     const Keyframe &in = csInterpolator<Keyframe>::Linear (keys);
-    result_frame.PutUnique (id, in);
+    result_frame.Push (csTuple2<size_t, Keyframe> (id, in));
   }
 }
 
-size_t AccumulateNode::AddNode (float weight, csRef<iMixingNode> node)
+size_t AccumulateNode::AddNode (float weight, iMixingNode* node)
 {
   // if we don't clamp the upper then life gets a bit difficult...
   if (weight > 1.0f)
@@ -429,7 +448,7 @@ float AccumulateNode::TimeUntilFinish () const
 {
   return MixingBase::TimeUntilFinish ();
 }
-size_t AccumulateNode::FindNodeIndex (csRef<iMixingNode> node) const
+size_t AccumulateNode::FindNodeIndex (iMixingNode* node) const
 {
   return MixingBase::FindNodeIndex (node);
 }
@@ -445,11 +464,11 @@ float AccumulateNode::GetWeight (size_t i) const
 AnimationLayer::AnimationLayer () : scfImplementationType (this)
 {
 }
-csRef<iMixingNode> AnimationLayer::GetRootMixingNode ()
+iMixingNode* AnimationLayer::GetRootMixingNode ()
 {
   return mix_node;
 }
-void AnimationLayer::SetRootMixingNode (csRef<iMixingNode> root)
+void AnimationLayer::SetRootMixingNode (iMixingNode* root)
 {
   mix_node = root;
 }
@@ -466,15 +485,19 @@ void AnimationLayer::UpdateSkeleton (Skeleton::iSkeleton *s, float delta_time)
   mix_node->ReadChannels (frame);
   for (size_t i = 0; i < s->GetChildrenCount (); i++)
   {
-    const Keyframe* key = frame.GetElementPointer (i);
-    if (key)
+    for (Frame::Iterator it = frame.GetIterator (); it.HasNext ();)
     {
-      Skeleton::iSkeleton::iBone* b = s->GetChild (i);
-      b->SetRotation (key->first);
-      b->SetPosition (key->second);
-      //csQuaternion q (key->first);
-      //csVector3 v (key->second);
-      //printf ("'%s' (%f, %f, %f, %f)   (%s)\n", b->GetFactory ()->GetName (), q.v.x, q.v.y, q.v.z, q.w, v.Description ().GetData ());
+      const csTuple2<size_t, Keyframe> &idkeyf = it.Next ();
+      if (idkeyf.first == i)
+      {
+        const Keyframe &keyf = idkeyf.second;
+        Skeleton::iSkeleton::iBone* b = s->GetChild (i);
+        b->SetRotation (keyf.first);
+        b->SetPosition (keyf.second);
+        //csQuaternion q (key->first);
+        //csVector3 v (key->second);
+        //printf ("'%s' (%f, %f, %f, %f)   (%s)\n", b->GetFactory ()->GetName (), q.v.x, q.v.y, q.v.z, q.w, v.Description ().GetData ());
+      }
     }
   }
 }

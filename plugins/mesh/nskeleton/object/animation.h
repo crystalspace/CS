@@ -94,11 +94,11 @@ class MixingBase
 {
 public:
   void Tick (float amount);
-  size_t AddNode (float weight, csRef<iMixingNode> node);
+  size_t AddNode (float weight, iMixingNode* node);
   void SetWeight (size_t i, float weight);
   bool IsActive () const;
   float TimeUntilFinish () const;
-  size_t FindNodeIndex (csRef<iMixingNode> node) const;
+  size_t FindNodeIndex (iMixingNode* node) const;
   size_t GetNodeCount () const;
   float GetWeight (size_t i) const;
 protected:
@@ -116,11 +116,11 @@ public:
 
   // these just delegate to MixingBase base class because C++ is thick
   void Tick (float amount);
-  size_t AddNode (float weight, csRef<iMixingNode> node);
+  size_t AddNode (float weight, iMixingNode* node);
   void SetWeight (size_t i, float weight);
   bool IsActive () const;
   float TimeUntilFinish () const;
-  size_t FindNodeIndex (csRef<iMixingNode> node) const;
+  size_t FindNodeIndex (iMixingNode* node) const;
   size_t GetNodeCount () const;
   float GetWeight (size_t i) const;
 };
@@ -131,13 +131,13 @@ class AccumulateNode
 public:
   AccumulateNode ();
   void ReadChannels (Frame &result_frame);
-  size_t AddNode (float weight, csRef<iMixingNode> node);
+  size_t AddNode (float weight, iMixingNode* node);
   void SetWeight (size_t i, float weight);
 
   void Tick (float amount);
   bool IsActive () const;
   float TimeUntilFinish () const;
-  size_t FindNodeIndex (csRef<iMixingNode> node) const;
+  size_t FindNodeIndex (iMixingNode* node) const;
   size_t GetNodeCount () const;
   float GetWeight (size_t i) const;
 };
@@ -147,8 +147,8 @@ class AnimationLayer
 {
 public:
   AnimationLayer ();
-  csRef<iMixingNode> GetRootMixingNode ();
-  void SetRootMixingNode (csRef<iMixingNode> root);
+  iMixingNode* GetRootMixingNode ();
+  void SetRootMixingNode (iMixingNode* root);
   void UpdateSkeleton (Skeleton::iSkeleton *s, float delta_time);
 
   csPtr<iBlendNode> CreateBlendNode ();
