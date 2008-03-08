@@ -10,6 +10,8 @@ chronological order.
 	- Vincent applied Guillaume Libersat's patch for #457,
 	  csInputDefinition::ParseKey() wasn't returning false for non
 	  keyboard input definitions.
+03-Mar-2008
+	- res removed an int cast from csperl5. Should fix trac #394.
 25-Feb-2008
 	- Happy Birthday Sueastside! Oh and I fixed a crash in basemapgen.
 	- Eric Sunshine fixed bug in mk/autoconf/checkpython.m4 introduced by
