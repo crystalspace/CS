@@ -86,6 +86,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     virtual void Invalidate ();
 
+    virtual void SetSkeletonFactory (iSkeletonFactory2* skeletonFactory);
+    virtual iSkeletonFactory2* GetSkeletonFactory () const;
     virtual void SetBoneInfluencesPerVertex (uint num);
     virtual uint GetBoneInfluencesPerVertex () const;
     virtual csAnimatedMeshBoneInfluence* GetBoneInfluences ();
@@ -139,6 +141,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     csDirtyAccessArray<csAnimatedMeshBoneInfluence> boneInfluences;
     csRef<iRenderBuffer> masterBWBuffer;
     csRef<iRenderBuffer> boneWeightAndIndexBuffer[2];
+
+    csRef<iSkeletonFactory2> skeletonFactory;
 
     // Submeshes
     csRefArray<FactorySubmesh> submeshes;
@@ -206,6 +210,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     //-- iAnimatedMesh
     virtual void SetSkeleton (iSkeleton2* skeleton);
+    virtual iSkeleton2* GetSkeleton () const;
 
     virtual iAnimatedMeshSubMesh* GetSubMesh (size_t index) const;
     virtual size_t GetSubMeshCount () const;
@@ -312,7 +317,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     uint mixMode;
     csFlags meshObjectFlags;
 
-    iSkeleton2* skeleton;
+    csRef<iSkeleton2> skeleton;
     csTicks lastTick;
 
     // Hold the bone transforms

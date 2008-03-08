@@ -19,41 +19,90 @@
 #ifndef __CS_ANIMATION_H__
 #define __CS_ANIMATION_H__
 
-
 #include "csutil/scf_implementation.h"
-#include "imesh/skeleton2.h"
+#include "imesh/skeleton2anim.h"
 #include "csutil/parray.h"
+#include "csutil/refarr.h"
+#include "csutil/csstring.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 {
+  class AnimationFactory;
+  class Animation;
+
+
+  class AnimationPacketFactory : 
+    public scfImplementation1<AnimationPacketFactory,
+                              iSkeletonAnimPacketFactory2>
+  {
+  public:
+    AnimationPacketFactory ();
+
+    //-- iSkeletonAnimPacketFactory2
+    virtual csPtr<iSkeletonAnimPacket2> CreateInstance (iSkeleton2* skeleton);
+
+    virtual iSkeletonAnimationFactory2* CreateAnimation (const char* name);
+    virtual iSkeletonAnimationFactory2* FindAnimation (const char* name);
+    virtual void ClearAnimations ();
+
+    virtual void SetAnimationRoot (iSkeletonAnimNodeFactory2* root);
+    virtual iSkeletonAnimNodeFactory2* GetAnimationRoot () const;
+
+    virtual csPtr<iSkeletonBlendNodeFactory2> CreateBlendNode (const char* name);
+
+  private:
+    csRefArray<AnimationFactory> animFactoryList;
+    csRef<iSkeletonAnimNodeFactory2> animRoot;
+  };
+
+  class AnimationPacket :
+    public scfImplementation1<AnimationPacket,
+                              iSkeletonAnimPacket2>
+  {
+  public:
+    AnimationPacket (AnimationPacketFactory* factory);
+
+    //-- iSkeletonAnimPacket2
+    virtual iSkeletonAnimation2* FindAnimation (const char* name);
+    virtual iSkeletonAnimNode2* GetAnimationRoot () const;
+
+  private:
+    friend class AnimationPacketFactory;
+
+    csRefArray<Animation> animList;
+    csRef<iSkeletonAnimNode2> animRoot;
+  };
 
   class AnimationFactory : 
     public scfImplementation2<AnimationFactory,
                               iSkeletonAnimationFactory2,
-                              scfFakeInterface<iSkeletonAnimationNodeFactory2> >
+                              scfFakeInterface<iSkeletonAnimNodeFactory2> >
   {
   public:
-    AnimationFactory ();
+    AnimationFactory (const char* name);
 
-    //-- iSkeletonAnimationFactory2
-    virtual ChannelID AddChannel (BoneID bone);
+    //-- iSkeletonAnimFactory2
+    virtual CS::Animation::ChannelID AddChannel (BoneID bone);
 
-    virtual ChannelID FindChannel (BoneID bone) const;
+    virtual CS::Animation::ChannelID FindChannel (BoneID bone) const;
 
-    virtual void AddKeyFrame (ChannelID channel, float time, 
+    virtual void AddKeyFrame (CS::Animation::ChannelID channel, float time, 
       const csQuaternion& rotation, const csVector3& offset);
 
-    virtual size_t GetKeyFrameCount (ChannelID channel) const;
+    virtual size_t GetKeyFrameCount (CS::Animation::ChannelID channel) const;
 
-    virtual void GetKeyFrame (ChannelID channel, KeyFrameID keyframe, BoneID& bone,
-      float& time, csQuaternion& rotation, csVector3& offset);  
+    virtual void GetKeyFrame (CS::Animation::ChannelID channel, CS::Animation::KeyFrameID keyframe, 
+      BoneID& bone, float& time, csQuaternion& rotation, csVector3& offset);  
 
-    virtual void GetTwoKeyFrames (ChannelID channel, float time, BoneID& bone,
+    virtual void GetTwoKeyFrames (CS::Animation::ChannelID channel, float time, BoneID& bone,
       float& timeBefore, csQuaternion& beforeRot, csVector3& beforeOffset,
       float& timeAfter, csQuaternion& afterRot, csVector3& afterOffset);
 
-    //-- iSkeletonAnimationNodeFactory2
-    virtual csPtr<iSkeletonAnimationNode2> CreateInstance (iSkeleton2*);
+    //-- iSkeletonAnimNodeFactory2
+    virtual csPtr<iSkeletonAnimNode2> CreateInstance (
+      iSkeletonAnimPacket2* packet, iSkeleton2* skeleton);
+    virtual const char* GetNodeName () const;
+    virtual iSkeletonAnimNodeFactory2* FindNode (const char* name);
 
     //-- "Private"
     void BlendState (csSkeletalState2* state, float baseWeight, float position, bool cycle);
@@ -62,7 +111,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       return duration;
     }
 
+    inline const csString& GetName () const
+    {
+      return name;
+    }
+
   private:
+    csString name;
 
     struct KeyFrame
     {
@@ -94,12 +149,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   class Animation : 
     public scfImplementation2<Animation,
                               iSkeletonAnimation2,
-                              scfFakeInterface<iSkeletonAnimationNode2> >
+                              scfFakeInterface<iSkeletonAnimNode2> >
   {
   public:
     Animation (AnimationFactory* factory);
 
-    //-- iSkeletonAnimation2
+    //-- iSkeletonAnim2
     virtual void PlayOnce (float speed = 1.0f);
     virtual void PlayCyclic (float speed = 1.0f);
     virtual void Stop ();
@@ -109,13 +164,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     virtual iSkeletonAnimationFactory2* GetAnimationFactory ();
 
-    //-- iSkeletonAnimationNode2
+    //-- iSkeletonAnimNode2
     virtual void BlendState (csSkeletalState2* state, float baseWeight = 1.0f);
     virtual void TickAnimation (float dt);
 
     virtual bool IsActive () const;
 
-    virtual iSkeletonAnimationNodeFactory2* GetFactory () const;
+    virtual iSkeletonAnimNodeFactory2* GetFactory () const;
+    virtual iSkeletonAnimNode2* FindNode (const char* name);
+
+    //-- Private
+    inline const csString& GetName () const
+    {
+      return factory->GetName ();
+    }
 
   private:
     AnimationFactory* factory;

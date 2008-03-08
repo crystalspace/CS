@@ -49,7 +49,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
   private: 
     iObjectRegistry* object_reg;
 
-    csRef<iSyntaxService> synldr;  
+    csRef<iSyntaxService> synldr;
+    csRef<iSkeletonManager2> skelMgr;
 
     csStringHash xmltokens;
 #define CS_TOKEN_ITEM_FILE \
@@ -95,6 +96,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
   private: 
     iObjectRegistry* object_reg;
     csRef<iSyntaxService> synldr;
+    csRef<iSkeletonManager2> skelMgr;
 
     csStringHash xmltokens;
 #define CS_TOKEN_ITEM_FILE \

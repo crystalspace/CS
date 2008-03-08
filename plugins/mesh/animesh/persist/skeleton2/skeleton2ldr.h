@@ -47,12 +47,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
     virtual bool Initialize (iObjectRegistry*);
 
   private: 
-    iSkeletonFactory2* ParseSkeleton (iDocumentNode* node);
-    csRef<iSkeletonAnimationNodeFactory2> ParseAnimTree (iDocumentNode* node);
+    bool ParseSkeleton (iDocumentNode* node);
+    bool ParseBone (iDocumentNode* node, iSkeletonFactory2* factory, BoneID parent);
 
-    void ParseBone (iDocumentNode* node, iSkeletonFactory2* factory, BoneID parent);
-    csPtr<iSkeletonAnimationNodeFactory2> ParseaAnimTreeNode (iDocumentNode* node);
-    bool ParseAnimation (iDocumentNode* node, iSkeletonAnimationFactory2* fact);
+    bool ParseAnimPacket (iDocumentNode* node);
+    csPtr<iSkeletonAnimNodeFactory2> ParseAnimTreeNode (iDocumentNode* node,
+      iSkeletonAnimPacketFactory2* packet);
+    iSkeletonAnimationFactory2* ParseAnimation (iDocumentNode* node, 
+      iSkeletonAnimPacketFactory2* packet);
+
+    //csRef<iSkeletonAnimationNodeFactory2> ParseAnimTree (iDocumentNode* node);
+
+    //csPtr<iSkeletonAnimationNodeFactory2> ParseaAnimTreeNode (iDocumentNode* node);
+    //bool ParseAnimation (iDocumentNode* node, iSkeletonAnimationFactory2* fact);
 
     iObjectRegistry* object_reg;
     csRef<iSyntaxService> synldr;

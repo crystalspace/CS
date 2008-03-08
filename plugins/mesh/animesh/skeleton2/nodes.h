@@ -21,33 +21,38 @@
 
 #include "csutil/scf_implementation.h"
 #include "imesh/skeleton2.h"
+#include "imesh/skeleton2anim.h"
 #include "csutil/refarr.h"
+#include "csutil/csstring.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 {
   class BlendNodeFactory :
     public scfImplementation2<BlendNodeFactory,
                               iSkeletonBlendNodeFactory2,
-                              scfFakeInterface<iSkeletonAnimationNodeFactory2> >
+                              scfFakeInterface<iSkeletonAnimNodeFactory2> >
   {
   public:
-    BlendNodeFactory ();
+    BlendNodeFactory (const char* name);
 
     //-- iSkeletonBlendNodeFactory2
-    virtual void AddNode (iSkeletonAnimationNodeFactory2* node, float weight);
+    virtual void AddNode (iSkeletonAnimNodeFactory2* node, float weight);
     virtual void SetNodeWeight (uint node, float weight);
     virtual void NormalizeWeights ();
-    virtual iSkeletonAnimationNodeFactory2* GetNode (uint node);
+    virtual iSkeletonAnimNodeFactory2* GetNode (uint node);
     virtual uint GetNodeCount () const;
     virtual void ClearNodes ();
 
     //-- iSkeletonAnimationNodeFactory2
-    virtual csPtr<iSkeletonAnimationNode2> CreateInstance (iSkeleton2*);
+    virtual csPtr<iSkeletonAnimNode2> CreateInstance (
+      iSkeletonAnimPacket2* packet, iSkeleton2* skeleton);
+    virtual const char* GetNodeName () const;
+    virtual iSkeletonAnimNodeFactory2* FindNode (const char* name);
 
-  private:
-    friend class BlendNode;
+  private:    
+    csString name;
 
-    csRefArray<iSkeletonAnimationNodeFactory2> subFactories;
+    csRefArray<iSkeletonAnimNodeFactory2> subFactories;
     csArray<float> weightList;
   };
 
@@ -55,10 +60,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   class BlendNode : 
     public scfImplementation2<BlendNode,
                               iSkeletonBlendNode2,
-                              scfFakeInterface<iSkeletonAnimationNode2> >
+                              scfFakeInterface<iSkeletonAnimNode2> >
   {
   public:
-    BlendNode (BlendNodeFactory* factory, iSkeleton2* skeleton);
+    BlendNode (BlendNodeFactory* factory);
 
     //-- iSkeletonBlendNode2
     virtual void SetNodeWeight (uint node, float weight);
@@ -68,11 +73,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual void BlendState (csSkeletalState2* state, float baseWeight = 1.0f);
     virtual void TickAnimation (float dt);
     virtual bool IsActive () const;
-    virtual iSkeletonAnimationNodeFactory2* GetFactory () const;
+    virtual iSkeletonAnimNodeFactory2* GetFactory () const;
+    virtual iSkeletonAnimNode2* FindNode (const char* name);
   
   private:
+    friend class BlendNodeFactory;
 
-    csRefArray<iSkeletonAnimationNode2> subNodes;
+    csRefArray<iSkeletonAnimNode2> subNodes;
     csArray<float> weightList;
 
     BlendNodeFactory* factory;

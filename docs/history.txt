@@ -6,6 +6,15 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+09-Mar-2008
+	- Marten did a number of improvements to the animesh and skeleton
+	  loaders and interfaces:
+	    - Moved the skeletal animation interfaces to its own header.
+	    - Added a new level of containment in the skeletal animation
+	      to group together a number of animations and the node tree
+	      to blend them together.
+	    - Updated the loaders to load animation packets and to 
+	      connect skeleton and animation packet.	      
 05-Mar-2008
 	- res patched relaytool to avoid a crash on x86_64.
 	- Vincent applied Guillaume Libersat's patch for #457,
@@ -77,7 +86,7 @@ chronological order.
 	   - Added a loader for skeleton2 and animation hierarchies.
 	   - Added code to animesh to setup the SVs with bone transforms.
 	   - Added loading of bone/vertex influences.
-2-Mar-2008
+02-Mar-2008
 	- Marten changed the way render buffers are handled in animesh
 	  slightly. Removed SetVertexCount from API and <vertexcount>
 	  from file format.

@@ -55,29 +55,29 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     factoryHash.DeleteAll ();
   }
 
-  void SkeletonSystem::RegisterAnimationTree (iSkeletonAnimationNodeFactory2* node, const char* name)
+  iSkeletonAnimPacketFactory2* SkeletonSystem::CreateAnimPacketFactory (const char* name)
   {
-    animTreeHash.PutUnique (name, node);
+    // Check name uniqueness
+    csRef<iSkeletonAnimPacketFactory2> newFact = 
+      csPtr<iSkeletonAnimPacketFactory2> (new AnimationPacketFactory);
+
+    return animPackets.PutUnique (name, newFact);
   }
 
-  iSkeletonAnimationNodeFactory2* SkeletonSystem::FindAnimationTree (const char* name)
+  iSkeletonAnimPacketFactory2* SkeletonSystem::FindAnimPacketFactory (const char* name)
   {
-    return animTreeHash.Get (name, 0);
+    return animPackets.Get (name, 0);
   }
 
-  void SkeletonSystem::ClearAnimationTrees ()
+  void SkeletonSystem::ClearAnimPacketFactories ()
   {
-    animTreeHash.DeleteAll ();
+    animPackets.DeleteAll ();
   }
 
-  csPtr<iSkeletonAnimationFactory2> SkeletonSystem::CreateAnimationFactory ()
+  void SkeletonSystem::ClearAll ()
   {
-    return new AnimationFactory;
-  }
-
-  csPtr<iSkeletonBlendNodeFactory2> SkeletonSystem::CreateBlendNodeFactory ()
-  {
-    return new BlendNodeFactory;
+    factoryHash.DeleteAll ();
+    animPackets.DeleteAll ();
   }
 
   bool SkeletonSystem::Initialize (iObjectRegistry*)
@@ -106,6 +106,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
         bone.created = true;
         bone.parent = parent;
 
+        boneNames[i] = "NEWBONE";
+
         return (BoneID)i;
       }
     }
@@ -114,6 +116,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     newBone.parent = parent;
     newBone.created = true;
 
+    boneNames.Push ("NEWBONE");
     return (BoneID)allBones.Push (newBone);
   }
 
@@ -122,9 +125,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     CS_ASSERT(bone < allBones.GetSize () && allBones[bone].created);
 
     if (bone == allBones.GetSize ()-1)
+    {
       allBones.SetSize (bone);
+      boneNames.SetSize (bone);
+    }
     else
+    {
       allBones[bone].created = false;
+      boneNames[bone] = "DELETED";
+    }
 
     // Handle bones parented to bone...
     cachedTransformsDirty = true;
@@ -142,6 +151,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   {
     return (bone < allBones.GetSize ()) && 
            allBones[bone].created;
+  }
+
+  void SkeletonFactory::SetBoneName (BoneID bone, const char* name)
+  {
+    CS_ASSERT(bone < allBones.GetSize () && allBones[bone].created);
+
+    boneNames[bone] = name;
+  }
+
+  const char* SkeletonFactory::GetBoneName (BoneID bone) const
+  {
+    CS_ASSERT(bone < allBones.GetSize () && allBones[bone].created);
+
+    return boneNames[bone];
   }
 
   void SkeletonFactory::GetTransformBoneSpace (BoneID bone, csQuaternion& rot, 
@@ -222,18 +245,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   csPtr<iSkeleton2> SkeletonFactory::CreateSkeleton ()
   {
-    return 0;
+    return new Skeleton (this);
   }
 
-  iSkeletonAnimationNodeFactory2* SkeletonFactory::GetAnimationRoot () const
+  iSkeletonAnimPacketFactory2* SkeletonFactory::GetAnimationPacket () const
   {
-    return animationRoot;
+    return animationPacket;
   }
 
-  void SkeletonFactory::SetAnimationRoot (iSkeletonAnimationNodeFactory2* fact)
+  void SkeletonFactory::SetAnimationPacket (iSkeletonAnimPacketFactory2* fact)
   {
-    animationRoot = fact;
-  }  
+    animationPacket = fact;
+  }
 
   void SkeletonFactory::UpdateCachedTransforms ()
   {
@@ -497,15 +520,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return factory;
   }
 
-  iSkeletonAnimationNode2* Skeleton::GetAnimationRoot () const
+
+  iSkeletonAnimPacket2* Skeleton::GetAnimationPacket () const
   {
-    return animationRoot;
+    return animationPacket;
   }
 
-  void Skeleton::RecreateAnimationTree ()
+  void Skeleton::SetAnimationPacket (iSkeletonAnimPacket2* packet)
   {
-    RecreateAnimationTreeP ();
+    animationPacket = packet;
   }
+
 
   void Skeleton::RecreateSkeleton ()
   {
@@ -514,12 +539,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   void Skeleton::UpdateSkeleton (float dt)
   {
-    if (!animationRoot)
+    if (!animationPacket || !animationPacket->GetAnimationRoot ())
       return;
 
+    iSkeletonAnimNode2* rootNode = animationPacket->GetAnimationRoot ();
     // 
-    animationRoot->TickAnimation (dt);
-    if (!animationRoot->IsActive ())
+    rootNode->TickAnimation (dt);
+    if (!rootNode->IsActive ())
       return;
 
     //
@@ -529,7 +555,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       finalState.AttachNew (new csSkeletalState2);
       finalState->Setup (allBones.GetSize ());
 
-      animationRoot->BlendState (finalState);
+      rootNode->BlendState (finalState);
 
       // Apply the bone state
       for (size_t i = 0; i < allBones.GetSize (); ++i)
@@ -577,10 +603,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   void Skeleton::RecreateAnimationTreeP ()
   {
-    if (!factory->animationRoot)
+    if (!factory->animationPacket)
       return;
 
-    animationRoot = factory->animationRoot->CreateInstance (this);
+    animationPacket = factory->animationPacket->CreateInstance (this);
   }
 
   void Skeleton::UpdateCachedTransforms ()

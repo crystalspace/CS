@@ -43,19 +43,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual iSkeletonFactory2* FindSkeletonFactory (const char* name);
     virtual void ClearSkeletonFactories ();
 
-    virtual void RegisterAnimationTree (iSkeletonAnimationNodeFactory2* node, const char* name);
-    virtual iSkeletonAnimationNodeFactory2* FindAnimationTree (const char* name);
-    virtual void ClearAnimationTrees ();
+    virtual iSkeletonAnimPacketFactory2* CreateAnimPacketFactory (const char* name);
+    virtual iSkeletonAnimPacketFactory2* FindAnimPacketFactory (const char* name);
+    virtual void ClearAnimPacketFactories ();
 
-    virtual csPtr<iSkeletonAnimationFactory2> CreateAnimationFactory ();
-    virtual csPtr<iSkeletonBlendNodeFactory2> CreateBlendNodeFactory ();
+    virtual void ClearAll ();
 
     //-- iComponent
     virtual bool Initialize (iObjectRegistry*);
   
   private:
     csHash<csRef<iSkeletonFactory2>, csString> factoryHash;
-    csHash<csRef<iSkeletonAnimationNodeFactory2>, csString> animTreeHash;
+    csHash<csRef<iSkeletonAnimPacketFactory2>, csString> animPackets;
   };
 
 
@@ -72,6 +71,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual void RemoveBone (BoneID bone);
     virtual BoneID GetBoneParent (BoneID bone) const;
     virtual bool HasBone (BoneID bone) const;
+    virtual void SetBoneName (BoneID bone, const char* name);
+    virtual const char* GetBoneName (BoneID bone) const;
 
     virtual void GetTransformBoneSpace (BoneID bone, csQuaternion& rot, 
       csVector3& offset) const;
@@ -85,9 +86,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     virtual csPtr<iSkeleton2> CreateSkeleton ();
  
-    virtual iSkeletonAnimationNodeFactory2* GetAnimationRoot () const;
-
-    virtual void SetAnimationRoot (iSkeletonAnimationNodeFactory2* fact);
+    virtual iSkeletonAnimPacketFactory2* GetAnimationPacket () const;
+    virtual void SetAnimationPacket (iSkeletonAnimPacketFactory2* fact);
 
     //-- "Private"
     inline const csArray<size_t>& GetOrderList () const
@@ -119,8 +119,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     };
 
     csArray<Bone> allBones;
+    csSafeCopyArray<csString> boneNames;
+
     csArray<size_t> boneOrderList;
-    csRef<iSkeletonAnimationNodeFactory2> animationRoot;    
+    csRef<iSkeletonAnimPacketFactory2> animationPacket;    
 
     bool cachedTransformsDirty;
     bool orderListDirty;
@@ -159,12 +161,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     virtual iSkeletonFactory2* GetFactory () const;
 
-    virtual iSkeletonAnimationNode2* GetAnimationRoot () const;
-
-    virtual void RecreateAnimationTree ();
+    virtual iSkeletonAnimPacket2* GetAnimationPacket () const;
+    virtual void SetAnimationPacket (iSkeletonAnimPacket2* packet);
 
     virtual void RecreateSkeleton ();
-
     virtual void UpdateSkeleton (float dt);
 
   private:
@@ -197,7 +197,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     csArray<Bone> allBones;
 
     SkeletonFactory* factory;
-    csRef<iSkeletonAnimationNode2> animationRoot;
+    csRef<iSkeletonAnimPacket2> animationPacket;
     bool cachedTransformsDirty;
   };
 

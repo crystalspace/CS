@@ -29,6 +29,8 @@
 #include "ivaria/reporter.h"
 #include "imap/ldrctxt.h"
 #include "iengine/mesh.h"
+#include "imesh/skeleton2.h"
+#include "imesh/skeleton2anim.h"
 
 #include "animeshldr.h"
 
@@ -250,6 +252,30 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           }
         }
         break;
+      case XMLTOKEN_SKELETON:
+        {
+          if (!skelMgr)
+          {
+            skelMgr = csQueryRegistry<iSkeletonManager2> (object_reg);
+
+            if (!skelMgr)
+            {
+              synldr->ReportError (msgid, child, "Could not find any loaded skeletons");
+              return 0;
+            }
+          }
+          
+          const char* skelName = child->GetContentsValue ();
+          iSkeletonFactory2* skelFact = skelMgr->FindSkeletonFactory (skelName);
+          if (!skelFact)
+          {
+            synldr->ReportError (msgid, child, "Could not find skeleton %s", skelName);
+            return 0;
+          }
+
+          amfact->SetSkeletonFactory (skelFact);
+        }
+        break;
       default:
         synldr->ReportBadToken (child);
         return 0;
@@ -363,6 +389,63 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           if (!synldr->ParseMixmode (child, mm))
             return 0;
           mesh->SetMixMode (mm);
+        }
+        break;
+      case XMLTOKEN_SKELETON:
+        {
+          if (!skelMgr)
+          {
+            skelMgr = csQueryRegistry<iSkeletonManager2> (object_reg);
+
+            if (!skelMgr)
+            {
+              synldr->ReportError (msgid, child, "Could not find any loaded skeletons");
+              return 0;
+            }
+          }      
+
+          const char* skelName = child->GetContentsValue ();
+          iSkeletonFactory2* skelFact = skelMgr->FindSkeletonFactory (skelName);
+          if (!skelFact)
+          {
+            synldr->ReportError (msgid, child, "Could not find skeleton %s", skelName);
+            return 0;
+          }
+
+          csRef<iSkeleton2> skeleton = skelFact->CreateSkeleton ();
+          ammesh->SetSkeleton (skeleton);
+        }
+        break;
+      case XMLTOKEN_ANIMATIONPACKET:
+        {
+          if (!skelMgr)
+          {
+            skelMgr = csQueryRegistry<iSkeletonManager2> (object_reg);
+
+            if (!skelMgr)
+            {
+              synldr->ReportError (msgid, child, "Could not find any loaded skeletons");
+              return 0;
+            }
+          }
+
+          iSkeleton2* skeleton = ammesh->GetSkeleton ();
+          if (!skeleton)
+          {
+            synldr->ReportError (msgid, child, "Mesh does not have a skeleton");
+            return 0;
+          }
+
+          const char* packetName = child->GetContentsValue ();
+          iSkeletonAnimPacketFactory2* packetFact = skelMgr->FindAnimPacketFactory (packetName);
+          if (!packetFact)
+          {
+            synldr->ReportError (msgid, child, "Could not find animation packet %s", packetName);
+            return 0;
+          }
+
+          csRef<iSkeletonAnimPacket2> packet = packetFact->CreateInstance (skeleton);
+          skeleton->SetAnimationPacket (packet);
         }
         break;
       default:

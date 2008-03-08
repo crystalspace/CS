@@ -24,6 +24,8 @@
 #include "iutil/document.h"
 #include "iutil/plugin.h"
 #include "imap/ldrctxt.h"
+#include "imesh/skeleton2.h"
+#include "imesh/skeleton2anim.h"
 
 #include "skeleton2ldr.h"
 
@@ -61,10 +63,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
       switch (id)
       {
       case XMLTOKEN_SKELETON:
-        ParseSkeleton (child);
+        if (!ParseSkeleton (child))
+        {
+          return 0;
+        }
+
         break;
-      case XMLTOKEN_ANIMATIONTREE:
-        ParseAnimTree (child);
+      case XMLTOKEN_ANIMATIONPACKET:
+        if (!ParseAnimPacket (child))
+        {
+          return 0;
+        }
+
         break;
       default:
         synldr->ReportBadToken (child);
@@ -88,7 +98,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
     return true;
   }
 
-  iSkeletonFactory2* SkeletonLoader::ParseSkeleton (iDocumentNode* node)
+  bool SkeletonLoader::ParseSkeleton (iDocumentNode* node)
   {
     static const char* msgid = "crystalspace.skeletonloader.parseskeleton";
 
@@ -99,10 +109,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
     if (!name)
     {
       synldr->ReportError (msgid, node, "No name set for skeleton");
-      return 0;
+      return false;
     }
 
     factory = skelManager->CreateSkeletonFactory (name);
+    if (!factory)
+    {
+      synldr->ReportError (msgid, node, 
+        "Could not create skeleton, another skeleton with same name might already exist.");
+      return false;
+    }
+
 
     // Load bones etc..
     csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -115,74 +132,47 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
       switch (id)
       {
       case XMLTOKEN_BONE:
-        ParseBone (child, factory, InvalidBoneID);
-        break;
-      case XMLTOKEN_ANIMATIONTREE:
+        if (!ParseBone (child, factory, InvalidBoneID))
         {
-          csRef<iSkeletonAnimationNodeFactory2> nf;
+          return false;
+        }
+        break;
+      case XMLTOKEN_ANIMATIONPACKET:
+        {
+          csRef<iSkeletonAnimPacketFactory2> packet;
+          const char* name = child->GetContentsValue ();
 
-          const char* reference = child->GetAttributeValue ("ref");          
+          packet = skelManager->FindAnimPacketFactory (name);
 
-          if (reference)
+          if (!packet)
           {
-            // Referencing an already loaded one, use that
-            nf = skelManager->FindAnimationTree (reference);
-            if (!nf)
-            {
-              synldr->ReportError (msgid, node, 
-                "Could not find animation tree named %s", reference);
-              return 0;
-            }
+            synldr->ReportError (msgid, child, "Animation packet not found!");
+            return false;
           }
-          else
-          {
-            nf = ParseAnimTree (child);
-
-            if (!nf)
-            {
-              synldr->ReportError (msgid, node, "Error parsing animation tree");
-              return 0;
-            }
-          }
-
-          factory->SetAnimationRoot (nf);
+          factory->SetAnimationPacket (packet);
         }
         break;
       default:
         synldr->ReportBadToken (child);
-        return 0;
+        return false;
       }
     }
     
-    return factory;
+    return true;
   }
 
-  csRef<iSkeletonAnimationNodeFactory2> SkeletonLoader::ParseAnimTree (iDocumentNode* node)
-  {
-    static const char* msgid = "crystalspace.skeletonloader.parseanimtree";
-    csRef<iSkeletonAnimationNodeFactory2> rootNode;
 
-    const char* name = node->GetAttributeValue ("name");
-
-    csRef<iDocumentNodeIterator> it = node->GetNodes ("node");
-    if (it->HasNext ())
-    {
-      rootNode = ParseaAnimTreeNode (it->Next ());
-    }
-
-    if (name && rootNode)
-    {
-      skelManager->RegisterAnimationTree (rootNode, name);
-    }
-
-    return rootNode;
-  }
-
-  void SkeletonLoader::ParseBone (iDocumentNode* node, iSkeletonFactory2* factory, BoneID parent)
+  bool SkeletonLoader::ParseBone (iDocumentNode* node, iSkeletonFactory2* factory, BoneID parent)
   {
     static const char* msgid = "crystalspace.skeletonloader.parsebone";
 
     BoneID id = factory->CreateBone (parent);
+
+    const char* name = node->GetAttributeValue ("name");
+    if (name)
+    {
+      factory->SetBoneName (id, name);
+    }
 
     csRef<iDocumentNodeIterator> it = node->GetNodes ();
     while (it->HasNext ())
@@ -194,7 +184,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
       switch (id)
       {
       case XMLTOKEN_BONE:
-        ParseBone (child, factory, id);
+        if (!ParseBone (child, factory, id))
+        {
+          synldr->ReportError (msgid, child, "Couldn't parse bone");
+          return false;
+        }
         break;
       case XMLTOKEN_TRANSFORM:
         {
@@ -202,7 +196,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
           if (!synldr->ParseVector (child, offs))
           {
             synldr->ReportError (msgid, child, "Couldn't parse transform");
-            return;
+            return false;
           }
 
           // Get the rotation part
@@ -217,17 +211,79 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
         break;
       default:
         synldr->ReportBadToken (child);
-        return;
+        return false;
       }
     }
+
+    return true;
   }
 
-  csPtr<iSkeletonAnimationNodeFactory2> SkeletonLoader::ParseaAnimTreeNode (
-    iDocumentNode* node)
+  bool SkeletonLoader::ParseAnimPacket (iDocumentNode* node)
+  {
+    static const char* msgid = "crystalspace.skeletonloader.parseanimpacket";
+
+    // Get common properties
+    const char* name = node->GetAttributeValue ("name");
+    if (!name)
+    {
+      synldr->ReportError (msgid, node, "No name set for animation packet");
+      return false;
+    }
+
+    iSkeletonAnimPacketFactory2* packet = skelManager->CreateAnimPacketFactory (name);
+    if (!packet)
+    {
+      synldr->ReportError (msgid, node, 
+        "Could not create packet, another packet with same name might already exist.");
+      return false;
+    }
+
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch (id)
+      {
+      case XMLTOKEN_ANIMATION:
+        {
+          if (!ParseAnimation (child, packet))
+          {
+            synldr->ReportError (msgid, child, "Error loading animation.");
+            return false;
+          }
+        }
+        break;
+      case XMLTOKEN_NODE:
+        {
+          csRef<iSkeletonAnimNodeFactory2> nodeFact = ParseAnimTreeNode (child, packet);
+
+          if (!nodeFact)
+          {
+            synldr->ReportError (msgid, child, "Error loading animation node.");
+            return false;
+          }
+          // New root
+          packet->SetAnimationRoot (nodeFact);
+        }
+        break;
+      default:
+        synldr->ReportBadToken (child);
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  csPtr<iSkeletonAnimNodeFactory2> SkeletonLoader::ParseAnimTreeNode (iDocumentNode* node,
+    iSkeletonAnimPacketFactory2* packet)
   {
     static const char* msgid = "crystalspace.skeletonloader.parseanimtreenode";
 
-    csRef<iSkeletonAnimationNodeFactory2> result;
+    csRef<iSkeletonAnimNodeFactory2> result;
 
     const char* type = node->GetAttributeValue ("type");
 
@@ -238,8 +294,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
     case XMLTOKEN_ANIMATION:
       {
         csRef<iSkeletonAnimationFactory2> anode;
-        anode = skelManager->CreateAnimationFactory ();
-        if (!ParseAnimation (node, anode))
+        anode = ParseAnimation (node, packet);
+        if (anode)
         {
           synldr->ReportError (msgid, node, "Couldn't load animation");
           return 0;
@@ -250,7 +306,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
     case XMLTOKEN_BLEND:
       {
         csRef<iSkeletonBlendNodeFactory2> bnode;
-        bnode = skelManager->CreateBlendNodeFactory ();
+
+        const char* name = node->GetAttributeValue ("name");
+
+        bnode = packet->CreateBlendNode (name);
 
         csRef<iDocumentNodeIterator> it = node->GetNodes ();
         while (it->HasNext ())
@@ -263,8 +322,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
           {
           case XMLTOKEN_NODE:
             {
-              csRef<iSkeletonAnimationNodeFactory2> childFact = 
-                ParseaAnimTreeNode (child);
+              csRef<iSkeletonAnimNodeFactory2> childFact = 
+                ParseAnimTreeNode (child, packet);
 
               float weight = child->GetAttributeValueAsFloat ("weight");
               bnode->AddNode (childFact, weight);
@@ -284,12 +343,44 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
       return 0;
     }
 
-    return csPtr<iSkeletonAnimationNodeFactory2> (result);
+    return csPtr<iSkeletonAnimNodeFactory2> (result);    
   }
 
-  bool SkeletonLoader::ParseAnimation (iDocumentNode* node, iSkeletonAnimationFactory2* fact)
+  iSkeletonAnimationFactory2* SkeletonLoader::ParseAnimation (iDocumentNode* node, 
+    iSkeletonAnimPacketFactory2* packet)
   {
     static const char* msgid = "crystalspace.skeletonloader.parseanimation";
+
+    // Check if it is a ref..
+    const char* ref = node->GetAttributeValue ("ref");
+    if (ref)
+    {
+      iSkeletonAnimationFactory2* fact = packet->FindAnimation (ref);
+      if (!fact)
+      {      
+        synldr->ReportError (msgid, node, "Referenced animation %s not found", ref);
+        return 0;
+      }
+
+      return fact;
+    }
+
+    const char* name = node->GetAttributeValue ("name");
+    if (!name)
+    {
+      synldr->ReportError (msgid, node, "No name set for animation");
+      return false;
+    }
+
+    iSkeletonAnimationFactory2* fact = packet->CreateAnimation (name);
+    if (!fact)
+    {
+      synldr->ReportError (msgid, node, 
+        "Could not create animation, another animation with same name might already exist");
+      return false;
+    }
+    
+    // Handle "separate-file" loading...
 
 
     csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -305,7 +396,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
         {
           int boneid = child->GetAttributeValueAsInt ("bone");
 
-          ChannelID cID = fact->AddChannel (boneid);
+          CS::Animation::ChannelID cID = fact->AddChannel (boneid);
 
           csRef<iDocumentNodeIterator> it = child->GetNodes ();
           while (it->HasNext ())
@@ -322,7 +413,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
                 if (!synldr->ParseVector (child, offs))
                 {
                   synldr->ReportError (msgid, child, "Couldn't parse transform");
-                  return false;
+                  return 0;
                 }
 
                 // Get the rotation part
@@ -339,19 +430,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
               break;
             default:
               synldr->ReportBadToken (child);
-              return false;
+              return 0;
             }
           }
-
         }
-        break;      
+        break;
       default:
         synldr->ReportBadToken (child);
-        return false;
+        return 0;
       }
     }
 
-    return true;
+    return fact;
   }
 
 }

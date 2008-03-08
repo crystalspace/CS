@@ -21,12 +21,12 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 {
-  BlendNodeFactory::BlendNodeFactory ()
-    : scfImplementationType (this)
+  BlendNodeFactory::BlendNodeFactory (const char* name)
+    : scfImplementationType (this), name (name)
   {
   }
 
-  void BlendNodeFactory::AddNode (iSkeletonAnimationNodeFactory2* node, float weight)
+  void BlendNodeFactory::AddNode (iSkeletonAnimNodeFactory2* node, float weight)
   {
     subFactories.Push (node);
     weightList.Push (weight);
@@ -53,7 +53,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     }
   }
 
-  iSkeletonAnimationNodeFactory2* BlendNodeFactory::GetNode (uint node)
+  iSkeletonAnimNodeFactory2* BlendNodeFactory::GetNode (uint node)
   {
     CS_ASSERT(node < subFactories.GetSize ());
     return subFactories[node];
@@ -70,23 +70,44 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     weightList.DeleteAll ();
   }
 
-  csPtr<iSkeletonAnimationNode2> BlendNodeFactory::CreateInstance (iSkeleton2* s)
+  csPtr<iSkeletonAnimNode2> BlendNodeFactory::CreateInstance (
+    iSkeletonAnimPacket2* packet, iSkeleton2* skeleton)
   {
-    return new BlendNode (this, s);
+    csRef<BlendNode> newB;
+    newB = new BlendNode (this);
+
+    newB->weightList = weightList;
+    for (size_t i = 0; i < subFactories.GetSize (); ++i)
+    {
+      csRef<iSkeletonAnimNode2> node = 
+        subFactories[i]->CreateInstance (packet, skeleton);
+      newB->subNodes.Push (node);
+    }
+
+    return csPtr<iSkeletonAnimNode2> (newB);
+  }
+
+  const char* BlendNodeFactory::GetNodeName () const
+  {
+    return name;
+  }
+
+  iSkeletonAnimNodeFactory2* BlendNodeFactory::FindNode (const char* name)
+  {
+    for (size_t i = 0; i < subFactories.GetSize (); ++i)
+    {
+      iSkeletonAnimNodeFactory2* r = subFactories[i]->FindNode (name);
+      if (r)
+        return r;
+    }
+
+    return 0;
   }
 
 
-
-  BlendNode::BlendNode (BlendNodeFactory* factory, iSkeleton2* skeleton)
+  BlendNode::BlendNode (BlendNodeFactory* factory)
     : scfImplementationType (this, factory), factory (factory)
   {
-    weightList = factory->weightList;
-    for (size_t i = 0; i < factory->subFactories.GetSize (); ++i)
-    {
-      csRef<iSkeletonAnimationNode2> node = 
-        factory->subFactories[i]->CreateInstance (skeleton);
-      subNodes.Push (node);
-    }
   }
 
   void BlendNode::SetNodeWeight (uint node, float weight)
@@ -140,11 +161,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return false;
   }
 
-  iSkeletonAnimationNodeFactory2* BlendNode::GetFactory () const
+  iSkeletonAnimNodeFactory2* BlendNode::GetFactory () const
   {
     return factory;
   }
 
+  iSkeletonAnimNode2* BlendNode::FindNode (const char* name)
+  {
+    for (size_t i = 0; i < subNodes.GetSize (); ++i)
+    {
+      iSkeletonAnimNode2* r = subNodes[i]->FindNode (name);
+      if (r)
+        return r;
+    }
+
+    return 0;
+  }
 
 }
 CS_PLUGIN_NAMESPACE_END(Skeleton2)

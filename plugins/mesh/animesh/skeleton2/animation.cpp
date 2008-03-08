@@ -18,15 +18,107 @@
 
 #include "cssysdef.h"
 #include "animation.h"
+#include "nodes.h"
+
+using namespace CS::Animation;
 
 CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 {
+  AnimationPacketFactory::AnimationPacketFactory ()
+    : scfImplementationType (this)
+  {
+  }
+
+  csPtr<iSkeletonAnimPacket2> AnimationPacketFactory::CreateInstance (
+    iSkeleton2* skeleton)
+  {
+    csRef<AnimationPacket> newP;
+    newP.AttachNew (new AnimationPacket (this));
+
+    // Setup all animations
+    for (size_t i = 0; i < animFactoryList.GetSize (); ++i)
+    {
+      csRef<Animation> newAnim;
+      newAnim.AttachNew (new Animation (animFactoryList[i]));
+      newP->animList.Push (newAnim);
+    }
+
+    // Setup the root
+    newP->animRoot = animRoot->CreateInstance (newP, skeleton);
+
+    return newP;
+  }
+
+  iSkeletonAnimationFactory2* AnimationPacketFactory::CreateAnimation (
+    const char* name)
+  {
+    csRef<AnimationFactory> newFact;
+    newFact.AttachNew(new AnimationFactory (name));
+
+    animFactoryList.Push (newFact);
+
+    return newFact;
+  }
+
+  iSkeletonAnimationFactory2* AnimationPacketFactory::FindAnimation (
+    const char* name)
+  {
+    for (size_t i = 0; i < animFactoryList.GetSize (); ++i)
+    {
+      if (animFactoryList[i]->GetName () == name)
+        return animFactoryList[i];
+    }
+
+    return 0;
+  }
+
+  void AnimationPacketFactory::ClearAnimations ()
+  {
+    animFactoryList.DeleteAll ();
+  }
+
+  void AnimationPacketFactory::SetAnimationRoot (iSkeletonAnimNodeFactory2* root)
+  {
+    animRoot = root;
+  }
+
+  iSkeletonAnimNodeFactory2* AnimationPacketFactory::GetAnimationRoot () const
+  {
+    return animRoot;
+  }
+
+  csPtr<iSkeletonBlendNodeFactory2> AnimationPacketFactory::CreateBlendNode (
+    const char* name)
+  {
+    return new BlendNodeFactory (name);
+  }
 
 
+  AnimationPacket::AnimationPacket (AnimationPacketFactory* factory)
+    : scfImplementationType (this)
+  {    
+  }
+  
+  iSkeletonAnimation2* AnimationPacket::FindAnimation (const char* name)
+  {
+    for (size_t i = 0; i < animList.GetSize (); ++i)
+    {
+      if (animList[i]->GetName () == name)
+        return animList[i];
+    }
+
+    return 0; 
+  }
+
+  iSkeletonAnimNode2* AnimationPacket::GetAnimationRoot () const
+  {
+    return animRoot;
+  }
+  
 
 
-  AnimationFactory::AnimationFactory ()
-    : scfImplementationType (this), duration (0)
+  AnimationFactory::AnimationFactory (const char* name)
+    : scfImplementationType (this), name (name), duration (0)
   {
   }
 
@@ -136,9 +228,33 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     afterOffset = k2.offset;
   }
 
-  csPtr<iSkeletonAnimationNode2> AnimationFactory::CreateInstance (iSkeleton2*)
+  csPtr<iSkeletonAnimNode2> AnimationFactory::CreateInstance (
+    iSkeletonAnimPacket2* packet, iSkeleton2* skeleton)
   {
-    return new Animation (this);
+    iSkeletonAnimNode2* node = packet->FindAnimation (name);
+    
+    if (node)
+    {      
+      CS_ASSERT (node->GetFactory () == static_cast<iSkeletonAnimNodeFactory2*> (this));
+
+      // Reuse old node
+      return csPtr<iSkeletonAnimNode2> (node);
+    }
+
+    return csPtr<iSkeletonAnimNode2> (new Animation (this));
+  }
+
+  const char* AnimationFactory::GetNodeName () const
+  {
+    return GetName();
+  }
+
+  iSkeletonAnimNodeFactory2* AnimationFactory::FindNode (const char* name)
+  {
+    if (name == this->name)
+      return this;
+
+    return 0;
   }
 
   int AnimationFactory::KeyFrameCompare (KeyFrame const& k1, KeyFrame const& k2)
@@ -286,11 +402,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return isPlaying;
   }
 
-  iSkeletonAnimationNodeFactory2* Animation::GetFactory () const
+  iSkeletonAnimNodeFactory2* Animation::GetFactory () const
   {
     return factory;
   }
 
+  iSkeletonAnimNode2* Animation::FindNode (const char* name)
+  {
+    if (name == factory->GetName ())
+      return this;
+
+    return 0;
+  }
 
 
 }

@@ -31,6 +31,7 @@
 #include "iutil/strset.h"
 #include "csutil/objreg.h"
 #include "imesh/skeleton2.h"
+#include "imesh/skeleton2anim.h"
 
 #include "animesh.h"
 
@@ -320,6 +321,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     }
   }
 
+  void AnimeshObjectFactory::SetSkeletonFactory (iSkeletonFactory2* skeletonFactory)
+  {
+    this->skeletonFactory = skeletonFactory;
+  }
+
+  iSkeletonFactory2* AnimeshObjectFactory::GetSkeletonFactory () const
+  {
+    return skeletonFactory;
+  }
+
   void AnimeshObjectFactory::SetBoneInfluencesPerVertex (uint num)
   {
 
@@ -427,11 +438,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     material (0), mixMode (0), skeleton (0)
   {
     SetupSubmeshes ();
+
+    if (factory->skeletonFactory)
+    {
+      skeleton = factory->skeletonFactory->CreateSkeleton ();
+    }
   }
 
   void AnimeshObject::SetSkeleton (iSkeleton2* newskel)
   {
     skeleton = newskel;
+  }
+
+  iSkeleton2* AnimeshObject::GetSkeleton () const
+  {
+    return skeleton;
   }
 
   iAnimatedMeshSubMesh* AnimeshObject::GetSubMesh (size_t index) const
@@ -555,10 +576,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   {
     if (skeleton)
     {
-      iSkeletonAnimationNode2* root = skeleton->GetAnimationRoot ();
-      if (root)
+      iSkeletonAnimPacket2* packet = skeleton->GetAnimationPacket ();
+
+      if (packet && packet->GetAnimationRoot ())
       {
-        root->TickAnimation ((current_time - lastTick) / 1000.0f);
+        packet->GetAnimationRoot ()->TickAnimation ((current_time - lastTick) / 1000.0f);
       }
 
       // Copy the skeletal state into our buffers
