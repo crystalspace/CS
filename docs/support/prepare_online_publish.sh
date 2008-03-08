@@ -19,7 +19,7 @@ for d in $DIRS; do
   if test -d $d; then
     echo "Preparing $d for online publication."
     $EFED -d \
-      -e "s!(<li><a href=\"pages.php\"><span>Related&nbsp;Pages</span></a></li>)!\
+      -e "s!(<li><a href=\"pages.html\"><span>Related&nbsp;Pages</span></a></li>)!\
 \$1\
 <li><form class=\"search\" action=\"/cgi-bin/search.cgi\" method=\"get\">\
 <table cellspacing=\"0\" border=\"0\">\
