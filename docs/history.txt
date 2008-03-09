@@ -15,6 +15,16 @@ chronological order.
 	      to blend them together.
 	    - Updated the loaders to load animation packets and to 
 	      connect skeleton and animation packet.	      
+08-Mar-2008
+	- res fixed a pattern in CS/docs/support/prepare_online_publish.sh that
+	  was still using a .php instead of a .html file name.
+07-Mar-2008
+	- Eric Sunshine changed CS/docs/support/prepare_online_publish.sh so
+	  that it no longer converts published HTML files to PHP. This
+	  conversion can be avoided since we no longer utilize PHP in the
+	  online documentation. (It had been used by the now-retired annotation
+	  facility.) Furthermore, vending HTML rather than PHP reduces server
+	  load.
 05-Mar-2008
 	- res patched relaytool to avoid a crash on x86_64.
 	- Vincent applied Guillaume Libersat's patch for #457,
