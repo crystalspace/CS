@@ -20,6 +20,7 @@
 #include "csqint.h"
 
 #include "csgeom/plane3.h"
+#include "csgeom/projections.h"
 #include "csgfx/imagememory.h"
 #include "csgfx/textureformatstrings.h"
 #include "cstool/initapp.h"
@@ -301,6 +302,8 @@ bool csNullGraphics3D::CanSetRenderTarget (const char* format,
         return true;
     }
     break;
+  default:
+    break;
   }
   return false;
 }
@@ -469,5 +472,15 @@ void csNullGraphics3D::DisableZOffset ()
 void csNullGraphics3D::SetShadowState (int /*state*/)
 {
  return;
+}
+
+void csNullGraphics3D::ComputeProjectionMatrix()
+{
+  if (!needMatrixUpdate) return;
+  
+  projectionMatrix = CS::Math::Projections::CSPerspective (
+      w, h, cx, cy, 1.0f/a);
+  
+  needMatrixUpdate = false;
 }
 

@@ -16,6 +16,7 @@ chronological order.
 	- res implemented explicit projection matrix support for gl3d.
 	- res changed rendering by the engine to set an explicit projection
 	  matrix.
+	- res implemented explicit projection matrix support for null3d.
 08-Mar-2008
 	- res fixed a pattern in CS/docs/support/prepare_online_publish.sh that
 	  was still using a .php instead of a .html file name.
