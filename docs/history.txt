@@ -13,6 +13,7 @@ chronological order.
 	- res added a to get an OpenGL matrix from a CS::Math::Matrix4.
 	- res started to add explicit projection matrix support to iGraphics3D.
 	- res actually implemented CS::Math::Matrix4::Description().
+	- res implemented explicit projection matrix support for gl3d.
 08-Mar-2008
 	- res fixed a pattern in CS/docs/support/prepare_online_publish.sh that
 	  was still using a .php instead of a .html file name.

@@ -24,6 +24,7 @@
 #include "gl_r2t_ext_fb_o.h"
 
 #include "csplugincommon/opengl/glenum_identstrs.h"
+#include "csplugincommon/opengl/glhelper.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 {
@@ -387,6 +388,20 @@ void csGLRender2TextureEXTfbo::SetupProjection ()
 {
   GLRENDER3D_OUTPUT_LOCATION_MARKER;
   G3D->SetGlOrtho (true);
+}
+
+void csGLRender2TextureEXTfbo::SetupProjection (
+    const CS::Math::Matrix4& projectionMatrix)
+{
+  GLRENDER3D_OUTPUT_LOCATION_MARKER;
+  CS::Math::Matrix4 flipY (
+			   1, 0, 0, 0,
+      0, -1, 0, 0,
+      0, 0, 1, 0,
+      0, 0, 0, 1);
+  GLfloat matrixholder[16];
+  CS::PluginCommon::MakeGLMatrix4x4 (projectionMatrix * flipY, matrixholder);
+  glLoadMatrixf (matrixholder);
 }
 
 void csGLRender2TextureEXTfbo::FinishDraw ()

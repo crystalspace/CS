@@ -561,6 +561,7 @@ public:
     asp_center_y = y;
     frustum_valid = false;
     needProjectionUpdate = true;
+    explicitProjection = false;
   }
   
   /// Get center of projection.
@@ -577,6 +578,7 @@ public:
     inv_aspect = 1.0f / aspect;
     frustum_valid = false;
     needProjectionUpdate = true;
+    explicitProjection = false;
   }
 
   /// Get perspective aspect.
@@ -590,10 +592,10 @@ public:
     if (!explicitProjection && needMatrixUpdate) ComputeProjectionMatrix();
     return projectionMatrix;
   }
-  void SetProjectionMatrix(const CS::Math::Matrix4& m)
+  void SetProjectionMatrix (const CS::Math::Matrix4& m)
   {
     projectionMatrix = m;
-    explicitProjection = false;
+    explicitProjection = true;
   }
 
   /// Set the z buffer write/test mode

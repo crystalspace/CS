@@ -706,9 +706,14 @@ void csGLGraphics3D::SetupProjection ()
   statecache->SetMatrixMode (GL_PROJECTION);
   if (explicitProjection)
   {
-    GLfloat matrixholder[16];
-    CS::PluginCommon::MakeGLMatrix4x4 (projectionMatrix, matrixholder);
-    glLoadMatrixf (matrixholder);
+    if (currentAttachments != 0)
+      r2tbackend->SetupProjection (projectionMatrix);
+    else
+    {
+      GLfloat matrixholder[16];
+      CS::PluginCommon::MakeGLMatrix4x4 (projectionMatrix, matrixholder);
+      glLoadMatrixf (matrixholder);
+    }
   }
   else
   {
