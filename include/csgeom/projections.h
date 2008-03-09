@@ -46,9 +46,9 @@ namespace CS
       static Matrix4 Ortho (float left, float right, float bottom, float top,
         float near, float far)
       {
-	return Matrix4 (2.0f*(right-left), 0, 0, -(right+left)/(right-left),
-			0, 2.0f*(top-bottom), 0, -(top+bottom)/(top-bottom),
-			0, 0, -2.0f*(far-near), -(far+near)/(far-near),
+	return Matrix4 (2.0f/(right-left), 0, 0, -(right+left)/(right-left),
+			0, 2.0f/(top-bottom), 0, -(top+bottom)/(top-bottom),
+			0, 0, -2.0f/(far-near), -(far+near)/(far-near),
 			0, 0, 0, 1);
       }
       
@@ -59,13 +59,13 @@ namespace CS
 				    float shiftX, float shiftY,
 				    float invAspect)
       {
-	Matrix4 Mortho (Ortho (0, viewWidth, viewHeight, 0, -1.0f, 10.0f));
+	Matrix4 Mortho (Ortho (0, viewWidth, 0, viewHeight, -1.0f, 10.0f));
 
 	CS::Math::Matrix4 Mtranslate (
-	  1, 0, 0, shiftX/2,
-	  0, 1, 0, shiftY/2,
-          0, 0, 1,        0,
-          0, 0, 0,        1);
+	  1, 0, 0, shiftX,
+	  0, 1, 0, shiftY,
+          0, 0, 1,      0,
+          0, 0, 0,      1);
 
 	CS::Math::Matrix4 Mprojection (
 	  1, 0, 0, 0,
