@@ -29,6 +29,7 @@
 
 #include "csgeom/matrix4.h"
 #include "csutil/scf.h"
+#include "csgeom/matrix4.h"
 
 #define CS_VEC_FORWARD   csVector3(0,0,1)
 #define CS_VEC_BACKWARD  csVector3(0,0,-1)
@@ -284,6 +285,9 @@ struct iPerspectiveCamera : public virtual iBase
 {
   SCF_INTERFACE(iPerspectiveCamera, 1, 0, 0);
   
+  /// Get the iCamera interface for this camera.
+  virtual iCamera* GetCamera() = 0;
+  
   virtual int GetFOV () const = 0;
   /// Return the inverse flield of view (1/FOV) in pixels
   virtual float GetInvFOV () const = 0;
@@ -317,6 +321,9 @@ struct iPerspectiveCamera : public virtual iBase
 struct iCustomMatrixCamera : public virtual iBase
 {
   SCF_INTERFACE(iCustomMatrixCamera, 1, 0, 0);
+  
+  /// Get the iCamera interface for this camera.
+  virtual iCamera* GetCamera() = 0;
   
   virtual void SetProjectionMatrix (const CS::Math::Matrix4& mat) = 0;
 };

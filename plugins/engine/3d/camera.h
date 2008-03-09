@@ -516,6 +516,8 @@ public:
     return new csCameraPerspective (*this);
   }
   
+  iCamera* GetCamera() { return this; }
+  
   const CS::Math::Matrix4& GetProjectionMatrix (int w, int h)
   {
     return PerspectiveImpl::GetProjectionMatrix (w, h);
@@ -543,6 +545,8 @@ public:
   {
     return new csCameraCustomMatrix (*this);
   }
+  
+  iCamera* GetCamera() { return this; }
   
   const CS::Math::Matrix4& GetProjectionMatrix (int, int)
   { return matrix; }
