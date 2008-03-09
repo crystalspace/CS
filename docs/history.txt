@@ -20,6 +20,8 @@ chronological order.
 	- res corrected the creation of a Matrix4 from a transform.
 	- res added multiplication of a Matrix4 with a csVector4.
 	- res implemented explicit projection matrix support for soft3d.
+	- res added clip plane providing by the camera, depending on the
+	  actual projection. (Unused and incomplete tho.)
 08-Mar-2008
 	- res fixed a pattern in CS/docs/support/prepare_online_publish.sh that
 	  was still using a .php instead of a .html file name.

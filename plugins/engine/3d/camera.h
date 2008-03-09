@@ -344,6 +344,7 @@ public:
 
 class PerspectiveImpl : public iPerspectiveCamera
 {
+  protected:
   ///
   int aspect;
   static int default_aspect;
@@ -362,8 +363,9 @@ class PerspectiveImpl : public iPerspectiveCamera
   void ComputeAngle (int width);
   static void ComputeDefaultAngle (int width);
 
-  bool projDirty;
+  uint projNumber;
   int matrix_vw, matrix_vh;
+  uint matrixProjNumber;
   CS::Math::Matrix4 matrix;
   
   void UpdateMatrix (int viewWidth,
@@ -415,7 +417,7 @@ public:
   void SetPerspectiveCenter (float x, float y)
   {
     shift_x = x; shift_y = y; 
-    projDirty = true;
+    projNumber++;
   } 
 
   /// Calculate perspective corrected point for this camera.
@@ -491,9 +493,23 @@ class csCameraPerspective :
                                CameraPerspectiveProxy<csCameraPerspective>,
                                scfFakeInterface<iPerspectiveCamera> >
 {
+  uint clipPlanesProjNr;
+  csPlane3* clipPlanes;
+  
+  void UpdateClipPlanes();
 public:
   csCameraPerspective (int frameWidth, int frameHeight)
-    : PerspectiveImpl (frameWidth, frameHeight), scfImplementationType (this) {}
+    : PerspectiveImpl (frameWidth, frameHeight), scfImplementationType (this),
+      clipPlanesProjNr (~0), clipPlanes (0) {}
+
+  csCameraPerspective (const csCameraPerspective& other)
+   : PerspectiveImpl (other), scfImplementationType (this, other),
+     clipPlanesProjNr (~0), clipPlanes (0) {}
+
+  ~csCameraPerspective()
+  {
+    delete[] clipPlanes;
+  }
     
   csPtr<iCamera> Clone () const
   {
@@ -503,6 +519,13 @@ public:
   const CS::Math::Matrix4& GetProjectionMatrix (int w, int h)
   {
     return PerspectiveImpl::GetProjectionMatrix (w, h);
+  }
+  
+  const csPlane3* GetVisibleVolume (size_t& num)
+  {
+    UpdateClipPlanes();
+    num = 4; /* 4 sides */
+    return clipPlanes;
   }
 };
 
@@ -525,6 +548,13 @@ public:
   { return matrix; }
   void SetProjectionMatrix (const CS::Math::Matrix4& m)
   { matrix = m; }
+  
+  const csPlane3* GetVisibleVolume (size_t& num)
+  {
+    CS_ASSERT_MSG("Not implemented yet!", false);
+    num = 0;
+    return 0;
+  }
 };
 
 #include "csutil/deprecated_warn_on.h"

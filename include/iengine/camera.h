@@ -102,7 +102,7 @@ struct iCameraSectorListener : public virtual iBase
  */
 struct iCamera : public virtual iBase
 {
-  SCF_INTERFACE(iCamera, 2,1,1);
+  SCF_INTERFACE(iCamera, 2,1,2);
   /**
    * Create a clone of this camera. Note that the array of listeners
    * is not cloned.
@@ -272,6 +272,12 @@ struct iCamera : public virtual iBase
   /// Get the projection matrix for this camera
   virtual const CS::Math::Matrix4& GetProjectionMatrix (int viewWidth,
     int viewHeight) = 0;
+  
+  /**
+   * Return the planes limiting the visible volume (as specified by the
+   * projection). The returned planes are in camera space.
+   */
+  virtual const csPlane3* GetVisibleVolume (size_t& num) = 0;
 };
 
 struct iPerspectiveCamera : public virtual iBase

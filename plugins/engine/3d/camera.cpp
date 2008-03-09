@@ -163,7 +163,7 @@ float PerspectiveImpl:: default_inv_aspect = 0;
 float PerspectiveImpl:: default_fov_angle = 90;
 
 PerspectiveImpl::PerspectiveImpl (int frameWidth, int frameHeight)
-  : projDirty (true), matrix_vw (0), matrix_vh (0)
+  : projNumber (0), matrix_vw (0), matrix_vh (0), matrixProjNumber (~0)
 {
   aspect = default_aspect;
   inv_aspect = default_inv_aspect;
@@ -199,7 +199,7 @@ void PerspectiveImpl::SetFOVAngle (float a, int width)
   // set the other neccessary variables
   inv_aspect = 1.0f / aspect;
   fov_angle = a;
-  projDirty = true;
+  projNumber++;
 }
 
 void PerspectiveImpl::ComputeAngle (int width)
@@ -210,7 +210,7 @@ void PerspectiveImpl::ComputeAngle (int width)
       rview_fov * rview_fov + disp_width * disp_width);
   fov_angle = 2.0f * (float)acos (disp_width * inv_disp_radius)
   	* (360.0f / TWO_PI);
-  projDirty = true;
+  projNumber++;
 }
 
 void PerspectiveImpl::ComputeDefaultAngle (int width)
@@ -225,15 +225,40 @@ void PerspectiveImpl::ComputeDefaultAngle (int width)
 
 void PerspectiveImpl::UpdateMatrix (int viewWidth, int viewHeight)
 {
-  if (!projDirty && (matrix_vw == viewWidth) && (matrix_vh == viewHeight))
+  if ((projNumber == matrixProjNumber) && (matrix_vw == viewWidth)
+       && (matrix_vh == viewHeight))
     return;
   
   matrix = CS::Math::Projections::CSPerspective (viewWidth, viewHeight,
     shift_x, shift_y, inv_aspect);
   
-  projDirty = false;
+  matrixProjNumber = projNumber;
   matrix_vw = viewWidth;
   matrix_vh = viewHeight;
+}
+
+//---------------------------------------------------------------------------
+
+void csCameraPerspective::UpdateClipPlanes()
+{
+  if (clipPlanesProjNr == projNumber) return;
+  
+  csPlane3 *frustum = clipPlanes;
+  csVector3 v1 (-1, -1, 1);
+  csVector3 v2 (1, -1, 1);
+  frustum[0].Set (v1 % v2, 0);
+  frustum[0].norm.Normalize ();
+
+  csVector3 v3 (1, 1, 1);
+  frustum[1].Set (v2 % v3, 0);
+  frustum[1].norm.Normalize ();
+  v2.Set (-1, 1, 1);
+  frustum[2].Set (v3 % v2, 0);
+  frustum[2].norm.Normalize ();
+  frustum[3].Set (v2 % v1, 0);
+  frustum[3].norm.Normalize ();
+  
+  clipPlanesProjNr = projNumber;
 }
 
 }
