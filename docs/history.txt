@@ -7,10 +7,22 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 09-Mar-2008
+	- Marten fixed bug #461, terrain2 setting wrong parameter.
 	- res added some helpers to create matrices to common projections.
 	- res started to make iCamera projection-agnostic.
 	- res added a to get an OpenGL matrix from a CS::Math::Matrix4.
 	- res started to add explicit projection matrix support to iGraphics3D.
+	- res actually implemented CS::Math::Matrix4::Description().
+08-Mar-2008
+	- res fixed a pattern in CS/docs/support/prepare_online_publish.sh that
+	  was still using a .php instead of a .html file name.
+07-Mar-2008
+	- Eric Sunshine changed CS/docs/support/prepare_online_publish.sh so
+	  that it no longer converts published HTML files to PHP. This
+	  conversion can be avoided since we no longer utilize PHP in the
+	  online documentation. (It had been used by the now-retired annotation
+	  facility.) Furthermore, vending HTML rather than PHP reduces server
+	  load.
 05-Mar-2008
 	- res patched relaytool to avoid a crash on x86_64.
 	- Vincent applied Guillaume Libersat's patch for #457,
