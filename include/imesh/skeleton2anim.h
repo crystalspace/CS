@@ -76,7 +76,7 @@ namespace Animation
 
 /**
  * Defines a factory for a skeletal animation packet.
- * A packet consists of a number of animations and a hierarchial
+ * A packet consists of a number of animations and a hierarchical
  * structure of nodes that defines how those animations are mixed.
  */
 struct iSkeletonAnimPacketFactory2 : public virtual iBase
