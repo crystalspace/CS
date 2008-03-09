@@ -24,6 +24,17 @@ namespace CS
 {
   namespace Math
   {
+    csString Matrix4::Description() const
+    {
+      csString s;
+      s.Format ("%f,%f,%f,%f, %f,%f,%f,%f, %f,%f,%f,%f, %f,%f,%f,%f",
+		m11, m12, m13, m14,
+		m21, m22, m23, m24,
+		m31, m32, m33, m34,
+		m41, m42, m43, m44);
+      return s;
+    }
+    
     Matrix4 operator * (const Matrix4 &m1, const Matrix4 &m2)
     {
       return Matrix4 (

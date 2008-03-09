@@ -6,7 +6,26 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+09-Mar-2008
+	- Marten fixed bug #461, terrain2 setting wrong parameter.
+	- res actually implemented CS::Math::Matrix4::Description().
+	- res corrected the creation of a Matrix4 from a transform.
+	- res added multiplication of a Matrix4 with a csVector4.
+08-Mar-2008
+	- res fixed a pattern in CS/docs/support/prepare_online_publish.sh that
+	  was still using a .php instead of a .html file name.
+07-Mar-2008
+	- Eric Sunshine changed CS/docs/support/prepare_online_publish.sh so
+	  that it no longer converts published HTML files to PHP. This
+	  conversion can be avoided since we no longer utilize PHP in the
+	  online documentation. (It had been used by the now-retired annotation
+	  facility.) Furthermore, vending HTML rather than PHP reduces server
+	  load.
 05-Mar-2008
+	- res patched relaytool to avoid a crash on x86_64.
+	- Vincent applied Guillaume Libersat's patch for #457,
+	  csInputDefinition::ParseKey() wasn't returning false for non
+	  keyboard input definitions.
 	- res un-inlined some light setup code.
 04-Mar-2008
         - Piotr did few behavior fixes for ode joints (attaching bodies
@@ -63,6 +82,8 @@ chronological order.
 	  by the renderer through the vertex color it's now passed through a
 	  shader var ("mixmode alpha") and it's the responsibility of the
 	  shader to make use of that information.
+	- res removed the arbvp1 workaround from std_lighting.xml since it
+	  shouldn't be needed any more after r28886 (mixmode alpha through SV).
 03-Mar-2008
 	- res fixed some pointer formatting with unsigned longs recently
 	  introduced.

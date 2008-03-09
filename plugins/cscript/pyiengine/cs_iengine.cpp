@@ -34565,6 +34565,98 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iRenderLoopManager_UnregisterAll__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iRenderLoopManager *arg1 = (iRenderLoopManager *) 0 ;
+  bool arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  bool val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iRenderLoopManager_UnregisterAll",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iRenderLoopManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iRenderLoopManager_UnregisterAll" "', argument " "1"" of type '" "iRenderLoopManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iRenderLoopManager * >(argp1);
+  ecode2 = SWIG_AsVal_bool(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iRenderLoopManager_UnregisterAll" "', argument " "2"" of type '" "bool""'");
+  } 
+  arg2 = static_cast< bool >(val2);
+  (arg1)->UnregisterAll(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iRenderLoopManager_UnregisterAll__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iRenderLoopManager *arg1 = (iRenderLoopManager *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iRenderLoopManager_UnregisterAll",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iRenderLoopManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iRenderLoopManager_UnregisterAll" "', argument " "1"" of type '" "iRenderLoopManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iRenderLoopManager * >(argp1);
+  (arg1)->UnregisterAll();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iRenderLoopManager_UnregisterAll(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[3];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 2); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 1) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iRenderLoopManager, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_iRenderLoopManager_UnregisterAll__SWIG_1(self, args);
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iRenderLoopManager, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_bool(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        return _wrap_iRenderLoopManager_UnregisterAll__SWIG_0(self, args);
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iRenderLoopManager_UnregisterAll'.\n  Possible C/C++ prototypes are:\n    UnregisterAll(bool)\n    UnregisterAll()\n");
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iRenderLoopManager_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -35422,6 +35514,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iRenderLoopManager_GetName", _wrap_iRenderLoopManager_GetName, METH_VARARGS, NULL},
 	 { (char *)"iRenderLoopManager_Unregister", _wrap_iRenderLoopManager_Unregister, METH_VARARGS, NULL},
 	 { (char *)"iRenderLoopManager_Load", _wrap_iRenderLoopManager_Load, METH_VARARGS, NULL},
+	 { (char *)"iRenderLoopManager_UnregisterAll", _wrap_iRenderLoopManager_UnregisterAll, METH_VARARGS, NULL},
 	 { (char *)"iRenderLoopManager_scfGetVersion", _wrap_iRenderLoopManager_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iRenderLoopManager", _wrap_delete_iRenderLoopManager, METH_VARARGS, NULL},
 	 { (char *)"iRenderLoopManager_swigregister", iRenderLoopManager_swigregister, METH_VARARGS, NULL},

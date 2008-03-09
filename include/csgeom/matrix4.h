@@ -79,13 +79,15 @@ namespace CS
       /// Construct from a transform
       Matrix4 (csTransform const& o)
 	: m11(o.GetO2T().m11), m12(o.GetO2T().m12), m13(o.GetO2T().m13),
-	    m14(o.GetO2TTranslation().x),
 	  m21(o.GetO2T().m21), m22(o.GetO2T().m22), m23(o.GetO2T().m23),
-	    m24(o.GetO2TTranslation().y),
 	  m31(o.GetO2T().m31), m32(o.GetO2T().m32), m33(o.GetO2T().m33), 
-	    m34(o.GetO2TTranslation().z),
 	  m41(0), m42(0), m43(0), m44(1)
-      {  }
+      {
+	csVector3 o_t2o = -o.GetO2T()*o.GetO2TTranslation();
+	m14 = o_t2o.x;
+	m24 = o_t2o.y;
+	m34 = o_t2o.z;
+      }
     
       /// Return a textual representation of the matrix
       csString Description() const;
@@ -154,6 +156,16 @@ namespace CS
       /// Multiply two matrices.
       friend CS_CRYSTALSPACE_EXPORT Matrix4 operator* (const Matrix4& m1, 
 	const Matrix4& m2);
+      
+      /// Multiply matrix with a Vector
+      csVector4 operator* (const csVector4& v) const
+      {
+	return csVector4 (
+          m11*v.x + m12*v.y + m13*v.z + m14*v.w,
+	  m21*v.x + m22*v.y + m23*v.z + m24*v.w,
+	  m31*v.x + m32*v.y + m33*v.z + m34*v.w,
+	  m41*v.x + m42*v.y + m43*v.z + m44*v.w);
+      }
     };
 
   } // namespace Math

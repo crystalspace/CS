@@ -2307,6 +2307,9 @@ corecvar = cvar
 def CS_REQUEST_PLUGIN (name, intf):
   return (name, intf.__name__, 
      corecvar.iSCF_SCF.GetInterfaceID(intf.__name__),intf.scfGetVersion())
+def CS_REQUEST_PLUGIN_TAG (name, intf, tag):
+  return (name+":"+tag, intf.__name__, 
+     corecvar.iSCF_SCF.GetInterfaceID(intf.__name__),intf.scfGetVersion())
 def CS_REQUEST_VFS ():
   return CS_REQUEST_PLUGIN("crystalspace.kernel.vfs", iVFS)
 def CS_REQUEST_IMAGELOADER ():
