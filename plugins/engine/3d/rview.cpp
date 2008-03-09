@@ -214,8 +214,7 @@ void csRenderView::RestoreRenderContext ()
 iCamera *csRenderView::CreateNewCamera ()
 {
   // A pool for cameras?
-  csRef<iCamera> newcam;
-  newcam.AttachNew (ctxt->icamera->Clone ());
+  csRef<iCamera> newcam = ctxt->icamera->Clone ();
   ctxt->icamera = newcam;
   return ctxt->icamera;
 }
