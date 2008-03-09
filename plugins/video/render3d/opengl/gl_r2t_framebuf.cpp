@@ -22,6 +22,7 @@
 #include "csgfx/bakekeycolor.h"
 #include "csgfx/imagememory.h"
 #include "csgfx/packrgb.h"
+#include "csplugincommon/opengl/glhelper.h"
 
 #include "gl_render3d.h"
 #include "gl_txtmgr.h"
@@ -192,6 +193,20 @@ void csGLRender2TextureFramebuf::SetupProjection ()
 {
   GLRENDER3D_OUTPUT_LOCATION_MARKER;
   G3D->SetGlOrtho (true);
+}
+
+void csGLRender2TextureFramebuf::SetupProjection (
+    const CS::Math::Matrix4& projectionMatrix)
+{
+  GLRENDER3D_OUTPUT_LOCATION_MARKER;
+  CS::Math::Matrix4 flipY (
+      1, 0, 0, 0,
+      0, -1, 0, 0,
+      0, 0, 1, 0,
+      0, 0, 0, 1);
+  GLfloat matrixholder[16];
+  CS::PluginCommon::MakeGLMatrix4x4 (projectionMatrix * flipY, matrixholder);
+  glLoadMatrixf (matrixholder);
 }
 
 GLenum csGLRender2TextureFramebuf::GetInternalFormat (

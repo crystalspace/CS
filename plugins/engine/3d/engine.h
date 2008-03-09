@@ -64,7 +64,6 @@
 
 #include "reflectomotron3000.h"
 
-class csCamera;
 class csEngine;
 class csLight;
 class csLightPatchPool;
@@ -504,6 +503,8 @@ public:
   //-- Camera handling
 
   virtual csPtr<iCamera> CreateCamera ();
+  virtual csPtr<iPerspectiveCamera> CreatePerspectiveCamera ();
+  virtual csPtr<iCustomMatrixCamera> CreateCustomMatrixCamera ();
 
   virtual iCameraPosition* FindCameraPosition (const char* name,
     iBase* base = 0);

@@ -29,6 +29,7 @@
 #include "csutil/flags.h"
 #include "csutil/weakref.h"
 #include "csutil/scf_implementation.h"
+#include "csgeom/matrix4.h"
 #include "csgeom/plane3.h"
 
 #include "null_txt.h"
@@ -80,10 +81,22 @@ public:
   int GetWidth () const { return w; }
   int GetHeight () const { return h; }
   const csGraphics3DCaps *GetCaps () const { return &Caps; }
-  void SetPerspectiveCenter (int x, int y) { cx = x; cy = y; }
+  void SetPerspectiveCenter (int x, int y)
+  { cx = x; cy = y; explicitProjection = false; }
   void GetPerspectiveCenter (int& x, int& y) const { x = cx, y = cy; }
-  void SetPerspectiveAspect (float aspect) { a = aspect; }
-  float GetPerspectiveAspect () const { return a; }
+  void SetPerspectiveAspect (float aspect)
+  { a = aspect; explicitProjection = false; }
+  float GetPerspectiveAspect () const{ return a; }
+  const CS::Math::Matrix4& GetProjectionMatrix()
+  {
+    if (!explicitProjection && needMatrixUpdate) ComputeProjectionMatrix();
+    return projectionMatrix;
+  }
+  void SetProjectionMatrix (const CS::Math::Matrix4& m)
+  {
+    projectionMatrix = m;
+    explicitProjection = true;
+  }
   
   bool SetRenderTarget (iTextureHandle* handle,	bool persistent = false,
     int subtexture = 0,	csRenderTargetAttachment attachment = rtaColor0);
@@ -178,6 +191,8 @@ private:
   int cx, cy;
   float a;
   csReversibleTransform w2c;
+  CS::Math::Matrix4 projectionMatrix;
+  bool explicitProjection, needMatrixUpdate;
 
   int current_drawflags;
 
@@ -194,6 +209,8 @@ private:
   enum { numTargets = 2 };
   csRef<iTextureHandle> render_targets[numTargets];
   int rt_subtex[numTargets];
+  
+  void ComputeProjectionMatrix();
 };
 
 // To silence EnableZOffset/DisableZOffset

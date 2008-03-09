@@ -154,9 +154,6 @@ void csView::UpdateView ()
 void csView::Draw (iMeshWrapper* mesh)
 {
   UpdateClipper();
-  G3D->SetPerspectiveCenter ( (int)Camera->GetShiftX (),
-			      (int)Camera->GetShiftY () );
-
   Engine->Draw (Camera, Clipper, mesh);
 }
 

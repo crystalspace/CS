@@ -168,10 +168,6 @@ protected:
   int width;
   /// pseudo height of display.
   int height;
-  /// Perspective center X.
-  int persp_center_x;
-  /// Perspective center X.
-  int persp_center_y;
   /// The pixel format of display
   csPixelFormat pfmt;
   bool pixelBGR;
@@ -199,10 +195,21 @@ protected:
   csRef<iRenderBuffer> scrapColors;
   csShaderVariableContext scrapContext;
 
-  /// Current aspect ratio for perspective correction.
-  float aspect;
-  /// Current inverse aspect ratio for perspective correction.
-  float inv_aspect;
+  struct OldPersp
+  {
+    /// Perspective center X.
+    int persp_center_x;
+    /// Perspective center X.
+    int persp_center_y;
+    /// Current aspect ratio for perspective correction.
+    float aspect;
+    /// Current inverse aspect ratio for perspective correction.
+    float inv_aspect;
+  };
+  OldPersp oldPersp;
+  
+  CS::Math::Matrix4 projectionMatrix;
+  bool explicitProjection, needMatrixUpdate;
 
   /// Mipmap selection coefficient (normal == 1.0)
   float mipmap_coef;
@@ -275,7 +282,8 @@ protected:
   void SetupSpecifica();
   void FlushSmallBufferToScreen();
   void SetupClipper();
-public:
+  void ComputeProjectionMatrix();
+  public:
   /// Report
   void Report (int severity, const char* msg, ...);
 
@@ -382,26 +390,37 @@ public:
   /// Set center of projection.
   virtual void SetPerspectiveCenter (int x, int y)
   {
-    persp_center_x = x;
-    persp_center_y = y;
+    oldPersp.persp_center_x = x;
+    oldPersp.persp_center_y = y;
   }
   /// Get center of projection.
   virtual void GetPerspectiveCenter (int& x, int& y) const
   {
-    x = persp_center_x;
-    y = persp_center_y;
+    x = oldPersp.persp_center_x;
+    y = oldPersp.persp_center_y;
   }
   /// Set perspective aspect.
   virtual void SetPerspectiveAspect (float aspect)
   {
-    this->aspect = aspect;
-    inv_aspect = 1./aspect;
+    oldPersp.aspect = aspect;
+    oldPersp.inv_aspect = 1./aspect;
   }
   /// Get perspective aspect.
   virtual float GetPerspectiveAspect () const
   {
-    return aspect;
+    return oldPersp.aspect;
   }
+  const CS::Math::Matrix4& GetProjectionMatrix()
+  {
+    if (!explicitProjection && needMatrixUpdate) ComputeProjectionMatrix();
+    return projectionMatrix;
+  }
+  void SetProjectionMatrix (const CS::Math::Matrix4& m)
+  {
+    projectionMatrix = m;
+    explicitProjection = true;
+  }
+  
   virtual void SetWorldToCamera (const csReversibleTransform& w2c)
   {
     this->w2c = w2c;

@@ -77,6 +77,7 @@ public:
 
   virtual void BeginDraw (int drawflags);
   virtual void SetupProjection ();
+  virtual void SetupProjection (const CS::Math::Matrix4& projectionMatrix);
   virtual void FinishDraw ();
   virtual void SetClipRect (const csRect& clipRect);
   virtual void SetupClipPortalDrawing ();
