@@ -9,6 +9,7 @@ chronological order.
 09-Mar-2008
 	- res added some helpers to create matrices to common projections.
 	- res started to make iCamera projection-agnostic.
+	- res added a to get an OpenGL matrix from a CS::Math::Matrix4.
 05-Mar-2008
 	- res patched relaytool to avoid a crash on x86_64.
 	- Vincent applied Guillaume Libersat's patch for #457,
