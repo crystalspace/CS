@@ -8,6 +8,7 @@ chronological order.
 
 09-Mar-2008
 	- Marten fixed bug #461, terrain2 setting wrong parameter.
+	- res actually implemented CS::Math::Matrix4::Description().
 08-Mar-2008
 	- res fixed a pattern in CS/docs/support/prepare_online_publish.sh that
 	  was still using a .php instead of a .html file name.
