@@ -31,6 +31,7 @@
  
 #include "csutil/scf.h"
 
+#include "csgeom/matrix4.h"
 #include "csgeom/transfrm.h"
 #include "csutil/flags.h"
 #include "csutil/strset.h"
@@ -747,7 +748,7 @@ enum csRenderTargetAttachment
  */
 struct iGraphics3D : public virtual iBase
 {
-  SCF_INTERFACE(iGraphics3D, 3, 0, 0);
+  SCF_INTERFACE(iGraphics3D, 3, 0, 1);
   
   /// Open the 3D graphics display.
   virtual bool Open () = 0;
@@ -790,6 +791,7 @@ struct iGraphics3D : public virtual iBase
    *   space, i.e. y=0 is at the bottom of the viewport, y=GetHeight() at the 
    *   top.
    */
+  CS_DEPRECATED_METHOD_MSG("Use explicit projection matrix instead")
   virtual void SetPerspectiveCenter (int x, int y) = 0;
 
   /**
@@ -798,14 +800,17 @@ struct iGraphics3D : public virtual iBase
    *   space, i.e. y=0 is at the bottom of the viewport, y=GetHeight() at the 
    *   top.
    */
+  CS_DEPRECATED_METHOD_MSG("Use explicit projection matrix instead")
   virtual void GetPerspectiveCenter (int& x, int& y) const = 0;
 
   /**
    * Set aspect ratio for perspective projection.
    */
+  CS_DEPRECATED_METHOD_MSG("Use explicit projection matrix instead")
   virtual void SetPerspectiveAspect (float aspect) = 0;
 
   /// Get aspect ratio.
+  CS_DEPRECATED_METHOD_MSG("Use explicit projection matrix instead")
   virtual float GetPerspectiveAspect () const = 0;
  
   /**
@@ -1094,6 +1099,12 @@ struct iGraphics3D : public virtual iBase
    * Get the current drawflags
    */
   virtual int GetCurrentDrawFlags() const = 0;
+  
+  virtual const CS::Math::Matrix4& GetProjectionMatrix() = 0;
+  /**
+   * Set the projection matrix to use.
+   */
+  virtual void SetProjectionMatrix (const CS::Math::Matrix4& m) = 0;
 };
 
 /** @} */

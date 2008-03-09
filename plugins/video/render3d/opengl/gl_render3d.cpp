@@ -35,6 +35,7 @@
 #include "ivideo/rendermesh.h"
 
 #include "csgeom/box.h"
+#include "csgeom/projections.h"
 #include "csgfx/imagememory.h"
 #include "csgfx/renderbuffer.h"
 #include "csplugincommon/opengl/glhelper.h"
@@ -79,6 +80,7 @@ SCF_IMPLEMENT_FACTORY (csGLGraphics3D)
 
 csGLGraphics3D::csGLGraphics3D (iBase *parent) : 
   scfImplementationType (this, parent), isOpen (false), 
+  explicitProjection (false), needMatrixUpdate (true),
   wantToSwap (false), delayClearFlags (0), currentAttachments (0)
 {
   verbose = false;
@@ -214,6 +216,16 @@ void csGLGraphics3D::SetGlOrtho (bool inverted)
     glOrtho (0., (GLdouble) viewwidth, (GLdouble) viewheight, 0., -1.0, 10.0);
   else
     glOrtho (0., (GLdouble) viewwidth, 0., (GLdouble) viewheight, -1.0, 10.0);
+}
+  
+void csGLGraphics3D::ComputeProjectionMatrix()
+{
+  if (!needMatrixUpdate) return;
+  
+  projectionMatrix = CS::Math::Projections::CSPerspective (
+    viewwidth, viewheight, asp_center_x, asp_center_y, inv_aspect);
+  
+  needMatrixUpdate = false;
 }
 
 csZBufMode csGLGraphics3D::GetZModePass2 (csZBufMode mode)
@@ -692,23 +704,32 @@ void csGLGraphics3D::SetupProjection ()
   if (!needProjectionUpdate) return;
 
   statecache->SetMatrixMode (GL_PROJECTION);
-  glLoadIdentity ();
-  if (currentAttachments != 0)
-    r2tbackend->SetupProjection();
+  if (explicitProjection)
+  {
+    GLfloat matrixholder[16];
+    CS::PluginCommon::MakeGLMatrix4x4 (projectionMatrix, matrixholder);
+    glLoadMatrixf (matrixholder);
+  }
   else
   {
-    SetGlOrtho (false);
-    //glTranslatef (asp_center_x, asp_center_y, 0);
+    glLoadIdentity ();
+    if (currentAttachments != 0)
+      r2tbackend->SetupProjection();
+    else
+    {
+      SetGlOrtho (false);
+      //glTranslatef (asp_center_x, asp_center_y, 0);
+    }
+    glTranslatef (asp_center_x, asp_center_y, 0);
+  
+    GLfloat matrixholder[16];
+    for (int i = 0 ; i < 16 ; i++) matrixholder[i] = 0.0;
+    matrixholder[0] = matrixholder[5] = 1.0;
+    matrixholder[11] = 1.0/aspect;
+    matrixholder[14] = -matrixholder[11];
+    glMultMatrixf (matrixholder);
   }
-  glTranslatef (asp_center_x, asp_center_y, 0);
-
-  GLfloat matrixholder[16];
-  for (int i = 0 ; i < 16 ; i++) matrixholder[i] = 0.0;
-  matrixholder[0] = matrixholder[5] = 1.0;
-  matrixholder[11] = 1.0/aspect;
-  matrixholder[14] = -matrixholder[11];
-  glMultMatrixf (matrixholder);
-
+  
   statecache->SetMatrixMode (GL_MODELVIEW);
   needProjectionUpdate = false;
 }

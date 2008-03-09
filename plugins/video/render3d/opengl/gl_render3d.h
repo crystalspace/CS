@@ -216,6 +216,9 @@ private:
   bool needProjectionUpdate;
   float fov;
   int viewwidth, viewheight;
+  CS::Math::Matrix4 projectionMatrix;
+  bool explicitProjection, needMatrixUpdate;
+  
   bool needViewportUpdate;
   csPoly3D frustum;
   bool frustum_valid;
@@ -480,6 +483,8 @@ private:
    */
   bool drawPixmapAFP;
   GLuint drawPixmapProgram;
+  
+  void ComputeProjectionMatrix();
 public:
   static csGLStateCache* statecache;
   static csGLExtensionManager* ext;
@@ -578,6 +583,17 @@ public:
   virtual float GetPerspectiveAspect () const
   {
     return aspect;
+  }
+  
+  const CS::Math::Matrix4& GetProjectionMatrix()
+  {
+    if (!explicitProjection && needMatrixUpdate) ComputeProjectionMatrix();
+    return projectionMatrix;
+  }
+  void SetProjectionMatrix(const CS::Math::Matrix4& m)
+  {
+    projectionMatrix = m;
+    explicitProjection = false;
   }
 
   /// Set the z buffer write/test mode
