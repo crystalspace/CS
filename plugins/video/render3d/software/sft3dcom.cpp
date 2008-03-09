@@ -28,6 +28,7 @@
 #include "csgeom/plane3.h"
 #include "csgeom/poly2d.h"
 #include "csgeom/polyclip.h"
+#include "csgeom/projections.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/tri.h"
 #include "csgfx/textureformatstrings.h"
@@ -287,8 +288,8 @@ void csSoftwareGraphics3DCommon::SetDimensions (int nwidth, int nheight)
   display_height = nheight;
   width = nwidth;
   height = nheight;
-  persp_center_x = width/2;
-  persp_center_y = height/2;
+  oldPersp.persp_center_x = width/2;
+  oldPersp.persp_center_y = height/2;
 
   delete [] smaller_buffer;
   smaller_buffer = 0;
@@ -487,6 +488,17 @@ void csSoftwareGraphics3DCommon::SetupClipper()
   clipperDirty = false;
 }
 
+void csSoftwareGraphics3DCommon::ComputeProjectionMatrix()
+{
+  if (!needMatrixUpdate) return;
+  
+  projectionMatrix = CS::Math::Projections::CSPerspective (
+      width, height, oldPersp.persp_center_x, oldPersp.persp_center_y, 
+      1.0f/oldPersp.aspect);
+  
+  needMatrixUpdate = false;
+}
+
 #define CSDRAW_MASK2D3D	  (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS)
 
 bool csSoftwareGraphics3DCommon::BeginDraw (int DrawFlags)
@@ -498,6 +510,7 @@ bool csSoftwareGraphics3DCommon::BeginDraw (int DrawFlags)
   if ((G2D->GetWidth() != display_width) ||
       (G2D->GetHeight() != display_height))
     SetDimensions (G2D->GetWidth(), G2D->GetHeight());
+  ComputeProjectionMatrix();
 
   // if 2D graphics is not locked, lock it
   if ((DrawFlags & CSDRAW_MASK2D3D) && (!(DrawMode & CSDRAW_MASK2D3D)))
@@ -922,8 +935,8 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
       0.0f, -1.0f, 0.0f,
       0.0f, 0.0f, 1.0f));
     camtrans.SetO2TTranslation (csVector3 (
-      float (persp_center_x), 
-      float (GetHeight() - persp_center_y), -aspect));
+      float (oldPersp.persp_center_x), 
+      float (GetHeight() - oldPersp.persp_center_y), -oldPersp.aspect));
 
     SetWorldToCamera (camtrans.GetInverse ());
   }
