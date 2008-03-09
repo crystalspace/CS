@@ -44,6 +44,7 @@ struct iCamera;
 struct iCameraPosition;
 struct iCameraPositionList;
 struct iClipper2D;
+struct iCustomMatrixCamera;
 struct iDataBuffer;
 struct iFrustumView;
 struct iLight;
@@ -63,6 +64,7 @@ struct iMeshWrapperIterator;
 struct iObject;
 struct iObjectIterator;
 struct iObjectWatcher;
+struct iPerspectiveCamera;
 struct iPortal;
 struct iProgressMeter;
 struct iRegion;
@@ -174,7 +176,7 @@ struct iEngineSectorCallback : public virtual iBase
  */
 struct iEngine : public virtual iBase
 {
-  SCF_INTERFACE(iEngine, 3, 0, 0);
+  SCF_INTERFACE(iEngine, 3, 0, 1);
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;
@@ -997,6 +999,7 @@ struct iEngine : public virtual iBase
    * Create a new camera.
    * Assign to a csRef.
    */
+  CS_DEPRECATED_METHOD_MSG("Use CreatePerspectiveCamera instead")
   virtual csPtr<iCamera> CreateCamera () = 0;
 
   /**
@@ -1410,6 +1413,20 @@ struct iEngine : public virtual iBase
    */
   virtual bool GetDefaultKeepImage () = 0;
 
+  /** @} */
+  
+  /**\name Camera handling
+   * @{ */
+
+  /**
+   * Create a new perspective projection camera.
+   */
+  virtual csPtr<iPerspectiveCamera> CreatePerspectiveCamera () = 0;
+
+  /**
+   * Create a new custom projection camera.
+   */
+  virtual csPtr<iCustomMatrixCamera> CreateCustomMatrixCamera () = 0;
   /** @} */
 };
 

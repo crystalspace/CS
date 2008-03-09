@@ -79,6 +79,8 @@
 #include "plugins/engine/3d/texture.h"
 #include "plugins/engine/3d/meshgen.h"
 
+using namespace CS_PLUGIN_NAMESPACE_NAME(Engine);
+
 CS_IMPLEMENT_PLUGIN
 
 #define DEFAULT_COLLECTION "defaultCollection"
@@ -714,8 +716,8 @@ bool csEngine::HandleEvent (iEvent &Event)
     frameHeight = 480;
   }
 
-  if (csCamera::GetDefaultFOV () == 0)
-    csCamera::SetDefaultFOV (frameHeight, frameWidth);
+  if (PerspectiveImpl::GetDefaultFOV () == 0)
+    PerspectiveImpl::SetDefaultFOV (frameHeight, frameWidth);
 
   // Allow context resizing since we handle CanvasResize(G2D)
   if (G2D) G2D->AllowResize (true);
@@ -3219,7 +3221,20 @@ iCollection* csEngine::GetDefaultCollection()
 
 csPtr<iCamera> csEngine::CreateCamera ()
 {
-  return csPtr<iCamera> (new csCamera (frameWidth, frameHeight));
+  csCameraPerspective* cam = new csCameraPerspective (frameWidth, frameHeight);
+  return csPtr<iCamera> ((iCamera*)cam);
+}
+
+csPtr<iPerspectiveCamera> csEngine::CreatePerspectiveCamera ()
+{
+  csCameraPerspective* cam = new csCameraPerspective (frameWidth, frameHeight);
+  return csPtr<iPerspectiveCamera> (cam);
+}
+
+csPtr<iCustomMatrixCamera> csEngine::CreateCustomMatrixCamera ()
+{
+  csCameraCustomMatrix* cam = new csCameraCustomMatrix ();
+  return csPtr<iCustomMatrixCamera> (cam);
 }
 
 csPtr<iLight> csEngine::CreateLight (
@@ -3948,7 +3963,7 @@ bool csEngine::SetOption (int id, csVariant *value)
   switch (id)
   {
     case 0:
-      csCamera::SetDefaultFOV (value->GetLong (), G3D->GetWidth ());
+      PerspectiveImpl::SetDefaultFOV (value->GetLong (), G3D->GetWidth ());
       break;
     case 1:
       if (value->GetBool ())
@@ -3972,7 +3987,7 @@ bool csEngine::GetOption (int id, csVariant *value)
   switch (id)
   {
     case 0:
-      value->SetLong (csCamera::GetDefaultFOV ());
+      value->SetLong (PerspectiveImpl::GetDefaultFOV ());
       break;
     case 1:
       value->SetBool (csEngine::lightmapCacheMode == CS_ENGINE_CACHE_WRITE);

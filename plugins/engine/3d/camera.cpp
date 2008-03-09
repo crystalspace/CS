@@ -19,69 +19,49 @@
 #include "cssysdef.h"
 #include "csqint.h"
 #include "csqsqrt.h"
+#include "csgeom/projections.h"
 #include "plugins/engine/3d/camera.h"
 #include "plugins/engine/3d/sector.h"
 #include "plugins/engine/3d/engine.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(Engine)
+{
 
-int csCamera:: default_aspect = 0;
-float csCamera:: default_inv_aspect = 0;
-float csCamera:: default_fov_angle = 90;
-long csCamera:: cur_cameranr = 0;
+long csCameraBase:: cur_cameranr = 0;
 
-csCamera::csCamera (int frameWidth, int frameHeight) :
-  scfImplementationType (this), fp (0)
+csCameraBase::csCameraBase () : scfImplementationType (this), fp (0)
 {
   mirror = false;
   sector = 0;
-  aspect = default_aspect;
-  inv_aspect = default_inv_aspect;
-  fov_angle = default_fov_angle;
-  shift_x = frameWidth / 2;
-  shift_y = frameHeight / 2;
-  cameranr = cur_cameranr++;
+  BumpCamera();
   only_portals = true;
 }
 
-csCamera::csCamera (csCamera *c) :
-  csOrthoTransform(), scfImplementationType (this), fp (0)
+csCameraBase::csCameraBase (const csCameraBase& other)
+  : scfImplementationType (this), fp (0)
 {
-  *this = *c;
+  *this = other;
   if (fp)
   {
     // Make a copy of the plane.
     fp = new csPlane3 (*fp);
   }
-  
-  cameranr = cur_cameranr++;
+  BumpCamera();
 }
 
-csCamera::csCamera (const csCamera &c) :
-  iBase(), csOrthoTransform(), scfImplementationType (this), fp (0)
-{
-  *this = c;
-  if (fp)
-  {
-    // Make a copy of the plane.
-    fp = new csPlane3 (*fp);
-  }
- 
-  cameranr = cur_cameranr++;
-}
-
-csCamera::~csCamera ()
+csCameraBase::~csCameraBase ()
 {
   delete fp;
 }
 
-void csCamera::FireCameraSectorListeners (iSector* sector)
+void csCameraBase::FireCameraSectorListeners (iSector* sector)
 {
   size_t i;
   for (i = 0 ; i < listeners.GetSize () ; i++)
     listeners[i]->NewSector ((iCamera*)this, sector);
 }
 
-void csCamera::SetFarPlane (csPlane3 *farplane)
+void csCameraBase::SetFarPlane (csPlane3 *farplane)
 {
   delete fp;
   if (farplane)
@@ -90,7 +70,7 @@ void csCamera::SetFarPlane (csPlane3 *farplane)
     fp = 0;
 }
 
-void csCamera::MoveWorld (const csVector3 &v, bool cd)
+void csCameraBase::MoveWorld (const csVector3 &v, bool cd)
 {
   csVector3 new_position = GetOrigin () + v;
   if (sector)
@@ -117,7 +97,7 @@ void csCamera::MoveWorld (const csVector3 &v, bool cd)
   cameranr = cur_cameranr++;
 }
 
-void csCamera::Correct (int n)
+void csCameraBase::Correct (int n)
 {
   csVector3 w1, w2, w3;
   float *vals[5];
@@ -143,7 +123,7 @@ void csCamera::Correct (int n)
   SetT2O (csMatrix3 (w1.x, w2.x, w3.x, w1.y, w2.y, w3.y, w1.z, w2.z, w3.z));
 }
 
-void csCamera::Correct (int n, float *vals[])
+void csCameraBase::Correct (int n, float *vals[])
 {
   float r, angle;
 
@@ -176,7 +156,23 @@ void csCamera::Correct (int n, float *vals[])
   cameranr = cur_cameranr++;
 }
 
-void csCamera::SetFOVAngle (float a, int width)
+//---------------------------------------------------------------------------
+
+int PerspectiveImpl:: default_aspect = 0;
+float PerspectiveImpl:: default_inv_aspect = 0;
+float PerspectiveImpl:: default_fov_angle = 90;
+
+PerspectiveImpl::PerspectiveImpl (int frameWidth, int frameHeight)
+  : projDirty (true), matrix_vw (0), matrix_vh (0)
+{
+  aspect = default_aspect;
+  inv_aspect = default_inv_aspect;
+  fov_angle = default_fov_angle;
+  shift_x = frameWidth / 2;
+  shift_y = frameHeight / 2;
+}
+
+void PerspectiveImpl::SetFOVAngle (float a, int width)
 {
   // make sure we have valid angles
   if (a >= 180)
@@ -203,10 +199,10 @@ void csCamera::SetFOVAngle (float a, int width)
   // set the other neccessary variables
   inv_aspect = 1.0f / aspect;
   fov_angle = a;
-  cameranr = cur_cameranr++;
+  projDirty = true;
 }
 
-void csCamera::ComputeAngle (int width)
+void PerspectiveImpl::ComputeAngle (int width)
 {
   float rview_fov = (float)GetFOV () * 0.5f;
   float disp_width = (float)width * 0.5f;
@@ -214,9 +210,10 @@ void csCamera::ComputeAngle (int width)
       rview_fov * rview_fov + disp_width * disp_width);
   fov_angle = 2.0f * (float)acos (disp_width * inv_disp_radius)
   	* (360.0f / TWO_PI);
+  projDirty = true;
 }
 
-void csCamera::ComputeDefaultAngle (int width)
+void PerspectiveImpl::ComputeDefaultAngle (int width)
 {
   float rview_fov = (float)GetDefaultFOV () * 0.5f;
   float disp_width = (float)width * 0.5f;
@@ -225,3 +222,19 @@ void csCamera::ComputeDefaultAngle (int width)
   default_fov_angle = 2.0f * (float)acos (disp_width * inv_disp_radius)
   	* (360.0f / TWO_PI);
 }
+
+void PerspectiveImpl::UpdateMatrix (int viewWidth, int viewHeight)
+{
+  if (!projDirty && (matrix_vw == viewWidth) && (matrix_vh == viewHeight))
+    return;
+  
+  matrix = CS::Math::Projections::CSPerspective (viewWidth, viewHeight,
+    shift_x, shift_y, inv_aspect);
+  
+  projDirty = false;
+  matrix_vw = viewWidth;
+  matrix_vh = viewHeight;
+}
+
+}
+CS_PLUGIN_NAMESPACE_END(Engine)

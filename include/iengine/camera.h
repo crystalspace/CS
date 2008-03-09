@@ -27,6 +27,7 @@
  * \addtogroup engine3d_views
  * @{ */
 
+#include "csgeom/matrix4.h"
 #include "csutil/scf.h"
 
 #define CS_VEC_FORWARD   csVector3(0,0,1)
@@ -101,12 +102,12 @@ struct iCameraSectorListener : public virtual iBase
  */
 struct iCamera : public virtual iBase
 {
-  SCF_INTERFACE(iCamera, 2,1,0);
+  SCF_INTERFACE(iCamera, 2,1,1);
   /**
    * Create a clone of this camera. Note that the array of listeners
    * is not cloned.
    */
-  virtual iCamera *Clone () const = 0;
+  virtual csPtr<iCamera> Clone () const = 0;
 
   /**
    * Get the scene node that this object represents.
@@ -116,37 +117,45 @@ struct iCamera : public virtual iBase
   virtual iSceneNode* QuerySceneNode () = 0;
 
   /// Return the FOV (field of view) in pixels
+  CS_DEPRECATED_METHOD_MSG("Use iPerspectiveCamera instead")
   virtual int GetFOV () const = 0;
   /// Return the inverse flield of view (1/FOV) in pixels
+  CS_DEPRECATED_METHOD_MSG("Use iPerspectiveCamera instead")
   virtual float GetInvFOV () const = 0;
   /// Return the FOV (field of view) in degrees.
+  CS_DEPRECATED_METHOD_MSG("Use iPerspectiveCamera instead")
   virtual float GetFOVAngle () const = 0;
 
   /**
    * Set the FOV in pixels. 'fov' is the desired FOV in pixels. 'width' is
    * the display width, also in pixels.
    */
+  CS_DEPRECATED_METHOD_MSG("Use iPerspectiveCamera instead")
   virtual void SetFOV (int fov, int width) = 0;
   /**
    * Set the FOV in degrees. 'fov' is the desired FOV in degrees. 'width' is
    * the display width in pixels.
    */
+  CS_DEPRECATED_METHOD_MSG("Use iPerspectiveCamera instead")
   virtual void SetFOVAngle (float fov, int width) = 0;
 
   /**
    * Set the X shift amount. The parameter specified the desired X coordinate
    * on screen of the projection center of the camera.
    */
+  CS_DEPRECATED_METHOD_MSG("Use iPerspectiveCamera instead")
   virtual float GetShiftX () const = 0;
   /**
    * Set the Y shift amount. The parameter specified the desired Y coordinate
    * on screen of the projection center of the camera.
    */
+  CS_DEPRECATED_METHOD_MSG("Use iPerspectiveCamera instead")
   virtual float GetShiftY () const = 0;
   /**
    * Set the shift amount. The parameter specified the desired projection
    * center of the camera on screen.
    */
+  CS_DEPRECATED_METHOD_MSG("Use iPerspectiveCamera instead")
   virtual void SetPerspectiveCenter (float x, float y) = 0;
 
   /**
@@ -259,6 +268,51 @@ struct iCamera : public virtual iBase
   virtual void AddCameraSectorListener (iCameraSectorListener* listener) = 0;
   /// Remove a listener from this camera.
   virtual void RemoveCameraSectorListener (iCameraSectorListener* listener) = 0;
+  
+  /// Get the projection matrix for this camera
+  virtual const CS::Math::Matrix4& GetProjectionMatrix (int viewWidth,
+    int viewHeight) = 0;
+};
+
+struct iPerspectiveCamera : public virtual iBase
+{
+  SCF_INTERFACE(iPerspectiveCamera, 1, 0, 0);
+  
+  virtual int GetFOV () const = 0;
+  /// Return the inverse flield of view (1/FOV) in pixels
+  virtual float GetInvFOV () const = 0;
+  /// Return the FOV (field of view) in degrees.
+  virtual float GetFOVAngle () const = 0;
+  virtual void SetFOV (int fov, int width) = 0;
+  
+  /**
+   * Set the FOV in degrees. 'fov' is the desired FOV in degrees. 'width' is
+   * the display width in pixels.
+   */
+  virtual void SetFOVAngle (float fov, int width) = 0;
+
+  /**
+   * Set the X shift amount. The parameter specified the desired X coordinate
+   * on screen of the projection center of the camera.
+   */
+  virtual float GetShiftX () const = 0;
+  /**
+   * Set the Y shift amount. The parameter specified the desired Y coordinate
+   * on screen of the projection center of the camera.
+   */
+  virtual float GetShiftY () const = 0;
+  /**
+   * Set the shift amount. The parameter specified the desired projection
+   * center of the camera on screen.
+   */
+  virtual void SetPerspectiveCenter (float x, float y) = 0;
+};
+
+struct iCustomMatrixCamera : public virtual iBase
+{
+  SCF_INTERFACE(iCustomMatrixCamera, 1, 0, 0);
+  
+  virtual void SetProjectionMatrix (const CS::Math::Matrix4& mat) = 0;
 };
 
 /** @} */

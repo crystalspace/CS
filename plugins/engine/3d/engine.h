@@ -61,7 +61,6 @@
 #include "plugins/engine/3d/rview.h"
 #include "plugins/engine/3d/sharevar.h"
 
-class csCamera;
 class csEngine;
 class csLight;
 class csLightPatchPool;
@@ -499,6 +498,8 @@ public:
   //-- Camera handling
 
   virtual csPtr<iCamera> CreateCamera ();
+  virtual csPtr<iPerspectiveCamera> CreatePerspectiveCamera ();
+  virtual csPtr<iCustomMatrixCamera> CreateCustomMatrixCamera ();
 
   virtual iCameraPosition* FindCameraPosition (const char* name,
     iBase* base = 0);
