@@ -47,7 +47,8 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY (csNullGraphics3D)
 
 csNullGraphics3D::csNullGraphics3D (iBase *iParent) : 
-  scfImplementationType (this, iParent)
+  scfImplementationType (this, iParent), explicitProjection (false), 
+  needMatrixUpdate (true)
 {
   scfiEventHandler = 0;
 

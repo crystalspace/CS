@@ -78,10 +78,12 @@ public:
   int GetWidth () const { return w; }
   int GetHeight () const { return h; }
   const csGraphics3DCaps *GetCaps () const { return &Caps; }
-  void SetPerspectiveCenter (int x, int y) { cx = x; cy = y; }
+  void SetPerspectiveCenter (int x, int y)
+  { cx = x; cy = y; explicitProjection = false; }
   void GetPerspectiveCenter (int& x, int& y) const { x = cx, y = cy; }
-  void SetPerspectiveAspect (float aspect) { a = aspect; }
-  float GetPerspectiveAspect () const { return a; }
+  void SetPerspectiveAspect (float aspect)
+  { a = aspect; explicitProjection = false; }
+  float GetPerspectiveAspect () const{ return a; }
   const CS::Math::Matrix4& GetProjectionMatrix()
   {
     if (!explicitProjection && needMatrixUpdate) ComputeProjectionMatrix();
