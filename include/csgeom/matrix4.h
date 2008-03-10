@@ -153,6 +153,23 @@ namespace CS
       /// Assign another matrix to this one.
       Matrix4& operator= (const Matrix4& o) { Set(o); return *this; }
     
+      /// Scale complete matrix.
+      Matrix4& operator*= (float f)
+      {
+	m11 *= f; m12 *= f; m13 *= f; m14 *= f;
+	m21 *= f; m22 *= f; m23 *= f; m24 *= f;
+	m31 *= f; m32 *= f; m33 *= f; m34 *= f;
+	m41 *= f; m42 *= f; m43 *= f; m44 *= f;
+	return *this;
+      }
+    
+      /// Scale complete matrix.
+      Matrix4& operator/= (float f) 
+      {
+        *this *= 1.0f/f;	
+	return *this;
+      }
+    
       /// Multiply two matrices.
       friend CS_CRYSTALSPACE_EXPORT Matrix4 operator* (const Matrix4& m1, 
 	const Matrix4& m2);
@@ -166,6 +183,47 @@ namespace CS
 	  m31*v.x + m32*v.y + m33*v.z + m34*v.w,
 	  m41*v.x + m42*v.y + m43*v.z + m44*v.w);
       }
+      
+      /// Compute determinant of this matrix
+      float Determinant() const
+      {
+	return m14 * m23 * m32 * m41-m13 * m24 * m32 * m41-m14 * m22 * m33 * m41+m12 * m24 * m33 * m41
+	  + m13 * m22 * m34 * m41-m12 * m23 * m34 * m41-m14 * m23 * m31 * m42+m13 * m24 * m31 * m42
+	  + m14 * m21 * m33 * m42-m11 * m24 * m33 * m42-m13 * m21 * m34 * m42+m11 * m23 * m34 * m42
+	  + m14 * m22 * m31 * m43-m12 * m24 * m31 * m43-m14 * m21 * m32 * m43+m11 * m24 * m32 * m43
+	  + m12 * m21 * m34 * m43-m11 * m22 * m34 * m43-m13 * m22 * m31 * m44+m12 * m23 * m31 * m44
+	  + m13 * m21 * m32 * m44-m11 * m23 * m32 * m44-m12 * m21 * m33 * m44+m11 * m22 * m33 * m44;
+      }
+      
+      /// Return the inverse of this matrix. 
+      Matrix4 GetInverse() const
+      {
+	Matrix4 m (
+	  m23*m34*m42 - m24*m33*m42 + m24*m32*m43 - m22*m34*m43 - m23*m32*m44 + m22*m33*m44,
+	  m14*m33*m42 - m13*m34*m42 - m14*m32*m43 + m12*m34*m43 + m13*m32*m44 - m12*m33*m44,
+          m13*m24*m42 - m14*m23*m42 + m14*m22*m43 - m12*m24*m43 - m13*m22*m44 + m12*m23*m44,
+	  m14*m23*m32 - m13*m24*m32 - m14*m22*m33 + m12*m24*m33 + m13*m22*m34 - m12*m23*m34,
+   
+          m24*m33*m41 - m23*m34*m41 - m24*m31*m43 + m21*m34*m43 + m23*m31*m44 - m21*m33*m44,
+	  m13*m34*m41 - m14*m33*m41 + m14*m31*m43 - m11*m34*m43 - m13*m31*m44 + m11*m33*m44,
+          m14*m23*m41 - m13*m24*m41 - m14*m21*m43 + m11*m24*m43 + m13*m21*m44 - m11*m23*m44,
+	  m13*m24*m31 - m14*m23*m31 + m14*m21*m33 - m11*m24*m33 - m13*m21*m34 + m11*m23*m34,
+	
+          m22*m34*m41 - m24*m32*m41 + m24*m31*m42 - m21*m34*m42 - m22*m31*m44 + m21*m32*m44,
+	  m14*m32*m41 - m12*m34*m41 - m14*m31*m42 + m11*m34*m42 + m12*m31*m44 - m11*m32*m44,
+          m12*m24*m41 - m14*m22*m41 + m14*m21*m42 - m11*m24*m42 - m12*m21*m44 + m11*m22*m44,
+	  m14*m22*m31 - m12*m24*m31 - m14*m21*m32 + m11*m24*m32 + m12*m21*m34 - m11*m22*m34,
+
+          m23*m32*m41 - m22*m33*m41 - m23*m31*m42 + m21*m33*m42 + m22*m31*m43 - m21*m32*m43,
+	  m12*m33*m41 - m13*m32*m41 + m13*m31*m42 - m11*m33*m42 - m12*m31*m43 + m11*m32*m43,
+          m13*m22*m41 - m12*m23*m41 - m13*m21*m42 + m11*m23*m42 + m12*m21*m43 - m11*m22*m43,
+	  m12*m23*m31 - m13*m22*m31 + m13*m21*m32 - m11*m23*m32 - m12*m21*m33 + m11*m22*m33);
+	m /= Determinant();
+	return m;
+      }
+
+      /// Invert this matrix. 
+      void Invert() { *this = GetInverse(); }
     };
 
   } // namespace Math
