@@ -1422,6 +1422,8 @@ void csLoader::AddToRegionOrCollection(iLoaderContext* ldr_context, iObject* obj
     }
   }
 
+  // Don't add iMeshWrapper to workaround some weird bug causing everything to
+  // display black.
   csRef<iMeshWrapper> mesh = scfQueryInterface<iMeshWrapper>(obj);
   if(!mesh.IsValid())
   {
