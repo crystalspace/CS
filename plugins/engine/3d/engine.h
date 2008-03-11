@@ -21,6 +21,7 @@
 #define __CS_ENGINE_H__
 
 #include "csgeom/math3d.h"
+#include "csplugincommon/rendermanager/renderview.h"
 #include "csutil/array.h"
 #include "csutil/csobject.h"
 #include "csutil/hash.h"
@@ -901,6 +902,7 @@ private:
 
   /// Pool from which to allocate render views.
   csRenderView::Pool rviewPool;
+  CS::RenderManager::RenderView::Pool rmRviewPool;
 
   // -- Object lists
   /**

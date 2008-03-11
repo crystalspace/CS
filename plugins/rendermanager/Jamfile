@@ -1,4 +1,4 @@
 SubDir TOP plugins rendermanager ;
 
 SubInclude TOP plugins rendermanager test1 ;
-
+SubInclude TOP plugins rendermanager rlcompat ;

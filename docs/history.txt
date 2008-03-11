@@ -24,6 +24,12 @@ chronological order.
 	- res fixed the GL canvas closing to call the common canvas Close()
 	  before freeing GL-specific data, since the former accesses some of
 	  the latter. Fixes trac #460.
+	- res added a rendermanager which just forwards drawing to the engine's
+	  old renderloop based drawing - the idea being to provide some notion
+	  of backward compatibility. Made that manager default (for now at
+	  least).
+	- res changed csView to simply forward to the engine"s rendermanager
+	  Draw().
 10-Mar-2008
 	- res added inverting to CS::Math::Matrix4.
 09-Mar-2008

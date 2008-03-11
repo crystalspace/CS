@@ -891,8 +891,17 @@ void csEngine::DeleteAll ()
     renderLoopManager->Register (CS_DEFAULT_RENDERLOOP_NAME, 
       defaultRenderLoop);
 
+    const char fallbackRM[] = "crystalspace.rendermanager.rlcompat";
+    const char* defaultRM = cfg->GetStr ("Engine.RenderManager.Default", 0);
+    if (defaultRM == 0)
+    {
+      Warn ("No default render manager given, using '%s'", fallbackRM);
+      defaultRM = fallbackRM;
+    }
     renderManager = csQueryRegistryOrLoad<iRenderManager> (objectRegistry,
-      "crystalspace.rendermanager.test1");
+      defaultRM);
+    if (!renderManager)
+      Error ("No rendermanager set!");
   }
 }
 
