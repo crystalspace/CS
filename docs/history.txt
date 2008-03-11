@@ -14,6 +14,12 @@ chronological order.
 	  operations such as cleaning redundant flags.
 	- res changed Jam's LinkWith and LFlags rules to more aggressively
 	  remove duplicate flags.
+	- res changed csColliderHelper to only have one name for
+	  InitializeCollisionWrappers; distinguishing between regions and
+	  collections is done by overloading.
+	- res fixed collections InitializeCollisionWrappers not setting up any
+	  wrappers if no collection is given. Instead, set up all wrappers in
+	  that case (as the regions variant does).
 10-Mar-2008
 	- res added inverting to CS::Math::Matrix4.
 09-Mar-2008
