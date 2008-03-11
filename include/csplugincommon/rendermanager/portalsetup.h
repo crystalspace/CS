@@ -303,10 +303,11 @@ namespace RenderManager
 	    iCamera* cam = rview->GetCamera();
 	    // Create a new view
 	    csRef<CS::RenderManager::RenderView> newRenderView;
+	    csRef<iCamera> newCam (cam->Clone());
 #include "csutil/custom_new_disable.h"
 	    newRenderView.AttachNew (
 	      new (renderTree.GetPersistentData().renderViewPool) RenderView (
-	        cam->Clone(), 0, rview->GetGraphics3D(), rview->GetGraphics2D()));
+	        newCam, 0, rview->GetGraphics3D(), rview->GetGraphics2D()));
 #include "csutil/custom_new_enable.h"
 	    newRenderView->SetEngine (rview->GetEngine ());
 	    

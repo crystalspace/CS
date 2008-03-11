@@ -19,9 +19,12 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_RENDERTREE_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_RENDERTREE_H__
 
+#include "iengine/camera.h"
 #include "csplugincommon/rendermanager/standardtreetraits.h"
-#include "csutil/redblacktree.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/metautils.h"
+#include "csutil/redblacktree.h"
+#include "cstool/rendermeshholder.h"
 
 struct iMeshWrapper;
 struct iPortalContainer;
