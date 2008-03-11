@@ -717,7 +717,7 @@ bool csEngine::HandleEvent (iEvent &Event)
   }
 
   if (PerspectiveImpl::GetDefaultFOV () == 0)
-    PerspectiveImpl::SetDefaultFOV (frameHeight, frameWidth);
+    PerspectiveImpl::SetDefaultFOV (frameHeight/(float)frameWidth, 1.0f);
 
   // Allow context resizing since we handle CanvasResize(G2D)
   if (G2D) G2D->AllowResize (true);
@@ -1588,8 +1588,8 @@ void csEngine::Draw (iCamera *c, iClipper2D *view, iMeshWrapper* mesh)
   // First initialize G3D with the right clipper.
   G3D->SetClipper (view, CS_CLIPPER_TOPLEVEL);  // We are at top-level.
   G3D->ResetNearPlane ();
-  G3D->SetProjectionMatrix (
-    c->GetProjectionMatrix (frameWidth, frameHeight));
+  c->SetViewportSize (frameWidth, frameHeight);
+  G3D->SetProjectionMatrix (c->GetProjectionMatrix ());
 
   FireStartFrame (rview);
 
@@ -3222,13 +3222,13 @@ iCollection* csEngine::GetDefaultCollection()
 
 csPtr<iCamera> csEngine::CreateCamera ()
 {
-  csCameraPerspective* cam = new csCameraPerspective (frameWidth, frameHeight);
+  csCameraPerspective* cam = new csCameraPerspective ();
   return csPtr<iCamera> ((iCamera*)cam);
 }
 
 csPtr<iPerspectiveCamera> csEngine::CreatePerspectiveCamera ()
 {
-  csCameraPerspective* cam = new csCameraPerspective (frameWidth, frameHeight);
+  csCameraPerspective* cam = new csCameraPerspective ();
   return csPtr<iPerspectiveCamera> (cam);
 }
 
@@ -3964,7 +3964,7 @@ bool csEngine::SetOption (int id, csVariant *value)
   switch (id)
   {
     case 0:
-      PerspectiveImpl::SetDefaultFOV (value->GetLong (), G3D->GetWidth ());
+      PerspectiveImpl::SetDefaultFOV (value->GetFloat (), G3D->GetWidth ());
       break;
     case 1:
       if (value->GetBool ())
@@ -3988,7 +3988,7 @@ bool csEngine::GetOption (int id, csVariant *value)
   switch (id)
   {
     case 0:
-      value->SetLong (PerspectiveImpl::GetDefaultFOV ());
+      value->SetFloat(PerspectiveImpl::GetDefaultFOV ());
       break;
     case 1:
       value->SetBool (csEngine::lightmapCacheMode == CS_ENGINE_CACHE_WRITE);
