@@ -20,6 +20,9 @@ chronological order.
 	- res fixed collections InitializeCollisionWrappers not setting up any
 	  wrappers if no collection is given. Instead, set up all wrappers in
 	  that case (as the regions variant does).
+	- res fixed the GL canvas closing to call the common canvas Close()
+	  before freeing GL-specific data, since the former accesses some of
+	  the latter. Fixes trac #460.
 10-Mar-2008
 	- res added inverting to CS::Math::Matrix4.
 09-Mar-2008
