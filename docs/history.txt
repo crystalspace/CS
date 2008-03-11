@@ -12,6 +12,8 @@ chronological order.
 	- res changed jamcache.m4 to emit values to Jamconfig without quotes.
 	  That way Jam sees them as arrays not strings, easing some array-based
 	  operations such as cleaning redundant flags.
+	- res changed Jam's LinkWith and LFlags rules to more aggressively
+	  remove duplicate flags.
 10-Mar-2008
 	- res added inverting to CS::Math::Matrix4.
 09-Mar-2008
