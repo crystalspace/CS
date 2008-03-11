@@ -1,5 +1,0 @@
-SubDir TOP apps tests atomictest ;
-
-Description atomictest : "atomic operations tester" ;
-Application atomictest : [ Wildcard *.cpp *.h ] : console noinstall ;
-LinkWith atomictest : crystalspace ;

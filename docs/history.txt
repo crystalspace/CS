@@ -23,6 +23,7 @@ chronological order.
 	- res fixed the GL canvas closing to call the common canvas Close()
 	  before freeing GL-specific data, since the former accesses some of
 	  the latter. Fixes trac #460.
+	- Marten removed the no-longer-needed atomictest.
 10-Mar-2008
 	- res added inverting to CS::Math::Matrix4.
 09-Mar-2008
