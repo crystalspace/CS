@@ -24,6 +24,8 @@ chronological order.
 	  before freeing GL-specific data, since the former accesses some of
 	  the latter. Fixes trac #460.
 	- Marten removed the no-longer-needed atomictest.
+	- Marten added checks to XML parser plugins to skip any UTF8 BOM in the
+	  beginning of the XML stream.
 10-Mar-2008
 	- res added inverting to CS::Math::Matrix4.
 09-Mar-2008

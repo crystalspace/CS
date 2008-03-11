@@ -93,6 +93,10 @@ const char* csTinyDocWrapper::Parse (iString* str, bool collapse)
 
 const char* csTinyDocWrapper::Parse (const char* buf, bool collapse)
 {
+  // Skip any UTF8 BOM
+  if (buf[0] == 0xEF && buf[1] == 0xBB && buf[2] == 0xBF)
+    buf += 3;
+
   const char* b = buf;
   while ((*b == ' ') || (*b == '\n') || (*b == '\t') || 
     (*b == '\r')) b++;
