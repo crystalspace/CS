@@ -33,6 +33,7 @@ chronological order.
 	- res defused an assert in ShaderVarContextImpl - the condition may
 	  fail in certain border cases which, while probably caused by sloppy
 	  coding, are not (necessarily) a bug.
+	- res fixed a missing forward declaration in iengine/portalcontainer.h.
 10-Mar-2008
 	- res added inverting to CS::Math::Matrix4.
 09-Mar-2008
