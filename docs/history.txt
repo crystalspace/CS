@@ -8,6 +8,22 @@ chronological order.
 
 11-Mar-2008
 	- res fixed build errors.
+	- res fixed CS/docs/support/prepare_online_publish.sh to use the right
+	  search page parameter names for filtering for the docs only.
+	- res changed jamcache.m4 to emit values to Jamconfig without quotes.
+	  That way Jam sees them as arrays not strings, easing some array-based
+	  operations such as cleaning redundant flags.
+	- res changed Jam's LinkWith and LFlags rules to more aggressively
+	  remove duplicate flags.
+	- res changed csColliderHelper to only have one name for
+	  InitializeCollisionWrappers; distinguishing between regions and
+	  collections is done by overloading.
+	- res fixed collections InitializeCollisionWrappers not setting up any
+	  wrappers if no collection is given. Instead, set up all wrappers in
+	  that case (as the regions variant does).
+	- res fixed the GL canvas closing to call the common canvas Close()
+	  before freeing GL-specific data, since the former accesses some of
+	  the latter. Fixes trac #460.
 10-Mar-2008
 	- res added inverting to CS::Math::Matrix4.
 09-Mar-2008

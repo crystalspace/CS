@@ -40,10 +40,17 @@ rule LinkWith
   }
 
   Depends $($(<)_TARGET) : $(rawlibs) ;
-  NEEDLIBS on $($(<)_TARGET) += $(libs) ;
+  for l in $(libs)
+  {
+    NEEDLIBS on $($(<)_TARGET) =
+      [ MergeLFlags [ on $($(<)_TARGET) GetVar NEEDLIBS ] : $(l) ] ;
+  }
   $(<).NEEDLIBS += $(rawlibs) ;
 
-  LFlags $(<) : $($($(rawlibs).EXTERNALLIBS).LFLAGS) ;
+  for l in $(rawlibs)
+  {
+    LFlags $(<) : $($($(l).EXTERNALLIBS).LFLAGS) ;
+  }
 }
 
 ##  CFlags target : flags [ : options ]
@@ -98,8 +105,9 @@ rule LFlags
   CheckOptions nostatic : $(3) : $(<) ;
 
   NotFile $(>) ;
-  NEEDLIBS on $($(<)_TARGET) += $(>) ;
-  $(<).LFLAGS += $(>) ;
+  NEEDLIBS on $($(<)_TARGET) = [ Reverse [ RemoveDups [ Reverse 
+    [ on $($(<)_TARGET) GetVar NEEDLIBS ] $(>) ] ] ] ;
+  $(<).LFLAGS = [ Reverse [ RemoveDups [ Reverse $($(<).LFLAGS) $(>) ] ] ] ;
 
   UnitTestLFlags $(<) : $(>) : $(3) ;
 }
