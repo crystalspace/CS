@@ -75,7 +75,10 @@ void ShaderVariableContextImpl::PushVariables (
   for (size_t i=0; i<variables.GetSize (); ++i)
   {
     ShaderVarStringID name = variables[i]->GetName ();
-    CS_ASSERT_MSG("Shader variable stack is invalid!", name < stack.GetSize ());
+    if (name >= stack.GetSize ())
+      /* Not really an error: can happen if new shader vars are created
+       * after the stack was set up */
+      return;
     stack[name] = variables[i];
   }
 }
