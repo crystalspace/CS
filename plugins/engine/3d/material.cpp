@@ -212,7 +212,7 @@ csMaterialList::~csMaterialList()
 void csMaterialList::NameChanged (iObject* object, const char* oldname,
   	const char* newname)
 {
-  csRef<iMaterialWrapper> mat = scfQueryInterface<iMaterialWrapper> (object);
+  csWeakRef<iMaterialWrapper> mat = scfQueryInterface<iMaterialWrapper> (object);
   CS_ASSERT (mat != 0);
   if (oldname) mat_hash.Delete (oldname, mat);
   if (newname) mat_hash.Put (newname, mat);
@@ -221,8 +221,7 @@ void csMaterialList::NameChanged (iObject* object, const char* oldname,
 iMaterialWrapper *csMaterialList::NewMaterial (iMaterial *material,
 	const char* name)
 {
-  csRef<iMaterialWrapper> tm;
-  tm.AttachNew (new csMaterialWrapper (this, material));
+  csWeakRef<iMaterialWrapper> tm = new csMaterialWrapper (this, material);
   tm->QueryObject ()->SetName (name);
   if (name)
     mat_hash.Put (name, tm);

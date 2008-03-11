@@ -1421,7 +1421,12 @@ void csLoader::AddToRegionOrCollection(iLoaderContext* ldr_context, iObject* obj
       Engine->GetDefaultCollection()->Add(obj);
     }
   }
-  Engine->GetCollection(LOADING_COLLECTION)->Add(obj);
+
+  csRef<iMeshWrapper> mesh = scfQueryInterface<iMeshWrapper>(obj);
+  if(!mesh.IsValid())
+  {
+    Engine->GetCollection(LOADING_COLLECTION)->Add(obj);
+  }
 }
 
 void csLoader::AddChildrenToRegion (iLoaderContext* ldr_context,

@@ -210,7 +210,7 @@ public:
 class csTextureList : 
   public scfImplementation1<csTextureList,
                             iTextureList>,
-  public csRefArrayObject<iTextureWrapper>
+  public csWeakRefArrayObject<iTextureWrapper>
 {
   csEngine* engine;
 public:
@@ -223,7 +223,6 @@ public:
 
   /**
    * Create a engine wrapper for a pre-prepared iTextureHandle
-   * The handle will be IncRefed
    */
   virtual iTextureWrapper *NewTexture (iTextureHandle *ith);
 
