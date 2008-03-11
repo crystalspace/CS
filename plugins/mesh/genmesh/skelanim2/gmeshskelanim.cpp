@@ -82,7 +82,7 @@ csGenmeshSkelAnimationControl::csGenmeshSkelAnimationControl (
 
   csRef<iShaderVarStringSet> strings =
     csQueryRegistryTagInterface<iShaderVarStringSet> (object_reg,
-      "crystalspace.shared.stringset");
+      "crystalspace.shader.variablenameset");
 
 
   bones_name = strings->Request ("bones");

@@ -34,6 +34,7 @@ chronological order.
 	  fail in certain border cases which, while probably caused by sloppy
 	  coding, are not (necessarily) a bug.
 	- res fixed a missing forward declaration in iengine/portalcontainer.h.
+	- res fixed a string set mixup in gmeshskelanim2.
 10-Mar-2008
 	- res added inverting to CS::Math::Matrix4.
 09-Mar-2008
