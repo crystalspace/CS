@@ -195,7 +195,7 @@ static void *handle = 0;
     #define ASM_FUNC(x)     #x "@PLT"
     #define ASM_FIXUPVAR(x) #x "@GOTOFF(%%ebx)"
   #elif defined( __x86_64__ )
-    #define ASM_VAR(x)      #x "@GOT(%rbx)"
+    #define ASM_VAR(x)      #x "@GOTPCREL(%rip)"
     #define ASM_FUNC(x)     #x "@PLT"
     #define ASM_FIXUPVAR(x) #x "@GOT(%%rbx)"
   #endif
@@ -329,6 +329,7 @@ EOF
         "        .type " name ", @function\n"  \\
         name ":\n" \\
         "        movq " ASM_VAR (ptrs) ", %r11\n" \\
+        "        movq (%r11), %r11\n" \\
         "        movq " #index "(%r11), %r11\n" \\
         "        test %r11, %r11\n" \\
         "        jnz  JS" #index "\n" \\

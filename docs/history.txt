@@ -12,11 +12,32 @@ chronological order.
 	  unknown reason.
 	- Mike Gist changed csTextureList and csMaterialList to hold weak
 	  references.
+10-Mar-2008
+	- res added inverting to CS::Math::Matrix4.
+09-Mar-2008
+	- Marten fixed bug #461, terrain2 setting wrong parameter.
+	- res actually implemented CS::Math::Matrix4::Description().
+	- res corrected the creation of a Matrix4 from a transform.
+	- res added multiplication of a Matrix4 with a csVector4.
+08-Mar-2008
+	- res fixed a pattern in CS/docs/support/prepare_online_publish.sh that
+	  was still using a .php instead of a .html file name.
+07-Mar-2008
+	- Eric Sunshine changed CS/docs/support/prepare_online_publish.sh so
+	  that it no longer converts published HTML files to PHP. This
+	  conversion can be avoided since we no longer utilize PHP in the
+	  online documentation. (It had been used by the now-retired annotation
+	  facility.) Furthermore, vending HTML rather than PHP reduces server
+	  load.
 05-Mar-2008
 	- Mike Gist added a loading collection. It's used to hold temporary
 	  references to objects during loading to give other objects a chance
 	  to hold references if they use that object in some way. These temp
         references are released at the end of the load.
+	- res patched relaytool to avoid a crash on x86_64.
+	- Vincent applied Guillaume Libersat's patch for #457,
+	  csInputDefinition::ParseKey() wasn't returning false for non
+	  keyboard input definitions.
 04-Mar-2008
         - Piotr did few behavior fixes for ode joints (attaching bodies
           in the right time and added better way of checking if amotor is 

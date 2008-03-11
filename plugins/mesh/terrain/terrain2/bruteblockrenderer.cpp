@@ -126,7 +126,7 @@ public:
     else if (strcmp (name, "lod splitcoeff") == 0)
       SetLODSplitCoeff (atof (value));
     else if (strcmp (name, "splat distance") == 0)
-      SetLODSplitCoeff (atof (value));
+      SetSplatDistance (atof (value));
 
   }
 

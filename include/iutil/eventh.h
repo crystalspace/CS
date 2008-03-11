@@ -112,7 +112,7 @@ struct iEventHandler : public virtual iBase
   /**
    * This function takes a csEventID as an argument and returns an array of
    * csHandlerIDs identifying those event handlers which must, for the given
-   * event, only be called after this one (if the have been instantiated).
+   * event, only be called after this one (if they have been instantiated).
    * Should only return generic identifiers, not instance identifiers; in
    * other words, every member of the array should be the result of a call to
    * csHandlerRegistry::GetGenericID("name"), where "name" may be some
@@ -132,7 +132,7 @@ struct iEventHandler : public virtual iBase
    * csHandlerRegistry::GetGenericID() and csHandlerRegistry::GetID() calls.
    *
    * If the instance constraints are the same as the generic ones, use
-   * ths CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS macro instead of
+   * the CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS macro instead of
    * defining this for yourself.
    * \sa CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
    */
@@ -148,7 +148,7 @@ struct iEventHandler : public virtual iBase
    * csHandlerRegistry::GetGenericID() and csHandlerRegistry::GetID() calls.
    * <p>
    * If the instance constraints are the same as the generic ones, use
-   * ths CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS macro instead of
+   * the CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS macro instead of
    * defining this for yourself.
    * \sa CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
    */
