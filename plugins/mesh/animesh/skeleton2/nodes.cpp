@@ -133,10 +133,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   void BlendNode::BlendState (csSkeletalState2* state, float baseWeight)
   {
+    float accWeight = 0.0f;
+
     for (size_t i = 0; i < subNodes.GetSize (); ++i)
     {
-      float nodeWeight = baseWeight * weightList[i];
-      subNodes[i]->BlendState (state, nodeWeight);
+      const float nodeWeight = weightList[i];
+      accWeight += nodeWeight;
+      float w = nodeWeight / accWeight;
+
+      subNodes[i]->BlendState (state, w * baseWeight);
     }
   }
 

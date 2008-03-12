@@ -575,12 +575,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   {
     if (skeleton)
     {
-      iSkeletonAnimPacket2* packet = skeleton->GetAnimationPacket ();
-
-      if (packet && packet->GetAnimationRoot ())
-      {
-        packet->GetAnimationRoot ()->TickAnimation ((current_time - lastTick) / 1000.0f);
-      }
+      skeleton->UpdateSkeleton ((current_time - lastTick) / 1000.0f);
 
       // Copy the skeletal state into our buffers
       UpdateLocalBoneTransforms ();
@@ -789,7 +784,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       csRef<csShaderVariable> sv;
       for (size_t i = 0, j = 0; i < lastSkeletonState->GetBoneCount (); ++i, j+=2)
       {
-        const csDualQuaternion& dq = lastSkeletonState->GetDualQuaternion (i);
+        const csVector3& v = lastSkeletonState->GetVector (i);
+        const csQuaternion& q = lastSkeletonState->GetQuaternion (i);
+
+        const csDualQuaternion dq (q, v);
 
         sv = boneTransformArray->GetArrayElement (j);
         if (!sv)
@@ -832,7 +830,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
           unsigned int realBi = remap.boneRemappingTable[bi];
 
           // bi is the "virtual" bone index, realBi the real one
-          const csDualQuaternion& dq = lastSkeletonState->GetDualQuaternion (realBi);
+          const csVector3& v = lastSkeletonState->GetVector (i);
+          const csQuaternion& q = lastSkeletonState->GetQuaternion (i);
+
+          const csDualQuaternion dq (q, v);
 
           sv = boneTransformArray->GetArrayElement (k);
           if (!sv)

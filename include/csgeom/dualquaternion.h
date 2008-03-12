@@ -50,6 +50,7 @@ public:
 
   /// Initialize with identity
   inline csDualQuaternion ()
+    : real (0,0,0,1), dual (0,0,0,0)
   {}
 
   /// Initialize with given values.

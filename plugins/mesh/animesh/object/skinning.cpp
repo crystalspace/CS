@@ -64,7 +64,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         {
           numInfluences++;
 
-          csDualQuaternion inflQuat = skeletonState->GetDualQuaternion (influence->bone);
+          csDualQuaternion inflQuat (
+            skeletonState->GetQuaternion (influence->bone),
+            skeletonState->GetVector (influence->bone));
 
           if (j == 0)
           {

@@ -20,6 +20,8 @@
 #include "animation.h"
 #include "nodes.h"
 
+#include "csgeom/math.h"
+
 using namespace CS::Animation;
 
 CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
@@ -285,6 +287,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       {
         before = ki;
       }
+
+      if (channel->keyFrames[before].time > time && before > 0)
+        before--;
       
       // Second
       after = before + 1;
@@ -301,21 +306,40 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       const float t = (time - k1.time) / (k2.time - k1.time);
 
       // Blend together
-      csDualQuaternion& dq = state->GetDualQuaternion (channel->bone);
-      const csDualQuaternion dq1 (k1.rotation, k1.offset);
-      const csDualQuaternion dq2 (k2.rotation, k2.offset);
+      csQuaternion& q = state->GetQuaternion (channel->bone);
+      csVector3& v = state->GetVector (channel->bone);
 
-      dq += dq1 * (t * baseWeight);
-      dq += dq2 * ((1-t) * baseWeight);
+      csQuaternion qResult;
+      csVector3 vResult;
 
-      state->SetQuatUsed (channel->bone);
+      if (t <= 0.0f)
+      {
+        qResult = k1.rotation;
+        vResult = k1.offset;
+      }
+      else if (t >= 1.0f)
+      {
+        qResult = k2.rotation;
+        vResult = k2.offset;
+      }
+      else
+      {
+        qResult = k1.rotation.SLerp (k2.rotation, t);
+        vResult = csLerp (k1.offset, k2.offset, t);
+      }
+
+      q = q.SLerp (qResult, baseWeight);
+      v = csLerp (v, vResult, baseWeight);
+
+      state->SetBoneUsed (channel->bone);
     }
   }
 
 
   Animation::Animation (AnimationFactory* factory)
     : scfImplementationType (this, factory), factory (factory),
-    playbackPosition (0)
+    playbackPosition (0), playSpeed (1.0f), isPlaying (false), 
+    isPlayingCyclic (false)
   {
   }
 
@@ -393,6 +417,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       else
       {
         playbackPosition = duration;
+        isPlaying = false;
       }      
     }
   }

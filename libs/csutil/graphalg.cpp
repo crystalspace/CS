@@ -45,12 +45,14 @@ namespace Utility
       adjList.Push (edge.to);
 
       // Record adjacency
-      size_t& count = predCount.GetOrCreate (edge.from, 0);
+      size_t& count = predCount.GetOrCreate (edge.to, 0);
       count++;
 
       // Setup the targets
       adjacency.GetOrCreate (edge.to);
-      predCount.GetOrCreate (edge.to, 0);
+
+      // Make sure there's a count for the from
+      predCount.GetOrCreate (edge.from, 0);
     }
 
     // Find any non-preceded nodes
@@ -85,6 +87,8 @@ namespace Utility
           noPred.Push (to);
         }
       }
+
+      result.Push (from);
     }
 
     // If there are any nodes left with predCount then there are cycles.. problem!

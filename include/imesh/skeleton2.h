@@ -23,10 +23,10 @@
 #include "csutil/ref.h"
 #include "csutil/refcount.h"
 #include "csutil/bitarray.h"
-#include "csgeom/dualquaternion.h"
+#include "csgeom/quaternion.h"
+#include "csgeom/vector3.h"
 
-class csQuaternion;
-class csVector3;
+class csDualQuaternion;
 
 /**\file
  * Skeleton2 interface files
@@ -338,32 +338,37 @@ public:
 
   ///
   csSkeletalState2 ()
-    : boneQuats (0), numberOfBones (0)
+    : boneVecs (0), boneQuats (0), numberOfBones (0)
   {}
 
   //
   virtual inline ~csSkeletalState2 ()
   {
+    delete[] boneVecs;
     delete[] boneQuats;
   }
 
   /**
    * 
    */
-  inline csDualQuaternion* GetDualQuaternions () const 
+  inline const csVector3& GetVector (size_t i) const
   {
-    return boneQuats;
+    return boneVecs[i];
   }
 
   /**
    * 
    */
-  inline const csDualQuaternion& GetDualQuaternion (size_t i) const
+  inline csVector3& GetVector (size_t i) 
   {
-    return boneQuats[i];
+    return boneVecs[i];
   }
 
-  inline csDualQuaternion& GetDualQuaternion (size_t i) 
+
+  /**
+   * 
+   */
+  inline const csQuaternion& GetQuaternion (size_t i) const
   {
     return boneQuats[i];
   }
@@ -371,7 +376,15 @@ public:
   /**
    * 
    */
-  inline bool IsQuatUsed (BoneID bone) const
+  inline csQuaternion& GetQuaternion (size_t i) 
+  {
+    return boneQuats[i];
+  }
+
+  /**
+   * 
+   */
+  inline bool IsBoneUsed (BoneID bone) const
   {
     return bitSet.IsBitSet (bone);
   }
@@ -379,7 +392,7 @@ public:
   /**
    * 
    */
-  inline void SetQuatUsed (BoneID bone)
+  inline void SetBoneUsed (BoneID bone)
   {
     bitSet.SetBit (bone);
   }
@@ -397,17 +410,22 @@ public:
    */
   inline void Setup (size_t numBones)
   {
-    if (boneQuats)
-      delete[] boneQuats;
+    delete[] boneVecs;
+    delete[] boneQuats;
 
     bitSet.SetSize (numBones);
-    boneQuats = new csDualQuaternion [numBones];
-    numberOfBones = numberOfBones;
+    boneVecs = new csVector3 [numBones];
+    boneQuats = new csQuaternion [numBones];
+    numberOfBones = numBones;
+
+    for (size_t i = 0; i < numBones; ++i)
+      boneVecs[i].Set (0,0,0);
   }
 
 protected:
   csBitArray bitSet;
-  csDualQuaternion* boneQuats;  
+  csVector3* boneVecs;
+  csQuaternion* boneQuats;  
   size_t numberOfBones;
 };
 

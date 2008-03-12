@@ -464,9 +464,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     {
       if (allBones[i].created)
       {
-        currState->GetDualQuaternion (i) = 
-          csDualQuaternion (allBones[i].absRotation, allBones[i].absOffset);
-        currState->SetQuatUsed (i);
+        currState->GetQuaternion (i) = allBones[i].absRotation;
+        currState->GetVector (i) = allBones[i].absOffset;
+        currState->SetBoneUsed (i);
       }
     }
 
@@ -484,9 +484,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     {
       if (allBones[i].created)
       {
-        currState->GetDualQuaternion (i) = 
-          csDualQuaternion (allBones[i].boneRotation, allBones[i].boneOffset);
-        currState->SetQuatUsed (i);
+        currState->GetQuaternion (i) = allBones[i].boneRotation;
+        currState->GetVector (i) = allBones[i].boneOffset;
+        currState->SetBoneUsed (i);
       }
     }
 
@@ -505,10 +505,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     for (size_t i = 0; i < allBones.GetSize (); ++i)
     {
       if (allBones[i].created)
-      {
-        currState->GetDualQuaternion (i) = 
-          csDualQuaternion (allBones[i].bindRotation, allBones[i].bindOffset);
-        currState->SetQuatUsed (i);
+      {        
+        currState->GetQuaternion (i) = allBones[i].bindRotation;
+        currState->GetVector (i) = allBones[i].bindOffset;
+        currState->SetBoneUsed (i);
       }
     }
 
@@ -562,11 +562,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       {
         Bone& boneRef = allBones[i];
 
-        if (boneRef.created && finalState->IsQuatUsed ((BoneID)i))
+        if (boneRef.created && finalState->IsBoneUsed ((BoneID)i))
         {
-          const csDualQuaternion& q = finalState->GetDualQuaternion (i);          
-          boneRef.boneRotation = q.real;
-          boneRef.boneOffset = q.dual.v * 2;
+          const csQuaternion& q = finalState->GetQuaternion (i);
+          if (q.Norm () > 0)
+          {
+            boneRef.boneRotation = q.Unit ();
+          }          
+          else
+          {
+            boneRef.boneRotation = q;
+          }
+           
+          boneRef.boneOffset = finalState->GetVector (i);
 
           cachedTransformsDirty = true;
         }

@@ -26,16 +26,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 {
   
   inline void TransformQVFrame (const csQuaternion& parentQ, const csVector3& parentV,
-    const csQuaternion& relQ, const csVector3 relV,
-    csQuaternion resultQ, csVector3 resultV)
+    const csQuaternion& relQ, const csVector3& relV,
+    csQuaternion& resultQ, csVector3& resultV)
   {
     resultQ = parentQ * relQ;
     resultV = parentV + parentQ.Rotate (relV);
   }
 
   inline void TransformQVFrameInv (const csQuaternion& parentQ, const csVector3& parentV,
-    const csQuaternion& relQ, const csVector3 relV,
-    csQuaternion resultQ, csVector3 resultV)
+    const csQuaternion& relQ, const csVector3& relV,
+    csQuaternion& resultQ, csVector3& resultV)
   {
     const csQuaternion pqI = parentQ.GetConjugate ();
 
