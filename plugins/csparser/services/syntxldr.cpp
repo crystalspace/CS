@@ -1576,7 +1576,7 @@ csRef<iShader> csTextSyntaxService::ParseShaderRef (
     iLoaderContext* ldr_context, iDocumentNode* node)
 {
   // @@@ FIXME: unify with csLoader::ParseShader()?
-  static const char* msgid = "crystalspace.syntax.shaderred";
+  static const char* msgid = "crystalspace.syntax.shaderref";
 
   const char* shaderName = node->GetAttributeValue ("name");
   if (shaderName == 0)
