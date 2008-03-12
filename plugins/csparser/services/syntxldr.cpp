@@ -80,8 +80,8 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
 
   InitTokenTable (xmltokens);
 
-  strings = csQueryRegistryTagInterface<iStringSet> (
-    object_reg, "crystalspace.shared.stringset");
+  strings = csQueryRegistryTagInterface<iShaderVarStringSet> (
+    object_reg, "crystalspace.shader.variablenameset");
 
   return true;
 }
@@ -1208,7 +1208,7 @@ bool csTextSyntaxService::ParseShaderVar (iLoaderContext* ldr_context,
         {
           csRef<iDocumentNode> varNode = varNodes->Next ();
           csRef<csShaderVariable> elementVar = 
-            csPtr<csShaderVariable> (new csShaderVariable (csInvalidStringID));
+            csPtr<csShaderVariable> (new csShaderVariable (CS::InvalidShaderVarStringID));
           var.SetArrayElement (varCount, elementVar);
           ParseShaderVar (ldr_context, varNode, *elementVar);
           varCount++;
@@ -1258,7 +1258,7 @@ csRef<iShaderVariableAccessor> csTextSyntaxService::ParseShaderVarExpr (
     return 0;
   }
   csRef<csShaderVariable> var;
-  var.AttachNew (new csShaderVariable (csInvalidStringID));
+  var.AttachNew (new csShaderVariable (CS::InvalidShaderVarStringID));
   csRef<csShaderExpressionAccessor> acc;
   acc.AttachNew (new csShaderExpressionAccessor (object_reg, expression));
   return acc;
@@ -1576,7 +1576,7 @@ csRef<iShader> csTextSyntaxService::ParseShaderRef (
     iLoaderContext* ldr_context, iDocumentNode* node)
 {
   // @@@ FIXME: unify with csLoader::ParseShader()?
-  static const char* msgid = "crystalspace.syntax.shaderred";
+  static const char* msgid = "crystalspace.syntax.shaderref";
 
   const char* shaderName = node->GetAttributeValue ("name");
   if (shaderName == 0)
