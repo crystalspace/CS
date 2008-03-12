@@ -164,8 +164,11 @@ void RenderView::UpdateFrustum ()
 {
   size_t i;
   csBox2 bbox;
-  csVector2 shift (ctxt->icamera->GetShiftX (), ctxt->icamera->GetShiftY ());
-  float inv_fov = ctxt->icamera->GetInvFOV ();
+  csRef<iPerspectiveCamera> pcam (scfQueryInterfaceSafe<iPerspectiveCamera> (
+    ctxt->icamera));
+  if (!pcam) return;
+  csVector2 shift (pcam->GetShiftX (), pcam->GetShiftY ());
+  float inv_fov = pcam->GetInvFOV ();
   iClipper2D* clip = ctxt->iview;
   csVector2 *poly = clip->GetClipPoly ();
   bbox.StartBoundingBox ((poly[0] - shift) * inv_fov);
