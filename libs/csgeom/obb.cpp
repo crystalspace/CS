@@ -87,6 +87,55 @@ bool csOBBFrozen::ProjectOBB (
   return max_z >= .01;
 }
 
+// Version to cope with z <= 0. This is wrong but it in the places where
+// it is used below the result is acceptable because it generates a
+// conservative result (i.e. a box or outline that is bigger then reality).
+static void PerspectiveWrong (const csVector3& v, csVector2& p,
+  const CS::Math::Matrix4& proj, int screenWidth, int screenHeight)
+{
+  csVector4 v_proj (proj * csVector4 (v.x, v.y, 0.1f, 1));
+  p.x = (v_proj.x / v_proj.w) * screenWidth;
+  p.y = (v_proj.y / v_proj.w) * screenHeight;
+}
+
+static void Perspective (const csVector3& v, csVector2& p,
+  const CS::Math::Matrix4& proj, int screenWidth, int screenHeight)
+{
+  csVector4 v_proj (proj * csVector4 (v, 1));
+  p.x = (v_proj.x / v_proj.w) * screenWidth;
+  p.y = (v_proj.y / v_proj.w) * screenHeight;
+}
+
+bool csOBBFrozen::ProjectOBB (
+	const CS::Math::Matrix4& projection, csBox2& sbox,
+	float& min_z, float& max_z, int screenWidth, int screenHeight)
+{
+  csVector2 v;
+  csVector3 p;
+  p = GetCorner (0);
+  min_z = p.z;
+  max_z = p.z;
+  if (p.z < .1)
+    PerspectiveWrong (p, v, projection, screenWidth, screenHeight);
+  else
+    Perspective (p, v, projection, screenWidth, screenHeight);
+  sbox.StartBoundingBox (v);
+  int i;
+  for (i = 1; i < 8; i++)
+  {
+    p = GetCorner (i);
+    float z = p.z;
+    if (z < min_z) min_z = z;
+    else if (z > max_z) max_z = z;
+    if (z < .1)
+      PerspectiveWrong (p, v, projection, screenWidth, screenHeight);
+    else
+      Perspective (p, v, projection, screenWidth, screenHeight);
+    sbox.AddBoundingVertexSmart (v);
+  }
+
+  return max_z >= .01;
+}
 
 //=============================================================================
 

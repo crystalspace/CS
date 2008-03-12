@@ -9,6 +9,8 @@ chronological order.
 12-Mar-2008
 	- res added methods to csTiledCoverageBuffer taking a projection matrix
 	  instead of perspective parameters.
+	- res added methods to csOBB taking a projection matrix
+	  instead of perspective parameters.
 11-Mar-2008
 	- res made the following changes:
 	    - Changed the iCamera interface so that getting the projection
