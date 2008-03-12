@@ -720,10 +720,7 @@ bool csEngine::HandleEvent (iEvent &Event)
     }
 
     if (PerspectiveImpl::GetDefaultFOV () == 0)
-      PerspectiveImpl::SetDefaultFOV (frameHeight, frameWidth);
-
-  if (PerspectiveImpl::GetDefaultFOV () == 0)
-    PerspectiveImpl::SetDefaultFOV (frameHeight/(float)frameWidth, 1.0f);
+      PerspectiveImpl::SetDefaultFOV (frameHeight/(float)frameWidth, 1.0f);
 
     StartEngine ();
 
