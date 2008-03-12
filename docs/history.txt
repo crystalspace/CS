@@ -6,6 +6,12 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Mar-2008
+	- Marten made the UTF8 BOM checks a bit more robust after a few 
+	  comments from Mononoke.
+11-Mar-2008
+	- Marten added checks to XML parser plugins to skip any UTF8 BOM in the
+	  beginning of the XML stream.
 05-Mar-2008
 	- Vincent applied Guillaume Libersat's patch for #457,
 	  csInputDefinition::ParseKey() wasn't returning false for non

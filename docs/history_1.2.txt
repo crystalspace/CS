@@ -1,5 +1,8 @@
 1.2 branch log.
 
+12-Mar-2008
+	- Vincent merged r28962 and r28969 into 1.2 (fix for #70, (UTF-8 BOM
+	  trips up XML parser).
 08-Mar-2008
 	- Vincent merged r28852 into 1.2 (should fix #394, csperl5 on amd64).
 05-Mar-2008
