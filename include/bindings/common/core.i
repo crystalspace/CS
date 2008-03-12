@@ -546,12 +546,15 @@ void SetCoreSCFPointer(iSCF *scf_pointer)
 
 %include "csutil/flags.h"
 
-%ignore csStringSet::GlobalIterator;
-%ignore csStringSet::GetIterator;
-DEPRECATED_METHOD(csStringSet,Clear,Empty);
+%ignore CS::Utility::StringSet::GlobalIterator;
+%ignore CS::Utility::StringSet::GetIterator;
+%ignore CS::Utility::GetIterator;
 DEPRECATED_METHOD(iStringArray,Length,GetSize);
 DEPRECATED_METHOD(iStringArray,DeleteAll,Empty);
+/* %apply unsigned long { csStringID }; */
+%include "iutil/strset.h"
 %include "csutil/strset.h"
+DEPRECATED_METHOD(CS::Utility::StringSet,Clear,Empty);
 %ignore csSet::GlobalIterator;
 %ignore csSet::GetIterator;
 %include "csutil/set.h"
@@ -656,7 +659,6 @@ SET_HELPER(csStringID)
 {
   ITERATOR_FUNCTIONS(iObjectIterator)
 }
-%include "iutil/strset.h"
 %ignore CS_QUERY_REGISTRY_TAG_is_deprecated;
 %include "iutil/objreg.h"
 %include "iutil/virtclk.h"
