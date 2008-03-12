@@ -168,8 +168,8 @@ PerspectiveImpl::PerspectiveImpl ()
   aspect = default_aspect;
   inv_aspect = default_inv_aspect;
   fov_angle = default_fov_angle;
-  shift_x = frameWidth / 2;
-  shift_y = frameHeight / 2;
+  shift_x = 0.5f;
+  shift_y = 0.5f;
 }
 
 void PerspectiveImpl::SetFOVAngle (float a, int width)
