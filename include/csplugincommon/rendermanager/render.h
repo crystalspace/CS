@@ -247,9 +247,7 @@ namespace RenderManager
       iClipper2D* clipper = rview->GetClipper ();
 
       // Setup the camera etc.. @@should be delayed as well
-      g3d->SetPerspectiveCenter (int (cam->GetShiftX ()), 
-        int (cam->GetShiftY ()));
-      g3d->SetPerspectiveAspect (cam->GetFOV ());
+      g3d->SetProjectionMatrix (cam->GetProjectionMatrix ());
       g3d->SetClipper (clipper, CS_CLIPPER_TOPLEVEL);
 
       BeginFinishDrawScope bd (g3d, drawFlags);      

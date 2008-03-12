@@ -29,6 +29,8 @@ chronological order.
 	  instead of perspective parameters.
 	- res changed RenderView::UpdateFrustum() to use iPerspectiveCamera.
 	- res added helper functions to read render layers from XML.
+	- res changed CS::RenderManager::SimpleTreeRenderer to set a projection
+	  matrix for rendering instead of perspective parameters.
 11-Mar-2008
 	- res fixed build errors.
 	- res fixed CS/docs/support/prepare_online_publish.sh to use the right
