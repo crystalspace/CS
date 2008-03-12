@@ -13,6 +13,8 @@ chronological order.
 	- Marten made the UTF8 BOM checks a bit more robust after a few 
 	  comments from Mononoke.
 	- caedes added iTranslator to python bindings.
+	- res augmented the csVector4 from-csVector3 constructor to also
+	  optionally take a value for w.
 11-Mar-2008
 	- res fixed CS/docs/support/prepare_online_publish.sh to use the right
 	  search page parameter names for filtering for the docs only.
