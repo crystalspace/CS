@@ -18,7 +18,7 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
 <shader compiler="shaderweaver" name="lighting_default" lights="4">
-  <technique priority="100">
+  <technique priority="200">
     <pass>
       <?if vars."pass number".int == 0 ?>
         <!-- First pass: blend with copy -->
@@ -38,7 +38,7 @@
       <snippet id="parallax" file="/shader/surface/parallax.xml" />
       <snippet id="normalmap" file="/shader/snippets/surface/normalmap.xml" />
       <snippet id="surface" file="/shader/surface/surface-classic.xml" />
-      <snippet id="lighting" file="/shader/snippets/lighting/lighting-ppl-shadowmap.xml" />
+      <snippet id="lighting" file="/shader/snippets/lighting/lighting-ppl.xml" />
       <snippet id="mod_light_surf" file="/shader/snippets/modulate.xml" />
       <!--snippet id="add_specular" file="/shader/snippets/add.xml" /-->
       <snippet id="glow" file="/shader/lighting/glow.xml" />
@@ -47,6 +47,43 @@
       <!-- "connections" describe what snippets take input from what other
            snippets (ie the "data flow" is modeled). The exact resolution of
 	   what output is linked to what input is done automatically. -->
+      <connection from="position" to="parallax" />
+      <connection from="position" to="lighting" />
+      <connection from="parallax" to="surface" />
+      <connection from="normalmap" to="lighting" />
+      <connection from="surface" to="mod_light_surf" />
+      <connection from="lighting" to="mod_light_surf" />
+      <!--connection from="mod_light_surf" to="add_specular" />
+      <connection from="lighting" to="add_specular" />
+      <connection from="add_specular" to="glow" /-->
+      <connection from="mod_light_surf" to="glow" />
+      <connection from="glow" to="apply_mixmode_alpha" />
+      <connection from="apply_mixmode_alpha" to="sectorfog" />
+    </pass>
+  </technique>
+  
+  <!-- If PPL is not available, try PVL -->
+  <technique priority="100">
+    <pass>
+      <?if vars."pass number".int == 0 ?>
+        <!-- First pass: blend with copy -->
+      <?else?>
+        <!-- Later pass: blend with add -->
+        <mixmode><add /></mixmode>
+      <?endif?>
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+
+      <snippet id="position" file="/shader/snippets/position.xml" />
+      <snippet id="parallax" file="/shader/surface/parallax.xml" />
+      <snippet id="normalmap" file="/shader/snippets/surface/normalmap.xml" />
+      <snippet id="surface" file="/shader/surface/surface-classic.xml" />
+      <snippet id="lighting" file="/shader/snippets/lighting/lighting-pvl.xml" />
+      <snippet id="mod_light_surf" file="/shader/snippets/modulate.xml" />
+      <!--snippet id="add_specular" file="/shader/snippets/add.xml" /-->
+      <snippet id="glow" file="/shader/lighting/glow.xml" />
+      <snippet id="apply_mixmode_alpha" file="/shader/snippets/mixmode-alpha.xml" />
+      <snippet id="sectorfog" file="/shader/snippets/fog/fog-sector.xml" />
+
       <connection from="position" to="parallax" />
       <connection from="position" to="lighting" />
       <connection from="parallax" to="surface" />

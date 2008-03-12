@@ -31,6 +31,7 @@ chronological order.
 	- res added helper functions to read render layers from XML.
 	- res changed CS::RenderManager::SimpleTreeRenderer to set a projection
 	  matrix for rendering instead of perspective parameters.
+	- res added a simple "unshadowed" rendermanager and made it default.
 11-Mar-2008
 	- res fixed build errors.
 	- res fixed CS/docs/support/prepare_online_publish.sh to use the right

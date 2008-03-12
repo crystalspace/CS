@@ -1,0 +1,12 @@
+<layerconfig>
+	<layer>
+		<defaultshader name="lighting_default" file="/shader/lighting/lighting_default.xml" />
+		<shadertype>base</shadertype>
+		<shadertype>ambient</shadertype>
+		<shadertype>splatting ambient</shadertype>
+		<shadertype>standard</shadertype>
+	</layer>
+	<layer>
+		<shadertype>terrain splat</shadertype>
+	</layer>
+</layerconfig>
