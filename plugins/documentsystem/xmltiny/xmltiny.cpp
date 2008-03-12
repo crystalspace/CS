@@ -24,6 +24,12 @@
 #include "csutil/scf.h"
 #include "csutil/xmltiny.h"
 
+static inline bool HasUTF8Bom (const char* buf)
+{
+  unsigned char* ub = (unsigned char*)buf; //Need for test...
+  return (ub[0] == 0xEF && ub[1] == 0xBB && ub[2] == 0xBF);
+}
+
 struct csTinyDocWrapper :
   public scfImplementation1<csTinyDocWrapper, iDocument>
 {
@@ -94,7 +100,7 @@ const char* csTinyDocWrapper::Parse (iString* str, bool collapse)
 const char* csTinyDocWrapper::Parse (const char* buf, bool collapse)
 {
   // Skip any UTF8 BOM
-  if (buf[0] == 0xEF && buf[1] == 0xBB && buf[2] == 0xBF)
+  if (HasUTF8Bom (buf))
     buf += 3;
 
   const char* b = buf;

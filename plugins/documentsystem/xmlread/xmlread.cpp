@@ -29,6 +29,12 @@
 CS_PLUGIN_NAMESPACE_BEGIN(XMLRead)
 {
 
+static inline bool HasUTF8Bom (const char* buf)
+{
+  unsigned char* ub = (unsigned char*)buf; //Need for test...
+  return (ub[0] == 0xEF && ub[1] == 0xBB && ub[2] == 0xBF);
+}
+
 struct csXmlReadDocWrapper :
   public scfImplementation1<csXmlReadDocWrapper, iDocument>
 {
@@ -101,7 +107,7 @@ const char* csXmlReadDocWrapper::Parse (iString* str, bool collapse)
 const char* csXmlReadDocWrapper::Parse (const char* buf, bool collapse)
 {
   // Skip any UTF8 BOM
-  if (buf[0] == 0xEF && buf[1] == 0xBB && buf[2] == 0xBF)
+  if (HasUTF8Bom (buf))
     buf += 3;
 
   const char* b = buf;
@@ -120,7 +126,7 @@ const char* csXmlReadDocWrapper::Parse (const char* buf, bool collapse)
 const char* csXmlReadDocWrapper::ParseInPlace (char* buf, bool collapse)
 {
   // Skip any UTF8 BOM
-  if (buf[0] == 0xEF && buf[1] == 0xBB && buf[2] == 0xBF)
+  if (HasUTF8Bom (buf))
     buf += 3;
 
   char* b = buf;

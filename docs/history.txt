@@ -10,6 +10,8 @@ chronological order.
 	- caedes implemented some empty methods in bullet physics plugin:
 	  - csBulletCollider: IsStatic
 	  - csBulletRigidBody: AddForceAtPos, IsEnabled, Enable, Disable.
+	- Marten made the UTF8 BOM checks a bit more robust after a few 
+	  comments from Mononoke.
 11-Mar-2008
 	- res fixed CS/docs/support/prepare_online_publish.sh to use the right
 	  search page parameter names for filtering for the docs only.
