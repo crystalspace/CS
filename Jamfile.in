@@ -61,7 +61,7 @@ Description rendermanagers : "Render manager plugins" ;
 RegisterCompileGroups sndsys imageloaders fontservers
 		      canvases renderers meshes walkall openglcanvas 
 		      softcanvas proctexes renderall shaders softrenderer 
-		      openglrenderer ;
+		      openglrenderer rendermanagers ;
 
 # Useful dependencies
 Depends softrenderer : softcanvas ;
