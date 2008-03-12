@@ -188,7 +188,11 @@ struct iRenderView : public virtual iBase
   virtual iGraphics2D* GetGraphics2D () = 0;
   /// Get the 3D graphics subsystem.
   virtual iGraphics3D* GetGraphics3D () = 0;
-  /// Get the frustum.
+  /**
+   * Get the frustum.
+   * \deprecated Deprecated in 1.3. Use visible volume from camera
+   */
+  CS_DEPRECATED_METHOD_MSG("Use visible volume from camera")
   virtual void GetFrustum (float& lx, float& rx, float& ty, float& by) = 0;
 
   //-----------------------------------------------------------------

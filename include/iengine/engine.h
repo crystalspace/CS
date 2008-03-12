@@ -177,7 +177,7 @@ struct iEngineSectorCallback : public virtual iBase
  */
 struct iEngine : public virtual iBase
 {
-  SCF_INTERFACE(iEngine, 4, 0, 1);
+  SCF_INTERFACE(iEngine, 4, 0, 2);
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;
@@ -1419,6 +1419,20 @@ struct iEngine : public virtual iBase
 
   /// Fire all frame callbacks
   virtual void FireStartFrame (iRenderView* rview) = 0;
+  
+  /**\name Camera handling
+   * @{ */
+
+  /**
+   * Create a new perspective projection camera.
+   */
+  virtual csPtr<iPerspectiveCamera> CreatePerspectiveCamera () = 0;
+
+  /**
+   * Create a new custom projection camera.
+   */
+  virtual csPtr<iCustomMatrixCamera> CreateCustomMatrixCamera () = 0;
+  /** @} */
   
   /**\name Camera handling
    * @{ */

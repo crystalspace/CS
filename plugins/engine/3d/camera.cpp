@@ -158,12 +158,12 @@ void csCameraBase::Correct (int n, float *vals[])
 
 //---------------------------------------------------------------------------
 
-int PerspectiveImpl:: default_aspect = 0;
+float PerspectiveImpl:: default_aspect = 0;
 float PerspectiveImpl:: default_inv_aspect = 0;
 float PerspectiveImpl:: default_fov_angle = 90;
 
-PerspectiveImpl::PerspectiveImpl (int frameWidth, int frameHeight)
-  : projNumber (0), matrix_vw (0), matrix_vh (0), matrixProjNumber (~0)
+PerspectiveImpl::PerspectiveImpl ()
+  : projNumber (0), matrixProjNumber (~0)
 {
   aspect = default_aspect;
   inv_aspect = default_inv_aspect;
@@ -193,7 +193,37 @@ void PerspectiveImpl::SetFOVAngle (float a, int width)
   float vRefFOV = width;
 
   // We calculate the new aspect relative to a reference point
-  aspect = (int) ((tan((vRefFOVAngle * 0.5) / 180 * PI) * vRefFOV) /
+  default_aspect = ((tan((vRefFOVAngle * 0.5) / 180 * PI) * vRefFOV) /
+      tan((a * 0.5)  / 180 * PI));
+
+  // set the other neccessary variables
+  default_inv_aspect = 1.0f / default_aspect;
+  default_fov_angle = a;
+}
+
+
+void PerspectiveImpl::SetFOVAngle (float a, float width)
+{
+  // make sure we have valid angles
+  if (a >= 180)
+  {
+    a = 180 - SMALL_EPSILON;
+  }
+  else if (a <= 0)
+  {
+    a = SMALL_EPSILON;
+  }
+
+  // This is our reference point.
+  // It must be somewhere on the function graph.
+  // This reference point was composed by testing.
+  // If anyone knows a 100 percent correct reference point, please put it here.
+  // But for now it's about 99% correct
+  float vRefFOVAngle = 53;
+  float vRefFOV = width;
+
+  // We calculate the new aspect relative to a reference point
+  aspect = ((tan((vRefFOVAngle * 0.5) / 180 * PI) * vRefFOV) /
            tan((a * 0.5)  / 180 * PI));
 
   // set the other neccessary variables
@@ -202,7 +232,7 @@ void PerspectiveImpl::SetFOVAngle (float a, int width)
   projNumber++;
 }
 
-void PerspectiveImpl::ComputeAngle (int width)
+void PerspectiveImpl::ComputeAngle (float width)
 {
   float rview_fov = (float)GetFOV () * 0.5f;
   float disp_width = (float)width * 0.5f;
@@ -213,7 +243,7 @@ void PerspectiveImpl::ComputeAngle (int width)
   projNumber++;
 }
 
-void PerspectiveImpl::ComputeDefaultAngle (int width)
+void PerspectiveImpl::ComputeDefaultAngle (float width)
 {
   float rview_fov = (float)GetDefaultFOV () * 0.5f;
   float disp_width = (float)width * 0.5f;
@@ -223,18 +253,15 @@ void PerspectiveImpl::ComputeDefaultAngle (int width)
   	* (360.0f / TWO_PI);
 }
 
-void PerspectiveImpl::UpdateMatrix (int viewWidth, int viewHeight)
+void PerspectiveImpl::UpdateMatrix ()
 {
-  if ((projNumber == matrixProjNumber) && (matrix_vw == viewWidth)
-       && (matrix_vh == viewHeight))
+  if (projNumber == matrixProjNumber)
     return;
   
-  matrix = CS::Math::Projections::CSPerspective (viewWidth, viewHeight,
-    shift_x, shift_y, inv_aspect);
+  matrix = CS::Math::Projections::CSPerspective (1.0f, 
+    aspect, shift_x, shift_y*aspect, inv_aspect);
   
   matrixProjNumber = projNumber;
-  matrix_vw = viewWidth;
-  matrix_vh = viewHeight;
 }
 
 //---------------------------------------------------------------------------
@@ -243,23 +270,89 @@ void csCameraPerspective::UpdateClipPlanes()
 {
   if (clipPlanesProjNr == projNumber) return;
   
-  csPlane3 *frustum = clipPlanes;
-  csVector3 v1 (-1, -1, 1);
-  csVector3 v2 (1, -1, 1);
-  frustum[0].Set (v1 % v2, 0);
-  frustum[0].norm.Normalize ();
+  float lx, rx, ty, by;
+  lx = -shift_x * inv_aspect;
+  rx = (1.0f - shift_x) * inv_aspect;
+  ty = -shift_y;
+  by = (1.0f - shift_y);
+  
+  csPlane3* frust = clipPlanes;
+  csVector3 v1 (lx, ty, 1);
+  csVector3 v2 (rx, ty, 1);
+  frust[0].Set (v1 % v2, 0);
+  frust[0].norm.Normalize ();
 
-  csVector3 v3 (1, 1, 1);
-  frustum[1].Set (v2 % v3, 0);
-  frustum[1].norm.Normalize ();
-  v2.Set (-1, 1, 1);
-  frustum[2].Set (v3 % v2, 0);
-  frustum[2].norm.Normalize ();
-  frustum[3].Set (v2 % v1, 0);
-  frustum[3].norm.Normalize ();
+  csVector3 v3 (rx, by, 1);
+  frust[1].Set (v2 % v3, 0);
+  frust[1].norm.Normalize ();
+  v2.Set (lx, by, 1);
+  frust[2].Set (v3 % v2, 0);
+  frust[2].norm.Normalize ();
+  frust[3].Set (v2 % v1, 0);
+  frust[3].norm.Normalize ();
+  
+  csPlane3 pz0 (0, 0, 1, 0);	// Inverted!!!.
+  clipPlanes[4] = pz0;
+  clipPlanesMask = 0x1f;
+
+  if (fp)
+  {
+    clipPlanes[5] = *fp;
+    clipPlanesMask |= 0x20;
+  }
   
   clipPlanesProjNr = projNumber;
+}
+//---------------------------------------------------------------------------
+
+static csVector3 xyz (const csVector4 v)
+{
+  return csVector3 (v[0], v[1], v[2]);
+}
+
+const csPlane3* csCameraCustomMatrix::GetVisibleVolume (uint32& mask)
+{
+  if (clipPlanesDirty)
+  {
+    CS::Math::Matrix4 invProjection (matrix.GetInverse());
+    
+    const float A = 0.5f;
+    const csVector3 nbl (xyz (invProjection * csVector4 (-A, -A, -A, 1)));
+    const csVector3 nbr (xyz (invProjection * csVector4 ( A, -A, -A, 1)));
+    const csVector3 ntr (xyz (invProjection * csVector4 ( A,  A, -A, 1)));
+    const csVector3 ntl (xyz (invProjection * csVector4 (-A,  A, -A, 1)));
+    const csVector3 fbl (xyz (invProjection * csVector4 (-A, -A,  A, 1)));
+    const csVector3 fbr (xyz (invProjection * csVector4 ( A, -A,  A, 1)));
+    const csVector3 ftr (xyz (invProjection * csVector4 ( A,  A,  A, 1)));
+    const csVector3 ftl (xyz (invProjection * csVector4 (-A,  A,  A, 1)));
+      
+    int n = 0;
+    csPlane3 p;
+      // Back plane
+    p = csPlane3 (nbl, nbr, ntr);
+    clipPlanes[n++] = p;
+      // Far plane
+    p = csPlane3 (fbl, fbr, ftr);
+    clipPlanes[n++] = p;
+      // Left plane
+    p = csPlane3 (nbl, fbl, ntl);
+    clipPlanes[n++] = p;
+      // Right plane
+    p = csPlane3 (nbr, nbl, fbr);
+    clipPlanes[n++] = p;
+      // Bottom plane
+    p = csPlane3 (nbl, nbr, fbl);
+    clipPlanes[n++] = p;
+      // Top plane
+    p = csPlane3 (ntl, ftl, ntr);
+    clipPlanes[n++] = p;
+    clipPlanesMask = (1 << n) - 1;
+  }
+    
+  mask = clipPlanesMask;
+  return clipPlanes;
 }
 
 }
 CS_PLUGIN_NAMESPACE_END(Engine)
+

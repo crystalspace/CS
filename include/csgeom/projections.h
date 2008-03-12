@@ -55,7 +55,7 @@ namespace CS
       /**
        * Create a perspective projection as used by CS.
        */
-      static Matrix4 CSPerspective (int viewWidth, int viewHeight, 
+      static Matrix4 CSPerspective (float viewWidth, float viewHeight, 
 				    float shiftX, float shiftY,
 				    float invAspect)
       {
@@ -83,3 +83,4 @@ namespace CS
 /** @} */
 
 #endif // __CS_CSGEOM_PROJECTIONS_H__
+

@@ -43,7 +43,7 @@ class csCameraBase : public csOrthoTransform,
                                                iCamera,
                                                iSceneNode>
 {
-private:
+protected:
   /// @@@@@@@@@@@@@@  NOT USED YET!!!
   csMovable movable;
 
@@ -289,6 +289,8 @@ public:
     csVector3 v (0);
     return v;
   }
+  
+  void SetViewportSize (int, int) { }
 
   virtual void AddCameraSectorListener (iCameraSectorListener* listener)
   {
@@ -346,8 +348,8 @@ class PerspectiveImpl : public iPerspectiveCamera
 {
   protected:
   ///
-  int aspect;
-  static int default_aspect;
+  float aspect;
+  static float default_aspect;
   ///
   float inv_aspect;
   static float default_inv_aspect;
@@ -360,58 +362,57 @@ class PerspectiveImpl : public iPerspectiveCamera
   static float default_fov_angle;
 
   /// Compute above angle.
-  void ComputeAngle (int width);
-  static void ComputeDefaultAngle (int width);
+  void ComputeAngle (float width);
+  static void ComputeDefaultAngle (float width);
 
   uint projNumber;
-  int matrix_vw, matrix_vh;
   uint matrixProjNumber;
   CS::Math::Matrix4 matrix;
   
-  void UpdateMatrix (int viewWidth,
-    int viewHeight);
+  void UpdateMatrix ();
 public:
-  PerspectiveImpl (int frameWidth, int frameHeight);
+  PerspectiveImpl ();
   
   /// Set the default FOV for new cameras.
-  static void SetDefaultFOV (int fov, int width)
+  static void SetDefaultFOV (float fov, float width)
   {
     default_aspect = fov;
     default_inv_aspect = 1.0f / default_aspect;
     ComputeDefaultAngle (width);
   }
+  static void SetDefaultFOVAngle (float a, float width);
 
   /// Get the default FOV for new cameras.
-  static int GetDefaultFOV () { return default_aspect; }
+  static float GetDefaultFOV () { return default_aspect; }
   /// Get the default inverse FOV for new cameras.
   static float GetDefaultInvFOV () { return default_inv_aspect; }
   /// Get the default FOV in angles (degrees).
   static float GetDefaultFOVAngle () { return default_fov_angle; }
 
   /// Set the FOV for this camera.
-  void SetFOV (int a, int width)
+  void SetFOV (float a, float width)
   {
     aspect = a;
     inv_aspect = 1.0f / a;
     ComputeAngle (width);
   }
   /// Get the FOV for this camera
-  virtual int GetFOV () const { return aspect; }
+  float GetFOV () const { return aspect; }
   /// Get the inverse FOV for this camera.
-  virtual float GetInvFOV () const { return inv_aspect; }
+  float GetInvFOV () const { return inv_aspect; }
 
   /// Set the FOV in angles (degrees).
-  virtual void SetFOVAngle (float a, int width);
+  void SetFOVAngle (float a, float width);
   /// Get the FOV in angles (degrees).
-  virtual float GetFOVAngle () const
+  float GetFOVAngle () const
   {
     return fov_angle;
   }
 
   /// Get the X shift value.
-  virtual float GetShiftX () const { return shift_x; }
+  float GetShiftX () const { return shift_x; }
   /// Get the Y shift value.
-  virtual float GetShiftY () const { return shift_y; }
+  float GetShiftY () const { return shift_y; }
 
   /// Change the shift for perspective correction.
   void SetPerspectiveCenter (float x, float y)
@@ -421,7 +422,7 @@ public:
   } 
 
   /// Calculate perspective corrected point for this camera.
-  virtual csVector2 Perspective (const csVector3& v) const
+  csVector2 Perspective (const csVector3& v) const
   {
     csVector2 p;
     float iz = aspect / v.z;
@@ -431,7 +432,7 @@ public:
   }
 
   /// Calculate inverse perspective corrected point for this camera.
-  virtual csVector3 InvPerspective (const csVector2& p, float z) const
+  csVector3 InvPerspective (const csVector2& p, float z) const
   {
     csVector3 v;
     v.z = z;
@@ -440,10 +441,9 @@ public:
     return v;
   }
   
-  const CS::Math::Matrix4& GetProjectionMatrix (int viewWidth,
-    int viewHeight)
+  const CS::Math::Matrix4& GetProjectionMatrix ()
   {
-    UpdateMatrix (viewWidth, viewHeight);
+    UpdateMatrix ();
     return matrix;
   }
 };
@@ -452,39 +452,89 @@ public:
 template<typename ThisClass>
 class CameraPerspectiveProxy : public csCameraBase
 {
+  int vp_width, vp_height;
+  
   PerspectiveImpl& Persp ()
   { return *(static_cast<PerspectiveImpl*> (static_cast <ThisClass*> (this))); }
   const PerspectiveImpl& Persp () const
   { return *(static_cast<const PerspectiveImpl*> (
       static_cast <const ThisClass*> (this))); }
 public:
+  CameraPerspectiveProxy() : csCameraBase(), vp_width (0), vp_height (0) {}
+  CameraPerspectiveProxy (const CameraPerspectiveProxy* other)
+    : csCameraBase (*other), vp_width (other->vp_width),
+      vp_height (other->vp_height) {}
+
   void SetFOV (int a, int width)
   {
-    Persp().PerspectiveImpl::SetFOV (a, width);
+    CS_ASSERT_MSG("SetViewportSize() not called",
+                  (vp_width > 0) && (vp_height > 0));
+    Persp().PerspectiveImpl::SetFOV (a/(float)vp_height, width/(float)vp_width);
     BumpCamera();
   }
-  int GetFOV () const { return Persp().PerspectiveImpl::GetFOV(); }
-  float GetInvFOV () const { return Persp().PerspectiveImpl::GetInvFOV(); }
+  int GetFOV () const
+  { 
+    CS_ASSERT_MSG("SetViewportSize() not called",
+		  (vp_width > 0) && (vp_height > 0));
+    return int (Persp().PerspectiveImpl::GetFOV() * (float)vp_width); 
+  }
+  float GetInvFOV () const
+  { 
+    CS_ASSERT_MSG("SetViewportSize() not called",
+		  (vp_width > 0) && (vp_height > 0));
+    return Persp().PerspectiveImpl::GetInvFOV() / (float)vp_width; 
+  }
 
-  void SetFOVAngle (float a, int width)
+  void SetFOVAngle (float a, float width)
   {
-    Persp().PerspectiveImpl::SetFOVAngle (a, width);
+    CS_ASSERT_MSG("SetViewportSize() not called",
+		  (vp_width > 0) && (vp_height > 0));
+    Persp().PerspectiveImpl::SetFOVAngle (a, width/(float)vp_width);
     BumpCamera();
   }
   float GetFOVAngle () const { return Persp().PerspectiveImpl::GetFOVAngle(); }
 
-  float GetShiftX () const { return Persp().PerspectiveImpl::GetShiftX(); }
-  float GetShiftY () const { return Persp().PerspectiveImpl::GetShiftY(); }
+  float GetShiftX () const
+  { 
+    CS_ASSERT_MSG("SetViewportSize() not called",
+		  (vp_width > 0) && (vp_height > 0));
+    return Persp().PerspectiveImpl::GetShiftX() * vp_width; 
+  }
+  float GetShiftY () const
+  { 
+    CS_ASSERT_MSG("SetViewportSize() not called",
+		  (vp_width > 0) && (vp_height > 0));
+    return Persp().PerspectiveImpl::GetShiftY() * vp_height; 
+  }
 
   void SetPerspectiveCenter (float x, float y)
   {
-    Persp().PerspectiveImpl::SetPerspectiveCenter (x, y);
+    CS_ASSERT_MSG("SetViewportSize() not called",
+		  (vp_width > 0) && (vp_height > 0));
+    Persp().PerspectiveImpl::SetPerspectiveCenter (x/(float)vp_width,
+      y/(float)vp_height);
     BumpCamera();
   }
   csVector2 Perspective (const csVector3& v) const
-  { return Persp().PerspectiveImpl::Perspective (v); }
+  { 
+    CS_ASSERT_MSG("SetViewportSize() not called",
+		  (vp_width > 0) && (vp_height > 0));
+    csVector2 p = Persp().PerspectiveImpl::Perspective (v); 
+    p.x *= vp_width;
+    p.y *= vp_height;
+    return p;
+  }
   csVector3 InvPerspective (const csVector2& p, float z) const
-  { return Persp().PerspectiveImpl::InvPerspective (p, z); }
+  { 
+    CS_ASSERT_MSG("SetViewportSize() not called",
+		  (vp_width > 0) && (vp_height > 0));
+    csVector2 p_scaled (p.x / (float)vp_width, p.y / (float)vp_height);
+    return Persp().PerspectiveImpl::InvPerspective (p_scaled, z); 
+  }
+  void SetViewportSize (int width, int height)
+  {
+    vp_width = width; vp_height = height;
+  }
 };
 
 class csCameraPerspective : 
@@ -494,37 +544,35 @@ class csCameraPerspective :
                                scfFakeInterface<iPerspectiveCamera> >
 {
   uint clipPlanesProjNr;
-  csPlane3* clipPlanes;
+  csPlane3 clipPlanes[6];
+  uint32 clipPlanesMask;
   
   void UpdateClipPlanes();
 public:
-  csCameraPerspective (int frameWidth, int frameHeight)
-    : PerspectiveImpl (frameWidth, frameHeight), scfImplementationType (this),
-      clipPlanesProjNr (~0), clipPlanes (0) {}
+  csCameraPerspective ()
+    : PerspectiveImpl (), scfImplementationType (this),
+      clipPlanesProjNr (~0) {}
 
   csCameraPerspective (const csCameraPerspective& other)
-   : PerspectiveImpl (other), scfImplementationType (this, other),
-     clipPlanesProjNr (~0), clipPlanes (0) {}
+   : PerspectiveImpl (other), scfImplementationType (this, &other),
+     clipPlanesProjNr (~0) {}
 
-  ~csCameraPerspective()
-  {
-    delete[] clipPlanes;
-  }
-    
   csPtr<iCamera> Clone () const
   {
     return new csCameraPerspective (*this);
   }
   
-  const CS::Math::Matrix4& GetProjectionMatrix (int w, int h)
+  iCamera* GetCamera() { return this; }
+  
+  const CS::Math::Matrix4& GetProjectionMatrix ()
   {
-    return PerspectiveImpl::GetProjectionMatrix (w, h);
+    return PerspectiveImpl::GetProjectionMatrix ();
   }
   
-  const csPlane3* GetVisibleVolume (size_t& num)
+  const csPlane3* GetVisibleVolume (uint32& mask)
   {
     UpdateClipPlanes();
-    num = 4; /* 4 sides */
+    mask = clipPlanesMask;
     return clipPlanes;
   }
 };
@@ -536,25 +584,26 @@ class csCameraCustomMatrix :
 
 {
   CS::Math::Matrix4 matrix;
+  bool clipPlanesDirty;
+  csPlane3 clipPlanes[6];
+  uint32 clipPlanesMask;
 public:
-  csCameraCustomMatrix () :scfImplementationType (this) {}
+  csCameraCustomMatrix () : scfImplementationType (this), 
+    clipPlanesDirty (false) {}
     
   csPtr<iCamera> Clone () const
   {
     return new csCameraCustomMatrix (*this);
   }
   
-  const CS::Math::Matrix4& GetProjectionMatrix (int, int)
+  iCamera* GetCamera() { return this; }
+  
+  const CS::Math::Matrix4& GetProjectionMatrix ()
   { return matrix; }
   void SetProjectionMatrix (const CS::Math::Matrix4& m)
   { matrix = m; }
   
-  const csPlane3* GetVisibleVolume (size_t& num)
-  {
-    CS_ASSERT_MSG("Not implemented yet!", false);
-    num = 0;
-    return 0;
-  }
+  const csPlane3* GetVisibleVolume (uint32& mask);
 };
 
 #include "csutil/deprecated_warn_on.h"

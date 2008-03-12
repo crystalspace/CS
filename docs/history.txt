@@ -35,6 +35,16 @@ chronological order.
 	  coding, are not (necessarily) a bug.
 	- res fixed a missing forward declaration in iengine/portalcontainer.h.
 	- res fixed a string set mixup in gmeshskelanim2.
+	- res made the following changes:
+	    - Changed the iCamera interface so that getting the projection
+	      matrix doesn't require the screen dimensions any more.
+	    - iProjectionCamera now takes FOV, perspective center etc. in
+	      normalized screen space, not pixels. (Note: old iCamera still
+	      takes pixel coords!)
+	    - Added visible volume determination for custom matrix camera.
+	    - Changed how RenderViewClipper works: it now takes the visible
+	      volume from the camera instead of the frustum computed by the
+	      render view.
 10-Mar-2008
 	- res added inverting to CS::Math::Matrix4.
 09-Mar-2008
@@ -53,6 +63,8 @@ chronological order.
 	- res implemented explicit projection matrix support for soft3d.
 	- res added clip plane providing by the camera, depending on the
 	  actual projection. (Unused and incomplete tho.)
+	- res added methods to the projection/custom matrix interfaces to
+	  quickly obtain the iCamera interface.
 08-Mar-2008
 	- res fixed a pattern in CS/docs/support/prepare_online_publish.sh that
 	  was still using a .php instead of a .html file name.

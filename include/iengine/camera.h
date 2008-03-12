@@ -29,6 +29,7 @@
 
 #include "csgeom/matrix4.h"
 #include "csutil/scf.h"
+#include "csgeom/matrix4.h"
 
 #define CS_VEC_FORWARD   csVector3(0,0,1)
 #define CS_VEC_BACKWARD  csVector3(0,0,-1)
@@ -116,25 +117,39 @@ struct iCamera : public virtual iBase
    */
   virtual iSceneNode* QuerySceneNode () = 0;
 
-  /// Return the FOV (field of view) in pixels
+  /**
+   * Return the FOV (field of view) in pixels
+   * \deprecated Deprecated in 1.3. Use iPerspectiveCamera instead
+   */
+  CS_DEPRECATED_METHOD_MSG("Use iPerspectiveCamera instead")
   CS_DEPRECATED_METHOD_MSG("Use iPerspectiveCamera instead")
   virtual int GetFOV () const = 0;
-  /// Return the inverse flield of view (1/FOV) in pixels
+  /**
+   * Return the inverse flield of view (1/FOV) in pixels
+   * \deprecated Deprecated in 1.3. Use iPerspectiveCamera instead
+   */
+  CS_DEPRECATED_METHOD_MSG("Use iPerspectiveCamera instead")
   CS_DEPRECATED_METHOD_MSG("Use iPerspectiveCamera instead")
   virtual float GetInvFOV () const = 0;
-  /// Return the FOV (field of view) in degrees.
+  /**
+   * Return the FOV (field of view) in degrees.
+   * \deprecated Deprecated in 1.3. Use iPerspectiveCamera instead
+   */
+  CS_DEPRECATED_METHOD_MSG("Use iPerspectiveCamera instead")
   CS_DEPRECATED_METHOD_MSG("Use iPerspectiveCamera instead")
   virtual float GetFOVAngle () const = 0;
 
   /**
    * Set the FOV in pixels. 'fov' is the desired FOV in pixels. 'width' is
    * the display width, also in pixels.
+   * \deprecated Deprecated in 1.3. Use iPerspectiveCamera instead
    */
   CS_DEPRECATED_METHOD_MSG("Use iPerspectiveCamera instead")
   virtual void SetFOV (int fov, int width) = 0;
   /**
    * Set the FOV in degrees. 'fov' is the desired FOV in degrees. 'width' is
    * the display width in pixels.
+   * \deprecated Deprecated in 1.3. Use iPerspectiveCamera instead
    */
   CS_DEPRECATED_METHOD_MSG("Use iPerspectiveCamera instead")
   virtual void SetFOVAngle (float fov, int width) = 0;
@@ -142,18 +157,21 @@ struct iCamera : public virtual iBase
   /**
    * Set the X shift amount. The parameter specified the desired X coordinate
    * on screen of the projection center of the camera.
+   * \deprecated Deprecated in 1.3. Use iPerspectiveCamera instead
    */
   CS_DEPRECATED_METHOD_MSG("Use iPerspectiveCamera instead")
   virtual float GetShiftX () const = 0;
   /**
    * Set the Y shift amount. The parameter specified the desired Y coordinate
    * on screen of the projection center of the camera.
+   * \deprecated Deprecated in 1.3. Use iPerspectiveCamera instead
    */
   CS_DEPRECATED_METHOD_MSG("Use iPerspectiveCamera instead")
   virtual float GetShiftY () const = 0;
   /**
    * Set the shift amount. The parameter specified the desired projection
    * center of the camera on screen.
+   * \deprecated Deprecated in 1.3. Use iPerspectiveCamera instead
    */
   CS_DEPRECATED_METHOD_MSG("Use iPerspectiveCamera instead")
   virtual void SetPerspectiveCenter (float x, float y) = 0;
@@ -270,46 +288,56 @@ struct iCamera : public virtual iBase
   virtual void RemoveCameraSectorListener (iCameraSectorListener* listener) = 0;
   
   /// Get the projection matrix for this camera
-  virtual const CS::Math::Matrix4& GetProjectionMatrix (int viewWidth,
-    int viewHeight) = 0;
+  virtual const CS::Math::Matrix4& GetProjectionMatrix () = 0;
   
   /**
    * Return the planes limiting the visible volume (as specified by the
    * projection). The returned planes are in camera space.
    */
-  virtual const csPlane3* GetVisibleVolume (size_t& num) = 0;
+  virtual const csPlane3* GetVisibleVolume (uint32& mask) = 0;
+  
+  /// Set the size of the viewport this camera is associated with.
+  virtual void SetViewportSize (int width, int height) = 0;
 };
 
 struct iPerspectiveCamera : public virtual iBase
 {
   SCF_INTERFACE(iPerspectiveCamera, 1, 0, 0);
   
-  virtual int GetFOV () const = 0;
-  /// Return the inverse flield of view (1/FOV) in pixels
+  /// Get the iCamera interface for this camera.
+  virtual iCamera* GetCamera() = 0;
+  
+  /// Return the normalized FOV (field of view)
+  virtual float GetFOV () const = 0;
+  /// Return the inverse of normalized field of view (1/FOV)
   virtual float GetInvFOV () const = 0;
   /// Return the FOV (field of view) in degrees.
   virtual float GetFOVAngle () const = 0;
-  virtual void SetFOV (int fov, int width) = 0;
+  /**
+   * Set the FOV. \a fov is the desired FOV in normalized screen coordinates.
+   * \a width is the display width, also normalized.
+   */
+  virtual void SetFOV (float fov, float width) = 0;
   
   /**
-   * Set the FOV in degrees. 'fov' is the desired FOV in degrees. 'width' is
-   * the display width in pixels.
+   * Set the FOV in degrees. \a fov is the desired FOV in degrees. \a width is
+   * the display width in normalized screen coordinates.
    */
-  virtual void SetFOVAngle (float fov, int width) = 0;
+  virtual void SetFOVAngle (float fov, float width) = 0;
 
   /**
    * Set the X shift amount. The parameter specified the desired X coordinate
-   * on screen of the projection center of the camera.
+   * on the normalized screen of the projection center of the camera.
    */
   virtual float GetShiftX () const = 0;
   /**
    * Set the Y shift amount. The parameter specified the desired Y coordinate
-   * on screen of the projection center of the camera.
+   * on the normalized screen of the projection center of the camera.
    */
   virtual float GetShiftY () const = 0;
   /**
    * Set the shift amount. The parameter specified the desired projection
-   * center of the camera on screen.
+   * center of the camera on the normalized screen.
    */
   virtual void SetPerspectiveCenter (float x, float y) = 0;
 };
@@ -318,6 +346,10 @@ struct iCustomMatrixCamera : public virtual iBase
 {
   SCF_INTERFACE(iCustomMatrixCamera, 1, 0, 0);
   
+  /// Get the iCamera interface for this camera.
+  virtual iCamera* GetCamera() = 0;
+  
+  /// Set the projection matrix.
   virtual void SetProjectionMatrix (const CS::Math::Matrix4& mat) = 0;
 };
 

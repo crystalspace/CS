@@ -139,6 +139,7 @@ void csRenderView::UpdateFrustum ()
 {
   size_t i;
   csBox2 bbox;
+  ctxt->icamera->SetViewportSize (g3d->GetWidth(), g3d->GetHeight());
   csVector2 shift (ctxt->icamera->GetShiftX (), ctxt->icamera->GetShiftY ());
   float inv_fov = ctxt->icamera->GetInvFOV ();
   iClipper2D* clip = ctxt->iview;

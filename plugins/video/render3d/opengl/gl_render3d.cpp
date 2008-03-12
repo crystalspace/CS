@@ -81,6 +81,7 @@ SCF_IMPLEMENT_FACTORY (csGLGraphics3D)
 csGLGraphics3D::csGLGraphics3D (iBase *parent) : 
   scfImplementationType (this, parent), isOpen (false), imageUnits (0), 
   explicitProjection (false), needMatrixUpdate (true),
+  explicitProjection (false), needMatrixUpdate (true),
   wantToSwap (false), delayClearFlags (0), currentAttachments (0)
 {
   verbose = false;
