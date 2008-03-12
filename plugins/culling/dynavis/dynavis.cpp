@@ -536,29 +536,20 @@ namespace
 // Version to cope with z <= 0. This is wrong but it in the places where
 // it is used below the result is acceptable because it generates a
 // conservative result (i.e. a box or outline that is bigger then reality).
-void PerspectiveWrong (const csVector3& v, csVector2& p, float fov,
-    	float sx, float sy)
+void PerspectiveWrong (const csVector3& v, csVector2& p,
+  const CS::Math::Matrix4& proj, int screenWidth, int screenHeight)
 {
-  float iz = fov * 10;
-  p.x = v.x * iz + sx;
-  p.y = v.y * iz + sy;
-}
-
-void InvPerspective (const csVector2& p, float z, csVector3& v,
-	float fov, float sx, float sy)
-{
-  float iz = z / fov;
-  v.x = (p.x - sx) * iz;
-  v.y = (p.y - sy) * iz;
-  v.z = z;
+  csVector4 v_proj (proj * csVector4 (v.x, v.y, 0.1f, 1));
+  p.x = (v_proj.x / v_proj.w) * screenWidth;
+  p.y = (v_proj.y / v_proj.w) * screenHeight;
 }
 
 void Perspective (const csVector3& v, csVector2& p,
-	float fov, float sx, float sy)
+  const CS::Math::Matrix4& proj, int screenWidth, int screenHeight)
 {
-  float iz = fov / v.z;
-  p.x = v.x * iz + sx;
-  p.y = v.y * iz + sy;
+  csVector4 v_proj (proj * csVector4 (v, 1));
+  p.x = (v_proj.x / v_proj.w) * screenWidth;
+  p.y = (v_proj.y / v_proj.w) * screenHeight;
 }
 
 bool PrintObjects (csKDTree* treenode, void*, uint32, uint32&)
@@ -669,8 +660,8 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
     if (node_bbox.ProjectBoxAndOutline (cam_trans, fov, sx, sy, sbox,
     	outline, min_depth, max_depth))
 #else
-    if (node_bbox.ProjectBox (cam_trans, fov, sx, sy, sbox,
-    	min_depth, max_depth))
+    if (node_bbox.ProjectBox (cam_trans, camProj, sbox, min_depth, max_depth,
+      scr_width, scr_height))
 #endif
     {
 #     ifdef CS_DEBUG
@@ -866,7 +857,7 @@ void csDynaVis::UpdateCoverageBufferTri (csVisibilityObjectWrapper* obj)
   {
     (*tr_cam)[i] = trans.Other2This (verts[i]);
     if ((*tr_cam)[i].z > 0.1)
-      Perspective ((*tr_cam)[i], (*tr_verts)[i], fov, sx, sy);
+      Perspective ((*tr_cam)[i], (*tr_verts)[i], camProj, scr_width, scr_height);
   }
 
 # ifdef CS_DEBUG
@@ -971,7 +962,7 @@ void csDynaVis::UpdateCoverageBufferTri (csVisibilityObjectWrapper* obj)
       {
         const csVector3& v = back[j];
 	if (v.z > max_depth) max_depth = v.z;
-        Perspective (v, verts2d[j], fov, sx, sy);
+        Perspective (v, verts2d[j], camProj, scr_width, scr_height);
       }
 
       int mod = tcovbuf->InsertPolygon (verts2d, (int)num_verts, max_depth,
@@ -1063,7 +1054,7 @@ void csDynaVis::UpdateCoverageBufferOutline (csVisibilityObjectWrapper* obj)
   // Then insert the outline.
   csBox2Int occluder_box;
   int modified = tcovbuf->InsertOutline (
-  	trans, fov, sx, sy, verts, vertex_count,
+  	trans, camProj, verts, vertex_count,
   	outline_info.outline_verts,
   	(int*)outline_info.outline_edges, outline_info.num_outline_edges,
 	do_cull_outline_splatting,
@@ -1221,9 +1212,9 @@ void csDynaVis::TestSinglePolygonVisibility (csVisibilityObjectWrapper* obj,
     min_depth = v.z;
     max_depth = v.z;
     if (v.z < .1)
-      PerspectiveWrong (v, v2d, fov, sx, sy);
+      PerspectiveWrong (v, v2d, camProj, scr_width, scr_height);
     else
-      Perspective (v, v2d, fov, sx, sy);
+      Perspective (v, v2d, camProj, scr_width, scr_height);
     sbox.StartBoundingBox (v2d);
     int i;
     for (i = 1 ; i < 3 ; i++)
@@ -1232,9 +1223,9 @@ void csDynaVis::TestSinglePolygonVisibility (csVisibilityObjectWrapper* obj,
       if (min_depth > v.z) min_depth = v.z;
       else if (max_depth < v.z) max_depth = v.z;
       if (v.z < .1)
-        PerspectiveWrong (v, v2d, fov, sx, sy);
+        PerspectiveWrong (v, v2d, camProj, scr_width, scr_height);
       else
-        Perspective (v, v2d, fov, sx, sy);
+        Perspective (v, v2d, camProj, scr_width, scr_height);
       sbox.AddBoundingVertexSmart (v2d);
     }
   }
@@ -1456,13 +1447,14 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
     }
     const csOBB& obb = obj->model->GetOBB ();
     frozen_obb.Copy (obb, trans);
-    sbox_rc = frozen_obb.ProjectOBB (fov, sx, sy, sbox, min_depth, max_depth);
+    sbox_rc = frozen_obb.ProjectOBB (camProj, sbox, min_depth, max_depth,
+      scr_width, scr_height);
   }
   else
   {
     // No OBB, so use AABB instead.
-    sbox_rc = obj_bbox.ProjectBox (cam_trans, fov, sx, sy, sbox,
-		min_depth, max_depth);
+    sbox_rc = obj_bbox.ProjectBox (cam_trans, camProj, sbox,
+		min_depth, max_depth, scr_width, scr_height);
   }
   if (!sbox_rc || sbox.MaxX () <= 0 || sbox.MaxY () <= 0 ||
         sbox.MinX () >= scr_width || sbox.MinY () >= scr_height)
@@ -1487,7 +1479,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
       if (cam_center.z >= .1)
       {
 	csVector2 sbox_center;
-	Perspective (cam_center, sbox_center, fov, sx, sy);
+	Perspective (cam_center, sbox_center, camProj, scr_width, scr_height);
 	rc = tcovbuf->TestPoint (sbox_center, cam_center.z);
 	if (rc)
 	{
@@ -1606,7 +1598,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 	  if (v.z >= .1)
 	  {
 	    csVector2 p;
-	    Perspective (v, p, fov, sx, sy);
+	    Perspective (v, p, camProj, scr_width, scr_height);
 	    bool test = tcovbuf->TestPoint (p, v.z);
 	    if (test)
 	    {
@@ -1625,7 +1617,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 	  if (v.z >= .1)
 	  {
 	    csVector2 p;
-	    Perspective (v, p, fov, sx, sy);
+	    Perspective (v, p, camProj, scr_width, scr_height);
 	    bool test = tcovbuf->TestPoint (p, v.z);
 	    if (test)
 	    {
@@ -1778,17 +1770,7 @@ bool csDynaVis::VisTest (iRenderView* rview,
   debug_by = by;
 
   iCamera* camera = rview->GetCamera ();
-  fov = float (camera->GetFOV ());
-  sx = camera->GetShiftX ();
-  sy = camera->GetShiftY ();
-  int rb = reduce_buf;
-  while (rb)
-  {
-    fov /= 2.0f;
-    sx /= 2.0f;
-    sy /= 2.0f;
-    rb >>= 1;
-  }
+  camProj = camera->GetProjectionMatrix();
   csVector3 old_camera_pos = cam_trans.GetOrigin ();
   cam_trans = camera->GetTransform ();
   float sqdist = csSquaredDist::PointPoint (old_camera_pos,
@@ -2762,7 +2744,7 @@ void csDynaVis::Dump (iGraphics3D* g3d)
       csVector3 trans_origin = trans.Other2This (
     	  debug_camera->GetTransform ().GetOrigin ());
       csVector2 to;
-      Perspective (trans_origin, to, fov, sx, sy);
+      Perspective (trans_origin, to, camProj, scr_width, scr_height);
       g2d->DrawLine (to.x-3,  to.y-3, to.x+3,  to.y+3, col_cam);
       g2d->DrawLine (to.x+3,  to.y-3, to.x-3,  to.y+3, col_cam);
       g2d->DrawLine (to.x,    to.y,   to.x+30, to.y,   col_cam);
@@ -2847,8 +2829,8 @@ void csDynaVis::Dump (iGraphics3D* g3d)
 	      csVector3 camv2 = trans.Other2This (verts[vt2]);
 	      if (camv2.z <= 0.0) continue;
 	      csVector2 tr_vert1, tr_vert2;
-	      Perspective (camv1, tr_vert1, fov, sx, sy);
-	      Perspective (camv2, tr_vert2, fov, sx, sy);
+	      Perspective (camv1, tr_vert1, camProj, scr_width, scr_height);
+	      Perspective (camv2, tr_vert2, camProj, scr_width, scr_height);
 	      g2d->DrawLine (tr_vert1.x,  g2d->GetHeight ()-tr_vert1.y,
 	    	  tr_vert2.x,  g2d->GetHeight ()-tr_vert2.y, col_bgtext);
 	    }
