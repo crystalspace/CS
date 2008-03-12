@@ -428,28 +428,25 @@ bool csPortalContainer::ClipToPlane (
 class PerspectiveOutlet2D
 {
 protected:
-  int fov;
-  float shift_x;
-  float shift_y;
+  CS::Math::Matrix4 camProj;
   csPoly2D& dest;
   
-  static void Perspective (const csVector3& v, csVector2& p, int
-	  aspect, float shift_x, float shift_y)
+  static void Perspective (const csVector3& v, csVector2& p,
+    const CS::Math::Matrix4& camProj)
   {
-    float iz = aspect / v.z;
-    p.x = v.x * iz + shift_x;
-    p.y = v.y * iz + shift_y;
+    csVector4 v_proj (camProj * csVector4 (v, 1));
+    p.x = v_proj.x / v_proj.w;
+    p.y = v_proj.y / v_proj.w;
   }
 public:
-  PerspectiveOutlet2D (int fov, float shift_x, float shift_y,
-    csPoly2D& dest) : fov (fov), shift_x (shift_x), shift_y (shift_y),
-    dest (dest) {}
+  PerspectiveOutlet2D (const CS::Math::Matrix4& camProj,
+    csPoly2D& dest) : camProj (camProj), dest (dest) {}
 
   void MakeEmpty () { dest.MakeEmpty(); }
   void Add (const csVector3 &v)
   {
     csVector2 p;
-    Perspective (v, p, fov, shift_x, shift_y);
+    Perspective (v, p, camProj);
     dest.AddVertex (p);
   }
   void AddVertex (float x, float y)
@@ -459,7 +456,7 @@ public:
   const csVector2* GetLast() { return dest.GetLast(); }
   void Perspective (const csVector3& v, csVector2& p)
   {
-    Perspective (v, p, fov, shift_x, shift_y);
+    Perspective (v, p, camProj);
   }
   bool ClipAgainst (iClipper2D* clipper)
   {
@@ -930,15 +927,12 @@ bool csPortalContainer::Draw (iRenderView* rview, iMovable* /*movable*/,
 
   csPlane3 *farplane = camera->GetFarPlane ();
   bool mirrored = camera->IsMirrored ();
-  int fov = camera->GetFOV ();
-  float shift_x = camera->GetShiftX ();
-  float shift_y = camera->GetShiftY ();
 
   const csReversibleTransform movtrans = 
     meshwrapper->GetCsMovable ().GetFullTransform ();
 
   csPoly2D poly;
-  PerspectiveOutlet2D outlet (fov, shift_x, shift_y, poly);
+  PerspectiveOutlet2D outlet (camera->GetProjectionMatrix(), poly);
   size_t i;
   if (clip_plane || clip_portal || clip_z_plane || do_portal_plane || farplane)
   {
@@ -1103,9 +1097,9 @@ class PerspectiveOutlet2D3D : public PerspectiveOutlet2D
     return vLerped * z;
   }
 public:
-  PerspectiveOutlet2D3D (iCamera* cam, csPoly2D& dest2D, csPoly3D& dest3D) : 
-    PerspectiveOutlet2D (cam->GetFOV(), cam->GetShiftX(), 
-      cam->GetShiftY(), dest2D), dest3D (dest3D), cam (cam) {}
+  PerspectiveOutlet2D3D (iCamera* cam, csPoly2D& dest2D, csPoly3D& dest3D)
+    : PerspectiveOutlet2D (cam->GetProjectionMatrix(), dest2D),
+    dest3D (dest3D), cam (cam) {}
 
   void MakeEmpty () 
   { 

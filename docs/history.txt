@@ -25,6 +25,8 @@ chronological order.
 	  optionally take a value for w.
 	- res changed dynavis to use the projection matrices instead of
 	  perspective parameters.
+	- res changed the engine portal container to use projection matrices
+	  instead of perspective parameters.
 11-Mar-2008
 	- res fixed build errors.
 	- res fixed CS/docs/support/prepare_online_publish.sh to use the right
