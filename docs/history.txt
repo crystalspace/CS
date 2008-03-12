@@ -7,13 +7,40 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 12-Mar-2008
+	- caedes implemented some empty methods in bullet physics plugin:
+	  - csBulletCollider: IsStatic
+	  - csBulletRigidBody: AddForceAtPos, IsEnabled, Enable, Disable.
+	- Marten made the UTF8 BOM checks a bit more robust after a few 
+	  comments from Mononoke.
+	- caedes added iTranslator to python bindings.
 	- res added methods to csTiledCoverageBuffer taking a projection matrix
 	  instead of perspective parameters.
 	- res added methods to csOBB taking a projection matrix
 	  instead of perspective parameters.
 	- res added methods to csBox3 taking a projection matrix
 	  instead of perspective parameters.
+	- res augmented the csVector4 from-csVector3 constructor to also
+	  optionally take a value for w.
 11-Mar-2008
+	- res fixed CS/docs/support/prepare_online_publish.sh to use the right
+	  search page parameter names for filtering for the docs only.
+	- res changed jamcache.m4 to emit values to Jamconfig without quotes.
+	  That way Jam sees them as arrays not strings, easing some array-based
+	  operations such as cleaning redundant flags.
+	- res changed Jam's LinkWith and LFlags rules to more aggressively
+	  remove duplicate flags.
+	- res changed csColliderHelper to only have one name for
+	  InitializeCollisionWrappers; distinguishing between regions and
+	  collections is done by overloading.
+	- res fixed collections InitializeCollisionWrappers not setting up any
+	  wrappers if no collection is given. Instead, set up all wrappers in
+	  that case (as the regions variant does).
+	- res fixed the GL canvas closing to call the common canvas Close()
+	  before freeing GL-specific data, since the former accesses some of
+	  the latter. Fixes trac #460.
+	- Marten removed the no-longer-needed atomictest.
+	- Marten added checks to XML parser plugins to skip any UTF8 BOM in the
+	  beginning of the XML stream.
 	- res made the following changes:
 	    - Changed the iCamera interface so that getting the projection
 	      matrix doesn't require the screen dimensions any more.
