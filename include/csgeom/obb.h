@@ -171,12 +171,16 @@ public:
     return corners[corner];
   }
 
+  //@{
   /**
    * Project this OBB to a 2D screen space box.
    * Returns false if OBB is not on screen.
    */
   bool ProjectOBB (float fov, float sx, float sy, csBox2& sbox,
 	float& min_z, float& max_z);
+  bool ProjectOBB (const CS::Math::Matrix4& projection, csBox2& sbox,
+	float& min_z, float& max_z, int screenWidth, int screenHeight);
+  //@}
 };
 
 /** @} */

@@ -15,6 +15,12 @@ chronological order.
 	- caedes added iTranslator to python bindings.
 	- caedes fixed python use of stringids to cope with heavy changes
 	  in how they work internally.
+	- res added methods to csTiledCoverageBuffer taking a projection matrix
+	  instead of perspective parameters.
+	- res added methods to csOBB taking a projection matrix
+	  instead of perspective parameters.
+	- res added methods to csBox3 taking a projection matrix
+	  instead of perspective parameters.
 	- res augmented the csVector4 from-csVector3 constructor to also
 	  optionally take a value for w.
 11-Mar-2008
