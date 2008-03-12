@@ -172,7 +172,7 @@ PerspectiveImpl::PerspectiveImpl ()
   shift_y = 0.5f;
 }
 
-void PerspectiveImpl::SetFOVAngle (float a, int width)
+void PerspectiveImpl::SetDefaultFOVAngle (float a, float width)
 {
   // make sure we have valid angles
   if (a >= 180)
