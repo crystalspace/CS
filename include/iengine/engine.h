@@ -1433,20 +1433,6 @@ struct iEngine : public virtual iBase
    */
   virtual csPtr<iCustomMatrixCamera> CreateCustomMatrixCamera () = 0;
   /** @} */
-  
-  /**\name Camera handling
-   * @{ */
-
-  /**
-   * Create a new perspective projection camera.
-   */
-  virtual csPtr<iPerspectiveCamera> CreatePerspectiveCamera () = 0;
-
-  /**
-   * Create a new custom projection camera.
-   */
-  virtual csPtr<iCustomMatrixCamera> CreateCustomMatrixCamera () = 0;
-  /** @} */
 };
 
 /** @} */
