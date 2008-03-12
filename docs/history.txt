@@ -32,6 +32,7 @@ chronological order.
 	- res changed CS::RenderManager::SimpleTreeRenderer to set a projection
 	  matrix for rendering instead of perspective parameters.
 	- res added a simple "unshadowed" rendermanager and made it default.
+	- res beefed up simple1.
 11-Mar-2008
 	- res fixed build errors.
 	- res fixed CS/docs/support/prepare_online_publish.sh to use the right
