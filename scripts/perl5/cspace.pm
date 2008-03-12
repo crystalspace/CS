@@ -19290,8 +19290,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %ITERATORS = ();
 *InitializeCollisionWrapper = *cspacec::csColliderHelper_InitializeCollisionWrapper;
 *InitializeCollisionWrappers = *cspacec::csColliderHelper_InitializeCollisionWrappers;
-*InitializeCollisionWrappersCollection = *cspacec::csColliderHelper_InitializeCollisionWrappersCollection;
-*InitializeCollisionWrappersRegion = *cspacec::csColliderHelper_InitializeCollisionWrappersRegion;
 *CollideArray = *cspacec::csColliderHelper_CollideArray;
 *CollidePath = *cspacec::csColliderHelper_CollidePath;
 *TraceBeam = *cspacec::csColliderHelper_TraceBeam;

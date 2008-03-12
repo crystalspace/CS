@@ -88,7 +88,8 @@ public:
   csVector4T (const csVector4T& v) : x(v.x), y(v.y), z(v.z), w(v.w) {}
 
   /// Convert from a three-component vector. w is set to 1.
-  csVector4T (const csVector3 &v) : x(v.x), y(v.y), z(v.z), w(1.0f) {}
+  csVector4T (const csVector3 &v, float w = 1.0f)
+    : x(v.x), y(v.y), z(v.z), w(w) {}
 
   /// Assignment operator.
   template<typename T2>
@@ -329,8 +330,8 @@ public:
   csVector4 (const csVector4T<float>& v) : csVector4T<float> (v) {}
 
   /// Convert from a three-component vector. w is set to 1.
-  csVector4 (const csVector3 &v) : 
-    csVector4T<float> (v.x, v.y, v.z, 1.0f) {}
+  csVector4 (const csVector3 &v, float w = 1.0f) : 
+    csVector4T<float> (v.x, v.y, v.z, w) {}
 
   /// Assignment operator.
   csVector4& operator= (const csVector4T<float>& other)
