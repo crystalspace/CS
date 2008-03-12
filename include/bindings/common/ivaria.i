@@ -44,8 +44,6 @@ ARRAY_CHANGE_ALL_TEMPLATE(csCollisionPair)
 %rename(GetString) iScriptObject::Get(const char*, char**);
 %rename(GetObject) iScriptObject::Get(const char*, csRef<iStringObject>&);
 %include "ivaria/script.h"
-%include "ivaria/simpleformer.h"
-%include "ivaria/terraform.h"
 
 
 // ivaria/collider.h

@@ -1,8 +1,0 @@
-SubDir TOP plugins mesh lghtng object ;
-
-Description lghtng : "Lightning mesh object plugin" ;
-
-Plugin lghtng
-	: [ Wildcard *.cpp *.h ]
-;
-LinkWith lghtng : crystalspace ;

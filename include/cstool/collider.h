@@ -93,10 +93,6 @@ public:
 
   /// Create a collider based on a terrain.
   csColliderWrapper (iObject* parent, iCollideSystem* collide_system,
-  	iTerraFormer* terrain);
-
-  /// Create a collider based on a terrain.
-  csColliderWrapper (iObject* parent, iCollideSystem* collide_system,
   	iTerrainSystem* terrain);
 
   /**
@@ -157,10 +153,6 @@ public:
    * Update collider from a triangle mesh.
    */
   void UpdateCollider (iTriangleMesh* mesh);
-
-  /// Update collider from a terraformer.
-  void UpdateCollider (iTerraFormer* terrain);
-
 };
 
 /**

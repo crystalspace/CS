@@ -23,7 +23,6 @@ ARRAY_CHANGE_ALL_TEMPLATE(csSprite2DVertex)
 %include "imesh/object.h"
 %include "imesh/thing.h"
 %template (csCharArrayArray) csArray<csArray<char> >;
-%include "imesh/terrain.h"
 %include "imesh/terrain2.h"
 
 %include "imesh/particles.h"

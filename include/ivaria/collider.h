@@ -72,7 +72,6 @@ struct csIntersectingTriangle
 enum csColliderType
 {
   CS_MESH_COLLIDER = 0,
-  CS_TERRAFORMER_COLLIDER,
   CS_TERRAIN_COLLIDER
 };
 
@@ -112,7 +111,7 @@ struct iCollider : public virtual iBase
  */
 struct iCollideSystem : public virtual iBase
 {
-  SCF_INTERFACE (iCollideSystem, 2, 2, 1);
+  SCF_INTERFACE (iCollideSystem, 3, 0, 0);
 
   /**
    * Get the ID that the collision detection system prefers for getting
@@ -143,13 +142,6 @@ struct iCollideSystem : public virtual iBase
    */
   virtual csPtr<iCollider> CreateCollider (iTriangleMesh* mesh) = 0;
 
-  /**
-   * Create a Collider from a terrain. This should be used instead
-   * of the iTriangleMesh version in case you have a landscape because
-   * this is a more optimal way to do.
-   */
-  virtual csPtr<iCollider> CreateCollider (iTerraFormer* mesh) = 0;
-  
   /**
    * Create a Collider from a terrain.
    */

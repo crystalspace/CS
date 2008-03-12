@@ -38,7 +38,6 @@
 #include "csgeom/transfrm.h"
 #include "imesh/terrain2.h"
 #include "CSopcodecollider.h"
-#include "csTerraFormerCollider.h"
 #include "Opcode.h"
 
 struct iObjectRegistry;
@@ -52,16 +51,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
 class csOPCODECollideSystem :
   public scfImplementation2<csOPCODECollideSystem, iCollideSystem, iComponent>
 {
-
-  bool Collide (csOPCODECollider* collider1,
-    const csReversibleTransform* trans1, csTerraFormerCollider* terraformer,
-    const csReversibleTransform* trans2);
   
   bool Collide (csOPCODECollider* collider1, const csReversibleTransform*
     trans1, iTerrainSystem* terrain, const csReversibleTransform* terrainTrans);
-
-  bool TestTriangleTerraFormer (csVector3 triangle[3],
-    csTerraFormerCollider* c, csCollisionPair* pair);
 
 public:
   Opcode::AABBTreeCollider TreeCollider;
@@ -87,14 +79,10 @@ public:
   // to 'pairs'.
   void CopyCollisionPairs (csOPCODECollider* col1, csOPCODECollider* col2);
 
-  void CopyCollisionPairs (csOPCODECollider* col2,
-      csTerraFormerCollider* terraformer);
-
   virtual csStringID GetTriangleDataID () { return trianglemesh_id; }
   virtual csStringID GetBaseDataID () { return basemesh_id; }
 
   virtual csPtr<iCollider> CreateCollider (iTriangleMesh* mesh);
-  virtual csPtr<iCollider> CreateCollider (iTerraFormer* mesh);
   virtual csPtr<iCollider> CreateCollider (iTerrainSystem* mesh);
 
   /**
@@ -113,9 +101,7 @@ public:
   bool CollideRaySegment (
   	iTerrainSystem* terrain, const csReversibleTransform* trans,
 	const csVector3& start, const csVector3& end, bool use_ray);
-  bool CollideRaySegment (
-  	csTerraFormerCollider* terraformer, const csReversibleTransform* trans,
-	const csVector3& start, const csVector3& end, bool use_ray);
+
   virtual bool CollideRay (
   	iCollider* collider, const csReversibleTransform* trans,
 	const csVector3& start, const csVector3& end)
@@ -133,11 +119,7 @@ public:
   {
     return intersecting_triangles;
   }
-  bool CalculateIntersections (csTerraFormerCollider* terraformer);
-  bool TestSegmentTerraFormer (
-    csTerraFormerCollider* terraformer,
-    const IceMaths::Matrix4x4& transform,
-    const csVector3& start, const csVector3& end);
+  
 
   /**
    * Get pointer to current array of collision pairs.
