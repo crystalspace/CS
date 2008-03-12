@@ -242,11 +242,11 @@ bool csGraphics2DGLCommon::Open ()
 void csGraphics2DGLCommon::Close ()
 {
   if (!is_open) return;
+  csGraphics2D::Close ();
   delete statecontext; statecontext = 0;
   delete statecache; statecache = 0;
   ext.Close ();
   driverdb.Close ();
-  csGraphics2D::Close ();
 }
 
 void csGraphics2DGLCommon::SetClipRect (int xmin, int ymin, int xmax, int ymax)

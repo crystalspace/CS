@@ -639,19 +639,19 @@ bool csBulletRigidBody::IsStatic (void)
 
 bool csBulletRigidBody::Disable (void)
 {
+  body->setActivationState(ISLAND_SLEEPING);
   return false;
 }
 
 bool csBulletRigidBody::Enable (void)
 {
-  //pc->SetActive (true);
+  body->setActivationState(ACTIVE_TAG);
   return true;
 }
 
 bool csBulletRigidBody::IsEnabled (void)
 {
-  //return pc->GetRigidBody()->GetActivationState() == 1;
-  return true;
+  return body->isActive();
 }
 
 csRef<iBodyGroup> csBulletRigidBody::GetGroup (void)
@@ -926,9 +926,11 @@ void csBulletRigidBody::AddRelTorque (const csVector3& /*force*/)
 {
 }
 
-void csBulletRigidBody::AddForceAtPos (const csVector3& /*force*/,
-    const csVector3& /*pos*/)
+void csBulletRigidBody::AddForceAtPos (const csVector3& force,
+    const csVector3& pos)
 {
+  body->applyForce (btVector3 (force.x, force.y, force.z),
+      btVector3 (pos.x,pos.y,pos.z));
 }
 
 void csBulletRigidBody::AddForceAtRelPos (const csVector3& /*force*/,
@@ -1342,7 +1344,7 @@ void csBulletCollider::MakeDynamic ()
 
 bool csBulletCollider::IsStatic ()
 {
-  return false;
+  return body->isStaticObject();
 }
 
 //------------------------ csBulletJoint ------------------------------------
