@@ -6,6 +6,9 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Mar-2008
+	- res added methods to csTiledCoverageBuffer taking a projection matrix
+	  instead of perspective parameters.
 11-Mar-2008
 	- res made the following changes:
 	    - Changed the iCamera interface so that getting the projection
