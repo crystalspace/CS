@@ -12,6 +12,8 @@ chronological order.
 11-Mar-2008
 	- Marten added checks to XML parser plugins to skip any UTF8 BOM in the
 	  beginning of the XML stream.
+09-Mar-2008
+	- Marten fixed bug #461, terrain2 setting wrong parameter.
 05-Mar-2008
 	- Vincent applied Guillaume Libersat's patch for #457,
 	  csInputDefinition::ParseKey() wasn't returning false for non
