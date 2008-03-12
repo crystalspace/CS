@@ -337,7 +337,34 @@ class csRenderBufferHolder : public csRefCount
 {
 public:
   /** initialize */
-  csRenderBufferHolder() {accessorMask=0;}
+  csRenderBufferHolder () 
+    : accessorMask (0)
+  {    
+  }
+
+  csRenderBufferHolder (const csRenderBufferHolder& other)
+    : csRefCount (), accessorMask (other.accessorMask),
+    accessor (other.accessor)
+  {
+    for (size_t i = 0; i < CS_BUFFER_COUNT; ++i)
+    {
+      buffers[i] = other.buffers[i];
+    }
+  }
+
+  csRenderBufferHolder& operator= (const csRenderBufferHolder& other)
+  {
+    accessorMask = other.accessorMask;
+    accessor = other.accessor;
+
+    for (size_t i = 0; i < CS_BUFFER_COUNT; ++i)
+    {
+      buffers[i] = other.buffers[i];
+    }
+
+    return *this;
+  }
+
   /**
    * Get buffer by name.
    * If an accessor is set, it will first be called, after that the buffer

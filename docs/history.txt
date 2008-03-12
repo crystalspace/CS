@@ -6,6 +6,10 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Mar-2008
+	- Marten implemented first pieces of software skinning (of vertices)
+	  in animesh.
+	- Marten fixed two bugs in skeleton2 loader.
 09-Mar-2008
 	- Marten did a number of improvements to the animesh and skeleton
 	  loaders and interfaces:

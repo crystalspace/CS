@@ -46,7 +46,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     // Setup the root
     newP->animRoot = animRoot->CreateInstance (newP, skeleton);
 
-    return newP;
+    return csPtr<iSkeletonAnimPacket2> (newP);
   }
 
   iSkeletonAnimationFactory2* AnimationPacketFactory::CreateAnimation (

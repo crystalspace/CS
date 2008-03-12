@@ -143,6 +143,15 @@ public:
     return csQuaternion (q.v*f, q.w*f);
   }
 
+  /// Multiply by scalar
+  inline csQuaternion& operator*= (float f)
+  {
+    v *= f;
+    w *= f;
+
+    return *this;
+  }
+
   /// Divide by scalar
   inline friend csQuaternion operator/ (const csQuaternion& q, float f)
   {
@@ -155,6 +164,16 @@ public:
   {
     float invF = 1.0f/f;
     return csQuaternion (q.v*invF, q.w*invF);
+  }
+
+  /// Divide by scalar
+  inline csQuaternion& operator/= (float f)
+  {
+    float invF = 1.0f/f;
+    v *= invF;
+    w *= invF;
+
+    return *this;
   }
 
   /// Get the conjugate quaternion

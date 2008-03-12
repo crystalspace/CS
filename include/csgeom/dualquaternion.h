@@ -147,6 +147,14 @@ public:
     return csDualQuaternion (q.real*f, q.dual*f);
   }
 
+  /// Multiply by scalar
+  inline csDualQuaternion& operator*= (float f)
+  {
+    real *= f;
+    dual *= f;
+    return *this;
+  }
+
   /// Divide by scalar
   inline friend csDualQuaternion operator/ (const csDualQuaternion& q, float f)
   {
@@ -159,6 +167,14 @@ public:
   {
     float invF = 1.0f/f;
     return csDualQuaternion (q.real*invF, q.dual*invF);
+  }
+
+  /// v by scalar
+  inline csDualQuaternion& operator/= (float f)
+  {
+    real /= f;
+    dual /= f;
+    return *this;
   }
 
   /// Get the conjugate dual quaternion
@@ -193,7 +209,7 @@ public:
    * This is as it should be... fix the calling code.
    */
   inline csDualQuaternion Unit () const
-  {
+  {    
     const float lenRealInv = 1.0f / real.Norm ();
     
     csDualQuaternion result (real*lenRealInv, dual*lenRealInv);

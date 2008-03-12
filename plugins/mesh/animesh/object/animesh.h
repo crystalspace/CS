@@ -119,6 +119,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     virtual void SetMixMode (uint mode);
     virtual uint GetMixMode () const;
+
+    //-- Private
+    inline uint GetVertexCountP () const
+    {
+      return vertexCount;
+    }
   
   private: 
 
@@ -200,10 +206,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
 
   class AnimeshObject :
-    public scfImplementationExt2<AnimeshObject,
+    public scfImplementationExt3<AnimeshObject,
                                  csObjectModel,
                                  iAnimatedMesh,
-                                 iMeshObject>
+                                 iMeshObject,
+                                 iRenderBufferAccessor>
   {
   public:
     AnimeshObject (AnimeshObjectFactory* factory);
@@ -270,15 +277,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     virtual void SetObjectBoundingBox (const csBox3& bbox);
     virtual void GetRadius (float& radius, csVector3& center);
 
+    //-- iRenderBufferAccessor
+    virtual void PreGetBuffer (csRenderBufferHolder* holder, 
+      csRenderBufferName buffer);
+
     //
     void SetupSubmeshes ();
     void UpdateLocalBoneTransforms ();
 
   private:
+    void SkinVertices (iRenderBuffer* resultBuffer);
+
     class Submesh : 
-      public scfImplementation2<Submesh, 
-                                iAnimatedMeshSubMesh, 
-                                iShaderVariableAccessor>
+      public scfImplementation1<Submesh, 
+                                iAnimatedMeshSubMesh>
     {
     public:
       Submesh (AnimeshObject* meshObject, FactorySubmesh* factorySubmesh)
@@ -301,13 +313,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         return isRendering;
       }
 
-      virtual void PreGetValue (csShaderVariable *variable);
-
       AnimeshObject* meshObject;
       FactorySubmesh* factorySubmesh;
       bool isRendering;
 
       csRefArray<csShaderVariableContext> svContexts;
+      csRefArray<csRenderBufferHolder> bufferHolders;
       csRefArray<csShaderVariable> boneTransformArray;
     };    
 

@@ -82,7 +82,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
       }
     }
     
-    return 0;
+    return csPtr<iBase> (skelManager);
   }
   
   bool SkeletonLoader::Initialize (iObjectRegistry* objReg)
@@ -166,12 +166,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
   {
     static const char* msgid = "crystalspace.skeletonloader.parsebone";
 
-    BoneID id = factory->CreateBone (parent);
+    BoneID boneId = factory->CreateBone (parent);
 
     const char* name = node->GetAttributeValue ("name");
     if (name)
     {
-      factory->SetBoneName (id, name);
+      factory->SetBoneName (boneId, name);
     }
 
     csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -184,7 +184,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
       switch (id)
       {
       case XMLTOKEN_BONE:
-        if (!ParseBone (child, factory, id))
+        if (!ParseBone (child, factory, boneId))
         {
           synldr->ReportError (msgid, child, "Couldn't parse bone");
           return false;
@@ -206,7 +206,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
           q.v.z = child->GetAttributeValueAsFloat ("qz");
           q.w = child->GetAttributeValueAsFloat ("qw");
 
-          factory->SetTransformBoneSpace (id, q, offs);
+          factory->SetTransformBoneSpace (boneId, q, offs);
         }
         break;
       default:
@@ -295,7 +295,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
       {
         csRef<iSkeletonAnimationFactory2> anode;
         anode = ParseAnimation (node, packet);
-        if (anode)
+        if (!anode)
         {
           synldr->ReportError (msgid, node, "Couldn't load animation");
           return 0;

@@ -40,10 +40,11 @@ CS_IMPLEMENT_PLUGIN
 CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 {
 
-  static csStringID svNameVertexSkinned = csInvalidStringID;
-  static csStringID svNameNormalSkinned = csInvalidStringID;
-  static csStringID svNameTangentSkinned = csInvalidStringID;
-  static csStringID svNameBinormalSkinned = csInvalidStringID;
+  static csStringID svNameVertexUnskinned = csInvalidStringID;
+  static csStringID svNameNormalUnskinned = csInvalidStringID;
+  static csStringID svNameTangentUnskinned = csInvalidStringID;
+  static csStringID svNameBinormalUnskinned = csInvalidStringID;
+
   static csStringID svNameBoneIndex = csInvalidStringID;
   static csStringID svNameBoneWeight = csInvalidStringID;
   static csStringID svNameBoneTransforms = csInvalidStringID;
@@ -70,10 +71,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       object_reg, "crystalspace.shared.stringset");
 
     // Get the SV names
-    svNameVertexSkinned = strset->Request ("position skinned");
-    svNameNormalSkinned = strset->Request ("normal skinned");
-    svNameTangentSkinned = strset->Request ("tangent skinned");
-    svNameBinormalSkinned = strset->Request ("binormal skinned");
+    svNameVertexUnskinned = strset->Request ("position unskinned");
+    svNameNormalUnskinned = strset->Request ("normal unskinned");
+    svNameTangentUnskinned = strset->Request ("tangent unskinned");
+    svNameBinormalUnskinned = strset->Request ("binormal unskinned");
+
     svNameBoneIndex = strset->Request ("bone index");
     svNameBoneWeight = strset->Request ("bone weight");
     svNameBoneTransforms = strset->Request ("bone transform");
@@ -294,12 +296,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         csRef<csRenderBufferHolder> bufferholder;
         bufferholder.AttachNew (new csRenderBufferHolder);
         bufferholder->SetRenderBuffer (CS_BUFFER_INDEX, sm->indexBuffers[i]);
-        bufferholder->SetRenderBuffer (CS_BUFFER_POSITION, vertexBuffer);
         bufferholder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texcoordBuffer);
-        bufferholder->SetRenderBuffer (CS_BUFFER_NORMAL, normalBuffer);
-        bufferholder->SetRenderBuffer (CS_BUFFER_TANGENT, tangentBuffer);
-        bufferholder->SetRenderBuffer (CS_BUFFER_BINORMAL, binormalBuffer);
         bufferholder->SetRenderBuffer (CS_BUFFER_COLOR_UNLIT, colorBuffer);
+        bufferholder->SetRenderBuffer (CS_BUFFER_COLOR, colorBuffer);
         sm->bufferHolders.Push (bufferholder);
       }
     }
@@ -313,7 +312,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     
     // Fix the bb
     factoryBB.StartBoundingBox ();
-    csVertexListWalker<csVector3> vbuf (vertexBuffer);
+    csVertexListWalker<float, csVector3> vbuf (vertexBuffer);
     for (size_t i = 0; i < vertexCount; ++i)
     {
       factoryBB.AddBoundingVertex (*vbuf);
@@ -547,7 +546,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         meshPtr->material = mat;
 
         meshPtr->mixmode = mixMode;
-        meshPtr->buffers = fsm->bufferHolders[j];
+        meshPtr->buffers = sm->bufferHolders[j];
 
         meshPtr->object2world = o2wt;
         meshPtr->geometryInstance = factory;
@@ -706,17 +705,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         csRef<csShaderVariableContext> svContext;
         svContext.AttachNew (new csShaderVariableContext);
         csShaderVariable* sv;
-        sv = svContext->GetVariableAdd (svNameVertexSkinned);
-        sv->SetAccessor (sm, j);
+        
+        sv = svContext->GetVariableAdd (svNameVertexUnskinned);
+        sv->SetValue (factory->vertexBuffer);
 
-        sv = svContext->GetVariableAdd (svNameNormalSkinned);
-        sv->SetAccessor (sm, j);
+        if (factory->normalBuffer)
+        {
+          sv = svContext->GetVariableAdd (svNameNormalUnskinned);
+          sv->SetValue (factory->normalBuffer);
+        }        
 
-        sv = svContext->GetVariableAdd (svNameTangentSkinned);
-        sv->SetAccessor (sm, j);
+        if (factory->tangentBuffer)
+        {
+          sv = svContext->GetVariableAdd (svNameTangentUnskinned);
+          sv->SetValue (factory->tangentBuffer);
+        }        
 
-        sv = svContext->GetVariableAdd (svNameBinormalSkinned);
-        sv->SetAccessor (sm, j);
+        if (factory->binormalBuffer)
+        {
+          sv = svContext->GetVariableAdd (svNameBinormalUnskinned);
+          sv->SetValue (factory->binormalBuffer);
+        }
 
         
         sv = svContext->GetVariableAdd (svNameBoneIndex);
@@ -746,6 +755,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         }
 
         sm->svContexts.Push (svContext);
+      }
+
+      for (size_t j = 0; j < fsm->bufferHolders.GetSize (); ++j)
+      {
+        csRef<csRenderBufferHolder> bufferHolder;
+        bufferHolder.AttachNew (new csRenderBufferHolder (*fsm->bufferHolders[i]));        
+
+        // Setup the accessor to this mesh
+        bufferHolder->SetAccessor (this, 
+          CS_BUFFER_POSITION_MASK | CS_BUFFER_NORMAL_MASK | 
+          CS_BUFFER_TANGENT_MASK | CS_BUFFER_BINORMAL_MASK);          
+
+        sm->bufferHolders.Push (bufferHolder);
       }
 
     }
@@ -833,9 +855,35 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     }
   }
 
-  void AnimeshObject::Submesh::PreGetValue (csShaderVariable *variable)
-  {
+  void AnimeshObject::PreGetBuffer (csRenderBufferHolder* holder, 
+    csRenderBufferName buffer)
+  {  
+    switch (buffer)
+    {
+    case CS_BUFFER_POSITION:
+      {
+        if (!skeleton)
+        {
+          holder->SetRenderBuffer (CS_BUFFER_POSITION, factory->vertexBuffer);
+          return;
+        }
 
+        iRenderBuffer* currBuffer = holder->GetRenderBufferNoAccessor (buffer);
+        if (!currBuffer ||
+          currBuffer->GetElementCount () < factory->GetVertexCountP ())
+        {
+          csRef<iRenderBuffer> newBuf;
+          newBuf = csRenderBuffer::CreateRenderBuffer (factory->GetVertexCountP (),
+            CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
+
+          holder->SetRenderBuffer (CS_BUFFER_POSITION, newBuf);
+          currBuffer = newBuf;
+        }
+
+        SkinVertices (currBuffer);
+      }
+      break;
+    }     
   }
 
 }
