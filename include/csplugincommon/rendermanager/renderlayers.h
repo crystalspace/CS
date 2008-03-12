@@ -193,18 +193,20 @@ namespace RenderManager
     
     size_t GetMaxLightNum (size_t layer) const
     {
-      CS_ASSERT(layer == 0);
-
       return layers[layer].maxLights;
     }
 
     size_t GetMaxLightPasses (size_t layer) const
     {
-      CS_ASSERT(layer == 0);
-
       return layers[layer].maxLightPasses;
     }
 
+    /// Remove all layers
+    void Clear()
+    {
+      layers.DeleteAll ();
+      layerTypes.DeleteAll ();
+    }
   private:
     struct Layer
     {
@@ -229,8 +231,21 @@ namespace RenderManager
       (I[res] could imagine that light iteration needs another layer
       object). */
   void CS_CRYSTALSPACE_EXPORT AddDefaultBaseLayers (iObjectRegistry* objectReg,
-    MultipleRenderLayer& layers, uint flags = 0);
+    MultipleRenderLayer& layers, uint flags = 0, iShader* defaultShader = 0);
   
+  /**
+   * Read layers setup from a document node.
+   */
+  bool CS_CRYSTALSPACE_EXPORT AddLayersFromDocument (
+    iObjectRegistry* objectReg, iDocumentNode* node,
+    MultipleRenderLayer& layers);
+  
+  /**
+   * Read layers setup from a file.
+   */
+  bool CS_CRYSTALSPACE_EXPORT AddLayersFromFile (
+    iObjectRegistry* objectReg, const char* fileName,
+    MultipleRenderLayer& layers);
 }
 }
 

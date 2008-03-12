@@ -28,6 +28,7 @@ chronological order.
 	- res changed the engine portal container to use projection matrices
 	  instead of perspective parameters.
 	- res changed RenderView::UpdateFrustum() to use iPerspectiveCamera.
+	- res added helper functions to read render layers from XML.
 11-Mar-2008
 	- res fixed build errors.
 	- res fixed CS/docs/support/prepare_online_publish.sh to use the right
