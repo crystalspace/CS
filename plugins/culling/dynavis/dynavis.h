@@ -215,7 +215,7 @@ private:
 
   int scr_width, scr_height;	// Screen dimensions.
   int reduce_buf;
-  float fov, sx, sy;
+  CS::Math::Matrix4 camProj;
   csReversibleTransform cam_trans;	// Cache of the camera transform.
 
   uint32 current_vistest_nr;
