@@ -134,8 +134,6 @@ class csColliderHelper(object):
     __repr__ = _swig_repr
     InitializeCollisionWrapper = staticmethod(_cstool.csColliderHelper_InitializeCollisionWrapper)
     InitializeCollisionWrappers = staticmethod(_cstool.csColliderHelper_InitializeCollisionWrappers)
-    InitializeCollisionWrappersCollection = staticmethod(_cstool.csColliderHelper_InitializeCollisionWrappersCollection)
-    InitializeCollisionWrappersRegion = staticmethod(_cstool.csColliderHelper_InitializeCollisionWrappersRegion)
     CollideArray = staticmethod(_cstool.csColliderHelper_CollideArray)
     CollidePath = staticmethod(_cstool.csColliderHelper_CollidePath)
     TraceBeam = staticmethod(_cstool.csColliderHelper_TraceBeam)
@@ -149,8 +147,6 @@ csColliderHelper_swigregister = _cstool.csColliderHelper_swigregister
 csColliderHelper_swigregister(csColliderHelper)
 csColliderHelper_InitializeCollisionWrapper = _cstool.csColliderHelper_InitializeCollisionWrapper
 csColliderHelper_InitializeCollisionWrappers = _cstool.csColliderHelper_InitializeCollisionWrappers
-csColliderHelper_InitializeCollisionWrappersCollection = _cstool.csColliderHelper_InitializeCollisionWrappersCollection
-csColliderHelper_InitializeCollisionWrappersRegion = _cstool.csColliderHelper_InitializeCollisionWrappersRegion
 csColliderHelper_CollideArray = _cstool.csColliderHelper_CollideArray
 csColliderHelper_CollidePath = _cstool.csColliderHelper_CollidePath
 csColliderHelper_TraceBeam = _cstool.csColliderHelper_TraceBeam
