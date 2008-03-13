@@ -92,7 +92,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
           dq = dq.Unit ();
         }
       
-        dstVerts[i] = dq.Transform (*srcVerts);        
+        //dstVerts[i] = dq.Transform (*srcVerts);
+        dstVerts[i] = dq.dual.v * 2.0f + dq.real.Rotate (*srcVerts);
       }
 
       ++srcVerts;      

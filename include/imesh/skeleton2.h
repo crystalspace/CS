@@ -154,6 +154,11 @@ struct iSkeletonFactory2 : public virtual iBase
   virtual const char* GetBoneName (BoneID bone) const = 0;
 
   /**
+   * Get the highest bone ID used in skeleton
+   */
+  virtual BoneID GetTopBoneID () const = 0;
+
+  /**
    * Get the bone transform in bone space.
    * \param bone bone id to get the transform for
    * \param rot rotation quaternion

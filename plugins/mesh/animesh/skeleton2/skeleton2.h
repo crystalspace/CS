@@ -73,6 +73,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual bool HasBone (BoneID bone) const;
     virtual void SetBoneName (BoneID bone, const char* name);
     virtual const char* GetBoneName (BoneID bone) const;
+    virtual BoneID GetTopBoneID () const;
 
     virtual void GetTransformBoneSpace (BoneID bone, csQuaternion& rot, 
       csVector3& offset) const;

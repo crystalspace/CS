@@ -33,6 +33,8 @@ csShadow::csShadow () :
   wrap = 0;
   do_bbox = true;
   do_rad = true;
+  do_normals = false;
+  do_skeleton = false;
   logparent = 0;
 }
 

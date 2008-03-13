@@ -32,6 +32,7 @@
 #include "csutil/objreg.h"
 #include "imesh/skeleton2.h"
 #include "imesh/skeleton2anim.h"
+#include "csgeom/math3d.h"
 
 #include "animesh.h"
 
@@ -602,7 +603,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     csVector3& isect, float* pr, int* polygon_idx,
     iMaterialWrapper** material)
   {
-    return false;
+    return csIntersect3::BoxSegment (factory->factoryBB, csSegment3 (start, end),
+      isect, pr);
   }
 
   void AnimeshObject::SetMeshWrapper (iMeshWrapper* lp)

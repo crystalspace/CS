@@ -167,6 +167,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return boneNames[bone];
   }
 
+  BoneID SkeletonFactory::GetTopBoneID () const
+  {
+    return (BoneID)(allBones.GetSize () - 1);
+  }
+
   void SkeletonFactory::GetTransformBoneSpace (BoneID bone, csQuaternion& rot, 
     csVector3& offset) const
   {
