@@ -1,5 +1,9 @@
 1.2 branch log.
 
+13-Mar-2008
+	- Vincent merged r27274, r28613:28614, and r28618:28619 into 1.2
+	  (fix for #424 and #425, setting priority on a non-running thread had
+	  no effect, and ThreadedJobQueue SetPriority() support).
 12-Mar-2008
 	- Vincent merged r28962 and r28969 into 1.2 (fix for #70, (UTF-8 BOM
 	  trips up XML parser).

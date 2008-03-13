@@ -52,12 +52,20 @@ namespace Implementation
 
     static void Yield ();
 
+    static ThreadID GetThreadID ();
+
+    ThreadPriority GetPriority () const
+    {
+      return priority;
+    }
+
   private:
     csRef<Runnable> runnable;
 
     pthread_t threadHandle;
     
     int32 isRunning;
+    ThreadPriority priority;
   };
 
 

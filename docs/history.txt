@@ -66,6 +66,11 @@ chronological order.
 	- res fixed a copy and paste bug in xmlshader which could result in
 	  some conditions being wrongly determined to be "always true" or
 	  "always false".
+5-Feb-2008
+	- Marten redid some of the handling of thread priorities to be more
+	  robust.
+	- Sueastside redid his ThreadedJobQueue, should work now after Marten's
+	  changes.
 2-Feb-2008
 	- res fixed "short" (h) and "short short" (hh) handling to only cast
 	  to a signed char/short when formatting to a decimal integer; cast to
@@ -597,6 +602,9 @@ chronological order.
 	  trac #192.
 	- Marten fixed event constraint in viewmesh between viewmesh itself
 	  and CEGUI. Solves trac #332.
+20-Jul-2007
+	- Marten added a CS::Threading::Thread::GetThreadID function and
+	  backend implementations.
 19-Jul-2007
 	- Eric Sunshine eliminated several compilation and deprecation warnings
 	  on Mac OS X.

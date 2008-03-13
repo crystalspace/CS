@@ -43,7 +43,7 @@ class CS_CRYSTALSPACE_EXPORT ThreadedJobQueue :
   public scfImplementation1<ThreadedJobQueue, iJobQueue>
 {
 public:
-  ThreadedJobQueue (size_t numWorkers = 1);
+  ThreadedJobQueue (size_t numWorkers = 1, ThreadPriority priority = THREAD_PRIO_NORMAL);
   virtual ~ThreadedJobQueue ();
 
   virtual void Enqueue (iJob* job);

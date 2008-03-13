@@ -30,7 +30,7 @@ namespace CS
 namespace Threading
 {
 
-  ThreadedJobQueue::ThreadedJobQueue (size_t numWorkers)
+  ThreadedJobQueue::ThreadedJobQueue (size_t numWorkers, ThreadPriority priority)
     : scfImplementationType (this), 
     numWorkerThreads (csMin<size_t> (MAX_WORKER_THREADS, numWorkers)), 
     shutdownQueue (false)
@@ -39,6 +39,7 @@ namespace Threading
     for (size_t i = 0; i < numWorkerThreads; ++i)
     {
       allThreadState[i] = new ThreadState (this);
+      allThreadState[i]->threadObject->SetPriority(priority);
       allThreads.Add (allThreadState[i]->threadObject);
     }
     allThreads.StartAll ();

@@ -59,6 +59,13 @@ namespace Implementation
       csSleep (0);
     }
 
+    static CS::Threading::ThreadID GetThreadID ();
+
+    ThreadPriority GetPriority () const
+    {
+      return priority;
+    }
+
   private:
     csRef<Runnable> runnable;
 
@@ -66,6 +73,7 @@ namespace Implementation
     uint threadId;
 
     int32 isRunning;
+    ThreadPriority priority;
   };
 
 
