@@ -9,6 +9,7 @@ chronological order.
 13-Mar-2008
 	- Marten fixed the placement of some deprecation warning disable
 	  /enable includes. Eliminated some 8000 wrong warnings on MSVC9.
+	- Marten fixed a broken include guard.
 12-Mar-2008
 	- caedes implemented some empty methods in bullet physics plugin:
 	  - csBulletCollider: IsStatic
