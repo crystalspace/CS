@@ -533,23 +533,23 @@ void csDynaVis::UpdateObject (csVisibilityObjectWrapper* visobj_wrap)
 namespace
 {
 
+void Perspective (const csVector3& v, csVector2& p,
+  const CS::Math::Matrix4& proj, int screenWidth, int screenHeight)
+{
+  csVector4 v_proj (proj * csVector4 (v, 1));
+  float inv_w = 1.0f/v_proj.w;
+  p.x = (v_proj.x * inv_w + 1) * screenWidth/2;
+  p.y = (v_proj.y * inv_w + 1) * screenHeight/2;
+}
+
 // Version to cope with z <= 0. This is wrong but it in the places where
 // it is used below the result is acceptable because it generates a
 // conservative result (i.e. a box or outline that is bigger then reality).
 void PerspectiveWrong (const csVector3& v, csVector2& p,
   const CS::Math::Matrix4& proj, int screenWidth, int screenHeight)
 {
-  csVector4 v_proj (proj * csVector4 (v.x, v.y, 0.1f, 1));
-  p.x = (v_proj.x / v_proj.w) * screenWidth;
-  p.y = (v_proj.y / v_proj.w) * screenHeight;
-}
-
-void Perspective (const csVector3& v, csVector2& p,
-  const CS::Math::Matrix4& proj, int screenWidth, int screenHeight)
-{
-  csVector4 v_proj (proj * csVector4 (v, 1));
-  p.x = (v_proj.x / v_proj.w) * screenWidth;
-  p.y = (v_proj.y / v_proj.w) * screenHeight;
+  csVector3 v_new (v.x, v.y, 0.1f);
+  Perspective (v_new, p, proj, screenWidth, screenHeight);
 }
 
 bool PrintObjects (csKDTree* treenode, void*, uint32, uint32&)
