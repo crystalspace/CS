@@ -1004,6 +1004,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     scfArrayWrap<iLightInfluenceArray, csSafeCopyArray<csLightInfluence> > 
       relevantLightsWrap (relevant_lights); //Yes, know, its on the stack...
 
+    relevant_lights.DeleteAll();
     factory->light_mgr->GetRelevantLights (logparent, &relevantLightsWrap, -1);
   }
 

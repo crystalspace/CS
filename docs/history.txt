@@ -9,6 +9,7 @@ chronological order.
 14-Mar-2008
 	- res fixed perspective projection in csTiledCoverageBuffer/csOBB/
 	  csBox3 for the range of the projected coords.
+	- res fixed a leak in genmesh.
 12-Mar-2008
 	- caedes implemented some empty methods in bullet physics plugin:
 	  - csBulletCollider: IsStatic
