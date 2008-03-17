@@ -10,6 +10,8 @@ chronological order.
 	- res fixed the LinkWith jam rule to not add LFLAGS from the
 	  dependencies of the requested libraries piecemeal: this breaks
 	  static building.
+	- Mike Gist added support for compressed normal maps to the
+	  parallax and parallaxAtt shaders.
 13-Mar-2008
 	- Marten fixed the placement of some deprecation warning disable
 	  /enable includes. Eliminated some 8000 wrong warnings on MSVC9.
