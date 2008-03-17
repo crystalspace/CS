@@ -17,8 +17,8 @@
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_UTIL_EVENTHANDLERS_H__
-#define __CS_UTIL_EVENTHANDLERS_H__
+#ifndef __CS_CSUTIL_EVENTHANDLERS_H__
+#define __CS_CSUTIL_EVENTHANDLERS_H__
 
 #include "cssysdef.h"
 #include "csextern.h"
@@ -515,4 +515,5 @@ CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
   return 0;								\
 }
 
-#endif // __CS_UTIL_EVENTHANDLERS_H__
+#endif // __CS_CSUTIL_EVENTHANDLERS_H__
+

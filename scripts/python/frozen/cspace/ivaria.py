@@ -1330,6 +1330,18 @@ iTerraSampler_swigregister = _ivaria.iTerraSampler_swigregister
 iTerraSampler_swigregister(iTerraSampler)
 iTerraSampler_scfGetVersion = _ivaria.iTerraSampler_scfGetVersion
 
+class iTranslator(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetMsg(*args): return _ivaria.iTranslator_GetMsg(*args)
+    scfGetVersion = staticmethod(_ivaria.iTranslator_scfGetVersion)
+    __swig_destroy__ = _ivaria.delete_iTranslator
+    __del__ = lambda self : None;
+iTranslator_swigregister = _ivaria.iTranslator_swigregister
+iTranslator_swigregister(iTranslator)
+iTranslator_scfGetVersion = _ivaria.iTranslator_scfGetVersion
+
 def CS_REQUEST_REPORTERLISTENER ():
   return core.CS_REQUEST_PLUGIN("crystalspace.utilities.stdrep",
     iStandardReporterListener)

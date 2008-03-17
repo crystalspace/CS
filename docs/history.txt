@@ -20,10 +20,17 @@ chronological order.
 	  component.
 	- res fixed some assertions caused by the new camera stuff.
 	- res added the rendermanager plugins to the walktest plugins list.
+	- res fixed the LinkWith jam rule to not add LFLAGS from the
+	  dependencies of the requested libraries piecemeal: this breaks
+	  static building.
 14-Mar-2008
 	- res fixed perspective projection in csTiledCoverageBuffer/csOBB/
 	  csBox3 for the range of the projected coords.
 	- res fixed a leak in genmesh.
+13-Mar-2008
+	- Marten fixed the placement of some deprecation warning disable
+	  /enable includes. Eliminated some 8000 wrong warnings on MSVC9.
+	- Marten fixed a broken include guard.
 12-Mar-2008
 	- caedes implemented some empty methods in bullet physics plugin:
 	  - csBulletCollider: IsStatic

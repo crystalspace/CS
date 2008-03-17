@@ -762,6 +762,38 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iStringSet ##############
+
+package cspace::iStringSet;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*scfGetVersion = *cspacec::iStringSet_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iStringSet($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csStringIDSet ##############
 
 package cspace::csStringIDSet;
@@ -1823,38 +1855,6 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         cspacec::delete_iObjectIterator($self);
-        delete $OWNER{$self};
-    }
-}
-
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iStringSet ##############
-
-package cspace::iStringSet;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace );
-%OWNER = ();
-%ITERATORS = ();
-*scfGetVersion = *cspacec::iStringSet_scfGetVersion;
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_iStringSet($self);
         delete $OWNER{$self};
     }
 }
@@ -7796,6 +7796,39 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iTranslator ##############
+
+package cspace::iTranslator;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*GetMsg = *cspacec::iTranslator_GetMsg;
+*scfGetVersion = *cspacec::iTranslator_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iTranslator($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iShaderVarStringSetBase ##############
 
 package cspace::iShaderVarStringSetBase;
@@ -8882,6 +8915,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *PerformExtension = *cspacec::iGraphics3D_PerformExtension;
 *GetWorldToCamera = *cspacec::iGraphics3D_GetWorldToCamera;
 *GetCurrentDrawFlags = *cspacec::iGraphics3D_GetCurrentDrawFlags;
+*GetProjectionMatrix = *cspacec::iGraphics3D_GetProjectionMatrix;
+*SetProjectionMatrix = *cspacec::iGraphics3D_SetProjectionMatrix;
 *scfGetVersion = *cspacec::iGraphics3D_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -17636,6 +17671,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *ResetWorldSpecificSettings = *cspacec::iEngine_ResetWorldSpecificSettings;
 *GetRenderManager = *cspacec::iEngine_GetRenderManager;
 *FireStartFrame = *cspacec::iEngine_FireStartFrame;
+*CreatePerspectiveCamera = *cspacec::iEngine_CreatePerspectiveCamera;
+*CreateCustomMatrixCamera = *cspacec::iEngine_CreateCustomMatrixCamera;
 *scfGetVersion = *cspacec::iEngine_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -17730,6 +17767,10 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetOnlyPortals = *cspacec::iCamera_GetOnlyPortals;
 *AddCameraSectorListener = *cspacec::iCamera_AddCameraSectorListener;
 *RemoveCameraSectorListener = *cspacec::iCamera_RemoveCameraSectorListener;
+*GetProjectionMatrix = *cspacec::iCamera_GetProjectionMatrix;
+*GetVisibleVolume = *cspacec::iCamera_GetVisibleVolume;
+*SetViewportSize = *cspacec::iCamera_SetViewportSize;
+*GetInvProjectionMatrix = *cspacec::iCamera_GetInvProjectionMatrix;
 *scfGetVersion = *cspacec::iCamera_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -17738,6 +17779,79 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         cspacec::delete_iCamera($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iPerspectiveCamera ##############
+
+package cspace::iPerspectiveCamera;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*GetCamera = *cspacec::iPerspectiveCamera_GetCamera;
+*GetFOV = *cspacec::iPerspectiveCamera_GetFOV;
+*GetInvFOV = *cspacec::iPerspectiveCamera_GetInvFOV;
+*GetFOVAngle = *cspacec::iPerspectiveCamera_GetFOVAngle;
+*SetFOV = *cspacec::iPerspectiveCamera_SetFOV;
+*SetFOVAngle = *cspacec::iPerspectiveCamera_SetFOVAngle;
+*GetShiftX = *cspacec::iPerspectiveCamera_GetShiftX;
+*GetShiftY = *cspacec::iPerspectiveCamera_GetShiftY;
+*SetPerspectiveCenter = *cspacec::iPerspectiveCamera_SetPerspectiveCenter;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iPerspectiveCamera($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iCustomMatrixCamera ##############
+
+package cspace::iCustomMatrixCamera;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*GetCamera = *cspacec::iCustomMatrixCamera_GetCamera;
+*SetProjectionMatrix = *cspacec::iCustomMatrixCamera_SetProjectionMatrix;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iCustomMatrixCamera($self);
         delete $OWNER{$self};
     }
 }

@@ -32,6 +32,8 @@
 #include "ivideo/txtmgr.h"
 #include "imap/streamsource.h"
 
+#include "csutil/deprecated_warn_off.h"
+
 struct iCollection;
 struct iDocumentNode;
 struct iImage;
@@ -741,8 +743,6 @@ struct iLoader : public virtual iBase
     bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0) = 0;
 
-#include "csutil/deprecated_warn_on.h"
-
   /**
   * Set whether to load each file into a separate region.
   * \deprecated Deprecated in 1.3. Use the iCollections instead.
@@ -759,6 +759,8 @@ struct iLoader : public virtual iBase
 };
 
 /** @} */
+
+#include "csutil/deprecated_warn_on.h"
 
 #endif // __CS_IMAP_PARSER_H__
 

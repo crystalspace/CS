@@ -7762,6 +7762,40 @@ fail:
 SWIGINTERN PyObject *_wrap_new_csVector4__SWIG_7(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csVector3 *arg1 = 0 ;
+  float arg2 ;
+  csVector4 *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  float val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"new_csVector4",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_csVector4" "', argument " "1"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_csVector4" "', argument " "1"" of type '" "csVector3 const &""'"); 
+  }
+  arg1 = reinterpret_cast< csVector3 * >(argp1);
+  ecode2 = SWIG_AsVal_float(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_csVector4" "', argument " "2"" of type '" "float""'");
+  } 
+  arg2 = static_cast< float >(val2);
+  result = (csVector4 *)new csVector4((csVector3 const &)*arg1,arg2);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csVector4, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_new_csVector4__SWIG_8(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csVector3 *arg1 = 0 ;
   csVector4 *result = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -7818,7 +7852,7 @@ SWIGINTERN PyObject *_wrap_new_csVector4(PyObject *self, PyObject *args) {
     int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_csVector3, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
-      return _wrap_new_csVector4__SWIG_7(self, args);
+      return _wrap_new_csVector4__SWIG_8(self, args);
     }
   }
   if (argc == 1) {
@@ -7829,6 +7863,20 @@ SWIGINTERN PyObject *_wrap_new_csVector4(PyObject *self, PyObject *args) {
     }
     if (_v) {
       return _wrap_new_csVector4__SWIG_1(self, args);
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_csVector3, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_float(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        return _wrap_new_csVector4__SWIG_7(self, args);
+      }
     }
   }
   if (argc == 2) {
@@ -7899,7 +7947,7 @@ SWIGINTERN PyObject *_wrap_new_csVector4(PyObject *self, PyObject *args) {
   }
   
 fail:
-  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'new_csVector4'.\n  Possible C/C++ prototypes are:\n    csVector4()\n    csVector4(float const &)\n    csVector4(float,float,float,float)\n    csVector4(float,float,float)\n    csVector4(float,float)\n    csVector4(csVector4 const &)\n    csVector4(csVector4T<float > const &)\n    csVector4(csVector3 const &)\n");
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'new_csVector4'.\n  Possible C/C++ prototypes are:\n    csVector4()\n    csVector4(float const &)\n    csVector4(float,float,float,float)\n    csVector4(float,float,float)\n    csVector4(float,float)\n    csVector4(csVector4 const &)\n    csVector4(csVector4T<float > const &)\n    csVector4(csVector3 const &,float)\n    csVector4(csVector3 const &)\n");
   return NULL;
 }
 
