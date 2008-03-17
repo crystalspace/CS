@@ -78,7 +78,6 @@ public:
     iVisibilityCuller* culler = sector->GetVisibilityCuller ();
     Viscull<RenderTreeType> (context, rview, culler);
 
-
     // Set up all portals
     {
       recurseCount++;
@@ -149,6 +148,8 @@ bool RMUnshadowed::RenderView (iView* view)
   rview.AttachNew (new (treePersistent.renderViewPool) 
     CS::RenderManager::RenderView(view));
 #include "csutil/custom_new_enable.h"
+  view->GetCamera()->SetViewportSize (rview->GetGraphics3D()->GetWidth(),
+    rview->GetGraphics3D()->GetHeight());
   view->GetEngine ()->UpdateNewFrame ();  
   view->GetEngine ()->FireStartFrame (rview);
 

@@ -316,6 +316,7 @@ namespace RenderManager
 	    {
               SetupWarp (inewcam, holder.meshWrapper->GetMovable(), portal);
 	    }
+	    inewcam->SetViewportSize (real_w, real_h);
 	    inewcam->SetPerspectiveCenter (cam->GetShiftX() - sb_minX,
 	      real_h - (sb_maxY - cam->GetShiftY()));
             /* Visible cracks can occur on portal borders when the geometry
