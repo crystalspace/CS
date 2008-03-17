@@ -58,6 +58,8 @@ WALKALL.PLUGINLIST =
   rendloop_loader
   rendstep_std
   reporter
+  rm_rlcompat
+  rm_unshadowed
   sequence
   shadermgr
   simpleformer

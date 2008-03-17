@@ -19,6 +19,7 @@ chronological order.
 	- res added some missing per-frame housekeeping to the light setup RM
 	  component.
 	- res fixed some assertions caused by the new camera stuff.
+	- res added the rendermanager plugins to the walktest plugins list.
 14-Mar-2008
 	- res fixed perspective projection in csTiledCoverageBuffer/csOBB/
 	  csBox3 for the range of the projected coords.
