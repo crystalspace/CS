@@ -8,6 +8,8 @@ chronological order.
 
 17-Mar-2008
 	- res added getting the inverse projection to iCamera.
+	- res added creating a custom projection matrix camera from an
+	  existing camera.
 14-Mar-2008
 	- res fixed perspective projection in csTiledCoverageBuffer/csOBB/
 	  csBox3 for the range of the projected coords.

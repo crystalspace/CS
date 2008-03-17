@@ -176,7 +176,7 @@ struct iEngineSectorCallback : public virtual iBase
  */
 struct iEngine : public virtual iBase
 {
-  SCF_INTERFACE(iEngine, 3, 0, 1);
+  SCF_INTERFACE(iEngine, 3, 0, 2);
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;
@@ -1425,8 +1425,11 @@ struct iEngine : public virtual iBase
 
   /**
    * Create a new custom projection camera.
+   * \param copyFrom If given, the new camera's initial tranform, settings 
+   *   and projection matrix are copied from that camera.
    */
-  virtual csPtr<iCustomMatrixCamera> CreateCustomMatrixCamera () = 0;
+  virtual csPtr<iCustomMatrixCamera> CreateCustomMatrixCamera (
+    iCamera* copyFrom = 0) = 0;
   /** @} */
 };
 
