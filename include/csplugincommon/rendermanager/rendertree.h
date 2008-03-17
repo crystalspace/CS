@@ -182,8 +182,6 @@ namespace RenderManager
       csDirtyAccessArray<iShader*> shaderArray;
       csArray<size_t> ticketArray;
 
-      csArray<int> stencilState; // @@@ Needed by stencil shadows
-
       // Total number of render meshes within the context, just for statistics
       size_t totalRenderMeshes;
       
@@ -285,7 +283,7 @@ namespace RenderManager
       }
       else
       {
-        contexts.Push (newCtx);      
+        contexts.Push (newCtx);
       }
 
       return newCtx;
