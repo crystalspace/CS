@@ -42,6 +42,12 @@ namespace RenderManager
     {
       csArray<size_t> newLayerIndices;
       csArray<size_t> newLayerCounts;
+      
+      void UpdateNewFrame()
+      {
+        newLayerIndices.DeleteAll();
+        newLayerCounts.DeleteAll();
+      }
     };
 
     LayerHelper (PersistentData& persist, 
@@ -109,6 +115,11 @@ namespace RenderManager
     struct PersistentData
     {
       csArray<IndexLightTypePair> lightTypeScratch;
+      
+      void UpdateNewFrame()
+      {
+        lightTypeScratch.DeleteAll();
+      }
     };
 
     LightingSorter (PersistentData& persist,
@@ -218,6 +229,7 @@ namespace RenderManager
       }
       void UpdateNewFrame ()
       {
+        lightSorterPersist.UpdateNewFrame();
         varsHelperPersist.UpdateNewFrame();
       }
 
@@ -540,6 +552,7 @@ namespace RenderManager
       void UpdateNewFrame ()
       {
         shadowPersist.UpdateNewFrame();
+        layerPersist.UpdateNewFrame();
       }
     };
 

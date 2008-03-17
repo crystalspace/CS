@@ -16,6 +16,8 @@ chronological order.
 	- res added an optional specification of the render dimensions to
 	  the iView* version of iVisibilityCuller::VisTest(). This is needed
 	  since at least dynavis is resolution-dependent.
+	- res added some missing per-frame housekeeping to the light setup RM
+	  component.
 14-Mar-2008
 	- res fixed perspective projection in csTiledCoverageBuffer/csOBB/
 	  csBox3 for the range of the projected coords.
