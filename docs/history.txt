@@ -13,6 +13,9 @@ chronological order.
 	- res added getting the inverse projection to iCamera.
 	- res added creating a custom projection matrix camera from an
 	  existing camera.
+	- res added an optional specification of the render dimensions to
+	  the iView* version of iVisibilityCuller::VisTest(). This is needed
+	  since at least dynavis is resolution-dependent.
 14-Mar-2008
 	- res fixed perspective projection in csTiledCoverageBuffer/csOBB/
 	  csBox3 for the range of the projected coords.

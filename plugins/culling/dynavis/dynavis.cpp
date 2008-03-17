@@ -1741,7 +1741,8 @@ static bool Dummy_Front2Back (csKDTree* treenode, void*,
 }
 
 bool csDynaVis::VisTest (iRenderView* rview, 
-			 iVisibilityCullerListener* viscallback)
+			 iVisibilityCullerListener* viscallback, 
+			 int renderW, int renderH)
 {
   // We update the objects before testing the callback so that
   // we can use this VisTest() call to make sure the objects in the
@@ -1816,6 +1817,13 @@ bool csDynaVis::VisTest (iRenderView* rview,
   }
 
   // Initialize the coverage buffer to all empty.
+  int old_scr_w = scr_width, old_scr_h = scr_height;
+  if ((renderW != 0) && (renderH != 0))
+  {
+    scr_width = renderW;
+    scr_height = renderH;
+  }
+  tcovbuf->SetSize (scr_width, scr_height);
   tcovbuf->Initialize ();
 
   // Initialize the write queue to empty.
@@ -1828,6 +1836,7 @@ bool csDynaVis::VisTest (iRenderView* rview,
   // so that all is marked invisible and rendering goes faster.
   if (bugplug && bugplug->CheckDebugSector ())
   {
+    scr_width = old_scr_w; scr_height = old_scr_h;
     return true;
   }
 
@@ -1847,7 +1856,7 @@ bool csDynaVis::VisTest (iRenderView* rview,
     {
       iClipper2D* clipper = rview->GetClipper ();
       tcovbuf->InsertPolygonInverted (clipper->GetClipPoly (),
-    	  clipper->GetVertexCount (), .01f);
+    	clipper->GetVertexCount (), .01f);
     }
   }
 
@@ -1902,6 +1911,7 @@ bool csDynaVis::VisTest (iRenderView* rview,
 
   do_state_dump = false;
 
+  scr_width = old_scr_w; scr_height = old_scr_h;
   return true;
 }
 

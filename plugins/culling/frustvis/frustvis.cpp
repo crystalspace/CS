@@ -489,7 +489,7 @@ void csFrustumVis::FrustTest_Traverse (csKDTree* treenode,
 }
 
 bool csFrustumVis::VisTest (iRenderView* rview, 
-                            iVisibilityCullerListener* viscallback)
+                            iVisibilityCullerListener* viscallback, int, int)
 {
   // We update the objects before testing the callback so that
   // we can use this VisTest() call to make sure the objects in the

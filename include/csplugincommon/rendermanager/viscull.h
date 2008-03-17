@@ -58,7 +58,7 @@ namespace RenderManager
 
       virtual void ObjectVisible (iVisibilityObject *visobject, 
         iMeshWrapper *imesh, uint32 frustum_mask)
-      {        
+      {
         if (!(filter && filter->IsMeshFiltered (imesh)))
         {
           // Todo: Handle static lod & draw distance
@@ -76,7 +76,7 @@ namespace RenderManager
           sm.meshObjSVs = imesh->GetSVContext();
           sm.zmode = zmode;
           sm.bbox = imesh->GetWorldBoundingBox(); // @@@ Use RM bbox
-
+          
           // Add it to the appropriate meshnode
           for (int i = 0; i < numMeshes; ++i)
           {
@@ -120,7 +120,16 @@ namespace RenderManager
     CS::Utility::MeshFilter* filter = &rw->GetMeshFilter();
     CS::RenderManager::Implementation::ViscullCallback<RenderTree> cb (context, rw, filter);
 
-    culler->VisTest (rw, &cb);
+    int renderW = 0, renderH = 0;
+    for (int a = 0; a < rtaNumAttachments; a++)
+    {
+      if (context.renderTargets[a].texHandle != 0)
+      {
+        context.renderTargets[a].texHandle->GetRendererDimensions (
+          renderW, renderH);
+      }
+    }
+    culler->VisTest (rw, &cb, renderW, renderH);
 
     return true;
   }
