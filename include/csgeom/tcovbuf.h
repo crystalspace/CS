@@ -561,6 +561,13 @@ public:
 
   /// Setup coverage buffer for given size.
   void Setup (int w, int h);
+  
+  void SetSize (int w, int h)
+  {
+    if ((w > width_po2) || (h > height_64)) Setup (w, h);
+    width = w;
+    height = h;
+  }
 
   /// Initialize the coverage buffer to empty.
   void Initialize ();
