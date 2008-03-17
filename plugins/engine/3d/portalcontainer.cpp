@@ -1114,8 +1114,9 @@ public:
   void AddVertex (float x, float y)
   {
     PerspectiveOutlet2D::AddVertex (x, y);
-    csVector2 p (x, y);
-    dest3D.AddVertex (cam->InvPerspective (p, Z_NEAR));
+    csVector4 p (x, y, 1.0f/Z_NEAR, 1);
+    csVector4 p3d (cam->GetInvProjectionMatrix() * p);
+    dest3D.AddVertex (csVector3 (p3d[0], p3d[1], p3d[2]));
   }
   bool ClipAgainst (iClipper2D* clipper)
   {
