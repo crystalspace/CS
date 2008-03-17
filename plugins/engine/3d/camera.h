@@ -84,7 +84,7 @@ protected:
 public:
   ///
   csCameraBase ();
-  csCameraBase (const csCameraBase& other);
+  csCameraBase (const csCameraBase* other);
   ///
   virtual ~csCameraBase ();
 
@@ -346,7 +346,7 @@ public:
 
 class PerspectiveImpl : public iPerspectiveCamera
 {
-  protected:
+protected:
   ///
   float aspect;
   static float default_aspect;
@@ -365,11 +365,14 @@ class PerspectiveImpl : public iPerspectiveCamera
   void ComputeAngle (float width);
   static void ComputeDefaultAngle (float width);
 
-  uint projNumber;
-  uint matrixProjNumber;
   CS::Math::Matrix4 matrix;
+  CS::Math::Matrix4 invMatrix;
+  bool matrixDirty;
+  bool invMatrixDirty;
   
+  virtual void Dirtify () { matrixDirty = true; }
   void UpdateMatrix ();
+  void UpdateInvMatrix ();
 public:
   PerspectiveImpl ();
   
@@ -418,7 +421,7 @@ public:
   void SetPerspectiveCenter (float x, float y)
   {
     shift_x = x; shift_y = y; 
-    projNumber++;
+    Dirtify ();
   } 
 
   /// Calculate perspective corrected point for this camera.
@@ -446,6 +449,13 @@ public:
     UpdateMatrix ();
     return matrix;
   }
+  
+  const CS::Math::Matrix4& GetInvProjectionMatrix ()
+  {
+    UpdateMatrix ();
+    UpdateInvMatrix ();
+    return invMatrix;
+  }
 };
 
 // Helper to forward iCamera perspective methods to a PerspectiveImpl instance
@@ -462,7 +472,7 @@ class CameraPerspectiveProxy : public csCameraBase
 public:
   CameraPerspectiveProxy() : csCameraBase(), vp_width (0), vp_height (0) {}
   CameraPerspectiveProxy (const CameraPerspectiveProxy* other)
-    : csCameraBase (*other), vp_width (other->vp_width),
+    : csCameraBase (other), vp_width (other->vp_width),
       vp_height (other->vp_height) {}
 
   void SetFOV (int a, int width)
@@ -543,19 +553,20 @@ class csCameraPerspective :
                                CameraPerspectiveProxy<csCameraPerspective>,
                                scfFakeInterface<iPerspectiveCamera> >
 {
-  uint clipPlanesProjNr;
+  bool clipPlanesDirty;
   csPlane3 clipPlanes[6];
   uint32 clipPlanesMask;
   
   void UpdateClipPlanes();
+  void Dirtify () { PerspectiveImpl::Dirtify(); clipPlanesDirty = true; }
 public:
   csCameraPerspective ()
     : PerspectiveImpl (), scfImplementationType (this),
-      clipPlanesProjNr (~0) {}
+      clipPlanesDirty (true) {}
 
   csCameraPerspective (const csCameraPerspective& other)
    : PerspectiveImpl (other), scfImplementationType (this, &other),
-     clipPlanesProjNr (~0) {}
+     clipPlanesDirty (true) {}
 
   csPtr<iCamera> Clone () const
   {
@@ -567,6 +578,11 @@ public:
   const CS::Math::Matrix4& GetProjectionMatrix ()
   {
     return PerspectiveImpl::GetProjectionMatrix ();
+  }
+  
+  const CS::Math::Matrix4& GetInvProjectionMatrix ()
+  {
+    return PerspectiveImpl::GetInvProjectionMatrix ();
   }
   
   const csPlane3* GetVisibleVolume (uint32& mask)
@@ -584,12 +600,17 @@ class csCameraCustomMatrix :
 
 {
   CS::Math::Matrix4 matrix;
+  CS::Math::Matrix4 invMatrix;
+  bool invMatrixDirty;
   bool clipPlanesDirty;
   csPlane3 clipPlanes[6];
   uint32 clipPlanesMask;
+
+  void UpdateInvMatrix ();
 public:
   csCameraCustomMatrix () : scfImplementationType (this), 
-    clipPlanesDirty (false) {}
+    invMatrixDirty (true), clipPlanesDirty (true) {}
+  csCameraCustomMatrix (csCameraBase* other);
     
   csPtr<iCamera> Clone () const
   {
@@ -601,7 +622,16 @@ public:
   const CS::Math::Matrix4& GetProjectionMatrix ()
   { return matrix; }
   void SetProjectionMatrix (const CS::Math::Matrix4& m)
-  { matrix = m; }
+  {
+    matrix = m;
+    clipPlanesDirty = true;
+    invMatrixDirty = true; 
+  }
+  const CS::Math::Matrix4& GetInvProjectionMatrix ()
+  { 
+    UpdateInvMatrix ();
+    return invMatrix; 
+  }
   
   const csPlane3* GetVisibleVolume (uint32& mask);
 };

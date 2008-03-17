@@ -3316,9 +3316,14 @@ csPtr<iPerspectiveCamera> csEngine::CreatePerspectiveCamera ()
   return csPtr<iPerspectiveCamera> (cam);
 }
 
-csPtr<iCustomMatrixCamera> csEngine::CreateCustomMatrixCamera ()
+csPtr<iCustomMatrixCamera> csEngine::CreateCustomMatrixCamera (
+  iCamera* copyFrom)
 {
-  csCameraCustomMatrix* cam = new csCameraCustomMatrix ();
+  csCameraCustomMatrix* cam;
+  if (copyFrom)
+    cam = new csCameraCustomMatrix (static_cast<csCameraBase*> (copyFrom));
+  else
+    cam = new csCameraCustomMatrix ();
   return csPtr<iCustomMatrixCamera> (cam);
 }
 

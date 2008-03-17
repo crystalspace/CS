@@ -505,7 +505,7 @@ public:
 
   virtual csPtr<iCamera> CreateCamera ();
   virtual csPtr<iPerspectiveCamera> CreatePerspectiveCamera ();
-  virtual csPtr<iCustomMatrixCamera> CreateCustomMatrixCamera ();
+  virtual csPtr<iCustomMatrixCamera> CreateCustomMatrixCamera (iCamera* copyFrom = 0);
 
   virtual iCameraPosition* FindCameraPosition (const char* name,
     iBase* base = 0);

@@ -37,15 +37,17 @@ csCameraBase::csCameraBase () : scfImplementationType (this), fp (0)
   only_portals = true;
 }
 
-csCameraBase::csCameraBase (const csCameraBase& other)
-  : scfImplementationType (this), fp (0)
+csCameraBase::csCameraBase (const csCameraBase* other)
+  : scfImplementationType (this)
 {
-  *this = other;
+  *this = *other;
   if (fp)
   {
     // Make a copy of the plane.
     fp = new csPlane3 (*fp);
   }
+  // Listeners are not supposed to be cloned
+  listeners.DeleteAll();
   BumpCamera();
 }
 
@@ -163,7 +165,7 @@ float PerspectiveImpl:: default_inv_aspect = 0;
 float PerspectiveImpl:: default_fov_angle = 90;
 
 PerspectiveImpl::PerspectiveImpl ()
-  : projNumber (0), matrixProjNumber (~0)
+  : matrixDirty (true), invMatrixDirty (true)
 {
   aspect = default_aspect;
   inv_aspect = default_inv_aspect;
@@ -229,7 +231,7 @@ void PerspectiveImpl::SetFOVAngle (float a, float width)
   // set the other neccessary variables
   inv_aspect = 1.0f / aspect;
   fov_angle = a;
-  projNumber++;
+  Dirtify();
 }
 
 void PerspectiveImpl::ComputeAngle (float width)
@@ -240,7 +242,7 @@ void PerspectiveImpl::ComputeAngle (float width)
       rview_fov * rview_fov + disp_width * disp_width);
   fov_angle = 2.0f * (float)acos (disp_width * inv_disp_radius)
   	* (360.0f / TWO_PI);
-  projNumber++;
+  Dirtify();
 }
 
 void PerspectiveImpl::ComputeDefaultAngle (float width)
@@ -255,20 +257,29 @@ void PerspectiveImpl::ComputeDefaultAngle (float width)
 
 void PerspectiveImpl::UpdateMatrix ()
 {
-  if (projNumber == matrixProjNumber)
-    return;
+  if (!matrixDirty) return;
   
   matrix = CS::Math::Projections::CSPerspective (1.0f, 
     aspect, shift_x, shift_y*aspect, inv_aspect);
   
-  matrixProjNumber = projNumber;
+  matrixDirty = false;
+  invMatrixDirty = true;
+}
+
+void PerspectiveImpl::UpdateInvMatrix ()
+{
+  if (!invMatrixDirty) return;
+  
+  invMatrix = matrix.GetInverse();
+  
+  invMatrixDirty = false;
 }
 
 //---------------------------------------------------------------------------
 
 void csCameraPerspective::UpdateClipPlanes()
 {
-  if (clipPlanesProjNr == projNumber) return;
+  if (!clipPlanesDirty) return;
   
   float lx, rx, ty, by;
   lx = -shift_x * inv_aspect;
@@ -301,9 +312,33 @@ void csCameraPerspective::UpdateClipPlanes()
     clipPlanesMask |= 0x20;
   }
   
-  clipPlanesProjNr = projNumber;
+  clipPlanesDirty = false;
 }
 //---------------------------------------------------------------------------
+
+csCameraCustomMatrix::csCameraCustomMatrix (csCameraBase* other)
+  : scfImplementationType (this, other), invMatrixDirty (true),
+    clipPlanesDirty (true)
+{
+  if (fp)
+  {
+    // Make a copy of the plane.
+    fp = new csPlane3 (*fp);
+  }
+  // Listeners are not supposed to be cloned
+  listeners.DeleteAll();
+  matrix = other->GetProjectionMatrix();
+  BumpCamera();
+}
+
+void csCameraCustomMatrix::UpdateInvMatrix ()
+{
+  if (!invMatrixDirty) return;
+  
+  invMatrix = matrix.GetInverse();
+  
+  invMatrixDirty = false;
+}
 
 static csVector3 xyz (const csVector4 v)
 {
@@ -314,39 +349,41 @@ const csPlane3* csCameraCustomMatrix::GetVisibleVolume (uint32& mask)
 {
   if (clipPlanesDirty)
   {
-    CS::Math::Matrix4 invProjection (matrix.GetInverse());
+    UpdateInvMatrix();
     
-    const float A = 0.5f;
-    const csVector3 nbl (xyz (invProjection * csVector4 (-A, -A, -A, 1)));
-    const csVector3 nbr (xyz (invProjection * csVector4 ( A, -A, -A, 1)));
-    const csVector3 ntr (xyz (invProjection * csVector4 ( A,  A, -A, 1)));
-    const csVector3 ntl (xyz (invProjection * csVector4 (-A,  A, -A, 1)));
-    const csVector3 fbl (xyz (invProjection * csVector4 (-A, -A,  A, 1)));
-    const csVector3 fbr (xyz (invProjection * csVector4 ( A, -A,  A, 1)));
-    const csVector3 ftr (xyz (invProjection * csVector4 ( A,  A,  A, 1)));
-    const csVector3 ftl (xyz (invProjection * csVector4 (-A,  A,  A, 1)));
+    const float A = 1.0f;
+    const csVector3 nbl (xyz (invMatrix * csVector4 (-A, -A, 1, -A)));
+    const csVector3 nbr (xyz (invMatrix * csVector4 ( A, -A, 1, -A)));
+    const csVector3 ntr (xyz (invMatrix * csVector4 ( A,  A, 1, -A)));
+    const csVector3 ntl (xyz (invMatrix * csVector4 (-A,  A, 1, -A)));
+    const csVector3 fbl (xyz (invMatrix * csVector4 (-A, -A, 1,  A)));
+    const csVector3 fbr (xyz (invMatrix * csVector4 ( A, -A, 1,  A)));
+    const csVector3 ftr (xyz (invMatrix * csVector4 ( A,  A, 1,  A)));
+    const csVector3 ftl (xyz (invMatrix * csVector4 (-A,  A, 1,  A)));
       
     int n = 0;
     csPlane3 p;
-      // Back plane
+    // Back plane
     p = csPlane3 (nbl, nbr, ntr);
-    clipPlanes[n++] = p;
-      // Far plane
+    if (!p.GetNormal().IsZero()) clipPlanes[n++] = p;
+    // Far plane
     p = csPlane3 (fbl, fbr, ftr);
-    clipPlanes[n++] = p;
-      // Left plane
+    if (!p.GetNormal().IsZero()) clipPlanes[n++] = p;
+    // Left plane
     p = csPlane3 (nbl, fbl, ntl);
-    clipPlanes[n++] = p;
-      // Right plane
+    if (!p.GetNormal().IsZero()) clipPlanes[n++] = p;
+    // Right plane
     p = csPlane3 (nbr, nbl, fbr);
-    clipPlanes[n++] = p;
-      // Bottom plane
+    if (!p.GetNormal().IsZero()) clipPlanes[n++] = p;
+    // Bottom plane
     p = csPlane3 (nbl, nbr, fbl);
-    clipPlanes[n++] = p;
-      // Top plane
+    if (!p.GetNormal().IsZero()) clipPlanes[n++] = p;
+    // Top plane
     p = csPlane3 (ntl, ftl, ntr);
-    clipPlanes[n++] = p;
+    if (!p.GetNormal().IsZero()) clipPlanes[n++] = p;
     clipPlanesMask = (1 << n) - 1;
+    
+    clipPlanesDirty = false;
   }
     
   mask = clipPlanesMask;
