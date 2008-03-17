@@ -103,7 +103,7 @@ struct iCameraSectorListener : public virtual iBase
  */
 struct iCamera : public virtual iBase
 {
-  SCF_INTERFACE(iCamera, 2,1,2);
+  SCF_INTERFACE(iCamera, 2,1,3);
   /**
    * Create a clone of this camera. Note that the array of listeners
    * is not cloned.
@@ -295,6 +295,9 @@ struct iCamera : public virtual iBase
   
   /// Set the size of the viewport this camera is associated with.
   virtual void SetViewportSize (int width, int height) = 0;
+  
+  /// Get the inverse projection matrix for this camera
+  virtual const CS::Math::Matrix4& GetInvProjectionMatrix () = 0;
 };
 
 struct iPerspectiveCamera : public virtual iBase
