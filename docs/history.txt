@@ -6,6 +6,10 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Mar-2008
+	- res fixed the LinkWith jam rule to not add LFLAGS from the
+	  dependencies of the requested libraries piecemeal: this breaks
+	  static building.
 13-Mar-2008
 	- Marten fixed the placement of some deprecation warning disable
 	  /enable includes. Eliminated some 8000 wrong warnings on MSVC9.
