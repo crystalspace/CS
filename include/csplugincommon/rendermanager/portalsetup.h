@@ -208,6 +208,12 @@ namespace RenderManager
     {
       RenderView* rview = context.renderView;
       RenderTreeType& renderTree = context.owner;
+      int screenW, screenH;
+      if (!context.GetTargetDimensions (screenW, screenH))
+      {
+        screenW = rview->GetGraphics3D()->GetWidth();
+        screenH = rview->GetGraphics3D()->GetHeight();
+      }
 
       csDirtyAccessArray<csVector2> allPortalVerts2d (64);
       csDirtyAccessArray<csVector3> allPortalVerts3d (64);
@@ -230,7 +236,8 @@ namespace RenderManager
         /* Get clipped screen space and camera space vertices */
         holder.portalContainer->ComputeScreenPolygons (rview, 
           portalVerts2d, portalVerts3d, 
-          allPortalVerts2d.GetSize(), allPortalVertsNums.GetArray());
+          allPortalVerts2d.GetSize(), allPortalVertsNums.GetArray(),
+          screenW, screenH);
 
         for (size_t pi = 0; pi < portalCount; ++pi)
         {
@@ -288,11 +295,12 @@ namespace RenderManager
 	    
 	    // Setup a bounding box, in screen-space
 	    csBox2 screenBox;
-	    ComputeVector2BoundingBox (portalVerts2d, count, screenBox);
+	    ComputeVector2BoundingBox (portalVerts2d, count, screenBox,
+	      screenW, screenH);
 	    
 	    // Obtain a texture handle for the portal to render to
             int sb_minX = int (screenBox.MinX());
-            int sb_maxY = int (screenBox.MaxY());
+            int sb_minY = int (screenBox.MinY());
 	    int txt_w = int (ceil (screenBox.MaxX() - screenBox.MinX()));
 	    int txt_h = int (ceil (screenBox.MaxY() - screenBox.MinY()));
 	    int real_w, real_h;
@@ -303,22 +311,35 @@ namespace RenderManager
 	    iCamera* cam = rview->GetCamera();
 	    // Create a new view
 	    csRef<CS::RenderManager::RenderView> newRenderView;
-	    csRef<iCamera> newCam (cam->Clone());
+	    csRef<iCustomMatrixCamera> newCam (
+	      rview->GetEngine()->CreateCustomMatrixCamera (cam));
+	    iCamera* inewcam = newCam->GetCamera();
 #include "csutil/custom_new_disable.h"
 	    newRenderView.AttachNew (
 	      new (renderTree.GetPersistentData().renderViewPool) RenderView (
-	        newCam, 0, rview->GetGraphics3D(), rview->GetGraphics2D()));
+	        inewcam, 0, rview->GetGraphics3D(), rview->GetGraphics2D()));
 #include "csutil/custom_new_enable.h"
 	    newRenderView->SetEngine (rview->GetEngine ());
 	    
-	    iCamera *inewcam = newRenderView->GetCamera();
 	    if (portalFlags.Check (CS_PORTAL_WARP))
 	    {
               SetupWarp (inewcam, holder.meshWrapper->GetMovable(), portal);
 	    }
-	    inewcam->SetViewportSize (real_w, real_h);
-	    inewcam->SetPerspectiveCenter (cam->GetShiftX() - sb_minX,
-	      real_h - (sb_maxY - cam->GetShiftY()));
+	    {
+	      // Old top right coords, transformed to 1,1
+	      float xr = ((float)(sb_minX + real_w)/(float)screenW)*2-1;
+	      float yt = ((float)(sb_minY)/(float)screenH)*2-1;
+	      // Old bottom left coords, transformed to -1,-1
+	      float xl = ((float)(sb_minX)/(float)screenW)*2-1;
+	      float yb = ((float)(sb_minY + real_h)/(float)screenH)*2-1;
+	      CS::Math::Matrix4 projShift (
+	        2.0f/(xr-xl), 0, 0, -(0.5f*(xl+xr))/(xr-xl),
+	        0, 2.0f/(yb-yt), 0, -(0.5f*(yt+yb))/(yb-yt),
+	        0, 0, 1, 0,
+	        0, 0, 0, 1);
+	      newCam->SetProjectionMatrix (inewcam->GetProjectionMatrix()
+		* projShift);
+	    }
             /* Visible cracks can occur on portal borders when the geometry
                behind the portal is supposed to fit seamlessly into geometry
                before the portal since the rendering of the target geometry
@@ -342,10 +363,14 @@ namespace RenderManager
                 }
 	      }
               // - Find inverse perspective point of pMZ plus some offset (pMZ2)
+	      const CS::Math::Matrix4& inverseProj (
+		inewcam->GetInvProjectionMatrix());
               csVector2 p (portalVerts2d[maxc]);
               p.x += 1.5f;
               p.y += 1.5f;
-              csVector3 pMZ2 = cam->InvPerspective (p, maxz);
+              csVector4 p_proj (p.x, p.y, 1.0f/maxz, 1.0f);
+              csVector4 p_proj_inv = inverseProj * p_proj;
+              csVector3 pMZ2 (p_proj_inv[0], p_proj_inv[1], p_proj_inv[2]);
               // - d = distance pMZ, pMZ2
               float d = sqrtf (csSquaredDist::PointPoint (portalVerts3d[maxc], pMZ2));
               // - Get portal target plane in target world space
@@ -365,6 +390,7 @@ namespace RenderManager
 	    newRenderView->SetLastPortal (portal);
             newRenderView->SetPreviousSector (rview->GetThisSector ());
             newRenderView->SetThisSector (portal->GetSector ());
+            //newRenderView->SetViewport (real_w, real_h);
 	    csBox2 clipBox (0, real_h - txt_h, txt_w, real_h);
             csRef<iClipper2D> newView;
             /* @@@ Consider PolyClipper?
@@ -430,14 +456,16 @@ namespace RenderManager
 	      }
 	    }
 	    {
-	      float xscale = 1.0f / real_w;
-	      float yscale = 1.0f / real_h;
+	      float xscale = (float)1.0f/(float)real_w;
+	      float yscale = (float)1.0f/(float)real_h;
 	      csRenderBufferLock<csVector4> tcoords (bufs->tcBuf);
 	      for (size_t c = 0; c < count; c++)
 	      {
 	        float z = portalVerts3d[c].z;
-		tcoords[c].Set ((portalVerts2d[c].x - sb_minX) * xscale * z, 
-		  (sb_maxY - portalVerts2d[c].y) * yscale * z, 0, 
+	        csVector2 p2 ((portalVerts2d[c].x+1) * screenW/2,
+	          (portalVerts2d[c].y+1) * screenH/2);
+		tcoords[c].Set ((p2.x - sb_minX) * xscale * z, 
+		  (real_h - (p2.y - sb_minY)) * yscale * z, 0, 
 		  z);
 	      }
 	    }
@@ -500,16 +528,18 @@ namespace RenderManager
     }
     
     void ComputeVector2BoundingBox (const csVector2* verts, size_t count, 
-                                    csBox2& box)
+                                    csBox2& box, int w, int h)
     {
       if (count == 0)
       {
         box.StartBoundingBox ();
         return;
       }
-      box.StartBoundingBox (verts[0]);
+      box.StartBoundingBox (
+        csVector2 ((verts[0].x+1) * w/2, (verts[0].y+1) * h/2));
       for (size_t i = 1; i < count; i++)
-        box.AddBoundingVertexSmart (verts[i]);
+        box.AddBoundingVertexSmart (
+          csVector2 ((verts[i].x+1) * w/2, (verts[i].y+1) * h/2));
     }
 
     void SetupWarp (iCamera* inewcam, iMovable* movable, iPortal* portal)
