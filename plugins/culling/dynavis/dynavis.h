@@ -221,7 +221,7 @@ private:
   uint32 current_vistest_nr;
 
   // For Debug_Dump(g3d): keep the last original camera.
-  iCamera* debug_camera;
+  csRef<iCamera> debug_camera;
   float debug_lx, debug_rx, debug_ty, debug_by;	// Frustum.
 
   // Count the number of objects marked as visible.
