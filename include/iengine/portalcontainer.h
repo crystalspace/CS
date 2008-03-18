@@ -50,7 +50,7 @@ struct csVector2;
  */
 struct iPortalContainer : public virtual iBase
 {
-  SCF_INTERFACE(iPortalContainer, 2,1,0);
+  SCF_INTERFACE(iPortalContainer, 3,0,0);
   /// Get the number of portals in this contain.
   virtual int GetPortalCount () const = 0;
 
@@ -67,21 +67,25 @@ struct iPortalContainer : public virtual iBase
   virtual void Draw (iRenderView* rview) = 0;
   
   /**
-   * Compute the screen-space and camera-space polygons for all portals.
+   * Compute the normalized screen-space and camera-space polygons for all 
+   * portals.
    * \param rview Render view for which to compute the screen space polys.
-   * \param verts2D Output buffer receiving the screen space coordinates.
+   * \param verts2D Output buffer receiving the normalized screen space 
+   *   coordinates.
    * \param verts3D Output buffer receiving the camera space coordinates
    *   corresponding to the screen space coordinates.
    * \param vertsSize Size of the \a verts buffer.
    * \param numVerts Output buffer receiving the number of vertices in each
    *   polygon.
+   * \param viewWidth Width of the view in which the polys are computed.
+   * \param viewHeight Height of the view in which the polys are computed.
    * \remarks The polygon vertices are stored in a flat fashion. To obtain
    *  the vertices for a certain polygon, sum up the vertex numbers for all
    *  previous polygons and use that as an index into the vertices array.
    */
   virtual void ComputeScreenPolygons (iRenderView* rview,
     csVector2* verts2D, csVector3* verts3D, size_t vertsSize,
-    size_t* numVerts) = 0;
+    size_t* numVerts, int viewWidth, int viewHeight) = 0;
   
   /**
    * Get the total amount of vertices used by all portals.

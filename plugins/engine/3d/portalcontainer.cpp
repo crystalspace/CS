@@ -1087,6 +1087,7 @@ class PerspectiveOutlet2D3D : public PerspectiveOutlet2D
 {
   csPoly3D& dest3D;
   iCamera* cam;
+  int viewWidth, viewHeight;
   
   static csVector3 LerpPC (const csVector3& v1, const csVector3& v2, float t)
   {
@@ -1097,9 +1098,10 @@ class PerspectiveOutlet2D3D : public PerspectiveOutlet2D
     return vLerped * z;
   }
 public:
-  PerspectiveOutlet2D3D (iCamera* cam, csPoly2D& dest2D, csPoly3D& dest3D)
+  PerspectiveOutlet2D3D (iCamera* cam, csPoly2D& dest2D, csPoly3D& dest3D,
+    int viewWidth, int viewHeight)
     : PerspectiveOutlet2D (cam->GetProjectionMatrix(), dest2D),
-    dest3D (dest3D), cam (cam) {}
+    dest3D (dest3D), cam (cam), viewWidth (viewWidth), viewHeight (viewWidth) {}
 
   void MakeEmpty () 
   { 
@@ -1124,19 +1126,27 @@ public:
     CS_ALLOC_STACK_ARRAY(csVector2, clipOut, clipOutputVerts);
     CS_ALLOC_STACK_ARRAY(csVertexStatus, clipOutStatus, clipOutputVerts);
     size_t outNum;
-    uint8 clipRes = clipper->Clip (dest.GetVertices(), dest.GetVertexCount(), clipOut,
-      outNum, clipOutStatus);
+    csPoly2D destPx;
+    destPx.SetVertexCount (dest.GetVertexCount());
+    for (size_t p = 0; p < dest.GetVertexCount(); p++)
+    {
+      destPx[p].Set (dest[p].x * viewWidth, dest[p].y * viewHeight);
+    }
+    uint8 clipRes = clipper->Clip (
+      destPx.GetVertices(), destPx.GetVertexCount(), clipOut, outNum,
+      clipOutStatus);
     CS_ASSERT(outNum <= clipOutputVerts);
     if (clipRes == CS_CLIP_OUTSIDE) return false;
     if (clipRes == CS_CLIP_INSIDE) return true;
     
-    csPoly2D orgDest2D (dest);
+    csPoly2D orgDest2D (destPx);
     csPoly3D orgDest3D (dest3D);
     MakeEmpty ();
       
+    float iw = 1.0f/viewWidth, ih = 1.0f/viewHeight;
     for (size_t i = 0 ; i < outNum; i++)
     {
-      dest.AddVertex (clipOut[i]);
+      dest.AddVertex (csVector2 (clipOut[i].x * iw, clipOut[i].y * ih));
       switch (clipOutStatus[i].Type)
       {
 	case CS_VERTEX_ORIGINAL:
@@ -1207,7 +1217,8 @@ void csPortalContainer::ComputeScreenPolygons (iRenderView* rview,
                                                csVector2* verts2D,
                                                csVector3* verts3D,  
                                                size_t vertsSize,
-                                               size_t* numVerts)
+                                               size_t* numVerts, 
+                                               int viewWidth, int viewHeight)
 {
   Prepare ();
   
@@ -1242,7 +1253,7 @@ void csPortalContainer::ComputeScreenPolygons (iRenderView* rview,
   size_t i;
   csPoly2D poly2D;
   csPoly3D poly3D;
-  PerspectiveOutlet2D3D outlet (camera, poly2D, poly3D);
+  PerspectiveOutlet2D3D outlet (camera, poly2D, poly3D, viewWidth, viewHeight);
   if (clip_plane || clip_portal || clip_z_plane || do_portal_plane || farplane)
   {
     for (i = 0 ; i < portals.GetSize () ; i++)

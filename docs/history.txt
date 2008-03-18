@@ -8,6 +8,8 @@ chronological order.
 
 18-Mar-2008
 	- res changed dynavis to keep a reference to the debug camera stored.
+	- res changed iPortalContainer::ComputeScreenPolygons() to take the
+	  dimensions if the view rendered to (needed for clipping).
 17-Mar-2008
 	- res made csTiledCoverageBuffer resizeable.
 	- res made portal containers use the inverse projection matrix for

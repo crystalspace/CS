@@ -231,7 +231,8 @@ public:
   virtual void GetRadius (float& radius, csVector3& center);
   
   void ComputeScreenPolygons (iRenderView* rview,
-    csVector2* verts2D, csVector3* verts3D, size_t vertsSize, size_t* numVerts);
+    csVector2* verts2D, csVector3* verts3D, size_t vertsSize, size_t* numVerts,
+    int viewWidth, int viewHeight);
   
   size_t GetTotalVertexCount () const;
 };
