@@ -370,6 +370,17 @@ class csFlags(object):
 csFlags_swigregister = _core.csFlags_swigregister
 csFlags_swigregister(csFlags)
 
+class iStringSet(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    scfGetVersion = staticmethod(_core.iStringSet_scfGetVersion)
+    __swig_destroy__ = _core.delete_iStringSet
+    __del__ = lambda self : None;
+iStringSet_swigregister = _core.iStringSet_swigregister
+iStringSet_swigregister(iStringSet)
+iStringSet_scfGetVersion = _core.iStringSet_scfGetVersion
+
 class csStringIDSet(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
@@ -889,17 +900,6 @@ iObjectIterator_swigregister = _core.iObjectIterator_swigregister
 iObjectIterator_swigregister(iObjectIterator)
 iObjectIterator_scfGetVersion = _core.iObjectIterator_scfGetVersion
 
-class iStringSet(object):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    scfGetVersion = staticmethod(_core.iStringSet_scfGetVersion)
-    __swig_destroy__ = _core.delete_iStringSet
-    __del__ = lambda self : None;
-iStringSet_swigregister = _core.iStringSet_swigregister
-iStringSet_swigregister(iStringSet)
-iStringSet_scfGetVersion = _core.iStringSet_scfGetVersion
-
 class iObjectRegistry(iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
@@ -913,7 +913,6 @@ class iObjectRegistry(iBase):
     __del__ = lambda self : None;
 iObjectRegistry_swigregister = _core.iObjectRegistry_swigregister
 iObjectRegistry_swigregister(iObjectRegistry)
-csInvalidStringID = cvar.csInvalidStringID
 iObjectRegistry_scfGetVersion = _core.iObjectRegistry_scfGetVersion
 
 class iObjectRegistryIterator(iBase):
@@ -2271,7 +2270,8 @@ csInitializer.SetupEventHandler = \
 
 def csevCommandLineHelp(reg):
   csEventNameRegistry.GetID(reg, "crystalspace.application.commandlinehelp")
-  
+
+csInvalidStringID = ~0 # we want stringids as unsigned long
 CS_EVENTLIST_END = csInvalidStringID
 
 def _csInitializer_RequestPlugins (reg, plugins):

@@ -441,6 +441,8 @@ class iGraphics3D(core.iBase):
     def PerformExtension(*args): return _ivideo.iGraphics3D_PerformExtension(*args)
     def GetWorldToCamera(*args): return _ivideo.iGraphics3D_GetWorldToCamera(*args)
     def GetCurrentDrawFlags(*args): return _ivideo.iGraphics3D_GetCurrentDrawFlags(*args)
+    def GetProjectionMatrix(*args): return _ivideo.iGraphics3D_GetProjectionMatrix(*args)
+    def SetProjectionMatrix(*args): return _ivideo.iGraphics3D_SetProjectionMatrix(*args)
     scfGetVersion = staticmethod(_ivideo.iGraphics3D_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iGraphics3D
     __del__ = lambda self : None;
@@ -654,6 +656,7 @@ class csShaderVariableStack(object):
     __swig_destroy__ = _ivideo.delete_csShaderVariableStack
     __del__ = lambda self : None;
     def Setup(*args): return _ivideo.csShaderVariableStack_Setup(*args)
+    def MakeOwnArray(*args): return _ivideo.csShaderVariableStack_MakeOwnArray(*args)
     def GetSize(*args): return _ivideo.csShaderVariableStack_GetSize(*args)
     def Clear(*args): return _ivideo.csShaderVariableStack_Clear(*args)
     def MergeFront(*args): return _ivideo.csShaderVariableStack_MergeFront(*args)
@@ -743,6 +746,7 @@ class iShader(iShaderVariableContext):
     def DeactivatePass(*args): return _ivideo.iShader_DeactivatePass(*args)
     def GetUsedShaderVars(*args): return _ivideo.iShader_GetUsedShaderVars(*args)
     def GetMetadata(*args): return _ivideo.iShader_GetMetadata(*args)
+    def PushShaderVariables(*args): return _ivideo.iShader_PushShaderVariables(*args)
     scfGetVersion = staticmethod(_ivideo.iShader_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iShader
     __del__ = lambda self : None;

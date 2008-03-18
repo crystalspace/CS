@@ -3286,7 +3286,10 @@ SWIGINTERN PyObject *_wrap_iShaderVarStringSetBase_Request__SWIG_0(PyObject *SWI
   }
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->Request((char const *)arg2);
-  resultobj = SWIG_NewPointerObj((new CS::StringID<CS::StringSetTag::ShaderVar >(static_cast< const CS::StringID<CS::StringSetTag::ShaderVar >& >(result))), SWIGTYPE_p_CS__StringIDTCS__StringSetTag__ShaderVar_t, SWIG_POINTER_OWN |  0 );
+  {
+    CS::StringID<CS::StringSetTag::ShaderVar > stringid = result;
+    resultobj = PyLong_FromUnsignedLong((unsigned long)stringid);
+  }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
 fail:
@@ -3302,8 +3305,6 @@ SWIGINTERN PyObject *_wrap_iShaderVarStringSetBase_Request__SWIG_1(PyObject *SWI
   char *result = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
@@ -3314,17 +3315,7 @@ SWIGINTERN PyObject *_wrap_iShaderVarStringSetBase_Request__SWIG_1(PyObject *SWI
   }
   arg1 = reinterpret_cast< iStringSetBase<CS::StringSetTag::ShaderVar > * >(argp1);
   {
-    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__StringIDTCS__StringSetTag__ShaderVar_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShaderVarStringSetBase_Request" "', argument " "2"" of type '" "CS::StringID<CS::StringSetTag::ShaderVar >""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iShaderVarStringSetBase_Request" "', argument " "2"" of type '" "CS::StringID<CS::StringSetTag::ShaderVar >""'");
-    } else {
-      CS::StringID<CS::StringSetTag::ShaderVar > * temp = reinterpret_cast< CS::StringID<CS::StringSetTag::ShaderVar > * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
+    arg2 = (CS::StringID<CS::StringSetTag::ShaderVar >)PyLong_AsUnsignedLong(obj1);
   }
   result = (char *)((iStringSetBase<CS::StringSetTag::ShaderVar > const *)arg1)->Request(arg2);
   resultobj = SWIG_FromCharPtr((const char *)result);
@@ -3350,10 +3341,10 @@ SWIGINTERN PyObject *_wrap_iShaderVarStringSetBase_Request(PyObject *self, PyObj
     int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iStringSetBaseTCS__StringSetTag__ShaderVar_t, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_CS__StringIDTCS__StringSetTag__ShaderVar_t, 0);
+      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
       _v = SWIG_CheckState(res);
       if (_v) {
-        return _wrap_iShaderVarStringSetBase_Request__SWIG_1(self, args);
+        return _wrap_iShaderVarStringSetBase_Request__SWIG_0(self, args);
       }
     }
   }
@@ -3363,10 +3354,11 @@ SWIGINTERN PyObject *_wrap_iShaderVarStringSetBase_Request(PyObject *self, PyObj
     int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iStringSetBaseTCS__StringSetTag__ShaderVar_t, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
-      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
-      _v = SWIG_CheckState(res);
+      {
+        _v = PyInt_Check(argv[1]);
+      }
       if (_v) {
-        return _wrap_iShaderVarStringSetBase_Request__SWIG_0(self, args);
+        return _wrap_iShaderVarStringSetBase_Request__SWIG_1(self, args);
       }
     }
   }
@@ -3418,8 +3410,6 @@ SWIGINTERN PyObject *_wrap_iShaderVarStringSetBase_Contains__SWIG_1(PyObject *SW
   bool result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
@@ -3430,17 +3420,7 @@ SWIGINTERN PyObject *_wrap_iShaderVarStringSetBase_Contains__SWIG_1(PyObject *SW
   }
   arg1 = reinterpret_cast< iStringSetBase<CS::StringSetTag::ShaderVar > * >(argp1);
   {
-    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__StringIDTCS__StringSetTag__ShaderVar_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShaderVarStringSetBase_Contains" "', argument " "2"" of type '" "CS::StringID<CS::StringSetTag::ShaderVar >""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iShaderVarStringSetBase_Contains" "', argument " "2"" of type '" "CS::StringID<CS::StringSetTag::ShaderVar >""'");
-    } else {
-      CS::StringID<CS::StringSetTag::ShaderVar > * temp = reinterpret_cast< CS::StringID<CS::StringSetTag::ShaderVar > * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
+    arg2 = (CS::StringID<CS::StringSetTag::ShaderVar >)PyLong_AsUnsignedLong(obj1);
   }
   result = (bool)((iStringSetBase<CS::StringSetTag::ShaderVar > const *)arg1)->Contains(arg2);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
@@ -3466,10 +3446,10 @@ SWIGINTERN PyObject *_wrap_iShaderVarStringSetBase_Contains(PyObject *self, PyOb
     int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iStringSetBaseTCS__StringSetTag__ShaderVar_t, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_CS__StringIDTCS__StringSetTag__ShaderVar_t, 0);
+      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
       _v = SWIG_CheckState(res);
       if (_v) {
-        return _wrap_iShaderVarStringSetBase_Contains__SWIG_1(self, args);
+        return _wrap_iShaderVarStringSetBase_Contains__SWIG_0(self, args);
       }
     }
   }
@@ -3479,10 +3459,11 @@ SWIGINTERN PyObject *_wrap_iShaderVarStringSetBase_Contains(PyObject *self, PyOb
     int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iStringSetBaseTCS__StringSetTag__ShaderVar_t, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
-      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
-      _v = SWIG_CheckState(res);
+      {
+        _v = PyInt_Check(argv[1]);
+      }
       if (_v) {
-        return _wrap_iShaderVarStringSetBase_Contains__SWIG_0(self, args);
+        return _wrap_iShaderVarStringSetBase_Contains__SWIG_1(self, args);
       }
     }
   }
@@ -3534,8 +3515,6 @@ SWIGINTERN PyObject *_wrap_iShaderVarStringSetBase_Delete__SWIG_1(PyObject *SWIG
   bool result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
@@ -3546,17 +3525,7 @@ SWIGINTERN PyObject *_wrap_iShaderVarStringSetBase_Delete__SWIG_1(PyObject *SWIG
   }
   arg1 = reinterpret_cast< iStringSetBase<CS::StringSetTag::ShaderVar > * >(argp1);
   {
-    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__StringIDTCS__StringSetTag__ShaderVar_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShaderVarStringSetBase_Delete" "', argument " "2"" of type '" "CS::StringID<CS::StringSetTag::ShaderVar >""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iShaderVarStringSetBase_Delete" "', argument " "2"" of type '" "CS::StringID<CS::StringSetTag::ShaderVar >""'");
-    } else {
-      CS::StringID<CS::StringSetTag::ShaderVar > * temp = reinterpret_cast< CS::StringID<CS::StringSetTag::ShaderVar > * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
+    arg2 = (CS::StringID<CS::StringSetTag::ShaderVar >)PyLong_AsUnsignedLong(obj1);
   }
   result = (bool)(arg1)->Delete(arg2);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
@@ -3582,10 +3551,10 @@ SWIGINTERN PyObject *_wrap_iShaderVarStringSetBase_Delete(PyObject *self, PyObje
     int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iStringSetBaseTCS__StringSetTag__ShaderVar_t, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_CS__StringIDTCS__StringSetTag__ShaderVar_t, 0);
+      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
       _v = SWIG_CheckState(res);
       if (_v) {
-        return _wrap_iShaderVarStringSetBase_Delete__SWIG_1(self, args);
+        return _wrap_iShaderVarStringSetBase_Delete__SWIG_0(self, args);
       }
     }
   }
@@ -3595,10 +3564,11 @@ SWIGINTERN PyObject *_wrap_iShaderVarStringSetBase_Delete(PyObject *self, PyObje
     int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iStringSetBaseTCS__StringSetTag__ShaderVar_t, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
-      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
-      _v = SWIG_CheckState(res);
+      {
+        _v = PyInt_Check(argv[1]);
+      }
       if (_v) {
-        return _wrap_iShaderVarStringSetBase_Delete__SWIG_0(self, args);
+        return _wrap_iShaderVarStringSetBase_Delete__SWIG_1(self, args);
       }
     }
   }
@@ -5470,23 +5440,11 @@ SWIGINTERN PyObject *_wrap_new_csShaderVariable__SWIG_1(PyObject *SWIGUNUSEDPARM
   PyObject *resultobj = 0;
   SwigValueWrapper<CS::StringID<CS::StringSetTag::ShaderVar > > arg1 ;
   csShaderVariable *result = 0 ;
-  void *argp1 ;
-  int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"new_csShaderVariable",1,1,&obj0)) SWIG_fail;
   {
-    res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_CS__StringIDTCS__StringSetTag__ShaderVar_t,  0  | 0);
-    if (!SWIG_IsOK(res1)) {
-      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_csShaderVariable" "', argument " "1"" of type '" "CS::ShaderVarStringID""'"); 
-    }  
-    if (!argp1) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_csShaderVariable" "', argument " "1"" of type '" "CS::ShaderVarStringID""'");
-    } else {
-      CS::ShaderVarStringID * temp = reinterpret_cast< CS::ShaderVarStringID * >(argp1);
-      arg1 = *temp;
-      if (SWIG_IsNewObj(res1)) delete temp;
-    }
+    arg1 = (CS::ShaderVarStringID)PyLong_AsUnsignedLong(obj0);
   }
   result = (csShaderVariable *)new csShaderVariable(arg1);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csShaderVariable, SWIG_POINTER_NEW |  0 );
@@ -5536,18 +5494,19 @@ SWIGINTERN PyObject *_wrap_new_csShaderVariable(PyObject *self, PyObject *args) 
   }
   if (argc == 1) {
     int _v;
-    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_CS__StringIDTCS__StringSetTag__ShaderVar_t, 0);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      return _wrap_new_csShaderVariable__SWIG_1(self, args);
-    }
-  }
-  if (argc == 1) {
-    int _v;
     int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_csShaderVariable, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
       return _wrap_new_csShaderVariable__SWIG_2(self, args);
+    }
+  }
+  if (argc == 1) {
+    int _v;
+    {
+      _v = PyInt_Check(argv[0]);
+    }
+    if (_v) {
+      return _wrap_new_csShaderVariable__SWIG_1(self, args);
     }
   }
   
@@ -5704,8 +5663,6 @@ SWIGINTERN PyObject *_wrap_csShaderVariable_SetName(PyObject *SWIGUNUSEDPARM(sel
   SwigValueWrapper<CS::StringID<CS::StringSetTag::ShaderVar > > arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
@@ -5716,17 +5673,7 @@ SWIGINTERN PyObject *_wrap_csShaderVariable_SetName(PyObject *SWIGUNUSEDPARM(sel
   }
   arg1 = reinterpret_cast< csShaderVariable * >(argp1);
   {
-    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__StringIDTCS__StringSetTag__ShaderVar_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csShaderVariable_SetName" "', argument " "2"" of type '" "CS::ShaderVarStringID""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csShaderVariable_SetName" "', argument " "2"" of type '" "CS::ShaderVarStringID""'");
-    } else {
-      CS::ShaderVarStringID * temp = reinterpret_cast< CS::ShaderVarStringID * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
+    arg2 = (CS::ShaderVarStringID)PyLong_AsUnsignedLong(obj1);
   }
   (arg1)->SetName(arg2);
   resultobj = SWIG_Py_Void();
@@ -5751,7 +5698,10 @@ SWIGINTERN PyObject *_wrap_csShaderVariable_GetName(PyObject *SWIGUNUSEDPARM(sel
   }
   arg1 = reinterpret_cast< csShaderVariable * >(argp1);
   result = ((csShaderVariable const *)arg1)->GetName();
-  resultobj = SWIG_NewPointerObj((new CS::ShaderVarStringID(static_cast< const CS::ShaderVarStringID& >(result))), SWIGTYPE_p_CS__StringIDTCS__StringSetTag__ShaderVar_t, SWIG_POINTER_OWN |  0 );
+  {
+    CS::ShaderVarStringID stringid = result;
+    resultobj = PyLong_FromUnsignedLong((unsigned long)stringid);
+  }
   return resultobj;
 fail:
   return NULL;
