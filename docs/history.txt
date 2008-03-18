@@ -18,6 +18,7 @@ chronological order.
 	- res added support for specifying explicit input/output links between
 	  nodes in weaver shaders. This gives a greater degree of control and
 	  is sometimes necessary to avoid ambiguities.
+	- res made the lighting_default shader support specular.
 17-Mar-2008
 	- res made csTiledCoverageBuffer resizeable.
 	- res made portal containers use the inverse projection matrix for

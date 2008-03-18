@@ -40,7 +40,7 @@
       <snippet id="surface" file="/shader/surface/surface-classic.xml" />
       <snippet id="lighting" file="/shader/snippets/lighting/lighting-ppl.xml" />
       <snippet id="mod_light_surf" file="/shader/snippets/modulate.xml" />
-      <!--snippet id="add_specular" file="/shader/snippets/add.xml" /-->
+      <snippet id="add_specular" file="/shader/snippets/add.xml" />
       <snippet id="glow" file="/shader/lighting/glow.xml" />
       <snippet id="apply_mixmode_alpha" file="/shader/snippets/mixmode-alpha.xml" />
       <snippet id="sectorfog" file="/shader/snippets/fog/fog-sector.xml" />
@@ -53,10 +53,13 @@
       <connection from="normalmap" to="lighting" />
       <connection from="surface" to="mod_light_surf" />
       <connection from="lighting" to="mod_light_surf" />
-      <!--connection from="mod_light_surf" to="add_specular" />
-      <connection from="lighting" to="add_specular" />
-      <connection from="add_specular" to="glow" /-->
-      <connection from="mod_light_surf" to="glow" />
+      <connection from="mod_light_surf" to="add_specular">
+	<explicit from="result" to="a" />
+      </connection>
+      <connection from="lighting" to="add_specular">
+	<explicit from="specularColor" to="b" />
+      </connection>
+      <connection from="add_specular" to="glow" />
       <connection from="glow" to="apply_mixmode_alpha" />
       <connection from="apply_mixmode_alpha" to="sectorfog" />
     </pass>
@@ -79,7 +82,7 @@
       <snippet id="surface" file="/shader/surface/surface-classic.xml" />
       <snippet id="lighting" file="/shader/snippets/lighting/lighting-pvl.xml" />
       <snippet id="mod_light_surf" file="/shader/snippets/modulate.xml" />
-      <!--snippet id="add_specular" file="/shader/snippets/add.xml" /-->
+      <snippet id="add_specular" file="/shader/snippets/add.xml" />
       <snippet id="glow" file="/shader/lighting/glow.xml" />
       <snippet id="apply_mixmode_alpha" file="/shader/snippets/mixmode-alpha.xml" />
       <snippet id="sectorfog" file="/shader/snippets/fog/fog-sector.xml" />
@@ -90,10 +93,13 @@
       <connection from="normalmap" to="lighting" />
       <connection from="surface" to="mod_light_surf" />
       <connection from="lighting" to="mod_light_surf" />
-      <!--connection from="mod_light_surf" to="add_specular" />
-      <connection from="lighting" to="add_specular" />
-      <connection from="add_specular" to="glow" /-->
-      <connection from="mod_light_surf" to="glow" />
+      <connection from="mod_light_surf" to="add_specular">
+	<explicit from="result" to="a" />
+      </connection>
+      <connection from="lighting" to="add_specular">
+	<explicit from="specularColor" to="b" />
+      </connection>
+      <connection from="add_specular" to="glow" />
       <connection from="glow" to="apply_mixmode_alpha" />
       <connection from="apply_mixmode_alpha" to="sectorfog" />
     </pass>
