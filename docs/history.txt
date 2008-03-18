@@ -19,6 +19,8 @@ chronological order.
 	  nodes in weaver shaders. This gives a greater degree of control and
 	  is sometimes necessary to avoid ambiguities.
 	- res made the lighting_default shader support specular.
+	- res added support for compressed normal maps to the normalmap
+	  snippet.
 17-Mar-2008
 	- res made csTiledCoverageBuffer resizeable.
 	- res made portal containers use the inverse projection matrix for
