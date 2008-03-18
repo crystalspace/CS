@@ -6,6 +6,18 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Mar-2008
+	- Marten added separate alpha-maps to terrain2 renderer, cells
+	  and feeder.
+	- Marten added explicit calls to the terrain2 feeder properties
+	  for the most common operations in addition to the unspecific
+	  SetParameter.
+17-Mar-2008
+	- res fixed the LinkWith jam rule to not add LFLAGS from the
+	  dependencies of the requested libraries piecemeal: this breaks
+	  static building.
+	- Mike Gist added support for compressed normal maps to the
+	  parallax and parallaxAtt shaders.
 13-Mar-2008
 	- Marten fixed the placement of some deprecation warning disable
 	  /enable includes. Eliminated some 8000 wrong warnings on MSVC9.
