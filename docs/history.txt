@@ -10,6 +10,8 @@ chronological order.
 	- res changed dynavis to keep a reference to the debug camera stored.
 	- res changed iPortalContainer::ComputeScreenPolygons() to take the
 	  dimensions if the view rendered to (needed for clipping).
+	- res moved "render target size determination" from the viscull code
+	  to the context node since it's generally useful.
 17-Mar-2008
 	- res made csTiledCoverageBuffer resizeable.
 	- res made portal containers use the inverse projection matrix for

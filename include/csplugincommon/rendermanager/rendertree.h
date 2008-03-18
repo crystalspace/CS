@@ -246,6 +246,20 @@ namespace RenderManager
         shaderArray[toLayerOffset + meshId] =
           shaderArray[fromLayerOffset + meshId];
       }
+      
+      bool GetTargetDimensions (int& renderW, int& renderH)
+      {
+	for (int a = 0; a < rtaNumAttachments; a++)
+	{
+	  if (renderTargets[a].texHandle != 0)
+	  {
+	    renderTargets[a].texHandle->GetRendererDimensions (
+	      renderW, renderH);
+	    return true;
+	  }
+        }
+        return false;
+      }
     };
 
 

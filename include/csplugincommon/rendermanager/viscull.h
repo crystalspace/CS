@@ -121,14 +121,7 @@ namespace RenderManager
     CS::RenderManager::Implementation::ViscullCallback<RenderTree> cb (context, rw, filter);
 
     int renderW = 0, renderH = 0;
-    for (int a = 0; a < rtaNumAttachments; a++)
-    {
-      if (context.renderTargets[a].texHandle != 0)
-      {
-        context.renderTargets[a].texHandle->GetRendererDimensions (
-          renderW, renderH);
-      }
-    }
+    context.GetTargetDimensions (renderW, renderH);
     culler->VisTest (rw, &cb, renderW, renderH);
 
     return true;
