@@ -21,6 +21,9 @@ chronological order.
 	- res made the lighting_default shader support specular.
 	- res added support for compressed normal maps to the normalmap
 	  snippet.
+	- res fixed the half vector computation in the lighting snippet
+	  (the length of the sum of two vectors is not the sum the length of
+	  the vectors).
 17-Mar-2008
 	- res made csTiledCoverageBuffer resizeable.
 	- res made portal containers use the inverse projection matrix for

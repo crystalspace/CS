@@ -102,7 +102,7 @@
       <?! Assume point light ?>
       L = surfToLight;
       <?endif?>
-      float3 H = 0.5 * (surfToLight - normalize (eyeToSurf));
+      float3 H = normalize (surfToLight - normalize (eyeToSurf));
       
       float4 lightCoeff = lit (dot (normal, L), dot (normal, H),
         32);
