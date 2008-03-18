@@ -33,7 +33,7 @@
 struct iPortal;
 struct iRenderView;
 
-struct csVector2;
+class csVector2;
 
 /**
  * A container for portals.

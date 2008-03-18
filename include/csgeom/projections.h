@@ -39,16 +39,16 @@ namespace CS
     {
       /**
        * Create an orthographic projection. \a left is mapped to x=0, \a right
-       * to x=1, \a bottom to y=0 and \a top to y=1. \a near specfies the near
-       * clipping distance, \a far the far clipping distance.
+       * to x=1, \a bottom to y=0 and \a top to y=1. \a nearz specifies the near
+       * clipping distance, \a farz the far clipping distance.
        * \sa \link http://www.opengl.org/sdk/docs/man/xhtml/glOrtho.xml glOrtho \endlink
        */
       static Matrix4 Ortho (float left, float right, float bottom, float top,
-        float near, float far)
+        float nearz, float farz)
       {
 	return Matrix4 (2.0f/(right-left), 0, 0, -(right+left)/(right-left),
 			0, 2.0f/(top-bottom), 0, -(top+bottom)/(top-bottom),
-			0, 0, -2.0f/(far-near), -(far+near)/(far-near),
+			0, 0, -2.0f/(farz-nearz), -(farz+nearz)/(farz-nearz),
 			0, 0, 0, 1);
       }
       

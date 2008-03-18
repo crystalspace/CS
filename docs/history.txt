@@ -14,6 +14,7 @@ chronological order.
 	  to the context node since it's generally useful.
 	- res made a stab at fixing the projection matrix in the portal setup.
 	  Does not give the right results tho.
+	- Marten fixed some vc build errors.
 17-Mar-2008
 	- res made csTiledCoverageBuffer resizeable.
 	- res made portal containers use the inverse projection matrix for

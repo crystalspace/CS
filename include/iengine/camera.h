@@ -120,8 +120,7 @@ struct iCamera : public virtual iBase
   /**
    * Return the FOV (field of view) in pixels
    * \deprecated Deprecated in 1.3. Use iPerspectiveCamera instead
-   */
-  CS_DEPRECATED_METHOD_MSG("Use iPerspectiveCamera instead")
+   */  
   CS_DEPRECATED_METHOD_MSG("Use iPerspectiveCamera instead")
   virtual int GetFOV () const = 0;
   /**
@@ -129,13 +128,11 @@ struct iCamera : public virtual iBase
    * \deprecated Deprecated in 1.3. Use iPerspectiveCamera instead
    */
   CS_DEPRECATED_METHOD_MSG("Use iPerspectiveCamera instead")
-  CS_DEPRECATED_METHOD_MSG("Use iPerspectiveCamera instead")
   virtual float GetInvFOV () const = 0;
   /**
    * Return the FOV (field of view) in degrees.
    * \deprecated Deprecated in 1.3. Use iPerspectiveCamera instead
    */
-  CS_DEPRECATED_METHOD_MSG("Use iPerspectiveCamera instead")
   CS_DEPRECATED_METHOD_MSG("Use iPerspectiveCamera instead")
   virtual float GetFOVAngle () const = 0;
 
