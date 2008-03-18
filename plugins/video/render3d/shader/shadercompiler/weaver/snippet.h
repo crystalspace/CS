@@ -130,6 +130,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       { return new BasicIteratorImpl<const Output, csArray<Output> > (outputs); }
     };
     
+    struct ExplicitConnectionSource
+    {
+      const Snippet* from;
+      csString outputName;
+    };
+    typedef csHash<ExplicitConnectionSource, csString> ExplicitConnectionsHash;
     struct Connection
     {
       Snippet* from;
@@ -150,6 +156,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       /// "Output" snippets - those having no connections out
       csArray<Snippet*> outSnippets;
       Technique::CombinerPlugin combiner;
+      csHash<ExplicitConnectionsHash, csPtrKey<Snippet> > explicitConnections;
     public:
       CompoundTechnique (const char* snippetName) : Technique (snippetName) {}
       ~CompoundTechnique();
@@ -160,6 +167,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       Snippet* GetSnippet (const char* id)
       { return snippets.Get (id, 0); }
       void AddConnection (const Connection& conn);
+      
+      ExplicitConnectionsHash& GetExplicitConnections (Snippet* to)
+      { return explicitConnections.GetOrCreate (to); }
+      const ExplicitConnectionsHash* GetExplicitConnections (Snippet* to) const
+      { return explicitConnections.GetElementPointer (to); }
       
       virtual const CombinerPlugin& GetCombiner() const { return combiner; }
       virtual BasicIterator<const Block>* GetBlocks() const { return 0; }
@@ -227,6 +239,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   class TechniqueGraph
   {
   public:
+    struct ExplicitConnectionSource
+    {
+      const Snippet::Technique* from;
+      csString outputName;
+    };
+    typedef csHash<ExplicitConnectionSource, csString> ExplicitConnectionsHash;
+    
     struct Connection
     {
       /* If a connection is weak, don't use it for input/output matching.
@@ -256,12 +275,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       bool strongOnly = true) const;
     void GetDependants (const Snippet::Technique* tech, csArray<const Snippet::Technique*>& deps,
       bool strongOnly = true) const;
+      
+    const ExplicitConnectionsHash* GetExplicitConnections (const Snippet::Technique* to) const
+    { return explicitConnections.GetElementPointer (to); }
+    ExplicitConnectionsHash& GetExplicitConnections (const Snippet::Technique* to)
+    { return explicitConnections.GetOrCreate (to); }
   private:
     typedef csArray<const Snippet::Technique*> TechniquePtrArray;
     TechniquePtrArray techniques;
     csArray<Connection> connections;
     TechniquePtrArray inTechniques;
     TechniquePtrArray outTechniques;
+    csHash<ExplicitConnectionsHash, csConstPtrKey<Snippet::Technique> > explicitConnections;
   };
 
   class TechniqueGraphBuilder

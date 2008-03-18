@@ -94,7 +94,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         CS::PluginCommon::ShaderWeaver::iCombiner* combiner,
         CS::PluginCommon::ShaderWeaver::iCoerceChainIterator* linkChain, 
         TechniqueGraph& graph, Node& inNode, 
-        const char* inName, const Snippet::Technique* outTech);
+        const char* inName, const Snippet::Technique* outTech,
+        const char* outName);
       Node& GetNodeForTech (const Snippet::Technique* tech)
       { return *nodes[techToNode.Get (tech, csArrayItemNotFound)]; }
 
@@ -153,6 +154,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   
     typedef csSet<csConstPtrKey<Snippet::Technique::Output> > UsedOutputsHash;
     bool FindInput (const TechniqueGraph& graph,
+      CS::PluginCommon::ShaderWeaver::iCombiner* combiner,
+      csString& nodeAnnotation,
+      const Snippet::Technique* receivingTech, 
+      const Snippet::Technique::Input& input,
+      const Snippet::Technique*& sourceTech,
+      const Snippet::Technique::Output*& output,
+      UsedOutputsHash& usedOutputs);
+    bool FindExplicitInput (const TechniqueGraph& graph,
       CS::PluginCommon::ShaderWeaver::iCombiner* combiner,
       csString& nodeAnnotation,
       const Snippet::Technique* receivingTech, 

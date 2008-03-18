@@ -306,8 +306,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
           nodeAnnotation.Append (GetAnnotation ("Input: %s %s -",
             inp.type.GetData(), inp.name.GetData()));
           if (!(inp.isPrivate)
-            && FindInput (graph, combiner, nodeAnnotation, node.tech, inp, 
-            sourceTech, output, usedOutputs))
+            && (FindExplicitInput (graph, combiner, nodeAnnotation, node.tech, inp, 
+              sourceTech, output, usedOutputs)
+            || FindInput (graph, combiner, nodeAnnotation, node.tech, inp, 
+              sourceTech, output, usedOutputs)))
           {
             nodeAnnotation.Append (
               GetAnnotation (" found match: %s %s from %s\n",
@@ -332,7 +334,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
               // Subtle: may add nodes to the node tree
               synthTree.AugmentCoerceChain (compiler, tempComb, 
                 combiner, coerceChain, graph, node, inp.name,
-                sourceTech);
+                sourceTech, output->name);
 	    }
 	  }
 	  else
@@ -790,6 +792,95 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     return result;
   }
       
+  bool Synthesizer::FindExplicitInput (const TechniqueGraph& graph,
+    WeaverCommon::iCombiner* combiner,
+    csString& nodeAnnotation,
+    const Snippet::Technique* receivingTech, 
+    const Snippet::Technique::Input& input,
+    const Snippet::Technique*& sourceTech,
+    const Snippet::Technique::Output*& output,
+    UsedOutputsHash& usedOutputs)
+  {
+    const TechniqueGraph::ExplicitConnectionsHash* explicitConns =
+      graph.GetExplicitConnections (receivingTech);
+    if (!explicitConns) return false;
+    
+    const TechniqueGraph::ExplicitConnectionSource* src =
+      explicitConns->GetElementPointer (input.name);
+    if (!src) return false;
+    
+    const WeaverCommon::TypeInfo* inputTypeInfo = 
+      WeaverCommon::QueryTypeInfo (input.type);
+  
+    uint coerceCost = WeaverCommon::NoCoercion;
+    const Snippet::Technique* tech = src->from;
+    CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique::Output> > 
+      outputIt (tech->GetOutputs());
+    while (outputIt->HasNext())
+    {
+      const Snippet::Technique::Output& outp = outputIt->Next();
+      if (usedOutputs.Contains (&outp)) continue;
+      if (outp.name != src->outputName) continue;
+      nodeAnnotation.Append (
+	GetAnnotation (" trying explicit %s %s of %s: ",
+	  outp.type.GetData(), outp.name.GetData(),
+	  tech->snippetName));
+      if (outp.type == input.type)
+      {
+	nodeAnnotation.Append ("match\n");
+	sourceTech = tech;
+	output = &outp;
+	usedOutputs.AddNoTest (output);
+	return true;
+      }
+      uint cost = combiner->CoerceCost (outp.type, input.type);
+      nodeAnnotation.Append ((cost == WeaverCommon::NoCoercion)
+	? "no coercion\n" : GetAnnotation ("cost %u\n", cost));
+      if (cost < coerceCost)
+      {
+	sourceTech = tech;
+	output = &outp;
+	if (cost == 0)
+	{
+	  usedOutputs.AddNoTest (output);
+	  return true;
+	}
+	coerceCost = cost;
+      }
+      // See if maybe we can just drop a property.
+      const WeaverCommon::TypeInfo* outputTypeInfo = 
+	WeaverCommon::QueryTypeInfo (outp.type);
+      if (inputTypeInfo && outputTypeInfo
+	&& (outputTypeInfo->baseType == inputTypeInfo->baseType)
+	&& (outputTypeInfo->samplerIsCube == inputTypeInfo->samplerIsCube)
+	&& (outputTypeInfo->dimensions == inputTypeInfo->dimensions)
+	&& ((outputTypeInfo->semantics == inputTypeInfo->semantics)
+	  || (inputTypeInfo->semantics == WeaverCommon::TypeInfo::NoSemantics))
+	&& ((outputTypeInfo->space == inputTypeInfo->space)
+	  || (inputTypeInfo->space == WeaverCommon::TypeInfo::NoSpace))
+	&& ((outputTypeInfo->unit == inputTypeInfo->unit)
+	  || (!inputTypeInfo->unit)))
+      {
+	bool b = compiler->annotateCombined 
+	  && (rand() <= int (INT_MAX * 0.005));
+	nodeAnnotation.Append (
+	  GetAnnotation ("drop a prop%s\n", b ? " like it's hot" : ""));
+	sourceTech = tech;
+	output = &outp;
+	usedOutputs.AddNoTest (output);
+	return true;
+      }
+    }
+
+    bool result = coerceCost != WeaverCommon::NoCoercion;
+    if (result)
+    {
+      usedOutputs.AddNoTest (output);
+    }
+    
+    return result;
+  }
+      
   WeaverCommon::iCombiner* Synthesizer::GetCombiner (
       WeaverCommon::iCombiner* used, 
       const Snippet::Technique::CombinerPlugin& comb,
@@ -917,7 +1008,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     WeaverCommon::iCombiner* combiner, 
     WeaverCommon::iCoerceChainIterator* linkChain,  
     TechniqueGraph& graph, Node& inNode, 
-    const char* inName, const Snippet::Technique* outTech)
+    const char* inName, const Snippet::Technique* outTech,
+    const char* outName)
   {
     {
       TechniqueGraph::Connection conn;
@@ -927,6 +1019,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     }
 
     const Snippet::Technique* lastTech = outTech;
+    const Snippet::Technique* tech2 = 0;
     while (linkChain->HasNext())
     {
       Snippet* snippet;
@@ -961,31 +1054,56 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       conn.to = tech;
       graph.AddConnection (conn);
       lastTech = tech;
+      if (tech2 == 0) tech2 = tech;
       
       Node* node = nodeAlloc.Alloc();
       node->tech = tech;
       ComputeRenames (*node, combiner);
       techToNode.Put (tech, nodes.Push (node));
     }
+    
+    {
+      TechniqueGraph::ExplicitConnectionsHash& explicitConns =
+	graph.GetExplicitConnections (tech2);
+	
+      const char* inpName;
+      CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique::Input> > 
+	inputIt (tech2->GetInputs());
+      if (inputIt->HasNext())
+      {
+	const Snippet::Technique::Input& inp = inputIt->Next();
+	inpName = inp.name;
+      }
+      else
+      {
+	/* error? */
+	return;
+      }
+      
+      TechniqueGraph::ExplicitConnectionSource& explicitSrc =
+        explicitConns.GetOrCreate (inpName);
+      explicitSrc.from = outTech;
+      explicitSrc.outputName = outName;
+    }
+    
     TechniqueGraph::Connection conn;
     conn.from = lastTech;
     conn.to = inNode.tech;
     graph.AddConnection (conn);
-    
     {
       CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique::Output> > 
-        outputIt (lastTech->GetOutputs());
+	outputIt (lastTech->GetOutputs());
       if (outputIt->HasNext())
       {
-        const Snippet::Technique::Output& outp = outputIt->Next();
-        
-        const csString& linkFromName = 
-          GetNodeForTech (lastTech).outputRenames.Get (outp.name, (const char*)0);
-        inNode.inputLinks.Put (inName, linkFromName);
+	const Snippet::Technique::Output& outp = outputIt->Next();
+	
+	const csString& linkFromName = 
+	  GetNodeForTech (lastTech).outputRenames.Get (outp.name, (const char*)0);
+	inNode.inputLinks.Put (inName, linkFromName);
       }
       else
       {
-        /* error? */
+	/* error? */
       }
     }
   }

@@ -622,7 +622,49 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  return;
       }
     }
+    
     tech.AddConnection (newConn);
+    
+    csRef<iDocumentNodeIterator> nodes = node->GetNodes();
+    while (nodes->HasNext())
+    {
+      csRef<iDocumentNode> child = nodes->Next();
+      if (child->GetType() != CS_NODE_ELEMENT) continue;
+      if (strcmp (child->GetValue(), "explicit") != 0)
+      {
+	compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
+	  "Expected 'explicit' node");
+	return;
+      }
+      const char* fromId = child->GetAttributeValue ("from");
+      if (fromId == 0)
+      {
+	compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
+	  "'explicit' node lacks 'from' attribute");
+	return;
+      }
+      const char* toId = child->GetAttributeValue ("to");
+      if (toId == 0)
+      {
+	compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
+	  "'explicit' node lacks 'to' attribute");
+	return;
+      }
+      ExplicitConnectionsHash& explConn =
+        tech.GetExplicitConnections (newConn.to);
+      if (explConn.Contains (toId))
+      {
+	compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
+	  "An explicit input was already mapped to '%s'", toId);
+      }
+      else
+      {
+        ExplicitConnectionSource connSrc;
+        connSrc.from = newConn.from;
+        connSrc.outputName = fromId;
+        explConn.Put (toId, connSrc);
+      }
+    }
   }
     
   void Snippet::HandleCombinerNode (CompoundTechnique& tech, 
@@ -982,6 +1024,46 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	      {
 	        newConn.to = toIt.Next();
 	        graphInfo.graph.AddConnection (newConn);
+	      }
+	    }
+	  }
+	}
+	// Transfer explicit connections
+	for (size_t g = 0; g < techGraphs.GetSize(); g++)
+	{
+	  GraphInfo& graphInfo = techGraphs[g];
+	  snippetIter.Reset();
+	  while (snippetIter.HasNext())
+	  {
+	    Snippet* toSnippet = snippetIter.Next ();
+	    const Snippet::ExplicitConnectionsHash* explicitConns =
+	      compTech->GetExplicitConnections (toSnippet);
+	    if (!explicitConns) continue;
+	    
+	    TechniqueGraph::ExplicitConnectionsHash newExplicitConns;
+	    SnippetToTechMap::Iterator toIt = 
+	      graphInfo.snippetToTechIn.GetIterator (toSnippet);
+	    while (toIt.HasNext())
+	    {
+	      const Snippet::Technique* toTech = toIt.Next();
+	      Snippet::ExplicitConnectionsHash::ConstGlobalIterator
+	        explicitConnIt = explicitConns->GetIterator ();
+	      while (explicitConnIt.HasNext())
+	      {
+		csString dest;
+		const Snippet::ExplicitConnectionSource& source = 
+		  explicitConnIt.Next (dest);
+		TechniqueGraph::ExplicitConnectionSource newSource;
+		SnippetToTechMap::Iterator fromIt = 
+		  graphInfo.snippetToTechOut.GetIterator (source.from);
+		while (fromIt.HasNext())
+		{
+		  newSource.from = fromIt.Next();
+		  newSource.outputName = source.outputName;
+		  newExplicitConns.Put (dest, newSource);
+		}
+		graphInfo.graph.GetExplicitConnections (toTech) =
+		  newExplicitConns;
 	      }
 	    }
 	  }
