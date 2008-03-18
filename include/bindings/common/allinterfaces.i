@@ -152,6 +152,7 @@
   INTERFACE_APPLY(iDecalTemplate)
   INTERFACE_APPLY(iMovieRecorder)
   INTERFACE_APPLY(iView)
+  INTERFACE_APPLY(iTranslator)
 %enddef
 
 %define IVIDEO_APPLY_FOR_EACH_INTERFACE
