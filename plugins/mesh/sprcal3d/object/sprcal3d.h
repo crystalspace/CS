@@ -492,7 +492,6 @@ private:
     void UpdatePosition (float delta, CalModel*);
   };
 
-  csRef<iStringSet> strings;
   csWeakRef<iGraphics3D> G3D;
 
   /* The deal with meshes, submeshes and attached meshes:

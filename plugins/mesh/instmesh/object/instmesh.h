@@ -426,7 +426,6 @@ private:
   bool do_fullbright;
 
   csWeakRef<iGraphics3D> g3d;
-  csRef<iStringSet> strings;
 
   uint default_mixmode;
   bool default_lighting;
@@ -510,9 +509,6 @@ public:
 
   void CalculateNormals (bool compress);
   void Compress ();
-
-  iStringSet* GetStrings()
-  { return strings; }
 
   void SetMixMode (uint mode)
   {

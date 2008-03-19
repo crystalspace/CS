@@ -1420,8 +1420,6 @@ csInstmeshMeshObjectFactory::csInstmeshMeshObjectFactory (
   light_mgr = csQueryRegistry<iLightManager> (object_reg);
 
   g3d = csQueryRegistry<iGraphics3D> (object_reg);
-  strings = csQueryRegistryTagInterface<iStringSet> (object_reg,
-    "crystalspace.shared.stringset");
 
   autonormals = false;
   autonormals_compress = true;

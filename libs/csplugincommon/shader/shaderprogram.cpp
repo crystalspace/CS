@@ -41,8 +41,8 @@ csShaderProgram::csShaderProgram (iObjectRegistry* objectReg)
 
   csShaderProgram::objectReg = objectReg;
   synsrv = csQueryRegistry<iSyntaxService> (objectReg);
-  strings = csQueryRegistryTagInterface<iStringSet> 
-    (objectReg, "crystalspace.shared.stringset");
+  stringsSvName = csQueryRegistryTagInterface<iStringSet> 
+    (objectReg, "crystalspace.shader.variablenameset");
   
   csRef<iVerbosityManager> verbosemgr (
     csQueryRegistry<iVerbosityManager> (objectReg));
@@ -310,7 +310,7 @@ bool csShaderProgram::ParseCommon (iDocumentNode* child)
 	else
 	{
 	  // "Classic" variable mapping
-	  variablemap.Push (VariableMapEntry (strings->Request (varname),
+	  variablemap.Push (VariableMapEntry (stringsSvName->Request (varname),
 	    destname));
 	}
       }
@@ -413,7 +413,7 @@ void csShaderProgram::DumpVariableMappings (csString& output)
   {
     const VariableMapEntry& vme = variablemap[v];
 
-    output << strings->Request (vme.name);
+    output << stringsSvName->Request (vme.name);
     output << '(' << vme.name << ") -> ";
     output << vme.destination << ' ';
     output << vme.userVal << ' ';

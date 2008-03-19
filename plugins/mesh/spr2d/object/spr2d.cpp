@@ -690,8 +690,6 @@ csSprite2DMeshObjectFactory::csSprite2DMeshObjectFactory (iMeshObjectType* pPare
 {
   light_mgr = csQueryRegistry<iLightManager> (object_reg);
   g3d = csQueryRegistry<iGraphics3D> (object_reg);
-  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
-    object_reg, "crystalspace.shared.stringset");
 }
 
 csSprite2DMeshObjectFactory::~csSprite2DMeshObjectFactory ()

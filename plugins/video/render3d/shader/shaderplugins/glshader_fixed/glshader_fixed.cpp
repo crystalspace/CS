@@ -156,7 +156,7 @@ void csGLShader_FIXED::Open()
   }
   
   csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
-    object_reg, "crystalspace.shared.stringset");
+    object_reg, "crystalspace.shader.variablenameset");
   lsvCache.SetStrings (strings);
 
   bool verbose = false;

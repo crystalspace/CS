@@ -743,8 +743,8 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
   do_lighting = false;
   ambientvar = csInvalidStringID;
   primcolvar = csInvalidStringID;
-  string_world2camera = strings->Request ("world2camera transform");
-  string_object2world = strings->Request ("object2world transform");
+  string_world2camera = stringsSvName->Request ("world2camera transform");
+  string_object2world = stringsSvName->Request ("object2world transform");
 
   csRef<iShaderManager> shadermgr = 
   	csQueryRegistry<iShaderManager> (objectReg);
@@ -787,7 +787,7 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
           {
             const char* str;
             if ((str = child->GetContentsValue ()) != 0)
-              primcolvar = strings->Request (str);
+              primcolvar = stringsSvName->Request (str);
           }
           break;
         case XMLTOKEN_CONSTANTCOLOR:
@@ -810,9 +810,9 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
           {
             const char* str;
             if ((str = child->GetAttributeValue("color")))
-              ambientvar = strings->Request (str);
+              ambientvar = stringsSvName->Request (str);
             else
-              ambientvar = strings->Request ("light ambient");
+              ambientvar = stringsSvName->Request ("light ambient");
           
             do_lighting = true;
           }
@@ -864,14 +864,14 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
                 layers[layer].texgen = TEXGEN_FOG;
 
                 if ((str = child->GetAttributeValue("plane")))
-                  layers[layer].fogplane = strings->Request (str);
+                  layers[layer].fogplane = stringsSvName->Request (str);
                 else
-                  layers[layer].fogplane = strings->Request ("fogplane");
+                  layers[layer].fogplane = stringsSvName->Request ("fogplane");
 
                 if ((str = child->GetAttributeValue("density")))
-                  layers[layer].fogdensity = strings->Request (str);
+                  layers[layer].fogdensity = stringsSvName->Request (str);
                 else
-                  layers[layer].fogdensity = strings->Request ("fog density");
+                  layers[layer].fogdensity = stringsSvName->Request ("fog density");
               }
 	      else
 	      {

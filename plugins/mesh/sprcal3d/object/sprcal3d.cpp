@@ -869,9 +869,6 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
 //      "Error creating model instance");
 //    return;
 //  }
-  
-  strings = csQueryRegistryTagInterface<iStringSet> (object_reg, 
-    "crystalspace.shared.stringset");
   G3D = csQueryRegistry<iGraphics3D> (object_reg);
 
   // set the material set of the whole model

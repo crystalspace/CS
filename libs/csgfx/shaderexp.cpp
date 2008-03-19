@@ -285,7 +285,7 @@ bool csShaderExpression::Parse(iDocumentNode * node)
   cons * head = new cons;
 
   strset = csQueryRegistryTagInterface<iStringSet> (
-    obj_reg, "crystalspace.shared.stringset");
+    obj_reg, "crystalspace.shader.variablenameset");
   if (!strset) 
   {
     ParseError ("Can't find string registry.");

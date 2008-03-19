@@ -88,8 +88,6 @@ public:
  */
 class csRenderContext
 {
-  friend class csRenderView;
-
 public:
   /// A pointer back to the previous render context.
   csRenderContext* previous;

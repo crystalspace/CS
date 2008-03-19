@@ -59,7 +59,7 @@ private:
   csRef<iCommandLineParser> cmdline;
   csRef<iView> view;
   csRef<iMeshObject> meshObject;
-  csRef<iStringSet> strings;
+  csRef<iStringSet> strings, stringsSvName;
   iSector* room_single;
   iSector* room_multi;
   iMaterialWrapper* material;

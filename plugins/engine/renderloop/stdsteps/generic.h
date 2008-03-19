@@ -104,7 +104,7 @@ private:
   bool zOffset;
   bool portalTraversal;
   csZBufMode zmode;
-  csRef<iStringSet> strings;
+  csRef<iStringSet> strings, stringsSvName;
   csWeakRef<iShaderManager> shaderManager;
   iObjectRegistry *objreg;
   csRef<iShader> defShader;

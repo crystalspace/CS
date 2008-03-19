@@ -73,7 +73,7 @@ protected:
 protected:
   iObjectRegistry* objectReg;
   csRef<iSyntaxService> synsrv;
-  csRef<iStringSet> strings;
+  csRef<iStringSet> stringsSvName;
 
 public:
   /**

@@ -92,6 +92,8 @@ bool csSaver::Initialize(iObjectRegistry* p)
   plugin_mgr = csQueryRegistry<iPluginManager> (object_reg);
   strings = csQueryRegistryTagInterface<iStringSet> (object_reg,
       "crystalspace.shared.stringset");
+  stringsSvName = csQueryRegistryTagInterface<iStringSet> (object_reg,
+    "crystalspace.shader.variablenameset");
 
   if (!engine->GetSaveableFlag())
   {
@@ -342,13 +344,9 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
 
 bool csSaver::SaveMaterials(iDocumentNode *parent)
 {
-  csRef<iStringSet> stringset =
-    csQueryRegistryTagInterface<iStringSet> 
-    (object_reg, "crystalspace.shared.stringset");
-
-  csStringID texdiffID = stringset->Request("tex diffuse");
-  csStringID orlightID = stringset->Request("std_lighting");
-  csStringID orcompatID = stringset->Request("standard");
+  csStringID texdiffID = stringsSvName->Request("tex diffuse");
+  csStringID orlightID = stringsSvName->Request("std_lighting");
+  csStringID orcompatID = stringsSvName->Request("standard");
 
   csRef<iDocumentNode> current = CreateNode(parent, "materials");
   iMaterialList *matList=engine->GetMaterialList();
@@ -392,8 +390,8 @@ bool csSaver::SaveMaterials(iDocumentNode *parent)
       iShader* shader = shaderIter.Next(typeID);
       if (!shader || !typeID) continue;
       const char *shadername = shader->QueryObject()->GetName();
-      const char *shadertype = stringset->Request(typeID);
-      if (orcompatID == typeID && orlightID == stringset->Request(shadername))
+      const char *shadertype = strings->Request(typeID);
+      if (orcompatID == typeID && orlightID == strings->Request(shadername))
         continue;
 
       csRef<iDocumentNode> shaderNode = CreateNode(child, "shader");
@@ -409,7 +407,7 @@ bool csSaver::SaveMaterials(iDocumentNode *parent)
     {
       csShaderVariable* shaderVar = shaderVarIter.Next();
       csStringID varnameid = shaderVar->GetName();
-      csString varname(stringset->Request(varnameid));
+      csString varname(stringsSvName->Request(varnameid));
       csRef<iDocumentNode> shadervarNode = CreateNode(child, "shadervar");
       shadervarNode->SetAttribute("name", (const char*)varname);
 

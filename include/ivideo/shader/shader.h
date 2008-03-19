@@ -133,6 +133,12 @@ struct iShaderVariableContext : public virtual iBase
    * supplied in the "stacks" argument
    */
   virtual void PushVariables (iShaderVarStack* stacks) const = 0;
+  
+  /**
+   * Push the variables of this context onto the variable stacks
+   * supplied in the "stacks" argument
+   */
+  virtual void PushVariables (csShaderVariable** stack) const = 0;
 
   /// Determine whether this SV context contains any variables at all.
   virtual bool IsEmpty () const = 0;

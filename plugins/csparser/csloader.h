@@ -164,7 +164,7 @@ private:
   /// Pointer to the engine sequencer (optional module).
   csRef<iEngineSequenceManager> eseqmgr;
   /// Shared string set
-  csRef<iStringSet> stringSet;
+  csRef<iStringSet> stringSet, stringSetSvName;
 
   /// Pointer to built-in image texture loader.
   csRef<iLoaderPlugin> BuiltinImageTexLoader;

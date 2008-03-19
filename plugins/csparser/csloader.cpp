@@ -1623,6 +1623,8 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
 
   stringSet = csQueryRegistryTagInterface<iStringSet> (
     object_reg, "crystalspace.shared.stringset");
+  stringSetSvName = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shader.variablenameset");
 
   return true;
 }
@@ -3445,7 +3447,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
         //create a new variable
         const char* varname = child->GetAttributeValue ("name");
 	csRef<csShaderVariable> var;
-	var.AttachNew (new csShaderVariable (stringSet->Request (varname)));
+	var.AttachNew (new csShaderVariable (stringSetSvName->Request (varname)));
 	if (!SyntaxService->ParseShaderVar (ldr_context, child, *var))
         {
 	  SyntaxService->ReportError (
@@ -5082,7 +5084,7 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
 	{
 	  const char* varname = child->GetAttributeValue ("name");
 	  csRef<csShaderVariable> var;
-	  var.AttachNew (new csShaderVariable (stringSet->Request (varname)));
+	  var.AttachNew (new csShaderVariable (stringSetSvName->Request (varname)));
 	  if (!SyntaxService->ParseShaderVar (ldr_context, child, *var))
 	  {
 	    SyntaxService->ReportError (

@@ -85,6 +85,8 @@ void Simple::Frame ()
   csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
   csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
   c->SetTransform (ot);
+
+  rm->RenderView (view);
 }
 
 bool Simple::OnKeyboard(iEvent& ev)
@@ -194,6 +196,9 @@ bool Simple::SetupModules ()
   loader = csQueryRegistry<iLoader> (GetObjectRegistry());
   if (!loader) return ReportError("Failed to locate Loader!");
 
+  rm = csQueryRegistryOrLoad<iRenderManager> (GetObjectRegistry (),
+    "crystalspace.rendermanager.test1");
+
   // We need a View to the virtual world.
   view.AttachNew(new csView (engine, g3d));
   iGraphics2D* g2d = g3d->GetDriver2D ();
@@ -221,7 +226,7 @@ bool Simple::SetupModules ()
   // We use some other "helper" event handlers to handle 
   // pushing our work into the 3D engine and rendering it
   // to the screen.
-  drawer.AttachNew(new FrameBegin3DDraw (GetObjectRegistry (), view));
+  //drawer.AttachNew(new FrameBegin3DDraw (GetObjectRegistry (), view));
   printer.AttachNew(new FramePrinter (GetObjectRegistry ()));
 
   return true;

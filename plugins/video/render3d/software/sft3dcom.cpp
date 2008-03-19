@@ -142,7 +142,7 @@ bool csSoftwareGraphics3DCommon::Initialize (iObjectRegistry* p)
   }
 
   strings = csQueryRegistryTagInterface<iStringSet> (
-    object_reg, "crystalspace.shared.stringset");
+    object_reg, "crystalspace.shader.variablenameset");
   string_world2camera = strings->Request ("world2camera transform");
   string_indices = strings->Request ("indices");
 

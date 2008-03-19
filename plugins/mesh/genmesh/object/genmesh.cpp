@@ -1641,7 +1641,7 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (
 
   g3d = csQueryRegistry<iGraphics3D> (object_reg);
   strings = csQueryRegistryTagInterface<iStringSet>
-    (object_reg, "crystalspace.shared.stringset");
+    (object_reg, "crystalspace.shader.variablenameset");
 
   mesh_vertices_dirty_flag = false;
   mesh_texels_dirty_flag = false;
@@ -2404,7 +2404,7 @@ bool csGenmeshMeshObjectType::Initialize (iObjectRegistry* object_reg)
 {
   csGenmeshMeshObjectType::object_reg = object_reg;
   csRef<iStringSet> strset = csQueryRegistryTagInterface<iStringSet> (
-      object_reg, "crystalspace.shared.stringset");
+      object_reg, "crystalspace.shader.variablenameset");
   base_id = strset->Request ("base");
   csRef<iVerbosityManager> verbosemgr (
     csQueryRegistry<iVerbosityManager> (object_reg));

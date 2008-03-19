@@ -87,6 +87,20 @@ namespace CS
     return Func;
   }
 
+  /**
+  * Iterate over all elements in the iterator and perform operation
+  * given by Func.
+  */
+  template <class T, class Fn, class P1, class P2>
+  CS_FORCEINLINE_TEMPLATEMETHOD Fn& ForEach (T it, Fn& Func, P1& p1, P2& p2)
+  {
+    while (it.HasNext ())
+    {
+      Func (it.Next (), p1, p2);
+    }
+    return Func;
+  }
+
 
 }
 

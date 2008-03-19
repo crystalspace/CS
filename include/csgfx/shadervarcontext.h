@@ -113,6 +113,7 @@ namespace CS
   // Deprecated in 1.3
   typedef CS_DEPRECATED_TYPE_MSG("Use Graphics::ShaderVariableContextImpl")
     Graphics::ShaderVariableContextImpl ShaderVariableContextImpl;
+
 }
 
 /**

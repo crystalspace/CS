@@ -3480,7 +3480,7 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
   bugplug = csQueryRegistry<iBugPlug> (object_reg);
 
   strings = csQueryRegistryTagInterface<iStringSet> (
-    object_reg, "crystalspace.shared.stringset");
+    object_reg, "crystalspace.shader.variablenameset");
 
   csRef<iPluginManager> plugin_mgr = 
   	csQueryRegistry<iPluginManager> (object_reg);

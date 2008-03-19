@@ -55,6 +55,11 @@ public:
 
   virtual size_t GetTicket (const CS::Graphics::RenderMeshModes&, 
     const iShaderVarStack*) { return 0; }
+  virtual size_t GetTicket (const csRenderMeshModes& modes,
+    csShaderVariable** stacks)
+  {
+    return 0;
+  }
 
   virtual size_t GetNumberOfPasses (size_t) { return 0; }
   virtual bool ActivatePass (size_t, size_t) { return false; }
@@ -74,6 +79,7 @@ public:
   const csRefArray<csShaderVariable>& GetShaderVariables () const
   { return dummySVs; }
   void PushVariables (iShaderVarStack*) const { }
+  void PushVariables (csShaderVariable** stacks) const {  }
 
   bool IsEmpty() const { return true; }
   void ReplaceVariable (csShaderVariable*) {}

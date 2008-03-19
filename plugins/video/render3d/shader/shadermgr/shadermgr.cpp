@@ -132,6 +132,8 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
 
   strings = csQueryRegistryTagInterface<iStringSet> (
     objectreg, "crystalspace.shared.stringset");
+  csRef<iStringSet> stringsSvName = csQueryRegistryTagInterface<iStringSet> (
+    objectreg, "crystalspace.shader.variablenameset");
 
   {
     csRef<csNullShader> nullShader;
@@ -214,7 +216,7 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
     SetTagOptions (tagID, presence, tagPriority);
   }
 
-  sv_time.AttachNew (new csShaderVariable (strings->Request ("standard time")));
+  sv_time.AttachNew (new csShaderVariable (stringsSvName->Request ("standard time")));
   sv_time->SetValue (0.0f);
   AddVariable (sv_time);
 

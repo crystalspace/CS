@@ -1,0 +1,4 @@
+SubDir TOP plugins rendermanager ;
+
+SubInclude TOP plugins rendermanager test1 ;
+

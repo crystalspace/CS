@@ -55,9 +55,9 @@ csVProcStandardProgram::csVProcStandardProgram (csVProc_Std *plug)
   bitangentBuffer (CS_BUFFER_BINORMAL)
 {
   InitTokenTable (tokens);
-  bones_indices_name = strings->Request("bones indices");
-  bones_weights_name = strings->Request("bones weights");
-  bones_name = strings->Request("bones");
+  bones_indices_name = stringsSvName->Request("bones indices");
+  bones_weights_name = stringsSvName->Request("bones weights");
+  bones_name = stringsSvName->Request("bones");
 }
 
 csVProcStandardProgram::~csVProcStandardProgram ()
@@ -616,7 +616,7 @@ bool csVProcStandardProgram::ParseBufferName (iDocumentNode* child,
   name.defaultName = csRenderBuffer::GetBufferNameFromDescr (str);
 
   if (name.defaultName == CS_BUFFER_NONE)
-    name.userName = strings->Request (str);
+    name.userName = stringsSvName->Request (str);
 
   return true;
 }

@@ -293,7 +293,7 @@ void csPolygonRenderer::SetupBufferHolder (csThing* instance,
     csStringID name;
     csRef<iRenderBuffer> buf = userBufIt.Next (name);
     csRenderBufferName bufName = 
-      csRenderBuffer::GetBufferNameFromDescr (parent->stringset->Request (name));
+      csRenderBuffer::GetBufferNameFromDescr (parent->stringsetSvName->Request (name));
     if (bufName >= CS_BUFFER_POSITION)
     {
       accessorMask &= ~(1 << bufName);

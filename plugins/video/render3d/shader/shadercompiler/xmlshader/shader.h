@@ -329,6 +329,17 @@ public:
     GetUsedSVContext().PushVariables (stacks); 
   }
 
+  void PushVariables (csShaderVariable** stacks) const
+  { 
+    if (useFallbackContext)
+    {
+      fallbackShader->PushVariables (stacks);
+      return;
+    }
+    GetUsedSVContext().PushVariables (stacks); 
+  }
+
+
   bool IsEmpty() const
   {
     if (useFallbackContext)

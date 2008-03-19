@@ -177,7 +177,7 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
 
   if ((texLightmapName == csInvalidStringID))
   {
-    texLightmapName = thing_type->stringset->Request ("tex lightmap");
+    texLightmapName = thing_type->stringsetSvName->Request ("tex lightmap");
   }
 }
 
@@ -1498,7 +1498,7 @@ bool csThingStatic::IsPolygonTransparent (int polygon_idx)
 bool csThingStatic::AddPolygonRenderBuffer (int polygon_idx, const char* name,
                                             iRenderBuffer* buffer)
 {
-  csStringID nameID = thing_type->stringset->Request (name);
+  csStringID nameID = thing_type->stringsetSvName->Request (name);
   iRenderBuffer* Template;
   if ((Template = polyBufferTemplates.GetRenderBuffer (nameID)) != 0)
   {
@@ -2899,8 +2899,8 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
     Notify ("Lightmapping enabled=%d", (int)csThing::lightmap_enabled);
   }
 
-  stringset = csQueryRegistryTagInterface<iStringSet> (
-    object_reg, "crystalspace.shared.stringset");
+  stringsetSvName = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shader.variablenameset");
 
   shadermgr = csQueryRegistry<iShaderManager> (object_reg);
 

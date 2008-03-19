@@ -2245,7 +2245,15 @@ chronological order.
 	  wrapper creation.
 	- res added support for float textures to gl3d CreateTexture().
 8-Jul-2007
-	- Genjix removed qualifier for LightmapMask destructor due to failing
+	- Marten changed the single global stringset into two, one for
+	  general usage and one that is only to be used for shader variable
+	  names (all SV names).
+	- Marten added the first baby-steps towards the RM:
+	    - Added a iRenderView implementation outside of engine.
+	    - Added first prototype of RenderTree
+	    - Added a testing RM for development.
+	    - Made simple1 use said RM, whoever atm without any visual output.
+	    	- Genjix removed qualifier for LightmapMask destructor due to failing
 	  to compile on linux.
 7-Jul-2007
 	- Marten fixed the OSX assistant to properly expose its intefaces.

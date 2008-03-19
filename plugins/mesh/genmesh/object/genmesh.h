@@ -119,6 +119,11 @@ public:
     context2->PushVariables (stacks);
     context1->PushVariables (stacks);
   }
+  void PushVariables (csShaderVariable** stacks) const
+  {
+    context2->PushVariables (stacks);
+    context1->PushVariables (stacks);
+  }
 
   bool IsEmpty () const { return context1->IsEmpty() && context2->IsEmpty(); }
 

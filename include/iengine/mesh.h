@@ -650,6 +650,12 @@ struct iMeshWrapper : public virtual iBase
   virtual iShaderVariableContext* GetSVContext() = 0;
 
   /**
+   * Get the render mesh list for this mesh wrapper and given view
+   */
+  virtual csRenderMesh** GetRenderMeshes (int& num, iRenderView* rview,
+    uint32 frustum_mask) = 0;
+
+  /**
    * Adds a render mesh to the list of extra render meshes.
    * This list is used for special cases (like decals) where additional
    * things need to be renderered for the mesh in an abstract way.
