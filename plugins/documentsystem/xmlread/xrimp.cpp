@@ -30,6 +30,9 @@
 #include "iutil/databuff.h"
 #include "xr.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(XMLRead)
+{
+
 //------------------------------------------------------------------------
 
 csXmlReadDocumentSystem::csXmlReadDocumentSystem (iBase* parent) :
@@ -480,8 +483,7 @@ const char* csXmlReadDocument::Parse (const char* buf, bool collapse)
 {
   CreateRoot (CS::StrDup (buf));
   root->SetCondenseWhiteSpace(collapse);
-  ParseInfo parse;
-  root->Parse (parse, root->input_data);
+  root->Parse (root->input_data);
   if (root->Error ())
     return root->ErrorDesc ();
   return 0;
@@ -491,8 +493,7 @@ const char* csXmlReadDocument::ParseInPlace (char* buf, bool collapse)
 {
   CreateRoot (buf);
   root->SetCondenseWhiteSpace(collapse);
-  ParseInfo parse;
-  root->Parse (parse, root->input_data);
+  root->Parse (root->input_data);
   if (root->Error ())
     return root->ErrorDesc ();
   return 0;
@@ -532,3 +533,6 @@ void csXmlReadDocument::Free (csXmlReadNode* n)
 
 //------------------------------------------------------------------------
 
+
+}
+CS_PLUGIN_NAMESPACE_END(XMLRead)

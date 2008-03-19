@@ -1,5 +1,9 @@
 1.2 branch log.
 
+19-Mar-2008
+	- Vincent merged r27217, r27408, r27410:27411, r27427, r27671, r27680,
+	  r27746 and r29044 into 1.2 (fixes and enhancements for TinyXML and
+	  xmlread).
 13-Mar-2008
 	- Vincent merged r27274, r28613:28614, and r28618:28619 into 1.2
 	  (fix for #424 and #425, setting priority on a non-running thread had

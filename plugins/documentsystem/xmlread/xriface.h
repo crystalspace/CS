@@ -22,6 +22,9 @@
 #include "iutil/document.h"
 #include "csutil/scf_implementation.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(XMLRead)
+{
+
 struct csXmlReadNode;
 class TrDocumentNode;
 
@@ -38,5 +41,8 @@ public:
 
   virtual csRef<iDocument> CreateDocument ();
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(XMLRead)
 
 #endif // __CS_XRIFACE_H__

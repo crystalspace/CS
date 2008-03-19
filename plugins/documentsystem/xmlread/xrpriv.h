@@ -23,6 +23,9 @@
 #include "csutil/scf_implementation.h"
 #include "xr.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(XMLRead)
+{
+
 class csXmlReadDocument;
 
 /**
@@ -240,5 +243,8 @@ public:
 
   virtual int Changeable () { return CS_CHANGEABLE_NEVER; }
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(XMLRead)
 
 #endif // __XRPRIV_H__

@@ -6,6 +6,10 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-Mar-2008
+	- Mike Gist fixed a crash in tinyxml when parsing a binary xml file.
+	- Mike Gist added some missing error sets in tinyxml, so it now
+	  returns an error when it fails to parse a binary xml file.
 12-Mar-2008
 	- Marten made the UTF8 BOM checks a bit more robust after a few 
 	  comments from Mononoke.
@@ -465,6 +469,11 @@ chronological order.
         - Mike Gist reversed the loops in csSector::UnlinkObjects() to avoid
           meshes being skipped if sl->Remove() removes a mesh object from the
           sector's mesh list.
+	- res made the following changes to TinyXML:
+	  - When writing to an iFile, instead of storing the XML to a string
+	    buffer and writing out everything at once, a smaller buffer is
+	    used and the data is written out incrementally.
+	  - Scraped a few bytes off the Tiny node's memory footprint.
 29-Sep-2007
 	- Mike Gist changed the call to LoadTexture() in FindTexture() to not
 	  create a material if the texture isn't found. This fixes a material
@@ -505,11 +514,16 @@ chronological order.
 	  can't be loaded - it merely displays an error message now.
 	- res changed lighter2 to only propagate lights once through any 
 	  portal. This works around apparently occuring infinite recursions.
+	- res added the line number + column reporting to the TinyXML and 
+	  xmlread error strings. Addresses trac #123.
 17-Sep-2007
 	- res added a driver DB tweak to disable EXT_framebuffer_object for
 	  (now rather old) ATI drivers (see trac #261).
 	- res tweaked the driver DB to enabled "hidden Radeon NPOTS" for newer
 	  ATI drivers (which have a slightly different renderer string).
+	- res made the XML parsers errors slightly more helpful by having the
+	  error message contain the hierarchy of elements in which the error
+	  occured.
 15-Sep-2007
 	- res fixed a crash in the GL driver DB when <comparever> was used
 	  with an unrecognized version type.
@@ -552,13 +566,21 @@ chronological order.
 	- Jorrit fixed a bug in genmesh. Decals didn't work on submeshes.
 	  This prevented decals from working on levels treated with
 	  lighter2.
+	- res fixed TinyXML to build on gcc 4.1.2 again (issue found by Darek).
 11-Aug-2007
+	- res changed csFixedSizeAllocator<> to allow construction from a
+	  given memory allocator.
+	- res changed TinyXML documents to use their own heap. Can reduce 
+	  memory fragmentation when dealing with large documents.
 	- res added CS::Utility::SmartFileOpen() - a function for the somewhat
 	  common task to open a world file from a path that could denote any
 	  of: a plain filename, directory or .zip archive.
 	- res added an option to levtool to fix <polymesh> tags (by replacing
 	  them with <trimesh> tags).
 	- res made levtool use CS::Utility::SmartFileOpen().
+10-Aug-2007
+	- res changed the delayed TinyXML node freeing to use less memory 
+	  allocations. Can speed up cleanup for large documents.
 8-Aug-2007
 	- res added a missing initialization to csConsoleOutput. Should 
 	  address trac #368.
@@ -650,6 +672,9 @@ chronological order.
 	- Eric Sunshine fixed csQsqrt() check in configure.ac which was broken
 	  due to use of CS_FORCEINLINE in csqsqrt.h, causing the test to fail
 	  unconditionally.
+	- res relaxed the "no copy" restriction for csFixedSizeAllocator<> a 
+	  bit: it's now	allowed to copy an empty allocator (which basically 
+	  only copies the block sizes). Useful for some initialization cases.
 8-Jul-2007
 	- Genjix removed qualifier for LightmapMask destructor due to failing
 	  to compile on linux.
