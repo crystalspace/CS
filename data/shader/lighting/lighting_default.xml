@@ -50,6 +50,7 @@
       <connection from="position" to="parallax" />
       <connection from="position" to="lighting" />
       <connection from="parallax" to="surface" />
+      <connection from="parallax" to="normalmap" />
       <connection from="normalmap" to="lighting" />
       <connection from="surface" to="mod_light_surf" />
       <connection from="lighting" to="mod_light_surf" />
@@ -90,6 +91,7 @@
       <connection from="position" to="parallax" />
       <connection from="position" to="lighting" />
       <connection from="parallax" to="surface" />
+      <connection from="parallax" to="normalmap" />
       <connection from="normalmap" to="lighting" />
       <connection from="surface" to="mod_light_surf" />
       <connection from="lighting" to="mod_light_surf" />

@@ -8,6 +8,8 @@ chronological order.
 
 19-Mar-2008
 	- res fixed the parallax snippet to avoid duplicate identifier errors.
+	- res fixed lighting_default to use parallax TCs for the normal map
+	  as well.
 18-Mar-2008
 	- res changed dynavis to keep a reference to the debug camera stored.
 	- res changed iPortalContainer::ComputeScreenPolygons() to take the
