@@ -370,7 +370,6 @@ protected:
   bool matrixDirty;
   bool invMatrixDirty;
   
-  virtual void Dirtify () { matrixDirty = true; }
   void UpdateMatrix ();
   void UpdateInvMatrix ();
 public:
@@ -456,6 +455,8 @@ public:
     UpdateInvMatrix ();
     return invMatrix;
   }
+  
+  virtual void Dirtify () { matrixDirty = true; }
 };
 
 // Helper to forward iCamera perspective methods to a PerspectiveImpl instance
@@ -544,6 +545,7 @@ public:
   void SetViewportSize (int width, int height)
   {
     vp_width = width; vp_height = height;
+    Persp().Dirtify();
   }
 };
 

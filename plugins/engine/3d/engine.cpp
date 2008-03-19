@@ -1580,6 +1580,7 @@ void csEngine::Draw (iCamera *c, iClipper2D *view, iMeshWrapper* mesh)
     bugplug->ResetCounter ("Sector Count");
 
   currentFrameNumber++;
+  c->SetViewportSize (frameWidth, frameHeight);
   ControlMeshes ();
   csRef<csRenderView> rview;
   rview.AttachNew (new (rviewPool) csRenderView (c, view, G3D, G2D));
@@ -1588,7 +1589,6 @@ void csEngine::Draw (iCamera *c, iClipper2D *view, iMeshWrapper* mesh)
   // First initialize G3D with the right clipper.
   G3D->SetClipper (view, CS_CLIPPER_TOPLEVEL);  // We are at top-level.
   G3D->ResetNearPlane ();
-  c->SetViewportSize (frameWidth, frameHeight);
   G3D->SetProjectionMatrix (c->GetProjectionMatrix ());
 
   FireStartFrame (rview);
