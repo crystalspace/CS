@@ -6,6 +6,11 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+
+19-Mar-2008
+	- Mike Gist fixed a crash in tinyxml when parsing a binary xml file.
+	- Mike Gist added some missing error sets in tinyxml, so it now
+	  returns an error when it fails to parse a binary xml file.
 18-Mar-2008
 	- Marten added separate alpha-maps to terrain2 renderer, cells
 	  and feeder.
