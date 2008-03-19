@@ -20,6 +20,7 @@
 
 #include "iengine/engine.h"
 #include "ivaria/reporter.h"
+#include "csplugincommon/rendermanager/render.h"
 
 #include "rm_compat.h"
 
@@ -31,21 +32,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(RM_RLCompat)
 
   bool RMCompat::Initialize (iObjectRegistry* objReg)
   {
-    engine = csQueryRegistry<iEngine> (objReg);
-    if (!engine)
-    {
-      csReport (objReg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.rendermanager.rlcompat",
-        "No iEngine available");
-      return false;
-    }
-    
     return true;
   }
   
   bool RMCompat::RenderView (iView* view)
   {
+    iEngine* engine = view->GetEngine();
     view->UpdateClipper();
+    CS::RenderManager::BeginFinishDrawScope drawScope (
+      view->GetContext(),
+      engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS);
     engine->Draw (view->GetCamera(), view->GetClipper());
     return true;
   }

@@ -33,10 +33,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RM_RLCompat)
 					     iRenderManager,
 					     iComponent>
   {
-    csWeakRef<iEngine> engine;
   public:
-    RMCompat (iBase* parent) : scfImplementationType (this, parent),
-      engine (0) {}
+    RMCompat (iBase* parent) : scfImplementationType (this, parent) {}
       
     bool Initialize (iObjectRegistry* objReg);
   
