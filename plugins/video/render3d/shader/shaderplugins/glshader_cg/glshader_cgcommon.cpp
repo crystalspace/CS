@@ -338,10 +338,7 @@ void csShaderGLCGCommon::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
   {
     VariableMapEntry& mapping = variablemap[i];
     
-    var = csGetShaderVariableFromStack (stack, mapping.name);
-    if (!var.IsValid ())
-      var = mapping.mappingParam.var;
-
+    var = GetParamSV (stack, mapping.mappingParam);
     // If var is null now we have no const nor any passed value, ignore it
     if (!var.IsValid ())
       continue;

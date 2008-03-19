@@ -13,6 +13,7 @@ chronological order.
 	- res moved the parallax snippet to a better location.
 	- res fixed array index support in 'new' variablemap syntax and added
 	  array index support to 'old' variablemap syntax in csShaderProgram.
+	- res made the Cg shader plugin support array items.
 18-Mar-2008
 	- res changed dynavis to keep a reference to the debug camera stored.
 	- res changed iPortalContainer::ComputeScreenPolygons() to take the
