@@ -88,7 +88,7 @@ bool csShaderProgram::ProgramParamParser::ParseProgramParam (
     
     CS::Graphics::ShaderVarNameParser nameParse (value);
     param.name = stringsSvName->Request (nameParse.GetShaderVarName());
-    for (size_t n; n < nameParse.GetIndexNum(); n++)
+    for (size_t n = 0; n < nameParse.GetIndexNum(); n++)
     {
       param.indices.Push (nameParse.GetIndexValue (n));
     }
@@ -316,8 +316,15 @@ bool csShaderProgram::ParseCommon (iDocumentNode* child)
 	else
 	{
 	  // "Classic" variable mapping
-	  variablemap.Push (VariableMapEntry (stringsSvName->Request (varname),
-	    destname));
+	  CS::Graphics::ShaderVarNameParser nameParse (varname);
+	  VariableMapEntry vme (
+	    stringsSvName->Request (nameParse.GetShaderVarName()),
+	    destname);
+	  for (size_t n = 0; n < nameParse.GetIndexNum(); n++)
+	  {
+	    vme.mappingParam.indices.Push (nameParse.GetIndexValue (n));
+	  }
+	  variablemap.Push (vme);
 	}
       }
       break;

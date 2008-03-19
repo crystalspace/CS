@@ -11,6 +11,8 @@ chronological order.
 	- res fixed lighting_default to use parallax TCs for the normal map
 	  as well.
 	- res moved the parallax snippet to a better location.
+	- res fixed array index support in 'new' variablemap syntax and added
+	  array index support to 'old' variablemap syntax in csShaderProgram.
 18-Mar-2008
 	- res changed dynavis to keep a reference to the debug camera stored.
 	- res changed iPortalContainer::ComputeScreenPolygons() to take the
