@@ -1,8 +1,8 @@
 <cgvp>
 <profile>arbvp1</profile> 
 <compilerargs>-posinv</compilerargs>
-<variablemap variable="light 0 position" destination="LightPos" />
-<variablemap variable="light 0 attenuation" destination="Attenuation" />
+<variablemap variable="light position[0]" destination="LightPos" />
+<variablemap variable="light attenuation[0]" destination="Attenuation" />
 
 <program>
 <![CDATA[
