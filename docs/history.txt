@@ -19,6 +19,8 @@ chronological order.
 	- res tweaked the setup of the backwards compatible camera somewhat.
 	- res changed the "compatibility" render manager to also call
 	  BeginDraw().
+	- res changed the lightiter step to use array variables for light data
+	  instead of "numbered names".
 18-Mar-2008
 	- res changed dynavis to keep a reference to the debug camera stored.
 	- res changed iPortalContainer::ComputeScreenPolygons() to take the

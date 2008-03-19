@@ -76,10 +76,12 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s, iMeshWrapper* mesh)
     csSector* cs = (csSector*)s;
     cs->SetSingleMesh (mesh);
 
+    csShaderVariableStack& stack = shadermanager->GetShaderVariableStack ();
     size_t i;
     for (i = 0; i < steps.GetSize (); i++)
     {
-      steps[i]->Perform (rview, s, shadermanager->GetShaderVariableStack ());
+      stack.Clear ();
+      steps[i]->Perform (rview, s, stack);
     }
     s->DecRecLevel ();
     cs->SetSingleMesh (0);

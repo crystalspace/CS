@@ -137,7 +137,7 @@ csPtr<iRenderStep> csLightIterRenderStepFactory::Create ()
 
 csLightIterRenderStep::csLightIterRenderStep (
   iObjectRegistry* object_reg) :
-  scfImplementationType (this)
+  scfImplementationType (this), lastLSVHelperFrame ((uint)~0)
 {
   csLightIterRenderStep::object_reg = object_reg;
   initialized = false;
@@ -167,102 +167,16 @@ void csLightIterRenderStep::Init ()
     csRef<iShaderVarStringSet> strings =
       csQueryRegistryTagInterface<iShaderVarStringSet> (
         object_reg, "crystalspace.shader.variablenameset");
+        
+    csLightShaderVarCache svNames;
+    svNames.SetStrings (strings);
+    sv_attn_tex_name = svNames.GetLightSVId (
+      csLightShaderVarCache::lightAttenuationTex);
 
-    CS::ShaderVarStringID posname = strings->Request ("light 0 position");
-    CS::ShaderVarStringID poswname = strings->Request ("light 0 position world");
-    CS::ShaderVarStringID trname = strings->Request ("light 0 transform");
-    CS::ShaderVarStringID trwname = strings->Request ("light 0 transform world");
-    CS::ShaderVarStringID difname = strings->Request ("light 0 diffuse");
-    CS::ShaderVarStringID spcname = strings->Request ("light 0 specular");
-    CS::ShaderVarStringID attname = strings->Request ("light 0 attenuation");
-    CS::ShaderVarStringID atxname = strings->Request ("light 0 attenuationtex");
-    CS::ShaderVarStringID infallname = strings->Request ("light 0 inner falloff");
-    CS::ShaderVarStringID ofallname = strings->Request ("light 0 outer falloff");
-    trw_inv_name = strings->Request ("light 0 transform inverse world");
     CS::ShaderVarName lightcountname (strings, "light count");
 
     shadermgr = csQueryRegistry<iShaderManager> (object_reg);
     lightmgr = csQueryRegistry<iLightManager> (object_reg);
-
-    shvar_light_0_position = shadermgr->GetVariable (posname);
-    if (!shvar_light_0_position)
-    {
-      shvar_light_0_position.AttachNew(new csShaderVariable (posname));
-      shvar_light_0_position->SetType (csShaderVariable::VECTOR4);
-      shadermgr->AddVariable (shvar_light_0_position);
-    }
-
-    shvar_light_0_position_world = shadermgr->GetVariable (poswname);
-    if (!shvar_light_0_position_world)
-    {
-      shvar_light_0_position_world.AttachNew(new csShaderVariable (poswname));
-      shvar_light_0_position_world->SetType (csShaderVariable::VECTOR4);
-      shadermgr->AddVariable (shvar_light_0_position_world);
-    }
-
-    shvar_light_0_transform = shadermgr->GetVariable (trname);
-    if (!shvar_light_0_transform)
-    {
-      shvar_light_0_transform.AttachNew(new csShaderVariable (trname));
-      shvar_light_0_transform->SetType (csShaderVariable::TRANSFORM);
-      shadermgr->AddVariable (shvar_light_0_transform);
-    }
-
-    shvar_light_0_transform_world = shadermgr->GetVariable (trwname);
-    if (!shvar_light_0_transform_world)
-    {
-      shvar_light_0_transform_world.AttachNew(new csShaderVariable (trwname));
-      shvar_light_0_transform_world->SetType (csShaderVariable::TRANSFORM);
-      shadermgr->AddVariable (shvar_light_0_transform_world);
-    }
-
-    shvar_light_0_diffuse = shadermgr->GetVariable (difname);
-    if (!shvar_light_0_diffuse)
-    {
-      shvar_light_0_diffuse.AttachNew(new csShaderVariable (difname));
-      shvar_light_0_diffuse->SetType (csShaderVariable::VECTOR4);
-      shadermgr->AddVariable (shvar_light_0_diffuse);
-    }
-
-    shvar_light_0_specular = shadermgr->GetVariable (spcname);
-    if (!shvar_light_0_specular)
-    {
-      shvar_light_0_specular.AttachNew(new csShaderVariable (spcname));
-      shvar_light_0_specular->SetType (csShaderVariable::VECTOR4);
-      shadermgr->AddVariable (shvar_light_0_specular);
-    }
-
-    shvar_light_0_attenuation = shadermgr->GetVariable (attname);
-    if (!shvar_light_0_attenuation)
-    {
-      shvar_light_0_attenuation.AttachNew(new csShaderVariable (attname));
-      shvar_light_0_attenuation->SetType (csShaderVariable::VECTOR4);
-      shadermgr->AddVariable (shvar_light_0_attenuation);
-    }
-
-    shvar_light_0_attenuationtex = shadermgr->GetVariable (atxname);
-    if (!shvar_light_0_attenuationtex)
-    {
-      shvar_light_0_attenuationtex.AttachNew(new csShaderVariable (atxname));
-      shvar_light_0_attenuationtex->SetType (csShaderVariable::TEXTURE);
-      shadermgr->AddVariable (shvar_light_0_attenuationtex);
-    }
-
-    shvar_light_0_inner_falloff = shadermgr->GetVariable (infallname);
-    if (!shvar_light_0_inner_falloff)
-    {
-      shvar_light_0_inner_falloff.AttachNew(new csShaderVariable (infallname));
-      shvar_light_0_inner_falloff->SetType (csShaderVariable::FLOAT);
-      shadermgr->AddVariable (shvar_light_0_inner_falloff);
-    }
-
-    shvar_light_0_outer_falloff = shadermgr->GetVariable (ofallname);
-    if (!shvar_light_0_outer_falloff)
-    {
-      shvar_light_0_outer_falloff.AttachNew(new csShaderVariable (ofallname));
-      shvar_light_0_outer_falloff->SetType (csShaderVariable::FLOAT);
-      shadermgr->AddVariable (shvar_light_0_outer_falloff);
-    }
 
     csRef<csShaderVariable> svLightCount (
       shadermgr->GetVariable (lightcountname));
@@ -289,9 +203,17 @@ csLightIterRenderStep::GetLightAccessor (iLight* light)
 }
 
 void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
-  csShaderVariableStack& stack)
+  csShaderVariableStack& _stack)
 {
   Init ();
+  
+  uint frameNum = rview->GetCurrentFrameNumber ();
+  if (frameNum != lastLSVHelperFrame)
+  {
+    lastLSVHelperFrame = frameNum;
+    lightSvHelperPersist.UpdateNewFrame();
+  }
+  CS::RenderManager::LightingVariablesHelper lsvHelper (lightSvHelperPersist);
 
   // @@@ This code is ignoring dynamic lights. Perhaps we need a better
   // way to represent those.
@@ -314,50 +236,20 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
 
     const csVector3 lightPos = light->GetMovable ()->GetFullPosition ();
 
-    /* 
-    @@@ material specific diffuse/specular/ambient.
-    Realized as shader variables maybe?
-    */
-    csReversibleTransform camTransR = rview->GetCamera()->GetTransform();
-
-    const csColor& color = light->GetColor ();
-    shvar_light_0_diffuse->SetValue (
-      csVector3 (color.red, color.green, color.blue));
-
-    shvar_light_0_specular->SetValue (csVector3 (1));
-
-    csLightAttenuationMode attnMode = light->GetAttenuationMode ();
-    if (attnMode == CS_ATTN_LINEAR)
-    {
-      float r = light->GetAttenuationConstants ().x;
-      shvar_light_0_attenuation->SetValue (csVector3(r, 1/r, 0));
-    }
-    else
-    {
-      shvar_light_0_attenuation->SetValue (light->GetAttenuationConstants ());
-    }
-    shvar_light_0_position->SetValue (lightPos * camTransR);
-    shvar_light_0_position_world->SetValue (lightPos);
-    shvar_light_0_transform->SetValue (light->GetMovable()->GetFullTransform()
-    	* camTransR);
-    shvar_light_0_transform_world->SetValue (light->GetMovable()
-    	->GetFullTransform());
-    float falloffInner, falloffOuter;
-    light->GetSpotLightFalloff (falloffInner, falloffOuter);
-    shvar_light_0_inner_falloff->SetValue (falloffInner);
-    shvar_light_0_outer_falloff->SetValue (falloffOuter);
-
-    shvar_light_0_attenuationtex->SetAccessor (GetLightAccessor (light));
-
-	csShaderVariable *sv;
-	sv = light->GetSVContext()->GetVariableAdd(trw_inv_name);
-    sv->SetValue (light->GetMovable()->GetFullTransform().GetInverse());
+    csShaderVariableStack stack (_stack);
+    stack.MakeOwnArray();
+    csShaderVariable* svAttnTex = lsvHelper.CreateTempSV (sv_attn_tex_name);
+    svAttnTex->SetAccessor (GetLightAccessor (light));
+    lsvHelper.MergeAsArrayItem (stack, svAttnTex, 0);
+    lsvHelper.MergeAsArrayItems (stack,
+      light->GetSVContext()->GetShaderVariables (), 0);
 
     lightList.Push (light);
     shadermgr->SetActiveLights (lightList);
     lightList.Empty ();
 
     csSphere lightSphere (lightPos, light->GetCutoffDistance ());
+    csReversibleTransform camTransR = rview->GetCamera()->GetTransform();
     if (CS::RenderViewClipper::TestBSphere (rview->GetRenderContext (),
 	  camTransR, lightSphere))
     {

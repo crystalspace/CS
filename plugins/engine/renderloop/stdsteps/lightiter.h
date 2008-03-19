@@ -31,6 +31,7 @@
 #include "iengine/lightmgr.h"
 #include "ivideo/shader/shader.h"
 
+#include "csplugincommon/rendermanager/lightsetup.h"
 #include "csplugincommon/renderstep/basesteptype.h"
 #include "csplugincommon/renderstep/basesteploader.h"
 #include "csplugincommon/renderstep/parserenderstep.h"
@@ -91,19 +92,6 @@ private:
   csRefArray<iLightRenderStep> steps;
 
   iObjectRegistry* object_reg;
-  csRef<csShaderVariable> shvar_light_0_position;
-  csRef<csShaderVariable> shvar_light_0_position_world;
-  csRef<csShaderVariable> shvar_light_0_transform;
-  csRef<csShaderVariable> shvar_light_0_transform_world;
-  csRef<csShaderVariable> shvar_light_0_diffuse;
-  csRef<csShaderVariable> shvar_light_0_specular;
-  csRef<csShaderVariable> shvar_light_0_attenuation;
-  csRef<csShaderVariable> shvar_light_0_attenuationtex;
-  csRef<csShaderVariable> shvar_light_0_inner_falloff;
-  csRef<csShaderVariable> shvar_light_0_outer_falloff;
-
-  CS::ShaderVarStringID trw_inv_name;
-
 
   csRef<iShaderManager> shadermgr;
   csRef<iLightManager> lightmgr;
@@ -141,6 +129,11 @@ private:
 
   csHash<LightSVAccessor*, csPtrKey<iLight> > knownLights;
   csRef<iTextureHandle> attTex;
+  
+  uint lastLSVHelperFrame;
+  CS::RenderManager::LightingVariablesHelper::PersistentData
+    lightSvHelperPersist;
+  CS::ShaderVarStringID sv_attn_tex_name;
 
   LightSVAccessor* GetLightAccessor (iLight* light);
 
