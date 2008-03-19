@@ -16,6 +16,7 @@ chronological order.
 	- res made the Cg shader plugin support array items.
 	- res fixed the engine light iterator to return lights when no bbox
 	  is given by using a really huge bbox (as originally intended).
+	- res tweaked the setup of the backwards compatible camera somewhat.
 18-Mar-2008
 	- res changed dynavis to keep a reference to the debug camera stored.
 	- res changed iPortalContainer::ComputeScreenPolygons() to take the
