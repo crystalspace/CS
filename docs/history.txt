@@ -6,6 +6,7 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+<<<<<<< .working
 18-Mar-2008
 	- Marten added separate alpha-maps to terrain2 renderer, cells
 	  and feeder.
@@ -2159,6 +2160,9 @@ chronological order.
 	- Eric Sunshine rewrote the plugin loader for Mac OS X to fully employ
 	  the "two-level" namespace dynamic-library model introduced in OSX
 	  10.1. The deprecated "flat" namespace model is no longer supported.
+	- Marten changed i/csShaderVarStack into csShaderVariableStack. Its
+	  interface is non-virtual, so be careful with calling of the Setup
+	  method.
 21-Jul-2007
 	- Vincent updated rpm/cs.spec for items moved to CSExtra, lighter2
 	  addition, and versioned files & directories.
@@ -2194,6 +2198,10 @@ chronological order.
 	  Also made the "no cs-config-* ..." error message output to stderr
 	  instead of stdout.
 	- res added a (still empty) appendix for the 1.2 to 1.4 API changes.
+	- Marten made some more improvements to the rendermanager, added a
+	  mesh sorter, extended the interface of the rendertree.
+	- Marten changed the csRedBlackTree to use usual functors instead
+	  of object with .Process for traversal.
 16-Jul-2007
 	- Jorrit fixed two problems in csSpline as reported by valgrind.
 	- Andres changed the python detection code to look for a 

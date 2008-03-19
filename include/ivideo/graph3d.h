@@ -44,7 +44,6 @@ struct iRenderBuffer;
 struct iRendererLightmap;
 struct iShader;
 struct iShaderVariableContext;
-struct iShaderVarStack;
 struct iTextureHandle;
 struct iTextureManager;
 
@@ -64,6 +63,7 @@ namespace CS
   } // namespace Graphics
 } // namespace CS
 class csRenderBufferHolder;
+class csShaderVariableStack;
 
 
 /**\name iGraphics3D::BeginDraw() flags
@@ -887,7 +887,7 @@ struct iGraphics3D : public virtual iBase
   /// Drawroutine. Only way to draw stuff
   virtual void DrawMesh (const CS::Graphics::CoreRenderMesh* mymesh,
                          const CS::Graphics::RenderMeshModes& modes,
-                         const iShaderVarStack* stacks) = 0;
+                         const csShaderVariableStack& stack) = 0;
   /**
   * Draw a csSimpleRenderMesh on the screen.
   * Simple render meshes are intended for cases where setting up

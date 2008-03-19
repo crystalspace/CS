@@ -612,6 +612,10 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
 
   globalStringSet = csQueryRegistryTagInterface<iStringSet> (
       objectRegistry, "crystalspace.shared.stringset");
+
+  svNameStringSet = csQueryRegistryTagInterface<iStringSet> (
+    objectRegistry, "crystalspace.shader.variablenameset");
+
   colldet_id = globalStringSet->Request ("colldet");
   viscull_id = globalStringSet->Request ("viscull");
   base_id = globalStringSet->Request ("base");
@@ -701,7 +705,7 @@ bool csEngine::HandleEvent (iEvent &Event)
   {
   if (G3D)
   {
-    id_creation_time = globalStringSet->Request("mesh creation time");
+    id_creation_time = svNameStringSet->Request("mesh creation time");
 
     maxAspectRatio = 4096;
     frameWidth = G3D->GetWidth ();

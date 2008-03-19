@@ -67,7 +67,7 @@ csImposterProcTex::csImposterProcTex  (csEngine* engine,
 
   if (stringid_standard == csInvalidStringID)
   {
-    csRef<iStringSet> stringSet = csQueryRegistryTagInterface<iStringSet> (
+    stringSet = csQueryRegistryTagInterface<iStringSet> (
       engine->objectRegistry, "crystalspace.shader.variablenameset");
     stringid_standard = stringSet->Request("standard");
     stringid_light_ambient = stringSet->Request("light ambient");
@@ -172,12 +172,15 @@ void csImposterProcTex::RenderToTexture (iRenderView *rview, iSector *s)
   csRenderMesh** rendermeshes = meshobj->GetRenderMeshes (num, rview, 
     originalmesh->GetMovable (), ~0);
 
+  csShaderVariableStack& sva = shadermanager->GetShaderVariableStack ();
+  sva.Setup (stringSet->GetSize ());
+
   //draw them, as the view, engine and renderloops do
   for (int i = 0; i < num; i++)
   {
     csRenderMesh* rendermesh = rendermeshes[i];
     csRenderMeshModes mode (*rendermesh);
-    iShaderVarStack *sva = shadermanager->GetShaderVariableStack ();
+    sva.Clear ();
 
     iMaterial* hdl = rendermesh->material->GetMaterial ();
     iShader* meshShader = hdl->GetShader (stringid_standard);

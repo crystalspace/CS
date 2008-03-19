@@ -1680,7 +1680,7 @@ void csGLGraphics3D::SetWorldToCamera (const csReversibleTransform& w2c)
 
 void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     const csRenderMeshModes& modes,
-    const iShaderVarStack* stacks)
+    const csShaderVariableStack& stack)
 {
   if (cliptype == CS_CLIPPER_EMPTY) 
     return;
@@ -1724,7 +1724,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 
   if (!iIndexbuf)
   {
-    csShaderVariable* indexBufSV = csGetShaderVariableFromStack (stacks, string_indices);
+    csShaderVariable* indexBufSV = csGetShaderVariableFromStack (stack, string_indices);
     CS_ASSERT (indexBufSV);
     indexBufSV->GetValue (iIndexbuf);
     CS_ASSERT(iIndexbuf);
@@ -1764,11 +1764,11 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
         break;
       }
       float radius, scale;
-      csShaderVariable* radiusSV = csGetShaderVariableFromStack (stacks, string_point_radius);
+      csShaderVariable* radiusSV = csGetShaderVariableFromStack (stack, string_point_radius);
       CS_ASSERT (radiusSV);
       radiusSV->GetValue (radius);
 
-      csShaderVariable* scaleSV = csGetShaderVariableFromStack (stacks, string_point_scale);
+      csShaderVariable* scaleSV = csGetShaderVariableFromStack (stack, string_point_scale);
       CS_ASSERT (scaleSV);
       scaleSV->GetValue (scale);
 
@@ -3154,19 +3154,19 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   
   rmesh.object2world = mesh.object2world;
 
-  csRef<iShaderVarStack> stacks;
-  stacks.AttachNew(new scfArray<iShaderVarStack>);
-  shadermgr->PushVariables (stacks);
-  scrapContext.PushVariables (stacks);
-  if (mesh.shader != 0) mesh.shader->PushVariables (stacks);
-  if (mesh.dynDomain != 0) mesh.dynDomain->PushVariables (stacks);
+  csShaderVariableStack stack;
+  stack.Setup (strings->GetSize ());
+  shadermgr->PushVariables (stack);
+  scrapContext.PushVariables (stack);
+  if (mesh.shader != 0) mesh.shader->PushVariables (stack);
+  if (mesh.dynDomain != 0) mesh.dynDomain->PushVariables (stack);
 
   if (mesh.alphaType.autoAlphaMode)
   {
     csAlphaMode::AlphaType autoMode = csAlphaMode::alphaNone;
 
     iTextureHandle* tex = 0;
-    csShaderVariable *texVar = csGetShaderVariableFromStack (stacks, 
+    csShaderVariable *texVar = csGetShaderVariableFromStack (stack, 
       mesh.alphaType.autoModeTexture);
     if (texVar)
       texVar->GetValue (tex);
@@ -3191,7 +3191,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   size_t passCount = 1;
   if (mesh.shader != 0)
   {
-    shaderTicket = mesh.shader->GetTicket (modes, stacks);
+    shaderTicket = mesh.shader->GetTicket (modes, stack);
     passCount = mesh.shader->GetNumberOfPasses (shaderTicket);
   }
 
@@ -3200,13 +3200,13 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
     if (mesh.shader != 0)
     {
       mesh.shader->ActivatePass (shaderTicket, p);
-      mesh.shader->SetupPass (shaderTicket, &rmesh, modes, stacks);
+      mesh.shader->SetupPass (shaderTicket, &rmesh, modes, stack);
     }
     else
     {
       ActivateBuffers (scrapBufferHolder, scrapMapping);
     }
-    DrawMesh (&rmesh, modes, stacks);
+    DrawMesh (&rmesh, modes, stack);
     if (mesh.shader != 0)
     {
       mesh.shader->TeardownPass (shaderTicket);

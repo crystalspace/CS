@@ -246,7 +246,7 @@ csShadowmapRenderStep::~csShadowmapRenderStep ()
 }
 
 void csShadowmapRenderStep::Perform (iRenderView* rview, iSector* sector,
-  iShaderVarStack* stacks)
+  csShaderVariableStack& stack)
 {
   csOrthoTransform old_transform = rview->GetCamera()->GetTransform();;
   context = engine->GetContext();
@@ -368,18 +368,18 @@ void csShadowmapRenderStep::Perform (iRenderView* rview, iSector* sector,
 	{
 	  continue;
 	}
-	size_t ticket = shader->GetTicket (modes, stacks);
+	size_t ticket = shader->GetTicket (modes, stack);
 	for (size_t p = 0; p < shader->GetNumberOfPasses (ticket); p ++) 
 	{
 	  shader->ActivatePass (ticket, p);
-	  stacks->Empty ();
-	  mesh_wrappers[i]->GetSVContext ()->PushVariables (stacks);
-	  rmesh->variablecontext->PushVariables (stacks);
-	  shaderMgr->PushVariables (stacks);
-	  shader->PushVariables (stacks);
+	  stack.Clear ();
+	  mesh_wrappers[i]->GetSVContext ()->PushVariables (stack);
+	  rmesh->variablecontext->PushVariables (stack);
+	  shaderMgr->PushVariables (stack);
+	  shader->PushVariables (stack);
 	  g3d->SetWorldToCamera (rview->GetCamera()->GetTransform ().GetInverse ());
-	  shader->SetupPass (ticket, rmesh, modes, stacks);
-	  g3d->DrawMesh (rmesh, modes, stacks);
+	  shader->SetupPass (ticket, rmesh, modes, stack);
+	  g3d->DrawMesh (rmesh, modes, stack);
 	  shader->TeardownPass (ticket);
 	  shader->DeactivatePass (ticket);
         }

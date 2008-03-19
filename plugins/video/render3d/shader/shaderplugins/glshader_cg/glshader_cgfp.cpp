@@ -61,15 +61,15 @@ void csShaderGLCGFP::Deactivate()
 
 void csShaderGLCGFP::SetupState (const CS::Graphics::RenderMesh* mesh,
                                  CS::Graphics::RenderMeshModes& modes,
-                                 const iShaderVarStack* stacks)
+                                 const csShaderVariableStack& stack)
 {
   if (pswrap)
   {
-    pswrap->SetupState (mesh, modes, stacks);
+    pswrap->SetupState (mesh, modes, stack);
     return;
   } 
 
-  csShaderGLCGCommon::SetupState (mesh, modes, stacks);
+  csShaderGLCGCommon::SetupState (mesh, modes, stack);
 }
 
 void csShaderGLCGFP::ResetState()

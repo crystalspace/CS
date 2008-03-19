@@ -152,7 +152,7 @@ public:
 
   void Init ();
   virtual void Perform (iRenderView* rview, iSector* sector,
-    iShaderVarStack* stacks);
+    csShaderVariableStack& stack);
 
   virtual size_t AddStep (iRenderStep* step);
   virtual bool DeleteStep (iRenderStep* step);

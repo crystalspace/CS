@@ -755,19 +755,19 @@ static const csVector4 defVector (0.0f, 0.0f, 0.0f, 1.0f);
 
 void csGLShaderFFP::SetupState (const CS::Graphics::RenderMesh* /*mesh*/, 
                                 CS::Graphics::RenderMeshModes& /*modes*/,
-                                const iShaderVarStack* stacks)
+                                const csShaderVariableStack& stack)
 {
   if (fog.mode != CS_FOG_MODE_NONE)
   {
-    csVector4 fc = GetParamVectorVal (stacks, fog.color, defVector);
+    csVector4 fc = GetParamVectorVal (stack, fog.color, defVector);
     glFogfv (GL_FOG_COLOR, (float*)&fc.x);
 
     switch (fog.mode)
     {
       case CS_FOG_MODE_LINEAR:
 	{
-          float start = GetParamFloatVal (stacks, fog.start, 0.0f);
-          float end = GetParamFloatVal (stacks, fog.end, 0.0f);
+          float start = GetParamFloatVal (stack, fog.start, 0.0f);
+          float end = GetParamFloatVal (stack, fog.end, 0.0f);
 
           end = (end == start) ? start + 0.001f : end;
 
@@ -780,14 +780,14 @@ void csGLShaderFFP::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
 	{
 	  glFogi (GL_FOG_MODE, GL_EXP);
 	  glFogf (GL_FOG_DENSITY, 
-	    GetParamFloatVal (stacks, fog.density, 0.0f));
+	    GetParamFloatVal (stack, fog.density, 0.0f));
 	}
 	break;
       case CS_FOG_MODE_EXP2:
 	{
 	  glFogi (GL_FOG_MODE, GL_EXP2);
 	  glFogf (GL_FOG_DENSITY, 
-	    GetParamFloatVal (stacks, fog.density, 0.0f));
+	    GetParamFloatVal (stack, fog.density, 0.0f));
 	}
 	break;
       default:

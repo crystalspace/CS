@@ -556,55 +556,6 @@ public:
 
   //--------------------- SCF stuff follows ------------------------------//
 
-  /// Get a named variable from this context
-  csShaderVariable* GetVariable (csStringID name) const
-  { 
-    csShaderVariable* sv = svcontext.GetVariable (name); 
-    if ((sv == 0) && (factorySVC.IsValid()))
-      sv = factorySVC->GetVariable (name);
-    return sv;
-  }
-
-  /// Get Array of all ShaderVariables
-  const csRefArray<csShaderVariable>& GetShaderVariables () const
-  { 
-    // @@@ Will not return factory SVs
-    return svcontext.GetShaderVariables (); 
-  }
-
-  /**
-   * Push the variables of this context onto the variable stacks
-   * supplied in the "stacks" argument
-   */
-  void PushVariables (iShaderVarStack* stacks) const
-  { 
-    if (factorySVC.IsValid()) factorySVC->PushVariables (stacks);
-    svcontext.PushVariables (stacks); 
-  }
-
-  void PushVariables (csShaderVariable** stacks) const
-  { 
-    if (factorySVC.IsValid()) factorySVC->PushVariables (stacks);
-    svcontext.PushVariables (stacks); 
-  }
-
-  bool IsEmpty () const 
-  {
-    return svcontext.IsEmpty() 
-      && (!factorySVC.IsValid() || factorySVC->IsEmpty());
-  }
-
-  void ReplaceVariable (csShaderVariable *variable)
-  { svcontext.ReplaceVariable (variable); }
-  void Clear () { svcontext.Clear(); }
-  
-  bool RemoveVariable (csShaderVariable* variable)
-  { 
-    // @@@ Also remove from factory?
-    return svcontext.RemoveVariable (variable); 
-  }
-  /** @} */
-
   //--------------------- iSelfDestruct implementation -------------------//
   virtual void SelfDestruct ();
 

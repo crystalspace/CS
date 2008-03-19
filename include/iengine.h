@@ -41,7 +41,6 @@
 #include "iengine/portalcontainer.h"
 #include "iengine/region.h"
 #include "iengine/renderloop.h"
-#include "iengine/rendermanager.h"
 #include "iengine/rendersteps/icontainer.h"
 #include "iengine/rendersteps/igeneric.h"
 #include "iengine/rendersteps/ilightiter.h"

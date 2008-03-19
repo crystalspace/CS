@@ -80,9 +80,9 @@ public:
   virtual void SetFileName (const char* fn) { filename = fn; }
 
   virtual size_t GetTicket (const CS::Graphics::RenderMeshModes& modes,
-      const iShaderVarStack* stacks)
+      const csShaderVariableStack& stack)
   {
-    return realShader->GetTicket (modes, stacks);
+    return realShader->GetTicket (modes, stack);
   }
 
   virtual size_t GetNumberOfPasses (size_t ticket)
@@ -97,9 +97,9 @@ public:
 
   virtual bool SetupPass (size_t ticket, const CS::Graphics::RenderMesh *mesh,
     CS::Graphics::RenderMeshModes& modes,
-    const iShaderVarStack* stacks)
+    const csShaderVariableStack& stack)
   { 
-    return realShader->SetupPass (ticket, mesh, modes, stacks);
+    return realShader->SetupPass (ticket, mesh, modes, stack);
   }
 
   virtual bool TeardownPass (size_t ticket)
@@ -141,14 +141,9 @@ public:
     return realShader->GetShaderVariables ();
   }
 
-  void PushVariables (iShaderVarStack* stacks) const
+  void PushVariables (csShaderVariableStack& stack) const
   { 
-    realShader->PushVariables (stacks);
-  }
-
-  void PushVariables (csShaderVariable** stacks) const
-  {
-    realShader->PushVariables (stacks);
+    realShader->PushVariables (stack);
   }
 
   bool IsEmpty() const

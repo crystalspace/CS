@@ -244,7 +244,7 @@ static const op_args_info optimize_arg_table[] =
 CS_LEAKGUARD_IMPLEMENT (csShaderExpression);
 
 csShaderExpression::csShaderExpression(iObjectRegistry * objr) :
-accstack_max(0)
+accstack_max(0), stack (0)
 {
   obj_reg = objr;
 
@@ -275,8 +275,8 @@ void csShaderExpression::EvalError (const char* message, ...) const
 
 csShaderVariable* csShaderExpression::ResolveVar (csStringID name)
 {
-  if (!stacks) return 0;
-  return csGetShaderVariableFromStack (stacks, name);
+  if (!stack) return 0;
+  return csGetShaderVariableFromStack (*stack, name);
 }
 
 bool csShaderExpression::Parse(iDocumentNode * node)
@@ -351,17 +351,9 @@ bool csShaderExpression::Parse(iDocumentNode * node)
   return true;
 }
 
-bool csShaderExpression::Evaluate(csShaderVariable* var, 
-                                  csShaderVarStack& stacks)
-{
-  csRef<iShaderVarStack> wrapStacks;
-  wrapStacks.AttachNew (new scfArrayWrap <iShaderVarStack, 
-    csShaderVarStack> (stacks));
-  return Evaluate (var, wrapStacks);
-}
 
 bool csShaderExpression::Evaluate(csShaderVariable* var, 
-                                  iShaderVarStack* stacks)
+                                  csShaderVariableStack& stacks)
 {
 #ifdef SHADEREXP_DEBUG
   int debug_counter = 0;
@@ -375,7 +367,7 @@ bool csShaderExpression::Evaluate(csShaderVariable* var,
   }
 
   bool eval = true;
-  this->stacks = stacks;
+  this->stack = &stacks;
 
   oper_array::Iterator iter = opcodes.GetIterator();
 
@@ -422,7 +414,7 @@ bool csShaderExpression::Evaluate(csShaderVariable* var,
   bool ret = false;
   if (eval) ret = eval_argument(accstack.Get(0), var);
 
-  this->stacks = 0;
+  this->stack = 0;
 
   return ret;
 }

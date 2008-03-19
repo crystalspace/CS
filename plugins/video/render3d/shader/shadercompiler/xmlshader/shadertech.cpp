@@ -652,7 +652,7 @@ bool csXMLShaderTech::DeactivatePass ()
 
 bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh, 
 			         csRenderMeshModes& modes,
-			         const iShaderVarStack* stacks)
+			         const csShaderVariableStack& stack)
 {
   if(currentPass>=passesCount)
     return false;
@@ -661,7 +661,7 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   shaderPass *thispass = &passes[currentPass];
 
   //first run the preprocessor
-  if(thispass->vproc) thispass->vproc->SetupState (mesh, modes, stacks);
+  if(thispass->vproc) thispass->vproc->SetupState (mesh, modes, stack);
 
   //now map our buffers. all refs should be set
   size_t i;
@@ -672,10 +672,10 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
       last_buffers[i] = modes.buffers->GetRenderBuffer (
 	thispass->custommapping_buffer[i]);
     }
-    else if (thispass->custommapping_id[i] < (csStringID)stacks->GetSize ())
+    else if (thispass->custommapping_id[i] < (csStringID)stack.GetSize ())
     {
       csShaderVariable* var = 0;
-      var = csGetShaderVariableFromStack (stacks, thispass->custommapping_id[i]);
+      var = csGetShaderVariableFromStack (stack, thispass->custommapping_id[i]);
       if (var)
         var->GetValue(last_buffers[i]);
       else
@@ -693,10 +693,10 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   int j;
   for (j = 0; j < thispass->textureCount; j++)
   {
-    if (thispass->textureID[j] < (csStringID)stacks->GetSize ())
+    if (thispass->textureID[j] < (csStringID)stack.GetSize ())
     {
       csShaderVariable* var = 0;
-      var = csGetShaderVariableFromStack (stacks, thispass->textureID[j]);
+      var = csGetShaderVariableFromStack (stack, thispass->textureID[j]);
       if (var)
       {
         iTextureWrapper* wrap;
@@ -723,10 +723,10 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
     iTextureHandle* tex = 0;
     if (thispass->alphaMode.autoModeTexture != csInvalidStringID)
     {
-      if (thispass->alphaMode.autoModeTexture < (csStringID)stacks->GetSize ())
+      if (thispass->alphaMode.autoModeTexture < (csStringID)stack.GetSize ())
       {
         csShaderVariable* var = 0;
-        var = csGetShaderVariableFromStack (stacks, thispass->alphaMode.autoModeTexture);
+        var = csGetShaderVariableFromStack (stack, thispass->alphaMode.autoModeTexture);
         if (var)
           var->GetValue (tex);
       }
@@ -752,8 +752,8 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   parent->shadermgr->GetVariableAdd (
     parent->compiler->string_mixmode_alpha)->SetValue (alpha);
 
-  if(thispass->vp) thispass->vp->SetupState (mesh, modes, stacks);
-  if(thispass->fp) thispass->fp->SetupState (mesh, modes, stacks);
+  if(thispass->vp) thispass->vp->SetupState (mesh, modes, stack);
+  if(thispass->fp) thispass->fp->SetupState (mesh, modes, stack);
 
   return true;
 }

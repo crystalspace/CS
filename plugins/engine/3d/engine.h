@@ -824,8 +824,10 @@ public:
 
   /// Remember iObjectRegistry.
   iObjectRegistry* objectRegistry;
-  /// The global material/shader string set
+  /// The global string set
   csRef<iStringSet> globalStringSet;
+  /// The shader variable name string set
+  csRef<iStringSet> svNameStringSet;
   /// The 3D driver
   csRef<iGraphics3D> G3D;
   /// Pointer to the shader manager

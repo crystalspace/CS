@@ -251,7 +251,7 @@ csFullScreenQuadRenderStep::~csFullScreenQuadRenderStep ()
 }
 
 void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* /*sector*/,
-  iShaderVarStack* /*stacks*/)
+  csShaderVariableStack& /*stacks*/)
 {
   csRef<iGraphics3D> g3d = rview->GetGraphics3D();
   if (!shaderMgr.IsValid())

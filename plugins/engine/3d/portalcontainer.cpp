@@ -126,9 +126,9 @@ csPortalContainer::csPortalContainer (iEngine* engine,
   shader_man = csQueryRegistry<iShaderManager> (object_reg);
   fog_shader = shader_man->GetShader ("std_lighting_portal");
 
-  fogplane_name = e->globalStringSet->Request ("fogplane");
-  fogdensity_name = e->globalStringSet->Request ("fog density");
-  fogcolor_name = e->globalStringSet->Request ("fog color");
+  fogplane_name = e->svNameStringSet->Request ("fogplane");
+  fogdensity_name = e->svNameStringSet->Request ("fog density");
+  fogcolor_name = e->svNameStringSet->Request ("fog color");
 }
 
 csPortalContainer::~csPortalContainer ()

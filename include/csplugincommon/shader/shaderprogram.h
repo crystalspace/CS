@@ -136,7 +136,7 @@ protected:
   bool ParseProgramParam (iDocumentNode* node,
     ProgramParam& param, uint types = ~0)
   {
-    ProgramParamParser parser (synsrv, strings);
+    ProgramParamParser parser (synsrv, stringsSvName);
     return parser.ParseProgramParam (node, param, types);
   }
 
@@ -200,12 +200,12 @@ protected:
    * Query the value of a ProgramParam variable by reading the constant or
    * resolving the shader variable.
    */
-  inline csVector4 GetParamVectorVal (const iShaderVarStack* stacks, 
+  inline csVector4 GetParamVectorVal (const csShaderVariableStack& stack, 
     const ProgramParam &param, const csVector4& defVal)
   {
     csRef<csShaderVariable> var;
   
-    var = csGetShaderVariableFromStack (stacks, param.name);
+    var = csGetShaderVariableFromStack (stack, param.name);
     if (!var.IsValid ())
       var = param.var;
   
@@ -217,12 +217,12 @@ protected:
     var->GetValue (v);
     return v;
   }
-  inline csReversibleTransform GetParamTransformVal (const iShaderVarStack* stacks, 
+  inline csReversibleTransform GetParamTransformVal (const csShaderVariableStack& stack, 
     const ProgramParam &param, const csReversibleTransform& defVal)
   {
     csRef<csShaderVariable> var;
   
-    var = csGetShaderVariableFromStack (stacks, param.name);
+    var = csGetShaderVariableFromStack (stack, param.name);
     if (!var.IsValid ())
       var = param.var;
   
@@ -234,12 +234,12 @@ protected:
     var->GetValue (t);
     return t;
   }
-  inline float GetParamFloatVal (const iShaderVarStack* stacks, 
+  inline float GetParamFloatVal (const csShaderVariableStack& stack, 
     const ProgramParam &param, float defVal)
   {
     csRef<csShaderVariable> var;
   
-    var = csGetShaderVariableFromStack (stacks, param.name);
+    var = csGetShaderVariableFromStack (stack, param.name);
     if (!var.IsValid ())
       var = param.var;
   

@@ -114,15 +114,10 @@ public:
   { 
     return context1->GetShaderVariables();
   }
-  void PushVariables (iShaderVarStack* stacks) const
+  void PushVariables (csShaderVariableStack& stack) const
   { 
-    context2->PushVariables (stacks);
-    context1->PushVariables (stacks);
-  }
-  void PushVariables (csShaderVariable** stacks) const
-  {
-    context2->PushVariables (stacks);
-    context1->PushVariables (stacks);
+    context2->PushVariables (stack);
+    context1->PushVariables (stack);
   }
 
   bool IsEmpty () const { return context1->IsEmpty() && context2->IsEmpty(); }

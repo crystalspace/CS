@@ -631,7 +631,7 @@ public:
   /// Drawroutine. Only way to draw stuff
   virtual void DrawMesh (const csCoreRenderMesh* mymesh,
     const csRenderMeshModes& modes,
-    const iShaderVarStack* stacks);
+    const csShaderVariableStack& stack);
   void DrawSimpleMesh (const csSimpleRenderMesh &mesh, uint flags = 0);
 
   bool PerformExtension (char const* /*command*/, ...) { return false; }

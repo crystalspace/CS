@@ -405,7 +405,7 @@ void csNullGraphics3D::SetTextureState (int*, iTextureHandle**, int)
 
 void csNullGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     const csRenderMeshModes& /*modes*/,
-    const iShaderVarStack* /*stacks*/)
+    const csShaderVariableStack& /*stacks*/)
 {
   if (bugplug)
   {

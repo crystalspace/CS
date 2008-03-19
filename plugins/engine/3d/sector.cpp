@@ -1191,17 +1191,17 @@ void csSector::SetupSVNames()
 {
   if (SVNames().dynamicAmbient == csInvalidStringID)
   {
-    SVNames().dynamicAmbient = CS::ShaderVarName (engine->globalStringSet,
+    SVNames().dynamicAmbient = CS::ShaderVarName (engine->svNameStringSet,
       "dynamic ambient");
-    SVNames().fogColor = CS::ShaderVarName (engine->globalStringSet,
+    SVNames().fogColor = CS::ShaderVarName (engine->svNameStringSet,
       "fog color");
-    SVNames().fogMode = CS::ShaderVarName (engine->globalStringSet,
+    SVNames().fogMode = CS::ShaderVarName (engine->svNameStringSet,
       "fog mode");
-    SVNames().fogStart = CS::ShaderVarName (engine->globalStringSet,
+    SVNames().fogStart = CS::ShaderVarName (engine->svNameStringSet,
       "fog start");
-    SVNames().fogEnd = CS::ShaderVarName (engine->globalStringSet,
+    SVNames().fogEnd = CS::ShaderVarName (engine->svNameStringSet,
       "fog end");
-    SVNames().fogDensity = CS::ShaderVarName (engine->globalStringSet,
+    SVNames().fogDensity = CS::ShaderVarName (engine->svNameStringSet,
       "fog density");
   }
 }

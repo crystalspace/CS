@@ -136,51 +136,6 @@ public:
       new TerrainBBCellRenderProperties (*this));
   }
 
-  //-- iShaderVariableContext --
-  virtual void AddVariable (csShaderVariable *variable)
-  {
-    svContext.AddVariable (variable);
-  }
-  virtual csShaderVariable* GetVariable (csStringID name) const
-  {
-    return svContext.GetVariable (name);
-  }
-
-  virtual const csRefArray<csShaderVariable>& GetShaderVariables () const
-  {
-    return svContext.GetShaderVariables ();
-  }
-
-  virtual void PushVariables (iShaderVarStack* stacks) const
-  {
-    svContext.PushVariables (stacks);
-  }
-
-  virtual void PushVariables (csShaderVariable** stacks) const
-  {
-    svContext.PushVariables (stacks);
-  }
-
-  virtual bool IsEmpty () const
-  {
-    return svContext.IsEmpty ();
-  }
-
-  virtual void ReplaceVariable (csShaderVariable* variable)
-  {
-    svContext.ReplaceVariable (variable);
-  }
-
-  virtual void Clear()
-  {
-    svContext.Clear ();
-  }
-
-  virtual bool RemoveVariable (csShaderVariable* variable) 
-  {
-    return svContext.RemoveVariable (variable);
-  }
-
 private:
   // Per cell properties
   bool visible;

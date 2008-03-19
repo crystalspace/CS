@@ -85,7 +85,7 @@ class csShaderConditionResolver : public iConditionResolver
   csHash<size_t, MyBitArrayTemp, TempHeapAlloc> variantIDs;
 
   const CS::Graphics::RenderMeshModes* modes;
-  const iShaderVarStack* stacks;
+  const csShaderVariableStack* stack;
 
   csString lastError;
   const char* SetLastError (const char* msg, ...) CS_GNUC_PRINTF (2, 3);
@@ -115,7 +115,7 @@ public:
   void ResetEvaluationCache() { evaluator.ResetEvaluationCache(); }
 
   void SetEvalParams (const CS::Graphics::RenderMeshModes* modes,
-    const iShaderVarStack* stacks);
+    const csShaderVariableStack* stack);
   size_t GetVariant ();
   size_t GetVariantCount () const
   { return nextVariant; }
@@ -219,7 +219,7 @@ public:
   { this->filename = CS::StrDup(filename); }
 
   virtual size_t GetTicket (const CS::Graphics::RenderMeshModes& modes,
-      const iShaderVarStack* stacks);
+      const csShaderVariableStack& stack);
 
   /// Get number of passes this shader have
   virtual size_t GetNumberOfPasses (size_t ticket)
@@ -237,15 +237,15 @@ public:
   /// Setup a pass.
   virtual bool SetupPass (size_t ticket, const CS::Graphics::RenderMesh *mesh,
     CS::Graphics::RenderMeshModes& modes,
-    const iShaderVarStack* stacks)
+    const csShaderVariableStack& stack)
   { 
     if (IsFallbackTicket (ticket))
       return fallbackShader->SetupPass (GetFallbackTicket (ticket),
-	mesh, modes, stacks);
+	mesh, modes, stack);
 
     CS_ASSERT_MSG ("A pass must be activated prior calling SetupPass()",
       activeTech);
-    return activeTech->SetupPass (mesh, modes, stacks); 
+    return activeTech->SetupPass (mesh, modes, stack); 
   }
 
   /**
@@ -319,26 +319,15 @@ public:
    * Push the variables of this context onto the variable stacks
    * supplied in the "stacks" argument
    */
-  void PushVariables (iShaderVarStack* stacks) const
+  void PushVariables (csShaderVariableStack& stack) const
   { 
     if (useFallbackContext)
     {
-      fallbackShader->PushVariables (stacks);
+      fallbackShader->PushVariables (stack);
       return;
     }
-    GetUsedSVContext().PushVariables (stacks); 
+    GetUsedSVContext().PushVariables (stack); 
   }
-
-  void PushVariables (csShaderVariable** stacks) const
-  { 
-    if (useFallbackContext)
-    {
-      fallbackShader->PushVariables (stacks);
-      return;
-    }
-    GetUsedSVContext().PushVariables (stacks); 
-  }
-
 
   bool IsEmpty() const
   {

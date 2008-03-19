@@ -68,24 +68,13 @@ csShaderVariable* ShaderVariableContextImpl::GetVariable (
 }
 
 void ShaderVariableContextImpl::PushVariables (
-  iShaderVarStack* stacks) const
+  csShaderVariableStack& stack) const
 {
   for (size_t i=0; i<variables.GetSize (); ++i)
   {
     csStringID name = variables[i]->GetName ();
-    if (stacks->GetSize () <= (size_t)name)
-      stacks->SetSize (name+1, 0);
-    stacks->Put (name, variables[i]);
-  }
-}
-
-void ShaderVariableContextImpl::PushVariables (
-  csShaderVariable** stacks) const
-{
-  for (size_t i=0; i<variables.GetSize (); ++i)
-  {
-    csStringID name = variables[i]->GetName ();
-    stacks[name] = variables[i];
+    CS_ASSERT_MSG("Shader variable stack is invalid!", name < stack.GetSize ());
+    stack[name] = variables[i];
   }
 }
 

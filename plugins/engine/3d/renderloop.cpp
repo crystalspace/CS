@@ -71,7 +71,8 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s, iMeshWrapper* mesh)
     csRef<iClipper2D> oldClipper = rview->GetGraphics3D()->GetClipper();
     int oldClipType = rview->GetGraphics3D()->GetClipType();
 
-    csRef<iShaderVarStack> varStack = shadermanager->GetShaderVariableStack ();
+    csShaderVariableStack& varStack = shadermanager->GetShaderVariableStack ();
+    varStack.Setup (shadermanager->GetSVNameStringset ()->GetSize ());
 
     s->IncRecLevel ();
     s->PrepareDraw (rview);
@@ -94,6 +95,8 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s, iMeshWrapper* mesh)
       // Tell the engine to try to add this light into the halo queue
       engine->AddHalo (rview->GetCamera(), 
         ((csLight*)lights->Get ((int)i))->GetPrivateObject ());
+
+    varStack.Setup (0);
   }
 }
 
