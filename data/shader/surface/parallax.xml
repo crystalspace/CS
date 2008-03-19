@@ -59,19 +59,12 @@
 	</block>
 	  
 	<block location="cg:vertexToFragment">
-	  <?if vars."tex height".texture?>
-	    float3 eyeVec;
-	    <?if vars."tex height scale" 
-	      && ((vars."tex height scale".x != 1) 
-		|| (vars."tex height scale".y != 1)) ?>
-	      float2 tcParallax;
-	    <?endif?>
-	  <?endif?>
+	  <varying type="float3" name="eyeVec" />
+	  <varying type="float2" name="tcParallax" />
 	</block>
 	
 	<block location="cg:vertexMain">
 	  <?if vars."tex height".texture ?>
-	    vertexToFragment.eyeVec =  eyeVec;
 	    <?if vars."tex height scale" 
 	      && ((vars."tex height scale".x != 1) 
 		|| (vars."tex height scale".y != 1)) ?>
@@ -94,7 +87,7 @@
 	  <?endif?>
 	  <?if vars."tex height".texture ?>
 	    offset = ComputeParallaxOffset (texHeight, usedTC, 
-	      normalize (vertexToFragment.eyeVec), 0.04);
+	      normalize (eyeVec), 0.04);
 	  <?endif?>
 	  texCoordOffset = texCoord + offset;
 	</block>
