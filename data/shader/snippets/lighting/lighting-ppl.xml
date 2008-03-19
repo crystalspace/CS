@@ -54,7 +54,7 @@
 	
 	<block location="cg:vertexMain">
 	  diffuseColor = float3(0);
-	  specularColor = float4(0);
+	  specularColor = float3(0);
 	</block>
 	
 	<block location="cg:fragmentMain">
