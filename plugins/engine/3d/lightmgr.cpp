@@ -60,7 +60,8 @@ void csLightManager::GetRelevantLights (iSector* sector,
   iLightInfluenceArray* lightArray, int maxLights, 
   uint flags)
 {
-  const csBox3 bigBox;  
+  const csBox3 bigBox (csVector3 (-CS_BOUNDINGBOX_MAXVALUE),
+    csVector3 (CS_BOUNDINGBOX_MAXVALUE));
   GetRelevantLights (sector, bigBox, lightArray, maxLights, flags);
 }
 
@@ -68,7 +69,8 @@ void csLightManager::GetRelevantLights (iSector* sector,
   iLightInfluenceCallback* lightCallback, int maxLights, 
   uint flags)
 {
-  const csBox3 bigBox;  
+  const csBox3 bigBox (csVector3 (-CS_BOUNDINGBOX_MAXVALUE),
+    csVector3 (CS_BOUNDINGBOX_MAXVALUE));
   GetRelevantLights (sector, bigBox, lightCallback, maxLights, flags);
 }
 
