@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<shader type="xmlshader" name="parallaxAtt">
+<shader type="xmlshader" name="parallaxAtt" lights="1">
   <technique priority="150">
     <!--?include /shader/snippets/projection-pass.inc ?-->
     <pass>
@@ -35,8 +35,8 @@
 		  <buffer source="texture coordinate 0" destination="texture coordinate 0" />
 		  <buffer source="texture coordinate 1" destination="texture coordinate 1" />
 		  <vp plugin="glcg" file="/shader/parallaxAtt/attenuation.cgvp" />
-		  <texture destination="unit 0" name="light 0 attenuationtex" />
-		  <texture destination="unit 1" name="light 0 attenuationtex" />
+		  <texture destination="unit 0" name="light attenuationtex[0]" />
+		  <texture destination="unit 1" name="light attenuationtex[0]" />
 		  <fp plugin="glfixed">
 			  <fixedfp>
 				  <layer>
