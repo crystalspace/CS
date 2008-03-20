@@ -18,6 +18,8 @@ chronological order.
 	      light is to be drawn. As the name suggests this is needed for
 	      ambient passes.
 	    - Made it properly render a set of lights over multiple passes.
+	- res made sectors provide the "light ambient" SV (combined dynamic and
+	  static ambient).
 19-Mar-2008
 	- Mike Gist fixed a crash in tinyxml when parsing a binary xml file.
 	- Mike Gist added some missing error sets in tinyxml, so it now

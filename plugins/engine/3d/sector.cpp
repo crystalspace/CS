@@ -105,8 +105,7 @@ void csSectorLightList::UpdateLightBounds (csLight* light, const csBox3& oldBox)
 //---------------------------------------------------------------------------
 
 csSector::csSector (csEngine *engine) :
-  scfImplementationType (this), engine (engine),
-  lights (this)
+  scfImplementationType (this), lights (this), engine (engine)
 {
   drawBusy = 0;
   dynamicAmbientLightColor.Set (0,0,0);
@@ -122,6 +121,14 @@ csSector::csSector (csEngine *engine) :
   svDynamicAmbient.AttachNew (new csShaderVariable (SVNames().dynamicAmbient));
   svDynamicAmbient->SetValue (dynamicAmbientLightColor);
   AddVariable (svDynamicAmbient);
+  svLightAmbient.AttachNew (new csShaderVariable (SVNames().lightAmbient));
+  svLightAmbient->SetType (csShaderVariable::VECTOR3);
+  {
+    csRef<iShaderVariableAccessor> sva;
+    sva.AttachNew (new LightAmbientAccessor (this));
+    svLightAmbient->SetAccessor (sva);
+  }
+  AddVariable (svLightAmbient);
   svFogColor.AttachNew (new csShaderVariable (SVNames().fogColor));
   AddVariable (svFogColor);
   svFogMode.AttachNew (new csShaderVariable (SVNames().fogMode));
@@ -1053,6 +1060,8 @@ void csSector::SetupSVNames()
   {
     SVNames().dynamicAmbient = CS::ShaderVarName (engine->svNameStringSet,
       "dynamic ambient");
+    SVNames().lightAmbient = CS::ShaderVarName (engine->svNameStringSet,
+      "light ambient");
     SVNames().fogColor = CS::ShaderVarName (engine->svNameStringSet,
       "fog color");
     SVNames().fogMode = CS::ShaderVarName (engine->svNameStringSet,
@@ -1072,6 +1081,15 @@ void csSector::UpdateLightBounds (csLight* light,
   lights.UpdateLightBounds (light, oldBox);
 }
 
+//---------------------------------------------------------------------------
+
+void csSector::LightAmbientAccessor::PreGetValue (csShaderVariable* sv)
+{
+  csColor engineAmbient;
+  sector->engine->csEngine::GetAmbientLight (engineAmbient);
+  sv->SetValue (sector->dynamicAmbientLightColor + engineAmbient);
+}
+    
 //---------------------------------------------------------------------------
 
 
@@ -1154,3 +1172,4 @@ iSector *csSectorList::FindByName (const char *Name) const
 {
   return sectors_hash.Get (Name, 0);
 }
+

@@ -524,6 +524,7 @@ private:
   struct SVNamesHolder
   {
     CS::ShaderVarName dynamicAmbient;
+    CS::ShaderVarName lightAmbient;
     CS::ShaderVarName fogColor;
     CS::ShaderVarName fogMode;
     CS::ShaderVarName fogStart;
@@ -532,11 +533,24 @@ private:
   };
   CS_DECLARE_STATIC_CLASSVAR_REF(svNames, SVNames, SVNamesHolder);
   csRef<csShaderVariable> svDynamicAmbient;
+  csRef<csShaderVariable> svLightAmbient;
   csRef<csShaderVariable> svFogColor;
   csRef<csShaderVariable> svFogMode;
   csRef<csShaderVariable> svFogStart;
   csRef<csShaderVariable> svFogEnd;
   csRef<csShaderVariable> svFogDensity;
+  
+  class LightAmbientAccessor :
+    public scfImplementation1<LightAmbientAccessor,
+                              iShaderVariableAccessor>
+  {
+    csSector* sector;
+  public:
+    LightAmbientAccessor (csSector* sector) : scfImplementationType (this),
+      sector (sector) {}
+      
+    void PreGetValue (csShaderVariable* sv);
+  };
 };
 
 #include "csutil/deprecated_warn_on.h"
