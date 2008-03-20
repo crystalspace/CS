@@ -1,9 +1,9 @@
   <arbvp>
   <variablemap variable="light ambient" destination="register 0"/>
-  <variablemap variable="light 0 position" destination="register 1"/>
-  <variablemap variable="light 0 diffuse" destination="register 2"/>
-  <variablemap variable="light 0 specular" destination="register 3"/>
-  <variablemap variable="light 0 attenuation" destination="register 4"/>
+  <variablemap variable="light position[0]" destination="register 1"/>
+  <variablemap variable="light diffuse[0]" destination="register 2"/>
+  <variablemap variable="light specular[0]" destination="register 3"/>
+  <variablemap variable="light attenuation[0]" destination="register 4"/>
   <variablemap variable="beta1 + beta2" destination="register 5" />
 
   <variablemap variable="texture scale" destination="register 6" />

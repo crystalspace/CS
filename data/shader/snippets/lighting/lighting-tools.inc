@@ -69,9 +69,6 @@
   <?Endtemplate?>
     
   <?Template Lighting_Compute PROG LightNum Shadow?>
-    float3 diffuseColorSep[$LightNum$];
-    float3 specularColorSep[$LightNum$];
-  
     diffuseColor = float3(0);
     specularColor = float3(0);
     <![CDATA[
@@ -120,9 +117,7 @@
       float3 d = $PROG$In.lightColorDiffuse[i] * lightCoeff.y * spot * attn;
       float3 s = $PROG$In.lightColorSpecular[i] * lightCoeff.z * spot * attn;
       diffuseColor += d;
-      diffuseColorSep[l] = d;
       specularColor += s;
-      specularColorSep[l] = s;
     }
   <?Endtemplate?>
     
