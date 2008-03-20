@@ -79,7 +79,8 @@ private:
 class csSectorLightList : public csLightList
 {
 public:
-  typedef CS::Geometry::AABBTree<csLight, 2>  LightAABBTree;
+  typedef CS::Geometry::AABBTree<
+    CS_PLUGIN_NAMESPACE_NAME(Engine)::csLight, 2>  LightAABBTree;
   /// constructor
   csSectorLightList (csSector* s);
   /// destructor
@@ -94,7 +95,8 @@ public:
   const LightAABBTree& GetLightAABBTree () const 
   { return lightTree; }
 
-  void UpdateLightBounds (csLight* light, const csBox3& oldBox);
+  void UpdateLightBounds (CS_PLUGIN_NAMESPACE_NAME(Engine)::csLight* light,
+    const csBox3& oldBox);
 
 private:
   csSector* sector;
@@ -287,7 +289,8 @@ public:
   virtual void RemoveLightVisibleCallback (iLightVisibleCallback* cb) {}
   void FireLightVisibleCallbacks (iLight* light) {}
 
-  void UpdateLightBounds (csLight* light, const csBox3& oldBox);
+  void UpdateLightBounds (CS_PLUGIN_NAMESPACE_NAME(Engine)::csLight* light,
+    const csBox3& oldBox);
 
   /** @} */
 

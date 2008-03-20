@@ -51,6 +51,9 @@ struct iSector;
 
 #include "csutil/deprecated_warn_off.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(Engine)
+{
+
 class csLightObjectModel : public scfImplementationExt0<csLightObjectModel,
                                                         csObjectModel>
 {
@@ -651,6 +654,26 @@ public:
   /// Finalize lighting.
   virtual void FinalizeLighting ();
 };
+
+class LightAttenuationTextureAccessor :
+  public scfImplementation1<LightAttenuationTextureAccessor ,
+                            iShaderVariableAccessor>
+{
+  csEngine* engine;
+  void CreateAttenuationTexture ();
+public:
+  csRef<iTextureHandle> attTex;
+
+  LightAttenuationTextureAccessor (csEngine* engine);
+  virtual ~LightAttenuationTextureAccessor ();
+
+  virtual void PreGetValue (csShaderVariable *variable);
+};
+
+}
+CS_PLUGIN_NAMESPACE_END(Engine)
+
+using CS_PLUGIN_NAMESPACE_NAME(Engine)::csLightList;
 
 #endif // __CS_LIGHT_H__
 

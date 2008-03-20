@@ -11,6 +11,7 @@ chronological order.
 	  numbers and brackets occuring at the end as array indices. This fixes
 	  parsing of SV names with 'embedded' numbers.
 	- res fixed csShaderProgram indirectly memcpy()ing a local allocator.
+	- res made the engine provide the 'legacy" light attenuation texture.
 19-Mar-2008
 	- Mike Gist fixed a crash in tinyxml when parsing a binary xml file.
 	- Mike Gist added some missing error sets in tinyxml, so it now

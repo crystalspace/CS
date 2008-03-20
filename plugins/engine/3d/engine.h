@@ -65,8 +65,13 @@
 
 #include "reflectomotron3000.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(Engine)
+{
+  class csLight;
+}
+CS_PLUGIN_NAMESPACE_END(Engine)
+
 class csEngine;
-class csLight;
 class csLightPatchPool;
 class csMaterialList;
 class csMeshWrapper;
@@ -203,7 +208,7 @@ class csEngine : public scfImplementationExt5<csEngine, csObject,
   iEngine, iComponent, iPluginConfig, iDebugHelper, iEventHandler>
 {
   // friends
-  friend class csLight;
+  friend class CS_PLUGIN_NAMESPACE_NAME(Engine)::csLight;
   friend class csLightIt;
   friend class csRenderLoop;
   friend class csSectorList;
@@ -800,12 +805,13 @@ private:
   /**
    * Add a halo attached to given light to the engine.
    */
-  void AddHalo (iCamera* camera, csLight* Light);
+  void AddHalo (iCamera* camera,
+    CS_PLUGIN_NAMESPACE_NAME(Engine)::csLight* Light);
 
   /**
    * Remove halo attached to given light from the engine.
    */
-  void RemoveHalo (csLight* Light);
+  void RemoveHalo (CS_PLUGIN_NAMESPACE_NAME(Engine)::csLight* Light);
 
   //Sector event helpers
   void FireNewSector (iSector* sector);
@@ -896,6 +902,9 @@ public:
 
   /// Shader variable names for light SVs
   csLightShaderVarCache lightSvNames;
+  
+  /// Get the shader attenuation texture SV
+  csShaderVariable* GetLightAttenuationTextureSV();
 private:
 
   // -- PRIVATE MEMBERS
@@ -1090,6 +1099,8 @@ private:
    * There is a different list for every distinct camera instance.
    */
   csHash<csImposterUpdateQueue,long> imposterUpdateQueue;
+  
+  csRef<csShaderVariable> lightAttenuationTexture;
 
   CS_DECLARE_SYSTEM_EVENT_SHORTCUTS;
   csEventID CanvasResize;

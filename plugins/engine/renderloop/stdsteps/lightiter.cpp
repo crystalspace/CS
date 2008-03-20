@@ -22,7 +22,6 @@
 #include "csqint.h"
 
 #include "csgeom/sphere.h"
-#include "csgfx/imagememory.h"
 #include "cstool/rviewclipper.h"
 #include "csutil/cscolor.h"
 #include "csutil/scfarray.h"
@@ -36,14 +35,12 @@
 #include "igraphic/image.h"
 #include "iutil/document.h"
 #include "ivideo/rndbuf.h"
-#include "ivideo/txtmgr.h"
 
 #include "lightiter.h"
 
 CS_LEAKGUARD_IMPLEMENT (csLightIterRSType);
 CS_LEAKGUARD_IMPLEMENT (csLightIterRSLoader);
 CS_LEAKGUARD_IMPLEMENT (csLightIterRenderStepFactory);
-CS_LEAKGUARD_IMPLEMENT (csLightIterRenderStep::LightSVAccessor);
 
 SCF_IMPLEMENT_FACTORY(csLightIterRSType)
 SCF_IMPLEMENT_FACTORY(csLightIterRSLoader)
@@ -145,15 +142,6 @@ csLightIterRenderStep::csLightIterRenderStep (
 
 csLightIterRenderStep::~csLightIterRenderStep ()
 {
-  csHash<LightSVAccessor*, csPtrKey<iLight> >::GlobalIterator it =
-    knownLights.GetIterator();
-
-  while (it.HasNext())
-  {
-    csPtrKey<iLight> light;
-    LightSVAccessor* cb = it.Next (light);
-    light->RemoveLightCallback (cb);
-  }
 }
 
 void csLightIterRenderStep::Init ()
@@ -187,19 +175,6 @@ void csLightIterRenderStep::Init ()
     }
     svLightCount->SetValue (1);
   }
-}
-
-csLightIterRenderStep::LightSVAccessor* 
-csLightIterRenderStep::GetLightAccessor (iLight* light)
-{
-  LightSVAccessor* acc = knownLights.Get (light, 0);
-  if (acc == 0)
-  {
-    acc = new LightSVAccessor (light, this);
-    knownLights.Put (light, acc);
-    acc->DecRef();
-  }
-  return acc;
 }
 
 void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
@@ -238,9 +213,6 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
 
     csShaderVariableStack stack (_stack);
     stack.MakeOwnArray();
-    csShaderVariable* svAttnTex = lsvHelper.CreateTempSV (sv_attn_tex_name);
-    svAttnTex->SetAccessor (GetLightAccessor (light));
-    lsvHelper.MergeAsArrayItem (stack, svAttnTex, 0);
     lsvHelper.MergeAsArrayItems (stack,
       light->GetSVContext()->GetShaderVariables (), 0);
 
@@ -294,118 +266,4 @@ size_t csLightIterRenderStep::Find (iRenderStep* step) const
 size_t csLightIterRenderStep::GetStepCount () const
 {
   return steps.GetSize ();
-}
-
-csPtr<iTextureHandle> csLightIterRenderStep::GetAttenuationTexture (
-  int /*attnType*/)
-{
-  if (!attTex.IsValid())
-  {
-  #define CS_ATTTABLE_SIZE	  128
-  #define CS_HALF_ATTTABLE_SIZE	  ((float)CS_ATTTABLE_SIZE/2.0f)
-
-    csRGBpixel *attenuationdata = 
-      new csRGBpixel[CS_ATTTABLE_SIZE * CS_ATTTABLE_SIZE];
-    csRGBpixel* data = attenuationdata;
-    for (int y=0; y < CS_ATTTABLE_SIZE; y++)
-    {
-      for (int x=0; x < CS_ATTTABLE_SIZE; x++)
-      {
-	float yv = 3.0f * ((y + 0.5f)/CS_HALF_ATTTABLE_SIZE - 1.0f);
-	float xv = 3.0f * ((x + 0.5f)/CS_HALF_ATTTABLE_SIZE - 1.0f);
-	float i = exp (-0.7 * (xv*xv + yv*yv));
-	unsigned char v = i>1.0f ? 255 : csQint (i*255.99f);
-	(data++)->Set (v, v, v, v);
-      }
-    }
-
-    csRef<iImage> img = csPtr<iImage> (new csImageMemory (
-      CS_ATTTABLE_SIZE, CS_ATTTABLE_SIZE, attenuationdata, true, 
-      CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
-    attTex = g3d->GetTextureManager()->RegisterTexture (
-	img, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS);
-    attTex->SetTextureClass ("lookup");
-  }
-  return csPtr<iTextureHandle> (attTex);
-}
-
-csPtr<iTextureHandle> csLightIterRenderStep::GetAttenuationTexture (
-  const csVector4& attnVec)
-{
-  if (attnVec.z != 0)
-    return GetAttenuationTexture (CS_ATTN_REALISTIC);
-  else if (attnVec.y != 0)
-    return GetAttenuationTexture (CS_ATTN_INVERSE);
-  else 
-    return GetAttenuationTexture (CS_ATTN_NONE);
-}
-
-
-//---------------------------------------------------------------------------
-
-csLightIterRenderStep::LightSVAccessor::LightSVAccessor (iLight* light,
-  csLightIterRenderStep* parent) :
-  scfImplementationType (this)
-{
-  LightSVAccessor::light = light;
-  LightSVAccessor::parent = parent;
-
-  needUpdate = true;
-  light->SetLightCallback (this);
-}
-
-csLightIterRenderStep::LightSVAccessor::~LightSVAccessor ()
-{
-}
-
-void csLightIterRenderStep::LightSVAccessor::OnColorChange (iLight* /*light*/,
-  const csColor& /*newcolor*/)
-{
-}
-
-void csLightIterRenderStep::LightSVAccessor::OnPositionChange (iLight* /*light*/, 
-  const csVector3& /*newpos*/)
-{
-}
-
-void csLightIterRenderStep::LightSVAccessor::OnSectorChange (iLight* /*light*/, 
-  iSector* /*newsector*/)
-{
-}
-
-void csLightIterRenderStep::LightSVAccessor::OnRadiusChange (iLight* /*light*/, 
-  float /*newradius*/)
-{
-}
-
-void csLightIterRenderStep::LightSVAccessor::OnDestroy (iLight* /*light*/)
-{
-  parent->knownLights.Delete (this->light, this);
-  //delete this;
-}
-
-void csLightIterRenderStep::LightSVAccessor::OnAttenuationChange (
-  iLight* /*light*/, int newatt)
-{
-  needUpdate = true;
-  attnType = newatt;
-}
-
-void csLightIterRenderStep::LightSVAccessor::PreGetValue (
-  csShaderVariable *variable)
-{
-  if (needUpdate)
-  {
-    //CreateTexture ();
-    if (attnType == CS_ATTN_CLQ)
-    {
-      const csVector4& attnVec = light->GetAttenuationConstants ();
-      attTex = parent->GetAttenuationTexture (attnVec);
-    }
-    else
-      attTex = parent->GetAttenuationTexture (attnType);
-
-    needUpdate = false;
-  }
-  variable->SetValue (attTex);
 }

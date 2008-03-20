@@ -31,12 +31,12 @@
 class csVector3;
 class csMatrix3;
 class csMovable;
-class csLight;
 class csMeshWrapper;
 
 CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 {
   class csCameraBase;
+  class csLight;
 }
 CS_PLUGIN_NAMESPACE_END(Engine)
 
@@ -105,7 +105,7 @@ private:
   /**
    * Light on which this movable operates.
    */
-  csLight* lightobject;
+  CS_PLUGIN_NAMESPACE_NAME(Engine)::csLight* lightobject;
 
   /**
    * Camera on which this movable operates.
@@ -140,13 +140,13 @@ public:
   const csRefArray<iSceneNode>& GetChildren () const { return scene_children; }
 
   /// Set light on which this movable operates.
-  void SetLight (csLight* obj)
+  void SetLight (CS_PLUGIN_NAMESPACE_NAME(Engine)::csLight* obj)
   {
     lightobject = obj;
   }
 
   /// Get the light on which we operate.
-  csLight* GetCsLight () const
+  CS_PLUGIN_NAMESPACE_NAME(Engine)::csLight* GetCsLight () const
   {
     return lightobject;
   }

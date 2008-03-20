@@ -51,8 +51,13 @@ struct iMovable;
 struct iRenderView;
 struct iSharedVariable;
 class csEngine;
-class csLight;
 class csMeshFactoryWrapper;
+
+CS_PLUGIN_NAMESPACE_BEGIN(Engine)
+{
+  class csLight;
+}
+CS_PLUGIN_NAMESPACE_END(Engine)
 
 /**
  * A list of mesh factories.

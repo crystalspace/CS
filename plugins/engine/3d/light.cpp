@@ -19,8 +19,10 @@
 #include "csqsqrt.h"
 #include "csqint.h"
 
+#include "ivideo/txtmgr.h"
 #include "csgeom/frustum.h"
 #include "csgeom/trimesh.h"
+#include "csgfx/imagememory.h"
 #include "csutil/csendian.h"
 #include "csutil/csmd5.h"
 #include "csutil/memfile.h"
@@ -34,6 +36,8 @@
 
 #define HUGE_RADIUS 100000000
 
+CS_PLUGIN_NAMESPACE_BEGIN(Engine)
+{
 
 csLight::csLight (csEngine* engine,
   float x, float y, float z,
@@ -62,6 +66,9 @@ csLight::csLight (csEngine* engine,
   //  CalculateInfluenceRadius ();
   CalculateAttenuationVector ();
   UpdateBBox ();
+  
+  CS::ShaderVariableContextImpl::AddVariable (
+    engine->GetLightAttenuationTextureSV ());
 }
 
 csLight::~csLight ()
@@ -709,4 +716,48 @@ void csLightingProcessInfo::FinalizeLighting ()
 }
 
 // ---------------------------------------------------------------------------
+  
+void LightAttenuationTextureAccessor::CreateAttenuationTexture ()
+{
+#define CS_ATTTABLE_SIZE	  128
+#define CS_HALF_ATTTABLE_SIZE	  ((float)CS_ATTTABLE_SIZE/2.0f)
+  csRGBpixel *attenuationdata = 
+    new csRGBpixel[CS_ATTTABLE_SIZE * CS_ATTTABLE_SIZE];
+  csRGBpixel* data = attenuationdata;
+  for (int y=0; y < CS_ATTTABLE_SIZE; y++)
+  {
+    for (int x=0; x < CS_ATTTABLE_SIZE; x++)
+    {
+      float yv = 3.0f * ((y + 0.5f)/CS_HALF_ATTTABLE_SIZE - 1.0f);
+      float xv = 3.0f * ((x + 0.5f)/CS_HALF_ATTTABLE_SIZE - 1.0f);
+      float i = exp (-0.7 * (xv*xv + yv*yv));
+      unsigned char v = i>1.0f ? 255 : csQint (i*255.99f);
+      (data++)->Set (v, v, v, v);
+    }
+  }
 
+  csRef<iImage> img = csPtr<iImage> (new csImageMemory (
+    CS_ATTTABLE_SIZE, CS_ATTTABLE_SIZE, attenuationdata, true, 
+    CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
+   attTex = engine->G3D->GetTextureManager()->RegisterTexture (
+      img, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS);
+  attTex->SetTextureClass ("lookup");
+}
+
+LightAttenuationTextureAccessor::LightAttenuationTextureAccessor (
+  csEngine* engine) : scfImplementationType (this), engine (engine)
+{
+}
+
+LightAttenuationTextureAccessor::~LightAttenuationTextureAccessor ()
+{
+}
+
+void LightAttenuationTextureAccessor::PreGetValue (csShaderVariable *variable)
+{
+  if (!attTex.IsValid()) CreateAttenuationTexture ();
+  variable->SetValue (attTex);
+}
+
+}
+CS_PLUGIN_NAMESPACE_END(Engine)

@@ -97,46 +97,10 @@ private:
   csRef<iLightManager> lightmgr;
   bool initialized;
 
-  class LightSVAccessor :
-    public scfImplementation2<LightSVAccessor,
-      iLightCallback, iShaderVariableAccessor>
-  {
-  private:
-    iLight* light;
-    csLightIterRenderStep* parent;
-
-    csRef<iTextureHandle> attTex;
-    int attnType;
-
-    bool needUpdate;
-
-  public:
-    CS_LEAKGUARD_DECLARE (LightSVAccessor);
-
-    LightSVAccessor (iLight* light, csLightIterRenderStep* parent);
-    virtual ~LightSVAccessor ();
-
-    virtual void OnColorChange (iLight* light, const csColor& newcolor);
-    virtual void OnPositionChange (iLight* light, const csVector3& newpos);
-    virtual void OnSectorChange (iLight* light, iSector* newsector);
-    virtual void OnRadiusChange (iLight* light, float newradius);
-    virtual void OnDestroy (iLight* light);
-    virtual void OnAttenuationChange (iLight* light, int newatt);
-
-    virtual void PreGetValue (csShaderVariable *variable);
-  };
-  friend class LightSVAccessor;
-
-  csHash<LightSVAccessor*, csPtrKey<iLight> > knownLights;
-  csRef<iTextureHandle> attTex;
-  
   uint lastLSVHelperFrame;
   CS::RenderManager::LightingVariablesHelper::PersistentData
     lightSvHelperPersist;
   CS::ShaderVarStringID sv_attn_tex_name;
-
-  LightSVAccessor* GetLightAccessor (iLight* light);
-
 public:
   csWeakRef<iGraphics3D> g3d;
 
@@ -152,9 +116,6 @@ public:
   virtual iRenderStep* GetStep (size_t n) const;
   virtual size_t Find (iRenderStep* step) const;
   virtual size_t GetStepCount () const;
-
-  csPtr<iTextureHandle> GetAttenuationTexture (int attnType);
-  csPtr<iTextureHandle> GetAttenuationTexture (const csVector4& attnVec);
 };
 
 

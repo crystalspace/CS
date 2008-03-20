@@ -762,6 +762,20 @@ iMeshObjectType* csEngine::GetThingType ()
   return (iMeshObjectType*)thingMeshType;
 }
 
+csShaderVariable* csEngine::GetLightAttenuationTextureSV()
+{
+  if (!lightAttenuationTexture)
+  {
+    lightAttenuationTexture.AttachNew (new csShaderVariable (
+      lightSvNames.GetLightSVId (csLightShaderVarCache::lightAttenuationTex)));
+    lightAttenuationTexture->SetType (csShaderVariable::TEXTURE);
+    csRef<LightAttenuationTextureAccessor> accessor;
+    accessor.AttachNew (new LightAttenuationTextureAccessor (this));
+    lightAttenuationTexture->SetAccessor (accessor);
+  }
+  return lightAttenuationTexture;
+}
+
 void csEngine::DeleteAllForce ()
 {
   // First notify all sector removal callbacks.
@@ -813,6 +827,8 @@ void csEngine::DeleteAllForce ()
   QueryObject ()->ObjRemoveAll ();
 
   envTexHolder.Clear ();
+  
+  lightAttenuationTexture.Invalidate ();
 }
 
 void csEngine::DeleteAll ()

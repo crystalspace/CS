@@ -28,13 +28,18 @@
 
 class csMatrix3;
 class csVector3;
-class csLight;
 class csFrustumView;
 struct csFog;
 struct iGraphics3D;
 struct iGraphics2D;
 struct iSector;
 struct iClipper2D;
+
+CS_PLUGIN_NAMESPACE_BEGIN(Engine)
+{
+  class csLight;
+}
+CS_PLUGIN_NAMESPACE_END(Engine)
 
 /**
  * This class is a csFrustum especially used for the lighting calculations.
