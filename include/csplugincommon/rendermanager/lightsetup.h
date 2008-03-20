@@ -20,6 +20,7 @@
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_LIGHTSETUP_H__
 
 #include "iengine/lightmgr.h"
+#include "iutil/object.h"
 #include "ivideo/shader/shader.h"
 
 #include "csgfx/lightsvcache.h"
@@ -270,7 +271,7 @@ namespace RenderManager
       : persist (persist), layerConfig (layerConfig), lastShader (0) { }
 
     template<typename LayerHelper>
-    void HandleLights (csLightInfluence* influenceLights, size_t numLights,
+    size_t HandleLights (csLightInfluence* influenceLights, size_t numLights,
       size_t layer, LayerHelper& layers,
       typename RenderTree::MeshNode::SingleMesh& mesh,
       typename RenderTree::MeshNode* node)
@@ -284,12 +285,16 @@ namespace RenderManager
       iShader* shaderToUse =
 	node->owner.shaderArray[layers.GetNewLayerIndex (layer, 0) 
           * node->owner.totalRenderMeshes + mesh.contextLocalId];
-      if (!shaderToUse) return;
+      if (!shaderToUse) return 0;
 
+      const char* shaderName = shaderToUse->QueryObject()->GetName();
       UpdateMetadata (shaderToUse);
-      if (lastMetadata.numberOfLights == 0) return;
+      if ((lastMetadata.numberOfLights == 0) 
+        && !layerConfig.IsAmbientLayer (layer)) return 0;
 
-      const size_t layerLights = sortedLights.GetSize();
+      size_t layerLights = sortedLights.GetSize();
+      if (lastMetadata.numberOfLights == 0)
+        layerLights = 0;
 
       // Set up layers
       size_t firstLight = 0;
@@ -298,7 +303,7 @@ namespace RenderManager
       while (firstLight < layerLights)
       {
 	csLightType lightType = sortedLights.GetLightType (firstLight);
-	size_t num = 1;
+	size_t num = 0;
 	for (; num < remainingLights; num++)
 	{
 	  if (sortedLights.GetLightType (firstLight + num) != lightType)
@@ -306,9 +311,20 @@ namespace RenderManager
 	}
 	/* We have a subset of the lights that are of the same type.
 	 * Check the size of it against the shader limit */
-	size_t thisPassLayers = (num 
-	  + lastMetadata.numberOfLights - 1) / lastMetadata.numberOfLights;
-	thisPassLayers = csMin (thisPassLayers, layerConfig.GetMaxLightPasses (layer));
+	size_t thisPassLayers;
+	if (lastMetadata.numberOfLights != 0)
+	{
+	  thisPassLayers = (num + lastMetadata.numberOfLights - 1)
+	    / lastMetadata.numberOfLights;
+	  thisPassLayers = csMin (totalLayers + thisPassLayers,
+	    layerConfig.GetMaxLightPasses (layer)) - totalLayers;
+	}
+	else
+	{
+	  // Shader that doesn't do lights: draw one layer (for ambient)
+	  thisPassLayers = 1;
+	  num = remainingLights;
+	}
 	size_t neededLayers = totalLayers + thisPassLayers;
 
         layers.Ensure (layer, neededLayers, node);
@@ -322,10 +338,13 @@ namespace RenderManager
       firstLight = 0;
       remainingLights = layerLights;
       totalLayers = 0;
-      while (firstLight < layerLights)
+      while ((firstLight < layerLights)
+        || (layerConfig.IsAmbientLayer (layer)))
       {
-	csLightType lightType = sortedLights.GetLightType (firstLight);
-	size_t num = 1;
+	csLightType lightType = (remainingLights > 0) 
+	  ? sortedLights.GetLightType (firstLight)
+	  : (csLightType)0;
+	size_t num = 0;
 	for (; num < remainingLights; num++)
 	{
 	  if (sortedLights.GetLightType (firstLight + num) != lightType)
@@ -333,9 +352,22 @@ namespace RenderManager
 	}
 	/* We have a subset of the lights that are of the same type.
 	  * Check the size of it against the shader limit */
-	size_t thisPassLayers = (num 
-	  + lastMetadata.numberOfLights - 1) / lastMetadata.numberOfLights;
-	thisPassLayers = csMin (thisPassLayers, layerConfig.GetMaxLightPasses (layer));
+	size_t thisPassLayers;
+	if (lastMetadata.numberOfLights != 0)
+	{
+	  thisPassLayers = (num + lastMetadata.numberOfLights - 1)
+	    / lastMetadata.numberOfLights;
+	  thisPassLayers = csMin (totalLayers + thisPassLayers,
+	    layerConfig.GetMaxLightPasses (layer)) - totalLayers;
+	}
+	else
+	{
+	  thisPassLayers = 1;
+	  num = 0;
+	}
+	if (thisPassLayers == 0)
+	  // Reached layer pass limit
+	  break;
 	size_t neededLayers = totalLayers + thisPassLayers;
 
 	csShaderVariableStack localStack;
@@ -355,6 +387,7 @@ namespace RenderManager
   
 	  size_t thisNum = csMin (num,
 	    layerConfig.GetMaxLightNum (layer));
+	  thisNum = csMin (thisNum, (size_t)lastMetadata.numberOfLights);
 	  csShaderVariable* lightNum = lightVarsHelper.CreateVarOnStack (
 	    persist.svNames.GetDefaultSVId (
 	      csLightShaderVarCache::varLightCount), localStack);
@@ -370,7 +403,6 @@ namespace RenderManager
 	  lightTypeSV->SetValue ((int)(lightType));
   
 	  for (size_t l = thisNum; l-- > 0; )
-	  //for (size_t l = 0; l < thisNum; l++)
 	  {
 	    iLight* light = sortedLights.GetLight (firstLight + l);
 	    CachedLightData* thisLightSVs =
@@ -391,9 +423,11 @@ namespace RenderManager
 	  firstLight += thisNum;
 	  remainingLights -= thisNum;
 	}
+        if (layerLights == 0) break;
 
 	totalLayers = neededLayers;
       }
+      return firstLight;
     }
   protected:
     PersistentData& persist;
@@ -463,7 +497,6 @@ namespace RenderManager
         csLightInfluence* influences;
 	lightmgr->GetRelevantLights (node->owner.sector,
 	  mesh.bbox, influences, numLights, allMaxLights);
-	if (numLights == 0) continue; // Not much to do ...
         
         size_t lightOffset = 0;
 	for (size_t layer = 0; layer < layerConfig.GetLayerCount (); ++layer)
@@ -471,12 +504,12 @@ namespace RenderManager
           // Get the subset of lights for this layer
           size_t layerLights = csMin (layerConfig.GetMaxLightNum (layer),
             numLights - lightOffset);
-          if (layerLights == 0) continue;
+          if ((layerLights == 0)
+            && (!layerConfig.IsAmbientLayer (layer))) continue;
           csLightInfluence* currentInfluences = influences + lightOffset;
 
-          shadows.HandleLights (currentInfluences,
-            numLights, layer, layerHelper, mesh, node);
-	  lightOffset += layerLights;
+          lightOffset += shadows.HandleLights (currentInfluences,
+            layerLights, layer, layerHelper, mesh, node);
 	}
 
         lightmgr->FreeInfluenceArray (influences);
@@ -525,6 +558,10 @@ namespace RenderManager
       size_t GetMaxLightPasses (size_t layer) const
       {
         return layerConfig.GetMaxLightPasses (layerMap[layer]);
+      }
+      bool IsAmbientLayer (size_t layer) const
+      {
+        return layerConfig.IsAmbientLayer (layerMap[layer]);
       }
 
 

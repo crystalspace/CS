@@ -267,7 +267,7 @@ namespace RenderManager
         lastShader (0) { }
 
     template<typename LayerHelper>
-    void HandleLights (csLightInfluence* influenceLights, size_t numLights,
+    size_t HandleLights (csLightInfluence* influenceLights, size_t numLights,
       size_t layer, LayerHelper& layers,
       typename RenderTree::MeshNode::SingleMesh& mesh,
       typename RenderTree::MeshNode* node)
@@ -283,10 +283,10 @@ namespace RenderManager
       iShader* shaderToUse =
 	node->owner.shaderArray[layers.GetNewLayerIndex (layer, 0) 
           * node->owner.totalRenderMeshes + mesh.contextLocalId];
-      if (!shaderToUse) return;
+      if (!shaderToUse) return 0;
 
       UpdateMetadata (shaderToUse);
-      if (lastMetadata.numberOfLights == 0) return;
+      if (lastMetadata.numberOfLights == 0) return 0;
 
       const size_t layerLights = sortedLights.GetSize();
 
@@ -430,6 +430,7 @@ namespace RenderManager
 
 	totalLayers = neededLayers;
       }
+      return firstLight;
     }
   protected:
     PersistentData& persist;

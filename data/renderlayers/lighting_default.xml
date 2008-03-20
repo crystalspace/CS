@@ -1,12 +1,20 @@
 <layerconfig>
 	<layer>
 		<defaultshader name="lighting_default" file="/shader/lighting/lighting_default.xml" />
+		<ambient />
 		<shadertype>base</shadertype>
 		<shadertype>ambient</shadertype>
 		<shadertype>splatting ambient</shadertype>
 		<shadertype>standard</shadertype>
 	</layer>
 	<layer>
+	        <shadertype>diffuse</shadertype>
+		<!-- Practically unlimited passes -->
+		<maxlightpasses>2147483647</maxlightpasses>
+	</layer>
+	<layer>
 		<shadertype>terrain splat</shadertype>
+		<!-- Practically unlimited passes -->
+		<maxlightpasses>2147483647</maxlightpasses>
 	</layer>
 </layerconfig>

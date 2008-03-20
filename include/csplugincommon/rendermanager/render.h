@@ -19,9 +19,9 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_RENDER_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_RENDER_H__
 
+#include "csplugincommon/rendermanager/operations.h"
 #include "csplugincommon/rendermanager/rendertree.h"
 #include "csplugincommon/rendermanager/svarrayholder.h"
-
 
 namespace CS
 {

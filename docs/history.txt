@@ -12,6 +12,12 @@ chronological order.
 	  parsing of SV names with 'embedded' numbers.
 	- res fixed csShaderProgram indirectly memcpy()ing a local allocator.
 	- res made the engine provide the 'legacy" light attenuation texture.
+	- res made a number of improvements and fixes to the RM light setup:
+	    - Now actually respects the "maximum passes" layer setting.
+	    - Added "ambient" layer option which draws the layer even though no
+	      light is to be drawn. As the name suggests this is needed for
+	      ambient passes.
+	    - Made it properly render a set of lights over multiple passes.
 19-Mar-2008
 	- Mike Gist fixed a crash in tinyxml when parsing a binary xml file.
 	- Mike Gist added some missing error sets in tinyxml, so it now
@@ -72,15 +78,12 @@ chronological order.
 	- res fixed the LinkWith jam rule to not add LFLAGS from the
 	  dependencies of the requested libraries piecemeal: this breaks
 	  static building.
-<<<<<<< .working
 14-Mar-2008
 	- res fixed perspective projection in csTiledCoverageBuffer/csOBB/
 	  csBox3 for the range of the projected coords.
 	- res fixed a leak in genmesh.
-=======
 	- Mike Gist added support for compressed normal maps to the
 	  parallax and parallaxAtt shaders.
->>>>>>> .merge-right.r29044
 13-Mar-2008
 	- Marten fixed the placement of some deprecation warning disable
 	  /enable includes. Eliminated some 8000 wrong warnings on MSVC9.

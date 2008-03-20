@@ -75,10 +75,11 @@ namespace CS
       
         bool ParseLayer (iDocumentNode* node, SingleRenderLayer& layer)
         {
-          size_t maxLightPasses = 1;
+          size_t maxLightPasses = 3;
           size_t maxLights = ~0;
           csRef<iShader> defaultShader;
           csDirtyAccessArray<csStringID> shaderTypes;
+          bool isAmbient = false;
         
 	  csRef<iDocumentNodeIterator> it = node->GetNodes();
 	  while (it->HasNext())
@@ -125,14 +126,24 @@ namespace CS
 	          shaderTypes.Push (stringSet->Request (child->GetContentsValue()));
 	        }
 	        break;
+	      case XMLTOKEN_AMBIENT:
+	        {
+	          if (!synldr->ParseBool (child, isAmbient, true))
+	           return false;
+	        }
+	        break;
 	      default:
 	        synldr->ReportBadToken (child);
 	        return false;
 	    }
 	  }
 	  
-	  layer = SingleRenderLayer (shaderTypes.GetArray(),
-	    shaderTypes.GetSize(), defaultShader, maxLightPasses, maxLights);
+	  layer.SetShaderTypes (shaderTypes.GetArray(),
+	    shaderTypes.GetSize());
+	  layer.SetDefaultShader (defaultShader);
+	  layer.SetMaxLightPasses (maxLightPasses);
+	  layer.SetMaxLights (maxLights);
+	  layer.SetAmbient (isAmbient);
 	  
           return true;
         }

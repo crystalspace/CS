@@ -45,24 +45,24 @@ namespace RenderManager
   public:
     /// Create a single render layer with a no shader type.
     SingleRenderLayer (iShader* defaultShader = 0,
-      size_t maxLightPasses = 1, size_t maxLights = ~0)
+      size_t maxLightPasses = 3, size_t maxLights = ~0)
       : defaultShader (defaultShader), maxLightPasses (maxLightPasses), 
-        maxLights (maxLights)
+        maxLights (maxLights), isAmbient (false)
     { }
     /// Create a single render layer with a single shader type.
     SingleRenderLayer (const csStringID shaderType, iShader* defaultShader = 0,
-        size_t maxLightPasses = 1, size_t maxLights = ~0)
+        size_t maxLightPasses = 3, size_t maxLights = ~0)
       : defaultShader (defaultShader), maxLightPasses (maxLightPasses),
-        maxLights (maxLights)
+        maxLights (maxLights), isAmbient (false)
     {
       shaderTypes.Push (shaderType);
     }
     /// Create a single render layer with a multiply shader type.
     SingleRenderLayer (const csStringID* shaderTypes, size_t numTypes,
       iShader* defaultShader = 0,
-      size_t maxLightPasses = 1, size_t maxLights = ~0)
+      size_t maxLightPasses = 3, size_t maxLights = ~0)
       : defaultShader (defaultShader), maxLightPasses (maxLightPasses), 
-        maxLights (maxLights)
+        maxLights (maxLights), isAmbient (false)
     {
       this->shaderTypes.SetSize (numTypes);
       for (size_t i = 0; i < numTypes; ++i)
@@ -107,7 +107,34 @@ namespace RenderManager
 
       return maxLightPasses;
     }
+    bool IsAmbientLayer (size_t layer) const
+    {
+      CS_ASSERT(layer == 0);
+      return isAmbient;
+    }
 
+    void SetShaderTypes (const csStringID* shaderTypes, size_t numTypes)
+    {
+      this->shaderTypes.SetSize (numTypes);
+      for (size_t i = 0; i < numTypes; ++i)
+        this->shaderTypes[i] = shaderTypes[i];
+    }
+    void SetDefaultShader (iShader* defaultShader)
+    {
+      this->defaultShader = defaultShader;
+    }
+    void SetMaxLightPasses (size_t maxLightPasses)
+    {
+      this->maxLightPasses = maxLightPasses;
+    }
+    void SetMaxLights (size_t maxLights)
+    {
+      this->maxLights = maxLights;
+    }
+    void SetAmbient (bool isAmbient)
+    {
+      this->isAmbient = isAmbient;
+    }
   private:
     /*csDirtyAccessArray<StringIDValue,
       csArrayElementHandler<StringIDValue>,
@@ -117,6 +144,7 @@ namespace RenderManager
     csRef<iShader> defaultShader;
     size_t maxLightPasses;
     size_t maxLights;
+    bool isAmbient;
   };
 
   /**
@@ -141,6 +169,7 @@ namespace RenderManager
 	newLayer.maxLights = maxLights ? maxLights[l] : ~0;
 	newLayer.firstType = l;
 	newLayer.numTypes = 1;
+	newLayer.isAmbient = false;
 	layers.Push (newLayer);
       }
       layers.ShrinkBestFit ();
@@ -160,6 +189,7 @@ namespace RenderManager
 	newLayer.defaultShader = layers.GetDefaultShader (l);
 	newLayer.maxLightPasses = layers.GetMaxLightPasses (l);
 	newLayer.maxLights = layers.GetMaxLightNum (l);
+	newLayer.isAmbient = layers.IsAmbientLayer (l);
 	newLayer.firstType = layerTypes.GetSize ();
 	const csStringID* copyTypes = layers.GetShaderTypes (l,
 	  newLayer.numTypes);
@@ -200,6 +230,10 @@ namespace RenderManager
     {
       return layers[layer].maxLightPasses;
     }
+    bool IsAmbientLayer (size_t layer) const
+    {
+      return layers[layer].isAmbient;
+    }
 
     /// Remove all layers
     void Clear()
@@ -215,6 +249,7 @@ namespace RenderManager
       size_t maxLights;
       size_t firstType;
       size_t numTypes;
+      bool isAmbient;
     };
     csArray<Layer> layers;
     csDirtyAccessArray<StringIDValue> layerTypes;
