@@ -1423,6 +1423,9 @@ class iTerrainCellFeederProperties(core.iBase):
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetHeightmapSource(*args): return _imesh.iTerrainCellFeederProperties_SetHeightmapSource(*args)
+    def SetMaterialMapSource(*args): return _imesh.iTerrainCellFeederProperties_SetMaterialMapSource(*args)
+    def SetHeightOffset(*args): return _imesh.iTerrainCellFeederProperties_SetHeightOffset(*args)
+    def AddAlphaMap(*args): return _imesh.iTerrainCellFeederProperties_AddAlphaMap(*args)
     def SetParameter(*args): return _imesh.iTerrainCellFeederProperties_SetParameter(*args)
     def Clone(*args): return _imesh.iTerrainCellFeederProperties_Clone(*args)
     scfGetVersion = staticmethod(_imesh.iTerrainCellFeederProperties_scfGetVersion)
@@ -1489,6 +1492,7 @@ class iTerrainRenderer(core.iBase):
     def GetRenderMeshes(*args): return _imesh.iTerrainRenderer_GetRenderMeshes(*args)
     def OnMaterialPaletteUpdate(*args): return _imesh.iTerrainRenderer_OnMaterialPaletteUpdate(*args)
     def OnMaterialMaskUpdate(*args): return _imesh.iTerrainRenderer_OnMaterialMaskUpdate(*args)
+    def OnAlphaMapUpdate(*args): return _imesh.iTerrainRenderer_OnAlphaMapUpdate(*args)
     scfGetVersion = staticmethod(_imesh.iTerrainRenderer_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainRenderer
     __del__ = lambda self : None;
@@ -1583,6 +1587,7 @@ class iTerrainCell(core.iBase):
     def LockMaterialMap(*args): return _imesh.iTerrainCell_LockMaterialMap(*args)
     def UnlockMaterialMap(*args): return _imesh.iTerrainCell_UnlockMaterialMap(*args)
     def SetMaterialMask(*args): return _imesh.iTerrainCell_SetMaterialMask(*args)
+    def SetAlphaMask(*args): return _imesh.iTerrainCell_SetAlphaMask(*args)
     def SetBaseMaterial(*args): return _imesh.iTerrainCell_SetBaseMaterial(*args)
     def GetBaseMaterial(*args): return _imesh.iTerrainCell_GetBaseMaterial(*args)
     def CollideSegment(*args): return _imesh.iTerrainCell_CollideSegment(*args)

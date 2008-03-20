@@ -31422,15 +31422,20 @@ SWIGINTERN PyObject *_wrap_iTerrainCellFeederProperties_SetHeightmapSource(PyObj
   PyObject *resultobj = 0;
   iTerrainCellFeederProperties *arg1 = (iTerrainCellFeederProperties *) 0 ;
   char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellFeederProperties_SetHeightmapSource",2,2,&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellFeederProperties_SetHeightmapSource",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellFeederProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCellFeederProperties_SetHeightmapSource" "', argument " "1"" of type '" "iTerrainCellFeederProperties *""'"); 
@@ -31441,12 +31446,127 @@ SWIGINTERN PyObject *_wrap_iTerrainCellFeederProperties_SetHeightmapSource(PyObj
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iTerrainCellFeederProperties_SetHeightmapSource" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  (arg1)->SetHeightmapSource((char const *)arg2);
+  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iTerrainCellFeederProperties_SetHeightmapSource" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
+  (arg1)->SetHeightmapSource((char const *)arg2,(char const *)arg3);
+  resultobj = SWIG_Py_Void();
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTerrainCellFeederProperties_SetMaterialMapSource(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTerrainCellFeederProperties *arg1 = (iTerrainCellFeederProperties *) 0 ;
+  char *arg2 = (char *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellFeederProperties_SetMaterialMapSource",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellFeederProperties, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCellFeederProperties_SetMaterialMapSource" "', argument " "1"" of type '" "iTerrainCellFeederProperties *""'"); 
+  }
+  arg1 = reinterpret_cast< iTerrainCellFeederProperties * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iTerrainCellFeederProperties_SetMaterialMapSource" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  (arg1)->SetMaterialMapSource((char const *)arg2);
   resultobj = SWIG_Py_Void();
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTerrainCellFeederProperties_SetHeightOffset(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTerrainCellFeederProperties *arg1 = (iTerrainCellFeederProperties *) 0 ;
+  float arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  float val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellFeederProperties_SetHeightOffset",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellFeederProperties, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCellFeederProperties_SetHeightOffset" "', argument " "1"" of type '" "iTerrainCellFeederProperties *""'"); 
+  }
+  arg1 = reinterpret_cast< iTerrainCellFeederProperties * >(argp1);
+  ecode2 = SWIG_AsVal_float(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iTerrainCellFeederProperties_SetHeightOffset" "', argument " "2"" of type '" "float""'");
+  } 
+  arg2 = static_cast< float >(val2);
+  (arg1)->SetHeightOffset(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTerrainCellFeederProperties_AddAlphaMap(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTerrainCellFeederProperties *arg1 = (iTerrainCellFeederProperties *) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellFeederProperties_AddAlphaMap",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellFeederProperties, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCellFeederProperties_AddAlphaMap" "', argument " "1"" of type '" "iTerrainCellFeederProperties *""'"); 
+  }
+  arg1 = reinterpret_cast< iTerrainCellFeederProperties * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iTerrainCellFeederProperties_AddAlphaMap" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iTerrainCellFeederProperties_AddAlphaMap" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
+  (arg1)->AddAlphaMap((char const *)arg2,(char const *)arg3);
+  resultobj = SWIG_Py_Void();
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   return NULL;
 }
 
@@ -32739,7 +32859,67 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iTerrainRenderer_OnMaterialMaskUpdate(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iTerrainRenderer_OnMaterialMaskUpdate__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTerrainRenderer *arg1 = (iTerrainRenderer *) 0 ;
+  iTerrainCell *arg2 = (iTerrainCell *) 0 ;
+  csRect *arg3 = 0 ;
+  unsigned char *arg4 = (unsigned char *) 0 ;
+  size_t arg5 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  size_t val5 ;
+  int ecode5 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainRenderer_OnMaterialMaskUpdate",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainRenderer, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainRenderer_OnMaterialMaskUpdate" "', argument " "1"" of type '" "iTerrainRenderer *""'"); 
+  }
+  arg1 = reinterpret_cast< iTerrainRenderer * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iTerrainCell, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iTerrainRenderer_OnMaterialMaskUpdate" "', argument " "2"" of type '" "iTerrainCell *""'"); 
+  }
+  arg2 = reinterpret_cast< iTerrainCell * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csRect,  0  | 0);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iTerrainRenderer_OnMaterialMaskUpdate" "', argument " "3"" of type '" "csRect const &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iTerrainRenderer_OnMaterialMaskUpdate" "', argument " "3"" of type '" "csRect const &""'"); 
+  }
+  arg3 = reinterpret_cast< csRect * >(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4,SWIGTYPE_p_unsigned_char, 0 |  0 );
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iTerrainRenderer_OnMaterialMaskUpdate" "', argument " "4"" of type '" "unsigned char const *""'"); 
+  }
+  arg4 = reinterpret_cast< unsigned char * >(argp4);
+  ecode5 = SWIG_AsVal_size_t(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iTerrainRenderer_OnMaterialMaskUpdate" "', argument " "5"" of type '" "size_t""'");
+  } 
+  arg5 = static_cast< size_t >(val5);
+  (arg1)->OnMaterialMaskUpdate(arg2,(csRect const &)*arg3,(unsigned char const *)arg4,arg5);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTerrainRenderer_OnMaterialMaskUpdate__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iTerrainRenderer *arg1 = (iTerrainRenderer *) 0 ;
   iTerrainCell *arg2 = (iTerrainCell *) 0 ;
@@ -32801,6 +32981,156 @@ SWIGINTERN PyObject *_wrap_iTerrainRenderer_OnMaterialMaskUpdate(PyObject *SWIGU
   } 
   arg6 = static_cast< size_t >(val6);
   (arg1)->OnMaterialMaskUpdate(arg2,arg3,(csRect const &)*arg4,(unsigned char const *)arg5,arg6);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTerrainRenderer_OnMaterialMaskUpdate(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[7];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 6); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 5) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iTerrainRenderer, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iTerrainCell, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_csRect, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          void *vptr = 0;
+          int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_unsigned_char, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            {
+              int res = SWIG_AsVal_size_t(argv[4], NULL);
+              _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              return _wrap_iTerrainRenderer_OnMaterialMaskUpdate__SWIG_0(self, args);
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 6) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iTerrainRenderer, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iTerrainCell, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        {
+          int res = SWIG_AsVal_size_t(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_csRect, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            void *vptr = 0;
+            int res = SWIG_ConvertPtr(argv[4], &vptr, SWIGTYPE_p_unsigned_char, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              {
+                int res = SWIG_AsVal_size_t(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
+              if (_v) {
+                return _wrap_iTerrainRenderer_OnMaterialMaskUpdate__SWIG_1(self, args);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iTerrainRenderer_OnMaterialMaskUpdate'.\n  Possible C/C++ prototypes are:\n    OnMaterialMaskUpdate(iTerrainCell *,csRect const &,unsigned char const *,size_t)\n    OnMaterialMaskUpdate(iTerrainCell *,size_t,csRect const &,unsigned char const *,size_t)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTerrainRenderer_OnAlphaMapUpdate(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTerrainRenderer *arg1 = (iTerrainRenderer *) 0 ;
+  iTerrainCell *arg2 = (iTerrainCell *) 0 ;
+  iMaterialWrapper *arg3 = (iMaterialWrapper *) 0 ;
+  unsigned char *arg4 = (unsigned char *) 0 ;
+  csRect *arg5 = 0 ;
+  size_t arg6 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  size_t val6 ;
+  int ecode6 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainRenderer_OnAlphaMapUpdate",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainRenderer, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainRenderer_OnAlphaMapUpdate" "', argument " "1"" of type '" "iTerrainRenderer *""'"); 
+  }
+  arg1 = reinterpret_cast< iTerrainRenderer * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iTerrainCell, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iTerrainRenderer_OnAlphaMapUpdate" "', argument " "2"" of type '" "iTerrainCell *""'"); 
+  }
+  arg2 = reinterpret_cast< iTerrainCell * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_iMaterialWrapper, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iTerrainRenderer_OnAlphaMapUpdate" "', argument " "3"" of type '" "iMaterialWrapper *""'"); 
+  }
+  arg3 = reinterpret_cast< iMaterialWrapper * >(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4,SWIGTYPE_p_unsigned_char, 0 |  0 );
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iTerrainRenderer_OnAlphaMapUpdate" "', argument " "4"" of type '" "unsigned char const *""'"); 
+  }
+  arg4 = reinterpret_cast< unsigned char * >(argp4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_csRect,  0  | 0);
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "iTerrainRenderer_OnAlphaMapUpdate" "', argument " "5"" of type '" "csRect const &""'"); 
+  }
+  if (!argp5) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iTerrainRenderer_OnAlphaMapUpdate" "', argument " "5"" of type '" "csRect const &""'"); 
+  }
+  arg5 = reinterpret_cast< csRect * >(argp5);
+  ecode6 = SWIG_AsVal_size_t(obj5, &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iTerrainRenderer_OnAlphaMapUpdate" "', argument " "6"" of type '" "size_t""'");
+  } 
+  arg6 = static_cast< size_t >(val6);
+  (arg1)->OnAlphaMapUpdate(arg2,arg3,(unsigned char const *)arg4,(csRect const &)*arg5,arg6);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -35025,6 +35355,45 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_SetMaterialMask(PyObject *self, PyObject
   
 fail:
   SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iTerrainCell_SetMaterialMask'.\n  Possible C/C++ prototypes are:\n    SetMaterialMask(unsigned int,iImage *)\n    SetMaterialMask(unsigned int,unsigned char const *,unsigned int,unsigned int)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTerrainCell_SetAlphaMask(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTerrainCell *arg1 = (iTerrainCell *) 0 ;
+  iMaterialWrapper *arg2 = (iMaterialWrapper *) 0 ;
+  iImage *arg3 = (iImage *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_SetAlphaMask",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_SetAlphaMask" "', argument " "1"" of type '" "iTerrainCell *""'"); 
+  }
+  arg1 = reinterpret_cast< iTerrainCell * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iMaterialWrapper, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iTerrainCell_SetAlphaMask" "', argument " "2"" of type '" "iMaterialWrapper *""'"); 
+  }
+  arg2 = reinterpret_cast< iMaterialWrapper * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_iImage, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iTerrainCell_SetAlphaMask" "', argument " "3"" of type '" "iImage *""'"); 
+  }
+  arg3 = reinterpret_cast< iImage * >(argp3);
+  (arg1)->SetAlphaMask(arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
   return NULL;
 }
 
@@ -41827,6 +42196,9 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"delete_iTerrainCellRenderProperties", _wrap_delete_iTerrainCellRenderProperties, METH_VARARGS, NULL},
 	 { (char *)"iTerrainCellRenderProperties_swigregister", iTerrainCellRenderProperties_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iTerrainCellFeederProperties_SetHeightmapSource", _wrap_iTerrainCellFeederProperties_SetHeightmapSource, METH_VARARGS, NULL},
+	 { (char *)"iTerrainCellFeederProperties_SetMaterialMapSource", _wrap_iTerrainCellFeederProperties_SetMaterialMapSource, METH_VARARGS, NULL},
+	 { (char *)"iTerrainCellFeederProperties_SetHeightOffset", _wrap_iTerrainCellFeederProperties_SetHeightOffset, METH_VARARGS, NULL},
+	 { (char *)"iTerrainCellFeederProperties_AddAlphaMap", _wrap_iTerrainCellFeederProperties_AddAlphaMap, METH_VARARGS, NULL},
 	 { (char *)"iTerrainCellFeederProperties_SetParameter", _wrap_iTerrainCellFeederProperties_SetParameter, METH_VARARGS, NULL},
 	 { (char *)"iTerrainCellFeederProperties_Clone", _wrap_iTerrainCellFeederProperties_Clone, METH_VARARGS, NULL},
 	 { (char *)"iTerrainCellFeederProperties_scfGetVersion", _wrap_iTerrainCellFeederProperties_scfGetVersion, METH_VARARGS, NULL},
@@ -41865,6 +42237,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iTerrainRenderer_GetRenderMeshes", _wrap_iTerrainRenderer_GetRenderMeshes, METH_VARARGS, NULL},
 	 { (char *)"iTerrainRenderer_OnMaterialPaletteUpdate", _wrap_iTerrainRenderer_OnMaterialPaletteUpdate, METH_VARARGS, NULL},
 	 { (char *)"iTerrainRenderer_OnMaterialMaskUpdate", _wrap_iTerrainRenderer_OnMaterialMaskUpdate, METH_VARARGS, NULL},
+	 { (char *)"iTerrainRenderer_OnAlphaMapUpdate", _wrap_iTerrainRenderer_OnAlphaMapUpdate, METH_VARARGS, NULL},
 	 { (char *)"iTerrainRenderer_scfGetVersion", _wrap_iTerrainRenderer_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iTerrainRenderer", _wrap_delete_iTerrainRenderer, METH_VARARGS, NULL},
 	 { (char *)"iTerrainRenderer_swigregister", iTerrainRenderer_swigregister, METH_VARARGS, NULL},
@@ -41924,6 +42297,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iTerrainCell_LockMaterialMap", _wrap_iTerrainCell_LockMaterialMap, METH_VARARGS, NULL},
 	 { (char *)"iTerrainCell_UnlockMaterialMap", _wrap_iTerrainCell_UnlockMaterialMap, METH_VARARGS, NULL},
 	 { (char *)"iTerrainCell_SetMaterialMask", _wrap_iTerrainCell_SetMaterialMask, METH_VARARGS, NULL},
+	 { (char *)"iTerrainCell_SetAlphaMask", _wrap_iTerrainCell_SetAlphaMask, METH_VARARGS, NULL},
 	 { (char *)"iTerrainCell_SetBaseMaterial", _wrap_iTerrainCell_SetBaseMaterial, METH_VARARGS, NULL},
 	 { (char *)"iTerrainCell_GetBaseMaterial", _wrap_iTerrainCell_GetBaseMaterial, METH_VARARGS, NULL},
 	 { (char *)"iTerrainCell_CollideSegment", _wrap_iTerrainCell_CollideSegment, METH_VARARGS, NULL},

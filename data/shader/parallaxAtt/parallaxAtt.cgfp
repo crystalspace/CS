@@ -17,6 +17,7 @@ float4 main (vertex2fragment IN,
 			uniform float4 lightcolor,
 			uniform float4 specular,
 			uniform sampler2D TexNormal,
+			uniform sampler2D TexNormalCompressed,
 			uniform sampler2D TexDiffuse,
 			uniform sampler2D TexHeight,
 			uniform sampler2D TexAttn) : COLOR
@@ -31,10 +32,22 @@ float4 main (vertex2fragment IN,
  
 	float4 diffuseCol = tex2D(TexDiffuse, newTexcoord);
 	float4 glowCol = float4(0);
+      float3 normBumpNormal = float3(0);
+
+	<?if vars."tex normal compressed" ?>
+	float4 bumpNormal = tex2D(TexNormalCompressed, newTexcoord);
+	bumpNormal *= 2;
+	bumpNormal -= 1;
+	bumpNormal.x = bumpNormal.w;
+	bumpNormal.w = 0;
+	bumpNormal.z = sqrt(saturate(1 - bumpNormal.x*bumpNormal.x - bumpNormal.y*bumpNormal.y));
+	normBumpNormal = bumpNormal.xyz;
+	<?else?>
 	float4 bumpNormal = tex2D(TexNormal, newTexcoord);
 	bumpNormal *= 2;
 	bumpNormal -= 1;
-	float3 normBumpNormal = normalize(bumpNormal.xyz);
+	normBumpNormal = normalize(bumpNormal.xyz);
+	<?endif?>
  
 	float bump = dot(normLight, normBumpNormal);
 	<?if vars."specular" ?>
@@ -53,4 +66,5 @@ float4 main (vertex2fragment IN,
  
 </program>
 </include>
+
 
