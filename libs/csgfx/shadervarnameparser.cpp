@@ -29,7 +29,9 @@ namespace CS
     {
       if (identifier == 0) return;
       
-      size_t nameLen = strcspn (identifier, "0123456789[]");
+      size_t nameLen = strlen (identifier);
+      while ((nameLen > 0) && (strchr ("0123456789[]", identifier[nameLen]-1) != 0))
+        nameLen--;
       
       name.Replace (identifier, nameLen);
       
