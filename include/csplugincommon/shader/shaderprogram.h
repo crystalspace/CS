@@ -172,7 +172,7 @@ protected:
     }
   };
   /// Variable mappings
-  csArray<VariableMapEntry> variablemap;
+  csSafeCopyArray<VariableMapEntry> variablemap;
 
   void TryAddUsedShaderVarName (CS::ShaderVarStringID name, csBitArray& bits) const
   {
