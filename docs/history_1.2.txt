@@ -1,5 +1,8 @@
 1.2 branch log.
 
+21-Mar-2008
+	- Vincent fixed #426 (libcrystalspace_staticplugins fails to compile
+	  in MSVC8 due to pycscegui).
 19-Mar-2008
 	- Vincent merged r27217, r27408, r27410:27411, r27427, r27671, r27680,
 	  r27746 and r29044 into 1.2 (fixes and enhancements for TinyXML and

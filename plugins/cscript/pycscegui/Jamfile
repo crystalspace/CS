@@ -52,7 +52,7 @@ if $(PYTHON.AVAILABLE) = "yes"
   #--------
   # cegui -- Pure Python module
   #--------
-  if $(CEGUI.AVAILABLE) = "yes"
+  if $(CEGUI.AVAILABLE) = "yes" && ! [ Property build : projgen ]
   {
   PythMod pyceguimod : _pycscegui : 
 	ceguimod.cpp cs_cegui.cpp : 
