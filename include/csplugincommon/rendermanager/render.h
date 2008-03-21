@@ -112,10 +112,6 @@ namespace RenderManager
         typename RenderTree::MeshNode::SingleMesh& mesh = node->meshes.Get (m);
         iShader* shader = context.shaderArray[mesh.contextLocalId+layerOffset];
         
-        // Skip meshes without shader (for current layer)
-        if (!shader)
-          continue;
-
         size_t ticket = context.ticketArray[mesh.contextLocalId+layerOffset];
 
         if (shader != lastShader || ticket != lastTicket)
@@ -140,6 +136,7 @@ namespace RenderManager
       if (firstMesh == lastMesh)
         return;
       
+      // Skip meshes without shader (for current layer)
       if (!shader)
         return;
 
