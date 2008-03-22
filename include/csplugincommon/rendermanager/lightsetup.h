@@ -505,7 +505,14 @@ namespace RenderManager
           size_t layerLights = csMin (layerConfig.GetMaxLightNum (layer),
             numLights - lightOffset);
           if ((layerLights == 0)
-            && (!layerConfig.IsAmbientLayer (layer))) continue;
+            && (!layerConfig.IsAmbientLayer (layer)))
+          {
+            /* Layer has no lights and is no ambient layer - prevent it from
+             * being drawn completely */
+            node->owner.shaderArray[layerHelper.GetNewLayerIndex (layer, 0) 
+              * node->owner.totalRenderMeshes + mesh.contextLocalId] = 0;
+            continue;
+          }
           csLightInfluence* currentInfluences = influences + lightOffset;
 
           lightOffset += shadows.HandleLights (currentInfluences,

@@ -112,6 +112,11 @@ namespace RenderManager
       CS_ASSERT(layer == 0);
       return isAmbient;
     }
+    iShaderVariableContext* GetSVContext (size_t layer) const
+    {
+      CS_ASSERT(layer == 0);
+      return svContext;
+    }
 
     void SetShaderTypes (const csStringID* shaderTypes, size_t numTypes)
     {
@@ -135,6 +140,10 @@ namespace RenderManager
     {
       this->isAmbient = isAmbient;
     }
+    void SetSVContext (iShaderVariableContext* svContext)
+    {
+      this->svContext = svContext;
+    }
   private:
     /*csDirtyAccessArray<StringIDValue,
       csArrayElementHandler<StringIDValue>,
@@ -145,6 +154,7 @@ namespace RenderManager
     size_t maxLightPasses;
     size_t maxLights;
     bool isAmbient;
+    csRef<iShaderVariableContext> svContext;
   };
 
   /**
@@ -190,6 +200,7 @@ namespace RenderManager
 	newLayer.maxLightPasses = layers.GetMaxLightPasses (l);
 	newLayer.maxLights = layers.GetMaxLightNum (l);
 	newLayer.isAmbient = layers.IsAmbientLayer (l);
+	newLayer.svContext = layers.GetSVContext (l);
 	newLayer.firstType = layerTypes.GetSize ();
 	const csStringID* copyTypes = layers.GetShaderTypes (l,
 	  newLayer.numTypes);
@@ -234,6 +245,10 @@ namespace RenderManager
     {
       return layers[layer].isAmbient;
     }
+    iShaderVariableContext* GetSVContext (size_t layer) const
+    {
+      return layers[layer].svContext;
+    }
 
     /// Remove all layers
     void Clear()
@@ -250,6 +265,7 @@ namespace RenderManager
       size_t firstType;
       size_t numTypes;
       bool isAmbient;
+      csRef<iShaderVariableContext> svContext;
     };
     csArray<Layer> layers;
     csDirtyAccessArray<StringIDValue> layerTypes;

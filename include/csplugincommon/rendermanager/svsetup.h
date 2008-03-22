@@ -63,6 +63,9 @@ namespace RenderManager
           // Push all contexts here 
           // @@TODO: get more of them        
           localStack[svO2wName] = mesh.svObjectToWorld;
+          iShaderVariableContext* layerContext =
+            layerConfig.GetSVContext (layer);
+          if (layerContext) layerContext->PushVariables (localStack);
           if (rm->material)
             rm->material->GetMaterial ()->PushVariables (localStack);
           if (rm->variablecontext)

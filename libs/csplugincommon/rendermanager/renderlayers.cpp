@@ -23,6 +23,7 @@
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 #include "ivideo/shader/shader.h"
+#include "csgfx/shadervarcontext.h"
 #include "csutil/objreg.h"
 #include "csutil/xmltiny.h"
 
@@ -80,6 +81,7 @@ namespace CS
           csRef<iShader> defaultShader;
           csDirtyAccessArray<csStringID> shaderTypes;
           bool isAmbient = false;
+          csRef<iShaderVariableContext> svContext;
         
 	  csRef<iDocumentNodeIterator> it = node->GetNodes();
 	  while (it->HasNext())
@@ -132,6 +134,17 @@ namespace CS
 	           return false;
 	        }
 	        break;
+	      case XMLTOKEN_SHADERVAR:
+	        {
+	          csRef<csShaderVariable> sv;
+	          sv.AttachNew (new csShaderVariable);
+	          if (!synldr->ParseShaderVar (0, child, *sv))
+	            return false;
+	          if (!svContext.IsValid())
+	            svContext.AttachNew (new csShaderVariableContext());
+	          svContext->AddVariable (sv);
+	        }
+	        break;
 	      default:
 	        synldr->ReportBadToken (child);
 	        return false;
@@ -144,6 +157,7 @@ namespace CS
 	  layer.SetMaxLightPasses (maxLightPasses);
 	  layer.SetMaxLights (maxLights);
 	  layer.SetAmbient (isAmbient);
+	  layer.SetSVContext (svContext);
 	  
           return true;
         }
