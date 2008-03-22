@@ -7,6 +7,9 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 
+22-Mar-2008
+	- res changed gl3d to free the VBO manager in Close(): VBOs should be
+	  cleaned up before the GL context itself is torn down.
 19-Mar-2008
 	- Mike Gist fixed a crash in tinyxml when parsing a binary xml file.
 	- Mike Gist added some missing error sets in tinyxml, so it now
