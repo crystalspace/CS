@@ -52,7 +52,7 @@ namespace RenderManager
     if (name >= dst.GetSize()) return false;
     csShaderVariable*& dstVar = dst[name];
 
-    if (dstVar == 0) dstVar = new csShaderVariable (name);
+    if (dstVar == 0) dstVar = CreateTempSV (name);
     if ((dstVar->GetType() != csShaderVariable::UNKNOWN)
 	  && (dstVar->GetType() != csShaderVariable::ARRAY)) return true;
     dstVar->SetArraySize (csMax (index+1, dstVar->GetArraySize()));
