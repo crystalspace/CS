@@ -20,7 +20,7 @@
 <shader compiler="shaderweaver" name="lighting_default" lights="4">
   <technique priority="200">
     <pass>
-      <?if vars."pass number".int == 0 ?>
+      <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
         <!-- First pass: blend with copy -->
       <?else?>
         <!-- Later pass: blend with add -->
@@ -39,6 +39,8 @@
       <snippet id="normalmap" file="/shader/snippets/surface/normalmap.xml" />
       <snippet id="surface" file="/shader/surface/surface-classic.xml" />
       <snippet id="lighting" file="/shader/snippets/lighting/lighting-ppl.xml" />
+      <snippet id="ambient" file="/shader/snippets/lighting/ambient-simple.xml" />
+      <snippet id="add_ambient" file="/shader/snippets/add.xml" />
       <snippet id="mod_light_surf" file="/shader/snippets/modulate.xml" />
       <snippet id="add_specular" file="/shader/snippets/add.xml" />
       <snippet id="glow" file="/shader/lighting/glow.xml" />
@@ -53,7 +55,9 @@
       <connection from="parallax" to="normalmap" />
       <connection from="normalmap" to="lighting" />
       <connection from="surface" to="mod_light_surf" />
-      <connection from="lighting" to="mod_light_surf" />
+      <connection from="lighting" to="add_ambient" />
+      <connection from="ambient" to="add_ambient" />
+      <connection from="add_ambient" to="mod_light_surf" />
       <connection from="mod_light_surf" to="add_specular">
 	<explicit from="result" to="a" />
       </connection>
@@ -69,7 +73,7 @@
   <!-- If PPL is not available, try PVL -->
   <technique priority="100">
     <pass>
-      <?if vars."pass number".int == 0 ?>
+      <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
         <!-- First pass: blend with copy -->
       <?else?>
         <!-- Later pass: blend with add -->
@@ -83,6 +87,8 @@
       <snippet id="surface" file="/shader/surface/surface-classic.xml" />
       <snippet id="lighting" file="/shader/snippets/lighting/lighting-pvl.xml" />
       <snippet id="mod_light_surf" file="/shader/snippets/modulate.xml" />
+      <snippet id="ambient" file="/shader/snippets/lighting/ambient-simple.xml" />
+      <snippet id="add_ambient" file="/shader/snippets/add.xml" />
       <snippet id="add_specular" file="/shader/snippets/add.xml" />
       <snippet id="glow" file="/shader/lighting/glow.xml" />
       <snippet id="apply_mixmode_alpha" file="/shader/snippets/mixmode-alpha.xml" />
@@ -94,7 +100,9 @@
       <connection from="parallax" to="normalmap" />
       <connection from="normalmap" to="lighting" />
       <connection from="surface" to="mod_light_surf" />
-      <connection from="lighting" to="mod_light_surf" />
+      <connection from="lighting" to="add_ambient" />
+      <connection from="ambient" to="add_ambient" />
+      <connection from="add_ambient" to="mod_light_surf" />
       <connection from="mod_light_surf" to="add_specular">
 	<explicit from="result" to="a" />
       </connection>

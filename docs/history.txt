@@ -11,6 +11,7 @@ chronological order.
 	- res changed the shader weaver to not use outputs that are a result
 	  from a coercion when looking for suitable outputs for an input.
 	- res added the ability to attach shader variables to RM render layers.
+	- res added a simple ambient snippet.	
 21-Mar-2008
 	- res fixed the RM SimpleContextRender to truly not render meshes with
 	  a 0 shader.
