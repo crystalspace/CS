@@ -79,8 +79,8 @@ CS_IMPLEMENT_STATIC_CLASSVAR_ARRAY(MakeAString, reader, GetReader,
 SCF_IMPLEMENT_FACTORY (csGLGraphics3D)
 
 csGLGraphics3D::csGLGraphics3D (iBase *parent) : 
-  scfImplementationType (this, parent), isOpen (false), imageUnits (0), 
-  explicitProjection (false), needMatrixUpdate (true),
+  scfImplementationType (this, parent), isOpen (false), 
+  explicitProjection (false), needMatrixUpdate (true), imageUnits (0),
   wantToSwap (false), delayClearFlags (0), currentAttachments (0)
 {
   verbose = false;
