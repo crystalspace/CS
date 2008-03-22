@@ -118,11 +118,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   }
   
   Snippet::Technique* Snippet::LoadLibraryTechnique (WeaverCompiler* compiler, 
-    iDocumentNode* node, const Technique::CombinerPlugin& combiner) const
+    iDocumentNode* node, const Technique::CombinerPlugin& combiner,
+    bool markAsCoercion) const
   {
     Snippet::AtomTechnique* technique = 
       ParseAtomTechnique (compiler, node, true, combiner.name);
     technique->combiner = combiner;
+    if (markAsCoercion)
+    {
+      CS::Utility::ScopedDelete<BasicIterator<Snippet::Technique::Output> > 
+	outputIt (technique->GetOutputs());
+      while (outputIt->HasNext())
+      {
+        Snippet::Technique::Output& outp = outputIt->Next();
+	outp.coercionOutput = true;
+      }
+    }
     return technique;
   }
   

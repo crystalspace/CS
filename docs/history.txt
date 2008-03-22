@@ -8,6 +8,8 @@ chronological order.
 
 22-Mar-2008
 	- res fixed a leak in LightingVariablesHelper.
+	- res changed the shader weaver to not use outputs that are a result
+	  from a coercion when looking for suitable outputs for an input.
 21-Mar-2008
 	- res fixed the RM SimpleContextRender to truly not render meshes with
 	  a 0 shader.

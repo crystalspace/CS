@@ -46,6 +46,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     virtual T& Next()
     { return array[pos++]; }
   };
+  
+  template<typename T, class ArrayType>
+  class BasicIteratorImplNonConst : public BasicIterator<T>
+  {
+    ArrayType& array;
+    size_t pos;
+  public:
+    BasicIteratorImplNonConst (ArrayType& array) : array (array), pos (0) {}
+  
+    virtual bool HasNext()
+    { return pos < array.GetSize(); }
+    virtual T& Next()
+    { return array[pos++]; }
+  };
 }
 CS_PLUGIN_NAMESPACE_END(ShaderWeaver)
 

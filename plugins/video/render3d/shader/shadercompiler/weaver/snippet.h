@@ -85,7 +85,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         csString name;
         csString type;
         csString inheritAttrFrom;
+        bool coercionOutput;
         csArray<Attribute> attributes;
+        
+        Output() : coercionOutput (false) {}
       };
       
       Technique (const char* snippetName) : snippetName (snippetName), 
@@ -128,6 +131,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       { return new BasicIteratorImpl<const Input, csArray<Input> > (inputs); }
       virtual BasicIterator<const Output>* GetOutputs() const
       { return new BasicIteratorImpl<const Output, csArray<Output> > (outputs); }
+      
+      BasicIterator<Output>* GetOutputs()
+      { return new BasicIteratorImplNonConst<Output, csArray<Output> > (outputs); }
     };
     
     struct ExplicitConnectionSource
@@ -190,7 +196,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     BasicIterator<const Technique*>* GetTechniques() const;
     
     Technique* LoadLibraryTechnique (WeaverCompiler* compiler,
-      iDocumentNode* node, const Technique::CombinerPlugin& combiner) const;
+      iDocumentNode* node, const Technique::CombinerPlugin& combiner,
+      bool markAsCoercion = false) const;
     Technique* CreatePassthrough (const char* varName, const char* type) const;
     
     const csRefArray<iDocumentNode>& GetPassForwardedNodes() const

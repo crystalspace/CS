@@ -719,6 +719,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  {
 	    const Snippet::Technique::Output& outp = outputIt->Next();
 	    if (usedOutputs.Contains (&outp)) continue;
+	    /* If we really end up using the same output twice coercions
+	     * should be folded later on */
+	    if (outp.coercionOutput) continue;
             nodeAnnotation.Append (
               GetAnnotation (" trying %s %s of %s: ",
                 outp.type.GetData(), outp.name.GetData(),
@@ -1046,7 +1049,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       scratchSnippets.Push (snippet);
 
       Snippet::Technique* tech = 
-        snippet->LoadLibraryTechnique (compiler, link, combinerPlugin);
+        snippet->LoadLibraryTechnique (compiler, link, combinerPlugin, true);
       augmentedTechniques.Push (tech);
       graph.AddTechnique (tech);
       TechniqueGraph::Connection conn;
