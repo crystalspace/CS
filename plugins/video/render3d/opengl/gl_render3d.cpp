@@ -1196,6 +1196,7 @@ void csGLGraphics3D::Close ()
   {
     if (halos[h]) halos[h]->DeleteTexture();
   }
+  vboManager.Invalidate();
 
   if (G2D)
     G2D->Close ();

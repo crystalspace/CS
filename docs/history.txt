@@ -28,6 +28,16 @@ chronological order.
 	    - Only light position in world space is available now.
 	    - The lightiter step used to provide a light attenuation vector of
 	      "radius,1/radius,0" for linear lights. This is no more the case.
+22-Mar-2008
+	- res changed gl3d to free the VBO manager in Close(): VBOs should be
+	  cleaned up before the GL context itself is torn down.
+	- res changed the way memory tracking is handled. Notably, the 
+	  returned csMemTrackerInfo* isn't needed any more; instead, the
+	  information string serves as "handle" now. Also, allocated blocks
+	  are recorded in the memory tracker itself, thus freeing of a block
+	  can be tracked by merely passing it's address to the mem tracker.
+	- res fixed a bug in the debug ptmalloc code where allocation location
+	  information wasn't kept when it should have been.
 19-Mar-2008
 	- Mike Gist fixed a crash in tinyxml when parsing a binary xml file.
 	- Mike Gist added some missing error sets in tinyxml, so it now

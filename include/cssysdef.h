@@ -402,6 +402,25 @@ void Name (void (*p)())                                                \
 #  define CS_DEFINE_STATICALLY_LINKED_FLAG  bool scfStaticallyLinked = false;
 #endif
 
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+#  define CS_DEFINE_MEMTRACKER_MODULE             \
+  class csMemTrackerModule;                       \
+  namespace CS                                    \
+  {                                               \
+    namespace Debug                               \
+    {                                             \
+      namespace MemTracker                        \
+      {                                           \
+	namespace Impl                            \
+	{                                         \
+	  csMemTrackerModule* thisModule = 0;     \
+	}                                         \
+      }                                           \
+    }                                             \
+  }
+#else
+#  define CS_DEFINE_MEMTRACKER_MODULE
+#endif
 
 /**\def CS_IMPLEMENT_FOREIGN_DLL
  * The CS_IMPLEMENT_FOREIGN_DLL macro should be placed at the global scope in
@@ -427,12 +446,14 @@ void Name (void (*p)())                                                \
 #    define CS_IMPLEMENT_FOREIGN_DLL					    \
        CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION(csStaticVarCleanup_local); \
        CS_DEFINE_STATICALLY_LINKED_FLAG					    \
-       CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_local);
+       CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_local);   \
+       CS_DEFINE_MEMTRACKER_MODULE
 #  else
 #    define CS_IMPLEMENT_FOREIGN_DLL					    \
        CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION			    \
        CS_DEFINE_STATICALLY_LINKED_FLAG					    \
-       CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);
+       CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);  \
+       CS_DEFINE_MEMTRACKER_MODULE
 #  endif
 #endif
 
@@ -458,7 +479,8 @@ void Name (void (*p)())                                                \
           CS_IMPLEMENT_PLATFORM_PLUGIN 					\
 	  CS_DEFINE_STATICALLY_LINKED_FLAG				\
 	  CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION		\
-	  CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);
+	  CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);   \
+          CS_DEFINE_MEMTRACKER_MODULE
 #  endif
 
 #else
@@ -468,7 +490,8 @@ void Name (void (*p)())                                                \
    CS_DEFINE_STATICALLY_LINKED_FLAG					\
    CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION(csStaticVarCleanup_local)	\
    CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_local);	\
-   CS_IMPLEMENT_PLATFORM_PLUGIN 
+   CS_IMPLEMENT_PLATFORM_PLUGIN                                         \
+   CS_DEFINE_MEMTRACKER_MODULE
 #  endif
 
 #endif
@@ -486,7 +509,8 @@ void Name (void (*p)())                                                \
   CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION			\
   CS_DEFINE_STATICALLY_LINKED_FLAG					\
   CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);	\
-  CS_IMPLEMENT_PLATFORM_APPLICATION 
+  CS_IMPLEMENT_PLATFORM_APPLICATION                                     \
+  CS_DEFINE_MEMTRACKER_MODULE
 #endif
 
 /**\def CS_REGISTER_STATIC_FOR_DESTRUCTION
@@ -745,7 +769,7 @@ extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* ptcalloc_checking (
 #  endif
 #endif
 
-#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+#if defined(CS_EXTENSIVE_MEMDEBUG)
 CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_malloc (size_t n)
 { 
 #ifdef CS_CHECKING_ALLOCATIONS
@@ -782,7 +806,7 @@ CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_calloc (size_t n, size_t s)
 #endif
 }
 
-#else
+#else // defined(CS_EXTENSIVE_MEMDEBUG)
 /**\name Default Crystal Space memory allocation
  * Always the same memory allocation functions as internally used by 
  * Crystal Space.
@@ -868,7 +892,6 @@ static inline bool isdir (const char *path, struct dirent *de)
 // defines its own 'new' operator, since this version will interfere with your
 // own.
 // CS_MEMORY_TRACKER is treated like CS_EXTENSIVE_MEMDEBUG here.
-// Same for CS_REF_TRACKER.
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
 extern CS_CRYSTALSPACE_EXPORT void operator delete (void* p);
 extern CS_CRYSTALSPACE_EXPORT void operator delete[] (void* p);

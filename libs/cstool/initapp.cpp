@@ -29,6 +29,7 @@
 #include "csutil/csinput.h"
 #include "csutil/csshlib.h"
 #include "csutil/csstring.h"
+#include "csutil/memdebug.h"
 #include "csutil/objreg.h"
 #include "csutil/plugldr.h"
 #include "csutil/plugmgr.h"
@@ -124,8 +125,7 @@ iObjectRegistry* csInitializer::CreateEnvironment (
       else
         r->DecRef();
 #ifdef CS_MEMORY_TRACKER
-    extern void mtiRegisterModule (char* Class);
-    mtiRegisterModule ("app");
+    CS::Debug::MemTracker::RegisterModule ("app");
 #endif
 
     }
