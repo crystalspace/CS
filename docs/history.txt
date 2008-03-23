@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 
+23-Mar-2008
+	- res fixed an uninitialized var in gmeshanimpdl.
 22-Mar-2008
 	- res changed gl3d to free the VBO manager in Close(): VBOs should be
 	  cleaned up before the GL context itself is torn down.
