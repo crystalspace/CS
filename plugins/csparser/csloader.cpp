@@ -2942,6 +2942,9 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
       case XMLTOKEN_DETAIL:
         stemp->GetFlags ().Set (CS_ENTITY_DETAIL, CS_ENTITY_DETAIL);
         break;
+      case XMLTOKEN_STATICLIT:
+        stemp->GetFlags ().Set (CS_ENTITY_STATICLIT, CS_ENTITY_STATICLIT);
+        break;
       case XMLTOKEN_IMPOSTER:
         {
           csRef<iImposter> imposter = scfQueryInterface<iImposter> (stemp);
@@ -3201,6 +3204,13 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
         mesh->SetFlagsRecursive (CS_ENTITY_DETAIL, CS_ENTITY_DETAIL);
       else
         mesh->GetFlags ().Set (CS_ENTITY_DETAIL, CS_ENTITY_DETAIL);
+      break;
+      case XMLTOKEN_STATICLIT:
+      TEST_MISSING_MESH
+      if (recursive)
+        mesh->SetFlagsRecursive (CS_ENTITY_STATICLIT, CS_ENTITY_STATICLIT);
+      else
+        mesh->GetFlags ().Set (CS_ENTITY_STATICLIT, CS_ENTITY_STATICLIT);
       break;
     case XMLTOKEN_ZFILL:
       TEST_MISSING_MESH

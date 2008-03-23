@@ -133,6 +133,11 @@ class csReversibleTransform;
  */
 #define CS_ENTITY_NODECAL 256
 
+/**
+ * Indicates that static lighting was computed for this mesh.
+ */
+#define CS_ENTITY_STATICLIT 512
+
 /** @} */
 
 /** \name SetLightingUpdate flags

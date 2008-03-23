@@ -12,6 +12,8 @@ chronological order.
 	  conditions (e.g. vars."color".buffers will now work even though
 	  there is likely no SV "color", only a color render buffer set in
 	  the buffer holder).
+	- res added a "staticlit" mesh flag to indicate that static lighting
+	  has been computed for a mesh.
 22-Mar-2008
 	- res fixed a leak in LightingVariablesHelper.
 	- res changed the shader weaver to not use outputs that are a result
