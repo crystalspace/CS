@@ -18,6 +18,8 @@ chronological order.
 	    - Per-vertex lighting information is stored in the buffer 
 	      "lit color" instead of "color".
 	    - The "staticlit" flag is set on meshes.
+	- res started to add settings to RM render layers controlling how
+	  to deal with static lights.
 22-Mar-2008
 	- res fixed a leak in LightingVariablesHelper.
 	- res changed the shader weaver to not use outputs that are a result

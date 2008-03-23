@@ -36,6 +36,14 @@ namespace RenderManager
    *  - const csStringID* GetShaderTypes (size_t layer, size_t& num) const
    *  - iShader* GetDefaultShader (size_t layer) const
    */
+   
+  struct StaticLightsSettings
+  {
+    /// Don't render static lights.
+    bool nodraw;
+    
+    StaticLightsSettings() : nodraw (false) {}
+  };
 
   /**
    * Render layer implementation for a single render layer.
@@ -117,6 +125,16 @@ namespace RenderManager
       CS_ASSERT(layer == 0);
       return svContext;
     }
+    StaticLightsSettings& GetStaticLightsSettings (size_t layer)
+    {
+      CS_ASSERT(layer == 0);
+      return staticLights;
+    }
+    const StaticLightsSettings& GetStaticLightsSettings (size_t layer) const
+    {
+      CS_ASSERT(layer == 0);
+      return staticLights;
+    }
 
     void SetShaderTypes (const csStringID* shaderTypes, size_t numTypes)
     {
@@ -155,6 +173,7 @@ namespace RenderManager
     size_t maxLights;
     bool isAmbient;
     csRef<iShaderVariableContext> svContext;
+    StaticLightsSettings staticLights;
   };
 
   /**
@@ -201,6 +220,7 @@ namespace RenderManager
 	newLayer.maxLights = layers.GetMaxLightNum (l);
 	newLayer.isAmbient = layers.IsAmbientLayer (l);
 	newLayer.svContext = layers.GetSVContext (l);
+	newLayer.staticLights = layers.GetStaticLightsSettings (l);
 	newLayer.firstType = layerTypes.GetSize ();
 	const csStringID* copyTypes = layers.GetShaderTypes (l,
 	  newLayer.numTypes);
@@ -249,6 +269,14 @@ namespace RenderManager
     {
       return layers[layer].svContext;
     }
+    StaticLightsSettings& GetStaticLightsSettings (size_t layer)
+    {
+      return layers[layer].staticLights;
+    }
+    const StaticLightsSettings& GetStaticLightsSettings (size_t layer) const
+    {
+      return layers[layer].staticLights;
+    }
 
     /// Remove all layers
     void Clear()
@@ -266,6 +294,7 @@ namespace RenderManager
       size_t numTypes;
       bool isAmbient;
       csRef<iShaderVariableContext> svContext;
+      StaticLightsSettings staticLights;
     };
     csArray<Layer> layers;
     csDirtyAccessArray<StringIDValue> layerTypes;

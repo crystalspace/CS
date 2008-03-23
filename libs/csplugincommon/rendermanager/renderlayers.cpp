@@ -74,6 +74,30 @@ namespace CS
       #include "cstool/tokenlist.h"
       #undef CS_TOKEN_ITEM_FILE
       
+        bool ParseStaticLightsSettings (iDocumentNode* node, 
+                                        StaticLightsSettings& settings)
+        {
+	  csRef<iDocumentNodeIterator> it = node->GetNodes();
+	  while (it->HasNext())
+	  {
+	    csRef<iDocumentNode> child = it->Next();
+	    if (child->GetType() != CS_NODE_ELEMENT) continue;
+	    
+	    csStringID id = xmltokens.Request (child->GetValue());
+	    switch (id)
+	    {
+	      case XMLTOKEN_NODRAW:
+	        settings.nodraw = true;
+	        break;
+	      default:
+	        synldr->ReportBadToken (child);
+	        return false;
+	    }
+	  }
+	  
+          return true;
+        }
+      
         bool ParseLayer (iDocumentNode* node, SingleRenderLayer& layer)
         {
           size_t maxLightPasses = 3;
@@ -82,6 +106,7 @@ namespace CS
           csDirtyAccessArray<csStringID> shaderTypes;
           bool isAmbient = false;
           csRef<iShaderVariableContext> svContext;
+          StaticLightsSettings staticLights;
         
 	  csRef<iDocumentNodeIterator> it = node->GetNodes();
 	  while (it->HasNext())
@@ -145,6 +170,12 @@ namespace CS
 	          svContext->AddVariable (sv);
 	        }
 	        break;
+	      case XMLTOKEN_STATICLIGHTS:
+	        {
+	          if (!ParseStaticLightsSettings (child, staticLights))
+	           return false;
+	        }
+	        break;
 	      default:
 	        synldr->ReportBadToken (child);
 	        return false;
@@ -158,6 +189,7 @@ namespace CS
 	  layer.SetMaxLights (maxLights);
 	  layer.SetAmbient (isAmbient);
 	  layer.SetSVContext (svContext);
+	  layer.GetStaticLightsSettings (0) = staticLights;
 	  
           return true;
         }
