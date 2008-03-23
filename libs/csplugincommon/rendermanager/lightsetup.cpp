@@ -36,9 +36,23 @@ namespace RenderManager
       IndexLightTypePair iltp;
       iltp.light = influenceLights[l].light;
       iltp.type = influenceLights[l].light->GetType();
+      iltp.isStatic =
+        influenceLights[l].light->GetDynamicType() != CS_LIGHT_DYNAMICTYPE_DYNAMIC;
       persist.lightTypeScratch.Push (iltp);
     }
     persist.lightTypeScratch.Sort();
+  }
+  
+  size_t LightingSorter::RemoveStatic ()
+  {
+    for (size_t l = 0; l < persist.lightTypeScratch.GetSize();)
+    {
+      if (!persist.lightTypeScratch[l].isStatic)
+        l++;
+      else
+        persist.lightTypeScratch.DeleteIndex (l);
+    }
+    return persist.lightTypeScratch.GetSize();
   }
   
   //-------------------------------------------------------------------------

@@ -108,6 +108,7 @@ namespace RenderManager
     {
       iLight* light;
       csLightType type;
+      bool isStatic;
 
       bool operator<(const IndexLightTypePair& other) const
       { return type < other.type; }
@@ -140,6 +141,13 @@ namespace RenderManager
     {
       return persist.lightTypeScratch[n].type;
     }
+    
+    bool IsLightStatic (size_t n) const
+    {
+      return persist.lightTypeScratch[n].isStatic;
+    }
+    
+    size_t RemoveStatic ();
   protected:
     PersistentData& persist;
   };
@@ -287,15 +295,21 @@ namespace RenderManager
           * node->owner.totalRenderMeshes + mesh.contextLocalId];
       if (!shaderToUse) return 0;
 
-      const char* shaderName = shaderToUse->QueryObject()->GetName();
       UpdateMetadata (shaderToUse);
       if ((lastMetadata.numberOfLights == 0) 
         && !layerConfig.IsAmbientLayer (layer)) return 0;
 
+      bool meshStaticLit = mesh.meshFlags.Check (CS_ENTITY_STATICLIT);
+      if (meshStaticLit
+	  && layerConfig.GetStaticLightsSettings (layer).nodraw)
+	sortedLights.RemoveStatic();
+
       size_t layerLights = sortedLights.GetSize();
       if (lastMetadata.numberOfLights == 0)
         layerLights = 0;
-
+      if ((layerLights == 0) 
+        && !layerConfig.IsAmbientLayer (layer)) return 0;
+        
       // Set up layers
       size_t firstLight = 0;
       size_t remainingLights = layerLights;
@@ -502,8 +516,12 @@ namespace RenderManager
 	for (size_t layer = 0; layer < layerConfig.GetLayerCount (); ++layer)
         {
           // Get the subset of lights for this layer
-          size_t layerLights = csMin (layerConfig.GetMaxLightNum (layer),
-            numLights - lightOffset);
+          size_t layerLights;
+          if (mesh.meshFlags.Check (CS_ENTITY_NOLIGHTING))
+            layerLights = 0;
+          else
+            layerLights = csMin (layerConfig.GetMaxLightNum (layer),
+              numLights - lightOffset);
           if ((layerLights == 0)
             && (!layerConfig.IsAmbientLayer (layer)))
           {
@@ -515,8 +533,18 @@ namespace RenderManager
           }
           csLightInfluence* currentInfluences = influences + lightOffset;
 
-          lightOffset += shadows.HandleLights (currentInfluences,
+          size_t handledLights = shadows.HandleLights (currentInfluences,
             layerLights, layer, layerHelper, mesh, node);
+          if ((handledLights == 0)
+            && (!layerConfig.IsAmbientLayer (layer)))
+          {
+            /* No lights have been set up, so don't draw either */
+            node->owner.shaderArray[layerHelper.GetNewLayerIndex (layer, 0) 
+              * node->owner.totalRenderMeshes + mesh.contextLocalId] = 0;
+            continue;
+          }
+          
+          lightOffset += handledLights;
 	}
 
         lightmgr->FreeInfluenceArray (influences);

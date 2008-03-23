@@ -6,6 +6,12 @@
 		<shadervar name="pass do_ambient" type="integer">1</shadervar>
 	        <!-- Draw layer, even if no lights are present -->
 		<ambient />
+		<!-- Options to control lighting for static lights -->
+		<staticlights>
+		  <!-- Don't draw static lights for meshes which have the 
+		       CS_ENTITY_STATICLIGHT flag set -->
+		  <nodraw />
+		</staticlights>
 		<maxlightpasses>1</maxlightpasses>
 		<shadertype>base</shadertype>
 		<shadertype>ambient</shadertype>
@@ -17,6 +23,12 @@
 	        <shadertype>diffuse</shadertype>
 		<!-- Practically unlimited passes -->
 		<maxlightpasses>2147483647</maxlightpasses>
+		<!-- Options to control lighting for static lights -->
+		<staticlights>
+		  <!-- Don't draw static lights for meshes which have the 
+		       CS_ENTITY_STATICLIGHT flag set -->
+		  <nodraw />
+		</staticlights>
 	</layer>
 	<layer>
 		<shadertype>terrain splat</shadertype>

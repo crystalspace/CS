@@ -107,6 +107,7 @@ namespace RenderManager
         iShaderVariableContext* meshObjSVs;
         csRef<csShaderVariable> svObjectToWorld;
         csBox3 bbox;
+        csFlags meshFlags;
 
         size_t contextLocalId;
       };
