@@ -8,6 +8,10 @@ chronological order.
 
 23-Mar-2008
 	- res fixed an uninitialized var in gmeshanimpdl.
+	- res enhanced xmlshader to support "well known" buffer names in
+	  conditions (e.g. vars."color".buffers will now work even though
+	  there is likely no SV "color", only a color render buffer set in
+	  the buffer holder).
 22-Mar-2008
 	- res fixed a leak in LightingVariablesHelper.
 	- res changed the shader weaver to not use outputs that are a result

@@ -19,6 +19,9 @@
 
 #include "cssysdef.h"
 
+#include "csgfx/renderbuffer.h"
+#include "ivideo/rendermesh.h"
+
 #include "condeval.h"
 #include "tokenhelper.h"
 
@@ -588,6 +591,8 @@ const char* csConditionEvaluator::ResolveSVIdentifier (
       operand.type = operandSV;
       operand.svLocation.svName = strings->Request (svParser.GetShaderVarName());
       operand.svLocation.indices = AllocSVIndices (svParser);
+      operand.svLocation.bufferName = csRenderBuffer::GetBufferNameFromDescr (
+        svParser.GetShaderVarName());
     }
     const csExpressionToken& right = 
       expression->expressionValue.right->valueValue;
@@ -999,15 +1004,23 @@ csConditionEvaluator::EvaluatorShadervar::Boolean (
       }
       break;
     case operandSVValueBuffer:
-      //@@TODO: CHECK FOR DEFAULTBUFFERS
       {
-	csShaderVariable* sv = GetShaderVar (operand);
-	if (sv != 0)
-	{
-	  iRenderBuffer* th;
-	  if (sv->GetValue (th))
-	    return th != 0;
+        iRenderBuffer* rb = 0;
+        if (operand.svLocation.bufferName != CS_BUFFER_NONE)
+        {
+          if (modes.buffers.IsValid())
+            rb = modes.buffers->GetRenderBuffer (
+              operand.svLocation.bufferName);
+        }
+        else
+        {
+	  csShaderVariable* sv = GetShaderVar (operand);
+	  if (sv != 0)
+	  {
+	    sv->GetValue (rb);
+	  }
 	}
+	return rb != 0;
       }
       break;
     default:
@@ -1671,7 +1684,6 @@ EvaluatorShadervarValuesSimple::BoolType EvaluatorShadervarValuesSimple::Boolean
         return ValueSetWrapper (vs);
       }
     case operandSVValueBuffer:
-      //@@TODO: CHECK FOR DEFAULTBUFFERS
       {
         const Variables::Values* startValues = ValuesForOperand (operand);
         ValueSet& vs = CreateValue();
@@ -2059,7 +2071,6 @@ EvaluatorShadervarValues::BoolType EvaluatorShadervarValues::Boolean (
         return JanusValueSet (vs, valuesTrue->GetTex(), valuesFalse->GetTex());
       }
     case operandSVValueBuffer:
-      //@@TODO: CHECK FOR DEFAULTBUFFERS
       {
         const Variables::Values* startValues = ValuesForOperand (operand);
         ValueSet& vs = CreateValue();

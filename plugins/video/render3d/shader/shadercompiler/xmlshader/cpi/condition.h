@@ -20,6 +20,7 @@
 #ifndef __CS_CONDITION_H__
 #define __CS_CONDITION_H__
 
+#include "ivideo/rndbuf.h"
 #include "csutil/csstring.h"
 #include "csutil/strhash.h"
 #include "csutil/sysfunc.h"
@@ -75,6 +76,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     {
       CS::StringIDValue svName;
       size_t* indices;
+      csRenderBufferName bufferName;
     };
     union
     {
