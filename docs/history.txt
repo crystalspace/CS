@@ -14,6 +14,10 @@ chronological order.
 	  the buffer holder).
 	- res added a "staticlit" mesh flag to indicate that static lighting
 	  has been computed for a mesh.
+	- res made the following changes to lighter2:
+	    - Per-vertex lighting information is stored in the buffer 
+	      "lit color" instead of "color".
+	    - The "staticlit" flag is set on meshes.
 22-Mar-2008
 	- res fixed a leak in LightingVariablesHelper.
 	- res changed the shader weaver to not use outputs that are a result
