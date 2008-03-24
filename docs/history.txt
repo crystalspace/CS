@@ -25,6 +25,7 @@ chronological order.
 	    normal bump and displacement textures to the material in 3dsmax,
 	    and use the "diffuse" renderloop type on the sectors to use them.
 	  - Tidied up the output formatting a bit, it's nicer on the eye now.
+	- Mike Gist added support for spec maps to the parallax shaders.
 23-Mar-2008
 	- res fixed an uninitialized var in gmeshanimpdl.
 22-Mar-2008
