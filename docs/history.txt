@@ -7,7 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 24-Mar-2008
-	- Mike Gist made several improvements to the 3dsmax level exporter:
+	- Mike Gist made several improvements to the 3ds max level exporter:
 	  - Did a bit of cleaning; removed thing support from exportCS.mcr,
 	    exportcsp.mcr still has it if you need it.
 	  - Fixed a bug in the materialnotdefined checks, the comparison was
@@ -24,6 +24,8 @@ chronological order.
 	  - Added support for the parallaxAtt shader. To use it, just attach
 	    normal bump and displacement textures to the material in 3dsmax,
 	    and use the "diffuse" renderloop type on the sectors to use them.
+	    This also supports a spec map. To use one, attach it to the
+	    'glossiness' map attribute of the material.
 	  - Tidied up the output formatting a bit, it's nicer on the eye now.
 	- Mike Gist added support for spec maps to the parallax shaders.
 23-Mar-2008
