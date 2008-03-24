@@ -6,7 +6,25 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-
+24-Mar-2008
+	- Mike Gist made several improvements to the 3dsmax level exporter:
+	  - Did a bit of cleaning; removed thing support from exportCS.mcr,
+	    exportcsp.mcr still has it if you need it.
+	  - Fixed a bug in the materialnotdefined checks, the comparison was
+	    wrong so they were failing.
+	  - Added RENDERLOOP_TYPE user defined option, so you can specify the
+	    renderloop you want on a per-sector basis. Current options are 
+	    "diffuse" and "terrainfixed" (nothing is valid too of course).
+	    The collision plugin selection now takes this into consideration
+	    too, so sectors within the same map don't end up with the wrong
+	    collision type.
+	  - Changed shader and renderloop selection to be calculated
+	    automatically. Removed "Export as Terrain Level" checkbox, as this
+	    is no longer needed as a result.
+	  - Added support for the parallaxAtt shader. To use it, just attach
+	    normal bump and displacement textures to the material in 3dsmax,
+	    and use the "diffuse" renderloop type on the sectors to use them.
+	  - Tidied up the output formatting a bit, it's nicer on the eye now.
 23-Mar-2008
 	- res fixed an uninitialized var in gmeshanimpdl.
 22-Mar-2008
