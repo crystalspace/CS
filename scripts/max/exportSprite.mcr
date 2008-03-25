@@ -21,8 +21,8 @@
 macroScript Export_Sprite_CS
 category:"PlaneShift"
 internalcategory:"PlaneShift"
-ButtonText:"Export Sprite CS" 
-tooltip:"Export Sprite CS" Icon:#("Maxscript",1)
+ButtonText:"Export Sprite to CS" 
+tooltip:"Export Sprite to CS" Icon:#("Maxscript",1)
 (
 
 rollout Test1 "Export Sprite" width:238 height:128
@@ -473,8 +473,11 @@ rollout Test1 "Export Sprite" width:238 height:128
 
 	on Test1 open do
 	(
-	   name = selection[1].name
-	   edt3.text = "d:\\Luca\\"+name+".spr"
+	   if(selection[1]!=undefined) then
+	   (
+	     name = selection[1].name
+	     edt3.text = "d:\\Luca\\"+name+".spr"
+	   )
 
 	)
 	on btn2 pressed do
