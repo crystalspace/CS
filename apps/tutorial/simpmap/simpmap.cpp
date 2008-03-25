@@ -192,7 +192,7 @@ void Simple::ProcessFrame ()
     //return;
 
   // Tell the camera to render into the frame buffer.
-  //view->Draw ();
+  view->Draw ();
   rm->RenderView (view);
 }
 

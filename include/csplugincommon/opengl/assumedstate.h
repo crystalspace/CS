@@ -42,9 +42,14 @@ namespace CS
        * - Depth clear value (glClearDepth)
        * - Pixel unpack alignment (GL_UNPACK_ALIGNMENT)
        * - Pixel byte swapping (GL_UNPACK_SWAP_BYTES)
+       * - Vertex program point size (GL_VERTEX_PROGRAM_POINT_SIZE_ARB)
+       * - GL_POINT_SPRITE_ARB texture environment setting
+       * - Minimum, maximum point sizes
+       * - Point fade threshold
        */
       extern void CS_CSPLUGINCOMMON_GL_EXPORT SetAssumedState (
-	csGLStateCache* statecache);
+	csGLStateCache* statecache,
+        csGLExtensionManager* ext);
     } // namespace GL
   } // namespace PluginCommon
 } // namespace CS

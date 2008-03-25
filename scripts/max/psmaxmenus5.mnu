@@ -1,5 +1,5 @@
 [MenuContexts]
-NumContexts=11
+NumContexts=15
 MenuContext_Type_0=0
 MenuBarContext_Id_0=1
 MenuBarContext_Name_0="Main Menu Bar"
@@ -107,9 +107,28 @@ MenuContext_Type_10=0
 MenuBarContext_Id_10=9
 MenuBarContext_Name_10="Material Editor Menu Bar"
 MenuBarContext_menu_10=185
+MenuContext_Type_11=0
+MenuBarContext_Id_11=844192994
+MenuBarContext_Name_11="Asset Tracking - Menu Bar"
+MenuBarContext_menu_11=197
+MenuContext_Type_12=1
+QuadMenuContext_Id_12=844192995
+QuadMenuContext_Name_12="Asset Tracking Quad"
+QuadMenuContext_NumMenus_12=1
+QuadMenuContext_menu_12_0=15
+QuadMenuContext_MenuName_12_0="Asset Tracking Quad"
+QuadMenuContext_ShowAll_12_0=0
+MenuContext_Type_13=0
+MenuBarContext_Id_13=827350242
+MenuBarContext_Name_13="Parameter Collector Menu"
+MenuBarContext_menu_13=202
+MenuContext_Type_14=0
+MenuBarContext_Id_14=827415778
+MenuBarContext_Name_14="Schematic View List View Menu"
+MenuBarContext_menu_14=203
 [MenuManager]
-NumberOfMenus=197
-NumberOfQuadMenus=15
+NumberOfMenus=204
+NumberOfQuadMenus=16
 [Menu_0]
 MenuName="Main Menu Bar"
 ItemCount=15
@@ -1036,7 +1055,7 @@ Item_15_Mode=1
 Item_16_Mode=2
 Item16_Action=647394|SunLight`Lights and Cameras
 Item_17_Mode=2
-Item17_Action=647394|Daylight`Lights and Cameras
+Item17_Action=647394|DayLight`Lights and Cameras
 [Menu_35]
 MenuName="Shapes"
 ItemCount=11
@@ -3645,6 +3664,34 @@ Item_3_Mode=2
 Item3_Action=647394|ShowMaps`PlaneShift
 Item_4_Mode=2
 Item4_Action=647394|Fix_Duplicate_Materials`PlaneShift
+[Menu_197]
+MenuName="Asset Tracking - Menu Bar"
+ItemCount=0
+Flags=1
+[Menu_198]
+MenuName="Asset Tracking Quad 1"
+ItemCount=0
+Flags=2
+[Menu_199]
+MenuName="Asset Tracking Quad 2"
+ItemCount=0
+Flags=2
+[Menu_200]
+MenuName="Asset Tracking Quad 3"
+ItemCount=0
+Flags=2
+[Menu_201]
+MenuName="Asset Tracking Quad 4"
+ItemCount=0
+Flags=2
+[Menu_202]
+MenuName="Parameter Collector Menu"
+ItemCount=0
+Flags=1
+[Menu_203]
+MenuName="Schematic View List View Menu"
+ItemCount=0
+Flags=1
 [QuadMenu_0]
 MenuCount=4
 MenuIndex_0=16
@@ -3795,4 +3842,13 @@ MenuIndex_2=193
 Title_2="Quad 3"
 MenuIndex_3=194
 Title_3="Quad 4"
-
+[QuadMenu_15]
+MenuCount=4
+MenuIndex_0=198
+Title_0="Asset Tracking 1"
+MenuIndex_1=199
+Title_1="Asset Tracking 2"
+MenuIndex_2=200
+Title_2="Asset Tracking 3"
+MenuIndex_3=201
+Title_3="Asset Tracking 4"

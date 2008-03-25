@@ -18,7 +18,7 @@
 ------------------------------------------------------------
 
 
-macroScript Export_Level_CS
+macroScript Export_Level_CS_Thing
 category:"PlaneShift"
 internalcategory:"PlaneShift"
 ButtonText:"Export Level CS" 
