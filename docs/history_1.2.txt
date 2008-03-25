@@ -1,5 +1,7 @@
 1.2 branch log.
 
+25-Mar-2008
+	- Vincent merged r29088 into 1.2 (fix MacOS X enter raw-key-code).
 21-Mar-2008
 	- Vincent fixed #426 (libcrystalspace_staticplugins fails to compile
 	  in MSVC8 due to pycscegui).
