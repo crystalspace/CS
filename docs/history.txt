@@ -21,6 +21,9 @@ chronological order.
 	  "render to target" methods are in their own interface now.
 	- res changed PostEffectManager to use a simple node system instead of
 	  layers.
+	- res (again) changed CS::Graphics::ShaderVarNameParser for more proper
+	  splitting of names and indices: now, everything after the first '['
+	  is considered as indices.
 25-Mar-2008
 	- Andrew Dai fixed the problem of the enter key being mapped to the
 	  incorrect raw keycode on MAC OS X.
