@@ -51,6 +51,8 @@
 	     xmlshader - so we can't use includes, templates here. Pity -->
 	<block location="cg:fragmentIn"
 	       file="/shader/snippets/lighting/lighting-cg-input.block" />
+	<block location="cg:fragmentIn"
+	       file="/shader/snippets/lighting/lighting-cg-input-shadowmap.block" />
 	
 	<block location="cg:vertexMain">
 	  diffuseColor = float3(0);

@@ -30,17 +30,14 @@
 	<input name="normal" type="normal_world" />
 	
 	<input name="lightOffset" type="float" default="value" defval="0"/>
+	<input name="maxLights" type="float" default="value" defval="8"/>
 	
 	<block location="pass">
 	  <?Include /shader/snippets/lighting/lighting-tools.inc ?>
-	  
-	  <?Generate L 0 7?>
-	    <texture name="light shadow map[$L$]" destination="fragmentIn.lightShadowMap[$L$]" />
-	  <?Endgenerate?>
 	</block>
 	
 	<block location="cg:variablemap">
-	  <?Lighting_Variablemaps fragment?>
+	  <?Lighting_Variablemaps?>
 	</block>
 	
 	<block location="cg:definitions">
@@ -53,16 +50,38 @@
 	       file="/shader/snippets/lighting/lighting-cg-input.block" />
 	
 	<block location="cg:vertexMain">
-	  diffuseColor = float3(0);
-	  specularColor = float3(0);
+	  diffuseColor = float4(0, 0, 0, 1);
+	  specularColor = float4(0);
 	</block>
 	
 	<block location="cg:fragmentMain">
-	  <?Lighting_Compute fragment 8 None?>
+	  diffuseColor = float4(0, 0, 0, 1);
+	  specularColor = float4(0);
+	  <![CDATA[
+	  for (int l = 0; l < maxLights; l++)
+	  {
+	    if (l >= lightProps.count) break;
+	  ]]>
+	    
+	    int i = lightOffset + l;
+	    LightSpaceWorld lightSpace;
+	    lightSpace.Init (i, position);
+	    
+	    Light light = GetCurrentLight (lightSpace, i, normal);
+	    float4 lightAttenuationVec = lightProps.attenuationVec[i];
+	    ShadowNone shadow;
+	    float3 d, s;
+	    ComputeLight (lightSpace, light, eyeToSurf, normal, 32,
+	    lightProps.colorDiffuse[i], lightProps.colorSpecular[i],
+	    lightAttenuationVec, shadow, d, s);
+	    
+	    diffuseColor += float4 (d, 0);
+	    specularColor += float4 (s, 0);
+	  }
 	</block>
 	
-	<output name="diffuseColor" type="rgb" />
-	<output name="specularColor" type="rgb" />
+	<output name="diffuseColor" type="rgba" />
+	<output name="specularColor" type="rgba" />
       </technique>
     </snippet>
     <connection from="eyeVecWorld" to="lighting" />

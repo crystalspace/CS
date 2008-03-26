@@ -24,7 +24,7 @@
         <!-- First pass: blend with copy -->
       <?else?>
         <!-- Later pass: blend with add -->
-        <mixmode><add /></mixmode>
+        <mixmode><srcalphaadd /></mixmode>
       <?endif?>
       <!-- Combiner to use for this particular pass.
 	   Techniques Referenced snippets must only utilize the same 
@@ -77,7 +77,7 @@
         <!-- First pass: blend with copy -->
       <?else?>
         <!-- Later pass: blend with add -->
-        <mixmode><add /></mixmode>
+	<mixmode><srcalphaadd /></mixmode>
       <?endif?>
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
 
