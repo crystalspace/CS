@@ -1,0 +1,27 @@
+<shader compiler="xmlshader" name="postproc_add">
+  <technique priority="200">
+    <pass>
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+      <!-- vp plugin="glfixed" / -->
+      <texture destination="Texture1" name="tex diffuse" />
+      <texture destination="Texture2" name="tex diffuse 2" />
+      <fp plugin="glcg">
+	<cgfp>
+	  <program>
+	    <![CDATA[
+
+	    float4 main (in float2 TexCoord : TEXCOORD0,
+		      uniform sampler2D Texture1, uniform sampler2D Texture2) : COLOR
+	    {
+		    float4 a = tex2D (Texture1, TexCoord);
+		    float4 b = tex2D (Texture2, TexCoord);
+		    return a+b;
+	    }
+
+	    ]]>
+	  </program>
+	</cgfp>
+      </fp>
+    </pass>
+  </technique>
+</shader>

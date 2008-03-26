@@ -266,9 +266,9 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
       renderLayer);
     if (!layersValid) renderLayer.Clear();
   }
+  csRef<iLoader> loader (csQueryRegistry<iLoader> (objectReg));
   if (!layersValid)
   {
-    csRef<iLoader> loader (csQueryRegistry<iLoader> (objectReg));
     if (!loader->LoadShader ("/shader/lighting/lighting_default.xml"))
     {
       csReport (objectReg, CS_REPORTER_SEVERITY_WARNING,
@@ -286,10 +286,26 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
   csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objectReg);
   treePersistent.Initialize (shaderManager);
   postEffects.Initialize (objectReg);
+  postEffects.SetIntermediateTargetFormat ("rgb16_f");
+  
+  csRef<iShader> threshold =
+    loader->LoadShader ("/shader/postproc/threshold.xml");
+  csRef<iShader> blur =
+    loader->LoadShader ("/shader/postproc/blur.xml");
+  csRef<iShader> add =
+    loader->LoadShader ("/shader/postproc/add_squared.xml");
+
+  PostEffectManager::Layer* thresholded = postEffects.AddLayer (threshold);
+  PostEffectManager::Layer* lastBlur = postEffects.AddLayer (blur, 1, thresholded, "tex diffuse");
+  lastBlur = postEffects.AddLayer (blur, 1, lastBlur, "tex diffuse");
+  lastBlur = postEffects.AddLayer (blur, 1, lastBlur, "tex diffuse");
+  postEffects.AddLayer (add, 2, 
+    postEffects.GetScreenLayer(), "tex diffuse",
+    lastBlur, "tex diffuse 2");
   
   portalPersistent.Initialize (shaderManager, g3d);
   lightPersistent.Initialize (shaderManager);
-
+  
   return true;
 }
 

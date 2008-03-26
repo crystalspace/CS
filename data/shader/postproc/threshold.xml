@@ -1,0 +1,27 @@
+<shader compiler="xmlshader" name="postproc_threshold">
+  <technique priority="200">
+    <pass>
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+      <!-- vp plugin="glfixed" / -->
+      <texture destination="Texture1" name="tex diffuse" />
+      <fp plugin="glcg">
+	<cgfp>
+	  <program>
+	      <![CDATA[
+
+	      float4 main (in float2 TexCoord : TEXCOORD0,
+			uniform sampler2D Texture1) : COLOR
+	      {
+		      float threshold = 0.8; // FIXME: un-hardcode
+		      float4 src = tex2D (Texture1, TexCoord);
+		      float3 thresholded = max ((src.rgb - float3 (threshold))/(1-threshold), 0);
+		      return float4 (thresholded, src.a);
+	      }
+
+	      ]]>
+	  </program>
+	</cgfp>
+      </fp>
+    </pass>
+  </technique>
+</shader>

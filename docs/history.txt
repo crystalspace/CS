@@ -25,6 +25,7 @@ chronological order.
 	  splitting of names and indices: now, everything after the first '['
 	  is considered as indices.
 	- res fixed a mess-up in csMatrix3 transposing.
+	- res added a simple postprocess glare to rm_unshadowed.
 25-Mar-2008
 	- Andrew Dai fixed the problem of the enter key being mapped to the
 	  incorrect raw keycode on MAC OS X.
