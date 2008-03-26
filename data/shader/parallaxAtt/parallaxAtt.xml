@@ -15,7 +15,7 @@
       <texture destination="TexNormalCompressed" name="tex normal compressed" />
       <texture destination="TexDiffuse" name="tex diffuse" />
       <texture destination="TexHeight" name="tex height" />
-      <texture destination="TexSpec" name="tex spec" />
+      <texture destination="TexSpecular" name="tex specular" />
 	<texture destination="TexAttn" name="light 0 attenuationtex" />
 	<fp plugin="glcg">
 	  <cgfp>
@@ -65,7 +65,7 @@
               <texture destination="TexNormalCompressed" name="tex normal compressed" />
 		  <texture destination="TexDiffuse" name="tex diffuse" />
 		  <texture destination="TexHeight" name="tex height" />
-              <texture destination="TexSpec" name="tex spec" />
+              <texture destination="TexSpecular" name="tex specular" />
 		  <fp plugin="glcg">
 			  <cgfp>
 				  <?Include /shader/parallaxAtt/parallax.cgfp ?>
