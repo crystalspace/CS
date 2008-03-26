@@ -9,6 +9,8 @@ chronological order.
 26-Mar-2008
 	- Marten commited a number of re-inlinings of basic matrix & vector 
 	  methods.
+	- res fixed the OpenGL state cache storing the active buffer binding in
+	  the wrong member.
 25-Mar-2008
 	- Andrew Dai fixed the problem of the enter key being mapped to the
 	  incorrect raw keycode on MAC OS X.
