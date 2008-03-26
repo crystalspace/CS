@@ -62,9 +62,9 @@ namespace RenderManager
     {
       typename RenderTargetInfo::ViewInfo newView;
       newView.view = view;
-      newView.flags = flags & ~iRenderManager::updateOnce;
+      newView.flags = flags & ~iRenderManagerTargets::updateOnce;
       TargetsHash* targets;
-      if (flags & iRenderManager::updateOnce)
+      if (flags & iRenderManagerTargets::updateOnce)
       {
         targets = &oneTimeTargets;
       }

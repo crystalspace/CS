@@ -28,9 +28,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMUnshadowed)
   template<typename RenderTreeType, typename LayerConfigType>
   class StandardContextSetup;
 
-  class RMUnshadowed : public scfImplementation2<RMUnshadowed, 
-                                            iRenderManager, 
-                                            iComponent>
+  class RMUnshadowed : public scfImplementation3<RMUnshadowed, 
+                                                 iRenderManager, 
+                                                 iRenderManagerTargets,
+                                                 iComponent>
   {
   public:
     RMUnshadowed (iBase* parent);

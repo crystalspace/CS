@@ -26,9 +26,14 @@ struct iTextureHandle;
 
 struct iRenderManager : public virtual iBase
 {
-  SCF_INTERFACE(iRenderManager,1,0,2);
+  SCF_INTERFACE(iRenderManager,2,0,0);
 
   virtual bool RenderView (iView* view) = 0;
+};
+
+struct iRenderManagerTargets : public virtual iBase
+{
+  SCF_INTERFACE(iRenderManagerTargets,1,0,0);
 
   enum TargetFlags
   {
@@ -40,4 +45,4 @@ struct iRenderManager : public virtual iBase
     int subtexture = 0) = 0;
 };
 
-#endif
+#endif // __CS_IENGINE_RENDERMANAGER_H__

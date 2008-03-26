@@ -92,6 +92,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
         variable->SetValue (envTex);
         return;
       }
+      
+      csRef<iRenderManagerTargets> rmTargets =
+        scfQueryInterface<iRenderManagerTargets> (engine->renderManager);
+      if (!rmTargets) return;
+      
       lastUpdateFrame = engine->GetCurrentFrameNumber();
       lastUpdateTime = currentTime;
       iMovable* movable = meshwrap->GetMovable();
@@ -132,8 +137,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
         csOrthoTransform& camTF = cam->GetTransform();
         camTF.LookAt (lookAtVecs[i*2], lookAtVecs[i*2 + 1]);
 
-        engine->renderManager->RegisterRenderTarget (envTex, sideView, i, 
-          iRenderManager::updateOnce);
+        rmTargets->RegisterRenderTarget (envTex, sideView, i, 
+          iRenderManagerTargets::updateOnce);
       }
     }
   } // namespace EnvTex
