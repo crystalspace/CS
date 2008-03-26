@@ -1,6 +1,5 @@
 <!--
-  Copyright (C) 2007 by Frank Richter
-	    (C) 2007 by Jorrit Tyberghein
+  Copyright (C) 2008 by Frank Richter
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -20,69 +19,65 @@
   <technique priority="100">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
-    <input file="/shader/snippets/texCoord.inp"	
-      condition='vars."tex diffuse".texture' />
+    <input file="/shader/snippets/texCoord.inp"	/>
     
-    <input name="texDiffuse" type="tex2d" default="complex"
-	condition='vars."tex diffuse".texture'>
+    <input name="texSpecular" type="tex2d" default="complex">
       <block location="pass">
-	<texture name="tex diffuse" destination="fragmentIn.texDiffuse" />
+	<texture name="tex specular" destination="fragmentIn.texSpecular" />
       </block>
       
       <block location="cg:fragmentIn">
-	<uniform type="tex2d" name="texDiffuse" />
+	<uniform type="tex2d" name="texSpecular" />
       </block>
       
       <block location="cg:fragmentMain">
-	texDiffuse = fragmentIn.texDiffuse;
+	texSpecular = fragmentIn.texSpecular;
       </block>
     </input>
     
-    <input name="flatColor" type="rgba" default="complex">
+    <input name="specular" type="rgb" default="complex" private="yes">
       <block location="cg:variablemap">
-        <variablemap variable="mat flatcolor" 
-	  destination="fragmentIn.flatColor" />
-        <variablemap variable="mat flatcolor" 
-	  destination="vertexIn.flatColor" />
+	<variablemap variable="specular" destination="fragmentIn.specular" />
+	<variablemap variable="specular" destination="vertexIn.specular" />
       </block>
       
       <block location="cg:fragmentIn">
-	<uniform type="rgba" name="flatColor" />
+	<uniform type="rgb" name="specular" />
       </block>
       
       <block location="cg:vertexIn">
-	<uniform type="rgba" name="flatColor" />
+	<uniform type="rgb" name="specular" />
       </block>
       
       <block location="cg:fragmentMain">
-	flatColor = fragmentIn.flatColor;
+	specular = fragmentIn.specular;
       </block>
 
       <block location="cg:vertexMain">
-	flatColor = vertexIn.flatColor;
+	specular = vertexIn.specular;
       </block>
     </input>
       
     <block location="cg:vertexMain">
-      surfaceColor = flatColor;
+      specularColor = specular;
       <?if vars."tex specular".texture?>
-        surfaceColor_attr_perfragment = true;
+        specularColor_attr_perfragment = true;
       <?else?>
-        surfaceColor_attr_perfragment = false;
+        specularColor_attr_perfragment = false;
       <?endif?>
     </block>
     
     <block location="cg:fragmentMain">
       <?if vars."tex diffuse".texture?>
-	surfaceColor = tex2D (texDiffuse, texCoord);
-	surfaceColor_attr_perfragment = true;
+        specularColor = tex2D (texSpecular, texCoord).rgb;
+	specularColor_attr_perfragment = true;
       <?else?>
-	surfaceColor = flatColor;
-	surfaceColor_attr_perfragment = false;
+        specularColor = specular;
+	specularColor_attr_perfragment = false;
       <?endif?>
     </block>
     
-    <output name="surfaceColor" type="rgba">
+    <output name="specularColor" type="rgb">
       <attribute name="perfragment" type="bool" />
     </output>
   </technique>

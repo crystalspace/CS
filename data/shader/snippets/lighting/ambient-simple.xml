@@ -51,23 +51,23 @@
 	
 	<block location="cg:vertexMain">
 	  <?if vars."pass do_ambient" ?>
-	  ambient = float4(combinedAmbient*occlusionFactor, 0);
+	  ambient = combinedAmbient*occlusionFactor;
 	  <?else?>
-	  ambient = float4(0);
+	  ambient = float3(0);
 	  <?endif?>
 	  ambient_attr_perfragment = occlusionFactor_attr_perfragment;
 	</block>
 	  
 	<block location="cg:fragmentMain">
 	  <?if vars."pass do_ambient" ?>
-	  ambient = float4(combinedAmbient*occlusionFactor, 0);
+	  ambient = combinedAmbient*occlusionFactor;
 	  <?else?>
-	  ambient = float4(0);
+	  ambient = float3(0);
 	  <?endif?>
 	  ambient_attr_perfragment = occlusionFactor_attr_perfragment;
 	</block>
 	
-	<output name="ambient" type="rgba">
+	<output name="ambient" type="rgb">
 	  <attribute name="perfragment" type="bool" />
 	</output>
       </snippet>

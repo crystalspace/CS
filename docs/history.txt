@@ -29,6 +29,7 @@ chronological order.
 	- res changed the default lighting snippets from using shader condition
 	  templates to somewhat nicer Cg interfaces.
 	- res added AO support to the "static" and "simple" ambient snippets.
+	- res added specular color snippets and made lighting_default use them.
 25-Mar-2008
 	- Andrew Dai fixed the problem of the enter key being mapped to the
 	  incorrect raw keycode on MAC OS X.

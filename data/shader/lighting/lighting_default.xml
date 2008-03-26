@@ -41,9 +41,8 @@
       <snippet id="apply_mixmode_alpha" file="/shader/snippets/mixmode-alpha.xml" />
       <snippet id="lighting" file="/shader/snippets/lighting/lighting-ppl.xml" />
       <snippet id="ambient" file="/shader/snippets/lighting/ambient-static.xml" />
-      <snippet id="add_ambient" file="/shader/snippets/add.xml" />
-      <snippet id="mod_light_surf" file="/shader/snippets/modulate.xml" />
-      <snippet id="add_specular" file="/shader/snippets/add.xml" />
+      <snippet id="specular" file="/shader/snippets/surface/specular-weirdold.xml" />
+      <snippet id="apply_lighting" file="/shader/snippets/lighting/apply-lighting.xml" />
       <snippet id="glow" file="/shader/lighting/glow.xml" />
       <snippet id="sectorfog" file="/shader/snippets/fog/fog-sector.xml" />
       <!-- "connections" describe what snippets take input from what other
@@ -55,21 +54,20 @@
       <connection from="parallax" to="normalmap" />
       <connection from="normalmap" to="lighting" />
       <connection from="surface" to="apply_mixmode_alpha" />
-      <connection from="apply_mixmode_alpha" to="mod_light_surf" />
-      <connection from="lighting" to="add_ambient">
-	<explicit from="diffuseColor" to="a" />
+      <connection from="apply_mixmode_alpha" to="apply_lighting">
+	<explicit from="outputColor" to="surfaceDiffuse" />
       </connection>
-      <connection from="ambient" to="add_ambient">
-	<explicit from="ambient" to="b" />
+      <connection from="lighting" to="apply_lighting">
+	<explicit from="diffuseColor" to="lightDiffuse" />
+	<explicit from="specularColor" to="lightSpecular" />
       </connection>
-      <connection from="add_ambient" to="mod_light_surf" />
-      <connection from="mod_light_surf" to="add_specular">
-	<explicit from="result" to="a" />
+      <connection from="ambient" to="apply_lighting">
+	<explicit from="ambient" to="ambient" />
       </connection>
-      <connection from="lighting" to="add_specular">
-	<explicit from="specularColor" to="b" />
+      <connection from="specular" to="apply_lighting">
+	<explicit from="specularColor" to="surfaceSpecular" />
       </connection>
-      <connection from="add_specular" to="glow" />
+      <connection from="apply_lighting" to="glow" />
       <connection from="glow" to="sectorfog" />
     </pass>
   </technique>
@@ -91,10 +89,9 @@
       <snippet id="surface" file="/shader/snippets/surface/surface-classic.xml" />
       <snippet id="apply_mixmode_alpha" file="/shader/snippets/mixmode-alpha.xml" />
       <snippet id="lighting" file="/shader/snippets/lighting/lighting-pvl.xml" />
-      <snippet id="mod_light_surf" file="/shader/snippets/modulate.xml" />
       <snippet id="ambient" file="/shader/snippets/lighting/ambient-static.xml" />
-      <snippet id="add_ambient" file="/shader/snippets/add.xml" />
-      <snippet id="add_specular" file="/shader/snippets/add.xml" />
+      <snippet id="specular" file="/shader/snippets/surface/specular-weirdold.xml" />
+      <snippet id="apply_lighting" file="/shader/snippets/lighting/apply-lighting.xml" />
       <snippet id="glow" file="/shader/lighting/glow.xml" />
       <snippet id="sectorfog" file="/shader/snippets/fog/fog-sector.xml" />
 
@@ -104,21 +101,20 @@
       <connection from="parallax" to="normalmap" />
       <connection from="normalmap" to="lighting" />
       <connection from="surface" to="apply_mixmode_alpha" />
-      <connection from="apply_mixmode_alpha" to="mod_light_surf" />
-      <connection from="lighting" to="add_ambient">
-	<explicit from="diffuseColor" to="a" />
+      <connection from="apply_mixmode_alpha" to="apply_lighting">
+	<explicit from="outputColor" to="surfaceDiffuse" />
       </connection>
-      <connection from="ambient" to="add_ambient">
-	<explicit from="ambient" to="b" />
+      <connection from="lighting" to="apply_lighting">
+	<explicit from="diffuseColor" to="lightDiffuse" />
+	<explicit from="specularColor" to="lightSpecular" />
       </connection>
-      <connection from="add_ambient" to="mod_light_surf" />
-      <connection from="mod_light_surf" to="add_specular">
-	<explicit from="result" to="a" />
+      <connection from="ambient" to="apply_lighting">
+	<explicit from="ambient" to="ambient" />
       </connection>
-      <connection from="lighting" to="add_specular">
-	<explicit from="specularColor" to="b" />
+      <connection from="specular" to="apply_lighting">
+	<explicit from="specularColor" to="surfaceSpecular" />
       </connection>
-      <connection from="add_specular" to="glow" />
+      <connection from="apply_lighting" to="glow" />
       <connection from="glow" to="sectorfog" />
     </pass>
   </technique>

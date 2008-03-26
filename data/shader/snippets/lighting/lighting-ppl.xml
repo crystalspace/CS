@@ -50,13 +50,15 @@
 	       file="/shader/snippets/lighting/lighting-cg-input.block" />
 	
 	<block location="cg:vertexMain">
-	  diffuseColor = float4(0, 0, 0, 1);
-	  specularColor = float4(0);
+	  diffuseColor = float3(0);
+	  specularColor = float3(0);
+	  diffuseColor_attr_perfragment = true;
+	  specularColor_attr_perfragment = true;
 	</block>
 	
 	<block location="cg:fragmentMain">
-	  diffuseColor = float4(0, 0, 0, 1);
-	  specularColor = float4(0);
+	  diffuseColor = float3(0);
+	  specularColor = float3(0);
 	  <![CDATA[
 	  for (int l = 0; l < maxLights; l++)
 	  {
@@ -75,13 +77,19 @@
 	    lightProps.colorDiffuse[i], lightProps.colorSpecular[i],
 	    lightAttenuationVec, shadow, d, s);
 	    
-	    diffuseColor += float4 (d, 0);
-	    specularColor += float4 (s, 0);
+	    diffuseColor += d;
+	    specularColor += s;
 	  }
+	  diffuseColor_attr_perfragment = true;
+	  specularColor_attr_perfragment = true;
 	</block>
 	
-	<output name="diffuseColor" type="rgba" />
-	<output name="specularColor" type="rgba" />
+	<output name="diffuseColor" type="rgb">
+	  <attribute name="perfragment" type="bool" />
+	</output>
+	<output name="specularColor" type="rgb">
+	  <attribute name="perfragment" type="bool" />
+	</output>
       </technique>
     </snippet>
     <connection from="eyeVecWorld" to="lighting" />

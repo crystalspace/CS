@@ -261,14 +261,14 @@
 	    ambient_attr_perfragment = occlusionFactor_attr_perfragment;
 	  <?endif?>
 	  }
-	  ambient = float4(ambient_dynamic + ambient_static, 0);
+	  ambient = ambient_dynamic + ambient_static;
 	  <?else?>
-	  ambient = float4(0);
+	  ambient = float3(0);
 	  ambient_attr_perfragment = false;
 	  <?endif?>
 	</block>
 	
-	<output name="ambient" type="rgba">
+	<output name="ambient" type="rgb">
 	  <attribute name="perfragment" type="bool" />
 	</output>
       </technique>
@@ -379,14 +379,14 @@
 	      ambient_static = combinedAmbient * occlusionFactor;
 	      ambient_attr_perfragment = occlusionFactor_attr_perfragment;
 	    <?endif?>
-	    ambient = float4(ambient_dynamic + ambient_static, 0);
+	    ambient = ambient_dynamic + ambient_static;
 	  <?else?>
-	  ambient = float4(0);
+	  ambient = float3(0);
 	  ambient_attr_perfragment = false;
 	  <?endif?>
 	</block>
 	
-	<output name="ambient" type="rgba">
+	<output name="ambient" type="rgb">
 	  <attribute name="perfragment" type="bool" />
 	</output>
       </technique>
