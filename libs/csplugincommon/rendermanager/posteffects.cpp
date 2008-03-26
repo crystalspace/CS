@@ -18,30 +18,43 @@
 
 #include "cssysdef.h"
 
-#include "ivaria/view.h"
+#include "csgfx/shadervarcontext.h"
 #include "csutil/objreg.h"
+#include "ivaria/view.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
+
 #include "csplugincommon/rendermanager/posteffects.h"
 
+#include <stdarg.h>
 
 using namespace CS::RenderManager;
 
 PostEffectManager::PostEffectManager ()
-  : screenQuadVerts (0), screenQuadTex (0), currentWidth (0), currentHeight (0),
+  : currentWidth (0), currentHeight (0),
   textureCoordinateX (1), textureCoordinateY (1), 
-  textureOffsetX (0), textureOffsetY (0), activeTexture (0)
-{}
+  textureOffsetX (0), textureOffsetY (0), textureFmt ("rgba8"),
+  lastLayer (0)
+{
+  AddLayer (0, 0);
+}
 
 PostEffectManager::~PostEffectManager ()
 {
-  KillScreenQuad ();
 }
 
 void PostEffectManager::Initialize (iObjectRegistry* objectReg)
 {
   graphics3D = csQueryRegistry<iGraphics3D> (objectReg);
+  svStrings = csQueryRegistryTagInterface<iShaderVarStringSet> (objectReg,
+    "crystalspace.shader.variablenameset");
+  svPixelSize.AttachNew (new csShaderVariable (svStrings->Request ("pixel size")));
+}
+
+void PostEffectManager::SetIntermediateTargetFormat (const char* textureFmt)
+{
+  this->textureFmt = textureFmt;
 }
 
 void PostEffectManager::SetupView (iView* view)
@@ -54,16 +67,18 @@ void PostEffectManager::SetupView (iView* view)
     currentWidth = width;
     currentHeight = height;
 
+    UpdateTextureDistribution();
     AllocatePingpongTextures ();
-    SetupScreenQuad (width, height);    
+    UpdateSVContexts ();
+    SetupScreenQuad (width, height);
   }
 }
 
 iTextureHandle* PostEffectManager::GetScreenTarget ()
 {
-  if (postLayers.GetSize () > 0)
+  if (postLayers.GetSize () > 1)
   {
-    return textures[activeTexture];
+    return textures[postLayers[0]->outTextureNum];
   }
 
   return 0;
@@ -73,34 +88,59 @@ void PostEffectManager::DrawPostEffects ()
 { 
   graphics3D->FinishDraw ();
 
-  for (size_t layer = 0; layer < postLayers.GetSize (); ++layer)
+  for (size_t layer = 1; layer < postLayers.GetSize (); ++layer)
   {   
     // Draw and ping-pong   
-    fullscreenQuad.texture = textures[activeTexture];
-    fullscreenQuad.shader = postLayers[layer].effectShader;
+    fullscreenQuad.dynDomain = postLayers[layer]->svContext;
+    fullscreenQuad.shader = postLayers[layer]->effectShader;
 
-    activeTexture ^= 1;
-    graphics3D->SetRenderTarget (layer < postLayers.GetSize () - 1 ? textures[activeTexture] : 0);
-    graphics3D->BeginDraw (CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER | CSDRAW_3DGRAPHICS);
+    graphics3D->SetRenderTarget (layer < postLayers.GetSize () - 1 
+      ? textures[postLayers[layer]->outTextureNum] : 0);
+    graphics3D->BeginDraw (CSDRAW_CLEARZBUFFER | CSDRAW_3DGRAPHICS);
     graphics3D->DrawSimpleMesh (fullscreenQuad, csSimpleMeshScreenspace);
     graphics3D->FinishDraw ();
   }
 }
+    
+PostEffectManager::Layer* PostEffectManager::AddLayer (iShader* shader)
+{
+  return AddLayer (shader, 1, lastLayer, "tex diffuse");
+}
+
+PostEffectManager::Layer* PostEffectManager::AddLayer (iShader* shader, const LayerInputMap& inputs)
+{
+  Layer* newLayer = new Layer;
+  newLayer->effectShader = shader;
+  newLayer->inputs = inputs;
+  postLayers.Push (newLayer);
+  textureDistributionDirty = true;
+  lastLayer = newLayer;
+  return newLayer;
+}
+
+PostEffectManager::Layer* PostEffectManager::AddLayer (iShader* shader, size_t numMaps, ...)
+{
+  LayerInputMap inputs;
+
+  va_list va;
+  va_start (va, numMaps);
+  for (size_t i = 0; i < numMaps; i++)
+  {
+    Layer* layer = va_arg (va, Layer*);
+    const char* dst = va_arg (va, const char*);
+    inputs.Put (dst, layer);
+  }
+  va_end (va);
+  return AddLayer (shader, inputs);
+}
 
 void PostEffectManager::SetupScreenQuad (unsigned int width, unsigned int height)
 {
-  // Deallocate any built-in data
-  KillScreenQuad ();
-
   fullscreenQuad.meshtype = CS_MESHTYPE_QUADS;
   
-  screenQuadVerts = static_cast<csVector3*> (cs_malloc(sizeof(csVector3)*4));
   fullscreenQuad.vertices = screenQuadVerts;
   fullscreenQuad.vertexCount = 4;
-
-  screenQuadTex = static_cast<csVector2*> (cs_malloc(sizeof(csVector2)*4));
   fullscreenQuad.texcoords = screenQuadTex;
-  
 
   // Setup the vertices & texcoords
   screenQuadVerts[0].Set (0, 0, 0);
@@ -117,16 +157,13 @@ void PostEffectManager::SetupScreenQuad (unsigned int width, unsigned int height
   screenQuadTex[3].Set (textureOffsetX, textureCoordinateY + textureOffsetY);
 }
 
-void PostEffectManager::KillScreenQuad ()
-{
-  cs_free (screenQuadVerts);
-  cs_free (screenQuadTex);
-}
-
 void PostEffectManager::AllocatePingpongTextures ()
 {
-  textures[0] = graphics3D->GetTextureManager ()->CreateTexture (currentWidth, currentHeight, 
-    csimg2D, "rgb8", CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_NPOTS | CS_TEXTURE_CLAMP | CS_TEXTURE_SCALE_UP);
+  csRef<iTextureHandle> t;
+  t = graphics3D->GetTextureManager ()->CreateTexture (currentWidth, currentHeight, 
+    csimg2D, textureFmt, 
+    CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_NPOTS | CS_TEXTURE_CLAMP | CS_TEXTURE_SCALE_UP);
+  textures.Put (0, t);
 
   textureOffsetX = textureOffsetY = 0;
 
@@ -157,7 +194,83 @@ void PostEffectManager::AllocatePingpongTextures ()
     textureCoordinateX = 1;
     textureCoordinateY = 1;
   }  
+  svPixelSize->SetValue (csVector2 (textureCoordinateX/currentWidth, 
+    textureCoordinateY/currentHeight));
 
-  textures[1] = graphics3D->GetTextureManager ()->CreateTexture (currentWidth, currentHeight, 
-    csimg2D, "rgb8", resultFlags);
+  for (size_t i = 1; i < textures.GetSize(); i++)
+  {
+    t = graphics3D->GetTextureManager ()->CreateTexture (currentWidth, currentHeight, 
+      csimg2D, textureFmt, resultFlags);
+    textures.Put (i, t);
+  }
+}
+
+void PostEffectManager::UpdateTextureDistribution()
+{
+  csArray<csBitArray> usedTextureBits;
+  usedTextureBits.SetSize (postLayers.GetSize ());
+  
+  for (size_t l = 0; l < postLayers.GetSize ()-1; l++)
+  {
+    // Look for an unused texture
+    size_t freeTexture = usedTextureBits[l].GetFirstBitUnset ();
+    if (freeTexture == csArrayItemNotFound)
+    {
+      // Add a new texture
+      freeTexture = usedTextureBits[l].GetSize();
+      for (size_t b = l; b < postLayers.GetSize (); b++)
+        usedTextureBits[b].SetSize (freeTexture+1);
+    }
+    
+    postLayers[l]->outTextureNum = freeTexture;
+    
+    size_t lastLayer = l;
+    // Look for last layer which has current layer as an input
+    for (size_t l2 = postLayers.GetSize (); l2-- > l; )
+    {
+      if (postLayers[l2]->IsInput (postLayers[l]))
+      {
+        lastLayer = l2;
+        break;
+      }
+    }
+    // Mark texture as used
+    for (size_t l2 = l; l2 <= lastLayer; l2++)
+    {
+      usedTextureBits[l2].SetBit (freeTexture);
+    }
+  }
+  textures.SetSize (usedTextureBits[postLayers.GetSize()-1].GetSize());
+}
+
+void PostEffectManager::UpdateSVContexts ()
+{
+  for (size_t l = 0; l < postLayers.GetSize (); l++)
+  {
+    postLayers[l]->svContext.AttachNew (new csShaderVariableContext);
+    LayerInputMap::GlobalIterator iter (postLayers[l]->inputs.GetIterator());
+    while (iter.HasNext())
+    {
+      csString texName;
+      Layer* input = iter.Next (texName);
+      
+      csRef<csShaderVariable> sv;
+      sv.AttachNew (new csShaderVariable (svStrings->Request (texName)));
+      sv->SetValue (textures[input->outTextureNum]);
+      postLayers[l]->svContext->AddVariable (sv);
+      postLayers[l]->svContext->AddVariable (svPixelSize);
+    }
+  }
+}
+
+//---------------------------------------------------------------------------
+
+bool PostEffectManager::Layer::IsInput (const Layer* layer) const
+{
+  LayerInputMap::ConstGlobalIterator iter (inputs.GetIterator());
+  while (iter.HasNext())
+  {
+    if (iter.Next() == layer) return true;
+  }
+  return false;
 }

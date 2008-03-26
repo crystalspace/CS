@@ -21,6 +21,7 @@
 
 #include "csutil/ref.h"
 #include "csutil/array.h"
+#include "csutil/parray.h"
 #include "ivideo/shader/shader.h"
 
 struct iShader;
@@ -32,8 +33,6 @@ namespace CS
 {
 namespace RenderManager
 {
-
-
   /**
    * Helper for "simple" post effects usage in render manager.
    * Provides a simple way to render the screen to a texture and then use
@@ -43,10 +42,26 @@ namespace RenderManager
   class CS_CRYSTALSPACE_EXPORT PostEffectManager
   {
   public:
+    class Layer;
+    typedef csHash<Layer*, csString> LayerInputMap;
+    class Layer
+    {
+    private:
+      friend class PostEffectManager;
+      csRef<iShader> effectShader;
+      int outTextureNum;
+      LayerInputMap inputs;
+      csRef<iShaderVariableContext> svContext;
+      
+      bool IsInput (const Layer* layer) const;
+    };
+  
     PostEffectManager ();
     ~PostEffectManager ();
 
     void Initialize (iObjectRegistry* objectReg);
+    
+    void SetIntermediateTargetFormat (const char* textureFmt);
 
     void SetupView (iView* view);
 
@@ -54,38 +69,36 @@ namespace RenderManager
 
     void DrawPostEffects ();
 
-    void AddLayer (iShader* shader)
-    {
-      PostEffectLayer layer;
-      layer.effectShader = shader;
-
-      postLayers.Push (layer);
-    }
-
+    Layer* AddLayer (iShader* shader);
+    Layer* AddLayer (iShader* shader, const LayerInputMap& inputs);
+    Layer* AddLayer (iShader* shader, size_t numMaps, ...);
+    
+    Layer* GetScreenLayer() { return postLayers[0]; }
   private:
     void SetupScreenQuad (unsigned int width, unsigned int height);
-    void KillScreenQuad ();
 
     void AllocatePingpongTextures ();
     
     csRef<iGraphics3D> graphics3D;
+    csRef<iShaderVarStringSet> svStrings;
 
     csSimpleRenderMesh fullscreenQuad;
-    csVector3* screenQuadVerts;
-    csVector2* screenQuadTex;
+    csVector3 screenQuadVerts[4];
+    csVector2 screenQuadTex[4];
 
     unsigned int currentWidth, currentHeight;
     float textureCoordinateX, textureCoordinateY, textureOffsetX, textureOffsetY;
+    csRef<csShaderVariable> svPixelSize;
 
-    csRef<iTextureHandle> textures[2];
-    unsigned int activeTexture;
-
-    struct PostEffectLayer
-    {
-      csRef<iShader> effectShader;
-    };
-
-    csArray<PostEffectLayer> postLayers;
+    const char* textureFmt;
+    Layer* lastLayer;
+    csRefArray<iTextureHandle> textures;
+    csPDelArray<Layer> postLayers;
+    
+    bool textureDistributionDirty;
+    void UpdateTextureDistribution();
+    
+    void UpdateSVContexts ();
   };
 
 }
