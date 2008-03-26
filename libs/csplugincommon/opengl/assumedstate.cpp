@@ -25,7 +25,8 @@ namespace CS
   {
     namespace GL
     {
-      void SetAssumedState (csGLStateCache* statecache)
+      void SetAssumedState (csGLStateCache* statecache,
+			    csGLExtensionManager* ext)
       {
 	glClearDepth (0.0);
 	statecache->SetPixelUnpackAlignment (1);
@@ -35,6 +36,20 @@ namespace CS
 #else
 	statecache->SetPixelUnpackSwapBytes (false);
 #endif
+	
+	statecache->Enable_GL_VERTEX_PROGRAM_POINT_SIZE_ARB ();
+	for (int i = statecache->GetNumTexCoords(); i-- > 0; )
+	{
+	  statecache->SetCurrentTU (i);
+	  statecache->ActivateTU (csGLStateCache::activateTexCoord);
+	  glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE);
+	}
+	if (ext->CS_GL_ARB_point_parameters)
+	{
+	  ext->glPointParameterfARB (GL_POINT_SIZE_MAX_ARB, 9999.0f);
+	  ext->glPointParameterfARB (GL_POINT_SIZE_MIN_ARB, 0.0f);
+	  ext->glPointParameterfARB (GL_POINT_FADE_THRESHOLD_SIZE_ARB, 1.0f);
+	}
       }
     } // namespace GL
   } // namespace PluginCommon

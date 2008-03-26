@@ -18,10 +18,28 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/memdebug.h"
 
 CS_CRYSTALSPACE_EXPORT 
 CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil)
 
 #ifdef CS_BUILD_SHARED_LIBS
 CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);
+CS_DEFINE_MEMTRACKER_MODULE
+
+#if defined(CS_MEMORY_TRACKER)
+struct MemTrackerModuleIniter
+{
+  MemTrackerModuleIniter (const char* modName)
+  {
+    CS::Debug::MemTracker::RegisterModule (modName);
+  }
+};
+
+namespace
+{
+  static MemTrackerModuleIniter mtmi ("libcrystalspace");
+}
+#endif
+
 #endif

@@ -227,7 +227,7 @@ bool csGraphics2DGLCommon::Open ()
 
   GLFontCache->Setup();
 
-  CS::PluginCommon::GL::SetAssumedState (statecache);
+  CS::PluginCommon::GL::SetAssumedState (statecache, &ext);
   glClearColor (0., 0., 0., 0.);
 
   statecache->SetMatrixMode (GL_MODELVIEW);
