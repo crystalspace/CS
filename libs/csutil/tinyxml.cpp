@@ -846,6 +846,9 @@ const char* TiDocument::Print( PrintState& print, int depth ) const
 
 const char* TiDocumentAttribute::Print( PrintState& print, int /*depth*/ ) const
 {
+  if (!value) // Don't print attributes without value
+    return 0;
+
   TiXmlString n, v;
 
   TiXmlBase::PutString( Name(), &n );

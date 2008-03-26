@@ -6,6 +6,8 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Mar-2008
+	- Marten fixed tinyxml writer not to crash on empty attributes.
 25-Mar-2008
 	- Andrew Dai fixed the problem of the enter key being mapped to the
 	  incorrect raw keycode on MAC OS X.
