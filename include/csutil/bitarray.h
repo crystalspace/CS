@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2000 by Andrew Kirmse
+                  2008 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -31,10 +32,13 @@
  */
 
 #include "csextern.h"
-#include "allocator.h"
-#include "bitops.h"
-#include "comparator.h"
-#include "hash.h"
+#include "csutil/allocator.h"
+#include "csutil/bitops.h"
+#include "csutil/comparator.h"
+#include "csutil/hash.h"
+
+#include "csutil/metautils.h"
+#include "csutil/compileassert.h"
 
 #if defined(CS_COMPILER_MSVC) && (CS_PROCESSOR_SIZE == 64)
 /* long is 32 bit even on 64-bit MSVC, so use uint64 to utilize a storage in
@@ -137,9 +141,13 @@ protected:
 
   enum
   {
-    cellSize    = csBitArrayDefaultInlineBits,
-    cellCount   = (InlinedBits + (cellSize-1)) / cellSize
+    cellSize    = csBitArrayDefaultInlineBits,            // This _have_ to be PO2
+    cellCount   = (InlinedBits + (cellSize-1)) / cellSize,
+    
+    cellMask    = (cellSize - 1),
+    cellShift   = CS::Meta::Log2<cellSize>::value
   };
+  CS_COMPILE_ASSERT(CS::Meta::IsLog2<cellSize>::value);
 
   struct Storage : public Allocator
   {
@@ -162,13 +170,13 @@ protected:
   /// Get the GetStore()[] index for a given bit number.
   static size_t GetIndex (size_t bit_num)
   {
-    return bit_num / cellSize;
+    return bit_num >> cellShift;
   }
 
   /// Get the offset within GetStore()[GetIndex()] for a given bit number.
   static size_t GetOffset (size_t bit_num)
   {
-    return bit_num % cellSize;
+    return bit_num & cellMask;
   }
 
   /// Return whether the inline or heap store is used
@@ -577,6 +585,141 @@ public:
 
     return num;
   }
+  
+  /**
+   * Find first bit in array which is set.
+   * \return First bit set or csArrayItemNotFound if all bits are set.
+   */
+  size_t GetFirstBitSet() const
+  {
+    const size_t ui32perStorage = 
+      sizeof (csBitArrayStorageType) / sizeof (uint32);
+
+    union
+    {
+      csBitArrayStorageType s;
+      uint32 ui32[ui32perStorage];
+    } v;
+
+    const csBitArrayStorageType* p = GetStore();
+    size_t ofs = 0, result;
+    for (size_t i = 0; i < mLength; i++)
+    {
+      v.s = p[i];
+      for (size_t j = 0; j < ui32perStorage; j++)
+      {
+        if (CS::Utility::BitOps::ScanBitForward (v.ui32[j], result))
+        {
+          size_t r = ofs + result;
+          if (r >= mNumBits) return csArrayItemNotFound;
+          return r;
+        }
+        ofs += 32;
+      }
+    }
+    return csArrayItemNotFound;
+  }
+  /**
+   * Find first bit in array which is not set.
+   * \return First bit set or csArrayItemNotFound if all bits are not set.
+   */
+  size_t GetFirstBitUnset() const
+  {
+    const size_t ui32perStorage = 
+      sizeof (csBitArrayStorageType) / sizeof (uint32);
+
+    union
+    {
+      csBitArrayStorageType s;
+      uint32 ui32[ui32perStorage];
+    } v;
+
+    const csBitArrayStorageType* p = GetStore();
+    size_t ofs = 0, result;
+    for (size_t i = 0; i < mLength; i++)
+    {
+      v.s = p[i];
+      for (size_t j = 0; j < ui32perStorage; j++)
+      {
+        if (CS::Utility::BitOps::ScanBitForward (~v.ui32[j], result))
+        {
+          size_t r = ofs + result;
+          if (r >= mNumBits) return csArrayItemNotFound;
+          return r;
+        }
+        ofs += 32;
+      }
+    }
+    return csArrayItemNotFound;
+  }
+  /**
+   * Find last bit in array which is set.
+   * \return First bit set or csArrayItemNotFound if all bits are set.
+   */
+  size_t GetLastBitSet() const
+  {
+    const size_t ui32perStorage = 
+      sizeof (csBitArrayStorageType) / sizeof (uint32);
+
+    union
+    {
+      csBitArrayStorageType s;
+      uint32 ui32[ui32perStorage];
+    } v;
+
+    const csBitArrayStorageType* p = GetStore();
+    size_t ofs, result;
+    ofs = 32 * (mLength*ui32perStorage-1);
+    for (size_t i = mLength; i-- > 0;)
+    {
+      v.s = p[i];
+      for (size_t j = ui32perStorage; j-- > 0; )
+      {
+        if (CS::Utility::BitOps::ScanBitForward (v.ui32[j], result))
+        {
+          size_t r = ofs + result;
+          if (r >= mNumBits) return csArrayItemNotFound;
+          return r;
+        }
+        ofs -= 32;
+      }
+    }
+    return csArrayItemNotFound;
+  }
+  /**
+   * Find last bit in array which is not set.
+   * \return First bit set or csArrayItemNotFound if all bits are not set.
+   */
+  size_t GetLastBitUnset() const
+  {
+    const size_t ui32perStorage = 
+      sizeof (csBitArrayStorageType) / sizeof (uint32);
+
+    union
+    {
+      csBitArrayStorageType s;
+      uint32 ui32[ui32perStorage];
+    } v;
+
+    const csBitArrayStorageType* p = GetStore();
+    size_t ofs, result;
+    ofs = 32 * (mLength*ui32perStorage-1);
+    for (size_t i = mLength; i-- > 0;)
+    {
+      v.s = p[i];
+      for (size_t j = ui32perStorage; j-- > 0; )
+      {
+        if (CS::Utility::BitOps::ScanBitForward (~v.ui32[j], result))
+        {
+          size_t r = ofs + result;
+          if (r >= mNumBits) return csArrayItemNotFound;
+          return r;
+        }
+        ofs -= 32;
+      }
+    }
+    return csArrayItemNotFound;
+  }
 
   /**
    * Delete from the array \a count bits starting at \a pos, making the array
@@ -614,6 +757,92 @@ public:
   /// Return the full backing-store.
   csBitArrayStorageType* GetArrayBits() { return GetStore(); }
   const csBitArrayStorageType* GetArrayBits() const { return GetStore(); }
+  //@}
+
+  //@{
+  /**
+   * 
+   */
+  class SetBitIterator
+  {
+  public:
+    SetBitIterator (const SetBitIterator& other)
+      : bitArray (other.bitArray), pos (other.pos), offset (other.offset),
+      cachedStore (other.cachedStore)
+    {}
+
+    /// 
+    size_t Next ()
+    {
+      while (offset < 8*sizeof(csBitArrayStorageType))
+      {        
+        if ((cachedStore & 0x1) != 0)
+        {
+          const size_t result = (pos-1)*sizeof(csBitArrayStorageType)*8 + offset;
+
+          ++offset;
+          cachedStore >>= 1;
+          if (!cachedStore)
+            GetNextCacheItem ();
+
+          return result;
+        }        
+        else
+        {
+          ++offset;
+          cachedStore >>= 1;
+          if (!cachedStore)
+            GetNextCacheItem ();
+        }
+      }
+      CS_ASSERT_MSG ("Invalid iteration", false);
+      return 0;
+    }
+
+    ///
+    bool HasNext () const
+    {
+      return cachedStore != 0;
+    }
+
+    ///
+    void Reset ()
+    {
+      pos = 0;
+      GetNextCacheItem ();
+    }
+
+  protected:
+    SetBitIterator (const ThisType& bitArray)
+      : bitArray (bitArray), pos (0), offset (0), cachedStore (0)
+    {
+      Reset ();
+    }
+
+    friend class csBitArrayTweakable<InlinedBits, Allocator>;
+
+    void GetNextCacheItem ()
+    {
+      offset = 0;
+      while (pos < bitArray.mLength)
+      {
+        cachedStore = bitArray.GetStore ()[pos++];
+        if (cachedStore)
+          return;
+      }
+      cachedStore = 0;
+    }
+
+    const ThisType& bitArray;
+    size_t pos, offset;
+    csBitArrayStorageType cachedStore;    
+  };
+  friend class SetBitIterator;
+
+  SetBitIterator GetSetBitIterator () const
+  {
+    return SetBitIterator (*this);
+  }
   //@}
 };
 
