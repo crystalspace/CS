@@ -229,9 +229,9 @@ public:
   csMatrix3 GetTranspose () const
   {
     return csMatrix3 (
-      m11, m12, m13,
-      m21, m22, m21,
-      m31, m32, m33);
+      m11, m21, m31,
+      m12, m22, m32,
+      m13, m23, m33);
   }
 
   /// Return the inverse of this matrix.
