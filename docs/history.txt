@@ -15,6 +15,7 @@ chronological order.
 	  bit.
 	- res fixed a mess-up in csMatrix3 transposing.
 	- Marten fixed tinyxml writer not to crash on empty attributes.
+	- Marten fixed light name handling of proxylights in lighter2.
 25-Mar-2008
 	- Andrew Dai fixed the problem of the enter key being mapped to the
 	  incorrect raw keycode on MAC OS X.
