@@ -13,6 +13,7 @@ chronological order.
 	  the wrong member.
 	- res added methods to csBitArray to obtain the first/last set/unset
 	  bit.
+	- res fixed a mess-up in csMatrix3 transposing.
 25-Mar-2008
 	- Andrew Dai fixed the problem of the enter key being mapped to the
 	  incorrect raw keycode on MAC OS X.
