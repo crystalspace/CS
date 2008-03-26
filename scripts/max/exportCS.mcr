@@ -2402,8 +2402,8 @@ rollout Test1 "Export Level to CS" width:226 height:350
 					)
 	
 					if (lodlow==undefined) then (
-						-- ALL genmeshes must have this to support light changes.
-						format "        <localshadows />\n" to:outFile
+						-- localshadows no more needed for lighter2 levels.
+						-- format "      <localshadows />\n" to:outFile
 						format "      </params>\n" to:outFile
 					)
 		

@@ -6,6 +6,13 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Mar-2008
+	- Marten commited a number of re-inlinings of basic matrix & vector 
+	  methods.
+	- res fixed the OpenGL state cache storing the active buffer binding in
+	  the wrong member.
+	- res added methods to csBitArray to obtain the first/last set/unset
+	  bit.
 25-Mar-2008
 	- Andrew Dai fixed the problem of the enter key being mapped to the
 	  incorrect raw keycode on MAC OS X.
@@ -16,6 +23,8 @@ chronological order.
 	- res made the vertex array caching more agressive: now, the VBO is
 	  stored as well in the statecache, and if the same area of the same
 	  buffer is set the buffer binding and vertex array setting are avoided.
+	- Mike Gist committed fixes to the 3ds max level exporters and a
+	  3ds max genmesh sprite exporter; both from Luca Pancallo.
 24-Mar-2008
 	- Mike Gist made several improvements to the 3ds max level exporter:
 	  - Did a bit of cleaning; removed thing support from exportCS.mcr,

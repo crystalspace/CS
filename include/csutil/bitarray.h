@@ -585,6 +585,141 @@ public:
 
     return num;
   }
+  
+  /**
+   * Find first bit in array which is set.
+   * \return First bit set or csArrayItemNotFound if all bits are set.
+   */
+  size_t GetFirstBitSet() const
+  {
+    const size_t ui32perStorage = 
+      sizeof (csBitArrayStorageType) / sizeof (uint32);
+
+    union
+    {
+      csBitArrayStorageType s;
+      uint32 ui32[ui32perStorage];
+    } v;
+
+    const csBitArrayStorageType* p = GetStore();
+    size_t ofs = 0, result;
+    for (size_t i = 0; i < mLength; i++)
+    {
+      v.s = p[i];
+      for (size_t j = 0; j < ui32perStorage; j++)
+      {
+        if (CS::Utility::BitOps::ScanBitForward (v.ui32[j], result))
+        {
+          size_t r = ofs + result;
+          if (r >= mNumBits) return csArrayItemNotFound;
+          return r;
+        }
+        ofs += 32;
+      }
+    }
+    return csArrayItemNotFound;
+  }
+  /**
+   * Find first bit in array which is not set.
+   * \return First bit set or csArrayItemNotFound if all bits are not set.
+   */
+  size_t GetFirstBitUnset() const
+  {
+    const size_t ui32perStorage = 
+      sizeof (csBitArrayStorageType) / sizeof (uint32);
+
+    union
+    {
+      csBitArrayStorageType s;
+      uint32 ui32[ui32perStorage];
+    } v;
+
+    const csBitArrayStorageType* p = GetStore();
+    size_t ofs = 0, result;
+    for (size_t i = 0; i < mLength; i++)
+    {
+      v.s = p[i];
+      for (size_t j = 0; j < ui32perStorage; j++)
+      {
+        if (CS::Utility::BitOps::ScanBitForward (~v.ui32[j], result))
+        {
+          size_t r = ofs + result;
+          if (r >= mNumBits) return csArrayItemNotFound;
+          return r;
+        }
+        ofs += 32;
+      }
+    }
+    return csArrayItemNotFound;
+  }
+  /**
+   * Find last bit in array which is set.
+   * \return First bit set or csArrayItemNotFound if all bits are set.
+   */
+  size_t GetLastBitSet() const
+  {
+    const size_t ui32perStorage = 
+      sizeof (csBitArrayStorageType) / sizeof (uint32);
+
+    union
+    {
+      csBitArrayStorageType s;
+      uint32 ui32[ui32perStorage];
+    } v;
+
+    const csBitArrayStorageType* p = GetStore();
+    size_t ofs, result;
+    ofs = 32 * (mLength*ui32perStorage-1);
+    for (size_t i = mLength; i-- > 0;)
+    {
+      v.s = p[i];
+      for (size_t j = ui32perStorage; j-- > 0; )
+      {
+        if (CS::Utility::BitOps::ScanBitForward (v.ui32[j], result))
+        {
+          size_t r = ofs + result;
+          if (r >= mNumBits) return csArrayItemNotFound;
+          return r;
+        }
+        ofs -= 32;
+      }
+    }
+    return csArrayItemNotFound;
+  }
+  /**
+   * Find last bit in array which is not set.
+   * \return First bit set or csArrayItemNotFound if all bits are not set.
+   */
+  size_t GetLastBitUnset() const
+  {
+    const size_t ui32perStorage = 
+      sizeof (csBitArrayStorageType) / sizeof (uint32);
+
+    union
+    {
+      csBitArrayStorageType s;
+      uint32 ui32[ui32perStorage];
+    } v;
+
+    const csBitArrayStorageType* p = GetStore();
+    size_t ofs, result;
+    ofs = 32 * (mLength*ui32perStorage-1);
+    for (size_t i = mLength; i-- > 0;)
+    {
+      v.s = p[i];
+      for (size_t j = ui32perStorage; j-- > 0; )
+      {
+        if (CS::Utility::BitOps::ScanBitForward (~v.ui32[j], result))
+        {
+          size_t r = ofs + result;
+          if (r >= mNumBits) return csArrayItemNotFound;
+          return r;
+        }
+        ofs -= 32;
+      }
+    }
+    return csArrayItemNotFound;
+  }
 
   /**
    * Delete from the array \a count bits starting at \a pos, making the array
