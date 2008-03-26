@@ -14,6 +14,7 @@ chronological order.
 	- res added methods to csBitArray to obtain the first/last set/unset
 	  bit.
 	- res fixed a mess-up in csMatrix3 transposing.
+	- Marten fixed tinyxml writer not to crash on empty attributes.
 25-Mar-2008
 	- Andrew Dai fixed the problem of the enter key being mapped to the
 	  incorrect raw keycode on MAC OS X.
