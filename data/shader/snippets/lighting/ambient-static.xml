@@ -51,7 +51,7 @@
     
     <input name="litColor" type="rgb" default="complex" private="yes">
       <block location="pass">
-	<buffer source="lit color" destination="vertexIn.litColor" />
+	<buffer source="static color" destination="vertexIn.litColor" />
       </block>
       
       <block location="cg:vertexIn">
@@ -68,7 +68,7 @@
     </input>
     <input name="color_dir1" type="rgb" default="complex" private="yes">
       <block location="pass">
-	<buffer source="lit color dir 1" destination="vertexIn.color_dir1" />
+	<buffer source="static color dir 1" destination="vertexIn.color_dir1" />
       </block>
       
       <block location="cg:vertexIn">
@@ -85,7 +85,7 @@
     </input>
     <input name="color_dir2" type="rgb" default="complex" private="yes">
       <block location="pass">
-	<buffer source="lit color dir 2" destination="vertexIn.color_dir2" />
+	<buffer source="static color dir 2" destination="vertexIn.color_dir2" />
       </block>
       
       <block location="cg:vertexIn">
@@ -102,7 +102,7 @@
     </input>
     <input name="color_dir3" type="rgb" default="complex" private="yes">
       <block location="pass">
-	<buffer source="lit color dir 3" destination="vertexIn.color_dir3" />
+	<buffer source="static color dir 3" destination="vertexIn.color_dir3" />
       </block>
       
       <block location="cg:vertexIn">
@@ -199,7 +199,7 @@
       <?if vars."pass do_ambient" ?>
       float3 ambient_dynamic = dynamicAmbient;
       float3 ambient_static;
-      <?if vars."tex lightmap dir 1".texture || vars."lit color dir 1".buffer ?>
+      <?if vars."tex lightmap dir 1".texture || vars."static color dir 1".buffer ?>
       <![CDATA[
       // Utilize directional LM/colors only if normal is changed per-fragment
       if (normal_attr_perfragment)
@@ -243,7 +243,7 @@
       {
       <?if vars."tex lightmap".texture ?>
         ambient_static = 2 * tex2D (lightmap, texCoordLM).rgb;
-      <?elsif vars."lit color".buffer ?>
+      <?elsif vars."static color".buffer ?>
         ambient_static = 2 * litColor;
       <?else?>
         ambient_dynamic = float3 (0);
@@ -320,7 +320,7 @@
     
     <input name="litColor" type="rgb" default="complex" private="yes">
       <block location="pass">
-	<buffer source="lit color" destination="vertexIn.litColor" />
+	<buffer source="static color" destination="vertexIn.litColor" />
       </block>
       
       <block location="cg:vertexIn">
@@ -355,7 +355,7 @@
         float3 ambient_static;
         <?if vars."tex lightmap".texture ?>
           ambient_static = 2 * tex2D (lightmap, texCoordLM).rgb;
-        <?elsif vars."lit color".buffer?>
+        <?elsif vars."static color".buffer?>
           ambient_static = 2 * litColor;
         <?else?>
           ambient_dynamic = float3 (0);

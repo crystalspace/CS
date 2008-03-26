@@ -13,6 +13,10 @@ chronological order.
 	  the wrong member.
 	- res added methods to csBitArray to obtain the first/last set/unset
 	  bit.
+	- res changed the name of the buffer for static per-vertex lighting
+	  information from "lit color" to "static color": the former overlaps
+	  with dynamic software lighting computed in the mesh and it's not
+	  always desireable to use that.
 25-Mar-2008
 	- Andrew Dai fixed the problem of the enter key being mapped to the
 	  incorrect raw keycode on MAC OS X.
@@ -61,6 +65,8 @@ chronological order.
 	    - The "staticlit" flag is set on meshes.
 	- res started to add settings to RM render layers controlling how
 	  to deal with static lights.
+	- res changed the light setup and light_default shader to allow mixing
+	  of statically and dynamically lit meshes.
 22-Mar-2008
 	- res fixed a leak in LightingVariablesHelper.
 	- res changed the shader weaver to not use outputs that are a result
