@@ -21,6 +21,7 @@
 #define __CS_VECTOR2_H__
 
 #include "csextern.h"
+#include "csqsqrt.h"
 
 /**\file
  * 2D vector.
@@ -81,10 +82,12 @@ public:
   inline void Get (float* v) { v[0] = x; v[1] = y; }
 
   /// Return the norm (magnitude) of a 2D vector.
-  static float Norm (csVector2 const& v);
+  inline static float Norm (csVector2 const& v)
+  { return csQsqrt (v * v); }
 
   /// Return the norm (magnitude) of this vector.
-  float Norm () const;
+  inline float Norm () const
+  { return csQsqrt (x * x + y * y); }
 
   /// Return the squared norm (magnitude) of this vector.
   inline float SquaredNorm () const
@@ -103,18 +106,19 @@ public:
   }
 
   /// Add another vector to this vector.
-  csVector2& operator+= (const csVector2& v)
+  inline csVector2& operator+= (const csVector2& v)
   { x += v.x;  y += v.y;  return *this; }
 
   /// Subtract another vector from this vector.
-  csVector2& operator-= (const csVector2& v)
+  inline csVector2& operator-= (const csVector2& v)
   { x -= v.x;  y -= v.y;  return *this; }
 
   /// Multiply this vector by a scalar.
-  csVector2& operator*= (float f) { x *= f;  y *= f;  return *this; }
+  inline csVector2& operator*= (float f) 
+  { x *= f;  y *= f;  return *this; }
 
   /// Divide this vector by a scalar.
-  csVector2& operator/= (float f)
+  inline csVector2& operator/= (float f)
   {
     f = 1.0f / f;
     x *= f;
@@ -123,35 +127,47 @@ public:
   }
 
   /// Unary + operator.
-  inline csVector2 operator+ () const { return *this; }
+  inline csVector2 operator+ () const 
+  { return *this; }
 
   /// Unary - operator.
-  inline csVector2 operator- () const { return csVector2(-x,-y); }
+  inline csVector2 operator- () const 
+  { return csVector2 (-x,-y); }
 
   /// Add two vectors.
-  friend CS_CRYSTALSPACE_EXPORT csVector2 operator+ (const csVector2& v1, 
-    const csVector2& v2);
+  inline friend csVector2 operator+ (const csVector2& v1, const csVector2& v2)
+  { return csVector2 (v1.x + v2.x, v1.y + v2.y); }
+
   /// Subtract two vectors.
-  friend CS_CRYSTALSPACE_EXPORT csVector2 operator- (const csVector2& v1, 
-    const csVector2& v2);
+  inline friend csVector2 operator- (const csVector2& v1, const csVector2& v2)
+  { return csVector2 (v1.x - v2.x, v1.y - v2.y); }
+
   /// Take the dot product of two vectors.
-  friend CS_CRYSTALSPACE_EXPORT float operator* (const csVector2& v1, 
-    const csVector2& v2);
+  inline friend float operator* (const csVector2& v1, const csVector2& v2)
+  { return v1.x * v2.x + v1.y * v2.y; }
+
   /// Multiply a vector and a scalar.
-  friend CS_CRYSTALSPACE_EXPORT csVector2 operator* (const csVector2& v,
-  	float f);
+  inline friend csVector2 operator* (const csVector2& v, float f)
+  { return csVector2 (v.x * f, v.y * f); }
+
   /// Multiply a vector and a scalar.
-  friend CS_CRYSTALSPACE_EXPORT csVector2 operator* (float f,
-  	const csVector2& v);
+  inline friend csVector2 operator* (float f, const csVector2& v)
+  { return csVector2 (v.x * f, v.y * f); }
+
   /// Divide a vector by a scalar.
-  friend CS_CRYSTALSPACE_EXPORT csVector2 operator/ (const csVector2& v,
-  	float f);
+  inline friend csVector2 operator/ (const csVector2& v, float f)
+  {
+    f = 1.0f / f;
+    return csVector2 (v.x * f, v.y * f);
+  }
+
   /// Check if two vectors are equal.
-  friend CS_CRYSTALSPACE_EXPORT bool operator== (const csVector2& v1, 
-    const csVector2& v2);
+  inline friend bool operator== (const csVector2& v1, const csVector2& v2)
+  { return (v1.x == v2.x) && (v1.y == v2.y); }
+
   /// Check if two vectors are not equal.
-  friend CS_CRYSTALSPACE_EXPORT bool operator!= (const csVector2& v1, 
-    const csVector2& v2);
+  inline friend bool operator!= (const csVector2& v1, const csVector2& v2)
+  { return (v1.x != v2.x) || (v1.y != v2.y); }
 
   /// Test if each component of a vector is less than a small epsilon value.
   inline friend bool operator< (const csVector2& v, float f)
@@ -161,11 +177,13 @@ public:
   inline friend bool operator> (float f, const csVector2& v)
   { return ABS(v.x)<f && ABS(v.y)<f; }
 
+  /// Returns n-th component of the vector.
+  inline float operator[] (int n) const 
+  { return !n?x:y; }
 
   /// Returns n-th component of the vector.
-  inline float operator[] (int n) const { return !n?x:y; }
-  /// Returns n-th component of the vector.
-  inline float & operator[] (int n) { return !n?x:y; }
+  inline float & operator[] (int n) 
+  { return !n?x:y; }
 };
 
 /** @} */

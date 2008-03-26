@@ -19,7 +19,6 @@
 
 #include "cssysdef.h"
 #include <math.h>
-#include "csqsqrt.h"
 #include "csgeom/vector2.h"
 #include "csutil/csstring.h"
 
@@ -30,62 +29,11 @@ csString csVector2::Description() const
   return s;
 }
 
-float csVector2::Norm (const csVector2 &v)
-{
-  return csQsqrt (v * v);
-}
-
-float csVector2::Norm () const
-{
-  return csQsqrt (x * x + y * y);
-}
-
 void csVector2::Rotate (float angle)
 {
-  float s = (float)sin (angle);
-  float c = (float)cos (angle);
+  float s = sinf (angle);
+  float c = cosf (angle);
   float nx = x * c + y * s;
   y = -x * s + y * c;
   x = nx;
-}
-
-csVector2 operator+ (const csVector2 &v1, const csVector2 &v2)
-{
-  return csVector2 (v1.x + v2.x, v1.y + v2.y);
-}
-
-csVector2 operator- (const csVector2 &v1, const csVector2 &v2)
-{
-  return csVector2 (v1.x - v2.x, v1.y - v2.y);
-}
-
-float operator * (const csVector2 &v1, const csVector2 &v2)
-{
-  return v1.x * v2.x + v1.y * v2.y;
-}
-
-csVector2 operator * (const csVector2 &v, float f)
-{
-  return csVector2 (v.x * f, v.y * f);
-}
-
-csVector2 operator * (float f, const csVector2 &v)
-{
-  return csVector2 (v.x * f, v.y * f);
-}
-
-csVector2 operator/ (const csVector2 &v, float f)
-{
-  f = 1.0f / f;
-  return csVector2 (v.x * f, v.y * f);
-}
-
-bool operator== (const csVector2 &v1, const csVector2 &v2)
-{
-  return (v1.x == v2.x) && (v1.y == v2.y);
-}
-
-bool operator!= (const csVector2 &v1, const csVector2 &v2)
-{
-  return (v1.x != v2.x) || (v1.y != v2.y);
 }
