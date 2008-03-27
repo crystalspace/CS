@@ -23,7 +23,7 @@
       <technique priority="100">
 	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
 	
-	<input file="/shader/snippets/texCoord.inp"	/>
+	<input file="/shader/snippets/texCoord.inp"/>
 	
 	<input name="texSpecular" type="tex2d" default="complex">
 	  <block location="pass">

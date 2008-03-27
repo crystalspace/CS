@@ -52,20 +52,20 @@
     
     <block location="cg:fragmentMain">
     <?if vars."tex normal compressed".texture ?>
-      normal = float3 (tex2D (texNormalCompressed, texCoord).wy*2-1, 0);
+      normal = half3 (h4tex2D (texNormalCompressed, texCoord).wy*2-1, 0);
       normal.z = sqrt (1 - dot (normal.xy, normal.xy));
       normal_attr_perfragment = true;
     <?elsif vars."tex normal".texture ?>
-      normal = normalize (tex2D (texNormal, texCoord).xyz*2-1);
+      normal = normalize (h4tex2D (texNormal, texCoord).xyz*2-1);
       normal_attr_perfragment = true;
     <?else?>
-      normal = float3 (0, 0, 1);
+      normal = half3 (0, 0, 1);
       normal_attr_perfragment = false;
     <?endif?>
     </block>
     
     <block location="cg:vertexMain">
-      normal = float3 (0, 0, 1);
+      normal = half3 (0, 0, 1);
     <?if vars."tex normal".texture || vars."tex normal compressed".texture?>
       normal_attr_perfragment = true;
     <?else?>

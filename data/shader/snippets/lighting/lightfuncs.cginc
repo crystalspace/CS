@@ -22,31 +22,30 @@
 
 #define MAX_LIGHTS 8
 
-float Attenuation_Linear (float d, float invLightRadius)
+half Attenuation_Linear (float d, float invLightRadius)
 {
-  return max (1 - d * invLightRadius, 0);
+  return saturate (1 - d * invLightRadius);
 }
 
-float Attenuation_Inverse (float d)
+half Attenuation_Inverse (float d)
 {
   return 1/d;
 }
 
-float Attenuation_Realistic (float d)
+half Attenuation_Realistic (float d)
 {
   return 1/(d*d);
 }
 
-float Attenuation_CLQ (float d, float3 coeff)
+half Attenuation_CLQ (float d, float3 coeff)
 {
   return 1/(coeff.x + d*coeff.y + d*d*coeff.z);
 }
 
-float Light_Spot (float3 surfNorm, float3 surfToLight, 
-                  float3 lightDir, float falloffInner, float falloffOuter)
+half Light_Spot (half3 surfNorm, half3 surfToLight, 
+                 half3 lightDir, half falloffInner, half falloffOuter)
 {
-  float a = smoothstep (falloffOuter, falloffInner, -dot (surfToLight, lightDir));
-  return max (a, 0);
+  return smoothstep (falloffOuter, falloffInner, -dot (surfToLight, lightDir));
 }
 
 
@@ -76,16 +75,16 @@ LightProperties lightProps;
 interface LightSpace
 {
   float4 GetPosition();
-  float3 GetDirection();
-  float3 GetSurfaceToLight();
+  half3 GetDirection();
+  half3 GetSurfaceToLight();
   float GetLightDistance ();
 };
 
 struct LightSpaceWorld : LightSpace
 {
   float4 pos;
-  float3 dir;
-  float3 surfToLight;
+  half3 dir;
+  half3 surfToLight;
   float lightDist;
 
   void Init (int lightNum, float4 surfPositionWorld)
@@ -98,19 +97,19 @@ struct LightSpaceWorld : LightSpace
     surfToLight = normalize (surfToLight);
   }
   float4 GetPosition() { return pos; }
-  float3 GetDirection() { return dir; }
-  float3 GetSurfaceToLight() { return surfToLight; }
+  half3 GetDirection() { return dir; }
+  half3 GetSurfaceToLight() { return surfToLight; }
   float GetLightDistance () {return lightDist; }
 };
 
 interface Shadow
 {
-  float GetVisibility();
+  half GetVisibility();
 };
 
 struct ShadowNone : Shadow
 {
-  float GetVisibility() { return 1; }
+  half GetVisibility() { return 1; }
 };
 
 #if 0
@@ -140,51 +139,51 @@ struct ShadowNone : Shadow
 
 interface Light
 {
-  float3 GetIncidence();
-  float GetAttenuation();
+  half3 GetIncidence();
+  half GetAttenuation();
 };
 
 struct LightDirectional : Light
 {
-  float3 dir;
+  half3 dir;
   
   void Init (LightSpace space)
   {
     dir = -space.GetDirection();
   }
-  float3 GetIncidence() { return dir; }
-  float GetAttenuation() { return 1; }
+  half3 GetIncidence() { return dir; }
+  half GetAttenuation() { return 1; }
 };
 
 struct LightPoint : Light
 {
-  float3 dir;
+  half3 dir;
   
   void Init (LightSpace space)
   {
     dir = space.GetSurfaceToLight();
   }
-  float3 GetIncidence() { return dir; }
-  float GetAttenuation() { return 1; }
+  half3 GetIncidence() { return dir; }
+  half GetAttenuation() { return 1; }
 };
 
 struct LightSpot : Light
 {
-  float3 dir;
-  float spot;
+  half3 dir;
+  half spot;
   
-  void Init (LightSpace space, float3 normal, float falloffInner, float falloffOuter)
+  void Init (LightSpace space, half3 normal, half falloffInner, half falloffOuter)
   {
     dir = space.GetDirection();
     spot = Light_Spot (normal, space.GetSurfaceToLight(),
       dir, falloffInner, falloffOuter);
   }
-  float3 GetIncidence() { return dir; }
-  float GetAttenuation() { return spot; }
+  half3 GetIncidence() { return dir; }
+  half GetAttenuation() { return spot; }
 };
 ]]>
 
-Light GetCurrentLight (LightSpace lightSpace, int lightNum, float3 surfNormal)
+Light GetCurrentLight (LightSpace lightSpace, int lightNum, half3 surfNormal)
 {
 <?if vars."light type".int == consts.CS_LIGHT_DIRECTIONAL ?>
   LightDirectional ld;
@@ -206,21 +205,21 @@ Light GetCurrentLight (LightSpace lightSpace, int lightNum, float3 surfNormal)
 
 <![CDATA[
 void ComputeLight (LightSpace lightSpace, Light light, 
-                   float3 eyeToSurf, float3 surfNormal,
-                   float surfShininess, 
+                   half3 eyeToSurf, half3 surfNormal,
+                   half surfShininess, 
                    float3 lightDiffuse, float3 lightSpecular,
                    float4 lightAttenuationVec,
                    Shadow shadow, out float3 d, out float3 s)
 {
-  float3 L = light.GetIncidence();
-  float3 H = normalize (lightSpace.GetSurfaceToLight() - normalize (eyeToSurf));
-  float spot = light.GetAttenuation();
+  half3 L = light.GetIncidence();
+  half3 H = normalize (lightSpace.GetSurfaceToLight() - eyeToSurf);
+  half spot = light.GetAttenuation();
   
   float4 lightCoeff = lit (dot (surfNormal, L), dot (surfNormal, H),
     surfShininess);
   
   float lightDist = lightSpace.GetLightDistance();
-  float attn;
+  half attn;
   float attnRadius = lightAttenuationVec.w;
   if (attnRadius > 0)
     attn = Attenuation_Linear (lightDist, 1 / attnRadius);

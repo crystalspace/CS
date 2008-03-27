@@ -59,8 +59,10 @@
 	<block location="cg:fragmentMain">
 	  diffuseColor = float3(0);
 	  specularColor = float3(0);
+	  half3 myEyeToSurf = eyeToSurf;
+	  myEyeToSurf = normalize (eyeToSurf);
 	  <![CDATA[
-	  for (int l = 0; l < maxLights; l++)
+	  for (int l = 0; l < 8; l++)
 	  {
 	    if (l >= lightProps.count) break;
 	  ]]>
@@ -73,9 +75,9 @@
 	    float4 lightAttenuationVec = lightProps.attenuationVec[i];
 	    ShadowNone shadow;
 	    float3 d, s;
-	    ComputeLight (lightSpace, light, eyeToSurf, normal, 32,
-	    lightProps.colorDiffuse[i], lightProps.colorSpecular[i],
-	    lightAttenuationVec, shadow, d, s);
+	    ComputeLight (lightSpace, light, myEyeToSurf, normal, 32,
+	      lightProps.colorDiffuse[i], lightProps.colorSpecular[i],
+	      lightAttenuationVec, shadow, d, s);
 	    
 	    diffuseColor += d;
 	    specularColor += s;

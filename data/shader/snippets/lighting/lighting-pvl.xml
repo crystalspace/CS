@@ -57,6 +57,7 @@
 	<block location="cg:vertexMain">
 	  diffuseColor = float3(0);
 	  specularColor = float3(0);
+	  eyeToSurf = normalize (eyeToSurf);
 	  <![CDATA[
 	  for (int l = 0; l < maxLights; l++)
 	  {
@@ -72,8 +73,8 @@
 	    ShadowNone shadow;
 	    float3 d, s;
 	    ComputeLight (lightSpace, light, eyeToSurf, normal, 32,
-	    lightProps.colorDiffuse[i], lightProps.colorSpecular[i],
-	    lightAttenuationVec, shadow, d, s);
+	      lightProps.colorDiffuse[i], lightProps.colorSpecular[i],
+	      lightAttenuationVec, shadow, d, s);
 		      
 	    diffuseColor += d;
 	    specularColor += s;
