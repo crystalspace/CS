@@ -910,6 +910,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       AddTechnique (other.techniques[t]);
     for (size_t c = 0; c < other.connections.GetSize(); c++)
       AddConnection (other.connections[c]);
+    ExplicitConnectionsHashHash::ConstGlobalIterator otherExplicitIt (
+      other.explicitConnections.GetIterator());
+    while (otherExplicitIt.HasNext())
+    {
+      csConstPtrKey<Snippet::Technique> key;
+      const ExplicitConnectionsHash& val = otherExplicitIt.Next (key);
+      explicitConnections.Put (key, val);
+    }
   }
   
   void TechniqueGraph::GetDependencies (const Snippet::Technique* tech, 
@@ -920,7 +928,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     {
       const Connection& conn = connections[c];
       if ((conn.to == tech) && (!addedDeps.Contains (conn.from))
-        && (!strongOnly || !conn.weak))
+        && (!strongOnly || !conn.inputConnection))
       {
         deps.Push (conn.from);
         addedDeps.AddNoTest (conn.from);
@@ -936,11 +944,37 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     {
       const Connection& conn = connections[c];
       if ((conn.from == tech) && (!addedDeps.Contains (conn.to))
-        && (!strongOnly || !conn.weak))
+        && (!strongOnly || !conn.inputConnection))
       {
         deps.Push (conn.to);
         addedDeps.AddNoTest (conn.to);
       }
+    }
+  }
+    
+  bool TechniqueGraph::IsDependencyOf (const Snippet::Technique* tech,
+    const Snippet::Technique* dependentOf) const
+  {
+    csArray<const Snippet::Technique*> deps;
+    GetDependencies (dependentOf, deps);
+    for (size_t i = 0; i < deps.GetSize(); i++)
+    {
+      if (deps[i] == tech) return true;
+      if (IsDependencyOf (tech, deps[i])) return true;
+    }
+    return false;
+  }
+    
+  void TechniqueGraph::SwitchTechs (const Snippet::Technique* oldTech,
+                                    const Snippet::Technique* newTech,
+                                    bool inputsOnly)
+  {
+    for (size_t c = 0; c < connections.GetSize(); c++)
+    {
+      Connection& conn = connections[c];
+      if (inputsOnly && !conn.inputConnection) continue;
+      if (conn.from == oldTech) conn.from = newTech;
+      if (conn.to == oldTech) conn.to = newTech;
     }
   }
 
@@ -1101,7 +1135,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       graphInfo.graph.GetInputTechniques (inTechs);
       for (size_t t = 0; t < inTechs.GetSize(); t++)
       {
-        graphInfo.snippetToTechIn.PutUnique (snip, inTechs[t]);
+        graphInfo.snippetToTechIn.Put (snip, inTechs[t]);
       }
     }
     {
@@ -1109,7 +1143,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       graphInfo.graph.GetOutputTechniques (outTechs);
       for (size_t t = 0; t < outTechs.GetSize(); t++)
       {
-        graphInfo.snippetToTechOut.PutUnique (snip, outTechs[t]);
+        graphInfo.snippetToTechOut.Put (snip, outTechs[t]);
       }
     }
   }

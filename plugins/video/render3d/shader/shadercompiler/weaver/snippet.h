@@ -255,13 +255,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     struct Connection
     {
-      /* If a connection is weak, don't use it for input/output matching.
+      /* Don't use connection for input/output matching.
          (But it still affects ordering.) */
-      bool weak;
+      bool inputConnection;
       const Snippet::Technique* from;
       const Snippet::Technique* to;
 
-      Connection () : weak (false), from (0), to (0) {}
+      Connection () : inputConnection (false), from (0), to (0) {}
       
       inline bool operator==(const Connection& other)
       { return (from == other.from) && (to == other.to); }
@@ -283,6 +283,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     void GetDependants (const Snippet::Technique* tech, csArray<const Snippet::Technique*>& deps,
       bool strongOnly = true) const;
       
+    bool IsDependencyOf (const Snippet::Technique* tech,
+      const Snippet::Technique* dependentOf) const;
+      
+    void SwitchTechs (const Snippet::Technique* oldTech,
+      const Snippet::Technique* newTech, bool inputsOnly);
+      
     const ExplicitConnectionsHash* GetExplicitConnections (const Snippet::Technique* to) const
     { return explicitConnections.GetElementPointer (to); }
     ExplicitConnectionsHash& GetExplicitConnections (const Snippet::Technique* to)
@@ -293,7 +299,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     csArray<Connection> connections;
     TechniquePtrArray inTechniques;
     TechniquePtrArray outTechniques;
-    csHash<ExplicitConnectionsHash, csConstPtrKey<Snippet::Technique> > explicitConnections;
+    typedef csHash<ExplicitConnectionsHash, csConstPtrKey<Snippet::Technique> >
+      ExplicitConnectionsHashHash;
+    ExplicitConnectionsHashHash explicitConnections;
   };
 
   class TechniqueGraphBuilder

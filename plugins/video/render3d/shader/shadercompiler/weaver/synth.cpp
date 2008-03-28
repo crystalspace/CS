@@ -362,7 +362,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
                 break;
 	      case Snippet::Technique::Input::Complex:
 	        {
-                  if (prevInput != 0)
+		  bool prevInputIsDepOfNode = prevInput
+		    // Connections where from is node.tech, to is prevInput->node->tech
+		    && graph.IsDependencyOf (node.tech, prevInput->node->tech);
+                  if ((prevInput != 0) && !prevInputIsDepOfNode)
                   {
                     const StringStringHash& srcInputLinks = 
                       synthTree.GetNodeForTech (prevInput->node->tech).inputLinks;
@@ -380,7 +383,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
                       TechniqueGraph::Connection conn;
                       conn.from = prevInput->node->tech;
                       conn.to = node.tech;
-                      conn.weak = true;
+                      conn.inputConnection = true;
                       newConnections.Push (conn);
 		    }
                   }
@@ -392,13 +395,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
                     if (!inp.condition.IsEmpty())
                       emit.conditions.Push (inp.condition);
                     emit.tag = tag;
-                    size_t index = emitInputs.Push (emit);
-                    if (!tag.IsEmpty() && !inp.noMerge)
-                      taggedInputs.Put (tag, index);
+                    if (prevInputIsDepOfNode)
+                    {
+                      /* "Previous" node is a dependency of current node. So 
+                         adding a dependency on the previous node would cause
+                         a circular dep. So instead swap out all deps on 
+                         the previous node with the current node. */
+                      graph.SwitchTechs (prevInput->node->tech, node.tech, true);
+                    }
+                    else
+                    {
+		      size_t index = emitInputs.Push (emit);
+		      if (!tag.IsEmpty() && !inp.noMerge)
+			taggedInputs.Put (tag, index);
+		    }
                     
                     csString inpOutputName;
 	            inpOutputName.Format ("in_%s", inp.name.GetData());
                     node.inputLinks.Put (inp.name, inpOutputName);
+                    
                   }
                 }
 	        break;
@@ -808,70 +823,74 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       graph.GetExplicitConnections (receivingTech);
     if (!explicitConns) return false;
     
-    const TechniqueGraph::ExplicitConnectionSource* src =
-      explicitConns->GetElementPointer (input.name);
-    if (!src) return false;
-    
-    const WeaverCommon::TypeInfo* inputTypeInfo = 
-      WeaverCommon::QueryTypeInfo (input.type);
-  
     uint coerceCost = WeaverCommon::NoCoercion;
-    const Snippet::Technique* tech = src->from;
-    CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique::Output> > 
-      outputIt (tech->GetOutputs());
-    while (outputIt->HasNext())
+    TechniqueGraph::ExplicitConnectionsHash::ConstIterator connIt (
+      explicitConns->GetIterator (input.name));
+    while (connIt.HasNext())
     {
-      const Snippet::Technique::Output& outp = outputIt->Next();
-      if (usedOutputs.Contains (&outp)) continue;
-      if (outp.name != src->outputName) continue;
-      nodeAnnotation.Append (
-	GetAnnotation (" trying explicit %s %s of %s: ",
-	  outp.type.GetData(), outp.name.GetData(),
-	  tech->snippetName));
-      if (outp.type == input.type)
+      const TechniqueGraph::ExplicitConnectionSource* src =
+        &connIt.Next ();
+    
+      const WeaverCommon::TypeInfo* inputTypeInfo = 
+	WeaverCommon::QueryTypeInfo (input.type);
+    
+      const Snippet::Technique* tech = src->from;
+      CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique::Output> > 
+	outputIt (tech->GetOutputs());
+      while (outputIt->HasNext())
       {
-	nodeAnnotation.Append ("match\n");
-	sourceTech = tech;
-	output = &outp;
-	usedOutputs.AddNoTest (output);
-	return true;
-      }
-      uint cost = combiner->CoerceCost (outp.type, input.type);
-      nodeAnnotation.Append ((cost == WeaverCommon::NoCoercion)
-	? "no coercion\n" : GetAnnotation ("cost %u\n", cost));
-      if (cost < coerceCost)
-      {
-	sourceTech = tech;
-	output = &outp;
-	if (cost == 0)
+	const Snippet::Technique::Output& outp = outputIt->Next();
+	if (usedOutputs.Contains (&outp)) continue;
+	if (outp.name != src->outputName) continue;
+	nodeAnnotation.Append (
+	  GetAnnotation (" trying explicit %s %s of %s: ",
+	    outp.type.GetData(), outp.name.GetData(),
+	    tech->snippetName));
+	if (outp.type == input.type)
 	{
+	  nodeAnnotation.Append ("match\n");
+	  sourceTech = tech;
+	  output = &outp;
 	  usedOutputs.AddNoTest (output);
 	  return true;
 	}
-	coerceCost = cost;
-      }
-      // See if maybe we can just drop a property.
-      const WeaverCommon::TypeInfo* outputTypeInfo = 
-	WeaverCommon::QueryTypeInfo (outp.type);
-      if (inputTypeInfo && outputTypeInfo
-	&& (outputTypeInfo->baseType == inputTypeInfo->baseType)
-	&& (outputTypeInfo->samplerIsCube == inputTypeInfo->samplerIsCube)
-	&& (outputTypeInfo->dimensions == inputTypeInfo->dimensions)
-	&& ((outputTypeInfo->semantics == inputTypeInfo->semantics)
-	  || (inputTypeInfo->semantics == WeaverCommon::TypeInfo::NoSemantics))
-	&& ((outputTypeInfo->space == inputTypeInfo->space)
-	  || (inputTypeInfo->space == WeaverCommon::TypeInfo::NoSpace))
-	&& ((outputTypeInfo->unit == inputTypeInfo->unit)
-	  || (!inputTypeInfo->unit)))
-      {
-	bool b = compiler->annotateCombined 
-	  && (rand() <= int (INT_MAX * 0.005));
-	nodeAnnotation.Append (
-	  GetAnnotation ("drop a prop%s\n", b ? " like it's hot" : ""));
-	sourceTech = tech;
-	output = &outp;
-	usedOutputs.AddNoTest (output);
-	return true;
+	uint cost = combiner->CoerceCost (outp.type, input.type);
+	nodeAnnotation.Append ((cost == WeaverCommon::NoCoercion)
+	  ? "no coercion\n" : GetAnnotation ("cost %u\n", cost));
+	if (cost < coerceCost)
+	{
+	  sourceTech = tech;
+	  output = &outp;
+	  if (cost == 0)
+	  {
+	    usedOutputs.AddNoTest (output);
+	    return true;
+	  }
+	  coerceCost = cost;
+	}
+	// See if maybe we can just drop a property.
+	const WeaverCommon::TypeInfo* outputTypeInfo = 
+	  WeaverCommon::QueryTypeInfo (outp.type);
+	if (inputTypeInfo && outputTypeInfo
+	  && (outputTypeInfo->baseType == inputTypeInfo->baseType)
+	  && (outputTypeInfo->samplerIsCube == inputTypeInfo->samplerIsCube)
+	  && (outputTypeInfo->dimensions == inputTypeInfo->dimensions)
+	  && ((outputTypeInfo->semantics == inputTypeInfo->semantics)
+	    || (inputTypeInfo->semantics == WeaverCommon::TypeInfo::NoSemantics))
+	  && ((outputTypeInfo->space == inputTypeInfo->space)
+	    || (inputTypeInfo->space == WeaverCommon::TypeInfo::NoSpace))
+	  && ((outputTypeInfo->unit == inputTypeInfo->unit)
+	    || (!inputTypeInfo->unit)))
+	{
+	  bool b = compiler->annotateCombined 
+	    && (rand() <= int (INT_MAX * 0.005));
+	  nodeAnnotation.Append (
+	    GetAnnotation ("drop a prop%s\n", b ? " like it's hot" : ""));
+	  sourceTech = tech;
+	  output = &outp;
+	  usedOutputs.AddNoTest (output);
+	  return true;
+	}
       }
     }
 
