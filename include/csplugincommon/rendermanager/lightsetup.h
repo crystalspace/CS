@@ -104,19 +104,21 @@ namespace RenderManager
 
   class CS_CRYSTALSPACE_EXPORT LightingSorter
   {
-    struct IndexLightTypePair
+    size_t lightLimit;
+  public:
+    struct LightInfo
     {
       iLight* light;
       csLightType type;
       bool isStatic;
 
-      bool operator<(const IndexLightTypePair& other) const
-      { return type < other.type; }
+      //bool operator<(const LightInfo& other) const
+      //{ return type < other.type; }
     };
-  public:
+    
     struct PersistentData
     {
-      csArray<IndexLightTypePair> lightTypeScratch;
+      csArray<LightInfo> lightTypeScratch;
       
       void UpdateNewFrame()
       {
@@ -129,10 +131,14 @@ namespace RenderManager
 
     size_t GetSize() const
     {
-      return persist.lightTypeScratch.GetSize();
+      return lightLimit;
+    }
+    void SetLightsLimit (size_t limit)
+    {
+      lightLimit = csMin (persist.lightTypeScratch.GetSize(), limit);
     }
 
-    iLight* GetLight (size_t n) const
+    /*iLight* GetLight (size_t n) const
     {
       return persist.lightTypeScratch[n].light;
     }
@@ -140,14 +146,18 @@ namespace RenderManager
     csLightType GetLightType (size_t n) const
     {
       return persist.lightTypeScratch[n].type;
-    }
+    }*/
     
-    bool IsLightStatic (size_t n) const
+    bool GetNextLight (bool skipStatic, LightInfo& out);
+    bool GetNextLight (csLightType lightType, bool skipStatic,
+      LightInfo& out);
+    
+    /*bool IsLightStatic (size_t n) const
     {
       return persist.lightTypeScratch[n].isStatic;
-    }
+    }*/
     
-    size_t RemoveStatic ();
+    //size_t RemoveStatic ();
   protected:
     PersistentData& persist;
   };
@@ -221,7 +231,6 @@ namespace RenderManager
     {
       csLightShaderVarCache svNames;
       CS::ShaderVarStringID svPassNum;
-      LightingSorter::PersistentData lightSorterPersist;
       LightingVariablesHelper::PersistentData varsHelperPersist;
       csHash<CachedLightData, csPtrKey<iLight> > lightDataCache;
 
@@ -238,7 +247,6 @@ namespace RenderManager
       }
       void UpdateNewFrame ()
       {
-        lightSorterPersist.UpdateNewFrame();
         varsHelperPersist.UpdateNewFrame();
       }
 
@@ -279,13 +287,11 @@ namespace RenderManager
       : persist (persist), layerConfig (layerConfig), lastShader (0) { }
 
     template<typename LayerHelper>
-    size_t HandleLights (csLightInfluence* influenceLights, size_t numLights,
+    size_t HandleLights (LightingSorter& sortedLights,
       size_t layer, LayerHelper& layers,
       typename RenderTree::MeshNode::SingleMesh& mesh,
       typename RenderTree::MeshNode* node)
     {
-      LightingSorter sortedLights (persist.lightSorterPersist, influenceLights,
-        numLights);
       LightingVariablesHelper lightVarsHelper (persist.varsHelperPersist);
 
       /* Get the shader since the number of passes for that layer depend
@@ -299,16 +305,15 @@ namespace RenderManager
       if ((lastMetadata.numberOfLights == 0) 
         && !layerConfig.IsAmbientLayer (layer)) return 0;
 
-      bool meshStaticLit = mesh.meshFlags.Check (CS_ENTITY_STATICLIT);
-      if (meshStaticLit
-	  && layerConfig.GetStaticLightsSettings (layer).nodraw)
-	sortedLights.RemoveStatic();
+      bool skipStatic = mesh.meshFlags.Check (CS_ENTITY_STATICLIT)
+	&& layerConfig.GetStaticLightsSettings (layer).nodraw;
 
       size_t layerLights = sortedLights.GetSize();
       if (lastMetadata.numberOfLights == 0)
         layerLights = 0;
       if ((layerLights == 0) 
         && !layerConfig.IsAmbientLayer (layer)) return 0;
+      CS_ALLOC_STACK_ARRAY(LightingSorter::LightInfo, renderLights, layerLights);
         
       // Set up layers
       size_t firstLight = 0;
@@ -316,11 +321,21 @@ namespace RenderManager
       size_t totalLayers = 0;
       while (firstLight < layerLights)
       {
-	csLightType lightType = sortedLights.GetLightType (firstLight);
+        if (totalLayers >= layerConfig.GetMaxLightPasses (layer))
+          break;
+      
 	size_t num = 0;
-	for (; num < remainingLights; num++)
+	csLightType lightType;
+	sortedLights.GetNextLight (skipStatic, renderLights[firstLight]);
+	lightType = renderLights[firstLight].type;
+	num = 1;
+	size_t maxPassLights = lastMetadata.numberOfLights * 
+	  layerConfig.GetMaxLightPasses (layer);
+	maxPassLights = csMin (maxPassLights, remainingLights);
+	for (; num < maxPassLights; num++)
 	{
-	  if (sortedLights.GetLightType (firstLight + num) != lightType)
+	  if (!sortedLights.GetNextLight (lightType, skipStatic, 
+	      renderLights[firstLight + num]))
 	    break;
 	}
 	/* We have a subset of the lights that are of the same type.
@@ -349,21 +364,22 @@ namespace RenderManager
       }
 
       // Now render lights for each light type
+      layerLights = remainingLights = firstLight;
       firstLight = 0;
-      remainingLights = layerLights;
       totalLayers = 0;
       while ((firstLight < layerLights)
         || (layerConfig.IsAmbientLayer (layer)))
       {
 	csLightType lightType = (remainingLights > 0) 
-	  ? sortedLights.GetLightType (firstLight)
+	  ? renderLights[firstLight].type
 	  : (csLightType)0;
-	size_t num = 0;
+	size_t num = 1;
 	for (; num < remainingLights; num++)
 	{
-	  if (sortedLights.GetLightType (firstLight + num) != lightType)
+	  if (renderLights[firstLight + num].type != lightType)
 	    break;
 	}
+	//csPrintf ("lightType = %d  num = %zu\n", (int)lightType, num);
 	/* We have a subset of the lights that are of the same type.
 	  * Check the size of it against the shader limit */
 	size_t thisPassLayers;
@@ -379,6 +395,7 @@ namespace RenderManager
 	  thisPassLayers = 1;
 	  num = 0;
 	}
+	//csPrintf ("thisPassLayers = %zu\n", thisPassLayers);
 	if (thisPassLayers == 0)
 	  // Reached layer pass limit
 	  break;
@@ -406,6 +423,7 @@ namespace RenderManager
 	    persist.svNames.GetDefaultSVId (
 	      csLightShaderVarCache::varLightCount), localStack);
 	  lightNum->SetValue ((int)thisNum);
+	  //csPrintf ("thisNum = %zu\n", thisNum);
 
 	  csShaderVariable* passNum = lightVarsHelper.CreateVarOnStack (
 	    persist.svPassNum, localStack);
@@ -418,7 +436,8 @@ namespace RenderManager
   
 	  for (size_t l = thisNum; l-- > 0; )
 	  {
-	    iLight* light = sortedLights.GetLight (firstLight + l);
+	    iLight* light = renderLights[firstLight + l].light;
+	    //csPrintf ("light = %s\n", light->QueryObject()->GetName());
 	    CachedLightData* thisLightSVs =
 	      persist.lightDataCache.GetElementPointer (light);
 	    if (thisLightSVs == 0)
@@ -441,6 +460,7 @@ namespace RenderManager
 
 	totalLayers = neededLayers;
       }
+      
       return firstLight;
     }
   protected:
@@ -511,10 +531,14 @@ namespace RenderManager
         csLightInfluence* influences;
 	lightmgr->GetRelevantLights (node->owner.sector,
 	  mesh.bbox, influences, numLights, allMaxLights);
+	
+	LightingSorter sortedLights (persist.lightSorterPersist, influences,
+	  numLights);
         
         size_t lightOffset = 0;
 	for (size_t layer = 0; layer < layerConfig.GetLayerCount (); ++layer)
         {
+          //csPrintf ("lightOffset = %zu\n", lightOffset );
           // Get the subset of lights for this layer
           size_t layerLights;
           if (mesh.meshFlags.Check (CS_ENTITY_NOLIGHTING))
@@ -531,10 +555,10 @@ namespace RenderManager
               * node->owner.totalRenderMeshes + mesh.contextLocalId] = 0;
             continue;
           }
-          csLightInfluence* currentInfluences = influences + lightOffset;
 
-          size_t handledLights = shadows.HandleLights (currentInfluences,
-            layerLights, layer, layerHelper, mesh, node);
+          sortedLights.SetLightsLimit (layerLights);
+          size_t handledLights = shadows.HandleLights (sortedLights,
+            layer, layerHelper, mesh, node);
           if ((handledLights == 0)
             && (!layerConfig.IsAmbientLayer (layer)))
           {
@@ -543,7 +567,7 @@ namespace RenderManager
               * node->owner.totalRenderMeshes + mesh.contextLocalId] = 0;
             continue;
           }
-          
+          //csPrintf ("handledLights = %zu\n", handledLights);
           lightOffset += handledLights;
 	}
 
@@ -616,6 +640,7 @@ namespace RenderManager
       typename ShadowHandler::PersistentData shadowPersist;
       typename LayerHelper<RenderTree, LayerConfigType,
         PostLightingLayers>::PersistentData layerPersist;
+      LightingSorter::PersistentData lightSorterPersist;
       
       void Initialize (iShaderManager* shaderManager)
       {
@@ -625,6 +650,7 @@ namespace RenderManager
       {
         shadowPersist.UpdateNewFrame();
         layerPersist.UpdateNewFrame();
+        lightSorterPersist.UpdateNewFrame();
       }
     };
 

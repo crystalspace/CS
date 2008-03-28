@@ -15,6 +15,10 @@ chronological order.
 	      inputs.
 	- res changed the Cg shader combiner to more aggressively try to detect
 	  unused vertex-to-fragment data.
+	- res changed the RM lighting setup to respect the initial order of
+	  lights as returned by the light manager (since presumably earlier
+	  lights are more 'important'). Also fixed errorneous skipping of
+	  lights.
 27-Mar-2008
 	- res changed the light snippets to use some more 'half' typed values
 	  internally: this can produce some more efficient shader code on some
