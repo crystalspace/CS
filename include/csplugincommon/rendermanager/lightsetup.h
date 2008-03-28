@@ -362,7 +362,7 @@ namespace RenderManager
 	/* We have a subset of the lights that are of the same type.
 	  * Check the size of it against the shader limit */
 	size_t thisPassLayers;
-	if (lastMetadata.numberOfLights != 40)
+	if (lastMetadata.numberOfLights != 0)
 	{
 	  thisPassLayers = (num + lastMetadata.numberOfLights - 1)
 	    / lastMetadata.numberOfLights;
