@@ -45,6 +45,7 @@
       <snippet id="apply_lighting" file="/shader/snippets/lighting/apply-lighting.xml" />
       <snippet id="glow" file="/shader/lighting/glow.xml" />
       <snippet id="sectorfog" file="/shader/snippets/fog/fog-sector.xml" />
+      <snippet id="hdrscale" file="/shader/snippets/hdr-postscale.xml" />
       <!-- "connections" describe what snippets take input from what other
            snippets (ie the "data flow" is modeled). The exact resolution of
 	   what output is linked to what input is done automatically. -->
@@ -69,6 +70,7 @@
       </connection>
       <connection from="apply_lighting" to="glow" />
       <connection from="glow" to="sectorfog" />
+      <connection from="sectorfog" to="hdrscale" />
     </pass>
   </technique>
   
@@ -94,6 +96,7 @@
       <snippet id="apply_lighting" file="/shader/snippets/lighting/apply-lighting.xml" />
       <snippet id="glow" file="/shader/lighting/glow.xml" />
       <snippet id="sectorfog" file="/shader/snippets/fog/fog-sector.xml" />
+      <snippet id="hdrscale" file="/shader/snippets/hdr-postscale.xml" />
 
       <connection from="position" to="parallax" />
       <connection from="position" to="lighting" />
@@ -116,6 +119,7 @@
       </connection>
       <connection from="apply_lighting" to="glow" />
       <connection from="glow" to="sectorfog" />
+      <connection from="sectorfog" to="hdrscale" />
     </pass>
   </technique>
   

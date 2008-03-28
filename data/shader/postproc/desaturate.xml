@@ -1,4 +1,7 @@
 <shader compiler="xmlshader" name="desaturate">
+  <shadervars>
+    <shadervar name="amount" type="float">0.25</shadervar>
+  </shadervars>
   <technique priority="200">
     <pass>
       <buffer source="texture coordinate 0" destination="texture coordinate 0" />

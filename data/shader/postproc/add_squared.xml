@@ -1,4 +1,7 @@
 <shader compiler="xmlshader" name="postproc_add_squared">
+   <shadervars>
+	<shadervar name="hdr scale" type="vector2">1,1</shadervar>
+   </shadervars>
   <technique priority="200">
     <pass>
       <buffer source="texture coordinate 0" destination="texture coordinate 0" />
@@ -7,15 +10,17 @@
       <texture destination="Texture2" name="tex diffuse 2" />
       <fp plugin="glcg">
 	<cgfp>
+	  <variablemap variable="hdr scale" destination="hdrScale" assumeconst="yes" />
 	  <program>
 	    <![CDATA[
 
 	    float4 main (in float2 TexCoord : TEXCOORD0,
-		      uniform sampler2D Texture1, uniform sampler2D Texture2) : COLOR
+		      uniform sampler2D Texture1, uniform sampler2D Texture2,
+		      uniform float2 hdrScale) : COLOR
 	    {
 		    float4 a = tex2D (Texture1, TexCoord);
-		    float4 b = tex2D (Texture2, TexCoord);
-		    return a+b*b;
+		    float4 b = tex2D (Texture2, TexCoord)*hdrScale.x;
+		    return a+b*b*hdrScale.y;
 	    }
 
 	    ]]>
