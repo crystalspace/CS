@@ -28,6 +28,7 @@ chronological order.
 	- res added a block destination "shadervars to shaderweaver.
 	- res added some helper snippets to deal with HDR and made some shaders
 	  use them.
+	- res made the unshadowed render manager use HDR.
 27-Mar-2008
 	- res changed the light snippets to use some more 'half' typed values
 	  internally: this can produce some more efficient shader code on some

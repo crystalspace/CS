@@ -19,6 +19,7 @@
 #include "crystalspace.h"
 
 #include "csplugincommon/rendermanager/dependenttarget.h"
+#include "csplugincommon/rendermanager/hdrhelper.h"
 #include "csplugincommon/rendermanager/lightsetup.h"
 #include "csplugincommon/rendermanager/operations.h"
 #include "csplugincommon/rendermanager/portalsetup.h"
@@ -286,7 +287,7 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
   csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objectReg);
   treePersistent.Initialize (shaderManager);
   postEffects.Initialize (objectReg);
-  postEffects.SetIntermediateTargetFormat ("rgb16_f");
+  //postEffects.SetIntermediateTargetFormat ("rgb16_f");
   
   csRef<iShader> threshold =
     loader->LoadShader ("/shader/postproc/threshold.xml");
@@ -294,14 +295,24 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
     loader->LoadShader ("/shader/postproc/blur.xml");
   csRef<iShader> add =
     loader->LoadShader ("/shader/postproc/add_squared.xml");
+  csRef<iShader> desaturate =
+    loader->LoadShader ("/shader/postproc/desaturate.xml");
+  csRef<iShader> logmap =
+    loader->LoadShader ("/shader/postproc/hdr/simple-log.xml");
 
   PostEffectManager::Layer* thresholded = postEffects.AddLayer (threshold);
   PostEffectManager::Layer* lastBlur = postEffects.AddLayer (blur, 1, thresholded, "tex diffuse");
   lastBlur = postEffects.AddLayer (blur, 1, lastBlur, "tex diffuse");
   lastBlur = postEffects.AddLayer (blur, 1, lastBlur, "tex diffuse");
-  postEffects.AddLayer (add, 2, 
+  PostEffectManager::Layer* bloomed = postEffects.AddLayer (add, 2, 
     postEffects.GetScreenLayer(), "tex diffuse",
     lastBlur, "tex diffuse 2");
+  //postEffects.AddLayer (logmap, 1, bloomed, "tex diffuse");
+  //postEffects.AddLayer (desaturate);
+  //postEffects.AddLayer (blur);
+  
+  HDRHelper hdr;
+  hdr.Setup (objectReg, HDRHelper::qualFloat16, 1, postEffects, false);
   
   portalPersistent.Initialize (shaderManager, g3d);
   lightPersistent.Initialize (shaderManager);
