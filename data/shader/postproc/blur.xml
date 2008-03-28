@@ -1,4 +1,4 @@
-<shader compiler="xmlshader" name="postproc_threshold">
+<shader compiler="xmlshader" name="postproc_blur">
   <technique priority="200">
     <pass>
       <buffer source="texture coordinate 0" destination="texture coordinate 0" />
