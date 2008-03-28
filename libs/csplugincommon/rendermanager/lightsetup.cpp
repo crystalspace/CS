@@ -33,26 +33,49 @@ namespace RenderManager
     persist.lightTypeScratch.Empty();
     for (size_t l = 0; l < numLights; l++)
     {
-      IndexLightTypePair iltp;
+      LightInfo iltp;
       iltp.light = influenceLights[l].light;
       iltp.type = influenceLights[l].light->GetType();
       iltp.isStatic =
         influenceLights[l].light->GetDynamicType() != CS_LIGHT_DYNAMICTYPE_DYNAMIC;
       persist.lightTypeScratch.Push (iltp);
     }
-    persist.lightTypeScratch.Sort();
+  }
+    
+  bool LightingSorter::GetNextLight (bool skipStatic, LightInfo& out)
+  {
+    size_t i = 0;
+    if (skipStatic)
+    {
+      while (i < lightLimit)
+      {
+	if (!persist.lightTypeScratch[i].isStatic) break;
+	i++;
+      }
+    }
+    if (i >= lightLimit) return false;
+    out = persist.lightTypeScratch[i];
+    persist.lightTypeScratch.DeleteIndex (i);
+    lightLimit = csMin (persist.lightTypeScratch.GetSize(), lightLimit);
+    return true;
   }
   
-  size_t LightingSorter::RemoveStatic ()
+  bool LightingSorter::GetNextLight (csLightType lightType, bool skipStatic,
+                                     LightInfo& out)
   {
-    for (size_t l = 0; l < persist.lightTypeScratch.GetSize();)
+    size_t i = 0;
+    while (i < lightLimit)
     {
-      if (!persist.lightTypeScratch[l].isStatic)
-        l++;
-      else
-        persist.lightTypeScratch.DeleteIndex (l);
+      if ((persist.lightTypeScratch[i].type == lightType)
+          && (!skipStatic || !persist.lightTypeScratch[i].isStatic))
+        break;
+      i++;
     }
-    return persist.lightTypeScratch.GetSize();
+    if (i >= lightLimit) return false;
+    out = persist.lightTypeScratch[i];
+    persist.lightTypeScratch.DeleteIndex (i);
+    lightLimit = csMin (persist.lightTypeScratch.GetSize(), lightLimit);
+    return true;
   }
   
   //-------------------------------------------------------------------------

@@ -111,9 +111,6 @@ namespace RenderManager
       iLight* light;
       csLightType type;
       bool isStatic;
-
-      //bool operator<(const LightInfo& other) const
-      //{ return type < other.type; }
     };
     
     struct PersistentData
@@ -138,26 +135,9 @@ namespace RenderManager
       lightLimit = csMin (persist.lightTypeScratch.GetSize(), limit);
     }
 
-    /*iLight* GetLight (size_t n) const
-    {
-      return persist.lightTypeScratch[n].light;
-    }
-
-    csLightType GetLightType (size_t n) const
-    {
-      return persist.lightTypeScratch[n].type;
-    }*/
-    
     bool GetNextLight (bool skipStatic, LightInfo& out);
     bool GetNextLight (csLightType lightType, bool skipStatic,
       LightInfo& out);
-    
-    /*bool IsLightStatic (size_t n) const
-    {
-      return persist.lightTypeScratch[n].isStatic;
-    }*/
-    
-    //size_t RemoveStatic ();
   protected:
     PersistentData& persist;
   };
@@ -379,11 +359,10 @@ namespace RenderManager
 	  if (renderLights[firstLight + num].type != lightType)
 	    break;
 	}
-	//csPrintf ("lightType = %d  num = %zu\n", (int)lightType, num);
 	/* We have a subset of the lights that are of the same type.
 	  * Check the size of it against the shader limit */
 	size_t thisPassLayers;
-	if (lastMetadata.numberOfLights != 0)
+	if (lastMetadata.numberOfLights != 40)
 	{
 	  thisPassLayers = (num + lastMetadata.numberOfLights - 1)
 	    / lastMetadata.numberOfLights;
@@ -395,7 +374,6 @@ namespace RenderManager
 	  thisPassLayers = 1;
 	  num = 0;
 	}
-	//csPrintf ("thisPassLayers = %zu\n", thisPassLayers);
 	if (thisPassLayers == 0)
 	  // Reached layer pass limit
 	  break;
@@ -423,7 +401,6 @@ namespace RenderManager
 	    persist.svNames.GetDefaultSVId (
 	      csLightShaderVarCache::varLightCount), localStack);
 	  lightNum->SetValue ((int)thisNum);
-	  //csPrintf ("thisNum = %zu\n", thisNum);
 
 	  csShaderVariable* passNum = lightVarsHelper.CreateVarOnStack (
 	    persist.svPassNum, localStack);
@@ -437,7 +414,6 @@ namespace RenderManager
 	  for (size_t l = thisNum; l-- > 0; )
 	  {
 	    iLight* light = renderLights[firstLight + l].light;
-	    //csPrintf ("light = %s\n", light->QueryObject()->GetName());
 	    CachedLightData* thisLightSVs =
 	      persist.lightDataCache.GetElementPointer (light);
 	    if (thisLightSVs == 0)
@@ -538,7 +514,6 @@ namespace RenderManager
         size_t lightOffset = 0;
 	for (size_t layer = 0; layer < layerConfig.GetLayerCount (); ++layer)
         {
-          //csPrintf ("lightOffset = %zu\n", lightOffset );
           // Get the subset of lights for this layer
           size_t layerLights;
           if (mesh.meshFlags.Check (CS_ENTITY_NOLIGHTING))
@@ -567,7 +542,6 @@ namespace RenderManager
               * node->owner.totalRenderMeshes + mesh.contextLocalId] = 0;
             continue;
           }
-          //csPrintf ("handledLights = %zu\n", handledLights);
           lightOffset += handledLights;
 	}
 
