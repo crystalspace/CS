@@ -216,6 +216,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   
     void AppendProgramInput (const csRefArray<iDocumentNode>& nodes, 
       DocNodeCgAppender& appender);
+    void AppendProgramInput_V2FHead (const Snippet& snippet, 
+      DocNodeCgAppender& appender);
     void AppendProgramInput_V2FDecl (const Snippet& snippet, 
       DocNodeCgAppender& appender);
     void AppendProgramInput_V2FLocals (const Snippet& snippet, 

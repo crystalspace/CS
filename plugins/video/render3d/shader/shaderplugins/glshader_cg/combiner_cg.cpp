@@ -1041,6 +1041,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       
       DocNodeCgAppender appender (programNode);
       
+      for (size_t s = 0; s < snippets.GetSize(); s++)
+      {
+        AppendProgramInput_V2FHead (snippets[s], appender);
+      }
+      
       if (definitions.GetSize() > 0)
       {
         appender.Append ("\n");
@@ -1173,6 +1178,46 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     }
   }
   
+  void ShaderCombinerCg::AppendProgramInput_V2FHead (
+    const Snippet& snippet, DocNodeCgAppender& appender)
+  {
+    // FIXME: error handling here
+    for (size_t n = 0; n < snippet.vert2frag.GetSize(); n++)
+    {
+      iDocumentNode* node = snippet.vert2frag[n];
+      if (node->GetType() == CS_NODE_ELEMENT)
+      {
+        csStringID id = loader->xmltokens.Request (node->GetValue());
+        if (id == ShaderCombinerLoaderCg::XMLTOKEN_VARYING)
+        {
+          csString name = node->GetAttributeValue ("name");
+          if (name.IsEmpty()) continue;
+          int count;
+          SplitOffArrayCount (name, count);
+          
+          const csString& uniqueName = snippet.v2fMaps.Get (name, name);
+          if (count > 0)
+          {
+	    csString defineName;
+	    for (int i = 0; i < count; i++)
+	    {
+	      defineName.Format ("PARAM_vertexToFragment_%s_%d__UNUSED", 
+		uniqueName.GetData(), i);
+	      appender.AppendFmt ("//@@UNUSED? %s\n", defineName.GetData());
+	    }
+          }
+          else
+          {
+	    csString defineName;
+	    defineName.Format ("PARAM_vertexToFragment_%s_UNUSED", 
+	      uniqueName.GetData());
+	    appender.AppendFmt ("//@@UNUSED? %s\n", defineName.GetData());
+	  }
+        }
+      }
+    }
+  }
+  
   void ShaderCombinerCg::AppendProgramInput_V2FDecl (
     const Snippet& snippet, DocNodeCgAppender& appender)
   {
@@ -1193,15 +1238,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
           const csString& uniqueName = snippet.v2fMaps.Get (name, name);
           if (count > 0)
           {
-	    appender.AppendFmt ("#if 1");
+	    appender.AppendFmt ("#if 0\n");
 	    csString defineName;
-	    for (int i = 0; i < count; i++)
+	    for (int i = count; i-- > 0; )
 	    {
-	      defineName.Format ("PARAM_vertexToFragment_%s__%d__UNUSED", 
+	      defineName.Format ("PARAM_vertexToFragment_%s_%d__UNUSED", 
 		uniqueName.GetData(), i);
-	      appender.AppendFmt (" && !defined(%s)", defineName.GetData());
+	      appender.AppendFmt ("#elif !defined(%s)\n", defineName.GetData());
+	      const char* type = node->GetAttributeValue ("type");
+	      const char* binding = node->GetAttributeValue ("binding");
+	      if (type && *type)
+	      {
+		csString bindingStr;
+		if (binding) bindingStr.Format (" : %s", binding);
+		csString str;
+		str.Format ("varying %s %s[%d]%s;\n", 
+		  CgType (type).GetData(), uniqueName.GetData(), 
+		  i+1, bindingStr.GetDataSafe());
+		appender.Append (str);
+	      }
 	    }
-	    appender.Append ("\n");
+	    appender.Append ("#endif\n");
           }
           else
           {
@@ -1209,22 +1266,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 	    defineName.Format ("PARAM_vertexToFragment_%s_UNUSED", 
 	      uniqueName.GetData());
 	    appender.AppendFmt ("#ifndef %s\n", defineName.GetData());
+	    const char* type = node->GetAttributeValue ("type");
+	    const char* binding = node->GetAttributeValue ("binding");
+	    if (type && *type)
+	    {
+	      csString countStr;
+	      if (count > 0) countStr.Format ("[%d]", count);
+	      csString bindingStr;
+	      if (binding) bindingStr.Format (" : %s", binding);
+	      csString str;
+	      str.Format ("varying %s %s%s%s;\n", 
+		CgType (type).GetData(), uniqueName.GetData(), 
+		countStr.GetDataSafe(), bindingStr.GetDataSafe());
+	      appender.Append (str);
+	    }
+	    appender.Append ("#endif\n");
 	  }
-	  const char* type = node->GetAttributeValue ("type");
-	  const char* binding = node->GetAttributeValue ("binding");
-	  if (type && *type)
-	  {
-	    csString countStr;
-	    if (count > 0) countStr.Format ("[%d]", count);
-	    csString bindingStr;
-	    if (binding) bindingStr.Format (" : %s", binding);
-	    csString str;
-	    str.Format ("varying %s %s%s%s;\n", 
-	      CgType (type).GetData(), uniqueName.GetData(), 
-	      countStr.GetDataSafe(), bindingStr.GetDataSafe());
-	    appender.Append (str);
-	  }
-	  appender.Append ("#endif\n");
         }
       }
       else
@@ -1302,7 +1359,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 	    csString defineName;
 	    for (int i = 0; i < count; i++)
 	    {
-	      defineName.Format ("PARAM_vertexToFragment_%s__%d__UNUSED", 
+	      defineName.Format ("PARAM_vertexToFragment_%s_%d__UNUSED", 
 		uniqueName.GetData(), i);
 	      appender.AppendFmt ("#ifndef %s\n", defineName.GetData());
 	      appender.AppendFmt ("vertexToFragment.%s[%d] = %s[%d];\n", 
@@ -1351,7 +1408,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 	    csString defineName;
 	    for (int i = 0; i < count; i++)
 	    {
-	      defineName.Format ("PARAM_vertexToFragment_%s__%d__UNUSED", 
+	      defineName.Format ("PARAM_vertexToFragment_%s_%d__UNUSED", 
 		uniqueName.GetData(), i);
 	      appender.AppendFmt ("#ifndef %s\n", defineName.GetData());
 	      appender.AppendFmt ("%s[%d] = vertexToFragment.%s[%d];\n", 

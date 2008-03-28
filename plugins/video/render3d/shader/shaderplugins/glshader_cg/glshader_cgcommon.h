@@ -36,7 +36,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   {
     SCF_INTERFACE(iShaderDestinationResolverCG, 0,0,1);
 
-    virtual const csArray<csString>& GetUnusedParameters () = 0;
+    virtual const csSet<csString>& GetUnusedParameters () = 0;
   };
 
 class csShaderGLCGCommon : public scfImplementationExt1<csShaderGLCGCommon,
@@ -62,9 +62,10 @@ protected:
   const char* programType;
   ArgumentArray compilerArgs;
   csRef<iShaderDestinationResolverCG> cgResolve;
-  csArray<csString> unusedParams;
+  csSet<csString> unusedParams;
 
   csString debugFN;
+  void EnsureDumpFile();
 
   bool DefaultLoadProgram (iShaderDestinationResolverCG* cgResolve,
     const char* programStr, CGGLenum type, 
@@ -72,7 +73,7 @@ protected:
   void DoDebugDump ();
   void WriteAdditionalDumpInfo (const char* description, const char* content);
   virtual const char* GetProgramType() = 0;
-  void CollectUnusedParameters ();
+  void CollectUnusedParameters (csSet<csString>& unusedParams);
   void SetParameterValue (CGparameter param, csShaderVariable* var);
   
   void SVtoCgMatrix3x3 (csShaderVariable* var, float* matrix);
@@ -114,7 +115,7 @@ public:
     csArray<csShaderVarMapping>&)
   { return false; }
 
-  const csArray<csString>& GetUnusedParameters ()
+  const csSet<csString>& GetUnusedParameters ()
   { return unusedParams; }
 };
 

@@ -352,6 +352,20 @@ void csShaderGLCGCommon::ResetState()
 {
 }
 
+void csShaderGLCGCommon::EnsureDumpFile()
+{
+  if (debugFN.IsEmpty())
+  {
+    static int programCounter = 0;
+    csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectReg);
+    csString filename;
+    filename << shaderPlug->dumpDir << (programCounter++) << programType << 
+      ".txt";
+    debugFN = filename;
+    vfs->DeleteFile (debugFN);
+  }
+}
+
 bool csShaderGLCGCommon::DefaultLoadProgram (
   iShaderDestinationResolverCG* cgResolve,
   const char* programStr, CGGLenum type, CGprofile maxProfile, 
@@ -361,23 +375,20 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
 
   size_t i;
   csString augmentedProgramStr;
+  const csSet<csString>* unusedParams = &this->unusedParams;
   if (cgResolve != 0)
   {
-    const csArray<csString>& unusedParams = cgResolve->GetUnusedParameters ();
-    for (size_t i = 0; i < unusedParams.GetSize(); i++)
-    {
-      csString param (unusedParams[i]);
-      for (size_t j = 0; j < param.Length(); j++)
-      {
-        if ((param[j] == '.') || (param[j] == '[') || (param[j] == ']'))
-          param[j] = '_';
-      }
-      augmentedProgramStr.AppendFmt ("#define PARAM_%s_UNUSED\n",
-        param.GetData());
-    }
-    augmentedProgramStr.Append (programStr);
-    programStr = augmentedProgramStr;
+    unusedParams = &cgResolve->GetUnusedParameters ();
   }
+  csSet<csString>::GlobalIterator unusedIt (unusedParams->GetIterator());
+  while (unusedIt.HasNext())
+  {
+    const csString& param = unusedIt.Next ();
+    augmentedProgramStr.AppendFmt ("#define %s\n",
+      param.GetData());
+  }
+  augmentedProgramStr.Append (programStr);
+  programStr = augmentedProgramStr;
 
   CGprofile profile = CG_PROFILE_UNKNOWN;
 
@@ -411,10 +422,17 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
   program = cgCreateProgram (shaderPlug->context, 
     compiled ? CG_OBJECT : CG_SOURCE, programStr, 
     profile, !entrypoint.IsEmpty() ? entrypoint : "main", args.GetArray());
-  shaderPlug->SetCompiledSource (0);
 
   if (!program)
+  {
+    shaderPlug->SetCompiledSource (0);
+    if (shaderPlug->debugDump)
+    {
+      EnsureDumpFile();
+      WriteAdditionalDumpInfo ("Failed program source", programStr);
+    }
     return false;
+  }
   programProfile = cgGetProgramProfile (program);
 
   if (shaderPlug->debugDump)
@@ -424,16 +442,20 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
   {
     cgGetError(); // Clear error
     cgGLLoadProgram (program);
-    if (cgGetError() != CG_NO_ERROR) return false;
-    if (!cgGLIsProgramLoaded (program)) return false;
+    if ((cgGetError() != CG_NO_ERROR)
+      || !cgGLIsProgramLoaded (program)) 
+    {
+      shaderPlug->SetCompiledSource (0);
+      return false;
+    }
   }
 
   const char* listing = cgGetLastListing (shaderPlug->context);
   if (listing && *listing && shaderPlug->doVerbose)
   {
-    shaderPlug->Report (CS_REPORTER_SEVERITY_WARNING,
-      "%s", listing);
+    shaderPlug->PrintCgListing (listing);
   }
+  shaderPlug->SetCompiledSource (0);
 
   i = 0;
   while (i < variablemap.GetSize ())
@@ -529,15 +551,7 @@ void csShaderGLCGCommon::DoDebugDump ()
   output << "\n";
 
   csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectReg);
-  if (debugFN.IsEmpty())
-  {
-    static int programCounter = 0;
-    csString filename;
-    filename << shaderPlug->dumpDir << (programCounter++) << programType << 
-      ".txt";
-    debugFN = filename;
-    vfs->DeleteFile (debugFN);
-  }
+  EnsureDumpFile();
 
   csRef<iFile> debugFile = vfs->Open (debugFN, VFS_FILE_APPEND);
   if (!debugFile)
@@ -563,7 +577,7 @@ void csShaderGLCGCommon::WriteAdditionalDumpInfo (const char* description,
   csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectReg);
   csRef<iDataBuffer> oldDump = vfs->ReadFile (debugFN, true);
 
-  csString output ((char*)oldDump->GetData());
+  csString output (oldDump ? (char*)oldDump->GetData() : 0);
   output << description << ":\n";
   output << content;
   output << "\n";
@@ -618,18 +632,25 @@ bool csShaderGLCGCommon::Load (iShaderDestinationResolver* resolve,
   return true;
 }
 
-void csShaderGLCGCommon::CollectUnusedParameters ()
+void csShaderGLCGCommon::CollectUnusedParameters (csSet<csString>& unusedParams)
 {
-  unusedParams.DeleteAll ();
-  CGparameter param = cgGetFirstLeafParameter (program, CG_PROGRAM);
-  while (param)
+  CGparameter cgParam = cgGetFirstLeafParameter (program, CG_PROGRAM);
+  while (cgParam)
   {
-    if (!cgIsParameterUsed (param, program))
+    if (!cgIsParameterUsed (cgParam, program))
     {
-      unusedParams.Push (cgGetParameterName (param));
+      csString param (cgGetParameterName (cgParam));
+      for (size_t j = 0; j < param.Length(); j++)
+      {
+        if ((param[j] == '.') || (param[j] == '[') || (param[j] == ']'))
+          param[j] = '_';
+      }
+      csString s;
+      s.Format ("PARAM_%s_UNUSED", param.GetData());
+      unusedParams.Add (s);
     }
 
-    param = cgGetNextLeafParameter (param);
+    cgParam = cgGetNextLeafParameter (cgParam);
   }
 }
 
