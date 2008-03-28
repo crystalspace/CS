@@ -33,6 +33,8 @@
 		 destination="lightProps.attenuationVec" />
     <variablemap variable="light inner falloff" 
 		 destination="lightProps.falloffInner" />
+    <variablemap variable="light outer falloff" 
+		 destination="lightProps.falloffOuter" />
     <variablemap variable="light transform world" 
 		 destination="lightProps.transform" />
     <variablemap variable="light transform world inverse" 

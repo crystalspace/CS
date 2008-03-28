@@ -21,6 +21,9 @@ chronological order.
 	  lights.
 	- res added a "object2world transform inverse" default shader var.
 	- res added some specular color maps to simplelights.
+	- res changed the lighting-ppl snippet to operate in tangent space
+	  instead of light space: that way some computations can be shifted
+	  from fragment to vertex unit.
 27-Mar-2008
 	- res changed the light snippets to use some more 'half' typed values
 	  internally: this can produce some more efficient shader code on some

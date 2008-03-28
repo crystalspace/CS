@@ -39,13 +39,12 @@ half Attenuation_Realistic (float d)
 
 half Attenuation_CLQ (float d, float3 coeff)
 {
-  return 1/(coeff.x + d*coeff.y + d*d*coeff.z);
+  return 1/(dot (half3 (1, d, d*d), half3 (coeff)));
 }
 
-half Light_Spot (half3 surfNorm, half3 surfToLight, 
-                 half3 lightDir, half falloffInner, half falloffOuter)
+half Light_Spot (half3 surfToLight, half3 lightDir, half falloffInner, half falloffOuter)
 {
-  return smoothstep (falloffOuter, falloffInner, -dot (surfToLight, lightDir));
+  return smoothstep (falloffOuter, falloffInner, dot (surfToLight, lightDir));
 }
 
 
@@ -74,7 +73,6 @@ LightProperties lightProps;
 
 interface LightSpace
 {
-  float4 GetPosition();
   half3 GetDirection();
   half3 GetSurfaceToLight();
   float GetLightDistance ();
@@ -82,21 +80,48 @@ interface LightSpace
 
 struct LightSpaceWorld : LightSpace
 {
-  float4 pos;
   half3 dir;
   half3 surfToLight;
   float lightDist;
 
   void Init (int lightNum, float4 surfPositionWorld)
   {
-    pos = lightProps.posWorld[lightNum];
-    float4x4 lightTransformInv = lightProps.transformInv[lightNum];
-    dir = lightTransformInv[2].xyz;
-    surfToLight = (lightProps.posWorld[lightNum] - surfPositionWorld).xyz;
+    float4 pos = lightProps.posWorld[lightNum];
+    float4x4 lightTransform = lightProps.transform[lightNum];
+    float3 lightDirW = mul (lightTransform, float4 (0, 0, 1, 0)).xyz;
+    dir = lightDirW;
+    surfToLight = (pos - surfPositionWorld).xyz;
     lightDist = length (surfToLight);
     surfToLight = normalize (surfToLight);
   }
-  float4 GetPosition() { return pos; }
+  half3 GetDirection() { return dir; }
+  half3 GetSurfaceToLight() { return surfToLight; }
+  float GetLightDistance () {return lightDist; }
+};
+
+struct LightSpaceTangent : LightSpace
+{
+  half3 dir;
+  half3 surfToLight;
+  float lightDist;
+  
+  void InitVP (int lightNum, 
+               float4x4 world2tangent, float4 surfPositionWorld,
+               out half3 vp_dir, out float3 vp_surfToLight)
+  {
+    float4 pos = lightProps.posWorld[lightNum];
+    float4x4 lightTransform = lightProps.transform[lightNum];
+    float4 lightDirW = mul (lightTransform, float4 (0, 0, 1, 0));
+    vp_dir = mul (world2tangent, lightDirW).xyz;
+    vp_surfToLight = mul (world2tangent, float4 ((pos - surfPositionWorld).xyz, 0)).xyz;
+  }
+
+  void Init (half3 vp_dir, float3 vp_surfToLight)
+  {
+    dir = vp_dir;
+    lightDist = length (vp_surfToLight);
+    surfToLight = normalize (vp_surfToLight);
+  }
   half3 GetDirection() { return dir; }
   half3 GetSurfaceToLight() { return surfToLight; }
   float GetLightDistance () {return lightDist; }
@@ -174,9 +199,8 @@ struct LightSpot : Light
   
   void Init (LightSpace space, half3 normal, half falloffInner, half falloffOuter)
   {
-    dir = space.GetDirection();
-    spot = Light_Spot (normal, space.GetSurfaceToLight(),
-      dir, falloffInner, falloffOuter);
+    dir = -space.GetDirection();
+    spot = Light_Spot (space.GetSurfaceToLight(), dir, falloffInner, falloffOuter);
   }
   half3 GetIncidence() { return dir; }
   half GetAttenuation() { return spot; }
