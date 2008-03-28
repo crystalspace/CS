@@ -447,7 +447,7 @@ rollout Test1 "Export Level to CS" width:226 height:350
 					)
                               specMapImage = getMatSpecMapFilename m
                               if(specMapImage!="materialnotdefined") then (
-                                format "      <shadervar type=\"texture\" name=\"tex spec\">%</shadervar>\n" specMapImage to:outFile
+                                format "      <shadervar type=\"texture\" name=\"tex specular\">%</shadervar>\n" specMapImage to:outFile
                               )
 					
                     format "    </material>\n" to:outFile

@@ -10326,9 +10326,11 @@ sub new {
 *Row1 = *cspacec::csMatrix3_Row1;
 *Row2 = *cspacec::csMatrix3_Row2;
 *Row3 = *cspacec::csMatrix3_Row3;
+*Row = *cspacec::csMatrix3_Row;
 *Col1 = *cspacec::csMatrix3_Col1;
 *Col2 = *cspacec::csMatrix3_Col2;
 *Col3 = *cspacec::csMatrix3_Col3;
+*Col = *cspacec::csMatrix3_Col;
 *Set = *cspacec::csMatrix3_Set;
 *__neg__ = *cspacec::csMatrix3___neg__;
 *Transpose = *cspacec::csMatrix3_Transpose;

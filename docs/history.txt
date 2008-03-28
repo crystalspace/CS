@@ -9,6 +9,14 @@ chronological order.
 26-Mar-2008
 	- Marten commited a number of re-inlinings of basic matrix & vector 
 	  methods.
+	- res fixed the OpenGL state cache storing the active buffer binding in
+	  the wrong member.
+	- res added methods to csBitArray to obtain the first/last set/unset
+	  bit.
+	- res fixed a mess-up in csMatrix3 transposing.
+	- Marten fixed tinyxml writer not to crash on empty attributes.
+	- Marten fixed light name handling of proxylights in lighter2.
+	- Mike Gist renamed the "tex spec" shadervar to "tex specular".
 25-Mar-2008
 	- Andrew Dai fixed the problem of the enter key being mapped to the
 	  incorrect raw keycode on MAC OS X.

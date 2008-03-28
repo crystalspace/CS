@@ -88,6 +88,14 @@ public:
   inline csVector3 Row3() const 
   { return csVector3 (m31, m32, m33); }
 
+  /// Get a row from this matrix as a vector.
+  inline csVector3 Row(size_t n) const
+  {
+    return !n ? csVector3 (m11, m12, m13) : 
+      n&1 ? csVector3 (m21, m22, m23) :
+      csVector3 (m31, m32, m33);    
+  }
+
   /// Get the first column of this matrix as a vector.
   inline csVector3 Col1() const 
   { return csVector3 (m11, m21, m31); }
@@ -99,6 +107,14 @@ public:
   /// Get the third column of this matrix as a vector.
   inline csVector3 Col3() const 
   { return csVector3 (m13, m23, m33); }
+
+  /// Get a column from this matrix as a vector.
+  inline csVector3 Col(size_t n) const
+  {
+    return !n ? csVector3 (m11, m21, m31) : 
+      n&1 ? csVector3 (m12, m22, m32) :
+      csVector3 (m13, m23, m33);    
+  }
 
   /// Set matrix values.
   inline void Set (float o11, float o12, float o13,
@@ -213,9 +229,9 @@ public:
   csMatrix3 GetTranspose () const
   {
     return csMatrix3 (
-      m11, m12, m13,
-      m21, m22, m21,
-      m31, m32, m33);
+      m11, m21, m31,
+      m12, m22, m32,
+      m13, m23, m33);
   }
 
   /// Return the inverse of this matrix.

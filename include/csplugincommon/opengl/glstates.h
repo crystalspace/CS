@@ -766,7 +766,7 @@ public:
 	  { GL_ARRAY_BUFFER_BINDING_ARB, GL_ELEMENT_ARRAY_BUFFER_BINDING_ARB, 
 	    GL_PIXEL_PACK_BUFFER_BINDING_ARB, GL_PIXEL_UNPACK_BUFFER_BINDING_ARB };
 	  glGetIntegerv (localIndexToGLBufferBinding[b], 
-	    (GLint*)&currentBufferID[b]);
+	    (GLint*)&activeBufferID[b]);
 	}
       }
     }
