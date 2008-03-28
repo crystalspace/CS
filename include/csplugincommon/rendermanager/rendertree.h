@@ -70,6 +70,8 @@ namespace RenderManager
       {
         svObjectToWorldName = 
           shmgr->GetSVNameStringset()->Request ("object2world transform");
+        svObjectToWorldInvName = 
+          shmgr->GetSVNameStringset()->Request ("object2world transform inverse");
       }
 
       void Clear ()
@@ -84,6 +86,7 @@ namespace RenderManager
       
 
       CS::ShaderVarStringID svObjectToWorldName;
+      CS::ShaderVarStringID svObjectToWorldInvName;
     
       RenderView::Pool renderViewPool;
       csRenderMeshHolder rmHolder;
@@ -106,6 +109,7 @@ namespace RenderManager
         csZBufMode zmode;
         iShaderVariableContext* meshObjSVs;
         csRef<csShaderVariable> svObjectToWorld;
+        csRef<csShaderVariable> svObjectToWorldInv;
         csBox3 bbox;
         csFlags meshFlags;
 
@@ -215,10 +219,15 @@ namespace RenderManager
 	svObjectToWorld.AttachNew (new csShaderVariable (
 	  owner.GetPersistentData ().svObjectToWorldName));
 	svObjectToWorld->SetValue (rm->object2world);
+	csRef<csShaderVariable> svObjectToWorldInv;
+	svObjectToWorldInv.AttachNew (new csShaderVariable (
+	  owner.GetPersistentData ().svObjectToWorldInvName));
+	svObjectToWorldInv->SetValue (rm->object2world.GetInverse());
     
 	typename MeshNode::SingleMesh sm (singleMeshTemplate);
 	sm.renderMesh = rm;
 	sm.svObjectToWorld = svObjectToWorld;
+	sm.svObjectToWorldInv = svObjectToWorldInv;
 	if (rm->z_buf_mode != (csZBufMode)~0) 
 	  sm.zmode = rm->z_buf_mode;
     

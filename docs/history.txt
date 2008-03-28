@@ -19,6 +19,7 @@ chronological order.
 	  lights as returned by the light manager (since presumably earlier
 	  lights are more 'important'). Also fixed errorneous skipping of
 	  lights.
+	- res added a "object2world transform inverse" default shader var.
 27-Mar-2008
 	- res changed the light snippets to use some more 'half' typed values
 	  internally: this can produce some more efficient shader code on some

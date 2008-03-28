@@ -49,7 +49,8 @@ namespace RenderManager
       csShaderVariableStack localStack;
 
       // @@TODO: keep the sv-name around in a better way
-      static size_t svO2wName = node->owner.owner.GetPersistentData().svObjectToWorldName;
+      const size_t svO2wName = node->owner.owner.GetPersistentData().svObjectToWorldName;
+      const size_t svO2wIName = node->owner.owner.GetPersistentData().svObjectToWorldInvName;
 
       for (size_t i = 0; i < node->meshes.GetSize (); ++i)
       {
@@ -63,6 +64,7 @@ namespace RenderManager
           // Push all contexts here 
           // @@TODO: get more of them        
           localStack[svO2wName] = mesh.svObjectToWorld;
+          localStack[svO2wIName] = mesh.svObjectToWorldInv;
           iShaderVariableContext* layerContext =
             layerConfig.GetSVContext (layer);
           if (layerContext) layerContext->PushVariables (localStack);
