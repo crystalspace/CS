@@ -57,7 +57,7 @@ csLight::csLight (csEngine* engine,
   csLight::SetColor (csColor (red, green, blue));
   csLight::SetType (CS_LIGHT_POINTLIGHT);
   csLight::SetAttenuationMode (CS_ATTN_LINEAR);
-  csLight::SetSpotLightFalloff (0, 1);
+  csLight::SetSpotLightFalloff (1, 0);
 
   SetName ("__light__");
 
