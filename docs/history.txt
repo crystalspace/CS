@@ -24,6 +24,7 @@ chronological order.
 	- res changed the lighting-ppl snippet to operate in tangent space
 	  instead of light space: that way some computations can be shifted
 	  from fragment to vertex unit.
+	- res added a "HDR helper" to set up post effects and SVs for HDR.
 27-Mar-2008
 	- res changed the light snippets to use some more 'half' typed values
 	  internally: this can produce some more efficient shader code on some
