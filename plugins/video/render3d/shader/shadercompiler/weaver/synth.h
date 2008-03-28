@@ -22,15 +22,27 @@
 #include "csplugincommon/shader/weavercombiner.h"
 #include "csutil/blockallocator.h"
 #include "csutil/hashr.h"
+#include "csutil/set.h"
 #include "csutil/strhash.h"
 
 #include "snippet.h"
+#include "weaver.h"
 
 struct iDocumentNode;
 
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 {
   class WeaverCompiler;
+
+  class ShaderVarNodesHelper
+  {
+    iDocumentNode* shaderVarsNode;
+    csSet<csString> seenVars;
+  public:
+    ShaderVarNodesHelper (iDocumentNode* shaderVarsNode);
+    
+    void AddNode (iDocumentNode* node);
+  };
 
   class Synthesizer
   {
@@ -53,8 +65,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       va_end (args);
       return annotateString.GetData();
     }
-
-    bool SynthesizeTechnique (iDocumentNode* passNode,
+    
+    bool SynthesizeTechnique (
+      ShaderVarNodesHelper& shaderVarNodes, iDocumentNode* passNode,
       const Snippet* snippet, const TechniqueGraph& graph);
     
     typedef csHash<csString, csString> StringStringHash;

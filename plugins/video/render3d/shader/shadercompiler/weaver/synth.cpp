@@ -41,6 +41,24 @@
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 {
   namespace WeaverCommon = CS::PluginCommon::ShaderWeaver;
+  
+  ShaderVarNodesHelper::ShaderVarNodesHelper (iDocumentNode* shaderVarsNode)
+  : shaderVarsNode (shaderVarsNode) {}
+    
+  void ShaderVarNodesHelper::AddNode (iDocumentNode* node)
+  {
+    if (node->GetType() == CS_NODE_ELEMENT)
+    {
+      const char* name = node->GetAttributeValue ("name");
+      if (name && *name && seenVars.Contains (name)) return;
+      seenVars.AddNoTest (name);
+    }
+    csRef<iDocumentNode> newNode = 
+      shaderVarsNode ->CreateNodeBefore (node->GetType ());
+    CS::DocSystem::CloneNode (node, newNode);
+  }
+    
+  //-------------------------------------------------------------------------
 
   Synthesizer::Synthesizer (WeaverCompiler* compiler, 
                             const csPDelArray<Snippet>& outerSnippets) : 
@@ -67,13 +85,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     CS::DocSystem::CloneAttributes (sourceNode, shaderNode);
     shaderNode->SetAttribute ("compiler", "xmlshader");
 
+    csRef<iDocumentNode> shadervarsNode =
+      shaderNode->CreateNodeBefore (CS_NODE_ELEMENT);
+    shadervarsNode->SetValue ("shadervars");
+    ShaderVarNodesHelper shaderVarNodesHelper (shadervarsNode);
+	  
     csRef<iDocumentNodeIterator> shaderVarNodes = 
       sourceNode->GetNodes ("shadervar");
     while (shaderVarNodes->HasNext ())
     {
       csRef<iDocumentNode> svNode = shaderVarNodes->Next ();
       csRef<iDocumentNode> newNode = 
-        shaderNode->CreateNodeBefore (svNode->GetType ());
+        shadervarsNode->CreateNodeBefore (svNode->GetType ());
       CS::DocSystem::CloneNode (svNode, newNode);
     }
     
@@ -112,7 +135,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	      passNode->CreateNodeBefore (srcNode->GetType());
 	    CS::DocSystem::CloneNode (srcNode, dstNode);
 	  }
-	  if (!SynthesizeTechnique (passNode, snippet, graph))
+	  if (!SynthesizeTechnique (shaderVarNodesHelper, passNode, snippet, graph))
             techniqueNode->RemoveNode (passNode);
           else
             aPassSucceeded = true;
@@ -136,11 +159,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     return csPtr<iDocument> (synthesizedDoc);
   }
 
-  bool Synthesizer::SynthesizeTechnique (iDocumentNode* passNode,
+  bool Synthesizer::SynthesizeTechnique (ShaderVarNodesHelper& shaderVarNodes, 
+                                         iDocumentNode* passNode,
                                          const Snippet* snippet, 
                                          const TechniqueGraph& techGraph)
   {
-    defaultCombiner.AttachNew (new CombinerDefault (compiler));
+    defaultCombiner.AttachNew (new CombinerDefault (compiler, shaderVarNodes));
 
     TechniqueGraph graph (techGraph);
     /*
