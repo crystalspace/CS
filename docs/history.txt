@@ -20,6 +20,7 @@ chronological order.
 	  lights are more 'important'). Also fixed errorneous skipping of
 	  lights.
 	- res added a "object2world transform inverse" default shader var.
+	- res added some specular color maps to simplelights.
 27-Mar-2008
 	- res changed the light snippets to use some more 'half' typed values
 	  internally: this can produce some more efficient shader code on some
