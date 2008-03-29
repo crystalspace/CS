@@ -194,7 +194,7 @@ namespace lighter
     lightFrustum = frustum;
 
     csPlane3 bp (portalPlane);
-    bp.DD -= bp.norm * lightFrustum.GetOrigin ();
+    bp.DD += bp.norm * lightFrustum.GetOrigin ();
     bp.Invert ();
     lightFrustum.SetBackPlane (bp);
   }
