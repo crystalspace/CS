@@ -2,6 +2,24 @@ SubDir TOP plugins cscript cspython ;
 
 if $(PYTHON.AVAILABLE) = "yes"
 {
+  if $(CMD.SWIG)
+  {
+    if $(PYTHON.VERSION) >= "2.5"
+    {
+      if $(CMD.SWIG.VERSION) >= "1.3.31"
+      {
+        DO_SWIG_PYTHON = "yes" ;
+      }
+    }
+    else
+    {
+      if $(CMD.SWIG.VERSION) >= "1.3.28"
+      {
+        DO_SWIG_PYTHON = "yes" ;
+      }
+    }
+  }
+
   # Compiler flags for Swig-generated code. The synthesized code is not 100%
   # clean, so we disable some compilation warnings in order to avoid abuse
   # about code over which we have no control.  Additionally, it is reported
@@ -31,7 +49,7 @@ if $(PYTHON.AVAILABLE) = "yes"
   {
     common = [ DoSourceGrist $(common) ] ;
 
-    if $(CMD.SWIG)
+    if $(DO_SWIG_PYTHON)
     {
       Swig $(common) $(cspacepy) :
         [ DoSourceGrist cspace.i ] :

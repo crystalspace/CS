@@ -43,7 +43,8 @@ AC_PREREQ([2.56])
 #	"yes", then CS_EMIT_BUILD_RESULT()'s default emitter will be used.
 #	When EMITTER is provided, the following properties are emitted to the
 #	output file: PYTHON (the actual interpreter), PYTHON.AVAILABLE ("yes"
-#	or "no"), PYTHON.CFLAGS, PYTHON.LFLAGS, and PYTHON.MODULE_EXT.
+#	or "no"), PYTHON.CFLAGS, PYTHON.LFLAGS, PYTHON.VERSION,
+#	and PYTHON.MODULE_EXT.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_PYTHON],
     [AC_REQUIRE([CS_CHECK_PTHREAD])
@@ -65,6 +66,9 @@ AC_DEFUN([CS_CHECK_PYTHON],
 	    [cs_pyver=`AC_RUN_LOG([$PYTHON -c 'import sys, string; \
 		print string.join(map(str,sys.version_info[[:2]]),".")'])`
 	    cs_cv_pybase="python${cs_pyver}"
+
+	    CS_EMIT_BUILD_PROPERTY([PYTHON.VERSION],[$cs_pyver],[],[],
+		CS_EMITTER_OPTIONAL([$1]))
 
 	    cs_cv_pybase_cflags=CS_RUN_PATH_NORMALIZE([$PYTHON -c \
 		'import distutils.sysconfig; \

@@ -7338,6 +7338,13 @@ if test "$cs_cv_prog_swig_version_1_3_21_ok" = yes; then
 "
 fi
 
+         cs_build_prop_val="$cs_prog_swig_version"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.SWIG.VERSION ?= \"$cs_build_prop_val\" ;
+"
+fi
+
 fi
 
 fi
@@ -11624,6 +11631,14 @@ else
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }`
 	    cs_cv_pybase="python${cs_pyver}"
+
+	    cs_build_prop_val="$cs_pyver"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}PYTHON.VERSION ?= \"$cs_build_prop_val\" ;
+"
+fi
+
 
 	    cs_cv_pybase_cflags=`{ (echo "$as_me:$LINENO: \$PYTHON -c \\
 		'import distutils.sysconfig; \\

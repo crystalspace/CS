@@ -447,6 +447,14 @@ chronological order.
 	  'elsif ... else ... endif' would result in document data to be
 	  internally assigned to the wrong block (and hence cause invalid
 	  output).
+	- iceeey made CS_CHECK_PYTHON emit PYTHON.VERSION.
+	- iceeey made configure emit CMD.SWIG.VERSION.
+	- iceeey made python binding generation require at least SWIG 1.3.28
+	  for since this allows the use of modern SWIG features.
+        - iceeey made python binding generation for Python 2.5 require at least
+	  SWIG 1.3.31 since Python 2.5 was first supported in this version
+	  (actually in 1.3.30, but this version was buggy and was superceded
+	  by 1.3.30 7 days later).
 04-Oct-2007
 	- andres added a VarFileInfo Block to the resources for win32
 	  dlls/executables as they are invalid without and especially

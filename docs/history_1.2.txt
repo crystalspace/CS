@@ -1,5 +1,9 @@
 1.2 branch log.
 
+29-Mar-2008
+	- Vincent backported r27834 into 1.2 (fix for #283: require SWIG
+	  1.3.31+ to build python bindings when using Python 2.5, else use
+	  pre-generated files).
 26-Mar-2008
 	- Vincent merged r29110 into 1.2 (fix for TinyXML writer crashing on
 	  emtpy attributes).
