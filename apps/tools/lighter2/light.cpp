@@ -249,6 +249,7 @@ namespace lighter
     SetPDLight (parent->IsPDLight ());
     SetColor (parent->GetColor ());
     SetLightID ((const char*)parent->GetLightID ().data);
+    SetName (parent->GetName ());
     lightFrustum = frustum;
     boundingSphere = transform.Other2This (parentLight->GetBoundingSphere ());
 

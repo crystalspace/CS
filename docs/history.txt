@@ -6,6 +6,8 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+30-Mar-2008
+	- res fixed PBOs not being bound before used in the texture blit code.
 29-Mar-2008
 	- res fixed gl3d's DrawSimpleMesh() to give the shader SVs lowest
 	  precedence (mimicking the usual behaviour of RMs).
@@ -55,6 +57,9 @@ chronological order.
 	  splitting of names and indices: now, everything after the first '['
 	  is considered as indices.
 	- res fixed a mess-up in csMatrix3 transposing.
+	- Marten fixed tinyxml writer not to crash on empty attributes.
+	- Marten fixed light name handling of proxylights in lighter2.
+	- Mike Gist renamed the "tex spec" shadervar to "tex specular".
 	- res added a simple postprocess glare to rm_unshadowed.
 	- res changed the default lighting snippets from using shader condition
 	  templates to somewhat nicer Cg interfaces.

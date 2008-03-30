@@ -15,13 +15,13 @@
       <texture destination="TexNormalCompressed" name="tex normal compressed" />
       <texture destination="TexDiffuse" name="tex diffuse" />
       <texture destination="TexHeight" name="tex height" />
-      <texture destination="TexSpec" name="tex spec" />
+      <texture destination="TexSpecular" name="tex specular" />
 	  <texture destination="TexAttn" name="light attenuationtex[0]" />
-	  <fp plugin="glcg">
-	    <cgfp>
-	      <?Include /shader/parallaxAtt/parallaxAtt.cgfp ?>
-	    </cgfp>
-	  </fp>
+	<fp plugin="glcg">
+	  <cgfp>
+	    <?Include /shader/parallaxAtt/parallaxAtt.cgfp ?>
+	  </cgfp>
+	</fp>
     </pass>
   </technique>
   <technique priority="130">
@@ -65,7 +65,7 @@
               <texture destination="TexNormalCompressed" name="tex normal compressed" />
 		  <texture destination="TexDiffuse" name="tex diffuse" />
 		  <texture destination="TexHeight" name="tex height" />
-		  <texture destination="TexSpec" name="tex spec" />
+              <texture destination="TexSpecular" name="tex specular" />
 		  <fp plugin="glcg">
 			  <cgfp>
 				  <?Include /shader/parallaxAtt/parallax.cgfp ?>
@@ -93,5 +93,4 @@
   
   <fallbackshader name="light_spec_bumpmap" file="/shader/specular/light_spec_bumpmap.xml" />
 </shader>
-
 
