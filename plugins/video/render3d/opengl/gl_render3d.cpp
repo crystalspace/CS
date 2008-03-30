@@ -3080,9 +3080,9 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
 
   csShaderVariableStack stack;
   stack.Setup (strings->GetSize ());
+  if (mesh.shader != 0) mesh.shader->PushVariables (stack);
   shadermgr->PushVariables (stack);
   scrapContext.PushVariables (stack);
-  if (mesh.shader != 0) mesh.shader->PushVariables (stack);
   if (mesh.dynDomain != 0) mesh.dynDomain->PushVariables (stack);
 
   if (mesh.alphaType.autoAlphaMode)
