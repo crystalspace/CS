@@ -25,6 +25,9 @@ namespace CS
 {
   namespace RenderManager
   {
+    /**
+     * To help setting up a post effects manager for HDR rendering.
+     */
     class HDRHelper
     {
     public:
@@ -32,13 +35,18 @@ namespace CS
       enum Quality
       {
         /**
-         * Use 8-bit integers: fastest, but looks total crap. Use only
+         * Use 8-bit integers: fastest, but can look very, very bad. Use only
          * when desperate
          */
         qualInt8,
         /**
+         * Use 10-bit integers: faster and usually looking good enough;
+         * range is still rather limited.
+         */
+        qualInt10,
+        /**
          * Use 16-bit integers: fast and usually good enough;
-         * range is still limited. Recommended.
+         * range is still limited.
          */
         qualInt16,
         /**
@@ -53,6 +61,21 @@ namespace CS
         qualFloat32
       };
     
+      /**
+       * Set up a post processing effects manager for rendering to HDR 
+       * textures.
+       * \param objectReg Pointer to the object registry.
+       * \param quality Quality of the intermediate textures rendered to.
+       * \param colorRange Range of colors for integer texture qualities.
+       *   Typical values are 16 for qualInt16 and 4 for qualInt8.
+       * \param postEffects Post processing effects manager used.
+       * \param addDefaultMappingShader Whether a default effect should be
+       *   added that performs a simple linear tone mapping to the screen
+       *   color space.
+       * \return Whether the setup succeeded.
+       * \remarks If no default mapping shader is added you should manually
+       *   add a tone mapping effect.
+       */
       bool Setup (iObjectRegistry* objectReg, 
         Quality quality, int colorRange,
         PostEffectManager& postEffects, bool addDefaultMappingShader = true)
@@ -64,8 +87,9 @@ namespace CS
            * alpha. But without is prolly faster, and post proc shaders are less
            * likely to need it. So perhaps allow different formats in one post
            * effect manager ... */
-          case qualInt8:    textureFmt = "rgb8"; break;
-          case qualInt16:   textureFmt = "rgb16"; break;
+          case qualInt8:    textureFmt = "bgr8"; break;
+          case qualInt10:   textureFmt = "bgr10"; break;
+          case qualInt16:   textureFmt = "bgr16"; break;
           case qualFloat16: textureFmt = "rgb16_f"; break;
           case qualFloat32: textureFmt = "rgb32_f"; break;
           default: return false;
