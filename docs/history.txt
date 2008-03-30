@@ -8,6 +8,8 @@ chronological order.
 
 30-Mar-2008
 	- res fixed PBOs not being bound before used in the texture blit code.
+	- res changed the RM light setup to handle ambient-only layers more
+	  elegantly and fixed static light support.
 29-Mar-2008
 	- res fixed gl3d's DrawSimpleMesh() to give the shader SVs lowest
 	  precedence (mimicking the usual behaviour of RMs).

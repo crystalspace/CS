@@ -126,9 +126,20 @@ namespace RenderManager
     LightingSorter (PersistentData& persist,
       csLightInfluence* influenceLights, size_t numLights);
 
-    size_t GetSize() const
+    size_t GetSize (bool skipStatic)
     {
-      return lightLimit;
+      size_t n = 0;
+      while (n < lightLimit)
+      {
+        if (!skipStatic || !persist.lightTypeScratch[n].isStatic)
+          n++;
+        else
+        {
+          persist.lightTypeScratch.DeleteIndex (n);
+          lightLimit = csMin (persist.lightTypeScratch.GetSize(), lightLimit);
+        }
+      }
+      return n;
     }
     void SetLightsLimit (size_t limit)
     {
@@ -288,156 +299,160 @@ namespace RenderManager
       bool skipStatic = mesh.meshFlags.Check (CS_ENTITY_STATICLIT)
 	&& layerConfig.GetStaticLightsSettings (layer).nodraw;
 
-      size_t layerLights = sortedLights.GetSize();
+      size_t layerLights = sortedLights.GetSize (skipStatic);
       if (lastMetadata.numberOfLights == 0)
         layerLights = 0;
-      if ((layerLights == 0) 
-        && !layerConfig.IsAmbientLayer (layer)) return 0;
-      CS_ALLOC_STACK_ARRAY(LightingSorter::LightInfo, renderLights, layerLights);
+      if (layerLights == 0)
+      {
+        if (!layerConfig.IsAmbientLayer (layer)) return 0;
         
-      // Set up layers
-      size_t firstLight = 0;
-      size_t remainingLights = layerLights;
-      size_t totalLayers = 0;
-      while (firstLight < layerLights)
-      {
-        if (totalLayers >= layerConfig.GetMaxLightPasses (layer))
-          break;
-      
-	size_t num = 0;
-	csLightType lightType;
-	sortedLights.GetNextLight (skipStatic, renderLights[firstLight]);
-	lightType = renderLights[firstLight].type;
-	num = 1;
-	size_t maxPassLights = lastMetadata.numberOfLights * 
-	  layerConfig.GetMaxLightPasses (layer);
-	maxPassLights = csMin (maxPassLights, remainingLights);
-	for (; num < maxPassLights; num++)
-	{
-	  if (!sortedLights.GetNextLight (lightType, skipStatic, 
-	      renderLights[firstLight + num]))
-	    break;
-	}
-	/* We have a subset of the lights that are of the same type.
-	 * Check the size of it against the shader limit */
-	size_t thisPassLayers;
-	if (lastMetadata.numberOfLights != 0)
-	{
-	  thisPassLayers = (num + lastMetadata.numberOfLights - 1)
-	    / lastMetadata.numberOfLights;
-	  thisPassLayers = csMin (totalLayers + thisPassLayers,
-	    layerConfig.GetMaxLightPasses (layer)) - totalLayers;
-	}
-	else
-	{
-	  // Shader that doesn't do lights: draw one layer (for ambient)
-	  thisPassLayers = 1;
-	  num = remainingLights;
-	}
-	size_t neededLayers = totalLayers + thisPassLayers;
+        // Render 1 layer only, no lights
+        layers.Ensure (layer, 1, node);
+        
+        csShaderVariableStack localStack;
+	node->owner.svArrays.SetupSVStack (localStack, 
+	  layers.GetNewLayerIndex (layer, 0),
+	  mesh.contextLocalId);
 
-        layers.Ensure (layer, neededLayers, node);
+	csShaderVariable* lightNum = lightVarsHelper.CreateVarOnStack (
+	  persist.svNames.GetDefaultSVId (
+	    csLightShaderVarCache::varLightCount), localStack);
+	lightNum->SetValue ((int)0);
 
-	firstLight += num;
-	remainingLights -= num;
-	totalLayers = neededLayers;
+	csShaderVariable* passNum = lightVarsHelper.CreateVarOnStack (
+	  persist.svPassNum, localStack);
+	passNum->SetValue ((int)0);
+	
+	return 0;
       }
-
-      // Now render lights for each light type
-      layerLights = remainingLights = firstLight;
-      firstLight = 0;
-      totalLayers = 0;
-      while ((firstLight < layerLights)
-        || (layerConfig.IsAmbientLayer (layer)))
+      else
       {
-	csLightType lightType = (remainingLights > 0) 
-	  ? renderLights[firstLight].type
-	  : (csLightType)0;
-	size_t num = 1;
-	for (; num < remainingLights; num++)
+        // Assume at least 1 light
+	CS_ALLOC_STACK_ARRAY(LightingSorter::LightInfo, renderLights, layerLights);
+	  
+	// Set up layers
+	size_t firstLight = 0;
+	size_t remainingLights = layerLights;
+	size_t totalLayers = 0;
+	while (firstLight < layerLights)
 	{
-	  if (renderLights[firstLight + num].type != lightType)
+	  if (totalLayers >= layerConfig.GetMaxLightPasses (layer))
 	    break;
-	}
-	/* We have a subset of the lights that are of the same type.
+	
+	  size_t num = 1;
+	  sortedLights.GetNextLight (skipStatic, renderLights[firstLight]);
+	  csLightType lightType;
+	  lightType = renderLights[firstLight].type;
+	  num = 1;
+	  size_t maxPassLights = lastMetadata.numberOfLights * 
+	    layerConfig.GetMaxLightPasses (layer);
+	  maxPassLights = csMin (maxPassLights, remainingLights);
+	  for (; num < maxPassLights; num++)
+	  {
+	    if (!sortedLights.GetNextLight (lightType, skipStatic, 
+		renderLights[firstLight + num]))
+	      break;
+	  }
+	  /* We have a subset of the lights that are of the same type.
 	  * Check the size of it against the shader limit */
-	size_t thisPassLayers;
-	if (lastMetadata.numberOfLights != 0)
-	{
+	  size_t thisPassLayers;
 	  thisPassLayers = (num + lastMetadata.numberOfLights - 1)
 	    / lastMetadata.numberOfLights;
 	  thisPassLayers = csMin (totalLayers + thisPassLayers,
 	    layerConfig.GetMaxLightPasses (layer)) - totalLayers;
+	  size_t neededLayers = totalLayers + thisPassLayers;
+  
+	  layers.Ensure (layer, neededLayers, node);
+  
+	  firstLight += num;
+	  remainingLights -= num;
+	  totalLayers = neededLayers;
 	}
-	else
+  
+	// Now render lights for each light type
+	layerLights = remainingLights = firstLight;
+	firstLight = 0;
+	totalLayers = 0;
+	while (firstLight < layerLights)
 	{
-	  thisPassLayers = 1;
-	  num = 0;
-	}
-	if (thisPassLayers == 0)
-	  // Reached layer pass limit
-	  break;
-	size_t neededLayers = totalLayers + thisPassLayers;
-
-	csShaderVariableStack localStack;
-	for (size_t n = 0; n < thisPassLayers; n++)
-	{
-	  if ((totalLayers != 0) || (n > 0))
+	  csLightType lightType = renderLights[firstLight].type;
+	  size_t num = 1;
+	  for (; num < remainingLights; num++)
 	  {
-	    /* The first layer will have the shader to use set;
-	      * subsequent ones don't */
-	    node->owner.CopyLayerShader (mesh.contextLocalId,
-              layers.GetNewLayerIndex (layer, 0),
-              layers.GetNewLayerIndex (layer, n + totalLayers));
+	    if (renderLights[firstLight + num].type != lightType)
+	      break;
 	  }
-	  node->owner.svArrays.SetupSVStack (localStack, 
-            layers.GetNewLayerIndex (layer, n + totalLayers),
-	    mesh.contextLocalId);
+	  /* We have a subset of the lights that are of the same type.
+	  * Check the size of it against the shader limit */
+	  size_t thisPassLayers;
+	  thisPassLayers = (num + lastMetadata.numberOfLights - 1)
+	    / lastMetadata.numberOfLights;
+	  thisPassLayers = csMin (totalLayers + thisPassLayers,
+	    layerConfig.GetMaxLightPasses (layer)) - totalLayers;
+	  if (thisPassLayers == 0)
+	    // Reached layer pass limit
+	    break;
+	  size_t neededLayers = totalLayers + thisPassLayers;
   
-	  size_t thisNum = csMin (num,
-	    layerConfig.GetMaxLightNum (layer));
-	  thisNum = csMin (thisNum, (size_t)lastMetadata.numberOfLights);
-	  csShaderVariable* lightNum = lightVarsHelper.CreateVarOnStack (
-	    persist.svNames.GetDefaultSVId (
-	      csLightShaderVarCache::varLightCount), localStack);
-	  lightNum->SetValue ((int)thisNum);
-
-	  csShaderVariable* passNum = lightVarsHelper.CreateVarOnStack (
-	    persist.svPassNum, localStack);
-	  passNum->SetValue ((int)(n + totalLayers));
-  
-	  csShaderVariable* lightTypeSV = lightVarsHelper.CreateVarOnStack (
-	    persist.svNames.GetLightSVId (
-	      csLightShaderVarCache::lightType), localStack);
-	  lightTypeSV->SetValue ((int)(lightType));
-  
-	  for (size_t l = thisNum; l-- > 0; )
+	  csShaderVariableStack localStack;
+	  for (size_t n = 0; n < thisPassLayers; n++)
 	  {
-	    iLight* light = renderLights[firstLight + l].light;
-	    CachedLightData* thisLightSVs =
-	      persist.lightDataCache.GetElementPointer (light);
-	    if (thisLightSVs == 0)
+	    if ((totalLayers != 0) || (n > 0))
 	    {
-              CachedLightData newCacheData;
-              newCacheData.shaderVars =
-                &(light->GetSVContext()->GetShaderVariables());
-	      thisLightSVs = &persist.lightDataCache.Put (
-		light, newCacheData);
+	      /* The first layer will have the shader to use set;
+		* subsequent ones don't */
+	      node->owner.CopyLayerShader (mesh.contextLocalId,
+		layers.GetNewLayerIndex (layer, 0),
+		layers.GetNewLayerIndex (layer, n + totalLayers));
 	    }
+	    node->owner.svArrays.SetupSVStack (localStack, 
+	      layers.GetNewLayerIndex (layer, n + totalLayers),
+	      mesh.contextLocalId);
+    
+	    size_t thisNum = csMin (num,
+	      layerConfig.GetMaxLightNum (layer));
+	    thisNum = csMin (thisNum, (size_t)lastMetadata.numberOfLights);
+	    csShaderVariable* lightNum = lightVarsHelper.CreateVarOnStack (
+	      persist.svNames.GetDefaultSVId (
+		csLightShaderVarCache::varLightCount), localStack);
+	    lightNum->SetValue ((int)thisNum);
   
-	    lightVarsHelper.MergeAsArrayItems (localStack,
-              *(thisLightSVs->shaderVars), l);
+	    csShaderVariable* passNum = lightVarsHelper.CreateVarOnStack (
+	      persist.svPassNum, localStack);
+	    passNum->SetValue ((int)(n + totalLayers));
+    
+	    csShaderVariable* lightTypeSV = lightVarsHelper.CreateVarOnStack (
+	      persist.svNames.GetLightSVId (
+		csLightShaderVarCache::lightType), localStack);
+	    lightTypeSV->SetValue ((int)(lightType));
+    
+	    for (size_t l = thisNum; l-- > 0; )
+	    {
+	      iLight* light = renderLights[firstLight + l].light;
+	      CachedLightData* thisLightSVs =
+		persist.lightDataCache.GetElementPointer (light);
+	      if (thisLightSVs == 0)
+	      {
+		CachedLightData newCacheData;
+		newCacheData.shaderVars =
+		  &(light->GetSVContext()->GetShaderVariables());
+		thisLightSVs = &persist.lightDataCache.Put (
+		  light, newCacheData);
+	      }
+    
+	      lightVarsHelper.MergeAsArrayItems (localStack,
+		*(thisLightSVs->shaderVars), l);
+	    }
+	    num -= thisNum;
+	    firstLight += thisNum;
+	    remainingLights -= thisNum;
 	  }
-	  num -= thisNum;
-	  firstLight += thisNum;
-	  remainingLights -= thisNum;
+  
+	  totalLayers = neededLayers;
 	}
-        if (layerLights == 0) break;
-
-	totalLayers = neededLayers;
+	
+	return firstLight;
       }
-      
-      return firstLight;
     }
   protected:
     PersistentData& persist;
