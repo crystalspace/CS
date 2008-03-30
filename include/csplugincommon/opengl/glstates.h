@@ -1001,26 +1001,12 @@ public:
    * \remarks Doesn't check whether the relevant buffer object extension is 
    *   actually supported, this must be done in calling code.
    */
-  void SetBufferARB (GLenum target, GLuint id)
+  void SetBufferARB (GLenum target, GLuint id, bool applyNow = false)
   {
     int index = csGLStateCacheContext::GLBufferTargetToCacheIndex (target);
     CS_ASSERT (index >= 0);
-    /*if (id != currentContext->currentBufferID[index])
-    {
-      extmgr->glBindBufferARB (target, id);
-      currentContext->currentBufferID[index] = id;
-
-      if (target == GL_ARRAY_BUFFER_ARB)
-      {
-        //invalidate vertex pointers
-        currentContext->parameter_vpointer = (GLvoid*)~0; 
-        currentContext->parameter_npointer = (GLvoid*)~0;
-        currentContext->parameter_cpointer = (GLvoid*)~0;
-        memset(currentContext->parameter_tpointer.p, ~0,
-          sizeof(GLvoid*)*currentContext->numTexCoords);
-      }
-    }*/
     currentContext->currentBufferID[index] = id;
+    if (applyNow) ApplyBufferBinding (index);
   }
 
   /**
