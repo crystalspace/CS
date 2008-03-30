@@ -8,6 +8,8 @@ chronological order.
 
 30-Mar-2008
 	- res fixed PBOs not being bound before used in the texture blit code.
+	- res applied a patch from Lukas Erlinghagen to fix compiling on
+	  gcc 3.4.
 26-Mar-2008
 	- Marten commited a number of re-inlinings of basic matrix & vector 
 	  methods.
