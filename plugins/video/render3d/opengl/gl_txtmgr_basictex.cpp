@@ -840,6 +840,36 @@ void csGLBasicTextureHandle::ApplyBlitBufferPBO (uint8* buf)
     csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB, 0, true);
   }
 }
+  
+void csGLBasicTextureHandle::SetMipmapLimits (int maxMip, int minMip)
+{
+  if (G3D->ext->CS_GL_SGIS_texture_lod)
+  {
+    GLenum textarget = GetGLTextureTarget();
+    csGLGraphics3D::statecache->SetTexture (textarget, GetHandle ());
+    glTexParameteri (textarget, GL_TEXTURE_BASE_LEVEL_SGIS, minMip);
+    glTexParameteri (textarget, GL_TEXTURE_MAX_LEVEL_SGIS, maxMip);
+  }
+}
+
+void csGLBasicTextureHandle::GetMipmapLimits (int& maxMip, int& minMip)
+{
+  if (G3D->ext->CS_GL_SGIS_texture_lod)
+  {
+    GLenum textarget = GetGLTextureTarget();
+    csGLGraphics3D::statecache->SetTexture (textarget, GetHandle ());
+    GLint baseLevel, maxLevel;
+    glGetTexParameteriv (textarget, GL_TEXTURE_BASE_LEVEL_SGIS, &baseLevel);
+    glGetTexParameteriv (textarget, GL_TEXTURE_MAX_LEVEL_SGIS, &maxLevel);
+    minMip = baseLevel;
+    maxMip = maxLevel;
+  }
+  else
+  {
+    maxMip = 1000;
+    minMip = 0;
+  }
+}
 
 csPtr<iImage> csGLBasicTextureHandle::Dump ()
 {

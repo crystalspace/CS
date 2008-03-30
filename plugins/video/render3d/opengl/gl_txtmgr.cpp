@@ -56,6 +56,8 @@ csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
 
   G3D->ext->InitGL_ARB_pixel_buffer_object();
   hasPBO = G3D->ext->CS_GL_ARB_pixel_buffer_object;
+  
+  G3D->ext->InitGL_SGIS_texture_lod();
 
 #define CS_GL_TEXTURE_FORMAT(fmt)					    \
   textureFormats.Put (#fmt, TextureFormat (fmt, true));		

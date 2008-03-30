@@ -50,7 +50,7 @@ struct iGraphics3D;
  */
 struct iTextureHandle : public virtual iBase
 {
-  SCF_INTERFACE(iTextureHandle, 4,0,3);
+  SCF_INTERFACE(iTextureHandle, 4,0,4);
   /// Retrieve the flags set for this texture
   virtual int GetFlags () const = 0;
 
@@ -287,6 +287,11 @@ struct iTextureHandle : public virtual iBase
     natureDirect = 1
   };
   virtual BlitBufferNature GetBufferNature (uint8* buf) = 0;
+  
+  /// Set the highest and lowest used mipmap for this texture.
+  virtual void SetMipmapLimits (int maxMip, int minMip = 0) = 0;
+  /// Get the highest and lowest used mipmap for this texture.
+  virtual void GetMipmapLimits (int& maxMip, int& minMip) = 0;
 };
 
 /** @} */

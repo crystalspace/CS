@@ -344,6 +344,9 @@ public:
   void ApplyBlitBuffer (uint8* buf);
   BlitBufferNature GetBufferNature (uint8* buf);
 
+  void SetMipmapLimits (int maxMip, int minMip = 0);
+  void GetMipmapLimits (int& maxMip, int& minMip);
+  
   /// Dump the contents onto an image.
   csPtr<iImage> Dump ();
 };

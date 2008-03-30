@@ -201,6 +201,9 @@ public:
     size_t& pitch, TextureBlitDataFormat format, uint bufFlags);
   void ApplyBlitBuffer (uint8* buf);
   BlitBufferNature GetBufferNature (uint8* buf) { return natureDirect; }
+
+  void SetMipmapLimits (int maxMip, int minMip = 0) {}
+  void GetMipmapLimits (int& maxMip, int& minMip) { maxMip = 3; minMip = 0; }
 };
 
 #include "csutil/deprecated_warn_on.h"

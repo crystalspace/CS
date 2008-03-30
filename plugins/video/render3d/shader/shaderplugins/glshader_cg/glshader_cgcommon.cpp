@@ -61,6 +61,7 @@ csShaderGLCGCommon::~csShaderGLCGCommon ()
 void csShaderGLCGCommon::Activate()
 {
   cgGLEnableProfile (programProfile);
+  if (!cgGLIsProgramLoaded (program)) cgGLLoadProgram (program);
   cgGLBindProgram (program);
 }
 
@@ -457,34 +458,44 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
   }
   shaderPlug->SetCompiledSource (0);
 
-  i = 0;
-  while (i < variablemap.GetSize ())
+  if (doLoad)
   {
-    // Get the Cg parameter
-    CGparameter param = cgGetNamedParameter (program, 
-      variablemap[i].destination);
-
-    if (!param ||
-        (cgGetParameterType (param) != CG_ARRAY && !cgIsParameterReferenced (param)))
+    i = 0;
+    while (i < variablemap.GetSize ())
     {
-      variablemap.DeleteIndex (i);
-      continue;
+      // Get the Cg parameter
+      CGparameter param = cgGetNamedParameter (program, 
+	variablemap[i].destination);
+  
+      if (!param ||
+	  (cgGetParameterType (param) != CG_ARRAY && !cgIsParameterReferenced (param)))
+      {
+	variablemap.DeleteIndex (i);
+	continue;
+      }
+      bool assumeConst = false;/*variablemap[i].userVal != 0;*/
+      // Mark constants as to be folded in
+      if (assumeConst)
+      {
+	cgSetParameterVariability (param, CG_LITERAL);
+	variablemap.DeleteIndex (i);
+	continue;
+      }
+      if (variablemap[i].mappingParam.IsConstant())
+      {
+	csShaderVariable* var = variablemap[i].mappingParam.var;
+	if (var != 0)
+	  SetParameterValue (param, var);
+	cgSetParameterVariability (param, CG_LITERAL);
+	variablemap.DeleteIndex (i);
+	continue;
+      }
+      variablemap[i].userVal = (intptr_t)param;
+      i++;
     }
-    // Mark constants as to be folded in
-    if (variablemap[i].mappingParam.IsConstant())
-    {
-      csShaderVariable* var = variablemap[i].mappingParam.var;
-      if (var != 0)
-        SetParameterValue (param, var);
-      cgSetParameterVariability (param, CG_LITERAL);
-      variablemap.DeleteIndex (i);
-      continue;
-    }
-    variablemap[i].userVal = (intptr_t)param;
-    i++;
+  
+    variablemap.ShrinkBestFit();
   }
-
-  variablemap.ShrinkBestFit();
 
   return true;
 }
@@ -620,6 +631,48 @@ bool csShaderGLCGCommon::Load (iShaderDestinationResolver* resolve,
           shaderPlug->SplitArgsString (child->GetContentsValue (), 
             compilerArgs);
           break;
+	case XMLTOKEN_VARIABLEMAP:
+	  {
+	    //@@ REWRITE
+	    const char* destname = child->GetAttributeValue ("destination");
+	    if (!destname)
+	    {
+	      synsrv->Report ("crystalspace.graphics3d.shader.common",
+		CS_REPORTER_SEVERITY_WARNING, child,
+		"<variablemap> has no 'destination' attribute");
+	      return false;
+	    }
+	    
+	    bool assumeConst = child->GetAttributeValueAsBool ("assumeconst",
+	      false);
+    
+	    const char* varname = child->GetAttributeValue ("variable");
+	    if (!varname)
+	    {
+	      // "New style" variable mapping
+	      VariableMapEntry vme (CS::InvalidShaderVarStringID, destname);
+	      if (!ParseProgramParam (child, vme.mappingParam,
+		ParamFloat | ParamVector2 | ParamVector3 | ParamVector4))
+		return false;
+	      vme.userVal = (int)assumeConst;
+	      variablemap.Push (vme);
+	    }
+	    else
+	    {
+	      // "Classic" variable mapping
+	      CS::Graphics::ShaderVarNameParser nameParse (varname);
+	      VariableMapEntry vme (
+		stringsSvName->Request (nameParse.GetShaderVarName()),
+		destname);
+	      for (size_t n = 0; n < nameParse.GetIndexNum(); n++)
+	      {
+		vme.mappingParam.indices.Push (nameParse.GetIndexValue (n));
+	      }
+	      vme.userVal = (int)assumeConst;
+	      variablemap.Push (vme);
+	    }
+	  }
+	  break;
         default:
 	  if (!ParseCommon (child))
 	    return false;
