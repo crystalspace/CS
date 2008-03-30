@@ -10,6 +10,8 @@ chronological order.
 	- res fixed PBOs not being bound before used in the texture blit code.
 	- res applied a patch from Lukas Erlinghagen to fix compiling on
 	  gcc 3.4.
+	- res applied a patch from Lukas Erlinghagen to add frame time display
+	  to bugplug.
 26-Mar-2008
 	- Marten commited a number of re-inlinings of basic matrix & vector 
 	  methods.
