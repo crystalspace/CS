@@ -14,6 +14,7 @@ chronological order.
 	  failure following cel:r3270.
 	- Mike Gist fixed a bug in the 3ds max exportSprite script and also 
 	  improved the formatting of the output.
+	- Marten added iMissingLoaderData to the python-exposed interfaces.
 30-Mar-2008
 	- res fixed PBOs not being bound before used in the texture blit code.
 	- res applied a patch from Lukas Erlinghagen to fix compiling on
