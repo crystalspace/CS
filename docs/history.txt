@@ -6,6 +6,12 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+31-Mar-2008
+	- Eric Sunshine applied changes to jobber-cel-svn.cfg similar to those
+	  made to jobber-svn.cfg in r27840, r27842, r27849: actually run CEL's
+	  configure script rather than faking it, and perform checkout from a
+	  local repository then switch the live one. This fixes CEL jobber
+	  failure following cel:r3270.
 30-Mar-2008
 	- res fixed PBOs not being bound before used in the texture blit code.
 	- res applied a patch from Lukas Erlinghagen to fix compiling on
