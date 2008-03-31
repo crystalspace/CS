@@ -64,8 +64,8 @@ public:
   {}
 
   /// Construct from quaternion and a vector
-  inline csDualQuaternion (const csQuaternion& real, const csVector3& translation)
-    : real (real), dual (translation/2.0f, 0)
+  inline csDualQuaternion (const csQuaternion& real, const csVector3& t)
+    : real (real), dual (0.5 * (csQuaternion (t, 0)*real))
   {}
 
   /// Copy-constructor
@@ -211,15 +211,25 @@ public:
    */
   inline csDualQuaternion Unit () const
   {    
-    const float lenRealInv = 1.0f / real.Norm ();
+    const float lenReal = real.Norm ();
+
+    if (lenReal == 0)
+    {
+      return *this;
+    }
+
+    const float lenRealInv = 1.0f / lenReal;
     
-    csDualQuaternion result (real*lenRealInv, dual*lenRealInv);
-    csQuaternion r (result.real);
+    csQuaternion _real = real * lenRealInv;
+    csQuaternion _dual = dual * lenRealInv;
 
-    r = r * result.real.Dot (result.dual);
-    result.dual -= r;
+    csQuaternion r (_real);
+    r *= _real.Dot (_dual);
+    r *= -1.0f;
 
-    return result;
+    _dual += r;
+
+    return csDualQuaternion (_real, _dual);
   }
 
   /**
@@ -241,17 +251,10 @@ public:
    */
   inline csVector3 Transform (const csVector3& v) const
   {
-    const csQuaternion vQ (v, 0);
+    csVector3 position = v + 2.0f * (real.v % ((real.v % v) + real.w * v));
+    csVector3 trans = 2.0f * (real.w * dual.v - dual.w * real.v + (real.v % dual.v));
 
-    csQuaternion a (real.GetConjugate ());
-    csQuaternion b (a);
-    a *= dual;    
-
-    b *= vQ;
-    b *= real;
-     
-    a = a*2 + b;
-    return a.v;    
+    return position + trans;
   }
 
 

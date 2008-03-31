@@ -319,6 +319,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       factoryBB.AddBoundingVertex (*vbuf);
       ++vbuf;
     }
+
+    // Normalize the bone weights
+    for (size_t i = 0; i < vertexCount; ++i)
+    {
+      float sumWeight = 0;
+      for (size_t j = 0; j < 4; ++j)
+      {
+        sumWeight += boneInfluences[i*4+j].influenceWeight;
+      }
+
+      for (size_t j = 0; j < 4; ++j)
+      {
+        boneInfluences[i*4+j].influenceWeight /= sumWeight;
+      }
+    }
   }
 
   void AnimeshObjectFactory::SetSkeletonFactory (iSkeletonFactory2* skeletonFactory)

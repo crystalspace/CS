@@ -138,6 +138,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     for (size_t i = 0; i < subNodes.GetSize (); ++i)
     {
       const float nodeWeight = weightList[i];
+      if (nodeWeight == 0 || !subNodes[i]->IsActive())
+        continue;
+
       accWeight += nodeWeight;
       float w = nodeWeight / accWeight;
 

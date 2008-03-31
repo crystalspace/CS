@@ -52,10 +52,35 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     for (size_t i = 0; i < factory->vertexCount; ++i)
     {
       // Accumulate data for the vertex
-      csDualQuaternion dq (csQuaternion (0,0,0,0), csQuaternion (0,0,0,0)); 
-      csQuaternion pivot;
-
       int numInfluences = 0;
+
+      /*csVector3 result (0,0,0);     
+      for (size_t j = 0; j < 4; ++j, ++influence)
+      {
+        if (influence->influenceWeight > 0)
+        {
+          numInfluences++;
+
+          csVector3 tmp;          
+          tmp = skeletonState->GetQuaternion (influence->bone).Rotate (*srcVerts);
+          tmp += skeletonState->GetVector (influence->bone);
+
+          result += tmp * influence->influenceWeight;
+        }
+      }
+      if (numInfluences == 0)
+      {
+      dstVerts[i] = *srcVerts;
+      }
+      else
+      {
+      dstVerts[i] = result;
+      }
+      
+      */
+
+      csDualQuaternion dq (csQuaternion (0,0,0,0), csQuaternion (0,0,0,0)); 
+      csQuaternion pivot;   
 
       //@@ Add handling to avoid "empty" dq below
       for (size_t j = 0; j < 4; ++j, ++influence) // @@SOLVE 4
@@ -68,7 +93,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
             skeletonState->GetQuaternion (influence->bone),
             skeletonState->GetVector (influence->bone));
 
-          if (j == 0)
+          if (numInfluences == 1)
           {
             pivot = inflQuat.real;
           }
@@ -87,14 +112,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       }
       else
       {
-        if (dq.real.Norm () > 0)
-        {
-          dq = dq.Unit ();
-        }
-      
-        //dstVerts[i] = dq.Transform (*srcVerts);
-        dstVerts[i] = dq.dual.v * 2.0f + dq.real.Rotate (*srcVerts);
-      }
+        dq = dq.Unit ();
+
+        dstVerts[i] = dq.Transform (*srcVerts);        
+      }  
 
       ++srcVerts;      
     }
