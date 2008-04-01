@@ -4254,6 +4254,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *MissingMesh = *cspacec::iMissingLoaderData_MissingMesh;
 *MissingSector = *cspacec::iMissingLoaderData_MissingSector;
 *MissingLight = *cspacec::iMissingLoaderData_MissingLight;
+*scfGetVersion = *cspacec::iMissingLoaderData_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});

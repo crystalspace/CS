@@ -78,10 +78,12 @@ class iMissingLoaderData(core.iBase):
     def MissingMesh(*args): return _imap.iMissingLoaderData_MissingMesh(*args)
     def MissingSector(*args): return _imap.iMissingLoaderData_MissingSector(*args)
     def MissingLight(*args): return _imap.iMissingLoaderData_MissingLight(*args)
+    scfGetVersion = staticmethod(_imap.iMissingLoaderData_scfGetVersion)
     __swig_destroy__ = _imap.delete_iMissingLoaderData
     __del__ = lambda self : None;
 iMissingLoaderData_swigregister = _imap.iMissingLoaderData_swigregister
 iMissingLoaderData_swigregister(iMissingLoaderData)
+iMissingLoaderData_scfGetVersion = _imap.iMissingLoaderData_scfGetVersion
 
 class csLoadResult(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
