@@ -22,6 +22,8 @@ chronological order.
 	    - When specifying an input for a layer, a texture coordinate
 	      buffer has to be specified as well (since different layers may
 	      have different sizes and thus different TCs).
+	- res made yet another fix to the RM light setup, this time fixing
+	  skipping static lights.
 31-Mar-2008
 	- Eric Sunshine applied changes to jobber-cel-svn.cfg similar to those
 	  made to jobber-svn.cfg in r27840, r27842, r27849: actually run CEL's

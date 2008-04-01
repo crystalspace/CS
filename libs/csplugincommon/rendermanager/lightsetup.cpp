@@ -50,7 +50,8 @@ namespace RenderManager
       while (i < lightLimit)
       {
 	if (!persist.lightTypeScratch[i].isStatic) break;
-	i++;
+	persist.lightTypeScratch.DeleteIndex (i);
+	lightLimit = csMin (persist.lightTypeScratch.GetSize(), lightLimit);
       }
     }
     if (i >= lightLimit) return false;
@@ -66,8 +67,13 @@ namespace RenderManager
     size_t i = 0;
     while (i < lightLimit)
     {
-      if ((persist.lightTypeScratch[i].type == lightType)
-          && (!skipStatic || !persist.lightTypeScratch[i].isStatic))
+      if (skipStatic && persist.lightTypeScratch[i].isStatic)
+      {
+	persist.lightTypeScratch.DeleteIndex (i);
+	lightLimit = csMin (persist.lightTypeScratch.GetSize(), lightLimit);
+	continue;
+      }
+      if (persist.lightTypeScratch[i].type == lightType)
         break;
       i++;
     }
