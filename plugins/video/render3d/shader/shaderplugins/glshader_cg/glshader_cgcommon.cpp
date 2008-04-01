@@ -436,9 +436,6 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
   }
   programProfile = cgGetProgramProfile (program);
 
-  if (shaderPlug->debugDump)
-    DoDebugDump();
-
   if (doLoad)
   {
     cgGetError(); // Clear error
@@ -446,6 +443,9 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
     if ((cgGetError() != CG_NO_ERROR)
       || !cgGLIsProgramLoaded (program)) 
     {
+      if (shaderPlug->debugDump)
+	DoDebugDump();
+
       shaderPlug->SetCompiledSource (0);
       return false;
     }
@@ -496,6 +496,9 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
   
     variablemap.ShrinkBestFit();
   }
+  
+  if (shaderPlug->debugDump)
+    DoDebugDump();
 
   return true;
 }

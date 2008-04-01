@@ -10,6 +10,9 @@ chronological order.
 	- res made simple mesh screen space work right again.
 	- res added the ability to specify a buffer holder in
 	  csSimpleRenderMesh.
+	- res changed glshader_cg to dump programs after setting parameters
+	  to literal: that way, the literal setting is respected in the
+	  dumped source.
 31-Mar-2008
 	- Eric Sunshine applied changes to jobber-cel-svn.cfg similar to those
 	  made to jobber-svn.cfg in r27840, r27842, r27849: actually run CEL's
