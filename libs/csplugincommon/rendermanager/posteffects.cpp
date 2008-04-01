@@ -150,6 +150,17 @@ PostEffectManager::Layer* PostEffectManager::AddLayer (iShader* shader, const La
   return newLayer;
 }
 
+void PostEffectManager::ClearLayers()
+{
+  buckets.DeleteAll();
+  postLayers.DeleteAll();
+  currentWidth = 0; currentHeight = 0;
+  lastLayer = 0;
+  
+  AddLayer (0, 0, 0);
+  GetBucketIndex (lastLayer->options);
+}
+
 void PostEffectManager::SetupScreenQuad (unsigned int width, unsigned int height)
 {
   indices = csRenderBuffer::CreateIndexRenderBuffer (4,
@@ -513,8 +524,8 @@ bool PostEffectLayersParser::ParseLayer (iDocumentNode* node,
   return true;
 }
 
-bool PostEffectLayersParser::Parse (iDocumentNode* node, 
-                                    PostEffectManager& effects)
+bool PostEffectLayersParser::AddLayersFromDocument (iDocumentNode* node, 
+                                                    PostEffectManager& effects)
 {
   ParsedLayers layers;
   ShadersLayers shaders;
@@ -541,7 +552,8 @@ bool PostEffectLayersParser::Parse (iDocumentNode* node,
   return true;
 }
 
-bool PostEffectLayersParser::Parse (const char* filename, PostEffectManager& effects)
+bool PostEffectLayersParser::AddLayersFromFile (const char* filename, 
+  PostEffectManager& effects)
 {
   csRef<iDocumentSystem> docsys = csQueryRegistry<iDocumentSystem> (
     objReg);
@@ -576,5 +588,5 @@ bool PostEffectLayersParser::Parse (const char* filename, PostEffectManager& eff
       "No <posteffect> in '%s'", filename);
     return false;
   }
-  return Parse (postEffectNode, effects);
+  return AddLayersFromDocument (postEffectNode, effects);
 }

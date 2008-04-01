@@ -205,9 +205,9 @@ namespace RenderManager
     PostEffectLayersParser (iObjectRegistry* objReg);
   
     /// Parse from a document node,
-    bool Parse (iDocumentNode* node, PostEffectManager& effects);
+    bool AddLayersFromDocument (iDocumentNode* node, PostEffectManager& effects);
     /// Parse from file. Document node must be "posteffect"
-    bool Parse (const char* filename, PostEffectManager& effects);
+    bool AddLayersFromFile (const char* filename, PostEffectManager& effects);
   };
 
 }

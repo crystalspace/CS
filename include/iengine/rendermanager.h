@@ -45,4 +45,13 @@ struct iRenderManagerTargets : public virtual iBase
     int subtexture = 0) = 0;
 };
 
+struct iRenderManagerPostEffects : public virtual iBase
+{
+  SCF_INTERFACE(iRenderManagerTargets,1,0,0);
+
+  virtual void ClearLayers() = 0;
+  virtual bool AddLayersFromDocument (iDocumentNode* node) = 0;
+  virtual bool AddLayersFromFile (const char* filename) = 0;
+};
+
 #endif // __CS_IENGINE_RENDERMANAGER_H__

@@ -28,9 +28,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMUnshadowed)
   template<typename RenderTreeType, typename LayerConfigType>
   class StandardContextSetup;
 
-  class RMUnshadowed : public scfImplementation3<RMUnshadowed, 
+  class RMUnshadowed : public scfImplementation4<RMUnshadowed, 
                                                  iRenderManager, 
                                                  iRenderManagerTargets,
+                                                 iRenderManagerPostEffects,
                                                  iComponent>
   {
   public:
@@ -48,6 +49,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMUnshadowed)
       int subtexture = 0)
     {
       targets.UnregisterRenderTarget (target, subtexture);
+    }
+  
+    void ClearLayers() { postEffects.ClearLayers(); }
+    bool AddLayersFromDocument (iDocumentNode* node)
+    {
+      CS::RenderManager::PostEffectLayersParser postEffectsParser (objectReg);
+      return postEffectsParser.AddLayersFromDocument (node, postEffects);
+    }
+    bool AddLayersFromFile (const char* filename)
+    {
+      CS::RenderManager::PostEffectLayersParser postEffectsParser (objectReg);
+      return postEffectsParser.AddLayersFromFile (filename, postEffects);
     }
 
     //---- iComponent ----
@@ -74,7 +87,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMUnshadowed)
     typedef CS::RenderManager::LightSetup<RenderTreeType, 
       CS::RenderManager::MultipleRenderLayer> LightSetupType;
 
-  public:    
+  public:
+    iObjectRegistry* objectReg;
 
     bool HandleTarget (RenderTreeType& renderTree, 
       const TargetManagerType::TargetSettings& settings);

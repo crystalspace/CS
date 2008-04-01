@@ -241,6 +241,8 @@ bool RMUnshadowed::HandleTarget (RenderTreeType& renderTree,
 bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
 {
   const char messageID[] = "crystalspace.rendermanager.unshadowed";
+  
+  this->objectReg = objectReg;
 
   svNameStringSet = csQueryRegistryTagInterface<iShaderVarStringSet> (objectReg,
     "crystalspace.shader.variablenameset");
@@ -291,8 +293,12 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
   /*csRef<iShader> logmap =
     loader->LoadShader ("/shader/postproc/hdr/simple-log.xml");*/
 
-  PostEffectLayersParser postEffectsParser (objectReg);
-  postEffectsParser.Parse ("/data/posteffects/bloom.xml", postEffects);
+  const char* effectsFile = cfg->GetStr ("RenderManager.Unshadowed.Effects", 0);
+  if (effectsFile)
+  {
+    PostEffectLayersParser postEffectsParser (objectReg);
+    postEffectsParser.AddLayersFromFile (effectsFile, postEffects);
+  }
   
   HDRHelper hdr;
   // @@@ FIXME: pick a better intermediate format
