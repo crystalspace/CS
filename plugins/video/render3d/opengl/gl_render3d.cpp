@@ -770,8 +770,10 @@ bool csGLGraphics3D::Open ()
     return false;
   }
 
-  SetPerspectiveAspect (G2D->GetHeight ());
-  SetPerspectiveCenter (G2D->GetWidth ()/2, G2D->GetHeight ()/2);
+  viewwidth = G2D->GetWidth();
+  viewheight = G2D->GetHeight();
+  SetPerspectiveAspect (viewheight);
+  SetPerspectiveCenter (viewwidth/2, viewheight/2);
   
   object_reg->Register( G2D, "iGraphics2D");
 
@@ -3531,11 +3533,11 @@ bool csGLGraphics3D::HandleEvent (iEvent& Event)
   }
   else if (Event.Name == CanvasResize)
   {
-    int w = G2D->GetWidth ();
-    int h = G2D->GetHeight ();
+    viewwidth = G2D->GetWidth();
+    viewheight = G2D->GetHeight();
     G2D->GetFramebufferDimensions (scrwidth, scrheight);
-    asp_center_x = w/2;
-    asp_center_y = h/2;
+    asp_center_x = viewwidth/2;
+    asp_center_y = viewheight/2;
     return true;
   }
   else if (Event.Name == Frame)

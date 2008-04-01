@@ -1010,8 +1010,8 @@ bool csGraphics2D::Resize (int w, int h)
   if (!LineAddress)
   {
     // Still in Initialization phase, configuring size of canvas
-    fbWidth = w;
-    fbHeight = h;
+    vpWidth = fbWidth = w;
+    vpHeight = fbHeight = h;
     return true;
   }
 

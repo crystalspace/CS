@@ -906,8 +906,8 @@ bool csGraphics2DGLCommon::Resize (int width, int height)
 {
   if (!is_open)
   {
-    fbWidth = width;
-    fbHeight = height;
+    vpWidth = fbWidth = width;
+    vpHeight = fbHeight = height;
     return true;
   }
   if (!AllowResizing)
