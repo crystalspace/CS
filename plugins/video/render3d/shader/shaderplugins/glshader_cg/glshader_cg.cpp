@@ -398,6 +398,10 @@ bool csGLShader_CG::Open()
   if (debugDump)
     dumpDir = CS::StrDup (config->GetStr ("Video.OpenGL.Shader.Cg.DebugDumpDir",
     "/tmp/cgdump/"));
+    
+  cgSetAutoCompile (context, CG_COMPILE_LAZY);
+  cgGLSetDebugMode (config->GetBool ("Video.OpenGL.Shader.Cg.CgDebugMode",
+    false));
  
   // Determining what profile to use:
   //  Start off with the highest supported profile.

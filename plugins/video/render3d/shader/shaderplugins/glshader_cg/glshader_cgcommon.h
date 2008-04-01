@@ -63,6 +63,7 @@ protected:
   ArgumentArray compilerArgs;
   csRef<iShaderDestinationResolverCG> cgResolve;
   csSet<csString> unusedParams;
+  csSafeCopyArray<VariableMapEntry>* assumedConstParams;
 
   csString debugFN;
   void EnsureDumpFile();
