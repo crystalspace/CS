@@ -8,6 +8,8 @@ chronological order.
 
 1-Apr-2008
 	- res made simple mesh screen space work right again.
+	- res added the ability to specify a buffer holder in
+	  csSimpleRenderMesh.
 31-Mar-2008
 	- Eric Sunshine applied changes to jobber-cel-svn.cfg similar to those
 	  made to jobber-svn.cfg in r27840, r27842, r27849: actually run CEL's

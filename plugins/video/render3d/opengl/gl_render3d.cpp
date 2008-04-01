@@ -2932,83 +2932,88 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
     G2D->PerformExtension ("glflushtext");
   }
 
-  uint indexCount = mesh.indices ? mesh.indexCount : mesh.vertexCount;
-  if (scrapIndicesSize < indexCount)
-  {
-    scrapIndices = csRenderBuffer::CreateIndexRenderBuffer (indexCount,
-      CS_BUF_STREAM, CS_BUFCOMP_UNSIGNED_INT, 0, mesh.vertexCount - 1);
-    scrapIndicesSize = indexCount;
-  }
-  if (scrapVerticesSize < mesh.vertexCount)
-  {
-    scrapVertices = csRenderBuffer::CreateRenderBuffer (
-      mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
-    scrapTexcoords = csRenderBuffer::CreateRenderBuffer (
-      mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 2);
-    scrapColors = csRenderBuffer::CreateRenderBuffer (
-      mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 4);
-
-    scrapVerticesSize = mesh.vertexCount;
-  }
-
   bool useShader = (mesh.shader != 0);
+  uint indexCount = mesh.indices ? mesh.indexCount : mesh.vertexCount;
+  if (!mesh.renderBuffers.IsValid())
+  {
+    if (scrapIndicesSize < indexCount)
+    {
+      scrapIndices = csRenderBuffer::CreateIndexRenderBuffer (indexCount,
+	CS_BUF_STREAM, CS_BUFCOMP_UNSIGNED_INT, 0, mesh.vertexCount - 1);
+      scrapIndicesSize = indexCount;
+    }
+    if (scrapVerticesSize < mesh.vertexCount)
+    {
+      scrapVertices = csRenderBuffer::CreateRenderBuffer (
+	mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
+      scrapTexcoords = csRenderBuffer::CreateRenderBuffer (
+	mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 2);
+      scrapColors = csRenderBuffer::CreateRenderBuffer (
+	mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 4);
+  
+      scrapVerticesSize = mesh.vertexCount;
+    }
+  }
 
   csShaderVariable* sv;
-  sv = scrapContext.GetVariableAdd (string_indices);
-  if (mesh.indices)
+  if (!mesh.renderBuffers.IsValid())
   {
-    scrapIndices->CopyInto (mesh.indices, indexCount);
-  }
-  else
-  {
-    csRenderBufferLock<uint> indexLock (scrapIndices);
-    for (uint i = 0; i < mesh.vertexCount; i++)
-      indexLock[(size_t)i] = i;
-  }
-  sv->SetValue (scrapIndices);
-  scrapBufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, scrapIndices);
-
-  sv = scrapContext.GetVariableAdd (string_vertices);
-  if (mesh.vertices)
-  {
-    scrapVertices->CopyInto (mesh.vertices, mesh.vertexCount);
-    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, scrapVertices);
-    if (useShader)
-      sv->SetValue (scrapVertices);
-  }
-  else
-  {
-    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, 0);
-    if (useShader)
-      sv->SetValue (0);
-  }
-  sv = scrapContext.GetVariableAdd (string_texture_coordinates);
-  if (mesh.texcoords)
-  {
-    scrapTexcoords->CopyInto (mesh.texcoords, mesh.vertexCount);
-    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, scrapTexcoords);
-    if (useShader)
-      sv->SetValue (scrapTexcoords);
-  }
-  else
-  {
-    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, 0);
-    if (useShader)
-      sv->SetValue (0);
-  }
-  sv = scrapContext.GetVariableAdd (string_colors);
-  if (mesh.colors)
-  {
-    scrapColors->CopyInto (mesh.colors, mesh.vertexCount);
-    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, scrapColors);
-    if (useShader)
-      sv->SetValue (scrapColors);
-  }
-  else
-  {
-    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, 0);
-    if (useShader)
-      sv->SetValue (0);
+    sv = scrapContext.GetVariableAdd (string_indices);
+    if (mesh.indices)
+    {
+      scrapIndices->CopyInto (mesh.indices, indexCount);
+    }
+    else
+    {
+      csRenderBufferLock<uint> indexLock (scrapIndices);
+      for (uint i = 0; i < mesh.vertexCount; i++)
+	indexLock[(size_t)i] = i;
+    }
+    sv->SetValue (scrapIndices);
+    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, scrapIndices);
+  
+    sv = scrapContext.GetVariableAdd (string_vertices);
+    if (mesh.vertices)
+    {
+      scrapVertices->CopyInto (mesh.vertices, mesh.vertexCount);
+      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, scrapVertices);
+      if (useShader)
+	sv->SetValue (scrapVertices);
+    }
+    else
+    {
+      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, 0);
+      if (useShader)
+	sv->SetValue (0);
+    }
+    sv = scrapContext.GetVariableAdd (string_texture_coordinates);
+    if (mesh.texcoords)
+    {
+      scrapTexcoords->CopyInto (mesh.texcoords, mesh.vertexCount);
+      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, scrapTexcoords);
+      if (useShader)
+	sv->SetValue (scrapTexcoords);
+    }
+    else
+    {
+      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, 0);
+      if (useShader)
+	sv->SetValue (0);
+    }
+    sv = scrapContext.GetVariableAdd (string_colors);
+    if (mesh.colors)
+    {
+      scrapColors->CopyInto (mesh.colors, mesh.vertexCount);
+      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, scrapColors);
+      if (useShader)
+	sv->SetValue (scrapColors);
+    }
+    else
+    {
+      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, 0);
+      if (useShader)
+	sv->SetValue (0);
+    }
   }
   if (useShader)
   {
@@ -3048,7 +3053,8 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   rmesh.indexstart = 0;
   rmesh.indexend = indexCount;
   rmesh.variablecontext = &scrapContext;
-  rmesh.buffers = scrapBufferHolder;
+  rmesh.buffers =
+    mesh.renderBuffers.IsValid() ? mesh.renderBuffers : scrapBufferHolder;
 
   if (flags & csSimpleMeshScreenspace)
   {
