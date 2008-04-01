@@ -15,6 +15,7 @@ chronological order.
 	  the user defined allocator and element handler (under res guidance).
 	- res enabled the 'resizing' flag in embedgl.
 	- res added viewport control to iGraphics2D.
+	- res added the canvas event IDs to the script bindings.
 31-Mar-2008
 	- Eric Sunshine applied changes to jobber-cel-svn.cfg similar to those
 	  made to jobber-svn.cfg in r27840, r27842, r27849: actually run CEL's
