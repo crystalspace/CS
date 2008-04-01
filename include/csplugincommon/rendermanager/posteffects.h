@@ -24,10 +24,12 @@
 #include "csutil/parray.h"
 #include "ivideo/shader/shader.h"
 
+struct iGraphics3D;
+struct iLoader;
 struct iShader;
+struct iSyntaxService;
 struct iTextureHandle;
 struct iView;
-struct iGraphics3D;
 
 namespace CS
 {
@@ -45,8 +47,14 @@ namespace RenderManager
     class Layer;
     struct LayerOptions
     {
+      /// Generate mipmaps for this layer
       bool mipmap;
+      /// Highest mipmap level to generate
       int maxMipmap;
+      /**
+       * Reduce output size. Each downsample step reduces the output by half 
+       * in each dimensions.
+       */
       int downsample;
       
       LayerOptions() : mipmap (false), maxMipmap (-1), downsample (0) {}
@@ -58,16 +66,24 @@ namespace RenderManager
       }
     };
 
+    /// Custom input mapping for a layer
     struct LayerInputMap
     {
+      /// Input layer
       Layer* inputLayer;
-      const char* textureName;
-      const char* texcoordName;
+      /// Name of the shader variable to provide the input layer texture in
+      csString textureName;
+      /**
+       * Name of the shader variable to provide the texture coordinates for the
+       * input layer texture in
+       */
+      csString texcoordName;
       
       LayerInputMap() : inputLayer (0), textureName ("tex diffuse"),
         texcoordName ("texture coordinate 0") {}
     };
     
+    /// An effect layer.
     class Layer
     {
     private:
@@ -85,28 +101,46 @@ namespace RenderManager
       }
       bool IsInput (const Layer* layer) const;
     public:
+      /// Get the shader variables for this layer.
       iShaderVariableContext* GetSVContext() { return svContext; }
     };
   
     PostEffectManager ();
     ~PostEffectManager ();
 
+    /// Initialize
     void Initialize (iObjectRegistry* objectReg);
     
+    /// Set the texture format for the intermediate textures used.
     void SetIntermediateTargetFormat (const char* textureFmt);
 
+    /// Set up post processing manager for a view
     void SetupView (iView* view);
 
+    /// Get the texture to render a scene to for post processing.
     iTextureHandle* GetScreenTarget ();
 
+    /**
+     * Draw post processing effects after the scene was rendered to
+     * the handle returned by GetScreenTarget().
+     */
     void DrawPostEffects ();
     
+    //@{
+    /// Add an effect pass. Uses last added layer as the input
     Layer* AddLayer (iShader* shader);
     Layer* AddLayer (iShader* shader, const LayerOptions& opt);
+    //@}
+    //@{
+    /// Add an effect pass with custom input mappings.
     Layer* AddLayer (iShader* shader, size_t numMaps, const LayerInputMap* maps);
     Layer* AddLayer (iShader* shader, const LayerOptions& opt, size_t numMaps,
       const LayerInputMap* maps);
+    //@}
+    /// Remove all layers
+    void ClearLayers();
     
+    /// Get the layer representing the "screen" a scene is rendered to.
     Layer* GetScreenLayer() { return postLayers[0]; }
   private:
     void SetupScreenQuad (unsigned int width, unsigned int height);
@@ -147,7 +181,34 @@ namespace RenderManager
     size_t GetBucketIndex (const LayerOptions& options);
     TexturesBucket& GetBucket (const LayerOptions& options)
     { return buckets[GetBucketIndex (options)]; }
-};
+  };
+  
+  /// Helper to parse post processing effect configurations.
+  class CS_CRYSTALSPACE_EXPORT PostEffectLayersParser
+  {
+    csStringHash xmltokens;
+    iObjectRegistry* objReg;
+    csRef<iSyntaxService> synldr;
+    csRef<iLoader> loader;
+    
+    typedef csHash<PostEffectManager::Layer*, csString> ParsedLayers;
+    typedef csDirtyAccessArray<PostEffectManager::LayerInputMap> InputsArray;
+    typedef csHash<csRef<iShader>, csString> ShadersLayers;
+    
+    bool ParseInputs (iDocumentNode* node, PostEffectManager& effects,
+                      ParsedLayers& layers, ShadersLayers& shaders,
+                      InputsArray& inputs);
+    bool ParseLayer (iDocumentNode* node, PostEffectManager& effects,
+                     ParsedLayers& layers, ShadersLayers& shaders);
+  public:
+    /// Create.
+    PostEffectLayersParser (iObjectRegistry* objReg);
+  
+    /// Parse from a document node,
+    bool Parse (iDocumentNode* node, PostEffectManager& effects);
+    /// Parse from file. Document node must be "posteffect"
+    bool Parse (const char* filename, PostEffectManager& effects);
+  };
 
 }
 }

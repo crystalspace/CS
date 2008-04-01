@@ -287,32 +287,16 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
   csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objectReg);
   treePersistent.Initialize (shaderManager);
   postEffects.Initialize (objectReg);
-  //postEffects.SetIntermediateTargetFormat ("rgb16_f");
   
-  csRef<iShader> threshold =
-    loader->LoadShader ("/shader/postproc/threshold.xml");
-  csRef<iShader> blur =
-    loader->LoadShader ("/shader/postproc/blur.xml");
-  csRef<iShader> add =
-    loader->LoadShader ("/shader/postproc/add_squared.xml");
-  csRef<iShader> desaturate =
-    loader->LoadShader ("/shader/postproc/desaturate.xml");
-  csRef<iShader> logmap =
-    loader->LoadShader ("/shader/postproc/hdr/simple-log.xml");
+  /*csRef<iShader> logmap =
+    loader->LoadShader ("/shader/postproc/hdr/simple-log.xml");*/
 
-  PostEffectManager::Layer* thresholded = postEffects.AddLayer (threshold);
-  PostEffectManager::Layer* lastBlur = postEffects.AddLayer (blur, 1, thresholded, "tex diffuse");
-  lastBlur = postEffects.AddLayer (blur, 1, lastBlur, "tex diffuse");
-  lastBlur = postEffects.AddLayer (blur, 1, lastBlur, "tex diffuse");
-  PostEffectManager::Layer* bloomed = postEffects.AddLayer (add, 2, 
-    postEffects.GetScreenLayer(), "tex diffuse",
-    lastBlur, "tex diffuse 2");
-  //postEffects.AddLayer (logmap, 1, bloomed, "tex diffuse");
-  //postEffects.AddLayer (desaturate);
-  //postEffects.AddLayer (blur);
+  PostEffectLayersParser postEffectsParser (objectReg);
+  postEffectsParser.Parse ("/data/posteffects/bloom.xml", postEffects);
   
   HDRHelper hdr;
-  hdr.Setup (objectReg, HDRHelper::qualFloat16, 1, postEffects, false);
+  // @@@ FIXME: pick a better intermediate format
+  hdr.Setup (objectReg, HDRHelper::qualInt8, 4, postEffects, true);
   
   portalPersistent.Initialize (shaderManager, g3d);
   lightPersistent.Initialize (shaderManager);

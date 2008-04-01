@@ -30,6 +30,7 @@ chronological order.
 	  alpha component of colors.
 	- res added scaling of the addends to the add postproc shaders.
 	- res made "assumed constant" variable maps for Cg work.
+	- res added a parser to read post effect setups from files.
 31-Mar-2008
 	- Eric Sunshine applied changes to jobber-cel-svn.cfg similar to those
 	  made to jobber-svn.cfg in r27840, r27842, r27849: actually run CEL's

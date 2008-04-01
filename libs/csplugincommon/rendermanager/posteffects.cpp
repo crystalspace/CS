@@ -21,8 +21,15 @@
 #include "csgfx/renderbuffer.h"
 #include "csgfx/shadervarcontext.h"
 #include "csutil/cfgacc.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/objreg.h"
+#include "csutil/xmltiny.h"
 #include "cstool/rbuflock.h"
+#include "imap/loader.h"
+#include "imap/services.h"
+#include "iutil/document.h"
+#include "iutil/vfs.h"
+#include "ivaria/reporter.h"
 #include "ivaria/view.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
@@ -366,4 +373,208 @@ bool PostEffectManager::Layer::IsInput (const Layer* layer) const
     if (inputs[i].inputLayer == layer) return true;
   }
   return false;
+}
+
+//---------------------------------------------------------------------------
+
+namespace
+{
+  static const char messageID[] = "crystalspace.posteffects.parser";
+        
+#define CS_TOKEN_ITEM_FILE "libs/csplugincommon/rendermanager/posteffects.tok"
+#include "cstool/tokenlist.h"
+#undef CS_TOKEN_ITEM_FILE
+}
+
+PostEffectLayersParser::PostEffectLayersParser (iObjectRegistry* objReg)
+ : objReg (objReg)
+{
+  InitTokenTable (xmltokens);
+  synldr = csQueryRegistry<iSyntaxService> (objReg);
+  loader = csQueryRegistry<iLoader> (objReg);
+}
+
+bool PostEffectLayersParser::ParseInputs (iDocumentNode* node, 
+                                          PostEffectManager& effects,
+		                          ParsedLayers& layers,
+                                          ShadersLayers& shaders, 
+		                          InputsArray& inputs)
+{
+  csRef<iDocumentNodeIterator> inputsIt = node->GetNodes ("input");
+  while (inputsIt->HasNext())
+  {
+    csRef<iDocumentNode> child = inputsIt->Next();
+    if (child->GetType() != CS_NODE_ELEMENT) continue;
+    
+    const char* layerInpID = child->GetAttributeValue ("layer");
+    if (!layerInpID || !*layerInpID)
+    {
+      synldr->ReportError (messageID, child, "Expected 'layer' attribute");
+      return false;
+    }
+    PostEffectManager::Layer* inpLayer = 0;
+    if (strcmp (layerInpID, "*screen") == 0)
+      inpLayer = effects.GetScreenLayer();
+    else
+      inpLayer = layers.Get (layerInpID, 0);
+    if (inpLayer == 0)
+    {
+      synldr->ReportError (messageID, child, "Invalid input layer");
+      return false;
+    }
+    
+    PostEffectManager::LayerInputMap inp;
+    inp.inputLayer = inpLayer;
+    if (child->GetAttribute ("texname").IsValid())
+      inp.textureName = child->GetAttributeValue ("texname");
+    if (child->GetAttribute ("texcoord").IsValid())
+      inp.texcoordName = child->GetAttributeValue ("texcoord");
+    inputs.Push (inp);
+  }
+  return true;
+}
+
+bool PostEffectLayersParser::ParseLayer (iDocumentNode* node, 
+                                         PostEffectManager& effects,
+		                         ParsedLayers& layers,
+                                         ShadersLayers& shaders)
+{
+  const char* layerID = node->GetAttributeValue ("name");
+  PostEffectManager::LayerOptions layerOpts;
+  layerOpts.mipmap = node->GetAttributeValueAsBool ("mipmap", false);
+  layerOpts.downsample = node->GetAttributeValueAsInt ("downsample");
+  if (node->GetAttribute ("maxmipmap").IsValid())
+    layerOpts.maxMipmap = node->GetAttributeValueAsInt ("maxmipmap");
+    
+  csRefArray<csShaderVariable> shaderVars;
+  bool hasInputs = false;
+  csDirtyAccessArray<PostEffectManager::LayerInputMap> inputs;
+  csRef<iDocumentNodeIterator> it = node->GetNodes();
+  while (it->HasNext())
+  {
+    csRef<iDocumentNode> child = it->Next();
+    if (child->GetType() != CS_NODE_ELEMENT) continue;
+    
+    csStringID id = xmltokens.Request (child->GetValue());
+    switch (id)
+    {
+      case XMLTOKEN_INPUTS:
+        {
+          hasInputs = true;
+          if (!ParseInputs (child, effects, layers, shaders, inputs))
+            return false;
+        }
+	break;
+      case XMLTOKEN_SHADERVAR:
+        {
+          csRef<csShaderVariable> sv;
+          sv.AttachNew (new csShaderVariable);
+          if (!synldr->ParseShaderVar (0, child, *sv))
+            return false;
+          shaderVars.Push (sv);
+        }
+        break;
+      default:
+	synldr->ReportBadToken (child);
+	return false;
+    }
+  }
+    
+  const char* shader = node->GetAttributeValue ("shader");
+  if (!shader || (*shader == 0))
+  {
+    synldr->ReportError (messageID, node, "Expected 'shader' attribute");
+    return false;
+  }
+  csRef<iShader> shaderObj = shaders.Get (shader, 0);
+  if (!shaderObj.IsValid())
+  {
+    shaderObj = loader->LoadShader (shader);
+    if (!shaderObj.IsValid()) return false;
+    shaders.Put (shader, shaderObj);
+  }
+  
+  PostEffectManager::Layer* layer;
+  if (hasInputs)
+  {
+    layer = effects.AddLayer (shaderObj, layerOpts, inputs.GetSize(),
+      inputs.GetArray());
+  }
+  else
+  {
+    layer = effects.AddLayer (shaderObj, layerOpts);
+  }
+  if (layerID && *layerID)
+    layers.Put (layerID, layer);
+    
+  for (size_t i = 0; i < shaderVars.GetSize(); i++)
+    layer->GetSVContext()->AddVariable (shaderVars[i]);
+    
+  return true;
+}
+
+bool PostEffectLayersParser::Parse (iDocumentNode* node, 
+                                    PostEffectManager& effects)
+{
+  ParsedLayers layers;
+  ShadersLayers shaders;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes();
+  while (it->HasNext())
+  {
+    csRef<iDocumentNode> child = it->Next();
+    if (child->GetType() != CS_NODE_ELEMENT) continue;
+    
+    csStringID id = xmltokens.Request (child->GetValue());
+    switch (id)
+    {
+      case XMLTOKEN_LAYER:
+        if (!ParseLayer (child, effects, layers, shaders))
+          return false;
+	break;
+      default:
+	synldr->ReportBadToken (child);
+	return false;
+    }
+  }
+  
+  return true;
+}
+
+bool PostEffectLayersParser::Parse (const char* filename, PostEffectManager& effects)
+{
+  csRef<iDocumentSystem> docsys = csQueryRegistry<iDocumentSystem> (
+    objReg);
+  if (!docsys.IsValid())
+    docsys.AttachNew (new csTinyDocumentSystem ());
+  
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (objReg);
+  CS_ASSERT(vfs);
+  csRef<iFile> file = vfs->Open (filename, VFS_FILE_READ);
+  if (!file)
+  {
+    csReport (objReg, CS_REPORTER_SEVERITY_WARNING, messageID,
+      "Error opening '%s'", filename);
+    return false;
+  }
+  
+  csRef<iDocument> doc = docsys->CreateDocument();
+  const char* error = doc->Parse (file);
+  if (error != 0)
+  {
+    csReport (objReg, CS_REPORTER_SEVERITY_WARNING, messageID,
+      "Error parsing '%s': %s", filename, error);
+    return false;
+  }
+  
+  csRef<iDocumentNode> docRoot = doc->GetRoot();
+  if (!docRoot) return false;
+  csRef<iDocumentNode> postEffectNode = docRoot->GetNode ("posteffect");
+  if (!postEffectNode)
+  {
+    csReport (objReg, CS_REPORTER_SEVERITY_WARNING, messageID,
+      "No <posteffect> in '%s'", filename);
+    return false;
+  }
+  return Parse (postEffectNode, effects);
 }
