@@ -4202,6 +4202,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *MissingMesh = *cspacec::iMissingLoaderData_MissingMesh;
 *MissingSector = *cspacec::iMissingLoaderData_MissingSector;
 *MissingLight = *cspacec::iMissingLoaderData_MissingLight;
+*scfGetVersion = *cspacec::iMissingLoaderData_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -9732,6 +9733,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *natureIndirect = *cspacec::iTextureHandle_natureIndirect;
 *natureDirect = *cspacec::iTextureHandle_natureDirect;
 *GetBufferNature = *cspacec::iTextureHandle_GetBufferNature;
+*SetMipmapLimits = *cspacec::iTextureHandle_SetMipmapLimits;
+*GetMipmapLimits = *cspacec::iTextureHandle_GetMipmapLimits;
 *scfGetVersion = *cspacec::iTextureHandle_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -20874,6 +20877,7 @@ sub CS_ENTITY_NOLIGHTING () { $cspacec::CS_ENTITY_NOLIGHTING }
 sub CS_ENTITY_NOHITBEAM () { $cspacec::CS_ENTITY_NOHITBEAM }
 sub CS_ENTITY_NOCLIP () { $cspacec::CS_ENTITY_NOCLIP }
 sub CS_ENTITY_NODECAL () { $cspacec::CS_ENTITY_NODECAL }
+sub CS_ENTITY_STATICLIT () { $cspacec::CS_ENTITY_STATICLIT }
 sub CS_LIGHTINGUPDATE_SORTRELEVANCE () { $cspacec::CS_LIGHTINGUPDATE_SORTRELEVANCE }
 sub CS_LIGHTINGUPDATE_ALWAYSUPDATE () { $cspacec::CS_LIGHTINGUPDATE_ALWAYSUPDATE }
 sub CS_CULLER_HINT_GOODOCCLUDER () { $cspacec::CS_CULLER_HINT_GOODOCCLUDER }

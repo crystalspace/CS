@@ -192,7 +192,6 @@ void Simple::ProcessFrame ()
     //return;
 
   // Tell the camera to render into the frame buffer.
-  view->Draw ();
   rm->RenderView (view);
 }
 
@@ -285,7 +284,6 @@ bool Simple::LoadMap ()
   // Set VFS current directory to the level we want to load.
   csRef<iVFS> VFS (csQueryRegistry<iVFS> (GetObjectRegistry ()));
   VFS->ChDir ("/lev/partsys");
-  //VFS->ChDir ("/lev/part");
   // Load the level file which is called 'world'.
   if (!loader->LoadMapFile ("world"))
     ReportError("Error couldn't load level!");

@@ -153,12 +153,12 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
     statecache->Enable_GL_LIGHTING ();
   }
   
-  glPointSize (GetParamFloatVal (stack, pointSize, 1.0f));
+  glPointSize (GetParamFloatVal (stacks, pointSize, 1.0f));
   if (ext->CS_GL_ARB_point_sprite)
   {
     csVector4 v;
     const csVector4 defAtten (0, 1, 0, 0);
-    v = GetParamVectorVal (stack, pointAttenuation, defAtten);
+    v = GetParamVectorVal (stacks, pointAttenuation, defAtten);
     ext->glPointParameterfvARB (GL_POINT_DISTANCE_ATTENUATION_ARB, (float*)&v);
   }
 

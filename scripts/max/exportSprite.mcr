@@ -31,8 +31,46 @@ rollout Test1 "Export Sprite" width:238 height:128
 	label lbl1 "Export Sprite To:" pos:[21,7] width:142 height:20
 	button btn2 "Export!" pos:[39,72] width:152 height:24
 
+	on Test1 open do
+	(
+	   if(selection[1]!=undefined) then
+	   (
+	     name = selection[1].name
+	     edt3.text = "C:\CS\\"+name+".spr"
+	   )
+	   else
+	   (
+			message = "Please select the mesh to export!\n"
+			MessageBox message
+			return 1
+	   )
 
-
+	)
+	on btn2 pressed do
+	(
+	
+		-- ////////////////////////
+		-- Variables used in the program
+		-- ////////////////////////
+	
+		-- get filename
+		filename = edt3.text
+	
+		-- output file
+		outFile = createFile filename
+	
+		-- set debug output
+		debug=false
+	
+		-- Define verbose output (that takes more space and memory)
+		verboseMode = true
+	
+		-- functions declaration
+		global tokenize
+		global OutputGenMeshFactory
+		global getMatFilename
+		global lowercase
+		
 		-- parameters for scaling and relocation
 		global xscale = 1.0
 		global yscale = 1.0
@@ -41,14 +79,63 @@ rollout Test1 "Export Sprite" width:238 height:128
 		global xrelocate = 0
 		global yrelocate = 0
 		global zrelocate = 0
+	
+		-- Tokenize utility function
+		fn tokenize instring sep = 
+		(
+		   outarray = #()
+		   temp=copy instring
+		   i = 1
+		   while (true) do (
+		   	index = findstring temp sep
+			if (index==undefined) then
+			(
+				outarray[i]=temp
+				exit
+			) else (
+				outarray[i] = substring temp 1 (index-1)
+				temp = substring temp (index+1) -1
+			)
+			i = i +1
+		   )
+		   outarray
+		)
+	
+		-- get filename from a material
+		fn getMatFilename m = 
+		(
+		    if (m==undefined) then
+				image="materialnotdefined"
+			else (
+			    mat = m.maps[2]
+				if (mat!=undefined) then
+				(
+					image = mat.filename
+					indx = tokenize image "\\"
+					image = indx[indx.count]
+				) else
+					image="materialnotdefined"
 
+				image = lowercase(image)
+			)
+		)
+	
+		-- LowerCase utility function
+		fn lowercase instring = 
+		(
+		   local upper, lower, outstring
+		   upper="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		   lower="abcdefghijklmnopqrstuvwxyz" 
+		
+		   outstring=copy instring 
+		
+		   for i=1 to outstring.count do 
+		   (  j=findString upper outstring[i] 
+		      if (j != undefined) do outstring[i]=lower[j] 
+		   )
 
-
-
-
-
-
-
+		   outstring
+		)
 
 		fn OutputGenMeshFactory obj outFile debug auto =
         (
@@ -110,8 +197,13 @@ rollout Test1 "Export Sprite" width:238 height:128
 				)
 				rmin = (rmin * xscale) + xrelocate
 				rmax = (rmax * xscale) + xrelocate
-				format "<nullmesh><min x=\"%\" y=\"%\" z=\"%\" /><max x=\"%\" y=\"%\" z=\"%\" /></nullmesh>\n" rmin.x rmin.z rmin.y rmax.x rmax.z rmax.y to:outFile
-				format "<staticlod><distance varm=\"LodM\" vara=\"LodA\" /></staticlod>\n" to:outFile
+				format "  <nullmesh>\n" to:outFile
+				format "    <min x=\"%\" y=\"%\" z=\"%\" />\n" rmin.x rmin.z rmin.y to:outFile
+				format "    <max x=\"%\" y=\"%\" z=\"%\" />\n" rmax.x rmax.z rmax.y to:outFile
+				format "  </nullmesh>\n" to:outFile
+				format "  <staticlod>\n" to:outFile
+				format "    <distance varm=\"LodM\" vara=\"LodA\" />\n" to:outFile
+				format "  </staticlod>\n" to:outFile
 			)
 
 			for k=1 to lodobjects.count do
@@ -123,10 +215,13 @@ rollout Test1 "Export Sprite" width:238 height:128
 		   		-- output nullmesh
 				if (lodobjects[k]=="null") then
 				(
-					format "  <meshfact name=\"%_%\">\n" factoryName (k-1) to:outFile
+					format "<meshfact name=\"%_%\">\n" factoryName (k-1) to:outFile
 					format "  <lodlevel>%</lodlevel>\n" (k-1) to:outFile
-					format "  <nullmesh><min x=\"-0.1\" y=\"-0.1\" z=\"-0.1\" /><max x=\"0.1\" y=\"0.1\" z=\"0.1\" /></nullmesh>\n" to:outFile
-					format "  </meshfact>\n\n" to:outFile
+					format "  <nullmesh>\n" to:outFile
+					format "    <min x=\"-0.1\" y=\"-0.1\" z=\"-0.1\" />\n" to:outFile
+					format "    <max x=\"0.1\" y=\"0.1\" z=\"0.1\" />\n" to:outFile
+					format "  </nullmesh>\n" to:outFile
+					format "</meshfact>\n\n" to:outFile
 					continue;
 				)
 
@@ -135,13 +230,18 @@ rollout Test1 "Export Sprite" width:238 height:128
 				-- output normalmeshfact
 				-- meshfact name changes for hierarchy
 				if (lodlow!=undefined) then
-					format "  <meshfact name=\"%_%\">\n" factoryName (k-1) to:outFile
+					format "<meshfact name=\"%_%\">\n" factoryName (k-1) to:outFile
 				else
-					format "  <meshfact name=\"%\">\n" factoryName to:outFile
+					format "<meshfact name=\"%\">\n" factoryName to:outFile
 
 				if (lodobjects.count!=1) then
-					format "<lodlevel>%</lodlevel>\n" (k-1) to:outFile
-				format "  <plugin>crystalspace.mesh.loader.factory.genmesh</plugin><params><numvt>%</numvt>\n" (getNumTVerts obj) to:outFile
+				(
+					format "  <lodlevel>%</lodlevel>\n" (k-1) to:outFile
+				)
+				
+				format "  <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>\n" to:outFile
+				format "  <params>\n" to:outFile
+				format "    <numvt>%</numvt>\n" (getNumTVerts obj) to:outFile
 
 				-- just for LOD hierarchical objects material must be speficied in the factory
 				if (lodlow!=undefined) then (
@@ -150,7 +250,7 @@ rollout Test1 "Export Sprite" width:238 height:128
 						matUsed = getFaceMatID obj 1
 						m = obj.mat[matUsed];
 					)
-					format "      <material>%</material>\n" (getMatFilename m) to:outFile
+					format "    <material>%</material>\n" (getMatFilename m) to:outFile
 				)
 
 				-- check texture
@@ -270,7 +370,7 @@ rollout Test1 "Export Sprite" width:238 height:128
 						zvert = zvert - obj.pos.z
 					)
 
-					format "      <v x=\"%\" y=\"%\" z=\"%\" u=\"%\" v=\"%\" /> \n" xvert zvert yvert Tvert[1] (1-Tvert[2]) i to:outFile
+					format "    <v x=\"%\" y=\"%\" z=\"%\" u=\"%\" v=\"%\" /> \n" xvert zvert yvert Tvert[1] (1-Tvert[2]) i to:outFile
 				)
 
 				-- write all normals
@@ -279,21 +379,24 @@ rollout Test1 "Export Sprite" width:238 height:128
 					Tvert = getTVert obj i
 					normalvert = normalsVert[i]
 					normalvert = normalize(normalvert)
-					format "      <n x=\"%\" y=\"%\" z=\"%\" /> \n" normalvert.x normalvert.z normalvert.y to:outFile
+					format "    <n x=\"%\" y=\"%\" z=\"%\" /> \n" normalvert.x normalvert.z normalvert.y to:outFile
 				)
 
 				-- cycle on all faces of object and split by material
 				facesmaterial=#()
 				facesmaterialfaces=#()
                 -- if standard material, then 1 submesh only
-				if ((classOf obj.mat)==Standardmaterial) then (
+				if ((classOf obj.mat)==Standardmaterial) then
+				(
 				    append facesmaterial (getMatFilename (obj.mat))
 					facesmaterialfaces[1]=#()
 					for i =1 to obj.numFaces do
 					(
 						append facesmaterialfaces[1] i
 					)
-				) else (
+				)
+				else
+				(
 					for i =1 to obj.numFaces do
 					(
 					    textid = getFaceMatID obj i
@@ -321,8 +424,8 @@ rollout Test1 "Export Sprite" width:238 height:128
 					mname = facesmaterial[i];
 
 					format "    <submesh name=\"%\">\n" ("submesh"+i as String) to:outFile
-                    format "    <material>%</material>\n" mname to:outFile
-                    format "    <indexbuffer components=\"1\" type=\"uint\" indices=\"yes\">\n" to:outFile
+                    format "      <material>%</material>\n" mname to:outFile
+                    format "      <indexbuffer components=\"1\" type=\"uint\" indices=\"yes\">\n" to:outFile
 
                     -- cycle on all faces using same material
                     for j=1 to facesmaterialfaces[i].count do
@@ -341,14 +444,15 @@ rollout Test1 "Export Sprite" width:238 height:128
 	
 						-- exclude collision detection on low lod versions
 						if (k!=lodobjects.count) then (
-							format "    <e c0=\"%\" /><e c0=\"%\" /><e c0=\"%\" />\n" a b c to:outFile
+							format "        <e c0=\"%\" /><e c0=\"%\" /><e c0=\"%\" />\n" a b c to:outFile
 							--if (colldet=="no") then format "<colldet>no</colldet>" to:outFile
 						) else (
 							--if (colldet=="no") then format "<t v1=\"%\" v2=\"%\" v3=\"%\"><colldet>no</colldet></t>"  a b c to:outFile
-							format "    <e c0=\"%\" /><e c0=\"%\" /><e c0=\"%\" />\n" a b c to:outFile
+							format "        <e c0=\"%\" /><e c0=\"%\" /><e c0=\"%\" />\n" a b c to:outFile
 						)
 					)
-					format "    </indexbuffer></submesh>\n" to:outFile
+					format "      </indexbuffer>\n" to:outFile
+					format "    </submesh>\n" to:outFile
 			    )
 
 
@@ -358,7 +462,7 @@ rollout Test1 "Export Sprite" width:238 height:128
 				--if (smooth=="yes") then
 				--	format "      <autonormals/>\n" to:outFile
 					
-				format "    </params>\n" to:outFile
+				format "  </params>\n" to:outFile
 	
 				-- check for no lighting setting
 				lighting = getUserProp obj "LIGHTING"
@@ -402,32 +506,32 @@ rollout Test1 "Export Sprite" width:238 height:128
 
 				-- handles transparent objects
 				if (istrasparent) then (
-				  format "      <priority>alpha</priority>\n" to:outFile
-				  format "      <ztest />\n" to:outFile
+				  format "  <priority>alpha</priority>\n" to:outFile
+				  format "  <ztest />\n" to:outFile
 				)
 			    -- handles sky objects
 				else if (findString obj.name "_sky_" !=undefined) then (
-				  format "      <priority>sky</priority>\n" to:outFile
-				  format "      <zuse />\n" to:outFile
+				  format "  <priority>sky</priority>\n" to:outFile
+				  format "  <zuse />\n" to:outFile
 				)
 			    -- handles zfill objects
 				else if (findString obj.name "_s_" !=undefined) then (
-				  format "      <priority>object</priority>\n" to:outFile
-				  format "      <zuse />\n" to:outFile
+				  format "  <priority>object</priority>\n" to:outFile
+				  format "  <zuse />\n" to:outFile
 				)
 				else if (culleronly=="yes" or playerbarrier=="yes" or (occluder and (classOf obj)!=Box)) then (
-					format "      <mesh>\n" to:outFile
+					format "  <mesh>\n" to:outFile
 				) else if (occluder and (classOf obj)==Box) then (
-					format "      <box>\n" to:outFile
+					format "  <box>\n" to:outFile
 				) else (
-				  format "      <priority>object</priority>\n" to:outFile
-				  format "      <zuse />\n" to:outFile
+				  format "  <priority>object</priority>\n" to:outFile
+				  format "  <zuse />\n" to:outFile
 				)
 
 				-- check for no shadow setting
 				noshadows = getUserProp obj "NOSHADOWS"
 				if (noshadows=="yes") then
-					format "      <noshadows />\n" to:outFile
+					format "  <noshadows />\n" to:outFile
 
 
 				if (colldet=="no") then format "<trimesh><id>colldet</id></trimesh>\n" to:outFile
@@ -436,132 +540,55 @@ rollout Test1 "Export Sprite" width:238 height:128
 				-- NO MORE WORKING??
 				noshadows = getUserProp obj "NOSHADOWS"
 				if (noshadows=="yes") then
-					format "      <noshadows />\n" to:outFile
+					format "  <noshadows />\n" to:outFile
 
 
 				-- check if object is a range alpha trasparent
 				rangetrasp = getUserProp obj "RANGETRASP"
-				if (rangetrasp=="yes") then (
-				  format "      <ztest/><priority>alpha</priority>\n" to:outFile
+				if (rangetrasp=="yes") then
+				(
+				  format "  <ztest/>\n" to:outFile
+				  format "  <priority>alpha</priority>\n" to:outFile
 				)
 
 				-- check if object uses a binary alpha texture
-			    if ((classOf obj.mat)==Standardmaterial) then (
-					if (obj.mat.mapEnables[7]) then (
-					  format "      <trimesh><id>viscull</id></trimesh>\n" to:outFile
-					  format "      <trimesh><default /><id>colldet</id></trimesh>\n" to:outFile
+			    if ((classOf obj.mat)==Standardmaterial) then
+				(
+					if (obj.mat.mapEnables[7]) then
+					(
+						format "  <trimesh>\n" to:outFile
+						format "    <id>viscull</id>\n" to:outFile
+						format "  </trimesh>\n" to:outFile
+					    format "  <trimesh>\n" to:outFile
+						format "    <default />\n" to:outFile
+						format "    <id>colldet</id>\n" to:outFile
+						format "  </trimesh>\n" to:outFile
 					)
-				) else (
-					if (obj.mat[1].mapEnables[7]) then (
-					  format "      <trimesh><id>viscull</id></trimesh>\n" to:outFile
-					  format "      <trimesh><default /><id>colldet</id></trimesh>\n" to:outFile
+				)
+				else
+				(
+					if (obj.mat[1].mapEnables[7]) then
+					(
+						format "  <trimesh>\n" to:outFile
+						format "    <id>viscull</id>\n" to:outFile
+						format "  </trimesh>\n" to:outFile
+						format "  <trimesh>\n" to:outFile
+						format "    <default />\n" to:outFile
+						format "    <id>colldet</id>\n" to:outFile
+						format "  </trimesh>\n" to:outFile
 					)
 				)
 
 
 
-				format "    </meshfact>\n" to:outFile
+				format "</meshfact>\n" to:outFile
 
 			) -- end for each lodobject
 
 			if (lodobjects.count!=1) then
-				format "  </meshfact>\n" to:outFile
+				format "</meshfact>\n" to:outFile
 
-        )
-
-
-
-	on Test1 open do
-	(
-	   if(selection[1]!=undefined) then
-	   (
-	     name = selection[1].name
-	     edt3.text = "d:\\Luca\\"+name+".spr"
-	   )
-
-	)
-	on btn2 pressed do
-	(
-	
-		-- ////////////////////////
-		-- Variables used in the program
-		-- ////////////////////////
-	
-		-- get filename
-		filename = edt3.text
-	
-		-- output file
-		outFile = createFile filename
-	
-		-- set debug output
-		debug=false
-	
-		-- Define verbose output (that takes more space and memory)
-		verboseMode = true
-	
-		-- functions declaration
-		global tokenize
-		global OutputGenMeshFactory
-		global getMatFilename
-		global lowercase
-	
-		-- Tokenize utility function
-		fn tokenize instring sep = 
-		(
-		   outarray = #()
-		   temp=copy instring
-		   i = 1
-		   while (true) do (
-		   	index = findstring temp sep
-			if (index==undefined) then
-			(
-				outarray[i]=temp
-				exit
-			) else (
-				outarray[i] = substring temp 1 (index-1)
-				temp = substring temp (index+1) -1
-			)
-			i = i +1
-		   )
-		   outarray
-		)
-	
-		-- get filename from a material
-		fn getMatFilename m = 
-		(
-		    if (m==undefined) then
-				image="MATERIALNOTDEFINED"
-			else (
-			    mat = m.maps[2]
-				if (mat!=undefined) then
-				(
-					image = mat.filename
-					indx = tokenize image "\\"
-					image = indx[indx.count]
-				) else
-					image="MATERIALNOTDEFINED"
-
-				image = lowercase(image)
-			)
-		)
-	
-		-- LowerCase utility function
-		fn lowercase instring = 
-		(
-		   local upper, lower, outstring
-		   upper="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-		   lower="abcdefghijklmnopqrstuvwxyz" 
-		
-		   outstring=copy instring 
-		
-		   for i=1 to outstring.count do 
-		   (  j=findString upper outstring[i] 
-		      if (j != undefined) do outstring[i]=lower[j] 
-		   )
-
-		   outstring
-		)
-	
+        )	
 	
 		-- ////////////////////////
 		-- Main: program starts here
@@ -598,3 +625,4 @@ addRollout Test1 gw
 -- This means that some UV coords are shared on multiple vertexes
 -- Go in the UVUnwrap function and Unweld all the vertexes of the face found
 -------------------
+

@@ -6,8 +6,23 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+1-Apr-2008
+	- res made simple mesh screen space work right again.
+31-Mar-2008
+	- Eric Sunshine applied changes to jobber-cel-svn.cfg similar to those
+	  made to jobber-svn.cfg in r27840, r27842, r27849: actually run CEL's
+	  configure script rather than faking it, and perform checkout from a
+	  local repository then switch the live one. This fixes CEL jobber
+	  failure following cel:r3270.
+	- Mike Gist fixed a bug in the 3ds max exportSprite script and also 
+	  improved the formatting of the output.
+	- Marten added iMissingLoaderData to the python-exposed interfaces.
 30-Mar-2008
 	- res fixed PBOs not being bound before used in the texture blit code.
+	- res applied a patch from Lukas Erlinghagen to fix compiling on
+	  gcc 3.4.
+	- res applied a patch from Lukas Erlinghagen to add frame time display
+	  to bugplug.
 	- res changed the RM light setup to handle ambient-only layers more
 	  elegantly and fixed static light support.
 	- res added iTextureHandle::SetMipmapLimits() to limit which mipmaps
@@ -49,6 +64,10 @@ chronological order.
 	  the wrong member.
 	- res added methods to csBitArray to obtain the first/last set/unset
 	  bit.
+	- res fixed a mess-up in csMatrix3 transposing.
+	- Marten fixed tinyxml writer not to crash on empty attributes.
+	- Marten fixed light name handling of proxylights in lighter2.
+	- Mike Gist renamed the "tex spec" shadervar to "tex specular".
 	- res changed the name of the buffer for static per-vertex lighting
 	  information from "lit color" to "static color": the former overlaps
 	  with dynamic software lighting computed in the mesh and it's not
@@ -60,10 +79,6 @@ chronological order.
 	- res (again) changed CS::Graphics::ShaderVarNameParser for more proper
 	  splitting of names and indices: now, everything after the first '['
 	  is considered as indices.
-	- res fixed a mess-up in csMatrix3 transposing.
-	- Marten fixed tinyxml writer not to crash on empty attributes.
-	- Marten fixed light name handling of proxylights in lighter2.
-	- Mike Gist renamed the "tex spec" shadervar to "tex specular".
 	- res added a simple postprocess glare to rm_unshadowed.
 	- res changed the default lighting snippets from using shader condition
 	  templates to somewhat nicer Cg interfaces.
@@ -120,6 +135,15 @@ chronological order.
 	- res changed the light setup and light_default shader to allow mixing
 	  of statically and dynamically lit meshes.
 22-Mar-2008
+	- res changed gl3d to free the VBO manager in Close(): VBOs should be
+	  cleaned up before the GL context itself is torn down.
+	- res changed the way memory tracking is handled. Notably, the 
+	  returned csMemTrackerInfo* isn't needed any more; instead, the
+	  information string serves as "handle" now. Also, allocated blocks
+	  are recorded in the memory tracker itself, thus freeing of a block
+	  can be tracked by merely passing it's address to the mem tracker.
+	- res fixed a bug in the debug ptmalloc code where allocation location
+	  information wasn't kept when it should have been.
 	- res fixed a leak in LightingVariablesHelper.
 	- res changed the shader weaver to not use outputs that are a result
 	  from a coercion when looking for suitable outputs for an input.
@@ -147,16 +171,6 @@ chronological order.
 	    - Only light position in world space is available now.
 	    - The lightiter step used to provide a light attenuation vector of
 	      "radius,1/radius,0" for linear lights. This is no more the case.
-22-Mar-2008
-	- res changed gl3d to free the VBO manager in Close(): VBOs should be
-	  cleaned up before the GL context itself is torn down.
-	- res changed the way memory tracking is handled. Notably, the 
-	  returned csMemTrackerInfo* isn't needed any more; instead, the
-	  information string serves as "handle" now. Also, allocated blocks
-	  are recorded in the memory tracker itself, thus freeing of a block
-	  can be tracked by merely passing it's address to the mem tracker.
-	- res fixed a bug in the debug ptmalloc code where allocation location
-	  information wasn't kept when it should have been.
 19-Mar-2008
 	- Mike Gist fixed a crash in tinyxml when parsing a binary xml file.
 	- Mike Gist added some missing error sets in tinyxml, so it now
@@ -204,6 +218,11 @@ chronological order.
 	- res made csTiledCoverageBuffer resizeable.
 	- res made portal containers use the inverse projection matrix for
 	  unprojecting vertices.
+	- res fixed the LinkWith jam rule to not add LFLAGS from the
+	  dependencies of the requested libraries piecemeal: this breaks
+	  static building.
+	- Mike Gist added support for compressed normal maps to the
+	  parallax and parallaxAtt shaders.
 	- res added getting the inverse projection to iCamera.
 	- res added creating a custom projection matrix camera from an
 	  existing camera.
