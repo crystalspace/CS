@@ -45,49 +45,76 @@ public:
 public:
   /// Construct a matrix, initialized to be the identity.
   csMatrix3 ()
-      : m11(1), m12(0), m13(0),
-	m21(0), m22(1), m23(0),
-	m31(0), m32(0), m33(1)
+    : m11(1), m12(0), m13(0),
+      m21(0), m22(1), m23(0),
+      m31(0), m32(0), m33(1)
   {}
 
   /// Construct a matrix and initialize it.
   csMatrix3 (float am11, float am12, float am13,
              float am21, float am22, float am23,
              float am31, float am32, float am33)
-      : m11(am11), m12(am12), m13(am13),
-	m21(am21), m22(am22), m23(am23),
-	m31(am31), m32(am32), m33(am33)
+    : m11(am11), m12(am12), m13(am13),
+      m21(am21), m22(am22), m23(am23),
+      m31(am31), m32(am32), m33(am33)
   {}
 
   /// Copy constructor.
-  csMatrix3 (csMatrix3 const& o) { Set(o); }
+  csMatrix3 (csMatrix3 const& o) 
+    : m11(o.m11), m12(o.m12), m13(o.m13),
+      m21(o.m21), m22(o.m22), m23(o.m23),
+      m31(o.m31), m32(o.m32), m33(o.m33)
+  {}
 
   /// Construct a matrix from axis-angle specifier.
   csMatrix3 (float x,float y, float z, float angle);
 
   /// Construct a matrix with a quaternion.
-  explicit csMatrix3 (const csQuaternion &quat) { Set (quat); }
+  explicit csMatrix3 (const csQuaternion &quat) 
+  { Set (quat); }
 
   /// Return a textual representation of the matrix
   csString Description() const;
   
   /// Get the first row of this matrix as a vector.
-  inline csVector3 Row1() const { return csVector3 (m11,m12,m13); }
+  inline csVector3 Row1() const 
+  { return csVector3 (m11, m12, m13); }
 
   /// Get the second row of this matrix as a vector.
-  inline csVector3 Row2() const { return csVector3 (m21,m22,m23); }
+  inline csVector3 Row2() const 
+  { return csVector3 (m21, m22, m23); }
 
   /// Get the third row of this matrix as a vector.
-  inline csVector3 Row3() const { return csVector3 (m31,m32,m33); }
+  inline csVector3 Row3() const 
+  { return csVector3 (m31, m32, m33); }
+
+  /// Get a row from this matrix as a vector.
+  inline csVector3 Row(size_t n) const
+  {
+    return !n ? csVector3 (m11, m12, m13) : 
+      n&1 ? csVector3 (m21, m22, m23) :
+      csVector3 (m31, m32, m33);    
+  }
 
   /// Get the first column of this matrix as a vector.
-  inline csVector3 Col1() const { return csVector3 (m11,m21,m31); }
+  inline csVector3 Col1() const 
+  { return csVector3 (m11, m21, m31); }
 
   /// Get the second column of this matrix as a vector.
-  inline csVector3 Col2() const { return csVector3 (m12,m22,m32); }
+  inline csVector3 Col2() const 
+  { return csVector3 (m12, m22, m32); }
 
   /// Get the third column of this matrix as a vector.
-  inline csVector3 Col3() const { return csVector3 (m13,m23,m33); }
+  inline csVector3 Col3() const 
+  { return csVector3 (m13, m23, m33); }
+
+  /// Get a column from this matrix as a vector.
+  inline csVector3 Col(size_t n) const
+  {
+    return !n ? csVector3 (m11, m21, m31) : 
+      n&1 ? csVector3 (m12, m22, m32) :
+      csVector3 (m13, m23, m33);    
+  }
 
   /// Set matrix values.
   inline void Set (float o11, float o12, float o13,
@@ -99,6 +126,7 @@ public:
     m31 = o31; m32 = o32; m33 = o33;
   }
 
+  /// Set matrix values.
   inline void Set (csMatrix3 const &o)
   {
     m11 = o.m11; m12 = o.m12; m13 = o.m13;
@@ -110,27 +138,78 @@ public:
   void Set (const csQuaternion&);
 
   /// Assign another matrix to this one.
-  csMatrix3& operator= (const csMatrix3& o) { Set(o); return *this; }
+  inline csMatrix3& operator= (const csMatrix3& o) 
+  { Set(o); return *this; }
 
   /// Add another matrix to this matrix.
-  csMatrix3& operator+= (const csMatrix3&);
+  inline csMatrix3& operator+= (const csMatrix3& m)
+  {
+    m11 += m.m11; m12 += m.m12; m13 += m.m13;
+    m21 += m.m21; m22 += m.m22; m23 += m.m23;
+    m31 += m.m31; m32 += m.m32; m33 += m.m33;
+    return *this;
+  }
 
   /// Subtract another matrix from this matrix.
-  csMatrix3& operator-= (const csMatrix3&);
+  inline csMatrix3& operator-= (const csMatrix3& m)
+  {
+    m11 -= m.m11; m12 -= m.m12; m13 -= m.m13;
+    m21 -= m.m21; m22 -= m.m22; m23 -= m.m23;
+    m31 -= m.m31; m32 -= m.m32; m33 -= m.m33;
+    return *this;
+  }
 
   /// Multiply another matrix with this matrix.
-  csMatrix3& operator*= (const csMatrix3&);
+  inline csMatrix3& operator*= (const csMatrix3& m)
+  {
+    float old_m11 = m11;
+    m11 = m11 * m.m11 + m12 * m.m21 + m13 * m.m31;
+
+    float old_m12 = m12;
+    m12 = old_m11 * m.m12 + m12 * m.m22 + m13 * m.m32;
+    m13 = old_m11 * m.m13 + old_m12 * m.m23 + m13 * m.m33;
+
+    float old_m21 = m21;
+    m21 = m21 * m.m11 + m22 * m.m21 + m23 * m.m31;
+
+    float old_m22 = m22;
+    m22 = old_m21 * m.m12 + m22 * m.m22 + m23 * m.m32;
+    m23 = old_m21 * m.m13 + old_m22 * m.m23 + m23 * m.m33;
+
+    float old_m31 = m31;
+    m31 = m31 * m.m11 + m32 * m.m21 + m33 * m.m31;
+
+    float old_m32 = m32;
+    m32 = old_m31 * m.m12 + m32 * m.m22 + m33 * m.m32;
+    m33 = old_m31 * m.m13 + old_m32 * m.m23 + m33 * m.m33;
+    return *this;
+  }
 
   /// Multiply this matrix with a scalar.
-  csMatrix3& operator*= (float);
+  inline csMatrix3& operator*= (float s)
+  {
+    m11 *= s; m12 *= s; m13 *= s;
+    m21 *= s; m22 *= s; m23 *= s;
+    m31 *= s; m32 *= s; m33 *= s;
+    return *this;
+  }
 
   /// Divide this matrix by a scalar.
-  csMatrix3& operator/= (float);
+  inline csMatrix3& operator/= (float s)
+  {
+    s = 1.0f/s;
+    m11 *= s; m12 *= s; m13 *= s;
+    m21 *= s; m22 *= s; m23 *= s;
+    m31 *= s; m32 *= s; m33 *= s;
+    return *this;
+  }
 
   /// Unary + operator.
-  csMatrix3 operator+ () const { return *this; }
+  inline csMatrix3 operator+ () const 
+  { return *this; }
+
   /// Unary - operator.
-  csMatrix3 operator- () const
+  inline csMatrix3 operator- () const
   {
     return csMatrix3(-m11,-m12,-m13,
                      -m21,-m22,-m23,
@@ -138,10 +217,22 @@ public:
   }
 
   /// Transpose this matrix.
-  void Transpose ();
+  inline void Transpose ()
+  {
+    float swap;
+    swap = m12; m12 = m21; m21 = swap;
+    swap = m13; m13 = m31; m31 = swap;
+    swap = m23; m23 = m32; m32 = swap;
+  }
 
   /// Return the transpose of this matrix.
-  csMatrix3 GetTranspose () const;
+  csMatrix3 GetTranspose () const
+  {
+    return csMatrix3 (
+      m11, m21, m31,
+      m12, m22, m32,
+      m13, m23, m33);
+  }
 
   /// Return the inverse of this matrix.
   inline csMatrix3 GetInverse () const
@@ -156,26 +247,64 @@ public:
   }
 
   /// Invert this matrix.
-  inline void Invert() { *this = GetInverse (); }
+  inline void Invert() 
+  { *this = GetInverse (); }
 
   /// Compute the determinant of this matrix.
-  float Determinant () const;
+  float Determinant () const
+  {
+    return m11 * (m22 * m33 - m23 * m32)
+         - m12 * (m21 * m33 - m23 * m31)
+         + m13 * (m21 * m32 - m22 * m31);
+  }
 
   /// Set this matrix to the identity matrix.
-  void Identity ();
+  inline void Identity ()
+  {
+    m11 = m22 = m33 = 1.0;
+    m12 = m13 = m21 = m23 = m31 = m32 = 0.0;
+  }
 
   /// Check if the matrix is identity
-  bool IsIdentity () const;
+  inline bool IsIdentity () const
+  {
+    return (m11 == 1.0) && (m12 == 0.0) && (m13 == 0.0) && 
+           (m21 == 0.0) && (m22 == 1.0) && (m23 == 0.0) &&
+           (m31 == 0.0) && (m32 == 0.0) && (m33 == 1.0);
+  }
 
   /// Add two matricies.
-  friend CS_CRYSTALSPACE_EXPORT csMatrix3 operator+ (const csMatrix3& m1, 
-    const csMatrix3& m2);
+  inline friend csMatrix3 operator+ (const csMatrix3& m1, const csMatrix3& m2)
+  {
+    return csMatrix3 (
+      m1.m11 + m2.m11, m1.m12 + m2.m12, m1.m13 + m2.m13,
+      m1.m21 + m2.m21, m1.m22 + m2.m22, m1.m23 + m2.m23,
+      m1.m31 + m2.m31, m1.m32 + m2.m32, m1.m33 + m2.m33);
+  }
+  
   /// Subtract two matricies.
-  friend CS_CRYSTALSPACE_EXPORT csMatrix3 operator- (const csMatrix3& m1, 
-    const csMatrix3& m2);
+  inline friend csMatrix3 operator- (const csMatrix3& m1, const csMatrix3& m2)
+  {
+    return csMatrix3 (
+      m1.m11 - m2.m11, m1.m12 - m2.m12, m1.m13 - m2.m13,
+      m1.m21 - m2.m21, m1.m22 - m2.m22, m1.m23 - m2.m23,
+      m1.m31 - m2.m31, m1.m32 - m2.m32, m1.m33 - m2.m33);
+  }
+  
   /// Multiply two matricies.
-  friend CS_CRYSTALSPACE_EXPORT csMatrix3 operator* (const csMatrix3& m1, 
-    const csMatrix3& m2);
+  inline friend csMatrix3 operator* (const csMatrix3& m1, const csMatrix3& m2)
+  {
+    return csMatrix3 (
+      m1.m11 * m2.m11 + m1.m12 * m2.m21 + m1.m13 * m2.m31,
+      m1.m11 * m2.m12 + m1.m12 * m2.m22 + m1.m13 * m2.m32,
+      m1.m11 * m2.m13 + m1.m12 * m2.m23 + m1.m13 * m2.m33,
+      m1.m21 * m2.m11 + m1.m22 * m2.m21 + m1.m23 * m2.m31,
+      m1.m21 * m2.m12 + m1.m22 * m2.m22 + m1.m23 * m2.m32,
+      m1.m21 * m2.m13 + m1.m22 * m2.m23 + m1.m23 * m2.m33,
+      m1.m31 * m2.m11 + m1.m32 * m2.m21 + m1.m33 * m2.m31,
+      m1.m31 * m2.m12 + m1.m32 * m2.m22 + m1.m33 * m2.m32,
+      m1.m31 * m2.m13 + m1.m32 * m2.m23 + m1.m33 * m2.m33);
+  }
 
   /// Multiply a vector by a matrix (transform it).
   inline friend csVector3 operator* (const csMatrix3& m, const csVector3& v)
@@ -186,25 +315,67 @@ public:
   }
 
   /// Multiply a matrix and a scalar.
-  friend CS_CRYSTALSPACE_EXPORT csMatrix3 operator* (const csMatrix3& m,
-  	float f);
+  inline friend csMatrix3 operator* (const csMatrix3& m, float f)
+  {
+    return csMatrix3 (
+      m.m11 * f, m.m12 * f, m.m13 * f,
+      m.m21 * f, m.m22 * f, m.m23 * f,
+      m.m31 * f, m.m32 * f, m.m33 * f);
+  }
+
   /// Multiply a matrix and a scalar.
-  friend CS_CRYSTALSPACE_EXPORT csMatrix3 operator* (float f,
-  	const csMatrix3& m);
+  inline friend csMatrix3 operator* (float f, const csMatrix3& m)
+  {
+    return csMatrix3 (
+      m.m11 * f, m.m12 * f, m.m13 * f,
+      m.m21 * f, m.m22 * f, m.m23 * f,
+      m.m31 * f, m.m32 * f, m.m33 * f);
+  }
+
   /// Divide a matrix by a scalar.
-  friend CS_CRYSTALSPACE_EXPORT csMatrix3 operator/ (const csMatrix3& m,
-  	float f);
+  inline friend csMatrix3 operator/ (const csMatrix3& m, float f)
+  {
+    float inv_f = 1 / f;
+    return csMatrix3 (
+      m.m11 * inv_f, m.m12 * inv_f, m.m13 * inv_f,
+      m.m21 * inv_f, m.m22 * inv_f, m.m23 * inv_f,
+      m.m31 * inv_f, m.m32 * inv_f, m.m33 * inv_f);
+  }
+
   /// Check if two matricies are equal.
-  friend CS_CRYSTALSPACE_EXPORT bool operator== (const csMatrix3& m1, 
-    const csMatrix3& m2);
+  inline friend bool operator== (const csMatrix3& m1, const csMatrix3& m2)
+  {
+    if (m1.m11 != m2.m11 || m1.m12 != m2.m12 || m1.m13 != m2.m13)
+      return false;
+    if (m1.m21 != m2.m21 || m1.m22 != m2.m22 || m1.m23 != m2.m23)
+      return false;
+    if (m1.m31 != m2.m31 || m1.m32 != m2.m32 || m1.m33 != m2.m33)
+      return false;
+    return true;
+  }
+
   /// Check if two matricies are not equal.
-  friend CS_CRYSTALSPACE_EXPORT bool operator!= (const csMatrix3& m1, 
-    const csMatrix3& m2);
+  inline friend bool operator!= (const csMatrix3& m1, const csMatrix3& m2)
+  {
+    if (m1.m11 != m2.m11 || m1.m12 != m2.m12 || m1.m13 != m2.m13) return true;
+    if (m1.m21 != m2.m21 || m1.m22 != m2.m22 || m1.m23 != m2.m23) return true;
+    if (m1.m31 != m2.m31 || m1.m32 != m2.m32 || m1.m33 != m2.m33) return true;
+    return false;
+  }
+
   /// Test if each component of a matrix is less than a small epsilon value.
-  friend CS_CRYSTALSPACE_EXPORT bool operator< (const csMatrix3& m, float f);
+  inline friend bool operator< (const csMatrix3& m, float f)
+  {
+    return fabsf (m.m11) < f && fabsf (m.m12) < f && fabsf (m.m13) < f &&
+           fabsf (m.m21) < f && fabsf (m.m22) < f && fabsf (m.m23) < f &&
+           fabsf (m.m31) < f && fabsf (m.m32) < f && fabsf (m.m33) < f;
+  }
+
   /// Test if each component of a matrix is greater than a small epsilon value.
-  friend CS_CRYSTALSPACE_EXPORT bool operator> (float f,
-  	const csMatrix3& m);
+  inline friend bool operator> (float f, const csMatrix3& m)
+  {
+    return !(m < f);
+  }
 };
 
 /// An instance of csMatrix3 that is initialized as a rotation about X
@@ -253,7 +424,9 @@ public:
   /**
    * Return a matrix which scales in the X dimension.
    */
-  csXScaleMatrix3 (float scaler) : csMatrix3(scaler, 0, 0, 0, 1, 0, 0, 0, 1) {}
+  csXScaleMatrix3 (float scaler) 
+    : csMatrix3(scaler, 0, 0, 0, 1, 0, 0, 0, 1) 
+  {}
 };
 
 /// An instance of csMatrix3 that is initialized to scale the Y dimension.
@@ -263,7 +436,9 @@ public:
   /**
    * Return a matrix which scales in the Y dimension.
    */
-  csYScaleMatrix3 (float scaler) : csMatrix3(1, 0, 0, 0, scaler, 0, 0, 0, 1) {}
+  csYScaleMatrix3 (float scaler) 
+    : csMatrix3(1, 0, 0, 0, scaler, 0, 0, 0, 1) 
+  {}
 };
 
 /// An instance of csMatrix3 that is initialized to scale the Z dimension.
@@ -273,7 +448,9 @@ public:
   /**
    * Return a matrix which scales in the Z dimension.
    */
-  csZScaleMatrix3 (float scaler) : csMatrix3(1, 0, 0, 0, 1, 0, 0, 0, scaler) {}
+  csZScaleMatrix3 (float scaler) 
+    : csMatrix3(1, 0, 0, 0, 1, 0, 0, 0, scaler) 
+  {}
 };
 
 

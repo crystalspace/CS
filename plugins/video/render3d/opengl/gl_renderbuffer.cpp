@@ -179,7 +179,8 @@ csGLVBOBufferManager::VBOSlot* csGLVBOBufferManager::GetVBOSlot (
   VBOSlot* slot = 0;
 
   slot = renderBufferMappings.Get (buffer, 0);
-  const size_t slotType = buffer->IsIndexBuffer () ?
+  const bool isIndexBuffer = buffer->IsIndexBuffer ();
+  const size_t slotType = isIndexBuffer ?
     VBO_BUFFER_INDEX : VBO_BUFFER_VERTEX;
 
   if (!slot)
@@ -233,7 +234,10 @@ csGLVBOBufferManager::VBOSlot* csGLVBOBufferManager::GetVBOSlot (
 
       GetSlotIdAndOffset (slot, vboID, offset);
       stateCache->SetBufferARB (VBO_BUFFER_GL_TYPE[slotType], vboID);
-
+      stateCache->ApplyBufferBinding (isIndexBuffer
+	? csGLStateCacheContext::boIndexArray
+	: csGLStateCacheContext::boElementArray);
+      
       //Copy data into it
       void* bufferData = buffer->Lock (CS_BUF_LOCK_READ);
       extensionManager->glBufferSubDataARB (VBO_BUFFER_GL_TYPE[slotType],
@@ -460,6 +464,9 @@ csGLVBOBufferManager::VBOBuffer* csGLVBOBufferManager::GetNewVBOBuffer (
   extensionManager->glGenBuffersARB (1, &(buffer->vboID));
   CS_ASSERT(buffer->vboID);
   stateCache->SetBufferARB (VBO_BUFFER_GL_TYPE[slotType], buffer->vboID);
+  stateCache->ApplyBufferBinding (slotType == VBO_BUFFER_INDEX
+    ? csGLStateCacheContext::boIndexArray
+    : csGLStateCacheContext::boElementArray);
   extensionManager->glBufferDataARB (VBO_BUFFER_GL_TYPE[slotType], 
     (GLsizei)(buffer->slotSize*buffer->numberOfSlots), 0, GL_DYNAMIC_DRAW_ARB);
   stateCache->SetBufferARB (VBO_BUFFER_GL_TYPE[slotType], 0);

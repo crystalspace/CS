@@ -84,7 +84,7 @@ namespace CS
     class AllocatorHeapBase : protected HeapAccess
     {
     #if defined(CS_MEMORY_TRACKER)
-      csMemTrackerInfo* mti;
+      const char* mti;
     #endif
     public:
     #if defined(CS_MEMORY_TRACKER)
@@ -98,17 +98,14 @@ namespace CS
       void* Alloc (const size_t n)
       {
       #if defined(CS_MEMORY_TRACKER)
-        size_t* p = (size_t*)HeapAccess::Alloc (n + sizeof (size_t));
-        *p = n;
-        p++;
+        void* p = HeapAccess::Alloc (n);
         if (mti == 0)
         {
 	  /*csString mtiInfo;
           mtiInfo.Format ("%s with %p", typeid(*this).name(), HeapAccess::GetHeap());*/
-	  mti = mtiRegisterAlloc (n, /*mtiInfo*/typeid(*this).name());
+	  mti = /*mtiInfo*/typeid(*this).name();
         }
-        else
-	  mtiUpdateAmount (mti, 1, int (n));
+	CS::Debug::MemTracker::RegisterAlloc (p, n, mti);
         return p;
       #else
         return HeapAccess::Alloc (n);
@@ -118,28 +115,17 @@ namespace CS
       void Free (void* p)
       {
       #if defined(CS_MEMORY_TRACKER)
-        size_t* x = (size_t*)p;
-        x--;
-        size_t allocSize = *x;
-        HeapAccess::Free (x);
-        if (mti) mtiUpdateAmount (mti, -1, -int (allocSize));
-      #else
-        HeapAccess::Free (p);
+        CS::Debug::MemTracker::RegisterFree (p);
       #endif
+        HeapAccess::Free (p);
       }
       /// Resize the allocated block \p p to size \p newSize.
       void* Realloc (void* p, size_t newSize)
       {
       #ifdef CS_MEMORY_TRACKER
         if (p == 0) return Alloc (newSize);
-        size_t* x = (size_t*)p;
-        x--;
-        if (mti) mtiUpdateAmount (mti, -1, -int (*x));
-        size_t* np = 
-	  (size_t*)HeapAccess::Realloc (x, newSize + sizeof (size_t));
-        *np = newSize;
-        np++;
-        if (mti) mtiUpdateAmount (mti, 1, int (newSize));
+        void* np = HeapAccess::Realloc (p, newSize);
+        CS::Debug::MemTracker::UpdateSize (p, np, newSize);
         return np;
       #else
         return HeapAccess::Realloc (p, newSize);
@@ -153,7 +139,7 @@ namespace CS
         /*csString mtiInfo;
         mtiInfo.Format ("%s with %p for %s", typeid(*this).name(), 
           HeapAccess::GetHeap(), info);*/
-        mti = mtiRegister (/*mtiInfo*/info);
+        mti = info;
       #else
         (void)info;
       #endif

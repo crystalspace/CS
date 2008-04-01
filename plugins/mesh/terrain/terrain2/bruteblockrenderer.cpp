@@ -320,9 +320,15 @@ struct TerrainCellRData : public csRefCount
   csRef<iShaderVariableContext> commonSVContext;
 
   // Per cell, per layer sv contexts
-  csRefArray<OverlaidShaderVariableContext> svContextArray;
-  csRefArray<iTextureHandle> alphaMapArray;
+  // For materialmap
+  csRefArray<OverlaidShaderVariableContext> svContextArrayMM;
+  csRefArray<iTextureHandle> alphaMapArrayMM;  
   
+  // For separate alpha-maps
+  csRefArray<OverlaidShaderVariableContext> svContextArrayAlpha;
+  csRefArray<iTextureHandle> alphaMapArrayAlpha;
+  csRefArray<iMaterialWrapper> materialArrayAlpha;
+
   // Settings
   size_t blockResolution;
   
@@ -891,7 +897,7 @@ void TerrainBlock::CullRenderMeshes (iRenderView* rview, const csPlane3* cullPla
     else
     {
       mat = palette.Get (j);
-      svContext = renderData->svContextArray[j];
+      svContext = renderData->svContextArrayMM[j];
     }
 
     if (!mat || !svContext)
@@ -927,8 +933,8 @@ TerrainCellRData::TerrainCellRData (iTerrainCell* cell,
   blockResolution = properties->GetBlockResolution ();
 
   commonSVContext = cell->GetRenderProperties ();
-  svContextArray.SetSize (renderer->GetMaterialPalette ().GetSize ());
-  alphaMapArray.SetSize (renderer->GetMaterialPalette ().GetSize ());
+  svContextArrayMM.SetSize (renderer->GetMaterialPalette ().GetSize ());
+  alphaMapArrayMM.SetSize (renderer->GetMaterialPalette ().GetSize ());
 
   // Setup the base context
 
@@ -1114,67 +1120,136 @@ void csTerrainBruteBlockRenderer::OnMaterialPaletteUpdate (
   materialPalette = &material_palette;  
 }
 
-void csTerrainBruteBlockRenderer::OnMaterialMaskUpdate (iTerrainCell* cell, size_t materialIdx,
-  const csRect& rectangle, const unsigned char* mapData, size_t pitch)
+void csTerrainBruteBlockRenderer::OnMaterialMaskUpdate (iTerrainCell* cell, 
+  const csRect& rectangle, const unsigned char* materialMap, size_t pitch)
 {
-  SetupCellData (cell);
+  SetupCellMMArrays (cell);
+
+  csRef<TerrainCellRData> data = (TerrainCellRData*)cell->GetRenderData ();
+
+  if (data)
+  {    
+    // Iterate and build all the alpha-masks
+    csDirtyAccessArray<csRGBpixel> imageData;
+    imageData.SetSize (rectangle.Width () * rectangle.Height ());
+
+    for (size_t i = 0; i < materialPalette->GetSize (); ++i)
+    {
+      csRGBpixel* dst_data = imageData.GetArray ();
+
+      for (int y = rectangle.ymin; y < rectangle.ymax; ++y)
+      {
+        const unsigned char* src_data = materialMap + y * pitch;
+
+        for (int x = rectangle.xmin; x < rectangle.xmax; ++x, ++src_data)
+        {
+          const unsigned char result = *src_data == i ? 255 : 0;
+
+          (*dst_data++).Set (result, result, result, result);
+        }
+      }
+
+      data->alphaMapArrayMM[i]->Blit (rectangle.xmin, rectangle.ymin,
+        rectangle.Width (), rectangle.Height (), 
+        (unsigned char*)imageData.GetArray (), iTextureHandle::RGBA8888);
+
+    }
+  }
+}
+
+void csTerrainBruteBlockRenderer::OnMaterialMaskUpdate (iTerrainCell* cell, 
+  size_t matIdx, const csRect& rectangle, const unsigned char* materialMap, size_t pitch)
+{
+  SetupCellMMArrays (cell);
 
   csRef<TerrainCellRData> data = (TerrainCellRData*)cell->GetRenderData ();
 
   if (data)
   {
-    // Set enough length
-    if (data->svContextArray.GetSize () <= materialIdx)
-    {
-      data->svContextArray.SetSize (materialIdx + 1);
-      data->alphaMapArray.SetSize (materialIdx + 1);
-    }
-
-    if (!data->svContextArray[materialIdx])
-    {
-      csRef<OverlaidShaderVariableContext> ctx;
-      ctx.AttachNew (new OverlaidShaderVariableContext);
-      ctx->SetParentContext (data->commonSVContext);
-
-      data->svContextArray.Put (materialIdx, ctx);
-    }
-
-    if (!data->alphaMapArray[materialIdx])
-    {
-      csRef<iImage> alphaImg;
-      alphaImg.AttachNew (new csImageMemory (cell->GetMaterialMapWidth (), 
-        cell->GetMaterialMapHeight (), CS_IMGFMT_TRUECOLOR));
-
-      csRef<iTextureHandle> txtHandle = graph3d->GetTextureManager ()->RegisterTexture (alphaImg, 
-        CS_TEXTURE_2D | CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
-
-      data->alphaMapArray.Put (materialIdx, txtHandle);
-
-      csRef<csShaderVariable> var;
-      var.AttachNew (new csShaderVariable(stringSet->Request ("splat alpha map")));
-      var->SetType (csShaderVariable::TEXTURE);
-      var->SetValue (data->alphaMapArray[materialIdx]);
-
-      data->svContextArray[materialIdx]->AddVariable (var);
-    }
-
     // Update the alpha map
     csDirtyAccessArray<csRGBpixel> imageData;
     imageData.SetSize (rectangle.Width () * rectangle.Height ());
-   
+
     csRGBpixel* dst_data = imageData.GetArray ();
 
-    for (int y = 0; y < rectangle.Width (); ++y)
+    for (int y = rectangle.ymin; y < rectangle.ymax; ++y)
     {
-      const unsigned char* src_data = mapData + y * pitch;
+      const unsigned char* src_data = materialMap + y * pitch;
 
-      for (int x = 0; x < rectangle.Height (); ++x, ++src_data)
+      for (int x = rectangle.xmin; x < rectangle.xmax; ++x, ++src_data)
       {
         (*dst_data++).Set (*src_data, *src_data, *src_data, *src_data);
       }
     }
 
-    data->alphaMapArray[materialIdx]->Blit (rectangle.xmin, rectangle.ymin,
+    data->alphaMapArrayMM[matIdx]->Blit (rectangle.xmin, rectangle.ymin,
+      rectangle.Width (), rectangle.Height (), 
+      (unsigned char*)imageData.GetArray (), iTextureHandle::RGBA8888);
+
+  }
+}
+
+void csTerrainBruteBlockRenderer::OnAlphaMapUpdate (iTerrainCell* cell,
+  iMaterialWrapper* material, const unsigned char* alphaMap, const csRect& rectangle, 
+  size_t pitch)
+{
+  SetupCellData (cell);
+
+  csRef<TerrainCellRData> data = (TerrainCellRData*)cell->GetRenderData ();
+  if (data)
+  {
+    // Check if we already have the material or not
+    size_t idx = data->materialArrayAlpha.Find (material);
+    
+    if (idx == csArrayItemNotFound)
+    {
+      // Setup new one
+      idx = data->materialArrayAlpha.Push (material);
+
+      // Allocate SV & texture
+      {
+        csRef<OverlaidShaderVariableContext> ctx;
+        ctx.AttachNew (new OverlaidShaderVariableContext);
+        ctx->SetParentContext (data->commonSVContext);
+
+        data->svContextArrayAlpha.Push (ctx);
+      }
+
+      {
+        csRef<iImage> alphaImg;
+        alphaImg.AttachNew (new csImageMemory (cell->GetMaterialMapWidth (), 
+          cell->GetMaterialMapHeight (), CS_IMGFMT_TRUECOLOR));
+
+        csRef<iTextureHandle> txtHandle = graph3d->GetTextureManager ()->RegisterTexture (alphaImg, 
+          CS_TEXTURE_2D | CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
+
+        data->alphaMapArrayAlpha.Push (txtHandle);
+
+        csRef<csShaderVariable> var;
+        var.AttachNew (new csShaderVariable(stringSet->Request ("splat alpha map")));
+        var->SetType (csShaderVariable::TEXTURE);
+        var->SetValue (data->alphaMapArrayAlpha[idx]);
+
+        data->svContextArrayAlpha[idx]->AddVariable (var);
+      }
+    }
+
+    csDirtyAccessArray<csRGBpixel> imageData;
+    imageData.SetSize (rectangle.Width () * rectangle.Height ());
+
+    csRGBpixel* dst_data = imageData.GetArray ();
+
+    for (int y = rectangle.ymin; y < rectangle.ymax; ++y)
+    {
+      const unsigned char* src_data = alphaMap + y * pitch;
+
+      for (int x = rectangle.xmin; x < rectangle.xmax; ++x, ++src_data)
+      {
+        (*dst_data++).Set (*src_data, *src_data, *src_data, *src_data);
+      }
+    }
+
+    data->alphaMapArrayAlpha[idx]->Blit (rectangle.xmin, rectangle.ymin,
       rectangle.Width (), rectangle.Height (), 
       (unsigned char*)imageData.GetArray (), iTextureHandle::RGBA8888);
 
@@ -1418,6 +1493,55 @@ iRenderBuffer* csTerrainBruteBlockRenderer::GetIndexBuffer (size_t blockResoluti
   return set->meshIndices[indexType];
 }
 
+void csTerrainBruteBlockRenderer::SetupCellMMArrays (iTerrainCell* cell)
+{
+  SetupCellData (cell);
+
+  csRef<TerrainCellRData> data = (TerrainCellRData*)cell->GetRenderData ();
+
+  if (data)
+  {
+    size_t numMats = materialPalette->GetSize ();
+
+    // Set enough length
+    if (data->svContextArrayMM.GetSize () < numMats)
+    {
+      data->svContextArrayMM.SetSize (numMats);
+      data->alphaMapArrayMM.SetSize (numMats);
+    }
+
+    for (size_t matIdx = 0; matIdx < numMats; ++matIdx)
+    {
+      if (!data->svContextArrayMM[matIdx])
+      {
+        csRef<OverlaidShaderVariableContext> ctx;
+        ctx.AttachNew (new OverlaidShaderVariableContext);
+        ctx->SetParentContext (data->commonSVContext);
+
+        data->svContextArrayMM.Put (matIdx, ctx);
+      }
+
+      if (!data->alphaMapArrayMM[matIdx])
+      {
+        csRef<iImage> alphaImg;
+        alphaImg.AttachNew (new csImageMemory (cell->GetMaterialMapWidth (), 
+          cell->GetMaterialMapHeight (), CS_IMGFMT_TRUECOLOR));
+
+        csRef<iTextureHandle> txtHandle = graph3d->GetTextureManager ()->RegisterTexture (alphaImg, 
+          CS_TEXTURE_2D | CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
+
+        data->alphaMapArrayMM.Put (matIdx, txtHandle);
+
+        csRef<csShaderVariable> var;
+        var.AttachNew (new csShaderVariable(stringSet->Request ("splat alpha map")));
+        var->SetType (csShaderVariable::TEXTURE);
+        var->SetValue (data->alphaMapArrayMM[matIdx]);
+
+        data->svContextArrayMM[matIdx]->AddVariable (var);
+      }
+    }
+  }
+}
 
 }
 CS_PLUGIN_NAMESPACE_END(Terrain2)

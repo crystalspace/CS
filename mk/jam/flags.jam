@@ -40,11 +40,8 @@ rule LinkWith
   }
 
   Depends $($(<)_TARGET) : $(rawlibs) ;
-  for l in $(libs)
-  {
-    NEEDLIBS on $($(<)_TARGET) =
-      [ MergeLFlags [ on $($(<)_TARGET) GetVar NEEDLIBS ] : $(l) ] ;
-  }
+  NEEDLIBS on $($(<)_TARGET) =
+    [ MergeLFlags [ on $($(<)_TARGET) GetVar NEEDLIBS ] : $(libs) ] ;
   $(<).NEEDLIBS += $(rawlibs) ;
 
   for l in $(rawlibs)

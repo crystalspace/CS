@@ -157,6 +157,41 @@
     param3 = currentContext->parameter_##param3;  \
   }
 
+#define DECLARE_CACHED_PARAMETER_3_BUF(func, name, type1, param1, type2, param2, type3, param3, vbo) \
+  type1 parameter_##param1; \
+  type2 parameter_##param2; \
+  type3 parameter_##param3; \
+  GLuint parameter_##vbo;
+
+#define IMPLEMENT_CACHED_PARAMETER_3_BUF(func, name, type1, param1, type2, param2, type3, param3, vbo) \
+  void Set##name (type1 param1, type2 param2, type3 param3, bool forced = false) \
+  { \
+    if (forced || (param1 != currentContext->parameter_##param1) \
+        || (param2 != currentContext->parameter_##param2) \
+        || (param3 != currentContext->parameter_##param3) \
+        || (currentContext->currentBufferID[csGLStateCacheContext::boElementArray] \
+          != currentContext->parameter_##vbo) \
+        || FORCE_STATE_CHANGE) \
+    { \
+      currentContext->parameter_##param1 = param1;  \
+      currentContext->parameter_##param2 = param2;  \
+      currentContext->parameter_##param3 = param3;  \
+      if (extmgr->CS_GL_ARB_vertex_buffer_object)                             \
+      {                                                                       \
+        ApplyBufferBinding (csGLStateCacheContext::boElementArray);           \
+	currentContext->parameter_##vbo                                       \
+	 = currentContext->currentBufferID[csGLStateCacheContext::boElementArray];\
+      }                                                                       \
+      func (param1, param2, param3); \
+    } \
+  } \
+  void Get##name (type1 &param1, type2 & param2, type3 & param3) const\
+  { \
+    param1 = currentContext->parameter_##param1;  \
+    param2 = currentContext->parameter_##param2;  \
+    param3 = currentContext->parameter_##param3;  \
+  }
+
 #define DECLARE_CACHED_PARAMETER_4(func, name, type1, param1, \
   type2, param2, type3, param3, type4, param4) \
   type1 parameter_##param1; \
@@ -189,6 +224,48 @@
     param4 = currentContext->parameter_##param4;  \
   }
 
+#define DECLARE_CACHED_PARAMETER_4_BUF(func, name, type1, param1, \
+  type2, param2, type3, param3, type4, param4, vbo) \
+  type1 parameter_##param1; \
+  type2 parameter_##param2; \
+  type3 parameter_##param3; \
+  type4 parameter_##param4; \
+  GLuint parameter_##vbo;
+
+#define IMPLEMENT_CACHED_PARAMETER_4_BUF(func, name, type1, param1, \
+    type2, param2, type3, param3, type4, param4, vbo) \
+  void Set##name (type1 param1, type2 param2, type3 param3, type4 param4, \
+    bool forced = false) \
+  { \
+    if (forced || (param1 != currentContext->parameter_##param1) || \
+      (param2 != currentContext->parameter_##param2) || \
+      (param3 != currentContext->parameter_##param3) || \
+      (param4 != currentContext->parameter_##param4) \
+      || (currentContext->currentBufferID[csGLStateCacheContext::boElementArray] \
+        != currentContext->parameter_##vbo) \
+      || FORCE_STATE_CHANGE) \
+    { \
+      currentContext->parameter_##param1 = param1;  \
+      currentContext->parameter_##param2 = param2;  \
+      currentContext->parameter_##param3 = param3;  \
+      currentContext->parameter_##param4 = param4;  \
+      if (extmgr->CS_GL_ARB_vertex_buffer_object)                             \
+      {                                                                       \
+        ApplyBufferBinding (csGLStateCacheContext::boElementArray);           \
+	currentContext->parameter_##vbo =                                     \
+	  currentContext->currentBufferID[csGLStateCacheContext::boElementArray];\
+      }                                                                       \
+      func (param1, param2, param3, param4); \
+    } \
+  } \
+  void Get##name (type1 &param1, type2 & param2, type3 & param3, type4& param4) const\
+  { \
+    param1 = currentContext->parameter_##param1;  \
+    param2 = currentContext->parameter_##param2;  \
+    param3 = currentContext->parameter_##param3;  \
+    param4 = currentContext->parameter_##param4;  \
+  }
+
 #define DECLARE_CACHED_CLIENT_STATE(name)	      \
   bool enabled_##name;
 
@@ -201,7 +278,7 @@
       glEnableClientState (name); \
     } \
   } \
-  void Disable_##name () \
+    void Disable_##name () \
   { \
     if (currentContext->enabled_##name || FORCE_STATE_CHANGE) { \
       currentContext->enabled_##name = false;  \
@@ -325,15 +402,16 @@
   }
 
 
-#define DECLARE_CACHED_PARAMETER_4_LAYER(func, name, type1, param1,           \
-  type2, param2, type3, param3, type4, param4)                                \
+#define DECLARE_CACHED_PARAMETER_4_BUF_LAYER(func, name, type1, param1,       \
+  type2, param2, type3, param3, type4, param4, vbo)                           \
   AutoArray<type1> parameter_##param1;                                        \
   AutoArray<type2> parameter_##param2;                                        \
   AutoArray<type3> parameter_##param3;                                        \
-  AutoArray<type4> parameter_##param4;
+  AutoArray<type4> parameter_##param4;                                        \
+  AutoArray<GLuint> parameter_##vbo;
 
-#define IMPLEMENT_CACHED_PARAMETER_4_LAYER(func, name, type1, param1,         \
-    type2, param2, type3, param3, type4, param4)                              \
+#define IMPLEMENT_CACHED_PARAMETER_4_BUF_LAYER(func, name, type1, param1,     \
+    type2, param2, type3, param3, type4, param4, vbo)                         \
   void Set##name (type1 param1, type2 param2, type3 param3, type4 param4,     \
     bool forced = false)                                                      \
   {                                                                           \
@@ -343,6 +421,8 @@
       || (param2 != currentContext->parameter_##param2[currentUnit])          \
       || (param3 != currentContext->parameter_##param3[currentUnit])          \
       || (param4 != currentContext->parameter_##param4[currentUnit])          \
+      || (currentContext->currentBufferID[csGLStateCacheContext::boElementArray]\
+        != currentContext->parameter_##vbo[currentUnit])                      \
       || FORCE_STATE_CHANGE)                                                  \
     {                                                                         \
       ActivateTU (activateTexCoord);                                          \
@@ -350,6 +430,12 @@
       currentContext->parameter_##param2[currentUnit] = param2;               \
       currentContext->parameter_##param3[currentUnit] = param3;               \
       currentContext->parameter_##param4[currentUnit] = param4;               \
+      if (extmgr->CS_GL_ARB_vertex_buffer_object)                             \
+      {                                                                       \
+        ApplyBufferBinding (csGLStateCacheContext::boElementArray);           \
+        currentContext->parameter_##vbo[currentUnit] =                        \
+	  currentContext->currentBufferID[csGLStateCacheContext::boElementArray];\
+      }                                                                       \
       func (param1, param2, param3, param4);                                  \
     }                                                                         \
   }                                                                           \
@@ -403,16 +489,24 @@ public:
     boCount
   };
   GLuint currentBufferID[boCount];
+  GLuint activeBufferID[boCount];
   static int GLBufferTargetToCacheIndex (GLenum target)
   {
     switch (target)
     {
-    case GL_ELEMENT_ARRAY_BUFFER_ARB: return boElementArray;
-    case GL_ARRAY_BUFFER_ARB:         return boIndexArray;
+    case GL_ARRAY_BUFFER_ARB:         return boElementArray;
+    case GL_ELEMENT_ARRAY_BUFFER_ARB: return boIndexArray;
     case GL_PIXEL_PACK_BUFFER_ARB:    return boPixelPack;
     case GL_PIXEL_UNPACK_BUFFER_ARB:  return boPixelUnpack;
     default: return -1;      
     }
+  }
+  static GLenum CacheIndexToGLBufferTarget (int index)
+  {
+    static const GLenum localIndexToGLBufferTarget[boCount] =
+    { GL_ARRAY_BUFFER_ARB, GL_ELEMENT_ARRAY_BUFFER_ARB, 
+      GL_PIXEL_PACK_BUFFER_ARB, GL_PIXEL_UNPACK_BUFFER_ARB };
+    return localIndexToGLBufferTarget[index];
   }
 
   // BlendFunc/BlendFuncSeparate
@@ -441,6 +535,8 @@ public:
   DECLARE_CACHED_BOOL (GL_TEXTURE_GEN_Q)
   DECLARE_CACHED_BOOL (GL_FOG)
   DECLARE_CACHED_BOOL (GL_COLOR_SUM_EXT)
+  DECLARE_CACHED_BOOL (GL_VERTEX_PROGRAM_POINT_SIZE_ARB)
+  DECLARE_CACHED_BOOL (GL_POINT_SPRITE_ARB)
   DECLARE_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_1D)
   DECLARE_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_2D)
   DECLARE_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_3D)
@@ -465,17 +561,17 @@ public:
 
   DECLARE_CACHED_PARAMETER_1 (glMatrixMode, MatrixMode, GLenum, matrixMode)
   
-  DECLARE_CACHED_PARAMETER_4 (glVertexPointer, VertexPointer, GLint, vsize,
-    GLenum, vtype, GLsizei, vstride, GLvoid*, vpointer)
-  DECLARE_CACHED_PARAMETER_3 (glNormalPointer, NormalPointer, GLenum, ntype,
-    GLsizei, nstride, GLvoid*, npointer)
-  DECLARE_CACHED_PARAMETER_4 (glColorPointer, ColorPointer, GLint, csize,
-    GLenum, ctype, GLsizei, cstride, GLvoid*, cpointer)
-  DECLARE_CACHED_PARAMETER_4 (extmgr->glSecondaryColorPointerEXT, 
+  DECLARE_CACHED_PARAMETER_4_BUF (glVertexPointer, VertexPointer, GLint, vsize,
+    GLenum, vtype, GLsizei, vstride, GLvoid*, vpointer, vvbo)
+  DECLARE_CACHED_PARAMETER_3_BUF (glNormalPointer, NormalPointer, GLenum, ntype,
+    GLsizei, nstride, GLvoid*, npointer, nvbo)
+  DECLARE_CACHED_PARAMETER_4_BUF (glColorPointer, ColorPointer, GLint, csize,
+    GLenum, ctype, GLsizei, cstride, GLvoid*, cpointer, cvbo)
+  DECLARE_CACHED_PARAMETER_4_BUF (extmgr->glSecondaryColorPointerEXT, 
     SecondaryColorPointerEXT, GLint, scsize, GLenum, sctype, GLsizei, scstride, 
-    GLvoid*, scpointer);
-  DECLARE_CACHED_PARAMETER_4_LAYER (glTexCoordPointer, TexCoordPointer, GLint, tsize,
-    GLenum, ttype, GLsizei, tstride, GLvoid*, tpointer)
+    GLvoid*, scpointer, scvbo);
+  DECLARE_CACHED_PARAMETER_4_BUF_LAYER (glTexCoordPointer, TexCoordPointer, GLint, tsize,
+    GLenum, ttype, GLsizei, tstride, GLvoid*, tpointer, tvbo)
   
   csGLStateCacheContext (csGLExtensionManager* extmgr)
   {
@@ -512,6 +608,9 @@ public:
     parameter_ttype.Setup (numTexCoords);
     parameter_tstride.Setup (numTexCoords);
     parameter_tpointer.Setup (numTexCoords);
+    parameter_tvbo.Setup (numTexCoords);
+    
+    memset (activeBufferID, 0, sizeof (activeBufferID));
   }
 
   /** 
@@ -596,6 +695,9 @@ public:
         glGetIntegerv (GL_TEXTURE_COORD_ARRAY_STRIDE, (GLint*)&parameter_tstride[i]);
         glGetIntegerv (GL_TEXTURE_COORD_ARRAY_TYPE, (GLint*)&parameter_ttype[i]);
         glGetPointerv (GL_TEXTURE_COORD_ARRAY_POINTER, &parameter_tpointer[i]);
+	if (extmgr->CS_GL_ARB_vertex_buffer_object)
+	  glGetIntegerv (GL_TEXTURE_COORD_ARRAY_BUFFER_BINDING_ARB,
+	    (GLint*)&parameter_tvbo[i]);
       }
     } 
     else 
@@ -615,6 +717,9 @@ public:
       glGetIntegerv (GL_TEXTURE_COORD_ARRAY_STRIDE, (GLint*)&parameter_tstride[0]);
       glGetIntegerv (GL_TEXTURE_COORD_ARRAY_TYPE, (GLint*)&parameter_ttype[0]);
       glGetPointerv (GL_TEXTURE_COORD_ARRAY_POINTER, &parameter_tpointer[0]);
+      if (extmgr->CS_GL_ARB_vertex_buffer_object)
+	glGetIntegerv (GL_TEXTURE_COORD_ARRAY_BUFFER_BINDING_ARB,
+	  (GLint*)&parameter_tvbo[0]);
       for (i = 1 ; i < numImageUnits; i++)
       {
         enabled_GL_TEXTURE_1D[i] = enabled_GL_TEXTURE_1D[0];
@@ -637,14 +742,15 @@ public:
         (glIsEnabled (GL_SECONDARY_COLOR_ARRAY_EXT) == GL_TRUE);
     else
       enabled_GL_SECONDARY_COLOR_ARRAY_EXT = false;
+    if (extmgr->CS_GL_ARB_vertex_program)
+      enabled_GL_VERTEX_PROGRAM_POINT_SIZE_ARB =
+        (glIsEnabled (GL_VERTEX_PROGRAM_POINT_SIZE_ARB) == GL_TRUE);
+    else
+      enabled_GL_VERTEX_PROGRAM_POINT_SIZE_ARB = false;
     enabled_GL_NORMAL_ARRAY = (glIsEnabled (GL_NORMAL_ARRAY) == GL_TRUE);
 
     memset (currentBufferID, 0, sizeof (currentBufferID));
     {
-      static const GLenum localIndexToGLBufferBinding[boCount] =
-      { GL_ELEMENT_ARRAY_BUFFER_BINDING_ARB, GL_ARRAY_BUFFER_BINDING_ARB, 
-	GL_PIXEL_PACK_BUFFER_BINDING_ARB, GL_PIXEL_UNPACK_BUFFER_BINDING_ARB };
-
       enum { extVBO = 1, extPBO = 2 };
       static const GLenum requiredExt[boCount] =
       { extVBO, extVBO, extPBO, extPBO };
@@ -656,8 +762,11 @@ public:
       {
 	if (requiredExt[b] & boExt)
 	{
+	  static const GLenum localIndexToGLBufferBinding[boCount] =
+	  { GL_ARRAY_BUFFER_BINDING_ARB, GL_ELEMENT_ARRAY_BUFFER_BINDING_ARB, 
+	    GL_PIXEL_PACK_BUFFER_BINDING_ARB, GL_PIXEL_UNPACK_BUFFER_BINDING_ARB };
 	  glGetIntegerv (localIndexToGLBufferBinding[b], 
-	    (GLint*)&currentBufferID[b]);
+	    (GLint*)&activeBufferID[b]);
 	}
       }
     }
@@ -666,15 +775,21 @@ public:
     glGetIntegerv (GL_VERTEX_ARRAY_STRIDE, (GLint*)&parameter_vstride);
     glGetIntegerv (GL_VERTEX_ARRAY_TYPE, (GLint*)&parameter_vtype);
     glGetPointerv (GL_VERTEX_ARRAY_POINTER, &parameter_vpointer);
+    if (extmgr->CS_GL_ARB_vertex_buffer_object)
+      glGetIntegerv (GL_VERTEX_ARRAY_BUFFER_BINDING_ARB, (GLint*)&parameter_vvbo);
 
     glGetIntegerv (GL_NORMAL_ARRAY_STRIDE, (GLint*)&parameter_nstride);
     glGetIntegerv (GL_NORMAL_ARRAY_TYPE, (GLint*)&parameter_ntype);
     glGetPointerv (GL_NORMAL_ARRAY_POINTER, &parameter_npointer);
+    if (extmgr->CS_GL_ARB_vertex_buffer_object)
+      glGetIntegerv (GL_NORMAL_ARRAY_BUFFER_BINDING_ARB, (GLint*)&parameter_nvbo);
 
     glGetIntegerv (GL_COLOR_ARRAY_SIZE, (GLint*)&parameter_csize);
     glGetIntegerv (GL_COLOR_ARRAY_STRIDE, (GLint*)&parameter_cstride);
     glGetIntegerv (GL_COLOR_ARRAY_TYPE, (GLint*)&parameter_ctype);
     glGetPointerv (GL_COLOR_ARRAY_POINTER, &parameter_cpointer);
+    if (extmgr->CS_GL_ARB_vertex_buffer_object)
+      glGetIntegerv (GL_COLOR_ARRAY_BUFFER_BINDING_ARB, (GLint*)&parameter_cvbo);
     
     if (extmgr->CS_GL_EXT_secondary_color)
     {
@@ -686,6 +801,9 @@ public:
         (GLint*)&parameter_sctype);
       glGetPointerv (GL_SECONDARY_COLOR_ARRAY_POINTER_EXT, 
         &parameter_scpointer);
+      if (extmgr->CS_GL_ARB_vertex_buffer_object)
+	glGetIntegerv (GL_SECONDARY_COLOR_ARRAY_BUFFER_BINDING_ARB,
+	  (GLint*)&parameter_scvbo);
       enabled_GL_COLOR_SUM_EXT = glIsEnabled (GL_COLOR_SUM_EXT) != GL_FALSE;
     }
     else
@@ -753,6 +871,8 @@ public:
   IMPLEMENT_CACHED_BOOL (GL_TEXTURE_GEN_Q)
   IMPLEMENT_CACHED_BOOL (GL_FOG)
   IMPLEMENT_CACHED_BOOL (GL_COLOR_SUM_EXT)
+  IMPLEMENT_CACHED_BOOL (GL_VERTEX_PROGRAM_POINT_SIZE_ARB)
+  IMPLEMENT_CACHED_BOOL (GL_POINT_SPRITE_ARB)
   IMPLEMENT_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_1D)
   IMPLEMENT_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_2D)
   IMPLEMENT_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_3D)
@@ -777,17 +897,17 @@ public:
 
   IMPLEMENT_CACHED_PARAMETER_1 (glMatrixMode, MatrixMode, GLenum, matrixMode)
   
-  IMPLEMENT_CACHED_PARAMETER_4 (glVertexPointer, VertexPointer, GLint, vsize,
-    GLenum, vtype, GLsizei, vstride, GLvoid*, vpointer);
-  IMPLEMENT_CACHED_PARAMETER_3 (glNormalPointer, NormalPointer, GLenum, ntype,
-    GLsizei, nstride, GLvoid*, npointer);
-  IMPLEMENT_CACHED_PARAMETER_4 (glColorPointer, ColorPointer, GLint, csize,
-    GLenum, ctype, GLsizei, cstride, GLvoid*, cpointer);
-  IMPLEMENT_CACHED_PARAMETER_4 (extmgr->glSecondaryColorPointerEXT, 
+  IMPLEMENT_CACHED_PARAMETER_4_BUF (glVertexPointer, VertexPointer, GLint, vsize,
+    GLenum, vtype, GLsizei, vstride, GLvoid*, vpointer, vvbo);
+  IMPLEMENT_CACHED_PARAMETER_3_BUF (glNormalPointer, NormalPointer, GLenum, ntype,
+    GLsizei, nstride, GLvoid*, npointer, nvbo);
+  IMPLEMENT_CACHED_PARAMETER_4_BUF (glColorPointer, ColorPointer, GLint, csize,
+    GLenum, ctype, GLsizei, cstride, GLvoid*, cpointer, cvbo);
+  IMPLEMENT_CACHED_PARAMETER_4_BUF (extmgr->glSecondaryColorPointerEXT, 
     SecondaryColorPointerExt, GLint, scsize, GLenum, sctype, GLsizei, scstride, 
-    GLvoid*, scpointer);
-  IMPLEMENT_CACHED_PARAMETER_4_LAYER (glTexCoordPointer, TexCoordPointer, GLint, tsize,
-    GLenum, ttype, GLsizei, tstride, GLvoid*, tpointer);
+    GLvoid*, scpointer, scvbo);
+  IMPLEMENT_CACHED_PARAMETER_4_BUF_LAYER (glTexCoordPointer, TexCoordPointer, GLint, tsize,
+    GLenum, ttype, GLsizei, tstride, GLvoid*, tpointer, tvbo);
   
   // Special caches
   void SetTexture (GLenum target, GLuint texture)
@@ -864,31 +984,29 @@ public:
       }
     }
   }
+  
+  void ApplyBufferBinding (int index)
+  {
+    GLuint id = currentContext->currentBufferID[index];
+    if (currentContext->activeBufferID[index] != id)
+    {
+      extmgr->glBindBufferARB (
+        csGLStateCacheContext::CacheIndexToGLBufferTarget (index), id);
+      currentContext->activeBufferID[index] = id;
+    }
+  }
 
   /**
    * Bind a given VBO/PBO buffer.
    * \remarks Doesn't check whether the relevant buffer object extension is 
    *   actually supported, this must be done in calling code.
    */
-  void SetBufferARB (GLenum target, GLuint id)
+  void SetBufferARB (GLenum target, GLuint id, bool applyNow = false)
   {
     int index = csGLStateCacheContext::GLBufferTargetToCacheIndex (target);
     CS_ASSERT (index >= 0);
-    if (id != currentContext->currentBufferID[index])
-    {
-      extmgr->glBindBufferARB (target, id);
-      currentContext->currentBufferID[index] = id;
-
-      if (target == GL_ARRAY_BUFFER_ARB)
-      {
-        //invalidate vertex pointers
-        currentContext->parameter_vpointer = (GLvoid*)~0; 
-        currentContext->parameter_npointer = (GLvoid*)~0;
-        currentContext->parameter_cpointer = (GLvoid*)~0;
-        memset(currentContext->parameter_tpointer.p, ~0,
-          sizeof(GLvoid*)*currentContext->numTexCoords);
-      }
-    }
+    currentContext->currentBufferID[index] = id;
+    if (applyNow) ApplyBufferBinding (index);
   }
 
   /**

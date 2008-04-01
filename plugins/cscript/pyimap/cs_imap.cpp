@@ -2851,6 +2851,8 @@ SWIG_AsCharPtrAndSize(PyObject *obj, char** cptr, size_t* psize, int *alloc)
 
 
 
+SWIGINTERN int iMissingLoaderData_scfGetVersion(){ return scfInterfaceTraits<iMissingLoaderData>::GetVersion(); }
+SWIGINTERN void delete_iMissingLoaderData(iMissingLoaderData *self){ if (self) self->DecRef (); }
 
 SWIGINTERN int
 SWIG_AsVal_double (PyObject *obj, double *val)
@@ -3388,6 +3390,19 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iMissingLoaderData_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  int result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iMissingLoaderData_scfGetVersion",0,0)) SWIG_fail;
+  result = (int)iMissingLoaderData_scfGetVersion();
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_delete_iMissingLoaderData(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iMissingLoaderData *arg1 = (iMissingLoaderData *) 0 ;
@@ -3401,7 +3416,7 @@ SWIGINTERN PyObject *_wrap_delete_iMissingLoaderData(PyObject *SWIGUNUSEDPARM(se
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iMissingLoaderData" "', argument " "1"" of type '" "iMissingLoaderData *""'"); 
   }
   arg1 = reinterpret_cast< iMissingLoaderData * >(argp1);
-  delete arg1;
+  delete_iMissingLoaderData(arg1);
   
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -22816,6 +22831,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iMissingLoaderData_MissingMesh", _wrap_iMissingLoaderData_MissingMesh, METH_VARARGS, NULL},
 	 { (char *)"iMissingLoaderData_MissingSector", _wrap_iMissingLoaderData_MissingSector, METH_VARARGS, NULL},
 	 { (char *)"iMissingLoaderData_MissingLight", _wrap_iMissingLoaderData_MissingLight, METH_VARARGS, NULL},
+	 { (char *)"iMissingLoaderData_scfGetVersion", _wrap_iMissingLoaderData_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iMissingLoaderData", _wrap_delete_iMissingLoaderData, METH_VARARGS, NULL},
 	 { (char *)"iMissingLoaderData_swigregister", iMissingLoaderData_swigregister, METH_VARARGS, NULL},
 	 { (char *)"csLoadResult_success_set", _wrap_csLoadResult_success_set, METH_VARARGS, NULL},

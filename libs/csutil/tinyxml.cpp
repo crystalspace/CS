@@ -267,6 +267,8 @@ csPtr<TiDocumentNode> TiDocumentNodeChildren::Identify( ParseInfo& parse,
   p = SkipWhiteSpace( parse, p );
   if( !p || !*p || *p != '<' )
   {
+    // Will happen if the document is binary xml.
+    parse.document->SetError( TIXML_ERROR, this, p );
     return 0;
   }
 
@@ -274,6 +276,7 @@ csPtr<TiDocumentNode> TiDocumentNodeChildren::Identify( ParseInfo& parse,
 
   if ( !p || !*p )
   {
+    parse.document->SetError( TIXML_ERROR, this, p );
     return 0;
   }
 
@@ -849,6 +852,9 @@ const char* TiDocument::Print( PrintState& print, int depth ) const
 
 const char* TiDocumentAttribute::Print( PrintState& print, int /*depth*/ ) const
 {
+  if (!value) // Don't print attributes without value
+    return 0;
+
   TiXmlString n, v;
 
   TiXmlBase::PutString( Name(), &n );

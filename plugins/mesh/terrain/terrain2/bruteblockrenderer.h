@@ -57,9 +57,16 @@ public:
 
   virtual void OnMaterialPaletteUpdate (const csTerrainMaterialPalette&
                                         material_palette);  
-  virtual void OnMaterialMaskUpdate (iTerrainCell* cell, size_t material,
-                               const csRect& rectangle, const unsigned char*
-                               data, size_t pitch);
+
+  virtual void OnMaterialMaskUpdate (iTerrainCell* cell, 
+    const csRect& rectangle, const unsigned char* materialMap, size_t pitch);
+
+  virtual void OnMaterialMaskUpdate (iTerrainCell* cell, size_t matIdx,
+    const csRect& rectangle, const unsigned char* materialMap, size_t pitch); 
+
+  virtual void OnAlphaMapUpdate (iTerrainCell* cell,
+    iMaterialWrapper* material, const unsigned char* alphaMap, const csRect& rectangle, 
+    size_t pitch);
 
   // ------------ iTerrainCellHeightDataCallback ------------
   virtual void OnHeightUpdate (iTerrainCell* cell, const csRect& rectangle);
@@ -96,6 +103,9 @@ public:
   // Get index buffer with given resolution and index
   iRenderBuffer* GetIndexBuffer (size_t blockResolution, size_t indexType, uint& numIndices);
 
+  // Allocate the material palette related data in cell
+  void SetupCellMMArrays (iTerrainCell* cell);
+  
 private:
   // Holder for render meshes while rendering
   csDirtyAccessArray<csRenderMesh*> renderMeshCache;

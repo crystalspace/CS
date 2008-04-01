@@ -18,9 +18,6 @@
 */
 
 #include "cssysdef.h"
-#include <math.h>
-#include <float.h>
-#include "csqsqrt.h"
 #include "csgeom/vector3.h"
 #include "csutil/csstring.h"
 
@@ -31,19 +28,6 @@ csString csVector3::Description() const
   return s;
 }
 
-float csVector3::Norm () const
-{
-  return csQsqrt (x * x + y * y + z * z);
-}
-
-void csVector3::Normalize ()
-{
-  float sqlen = x * x + y * y + z * z;
-  if (sqlen < SMALL_EPSILON) return ;
-
-  float invlen = csQisqrt (sqlen);
-  *this *= invlen;
-}
 
 csVector3::csVector3 (const csDVector3 &v)
 {

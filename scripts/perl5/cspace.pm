@@ -4254,6 +4254,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *MissingMesh = *cspacec::iMissingLoaderData_MissingMesh;
 *MissingSector = *cspacec::iMissingLoaderData_MissingSector;
 *MissingLight = *cspacec::iMissingLoaderData_MissingLight;
+*scfGetVersion = *cspacec::iMissingLoaderData_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -7847,6 +7848,39 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iTranslator ##############
+
+package cspace::iTranslator;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*GetMsg = *cspacec::iTranslator_GetMsg;
+*scfGetVersion = *cspacec::iTranslator_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iTranslator($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csRGBcolor ##############
 
 package cspace::csRGBcolor;
@@ -10293,9 +10327,11 @@ sub new {
 *Row1 = *cspacec::csMatrix3_Row1;
 *Row2 = *cspacec::csMatrix3_Row2;
 *Row3 = *cspacec::csMatrix3_Row3;
+*Row = *cspacec::csMatrix3_Row;
 *Col1 = *cspacec::csMatrix3_Col1;
 *Col2 = *cspacec::csMatrix3_Col2;
 *Col3 = *cspacec::csMatrix3_Col3;
+*Col = *cspacec::csMatrix3_Col;
 *Set = *cspacec::csMatrix3_Set;
 *__neg__ = *cspacec::csMatrix3___neg__;
 *Transpose = *cspacec::csMatrix3_Transpose;
@@ -15512,6 +15548,9 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %OWNER = ();
 %ITERATORS = ();
 *SetHeightmapSource = *cspacec::iTerrainCellFeederProperties_SetHeightmapSource;
+*SetMaterialMapSource = *cspacec::iTerrainCellFeederProperties_SetMaterialMapSource;
+*SetHeightOffset = *cspacec::iTerrainCellFeederProperties_SetHeightOffset;
+*AddAlphaMap = *cspacec::iTerrainCellFeederProperties_AddAlphaMap;
 *SetParameter = *cspacec::iTerrainCellFeederProperties_SetParameter;
 *Clone = *cspacec::iTerrainCellFeederProperties_Clone;
 *scfGetVersion = *cspacec::iTerrainCellFeederProperties_scfGetVersion;
@@ -15671,6 +15710,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetRenderMeshes = *cspacec::iTerrainRenderer_GetRenderMeshes;
 *OnMaterialPaletteUpdate = *cspacec::iTerrainRenderer_OnMaterialPaletteUpdate;
 *OnMaterialMaskUpdate = *cspacec::iTerrainRenderer_OnMaterialMaskUpdate;
+*OnAlphaMapUpdate = *cspacec::iTerrainRenderer_OnAlphaMapUpdate;
 *scfGetVersion = *cspacec::iTerrainRenderer_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -15849,6 +15889,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *LockMaterialMap = *cspacec::iTerrainCell_LockMaterialMap;
 *UnlockMaterialMap = *cspacec::iTerrainCell_UnlockMaterialMap;
 *SetMaterialMask = *cspacec::iTerrainCell_SetMaterialMask;
+*SetAlphaMask = *cspacec::iTerrainCell_SetAlphaMask;
 *SetBaseMaterial = *cspacec::iTerrainCell_SetBaseMaterial;
 *GetBaseMaterial = *cspacec::iTerrainCell_GetBaseMaterial;
 *CollideSegment = *cspacec::iTerrainCell_CollideSegment;

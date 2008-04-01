@@ -36,7 +36,7 @@ bool csGraphics2DGLEmbed::PerformExtensionV (char const* command, va_list args)
   if (!strcasecmp (command, "resetstatecache"))
   {
     statecontext->InitCache ();
-    CS::PluginCommon::GL::SetAssumedState (statecache);
+    CS::PluginCommon::GL::SetAssumedState (statecache, &ext);
     return true;
   }
   return csGraphics2DGLCommon::PerformExtensionV (command,args);
