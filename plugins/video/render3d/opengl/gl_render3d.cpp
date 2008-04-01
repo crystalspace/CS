@@ -778,11 +778,7 @@ bool csGLGraphics3D::Open ()
   G2D->PerformExtension ("getstatecache", &statecache);
   G2D->PerformExtension	("getextmanager", &ext);
 
-  int w = G2D->GetWidth ();
-  int h = G2D->GetHeight ();
-  SetDimensions (w, h);
-  asp_center_x = w/2;
-  asp_center_y = h/2;
+  G2D->GetFramebufferDimensions (scrwidth, scrheight);
 
   // The extension manager requires to initialize all used extensions with
   // a call to Init<ext> first.
@@ -1272,6 +1268,8 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
       G2D->PerformExtension ("glflushtext");
     GLRENDER3D_OUTPUT_STRING_MARKER(("after G2D->BeginDraw()"));
   }
+  viewwidth = G2D->GetWidth();
+  viewheight = G2D->GetHeight();
   needViewportUpdate = false;
   const int old_drawflags = current_drawflags;
   current_drawflags = drawflags;
@@ -2932,8 +2930,12 @@ void csGLGraphics3D::SetClipper (iClipper2D* clipper, int cliptype)
     if (currentAttachments != 0)
       r2tbackend->SetClipRect (scissorRect);
     else
-      glScissor (scissorRect.xmin, scissorRect.ymin, scissorRect.Width(),
+    {
+      GLint vp[4];
+      glGetIntegerv (GL_VIEWPORT, vp);
+      glScissor (vp[0] + scissorRect.xmin, vp[1] + scissorRect.ymin, scissorRect.Width(),
 	scissorRect.Height());
+    }
   }
   else if (hasOld2dClip)
   {
@@ -3531,7 +3533,7 @@ bool csGLGraphics3D::HandleEvent (iEvent& Event)
   {
     int w = G2D->GetWidth ();
     int h = G2D->GetHeight ();
-    SetDimensions (w, h);
+    G2D->GetFramebufferDimensions (scrwidth, scrheight);
     asp_center_x = w/2;
     asp_center_y = h/2;
     return true;

@@ -215,6 +215,7 @@ private:
   float aspect, inv_aspect;
   bool needProjectionUpdate;
   float fov;
+  int scrwidth, scrheight;
   int viewwidth, viewheight;
   bool needViewportUpdate;
   csPoly3D frustum;
