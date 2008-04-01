@@ -105,8 +105,8 @@ bool csGraphics2DCaca::Open ()
     setenv ("CACA_FONT", 
       config->GetStr("Video.ASCII.Console.Font", "fixed"), false);
   
-  Width = config->GetInt("Video.Ascii.Offscreen.Width", 320);
-  Height = config->GetInt("Video.Ascii.Offscreen.Height", 240);
+  fbWidth = config->GetInt("Video.Ascii.Offscreen.Width", 320);
+  fbHeight = config->GetInt("Video.Ascii.Offscreen.Height", 240);
   
   cucul_canvas = cucul_create_canvas (0, 0);
   if (cucul_canvas == 0) return false;
@@ -115,8 +115,8 @@ bool csGraphics2DCaca::Open ()
     return false;
   cucul_clear_canvas (cucul_canvas);
   
-  dither = cucul_create_dither (Depth, Width, Height, 
-    Width*pfmt.PixelBytes, pfmt.RedMask, pfmt.GreenMask, 
+  dither = cucul_create_dither (Depth, fbWidth, fbHeight, 
+    fbWidth*pfmt.PixelBytes, pfmt.RedMask, pfmt.GreenMask, 
     pfmt.BlueMask, pfmt.AlphaMask);
   if (dither == 0)
     return false;
@@ -129,7 +129,7 @@ bool csGraphics2DCaca::Open ()
   
   caca_set_display_title (caca_display, win_title);
   
-  Memory = new unsigned char[ pfmt.PixelBytes*Width*Height ];
+  Memory = new unsigned char[ pfmt.PixelBytes*fbWidth*fbHeight ];
   
 
   return csGraphics2D::Open ();

@@ -645,6 +645,30 @@ public:
     return GetSize() == 0;
   }
 
+  /**
+   * Compacts the hash by removing entries which have a zero value.
+   * Useful where the type is a csWeakRef<>.
+   */
+  void Compact()
+  {
+    if (Elements.GetSize() == 0)
+      return;
+
+    for(size_t i=0; i<Elements.GetSize(); i++)
+    {
+      ElementArray& values = Elements[i];
+      for (size_t j = values.GetSize(); j > 0; j--)
+      {
+        const size_t idx = j - 1;
+        if(csComparator<T, T>::Compare (values[idx].value, 0) == 0)
+        {
+          values.DeleteIndexFast(idx);
+          Size--;
+        }
+      }
+    }
+  }
+
   /// An iterator class for the hash.
   class Iterator
   {
