@@ -232,6 +232,38 @@ public:
   }
 };
 
+template <class T, class K, 
+  class ArrayMemoryAlloc, class ArrayElementHandler> class csHash;
+
+namespace CS
+{
+  namespace Container
+  {
+    /**
+     * An element of a hash.
+     * This class is internally used by csHash<>. However, it has to be used
+     * when a custom element handler needs to be used.
+     */
+    template <class T, class K>
+    class HashElement
+    {
+    private:
+      template <class _T, class _K, class ArrayMemoryAlloc,
+        class ArrayElementHandler> friend class csHash;
+      
+      const K key;
+      T value;
+
+      HashElement (const K& key0, const T &value0) : key (key0), value (value0) {}
+    public:
+      HashElement (const HashElement& other) : key (other.key), value (other.value) {}
+      
+      const K& GetKey() const { return key; }
+      const T& GetValue() const { return value; }
+      T& GetValue() { return value; }
+    };
+  } // namespace Container
+} // namespace CS
 
 /**
  * A generic hash table class,
@@ -243,7 +275,9 @@ public:
  * are already provided) or special hash algorithms. 
  */
 template <class T, class K = unsigned int, 
-  class ArrayMemoryAlloc = CS::Memory::AllocatorMalloc> 
+  class ArrayMemoryAlloc = CS::Memory::AllocatorMalloc,
+  class ArrayElementHandler = csArrayElementHandler<
+    CS::Container::HashElement<T, K> > > 
 class csHash
 {
 public:
@@ -253,16 +287,9 @@ public:
   typedef ArrayMemoryAlloc AllocatorType;
 
 protected:
-  struct Element
-  {
-    const K key;
-    T value;
-
-    Element (const K& key0, const T &value0) : key (key0), value (value0) {}
-    Element (const Element &other) : key (other.key), value (other.value) {}
-  };
-  typedef csArray<Element, csArrayElementHandler<Element>,
-    ArrayMemoryAlloc> ElementArray;
+  typedef CS::Container::HashElement<T, K> Element;
+  typedef csArray<Element,
+    ArrayElementHandler, ArrayMemoryAlloc> ElementArray;
   csArray<ElementArray, csArrayElementHandler<ElementArray>,
     ArrayMemoryAlloc> Elements;
 
@@ -756,7 +783,7 @@ public:
     /// Get the next element's value, don't move the iterator.
     T& NextNoAdvance ()
     {
-      return hash->Elements[bucket][element].value;
+      return hash->Elements[bucket][element].GetValue();
     }
 
     /// Get the next element's value.
@@ -770,14 +797,14 @@ public:
     /// Get the next element's value and key, don't move the iterator.
     T& NextNoAdvance (K &key)
     {
-      key = hash->Elements[bucket][element].key;
+      key = hash->Elements[bucket][element].GetKey();
       return NextNoAdvance ();
     }
 
     /// Get the next element's value and key.
     T& Next (K &key)
     {
-      key = hash->Elements[bucket][element].key;
+      key = hash->Elements[bucket][element].GetKey();
       return Next ();
     }
 
@@ -785,7 +812,7 @@ public:
     const csTuple2<T, K> NextTuple ()
     {
       csTuple2<T, K> t (NextNoAdvance (),
-          hash->Elements[bucket][element].key);
+        hash->Elements[bucket][element].GetKey());
       Advance ();
       return t;
     }
@@ -934,7 +961,7 @@ public:
     /// Get the next element's value, don't move the iterator.
     const T& NextNoAdvance ()
     {
-      return hash->Elements[bucket][element].value;
+      return hash->Elements[bucket][element].GetValue();
     }
 
     /// Get the next element's value.
@@ -948,14 +975,14 @@ public:
     /// Get the next element's value and key, don't move the iterator.
     const T& NextNoAdvance (K &key)
     {
-      key = hash->Elements[bucket][element].key;
+      key = hash->Elements[bucket][element].GetKey();
       return NextNoAdvance ();
     }
 
     /// Get the next element's value and key.
     const T& Next (K &key)
     {
-      key = hash->Elements[bucket][element].key;
+      key = hash->Elements[bucket][element].GetKey();
       return Next ();
     }
 
@@ -963,7 +990,7 @@ public:
     const csTuple2<T, K> NextTuple ()
     {
       csTuple2<T, K> t (NextNoAdvance (),
-          hash->Elements[bucket][element].key);
+        hash->Elements[bucket][element].GetKey());
       Advance ();
       return t;
     }
