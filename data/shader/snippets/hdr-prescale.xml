@@ -43,11 +43,11 @@
     </input>
       
     <block location="cg:fragmentMain">
-      result = a*hdrScale.x;
+      result = float4 (a.rgb*hdrScale.x, a.a);
     </block>
 
     <block location="cg:vertexMain">
-      result = a*hdrScale.x;
+      result = float4 (a.rgb*hdrScale.x, a.a);
     </block>
     
     <output name="result" type="rgba" />
