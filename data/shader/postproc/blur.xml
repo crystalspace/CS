@@ -6,7 +6,7 @@
       <texture destination="Texture1" name="tex diffuse" />
       <fp plugin="glcg">
 	<cgfp>
-	   <variablemap variable="pixel size" destination="pixelSize" />
+	  <variablemap variable="pixel size" destination="pixelSize" />
 	  <program>
 	      <![CDATA[
 

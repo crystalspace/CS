@@ -26,6 +26,9 @@ chronological order.
 	  skipping static lights.
 	- res added a weaver fullbright shader.
 	- res added a postproc shader for gaussian blur.
+	- res changed the postproc shaders/HDR scale snippets to not scale the
+	  alpha component of colors.
+	- res added scaling of the addends to the add postproc shaders.
 31-Mar-2008
 	- Eric Sunshine applied changes to jobber-cel-svn.cfg similar to those
 	  made to jobber-svn.cfg in r27840, r27842, r27849: actually run CEL's

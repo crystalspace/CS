@@ -1,6 +1,6 @@
 <shader compiler="xmlshader" name="postproc_threshold">
    <shadervars>
-	<shadervar name="threshold" type="float">0.8</shadervar>
+	<shadervar name="threshold" type="float">0.6</shadervar>
 	<shadervar name="hdr scale" type="vector2">1,1</shadervar>
    </shadervars>
   <technique priority="200">
@@ -20,8 +20,8 @@
 			uniform float threshold,
 			uniform float2 hdrScale) : COLOR
 	      {
-		      float4 src = tex2D (Texture1, TexCoord) * hdrScale.x;
-		      float3 thresholded = max ((src.rgb - float3 (threshold))/(1-threshold), 0);
+		      float4 src = tex2D (Texture1, TexCoord);
+		      float3 thresholded = max ((src.rgb * hdrScale.x - float3 (threshold))/(1-threshold), 0);
 		      return float4 (thresholded* hdrScale.y, src.a);
 	      }
 
