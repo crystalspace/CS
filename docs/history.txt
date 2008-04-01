@@ -11,6 +11,8 @@ chronological order.
 	- res changed the csHash<> implementation to move the Element type out
 	  of the csHash<> class. Kludgy, but makes it possible to provide
 	  custom element handlers for the arrays inside the hash.
+	- caedes fixed all uses of csHash template inside csHash so it uses
+	  the user defined allocator and element handler (under res guidance).
 31-Mar-2008
 	- Eric Sunshine applied changes to jobber-cel-svn.cfg similar to those
 	  made to jobber-svn.cfg in r27840, r27842, r27849: actually run CEL's
