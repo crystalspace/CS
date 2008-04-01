@@ -3156,7 +3156,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
 		   0.0f, -1.0f, 0.0f,
 		   0.0f, 0.0f, 1.0f));
       camtrans.SetO2TTranslation (csVector3 (
-	vwf / 2.0f, vhf / 2.0f, -aspect));
+	vwf / 2.0f, vhf / 2.0f, -vhf)); // @@@ FIXME: vhf doesn't seem right
     }
     SetWorldToCamera (camtrans.GetInverse ());
   }
