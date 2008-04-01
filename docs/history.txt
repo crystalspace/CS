@@ -13,6 +13,15 @@ chronological order.
 	- res changed glshader_cg to dump programs after setting parameters
 	  to literal: that way, the literal setting is respected in the
 	  dumped source.
+	- res made some enhancements to the post effects manager:
+	    - Added ability to mipmap intermediate buffers and specify a
+	      maximum mipmap.
+	    - Added ability to render to intermediate buffers with lower
+	      resolution.
+	    - Added ability to keep all intermediate buffers (for debugging).
+	    - When specifying an input for a layer, a texture coordinate
+	      buffer has to be specified as well (since different layers may
+	      have different sizes and thus different TCs).
 31-Mar-2008
 	- Eric Sunshine applied changes to jobber-cel-svn.cfg similar to those
 	  made to jobber-svn.cfg in r27840, r27842, r27849: actually run CEL's

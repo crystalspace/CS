@@ -43,17 +43,49 @@ namespace RenderManager
   {
   public:
     class Layer;
-    typedef csHash<Layer*, csString> LayerInputMap;
+    struct LayerOptions
+    {
+      bool mipmap;
+      int maxMipmap;
+      int downsample;
+      
+      LayerOptions() : mipmap (false), maxMipmap (-1), downsample (0) {}
+      
+      bool operator==(const LayerOptions& other) const
+      { 
+        return (mipmap == other.mipmap) && (maxMipmap == other.maxMipmap)
+          && (downsample == other.downsample); 
+      }
+    };
+
+    struct LayerInputMap
+    {
+      Layer* inputLayer;
+      const char* textureName;
+      const char* texcoordName;
+      
+      LayerInputMap() : inputLayer (0), textureName ("tex diffuse"),
+        texcoordName ("texture coordinate 0") {}
+    };
+    
     class Layer
     {
     private:
       friend class PostEffectManager;
       csRef<iShader> effectShader;
       int outTextureNum;
-      LayerInputMap inputs;
+      csArray<LayerInputMap> inputs;
       csRef<iShaderVariableContext> svContext;
+      LayerOptions options;
+      csRef<csRenderBufferHolder> buffers;
       
+      Layer()
+      {
+        svContext.AttachNew (new csShaderVariableContext);
+      }
       bool IsInput (const Layer* layer) const;
+    public:
+      iShaderVariableContext* GetSVContext() { return svContext; }
     };
   
     PostEffectManager ();
@@ -68,10 +100,12 @@ namespace RenderManager
     iTextureHandle* GetScreenTarget ();
 
     void DrawPostEffects ();
-
+    
     Layer* AddLayer (iShader* shader);
-    Layer* AddLayer (iShader* shader, const LayerInputMap& inputs);
-    Layer* AddLayer (iShader* shader, size_t numMaps, ...);
+    Layer* AddLayer (iShader* shader, const LayerOptions& opt);
+    Layer* AddLayer (iShader* shader, size_t numMaps, const LayerInputMap* maps);
+    Layer* AddLayer (iShader* shader, const LayerOptions& opt, size_t numMaps,
+      const LayerInputMap* maps);
     
     Layer* GetScreenLayer() { return postLayers[0]; }
   private:
@@ -81,25 +115,39 @@ namespace RenderManager
     
     csRef<iGraphics3D> graphics3D;
     csRef<iShaderVarStringSet> svStrings;
+    bool keepAllIntermediates;
+    csRef<iRenderBuffer> indices;
 
     csSimpleRenderMesh fullscreenQuad;
-    csVector3 screenQuadVerts[4];
-    csVector2 screenQuadTex[4];
 
     unsigned int currentWidth, currentHeight;
-    float textureCoordinateX, textureCoordinateY, textureOffsetX, textureOffsetY;
-    csRef<csShaderVariable> svPixelSize;
+    struct TexturesBucket
+    {
+      LayerOptions options;
+      csRef<iRenderBuffer> vertBuf;
+      csRef<iRenderBuffer> texcoordBuf;
+      float textureCoordinateX, textureCoordinateY, textureOffsetX, textureOffsetY;
+      csRef<csShaderVariable> svPixelSize;
+      csRefArray<iTextureHandle> textures;
+      
+      TexturesBucket() : textureCoordinateX (1), textureCoordinateY (1), 
+        textureOffsetX (0), textureOffsetY (0) { }
+    };
+    csArray<TexturesBucket> buckets;
 
     const char* textureFmt;
     Layer* lastLayer;
-    csRefArray<iTextureHandle> textures;
     csPDelArray<Layer> postLayers;
     
     bool textureDistributionDirty;
     void UpdateTextureDistribution();
     
     void UpdateSVContexts ();
-  };
+  
+    size_t GetBucketIndex (const LayerOptions& options);
+    TexturesBucket& GetBucket (const LayerOptions& options)
+    { return buckets[GetBucketIndex (options)]; }
+};
 
 }
 }
