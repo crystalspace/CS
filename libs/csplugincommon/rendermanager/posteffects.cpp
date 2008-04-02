@@ -191,19 +191,22 @@ void PostEffectManager::SetupScreenQuad (unsigned int width, unsigned int height
     int texH = height >> buckets[b].options.downsample;
     
     // Setup the vertices & texcoords
-    screenQuadVerts[0].Set (0, 0, 0);
-    screenQuadTex[0].Set (buckets[b].textureOffsetX, buckets[b].textureOffsetY);
-  
-    screenQuadVerts[1].Set (texW, 0, 0);
-    screenQuadTex[1].Set (buckets[b].textureCoordinateX + buckets[b].textureOffsetX, 
+    screenQuadVerts[(size_t)0].Set (0, 0, 0);
+    screenQuadTex[(size_t)0].Set (buckets[b].textureOffsetX,
       buckets[b].textureOffsetY);
   
-    screenQuadVerts[2].Set (texW, texH, 0);
-    screenQuadTex[2].Set (buckets[b].textureCoordinateX + buckets[b].textureOffsetX, 
+    screenQuadVerts[(size_t)1].Set (texW, 0, 0);
+    screenQuadTex[(size_t)1].Set (
+      buckets[b].textureCoordinateX + buckets[b].textureOffsetX, 
+      buckets[b].textureOffsetY);
+  
+    screenQuadVerts[(size_t)2].Set (texW, texH, 0);
+    screenQuadTex[(size_t)2].Set (
+      buckets[b].textureCoordinateX + buckets[b].textureOffsetX, 
       buckets[b].textureCoordinateY + buckets[b].textureOffsetY);
   
-    screenQuadVerts[3].Set (0, texH, 0);
-    screenQuadTex[3].Set (buckets[b].textureOffsetX, 
+    screenQuadVerts[(size_t)3].Set (0, texH, 0);
+    screenQuadTex[(size_t)3].Set (buckets[b].textureOffsetX, 
       buckets[b].textureCoordinateY + buckets[b].textureOffsetY);
   }
 }
