@@ -14,6 +14,7 @@ chronological order.
 	- caedes fixed a number of gcc compiler errors on csWeakRefHash 
 	  (guided by res).
 	- Mike Gist moved csWeakRefHash into its own file.
+	- caedes added iCollection to scripting bindings.
 1-Apr-2008
 	- res fixed a missing 'break' in the terrain2 loader.
 	- res changed the csHash<> implementation to move the Element type out
