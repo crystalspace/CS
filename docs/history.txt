@@ -21,6 +21,7 @@ chronological order.
 	- res fixed the Cg plugin not compiling programs unless debug dumping
 	  is enabled.
 	- res added a facility to read back texture data.
+	- res added a very naive "automatic exposure".
 1-Apr-2008
 	- res fixed a missing 'break' in the terrain2 loader.
 	- res changed the csHash<> implementation to move the Element type out

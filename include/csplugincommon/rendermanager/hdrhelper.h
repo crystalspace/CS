@@ -108,9 +108,9 @@ namespace CS
 	  shaderManager->GetVariableAdd (svNameStringSet->Request (
 	    "hdr scale"));
         if ((quality == qualInt8) || (quality == qualInt16))
-          svHdrScale->SetValue (csVector2 (colorRange, 1.0f/colorRange));
+          svHdrScale->SetValue (csVector4 (colorRange, 1.0f/colorRange, 0, 0));
         else
-          svHdrScale->SetValue (csVector2 (1, 1));
+          svHdrScale->SetValue (csVector4 (1, 1, 0, 0));
           
         if (addDefaultMappingShader)
         {

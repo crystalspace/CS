@@ -1,7 +1,7 @@
 <shader compiler="xmlshader" name="postproc_threshold">
    <shadervars>
 	<shadervar name="threshold" type="float">0.6</shadervar>
-	<shadervar name="hdr scale" type="vector2">1,1</shadervar>
+	<shadervar name="hdr scale" type="vector4">1,1,0,0</shadervar>
    </shadervars>
   <technique priority="200">
     <pass>
@@ -10,7 +10,7 @@
       <texture destination="Texture1" name="tex diffuse" />
       <fp plugin="glcg">
 	<cgfp>
-	  <variablemap variable="hdr scale" destination="hdrScale" assumeconst="yes" />
+	  <variablemap variable="hdr scale" destination="hdrScale" />
 	  <variablemap variable="threshold" destination="threshold" />
 	  <program>
 	      <![CDATA[
@@ -18,11 +18,11 @@
 	      float4 main (in float2 TexCoord : TEXCOORD0,
 			uniform sampler2D Texture1,
 			uniform float threshold,
-			uniform float2 hdrScale) : COLOR
+			uniform float4 hdrScale) : COLOR
 	      {
 		      float4 src = tex2D (Texture1, TexCoord);
-		      float3 thresholded = max ((src.rgb * hdrScale.x - float3 (threshold))/(1-threshold), 0);
-		      return float4 (thresholded* hdrScale.y, src.a);
+		      float3 thresholded = max ((src.rgb * hdrScale.x + hdrScale.z - float3 (threshold))/(1-threshold), 0);
+		      return float4 (thresholded* hdrScale.y + hdrScale.w, src.a);
 	      }
 
 	      ]]>

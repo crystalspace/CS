@@ -19,6 +19,7 @@
 #ifndef __CS_RM_UNSHADOWED_H__
 #define __CS_RM_UNSHADOWED_H__
 
+#include "csplugincommon/rendermanager/hdrexposure.h"
 #include "csutil/scf_implementation.h"
 #include "iutil/comp.h"
 #include "iengine/rendermanager.h"
@@ -98,6 +99,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMUnshadowed)
     LightSetupType::PersistentData lightPersistent;
 
     CS::RenderManager::PostEffectManager       postEffects;
+    CS::RenderManager::HDRExposureLinear hdrExposure;
 
     csRef<iShaderVarStringSet>  svNameStringSet;
     csRef<iStringSet>           stringSet;

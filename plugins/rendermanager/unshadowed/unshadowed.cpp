@@ -203,6 +203,8 @@ bool RMUnshadowed::RenderView (iView* view)
   }
 
   postEffects.DrawPostEffects ();
+  
+  hdrExposure.ApplyExposure (postEffects);
 
   return true;
 }
@@ -302,7 +304,9 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
   
   HDRHelper hdr;
   // @@@ FIXME: pick a better intermediate format
-  hdr.Setup (objectReg, HDRHelper::qualInt8, 4, postEffects, true);
+  hdr.Setup (objectReg, HDRHelper::qualInt8, 4, postEffects, /*true*/false);
+  
+  hdrExposure.Initialize (objectReg, postEffects);
   
   portalPersistent.Initialize (shaderManager, g3d);
   lightPersistent.Initialize (shaderManager);

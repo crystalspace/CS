@@ -90,7 +90,7 @@ iTextureHandle* PostEffectManager::GetScreenTarget ()
 {
   if (postLayers.GetSize () > 1)
   {
-    return buckets[0].textures[postLayers[0]->outTextureNum];
+    return GetBucket (postLayers[0]->options).textures[postLayers[0]->outTextureNum];
   }
 
   return 0;
@@ -292,7 +292,7 @@ void PostEffectManager::UpdateTextureDistribution()
     
     // Look for an unused texture
     size_t freeTexture;
-    if (keepAllIntermediates)
+    if (keepAllIntermediates || buckets[bucket].options.noTextureReuse)
       freeTexture = csArrayItemNotFound;
     else
       freeTexture = usedTextureBits[l].GetFirstBitUnset ();

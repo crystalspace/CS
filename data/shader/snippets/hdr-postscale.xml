@@ -20,34 +20,34 @@
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
     <input name="a" type="rgba" />
-    <input name="hdrScale" type="float2" default="complex" private="yes">
+    <input name="hdrScale" type="float4" default="complex" private="yes">
       <block location="shadervars">
-	<shadervar name="hdr scale" type="vector2">1,1</shadervar>
+	<shadervar name="hdr scale" type="vector4">1,1,0,0</shadervar>
       </block>
       <block location="cg:vertexIn">
-	<uniform type="float2" name="hdrScale" />
+	<uniform type="float4" name="hdrScale" />
       </block>
       <block location="cg:vertexMain">
 	hdrScale = vertexIn.hdrScale;
       </block>
       <block location="cg:fragmentIn">
-	<uniform type="float2" name="hdrScale" />
+	<uniform type="float4" name="hdrScale" />
       </block>
       <block location="cg:fragmentMain">
 	hdrScale = fragmentIn.hdrScale;
       </block>
       <block location="cg:variablemap">
-	 <variablemap variable="hdr scale" destination="vertexIn.hdrScale" assumeconst="yes" />
-	 <variablemap variable="hdr scale" destination="fragmentIn.hdrScale" assumeconst="yes" />
+	 <variablemap variable="hdr scale" destination="vertexIn.hdrScale" />
+	 <variablemap variable="hdr scale" destination="fragmentIn.hdrScale" />
       </block>
     </input>
       
     <block location="cg:fragmentMain">
-      result = float4 (a.rgb*hdrScale.y, a.a);
+      result = float4 (a.rgb*hdrScale.y+hdrScale.w, a.a);
     </block>
 
     <block location="cg:vertexMain">
-      result = float4 (a.rgb*hdrScale.y, a.a);
+      result = float4 (a.rgb*hdrScale.y+hdrScale.w, a.a);
     </block>
     
     <output name="result" type="rgba" />

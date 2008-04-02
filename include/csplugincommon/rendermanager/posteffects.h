@@ -19,9 +19,11 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_POSTEFFECTS_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_POSTEFFECTS_H__
 
-#include "csutil/ref.h"
+#include "csgfx/shadervarcontext.h"
 #include "csutil/array.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/parray.h"
+#include "csutil/ref.h"
 #include "ivideo/shader/shader.h"
 
 struct iGraphics3D;
@@ -56,13 +58,18 @@ namespace RenderManager
        * in each dimensions.
        */
       int downsample;
+      /// Prevent texture reuse. Useful for readback or feedback effects.
+      bool noTextureReuse;
       
-      LayerOptions() : mipmap (false), maxMipmap (-1), downsample (0) {}
+      LayerOptions() : mipmap (false), maxMipmap (-1), downsample (0),
+        noTextureReuse (false) {}
       
       bool operator==(const LayerOptions& other) const
       { 
-        return (mipmap == other.mipmap) && (maxMipmap == other.maxMipmap)
-          && (downsample == other.downsample); 
+        return (mipmap == other.mipmap)
+          && (maxMipmap == other.maxMipmap)
+          && (downsample == other.downsample)
+          && (noTextureReuse == other.noTextureReuse);
       }
     };
 
@@ -103,6 +110,9 @@ namespace RenderManager
     public:
       /// Get the shader variables for this layer.
       iShaderVariableContext* GetSVContext() { return svContext; }
+      
+      const LayerOptions& GetOptions() const { return options; }
+      void SetOptions (const LayerOptions& opt) { options = opt; }
     };
   
     PostEffectManager ();
@@ -142,6 +152,11 @@ namespace RenderManager
     
     /// Get the layer representing the "screen" a scene is rendered to.
     Layer* GetScreenLayer() { return postLayers[0]; }
+    
+    iTextureHandle* GetLayerOutput (const Layer* layer)
+    {
+      return GetBucket (layer->options).textures[layer->outTextureNum];
+    }
   private:
     void SetupScreenQuad (unsigned int width, unsigned int height);
 
