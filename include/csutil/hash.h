@@ -295,12 +295,12 @@ protected:
     ArrayMemoryAlloc> Elements;
 
   size_t Modulo;
+  size_t Size;
 
 private:
   size_t InitModulo;
   size_t GrowRate;
   size_t MaxSize;
-  size_t Size;
 
   void Grow ()
   {
@@ -1076,15 +1076,13 @@ class csWeakRefHash : public csHash<csWeakRef<T>, K, ArrayMemoryAlloc,
 {
 public:
   csWeakRefHash (size_t size = 23, size_t grow_rate = 5, size_t max_size = 20000)
-    : Modulo (size), InitModulo (size),
-    GrowRate (MIN (grow_rate, size)), MaxSize (max_size), Size (0)
+    : csHash(size, grow_rate, max_size)
   {
   }
 
   /// Copy constructor.
   csWeakRefHash (const csWeakRefHash<csWeakRef<T>, K, ArrayMemoryAlloc> &o) : 
-  Elements (o.Elements),
-    Modulo (o.Modulo), InitModulo (o.InitModulo),
+  Elements (o.Elements), Modulo (o.Modulo), InitModulo (o.InitModulo),
     GrowRate (o.GrowRate), MaxSize (o.MaxSize), Size (o.Size) {}
 
   /**
@@ -1101,7 +1099,7 @@ public:
       for (size_t j = values.GetSize(); j > 0; j--)
       {
         const size_t idx = j - 1;
-        if(csComparator<csWeakRef<T>, csWeakRef<T>>::Compare (values[idx].value, NULL) == 0)
+        if(csComparator<csWeakRef<T>, csWeakRef<T>>::Compare (values[idx].GetValue(), NULL) == 0)
         {
           values.DeleteIndexFast(idx);
           Size--;
