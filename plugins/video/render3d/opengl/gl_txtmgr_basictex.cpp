@@ -870,6 +870,37 @@ void csGLBasicTextureHandle::GetMipmapLimits (int& maxMip, int& minMip)
     minMip = 0;
   }
 }
+  
+csPtr<iDataBuffer> csGLBasicTextureHandle::Readback (
+  const CS::StructuredTextureFormat& format, int mip)
+{
+  if (format.GetFormat() == CS::StructuredTextureFormat::Special)
+    return 0;
+  
+  TextureStorageFormat glFormat;
+  TextureSourceFormat sourceFormat;
+  if (!txtmgr->DetermineGLFormat (format, glFormat, sourceFormat))
+    return 0;
+    
+  int s = 0;
+  for (int i = 0; i < format.GetComponentCount(); i++)
+    s += format.GetComponentSize (i);
+  
+  int w = csMax (actual_width >> mip, 1);
+  int h = csMax (actual_height >> mip, 1);
+  int d = csMax (actual_d >> mip, 1);
+  size_t byteSize = w * h * d * ((s+7)/8);
+  void* data = cs_malloc (byteSize);
+
+  GLenum textarget = GetGLTextureTarget();
+  csGLGraphics3D::statecache->SetTexture (textarget, GetHandle ());
+  glGetTexImage (textarget, mip, sourceFormat.format, sourceFormat.type, data);
+  
+  csRef<iDataBuffer> db;
+  db.AttachNew (new (txtmgr->simpleTextureReadbacks) TextureReadbackSimple (
+    data, byteSize));
+  return csPtr<iDataBuffer> (db);
+}
 
 csPtr<iImage> csGLBasicTextureHandle::Dump ()
 {

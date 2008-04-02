@@ -28,12 +28,14 @@
 #endif
 
 #include "csutil/leakguard.h"
+#include "csutil/pooledscfclass.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/weakref.h"
 
 #include "igraphic/image.h"
+#include "iutil/databuff.h"
 #include "ivideo/texture.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
@@ -88,6 +90,30 @@ struct csGLUploadData
 };
 
 struct csGLTextureClassSettings;
+
+class TextureReadbackSimple :
+  public scfImplementationPooled<scfImplementation1<TextureReadbackSimple,
+                                                    iDataBuffer> >
+{
+  typedef scfImplementationPooled<scfImplementation1<TextureReadbackSimple,
+                                                    iDataBuffer> > SuperClass;
+
+  void* data;
+  size_t size;
+public:
+  TextureReadbackSimple (void* data, size_t size) : SuperClass (this),
+    data (data), size (size) {}
+  ~TextureReadbackSimple()
+  {
+    cs_free (data);
+  }
+  
+  char* GetData () const { return (char*)data; }
+  int8* GetInt8 () { return (int8*)data; }
+  size_t GetSize () const { return size; }
+  uint8* GetUint8 () { return (uint8*)data; }
+  char* operator * () const { return (char*)data; }
+};
 
 // For GetTextureTarget ()
 #include "csutil/deprecated_warn_off.h"
@@ -346,6 +372,8 @@ public:
 
   void SetMipmapLimits (int maxMip, int minMip = 0);
   void GetMipmapLimits (int& maxMip, int& minMip);
+  
+  csPtr<iDataBuffer> Readback (const CS::StructuredTextureFormat&, int);
   
   /// Dump the contents onto an image.
   csPtr<iImage> Dump ();

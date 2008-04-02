@@ -92,6 +92,9 @@ public:
   void SetMipmapLimits (int maxMip, int minMip = 0) {}
   void GetMipmapLimits (int& maxMip, int& minMip)
   { maxMip = 1000; minMip = 0; }
+  
+  csPtr<iDataBuffer> Readback (const CS::StructuredTextureFormat&, int)
+  { return 0; }
 };
 
 #include "csutil/deprecated_warn_on.h"
