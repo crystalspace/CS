@@ -7,8 +7,9 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 2-Apr-2008
-	- Mike Gist added a Compact() function to csHash, which removes all
-	  elements with a value of 0.
+	- Mike Gist added csWeakRefHash which inherits from csHash.
+	  It has a Compact() function which removes all deleted elements
+	  (NULL value), and uses csArraySafeCopyElementHandler.
 	- res fixed graphic distortions after r29169.
 1-Apr-2008
 	- res fixed a missing 'break' in the terrain2 loader.

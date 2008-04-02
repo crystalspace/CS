@@ -28,6 +28,7 @@
 #include "csutil/comparator.h"
 #include "csutil/util.h"
 #include "csutil/tuple.h"
+#include "csutil/weakref.h"
 
 /**\addtogroup util_containers
  * @{ */
@@ -645,30 +646,6 @@ public:
     return GetSize() == 0;
   }
 
-  /**
-   * Compacts the hash by removing entries which have a zero value.
-   * Useful where the type is a csWeakRef<>.
-   */
-  void Compact()
-  {
-    if (Elements.GetSize() == 0)
-      return;
-
-    for(size_t i=0; i<Elements.GetSize(); i++)
-    {
-      ElementArray& values = Elements[i];
-      for (size_t j = values.GetSize(); j > 0; j--)
-      {
-        const size_t idx = j - 1;
-        if(csComparator<T, T>::Compare (values[idx].value, 0) == 0)
-        {
-          values.DeleteIndexFast(idx);
-          Size--;
-        }
-      }
-    }
-  }
-
   /// An iterator class for the hash.
   class Iterator
   {
@@ -1091,6 +1068,49 @@ public:
     return ConstGlobalIterator (this);
   }
 };
+
+template <class T, class K = unsigned int, 
+  class ArrayMemoryAlloc = CS::Memory::AllocatorMalloc>
+class csWeakRefHash : public csHash<csWeakRef<T>, K, ArrayMemoryAlloc,
+                      csArraySafeCopyElementHandler<CS::Container::HashElement<csWeakRef<T>, K>>>
+{
+public:
+  csWeakRefHash (size_t size = 23, size_t grow_rate = 5, size_t max_size = 20000)
+    : Modulo (size), InitModulo (size),
+    GrowRate (MIN (grow_rate, size)), MaxSize (max_size), Size (0)
+  {
+  }
+
+  /// Copy constructor.
+  csWeakRefHash (const csWeakRefHash<csWeakRef<T>, K, ArrayMemoryAlloc> &o) : 
+  Elements (o.Elements),
+    Modulo (o.Modulo), InitModulo (o.InitModulo),
+    GrowRate (o.GrowRate), MaxSize (o.MaxSize), Size (o.Size) {}
+
+  /**
+  * Compacts the hash by removing entries which have been deleted.
+  */
+  void Compact()
+  {
+    if (Elements.GetSize() == 0)
+      return;
+
+    for(size_t i=0; i<Elements.GetSize(); i++)
+    {
+      ElementArray& values = Elements[i];
+      for (size_t j = values.GetSize(); j > 0; j--)
+      {
+        const size_t idx = j - 1;
+        if(csComparator<csWeakRef<T>, csWeakRef<T>>::Compare (values[idx].value, NULL) == 0)
+        {
+          values.DeleteIndexFast(idx);
+          Size--;
+        }
+      }
+    }
+  }  
+};
+
 
 /** @} */
 
