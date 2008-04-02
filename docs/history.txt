@@ -11,6 +11,8 @@ chronological order.
 	  It has a Compact() function which removes all deleted elements
 	  (NULL value), and uses csArraySafeCopyElementHandler.
 	- res fixed graphic distortions after r29169.
+	- caedes fixed a number of gcc compiler errors on csWeakRefHash 
+	  (guided by res).
 1-Apr-2008
 	- res fixed a missing 'break' in the terrain2 loader.
 	- res changed the csHash<> implementation to move the Element type out

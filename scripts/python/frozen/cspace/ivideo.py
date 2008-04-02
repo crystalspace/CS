@@ -189,6 +189,9 @@ class iGraphics2D(core.iBase):
     def GetName(*args): return _ivideo.iGraphics2D_GetName(*args)
     def CreateOffscreenCanvas(*args): return _ivideo.iGraphics2D_CreateOffscreenCanvas(*args)
     def Write(*args): return _ivideo.iGraphics2D_Write(*args)
+    def SetViewport(*args): return _ivideo.iGraphics2D_SetViewport(*args)
+    def GetViewport(*args): return _ivideo.iGraphics2D_GetViewport(*args)
+    def GetFramebufferDimensions(*args): return _ivideo.iGraphics2D_GetFramebufferDimensions(*args)
     scfGetVersion = staticmethod(_ivideo.iGraphics2D_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iGraphics2D
     __del__ = lambda self : None;
