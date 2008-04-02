@@ -28,7 +28,6 @@
 #include "csutil/comparator.h"
 #include "csutil/util.h"
 #include "csutil/tuple.h"
-#include "csutil/weakref.h"
 
 /**\addtogroup util_containers
  * @{ */
@@ -1068,48 +1067,6 @@ public:
     return ConstGlobalIterator (this);
   }
 };
-
-template <class T, class K = unsigned int, 
-  class ArrayMemoryAlloc = CS::Memory::AllocatorMalloc>
-class csWeakRefHash : public csHash<csWeakRef<T>, K, ArrayMemoryAlloc,
-                      csArraySafeCopyElementHandler<CS::Container::HashElement<csWeakRef<T>, K> > >
-{
-public:
-  typedef csHash<csWeakRef<T>, K, ArrayMemoryAlloc,
-                      csArraySafeCopyElementHandler<CS::Container::HashElement<csWeakRef<T>, K> > > SuperClass;
-  csWeakRefHash (size_t size = 23, size_t grow_rate = 5, size_t max_size = 20000)
-    : SuperClass(size, grow_rate, max_size)
-  {
-  }
-
-  /// Copy constructor.
-  csWeakRefHash (const csWeakRefHash<csWeakRef<T>, K, ArrayMemoryAlloc> &o) : 
-  SuperClass(o) {}
-
-  /**
-  * Compacts the hash by removing entries which have been deleted.
-  */
-  void Compact()
-  {
-    if (this->Elements.GetSize() == 0)
-      return;
-
-    for(size_t i=0; i<this->Elements.GetSize(); i++)
-    {
-      typename SuperClass::ElementArray& values = this->Elements[i];
-      for (size_t j = values.GetSize(); j > 0; j--)
-      {
-        const size_t idx = j - 1;
-        if(csComparator<csWeakRef<T>, csWeakRef<T> >::Compare (values[idx].GetValue(), NULL) == 0)
-        {
-          values.DeleteIndexFast(idx);
-          this->Size--;
-        }
-      }
-    }
-  }  
-};
-
 
 /** @} */
 
