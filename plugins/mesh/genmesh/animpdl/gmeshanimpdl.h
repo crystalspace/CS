@@ -150,7 +150,7 @@ private:
     csRef<iRenderBuffer> staticColors;
     csDirtyAccessArray<csColor4> combinedColors;
 
-    ColorBuffer() : lightsDirty (true), lastMeshVersion (~0) {}
+    ColorBuffer() : name (0), lightsDirty (true), lastMeshVersion (~0) {}
   };
 
   bool prepared;

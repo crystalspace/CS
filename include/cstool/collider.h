@@ -221,12 +221,17 @@ public:
    * the objects from that region will be initialized.
    */
   static void InitializeCollisionWrappers (iCollideSystem* colsys,
-  	iEngine* engine, iBase* base = 0);
-
-  static void InitializeCollisionWrappersCollection (iCollideSystem* colsys,
-  	iEngine* engine, iCollection* collection = 0);
-  static void InitializeCollisionWrappersRegion (iCollideSystem* colsys,
-  	iEngine* engine, iRegion* region);
+      iEngine* engine, iCollection* collection = 0);
+  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
+  static void InitializeCollisionWrappers (iCollideSystem* colsys,
+      iEngine* engine, iRegion* region);
+  /* Hack to ensure source compatibility when a 0 collection/region is used.
+   * Remove with region variant. */
+  static CS_FORCEINLINE void InitializeCollisionWrappers (iCollideSystem* colsys,
+      iEngine* engine, int dummy)
+  { 
+    InitializeCollisionWrappers (colsys, engine, (iCollection*)0);
+  }
 
 
   /**

@@ -54,6 +54,7 @@
   INTERFACE_APPLY(iBinaryLoaderPlugin)
   INTERFACE_APPLY(iLoader)
   INTERFACE_APPLY(iLoaderPlugin)
+  INTERFACE_APPLY(iMissingLoaderData)
 %enddef
 
 %define IMESH_APPLY_FOR_EACH_INTERFACE
@@ -157,6 +158,7 @@
   INTERFACE_APPLY(iDecalTemplate)
   INTERFACE_APPLY(iMovieRecorder)
   INTERFACE_APPLY(iView)
+  INTERFACE_APPLY(iTranslator)
 %enddef
 
 %define IVIDEO_APPLY_FOR_EACH_INTERFACE

@@ -6,12 +6,147 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+2-Apr-2008
+	- Mike Gist added csWeakRefHash which inherits from csHash.
+	  It has a Compact() function which removes all deleted elements
+	  (NULL value), and uses csArraySafeCopyElementHandler.
+	- res fixed graphic distortions after r29169.
+1-Apr-2008
+	- res fixed a missing 'break' in the terrain2 loader.
+	- res changed the csHash<> implementation to move the Element type out
+	  of the csHash<> class. Kludgy, but makes it possible to provide
+	  custom element handlers for the arrays inside the hash.
+	- caedes fixed all uses of csHash template inside csHash so it uses
+	  the user defined allocator and element handler (under res guidance).
+	- res enabled the 'resizing' flag in embedgl.
+	- res added viewport control to iGraphics2D.
+	- res added the canvas event IDs to the script bindings.
+31-Mar-2008
+	- Eric Sunshine applied changes to jobber-cel-svn.cfg similar to those
+	  made to jobber-svn.cfg in r27840, r27842, r27849: actually run CEL's
+	  configure script rather than faking it, and perform checkout from a
+	  local repository then switch the live one. This fixes CEL jobber
+	  failure following cel:r3270.
+	- Mike Gist fixed a bug in the 3ds max exportSprite script and also 
+	  improved the formatting of the output.
+	- Marten added iMissingLoaderData to the python-exposed interfaces.
+30-Mar-2008
+	- res fixed PBOs not being bound before used in the texture blit code.
+	- res applied a patch from Lukas Erlinghagen to fix compiling on
+	  gcc 3.4.
+	- res applied a patch from Lukas Erlinghagen to add frame time display
+	  to bugplug.
+26-Mar-2008
+	- Marten commited a number of re-inlinings of basic matrix & vector 
+	  methods.
+	- res fixed the OpenGL state cache storing the active buffer binding in
+	  the wrong member.
+	- res added methods to csBitArray to obtain the first/last set/unset
+	  bit.
+	- res fixed a mess-up in csMatrix3 transposing.
+	- Marten fixed tinyxml writer not to crash on empty attributes.
+	- Marten fixed light name handling of proxylights in lighter2.
+	- Mike Gist renamed the "tex spec" shadervar to "tex specular".
+25-Mar-2008
+	- Andrew Dai fixed the problem of the enter key being mapped to the
+	  incorrect raw keycode on MAC OS X.
+	- res changed the way point sprite state is set up: now it's only set
+	  up once and using a point sprite mesh only changes the point sprite
+	  enable state.
+	- res made point sprite size setup a shader responsibility.
+	- res made the vertex array caching more agressive: now, the VBO is
+	  stored as well in the statecache, and if the same area of the same
+	  buffer is set the buffer binding and vertex array setting are avoided.
+	- Mike Gist committed fixes to the 3ds max level exporters and a
+	  3ds max genmesh sprite exporter; both from Luca Pancallo.
+24-Mar-2008
+	- Mike Gist made several improvements to the 3ds max level exporter:
+	  - Did a bit of cleaning; removed thing support from exportCS.mcr,
+	    exportcsp.mcr still has it if you need it.
+	  - Fixed a bug in the materialnotdefined checks, the comparison was
+	    wrong so they were failing.
+	  - Added RENDERLOOP_TYPE user defined option, so you can specify the
+	    renderloop you want on a per-sector basis. Current options are 
+	    "diffuse" and "terrainfixed" (nothing is valid too of course).
+	    The collision plugin selection now takes this into consideration
+	    too, so sectors within the same map don't end up with the wrong
+	    collision type.
+	  - Changed shader and renderloop selection to be calculated
+	    automatically. Removed "Export as Terrain Level" checkbox, as this
+	    is no longer needed as a result.
+	  - Added support for the parallaxAtt shader. To use it, just attach
+	    normal bump and displacement textures to the material in 3dsmax,
+	    and use the "diffuse" renderloop type on the sectors to use them.
+	    This also supports a spec map. To use one, attach it to the
+	    'glossiness' map attribute of the material.
+	  - Tidied up the output formatting a bit, it's nicer on the eye now.
+	- Mike Gist added support for spec maps to the parallax shaders.
+23-Mar-2008
+	- res fixed an uninitialized var in gmeshanimpdl.
+22-Mar-2008
+	- res changed gl3d to free the VBO manager in Close(): VBOs should be
+	  cleaned up before the GL context itself is torn down.
+	- res changed the way memory tracking is handled. Notably, the 
+	  returned csMemTrackerInfo* isn't needed any more; instead, the
+	  information string serves as "handle" now. Also, allocated blocks
+	  are recorded in the memory tracker itself, thus freeing of a block
+	  can be tracked by merely passing it's address to the mem tracker.
+	- res fixed a bug in the debug ptmalloc code where allocation location
+	  information wasn't kept when it should have been.
+19-Mar-2008
+	- Mike Gist fixed a crash in tinyxml when parsing a binary xml file.
+	- Mike Gist added some missing error sets in tinyxml, so it now
+	  returns an error when it fails to parse a binary xml file.
+18-Mar-2008
+	- Marten added separate alpha-maps to terrain2 renderer, cells
+	  and feeder.
+	- Marten added explicit calls to the terrain2 feeder properties
+	  for the most common operations in addition to the unspecific
+	  SetParameter.
+17-Mar-2008
+	- res fixed the LinkWith jam rule to not add LFLAGS from the
+	  dependencies of the requested libraries piecemeal: this breaks
+	  static building.
+	- Mike Gist added support for compressed normal maps to the
+	  parallax and parallaxAtt shaders.
+13-Mar-2008
+	- Marten fixed the placement of some deprecation warning disable
+	  /enable includes. Eliminated some 8000 wrong warnings on MSVC9.
+	- Marten fixed a broken include guard.
+12-Mar-2008
+	- caedes implemented some empty methods in bullet physics plugin:
+	  - csBulletCollider: IsStatic
+	  - csBulletRigidBody: AddForceAtPos, IsEnabled, Enable, Disable.
+	- Marten made the UTF8 BOM checks a bit more robust after a few 
+	  comments from Mononoke.
+	- caedes added iTranslator to python bindings.
+	- res augmented the csVector4 from-csVector3 constructor to also
+	  optionally take a value for w.
 11-Mar-2008
 	- Mike Gist altered the loading collection to not hold any iMeshWrapper
 	  objects, as these conflict with this in a strange way for some
 	  unknown reason.
 	- Mike Gist changed csTextureList and csMaterialList to hold weak
 	  references.
+	- res fixed CS/docs/support/prepare_online_publish.sh to use the right
+	  search page parameter names for filtering for the docs only.
+	- res changed jamcache.m4 to emit values to Jamconfig without quotes.
+	  That way Jam sees them as arrays not strings, easing some array-based
+	  operations such as cleaning redundant flags.
+	- res changed Jam's LinkWith and LFlags rules to more aggressively
+	  remove duplicate flags.
+	- res changed csColliderHelper to only have one name for
+	  InitializeCollisionWrappers; distinguishing between regions and
+	  collections is done by overloading.
+	- res fixed collections InitializeCollisionWrappers not setting up any
+	  wrappers if no collection is given. Instead, set up all wrappers in
+	  that case (as the regions variant does).
+	- res fixed the GL canvas closing to call the common canvas Close()
+	  before freeing GL-specific data, since the former accesses some of
+	  the latter. Fixes trac #460.
+	- Marten removed the no-longer-needed atomictest.
+	- Marten added checks to XML parser plugins to skip any UTF8 BOM in the
+	  beginning of the XML stream.
 10-Mar-2008
 	- res added inverting to CS::Math::Matrix4.
 09-Mar-2008

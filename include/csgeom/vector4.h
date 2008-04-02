@@ -70,25 +70,33 @@ public:
    * Make a new vector. The vector is not
    * initialized. This makes the code slightly faster.
    */
-  csVector4T () {}
+  csVector4T () 
+  {}
 
   /**
    * Make a new initialized vector.
    * Creates a new vector and initializes it to m*<1,1,1,1>.  To create
    * a vector initialized to the zero vector, use csVector4(0)
    */
-  csVector4T (const T& m) : x(m), y(m), z(m), w(m) {}
+  csVector4T (const T& m) 
+    : x(m), y(m), z(m), w(m) 
+  {}
 
   /// Make a new vector and initialize with the given values.
   csVector4T (const T& ix, const T& iy, const T& iz = T(0), 
     const T& iw = T(1))
-  	: x(ix), y(iy), z(iz), w(iw) {}
+    : x(ix), y(iy), z(iz), w(iw) 
+  {}
 
   /// Copy Constructor.
-  csVector4T (const csVector4T& v) : x(v.x), y(v.y), z(v.z), w(v.w) {}
+  csVector4T (const csVector4T& v) 
+    : x(v.x), y(v.y), z(v.z), w(v.w) 
+  {}
 
   /// Convert from a three-component vector. w is set to 1.
-  csVector4T (const csVector3 &v) : x(v.x), y(v.y), z(v.z), w(1.0f) {}
+  csVector4T (const csVector3 &v, float w = 1.0f)
+    : x(v.x), y(v.y), z(v.z), w(w) 
+  {}
 
   /// Assignment operator.
   template<typename T2>
@@ -206,7 +214,8 @@ public:
   inline float & operator[] (size_t n) 
   { return (n&2)?((n&1)?w:z):((n&1)?y:x); }
 #else
-  inline float & operator[] (size_t n) { return m[n]; }
+  inline float & operator[] (size_t n) 
+  { return m[n]; }
 #endif
 
   /// Add another vector to this vector.
@@ -240,32 +249,39 @@ public:
   { f = 1.0f / f; x *= f; y *= f; z *= f; w *= f; return *this; }
 
   /// Unary + operator.
-  inline csVector4T operator+ () const { return *this; }
+  inline csVector4T operator+ () const 
+  { return *this; }
 
   /// Unary - operator.
-  inline csVector4T operator- () const { return csVector4(-x,-y,-z, -w); }
+  inline csVector4T operator- () const 
+  { return csVector4(-x,-y,-z, -w); }
 
   /// Set the value of this vector.
   inline void Set (T sx, T sy, T sz, T sw)
   { x = sx; y = sy; z = sz; w = sw; }
 
   /// Set the value of this vector.
-  inline void Set (csVector4T const& v) { x = v.x; y = v.y; z = v.z; w = v.w; }
+  inline void Set (csVector4T const& v) 
+  { x = v.x; y = v.y; z = v.z; w = v.w; }
 
   /// Set the value of this vector.
-  inline void Set (T const* v) { x = v[0]; y = v[1]; z = v[2]; w = v[3]; }
+  inline void Set (T const* v) 
+  { x = v[0]; y = v[1]; z = v[2]; w = v[3]; }
 
   /// Set the value of this vector so that all components are the same.
-  inline void Set (T v) { x = y = z = w = v; }
+  inline void Set (T v) 
+  { x = y = z = w = v; }
 
   /// Get the value of this vector.
-  inline void Get (T* v) { v[0] = x; v[1] = y; v[2] = z; v[3] = w; }
+  inline void Get (T* v) 
+  { v[0] = x; v[1] = y; v[2] = z; v[3] = w; }
 
   /// Returns the norm of this vector.
-  T Norm () const { return sqrtf (x * x + y * y + z * z + w * w); }
+  inline T Norm () const 
+  { return sqrt (x * x + y * y + z * z + w * w); }
 
   /// Return the squared norm (magnitude) of this vector.
-  T SquaredNorm () const
+  inline T SquaredNorm () const
   { return x * x + y * y + z * z + w * w; }
 
   /**
@@ -273,16 +289,19 @@ public:
    * Attempting to normalize a zero-vector will result in a divide by
    * zero error.  This is as it should be... fix the calling code.
    */
-  csVector4T Unit () const { return (*this)/(this->Norm()); }
+  inline csVector4T Unit () const 
+  { return (*this)/(this->Norm()); }
 
   /// Returns the norm (magnitude) of a vector.
-  inline static T Norm (const csVector4T& v) { return v.Norm(); }
+  inline static T Norm (const csVector4T& v) 
+  { return v.Norm(); }
 
   /// Normalizes a vector to a unit vector.
-  inline static csVector4T Unit (const csVector4T& v) { return v.Unit(); }
+  inline static csVector4T Unit (const csVector4T& v) 
+  { return v.Unit(); }
 
   /// Scale this vector to length = 1.0;
-  void Normalize ()
+  inline void Normalize ()
   {
     T sqlen = x * x + y * y + z * z + w * w;
     if (sqlen < SMALL_EPSILON) return ;
@@ -294,7 +313,8 @@ public:
 
   /// Query if the vector is zero
   inline bool IsZero (T precision = SMALL_EPSILON) const
-  { return (ABS(x) < precision) && (ABS(y) < precision)
+  { 
+    return (ABS(x) < precision) && (ABS(y) < precision)
             && (ABS(z) < precision) &&  (ABS(w) < precision);
   }
 };
@@ -316,21 +336,29 @@ public:
    * Creates a new vector and initializes it to m*<1,1,1,1>.  To create
    * a vector initialized to the zero vector, use csVector4(0)
    */
-  csVector4 (const float& m) : csVector4T<float> (m) {}
+  csVector4 (const float& m) 
+    : csVector4T<float> (m) 
+  {}
 
   /// Make a new vector and initialize with the given values.
   csVector4 (float ix, float iy, float iz = 0, float iw = 1)
-  	: csVector4T<float> (ix, iy, iz, iw) {}
+    : csVector4T<float> (ix, iy, iz, iw) 
+  {}
 
   /// Copy Constructor.
-  csVector4 (const csVector4& v) : csVector4T<float> (v) {}
+  csVector4 (const csVector4& v) 
+    : csVector4T<float> (v) 
+  {}
 
   /// Copy Constructor.
-  csVector4 (const csVector4T<float>& v) : csVector4T<float> (v) {}
+  csVector4 (const csVector4T<float>& v) 
+    : csVector4T<float> (v) 
+  {}
 
   /// Convert from a three-component vector. w is set to 1.
-  csVector4 (const csVector3 &v) : 
-    csVector4T<float> (v.x, v.y, v.z, 1.0f) {}
+  csVector4 (const csVector3 &v, float w = 1.0f) 
+    : csVector4T<float> (v.x, v.y, v.z, w) 
+  {}
 
   /// Assignment operator.
   csVector4& operator= (const csVector4T<float>& other)

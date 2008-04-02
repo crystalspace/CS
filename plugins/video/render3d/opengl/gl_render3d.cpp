@@ -37,6 +37,7 @@
 #include "csgeom/box.h"
 #include "csgfx/imagememory.h"
 #include "csgfx/renderbuffer.h"
+#include "csplugincommon/opengl/assumedstate.h"
 #include "csplugincommon/opengl/glhelper.h"
 #include "csplugincommon/opengl/glstates.h"
 #include "csplugincommon/render3d/normalizationcube.h"
@@ -769,19 +770,17 @@ bool csGLGraphics3D::Open ()
     return false;
   }
 
-  SetPerspectiveAspect (G2D->GetHeight ());
-  SetPerspectiveCenter (G2D->GetWidth ()/2, G2D->GetHeight ()/2);
+  viewwidth = G2D->GetWidth();
+  viewheight = G2D->GetHeight();
+  SetPerspectiveAspect (viewheight);
+  SetPerspectiveCenter (viewwidth/2, viewheight/2);
   
   object_reg->Register( G2D, "iGraphics2D");
 
   G2D->PerformExtension ("getstatecache", &statecache);
   G2D->PerformExtension	("getextmanager", &ext);
 
-  int w = G2D->GetWidth ();
-  int h = G2D->GetHeight ();
-  SetDimensions (w, h);
-  asp_center_x = w/2;
-  asp_center_y = h/2;
+  G2D->GetFramebufferDimensions (scrwidth, scrheight);
 
   // The extension manager requires to initialize all used extensions with
   // a call to Init<ext> first.
@@ -822,7 +821,10 @@ bool csGLGraphics3D::Open ()
 #ifdef CS_DEBUG
   ext->InitGL_GREMEDY_string_marker ();
 #endif
-
+  
+  // Some 'assumed state' is for extensions, so set again
+  CS::PluginCommon::GL::SetAssumedState (statecache, ext);
+  
   rendercaps.minTexHeight = 2;
   rendercaps.minTexWidth = 2;
   GLint mts = config->GetInt ("Video.OpenGL.Caps.MaxTextureSize", -1);
@@ -1170,6 +1172,7 @@ void csGLGraphics3D::Close ()
   {
     if (halos[h]) halos[h]->DeleteTexture();
   }
+  vboManager.Invalidate();
 
   if (G2D)
     G2D->Close ();
@@ -1244,6 +1247,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
     csBitmaskToString::GetStr (drawflags, drawflagNames)));
 
   SetWriteMask (true, true, true, true);
+  statecache->Disable_GL_POINT_SPRITE_ARB();
 
   clipportal_dirty = true;
   clipportal_floating = 0;
@@ -1266,6 +1270,8 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
       G2D->PerformExtension ("glflushtext");
     GLRENDER3D_OUTPUT_STRING_MARKER(("after G2D->BeginDraw()"));
   }
+  viewwidth = G2D->GetWidth();
+  viewheight = G2D->GetHeight();
   needViewportUpdate = false;
   const int old_drawflags = current_drawflags;
   current_drawflags = drawflags;
@@ -1763,31 +1769,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       {
         break;
       }
-      float radius, scale;
-      csShaderVariable* radiusSV = csGetShaderVariableFromStack (stacks, string_point_radius);
-      CS_ASSERT (radiusSV);
-      radiusSV->GetValue (radius);
-
-      csShaderVariable* scaleSV = csGetShaderVariableFromStack (stacks, string_point_scale);
-      CS_ASSERT (scaleSV);
-      scaleSV->GetValue (scale);
-
-      glPointSize (1.0f);
-      GLfloat atten[3] = {0.0f, 0.0f, scale * scale};
-      ext->glPointParameterfvARB (GL_POINT_DISTANCE_ATTENUATION_ARB, atten);
-      ext->glPointParameterfARB (GL_POINT_SIZE_MAX_ARB, 9999.0f);
-      ext->glPointParameterfARB (GL_POINT_SIZE_MIN_ARB, 0.0f);
-      ext->glPointParameterfARB (GL_POINT_FADE_THRESHOLD_SIZE_ARB, 1.0f);
-
-      glEnable (GL_POINT_SPRITE_ARB);
       primitivetype = GL_POINTS;
-      if (ext->CS_GL_ARB_multitexture)
-      {
-        statecache->SetCurrentTU (0);
-        statecache->ActivateTU (csGLStateCache::activateTexCoord);
-      }
-      glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE);
-
       break;
     }
     case CS_MESHTYPE_LINES:
@@ -1804,6 +1786,10 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       primitivetype = GL_TRIANGLES;
       break;
   }
+  if (primitivetype == GL_POINTS)
+    statecache->Enable_GL_POINT_SPRITE_ARB();
+  else
+    statecache->Disable_GL_POINT_SPRITE_ARB();
 
   // Based on the kind of clipping we need we set or clip mask.
   int clip_mask, clip_value;
@@ -1892,6 +1878,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   GLenum compType;
   void* bufData = //indexbuf->RenderLock (CS_GLBUF_RENDERLOCK_ELEMENTS);
     RenderLock (iIndexbuf, CS_GLBUF_RENDERLOCK_ELEMENTS, compType);
+  statecache->ApplyBufferBinding (csGLStateCacheContext::boIndexArray);
   if (bufData != (void*)-1)
   {
     SetMixMode (mixmode, modes.alphaType);
@@ -1923,11 +1910,6 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     //indexbuf->Release();
   }
 
-  if (mymesh->meshtype == CS_MESHTYPE_POINT_SPRITES) 
-  {
-    glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE);
-    glDisable (GL_POINT_SPRITE_ARB);
-  }
   if (needMatrix)
     glPopMatrix ();
   //indexbuf->RenderRelease ();
@@ -2352,6 +2334,7 @@ void csGLGraphics3D::ApplyBufferChanges()
 	  if (ext->glEnableVertexAttribArrayARB)
 	  {
 	    GLuint index = att - CS_VATTRIB_GENERIC_FIRST;
+	    statecache->ApplyBufferBinding (csGLStateCacheContext::boElementArray);
 	    ext->glEnableVertexAttribArrayARB (index);
 	    ext->glVertexAttribPointerARB(index, buffer->GetComponentCount (),
 	      compType, false, (GLsizei)buffer->GetStride (), data);
@@ -2949,8 +2932,12 @@ void csGLGraphics3D::SetClipper (iClipper2D* clipper, int cliptype)
     if (currentAttachments != 0)
       r2tbackend->SetClipRect (scissorRect);
     else
-      glScissor (scissorRect.xmin, scissorRect.ymin, scissorRect.Width(),
+    {
+      GLint vp[4];
+      glGetIntegerv (GL_VIEWPORT, vp);
+      glScissor (vp[0] + scissorRect.xmin, vp[1] + scissorRect.ymin, scissorRect.Width(),
 	scissorRect.Height());
+    }
   }
   else if (hasOld2dClip)
   {
@@ -3546,11 +3533,11 @@ bool csGLGraphics3D::HandleEvent (iEvent& Event)
   }
   else if (Event.Name == CanvasResize)
   {
-    int w = G2D->GetWidth ();
-    int h = G2D->GetHeight ();
-    SetDimensions (w, h);
-    asp_center_x = w/2;
-    asp_center_y = h/2;
+    viewwidth = G2D->GetWidth();
+    viewheight = G2D->GetHeight();
+    G2D->GetFramebufferDimensions (scrwidth, scrheight);
+    asp_center_x = viewwidth/2;
+    asp_center_y = viewheight/2;
     return true;
   }
   else if (Event.Name == Frame)

@@ -46,6 +46,7 @@ ARRAY_CHANGE_ALL_TEMPLATE(csCollisionPair)
 %include "ivaria/script.h"
 %include "ivaria/simpleformer.h"
 %include "ivaria/terraform.h"
+%include "ivaria/translator.h"
 
 
 // ivaria/collider.h

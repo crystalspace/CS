@@ -43,6 +43,8 @@ class csSoftFontCacheImpl : public csSoftFontCache
   void WriteString (iFont *font, int x, int y, int fg, int bg, 
     const void* text, bool isWide, uint flags)
   {
+    x += vpX; y += vpY;
+    
     int realColorFG;
     uint8 alphaFG;
     SplitAlpha (fg, realColorFG, alphaFG);

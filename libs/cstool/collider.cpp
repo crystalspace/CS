@@ -300,22 +300,7 @@ csColliderWrapper* csColliderHelper::InitializeCollisionWrapper (
 
 #include "csutil/deprecated_warn_off.h"
 
-void csColliderHelper::InitializeCollisionWrappers(iCollideSystem* colsys,
-  	iEngine* engine, iBase* base)
-{
-  csRef<iRegion> region (scfQueryInterfaceSafe<iRegion>(base));
-  if(region)
-  {
-    return InitializeCollisionWrappersRegion(colsys, engine, region);
-  }
-  else
-  {
-    csRef<iCollection> collection (scfQueryInterfaceSafe<iCollection>(base));
-    return InitializeCollisionWrappersCollection(colsys, engine, collection);
-  }
-}
-
-void csColliderHelper::InitializeCollisionWrappersCollection(iCollideSystem* colsys,
+void csColliderHelper::InitializeCollisionWrappers (iCollideSystem* colsys,
   	iEngine* engine, iCollection* collection)
 {
   // Initialize all mesh objects for collision detection.
@@ -324,14 +309,12 @@ void csColliderHelper::InitializeCollisionWrappersCollection(iCollideSystem* col
   for (i = 0 ; i < meshes->GetCount () ; i++)
   {
     iMeshWrapper* sp = meshes->Get (i);
-    if (collection && collection->IsParentOf(sp->QueryObject ()))
-    {
-      InitializeCollisionWrapper (colsys, sp);
-    }
+    if (collection && !collection->IsParentOf(sp->QueryObject ())) continue;
+    InitializeCollisionWrapper (colsys, sp);
   }
 }
 
-void csColliderHelper::InitializeCollisionWrappersRegion (iCollideSystem* colsys,
+void csColliderHelper::InitializeCollisionWrappers (iCollideSystem* colsys,
   	iEngine* engine, iRegion* region)
 {
   // Initialize all mesh objects for collision detection.

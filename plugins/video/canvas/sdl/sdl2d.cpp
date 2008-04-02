@@ -248,7 +248,7 @@ bool csGraphics2DSDL::Initialize (iObjectRegistry *object_reg)
     fixlibrary();
 
     Report (CS_REPORTER_SEVERITY_NOTIFY,
-      "Defaults to %dx%dx%d resolution.", Width, Height, Depth);
+      "Defaults to %dx%dx%d resolution.", fbWidth, fbHeight, Depth);
 
     Memory = 0;
 
@@ -316,10 +316,10 @@ bool csGraphics2DSDL::Open()
     return false;
   }
 
-  screen = SDL_SetVideoMode(Width,Height,Depth,SDL_SWSURFACE);
+  screen = SDL_SetVideoMode(fbWidth,fbHeight,Depth,SDL_SWSURFACE);
   if (screen == 0) {
     Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't set %dx%dx%d video mode: %s",
-                               Width, Height, Depth, SDL_GetError());
+                               fbWidth, fbHeight, Depth, SDL_GetError());
     return false;
   }
 
@@ -330,9 +330,9 @@ bool csGraphics2DSDL::Open()
 #if SHADE_BUF
   cursorNo = csmcNone;
   *((char **)&Memory) =
-    new char[(size_mem=Width*Height*screen->format->BytesPerPixel)+128];
+    new char[(size_mem=fbWidth*fbHeight*screen->format->BytesPerPixel)+128];
   *((char **)&membuffer) =
-    new char[(size_mem=Width*Height*screen->format->BytesPerPixel)+128];
+    new char[(size_mem=fbWidth*fbHeight*screen->format->BytesPerPixel)+128];
   init_surfaces();
   Scurrent = 0;
   th_lock = SDL_CreateMutex();
@@ -543,8 +543,8 @@ void csGraphics2DSDL::Print (csRect const* area)
   SDL_UnlockMutex(th_lock);
 #else
   if ((!area)||
-       ((area->xmin==0)&&(area->xmax==Width)&&
-        (area->ymin==0)&&(area->ymax==Height)))
+       ((area->xmin==0)&&(area->xmax==fbWidth)&&
+        (area->ymin==0)&&(area->ymax==fbHeight)))
     SDL_Flip(screen);
   else
     SDL_UpdateRect(
