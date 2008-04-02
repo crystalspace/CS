@@ -17,6 +17,7 @@ chronological order.
 	- caedes added iCollection to scripting bindings.
 	- res fixed a strict aliasing violation in csFixedSizeAllocator that
 	  caused crashes in optimize mode.
+	- res silenced a strict aliasing warning in svarrayholder.h.
 1-Apr-2008
 	- res fixed a missing 'break' in the terrain2 loader.
 	- res changed the csHash<> implementation to move the Element type out

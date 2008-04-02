@@ -209,7 +209,15 @@ namespace RenderManager
     csArray<csShaderVariable**> svArray;
 
     csMemoryPool& GetMemAlloc()
-    { return *(reinterpret_cast<csMemoryPool*> (memAlloc)); }
+    { 
+      union
+      {
+        uint* a;
+        csMemoryPool* b;
+      } pun;
+      pun.a = memAlloc;
+      return *(pun.b); 
+    }
 
     uint memAlloc[(sizeof(csMemoryPool) + sizeof (uint) - 1) / sizeof (uint)];
     bool memAllocSetUp;
