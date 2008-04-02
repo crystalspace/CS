@@ -1377,6 +1377,7 @@ iEventQueue_swigregister = _core.iEventQueue_swigregister
 iEventQueue_swigregister(iEventQueue)
 iEventQueue_scfGetVersion = _core.iEventQueue_scfGetVersion
 
+Compact = _core.Compact
 class iEventNameRegistry(iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
@@ -2074,6 +2075,13 @@ csevAllEvents = _core.csevAllEvents
 csevFrame = _core.csevFrame
 csevInput = _core.csevInput
 csevQuit = _core.csevQuit
+csevCanvasClose = _core.csevCanvasClose
+csevCanvasExposed = _core.csevCanvasExposed
+csevCanvasHidden = _core.csevCanvasHidden
+csevCanvasResize = _core.csevCanvasResize
+csevFocusChanged = _core.csevFocusChanged
+csevFocusGained = _core.csevFocusGained
+csevFocusLost = _core.csevFocusLost
 csevKeyboardEvent = _core.csevKeyboardEvent
 csevKeyboardDown = _core.csevKeyboardDown
 csevKeyboardUp = _core.csevKeyboardUp

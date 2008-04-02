@@ -30101,40 +30101,24 @@ SWIGINTERN PyObject *_wrap_iTerrainObjectState_GetMaterialMapFile(PyObject *SWIG
   char *result = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  void *argp3 = 0 ;
-  int res3 = 0 ;
+  int temp2 ;
+  int res2 = SWIG_TMPOBJ ;
+  int temp3 ;
+  int res3 = SWIG_TMPOBJ ;
   void *argp4 = 0 ;
   int res4 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"iTerrainObjectState_GetMaterialMapFile",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  arg2 = &temp2;
+  arg3 = &temp3;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainObjectState_GetMaterialMapFile",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainObjectState, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainObjectState_GetMaterialMapFile" "', argument " "1"" of type '" "iTerrainObjectState *""'"); 
   }
   arg1 = reinterpret_cast< iTerrainObjectState * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_int,  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iTerrainObjectState_GetMaterialMapFile" "', argument " "2"" of type '" "int &""'"); 
-  }
-  if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iTerrainObjectState_GetMaterialMapFile" "', argument " "2"" of type '" "int &""'"); 
-  }
-  arg2 = reinterpret_cast< int * >(argp2);
-  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_int,  0 );
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iTerrainObjectState_GetMaterialMapFile" "', argument " "3"" of type '" "int &""'"); 
-  }
-  if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iTerrainObjectState_GetMaterialMapFile" "', argument " "3"" of type '" "int &""'"); 
-  }
-  arg3 = reinterpret_cast< int * >(argp3);
-  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_bool,  0 );
+  res4 = SWIG_ConvertPtr(obj1, &argp4, SWIGTYPE_p_bool,  0 );
   if (!SWIG_IsOK(res4)) {
     SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iTerrainObjectState_GetMaterialMapFile" "', argument " "4"" of type '" "bool &""'"); 
   }
@@ -30144,6 +30128,18 @@ SWIGINTERN PyObject *_wrap_iTerrainObjectState_GetMaterialMapFile(PyObject *SWIG
   arg4 = reinterpret_cast< bool * >(argp4);
   result = (char *)(arg1)->GetMaterialMapFile(*arg2,*arg3,*arg4);
   resultobj = SWIG_FromCharPtr((const char *)result);
+  if (SWIG_IsTmpObj(res2)) {
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_int((*arg2)));
+  } else {
+    int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_int, new_flags));
+  }
+  if (SWIG_IsTmpObj(res3)) {
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_int((*arg3)));
+  } else {
+    int new_flags = SWIG_IsNewObj(res3) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg3), SWIGTYPE_p_int, new_flags));
+  }
   return resultobj;
 fail:
   return NULL;

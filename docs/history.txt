@@ -6,7 +6,27 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+2-Apr-2008
+	- Mike Gist added csWeakRefHash which inherits from csHash.
+	  It has a Compact() function which removes all deleted elements
+	  (NULL value), and uses csArraySafeCopyElementHandler.
+	- res fixed graphic distortions after r29169.
+	- caedes fixed a number of gcc compiler errors on csWeakRefHash 
+	  (guided by res).
+	- Mike Gist moved csWeakRefHash into its own file.
+	- caedes added iCollection to scripting bindings.
+	- res fixed a strict aliasing violation in csFixedSizeAllocator that
+	  caused crashes in optimize mode.
 1-Apr-2008
+	- res fixed a missing 'break' in the terrain2 loader.
+	- res changed the csHash<> implementation to move the Element type out
+	  of the csHash<> class. Kludgy, but makes it possible to provide
+	  custom element handlers for the arrays inside the hash.
+	- caedes fixed all uses of csHash template inside csHash so it uses
+	  the user defined allocator and element handler (under res guidance).
+	- res enabled the 'resizing' flag in embedgl.
+	- res added viewport control to iGraphics2D.
+	- res added the canvas event IDs to the script bindings.
 	- res made simple mesh screen space work right again.
 	- res added the ability to specify a buffer holder in
 	  csSimpleRenderMesh.

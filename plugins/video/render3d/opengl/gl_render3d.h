@@ -215,6 +215,7 @@ private:
   float aspect, inv_aspect;
   bool needProjectionUpdate;
   float fov;
+  int scrwidth, scrheight;
   int viewwidth, viewheight;
   CS::Math::Matrix4 projectionMatrix;
   bool explicitProjection, needMatrixUpdate;

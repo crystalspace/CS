@@ -321,12 +321,17 @@ protected: // 'protected' allows access by test-suite.
       blocks.b.InsertSorted(p);
       freenode = (FreeNode*)p;
     }
-    void* const node = freenode;
+    union
+    {
+      FreeNode* a;
+      void* b;
+    } pun;
+    pun.a = freenode;
     freenode = freenode->next;
 #ifdef CS_FIXEDSIZEALLOC_DEBUG
-    memset (node, 0xfa, elsize);
+    memset (pun.b, 0xfa, elsize);
 #endif
-    return node;
+    return pun.b;
   }
 private:
   void operator= (csFixedSizeAllocator const&); 	// Illegal; unimplemented.

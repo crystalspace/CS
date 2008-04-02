@@ -331,6 +331,7 @@ bool csTerrain2FactoryLoader::ParseFeederParams (ParamPairArray& pairs,
         p.value = child2->GetContentsValue ();
 
         alphaMaps.Push (p);
+	break;
       }
     default:
       {

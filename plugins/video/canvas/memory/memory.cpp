@@ -110,7 +110,7 @@ bool csGraphicsMemory::Initialize(iObjectRegistry* obj_reg)
     pfmt.PixelBytes = 2;
     pfmt.complete();
 		
-    size=Height*Width;
+    size=fbHeight*fbWidth;
     buff_a = new unsigned char[size * pfmt.PixelBytes];
 #if THREAD_SUPPORT
     buff_b = new unsigned char[size * pfmt.PixelBytes];

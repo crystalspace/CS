@@ -54,11 +54,10 @@ void R2TViewportHelper::Set2DViewport (iGraphics3D* G3D, int txt_w, int txt_h)
 {
   iGraphics2D* g2d = G3D->GetDriver2D();
     
-  framebufW = g2d->GetWidth();
-  framebufH = g2d->GetHeight();
+  g2d->GetFramebufferDimensions (framebufW, framebufH);
+  g2d->GetViewport (vp_old_l, vp_old_t, vp_old_w, vp_old_h);
 
-  g2d->PerformExtension ("vp_set", txt_w, txt_h);
-
+  g2d->SetViewport (0, framebufH - txt_h, txt_w, txt_h);
   g2d->GetClipRect (rt_old_minx, rt_old_miny, 
     rt_old_maxx, rt_old_maxy);
   if ((rt_old_minx != 0) || (rt_old_miny != 0)
@@ -72,7 +71,7 @@ void R2TViewportHelper::Reset2DViewport (iGraphics3D* G3D)
 {
   iGraphics2D* g2d = G3D->GetDriver2D();
     
-  g2d->PerformExtension ("vp_reset");
+  g2d->SetViewport (vp_old_l, vp_old_t, vp_old_w, vp_old_h);
   g2d->SetClipRect (rt_old_minx, rt_old_miny, 
     rt_old_maxx, rt_old_maxy);
 }

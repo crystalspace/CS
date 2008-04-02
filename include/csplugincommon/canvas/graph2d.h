@@ -103,10 +103,9 @@ public:
   csString win_title;
 
   /// The width, height and depth of visual.
-  int Width, Height, Depth;
+  int fbWidth, fbHeight, Depth;
 
-  int vpWidth, vpHeight;
-  bool vpSet;
+  int vpLeft, vpTop, vpWidth, vpHeight;
 
   /**
    * Display number.  If 0, use primary display; else if greater than 0, use
@@ -255,7 +254,7 @@ public:
   unsigned char* (*_GetPixelAt) (csGraphics2D *This, int x, int y);
   /// Same but exposed through iGraphics2D interface
   virtual unsigned char *GetPixelAt (int x, int y)
-  { return _GetPixelAt (this, x, y); }
+  { return _GetPixelAt (this, vpLeft+x, vpTop+y); }
 
   /**
    * Return the number of palette entries that can be modified.
@@ -315,10 +314,8 @@ public:
   virtual iFontServer *GetFontServer ()
   { return FontServer; }
 
-  virtual int GetWidth ()
-  { return vpSet ? vpWidth : Width; }
-  virtual int GetHeight ()
-  { return vpSet ? vpHeight : Height; }
+  virtual int GetWidth () { return vpWidth; }
+  virtual int GetHeight () { return vpHeight; }
 
   /// Get the palette (if there is one)
   virtual csRGBpixel *GetPalette ()
@@ -387,6 +384,13 @@ public:
                                int hotspot_x = 0, int hotspot_y = 0,
                                csRGBcolor fg = csRGBcolor(255,255,255),
                                csRGBcolor bg = csRGBcolor(0,0,0));
+  
+  void SetViewport (int left, int top, int width, int height);
+  void GetViewport (int& left, int& top, int& width, int& height)
+  { left = vpLeft; top = vpTop; width = vpWidth; height = vpHeight; }
+  
+  void GetFramebufferDimensions (int& width, int& height)
+  { width = fbWidth; height = fbHeight; }
 
   CS_EVENTHANDLER_NAMES("crystalspace.graphics2d.common")
   CS_EVENTHANDLER_NIL_CONSTRAINTS

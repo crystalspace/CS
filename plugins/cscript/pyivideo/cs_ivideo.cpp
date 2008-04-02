@@ -2513,7 +2513,7 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_csFlags swig_types[35]
 #define SWIGTYPE_p_csGlyphMetrics swig_types[36]
 #define SWIGTYPE_p_csGraphics3DCaps swig_types[37]
-#define SWIGTYPE_p_csHashTcsRefTiShader_t_CS__StringIDTCS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t swig_types[38]
+#define SWIGTYPE_p_csHashTcsRefTiShader_t_CS__StringIDTCS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerTCS__Container__HashElementTcsRefTiShader_t_CS__StringIDTCS__StringSetTag__General_t_t_t_t swig_types[38]
 #define SWIGTYPE_p_csImageArea swig_types[39]
 #define SWIGTYPE_p_csImageBase swig_types[40]
 #define SWIGTYPE_p_csImageMemory swig_types[41]
@@ -7920,6 +7920,165 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iGraphics2D_SetViewport(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGraphics2D *arg1 = (iGraphics2D *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  int arg4 ;
+  int arg5 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  int val4 ;
+  int ecode4 = 0 ;
+  int val5 ;
+  int ecode5 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGraphics2D_SetViewport",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGraphics2D, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGraphics2D_SetViewport" "', argument " "1"" of type '" "iGraphics2D *""'"); 
+  }
+  arg1 = reinterpret_cast< iGraphics2D * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iGraphics2D_SetViewport" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iGraphics2D_SetViewport" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
+  ecode4 = SWIG_AsVal_int(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iGraphics2D_SetViewport" "', argument " "4"" of type '" "int""'");
+  } 
+  arg4 = static_cast< int >(val4);
+  ecode5 = SWIG_AsVal_int(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iGraphics2D_SetViewport" "', argument " "5"" of type '" "int""'");
+  } 
+  arg5 = static_cast< int >(val5);
+  (arg1)->SetViewport(arg2,arg3,arg4,arg5);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGraphics2D_GetViewport(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGraphics2D *arg1 = (iGraphics2D *) 0 ;
+  int *arg2 = 0 ;
+  int *arg3 = 0 ;
+  int *arg4 = 0 ;
+  int *arg5 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int temp2 ;
+  int res2 = SWIG_TMPOBJ ;
+  int temp3 ;
+  int res3 = SWIG_TMPOBJ ;
+  int temp4 ;
+  int res4 = SWIG_TMPOBJ ;
+  int temp5 ;
+  int res5 = SWIG_TMPOBJ ;
+  PyObject * obj0 = 0 ;
+  
+  arg2 = &temp2;
+  arg3 = &temp3;
+  arg4 = &temp4;
+  arg5 = &temp5;
+  if(!PyArg_UnpackTuple(args,(char *)"iGraphics2D_GetViewport",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGraphics2D, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGraphics2D_GetViewport" "', argument " "1"" of type '" "iGraphics2D *""'"); 
+  }
+  arg1 = reinterpret_cast< iGraphics2D * >(argp1);
+  (arg1)->GetViewport(*arg2,*arg3,*arg4,*arg5);
+  resultobj = SWIG_Py_Void();
+  if (SWIG_IsTmpObj(res2)) {
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_int((*arg2)));
+  } else {
+    int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_int, new_flags));
+  }
+  if (SWIG_IsTmpObj(res3)) {
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_int((*arg3)));
+  } else {
+    int new_flags = SWIG_IsNewObj(res3) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg3), SWIGTYPE_p_int, new_flags));
+  }
+  if (SWIG_IsTmpObj(res4)) {
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_int((*arg4)));
+  } else {
+    int new_flags = SWIG_IsNewObj(res4) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg4), SWIGTYPE_p_int, new_flags));
+  }
+  if (SWIG_IsTmpObj(res5)) {
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_int((*arg5)));
+  } else {
+    int new_flags = SWIG_IsNewObj(res5) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg5), SWIGTYPE_p_int, new_flags));
+  }
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGraphics2D_GetFramebufferDimensions(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGraphics2D *arg1 = (iGraphics2D *) 0 ;
+  int *arg2 = 0 ;
+  int *arg3 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int temp2 ;
+  int res2 = SWIG_TMPOBJ ;
+  int temp3 ;
+  int res3 = SWIG_TMPOBJ ;
+  PyObject * obj0 = 0 ;
+  
+  arg2 = &temp2;
+  arg3 = &temp3;
+  if(!PyArg_UnpackTuple(args,(char *)"iGraphics2D_GetFramebufferDimensions",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGraphics2D, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGraphics2D_GetFramebufferDimensions" "', argument " "1"" of type '" "iGraphics2D *""'"); 
+  }
+  arg1 = reinterpret_cast< iGraphics2D * >(argp1);
+  (arg1)->GetFramebufferDimensions(*arg2,*arg3);
+  resultobj = SWIG_Py_Void();
+  if (SWIG_IsTmpObj(res2)) {
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_int((*arg2)));
+  } else {
+    int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_int, new_flags));
+  }
+  if (SWIG_IsTmpObj(res3)) {
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_int((*arg3)));
+  } else {
+    int new_flags = SWIG_IsNewObj(res3) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg3), SWIGTYPE_p_int, new_flags));
+  }
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iGraphics2D_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -9263,6 +9422,59 @@ SWIGINTERN PyObject *_wrap_csSimpleRenderMesh_object2world_get(PyObject *SWIGUNU
   arg1 = reinterpret_cast< csSimpleRenderMesh * >(argp1);
   result =  ((arg1)->object2world);
   resultobj = SWIG_NewPointerObj((new csReversibleTransform(static_cast< const csReversibleTransform& >(result))), SWIGTYPE_p_csReversibleTransform, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csSimpleRenderMesh_renderBuffers_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csSimpleRenderMesh *arg1 = (csSimpleRenderMesh *) 0 ;
+  csRef<csRenderBufferHolder > *arg2 = (csRef<csRenderBufferHolder > *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csSimpleRenderMesh_renderBuffers_set",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSimpleRenderMesh, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSimpleRenderMesh_renderBuffers_set" "', argument " "1"" of type '" "csSimpleRenderMesh *""'"); 
+  }
+  arg1 = reinterpret_cast< csSimpleRenderMesh * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_csRefTcsRenderBufferHolder_t, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csSimpleRenderMesh_renderBuffers_set" "', argument " "2"" of type '" "csRef<csRenderBufferHolder > *""'"); 
+  }
+  arg2 = reinterpret_cast< csRef<csRenderBufferHolder > * >(argp2);
+  if (arg1) (arg1)->renderBuffers = *arg2;
+  
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csSimpleRenderMesh_renderBuffers_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csSimpleRenderMesh *arg1 = (csSimpleRenderMesh *) 0 ;
+  csRef<csRenderBufferHolder > *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csSimpleRenderMesh_renderBuffers_get",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSimpleRenderMesh, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSimpleRenderMesh_renderBuffers_get" "', argument " "1"" of type '" "csSimpleRenderMesh *""'"); 
+  }
+  arg1 = reinterpret_cast< csSimpleRenderMesh * >(argp1);
+  result = (csRef<csRenderBufferHolder > *)& ((arg1)->renderBuffers);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csRefTcsRenderBufferHolder_t, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -19442,6 +19654,173 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iTextureHandle_SetMipmapLimits__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTextureHandle *arg1 = (iTextureHandle *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTextureHandle_SetMipmapLimits",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTextureHandle, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTextureHandle_SetMipmapLimits" "', argument " "1"" of type '" "iTextureHandle *""'"); 
+  }
+  arg1 = reinterpret_cast< iTextureHandle * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iTextureHandle_SetMipmapLimits" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iTextureHandle_SetMipmapLimits" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
+  (arg1)->SetMipmapLimits(arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTextureHandle_SetMipmapLimits__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTextureHandle *arg1 = (iTextureHandle *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTextureHandle_SetMipmapLimits",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTextureHandle, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTextureHandle_SetMipmapLimits" "', argument " "1"" of type '" "iTextureHandle *""'"); 
+  }
+  arg1 = reinterpret_cast< iTextureHandle * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iTextureHandle_SetMipmapLimits" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  (arg1)->SetMipmapLimits(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTextureHandle_SetMipmapLimits(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[4];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 3); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iTextureHandle, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_int(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        return _wrap_iTextureHandle_SetMipmapLimits__SWIG_1(self, args);
+      }
+    }
+  }
+  if (argc == 3) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iTextureHandle, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_int(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        {
+          int res = SWIG_AsVal_int(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          return _wrap_iTextureHandle_SetMipmapLimits__SWIG_0(self, args);
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iTextureHandle_SetMipmapLimits'.\n  Possible C/C++ prototypes are:\n    SetMipmapLimits(int,int)\n    SetMipmapLimits(int)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTextureHandle_GetMipmapLimits(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTextureHandle *arg1 = (iTextureHandle *) 0 ;
+  int *arg2 = 0 ;
+  int *arg3 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTextureHandle_GetMipmapLimits",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTextureHandle, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTextureHandle_GetMipmapLimits" "', argument " "1"" of type '" "iTextureHandle *""'"); 
+  }
+  arg1 = reinterpret_cast< iTextureHandle * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_int,  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iTextureHandle_GetMipmapLimits" "', argument " "2"" of type '" "int &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iTextureHandle_GetMipmapLimits" "', argument " "2"" of type '" "int &""'"); 
+  }
+  arg2 = reinterpret_cast< int * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_int,  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iTextureHandle_GetMipmapLimits" "', argument " "3"" of type '" "int &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iTextureHandle_GetMipmapLimits" "', argument " "3"" of type '" "int &""'"); 
+  }
+  arg3 = reinterpret_cast< int * >(argp3);
+  (arg1)->GetMipmapLimits(*arg2,*arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iTextureHandle_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -19497,38 +19876,22 @@ SWIGINTERN PyObject *_wrap_iRendererLightmap_GetSLMCoords(PyObject *SWIGUNUSEDPA
   int res2 = SWIG_TMPOBJ ;
   int temp3 ;
   int res3 = SWIG_TMPOBJ ;
-  void *argp4 = 0 ;
-  int res4 = 0 ;
-  void *argp5 = 0 ;
-  int res5 = 0 ;
+  int temp4 ;
+  int res4 = SWIG_TMPOBJ ;
+  int temp5 ;
+  int res5 = SWIG_TMPOBJ ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
   
   arg2 = &temp2;
   arg3 = &temp3;
-  if(!PyArg_UnpackTuple(args,(char *)"iRendererLightmap_GetSLMCoords",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  arg4 = &temp4;
+  arg5 = &temp5;
+  if(!PyArg_UnpackTuple(args,(char *)"iRendererLightmap_GetSLMCoords",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iRendererLightmap, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iRendererLightmap_GetSLMCoords" "', argument " "1"" of type '" "iRendererLightmap *""'"); 
   }
   arg1 = reinterpret_cast< iRendererLightmap * >(argp1);
-  res4 = SWIG_ConvertPtr(obj1, &argp4, SWIGTYPE_p_int,  0 );
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iRendererLightmap_GetSLMCoords" "', argument " "4"" of type '" "int &""'"); 
-  }
-  if (!argp4) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iRendererLightmap_GetSLMCoords" "', argument " "4"" of type '" "int &""'"); 
-  }
-  arg4 = reinterpret_cast< int * >(argp4);
-  res5 = SWIG_ConvertPtr(obj2, &argp5, SWIGTYPE_p_int,  0 );
-  if (!SWIG_IsOK(res5)) {
-    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "iRendererLightmap_GetSLMCoords" "', argument " "5"" of type '" "int &""'"); 
-  }
-  if (!argp5) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iRendererLightmap_GetSLMCoords" "', argument " "5"" of type '" "int &""'"); 
-  }
-  arg5 = reinterpret_cast< int * >(argp5);
   (arg1)->GetSLMCoords(*arg2,*arg3,*arg4,*arg5);
   resultobj = SWIG_Py_Void();
   if (SWIG_IsTmpObj(res2)) {
@@ -19542,6 +19905,18 @@ SWIGINTERN PyObject *_wrap_iRendererLightmap_GetSLMCoords(PyObject *SWIGUNUSEDPA
   } else {
     int new_flags = SWIG_IsNewObj(res3) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
     resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg3), SWIGTYPE_p_int, new_flags));
+  }
+  if (SWIG_IsTmpObj(res4)) {
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_int((*arg4)));
+  } else {
+    int new_flags = SWIG_IsNewObj(res4) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg4), SWIGTYPE_p_int, new_flags));
+  }
+  if (SWIG_IsTmpObj(res5)) {
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_int((*arg5)));
+  } else {
+    int new_flags = SWIG_IsNewObj(res5) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg5), SWIGTYPE_p_int, new_flags));
   }
   return resultobj;
 fail:
@@ -20491,7 +20866,7 @@ SWIGINTERN PyObject *_wrap_iMaterial_GetShaders(PyObject *SWIGUNUSEDPARM(self), 
     csHash<csRef<iShader >,csStringID > const &_result_ref = ((iMaterial const *)arg1)->GetShaders();
     result = (csHash<csRef<iShader >,csStringID > *) &_result_ref;
   }
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csHashTcsRefTiShader_t_CS__StringIDTCS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t, 0 |  0 );
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csHashTcsRefTiShader_t_CS__StringIDTCS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerTCS__Container__HashElementTcsRefTiShader_t_CS__StringIDTCS__StringSetTag__General_t_t_t_t, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -20820,6 +21195,9 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iGraphics2D_GetName", _wrap_iGraphics2D_GetName, METH_VARARGS, NULL},
 	 { (char *)"iGraphics2D_CreateOffscreenCanvas", _wrap_iGraphics2D_CreateOffscreenCanvas, METH_VARARGS, NULL},
 	 { (char *)"iGraphics2D_Write", _wrap_iGraphics2D_Write, METH_VARARGS, NULL},
+	 { (char *)"iGraphics2D_SetViewport", _wrap_iGraphics2D_SetViewport, METH_VARARGS, NULL},
+	 { (char *)"iGraphics2D_GetViewport", _wrap_iGraphics2D_GetViewport, METH_VARARGS, NULL},
+	 { (char *)"iGraphics2D_GetFramebufferDimensions", _wrap_iGraphics2D_GetFramebufferDimensions, METH_VARARGS, NULL},
 	 { (char *)"iGraphics2D_scfGetVersion", _wrap_iGraphics2D_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iGraphics2D", _wrap_delete_iGraphics2D, METH_VARARGS, NULL},
 	 { (char *)"iGraphics2D__PerformExtension", _wrap_iGraphics2D__PerformExtension, METH_VARARGS, NULL},
@@ -20874,6 +21252,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csSimpleRenderMesh_mixmode_get", _wrap_csSimpleRenderMesh_mixmode_get, METH_VARARGS, NULL},
 	 { (char *)"csSimpleRenderMesh_object2world_set", _wrap_csSimpleRenderMesh_object2world_set, METH_VARARGS, NULL},
 	 { (char *)"csSimpleRenderMesh_object2world_get", _wrap_csSimpleRenderMesh_object2world_get, METH_VARARGS, NULL},
+	 { (char *)"csSimpleRenderMesh_renderBuffers_set", _wrap_csSimpleRenderMesh_renderBuffers_set, METH_VARARGS, NULL},
+	 { (char *)"csSimpleRenderMesh_renderBuffers_get", _wrap_csSimpleRenderMesh_renderBuffers_get, METH_VARARGS, NULL},
 	 { (char *)"new_csSimpleRenderMesh", _wrap_new_csSimpleRenderMesh, METH_VARARGS, NULL},
 	 { (char *)"csSimpleRenderMesh_SetWithGenmeshFactory", _wrap_csSimpleRenderMesh_SetWithGenmeshFactory, METH_VARARGS, NULL},
 	 { (char *)"delete_csSimpleRenderMesh", _wrap_delete_csSimpleRenderMesh, METH_VARARGS, NULL},
@@ -21141,6 +21521,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iTextureHandle_QueryBlitBuffer", _wrap_iTextureHandle_QueryBlitBuffer, METH_VARARGS, NULL},
 	 { (char *)"iTextureHandle_ApplyBlitBuffer", _wrap_iTextureHandle_ApplyBlitBuffer, METH_VARARGS, NULL},
 	 { (char *)"iTextureHandle_GetBufferNature", _wrap_iTextureHandle_GetBufferNature, METH_VARARGS, NULL},
+	 { (char *)"iTextureHandle_SetMipmapLimits", _wrap_iTextureHandle_SetMipmapLimits, METH_VARARGS, NULL},
+	 { (char *)"iTextureHandle_GetMipmapLimits", _wrap_iTextureHandle_GetMipmapLimits, METH_VARARGS, NULL},
 	 { (char *)"iTextureHandle_scfGetVersion", _wrap_iTextureHandle_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iTextureHandle", _wrap_delete_iTextureHandle, METH_VARARGS, NULL},
 	 { (char *)"iTextureHandle_swigregister", iTextureHandle_swigregister, METH_VARARGS, NULL},
@@ -21500,7 +21882,7 @@ static swig_type_info _swigt__p_csBitmapMetrics = {"_p_csBitmapMetrics", "csBitm
 static swig_type_info _swigt__p_csFlags = {"_p_csFlags", "csFlags *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csGlyphMetrics = {"_p_csGlyphMetrics", "csGlyphMetrics *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csGraphics3DCaps = {"_p_csGraphics3DCaps", "csGraphics3DCaps *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_csHashTcsRefTiShader_t_CS__StringIDTCS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t = {"_p_csHashTcsRefTiShader_t_CS__StringIDTCS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t", "csHash<csRef<iShader >,CS::StringID<CS::StringSetTag::General > > *|csHash<csRef<iShader >,csStringID > *|csHash<csRef<iShader >,CS::StringID<CS::StringSetTag::General >,CS::Memory::AllocatorMalloc > *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_csHashTcsRefTiShader_t_CS__StringIDTCS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerTCS__Container__HashElementTcsRefTiShader_t_CS__StringIDTCS__StringSetTag__General_t_t_t_t = {"_p_csHashTcsRefTiShader_t_CS__StringIDTCS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerTCS__Container__HashElementTcsRefTiShader_t_CS__StringIDTCS__StringSetTag__General_t_t_t_t", "csHash<csRef<iShader >,CS::StringID<CS::StringSetTag::General > > *|csHash<csRef<iShader >,csStringID > *|csHash<csRef<iShader >,CS::StringID<CS::StringSetTag::General >,CS::Memory::AllocatorMalloc,csArrayElementHandler<CS::Container::HashElement<csRef<iShader >,CS::StringID<CS::StringSetTag::General > > > > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csImageArea = {"_p_csImageArea", "csImageArea *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csPixelCoord = {"_p_csPixelCoord", "csPixelCoord *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csPixelFormat = {"_p_csPixelFormat", "csPixelFormat *", 0, 0, (void*)0, 0};
@@ -21677,7 +22059,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_csFlags,
   &_swigt__p_csGlyphMetrics,
   &_swigt__p_csGraphics3DCaps,
-  &_swigt__p_csHashTcsRefTiShader_t_CS__StringIDTCS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t,
+  &_swigt__p_csHashTcsRefTiShader_t_CS__StringIDTCS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerTCS__Container__HashElementTcsRefTiShader_t_CS__StringIDTCS__StringSetTag__General_t_t_t_t,
   &_swigt__p_csImageArea,
   &_swigt__p_csImageBase,
   &_swigt__p_csImageMemory,
@@ -21852,7 +22234,7 @@ static swig_cast_info _swigc__p_csBitmapMetrics[] = {  {&_swigt__p_csBitmapMetri
 static swig_cast_info _swigc__p_csFlags[] = {  {&_swigt__p_csFlags, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csGlyphMetrics[] = {  {&_swigt__p_csGlyphMetrics, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csGraphics3DCaps[] = {  {&_swigt__p_csGraphics3DCaps, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csHashTcsRefTiShader_t_CS__StringIDTCS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t[] = {  {&_swigt__p_csHashTcsRefTiShader_t_CS__StringIDTCS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_csHashTcsRefTiShader_t_CS__StringIDTCS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerTCS__Container__HashElementTcsRefTiShader_t_CS__StringIDTCS__StringSetTag__General_t_t_t_t[] = {  {&_swigt__p_csHashTcsRefTiShader_t_CS__StringIDTCS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerTCS__Container__HashElementTcsRefTiShader_t_CS__StringIDTCS__StringSetTag__General_t_t_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csImageArea[] = {  {&_swigt__p_csImageArea, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csPixelCoord[] = {  {&_swigt__p_csPixelCoord, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csPixelFormat[] = {  {&_swigt__p_csPixelFormat, 0, 0, 0},{0, 0, 0, 0}};
@@ -22029,7 +22411,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_csFlags,
   _swigc__p_csGlyphMetrics,
   _swigc__p_csGraphics3DCaps,
-  _swigc__p_csHashTcsRefTiShader_t_CS__StringIDTCS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t,
+  _swigc__p_csHashTcsRefTiShader_t_CS__StringIDTCS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_csArrayElementHandlerTCS__Container__HashElementTcsRefTiShader_t_CS__StringIDTCS__StringSetTag__General_t_t_t_t,
   _swigc__p_csImageArea,
   _swigc__p_csImageBase,
   _swigc__p_csImageMemory,

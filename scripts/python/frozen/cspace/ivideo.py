@@ -189,6 +189,9 @@ class iGraphics2D(core.iBase):
     def GetName(*args): return _ivideo.iGraphics2D_GetName(*args)
     def CreateOffscreenCanvas(*args): return _ivideo.iGraphics2D_CreateOffscreenCanvas(*args)
     def Write(*args): return _ivideo.iGraphics2D_Write(*args)
+    def SetViewport(*args): return _ivideo.iGraphics2D_SetViewport(*args)
+    def GetViewport(*args): return _ivideo.iGraphics2D_GetViewport(*args)
+    def GetFramebufferDimensions(*args): return _ivideo.iGraphics2D_GetFramebufferDimensions(*args)
     scfGetVersion = staticmethod(_ivideo.iGraphics2D_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iGraphics2D
     __del__ = lambda self : None;
@@ -371,6 +374,7 @@ class csSimpleRenderMesh(object):
     z_buf_mode = _swig_property(_ivideo.csSimpleRenderMesh_z_buf_mode_get, _ivideo.csSimpleRenderMesh_z_buf_mode_set)
     mixmode = _swig_property(_ivideo.csSimpleRenderMesh_mixmode_get, _ivideo.csSimpleRenderMesh_mixmode_set)
     object2world = _swig_property(_ivideo.csSimpleRenderMesh_object2world_get, _ivideo.csSimpleRenderMesh_object2world_set)
+    renderBuffers = _swig_property(_ivideo.csSimpleRenderMesh_renderBuffers_get, _ivideo.csSimpleRenderMesh_renderBuffers_set)
     def __init__(self, *args): 
         this = _ivideo.new_csSimpleRenderMesh(*args)
         try: self.this.append(this)
@@ -826,6 +830,8 @@ class iTextureHandle(core.iBase):
     natureIndirect = _ivideo.iTextureHandle_natureIndirect
     natureDirect = _ivideo.iTextureHandle_natureDirect
     def GetBufferNature(*args): return _ivideo.iTextureHandle_GetBufferNature(*args)
+    def SetMipmapLimits(*args): return _ivideo.iTextureHandle_SetMipmapLimits(*args)
+    def GetMipmapLimits(*args): return _ivideo.iTextureHandle_GetMipmapLimits(*args)
     scfGetVersion = staticmethod(_ivideo.iTextureHandle_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iTextureHandle
     __del__ = lambda self : None;

@@ -92,6 +92,13 @@ package cspace;
 *csevFrame = *cspacec::csevFrame;
 *csevInput = *cspacec::csevInput;
 *csevQuit = *cspacec::csevQuit;
+*csevCanvasClose = *cspacec::csevCanvasClose;
+*csevCanvasExposed = *cspacec::csevCanvasExposed;
+*csevCanvasHidden = *cspacec::csevCanvasHidden;
+*csevCanvasResize = *cspacec::csevCanvasResize;
+*csevFocusChanged = *cspacec::csevFocusChanged;
+*csevFocusGained = *cspacec::csevFocusGained;
+*csevFocusLost = *cspacec::csevFocusLost;
 *csevKeyboardEvent = *cspacec::csevKeyboardEvent;
 *csevKeyboardDown = *cspacec::csevKeyboardDown;
 *csevKeyboardUp = *cspacec::csevKeyboardUp;
@@ -8673,6 +8680,9 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetName = *cspacec::iGraphics2D_GetName;
 *CreateOffscreenCanvas = *cspacec::iGraphics2D_CreateOffscreenCanvas;
 *Write = *cspacec::iGraphics2D_Write;
+*SetViewport = *cspacec::iGraphics2D_SetViewport;
+*GetViewport = *cspacec::iGraphics2D_GetViewport;
+*GetFramebufferDimensions = *cspacec::iGraphics2D_GetFramebufferDimensions;
 *scfGetVersion = *cspacec::iGraphics2D_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -8826,6 +8836,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *swig_mixmode_set = *cspacec::csSimpleRenderMesh_mixmode_set;
 *swig_object2world_get = *cspacec::csSimpleRenderMesh_object2world_get;
 *swig_object2world_set = *cspacec::csSimpleRenderMesh_object2world_set;
+*swig_renderBuffers_get = *cspacec::csSimpleRenderMesh_renderBuffers_get;
+*swig_renderBuffers_set = *cspacec::csSimpleRenderMesh_renderBuffers_set;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csSimpleRenderMesh(@_);
@@ -19234,6 +19246,50 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         cspacec::delete_iRenderLoopManager($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iCollection ##############
+
+package cspace::iCollection;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*QueryObject = *cspacec::iCollection_QueryObject;
+*Add = *cspacec::iCollection_Add;
+*Remove = *cspacec::iCollection_Remove;
+*ReleaseAllObjects = *cspacec::iCollection_ReleaseAllObjects;
+*IsParentOf = *cspacec::iCollection_IsParentOf;
+*FindSector = *cspacec::iCollection_FindSector;
+*FindMeshObject = *cspacec::iCollection_FindMeshObject;
+*FindMeshFactory = *cspacec::iCollection_FindMeshFactory;
+*FindTexture = *cspacec::iCollection_FindTexture;
+*FindMaterial = *cspacec::iCollection_FindMaterial;
+*FindShader = *cspacec::iCollection_FindShader;
+*FindCameraPosition = *cspacec::iCollection_FindCameraPosition;
+*scfGetVersion = *cspacec::iCollection_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iCollection($self);
         delete $OWNER{$self};
     }
 }
