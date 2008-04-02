@@ -18,6 +18,8 @@ chronological order.
 	- res fixed a strict aliasing violation in csFixedSizeAllocator that
 	  caused crashes in optimize mode.
 	- res silenced a strict aliasing warning in svarrayholder.h.
+	- res fixed the Cg plugin not compiling programs unless debug dumping
+	  is enabled.
 1-Apr-2008
 	- res fixed a missing 'break' in the terrain2 loader.
 	- res changed the csHash<> implementation to move the Element type out

@@ -524,11 +524,10 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
     variablemap.ShrinkBestFit();
   }
   
-  if (shaderPlug->debugDump && (assumedConstParams == 0))
-  {
+  if (assumedConstParams == 0)
     cgCompileProgram (program);
+  if (shaderPlug->debugDump)
     DoDebugDump();
-  }
 
   return true;
 }
