@@ -33,12 +33,12 @@ namespace CS
     void HDRExposureLinear::Initialize (iObjectRegistry* objReg,
       PostEffectManager& postEffects)
     {
-      PostEffectManager::LayerOptions screenOpts =
-        postEffects.GetScreenLayer()->GetOptions();
-      screenOpts.mipmap = true;
-      screenOpts.maxMipmap = csMax (screenOpts.maxMipmap, 2);
-      screenOpts.noTextureReuse = true;
-      postEffects.GetScreenLayer()->SetOptions (screenOpts);
+      measureLayer = postEffects.GetLastLayer();
+      PostEffectManager::LayerOptions measureOpts = measureLayer->GetOptions();
+      measureOpts.mipmap = true;
+      measureOpts.maxMipmap = csMax (measureOpts.maxMipmap, 2);
+      measureOpts.noTextureReuse = true;
+      measureLayer->SetOptions (measureOpts);
       
       csRef<iLoader> loader (csQueryRegistry<iLoader> (objReg));
       CS_ASSERT(loader);
@@ -61,10 +61,10 @@ namespace CS
     
     void HDRExposureLinear::ApplyExposure (PostEffectManager& postEffects)
     {
-      iTextureHandle* screenTex = postEffects.GetScreenTarget();
-      csRef<iDataBuffer> newData = screenTex->Readback (readbackFmt, 2);
+      iTextureHandle* measureTex = postEffects.GetLayerOutput (measureLayer);
+      csRef<iDataBuffer> newData = measureTex->Readback (readbackFmt, 2);
       int newW, newH;
-      screenTex->GetRendererDimensions (newW, newH);
+      measureTex->GetRendererDimensions (newW, newH);
       
       csTicks currentTime = csGetTicks();
       if (lastData.IsValid() && (lastTime != 0))
@@ -77,17 +77,17 @@ namespace CS
           int r = *rgba++;
           int g = *rgba++;
           int b = *rgba++;
-          /*int a = **/rgba++;
+          rgba++;
           float lum = r*(0.2126f/255) + g*(0.7152f/255) + b*(0.722f/255);
           totalLum += lum;
         }
         
-        const float exposureAdjust = csMin (0.5f*(currentTime-lastTime)/1000.0f, 0.2f);
-        const float targetLum = 0.8f;
-        float avgLum = totalLum / numPixels;
-        if (avgLum >= targetLum+0.1f)
+        uint deltaTime = csMin (currentTime-lastTime, (uint)33);
+        const float exposureAdjust = exposureChangeRate*deltaTime/1000.0f;
+        float avgLum = (totalLum / numPixels) * exposure;
+        if (avgLum >= targetAvgLum+targetAvgLumTolerance)
           exposure -= exposureAdjust;
-        else if (avgLum <= targetLum-0.1f)
+        else if (avgLum <= targetAvgLum-targetAvgLumTolerance)
           exposure += exposureAdjust;
           
         svHDRScale->SetValue (csVector4 (1.0f/exposure, exposure, 0, 0));

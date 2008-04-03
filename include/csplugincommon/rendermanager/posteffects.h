@@ -153,6 +153,9 @@ namespace RenderManager
     /// Get the layer representing the "screen" a scene is rendered to.
     Layer* GetScreenLayer() { return postLayers[0]; }
     
+    /// Get the layer that was added last
+    Layer* GetLastLayer() { return lastLayer; }
+    
     iTextureHandle* GetLayerOutput (const Layer* layer)
     {
       return GetBucket (layer->options).textures[layer->outTextureNum];
