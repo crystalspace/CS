@@ -152,8 +152,12 @@ csPtr<iRenderLoop> csRenderLoopManager::Create ()
 bool csRenderLoopManager::Register (const char* name, iRenderLoop* loop)
 {
   const char* myName = strings.Request (strings.Request (name));
-  if (loops.In (myName)) return false;
-  loops.Put (myName, loop);
+  if (loops.In (myName))
+  {
+    if(loops.Get(name, 0))
+      return false;
+  }
+  loops.PutUnique (myName, loop);
   return true;
 }
  

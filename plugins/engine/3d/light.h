@@ -644,11 +644,11 @@ public:
   /// Override FreeLight
   virtual void FreeLight (iLight*) { }
 
-  virtual int GetCount () const { return (int)list.GetSize (); }
-  virtual iLight *Get (int n) const { return list.Get (n); }
+  virtual size_t GetCount () const { return list.GetSize (); }
+  virtual iLight *Get (size_t n) const { return list.Get (n); }
   virtual int Add (iLight *obj);
   virtual bool Remove (iLight *obj);
-  virtual bool Remove (int n);
+  virtual bool Remove (size_t n);
   virtual void RemoveAll ();
   virtual int Find (iLight *obj) const;
   virtual iLight *FindByName (const char *Name) const;

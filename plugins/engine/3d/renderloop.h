@@ -22,8 +22,8 @@
 #ifndef __CS_CSENGINE_RENDERLOOP_H__
 #define __CS_CSENGINE_RENDERLOOP_H__
 
-#include "csutil/hashr.h"
-#include "csutil/refarr.h"
+#include "csutil/weakrefhashr.h"
+#include "csutil/weakrefarr.h"
 #include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/csobject.h"
@@ -73,7 +73,8 @@ public:
 class csRenderLoopManager : public scfImplementation1<csRenderLoopManager,
                                                       iRenderLoopManager>
 {
-  typedef csHashReversible<csRef<iRenderLoop>, const char*> LoopsHash;
+  typedef csWeakRefHashReversible<iRenderLoop, const char*> LoopsHash;
+
   LoopsHash loops;
   csStringSet strings;
 

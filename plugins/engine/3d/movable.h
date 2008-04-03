@@ -37,8 +37,7 @@ class csCamera;
 
 /// A list of sectors as the movable uses it
 class csMovableSectorList : public scfImplementation1<csMovableSectorList,
-				iSectorList>,
-                            public csRefArrayObject<iSector>
+				            iSectorList>, public csWeakRefArrayObject<iSector>
 {
 private:
   csMovable* movable;
@@ -51,14 +50,14 @@ public:
 
   bool PrepareSector (iSector* item);
 
-  virtual int GetCount () const { return (int)GetSize (); }
-  virtual iSector *Get (int n) const { return (*this)[n]; }
+  virtual size_t GetCount () { Compact(); return GetSize (); }
+  virtual iSector *Get (size_t n) const { return (*this)[n]; }
   virtual int Add (iSector *obj);
   virtual bool Remove (iSector *obj);
   virtual bool Remove (int n);
   virtual void RemoveAll ();
   virtual int Find (iSector *obj) const;
-  virtual iSector *FindByName (const char *Name) const;
+  virtual iSector *FindByName (const char *Name);
 };
 
 /**

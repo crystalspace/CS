@@ -182,8 +182,8 @@ iMaterialWrapper* StdLoaderContext::FindMaterial (const char* filename)
     char const* n = strchr (filename, '/');
     if (!n) n = filename;
     else n++;
-    iMaterialWrapper *mat = Engine->GetMaterialList ()
-      	->NewMaterial (material, n);
+    csRef<iMaterialWrapper> mat;
+    mat.AttachNew(Engine->GetMaterialList ()->NewMaterial (material, n));
 
     if(region)
     {
@@ -192,6 +192,10 @@ iMaterialWrapper* StdLoaderContext::FindMaterial (const char* filename)
     else if(collection)
     {
       collection->Add(mat->QueryObject());
+    }
+    else
+    {
+      Engine->GetDefaultCollection()->Add(mat->QueryObject());
     }
 
     iTextureManager *tm;
@@ -239,8 +243,9 @@ iMaterialWrapper* StdLoaderContext::FindNamedMaterial (const char* name,
     char const* n = strchr (name, '/');
     if (!n) n = name;
     else n++;
-    iMaterialWrapper *mat = Engine->GetMaterialList ()
-      	->NewMaterial (material, n);
+    csRef<iMaterialWrapper> mat;
+    mat.AttachNew(Engine->GetMaterialList ()->NewMaterial (material, n));
+
     if (region)
     {
         region->QueryObject ()->ObjAdd (mat->QueryObject ());
@@ -340,7 +345,7 @@ iShader* StdLoaderContext::FindShader (const char *name)
     return shader;
   }
 
-  csRefArray<iShader> shaders = shaderMgr->GetShaders ();
+  csWeakRefArray<iShader> shaders = shaderMgr->GetAllShaders ();
   size_t i;
   for (i = 0 ; i < shaders.GetSize () ; i++)
   {
@@ -1779,8 +1784,9 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode,
       case XMLTOKEN_START:
       {
 	const char* name = child->GetAttributeValue ("name");
-	iCameraPosition* campos = Engine->GetCameraPositions ()->
-	  	NewCameraPosition (name ? name : "Start");
+	csRef<iCameraPosition> campos;
+  campos.AttachNew(Engine->GetCameraPositions ()->
+	  	NewCameraPosition (name ? name : "Start"));
 	AddToRegionOrCollection (ldr_context, campos->QueryObject ());
 	if (!ParseStart (child, campos))
 	  return false;
@@ -5205,7 +5211,6 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
   l->QueryObject ()->ObjAddChildren (&Keys);
   Keys.ObjRemoveAll ();
 
-  l->IncRef ();	// To make sure smart pointer doesn't release.
   return l;
 }
 
@@ -5484,7 +5489,7 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
   iSector* sector = ldr_context->FindSector (secname);
   if (sector == 0)
   {
-    sector = Engine->CreateSector (secname);
+      sector = Engine->CreateSector (secname, ldr_context->GetCollection(), ldr_context->GetRegion());
     AddToRegionOrCollection (ldr_context, sector->QueryObject ());
   }
   
@@ -5681,11 +5686,10 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
         break;
       case XMLTOKEN_LIGHT:
         {
-	  iLight* sl = ParseStatlight (ldr_context, child);
-	  if (!sl) return 0;
+          iLight* sl = ParseStatlight (ldr_context, child);
+          if (!sl) return 0;
           sector->GetLights ()->Add (sl);
-	  sl->DecRef ();
-	}
+        }
         break;
       case XMLTOKEN_NODE:
         {

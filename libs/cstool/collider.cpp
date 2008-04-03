@@ -304,9 +304,8 @@ void csColliderHelper::InitializeCollisionWrappers (iCollideSystem* colsys,
   	iEngine* engine, iCollection* collection)
 {
   // Initialize all mesh objects for collision detection.
-  int i;
   iMeshList* meshes = engine->GetMeshes ();
-  for (i = 0 ; i < meshes->GetCount () ; i++)
+  for (size_t i = 0 ; i < meshes->GetCount () ; i++)
   {
     iMeshWrapper* sp = meshes->Get (i);
     if (collection && !collection->IsParentOf(sp->QueryObject ())) continue;
@@ -318,9 +317,8 @@ void csColliderHelper::InitializeCollisionWrappers (iCollideSystem* colsys,
   	iEngine* engine, iRegion* region)
 {
   // Initialize all mesh objects for collision detection.
-  int i;
   iMeshList* meshes = engine->GetMeshes ();
-  for (i = 0 ; i < meshes->GetCount () ; i++)
+  for (size_t i = 0 ; i < meshes->GetCount () ; i++)
   {
     iMeshWrapper* sp = meshes->Get (i);
     if (region && !region->IsInRegion (sp->QueryObject ())) continue;
@@ -812,7 +810,7 @@ int csColliderActor::CollisionDetect (
       CD_contact = cdsys->GetCollisionPairs ();
       size_t count = cdsys->GetCollisionPairCount();
       iSectorList * sectors = meshMovable->GetSectors();
-      int sector_max = sectors->GetCount ();
+      size_t sector_max = sectors->GetCount ();
       csReversibleTransform temptrans(*old_transform);
 
       for (size_t j = 0; j < count; j++ )
@@ -823,7 +821,6 @@ int csColliderActor::CollisionDetect (
         * in is not the sector of the mesh we collided with,
         * this is invalid.
         */
-        int sector_idx;
         iSector* CollisionSector;
         bool mirror=false;
 
@@ -858,7 +855,7 @@ int csColliderActor::CollisionDetect (
 
           // Iterate through all the sectors of the destination mesh,
           // incase it's in multiple sectors.
-          for (sector_idx=0 ; sector_idx<sector_max ; sector_idx++)
+          for (size_t sector_idx=0 ; sector_idx<sector_max ; sector_idx++)
           {
             // Check to see if this sector is the sector of the collision.
             if (CollisionSector == sectors->Get (sector_idx))

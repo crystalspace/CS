@@ -426,12 +426,12 @@ struct iLight : public virtual iBase
  */
 struct iLightList : public virtual iBase
 {
-  SCF_INTERFACE(iLightList,2,0,0);
+  SCF_INTERFACE(iLightList,2,1,0);
   /// Return the number of lights in this list.
-  virtual int GetCount () const = 0;
+  virtual size_t GetCount () const = 0;
 
   /// Return a light by index.
-  virtual iLight *Get (int n) const = 0;
+  virtual iLight *Get (size_t n) const = 0;
 
   /// Add a light.
   virtual int Add (iLight *obj) = 0;
@@ -440,7 +440,7 @@ struct iLightList : public virtual iBase
   virtual bool Remove (iLight *obj) = 0;
 
   /// Remove the nth light.
-  virtual bool Remove (int n) = 0;
+  virtual bool Remove (size_t n) = 0;
 
   /// Remove all lights.
   virtual void RemoveAll () = 0;

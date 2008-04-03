@@ -896,12 +896,12 @@ struct iMeshFactoryWrapper : public virtual iBase
  */
 struct iMeshList : public virtual iBase
 {
-  SCF_INTERFACE(iMeshList, 2,0,0);
+  SCF_INTERFACE(iMeshList, 2,1,0);
   /// Return the number of meshes in this list
-  virtual int GetCount () const = 0;
+  virtual size_t GetCount () = 0;
 
   /// Return a mesh by index
-  virtual iMeshWrapper *Get (int n) const = 0;
+  virtual iMeshWrapper *Get (size_t n) const = 0;
 
   /// Add a mesh
   virtual int Add (iMeshWrapper *obj) = 0;
@@ -923,7 +923,7 @@ struct iMeshList : public virtual iBase
    * then this function is able to search for children too.
    * i.e. like mesh:childmesh:childmesh.
    */
-  virtual iMeshWrapper *FindByName (const char *Name) const = 0;
+  virtual iMeshWrapper *FindByName (const char *Name) = 0;
 };
 
 /**
@@ -938,12 +938,12 @@ struct iMeshList : public virtual iBase
  */
 struct iMeshFactoryList : public virtual iBase
 {
-  SCF_INTERFACE(iMeshFactoryList,2,0,0);
+  SCF_INTERFACE(iMeshFactoryList,2,1,0);
   /// Return the number of mesh factory wrappers in this list.
-  virtual int GetCount () const = 0;
+  virtual size_t GetCount () = 0;
 
   /// Return a mesh factory wrapper by index.
-  virtual iMeshFactoryWrapper *Get (int n) const = 0;
+  virtual iMeshFactoryWrapper *Get (size_t n) const = 0;
 
   /// Add a mesh factory wrapper.
   virtual int Add (iMeshFactoryWrapper *obj) = 0;
@@ -952,7 +952,7 @@ struct iMeshFactoryList : public virtual iBase
   virtual bool Remove (iMeshFactoryWrapper *obj) = 0;
 
   /// Remove the nth mesh factory wrapper.
-  virtual bool Remove (int n) = 0;
+  virtual bool Remove (size_t n) = 0;
 
   /// Remove all mesh factory wrappers.
   virtual void RemoveAll () = 0;
@@ -961,7 +961,7 @@ struct iMeshFactoryList : public virtual iBase
   virtual int Find (iMeshFactoryWrapper *obj) const = 0;
 
   /// Find a mesh factory wrapper by name.
-  virtual iMeshFactoryWrapper *FindByName (const char *Name) const = 0;
+  virtual iMeshFactoryWrapper *FindByName (const char *Name) = 0;
 };
 
 /**

@@ -153,6 +153,7 @@ csSector::~csSector ()
 {
   CleanupLSI ();
   lights.RemoveAll ();
+  meshes.RemoveAll ();
 }
 
 void csSector::SelfDestruct ()
@@ -180,7 +181,7 @@ void csSector::SetLightCulling (bool enable)
 {
   if (enable == use_lightculling) return;
   use_lightculling = enable;
-  int i;
+  size_t i;
   if (use_lightculling)
   {
     for (i = 0; i < lights.GetCount (); i++)
@@ -223,17 +224,17 @@ void csSector::FireLightVisibleCallbacks (iLight* light)
 
 void csSector::UnlinkObjects ()
 {
-  int i;
-  for (i = meshes.GetCount()-1; i >= 0; i--)
+  size_t i;
+  for (i = meshes.GetCount(); i > 0; i--)
   {
-    iMeshWrapper* m = meshes.Get (i);
+    csRef<iMeshWrapper> m = meshes.Get (i-1);
     iSectorList* sl = m->GetMovable ()->GetSectors ();
     sl->Remove ((iSector*)this);
     m->GetMovable ()->UpdateMove ();
   }
-  for (i = lights.GetCount()-1; i >= 0; i--)
+  for (i = lights.GetCount(); i > 0; i--)
   {
-    iLight* l = lights.Get (i);
+    csRef<iLight> l = lights.Get (i-1);
     iSectorList* sl = l->GetMovable ()->GetSectors ();
     sl->Remove ((iSector*)this);
     l->GetMovable ()->UpdateMove ();
@@ -297,17 +298,16 @@ void csSector::PrepareMesh (iMeshWrapper *mesh)
 
 void csSector::UnprepareMesh (iMeshWrapper *mesh)
 {
-  cameraMeshes.Delete (mesh);
-
-  if (culler) UnregisterMeshToCuller (mesh);
-  size_t i;
   const csRefArray<iSceneNode>& ml = ((csMeshWrapper*)mesh)->GetChildren ();
-  for (i = 0 ; i < ml.GetSize () ; i++)
+  for (size_t i = 0 ; i < ml.GetSize () ; i++)
   {
     iMeshWrapper* child = ml[i]->QueryMesh ();
     if (child)
       UnprepareMesh (child);
   }
+
+  cameraMeshes.Delete (mesh);
+  if (culler) UnregisterMeshToCuller (mesh);
 }
 
 void csSector::RelinkMesh (iMeshWrapper *mesh)
@@ -333,8 +333,7 @@ void csSector::PrecacheDraw ()
   // First calculate the box of all objects in the level.
   csBox3 box;
   box.StartBoundingBox ();
-  int i;
-  for (i = 0; i < meshes.GetCount (); i++)
+  for (size_t i = 0; i < meshes.GetCount (); i++)
   {
     iMeshWrapper* m = meshes.Get (i);
     const csBox3& mesh_box = m->GetWorldBoundingBox ();
@@ -374,8 +373,7 @@ bool csSector::SetVisibilityCullerPlugin (const char *plugname,
 {
   if (use_lightculling)
   {
-    int i;
-    for (i = 0; i < lights.GetCount (); i++)
+    for (size_t i = 0; i < lights.GetCount (); i++)
     {
       iLight* l = lights.Get (i);
       csLight* clight = ((csLight*)l)->GetPrivateObject ();
@@ -409,8 +407,7 @@ bool csSector::SetVisibilityCullerPlugin (const char *plugname,
   culler->Setup (cachename);
 
   // Loop through all meshes and register them to the visibility culler.
-  int i;
-  for (i = 0; i < meshes.GetCount (); i++)
+  for (size_t i = 0; i < meshes.GetCount (); i++)
   {
     iMeshWrapper* m = meshes.Get (i);
     m->GetMovable ()->UpdateMove ();
@@ -418,7 +415,7 @@ bool csSector::SetVisibilityCullerPlugin (const char *plugname,
   }
   if (use_lightculling)
   {
-    for (i = 0; i < lights.GetCount (); i++)
+    for (size_t i = 0; i < lights.GetCount (); i++)
     {
       iLight* l = lights.Get (i);
       csLight* clight = ((csLight*)l)->GetPrivateObject ();
@@ -1041,8 +1038,7 @@ void csSector::RealCheckFrustum (iFrustumView *lview)
 
 void csSector::ShineLightsInt (csProgressPulse *pulse)
 {
-  int i;
-  for (i = 0; i < lights.GetCount (); i++)
+  for (size_t i = 0; i < lights.GetCount (); i++)
   {
     if (pulse != 0) pulse->Step ();
 
@@ -1053,8 +1049,7 @@ void csSector::ShineLightsInt (csProgressPulse *pulse)
 
 void csSector::ShineLightsInt (iMeshWrapper *mesh, csProgressPulse *pulse)
 {
-  int i;
-  for (i = 0; i < lights.GetCount (); i++)
+  for (size_t i = 0; i < lights.GetCount (); i++)
   {
     if (pulse != 0) pulse->Step ();
 
@@ -1070,15 +1065,14 @@ void csSector::SetDynamicAmbientLight (const csColor& color)
   svDynamicAmbient->SetValue (dynamicAmbientLightColor);
 }
 
-void csSector::CalculateSectorBBox (csBox3 &bbox, bool do_meshes) const
+void csSector::CalculateSectorBBox (csBox3 &bbox, bool do_meshes)
 {
   bbox.StartBoundingBox ();
 
   csBox3 b;
-  int i;
   if (do_meshes)
   {
-    for (i = 0; i < meshes.GetCount (); i++)
+    for (size_t i = 0; i < meshes.GetCount (); i++)
     {
       iMeshWrapper *mesh = meshes.Get (i);
       b = mesh->GetTransformedBoundingBox (
@@ -1240,7 +1234,10 @@ int csSectorList::Add (iSector *obj)
 {
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
+  {
+    sectors_hash.Compact();
     sectors_hash.Put (name, obj);
+  }
   obj->QueryObject ()->AddNameChangeListener (listener);
   return (int)list.Push (obj);
 }
@@ -1270,7 +1267,7 @@ bool csSectorList::Remove (int n)
 void csSectorList::RemoveAll ()
 {
   size_t i;
-  for (i = 0 ; i < list.GetSize () ; i++)
+  for (i = 0 ; i < GetCount(); i++)
   {
     list[i]->QueryObject ()->RemoveNameChangeListener (listener);
     FreeSector (list[i]);
@@ -1284,7 +1281,8 @@ int csSectorList::Find (iSector *obj) const
   return (int)list.Find (obj);
 }
 
-iSector *csSectorList::FindByName (const char *Name) const
+iSector *csSectorList::FindByName (const char *Name)
 {
+  sectors_hash.Compact();
   return sectors_hash.Get (Name, 0);
 }

@@ -117,9 +117,9 @@ private:
   // The collection we are iterating in (optional).
   iCollection* collection;
   // Current sector index.
-  int sectorIndex;
+  size_t sectorIndex;
   // Current light index.
-  int lightIndex;
+  size_t lightIndex;
   // Get current light.
   iLight* currentLight;
 
@@ -166,7 +166,7 @@ public:
   virtual int Find (iCameraPosition *obj) const;
   virtual iCameraPosition *FindByName (const char *Name) const;
 private:
-  csRefArrayObject<iCameraPosition> positions;
+  csWeakRefArrayObject<iCameraPosition> positions;
 };
 
 /**
@@ -343,9 +343,8 @@ public:
   virtual csPtr<iLight> CreateLight (const char* name, const csVector3& pos,
   	float radius, const csColor& color,
 	csLightDynamicType dyntype = CS_LIGHT_DYNAMICTYPE_STATIC);
-  virtual iLight* FindLight (const char *Name, bool RegionOnly = false)
-    const;
-  virtual iLight* FindLightID (const char* light_id) const;
+  virtual iLight* FindLight (const char *Name, bool RegionOnly = false);
+  virtual iLight* FindLightID (const char* light_id);
 
   virtual csPtr<iLightIterator> GetLightIterator (iBase* base = 0)
   {
@@ -384,7 +383,7 @@ public:
   
   //-- Sector handling
 
-  virtual iSector *CreateSector (const char *name);
+  virtual iSector *CreateSector (const char *name, iCollection *col = 0, iRegion *reg = 0);
   virtual iSectorList* GetSectors ()
   { return &sectors; }
   virtual iSector* FindSector (const char* name,

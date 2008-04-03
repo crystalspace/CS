@@ -49,8 +49,9 @@ csSharedVariableList::~csSharedVariableList ()
   list.DeleteAll ();
 }
 
-int csSharedVariableList::GetCount () const
+int csSharedVariableList::GetCount ()
 {
+  list.Compact();
   return (int)list.GetSize ();
 }
 

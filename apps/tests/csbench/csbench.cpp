@@ -499,8 +499,8 @@ void CsBench::PerformShaderTest (const char* shaderPath, const char* shtype,
       matinput->SetShader (shadertype, shader);
       if (shader2)
 	matinput->SetShader (shadertype2, shader2);
-      iMaterialWrapper* mat = engine->GetMaterialList ()->NewMaterial (
-      	matinput, 0);
+      csRef<iMaterialWrapper> mat;
+      mat.AttachNew(engine->GetMaterialList ()->NewMaterial (matinput, 0));
       mesh->SetMaterialWrapper (mat);
       walls->GetMeshObject ()->SetMaterialWrapper (mat);
 

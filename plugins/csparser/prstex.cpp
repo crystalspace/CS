@@ -344,7 +344,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       proxTex.img.AttachNew (new ProxyImage (this, filename));
       proxTex.always_animate = always_animate;
 
-      tex = Engine->GetTextureList()->NewTexture (proxTex.img);
+      tex.AttachNew(Engine->GetTextureList()->NewTexture (proxTex.img));
       tex->SetTextureClass(context.GetClass());
       tex->SetFlags(context.GetFlags());
       tex->QueryObject()->SetName(txtname);
@@ -669,7 +669,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       flatSV->SetValue (col);
     }
 
-    iMaterialWrapper *mat;
+    csRef<iMaterialWrapper> mat;
 
     if (prefix)
     {
@@ -677,12 +677,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       strcpy (prefixedname, prefix);
       strcat (prefixedname, "_");
       strcat (prefixedname, matname);
-      mat = Engine->GetMaterialList ()->NewMaterial (material, prefixedname);
+      mat.AttachNew(Engine->GetMaterialList ()->NewMaterial (material, prefixedname));
       delete [] prefixedname;
     }
     else
     {
-      mat = Engine->GetMaterialList ()->NewMaterial (material, matname);
+      mat.AttachNew(Engine->GetMaterialList ()->NewMaterial (material, matname));
     }
 
     size_t i;
@@ -691,8 +691,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       material->SetShader (shadertypes[i], shaders[i]);
     for (i=0; i<shadervars.GetSize (); i++)
       material->AddVariable (shadervars[i]);
-
-    // dereference material since mat already incremented it
 
     for (i = 0 ; i < key_nodes.GetSize () ; i++)
     {

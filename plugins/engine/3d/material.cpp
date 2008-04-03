@@ -221,20 +221,26 @@ void csMaterialList::NameChanged (iObject* object, const char* oldname,
 iMaterialWrapper *csMaterialList::NewMaterial (iMaterial *material,
 	const char* name)
 {
-  csWeakRef<iMaterialWrapper> tm = new csMaterialWrapper (this, material);
-  tm->QueryObject ()->SetName (name);
+  iMaterialWrapper* mw = new csMaterialWrapper (this, material);
+  mw->QueryObject ()->SetName (name);
   if (name)
-    mat_hash.Put (name, tm);
-  list.Push (tm);
-  tm->QueryObject ()->AddNameChangeListener (listener);
-  return tm;
+  {
+    mat_hash.Compact();
+    mat_hash.Put (name, mw);
+  }
+  list.Push (mw);
+  mw->QueryObject ()->AddNameChangeListener (listener);
+  return mw;
 }
 
 int csMaterialList::Add (iMaterialWrapper *obj)
 {
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
+  {
+    mat_hash.Compact();
     mat_hash.Put (name, obj);
+  }
   obj->QueryObject ()->AddNameChangeListener (listener);
   return (int)list.Push (obj);
 }
@@ -248,7 +254,7 @@ bool csMaterialList::Remove (iMaterialWrapper *obj)
   return list.Delete (obj);
 }
 
-bool csMaterialList::Remove (int n)
+bool csMaterialList::Remove (size_t n)
 {
   iMaterialWrapper* obj = list[n];
   const char* name = obj->QueryObject ()->GetName ();
@@ -261,8 +267,10 @@ bool csMaterialList::Remove (int n)
 void csMaterialList::RemoveAll ()
 {
   size_t i;
-  for (i = 0 ; i < list.GetSize () ; i++)
+  for (i = 0 ; i < GetCount() ; i++)
+  {
     list[i]->QueryObject ()->RemoveNameChangeListener (listener);
+  }
   list.DeleteAll ();
   mat_hash.DeleteAll ();
 }
@@ -272,7 +280,8 @@ int csMaterialList::Find (iMaterialWrapper *obj) const
   return (int)list.Find (obj);
 }
 
-iMaterialWrapper *csMaterialList::FindByName (const char *Name) const
+iMaterialWrapper *csMaterialList::FindByName (const char *Name)
 {
+  mat_hash.Compact();
   return mat_hash.Get (Name, 0);
 }

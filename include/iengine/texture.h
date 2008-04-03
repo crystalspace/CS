@@ -175,7 +175,7 @@ struct iTextureWrapper : public virtual iBase
  */
 struct iTextureList : public virtual iBase
 {
-  SCF_INTERFACE (iTextureList, 1, 0, 0);
+  SCF_INTERFACE (iTextureList, 1, 0, 1);
 
   /// Create a new texture.
   virtual iTextureWrapper *NewTexture (iImage *image) = 0;
@@ -187,7 +187,7 @@ struct iTextureList : public virtual iBase
   virtual iTextureWrapper *NewTexture (iTextureHandle *ith) = 0;
 
   /// Return the number of textures in this list.
-  virtual int GetCount () const = 0;
+  virtual int GetCount () = 0;
 
   /// Return a texture by index.
   virtual iTextureWrapper *Get (int n) const = 0;

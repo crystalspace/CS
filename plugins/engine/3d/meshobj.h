@@ -28,7 +28,7 @@
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/weakref.h"
 #include "csutil/leakguard.h"
-#include "csutil/hash.h"
+#include "csutil/weakrefhash.h"
 #include "iutil/selfdestruct.h"
 #include "csgfx/shadervarcontext.h"
 #include "imesh/object.h"
@@ -60,8 +60,8 @@ class csMeshWrapper;
 class csMeshList : public scfImplementation1<csMeshList, iMeshList>
 {
 private:
-  csRefArrayObject<iMeshWrapper> list;
-  csHash<iMeshWrapper*, csString> meshes_hash;
+  csWeakRefArrayObject<iMeshWrapper> list;
+  csWeakRefHash<iMeshWrapper, csString> meshes_hash;
 
   class NameChangeListener : public scfImplementation1<NameChangeListener,
   	iObjectNameChangeListener>
@@ -95,21 +95,21 @@ public:
   virtual ~csMeshList ();
 
   /// Find a mesh in <name>:<childname>:<childname> notation.
-  iMeshWrapper *FindByNameWithChild (const char *Name) const;
+  iMeshWrapper *FindByNameWithChild (const char *Name);
 
   /// Override PrepareMesh
   virtual void PrepareMesh (iMeshWrapper*) { }
   /// Override FreeMesh
   virtual void FreeMesh (iMeshWrapper*) { }
 
-  virtual int GetCount () const { return (int)list.GetSize () ; }
-  virtual iMeshWrapper *Get (int n) const { return list.Get (n); }
+  virtual size_t GetCount () { list.Compact(); return list.GetSize () ; }
+  virtual iMeshWrapper *Get (size_t n) const { return list.Get (n); }
   virtual int Add (iMeshWrapper *obj);
   virtual bool Remove (iMeshWrapper *obj);
   virtual bool Remove (int n);
   virtual void RemoveAll ();
   virtual int Find (iMeshWrapper *obj) const;
-  virtual iMeshWrapper *FindByName (const char *Name) const;
+  virtual iMeshWrapper *FindByName (const char *Name);
 };
 
 struct LSIAndDist

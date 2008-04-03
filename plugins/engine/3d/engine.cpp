@@ -196,9 +196,9 @@ csCameraPositionList::~csCameraPositionList ()
 iCameraPosition *csCameraPositionList::NewCameraPosition (const char *name)
 {
   csVector3 v (0);
-  csRef<csCameraPosition> cp;
-  cp.AttachNew (new csCameraPosition (this, name, "", v, v, v));
+  csWeakRef<iCameraPosition> cp = new csCameraPosition (this, name, "", v, v, v);
   positions.Push (cp);
+
   return cp;
 }
 
@@ -248,10 +248,12 @@ iCameraPosition *csCameraPositionList::FindByName (
 
 void csEngineMeshList::FreeMesh (iMeshWrapper* mesh)
 {
-  mesh->GetMovable ()->ClearSectors ();
+  // Make sure the mesh exists until after the end of the function.
+  csRef<iMeshWrapper> mw = mesh;
+  mw->GetMovable ()->ClearSectors ();
   // @@@ Need similar for light/camera!
-  mesh->QuerySceneNode ()->SetParent (0);
-  csMeshList::FreeMesh (mesh);
+  mw->QuerySceneNode ()->SetParent (0);
+  csMeshList::FreeMesh (mw);
 }
 
 //---------------------------------------------------------------------------
@@ -763,8 +765,7 @@ iMeshObjectType* csEngine::GetThingType ()
 void csEngine::DeleteAllForce ()
 {
   // First notify all sector removal callbacks.
-  int i;
-  for (i = 0 ; i < sectors.GetCount () ; i++)
+  for (size_t i = 0 ; i < sectors.GetCount () ; i++)
     FireRemoveSector (sectors.Get (i));
 
   nextframePending = 0;
@@ -1012,8 +1013,7 @@ void csEngine::PrepareTextures ()
 
 void csEngine::PrepareMeshes ()
 {
-  int i;
-  for (i = 0; i < meshes.GetCount (); i++)
+  for (size_t i = 0; i < meshes.GetCount (); i++)
   {
     iMeshWrapper *sp = meshes.Get (i);
     sp->GetMovable ()->UpdateMove ();
@@ -1045,8 +1045,8 @@ void csEngine::ForceRelight (iRegion* region, iProgressMeter *meter)
 
 void csEngine::ForceRelight (iLight* light, iRegion* region)
 {
-  int sn;
-  int num_meshes = meshes.GetCount ();
+  size_t sn;
+  size_t num_meshes = meshes.GetCount ();
 
   for (sn = 0; sn < num_meshes; sn++)
   {
@@ -1089,8 +1089,8 @@ void csEngine::ForceRelight (iLight* light, iRegion* region)
 
 void csEngine::RemoveLight (iLight* light)
 {
-  int sn;
-  int num_meshes = meshes.GetCount ();
+  size_t sn;
+  size_t num_meshes = meshes.GetCount ();
 
   for (sn = 0; sn < num_meshes; sn++)
   {
@@ -1294,8 +1294,8 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
   lit->Reset ();
   while (lit->HasNext ()) { lit->Next (); light_count++; }
 
-  int sn = 0;
-  int num_meshes = meshes.GetCount ();
+  size_t sn = 0;
+  size_t num_meshes = meshes.GetCount ();
 
   if (do_relight)
   {
@@ -1480,7 +1480,7 @@ void csEngine::PrecacheDrawCollection (iCollection* collection)
   csRenderView rview (c, view, G3D, G2D);
   StartDraw (c, view, rview);
 
-  int sn;
+  size_t sn;
   for (sn = 0; sn < meshes.GetCount (); sn++)
   {
     iMeshWrapper *s = meshes.Get (sn);
@@ -1519,7 +1519,7 @@ void csEngine::PrecacheDrawRegion (iRegion* region)
   csRenderView rview (c, view, G3D, G2D);
   StartDraw (c, view, rview);
 
-  int sn;
+  size_t sn;
   for (sn = 0; sn < meshes.GetCount (); sn++)
   {
     iMeshWrapper *s = meshes.Get (sn);
@@ -1784,9 +1784,9 @@ void csEngine::RemoveHalo (csLight *Light)
   }
 }
 
-iLight *csEngine::FindLightID (const char* light_id) const
+iLight *csEngine::FindLightID (const char* light_id)
 {
-  for (int i = 0; i < sectors.GetCount (); i++)
+  for (size_t i = 0; i < sectors.GetCount (); i++)
   {
     iLight *l = sectors.Get (i)->GetLights ()->FindByID (light_id);
     if (l) return l;
@@ -1795,14 +1795,13 @@ iLight *csEngine::FindLightID (const char* light_id) const
   return 0;
 }
 
-iLight *csEngine::FindLight (const char *name, bool regionOnly) const
+iLight *csEngine::FindLight (const char *name, bool regionOnly)
 {
   // XXX: Need to implement region?
   (void)regionOnly;
 
   // @@@### regionOnly
-  int i;
-  for (i = 0; i < sectors.GetCount (); i++)
+  for (size_t i = 0; i < sectors.GetCount (); i++)
   {
     iLight *l = sectors.Get (i)->GetLights ()->FindByName (name);
     if (l) return l;
@@ -3000,11 +2999,11 @@ iTextureWrapper *csEngine::CreateTexture (
   ifile->SetName (**xname);
 
   // Okay, now create the respective texture handle object
-  iTextureWrapper *tex = GetTextures ()->FindByName (name);
+  csRef<iTextureWrapper> tex = GetTextures ()->FindByName (name);
   if (tex)
     tex->SetImageFile (ifile);
   else
-    tex = GetTextures ()->NewTexture (ifile);
+    tex.AttachNew(GetTextures ()->NewTexture (ifile));
 
   tex->SetFlags (iFlags);
   tex->QueryObject ()->SetName (name);
@@ -3082,12 +3081,25 @@ csPtr<iMeshWrapper> csEngine::CreateSectorWallsMesh (
   return csPtr<iMeshWrapper> (thing_wrap);
 }
 
-iSector *csEngine::CreateSector (const char *name)
+iSector *csEngine::CreateSector(const char *name, iCollection *col, iRegion *reg)
 {
   csRef<iSector> sector;
   sector.AttachNew (new csSector (this));
   sector->QueryObject ()->SetName (name);
   sectors.Add (sector);
+
+  if(col)
+  {
+      col->Add(sector->QueryObject());
+  }
+  else if(reg)
+  {
+      reg->Add(sector->QueryObject());
+  }
+  else
+  {
+      GetDefaultCollection()->Add(sector->QueryObject());
+  }
 
   FireNewSector (sector);
 
@@ -3465,8 +3477,8 @@ iShader* EngineLoaderContext::FindShader (const char* name)
     || (name && *name == '*')) // Always look up builtin shaders globally
     return Engine->shaderManager->GetShader (name);
 
-  const csRefArray<iShader>& shaders = 
-    Engine->shaderManager->GetShaders ();
+  const csWeakRefArray<iShader>& shaders = 
+    Engine->shaderManager->GetAllShaders ();
   size_t i;
   for (i = 0 ; i < shaders.GetSize () ; i++)
   {

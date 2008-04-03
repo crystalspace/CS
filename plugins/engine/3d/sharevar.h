@@ -160,7 +160,7 @@ public:
   /// iSharedVariable Factory method. This does not add the new var to the list.
   csPtr<iSharedVariable> New();
 
-  virtual int GetCount () const;
+  virtual int GetCount ();
   virtual iSharedVariable *Get (int n) const;
   virtual int Add (iSharedVariable *obj);
   virtual bool Remove (iSharedVariable *obj);
@@ -169,7 +169,7 @@ public:
   virtual int Find (iSharedVariable *obj) const;
   virtual iSharedVariable *FindByName (const char *Name) const;
 private:
-  csRefArrayObject<iSharedVariable> list;
+  csWeakRefArrayObject<iSharedVariable> list;
    
 };
 

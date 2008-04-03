@@ -58,7 +58,7 @@ public:
   long shape_number;	// Last used shape_number from model.
 
   // Optional data for shadows. Both fields can be 0.
-  csRef<iMeshWrapper> mesh;
+  csWeakRef<iMeshWrapper> mesh;
   csRef<iShadowCaster> caster;
 
   csFrustVisObjectWrapper (csFrustumVis* frustvis) :

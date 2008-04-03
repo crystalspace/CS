@@ -174,7 +174,7 @@ struct iEngineSectorCallback : public virtual iBase
  */
 struct iEngine : public virtual iBase
 {
-  SCF_INTERFACE(iEngine, 3, 0, 0);
+  SCF_INTERFACE(iEngine, 3, 1, 0);
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;
@@ -551,14 +551,13 @@ struct iEngine : public virtual iBase
    * \param Name the engine name of the desired light
    * \param RegionOnly (parameter presently unused)
    */
-  virtual iLight* FindLight (const char *Name, bool RegionOnly = false)
-    const = 0;
+  virtual iLight* FindLight (const char *Name, bool RegionOnly = false) = 0;
 
   /**
    * Find a static/pseudo-dynamic light by id. 
    * \param light_id a 16-byte MD5 checksum for the light.
    */
-  virtual iLight* FindLightID (const char* light_id) const = 0;
+  virtual iLight* FindLightID (const char* light_id) = 0;
 
   /**
    * Create an iterator to iterate over all static lights of the engine.
@@ -630,7 +629,7 @@ struct iEngine : public virtual iBase
    * Create a empty sector with given name.
    * \param name the sector name
    */
-  virtual iSector *CreateSector (const char *name) = 0;
+  virtual iSector *CreateSector (const char *name, iCollection *col = 0, iRegion *reg = 0) = 0;
 
   /// Get the list of sectors
   virtual iSectorList* GetSectors () = 0;

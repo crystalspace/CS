@@ -28,7 +28,7 @@
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/weakref.h"
 #include "csutil/leakguard.h"
-#include "csutil/hash.h"
+#include "csutil/weakrefhash.h"
 #include "iutil/selfdestruct.h"
 #include "csgfx/shadervarcontext.h"
 #include "imesh/object.h"
@@ -61,9 +61,9 @@ class csMeshFactoryList : public scfImplementation1<csMeshFactoryList,
 	iMeshFactoryList>
 {
 private:
-  csRefArrayObject<iMeshFactoryWrapper> list;
-  csHash<iMeshFactoryWrapper*, csString>
-  	factories_hash;
+  csWeakRefArrayObject<iMeshFactoryWrapper> list;
+  csWeakRefHash<iMeshFactoryWrapper, csString,
+         CS::Memory::AllocatorMalloc> factories_hash;
 
   class NameChangeListener : public scfImplementation1<NameChangeListener,
   	iObjectNameChangeListener>
@@ -99,14 +99,14 @@ public:
   virtual void PrepareFactory (iMeshFactoryWrapper*) { }
   virtual void FreeFactory (iMeshFactoryWrapper*) { }
 
-  virtual int GetCount () const { return (int)list.GetSize (); }
-  virtual iMeshFactoryWrapper *Get (int n) const { return list.Get (n); }
+  virtual size_t GetCount () { list.Compact(); return list.GetSize (); }
+  virtual iMeshFactoryWrapper *Get (size_t n) const { return list.Get (n); }
   virtual int Add (iMeshFactoryWrapper *obj);
   virtual bool Remove (iMeshFactoryWrapper *obj);
-  virtual bool Remove (int n);
+  virtual bool Remove (size_t n);
   virtual void RemoveAll ();
   virtual int Find (iMeshFactoryWrapper *obj) const;
-  virtual iMeshFactoryWrapper *FindByName (const char *Name) const;
+  virtual iMeshFactoryWrapper *FindByName (const char *Name);
 };
 
 /**

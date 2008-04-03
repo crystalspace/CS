@@ -80,8 +80,8 @@ iMaterialWrapper* StdLoaderContext::FindMaterial (const char* filename)
     char const* n = strchr (filename, '/');
     if (!n) n = filename;
     else n++;
-    iMaterialWrapper *mat = Engine->GetMaterialList ()
-      	->NewMaterial (material, n);
+    csRef <iMaterialWrapper> mat;
+    mat.AttachNew(Engine->GetMaterialList ()->NewMaterial (material, n));
 
     if(region)
     {
@@ -116,8 +116,8 @@ iMaterialWrapper* StdLoaderContext::FindNamedMaterial (const char* name,
     char const* n = strchr (name, '/');
     if (!n) n = name;
     else n++;
-    iMaterialWrapper *mat = Engine->GetMaterialList ()
-      	->NewMaterial (material, n);
+    csRef<iMaterialWrapper> mat;
+    mat.AttachNew(Engine->GetMaterialList ()->NewMaterial (material, n));
 
     if(region)
     {

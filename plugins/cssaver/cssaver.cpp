@@ -508,7 +508,7 @@ bool csSaver::SaveShaders (iDocumentNode *parent)
     csQueryRegistry<iShaderManager> (object_reg);
   if (!shaderMgr) return false;
 
-  csRefArray<iShader> shaders = shaderMgr->GetShaders ();
+  csWeakRefArray<iShader> shaders = shaderMgr->GetAllShaders ();
   size_t i;
   for (i = 0 ; i < shaders.GetSize () ; i++)
   {

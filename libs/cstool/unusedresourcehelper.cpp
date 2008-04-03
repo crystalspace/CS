@@ -35,7 +35,7 @@ namespace CS
         iMaterialList *matList = engine->GetMaterialList();
 
         iRegionList *regList = engine->GetRegions();
-        for(int i=0; i<matList->GetCount(); i++)
+        for(size_t i=0; i<matList->GetCount(); i++)
         {
           int regionCount = 0;
           csArray<iRegion*> regionList;
@@ -113,7 +113,7 @@ namespace CS
         iMeshFactoryList *factList = engine->GetMeshFactories();
 
         iRegionList *regList = engine->GetRegions();
-        for(int i=0; i<factList->GetCount(); i++)
+        for(size_t i=0; i<factList->GetCount(); i++)
         {
           int regionCount = 0;
           csArray<iRegion*> regionList;

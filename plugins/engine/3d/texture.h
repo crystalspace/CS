@@ -226,7 +226,7 @@ public:
    */
   virtual iTextureWrapper *NewTexture (iTextureHandle *ith);
 
-  virtual int GetCount () const;
+  virtual int GetCount ();
   virtual iTextureWrapper *Get (int n) const;
   virtual int Add (iTextureWrapper *obj);
   virtual bool Remove (iTextureWrapper *obj);

@@ -2650,7 +2650,7 @@ iMaterialWrapper* csBugPlug::FindColor (float r, float g, float b)
   // Assumes the current region is the debug region.
   csString name;
   name.Format ("mat%d,%d,%d\n", int (r*255), int (g*255), int (b*255));
-  iMaterialWrapper* mw = Engine->FindMaterial (name);
+  csRef<iMaterialWrapper> mw = Engine->FindMaterial (name);
   if (mw) return mw;
   // Create a new material.
   csRef<iMaterial> mat (Engine->CreateBaseMaterial (0));
@@ -2659,7 +2659,7 @@ iMaterialWrapper* csBugPlug::FindColor (float r, float g, float b)
   csShaderVariable* var = mat->GetVariableAdd (stringSet->Request (CS_MATERIAL_VARNAME_FLATCOLOR));
   var->SetValue (csColor (r,g,b));
 
-  mw = Engine->GetMaterialList ()->NewMaterial (mat, name);
+  mw.AttachNew(Engine->GetMaterialList ()->NewMaterial (mat, name));
   return mw;
 }
 

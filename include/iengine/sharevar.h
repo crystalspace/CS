@@ -129,9 +129,9 @@ struct iSharedVariableListener : public virtual iBase
  */
 struct iSharedVariableList : public virtual iBase
 {
-  SCF_INTERFACE(iSharedVariableList, 2,0,0);
+  SCF_INTERFACE(iSharedVariableList, 2,0,1);
   /// Return the number of Shared Variables in this list.
-  virtual int GetCount () const = 0;
+  virtual int GetCount () = 0;
 
   /// Return a SharedVariable by index.
   virtual iSharedVariable *Get (int n) const = 0;

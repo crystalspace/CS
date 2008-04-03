@@ -103,6 +103,7 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   objectreg = objreg;
   vc = csQueryRegistry<iVirtualClock> (objectreg);
   txtmgr = csQueryRegistry<iTextureManager> (objectreg);
+  csRef<iEngine> Engine = csQueryRegistry<iEngine> (objectreg);
 
   csRef<iVerbosityManager> verbosemgr (
     csQueryRegistry<iVerbosityManager> (objectreg));
@@ -137,6 +138,7 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
     csRef<csNullShader> nullShader;
     nullShader.AttachNew (new csNullShader (this));
     nullShader->SetName ("*null");
+    Engine->GetDefaultCollection()->Add(nullShader->QueryObject());
     RegisterShader (nullShader);
   }
 
@@ -277,8 +279,8 @@ void csShaderManager::UpdateStandardVariables()
   sv_time->SetValue ((float)vc->GetCurrentTicks() / 1000.0f);
 }
 
-static int ShaderCompare (iShader* const& s1,
-			  iShader* const& s2)
+static int ShaderCompare (csWeakRef<iShader> const& s1,
+			  csWeakRef<iShader> const& s2)
 {
   return strcasecmp (s1->QueryObject ()->GetName(), 
     s2->QueryObject ()->GetName());
@@ -295,7 +297,7 @@ void csShaderManager::UnregisterShader (iShader* shader)
   if (shader != 0)
   {
     size_t index = shaders.FindSortedKey (
-      csArrayCmp<iShader*, iShader*> (shader, &ShaderCompare));
+      csArrayCmp<csWeakRef<iShader>, csWeakRef<iShader>> (shader, &ShaderCompare));
     if (index != csArrayItemNotFound) shaders.DeleteIndex (index);
   }
 }
@@ -309,7 +311,7 @@ void csShaderManager::UnregisterShaders ()
   RegisterShader (nullShader);
 }
 
-static int ShaderCompareName (iShader* const& s1,
+static int ShaderCompareName (csWeakRef<iShader> const& s1,
 			      const char* const& name)
 {
   return strcasecmp (s1->QueryObject ()->GetName(), 
@@ -318,8 +320,9 @@ static int ShaderCompareName (iShader* const& s1,
 
 iShader* csShaderManager::GetShader(const char* name)
 {
+  shaders.Compact();
   size_t index = shaders.FindSortedKey (
-    csArrayCmp<iShader*, const char*> (name, &ShaderCompareName));
+    csArrayCmp<csWeakRef<iShader>, const char*> (name, &ShaderCompareName));
   if (index != csArrayItemNotFound) return shaders[index];
 
   return 0;

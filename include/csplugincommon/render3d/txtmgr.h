@@ -146,7 +146,6 @@ class CS_CRYSTALSPACE_EXPORT csTextureManager :
 {
 protected:
 
-  //typedef csArray<csTextureHandle*> csTexVector;
   typedef csWeakRefArray<csTextureHandle> csTexVector;
 
   /// List of textures.

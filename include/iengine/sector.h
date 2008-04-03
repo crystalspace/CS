@@ -187,7 +187,7 @@ struct csSectorHitBeamResult
  */
 struct iSector : public virtual iBase
 {
-  SCF_INTERFACE(iSector,2,2,0);
+  SCF_INTERFACE(iSector,2,3,0);
   /// Get the iObject for this sector.
   virtual iObject *QueryObject () = 0;
 
@@ -355,7 +355,7 @@ struct iSector : public virtual iBase
    * in the sector one by one and compute a bounding box from that.
    */
   virtual void CalculateSectorBBox (csBox3& bbox,
-    bool do_meshes) const = 0;
+    bool do_meshes) = 0;
 
   /**
    * Use the specified plugin as the visibility culler for
@@ -491,12 +491,12 @@ struct iSector : public virtual iBase
  */
 struct iSectorList : public virtual iBase
 {
-  SCF_INTERFACE(iSectorList, 2,0,0);
+  SCF_INTERFACE(iSectorList, 2,1,0);
   /// Return the number of sectors in this list.
-  virtual int GetCount () const = 0;
+  virtual size_t GetCount () = 0;
 
   /// Return a sector by index.
-  virtual iSector *Get (int n) const = 0;
+  virtual iSector *Get (size_t n) const = 0;
 
   /// Add a sector.
   virtual int Add (iSector *obj) = 0;
@@ -514,7 +514,7 @@ struct iSectorList : public virtual iBase
   virtual int Find (iSector *obj) const = 0;
 
   /// Find a sector by name.
-  virtual iSector *FindByName (const char *Name) const = 0;
+  virtual iSector *FindByName (const char *Name) = 0;
 };
 
 

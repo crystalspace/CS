@@ -27,7 +27,7 @@
 #include "csutil/array.h"
 #include "csutil/cscolor.h"
 #include "csutil/csobject.h"
-#include "csutil/hash.h"
+#include "csutil/weakrefhash.h"
 #include "csutil/nobjvec.h"
 #include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
@@ -225,7 +225,7 @@ public:
   /**\name Visculling
    * @{ */
   virtual void CalculateSectorBBox (csBox3& bbox,
-    bool do_meshes) const;
+    bool do_meshes);
 
   virtual bool SetVisibilityCullerPlugin (const char* name,
   	iDocumentNode* culler_params = 0);
@@ -554,8 +554,8 @@ private:
 class csSectorList : public scfImplementation1<csSectorList, iSectorList>
 {
 private:
-  csRefArrayObject<iSector> list;
-  csHash<iSector*, csString> sectors_hash;
+  csWeakRefArrayObject<iSector> list;
+  csWeakRefHash<iSector, csString> sectors_hash;
 
   class NameChangeListener : public scfImplementation1<NameChangeListener,
   	iObjectNameChangeListener>
@@ -592,14 +592,14 @@ public:
   /// Override FreeSector.
   virtual void FreeSector (iSector* item);
 
-  virtual int GetCount () const { return (int)list.GetSize (); }
-  virtual iSector *Get (int n) const { return list.Get (n); }
+  virtual size_t GetCount () { list.Compact(); return list.GetSize (); }
+  virtual iSector *Get (size_t n) const { return list.Get (n); }
   virtual int Add (iSector *obj);
   virtual bool Remove (iSector *obj);
   virtual bool Remove (int n);
   virtual void RemoveAll ();
   virtual int Find (iSector *obj) const;
-  virtual iSector *FindByName (const char *Name) const;
+  virtual iSector *FindByName (const char *Name);
 };
 
 #endif // __CS_SECTOR_H__

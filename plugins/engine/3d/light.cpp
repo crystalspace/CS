@@ -718,7 +718,7 @@ bool csLightList::Remove (iLight *obj)
   return list.Delete (obj);
 }
 
-bool csLightList::Remove (int n)
+bool csLightList::Remove (size_t n)
 {
   FreeLight (list[n]);
   iLight* obj = list[n];

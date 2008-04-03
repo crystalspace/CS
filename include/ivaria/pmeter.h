@@ -32,7 +32,7 @@
  */
 struct iProgressMeter : public virtual iBase
 {
-  SCF_INTERFACE(iProgressMeter, 2,0,0);
+  SCF_INTERFACE(iProgressMeter, 2,0,1);
   /**
    * Set the id and description of what we are currently monitoring.
    * An id can be something like "crystalspace.engine.lighting.calculation".
@@ -64,7 +64,7 @@ struct iProgressMeter : public virtual iBase
   virtual void Finalize () = 0;
 
   /// Set the total element count represented by the meter and perform a reset.
-  virtual void SetTotal (int n) = 0;
+  virtual void SetTotal (size_t n) = 0;
   /// Get the total element count represented by the meter.
   virtual int GetTotal () const = 0;
   /// Get the current value of the meter (<= total).

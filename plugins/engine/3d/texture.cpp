@@ -210,8 +210,9 @@ iTextureWrapper *csTextureList::NewTexture (iTextureHandle *ith)
   return tm;
 }
 
-int csTextureList::GetCount () const
+int csTextureList::GetCount ()
 {
+  this->Compact();
   return (int)this->GetSize ();
 }
 

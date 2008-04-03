@@ -78,20 +78,18 @@ void csMeshFactoryWrapper::SelfDestruct ()
 void csMeshFactoryWrapper::SetZBufModeRecursive (csZBufMode mode)
 {
   SetZBufMode (mode);
-  const iMeshFactoryList* ml = &children;
+  iMeshFactoryList* ml = &children;
   if (!ml) return;
-  int i;
-  for (i = 0 ; i < ml->GetCount () ; i++)
+  for (size_t i = 0 ; i < ml->GetCount () ; i++)
     ml->Get (i)->SetZBufModeRecursive (mode);
 }
 
 void csMeshFactoryWrapper::SetRenderPriorityRecursive (long rp)
 {
   SetRenderPriority (rp);
-  const iMeshFactoryList* ml = &children;
+  iMeshFactoryList* ml = &children;
   if (!ml) return;
-  int i;
-  for (i = 0 ; i < ml->GetCount () ; i++)
+  for (size_t i = 0 ; i < ml->GetCount () ; i++)
     ml->Get (i)->SetRenderPriorityRecursive (rp);
 }
 
@@ -135,8 +133,7 @@ csPtr<iMeshWrapper> csMeshFactoryWrapper::CreateMeshWrapper ()
     }
   }
 
-  int i;
-  for (i = 0; i < children.GetCount (); i++)
+  for (size_t i = 0; i < children.GetCount (); i++)
   {
     iMeshFactoryWrapper *childfact = children.Get (i);
     csRef<iMeshWrapper> child = childfact->CreateMeshWrapper ();
@@ -269,7 +266,10 @@ int csMeshFactoryList::Add (iMeshFactoryWrapper *obj)
   PrepareFactory (obj);
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
+  {
+    factories_hash.Compact();
     factories_hash.Put (name, obj);
+  }
   obj->QueryObject ()->AddNameChangeListener (listener);
   return (int)list.Push (obj);
 }
@@ -285,7 +285,7 @@ bool csMeshFactoryList::Remove (iMeshFactoryWrapper *obj)
   return true;
 }
 
-bool csMeshFactoryList::Remove (int n)
+bool csMeshFactoryList::Remove (size_t n)
 {
   return Remove (Get (n));
 }
@@ -293,7 +293,7 @@ bool csMeshFactoryList::Remove (int n)
 void csMeshFactoryList::RemoveAll ()
 {
   size_t i;
-  for (i = 0 ; i < list.GetSize () ; i++)
+  for (i = 0 ; i < GetCount() ; i++)
   {
     list[i]->QueryObject ()->RemoveNameChangeListener (listener);
     FreeFactory (list[i]);
@@ -308,9 +308,10 @@ int csMeshFactoryList::Find (iMeshFactoryWrapper *obj) const
 }
 
 iMeshFactoryWrapper *csMeshFactoryList::FindByName (
-  const char *Name) const
+  const char *Name)
 {
   if (!Name) return 0;
+  factories_hash.Compact();
   return factories_hash.Get (Name, 0);
 }
 
