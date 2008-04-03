@@ -1408,7 +1408,6 @@ iEventQueue_swigregister = _core.iEventQueue_swigregister
 iEventQueue_swigregister(iEventQueue)
 iEventQueue_scfGetVersion = _core.iEventQueue_scfGetVersion
 
-Compact = _core.Compact
 class iEventNameRegistry(iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"

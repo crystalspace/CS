@@ -154,6 +154,7 @@
 #include "csutil/weakref.h"
 #include "csutil/weakrefarr.h"
 #include "csutil/weakreferenced.h"
+#include "csutil/weakrefhash.h"
 #include "csutil/xmltiny.h"
 #if defined(CS_PLATFORM_MACOSX)
 #include "csutil/macosx/OSXAssistant.h"
