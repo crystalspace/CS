@@ -9,6 +9,9 @@ chronological order.
 3-Apr-2008
 	- res added a workaround to configure to avoid -Wno-long-double
 	  warnings occuring with g++ 4.2.3.
+	- Marten made a fix to rendering of separate alphamaps in terrain2.
+	- Marten optimized terrain2 renderer not to use material map layers
+	  where the material isn't used at all in the cell.
 2-Apr-2008
 	- Mike Gist added csWeakRefHash which inherits from csHash.
 	  It has a Compact() function which removes all deleted elements

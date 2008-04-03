@@ -321,6 +321,7 @@ struct TerrainCellRData : public csRefCount
 
   // Per cell, per layer sv contexts
   // For materialmap
+  csBitArray alphaMapMMUse;
   csRefArray<OverlaidShaderVariableContext> svContextArrayMM;
   csRefArray<iTextureHandle> alphaMapArrayMM;  
   
@@ -898,7 +899,40 @@ void TerrainBlock::CullRenderMeshes (iRenderView* rview, const csPlane3* cullPla
     {
       mat = palette.Get (j);
       svContext = renderData->svContextArrayMM[j];
+
+      // Map not used
+      if (!renderData->alphaMapMMUse.IsBitSet (j))
+      {
+        continue;
+      }
     }
+
+    if (!mat || !svContext)
+      continue;
+
+    bool created;
+    csRenderMesh*& mesh = renderData->renderer->GetMeshHolder ().GetUnusedMesh (created,
+      rview->GetCurrentFrameNumber ());
+
+    mesh->meshtype = CS_MESHTYPE_TRIANGLESTRIP;
+    mesh->clip_portal = clipPortal;
+    mesh->clip_plane = clipPlane;
+    mesh->clip_z_plane = clipZPlane;
+    mesh->indexstart = 0;
+    mesh->indexend = numIndices;
+    mesh->material = mat;
+    mesh->variablecontext = svContext;
+    mesh->buffers = bufferHolder;
+
+    mesh->worldspace_origin = worldOrigin;
+
+    meshCache.Push (mesh);
+  }
+
+  for (int j = 0; j < renderData->alphaMapArrayAlpha.GetSize (); ++j)
+  {
+    iMaterialWrapper* mat = renderData->materialArrayAlpha[j];
+    iShaderVariableContext* svContext = renderData->svContextArrayAlpha[j];
 
     if (!mat || !svContext)
       continue;
@@ -935,6 +969,7 @@ TerrainCellRData::TerrainCellRData (iTerrainCell* cell,
   commonSVContext = cell->GetRenderProperties ();
   svContextArrayMM.SetSize (renderer->GetMaterialPalette ().GetSize ());
   alphaMapArrayMM.SetSize (renderer->GetMaterialPalette ().GetSize ());
+  alphaMapMMUse.SetSize (renderer->GetMaterialPalette ().GetSize ());
 
   // Setup the base context
 
@@ -1131,11 +1166,12 @@ void csTerrainBruteBlockRenderer::OnMaterialMaskUpdate (iTerrainCell* cell,
   {    
     // Iterate and build all the alpha-masks
     csDirtyAccessArray<csRGBpixel> imageData;
-    imageData.SetSize (rectangle.Width () * rectangle.Height ());
+    imageData.SetSize (rectangle.Width () * rectangle.Height ());    
 
     for (size_t i = 0; i < materialPalette->GetSize (); ++i)
     {
       csRGBpixel* dst_data = imageData.GetArray ();
+      bool isUsed = false;
 
       for (int y = rectangle.ymin; y < rectangle.ymax; ++y)
       {
@@ -1143,7 +1179,13 @@ void csTerrainBruteBlockRenderer::OnMaterialMaskUpdate (iTerrainCell* cell,
 
         for (int x = rectangle.xmin; x < rectangle.xmax; ++x, ++src_data)
         {
-          const unsigned char result = *src_data == i ? 255 : 0;
+          unsigned char result = 0;
+          
+          if (*src_data == i)
+          {
+            result = 255;
+            isUsed = true;
+          }
 
           (*dst_data++).Set (result, result, result, result);
         }
@@ -1153,6 +1195,14 @@ void csTerrainBruteBlockRenderer::OnMaterialMaskUpdate (iTerrainCell* cell,
         rectangle.Width (), rectangle.Height (), 
         (unsigned char*)imageData.GetArray (), iTextureHandle::RGBA8888);
 
+      if (isUsed)
+      {
+        data->alphaMapMMUse.SetBit (i);
+      }
+      else
+      {
+        data->alphaMapMMUse.ClearBit (i);
+      }
     }
   }
 }
@@ -1171,6 +1221,7 @@ void csTerrainBruteBlockRenderer::OnMaterialMaskUpdate (iTerrainCell* cell,
     imageData.SetSize (rectangle.Width () * rectangle.Height ());
 
     csRGBpixel* dst_data = imageData.GetArray ();
+    bool isUsed = false;
 
     for (int y = rectangle.ymin; y < rectangle.ymax; ++y)
     {
@@ -1178,7 +1229,14 @@ void csTerrainBruteBlockRenderer::OnMaterialMaskUpdate (iTerrainCell* cell,
 
       for (int x = rectangle.xmin; x < rectangle.xmax; ++x, ++src_data)
       {
-        (*dst_data++).Set (*src_data, *src_data, *src_data, *src_data);
+        const unsigned char result = *src_data;
+
+        if (result > 0)
+        {
+          isUsed = true;
+        }
+
+        (*dst_data++).Set (result, result, result, result);
       }
     }
 
@@ -1186,6 +1244,14 @@ void csTerrainBruteBlockRenderer::OnMaterialMaskUpdate (iTerrainCell* cell,
       rectangle.Width (), rectangle.Height (), 
       (unsigned char*)imageData.GetArray (), iTextureHandle::RGBA8888);
 
+    if (isUsed)
+    {
+      data->alphaMapMMUse.SetBit (matIdx);
+    }
+    else
+    {
+      data->alphaMapMMUse.ClearBit (matIdx);
+    }
   }
 }
 
