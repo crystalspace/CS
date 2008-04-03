@@ -14,6 +14,8 @@ chronological order.
 	  where the material isn't used at all in the cell.
 	- Vincent fixed sound sources not being cleaned when closing the
 	  OpenAL renderer.
+	- Sueastside committed a patch by Mononoke to fix a crash in the Alsa
+	  renderer on exit.
 2-Apr-2008
 	- Mike Gist added csWeakRefHash which inherits from csHash.
 	  It has a Compact() function which removes all deleted elements
