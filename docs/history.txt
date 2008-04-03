@@ -10,6 +10,8 @@ chronological order.
 	- res fixed a potential crash in shaderweaver.
 	- res made cssynldr also accept "int" as a type name for shader
 	  variable values.
+	- res made csShaderProgram also accept "int" as a type name for
+	  program parameter values.
 2-Apr-2008
 	- Mike Gist added csWeakRefHash which inherits from csHash.
 	  It has a Compact() function which removes all deleted elements

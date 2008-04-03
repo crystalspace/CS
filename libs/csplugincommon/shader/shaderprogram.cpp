@@ -95,7 +95,7 @@ bool csShaderProgram::ProgramParamParser::ParseProgramParam (
     param.valid = true;
     return true;
   }
-  else if (strcmp (type, "float") == 0)
+  else if ((strcmp (type, "float") == 0) || (strcmp (type, "int") == 0))
   {
     paramType = ParamFloat;
   }
