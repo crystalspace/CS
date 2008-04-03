@@ -17,8 +17,8 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
-<shader compiler="shaderweaver" name="lighting_default" lights="4">
-  <technique priority="200">
+<shader compiler="shaderweaver" name="lighting_default" lights="6">
+  <technique priority="500">
     <pass>
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
         <!-- First pass: blend with copy -->
@@ -33,97 +33,205 @@
 	-->
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
 
-      <!-- Snippets - the building blocks of this shader. -->
-      <snippet id="position" file="/shader/snippets/position.xml" />
-      <snippet id="parallax" file="/shader/snippets/surface/parallax.xml" />
-      <snippet id="normalmap" file="/shader/snippets/surface/normalmap.xml" />
-      <snippet id="surface" file="/shader/snippets/surface/surface-classic.xml" />
-      <snippet id="apply_mixmode_alpha" file="/shader/snippets/mixmode-alpha.xml" />
-      <snippet id="lighting" file="/shader/snippets/lighting/lighting-ppl.xml" />
-      <snippet id="ambient" file="/shader/snippets/lighting/ambient-static.xml" />
-      <snippet id="specular" file="/shader/snippets/surface/specular-weirdold.xml" />
-      <snippet id="apply_lighting" file="/shader/snippets/lighting/apply-lighting.xml" />
-      <snippet id="glow" file="/shader/lighting/glow.xml" />
-      <snippet id="sectorfog" file="/shader/snippets/fog/fog-sector.xml" />
-      <snippet id="hdrscale" file="/shader/snippets/hdr-postscale.xml" />
-      <!-- "connections" describe what snippets take input from what other
-           snippets (ie the "data flow" is modeled). The exact resolution of
-	   what output is linked to what input is done automatically. -->
-      <connection from="position" to="parallax" />
-      <connection from="position" to="lighting" />
-      <connection from="parallax" to="surface" />
-      <connection from="parallax" to="normalmap" />
-      <connection from="normalmap" to="lighting" />
-      <connection from="surface" to="apply_mixmode_alpha" />
-      <connection from="apply_mixmode_alpha" to="apply_lighting">
-	<explicit from="outputColor" to="surfaceDiffuse" />
-      </connection>
-      <connection from="lighting" to="apply_lighting">
-	<explicit from="diffuseColor" to="lightDiffuse" />
-	<explicit from="specularColor" to="lightSpecular" />
-      </connection>
-      <connection from="ambient" to="apply_lighting">
-	<explicit from="ambient" to="ambient" />
-      </connection>
-      <connection from="specular" to="apply_lighting">
-	<explicit from="specularColor" to="surfaceSpecular" />
-      </connection>
-      <connection from="apply_lighting" to="glow" />
-      <connection from="glow" to="sectorfog" />
-      <connection from="sectorfog" to="hdrscale" />
+      <!-- The meat of the shader is actually in a snippet. to be shared more
+	   easily across all techniques -->
+      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
+      
+      <parameter id="lightOffset" type="int">0</parameter>
+      <parameter id="maxLights" type="int">6</parameter>
+      <connection from="lightOffset" to="shared" />
+      <connection from="maxLights" to="shared" />
     </pass>
   </technique>
   
-  <!-- If PPL is not available, try PVL -->
-  <technique priority="100">
+  <technique priority="400">
     <pass>
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
         <!-- First pass: blend with copy -->
       <?else?>
         <!-- Later pass: blend with add -->
-	<mixmode><srcalphaadd /></mixmode>
+        <mixmode><srcalphaadd /></mixmode>
       <?endif?>
+      
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
-
-      <snippet id="position" file="/shader/snippets/position.xml" />
-      <snippet id="parallax" file="/shader/snippets/surface/parallax.xml" />
-      <snippet id="normalmap" file="/shader/snippets/surface/normalmap.xml" />
-      <snippet id="surface" file="/shader/snippets/surface/surface-classic.xml" />
-      <snippet id="apply_mixmode_alpha" file="/shader/snippets/mixmode-alpha.xml" />
-      <snippet id="lighting" file="/shader/snippets/lighting/lighting-pvl.xml" />
-      <snippet id="ambient" file="/shader/snippets/lighting/ambient-static.xml" />
-      <snippet id="specular" file="/shader/snippets/surface/specular-weirdold.xml" />
-      <snippet id="apply_lighting" file="/shader/snippets/lighting/apply-lighting.xml" />
-      <snippet id="glow" file="/shader/lighting/glow.xml" />
-      <snippet id="sectorfog" file="/shader/snippets/fog/fog-sector.xml" />
-      <snippet id="hdrscale" file="/shader/snippets/hdr-postscale.xml" />
-
-      <connection from="position" to="parallax" />
-      <connection from="position" to="lighting" />
-      <connection from="parallax" to="surface" />
-      <connection from="parallax" to="normalmap" />
-      <connection from="normalmap" to="lighting" />
-      <connection from="surface" to="apply_mixmode_alpha" />
-      <connection from="apply_mixmode_alpha" to="apply_lighting">
-	<explicit from="outputColor" to="surfaceDiffuse" />
-      </connection>
-      <connection from="lighting" to="apply_lighting">
-	<explicit from="diffuseColor" to="lightDiffuse" />
-	<explicit from="specularColor" to="lightSpecular" />
-      </connection>
-      <connection from="ambient" to="apply_lighting">
-	<explicit from="ambient" to="ambient" />
-      </connection>
-      <connection from="specular" to="apply_lighting">
-	<explicit from="specularColor" to="surfaceSpecular" />
-      </connection>
-      <connection from="apply_lighting" to="glow" />
-      <connection from="glow" to="sectorfog" />
-      <connection from="sectorfog" to="hdrscale" />
+      
+      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
+      
+      <parameter id="lightOffset" type="int">0</parameter>
+      <parameter id="maxLights" type="int">4</parameter>
+      <connection from="lightOffset" to="shared" />
+      <connection from="maxLights" to="shared" />
+    </pass>
+    <pass>
+      <mixmode><srcalphaadd /></mixmode>
+      
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+      
+      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
+      
+      <parameter id="lightOffset" type="int">4</parameter>
+      <parameter id="maxLights" type="int">2</parameter>
+      <connection from="lightOffset" to="shared" />
+      <connection from="maxLights" to="shared" />
     </pass>
   </technique>
   
-  <!-- Last but not least, fall back to a fixed function version, for older
-       hardware. -->
-  <fallbackshader name="lighting_vproc_fixed" file="/shader/lighting/vproc_fixed.xml" />
+  <technique priority="300">
+    <pass>
+      <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
+      <!-- First pass: blend with copy -->
+      <?else?>
+      <!-- Later pass: blend with add -->
+      <mixmode><srcalphaadd /></mixmode>
+      <?endif?>
+      
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+      
+      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
+      
+      <parameter id="lightOffset" type="int">0</parameter>
+      <parameter id="maxLights" type="int">3</parameter>
+      <connection from="lightOffset" to="shared" />
+      <connection from="maxLights" to="shared" />
+    </pass>
+    <pass>
+      <mixmode><srcalphaadd /></mixmode>
+      
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+      
+      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
+      
+      <parameter id="lightOffset" type="int">3</parameter>
+      <parameter id="maxLights" type="int">3</parameter>
+      <connection from="lightOffset" to="shared" />
+      <connection from="maxLights" to="shared" />
+    </pass>
+  </technique>
+  
+  <technique priority="200">
+    <pass>
+      <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
+      <!-- First pass: blend with copy -->
+      <?else?>
+      <!-- Later pass: blend with add -->
+      <mixmode><srcalphaadd /></mixmode>
+      <?endif?>
+      
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+      
+      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
+      
+      <parameter id="lightOffset" type="int">0</parameter>
+      <parameter id="maxLights" type="int">2</parameter>
+      <connection from="lightOffset" to="shared" />
+      <connection from="maxLights" to="shared" />
+    </pass>
+    <pass>
+      <mixmode><srcalphaadd /></mixmode>
+      
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+      
+      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
+      
+      <parameter id="lightOffset" type="int">2</parameter>
+      <parameter id="maxLights" type="int">2</parameter>
+      <connection from="lightOffset" to="shared" />
+      <connection from="maxLights" to="shared" />
+    </pass>
+    <pass>
+      <mixmode><srcalphaadd /></mixmode>
+      
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+      
+      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
+      
+      <parameter id="lightOffset" type="int">2</parameter>
+      <parameter id="maxLights" type="int">2</parameter>
+      <connection from="lightOffset" to="shared" />
+      <connection from="maxLights" to="shared" />
+    </pass>
+  </technique>
+  
+  <technique priority="200">
+    <pass>
+      <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
+        <!-- First pass: blend with copy -->
+      <?else?>
+        <!-- Later pass: blend with add -->
+        <mixmode><srcalphaadd /></mixmode>
+      <?endif?>
+      
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+      
+      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
+      
+      <parameter id="lightOffset" type="int">0</parameter>
+      <parameter id="maxLights" type="int">1</parameter>
+      <connection from="lightOffset" to="shared" />
+      <connection from="maxLights" to="shared" />
+    </pass>
+    <pass>
+      <mixmode><srcalphaadd /></mixmode>
+      
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+      
+      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
+      
+      <parameter id="lightOffset" type="int">1</parameter>
+      <parameter id="maxLights" type="int">1</parameter>
+      <connection from="lightOffset" to="shared" />
+      <connection from="maxLights" to="shared" />
+    </pass>
+    <pass>
+      <mixmode><srcalphaadd /></mixmode>
+      
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+      
+      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
+      
+      <parameter id="lightOffset" type="int">2</parameter>
+      <parameter id="maxLights" type="int">1</parameter>
+      <connection from="lightOffset" to="shared" />
+      <connection from="maxLights" to="shared" />
+    </pass>
+    <pass>
+      <mixmode><srcalphaadd /></mixmode>
+      
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+      
+      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
+      
+      <parameter id="lightOffset" type="int">3</parameter>
+      <parameter id="maxLights" type="int">1</parameter>
+      <connection from="lightOffset" to="shared" />
+      <connection from="maxLights" to="shared" />
+    </pass>
+    <pass>
+      <mixmode><srcalphaadd /></mixmode>
+      
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+      
+      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
+      
+      <parameter id="lightOffset" type="int">4</parameter>
+      <parameter id="maxLights" type="int">1</parameter>
+      <connection from="lightOffset" to="shared" />
+      <connection from="maxLights" to="shared" />
+    </pass>
+    <pass>
+      <mixmode><srcalphaadd /></mixmode>
+      
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+      
+      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
+      
+      <parameter id="lightOffset" type="int">5</parameter>
+      <parameter id="maxLights" type="int">1</parameter>
+      <connection from="lightOffset" to="shared" />
+      <connection from="maxLights" to="shared" />
+    </pass>
+  </technique>
+  
+  <!-- If PPL is not available, try PVL -->
+  <fallbackshader name="lighting_default_pvl" file="/shader/lighting/lighting_default_pvl.xml" />
 </shader>

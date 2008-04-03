@@ -13,6 +13,7 @@ chronological order.
 	- res made csShaderProgram also accept "int" as a type name for
 	  program parameter values.
 	- res added "int" as a weaver type.
+	- res added more fallbacks for the lighting_default shader.
 2-Apr-2008
 	- Mike Gist added csWeakRefHash which inherits from csHash.
 	  It has a Compact() function which removes all deleted elements

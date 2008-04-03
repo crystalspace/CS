@@ -29,8 +29,8 @@
 	<!-- Surface normal -->
 	<input name="normal" type="normal_world" />
 	
-	<input name="lightOffset" type="float" default="value" defval="0"/>
-	<input name="maxLights" type="float" default="value" defval="8"/>
+	<input name="lightOffset" type="int" default="value" defval="0"/>
+	<input name="maxLights" type="int" default="value" defval="8"/>
 	
 	<block location="pass">
 	  <?Include /shader/snippets/lighting/lighting-tools.inc ?>

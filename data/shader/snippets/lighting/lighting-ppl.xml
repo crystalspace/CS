@@ -112,8 +112,8 @@
 	  </block>
 	</input>
 	
-	<input name="lightOffset" type="float" default="value" defval="0"/>
-	<input name="maxLights" type="float" default="value" defval="3"/>
+	<input name="lightOffset" type="int" default="value" defval="0"/>
+	<input name="maxLights" type="int" default="value" defval="3"/>
 	
 	<block location="pass">
 	  <?Include /shader/snippets/lighting/lighting-tools.inc ?>
