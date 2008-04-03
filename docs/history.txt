@@ -12,6 +12,8 @@ chronological order.
 	- Marten made a fix to rendering of separate alphamaps in terrain2.
 	- Marten optimized terrain2 renderer not to use material map layers
 	  where the material isn't used at all in the cell.
+	- Vincent fixed sound sources not being cleaned when closing the
+	  OpenAL renderer.
 2-Apr-2008
 	- Mike Gist added csWeakRefHash which inherits from csHash.
 	  It has a Compact() function which removes all deleted elements
