@@ -1108,6 +1108,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       techToNode.Put (tech, nodes.Push (node));
     }
     
+    if (tech2 != 0)
     {
       TechniqueGraph::ExplicitConnectionsHash& explicitConns =
 	graph.GetExplicitConnections (tech2);

@@ -6,6 +6,8 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+3-Apr-2008
+	- res fixed a potential crash in shaderweaver.
 2-Apr-2008
 	- Mike Gist added csWeakRefHash which inherits from csHash.
 	  It has a Compact() function which removes all deleted elements
