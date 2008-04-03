@@ -13251,16 +13251,17 @@ fi
 { echo "$as_me:$LINENO: result: $cs_cv_prog_gpp_version_4_2_ok_annotated" >&5
 echo "${ECHO_T}$cs_cv_prog_gpp_version_4_2_ok_annotated" >&6; }
 if test "$cs_cv_prog_gpp_version_4_2_ok" = yes; then
-  cs_cv_gxx_version_buggy_long_double=no
-else
   cs_cv_gxx_version_buggy_long_double=yes
+else
+  cs_cv_gxx_version_buggy_long_double=no
 fi
 
 else
   cs_cv_gxx_version_buggy_long_double=no
 fi
 
-    if test \( x$cs_host_macosx = xno -a cs_cv_gxx_version_buggy = no \); then
+    if test x$cs_host_macosx != xyes \
+	   && test $cs_cv_gxx_version_buggy_long_double = no; then
   { echo "$as_me:$LINENO: checking how to suppress C++ \`long double' warnings" >&5
 echo $ECHO_N "checking how to suppress C++ \`long double' warnings... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_ignore_long_double_ok+set}" = set; then
@@ -15912,16 +15913,17 @@ fi
 { echo "$as_me:$LINENO: result: $cs_cv_prog_gpp_version_4_2_ok_annotated" >&5
 echo "${ECHO_T}$cs_cv_prog_gpp_version_4_2_ok_annotated" >&6; }
 if test "$cs_cv_prog_gpp_version_4_2_ok" = yes; then
-  cs_cv_gxx_version_buggy_long_double=no
-else
   cs_cv_gxx_version_buggy_long_double=yes
+else
+  cs_cv_gxx_version_buggy_long_double=no
 fi
 
 else
   cs_cv_gxx_version_buggy_long_double=no
 fi
 
-    if test \( x$cs_host_macosx = xno -a cs_cv_gxx_version_buggy = no \); then
+    if test x$cs_host_macosx != xyes \
+	   && test $cs_cv_gxx_version_buggy_long_double = no; then
   { echo "$as_me:$LINENO: checking how to suppress C++ \`long double' warnings" >&5
 echo $ECHO_N "checking how to suppress C++ \`long double' warnings... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_ignore_long_double_ok+set}" = set; then
