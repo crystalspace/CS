@@ -159,10 +159,11 @@ AC_DEFUN([CS_COMPILER_IGNORE_PRAGMAS],
 AC_DEFUN([CS_COMPILER_IGNORE_LONG_DOUBLE],
     [AS_IF([test $ac_compiler_gnu = yes],
 	[CS_CHECK_PROG_VERSION([g++], [$CXX --version], [4.2], [9.9|.9],
-	    [cs_cv_gxx_version_buggy_long_double=no],
-	    [cs_cv_gxx_version_buggy_long_double=yes])],
+	    [cs_cv_gxx_version_buggy_long_double=yes],
+	    [cs_cv_gxx_version_buggy_long_double=no])],
 	[cs_cv_gxx_version_buggy_long_double=no])
-    AS_IF([test \( x$cs_host_macosx = xno -a cs_cv_gxx_version_buggy = no \)],
+    AS_IF([test x$cs_host_macosx != xyes \
+	   && test $cs_cv_gxx_version_buggy_long_double = no],
 	[CS_CHECK_BUILD_FLAGS(
 	    [_CS_WARNING_SUPPRESS_MSG([`long double'], [$1])],
 	    [_CS_WARNING_CACHE_VAR([$2], [$1], [ignore_long_double])],
