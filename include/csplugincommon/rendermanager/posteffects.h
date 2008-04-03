@@ -28,6 +28,7 @@
 
 struct iGraphics3D;
 struct iLoader;
+struct iObjectRegistry;
 struct iShader;
 struct iSyntaxService;
 struct iTextureHandle;
