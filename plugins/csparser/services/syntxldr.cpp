@@ -1104,6 +1104,7 @@ bool csTextSyntaxService::ParseShaderVar (iLoaderContext* ldr_context,
   csStringID idtype = xmltokens.Request (type);
   switch (idtype)
   {
+    case XMLTOKEN_INT:
     case XMLTOKEN_INTEGER:
       var.SetValue (node->GetContentsValueAsInt ());
       break;
