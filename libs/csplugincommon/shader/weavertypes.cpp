@@ -56,6 +56,8 @@ namespace CS
             {TypeInfo::Vector,  false, 3, TypeInfo::NoSemantics, TypeInfo::NoSpace, false}},
           {"float4", 
             {TypeInfo::Vector,  false, 4, TypeInfo::NoSemantics, TypeInfo::NoSpace, false}},
+          {"int", 
+            {TypeInfo::VectorI, false, 1, TypeInfo::NoSemantics, TypeInfo::NoSpace, false}},
           {"normal",
             {TypeInfo::Vector,  false, 3, TypeInfo::Direction,   TypeInfo::NoSpace, true}},
           {"normal_camera",
