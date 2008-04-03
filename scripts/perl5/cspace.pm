@@ -69,7 +69,6 @@ package cspace;
 *RegisterWeakListener = *cspacec::RegisterWeakListener;
 *RemoveWeakListener = *cspacec::RemoveWeakListener;
 *csHashCompute = *cspacec::csHashCompute;
-*Compact = *cspacec::Compact;
 *csevMouse = *cspacec::csevMouse;
 *csevMouseOp = *cspacec::csevMouseOp;
 *csevJoystick = *cspacec::csevJoystick;
@@ -19116,6 +19115,50 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         cspacec::delete_iRenderLoopManager($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iCollection ##############
+
+package cspace::iCollection;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*QueryObject = *cspacec::iCollection_QueryObject;
+*Add = *cspacec::iCollection_Add;
+*Remove = *cspacec::iCollection_Remove;
+*ReleaseAllObjects = *cspacec::iCollection_ReleaseAllObjects;
+*IsParentOf = *cspacec::iCollection_IsParentOf;
+*FindSector = *cspacec::iCollection_FindSector;
+*FindMeshObject = *cspacec::iCollection_FindMeshObject;
+*FindMeshFactory = *cspacec::iCollection_FindMeshFactory;
+*FindTexture = *cspacec::iCollection_FindTexture;
+*FindMaterial = *cspacec::iCollection_FindMaterial;
+*FindShader = *cspacec::iCollection_FindShader;
+*FindCameraPosition = *cspacec::iCollection_FindCameraPosition;
+*scfGetVersion = *cspacec::iCollection_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iCollection($self);
         delete $OWNER{$self};
     }
 }

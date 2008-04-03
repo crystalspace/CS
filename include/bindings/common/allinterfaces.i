@@ -23,6 +23,7 @@
 %define IENGINE_APPLY_FOR_EACH_INTERFACE
   INTERFACE_APPLY(iCamera)
   INTERFACE_APPLY(iCameraPosition)
+  INTERFACE_APPLY(iCollection)
   INTERFACE_APPLY(iEngine)
   INTERFACE_APPLY(iFrustumView)
   INTERFACE_APPLY(iFrustumViewUserdata)

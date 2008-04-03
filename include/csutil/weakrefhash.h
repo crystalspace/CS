@@ -25,14 +25,20 @@
 /**
  * A hash table class, to be used with csWeakRef<> as the value type.
  */
-template <class T, class K = unsigned int, class ArrayMemoryAlloc = CS::Memory::AllocatorMalloc>
-class csWeakRefHash : public csHash<csWeakRef<T>, K, ArrayMemoryAlloc,
-                      csArraySafeCopyElementHandler<CS::Container::HashElement<csWeakRef<T>, K> > >
+template <class T, class K = unsigned int, 
+  class ArrayMemoryAlloc = CS::Memory::AllocatorMalloc>
+class csWeakRefHash :
+  public csHash<csWeakRef<T>, K, 
+                ArrayMemoryAlloc,
+                csArraySafeCopyElementHandler<CS::Container::HashElement<
+		  csWeakRef<T>, K> > >
 {
 public:
-  typedef csHash<csWeakRef<T>, K, ArrayMemoryAlloc,
-                      csArraySafeCopyElementHandler<CS::Container::HashElement<csWeakRef<T>, K> > > SuperClass;
-  csWeakRefHash (size_t size = 23, size_t grow_rate = 5, size_t max_size = 20000)
+  typedef csHash<csWeakRef<T>, K, 
+    ArrayMemoryAlloc, csArraySafeCopyElementHandler<
+      CS::Container::HashElement<csWeakRef<T>, K> > > SuperClass;
+  csWeakRefHash (size_t size = 23, size_t grow_rate = 5, 
+    size_t max_size = 20000)
     : SuperClass(size, grow_rate, max_size)
   {
   }
@@ -52,7 +58,8 @@ public:
       for (size_t j = values.GetSize(); j > 0; j--)
       {
         const size_t idx = j - 1;
-        if(csComparator<csWeakRef<T>, csWeakRef<T> >::Compare (values[idx].GetValue(), NULL) == 0)
+        if(csComparator<csWeakRef<T>, csWeakRef<T> >::Compare (
+	    values[idx].GetValue(), NULL) == 0)
         {
           values.DeleteIndexFast(idx);
           this->Size--;
