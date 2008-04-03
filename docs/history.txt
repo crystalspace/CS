@@ -16,6 +16,8 @@ chronological order.
 	  OpenAL renderer.
 	- Sueastside committed a patch by Mononoke to fix a crash in the Alsa
 	  renderer on exit.
+	- Vincent applied Marten's fix for sound sources not being cleaned
+	  when closing the software renderer. Happy Bithday Marten !
 2-Apr-2008
 	- Mike Gist added csWeakRefHash which inherits from csHash.
 	  It has a Compact() function which removes all deleted elements
