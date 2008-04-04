@@ -9,6 +9,11 @@ chronological order.
 4-Apr-2008
 	- res made GL texture readback fail if a mipmap is requested but
 	  the texture isn't mipmapped.
+	- res fixed the Cg shader plugin to load a program after constants
+	  have been marked literal (since a program may load only with some
+	  inputs set to constant).
+	- res made the Cg shader plugin more quiet in the "precompiling"
+	  steps.
 3-Apr-2008
 	- res fixed a potential crash in shaderweaver.
 	- res made cssynldr also accept "int" as a type name for shader

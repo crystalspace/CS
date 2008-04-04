@@ -68,9 +68,15 @@ protected:
   csString debugFN;
   void EnsureDumpFile();
 
+  enum
+  {
+    loadPrecompiled = 1,
+    loadLoadToGL = 2,
+    loadIgnoreErrors = 4
+  };
   bool DefaultLoadProgram (iShaderDestinationResolverCG* cgResolve,
     const char* programStr, CGGLenum type, 
-    CGprofile maxProfile, bool compiled = false, bool doLoad = true);
+    CGprofile maxProfile, uint flags = loadLoadToGL);
   void DoDebugDump ();
   void WriteAdditionalDumpInfo (const char* description, const char* content);
   virtual const char* GetProgramType() = 0;

@@ -56,6 +56,7 @@ private:
   bool enable;
   bool isOpen;
   const char* compiledProgram;
+  bool doIgnoreErrors;
 public:
   CS_LEAKGUARD_DECLARE (csGLShader_CG);
 
@@ -102,6 +103,7 @@ public:
   
   void SetCompiledSource (const char* prog)
   { compiledProgram = prog; }
+  void SetIgnoreErrors (bool doIgnore) { doIgnoreErrors = doIgnore; }
   void PrintCgListing (const char* listing);
 };
 

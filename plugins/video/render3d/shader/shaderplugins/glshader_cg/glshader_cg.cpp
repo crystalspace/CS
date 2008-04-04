@@ -67,6 +67,7 @@ void csGLShader_CG::ErrorHandler (CGcontext context, CGerror error,
 				  void* appData)
 {
   csGLShader_CG* This = reinterpret_cast<csGLShader_CG*> (appData);
+  if (This->doIgnoreErrors) return;
 
   bool doVerbose;
   csRef<iVerbosityManager> verbosemgr (
@@ -399,7 +400,7 @@ bool csGLShader_CG::Open()
     dumpDir = CS::StrDup (config->GetStr ("Video.OpenGL.Shader.Cg.DebugDumpDir",
     "/tmp/cgdump/"));
     
-  cgSetAutoCompile (context, CG_COMPILE_LAZY);
+  cgSetAutoCompile (context, CG_COMPILE_MANUAL);
   cgGLSetDebugMode (config->GetBool ("Video.OpenGL.Shader.Cg.CgDebugMode",
     false));
  

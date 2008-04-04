@@ -183,7 +183,7 @@ bool csShaderGLCGFP::Compile ()
         for (size_t i = offset+step; i < testForUnused.GetSize(); i++)
           unusedParams.Add (testForUnused[i]);
 	if (DefaultLoadProgram (0, programStr, CG_GL_FRAGMENT, 
-	  shaderPlug->maxProfileFragment, false, false))
+	  shaderPlug->maxProfileFragment, loadIgnoreErrors))
 	{
 	  csSet<csString> newUnusedParams;
 	  CollectUnusedParameters (newUnusedParams);
@@ -205,7 +205,7 @@ bool csShaderGLCGFP::Compile ()
       unusedParams.DeleteAll();
     }
     if (!DefaultLoadProgram (0, programStr, CG_GL_FRAGMENT, 
-      shaderPlug->maxProfileFragment, false, false))
+      shaderPlug->maxProfileFragment, loadIgnoreErrors))
       return false;
     /* Compile twice to be able to filter out unused vertex2fragment stuff on 
      * pass 2.

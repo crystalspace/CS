@@ -395,7 +395,7 @@ void csShaderGLCGCommon::EnsureDumpFile()
 bool csShaderGLCGCommon::DefaultLoadProgram (
   iShaderDestinationResolverCG* cgResolve,
   const char* programStr, CGGLenum type, CGprofile maxProfile, 
-  bool compiled, bool doLoad)
+  uint flags)
 {
   if (!programStr || !*programStr) return false;
 
@@ -446,7 +446,7 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
   }
   shaderPlug->SetCompiledSource (programStr);
   program = cgCreateProgram (shaderPlug->context, 
-    compiled ? CG_OBJECT : CG_SOURCE, programStr, 
+    (flags & loadPrecompiled) ? CG_OBJECT : CG_SOURCE, programStr, 
     profile, !entrypoint.IsEmpty() ? entrypoint : "main", args.GetArray());
 
   if (!program)
@@ -461,29 +461,7 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
   }
   programProfile = cgGetProgramProfile (program);
 
-  if (doLoad)
-  {
-    cgGetError(); // Clear error
-    cgGLLoadProgram (program);
-    if ((cgGetError() != CG_NO_ERROR)
-      || !cgGLIsProgramLoaded (program)) 
-    {
-      if (shaderPlug->debugDump)
-	DoDebugDump();
-
-      shaderPlug->SetCompiledSource (0);
-      return false;
-    }
-  }
-
-  const char* listing = cgGetLastListing (shaderPlug->context);
-  if (listing && *listing && shaderPlug->doVerbose)
-  {
-    shaderPlug->PrintCgListing (listing);
-  }
-  shaderPlug->SetCompiledSource (0);
-
-  if (doLoad)
+  if (flags & loadLoadToGL)
   {
     i = 0;
     while (i < variablemap.GetSize ())
@@ -523,9 +501,36 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
   
     variablemap.ShrinkBestFit();
   }
-  
+
   if (assumedConstParams == 0)
+  {
+    if (flags & loadIgnoreErrors) shaderPlug->SetIgnoreErrors (true);
     cgCompileProgram (program);
+    if (flags & loadIgnoreErrors) shaderPlug->SetIgnoreErrors (false);
+  }
+
+  if (flags & loadLoadToGL)
+  {
+    cgGetError(); // Clear error
+    cgGLLoadProgram (program);
+    if ((cgGetError() != CG_NO_ERROR)
+      || !cgGLIsProgramLoaded (program)) 
+    {
+      if (shaderPlug->debugDump)
+	DoDebugDump();
+
+      shaderPlug->SetCompiledSource (0);
+      return false;
+    }
+  }
+
+  const char* listing = cgGetLastListing (shaderPlug->context);
+  if (listing && *listing && shaderPlug->doVerbose)
+  {
+    shaderPlug->PrintCgListing (listing);
+  }
+  shaderPlug->SetCompiledSource (0);
+
   if (shaderPlug->debugDump)
     DoDebugDump();
 
