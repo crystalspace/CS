@@ -286,7 +286,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     void UpdateLocalBoneTransforms ();
 
   private:
-    void SkinVertices (iRenderBuffer* resultBuffer);
+    void SkinVertices (iRenderBuffer* vResultBuffer);
 
     class Submesh : 
       public scfImplementation1<Submesh, 

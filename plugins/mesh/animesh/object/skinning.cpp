@@ -31,20 +31,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
 
   
-  void AnimeshObject::SkinVertices (iRenderBuffer* resultBuffer)
+  void AnimeshObject::SkinVertices (iRenderBuffer* vResultBuffer)
   {
     if (!skeleton)
       return;
 
     // @@Better checks/handling...
-    CS_ASSERT (resultBuffer->GetElementCount () >= factory->vertexCount);
+    CS_ASSERT (vResultBuffer->GetElementCount () >= factory->vertexCount);
     
     // Get the buffer to skin from 
     iRenderBuffer* srcBuffer = factory->vertexBuffer;
 
     // Setup some local data
     csVertexListWalker<float, csVector3> srcVerts (srcBuffer);
-    csRenderBufferLock<csVector3> dstVerts (resultBuffer);
+    csRenderBufferLock<csVector3> dstVerts (vResultBuffer);
     csSkeletalState2* skeletonState = lastSkeletonState;    
 
     csAnimatedMeshBoneInfluence* influence = factory->boneInfluences.GetArray ();
@@ -54,35 +54,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       // Accumulate data for the vertex
       int numInfluences = 0;
 
-      /*csVector3 result (0,0,0);     
-      for (size_t j = 0; j < 4; ++j, ++influence)
-      {
-        if (influence->influenceWeight > 0)
-        {
-          numInfluences++;
-
-          csVector3 tmp;          
-          tmp = skeletonState->GetQuaternion (influence->bone).Rotate (*srcVerts);
-          tmp += skeletonState->GetVector (influence->bone);
-
-          result += tmp * influence->influenceWeight;
-        }
-      }
-      if (numInfluences == 0)
-      {
-      dstVerts[i] = *srcVerts;
-      }
-      else
-      {
-      dstVerts[i] = result;
-      }
-      
-      */
-
       csDualQuaternion dq (csQuaternion (0,0,0,0), csQuaternion (0,0,0,0)); 
       csQuaternion pivot;   
 
-      //@@ Add handling to avoid "empty" dq below
       for (size_t j = 0; j < 4; ++j, ++influence) // @@SOLVE 4
       {
         if (influence->influenceWeight > 0)
@@ -114,7 +88,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       {
         dq = dq.Unit ();
 
-        dstVerts[i] = dq.Transform (*srcVerts);        
+        dstVerts[i] = dq.TransformPoint (*srcVerts);        
       }  
 
       ++srcVerts;      

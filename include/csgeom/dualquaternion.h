@@ -247,9 +247,9 @@ public:
   }
 
   /**
-   * Transform a vector by a dual quaternion
+   * Transform a vector by a dual quaternion as if the vector is a position
    */
-  inline csVector3 Transform (const csVector3& v) const
+  inline csVector3 TransformPoint (const csVector3& v) const
   {
     csVector3 position = v + 2.0f * (real.v % ((real.v % v) + real.w * v));
     csVector3 trans = 2.0f * (real.w * dual.v - dual.w * real.v + (real.v % dual.v));
@@ -257,6 +257,16 @@ public:
     return position + trans;
   }
 
+  /**
+   * Transform a vector by a dual quaternion
+   */
+  inline csVector3 Transform (const csVector3& v) const
+  {
+    csVector3 position = v + 2.0f * (real.v % ((real.v % v) + real.w * v));
+    //csVector3 trans = 2.0f * (real.w * dual.v - dual.w * real.v + (real.v % dual.v));
+
+    return position /*+ trans*/;
+  }
 
   // Data
   /// The real part, representing rotational component
