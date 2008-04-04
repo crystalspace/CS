@@ -6,6 +6,9 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-Apr-2008
+	- res made GL texture readback fail if a mipmap is requested but
+	  the texture isn't mipmapped.
 3-Apr-2008
 	- res fixed a potential crash in shaderweaver.
 	- res made cssynldr also accept "int" as a type name for shader

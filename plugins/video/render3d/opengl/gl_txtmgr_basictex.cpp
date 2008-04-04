@@ -877,11 +877,13 @@ csPtr<iDataBuffer> csGLBasicTextureHandle::Readback (
   if (format.GetFormat() == CS::StructuredTextureFormat::Special)
     return 0;
   
+  if ((mip > 0) && (texFlags.Get() & CS_TEXTURE_NOMIPMAPS)) return 0;
+
   TextureStorageFormat glFormat;
   TextureSourceFormat sourceFormat;
   if (!txtmgr->DetermineGLFormat (format, glFormat, sourceFormat))
     return 0;
-    
+
   int s = 0;
   for (int i = 0; i < format.GetComponentCount(); i++)
     s += format.GetComponentSize (i);
