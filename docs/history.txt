@@ -15,6 +15,8 @@ chronological order.
 	- res made the Cg shader plugin more quiet in the "precompiling"
 	  steps.
 	- res tweaked the texture formats used by the HDR helper.
+	- res made the HDR exposure control fall back to using the whole
+	  screen if a mipmapped version isn't available.
 3-Apr-2008
 	- res fixed a potential crash in shaderweaver.
 	- res made cssynldr also accept "int" as a type name for shader

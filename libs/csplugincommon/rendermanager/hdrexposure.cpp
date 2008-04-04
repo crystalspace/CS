@@ -62,22 +62,32 @@ namespace CS
     void HDRExposureLinear::ApplyExposure (PostEffectManager& postEffects)
     {
       iTextureHandle* measureTex = postEffects.GetLayerOutput (measureLayer);
-      csRef<iDataBuffer> newData = measureTex->Readback (readbackFmt, 2);
       int newW, newH;
       measureTex->GetRendererDimensions (newW, newH);
+      csRef<iDataBuffer> newData = measureTex->Readback (readbackFmt, 2);
+      if (!newData.IsValid())
+      {
+	// If we can't get the mipmapped version, try to get full version
+        newData = measureTex->Readback (readbackFmt, 0);
+        if (!newData.IsValid()) return;
+      }
+      else
+      {
+        lastW >>= 2; lastH >>= 2;
+      }
       
       csTicks currentTime = csGetTicks();
       if (lastData.IsValid() && (lastTime != 0))
       {
-        const uint8* rgba = lastData->GetUint8();
+        const uint8* bgra = lastData->GetUint8();
         int numPixels = lastW * lastH;
         float totalLum = 0;
         for (int i = 0; i < numPixels; i++)
         {
-          int r = *rgba++;
-          int g = *rgba++;
-          int b = *rgba++;
-          rgba++;
+          int b = *bgra++;
+          int g = *bgra++;
+          int r = *bgra++;
+          bgra++;
           float lum = r*(0.2126f/255) + g*(0.7152f/255) + b*(0.722f/255);
           totalLum += lum;
         }
@@ -94,7 +104,7 @@ namespace CS
       }
       
       lastData = newData;
-      lastW = newW >> 2; lastH = newH >> 2;
+      lastW = newW; lastH = newH;
       lastTime = currentTime;
     }
   
