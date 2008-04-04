@@ -35,6 +35,58 @@ chronological order.
 	  -Wno-long-double is spuriously and incorrectly accepted by the
 	  compiler.
 	- caedes added iBugPlug to scripting bindings.
+	- Eric Sunshine added mk/autoconf/listutil.m4, containing m4
+	  list-related utilities. Added macro CS_MEMBERSHIP_ANY() which checks
+	  if any item of an input list exists in a target list.
+	- Eric Sunshine changed the signatures of all of the emitter macros,
+	  CS_JAMCONFIG_PROPERTY (jamcache.m4), CS_MAKEFILE_PROPERTY
+	  (makecache.m4), CS_HEADER_PROPERTY (headercache.m4),
+	  CS_DEFINE_EMITTER (emit.m4), CS_SUBST_EMITTER (emit.m4),
+	  CS_NULL_EMITTER (emit.m4), to accept a single optional OPTIONS
+	  argument rather than separate APPEND and UNCONDITIONAL arguments. The
+	  new generalized OPTIONS argument is a comma-separated list of
+	  keywords which control emitter behavior. Present options include
+	  "append", "atomic", "conditional", "default", and "unconditional".
+	  Options "append", "conditional", and "unconditional" control property
+	  assignment (essentially, '+=', '?=', and '='). "default" is an alias
+	  for the emitter's default behavior, as is an empty OPTIONS argument.
+	  The "atomic" option tells the emitter to treat its VALUE argument as
+	  a single unit (i.e. quoting it in some manner) rather than as
+	  potentially multiple tokens. Note that, for backward-compatibility,
+	  all emitters still also respect the old calling semantics, so
+	  existing code should continue working correctly.
+	- Eric Sunshine changed the special-purpose EMPTY-OKAY argument of
+	  CS_EMIT_BUILD_PROPERTY (emit.m4) into a general-purpose
+	  PROPERTY-OPTIONS argument, which is a comma-separated list of
+	  keywords. Recognized options are "conditional", "default", and
+	  "unconditional". The "conditional" option results in the property
+	  being emitted only if the VALUE is non-empty, whereas the
+	  "unconditional" option causes the value to be emitted regardless.
+	  "default" is an alias for "conditional", as is an empty
+	  PROPERTY-OPTIONS argument. Note that, for backward-compatibility, the
+	  old calling semantic is also respected, so existing code should
+	  continue working correctly.
+	- Eric Sunshine changed the signature of CS_EMIT_BUILD_PROPERTY
+	  (emit.m4) to accept a single EMITTER-OPTIONS argument rather than
+	  separate APPEND and UNCONDITIONAL arguments. The new EMITTER-OPTIONS
+	  is passed along to the emitter as its optional third argument. Note
+	  that, for backward-compatibility, the old calling semantic is also
+	  respected.
+	- Eric Sunshine changed the APPEND option of CS_EMIT_BUILD_FLAGS
+	  (emit.m4) into a general EMITTER-OPTIONS argument which is passed
+	  directly to the emitter. Note that, for backward-compatibility, the
+	  old calling semantic is also respected.
+	- Eric Sunshine augmented CS_EMIT_PACKAGEINFO (packageinfo.m4) so that
+	  it employs the new "atomic" emitter option for properties
+	  PACKAGE_STRING, PACKAGE_BUGREPORT, PACKAGE_LONGNAME,
+	  PACKAGE_HOMEPAGE, and PACKAGE_COPYRIGHT. This fixes fallout from
+	  r28950 which caused the values of these properties to be seen by the
+	  build system as multiple tokens rather than each as a single string
+	  (containing multiple words).  When seen incorrectly as multiple
+	  tokens, generation of some related resources (such as Visual Studio
+	  project files) broke. Also simplified emission of
+	  PACKAGE_VERSION_LIST property for which the implementation became
+	  unnecessarily complicated following r28950.
 3-Apr-2008
 	- res added a workaround to configure to avoid -Wno-long-double
 	  warnings occuring with g++ 4.2.3.
