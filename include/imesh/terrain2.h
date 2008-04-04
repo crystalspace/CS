@@ -443,12 +443,9 @@ struct iTerrainRenderer : public virtual iBase
    * \param cell cell with changed data
    * \param material material
    * \param alphaMap the alpha map
-   * \param rectangle changed rectangle within alpha texture
-   * \param the pitch of the data
    */
   virtual void OnAlphaMapUpdate (iTerrainCell* cell,
-    iMaterialWrapper* material, const unsigned char* alphaMap, const csRect& rectangle, 
-    size_t pitch) = 0;
+    iMaterialWrapper* material, iImage* alphaMap) = 0;
 };
 
 /// Callbacks for cell height data modifications
