@@ -74,6 +74,7 @@ namespace CS
 	  template<typename ResourceCacheType>
 	  StoredAuxiliaryInfo (const ResourceCacheType& cache, 
 	    const AddParameter& param) : 
+	    timeToDie (0),
 	    lifeTime (param.lifeTime)
 	  {}
 	};
@@ -155,7 +156,7 @@ namespace CS
 	  
 	  template<typename ResourceCacheType>
 	  StoredAuxiliaryInfo (const ResourceCacheType& cache, 
-	    const AddParameter& param) {}
+	    const AddParameter& param) : lastTimeUsed(0) {}
 	};
 	
 	PurgeConditionAfterTime (TimeType purgeAge = 60)
