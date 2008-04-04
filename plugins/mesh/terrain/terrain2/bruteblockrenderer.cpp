@@ -929,7 +929,7 @@ void TerrainBlock::CullRenderMeshes (iRenderView* rview, const csPlane3* cullPla
     meshCache.Push (mesh);
   }
 
-  for (int j = 0; j < renderData->alphaMapArrayAlpha.GetSize (); ++j)
+  for (size_t j = 0; j < renderData->alphaMapArrayAlpha.GetSize (); ++j)
   {
     iMaterialWrapper* mat = renderData->materialArrayAlpha[j];
     iShaderVariableContext* svContext = renderData->svContextArrayAlpha[j];
