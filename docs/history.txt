@@ -34,6 +34,7 @@ chronological order.
 	  side-steps the g++ 4.2.3 bug on non-Apple platforms where
 	  -Wno-long-double is spuriously and incorrectly accepted by the
 	  compiler.
+	- caedes added iBugPlug to scripting bindings.
 3-Apr-2008
 	- res added a workaround to configure to avoid -Wno-long-double
 	  warnings occuring with g++ 4.2.3.
