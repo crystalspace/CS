@@ -3179,7 +3179,7 @@ echo $ECHO_N "checking if $CC accepts -pipe... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cc_pipe_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-pipe@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-pipe@@ | sed 'y% %#%'`"; then
   ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -3757,7 +3757,7 @@ echo $ECHO_N "checking how to treat C++ warnings as errors... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_pic_werror_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-Werror@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-Werror@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -3914,7 +3914,7 @@ echo $ECHO_N "checking how to enable C++ PIC generation... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_pic_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-fPIC@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-fPIC@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -4607,7 +4607,7 @@ echo $ECHO_N "checking if -shared is accepted... $ECHO_C" >&6; }
 if test "${cs_cv_prog_link_shared_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-shared $cs_cv_prog_cxx_pic@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-shared $cs_cv_prog_cxx_pic@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -5198,7 +5198,7 @@ echo $ECHO_N "checking if --as-needed is supported... $ECHO_C" >&6; }
 if test "${cs_cv_prog_link_as_needed_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-Wl,--as-needed@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-Wl,--as-needed@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -5365,7 +5365,7 @@ echo $ECHO_N "checking if --no-as-needed is supported... $ECHO_C" >&6; }
 if test "${cs_cv_prog_link_no_as_needed_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-Wl,--no-as-needed@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-Wl,--no-as-needed@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -5538,7 +5538,7 @@ echo $ECHO_N "checking if --gc-sections is supported... $ECHO_C" >&6; }
 if test "${cs_cv_prog_link_gc_sections_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-Wl,--gc-sections@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-Wl,--gc-sections@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -11206,7 +11206,7 @@ echo $ECHO_N "checking for -static-libgcc... $ECHO_C" >&6; }
 if test "${cs_cv_prog_link_static_libgcc_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-static-libgcc@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-static-libgcc@@ | sed 'y% %#%'`"; then
   ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -11374,7 +11374,7 @@ echo $ECHO_N "checking for static libstdc++... $ECHO_C" >&6; }
 if test "${cs_cv_prog_link_static_libstdcxx_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @$libstdcxx@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @$libstdcxx@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -12108,7 +12108,7 @@ echo $ECHO_N "checking for -mmmx flag... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cc_mmmx_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-mmmx@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-mmmx@@ | sed 'y% %#%'`"; then
   ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -13238,7 +13238,7 @@ echo $ECHO_N "checking how to suppress C++ \`long double' warnings... $ECHO_C" >
 if test "${cs_cv_prog_cxx_ignore_long_double_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$$cs_ignore_long_double_tuples"; then
+  if test -n "$cs_ignore_long_double_tuples"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -15011,7 +15011,7 @@ echo $ECHO_N "checking how to enable C++ compilation warnings... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_enable_warnings_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-Wmost@@ | sed 'y% %#%'` `echo @-Wall@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-Wmost@@ | sed 'y% %#%'` `echo @-Wall@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -15178,7 +15178,7 @@ echo $ECHO_N "checking how to treat C++ warnings as errors... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_enable_errors_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-Werror@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-Werror@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -15336,7 +15336,7 @@ echo $ECHO_N "checking how to suppress C++ unused variable warnings... $ECHO_C" 
 if test "${cs_cv_prog_cxx_ignore_unused_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-Wno-unused@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-Wno-unused@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -15503,7 +15503,7 @@ echo $ECHO_N "checking how to suppress C++ uninitialized variable warnings... $E
 if test "${cs_cv_prog_cxx_ignore_uninitialized_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-Wno-uninitialized@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-Wno-uninitialized@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -15670,7 +15670,7 @@ echo $ECHO_N "checking how to suppress C++ unknown #pragma warnings... $ECHO_C" 
 if test "${cs_cv_prog_cxx_ignore_unknown_pragmas_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-Wno-unknown-pragmas@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-Wno-unknown-pragmas@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -15845,7 +15845,7 @@ echo $ECHO_N "checking how to suppress C++ \`long double' warnings... $ECHO_C" >
 if test "${cs_cv_prog_cxx_ignore_long_double_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$$cs_ignore_long_double_tuples"; then
+  if test -n "$cs_ignore_long_double_tuples"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -16012,7 +16012,7 @@ echo $ECHO_N "checking how to suppress C++ non-virtual destructor warnings... $E
 if test "${cs_cv_prog_cxx_ignore_non_virtual_dtor_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-Wno-non-virtual-dtor@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-Wno-non-virtual-dtor@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -16186,7 +16186,7 @@ echo $ECHO_N "checking for flag to disable string-aliasing... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_no_strict_aliasing_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-fno-strict-aliasing@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-fno-strict-aliasing@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -16360,7 +16360,7 @@ echo $ECHO_N "checking how to enable C++ exceptions... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_enable_exceptions_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-fexceptions -fno-omit-frame-pointer@@ | sed 'y% %#%'` \
+  if test -n "`echo @-fexceptions -fno-omit-frame-pointer@@ | sed 'y% %#%'` \
     `echo @-fexceptions@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
@@ -16530,7 +16530,7 @@ echo $ECHO_N "checking how to disable C++ exceptions... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_disable_exceptions_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-fno-exceptions@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-fno-exceptions@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -16715,7 +16715,7 @@ echo $ECHO_N "checking how to enforce C++ standards conformance... $ECHO_C" >&6;
 if test "${cs_cv_prog_cxx_enable_pedantic_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-ansi -pedantic@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-ansi -pedantic@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -16894,7 +16894,7 @@ echo $ECHO_N "checking if -force_cpusubtype_ALL is needed... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_force_cpusubtype_all_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @@-force_cpusubtype_ALL@ | sed 'y% %#%'`"; then
+  if test -n "`echo @@-force_cpusubtype_ALL@ | sed 'y% %#%'`"; then
   ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -17073,7 +17073,7 @@ echo $ECHO_N "checking if -fno-common is needed... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_no_common_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @@-fno-common@ | sed 'y% %#%'`"; then
+  if test -n "`echo @@-fno-common@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -17257,7 +17257,7 @@ echo $ECHO_N "checking if -fvtable-thunks is needed... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_vtable_thunks_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-fvtable-thunks@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-fvtable-thunks@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -17432,7 +17432,7 @@ echo $ECHO_N "checking how to export all dynamic symbols... $ECHO_C" >&6; }
 if test "${cs_cv_prog_link_export_dynamic_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-Wl,-E@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-Wl,-E@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -17933,7 +17933,7 @@ echo $ECHO_N "checking if reporting missing symbols is supported... $ECHO_C" >&6
 if test "${cs_cv_prog_link_z_defs_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @@-Wl,-z,defs@ | sed 'y% %#%'`"; then
+  if test -n "`echo @@-Wl,-z,defs@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -18100,7 +18100,7 @@ echo $ECHO_N "checking if missing symbols can be reported as warnings... $ECHO_C
 if test "${cs_cv_prog_link_warn_unresolved_symbols_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @@-Wl,--warn-unresolved-symbols@ | sed 'y% %#%'`"; then
+  if test -n "`echo @@-Wl,--warn-unresolved-symbols@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -18277,7 +18277,7 @@ echo $ECHO_N "checking how to disable function inlining... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_disable_inlining_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-fno-inline-functions@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-fno-inline-functions@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -18450,7 +18450,7 @@ echo $ECHO_N "checking how to treat C warnings as errors... $ECHO_C" >&6; }
 if test "${cs_cv_prog_c_enable_errors_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-Werror@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-Werror@@ | sed 'y% %#%'`"; then
   ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -18607,7 +18607,7 @@ echo $ECHO_N "checking how to treat C++ warnings as errors... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_enable_errors_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-Werror@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-Werror@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -18767,7 +18767,7 @@ echo $ECHO_N "checking how to treat C++ warnings as errors... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_pic_werror_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-Werror@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-Werror@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -18924,7 +18924,7 @@ echo $ECHO_N "checking how to enable C++ PIC generation... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_pic_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-fPIC@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-fPIC@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -19093,7 +19093,7 @@ echo $ECHO_N "checking for inline visibility flag... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_visibility_inlines_hidden_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-fvisibility-inlines-hidden@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-fvisibility-inlines-hidden@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -19757,7 +19757,7 @@ echo $ECHO_N "checking for hidden symbol visibility flag... $ECHO_C" >&6; }
 if test "${cs_cv_prog_c_visibility_hidden_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-fvisibility=hidden@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-fvisibility=hidden@@ | sed 'y% %#%'`"; then
   ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -19925,7 +19925,7 @@ echo $ECHO_N "checking for default symbol visibility flag... $ECHO_C" >&6; }
 if test "${cs_cv_prog_c_visibility_default_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-fvisibility=default@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-fvisibility=default@@ | sed 'y% %#%'`"; then
   ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -24202,7 +24202,7 @@ echo $ECHO_N "checking how to enable optimizations... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_optimize_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-O3@@ | sed 'y% %#%'` `echo @-O2@@ | sed 'y% %#%'` `echo @-O@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-O3@@ | sed 'y% %#%'` `echo @-O2@@ | sed 'y% %#%'` `echo @-O@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -24370,7 +24370,7 @@ echo $ECHO_N "checking if -fomit-frame-pointer is accepted... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_omit_frame_pointer_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-fomit-frame-pointer@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-fomit-frame-pointer@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -24539,7 +24539,7 @@ echo $ECHO_N "checking if -ffast-math is accepted... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_fast_math_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-ffast-math@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-ffast-math@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -25230,7 +25230,7 @@ echo $ECHO_N "checking how to enable debug mode debugging symbols... $ECHO_C" >&
 if test "${cs_cv_prog_cxx_debug_symbols_extra_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-g3@@ | sed 'y% %#%'` `echo @-g2@@ | sed 'y% %#%'` `echo @-g@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-g3@@ | sed 'y% %#%'` `echo @-g2@@ | sed 'y% %#%'` `echo @-g@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -25418,7 +25418,7 @@ echo $ECHO_N "checking how to enable optimize mode debugging symbols... $ECHO_C"
 if test "${cs_cv_prog_cxx_debug_symbols_normal_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-g2@@ | sed 'y% %#%'` `echo @-g@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-g2@@ | sed 'y% %#%'` `echo @-g@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -25611,7 +25611,7 @@ echo $ECHO_N "checking if -I/usr/local/include is usable... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cpp_local_include_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$`echo @-I/usr/local/include@@ | sed 'y% %#%'`"; then
+  if test -n "`echo @-I/usr/local/include@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
