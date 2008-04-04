@@ -23,6 +23,10 @@ chronological order.
 	    - No longer unnecessarily caches the result of the buggy g++ check
 	      since the expensive part of this check, the
 	      CS_CHECK_PROG_VERSION() invocation, is already cache-friendly.
+	- Eric Sunshine augmented CS_CHECK_BUILD_FLAGS() in checkbuild.m4 so
+	  that an empty FLAGS argument is now explicitly considered a failure
+	  and is documented as such. Previously, behavior for this case was
+	  undefined.
 3-Apr-2008
 	- res added a workaround to configure to avoid -Wno-long-double
 	  warnings occuring with g++ 4.2.3.
