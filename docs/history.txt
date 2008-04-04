@@ -14,6 +14,7 @@ chronological order.
 	  inputs set to constant).
 	- res made the Cg shader plugin more quiet in the "precompiling"
 	  steps.
+	- res tweaked the texture formats used by the HDR helper.
 3-Apr-2008
 	- res fixed a potential crash in shaderweaver.
 	- res made cssynldr also accept "int" as a type name for shader

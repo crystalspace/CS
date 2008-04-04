@@ -87,11 +87,11 @@ namespace CS
            * alpha. But without is prolly faster, and post proc shaders are less
            * likely to need it. So perhaps allow different formats in one post
            * effect manager ... */
-          case qualInt8:    textureFmt = "bgr8"; break;
-          case qualInt10:   textureFmt = "bgr10"; break;
-          case qualInt16:   textureFmt = "bgr16"; break;
-          case qualFloat16: textureFmt = "rgb16_f"; break;
-          case qualFloat32: textureFmt = "rgb32_f"; break;
+          case qualInt8:    textureFmt = "argb8"; break;
+          case qualInt10:   textureFmt = "rgb10"; break;
+          case qualInt16:   textureFmt = "rgb16"; break;
+          case qualFloat16: textureFmt = "bgr16_f"; break;
+          case qualFloat32: textureFmt = "bgr32_f"; break;
           default: return false;
         }
         postEffects.SetIntermediateTargetFormat (textureFmt);
