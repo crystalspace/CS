@@ -471,7 +471,7 @@ void csGraphics2DXLib::recompute_simulated_palette ()
   if (sim_depth == 15 || sim_depth == 16)
   {
     uint16* m = (uint16*)Memory;
-    i = Width*Height;
+    i = fbWidth*fbHeight;
     while (i > 0)
     {
       pe[*m++].cnt++;
@@ -481,7 +481,7 @@ void csGraphics2DXLib::recompute_simulated_palette ()
   else if (sim_depth == 32)
   {
     uint32* m = (uint32*)Memory;
-    i = Width*Height;
+    i = fbWidth*fbHeight;
     while (i > 0)
     {
       uint32 col = *m++;
@@ -496,7 +496,7 @@ void csGraphics2DXLib::recompute_simulated_palette ()
 
   // Fake that color 0 (black) is used very much so that
   // it will appear in front of all colors after sorting.
-  pe[0].cnt = Width*Height+1;
+  pe[0].cnt = fbWidth*fbHeight+1;
 
   // Sort based on count.
   qsort ((void*)pe, 65536, sizeof (palent), cmp_palent);
@@ -687,7 +687,7 @@ void csGraphics2DXLib::Print (csRect const* area)
     {
       uint16* src = (uint16*)Memory;
       uint32* dst = (uint32*)real_Memory;
-      int i = Width * Height;
+      int i = fbWidth * fbHeight;
       while (i > 0)
       {
         uint16 rgb = *src++;
@@ -699,7 +699,7 @@ void csGraphics2DXLib::Print (csRect const* area)
     {
       uint16* src = (uint16*)Memory;
       uint32* dst = (uint32*)real_Memory;
-      int i = Width * Height;
+      int i = fbWidth * fbHeight;
       while (i > 0)
       {
         uint16 rgb = *src++;
@@ -711,7 +711,7 @@ void csGraphics2DXLib::Print (csRect const* area)
     {
       uint16* src = (uint16*)Memory;
       uint16* dst = (uint16*)real_Memory;
-      int i = Width * Height;
+      int i = fbWidth * fbHeight;
       while (i > 0)
       {
         uint16 rgb = *src++;
@@ -723,7 +723,7 @@ void csGraphics2DXLib::Print (csRect const* area)
     {
       uint16* src = (uint16*)Memory;
       uint16* dst = (uint16*)real_Memory;
-      int i = Width * Height;
+      int i = fbWidth * fbHeight;
       while (i > 0)
       {
         uint16 rgb = *src++;
@@ -735,7 +735,7 @@ void csGraphics2DXLib::Print (csRect const* area)
     {
       uint16* src = (uint16*)Memory;
       unsigned char* dst = real_Memory;
-      int i = Width * Height;
+      int i = fbWidth * fbHeight;
       while (i > 0)
       {
         *dst++ = sim_lt8[*src++];
@@ -746,7 +746,7 @@ void csGraphics2DXLib::Print (csRect const* area)
     {
       uint32* src = (uint32*)Memory;
       unsigned char* dst = real_Memory;
-      int i = Width*Height;
+      int i = fbWidth*fbHeight;
       while (i > 0)
       {
         uint32 col = *src++;
@@ -762,7 +762,7 @@ void csGraphics2DXLib::Print (csRect const* area)
     {
       uint32* src = (uint32*)Memory;
       uint16* dst = (uint16*)real_Memory;
-      int i = Width*Height;
+      int i = fbWidth*fbHeight;
       while (i > 0)
       {
         uint32 col = *src++;
@@ -808,7 +808,7 @@ void csGraphics2DXLib::Print (csRect const* area)
       {
         unsigned char* src = Memory;
         uint16* dst = (uint16*)real_Memory;
-        int i = Width*Height;
+	int i = fbWidth*fbHeight;
         while (i > 0)
         {
           *dst++ = sim_lt16[*src++];
@@ -819,7 +819,7 @@ void csGraphics2DXLib::Print (csRect const* area)
       {
         unsigned char* src = Memory;
         uint32* dst = (uint32*)real_Memory;
-        int i = Width*Height;
+	int i = fbWidth*fbHeight;
         while (i > 0)
         {
           uint16 rgb = sim_lt16[*src++];
@@ -837,7 +837,7 @@ void csGraphics2DXLib::Print (csRect const* area)
 	       area->xmin, area->ymin, area->xmin, area->ymin,
 	       area->Width (), area->Height ());
   else
-    XPutImage (dpy, window, gc, xim, 0, 0, 0, 0, Width, Height);
+    XPutImage (dpy, window, gc, xim, 0, 0, 0, 0, fbWidth, fbHeight);
 }
 
 bool csGraphics2DXLib::AllocateMemory ()
@@ -862,7 +862,7 @@ bool csGraphics2DXLib::AllocateMemory ()
 bool csGraphics2DXLib::TryAllocateMemory ()
 {
   if (xshm)
-    real_Memory = xshm->CreateMemory (Width, Height);
+    real_Memory = xshm->CreateMemory (fbWidth, fbHeight);
   else
   {
     int disp_depth = DefaultDepth(dpy,screen_num);
@@ -870,7 +870,7 @@ bool csGraphics2DXLib::TryAllocateMemory ()
     bitmap_pad = (bitmap_pad == 3) ? 32 : bitmap_pad*8;
     xim = XCreateImage(dpy, DefaultVisual(dpy,screen_num),
 		       disp_depth, ZPixmap, 0, 0,
-		       Width, Height, bitmap_pad, 0);
+	               fbWidth, fbHeight, bitmap_pad, 0);
     xim->data = new char[xim->bytes_per_line*xim->height];
     real_Memory = (unsigned char*)(xim->data);
   }
@@ -882,7 +882,7 @@ bool csGraphics2DXLib::TryAllocateMemory ()
   if (!sim_depth)
     Memory = real_Memory;
   else
-    Memory = new unsigned char [Width * Height * pfmt.PixelBytes];
+    Memory = new unsigned char [fbWidth * fbHeight * pfmt.PixelBytes];
 
   return true;
 }

@@ -7,12 +7,146 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 4-Apr-2008
+	- Eric Sunshine applied the following fixes and improvements to the g++
+	  bug check added to the CS_COMPILER_IGNORE_LONG_DOUBLE() macro
+	  (warnings.m4) from r29198 and r29200:
+	    - Now properly sets CACHE-VAR, as documented, even when g++ is
+	      found to be buggy.
+	    - Now emits the result of the "suppress long double warnings" check
+	      even when g++ is found to be buggy.
+	    - No longer incorrectly accesses the variable 'cs_host_macosx',
+	      which is private to the _CS_CHECK_HOST_DARWIN() macro
+	      (cs_check_host.m4).
+	    - For improved robustness, no longer considers Mac OS X a special
+	      case, and respects the g++ bug discovery uniformly on all
+	      platforms.
+	    - No longer unnecessarily caches the result of the buggy g++ check
+	      since the expensive part of this check, the
+	      CS_CHECK_PROG_VERSION() invocation, is already cache-friendly.
+	- Eric Sunshine augmented CS_CHECK_BUILD_FLAGS() in checkbuild.m4 so
+	  that an empty FLAGS argument is now explicitly considered a failure
+	  and is documented as such. Previously, behavior for this case was
+	  undefined.
+	- Eric Sunshine, after further research, changed
+	  CS_COMPILER_IGNORE_LONG_DOUBLE() in warnings.m4 so that it only tests
+	  for -Wno-long-double support on Apple platforms since it is an
+	  Apple-specific g++ option. Checking this option conditionally
+	  side-steps the g++ 4.2.3 bug on non-Apple platforms where
+	  -Wno-long-double is spuriously and incorrectly accepted by the
+	  compiler.
+	- caedes added iBugPlug to scripting bindings.
+	- Eric Sunshine added mk/autoconf/listutil.m4, containing m4
+	  list-related utilities. Added macro CS_MEMBERSHIP_ANY() which checks
+	  if any item of an input list exists in a target list.
+	- Eric Sunshine changed the signatures of all of the emitter macros,
+	  CS_JAMCONFIG_PROPERTY (jamcache.m4), CS_MAKEFILE_PROPERTY
+	  (makecache.m4), CS_HEADER_PROPERTY (headercache.m4),
+	  CS_DEFINE_EMITTER (emit.m4), CS_SUBST_EMITTER (emit.m4),
+	  CS_NULL_EMITTER (emit.m4), to accept a single optional OPTIONS
+	  argument rather than separate APPEND and UNCONDITIONAL arguments. The
+	  new generalized OPTIONS argument is a comma-separated list of
+	  keywords which control emitter behavior. Present options include
+	  "append", "atomic", "conditional", "default", and "unconditional".
+	  Options "append", "conditional", and "unconditional" control property
+	  assignment (essentially, '+=', '?=', and '='). "default" is an alias
+	  for the emitter's default behavior, as is an empty OPTIONS argument.
+	  The "atomic" option tells the emitter to treat its VALUE argument as
+	  a single unit (i.e. quoting it in some manner) rather than as
+	  potentially multiple tokens. Note that, for backward-compatibility,
+	  all emitters still also respect the old calling semantics, so
+	  existing code should continue working correctly.
+	- Eric Sunshine changed the special-purpose EMPTY-OKAY argument of
+	  CS_EMIT_BUILD_PROPERTY (emit.m4) into a general-purpose
+	  PROPERTY-OPTIONS argument, which is a comma-separated list of
+	  keywords. Recognized options are "conditional", "default", and
+	  "unconditional". The "conditional" option results in the property
+	  being emitted only if the VALUE is non-empty, whereas the
+	  "unconditional" option causes the value to be emitted regardless.
+	  "default" is an alias for "conditional", as is an empty
+	  PROPERTY-OPTIONS argument. Note that, for backward-compatibility, the
+	  old calling semantic is also respected, so existing code should
+	  continue working correctly.
+	- Eric Sunshine changed the signature of CS_EMIT_BUILD_PROPERTY
+	  (emit.m4) to accept a single EMITTER-OPTIONS argument rather than
+	  separate APPEND and UNCONDITIONAL arguments. The new EMITTER-OPTIONS
+	  is passed along to the emitter as its optional third argument. Note
+	  that, for backward-compatibility, the old calling semantic is also
+	  respected.
+	- Eric Sunshine changed the APPEND option of CS_EMIT_BUILD_FLAGS
+	  (emit.m4) into a general EMITTER-OPTIONS argument which is passed
+	  directly to the emitter. Note that, for backward-compatibility, the
+	  old calling semantic is also respected.
+	- Eric Sunshine augmented CS_EMIT_PACKAGEINFO (packageinfo.m4) so that
+	  it employs the new "atomic" emitter option for properties
+	  PACKAGE_STRING, PACKAGE_BUGREPORT, PACKAGE_LONGNAME,
+	  PACKAGE_HOMEPAGE, and PACKAGE_COPYRIGHT. This fixes fallout from
+	  r28950 which caused the values of these properties to be seen by the
+	  build system as multiple tokens rather than each as a single string
+	  (containing multiple words).  When seen incorrectly as multiple
+	  tokens, generation of some related resources (such as Visual Studio
+	  project files) broke. Also simplified emission of
+	  PACKAGE_VERSION_LIST property for which the implementation became
+	  unnecessarily complicated following r28950.
+	- Eric Sunshine eliminated compilation warning in
+	  terrain2/bruteblockrenderer.
+	- Marten fixed terrain2 to properly handle alphamaps independent of if
+	  they are true color or paletted, with or without alpha.
+	- Marten optimized the terrain2 texture updates.
+	- Eric Sunshine eliminated compilation warnings in csutil and null3d.
 	- Marten added method to csDualQuaternion for transforming without
 	  movements.
 	- Marten cleaned up software vertex skinning a bit.
+3-Apr-2008
+	- res added a workaround to configure to avoid -Wno-long-double
+	  warnings occuring with g++ 4.2.3.
+	- Marten made a fix to rendering of separate alphamaps in terrain2.
+	- Marten optimized terrain2 renderer not to use material map layers
+	  where the material isn't used at all in the cell.
+	- Vincent fixed sound sources not being cleaned when closing the
+	  OpenAL renderer.
+	- Sueastside committed a patch by Mononoke to fix a crash in the Alsa
+	  renderer on exit.
+	- Vincent applied Marten's fix for sound sources not being cleaned
+	  when closing the software renderer. Happy Bithday Marten !
+2-Apr-2008
+	- Mike Gist added csWeakRefHash which inherits from csHash.
+	  It has a Compact() function which removes all deleted elements
+	  (NULL value), and uses csArraySafeCopyElementHandler.
+	- res fixed graphic distortions after r29169.
+	- caedes fixed a number of gcc compiler errors on csWeakRefHash 
+	  (guided by res).
+	- Mike Gist moved csWeakRefHash into its own file.
+	- caedes added iCollection to scripting bindings.
+	- res fixed a strict aliasing violation in csFixedSizeAllocator that
+	  caused crashes in optimize mode.
+1-Apr-2008
+	- res fixed a missing 'break' in the terrain2 loader.
+	- res changed the csHash<> implementation to move the Element type out
+	  of the csHash<> class. Kludgy, but makes it possible to provide
+	  custom element handlers for the arrays inside the hash.
+	- caedes fixed all uses of csHash template inside csHash so it uses
+	  the user defined allocator and element handler (under res guidance).
+	- res enabled the 'resizing' flag in embedgl.
+	- res added viewport control to iGraphics2D.
+	- res added the canvas event IDs to the script bindings.
 31-Mar-2008
+	- Eric Sunshine applied changes to jobber-cel-svn.cfg similar to those
+	  made to jobber-svn.cfg in r27840, r27842, r27849: actually run CEL's
+	  configure script rather than faking it, and perform checkout from a
+	  local repository then switch the live one. This fixes CEL jobber
+	  failure following cel:r3270.
+	- Mike Gist fixed a bug in the 3ds max exportSprite script and also 
+	  improved the formatting of the output.
+	- Marten added iMissingLoaderData to the python-exposed interfaces.
 	- Marten fixed the software skinning and animation to actually work
 	  correctly.
+30-Mar-2008
+	- res fixed PBOs not being bound before used in the texture blit code.
+	- res applied a patch from Lukas Erlinghagen to fix compiling on
+	  gcc 3.4.
+	- res applied a patch from Lukas Erlinghagen to add frame time display
+	  to bugplug.
+>>>>>>> .merge-right.r29236
 26-Mar-2008
 	- Marten commited a number of re-inlinings of basic matrix & vector 
 	  methods.

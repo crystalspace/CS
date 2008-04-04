@@ -254,17 +254,19 @@ namespace CS
       void **buffer1, size_t *buffer1_bytes, void **buffer2, size_t *buffer2_bytes);
 
     /**
-    * Fill a size_t value that will be used to track a Source's position through 
-    * calls to GetDataPointers().
+    * Fill a size_t value that will be used to track a Source's position
+    * through calls to GetDataPointers().
     *
     * \remarks Not intended to be called by an application.
     */
     virtual void InitializeSourcePositionMarker (size_t* position_marker);
 
-    /** Called by the sound system to allow a stream time to process pending notifications.
+    /**
+    * Called by the sound system to allow a stream time to process pending
+    * notifications.
     * 
-    * \remarks Not intended to be called by an application.  This is called from the
-    *          main application thread.
+    * \remarks Not intended to be called by an application.
+    *   This is called from the main application thread.
     */
     virtual void ProcessNotifications();
 
@@ -275,15 +277,16 @@ namespace CS
     /// Unregister a previously registered callback component 
     virtual bool UnregisterCallback(iSndSysStreamCallback *pCallback);
 
-    /// Register a particular frame number which will trigger a callback notification when
-    //   it's crossed.
+    /// Register a particular frame number which will trigger a callback
+    /// notification when it's crossed.
     virtual bool RegisterFrameNotification(size_t frame_number);
 
     ////
     // Internal functions
     ////
   protected:
-    /// Copies audio data from the ogg decoding buffer into the cyclic sample buffer
+    /// Copies audio data from the ogg decoding buffer into the cyclic
+    /// sample buffer
     //
     size_t CopyBufferBytes (size_t max_dest_bytes);
 

@@ -18,6 +18,7 @@
 */
 
 #include "cssysdef.h"
+#include "csgeom/math.h"
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
 #include <stdarg.h>
@@ -41,15 +42,15 @@
 #include "csplugincommon/canvas/softfontcacheimpl.h"
 
 csGraphics2D::csGraphics2D (iBase* parent) : 
-  scfImplementationType (this, parent), vpSet(false)
+  scfImplementationType (this, parent)
 {
   static uint g2d_count = 0;
 
   Memory = 0;
   LineAddress = 0;
   Palette = 0;
-  Width = 640;
-  Height = 480;
+  fbWidth = 640;
+  fbHeight = 480;
   Depth = 16;
   DisplayNumber = 0;
   FullScreen = false;
@@ -85,8 +86,8 @@ bool csGraphics2D::Initialize (iObjectRegistry* r)
   plugin_mgr = csQueryRegistry<iPluginManager> (object_reg);
   // Get the system parameters
   config.AddConfig (object_reg, "/config/video.cfg");
-  Width = config->GetInt ("Video.ScreenWidth", Width);
-  Height = config->GetInt ("Video.ScreenHeight", Height);
+  vpWidth = fbWidth = config->GetInt ("Video.ScreenWidth", fbWidth);
+  vpHeight = fbHeight = config->GetInt ("Video.ScreenHeight", fbHeight);
   Depth = config->GetInt ("Video.ScreenDepth", Depth);
   FullScreen = config->GetBool ("Video.FullScreen", FullScreen);
   DisplayNumber = config->GetInt ("Video.DisplayNumber", DisplayNumber);
@@ -147,8 +148,8 @@ bool csGraphics2D::Initialize (iObjectRegistry* r, int width, int height,
   plugin_mgr = csQueryRegistry<iPluginManager> (object_reg);
   // Get the system parameters
   config.AddConfig (object_reg, "/config/video.cfg");
-  Width = width;
-  Height = height;
+  fbWidth = width;
+  fbHeight = height;
   Depth = depth;
   FullScreen = false;
   Memory = (unsigned char*)memory;
@@ -275,24 +276,23 @@ bool csGraphics2D::Open ()
   if (is_open) return true;
   is_open = true;
 
-  vpWidth = Width;
-  vpHeight = Height;
-  vpSet = false;
+  vpLeft = 0;
+  vpTop = 0;
   
   FrameBufferLocked = 0;
 
   // Allocate buffer for address of each scan line to avoid multuplication
-  LineAddress = new int [Height];
+  LineAddress = new int [fbHeight];
   if (LineAddress == 0) return false;
 
   // Initialize scanline address array
-  int i,addr,bpl = Width * pfmt.PixelBytes;
-  for (i = 0, addr = 0; i < Height; i++, addr += bpl)
+  int i,addr,bpl = fbWidth * pfmt.PixelBytes;
+  for (i = 0, addr = 0; i < fbHeight; i++, addr += bpl)
     LineAddress[i] = addr;
 
   CreateDefaultFontCache ();
 
-  SetClipRect (0, 0, Width, Height);
+  SetClipRect (0, 0, fbWidth, fbHeight);
 
   return true;
 }
@@ -552,15 +552,15 @@ void csGraphics2D::DrawLine (float x1, float y1, float x2, float y2, int color)
     {
       case 1:
 	csG2DDrawLine<uint8, csPixMixerCopy<uint8> >::DrawLine (this,
-	  x1, y1, x2, y2, realColor, alpha);
+	  vpLeft+x1, vpTop+y1, vpLeft+x2, vpTop+y2, realColor, alpha);
 	break;
       case 2:
 	csG2DDrawLine<uint16, csPixMixerCopy<uint16> >::DrawLine (this,
-	  x1, y1, x2, y2, realColor, alpha);
+	  vpLeft+x1, vpTop+y1, vpLeft+x2, vpTop+y2, realColor, alpha);
 	break;
       case 4:
 	csG2DDrawLine<uint32, csPixMixerCopy<uint32> >::DrawLine (this,
-	  x1, y1, x2, y2, realColor, alpha);
+	  vpLeft+x1, vpTop+y1, vpLeft+x2, vpTop+y2, realColor, alpha);
 	break;
     }
   }
@@ -570,15 +570,15 @@ void csGraphics2D::DrawLine (float x1, float y1, float x2, float y2, int color)
     {
       case 1:
 	csG2DDrawLine<uint8, csPixMixerCopy<uint8> >::DrawLine (this,
-	  x1, y1, x2, y2, realColor, alpha);
+	  vpLeft+x1, vpTop+y1, vpLeft+x2, vpTop+y2, realColor, alpha);
 	break;
       case 2:
 	csG2DDrawLine<uint16, csPixMixerRGBA<uint16> >::DrawLine (this,
-	  x1, y1, x2, y2, realColor, alpha);
+	  vpLeft+x1, vpTop+y1, vpLeft+x2, vpTop+y2, realColor, alpha);
 	break;
       case 4:
 	csG2DDrawLine<uint32, csPixMixerRGBA<uint32> >::DrawLine (this,
-	  x1, y1, x2, y2, realColor, alpha);
+	  vpLeft+x1, vpTop+y1, vpLeft+x2, vpTop+y2, realColor, alpha);
 	break;
     }
   }
@@ -614,15 +614,15 @@ void csGraphics2D::DrawBox (int x, int y, int w, int h, int color)
     {
       case 1:
 	csG2DDrawBox<uint8, csPixMixerCopy<uint8> >::DrawBox (this,
-	  x, y, w, h, realColor, alpha);
+	  vpLeft+x, vpTop+y, w, h, realColor, alpha);
 	break;
       case 2:
 	csG2DDrawBox<uint16, csPixMixerCopy<uint16> >::DrawBox (this,
-	  x, y, w, h, realColor, alpha);
+	  vpLeft+x, vpTop+y, w, h, realColor, alpha);
 	break;
       case 4:
 	csG2DDrawBox<uint32, csPixMixerCopy<uint32> >::DrawBox (this,
-	  x, y, w, h, realColor, alpha);
+	  vpLeft+x, vpTop+y, w, h, realColor, alpha);
 	break;
     }
   }
@@ -659,7 +659,8 @@ void csGraphics2D::SetClipRect (int xmin, int ymin, int xmax, int ymax)
   ClipX1 = xmin; ClipX2 = xmax;
   ClipY1 = ymin; ClipY2 = ymax;
   
-  fontCache->SetClipRect (ClipX1, ClipY1, ClipX2, ClipY2);
+  fontCache->SetClipRect (vpLeft+ClipX1, vpTop+ClipY1,
+    vpLeft+ClipX2, vpTop+ClipY2);
 }
 
 void csGraphics2D::GetClipRect (int &xmin, int &ymin, int &xmax, int &ymax)
@@ -764,7 +765,7 @@ csImageArea *csGraphics2D::SaveArea (int x, int y, int w, int h)
   }
   for (; h > 0; y++, h--)
   {
-    unsigned char *VRAM = GetPixelAt (x, y);
+    unsigned char *VRAM = GetPixelAt (vpLeft+x, vpTop+y);
     memcpy (dest, VRAM, w);
     dest += w;
   } /* endfor */
@@ -780,7 +781,7 @@ void csGraphics2D::RestoreArea (csImageArea *Area, bool Free)
     w *= pfmt.PixelBytes;
     for (; h; y++, h--)
     {
-      unsigned char *VRAM = GetPixelAt (x, y);
+      unsigned char *VRAM = GetPixelAt (vpLeft+x, vpTop+y);
       memcpy (VRAM, dest, w);
       dest += w;
     } /* endfor */
@@ -846,7 +847,7 @@ void csGraphics2D::Write (iFont *font, int x, int y, int fg, int bg,
 			  const wchar_t*text, uint flags) 
 { 
   if (!text || !*text) return;
-  fontCache->WriteString (font, x, y, fg, bg, text, true, flags);
+  fontCache->WriteString (font, x, vpTop+y, fg, bg, text, true, flags);
 }
 
 unsigned char *csGraphics2D::GetPixelAt8 (csGraphics2D *This, int x, int y)
@@ -866,20 +867,6 @@ unsigned char *csGraphics2D::GetPixelAt32 (csGraphics2D *This, int x, int y)
 
 bool csGraphics2D::PerformExtensionV (char const* command, va_list args)
 {
-  if (!strcasecmp (command, "vp_set"))
-  {
-    vpWidth = va_arg (args, int);
-    vpHeight = va_arg (args, int);
-    vpSet = true;
-    return true;
-  }
-  else if (!strcasecmp (command, "vp_reset"))
-  {
-    vpWidth = Width;
-    vpHeight = Height;
-    vpSet = false;
-    return true;
-  }
   return false;
 }
 
@@ -896,10 +883,12 @@ void csGraphics2D::GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB)
 {
   oR = oG = oB = 0;
 
-  if (x < 0 || y < 0 || x >= vpWidth || y >= Height)
+  if (x < 0 || y < 0 
+      || x >= csMin (vpWidth, fbWidth - vpLeft)
+      || y >= csMin (vpHeight, fbHeight - vpTop))
     return;
 
-  uint8 *vram = GetPixelAt (x, y);
+  uint8 *vram = GetPixelAt (x+vpLeft, y+vpTop);
   if (!vram)
     return;
 
@@ -930,10 +919,12 @@ void csGraphics2D::GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB, uint
   oR = oG = oB = 0;
   oA = 255;
 
-  if (x < 0 || y < 0 || x >= vpWidth || y >= Height)
+  if (x < 0 || y < 0 
+      || x >= csMin (vpWidth, fbWidth - vpLeft)
+      || y >= csMin (vpHeight, fbHeight - vpTop))
     return;
 
-  uint8 *vram = GetPixelAt (x, y);
+  uint8 *vram = GetPixelAt (x+vpLeft, y+vpTop);
   if (!vram)
     return;
 
@@ -1019,37 +1010,36 @@ bool csGraphics2D::Resize (int w, int h)
   if (!LineAddress)
   {
     // Still in Initialization phase, configuring size of canvas
-    Width = w;
-    Height = h;
+    vpWidth = fbWidth = w;
+    vpHeight = fbHeight = h;
     return true;
   }
 
   if (!AllowResizing)
     return false;
 
-  if (Width != w || Height != h)
+  if (fbWidth != w || fbHeight != h)
   {
-    Width = w;
-    Height = h;
+    if ((vpLeft == 0) && (vpTop == 0)
+        && (vpWidth == fbWidth) && (vpHeight == fbHeight))
+    {
+      vpWidth = w;
+      vpHeight = h;
+    }
+    fbWidth = w;
+    fbHeight = h;
 
     delete [] LineAddress;
     LineAddress = 0;
 
     // Allocate buffer for address of each scan line to avoid multuplication
-    LineAddress = new int [Height];
+    LineAddress = new int [fbHeight];
     CS_ASSERT (LineAddress != 0);
 
     // Initialize scanline address array
-    int i,addr,bpl = Width * pfmt.PixelBytes;
-    for (i = 0, addr = 0; i < Height; i++, addr += bpl)
+    int i,addr,bpl = fbWidth * pfmt.PixelBytes;
+    for (i = 0, addr = 0; i < fbHeight; i++, addr += bpl)
       LineAddress[i] = addr;
-
-    if (!vpSet)
-    {
-      vpWidth = Width;
-      vpHeight = Height;
-      SetClipRect (0, 0, Width, Height);
-    }
   }
   return true;
 }
@@ -1077,6 +1067,11 @@ bool csGraphics2D::SetMouseCursor (iImage *, const csRGBcolor*, int, int,
   return false;
 }
 
+void csGraphics2D::SetViewport (int left, int top, int width, int height)
+{ 
+  vpLeft = left; vpTop = top; vpWidth = width; vpHeight = height;
+  fontCache->SetViewportOfs (left, top);
+}
 
 /**
  * A nice observation about the properties of the human eye:

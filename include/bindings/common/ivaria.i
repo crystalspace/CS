@@ -9,6 +9,7 @@
 
 %include "ivaria/stdrep.h"
 %include "ivaria/view.h"
+%include "ivaria/bugplug.h"
 %include "ivaria/collider.h"
 ARRAY_CHANGE_ALL_TEMPLATE(csCollisionPair)
 %include "ivaria/dynamics.h"

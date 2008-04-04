@@ -149,6 +149,7 @@ csBugPlug::csBugPlug (iBase *iParent)
   weakEventHandler = 0;
 
   do_fps = true;
+  display_time = false;
   fps_frame_count = 0;
   fps_tottime = 0;
   fps_cur = -1;
@@ -1042,6 +1043,10 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
 	fps_frame_count = 0;
 	fps_tottime = 0;
 	fps_cur = -1;
+      break;
+    case DEBUGCMD_TOGGLEFPSTIME:
+      display_time = !display_time;
+      Report (CS_REPORTER_SEVERITY_DEBUG, "BugPlug will display %s.", display_time ? "frame time" : "fps");
       break;
     case DEBUGCMD_MESH_XMIN:
       MoveSelectedMeshes (csVector3 (-1, 0, 0));
@@ -1966,16 +1971,27 @@ bool csBugPlug::HandleFrame (iEvent& /*event*/)
       int fw, fh;
       fnt->GetMaxSize (fw, fh);
       int fgcolor = G2D->FindRGB (255, 255, 255);
-      if (fps_cur < 0.5)
+
+      if (display_time)
       {
-	const float spf = 1.0f/fps_cur;
-	GfxWrite (G2D, fnt, 11, sh - fh - 3, 0, -1, "SPF=%.2f", spf);
-	GfxWrite (G2D, fnt, 10, sh - fh - 2, fgcolor, -1, "SPF=%.2f", spf);
+        const float mspf = 1000.0f / fps_cur;
+
+        GfxWrite (G2D, fnt, 11, sh - fh - 3, 0, -1, "%.3f msec", mspf);
+        GfxWrite (G2D, fnt, 10, sh - fh - 2, fgcolor, -1, "%.3f msec", mspf);
       }
       else
       {
-	GfxWrite (G2D, fnt, 11, sh - fh - 3, 0, -1, "FPS=%.2f", fps_cur);
-	GfxWrite (G2D, fnt, 10, sh - fh - 2, fgcolor, -1, "FPS=%.2f", fps_cur);
+        if (fps_cur < 0.5)
+        {
+          const float spf = 1.0f/fps_cur;
+          GfxWrite (G2D, fnt, 11, sh - fh - 3, 0, -1, "SPF=%.2f", spf);
+          GfxWrite (G2D, fnt, 10, sh - fh - 2, fgcolor, -1, "SPF=%.2f", spf);
+        }
+        else
+        {
+          GfxWrite (G2D, fnt, 11, sh - fh - 3, 0, -1, "FPS=%.2f", fps_cur);
+          GfxWrite (G2D, fnt, 10, sh - fh - 2, fgcolor, -1, "FPS=%.2f", fps_cur);
+        }
       }
     }
     G3D->FinishDraw ();
@@ -2253,6 +2269,7 @@ int csBugPlug::GetCommandCode (const char* cmdstr, csString& args)
   if (!strcmp (cmd, "prof_autoreset"))	return DEBUGCMD_PROFAUTORESET;
   if (!strcmp (cmd, "uberscreenshot"))	return DEBUGCMD_UBERSCREENSHOT;
   if (!strcmp (cmd, "meshnorm"))	return DEBUGCMD_MESHNORM;
+  if (!strcmp (cmd, "toggle_fps_time")) return DEBUGCMD_TOGGLEFPSTIME;
   if (!strcmp (cmd, "meshskel"))        return DEBUGCMD_MESHSKEL;
 
   return DEBUGCMD_UNKNOWN;

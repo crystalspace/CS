@@ -301,6 +301,8 @@ bool csNullGraphics3D::CanSetRenderTarget (const char* format,
         return true;
     }
     break;
+  default:
+    break;
   }
   return false;
 }

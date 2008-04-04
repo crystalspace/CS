@@ -234,6 +234,8 @@ typedef unsigned char uint8;
 %apply int * OUTPUT { int & adv };
 %apply int * OUTPUT { int & left };
 %apply int * OUTPUT { int & top };
+%apply int * OUTPUT { int & width };
+%apply int * OUTPUT { int & height };
 %apply int * OUTPUT { int & desc };
 %apply int * OUTPUT { int & nr };
 %apply int * OUTPUT { int & key };
@@ -905,6 +907,32 @@ csEventID _csevPostProcess (iObjectRegistry *);
 #define _csevFinalProcess(reg) csevFinalProcess(reg)
 #undef csevFinalProcess
 csEventID _csevFinalProcess (iObjectRegistry *);
+
+/* Canvas */
+#define _csevCanvasClose(reg, g2d) csevCanvasClose(reg, g2d)
+#undef csevCanvasClose
+csEventID csevCanvasClose(iObjectRegistry*, iGraphics2D*);
+#define _csevCanvasExposed(reg, g2d) csevCanvasExposed(reg, g2d)
+#undef csevCanvasExposed
+csEventID csevCanvasExposed(iObjectRegistry*, iGraphics2D*);
+#define _csevCanvasExposed(reg, g2d) csevCanvasExposed(reg, g2d)
+#undef csevCanvasExposed
+csEventID csevCanvasExposed(iObjectRegistry*, iGraphics2D*);
+#define _csevCanvasHidden(reg, g2d) csevCanvasHidden(reg, g2d)
+#undef csevCanvasHidden
+csEventID csevCanvasHidden(iObjectRegistry*, iGraphics2D*);
+#define _csevCanvasResize(reg, g2d) csevCanvasResize(reg, g2d)
+#undef csevCanvasResize
+csEventID csevCanvasResize(iObjectRegistry*, iGraphics2D*);
+#define _csevFocusChanged(reg) csevFocusChanged(reg)
+#undef csevFocusChanged
+csEventID csevFocusChanged(iObjectRegistry*);
+#define _csevFocusGained(reg) csevFocusGained(reg)
+#undef csevFocusGained
+csEventID csevFocusGained(iObjectRegistry*);
+#define _csevFocusLost(reg) csevFocusLost(reg)
+#undef csevFocusLost
+csEventID csevFocusLost(iObjectRegistry*);
 
 /* Keyboard */
 #define _csevKeyboardEvent(reg) csevKeyboardEvent(reg)

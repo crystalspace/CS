@@ -98,6 +98,8 @@ class R2TViewportHelper
   int rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy;
   /// Framebuffer dimensions
   int framebufW, framebufH;
+  /// Old viewport
+  int vp_old_l, vp_old_t, vp_old_w, vp_old_h;
 public:
   void Set2DViewport (iGraphics3D* G3D, int texW, int texH);
   void Reset2DViewport (iGraphics3D* G3D);
