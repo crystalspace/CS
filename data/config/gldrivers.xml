@@ -664,6 +664,22 @@
       </applicable>
     </rule>
     
+    <!--
+	* 2008-04-04: ATI Mobility Radeon HD 2600, Linux (32 bit),
+		      OpenGL 2.1.7281 Release
+		      Framebuffer objects don't work well: mipmap generation
+		      and readback seem to be broken.
+	-->
+    <rule description="ATI: Disable unsatisfactory framebuffer objects">
+	<conditions>
+		<regexp string="vendor" pattern="^ATI" />
+		<comparever version="gl" relation="le 2.1.7281" />
+	</conditions>
+	<applicable>
+		<usecfg>nofbo</usecfg>
+	</applicable>
+    </rule>
+    
     <rule description="Software GL tweaks">
       <conditions fulfill="one">
 	<regexp string="renderer" pattern="Mesa GLX Indirect" />
