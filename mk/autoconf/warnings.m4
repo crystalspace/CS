@@ -148,26 +148,30 @@ AC_DEFUN([CS_COMPILER_IGNORE_PRAGMAS],
 #	is discovered, then it is assigned to CACHE-VAR and ACTION-IF-FOUND is
 #	invoked; otherwise the empty string is assigned to CACHE-VAR and
 #	ACTION-IF-NOT-FOUND is invoked.
-#------------------------------------------------------------------------------
-# Note: As of at least 2008-04-03, gcc 4.2.3 produces spurious, errorneous
-#       'unrecognized command line option "-Wno-long-double"' errors, breaking
+#
+# IMPLEMENTATION NOTES
+#	As of at least 2008-04-03, gcc 4.2.3 produces spurious, errorneous
+#	'unrecognized command line option "-Wno-long-double"' errors, breaking
 #	builds. This problem is not caught by the -Wno-long-double check. In
 #	fact, two compiler invocations with exactly the same parameters except
 #	input/output files one may produce the error, the other may not.
 #	To work around the problem detect buggy gcc versions (assume 4.2 to be)
 #	and never use -Wno-long-double there.
+#------------------------------------------------------------------------------
 AC_DEFUN([CS_COMPILER_IGNORE_LONG_DOUBLE],
-    [AS_IF([test $ac_compiler_gnu = yes],
+    [AS_IF([test "$ac_compiler_gnu" = yes],
 	[CS_CHECK_PROG_VERSION([g++], [$CXX --version], [4.2], [9.9|.9],
-	    [cs_cv_gxx_version_buggy_long_double=yes],
-	    [cs_cv_gxx_version_buggy_long_double=no])],
-	[cs_cv_gxx_version_buggy_long_double=no])
-    AS_IF([test x$cs_host_macosx != xyes \
-	   && test $cs_cv_gxx_version_buggy_long_double = no],
+	    [cs_gxx_wno_long_double_buggy=yes],
+	    [cs_gxx_wno_long_double_buggy=no])],
+	[cs_gxx_wno_long_double_buggy=no])
+    AS_IF([test $cs_gxx_wno_long_double_buggy = no],
 	[CS_CHECK_BUILD_FLAGS(
 	    [_CS_WARNING_SUPPRESS_MSG([`long double'], [$1])],
 	    [_CS_WARNING_CACHE_VAR([$2], [$1], [ignore_long_double])],
-	    [CS_CREATE_TUPLE([-Wno-long-double])], [$1], [$3], [$4])])])
+	    [CS_CREATE_TUPLE([-Wno-long-double])], [$1], [$3], [$4])],
+        [AC_CACHE_CHECK([_CS_WARNING_SUPPRESS_MSG([`long double'], [$1])],
+            [_CS_WARNING_CACHE_VAR([$2], [$1], [ignore_long_double])],
+            [_CS_WARNING_CACHE_VAR([$2], [$1], [ignore_long_double])=''])])])
 
 
 
