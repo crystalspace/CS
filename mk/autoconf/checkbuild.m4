@@ -210,7 +210,7 @@ AC_DEFUN([CS_CHECK_BUILD],
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_BUILD_FLAGS],
     [AC_CACHE_CHECK([$1], [$2_ok],
-        [AS_IF([test -n "$$3"],
+        [AS_IF([test -n "$3"],
 	    [CS_BUILD_IFELSE([], [$3], [$4],
 		[$2=CS_TRIM([$cs_build_cflags $cs_build_lflags $cs_build_libs])
 		$2_ok="$$2"],
