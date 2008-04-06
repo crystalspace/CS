@@ -18,6 +18,8 @@
 
 #include "csutil/memutil.h"
 
+#if 0 // Marten temporarily disabled this until it has been sorted out
+
 namespace CS {
   namespace Memory {
     
@@ -65,3 +67,5 @@ namespace CS {
 
   } // End namespace Memory
 } // End namespace CS
+
+#endif
