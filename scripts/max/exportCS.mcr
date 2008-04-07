@@ -274,7 +274,7 @@ rollout Test1 "Export Level to CS" width:226 height:350
 			    mat = m.bumpMap
 				if (mat!=undefined) then
 				(
-					image = mat.normal_map.filename
+					image = mat.filename
 				) else
 					image="materialnotdefined"
 			    image = lowercase(image)
