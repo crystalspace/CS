@@ -16,6 +16,8 @@ chronological order.
 	- caedes added a "cleareffects" command to walktest to clear the
 	  post processing effects.
 	- res fixed a stupid typo causing a crash on walktest "cleareffects".
+	- caedes fixed the swig CS::StringSet typecheck, it was checking for
+	  PyInt type, but most often it'll be a PyLong.
 6-Apr-2008
 	- Marten temporarily disabled csutil/memutil.cpp by #if 0 until
 	  a proper way to write it has been commited. Fixes compilation

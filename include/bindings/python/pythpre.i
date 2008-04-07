@@ -156,7 +156,7 @@ CSMutableArrayHelper = core.CSMutableArrayHelper
 
 %typemap(typecheck) CS::StringID
 {
-  $1 = PyInt_Check($input);
+  $1 = (PyLong_Check($input) || PyInt_Check($input));
 }
 
 #undef TYPEMAP_OUT_csRef
