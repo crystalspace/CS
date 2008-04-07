@@ -47,7 +47,7 @@ struct iRenderManagerTargets : public virtual iBase
 
 struct iRenderManagerPostEffects : public virtual iBase
 {
-  SCF_INTERFACE(iRenderManagerTargets,1,0,0);
+  SCF_INTERFACE(iRenderManagerPostEffects,1,0,0);
 
   virtual void ClearLayers() = 0;
   virtual bool AddLayersFromDocument (iDocumentNode* node) = 0;
