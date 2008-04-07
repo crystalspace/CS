@@ -930,6 +930,7 @@ CS_ENTITY_NOLIGHTING = _iengine.CS_ENTITY_NOLIGHTING
 CS_ENTITY_NOHITBEAM = _iengine.CS_ENTITY_NOHITBEAM
 CS_ENTITY_NOCLIP = _iengine.CS_ENTITY_NOCLIP
 CS_ENTITY_NODECAL = _iengine.CS_ENTITY_NODECAL
+CS_ENTITY_STATICLIT = _iengine.CS_ENTITY_STATICLIT
 CS_LIGHTINGUPDATE_SORTRELEVANCE = _iengine.CS_LIGHTINGUPDATE_SORTRELEVANCE
 CS_LIGHTINGUPDATE_ALWAYSUPDATE = _iengine.CS_LIGHTINGUPDATE_ALWAYSUPDATE
 class iMeshDrawCallback(core.iBase):
@@ -1432,6 +1433,29 @@ class iRenderLoopManager(core.iBase):
 iRenderLoopManager_swigregister = _iengine.iRenderLoopManager_swigregister
 iRenderLoopManager_swigregister(iRenderLoopManager)
 iRenderLoopManager_scfGetVersion = _iengine.iRenderLoopManager_scfGetVersion
+
+class iCollection(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def QueryObject(*args): return _iengine.iCollection_QueryObject(*args)
+    def Add(*args): return _iengine.iCollection_Add(*args)
+    def Remove(*args): return _iengine.iCollection_Remove(*args)
+    def ReleaseAllObjects(*args): return _iengine.iCollection_ReleaseAllObjects(*args)
+    def IsParentOf(*args): return _iengine.iCollection_IsParentOf(*args)
+    def FindSector(*args): return _iengine.iCollection_FindSector(*args)
+    def FindMeshObject(*args): return _iengine.iCollection_FindMeshObject(*args)
+    def FindMeshFactory(*args): return _iengine.iCollection_FindMeshFactory(*args)
+    def FindTexture(*args): return _iengine.iCollection_FindTexture(*args)
+    def FindMaterial(*args): return _iengine.iCollection_FindMaterial(*args)
+    def FindShader(*args): return _iengine.iCollection_FindShader(*args)
+    def FindCameraPosition(*args): return _iengine.iCollection_FindCameraPosition(*args)
+    scfGetVersion = staticmethod(_iengine.iCollection_scfGetVersion)
+    __swig_destroy__ = _iengine.delete_iCollection
+    __del__ = lambda self : None;
+iCollection_swigregister = _iengine.iCollection_swigregister
+iCollection_swigregister(iCollection)
+iCollection_scfGetVersion = _iengine.iCollection_scfGetVersion
 
 def CS_REQUEST_ENGINE ():
    return core.CS_REQUEST_PLUGIN("crystalspace.engine.3d", iEngine)

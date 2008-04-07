@@ -738,7 +738,7 @@ public:
     if (n == 0) return;
     Node* p = n->GetParent();
     int oldSide = -1;
-    Node* oldRootLeft;
+    Node* oldRootLeft = 0;
     if (p != 0)
     {
       if (n == p->left)

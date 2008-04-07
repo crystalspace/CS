@@ -27,7 +27,6 @@
 #include "iutil/comp.h"
 #include "iutil/strset.h"
 #include "ivideo/graph3d.h"
-#include "ivideo/shader/shader.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
 {
@@ -66,8 +65,7 @@ public:
     const csRect& rectangle, const unsigned char* materialMap, size_t pitch); 
 
   virtual void OnAlphaMapUpdate (iTerrainCell* cell,
-    iMaterialWrapper* material, const unsigned char* alphaMap, const csRect& rectangle, 
-    size_t pitch);
+    iMaterialWrapper* material, iImage* alphaMap);
 
   // ------------ iTerrainCellHeightDataCallback ------------
   virtual void OnHeightUpdate (iTerrainCell* cell, const csRect& rectangle);
@@ -114,7 +112,7 @@ private:
 
   iObjectRegistry* objectRegistry;
   csRef<iGraphics3D> graph3d;
-  csRef<iShaderVarStringSet> stringSet;
+csRef<iShaderVarStringSet> stringSet;
 
   const csTerrainMaterialPalette* materialPalette;
   csTerrainMaterialPalette emptyPalette;  

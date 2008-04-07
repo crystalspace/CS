@@ -30689,18 +30689,6 @@ SWIGINTERN PyObject *iEventQueue_swigregister(PyObject *SWIGUNUSEDPARM(self), Py
   return SWIG_Py_Void();
 }
 
-SWIGINTERN PyObject *_wrap_Compact(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"Compact",0,0)) SWIG_fail;
-  Compact();
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_iEventNameRegistry_GetID(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iEventNameRegistry *arg1 = (iEventNameRegistry *) 0 ;
@@ -53249,7 +53237,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iEventQueue_scfGetVersion", _wrap_iEventQueue_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iEventQueue", _wrap_delete_iEventQueue, METH_VARARGS, NULL},
 	 { (char *)"iEventQueue_swigregister", iEventQueue_swigregister, METH_VARARGS, NULL},
-	 { (char *)"Compact", _wrap_Compact, METH_VARARGS, NULL},
 	 { (char *)"iEventNameRegistry_GetID", _wrap_iEventNameRegistry_GetID, METH_VARARGS, NULL},
 	 { (char *)"iEventNameRegistry_GetString", _wrap_iEventNameRegistry_GetString, METH_VARARGS, NULL},
 	 { (char *)"iEventNameRegistry_GetParentID", _wrap_iEventNameRegistry_GetParentID, METH_VARARGS, NULL},
