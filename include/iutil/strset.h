@@ -189,6 +189,12 @@ namespace CS
   } // namespace StringSetTag
 } // namespace CS
 
+#if defined(SWIG)
+// Templated classes must be declared before we actually use
+// them, so we have to declare the following here.
+%template(iGeneralStringSetBase) iStringSetBase<CS::StringSetTag::General>;
+#endif
+
 /// General string ID string set
 struct iStringSet : public iStringSetBase<CS::StringSetTag::General>
 {

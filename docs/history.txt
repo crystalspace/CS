@@ -11,6 +11,8 @@ chronological order.
 	- Mike Gist added an exportCS max script supporting 3ds max 2008, and
 	  moved the previous one to exportCS-oldmax to keep support for older
 	  versions.
+	- caedes added swig %template declaration for templated class base
+	  of iStringSet.
 6-Apr-2008
 	- Marten temporarily disabled csutil/memutil.cpp by #if 0 until
 	  a proper way to write it has been commited. Fixes compilation
