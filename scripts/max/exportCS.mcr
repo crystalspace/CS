@@ -97,11 +97,11 @@ rollout Test1 "Export Level to CS" width:226 height:350
 		global tokenize
 		global lowercase
 		global getMatDiffuseMapFilename
-		global getMatSpecMapFilename
+		global getMatGlossMapFilename
 		global getMatNormalMapFilename
 		global getMatDispMapFilename
 		global getMatDiffuseMapFullPath
-		global getMatSpecMapFullPath
+		global getMatGlossMapFullPath
 		global getMatNormalMapFullPath
 		global getMatDispMapFullPath
 	
@@ -168,7 +168,7 @@ rollout Test1 "Export Level to CS" width:226 height:350
 		    if (m==undefined) then
 				image="materialnotdefined"
 			else (
-			    mat = m.maps[2]
+			    mat = m.diffuseMap
 				if (mat!=undefined) then
 				(
 					image = mat.filename
@@ -181,12 +181,12 @@ rollout Test1 "Export Level to CS" width:226 height:350
 			)
 		)
 
-          fn getMatSpecMapFilename m = 
+          fn getMatGlossMapFilename m = 
 		(
 		    if (m==undefined) then
 				image="materialnotdefined"
 			else (
-			    mat = m.maps[5]
+			    mat = m.glossinessMap
 				if (mat!=undefined) then
 				(
 					image = mat.filename
@@ -204,10 +204,10 @@ rollout Test1 "Export Level to CS" width:226 height:350
 		    if (m==undefined) then
 				image="materialnotdefined"
 			else (
-			    mat = m.maps[9]
+			    mat = m.bumpMap
 				if (mat!=undefined) then
 				(
-					image = mat.normal_map.filename
+					image = mat.filename
 					indx = tokenize image "\\"
 					image = indx[indx.count]
 				) else
@@ -222,7 +222,7 @@ rollout Test1 "Export Level to CS" width:226 height:350
 		    if (m==undefined) then
 				image="materialnotdefined"
 			else (
-			    mat = m.maps[12]
+			    mat = m.displacementMap
 				if (mat!=undefined) then
 				(
 					image = mat.filename
@@ -241,7 +241,7 @@ rollout Test1 "Export Level to CS" width:226 height:350
 		    if (m==undefined) then
 				image="materialnotdefined"
 			else (
-			    mat = m.maps[2]
+			    mat = m.diffuseMap
 				if (mat!=undefined) then
 				(
 					image = mat.filename
@@ -251,12 +251,12 @@ rollout Test1 "Export Level to CS" width:226 height:350
 			)
 		)
 
-		fn getMatSpecMapFullPath m = 
+		fn getMatGlossMapFullPath m = 
 		(
 		    if (m==undefined) then
 				image="materialnotdefined"
 			else (
-			    mat = m.maps[5]
+			    mat = m.glossinessMap
 				if (mat!=undefined) then
 				(
 					image = mat.filename
@@ -271,10 +271,10 @@ rollout Test1 "Export Level to CS" width:226 height:350
 		    if (m==undefined) then
 				image="materialnotdefined"
 			else (
-			    mat = m.maps[9]
+			    mat = m.bumpMap
 				if (mat!=undefined) then
 				(
-					image = mat.normal_map.filename
+					image = mat.filename
 				) else
 					image="materialnotdefined"
 			    image = lowercase(image)
@@ -286,7 +286,7 @@ rollout Test1 "Export Level to CS" width:226 height:350
 		    if (m==undefined) then
 				image="materialnotdefined"
 			else (
-			    mat = m.maps[12]
+			    mat = m.displacementMap
 				if (mat!=undefined) then
 				(
 					image = mat.filename
@@ -333,17 +333,17 @@ rollout Test1 "Export Level to CS" width:226 height:350
                     
 				append materialsWrittenToWorld diffuseImage
 			  )
-			  -- Spec Map Texture:
-			  specMapImage = getMatSpecMapFilename m
-			  if (findItem materialsWrittenToWorld specMapImage==0 and specMapImage!="materialnotdefined") then
+			  -- Gloss Map Texture:
+			  glossMapImage = getMatGlossMapFilename m
+			  if (findItem materialsWrittenToWorld glossMapImage==0 and glossMapImage!="materialnotdefined") then
 			  (
 			    format "m: % \n" m
-				format "    <texture name=\"%\">\n" specMapImage to:outFile
-				format "      <file>%</file>\n" specMapImage to:outFile
+				format "    <texture name=\"%\">\n" glossMapImage to:outFile
+				format "      <file>%</file>\n" glossMapImage to:outFile
 				format "      <class>normalmap</class>\n" to:outFile
 				format "    </texture>\n" to:outFile
 					
-				append materialsWrittenToWorld dispMapImage
+				append materialsWrittenToWorld glossMapImage
 			  )
 			  -- Normal Map Texture:
 			  normalMapImage = getMatNormalMapFilename m
@@ -445,9 +445,9 @@ rollout Test1 "Export Level to CS" width:226 height:350
 					  format "      <shadervar type=\"texture\" name=\"tex normal compressed\">%</shadervar>\n" normalMapImage to:outFile
 					  format "      <shadervar type=\"texture\" name=\"tex height\">%</shadervar>\n" dispMapImage to:outFile
 					)
-                              specMapImage = getMatSpecMapFilename m
-                              if(specMapImage!="materialnotdefined") then (
-                                format "      <shadervar type=\"texture\" name=\"tex specular\">%</shadervar>\n" specMapImage to:outFile
+                              glossMapImage = getMatGlossMapFilename m
+                              if(glossMapImage!="materialnotdefined") then (
+                                format "      <shadervar type=\"texture\" name=\"tex specular\">%</shadervar>\n" glossMapImage to:outFile
                               )
 					
                     format "    </material>\n" to:outFile
@@ -852,14 +852,14 @@ rollout Test1 "Export Level to CS" width:226 height:350
 					copyFile diffuseImage destFile2
 					append materialsWrittenToWorld diffuseImage
 				)
-				specMapImage = getMatSpecMapFullPath m
-				if (specMapImage!="materialnotdefined" and findItem materialsWrittenToWorld specMapImage==0) then
+				glossMapImage = getMatGlossMapFullPath m
+				if (glossMapImage!="materialnotdefined" and findItem materialsWrittenToWorld glossMapImage==0) then
 				(
-					destFile2 = filenameFromPath specMapImage
+					destFile2 = filenameFromPath glossMapImage
 					destFile2 = destDir + "\\" + destFile2
-					Format "copy from % to % \n" specMapImage destFile2
-					copyFile specMapImage destFile2
-					append materialsWrittenToWorld specMapImage 
+					Format "copy from % to % \n" glossMapImage destFile2
+					copyFile glossMapImage destFile2
+					append materialsWrittenToWorld glossMapImage 
 				)
 				normalMapImage = getMatNormalMapFullPath m
 				if (normalMapImage!="materialnotdefined" and findItem materialsWrittenToWorld normalMapImage==0) then

@@ -251,6 +251,51 @@ iView_swigregister = _ivaria.iView_swigregister
 iView_swigregister(iView)
 iView_scfGetVersion = _ivaria.iView_scfGetVersion
 
+class iBugPlugRenderObject(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def Render(*args): return _ivaria.iBugPlugRenderObject_Render(*args)
+    __swig_destroy__ = _ivaria.delete_iBugPlugRenderObject
+    __del__ = lambda self : None;
+iBugPlugRenderObject_swigregister = _ivaria.iBugPlugRenderObject_swigregister
+iBugPlugRenderObject_swigregister(iBugPlugRenderObject)
+
+class iBugPlug(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def SetupDebugSector(*args): return _ivaria.iBugPlug_SetupDebugSector(*args)
+    def DebugSectorBox(*args): return _ivaria.iBugPlug_DebugSectorBox(*args)
+    def DebugSectorTriangle(*args): return _ivaria.iBugPlug_DebugSectorTriangle(*args)
+    def SwitchDebugSector(*args): return _ivaria.iBugPlug_SwitchDebugSector(*args)
+    def CheckDebugSector(*args): return _ivaria.iBugPlug_CheckDebugSector(*args)
+    def SetupDebugView(*args): return _ivaria.iBugPlug_SetupDebugView(*args)
+    def DebugViewPoint(*args): return _ivaria.iBugPlug_DebugViewPoint(*args)
+    def DebugViewLine(*args): return _ivaria.iBugPlug_DebugViewLine(*args)
+    def DebugViewBox(*args): return _ivaria.iBugPlug_DebugViewBox(*args)
+    def DebugViewPointCount(*args): return _ivaria.iBugPlug_DebugViewPointCount(*args)
+    def DebugViewGetPoint(*args): return _ivaria.iBugPlug_DebugViewGetPoint(*args)
+    def DebugViewLineCount(*args): return _ivaria.iBugPlug_DebugViewLineCount(*args)
+    def DebugViewGetLine(*args): return _ivaria.iBugPlug_DebugViewGetLine(*args)
+    def DebugViewBoxCount(*args): return _ivaria.iBugPlug_DebugViewBoxCount(*args)
+    def DebugViewGetBox(*args): return _ivaria.iBugPlug_DebugViewGetBox(*args)
+    def DebugViewRenderObject(*args): return _ivaria.iBugPlug_DebugViewRenderObject(*args)
+    def DebugViewClearScreen(*args): return _ivaria.iBugPlug_DebugViewClearScreen(*args)
+    def SwitchDebugView(*args): return _ivaria.iBugPlug_SwitchDebugView(*args)
+    def CheckDebugView(*args): return _ivaria.iBugPlug_CheckDebugView(*args)
+    def AddCounter(*args): return _ivaria.iBugPlug_AddCounter(*args)
+    def AddCounterEnum(*args): return _ivaria.iBugPlug_AddCounterEnum(*args)
+    def ResetCounter(*args): return _ivaria.iBugPlug_ResetCounter(*args)
+    def RemoveCounter(*args): return _ivaria.iBugPlug_RemoveCounter(*args)
+    def ExecCommand(*args): return _ivaria.iBugPlug_ExecCommand(*args)
+    scfGetVersion = staticmethod(_ivaria.iBugPlug_scfGetVersion)
+    __swig_destroy__ = _ivaria.delete_iBugPlug
+    __del__ = lambda self : None;
+iBugPlug_swigregister = _ivaria.iBugPlug_swigregister
+iBugPlug_swigregister(iBugPlug)
+iBugPlug_scfGetVersion = _ivaria.iBugPlug_scfGetVersion
+
 class csCollisionPair(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr

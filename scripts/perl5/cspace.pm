@@ -5778,6 +5778,94 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iBugPlugRenderObject ##############
+
+package cspace::iBugPlugRenderObject;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*Render = *cspacec::iBugPlugRenderObject_Render;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iBugPlugRenderObject($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iBugPlug ##############
+
+package cspace::iBugPlug;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*SetupDebugSector = *cspacec::iBugPlug_SetupDebugSector;
+*DebugSectorBox = *cspacec::iBugPlug_DebugSectorBox;
+*DebugSectorTriangle = *cspacec::iBugPlug_DebugSectorTriangle;
+*SwitchDebugSector = *cspacec::iBugPlug_SwitchDebugSector;
+*CheckDebugSector = *cspacec::iBugPlug_CheckDebugSector;
+*SetupDebugView = *cspacec::iBugPlug_SetupDebugView;
+*DebugViewPoint = *cspacec::iBugPlug_DebugViewPoint;
+*DebugViewLine = *cspacec::iBugPlug_DebugViewLine;
+*DebugViewBox = *cspacec::iBugPlug_DebugViewBox;
+*DebugViewPointCount = *cspacec::iBugPlug_DebugViewPointCount;
+*DebugViewGetPoint = *cspacec::iBugPlug_DebugViewGetPoint;
+*DebugViewLineCount = *cspacec::iBugPlug_DebugViewLineCount;
+*DebugViewGetLine = *cspacec::iBugPlug_DebugViewGetLine;
+*DebugViewBoxCount = *cspacec::iBugPlug_DebugViewBoxCount;
+*DebugViewGetBox = *cspacec::iBugPlug_DebugViewGetBox;
+*DebugViewRenderObject = *cspacec::iBugPlug_DebugViewRenderObject;
+*DebugViewClearScreen = *cspacec::iBugPlug_DebugViewClearScreen;
+*SwitchDebugView = *cspacec::iBugPlug_SwitchDebugView;
+*CheckDebugView = *cspacec::iBugPlug_CheckDebugView;
+*AddCounter = *cspacec::iBugPlug_AddCounter;
+*AddCounterEnum = *cspacec::iBugPlug_AddCounterEnum;
+*ResetCounter = *cspacec::iBugPlug_ResetCounter;
+*RemoveCounter = *cspacec::iBugPlug_RemoveCounter;
+*ExecCommand = *cspacec::iBugPlug_ExecCommand;
+*scfGetVersion = *cspacec::iBugPlug_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iBugPlug($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csCollisionPair ##############
 
 package cspace::csCollisionPair;

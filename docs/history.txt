@@ -6,6 +6,19 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Apr-2008
+	- Mike Gist fixed a compile error.
+	- Mike Gist added an exportCS max script supporting 3ds max 2008, and
+	  moved the previous one to exportCS-oldmax to keep support for older
+	  versions.
+6-Apr-2008
+	- Marten temporarily disabled csutil/memutil.cpp by #if 0 until
+	  a proper way to write it has been commited. Fixes compilation
+	  errors due to missing includes.
+5-Apr-2008
+	- Scott Johnson added csutil/memutil.h and csutil/memutil.cpp, which 
+	  includes the function CS::Memory::GetPhysicalMemory().  This function
+	  returns the physical memory (in KB) when called.
 4-Apr-2008
 	- Eric Sunshine applied the following fixes and improvements to the g++
 	  bug check added to the CS_COMPILER_IGNORE_LONG_DOUBLE() macro
