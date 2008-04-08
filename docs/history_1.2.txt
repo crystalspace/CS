@@ -2,6 +2,7 @@
 
 8-Apr-2008
 	- res merged r29258 into 1.2 (Update links for PSDK with VC8 Express).
+	- Vincent merged r27907 into 1.2 (compilation warning fixes).
 30-Mar-2008
 	- caedes fixed incorrect declaration of pycscegui clean target.
 29-Mar-2008

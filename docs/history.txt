@@ -422,6 +422,7 @@ chronological order.
 	  the old ">= 1.3.0" message appeared immediately after a "if lib3ds is
 	  sufficiently recent" message). Also, renamed related C++ #define from
 	  NEW_DATA_CALLBACKS to LIB3DS_GENERIC_DATA_IO_CALLBACKS.
+	- Eric Sunshine eliminated several compilation warnings.
 13-Oct-2007
 	- res fixed a bug in DDS cubemap saving (checked for wrong subimage
 	  count).

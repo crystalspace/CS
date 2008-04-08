@@ -320,7 +320,7 @@ void csPrimitives::GenerateSphere (const csEllipsoid& ellips, int num,
 
   csArray<int> prev_verticesT;
   csArray<int> prev_verticesB;
-  float u, v;
+  float u = 0.0f, v = 0.0f;
   int i, j;
 
   // Number of degrees between layers.
