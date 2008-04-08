@@ -234,7 +234,7 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
     if (err == 0)
     {
       buffer = FillBuffer<int> (buf, 
-        normalized ? CS_BUFCOMP_INT : CS_BUFCOMP_INT_NORM, 
+	normalized ? CS_BUFCOMP_INT_NORM : CS_BUFCOMP_INT, 
 	componentNum, indexBuf);
     }
   }
@@ -246,7 +246,7 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
     if (err == 0)
     {
       buffer = FillBuffer<uint> (buf,
-        normalized ? CS_BUFCOMP_UNSIGNED_INT : CS_BUFCOMP_UNSIGNED_INT_NORM,
+	normalized ? CS_BUFCOMP_UNSIGNED_INT_NORM : CS_BUFCOMP_UNSIGNED_INT,
         componentNum, indexBuf);
     }
   }
@@ -258,7 +258,7 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
     if (err == 0)
     {
       buffer = FillBuffer<char> (buf,
-	normalized ? CS_BUFCOMP_BYTE : CS_BUFCOMP_BYTE_NORM, 
+	normalized ? CS_BUFCOMP_BYTE_NORM : CS_BUFCOMP_BYTE, 
         componentNum, indexBuf);
     }
   }
@@ -270,7 +270,7 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
     if (err == 0)
     {
       buffer = FillBuffer<unsigned char> (buf,
-        normalized ? CS_BUFCOMP_UNSIGNED_BYTE : CS_BUFCOMP_UNSIGNED_BYTE_NORM,
+	normalized ? CS_BUFCOMP_UNSIGNED_BYTE_NORM : CS_BUFCOMP_UNSIGNED_BYTE,
 	componentNum, indexBuf);
     }
   }
@@ -282,7 +282,7 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
     if (err == 0)
     {
       buffer = FillBuffer<short> (buf,
-        normalized ? CS_BUFCOMP_SHORT : CS_BUFCOMP_SHORT_NORM,
+	normalized ? CS_BUFCOMP_SHORT_NORM : CS_BUFCOMP_SHORT,
 	componentNum, indexBuf);
     }
   }
@@ -294,7 +294,7 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
     if (err == 0)
     {
       buffer = FillBuffer<unsigned short> (buf,
-        normalized ? CS_BUFCOMP_UNSIGNED_SHORT : CS_BUFCOMP_UNSIGNED_SHORT_NORM,
+	normalized ? CS_BUFCOMP_UNSIGNED_SHORT_NORM : CS_BUFCOMP_UNSIGNED_SHORT,
 	componentNum, indexBuf);
     }
   }

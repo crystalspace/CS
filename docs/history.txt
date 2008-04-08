@@ -13,6 +13,8 @@ chronological order.
 	- res fixed binary render buffers returning a buffer version of '~0' -
 	  this conflicted with the default value for the version used by the
 	  gl3d buffer manager, meaning a binary buffer was never uploaded.
+	- res fixed the render buffer parser to set the "normalized" flag
+	  when it was actually specified (and not the other way round).
 7-Apr-2008
 	- Mike Gist fixed a compile error.
 	- Mike Gist added an exportCS max script supporting 3ds max 2008, and
