@@ -148,12 +148,25 @@ AC_DEFUN([CS_COMPILER_IGNORE_PRAGMAS],
 #	is discovered, then it is assigned to CACHE-VAR and ACTION-IF-FOUND is
 #	invoked; otherwise the empty string is assigned to CACHE-VAR and
 #	ACTION-IF-NOT-FOUND is invoked.
+#
+# IMPLEMENTATION NOTES
+#	The -Wno-long-double option is specific to the Apple version of g++.
+#	Furthermore, as of at least 2008-04-03, the
+#	CS_CHECK_BUILD_FLAGS([-Wno-long-double]) check spuriously and
+#	incorrectly *succeeds* with g++ 4.2.3 on non-Apple platforms even
+#	though the compiler does not really accept the option. This is a g++
+#	bug.  To work around this issue, the -Wno-long-double check is
+#	performed only on Apple platforms.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_COMPILER_IGNORE_LONG_DOUBLE],
-    [CS_CHECK_BUILD_FLAGS(
+    [AC_REQUIRE([CS_CHECK_HOST])
+    AS_IF([test "$cs_host_target" = macosx],
+	[cs_ignore_long_double_tuples=CS_CREATE_TUPLE([-Wno-long-double])],
+	[cs_ignore_long_double_tuples=''])
+    CS_CHECK_BUILD_FLAGS(
 	[_CS_WARNING_SUPPRESS_MSG([`long double'], [$1])],
 	[_CS_WARNING_CACHE_VAR([$2], [$1], [ignore_long_double])],
-	[CS_CREATE_TUPLE([-Wno-long-double])], [$1], [$3], [$4])])
+	[$cs_ignore_long_double_tuples], [$1], [$3], [$4])])
 
 
 
