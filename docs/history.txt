@@ -10,6 +10,9 @@ chronological order.
 	- res added some initial support for normalized render buffers.
 	- res fixed a crash in binary render buffers.
 	- res changed csVertexListWalker to lock buffers for reading only.
+	- res fixed binary render buffers returning a buffer version of '~0' -
+	  this conflicted with the default value for the version used by the
+	  gl3d buffer manager, meaning a binary buffer was never uploaded.
 7-Apr-2008
 	- Mike Gist fixed a compile error.
 	- Mike Gist added an exportCS max script supporting 3ds max 2008, and

@@ -640,7 +640,7 @@ public:
     if (IsEdited())
       return GetWrappedBuffer()->GetVersion();
     else
-      return (uint)~0;
+      return (uint)0;
   }
 
   virtual iRenderBuffer* GetMasterBuffer () const
