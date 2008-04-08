@@ -198,6 +198,8 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
     ReportError (msgid, node, "bogus 'components' attribute: %d", componentNum);
     return 0;
   }
+  
+  bool normalized = node->GetAttributeValueAsBool ("normalized", false);
 
   bool indexBuf = false;
   {
@@ -212,7 +214,13 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
 
   if (indexBuf && (componentNum != 1))
   {
-    ReportError (msgid, node, "index buffers are required to have 1 component", componentNum);
+    ReportError (msgid, node, "index buffers are required to have 1 component");
+    return 0;
+  }
+  
+  if (indexBuf && normalized)
+  {
+    ReportError (msgid, node, "index buffers are required to be unnormalized");
     return 0;
   }
   
@@ -225,7 +233,9 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
     err = BufferParser<vhInt>::Parse (node, componentNum, buf);
     if (err == 0)
     {
-      buffer = FillBuffer<int> (buf, CS_BUFCOMP_INT, componentNum, indexBuf);
+      buffer = FillBuffer<int> (buf, 
+        normalized ? CS_BUFCOMP_INT : CS_BUFCOMP_INT_NORM, 
+	componentNum, indexBuf);
     }
   }
   else if ((strcmp (componentType, "uint") == 0) 
@@ -235,7 +245,9 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
     err = BufferParser<vhInt>::Parse (node, componentNum, buf);
     if (err == 0)
     {
-      buffer = FillBuffer<uint> (buf, CS_BUFCOMP_UNSIGNED_INT, componentNum, indexBuf);
+      buffer = FillBuffer<uint> (buf,
+        normalized ? CS_BUFCOMP_UNSIGNED_INT : CS_BUFCOMP_UNSIGNED_INT_NORM,
+        componentNum, indexBuf);
     }
   }
   else if ((strcmp (componentType, "byte") == 0) 
@@ -245,7 +257,9 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
     err = BufferParser<vhInt>::Parse (node, componentNum, buf);
     if (err == 0)
     {
-      buffer = FillBuffer<char> (buf, CS_BUFCOMP_BYTE, componentNum, indexBuf);
+      buffer = FillBuffer<char> (buf,
+	normalized ? CS_BUFCOMP_BYTE : CS_BUFCOMP_BYTE_NORM, 
+        componentNum, indexBuf);
     }
   }
   else if ((strcmp (componentType, "ubyte") == 0) 
@@ -255,7 +269,9 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
     err = BufferParser<vhInt>::Parse (node, componentNum, buf);
     if (err == 0)
     {
-      buffer = FillBuffer<unsigned char> (buf, CS_BUFCOMP_UNSIGNED_BYTE, componentNum, indexBuf);
+      buffer = FillBuffer<unsigned char> (buf,
+        normalized ? CS_BUFCOMP_UNSIGNED_BYTE : CS_BUFCOMP_UNSIGNED_BYTE_NORM,
+	componentNum, indexBuf);
     }
   }
   else if ((strcmp (componentType, "short") == 0) 
@@ -265,7 +281,9 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
     err = BufferParser<vhInt>::Parse (node, componentNum, buf);
     if (err == 0)
     {
-      buffer = FillBuffer<short> (buf, CS_BUFCOMP_SHORT, componentNum, indexBuf);
+      buffer = FillBuffer<short> (buf,
+        normalized ? CS_BUFCOMP_SHORT : CS_BUFCOMP_SHORT_NORM,
+	componentNum, indexBuf);
     }
   }
   else if ((strcmp (componentType, "ushort") == 0) 
@@ -275,7 +293,9 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
     err = BufferParser<vhInt>::Parse (node, componentNum, buf);
     if (err == 0)
     {
-      buffer = FillBuffer<unsigned short> (buf, CS_BUFCOMP_UNSIGNED_SHORT, componentNum, indexBuf);
+      buffer = FillBuffer<unsigned short> (buf,
+        normalized ? CS_BUFCOMP_UNSIGNED_SHORT : CS_BUFCOMP_UNSIGNED_SHORT_NORM,
+	componentNum, indexBuf);
     }
   }
   else if ((strcmp (componentType, "float") == 0) 
@@ -353,8 +373,12 @@ bool csTextSyntaxService::WriteRenderBuffer (iDocumentNode* node, iRenderBuffer*
   // Common attribute
   int componentCount = buffer->GetComponentCount ();
   node->SetAttributeAsInt ("components", componentCount);
+  
+  csRenderBufferComponentType compType = buffer->GetComponentType ();
+  if (compType & CS_BUFCOMP_NORMALIZED)
+    node->SetAttribute ("normalized", "yes");
 
-  switch (buffer->GetComponentType ())
+  switch (compType & ~CS_BUFCOMP_NORMALIZED)
   {
   case CS_BUFCOMP_BYTE:
     {
@@ -717,7 +741,7 @@ static void ConvertBufferDataToLE (csRenderBufferComponentType compType,
                                    const void* source, void* dest, 
                                    size_t totalElementCount)
 {
-  switch (compType)
+  switch (compType & ~CS_BUFCOMP_NORMALIZED)
   {
     case CS_BUFCOMP_BYTE:
     case CS_BUFCOMP_UNSIGNED_BYTE:
@@ -748,7 +772,10 @@ static const size_t RenderBufferComponentSizesOnDisk[CS_BUFCOMP_TYPECOUNT] =
   sizeof (int16), sizeof (uint16),
   sizeof (int32), sizeof (uint32),
   sizeof (uint32),
-  sizeof (uint64)
+  sizeof (uint64),
+  sizeof (int8), sizeof (uint8), 
+  sizeof (int16), sizeof (uint16),
+  sizeof (int32), sizeof (uint32)
 };
 
 csRef<iRenderBuffer> csTextSyntaxService::ReadRenderBuffer (iDataBuffer* buf, 

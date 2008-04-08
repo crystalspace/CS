@@ -1876,8 +1876,9 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 
 
   GLenum compType;
+  bool normalized;
   void* bufData = //indexbuf->RenderLock (CS_GLBUF_RENDERLOCK_ELEMENTS);
-    RenderLock (iIndexbuf, CS_GLBUF_RENDERLOCK_ELEMENTS, compType);
+    RenderLock (iIndexbuf, CS_GLBUF_RENDERLOCK_ELEMENTS, compType, normalized);
   statecache->ApplyBufferBinding (csGLStateCacheContext::boIndexArray);
   if (bufData != (void*)-1)
   {
@@ -2209,9 +2210,13 @@ void csGLGraphics3D::ClosePortal ()
 
 void* csGLGraphics3D::RenderLock (iRenderBuffer* buffer, 
 				  csGLRenderBufferLockType type, 
-				  GLenum& compGLType)
+                                  GLenum& compGLType, bool& normalized)
 {
-  compGLType = compGLtypes[buffer->GetComponentType()];
+  csRenderBufferComponentType compType = buffer->GetComponentType();
+  normalized = (compType != CS_BUFCOMP_FLOAT) 
+    && (compType != CS_BUFCOMP_DOUBLE)
+    && (compType & CS_BUFCOMP_NORMALIZED);
+  compGLType = compGLtypes[compType];
   if (vboManager.IsValid())
     return vboManager->RenderLock (buffer, type);
   else
@@ -2286,31 +2291,36 @@ void csGLGraphics3D::ApplyBufferChanges()
       }
 
       GLenum compType;
+      bool normalized;
       void *data =
-        RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY, compType);
+	RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY, compType, normalized);
 
       if (data == (void*)-1) continue;
 
       switch (att)
       {
       case CS_VATTRIB_POSITION:
+	// @@@ FIXME: How to deal with normalized buffers?
         statecache->Enable_GL_VERTEX_ARRAY ();
         statecache->SetVertexPointer (buffer->GetComponentCount (),
           compType, (GLsizei)buffer->GetStride (), data);
         break;
       case CS_VATTRIB_NORMAL:
-        statecache->Enable_GL_NORMAL_ARRAY ();
+	// @@@ FIXME: How to deal with unnormalized buffers?
+	statecache->Enable_GL_NORMAL_ARRAY ();
         statecache->SetNormalPointer (compType, (GLsizei)buffer->GetStride (), 
           data);
         break;
       case CS_VATTRIB_COLOR:
-        statecache->Enable_GL_COLOR_ARRAY ();
+	// @@@ FIXME: How to deal with unnormalized buffers?
+	statecache->Enable_GL_COLOR_ARRAY ();
         statecache->SetColorPointer (buffer->GetComponentCount (),
           compType, (GLsizei)buffer->GetStride (), data);
         break;
       case CS_VATTRIB_SECONDARY_COLOR:
         if (ext->CS_GL_EXT_secondary_color)
         {
+	  // @@@ FIXME: How to deal with unnormalized buffers?
 	  statecache->Enable_GL_SECONDARY_COLOR_ARRAY_EXT ();
 	  statecache->SetSecondaryColorPointerExt (buffer->GetComponentCount (),
 	    compType, (GLsizei)buffer->GetStride (), data);
@@ -2325,7 +2335,8 @@ void csGLGraphics3D::ApplyBufferChanges()
           {
             statecache->SetCurrentTU (unit);
           } 
-          statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
+	  // @@@ FIXME: How to deal with normalized buffers?
+	  statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
           statecache->SetTexCoordPointer (buffer->GetComponentCount (),
             compType, (GLsizei)buffer->GetStride (), data);
         }
@@ -2337,7 +2348,7 @@ void csGLGraphics3D::ApplyBufferChanges()
 	    statecache->ApplyBufferBinding (csGLStateCacheContext::boElementArray);
 	    ext->glEnableVertexAttribArrayARB (index);
 	    ext->glVertexAttribPointerARB(index, buffer->GetComponentCount (),
-	      compType, false, (GLsizei)buffer->GetStride (), data);
+              compType, normalized, (GLsizei)buffer->GetStride (), data);
 	  }
         }
         else

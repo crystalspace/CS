@@ -412,7 +412,7 @@ private:
   }
 
   void* RenderLock (iRenderBuffer* buffer, csGLRenderBufferLockType type, 
-    GLenum& compGLType);
+    GLenum& compGLType, bool& normalized);
   void RenderRelease (iRenderBuffer* buffer);
 
   struct ImageUnit : public CS::Memory::CustomAllocated
