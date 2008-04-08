@@ -1697,7 +1697,7 @@ int csSpriteCal3DMeshObject::FindAnim(const char *name)
 void csSpriteCal3DMeshObject::ClearAllAnims()
 {
   while (active_anims.GetSize ())
-    ClearAnimCyclePos ((int)(active_anims.GetSize () - 1), 0.1f);
+    ClearAnimCyclePos ((int)(active_anims.GetSize () - 1), 0);
 
   if (last_locked_anim != -1)
   {
@@ -1710,13 +1710,13 @@ void csSpriteCal3DMeshObject::ClearAllAnims()
 bool csSpriteCal3DMeshObject::SetAnimCycle(const char *name, float weight)
 {
   ClearAllAnims();
-  return AddAnimCycle(name, weight, 0.1f);
+  return AddAnimCycle(name, weight, 0);
 }
 
 bool csSpriteCal3DMeshObject::SetAnimCycle(int idx, float weight)
 {
   ClearAllAnims();
-  return AddAnimCycle(idx, weight, 0.1f);
+  return AddAnimCycle(idx, weight, 0);
 }
 
 bool csSpriteCal3DMeshObject::AddAnimCycle(const char *name, float weight,
