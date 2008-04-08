@@ -8,6 +8,7 @@ chronological order.
 
 8-Apr-2008
 	- res added some initial support for normalized render buffers.
+	- res fixed a crash in binary render buffers.
 7-Apr-2008
 	- Mike Gist fixed a compile error.
 	- Mike Gist added an exportCS max script supporting 3ds max 2008, and

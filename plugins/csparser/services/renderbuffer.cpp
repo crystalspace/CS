@@ -626,7 +626,10 @@ public:
 
   virtual size_t GetElementDistance() const
   {
-    return header->compCount * csRenderBufferComponentSizes[header->compType];
+    if (IsEdited())
+      return GetWrappedBuffer()->GetElementDistance();
+    else
+      return header->compCount * csRenderBufferComponentSizes[header->compType];
   }
 
   virtual size_t GetOffset() const
