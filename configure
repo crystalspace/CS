@@ -2591,6 +2591,7 @@ echo $ECHO_N "checking if $CC accepts -pipe... $ECHO_C" >&6
 if test "${cs_cv_prog_cc_pipe_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-pipe@@ | sed 'y% %#%'`"; then
   ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -2729,10 +2730,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cc_pipe=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cc_pipe_ok="$cs_cv_prog_cc_pipe"
+		cs_cv_prog_cc_pipe_ok="$cs_cv_prog_cc_pipe"
 else
   cs_cv_prog_cc_pipe=''
-	    cs_cv_prog_cc_pipe_ok=no
+		cs_cv_prog_cc_pipe_ok=no
+fi
+
+else
+  cs_cv_prog_cc_pipe=''
+            cs_cv_prog_cc_pipe_ok=no
 fi
 
 fi
@@ -3156,6 +3162,7 @@ echo $ECHO_N "checking how to treat C++ warnings as errors... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_pic_werror_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-Werror@@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -3294,10 +3301,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_pic_werror=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_pic_werror_ok="$cs_cv_prog_cxx_pic_werror"
+		cs_cv_prog_cxx_pic_werror_ok="$cs_cv_prog_cxx_pic_werror"
 else
   cs_cv_prog_cxx_pic_werror=''
-	    cs_cv_prog_cxx_pic_werror_ok=no
+		cs_cv_prog_cxx_pic_werror_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_pic_werror=''
+            cs_cv_prog_cxx_pic_werror_ok=no
 fi
 
 fi
@@ -3309,6 +3321,7 @@ echo $ECHO_N "checking how to enable C++ PIC generation... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_pic_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-fPIC@@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -3457,10 +3470,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_pic=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_pic_ok="$cs_cv_prog_cxx_pic"
+		cs_cv_prog_cxx_pic_ok="$cs_cv_prog_cxx_pic"
 else
   cs_cv_prog_cxx_pic=''
-	    cs_cv_prog_cxx_pic_ok=no
+		cs_cv_prog_cxx_pic_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_pic=''
+            cs_cv_prog_cxx_pic_ok=no
 fi
 
 fi
@@ -3962,6 +3980,7 @@ echo $ECHO_N "checking if -shared is accepted... $ECHO_C" >&6
 if test "${cs_cv_prog_link_shared_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-shared $cs_cv_prog_cxx_pic@@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -4110,10 +4129,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_link_shared=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_link_shared_ok="$cs_cv_prog_link_shared"
+		cs_cv_prog_link_shared_ok="$cs_cv_prog_link_shared"
 else
   cs_cv_prog_link_shared=''
-	    cs_cv_prog_link_shared_ok=no
+		cs_cv_prog_link_shared_ok=no
+fi
+
+else
+  cs_cv_prog_link_shared=''
+            cs_cv_prog_link_shared_ok=no
 fi
 
 fi
@@ -4556,6 +4580,7 @@ echo $ECHO_N "checking if --as-needed is supported... $ECHO_C" >&6
 if test "${cs_cv_prog_link_as_needed_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-Wl,--as-needed@@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -4694,10 +4719,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_link_as_needed=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_link_as_needed_ok="$cs_cv_prog_link_as_needed"
+		cs_cv_prog_link_as_needed_ok="$cs_cv_prog_link_as_needed"
 else
   cs_cv_prog_link_as_needed=''
-	    cs_cv_prog_link_as_needed_ok=no
+		cs_cv_prog_link_as_needed_ok=no
+fi
+
+else
+  cs_cv_prog_link_as_needed=''
+            cs_cv_prog_link_as_needed_ok=no
 fi
 
 fi
@@ -4719,6 +4749,7 @@ echo $ECHO_N "checking if --no-as-needed is supported... $ECHO_C" >&6
 if test "${cs_cv_prog_link_no_as_needed_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-Wl,--no-as-needed@@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -4857,10 +4888,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_link_no_as_needed=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_link_no_as_needed_ok="$cs_cv_prog_link_no_as_needed"
+		cs_cv_prog_link_no_as_needed_ok="$cs_cv_prog_link_no_as_needed"
 else
   cs_cv_prog_link_no_as_needed=''
-	    cs_cv_prog_link_no_as_needed_ok=no
+		cs_cv_prog_link_no_as_needed_ok=no
+fi
+
+else
+  cs_cv_prog_link_no_as_needed=''
+            cs_cv_prog_link_no_as_needed_ok=no
 fi
 
 fi
@@ -9825,6 +9861,7 @@ echo $ECHO_N "checking for -static-libgcc... $ECHO_C" >&6
 if test "${cs_cv_prog_link_static_libgcc_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-static-libgcc@@ | sed 'y% %#%'`"; then
   ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -9963,10 +10000,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_link_static_libgcc=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_link_static_libgcc_ok="$cs_cv_prog_link_static_libgcc"
+		cs_cv_prog_link_static_libgcc_ok="$cs_cv_prog_link_static_libgcc"
 else
   cs_cv_prog_link_static_libgcc=''
-	    cs_cv_prog_link_static_libgcc_ok=no
+		cs_cv_prog_link_static_libgcc_ok=no
+fi
+
+else
+  cs_cv_prog_link_static_libgcc=''
+            cs_cv_prog_link_static_libgcc_ok=no
 fi
 
 fi
@@ -9989,6 +10031,7 @@ echo $ECHO_N "checking for static libstdc++... $ECHO_C" >&6
 if test "${cs_cv_prog_link_static_libstdcxx_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @$libstdcxx@@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -10127,10 +10170,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_link_static_libstdcxx=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_link_static_libstdcxx_ok="$cs_cv_prog_link_static_libstdcxx"
+		cs_cv_prog_link_static_libstdcxx_ok="$cs_cv_prog_link_static_libstdcxx"
 else
   cs_cv_prog_link_static_libstdcxx=''
-	    cs_cv_prog_link_static_libstdcxx_ok=no
+		cs_cv_prog_link_static_libstdcxx_ok=no
+fi
+
+else
+  cs_cv_prog_link_static_libstdcxx=''
+            cs_cv_prog_link_static_libstdcxx_ok=no
 fi
 
 fi
@@ -11350,11 +11398,19 @@ fi
 # required to embed Python.
 #------------------------------------------------------------------------------
 
+
+    if test "$cs_host_target" = macosx; then
+  cs_ignore_long_double_tuples=`echo @-Wno-long-double@@ | sed 'y% %#%'`
+else
+  cs_ignore_long_double_tuples=''
+fi
+
     echo "$as_me:$LINENO: checking how to suppress C++ \`long double' warnings" >&5
 echo $ECHO_N "checking how to suppress C++ \`long double' warnings... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_ignore_long_double_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "$cs_ignore_long_double_tuples"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -11367,7 +11423,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
     cs_build_ok=no
 
 
-    for cs_build_item in `echo @-Wno-long-double@@ | sed 'y% %#%'`
+    for cs_build_item in $cs_ignore_long_double_tuples
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -11493,10 +11549,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_ignore_long_double=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_ignore_long_double_ok="$cs_cv_prog_cxx_ignore_long_double"
+		cs_cv_prog_cxx_ignore_long_double_ok="$cs_cv_prog_cxx_ignore_long_double"
 else
   cs_cv_prog_cxx_ignore_long_double=''
-	    cs_cv_prog_cxx_ignore_long_double_ok=no
+		cs_cv_prog_cxx_ignore_long_double_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_ignore_long_double=''
+            cs_cv_prog_cxx_ignore_long_double_ok=no
 fi
 
 fi
@@ -13093,6 +13154,7 @@ echo $ECHO_N "checking how to enable C++ compilation warnings... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_enable_warnings_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-Wmost@@ | sed 'y% %#%'` `echo @-Wall@@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -13231,10 +13293,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_enable_warnings=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_enable_warnings_ok="$cs_cv_prog_cxx_enable_warnings"
+		cs_cv_prog_cxx_enable_warnings_ok="$cs_cv_prog_cxx_enable_warnings"
 else
   cs_cv_prog_cxx_enable_warnings=''
-	    cs_cv_prog_cxx_enable_warnings_ok=no
+		cs_cv_prog_cxx_enable_warnings_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_enable_warnings=''
+            cs_cv_prog_cxx_enable_warnings_ok=no
 fi
 
 fi
@@ -13256,6 +13323,7 @@ echo $ECHO_N "checking how to treat C++ warnings as errors... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_enable_errors_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-Werror@@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -13394,10 +13462,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_enable_errors=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_enable_errors_ok="$cs_cv_prog_cxx_enable_errors"
+		cs_cv_prog_cxx_enable_errors_ok="$cs_cv_prog_cxx_enable_errors"
 else
   cs_cv_prog_cxx_enable_errors=''
-	    cs_cv_prog_cxx_enable_errors_ok=no
+		cs_cv_prog_cxx_enable_errors_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_enable_errors=''
+            cs_cv_prog_cxx_enable_errors_ok=no
 fi
 
 fi
@@ -13410,6 +13483,7 @@ echo $ECHO_N "checking how to suppress C++ unused variable warnings... $ECHO_C" 
 if test "${cs_cv_prog_cxx_ignore_unused_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-Wno-unused@@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -13548,10 +13622,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_ignore_unused=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_ignore_unused_ok="$cs_cv_prog_cxx_ignore_unused"
+		cs_cv_prog_cxx_ignore_unused_ok="$cs_cv_prog_cxx_ignore_unused"
 else
   cs_cv_prog_cxx_ignore_unused=''
-	    cs_cv_prog_cxx_ignore_unused_ok=no
+		cs_cv_prog_cxx_ignore_unused_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_ignore_unused=''
+            cs_cv_prog_cxx_ignore_unused_ok=no
 fi
 
 fi
@@ -13573,6 +13652,7 @@ echo $ECHO_N "checking how to suppress C++ uninitialized variable warnings... $E
 if test "${cs_cv_prog_cxx_ignore_uninitialized_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-Wno-uninitialized@@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -13711,10 +13791,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_ignore_uninitialized=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_ignore_uninitialized_ok="$cs_cv_prog_cxx_ignore_uninitialized"
+		cs_cv_prog_cxx_ignore_uninitialized_ok="$cs_cv_prog_cxx_ignore_uninitialized"
 else
   cs_cv_prog_cxx_ignore_uninitialized=''
-	    cs_cv_prog_cxx_ignore_uninitialized_ok=no
+		cs_cv_prog_cxx_ignore_uninitialized_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_ignore_uninitialized=''
+            cs_cv_prog_cxx_ignore_uninitialized_ok=no
 fi
 
 fi
@@ -13736,6 +13821,7 @@ echo $ECHO_N "checking how to suppress C++ unknown #pragma warnings... $ECHO_C" 
 if test "${cs_cv_prog_cxx_ignore_unknown_pragmas_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-Wno-unknown-pragmas@@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -13874,10 +13960,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_ignore_unknown_pragmas=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_ignore_unknown_pragmas_ok="$cs_cv_prog_cxx_ignore_unknown_pragmas"
+		cs_cv_prog_cxx_ignore_unknown_pragmas_ok="$cs_cv_prog_cxx_ignore_unknown_pragmas"
 else
   cs_cv_prog_cxx_ignore_unknown_pragmas=''
-	    cs_cv_prog_cxx_ignore_unknown_pragmas_ok=no
+		cs_cv_prog_cxx_ignore_unknown_pragmas_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_ignore_unknown_pragmas=''
+            cs_cv_prog_cxx_ignore_unknown_pragmas_ok=no
 fi
 
 fi
@@ -13895,11 +13986,19 @@ fi
 
 
 # On MacOS/X, use of `long double' in csutil/formatter.h causes complaints.
-echo "$as_me:$LINENO: checking how to suppress C++ \`long double' warnings" >&5
+
+    if test "$cs_host_target" = macosx; then
+  cs_ignore_long_double_tuples=`echo @-Wno-long-double@@ | sed 'y% %#%'`
+else
+  cs_ignore_long_double_tuples=''
+fi
+
+    echo "$as_me:$LINENO: checking how to suppress C++ \`long double' warnings" >&5
 echo $ECHO_N "checking how to suppress C++ \`long double' warnings... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_ignore_long_double_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "$cs_ignore_long_double_tuples"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -13912,7 +14011,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
     cs_build_ok=no
 
 
-    for cs_build_item in `echo @-Wno-long-double@@ | sed 'y% %#%'`
+    for cs_build_item in $cs_ignore_long_double_tuples
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -14038,10 +14137,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_ignore_long_double=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_ignore_long_double_ok="$cs_cv_prog_cxx_ignore_long_double"
+		cs_cv_prog_cxx_ignore_long_double_ok="$cs_cv_prog_cxx_ignore_long_double"
 else
   cs_cv_prog_cxx_ignore_long_double=''
-	    cs_cv_prog_cxx_ignore_long_double_ok=no
+		cs_cv_prog_cxx_ignore_long_double_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_ignore_long_double=''
+            cs_cv_prog_cxx_ignore_long_double_ok=no
 fi
 
 fi
@@ -14063,6 +14167,7 @@ echo $ECHO_N "checking how to suppress C++ non-virtual destructor warnings... $E
 if test "${cs_cv_prog_cxx_ignore_non_virtual_dtor_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-Wno-non-virtual-dtor@@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -14201,10 +14306,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_ignore_non_virtual_dtor=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_ignore_non_virtual_dtor_ok="$cs_cv_prog_cxx_ignore_non_virtual_dtor"
+		cs_cv_prog_cxx_ignore_non_virtual_dtor_ok="$cs_cv_prog_cxx_ignore_non_virtual_dtor"
 else
   cs_cv_prog_cxx_ignore_non_virtual_dtor=''
-	    cs_cv_prog_cxx_ignore_non_virtual_dtor_ok=no
+		cs_cv_prog_cxx_ignore_non_virtual_dtor_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_ignore_non_virtual_dtor=''
+            cs_cv_prog_cxx_ignore_non_virtual_dtor_ok=no
 fi
 
 fi
@@ -14233,6 +14343,7 @@ echo $ECHO_N "checking for flag to disable string-aliasing... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_no_strict_aliasing_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-fno-strict-aliasing@@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -14371,10 +14482,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_no_strict_aliasing=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_no_strict_aliasing_ok="$cs_cv_prog_cxx_no_strict_aliasing"
+		cs_cv_prog_cxx_no_strict_aliasing_ok="$cs_cv_prog_cxx_no_strict_aliasing"
 else
   cs_cv_prog_cxx_no_strict_aliasing=''
-	    cs_cv_prog_cxx_no_strict_aliasing_ok=no
+		cs_cv_prog_cxx_no_strict_aliasing_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_no_strict_aliasing=''
+            cs_cv_prog_cxx_no_strict_aliasing_ok=no
 fi
 
 fi
@@ -14403,6 +14519,8 @@ echo $ECHO_N "checking how to enable C++ exceptions... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_enable_exceptions_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-fexceptions -fno-omit-frame-pointer@@ | sed 'y% %#%'` \
+    `echo @-fexceptions@@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -14542,10 +14660,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_enable_exceptions=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_enable_exceptions_ok="$cs_cv_prog_cxx_enable_exceptions"
+		cs_cv_prog_cxx_enable_exceptions_ok="$cs_cv_prog_cxx_enable_exceptions"
 else
   cs_cv_prog_cxx_enable_exceptions=''
-	    cs_cv_prog_cxx_enable_exceptions_ok=no
+		cs_cv_prog_cxx_enable_exceptions_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_enable_exceptions=''
+            cs_cv_prog_cxx_enable_exceptions_ok=no
 fi
 
 fi
@@ -14568,6 +14691,7 @@ echo $ECHO_N "checking how to disable C++ exceptions... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_disable_exceptions_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-fno-exceptions@@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -14706,10 +14830,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_disable_exceptions=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_disable_exceptions_ok="$cs_cv_prog_cxx_disable_exceptions"
+		cs_cv_prog_cxx_disable_exceptions_ok="$cs_cv_prog_cxx_disable_exceptions"
 else
   cs_cv_prog_cxx_disable_exceptions=''
-	    cs_cv_prog_cxx_disable_exceptions_ok=no
+		cs_cv_prog_cxx_disable_exceptions_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_disable_exceptions=''
+            cs_cv_prog_cxx_disable_exceptions_ok=no
 fi
 
 fi
@@ -14749,6 +14878,7 @@ echo $ECHO_N "checking how to enforce C++ standards conformance... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_enable_pedantic_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-ansi -pedantic@@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -14887,10 +15017,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_enable_pedantic=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_enable_pedantic_ok="$cs_cv_prog_cxx_enable_pedantic"
+		cs_cv_prog_cxx_enable_pedantic_ok="$cs_cv_prog_cxx_enable_pedantic"
 else
   cs_cv_prog_cxx_enable_pedantic=''
-	    cs_cv_prog_cxx_enable_pedantic_ok=no
+		cs_cv_prog_cxx_enable_pedantic_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_enable_pedantic=''
+            cs_cv_prog_cxx_enable_pedantic_ok=no
 fi
 
 fi
@@ -14924,6 +15059,7 @@ echo $ECHO_N "checking if -force_cpusubtype_ALL is needed... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_force_cpusubtype_all_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @@-force_cpusubtype_ALL@ | sed 'y% %#%'`"; then
   ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -15062,10 +15198,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_force_cpusubtype_all=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_force_cpusubtype_all_ok="$cs_cv_prog_cxx_force_cpusubtype_all"
+		cs_cv_prog_cxx_force_cpusubtype_all_ok="$cs_cv_prog_cxx_force_cpusubtype_all"
 else
   cs_cv_prog_cxx_force_cpusubtype_all=''
-	    cs_cv_prog_cxx_force_cpusubtype_all_ok=no
+		cs_cv_prog_cxx_force_cpusubtype_all_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_force_cpusubtype_all=''
+            cs_cv_prog_cxx_force_cpusubtype_all_ok=no
 fi
 
 fi
@@ -15099,6 +15240,7 @@ echo $ECHO_N "checking if -fno-common is needed... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_no_common_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @@-fno-common@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -15237,10 +15379,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_no_common=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_no_common_ok="$cs_cv_prog_cxx_no_common"
+		cs_cv_prog_cxx_no_common_ok="$cs_cv_prog_cxx_no_common"
 else
   cs_cv_prog_cxx_no_common=''
-	    cs_cv_prog_cxx_no_common_ok=no
+		cs_cv_prog_cxx_no_common_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_no_common=''
+            cs_cv_prog_cxx_no_common_ok=no
 fi
 
 fi
@@ -15279,6 +15426,7 @@ echo $ECHO_N "checking if -fvtable-thunks is needed... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_vtable_thunks_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-fvtable-thunks@@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -15417,10 +15565,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_vtable_thunks=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_vtable_thunks_ok="$cs_cv_prog_cxx_vtable_thunks"
+		cs_cv_prog_cxx_vtable_thunks_ok="$cs_cv_prog_cxx_vtable_thunks"
 else
   cs_cv_prog_cxx_vtable_thunks=''
-	    cs_cv_prog_cxx_vtable_thunks_ok=no
+		cs_cv_prog_cxx_vtable_thunks_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_vtable_thunks=''
+            cs_cv_prog_cxx_vtable_thunks_ok=no
 fi
 
 fi
@@ -15450,6 +15603,7 @@ echo $ECHO_N "checking how to export all dynamic symbols... $ECHO_C" >&6
 if test "${cs_cv_prog_link_export_dynamic_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-Wl,-E@@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -15588,10 +15742,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_link_export_dynamic=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_link_export_dynamic_ok="$cs_cv_prog_link_export_dynamic"
+		cs_cv_prog_link_export_dynamic_ok="$cs_cv_prog_link_export_dynamic"
 else
   cs_cv_prog_link_export_dynamic=''
-	    cs_cv_prog_link_export_dynamic_ok=no
+		cs_cv_prog_link_export_dynamic_ok=no
+fi
+
+else
+  cs_cv_prog_link_export_dynamic=''
+            cs_cv_prog_link_export_dynamic_ok=no
 fi
 
 fi
@@ -15951,6 +16110,7 @@ echo $ECHO_N "checking if reporting missing symbols is supported... $ECHO_C" >&6
 if test "${cs_cv_prog_link_z_defs_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @@-Wl,-z,defs@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -16089,10 +16249,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_link_z_defs=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_link_z_defs_ok="$cs_cv_prog_link_z_defs"
+		cs_cv_prog_link_z_defs_ok="$cs_cv_prog_link_z_defs"
 else
   cs_cv_prog_link_z_defs=''
-	    cs_cv_prog_link_z_defs_ok=no
+		cs_cv_prog_link_z_defs_ok=no
+fi
+
+else
+  cs_cv_prog_link_z_defs=''
+            cs_cv_prog_link_z_defs_ok=no
 fi
 
 fi
@@ -16114,6 +16279,7 @@ echo $ECHO_N "checking if missing symbols can be reported as warnings... $ECHO_C
 if test "${cs_cv_prog_link_warn_unresolved_symbols_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @@-Wl,--warn-unresolved-symbols@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -16252,10 +16418,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_link_warn_unresolved_symbols=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_link_warn_unresolved_symbols_ok="$cs_cv_prog_link_warn_unresolved_symbols"
+		cs_cv_prog_link_warn_unresolved_symbols_ok="$cs_cv_prog_link_warn_unresolved_symbols"
 else
   cs_cv_prog_link_warn_unresolved_symbols=''
-	    cs_cv_prog_link_warn_unresolved_symbols_ok=no
+		cs_cv_prog_link_warn_unresolved_symbols_ok=no
+fi
+
+else
+  cs_cv_prog_link_warn_unresolved_symbols=''
+            cs_cv_prog_link_warn_unresolved_symbols_ok=no
 fi
 
 fi
@@ -16287,6 +16458,7 @@ echo $ECHO_N "checking how to disable function inlining... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_disable_inlining_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-fno-inline-functions@@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -16425,10 +16597,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_disable_inlining=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_disable_inlining_ok="$cs_cv_prog_cxx_disable_inlining"
+		cs_cv_prog_cxx_disable_inlining_ok="$cs_cv_prog_cxx_disable_inlining"
 else
   cs_cv_prog_cxx_disable_inlining=''
-	    cs_cv_prog_cxx_disable_inlining_ok=no
+		cs_cv_prog_cxx_disable_inlining_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_disable_inlining=''
+            cs_cv_prog_cxx_disable_inlining_ok=no
 fi
 
 fi
@@ -16456,6 +16633,7 @@ echo $ECHO_N "checking how to treat C warnings as errors... $ECHO_C" >&6
 if test "${cs_cv_prog_c_enable_errors_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-Werror@@ | sed 'y% %#%'`"; then
   ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -16594,10 +16772,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_c_enable_errors=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_c_enable_errors_ok="$cs_cv_prog_c_enable_errors"
+		cs_cv_prog_c_enable_errors_ok="$cs_cv_prog_c_enable_errors"
 else
   cs_cv_prog_c_enable_errors=''
-	    cs_cv_prog_c_enable_errors_ok=no
+		cs_cv_prog_c_enable_errors_ok=no
+fi
+
+else
+  cs_cv_prog_c_enable_errors=''
+            cs_cv_prog_c_enable_errors_ok=no
 fi
 
 fi
@@ -16609,6 +16792,7 @@ echo $ECHO_N "checking how to treat C++ warnings as errors... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_enable_errors_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-Werror@@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -16747,10 +16931,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_enable_errors=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_enable_errors_ok="$cs_cv_prog_cxx_enable_errors"
+		cs_cv_prog_cxx_enable_errors_ok="$cs_cv_prog_cxx_enable_errors"
 else
   cs_cv_prog_cxx_enable_errors=''
-	    cs_cv_prog_cxx_enable_errors_ok=no
+		cs_cv_prog_cxx_enable_errors_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_enable_errors=''
+            cs_cv_prog_cxx_enable_errors_ok=no
 fi
 
 fi
@@ -16765,6 +16954,7 @@ echo $ECHO_N "checking how to treat C++ warnings as errors... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_pic_werror_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-Werror@@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -16903,10 +17093,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_pic_werror=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_pic_werror_ok="$cs_cv_prog_cxx_pic_werror"
+		cs_cv_prog_cxx_pic_werror_ok="$cs_cv_prog_cxx_pic_werror"
 else
   cs_cv_prog_cxx_pic_werror=''
-	    cs_cv_prog_cxx_pic_werror_ok=no
+		cs_cv_prog_cxx_pic_werror_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_pic_werror=''
+            cs_cv_prog_cxx_pic_werror_ok=no
 fi
 
 fi
@@ -16918,6 +17113,7 @@ echo $ECHO_N "checking how to enable C++ PIC generation... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_pic_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-fPIC@@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -17066,10 +17262,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_pic=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_pic_ok="$cs_cv_prog_cxx_pic"
+		cs_cv_prog_cxx_pic_ok="$cs_cv_prog_cxx_pic"
 else
   cs_cv_prog_cxx_pic=''
-	    cs_cv_prog_cxx_pic_ok=no
+		cs_cv_prog_cxx_pic_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_pic=''
+            cs_cv_prog_cxx_pic_ok=no
 fi
 
 fi
@@ -17083,6 +17284,7 @@ echo $ECHO_N "checking for inline visibility flag... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_visibility_inlines_hidden_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-fvisibility-inlines-hidden@@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -17221,10 +17423,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_visibility_inlines_hidden=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_visibility_inlines_hidden_ok="$cs_cv_prog_cxx_visibility_inlines_hidden"
+		cs_cv_prog_cxx_visibility_inlines_hidden_ok="$cs_cv_prog_cxx_visibility_inlines_hidden"
 else
   cs_cv_prog_cxx_visibility_inlines_hidden=''
-	    cs_cv_prog_cxx_visibility_inlines_hidden_ok=no
+		cs_cv_prog_cxx_visibility_inlines_hidden_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_visibility_inlines_hidden=''
+            cs_cv_prog_cxx_visibility_inlines_hidden_ok=no
 fi
 
 fi
@@ -17749,6 +17956,7 @@ echo $ECHO_N "checking for hidden symbol visibility flag... $ECHO_C" >&6
 if test "${cs_cv_prog_c_visibility_hidden_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-fvisibility=hidden@@ | sed 'y% %#%'`"; then
   ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -17887,10 +18095,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_c_visibility_hidden=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_c_visibility_hidden_ok="$cs_cv_prog_c_visibility_hidden"
+		cs_cv_prog_c_visibility_hidden_ok="$cs_cv_prog_c_visibility_hidden"
 else
   cs_cv_prog_c_visibility_hidden=''
-	    cs_cv_prog_c_visibility_hidden_ok=no
+		cs_cv_prog_c_visibility_hidden_ok=no
+fi
+
+else
+  cs_cv_prog_c_visibility_hidden=''
+            cs_cv_prog_c_visibility_hidden_ok=no
 fi
 
 fi
@@ -17913,6 +18126,7 @@ echo $ECHO_N "checking for default symbol visibility flag... $ECHO_C" >&6
 if test "${cs_cv_prog_c_visibility_default_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-fvisibility=default@@ | sed 'y% %#%'`"; then
   ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -18051,10 +18265,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_c_visibility_default=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_c_visibility_default_ok="$cs_cv_prog_c_visibility_default"
+		cs_cv_prog_c_visibility_default_ok="$cs_cv_prog_c_visibility_default"
 else
   cs_cv_prog_c_visibility_default=''
-	    cs_cv_prog_c_visibility_default_ok=no
+		cs_cv_prog_c_visibility_default_ok=no
+fi
+
+else
+  cs_cv_prog_c_visibility_default=''
+            cs_cv_prog_c_visibility_default_ok=no
 fi
 
 fi
@@ -22221,6 +22440,7 @@ echo $ECHO_N "checking how to enable optimizations... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_optimize_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-O3@@ | sed 'y% %#%'` `echo @-O2@@ | sed 'y% %#%'` `echo @-O@@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -22359,10 +22579,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_optimize=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_optimize_ok="$cs_cv_prog_cxx_optimize"
+		cs_cv_prog_cxx_optimize_ok="$cs_cv_prog_cxx_optimize"
 else
   cs_cv_prog_cxx_optimize=''
-	    cs_cv_prog_cxx_optimize_ok=no
+		cs_cv_prog_cxx_optimize_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_optimize=''
+            cs_cv_prog_cxx_optimize_ok=no
 fi
 
 fi
@@ -22385,6 +22610,7 @@ echo $ECHO_N "checking if -fomit-frame-pointer is accepted... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_omit_frame_pointer_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-fomit-frame-pointer@@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -22523,10 +22749,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_omit_frame_pointer=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_omit_frame_pointer_ok="$cs_cv_prog_cxx_omit_frame_pointer"
+		cs_cv_prog_cxx_omit_frame_pointer_ok="$cs_cv_prog_cxx_omit_frame_pointer"
 else
   cs_cv_prog_cxx_omit_frame_pointer=''
-	    cs_cv_prog_cxx_omit_frame_pointer_ok=no
+		cs_cv_prog_cxx_omit_frame_pointer_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_omit_frame_pointer=''
+            cs_cv_prog_cxx_omit_frame_pointer_ok=no
 fi
 
 fi
@@ -22550,6 +22781,7 @@ echo $ECHO_N "checking if -ffast-math is accepted... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_fast_math_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-ffast-math@@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -22688,10 +22920,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_fast_math=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_fast_math_ok="$cs_cv_prog_cxx_fast_math"
+		cs_cv_prog_cxx_fast_math_ok="$cs_cv_prog_cxx_fast_math"
 else
   cs_cv_prog_cxx_fast_math=''
-	    cs_cv_prog_cxx_fast_math_ok=no
+		cs_cv_prog_cxx_fast_math_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_fast_math=''
+            cs_cv_prog_cxx_fast_math_ok=no
 fi
 
 fi
@@ -23200,6 +23437,7 @@ echo $ECHO_N "checking how to enable debug mode debugging symbols... $ECHO_C" >&
 if test "${cs_cv_prog_cxx_debug_symbols_extra_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-g3@@ | sed 'y% %#%'` `echo @-g2@@ | sed 'y% %#%'` `echo @-g@@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -23338,10 +23576,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_debug_symbols_extra=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_debug_symbols_extra_ok="$cs_cv_prog_cxx_debug_symbols_extra"
+		cs_cv_prog_cxx_debug_symbols_extra_ok="$cs_cv_prog_cxx_debug_symbols_extra"
 else
   cs_cv_prog_cxx_debug_symbols_extra=''
-	    cs_cv_prog_cxx_debug_symbols_extra_ok=no
+		cs_cv_prog_cxx_debug_symbols_extra_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_debug_symbols_extra=''
+            cs_cv_prog_cxx_debug_symbols_extra_ok=no
 fi
 
 fi
@@ -23384,6 +23627,7 @@ echo $ECHO_N "checking how to enable optimize mode debugging symbols... $ECHO_C"
 if test "${cs_cv_prog_cxx_debug_symbols_normal_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-g2@@ | sed 'y% %#%'` `echo @-g@@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -23522,10 +23766,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_debug_symbols_normal=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_debug_symbols_normal_ok="$cs_cv_prog_cxx_debug_symbols_normal"
+		cs_cv_prog_cxx_debug_symbols_normal_ok="$cs_cv_prog_cxx_debug_symbols_normal"
 else
   cs_cv_prog_cxx_debug_symbols_normal=''
-	    cs_cv_prog_cxx_debug_symbols_normal_ok=no
+		cs_cv_prog_cxx_debug_symbols_normal_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_debug_symbols_normal=''
+            cs_cv_prog_cxx_debug_symbols_normal_ok=no
 fi
 
 fi
@@ -23573,6 +23822,7 @@ echo $ECHO_N "checking if -I/usr/local/include is usable... $ECHO_C" >&6
 if test "${cs_cv_prog_cpp_local_include_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-I/usr/local/include@@ | sed 'y% %#%'`"; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -23711,10 +23961,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cpp_local_include=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cpp_local_include_ok="$cs_cv_prog_cpp_local_include"
+		cs_cv_prog_cpp_local_include_ok="$cs_cv_prog_cpp_local_include"
 else
   cs_cv_prog_cpp_local_include=''
-	    cs_cv_prog_cpp_local_include_ok=no
+		cs_cv_prog_cpp_local_include_ok=no
+fi
+
+else
+  cs_cv_prog_cpp_local_include=''
+            cs_cv_prog_cpp_local_include_ok=no
 fi
 
 fi
