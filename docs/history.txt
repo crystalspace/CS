@@ -37,6 +37,8 @@ chronological order.
 3-Apr-2008
 	- res added a workaround to configure to avoid -Wno-long-double
 	  warnings occuring with g++ 4.2.3.
+	- Sueastside committed a patch by Mononoke to fix a crash in the Alsa
+	  renderer on exit.
 26-Mar-2008
 	- Marten fixed tinyxml writer not to crash on empty attributes.
 25-Mar-2008

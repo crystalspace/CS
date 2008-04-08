@@ -5,6 +5,8 @@
 	- Vincent merged r27907 into 1.2 (compilation warning fixes).
 	- Vincent merged r29198, r29200, r29216:29218 and r29220 into 1.2
 	  (work around g++ -Wno-long-double bug).
+	- Vincent merged r29213 into 1.2 (fix for crash in the Alsa driver at
+	  exit).
 30-Mar-2008
 	- caedes fixed incorrect declaration of pycscegui clean target.
 29-Mar-2008
