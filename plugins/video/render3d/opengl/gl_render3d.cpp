@@ -65,6 +65,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 
 CS_DECLARE_PROFILER
 CS_DECLARE_PROFILER_ZONE(csGLGraphics3D_DrawMesh);
+CS_DECLARE_PROFILER_ZONE(csGLGraphics3D_DrawMesh_DrawElements);
 
 #define BYTE_TO_FLOAT(x) ((x) * (1.0 / 255.0))
 
@@ -140,25 +141,19 @@ void csGLGraphics3D::OutputMarkerString (const char* function,
 					 const wchar_t* file,
 					 int line, const char* message)
 {
-  if (ext && ext->CS_GL_GREMEDY_string_marker)
-  {
-    csStringFast<256> marker;
-    marker.Format ("[%ls %s():%d] %s", file, function, line, message);
-    ext->glStringMarkerGREMEDY ((GLsizei)marker.Length (), marker);
-  }
+  csStringFast<256> marker;
+  marker.Format ("[%ls %s():%d] %s", file, function, line, message);
+  ext->glStringMarkerGREMEDY ((GLsizei)marker.Length (), marker);
 }
 
 void csGLGraphics3D::OutputMarkerString (const char* function, 
 					 const wchar_t* file,
 					 int line, MakeAString& message)
 {
-  if (ext && ext->CS_GL_GREMEDY_string_marker)
-  {
-    csStringFast<256> marker;
-    marker.Format ("[%ls %s():%d] %s", file, function, line, 
-      message.GetStr());
-    ext->glStringMarkerGREMEDY ((GLsizei)marker.Length (), marker);
-  }
+  csStringFast<256> marker;
+  marker.Format ("[%ls %s():%d] %s", file, function, line, 
+    message.GetStr());
+  ext->glStringMarkerGREMEDY ((GLsizei)marker.Length (), marker);
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -539,7 +534,7 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
 {
   GLRENDER3D_OUTPUT_STRING_MARKER(("(%d, %d, %d, %d)", 
     clip_portal, clip_plane, clip_z_plane, tri_count));
-
+  
   // @@@@ RETHINK!!! THIS IS A HUGE PERFORMANCE BOOST. BUT???
   clip_z_plane = CS_CLIP_NOT;
 
@@ -1715,12 +1710,10 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 
   SetupProjection ();
 
-  int num_tri = (mymesh->indexend-mymesh->indexstart)/3;
-
   SetupClipper (mymesh->clip_portal, 
                 mymesh->clip_plane, 
                 mymesh->clip_z_plane,
-		num_tri);
+		(mymesh->indexend-mymesh->indexstart)/3);
   if (debug_inhibit_draw) 
     return;
 
@@ -1757,31 +1750,33 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     csRenderBufferComponentSizes[iIndexbuf->GetComponentType()];
   CS_ASSERT_MSG("Expecting index buffers to have only 1 component",
     (iIndexbuf->GetComponentCount() == 1));
-  CS_ASSERT((indexCompsBytes * mymesh->indexstart) <= iIndexbuf->GetSize());
-  CS_ASSERT((indexCompsBytes * mymesh->indexend) <= iIndexbuf->GetSize());
+  if (!(mymesh->multiRanges && mymesh->rangesNum))
+  {
+    CS_ASSERT((indexCompsBytes * mymesh->indexstart) <= iIndexbuf->GetSize());
+    CS_ASSERT((indexCompsBytes * mymesh->indexend) <= iIndexbuf->GetSize());
+  }
 
   GLenum primitivetype = GL_TRIANGLES;
+  int primNum_divider = 1, primNum_sub = 0;
   switch (mymesh->meshtype)
   {
     case CS_MESHTYPE_QUADS:
-      num_tri = (mymesh->indexend-mymesh->indexstart)/2;
+      primNum_divider = 2;
       primitivetype = GL_QUADS;
       break;
     case CS_MESHTYPE_TRIANGLESTRIP:
-      num_tri = (mymesh->indexend-mymesh->indexstart)-2;
+      primNum_sub = 2;
       primitivetype = GL_TRIANGLE_STRIP;
       break;
     case CS_MESHTYPE_TRIANGLEFAN:
-      num_tri = (mymesh->indexend-mymesh->indexstart)-2;
+      primNum_sub = 2;
       primitivetype = GL_TRIANGLE_FAN;
       break;
     case CS_MESHTYPE_POINTS:
       primitivetype = GL_POINTS;
-      num_tri = (mymesh->indexend-mymesh->indexstart);
       break;
     case CS_MESHTYPE_POINT_SPRITES:
     {
-      num_tri = (mymesh->indexend-mymesh->indexstart);
       if(!(ext->CS_GL_ARB_point_sprite && ext->CS_GL_ARB_point_parameters))
       {
         break;
@@ -1790,16 +1785,16 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       break;
     }
     case CS_MESHTYPE_LINES:
-      num_tri = (mymesh->indexend-mymesh->indexstart)/2;
+      primNum_divider = 2;
       primitivetype = GL_LINES;
       break;
     case CS_MESHTYPE_LINESTRIP:
-      num_tri = (mymesh->indexend-mymesh->indexstart)-1;
+      primNum_sub = 1;
       primitivetype = GL_LINE_STRIP;
       break;
     case CS_MESHTYPE_TRIANGLES:
     default:
-      num_tri = (mymesh->indexend-mymesh->indexstart)/3;
+      primNum_divider = 3;
       primitivetype = GL_TRIANGLES;
       break;
   }
@@ -1897,18 +1892,13 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     statecache->Disable_GL_POLYGON_OFFSET_FILL ();
 
   GLenum compType;
-  void* bufData = //indexbuf->RenderLock (CS_GLBUF_RENDERLOCK_ELEMENTS);
-    RenderLock (iIndexbuf, CS_GLBUF_RENDERLOCK_ELEMENTS, compType);
+  bool normalized;
+  void* bufData =
+    RenderLock (iIndexbuf, CS_GLBUF_RENDERLOCK_ELEMENTS, compType, normalized);
   statecache->ApplyBufferBinding (csGLStateCacheContext::boIndexArray);
   if (bufData != (void*)-1)
   {
     SetMixMode (mixmode, modes.alphaType);
-
-    if (bugplug)
-    {
-      bugplug->AddCounter ("Triangle Count", num_tri);
-      bugplug->AddCounter ("Mesh Count", 1);
-    }
 
     if ((current_zmode == CS_ZBUF_MESH) || (current_zmode == CS_ZBUF_MESH2))
     {
@@ -1924,10 +1914,40 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       }*/
     }
 
-    glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
-      (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
-      compType, 
-      ((uint8*)bufData) + (indexCompsBytes * mymesh->indexstart));
+    {
+      CS_PROFILER_ZONE(csGLGraphics3D_DrawMesh_DrawElements);
+      if (mymesh->multiRanges && mymesh->rangesNum)
+      {
+	size_t num_tri = 0;
+	for (size_t r = 0; r < mymesh->rangesNum; r++)
+	{
+	  CS::Graphics::RenderMeshIndexRange range = mymesh->multiRanges[r];
+	  if (bugplug) num_tri += (range.end-range.start)/primNum_divider - primNum_sub;
+	  glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
+	    (GLuint)iIndexbuf->GetRangeEnd(), range.end - range.start,
+	    compType, 
+            ((uint8*)bufData) + (indexCompsBytes * range.start));
+	}
+	if (bugplug)
+	{
+	  bugplug->AddCounter ("Triangle Count", num_tri);
+	  bugplug->AddCounter ("Mesh Count", 1);
+	}
+      }
+      else
+      {
+	if (bugplug)
+	{
+	  size_t num_tri = (mymesh->indexend-mymesh->indexstart)/primNum_divider - primNum_sub;
+	  bugplug->AddCounter ("Triangle Count", num_tri);
+	  bugplug->AddCounter ("Mesh Count", 1);
+	}
+	glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
+	  (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
+	  compType, 
+	  ((uint8*)bufData) + (indexCompsBytes * mymesh->indexstart));
+      }
+    }
     //indexbuf->Release();
   }
 
@@ -2230,9 +2250,13 @@ void csGLGraphics3D::ClosePortal ()
 
 void* csGLGraphics3D::RenderLock (iRenderBuffer* buffer, 
 				  csGLRenderBufferLockType type, 
-				  GLenum& compGLType)
+                                  GLenum& compGLType, bool& normalized)
 {
-  compGLType = compGLtypes[buffer->GetComponentType()];
+  csRenderBufferComponentType compType = buffer->GetComponentType();
+  normalized = (compType != CS_BUFCOMP_FLOAT) 
+    && (compType != CS_BUFCOMP_DOUBLE)
+    && (compType & CS_BUFCOMP_NORMALIZED);
+  compGLType = compGLtypes[compType];
   if (vboManager.IsValid())
     return vboManager->RenderLock (buffer, type);
   else
@@ -2267,7 +2291,7 @@ void csGLGraphics3D::RenderRelease (iRenderBuffer* buffer)
 void csGLGraphics3D::ApplyBufferChanges()
 {
   GLRENDER3D_OUTPUT_LOCATION_MARKER;
-
+  
   for (size_t i = 0; i < changeQueue.GetSize (); i++)
   {
     const BufferChange& changeEntry = changeQueue[i];
@@ -2290,31 +2314,36 @@ void csGLGraphics3D::ApplyBufferChanges()
         AssignSpecBuffer (att-CS_VATTRIB_SPECIFIC_FIRST, buffer);      
 
       GLenum compType;
+      bool normalized;
       void *data =
-        RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY, compType);
+	RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY, compType, normalized);
 
       if (data == (void*)-1) continue;
 
       switch (att)
       {
       case CS_VATTRIB_POSITION:
+	// @@@ FIXME: How to deal with normalized buffers?
         statecache->Enable_GL_VERTEX_ARRAY ();
         statecache->SetVertexPointer (buffer->GetComponentCount (),
           compType, (GLsizei)buffer->GetStride (), data);
         break;
       case CS_VATTRIB_NORMAL:
-        statecache->Enable_GL_NORMAL_ARRAY ();
+	// @@@ FIXME: How to deal with unnormalized buffers?
+	statecache->Enable_GL_NORMAL_ARRAY ();
         statecache->SetNormalPointer (compType, (GLsizei)buffer->GetStride (), 
           data);
         break;
       case CS_VATTRIB_COLOR:
-        statecache->Enable_GL_COLOR_ARRAY ();
+	// @@@ FIXME: How to deal with unnormalized buffers?
+	statecache->Enable_GL_COLOR_ARRAY ();
         statecache->SetColorPointer (buffer->GetComponentCount (),
           compType, (GLsizei)buffer->GetStride (), data);
         break;
       case CS_VATTRIB_SECONDARY_COLOR:
         if (ext->CS_GL_EXT_secondary_color)
         {
+	  // @@@ FIXME: How to deal with unnormalized buffers?
 	  statecache->Enable_GL_SECONDARY_COLOR_ARRAY_EXT ();
 	  statecache->SetSecondaryColorPointerExt (buffer->GetComponentCount (),
 	    compType, (GLsizei)buffer->GetStride (), data);
@@ -2329,7 +2358,8 @@ void csGLGraphics3D::ApplyBufferChanges()
           {
             statecache->SetCurrentTU (unit);
           } 
-          statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
+	  // @@@ FIXME: How to deal with normalized buffers?
+	  statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
           statecache->SetTexCoordPointer (buffer->GetComponentCount (),
             compType, (GLsizei)buffer->GetStride (), data);
         }
@@ -2341,7 +2371,7 @@ void csGLGraphics3D::ApplyBufferChanges()
 	    statecache->ApplyBufferBinding (csGLStateCacheContext::boElementArray);
 	    ext->glEnableVertexAttribArrayARB (index);
 	    ext->glVertexAttribPointerARB(index, buffer->GetComponentCount (),
-	      compType, false, (GLsizei)buffer->GetStride (), data);
+              compType, normalized, (GLsizei)buffer->GetStride (), data);
 	  }
         }
         else
