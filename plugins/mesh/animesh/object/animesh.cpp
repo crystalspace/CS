@@ -450,19 +450,30 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   AnimeshObject::AnimeshObject (AnimeshObjectFactory* factory)
     : scfImplementationType (this), factory (factory), logParent (0),
-    material (0), mixMode (0), skeleton (0)
+    material (0), mixMode (0), skeleton (0),
+    skinVertexVersion (~0), skinNormalVersion (~0), skinTangentVersion (~0), skinBinormalVersion (~0),
+    skinVertexLF (false), skinNormalLF (false), skinTangentLF (false), skinBinormalLF (false)
   {
     SetupSubmeshes ();
 
     if (factory->skeletonFactory)
     {
       skeleton = factory->skeletonFactory->CreateSkeleton ();
+      skeletonVersion = skeleton->GetSkeletonStateVersion() - 1;
     }
   }
 
   void AnimeshObject::SetSkeleton (iSkeleton2* newskel)
   {
     skeleton = newskel;
+    if (skeleton)
+    {
+      skeletonVersion = skeleton->GetSkeletonStateVersion() - 1;
+    }
+    else
+    {
+      skeletonVersion = ~0;
+    }
   }
 
   iSkeleton2* AnimeshObject::GetSkeleton () const
@@ -572,6 +583,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       }
     }
 
+    PreskinLF ();
 
     num = (int)renderMeshList.GetSize ();
     return renderMeshList.GetArray ();
@@ -597,6 +609,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       UpdateLocalBoneTransforms ();
     }
     lastTick = current_time;
+    skinVertexLF = skinNormalLF = skinBinormalLF = skinTangentLF = false;
   }
 
   void AnimeshObject::HardTransform (const csReversibleTransform& t)
@@ -792,6 +805,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       return; // nothing to update
 
     lastSkeletonState = skeleton->GetStateBindSpace ();
+    skeletonVersion = skeleton->GetSkeletonStateVersion ();
 
     if (boneTransformArray)
     {
@@ -890,18 +904,115 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         if (!currBuffer ||
           currBuffer->GetElementCount () < factory->GetVertexCountP ())
         {
-          csRef<iRenderBuffer> newBuf;
-          newBuf = csRenderBuffer::CreateRenderBuffer (factory->GetVertexCountP (),
+          skinnedVertices = csRenderBuffer::CreateRenderBuffer (factory->GetVertexCountP (),
             CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
 
-          holder->SetRenderBuffer (CS_BUFFER_POSITION, newBuf);
-          currBuffer = newBuf;
+          holder->SetRenderBuffer (CS_BUFFER_POSITION, skinnedVertices);          
+          skinVertexVersion = skeletonVersion - 1;
         }
 
-        SkinVertices (currBuffer);
+        if (skeletonVersion != skinVertexVersion)
+        {
+          SkinVertices ();
+          skinVertexVersion = skeletonVersion;
+        }
+        skinVertexLF = true;
       }
       break;
-    }     
+    case CS_BUFFER_NORMAL:
+      {
+        if (!skeleton)
+        {
+          holder->SetRenderBuffer (CS_BUFFER_NORMAL, factory->normalBuffer);
+          return;
+        }
+
+        iRenderBuffer* currBuffer = holder->GetRenderBufferNoAccessor (buffer);
+        if (!currBuffer ||
+          currBuffer->GetElementCount () < factory->GetVertexCountP ())
+        {
+          skinnedNormals = csRenderBuffer::CreateRenderBuffer (factory->GetVertexCountP (),
+            CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
+
+          holder->SetRenderBuffer (CS_BUFFER_NORMAL, skinnedNormals);          
+          skinNormalVersion = skeletonVersion - 1;
+        }
+
+        if (skeletonVersion != skinNormalVersion)
+        {
+          SkinNormals ();
+          skinNormalVersion = skeletonVersion;
+        }
+        skinNormalLF = true;
+      }
+      break;
+    case CS_BUFFER_TANGENT:
+    case CS_BUFFER_BINORMAL:
+      {
+        if (!skeleton)
+        {
+          holder->SetRenderBuffer (CS_BUFFER_TANGENT, factory->tangentBuffer);
+          holder->SetRenderBuffer (CS_BUFFER_BINORMAL, factory->binormalBuffer);
+          return;
+        }
+
+        iRenderBuffer* currBuffer = holder->GetRenderBufferNoAccessor (CS_BUFFER_TANGENT);
+        if (!currBuffer ||
+          currBuffer->GetElementCount () < factory->GetVertexCountP ())
+        {
+          skinnedTangents = csRenderBuffer::CreateRenderBuffer (factory->GetVertexCountP (),
+            CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
+
+          holder->SetRenderBuffer (CS_BUFFER_TANGENT, skinnedTangents);          
+          skinTangentVersion = skeletonVersion - 1;
+        }
+
+        currBuffer = holder->GetRenderBufferNoAccessor (CS_BUFFER_BINORMAL);
+        if (!currBuffer ||
+          currBuffer->GetElementCount () < factory->GetVertexCountP ())
+        {
+          skinnedBinormals = csRenderBuffer::CreateRenderBuffer (factory->GetVertexCountP (),
+            CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
+
+          holder->SetRenderBuffer (CS_BUFFER_BINORMAL, skinnedBinormals);          
+          skinBinormalVersion = skeletonVersion - 1;
+        }
+
+        if (skeletonVersion != skinTangentVersion ||
+          skeletonVersion != skinBinormalVersion)
+        {
+          SkinTangentAndBinormal ();
+
+          skinTangentVersion = skeletonVersion;
+          skinBinormalVersion = skeletonVersion;
+        }
+
+        skinTangentLF = true;
+        skinBinormalLF = true;
+      }
+      break;
+
+    }    
+  }
+
+  void AnimeshObject::PreskinLF ()
+  {
+    if (skinVertexLF && skinNormalLF && (skinTangentLF || skinBinormalLF))
+    {
+      SkinAll ();
+      skinVertexVersion = skinNormalVersion = skinTangentVersion =
+        skinBinormalVersion = skeletonVersion;
+    }
+    else if (skinVertexLF && skinNormalLF)
+    {
+      SkinVerticesAndNormals ();
+      skinVertexVersion = skinNormalVersion = skeletonVersion;
+    }
+    else if (skinVertexLF)
+    {
+      SkinVertices ();
+      skinVertexVersion = skeletonVersion;
+    }
   }
 
 }

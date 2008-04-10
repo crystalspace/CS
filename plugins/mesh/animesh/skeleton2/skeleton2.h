@@ -168,6 +168,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual void RecreateSkeleton ();
     virtual void UpdateSkeleton (float dt);
 
+    virtual unsigned int GetSkeletonStateVersion () const;
+
   private:
     void RecreateSkeletonP ();
     void RecreateAnimationTreeP ();
@@ -200,6 +202,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     SkeletonFactory* factory;
     csRef<iSkeletonAnimPacket2> animationPacket;
     bool cachedTransformsDirty;
+    unsigned int version;
   };
 
 }

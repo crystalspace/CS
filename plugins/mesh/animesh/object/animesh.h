@@ -172,7 +172,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     virtual uint GetIndexSetCount () const
     {
-      return indexBuffers.GetSize ();
+      return (uint)indexBuffers.GetSize ();
     }
 
     virtual const csArray<unsigned int>& GetBoneIndices (size_t set)
@@ -286,7 +286,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     void UpdateLocalBoneTransforms ();
 
   private:
-    void SkinVertices (iRenderBuffer* vResultBuffer);
+    void SkinVertices ();
+    void SkinNormals ();
+    void SkinVerticesAndNormals ();
+    void SkinTangentAndBinormal ();
+    void SkinAll ();
+
+    void PreskinLF ();
 
     class Submesh : 
       public scfImplementation1<Submesh, 
@@ -329,6 +335,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     csFlags meshObjectFlags;
 
     csRef<iSkeleton2> skeleton;
+    unsigned int skeletonVersion;
     csTicks lastTick;
 
     // Hold the bone transforms
@@ -339,6 +346,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     csDirtyAccessArray<CS::Graphics::RenderMesh*> renderMeshList;
 
     csRefArray<Submesh> submeshes;
+
+    // Holder for skinned vertex buffers
+    csRef<iRenderBuffer> skinnedVertices;
+    csRef<iRenderBuffer> skinnedNormals;
+    csRef<iRenderBuffer> skinnedTangents;
+    csRef<iRenderBuffer> skinnedBinormals;    
+
+    // Version numbers for the software skinning
+    unsigned int skinVertexVersion, skinNormalVersion, skinTangentVersion, skinBinormalVersion;
+    // Things we skinned in software last frame
+    bool skinVertexLF, skinNormalLF, skinTangentLF, skinBinormalLF;
   };
 
 }

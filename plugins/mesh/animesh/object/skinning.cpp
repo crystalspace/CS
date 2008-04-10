@@ -28,23 +28,18 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 {
-
-
   
-  void AnimeshObject::SkinVertices (iRenderBuffer* vResultBuffer)
+  void AnimeshObject::SkinVertices ()
   {
     if (!skeleton)
       return;
 
     // @@Better checks/handling...
-    CS_ASSERT (vResultBuffer->GetElementCount () >= factory->vertexCount);
+    CS_ASSERT (skinnedVertices->GetElementCount () >= factory->vertexCount);
     
-    // Get the buffer to skin from 
-    iRenderBuffer* srcBuffer = factory->vertexBuffer;
-
     // Setup some local data
-    csVertexListWalker<float, csVector3> srcVerts (srcBuffer);
-    csRenderBufferLock<csVector3> dstVerts (vResultBuffer);
+    csVertexListWalker<float, csVector3> srcVerts (factory->vertexBuffer);
+    csRenderBufferLock<csVector3> dstVerts (skinnedVertices);
     csSkeletalState2* skeletonState = lastSkeletonState;    
 
     csAnimatedMeshBoneInfluence* influence = factory->boneInfluences.GetArray ();
@@ -92,6 +87,288 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       }  
 
       ++srcVerts;      
+    }
+  }
+
+
+  void AnimeshObject::SkinNormals ()
+  {
+    if (!skeleton)
+      return;
+
+    // @@Better checks/handling...
+    CS_ASSERT (skinnedNormals->GetElementCount () >= factory->vertexCount);
+
+    // Setup some local data
+    csVertexListWalker<float, csVector3> srcNormals (factory->normalBuffer);
+    csRenderBufferLock<csVector3> dstNormals (skinnedNormals);
+    csSkeletalState2* skeletonState = lastSkeletonState;    
+
+    csAnimatedMeshBoneInfluence* influence = factory->boneInfluences.GetArray ();
+
+    for (size_t i = 0; i < factory->vertexCount; ++i)
+    {
+      // Accumulate data for the vertex
+      int numInfluences = 0;
+
+      csDualQuaternion dq (csQuaternion (0,0,0,0), csQuaternion (0,0,0,0)); 
+      csQuaternion pivot;   
+
+      for (size_t j = 0; j < 4; ++j, ++influence) // @@SOLVE 4
+      {
+        if (influence->influenceWeight > 0)
+        {
+          numInfluences++;
+
+          csDualQuaternion inflQuat (
+            skeletonState->GetQuaternion (influence->bone),
+            skeletonState->GetVector (influence->bone));
+
+          if (numInfluences == 1)
+          {
+            pivot = inflQuat.real;
+          }
+          else if (inflQuat.real.Dot (pivot) < 0.0f)
+          {
+            inflQuat *= -1.0f;
+          }
+
+          dq += inflQuat * influence->influenceWeight;
+        }
+      }
+
+      if (numInfluences == 0)
+      {
+        dstNormals[i] = *srcNormals;
+      }
+      else
+      {
+        dq = dq.Unit ();
+
+        dstNormals[i] = dq.Transform (*srcNormals);
+      }  
+
+      ++srcNormals;      
+    }
+  }
+
+
+  void AnimeshObject::SkinVerticesAndNormals ()
+  {
+    if (!skeleton)
+      return;
+
+    // @@Better checks/handling...
+    CS_ASSERT (skinnedVertices->GetElementCount () >= factory->vertexCount);
+    CS_ASSERT (skinnedNormals->GetElementCount () >= factory->vertexCount);
+
+
+    // Setup some local data
+    csVertexListWalker<float, csVector3> srcVerts (factory->vertexBuffer);
+    csRenderBufferLock<csVector3> dstVerts (skinnedVertices);
+    csVertexListWalker<float, csVector3> srcNormals (factory->normalBuffer);
+    csRenderBufferLock<csVector3> dstNormals (skinnedNormals);
+
+    csSkeletalState2* skeletonState = lastSkeletonState;    
+
+    csAnimatedMeshBoneInfluence* influence = factory->boneInfluences.GetArray ();
+
+    for (size_t i = 0; i < factory->vertexCount; ++i)
+    {
+      // Accumulate data for the vertex
+      int numInfluences = 0;
+
+      csDualQuaternion dq (csQuaternion (0,0,0,0), csQuaternion (0,0,0,0)); 
+      csQuaternion pivot;   
+
+      for (size_t j = 0; j < 4; ++j, ++influence) // @@SOLVE 4
+      {
+        if (influence->influenceWeight > 0)
+        {
+          numInfluences++;
+
+          csDualQuaternion inflQuat (
+            skeletonState->GetQuaternion (influence->bone),
+            skeletonState->GetVector (influence->bone));
+
+          if (numInfluences == 1)
+          {
+            pivot = inflQuat.real;
+          }
+          else if (inflQuat.real.Dot (pivot) < 0.0f)
+          {
+            inflQuat *= -1.0f;
+          }
+
+          dq += inflQuat * influence->influenceWeight;
+        }
+      }
+
+      if (numInfluences == 0)
+      {
+        dstVerts[i] = *srcVerts;
+        dstNormals[i] = *srcNormals;
+      }
+      else
+      {
+        dq = dq.Unit ();
+
+        dstVerts[i] = dq.TransformPoint (*srcVerts);        
+        dstNormals[i] = dq.Transform (*srcNormals);
+      }  
+
+      ++srcVerts;
+      ++srcNormals;
+    }
+  }
+
+  void AnimeshObject::SkinTangentAndBinormal ()
+  {
+    if (!skeleton)
+      return;
+
+    // @@Better checks/handling...
+    CS_ASSERT (skinnedTangents->GetElementCount () >= factory->vertexCount);
+    CS_ASSERT (skinnedBinormals->GetElementCount () >= factory->vertexCount);
+
+
+    // Setup some local data
+    csVertexListWalker<float, csVector3> srcTangents (factory->tangentBuffer);
+    csRenderBufferLock<csVector3> dstTangents (skinnedTangents);
+    csVertexListWalker<float, csVector3> srcBinormals (factory->binormalBuffer);
+    csRenderBufferLock<csVector3> dstBinormals (skinnedBinormals);
+
+    csSkeletalState2* skeletonState = lastSkeletonState;    
+
+    csAnimatedMeshBoneInfluence* influence = factory->boneInfluences.GetArray ();
+
+    for (size_t i = 0; i < factory->vertexCount; ++i)
+    {
+      // Accumulate data for the vertex
+      int numInfluences = 0;
+
+      csDualQuaternion dq (csQuaternion (0,0,0,0), csQuaternion (0,0,0,0)); 
+      csQuaternion pivot;   
+
+      for (size_t j = 0; j < 4; ++j, ++influence) // @@SOLVE 4
+      {
+        if (influence->influenceWeight > 0)
+        {
+          numInfluences++;
+
+          csDualQuaternion inflQuat (
+            skeletonState->GetQuaternion (influence->bone),
+            skeletonState->GetVector (influence->bone));
+
+          if (numInfluences == 1)
+          {
+            pivot = inflQuat.real;
+          }
+          else if (inflQuat.real.Dot (pivot) < 0.0f)
+          {
+            inflQuat *= -1.0f;
+          }
+
+          dq += inflQuat * influence->influenceWeight;
+        }
+      }
+
+      if (numInfluences == 0)
+      {
+        dstTangents[i] = *srcTangents;
+        dstBinormals[i] = *srcBinormals;
+      }
+      else
+      {
+        dq = dq.Unit ();
+
+        dstTangents[i] = dq.Transform (*srcTangents);        
+        dstBinormals[i] = dq.Transform (*srcBinormals);
+      }  
+
+      ++srcTangents;
+      ++srcBinormals;
+    }
+  }
+
+  void AnimeshObject::SkinAll ()
+  {
+    if (!skeleton)
+      return;
+
+    // @@Better checks/handling...
+    CS_ASSERT (skinnedVertices->GetElementCount () >= factory->vertexCount);
+    CS_ASSERT (skinnedNormals->GetElementCount () >= factory->vertexCount);
+    CS_ASSERT (skinnedTangents->GetElementCount () >= factory->vertexCount);
+    CS_ASSERT (skinnedBinormals->GetElementCount () >= factory->vertexCount);
+
+    // Setup some local data
+    csVertexListWalker<float, csVector3> srcVerts (factory->vertexBuffer);
+    csRenderBufferLock<csVector3> dstVerts (skinnedVertices);
+    csVertexListWalker<float, csVector3> srcNormals (factory->normalBuffer);
+    csRenderBufferLock<csVector3> dstNormals (skinnedNormals);
+
+    csVertexListWalker<float, csVector3> srcTangents (factory->tangentBuffer);
+    csRenderBufferLock<csVector3> dstTangents (skinnedTangents);
+    csVertexListWalker<float, csVector3> srcBinormals (factory->binormalBuffer);
+    csRenderBufferLock<csVector3> dstBinormals (skinnedBinormals);
+
+    csSkeletalState2* skeletonState = lastSkeletonState;    
+
+    csAnimatedMeshBoneInfluence* influence = factory->boneInfluences.GetArray ();
+
+    for (size_t i = 0; i < factory->vertexCount; ++i)
+    {
+      // Accumulate data for the vertex
+      int numInfluences = 0;
+
+      csDualQuaternion dq (csQuaternion (0,0,0,0), csQuaternion (0,0,0,0)); 
+      csQuaternion pivot;   
+
+      for (size_t j = 0; j < 4; ++j, ++influence) // @@SOLVE 4
+      {
+        if (influence->influenceWeight > 0)
+        {
+          numInfluences++;
+
+          csDualQuaternion inflQuat (
+            skeletonState->GetQuaternion (influence->bone),
+            skeletonState->GetVector (influence->bone));
+
+          if (numInfluences == 1)
+          {
+            pivot = inflQuat.real;
+          }
+          else if (inflQuat.real.Dot (pivot) < 0.0f)
+          {
+            inflQuat *= -1.0f;
+          }
+
+          dq += inflQuat * influence->influenceWeight;
+        }
+      }   
+
+      if (numInfluences == 0)
+      {
+        dstVerts[i] = *srcVerts;
+        dstNormals[i] = *srcNormals;
+        dstTangents[i] = *srcTangents;
+        dstBinormals[i] = *srcBinormals;
+      }
+      else
+      {
+        dq = dq.Unit ();
+
+        dstVerts[i] = dq.TransformPoint (*srcVerts);
+        dstNormals[i] = dq.Transform (*srcNormals);
+        dstTangents[i] = dq.Transform (*srcTangents);        
+        dstBinormals[i] = dq.Transform (*srcBinormals);
+      }
+
+      ++srcVerts;
+      ++srcNormals;
+      ++srcTangents;
+      ++srcBinormals;
     }
   }
 

@@ -324,7 +324,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   Skeleton::Skeleton (SkeletonFactory* factory)
     : scfImplementationType (this, factory), factory (factory), 
-    cachedTransformsDirty (true)
+    cachedTransformsDirty (true), version (0)
   {
     // Setup the bones from the parent setup
     RecreateSkeletonP ();
@@ -584,7 +584,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
           cachedTransformsDirty = true;
         }
       }
+      
+      version++;
     }    
+  }
+
+  unsigned int Skeleton::GetSkeletonStateVersion () const
+  {
+    return version;
   }
 
   void Skeleton::RecreateSkeletonP ()

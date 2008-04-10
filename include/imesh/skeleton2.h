@@ -332,6 +332,11 @@ struct iSkeleton2 : public virtual iBase
    * Update the skeleton
    */
   virtual void UpdateSkeleton (float dt) = 0;
+
+  /**
+   * Get skeleton update version number
+   */
+  virtual unsigned int GetSkeletonStateVersion () const = 0;
 };
 
 /**
