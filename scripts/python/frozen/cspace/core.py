@@ -370,7 +370,23 @@ class csFlags(object):
 csFlags_swigregister = _core.csFlags_swigregister
 csFlags_swigregister(csFlags)
 
-class iStringSet(object):
+class iGeneralStringSetBase(iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def Request(*args): return _core.iGeneralStringSetBase_Request(*args)
+    def Contains(*args): return _core.iGeneralStringSetBase_Contains(*args)
+    def Delete(*args): return _core.iGeneralStringSetBase_Delete(*args)
+    def Empty(*args): return _core.iGeneralStringSetBase_Empty(*args)
+    def Clear(*args): return _core.iGeneralStringSetBase_Clear(*args)
+    def GetSize(*args): return _core.iGeneralStringSetBase_GetSize(*args)
+    def IsEmpty(*args): return _core.iGeneralStringSetBase_IsEmpty(*args)
+    __swig_destroy__ = _core.delete_iGeneralStringSetBase
+    __del__ = lambda self : None;
+iGeneralStringSetBase_swigregister = _core.iGeneralStringSetBase_swigregister
+iGeneralStringSetBase_swigregister(iGeneralStringSetBase)
+
+class iStringSet(iGeneralStringSetBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
