@@ -9134,6 +9134,47 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::RenderMeshIndexRange ##############
+
+package cspace::RenderMeshIndexRange;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_start_get = *cspacec::RenderMeshIndexRange_start_get;
+*swig_start_set = *cspacec::RenderMeshIndexRange_start_set;
+*swig_end_get = *cspacec::RenderMeshIndexRange_end_get;
+*swig_end_set = *cspacec::RenderMeshIndexRange_end_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_RenderMeshIndexRange(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_RenderMeshIndexRange($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::CoreRenderMesh ##############
 
 package cspace::CoreRenderMesh;
@@ -9174,6 +9215,10 @@ sub DESTROY {
 *swig_indexstart_set = *cspacec::CoreRenderMesh_indexstart_set;
 *swig_indexend_get = *cspacec::CoreRenderMesh_indexend_get;
 *swig_indexend_set = *cspacec::CoreRenderMesh_indexend_set;
+*swig_multiRanges_get = *cspacec::CoreRenderMesh_multiRanges_get;
+*swig_multiRanges_set = *cspacec::CoreRenderMesh_multiRanges_set;
+*swig_rangesNum_get = *cspacec::CoreRenderMesh_rangesNum_get;
+*swig_rangesNum_set = *cspacec::CoreRenderMesh_rangesNum_set;
 *swig_material_get = *cspacec::CoreRenderMesh_material_get;
 *swig_material_set = *cspacec::CoreRenderMesh_material_set;
 *swig_object2world_get = *cspacec::CoreRenderMesh_object2world_get;
