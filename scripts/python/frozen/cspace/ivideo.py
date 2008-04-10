@@ -508,6 +508,20 @@ class RenderMeshModes(object):
 RenderMeshModes_swigregister = _ivideo.RenderMeshModes_swigregister
 RenderMeshModes_swigregister(RenderMeshModes)
 
+class RenderMeshIndexRange(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    start = _swig_property(_ivideo.RenderMeshIndexRange_start_get, _ivideo.RenderMeshIndexRange_start_set)
+    end = _swig_property(_ivideo.RenderMeshIndexRange_end_get, _ivideo.RenderMeshIndexRange_end_set)
+    def __init__(self, *args): 
+        this = _ivideo.new_RenderMeshIndexRange(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _ivideo.delete_RenderMeshIndexRange
+    __del__ = lambda self : None;
+RenderMeshIndexRange_swigregister = _ivideo.RenderMeshIndexRange_swigregister
+RenderMeshIndexRange_swigregister(RenderMeshIndexRange)
+
 class CoreRenderMesh(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
@@ -525,6 +539,8 @@ class CoreRenderMesh(object):
     meshtype = _swig_property(_ivideo.CoreRenderMesh_meshtype_get, _ivideo.CoreRenderMesh_meshtype_set)
     indexstart = _swig_property(_ivideo.CoreRenderMesh_indexstart_get, _ivideo.CoreRenderMesh_indexstart_set)
     indexend = _swig_property(_ivideo.CoreRenderMesh_indexend_get, _ivideo.CoreRenderMesh_indexend_set)
+    multiRanges = _swig_property(_ivideo.CoreRenderMesh_multiRanges_get, _ivideo.CoreRenderMesh_multiRanges_set)
+    rangesNum = _swig_property(_ivideo.CoreRenderMesh_rangesNum_get, _ivideo.CoreRenderMesh_rangesNum_set)
     material = _swig_property(_ivideo.CoreRenderMesh_material_get, _ivideo.CoreRenderMesh_material_set)
     object2world = _swig_property(_ivideo.CoreRenderMesh_object2world_get, _ivideo.CoreRenderMesh_object2world_set)
 CoreRenderMesh_swigregister = _ivideo.CoreRenderMesh_swigregister

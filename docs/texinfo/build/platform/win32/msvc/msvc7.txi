@@ -41,10 +41,10 @@ the Platform SDK. Follow these instructions exactly to set up the @sc{psdk}:
 
 @noindent
 @ifnottex
-@uref{http://msdn.microsoft.com/vstudio/express/visualc/usingpsdk/}
+@uref{http://msdn2.microsoft.com/en-us/vstudio/aa700755.aspx}
 @end ifnottex
 @iftex
-@code{http://msdn.microsoft.com/vstudio/express/visualc/usingpsdk/}
+@code{http://msdn2.microsoft.com/en-us/vstudio/aa700755.aspx}
 @end iftex
 
 @subsubheading cs-win32libs - Required

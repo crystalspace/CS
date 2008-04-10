@@ -86,7 +86,7 @@ void Report (iObjectRegistry *object_reg, int severity, const char* msg, ...)
 }
 
 /// report libmng error information 
-void ReportLibmngError (iObjectRegistry *object_reg, mng_handle hMNG, char* msg)
+void ReportLibmngError (iObjectRegistry *object_reg, mng_handle hMNG, const char* msg)
 {
   mng_int8     severity;
   mng_chunkid  chunkname;

@@ -129,11 +129,13 @@ public:
 
 #ifdef CS_DEBUG
 #define GLRENDER3D_OUTPUT_STRING_MARKER(fmtParam)			    \
+  if (csGLGraphics3D::DoOutputMarkerString ())                              \
   { MakeAString mas fmtParam; csGLGraphics3D::OutputMarkerString (          \
     CS_FUNCTION_NAME, CS_STRING_TO_WIDE(__FILE__), __LINE__, mas); }
 #define GLRENDER3D_OUTPUT_LOCATION_MARKER				    \
-  csGLGraphics3D::OutputMarkerString (CS_FUNCTION_NAME, 		    \
-  CS_STRING_TO_WIDE(__FILE__), __LINE__, "")
+  if (csGLGraphics3D::DoOutputMarkerString ())                              \
+    csGLGraphics3D::OutputMarkerString (CS_FUNCTION_NAME, 		    \
+      CS_STRING_TO_WIDE(__FILE__), __LINE__, "")
 #else
 #define GLRENDER3D_OUTPUT_STRING_MARKER(fmtParam)
 #define GLRENDER3D_OUTPUT_LOCATION_MARKER
@@ -412,7 +414,7 @@ private:
   }
 
   void* RenderLock (iRenderBuffer* buffer, csGLRenderBufferLockType type, 
-    GLenum& compGLType);
+    GLenum& compGLType, bool& normalized);
   void RenderRelease (iRenderBuffer* buffer);
 
   struct ImageUnit : public CS::Memory::CustomAllocated
@@ -491,6 +493,10 @@ public:
   virtual ~csGLGraphics3D ();
 
   iStringSet* GetStrings () { return strings; }
+  inline static bool DoOutputMarkerString ()
+  {
+    return ext && ext->CS_GL_GREMEDY_string_marker;
+  }
   static void OutputMarkerString (const char* function, const wchar_t* file,
     int line, const char* message);
   static void OutputMarkerString (const char* function, const wchar_t* file,
