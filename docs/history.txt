@@ -8,6 +8,10 @@ chronological order.
 
 12-Apr-2008
 	- res worked around SWIG 1.3.33 breakage in the perl bindings.
+	- res added methods to iImage to query the image format as a "texture
+	  format string". The idea is to eventually move to this more flexible
+	  format identification in the future (and thus provide support to
+	  load more image formats).
 11-Apr-2008
 	- res changed the X window creation to set a background color when
 	  creating the window. This prevents a brief flash of undefined
