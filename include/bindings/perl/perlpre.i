@@ -60,8 +60,9 @@
 %ignore operator&=;
 %ignore operator|=;
 %ignore operator^=;
-%ignore operator&&=;
-%ignore operator||=;
+// SWIG 1.3.33 reports a syntax error here
+//%ignore operator&&=;
+//%ignore operator||=;
 %ignore operator->;
 %ignore operator->*;
 %ignore operator,;

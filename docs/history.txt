@@ -6,6 +6,8 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Apr-2008
+	- res worked around SWIG 1.3.33 breakage in the perl bindings.
 11-Apr-2008
 	- res changed the X window creation to set a background color when
 	  creating the window. This prevents a brief flash of undefined
