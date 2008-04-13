@@ -1960,6 +1960,8 @@ class iImage(iBase):
     def GetImageType(*args): return _core.iImage_GetImageType(*args)
     def HasSubImages(*args): return _core.iImage_HasSubImages(*args)
     def GetSubImage(*args): return _core.iImage_GetSubImage(*args)
+    def GetCookedImageFormat(*args): return _core.iImage_GetCookedImageFormat(*args)
+    def GetCookedImageData(*args): return _core.iImage_GetCookedImageData(*args)
     scfGetVersion = staticmethod(_core.iImage_scfGetVersion)
     __swig_destroy__ = _core.delete_iImage
     __del__ = lambda self : None;
