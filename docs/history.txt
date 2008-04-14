@@ -8,6 +8,7 @@ chronological order.
 
 14-Apr-2008
 	- res added an exponentially growing array capacity handler.
+	- res made some small optimizations to xmlshader.
 11-Apr-2008
 	- res changed the X window creation to set a background color when
 	  creating the window. This prevents a brief flash of undefined

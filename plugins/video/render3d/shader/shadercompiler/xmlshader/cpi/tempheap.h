@@ -42,17 +42,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
    */
   class TempHeap
   {
-    class HeapRefCounted : public csRefCount, public CS::Memory::Heap
+    class HeapRefCounted : public CS::Utility::FastRefCount<HeapRefCounted>,
+                           public CS::Memory::Heap
     { };
 
     CS_DECLARE_STATIC_CLASSVAR (theHeap,
-      TheHeap, csRef<HeapRefCounted>);
+      TheHeap, HeapRefCounted);
 
     static inline HeapRefCounted* GetHeapPtr()
     {
-      csRef<HeapRefCounted>* hr = TheHeap();
-      if (!hr->IsValid()) hr->AttachNew (new HeapRefCounted);
-      return *hr;
+      HeapRefCounted* hr = TheHeap();
+      return hr;
     }
   public:
     TempHeap()

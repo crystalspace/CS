@@ -73,14 +73,17 @@ class ConditionTree
   csFixedSizeAllocator<sizeof (Node), TempHeapAlloc> nodeAlloc;
   Node* root;
   int currentBranch;
-  typedef csArray<Node*, csArrayElementHandler<Node*>, TempHeapAlloc> 
-    NodeArray;
+  
+  typedef csArray<Node*, csArrayElementHandler<Node*>, TempHeapAlloc,
+    CS::Container::ArrayCapacityExponential<> > NodeArray;
   struct NodeStackEntry
   {
     NodeArray branches[2];
   };
-
-  csArray<NodeStackEntry, csArrayElementHandler<NodeStackEntry>, 
+  csBlockAllocator<NodeStackEntry, TempHeapAlloc,
+    csBlockAllocatorDisposeDelete<NodeStackEntry> > nodeStackEntryAlloc;
+  
+  csArray<NodeStackEntry*, csArrayElementHandler<NodeStackEntry*>,
     TempHeapAlloc> nodeStack;
   csArray<int, csArrayElementHandler<int>, TempHeapAlloc> branchStack;
 
@@ -100,8 +103,8 @@ public:
     root = (Node*)nodeAlloc.Alloc();
     new (root) Node (0, this);
     currentBranch = 0;
-    NodeStackEntry newPair;
-    newPair.branches[0].Push (root);
+    NodeStackEntry* newPair = nodeStackEntryAlloc.Alloc();
+    newPair->branches[0].Push (root);
     nodeStack.Push (newPair);
   }
   ~ConditionTree ()
@@ -134,8 +137,12 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
     return;
   }
 
-  Variables trueVals;
-  Variables falseVals;
+  // Possibly delay construction
+  uint8 _trueVals[sizeof(Variables)];
+  uint8 _falseVals[sizeof(Variables)];
+  bool valsInit = false;
+  Variables& trueVals = *(reinterpret_cast<Variables*> (_trueVals));
+  Variables& falseVals = *(reinterpret_cast<Variables*> (_falseVals));
   Logic3 r;
   if (condition == csCondAlwaysTrue)
     r.state = Logic3::Truth;
@@ -166,6 +173,9 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
       }
       doCheck = !(affectedSVs & nodeAffectedSVs).AllBitsFalse();
     }
+    new (_trueVals) Variables;
+    new (_falseVals) Variables;
+    valsInit = true;
     if (doCheck)
     {
       if (isLeaf)
@@ -212,6 +222,7 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
         {
           Node* nn = (Node*)nodeAlloc.Alloc();
           new (nn) Node (node, this);
+          CS_ASSERT(valsInit);
           if (hasContainer)
           {
             /* If this condition is part of a "composite condition"
@@ -256,21 +267,27 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
       }
       break;
   }
+  
+  if (valsInit)
+  {
+    trueVals.~ Variables();
+    falseVals.~ Variables();
+  }
 }
 
 Logic3 ConditionTree::Descend (csConditionID condition)
 {
   const NodeStackEntry& current = 
-    nodeStack[nodeStack.GetSize()-1];
+    *(nodeStack[nodeStack.GetSize()-1]);
 
-  NodeStackEntry newCurrent;
+  NodeStackEntry* newCurrent = nodeStackEntryAlloc.Alloc();
 
   MyBitArrayTemp affectedSVs;
   evaluator.GetUsedSVs (condition, affectedSVs);
   const NodeArray& currentNodes = current.branches[currentBranch];
   for (size_t i = 0; i < currentNodes.GetSize(); i++)
   {
-    RecursiveAdd (condition, currentNodes[i], newCurrent, affectedSVs);
+    RecursiveAdd (condition, currentNodes[i], *newCurrent, affectedSVs);
   }
 
   nodeStack.Push (newCurrent);
@@ -278,11 +295,11 @@ Logic3 ConditionTree::Descend (csConditionID condition)
   currentBranch = 0;
 
   Logic3 r;
-  if (newCurrent.branches[0].IsEmpty()
-    && !newCurrent.branches[1].IsEmpty())
+  if (newCurrent->branches[0].IsEmpty()
+    && !newCurrent->branches[1].IsEmpty())
     r.state = Logic3::Lie;
-  else if (!newCurrent.branches[0].IsEmpty()
-    && newCurrent.branches[1].IsEmpty())
+  else if (!newCurrent->branches[0].IsEmpty()
+    && newCurrent->branches[1].IsEmpty())
     r.state = Logic3::Truth;
 
   return r;
