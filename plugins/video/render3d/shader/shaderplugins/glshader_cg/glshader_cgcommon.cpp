@@ -448,6 +448,8 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
   program = cgCreateProgram (shaderPlug->context, 
     (flags & loadPrecompiled) ? CG_OBJECT : CG_SOURCE, programStr, 
     profile, !entrypoint.IsEmpty() ? entrypoint : "main", args.GetArray());
+  
+  if (!(flags & loadIgnoreErrors)) shaderPlug->PrintAnyListing();
 
   if (!program)
   {
@@ -506,7 +508,10 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
   {
     if (flags & loadIgnoreErrors) shaderPlug->SetIgnoreErrors (true);
     cgCompileProgram (program);
-    if (flags & loadIgnoreErrors) shaderPlug->SetIgnoreErrors (false);
+    if (flags & loadIgnoreErrors)
+      shaderPlug->SetIgnoreErrors (false);
+    else
+      shaderPlug->PrintAnyListing();
   }
 
   if (flags & loadLoadToGL)
@@ -522,17 +527,13 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
       shaderPlug->SetCompiledSource (0);
       return false;
     }
+    if (!(flags & loadIgnoreErrors)) shaderPlug->PrintAnyListing();
   }
-
-  const char* listing = cgGetLastListing (shaderPlug->context);
-  if (listing && *listing && shaderPlug->doVerbose)
-  {
-    shaderPlug->PrintCgListing (listing);
-  }
-  shaderPlug->SetCompiledSource (0);
 
   if (shaderPlug->debugDump)
     DoDebugDump();
+  
+  shaderPlug->SetCompiledSource (0);
 
   return true;
 }

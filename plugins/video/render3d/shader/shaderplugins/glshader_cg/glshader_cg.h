@@ -105,6 +105,14 @@ public:
   { compiledProgram = prog; }
   void SetIgnoreErrors (bool doIgnore) { doIgnoreErrors = doIgnore; }
   void PrintCgListing (const char* listing);
+  void PrintAnyListing ()
+  {
+    const char* listing = cgGetLastListing (context);
+    if (listing && *listing && doVerbose)
+    {
+      PrintCgListing (listing);
+    }
+  }
 };
 
 }
