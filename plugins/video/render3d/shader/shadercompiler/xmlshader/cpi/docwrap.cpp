@@ -270,8 +270,8 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
   
   if (valsInit)
   {
-    trueVals.~ Variables();
-    falseVals.~ Variables();
+    trueVals.~Variables();
+    falseVals.~Variables();
   }
 }
 

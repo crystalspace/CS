@@ -11,6 +11,9 @@ chronological order.
 	- res made some small optimizations to xmlshader.
 	- res tweaked the error reporting of the Cg shader plugin.
 	- res added a macro to set struct alignment.
+	- res changed the possible bool value checking in xmlshader to not
+	  use the general float values stuff but something bit-based.
+	  Makes it a bit faster.
 11-Apr-2008
 	- res changed the X window creation to set a background color when
 	  creating the window. This prevents a brief flash of undefined

@@ -120,6 +120,32 @@ struct SliceAllocator
 CS_IMPLEMENT_STATIC_CLASSVAR_REF(SliceAllocator, sliceAlloc,
   SliceAlloc, SliceAllocator::BlockAlloc, (32));
 
+struct SliceAllocatorBool
+{
+  static const size_t valueSetsPerSlice = 32;
+  static const size_t sliceSize = valueSetsPerSlice * sizeof (ValueSetBool);
+
+  typedef csFixedSizeAllocator<sliceSize, TempHeapAlloc> BlockAlloc;
+  CS_DECLARE_STATIC_CLASSVAR_REF (sliceAlloc, SliceAllocBool, 
+    BlockAlloc);
+
+  static inline uint8* Alloc (size_t blocksize) 
+  {
+    return (uint8*)SliceAllocBool().Alloc (blocksize);
+  }
+  static inline void Free (uint8* p)
+  {
+    SliceAllocBool().Free (p);
+  }
+  static void CompactAllocator()
+  {
+    SliceAllocBool().Compact();
+  }
+  static void SetMemTrackerInfo (const char*) {}
+};
+CS_IMPLEMENT_STATIC_CLASSVAR_REF(SliceAllocatorBool, sliceAlloc,
+  SliceAllocBool, SliceAllocatorBool::BlockAlloc, (32));
+
 CS_IMPLEMENT_STATIC_CLASSVAR_REF(Variables, valAlloc,
   ValAlloc, Variables::ValBlockAlloc, (1024));
 size_t Variables::Values::deallocCount = 0;
@@ -1587,10 +1613,46 @@ struct ValueSetWrapper
   }
 };
 
+struct ValueSetBoolWrapper
+{
+  const ValueSetBool* startVals;
+
+  ValueSetBoolWrapper (const ValueSetBool& startVals) : startVals (&startVals) {}
+  ValueSetBoolWrapper (bool b);
+
+  // @@@ FIXME: probably cleaner to not (ab)use operators...
+  friend Logic3 operator== (ValueSetBoolWrapper& a, ValueSetBoolWrapper& b)
+  {
+    if ((a.startVals->IsSingleValue() && b.startVals->IsSingleValue())
+      && (a.startVals->GetSingleValue() == b.startVals->GetSingleValue()))
+    {
+      return Logic3::Truth;
+    }
+    else
+    {
+      if (a.startVals->Overlaps (*b.startVals))
+      {
+        return Logic3::Uncertain;
+      }
+      else
+      {
+        return Logic3::Lie;
+      }
+    }
+  }
+  friend Logic3 operator!= (ValueSetBoolWrapper& a, ValueSetBoolWrapper& b)
+  {
+    Logic3 r = !operator== (a, b);
+    return r;
+  }
+
+  operator Logic3 () const;
+};
+
 struct EvaluatorShadervarValuesSimple
 {
   typedef Logic3 EvalResult;
-  typedef ValueSetWrapper BoolType;
+  typedef ValueSetBoolWrapper BoolType;
   typedef ValueSetWrapper FloatType;
   typedef ValueSetWrapper IntType;
 
@@ -1601,12 +1663,17 @@ struct EvaluatorShadervarValuesSimple
 
   csConditionEvaluator& evaluator;
   const Variables& vars; 
-  ValueSet boolMask;
+  ValueSetBool boolUncertain;
 
   EvaluatorShadervarValuesSimple (csConditionEvaluator& evaluator, 
     const Variables& vars) : evaluator (evaluator), vars (vars), 
-    boolMask (ValueSet (0.0f) | ValueSet (1.0f)),
-    createdValues (SliceAllocator::valueSetsPerSlice) {}
+    createdValues (SliceAllocator::valueSetsPerSlice),
+    blockRemaining (0) {}
+  ~EvaluatorShadervarValuesSimple()
+  {
+    for (size_t i = 0; i < blocks.GetSize(); i++)
+      SliceAllocatorBool::Free (blocks[i]);
+  }
 
   BoolType Boolean (const CondOperand& operand);
   IntType Int (const CondOperand& operand)
@@ -1617,10 +1684,32 @@ struct EvaluatorShadervarValuesSimple
   EvalResult LogicOr (const CondOperand& a, const CondOperand& b);
 
   csBlockAllocator<ValueSet, SliceAllocator> createdValues;
+  // Abuse the fact ValueSetBool doesn't need to be destructed
+  csArray<uint8*, csArrayElementHandler<uint8*>, TempHeapAlloc> blocks;
+  uint8* block;
+  size_t blockRemaining;
+  
+  void* AllocValueSetBool()
+  {
+    if (blockRemaining == 0)
+    {
+      blockRemaining = SliceAllocatorBool::sliceSize;
+      block = SliceAllocatorBool::Alloc (blockRemaining);
+    }
+    void* r = block;
+    block += sizeof (ValueSetBool);
+    blockRemaining -= sizeof (ValueSetBool);
+    return r;
+  }
 protected:
   ValueSet& CreateValue ()
   {
     ValueSet* vs = createdValues.Alloc();
+    return *vs;
+  }
+  ValueSetBool& CreateValueBool ()
+  {
+    ValueSetBool* vs = new (AllocValueSetBool()) ValueSetBool;
     return *vs;
   }
   ValueSet& CreateValue (float f)
@@ -1652,43 +1741,42 @@ EvaluatorShadervarValuesSimple::BoolType EvaluatorShadervarValuesSimple::Boolean
   {
     case operandOperation:
       {
-        ValueSet& vs = CreateValue();
+        ValueSetBool& vs = CreateValueBool();
         Logic3 result (evaluator.Evaluate (*this, operand.operation));
         switch (result.state)
         {
-          case Logic3::Truth: vs = 1.0f; break;
-          case Logic3::Lie:   vs = 0.0f; break;
-          default:
-            vs = boolMask;
+          case Logic3::Truth: vs = true; break;
+          case Logic3::Lie:   vs = false; break;
+          default: /* vs defaults to 'uncertainity' */ break;
         }
-        return ValueSetWrapper (vs);
+        return ValueSetBoolWrapper (vs);
       }
     case operandBoolean:
       {
-        ValueSet& vs = CreateValue();
-        vs = operand.boolVal ? 1.0f : 0.0f;
-        return ValueSetWrapper (vs);
+        ValueSetBool& vs = CreateValueBool();
+        vs = operand.boolVal;
+        return ValueSetBoolWrapper (vs);
       }
     case operandSV:
       {
         const Variables::Values* startValues = ValuesForOperand (operand);
-        ValueSet& vs = CreateValue();
-        vs = startValues->GetVar() & boolMask;
-        return ValueSetWrapper (vs);
+        ValueSetBool& vs = CreateValueBool();
+        vs = startValues->GetVar();
+        return ValueSetBoolWrapper (vs);
       }
     case operandSVValueTexture:
       {
         const Variables::Values* startValues = ValuesForOperand (operand);
-        ValueSet& vs = CreateValue();
-        vs = startValues->GetTex() & boolMask;
-        return ValueSetWrapper (vs);
+        ValueSetBool& vs = CreateValueBool();
+        vs = startValues->GetTex();
+        return ValueSetBoolWrapper (vs);
       }
     case operandSVValueBuffer:
       {
         const Variables::Values* startValues = ValuesForOperand (operand);
-        ValueSet& vs = CreateValue();
-        vs = startValues->GetBuf() & boolMask;
-        return ValueSetWrapper (vs);
+        ValueSetBool& vs = CreateValueBool();
+        vs = startValues->GetBuf();
+        return ValueSetBoolWrapper (vs);
       }
     default:
       {
@@ -1696,7 +1784,7 @@ EvaluatorShadervarValuesSimple::BoolType EvaluatorShadervarValuesSimple::Boolean
       }
   }
 
-  return ValueSetWrapper (boolMask);
+  return ValueSetBoolWrapper (boolUncertain);
 }
 
 EvaluatorShadervarValuesSimple::FloatType EvaluatorShadervarValuesSimple::Float (
@@ -1945,10 +2033,69 @@ struct JanusValueSet
   }
 };
 
+struct JanusValueSetBool
+{
+  const ValueSetBool* startVals;
+  ValueSetBool* trueVals;
+  ValueSetBool* falseVals;
+
+  JanusValueSetBool (const ValueSetBool& startVals, ValueSetBool& trueVals, 
+    ValueSetBool& falseVals) : startVals (&startVals), trueVals (&trueVals), 
+    falseVals (&falseVals) {}
+
+  // @@@ FIXME: probably cleaner to not (ab)use operators...
+  friend Logic3 operator== (JanusValueSetBool& a, JanusValueSetBool& b)
+  {
+    if ((a.startVals->IsSingleValue() && b.startVals->IsSingleValue())
+      && (a.startVals->GetSingleValue() == b.startVals->GetSingleValue()))
+    {
+      *a.trueVals = *b.trueVals = *a.startVals;
+      *a.falseVals = *b.falseVals = !*a.startVals;
+      return Logic3::Truth;
+    }
+    else
+    {
+      if (a.startVals->Overlaps (*b.startVals))
+      {
+        // Make the "true" values those that both share.
+        ValueSetBool overlap = *a.startVals & *b.startVals;
+        *a.trueVals = *b.trueVals = overlap;
+        // Take the overlap out of the "false" values.
+        *a.falseVals = *a.startVals & !overlap;
+        *b.falseVals = *b.startVals & !overlap;
+        return Logic3::Uncertain;
+      }
+      else
+      {
+        *a.trueVals = *a.falseVals = *a.startVals;
+        *b.trueVals = *b.falseVals = *b.startVals;
+        return Logic3::Lie;
+      }
+    }
+  }
+  friend Logic3 operator!= (JanusValueSetBool& a, JanusValueSetBool& b)
+  {
+    Logic3 r = !operator== (a, b);
+    ValueSetBool t1 = *a.trueVals;
+    ValueSetBool t2 = *b.trueVals;
+    ValueSetBool f1 = *a.falseVals;
+    ValueSetBool f2 = *b.falseVals;
+    /* To make != true, we need the ranges that makes == false
+     * and vice versa */
+    *a.trueVals = f1;
+    *b.trueVals = f2;
+    *a.falseVals = t1;
+    *b.falseVals = t2;
+    return r;
+  }
+
+  operator Logic3 () const;
+};
+
 struct EvaluatorShadervarValues
 {
   typedef Logic3 EvalResult;
-  typedef JanusValueSet BoolType;
+  typedef JanusValueSetBool BoolType;
   typedef JanusValueSet FloatType;
   typedef JanusValueSet IntType;
 
@@ -1961,12 +2108,11 @@ struct EvaluatorShadervarValues
   const Variables& vars; 
   Variables& trueVars; 
   Variables& falseVars;
-  ValueSet boolMask;
+  ValueSetBool boolUncertain;
 
   EvaluatorShadervarValues (csConditionEvaluator& evaluator, const Variables& vars,
     Variables& trueVars, Variables& falseVars) : evaluator (evaluator), 
     vars (vars), trueVars (trueVars), falseVars (falseVars),
-    boolMask (ValueSet (0.0f) | ValueSet (1.0f)),
     createdValues (SliceAllocator::valueSetsPerSlice) {}
 
   BoolType Boolean (const CondOperand& operand);
@@ -1978,10 +2124,16 @@ struct EvaluatorShadervarValues
   EvalResult LogicOr (const CondOperand& a, const CondOperand& b);
 
   csBlockAllocator<ValueSet/*, BlockAllocatorSlicePolicy*/> createdValues;
+  csBlockAllocator<ValueSetBool/*, BlockAllocatorSlicePolicy*/> createdBoolValues;
 protected:
   ValueSet& CreateValue ()
   {
     ValueSet* vs = createdValues.Alloc();
+    return *vs;
+  }
+  ValueSetBool& CreateValueBool ()
+  {
+    ValueSetBool* vs = createdBoolValues.Alloc();
     return *vs;
   }
   ValueSet& CreateValue (float f)
@@ -2030,54 +2182,54 @@ EvaluatorShadervarValues::BoolType EvaluatorShadervarValues::Boolean (
         Logic3 result (evaluator.CheckConditionResults (operand.operation,
           vars, trueVars, falseVars));
         
-        ValueSet& vs = CreateValue();
-        ValueSet& vsTrue = CreateValue();
-        ValueSet& vsFalse = CreateValue();
+        ValueSetBool& vs = CreateValueBool();
+        ValueSetBool& vsTrue = CreateValueBool();
+        ValueSetBool& vsFalse = CreateValueBool();
         switch (result.state)
         {
-          case Logic3::Truth: vs = 1.0f; break;
-          case Logic3::Lie:   vs = 0.0f; break;
+          case Logic3::Truth: vs = true; break;
+          case Logic3::Lie:   vs = false; break;
           default:
-            vs = boolMask;
-            vsTrue = 1.0f;
-            vsFalse = 0.0f;
+            /* vs defaults to 'uncertainity' */
+            vsTrue = true;
+            vsFalse = false;
         }
-        return JanusValueSet (vs, vsTrue, vsFalse);
+        return JanusValueSetBool (vs, vsTrue, vsFalse);
       }
     case operandBoolean:
       {
-        ValueSet& vs = CreateValue();
-        vs = operand.boolVal ? 1.0f : 0.0f;
-        ValueSet& vsTrue = CreateValue();
-        ValueSet& vsFalse = CreateValue();
-        return JanusValueSet (vs, vsTrue, vsFalse);
+        ValueSetBool& vs = CreateValueBool();
+        vs = operand.boolVal;
+        ValueSetBool& vsTrue = CreateValueBool();
+        ValueSetBool& vsFalse = CreateValueBool();
+        return JanusValueSetBool (vs, vsTrue, vsFalse);
       }
     case operandSV:
       {
         const Variables::Values* startValues = ValuesForOperand (operand);
-        ValueSet& vs = CreateValue();
-        vs = startValues->GetVar() & boolMask;
+        ValueSetBool& vs = CreateValueBool();
+        vs = startValues->GetVar();
         Variables::Values* valuesTrue = ValuesForOperand (trueVars, operand);
         Variables::Values* valuesFalse = ValuesForOperand (falseVars, operand);
-        return JanusValueSet (vs, valuesTrue->GetVar(), valuesFalse->GetVar());
+        return JanusValueSetBool (vs, valuesTrue->GetVar(), valuesFalse->GetVar());
       }
     case operandSVValueTexture:
       {
         const Variables::Values* startValues = ValuesForOperand (operand);
-        ValueSet& vs = CreateValue();
-        vs = startValues->GetTex() & boolMask;
+        ValueSetBool& vs = CreateValueBool();
+        vs = startValues->GetTex();
         Variables::Values* valuesTrue = ValuesForOperand (trueVars, operand);
         Variables::Values* valuesFalse = ValuesForOperand (falseVars, operand);
-        return JanusValueSet (vs, valuesTrue->GetTex(), valuesFalse->GetTex());
+        return JanusValueSetBool (vs, valuesTrue->GetTex(), valuesFalse->GetTex());
       }
     case operandSVValueBuffer:
       {
         const Variables::Values* startValues = ValuesForOperand (operand);
-        ValueSet& vs = CreateValue();
-        vs = startValues->GetBuf() & boolMask;
+        ValueSetBool& vs = CreateValueBool();
+        vs = startValues->GetBuf();
         Variables::Values* valuesTrue = ValuesForOperand (trueVars, operand);
         Variables::Values* valuesFalse = ValuesForOperand (falseVars, operand);
-        return JanusValueSet (vs, valuesTrue->GetBuf(), valuesFalse->GetBuf());
+        return JanusValueSetBool (vs, valuesTrue->GetBuf(), valuesFalse->GetBuf());
       }
     default:
       {
@@ -2085,9 +2237,9 @@ EvaluatorShadervarValues::BoolType EvaluatorShadervarValues::Boolean (
       }
   }
 
-  ValueSet& vsTrue = CreateValue();
-  ValueSet& vsFalse = CreateValue();
-  return JanusValueSet (boolMask, vsTrue, vsFalse);
+  ValueSetBool& vsTrue = CreateValueBool();
+  ValueSetBool& vsFalse = CreateValueBool();
+  return JanusValueSetBool (boolUncertain, vsTrue, vsFalse);
 }
 
 EvaluatorShadervarValues::FloatType EvaluatorShadervarValues::Float (

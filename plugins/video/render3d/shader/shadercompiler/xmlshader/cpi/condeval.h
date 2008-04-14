@@ -99,12 +99,6 @@ public:
       if (refcount == 0) 
       {
         Variables::ValAlloc().Free (this);
-        /*deallocCount++;
-        if (deallocCount > 65536)
-        {
-          Variables::ValAlloc().Compact();
-          deallocCount = 0;
-        }*/
       }
     }
     int GetRefCount () const { return refcount; }
@@ -115,19 +109,16 @@ public:
 
     enum
     {
-      valueVar = 0,
-      valueVec0,
+      valueVec0 = 0,
       valueVec1,
       valueVec2,
       valueVec3,
-      valueTex,
-      valueBuf,
 
-      valueFirst = valueVar,
-      valueLast = valueBuf,
+      valueFirst = valueVec0,
+      valueLast = valueVec3,
 
       // Bits needed to store one of the value* values above
-      valueBits = 3,
+      valueBits = 2,
       valueIndexOffs = valueLast + 1
     };
     uint valueFlags;
@@ -180,9 +171,12 @@ public:
       return n;
     }
     
+    ValueSetBool valueVar;
+    ValueSetBool valueTex;
+    ValueSetBool valueBuf;
   public:
-    ValueSet& GetVar() { return GetValue (valueVar); }
-    const ValueSet& GetVar() const { return GetValue (valueVar); }
+    ValueSetBool& GetVar() { return valueVar; }
+    const ValueSetBool& GetVar() const { return valueVar; }
     ValueSet& GetVec (int n) 
     { 
       CS_ASSERT((n >= 0) && (n < 4));
@@ -193,14 +187,15 @@ public:
       CS_ASSERT((n >= 0) && (n < 4));
       return GetValue (valueVec0 + n);
     }
-    ValueSet& GetTex() { return GetValue (valueTex); }
-    const ValueSet& GetTex() const { return GetValue (valueTex); }
-    ValueSet& GetBuf() { return GetValue (valueBuf); }
-    const ValueSet& GetBuf() const { return GetValue (valueBuf); }
+    ValueSetBool& GetTex() { return valueTex; }
+    const ValueSetBool& GetTex() const { return valueTex; }
+    ValueSetBool& GetBuf() { return valueBuf; }
+    const ValueSetBool& GetBuf() const { return valueBuf; }
 
     Values () : refcount (1), valueFlags (0), multiValues (0) { }
     Values (const Values& other) : refcount (1), valueFlags (other.valueFlags), 
-      multiValues (0)
+      multiValues (0), valueVar (other.valueVar), valueTex (other.valueTex),
+      valueBuf (other.valueBuf)
     {
       for (uint n = 0; n < inlinedSets; n++)
       {
@@ -230,6 +225,9 @@ public:
       {
         inlineValues[n] = other.inlineValues[n];
       }
+      valueVar = other.valueVar;
+      valueTex = other.valueTex;
+      valueBuf = other.valueBuf;
 
       delete multiValues; multiValues = 0;
       ValueSetChain* s = other.multiValues;
@@ -257,6 +255,9 @@ public:
         else if (!aHas && bHas)
           newValues.GetValue (v) = b.GetValue (v);
       }
+      newValues.valueVar = a.valueVar & b.valueVar;
+      newValues.valueTex = a.valueTex & b.valueTex;
+      newValues.valueBuf = a.valueBuf & b.valueBuf;
       return newValues;
     }
     Values& operator&= (const Values& other)
@@ -266,6 +267,9 @@ public:
         if (other.valueFlags & (1 << v))
           GetValue (v) &= other.GetValue (v);
       }
+      valueVar &= other.valueVar;
+      valueTex &= other.valueTex;
+      valueBuf &= other.valueBuf;
       return *this;
     }
     friend Values operator| (const Values& a, const Values& b)
@@ -278,6 +282,9 @@ public:
         if (aHas && bHas)
           newValues.GetValue (v) = a.GetValue (v) | b.GetValue (v);
       }
+      newValues.valueVar = a.valueVar | b.valueVar;
+      newValues.valueTex = a.valueTex | b.valueTex;
+      newValues.valueBuf = a.valueBuf | b.valueBuf;
       return newValues;
     }
     Values& operator|= (const Values& other)
@@ -287,6 +294,9 @@ public:
         if (valueFlags & (1 << v))
           GetValue (v) |= other.GetValue (v);
       }
+      valueVar |= other.valueVar;
+      valueTex |= other.valueTex;
+      valueBuf |= other.valueBuf;
       return *this;
     }
     friend Logic3 operator== (const Values& a, const Values& b);
@@ -298,20 +308,23 @@ public:
     void Dump (csString& str) const
     {
       static const char* const valueNames[] = {
-        "var", "v0", "v1", "v2", "v3", "tex", "buf"
+        "v0", "v1", "v2", "v3"
       };
+      csString valuesStr;
       for (uint v = valueFirst; v <= valueLast; v++)
       {
         if (valueFlags & (1 << v))
         {
           str << valueNames[v-valueFirst];
           str << ": ";
-          csString valuesStr;
           GetValue (v).Dump (valuesStr);
           str << valuesStr;
           str << "; ";
         }
       }
+      valueVar.Dump (valuesStr); str.AppendFmt ("var: %s; ", valuesStr.GetData());
+      valueTex.Dump (valuesStr); str.AppendFmt ("tex: %s; ", valuesStr.GetData());
+      valueBuf.Dump (valuesStr); str.AppendFmt ("buf: %s; ", valuesStr.GetData());
     }
 
     static void CompactAllocator()
