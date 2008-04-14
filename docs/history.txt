@@ -6,6 +6,13 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Apr-2008
+	- Eric Sunshine fixed CS_CHECK_BINUTILS_2_17() in checkbinutils.m4 to
+	  be compatible with Mac OS X linkers which are not GNU-compatible.
+	  Further, it now correctly suppresses unwanted output from the Leopard
+	  linker which was messing up the displayed 'configure' output since
+	  Leopard 'ld' emits its version information to stderr rather than
+	  stdout.
 12-Apr-2008
 	- res worked around SWIG 1.3.33 breakage in the perl bindings.
 	- res added methods to iImage to query the image format as a "texture
