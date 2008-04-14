@@ -174,7 +174,7 @@ void csMeshGeneratorGeometry::SetDensity (float density)
   csMeshGeneratorGeometry::density = density;
 }
 
-csPtr<iMeshWrapper> csMeshGeneratorGeometry::AllocMesh (
+iMeshWrapper* csMeshGeneratorGeometry::AllocMesh (
   int cidx, const csMGCell& cell, float sqdist,
   size_t& lod, size_t& instance_id)
 {
@@ -187,13 +187,13 @@ csPtr<iMeshWrapper> csMeshGeneratorGeometry::AllocMesh (
   {
     csMGMesh mgmesh = geom.mesh_setaside.Pop ();
     instance_id = mgmesh.instance_id;
-    return csPtr<iMeshWrapper>(mgmesh.mesh);
+    return mgmesh.mesh;
   }
   else if (geom.mesh_cache.GetSize () > 0)
   {
     csMGMesh mgmesh = geom.mesh_cache.Pop ();
     instance_id = mgmesh.instance_id;
-    return csPtr<iMeshWrapper>(mgmesh.mesh);
+    return mgmesh.mesh;
   }
   else
   {
@@ -210,7 +210,7 @@ csPtr<iMeshWrapper> csMeshGeneratorGeometry::AllocMesh (
       mesh = generator->engine->CreateMeshWrapper (geom.factory, 0);
     }
 
-    return csPtr<iMeshWrapper>(mesh);
+    return mesh;
   }
 }
 
@@ -800,7 +800,7 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
 
         if (show)
         {
-          csRef<iMeshWrapper> mesh = geometries[p.geom_type]->AllocMesh (
+          iMeshWrapper* mesh = geometries[p.geom_type]->AllocMesh (
             cidx, cell, sqdist, p.lod, p.instance_id);
           if (mesh)
           {
@@ -830,7 +830,7 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
           // We need a different mesh here.
           geometries[p.geom_type]->SetAsideMesh (cidx, p.mesh, p.lod,
             p.instance_id);
-          csRef<iMeshWrapper> mesh = geometries[p.geom_type]->AllocMesh (
+          iMeshWrapper* mesh = geometries[p.geom_type]->AllocMesh (
             cidx, cell, sqdist, p.lod, p.instance_id);
           p.mesh = mesh;
           if (mesh)

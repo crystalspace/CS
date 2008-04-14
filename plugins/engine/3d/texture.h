@@ -30,8 +30,8 @@
 #include "iengine/texture.h"
 #include "igraphic/image.h"
 
-class csEngine;
-class csTextureWrapper;
+#include "engine.h"
+
 struct iTextureManager;
 struct iTextureHandle;
 struct iImage;
@@ -43,7 +43,7 @@ struct iImage;
 class csTextureWrapper : public scfImplementationExt2<csTextureWrapper,
                                                       csObject,
                                                       iTextureWrapper,
-						      iSelfDestruct>
+                                                      iSelfDestruct>
 {
 private:
   csEngine* engine;
@@ -91,6 +91,9 @@ private:
       key_col_r = -1;
     keyColorDirty = false;
   }
+
+protected:
+  inline void InternalRemove() { SelfDestruct(); }
 
 public:
   CS_LEAKGUARD_DECLARE (csTextureWrapper);
@@ -210,7 +213,7 @@ public:
 class csTextureList : 
   public scfImplementation1<csTextureList,
                             iTextureList>,
-  public csWeakRefArrayObject<iTextureWrapper>
+  public csRefArrayObject<iTextureWrapper>
 {
   csEngine* engine;
 public:
@@ -226,7 +229,7 @@ public:
    */
   virtual iTextureWrapper *NewTexture (iTextureHandle *ith);
 
-  virtual int GetCount ();
+  virtual size_t GetCount () const;
   virtual iTextureWrapper *Get (int n) const;
   virtual int Add (iTextureWrapper *obj);
   virtual bool Remove (iTextureWrapper *obj);

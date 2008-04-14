@@ -61,8 +61,8 @@ class csMeshFactoryList : public scfImplementation1<csMeshFactoryList,
 	iMeshFactoryList>
 {
 private:
-  csWeakRefArrayObject<iMeshFactoryWrapper> list;
-  csWeakRefHash<iMeshFactoryWrapper, csString,
+  csRefArrayObject<iMeshFactoryWrapper> list;
+  csHash<iMeshFactoryWrapper*, csString,
          CS::Memory::AllocatorMalloc> factories_hash;
 
   class NameChangeListener : public scfImplementation1<NameChangeListener,
@@ -99,14 +99,14 @@ public:
   virtual void PrepareFactory (iMeshFactoryWrapper*) { }
   virtual void FreeFactory (iMeshFactoryWrapper*) { }
 
-  virtual size_t GetCount () { list.Compact(); return list.GetSize (); }
+  virtual size_t GetCount () const { return list.GetSize (); }
   virtual iMeshFactoryWrapper *Get (size_t n) const { return list.Get (n); }
   virtual int Add (iMeshFactoryWrapper *obj);
   virtual bool Remove (iMeshFactoryWrapper *obj);
   virtual bool Remove (size_t n);
   virtual void RemoveAll ();
   virtual int Find (iMeshFactoryWrapper *obj) const;
-  virtual iMeshFactoryWrapper *FindByName (const char *Name);
+  virtual iMeshFactoryWrapper *FindByName (const char *Name) const;
 };
 
 /**
@@ -167,6 +167,9 @@ private:
 
   /// Class for keeping track of imposter information.
   csImposterFactory* imposter_factory;
+
+protected:
+  inline void InternalRemove() { SelfDestruct(); }
 
 public:
   /// Flag indicating whether this factory should try to imposter or not.

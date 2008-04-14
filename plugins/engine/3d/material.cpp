@@ -212,7 +212,7 @@ csMaterialList::~csMaterialList()
 void csMaterialList::NameChanged (iObject* object, const char* oldname,
   	const char* newname)
 {
-  csWeakRef<iMaterialWrapper> mat = scfQueryInterface<iMaterialWrapper> (object);
+  csRef<iMaterialWrapper> mat = scfQueryInterface<iMaterialWrapper> (object);
   CS_ASSERT (mat != 0);
   if (oldname) mat_hash.Delete (oldname, mat);
   if (newname) mat_hash.Put (newname, mat);
@@ -221,13 +221,11 @@ void csMaterialList::NameChanged (iObject* object, const char* oldname,
 iMaterialWrapper *csMaterialList::NewMaterial (iMaterial *material,
 	const char* name)
 {
-  iMaterialWrapper* mw = new csMaterialWrapper (this, material);
+  csRef<iMaterialWrapper> mw;
+  mw.AttachNew(new csMaterialWrapper (this, material));
   mw->QueryObject ()->SetName (name);
   if (name)
-  {
-    mat_hash.Compact();
     mat_hash.Put (name, mw);
-  }
   list.Push (mw);
   mw->QueryObject ()->AddNameChangeListener (listener);
   return mw;
@@ -237,10 +235,7 @@ int csMaterialList::Add (iMaterialWrapper *obj)
 {
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
-  {
-    mat_hash.Compact();
     mat_hash.Put (name, obj);
-  }
   obj->QueryObject ()->AddNameChangeListener (listener);
   return (int)list.Push (obj);
 }
@@ -280,8 +275,7 @@ int csMaterialList::Find (iMaterialWrapper *obj) const
   return (int)list.Find (obj);
 }
 
-iMaterialWrapper *csMaterialList::FindByName (const char *Name)
+iMaterialWrapper *csMaterialList::FindByName (const char *Name) const
 {
-  mat_hash.Compact();
   return mat_hash.Get (Name, 0);
 }

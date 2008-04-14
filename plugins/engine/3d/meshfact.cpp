@@ -78,7 +78,7 @@ void csMeshFactoryWrapper::SelfDestruct ()
 void csMeshFactoryWrapper::SetZBufModeRecursive (csZBufMode mode)
 {
   SetZBufMode (mode);
-  iMeshFactoryList* ml = &children;
+  const iMeshFactoryList* ml = &children;
   if (!ml) return;
   for (size_t i = 0 ; i < ml->GetCount () ; i++)
     ml->Get (i)->SetZBufModeRecursive (mode);
@@ -87,7 +87,7 @@ void csMeshFactoryWrapper::SetZBufModeRecursive (csZBufMode mode)
 void csMeshFactoryWrapper::SetRenderPriorityRecursive (long rp)
 {
   SetRenderPriority (rp);
-  iMeshFactoryList* ml = &children;
+  const iMeshFactoryList* ml = &children;
   if (!ml) return;
   for (size_t i = 0 ; i < ml->GetCount () ; i++)
     ml->Get (i)->SetRenderPriorityRecursive (rp);
@@ -266,10 +266,7 @@ int csMeshFactoryList::Add (iMeshFactoryWrapper *obj)
   PrepareFactory (obj);
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
-  {
-    factories_hash.Compact();
     factories_hash.Put (name, obj);
-  }
   obj->QueryObject ()->AddNameChangeListener (listener);
   return (int)list.Push (obj);
 }
@@ -308,10 +305,9 @@ int csMeshFactoryList::Find (iMeshFactoryWrapper *obj) const
 }
 
 iMeshFactoryWrapper *csMeshFactoryList::FindByName (
-  const char *Name)
+  const char *Name) const
 {
   if (!Name) return 0;
-  factories_hash.Compact();
   return factories_hash.Get (Name, 0);
 }
 

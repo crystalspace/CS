@@ -28,7 +28,7 @@
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/weakref.h"
 #include "csutil/leakguard.h"
-#include "csutil/weakrefhash.h"
+#include "csutil/hash.h"
 #include "iutil/selfdestruct.h"
 #include "csgfx/shadervarcontext.h"
 #include "imesh/object.h"
@@ -60,8 +60,8 @@ class csMeshWrapper;
 class csMeshList : public scfImplementation1<csMeshList, iMeshList>
 {
 private:
-  csWeakRefArrayObject<iMeshWrapper> list;
-  csWeakRefHash<iMeshWrapper, csString> meshes_hash;
+  csRefArrayObject<iMeshWrapper> list;
+  csHash<iMeshWrapper*, csString> meshes_hash;
 
   class NameChangeListener : public scfImplementation1<NameChangeListener,
   	iObjectNameChangeListener>
@@ -95,21 +95,21 @@ public:
   virtual ~csMeshList ();
 
   /// Find a mesh in <name>:<childname>:<childname> notation.
-  iMeshWrapper *FindByNameWithChild (const char *Name);
+  iMeshWrapper *FindByNameWithChild (const char *Name) const;
 
   /// Override PrepareMesh
   virtual void PrepareMesh (iMeshWrapper*) { }
   /// Override FreeMesh
   virtual void FreeMesh (iMeshWrapper*) { }
 
-  virtual size_t GetCount () { list.Compact(); return list.GetSize () ; }
+  virtual size_t GetCount () const { return list.GetSize () ; }
   virtual iMeshWrapper *Get (size_t n) const { return list.Get (n); }
   virtual int Add (iMeshWrapper *obj);
   virtual bool Remove (iMeshWrapper *obj);
   virtual bool Remove (int n);
   virtual void RemoveAll ();
   virtual int Find (iMeshWrapper *obj) const;
-  virtual iMeshWrapper *FindByName (const char *Name);
+  virtual iMeshWrapper *FindByName (const char *Name) const;
 };
 
 struct LSIAndDist
@@ -136,7 +136,7 @@ class csMeshWrapper :
                                iMeshWrapper,
                                scfFakeInterface<iShaderVariableContext>,
                                iVisibilityObject,
-    		               iSceneNode,
+                               iSceneNode,
                                iSelfDestruct>,
   public CS::Graphics::OverlayShaderVariableContextImpl
 {
@@ -204,6 +204,9 @@ protected:
   csRef<csLODListener> var_max_render_dist_listener;
 
   csEngine* engine;
+
+  inline void InternalRemove() { SelfDestruct(); }
+
 private:
   /// Mesh object corresponding with this csMeshWrapper.
   csRef<iMeshObject> meshobj;

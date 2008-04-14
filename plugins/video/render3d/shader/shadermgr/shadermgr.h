@@ -67,7 +67,7 @@ private:
 
   bool do_verbose;
 
-  csWeakRefArray<iShader> shaders;
+  csRefArray<iShader> shaders;
   csRefArray<iShader> shaderscopy;
   csRefArray<iShaderCompiler> compilers;
 
@@ -122,19 +122,7 @@ public:
   /// Get a shader by name
   virtual iShader* GetShader (const char* name);
   /// Returns all shaders that have been created
-  virtual const csWeakRefArray<iShader> &GetAllShaders () { return shaders; }
-
-  virtual const csRefArray<iShader> &GetShaders ()
-  {
-    shaderscopy.Empty();
-    for(size_t i=0; i<shaders.GetSize(); i++)
-    {
-      csRef<iShader> s = shaders.Get(i);
-      shaderscopy.Push(s);
-    }
-    return shaderscopy;
-  }
-
+  virtual const csRefArray<iShader> &GetShaders () { return shaders; }
 
   /// Register a compiler to the manager
   virtual void RegisterCompiler (iShaderCompiler* compiler);

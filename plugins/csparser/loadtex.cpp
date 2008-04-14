@@ -205,16 +205,14 @@ iTextureWrapper* csLoader::LoadTexture (const char *name,
   if (!TexHandle)
     return 0;
 
-  csRef<iTextureWrapper> TexWrapper;
-  TexWrapper.AttachNew(Engine->GetTextureList ()->NewTexture(TexHandle));
+  iTextureWrapper *TexWrapper = Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->QueryObject ()->SetName (name);
   TexWrapper->SetImageFile(img);
 
-  csRef<iMaterialWrapper> matwrap;
   if (create_material)
   {
     csRef<iMaterial> material (Engine->CreateBaseMaterial (TexWrapper));
-    matwrap.AttachNew(Engine->GetMaterialList ()->NewMaterial (material, name));
+    Engine->GetMaterialList ()->NewMaterial (material, name);
   }
 
   if (reg && tm)
@@ -293,37 +291,21 @@ iTextureWrapper* csLoader::LoadTexture (const char *name,
   if (!TexHandle)
     return 0;
 
-  csRef<iTextureWrapper> TexWrapper;
-  TexWrapper.AttachNew(Engine->GetTextureList ()->NewTexture(TexHandle));
+  iTextureWrapper *TexWrapper = Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->QueryObject ()->SetName (name);
   TexWrapper->SetImageFile(img);
-  if(keepFlags == KEEP_ALL)
+  if(collection)
   {
-    if(collection)
-    {
-      collection->Add(TexWrapper->QueryObject());
-    }
-    else
-    {
-      Engine->GetDefaultCollection()->Add(TexWrapper->QueryObject());
-    }
+    collection->Add(TexWrapper->QueryObject());
   }
 
-  csRef<iMaterialWrapper> matwrap;
   if (create_material)
   {
     csRef<iMaterial> material (Engine->CreateBaseMaterial (TexWrapper));
-    matwrap.AttachNew(Engine->GetMaterialList ()->NewMaterial (material, name));
-    if(keepFlags == KEEP_ALL)
+    iMaterialWrapper* matwrap = Engine->GetMaterialList ()->NewMaterial (material, name);
+    if(collection)
     {
-      if(collection)
-      {
-        collection->Add(matwrap->QueryObject());
-      }
-      else
-      {
-        Engine->GetDefaultCollection()->Add(TexWrapper->QueryObject());
-      }
+      collection->Add(matwrap->QueryObject());
     }
   }
 
@@ -352,17 +334,15 @@ iTextureWrapper* csLoader::LoadTexture (const char *name,
   if (!TexHandle)
     return 0;
 
-  csRef<iTextureWrapper> TexWrapper;
-  TexWrapper.AttachNew(Engine->GetTextureList ()->NewTexture(TexHandle));
+  iTextureWrapper *TexWrapper = Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->QueryObject ()->SetName (name);
   TexWrapper->SetImageFile(img);
   if (region) region->QueryObject ()->ObjAdd (TexWrapper->QueryObject ());
 
-  csRef<iMaterialWrapper> matwrap;
   if (create_material)
   {
     csRef<iMaterial> material (Engine->CreateBaseMaterial (TexWrapper));
-    matwrap.AttachNew(Engine->GetMaterialList ()->NewMaterial (material, name));
+    iMaterialWrapper* matwrap = Engine->GetMaterialList ()->NewMaterial (material, name);
     if (region) region->QueryObject ()->ObjAdd (matwrap->QueryObject ());
   }
 
@@ -611,8 +591,7 @@ csPtr<iBase> csImageTextureLoader::Parse (iDocumentNode* /*node*/,
     return 0;
   }
 
-  csRef<iTextureWrapper> TexWrapper;
-  TexWrapper.AttachNew(Engine->GetTextureList ()->NewTexture(TexHandle));
+  csRef<iTextureWrapper> TexWrapper = Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->SetImageFile(ctx->GetImage());
 
   return csPtr<iBase> (TexWrapper);
@@ -690,11 +669,10 @@ csPtr<iBase> csCheckerTextureLoader::Parse (iDocumentNode* node,
     return 0;
   }
 
-  csRef<iTextureWrapper> TexWrapper;
-  TexWrapper.AttachNew(Engine->GetTextureList ()->NewTexture(TexHandle));
+  csRef<iTextureWrapper> TexWrapper = Engine->GetTextureList ()->NewTexture(TexHandle);;
   TexWrapper->SetImageFile (Image);
 
-  return csPtr<iBase> ((iBase*)TexWrapper);
+  return csPtr<iBase> (TexWrapper);
 }
 
 
@@ -840,8 +818,7 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
     return 0;
   }
 
-  csRef<iTextureWrapper> TexWrapper;
-  TexWrapper.AttachNew(Engine->GetTextureList ()->NewTexture(TexHandle));
+  csRef<iTextureWrapper> TexWrapper = Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->SetImageFile (cube);
 
   return csPtr<iBase> (TexWrapper);
@@ -929,8 +906,7 @@ csPtr<iBase> csTexture3DLoader::Parse (iDocumentNode* node,
     return 0;
   }
 
-  csRef<iTextureWrapper> TexWrapper;
-	TexWrapper.AttachNew(Engine->GetTextureList ()->NewTexture(TexHandle));
+  csRef<iTextureWrapper> TexWrapper = Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->SetImageFile (vol);
 
   return csPtr<iBase> (TexWrapper);
@@ -990,12 +966,10 @@ csPtr<iBase> csMissingTextureLoader::Parse (iDocumentNode* node,
     return 0;
   }
 
-  csRef<iTextureWrapper> TexWrapper;
-  TexWrapper.AttachNew(Engine->GetTextureList ()->NewTexture(TexHandle));
+  csRef<iTextureWrapper> TexWrapper = Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->SetImageFile (image);
 
-  TexWrapper->IncRef ();
-  return csPtr<iBase> ((iBase*)TexWrapper);
+  return csPtr<iBase> (TexWrapper);
 }
 
 }

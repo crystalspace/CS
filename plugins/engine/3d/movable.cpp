@@ -60,13 +60,12 @@ bool csMovableSectorList::PrepareSector (iSector* sector)
 int csMovableSectorList::Add (iSector *obj)
 {
   if (!PrepareSector (obj)) return -1;
-  Compact();
   return (int)Push (obj);
 }
 
 bool csMovableSectorList::Remove (iSector *obj)
 {
-  csRef<csMeshWrapper> object = movable->GetMeshWrapper ();
+  csMeshWrapper* object = movable->GetMeshWrapper ();
   if (object) object->RemoveFromSectors (obj);
   return Delete (obj);
 }
@@ -86,12 +85,12 @@ void csMovableSectorList::RemoveAll ()
 
 int csMovableSectorList::Find (iSector *obj) const
 {
-  return (int)csWeakRefArrayObject<iSector>::Find (obj);
+  return (int)csRefArrayObject<iSector>::Find (obj);
 }
 
-iSector *csMovableSectorList::FindByName (const char *Name)
+iSector *csMovableSectorList::FindByName (const char *Name) const
 {
-  return csWeakRefArrayObject<iSector>::FindByName (Name);
+  return csRefArrayObject<iSector>::FindByName (Name);
 }
 
 //---------------------------------------------------------------------------

@@ -182,8 +182,7 @@ iMaterialWrapper* StdLoaderContext::FindMaterial (const char* filename)
     char const* n = strchr (filename, '/');
     if (!n) n = filename;
     else n++;
-    csRef<iMaterialWrapper> mat;
-    mat.AttachNew(Engine->GetMaterialList ()->NewMaterial (material, n));
+    iMaterialWrapper* mat = Engine->GetMaterialList ()->NewMaterial (material, n);
 
     if(region)
     {
@@ -192,10 +191,6 @@ iMaterialWrapper* StdLoaderContext::FindMaterial (const char* filename)
     else if(collection)
     {
       collection->Add(mat->QueryObject());
-    }
-    else
-    {
-      Engine->GetDefaultCollection()->Add(mat->QueryObject());
     }
 
     iTextureManager *tm;
@@ -243,8 +238,7 @@ iMaterialWrapper* StdLoaderContext::FindNamedMaterial (const char* name,
     char const* n = strchr (name, '/');
     if (!n) n = name;
     else n++;
-    csRef<iMaterialWrapper> mat;
-    mat.AttachNew(Engine->GetMaterialList ()->NewMaterial (material, n));
+    iMaterialWrapper* mat = Engine->GetMaterialList ()->NewMaterial (material, n);
 
     if (region)
     {
@@ -345,7 +339,7 @@ iShader* StdLoaderContext::FindShader (const char *name)
     return shader;
   }
 
-  csWeakRefArray<iShader> shaders = shaderMgr->GetAllShaders ();
+  csRefArray<iShader> shaders = shaderMgr->GetShaders ();
   size_t i;
   for (i = 0 ; i < shaders.GetSize () ; i++)
   {
@@ -1408,31 +1402,15 @@ bool csLoader::LoadLibrary (iDocumentNode* lib_node, iRegion* region,
 
 //---------------------------------------------------------------------------
 
-void csLoader::AddToRegionOrCollection(iLoaderContext* ldr_context, iObject* obj,
-                                       bool alwaysKeep)
+void csLoader::AddToRegionOrCollection(iLoaderContext* ldr_context, iObject* obj)
 {
   if(ldr_context->GetRegion())
   {
-    ldr_context->GetRegion()->QueryObject()->ObjAdd(obj);
+    ldr_context->GetRegion()->Add(obj);
   }
-  else if(ldr_context->GetKeepFlags() == KEEP_ALL || alwaysKeep)
+  else if(ldr_context->GetCollection())
   {
-    if(ldr_context->GetCollection())
-    {
-      ldr_context->GetCollection()->Add(obj);
-    }
-    else
-    {
-      Engine->GetDefaultCollection()->Add(obj);
-    }
-  }
-
-  // Don't add iMeshWrapper to workaround some weird bug causing everything to
-  // display black.
-  csRef<iMeshWrapper> mesh = scfQueryInterface<iMeshWrapper>(obj);
-  if(!mesh.IsValid())
-  {
-    Engine->GetCollection(LOADING_COLLECTION)->Add(obj);
+    ldr_context->GetCollection()->Add(obj);
   }
 }
 
@@ -1580,7 +1558,6 @@ csLoader::csLoader (iBase *p) : scfImplementationType (this, p)
 
 csLoader::~csLoader()
 {
-  Engine->RemoveCollection(LOADING_COLLECTION);
   loaded_plugins.DeleteAll ();
 }
 
@@ -1637,9 +1614,6 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
 
   stringSet = csQueryRegistryTagInterface<iStringSet> (
     object_reg, "crystalspace.shared.stringset");
-
-  // Create collection to hold a reference to objects while loading.
-  Engine->CreateCollection(LOADING_COLLECTION);
 
   return true;
 }
@@ -1784,9 +1758,8 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode,
       case XMLTOKEN_START:
       {
 	const char* name = child->GetAttributeValue ("name");
-	csRef<iCameraPosition> campos;
-  campos.AttachNew(Engine->GetCameraPositions ()->
-	  	NewCameraPosition (name ? name : "Start"));
+	iCameraPosition* campos = Engine->GetCameraPositions ()->
+                            NewCameraPosition (name ? name : "Start");
 	AddToRegionOrCollection (ldr_context, campos->QueryObject ());
 	if (!ParseStart (child, campos))
 	  return false;
@@ -1823,9 +1796,6 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode,
     if(!LoadProxyTextures())
       return false;
   }
-
-  // We've finished loading, so release all temp references on objects.
-  Engine->GetCollection(LOADING_COLLECTION)->ReleaseAllObjects();
 
   return true;
 }
@@ -1973,7 +1943,6 @@ bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* libnode,
 	  }
 	  mesh->QueryObject ()->SetName (child->GetAttributeValue ("name"));
 	  Engine->AddMeshAndChildren (mesh);
-	  //mesh->DecRef ();
         }
         break;
       case XMLTOKEN_MESHOBJ:
@@ -2033,9 +2002,6 @@ bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* libnode,
       if(!LoadProxyTextures())
           return false;
   }
-
-  // We've finished loading, so release all temp references on objects.
-  Engine->GetCollection(LOADING_COLLECTION)->ReleaseAllObjects();
 
   return true;
 }
@@ -5489,7 +5455,7 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
   iSector* sector = ldr_context->FindSector (secname);
   if (sector == 0)
   {
-      sector = Engine->CreateSector (secname, ldr_context->GetCollection(), ldr_context->GetRegion());
+    sector = Engine->CreateSector (secname);
     AddToRegionOrCollection (ldr_context, sector->QueryObject ());
   }
   
@@ -5694,11 +5660,7 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
       case XMLTOKEN_NODE:
         {
           iMapNode *n = ParseNode (child, sector);
-	  if (n)
-	  {
-	    n->DecRef ();
-	  }
-	  else
+	  if (!n)
 	  {
 	    return 0;
 	  }

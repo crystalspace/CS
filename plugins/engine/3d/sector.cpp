@@ -227,14 +227,14 @@ void csSector::UnlinkObjects ()
   size_t i;
   for (i = meshes.GetCount(); i > 0; i--)
   {
-    csRef<iMeshWrapper> m = meshes.Get (i-1);
+    iMeshWrapper* m = meshes.Get (i-1);
     iSectorList* sl = m->GetMovable ()->GetSectors ();
     sl->Remove ((iSector*)this);
     m->GetMovable ()->UpdateMove ();
   }
   for (i = lights.GetCount(); i > 0; i--)
   {
-    csRef<iLight> l = lights.Get (i-1);
+    iLight* l = lights.Get (i-1);
     iSectorList* sl = l->GetMovable ()->GetSectors ();
     sl->Remove ((iSector*)this);
     l->GetMovable ()->UpdateMove ();
@@ -298,6 +298,9 @@ void csSector::PrepareMesh (iMeshWrapper *mesh)
 
 void csSector::UnprepareMesh (iMeshWrapper *mesh)
 {
+  cameraMeshes.Delete (mesh);
+
+  if (culler) UnregisterMeshToCuller (mesh);
   const csRefArray<iSceneNode>& ml = ((csMeshWrapper*)mesh)->GetChildren ();
   for (size_t i = 0 ; i < ml.GetSize () ; i++)
   {
@@ -305,9 +308,6 @@ void csSector::UnprepareMesh (iMeshWrapper *mesh)
     if (child)
       UnprepareMesh (child);
   }
-
-  cameraMeshes.Delete (mesh);
-  if (culler) UnregisterMeshToCuller (mesh);
 }
 
 void csSector::RelinkMesh (iMeshWrapper *mesh)
@@ -1065,7 +1065,7 @@ void csSector::SetDynamicAmbientLight (const csColor& color)
   svDynamicAmbient->SetValue (dynamicAmbientLightColor);
 }
 
-void csSector::CalculateSectorBBox (csBox3 &bbox, bool do_meshes)
+void csSector::CalculateSectorBBox (csBox3 &bbox, bool do_meshes) const
 {
   bbox.StartBoundingBox ();
 
@@ -1234,10 +1234,7 @@ int csSectorList::Add (iSector *obj)
 {
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
-  {
-    sectors_hash.Compact();
     sectors_hash.Put (name, obj);
-  }
   obj->QueryObject ()->AddNameChangeListener (listener);
   return (int)list.Push (obj);
 }
@@ -1281,8 +1278,7 @@ int csSectorList::Find (iSector *obj) const
   return (int)list.Find (obj);
 }
 
-iSector *csSectorList::FindByName (const char *Name)
+iSector *csSectorList::FindByName (const char *Name) const
 {
-  sectors_hash.Compact();
   return sectors_hash.Get (Name, 0);
 }

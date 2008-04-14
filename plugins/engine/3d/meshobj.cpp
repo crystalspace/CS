@@ -218,7 +218,7 @@ void csMeshWrapper::AddToSectorPortalLists ()
     csMovable* prev = &movable;
     csMovable* m = movable.GetParent ();
     while (m) { prev = m; m = m->GetParent (); }
-    iSectorList *sectors = prev->GetSectors ();
+    const iSectorList *sectors = prev->GetSectors ();
     for (size_t i = 0; i < sectors->GetCount (); i++)
     {
       iSector *ss = sectors->Get (i);
@@ -241,7 +241,7 @@ void csMeshWrapper::ClearFromSectorPortalLists (iSector* sector)
       csMovable* m = movable.GetParent ();
       while (m) { prev = m; m = m->GetParent (); }
 
-      iSectorList *sectors = prev->GetSectors ();
+      const iSectorList *sectors = prev->GetSectors ();
       for (size_t i = 0; i < sectors->GetCount (); i++)
       {
         iSector *ss = sectors->Get (i);
@@ -371,7 +371,7 @@ void csMeshWrapper::RemoveFromSectors (iSector* sector)
     sector->GetMeshes ()->Remove ((iMeshWrapper*)this);
   else
   {
-    iSectorList *sectors = movable.GetSectors ();
+    const iSectorList *sectors = movable.GetSectors ();
     if (sectors != 0)
     {
       for (size_t i = 0; i < sectors->GetCount (); i++)
@@ -429,7 +429,7 @@ void csMeshWrapper::SetRenderPriority (CS::Graphics::RenderPriority rp)
 
   if (movable.GetParent ()) return ;
 
-  iSectorList *sectors = movable.GetSectors ();
+  const iSectorList *sectors = movable.GetSectors ();
   for (size_t i = 0; i < sectors->GetCount (); i++)
   {
     iSector *ss = sectors->Get (i);
@@ -497,7 +497,7 @@ const csArray<iLightSectorInfluence*>& csMeshWrapper::GetRelevantLights
   relevant_lights.Empty ();
   relevant_lights_ref.Empty ();
 
-  iSectorList *movable_sectors = movable.GetSectors ();
+  const iSectorList *movable_sectors = movable.GetSectors ();
   if (movable_sectors->GetCount () > 0 && relevant_lights_max > 0)
   {
     csBox3 box;
@@ -1326,9 +1326,8 @@ void csMeshList::NameChanged (iObject* object, const char* oldname,
   if (newname) meshes_hash.Put (newname, mesh);
 }
 
-iMeshWrapper* csMeshList::FindByNameWithChild (const char *Name)
+iMeshWrapper* csMeshList::FindByNameWithChild (const char *Name) const
 {
-  meshes_hash.Compact();
   char const* p = strchr (Name, ':');
   if (!p) return meshes_hash.Get (Name, 0);
 
@@ -1346,22 +1345,19 @@ int csMeshList::Add (iMeshWrapper *obj)
   PrepareMesh (obj);
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
-  {
-    meshes_hash.Compact();
     meshes_hash.Put (name, obj);
-  }
   obj->QueryObject ()->AddNameChangeListener (listener);
   return (int)list.Push (obj);
 }
 
 bool csMeshList::Remove (iMeshWrapper *obj)
 {
+  FreeMesh (obj);
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
     meshes_hash.Delete (name, obj);
   obj->QueryObject ()->RemoveNameChangeListener (listener);
   list.Delete (obj);
-  FreeMesh (obj);
   return true;
 }
 
@@ -1394,15 +1390,12 @@ int csMeshList::Find (iMeshWrapper *obj) const
   return (int)list.Find (obj);
 }
 
-iMeshWrapper *csMeshList::FindByName (const char *Name)
+iMeshWrapper *csMeshList::FindByName (const char *Name) const
 {
   if (strchr (Name, ':'))
     return FindByNameWithChild (Name);
   else
-  {
-    meshes_hash.Compact();
     return meshes_hash.Get (Name, 0);
-  }
 }
 
 #if 0

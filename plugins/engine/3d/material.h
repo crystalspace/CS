@@ -24,7 +24,6 @@
 #include "csutil/scf_implementation.h"
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
-#include "csutil/weakrefhash.h"
 #include "iutil/selfdestruct.h"
 #include "csutil/leakguard.h"
 #include "ivideo/material.h"
@@ -140,9 +139,12 @@ private:
   csRef<iMaterialEngine> matEngine;
 
   iMaterialList* materials;
-private:
+
   /// Release material handle
   virtual ~csMaterialWrapper ();
+
+protected:
+  inline void InternalRemove() { SelfDestruct(); }
 
 public:
   CS_LEAKGUARD_DECLARE (csMaterialWrapper);
@@ -182,8 +184,8 @@ class csMaterialList : public scfImplementation1<csMaterialList,
                                                  iMaterialList>
 {
 private:
-  csWeakRefArrayObject<iMaterialWrapper> list;
-  csWeakRefHash<iMaterialWrapper, csString> mat_hash;
+  csRefArrayObject<iMaterialWrapper> list;
+  csHash<iMaterialWrapper*, csString> mat_hash;
 
   class NameChangeListener : public scfImplementation1<NameChangeListener,
   	iObjectNameChangeListener>
@@ -217,14 +219,14 @@ public:
 
   virtual iMaterialWrapper* NewMaterial (iMaterial* material,
   	const char* name);
-  virtual size_t GetCount () { list.Compact(); return list.GetSize (); }
+  virtual size_t GetCount () const { return list.GetSize (); }
   virtual iMaterialWrapper *Get (size_t n) const { return list[n]; }
   virtual int Add (iMaterialWrapper *obj);
   virtual bool Remove (iMaterialWrapper *obj);
   virtual bool Remove (size_t n);
   virtual void RemoveAll ();
   virtual int Find (iMaterialWrapper *obj) const;
-  virtual iMaterialWrapper *FindByName (const char *Name);
+  virtual iMaterialWrapper *FindByName (const char *Name) const;
 };
 
 #endif // __CS_MATERIAL_H__

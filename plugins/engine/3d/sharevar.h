@@ -38,7 +38,7 @@ class csSharedVariableList;
 class csSharedVariable : public scfImplementationExt2<csSharedVariable, 
                                                       csObject,
                                                       iSharedVariable,
-						      iSelfDestruct>
+                                                      iSelfDestruct>
 {
 private:
   int   type;
@@ -50,6 +50,9 @@ private:
   csSharedVariableList* variables;
 
   void FireListeners ();
+
+protected:
+  void InternalRemove() { SelfDestruct(); }
 
 public:
   CS_LEAKGUARD_DECLARE (csSharedVariable);
@@ -160,7 +163,7 @@ public:
   /// iSharedVariable Factory method. This does not add the new var to the list.
   csPtr<iSharedVariable> New();
 
-  virtual int GetCount ();
+  virtual int GetCount () const;
   virtual iSharedVariable *Get (int n) const;
   virtual int Add (iSharedVariable *obj);
   virtual bool Remove (iSharedVariable *obj);
@@ -169,7 +172,7 @@ public:
   virtual int Find (iSharedVariable *obj) const;
   virtual iSharedVariable *FindByName (const char *Name) const;
 private:
-  csWeakRefArrayObject<iSharedVariable> list;
+  csRefArrayObject<iSharedVariable> list;
    
 };
 

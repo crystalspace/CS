@@ -180,7 +180,7 @@ enum csShaderTagPresence
  */
 struct iShaderManager : public virtual iShaderVariableContext
 {
-  SCF_INTERFACE (iShaderManager, 2, 1, 0);
+  SCF_INTERFACE (iShaderManager, 2, 0, 0);
   /**
    * Register a shader to the shadermanager.
    * Compiler should register all shaders
@@ -192,11 +192,8 @@ struct iShaderManager : public virtual iShaderVariableContext
   virtual void UnregisterShaders () = 0;
   /// Get a shader by name
   virtual iShader* GetShader (const char* name) = 0;
-  /// Returns all shaders that have been created. Deprecated in 1.3
-  CS_DEPRECATED_METHOD_MSG("Deprecated, use GetAllShaders().")
+  /// Returns all shaders that have been created.
   virtual const csRefArray<iShader> &GetShaders ()  = 0;
-  /// Returns all shaders that have been created
-  virtual const csWeakRefArray<iShader> &GetAllShaders ()  = 0;
 
   /// Register a compiler to the manager
   virtual void RegisterCompiler (iShaderCompiler* compiler) = 0;

@@ -398,6 +398,21 @@ public:
       typename csArray<T>::AllocatorType> (key);
   }
 
+  /// Get all the elements, or empty if there are none.
+  csArray<T> GetAll () const
+  {
+    if (Elements.GetSize() == 0) return csArray<T> ();
+
+    csHash<T,K>::ConstGlobalIterator itr = GetIterator();
+    csArray<T> ret;
+    while(itr.HasNext())
+    {
+      ret.Push(itr.Next());
+    }
+
+    return ret;
+  }
+
   /// Get all the elements with the given key, or empty if there are none.
   template<typename H, typename M>
   csArray<T, H, M> GetAll (const K& key) const

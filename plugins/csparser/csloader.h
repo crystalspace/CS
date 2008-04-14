@@ -92,8 +92,6 @@ struct iSceneNodeArray;
 CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 {
 
-#define LOADING_COLLECTION "Loading"
-
 class csLoader;
 struct csLoaderPluginRec;
 
@@ -514,8 +512,7 @@ private:
    * Add the given object to the region in the context (if there is
    * such a region).
    */
-  void AddToRegionOrCollection (iLoaderContext* ldr_context, iObject* obj,
-                                bool alwaysKeep = false);
+  void AddToRegionOrCollection (iLoaderContext* ldr_context, iObject* obj);
 
   /**
    * Add children to the region.

@@ -40,7 +40,7 @@ class csPlane3;
 class csCameraPosition : public scfImplementationExt2<csCameraPosition,
                                                  csObject,
                                                  iCameraPosition,
-						 iSelfDestruct>
+                                                 iSelfDestruct>
 {
 public:
   /// Initialize the camera position object
@@ -76,6 +76,9 @@ public:
   //--------------------- iSelfDestruct implementation -------------------//
 
   virtual void SelfDestruct ();
+
+protected:
+  void InternalRemove() { SelfDestruct(); }
 
 private:
   /// The sector this camera points to

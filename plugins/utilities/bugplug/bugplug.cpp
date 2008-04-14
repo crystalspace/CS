@@ -2636,7 +2636,7 @@ void csBugPlug::SetupDebugSector ()
 
   iRegion* db_region = Engine->CreateRegion ("__BugPlug_region__");
   debug_sector.sector = Engine->CreateSector ("__BugPlug_sector__");
-  db_region->QueryObject ()->ObjAdd (debug_sector.sector->QueryObject ());
+  db_region->Add (debug_sector.sector->QueryObject ());
 
   debug_sector.view = new csView (Engine, G3D);
   int w3d = G3D->GetWidth ();
@@ -2659,8 +2659,7 @@ iMaterialWrapper* csBugPlug::FindColor (float r, float g, float b)
   csShaderVariable* var = mat->GetVariableAdd (stringSet->Request (CS_MATERIAL_VARNAME_FLATCOLOR));
   var->SetValue (csColor (r,g,b));
 
-  mw.AttachNew(Engine->GetMaterialList ()->NewMaterial (mat, name));
-  return mw;
+  return Engine->GetMaterialList ()->NewMaterial (mat, name);
 }
 
 void csBugPlug::DebugSectorBox (const csBox3& box, float r, float g, float b,

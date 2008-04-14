@@ -513,8 +513,7 @@ bool csWaterDemo::Initialize ()
 
   mat->SetShader (strings->Request ("general"), shader);
 
-  csRef<iMaterialWrapper> matW;
-  matW.AttachNew(engine->GetMaterialList ()->NewMaterial (mat, "waterMaterial"));
+  iMaterialWrapper* matW = engine->GetMaterialList ()->NewMaterial (mat, "waterMaterial");
 
   csRef<csImageCubeMapMaker> cubeMaker;
   cubeMaker.AttachNew (new csImageCubeMapMaker ());

@@ -81,8 +81,6 @@
 
 CS_IMPLEMENT_PLUGIN
 
-#define DEFAULT_COLLECTION "defaultCollection"
-
 bool csEngine::doVerbose = false;
 
 //---------------------------------------------------------------------------
@@ -196,7 +194,8 @@ csCameraPositionList::~csCameraPositionList ()
 iCameraPosition *csCameraPositionList::NewCameraPosition (const char *name)
 {
   csVector3 v (0);
-  csWeakRef<iCameraPosition> cp = new csCameraPosition (this, name, "", v, v, v);
+  csRef<iCameraPosition> cp;
+  cp.AttachNew(new csCameraPosition (this, name, "", v, v, v));
   positions.Push (cp);
 
   return cp;
@@ -248,12 +247,10 @@ iCameraPosition *csCameraPositionList::FindByName (
 
 void csEngineMeshList::FreeMesh (iMeshWrapper* mesh)
 {
-  // Make sure the mesh exists until after the end of the function.
-  csRef<iMeshWrapper> mw = mesh;
-  mw->GetMovable ()->ClearSectors ();
+  mesh->GetMovable ()->ClearSectors ();
   // @@@ Need similar for light/camera!
-  mw->QuerySceneNode ()->SetParent (0);
-  csMeshList::FreeMesh (mw);
+  mesh->QuerySceneNode ()->SetParent (0);
+  csMeshList::FreeMesh (mesh);
 }
 
 //---------------------------------------------------------------------------
@@ -689,9 +686,6 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
   csLightManager* light_mgr = new csLightManager ();
   objectRegistry->Register (light_mgr, "iLightManager");
   light_mgr->DecRef ();
-
-  // Create the default collection.
-  CreateCollection(DEFAULT_COLLECTION);
 
   return true;
 }
@@ -1784,7 +1778,7 @@ void csEngine::RemoveHalo (csLight *Light)
   }
 }
 
-iLight *csEngine::FindLightID (const char* light_id)
+iLight *csEngine::FindLightID (const char* light_id) const
 {
   for (size_t i = 0; i < sectors.GetCount (); i++)
   {
@@ -1795,7 +1789,7 @@ iLight *csEngine::FindLightID (const char* light_id)
   return 0;
 }
 
-iLight *csEngine::FindLight (const char *name, bool regionOnly)
+iLight *csEngine::FindLight (const char *name, bool regionOnly) const
 {
   // XXX: Need to implement region?
   (void)regionOnly;
@@ -3081,26 +3075,12 @@ csPtr<iMeshWrapper> csEngine::CreateSectorWallsMesh (
   return csPtr<iMeshWrapper> (thing_wrap);
 }
 
-iSector *csEngine::CreateSector(const char *name, iCollection *col, iRegion *reg)
+iSector *csEngine::CreateSector(const char *name)
 {
   csRef<iSector> sector;
   sector.AttachNew (new csSector (this));
   sector->QueryObject ()->SetName (name);
   sectors.Add (sector);
-
-  if(col)
-  {
-      col->Add(sector->QueryObject());
-  }
-  else if(reg)
-  {
-      reg->Add(sector->QueryObject());
-  }
-  else
-  {
-      GetDefaultCollection()->Add(sector->QueryObject());
-  }
-
   FireNewSector (sector);
 
   return sector;
@@ -3121,20 +3101,19 @@ iCollection* csEngine::CreateCollection(const char *name)
 
 void csEngine::RemoveCollection(const char *name)
 {
-  csCollection* collect = collections.Get(name, NULL);
+  csRef<iCollection> collect = collections.Get(name, NULL);
   if(collect)
   {
     collections.Delete(name, collect);
-    delete collect;
   }
 }
 
 void csEngine::RemoveAllCollections()
 {
-  csHash<csCollection*, csString>::GlobalIterator itr = collections.GetIterator();
+  csHash<iCollection*, csString>::GlobalIterator itr = collections.GetIterator();
   while(itr.HasNext())
   {
-    RemoveCollection(itr.Next()->GetName());
+    RemoveCollection(itr.Next()->QueryObject()->GetName());
   }
 }
 
@@ -3219,14 +3198,9 @@ iRegionList *csEngine::GetRegions ()
   return &regions;
 }
 
-iCollection* csEngine::GetCollection(const char *name)
+iCollection* csEngine::GetCollection(const char *name) const
 {
   return dynamic_cast<iCollection*>(collections.Get(name, NULL));
-}
-
-iCollection* csEngine::GetDefaultCollection()
-{
-  return dynamic_cast<iCollection*>(collections.Get(DEFAULT_COLLECTION, NULL));
 }
 
 csPtr<iCamera> csEngine::CreateCamera ()
@@ -3477,8 +3451,8 @@ iShader* EngineLoaderContext::FindShader (const char* name)
     || (name && *name == '*')) // Always look up builtin shaders globally
     return Engine->shaderManager->GetShader (name);
 
-  const csWeakRefArray<iShader>& shaders = 
-    Engine->shaderManager->GetAllShaders ();
+  const csRefArray<iShader>& shaders = 
+    Engine->shaderManager->GetShaders ();
   size_t i;
   for (i = 0 ; i < shaders.GetSize () ; i++)
   {

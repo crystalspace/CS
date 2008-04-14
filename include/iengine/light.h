@@ -426,7 +426,7 @@ struct iLight : public virtual iBase
  */
 struct iLightList : public virtual iBase
 {
-  SCF_INTERFACE(iLightList,2,1,0);
+  SCF_INTERFACE(iLightList,2,0,1);
   /// Return the number of lights in this list.
   virtual size_t GetCount () const = 0;
 

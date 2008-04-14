@@ -166,7 +166,7 @@ public:
   virtual int Find (iCameraPosition *obj) const;
   virtual iCameraPosition *FindByName (const char *Name) const;
 private:
-  csWeakRefArrayObject<iCameraPosition> positions;
+  csRefArrayObject<iCameraPosition> positions;
 };
 
 /**
@@ -343,8 +343,8 @@ public:
   virtual csPtr<iLight> CreateLight (const char* name, const csVector3& pos,
   	float radius, const csColor& color,
 	csLightDynamicType dyntype = CS_LIGHT_DYNAMICTYPE_STATIC);
-  virtual iLight* FindLight (const char *Name, bool RegionOnly = false);
-  virtual iLight* FindLightID (const char* light_id);
+  virtual iLight* FindLight (const char *Name, bool RegionOnly = false) const;
+  virtual iLight* FindLightID (const char* light_id) const;
 
   virtual csPtr<iLightIterator> GetLightIterator (iBase* base = 0)
   {
@@ -383,7 +383,7 @@ public:
   
   //-- Sector handling
 
-  virtual iSector *CreateSector (const char *name, iCollection *col = 0, iRegion *reg = 0);
+  virtual iSector *CreateSector (const char *name);
   virtual iSectorList* GetSectors ()
   { return &sectors; }
   virtual iSector* FindSector (const char* name,
@@ -487,9 +487,10 @@ public:
 
   virtual iCollection* CreateCollection(const char* name);
 
-  virtual iCollection* GetCollection(const char* name);
+  virtual iCollection* GetCollection(const char* name) const;
 
-  virtual iCollection* GetDefaultCollection();
+  virtual const csArray<iCollection*> GetCollections() const
+  { return collections.GetAll(); }
 
   virtual void RemoveCollection(const char* name);
 
@@ -914,7 +915,7 @@ private:
   /// The list of all regions currently loaded.
   csRegionList regions;
   /// The hash of all collections currently existing.
-  csHash<csCollection*, csString> collections;
+  csHash<iCollection*, csString> collections;
 
   /// Sector callbacks.
   csRefArray<iEngineSectorCallback> sectorCallbacks;

@@ -27,7 +27,7 @@
 #include "csutil/array.h"
 #include "csutil/cscolor.h"
 #include "csutil/csobject.h"
-#include "csutil/weakrefhash.h"
+#include "csutil/hash.h"
 #include "csutil/nobjvec.h"
 #include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
@@ -107,7 +107,7 @@ private:
 class csSector : public scfImplementationExt3<csSector, 
                                               csObject,
                                               iSector,
-					      iSelfDestruct,
+                                              iSelfDestruct,
                                               scfFakeInterface<iShaderVariableContext> >,
                  public CS::ShaderVariableContextImpl
 {
@@ -225,7 +225,7 @@ public:
   /**\name Visculling
    * @{ */
   virtual void CalculateSectorBBox (csBox3& bbox,
-    bool do_meshes);
+    bool do_meshes) const;
 
   virtual bool SetVisibilityCullerPlugin (const char* name,
   	iDocumentNode* culler_params = 0);
@@ -315,6 +315,9 @@ public:
   { return static_cast<iShaderVariableContext*> (this); }
 
   virtual void PrecacheDraw ();
+
+protected:
+  inline void InternalRemove() { SelfDestruct(); }
 
 private:
   // -- PRIVATE METHODS
@@ -554,8 +557,8 @@ private:
 class csSectorList : public scfImplementation1<csSectorList, iSectorList>
 {
 private:
-  csWeakRefArrayObject<iSector> list;
-  csWeakRefHash<iSector, csString> sectors_hash;
+  csRefArrayObject<iSector> list;
+  csHash<iSector*, csString> sectors_hash;
 
   class NameChangeListener : public scfImplementation1<NameChangeListener,
   	iObjectNameChangeListener>
@@ -592,14 +595,14 @@ public:
   /// Override FreeSector.
   virtual void FreeSector (iSector* item);
 
-  virtual size_t GetCount () { list.Compact(); return list.GetSize (); }
+  virtual size_t GetCount () const { return list.GetSize (); }
   virtual iSector *Get (size_t n) const { return list.Get (n); }
   virtual int Add (iSector *obj);
   virtual bool Remove (iSector *obj);
   virtual bool Remove (int n);
   virtual void RemoveAll ();
   virtual int Find (iSector *obj) const;
-  virtual iSector *FindByName (const char *Name);
+  virtual iSector *FindByName (const char *Name) const;
 };
 
 #endif // __CS_SECTOR_H__

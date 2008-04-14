@@ -328,8 +328,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csString texClass = context.GetClass();
 
     // Proxy texture loading if the loader isn't specified
-    // and we don't need to load them immediately.
-    if(txtname && type.IsEmpty() && ldr_context->GetKeepFlags() == KEEP_USED)
+    // and we don't need to load them immediately. Not used with regions.
+    if(txtname && type.IsEmpty() && ldr_context->GetKeepFlags() == KEEP_USED &&
+       !ldr_context->GetRegion())
     {
       if (filename.IsEmpty())
       {
@@ -344,7 +345,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       proxTex.img.AttachNew (new ProxyImage (this, filename));
       proxTex.always_animate = always_animate;
 
-      tex.AttachNew(Engine->GetTextureList()->NewTexture (proxTex.img));
+      tex = Engine->GetTextureList()->NewTexture (proxTex.img);
       tex->SetTextureClass(context.GetClass());
       tex->SetFlags(context.GetFlags());
       tex->QueryObject()->SetName(txtname);
@@ -365,7 +366,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
 
       proxTex.textureWrapper = tex;
+
       AddToRegionOrCollection (ldr_context, proxTex.textureWrapper->QueryObject());
+
       proxyTextures.Push(proxTex);
 
       return tex;
@@ -669,7 +672,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       flatSV->SetValue (col);
     }
 
-    csRef<iMaterialWrapper> mat;
+    iMaterialWrapper* mat;
 
     if (prefix)
     {
@@ -677,12 +680,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       strcpy (prefixedname, prefix);
       strcat (prefixedname, "_");
       strcat (prefixedname, matname);
-      mat.AttachNew(Engine->GetMaterialList ()->NewMaterial (material, prefixedname));
+      mat = Engine->GetMaterialList ()->NewMaterial (material, prefixedname);
       delete [] prefixedname;
     }
     else
     {
-      mat.AttachNew(Engine->GetMaterialList ()->NewMaterial (material, matname));
+      mat = Engine->GetMaterialList ()->NewMaterial (material, matname);
     }
 
     size_t i;

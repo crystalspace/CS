@@ -187,7 +187,7 @@ struct iTextureList : public virtual iBase
   virtual iTextureWrapper *NewTexture (iTextureHandle *ith) = 0;
 
   /// Return the number of textures in this list.
-  virtual int GetCount () = 0;
+  virtual size_t GetCount () const = 0;
 
   /// Return a texture by index.
   virtual iTextureWrapper *Get (int n) const = 0;

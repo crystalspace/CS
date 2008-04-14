@@ -71,7 +71,7 @@ static const char* AttachmentToStr (csRenderTargetAttachment a)
 
 iTextureWrapper* csEngineProcTex::CreateTexture (iObjectRegistry* object_reg)
 {
-  csRef<iTextureWrapper> tex;
+  iTextureWrapper *tex;
 
   csRef<iEngine> engine (csQueryRegistry<iEngine> (object_reg));
   
@@ -102,7 +102,7 @@ iTextureWrapper* csEngineProcTex::CreateTexture (iObjectRegistry* object_reg)
     
     if (!tex)
     {
-      tex.AttachNew(engine->GetTextureList()->NewTexture (texHandle));
+      tex = engine->GetTextureList()->NewTexture (texHandle);
       currentTargetStr.Format ("%s(%s)", AttachmentToStr (target.attachment),
         target.format);
     }

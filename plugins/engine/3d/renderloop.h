@@ -22,8 +22,8 @@
 #ifndef __CS_CSENGINE_RENDERLOOP_H__
 #define __CS_CSENGINE_RENDERLOOP_H__
 
-#include "csutil/weakrefhashr.h"
-#include "csutil/weakrefarr.h"
+#include "csutil/hashr.h"
+#include "csutil/refarr.h"
 #include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/csobject.h"
@@ -52,6 +52,8 @@ protected:
 
   csRefArray<iRenderStep> steps;
   csRef<iShaderManager> shadermanager;
+
+  inline void InternalRemove() { SelfDestruct(); }
 public:
 
   csRenderLoop (csEngine* engine);
@@ -73,7 +75,7 @@ public:
 class csRenderLoopManager : public scfImplementation1<csRenderLoopManager,
                                                       iRenderLoopManager>
 {
-  typedef csWeakRefHashReversible<iRenderLoop, const char*> LoopsHash;
+  typedef csHashReversible<csRef<iRenderLoop>, const char*> LoopsHash;
 
   LoopsHash loops;
   csStringSet strings;

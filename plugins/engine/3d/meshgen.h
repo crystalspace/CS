@@ -169,7 +169,7 @@ public:
    * It will also return an instance_id if the mesh represents an
    * instance from an instmesh.
    */
-  csPtr<iMeshWrapper> AllocMesh (int cidx, const csMGCell& cell,
+  iMeshWrapper* AllocMesh (int cidx, const csMGCell& cell,
       float sqdist, size_t& lod, size_t& instance_id);
 
   /**

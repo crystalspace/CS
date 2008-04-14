@@ -54,17 +54,36 @@ public:
   /**
    * Add an object to this collection.
    */
-  inline void Add(iObject *obj) { ObjAdd(obj); }
+  inline void Add(iObject *obj)
+  {
+    ObjAdd(obj);
+    csObject* object = (csObject*)obj;
+    object->InternalIncRef();
+  }
 
   /**
    * Remove an object from this collection.
    */
-  inline void Remove(iObject *obj) { ObjRemove(obj); }
+  inline void Remove(iObject *obj)
+  {
+    csObject* object = (csObject*)obj;
+    printf("Name: %s\n", object->GetName());
+    object->InternalDecRef();
+    ObjRemove(obj);
+  }
 
   /**
    * Release all references to objects held by this collection.
    */
-  inline void ReleaseAllObjects() { ObjRemoveAll(); }
+  void ReleaseAllObjects()
+  {
+    csRef<iObjectIterator> itr = this->QueryObject()->GetIterator();
+    while(itr->HasNext())
+    {
+      iObject* o = itr->Next();
+      Remove(o);
+    }
+  }
 
   /**
    * Returns true if this collection is the parent of the object passed.

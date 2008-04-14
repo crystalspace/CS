@@ -254,8 +254,7 @@ csPtr<iBase> csFuncTexLoader::Parse (iDocumentNode* node,
   csRef<iTextureHandle> TexHandle (tm->RegisterTexture (Image, 
     (ctx && ctx->HasFlags()) ? ctx->GetFlags() : CS_TEXTURE_3D));
 
-  csRef<iTextureWrapper> TexWrapper;
-  TexWrapper.AttachNew(Engine->GetTextureList ()->NewTexture(TexHandle));
+  csRef<iTextureWrapper> TexWrapper = Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->SetImageFile (Image);
 
   return csPtr<iBase> (TexWrapper);

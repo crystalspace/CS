@@ -90,13 +90,13 @@ void csObject::InitializeObject ()
 }
 
 csObject::csObject (iBase* pParent) 
-  : scfImplementationType (this, pParent), Children (0), Name (0)
+  : scfImplementationType (this, pParent), InternalRefCount(), Children (0), Name (0)
 {
   InitializeObject ();
 }
 
 csObject::csObject (csObject &o) 
-  : iBase(), scfImplementationType (this),  Children (0), Name (0)
+  : iBase(), scfImplementationType (this), InternalRefCount(), Children (0), Name (0)
 {
   InitializeObject ();
 

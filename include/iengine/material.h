@@ -133,14 +133,14 @@ struct iMaterialEngine : public virtual iBase
  */
 struct iMaterialList : public virtual iBase
 {
-  SCF_INTERFACE (iMaterialList, 1, 1, 0);
+  SCF_INTERFACE (iMaterialList, 1, 0, 1);
 
   /// Create a new material.
   virtual iMaterialWrapper* NewMaterial (iMaterial* material,
   	const char* name) = 0;
 
   /// Return the number of materials in this list
-  virtual size_t GetCount () = 0;
+  virtual size_t GetCount () const = 0;
 
   /// Return a material by index
   virtual iMaterialWrapper *Get (size_t n) const = 0;
@@ -161,7 +161,7 @@ struct iMaterialList : public virtual iBase
   virtual int Find (iMaterialWrapper *obj) const = 0;
 
   /// Find a material by name
-  virtual iMaterialWrapper *FindByName (const char *Name) = 0;
+  virtual iMaterialWrapper *FindByName (const char *Name) const = 0;
 };
 
 /** @} */

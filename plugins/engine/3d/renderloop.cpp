@@ -153,11 +153,8 @@ bool csRenderLoopManager::Register (const char* name, iRenderLoop* loop)
 {
   const char* myName = strings.Request (strings.Request (name));
   if (loops.In (myName))
-  {
-    if(loops.Get(name, 0))
       return false;
-  }
-  loops.PutUnique (myName, loop);
+  loops.Put (myName, loop);
   return true;
 }
  
@@ -268,4 +265,3 @@ csPtr<iRenderLoop> csRenderLoopManager::Load (const char* fileName)
   }
   return (csPtr<iRenderLoop> (rl));
 }
-
