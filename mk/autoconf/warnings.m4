@@ -148,26 +148,25 @@ AC_DEFUN([CS_COMPILER_IGNORE_PRAGMAS],
 #	is discovered, then it is assigned to CACHE-VAR and ACTION-IF-FOUND is
 #	invoked; otherwise the empty string is assigned to CACHE-VAR and
 #	ACTION-IF-NOT-FOUND is invoked.
+#
+# IMPLEMENTATION NOTES
+#	The -Wno-long-double option is specific to the Apple version of g++.
+#	Furthermore, as of at least 2008-04-03, the
+#	CS_CHECK_BUILD_FLAGS([-Wno-long-double]) check spuriously and
+#	incorrectly *succeeds* with g++ 4.2.3 on non-Apple platforms even
+#	though the compiler does not really accept the option. This is a g++
+#	bug.  To work around this issue, the -Wno-long-double check is
+#	performed only on Apple platforms.
 #------------------------------------------------------------------------------
-# Note: As of at least 2008-04-03, gcc 4.2.3 produces spurious, errorneous
-#       'unrecognized command line option "-Wno-long-double"' errors, breaking
-#	builds. This problem is not caught by the -Wno-long-double check. In
-#	fact, two compiler invocations with exactly the same parameters except
-#	input/output files one may produce the error, the other may not.
-#	To work around the problem detect buggy gcc versions (assume 4.2 to be)
-#	and never use -Wno-long-double there.
 AC_DEFUN([CS_COMPILER_IGNORE_LONG_DOUBLE],
-    [AS_IF([test $ac_compiler_gnu = yes],
-	[CS_CHECK_PROG_VERSION([g++], [$CXX --version], [4.2], [9.9|.9],
-	    [cs_cv_gxx_version_buggy_long_double=yes],
-	    [cs_cv_gxx_version_buggy_long_double=no])],
-	[cs_cv_gxx_version_buggy_long_double=no])
-    AS_IF([test x$cs_host_macosx != xyes \
-	   && test $cs_cv_gxx_version_buggy_long_double = no],
-	[CS_CHECK_BUILD_FLAGS(
-	    [_CS_WARNING_SUPPRESS_MSG([`long double'], [$1])],
-	    [_CS_WARNING_CACHE_VAR([$2], [$1], [ignore_long_double])],
-	    [CS_CREATE_TUPLE([-Wno-long-double])], [$1], [$3], [$4])])])
+    [AC_REQUIRE([CS_CHECK_HOST])
+    AS_IF([test "$cs_host_target" = macosx],
+	[cs_ignore_long_double_tuples=CS_CREATE_TUPLE([-Wno-long-double])],
+	[cs_ignore_long_double_tuples=''])
+    CS_CHECK_BUILD_FLAGS(
+	[_CS_WARNING_SUPPRESS_MSG([`long double'], [$1])],
+	[_CS_WARNING_CACHE_VAR([$2], [$1], [ignore_long_double])],
+	[$cs_ignore_long_double_tuples], [$1], [$3], [$4])])
 
 
 

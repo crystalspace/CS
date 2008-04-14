@@ -31,10 +31,15 @@ AC_PREREQ([2.56])
 #	Prepend text to the makefile text cache.  This is a cover for
 #	CS_TEXT_CACHE_PREPEND().
 #
-# CS_MAKEFILE_PROPERTY(KEY, VALUE, [APPEND])
-#	Append a line of the form "KEY = VALUE" to the makefile text cache.  If
-#	the APPEND argument is not the empty string, then VALUE is appended to
-#	the existing value of KEY using the form "KEY += VALUE".  Note that if
+# CS_MAKEFILE_PROPERTY(KEY, VALUE, [OPTIONS])
+#	Append a line of the form "KEY = VALUE" to the makefile text cache.
+#	OPTIONS is a comma-separated list of keywords which alter the format of
+#	the emitted line. The following options are understood:
+#	    append - Employ += appending assignment.
+#	    default - Alias for "unconditional".
+#	    unconditional - Employ = assignment (the default).
+#	For backward compatibility, if OPTIONS is not one of the above keywords
+#	and is not the empty string, then "append" is assumed.  Note that if
 #	VALUE references other makefile variables, for example $(OBJS), then be
 #	sure to protect the value with AS_ESCAPE().  For example:
 #	CS_MAKEFILE_PROPERTY([ALLOBJS], [AS_ESCAPE([$(OBJS) $(LIBOBJS)])])
@@ -48,6 +53,11 @@ AC_DEFUN([CS_MAKEFILE_APPEND],
 AC_DEFUN([CS_MAKEFILE_PREPEND],
     [CS_TEXT_CACHE_PREPEND([cs_makefile_text], [$1])])
 AC_DEFUN([CS_MAKEFILE_PROPERTY],
-    [CS_MAKEFILE_APPEND([$1 m4_ifval([$3], [+=], [=]) $2
+    [CS_MAKEFILE_APPEND(
+[$1 dnl
+CS_MEMBERSHIP_ANY([append], [$3], [+=],
+[CS_MEMBERSHIP_ANY([unconditional, default], [$3], [=],
+[m4_ifval([$3], [+=], dnl Backward compatibility.
+[=])])]) $2
 ])])
 AC_DEFUN([CS_MAKEFILE_OUTPUT],[CS_TEXT_CACHE_OUTPUT([cs_makefile_text], [$1])])

@@ -1,6 +1,6 @@
 # configure.ac                                                 -*- Autoconf -*-
 #==============================================================================
-# Copyright (C)2003-2006 by Eric Sunshine <sunshine@sunshineco.com>
+# Copyright (C)2003-2008 by Eric Sunshine <sunshine@sunshineco.com>
 #
 # Autoconf input script for Crystal Space.  Process this file with
 # CS/bin/autogen.sh to produce a configure script.
@@ -23,7 +23,7 @@ m4_define([cs_version_number], [1.3])
 AC_INIT([crystalspace], [cs_version_number],
         [crystal-main@lists.sourceforge.net])
 CS_PACKAGEINFO([Crystal Space],
-    [Copyright (C)1998-2007 Jorrit Tyberghein and others],
+    [Copyright (C)1998-2008 Jorrit Tyberghein and others],
     [http://www.crystalspace3d.org/])
 AC_CONFIG_SRCDIR([libs/Jamfile])
 AC_CONFIG_AUX_DIR([mk/autoconf])
