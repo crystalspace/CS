@@ -103,6 +103,15 @@ struct iSkeletonAnimPacketFactory2 : public virtual iBase
    */
   virtual void ClearAnimations () = 0;
 
+  /**
+   * Get animation factory by index
+   */
+  virtual iSkeletonAnimationFactory2* GetAnimation (size_t index) = 0;
+
+  /**
+   * Get the number of animation factories
+   */
+  virtual size_t GetAnimationCount () const = 0;
   
   /**
    * Set the root node for the animation mixing hierarchy
@@ -131,6 +140,16 @@ struct iSkeletonAnimPacket2 : public virtual iBase
    * Find an animation within the packet
    */
   virtual iSkeletonAnimation2* FindAnimation (const char* name) = 0;
+
+  /**
+  * Get animation factory by index
+  */
+  virtual iSkeletonAnimation2* GetAnimation (size_t index) = 0;
+
+  /**
+  * Get the number of animation factories
+  */
+  virtual size_t GetAnimationCount () const = 0;
 
   /**
    * Get the root node for the animation mixing hierarchy

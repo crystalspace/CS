@@ -79,6 +79,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     animFactoryList.DeleteAll ();
   }
 
+  iSkeletonAnimationFactory2* AnimationPacketFactory::GetAnimation (size_t index)
+  {
+    return animFactoryList[index];
+  }
+
+  size_t AnimationPacketFactory::GetAnimationCount () const
+  {
+    return animFactoryList.GetSize ();
+  }
+
   void AnimationPacketFactory::SetAnimationRoot (iSkeletonAnimNodeFactory2* root)
   {
     animRoot = root;
@@ -110,6 +120,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     }
 
     return 0; 
+  }
+
+  iSkeletonAnimation2* AnimationPacket::GetAnimation (size_t index)
+  {
+    return animList[index];
+  }
+
+  size_t AnimationPacket::GetAnimationCount () const
+  {
+    return animList.GetSize ();
   }
 
   iSkeletonAnimNode2* AnimationPacket::GetAnimationRoot () const

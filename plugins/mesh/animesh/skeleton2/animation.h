@@ -44,6 +44,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual iSkeletonAnimationFactory2* CreateAnimation (const char* name);
     virtual iSkeletonAnimationFactory2* FindAnimation (const char* name);
     virtual void ClearAnimations ();
+    virtual iSkeletonAnimationFactory2* GetAnimation (size_t index);
+    virtual size_t GetAnimationCount () const;
 
     virtual void SetAnimationRoot (iSkeletonAnimNodeFactory2* root);
     virtual iSkeletonAnimNodeFactory2* GetAnimationRoot () const;
@@ -64,6 +66,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     //-- iSkeletonAnimPacket2
     virtual iSkeletonAnimation2* FindAnimation (const char* name);
+    virtual iSkeletonAnimation2* GetAnimation (size_t index);
+    virtual size_t GetAnimationCount () const;
     virtual iSkeletonAnimNode2* GetAnimationRoot () const;
 
   private:
