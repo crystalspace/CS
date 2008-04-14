@@ -32,6 +32,7 @@
 #include "csutil/allocator.h"
 #include "csutil/comparator.h"
 #include "csutil/customallocated.h"
+#include "csutil/util.h"
 
 #include "csutil/custom_new_disable.h"
 
@@ -367,6 +368,20 @@ namespace CS
   {
     typedef CS::Memory::AllocatorMalloc ArrayAllocDefault;
     typedef csArrayCapacityFixedGrow<16> ArrayCapacityDefault;
+    
+    template<int MaxGrow = 1 << 20>
+    struct ArrayCapacityExponential
+    {
+      bool IsCapacityExcessive (size_t capacity, size_t count) const
+      {
+	return size_t (csFindNearestPowerOf2 (count)) < (capacity/2);
+      }
+      size_t GetCapacity (size_t count) const
+      {
+        size_t newCap = csFindNearestPowerOf2 (count);
+	return newCap < MaxGrow ? newCap : MaxGrow;
+      }
+    };
   } // namespace Container
 } // namespace CS
 
