@@ -136,6 +136,17 @@ struct RenderMeshModes
 };
 
 /**
+ * Start and end for a  range of indices to render.
+ * The indices are used in the range from \a start (inclusive) to \a end
+ * (exclusive): start <= n < end
+ */
+struct RenderMeshIndexRange
+{
+  unsigned int start;
+  unsigned int end;
+};
+
+/**
  * Data required by the renderer to draw a mesh.
  */
 struct CoreRenderMesh
@@ -148,7 +159,7 @@ struct CoreRenderMesh
 
   CoreRenderMesh () : db_mesh_name ("<unknown>"), clip_portal (0), 
     clip_plane (0), clip_z_plane (0), do_mirror (false), indexstart (0), 
-    indexend (0)
+    indexend (0), multiRanges (0), rangesNum (0)
   {
   }
 
@@ -194,6 +205,13 @@ struct CoreRenderMesh
   unsigned int indexstart;
   unsigned int indexend;
   /** @} */
+  /**
+   * Index ranges to render. If ranges are specified they have precedence
+   * over \a indexstart and \a indexend.
+   */
+  RenderMeshIndexRange* multiRanges;
+  /// Number of index ranges in \a multiRanges.
+  size_t rangesNum;
 
   /**
    * Material used for this mesh.

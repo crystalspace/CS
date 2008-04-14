@@ -671,7 +671,7 @@ public:
     void Seek ()
     {
       while ((element < size) && 
-        (csComparator<K, K>::Compare (hash->Elements[bucket][element].key, 
+        (csComparator<K, K>::Compare (hash->Elements[bucket][element].GetKey(), 
 	key) != 0))
           element++;
     }
@@ -715,7 +715,7 @@ public:
     /// Get the next element's value.
     T& Next ()
     {
-      T &ret = hash->Elements[bucket][element].value;
+      T &ret = hash->Elements[bucket][element].GetValue();
       element++;
       Seek ();
       return ret;

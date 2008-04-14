@@ -9,6 +9,45 @@ chronological order.
 14-Apr-2008
 	- Mike Gist did some initial work on adding an internal refcount
 	  for engine lists.
+12-Apr-2008
+	- res worked around SWIG 1.3.33 breakage in the perl bindings.
+	- res added methods to iImage to query the image format as a "texture
+	  format string". The idea is to eventually move to this more flexible
+	  format identification in the future (and thus provide support to
+	  load more image formats).
+11-Apr-2008
+	- res changed the X window creation to set a background color when
+	  creating the window. This prevents a brief flash of undefined
+	  window contents on compiz (and possibly other WMs).
+9-Apr-2008
+	- res made the following changes:
+	  - Made string markers in gl3d have practically no cost if not
+	    used (the common case).
+	  - Added support for multiple index ranges in one render mesh
+	    (this reduces the DrawMesh() overhead when a lot of ranges have
+	    to be rendered with the other mesh options are the same).
+8-Apr-2008
+	- res added some initial support for normalized render buffers.
+	- res fixed a crash in binary render buffers.
+	- res changed csVertexListWalker to lock buffers for reading only.
+	- res fixed binary render buffers returning a buffer version of '~0' -
+	  this conflicted with the default value for the version used by the
+	  gl3d buffer manager, meaning a binary buffer was never uploaded.
+	- res fixed the render buffer parser to set the "normalized" flag
+	  when it was actually specified (and not the other way round).
+7-Apr-2008
+	- Mike Gist fixed a compile error.
+	- Mike Gist added an exportCS max script supporting 3ds max 2008, and
+	  moved the previous one to exportCS-oldmax to keep support for older
+	  versions.
+6-Apr-2008
+	- Marten temporarily disabled csutil/memutil.cpp by #if 0 until
+	  a proper way to write it has been commited. Fixes compilation
+	  errors due to missing includes.
+5-Apr-2008
+	- Scott Johnson added csutil/memutil.h and csutil/memutil.cpp, which 
+	  includes the function CS::Memory::GetPhysicalMemory().  This function
+	  returns the physical memory (in KB) when called.
 4-Apr-2008
 	- Eric Sunshine applied the following fixes and improvements to the g++
 	  bug check added to the CS_COMPILER_IGNORE_LONG_DOUBLE() macro
@@ -92,6 +131,10 @@ chronological order.
 	  unnecessarily complicated following r28950.
 	- Eric Sunshine eliminated compilation warning in
 	  terrain2/bruteblockrenderer.
+	- Marten fixed terrain2 to properly handle alphamaps independent of if
+	  they are true color or paletted, with or without alpha.
+	- Marten optimized the terrain2 texture updates.
+	- Eric Sunshine eliminated compilation warnings in csutil and null3d.
 3-Apr-2008
 	- res added a workaround to configure to avoid -Wno-long-double
 	  warnings occuring with g++ 4.2.3.

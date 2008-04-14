@@ -87,6 +87,14 @@ enum csImageType
  * by creating a csImageMemory instance (which allows access to the
  * pixel data).
  *
+ * \par Raw and cooked image data
+ * For images the "raw" and "cooked" data is available. The raw data means the
+ * image data as read from the image file with little processing done;
+ * this means that the raw format can be a "special" format requiring some
+ * special algorithm to be translated into color data. The "cooked" data is
+ * the image data already translated into color data and is usually easier
+ * to deal with.
+ *
  * Main creators of instances implementing this interface:
  * - iImageIO::Load()
  * 
@@ -95,7 +103,7 @@ enum csImageType
  */
 struct iImage : public virtual iBase
 {
-  SCF_INTERFACE (iImage, 4, 0, 0);
+  SCF_INTERFACE (iImage, 4, 0, 1);
 
   /**
    * Get image data: returns either (csRGBpixel *) or (unsigned char *)
@@ -176,6 +184,19 @@ struct iImage : public virtual iBase
    * value returns 0.
    */
   virtual csRef<iImage> GetSubImage (uint num) = 0;
+
+  /**
+   * Return the "cooked" format of the image data (a non-"special" format
+   * into which image data may be processed).
+   * \sa \ref TextureFormatStrings 
+   */
+  virtual const char* GetCookedImageFormat () = 0;
+  /**
+   * Return the "cooked" image data (the image data into which an image of
+   * non-"special" format may be processed).
+   * \sa \ref TextureFormatStrings 
+   */
+  virtual csRef<iDataBuffer> GetCookedImageData () = 0;
 };
 
 /** @} */

@@ -346,7 +346,7 @@ void csTerrainCell::SetMaterialMask (unsigned int material, iImage* image)
 }
 
 void csTerrainCell::SetMaterialMask (unsigned int material,
-const unsigned char* data, unsigned int width, unsigned int height)
+  const unsigned char* data, unsigned int width, unsigned int height)
 {
   csImageMemory image(width, height, (void*)data, false, CS_IMGFMT_PALETTED8);
 	
@@ -357,10 +357,12 @@ void csTerrainCell::SetAlphaMask (iMaterialWrapper* material, iImage* alphaMap)
 {
   Touch();
 
-  terrain->GetRenderer ()->OnAlphaMapUpdate(this, material, 
-    (const unsigned char*)alphaMap->GetImageData (), 
-    csRect(0, 0, alphaMap->GetWidth (), alphaMap->GetHeight ()), 
-    alphaMap->GetWidth ());
+  // Make sure we have a true color image
+  csRef<iImage> image;
+  image.AttachNew (new csImageMemory (alphaMap, 
+    CS_IMGFMT_TRUECOLOR | (alphaMap->GetFormat () & ~CS_IMGFMT_MASK)));
+
+  terrain->GetRenderer ()->OnAlphaMapUpdate (this, material, image);
 }
 
 void csTerrainCell::SetBaseMaterial (iMaterialWrapper* material)

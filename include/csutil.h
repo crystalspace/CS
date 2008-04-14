@@ -88,6 +88,7 @@
 #include "csutil/memfile.h"
 #include "csutil/memheap.h"
 #include "csutil/mempool.h"
+#include "csutil/memutil.h"
 #include "csutil/metautils.h"
 #include "csutil/mmapio.h"
 #include "csutil/nobjvec.h"
