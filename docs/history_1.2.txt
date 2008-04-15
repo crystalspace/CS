@@ -1,5 +1,8 @@
 1.2 branch log.
 
+15-Apr-2008:
+	- Vincent merged r29292:29293 into 1.2 (fix binutils check for
+	  Mac OS X Leopard).
 8-Apr-2008
 	- res merged r29258 into 1.2 (Update links for PSDK with VC8 Express).
 	- Vincent merged r27907 into 1.2 (compilation warning fixes).

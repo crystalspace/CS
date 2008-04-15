@@ -6,6 +6,13 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Apr-2008
+	- Eric Sunshine fixed CS_CHECK_BINUTILS_2_17() in checkbinutils.m4 to
+	  be compatible with Mac OS X linkers which are not GNU-compatible.
+	  Further, it now correctly suppresses unwanted output from the Leopard
+	  linker which was messing up the displayed 'configure' output since
+	  Leopard 'ld' emits its version information to stderr rather than
+	  stdout.
 4-Apr-2008
 	- Eric Sunshine applied the following fixes and improvements to the g++
 	  bug check added to the CS_COMPILER_IGNORE_LONG_DOUBLE() macro

@@ -3592,8 +3592,11 @@ done
 fi
 
     if test -n "$LD"; then
+  # Apple linker is not GNU-compatible. Further, on Leopard, -v emits
+        # to stderr rather than stdout. Handle these anomalies.
+        if echo `ld -v 2>&1` | grep GNU 2>&1 > /dev/null; then
   # binutils versions come in the flavors X.Y as well as X.Y.Z
-        echo "$as_me:$LINENO: checking if binutils version >= 2.17" >&5
+	    echo "$as_me:$LINENO: checking if binutils version >= 2.17" >&5
 echo $ECHO_N "checking if binutils version >= 2.17... $ECHO_C" >&6
 if test "${cs_cv_prog_binutils_version_2_17_ok_annotated+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -3714,11 +3717,11 @@ else
   cs_cv_binutils_true_2_17=no
 fi
 
-        if test "$cs_cv_binutils_true_2_17" = yes; then
+	    if test "$cs_cv_binutils_true_2_17" = yes; then
   cs_cv_binutils_2_17=yes
 fi
 
-	if test -z "$cs_cv_binutils_2_17"; then
+	    if test -z "$cs_cv_binutils_2_17"; then
   echo "$as_me:$LINENO: checking if binutils version >= 2.16.91" >&5
 echo $ECHO_N "checking if binutils version >= 2.16.91... $ECHO_C" >&6
 if test "${cs_cv_prog_binutils_version_2_16_91_ok_annotated+set}" = set; then
@@ -3832,8 +3835,10 @@ fi
 
 fi
 
-	if test -z "$cs_cv_binutils_2_17"; then
+	    if test -z "$cs_cv_binutils_2_17"; then
   cs_cv_binutils_2_17=no
+fi
+
 fi
 
 fi
@@ -23153,8 +23158,11 @@ done
 fi
 
     if test -n "$LD"; then
+  # Apple linker is not GNU-compatible. Further, on Leopard, -v emits
+        # to stderr rather than stdout. Handle these anomalies.
+        if echo `ld -v 2>&1` | grep GNU 2>&1 > /dev/null; then
   # binutils versions come in the flavors X.Y as well as X.Y.Z
-        echo "$as_me:$LINENO: checking if binutils version >= 2.17" >&5
+	    echo "$as_me:$LINENO: checking if binutils version >= 2.17" >&5
 echo $ECHO_N "checking if binutils version >= 2.17... $ECHO_C" >&6
 if test "${cs_cv_prog_binutils_version_2_17_ok_annotated+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -23275,11 +23283,11 @@ else
   cs_cv_binutils_true_2_17=no
 fi
 
-        if test "$cs_cv_binutils_true_2_17" = yes; then
+	    if test "$cs_cv_binutils_true_2_17" = yes; then
   cs_cv_binutils_2_17=yes
 fi
 
-	if test -z "$cs_cv_binutils_2_17"; then
+	    if test -z "$cs_cv_binutils_2_17"; then
   echo "$as_me:$LINENO: checking if binutils version >= 2.16.91" >&5
 echo $ECHO_N "checking if binutils version >= 2.16.91... $ECHO_C" >&6
 if test "${cs_cv_prog_binutils_version_2_16_91_ok_annotated+set}" = set; then
@@ -23393,8 +23401,10 @@ fi
 
 fi
 
-	if test -z "$cs_cv_binutils_2_17"; then
+	    if test -z "$cs_cv_binutils_2_17"; then
   cs_cv_binutils_2_17=no
+fi
+
 fi
 
 fi
