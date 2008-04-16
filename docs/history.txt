@@ -41,6 +41,9 @@ chronological order.
 	  is a dependent of 'apps'.
 	- caedes added an extension to python wrapped interfaces so they can
 	  be compared using ==.
+	- caedes changed equality test for python wrapped interfaces to be 
+	  based on extending iBase instead of extending declared interfaces,
+	  and also added handling of inequality test.
 14-Apr-2008
 	- Eric Sunshine fixed CS_CHECK_BINUTILS_2_17() in checkbinutils.m4 to
 	  be compatible with Mac OS X linkers which are not GNU-compatible.
