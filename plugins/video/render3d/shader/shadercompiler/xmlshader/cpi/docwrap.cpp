@@ -82,7 +82,7 @@ class ConditionTree
   };
   csBlockAllocator<NodeStackEntry, TempHeapAlloc,
     csBlockAllocatorDisposeDelete<NodeStackEntry> > nodeStackEntryAlloc;
-  
+    
   csArray<NodeStackEntry*, csArrayElementHandler<NodeStackEntry*>,
     TempHeapAlloc> nodeStack;
   csArray<int, csArrayElementHandler<int>, TempHeapAlloc> branchStack;
@@ -124,7 +124,6 @@ public:
   void Dump (csString& out);
 };
 
-
 void ConditionTree::RecursiveAdd (csConditionID condition, Node* node, 
                                   NodeStackEntry& newCurrent, 
                                   MyBitArrayTemp& affectedSVs)
@@ -137,159 +136,168 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
     return;
   }
 
-  // Possibly delay construction
-  uint8 _trueVals[sizeof(Variables)];
-  uint8 _falseVals[sizeof(Variables)];
-  bool valsInit = false;
-  Variables& trueVals = *(reinterpret_cast<Variables*> (_trueVals));
-  Variables& falseVals = *(reinterpret_cast<Variables*> (_falseVals));
-  Logic3 r;
-  if (condition == csCondAlwaysTrue)
-    r.state = Logic3::Truth;
-  else if (condition == csCondAlwaysFalse)
-    r.state = Logic3::Lie;
+  bool isLeaf = node->condition == Node::csCondUnknown;
+  if (isLeaf)
+  {
+    Variables trueVals;
+    Variables falseVals;
+    Logic3 r = evaluator.CheckConditionResults (condition, 
+      node->values, trueVals, falseVals);
+  
+    switch (r.state)
+    {
+      case Logic3::Truth:
+	newCurrent.branches[0].Push (node);
+	break;
+      case Logic3::Lie:
+	newCurrent.branches[1].Push (node);
+	break;
+      case Logic3::Uncertain:
+	{
+	  csConditionID containerCondition;
+	  int containingBranch;
+	  bool hasContainer = HasContainingCondition (node, condition,
+	    containerCondition, containingBranch);
+  
+	  node->condition = condition;
+	  node->conditionAffectedSVs = affectedSVs;
+	  if (node->parent)
+	  {
+	    MyBitArrayTemp& nodeAffectedSVs = node->conditionAffectedSVs;
+	    MyBitArrayTemp& parentAffectedSVs = node->parent->conditionAffectedSVs;
+	    if (nodeAffectedSVs.GetSize() != parentAffectedSVs.GetSize())
+	    {
+	      size_t newSize = csMax (nodeAffectedSVs.GetSize(),
+		parentAffectedSVs.GetSize());
+	      nodeAffectedSVs.SetSize (newSize);
+	      parentAffectedSVs.SetSize (newSize);
+	    }
+	    nodeAffectedSVs |= parentAffectedSVs;
+	  }
+	  for (int b = 0; b < 2; b++)
+	  {
+	    Node* nn = (Node*)nodeAlloc.Alloc();
+	    new (nn) Node (node, this);
+	    if (hasContainer)
+	    {
+	      /* If this condition is part of a "composite condition"
+	      * (|| or &&) up above in the tree, use the possible values
+	      * from running that containing condition with the possible
+	      * values from the contained condition. That way, in cases
+	      * like 'a' nested in 'a || b', a true 'a' will result in
+	      * a set of possible values of only true for 'b', allowing
+	      * the latter to be possibly folded away later.
+	      */
+	      Variables newTrueVals;
+	      Variables newFalseVals;
+	      if (b == 0)
+	      {
+		evaluator.CheckConditionResults (containerCondition, 
+		  trueVals, newTrueVals, newFalseVals);
+	      }
+	      else
+	      {
+		evaluator.CheckConditionResults (containerCondition, 
+		  falseVals, newTrueVals, newFalseVals);
+	      }
+	      /* Pick the results for the branch of the containing condition
+	      * the contained one appears in. */
+	      if (containingBranch == 0)
+		nn->values = newTrueVals;
+	      else
+		nn->values = newFalseVals;
+	    }
+	    else
+	    {
+	      nn->values = (b == 0) ? trueVals : falseVals;
+	    }
+	    node->branches[b] = nn;
+	    newCurrent.branches[b].Push (nn);
+	  }
+	} 
+	break;
+    }
+  }
   else
   {
-    bool isLeaf = node->condition == Node::csCondUnknown;
+    Logic3 r;
     bool doCheck = true;
-    if (!isLeaf && (node->parent != 0))
+    if (node->parent != 0)
     {
       /* Do a check if a condition result check is worthwhile.
-       * For each node, the SVs which affect the node's and its
-       * parents conditions are recorded; if the intersection of
-       * that set with the set of SVs that affect the current
-       * condition is empty, we don't need to do a check.
-       *
-       * Though, if the node is a leaf, always check since the
-       * "true values" and "false values" are required.
-       */
+	* For each node, the SVs which affect the node's and its
+	* parents conditions are recorded; if the intersection of
+	* that set with the set of SVs that affect the current
+	* condition is empty, we don't need to do a check.
+	*
+	* Though, if the node is a leaf, always check since the
+	* "true values" and "false values" are required.
+	*/
       MyBitArrayTemp& nodeAffectedSVs = node->parent->conditionAffectedSVs;
       if (affectedSVs.GetSize() != nodeAffectedSVs.GetSize())
       {
-        size_t newSize = csMax (affectedSVs.GetSize(),
-          nodeAffectedSVs.GetSize());
-        affectedSVs.SetSize (newSize);
-        nodeAffectedSVs.SetSize (newSize);
+	size_t newSize = csMax (affectedSVs.GetSize(),
+	  nodeAffectedSVs.GetSize());
+	affectedSVs.SetSize (newSize);
+	nodeAffectedSVs.SetSize (newSize);
       }
       doCheck = !(affectedSVs & nodeAffectedSVs).AllBitsFalse();
     }
-    new (_trueVals) Variables;
-    new (_falseVals) Variables;
-    valsInit = true;
     if (doCheck)
     {
-      if (isLeaf)
-        r = evaluator.CheckConditionResults (condition, 
-          node->values, trueVals, falseVals);
-      else
-        r = evaluator.CheckConditionResults (condition, 
-          node->values);
+      r = evaluator.CheckConditionResults (condition, 
+	node->values);
     }
-  }
-
-  switch (r.state)
-  {
-    case Logic3::Truth:
-      newCurrent.branches[0].Push (node);
-      break;
-    case Logic3::Lie:
-      newCurrent.branches[1].Push (node);
-      break;
-    case Logic3::Uncertain:
-      if (node->condition == Node::csCondUnknown)
-      {
-        csConditionID containerCondition;
-        int containingBranch;
-        bool hasContainer = HasContainingCondition (node, condition,
-          containerCondition, containingBranch);
-
-        node->condition = condition;
-        node->conditionAffectedSVs = affectedSVs;
-        if (node->parent)
-        {
-          MyBitArrayTemp& nodeAffectedSVs = node->conditionAffectedSVs;
-          MyBitArrayTemp& parentAffectedSVs = node->parent->conditionAffectedSVs;
-          if (nodeAffectedSVs.GetSize() != parentAffectedSVs.GetSize())
-          {
-            size_t newSize = csMax (nodeAffectedSVs.GetSize(),
-              parentAffectedSVs.GetSize());
-            nodeAffectedSVs.SetSize (newSize);
-            parentAffectedSVs.SetSize (newSize);
-          }
-          nodeAffectedSVs |= parentAffectedSVs;
-        }
-        for (int b = 0; b < 2; b++)
-        {
-          Node* nn = (Node*)nodeAlloc.Alloc();
-          new (nn) Node (node, this);
-          CS_ASSERT(valsInit);
-          if (hasContainer)
-          {
-            /* If this condition is part of a "composite condition"
-             * (|| or &&) up above in the tree, use the possible values
-             * from running that containing condition with the possible
-             * values from the contained condition. That way, in cases
-             * like 'a' nested in 'a || b', a true 'a' will result in
-             * a set of possible values of only true for 'b', allowing
-             * the latter to be possibly folded away later.
-             */
-            Variables newTrueVals;
-            Variables newFalseVals;
-            if (b == 0)
-            {
-              evaluator.CheckConditionResults (containerCondition, 
-                trueVals, newTrueVals, newFalseVals);
-            }
-            else
-            {
-              evaluator.CheckConditionResults (containerCondition, 
-                falseVals, newTrueVals, newFalseVals);
-            }
-            /* Pick the results for the branch of the containing condition
-             * the contained one appears in. */
-            if (containingBranch == 0)
-              nn->values = newTrueVals;
-            else
-              nn->values = newFalseVals;
-          }
-          else
-          {
-            nn->values = (b == 0) ? trueVals : falseVals;
-          }
-          node->branches[b] = nn;
-          newCurrent.branches[b].Push (nn);
-        }
-      } 
-      else
-      {
-        RecursiveAdd (condition, node->branches[0], newCurrent, affectedSVs);
-        RecursiveAdd (condition, node->branches[1], newCurrent, affectedSVs);
-      }
-      break;
-  }
   
-  if (valsInit)
-  {
-    trueVals.~Variables();
-    falseVals.~Variables();
+    switch (r.state)
+    {
+      case Logic3::Truth:
+	newCurrent.branches[0].Push (node);
+	break;
+      case Logic3::Lie:
+	newCurrent.branches[1].Push (node);
+	break;
+      case Logic3::Uncertain:
+	RecursiveAdd (condition, node->branches[0], newCurrent, affectedSVs);
+	RecursiveAdd (condition, node->branches[1], newCurrent, affectedSVs);
+	break;
+    }
   }
 }
 
 Logic3 ConditionTree::Descend (csConditionID condition)
 {
-  const NodeStackEntry& current = 
-    *(nodeStack[nodeStack.GetSize()-1]);
-
+  bool conditionReserved = (condition == csCondAlwaysTrue)
+    || (condition == csCondAlwaysFalse);
+  
+  const NodeStackEntry& current = *(nodeStack[nodeStack.GetSize()-1]);
   NodeStackEntry* newCurrent = nodeStackEntryAlloc.Alloc();
-
-  MyBitArrayTemp affectedSVs;
-  evaluator.GetUsedSVs (condition, affectedSVs);
+  
   const NodeArray& currentNodes = current.branches[currentBranch];
-  for (size_t i = 0; i < currentNodes.GetSize(); i++)
+  if (conditionReserved)
   {
-    RecursiveAdd (condition, currentNodes[i], *newCurrent, affectedSVs);
+    switch (condition)
+    {
+      case csCondAlwaysTrue:
+	for (size_t i = 0; i < currentNodes.GetSize(); i++)
+	  newCurrent->branches[0].Push (currentNodes[i]);
+	break;
+      case csCondAlwaysFalse:
+	for (size_t i = 0; i < currentNodes.GetSize(); i++)
+	  newCurrent->branches[1].Push (currentNodes[i]);
+	break;
+    }
   }
-
+  else
+  {
+    MyBitArrayTemp affectedSVs;
+    evaluator.GetUsedSVs (condition, affectedSVs);
+    for (size_t i = 0; i < currentNodes.GetSize(); i++)
+    {
+      RecursiveAdd (condition, currentNodes[i], *newCurrent, affectedSVs);
+    }
+  }
+    
   nodeStack.Push (newCurrent);
   branchStack.Push (currentBranch);
   currentBranch = 0;

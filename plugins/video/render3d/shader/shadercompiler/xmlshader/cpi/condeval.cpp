@@ -1649,6 +1649,35 @@ struct ValueSetBoolWrapper
   operator Logic3 () const;
 };
 
+class ValueSetBoolAlloc
+{
+  // Abuse the fact ValueSetBool doesn't need to be destructed
+  csArray<uint8*, csArrayElementHandler<uint8*>, TempHeapAlloc> blocks;
+  uint8* block;
+  size_t blockRemaining;
+public:
+  ValueSetBoolAlloc() : blockRemaining (0) {}
+  ~ValueSetBoolAlloc()
+  {
+    for (size_t i = 0; i < blocks.GetSize(); i++)
+      SliceAllocatorBool::Free (blocks[i]);
+  }
+  
+  ValueSetBool* Alloc()
+  {
+    if (blockRemaining == 0)
+    {
+      blockRemaining = SliceAllocatorBool::sliceSize;
+      block = SliceAllocatorBool::Alloc (blockRemaining);
+      blocks.Push (block);
+    }
+    void* r = block;
+    block += sizeof (ValueSetBool);
+    blockRemaining -= sizeof (ValueSetBool);
+    return new (r) ValueSetBool;
+  }
+};
+
 struct EvaluatorShadervarValuesSimple
 {
   typedef Logic3 EvalResult;
@@ -1667,13 +1696,7 @@ struct EvaluatorShadervarValuesSimple
 
   EvaluatorShadervarValuesSimple (csConditionEvaluator& evaluator, 
     const Variables& vars) : evaluator (evaluator), vars (vars), 
-    createdValues (SliceAllocator::valueSetsPerSlice),
-    blockRemaining (0) {}
-  ~EvaluatorShadervarValuesSimple()
-  {
-    for (size_t i = 0; i < blocks.GetSize(); i++)
-      SliceAllocatorBool::Free (blocks[i]);
-  }
+    createdValues (SliceAllocator::valueSetsPerSlice) {}
 
   BoolType Boolean (const CondOperand& operand);
   IntType Int (const CondOperand& operand)
@@ -1684,23 +1707,7 @@ struct EvaluatorShadervarValuesSimple
   EvalResult LogicOr (const CondOperand& a, const CondOperand& b);
 
   csBlockAllocator<ValueSet, SliceAllocator> createdValues;
-  // Abuse the fact ValueSetBool doesn't need to be destructed
-  csArray<uint8*, csArrayElementHandler<uint8*>, TempHeapAlloc> blocks;
-  uint8* block;
-  size_t blockRemaining;
-  
-  void* AllocValueSetBool()
-  {
-    if (blockRemaining == 0)
-    {
-      blockRemaining = SliceAllocatorBool::sliceSize;
-      block = SliceAllocatorBool::Alloc (blockRemaining);
-    }
-    void* r = block;
-    block += sizeof (ValueSetBool);
-    blockRemaining -= sizeof (ValueSetBool);
-    return r;
-  }
+  ValueSetBoolAlloc createdBoolValues;
 protected:
   ValueSet& CreateValue ()
   {
@@ -1709,7 +1716,7 @@ protected:
   }
   ValueSetBool& CreateValueBool ()
   {
-    ValueSetBool* vs = new (AllocValueSetBool()) ValueSetBool;
+    ValueSetBool* vs = createdBoolValues.Alloc();
     return *vs;
   }
   ValueSet& CreateValue (float f)
@@ -2124,7 +2131,7 @@ struct EvaluatorShadervarValues
   EvalResult LogicOr (const CondOperand& a, const CondOperand& b);
 
   csBlockAllocator<ValueSet/*, BlockAllocatorSlicePolicy*/> createdValues;
-  csBlockAllocator<ValueSetBool/*, BlockAllocatorSlicePolicy*/> createdBoolValues;
+  ValueSetBoolAlloc createdBoolValues;
 protected:
   ValueSet& CreateValue ()
   {
