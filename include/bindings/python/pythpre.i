@@ -628,3 +628,16 @@ def __iter__(self):
 
 %enddef
 
+#undef LANG_POST
+%define LANG_POST(T)
+  %extend T
+  {
+    %pythoncode %{
+      def __eq__(self,other):
+          if hasattr(other,"this"):
+              return self.this == other.this
+          return False
+    %}
+  }
+%enddef
+

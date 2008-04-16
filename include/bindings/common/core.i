@@ -359,6 +359,7 @@ CS_WRAP_PTR_IMPLEMENT(csWrapPtr)
 #define DEPRECATED_METHOD(classname,method,replacement)
 #define TYPEMAP_STRING(Type)
 #define TYPEMAP_STRING_PTR(Type,Type2)
+#define LANG_POST(T)
 
 #if defined(SWIGPYTHON)
   %include "bindings/python/pythpre.i"
@@ -380,6 +381,7 @@ CS_WRAP_PTR_IMPLEMENT(csWrapPtr)
     static int scfGetVersion() { return scfInterfaceTraits<T>::GetVersion(); }
     virtual ~T() { if (self) self->DecRef (); }
   }
+  LANG_POST(T)
 %enddef
 
 %define INLINE_FUNCTIONS
