@@ -207,8 +207,8 @@ rule MergeLFlags
 ##    instance, given the seven-element input array [-foo, -bar, cow, -smurf,
 ##    -flub, glub, blug], returns the four-element array [-foo, -bar cow,
 ##    -smurf, -flub glub blug].  Multiple-argument switches are identified by a
-##    token with leading "-" or "/" prefix, followed by one or more
-##    non-prefixed tokens.
+##    token with "-" or "/" prefix, followed by one or more non-prefixed
+##    tokens.
 rule InferFlagTuples
 {
   local tuples ;
