@@ -70,9 +70,9 @@ rule LFlags
   CheckOptions nostatic : $(3) : $(<) ;
 
   NotFile $(>) ;
-  NEEDLIBS on $($(<)_TARGET) = [ Reverse [ RemoveDups [ Reverse 
-    [ on $($(<)_TARGET) GetVar NEEDLIBS ] $(>) ] ] ] ;
-  $(<).LFLAGS = [ Reverse [ RemoveDups [ Reverse $($(<).LFLAGS) $(>) ] ] ] ;
+  NEEDLIBS on $($(<)_TARGET) =
+    [ RemoveDupFlags [ on $($(<)_TARGET) GetVar NEEDLIBS ] $(>) ] ;
+  $(<).LFLAGS = [ RemoveDupFlags $($(<).LFLAGS) $(>) ] ;
 
   UnitTestLFlags $(<) : $(>) : $(3) ;
 }
@@ -192,6 +192,18 @@ rule MergeLFlags
   return [ MergeRemovingDups $(1) : $(2) ] ;
 }
 
+##  RemoveDupFlags switches
+##    Remove duplicates from an array of build switches. Unlike the generic
+##    RemoveDups rule which removes all but the first duplicated item,
+##    RemoveDupFlags removes all but the last duplicated item. This makes it
+##    convenient for folding duplicates out of an array of linker switches,
+##    which typically are order-sensitive, and in which the final instance of a
+##    duplicated switch has highest precedence.
+rule RemoveDupFlags
+{
+  return [ Reverse [ RemoveDups [ Reverse $(1) ] ] ] ;
+}
+
 #----------------------------------------------------------------------------
 # private part
 
@@ -209,8 +221,5 @@ rule ResolveLibs
   {
       libs += $(i) $($(i)_depends) ;
   }
-  # We must eliminate the duplicates in reverse order in order to ensure that
-  # we do not destroy the overall library ordering since Unix linkers are
-  # order-sensitive.
-  return [ Reverse [ RemoveDups [ Reverse $(libs) ] ] ] ;
+  return [ RemoveDupFlags $(libs) ] ;
 }

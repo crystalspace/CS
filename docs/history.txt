@@ -13,6 +13,15 @@ chronological order.
 	  helper.jam as the new rule MergeRemovingDups.  (The old MergeLFlags
 	  name is still recognized for backward compatibility but heavily
 	  deprecated.)
+	- Eric Sunshine added a RemoveDupFlags rule to flags.jam which removes
+	  duplicates from a list of build switches. Unlike the generic
+	  RemoveDups (helper.jam), RemoveDupFlags removes all but the _last_
+	  duplicated item. This makes it suitable for folding out duplicates
+	  from a list of linker switches which typically are order-sensitive,
+	  and in which the final instance of a duplicated switch has highest
+	  precedence.  (This new rule also helps to document clients which
+	  previously performed the same somewhat convoluted functionality
+	  manually and without explanation.)
 14-Apr-2008
 	- Eric Sunshine fixed CS_CHECK_BINUTILS_2_17() in checkbinutils.m4 to
 	  be compatible with Mac OS X linkers which are not GNU-compatible.

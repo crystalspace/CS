@@ -264,8 +264,8 @@ rule LinkStaticPlugins
       lflags += [ Filter $($(p).LFLAGS) : $(LINKLIBS) $(PLUGIN.LFLAGS) ] ;
       libs += $($(p).NEEDLIBS) ;
     }
-    target_link_with = [ Reverse [ RemoveDups [ Reverse $(libs) ] ] ] ;
-    target_lflags = [ Reverse [ RemoveDups [ Reverse $(lflags) ] ] ] ;
+    target_link_with = [ RemoveDupFlags $(libs) ] ;
+    target_lflags = [ RemoveDups $(lflags) ] ;
   }
   
   # construct initialization sourcefile
