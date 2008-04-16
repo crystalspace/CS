@@ -3,6 +3,8 @@
 16-Apr-2008
 	- Vincent merged r29296:29301 into 1.2 (fix broken folding of
 	  multi-token build switches (such as "-framework Foundation")).
+	- Vincent merged r29302 into 1.2 (fix missing dependency in
+	  cs-config/Jamfile).
 15-Apr-2008
 	- Vincent merged r29292:29293 into 1.2 (fix binutils check for
 	  Mac OS X Leopard).
