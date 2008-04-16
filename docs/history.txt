@@ -9,6 +9,10 @@ chronological order.
 15-Apr-2008
 	- Eric Sunshine clarified and enhanced documentation of RemoveDups rule
 	  in helper.jam.
+	- Eric Sunshine generalized MergeLFlags from flags.jam and moved it to
+	  helper.jam as the new rule MergeRemovingDups.  (The old MergeLFlags
+	  name is still recognized for backward compatibility but heavily
+	  deprecated.)
 14-Apr-2008
 	- Eric Sunshine fixed CS_CHECK_BINUTILS_2_17() in checkbinutils.m4 to
 	  be compatible with Mac OS X linkers which are not GNU-compatible.
