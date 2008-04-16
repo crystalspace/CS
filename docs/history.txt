@@ -6,6 +6,35 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+16-Apr-2008
+	- Eric Sunshine clarified and enhanced documentation of RemoveDups rule
+	  in helper.jam.
+	- Eric Sunshine generalized MergeLFlags from flags.jam and moved it to
+	  helper.jam as the new rule MergeRemovingDups.  (The old MergeLFlags
+	  name is still recognized for backward compatibility but heavily
+	  deprecated.)
+	- Eric Sunshine added a RemoveDupFlags rule to flags.jam which removes
+	  duplicates from a list of build switches. Unlike the generic
+	  RemoveDups (helper.jam), RemoveDupFlags removes all but the _last_
+	  duplicated item. This makes it suitable for folding out duplicates
+	  from a list of linker switches which typically are order-sensitive,
+	  and in which the final instance of a duplicated switch has highest
+	  precedence.  (This new rule also helps to document clients which
+	  previously performed the same somewhat convoluted functionality
+	  manually and without explanation.)
+	- Eric Sunshine added new rule InferFlagTuples to flags.jam which,
+	  given a list of build switches, infers which switches consist of
+	  multiple arguments, and returns a list in the same order but with
+	  multiple-argument switches converted to atomic array elements.  For
+	  instance, given the list [-framework, AppKit, -foo, -z, defs, -bar],
+	  it will correctly infer that "-framework" and "AppKit", and "-z" and
+	  "defs" should be combined, respectively, and return the corresponding
+	  list [-framework AppKit, -foo, -z defs, -bar]. Such multiple-argument
+	  switches can arise when linking against external libraries. For
+	  instance, 'wx-config --libs' on Mac OS X returns a list containing
+	  several "-framework Foo" switches. Also augmented CFlags and LFlags
+	  rules in flags.jam to normalize the incoming flags by passing them
+	  through InferFlagTuples. This resolves issue #270.
 14-Apr-2008
 	- Eric Sunshine fixed CS_CHECK_BINUTILS_2_17() in checkbinutils.m4 to
 	  be compatible with Mac OS X linkers which are not GNU-compatible.

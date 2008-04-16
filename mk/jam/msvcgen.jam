@@ -965,7 +965,7 @@ rule LinkStaticPlugins
     for mode in debug release
     {
       MsvcLFlags $(target) : 
-	[ Reverse [ RemoveDups [ Reverse $(lflags.$(mode)) ] ] ] : $(mode) ;
+	[ RemoveDupFlags $(lflags.$(mode)) ] : $(mode) ;
     }
   }
   else

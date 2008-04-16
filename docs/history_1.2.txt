@@ -1,6 +1,9 @@
 1.2 branch log.
 
-15-Apr-2008:
+16-Apr-2008
+	- Vincent merged r29296:29301 into 1.2 (fix broken folding of
+	  multi-token build switches (such as "-framework Foundation")).
+15-Apr-2008
 	- Vincent merged r29292:29293 into 1.2 (fix binutils check for
 	  Mac OS X Leopard).
 8-Apr-2008
