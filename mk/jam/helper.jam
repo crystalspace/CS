@@ -478,8 +478,9 @@ rule Filter
 }
 
 ##  RemoveDups list
-##    Removes duplicates in the list (this function tries to preserve the list
-##    order)
+##    Removes duplicate items from the list, discarding all but the first.
+##    Unlike the Jam built-in Sort rule, which removes duplicates as a
+##    side-effect, RemoveDups preserves item order.
 rule RemoveDups
 {
   local i result ;
