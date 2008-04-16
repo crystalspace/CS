@@ -22,6 +22,19 @@ chronological order.
 	  precedence.  (This new rule also helps to document clients which
 	  previously performed the same somewhat convoluted functionality
 	  manually and without explanation.)
+	- Eric Sunshine added new rule InferFlagTuples to flags.jam which,
+	  given a list of build switches, infers which switches consist of
+	  multiple arguments, and returns a list in the same order but with
+	  multiple-argument switches converted to atomic array elements.  For
+	  instance, given the list [-framework, AppKit, -foo, -z, defs, -bar],
+	  it will correctly infer that "-framework" and "AppKit", and "-z" and
+	  "defs" should be combined, respectively, and return the corresponding
+	  list [-framework AppKit, -foo, -z defs, -bar]. Such multiple-argument
+	  switches can arise when linking against external libraries. For
+	  instance, 'wx-config --libs' on Mac OS X returns a list containing
+	  several "-framework Foo" switches. Also augmented CFlags and LFlags
+	  rules in flags.jam to normalize the incoming flags by passing them
+	  through InferFlagTuples. This resolves issue #270.
 14-Apr-2008
 	- Eric Sunshine fixed CS_CHECK_BINUTILS_2_17() in checkbinutils.m4 to
 	  be compatible with Mac OS X linkers which are not GNU-compatible.
