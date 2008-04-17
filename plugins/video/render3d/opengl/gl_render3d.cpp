@@ -1686,6 +1686,8 @@ GLvoid csGLGraphics3D::myDrawRangeElements (GLenum mode, GLuint /*start*/,
 
 void csGLGraphics3D::SetWorldToCamera (const csReversibleTransform& w2c)
 {
+  GLRENDER3D_OUTPUT_LOCATION_MARKER;
+
   world2camera = w2c;
   float m[16];
 

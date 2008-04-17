@@ -395,7 +395,7 @@ void csGLRender2TextureEXTfbo::SetupProjection (
 {
   GLRENDER3D_OUTPUT_LOCATION_MARKER;
   CS::Math::Matrix4 flipY (
-			   1, 0, 0, 0,
+      1, 0, 0, 0,
       0, -1, 0, 0,
       0, 0, 1, 0,
       0, 0, 0, 1);
