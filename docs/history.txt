@@ -97,11 +97,11 @@ chronological order.
 	  window contents on compiz (and possibly other WMs).
 9-Apr-2008
 	- res made the following changes:
-	  - Made string markers in gl3d have practically no cost if not
-	    used (the common case).
-	  - Added support for multiple index ranges in one render mesh
-	    (this reduces the DrawMesh() overhead when a lot of ranges have
-	    to be rendered with the other mesh options are the same).
+	    - Made string markers in gl3d have practically no cost if not
+	      used (the common case).
+	    - Added support for multiple index ranges in one render mesh
+	      (this reduces the DrawMesh() overhead when a lot of ranges have
+	      to be rendered with the other mesh options are the same).
 8-Apr-2008
 	- res added some initial support for normalized render buffers.
 	- res fixed a crash in binary render buffers.
@@ -284,25 +284,25 @@ chronological order.
 	  3ds max genmesh sprite exporter; both from Luca Pancallo.
 24-Mar-2008
 	- Mike Gist made several improvements to the 3ds max level exporter:
-	  - Did a bit of cleaning; removed thing support from exportCS.mcr,
-	    exportcsp.mcr still has it if you need it.
-	  - Fixed a bug in the materialnotdefined checks, the comparison was
-	    wrong so they were failing.
-	  - Added RENDERLOOP_TYPE user defined option, so you can specify the
-	    renderloop you want on a per-sector basis. Current options are 
-	    "diffuse" and "terrainfixed" (nothing is valid too of course).
-	    The collision plugin selection now takes this into consideration
-	    too, so sectors within the same map don't end up with the wrong
-	    collision type.
-	  - Changed shader and renderloop selection to be calculated
-	    automatically. Removed "Export as Terrain Level" checkbox, as this
-	    is no longer needed as a result.
-	  - Added support for the parallaxAtt shader. To use it, just attach
-	    normal bump and displacement textures to the material in 3dsmax,
-	    and use the "diffuse" renderloop type on the sectors to use them.
-	    This also supports a spec map. To use one, attach it to the
-	    'glossiness' map attribute of the material.
-	  - Tidied up the output formatting a bit, it's nicer on the eye now.
+	    - Did a bit of cleaning; removed thing support from exportCS.mcr,
+	      exportcsp.mcr still has it if you need it.
+	    - Fixed a bug in the materialnotdefined checks, the comparison was
+	      wrong so they were failing.
+	    - Added RENDERLOOP_TYPE user defined option, so you can specify the
+	      renderloop you want on a per-sector basis. Current options are 
+	      "diffuse" and "terrainfixed" (nothing is valid too of course).
+	      The collision plugin selection now takes this into consideration
+	      too, so sectors within the same map don't end up with the wrong
+	      collision type.
+	    - Changed shader and renderloop selection to be calculated
+	      automatically. Removed "Export as Terrain Level" checkbox, as this
+	      is no longer needed as a result.
+	    - Added support for the parallaxAtt shader. To use it, just attach
+	      normal bump and displacement textures to the material in 3dsmax,
+	      and use the "diffuse" renderloop type on the sectors to use them.
+	      This also supports a spec map. To use one, attach it to the
+	      'glossiness' map attribute of the material.
+	    - Tidied up the output formatting a bit, it's nicer on the eye now.
 	- Mike Gist added support for spec maps to the parallax shaders.
 23-Mar-2008
 	- res fixed an uninitialized var in gmeshanimpdl.
