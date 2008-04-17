@@ -215,7 +215,7 @@ rule InferFlagTuples
   local flag ;
   for flag in $(1)
   {
-    if [ Match ^([-/][A-Za-z0-9]) : $(flag) ]
+    if [ Match ^([-/`][A-Za-z0-9]) : $(flag) ]
     {
       if $(accum)
       {
