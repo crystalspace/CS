@@ -32,8 +32,7 @@ struct iPortalContainer;
 namespace CS
 {
 namespace RenderManager
-{   
-
+{
   /**
    * RenderTree is the main data-structure for the rendermanagers.
    * It contains the entire setup of meshes and where to render those meshes,
@@ -191,7 +190,7 @@ namespace RenderManager
       size_t totalRenderMeshes;
       
       ContextNode(TreeType& owner) 
-        : owner (owner), totalRenderMeshes (0) 
+        : owner (owner), drawFlags (0), totalRenderMeshes (0) 
       {}
       
       /**
@@ -361,7 +360,67 @@ namespace RenderManager
       meshNode->owner.meshNodes.Delete (meshNode->key);
       persistentData.meshNodeAllocator.Free (meshNode);
     }
-
+    
+    
+    
+    void AddDebugTexture (iTextureHandle* tex, float aspect = 1.0f)
+    {
+      DebugTexture dt;
+      dt.texh = tex;
+      dt.aspect = aspect;
+      debugTextures.Push (dt);
+    }
+    void RenderDebugTextures (iGraphics3D* g3d)
+    {
+      if (debugTextures.GetSize() == 0) return;
+    
+      g3d->BeginDraw (CSDRAW_2DGRAPHICS);
+      int scrWidth = g3d->GetWidth();
+      int scrHeight = g3d->GetHeight();
+      
+      int desired_height = scrHeight / 6;
+      int total_width = (int)ceilf (debugTextures[0].aspect * desired_height);
+      
+      for (size_t i = 1; i < debugTextures.GetSize(); i++)
+      {
+        total_width += (int)ceilf (debugTextures[i].aspect * desired_height) + 16;
+      }
+      float scale = 1.0f;
+      if (total_width > scrWidth)
+        scale = (float)scrWidth/(float)total_width;
+      
+      float left = 0;
+      const float top = scrHeight - desired_height * scale;
+      const float bottom = scrHeight;
+      
+      csVector3 coords[4];
+      csVector2 tcs[4];
+      tcs[0].Set (0, 0);
+      tcs[1].Set (1, 0);
+      tcs[2].Set (1, 1);
+      tcs[3].Set (0, 1);
+      
+      csSimpleRenderMesh mesh;
+      mesh.alphaType.alphaType = csAlphaMode::alphaNone;
+      mesh.meshtype = CS_MESHTYPE_QUADS;
+      mesh.vertexCount = 4;
+      mesh.vertices = coords;
+      mesh.texcoords = tcs;
+      for (size_t i = 0; i < debugTextures.GetSize(); i++)
+      {
+        const float right = left + debugTextures[i].aspect * desired_height * scale;
+        coords[0].Set (left, top, 0);
+        coords[1].Set (right, top, 0);
+        coords[2].Set (right, bottom, 0);
+        coords[3].Set (left, bottom, 0);
+        
+        mesh.texture = debugTextures[i].texh;
+        g3d->DrawSimpleMesh (mesh, csSimpleMeshScreenspace);
+        
+        left = right + 16;
+      }
+      g3d->FinishDraw ();
+    }
 
 
     PersistentData& GetPersistentData()
@@ -376,6 +435,13 @@ namespace RenderManager
   protected:    
     PersistentData&         persistentData;
     ContextNodeArrayType    contexts; 
+    
+    struct DebugTexture
+    {
+      csRef<iTextureHandle> texh;
+      float aspect;
+    };
+    csArray<DebugTexture> debugTextures;
   };
 
 }

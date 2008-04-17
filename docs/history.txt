@@ -9,6 +9,8 @@ chronological order.
 17-Apr-2008
 	- res made a tweak to the parallax snippet, reducing shader
 	  variations.
+	- res added some simple "debug texture rendering" to the RM
+	  render tree.
 16-Apr-2008
 	- res made some more small optimizations to xmlshader.
 14-Apr-2008
