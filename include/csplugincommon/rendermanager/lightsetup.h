@@ -212,21 +212,27 @@ namespace RenderManager
   class ShadowNone
   {
   public:
-    struct CachedLightData{ };
+    struct CachedLightData {};
     struct PersistentData
     {
       void UpdateNewFrame () {}
-      void Initialize (iShaderManager* shaderManager) {}
+      void Initialize (iShaderManager*, iGraphics3D*) {}
     };
     struct ShadowParameters {};
 
     ShadowNone (PersistentData& persist,
-      const LayerConfigType& layerConfig, RenderTree&,
+      const LayerConfigType& layerConfig,
+      typename RenderTree::MeshNode* node, 
       ShadowParameters&) { }
 
-    void HandleOneLight (iLight* light, CachedLightData& lightData,
-                         csShaderVariableStack& lightStack)
+    void HandleOneLight (typename RenderTree::MeshNode::SingleMesh& singleMesh,
+                         iLight* light, CachedLightData& lightData,
+                         csShaderVariableStack& lightStack,
+                         uint lightNum)
     {}
+    
+    static bool NeedFinalHandleLight() { return false; }
+    void FinalHandleLight (iLight*, CachedLightData&) { }
   };
 
   /**
@@ -448,7 +454,7 @@ namespace RenderManager
 
     LightSetup (PersistentData& persist, iLightManager* lightmgr,
       SVArrayHolder& svArrays, const LayerConfigType& layerConfig,
-      ShadowParamType& shadowParam = ShadowParamType ())
+      ShadowParamType& shadowParam)
       : persist (persist), lightmgr (lightmgr), svArrays (svArrays),
         allMaxLights (0), newLayers (layerConfig), shadowParam (shadowParam)
     {
