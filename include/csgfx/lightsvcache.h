@@ -61,9 +61,9 @@ public:
      * \deprecated Deprecated in 1.3.
      */
     lightTransformCamera,
-    /// Transform (world space)
+    /// Transform (from light to world space)
     lightTransformWorld,
-    /// Inverse transform (world space)
+    /// Inverse transform (from world to light space)
     lightTransformWorldInverse,
     /// Attenuation vector
     lightAttenuation,
