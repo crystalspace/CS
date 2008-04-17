@@ -23,6 +23,9 @@ chronological order.
 	  - Fixed csHashReversible to correctly delete from the reversible hash
 	    as well as the normal hash, so it doesn't leak references.
 	  - Fixed a few other reference leaks.
+	- caedes fixed a memory leak on openal sound renderer listener
+	  creation, and also protected its Update method from using the
+	  listener before it is created.
 16-Apr-2008
 	- Eric Sunshine clarified and enhanced documentation of RemoveDups rule
 	  in helper.jam.
