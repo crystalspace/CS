@@ -77,15 +77,15 @@
 	
 	<block location="cg:fragmentMain">
 	  float2 offset = float2 (0, 0);
-	  float2 usedTC;
-	  <?if vars."tex height scale" 
-	    && ((vars."tex height scale".x != 1) 
-	      || (vars."tex height scale".y != 1)) ?>
-	    usedTC = vertexToFragment.tcParallax;
-	  <?else?>
-	    usedTC = texCoord;
-	  <?endif?>
 	  <?if vars."tex height".texture ?>
+	    float2 usedTC;
+	    <?if vars."tex height scale" 
+		&& ((vars."tex height scale".x != 1) 
+		|| (vars."tex height scale".y != 1)) ?>
+	    usedTC = vertexToFragment.tcParallax;
+	    <?else?>
+	    usedTC = texCoord;
+	    <?endif?>
 	    offset = ComputeParallaxOffset (texHeight, usedTC, 
 	      normalize (eyeVec), 0.04);
 	  <?endif?>
