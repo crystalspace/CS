@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
-<!-- rm_unshadowed.csplugin -->
+<!-- rm_shadow_pssm.csplugin -->
 <plugin>
   <scf>
     <classes>
       <class>
-        <name>crystalspace.rendermanager.unshadowed</name>
-        <implementation>RMUnshadowed</implementation>
-        <description>Rendermanager (unshadowed)</description>
+        <name>crystalspace.rendermanager.shadow_pssm</name>
+        <implementation>RMShadowedPSSM</implementation>
+        <description>Rendermanager (PSSM shadows)</description>
         <requires>
           <class>crystalspace.engine.</class>
           <class>crystalspace.graphics3d.</class>         

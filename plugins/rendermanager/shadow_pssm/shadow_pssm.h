@@ -24,19 +24,19 @@
 #include "iutil/comp.h"
 #include "iengine/rendermanager.h"
 
-CS_PLUGIN_NAMESPACE_BEGIN(RMUnshadowed)
+CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
 {
   template<typename RenderTreeType, typename LayerConfigType>
   class StandardContextSetup;
 
-  class RMUnshadowed : public scfImplementation4<RMUnshadowed, 
+  class RMShadowedPSSM : public scfImplementation4<RMShadowedPSSM, 
                                                  iRenderManager, 
                                                  iRenderManagerTargets,
                                                  iRenderManagerPostEffects,
                                                  iComponent>
   {
   public:
-    RMUnshadowed (iBase* parent);
+    RMShadowedPSSM (iBase* parent);
 
     //---- iRenderManager ----
     virtual bool RenderView (iView* view);
@@ -82,7 +82,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMUnshadowed)
     typedef CS::RenderManager::StandardPortalSetup<RenderTreeType, 
       ContextSetupType> PortalSetupType;
 
-    typedef CS::RenderManager::DependentTargetManager<RenderTreeType, RMUnshadowed>
+    typedef CS::RenderManager::DependentTargetManager<RenderTreeType, RMShadowedPSSM>
       TargetManagerType;
 
     typedef CS::RenderManager::LightSetup<RenderTreeType, 
@@ -114,11 +114,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMUnshadowed)
   };  
 
 }
-CS_PLUGIN_NAMESPACE_END(RMUnshadowed)
+CS_PLUGIN_NAMESPACE_END(RMShadowedPSSM)
 
 template<>
-class csHashComputer<CS_PLUGIN_NAMESPACE_NAME(RMUnshadowed)::RMUnshadowed::RenderTreeType::ContextNode*> : 
-  public csHashComputerIntegral<CS_PLUGIN_NAMESPACE_NAME(RMUnshadowed)::RMUnshadowed::RenderTreeType::ContextNode*> 
+class csHashComputer<CS_PLUGIN_NAMESPACE_NAME(RMShadowedPSSM)::RMShadowedPSSM::RenderTreeType::ContextNode*> : 
+  public csHashComputerIntegral<CS_PLUGIN_NAMESPACE_NAME(RMShadowedPSSM)::RMShadowedPSSM::RenderTreeType::ContextNode*> 
 {};
 
 #endif // __CS_RM_UNSHADOWED_H__

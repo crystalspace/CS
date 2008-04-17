@@ -32,16 +32,16 @@
 #include "csplugincommon/rendermanager/svsetup.h"
 #include "csplugincommon/rendermanager/viscull.h"
 
-#include "unshadowed.h"
+#include "shadow_pssm.h"
 
 CS_IMPLEMENT_PLUGIN
 
 using namespace CS::RenderManager;
 
-CS_PLUGIN_NAMESPACE_BEGIN(RMUnshadowed)
+CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
 {
 
-SCF_IMPLEMENT_FACTORY(RMUnshadowed)
+SCF_IMPLEMENT_FACTORY(RMShadowedPSSM)
 
 
 template<typename RenderTreeType, typename LayerConfigType>
@@ -51,7 +51,7 @@ public:
   typedef StandardContextSetup<RenderTreeType, LayerConfigType> ThisType;
   typedef StandardPortalSetup<RenderTreeType, ThisType> PortalSetupType;
 
-  StandardContextSetup (RMUnshadowed* rmanager, const LayerConfigType& layerConfig)
+  StandardContextSetup (RMShadowedPSSM* rmanager, const LayerConfigType& layerConfig)
     : rmanager (rmanager), layerConfig (layerConfig),
     recurseCount (0)
   {
@@ -114,7 +114,7 @@ public:
 
     SetupStandardShader (context, shaderManager, layerConfig);
 
-    RMUnshadowed::LightSetupType lightSetup (
+    RMShadowedPSSM::LightSetupType lightSetup (
       rmanager->lightPersistent, rmanager->lightManager,
       context.svArrays, layerConfig);
 
@@ -127,20 +127,20 @@ public:
 
 
 private:
-  RMUnshadowed* rmanager;
+  RMShadowedPSSM* rmanager;
   const LayerConfigType& layerConfig;
   int recurseCount;
 };
 
 
 
-RMUnshadowed::RMUnshadowed (iBase* parent)
+RMShadowedPSSM::RMShadowedPSSM (iBase* parent)
   : scfImplementationType (this, parent), targets (*this)
 {
 
 }
 
-bool RMUnshadowed::RenderView (iView* view)
+bool RMShadowedPSSM::RenderView (iView* view)
 {
   // Setup a rendering view
   view->UpdateClipper ();
@@ -210,7 +210,7 @@ bool RMUnshadowed::RenderView (iView* view)
 }
 
 
-bool RMUnshadowed::HandleTarget (RenderTreeType& renderTree,
+bool RMShadowedPSSM::HandleTarget (RenderTreeType& renderTree,
                                  const TargetManagerType::TargetSettings& settings)
 {
   // Prepare
@@ -240,7 +240,7 @@ bool RMUnshadowed::HandleTarget (RenderTreeType& renderTree,
 }
 
 
-bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
+bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
 {
   const char messageID[] = "crystalspace.rendermanager.unshadowed";
   
@@ -315,4 +315,4 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
 }
 
 }
-CS_PLUGIN_NAMESPACE_END(RMUnshadowed)
+CS_PLUGIN_NAMESPACE_END(RMShadowedPSSM)
