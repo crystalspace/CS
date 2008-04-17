@@ -11,6 +11,7 @@ chronological order.
 	  variations.
 	- res added some simple "debug texture rendering" to the RM
 	  render tree.
+	- res added support for custom draw flags in RM contexts.
 16-Apr-2008
 	- res made some more small optimizations to xmlshader.
 14-Apr-2008

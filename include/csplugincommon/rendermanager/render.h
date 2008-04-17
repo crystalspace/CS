@@ -239,6 +239,7 @@ namespace RenderManager
 
       int drawFlags = rview->GetEngine ()->GetBeginDrawFlags ();
       drawFlags |= CSDRAW_3DGRAPHICS /*| CSDRAW_CLEARSCREEN*/;
+      drawFlags |= context->drawFlags;
 
       iCamera* cam = rview->GetCamera ();
       iClipper2D* clipper = rview->GetClipper ();

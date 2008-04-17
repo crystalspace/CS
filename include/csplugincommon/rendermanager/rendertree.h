@@ -171,6 +171,7 @@ namespace RenderManager
       };
       TargetTexture renderTargets[rtaNumAttachments];
       csReversibleTransform cameraTransform;
+      int drawFlags;
       iSector* sector;
 
       // A sub-tree of mesh nodes
