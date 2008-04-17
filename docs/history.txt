@@ -38,6 +38,8 @@ chronological order.
 	- Eric Sunshine added some missing "local var" declarations to
 	  RelayLibs rule in flags.jam. Also cleaned up RelayLibs documentation
 	  slightly.
+	- Eric Sunshine eliminated usage of the long-obsolete 'nostatic' option
+	  for invocations of CFLags and LFLags Jam rules.
 16-Apr-2008
 	- Eric Sunshine clarified and enhanced documentation of RemoveDups rule
 	  in helper.jam.

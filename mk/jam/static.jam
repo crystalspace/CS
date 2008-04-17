@@ -338,9 +338,7 @@ rule StaticPluginLibrary
   Library $(name) : $(objects) : noinstall notest independent nohelp ;
   SEARCH on $(name) += $(LOCATE_TARGET) ;
   MsvcDefine $(name) : $(STATICPLUGINS.MSVC_DEFINES) ;
-  CFlags $(name) : 
-    [ FDefines CS_STATIC_LINKED ] 
-    : nostatic ;
+  CFlags $(name) : [ FDefines CS_STATIC_LINKED ] ;
   
   # Copy a variety of flags
   local o ;
