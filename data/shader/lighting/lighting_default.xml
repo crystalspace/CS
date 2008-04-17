@@ -19,6 +19,7 @@
 -->
 <shader compiler="shaderweaver" name="lighting_default" lights="6">
   <technique priority="500">
+    <!-- 1 pass, 6 lights -->
     <pass>
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
         <!-- First pass: blend with copy -->
@@ -45,6 +46,7 @@
   </technique>
   
   <technique priority="400">
+    <!-- 2 passes, 4+2 lights -->
     <pass>
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
         <!-- First pass: blend with copy -->
@@ -77,6 +79,7 @@
   </technique>
   
   <technique priority="300">
+    <!-- 2 passes, 3+3 lights -->
     <pass>
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
       <!-- First pass: blend with copy -->
@@ -109,6 +112,7 @@
   </technique>
   
   <technique priority="200">
+    <!-- 3 passes, 2+2+2 lights -->
     <pass>
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
       <!-- First pass: blend with copy -->
@@ -145,14 +149,15 @@
       
       <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
       
-      <parameter id="lightOffset" type="int">2</parameter>
+      <parameter id="lightOffset" type="int">4</parameter>
       <parameter id="maxLights" type="int">2</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
     </pass>
   </technique>
   
-  <technique priority="200">
+  <technique priority="100">
+    <!-- 6 passes, 1+1+1+1+1+1 lights -->
     <pass>
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
         <!-- First pass: blend with copy -->
