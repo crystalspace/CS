@@ -33,6 +33,8 @@ chronological order.
 	- Vincent applied another patch from Lukas Erlinghagen which fixes a
 	  build error on GCC when using the fully qualified name for
 	  ConstGlobalIterator in csHash.
+	- Eric Sunshine removed some useless (probably obsolete) CheckOptions
+	  invocations from flags.jam.
 16-Apr-2008
 	- Eric Sunshine clarified and enhanced documentation of RemoveDups rule
 	  in helper.jam.
