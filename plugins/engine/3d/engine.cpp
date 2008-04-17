@@ -3216,7 +3216,7 @@ csPtr<iCollectionArray> csEngine::GetCollections()
 {
   csRef<iCollectionArray> colScfArr;
   colScfArr.AttachNew(
-    new scfArray<iCollectionArray, csArray<iCollection*>>(collections.GetAll()));
+    new scfArray<iCollectionArray, csArray<iCollection*> >(collections.GetAll()));
   return csPtr<iCollectionArray>(colScfArr);
 }
 
