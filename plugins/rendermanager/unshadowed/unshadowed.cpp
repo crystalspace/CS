@@ -114,9 +114,10 @@ public:
 
     SetupStandardShader (context, shaderManager, layerConfig);
 
+    RMUnshadowed::LightSetupType::ShadowParamType shadowParam;
     RMUnshadowed::LightSetupType lightSetup (
       rmanager->lightPersistent, rmanager->lightManager,
-      context.svArrays, layerConfig);
+      context.svArrays, layerConfig, shadowParam);
 
     ForEachMeshNode (context, lightSetup);
 
