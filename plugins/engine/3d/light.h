@@ -208,6 +208,10 @@ protected:
   csLightSectorInfluences influences;
 
   csEngine* engine;
+
+protected:
+  void InternalRemove() { SelfDestruct(); }
+
 public:
   /// Set of flags
   csFlags flags;

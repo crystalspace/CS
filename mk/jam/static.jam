@@ -241,7 +241,7 @@ rule LinkStaticPlugins
         Echo "$(target): Warning: Static plugin \"$(p)\" from package \"$(package)\" not available." ;
       }
       CFlags $(target) : $(STATICPLUGIN.$(p).CFLAGS) ;
-      lflags = [ MergeLFlags $(lflags) : $(STATICPLUGIN.$(p).LFLAGS) ] ;
+      lflags = [ MergeRemovingDups $(lflags) : $(STATICPLUGIN.$(p).LFLAGS) ] ;
     }
     target_lflags = $(lflags) ;
   }
@@ -264,8 +264,8 @@ rule LinkStaticPlugins
       lflags += [ Filter $($(p).LFLAGS) : $(LINKLIBS) $(PLUGIN.LFLAGS) ] ;
       libs += $($(p).NEEDLIBS) ;
     }
-    target_link_with = [ Reverse [ RemoveDups [ Reverse $(libs) ] ] ] ;
-    target_lflags = [ Reverse [ RemoveDups [ Reverse $(lflags) ] ] ] ;
+    target_link_with = [ RemoveDupFlags $(libs) ] ;
+    target_lflags = [ RemoveDups $(lflags) ] ;
   }
   
   # construct initialization sourcefile
@@ -412,15 +412,15 @@ rule WriteDependencies
   for l in $(libs)
   {
     libname = [ LibraryBaseName $(l) ] ;
-    lflags = [ MergeLFlags $(lflags) : -l$(libname) ] ;
+    lflags = [ MergeRemovingDups $(lflags) : -l$(libname) ] ;
   }
   
   for l in $($(plugin).EXTERNALLIBS)
   {
     cflags += $($(l).CFLAGS) ;
-    lflags = [ MergeLFlags $(lflags) : [ Filter $($(l).LFLAGS) : $(LINKLIBS) $(PLUGIN.LFLAGS) ] ] ;
+    lflags = [ MergeRemovingDups $(lflags) : [ Filter $($(l).LFLAGS) : $(LINKLIBS) $(PLUGIN.LFLAGS) ] ] ;
   }
-  lflags = [ MergeLFlags $(lflags) : [ Filter $($(plugin).LFLAGS) : $(LINKLIBS) $(PLUGIN.LFLAGS) ] ] ;
+  lflags = [ MergeRemovingDups $(lflags) : [ Filter $($(plugin).LFLAGS) : $(LINKLIBS) $(PLUGIN.LFLAGS) ] ] ;
   CFLAGS on $(depfile_gristed) = "$(cflags)" ;
   LFLAGS on $(depfile_gristed) = "$(lflags)" ;
   

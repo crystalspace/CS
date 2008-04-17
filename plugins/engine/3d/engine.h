@@ -240,7 +240,7 @@ public:
   virtual void ForceRelight (iRegion* region = 0,
   	iProgressMeter* meter = 0);
   virtual void ForceRelight (iLight* light, iRegion* region = 0);
-  virtual void ShineLights (iRegion* region = 0, 
+  virtual void ShineLights (iBase* base = 0, 
     iProgressMeter* meter = 0);
 
   virtual void SetLightingCacheMode (int mode)
@@ -488,9 +488,9 @@ public:
 
   virtual iCollection* CreateCollection(const char* name);
 
-  virtual iCollection* GetCollection(const char* name);
+  virtual iCollection* GetCollection(const char* name) const;
 
-  virtual iCollection* GetDefaultCollection();
+  virtual csPtr<iCollectionArray> GetCollections();
 
   virtual void RemoveCollection(const char* name);
 
@@ -915,7 +915,7 @@ private:
   /// The list of all regions currently loaded.
   csRegionList regions;
   /// The hash of all collections currently existing.
-  csHash<csCollection*, csString> collections;
+  csHash<iCollection*, csString> collections;
 
   /// Sector callbacks.
   csRefArray<iEngineSectorCallback> sectorCallbacks;

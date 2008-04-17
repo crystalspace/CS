@@ -73,6 +73,16 @@ public:
   }
 
   /**
+   * Delete all the elements matching the given key and value.
+   */
+  bool Delete (const K& key, const T &value)
+  {
+    bool ret = csHash<T, K>::Delete (key, value);
+    ret &= reverse.Delete (value, key);
+    return ret;
+  }
+
+  /**
    * Get a pointer to the first key matching the given value, 
    * or 0 if there is none.
    */

@@ -1403,23 +1403,15 @@ bool csLoader::LoadLibrary (iDocumentNode* lib_node, iRegion* region,
 
 //---------------------------------------------------------------------------
 
-void csLoader::AddToRegionOrCollection(iLoaderContext* ldr_context, iObject* obj,
-                                       bool alwaysKeep)
+void csLoader::AddToRegionOrCollection(iLoaderContext* ldr_context, iObject* obj)
 {
   if(ldr_context->GetRegion())
   {
     ldr_context->GetRegion()->QueryObject()->ObjAdd(obj);
   }
-  else if(ldr_context->GetKeepFlags() == KEEP_ALL || alwaysKeep)
+  else if(ldr_context->GetCollection())
   {
-    if(ldr_context->GetCollection())
-    {
-      ldr_context->GetCollection()->Add(obj);
-    }
-    else
-    {
-      Engine->GetDefaultCollection()->Add(obj);
-    }
+    ldr_context->GetCollection()->Add(obj);
   }
 }
 
@@ -1842,9 +1834,20 @@ bool csLoader::LoadLibraryFromNode (iLoaderContext* ldr_context,
       AddToRegionOrCollection (ldr_context, libraryRef->QueryObject ());
     }
     
-    bool rc = LoadMapLibraryFile (file,
-	  	  ldr_context->GetRegion (), ldr_context->CurrentRegionOnly (),
-	      dupes, ssource, missingdata, loadProxyTex);
+    bool rc;
+
+    if(ldr_context->GetRegion())
+    {
+      rc = LoadMapLibraryFile (file, ldr_context->GetRegion (), 
+        ldr_context->CurrentRegionOnly (), dupes, ssource, missingdata, loadProxyTex);
+    }
+    else
+    {
+      rc = LoadMapLibraryFile (file, ldr_context->GetCollection (),
+        ldr_context->CurrentCollectionOnly (), dupes, ssource, missingdata,
+        ldr_context->GetKeepFlags(), loadProxyTex);
+    }
+
     if (path)
     {
       vfs->PopDir ();
@@ -1862,11 +1865,18 @@ bool csLoader::LoadLibraryFromNode (iLoaderContext* ldr_context,
       AddToRegionOrCollection (ldr_context, libraryRef->QueryObject ());
     }
     
-    if (!LoadMapLibraryFile (child->GetContentsValue (),
-	  	ldr_context->GetRegion (), ldr_context->CurrentRegionOnly (),
-		ldr_context->CheckDupes (), ssource, missingdata, 
-		loadProxyTex))
-    return false;
+    if(ldr_context->GetRegion())
+    {
+      return LoadMapLibraryFile (child->GetContentsValue (), ldr_context->GetRegion (),
+        ldr_context->CurrentRegionOnly (), ldr_context->CheckDupes (), ssource, missingdata, 
+		    loadProxyTex);
+    }
+    else
+    {
+      return LoadMapLibraryFile (child->GetContentsValue (), ldr_context->GetCollection (),
+        ldr_context->CurrentCollectionOnly (), ldr_context->CheckDupes (), ssource, missingdata, 
+        ldr_context->GetKeepFlags(), loadProxyTex);
+    }
   }
   return true;
 }

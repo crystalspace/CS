@@ -3747,6 +3747,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetImageType = *cspacec::iImage_GetImageType;
 *HasSubImages = *cspacec::iImage_HasSubImages;
 *GetSubImage = *cspacec::iImage_GetSubImage;
+*GetCookedImageFormat = *cspacec::iImage_GetCookedImageFormat;
+*GetCookedImageData = *cspacec::iImage_GetCookedImageData;
 *scfGetVersion = *cspacec::iImage_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -8350,11 +8352,11 @@ sub DESTROY {
 *GetKeyColor = *cspacec::csImageBase_GetKeyColor;
 *HasMipmaps = *cspacec::csImageBase_HasMipmaps;
 *GetMipmap = *cspacec::csImageBase_GetMipmap;
-*GetRawFormat = *cspacec::csImageBase_GetRawFormat;
-*GetRawData = *cspacec::csImageBase_GetRawData;
 *GetImageType = *cspacec::csImageBase_GetImageType;
 *HasSubImages = *cspacec::csImageBase_HasSubImages;
 *GetSubImage = *cspacec::csImageBase_GetSubImage;
+*GetCookedImageFormat = *cspacec::csImageBase_GetCookedImageFormat;
+*GetCookedImageData = *cspacec::csImageBase_GetCookedImageData;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -8436,11 +8438,8 @@ sub DESTROY {
 *CheckAlpha = *cspacec::csImageMemory_CheckAlpha;
 *SetFormat = *cspacec::csImageMemory_SetFormat;
 *SetKeyColor = *cspacec::csImageMemory_SetKeyColor;
-*SetKeycolor = *cspacec::csImageMemory_SetKeycolor;
 *ClearKeyColor = *cspacec::csImageMemory_ClearKeyColor;
-*ClearKeycolor = *cspacec::csImageMemory_ClearKeycolor;
 *ApplyKeyColor = *cspacec::csImageMemory_ApplyKeyColor;
-*ApplyKeycolor = *cspacec::csImageMemory_ApplyKeycolor;
 *GetImageType = *cspacec::csImageMemory_GetImageType;
 *SetImageType = *cspacec::csImageMemory_SetImageType;
 *HasMipmaps = *cspacec::csImageMemory_HasMipmaps;

@@ -6,9 +6,83 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Apr-2008
+	- Mike Gist made the following changes;
+	  - Added an InternalRefCount class, to be used where we want an extra
+	    reference count to be able to easily tell what's being held by certain
+	    object types. Provides an InternalRemove() function for when the ref
+	    count reaches 0.
+	  - Enhanced collections and csObject to use InternalRefCount. This
+	    resolves our problem where objects aren't correctly freed when unused.
+	  - csRenderLoop now sets its name correctly.
+	  - csRenderLoopManager::Register no longer prints a warning about
+	    duplicate renderloops if you have checkdupes set to true.
+	  - Fixed some missing adds to a collection and incorrect parameter passing.
+	  - Disabled proxy textures for regions, altered related code to be
+	    collection specific, greatly reducing complexity.
+	  - Fixed csHashReversible to correctly delete from the reversible hash
+	    as well as the normal hash, so it doesn't leak references.
+	  - Fixed a few other reference leaks.
+	- caedes fixed a memory leak on openal sound renderer listener
+	  creation, and also protected its Update method from using the
+	  listener before it is created.
+16-Apr-2008
+	- Eric Sunshine clarified and enhanced documentation of RemoveDups rule
+	  in helper.jam.
+	- Eric Sunshine generalized MergeLFlags from flags.jam and moved it to
+	  helper.jam as the new rule MergeRemovingDups.  (The old MergeLFlags
+	  name is still recognized for backward compatibility but heavily
+	  deprecated.)
+	- Eric Sunshine added a RemoveDupFlags rule to flags.jam which removes
+	  duplicates from a list of build switches. Unlike the generic
+	  RemoveDups (helper.jam), RemoveDupFlags removes all but the _last_
+	  duplicated item. This makes it suitable for folding out duplicates
+	  from a list of linker switches which typically are order-sensitive,
+	  and in which the final instance of a duplicated switch has highest
+	  precedence.  (This new rule also helps to document clients which
+	  previously performed the same somewhat convoluted functionality
+	  manually and without explanation.)
+	- Eric Sunshine added new rule InferFlagTuples to flags.jam which,
+	  given a list of build switches, infers which switches consist of
+	  multiple arguments, and returns a list in the same order but with
+	  multiple-argument switches converted to atomic array elements.  For
+	  instance, given the list [-framework, AppKit, -foo, -z, defs, -bar],
+	  it will correctly infer that "-framework" and "AppKit", and "-z" and
+	  "defs" should be combined, respectively, and return the corresponding
+	  list [-framework AppKit, -foo, -z defs, -bar]. Such multiple-argument
+	  switches can arise when linking against external libraries. For
+	  instance, 'wx-config --libs' on Mac OS X returns a list containing
+	  several "-framework Foo" switches. Also augmented CFlags and LFlags
+	  rules in flags.jam to normalize the incoming flags by passing them
+	  through InferFlagTuples. This resolves issue #270.
+	- Eric Sunshine fixed scripts/cs-config/Jamfile so that the generic
+	  'apps' target depends upon 'cs-config'. This makes it consistent with
+	  the generated version-specific 'cs-config-X.Y' which also (already)
+	  is a dependent of 'apps'.
+	- caedes added an extension to python wrapped interfaces so they can
+	  be compared using ==.
+	- caedes changed equality test for python wrapped interfaces to be 
+	  based on extending iBase instead of extending declared interfaces,
+	  and also added handling of inequality test.
 14-Apr-2008
+	- Eric Sunshine fixed CS_CHECK_BINUTILS_2_17() in checkbinutils.m4 to
+	  be compatible with Mac OS X linkers which are not GNU-compatible.
+	  Further, it now correctly suppresses unwanted output from the Leopard
+	  linker which was messing up the displayed 'configure' output since
+	  Leopard 'ld' emits its version information to stderr rather than
+	  stdout.
 	- Marten implemented a way to query the number of animations and
 	  animation by index in animation packet (factory).
+12-Apr-2008
+	- res worked around SWIG 1.3.33 breakage in the perl bindings.
+	- res added methods to iImage to query the image format as a "texture
+	  format string". The idea is to eventually move to this more flexible
+	  format identification in the future (and thus provide support to
+	  load more image formats).
+11-Apr-2008
+	- res changed the X window creation to set a background color when
+	  creating the window. This prevents a brief flash of undefined
+	  window contents on compiz (and possibly other WMs).
 10-Apr-2008
 	- Marten implemented software skinning of normals, tangents and
 	  binormals in animesh.

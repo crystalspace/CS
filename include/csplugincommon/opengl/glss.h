@@ -37,7 +37,7 @@ class csGraphics2DGLCommon;
  * OpenGL screen shot.
  */
 class CS_CSPLUGINCOMMON_GL_EXPORT csGLScreenShot :
-  public scfImplementationExt0<csGLScreenShot, csImageBase>
+  public scfImplementationExt1<csGLScreenShot, csImageBase, iDataBuffer>
 {
   csGraphics2DGLCommon* G2D;
   int Format;
@@ -63,6 +63,33 @@ public:
 
   void IncRef ();
   void DecRef ();
+
+  const char* GetRawFormat() const 
+  { 
+    if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
+      return "a8b8g8r8"; 
+    else
+      return 0;
+  }
+  csRef<iDataBuffer> GetRawData() const 
+  { 
+    return const_cast<csGLScreenShot*> (this); 
+  }
+
+  //@{
+  /// iDataBuffer implementation
+  size_t GetSize() const
+  {
+    if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
+      return Width * Height * 4;
+    else
+      return Width * Height;
+  }
+  char* GetData() const
+  {
+    return (char*)Data;
+  }
+  //@}
 };
 
 /** @} */

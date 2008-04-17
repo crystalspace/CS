@@ -329,7 +329,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     // Proxy texture loading if the loader isn't specified
     // and we don't need to load them immediately.
-    if(txtname && type.IsEmpty() && ldr_context->GetKeepFlags() == KEEP_USED)
+    if(txtname && type.IsEmpty() && ldr_context->GetKeepFlags() == KEEP_USED &&
+       !ldr_context->GetRegion())
     {
       if (filename.IsEmpty())
       {

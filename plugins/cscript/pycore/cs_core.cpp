@@ -46399,6 +46399,67 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iImage_GetCookedImageFormat(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iImage *arg1 = (iImage *) 0 ;
+  char *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iImage_GetCookedImageFormat",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iImage, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iImage_GetCookedImageFormat" "', argument " "1"" of type '" "iImage *""'"); 
+  }
+  arg1 = reinterpret_cast< iImage * >(argp1);
+  result = (char *)(arg1)->GetCookedImageFormat();
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iImage_GetCookedImageData(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iImage *arg1 = (iImage *) 0 ;
+  SwigValueWrapper<csRef<iDataBuffer > > result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iImage_GetCookedImageData",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iImage, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iImage_GetCookedImageData" "', argument " "1"" of type '" "iImage *""'"); 
+  }
+  arg1 = reinterpret_cast< iImage * >(argp1);
+  result = (arg1)->GetCookedImageData();
+  {
+    /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
+    csRef<iDataBuffer> ref((csRef<iDataBuffer>&)result); /* explicit cast */
+    /*const csRef<iBase> ref = csRef<iBase>((iDataBuffer *)ref1);
+      if (!ref.IsValid())
+      {
+        Py_INCREF(Py_None);
+        resultobj = Py_None;
+      }
+      else
+      {
+        ref->IncRef();
+        resultobj = SWIG_NewPointerObj((void *)(iDataBuffer *)ref1, SWIG_TypeQuery("iDataBuffer" " *"), 1);
+      }*/
+    resultobj = _csRef_to_Python(csRef<iBase>(
+        (iDataBuffer *)ref), (void *)(iDataBuffer *)ref, "iDataBuffer" " *");
+    /*@SWIG@*/
+  }
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iImage_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -54706,6 +54767,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iImage_GetImageType", _wrap_iImage_GetImageType, METH_VARARGS, NULL},
 	 { (char *)"iImage_HasSubImages", _wrap_iImage_HasSubImages, METH_VARARGS, NULL},
 	 { (char *)"iImage_GetSubImage", _wrap_iImage_GetSubImage, METH_VARARGS, NULL},
+	 { (char *)"iImage_GetCookedImageFormat", _wrap_iImage_GetCookedImageFormat, METH_VARARGS, NULL},
+	 { (char *)"iImage_GetCookedImageData", _wrap_iImage_GetCookedImageData, METH_VARARGS, NULL},
 	 { (char *)"iImage_scfGetVersion", _wrap_iImage_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iImage", _wrap_delete_iImage, METH_VARARGS, NULL},
 	 { (char *)"iImage_swigregister", iImage_swigregister, METH_VARARGS, NULL},
