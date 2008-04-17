@@ -137,30 +137,66 @@ struct ShadowNone : Shadow
   half GetVisibility() { return 1; }
 };
 
-#if 0
-  // @@@ TODO: Translate to interface implementation
-  <?Template Lighting_Shadow_Shadowmap PROG?>
-    <?if vars."light shadow map" ?>
-    // Transform fragment position into light space
-    float4 view_pos = mul($PROG$In.lightTransformInv[i], position);
-    // Transform fragment position in light space into "shadow map space"
+struct LightPropertiesShadowMap
+{
+  // Transformation from light to shadow map space
+  float4x4 shadowMapTF[MAX_LIGHTS];
+  // Shadow map
+  sampler2D shadowMap[MAX_LIGHTS];
+};
+LightPropertiesShadowMap lightPropsSM;
+
+struct ShadowShadowMap : Shadow
+{
+  float4 shadowMapCoords;
+  sampler2D shadowMap;
+
+  void InitVP (int lightNum, float4 surfPositionWorld,
+               out float4 vp_shadowMapCoords)
+  {
+    float4x4 lightTransformInv = lightProps.transformInv[lightNum];
+    // Transform world position into light space
+    float4 view_pos = mul(lightTransformInv, surfPositionWorld);
+    // Transform position in light space into "shadow map space"
     float4 shadowMapCoords;
-    shadowMapCoords = mul ($PROG$In.lightShadowMapProject[i], view_pos);
+    float4x4 shadowMapTF = lightPropsSM.shadowMapTF[lightNum];
+    /* CS' render-to-texture Y-flips render targets (so the upper left
+       gets rendered to 0,0), we need to unflip here again. */
+    float4x4 flipY;
+    flipY[0] = float4 (1, 0, 0, 0);
+    flipY[1] = float4 (0, -1, 0, 0);
+    flipY[2] = float4 (0, 0, 1, 0);
+    flipY[3] = float4 (0, 0, 0, 1);
+    shadowMapTF = mul (shadowMapTF, flipY);
+    shadowMapCoords = mul (shadowMapTF, view_pos);
+    //shadowMapCoords = mul (shadowMapTF, surfPositionWorld);
+    
+    vp_shadowMapCoords = shadowMapCoords;
+  }
+  
+  void Init (int lightNum, float4 vp_shadowMapCoords)
+  {
+    shadowMapCoords = vp_shadowMapCoords;
+    shadowMap = lightPropsSM.shadowMap[lightNum];
+  }
+  
+  half GetVisibility()
+  {
     // Project SM coordinates
     shadowMapCoords.xyz /= shadowMapCoords.w;
-    shadowMapCoords.xyz = (0.5*shadowMapCoords.xyz) + float3(0.5);
-    float4 shadowVal = tex2D ($PROG$In.lightShadowMap[i], shadowMapCoords.xy);
+    shadowMapCoords.xyz = (float3(0.5)*shadowMapCoords.xyz) + float3(0.5);
+    //debug (float4 (shadowMapCoords.xy, 0, 1));
+    float4 shadowVal = tex2D (shadowMap, shadowMapCoords.xy);
     
     // Depth to compare against
     float compareDepth = shadowMapCoords.z + (1.0/32768.0);
     // Depth from the shadow map
     float shadowMapDepth = shadowVal.r;
     // Shadow value
-    float inLight = compareDepth > shadowMapDepth;
-    attn *= inLight;
-    <?endif?>
-  <?Endtemplate?>
-#endif
+    half inLight = compareDepth > shadowMapDepth;
+    return inLight;
+  }
+};
 
 interface Light
 {
@@ -250,7 +286,8 @@ void ComputeLight (LightSpace lightSpace, Light light,
   else
     attn = Attenuation_CLQ (lightDist, lightAttenuationVec.xyz);
   
-  attn *= shadow.GetVisibility();
+  half shadowed = shadow.GetVisibility();
+  attn *= shadowed;
 
   d = lightDiffuse * lightCoeff.y * spot * attn;
   s = lightSpecular * lightCoeff.z * spot * attn;

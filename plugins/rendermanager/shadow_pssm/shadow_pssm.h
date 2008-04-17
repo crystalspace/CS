@@ -20,6 +20,7 @@
 #define __CS_RM_UNSHADOWED_H__
 
 #include "csplugincommon/rendermanager/hdrexposure.h"
+#include "csplugincommon/rendermanager/shadow_pssm.h"
 #include "csutil/scf_implementation.h"
 #include "iutil/comp.h"
 #include "iengine/rendermanager.h"
@@ -41,6 +42,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
     //---- iRenderManager ----
     virtual bool RenderView (iView* view);
 
+    //---- iRenderManagerTargets ----
     virtual void RegisterRenderTarget (iTextureHandle* target, 
       iView* view, int subtexture = 0, uint flags = 0)
     {
@@ -52,6 +54,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
       targets.UnregisterRenderTarget (target, subtexture);
     }
   
+    //---- iRenderManagerPostEffects ----
     void ClearLayers() { postEffects.ClearLayers(); }
     bool AddLayersFromDocument (iDocumentNode* node)
     {
@@ -85,8 +88,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
     typedef CS::RenderManager::DependentTargetManager<RenderTreeType, RMShadowedPSSM>
       TargetManagerType;
 
+    typedef CS::RenderManager::ShadowPSSM<RenderTreeType,
+      CS::RenderManager::MultipleRenderLayer> ShadowType;
     typedef CS::RenderManager::LightSetup<RenderTreeType, 
-      CS::RenderManager::MultipleRenderLayer> LightSetupType;
+      CS::RenderManager::MultipleRenderLayer,
+      ShadowType> LightSetupType;
 
   public:
     iObjectRegistry* objectReg;

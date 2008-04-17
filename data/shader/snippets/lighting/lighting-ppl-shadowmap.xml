@@ -17,56 +17,215 @@
 -->
 <snippet type="compound">
   <technique priority="100">
-    <snippet id="eyeVecWorld" file="/shader/snippets/eye-direction-world.xml" />
+    <snippet id="eyeVec" file="/shader/snippets/eye-direction-tangent.xml" />
+    
+    <snippet id="forward_normal">
+      <technique priority="100">
+	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+	
+	<!-- Surface normal -->
+	<input name="i_normal" type="normal_tangent" />
+	<output name="o_normal" type="normal_tangent" />
+	
+	<block location="cg:vertexMain">
+	  o_normal = i_normal;
+	</block>
+	<block location="cg:fragmentMain">
+	  o_normal = i_normal;
+	</block>
+      </technique>
+    </snippet>
     
     <snippet id="lighting">
       <technique priority="100">
 	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
 	<!-- Vector from eye to position -->
-	<input name="eyeToSurf" type="direction_world" />
-	<input name="position" type="position4_world" />
+	<input name="eyeToSurf" type="direction_tangent" />
+	<input name="positionW" type="position4_world" />
 	<!-- Surface normal -->
-	<input name="normal" type="normal_world" />
+	<input name="normal" type="normal_tangent" />
 	
-	<input name="lightOffset" type="float" default="value" defval="0"/>
+	<input name="objectToWorldInv" type="float4x4" default="complex" private="yes">
+	  <block location="cg:vertexIn">
+	    <uniform type="float4x4" name="objectToWorldInv" />
+	  </block>
+	  
+	  <block location="cg:vertexMain">
+	    objectToWorldInv = vertexIn.objectToWorldInv;
+	  </block>
+	  
+	  <block location="cg:variablemap">
+	    <variablemap variable="object2world transform inverse" 
+			 destination="vertexIn.objectToWorldInv" />
+	  </block>
+	</input>
+	<input name="Bitangent" type="normal" default="complex" private="yes">
+	  <block location="cg:vertexIn">
+	    <varying type="normal" name="Bitangent" />
+	  </block>
+	  
+	  <block location="pass">
+	    <buffer source="binormal" destination="vertexIn.Bitangent" />
+	  </block>
+	  
+	  <block location="cg:vertexToFragment">
+	    <varying type="normal" name="Bitangent" />
+	  </block>
+	  
+	  <block location="cg:vertexMain">
+	    Bitangent = vertexIn.Bitangent;
+	  </block>
+	</input>
+	<input name="Normal" type="normal" default="complex" private="yes">
+	  <block location="cg:vertexIn">
+	    <varying type="normal" name="Normal" />
+	  </block>
+	  
+	  <block location="pass">
+	    <buffer source="normal" destination="vertexIn.Normal" />
+	  </block>
+	  
+	  <block location="cg:vertexToFragment">
+	    <varying type="normal" name="Normal" />
+	  </block>
+	  
+	  <block location="cg:vertexMain">
+	    Normal = vertexIn.Normal;
+	  </block>
+	</input>
+	<input name="Tangent" type="normal" default="complex" private="yes">
+	  <block location="cg:vertexIn">
+	    <varying type="normal" name="Tangent" />
+	  </block>
+	  
+	  <block location="pass">
+	    <buffer source="tangent" destination="vertexIn.Tangent" />
+	  </block>
+	  
+	  <block location="cg:vertexToFragment">
+	    <varying type="normal" name="Tangent" />
+	  </block>
+	  
+	  <block location="cg:vertexMain">
+	    Tangent = vertexIn.Tangent;
+	  </block>
+	</input>
+	
+	<input name="lightOffset" type="int" default="value" defval="0"/>
+	<input name="maxLights" type="int" default="value" defval="3"/>
 	
 	<block location="pass">
 	  <?Include /shader/snippets/lighting/lighting-tools.inc ?>
 	  
 	  <?Generate L 0 7?>
-	    <texture name="light shadow map[$L$]" destination="fragmentIn.lightShadowMap[$L$]" />
+	    <texture name="light shadow map[$L$]" destination="lightPropsSM.shadowMap[$L$]" />
 	  <?Endgenerate?>
 	</block>
 	
 	<block location="cg:variablemap">
-	  <?Lighting_Variablemaps fragment?>
+	  <?Lighting_Variablemaps?>
+	  
+	  <variablemap variable="light shadow map projection" 
+		       destination="lightPropsSM.shadowMapTF" />
 	</block>
 	
 	<block location="cg:definitions">
 	  <?Include /shader/snippets/lighting/lightfuncs.cginc ?>
+	  
 	</block>
 	
 	<!-- @@@ The Cg combiner process the <uniform ... /> tags *before*
-	     xmlshader - so we can't use includes, templates here. Pity -->
+	      xmlshader - so we can't use includes, templates here. Pity -->
 	<block location="cg:fragmentIn"
-	       file="/shader/snippets/lighting/lighting-cg-input.block" />
-	<block location="cg:fragmentIn"
-	       file="/shader/snippets/lighting/lighting-cg-input-shadowmap.block" />
+		file="/shader/snippets/lighting/lighting-cg-input.block" />
+	
+	<block location="cg:vertexToFragment">
+	  <varying type="direction" name="surfToLight[8]" />
+	  <varying type="direction" name="lightDir[8]" />
+	  <varying type="float4" name="shadowMapCoords[8]" />
+	</block>
 	
 	<block location="cg:vertexMain">
 	  diffuseColor = float3(0);
-	  specularColor = float4(0);
+	  specularColor = float3(0);
+	  
+	  float4x4 obj2tang;
+	  obj2tang[0] = float4 (Tangent, 0);
+	  obj2tang[1] = float4 (Bitangent, 0);
+	  obj2tang[2] = float4 (Normal, 0);
+	  obj2tang[3] = float4 (0, 0, 0, 1);
+	  float4x4 world2tang = mul (obj2tang, objectToWorldInv);
+	  
+	  LightSpaceTangent lspace;
+	  ShadowShadowMap shadow;
+	  <![CDATA[
+          for (int l = 0; l < maxLights; l++)
+	  {
+	    if (l >= lightProps.count) break;
+	  ]]>
+	    
+	    int i = lightOffset + l;
+	    half3 vp_dir;
+	    lspace.InitVP (i, world2tang, positionW, vp_dir, surfToLight[l]);
+	    lightDir[l] = vp_dir;
+	    
+	    float4 vp_shadowMapCoords;
+	    shadow.InitVP (i, positionW, vp_shadowMapCoords);
+	    shadowMapCoords[l] = vp_shadowMapCoords;
+	  }
+	  diffuseColor_attr_perfragment = true;
+	  specularColor_attr_perfragment = true;
 	</block>
 	
 	<block location="cg:fragmentMain">
-	  <?Lighting_Compute fragment 8 Shadowmap?>
+	  diffuseColor = float3(0);
+	  specularColor = float3(0);
+	  half3 myEyeToSurf = eyeToSurf;
+	  myEyeToSurf = normalize (eyeToSurf);
+	  <![CDATA[
+          for (int l = 0; l < maxLights; l++)
+	  {
+	    if (l >= lightProps.count) break;
+	  ]]>
+	    int i = lightOffset + l;
+	    LightSpaceTangent lightSpace;
+	    lightSpace.Init (lightDir[l], surfToLight[l]);
+	    
+	    <?if vars."light shadow map" ?>
+	    ShadowShadowMap shadow;
+	    shadow.Init (l, shadowMapCoords[l]);
+	    <?else?>
+	    ShadowNone shadow;
+	    <?endif?>
+	    
+	    Light light = GetCurrentLight (lightSpace, i, normal);
+	    float4 lightAttenuationVec = lightProps.attenuationVec[i];
+	    float3 d, s;
+	    ComputeLight (lightSpace, light, myEyeToSurf, normal, 32,
+	      lightProps.colorDiffuse[i], lightProps.colorSpecular[i],
+	      lightAttenuationVec, shadow, d, s);
+	    
+	    diffuseColor += d;
+	    specularColor += s;
+	  }
+	  diffuseColor_attr_perfragment = true;
+	  specularColor_attr_perfragment = true;
 	</block>
 	
-	<output name="diffuseColor" type="rgb" />
-	<output name="specularColor" type="rgb" />
+	<output name="diffuseColor" type="rgb">
+	  <attribute name="perfragment" type="bool" />
+	</output>
+	<output name="specularColor" type="rgb">
+	  <attribute name="perfragment" type="bool" />
+	</output>
       </technique>
     </snippet>
-    <connection from="eyeVecWorld" to="lighting" />
+    <connection from="forward_normal" to="lighting">
+      <explicit from="o_normal" to="normal" />
+    </connection>
+    <connection from="eyeVec" to="lighting">
+      <explicit from="eyeDirectionTangent" to="eyeToSurf" />
+    </connection>
   </technique>
 </snippet>

@@ -41,5 +41,8 @@
 		 destination="lightProps.transformInv" />
   <?Endtemplate?>
   
+  <?Template Lighting_ShadowMap_Variablemaps?>
+  <?Endtemplate?>
+  
   <?SEndIf?>
 </include>

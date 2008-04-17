@@ -18,7 +18,7 @@
 <block>
   <!-- SHADOW MAPPING -->
   <!-- Shadow map -->
-  <uniform type="tex2d" name="lightShadowMap[8]" />
+  <!--uniform type="tex2d" name="lightShadowMap[8]" /-->
   <!-- Transformation from light space to shadow map space -->
-  <uniform type="float4x4" name="lightShadowMapProject[8]" />
+  <!--uniform type="float4x4" name="lightShadowMapProject[8]" /-->
 </block>

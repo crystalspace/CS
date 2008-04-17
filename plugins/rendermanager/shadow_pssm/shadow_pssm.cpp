@@ -67,6 +67,9 @@ public:
     // @@@ FIXME: Of course, don't hardcode.
     if (recurseCount > 30) return;
     
+    RMShadowedPSSM::ShadowType::ViewSetup shadowViewSetup (
+      rmanager->lightPersistent.shadowPersist, rview);
+    
     iShaderManager* shaderManager = rmanager->shaderManager;
 
     // @@@ This is somewhat "boilerplate" sector/rview setup.
@@ -116,9 +119,10 @@ public:
 
     RMShadowedPSSM::LightSetupType lightSetup (
       rmanager->lightPersistent, rmanager->lightManager,
-      context.svArrays, layerConfig);
+      context.svArrays, layerConfig, shadowViewSetup);
 
     ForEachMeshNode (context, lightSetup);
+    shadowViewSetup.PostLightSetup (context, layerConfig);
 
     // Setup shaders and tickets
     SetupStandardTicket (context, shaderManager,
@@ -205,6 +209,8 @@ bool RMShadowedPSSM::RenderView (iView* view)
   postEffects.DrawPostEffects ();
   
   hdrExposure.ApplyExposure (postEffects);
+  
+  renderTree.RenderDebugTextures (rview->GetGraphics3D ());
 
   return true;
 }
@@ -242,7 +248,7 @@ bool RMShadowedPSSM::HandleTarget (RenderTreeType& renderTree,
 
 bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
 {
-  const char messageID[] = "crystalspace.rendermanager.unshadowed";
+  const char messageID[] = "crystalspace.rendermanager.shadow_pssm";
   
   this->objectReg = objectReg;
 
@@ -257,11 +263,11 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
   
   csRef<iVerbosityManager> verbosity = csQueryRegistry<iVerbosityManager> (
     objectReg);
-  bool doVerbose = verbosity && verbosity->Enabled ("rendermanager.unshadowed");
+  bool doVerbose = verbosity && verbosity->Enabled ("rendermanager.shadow_pssm");
   
   csConfigAccess cfg (objectReg);
   bool layersValid = false;
-  const char* layersFile = cfg->GetStr ("RenderManager.Unshadowed.Layers", 0);
+  const char* layersFile = cfg->GetStr ("RenderManager.ShadowPSSM.Layers", 0);
   if (layersFile)
   {
     if (doVerbose)
@@ -295,7 +301,7 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
   /*csRef<iShader> logmap =
     loader->LoadShader ("/shader/postproc/hdr/simple-log.xml");*/
 
-  const char* effectsFile = cfg->GetStr ("RenderManager.Unshadowed.Effects", 0);
+  const char* effectsFile = cfg->GetStr ("RenderManager.ShadowPSSM.Effects", 0);
   if (effectsFile)
   {
     PostEffectLayersParser postEffectsParser (objectReg);
@@ -309,7 +315,7 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
   hdrExposure.Initialize (objectReg, postEffects);
   
   portalPersistent.Initialize (shaderManager, g3d);
-  lightPersistent.Initialize (shaderManager);
+  lightPersistent.Initialize (shaderManager, g3d);
   
   return true;
 }

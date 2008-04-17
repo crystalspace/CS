@@ -211,75 +211,47 @@ namespace RenderManager
   template<typename RenderTree, typename LayerConfigType>
   class ShadowNone
   {
-    struct CachedLightData
+  public:
+    struct CachedLightData{ };
+    struct PersistentData
+    {
+      void UpdateNewFrame () {}
+      void Initialize (iShaderManager* shaderManager) {}
+    };
+    struct ShadowParameters {};
+
+    ShadowNone (PersistentData& persist,
+      const LayerConfigType& layerConfig, RenderTree&,
+      ShadowParameters&) { }
+
+    void HandleOneLight (iLight* light, CachedLightData& lightData,
+                         csShaderVariableStack& lightStack)
+    {}
+  };
+
+  /**
+   * For each mesh determine the array of affecting lights and generate shader
+   * vars for it.
+   * Must be done after shader and shader SV (usually SetupStandardShader())
+   * and before ticket setup.
+   */
+  template<typename RenderTree, typename LayerConfigType,
+    typename ShadowHandler = ShadowNone<RenderTree, LayerConfigType> >
+  class LightSetup
+  {
+  public:
+    class PostLightingLayers;
+  
+  protected:
+    struct CachedLightData : public ShadowHandler::CachedLightData 
     {
       const csRefArray<csShaderVariable>* shaderVars;
     };
-
-  public:
-
-    struct PersistentData
-    {
-      csLightShaderVarCache svNames;
-      CS::ShaderVarStringID svPassNum;
-      LightingVariablesHelper::PersistentData varsHelperPersist;
-      csHash<CachedLightData, csPtrKey<iLight> > lightDataCache;
-
-      ~PersistentData()
-      {
-        if (lcb.IsValid()) lcb->parent = 0;
-      }
-      
-      void Initialize (iShaderManager* shaderManager)
-      {
-	iShaderVarStringSet* strings = shaderManager->GetSVNameStringset();
-	svNames.SetStrings (strings);
-        svPassNum = strings->Request ("pass number");
-      }
-      void UpdateNewFrame ()
-      {
-        varsHelperPersist.UpdateNewFrame();
-      }
-
-      iLightCallback* GetLightCallback()
-      {
-        if (!lcb.IsValid()) lcb.AttachNew (new LightCallback (this));
-        return lcb;
-      }
-    protected:
-      class LightCallback : public scfImplementation1<LightCallback, 
-                                                      iLightCallback>
-      {
-      public:
-        PersistentData* parent;
-
-        LightCallback (PersistentData* parent)
-          : scfImplementation1<LightCallback, iLightCallback> (this),
-            parent (parent) {}
-
-	void OnColorChange (iLight* light, const csColor& newcolor) { }
-	void OnPositionChange (iLight* light, const csVector3& newpos) { }
-	void OnSectorChange (iLight* light, iSector* newsector) { }
-	void OnRadiusChange (iLight* light, float newradius) { }
-	void OnDestroy (iLight* light)
-        {
-          if (parent != 0)
-          {
-            parent->lightDataCache.DeleteAll (light);
-          }
-        }
-	void OnAttenuationChange (iLight* light, int newatt) { }
-      };
-      csRef<LightCallback> lcb;
-    };
-
-    ShadowNone (PersistentData& persist,
-      const LayerConfigType& layerConfig, RenderTree&) 
-      : persist (persist), layerConfig (layerConfig), lastShader (0) { }
-
-    template<typename LayerHelper>
-    size_t HandleLights (LightingSorter& sortedLights,
-      size_t layer, LayerHelper& layers,
+    
+    size_t HandleLights (ShadowHandler& shadows,
+      LightingSorter& sortedLights,
+      size_t layer, LayerHelper<RenderTree, LayerConfigType,
+        PostLightingLayers>& layers, const LayerConfigType& layerConfig,
       typename RenderTree::MeshNode::SingleMesh& mesh,
       typename RenderTree::MeshNode* node)
     {
@@ -439,6 +411,8 @@ namespace RenderManager
 		thisLightSVs = &persist.lightDataCache.Put (
 		  light, newCacheData);
 	      }
+	      
+	      shadows.HandleOneLight (mesh, light, *thisLightSVs, localStack, l);
     
 	      lightVarsHelper.MergeAsArrayItems (localStack,
 		*(thisLightSVs->shaderVars), l);
@@ -454,10 +428,7 @@ namespace RenderManager
 	return firstLight;
       }
     }
-  protected:
-    PersistentData& persist;
-    const LayerConfigType& layerConfig;
-
+    
     // Simple cache
     iShader* lastShader;
     csShaderMetadata lastMetadata;
@@ -470,26 +441,16 @@ namespace RenderManager
 	lastShader = shaderToUse;
       }
     }
-  };
-
-  /**
-   * For each mesh determine the array of affecting lights and generate shader
-   * vars for it.
-   * Must be done after shader and shader SV (usually SetupStandardShader())
-   * and before ticket setup.
-   */
-  template<typename RenderTree, typename LayerConfigType,
-    typename ShadowHandler = ShadowNone<RenderTree, LayerConfigType> >
-  class LightSetup
-  {
   public:
     struct PersistentData;
     typedef csArray<iShader*> ShaderArrayType;
+    typedef typename ShadowHandler::ShadowParameters ShadowParamType;
 
     LightSetup (PersistentData& persist, iLightManager* lightmgr,
-      SVArrayHolder& svArrays, const LayerConfigType& layerConfig)
+      SVArrayHolder& svArrays, const LayerConfigType& layerConfig,
+      ShadowParamType& shadowParam = ShadowParamType ())
       : persist (persist), lightmgr (lightmgr), svArrays (svArrays),
-        allMaxLights (0), newLayers (layerConfig)
+        allMaxLights (0), newLayers (layerConfig), shadowParam (shadowParam)
     {
       // Sum up the number of lights we can possibly handle
       for (size_t layer = 0; layer < layerConfig.GetLayerCount (); ++layer)
@@ -512,7 +473,7 @@ namespace RenderManager
         PostLightingLayers> layerHelper (persist.layerPersist, layerConfig,
         newLayers);
       ShadowHandler shadows (persist.shadowPersist, layerConfig,
-        node->owner.owner);
+        node, shadowParam);
 
       for (size_t i = 0; i < node->meshes.GetSize (); ++i)
       {
@@ -547,8 +508,8 @@ namespace RenderManager
           }
 
           sortedLights.SetLightsLimit (layerLights);
-          size_t handledLights = shadows.HandleLights (sortedLights,
-            layer, layerHelper, mesh, node);
+          size_t handledLights = HandleLights (shadows, sortedLights,
+            layer, layerHelper, layerConfig, mesh, node);
           if ((handledLights == 0)
             && (!layerConfig.IsAmbientLayer (layer)))
           {
@@ -561,6 +522,18 @@ namespace RenderManager
 	}
 
         lightmgr->FreeInfluenceArray (influences);
+      }
+      
+      if (shadows.NeedFinalHandleLight())
+      {
+	typename PersistentData::LightDataCache::GlobalIterator lightDataIt (
+	  persist.lightDataCache.GetIterator());
+	while (lightDataIt.HasNext())
+	{
+	  csPtrKey<iLight> light;
+	  CachedLightData& data = lightDataIt.Next (light);
+	  shadows.FinalHandleLight (light, data);
+	}
       }
     }
 
@@ -612,7 +585,6 @@ namespace RenderManager
         return layerConfig.IsAmbientLayer (layerMap[layer]);
       }
 
-
       void InsertLayer (size_t after, size_t oldLayer)
       {
         layerMap.Insert (after+1, oldLayer);
@@ -630,17 +602,63 @@ namespace RenderManager
       typename LayerHelper<RenderTree, LayerConfigType,
         PostLightingLayers>::PersistentData layerPersist;
       LightingSorter::PersistentData lightSorterPersist;
-      
-      void Initialize (iShaderManager* shaderManager)
+      csLightShaderVarCache svNames;
+      CS::ShaderVarStringID svPassNum;
+      LightingVariablesHelper::PersistentData varsHelperPersist;
+      typedef csHash<CachedLightData, csPtrKey<iLight> > LightDataCache;
+      LightDataCache lightDataCache;
+
+      ~PersistentData()
       {
-	shadowPersist.Initialize (shaderManager);
+        if (lcb.IsValid()) lcb->parent = 0;
+      }
+      
+      void Initialize (iShaderManager* shaderManager,
+                       iGraphics3D* g3d)
+      {
+	iShaderVarStringSet* strings = shaderManager->GetSVNameStringset();
+	svNames.SetStrings (strings);
+        svPassNum = strings->Request ("pass number");
+	shadowPersist.Initialize (shaderManager, g3d);
       }
       void UpdateNewFrame ()
       {
         shadowPersist.UpdateNewFrame();
         layerPersist.UpdateNewFrame();
         lightSorterPersist.UpdateNewFrame();
+        varsHelperPersist.UpdateNewFrame();
       }
+      
+      iLightCallback* GetLightCallback()
+      {
+        if (!lcb.IsValid()) lcb.AttachNew (new LightCallback (this));
+        return lcb;
+      }
+    protected:
+      class LightCallback : public scfImplementation1<LightCallback, 
+                                                      iLightCallback>
+      {
+      public:
+        PersistentData* parent;
+
+        LightCallback (PersistentData* parent)
+          : scfImplementation1<LightCallback, iLightCallback> (this),
+            parent (parent) {}
+
+	void OnColorChange (iLight* light, const csColor& newcolor) { }
+	void OnPositionChange (iLight* light, const csVector3& newpos) { }
+	void OnSectorChange (iLight* light, iSector* newsector) { }
+	void OnRadiusChange (iLight* light, float newradius) { }
+	void OnDestroy (iLight* light)
+        {
+          if (parent != 0)
+          {
+            parent->lightDataCache.DeleteAll (light);
+          }
+        }
+	void OnAttenuationChange (iLight* light, int newatt) { }
+      };
+      csRef<LightCallback> lcb;
     };
 
   private:
@@ -649,6 +667,7 @@ namespace RenderManager
     SVArrayHolder& svArrays; 
     size_t allMaxLights;
     PostLightingLayers newLayers;
+    ShadowParamType& shadowParam;
   };
 
 }
