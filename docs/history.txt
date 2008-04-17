@@ -30,6 +30,9 @@ chronological order.
 	  listener before it is created.
 	- Vincent applied a patch from Lukas Erlinghagen which fixes a build
 	  problem with bjam ("module" is a restricted keyword there).
+	- Vincent applied another patch from Lukas Erlinghagen which fixes a
+	  build error on GCC when using the fully qualified name for
+	  ConstGlobalIterator in csHash.
 16-Apr-2008
 	- Eric Sunshine clarified and enhanced documentation of RemoveDups rule
 	  in helper.jam.
