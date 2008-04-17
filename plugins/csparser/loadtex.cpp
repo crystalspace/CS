@@ -297,16 +297,9 @@ iTextureWrapper* csLoader::LoadTexture (const char *name,
     Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->QueryObject ()->SetName (name);
   TexWrapper->SetImageFile(img);
-  if(keepFlags == KEEP_ALL)
+  if(collection)
   {
-    if(collection)
-    {
-      collection->Add(TexWrapper->QueryObject());
-    }
-    else
-    {
-      Engine->GetDefaultCollection()->Add(TexWrapper->QueryObject());
-    }
+    collection->Add(TexWrapper->QueryObject());
   }
 
   iMaterialWrapper* matwrap = 0;
@@ -314,16 +307,9 @@ iTextureWrapper* csLoader::LoadTexture (const char *name,
   {
     csRef<iMaterial> material (Engine->CreateBaseMaterial (TexWrapper));
     matwrap = Engine->GetMaterialList ()->NewMaterial (material, name);
-    if(keepFlags == KEEP_ALL)
+    if(collection)
     {
-      if(collection)
-      {
-        collection->Add(matwrap->QueryObject());
-      }
-      else
-      {
-        Engine->GetDefaultCollection()->Add(TexWrapper->QueryObject());
-      }
+      collection->Add(matwrap->QueryObject());
     }
   }
 
@@ -694,8 +680,7 @@ csPtr<iBase> csCheckerTextureLoader::Parse (iDocumentNode* node,
 	Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->SetImageFile (Image);
 
-  TexWrapper->IncRef ();
-  return csPtr<iBase> ((iBase*)TexWrapper);
+  return csPtr<iBase> (TexWrapper);
 }
 
 
@@ -845,7 +830,6 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->SetImageFile (cube);
 
-  TexWrapper->IncRef ();
   return csPtr<iBase> (TexWrapper);
 }
 
@@ -935,7 +919,6 @@ csPtr<iBase> csTexture3DLoader::Parse (iDocumentNode* node,
 	Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->SetImageFile (vol);
 
-  TexWrapper->IncRef ();
   return csPtr<iBase> (TexWrapper);
 }
 
@@ -997,8 +980,7 @@ csPtr<iBase> csMissingTextureLoader::Parse (iDocumentNode* node,
     Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->SetImageFile (image);
 
-  TexWrapper->IncRef ();
-  return csPtr<iBase> ((iBase*)TexWrapper);
+  return csPtr<iBase> (TexWrapper);
 }
 
 }

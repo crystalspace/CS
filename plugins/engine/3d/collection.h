@@ -29,7 +29,7 @@ class csEngine;
  * A collection is used to store related objects in a simple structure
  * to guarentee that they won't be freed by the engine. The engine has
  * a default collection where all iObjects are placed unless explicitly
- * placed in another collectino.
+ * placed in another collection.
  */
 
 class csCollection : public scfImplementationExt1<csCollection,
@@ -54,17 +54,62 @@ public:
   /**
    * Add an object to this collection.
    */
-  inline void Add(iObject *obj) { ObjAdd(obj); }
+  void Add(iObject *obj)
+  {
+    if(!IsParentOf(obj))
+    {
+      ObjAdd(obj);
+      csObject* object = (csObject*)obj;
+      object->InternalIncRef();
+    }
+  }
 
   /**
    * Remove an object from this collection.
    */
-  inline void Remove(iObject *obj) { ObjRemove(obj); }
+  void Remove(iObject *obj)
+  {
+    csObject* object = (csObject*)obj;
+    object->InternalDecRef();
+    ObjRemove(obj);
+  }
 
   /**
    * Release all references to objects held by this collection.
    */
-  inline void ReleaseAllObjects() { ObjRemoveAll(); }
+  void ReleaseAllObjects(bool debug = false)
+  {
+    csWeakRefArray<iObject> copy;
+    csRef<iObjectIterator> itr = GetIterator();
+    while(itr->HasNext())
+    {
+      copy.Push(itr->Next());
+    }
+
+    for(int i=0; i<copy.GetSize(); i++)
+    {
+      if(copy[i].IsValid())
+      {
+        Remove(copy[i]);
+      }
+    }
+
+    if(debug)
+    {
+      printf("Not Deleted for %s:\n", GetName());
+      for (int i = 0 ; i < copy.GetSize () ; i++)
+      {
+        iObject* obj = copy[i];
+        if(obj)
+        {
+          csObject* object = (csObject*)obj;
+          printf("Interface: %s, Name: %s, Address: %p, Reference Count: %i, Internal Count: %i\n",
+            obj->GetInterfaceMetadata()->metadata->interfaceName, obj->GetName(),
+            (iObject*)obj, obj->GetRefCount(), object->GetInternalRefCount());
+        }
+      }
+    }
+  }
 
   /**
    * Returns true if this collection is the parent of the object passed.

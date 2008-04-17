@@ -168,6 +168,9 @@ private:
   /// Class for keeping track of imposter information.
   csImposterFactory* imposter_factory;
 
+protected:
+  virtual void InternalRemove() { SelfDestruct(); }
+
 public:
   /// Flag indicating whether this factory should try to imposter or not.
   bool imposter_active;

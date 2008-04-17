@@ -125,6 +125,9 @@ private:
   csRef<csEngineSequenceParameters> params;
   uint sequence_id;
 
+protected:
+  void InternalRemove() { SelfDestruct(); }
+
 public:
   csSequenceWrapper (csEngineSequenceManager* eseqmgr, iSequence* sequence,
       uint sequence_id);
@@ -259,6 +262,9 @@ private:
 
   int total_conditions;
   int fired_conditions;
+
+protected:
+  void InternalRemove() { SelfDestruct(); }
 
 public:
   csSequenceTrigger (csEngineSequenceManager* eseqmgr);
