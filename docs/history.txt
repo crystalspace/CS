@@ -8,23 +8,23 @@ chronological order.
 
 17-Apr-2008
 	- Mike Gist made the following changes;
-	  - Added an InternalRefCount class, to be used where we want an extra
-	    reference count to be able to easily tell what's being held by
-	    certain object types. Provides an InternalRemove() function for
-	    when the ref count reaches 0.
-	  - Enhanced collections and csObject to use InternalRefCount. This
-	    resolves our problem where objects aren't correctly freed when
-	    unused.
-	  - csRenderLoop now sets its name correctly.
-	  - csRenderLoopManager::Register no longer prints a warning about
-	    duplicate renderloops if you have checkdupes set to true.
-	  - Fixed some missing adds to a collection and incorrect parameter
-	    passing.
-	  - Disabled proxy textures for regions, altered related code to be
-	    collection specific, greatly reducing complexity.
-	  - Fixed csHashReversible to correctly delete from the reversible hash
-	    as well as the normal hash, so it doesn't leak references.
-	  - Fixed a few other reference leaks.
+	    - Added an InternalRefCount class, to be used where we want an
+	      extra reference count to be able to easily tell what's being held
+	      by certain object types. Provides an InternalRemove() function
+	      for when the ref count reaches 0.
+	    - Enhanced collections and csObject to use InternalRefCount. This
+	      resolves our problem where objects aren't correctly freed when
+	      unused.
+	    - csRenderLoop now sets its name correctly.
+	    - csRenderLoopManager::Register no longer prints a warning about
+	      duplicate renderloops if you have checkdupes set to true.
+	    - Fixed some missing adds to a collection and incorrect parameter
+	      passing.
+	    - Disabled proxy textures for regions, altered related code to be
+	      collection specific, greatly reducing complexity.
+	    - Fixed csHashReversible to correctly delete from the reversible
+	      hash as well as the normal hash, so it doesn't leak references.
+	    - Fixed a few other reference leaks.
 	- caedes fixed a memory leak on openal sound renderer listener
 	  creation, and also protected its Update method from using the
 	  listener before it is created.
