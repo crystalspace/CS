@@ -17,7 +17,7 @@
 */
 
 #ifndef __CS_IVARIA_BULLET_H__
-#define __CS_IVARIA_BULLEt_H__
+#define __CS_IVARIA_BULLET_H__
 
 /**\file
  * Bullet-specific interfaces
