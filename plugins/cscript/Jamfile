@@ -28,12 +28,12 @@ if $(PYTHON.AVAILABLE) = "yes"
   rule PyBindingModule
   {
     local target = $(1) ;
-    local module = $(2) ;
+    local modname = $(2) ;
     #--------
     # Swig-generated files for 'target'.
     #--------
-    local common = cs_$(module).cpp ;
-    local modulepy = [ DoSourceGrist $(module).py ] ;
+    local common = cs_$(modname).cpp ;
+    local modulepy = [ DoSourceGrist $(modname).py ] ;
     MakeLocate $(modulepy) : [ ConcatDirs $(LOCATE.OBJECTS) bindings python cspace ] ;
   
     if ! [ Property build : projgen ]
@@ -43,7 +43,7 @@ if $(PYTHON.AVAILABLE) = "yes"
       if $(DO_SWIG_PYTHON)
       {
 	Swig $(common) $(modulepy) :
-	  [ DoSourceGrist $(module).i ] :
+	  [ DoSourceGrist $(modname).i ] :
 	  python :
 	  -c++ -shadow -modern :
 	  [ ConcatDirs $(TOP) include ]
@@ -51,9 +51,9 @@ if $(PYTHON.AVAILABLE) = "yes"
 	  [ ConcatDirs $(TOP) include bindings ]
 	  [ ConcatDirs $(TOP) include bindings python ] :
 	  $(SEARCH_SOURCE) [ ConcatDirs $(TOP) scripts python frozen cspace ] :
-	  $(module) :
+	  $(modname) :
 	  [ on $(modulepy) GetVar LOCATE ] ;
-	Depends $(module)clean : $(module)swigclean ;
+	Depends $(modname)clean : $(modname)swigclean ;
       }
       else
       {
@@ -64,9 +64,9 @@ if $(PYTHON.AVAILABLE) = "yes"
 	Depends $(modulepy) : $(frozenpy) ;
       }
     }
-    Clean $(module)clean : $(modulepy) ;
-    Depends bindingsclean : $(module)clean ;
-    Depends clean : $(module)clean ;
+    Clean $(modname)clean : $(modulepy) ;
+    Depends bindingsclean : $(modname)clean ;
+    Depends clean : $(modname)clean ;
   
     InstallBindingsData $(modulepy) : [ on $(<) GetVar LOCATE ] : bindings python cspace ;
   
@@ -74,7 +74,7 @@ if $(PYTHON.AVAILABLE) = "yes"
     #--------
     # core -- Pure Python module
     #--------
-    PythMod $(target) : _$(module) : 
+    PythMod $(target) : _$(modname) : 
 	  $(3) $(common) : 
 	  bindings python cspace :
 	  crystalspace $(4) : 
