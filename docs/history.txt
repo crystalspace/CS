@@ -35,6 +35,9 @@ chronological order.
 	  ConstGlobalIterator in csHash.
 	- Eric Sunshine removed some useless (probably obsolete) CheckOptions
 	  invocations from flags.jam.
+	- Eric Sunshine added some missing "local var" declarations to
+	  RelayLibs rule in flags.jam. Also cleaned up RelayLibs documentation
+	  slightly.
 16-Apr-2008
 	- Eric Sunshine clarified and enhanced documentation of RemoveDups rule
 	  in helper.jam.

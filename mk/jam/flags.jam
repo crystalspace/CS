@@ -127,16 +127,16 @@ rule ExtraObjects
   Clean clean : $(>) ;
 }
 
-##  RelayLib target : indentifier : relaylibs
+##  RelayLibs target : indentifier : relaylibs
 ##    Link external libraries identified by 'identifier' with 'target' with
 ##    the help of "relaytool". This tool provides a wrapper object file that
 ##    dynamically loads the requested library at runtime. The client code can
-##    check if a library is actually available and react gracefully if not -
-##    this is much more end-user friendly than a refusal by the application to
+##    check if a library is actually available and react gracefully if not.
+##    This is much more end-user friendly than a refusal by the application to
 ##    start due to a missing dependency.
 ##    From the external dependency identified by 'identifier' the individual
 ##    libraries specified in 'relaylibs' will be dynamically loaded. For each
-##    library 'whatever' a symbol 'libwhatever_is_present' will be provided.
+##    library 'foo' a symbol 'libfoo_is_present' will be provided.
 rule RelayLibs
 {
   if ! $(CMD.RELAYTOOL)
@@ -158,18 +158,20 @@ rule RelayLibs
   }
   else
   {
-    local extlib ;
     local relayparamslist = "--relay $(3)" ;
     local relayparam = $(relayparamslist[1]) ;
+    local r ;
     for r in $(relayparamslist[2-])
     {
       relayparam = "$(relayparam) $(r)" ;
     }
     local cflags = "$(CCFLAGS[1])" ;
+    local c ;
     for c in $(CCFLAGS[2-])
     {
       cflags = "$(cflags) $(c)" ;
     }
+    local extlib ;
     for extlib in $(>)
     {
       CFlags $(<) : $($(extlib).CFLAGS) ;
