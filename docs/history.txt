@@ -18,6 +18,8 @@ chronological order.
 	   - Made shadow map support in shader snippets work again.
 	   - Added (still very humble) beginnings of PSSM shadows.
 	- res retired rm_test1.
+	- res made a couple of corrections to the transforms in the PSSM
+	  RM component. Shadows seem to be essentially correct now.
 16-Apr-2008
 	- res made some more small optimizations to xmlshader.
 14-Apr-2008

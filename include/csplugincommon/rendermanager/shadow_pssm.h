@@ -53,14 +53,13 @@ public:
       float splitDists[NUM_PARTS+1];
       float lx, rx, ty, by;
       
-      
       ViewSetup (PersistentData& persist, CS::RenderManager::RenderView* rview)
        : persist (persist), rview (rview)
       {
 	// PSSM: split layers
 	
 	// @@@ FIXME: arbitrary
-	float near = 0.1f;
+	float near = 1.0f;
 	float far = 100.0f;
       
 	splitDists[0] = near;
@@ -98,15 +97,20 @@ public:
         CS::Math::Matrix4 world2lightNorm;
 	csShaderVariable* shadowMapSV;
 	csShaderVariable* shadowMapProjectSV;
+	
+	csArray<csBox3> containedObjects;
       };
       Frustum lightFrustums[NUM_PARTS];
       
       CachedLightData() : shadowMapCreateFrame (~0), frustumsSetup (false) {}
 
-      void SetupFrame (ViewSetup& viewSetup)
+      void SetupFrame (ViewSetup& viewSetup, iLight* light)
       {
         if (!frustumsSetup)
         {
+          CS::Math::Matrix4 world2lightNorm (
+            light->GetMovable()->GetFullTransform());
+        
 	  LightingVariablesHelper lightVarsHelper (viewSetup.persist.lightVarsPersist);
 	  /* Compute intersection of light frustum with view frustums:
 	      1. Compute corners of split frustums
@@ -122,6 +126,7 @@ public:
 	      csVector2 (viewSetup.rx, viewSetup.by)
 	    };
 	    Frustum& lightFrustum = lightFrustums[i];
+	    lightFrustum.world2lightNorm = world2lightNorm;
 	    lightFrustum.volume.StartBoundingBox();
 	    // Frustum corner, camera space
 	    csVector3 cornerCam;
@@ -146,7 +151,6 @@ public:
 		corner2D[c], viewSetup.splitDists[i+1]);
 	      cornerWorld = viewSetup.rview->GetCamera()->GetTransform().This2Other (
 		cornerCam);
-	      //cornerLight = lightTF.Other2This (cornerWorld);
 	      cornerUnproj = lightFrustum.world2lightNorm * csVector4 (cornerWorld);
 	      cornerProj =
 		csVector3 (cornerUnproj.x, cornerUnproj.y, cornerUnproj.z);
@@ -179,8 +183,12 @@ public:
       {
         typename RenderTree::ContextNode& context = meshNode->owner;
       
+        float allMinZ = HUGE_VALF;
 	for (int f = 0; f < NUM_PARTS; f++)
 	{
+	  const Frustum& lightFrust = lightData.lightFrustums[f];
+	  if (lightFrust.containedObjects.GetSize() == 0) continue;
+	  
 	  CS::RenderManager::RenderView* rview = context.renderView;
 	#include "csutil/custom_new_disable.h"
 	  csRef<CS::RenderManager::RenderView> newRenderView;
@@ -190,21 +198,34 @@ public:
 	  newRenderView->SetEngine (rview->GetEngine ());
 	  newRenderView->SetThisSector (rview->GetThisSector ());
 	  
-	  const Frustum& lightFrust = lightData.lightFrustums[f];
-	  const float frustW = lightFrust.volume.MaxX() - lightFrust.volume.MinX();
-	  const float frustH = lightFrust.volume.MaxY() - lightFrust.volume.MinY();
+	  /* Fit map to the bounding box of all shadowed objects.
+	     Serves two purposes:
+	     - If some objects cut the split plane (ie extend over the initial
+	       light frustum) this makes sure they're mapped to the SM entirely.
+	     - If the shadowed objects are smaller than the light frustum in some
+	       dimension makes sure the shadow map is used optimally. */
+	  csBox3 allObjsBox (lightFrust.containedObjects[0]);
+	  for (size_t i = 1; i < lightFrust.containedObjects.GetSize(); i++)
+	  {
+	    allObjsBox += lightFrust.containedObjects[i];
+	  }
+	  
+	  const float frustW = allObjsBox.MaxX() - allObjsBox.MinX();
+	  const float frustH = allObjsBox.MaxY() - allObjsBox.MinY();
 	  CS::Math::Matrix4 crop (
 	    2.0f/frustW, 0, 0, 
-	      (-1.0f * (lightFrust.volume.MaxX() + lightFrust.volume.MinX()))/frustW,
+	      (-1.0f * (allObjsBox.MaxX() + allObjsBox.MinX()))/frustW,
 	    0, 2.0f/frustH, 0,
-	      (-1.0f * (lightFrust.volume.MaxY() + lightFrust.volume.MinY()))/frustH,
+	      (-1.0f * (allObjsBox.MaxY() + allObjsBox.MinY()))/frustH,
 	    0, 0, 1, 0,
 	    0, 0, 0, 1);
-	  // @@@ TODO: consider min/max Z
-	  float n = -1.0f;
-	  float f = 10.0f;
-          CS::Math::Matrix4 Mortho = CS::Math::Projections::Ortho (-1, 1, -1, 1, -f, -n);
-	  CS::Math::Matrix4 matrix = Mortho * crop;
+	  /* The minimum Z over all parts is used to avoid clipping shadows of 
+	     casters closer to the light than the split plane */
+	  if (allObjsBox.MinZ() < allMinZ) allMinZ = allObjsBox.MinZ();
+	  float n = -allObjsBox.MaxZ(); //-1.0f;
+	  float f = -allMinZ;//10.0f;
+          CS::Math::Matrix4 Mortho = CS::Math::Projections::Ortho (-1, 1, 1, -1, n, f);
+	  CS::Math::Matrix4 matrix = crop * Mortho;
 	  
 	  int shadowMapSize;
 	  csReversibleTransform view = light->GetMovable()->GetFullTransform ();
@@ -250,6 +271,8 @@ public:
       void ClearFrameData()
       {
         frustumsSetup = false;
+        for (int i = 0; i < NUM_PARTS; i++)
+          lightFrustums[i].containedObjects.DeleteAll();
       }
     };
 private:
@@ -362,8 +385,8 @@ private:
 
     ShadowPSSM (PersistentData& persist,
       const LayerConfigType& layerConfig,
-        typename RenderTree::MeshNode* node, 
-        ViewSetup& viewSetup) 
+      typename RenderTree::MeshNode* node, 
+      ViewSetup& viewSetup) 
       : persist (persist), layerConfig (layerConfig), 
         renderTree (node->owner.owner), meshNode (node),
         viewSetup (viewSetup) { }
@@ -373,12 +396,26 @@ private:
                          csShaderVariableStack& lightStack,
                          uint lightNum)
     {
-      lightData.SetupFrame (viewSetup);
+      lightData.SetupFrame (viewSetup, light);
       LightingVariablesHelper lightVarsHelper (viewSetup.persist.lightVarsPersist);
       
+      const csReversibleTransform& world2light (
+        light->GetMovable()->GetFullTransform());
+      
+      csBox3 meshBboxLight;
+      meshBboxLight.StartBoundingBox (world2light.Other2This (
+        singleMesh.bbox.GetCorner (0)));
+      for (int c = 1; c < 8; c++)
+      {
+	meshBboxLight.AddBoundingVertex (world2light.Other2This (
+	  singleMesh.bbox.GetCorner (c)));
+      }
       for (int f = 0; f < NUM_PARTS; f++)
       {
-        if (!lightData.lightFrustums[f].volume.TestIntersect (singleMesh.bbox)) continue;
+        if (!lightData.lightFrustums[f].volume.TestIntersect (meshBboxLight))
+          continue;
+      
+      lightData.lightFrustums[f].containedObjects.Push (meshBboxLight);
       
 	// Add shadow map SVs
 	lightVarsHelper.MergeAsArrayItem (lightStack, 
