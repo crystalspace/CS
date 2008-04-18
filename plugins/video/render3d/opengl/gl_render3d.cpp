@@ -838,6 +838,7 @@ bool csGLGraphics3D::Open ()
   //ext->InitGL_ATI_separate_stencil ();
   ext->InitGL_EXT_secondary_color ();
   ext->InitGL_EXT_blend_func_separate ();
+  ext->InitGL_ARB_shadow ();
 #ifdef CS_DEBUG
   ext->InitGL_GREMEDY_string_marker ();
 #endif
@@ -1683,6 +1684,79 @@ void csGLGraphics3D::SetTextureState (int* units, iTextureHandle** textures,
 	ActivateTexture (txt, unit);
       else
 	DeactivateTexture (unit);
+    }
+  }
+}
+  
+void csGLGraphics3D::SetTextureComparisonModes (int* units,
+  CS::Graphics::TextureComparisonMode* modes, int count)
+{
+  if (!ext->CS_GL_ARB_shadow) return;
+
+  if (modes == 0)
+  {
+    for (int i = 0 ; i < count ; i++)
+    {
+      int unit = units[i];
+      if (ext->CS_GL_ARB_multitexture)
+      {
+	statecache->SetCurrentTU (unit);
+	statecache->ActivateTU (csGLStateCache::activateTexEnv);
+      }
+      else if (unit != 0) continue;
+      
+      if (imageUnits[unit].texCompare.mode
+        != CS::Graphics::TextureComparisonMode::compareNone)
+      {
+	glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+	imageUnits[unit].texCompare.mode =
+	  CS::Graphics::TextureComparisonMode::compareNone;
+      }
+    }
+  }
+  else
+  {
+    for (int i = 0 ; i < count ; i++)
+    {
+      int unit = units[i];
+      if (ext->CS_GL_ARB_multitexture)
+      {
+	statecache->SetCurrentTU (unit);
+	statecache->ActivateTU (csGLStateCache::activateTexEnv);
+      }
+      else if (unit != 0) continue;
+      
+      if (modes[i].mode != imageUnits[unit].texCompare.mode)
+      {
+	GLint compareMode = GL_NONE;
+	switch (modes[i].mode)
+	{
+	  case CS::Graphics::TextureComparisonMode::compareNone:
+	    //compareMode = GL_NONE;
+	    break;
+	  case CS::Graphics::TextureComparisonMode::compareR:
+	    compareMode = GL_COMPARE_R_TO_TEXTURE;
+	    break;
+	}
+	glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_COMPARE_MODE, compareMode);
+	imageUnits[unit].texCompare.mode = modes[i].mode;
+      }
+      if (modes[i].mode
+	&& (modes[i].function != imageUnits[unit].texCompare.function))
+      {
+	GLint compareFunc = GL_LEQUAL;
+	switch (modes[i].function)
+	{
+	  case CS::Graphics::TextureComparisonMode::funcLEqual:
+	    //compareFunc = GL_LEQUAL;
+	    break;
+	  case CS::Graphics::TextureComparisonMode::funcGEqual:
+	    compareFunc = GL_GEQUAL;
+	    break;
+	}
+	glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_COMPARE_FUNC, compareFunc);
+	imageUnits[unit].texCompare.function = modes[i].function;
+      }
     }
   }
 }

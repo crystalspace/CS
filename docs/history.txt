@@ -10,6 +10,7 @@ chronological order.
 	- Marten fixed a bug in barriers where the case of spurious condition
 	  wakeup wasn't correctly handled.
 	- res removed hardcoded texture and buffer limits from xmlshader.
+	- res added support texture comparison modes.
 17-Apr-2008
 	- Mike Gist made the following changes;
 	    - Added an InternalRefCount class, to be used where we want an

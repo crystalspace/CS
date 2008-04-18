@@ -142,6 +142,8 @@ public:
   {
   }
   void SetTextureState (int* units, iTextureHandle** textures, int count);
+  void SetTextureComparisonModes (int*, CS::Graphics::TextureComparisonMode*,
+    int) {}
   void DrawMesh (const CS::Graphics::CoreRenderMesh* mymesh,
     const CS::Graphics::RenderMeshModes& modes,
     const csShaderVariableStack& stack);

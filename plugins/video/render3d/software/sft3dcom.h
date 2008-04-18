@@ -582,17 +582,30 @@ protected:
   virtual void SetTextureState (int* units, iTextureHandle** textures,
   	int count)
   {
-    int i;
-    for (i = 0 ; i < count ; i++)
+    if (!textures)
     {
-      int unit = units[i];
-      iTextureHandle* txt = textures[i];
-      if (txt)
-        ActivateTexture (txt, unit);
-      else
-        DeactivateTexture (unit);
+      for (int i = 0 ; i < count ; i++)
+      {
+	int unit = units[i];
+	DeactivateTexture (unit);
+      }
+    }
+    else
+    {
+      for (int i = 0 ; i < count ; i++)
+      {
+	int unit = units[i];
+	iTextureHandle* txt = textures[i];
+	if (txt)
+	  ActivateTexture (txt, unit);
+	else
+	  DeactivateTexture (unit);
+      }
     }
   }
+  
+  void SetTextureComparisonModes (int*, CS::Graphics::TextureComparisonMode*,
+    int) {}
 
   /// Deactivate a texture
   void DeactivateTexture (int unit = 0)

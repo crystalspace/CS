@@ -394,9 +394,38 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, ShaderPass* pass,
       }
 
       if (texUnit < 0) continue;
+      
+      ShaderPass::TextureMapping texMap;
+      
+      const char* compareMode = mapping->GetAttributeValue ("comparemode");
+      const char* compareFunc = mapping->GetAttributeValue ("comparefunc");
+      if (compareMode && compareFunc)
+      {
+        if (strcmp (compareMode, "rToTexture") == 0)
+          texMap.texCompare.mode = CS::Graphics::TextureComparisonMode::compareR;
+        else if (strcmp (compareMode, "none") == 0)
+          texMap.texCompare.mode = CS::Graphics::TextureComparisonMode::compareNone;
+	else
+	{
+          SetFailReason ("invalid texture comparison mode '%s'",
+	    compareMode);
+          return false;
+	}
+      
+        if (strcmp (compareFunc, "lequal") == 0)
+          texMap.texCompare.function = CS::Graphics::TextureComparisonMode::funcLEqual;
+        else if (strcmp (compareFunc, "gequal") == 0)
+          texMap.texCompare.function = CS::Graphics::TextureComparisonMode::funcGEqual;
+	else
+	{
+          SetFailReason ("invalid texture comparison function '%s'",
+	    compareMode);
+          return false;
+	}
+      }
+      
       CS::Graphics::ShaderVarNameParser parser (
         mapping->GetAttributeValue("name"));
-      ShaderPass::TextureMapping texMap;
       texMap.id = stringsSvName->Request (parser.GetShaderVarName ());
       parser.FillArrayWithIndices (texMap.indices);
       texMap.textureUnit = texUnit;
@@ -630,6 +659,7 @@ bool csXMLShaderTech::DeactivatePass ()
   for (int j = 0; j < texturesCount; j++)
     textureUnits[j] = thispass->textures[j].textureUnit;
   g3d->SetTextureState(textureUnits, 0, texturesCount);
+  g3d->SetTextureComparisonModes (textureUnits, 0, texturesCount);
   
   if (thispass->overrideZmode)
     g3d->SetZMode (oldZmode);
@@ -683,6 +713,8 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   size_t textureCount = thispass->textures.GetSize();
   CS_ALLOC_STACK_ARRAY(int, textureUnits, textureCount);
   CS_ALLOC_STACK_ARRAY(iTextureHandle*, textureHandles, textureCount);
+  CS_ALLOC_STACK_ARRAY(CS::Graphics::TextureComparisonMode, texCompare,
+    textureCount);
   for (size_t j = 0; j < textureCount; j++)
   {
     textureUnits[j] = thispass->textures[j].textureUnit;
@@ -710,8 +742,10 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
     }
     else
       textureHandles[j] = 0;
+    texCompare[j] = thispass->textures[j].texCompare;
   }
   g3d->SetTextureState (textureUnits, textureHandles, textureCount);
+  g3d->SetTextureComparisonModes (textureUnits, texCompare, textureCount);
 
   modes = *mesh;
   if (thispass->alphaMode.autoAlphaMode)

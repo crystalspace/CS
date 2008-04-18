@@ -423,8 +423,9 @@ private:
   {
     bool enabled;
     GLuint target;
+    CS::Graphics::TextureComparisonMode texCompare;
     
-    ImageUnit (): enabled (false), target (0) {}
+    ImageUnit (): enabled (false), target (0) { }
   };
   GLint numImageUnits;
   ImageUnit* imageUnits;
@@ -537,6 +538,8 @@ public:
   void DeactivateTexture (int unit = 0);
   virtual void SetTextureState (int* units, iTextureHandle** textures,
   	int count);
+  void SetTextureComparisonModes (int*, CS::Graphics::TextureComparisonMode*,
+    int);
 
   /// Set dimensions of window
   void SetDimensions (int width, int height)

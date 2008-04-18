@@ -741,6 +741,30 @@ enum csRenderTargetAttachment
   rtaNumAttachments
 };
 
+namespace CS
+{
+  namespace Graphics
+  {
+    struct TextureComparisonMode
+    {
+      enum Mode
+      {
+        compareNone,
+        compareR
+      };
+      Mode mode;
+      enum Function
+      {
+        funcLEqual,
+        funcGEqual
+      };
+      Function function;
+      
+      TextureComparisonMode() : mode (compareNone), function (funcLEqual) {}
+    };
+  } // namespace Graphics
+} // namespace CS
+
 /**
  * This is the standard 3D graphics interface.
  * All 3D graphics rasterizer servers for Crystal Space should implement this
@@ -757,7 +781,7 @@ enum csRenderTargetAttachment
  */
 struct iGraphics3D : public virtual iBase
 {
-  SCF_INTERFACE(iGraphics3D, 3, 0, 1);
+  SCF_INTERFACE(iGraphics3D, 3, 0, 2);
   
   /// Open the 3D graphics display.
   virtual bool Open () = 0;
@@ -1125,6 +1149,13 @@ struct iGraphics3D : public virtual iBase
    * Set the projection matrix to use.
    */
   virtual void SetProjectionMatrix (const CS::Math::Matrix4& m) = 0;
+
+  /**
+   * Set the texture comparison modes for the given texture units.
+   */
+  virtual void SetTextureComparisonModes (int* units, 
+    CS::Graphics::TextureComparisonMode* texCompare,
+    int count) = 0;
 };
 
 /** @} */

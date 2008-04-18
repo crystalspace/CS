@@ -75,6 +75,7 @@ private:
 	CS::Memory::LocalBufferAllocator<size_t, 2,
 	  CS::Memory::AllocatorMalloc, true> > indices;
       int textureUnit;
+      CS::Graphics::TextureComparisonMode texCompare;
     };
     csArray<TextureMapping> textures;
 
