@@ -13,6 +13,7 @@ chronological order.
 	- Mike Gist fixed a bug in sprcal3d where the moveable wasn't being
 	  updated while the object is still. This caused issues such as dynamic
 	  lights not shining on the object until it moved.
+	- Marten fixed a bug unrevealed by the earlier barrier update.
 17-Apr-2008
 	- Mike Gist made the following changes;
 	    - Added an InternalRefCount class, to be used where we want an
