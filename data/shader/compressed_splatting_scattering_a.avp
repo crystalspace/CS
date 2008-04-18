@@ -1,8 +1,8 @@
 <arbvp>
-  <variablemap variable="light 0 position" destination="register 0"/>
-  <variablemap variable="light 0 diffuse" destination="register 1"/>
-  <variablemap variable="light 0 specular" destination="register 2"/>
-  <variablemap variable="light 0 attenuation" destination="register 3"/>
+  <variablemap variable="light position world[0]" destination="register 0"/>
+  <variablemap variable="light diffuse[0]" destination="register 1"/>
+  <variablemap variable="light specular[0]" destination="register 2"/>
+  <variablemap variable="light attenuation[0]" destination="register 3"/>
   
   <variablemap variable="mat diffuse" destination="register 4"/>
   <variablemap variable="mat ambient" destination="register 5"/>
@@ -12,6 +12,8 @@
   <variablemap variable="mat specular" destination="register 8"/>
 
   <variablemap variable="normal scale" destination="register 9" />
+  
+  <variablemap variable="object2world transform inverse" destination="register 10"/>
   <program>
     <![CDATA[
       !!ARBvp1.0
@@ -22,7 +24,8 @@
       PARAM mv[4]	     	= { state.matrix.modelview };
       PARAM mvi[4]	 	= { state.matrix.modelview.inverse };
       PARAM mvp[4]	     	= { state.matrix.mvp };
-      PARAM lightPos   		= program.local[0];
+      PARAM w2o[4]              = { program.local[10..13] };
+      PARAM lightPosW   	= program.local[0];
       PARAM lightDiffuse 	= program.local[1];
       PARAM lightSpecular 	= program.local[2];
       PARAM lightAttenuation 	= program.local[3];
@@ -75,10 +78,10 @@
       DP4 oPos.w, mvp[3], iPos;
       
       #Transform light to object space
-      DP4 objLight.x, mvi[0], lightPos;
-      DP4 objLight.y, mvi[1], lightPos;
-      DP4 objLight.z, mvi[2], lightPos;
-      DP4 objLight.w, mvi[3], lightPos;
+      DP4 objLight.x, w2o[0], lightPosW;
+      DP4 objLight.y, w2o[1], lightPosW;
+      DP4 objLight.z, w2o[2], lightPosW;
+      DP4 objLight.w, w2o[3], lightPosW;
 
       ADD objLight, objLight, -iPos;
 

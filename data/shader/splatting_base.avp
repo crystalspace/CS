@@ -1,8 +1,9 @@
 <arbvp>
-  <variablemap variable="light position[0]" destination="register 0"/>
+  <variablemap variable="light position world[0]" destination="register 0"/>
   <variablemap variable="light diffuse[0]" destination="register 1"/>
   <variablemap variable="light specular[0]" destination="register 2"/>
   <variablemap variable="light attenuation[0]" destination="register 3"/>
+  <variablemap variable="object2world transform inverse" destination="register 4"/>
 
   <variablemap variable="texture lod distance" destination="register 5"/>
 
@@ -15,8 +16,9 @@
     #Parameter definition
     PARAM mvp[4]		= { state.matrix.mvp };
     PARAM mvi[4]		= { state.matrix.modelview.inverse };
+    PARAM w2o[4]                = { program.local[4..7] };
     PARAM eyePos    	        = { 0.0, 0.0, 0.0, 1};
-    PARAM lightPos  	        = program.local[0];
+    PARAM lightPosW  	        = program.local[0];
     PARAM lightDiffuse 	        = program.local[1];
     PARAM lightSpecular 	= program.local[2];
     PARAM lightAttenuation 	= program.local[3];
@@ -44,10 +46,11 @@
     DP4 oPos.z, mvp[2], iPos;
     DP4 oPos.w, mvp[3], iPos;
 
-    DP4 objLight.x, mvi[0], lightPos;
-    DP4 objLight.y, mvi[1], lightPos;
-    DP4 objLight.z, mvi[2], lightPos;
-    DP4 objLight.w, mvi[3], lightPos;
+    #Transform light to object space
+    DP4 objLight.x, w2o[0], lightPosW;
+    DP4 objLight.y, w2o[1], lightPosW;
+    DP4 objLight.z, w2o[2], lightPosW;
+    DP4 objLight.w, w2o[3], lightPosW;
 
     ADD oLightDir, objLight, -iPos;
     MOV oNormal, iNorm;

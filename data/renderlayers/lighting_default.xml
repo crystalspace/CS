@@ -17,6 +17,7 @@
 		<shadertype>ambient</shadertype>
 		<shadertype>splatting ambient</shadertype>
 		<shadertype>standard</shadertype>
+		<shadertype>terrain splat</shadertype>
 	</layer>
 	<layer>
 	        <defaultshader name="lighting_default" file="/shader/lighting/lighting_default.xml" />
@@ -29,12 +30,5 @@
 		       CS_ENTITY_STATICLIGHT flag set -->
 		  <nodraw />
 		</staticlights>
-	</layer>
-	<layer>
-		<shadertype>terrain splat</shadertype>
-		<!-- Allow statically lit passes to work -->
-		<ambient />
-		<!-- Practically unlimited passes -->
-		<maxlightpasses>2147483647</maxlightpasses>
 	</layer>
 </layerconfig>

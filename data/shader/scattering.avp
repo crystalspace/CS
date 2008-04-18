@@ -1,6 +1,6 @@
 <arbvp>
   <!-- This should be directional light from the sun -->
-  <variablemap variable="light position[0]" destination="register 0" />
+  <variablemap variable="light position world[0]" destination="register 0" />
   <variablemap variable="light diffuse[0]" destination="register 1" />
   <variablemap variable="beta' 1" destination="register 2" />
   <variablemap variable="beta' 2" destination="register 3" />
@@ -9,6 +9,8 @@
   <variablemap variable="hg" destination="register 7" />
   <variablemap variable="inscattering term" destination="register 8" />
   <variablemap variable="mat reflection" destination="register 9" />
+  
+  <variablemap variable="object2world transform inverse" destination="register 10"/>
   
   <?if vars."tex normal"?>
     <!-- some things only needed by when using the PPL base map -->
@@ -25,10 +27,11 @@
       PARAM mv[4]		= { state.matrix.modelview };
       PARAM mvi[4]		= { state.matrix.modelview.inverse };
       PARAM mvp[4]		= { state.matrix.mvp };
+      PARAM w2o[4]              = { program.local[10..13] };
       PARAM ones		= { 1, 1, 1, 0 };
       PARAM log_2_e		= { 1.4427, 1.4427, 1.4427, 1.4427 };
       PARAM lightIntensity      = { 100, 100, 100, 0 };
-      PARAM lightPos		= program.local[0];
+      PARAM lightPosW		= program.local[0];
       PARAM lightDiffuse 	= program.local[1];
       # Several constant specified by the program (scattering factors)
       PARAM cBd1		= program.local[2];
@@ -81,10 +84,10 @@
       
       ###
       # transform light to objSpace
-      DP4 objLight.x, mvi[0], lightPos;
-      DP4 objLight.y, mvi[1], lightPos;
-      DP4 objLight.z, mvi[2], lightPos;
-      DP4 objLight.w, mvi[3], lightPos;
+      DP4 objLight.x, w2o[0], lightPosW;
+      DP4 objLight.y, w2o[1], lightPosW;
+      DP4 objLight.z, w2o[2], lightPosW;
+      DP4 objLight.w, w2o[3], lightPosW;
       
       ###
       # transform eye to objSpace

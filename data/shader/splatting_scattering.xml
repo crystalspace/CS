@@ -1,4 +1,4 @@
-<shader compiler="xmlshader" name="splatting_scattering">
+<shader compiler="xmlshader" name="splatting_scattering" lights="1">
   <shadervars>
     <!-- beta1 = Rayleigh -->
     <!-- .2
