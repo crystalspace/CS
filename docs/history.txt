@@ -27,6 +27,8 @@ chronological order.
 	- res created a retirement home for shaders.
 	- res reverted r28259: terrainf now works without changes to the world.
 	- res implemented texture comparison modes correctly in gl3d.
+	- res changed the shadowmapping shaders to utilize GL texture
+	  comparison (instead of "manual" comparison in the FP).
 17-Apr-2008
 	- Mike Gist made the following changes;
 	    - Added an InternalRefCount class, to be used where we want an

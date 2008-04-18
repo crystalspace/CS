@@ -41,7 +41,7 @@ namespace RenderManager
   template<typename RenderTree, typename LayerConfigType>
   class ShadowPSSM
   {
-public:
+  public:
     struct PersistentData;
     
     class ViewSetup
@@ -59,7 +59,7 @@ public:
 	// PSSM: split layers
 	
 	// @@@ FIXME: arbitrary
-	float near = 1.0f;
+	float near = SMALL_Z;
 	float far = 100.0f;
       
 	splitDists[0] = near;
@@ -222,6 +222,7 @@ public:
 	  /* The minimum Z over all parts is used to avoid clipping shadows of 
 	     casters closer to the light than the split plane */
 	  if (allObjsBox.MinZ() < allMinZ) allMinZ = allObjsBox.MinZ();
+	  /* Consider using DepthRange? */
 	  float n = -allObjsBox.MaxZ(); //-1.0f;
 	  float f = -allMinZ;//10.0f;
           CS::Math::Matrix4 Mortho = CS::Math::Projections::Ortho (-1, 1, 1, -1, n, f);
@@ -242,7 +243,7 @@ public:
 	    item->SetValue (matrix.Row (i));
 	  }
 	      
-	  shadowMapSize = 256;
+	  shadowMapSize = 1024;
   
 	  iTextureHandle* shadowTex = persist.texCache.QueryUnusedTexture (
 	    shadowMapSize, shadowMapSize, 0);

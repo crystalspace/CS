@@ -119,7 +119,8 @@
 	  <?Include /shader/snippets/lighting/lighting-tools.inc ?>
 	  
 	  <?Generate L 0 7?>
-	    <texture name="light shadow map[$L$]" destination="lightPropsSM.shadowMap[$L$]" />
+	    <texture name="light shadow map[$L$]" destination="lightPropsSM.shadowMap[$L$]"
+		     comparemode="rToTexture" comparefunc="gequal" />
 	  <?Endgenerate?>
 	</block>
 	

@@ -184,14 +184,11 @@ struct ShadowShadowMap : Shadow
     // Project SM coordinates
     shadowMapCoords.xyz /= shadowMapCoords.w;
     shadowMapCoords.xyz = (float3(0.5)*shadowMapCoords.xyz) + float3(0.5);
-    float4 shadowVal = tex2D (shadowMap, shadowMapCoords.xy);
     
     // Depth to compare against
     float compareDepth = shadowMapCoords.z + (1.0/32768.0);
-    // Depth from the shadow map
-    float shadowMapDepth = shadowVal.r;
-    // Shadow value
-    half inLight = compareDepth > shadowMapDepth;
+    // Depth compare with shadow map texel
+    half inLight = h4tex2D (shadowMap, float3 (shadowMapCoords.xy, compareDepth)).x;
     return inLight;
   }
 };
