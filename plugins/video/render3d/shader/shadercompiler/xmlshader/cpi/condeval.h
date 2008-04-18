@@ -104,6 +104,8 @@ public:
     int GetRefCount () const { return refcount; }
 
   private:
+    friend class Variables;
+  
     int refcount;
     CS_DECLARE_STATIC_CLASSVAR_REF (def, Def, ValueSet);
 
@@ -136,6 +138,10 @@ public:
       return (valueFlags >> shift) & valueMask;
     }
 
+    struct ValueSetChain;
+    typedef csBlockAllocator<ValueSetChain, TempHeapAlloc> ValChainBlockAlloc;
+    static void ValChainKill();
+    
     /* It works like this:
      * - the first inlinedSets value sets are inlined
      * - all sets above that stored in multiValues
@@ -152,10 +158,10 @@ public:
       ValueSetChain () : nextPlease (0) {}
       ValueSetChain (const ValueSetChain& other) : vs (other.vs), 
         nextPlease (0) {}
-      ~ValueSetChain() { delete nextPlease; }
-      // @@@ TODO: probably should use a blockalloc here as well
+      ~ValueSetChain() { ValChainAlloc().Free (nextPlease); }
     };
     ValueSetChain* multiValues;
+    DECLARE_STATIC_CLASSVAR_DIRECT(ValChainAlloc, ValChainBlockAlloc, ValChainKill,);
 
     ValueSet& GetMultiValue (uint num);
     const ValueSet& GetMultiValue (uint num) const;
@@ -206,7 +212,7 @@ public:
       ValueSetChain** d = &multiValues;
       while (s != 0)
       {
-        ValueSetChain* p = new ValueSetChain (*s);
+        ValueSetChain* p = ValChainAlloc().Alloc (*s);
         *d = p;
         d = &p->nextPlease;
         s = s->nextPlease;
@@ -214,7 +220,7 @@ public:
     }
     ~Values()
     {
-      delete multiValues;
+      ValChainAlloc().Free (multiValues);
     }
 
     Values& operator=(const Values& other)
@@ -229,12 +235,12 @@ public:
       valueTex = other.valueTex;
       valueBuf = other.valueBuf;
 
-      delete multiValues; multiValues = 0;
+      ValChainAlloc().Free (multiValues); multiValues = 0;
       ValueSetChain* s = other.multiValues;
       ValueSetChain** d = &multiValues;
       while (s != 0)
       {
-        ValueSetChain* p = new ValueSetChain (*s);
+        ValueSetChain* p = ValChainAlloc().Alloc (*s);
         *d = p;
         d = &p->nextPlease;
         s = s->nextPlease;
@@ -335,17 +341,34 @@ public:
   };
 protected:
   typedef csBlockAllocator<Values, TempHeapAlloc> ValBlockAlloc;
-  CS_DECLARE_STATIC_CLASSVAR_REF (valAlloc,
-    ValAlloc, ValBlockAlloc);
+  DECLARE_STATIC_CLASSVAR_DIRECT(ValAlloc, ValBlockAlloc, ValAllocKill,
+    (1024));
+  static void ValAllocKill();
+    
   static size_t valDeAllocCount;
   CS_DECLARE_STATIC_CLASSVAR (def,
     Def, Values);
 
+  class ValuesWrapper;
+  typedef csArray<ValuesWrapper> ValuesWrapperArray;
   class ValuesWrapper
   {
     csRef<Values> values;
+    ValuesWrapperArray* subValues;
   public:
-    csArray<ValuesWrapper> subValues;
+    ValuesWrapper () : subValues (0) {}
+    ValuesWrapper (const ValuesWrapper& other) : values (other.values),
+      subValues (other.subValues ? new ValuesWrapperArray (*other.subValues) : 0)
+    {}
+  
+    bool HasSubValues() const { return subValues != 0; }
+    const ValuesWrapperArray* GetSubValues() const
+    { return subValues; }
+    ValuesWrapperArray* GetSubValues()
+    {
+      if (subValues == 0) subValues = new ValuesWrapperArray;
+      return subValues;
+    }
 
     operator const Values* () const 
     { 
@@ -401,6 +424,11 @@ protected:
     inline ValuesWrapper& GetIndex (size_t n) { return _array.Get (n).v; }
     inline const ValuesWrapper& GetIndex (size_t n) const { return _array.Get (n).v; }
     inline CS::ShaderVarStringID GetIndexName (size_t n) const { return _array.Get (n).n; }
+    inline ValuesWrapper& Get (CS::ShaderVarStringID n)
+    { 
+      size_t index = _array.FindSortedKey (csArrayCmp<Entry, CS::StringIDValue> (n));
+      return _array[index].v;
+    }
     inline const ValuesWrapper& Get (CS::ShaderVarStringID n) const 
     { 
       size_t index = _array.FindSortedKey (csArrayCmp<Entry, CS::StringIDValue> (n));
@@ -447,7 +475,7 @@ protected:
   };
   ValuesArrayWrapper possibleValues;
   
-  static void MergeValuesInto (ValuesWrapper& dst, const ValuesWrapper& src)
+  static void OrMergeValuesInto (ValuesWrapper& dst, const ValuesWrapper& src)
   {
      // Subarrays may not have all items defined.
     if (dst == 0) return;
@@ -458,15 +486,40 @@ protected:
     }
     
     *dst |= *src;
-    size_t numIndices = csMin (dst.subValues.GetSize(), src.subValues.GetSize());
+    if (!dst.HasSubValues()) return;
+    size_t numIndices = csMin (dst.GetSubValues()->GetSize(), src.GetSubValues()->GetSize());
     for (size_t s = 0; s < numIndices; s++)
     {
-      MergeValuesInto (dst.subValues[s], src.subValues[s]);
+      OrMergeValuesInto (dst.GetSubValues()->Get (s), src.GetSubValues()->Get (s));
     }
-    while (dst.subValues.GetSize() > numIndices)
-      dst.subValues.DeleteIndexFast (numIndices);
+    while (dst.GetSubValues()->GetSize() > numIndices)
+      dst.GetSubValues()->DeleteIndexFast (numIndices);
+  }
+  static void AndMergeValuesInto (ValuesWrapper& dst, const ValuesWrapper& src)
+  {
+     // Subarrays may not have all items defined.
+    if (dst == 0)
+    {
+      dst = src;
+      return;
+    }
+    if (src == 0) return;
+    
+    *dst &= *src;
+    if (!src.HasSubValues()) return;
+    size_t numIndices = csMin (dst.GetSubValues()->GetSize(), src.GetSubValues()->GetSize());
+    for (size_t s = 0; s < numIndices; s++)
+    {
+      AndMergeValuesInto (dst.GetSubValues()->Get (s), src.GetSubValues()->Get (s));
+    }
+    for (size_t s = numIndices; s < src.GetSubValues()->GetSize(); s++)
+    {
+      dst.GetSubValues()->Push (src.GetSubValues()->Get (s));
+    }
   }
 public:
+  static void Init() { Values::ValChainAllocInit(); ValAllocInit(); }
+
   Variables () : possibleValues (ValuesArray ()) {}
   Variables (const Variables& other) : possibleValues (other.possibleValues)
   { }
@@ -488,7 +541,7 @@ public:
     {
       if (!vals->AsRef().IsValid()) vals->AsRef().AttachNew (ValAlloc().Alloc());
       if (numIndices > 0)
-        vals = &(vals->subValues.GetExtend (*ip++));
+        vals = &(vals->GetSubValues()->GetExtend (*ip++));
     }
     while (numIndices-- > 0);
     return vals->AsRef();
@@ -505,8 +558,8 @@ public:
       {
 	const ValuesWrapper* newVals = 0;
 	size_t subInd = *ip++;
-	if (vals->subValues.GetSize() > subInd)
-	  newVals = &(vals->subValues.Get (subInd));
+	if (vals->GetSubValues()->GetSize() > subInd)
+	  newVals = &(vals->GetSubValues()->Get (subInd));
 	vals = newVals;
       }
     }
@@ -528,6 +581,13 @@ public:
   }
   friend Variables operator| (const Variables& a, const Variables& b)
   {
+    /* "or":
+     * If no Values are available it means all values are possible.
+     * So if Values are in a but not in b, remove from a.
+     * If Values are not in a they'll have all possible values anyway,
+     *  don"t bother checking.
+     * If Values are in both, merge.
+     */
     Variables newVars (a);
     ValuesArray& nva = *newVars.possibleValues;
     const ValuesArray& pvB = *b.possibleValues;
@@ -538,12 +598,39 @@ public:
       {
         const ValuesWrapper& entry = pvB.Get (name);
         ValuesWrapper& vw = nva.GetIndex (n);
-        //*vw |= *entry;
-        MergeValuesInto (vw, entry);
+        OrMergeValuesInto (vw, entry);
         n++;
       }
       else
         nva.DeleteIndex (n);
+    }
+    return newVars;
+  }
+  friend Variables operator& (const Variables& a, const Variables& b)
+  {
+    /* "and":
+     * If no Values are available it means all values are possible.
+     * So if Values are in b but not in a, copy from b to a
+     * If Values are not in b leave value in a untouched.
+     * If Values are in both, merge.
+     */
+    Variables newVars (a);
+    ValuesArray& nva = *newVars.possibleValues;
+    const ValuesArray& pvB = *b.possibleValues;
+    for (size_t n = 0; n < pvB.GetSize(); n++)
+    {
+      const ValuesArray::Entry& entry = pvB[n];
+      CS::ShaderVarStringID name = entry.n;
+      if (nva.Has (name))
+      {
+        ValuesWrapper& vw = nva.Get (name);
+        AndMergeValuesInto (vw, entry.v);
+      }
+      else
+      {
+        ValuesWrapper& vw = nva.GetExtend (name);
+        vw = entry.v;
+      }
     }
     return newVars;
   }

@@ -32,6 +32,12 @@ using namespace CS;
 
 CS_IMPLEMENT_STATIC_CLASSVAR_REF(Variables::Values, def,
   Def, ValueSet, ());
+IMPLEMENT_STATIC_CLASSVAR_DIRECT(Variables::Values, ValChainAlloc);
+
+void Variables::Values::ValChainKill()
+{
+  ValChainAlloc().~csBlockAllocator();
+}
 
 ValueSet& Variables::Values::GetMultiValue (uint num)
 {
@@ -65,7 +71,7 @@ ValueSet& Variables::Values::GetValue (int type)
       {
         d = &(*d)->nextPlease;
       }
-      *d = new ValueSetChain ();
+      *d = ValChainAlloc().Alloc();
       return (*d)->vs;
     }
   }
@@ -146,8 +152,12 @@ struct SliceAllocatorBool
 CS_IMPLEMENT_STATIC_CLASSVAR_REF(SliceAllocatorBool, sliceAlloc,
   SliceAllocBool, SliceAllocatorBool::BlockAlloc, (32));
 
-CS_IMPLEMENT_STATIC_CLASSVAR_REF(Variables, valAlloc,
-  ValAlloc, Variables::ValBlockAlloc, (1024));
+IMPLEMENT_STATIC_CLASSVAR_DIRECT(Variables, ValAlloc);
+void Variables::ValAllocKill()
+{
+  ValAlloc().~csBlockAllocator();
+}
+
 size_t Variables::Values::deallocCount = 0;
 CS_IMPLEMENT_STATIC_CLASSVAR(Variables, def,
   Def, Variables::Values, ());
@@ -2184,10 +2194,8 @@ EvaluatorShadervarValues::BoolType EvaluatorShadervarValues::Boolean (
         /* Don't use the local trueVars/falseVars since the condition
            checking may change them to something which is not correct for
            the whole condition. */
-        Variables trueVars;
-        Variables falseVars;
         Logic3 result (evaluator.CheckConditionResults (operand.operation,
-          vars, trueVars, falseVars));
+          vars));
         
         ValueSetBool& vs = CreateValueBool();
         ValueSetBool& vsTrue = CreateValueBool();

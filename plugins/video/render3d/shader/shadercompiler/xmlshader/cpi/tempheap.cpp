@@ -23,20 +23,7 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
-  TempHeap::HeapRefCounted* TempHeap::theHeap = 0;
-  void TempHeap::TheHeap_kill ()
-  {
-    if (theHeap) theHeap->DecRef();
-    theHeap = 0;
-  }
-  TempHeap::HeapRefCounted* TempHeap::TheHeap ()
-  {
-    if (!theHeap)
-    {
-      theHeap = new TempHeap::HeapRefCounted;
-      csStaticVarCleanup (TheHeap_kill);
-    }
-    return theHeap;
-  }
+  int TempHeap::refcount;
+  IMPLEMENT_STATIC_CLASSVAR_DIRECT(TempHeap,TheHeap);
 }
 CS_PLUGIN_NAMESPACE_END(XMLShader)

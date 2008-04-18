@@ -86,6 +86,11 @@ class ConditionTree
   csArray<NodeStackEntry*, csArrayElementHandler<NodeStackEntry*>,
     TempHeapAlloc> nodeStack;
   csArray<int, csArrayElementHandler<int>, TempHeapAlloc> branchStack;
+  
+  csConditionID cheapshotCondition;
+  Variables cheapshotTrueVals;
+  Variables cheapshotFalseVals;
+  MyBitArrayTemp affectedSVs;
 
   void RecursiveAdd (csConditionID condition, Node* node, 
     NodeStackEntry& newCurrent, MyBitArrayTemp& affectedSVs);
@@ -136,13 +141,51 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
     return;
   }
 
+  Logic3 r;
   bool isLeaf = node->condition == Node::csCondUnknown;
+  bool doCheck = true;
+  if (node->parent != 0)
+  {
+    /* Do a check if a condition result check is worthwhile.
+      * For each node, the SVs which affect the node's and its
+      * parents conditions are recorded; if the intersection of
+      * that set with the set of SVs that affect the current
+      * condition is empty, we don't need to do a check.
+      *
+      * Though, if the node is a leaf, always check since the
+      * "true values" and "false values" are required.
+      */
+    MyBitArrayTemp& nodeAffectedSVs = node->parent->conditionAffectedSVs;
+    if (affectedSVs.GetSize() != nodeAffectedSVs.GetSize())
+    {
+      size_t newSize = csMax (affectedSVs.GetSize(),
+	nodeAffectedSVs.GetSize());
+      affectedSVs.SetSize (newSize);
+      nodeAffectedSVs.SetSize (newSize);
+    }
+    doCheck = !(affectedSVs & nodeAffectedSVs).AllBitsFalse();
+  }
   if (isLeaf)
   {
     Variables trueVals;
     Variables falseVals;
-    Logic3 r = evaluator.CheckConditionResults (condition, 
-      node->values, trueVals, falseVals);
+    if (doCheck)
+    {
+      r = evaluator.CheckConditionResults (condition, 
+	node->values, trueVals, falseVals);
+    }
+    else
+    {
+      if (cheapshotCondition != condition)
+      {
+        Variables v;
+	r = evaluator.CheckConditionResults (condition, 
+	  v, cheapshotTrueVals, cheapshotFalseVals);
+	cheapshotCondition = condition;
+      }
+      trueVals = node->values & cheapshotTrueVals;
+      falseVals = node->values & cheapshotFalseVals;
+    }
   
     switch (r.state)
     {
@@ -171,6 +214,7 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
 		parentAffectedSVs.GetSize());
 	      nodeAffectedSVs.SetSize (newSize);
 	      parentAffectedSVs.SetSize (newSize);
+	      affectedSVs.SetSize (newSize);
 	    }
 	    nodeAffectedSVs |= parentAffectedSVs;
 	  }
@@ -181,13 +225,13 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
 	    if (hasContainer)
 	    {
 	      /* If this condition is part of a "composite condition"
-	      * (|| or &&) up above in the tree, use the possible values
-	      * from running that containing condition with the possible
-	      * values from the contained condition. That way, in cases
-	      * like 'a' nested in 'a || b', a true 'a' will result in
-	      * a set of possible values of only true for 'b', allowing
-	      * the latter to be possibly folded away later.
-	      */
+	       * (|| or &&) up above in the tree, use the possible values
+	       * from running that containing condition with the possible
+	       * values from the contained condition. That way, in cases
+	       * like 'a' nested in 'a || b', a true 'a' will result in
+	       * a set of possible values of only true for 'b', allowing
+	       * the latter to be possibly folded away later.
+	       */
 	      Variables newTrueVals;
 	      Variables newFalseVals;
 	      if (b == 0)
@@ -220,29 +264,6 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
   }
   else
   {
-    Logic3 r;
-    bool doCheck = true;
-    if (node->parent != 0)
-    {
-      /* Do a check if a condition result check is worthwhile.
-	* For each node, the SVs which affect the node's and its
-	* parents conditions are recorded; if the intersection of
-	* that set with the set of SVs that affect the current
-	* condition is empty, we don't need to do a check.
-	*
-	* Though, if the node is a leaf, always check since the
-	* "true values" and "false values" are required.
-	*/
-      MyBitArrayTemp& nodeAffectedSVs = node->parent->conditionAffectedSVs;
-      if (affectedSVs.GetSize() != nodeAffectedSVs.GetSize())
-      {
-	size_t newSize = csMax (affectedSVs.GetSize(),
-	  nodeAffectedSVs.GetSize());
-	affectedSVs.SetSize (newSize);
-	nodeAffectedSVs.SetSize (newSize);
-      }
-      doCheck = !(affectedSVs & nodeAffectedSVs).AllBitsFalse();
-    }
     if (doCheck)
     {
       r = evaluator.CheckConditionResults (condition, 
@@ -279,18 +300,16 @@ Logic3 ConditionTree::Descend (csConditionID condition)
     switch (condition)
     {
       case csCondAlwaysTrue:
-	for (size_t i = 0; i < currentNodes.GetSize(); i++)
-	  newCurrent->branches[0].Push (currentNodes[i]);
+        newCurrent->branches[0] = currentNodes;
 	break;
       case csCondAlwaysFalse:
-	for (size_t i = 0; i < currentNodes.GetSize(); i++)
-	  newCurrent->branches[1].Push (currentNodes[i]);
+        newCurrent->branches[1] = currentNodes;
 	break;
     }
   }
   else
   {
-    MyBitArrayTemp affectedSVs;
+    affectedSVs.Clear();
     evaluator.GetUsedSVs (condition, affectedSVs);
     for (size_t i = 0; i < currentNodes.GetSize(); i++)
     {

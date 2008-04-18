@@ -49,6 +49,15 @@ SCF_IMPLEMENT_FACTORY (csXMLShaderCompiler)
 csXMLShaderCompiler::csXMLShaderCompiler(iBase* parent) : 
   scfImplementationType (this, parent), debugInstrProcessing (false)
 {
+  static bool staticInited = false;
+  if (!staticInited)
+  {
+    TempHeap::Init();
+    Variables::Init();
+    
+    staticInited = true;
+  }
+
   wrapperFact = 0;
   InitTokenTable (xmltokens);
 
