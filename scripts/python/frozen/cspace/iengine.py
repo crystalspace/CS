@@ -560,7 +560,7 @@ class iEngine(core.iBase):
     def GetRegions(*args): return _iengine.iEngine_GetRegions(*args)
     def CreateCollection(*args): return _iengine.iEngine_CreateCollection(*args)
     def GetCollection(*args): return _iengine.iEngine_GetCollection(*args)
-    def GetDefaultCollection(*args): return _iengine.iEngine_GetDefaultCollection(*args)
+    def GetCollections(*args): return _iengine.iEngine_GetCollections(*args)
     def RemoveCollection(*args): return _iengine.iEngine_RemoveCollection(*args)
     def RemoveAllCollections(*args): return _iengine.iEngine_RemoveAllCollections(*args)
     def CreateCamera(*args): return _iengine.iEngine_CreateCamera(*args)
@@ -1410,6 +1410,18 @@ class iCollection(core.iBase):
 iCollection_swigregister = _iengine.iCollection_swigregister
 iCollection_swigregister(iCollection)
 iCollection_scfGetVersion = _iengine.iCollection_scfGetVersion
+
+class iCollectionArray(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _iengine.new_iCollectionArray(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _iengine.delete_iCollectionArray
+    __del__ = lambda self : None;
+iCollectionArray_swigregister = _iengine.iCollectionArray_swigregister
+iCollectionArray_swigregister(iCollectionArray)
 
 def CS_REQUEST_ENGINE ():
    return core.CS_REQUEST_PLUGIN("crystalspace.engine.3d", iEngine)
