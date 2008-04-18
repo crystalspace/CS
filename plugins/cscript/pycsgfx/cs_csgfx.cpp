@@ -8514,67 +8514,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csImageBase_GetRawFormat(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csImageBase *arg1 = (csImageBase *) 0 ;
-  char *result = 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csImageBase_GetRawFormat",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csImageBase, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csImageBase_GetRawFormat" "', argument " "1"" of type '" "csImageBase const *""'"); 
-  }
-  arg1 = reinterpret_cast< csImageBase * >(argp1);
-  result = (char *)((csImageBase const *)arg1)->GetRawFormat();
-  resultobj = SWIG_FromCharPtr((const char *)result);
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csImageBase_GetRawData(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csImageBase *arg1 = (csImageBase *) 0 ;
-  SwigValueWrapper<csRef<iDataBuffer > > result;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csImageBase_GetRawData",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csImageBase, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csImageBase_GetRawData" "', argument " "1"" of type '" "csImageBase const *""'"); 
-  }
-  arg1 = reinterpret_cast< csImageBase * >(argp1);
-  result = ((csImageBase const *)arg1)->GetRawData();
-  {
-    /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
-    csRef<iDataBuffer> ref((csRef<iDataBuffer>&)result); /* explicit cast */
-    /*const csRef<iBase> ref = csRef<iBase>((iDataBuffer *)ref1);
-      if (!ref.IsValid())
-      {
-        Py_INCREF(Py_None);
-        resultobj = Py_None;
-      }
-      else
-      {
-        ref->IncRef();
-        resultobj = SWIG_NewPointerObj((void *)(iDataBuffer *)ref1, SWIG_TypeQuery("iDataBuffer" " *"), 1);
-      }*/
-    resultobj = _csRef_to_Python(csRef<iBase>(
-        (iDataBuffer *)ref), (void *)(iDataBuffer *)ref, "iDataBuffer" " *");
-    /*@SWIG@*/
-  }
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_csImageBase_GetImageType(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csImageBase *arg1 = (csImageBase *) 0 ;
@@ -8659,6 +8598,67 @@ SWIGINTERN PyObject *_wrap_csImageBase_GetSubImage(PyObject *SWIGUNUSEDPARM(self
       }*/
     resultobj = _csRef_to_Python(csRef<iBase>(
         (iImage *)ref), (void *)(iImage *)ref, "iImage" " *");
+    /*@SWIG@*/
+  }
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csImageBase_GetCookedImageFormat(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csImageBase *arg1 = (csImageBase *) 0 ;
+  char *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csImageBase_GetCookedImageFormat",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csImageBase, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csImageBase_GetCookedImageFormat" "', argument " "1"" of type '" "csImageBase *""'"); 
+  }
+  arg1 = reinterpret_cast< csImageBase * >(argp1);
+  result = (char *)(arg1)->GetCookedImageFormat();
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csImageBase_GetCookedImageData(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csImageBase *arg1 = (csImageBase *) 0 ;
+  SwigValueWrapper<csRef<iDataBuffer > > result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csImageBase_GetCookedImageData",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csImageBase, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csImageBase_GetCookedImageData" "', argument " "1"" of type '" "csImageBase *""'"); 
+  }
+  arg1 = reinterpret_cast< csImageBase * >(argp1);
+  result = (arg1)->GetCookedImageData();
+  {
+    /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
+    csRef<iDataBuffer> ref((csRef<iDataBuffer>&)result); /* explicit cast */
+    /*const csRef<iBase> ref = csRef<iBase>((iDataBuffer *)ref1);
+      if (!ref.IsValid())
+      {
+        Py_INCREF(Py_None);
+        resultobj = Py_None;
+      }
+      else
+      {
+        ref->IncRef();
+        resultobj = SWIG_NewPointerObj((void *)(iDataBuffer *)ref1, SWIG_TypeQuery("iDataBuffer" " *"), 1);
+      }*/
+    resultobj = _csRef_to_Python(csRef<iBase>(
+        (iDataBuffer *)ref), (void *)(iDataBuffer *)ref, "iDataBuffer" " *");
     /*@SWIG@*/
   }
   return resultobj;
@@ -10142,54 +10142,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csImageMemory_SetKeycolor(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csImageMemory *arg1 = (csImageMemory *) 0 ;
-  int arg2 ;
-  int arg3 ;
-  int arg4 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int val2 ;
-  int ecode2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
-  int val4 ;
-  int ecode4 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csImageMemory_SetKeycolor",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csImageMemory, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csImageMemory_SetKeycolor" "', argument " "1"" of type '" "csImageMemory *""'"); 
-  }
-  arg1 = reinterpret_cast< csImageMemory * >(argp1);
-  ecode2 = SWIG_AsVal_int(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csImageMemory_SetKeycolor" "', argument " "2"" of type '" "int""'");
-  } 
-  arg2 = static_cast< int >(val2);
-  ecode3 = SWIG_AsVal_int(obj2, &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "csImageMemory_SetKeycolor" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
-  ecode4 = SWIG_AsVal_int(obj3, &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "csImageMemory_SetKeycolor" "', argument " "4"" of type '" "int""'");
-  } 
-  arg4 = static_cast< int >(val4);
-  (arg1)->SetKeycolor(arg2,arg3,arg4);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_csImageMemory_ClearKeyColor(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csImageMemory *arg1 = (csImageMemory *) 0 ;
@@ -10211,27 +10163,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csImageMemory_ClearKeycolor(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csImageMemory *arg1 = (csImageMemory *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csImageMemory_ClearKeycolor",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csImageMemory, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csImageMemory_ClearKeycolor" "', argument " "1"" of type '" "csImageMemory *""'"); 
-  }
-  arg1 = reinterpret_cast< csImageMemory * >(argp1);
-  (arg1)->ClearKeycolor();
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_csImageMemory_ApplyKeyColor(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csImageMemory *arg1 = (csImageMemory *) 0 ;
@@ -10246,27 +10177,6 @@ SWIGINTERN PyObject *_wrap_csImageMemory_ApplyKeyColor(PyObject *SWIGUNUSEDPARM(
   }
   arg1 = reinterpret_cast< csImageMemory * >(argp1);
   (arg1)->ApplyKeyColor();
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csImageMemory_ApplyKeycolor(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csImageMemory *arg1 = (csImageMemory *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csImageMemory_ApplyKeycolor",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csImageMemory, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csImageMemory_ApplyKeycolor" "', argument " "1"" of type '" "csImageMemory *""'"); 
-  }
-  arg1 = reinterpret_cast< csImageMemory * >(argp1);
-  (arg1)->ApplyKeycolor();
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -11973,11 +11883,11 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csImageBase_GetKeyColor", _wrap_csImageBase_GetKeyColor, METH_VARARGS, NULL},
 	 { (char *)"csImageBase_HasMipmaps", _wrap_csImageBase_HasMipmaps, METH_VARARGS, NULL},
 	 { (char *)"csImageBase_GetMipmap", _wrap_csImageBase_GetMipmap, METH_VARARGS, NULL},
-	 { (char *)"csImageBase_GetRawFormat", _wrap_csImageBase_GetRawFormat, METH_VARARGS, NULL},
-	 { (char *)"csImageBase_GetRawData", _wrap_csImageBase_GetRawData, METH_VARARGS, NULL},
 	 { (char *)"csImageBase_GetImageType", _wrap_csImageBase_GetImageType, METH_VARARGS, NULL},
 	 { (char *)"csImageBase_HasSubImages", _wrap_csImageBase_HasSubImages, METH_VARARGS, NULL},
 	 { (char *)"csImageBase_GetSubImage", _wrap_csImageBase_GetSubImage, METH_VARARGS, NULL},
+	 { (char *)"csImageBase_GetCookedImageFormat", _wrap_csImageBase_GetCookedImageFormat, METH_VARARGS, NULL},
+	 { (char *)"csImageBase_GetCookedImageData", _wrap_csImageBase_GetCookedImageData, METH_VARARGS, NULL},
 	 { (char *)"csImageBase_swigregister", csImageBase_swigregister, METH_VARARGS, NULL},
 	 { (char *)"csImageMemoryBase_IncRef", _wrap_csImageMemoryBase_IncRef, METH_VARARGS, NULL},
 	 { (char *)"csImageMemoryBase_DecRef", _wrap_csImageMemoryBase_DecRef, METH_VARARGS, NULL},
@@ -12007,11 +11917,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csImageMemory_CheckAlpha", _wrap_csImageMemory_CheckAlpha, METH_VARARGS, NULL},
 	 { (char *)"csImageMemory_SetFormat", _wrap_csImageMemory_SetFormat, METH_VARARGS, NULL},
 	 { (char *)"csImageMemory_SetKeyColor", _wrap_csImageMemory_SetKeyColor, METH_VARARGS, NULL},
-	 { (char *)"csImageMemory_SetKeycolor", _wrap_csImageMemory_SetKeycolor, METH_VARARGS, NULL},
 	 { (char *)"csImageMemory_ClearKeyColor", _wrap_csImageMemory_ClearKeyColor, METH_VARARGS, NULL},
-	 { (char *)"csImageMemory_ClearKeycolor", _wrap_csImageMemory_ClearKeycolor, METH_VARARGS, NULL},
 	 { (char *)"csImageMemory_ApplyKeyColor", _wrap_csImageMemory_ApplyKeyColor, METH_VARARGS, NULL},
-	 { (char *)"csImageMemory_ApplyKeycolor", _wrap_csImageMemory_ApplyKeycolor, METH_VARARGS, NULL},
 	 { (char *)"csImageMemory_GetImageType", _wrap_csImageMemory_GetImageType, METH_VARARGS, NULL},
 	 { (char *)"csImageMemory_SetImageType", _wrap_csImageMemory_SetImageType, METH_VARARGS, NULL},
 	 { (char *)"csImageMemory_HasMipmaps", _wrap_csImageMemory_HasMipmaps, METH_VARARGS, NULL},

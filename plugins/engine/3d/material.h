@@ -143,6 +143,10 @@ private:
   csRef<iMaterialEngine> matEngine;
 
   iMaterialList* materials;
+
+protected:
+  virtual void InternalRemove() { SelfDestruct(); }
+
 private:
   /// Release material handle
   virtual ~csMaterialWrapper ();

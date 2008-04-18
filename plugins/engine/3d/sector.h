@@ -320,6 +320,9 @@ public:
 
   virtual void PrecacheDraw ();
 
+protected:
+  virtual void InternalRemove() { SelfDestruct(); }
+
 private:
   // -- PRIVATE METHODS
 

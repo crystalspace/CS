@@ -201,6 +201,10 @@ protected:
   csRef<iSharedVariable> var_min_render_dist, var_max_render_dist;
   csRef<csLODListener> var_min_render_dist_listener;
   csRef<csLODListener> var_max_render_dist_listener;
+
+protected:
+  virtual void InternalRemove() { SelfDestruct(); }
+
 private:
   /// Mesh object corresponding with this csMeshWrapper.
   csRef<iMeshObject> meshobj;

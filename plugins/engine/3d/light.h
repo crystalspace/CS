@@ -173,6 +173,10 @@ protected:
   csEngine* engine;
   
   csShaderVariable* GetPropertySV (csLightShaderVarCache::LightProperty prop);
+
+protected:
+  void InternalRemove() { SelfDestruct(); }
+
 public:
   /// Set of flags
   csFlags flags;

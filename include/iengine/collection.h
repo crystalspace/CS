@@ -19,6 +19,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __IENGINE_COLLECTION_H__
 #define __IENGINE_COLLECTION_H__
 
+#include "iutil/array.h"
 #include "csutil/scf.h"
 
 struct iCameraPosition;
@@ -32,9 +33,7 @@ struct iShader;
 
 /**
  * A collection is used to store related objects in a simple structure
- * to guarentee that they won't be freed by the engine. The engine has
- * a default collection where all iObjects are placed unless explicitly
- * placed in another collection.
+ * to guarentee that they won't be freed by the engine and to help management.
  */
 
 struct iCollection : public virtual iBase
@@ -59,7 +58,7 @@ struct iCollection : public virtual iBase
   /**
    * Release all references to objects held by this collection.
    */
-  virtual void ReleaseAllObjects() = 0;
+  virtual void ReleaseAllObjects(bool debug = false) = 0;
 
   /**
    * Returns true if this collection is the parent of the object passed.
@@ -107,6 +106,14 @@ struct iCollection : public virtual iBase
    * it returns the camera position.
    */
   virtual iCameraPosition* FindCameraPosition(const char *name) = 0;
+};
+
+/**
+ * Used for a readonly array of iCollection.
+ */
+struct iCollectionArray : public iArrayReadOnly<iCollection*>
+{
+  SCF_IARRAYREADONLY_INTERFACE (iCollectionArray);
 };
 
 #endif // __IENGINE_COLLECTION_H__

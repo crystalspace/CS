@@ -60,7 +60,9 @@ namespace Threading
       }
       else
       {
-        condition.Wait (mutex);
+        while (currentCount < maxCount)
+          condition.Wait (mutex);
+
         return false;
       }
     }

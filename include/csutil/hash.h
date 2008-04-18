@@ -236,6 +236,21 @@ public:
     return values[idx].value;
   }
 
+  /// Get all the elements, or empty if there are none.
+  csArray<T> GetAll () const
+  {
+    if (Elements.GetSize() == 0) return csArray<T> ();
+
+    ConstGlobalIterator itr = GetIterator();
+    csArray<T> ret;
+    while(itr.HasNext())
+    {
+      ret.Push(itr.Next());
+    }
+
+    return ret;
+  }
+
   /// Get all the elements with the given key, or empty if there are none.
   csArray<T> GetAll (const K& key) const
   {

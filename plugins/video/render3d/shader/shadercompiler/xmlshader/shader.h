@@ -199,6 +199,10 @@ class csXMLShader : public scfImplementationExt2<csXMLShader,
   {
     return activeTech ? activeTech->svcontext : globalSVContext;
   }
+
+protected:
+  void InternalRemove() { SelfDestruct(); }
+
 public:
   CS_LEAKGUARD_DECLARE (csXMLShader);
 

@@ -304,6 +304,11 @@ void csSndSysRendererOpenAL::Report(int severity, const char* msg, ...)
 
 void csSndSysRendererOpenAL::Update()
 {
+  // Listener is created on open, but EventHandler is setup at init,
+  // so, in some cases we can get here without the listener having been
+  // created yet.
+  if (!m_Listener)
+    return;
   // Get exclusive access to the OpenAL context.
   ScopedRendererLock lock (*this);
 
@@ -381,7 +386,7 @@ void csSndSysRendererOpenAL::Open()
   }
 
   // Create a listener
-  m_Listener = new SndSysListenerOpenAL();
+  m_Listener.AttachNew(new SndSysListenerOpenAL());
 }
 
 void csSndSysRendererOpenAL::Close()

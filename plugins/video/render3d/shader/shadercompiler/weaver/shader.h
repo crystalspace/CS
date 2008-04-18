@@ -64,6 +64,10 @@ class WeaverShader : public scfImplementationExt2<WeaverShader,
   /// Shader we actually use
   csRef<iShader> realShader;
   csString filename;
+
+protected:
+  void InternalRemove() { SelfDestruct(); }
+
 public:
   CS_LEAKGUARD_DECLARE (WeaverShader);
 
