@@ -125,9 +125,7 @@
 	
 	<block location="cg:variablemap">
 	  <?Lighting_Variablemaps?>
-	  
-	  <variablemap variable="light shadow map projection" 
-		       destination="lightPropsSM.shadowMapTF" />
+	  <?Lighting_ShadowMap_Variablemaps?>
 	</block>
 	
 	<block location="cg:definitions">

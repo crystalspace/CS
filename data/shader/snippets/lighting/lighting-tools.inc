@@ -42,6 +42,8 @@
   <?Endtemplate?>
   
   <?Template Lighting_ShadowMap_Variablemaps?>
+    <variablemap variable="light shadow map projection" 
+		 destination="lightPropsSM.shadowMapTF" />
   <?Endtemplate?>
   
   <?SEndIf?>

@@ -237,6 +237,6 @@
     </pass>
   </technique>
   
-  <!-- If PPL is not available, try PVL -->
-  <fallbackshader name="lighting_default_shadowmap_pvl" file="/shader/lighting/lighting_default_shadowmap_pvl.xml" />
+  <!-- Try w/o shadow map -->
+  <fallbackshader name="lighting_default" file="/shader/lighting/lighting_default.xml" />
 </shader>

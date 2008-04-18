@@ -169,7 +169,6 @@ struct ShadowShadowMap : Shadow
     flipY[3] = float4 (0, 0, 0, 1);
     shadowMapTF = mul (shadowMapTF, flipY);
     shadowMapCoords = mul (shadowMapTF, view_pos);
-    //shadowMapCoords = mul (shadowMapTF, surfPositionWorld);
     
     vp_shadowMapCoords = shadowMapCoords;
   }
@@ -185,7 +184,6 @@ struct ShadowShadowMap : Shadow
     // Project SM coordinates
     shadowMapCoords.xyz /= shadowMapCoords.w;
     shadowMapCoords.xyz = (float3(0.5)*shadowMapCoords.xyz) + float3(0.5);
-    //debug (float4 (shadowMapCoords.xy, 0, 1));
     float4 shadowVal = tex2D (shadowMap, shadowMapCoords.xy);
     
     // Depth to compare against
