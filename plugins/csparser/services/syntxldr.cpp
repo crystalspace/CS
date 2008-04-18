@@ -1177,6 +1177,10 @@ bool csTextSyntaxService::ParseShaderVar (iLoaderContext* ldr_context,
 	    return false;
 	  }
 	  var.SetAccessor (acc);
+	  /* Set a type to avoid a premature accessor call (many shader 
+	     expressions may utilize variables set in the shader which
+	     might not be available when the type is tried to be determined) */
+	  var.SetType (csShaderVariable::VECTOR4);
 	}
       }
       break;
@@ -1187,6 +1191,10 @@ bool csTextSyntaxService::ParseShaderVar (iLoaderContext* ldr_context,
 	if (!acc.IsValid())
 	  return false;
 	var.SetAccessor (acc);
+	/* Set a type to avoid a premature accessor call (many shader 
+	    expressions may utilize variables set in the shader which
+	    might not be available when the type is tried to be determined) */
+        var.SetType (csShaderVariable::VECTOR4);
       }
       break;
     case XMLTOKEN_ARRAY:

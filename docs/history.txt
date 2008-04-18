@@ -19,6 +19,9 @@ chronological order.
 	- Jorrit reverted Xordan's sprcal3d fix. The idea behind UpdateMove()
 	  is that it is only called when the object moves. Not all the time.
 	- res made more small optimizations to xmlshader.
+	- res changed the syntax service to set a shader var type on shader
+	  vars using expressions. This allows to use SVs which are only defined
+	  in the shader.
 17-Apr-2008
 	- Mike Gist made the following changes;
 	    - Added an InternalRefCount class, to be used where we want an
