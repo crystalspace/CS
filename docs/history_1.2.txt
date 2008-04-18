@@ -3,6 +3,8 @@
 18-Apr-2008
 	- Vincent merged r29324, r29326 and r29329 into 1.2 (cleanup of
 	  long-obsolete Jam rule options).
+	- Vincent merged r29330 and r29332 into 1.2 (work-around internal Jam
+	  crasher triggered by InferFlagTuples and RelayLibs Jam rules).
 16-Apr-2008
 	- Vincent merged r29296:29301 into 1.2 (fix broken folding of
 	  multi-token build switches (such as "-framework Foundation")).

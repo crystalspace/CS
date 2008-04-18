@@ -11,6 +11,16 @@ chronological order.
 	  invocations from flags.jam.
 	- Eric Sunshine eliminated usage of the long-obsolete 'nostatic' option
 	  for invocations of CFLags and LFLags Jam rules.
+	- Eric Sunshine augmented InferFlagsTuple in flags.jam so that it also
+	  considers the shell backtick (`) operator as an option introducer.
+	  This operator is used by the RelayLibs rule, for instance, to
+	  determine link flags dynamically at build time (as opposed to
+	  configure time). This change also works around a Jam bug where its
+	  var_expand() function in jam/expand.c allocates a buffer of only 1024
+	  characters for the variable expand-and-join operation $(var:J=x)
+	  which is employed by InferFlagsTuple. The very lengthy backtick
+	  commands employed by RelayLibs were easily overflowing this internal
+	  Jam limit, thus causing it to corrupt its own stack.
 16-Apr-2008
 	- Eric Sunshine clarified and enhanced documentation of RemoveDups rule
 	  in helper.jam.
