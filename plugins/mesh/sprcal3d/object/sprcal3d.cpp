@@ -1590,10 +1590,6 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
     ((MeshAccessor*)rm->buffers->GetAccessor())->movable = movable;
   }
 
-  // Make sure we have a regular update, so things like dynamic
-  // lighting affect the mesh immediately instead of on the next move.
-  movable->UpdateMove();
-
   n = (int)rendermeshes.GetSize ();
   return rendermeshes.GetArray();
 }
