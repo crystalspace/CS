@@ -24,6 +24,7 @@ chronological order.
 	  in the shader.
 	- res tweaked the default render layers, terrain shader and (minimally)
 	  'terrain' world to make it work with RM.
+	- res created a retirement home for shaders.
 17-Apr-2008
 	- Mike Gist made the following changes;
 	    - Added an InternalRefCount class, to be used where we want an
