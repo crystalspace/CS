@@ -206,6 +206,8 @@ protected:
   /// Upload the texture to GL.
   void Load ();
   void Unload ();
+  
+  CS::Graphics::TextureComparisonMode texCompare;
 public:
   /// The dimensions which were requested upon texture creation
   int orig_width, orig_height, orig_d;
@@ -338,6 +340,8 @@ public:
   void UpdateTexture ();
 
   GLuint GetHandle ();
+  void ChangeTextureCompareMode (
+    const CS::Graphics::TextureComparisonMode& mode);
 
   /**
    * Return the texture target for this texture (e.g. GL_TEXTURE_2D)

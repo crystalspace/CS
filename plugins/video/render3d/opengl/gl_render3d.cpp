@@ -838,7 +838,6 @@ bool csGLGraphics3D::Open ()
   //ext->InitGL_ATI_separate_stencil ();
   ext->InitGL_EXT_secondary_color ();
   ext->InitGL_EXT_blend_func_separate ();
-  ext->InitGL_ARB_shadow ();
 #ifdef CS_DEBUG
   ext->InitGL_GREMEDY_string_marker ();
 #endif
@@ -1620,17 +1619,14 @@ bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
       DeactivateTexture (unit);
       return false;
   }
-  /*texunitenabled[unit] = true;
-  texunittarget[unit] = gltxthandle->target;*/
+  
+  imageUnits[unit].texture = gltxthandle;
   
   return true;
 }
 
 void csGLGraphics3D::DeactivateTexture (int unit)
 {
-  /*if (!texunitenabled[unit])
-    return;*/
-
   if (ext->CS_GL_ARB_multitexture)
   {
     statecache->SetCurrentTU (unit);
@@ -1638,29 +1634,13 @@ void csGLGraphics3D::DeactivateTexture (int unit)
   }
   else if (unit != 0) return;
 
-  /*switch (texunittarget[unit])
-  {
-    case iTextureHandle::CS_TEX_IMG_1D:
-      statecache->Disable_GL_TEXTURE_1D ();
-      break;
-    case iTextureHandle::CS_TEX_IMG_2D:
-      statecache->Disable_GL_TEXTURE_2D ();
-      break;
-    case iTextureHandle::CS_TEX_IMG_3D:
-      statecache->Disable_GL_TEXTURE_3D ();
-      break;
-    case iTextureHandle::CS_TEX_IMG_CUBEMAP:
-      statecache->Disable_GL_TEXTURE_CUBE_MAP ();
-      break;
-  }*/
-
   statecache->Disable_GL_TEXTURE_1D ();
   statecache->Disable_GL_TEXTURE_2D ();
   statecache->Disable_GL_TEXTURE_3D ();
   statecache->Disable_GL_TEXTURE_CUBE_MAP ();
   statecache->Disable_GL_TEXTURE_RECTANGLE_ARB ();
 
-  imageUnits[unit].enabled = false;
+  imageUnits[unit].texture = 0;
 }
 
 void csGLGraphics3D::SetTextureState (int* units, iTextureHandle** textures,
@@ -1691,27 +1671,23 @@ void csGLGraphics3D::SetTextureState (int* units, iTextureHandle** textures,
 void csGLGraphics3D::SetTextureComparisonModes (int* units,
   CS::Graphics::TextureComparisonMode* modes, int count)
 {
-  if (!ext->CS_GL_ARB_shadow) return;
-
   if (modes == 0)
   {
+    CS::Graphics::TextureComparisonMode modeDisabled;
     for (int i = 0 ; i < count ; i++)
     {
       int unit = units[i];
+      
+      if (imageUnits[unit].texture == 0) continue;
+      
       if (ext->CS_GL_ARB_multitexture)
       {
 	statecache->SetCurrentTU (unit);
-	statecache->ActivateTU (csGLStateCache::activateTexEnv);
+	statecache->ActivateTU (csGLStateCache::activateImage);
       }
       else if (unit != 0) continue;
       
-      if (imageUnits[unit].texCompare.mode
-        != CS::Graphics::TextureComparisonMode::compareNone)
-      {
-	glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-	imageUnits[unit].texCompare.mode =
-	  CS::Graphics::TextureComparisonMode::compareNone;
-      }
+      imageUnits[unit].texture->ChangeTextureCompareMode (modeDisabled);
     }
   }
   else
@@ -1719,6 +1695,8 @@ void csGLGraphics3D::SetTextureComparisonModes (int* units,
     for (int i = 0 ; i < count ; i++)
     {
       int unit = units[i];
+      if (imageUnits[unit].texture == 0) continue;
+      
       if (ext->CS_GL_ARB_multitexture)
       {
 	statecache->SetCurrentTU (unit);
@@ -1726,37 +1704,7 @@ void csGLGraphics3D::SetTextureComparisonModes (int* units,
       }
       else if (unit != 0) continue;
       
-      if (modes[i].mode != imageUnits[unit].texCompare.mode)
-      {
-	GLint compareMode = GL_NONE;
-	switch (modes[i].mode)
-	{
-	  case CS::Graphics::TextureComparisonMode::compareNone:
-	    //compareMode = GL_NONE;
-	    break;
-	  case CS::Graphics::TextureComparisonMode::compareR:
-	    compareMode = GL_COMPARE_R_TO_TEXTURE;
-	    break;
-	}
-	glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_COMPARE_MODE, compareMode);
-	imageUnits[unit].texCompare.mode = modes[i].mode;
-      }
-      if (modes[i].mode
-	&& (modes[i].function != imageUnits[unit].texCompare.function))
-      {
-	GLint compareFunc = GL_LEQUAL;
-	switch (modes[i].function)
-	{
-	  case CS::Graphics::TextureComparisonMode::funcLEqual:
-	    //compareFunc = GL_LEQUAL;
-	    break;
-	  case CS::Graphics::TextureComparisonMode::funcGEqual:
-	    compareFunc = GL_GEQUAL;
-	    break;
-	}
-	glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_COMPARE_FUNC, compareFunc);
-	imageUnits[unit].texCompare.function = modes[i].function;
-      }
+      imageUnits[unit].texture->ChangeTextureCompareMode (modes[i]);
     }
   }
 }
@@ -3156,7 +3104,11 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
         | csGLStateCache::activateTexCoord);
     }
     if (mesh.texture)
+    {
       ActivateTexture (mesh.texture);
+      imageUnits[0].texture->ChangeTextureCompareMode (
+        CS::Graphics::TextureComparisonMode ());
+    }
     else
       DeactivateTexture ();
   }

@@ -635,6 +635,47 @@ GLuint csGLBasicTextureHandle::GetHandle ()
   Precache ();
   return Handle;
 }
+  
+void csGLBasicTextureHandle::ChangeTextureCompareMode (
+  const CS::Graphics::TextureComparisonMode& mode)
+{
+  if (!G3D->ext->CS_GL_ARB_shadow) return;
+
+  GLenum textarget = GetGLTextureTarget();
+  csGLGraphics3D::statecache->SetTexture (textarget, GetHandle ());
+  
+  if (mode.mode != texCompare.mode)
+  {
+    GLint compareMode = GL_NONE;
+    switch (mode.mode)
+    {
+      case CS::Graphics::TextureComparisonMode::compareNone:
+	//compareMode = GL_NONE;
+	break;
+      case CS::Graphics::TextureComparisonMode::compareR:
+	compareMode = GL_COMPARE_R_TO_TEXTURE;
+	break;
+    }
+    glTexParameteri (textarget, GL_TEXTURE_COMPARE_MODE, compareMode);
+    texCompare.mode = mode.mode;
+  }
+  if (mode.mode
+    && (mode.function != texCompare.function))
+  {
+    GLint compareFunc = GL_LEQUAL;
+    switch (mode.function)
+    {
+      case CS::Graphics::TextureComparisonMode::funcLEqual:
+	//compareFunc = GL_LEQUAL;
+	break;
+      case CS::Graphics::TextureComparisonMode::funcGEqual:
+	compareFunc = GL_GEQUAL;
+	break;
+    }
+    glTexParameteri (textarget, GL_TEXTURE_COMPARE_FUNC, compareFunc);
+    texCompare.function = mode.function;
+  }
+}
 
 GLenum csGLBasicTextureHandle::GetGLTextureTarget() const
 {

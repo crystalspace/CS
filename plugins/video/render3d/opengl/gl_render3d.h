@@ -421,11 +421,10 @@ private:
 
   struct ImageUnit : public CS::Memory::CustomAllocated
   {
-    bool enabled;
     GLuint target;
-    CS::Graphics::TextureComparisonMode texCompare;
+    csGLBasicTextureHandle* texture;
     
-    ImageUnit (): enabled (false), target (0) { }
+    ImageUnit (): target (0) { }
   };
   GLint numImageUnits;
   ImageUnit* imageUnits;
