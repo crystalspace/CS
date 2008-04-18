@@ -39,15 +39,6 @@ CS_LEAKGUARD_IMPLEMENT (csXMLShaderTech);
 
 //---------------------------------------------------------------------------
 
-iRenderBuffer* csXMLShaderTech::last_buffers[shaderPass::STREAMMAX*2];
-iRenderBuffer* csXMLShaderTech::clear_buffers[shaderPass::STREAMMAX*2];
-size_t csXMLShaderTech::lastBufferCount;
-
-iTextureHandle* csXMLShaderTech::last_textures[shaderPass::TEXTUREMAX];
-iTextureHandle* csXMLShaderTech::clear_textures[shaderPass::TEXTUREMAX];
-int csXMLShaderTech::textureUnits[shaderPass::TEXTUREMAX];
-size_t csXMLShaderTech::lastTexturesCount;
-
 csXMLShaderTech::csXMLShaderTech (csXMLShader* parent) : 
   passes(0), passesCount(0), currentPass((size_t)~0),
   xmltokens (parent->compiler->xmltokens)
@@ -55,10 +46,6 @@ csXMLShaderTech::csXMLShaderTech (csXMLShader* parent) :
   csXMLShaderTech::parent = parent;
 
   do_verbose = parent->compiler->do_verbose;
-
-  int i;
-  for (i = 0; i < shaderPass::TEXTUREMAX; i++)
-    textureUnits[i] = i;
 }
 
 csXMLShaderTech::~csXMLShaderTech()
@@ -71,7 +58,7 @@ static inline bool IsDestalphaMixmode (uint mode)
   return (mode == CS_FX_DESTALPHAADD);
 }
 
-bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass, 
+bool csXMLShaderTech::LoadPass (iDocumentNode *node, ShaderPass* pass, 
                                 size_t variant)
 {
   iSyntaxService* synldr = parent->compiler->synldr;
@@ -385,7 +372,6 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
 
 
   //get texturemappings
-  pass->textureCount = 0;
   it = node->GetNodes (xmltokens.Request (
     csXMLShaderCompiler::XMLTOKEN_TEXTURE));
   while(it->HasNext ())
@@ -410,12 +396,11 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
       if (texUnit < 0) continue;
       CS::Graphics::ShaderVarNameParser parser (
         mapping->GetAttributeValue("name"));
-      pass->textures[texUnit].id = stringsSvName->Request (
-        parser.GetShaderVarName ());
-      parser.FillArrayWithIndices (
-        pass->textures[texUnit].indices);
-
-      pass->textureCount = MAX(pass->textureCount, texUnit + 1);
+      ShaderPass::TextureMapping texMap;
+      texMap.id = stringsSvName->Request (parser.GetShaderVarName ());
+      parser.FillArrayWithIndices (texMap.indices);
+      texMap.textureUnit = texUnit;
+      pass->textures.Push (texMap);
     }
   }
 
@@ -441,7 +426,7 @@ bool csXMLShaderCompiler::LoadSVBlock (iLoaderContext* ldr_context,
 }
 
 csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (
-  iShaderDestinationResolver* resolve, iDocumentNode* node, shaderPass* /*pass*/,
+  iShaderDestinationResolver* resolve, iDocumentNode* node, ShaderPass* /*pass*/,
   size_t variant)
 {
   if (node->GetAttributeValue("plugin") == 0)
@@ -571,11 +556,11 @@ bool csXMLShaderTech::Load (iLoaderContext* ldr_context,
     parent->compiler->LoadSVBlock (ldr_context, varNode, &svcontext);
 
   //alloc passes
-  passes = new shaderPass[passesCount];
+  passes = new ShaderPass[passesCount];
   uint i;
   for (i = 0; i < passesCount; i++)
   {
-    shaderPass& pass = passes[i];
+    ShaderPass& pass = passes[i];
     pass.alphaMode.autoAlphaMode = true;
     pass.alphaMode.autoModeTexture = 
       parent->compiler->stringsSvName->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
@@ -606,7 +591,7 @@ bool csXMLShaderTech::ActivatePass (size_t number)
 
   currentPass = number;
 
-  shaderPass *thispass = &passes[currentPass];
+  ShaderPass* thispass = &passes[currentPass];
   if(thispass->vproc) thispass->vproc->Activate ();
   if(thispass->vp) thispass->vp->Activate ();
   if(thispass->fp) thispass->fp->Activate ();
@@ -629,7 +614,7 @@ bool csXMLShaderTech::DeactivatePass ()
 {
   if(currentPass>=passesCount)
     return false;
-  shaderPass *thispass = &passes[currentPass];
+  ShaderPass* thispass = &passes[currentPass];
   currentPass = (size_t)~0;
 
   if(thispass->vproc) thispass->vproc->Deactivate ();
@@ -637,15 +622,14 @@ bool csXMLShaderTech::DeactivatePass ()
   if(thispass->fp) thispass->fp->Deactivate ();
 
   iGraphics3D* g3d = parent->g3d;
-/*  g3d->SetBufferState(thispass->vertexattributes, clear_buffers, 
-    lastBufferCount);*/
   g3d->DeactivateBuffers (thispass->custommapping_attrib.GetArray (), 
-    (int)lastBufferCount);
-  lastBufferCount=0;
+    (int)thispass->custommapping_attrib.GetSize ());
 
-  g3d->SetTextureState(textureUnits, clear_textures, 
-    (int)lastTexturesCount);
-  lastTexturesCount=0;
+  int texturesCount = (int)thispass->textures.GetSize();
+  CS_ALLOC_STACK_ARRAY(int, textureUnits, texturesCount);
+  for (int j = 0; j < texturesCount; j++)
+    textureUnits[j] = thispass->textures[j].textureUnit;
+  g3d->SetTextureState(textureUnits, 0, texturesCount);
   
   if (thispass->overrideZmode)
     g3d->SetZMode (oldZmode);
@@ -663,18 +647,20 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
     return false;
 
   iGraphics3D* g3d = parent->g3d;
-  shaderPass *thispass = &passes[currentPass];
+  ShaderPass* thispass = &passes[currentPass];
 
   //first run the preprocessor
   if(thispass->vproc) thispass->vproc->SetupState (mesh, modes, stack);
 
+  size_t buffersCount = thispass->custommapping_attrib.GetSize ();
+  CS_ALLOC_STACK_ARRAY(iRenderBuffer*, customBuffers, buffersCount);
   //now map our buffers. all refs should be set
   size_t i;
   for (i = 0; i < thispass->custommapping_attrib.GetSize (); i++)
   {
     if (thispass->custommapping_buffer[i] != CS_BUFFER_NONE)
     {
-      last_buffers[i] = modes.buffers->GetRenderBuffer (
+      customBuffers[i] = modes.buffers->GetRenderBuffer (
 	thispass->custommapping_buffer[i]);
     }
     else if (thispass->custommapping_id[i] < (csStringID)stack.GetSize ())
@@ -682,22 +668,24 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
       csShaderVariable* var = 0;
       var = csGetShaderVariableFromStack (stack, thispass->custommapping_id[i]);
       if (var)
-        var->GetValue(last_buffers[i]);
+        var->GetValue (customBuffers[i]);
       else
-        last_buffers[i] = 0;
+        customBuffers[i] = 0;
     }
     else
-      last_buffers[i] = 0;
+      customBuffers[i] = 0;
   }
   g3d->ActivateBuffers (modes.buffers, thispass->defaultMappings);
   g3d->ActivateBuffers (thispass->custommapping_attrib.GetArray (), 
-    last_buffers, (uint)thispass->custommapping_attrib.GetSize ());
-  lastBufferCount = thispass->custommapping_attrib.GetSize ();
+    customBuffers, (uint)buffersCount);
   
   //and the textures
-  int j;
-  for (j = 0; j < thispass->textureCount; j++)
+  size_t textureCount = thispass->textures.GetSize();
+  CS_ALLOC_STACK_ARRAY(int, textureUnits, textureCount);
+  CS_ALLOC_STACK_ARRAY(iTextureHandle*, textureHandles, textureCount);
+  for (size_t j = 0; j < textureCount; j++)
   {
+    textureUnits[j] = thispass->textures[j].textureUnit;
     if (size_t (thispass->textures[j].id) < stack.GetSize ())
     {
       csShaderVariable* var = 0;
@@ -710,22 +698,20 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
       if (var)
       {
         iTextureWrapper* wrap;
-        var->GetValue(wrap);
+        var->GetValue (wrap);
         if (wrap) 
         {
           wrap->Visit ();
-          last_textures[j] = wrap->GetTextureHandle ();
+          textureHandles[j] = wrap->GetTextureHandle ();
         } else 
-          var->GetValue(last_textures[j]);
+          var->GetValue (textureHandles[j]);
       } else
-        last_textures[j] = 0;
+        textureHandles[j] = 0;
     }
     else
-      last_textures[j] = 0;
+      textureHandles[j] = 0;
   }
-  g3d->SetTextureState (textureUnits, last_textures, 
-    thispass->textureCount);
-  lastTexturesCount = thispass->textureCount;
+  g3d->SetTextureState (textureUnits, textureHandles, textureCount);
 
   modes = *mesh;
   if (thispass->alphaMode.autoAlphaMode)
@@ -771,7 +757,7 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
 
 bool csXMLShaderTech::TeardownPass ()
 {
-  shaderPass *thispass = &passes[currentPass];
+  ShaderPass* thispass = &passes[currentPass];
 
   if(thispass->vproc) thispass->vproc->ResetState ();
   if(thispass->vp) thispass->vp->ResetState ();
@@ -786,7 +772,7 @@ void csXMLShaderTech::GetUsedShaderVars (csBitArray& bits) const
 
   for (size_t pass = 0; pass < passesCount; pass++)
   {
-    shaderPass *thispass = &passes[pass];
+    ShaderPass* thispass = &passes[pass];
 
     if(thispass->vproc)
     {
@@ -801,7 +787,7 @@ void csXMLShaderTech::GetUsedShaderVars (csBitArray& bits) const
         bits.SetBit (id);
       }
     }
-    for (int j = 0; j < thispass->textureCount; j++)
+    for (size_t j = 0; j < thispass->textures.GetSize(); j++)
     {
       CS::ShaderVarStringID id = thispass->textures[j].id;
       if ((id != CS::InvalidShaderVarStringID) && (bits.GetSize() > id))
@@ -822,7 +808,7 @@ void csXMLShaderTech::GetUsedShaderVars (csBitArray& bits) const
   }
 }
 
-int csXMLShaderTech::GetPassNumber (shaderPass* pass)
+int csXMLShaderTech::GetPassNumber (ShaderPass* pass)
 {
   if ((pass >= passes) && (pass < passes + passesCount))
   {

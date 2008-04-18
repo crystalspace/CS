@@ -1665,16 +1665,25 @@ void csGLGraphics3D::DeactivateTexture (int unit)
 void csGLGraphics3D::SetTextureState (int* units, iTextureHandle** textures,
 	int count)
 {
-  int i;
-  int unit = 0;
-  for (i = 0 ; i < count ; i++)
+  if (!textures)
   {
-    unit = units[i];
-    iTextureHandle* txt = textures[i];
-    if (txt)
-      ActivateTexture (txt, unit);
-    else
+    for (int i = 0 ; i < count ; i++)
+    {
+      int unit = units[i];
       DeactivateTexture (unit);
+    }
+  }
+  else
+  {
+    for (int i = 0 ; i < count ; i++)
+    {
+      int unit = units[i];
+      iTextureHandle* txt = textures[i];
+      if (txt)
+	ActivateTexture (txt, unit);
+      else
+	DeactivateTexture (unit);
+    }
   }
 }
 

@@ -147,8 +147,12 @@ enum csZBufMode
 // \todo Document me!
 #define CS_VATTRIB_SPECIFIC_FIRST    0
 #define CS_VATTRIB_SPECIFIC_LAST    15
+#define CS_VATTRIB_SPECIFIC_NUM     \
+  (CS_VATTRIB_SPECIFIC_LAST - CS_VATTRIB_SPECIFIC_FIRST + 1)
 #define CS_VATTRIB_GENERIC_FIRST   100
 #define CS_VATTRIB_GENERIC_LAST    (CS_VATTRIB_GENERIC_FIRST + 15)
+#define CS_VATTRIB_GENERIC_NUM     \
+  (CS_VATTRIB_GENERIC_LAST - CS_VATTRIB_GENERIC_FIRST + 1)
 
 #define CS_VATTRIB_IS_GENERIC(va)   \
   ((va >= CS_VATTRIB_GENERIC_FIRST) && (va <=CS_VATTRIB_GENERIC_LAST))
@@ -965,7 +969,8 @@ struct iGraphics3D : public virtual iBase
 
   /**
   * Activate or deactivate all given textures depending on the value
-  * of 'textures' for that unit (i.e. deactivate if 0).
+  * of the entry of \a textures for that unit (i.e. deactivate if 0). 
+  * If \a textures itself is 0 all specified units are deactivated.
   */
   virtual void SetTextureState (int* units, iTextureHandle** textures,
     int count) = 0;
