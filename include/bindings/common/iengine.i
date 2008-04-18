@@ -41,6 +41,7 @@
 %include "iengine/portalcontainer.h"
 %include "iengine/rendersteps/icontainer.h"
 %include "iengine/renderloop.h"
+%template(iSwigCollectionArray) iArrayReadOnly<iCollection* >;
 %include "iengine/collection.h"
 
 %extend iVisibilityObjectIterator {

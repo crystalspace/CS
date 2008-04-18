@@ -11,6 +11,7 @@ chronological order.
 	  wakeup wasn't correctly handled.
 	- res removed hardcoded texture and buffer limits from xmlshader.
 	- res added support texture comparison modes.
+	- caedes fixed swig wrapping for iCollectionArray.
 17-Apr-2008
 	- Mike Gist made the following changes;
 	    - Added an InternalRefCount class, to be used where we want an
