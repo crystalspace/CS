@@ -1,0 +1,4 @@
+SubDir TOP data shader-old ;
+
+InstallData [ Wildcard *.afp *.avp *.fvp *.xml *.cgvp ] : data shader-old ;
+
