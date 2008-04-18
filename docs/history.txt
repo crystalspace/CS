@@ -16,6 +16,10 @@ chronological order.
 	- Marten fixed a bug unrevealed by the earlier barrier update.
 	- Jorrit reverted Xordan's sprcal3d fix. The idea behind UpdateMove()
 	  is that it is only called when the object moves. Not all the time.
+	- Mike Gist committed a better fix for dynamic lights not shining on
+	  certain objects from Jorrit. csLight::CalculateLighting() now marks
+	  RelevantLights as dirty correctly, instead of only when the mesh has
+	  a shadow receiver.
 17-Apr-2008
 	- Mike Gist made the following changes;
 	    - Added an InternalRefCount class, to be used where we want an
