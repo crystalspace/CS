@@ -123,8 +123,8 @@ rule Plugin
     }
   }
 
-  CFlags $(<) : $(PLUGIN.CFLAGS) : nostatic ;
-  LFlags $(<) : $(LINKLIBS) $(PLUGIN.LFLAGS) : nostatic ;
+  CFlags $(<) : $(PLUGIN.CFLAGS) ;
+  LFlags $(<) : $(LINKLIBS) $(PLUGIN.LFLAGS) ;
 
   # create target clean rule
   Always $(<)clean ;

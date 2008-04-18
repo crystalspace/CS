@@ -1,5 +1,8 @@
 1.2 branch log.
 
+18-Apr-2008
+	- Vincent merged r29324, r29326 and r29329 into 1.2 (cleanup of
+	  long-obsolete Jam rule options).
 16-Apr-2008
 	- Vincent merged r29296:29301 into 1.2 (fix broken folding of
 	  multi-token build switches (such as "-framework Foundation")).

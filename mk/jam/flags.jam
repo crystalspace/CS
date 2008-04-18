@@ -1,5 +1,7 @@
 #============================================================================
 # Rules for specifying compiler and linker flags
+# Copyright (C)2003-2008 by Eric Sunshine <sunshine@sunshineco.com>
+# Copyright (C)2005-2007 by Frank Richter
 # Copyright (C)2003 by Matze Braun <matzebraun@users.sourceforge.net>
 #
 #    This library is free software; you can redistribute it and/or modify it
@@ -55,8 +57,6 @@ rule CFlags
   local flags = [ InferFlagTuples $(2) ] ;
   local options = $(3) ;
 
-  CheckOptions nostatic : $(options) : $(target) ;
-
   CCFLAGS on $($(target)_OBJECTS) += $(flags) ;
   C++FLAGS on $($(target)_OBJECTS) += $(flags) ;
 
@@ -70,8 +70,6 @@ rule LFlags
   local target = $(1) ;
   local flags = [ InferFlagTuples $(2) ] ;
   local options = $(3) ;
-
-  CheckOptions nostatic : $(options) : $(target) ;
 
   NotFile $(flags) ;
   NEEDLIBS on $($(target)_TARGET) =
