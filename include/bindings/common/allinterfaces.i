@@ -24,6 +24,7 @@
   INTERFACE_APPLY(iCamera)
   INTERFACE_APPLY(iCameraPosition)
   INTERFACE_APPLY(iCollection)
+  INTERFACE_APPLY(iCollectionArray)
   INTERFACE_APPLY(iEngine)
   INTERFACE_APPLY(iFrustumView)
   INTERFACE_APPLY(iFrustumViewUserdata)

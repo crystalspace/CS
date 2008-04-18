@@ -1006,6 +1006,34 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::InternalRefCount ##############
+
+package cspace::InternalRefCount;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_InternalRefCount(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*InternalIncRef = *cspacec::InternalRefCount_InternalIncRef;
+*InternalDecRef = *cspacec::InternalRefCount_InternalDecRef;
+*GetInternalRefCount = *cspacec::InternalRefCount_GetInternalRefCount;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csPluginRequest ##############
 
 package cspace::csPluginRequest;
@@ -4011,7 +4039,7 @@ sub ACQUIRE {
 
 package cspace::csObject;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::pycsObject cspace );
+@ISA = qw( cspace::pycsObject cspace::InternalRefCount cspace );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -17732,7 +17760,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetRegions = *cspacec::iEngine_GetRegions;
 *CreateCollection = *cspacec::iEngine_CreateCollection;
 *GetCollection = *cspacec::iEngine_GetCollection;
-*GetDefaultCollection = *cspacec::iEngine_GetDefaultCollection;
+*GetCollections = *cspacec::iEngine_GetCollections;
 *RemoveCollection = *cspacec::iEngine_RemoveCollection;
 *RemoveAllCollections = *cspacec::iEngine_RemoveAllCollections;
 *CreateCamera = *cspacec::iEngine_CreateCamera;
@@ -19291,6 +19319,43 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         cspacec::delete_iCollection($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iCollectionArray ##############
+
+package cspace::iCollectionArray;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_iCollectionArray(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iCollectionArray($self);
         delete $OWNER{$self};
     }
 }

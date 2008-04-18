@@ -74,15 +74,15 @@ namespace Implementation
 
 
   ThreadBase::ThreadBase (Runnable* runnable)
-    : runnable (runnable), isRunning (0), priority (THREAD_PRIO_NORMAL)
+    : runnable (runnable), isRunning (0), priority (THREAD_PRIO_NORMAL),
+    startupBarrier (2)
   {
   }
 
   void ThreadBase::Start ()
   {
     if (!IsRunning ())
-    {
-      Barrier startupBarrier (2);
+    {      
       ThreadStartParams param (runnable, &isRunning, &startupBarrier);
 
       pthread_attr_t attr;

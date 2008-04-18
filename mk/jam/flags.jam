@@ -1,5 +1,7 @@
 #============================================================================
 # Rules for specifying compiler and linker flags
+# Copyright (C)2003-2008 by Eric Sunshine <sunshine@sunshineco.com>
+# Copyright (C)2005-2007 by Frank Richter
 # Copyright (C)2003 by Matze Braun <matzebraun@users.sourceforge.net>
 #
 #    This library is free software; you can redistribute it and/or modify it
@@ -59,8 +61,6 @@ rule CFlags
   local flags = [ InferFlagTuples $(2) ] ;
   local options = $(3) ;
 
-  CheckOptions nostatic : $(options) : $(target) ;
-
   CCFLAGS on $($(target)_OBJECTS) += $(flags) ;
   C++FLAGS on $($(target)_OBJECTS) += $(flags) ;
 
@@ -74,8 +74,6 @@ rule LFlags
   local target = $(1) ;
   local flags = [ InferFlagTuples $(2) ] ;
   local options = $(3) ;
-
-  CheckOptions nostatic : $(options) : $(target) ;
 
   NotFile $(flags) ;
   NEEDLIBS on $($(target)_TARGET) =
@@ -129,19 +127,18 @@ rule ExtraObjects
   Clean clean : $(>) ;
 }
 
-##  RelayLib target : indentifier : relaylibs
+##  RelayLibs target : indentifier : relaylibs
 ##    Link external libraries identified by 'identifier' with 'target' with
 ##    the help of "relaytool". This tool provides a wrapper object file that
 ##    dynamically loads the requested library at runtime. The client code can
-##    check if a library is actually available and react gracefully if not -
-##    this is much more end-user friendly than a refusal by the application to
+##    check if a library is actually available and react gracefully if not.
+##    This is much more end-user friendly than a refusal by the application to
 ##    start due to a missing dependency.
 ##    From the external dependency identified by 'identifier' the individual
 ##    libraries specified in 'relaylibs' will be dynamically loaded. For each
-##    library 'whatever' a symbol 'libwhatever_is_present' will be provided.
+##    library 'foo' a symbol 'libfoo_is_present' will be provided.
 rule RelayLibs
 {
-  CheckOptions relay_all : $(4) : $(<) ;
   if ! $(CMD.RELAYTOOL)
   {
     # Create fake libwhatever_is_present() symbols
@@ -161,18 +158,20 @@ rule RelayLibs
   }
   else
   {
-    local extlib ;
     local relayparamslist = "--relay $(3)" ;
     local relayparam = $(relayparamslist[1]) ;
+    local r ;
     for r in $(relayparamslist[2-])
     {
       relayparam = "$(relayparam) $(r)" ;
     }
     local cflags = "$(CCFLAGS[1])" ;
+    local c ;
     for c in $(CCFLAGS[2-])
     {
       cflags = "$(cflags) $(c)" ;
     }
+    local extlib ;
     for extlib in $(>)
     {
       CFlags $(<) : $($(extlib).CFLAGS) ;
@@ -207,8 +206,11 @@ rule MergeLFlags
 ##    instance, given the seven-element input array [-foo, -bar, cow, -smurf,
 ##    -flub, glub, blug], returns the four-element array [-foo, -bar cow,
 ##    -smurf, -flub glub blug].  Multiple-argument switches are identified by a
-##    token with "-" or "/" prefix, followed by one or more non-prefixed
-##    tokens.
+##    token with "-" or "/" prefix or by the shell backtick (`) operator,
+##    followed by one or more non-prefixed tokens.  The shell backtick operator
+##    is considered a switch-introducer since it may be used by specialized
+##    build rules to determine build flags dynamically at build-time (rather
+##    than statically at configuration time).
 rule InferFlagTuples
 {
   local tuples ;
@@ -216,7 +218,7 @@ rule InferFlagTuples
   local flag ;
   for flag in $(1)
   {
-    if [ Match ^([-/][A-Za-z0-9]) : $(flag) ]
+    if [ Match ^([-/`][A-Za-z0-9]) : $(flag) ]
     {
       if $(accum)
       {

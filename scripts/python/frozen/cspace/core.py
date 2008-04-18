@@ -179,6 +179,15 @@ class iBase(object):
     def GetInterfaceMetadata(*args): return _core.iBase_GetInterfaceMetadata(*args)
     def QueryInterface(*args): return _core.iBase_QueryInterface(*args)
     scfGetVersion = staticmethod(_core.iBase_scfGetVersion)
+    def __eq__(self,other):
+        if isinstance(other,iBase):
+            return self.this == other.this
+        return False
+    def __ne__(self,other):
+        if isinstance(other,iBase):
+            return not self.this == other.this
+        return True
+
 iBase_swigregister = _core.iBase_swigregister
 iBase_swigregister(iBase)
 iBase_scfGetVersion = _core.iBase_scfGetVersion
@@ -430,6 +439,19 @@ class csRefCount(object):
     def GetRefCount(*args): return _core.csRefCount_GetRefCount(*args)
 csRefCount_swigregister = _core.csRefCount_swigregister
 csRefCount_swigregister(csRefCount)
+
+class InternalRefCount(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _core.new_InternalRefCount(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def InternalIncRef(*args): return _core.InternalRefCount_InternalIncRef(*args)
+    def InternalDecRef(*args): return _core.InternalRefCount_InternalDecRef(*args)
+    def GetInternalRefCount(*args): return _core.InternalRefCount_GetInternalRefCount(*args)
+InternalRefCount_swigregister = _core.InternalRefCount_swigregister
+InternalRefCount_swigregister(InternalRefCount)
 
 csDefaultRunLoop = _core.csDefaultRunLoop
 csPlatformStartup = _core.csPlatformStartup
@@ -2068,7 +2090,7 @@ class pycsObject(iObject):
 pycsObject_swigregister = _core.pycsObject_swigregister
 pycsObject_swigregister(pycsObject)
 
-class csObject(pycsObject):
+class csObject(pycsObject,InternalRefCount):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 

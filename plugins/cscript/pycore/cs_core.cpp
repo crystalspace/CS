@@ -2482,235 +2482,236 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_CS__Geometry__TextureMapper swig_types[4]
 #define SWIGTYPE_p_CS__Memory__AllocatorMalloc swig_types[5]
 #define SWIGTYPE_p_CS__Memory__CustomAllocated swig_types[6]
-#define SWIGTYPE_p_CapacityHandlerType swig_types[7]
-#define SWIGTYPE_p_ElementHandlerType swig_types[8]
-#define SWIGTYPE_p_FILE swig_types[9]
-#define SWIGTYPE_p_FileFormatDescription swig_types[10]
-#define SWIGTYPE_p_HashType swig_types[11]
-#define SWIGTYPE_p_ThisType swig_types[12]
-#define SWIGTYPE_p_ValueType swig_types[13]
-#define SWIGTYPE_p__1_basetype swig_types[14]
-#define SWIGTYPE_p__csKeyCharType swig_types[15]
-#define SWIGTYPE_p__csKeyEventType swig_types[16]
-#define SWIGTYPE_p__csKeyModifierNumType swig_types[17]
-#define SWIGTYPE_p__csKeyModifierType swig_types[18]
-#define SWIGTYPE_p__csKeyModifiers swig_types[19]
-#define SWIGTYPE_p__csMouseEventType swig_types[20]
-#define SWIGTYPE_p__csPyEventHandler swig_types[21]
-#define SWIGTYPE_p_bool swig_types[22]
-#define SWIGTYPE_p_char swig_types[23]
-#define SWIGTYPE_p_csArrayCapacityDefault swig_types[24]
-#define SWIGTYPE_p_csArrayCapacityLinearTcsArrayThresholdVariable_t swig_types[25]
-#define SWIGTYPE_p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[26]
-#define SWIGTYPE_p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[27]
-#define SWIGTYPE_p_csArrayThresholdVariable swig_types[28]
-#define SWIGTYPE_p_csBox2 swig_types[29]
-#define SWIGTYPE_p_csBox3 swig_types[30]
-#define SWIGTYPE_p_csColor swig_types[31]
-#define SWIGTYPE_p_csColor4 swig_types[32]
-#define SWIGTYPE_p_csCommandEventData swig_types[33]
-#define SWIGTYPE_p_csCommandEventHelper swig_types[34]
-#define SWIGTYPE_p_csCommandLineHelper swig_types[35]
-#define SWIGTYPE_p_csConfigFile swig_types[36]
-#define SWIGTYPE_p_csDirtyAccessArrayTcsTriangle_t swig_types[37]
-#define SWIGTYPE_p_csDirtyAccessArrayTcsVector2_t swig_types[38]
-#define SWIGTYPE_p_csDirtyAccessArrayTcsVector3_t swig_types[39]
-#define SWIGTYPE_p_csEllipsoid swig_types[40]
-#define SWIGTYPE_p_csEvent swig_types[41]
-#define SWIGTYPE_p_csEventNameRegistry swig_types[42]
-#define SWIGTYPE_p_csFileTime swig_types[43]
-#define SWIGTYPE_p_csFlags swig_types[44]
-#define SWIGTYPE_p_csHandlerID swig_types[45]
-#define SWIGTYPE_p_csImageIOFileFormatDescription swig_types[46]
-#define SWIGTYPE_p_csInitializer swig_types[47]
-#define SWIGTYPE_p_csInputEventHelper swig_types[48]
-#define SWIGTYPE_p_csJoystickEventData swig_types[49]
-#define SWIGTYPE_p_csJoystickEventHelper swig_types[50]
-#define SWIGTYPE_p_csKeyEventData swig_types[51]
-#define SWIGTYPE_p_csKeyEventHelper swig_types[52]
-#define SWIGTYPE_p_csMouseEventData swig_types[53]
-#define SWIGTYPE_p_csMouseEventHelper swig_types[54]
-#define SWIGTYPE_p_csObject swig_types[55]
-#define SWIGTYPE_p_csPluginRequest swig_types[56]
-#define SWIGTYPE_p_csPrimitives swig_types[57]
-#define SWIGTYPE_p_csPtrTiBase_t swig_types[58]
-#define SWIGTYPE_p_csPtrTiKeyComposer_t swig_types[59]
-#define SWIGTYPE_p_csPtrTiObjectRegistryIterator_t swig_types[60]
-#define SWIGTYPE_p_csPyEventPlug swig_types[61]
-#define SWIGTYPE_p_csRGBpixel swig_types[62]
-#define SWIGTYPE_p_csRadixSorter swig_types[63]
-#define SWIGTYPE_p_csRect swig_types[64]
-#define SWIGTYPE_p_csRefArrayTiObject_t swig_types[65]
-#define SWIGTYPE_p_csRefCount swig_types[66]
-#define SWIGTYPE_p_csRefTiBase_t swig_types[67]
-#define SWIGTYPE_p_csRefTiDocumentAttribute_t swig_types[68]
-#define SWIGTYPE_p_csRefTiDocumentNodeIterator_t swig_types[69]
-#define SWIGTYPE_p_csRefTiDocumentNode_t swig_types[70]
-#define SWIGTYPE_p_csRefTiEventAttributeIterator_t swig_types[71]
-#define SWIGTYPE_p_csRefTiEventHandlerRegistry_t swig_types[72]
-#define SWIGTYPE_p_csRefTiEventHandler_t swig_types[73]
-#define SWIGTYPE_p_csRefTiEventNameRegistry_t swig_types[74]
-#define SWIGTYPE_p_csRefTiEvent_t swig_types[75]
-#define SWIGTYPE_p_csReporterHelper swig_types[76]
-#define SWIGTYPE_p_csSetTunsigned_long_CS__Memory__AllocatorMalloc_t swig_types[77]
-#define SWIGTYPE_p_csString swig_types[78]
-#define SWIGTYPE_p_csStringArray swig_types[79]
-#define SWIGTYPE_p_csStringBase swig_types[80]
-#define SWIGTYPE_p_csStringFastT36_t swig_types[81]
-#define SWIGTYPE_p_csStringSet swig_types[82]
-#define SWIGTYPE_p_csTinyDocumentSystem swig_types[83]
-#define SWIGTYPE_p_csTriangle swig_types[84]
-#define SWIGTYPE_p_csVector2 swig_types[85]
-#define SWIGTYPE_p_csVector3 swig_types[86]
-#define SWIGTYPE_p_csVertexStatus swig_types[87]
-#define SWIGTYPE_p_csWrapPtr swig_types[88]
-#define SWIGTYPE_p_double swig_types[89]
-#define SWIGTYPE_p_f_p_iBase__p__csPyEventHandler swig_types[90]
-#define SWIGTYPE_p_f_p_iBase__p_csConfigFile swig_types[91]
-#define SWIGTYPE_p_f_p_iBase__p_csObject swig_types[92]
-#define SWIGTYPE_p_f_p_iBase__p_csPyEventPlug swig_types[93]
-#define SWIGTYPE_p_f_p_iBase__p_iAnimatedImage swig_types[94]
-#define SWIGTYPE_p_f_p_iBase__p_iBase swig_types[95]
-#define SWIGTYPE_p_f_p_iBase__p_iCacheManager swig_types[96]
-#define SWIGTYPE_p_f_p_iBase__p_iClipper2D swig_types[97]
-#define SWIGTYPE_p_f_p_iBase__p_iCommandLineParser swig_types[98]
-#define SWIGTYPE_p_f_p_iBase__p_iComponent swig_types[99]
-#define SWIGTYPE_p_f_p_iBase__p_iConfigFile swig_types[100]
-#define SWIGTYPE_p_f_p_iBase__p_iConfigIterator swig_types[101]
-#define SWIGTYPE_p_f_p_iBase__p_iConfigManager swig_types[102]
-#define SWIGTYPE_p_f_p_iBase__p_iDataBuffer swig_types[103]
-#define SWIGTYPE_p_f_p_iBase__p_iDebugHelper swig_types[104]
-#define SWIGTYPE_p_f_p_iBase__p_iDocument swig_types[105]
-#define SWIGTYPE_p_f_p_iBase__p_iDocumentAttribute swig_types[106]
-#define SWIGTYPE_p_f_p_iBase__p_iDocumentAttributeIterator swig_types[107]
-#define SWIGTYPE_p_f_p_iBase__p_iDocumentNode swig_types[108]
-#define SWIGTYPE_p_f_p_iBase__p_iDocumentNodeIterator swig_types[109]
-#define SWIGTYPE_p_f_p_iBase__p_iDocumentSystem swig_types[110]
-#define SWIGTYPE_p_f_p_iBase__p_iEvent swig_types[111]
-#define SWIGTYPE_p_f_p_iBase__p_iEventAttributeIterator swig_types[112]
-#define SWIGTYPE_p_f_p_iBase__p_iEventCord swig_types[113]
-#define SWIGTYPE_p_f_p_iBase__p_iEventHandler swig_types[114]
-#define SWIGTYPE_p_f_p_iBase__p_iEventNameRegistry swig_types[115]
-#define SWIGTYPE_p_f_p_iBase__p_iEventOutlet swig_types[116]
-#define SWIGTYPE_p_f_p_iBase__p_iEventPlug swig_types[117]
-#define SWIGTYPE_p_f_p_iBase__p_iEventQueue swig_types[118]
-#define SWIGTYPE_p_f_p_iBase__p_iFactory swig_types[119]
-#define SWIGTYPE_p_f_p_iBase__p_iFile swig_types[120]
-#define SWIGTYPE_p_f_p_iBase__p_iImage swig_types[121]
-#define SWIGTYPE_p_f_p_iBase__p_iImageIO swig_types[122]
-#define SWIGTYPE_p_f_p_iBase__p_iJoystickDriver swig_types[123]
-#define SWIGTYPE_p_f_p_iBase__p_iKeyComposer swig_types[124]
-#define SWIGTYPE_p_f_p_iBase__p_iKeyboardDriver swig_types[125]
-#define SWIGTYPE_p_f_p_iBase__p_iMouseDriver swig_types[126]
-#define SWIGTYPE_p_f_p_iBase__p_iObject swig_types[127]
-#define SWIGTYPE_p_f_p_iBase__p_iObjectIterator swig_types[128]
-#define SWIGTYPE_p_f_p_iBase__p_iObjectNameChangeListener swig_types[129]
-#define SWIGTYPE_p_f_p_iBase__p_iObjectRegistry swig_types[130]
-#define SWIGTYPE_p_f_p_iBase__p_iObjectRegistryIterator swig_types[131]
-#define SWIGTYPE_p_f_p_iBase__p_iPath swig_types[132]
-#define SWIGTYPE_p_f_p_iBase__p_iPluginIterator swig_types[133]
-#define SWIGTYPE_p_f_p_iBase__p_iPluginManager swig_types[134]
-#define SWIGTYPE_p_f_p_iBase__p_iProcTexture swig_types[135]
-#define SWIGTYPE_p_f_p_iBase__p_iReporter swig_types[136]
-#define SWIGTYPE_p_f_p_iBase__p_iReporterIterator swig_types[137]
-#define SWIGTYPE_p_f_p_iBase__p_iReporterListener swig_types[138]
-#define SWIGTYPE_p_f_p_iBase__p_iSCF swig_types[139]
-#define SWIGTYPE_p_f_p_iBase__p_iString swig_types[140]
-#define SWIGTYPE_p_f_p_iBase__p_iStringArray swig_types[141]
-#define SWIGTYPE_p_f_p_iBase__p_iStringSet swig_types[142]
-#define SWIGTYPE_p_f_p_iBase__p_iTriangleMesh swig_types[143]
-#define SWIGTYPE_p_f_p_iBase__p_iVFS swig_types[144]
-#define SWIGTYPE_p_f_p_iBase__p_iVirtualClock swig_types[145]
-#define SWIGTYPE_p_f_p_iBase__p_scfImplementation1T_csPyEventHandler_iEventHandler_t swig_types[146]
-#define SWIGTYPE_p_f_p_iBase__p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[147]
-#define SWIGTYPE_p_f_p_iBase__p_scfImplementation1TcsObject_iObject_t swig_types[148]
-#define SWIGTYPE_p_f_p_iBase__p_scfImplementation1TcsPath_iPath_t swig_types[149]
-#define SWIGTYPE_p_f_p_iBase__p_scfImplementation1TcsPyEventPlug_iEventPlug_t swig_types[150]
-#define SWIGTYPE_p_float swig_types[151]
-#define SWIGTYPE_p_iAnimatedImage swig_types[152]
-#define SWIGTYPE_p_iBase swig_types[153]
-#define SWIGTYPE_p_iCacheManager swig_types[154]
-#define SWIGTYPE_p_iClipper2D swig_types[155]
-#define SWIGTYPE_p_iCommandLineParser swig_types[156]
-#define SWIGTYPE_p_iComponent swig_types[157]
-#define SWIGTYPE_p_iConfigFile swig_types[158]
-#define SWIGTYPE_p_iConfigIterator swig_types[159]
-#define SWIGTYPE_p_iConfigManager swig_types[160]
-#define SWIGTYPE_p_iDataBuffer swig_types[161]
-#define SWIGTYPE_p_iDebugHelper swig_types[162]
-#define SWIGTYPE_p_iDocument swig_types[163]
-#define SWIGTYPE_p_iDocumentAttribute swig_types[164]
-#define SWIGTYPE_p_iDocumentAttributeIterator swig_types[165]
-#define SWIGTYPE_p_iDocumentNode swig_types[166]
-#define SWIGTYPE_p_iDocumentNodeIterator swig_types[167]
-#define SWIGTYPE_p_iDocumentSystem swig_types[168]
-#define SWIGTYPE_p_iEvent swig_types[169]
-#define SWIGTYPE_p_iEventAttributeIterator swig_types[170]
-#define SWIGTYPE_p_iEventCord swig_types[171]
-#define SWIGTYPE_p_iEventHandler swig_types[172]
-#define SWIGTYPE_p_iEventNameRegistry swig_types[173]
-#define SWIGTYPE_p_iEventOutlet swig_types[174]
-#define SWIGTYPE_p_iEventPlug swig_types[175]
-#define SWIGTYPE_p_iEventQueue swig_types[176]
-#define SWIGTYPE_p_iFactory swig_types[177]
-#define SWIGTYPE_p_iFile swig_types[178]
-#define SWIGTYPE_p_iGraphics2D swig_types[179]
-#define SWIGTYPE_p_iGraphics3D swig_types[180]
-#define SWIGTYPE_p_iImage swig_types[181]
-#define SWIGTYPE_p_iImageIO swig_types[182]
-#define SWIGTYPE_p_iJoystickDriver swig_types[183]
-#define SWIGTYPE_p_iKeyComposer swig_types[184]
-#define SWIGTYPE_p_iKeyboardDriver swig_types[185]
-#define SWIGTYPE_p_iMouseDriver swig_types[186]
-#define SWIGTYPE_p_iObject swig_types[187]
-#define SWIGTYPE_p_iObjectIterator swig_types[188]
-#define SWIGTYPE_p_iObjectNameChangeListener swig_types[189]
-#define SWIGTYPE_p_iObjectRegistry swig_types[190]
-#define SWIGTYPE_p_iObjectRegistryIterator swig_types[191]
-#define SWIGTYPE_p_iPath swig_types[192]
-#define SWIGTYPE_p_iPluginIterator swig_types[193]
-#define SWIGTYPE_p_iPluginManager swig_types[194]
-#define SWIGTYPE_p_iProcTexture swig_types[195]
-#define SWIGTYPE_p_iReporter swig_types[196]
-#define SWIGTYPE_p_iReporterIterator swig_types[197]
-#define SWIGTYPE_p_iReporterListener swig_types[198]
-#define SWIGTYPE_p_iSCF swig_types[199]
-#define SWIGTYPE_p_iString swig_types[200]
-#define SWIGTYPE_p_iStringArray swig_types[201]
-#define SWIGTYPE_p_iStringSet swig_types[202]
-#define SWIGTYPE_p_iTextureFactory swig_types[203]
-#define SWIGTYPE_p_iTriangleMesh swig_types[204]
-#define SWIGTYPE_p_iVFS swig_types[205]
-#define SWIGTYPE_p_iVerbosityManager swig_types[206]
-#define SWIGTYPE_p_iVirtualClock swig_types[207]
-#define SWIGTYPE_p_int swig_types[208]
-#define SWIGTYPE_p_int16_t swig_types[209]
-#define SWIGTYPE_p_int64_t swig_types[210]
-#define SWIGTYPE_p_int8_t swig_types[211]
-#define SWIGTYPE_p_intptr_t swig_types[212]
-#define SWIGTYPE_p_long_long swig_types[213]
-#define SWIGTYPE_p_p_char swig_types[214]
-#define SWIGTYPE_p_p_csImageIOFileFormatDescription swig_types[215]
-#define SWIGTYPE_p_p_void swig_types[216]
-#define SWIGTYPE_p_scfImplementation1T_csPyEventHandler_iEventHandler_t swig_types[217]
-#define SWIGTYPE_p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[218]
-#define SWIGTYPE_p_scfImplementation1TcsObject_iObject_t swig_types[219]
-#define SWIGTYPE_p_scfImplementation1TcsPath_iPath_t swig_types[220]
-#define SWIGTYPE_p_scfImplementation1TcsPyEventPlug_iEventPlug_t swig_types[221]
-#define SWIGTYPE_p_scfInterfaceMetadata swig_types[222]
-#define SWIGTYPE_p_scfInterfaceMetadataList swig_types[223]
-#define SWIGTYPE_p_size_t swig_types[224]
-#define SWIGTYPE_p_uint16_t swig_types[225]
-#define SWIGTYPE_p_uint32_t swig_types[226]
-#define SWIGTYPE_p_uint64_t swig_types[227]
-#define SWIGTYPE_p_unsigned_char swig_types[228]
-#define SWIGTYPE_p_unsigned_int swig_types[229]
-#define SWIGTYPE_p_unsigned_long swig_types[230]
-#define SWIGTYPE_p_unsigned_long_long swig_types[231]
-#define SWIGTYPE_p_utf32_char swig_types[232]
-#define SWIGTYPE_p_void swig_types[233]
-static swig_type_info *swig_types[235];
-static swig_module_info swig_module = {swig_types, 234, 0, 0, 0, 0};
+#define SWIGTYPE_p_CS__Utility__InternalRefCount swig_types[7]
+#define SWIGTYPE_p_CapacityHandlerType swig_types[8]
+#define SWIGTYPE_p_ElementHandlerType swig_types[9]
+#define SWIGTYPE_p_FILE swig_types[10]
+#define SWIGTYPE_p_FileFormatDescription swig_types[11]
+#define SWIGTYPE_p_HashType swig_types[12]
+#define SWIGTYPE_p_ThisType swig_types[13]
+#define SWIGTYPE_p_ValueType swig_types[14]
+#define SWIGTYPE_p__1_basetype swig_types[15]
+#define SWIGTYPE_p__csKeyCharType swig_types[16]
+#define SWIGTYPE_p__csKeyEventType swig_types[17]
+#define SWIGTYPE_p__csKeyModifierNumType swig_types[18]
+#define SWIGTYPE_p__csKeyModifierType swig_types[19]
+#define SWIGTYPE_p__csKeyModifiers swig_types[20]
+#define SWIGTYPE_p__csMouseEventType swig_types[21]
+#define SWIGTYPE_p__csPyEventHandler swig_types[22]
+#define SWIGTYPE_p_bool swig_types[23]
+#define SWIGTYPE_p_char swig_types[24]
+#define SWIGTYPE_p_csArrayCapacityDefault swig_types[25]
+#define SWIGTYPE_p_csArrayCapacityLinearTcsArrayThresholdVariable_t swig_types[26]
+#define SWIGTYPE_p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[27]
+#define SWIGTYPE_p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[28]
+#define SWIGTYPE_p_csArrayThresholdVariable swig_types[29]
+#define SWIGTYPE_p_csBox2 swig_types[30]
+#define SWIGTYPE_p_csBox3 swig_types[31]
+#define SWIGTYPE_p_csColor swig_types[32]
+#define SWIGTYPE_p_csColor4 swig_types[33]
+#define SWIGTYPE_p_csCommandEventData swig_types[34]
+#define SWIGTYPE_p_csCommandEventHelper swig_types[35]
+#define SWIGTYPE_p_csCommandLineHelper swig_types[36]
+#define SWIGTYPE_p_csConfigFile swig_types[37]
+#define SWIGTYPE_p_csDirtyAccessArrayTcsTriangle_t swig_types[38]
+#define SWIGTYPE_p_csDirtyAccessArrayTcsVector2_t swig_types[39]
+#define SWIGTYPE_p_csDirtyAccessArrayTcsVector3_t swig_types[40]
+#define SWIGTYPE_p_csEllipsoid swig_types[41]
+#define SWIGTYPE_p_csEvent swig_types[42]
+#define SWIGTYPE_p_csEventNameRegistry swig_types[43]
+#define SWIGTYPE_p_csFileTime swig_types[44]
+#define SWIGTYPE_p_csFlags swig_types[45]
+#define SWIGTYPE_p_csHandlerID swig_types[46]
+#define SWIGTYPE_p_csImageIOFileFormatDescription swig_types[47]
+#define SWIGTYPE_p_csInitializer swig_types[48]
+#define SWIGTYPE_p_csInputEventHelper swig_types[49]
+#define SWIGTYPE_p_csJoystickEventData swig_types[50]
+#define SWIGTYPE_p_csJoystickEventHelper swig_types[51]
+#define SWIGTYPE_p_csKeyEventData swig_types[52]
+#define SWIGTYPE_p_csKeyEventHelper swig_types[53]
+#define SWIGTYPE_p_csMouseEventData swig_types[54]
+#define SWIGTYPE_p_csMouseEventHelper swig_types[55]
+#define SWIGTYPE_p_csObject swig_types[56]
+#define SWIGTYPE_p_csPluginRequest swig_types[57]
+#define SWIGTYPE_p_csPrimitives swig_types[58]
+#define SWIGTYPE_p_csPtrTiBase_t swig_types[59]
+#define SWIGTYPE_p_csPtrTiKeyComposer_t swig_types[60]
+#define SWIGTYPE_p_csPtrTiObjectRegistryIterator_t swig_types[61]
+#define SWIGTYPE_p_csPyEventPlug swig_types[62]
+#define SWIGTYPE_p_csRGBpixel swig_types[63]
+#define SWIGTYPE_p_csRadixSorter swig_types[64]
+#define SWIGTYPE_p_csRect swig_types[65]
+#define SWIGTYPE_p_csRefArrayTiObject_t swig_types[66]
+#define SWIGTYPE_p_csRefCount swig_types[67]
+#define SWIGTYPE_p_csRefTiBase_t swig_types[68]
+#define SWIGTYPE_p_csRefTiDocumentAttribute_t swig_types[69]
+#define SWIGTYPE_p_csRefTiDocumentNodeIterator_t swig_types[70]
+#define SWIGTYPE_p_csRefTiDocumentNode_t swig_types[71]
+#define SWIGTYPE_p_csRefTiEventAttributeIterator_t swig_types[72]
+#define SWIGTYPE_p_csRefTiEventHandlerRegistry_t swig_types[73]
+#define SWIGTYPE_p_csRefTiEventHandler_t swig_types[74]
+#define SWIGTYPE_p_csRefTiEventNameRegistry_t swig_types[75]
+#define SWIGTYPE_p_csRefTiEvent_t swig_types[76]
+#define SWIGTYPE_p_csReporterHelper swig_types[77]
+#define SWIGTYPE_p_csSetTunsigned_long_CS__Memory__AllocatorMalloc_t swig_types[78]
+#define SWIGTYPE_p_csString swig_types[79]
+#define SWIGTYPE_p_csStringArray swig_types[80]
+#define SWIGTYPE_p_csStringBase swig_types[81]
+#define SWIGTYPE_p_csStringFastT36_t swig_types[82]
+#define SWIGTYPE_p_csStringSet swig_types[83]
+#define SWIGTYPE_p_csTinyDocumentSystem swig_types[84]
+#define SWIGTYPE_p_csTriangle swig_types[85]
+#define SWIGTYPE_p_csVector2 swig_types[86]
+#define SWIGTYPE_p_csVector3 swig_types[87]
+#define SWIGTYPE_p_csVertexStatus swig_types[88]
+#define SWIGTYPE_p_csWrapPtr swig_types[89]
+#define SWIGTYPE_p_double swig_types[90]
+#define SWIGTYPE_p_f_p_iBase__p__csPyEventHandler swig_types[91]
+#define SWIGTYPE_p_f_p_iBase__p_csConfigFile swig_types[92]
+#define SWIGTYPE_p_f_p_iBase__p_csObject swig_types[93]
+#define SWIGTYPE_p_f_p_iBase__p_csPyEventPlug swig_types[94]
+#define SWIGTYPE_p_f_p_iBase__p_iAnimatedImage swig_types[95]
+#define SWIGTYPE_p_f_p_iBase__p_iBase swig_types[96]
+#define SWIGTYPE_p_f_p_iBase__p_iCacheManager swig_types[97]
+#define SWIGTYPE_p_f_p_iBase__p_iClipper2D swig_types[98]
+#define SWIGTYPE_p_f_p_iBase__p_iCommandLineParser swig_types[99]
+#define SWIGTYPE_p_f_p_iBase__p_iComponent swig_types[100]
+#define SWIGTYPE_p_f_p_iBase__p_iConfigFile swig_types[101]
+#define SWIGTYPE_p_f_p_iBase__p_iConfigIterator swig_types[102]
+#define SWIGTYPE_p_f_p_iBase__p_iConfigManager swig_types[103]
+#define SWIGTYPE_p_f_p_iBase__p_iDataBuffer swig_types[104]
+#define SWIGTYPE_p_f_p_iBase__p_iDebugHelper swig_types[105]
+#define SWIGTYPE_p_f_p_iBase__p_iDocument swig_types[106]
+#define SWIGTYPE_p_f_p_iBase__p_iDocumentAttribute swig_types[107]
+#define SWIGTYPE_p_f_p_iBase__p_iDocumentAttributeIterator swig_types[108]
+#define SWIGTYPE_p_f_p_iBase__p_iDocumentNode swig_types[109]
+#define SWIGTYPE_p_f_p_iBase__p_iDocumentNodeIterator swig_types[110]
+#define SWIGTYPE_p_f_p_iBase__p_iDocumentSystem swig_types[111]
+#define SWIGTYPE_p_f_p_iBase__p_iEvent swig_types[112]
+#define SWIGTYPE_p_f_p_iBase__p_iEventAttributeIterator swig_types[113]
+#define SWIGTYPE_p_f_p_iBase__p_iEventCord swig_types[114]
+#define SWIGTYPE_p_f_p_iBase__p_iEventHandler swig_types[115]
+#define SWIGTYPE_p_f_p_iBase__p_iEventNameRegistry swig_types[116]
+#define SWIGTYPE_p_f_p_iBase__p_iEventOutlet swig_types[117]
+#define SWIGTYPE_p_f_p_iBase__p_iEventPlug swig_types[118]
+#define SWIGTYPE_p_f_p_iBase__p_iEventQueue swig_types[119]
+#define SWIGTYPE_p_f_p_iBase__p_iFactory swig_types[120]
+#define SWIGTYPE_p_f_p_iBase__p_iFile swig_types[121]
+#define SWIGTYPE_p_f_p_iBase__p_iImage swig_types[122]
+#define SWIGTYPE_p_f_p_iBase__p_iImageIO swig_types[123]
+#define SWIGTYPE_p_f_p_iBase__p_iJoystickDriver swig_types[124]
+#define SWIGTYPE_p_f_p_iBase__p_iKeyComposer swig_types[125]
+#define SWIGTYPE_p_f_p_iBase__p_iKeyboardDriver swig_types[126]
+#define SWIGTYPE_p_f_p_iBase__p_iMouseDriver swig_types[127]
+#define SWIGTYPE_p_f_p_iBase__p_iObject swig_types[128]
+#define SWIGTYPE_p_f_p_iBase__p_iObjectIterator swig_types[129]
+#define SWIGTYPE_p_f_p_iBase__p_iObjectNameChangeListener swig_types[130]
+#define SWIGTYPE_p_f_p_iBase__p_iObjectRegistry swig_types[131]
+#define SWIGTYPE_p_f_p_iBase__p_iObjectRegistryIterator swig_types[132]
+#define SWIGTYPE_p_f_p_iBase__p_iPath swig_types[133]
+#define SWIGTYPE_p_f_p_iBase__p_iPluginIterator swig_types[134]
+#define SWIGTYPE_p_f_p_iBase__p_iPluginManager swig_types[135]
+#define SWIGTYPE_p_f_p_iBase__p_iProcTexture swig_types[136]
+#define SWIGTYPE_p_f_p_iBase__p_iReporter swig_types[137]
+#define SWIGTYPE_p_f_p_iBase__p_iReporterIterator swig_types[138]
+#define SWIGTYPE_p_f_p_iBase__p_iReporterListener swig_types[139]
+#define SWIGTYPE_p_f_p_iBase__p_iSCF swig_types[140]
+#define SWIGTYPE_p_f_p_iBase__p_iString swig_types[141]
+#define SWIGTYPE_p_f_p_iBase__p_iStringArray swig_types[142]
+#define SWIGTYPE_p_f_p_iBase__p_iStringSet swig_types[143]
+#define SWIGTYPE_p_f_p_iBase__p_iTriangleMesh swig_types[144]
+#define SWIGTYPE_p_f_p_iBase__p_iVFS swig_types[145]
+#define SWIGTYPE_p_f_p_iBase__p_iVirtualClock swig_types[146]
+#define SWIGTYPE_p_f_p_iBase__p_scfImplementation1T_csPyEventHandler_iEventHandler_t swig_types[147]
+#define SWIGTYPE_p_f_p_iBase__p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[148]
+#define SWIGTYPE_p_f_p_iBase__p_scfImplementation1TcsObject_iObject_t swig_types[149]
+#define SWIGTYPE_p_f_p_iBase__p_scfImplementation1TcsPath_iPath_t swig_types[150]
+#define SWIGTYPE_p_f_p_iBase__p_scfImplementation1TcsPyEventPlug_iEventPlug_t swig_types[151]
+#define SWIGTYPE_p_float swig_types[152]
+#define SWIGTYPE_p_iAnimatedImage swig_types[153]
+#define SWIGTYPE_p_iBase swig_types[154]
+#define SWIGTYPE_p_iCacheManager swig_types[155]
+#define SWIGTYPE_p_iClipper2D swig_types[156]
+#define SWIGTYPE_p_iCommandLineParser swig_types[157]
+#define SWIGTYPE_p_iComponent swig_types[158]
+#define SWIGTYPE_p_iConfigFile swig_types[159]
+#define SWIGTYPE_p_iConfigIterator swig_types[160]
+#define SWIGTYPE_p_iConfigManager swig_types[161]
+#define SWIGTYPE_p_iDataBuffer swig_types[162]
+#define SWIGTYPE_p_iDebugHelper swig_types[163]
+#define SWIGTYPE_p_iDocument swig_types[164]
+#define SWIGTYPE_p_iDocumentAttribute swig_types[165]
+#define SWIGTYPE_p_iDocumentAttributeIterator swig_types[166]
+#define SWIGTYPE_p_iDocumentNode swig_types[167]
+#define SWIGTYPE_p_iDocumentNodeIterator swig_types[168]
+#define SWIGTYPE_p_iDocumentSystem swig_types[169]
+#define SWIGTYPE_p_iEvent swig_types[170]
+#define SWIGTYPE_p_iEventAttributeIterator swig_types[171]
+#define SWIGTYPE_p_iEventCord swig_types[172]
+#define SWIGTYPE_p_iEventHandler swig_types[173]
+#define SWIGTYPE_p_iEventNameRegistry swig_types[174]
+#define SWIGTYPE_p_iEventOutlet swig_types[175]
+#define SWIGTYPE_p_iEventPlug swig_types[176]
+#define SWIGTYPE_p_iEventQueue swig_types[177]
+#define SWIGTYPE_p_iFactory swig_types[178]
+#define SWIGTYPE_p_iFile swig_types[179]
+#define SWIGTYPE_p_iGraphics2D swig_types[180]
+#define SWIGTYPE_p_iGraphics3D swig_types[181]
+#define SWIGTYPE_p_iImage swig_types[182]
+#define SWIGTYPE_p_iImageIO swig_types[183]
+#define SWIGTYPE_p_iJoystickDriver swig_types[184]
+#define SWIGTYPE_p_iKeyComposer swig_types[185]
+#define SWIGTYPE_p_iKeyboardDriver swig_types[186]
+#define SWIGTYPE_p_iMouseDriver swig_types[187]
+#define SWIGTYPE_p_iObject swig_types[188]
+#define SWIGTYPE_p_iObjectIterator swig_types[189]
+#define SWIGTYPE_p_iObjectNameChangeListener swig_types[190]
+#define SWIGTYPE_p_iObjectRegistry swig_types[191]
+#define SWIGTYPE_p_iObjectRegistryIterator swig_types[192]
+#define SWIGTYPE_p_iPath swig_types[193]
+#define SWIGTYPE_p_iPluginIterator swig_types[194]
+#define SWIGTYPE_p_iPluginManager swig_types[195]
+#define SWIGTYPE_p_iProcTexture swig_types[196]
+#define SWIGTYPE_p_iReporter swig_types[197]
+#define SWIGTYPE_p_iReporterIterator swig_types[198]
+#define SWIGTYPE_p_iReporterListener swig_types[199]
+#define SWIGTYPE_p_iSCF swig_types[200]
+#define SWIGTYPE_p_iString swig_types[201]
+#define SWIGTYPE_p_iStringArray swig_types[202]
+#define SWIGTYPE_p_iStringSet swig_types[203]
+#define SWIGTYPE_p_iTextureFactory swig_types[204]
+#define SWIGTYPE_p_iTriangleMesh swig_types[205]
+#define SWIGTYPE_p_iVFS swig_types[206]
+#define SWIGTYPE_p_iVerbosityManager swig_types[207]
+#define SWIGTYPE_p_iVirtualClock swig_types[208]
+#define SWIGTYPE_p_int swig_types[209]
+#define SWIGTYPE_p_int16_t swig_types[210]
+#define SWIGTYPE_p_int64_t swig_types[211]
+#define SWIGTYPE_p_int8_t swig_types[212]
+#define SWIGTYPE_p_intptr_t swig_types[213]
+#define SWIGTYPE_p_long_long swig_types[214]
+#define SWIGTYPE_p_p_char swig_types[215]
+#define SWIGTYPE_p_p_csImageIOFileFormatDescription swig_types[216]
+#define SWIGTYPE_p_p_void swig_types[217]
+#define SWIGTYPE_p_scfImplementation1T_csPyEventHandler_iEventHandler_t swig_types[218]
+#define SWIGTYPE_p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[219]
+#define SWIGTYPE_p_scfImplementation1TcsObject_iObject_t swig_types[220]
+#define SWIGTYPE_p_scfImplementation1TcsPath_iPath_t swig_types[221]
+#define SWIGTYPE_p_scfImplementation1TcsPyEventPlug_iEventPlug_t swig_types[222]
+#define SWIGTYPE_p_scfInterfaceMetadata swig_types[223]
+#define SWIGTYPE_p_scfInterfaceMetadataList swig_types[224]
+#define SWIGTYPE_p_size_t swig_types[225]
+#define SWIGTYPE_p_uint16_t swig_types[226]
+#define SWIGTYPE_p_uint32_t swig_types[227]
+#define SWIGTYPE_p_uint64_t swig_types[228]
+#define SWIGTYPE_p_unsigned_char swig_types[229]
+#define SWIGTYPE_p_unsigned_int swig_types[230]
+#define SWIGTYPE_p_unsigned_long swig_types[231]
+#define SWIGTYPE_p_unsigned_long_long swig_types[232]
+#define SWIGTYPE_p_utf32_char swig_types[233]
+#define SWIGTYPE_p_void swig_types[234]
+static swig_type_info *swig_types[236];
+static swig_module_info swig_module = {swig_types, 235, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -12562,6 +12563,90 @@ SWIGINTERN PyObject *csRefCount_swigregister(PyObject *SWIGUNUSEDPARM(self), PyO
   PyObject *obj;
   if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_csRefCount, SWIG_NewClientData(obj));
+  return SWIG_Py_Void();
+}
+
+SWIGINTERN PyObject *_wrap_new_InternalRefCount(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Utility::InternalRefCount *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"new_InternalRefCount",0,0)) SWIG_fail;
+  result = (CS::Utility::InternalRefCount *)new CS::Utility::InternalRefCount();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Utility__InternalRefCount, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_InternalRefCount_InternalIncRef(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Utility::InternalRefCount *arg1 = (CS::Utility::InternalRefCount *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"InternalRefCount_InternalIncRef",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Utility__InternalRefCount, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "InternalRefCount_InternalIncRef" "', argument " "1"" of type '" "CS::Utility::InternalRefCount *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Utility::InternalRefCount * >(argp1);
+  (arg1)->InternalIncRef();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_InternalRefCount_InternalDecRef(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Utility::InternalRefCount *arg1 = (CS::Utility::InternalRefCount *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"InternalRefCount_InternalDecRef",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Utility__InternalRefCount, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "InternalRefCount_InternalDecRef" "', argument " "1"" of type '" "CS::Utility::InternalRefCount *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Utility::InternalRefCount * >(argp1);
+  (arg1)->InternalDecRef();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_InternalRefCount_GetInternalRefCount(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Utility::InternalRefCount *arg1 = (CS::Utility::InternalRefCount *) 0 ;
+  int result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"InternalRefCount_GetInternalRefCount",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Utility__InternalRefCount, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "InternalRefCount_GetInternalRefCount" "', argument " "1"" of type '" "CS::Utility::InternalRefCount const *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Utility::InternalRefCount * >(argp1);
+  result = (int)((CS::Utility::InternalRefCount const *)arg1)->GetInternalRefCount();
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *InternalRefCount_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *obj;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
+  SWIG_TypeNewClientData(SWIGTYPE_p_CS__Utility__InternalRefCount, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
 
@@ -53983,6 +54068,11 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csRefCount_DecRef", _wrap_csRefCount_DecRef, METH_VARARGS, NULL},
 	 { (char *)"csRefCount_GetRefCount", _wrap_csRefCount_GetRefCount, METH_VARARGS, NULL},
 	 { (char *)"csRefCount_swigregister", csRefCount_swigregister, METH_VARARGS, NULL},
+	 { (char *)"new_InternalRefCount", _wrap_new_InternalRefCount, METH_VARARGS, NULL},
+	 { (char *)"InternalRefCount_InternalIncRef", _wrap_InternalRefCount_InternalIncRef, METH_VARARGS, NULL},
+	 { (char *)"InternalRefCount_InternalDecRef", _wrap_InternalRefCount_InternalDecRef, METH_VARARGS, NULL},
+	 { (char *)"InternalRefCount_GetInternalRefCount", _wrap_InternalRefCount_GetInternalRefCount, METH_VARARGS, NULL},
+	 { (char *)"InternalRefCount_swigregister", InternalRefCount_swigregister, METH_VARARGS, NULL},
 	 { (char *)"csDefaultRunLoop", _wrap_csDefaultRunLoop, METH_VARARGS, NULL},
 	 { (char *)"csPlatformStartup", _wrap_csPlatformStartup, METH_VARARGS, NULL},
 	 { (char *)"csPlatformShutdown", _wrap_csPlatformShutdown, METH_VARARGS, NULL},
@@ -55386,6 +55476,9 @@ static void *_p_csConfigFileTo_p_scfImplementation1TcsConfigFile_iConfigFile_t(v
 static void *_p_csColor4To_p_csColor(void *x) {
     return (void *)((csColor *)  ((csColor4 *) x));
 }
+static void *_p_csObjectTo_p_CS__Utility__InternalRefCount(void *x) {
+    return (void *)((CS::Utility::InternalRefCount *)  ((csObject *) x));
+}
 static swig_type_info _swigt__p_AllocatorType = {"_p_AllocatorType", "AllocatorType *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__Geometry__DensityTextureMapper = {"_p_CS__Geometry__DensityTextureMapper", "CS::Geometry::DensityTextureMapper *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__Geometry__Primitives = {"_p_CS__Geometry__Primitives", "CS::Geometry::Primitives *", 0, 0, (void*)0, 0};
@@ -55393,6 +55486,7 @@ static swig_type_info _swigt__p_CS__Geometry__TableTextureMapper = {"_p_CS__Geom
 static swig_type_info _swigt__p_CS__Geometry__TextureMapper = {"_p_CS__Geometry__TextureMapper", "CS::Geometry::TextureMapper *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__Memory__AllocatorMalloc = {"_p_CS__Memory__AllocatorMalloc", "CS::Memory::AllocatorMalloc *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__Memory__CustomAllocated = {"_p_CS__Memory__CustomAllocated", "CS::Memory::CustomAllocated *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_CS__Utility__InternalRefCount = {"_p_CS__Utility__InternalRefCount", "CS::Utility::InternalRefCount *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CapacityHandlerType = {"_p_CapacityHandlerType", "CapacityHandlerType *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_ElementHandlerType = {"_p_ElementHandlerType", "ElementHandlerType *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_FILE = {"_p_FILE", "FILE *", 0, 0, (void*)0, 0};
@@ -55629,6 +55723,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_CS__Geometry__TextureMapper,
   &_swigt__p_CS__Memory__AllocatorMalloc,
   &_swigt__p_CS__Memory__CustomAllocated,
+  &_swigt__p_CS__Utility__InternalRefCount,
   &_swigt__p_CapacityHandlerType,
   &_swigt__p_ElementHandlerType,
   &_swigt__p_FILE,
@@ -55865,6 +55960,7 @@ static swig_cast_info _swigc__p_CS__Geometry__TableTextureMapper[] = {  {&_swigt
 static swig_cast_info _swigc__p_CS__Geometry__TextureMapper[] = {  {&_swigt__p_CS__Geometry__TextureMapper, 0, 0, 0},  {&_swigt__p_CS__Geometry__TableTextureMapper, _p_CS__Geometry__TableTextureMapperTo_p_CS__Geometry__TextureMapper, 0, 0},  {&_swigt__p_CS__Geometry__DensityTextureMapper, _p_CS__Geometry__DensityTextureMapperTo_p_CS__Geometry__TextureMapper, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__Memory__AllocatorMalloc[] = {  {&_swigt__p_CS__Memory__AllocatorMalloc, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__Memory__CustomAllocated[] = {  {&_swigt__p_CS__Memory__CustomAllocated, 0, 0, 0},  {&_swigt__p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_CS__Utility__InternalRefCount[] = {  {&_swigt__p_csObject, _p_csObjectTo_p_CS__Utility__InternalRefCount, 0, 0},  {&_swigt__p_CS__Utility__InternalRefCount, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CapacityHandlerType[] = {  {&_swigt__p_CapacityHandlerType, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_ElementHandlerType[] = {  {&_swigt__p_ElementHandlerType, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_FILE[] = {  {&_swigt__p_FILE, 0, 0, 0},{0, 0, 0, 0}};
@@ -56101,6 +56197,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_CS__Geometry__TextureMapper,
   _swigc__p_CS__Memory__AllocatorMalloc,
   _swigc__p_CS__Memory__CustomAllocated,
+  _swigc__p_CS__Utility__InternalRefCount,
   _swigc__p_CapacityHandlerType,
   _swigc__p_ElementHandlerType,
   _swigc__p_FILE,

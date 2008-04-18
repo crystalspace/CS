@@ -396,7 +396,7 @@ public:
   {
     if (Elements.GetSize() == 0) return csArray<T> ();
 
-    csHash<T,K>::ConstGlobalIterator itr = GetIterator();
+    ConstGlobalIterator itr = GetIterator();
     csArray<T> ret;
     while(itr.HasNext())
     {

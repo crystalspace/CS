@@ -115,7 +115,7 @@ namespace Implementation
 
   ThreadBase::ThreadBase (Runnable* runnable)
     : runnable (runnable), threadHandle (0), threadId (0), isRunning (0), 
-    priority (THREAD_PRIO_NORMAL)
+    priority (THREAD_PRIO_NORMAL), startupBarrier (2)
   {
   }
 
@@ -128,7 +128,6 @@ namespace Implementation
   {
     if (!threadHandle)
     {
-      Barrier startupBarrier (2);
       ThreadStartParams param (runnable, &isRunning, &startupBarrier);
 
       // _beginthreadex does not always return a void*,
