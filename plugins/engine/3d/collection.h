@@ -86,7 +86,7 @@ public:
       copy.Push(itr->Next());
     }
 
-    for(int i=0; i<copy.GetSize(); i++)
+    for(size_t i=0; i<copy.GetSize(); i++)
     {
       if(copy[i].IsValid())
       {
@@ -97,7 +97,7 @@ public:
     if(debug)
     {
       printf("Not Deleted for %s:\n", GetName());
-      for (int i = 0 ; i < copy.GetSize () ; i++)
+      for (size_t i = 0 ; i < copy.GetSize () ; i++)
       {
         iObject* obj = copy[i];
         if(obj)
