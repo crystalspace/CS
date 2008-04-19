@@ -29,6 +29,8 @@ chronological order.
 	- res implemented texture comparison modes correctly in gl3d.
 	- res changed the shadowmapping shaders to utilize GL texture
 	  comparison (instead of "manual" comparison in the FP).
+	- res fixed the Cg shader plugin discarding variable maps when loading
+	  a program multiple times.
 17-Apr-2008
 	- Mike Gist made the following changes;
 	    - Added an InternalRefCount class, to be used where we want an

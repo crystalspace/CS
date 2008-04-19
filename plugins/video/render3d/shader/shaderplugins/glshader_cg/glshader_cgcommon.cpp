@@ -39,6 +39,8 @@
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 {
 
+static const int assumeConstFlag = 0x80000000;
+
 CS_LEAKGUARD_IMPLEMENT (csShaderGLCGCommon);
 
 csShaderGLCGCommon::csShaderGLCGCommon (csGLShader_CG* shaderPlug, 
@@ -478,8 +480,9 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
 	variablemap.DeleteIndex (i);
 	continue;
       }
-      bool assumeConst = variablemap[i].userVal != 0;
-      variablemap[i].userVal = (intptr_t)param;
+      bool assumeConst = variablemap[i].userVal & assumeConstFlag;
+      variablemap[i].userVal = (intptr_t)param
+        | (assumeConst ? assumeConstFlag : 0);
       if (assumeConst)
       {
         if (assumedConstParams == 0)
@@ -692,7 +695,7 @@ bool csShaderGLCGCommon::Load (iShaderDestinationResolver* resolve,
 	      if (!ParseProgramParam (child, vme.mappingParam,
 		ParamFloat | ParamVector2 | ParamVector3 | ParamVector4))
 		return false;
-	      vme.userVal = (int)assumeConst;
+	      vme.userVal = assumeConst ? assumeConstFlag : 0;
 	      variablemap.Push (vme);
 	    }
 	    else
