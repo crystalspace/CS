@@ -72,11 +72,12 @@ protected:
   {
     loadPrecompiled = 1,
     loadLoadToGL = 2,
-    loadIgnoreErrors = 4
+    loadIgnoreErrors = 4,
+    loadApplyVmap = 8,
   };
   bool DefaultLoadProgram (iShaderDestinationResolverCG* cgResolve,
     const char* programStr, CGGLenum type, 
-    CGprofile maxProfile, uint flags = loadLoadToGL);
+    CGprofile maxProfile, uint flags = loadLoadToGL | loadApplyVmap);
   void DoDebugDump ();
   void WriteAdditionalDumpInfo (const char* description, const char* content);
   virtual const char* GetProgramType() = 0;

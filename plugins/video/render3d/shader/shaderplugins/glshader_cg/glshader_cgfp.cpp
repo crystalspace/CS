@@ -205,7 +205,7 @@ bool csShaderGLCGFP::Compile ()
       unusedParams.DeleteAll();
     }
     if (!DefaultLoadProgram (0, programStr, CG_GL_FRAGMENT, 
-      shaderPlug->maxProfileFragment))
+      shaderPlug->maxProfileFragment, loadLoadToGL))
       return false;
     /* Compile twice to be able to filter out unused vertex2fragment stuff on 
      * pass 2.

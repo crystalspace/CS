@@ -31,6 +31,8 @@ chronological order.
 	  comparison (instead of "manual" comparison in the FP).
 	- res fixed the Cg shader plugin discarding variable maps when loading
 	  a program multiple times.
+	- res fixed the Cg shader plugin to not apply variable mappings on it's 
+	  first of the two FP compile passes.
 17-Apr-2008
 	- Mike Gist made the following changes;
 	    - Added an InternalRefCount class, to be used where we want an

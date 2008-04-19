@@ -465,7 +465,7 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
   }
   programProfile = cgGetProgramProfile (program);
 
-  if (flags & loadLoadToGL)
+  if (flags & loadApplyVmap)
   {
     i = 0;
     while (i < variablemap.GetSize ())
