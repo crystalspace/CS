@@ -80,10 +80,9 @@ public:
   void ReleaseAllObjects(bool debug = false)
   {
     csWeakRefArray<iObject> copy;
-    csRef<iObjectIterator> itr = GetIterator();
-    while(itr->HasNext())
+    for(int i=0; i<Children->GetSize(); i++)
     {
-      copy.Push(itr->Next());
+      copy.Push(Children->Get(i));
     }
 
     for(size_t i=0; i<copy.GetSize(); i++)

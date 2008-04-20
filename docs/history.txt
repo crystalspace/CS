@@ -12,6 +12,9 @@ chronological order.
 	  freed due to a leaked reference).
 	- Mike Gist added an iEngine::RemoveCollection overload taking the
 	  iCollection to be removed as a parameter.
+	- Mike Gist fixed an assert in csCollection::ReleaseAllObjects caused
+	  by the creation of an iterator when this function is called by the
+	  dtor. Now it loops on the csObjectContainer instead.
 19-Apr-2008
 	- Jorrit fixed a few warnings in the new collections code.
 18-Apr-2008
