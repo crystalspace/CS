@@ -3125,7 +3125,7 @@ void csEngine::RemoveCollection(const char *name)
 
 void csEngine::RemoveAllCollections()
 {
-  csArray<csRef<iCollection>> cols = collections.GetAll();
+  csArray<csRef<iCollection> > cols = collections.GetAll();
   for(size_t i=0; i<cols.GetSize(); i++)
   {
     RemoveCollection(cols[i]->QueryObject()->GetName());
