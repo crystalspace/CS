@@ -79,6 +79,9 @@ public:
    */
   void ReleaseAllObjects(bool debug = false)
   {
+    if (!Children)
+      return;
+
     csWeakRefArray<iObject> copy;
     for(int i=0; i<Children->GetSize(); i++)
     {
