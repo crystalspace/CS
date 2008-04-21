@@ -6,6 +6,8 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Apr-2008
+	- res started to work on a "shader cache" to reduce shader load times.
 18-Apr-2008
 	- Marten fixed a bug in barriers where the case of spurious condition
 	  wakeup wasn't correctly handled.

@@ -74,8 +74,10 @@ public:
   WeaverShader (WeaverCompiler* compiler);
   virtual ~WeaverShader();
   
-  bool Load (iLoaderContext* ldr_context, iDocumentNode* source,
-      int forcepriority);
+  bool LoadFromDoc (iLoaderContext* ldr_context, iDocumentNode* source,
+      int forcepriority, iFile* cacheFile, bool& cacheState);
+  bool LoadFromCache (iLoaderContext* ldr_context, iDocumentNode* source,
+      int forcepriority, iFile* cacheFile);
 
   virtual iObject* QueryObject () 
   { return static_cast<iObject*> (static_cast<csObject*> (this)); }

@@ -20,18 +20,19 @@
 #include "cssysdef.h"
 #include <ctype.h>
 
-// For builtin shader consts:
-#include "iengine/light.h"
-#include "iengine/sector.h"
 #include "imap/services.h"
-#include "iutil/document.h"
+#include "iutil/cache.h"
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
 #include "iutil/verbositymanager.h"
 #include "ivaria/keyval.h"
 #include "ivaria/reporter.h"
 
+#include "csplugincommon/shader/shadercachehelper.h"
 #include "csutil/cfgacc.h"
+#include "csutil/csendian.h"
+#include "csutil/memfile.h"
+#include "csutil/parasiticdatabuffer.h"
 #include "csutil/xmltiny.h"
 
 #include "weaver.h"
@@ -109,11 +110,9 @@ csPtr<iDocumentNode> WeaverCompiler::LoadDocumentFromFile (
 
 csRef<iDocumentNode> WeaverCompiler::CreateAutoNode (csDocumentNodeType type)
 {
-  if (!autoDocSys.IsValid())
-    autoDocSys.AttachNew (new csTinyDocumentSystem);
   if (!autoDocRoot.IsValid ())
   {
-    csRef<iDocument> autoDoc = autoDocSys->CreateDocument ();
+    csRef<iDocument> autoDoc = xmlDocSys->CreateDocument ();
     csRef<iDocumentNode> root = autoDoc->CreateRoot ();
     autoDocRoot = root->CreateNodeBefore (CS_NODE_ELEMENT);
     autoDocRoot->SetValue ("(auto)");
@@ -146,6 +145,10 @@ bool WeaverCompiler::Initialize (iObjectRegistry* object_reg)
   if (!synldr)
     return false;
   
+  binDocSys = csLoadPluginCheck<iDocumentSystem> (plugin_mgr,
+    "crystalspace.documentsystem.binary");
+  xmlDocSys.AttachNew (new csTinyDocumentSystem);
+  
   csRef<iVerbosityManager> verbosemgr (
     csQueryRegistry<iVerbosityManager> (object_reg));
   if (verbosemgr) 
@@ -164,26 +167,118 @@ csPtr<iShader> WeaverCompiler::CompileShader (
     	iLoaderContext* ldr_context, iDocumentNode *templ,
 	int forcepriority)
 {
-  csTicks startTime = 0, endTime = 0;
-  // Create a shader. The actual loading happens later.
+  /* Magic value for cache file.
+   * The most significant byte serves as a "version", increase when the
+   * cache file format changes. */
+  const uint32 cacheFileMagic = 0x00727677;
+
+  const char* shaderName = templ->GetAttributeValue ("name");
   csRef<WeaverShader> shader;
-  if (do_verbose) startTime = csGetTicks();
-  shader.AttachNew (new WeaverShader (this));
-  bool loadRet = shader->Load (ldr_context, templ, forcepriority);
-  autoDocRoot .Invalidate ();
-  if (!loadRet)
-    return 0;
-  if (do_verbose) endTime = csGetTicks();
-  shader->SetName (templ->GetAttributeValue ("name"));
-  //shader->SetDescription (templ->GetAttributeValue ("description"));
-  if (do_verbose)
+
+  csRef<iShaderManager> shadermgr = 
+    csQueryRegistry<iShaderManager> (objectreg);
+  CS_ASSERT (shadermgr);
+  
+  CS::PluginCommon::ShaderCacheHelper::ShaderDocHasher hasher (objectreg,
+    templ);
+  
+  iCacheManager* shaderCache = shadermgr->GetShaderCache();
+  bool useShaderCache = (shaderCache != 0)
+    && shaderName && *shaderName;
+  csRef<iFile> cacheFile;
+  csRef<iDataBuffer> cacheData;
+  if (useShaderCache)
   {
-    csString str;
-    //shader->DumpStats (str);
-    Report(CS_REPORTER_SEVERITY_NOTIFY, 
-      "Shader %s: %s weaved in %u ms", shader->GetName (), str.GetData (),
-      endTime - startTime);
+    shaderCache->SetCurrentType ("weaver");
+    shaderCache->SetCurrentScope (shaderName);
+    
+    cacheData = shaderCache->ReadCache (0, 0, ~0);
+    if (cacheData.IsValid())
+    {
+      cacheFile.AttachNew (new csMemFile (cacheData, true));
+    }
+    if (cacheFile.IsValid())
+    {
+      do
+      {
+	// Read magic header
+	uint32 diskMagic;
+	size_t read = cacheFile->Read ((char*)&diskMagic, sizeof (diskMagic));
+	if (read != sizeof (diskMagic)) break;
+	if (csLittleEndian::UInt32 (diskMagic) != cacheFileMagic) break;
+	
+	// Extract hash stream
+	uint32 hashStreamSize;
+	read = cacheFile->Read ((char*)&hashStreamSize,
+	  sizeof (hashStreamSize));
+	if (read != sizeof (hashStreamSize)) break;
+	hashStreamSize = csLittleEndian::UInt32 (hashStreamSize);
+	csRef<iDataBuffer> hashStream;
+	hashStream.AttachNew (new csParasiticDataBuffer (cacheData,
+	  cacheFile->GetPos(), hashStreamSize));
+	if (hashStream->GetSize() != hashStreamSize) break;
+	cacheFile->SetPos (cacheFile->GetPos() + hashStreamSize);
+	
+	if (hasher.ValidateHashStream (hashStream))
+	{
+	  // If hash stream is for document, 
+	  shader.AttachNew (new WeaverShader (this));
+	  // take shader from cache
+	  bool loadRet = shader->LoadFromCache (ldr_context, templ,
+	    forcepriority, cacheFile);
+	  if (!loadRet) shader.Invalidate ();
+	}
+      }
+      while (false);
+      cacheFile.Invalidate();
+    }
+    if (!shader.IsValid())
+    {
+      // Getting from cache failed, so prep for writing to cache
+      cacheFile.AttachNew (new csMemFile ());
+      // Write magic header
+      uint32 diskMagic = csLittleEndian::UInt32 (cacheFileMagic);
+      cacheFile->Write ((char*)&diskMagic, sizeof (diskMagic));
+      // Write hash stream
+      csRef<iDataBuffer> hashStream = hasher.GetHashStream ();
+      uint32 hashStrSizeLE = csLittleEndian::UInt32 (hashStream->GetSize());
+      cacheFile->Write ((char*)&hashStrSizeLE, sizeof (hashStrSizeLE));
+      cacheFile->Write (hashStream->GetData(), hashStream->GetSize());
+    }
   }
+  
+  if (!shader.IsValid())
+  {
+    csTicks startTime = 0, endTime = 0;
+    // Create a shader. The actual loading happens later.
+    if (do_verbose) startTime = csGetTicks();
+    shader.AttachNew (new WeaverShader (this));
+    bool cacheState;
+    bool loadRet = shader->LoadFromDoc (ldr_context, templ, forcepriority,
+      cacheFile, cacheState);
+    autoDocRoot.Invalidate ();
+    if (!loadRet)
+      return 0;
+    if (do_verbose) 
+    {
+      endTime = csGetTicks();
+    
+      csString str;
+      //shader->DumpStats (str);
+      Report(CS_REPORTER_SEVERITY_NOTIFY, 
+	"Shader %s: %s weaved in %u ms", shaderName, str.GetData (),
+	endTime - startTime);
+    }
+    
+    if (useShaderCache && cacheState && cacheFile.IsValid())
+    {
+      csRef<iDataBuffer> allCacheData = cacheFile->GetAllData();
+      shaderCache->CacheData (allCacheData->GetData(),
+        allCacheData->GetSize(), 0, 0, ~0);
+    }
+  }
+  shader->SetName (shaderName);
+  //shader->SetDescription (templ->GetAttributeValue ("description"));
 
   csRef<iDocumentNodeIterator> tagIt = templ->GetNodes ("key");
   while (tagIt->HasNext ())

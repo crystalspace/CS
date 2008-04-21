@@ -23,12 +23,12 @@
 #include "csgeom/vector3.h"
 #include "csgeom/vector4.h"
 #include "cstypes.h"
-#include "csutil/objreg.h"
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
+#include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
-#include "csutil/callstack.h"
+#include "csutil/vfscache.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
 #include "iengine/texture.h"
@@ -218,6 +218,10 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   sv_time.AttachNew (new csShaderVariable (stringsSvName->Request ("standard time")));
   sv_time->SetValue (0.0f);
   AddVariable (sv_time);
+  
+  if (config->GetBool ("Video.ShaderManager.EnableShaderCache", false))
+    shaderCache.AttachNew (new csVfsCacheManager (objectreg,
+       "/tmp/shadercache"));
 
   return true;
 }

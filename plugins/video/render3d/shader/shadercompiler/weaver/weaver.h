@@ -78,6 +78,9 @@ public:
   /// XML Token and management
   csStringHash xmltokens;
 
+  csRef<iDocumentSystem> binDocSys;
+  csRef<iDocumentSystem> xmlDocSys;
+
   //Standard vars
   iObjectRegistry* objectreg;
   csRef<iStringSet> strings;
@@ -93,7 +96,6 @@ public:
   /* When loading a snippet, sometimes document nodes have to be created.
      These are created from this "auto document".
    */
-  csRef<iDocumentSystem> autoDocSys;
   csRef<iDocumentNode> autoDocRoot;
   csRef<iDocumentNode> CreateAutoNode (csDocumentNodeType type);
 };

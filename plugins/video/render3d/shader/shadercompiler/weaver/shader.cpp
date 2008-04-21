@@ -18,9 +18,15 @@
 */
 
 #include "cssysdef.h"
+#include "iutil/databuff.h"
 #include "iutil/document.h"
+#include "iutil/vfs.h"
 
+#include "csutil/csendian.h"
+#include "csutil/documenthelper.h"
+#include "csutil/memfile.h"
 #include "csutil/objreg.h"
+#include "csutil/parasiticdatabuffer.h"
 
 #include "shader.h"
 #include "weaver.h"
@@ -41,11 +47,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   {
   }
 
-  bool WeaverShader::Load (iLoaderContext* ldr_context, iDocumentNode* source,
-                           int forcepriority)
+  bool WeaverShader::LoadFromDoc (iLoaderContext* ldr_context, iDocumentNode* source,
+                                  int forcepriority, iFile* cacheFile,
+                                  bool& cacheState)
   {
+    cacheState = true;
+    realShader.Invalidate();
+    
+    iDocumentSystem* cacheDocSys = compiler->binDocSys.IsValid()
+      ? compiler->binDocSys : compiler->xmlDocSys;
+
     csArray<TechniqueKeeper> techniques;
     ScanForTechniques (source, techniques, forcepriority);
+    
+    if (cacheFile)
+    {
+      uint32 techNumLE = csLittleEndian::UInt32 (techniques.GetSize());
+      cacheFile->Write ((char*)&techNumLE, sizeof (techNumLE));
+    }
     
     for (size_t t = 0; t < techniques.GetSize(); t++)
     {
@@ -77,17 +96,86 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  shaderName.Format ("shader%zu", counter++);
 	}
 	synthShader->Write (compiler->vfs, 
-	  csString().Format ("/tmp/shader/generated_%s.xml", shaderName.GetData()));
+	  csString().Format ("/tmp/shader/generated_%s_%zu.xml",
+	    shaderName.GetData(), t));
       }
       
-      realShader = compiler->xmlshader->CompileShader (ldr_context,
-	synthShader->GetRoot()->GetNode ("shader"));
-      if (realShader.IsValid())
-        return true;
+      csRef<iDocumentNode> shaderNode =
+        synthShader->GetRoot()->GetNode ("shader");
+      
+      if (cacheFile)
+      {
+        csRef<iDocument> cacheDoc = cacheDocSys->CreateDocument();
+        csRef<iDocumentNode> cacheDocRoot = cacheDoc->CreateRoot();
+        csRef<iDocumentNode> cacheShaderNode = cacheDocRoot->CreateNodeBefore (
+          CS_NODE_ELEMENT);
+	CS::DocSystem::CloneNode (shaderNode, cacheShaderNode);
+	
+	csMemFile cachedDocFile;
+	if (cacheDoc->Write (&cachedDocFile) != 0)
+	  cacheState = false;
+	else
+	{
+	  csRef<iDataBuffer> cachedDocBuf = cachedDocFile.GetAllData ();
+	  uint32 sizeLE = csLittleEndian::UInt32 (cachedDocBuf->GetSize());
+	  cacheFile->Write ((char*)&sizeLE, sizeof (sizeLE));
+	  cacheFile->Write (cachedDocBuf->GetData(), cachedDocBuf->GetSize());
+	}
+      }
+        
+      if (!realShader.IsValid())
+	realShader = compiler->xmlshader->CompileShader (ldr_context,
+	  shaderNode);
+      if (realShader.IsValid() && (!cacheFile || !cacheState)) break;
     }
 
-    return false;
+    return realShader.IsValid();
   }
+  
+  bool WeaverShader::LoadFromCache (iLoaderContext* ldr_context, 
+                                    iDocumentNode* source,
+				    int forcepriority, iFile* cacheFile)
+  {
+    size_t read;
+  
+    uint32 techNum;
+    read = cacheFile->Read ((char*)&techNum, sizeof (techNum));
+    if (read != sizeof (techNum)) return false;
+    techNum = csLittleEndian::UInt32 (techNum);
+    
+    csRef<iDataBuffer> cacheData = cacheFile->GetAllData();
+    for (uint t = 0; t < techNum; t++)
+    {
+      uint32 cachedDocSize;
+      read = cacheFile->Read ((char*)&cachedDocSize,
+	sizeof (cachedDocSize));
+      if (read != sizeof (cachedDocSize)) return false;
+      cachedDocSize = csLittleEndian::UInt32 (cachedDocSize);
+      csRef<iDataBuffer> cachedDocData;
+      cachedDocData.AttachNew (new csParasiticDataBuffer (cacheData,
+	cacheFile->GetPos(), cachedDocSize));
+      if (cachedDocData->GetSize() != cachedDocSize) break;
+      cacheFile->SetPos (cacheFile->GetPos() + cachedDocSize);
+      
+      csRef<iDocument> cacheDoc;
+      cacheDoc = compiler->binDocSys->CreateDocument();
+      if (cacheDoc->Parse (cachedDocData) != 0)
+      {
+        cacheDoc = compiler->xmlDocSys->CreateDocument();
+        if (cacheDoc->Parse (cachedDocData) != 0) return false;
+      }
+      
+      csRef<iDocumentNode> shaderNode =
+        cacheDoc->GetRoot()->GetNode ("shader");
+      
+      if (!realShader.IsValid())
+	realShader = compiler->xmlshader->CompileShader (ldr_context,
+	  shaderNode);
+      if (realShader.IsValid()) break;
+    }
+
+    return realShader.IsValid();
+  }  
       
   void WeaverShader::SelfDestruct ()
   {
