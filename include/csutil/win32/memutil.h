@@ -16,21 +16,28 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSUTIL_MEMUTIL_H__
-#define __CSUTIL_MEMUTIL_H__
+#ifndef __CSUTIL_WIN32_MEMUTIL_H__
+#define __CSUTIL_WIN32_MEMUTIL_H__
 
 #include "cssysdef.h"
 #include "csextern.h"
 
 namespace CS {
   namespace Memory {
+	  namespace Implementation {
 
-    /** @brief Retrieve the amount of physical system memory, in kB
+    /** @brief Implementation-dependant memory retreival function.
+	 *
+	 * Used by CS::Memory::GetPhysicalMemory().  Do not call this function
+	 * directly, use CS::Memory::GetPhysicalMemory().
      *
-     * @returns Physical system memory (in kB) on success, 0 otherwise
+     * @returns Physical system memory (in kB)
+	 *
+	 * @sa CS::Memory::GetPhysicalMemory()
      */
-   CS_CRYSTALSPACE_EXPORT size_t GetPhysicalMemory();
+     CS_CRYSTALSPACE_EXPORT size_t GetPhysicalMemory();
 
+    } // End namespace Implementation
   } // End namespace Memory
 } // End namespace CS
 
