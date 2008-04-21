@@ -6,6 +6,11 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Apr-2008
+	- Mike Gist committed a better fix for dynamic lights not shining on
+	  certain objects from Jorrit. csLight::CalculateLighting() now marks
+	  RelevantLights as dirty correctly, instead of only when the mesh has
+	  a shadow receiver.
 17-Apr-2008
 	- Eric Sunshine removed some useless (probably obsolete) CheckOptions
 	  invocations from flags.jam.

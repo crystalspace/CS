@@ -1,5 +1,8 @@
 1.2 branch log.
 
+21-Apr-2008
+	- Vincent merged r29350 into 1.2 (fix for dynamic lights not shining
+	  on certain objects).
 18-Apr-2008
 	- Vincent merged r29324, r29326 and r29329 into 1.2 (cleanup of
 	  long-obsolete Jam rule options).
