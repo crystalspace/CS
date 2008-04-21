@@ -191,7 +191,7 @@ namespace CS
 	if (file.IsValid())
 	{
 	  DocStackEntry newEntry;
-	  newEntry.docNode = doc;
+	  newEntry.sourceData = file->GetAllData();
 	  scanStack.Push (newEntry);
 	  return true;
 	}
