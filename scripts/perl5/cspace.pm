@@ -19378,7 +19378,7 @@ sub ACQUIRE {
 
 package cspace::iCollectionArray;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iSwigCollectionArray cspace );
+@ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
 *scfGetVersion = *cspacec::iCollectionArray_scfGetVersion;

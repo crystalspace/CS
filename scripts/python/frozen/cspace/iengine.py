@@ -1427,7 +1427,7 @@ iCollection_swigregister = _iengine.iCollection_swigregister
 iCollection_swigregister(iCollection)
 iCollection_scfGetVersion = _iengine.iCollection_scfGetVersion
 
-class iCollectionArray(iSwigCollectionArray):
+class iCollectionArray(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
