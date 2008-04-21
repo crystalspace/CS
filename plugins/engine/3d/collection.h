@@ -83,7 +83,7 @@ public:
       return;
 
     csWeakRefArray<iObject> copy;
-    for(int i=0; i<Children->GetSize(); i++)
+    for(size_t i=0; i<Children->GetSize(); i++)
     {
       copy.Push(Children->Get(i));
     }
