@@ -162,6 +162,7 @@
 #elif defined(CS_PLATFORM_WIN32)
 #include "csutil/win32/callstack.h"
 #include "csutil/win32/DbgHelpAPI.h"
+#include "csutil/win32/memutil.h"
 #include "csutil/win32/minidump.h"
 #include "csutil/win32/registrycfg.h"
 #include "csutil/win32/win32.h"
