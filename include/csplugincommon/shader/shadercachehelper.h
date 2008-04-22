@@ -65,9 +65,12 @@ namespace CS
         csRef<iVFS> vfs;
         csMemFile actualHashes;
       public:
+        /// Set up a hasher for the given node
         ShaderDocHasher (iObjectRegistry* objReg, iDocumentNode* doc);
         
+        /// Get the hash data for the given node and all included documents
         csPtr<iDataBuffer> GetHashStream ();
+        /// Check if the given hash data identifies the given node
         bool ValidateHashStream (iDataBuffer* stream);
       };
     } // namespace ShaderCacheHelper

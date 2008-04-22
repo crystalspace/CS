@@ -167,7 +167,16 @@ namespace CS
 	  }
         
           csRef<iDocumentNodeIterator> nodes (node->GetNodes());
-          while (nodes->HasNext());
+          while (nodes->HasNext())
+          {
+            csRef<iDocumentNode> child = nodes->Next();
+            PushReferencedFiles (child);
+          }
+        }
+        else if (nodeType == CS_NODE_DOCUMENT)
+        {
+          csRef<iDocumentNodeIterator> nodes (node->GetNodes());
+          while (nodes->HasNext())
           {
             csRef<iDocumentNode> child = nodes->Next();
             PushReferencedFiles (child);
