@@ -8,6 +8,7 @@ chronological order.
 
 22-Apr-2008
 	- Mike Gist fixed a crash in the rloop loader when ldr_context is null.
+	- res (blindly) fixed compilation on OS/X.
 21-Apr-2008
 	- Scott Johnson added implementation-dependant memutil.h and .cpp files
 	  no changes have been made to the running implementation yet. (i.e. they
