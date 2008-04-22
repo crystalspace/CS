@@ -17905,7 +17905,14 @@ sub ACQUIRE {
 
 package cspace;
 
+sub CS_COMPILER_NAME () { $cspacec::CS_COMPILER_NAME }
+sub CS_PLATFORM_NAME () { $cspacec::CS_PLATFORM_NAME }
+sub CS_PROCESSOR_SIZE () { $cspacec::CS_PROCESSOR_SIZE }
+sub CS_LONG_SIZE () { $cspacec::CS_LONG_SIZE }
+sub CS_PROCESSOR_NAME () { $cspacec::CS_PROCESSOR_NAME }
 sub CS_WCHAR_T_SIZE () { $cspacec::CS_WCHAR_T_SIZE }
+sub CS_PACKAGE_NAME () { $cspacec::CS_PACKAGE_NAME }
+sub CS_PACKAGE_VERSION () { $cspacec::CS_PACKAGE_VERSION }
 sub SCF_STATIC_CLASS_CONTEXT () { $cspacec::SCF_STATIC_CLASS_CONTEXT }
 sub SCF_VERBOSE_NONE () { $cspacec::SCF_VERBOSE_NONE }
 sub SCF_VERBOSE_PLUGIN_SCAN () { $cspacec::SCF_VERBOSE_PLUGIN_SCAN }

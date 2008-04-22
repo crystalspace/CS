@@ -48,7 +48,14 @@ except AttributeError:
 del types
 
 
+CS_COMPILER_NAME = _cspace.CS_COMPILER_NAME
+CS_PLATFORM_NAME = _cspace.CS_PLATFORM_NAME
+CS_PROCESSOR_SIZE = _cspace.CS_PROCESSOR_SIZE
+CS_LONG_SIZE = _cspace.CS_LONG_SIZE
+CS_PROCESSOR_NAME = _cspace.CS_PROCESSOR_NAME
 CS_WCHAR_T_SIZE = _cspace.CS_WCHAR_T_SIZE
+CS_PACKAGE_NAME = _cspace.CS_PACKAGE_NAME
+CS_PACKAGE_VERSION = _cspace.CS_PACKAGE_VERSION
 class csWrapPtr(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csWrapPtr, name, value)
