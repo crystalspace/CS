@@ -189,10 +189,7 @@ csPtr<iShader> WeaverCompiler::CompileShader (
   csRef<iDataBuffer> cacheData;
   if (useShaderCache)
   {
-    shaderCache->SetCurrentType ("weaver");
-    shaderCache->SetCurrentScope (shaderName);
-    
-    cacheData = shaderCache->ReadCache (0, 0, ~0);
+    cacheData = shaderCache->ReadCache ("weaver", shaderName, ~0);
     if (cacheData.IsValid())
     {
       cacheFile.AttachNew (new csMemFile (cacheData, true));
@@ -274,7 +271,7 @@ csPtr<iShader> WeaverCompiler::CompileShader (
     {
       csRef<iDataBuffer> allCacheData = cacheFile->GetAllData();
       shaderCache->CacheData (allCacheData->GetData(),
-        allCacheData->GetSize(), 0, 0, ~0);
+        allCacheData->GetSize(), "weaver", shaderName, ~0);
     }
   }
   shader->SetName (shaderName);

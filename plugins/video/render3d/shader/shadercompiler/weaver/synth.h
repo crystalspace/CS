@@ -46,6 +46,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 
   class Synthesizer
   {
+    SnippetNumbers snipNums;
     csArray<csArray<TechniqueGraph> > graphs;
     csArray<Snippet*> outerSnippets;
   public:
@@ -156,6 +157,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
           SeekNext();
           return *val; 
         }
+	size_t GetTotal() const
+	{
+	  CS_ASSERT(false);
+	  return array.GetSize(); 
+	}
       };
     };
 

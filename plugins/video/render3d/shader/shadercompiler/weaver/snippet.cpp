@@ -54,6 +54,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       storage = array[pos++]; 
       return storage;
     }
+    virtual size_t GetTotal() const
+    { return array.GetSize(); }
   };
 
   //-------------------------------------------------------------------
@@ -100,6 +102,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	}
       }
     }
+    //if (techniques.GetSize() > 1) csPrintf ("snippet %s: %zu techniques\n", name, techniques.GetSize());
   }
   
   Snippet::Snippet (WeaverCompiler* compiler, const char* name) : compiler (compiler), 
@@ -516,6 +519,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   {
     CompoundTechnique* newTech = new CompoundTechnique (GetName());
   
+    newTech->priority = node->GetAttributeValueAsInt ("priority");
+    
     csRef<iDocumentNodeIterator> nodes = node->GetNodes ();
     while (nodes->HasNext ())
     {
@@ -866,6 +871,35 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   
   //-------------------------------------------------------------------
   
+  size_t SnippetNumbers::GetSnippetNumber (const Snippet* snip)
+  {
+    if (snippetNums.Contains (snip->GetName()))
+      return snippetNums.Get (snip->GetName(), (size_t)~0);
+    size_t newNum = currentNum++;
+    snippetNums.Put (snip->GetName(), newNum);
+    return newNum;
+  }
+  
+  //-------------------------------------------------------------------
+  
+  void SnippetTechPriorities::Merge (const SnippetTechPriorities& other)
+  {
+    if (prios.GetSize() < other.prios.GetSize())
+      prios.SetSize (other.prios.GetSize(), INT_MIN);
+    for (size_t s = 0; s < other.prios.GetSize(); s++)
+    {
+      int otherPrio = other.prios[s];
+      if (otherPrio == INT_MIN) continue;
+      if (prios[s] != INT_MIN)
+      {
+        CS_ASSERT(prios[s] == otherPrio);
+      }
+      prios[s] = otherPrio;
+    }
+  }
+  
+  //-------------------------------------------------------------------
+  
   void TechniqueGraph::AddTechnique (const Snippet::Technique* tech)
   {
     techniques.Push (tech);
@@ -918,6 +952,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       const ExplicitConnectionsHash& val = otherExplicitIt.Next (key);
       explicitConnections.Put (key, val);
     }
+    
+    snipPrios.Merge (other.snipPrios);
   }
   
   void TechniqueGraph::GetDependencies (const Snippet::Technique* tech, 
@@ -1010,6 +1046,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   {
     CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique*> > techIter (
       snip->GetTechniques());
+    size_t snipNum = (size_t)~0;
+    if (techIter->GetTotal() > 1)
+    {
+      snipNum = snipNums.GetSnippetNumber (snip);
+    }
     while (techIter->HasNext())
     {
       const Snippet::Technique* tech = techIter->Next();
@@ -1038,8 +1079,37 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	     * the technique into each. */
 	    for (size_t g = 0; g < newGraphs.GetSize(); g++)
 	    {
+	      SnippetTechPriorities& newGraphPrios =
+	        newGraphs[g].graph.GetSnippetPrios();
 	      for (size_t g2 = 0; g2 < techGraphs.GetSize(); g2++)
 	      {
+	        /* Conserve variations: don't merge a graph if one of the
+	           contained snippets has a higher priority than the graph
+	           to merge into */
+	        bool skipTech = false;
+	        const SnippetTechPriorities& graphPrios =
+	          techGraphs[g2].graph.GetSnippetPrios();
+		for (size_t s = 0; s < snipNums.GetAllSnippetsCount(); s++)
+		{
+		  if (newGraphPrios.IsSnippetPrioritySet (s)
+		    && graphPrios.IsSnippetPrioritySet (s)
+		    && (newGraphPrios.GetSnippetPriority (s) <
+		      graphPrios.GetSnippetPriority(s)))
+		  {
+		    skipTech = true;
+		    break;
+		  }
+		}
+		if (skipTech) continue;
+		for (size_t s = 0; s < snipNums.GetAllSnippetsCount(); s++)
+		{
+		  if (graphPrios.IsSnippetPrioritySet (s))
+		  {
+		    newGraphPrios.SetSnippetPriority (s, 
+		      graphPrios.GetSnippetPriority (s));
+		  }
+		}
+		
 		GraphInfo graphMerged (techGraphs[g2]);
 		graphMerged.Merge (newGraphs[g]);
 		graphs2.Push (graphMerged);
@@ -1113,14 +1183,30 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	    }
 	  }
 	}
+	// Set priority for this snippet
+	if (snipNum != (size_t)~0)
+	{
+	  int prio = tech->priority;
+	  for (size_t g = 0; g < techGraphs.GetSize(); g++)
+	    techGraphs[g].graph.GetSnippetPrios().SetSnippetPriority (snipNum, prio);
+	}
         // Add all the graphs for the technique to the complete graph list
         for (size_t g = 0; g < techGraphs.GetSize(); g++)
           graphs.Push (techGraphs[g]);
       }
       else
       {
+        const Snippet::AtomTechnique* atomTech =
+          static_cast<const Snippet::AtomTechnique*> (tech);
+          
 	GraphInfo graphInfo;
 	graphInfo.graph.AddTechnique (tech);
+	// Set priority for this snippet
+	if (snipNum != (size_t)~0)
+	{
+	  int prio = tech->priority;
+	  graphInfo.graph.GetSnippetPrios().SetSnippetPriority (snipNum, prio);
+	}
 	graphs.Push (graphInfo);
       }
     }

@@ -67,7 +67,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     graphs.SetSize (outerSnippets.GetSize());
     for (size_t s = 0; s < outerSnippets.GetSize(); s++)
     {
-      TechniqueGraphBuilder builder;
+      TechniqueGraphBuilder builder (snipNums);
       this->outerSnippets.Push (outerSnippets[s]);
       builder.BuildGraphs (outerSnippets[s], graphs[s]);
     }
@@ -110,38 +110,74 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       size_t currentTech = 0;
       while (currentTech < techNum)
       {
-        csRef<iDocumentNode> techniqueNode =
-          shaderNode->CreateNodeBefore (CS_NODE_ELEMENT);
-        techniqueNode->SetValue ("technique");
-        techniqueNode->SetAttributeAsInt ("priority", int (techNum - currentTech));
-        
         size_t current = currentTech;
-        bool aPassSucceeded = false;
+	/* Conserve variations: don't generate a technique if some pass has
+	   a higher priority for a snippet than a pass that comes before it */
+        bool skipTech = false;
+        SnippetTechPriorities allTechPrios;
 	for (size_t g = 0; g < graphs.GetSize(); g++)
 	{
           const TechniqueGraph& graph = graphs.Get (g)[(current % graphs[g].GetSize())];
           current = current / graphs[g].GetSize();
-	  csRef<iDocumentNode> passNode =
-	    techniqueNode->CreateNodeBefore (CS_NODE_ELEMENT);
-	  passNode->SetValue ("pass");
-	  
-	  Snippet* snippet = outerSnippets[g];
-	  csRefArray<iDocumentNode> passForwardedNodes =
-	    snippet->GetPassForwardedNodes();
-	  for (size_t n = 0; n < passForwardedNodes.GetSize(); n++)
+          
+	  const SnippetTechPriorities& graphPrios = graph.GetSnippetPrios();
+	  for (size_t s = 0; s < snipNums.GetAllSnippetsCount(); s++)
 	  {
-	    iDocumentNode* srcNode = passForwardedNodes[n];
-	    csRef<iDocumentNode> dstNode =
-	      passNode->CreateNodeBefore (srcNode->GetType());
-	    CS::DocSystem::CloneNode (srcNode, dstNode);
+	    if (graphPrios.IsSnippetPrioritySet (s)
+	      && allTechPrios.IsSnippetPrioritySet (s)
+	      && (graphPrios.GetSnippetPriority (s) >
+	        allTechPrios.GetSnippetPriority(s)))
+	    {
+	      skipTech = true;
+	      break;
+	    }
 	  }
-	  if (!SynthesizeTechnique (shaderVarNodesHelper, passNode, snippet, graph))
-            techniqueNode->RemoveNode (passNode);
-          else
-            aPassSucceeded = true;
+	  if (skipTech) break;
+	  
+	  for (size_t s = 0; s < snipNums.GetAllSnippetsCount(); s++)
+	  {
+	    if (graphPrios.IsSnippetPrioritySet (s))
+	      allTechPrios.SetSnippetPriority (s,
+	        graphPrios.GetSnippetPriority (s));
+	  }
 	}
-        if (!aPassSucceeded)
-          shaderNode->RemoveNode (techniqueNode);
+	
+	if (!skipTech)
+	{
+	  current = currentTech;
+	  csRef<iDocumentNode> techniqueNode =
+	    shaderNode->CreateNodeBefore (CS_NODE_ELEMENT);
+	  techniqueNode->SetValue ("technique");
+	  techniqueNode->SetAttributeAsInt ("priority", int (techNum - currentTech));
+	  
+	  bool aPassSucceeded = false;
+	  for (size_t g = 0; g < graphs.GetSize(); g++)
+	  {
+	    const TechniqueGraph& graph = graphs.Get (g)[(current % graphs[g].GetSize())];
+	    
+	    current = current / graphs[g].GetSize();
+	    csRef<iDocumentNode> passNode =
+	      techniqueNode->CreateNodeBefore (CS_NODE_ELEMENT);
+	    passNode->SetValue ("pass");
+	    
+	    Snippet* snippet = outerSnippets[g];
+	    csRefArray<iDocumentNode> passForwardedNodes =
+	      snippet->GetPassForwardedNodes();
+	    for (size_t n = 0; n < passForwardedNodes.GetSize(); n++)
+	    {
+	      iDocumentNode* srcNode = passForwardedNodes[n];
+	      csRef<iDocumentNode> dstNode =
+		passNode->CreateNodeBefore (srcNode->GetType());
+	      CS::DocSystem::CloneNode (srcNode, dstNode);
+	    }
+	    if (!SynthesizeTechnique (shaderVarNodesHelper, passNode, snippet, graph))
+	      techniqueNode->RemoveNode (passNode);
+	    else
+	      aPassSucceeded = true;
+	  }
+	  if (!aPassSucceeded)
+	    shaderNode->RemoveNode (techniqueNode);
+	}
 	
 	currentTech++;
       }

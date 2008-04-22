@@ -242,6 +242,40 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     void HandleCombinerNode (CompoundTechnique& tech, iDocumentNode* node);
     void HandleParameterNode (CompoundTechnique& tech, iDocumentNode* node);
   };
+  
+  /// Helper to assign a running ID to each snippet
+  class SnippetNumbers
+  {
+    csHash<size_t, csString> snippetNums;
+    size_t currentNum;
+  public:
+    SnippetNumbers() : currentNum (0) {}
+  
+    size_t GetAllSnippetsCount() const { return snippetNums.GetSize(); }
+    size_t GetSnippetNumber (const Snippet* snip);
+  };
+  
+  /// Helper to manage priorities for snippets
+  class SnippetTechPriorities
+  {
+    csArray<int> prios;
+  public:
+    int GetSnippetPriority (size_t snippetNum) const
+    { return prios[snippetNum]; }
+    void SetSnippetPriority (size_t snippetNum, int prio)
+    {
+      if (prios.GetSize() <= snippetNum)
+        prios.SetSize (snippetNum+1, INT_MIN);
+      prios[snippetNum] = prio;
+    }
+    bool IsSnippetPrioritySet (size_t snippetNum) const
+    { 
+      return (prios.GetSize() > snippetNum)
+        && (prios[snippetNum] != INT_MIN); 
+    }
+    
+    void Merge (const SnippetTechPriorities& other);
+  };
 
   class TechniqueGraph
   {
@@ -293,6 +327,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     { return explicitConnections.GetElementPointer (to); }
     ExplicitConnectionsHash& GetExplicitConnections (const Snippet::Technique* to)
     { return explicitConnections.GetOrCreate (to); }
+    
+    SnippetTechPriorities& GetSnippetPrios () { return snipPrios; } 
+    const SnippetTechPriorities& GetSnippetPrios () const { return snipPrios; } 
   private:
     typedef csArray<const Snippet::Technique*> TechniquePtrArray;
     TechniquePtrArray techniques;
@@ -302,10 +339,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     typedef csHash<ExplicitConnectionsHash, csConstPtrKey<Snippet::Technique> >
       ExplicitConnectionsHashHash;
     ExplicitConnectionsHashHash explicitConnections;
+    SnippetTechPriorities snipPrios;
   };
 
   class TechniqueGraphBuilder
   {
+    SnippetNumbers& snipNums;
     typedef csHash<const Snippet::Technique*, csConstPtrKey<Snippet> > SnippetToTechMap;
     struct GraphInfo
     {
@@ -320,6 +359,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     void MapGraphInputsOutputs (csArray<GraphInfo>& graphs, 
       const Snippet* snip);
   public:
+    TechniqueGraphBuilder (SnippetNumbers& snipNums) : snipNums (snipNums) {}
+    
     void BuildGraphs (const Snippet* snip, csArray<TechniqueGraph>& graphs);
   };
 }

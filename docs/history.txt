@@ -9,6 +9,10 @@ chronological order.
 22-Apr-2008
 	- res fixed an infinite loop in ShaderDocHasher. Also made it hash
 	  included documents as intended.
+	- res changed the shader weaver to be more conservative when creating
+	  variations: the priorities of snippets are used to discard variations
+	  where a snippet is used one time with a low but also a higher
+	  priority at the same time.
 21-Apr-2008
 	- res started to work on a "shader cache" to reduce shader load times.
 18-Apr-2008
