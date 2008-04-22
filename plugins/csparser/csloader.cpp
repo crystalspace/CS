@@ -847,8 +847,41 @@ csLoadResult csLoader::Load (iDocumentNode* node, iCollection* collection,
     return rc;
   }
 
+  csRef<iDocumentNode> meshrefnode = node->GetNode ("meshref");
+  if (meshrefnode)
+  {
+    const char* meshobjname = override_name ? override_name :
+    	meshrefnode->GetAttributeValue ("name");
+    if (ldr_context->CheckDupes () && meshobjname)
+    {
+      iMeshWrapper* mw = Engine->FindMeshObject (meshobjname);
+      if (mw)
+      {
+        AddToRegionOrCollection (ldr_context, mw->QueryObject ());
+        rc.result = mw;
+        rc.success = true;
+        return rc;
+      }
+    }
+    csRef<iMeshWrapper> mesh = LoadMeshObjectFromFactory (ldr_context, meshrefnode, ssource);
+    if (mesh)
+    {
+      AddToRegionOrCollection (ldr_context, mesh->QueryObject ());
+      rc.result = mesh;
+      rc.success = true;
+      return rc;
+    }
+    else
+    {
+      // Error is already reported.
+      rc.result = 0;
+      rc.success = false;
+      return rc;
+    }
+  }
+
   ReportError ("crystalspace.maploader.parse",
-    "File doesn't seem to be a world, library, meshfact, meshobj, portals or light file!");
+    "File doesn't seem to be a world, library, meshfact, meshobj, meshref, portals or light file!");
 
   return rc;
 }
