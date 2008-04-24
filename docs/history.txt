@@ -11,6 +11,8 @@ chronological order.
 	  most once.
 	- res changed how the weaver caches weaved shaders: it now caches with
 	  technique granularity, not shader granularity.
+	- res added helper functions to the ShaderCacheHelper namespace to read
+	  and write complete data buffers from a file.
 22-Apr-2008
 	- res fixed an infinite loop in ShaderDocHasher. Also made it hash
 	  included documents as intended.

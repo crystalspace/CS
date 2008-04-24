@@ -21,8 +21,10 @@
 #include "csplugincommon/shader/shadercachehelper.h"
 
 #include "iutil/objreg.h"
+#include "csutil/csendian.h"
 #include "csutil/databuf.h"
 #include "csutil/documenthelper.h"
+#include "csutil/parasiticdatabuffer.h"
 #include "csutil/xmltiny.h"
 
 namespace CS
@@ -249,6 +251,35 @@ namespace CS
         if (bytesRemaining > 0) return false;
         return true;
       }
+      
+      //---------------------------------------------------------------------
+      
+      bool WriteDataBuffer (iFile* file, iDataBuffer* buf)
+      {
+	uint32 sizeLE = csLittleEndian::UInt32 (buf->GetSize());
+	if (file->Write ((char*)&sizeLE, sizeof (sizeLE)) != sizeof (sizeLE))
+	  return false;
+	size_t bufSize = buf->GetSize();
+	if (file->Write (buf->GetData(), bufSize) != bufSize)
+	  return false;
+	return true;
+      }
+      
+      csPtr<iDataBuffer> ReadDataBuffer (iFile* file)
+      {
+	uint32 bufSize;
+	size_t read = file->Read ((char*)&bufSize, sizeof (bufSize));
+	if (read != sizeof (bufSize)) return 0;
+	bufSize = csLittleEndian::UInt32 (bufSize);
+	csRef<iDataBuffer> allFileData (file->GetAllData());
+	csRef<iDataBuffer> buf;
+	buf.AttachNew (new csParasiticDataBuffer (allFileData,
+	  file->GetPos(), bufSize));
+	if (buf->GetSize() != bufSize) return 0;
+	file->SetPos (file->GetPos() + bufSize);
+	return csPtr<iDataBuffer> (buf);
+      }
+      
     } // namespace ShaderCacheHelper
   } // namespace PluginCommon
 } // namespace CS

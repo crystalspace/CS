@@ -75,6 +75,11 @@ namespace CS
         /// Check if the given hash data identifies the given node
         bool ValidateHashStream (iDataBuffer* stream);
       };
+      
+      /// Write a complete data buffer to a file
+      bool CS_CRYSTALSPACE_EXPORT WriteDataBuffer (iFile* file, iDataBuffer* buf);
+      /// Get a complete data buffer from a file
+      csPtr<iDataBuffer> CS_CRYSTALSPACE_EXPORT ReadDataBuffer (iFile* file);
     } // namespace ShaderCacheHelper
   } // namespace PluginCommon
 } // namespace CS
