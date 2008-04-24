@@ -68,7 +68,8 @@ class WeaverShader : public scfImplementationExt2<WeaverShader,
 protected:
   void InternalRemove() { SelfDestruct(); }
 
-  bool LoadTechFromDoc (iLoaderContext* ldr_context, iDocumentNode* source,
+  bool LoadTechFromDoc (iLoaderContext* ldr_context, iDocumentNode* docSource,
+      iDocumentNode* techSource, 
       size_t techNum, iFile* cacheFile, bool& cacheState);
   bool LoadTechFromCache (iLoaderContext* ldr_context, iFile* cacheFile);
       

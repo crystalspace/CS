@@ -13,6 +13,8 @@ chronological order.
 	  technique granularity, not shader granularity.
 	- res added helper functions to the ShaderCacheHelper namespace to read
 	  and write complete data buffers from a file.
+	- res fixed some of the logic in shader weaver controlling when to
+	  write data to the shader cache.
 22-Apr-2008
 	- res fixed an infinite loop in ShaderDocHasher. Also made it hash
 	  included documents as intended.

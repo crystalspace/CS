@@ -56,7 +56,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   }
 
   bool WeaverShader::LoadTechFromDoc (iLoaderContext* ldr_context, 
-                                      iDocumentNode* source, size_t techNum,
+                                      iDocumentNode* docSource,
+                                      iDocumentNode* techSource, size_t techNum,
                                       iFile* cacheFile, bool& cacheState)
   {
     cacheState = true;
@@ -65,7 +66,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     iDocumentSystem* cacheDocSys = compiler->binDocSys.IsValid()
       ? compiler->binDocSys : compiler->xmlDocSys;
 
-    csRef<iDocumentNodeIterator> it = source->GetNodes();
+    csRef<iDocumentNodeIterator> it = techSource->GetNodes();
   
     // Read in the passes.
     csPDelArray<Snippet> passSnippets;
@@ -81,12 +82,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       
     Synthesizer synth (compiler, passSnippets);
   
-    csRef<iDocument> synthShader = synth.Synthesize (source);
+    csRef<iDocument> synthShader = synth.Synthesize (docSource);
     CS_ASSERT (synthShader.IsValid());
     
     if (compiler->doDumpWeaved)
     {
-      csString shaderName (source->GetAttributeValue ("name"));
+      csString shaderName (docSource->GetAttributeValue ("name"));
       if (shaderName.IsEmpty())
       {
 	static size_t counter = 0;
@@ -118,9 +119,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       else
       {
 	csRef<iDataBuffer> cachedDocBuf = cachedDocFile.GetAllData ();
-	uint32 sizeLE = csLittleEndian::UInt32 (cachedDocBuf->GetSize());
-	cacheFile->Write ((char*)&sizeLE, sizeof (sizeLE));
-	cacheFile->Write (cachedDocBuf->GetData(), cachedDocBuf->GetSize());
+	CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (
+	  cacheFile, cachedDocBuf);
       }
     }
       
@@ -142,16 +142,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     if (read != sizeof (diskMagic)) return false;
     if (csLittleEndian::UInt32 (diskMagic) != cacheFileMagic) return false;
     
-    uint32 cachedDocSize;
-    read = cacheFile->Read ((char*)&cachedDocSize,
-      sizeof (cachedDocSize));
-    if (read != sizeof (cachedDocSize)) return false;
-    cachedDocSize = csLittleEndian::UInt32 (cachedDocSize);
-    csRef<iDataBuffer> cachedDocData;
-    cachedDocData.AttachNew (new csParasiticDataBuffer (cacheData,
-      cacheFile->GetPos(), cachedDocSize));
-    if (cachedDocData->GetSize() != cachedDocSize) return false;
-    cacheFile->SetPos (cacheFile->GetPos() + cachedDocSize);
+    csRef<iDataBuffer> cachedDocData = 
+      CS::PluginCommon::ShaderCacheHelper::ReadDataBuffer (cacheFile);
+    if (!cachedDocData.IsValid()) return false;
     
     csRef<iDocument> cacheDoc;
     cacheDoc = compiler->binDocSys->CreateDocument();
@@ -189,8 +182,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       cacheID_header.Format ("%sWH", digestStr.GetData());
       cacheID_tech.Format ("%sWT", digestStr.GetData());
     }
-    bool useShaderCache = (shaderCache != 0) && !shaderName.IsEmpty()
+    bool cacheValid = (shaderCache != 0) && !shaderName.IsEmpty()
       && !cacheID_header.IsEmpty() && !cacheID_tech.IsEmpty();
+    bool useShaderCache = cacheValid;
       
     if (useShaderCache)
     {
@@ -213,15 +207,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  if (csLittleEndian::UInt32 (diskMagic) != cacheFileMagic) break;
 	  
 	  // Extract hash stream
-	  uint32 hashStreamSize;
-	  read = cacheFile->Read ((char*)&hashStreamSize,
-	    sizeof (hashStreamSize));
-	  if (read != sizeof (hashStreamSize)) break;
-	  hashStreamSize = csLittleEndian::UInt32 (hashStreamSize);
-	  csRef<iDataBuffer> hashStream;
-	  hashStream.AttachNew (new csParasiticDataBuffer (cacheData,
-	    cacheFile->GetPos(), hashStreamSize));
-	  if (hashStream->GetSize() != hashStreamSize) break;
+	  csRef<iDataBuffer> hashStream = 
+	    CS::PluginCommon::ShaderCacheHelper::ReadDataBuffer (cacheFile);
+	  if (!hashStream.IsValid()) break;
 	  
 	  useShaderCache = hasher.ValidateHashStream (hashStream);
 	}
@@ -236,13 +224,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	cacheFile->Write ((char*)&diskMagic, sizeof (diskMagic));
 	// Write hash stream
 	csRef<iDataBuffer> hashStream = hasher.GetHashStream ();
-	uint32 hashStrSizeLE = csLittleEndian::UInt32 (hashStream->GetSize());
-	cacheFile->Write ((char*)&hashStrSizeLE, sizeof (hashStrSizeLE));
-	cacheFile->Write (hashStream->GetData(), hashStream->GetSize());
-	
-	csRef<iDataBuffer> allCacheData = cacheFile->GetAllData();
-	shaderCache->CacheData (allCacheData->GetData(),
-	  allCacheData->GetSize(), shaderName, cacheID_header, ~0);
+	if (CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (
+	  cacheFile, hashStream))
+	{
+	  csRef<iDataBuffer> allCacheData = cacheFile->GetAllData();
+	  shaderCache->CacheData (allCacheData->GetData(),
+	    allCacheData->GetSize(), shaderName, cacheID_header, ~0);
+	}
       }
     }
     
@@ -262,11 +250,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       
       if (!res)
       {
-        csMemFile cacheFile;
         bool cacheState;
-        res = LoadTechFromDoc (ldr_context, techniques[t].node, t, 
-          useShaderCache ? &cacheFile : 0, cacheState);
-        if (useShaderCache && cacheState)
+        csMemFile cacheFile;
+        res = LoadTechFromDoc (ldr_context, 
+          source, techniques[t].node, t,
+          cacheValid ? &cacheFile : 0, cacheState);
+        if (cacheValid && cacheState)
         {
           csRef<iDataBuffer> allCacheData = cacheFile.GetAllData();
 	  shaderCache->CacheData (allCacheData->GetData(),
