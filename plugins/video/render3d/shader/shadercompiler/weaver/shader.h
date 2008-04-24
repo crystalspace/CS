@@ -68,16 +68,18 @@ class WeaverShader : public scfImplementationExt2<WeaverShader,
 protected:
   void InternalRemove() { SelfDestruct(); }
 
+  bool LoadTechFromDoc (iLoaderContext* ldr_context, iDocumentNode* source,
+      size_t techNum, iFile* cacheFile, bool& cacheState);
+  bool LoadTechFromCache (iLoaderContext* ldr_context, iFile* cacheFile);
+      
 public:
   CS_LEAKGUARD_DECLARE (WeaverShader);
 
   WeaverShader (WeaverCompiler* compiler);
   virtual ~WeaverShader();
   
-  bool LoadFromDoc (iLoaderContext* ldr_context, iDocumentNode* source,
-      int forcepriority, iFile* cacheFile, bool& cacheState);
-  bool LoadFromCache (iLoaderContext* ldr_context, iDocumentNode* source,
-      int forcepriority, iFile* cacheFile);
+  bool Load (iLoaderContext* ldr_context, iDocumentNode* source,
+    int forcepriority);
 
   virtual iObject* QueryObject () 
   { return static_cast<iObject*> (static_cast<csObject*> (this)); }

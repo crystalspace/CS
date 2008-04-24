@@ -9,6 +9,8 @@ chronological order.
 24-Apr-2008
 	- res sped up ShaderDocHasher by only hashing each referenced file at
 	  most once.
+	- res changed how the weaver caches weaved shaders: it now caches with
+	  technique granularity, not shader granularity.
 22-Apr-2008
 	- res fixed an infinite loop in ShaderDocHasher. Also made it hash
 	  included documents as intended.
