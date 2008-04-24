@@ -15,6 +15,7 @@ chronological order.
 	  and write complete data buffers from a file.
 	- res fixed some of the logic in shader weaver controlling when to
 	  write data to the shader cache.
+	- res added csMemFile::Empty().
 22-Apr-2008
 	- res fixed an infinite loop in ShaderDocHasher. Also made it hash
 	  included documents as intended.
