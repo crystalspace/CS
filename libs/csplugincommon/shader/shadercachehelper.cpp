@@ -196,12 +196,15 @@ namespace CS
         
       bool ShaderDocHasher::AddFile (const char* filename)
       {
+        if (seenFiles.Contains (filename)) return true;
+      
 	csRef<iFile> file = vfs->Open (filename, VFS_FILE_READ);
 	if (file.IsValid())
 	{
 	  DocStackEntry newEntry;
 	  newEntry.sourceData = file->GetAllData();
 	  scanStack.Push (newEntry);
+          seenFiles.AddNoTest (filename);
 	  return true;
 	}
 	else

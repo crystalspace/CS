@@ -26,6 +26,7 @@
 #include "csutil/fifo.h"
 #include "csutil/memfile.h"
 #include "csutil/ref.h"
+#include "csutil/set.h"
 
 struct iDataBuffer;
 struct iDocumentNode;
@@ -64,6 +65,7 @@ namespace CS
         csRef<iDocumentSystem> docSys;
         csRef<iVFS> vfs;
         csMemFile actualHashes;
+        csSet<csString> seenFiles;
       public:
         /// Set up a hasher for the given node
         ShaderDocHasher (iObjectRegistry* objReg, iDocumentNode* doc);
