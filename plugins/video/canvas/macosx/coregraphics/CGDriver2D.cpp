@@ -85,7 +85,7 @@ bool CGDriver2D::Open()
     SetupDrawingFunctions();
 
     // Allocate memory for drawing
-    Memory = (unsigned char *) malloc(Width * Height * pfmt.PixelBytes);
+    Memory = (unsigned char *) malloc(fbWidth * fbHeight * pfmt.PixelBytes);
 
     if (csGraphics2D::Open() == false)
         return false;
@@ -131,7 +131,7 @@ void CGDriver2D::SetTitle(char *title)
 // Flip video page (or dump to framebuffer)
 void CGDriver2D::Print(csRect const* area)
 {
-    OSXDelegate2D_blitToWindow(delegate, Memory, Width, Height, Depth);
+    OSXDelegate2D_blitToWindow(delegate, Memory, fbWidth, fbHeight, Depth);
 }
 
 
@@ -169,7 +169,7 @@ bool CGDriver2D::Resize(int w, int h)
     if (success == true)
     {
         // Need to allocate new buffer
-        Memory = (unsigned char *) realloc(Memory, Width * Height * pfmt.PixelBytes);
+        Memory = (unsigned char *) realloc(Memory, fbWidth * fbHeight * pfmt.PixelBytes);
 
         // Should CGDriver2D inherit from iEventPlug and get it's own outlet?
         csRef<iEventQueue> queue = csQueryRegistry<iEventQueue> (object_reg);

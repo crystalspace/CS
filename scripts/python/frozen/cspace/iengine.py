@@ -1388,6 +1388,22 @@ iRenderLoopManager_swigregister = _iengine.iRenderLoopManager_swigregister
 iRenderLoopManager_swigregister(iRenderLoopManager)
 iRenderLoopManager_scfGetVersion = _iengine.iRenderLoopManager_scfGetVersion
 
+class iSwigCollectionArray(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetSize(*args): return _iengine.iSwigCollectionArray_GetSize(*args)
+    def Get(*args): return _iengine.iSwigCollectionArray_Get(*args)
+    def Top(*args): return _iengine.iSwigCollectionArray_Top(*args)
+    def Find(*args): return _iengine.iSwigCollectionArray_Find(*args)
+    def GetIndex(*args): return _iengine.iSwigCollectionArray_GetIndex(*args)
+    def IsEmpty(*args): return _iengine.iSwigCollectionArray_IsEmpty(*args)
+    def GetAll(*args): return _iengine.iSwigCollectionArray_GetAll(*args)
+    __swig_destroy__ = _iengine.delete_iSwigCollectionArray
+    __del__ = lambda self : None;
+iSwigCollectionArray_swigregister = _iengine.iSwigCollectionArray_swigregister
+iSwigCollectionArray_swigregister(iSwigCollectionArray)
+
 class iCollection(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
@@ -1413,15 +1429,14 @@ iCollection_scfGetVersion = _iengine.iCollection_scfGetVersion
 
 class iCollectionArray(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _iengine.new_iCollectionArray(*args)
-        try: self.this.append(this)
-        except: self.this = this
+    scfGetVersion = staticmethod(_iengine.iCollectionArray_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iCollectionArray
     __del__ = lambda self : None;
 iCollectionArray_swigregister = _iengine.iCollectionArray_swigregister
 iCollectionArray_swigregister(iCollectionArray)
+iCollectionArray_scfGetVersion = _iengine.iCollectionArray_scfGetVersion
 
 def CS_REQUEST_ENGINE ():
    return core.CS_REQUEST_PLUGIN("crystalspace.engine.3d", iEngine)

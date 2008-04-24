@@ -19292,6 +19292,44 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iSwigCollectionArray ##############
+
+package cspace::iSwigCollectionArray;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*GetSize = *cspacec::iSwigCollectionArray_GetSize;
+*Get = *cspacec::iSwigCollectionArray_Get;
+*Top = *cspacec::iSwigCollectionArray_Top;
+*Find = *cspacec::iSwigCollectionArray_Find;
+*GetIndex = *cspacec::iSwigCollectionArray_GetIndex;
+*IsEmpty = *cspacec::iSwigCollectionArray_IsEmpty;
+*GetAll = *cspacec::iSwigCollectionArray_GetAll;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSwigCollectionArray($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iCollection ##############
 
 package cspace::iCollection;
@@ -19343,12 +19381,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_iCollectionArray(@_);
-    bless $self, $pkg if defined($self);
-}
-
+*scfGetVersion = *cspacec::iCollectionArray_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});

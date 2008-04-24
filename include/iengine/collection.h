@@ -109,9 +109,9 @@ struct iCollection : public virtual iBase
 };
 
 /**
- * Used for a readonly array of iCollection.
+ * Used for a readonly array of csRef<iCollection>.
  */
-struct iCollectionArray : public iArrayReadOnly<iCollection*>
+struct iCollectionArray : public iArrayReadOnly<csRef<iCollection> >
 {
   SCF_IARRAYREADONLY_INTERFACE (iCollectionArray);
 };
