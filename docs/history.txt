@@ -15,6 +15,9 @@ chronological order.
 	  "flattened": since node attribute iterators return attributes in
 	  random order the same document could be flattened to different
 	  strings; sorting attributes works around that.
+	- res made the shadowmap RM use a special, lightweight shader when
+	  rendering to the shadow map (instead of the default material
+	  shader used before).
 24-Apr-2008
 	- res sped up ShaderDocHasher by only hashing each referenced file at
 	  most once.

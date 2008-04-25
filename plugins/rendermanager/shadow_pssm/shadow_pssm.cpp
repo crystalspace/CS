@@ -315,7 +315,15 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
   hdrExposure.Initialize (objectReg, postEffects);
   
   portalPersistent.Initialize (shaderManager, g3d);
-  lightPersistent.Initialize (shaderManager, g3d);
+  lightPersistent.Initialize (objectReg);
+  
+  lightPersistent.shadowPersist.SetShadowShaderType (
+    cfg->GetStr ("RenderManager.ShadowPSSM.ShadowShader.Type", "shadow"));
+  csRef<iShader> shadowDefault =
+    loader->LoadShader (
+      cfg->GetStr ("RenderManager.ShadowPSSM.ShadowShader.Default",
+                   "/shader/shadow/shadow_default.xml"));
+  lightPersistent.shadowPersist.SetDefaultShadowShader (shadowDefault);
   
   return true;
 }

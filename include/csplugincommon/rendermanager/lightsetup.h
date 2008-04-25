@@ -21,6 +21,7 @@
 
 #include "iengine/lightmgr.h"
 #include "iutil/object.h"
+#include "iutil/objreg.h"
 #include "ivideo/shader/shader.h"
 
 #include "csgfx/lightsvcache.h"
@@ -216,7 +217,7 @@ namespace RenderManager
     struct PersistentData
     {
       void UpdateNewFrame () {}
-      void Initialize (iShaderManager*, iGraphics3D*) {}
+      void Initialize (iObjectRegistry*) {}
     };
     struct ShadowParameters {};
 
@@ -619,13 +620,15 @@ namespace RenderManager
         if (lcb.IsValid()) lcb->parent = 0;
       }
       
-      void Initialize (iShaderManager* shaderManager,
-                       iGraphics3D* g3d)
+      void Initialize (iObjectRegistry* objReg)
       {
+        csRef<iShaderManager> shaderManager =
+          csQueryRegistry<iShaderManager> (objReg);
+        
 	iShaderVarStringSet* strings = shaderManager->GetSVNameStringset();
 	svNames.SetStrings (strings);
         svPassNum = strings->Request ("pass number");
-	shadowPersist.Initialize (shaderManager, g3d);
+	shadowPersist.Initialize (objReg);
       }
       void UpdateNewFrame ()
       {

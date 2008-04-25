@@ -310,7 +310,7 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
   hdrExposure.Initialize (objectReg, postEffects);
   
   portalPersistent.Initialize (shaderManager, g3d);
-  lightPersistent.Initialize (shaderManager, g3d);
+  lightPersistent.Initialize (objectReg);
   
   return true;
 }

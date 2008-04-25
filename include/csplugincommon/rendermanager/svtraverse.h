@@ -27,12 +27,12 @@ namespace CS
 namespace RenderManager
 {
 
-  template<typename RenderTree, typename LayerConfigType, typename Fn>
+  template<typename RenderTree, typename Fn>
   class TraverseUsedSVs
   {
   public:
-    TraverseUsedSVs (Fn& fn, const LayerConfigType& layers, size_t maxNumSVs)
-      : fn (fn), layers (layers)
+    TraverseUsedSVs (Fn& fn, size_t maxNumSVs)
+      : fn (fn)
     {
       names.SetSize (maxNumSVs);
     }
@@ -45,7 +45,7 @@ namespace RenderManager
       iShader* lastShader = 0;
       size_t lastTicket = ~0;
 
-      for (size_t layer = 0; layer < layers.GetLayerCount (); ++layer)
+      for (size_t layer = 0; layer < context.GetLayerCount (); ++layer)
       {
         const size_t layerOffset = context.totalRenderMeshes*layer;
         
@@ -91,7 +91,6 @@ namespace RenderManager
 
   private:
     Fn& fn;
-    const LayerConfigType& layers;
     csBitArray names;
   };
 

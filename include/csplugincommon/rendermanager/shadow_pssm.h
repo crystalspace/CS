@@ -53,8 +53,11 @@ namespace RenderManager
       float splitDists[NUM_PARTS+1];
       float lx, rx, ty, by;
       
+      SingleRenderLayer depthRenderLayer;
+      
       ViewSetup (PersistentData& persist, CS::RenderManager::RenderView* rview)
-       : persist (persist), rview (rview)
+       : persist (persist), rview (rview),
+         depthRenderLayer (persist.shadowShaderType, persist.defaultShadowShader)
       {
 	// PSSM: split layers
 	
@@ -178,7 +181,7 @@ namespace RenderManager
       }
       
       void AddShadowMapTarget (typename RenderTree::MeshNode* meshNode,
-	PersistentData& persist, const LayerConfigType& layerConfig,
+	PersistentData& persist, const SingleRenderLayer& layerConfig,
 	RenderTree& renderTree, iLight* light, CachedLightData& lightData)
       {
         typename RenderTree::ContextNode& context = meshNode->owner;
@@ -280,7 +283,7 @@ private:
     class ShadowmapContextSetup
     {
     public:
-      ShadowmapContextSetup (const LayerConfigType& layerConfig,
+      ShadowmapContextSetup (const SingleRenderLayer& layerConfig,
         iShaderManager* shaderManager)
 	: layerConfig (layerConfig), shaderManager (shaderManager)
       {
@@ -324,7 +327,7 @@ private:
     
 	// Setup the material&mesh SVs
 	{
-	  StandardSVSetup<RenderTree, MultipleRenderLayer> svSetup (
+	  StandardSVSetup<RenderTree, SingleRenderLayer> svSetup (
 	    context.svArrays, layerConfig);
     
 	  ForEachMeshNode (context, svSetup);
@@ -338,7 +341,7 @@ private:
     
     
     private:
-      const LayerConfigType& layerConfig;
+      const SingleRenderLayer& layerConfig;
       iShaderManager* shaderManager;
     };
   public:
@@ -350,6 +353,9 @@ private:
       LightingSorter::PersistentData lightSorterPersist;
       LightingVariablesHelper::PersistentData lightVarsPersist;
       iShaderManager* shaderManager;
+      csStringID shadowShaderType;
+      csRef<iStringSet> strings;
+      csRef<iShader> defaultShadowShader;
 
       TextureCache texCache;
 
@@ -365,9 +371,14 @@ private:
       {
       }
       
-      void Initialize (iShaderManager* shaderManager,
-                       iGraphics3D* g3d)
+      void Initialize (iObjectRegistry* objectReg)
       {
+        csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objectReg);
+        csRef<iShaderManager> shaderManager =
+          csQueryRegistry<iShaderManager> (objectReg);
+	strings = csQueryRegistryTagInterface<iStringSet> (objectReg,
+	  "crystalspace.shared.stringset");
+      
         texCache.SetG3D (g3d);
         this->shaderManager = shaderManager;
         iShaderVarStringSet* strings = shaderManager->GetSVNameStringset();
@@ -380,6 +391,14 @@ private:
         texCache.AdvanceFrame (time);
       }
 
+      const char* GetShadowShaderType () const
+      { return strings->Request (shadowShaderType); }
+      void SetShadowShaderType (const char* shaderType)
+      { shadowShaderType = strings->Request (shaderType); }
+      
+      iShader* GetDefaultShadowShader() const { return defaultShadowShader; }
+      void SetDefaultShadowShader (iShader* shader)
+      { defaultShadowShader = shader; }
     };
     
     typedef ViewSetup ShadowParameters;
@@ -431,8 +450,8 @@ private:
     static bool NeedFinalHandleLight() { return true; }
     void FinalHandleLight (iLight* light, CachedLightData& lightData)
     {
-      lightData.AddShadowMapTarget (meshNode, persist, layerConfig, 
-        renderTree, light, lightData);
+      lightData.AddShadowMapTarget (meshNode, persist,
+        viewSetup.depthRenderLayer, renderTree, light, lightData);
       
       lightData.ClearFrameData();
     }

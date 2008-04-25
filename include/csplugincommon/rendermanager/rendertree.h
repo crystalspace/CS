@@ -270,6 +270,11 @@ namespace RenderManager
         }
         return false;
       }
+      
+      size_t GetLayerCount() const
+      {
+        return shaderArray.GetSize() / totalRenderMeshes;
+      }
     };
 
 

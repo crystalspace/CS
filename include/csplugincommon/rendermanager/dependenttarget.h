@@ -130,9 +130,9 @@ namespace RenderManager
     {
       // Setup callbacks for SVs and mesh nodes
       NewTargetFn newTarget (*this, renderTree);
-      typedef TraverseUsedSVs<RenderTree, LayerConfigType, NewTargetFn> MeshTraverseType;
+      typedef TraverseUsedSVs<RenderTree, NewTargetFn> MeshTraverseType;
       MeshTraverseType svTraverser
-        (newTarget, layerConfig, shaderManager->GetSVNameStringset ()->GetSize ());
+        (newTarget, shaderManager->GetSVNameStringset ()->GetSize ());
 
       // Just traverse each context once
       Implementation::OnceOperationBlockRef<typename RenderTree::ContextNode*> 
