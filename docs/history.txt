@@ -18,6 +18,7 @@ chronological order.
 	- res made the shadowmap RM use a special, lightweight shader when
 	  rendering to the shadow map (instead of the default material
 	  shader used before).
+	- res enabled the shader cache in shadermgr.cfg.
 24-Apr-2008
 	- res sped up ShaderDocHasher by only hashing each referenced file at
 	  most once.
