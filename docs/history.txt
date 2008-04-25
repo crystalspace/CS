@@ -11,6 +11,10 @@ chronological order.
 	  document wrapper structures can be stored to disk now, eliminating
 	  the time usually spend for parsing + building the condition tree
 	  and document wrapper.
+	- res made CS::DocSystem::FlattenNode() sort the attributes that are
+	  "flattened": since node attribute iterators return attributes in
+	  random order the same document could be flattened to different
+	  strings; sorting attributes works around that.
 24-Apr-2008
 	- res sped up ShaderDocHasher by only hashing each referenced file at
 	  most once.
