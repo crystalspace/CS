@@ -2574,28 +2574,29 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_int16_t swig_types[96]
 #define SWIGTYPE_p_int64_t swig_types[97]
 #define SWIGTYPE_p_int8_t swig_types[98]
-#define SWIGTYPE_p_long_long swig_types[99]
-#define SWIGTYPE_p_p_csShaderVariable swig_types[100]
-#define SWIGTYPE_p_p_iRenderBuffer swig_types[101]
-#define SWIGTYPE_p_p_iTextureHandle swig_types[102]
-#define SWIGTYPE_p_p_iTextureWrapper swig_types[103]
-#define SWIGTYPE_p_p_void swig_types[104]
-#define SWIGTYPE_p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[105]
-#define SWIGTYPE_p_scfImplementation1TcsImageBase_iImage_t swig_types[106]
-#define SWIGTYPE_p_scfImplementation1TcsObject_iObject_t swig_types[107]
-#define SWIGTYPE_p_scfImplementation1TcsPath_iPath_t swig_types[108]
-#define SWIGTYPE_p_scfImplementationExt0TcsImageMemory_csImageBase_t swig_types[109]
-#define SWIGTYPE_p_scfInterfaceMetadataList swig_types[110]
-#define SWIGTYPE_p_uint16_t swig_types[111]
-#define SWIGTYPE_p_uint32_t swig_types[112]
-#define SWIGTYPE_p_uint64_t swig_types[113]
-#define SWIGTYPE_p_unsigned_char swig_types[114]
-#define SWIGTYPE_p_unsigned_int swig_types[115]
-#define SWIGTYPE_p_unsigned_long swig_types[116]
-#define SWIGTYPE_p_unsigned_long_long swig_types[117]
-#define SWIGTYPE_p_void swig_types[118]
-static swig_type_info *swig_types[120];
-static swig_module_info swig_module = {swig_types, 119, 0, 0, 0, 0};
+#define SWIGTYPE_p_intptr_t swig_types[99]
+#define SWIGTYPE_p_long_long swig_types[100]
+#define SWIGTYPE_p_p_csShaderVariable swig_types[101]
+#define SWIGTYPE_p_p_iRenderBuffer swig_types[102]
+#define SWIGTYPE_p_p_iTextureHandle swig_types[103]
+#define SWIGTYPE_p_p_iTextureWrapper swig_types[104]
+#define SWIGTYPE_p_p_void swig_types[105]
+#define SWIGTYPE_p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[106]
+#define SWIGTYPE_p_scfImplementation1TcsImageBase_iImage_t swig_types[107]
+#define SWIGTYPE_p_scfImplementation1TcsObject_iObject_t swig_types[108]
+#define SWIGTYPE_p_scfImplementation1TcsPath_iPath_t swig_types[109]
+#define SWIGTYPE_p_scfImplementationExt0TcsImageMemory_csImageBase_t swig_types[110]
+#define SWIGTYPE_p_scfInterfaceMetadataList swig_types[111]
+#define SWIGTYPE_p_uint16_t swig_types[112]
+#define SWIGTYPE_p_uint32_t swig_types[113]
+#define SWIGTYPE_p_uint64_t swig_types[114]
+#define SWIGTYPE_p_unsigned_char swig_types[115]
+#define SWIGTYPE_p_unsigned_int swig_types[116]
+#define SWIGTYPE_p_unsigned_long swig_types[117]
+#define SWIGTYPE_p_unsigned_long_long swig_types[118]
+#define SWIGTYPE_p_void swig_types[119]
+static swig_type_info *swig_types[121];
+static swig_module_info swig_module = {swig_types, 120, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -5148,7 +5149,54 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csShaderVariable_SetAccessor(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csShaderVariable_SetAccessor__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csShaderVariable *arg1 = (csShaderVariable *) 0 ;
+  iShaderVariableAccessor *arg2 = (iShaderVariableAccessor *) 0 ;
+  intptr_t arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 ;
+  int res3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csShaderVariable_SetAccessor",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariable_SetAccessor" "', argument " "1"" of type '" "csShaderVariable *""'"); 
+  }
+  arg1 = reinterpret_cast< csShaderVariable * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iShaderVariableAccessor, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csShaderVariable_SetAccessor" "', argument " "2"" of type '" "iShaderVariableAccessor *""'"); 
+  }
+  arg2 = reinterpret_cast< iShaderVariableAccessor * >(argp2);
+  {
+    res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_intptr_t,  0  | 0);
+    if (!SWIG_IsOK(res3)) {
+      SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "csShaderVariable_SetAccessor" "', argument " "3"" of type '" "intptr_t""'"); 
+    }  
+    if (!argp3) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csShaderVariable_SetAccessor" "', argument " "3"" of type '" "intptr_t""'");
+    } else {
+      intptr_t * temp = reinterpret_cast< intptr_t * >(argp3);
+      arg3 = *temp;
+      if (SWIG_IsNewObj(res3)) delete temp;
+    }
+  }
+  (arg1)->SetAccessor(arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csShaderVariable_SetAccessor__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csShaderVariable *arg1 = (csShaderVariable *) 0 ;
   iShaderVariableAccessor *arg2 = (iShaderVariableAccessor *) 0 ;
@@ -5174,6 +5222,55 @@ SWIGINTERN PyObject *_wrap_csShaderVariable_SetAccessor(PyObject *SWIGUNUSEDPARM
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csShaderVariable_SetAccessor(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[4];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 3); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csShaderVariable, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iShaderVariableAccessor, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_csShaderVariable_SetAccessor__SWIG_1(self, args);
+      }
+    }
+  }
+  if (argc == 3) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csShaderVariable, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iShaderVariableAccessor, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_intptr_t, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          return _wrap_csShaderVariable_SetAccessor__SWIG_0(self, args);
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csShaderVariable_SetAccessor'.\n  Possible C/C++ prototypes are:\n    SetAccessor(iShaderVariableAccessor *,intptr_t)\n    SetAccessor(iShaderVariableAccessor *)\n");
   return NULL;
 }
 
@@ -5224,6 +5321,28 @@ SWIGINTERN PyObject *_wrap_csShaderVariable_GetName(PyObject *SWIGUNUSEDPARM(sel
   arg1 = reinterpret_cast< csShaderVariable * >(argp1);
   result = (csStringID)((csShaderVariable const *)arg1)->GetName();
   resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csShaderVariable_GetAccessorData(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csShaderVariable *arg1 = (csShaderVariable *) 0 ;
+  intptr_t result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csShaderVariable_GetAccessorData",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariable_GetAccessorData" "', argument " "1"" of type '" "csShaderVariable const *""'"); 
+  }
+  arg1 = reinterpret_cast< csShaderVariable * >(argp1);
+  result = ((csShaderVariable const *)arg1)->GetAccessorData();
+  resultobj = SWIG_NewPointerObj((new intptr_t(static_cast< const intptr_t& >(result))), SWIGTYPE_p_intptr_t, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -11337,6 +11456,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csShaderVariable_SetAccessor", _wrap_csShaderVariable_SetAccessor, METH_VARARGS, NULL},
 	 { (char *)"csShaderVariable_SetName", _wrap_csShaderVariable_SetName, METH_VARARGS, NULL},
 	 { (char *)"csShaderVariable_GetName", _wrap_csShaderVariable_GetName, METH_VARARGS, NULL},
+	 { (char *)"csShaderVariable_GetAccessorData", _wrap_csShaderVariable_GetAccessorData, METH_VARARGS, NULL},
 	 { (char *)"csShaderVariable_SetValue", _wrap_csShaderVariable_SetValue, METH_VARARGS, NULL},
 	 { (char *)"csShaderVariable_AddVariableToArray", _wrap_csShaderVariable_AddVariableToArray, METH_VARARGS, NULL},
 	 { (char *)"csShaderVariable_RemoveFromArray", _wrap_csShaderVariable_RemoveFromArray, METH_VARARGS, NULL},
@@ -11794,6 +11914,7 @@ static swig_type_info _swigt__p_int = {"_p_int", "int *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_int16_t = {"_p_int16_t", "int16_t *|int16 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_int64_t = {"_p_int64_t", "int64_t *|int64 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_int8_t = {"_p_int8_t", "int8_t *|int8 *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_intptr_t = {"_p_intptr_t", "intptr_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_long_long = {"_p_long_long", "long long *|longlong *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_csShaderVariable = {"_p_p_csShaderVariable", "csShaderVariable **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_iRenderBuffer = {"_p_p_iRenderBuffer", "iRenderBuffer **", 0, 0, (void*)0, 0};
@@ -11912,6 +12033,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_int16_t,
   &_swigt__p_int64_t,
   &_swigt__p_int8_t,
+  &_swigt__p_intptr_t,
   &_swigt__p_long_long,
   &_swigt__p_p_csShaderVariable,
   &_swigt__p_p_iRenderBuffer,
@@ -12036,6 +12158,7 @@ static swig_cast_info _swigc__p_int[] = {  {&_swigt__p_int, 0, 0, 0},{0, 0, 0, 0
 static swig_cast_info _swigc__p_int16_t[] = {  {&_swigt__p_int16_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_int64_t[] = {  {&_swigt__p_int64_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_int8_t[] = {  {&_swigt__p_int8_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_intptr_t[] = {  {&_swigt__p_intptr_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_long_long[] = {  {&_swigt__p_long_long, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_csShaderVariable[] = {  {&_swigt__p_p_csShaderVariable, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_iRenderBuffer[] = {  {&_swigt__p_p_iRenderBuffer, 0, 0, 0},{0, 0, 0, 0}};
@@ -12154,6 +12277,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_int16_t,
   _swigc__p_int64_t,
   _swigc__p_int8_t,
+  _swigc__p_intptr_t,
   _swigc__p_long_long,
   _swigc__p_p_csShaderVariable,
   _swigc__p_p_iRenderBuffer,
