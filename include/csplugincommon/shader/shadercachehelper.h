@@ -77,9 +77,57 @@ namespace CS
       };
       
       /// Write a complete data buffer to a file
-      bool CS_CRYSTALSPACE_EXPORT WriteDataBuffer (iFile* file, iDataBuffer* buf);
+      CS_CRYSTALSPACE_EXPORT bool WriteDataBuffer (iFile* file, iDataBuffer* buf);
       /// Get a complete data buffer from a file
-      csPtr<iDataBuffer> CS_CRYSTALSPACE_EXPORT ReadDataBuffer (iFile* file);
+      CS_CRYSTALSPACE_EXPORT csPtr<iDataBuffer> ReadDataBuffer (iFile* file);
+      
+      /// Helper to write strings in an efficient way (each string once)
+      class CS_CRYSTALSPACE_EXPORT StringStoreWriter
+      {
+        csMemFile strings;
+        csHash<uint32, csString> stringPositions;
+        csRef<iFile> file;
+        size_t headPos;
+      public:
+        /**
+         * Start using a string store. Strings will ultimatively be written
+         * to file. Call EndUse() after use.
+         */
+        bool StartUse (iFile* file);
+        /**
+         * End string store usage.
+         * \remarks This will write more data to the file!
+         */
+        bool EndUse ();
+        
+        /// Get an ID for a string.
+        uint32 GetID (const char* string);
+      };
+      
+      /// Helper to read strings written with StringStoreWriter
+      class CS_CRYSTALSPACE_EXPORT StringStoreReader
+      {
+        csRef<iFile> file;
+        const char* stringBlock;
+        csRef<iDataBuffer> blockBuf;
+        size_t endPos;
+      public:
+        /**
+         * Start using a string store. 
+         * \remarks The place this is called when reading must be mirror the 
+         *  place this is called when writing the file!
+         */
+        bool StartUse (iFile* file);
+        /**
+         * End using the string store. 
+         * \remarks The place this is called when reading must be mirror the 
+         *  place this is called when writing the file!
+         */
+        bool EndUse ();
+        
+        /// Get a string for an ID
+        const char* GetString (uint32 id) const;
+      };
     } // namespace ShaderCacheHelper
   } // namespace PluginCommon
 } // namespace CS

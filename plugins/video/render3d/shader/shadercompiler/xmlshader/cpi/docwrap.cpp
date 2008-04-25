@@ -22,6 +22,8 @@
 
 #include "csgeom/math.h"
 #include "csutil/bitarray.h"
+#include "csutil/csendian.h"
+#include "csutil/documenthelper.h"
 #include "csutil/set.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
@@ -452,11 +454,18 @@ csWrappedDocumentNode::csWrappedDocumentNode (ConditionEval& eval,
 					      csWrappedDocumentNodeFactory* shared_fact, 
 					      GlobalProcessingState* global_state)
   : scfImplementationType (this), wrappedNode (wrapped_node), parent (parent),
-    resolver (res), objreg (shared_fact->plugin->objectreg), 
-    shared (shared_fact), globalState (global_state)
+    resolver (res), shared (shared_fact), globalState (global_state)
 {
   ProcessWrappedNode (eval);
   globalState = 0;
+}
+  
+csWrappedDocumentNode::csWrappedDocumentNode (csWrappedDocumentNode* parent,
+					      iConditionResolver* resolver,
+                                              csWrappedDocumentNodeFactory* shared)
+  : scfImplementationType (this), parent (parent), resolver (resolver),
+    shared (shared)
+{
 }
 
 csWrappedDocumentNode::~csWrappedDocumentNode ()
@@ -660,7 +669,7 @@ void csWrappedDocumentNode::ProcessInclude (ConditionEval& eval,
 					    NodeProcessingState* state, 
 					    iDocumentNode* node)
 {
-  csRef<iVFS> vfs = csQueryRegistry<iVFS> (objreg);
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (shared->objreg);
   CS_ASSERT (vfs.IsValid ());
   csRef<iFile> include = vfs->Open (filename, VFS_FILE_READ);
   if (!include.IsValid ())
@@ -671,7 +680,7 @@ void csWrappedDocumentNode::ProcessInclude (ConditionEval& eval,
   else
   {
     csRef<iDocumentSystem> docsys (
-      csQueryRegistry<iDocumentSystem> (objreg));
+      csQueryRegistry<iDocumentSystem> (shared->objreg));
     if (!docsys.IsValid())
       docsys.AttachNew (new csTinyDocumentSystem ());
 
@@ -1586,7 +1595,8 @@ void csWrappedDocumentNode::Report (int severity, iDocumentNode* node,
   va_list args;
   va_start (args, msg);
 
-  csRef<iSyntaxService> synsrv = csQueryRegistry<iSyntaxService> (objreg);
+  csRef<iSyntaxService> synsrv =
+    csQueryRegistry<iSyntaxService> (shared->objreg);
   if (synsrv.IsValid ())
   {
     csString str;
@@ -1596,7 +1606,7 @@ void csWrappedDocumentNode::Report (int severity, iDocumentNode* node,
   }
   else
   {
-    csReportV (objreg, severity, messageID, msg, args);
+    csReportV (shared->objreg, severity, messageID, msg, args);
   }
   va_end (args);
 }
@@ -1708,6 +1718,284 @@ bool csWrappedDocumentNode::GetAttributeValueAsBool (const char* name,
   bool defaultvalue)
 {
   return wrappedNode->GetAttributeValueAsBool (name, defaultvalue);
+}
+
+class csWrappedDocumentNode::ForeignNodeStorage
+{
+  csRef<iDocumentSystem> docSys;
+
+  csRef<iFile> file;
+  size_t headPos;
+  csRef<iDocument> doc;
+  csRef<iDocumentNode> baseNode;
+  int32 currentID;
+public:
+  ForeignNodeStorage (csXMLShaderCompiler* plugin)
+  {
+    docSys = plugin->binDocSys.IsValid() ? plugin->binDocSys : plugin->xmlDocSys;
+  }
+
+  bool StartUse (iFile* file)
+  {
+    CS_ASSERT(!this->file.IsValid());
+    this->file = file;
+    headPos = file->GetPos();
+    
+    uint32 dummy = (uint32)~0;
+    if (file->Write ((char*)&dummy, sizeof (dummy)) != sizeof (dummy))
+    {
+      this->file.Invalidate();
+      return false;
+    }
+    
+    currentID = 0;
+    doc = docSys->CreateDocument();
+    baseNode = doc->CreateRoot()->CreateNodeBefore (CS_NODE_ELEMENT);
+    baseNode->SetValue ("XD");
+    
+    return true;
+  }
+  bool EndUse ()
+  {
+    CS_ASSERT(this->file.IsValid());
+    
+    size_t curFilePos = file->GetPos();
+    
+    baseNode->SetAttributeAsInt ("n", currentID);
+    csMemFile docFile;
+    if (doc->Write (&docFile) != 0) return false;
+    csRef<iDataBuffer> docBuf = docFile.GetAllData();
+    if (!CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (file, docBuf))
+      return false;
+    
+    uint32 ofsLE = curFilePos - headPos;
+    curFilePos = file->GetPos();
+    bool ret = false;
+    file->SetPos (headPos);
+    ofsLE = csLittleEndian::UInt32 (ofsLE);
+    ret = (file->Write ((char*)&ofsLE, sizeof (ofsLE)) == sizeof (ofsLE));
+    
+    file->SetPos (curFilePos);
+    file.Invalidate();
+    return ret;
+  }
+  
+  int32 StoreNodeShallow (iDocumentNode* node)
+  {
+    csRef<iDocumentNode> storeNode = baseNode->CreateNodeBefore (CS_NODE_ELEMENT);
+    storeNode->SetValueAsInt (currentID);
+    csRef<iDocumentNode> realStoreNode = storeNode->CreateNodeBefore (node->GetType());
+    realStoreNode->SetValue (node->GetValue());
+    CS::DocSystem::CloneAttributes (node, realStoreNode);
+    return currentID++;
+  }
+};
+
+class csWrappedDocumentNode::ForeignNodeReader
+{
+  csRef<iDocumentSystem> binDocSys;
+  csRef<iDocumentSystem> xmlDocSys;
+
+  csRef<iFile> file;
+  size_t endPos;
+  csRefArray<iDocumentNode> nodes;
+public:
+  ForeignNodeReader (csXMLShaderCompiler* plugin)
+  {
+    binDocSys = plugin->binDocSys;
+    xmlDocSys = plugin->xmlDocSys;
+  }
+
+  bool StartUse (iFile* file)
+  {
+    CS_ASSERT(!this->file.IsValid());
+    
+    size_t curFilePos = file->GetPos();
+    uint32 ofsLE;
+    if (file->Read ((char*)&ofsLE, sizeof (ofsLE)) != sizeof (ofsLE))
+      return false;
+    ofsLE = csLittleEndian::UInt32 (ofsLE);
+    
+    file->SetPos (curFilePos + ofsLE);
+    csRef<iDataBuffer> docBuf =
+      CS::PluginCommon::ShaderCacheHelper::ReadDataBuffer (file);
+    if (!docBuf.IsValid ())
+      return false;
+    endPos = file->GetPos();
+    file->SetPos (curFilePos + sizeof (ofsLE));
+    
+    csRef<iDocumentNode> baseNode;
+    if (binDocSys.IsValid())
+    {
+      csRef<iDocument> doc = binDocSys->CreateDocument();
+      if (doc->Parse (docBuf) == 0)
+        baseNode = doc->GetRoot()->GetNode ("XD");
+    }
+    if (!baseNode.IsValid())
+    {
+      csRef<iDocument> doc = xmlDocSys->CreateDocument();
+      if (doc->Parse (docBuf) == 0)
+        baseNode = doc->GetRoot()->GetNode ("XD");
+    }
+    if (!baseNode.IsValid())
+      return false;
+      
+    int numNodes = baseNode->GetAttributeValueAsInt ("n");
+    this->nodes.SetSize (numNodes);
+    csRef<iDocumentNodeIterator> nodes = baseNode->GetNodes();
+    int num = 0;
+    while (nodes->HasNext())
+    {
+      csRef<iDocumentNode> node = nodes->Next();
+      csRef<iDocumentNodeIterator> subNodes = node->GetNodes();
+      if (!subNodes->HasNext()) return false;
+      this->nodes.Put (num++, subNodes->Next());
+    }
+      
+    this->file = file;
+    return true;
+  }
+  bool EndUse ()
+  {
+    CS_ASSERT(this->file.IsValid());
+    
+    file->SetPos (endPos);
+    file.Invalidate();
+    return true;
+  }
+  
+  csRef<iDocumentNode> GetNode (int32 ID)
+  {
+    return nodes[ID];
+  }
+};
+
+bool csWrappedDocumentNode::StoreToCache (iFile* cacheFile)
+{
+  ForeignNodeStorage foreignNodes (shared->plugin);
+  if (!foreignNodes.StartUse (cacheFile)) return false;
+  if (!StoreToCache (cacheFile, foreignNodes)) return false;
+  if (!foreignNodes.EndUse ()) return false;
+  return true;
+}
+
+bool csWrappedDocumentNode::StoreToCache (iFile* cacheFile,
+                                          ForeignNodeStorage& foreignNodes)
+{
+  int32 wrappedNodeLE = csLittleEndian::Int32 (foreignNodes.StoreNodeShallow (
+    wrappedNode));
+  if (cacheFile->Write ((char*)&wrappedNodeLE, sizeof (wrappedNodeLE))
+      != sizeof (wrappedNodeLE)) return false;
+  
+  return StoreWrappedChildren (cacheFile, foreignNodes, wrappedChildren);
+}
+
+bool csWrappedDocumentNode::ReadFromCache (iFile* cacheFile)
+{
+  ForeignNodeReader foreignNodes (shared->plugin);
+  if (!foreignNodes.StartUse (cacheFile)) return false;
+  if (!ReadFromCache (cacheFile, foreignNodes)) return false;
+  if (!foreignNodes.EndUse ()) return false;
+  return true;
+}
+
+bool csWrappedDocumentNode::ReadFromCache (iFile* cacheFile,
+                                           ForeignNodeReader& foreignNodes)
+{
+  int32 wrappedNodeLE;
+  if (cacheFile->Read ((char*)&wrappedNodeLE, sizeof (wrappedNodeLE))
+      != sizeof (wrappedNodeLE)) return false;
+  wrappedNode = foreignNodes.GetNode (csLittleEndian::Int32 (wrappedNodeLE));
+  
+  return ReadWrappedChildren (cacheFile, foreignNodes, wrappedChildren);
+}
+
+enum
+{
+  childValue = 1,
+  childIsNull = 2
+};
+
+bool csWrappedDocumentNode::StoreWrappedChildren (iFile* file, 
+  ForeignNodeStorage& foreignNodes, const csPDelArray<WrappedChild>& children)
+{
+  uint32 numChildrenLE = csLittleEndian::UInt32 (children.GetSize());
+  if (file->Write ((char*)&numChildrenLE, sizeof (numChildrenLE))
+      != sizeof (numChildrenLE)) return false;
+
+  for (size_t i = 0; i < children.GetSize(); i++)
+  {
+    uint32 flags = 0;
+    if (children[i]->conditionValue) flags |= childValue;
+    
+    csRef<iWrappedDocumentNode> wrapper;
+    if (!children[i]->childNode.IsValid())
+    {
+      flags |= childIsNull;
+    }
+    else
+    {
+      wrapper =
+        scfQueryInterface<iWrappedDocumentNode> (children[i]->childNode);
+      CS_ASSERT(wrapper);
+    }
+    
+    uint32 flagsLE = csLittleEndian::UInt32 (flags);
+    if (file->Write ((char*)&flagsLE, sizeof (flagsLE))
+	!= sizeof (flagsLE)) return false;
+    int32 condLE = csLittleEndian::Int32 (children[i]->condition);
+    if (file->Write ((char*)&condLE, sizeof (condLE))
+	!= sizeof (condLE)) return false;
+    
+    if (wrapper.IsValid())
+    {
+      csWrappedDocumentNode* child = static_cast<csWrappedDocumentNode*> (
+	(iWrappedDocumentNode*)wrapper);
+      if (!child->StoreToCache (file, foreignNodes))
+	return false;
+    }
+    if (!StoreWrappedChildren (file, foreignNodes, children[i]->childrenWrappers))
+      return false;
+  }
+  return true;
+}
+
+bool csWrappedDocumentNode::ReadWrappedChildren (iFile* file,
+  ForeignNodeReader& foreignNodes, csPDelArray<WrappedChild>& children)
+{
+  uint32 numChildrenLE;
+  if (file->Read ((char*)&numChildrenLE, sizeof (numChildrenLE))
+      != sizeof (numChildrenLE)) return false;
+      
+  size_t numChildren = csLittleEndian::UInt32 (numChildrenLE);
+  children.SetSize (numChildren);
+  for (size_t i = 0; i < numChildren; i++)
+  {
+    uint32 flagsLE;
+    if (file->Read ((char*)&flagsLE, sizeof (flagsLE))
+	!= sizeof (flagsLE)) return false;
+    uint32 flags = csLittleEndian::UInt32 (flagsLE);
+    
+    WrappedChild* child = new WrappedChild;
+    child->conditionValue = (flags & childValue) != 0;
+    
+    int32 condLE;
+    if (file->Read ((char*)&condLE, sizeof (condLE))
+	!= sizeof (condLE)) return false;
+    child->condition = long (csLittleEndian::Int32 (condLE));
+    if ((flags & childIsNull) == 0)
+    {
+      csWrappedDocumentNode* childWrapper = new csWrappedDocumentNode (
+        this, resolver, shared);
+      if (!childWrapper->ReadFromCache (file, foreignNodes))
+        return false;
+      child->childNode.AttachNew (childWrapper);
+    }
+    if (!ReadWrappedChildren (file, foreignNodes, child->childrenWrappers))
+      return false;
+    children.Put (i, child);
+  }
+  return true;
 }
 
 //---------------------------------------------------------------------------
@@ -1859,7 +2147,7 @@ csRef<iDocumentNode> csWrappedDocumentNodeIterator::Next ()
 //---------------------------------------------------------------------------
 
 csWrappedDocumentNodeFactory::csWrappedDocumentNodeFactory (
-  csXMLShaderCompiler* plugin) : plugin (plugin)
+  csXMLShaderCompiler* plugin) : plugin (plugin), objreg (plugin->objectreg)
 {
   InitTokenTable (pitokens);
   pitokens.Register ("Template", PITOKEN_TEMPLATE_NEW);
@@ -1998,6 +2286,19 @@ csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapperStatic (
     node = new csWrappedDocumentNode (eval, 0, wrappedNode, resolver, this, 
       globalState);
     CS_ASSERT(globalState->GetRefCount() == 1);
+  }
+  return node;
+}
+
+csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapperFromCache (
+  iFile* cacheFile, iConditionResolver* resolver, csConditionEvaluator& evaluator)
+{
+  csWrappedDocumentNode* node;
+  node = new csWrappedDocumentNode (0, resolver, this);
+  if (!node->ReadFromCache (cacheFile))
+  {
+    delete node;
+    return 0;
   }
   return node;
 }

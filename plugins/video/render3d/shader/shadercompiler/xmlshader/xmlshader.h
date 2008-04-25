@@ -95,6 +95,9 @@ public:
   /// Condition constants
   csConditionConstants condConstants;
   
+  csRef<iDocumentSystem> binDocSys;
+  csRef<iDocumentSystem> xmlDocSys;
+  
   CS::ShaderVarStringID string_mixmode_alpha;
 
 #define CS_TOKEN_ITEM_FILE \

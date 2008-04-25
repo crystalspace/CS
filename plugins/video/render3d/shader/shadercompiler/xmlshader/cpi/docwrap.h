@@ -83,11 +83,18 @@ struct iConditionResolver
     CondOperation& operation) = 0;
 };
 
+struct iWrappedDocumentNode : public virtual iBase
+{
+  SCF_INTERFACE (iWrappedDocumentNode, 0, 0, 1);
+};
+
 /**
  * Wrapper around a document node, supporting conditionals.
  */
 class csWrappedDocumentNode : 
-  public scfImplementationExt0<csWrappedDocumentNode, csDocumentNodeReadOnly>
+  public scfImplementationExt1<csWrappedDocumentNode,
+                               csDocumentNodeReadOnly,
+                               iWrappedDocumentNode>
 {
   friend class csWrappedDocumentNodeIterator;
   friend struct WrapperStackEntry;
@@ -97,7 +104,6 @@ class csWrappedDocumentNode :
   csRef<iDocumentNode> wrappedNode;
   csWeakRef<csWrappedDocumentNode> parent;
   iConditionResolver* resolver;
-  iObjectRegistry* objreg;
   csString contents;
   csWrappedDocumentNodeFactory* shared;
 
@@ -269,6 +275,21 @@ protected:
     iConditionResolver* resolver,
     csWrappedDocumentNodeFactory* shared, 
     GlobalProcessingState* globalState);
+  csWrappedDocumentNode (csWrappedDocumentNode* parent,
+    iConditionResolver* resolver,
+    csWrappedDocumentNodeFactory* shared);
+    
+  class ForeignNodeStorage;
+  class ForeignNodeReader;
+  
+  bool StoreToCache (iFile* cacheFile, ForeignNodeStorage& foreignNodes);
+  bool StoreWrappedChildren (iFile* file, 
+    ForeignNodeStorage& foreignNodes,
+    const csPDelArray<WrappedChild>& children);
+  bool ReadFromCache (iFile* cacheFile, ForeignNodeReader& foreignNodes);
+  bool ReadWrappedChildren (iFile* file, 
+    ForeignNodeReader& foreignNodes,
+    csPDelArray<WrappedChild>& children);
 public:
   CS_LEAKGUARD_DECLARE(csWrappedDocumentNode);
 
@@ -294,6 +315,9 @@ public:
   virtual float GetAttributeValueAsFloat (const char* name);
   virtual bool GetAttributeValueAsBool (const char* name, 
     bool defaultvalue = false);
+    
+  bool ReadFromCache (iFile* cacheFile);
+  bool StoreToCache (iFile* cacheFile);
 };
 
 class csTextNodeWrapper : 
@@ -353,6 +377,7 @@ class csWrappedDocumentNodeFactory
   csTextNodeWrapper::Pool textWrapperPool;
   csWrappedDocumentNodeIterator::Pool iterPool;
   csReplacerDocumentNodeFactory replacerFactory;
+  iObjectRegistry* objreg;
 
   csStringHash pitokens;
 #define CS_TOKEN_ITEM_FILE \
@@ -400,6 +425,9 @@ public:
     const csRefArray<iDocumentNode>& extraNodes, csString* dumpOut);
   csWrappedDocumentNode* CreateWrapperStatic (iDocumentNode* wrappedNode,
     iConditionResolver* resolver, csString* dumpOut);
+    
+  csWrappedDocumentNode* CreateWrapperFromCache (iFile* cacheFile,
+    iConditionResolver* resolver, csConditionEvaluator& evaluator);
 };
 
 }

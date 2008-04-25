@@ -27,6 +27,9 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
+  /* @@@ NOTE! Enums are written to disk (shader cache). If you change value 
+     make sure you also change cacheFileMagic in shader.cpp! */
+
   /**
    * Possible operations for a node in the internal expression
    * representation.

@@ -20,6 +20,7 @@
 #ifndef __CS_CONDEVAL_H__
 #define __CS_CONDEVAL_H__
 
+#include "csplugincommon/shader/shadercachehelper.h"
 #include "csutil/array.h"
 #include "csutil/bitarray.h"
 #include "csutil/blockallocator.h"
@@ -654,6 +655,7 @@ class csConditionEvaluator
   
   csMemoryPool scratch;
   size_t* AllocSVIndices (const CS::Graphics::ShaderVarNameParser& parser);
+  size_t* AllocSVIndices (size_t num);
 
   // Constants
   const csConditionConstants& constants;
@@ -737,6 +739,20 @@ class csConditionEvaluator
       return sv;
     }
   };
+  
+  bool ReadCondition (iFile* cacheFile,
+    const CS::PluginCommon::ShaderCacheHelper::StringStoreReader& strStore,
+    CondOperation& cond);
+  bool WriteCondition (iFile* cacheFile,
+    CS::PluginCommon::ShaderCacheHelper::StringStoreWriter& strStore,
+    const CondOperation& cond);
+    
+  bool ReadCondOperand (iFile* cacheFile,
+    const CS::PluginCommon::ShaderCacheHelper::StringStoreReader& strStore,
+    CondOperand& operand, bool hasIndices);
+  bool WriteCondOperand (iFile* cacheFile,
+    CS::PluginCommon::ShaderCacheHelper::StringStoreWriter& strStore,
+    const CondOperand& operand);
 public:
   template<typename Evaluator>
   typename Evaluator::EvalResult Evaluate (Evaluator& eval, csConditionID condition);
@@ -789,6 +805,11 @@ public:
 
   /// Determine which SVs are used in some condition.
   void GetUsedSVs (csConditionID condition, MyBitArrayTemp& affectedSVs);
+
+  /// Read conditions from file
+  bool ReadFromCache (iFile* cacheFile);
+  /// Write conditions to file
+  bool WriteToCache (iFile* cacheFile);
 
   /// Try to release unused temporary memory
   static void CompactMemory ();

@@ -30,6 +30,7 @@
 #include "ivaria/reporter.h"
 
 #include "csutil/cfgacc.h"
+#include "csutil/xmltiny.h"
 
 #include "cpi/docwrap.h"
 #include "shader.h"
@@ -113,6 +114,10 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
   else
     do_verbose = false;
     
+  binDocSys = csLoadPluginCheck<iDocumentSystem> (plugin_mgr,
+    "crystalspace.documentsystem.binary");
+  xmlDocSys.AttachNew (new csTinyDocumentSystem);
+  
   csConfigAccess config (object_reg);
   doDumpXML = config->GetBool ("Video.XMLShader.DumpVariantXML");
   doDumpConds = config->GetBool ("Video.XMLShader.DumpConditions");

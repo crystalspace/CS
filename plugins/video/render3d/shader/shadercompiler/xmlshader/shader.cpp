@@ -21,11 +21,15 @@
 #include <ctype.h>
 
 #include "imap/services.h"
+#include "iutil/cache.h"
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 #include "ivideo/rendermesh.h"
 
+#include "csplugincommon/shader/shadercachehelper.h"
+#include "csutil/csendian.h"
 #include "csutil/documenthelper.h"
+#include "csutil/parasiticdatabuffer.h"
 #include "csutil/scfarray.h"
 #include "csutil/xmltiny.h"
 
@@ -258,13 +262,108 @@ void csShaderConditionResolver::DumpConditionNode (csString& out,
     }
   }
 }
+  
+bool csShaderConditionResolver::ReadFromCache (iFile* cacheFile)
+{
+  uint32 nextVarLE;
+  if (cacheFile->Read ((char*)&nextVarLE, sizeof (nextVarLE))
+      != sizeof (nextVarLE))
+    return false;
+  nextVariant = csLittleEndian::UInt32 (nextVarLE);
+    
+  if (!ReadNode (cacheFile, 0, rootNode)
+    || !evaluator.ReadFromCache (cacheFile))
+  {
+    delete rootNode; rootNode = 0;
+    nextVariant = 0;
+    return false;
+  }
+  
+  return true;
+}
+
+bool csShaderConditionResolver::WriteToCache (iFile* cacheFile)
+{
+  uint32 nextVarLE = nextVariant;
+  nextVarLE = csLittleEndian::UInt32 (nextVarLE);
+  if (cacheFile->Write ((char*)&nextVarLE, sizeof (nextVarLE))
+      != sizeof (nextVarLE))
+    return false;
+
+  if (rootNode == 0)
+  {
+    // Special case
+    uint32 varLE = 0xffffffff;
+    if (cacheFile->Write ((char*)&varLE, sizeof (varLE)) != sizeof (varLE))
+      return false;
+  }
+  else
+  {
+    if (!WriteNode (cacheFile, rootNode)) return false;
+  }
+  
+  return evaluator.WriteToCache (cacheFile);
+}
+  
+bool csShaderConditionResolver::ReadNode (iFile* cacheFile, 
+  csConditionNode* parent, csConditionNode*& node)
+{
+  uint32 condLE;
+  if (cacheFile->Read ((char*)&condLE, sizeof (condLE)) != sizeof (condLE))
+    return false;
+  if (condLE == 0xffffffff)
+  {
+    // Special case 'no root'
+    node = 0;
+    return true;
+  }
+  node = NewNode (parent);
+  condLE = csLittleEndian::UInt32 (condLE);
+  if (condLE & 0x80000000)
+  {
+    // Leaf, ie variant
+    node->variant = condLE & 0x7fffffff;
+    return true;
+  }
+  else
+  {
+    // Node, ie condition
+    node->condition = condLE;
+    return ReadNode (cacheFile, node, node->trueNode)
+      && ReadNode (cacheFile, node, node->falseNode);
+  }
+}
+
+bool csShaderConditionResolver::WriteNode (iFile* cacheFile, csConditionNode* node)
+{
+  if (node->variant == csArrayItemNotFound)
+  {
+    CS_ASSERT(node->condition != csCondAlwaysTrue);
+    CS_ASSERT(node->condition != csCondAlwaysFalse);
+    
+    uint32 condLE = node->condition;
+    condLE = csLittleEndian::UInt32 (condLE);
+    if (cacheFile->Write ((char*)&condLE, sizeof (condLE)) != sizeof (condLE))
+      return false;
+    return WriteNode (cacheFile, node->trueNode)
+      && WriteNode (cacheFile, node->falseNode);
+  }
+  else
+  {
+    uint32 varLE = node->variant;
+    varLE |= 0x80000000;
+    varLE = csLittleEndian::UInt32 (varLE);
+    return cacheFile->Write ((char*)&varLE, sizeof (varLE)) == sizeof (varLE);
+  }
+}
 
 //---------------------------------------------------------------------------
 
 csXMLShader::csXMLShader (csXMLShaderCompiler* compiler, 
     			  iLoaderContext* ldr_context,
 			  iDocumentNode* source,
-			  int forcepriority) : scfImplementationType (this)
+			  int forcepriority)
+  : scfImplementationType (this), resolver (0)
 {
   InitTokenTable (xmltokens);
 
@@ -281,69 +380,9 @@ csXMLShader::csXMLShader (csXMLShaderCompiler* compiler,
 
   shadermgr = csQueryRegistry<iShaderManager> (compiler->objectreg);
   CS_ASSERT (shadermgr); // Should be present - loads us, after all
-
-  csRefArray<iDocumentNode> extraNodes;
-  {
-    static const char* const extraNodeNames[] = { "vp", "fp", "vproc", 0 };
-    csRef<iDocumentNodeIterator> techNodes = source->GetNodes ("technique");
-    while (techNodes->HasNext())
-    {
-      csRef<iDocumentNode> techNode = techNodes->Next();
-      csRef<iDocumentNodeIterator> passNodes = techNode->GetNodes ("pass");
-      while (passNodes->HasNext())
-      {
-        csRef<iDocumentNode> passNode = passNodes->Next();
-        const char* const* extraName = extraNodeNames;
-        while (*extraName)
-        {
-          csRef<iDocumentNode> node = passNode->GetNode (*extraName);
-          if (node.IsValid())
-          {
-            const char* filename = node->GetAttributeValue ("file");
-            if (filename != 0)
-            {
-              csRef<iDocumentNode> extraNode = OpenDocFile (filename);
-              if (extraNode.IsValid()) extraNodes.Push (extraNode);
-            }
-          }
-          extraName++;
-        }
-      }
-    }
-  }
-
-  resolver = new csShaderConditionResolver (compiler);
-  csRef<iDocumentNode> wrappedNode;
-  if (compiler->doDumpConds)
-  {
-    csString tree;
-    tree.SetGrowsBy (0);
-    wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (source, 
-      resolver, resolver->evaluator, extraNodes, &tree));
-    resolver->DumpConditionTree (tree);
-    csString filename;
-    filename.Format ("/tmp/shader/cond_%s.txt", source->GetAttributeValue ("name"));
-    compiler->vfs->WriteFile (filename, tree.GetData(), tree.Length ());
-  }
-  else
-    wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (source, 
-    resolver, resolver->evaluator, extraNodes, 0));
-  shaderSource = wrappedNode;
+  
   vfsStartDir = CS::StrDup (compiler->vfs->GetCwd ());
-
-  //Load global shadervars block
-  csRef<iDocumentNode> varNode = shaderSource->GetNode(
-    xmltokens.Request (csXMLShaderCompiler::XMLTOKEN_SHADERVARS));
- 
-  if (varNode)
-    ParseGlobalSVs (ldr_context, varNode);
-
-  csRef<iDocumentNode> fallbackNode = shaderSource->GetNode ("fallbackshader");
-  if (fallbackNode.IsValid())
-  {
-    fallbackShader = compiler->synldr->ParseShaderRef (ldr_context,
-	fallbackNode);
-  }
+  Load (source);
 }
 
 csXMLShader::~csXMLShader ()
@@ -357,6 +396,185 @@ csXMLShader::~csXMLShader ()
   delete resolver;
   cs_free (vfsStartDir);
   cs_free (const_cast<char*> (allShaderMeta.description));
+}
+
+/* Magic value for cache file.
+ * The most significant byte serves as a "version", increase when the
+ * cache file format changes. */
+static const uint32 cacheFileMagic = 0x00737863;
+
+void csXMLShader::Load (iDocumentNode* source)
+{
+  resolver = new csShaderConditionResolver (compiler);
+  
+  CS::PluginCommon::ShaderCacheHelper::ShaderDocHasher hasher (
+    compiler->objectreg, source);
+  
+  iCacheManager* shaderCache = shadermgr->GetShaderCache();
+  csString shaderName (source->GetAttributeValue ("name"));
+  csString cacheID_header;
+  {
+    csMD5::Digest sourceDigest (csMD5::Encode (CS::DocSystem::FlattenNode (source)));
+    csString digestStr (sourceDigest.HexString());
+    cacheID_header.Format ("%sXH", digestStr.GetData());
+  }
+  bool cacheValid = (shaderCache != 0) && !shaderName.IsEmpty()
+    && !cacheID_header.IsEmpty();
+  bool useShaderCache = cacheValid;
+  
+  csRef<iFile> cacheFile;
+  if (useShaderCache)
+  {
+    useShaderCache = false;
+    csRef<iDataBuffer> cacheData;
+    cacheData = shaderCache->ReadCache (shaderName, cacheID_header, ~0);
+    if (cacheData.IsValid())
+    {
+      cacheFile.AttachNew (new csMemFile (cacheData, true));
+    }
+    if (cacheFile.IsValid())
+    {
+      do
+      {
+	// Read magic header
+	uint32 diskMagic;
+	size_t read = cacheFile->Read ((char*)&diskMagic, sizeof (diskMagic));
+	if (read != sizeof (diskMagic)) break;
+	if (csLittleEndian::UInt32 (diskMagic) != cacheFileMagic) break;
+	
+	// Extract hash stream
+	csRef<iDataBuffer> hashStream = 
+	  CS::PluginCommon::ShaderCacheHelper::ReadDataBuffer (cacheFile);
+	if (!hashStream.IsValid()) break;
+	
+	useShaderCache = hasher.ValidateHashStream (hashStream);
+      }
+      while (false);
+    }
+    if (!useShaderCache)
+    {
+      // Getting from cache failed, so prep for writing to cache
+      cacheFile.AttachNew (new csMemFile ());
+      // Write magic header
+      uint32 diskMagic = csLittleEndian::UInt32 (cacheFileMagic);
+      cacheFile->Write ((char*)&diskMagic, sizeof (diskMagic));
+      // Write hash stream
+      csRef<iDataBuffer> hashStream = hasher.GetHashStream ();
+      if (!CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (
+	  cacheFile, hashStream))
+	cacheFile.Invalidate();
+    }
+  }
+  
+  if (useShaderCache)
+  {
+    {
+    // Read condition tree from cache
+    useShaderCache = resolver->ReadFromCache (cacheFile);
+    }
+    if (useShaderCache)
+    {
+      csRef<iDocumentNode> wrappedNode;
+      wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapperFromCache (
+	cacheFile, resolver, resolver->evaluator));
+      useShaderCache = wrappedNode.IsValid ();
+      shaderSource = wrappedNode;
+      
+      if (compiler->doDumpConds)
+      {
+	csString tree;
+	tree.SetGrowsBy (0);
+	resolver->DumpConditionTree (tree);
+	csString filename;
+	filename.Format ("/tmp/shader/cond_%s.txt", source->GetAttributeValue ("name"));
+	compiler->vfs->WriteFile (filename, tree.GetData(), tree.Length ());
+      }
+    }
+    else
+    {
+      // Make sure resolver is pristine
+      delete resolver;
+      resolver = new csShaderConditionResolver (compiler);
+    }
+  }
+  
+  if (!useShaderCache)
+  {
+    csRefArray<iDocumentNode> extraNodes;
+    {
+      static const char* const extraNodeNames[] = { "vp", "fp", "vproc", 0 };
+      csRef<iDocumentNodeIterator> techNodes = source->GetNodes ("technique");
+      while (techNodes->HasNext())
+      {
+	csRef<iDocumentNode> techNode = techNodes->Next();
+	csRef<iDocumentNodeIterator> passNodes = techNode->GetNodes ("pass");
+	while (passNodes->HasNext())
+	{
+	  csRef<iDocumentNode> passNode = passNodes->Next();
+	  const char* const* extraName = extraNodeNames;
+	  while (*extraName)
+	  {
+	    csRef<iDocumentNode> node = passNode->GetNode (*extraName);
+	    if (node.IsValid())
+	    {
+	      const char* filename = node->GetAttributeValue ("file");
+	      if (filename != 0)
+	      {
+		csRef<iDocumentNode> extraNode = OpenDocFile (filename);
+		if (extraNode.IsValid()) extraNodes.Push (extraNode);
+	      }
+	    }
+	    extraName++;
+	  }
+	}
+      }
+    }
+  
+    csRef<csWrappedDocumentNode> wrappedNode;
+    if (compiler->doDumpConds)
+    {
+      csString tree;
+      tree.SetGrowsBy (0);
+      wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (source, 
+	resolver, resolver->evaluator, extraNodes, &tree));
+      resolver->DumpConditionTree (tree);
+      csString filename;
+      filename.Format ("/tmp/shader/cond_%s.txt", source->GetAttributeValue ("name"));
+      compiler->vfs->WriteFile (filename, tree.GetData(), tree.Length ());
+    }
+    else
+      wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (source, 
+        resolver, resolver->evaluator, extraNodes, 0));
+    shaderSource = wrappedNode;
+    
+    if (cacheValid)
+    {
+      bool cacheState = resolver->WriteToCache (cacheFile);
+      if (cacheState)
+        cacheState = wrappedNode->StoreToCache (cacheFile);
+      
+      if (cacheState)
+      {
+        csRef<iDataBuffer> allCacheData = cacheFile->GetAllData();
+	shaderCache->CacheData (allCacheData->GetData(),
+	  allCacheData->GetSize(), shaderName, cacheID_header, ~0);
+      }
+    }
+  }
+  
+  //Load global shadervars block
+  csRef<iDocumentNode> varNode = shaderSource->GetNode(
+    xmltokens.Request (csXMLShaderCompiler::XMLTOKEN_SHADERVARS));
+ 
+  if (varNode)
+    ParseGlobalSVs (ldr_context, varNode);
+    
+  csRef<iDocumentNode> fallbackNode = shaderSource->GetNode ("fallbackshader");
+  if (fallbackNode.IsValid())
+  {
+    fallbackShader = compiler->synldr->ParseShaderRef (ldr_context,
+	fallbackNode);
+  }
 }
 
 void csXMLShader::SelfDestruct ()

@@ -94,6 +94,10 @@ class csShaderConditionResolver : public iConditionResolver
   
   void DumpConditionNode (csString& out, csConditionNode* node, int level);
   size_t GetVariant (csConditionNode* node);
+  
+  bool ReadNode (iFile* cacheFile, csConditionNode* parent,
+    csConditionNode*& node);
+  bool WriteNode (iFile* cacheFile, csConditionNode* node);
 public:
   csConditionEvaluator evaluator;
 
@@ -120,6 +124,9 @@ public:
   size_t GetVariantCount () const
   { return nextVariant; }
   void DumpConditionTree (csString& out);
+  
+  bool ReadFromCache (iFile* cacheFile);
+  bool WriteToCache (iFile* cacheFile);
 };
 
 class csXMLShader : public scfImplementationExt2<csXMLShader,
@@ -203,6 +210,7 @@ class csXMLShader : public scfImplementationExt2<csXMLShader,
 protected:
   void InternalRemove() { SelfDestruct(); }
 
+  void Load (iDocumentNode* source);
 public:
   CS_LEAKGUARD_DECLARE (csXMLShader);
 

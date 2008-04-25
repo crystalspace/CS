@@ -256,12 +256,20 @@ namespace CS
       
       bool WriteDataBuffer (iFile* file, iDataBuffer* buf)
       {
-	uint32 sizeLE = csLittleEndian::UInt32 (buf->GetSize());
+        size_t bufSize = buf->GetSize();
+	uint32 sizeLE = csLittleEndian::UInt32 (bufSize);
 	if (file->Write ((char*)&sizeLE, sizeof (sizeLE)) != sizeof (sizeLE))
 	  return false;
-	size_t bufSize = buf->GetSize();
 	if (file->Write (buf->GetData(), bufSize) != bufSize)
 	  return false;
+	  
+	size_t pad = 4 - (bufSize & 3);
+	if (pad < 4)
+	{
+          static const char null[] = {0, 0, 0};
+	  if (file->Write (null, pad) != pad)
+	    return false;
+        }
 	return true;
       }
       
@@ -276,8 +284,107 @@ namespace CS
 	buf.AttachNew (new csParasiticDataBuffer (allFileData,
 	  file->GetPos(), bufSize));
 	if (buf->GetSize() != bufSize) return 0;
+	size_t pad = 4 - (bufSize & 3);
+	if (pad < 4) bufSize += pad;
 	file->SetPos (file->GetPos() + bufSize);
 	return csPtr<iDataBuffer> (buf);
+      }
+      
+      //---------------------------------------------------------------------
+      
+      bool StringStoreWriter::StartUse (iFile* file)
+      {
+        CS_ASSERT(!this->file.IsValid());
+        this->file = file;
+        headPos = file->GetPos();
+        strings.Empty();
+        stringPositions.DeleteAll();
+        
+        uint32 dummy = (uint32)~0;
+        if (file->Write ((char*)&dummy, sizeof (dummy)) != sizeof (dummy))
+        {
+          this->file.Invalidate();
+          return false;
+        }
+        return true;
+      }
+      
+      bool StringStoreWriter::EndUse ()
+      {
+        CS_ASSERT(this->file.IsValid());
+        
+        size_t curFilePos = file->GetPos();
+        
+        csRef<iDataBuffer> stringsBuf (strings.GetAllData());
+        if (!stringsBuf.IsValid())
+          stringsBuf.AttachNew (new CS::DataBuffer<> ((size_t)0));
+        if (!WriteDataBuffer (file, stringsBuf)) return false;
+        
+        uint32 ofsLE = curFilePos - headPos;
+        curFilePos = file->GetPos();
+        bool ret = false;
+        file->SetPos (headPos);
+        ofsLE = csLittleEndian::UInt32 (ofsLE);
+        ret = (file->Write ((char*)&ofsLE, sizeof (ofsLE)) == sizeof (ofsLE));
+        
+        file->SetPos (curFilePos);
+        file.Invalidate();
+        return ret;
+      }
+      
+      uint32 StringStoreWriter::GetID (const char* string)
+      {
+        CS_ASSERT(this->file.IsValid());
+        
+        uint32 pos = stringPositions.Get (string, (uint32)~0);
+        if (pos == (uint32)~0)
+        {
+          pos = strings.GetPos();
+          strings.Write (string, strlen (string)+1);
+          stringPositions.Put (string, pos);
+        }
+        return pos;
+      }
+      
+      //---------------------------------------------------------------------
+      
+      bool StringStoreReader::StartUse (iFile* file)
+      {
+        CS_ASSERT(!this->file.IsValid());
+        this->file = file;
+        
+        size_t curFilePos = file->GetPos();
+        
+        uint32 ofsLE;
+        if (file->Read ((char*)&ofsLE, sizeof (ofsLE)) != sizeof (ofsLE))
+        {
+          this->file.Invalidate();
+          return false;
+        }
+        ofsLE = csLittleEndian::UInt32 (ofsLE);
+        file->SetPos (curFilePos + ofsLE);
+        blockBuf = ReadDataBuffer (file);
+        endPos = file->GetPos();;
+        if (!blockBuf.IsValid()) return false;
+        stringBlock = blockBuf->GetData();
+        file->SetPos (curFilePos + sizeof (ofsLE));
+        return true;
+      }
+      
+      bool StringStoreReader::EndUse ()
+      {
+        CS_ASSERT(this->file.IsValid());
+        
+        file->SetPos (endPos);
+        file.Invalidate();
+        return true;
+      }
+      
+      const char* StringStoreReader::GetString (uint32 id) const
+      {
+        CS_ASSERT(this->file.IsValid());
+        CS_ASSERT(id < blockBuf->GetSize());
+        return stringBlock + id;
       }
       
     } // namespace ShaderCacheHelper

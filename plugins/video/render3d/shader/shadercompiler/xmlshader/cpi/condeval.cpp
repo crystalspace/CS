@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 
 #include "csgfx/renderbuffer.h"
+#include "csutil/csendian.h"
 #include "ivideo/rendermesh.h"
 
 #include "condeval.h"
@@ -182,6 +183,14 @@ size_t* csConditionEvaluator::AllocSVIndices (
   *p++ = num;
   for (size_t n = 0; n < num; n++)
     *p++ = parser.GetIndexValue (n);
+  return mem;
+}
+
+size_t* csConditionEvaluator::AllocSVIndices (size_t num)
+{
+  if (num == 0) return 0;
+  
+  size_t* mem = (size_t*)scratch.Alloc ((num+1) * sizeof (size_t));
   return mem;
 }
 
@@ -1519,6 +1528,280 @@ void csConditionEvaluator::GetUsedSVs (csConditionID condition,
   if ((condition == csCondAlwaysFalse) || (condition == csCondAlwaysTrue))
     return;
   GetUsedSVs2 (condition, affectedSVs);
+}
+
+bool csConditionEvaluator::ReadFromCache (iFile* cacheFile)
+{
+  uint32 numCondsLE;
+  if (cacheFile->Read ((char*)&numCondsLE, sizeof (numCondsLE))
+      != sizeof (numCondsLE))
+    return false;
+    
+  nextConditionID = csLittleEndian::UInt32 (numCondsLE);
+  
+  CS::PluginCommon::ShaderCacheHelper::StringStoreReader strStore;
+  strStore.StartUse (cacheFile);
+  
+  conditions.DeleteAll();
+  for (csConditionID c = 0; c < nextConditionID; c++)
+  {
+    CondOperation op;
+    if (!ReadCondition (cacheFile, strStore, op))
+    {
+      conditions.DeleteAll();
+      nextConditionID = 0;
+      return false;
+    }
+    conditions.Put (op, c);
+  }
+  
+  strStore.EndUse ();
+  return true;
+}
+
+bool csConditionEvaluator::WriteToCache (iFile* cacheFile)
+{
+  uint32 numCondsLE = csLittleEndian::UInt32 (nextConditionID);
+  if (cacheFile->Write ((char*)&numCondsLE, sizeof (numCondsLE))
+      != sizeof (numCondsLE))
+    return false;
+    
+  CS::PluginCommon::ShaderCacheHelper::StringStoreWriter strStore;
+  strStore.StartUse (cacheFile);
+  
+  for (csConditionID c = 0; c < nextConditionID; c++)
+  {
+    const CondOperation* op = conditions.GetKeyPointer (c);
+    if (!WriteCondition (cacheFile, strStore, *op)) return false;
+  }
+  
+  strStore.EndUse ();
+  return true;
+}
+
+struct ConditionHeader
+{
+  uint8 op;
+  uint8 leftType;
+  uint8 rightType;
+  uint8 flags;
+  
+  enum
+  { 
+    leftHasIndices = 1, 
+    rightHasIndices = 2
+  };
+  
+  ConditionHeader() : op (0), leftType (0), rightType (0), flags (0) {}
+};
+
+bool csConditionEvaluator::ReadCondition (iFile* cacheFile,
+  const CS::PluginCommon::ShaderCacheHelper::StringStoreReader& strStore,
+  CondOperation& cond)
+{
+  ConditionHeader head;
+  if (cacheFile->Read ((char*)&head, sizeof (head)) != sizeof (head))
+    return false;
+  cond.operation = (ConditionOp)head.op;
+  cond.left.type = (OperandType)head.leftType;
+  cond.right.type = (OperandType)head.rightType;
+    
+  if (!ReadCondOperand (cacheFile, strStore, cond.left,
+      head.flags & ConditionHeader::leftHasIndices))
+    return false;
+  if (!ReadCondOperand (cacheFile, strStore, cond.right,
+      head.flags & ConditionHeader::rightHasIndices))
+    return false;
+  return true;
+}
+  
+bool csConditionEvaluator::WriteCondition (iFile* cacheFile,
+  CS::PluginCommon::ShaderCacheHelper::StringStoreWriter& strStore,
+  const CondOperation& cond)
+{
+  ConditionHeader head;
+  head.op = cond.operation;
+  head.leftType = cond.left.type;
+  if ((cond.left.type >= operandSV) && (cond.left.svLocation.indices != 0))
+    head.flags |= ConditionHeader::leftHasIndices;
+  head.rightType = cond.right.type;
+  if ((cond.right.type >= operandSV) && (cond.right.svLocation.indices != 0))
+    head.flags |= ConditionHeader::rightHasIndices;
+    
+  if (cacheFile->Write ((char*)&head, sizeof (head)) != sizeof (head))
+    return false;
+    
+  if (!WriteCondOperand (cacheFile, strStore, cond.left)) return false;
+  if (!WriteCondOperand (cacheFile, strStore, cond.right)) return false;
+  return true;
+}
+  
+bool csConditionEvaluator::ReadCondOperand (iFile* cacheFile,
+  const CS::PluginCommon::ShaderCacheHelper::StringStoreReader& strStore,
+  CondOperand& operand, bool hasIndices)
+{
+  switch (operand.type)
+  {
+    case operandOperation:
+      {
+        int32 condLE;
+        if (cacheFile->Read ((char*)&condLE, sizeof (condLE))
+            != sizeof (condLE))
+          return false;
+        operand.operation = (long)csLittleEndian::Int32 (condLE);
+        return true;
+      }
+      break;
+    case operandFloat:
+      {
+        uint32 valLE;
+        if (cacheFile->Read ((char*)&valLE, sizeof (valLE))
+            != sizeof (valLE))
+          return false;
+        operand.floatVal = csIEEEfloat::ToNative (
+          csLittleEndian::UInt32 (valLE));
+        return true;
+      }
+      break;
+    case operandInt:
+      {
+        int32 valLE;
+        if (cacheFile->Read ((char*)&valLE, sizeof (valLE))
+            != sizeof (valLE))
+          return false;
+        operand.intVal = csLittleEndian::UInt32 (valLE);
+        return true;
+      }
+      break;
+    case operandBoolean:
+      {
+        int32 valLE;
+        if (cacheFile->Read ((char*)&valLE, sizeof (valLE))
+            != sizeof (valLE))
+          return false;
+        operand.boolVal = csLittleEndian::UInt32 (valLE) != 0;
+        return true;
+      }
+      break;
+    case operandSV:
+    case operandSVValueInt:
+    case operandSVValueFloat:
+    case operandSVValueX:
+    case operandSVValueY:
+    case operandSVValueZ:
+    case operandSVValueW:
+    case operandSVValueTexture:
+    case operandSVValueBuffer:
+      {
+        uint32 nameIDLE;
+        if (cacheFile->Read ((char*)&nameIDLE, sizeof (nameIDLE))
+            != sizeof (nameIDLE))
+          return false;
+        const char* nameStr = strStore.GetString (
+          csLittleEndian::UInt32 (nameIDLE));
+	operand.svLocation.svName = strings->Request (nameStr);
+	operand.svLocation.bufferName = csRenderBuffer::GetBufferNameFromDescr (
+	  nameStr);
+        if (hasIndices)
+        {
+	  uint32 numIndLE;
+	  if (cacheFile->Read ((char*)&numIndLE, sizeof (numIndLE))
+	      != sizeof (numIndLE))
+	    return false;
+	  size_t numInd = csLittleEndian::UInt32 (numIndLE);
+	  operand.svLocation.indices = AllocSVIndices (numInd);
+	  for (size_t i = 0; i < numInd; i++)
+	  {
+	    size_t& ind = operand.svLocation.indices[i+1];
+	    uint32 indLE;
+	    if (cacheFile->Read ((char*)&indLE, sizeof (indLE))
+		!= sizeof (indLE))
+	      return false;
+	    ind = csLittleEndian::UInt32 (indLE);
+	  }
+        }
+        return true;
+      }
+      break;
+    default:
+      CS_ASSERT(false);
+  }
+  return false;
+}
+  
+bool csConditionEvaluator::WriteCondOperand (iFile* cacheFile,
+  CS::PluginCommon::ShaderCacheHelper::StringStoreWriter& strStore,
+  const CondOperand& operand)
+{
+  switch (operand.type)
+  {
+    case operandOperation:
+      {
+        int32 condLE = csLittleEndian::Int32 ((long)operand.operation);
+        return (cacheFile->Write ((char*)&condLE, sizeof (condLE))
+          == sizeof (condLE));
+      }
+      break;
+    case operandFloat:
+      {
+        uint32 valLE = csLittleEndian::UInt32 (
+          csIEEEfloat::FromNative (operand.floatVal));
+        return (cacheFile->Write ((char*)&valLE, sizeof (valLE))
+          == sizeof (valLE));
+      }
+      break;
+    case operandInt:
+      {
+        int32 valLE = csLittleEndian::Int32 (operand.intVal);
+        return (cacheFile->Write ((char*)&valLE, sizeof (valLE))
+          == sizeof (valLE));
+      }
+      break;
+    case operandBoolean:
+      {
+        int32 valLE = csLittleEndian::Int32 (int (operand.boolVal));
+        return (cacheFile->Write ((char*)&valLE, sizeof (valLE))
+          == sizeof (valLE));
+      }
+      break;
+    case operandSV:
+    case operandSVValueInt:
+    case operandSVValueFloat:
+    case operandSVValueX:
+    case operandSVValueY:
+    case operandSVValueZ:
+    case operandSVValueW:
+    case operandSVValueTexture:
+    case operandSVValueBuffer:
+      {
+        const char* nameStr = strings->Request (operand.svLocation.svName);
+        uint32 nameIDLE = csLittleEndian::UInt32 (strStore.GetID (nameStr));
+        if (cacheFile->Write ((char*)&nameIDLE, sizeof (nameIDLE))
+            != sizeof (nameIDLE))
+          return false;
+        if (operand.svLocation.indices != 0)
+        {
+          size_t numInd = *operand.svLocation.indices;
+          uint32 numIndLE = csLittleEndian::UInt32 (numInd);
+	  if (cacheFile->Write ((char*)&numIndLE, sizeof (numIndLE))
+	      != sizeof (numIndLE))
+	    return false;
+	  for (size_t i = 0; i < numInd; i++)
+	  {
+	   size_t ind = operand.svLocation.indices[i+1];
+	    uint32 indLE = csLittleEndian::UInt32 (ind);
+	    if (cacheFile->Write ((char*)&indLE, sizeof (indLE))
+		!= sizeof (indLE))
+	      return false;
+	  }
+        }
+        return true;
+      }
+      break;
+    default:
+      CS_ASSERT(false);
+  }
+  return false;
 }
 
 void csConditionEvaluator::CompactMemory ()
