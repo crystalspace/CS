@@ -19,6 +19,10 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_TEXTURECACHE_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_TEXTURECACHE_H__
 
+#include "igraphic/image.h"
+#include "ivideo/texture.h"
+#include "ivideo/txtmgr.h"
+
 #include "csutil/genericresourcecache.h"
 
 struct iTextureHandle;
@@ -151,6 +155,7 @@ namespace RenderManager
       real_w = width;
       real_h = height;
       
+      CS_ASSERT_MSG("SetG3D () not called", g3d);
       csRef<iTextureHandle> newTex (
         g3d->GetTextureManager()->CreateTexture (
         width, height, imgtype, format, textureFlags));
@@ -177,9 +182,9 @@ namespace RenderManager
       csTicks, Implementation::TextureSizeConstraint> backend;
 
     csImageType imgtype;
-    const char* format;
+    csString format;
     int textureFlags;
-    const char* texClass;
+    csString texClass;
     uint options;
   };
   

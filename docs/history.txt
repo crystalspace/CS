@@ -22,6 +22,8 @@ chronological order.
 	- res fixed csShaderVariable::NewType() to actually change Type.
 	- res added "type safety" to csShaderVariable texture GetValue():
 	  return 0 if type of SV is not a texture.
+	- res refactored some of the shadow code for a bit more control over
+	  what maps are rendered for shadows.
 25-Apr-2008
 	- res adding caching support to xmlshader: the condition tree and
 	  document wrapper structures can be stored to disk now, eliminating

@@ -298,9 +298,6 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
   treePersistent.Initialize (shaderManager);
   postEffects.Initialize (objectReg);
   
-  /*csRef<iShader> logmap =
-    loader->LoadShader ("/shader/postproc/hdr/simple-log.xml");*/
-
   const char* effectsFile = cfg->GetStr ("RenderManager.ShadowPSSM.Effects", 0);
   if (effectsFile)
   {
@@ -315,15 +312,9 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
   hdrExposure.Initialize (objectReg, postEffects);
   
   portalPersistent.Initialize (shaderManager, g3d);
+  lightPersistent.shadowPersist.SetShadowType (
+    cfg->GetStr ("RenderManager.ShadowPSSM.ShadowsType", "Depth"));
   lightPersistent.Initialize (objectReg);
-  
-  lightPersistent.shadowPersist.SetShadowShaderType (
-    cfg->GetStr ("RenderManager.ShadowPSSM.ShadowShader.Type", "shadow"));
-  csRef<iShader> shadowDefault =
-    loader->LoadShader (
-      cfg->GetStr ("RenderManager.ShadowPSSM.ShadowShader.Default",
-                   "/shader/shadow/shadow_default.xml"));
-  lightPersistent.shadowPersist.SetDefaultShadowShader (shadowDefault);
   
   return true;
 }

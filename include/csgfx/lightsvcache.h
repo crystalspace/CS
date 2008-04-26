@@ -92,12 +92,8 @@ public:
     lightType,
     /// Attenuation mode (csLightAttenuationMode casted to int)
     lightAttenuationMode,
-    /// Shadow map texture
-    lightShadowMap,
     /// Shadow map projection matrix
     lightShadowMapProjection,
-    /// Shadow map ID texture
-    lightShadowMapID,
     /// Shadow map pixel sizes + dimensions
     lightShadowMapPixelSize,
 

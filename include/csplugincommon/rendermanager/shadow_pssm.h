@@ -23,6 +23,7 @@
 
 #include "csplugincommon/rendermanager/operations.h"
 #include "csplugincommon/rendermanager/rendertree.h"
+#include "csplugincommon/rendermanager/shadow_common.h"
 #include "csplugincommon/rendermanager/standardsorter.h"
 #include "csplugincommon/rendermanager/viscull.h"
 
@@ -63,7 +64,8 @@ namespace RenderManager
       
       ViewSetup (PersistentData& persist, CS::RenderManager::RenderView* rview)
        : persist (persist), rview (rview),
-         depthRenderLayer (persist.shadowShaderType, persist.defaultShadowShader),
+         depthRenderLayer (persist.settings.shadowShaderType, 
+           persist.settings.shadowDefaultShader),
          lastMeshID (0)
       {
 	// PSSM: split layers
@@ -105,12 +107,14 @@ namespace RenderManager
       {
         csBox3 volume;
         CS::Math::Matrix4 world2lightNorm;
-	csShaderVariable* shadowMapSV;
 	csShaderVariable* shadowMapProjectSV;
-	csShaderVariable* shadowMapIDSV;
 	csShaderVariable* shadowMapDimSV;
+	csShaderVariable** textureSVs;
 	
 	csArray<csBox3> containedObjects;
+	
+	Frustum() : textureSVs (0) {}
+	~Frustum() { delete textureSVs; }
       };
       Frustum lightFrustums[NUM_PARTS];
       
@@ -170,9 +174,6 @@ namespace RenderManager
 	      lightFrustum.volume.AddBoundingVertex (cornerProj);
 	    }
 	  
-	    lightFrustum.shadowMapSV = lightVarsHelper.CreateTempSV (
-	      viewSetup.persist.svNames.GetLightSVId (
-		csLightShaderVarCache::lightShadowMap));
 	    lightFrustum.shadowMapProjectSV = lightVarsHelper.CreateTempSV (
 	      viewSetup.persist.svNames.GetLightSVId (
 		csLightShaderVarCache::lightShadowMapProjection));
@@ -183,12 +184,20 @@ namespace RenderManager
 		CS::InvalidShaderVarStringID);
 	      lightFrustum.shadowMapProjectSV->SetArrayElement (i, item);
 	    }
-	    lightFrustum.shadowMapIDSV = lightVarsHelper.CreateTempSV (
-	      viewSetup.persist.svNames.GetLightSVId (
-		csLightShaderVarCache::lightShadowMapID));
 	    lightFrustum.shadowMapDimSV = lightVarsHelper.CreateTempSV (
 	      viewSetup.persist.svNames.GetLightSVId (
 		csLightShaderVarCache::lightShadowMapPixelSize));
+		
+	    size_t numTex = viewSetup.persist.settings.targets.GetSize();
+            if (lightFrustum.textureSVs == 0)
+            {
+              lightFrustum.textureSVs = new csShaderVariable*[numTex];
+            }
+	    for (size_t t = 0; t < numTex; t++)
+	    {
+	      lightFrustum.textureSVs[t] = lightVarsHelper.CreateTempSV (
+		viewSetup.persist.settings.targets[t]->svName);
+	    }
 	  }
         
           frustumsSetup = true;
@@ -202,6 +211,8 @@ namespace RenderManager
       {
         typename RenderTree::ContextNode& context = meshNode->owner;
       
+        CS_ALLOC_STACK_ARRAY(iTextureHandle*, texHandles,
+          persist.settings.targets.GetSize());
         float allMinZ = HUGE_VALF;
 	for (int f = 0; f < NUM_PARTS; f++)
 	{
@@ -266,20 +277,16 @@ namespace RenderManager
 	  lightFrust.shadowMapDimSV->SetValue (csVector4 (1.0f/shadowMapSize,
 	    1.0f/shadowMapSize, shadowMapSize, shadowMapSize));
   
-	  iTextureHandle* shadowTex = persist.texCacheDepth.QueryUnusedTexture (
-	    shadowMapSize, shadowMapSize, 0);
-	  lightFrust.shadowMapSV->SetValue (shadowTex);
-	  renderTree.AddDebugTexture (shadowTex);
-	  
-	  iTextureHandle* shadowIDTex = 0;
-	  if (persist.doIDTexture)
-	  {
-	    shadowIDTex = persist.texCacheID.QueryUnusedTexture (
-	      shadowMapSize, shadowMapSize, 0);
-	    lightFrust.shadowMapIDSV->SetValue (shadowIDTex);
-	    renderTree.AddDebugTexture (shadowIDTex);
+          for (size_t t = 0; t < persist.settings.targets.GetSize(); t++)
+          {
+	    iTextureHandle* tex =
+	      persist.settings.targets[t]->texCache.QueryUnusedTexture (
+	        shadowMapSize, shadowMapSize, 0);
+	    lightFrust.textureSVs[t]->SetValue (tex);
+	    renderTree.AddDebugTexture (tex);
+	    texHandles[t] = tex;
 	  }
-  
+	  
 	  csBox2 clipBox (0, 0, shadowMapSize, shadowMapSize);
 	  csRef<iClipper2D> newView;
 	  newView.AttachNew (new csBoxClipper (clipBox));
@@ -288,13 +295,17 @@ namespace RenderManager
 	  // Create a new context for shadow map w/ computed view
 	  typename RenderTree::ContextNode* shadowMapCtx = 
 	    renderTree.CreateContext (newRenderView);
-	  shadowMapCtx->renderTargets[rtaColor0].texHandle = shadowIDTex;
-	  shadowMapCtx->renderTargets[rtaDepth].texHandle = shadowTex;
+          for (size_t t = 0; t < persist.settings.targets.GetSize(); t++)
+          {
+	    shadowMapCtx->renderTargets[
+	      persist.settings.targets[t]->attachment].texHandle = 
+	        texHandles[t];
+	  }
 	  shadowMapCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
   
 	  // Setup the new context
 	  ShadowmapContextSetup contextFunction (layerConfig,
-	    persist.shaderManager, viewSetup, persist.doIDTexture);
+	    persist.shaderManager, viewSetup, persist.settings.provideIDs);
 	  contextFunction (*shadowMapCtx);
 	}
       }
@@ -424,17 +435,14 @@ private:
       LightingSorter::PersistentData lightSorterPersist;
       LightingVariablesHelper::PersistentData lightVarsPersist;
       iShaderManager* shaderManager;
-      csStringID shadowShaderType;
-      csRef<iStringSet> strings;
-      csRef<iShader> defaultShadowShader;
-      CS::ShaderVarStringID svMeshIDName;
 
-      TextureCache texCacheDepth;
-      TextureCache texCacheID;
-      
-      bool doIDTexture;
+      //TextureCache texCacheDepth;
+      //TextureCache texCacheID;
+      //bool doIDTexture;
+      csString shadowType;
+      ShadowSettings settings;
 
-      PersistentData() : frameNum (0),
+      PersistentData() : frameNum (0), shadowType ("Depth")/*,
         texCacheDepth (csimg2D, "d32", 
           CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP,
           "shadowmap", 
@@ -443,7 +451,7 @@ private:
           CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP | CS_TEXTURE_NOFILTER,
           "shadowmap", 
           TextureCache::tcachePowerOfTwo | TextureCache::tcacheExactSizeMatch),
-        doIDTexture (false)
+        doIDTexture (false)*/
       {
       }
 
@@ -451,37 +459,28 @@ private:
       {
       }
       
+      void SetShadowType (const char* shadowType)
+      {
+        this->shadowType = shadowType;
+      }
+      
       void Initialize (iObjectRegistry* objectReg)
       {
-        csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objectReg);
         csRef<iShaderManager> shaderManager =
           csQueryRegistry<iShaderManager> (objectReg);
-	strings = csQueryRegistryTagInterface<iStringSet> (objectReg,
-	  "crystalspace.shared.stringset");
       
-        texCacheDepth.SetG3D (g3d);
-        texCacheID.SetG3D (g3d);
         this->shaderManager = shaderManager;
         iShaderVarStringSet* strings = shaderManager->GetSVNameStringset();
 	svNames.SetStrings (strings);
-	svMeshIDName = strings->Request ("shadowmap mesh id");
+	
+	settings.ReadSettings (objectReg, shadowType);
       }
       void UpdateNewFrame ()
       {
         frameNum++;
         csTicks time = csGetTicks ();
-        texCacheDepth.AdvanceFrame (time);
-        texCacheID.AdvanceFrame (time);
+        settings.AdvanceFrame (time);
       }
-
-      const char* GetShadowShaderType () const
-      { return strings->Request (shadowShaderType); }
-      void SetShadowShaderType (const char* shaderType)
-      { shadowShaderType = strings->Request (shaderType); }
-      
-      iShader* GetDefaultShadowShader() const { return defaultShadowShader; }
-      void SetDefaultShadowShader (iShader* shader)
-      { defaultShadowShader = shader; }
     };
     
     typedef ViewSetup ShadowParameters;
@@ -502,10 +501,10 @@ private:
       lightData.SetupFrame (viewSetup, light);
       LightingVariablesHelper lightVarsHelper (viewSetup.persist.lightVarsPersist);
       
-      if (persist.doIDTexture && !singleMesh.svMeshID.IsValid())
+      if (persist.settings.provideIDs && !singleMesh.svMeshID.IsValid())
       {
         singleMesh.svMeshID = lightVarsHelper.CreateTempSV (
-	  viewSetup.persist.svMeshIDName);
+	  viewSetup.persist.settings.svMeshIDName);
         lightStack[singleMesh.svMeshID->GetName()] = singleMesh.svMeshID;
         uint meshID = ++viewSetup.lastMeshID;
         singleMesh.svMeshID->SetValue ((int)meshID);
@@ -531,15 +530,16 @@ private:
         lightData.lightFrustums[f].containedObjects.Push (meshBboxLight);
       
 	// Add shadow map SVs
-	lightVarsHelper.MergeAsArrayItem (lightStack, 
-	  lightData.lightFrustums[f].shadowMapSV, lightNum);
 	lightVarsHelper.MergeAsArrayItem (lightStack,
 	  lightData.lightFrustums[f].shadowMapProjectSV, lightNum);
 	lightVarsHelper.MergeAsArrayItem (lightStack, 
-	  lightData.lightFrustums[f].shadowMapIDSV, lightNum);
-	lightVarsHelper.MergeAsArrayItem (lightStack, 
 	  lightData.lightFrustums[f].shadowMapDimSV, lightNum);
 	  
+	for (size_t t = 0; t < persist.settings.targets.GetSize(); t++)
+	{
+	  lightVarsHelper.MergeAsArrayItem (lightStack, 
+	    lightData.lightFrustums[f].textureSVs[t], lightNum);
+	}
 	break;
       }
     }
