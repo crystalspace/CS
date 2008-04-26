@@ -521,6 +521,7 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
   {
     cgGetError(); // Clear error
     cgGLLoadProgram (program);
+    if (!(flags & loadIgnoreErrors)) shaderPlug->PrintAnyListing();
     if ((cgGetError() != CG_NO_ERROR)
       || !cgGLIsProgramLoaded (program)) 
     {
@@ -530,7 +531,6 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
       shaderPlug->SetCompiledSource (0);
       return false;
     }
-    if (!(flags & loadIgnoreErrors)) shaderPlug->PrintAnyListing();
   }
 
   if (shaderPlug->debugDump)
