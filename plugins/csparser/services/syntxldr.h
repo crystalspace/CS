@@ -150,6 +150,7 @@ public:
   virtual bool WriteKey (iDocumentNode* node, iKeyValuePair* keyvalue);
 
   virtual csRef<iRenderBuffer> ParseRenderBuffer (iDocumentNode* node);
+  virtual bool ParseRenderBuffer (iDocumentNode* node, iRenderBuffer* buffer);
   virtual bool WriteRenderBuffer (iDocumentNode* node, iRenderBuffer* buffer);
   /**
    * Read a render buffer from a data buffer. If \a filename is not 0, the

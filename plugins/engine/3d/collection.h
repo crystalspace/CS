@@ -79,14 +79,16 @@ public:
    */
   void ReleaseAllObjects(bool debug = false)
   {
+    if (!Children)
+      return;
+
     csWeakRefArray<iObject> copy;
-    csRef<iObjectIterator> itr = GetIterator();
-    while(itr->HasNext())
+    for(size_t i=0; i<Children->GetSize(); i++)
     {
-      copy.Push(itr->Next());
+      copy.Push(Children->Get(i));
     }
 
-    for(int i=0; i<copy.GetSize(); i++)
+    for(size_t i=0; i<copy.GetSize(); i++)
     {
       if(copy[i].IsValid())
       {
@@ -97,7 +99,7 @@ public:
     if(debug)
     {
       printf("Not Deleted for %s:\n", GetName());
-      for (int i = 0 ; i < copy.GetSize () ; i++)
+      for (size_t i = 0 ; i < copy.GetSize () ; i++)
       {
         iObject* obj = copy[i];
         if(obj)

@@ -156,7 +156,8 @@ csPtr<iBase> csRenderLoopLoader::Parse (iDocumentNode* node,
   if (loopName)
   {
     obj->SetName(loopName);
-    if (!loopmgr->Register (loopName, loop, ldr_context->CheckDupes()))
+    bool checkDupes = ldr_context ? ldr_context->CheckDupes() : false;
+    if (!loopmgr->Register (loopName, loop, checkDupes))
     {
       if (synldr) 
       {

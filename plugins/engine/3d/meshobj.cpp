@@ -1012,7 +1012,7 @@ void csMeshWrapper::PlaceMesh ()
   if (!movable.IsFullTransformIdentity ())
     sphere = movable.GetFullTransform ().This2Other (sphere);
   radius = sphere.GetRadius ();
-  float max_sq_radius = radius * radius;
+  //float max_sq_radius = radius * radius;
 
   csRef<iMeshWrapperIterator> it = 
     engine->GetNearbyMeshes (sector, sphere.GetCenter (), radius, true);

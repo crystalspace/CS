@@ -8247,6 +8247,7 @@ sub DESTROY {
 *SetAccessor = *cspacec::csShaderVariable_SetAccessor;
 *SetName = *cspacec::csShaderVariable_SetName;
 *GetName = *cspacec::csShaderVariable_GetName;
+*GetAccessorData = *cspacec::csShaderVariable_GetAccessorData;
 *GetValue = *cspacec::csShaderVariable_GetValue;
 *SetValue = *cspacec::csShaderVariable_SetValue;
 *AddVariableToArray = *cspacec::csShaderVariable_AddVariableToArray;
@@ -9021,6 +9022,51 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::TextureComparisonMode ##############
+
+package cspace::TextureComparisonMode;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*compareNone = *cspacec::TextureComparisonMode_compareNone;
+*compareR = *cspacec::TextureComparisonMode_compareR;
+*swig_mode_get = *cspacec::TextureComparisonMode_mode_get;
+*swig_mode_set = *cspacec::TextureComparisonMode_mode_set;
+*funcLEqual = *cspacec::TextureComparisonMode_funcLEqual;
+*funcGEqual = *cspacec::TextureComparisonMode_funcGEqual;
+*swig_function_get = *cspacec::TextureComparisonMode_function_get;
+*swig_function_set = *cspacec::TextureComparisonMode_function_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_TextureComparisonMode(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_TextureComparisonMode($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iGraphics3D ##############
 
 package cspace::iGraphics3D;
@@ -9083,6 +9129,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetCurrentDrawFlags = *cspacec::iGraphics3D_GetCurrentDrawFlags;
 *GetProjectionMatrix = *cspacec::iGraphics3D_GetProjectionMatrix;
 *SetProjectionMatrix = *cspacec::iGraphics3D_SetProjectionMatrix;
+*SetTextureComparisonModes = *cspacec::iGraphics3D_SetTextureComparisonModes;
 *scfGetVersion = *cspacec::iGraphics3D_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -9714,6 +9761,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetActiveLights = *cspacec::iShaderManager_SetActiveLights;
 *GetActiveLights = *cspacec::iShaderManager_GetActiveLights;
 *GetSVNameStringset = *cspacec::iShaderManager_GetSVNameStringset;
+*GetShaderCache = *cspacec::iShaderManager_GetShaderCache;
 *scfGetVersion = *cspacec::iShaderManager_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -19462,6 +19510,44 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iSwigCollectionArray ##############
+
+package cspace::iSwigCollectionArray;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*GetSize = *cspacec::iSwigCollectionArray_GetSize;
+*Get = *cspacec::iSwigCollectionArray_Get;
+*Top = *cspacec::iSwigCollectionArray_Top;
+*Find = *cspacec::iSwigCollectionArray_Find;
+*GetIndex = *cspacec::iSwigCollectionArray_GetIndex;
+*IsEmpty = *cspacec::iSwigCollectionArray_IsEmpty;
+*GetAll = *cspacec::iSwigCollectionArray_GetAll;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSwigCollectionArray($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iCollection ##############
 
 package cspace::iCollection;
@@ -19513,12 +19599,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_iCollectionArray(@_);
-    bless $self, $pkg if defined($self);
-}
-
+*scfGetVersion = *cspacec::iCollectionArray_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -20881,8 +20962,10 @@ sub CS_ZBUF_MESH () { $cspacec::CS_ZBUF_MESH }
 sub CS_ZBUF_MESH2 () { $cspacec::CS_ZBUF_MESH2 }
 sub CS_VATTRIB_SPECIFIC_FIRST () { $cspacec::CS_VATTRIB_SPECIFIC_FIRST }
 sub CS_VATTRIB_SPECIFIC_LAST () { $cspacec::CS_VATTRIB_SPECIFIC_LAST }
+sub CS_VATTRIB_SPECIFIC_NUM () { $cspacec::CS_VATTRIB_SPECIFIC_NUM }
 sub CS_VATTRIB_GENERIC_FIRST () { $cspacec::CS_VATTRIB_GENERIC_FIRST }
 sub CS_VATTRIB_GENERIC_LAST () { $cspacec::CS_VATTRIB_GENERIC_LAST }
+sub CS_VATTRIB_GENERIC_NUM () { $cspacec::CS_VATTRIB_GENERIC_NUM }
 sub CS_VATTRIB_UNUSED () { $cspacec::CS_VATTRIB_UNUSED }
 sub CS_VATTRIB_INVALID () { $cspacec::CS_VATTRIB_INVALID }
 sub CS_VATTRIB_POSITION () { $cspacec::CS_VATTRIB_POSITION }

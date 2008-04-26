@@ -23,46 +23,27 @@
 namespace CS {
   namespace Memory {
     
-    long GetPhysicalMemory()
+	static size_t cachedMemory;
+	static bool memoryCached;
+	
+    size_t GetPhysicalMemory()
     {
-      #if defined(CS_PLATFORM_WIN32)
-        const int kbConversion = 1024;
-        MEMORYSTATUS memAmount;
-        GlobalMemoryStatus(&memAmount);
-        return (memAmount.dwTotalPhys/kbConversion);
-      #endif
-
-      #if defined(CS_PLATFORM_WIN64)
-        const int kbConversion = 1024;
-        MEMORYSTATUSEX memAmount;
-        GlobalMemoryStatusEx(&memAmount);
-        return (memAmount.ullTotalPhys/kbConversion);
-      #endif
-      
-      #if defined(CS_PLATFORM_UNIX)
-        ifstream memInfo("/proc/meminfo");
-
-        if (memInfo.fail())
-        {
-          cout << "Unable to get memory information!";
-          return 0;
-        }
-
-        string info, mem;
-        memInfo >> info >> mem;
-        long totalMemInKB = 0;
-
-        while (! (info.compare("MemTotal:") == 0) && !memInfo.eof())
-        {
-          memInfo >> info >> mem;
-        }
-
-        totalMemInKB = atol(mem.c_str());
-        memInfo.close();
-        return totalMemInKB;
-      #endif
-      
-      return 0;
+      // determine if the amount of physical memory has been cached
+	  if (memoryCached)
+	  {
+	  	// if so, return it
+		return cachedMemory;
+	  }
+	  
+	  // otherwise, use implementation-dependant function to get memory
+	  size_t currentMem = CS::Memory::Implementation::GetPhysicalMemory();
+	  
+	  // cache it
+	  cachedMemory = currentMem;
+	  memoryCached = true;
+	  
+	  // and return it 
+      return cachedMemory;
     }
 
   } // End namespace Memory

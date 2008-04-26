@@ -25,11 +25,11 @@
 namespace CS {
   namespace Memory {
 
-    /** @brief Retrieve the number of kB of physical system memory
+    /** @brief Retrieve the amount of physical system memory, in kB
      *
-     * @returns Physical system memory (in kB)
+     * @returns Physical system memory (in kB) on success, 0 otherwise
      */
-   CS_CRYSTALSPACE_EXPORT long GetPhysicalMemory();
+   CS_CRYSTALSPACE_EXPORT size_t GetPhysicalMemory();
 
   } // End namespace Memory
 } // End namespace CS

@@ -432,6 +432,11 @@ struct iSyntaxService : public virtual iBase
     iDocumentNode* child, iLoaderContext* ldr_context,
     csRef<csRefCount>& parseState, CS::Utility::PortalParameters& params,
     bool& handled) = 0;
+
+  /**
+   * Parse a user render buffer.
+   */
+  virtual bool ParseRenderBuffer (iDocumentNode* node, iRenderBuffer* buffer) = 0;
 };
 
 /** @} */

@@ -987,6 +987,8 @@ struct iEngine : public virtual iBase
 
   virtual csPtr<iCollectionArray> GetCollections() = 0;
 
+  virtual void RemoveCollection(iCollection* collect) = 0;
+
   virtual void RemoveCollection(const char* name) = 0;
 
   virtual void RemoveAllCollections() = 0;

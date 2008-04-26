@@ -528,8 +528,10 @@ void csLight::CalculateLighting ()
       iShadowReceiver* receiver = m->GetShadowReceiver ();
       if (receiver)
       {
-        receiver->CastShadows (m->GetMovable (), &lview);        
+        receiver->CastShadows (m->GetMovable (), &lview);
       }
+      csMeshWrapper* cmw = (csMeshWrapper*)m;
+      cmw->InvalidateRelevantLights ();
     }
   }
   else

@@ -502,6 +502,8 @@ public:
 
   virtual csPtr<iCollectionArray> GetCollections();
 
+  virtual void RemoveCollection(iCollection* collect);
+
   virtual void RemoveCollection(const char* name);
 
   virtual void RemoveAllCollections();
@@ -951,7 +953,7 @@ private:
   /// The list of all regions currently loaded.
   csRegionList regions;
   /// The hash of all collections currently existing.
-  csHash<iCollection*, csString> collections;
+  csHash<csRef<iCollection>, csString> collections;
 
   /// Sector callbacks.
   csRefArray<iEngineSectorCallback> sectorCallbacks;

@@ -16,6 +16,9 @@ chronological order.
 	     render to the depth target), tho unused.
 	- res renamed some shadow-related shaders and added depth bias scaling
 	  by a fake-gradient.
+	- res tweaked tangent space computation in
+	  csNormalMappingTools::CalculateTangents to avoid degenerate tangents
+	  and bitangents if the texture coordinate difference is zero.
 25-Apr-2008
 	- res adding caching support to xmlshader: the condition tree and
 	  document wrapper structures can be stored to disk now, eliminating
@@ -46,8 +49,25 @@ chronological order.
 	  variations: the priorities of snippets are used to discard variations
 	  where a snippet is used one time with a low but also a higher
 	  priority at the same time.
+	- Mike Gist fixed a crash in the rloop loader when ldr_context is null.
+	- res (blindly) fixed compilation on OS/X.
+	- Sueastside added 'meshref' loading to iLoader::Load().
 21-Apr-2008
 	- res started to work on a "shader cache" to reduce shader load times.
+	- Scott Johnson added implementation-dependant memutil.h and .cpp files
+	  no changes have been made to the running implementation yet. (i.e. they
+	  are all still commented out).
+20-Apr-2008
+	- Mike Gist changed the engine's collections hash to hold a reference to
+	  each collection. This fixes RemoveCollection (the collection wasn't
+	  freed due to a leaked reference).
+	- Mike Gist added an iEngine::RemoveCollection overload taking the
+	  iCollection to be removed as a parameter.
+	- Mike Gist fixed an assert in csCollection::ReleaseAllObjects caused
+	  by the creation of an iterator when this function is called by the
+	  dtor. Now it loops on the csObjectContainer instead.
+19-Apr-2008
+	- Jorrit fixed a few warnings in the new collections code.
 18-Apr-2008
 	- Marten fixed a bug in barriers where the case of spurious condition
 	  wakeup wasn't correctly handled.
@@ -75,6 +95,10 @@ chronological order.
 	  a program multiple times.
 	- res fixed the Cg shader plugin to not apply variable mappings on it's 
 	  first of the two FP compile passes.
+	- Mike Gist committed a better fix for dynamic lights not shining on
+	  certain objects from Jorrit. csLight::CalculateLighting() now marks
+	  RelevantLights as dirty correctly, instead of only when the mesh has
+	  a shadow receiver.
 17-Apr-2008
 	- Mike Gist made the following changes;
 	    - Added an InternalRefCount class, to be used where we want an
@@ -185,6 +209,8 @@ chronological order.
 	- res changed the possible bool value checking in xmlshader to not
 	  use the general float values stuff but something bit-based.
 	  Makes it a bit faster.
+	- Marten implemented a way to query the number of animations and
+	  animation by index in animation packet (factory).
 12-Apr-2008
 	- res worked around SWIG 1.3.33 breakage in the perl bindings.
 	- res added methods to iImage to query the image format as a "texture
@@ -195,6 +221,9 @@ chronological order.
 	- res changed the X window creation to set a background color when
 	  creating the window. This prevents a brief flash of undefined
 	  window contents on compiz (and possibly other WMs).
+10-Apr-2008
+	- Marten implemented software skinning of normals, tangents and
+	  binormals in animesh.
 9-Apr-2008
 	- res made the following changes:
 	    - Made string markers in gl3d have practically no cost if not
@@ -330,6 +359,9 @@ chronological order.
 	  screen if a mipmapped version isn't available.
 	- res added a GL driver db tweak to work around not very well working
 	  FBOs on ATI.
+	- Marten added method to csDualQuaternion for transforming without
+	  movements.
+	- Marten cleaned up software vertex skinning a bit.
 3-Apr-2008
 	- res added a workaround to configure to avoid -Wno-long-double
 	  warnings occuring with g++ 4.2.3.
@@ -411,6 +443,8 @@ chronological order.
 	- Mike Gist fixed a bug in the 3ds max exportSprite script and also 
 	  improved the formatting of the output.
 	- Marten added iMissingLoaderData to the python-exposed interfaces.
+	- Marten fixed the software skinning and animation to actually work
+	  correctly.
 30-Mar-2008
 	- res fixed PBOs not being bound before used in the texture blit code.
 	- res applied a patch from Lukas Erlinghagen to fix compiling on
@@ -640,6 +674,7 @@ chronological order.
 	- Marten fixed the placement of some deprecation warning disable
 	  /enable includes. Eliminated some 8000 wrong warnings on MSVC9.
 	- Marten fixed a broken include guard.
+	- Marten added a very primitive way to display skeletons.
 12-Mar-2008
 	- caedes implemented some empty methods in bullet physics plugin:
 	  - csBulletCollider: IsStatic
@@ -667,6 +702,11 @@ chronological order.
 	  matrix for rendering instead of perspective parameters.
 	- res added a simple "unshadowed" rendermanager and made it default.
 	- res beefed up simple1.
+	- Marten fixed a couple of bugs in the animation code.
+	- Marten changed so that skeletal state use quat+vector.
+	- Marten implemented first pieces of software skinning (of vertices)
+	  in animesh.
+	- Marten fixed two bugs in skeleton2 loader.
 11-Mar-2008
 	- res fixed build errors.
 	- res fixed CS/docs/support/prepare_online_publish.sh to use the right
@@ -729,6 +769,14 @@ chronological order.
 	  actual projection. (Unused and incomplete tho.)
 	- res added methods to the projection/custom matrix interfaces to
 	  quickly obtain the iCamera interface.
+	- Marten did a number of improvements to the animesh and skeleton
+	  loaders and interfaces:
+	    - Moved the skeletal animation interfaces to its own header.
+	    - Added a new level of containment in the skeletal animation
+	      to group together a number of animations and the node tree
+	      to blend them together.
+	    - Updated the loaders to load animation packets and to 
+	      connect skeleton and animation packet.
 08-Mar-2008
 	- res fixed a pattern in CS/docs/support/prepare_online_publish.sh that
 	  was still using a .php instead of a .html file name.
@@ -806,6 +854,18 @@ chronological order.
 	- res fixed some pointer formatting with unsigned longs recently
 	  introduced.
 	- res removed an int cast from csperl5. Should fix trac #394.
+	- Marten made a number of enhancements to skeleton2 and animesh:
+	   - Changed the animation interface so that data is handled
+	     as quaternion+vector instead of a dual quaternion.
+	   - Added methods to register an animation tree for later
+	     retrieval.
+	   - Added a loader for skeleton2 and animation hierarchies.
+	   - Added code to animesh to setup the SVs with bone transforms.
+	   - Added loading of bone/vertex influences.
+02-Mar-2008
+	- Marten changed the way render buffers are handled in animesh
+	  slightly. Removed SetVertexCount from API and <vertexcount>
+	  from file format.
 01-Mar-2008
 	- caedes added support for relative rotation operations to the
 	  sequence manager.
@@ -823,6 +883,16 @@ chronological order.
 	- res changed the 'glow' weaver snippet to declare vertex-to-fragment
 	  vars with XML.
 	- res added a first implementation of shadow mapping.
+	- Marten reduced the size of csShaderVariable a bit by joining
+	  a couple of members into a union.
+	- Marten added a member to csShaderVariable for accessor specific data.
+	- Marten implemented the basic functionality in the animesh factory
+	  and object.
+	- Marten extended iSyntaxService with a way to parse data into
+	  an already created iRenderBuffer.
+	- Marten implemented initial loader for animesh.
+28-Feb-2008
+	- Marten implemented the Blend animation node.
 27-Feb-2008
 	- res added a (still very bare) class for 4x4 matrices.
 	- res changed the libcrystalspace Jamfiles to exclude some files that
@@ -868,8 +938,11 @@ chronological order.
 	  "$cs_cv_pybase_lflags_base" being used, rather than the interpolation
 	  of that shell variable, in build attempts when detecting the Python
 	  link library. This should resolve issue #455.
+	- Marten implemented Skeleton & SkeletonFactory.
+	- Marten implemented basic skeletal animation playback.
 24-Feb-2008
 	- Vincent updated a bunch of URLs and FAQ entries in the manual.
+	- Marten added code stubs for the animated mesh and skeleton2.
 23-Feb-2008
 	- caedes added ivaria/sequence.h to scripting bindings.
 	- caedes added csgeom/obb.h to scripting bindings.
@@ -878,6 +951,10 @@ chronological order.
 	  The next job is to make the changes needed elsewhere to gain
 	  the benefits that collections bring.
 	- Mike Gist added csWeakRefArrayObject.
+	- Marten started work on new animated mesh:
+	    - Added later-to-be-used csDualQuaternion.
+	    - Wrote interface definitions for mesh and skeleton.
+	- Marten added plugin stub for new animated mesh.
 22-Feb-2008
 	- Mike Gist merged iLoaderCollection with iLoader, and formatted
 	  iLoader better.
@@ -888,7 +965,6 @@ chronological order.
 21-Feb-2008
 	- Mike Gist added the iCollection and iLoaderCollection interfaces,
 	  and csCollection.
-21-Feb-2008
 	- res fixed csimagetool to correctly get the optional argument for
 	  the save option.
 	- res restored r28657 which got accidentally lost in r28744.

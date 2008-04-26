@@ -3200,15 +3200,21 @@ iSector *csEngine::CreateSector (const char *name)
 
 iCollection* csEngine::CreateCollection(const char *name)
 {
-  iCollection* collection = GetCollection(name);
+  csRef<iCollection> collection = collections.Get(name, NULL);
   if(!collection)
   {
-    csCollection* collect = new csCollection();
+    csRef<csCollection> collect;
+    collect.AttachNew(new csCollection());
     collect->SetName(name);
-    collection = dynamic_cast<iCollection*>(collect);
+    collection = collect;
     collections.Put(name, collection);
   }
   return collection;
+}
+
+void csEngine::RemoveCollection(iCollection* collect)
+{
+  collections.Delete(collect->QueryObject()->GetName(), collect);
 }
 
 void csEngine::RemoveCollection(const char *name)
@@ -3222,8 +3228,8 @@ void csEngine::RemoveCollection(const char *name)
 
 void csEngine::RemoveAllCollections()
 {
-  csArray<iCollection*> cols = collections.GetAll();
-  for(int i=0; i<cols.GetSize(); i++)
+  csArray<csRef<iCollection> > cols = collections.GetAll();
+  for(size_t i=0; i<cols.GetSize(); i++)
   {
     RemoveCollection(cols[i]->QueryObject()->GetName());
   }
@@ -3319,7 +3325,7 @@ csPtr<iCollectionArray> csEngine::GetCollections()
 {
   csRef<iCollectionArray> colScfArr;
   colScfArr.AttachNew(
-    new scfArray<iCollectionArray, csArray<iCollection*> >(collections.GetAll()));
+    new scfArray<iCollectionArray, csArray<csRef<iCollection> > >(collections.GetAll()));
   return csPtr<iCollectionArray>(colScfArr);
 }
 

@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2003 by Mat Sutcliffe <oktal@gmx.co.uk>
-                          Marten Svanfeldt
+                  2003-2008 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -131,36 +131,6 @@ public:
     COLOR = VECTOR4
   };
 
-  //CS_LEAKGUARD_DECLARE (csShaderVariable);
-private:
-
-  VariableType Type;
-
-  csRef<iTextureHandle> TextureHandValue;
-  csRef<iTextureWrapper> TextureWrapValue;
-  csRef<iRenderBuffer> RenderBuffer;
-  csVector4 VectorValue;
-
-  int Int;
-  csMatrix3* MatrixValuePtr;
-  csReversibleTransform* TransformPtr;
-
-  csRef<iShaderVariableAccessor> accessor;
-
-  csRefArray<csShaderVariable> *shaderVarArray;
-
-  CS::ShaderVarStringID Name;
-
-  virtual csMatrix3* AllocateMatrixValuePtr(const csMatrix3 &value)
-  { return new csMatrix3 (value); }
-
-  virtual csReversibleTransform* AllocateTransformPtr(const csReversibleTransform &value)
-  { return new csReversibleTransform (value); }
-
-  virtual csRefArray<csShaderVariable>* AllocateShaderVarArray()
-  { return new csRefArray<csShaderVariable>; }
-
-public:
 
   /**
    * Construct without a name. SetName() must be called before the variable
@@ -169,15 +139,10 @@ public:
   csShaderVariable ();
   /// Construct with name.
   csShaderVariable (CS::ShaderVarStringID name);
-  csShaderVariable (const csShaderVariable& other) : csRefCount(),
-    MatrixValuePtr(0), TransformPtr (0), shaderVarArray(0), Name (0)
-    { *this = other; }
-  virtual ~csShaderVariable ()
-  {
-    delete MatrixValuePtr;
-    delete TransformPtr;
-    delete shaderVarArray;
-  }
+
+  csShaderVariable (const csShaderVariable& other);
+
+  virtual ~csShaderVariable ();  
 
   csShaderVariable& operator= (const csShaderVariable& copyFrom);
 
@@ -186,31 +151,51 @@ public:
   { 
     /* The accessor should be called at least once so the var has a proper
      * type set */
-    if ((Type == UNKNOWN) && accessor) accessor->PreGetValue (this);
+    if ((Type == UNKNOWN) && accessor) 
+      accessor->PreGetValue (this);
     return Type; 
   }
   /// Set type (calling this after SetValue will cause undefined behaviour)
-  void SetType (VariableType t) { Type = t; }
+  void SetType (VariableType t) 
+  {
+    NewType (t);
+  }
 
   /// Set an accessor to use when getting the value
-  void SetAccessor (iShaderVariableAccessor* a) { accessor = a;}
+  void SetAccessor (iShaderVariableAccessor* a, intptr_t extraData = 0) 
+  { 
+    accessor = a;
+    accessorData = extraData;
+  }
 
   /**
    * Set the name of the variable
    * \warning Changing the name of a variable while it's in use can cause 
-   *    inexpected behaviour.
+   *    unexpected behaviour.
    */
-  void SetName (CS::ShaderVarStringID newName)
-  { Name = newName; }
+  void SetName (CS::ShaderVarStringID newName) 
+  {
+    Name = newName; 
+  }
   
   /// Get the name of the variable
-  CS::ShaderVarStringID GetName () const
-  { return Name; }
+  CS::ShaderVarStringID GetName () const 
+  { 
+    return Name; 
+  }
+
+  /// Get the extra accessor data
+  intptr_t GetAccessorData () const
+  {
+    return accessorData;
+  }
 
   /// Retrieve an int
   bool GetValue (int& value)
   { 
-    if (accessor) accessor->PreGetValue (this);
+    if (accessor) 
+      accessor->PreGetValue (this);
+
     value = Int; 
     return true; 
   }
@@ -218,7 +203,9 @@ public:
   /// Retrieve a float
   bool GetValue (float& value)
   { 
-    if (accessor) accessor->PreGetValue (this);
+    if (accessor) 
+      accessor->PreGetValue (this);
+
     value = VectorValue.x; 
     return true; 
   }
@@ -226,7 +213,9 @@ public:
   /// Retrieve a color
   bool GetValue (csRGBpixel& value)
   {
-    if (accessor) accessor->PreGetValue (this);
+    if (accessor) 
+      accessor->PreGetValue (this);
+
     value.red = 
       (unsigned char) csClamp (int (VectorValue.x * 255.0f), 255, 0);
     value.green = 
@@ -241,25 +230,32 @@ public:
   /// Retrieve a texture handle
   bool GetValue (iTextureHandle*& value)
   {
-    if (accessor) accessor->PreGetValue (this);
-    value = TextureHandValue;
-    if (!value && TextureWrapValue)
-      value = TextureHandValue = TextureWrapValue->GetTextureHandle ();
+    if (accessor) 
+      accessor->PreGetValue (this);
+
+    value = texture.HandValue;
+
+    if (!value && texture.WrapValue)
+      value = texture.HandValue = texture.WrapValue->GetTextureHandle ();
     return true;
   }
 
   /// Retrieve a texture wrapper
   bool GetValue (iTextureWrapper*& value)
   {
-    if (accessor) accessor->PreGetValue (this);
-    value = TextureWrapValue;
+    if (accessor) 
+      accessor->PreGetValue (this);
+
+    value = texture.WrapValue;
     return true;
   }
 
   /// Retrieve a iRenderBuffer
   bool GetValue (iRenderBuffer*& value)
   {
-    if (accessor) accessor->PreGetValue (this);
+    if (accessor) 
+      accessor->PreGetValue (this);
+
     value = RenderBuffer;
     return true;
   }
@@ -267,7 +263,9 @@ public:
   /// Retrieve a csVector2
   bool GetValue (csVector2& value)
   {
-    if (accessor) accessor->PreGetValue (this);
+    if (accessor) 
+      accessor->PreGetValue (this);
+
     value.Set (VectorValue.x, VectorValue.y);
     return true;
   }
@@ -275,7 +273,9 @@ public:
   /// Retrieve a csVector3
   bool GetValue (csVector3& value)
   { 
-    if (accessor) accessor->PreGetValue (this);
+    if (accessor) 
+      accessor->PreGetValue (this);
+
     value.Set (VectorValue.x, VectorValue.y, VectorValue.z);
     return true; 
   }
@@ -283,7 +283,9 @@ public:
   /// Retrieve a csColor
   bool GetValue (csColor& value)
   { 
-    if (accessor) accessor->PreGetValue (this);
+    if (accessor) 
+      accessor->PreGetValue (this);
+
     value.Set (VectorValue.x, VectorValue.y, VectorValue.z);
     return true; 
   }
@@ -291,7 +293,9 @@ public:
   /// Retrieve a csVector4
   bool GetValue (csVector4& value)
   { 
-    if (accessor) accessor->PreGetValue (this);
+    if (accessor) 
+      accessor->PreGetValue (this);
+
     value = VectorValue; 
     return true; 
   }
@@ -299,7 +303,9 @@ public:
   /// Retrieve a csQuaternion
   bool GetValue (csQuaternion& value)
   { 
-    if (accessor) accessor->PreGetValue (this);
+    if (accessor) 
+      accessor->PreGetValue (this);
+
     value.Set (VectorValue.x, VectorValue.y, VectorValue.z, VectorValue.w);
     return true; 
   }
@@ -307,32 +313,32 @@ public:
   /// Retrieve a csMatrix3
   bool GetValue (csMatrix3& value)
   {
-    if (accessor) accessor->PreGetValue (this);
-    if (MatrixValuePtr)
+    if (accessor) 
+      accessor->PreGetValue (this);
+
+    if (Type == MATRIX)
     {
       value = *MatrixValuePtr;
       return true;
     }
-    else
-    {
-      value = csMatrix3();
-    }
+    
+    value = csMatrix3();    
     return false;
   }
 
   /// Retrieve a csReversibleTransform
   bool GetValue (csReversibleTransform& value)
   {
-    if (accessor) accessor->PreGetValue (this);
-    if (TransformPtr)
+    if (accessor)
+      accessor->PreGetValue (this);
+
+    if (Type == TRANSFORM)
     {
       value = *TransformPtr;
       return true;
     }
-    else
-    {
-      value = csReversibleTransform();
-    }
+    
+    value = csReversibleTransform();    
     return false;
   }
 
@@ -340,7 +346,9 @@ public:
   /// Store an int
   bool SetValue (int value) 
   { 
-    Type = INT; 
+    if (Type != INT)
+      NewType (INT);
+
     Int = value; 
     float f = (float)value;
     VectorValue.Set (f, f, f, f);
@@ -350,7 +358,9 @@ public:
   /// Store a float
   bool SetValue (float value)
   { 
-    Type = FLOAT; 
+    if (Type != FLOAT)
+      NewType (FLOAT);
+
     Int = (int)value;
     VectorValue.Set (value, value, value, value);
     return true; 
@@ -358,8 +368,10 @@ public:
 
   /// Store a color
   bool SetValue (const csRGBpixel &value)
-  {
-    Type = COLOR;
+  {    
+    if (Type != COLOR)
+      NewType (COLOR);
+
     VectorValue.x = (float)value.red / 255.0f;
     VectorValue.y = (float)value.green / 255.0f;
     VectorValue.z = (float)value.blue / 255.0f;
@@ -369,32 +381,49 @@ public:
 
   /// Store a texture handle
   bool SetValue (iTextureHandle* value)
-  {
-    Type = TEXTURE;
-    TextureHandValue = value;
+  {    
+    if (Type != TEXTURE)
+      NewType (TEXTURE);
+
+    texture.HandValue = value;
+    
+    if (value)
+      value->IncRef ();
     return true;
   }
 
   /// Store a texture wrapper
   bool SetValue (iTextureWrapper* value)
-  {
-    Type = TEXTURE;
-    TextureWrapValue = value;
+  {    
+    if (Type != TEXTURE)
+      NewType (TEXTURE);
+
+    texture.WrapValue = value;
+    
+    if (value)
+      value->IncRef ();
     return true;
   }
 
   /// Store a render buffer
   bool SetValue (iRenderBuffer* value)
-  {
-    Type = RENDERBUFFER;
+  {    
+    if (Type != RENDERBUFFER)
+      NewType (RENDERBUFFER);
+
     RenderBuffer = value;
+    
+    if (value)
+      value->IncRef ();
     return true;
   }
 
   /// Store a csVector2
   bool SetValue (const csVector2 &value)
   {
-    Type = VECTOR2;
+    if (Type != VECTOR2)
+      NewType (VECTOR2);
+    
     VectorValue.Set (value.x, value.y, 0.0f, 1.0f);
     Int = (int)value.x;
     return true;
@@ -403,7 +432,9 @@ public:
   /// Store a csVector3
   bool SetValue (const csVector3 &value)
   { 
-    Type = VECTOR3; 
+    if (Type != VECTOR3)
+      NewType (VECTOR3);
+
     VectorValue.Set (value.x, value.y, value.z, 1.0f);
     Int = (int)value.x;
     return true; 
@@ -412,7 +443,9 @@ public:
   /// Store a csColor
   bool SetValue (const csColor& value)
   { 
-    Type = VECTOR3; 
+    if (Type != VECTOR3)
+      NewType (VECTOR3);
+
     VectorValue.Set (value.red, value.green, value.blue, 1.0f);
     Int = (int)value.red;
     return true; 
@@ -421,7 +454,9 @@ public:
   /// Store a csVector4
   bool SetValue (const csVector4 &value)
   { 
-    Type = VECTOR4; 
+    if (Type != VECTOR4)
+      NewType (VECTOR4);
+
     VectorValue.Set (value.x, value.y, value.z, value.w);
     Int = (int)value.x;
     return true; 
@@ -429,7 +464,9 @@ public:
 
   bool SetValue (const csQuaternion& value)
   {
-    Type = VECTOR4;
+    if (Type != VECTOR4)
+      NewType (VECTOR4);
+
     VectorValue.Set (value.v.x, value.v.y, value.v.z, value.w);
     return true;
   }
@@ -437,61 +474,50 @@ public:
   /// Store a csMatrix3
   bool SetValue (const csMatrix3 &value)
   {
-    Type = MATRIX;
-    if (MatrixValuePtr)
-    {
-      *MatrixValuePtr = value;
-    }
-    else
-    {
-      MatrixValuePtr = AllocateMatrixValuePtr(value);
-    }
+    if (Type != MATRIX)
+      NewType (MATRIX);
+
+    *MatrixValuePtr = value;
+        
     return true;
   }
 
   /// Store a csReversibleTransform
   bool SetValue (const csReversibleTransform &value)
   {
-    Type = TRANSFORM;
-    if (TransformPtr)
-    {
-      *TransformPtr = value;
-    }
-    else
-    {
-      TransformPtr = AllocateTransformPtr(value);
-    }
+    if (Type != TRANSFORM)
+      NewType (TRANSFORM);
+
+    *TransformPtr = value;
+   
     return true;
   }
 
   void AddVariableToArray (csShaderVariable *variable)
   {
-    if (shaderVarArray) shaderVarArray->Push (variable);
+    if (Type == ARRAY) 
+      ShaderVarArray->Push (variable);
   }
 
   void RemoveFromArray (size_t element)
   {
-    if (shaderVarArray) shaderVarArray->DeleteIndex (element);
+    if (Type == ARRAY) 
+      ShaderVarArray->DeleteIndex (element);
   }
 
   /// Set the number of elements in an array variable
   void SetArraySize (size_t size)
   {
-    Type = ARRAY;
-    if (shaderVarArray == 0)
-    {
-      shaderVarArray = AllocateShaderVarArray();
-    }
-    shaderVarArray->SetSize (size);
+    if (Type != ARRAY)
+      NewType (ARRAY);
+
+    ShaderVarArray->SetSize (size);
   }
 
   /// Get the number of elements in an array variable
   size_t GetArraySize ()
   {
-    if (shaderVarArray == 0)
-      return 0;
-    else
-      return shaderVarArray->GetSize ();
+    return (Type == ARRAY) ? ShaderVarArray->GetSize () : 0;
   }
 
   /**
@@ -501,9 +527,9 @@ public:
    */
   csShaderVariable *GetArrayElement (size_t element)
   {
-    if (shaderVarArray != 0 && element<shaderVarArray->GetSize ())
+    if (Type == ARRAY && element < ShaderVarArray->GetSize ())
     {
-      return shaderVarArray->Get (element);
+      return ShaderVarArray->Get (element);
     }
     return 0;
   }
@@ -513,8 +539,35 @@ public:
    */
   void SetArrayElement (size_t element, csShaderVariable *variable)
   {
-    shaderVarArray->Put (element, variable);
+    ShaderVarArray->Put (element, variable);
   }
+
+private:
+  csStringID Name;
+  VariableType Type;
+
+  // Storage for types that can be combined..
+  union
+  {
+    // Refcounted
+    struct
+    {
+      iTextureHandle* HandValue;
+      iTextureWrapper* WrapValue;
+    } texture;    
+    iRenderBuffer* RenderBuffer;
+
+    int Int;
+    csMatrix3* MatrixValuePtr;
+    csReversibleTransform* TransformPtr;
+    csRefArray<csShaderVariable> *ShaderVarArray;
+  };
+
+  csVector4 VectorValue;  
+  csRef<iShaderVariableAccessor> accessor;
+  intptr_t accessorData;
+
+  virtual void NewType (VariableType nt);
 };
 
 namespace CS

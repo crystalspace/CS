@@ -35,7 +35,7 @@ invoke the @emph{Tools/Compiler Options} menu item and click on the green
 active in the popup and then switch to the @emph{Directories} tab.  On that tab
 change the path of everything to point to your MinGW installation rather than
 the Dev-@sc{cpp} versions. In the @emph{Binaries} sub-tab you have to add both
-the @file{bin} directory of MinGW, as well as the the @file{bin} directory of
+the @file{bin} directory of MinGW, as well as the @file{bin} directory of
 @sc{msys}, and remove the path to Dev-@sc{cpp}. In the @emph{Libraries}
 sub-tab add the path to the MinGW @file{lib} directory, and remove the path
 to Dev-@sc{cpp}. Do the same for on @emph{C Includes} sub-tab, add MinGW and

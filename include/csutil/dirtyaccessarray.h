@@ -86,7 +86,7 @@ public:
    */
   T* GetArrayCopy ()
   {
-    if (this->Length () > 0) // see *1*
+    if (this->GetSize () > 0) // see *1*
     {
       T* copy = new T [this->GetSize ()];
       memcpy (copy, &this->Get (0), sizeof (T) * this->GetSize ());
