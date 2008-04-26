@@ -9,6 +9,13 @@ chronological order.
 26-Apr-2008
 	- res improved error reporting by the Cg shader plugin when loading
 	  fails.
+	- res made the following changes to the PSSM render manager component:
+	   - Render to shadow map with correct face flipping (previously,
+	     backfaces instead of front faces were rendered).
+	   - Add some code "ID textures" (or, more general, don't just
+	     render to the depth target), tho unused.
+	- res renamed some shadow-related shaders and added depth bias scaling
+	  by a fake-gradient.
 25-Apr-2008
 	- res adding caching support to xmlshader: the condition tree and
 	  document wrapper structures can be stored to disk now, eliminating

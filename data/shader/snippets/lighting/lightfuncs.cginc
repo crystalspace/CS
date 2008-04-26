@@ -15,7 +15,8 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
-<include><![CDATA[
+<include>
+<![CDATA[
 
 #ifndef __LIGHTFUNCS_CG_INC__
 #define __LIGHTFUNCS_CG_INC__
@@ -143,23 +144,31 @@ struct LightPropertiesShadowMap
   float4x4 shadowMapTF[MAX_LIGHTS];
   // Shadow map
   sampler2D shadowMap[MAX_LIGHTS];
+  // Shadow map pixel size + dimensions
+  float4 shadowMapPixels[MAX_LIGHTS];
 };
 LightPropertiesShadowMap lightPropsSM;
 
-struct ShadowShadowMap : Shadow
+struct ShadowShadowMapDepth : Shadow
 {
+  float4x4 shadowMapTF;
   float4 shadowMapCoords;
+  float4 shadowMapCoordsProj;
   sampler2D shadowMap;
+  float bias;
+  float gradient;
 
   void InitVP (int lightNum, float4 surfPositionWorld,
-               out float4 vp_shadowMapCoords)
+               float3 normWorld,
+               out float4 vp_shadowMapCoords,
+               out float vp_gradientApprox)
   {
     float4x4 lightTransformInv = lightProps.transformInv[lightNum];
     // Transform world position into light space
     float4 view_pos = mul(lightTransformInv, surfPositionWorld);
     // Transform position in light space into "shadow map space"
     float4 shadowMapCoords;
-    float4x4 shadowMapTF = lightPropsSM.shadowMapTF[lightNum];
+    shadowMapTF = lightPropsSM.shadowMapTF[lightNum];
     /* CS' render-to-texture Y-flips render targets (so the upper left
        gets rendered to 0,0), we need to unflip here again. */
     float4x4 flipY;
@@ -171,24 +180,35 @@ struct ShadowShadowMap : Shadow
     shadowMapCoords = mul (shadowMapTF, view_pos);
     
     vp_shadowMapCoords = shadowMapCoords;
+    
+    float3 normL = mul(lightTransformInv, float4 (normWorld, 0)).xyz;
+    float3 normShadow = normalize (mul (shadowMapTF, float4 (normL, 0)).xyz);
+    vp_gradientApprox = 1 - saturate (dot (normShadow, float3 (0, 0, -1)));
   }
   
-  void Init (int lightNum, float4 vp_shadowMapCoords)
+  void Init (int lightNum, float4 vp_shadowMapCoords, float vp_gradient)
   {
     shadowMapCoords = vp_shadowMapCoords;
     shadowMap = lightPropsSM.shadowMap[lightNum];
+    gradient = vp_gradient;
+    
+    // Project SM coordinates
+    shadowMapCoordsProj = shadowMapCoords;
+    shadowMapCoordsProj.xyz /= shadowMapCoordsProj.w;
+    shadowMapCoordsProj.xyz = (float3(0.5)*shadowMapCoordsProj.xyz) + float3(0.5);
+    
+    // @@@ FIXME: Needing such a high bias scale seems ridiculous!
+    // Maybe fixing #471 would allow to reduce it.
+    bias = (1.0/32768.0);
+    bias *= 1 + (gradient*gradient*256);
   }
   
   half GetVisibility()
   {
-    // Project SM coordinates
-    shadowMapCoords.xyz /= shadowMapCoords.w;
-    shadowMapCoords.xyz = (float3(0.5)*shadowMapCoords.xyz) + float3(0.5);
-    
     // Depth to compare against
-    float compareDepth = shadowMapCoords.z + (1.0/32768.0);
+    float compareDepth = shadowMapCoordsProj.z + bias;
     // Depth compare with shadow map texel
-    half inLight = h4tex2D (shadowMap, float3 (shadowMapCoords.xy, compareDepth)).x;
+    half inLight = h4tex2D (shadowMap, float3 (shadowMapCoordsProj.xy, compareDepth)).x;
     return inLight;
   }
 };

@@ -46,6 +46,20 @@
 	<!-- Surface normal -->
 	<input name="normal" type="normal_tangent" />
 	
+	<input name="objectToWorld" type="float4x4" default="complex" private="yes">
+	  <block location="cg:vertexIn">
+	    <uniform type="float4x4" name="objectToWorld" />
+	  </block>
+	  
+	  <block location="cg:vertexMain">
+	    objectToWorldInv = vertexIn.objectToWorld;
+	  </block>
+	  
+	  <block location="cg:variablemap">
+	    <variablemap variable="object2world transform" 
+			 destination="vertexIn.objectToWorld" />
+	  </block>
+	</input>
 	<input name="objectToWorldInv" type="float4x4" default="complex" private="yes">
 	  <block location="cg:vertexIn">
 	    <uniform type="float4x4" name="objectToWorldInv" />
@@ -131,7 +145,6 @@
 	
 	<block location="cg:definitions">
 	  <?Include /shader/snippets/lighting/lightfuncs.cginc ?>
-	  
 	</block>
 	
 	<!-- @@@ The Cg combiner process the <uniform ... /> tags *before*
@@ -141,7 +154,7 @@
 	
 	<block location="cg:vertexToFragment">
 	  <varying type="direction" name="surfToLight[8]" />
-	  <varying type="direction" name="lightDir[8]" />
+	  <varying type="float4" name="lightDir[8]" />
 	  <varying type="float4" name="shadowMapCoords[8]" />
 	</block>
 	
@@ -157,7 +170,7 @@
 	  float4x4 world2tang = mul (obj2tang, objectToWorldInv);
 	  
 	  LightSpaceTangent lspace;
-	  ShadowShadowMap shadow;
+	  ShadowShadowMapDepth shadow;
 	  <![CDATA[
           for (int l = 0; l < maxLights; l++)
 	  {
@@ -167,11 +180,14 @@
 	    int i = lightOffset + l;
 	    half3 vp_dir;
 	    lspace.InitVP (i, world2tang, positionW, vp_dir, surfToLight[l]);
-	    lightDir[l] = vp_dir;
+	    lightDir[l].xyz = vp_dir;
 	    
 	    float4 vp_shadowMapCoords;
-	    shadow.InitVP (i, positionW, vp_shadowMapCoords);
+	    float vp_gradient;
+	    float3 normW = mul (objectToWorld, float4 (Normal, 0)).xyz;
+	    shadow.InitVP (i, positionW, normW , vp_shadowMapCoords, vp_gradient);
 	    shadowMapCoords[l] = vp_shadowMapCoords;
+	    lightDir[l].w = vp_gradient;
 	  }
 	  diffuseColor_attr_perfragment = true;
 	  specularColor_attr_perfragment = true;
@@ -189,11 +205,11 @@
 	  ]]>
 	    int i = lightOffset + l;
 	    LightSpaceTangent lightSpace;
-	    lightSpace.Init (lightDir[l], surfToLight[l]);
+	    lightSpace.Init (lightDir[l].xyz, surfToLight[l]);
 	    
 	    <?if vars."light shadow map" ?>
-	    ShadowShadowMap shadow;
-	    shadow.Init (l, shadowMapCoords[l]);
+	    ShadowShadowMapDepth shadow;
+	    shadow.Init (l, shadowMapCoords[l], lightDir[l].w);
 	    <?else?>
 	    ShadowNone shadow;
 	    <?endif?>

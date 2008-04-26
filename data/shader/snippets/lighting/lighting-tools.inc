@@ -44,6 +44,8 @@
   <?Template Lighting_ShadowMap_Variablemaps?>
     <variablemap variable="light shadow map projection" 
 		 destination="lightPropsSM.shadowMapTF" />
+    <variablemap variable="light shadow map pixel size" 
+		 destination="lightPropsSM.shadowMapPixels" />
   <?Endtemplate?>
   
   <?SEndIf?>
