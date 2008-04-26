@@ -543,7 +543,7 @@ public:
   }
 
 private:
-  csStringID Name;
+  CS::ShaderVarStringID Name;
   VariableType Type;
 
   // Storage for types that can be combined..
