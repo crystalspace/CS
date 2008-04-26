@@ -96,6 +96,10 @@ public:
     lightShadowMap,
     /// Shadow map projection matrix
     lightShadowMapProjection,
+    /// Shadow map ID texture
+    lightShadowMapID,
+    /// Shadow map pixel sizes + dimensions
+    lightShadowMapPixelSize,
 
     /// Number of properties
     _lightCount

@@ -37,6 +37,10 @@ namespace CS
 {
 namespace RenderManager
 {
+  struct ShadowPSSMExtraMeshData
+  {
+    csRef<csShaderVariable> svMeshID;
+  };
 
   template<typename RenderTree, typename LayerConfigType>
   class ShadowPSSM
@@ -54,10 +58,13 @@ namespace RenderManager
       float lx, rx, ty, by;
       
       SingleRenderLayer depthRenderLayer;
+      uint lastMeshID;
+      csHash<csRef<csShaderVariable>, csPtrKey<iShaderVariableContext> > meshIDs;
       
       ViewSetup (PersistentData& persist, CS::RenderManager::RenderView* rview)
        : persist (persist), rview (rview),
-         depthRenderLayer (persist.shadowShaderType, persist.defaultShadowShader)
+         depthRenderLayer (persist.shadowShaderType, persist.defaultShadowShader),
+         lastMeshID (0)
       {
 	// PSSM: split layers
 	
@@ -100,6 +107,8 @@ namespace RenderManager
         CS::Math::Matrix4 world2lightNorm;
 	csShaderVariable* shadowMapSV;
 	csShaderVariable* shadowMapProjectSV;
+	csShaderVariable* shadowMapIDSV;
+	csShaderVariable* shadowMapDimSV;
 	
 	csArray<csBox3> containedObjects;
       };
@@ -174,6 +183,12 @@ namespace RenderManager
 		CS::InvalidShaderVarStringID);
 	      lightFrustum.shadowMapProjectSV->SetArrayElement (i, item);
 	    }
+	    lightFrustum.shadowMapIDSV = lightVarsHelper.CreateTempSV (
+	      viewSetup.persist.svNames.GetLightSVId (
+		csLightShaderVarCache::lightShadowMapID));
+	    lightFrustum.shadowMapDimSV = lightVarsHelper.CreateTempSV (
+	      viewSetup.persist.svNames.GetLightSVId (
+		csLightShaderVarCache::lightShadowMapPixelSize));
 	  }
         
           frustumsSetup = true;
@@ -182,7 +197,8 @@ namespace RenderManager
       
       void AddShadowMapTarget (typename RenderTree::MeshNode* meshNode,
 	PersistentData& persist, const SingleRenderLayer& layerConfig,
-	RenderTree& renderTree, iLight* light, CachedLightData& lightData)
+	RenderTree& renderTree, iLight* light, CachedLightData& lightData,
+	ViewSetup& viewSetup)
       {
         typename RenderTree::ContextNode& context = meshNode->owner;
       
@@ -196,7 +212,7 @@ namespace RenderManager
 	#include "csutil/custom_new_disable.h"
 	  csRef<CS::RenderManager::RenderView> newRenderView;
 	  newRenderView.AttachNew (new (
-	    renderTree.GetPersistentData().renderViewPool) RenderView (*rview)); // @@@ rview copy needed?
+	    renderTree.GetPersistentData().renderViewPool) RenderView);
 	#include "csutil/custom_new_enable.h"
 	  newRenderView->SetEngine (rview->GetEngine ());
 	  newRenderView->SetThisSector (rview->GetThisSector ());
@@ -218,8 +234,8 @@ namespace RenderManager
 	  CS::Math::Matrix4 crop (
 	    2.0f/frustW, 0, 0, 
 	      (-1.0f * (allObjsBox.MaxX() + allObjsBox.MinX()))/frustW,
-	    0, 2.0f/frustH, 0,
-	      (-1.0f * (allObjsBox.MaxY() + allObjsBox.MinY()))/frustH,
+	    0, -2.0f/frustH, 0,
+	      (1.0f * (allObjsBox.MaxY() + allObjsBox.MinY()))/frustH,
 	    0, 0, 1, 0,
 	    0, 0, 0, 1);
 	  /* The minimum Z over all parts is used to avoid clipping shadows of 
@@ -247,12 +263,22 @@ namespace RenderManager
 	  }
 	      
 	  shadowMapSize = 1024;
+	  lightFrust.shadowMapDimSV->SetValue (csVector4 (1.0f/shadowMapSize,
+	    1.0f/shadowMapSize, shadowMapSize, shadowMapSize));
   
-	  iTextureHandle* shadowTex = persist.texCache.QueryUnusedTexture (
+	  iTextureHandle* shadowTex = persist.texCacheDepth.QueryUnusedTexture (
 	    shadowMapSize, shadowMapSize, 0);
 	  lightFrust.shadowMapSV->SetValue (shadowTex);
-	  
 	  renderTree.AddDebugTexture (shadowTex);
+	  
+	  iTextureHandle* shadowIDTex = 0;
+	  if (persist.doIDTexture)
+	  {
+	    shadowIDTex = persist.texCacheID.QueryUnusedTexture (
+	      shadowMapSize, shadowMapSize, 0);
+	    lightFrust.shadowMapIDSV->SetValue (shadowIDTex);
+	    renderTree.AddDebugTexture (shadowIDTex);
+	  }
   
 	  csBox2 clipBox (0, 0, shadowMapSize, shadowMapSize);
 	  csRef<iClipper2D> newView;
@@ -262,12 +288,13 @@ namespace RenderManager
 	  // Create a new context for shadow map w/ computed view
 	  typename RenderTree::ContextNode* shadowMapCtx = 
 	    renderTree.CreateContext (newRenderView);
+	  shadowMapCtx->renderTargets[rtaColor0].texHandle = shadowIDTex;
 	  shadowMapCtx->renderTargets[rtaDepth].texHandle = shadowTex;
 	  shadowMapCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
   
 	  // Setup the new context
 	  ShadowmapContextSetup contextFunction (layerConfig,
-	    persist.shaderManager);
+	    persist.shaderManager, viewSetup, persist.doIDTexture);
 	  contextFunction (*shadowMapCtx);
 	}
       }
@@ -282,10 +309,46 @@ namespace RenderManager
 private:
     class ShadowmapContextSetup
     {
+      class MeshIDSVSetup
+      {
+      public:    
+	MeshIDSVSetup (SVArrayHolder& svArrays, ViewSetup& viewSetup) 
+	 : svArrays (svArrays), viewSetup (viewSetup)
+	{
+	  tempStack.Setup (svArrays.GetNumSVNames ());
+	}
+    
+	void operator() (typename RenderTree::MeshNode* node)
+	{
+	  for (size_t i = 0; i < node->meshes.GetSize (); ++i)
+	  {
+	    typename RenderTree::MeshNode::SingleMesh& mesh = node->meshes[i];
+	    csShaderVariable* svMeshID = viewSetup.meshIDs.Get (mesh.meshObjSVs, 0);
+	    if (!svMeshID) continue;
+	    
+	    tempStack[svMeshID->GetName()] = svMeshID;
+	    
+	    for (size_t layer = 0; layer < svArrays.GetNumLayers(); ++layer)
+	    {
+	      // Back-merge it onto the real one
+	      csShaderVariableStack localStack;
+	      svArrays.SetupSVStack (localStack, layer, mesh.contextLocalId);
+	      localStack.MergeFront (tempStack);
+	    }
+	  }
+	}
+    
+      private:
+	SVArrayHolder& svArrays; 
+	csShaderVariableStack tempStack;
+	ViewSetup& viewSetup;
+      };
     public:
       ShadowmapContextSetup (const SingleRenderLayer& layerConfig,
-        iShaderManager* shaderManager)
-	: layerConfig (layerConfig), shaderManager (shaderManager)
+        iShaderManager* shaderManager, ViewSetup& viewSetup,
+        bool doIDTexture)
+	: layerConfig (layerConfig), shaderManager (shaderManager),
+	  viewSetup (viewSetup), doIDTexture (doIDTexture)
       {
     
       }
@@ -299,8 +362,7 @@ private:
 	rview->SetThisSector (sector);
 	sector->CallSectorCallbacks (rview);
 	// Make sure the clip-planes are ok
-	// @@@ FIXME: Seems broken!
-	//CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext ());
+	CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext ());
     
 	// Do the culling
 	iVisibilityCuller* culler = sector->GetVisibilityCuller ();
@@ -332,6 +394,13 @@ private:
     
 	  ForEachMeshNode (context, svSetup);
 	}
+	// Set up mesh ID SVs
+	if (doIDTexture)
+	{
+	  MeshIDSVSetup svSetup (context.svArrays, viewSetup);
+    
+	  ForEachMeshNode (context, svSetup);
+	}
     
 	SetupStandardShader (context, shaderManager, layerConfig);
     
@@ -343,6 +412,8 @@ private:
     private:
       const SingleRenderLayer& layerConfig;
       iShaderManager* shaderManager;
+      ViewSetup& viewSetup;
+      bool doIDTexture;
     };
   public:
 
@@ -356,14 +427,23 @@ private:
       csStringID shadowShaderType;
       csRef<iStringSet> strings;
       csRef<iShader> defaultShadowShader;
+      CS::ShaderVarStringID svMeshIDName;
 
-      TextureCache texCache;
+      TextureCache texCacheDepth;
+      TextureCache texCacheID;
+      
+      bool doIDTexture;
 
       PersistentData() : frameNum (0),
-        texCache (csimg2D, "d32", 
+        texCacheDepth (csimg2D, "d32", 
           CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP,
           "shadowmap", 
-          TextureCache::tcachePowerOfTwo | TextureCache::tcacheExactSizeMatch)
+          TextureCache::tcachePowerOfTwo | TextureCache::tcacheExactSizeMatch),
+        texCacheID (csimg2D, "argb8", 
+          CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP | CS_TEXTURE_NOFILTER,
+          "shadowmap", 
+          TextureCache::tcachePowerOfTwo | TextureCache::tcacheExactSizeMatch),
+        doIDTexture (false)
       {
       }
 
@@ -379,16 +459,19 @@ private:
 	strings = csQueryRegistryTagInterface<iStringSet> (objectReg,
 	  "crystalspace.shared.stringset");
       
-        texCache.SetG3D (g3d);
+        texCacheDepth.SetG3D (g3d);
+        texCacheID.SetG3D (g3d);
         this->shaderManager = shaderManager;
         iShaderVarStringSet* strings = shaderManager->GetSVNameStringset();
 	svNames.SetStrings (strings);
+	svMeshIDName = strings->Request ("shadowmap mesh id");
       }
       void UpdateNewFrame ()
       {
         frameNum++;
         csTicks time = csGetTicks ();
-        texCache.AdvanceFrame (time);
+        texCacheDepth.AdvanceFrame (time);
+        texCacheID.AdvanceFrame (time);
       }
 
       const char* GetShadowShaderType () const
@@ -419,6 +502,16 @@ private:
       lightData.SetupFrame (viewSetup, light);
       LightingVariablesHelper lightVarsHelper (viewSetup.persist.lightVarsPersist);
       
+      if (persist.doIDTexture && !singleMesh.svMeshID.IsValid())
+      {
+        singleMesh.svMeshID = lightVarsHelper.CreateTempSV (
+	  viewSetup.persist.svMeshIDName);
+        lightStack[singleMesh.svMeshID->GetName()] = singleMesh.svMeshID;
+        uint meshID = ++viewSetup.lastMeshID;
+        singleMesh.svMeshID->SetValue ((int)meshID);
+        viewSetup.meshIDs.Put (singleMesh.meshObjSVs, singleMesh.svMeshID);
+      }
+      
       const csReversibleTransform& world2light (
         light->GetMovable()->GetFullTransform());
       
@@ -435,13 +528,17 @@ private:
         if (!lightData.lightFrustums[f].volume.TestIntersect (meshBboxLight))
           continue;
       
-      lightData.lightFrustums[f].containedObjects.Push (meshBboxLight);
+        lightData.lightFrustums[f].containedObjects.Push (meshBboxLight);
       
 	// Add shadow map SVs
 	lightVarsHelper.MergeAsArrayItem (lightStack, 
 	  lightData.lightFrustums[f].shadowMapSV, lightNum);
 	lightVarsHelper.MergeAsArrayItem (lightStack,
 	  lightData.lightFrustums[f].shadowMapProjectSV, lightNum);
+	lightVarsHelper.MergeAsArrayItem (lightStack, 
+	  lightData.lightFrustums[f].shadowMapIDSV, lightNum);
+	lightVarsHelper.MergeAsArrayItem (lightStack, 
+	  lightData.lightFrustums[f].shadowMapDimSV, lightNum);
 	  
 	break;
       }
@@ -451,7 +548,7 @@ private:
     void FinalHandleLight (iLight* light, CachedLightData& lightData)
     {
       lightData.AddShadowMapTarget (meshNode, persist,
-        viewSetup.depthRenderLayer, renderTree, light, lightData);
+        viewSetup.depthRenderLayer, renderTree, light, lightData, viewSetup);
       
       lightData.ClearFrameData();
     }

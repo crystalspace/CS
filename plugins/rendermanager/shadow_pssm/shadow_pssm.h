@@ -29,6 +29,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
 {
   template<typename RenderTreeType, typename LayerConfigType>
   class StandardContextSetup;
+  
+  class RenderTreeTraits : public CS::RenderManager::RenderTreeStandardTraits
+  {
+  public:
+    typedef CS::RenderManager::ShadowPSSMExtraMeshData MeshExtraDataType;
+  };
 
   class RMShadowedPSSM : public scfImplementation4<RMShadowedPSSM, 
                                                  iRenderManager, 
@@ -77,7 +83,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
       return false;
     }
 
-    typedef CS::RenderManager::RenderTree<> RenderTreeType;
+    typedef CS::RenderManager::RenderTree<RenderTreeTraits> RenderTreeType;
 
     typedef StandardContextSetup<RenderTreeType, 
       CS::RenderManager::MultipleRenderLayer> ContextSetupType;
