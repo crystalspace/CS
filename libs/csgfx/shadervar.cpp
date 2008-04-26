@@ -134,8 +134,6 @@ csShaderVariable::~csShaderVariable ()
   default:
     ;
   }
-  
-  Type = nt;
 }
 
 csShaderVariable& csShaderVariable::operator= (const csShaderVariable& copyFrom)
@@ -270,5 +268,7 @@ void csShaderVariable::NewType (VariableType nt)
   default:
     ;
   }
+  
+  Type = nt;
 }
 
