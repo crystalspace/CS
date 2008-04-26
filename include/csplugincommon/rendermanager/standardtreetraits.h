@@ -52,10 +52,6 @@ namespace RenderManager
     {     
     };
     
-    struct ContextsContainerExtraDataType
-    {            
-    };
-
     // Any extra data per mesh in a single mesh 
     struct MeshExtraDataType
     {      

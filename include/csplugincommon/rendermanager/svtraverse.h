@@ -45,7 +45,7 @@ namespace RenderManager
       iShader* lastShader = 0;
       size_t lastTicket = ~0;
 
-      for (size_t layer = 0; layer < context.GetLayerCount (); ++layer)
+      for (size_t layer = 0; layer < context.svArrays.GetNumLayers(); ++layer)
       {
         const size_t layerOffset = context.totalRenderMeshes*layer;
         
