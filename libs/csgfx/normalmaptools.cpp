@@ -78,8 +78,16 @@ void csNormalMappingTools::CalculateTangents (size_t numTriangles,
       r = 1.0f / div;
     csVector3 sdir ((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r, 
       (t2 * z1 - t1 * z2) * r);
-    const csVector3 tdir((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r, 
+    if (sdir.IsZero())
+    {
+      sdir = v2 - v1;
+    }
+    csVector3 tdir((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r, 
       (s1 * z2 - s2 * z1) * r);
+    if (tdir.IsZero())
+    {
+      tdir = v3 - v1;
+    }
     outTangents[i1] += sdir;
     outTangents[i2] += sdir;
     outTangents[i3] += sdir;
