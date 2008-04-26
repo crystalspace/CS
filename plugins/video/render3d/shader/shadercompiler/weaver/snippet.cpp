@@ -1196,9 +1196,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       }
       else
       {
-        const Snippet::AtomTechnique* atomTech =
-          static_cast<const Snippet::AtomTechnique*> (tech);
-          
 	GraphInfo graphInfo;
 	graphInfo.graph.AddTechnique (tech);
 	// Set priority for this snippet
