@@ -11,6 +11,8 @@ chronological order.
 	  csNormalMappingTools::CalculateTangents to avoid degenerate tangents
 	  and bitangents if the texture coordinate difference is zero.
 	- res fixed csShaderVariable::NewType() to actually change Type.
+	- res added "type safety" to csShaderVariable texture GetValue():
+	  return 0 if type of SV is not a texture.
 22-Apr-2008
 	- Mike Gist fixed a crash in the rloop loader when ldr_context is null.
 	- res (blindly) fixed compilation on OS/X.

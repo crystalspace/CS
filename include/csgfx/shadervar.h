@@ -212,8 +212,13 @@ public:
     if (accessor) 
       accessor->PreGetValue (this);
 
-    value = texture.HandValue;
+    if (Type != TEXTURE)
+    {
+      value = 0;
+      return false;
+    }
 
+    value = texture.HandValue;
     if (!value && texture.WrapValue)
       value = texture.HandValue = texture.WrapValue->GetTextureHandle ();
     return true;
@@ -224,6 +229,12 @@ public:
   {
     if (accessor) 
       accessor->PreGetValue (this);
+
+    if (Type != TEXTURE)
+    {
+      value = 0;
+      return false;
+    }
 
     value = texture.WrapValue;
     return true;
