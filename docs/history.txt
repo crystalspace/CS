@@ -19,6 +19,9 @@ chronological order.
 	- res tweaked tangent space computation in
 	  csNormalMappingTools::CalculateTangents to avoid degenerate tangents
 	  and bitangents if the texture coordinate difference is zero.
+	- res fixed csShaderVariable::NewType() to actually change Type.
+	- res added "type safety" to csShaderVariable texture GetValue():
+	  return 0 if type of SV is not a texture.
 25-Apr-2008
 	- res adding caching support to xmlshader: the condition tree and
 	  document wrapper structures can be stored to disk now, eliminating
