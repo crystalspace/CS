@@ -174,7 +174,7 @@ struct iEngineSectorCallback : public virtual iBase
  */
 struct iEngine : public virtual iBase
 {
-  SCF_INTERFACE(iEngine, 3, 0, 0);
+  SCF_INTERFACE(iEngine, 4, 0, 0);
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;
@@ -259,7 +259,7 @@ struct iEngine : public virtual iBase
    * \param meter If supplied, the meter object will be called back
    * periodically to report the progress of engine lighting calculation.
    */
-  virtual void ShineLights (iRegion* region = 0,
+  virtual void ShineLights (iBase* base = 0,
   	iProgressMeter* meter = 0) = 0;
 
   /**
@@ -980,9 +980,11 @@ struct iEngine : public virtual iBase
 
   virtual iCollection* CreateCollection(const char* name) = 0;
 
-  virtual iCollection* GetCollection(const char* name) = 0;
+  virtual iCollection* GetCollection(const char* name) const = 0;
 
-  virtual iCollection* GetDefaultCollection() = 0;
+  virtual csPtr<iCollectionArray> GetCollections() = 0;
+
+  virtual void RemoveCollection(iCollection* collect) = 0;
 
   virtual void RemoveCollection(const char* name) = 0;
 

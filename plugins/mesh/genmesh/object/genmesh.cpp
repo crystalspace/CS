@@ -1910,7 +1910,7 @@ void csGenmeshMeshObjectFactory::Compress ()
         SubMesh* subMesh = subMeshes[s];
         csRenderBufferComponentType compType = 
           subMesh->index_buffer->GetComponentType ();
-        switch (compType)
+        switch (compType & ~CS_BUFCOMP_NORMALIZED)
         {
           case CS_BUFCOMP_BYTE:
             RemapIndexBuffer<char> (subMesh->index_buffer, vt);
@@ -1936,7 +1936,7 @@ void csGenmeshMeshObjectFactory::Compress ()
           case CS_BUFCOMP_DOUBLE:
             RemapIndexBuffer<double> (subMesh->index_buffer, vt);
             break;
-	  case CS_BUFCOMP_TYPECOUNT:
+	  default:
 	    CS_ASSERT_MSG("invalid component type", false);
         }
       }

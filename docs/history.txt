@@ -6,7 +6,373 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-<<<<<<< .working
+22-Apr-2008
+	- Mike Gist fixed a crash in the rloop loader when ldr_context is null.
+	- res (blindly) fixed compilation on OS/X.
+	- Sueastside added 'meshref' loading to iLoader::Load().
+21-Apr-2008
+	- Scott Johnson added implementation-dependant memutil.h and .cpp files
+	  no changes have been made to the running implementation yet. (i.e. they
+	  are all still commented out).
+20-Apr-2008
+	- Mike Gist changed the engine's collections hash to hold a reference to
+	  each collection. This fixes RemoveCollection (the collection wasn't
+	  freed due to a leaked reference).
+	- Mike Gist added an iEngine::RemoveCollection overload taking the
+	  iCollection to be removed as a parameter.
+	- Mike Gist fixed an assert in csCollection::ReleaseAllObjects caused
+	  by the creation of an iterator when this function is called by the
+	  dtor. Now it loops on the csObjectContainer instead.
+19-Apr-2008
+	- Jorrit fixed a few warnings in the new collections code.
+18-Apr-2008
+	- Marten fixed a bug in barriers where the case of spurious condition
+	  wakeup wasn't correctly handled.
+	- caedes fixed swig wrapping for iCollectionArray.
+	- Mike Gist fixed a bug in sprcal3d where the moveable wasn't being
+	  updated while the object is still. This caused issues such as dynamic
+	  lights not shining on the object until it moved.
+	- Marten fixed a bug unrevealed by the earlier barrier update.
+	- Jorrit reverted Xordan's sprcal3d fix. The idea behind UpdateMove()
+	  is that it is only called when the object moves. Not all the time.
+	- Mike Gist committed a better fix for dynamic lights not shining on
+	  certain objects from Jorrit. csLight::CalculateLighting() now marks
+	  RelevantLights as dirty correctly, instead of only when the mesh has
+	  a shadow receiver.
+17-Apr-2008
+	- Mike Gist made the following changes;
+	    - Added an InternalRefCount class, to be used where we want an
+	      extra reference count to be able to easily tell what's being held
+	      by certain object types. Provides an InternalRemove() function
+	      for when the ref count reaches 0.
+	    - Enhanced collections and csObject to use InternalRefCount. This
+	      resolves our problem where objects aren't correctly freed when
+	      unused.
+	    - csRenderLoop now sets its name correctly.
+	    - csRenderLoopManager::Register no longer prints a warning about
+	      duplicate renderloops if you have checkdupes set to true.
+	    - Fixed some missing adds to a collection and incorrect parameter
+	      passing.
+	    - Disabled proxy textures for regions, altered related code to be
+	      collection specific, greatly reducing complexity.
+	    - Fixed csHashReversible to correctly delete from the reversible
+	      hash as well as the normal hash, so it doesn't leak references.
+	    - Fixed a few other reference leaks.
+	- caedes fixed a memory leak on openal sound renderer listener
+	  creation, and also protected its Update method from using the
+	  listener before it is created.
+	- Vincent applied a patch from Lukas Erlinghagen which fixes a build
+	  problem with bjam ("module" is a restricted keyword there).
+	- Vincent applied another patch from Lukas Erlinghagen which fixes a
+	  build error on GCC when using the fully qualified name for
+	  ConstGlobalIterator in csHash.
+	- Eric Sunshine removed some useless (probably obsolete) CheckOptions
+	  invocations from flags.jam.
+	- Eric Sunshine added some missing "local var" declarations to
+	  RelayLibs rule in flags.jam. Also cleaned up RelayLibs documentation
+	  slightly.
+	- Eric Sunshine eliminated usage of the long-obsolete 'nostatic' option
+	  for invocations of CFLags and LFLags Jam rules.
+	- Eric Sunshine augmented InferFlagsTuple in flags.jam so that it also
+	  considers the shell backtick (`) operator as an option introducer.
+	  This operator is used by the RelayLibs rule, for instance, to
+	  determine link flags dynamically at build time (as opposed to
+	  configure time). This change also works around a Jam bug where its
+	  var_expand() function in jam/expand.c allocates a buffer of only 1024
+	  characters for the variable expand-and-join operation $(var:J=x)
+	  which is employed by InferFlagsTuple. The very lengthy backtick
+	  commands employed by RelayLibs were easily overflowing this internal
+	  Jam limit, thus causing it to corrupt its own stack.
+16-Apr-2008
+	- Eric Sunshine clarified and enhanced documentation of RemoveDups rule
+	  in helper.jam.
+	- Eric Sunshine generalized MergeLFlags from flags.jam and moved it to
+	  helper.jam as the new rule MergeRemovingDups.  (The old MergeLFlags
+	  name is still recognized for backward compatibility but heavily
+	  deprecated.)
+	- Eric Sunshine added a RemoveDupFlags rule to flags.jam which removes
+	  duplicates from a list of build switches. Unlike the generic
+	  RemoveDups (helper.jam), RemoveDupFlags removes all but the _last_
+	  duplicated item. This makes it suitable for folding out duplicates
+	  from a list of linker switches which typically are order-sensitive,
+	  and in which the final instance of a duplicated switch has highest
+	  precedence.  (This new rule also helps to document clients which
+	  previously performed the same somewhat convoluted functionality
+	  manually and without explanation.)
+	- Eric Sunshine added new rule InferFlagTuples to flags.jam which,
+	  given a list of build switches, infers which switches consist of
+	  multiple arguments, and returns a list in the same order but with
+	  multiple-argument switches converted to atomic array elements.  For
+	  instance, given the list [-framework, AppKit, -foo, -z, defs, -bar],
+	  it will correctly infer that "-framework" and "AppKit", and "-z" and
+	  "defs" should be combined, respectively, and return the corresponding
+	  list [-framework AppKit, -foo, -z defs, -bar]. Such multiple-argument
+	  switches can arise when linking against external libraries. For
+	  instance, 'wx-config --libs' on Mac OS X returns a list containing
+	  several "-framework Foo" switches. Also augmented CFlags and LFlags
+	  rules in flags.jam to normalize the incoming flags by passing them
+	  through InferFlagTuples. This resolves issue #270.
+	- Eric Sunshine fixed scripts/cs-config/Jamfile so that the generic
+	  'apps' target depends upon 'cs-config'. This makes it consistent with
+	  the generated version-specific 'cs-config-X.Y' which also (already)
+	  is a dependent of 'apps'.
+	- caedes added an extension to python wrapped interfaces so they can
+	  be compared using ==.
+	- caedes changed equality test for python wrapped interfaces to be 
+	  based on extending iBase instead of extending declared interfaces,
+	  and also added handling of inequality test.
+14-Apr-2008
+	- Eric Sunshine fixed CS_CHECK_BINUTILS_2_17() in checkbinutils.m4 to
+	  be compatible with Mac OS X linkers which are not GNU-compatible.
+	  Further, it now correctly suppresses unwanted output from the Leopard
+	  linker which was messing up the displayed 'configure' output since
+	  Leopard 'ld' emits its version information to stderr rather than
+	  stdout.
+	- Marten implemented a way to query the number of animations and
+	  animation by index in animation packet (factory).
+12-Apr-2008
+	- res worked around SWIG 1.3.33 breakage in the perl bindings.
+	- res added methods to iImage to query the image format as a "texture
+	  format string". The idea is to eventually move to this more flexible
+	  format identification in the future (and thus provide support to
+	  load more image formats).
+11-Apr-2008
+	- res changed the X window creation to set a background color when
+	  creating the window. This prevents a brief flash of undefined
+	  window contents on compiz (and possibly other WMs).
+10-Apr-2008
+	- Marten implemented software skinning of normals, tangents and
+	  binormals in animesh.
+9-Apr-2008
+	- res made the following changes:
+	    - Made string markers in gl3d have practically no cost if not
+	      used (the common case).
+	    - Added support for multiple index ranges in one render mesh
+	      (this reduces the DrawMesh() overhead when a lot of ranges have
+	      to be rendered with the other mesh options are the same).
+8-Apr-2008
+	- res added some initial support for normalized render buffers.
+	- res fixed a crash in binary render buffers.
+	- res changed csVertexListWalker to lock buffers for reading only.
+	- res fixed binary render buffers returning a buffer version of '~0' -
+	  this conflicted with the default value for the version used by the
+	  gl3d buffer manager, meaning a binary buffer was never uploaded.
+	- res fixed the render buffer parser to set the "normalized" flag
+	  when it was actually specified (and not the other way round).
+7-Apr-2008
+	- Mike Gist fixed a compile error.
+	- Mike Gist added an exportCS max script supporting 3ds max 2008, and
+	  moved the previous one to exportCS-oldmax to keep support for older
+	  versions.
+6-Apr-2008
+	- Marten temporarily disabled csutil/memutil.cpp by #if 0 until
+	  a proper way to write it has been commited. Fixes compilation
+	  errors due to missing includes.
+5-Apr-2008
+	- Scott Johnson added csutil/memutil.h and csutil/memutil.cpp, which 
+	  includes the function CS::Memory::GetPhysicalMemory().  This function
+	  returns the physical memory (in KB) when called.
+4-Apr-2008
+	- Eric Sunshine applied the following fixes and improvements to the g++
+	  bug check added to the CS_COMPILER_IGNORE_LONG_DOUBLE() macro
+	  (warnings.m4) from r29198 and r29200:
+	    - Now properly sets CACHE-VAR, as documented, even when g++ is
+	      found to be buggy.
+	    - Now emits the result of the "suppress long double warnings" check
+	      even when g++ is found to be buggy.
+	    - No longer incorrectly accesses the variable 'cs_host_macosx',
+	      which is private to the _CS_CHECK_HOST_DARWIN() macro
+	      (cs_check_host.m4).
+	    - For improved robustness, no longer considers Mac OS X a special
+	      case, and respects the g++ bug discovery uniformly on all
+	      platforms.
+	    - No longer unnecessarily caches the result of the buggy g++ check
+	      since the expensive part of this check, the
+	      CS_CHECK_PROG_VERSION() invocation, is already cache-friendly.
+	- Eric Sunshine augmented CS_CHECK_BUILD_FLAGS() in checkbuild.m4 so
+	  that an empty FLAGS argument is now explicitly considered a failure
+	  and is documented as such. Previously, behavior for this case was
+	  undefined.
+	- Eric Sunshine, after further research, changed
+	  CS_COMPILER_IGNORE_LONG_DOUBLE() in warnings.m4 so that it only tests
+	  for -Wno-long-double support on Apple platforms since it is an
+	  Apple-specific g++ option. Checking this option conditionally
+	  side-steps the g++ 4.2.3 bug on non-Apple platforms where
+	  -Wno-long-double is spuriously and incorrectly accepted by the
+	  compiler.
+	- caedes added iBugPlug to scripting bindings.
+	- Eric Sunshine added mk/autoconf/listutil.m4, containing m4
+	  list-related utilities. Added macro CS_MEMBERSHIP_ANY() which checks
+	  if any item of an input list exists in a target list.
+	- Eric Sunshine changed the signatures of all of the emitter macros,
+	  CS_JAMCONFIG_PROPERTY (jamcache.m4), CS_MAKEFILE_PROPERTY
+	  (makecache.m4), CS_HEADER_PROPERTY (headercache.m4),
+	  CS_DEFINE_EMITTER (emit.m4), CS_SUBST_EMITTER (emit.m4),
+	  CS_NULL_EMITTER (emit.m4), to accept a single optional OPTIONS
+	  argument rather than separate APPEND and UNCONDITIONAL arguments. The
+	  new generalized OPTIONS argument is a comma-separated list of
+	  keywords which control emitter behavior. Present options include
+	  "append", "atomic", "conditional", "default", and "unconditional".
+	  Options "append", "conditional", and "unconditional" control property
+	  assignment (essentially, '+=', '?=', and '='). "default" is an alias
+	  for the emitter's default behavior, as is an empty OPTIONS argument.
+	  The "atomic" option tells the emitter to treat its VALUE argument as
+	  a single unit (i.e. quoting it in some manner) rather than as
+	  potentially multiple tokens. Note that, for backward-compatibility,
+	  all emitters still also respect the old calling semantics, so
+	  existing code should continue working correctly.
+	- Eric Sunshine changed the special-purpose EMPTY-OKAY argument of
+	  CS_EMIT_BUILD_PROPERTY (emit.m4) into a general-purpose
+	  PROPERTY-OPTIONS argument, which is a comma-separated list of
+	  keywords. Recognized options are "conditional", "default", and
+	  "unconditional". The "conditional" option results in the property
+	  being emitted only if the VALUE is non-empty, whereas the
+	  "unconditional" option causes the value to be emitted regardless.
+	  "default" is an alias for "conditional", as is an empty
+	  PROPERTY-OPTIONS argument. Note that, for backward-compatibility, the
+	  old calling semantic is also respected, so existing code should
+	  continue working correctly.
+	- Eric Sunshine changed the signature of CS_EMIT_BUILD_PROPERTY
+	  (emit.m4) to accept a single EMITTER-OPTIONS argument rather than
+	  separate APPEND and UNCONDITIONAL arguments. The new EMITTER-OPTIONS
+	  is passed along to the emitter as its optional third argument. Note
+	  that, for backward-compatibility, the old calling semantic is also
+	  respected.
+	- Eric Sunshine changed the APPEND option of CS_EMIT_BUILD_FLAGS
+	  (emit.m4) into a general EMITTER-OPTIONS argument which is passed
+	  directly to the emitter. Note that, for backward-compatibility, the
+	  old calling semantic is also respected.
+	- Eric Sunshine augmented CS_EMIT_PACKAGEINFO (packageinfo.m4) so that
+	  it employs the new "atomic" emitter option for properties
+	  PACKAGE_STRING, PACKAGE_BUGREPORT, PACKAGE_LONGNAME,
+	  PACKAGE_HOMEPAGE, and PACKAGE_COPYRIGHT. This fixes fallout from
+	  r28950 which caused the values of these properties to be seen by the
+	  build system as multiple tokens rather than each as a single string
+	  (containing multiple words).  When seen incorrectly as multiple
+	  tokens, generation of some related resources (such as Visual Studio
+	  project files) broke. Also simplified emission of
+	  PACKAGE_VERSION_LIST property for which the implementation became
+	  unnecessarily complicated following r28950.
+	- Eric Sunshine eliminated compilation warning in
+	  terrain2/bruteblockrenderer.
+	- Marten fixed terrain2 to properly handle alphamaps independent of if
+	  they are true color or paletted, with or without alpha.
+	- Marten optimized the terrain2 texture updates.
+	- Eric Sunshine eliminated compilation warnings in csutil and null3d.
+	- Marten added method to csDualQuaternion for transforming without
+	  movements.
+	- Marten cleaned up software vertex skinning a bit.
+3-Apr-2008
+	- res added a workaround to configure to avoid -Wno-long-double
+	  warnings occuring with g++ 4.2.3.
+	- Marten made a fix to rendering of separate alphamaps in terrain2.
+	- Marten optimized terrain2 renderer not to use material map layers
+	  where the material isn't used at all in the cell.
+	- Vincent fixed sound sources not being cleaned when closing the
+	  OpenAL renderer.
+	- Sueastside committed a patch by Mononoke to fix a crash in the Alsa
+	  renderer on exit.
+	- Vincent applied Marten's fix for sound sources not being cleaned
+	  when closing the software renderer. Happy Bithday Marten !
+2-Apr-2008
+	- Mike Gist added csWeakRefHash which inherits from csHash.
+	  It has a Compact() function which removes all deleted elements
+	  (NULL value), and uses csArraySafeCopyElementHandler.
+	- res fixed graphic distortions after r29169.
+	- caedes fixed a number of gcc compiler errors on csWeakRefHash 
+	  (guided by res).
+	- Mike Gist moved csWeakRefHash into its own file.
+	- caedes added iCollection to scripting bindings.
+	- res fixed a strict aliasing violation in csFixedSizeAllocator that
+	  caused crashes in optimize mode.
+1-Apr-2008
+	- res fixed a missing 'break' in the terrain2 loader.
+	- res changed the csHash<> implementation to move the Element type out
+	  of the csHash<> class. Kludgy, but makes it possible to provide
+	  custom element handlers for the arrays inside the hash.
+	- caedes fixed all uses of csHash template inside csHash so it uses
+	  the user defined allocator and element handler (under res guidance).
+	- res enabled the 'resizing' flag in embedgl.
+	- res added viewport control to iGraphics2D.
+	- res added the canvas event IDs to the script bindings.
+31-Mar-2008
+	- Eric Sunshine applied changes to jobber-cel-svn.cfg similar to those
+	  made to jobber-svn.cfg in r27840, r27842, r27849: actually run CEL's
+	  configure script rather than faking it, and perform checkout from a
+	  local repository then switch the live one. This fixes CEL jobber
+	  failure following cel:r3270.
+	- Mike Gist fixed a bug in the 3ds max exportSprite script and also 
+	  improved the formatting of the output.
+	- Marten added iMissingLoaderData to the python-exposed interfaces.
+	- Marten fixed the software skinning and animation to actually work
+	  correctly.
+30-Mar-2008
+	- res fixed PBOs not being bound before used in the texture blit code.
+	- res applied a patch from Lukas Erlinghagen to fix compiling on
+	  gcc 3.4.
+	- res applied a patch from Lukas Erlinghagen to add frame time display
+	  to bugplug.
+26-Mar-2008
+	- Marten commited a number of re-inlinings of basic matrix & vector 
+	  methods.
+	- res fixed the OpenGL state cache storing the active buffer binding in
+	  the wrong member.
+	- res added methods to csBitArray to obtain the first/last set/unset
+	  bit.
+	- res fixed a mess-up in csMatrix3 transposing.
+	- Marten fixed tinyxml writer not to crash on empty attributes.
+	- Marten fixed light name handling of proxylights in lighter2.
+	- Mike Gist renamed the "tex spec" shadervar to "tex specular".
+25-Mar-2008
+	- Andrew Dai fixed the problem of the enter key being mapped to the
+	  incorrect raw keycode on MAC OS X.
+	- res changed the way point sprite state is set up: now it's only set
+	  up once and using a point sprite mesh only changes the point sprite
+	  enable state.
+	- res made point sprite size setup a shader responsibility.
+	- res made the vertex array caching more agressive: now, the VBO is
+	  stored as well in the statecache, and if the same area of the same
+	  buffer is set the buffer binding and vertex array setting are avoided.
+	- Mike Gist committed fixes to the 3ds max level exporters and a
+	  3ds max genmesh sprite exporter; both from Luca Pancallo.
+24-Mar-2008
+	- Mike Gist made several improvements to the 3ds max level exporter:
+	    - Did a bit of cleaning; removed thing support from exportCS.mcr,
+	      exportcsp.mcr still has it if you need it.
+	    - Fixed a bug in the materialnotdefined checks, the comparison was
+	      wrong so they were failing.
+	    - Added RENDERLOOP_TYPE user defined option, so you can specify the
+	      renderloop you want on a per-sector basis. Current options are 
+	      "diffuse" and "terrainfixed" (nothing is valid too of course).
+	      The collision plugin selection now takes this into consideration
+	      too, so sectors within the same map don't end up with the wrong
+	      collision type.
+	    - Changed shader and renderloop selection to be calculated
+	      automatically. Removed "Export as Terrain Level" checkbox, as this
+	      is no longer needed as a result.
+	    - Added support for the parallaxAtt shader. To use it, just attach
+	      normal bump and displacement textures to the material in 3dsmax,
+	      and use the "diffuse" renderloop type on the sectors to use them.
+	      This also supports a spec map. To use one, attach it to the
+	      'glossiness' map attribute of the material.
+	    - Tidied up the output formatting a bit, it's nicer on the eye now.
+	- Mike Gist added support for spec maps to the parallax shaders.
+23-Mar-2008
+	- res fixed an uninitialized var in gmeshanimpdl.
+22-Mar-2008
+	- res changed gl3d to free the VBO manager in Close(): VBOs should be
+	  cleaned up before the GL context itself is torn down.
+	- res changed the way memory tracking is handled. Notably, the 
+	  returned csMemTrackerInfo* isn't needed any more; instead, the
+	  information string serves as "handle" now. Also, allocated blocks
+	  are recorded in the memory tracker itself, thus freeing of a block
+	  can be tracked by merely passing it's address to the mem tracker.
+	- res fixed a bug in the debug ptmalloc code where allocation location
+	  information wasn't kept when it should have been.
+19-Mar-2008
+	- Mike Gist fixed a crash in tinyxml when parsing a binary xml file.
+	- Mike Gist added some missing error sets in tinyxml, so it now
+	  returns an error when it fails to parse a binary xml file.
 18-Mar-2008
 	- Marten added separate alpha-maps to terrain2 renderer, cells
 	  and feeder.
@@ -23,6 +389,7 @@ chronological order.
 	- Marten fixed the placement of some deprecation warning disable
 	  /enable includes. Eliminated some 8000 wrong warnings on MSVC9.
 	- Marten fixed a broken include guard.
+	- Marten added a very primitive way to display skeletons.
 12-Mar-2008
 	- caedes implemented some empty methods in bullet physics plugin:
 	  - csBulletCollider: IsStatic
@@ -32,6 +399,11 @@ chronological order.
 	- caedes added iTranslator to python bindings.
 	- res augmented the csVector4 from-csVector3 constructor to also
 	  optionally take a value for w.
+	- Marten fixed a couple of bugs in the animation code.
+	- Marten changed so that skeletal state use quat+vector.
+	- Marten implemented first pieces of software skinning (of vertices)
+	  in animesh.
+	- Marten fixed two bugs in skeleton2 loader.
 11-Mar-2008
 	- res fixed CS/docs/support/prepare_online_publish.sh to use the right
 	  search page parameter names for filtering for the docs only.
@@ -59,6 +431,14 @@ chronological order.
 	- res actually implemented CS::Math::Matrix4::Description().
 	- res corrected the creation of a Matrix4 from a transform.
 	- res added multiplication of a Matrix4 with a csVector4.
+	- Marten did a number of improvements to the animesh and skeleton
+	  loaders and interfaces:
+	    - Moved the skeletal animation interfaces to its own header.
+	    - Added a new level of containment in the skeletal animation
+	      to group together a number of animations and the node tree
+	      to blend them together.
+	    - Updated the loaders to load animation packets and to 
+	      connect skeleton and animation packet.
 08-Mar-2008
 	- res fixed a pattern in CS/docs/support/prepare_online_publish.sh that
 	  was still using a .php instead of a .html file name.
@@ -132,6 +512,18 @@ chronological order.
 	- res fixed some pointer formatting with unsigned longs recently
 	  introduced.
 	- res removed an int cast from csperl5. Should fix trac #394.
+	- Marten made a number of enhancements to skeleton2 and animesh:
+	   - Changed the animation interface so that data is handled
+	     as quaternion+vector instead of a dual quaternion.
+	   - Added methods to register an animation tree for later
+	     retrieval.
+	   - Added a loader for skeleton2 and animation hierarchies.
+	   - Added code to animesh to setup the SVs with bone transforms.
+	   - Added loading of bone/vertex influences.
+02-Mar-2008
+	- Marten changed the way render buffers are handled in animesh
+	  slightly. Removed SetVertexCount from API and <vertexcount>
+	  from file format.
 01-Mar-2008
 	- caedes added support for relative rotation operations to the
 	  sequence manager.
@@ -141,6 +533,16 @@ chronological order.
 	  bullet is available.
 	- caedes explained the concept of relative rotation operation a bit
 	  clearer in the manual.
+	- Marten reduced the size of csShaderVariable a bit by joining
+	  a couple of members into a union.
+	- Marten added a member to csShaderVariable for accessor specific data.
+	- Marten implemented the basic functionality in the animesh factory
+	  and object.
+	- Marten extended iSyntaxService with a way to parse data into
+	  an already created iRenderBuffer.
+	- Marten implemented initial loader for animesh.
+28-Feb-2008
+	- Marten implemented the Blend animation node.
 27-Feb-2008
 	- res added a (still very bare) class for 4x4 matrices.
 	- res changed the libcrystalspace Jamfiles to exclude some files that
@@ -180,8 +582,11 @@ chronological order.
 	  "$cs_cv_pybase_lflags_base" being used, rather than the interpolation
 	  of that shell variable, in build attempts when detecting the Python
 	  link library. This should resolve issue #455.
+	- Marten implemented Skeleton & SkeletonFactory.
+	- Marten implemented basic skeletal animation playback.
 24-Feb-2008
 	- Vincent updated a bunch of URLs and FAQ entries in the manual.
+	- Marten added code stubs for the animated mesh and skeleton2.
 23-Feb-2008
 	- caedes added ivaria/sequence.h to scripting bindings.
 	- caedes added csgeom/obb.h to scripting bindings.
@@ -190,6 +595,10 @@ chronological order.
 	  The next job is to make the changes needed elsewhere to gain
 	  the benefits that collections bring.
 	- Mike Gist added csWeakRefArrayObject.
+	- Marten started work on new animated mesh:
+	    - Added later-to-be-used csDualQuaternion.
+	    - Wrote interface definitions for mesh and skeleton.
+	- Marten added plugin stub for new animated mesh.
 22-Feb-2008
 	- Mike Gist merged iLoaderCollection with iLoader, and formatted
 	  iLoader better.
@@ -200,7 +609,6 @@ chronological order.
 21-Feb-2008
 	- Mike Gist added the iCollection and iLoaderCollection interfaces,
 	  and csCollection.
-21-Feb-2008
 	- res fixed csimagetool to correctly get the optional argument for
 	  the save option.
 	- res restored r28657 which got accidentally lost in r28744.

@@ -71,6 +71,7 @@ private:
 
   csWeakRef<iGraphics3D> g3d;
   csGLShader_FIXED* shaderPlug;
+  csGLExtensionManager* ext;
 
   enum GlLightParam
   {
@@ -108,6 +109,8 @@ private:
   ProgramParam matSpecular;
   ProgramParam matSpecularExp;
   bool separateSpecular;
+  ProgramParam pointSize;
+  ProgramParam pointAttenuation;
 
   struct layerentry
   {

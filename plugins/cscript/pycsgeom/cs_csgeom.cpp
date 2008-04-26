@@ -10369,6 +10369,37 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csMatrix3_Row(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csMatrix3 *arg1 = (csMatrix3 *) 0 ;
+  size_t arg2 ;
+  csVector3 result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csMatrix3_Row",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csMatrix3, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMatrix3_Row" "', argument " "1"" of type '" "csMatrix3 const *""'"); 
+  }
+  arg1 = reinterpret_cast< csMatrix3 * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csMatrix3_Row" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  result = ((csMatrix3 const *)arg1)->Row(arg2);
+  resultobj = SWIG_NewPointerObj((new csVector3(static_cast< const csVector3& >(result))), SWIGTYPE_p_csVector3, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_csMatrix3_Col1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csMatrix3 *arg1 = (csMatrix3 *) 0 ;
@@ -10428,6 +10459,37 @@ SWIGINTERN PyObject *_wrap_csMatrix3_Col3(PyObject *SWIGUNUSEDPARM(self), PyObje
   }
   arg1 = reinterpret_cast< csMatrix3 * >(argp1);
   result = ((csMatrix3 const *)arg1)->Col3();
+  resultobj = SWIG_NewPointerObj((new csVector3(static_cast< const csVector3& >(result))), SWIGTYPE_p_csVector3, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csMatrix3_Col(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csMatrix3 *arg1 = (csMatrix3 *) 0 ;
+  size_t arg2 ;
+  csVector3 result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csMatrix3_Col",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csMatrix3, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMatrix3_Col" "', argument " "1"" of type '" "csMatrix3 const *""'"); 
+  }
+  arg1 = reinterpret_cast< csMatrix3 * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csMatrix3_Col" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  result = ((csMatrix3 const *)arg1)->Col(arg2);
   resultobj = SWIG_NewPointerObj((new csVector3(static_cast< const csVector3& >(result))), SWIGTYPE_p_csVector3, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
@@ -30076,7 +30138,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csQuaternion___imul__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csQuaternion___imul____SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csQuaternion *arg1 = (csQuaternion *) 0 ;
   csQuaternion *arg2 = 0 ;
@@ -30104,6 +30166,119 @@ SWIGINTERN PyObject *_wrap_csQuaternion___imul__(PyObject *SWIGUNUSEDPARM(self),
   arg2 = reinterpret_cast< csQuaternion * >(argp2);
   {
     csQuaternion &_result_ref = (arg1)->operator *=((csQuaternion const &)*arg2);
+    result = (csQuaternion *) &_result_ref;
+  }
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csQuaternion, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csQuaternion___imul____SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csQuaternion *arg1 = (csQuaternion *) 0 ;
+  float arg2 ;
+  csQuaternion *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  float val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csQuaternion___imul__",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csQuaternion, SWIG_POINTER_DISOWN |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csQuaternion___imul__" "', argument " "1"" of type '" "csQuaternion *""'"); 
+  }
+  arg1 = reinterpret_cast< csQuaternion * >(argp1);
+  ecode2 = SWIG_AsVal_float(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csQuaternion___imul__" "', argument " "2"" of type '" "float""'");
+  } 
+  arg2 = static_cast< float >(val2);
+  {
+    csQuaternion &_result_ref = (arg1)->operator *=(arg2);
+    result = (csQuaternion *) &_result_ref;
+  }
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csQuaternion, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csQuaternion___imul__(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[3];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 2); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csQuaternion, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_csQuaternion, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_csQuaternion___imul____SWIG_0(self, args);
+      }
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csQuaternion, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_float(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        return _wrap_csQuaternion___imul____SWIG_1(self, args);
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csQuaternion___imul__'.\n  Possible C/C++ prototypes are:\n    operator *=(csQuaternion const &)\n    operator *=(float)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csQuaternion___idiv__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csQuaternion *arg1 = (csQuaternion *) 0 ;
+  float arg2 ;
+  csQuaternion *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  float val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csQuaternion___idiv__",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csQuaternion, SWIG_POINTER_DISOWN |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csQuaternion___idiv__" "', argument " "1"" of type '" "csQuaternion *""'"); 
+  }
+  arg1 = reinterpret_cast< csQuaternion * >(argp1);
+  ecode2 = SWIG_AsVal_float(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csQuaternion___idiv__" "', argument " "2"" of type '" "float""'");
+  } 
+  arg2 = static_cast< float >(val2);
+  {
+    csQuaternion &_result_ref = (arg1)->operator /=(arg2);
     result = (csQuaternion *) &_result_ref;
   }
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csQuaternion, SWIG_POINTER_OWN |  0 );
@@ -47205,9 +47380,11 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csMatrix3_Row1", _wrap_csMatrix3_Row1, METH_VARARGS, NULL},
 	 { (char *)"csMatrix3_Row2", _wrap_csMatrix3_Row2, METH_VARARGS, NULL},
 	 { (char *)"csMatrix3_Row3", _wrap_csMatrix3_Row3, METH_VARARGS, NULL},
+	 { (char *)"csMatrix3_Row", _wrap_csMatrix3_Row, METH_VARARGS, NULL},
 	 { (char *)"csMatrix3_Col1", _wrap_csMatrix3_Col1, METH_VARARGS, NULL},
 	 { (char *)"csMatrix3_Col2", _wrap_csMatrix3_Col2, METH_VARARGS, NULL},
 	 { (char *)"csMatrix3_Col3", _wrap_csMatrix3_Col3, METH_VARARGS, NULL},
+	 { (char *)"csMatrix3_Col", _wrap_csMatrix3_Col, METH_VARARGS, NULL},
 	 { (char *)"csMatrix3_Set", _wrap_csMatrix3_Set, METH_VARARGS, NULL},
 	 { (char *)"csMatrix3_assign", _wrap_csMatrix3_assign, METH_VARARGS, NULL},
 	 { (char *)"csMatrix3___iadd__", _wrap_csMatrix3___iadd__, METH_VARARGS, NULL},
@@ -47586,6 +47763,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csQuaternion___iadd__", _wrap_csQuaternion___iadd__, METH_VARARGS, NULL},
 	 { (char *)"csQuaternion___isub__", _wrap_csQuaternion___isub__, METH_VARARGS, NULL},
 	 { (char *)"csQuaternion___imul__", _wrap_csQuaternion___imul__, METH_VARARGS, NULL},
+	 { (char *)"csQuaternion___idiv__", _wrap_csQuaternion___idiv__, METH_VARARGS, NULL},
 	 { (char *)"csQuaternion_GetConjugate", _wrap_csQuaternion_GetConjugate, METH_VARARGS, NULL},
 	 { (char *)"csQuaternion_Conjugate", _wrap_csQuaternion_Conjugate, METH_VARARGS, NULL},
 	 { (char *)"csQuaternion_Dot", _wrap_csQuaternion_Dot, METH_VARARGS, NULL},

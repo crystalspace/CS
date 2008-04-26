@@ -43,8 +43,10 @@ namespace CS
     ////
   protected:
 
-    /// This is required to initialize the m_SampleCount and m_SoundFormat member variables. It is called internally.
-    //    This is only called the first time that SoundFormat or SampleCount data is requested.
+    /// This is required to initialize the m_SampleCount and m_SoundFormat
+    /// member variables. It is called internally.
+    //    This is only called the first time that SoundFormat or SampleCount
+    //    data is requested.
     virtual void Initialize() = 0;
 
 
@@ -95,7 +97,8 @@ namespace CS
     bool m_bInfoReady;
 
     /// The format that we're decoding the Ogg stream to. 
-    //    Currently this is the default format that the ogg vorbis library returns for a given Ogg audio file.
+    //    Currently this is the default format that the ogg vorbis library
+    //    returns for a given Ogg audio file.
     csSndSysSoundFormat m_SoundFormat;
 
     /// The number of frames in the decoded output

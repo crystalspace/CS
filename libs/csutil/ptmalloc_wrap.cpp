@@ -307,7 +307,7 @@ namespace
     *((CookieType*)(p + n)) = endCookie;
     // Pepper.
     memset (p, 0xca, n);
-    if (doCheck)
+    if (keepLocation)
     {
       AllocatedBlock newBlock;
       newBlock.address = p;
@@ -367,7 +367,7 @@ namespace
       if (index == csArrayItemNotFound)
       {
         fprintf (stderr, 
-          "MALLOC ISSUE: pointer 0x%p not allocated with ptmalloc_located\n",
+          "MALLOC ISSUE: pointer %p not allocated with ptmalloc_located\n",
           P);
         fflush (stderr);
       }

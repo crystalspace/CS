@@ -332,7 +332,7 @@ ND_PROTO(void,flush_graphics_context)(OSXDelegateHandle handle)
   switch (*raw)
   {
     case K_ESCAPE:    *cooked = CSKEY_ESC;       break;
-    case K_RETURN:    *cooked = CSKEY_ENTER;     break;	// *1*
+    case K_RETURN:    *raw = CSKEY_ENTER;        *cooked = CSKEY_ENTER;     break;	// *1*
     case K_TAB:       *cooked = CSKEY_TAB;       break;
     case K_BACKSPACE: *cooked = CSKEY_BACKSPACE; break;
     case K_DELETE:    *cooked = CSKEY_BACKSPACE; break; // *2*

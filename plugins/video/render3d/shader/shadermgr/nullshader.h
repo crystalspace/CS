@@ -40,6 +40,9 @@ private:
   csRefArray<csShaderVariable> dummySVs;
   csShaderManager* mgr;
 
+protected:
+  void InternalRemove() { SelfDestruct(); }
+
 public:
   CS_LEAKGUARD_DECLARE (csNullShader);
 

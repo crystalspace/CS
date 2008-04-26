@@ -638,7 +638,7 @@ search for an integer in an array of integers).  When the types of
 @samp{MyType} and @samp{MyKey} differ, @samp{MyType} is often a composite type,
 and @samp{MyKey} is the type of one attribute of @samp{MyType}, however you are
 not in any way limited to this arrangements.  If you do not provide a
-comparison function when constructing the functor, then the the elements are
+comparison function when constructing the functor, then the elements are
 compared with the search key via @code{T::operator<(K)} and
 @code{K::operator<(T)} where @samp{T} and @samp{K} are the type of the
 contained element and the type of the key, respectively.  This default

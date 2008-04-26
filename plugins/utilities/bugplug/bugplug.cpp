@@ -68,6 +68,9 @@
 #include "imesh/genmesh.h"
 #include "imesh/object.h"
 #include "imesh/thing.h"
+#include "imesh/animesh.h"
+#include "imesh/skeleton2.h"
+#include "imesh/skeleton2anim.h"
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
 #include "iutil/dbghelp.h"
@@ -146,6 +149,7 @@ csBugPlug::csBugPlug (iBase *iParent)
   weakEventHandler = 0;
 
   do_fps = true;
+  display_time = false;
   fps_frame_count = 0;
   fps_tottime = 0;
   fps_cur = -1;
@@ -342,10 +346,10 @@ void csBugPlug::SelectMesh (iSector* sector, const char* meshname)
   {
     Report (CS_REPORTER_SEVERITY_DEBUG,
         "Selecting %d mesh(es).", cnt);
-    bool bbox, rad, norm;
-    shadow->GetShowOptions (bbox, rad, norm);
+    bool bbox, rad, norm, skel;
+    shadow->GetShowOptions (bbox, rad, norm, skel);
 
-    if (bbox || rad || norm || show_polymesh != BUGPLUG_POLYMESH_NO)
+    if (bbox || rad || norm || skel || show_polymesh != BUGPLUG_POLYMESH_NO)
       shadow->AddToEngine (Engine);
     else
       shadow->RemoveFromEngine (Engine);
@@ -527,10 +531,10 @@ void csBugPlug::MouseButtonLeft (iCamera* camera)
     const char* n = sel->QueryObject ()->GetName ();
     Report (CS_REPORTER_SEVERITY_DEBUG, "BugPlug found mesh '%s'!",
       	n ? n : "<noname>");
-    bool bbox, rad, norm;
-    shadow->GetShowOptions (bbox, rad, norm);
+    bool bbox, rad, norm, skel;
+    shadow->GetShowOptions (bbox, rad, norm, skel);
 
-    if (bbox || rad || norm || show_polymesh != BUGPLUG_POLYMESH_NO)
+    if (bbox || rad || norm || skel || show_polymesh != BUGPLUG_POLYMESH_NO)
       shadow->AddToEngine (Engine);
     else
       shadow->RemoveFromEngine (Engine);
@@ -834,14 +838,15 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
       break;
     case DEBUGCMD_MESHBBOX:
       {
-        bool bbox, rad, norm;
-        shadow->GetShowOptions (bbox, rad, norm);
+        bool bbox, rad, norm, skel;
+        shadow->GetShowOptions (bbox, rad, norm, skel);
+        
         bbox = !bbox;
         Report (CS_REPORTER_SEVERITY_DEBUG,
 	    	"BugPlug %s bounding box display.",
 		bbox ? "enabled" : "disabled");
-        shadow->SetShowOptions (bbox, rad, norm);
-        if ((bbox || rad || norm || show_polymesh != BUGPLUG_POLYMESH_NO)
+        shadow->SetShowOptions (bbox, rad, norm, skel);
+        if ((bbox || rad || norm || skel || show_polymesh != BUGPLUG_POLYMESH_NO)
     	  && HasSelectedMeshes ())
           shadow->AddToEngine (Engine);
         else
@@ -850,14 +855,14 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
       break;
     case DEBUGCMD_MESHRAD:
       {
-	bool bbox, rad, norm;
-	shadow->GetShowOptions (bbox, rad, norm);
+	bool bbox, rad, norm, skel;
+	shadow->GetShowOptions (bbox, rad, norm, skel);
         rad = !rad;
 	Report (CS_REPORTER_SEVERITY_DEBUG,
 	    	"BugPlug %s bounding sphere display.",
 		rad ? "enabled" : "disabled");
-	shadow->SetShowOptions (bbox, rad, norm);
-	if ((bbox || rad || norm || show_polymesh != BUGPLUG_POLYMESH_NO)
+	shadow->SetShowOptions (bbox, rad, norm, skel);
+	if ((bbox || rad || norm || skel || show_polymesh != BUGPLUG_POLYMESH_NO)
 	  && HasSelectedMeshes ())
 	  shadow->AddToEngine (Engine);
 	else
@@ -866,18 +871,34 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
       break;
     case DEBUGCMD_MESHNORM:
       {
-	bool bbox, rad, norm;
-	shadow->GetShowOptions (bbox, rad, norm);
+	bool bbox, rad, norm, skel;
+	shadow->GetShowOptions (bbox, rad, norm, skel);
         norm = !norm;
 	Report (CS_REPORTER_SEVERITY_DEBUG,
 	    	"BugPlug %s normals display.",
 		norm ? "enabled" : "disabled");
-	shadow->SetShowOptions (bbox, rad, norm);
-	if ((bbox || rad || norm || show_polymesh != BUGPLUG_POLYMESH_NO)
+	shadow->SetShowOptions (bbox, rad, norm, skel);
+	if ((bbox || rad || norm || skel || show_polymesh != BUGPLUG_POLYMESH_NO)
 	  && HasSelectedMeshes ())
 	  shadow->AddToEngine (Engine);
 	else
 	  shadow->RemoveFromEngine (Engine);
+      }
+      break;
+    case DEBUGCMD_MESHSKEL:
+      {
+        bool bbox, rad, norm, skel;
+        shadow->GetShowOptions (bbox, rad, norm, skel);
+        skel = !skel;
+        Report (CS_REPORTER_SEVERITY_DEBUG,
+          "BugPlug %s skeleton display.",
+          norm ? "enabled" : "disabled");
+        shadow->SetShowOptions (bbox, rad, norm, skel);
+        if ((bbox || rad || norm || skel || show_polymesh != BUGPLUG_POLYMESH_NO)
+          && HasSelectedMeshes ())
+          shadow->AddToEngine (Engine);
+        else
+          shadow->RemoveFromEngine (Engine);
       }
       break;
     case DEBUGCMD_DEBUGVIEW:
@@ -1024,6 +1045,10 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
 	fps_frame_count = 0;
 	fps_tottime = 0;
 	fps_cur = -1;
+      break;
+    case DEBUGCMD_TOGGLEFPSTIME:
+      display_time = !display_time;
+      Report (CS_REPORTER_SEVERITY_DEBUG, "BugPlug will display %s.", display_time ? "frame time" : "fps");
       break;
     case DEBUGCMD_MESH_XMIN:
       MoveSelectedMeshes (csVector3 (-1, 0, 0));
@@ -1618,8 +1643,8 @@ bool csBugPlug::HandleFrame (iEvent& /*event*/)
     iCamera* cam = rview->GetOriginalCamera();
     csTransform tr_w2c = cam->GetTransform ();
     float fov = G3D->GetPerspectiveAspect ();
-    bool do_bbox, do_rad, do_norm;
-    shadow->GetShowOptions (do_bbox, do_rad, do_norm);
+    bool do_bbox, do_rad, do_norm, do_skel;
+    shadow->GetShowOptions (do_bbox, do_rad, do_norm, do_skel);
     G3D->BeginDraw (CSDRAW_2DGRAPHICS);
     for (k = 0 ; k < selected_meshes.GetSize () ; k++)
     {
@@ -1747,6 +1772,75 @@ bool csBugPlug::HandleFrame (iEvent& /*event*/)
             if (tangents != 0) tangents->~csRenderBufferLock<csVector3>();
             if (bitangents != 0) bitangents->~csRenderBufferLock<csVector3>();
           }
+        }
+      }
+      if (do_skel)
+      {
+        int bone_color = G3D->GetDriver2D ()->FindRGB (255, 0, 255);
+
+        csRef<iAnimatedMesh> aniMesh = scfQueryInterfaceSafe<iAnimatedMesh> (
+          selected_meshes[k]->GetMeshObject ());
+        if (!aniMesh)
+          continue;
+
+        iSkeleton2* skeleton = aniMesh->GetSkeleton ();
+        if (!skeleton)
+          continue;
+
+
+        iSkeletonFactory2* fact = skeleton->GetFactory ();
+
+        // Setup the "end" positions of all bones
+        const BoneID lastId = fact->GetTopBoneID ();
+        csArray<csVector3> childPos;
+        csArray<int> numChild;
+
+        childPos.SetSize (lastId+1, csVector3 (0));
+        numChild.SetSize (lastId+1, 0);
+
+        for (BoneID i = 0; i < lastId+1; ++i)
+        {
+          if (!fact->HasBone (i))
+            continue;
+
+          BoneID parent = fact->GetBoneParent (i);
+          if (parent != InvalidBoneID)
+          {
+            csQuaternion q;
+            csVector3 v;
+            skeleton->GetTransformBoneSpace (i, q, v);
+
+            childPos[parent] += v;
+            numChild[parent] += 1;
+          }
+        }
+
+        // Now draw the bones
+        for (BoneID i = 0; i < lastId+1; ++i)
+        {
+          if (!fact->HasBone (i))
+            continue;
+
+          csQuaternion q;
+          csVector3 v;
+          skeleton->GetTransformAbsSpace (i, q, v);
+
+          csVector3 gs = tr_o2c * v;
+          csVector3 endLocal;
+
+          if (numChild[i] > 0)
+          {
+            endLocal = childPos[i] / numChild[i];
+          }
+          else
+          {
+            endLocal = csVector3 (0,0,1);
+          }
+
+          csVector3 endGlobal = v + q.Rotate (endLocal);
+          csVector3 ge = tr_o2c * endGlobal;
+
+          G3D->DrawLine (gs, ge, fov, bone_color);
         }
       }
       if (show_polymesh != BUGPLUG_POLYMESH_NO)
@@ -1879,16 +1973,27 @@ bool csBugPlug::HandleFrame (iEvent& /*event*/)
       int fw, fh;
       fnt->GetMaxSize (fw, fh);
       int fgcolor = G2D->FindRGB (255, 255, 255);
-      if (fps_cur < 0.5)
+
+      if (display_time)
       {
-	const float spf = 1.0f/fps_cur;
-	GfxWrite (G2D, fnt, 11, sh - fh - 3, 0, -1, "SPF=%.2f", spf);
-	GfxWrite (G2D, fnt, 10, sh - fh - 2, fgcolor, -1, "SPF=%.2f", spf);
+        const float mspf = 1000.0f / fps_cur;
+
+        GfxWrite (G2D, fnt, 11, sh - fh - 3, 0, -1, "%.3f msec", mspf);
+        GfxWrite (G2D, fnt, 10, sh - fh - 2, fgcolor, -1, "%.3f msec", mspf);
       }
       else
       {
-	GfxWrite (G2D, fnt, 11, sh - fh - 3, 0, -1, "FPS=%.2f", fps_cur);
-	GfxWrite (G2D, fnt, 10, sh - fh - 2, fgcolor, -1, "FPS=%.2f", fps_cur);
+        if (fps_cur < 0.5)
+        {
+          const float spf = 1.0f/fps_cur;
+          GfxWrite (G2D, fnt, 11, sh - fh - 3, 0, -1, "SPF=%.2f", spf);
+          GfxWrite (G2D, fnt, 10, sh - fh - 2, fgcolor, -1, "SPF=%.2f", spf);
+        }
+        else
+        {
+          GfxWrite (G2D, fnt, 11, sh - fh - 3, 0, -1, "FPS=%.2f", fps_cur);
+          GfxWrite (G2D, fnt, 10, sh - fh - 2, fgcolor, -1, "FPS=%.2f", fps_cur);
+        }
       }
     }
     G3D->FinishDraw ();
@@ -2166,6 +2271,8 @@ int csBugPlug::GetCommandCode (const char* cmdstr, csString& args)
   if (!strcmp (cmd, "prof_autoreset"))	return DEBUGCMD_PROFAUTORESET;
   if (!strcmp (cmd, "uberscreenshot"))	return DEBUGCMD_UBERSCREENSHOT;
   if (!strcmp (cmd, "meshnorm"))	return DEBUGCMD_MESHNORM;
+  if (!strcmp (cmd, "toggle_fps_time")) return DEBUGCMD_TOGGLEFPSTIME;
+  if (!strcmp (cmd, "meshskel"))        return DEBUGCMD_MESHSKEL;
 
   return DEBUGCMD_UNKNOWN;
 }

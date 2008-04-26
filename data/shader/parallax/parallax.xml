@@ -19,6 +19,7 @@
       <texture destination="TexNormalCompressed" name="tex normal compressed" />
       <texture destination="TexDiffuse" name="tex diffuse" />
       <texture destination="TexHeight" name="tex height" />
+      <texture destination="TexSpecular" name="tex specular" />
       <fp plugin="glcg">
         <cgfp>
           <?Include parallax.cgfp ?>

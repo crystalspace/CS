@@ -136,6 +136,7 @@ struct csLoadResult
   * - 'library' file: 'result' will be 0.
   * - 'meshfact' file: 'result' will be the mesh factory wrapper.
   * - 'meshobj' file: 'result' will be the mesh wrapper.
+  * - 'meshref' file: 'result' will be the mesh wrapper.
   * - 'portals' file: 'result' will be the portal's mesh wrapper.
   * - 'light' file: 'result' will be the light. 
   * Note! In case of a light call DecRef() after you added it to a sector.
@@ -528,6 +529,7 @@ struct iLoader : public virtual iBase
   * - 'library' file: 'result' will be 0.
   * - 'meshfact' file: 'result' will be the mesh factory wrapper.
   * - 'meshobj' file: 'result' will be the mesh wrapper.
+  * - 'meshref' file: 'result' will be the mesh wrapper.
   * - 3ds/md2 models: 'result' will be the mesh factory wrapper.
   * - 'portals' file: 'result' will be the portal's mesh wrapper.
   * - 'light' file: 'result' will be the light.
@@ -593,6 +595,7 @@ struct iLoader : public virtual iBase
   * - 'library' file: 'result' will be 0.
   * - 'meshfact' file: 'result' will be the mesh factory wrapper.
   * - 'meshobj' file: 'result' will be the mesh wrapper.
+  * - 'meshref' file: 'result' will be the mesh wrapper.
   * - 3ds/md2 models: 'result' will be the mesh factory wrapper.
   * - 'portals' file: 'result' will be the portal's mesh wrapper.
   * - 'light' file: 'result' will be the light.
@@ -658,6 +661,7 @@ struct iLoader : public virtual iBase
   * - 'library' node: 'result' will be 0.
   * - 'meshfact' node: 'result' will be the mesh factory wrapper.
   * - 'meshobj' node: 'result' will be the mesh wrapper.
+  * - 'meshref' file: 'result' will be the mesh wrapper.
   * - 'portals' file: 'result' will be the portal's mesh wrapper.
   * - 'light' file: 'result' will be the light.
   *

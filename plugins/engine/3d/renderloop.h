@@ -52,6 +52,10 @@ protected:
 
   csRefArray<iRenderStep> steps;
   csRef<iShaderManager> shadermanager;
+
+protected:
+  virtual void InternalRemove() { SelfDestruct(); }
+
 public:
 
   csRenderLoop (csEngine* engine);
@@ -85,7 +89,7 @@ public:
 
   virtual csPtr<iRenderLoop> Create ();
   
-  virtual bool Register (const char* name, iRenderLoop* loop);
+  virtual bool Register (const char* name, iRenderLoop* loop, bool checkDupes = false);
   virtual iRenderLoop* Retrieve (const char* name);
   virtual const char* GetName (iRenderLoop* loop);
   virtual bool Unregister (iRenderLoop* loop);

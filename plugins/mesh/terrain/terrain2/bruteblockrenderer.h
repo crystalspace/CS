@@ -65,8 +65,7 @@ public:
     const csRect& rectangle, const unsigned char* materialMap, size_t pitch); 
 
   virtual void OnAlphaMapUpdate (iTerrainCell* cell,
-    iMaterialWrapper* material, const unsigned char* alphaMap, const csRect& rectangle, 
-    size_t pitch);
+    iMaterialWrapper* material, iImage* alphaMap);
 
   // ------------ iTerrainCellHeightDataCallback ------------
   virtual void OnHeightUpdate (iTerrainCell* cell, const csRect& rectangle);

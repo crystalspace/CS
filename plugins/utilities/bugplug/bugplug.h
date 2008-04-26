@@ -157,6 +157,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(BugPlug)
 #define DEBUGCMD_PROFAUTORESET	1067	// Reset profiler automagically at end of every frame
 #define DEBUGCMD_UBERSCREENSHOT 1068    // Create an "uberscreenshot"
 #define DEBUGCMD_MESHNORM       1069    // Draw normals of selected mesh
+#define DEBUGCMD_TOGGLEFPSTIME 1070 // Toggle between fps and frame time display
+#define DEBUGCMD_MESHSKEL       1080    // Draw skeleton of selected mesh
 
 // For showing of polygon meshes.
 #define BUGPLUG_POLYMESH_NO	0
@@ -298,7 +300,7 @@ private:
   void AddSelectedMesh (iMeshWrapper* m);
   void RemoveSelectedMesh (iMeshWrapper* m);
   bool HasSelectedMeshes () const { return selected_meshes.GetSize () > 0; }
-  void MoveSelectedMeshes (const csVector3& offset);
+  void MoveSelectedMeshes (const csVector3& offset);  
 
   // Shadow!
   csShadow* shadow;
@@ -519,6 +521,9 @@ public:
   CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
 
   CS_DECLARE_EVENT_SHORTCUTS;
+
+  private:
+    bool display_time;
 };
 
 }

@@ -20,11 +20,10 @@
 #define __CS_CSUTIL_UNUSED_RESOURCE_HELPER__
 
 #include "csutil/weakrefarr.h"
-#include "iengine/engine.h"
-#include "iengine/material.h"
-#include "iengine/mesh.h"
-#include "iengine/texture.h"
-#include "iutil/objreg.h"
+
+struct iEngine;
+struct iMaterialWrapper;
+struct iTextureWrapper;
 
 namespace CS
 {
@@ -34,15 +33,8 @@ namespace CS
     {
       void CS_CRYSTALSPACE_EXPORT UnloadUnusedMaterials(iEngine* engine,
         const csWeakRefArray<iMaterialWrapper>& materials);
-      void CS_CRYSTALSPACE_EXPORT UnloadUnusedShaders(iEngine* engine,
-        const csWeakRefArray<iShader>& shaders, iObjectRegistry* obj_reg);
       void CS_CRYSTALSPACE_EXPORT UnloadUnusedTextures(iEngine* engine,
         const csWeakRefArray<iTextureWrapper>& textures);
-      void CS_CRYSTALSPACE_EXPORT UnloadUnusedFactories(iEngine* engine, 
-        const csWeakRefArray<iMeshFactoryWrapper>& factories);
-      void CS_CRYSTALSPACE_EXPORT UnloadAllUnusedMaterials(iEngine* engine);
-      void CS_CRYSTALSPACE_EXPORT UnloadAllUnusedTextures(iEngine* engine);
-      void CS_CRYSTALSPACE_EXPORT UnloadAllUnusedFactories(iEngine* engine);
     }
   }
 }

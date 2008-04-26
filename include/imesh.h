@@ -22,6 +22,8 @@
  * subdirectory of the top Crystal Space include directory.
  */
 #include "cssysdef.h"
+
+#include "imesh/animesh.h"
 #include "imesh/genmesh.h"
 #include "imesh/gmeshanim.h"
 #include "imesh/gmeshskel2.h"
@@ -35,6 +37,8 @@
 #include "imesh/partsys.h"
 #include "imesh/protomesh.h"
 #include "imesh/skeleton.h"
+#include "imesh/skeleton2.h"
+#include "imesh/skeleton2anim.h"
 #include "imesh/sprite2d.h"
 #include "imesh/sprite3d.h"
 #include "imesh/spritecal3d.h"

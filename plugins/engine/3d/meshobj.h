@@ -204,6 +204,10 @@ protected:
   csRef<csLODListener> var_max_render_dist_listener;
 
   csEngine* engine;
+
+protected:
+  virtual void InternalRemove() { SelfDestruct(); }
+
 private:
   /// Mesh object corresponding with this csMeshWrapper.
   csRef<iMeshObject> meshobj;

@@ -53,7 +53,7 @@ const char* TiXmlBase::SkipWhiteSpace( ParseInfo& parse, const char* p )
   {
     return 0;
   }
-  while ( isspace (*p))
+  while ( isspace ((unsigned char)*p))
   {
     if (*p == '\n')
     {

@@ -458,7 +458,9 @@ void csGLRender2TextureFramebuf::FinishDraw ()
 void csGLRender2TextureFramebuf::SetClipRect (const csRect& clipRect)
 {
   GLRENDER3D_OUTPUT_LOCATION_MARKER;
-  glScissor (clipRect.xmin, txt_h - clipRect.ymax, clipRect.Width(),
+  GLint vp[4];
+  glGetIntegerv (GL_VIEWPORT, vp);
+  glScissor (vp[0] + clipRect.xmin, vp[1] + txt_h - clipRect.ymax, clipRect.Width(),
     clipRect.Height());
 }
 

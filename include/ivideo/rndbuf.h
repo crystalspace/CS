@@ -59,14 +59,42 @@ enum csRenderBufferType
 // NOTE: this is stored on disk by cssynldr! *Modify with care!*
 enum csRenderBufferComponentType
 {
+  /// Signed byte
   CS_BUFCOMP_BYTE = 0,
+  /// Unsigned byte
   CS_BUFCOMP_UNSIGNED_BYTE,
+  /// Signed short
   CS_BUFCOMP_SHORT,
+  /// Unsigned short
   CS_BUFCOMP_UNSIGNED_SHORT,
+  /// Signed integer
   CS_BUFCOMP_INT,
+  /// Unsigned integer
   CS_BUFCOMP_UNSIGNED_INT,
+  /// Float
   CS_BUFCOMP_FLOAT,
+  /// Double
   CS_BUFCOMP_DOUBLE,
+  
+  /// Normalization flag
+  CS_BUFCOMP_NORMALIZED = 8,
+  
+  /// Signed byte, normalized to [-1;1]
+  CS_BUFCOMP_BYTE_NORM = CS_BUFCOMP_BYTE | CS_BUFCOMP_NORMALIZED,
+  /// Unsigned byte, normalized to [0;1]
+  CS_BUFCOMP_UNSIGNED_BYTE_NORM =
+      CS_BUFCOMP_UNSIGNED_BYTE | CS_BUFCOMP_NORMALIZED,
+  /// Signed short, normalized to [-1;1]
+  CS_BUFCOMP_SHORT_NORM =
+      CS_BUFCOMP_SHORT | CS_BUFCOMP_NORMALIZED,
+  /// Unsigned short, normalized to [0;1]
+  CS_BUFCOMP_UNSIGNED_SHORT_NORM =
+      CS_BUFCOMP_UNSIGNED_SHORT | CS_BUFCOMP_NORMALIZED,
+  /// Signed integer, normalized to [-1;1]
+  CS_BUFCOMP_INT_NORM = CS_BUFCOMP_INT | CS_BUFCOMP_NORMALIZED,
+  /// Unsigned integer, normalized to [0;1]
+  CS_BUFCOMP_UNSIGNED_INT_NORM = 
+      CS_BUFCOMP_UNSIGNED_INT | CS_BUFCOMP_NORMALIZED,
 
   CS_BUFCOMP_TYPECOUNT
 };
@@ -110,7 +138,11 @@ static const size_t csRenderBufferComponentSizes[CS_BUFCOMP_TYPECOUNT] =
   sizeof (short), sizeof (unsigned short),
   sizeof (int), sizeof (unsigned int),
   sizeof (float),
-  sizeof (double)
+  sizeof (double),
+
+  sizeof (char), sizeof (unsigned char), 
+  sizeof (short), sizeof (unsigned short),
+  sizeof (int), sizeof (unsigned int)
 };
 
 struct iRenderBuffer;
@@ -337,7 +369,34 @@ class csRenderBufferHolder : public csRefCount
 {
 public:
   /** initialize */
-  csRenderBufferHolder() {accessorMask=0;}
+  csRenderBufferHolder () 
+    : accessorMask (0)
+  {    
+  }
+
+  csRenderBufferHolder (const csRenderBufferHolder& other)
+    : csRefCount (), accessorMask (other.accessorMask),
+    accessor (other.accessor)
+  {
+    for (size_t i = 0; i < CS_BUFFER_COUNT; ++i)
+    {
+      buffers[i] = other.buffers[i];
+    }
+  }
+
+  csRenderBufferHolder& operator= (const csRenderBufferHolder& other)
+  {
+    accessorMask = other.accessorMask;
+    accessor = other.accessor;
+
+    for (size_t i = 0; i < CS_BUFFER_COUNT; ++i)
+    {
+      buffers[i] = other.buffers[i];
+    }
+
+    return *this;
+  }
+
   /**
    * Get buffer by name.
    * If an accessor is set, it will first be called, after that the buffer

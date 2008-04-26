@@ -93,6 +93,13 @@ package cspace;
 *csevFrame = *cspacec::csevFrame;
 *csevInput = *cspacec::csevInput;
 *csevQuit = *cspacec::csevQuit;
+*csevCanvasClose = *cspacec::csevCanvasClose;
+*csevCanvasExposed = *cspacec::csevCanvasExposed;
+*csevCanvasHidden = *cspacec::csevCanvasHidden;
+*csevCanvasResize = *cspacec::csevCanvasResize;
+*csevFocusChanged = *cspacec::csevFocusChanged;
+*csevFocusGained = *cspacec::csevFocusGained;
+*csevFocusLost = *cspacec::csevFocusLost;
 *csevKeyboardEvent = *cspacec::csevKeyboardEvent;
 *csevKeyboardDown = *cspacec::csevKeyboardDown;
 *csevKeyboardUp = *cspacec::csevKeyboardUp;
@@ -986,6 +993,34 @@ sub new {
 *IncRef = *cspacec::csRefCount_IncRef;
 *DecRef = *cspacec::csRefCount_DecRef;
 *GetRefCount = *cspacec::csRefCount_GetRefCount;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::InternalRefCount ##############
+
+package cspace::InternalRefCount;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_InternalRefCount(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*InternalIncRef = *cspacec::InternalRefCount_InternalIncRef;
+*InternalDecRef = *cspacec::InternalRefCount_InternalDecRef;
+*GetInternalRefCount = *cspacec::InternalRefCount_GetInternalRefCount;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -3740,6 +3775,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetImageType = *cspacec::iImage_GetImageType;
 *HasSubImages = *cspacec::iImage_HasSubImages;
 *GetSubImage = *cspacec::iImage_GetSubImage;
+*GetCookedImageFormat = *cspacec::iImage_GetCookedImageFormat;
+*GetCookedImageData = *cspacec::iImage_GetCookedImageData;
 *scfGetVersion = *cspacec::iImage_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -4002,7 +4039,7 @@ sub ACQUIRE {
 
 package cspace::csObject;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::pycsObject cspace );
+@ISA = qw( cspace::pycsObject cspace::InternalRefCount cspace );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -4254,6 +4291,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *MissingMesh = *cspacec::iMissingLoaderData_MissingMesh;
 *MissingSector = *cspacec::iMissingLoaderData_MissingSector;
 *MissingLight = *cspacec::iMissingLoaderData_MissingLight;
+*scfGetVersion = *cspacec::iMissingLoaderData_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -5753,6 +5791,94 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         cspacec::delete_iView($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iBugPlugRenderObject ##############
+
+package cspace::iBugPlugRenderObject;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*Render = *cspacec::iBugPlugRenderObject_Render;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iBugPlugRenderObject($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iBugPlug ##############
+
+package cspace::iBugPlug;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*SetupDebugSector = *cspacec::iBugPlug_SetupDebugSector;
+*DebugSectorBox = *cspacec::iBugPlug_DebugSectorBox;
+*DebugSectorTriangle = *cspacec::iBugPlug_DebugSectorTriangle;
+*SwitchDebugSector = *cspacec::iBugPlug_SwitchDebugSector;
+*CheckDebugSector = *cspacec::iBugPlug_CheckDebugSector;
+*SetupDebugView = *cspacec::iBugPlug_SetupDebugView;
+*DebugViewPoint = *cspacec::iBugPlug_DebugViewPoint;
+*DebugViewLine = *cspacec::iBugPlug_DebugViewLine;
+*DebugViewBox = *cspacec::iBugPlug_DebugViewBox;
+*DebugViewPointCount = *cspacec::iBugPlug_DebugViewPointCount;
+*DebugViewGetPoint = *cspacec::iBugPlug_DebugViewGetPoint;
+*DebugViewLineCount = *cspacec::iBugPlug_DebugViewLineCount;
+*DebugViewGetLine = *cspacec::iBugPlug_DebugViewGetLine;
+*DebugViewBoxCount = *cspacec::iBugPlug_DebugViewBoxCount;
+*DebugViewGetBox = *cspacec::iBugPlug_DebugViewGetBox;
+*DebugViewRenderObject = *cspacec::iBugPlug_DebugViewRenderObject;
+*DebugViewClearScreen = *cspacec::iBugPlug_DebugViewClearScreen;
+*SwitchDebugView = *cspacec::iBugPlug_SwitchDebugView;
+*CheckDebugView = *cspacec::iBugPlug_CheckDebugView;
+*AddCounter = *cspacec::iBugPlug_AddCounter;
+*AddCounterEnum = *cspacec::iBugPlug_AddCounterEnum;
+*ResetCounter = *cspacec::iBugPlug_ResetCounter;
+*RemoveCounter = *cspacec::iBugPlug_RemoveCounter;
+*ExecCommand = *cspacec::iBugPlug_ExecCommand;
+*scfGetVersion = *cspacec::iBugPlug_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iBugPlug($self);
         delete $OWNER{$self};
     }
 }
@@ -8065,6 +8191,7 @@ sub DESTROY {
 *SetAccessor = *cspacec::csShaderVariable_SetAccessor;
 *SetName = *cspacec::csShaderVariable_SetName;
 *GetName = *cspacec::csShaderVariable_GetName;
+*GetAccessorData = *cspacec::csShaderVariable_GetAccessorData;
 *GetValue = *cspacec::csShaderVariable_GetValue;
 *SetValue = *cspacec::csShaderVariable_SetValue;
 *AddVariableToArray = *cspacec::csShaderVariable_AddVariableToArray;
@@ -8254,11 +8381,11 @@ sub DESTROY {
 *GetKeyColor = *cspacec::csImageBase_GetKeyColor;
 *HasMipmaps = *cspacec::csImageBase_HasMipmaps;
 *GetMipmap = *cspacec::csImageBase_GetMipmap;
-*GetRawFormat = *cspacec::csImageBase_GetRawFormat;
-*GetRawData = *cspacec::csImageBase_GetRawData;
 *GetImageType = *cspacec::csImageBase_GetImageType;
 *HasSubImages = *cspacec::csImageBase_HasSubImages;
 *GetSubImage = *cspacec::csImageBase_GetSubImage;
+*GetCookedImageFormat = *cspacec::csImageBase_GetCookedImageFormat;
+*GetCookedImageData = *cspacec::csImageBase_GetCookedImageData;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -8340,11 +8467,8 @@ sub DESTROY {
 *CheckAlpha = *cspacec::csImageMemory_CheckAlpha;
 *SetFormat = *cspacec::csImageMemory_SetFormat;
 *SetKeyColor = *cspacec::csImageMemory_SetKeyColor;
-*SetKeycolor = *cspacec::csImageMemory_SetKeycolor;
 *ClearKeyColor = *cspacec::csImageMemory_ClearKeyColor;
-*ClearKeycolor = *cspacec::csImageMemory_ClearKeycolor;
 *ApplyKeyColor = *cspacec::csImageMemory_ApplyKeyColor;
-*ApplyKeycolor = *cspacec::csImageMemory_ApplyKeycolor;
 *GetImageType = *cspacec::csImageMemory_GetImageType;
 *SetImageType = *cspacec::csImageMemory_SetImageType;
 *HasMipmaps = *cspacec::csImageMemory_HasMipmaps;
@@ -8654,6 +8778,9 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetName = *cspacec::iGraphics2D_GetName;
 *CreateOffscreenCanvas = *cspacec::iGraphics2D_CreateOffscreenCanvas;
 *Write = *cspacec::iGraphics2D_Write;
+*SetViewport = *cspacec::iGraphics2D_SetViewport;
+*GetViewport = *cspacec::iGraphics2D_GetViewport;
+*GetFramebufferDimensions = *cspacec::iGraphics2D_GetFramebufferDimensions;
 *scfGetVersion = *cspacec::iGraphics2D_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -9035,6 +9162,47 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::RenderMeshIndexRange ##############
+
+package cspace::RenderMeshIndexRange;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_start_get = *cspacec::RenderMeshIndexRange_start_get;
+*swig_start_set = *cspacec::RenderMeshIndexRange_start_set;
+*swig_end_get = *cspacec::RenderMeshIndexRange_end_get;
+*swig_end_set = *cspacec::RenderMeshIndexRange_end_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_RenderMeshIndexRange(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_RenderMeshIndexRange($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::CoreRenderMesh ##############
 
 package cspace::CoreRenderMesh;
@@ -9075,6 +9243,10 @@ sub DESTROY {
 *swig_indexstart_set = *cspacec::CoreRenderMesh_indexstart_set;
 *swig_indexend_get = *cspacec::CoreRenderMesh_indexend_get;
 *swig_indexend_set = *cspacec::CoreRenderMesh_indexend_set;
+*swig_multiRanges_get = *cspacec::CoreRenderMesh_multiRanges_get;
+*swig_multiRanges_set = *cspacec::CoreRenderMesh_multiRanges_set;
+*swig_rangesNum_get = *cspacec::CoreRenderMesh_rangesNum_get;
+*swig_rangesNum_set = *cspacec::CoreRenderMesh_rangesNum_set;
 *swig_material_get = *cspacec::CoreRenderMesh_material_get;
 *swig_material_set = *cspacec::CoreRenderMesh_material_set;
 *swig_object2world_get = *cspacec::CoreRenderMesh_object2world_get;
@@ -10326,9 +10498,11 @@ sub new {
 *Row1 = *cspacec::csMatrix3_Row1;
 *Row2 = *cspacec::csMatrix3_Row2;
 *Row3 = *cspacec::csMatrix3_Row3;
+*Row = *cspacec::csMatrix3_Row;
 *Col1 = *cspacec::csMatrix3_Col1;
 *Col2 = *cspacec::csMatrix3_Col2;
 *Col3 = *cspacec::csMatrix3_Col3;
+*Col = *cspacec::csMatrix3_Col;
 *Set = *cspacec::csMatrix3_Set;
 *__neg__ = *cspacec::csMatrix3___neg__;
 *Transpose = *cspacec::csMatrix3_Transpose;
@@ -15545,6 +15719,9 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %OWNER = ();
 %ITERATORS = ();
 *SetHeightmapSource = *cspacec::iTerrainCellFeederProperties_SetHeightmapSource;
+*SetMaterialMapSource = *cspacec::iTerrainCellFeederProperties_SetMaterialMapSource;
+*SetHeightOffset = *cspacec::iTerrainCellFeederProperties_SetHeightOffset;
+*AddAlphaMap = *cspacec::iTerrainCellFeederProperties_AddAlphaMap;
 *SetParameter = *cspacec::iTerrainCellFeederProperties_SetParameter;
 *Clone = *cspacec::iTerrainCellFeederProperties_Clone;
 *scfGetVersion = *cspacec::iTerrainCellFeederProperties_scfGetVersion;
@@ -15704,6 +15881,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetRenderMeshes = *cspacec::iTerrainRenderer_GetRenderMeshes;
 *OnMaterialPaletteUpdate = *cspacec::iTerrainRenderer_OnMaterialPaletteUpdate;
 *OnMaterialMaskUpdate = *cspacec::iTerrainRenderer_OnMaterialMaskUpdate;
+*OnAlphaMapUpdate = *cspacec::iTerrainRenderer_OnAlphaMapUpdate;
 *scfGetVersion = *cspacec::iTerrainRenderer_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -15882,6 +16060,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *LockMaterialMap = *cspacec::iTerrainCell_LockMaterialMap;
 *UnlockMaterialMap = *cspacec::iTerrainCell_UnlockMaterialMap;
 *SetMaterialMask = *cspacec::iTerrainCell_SetMaterialMask;
+*SetAlphaMask = *cspacec::iTerrainCell_SetAlphaMask;
 *SetBaseMaterial = *cspacec::iTerrainCell_SetBaseMaterial;
 *GetBaseMaterial = *cspacec::iTerrainCell_GetBaseMaterial;
 *CollideSegment = *cspacec::iTerrainCell_CollideSegment;
@@ -17582,7 +17761,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetRegions = *cspacec::iEngine_GetRegions;
 *CreateCollection = *cspacec::iEngine_CreateCollection;
 *GetCollection = *cspacec::iEngine_GetCollection;
-*GetDefaultCollection = *cspacec::iEngine_GetDefaultCollection;
+*GetCollections = *cspacec::iEngine_GetCollections;
 *RemoveCollection = *cspacec::iEngine_RemoveCollection;
 *RemoveAllCollections = *cspacec::iEngine_RemoveAllCollections;
 *CreateCamera = *cspacec::iEngine_CreateCamera;
@@ -19097,6 +19276,120 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         cspacec::delete_iRenderLoopManager($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSwigCollectionArray ##############
+
+package cspace::iSwigCollectionArray;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*GetSize = *cspacec::iSwigCollectionArray_GetSize;
+*Get = *cspacec::iSwigCollectionArray_Get;
+*Top = *cspacec::iSwigCollectionArray_Top;
+*Find = *cspacec::iSwigCollectionArray_Find;
+*GetIndex = *cspacec::iSwigCollectionArray_GetIndex;
+*IsEmpty = *cspacec::iSwigCollectionArray_IsEmpty;
+*GetAll = *cspacec::iSwigCollectionArray_GetAll;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSwigCollectionArray($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iCollection ##############
+
+package cspace::iCollection;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*QueryObject = *cspacec::iCollection_QueryObject;
+*Add = *cspacec::iCollection_Add;
+*Remove = *cspacec::iCollection_Remove;
+*ReleaseAllObjects = *cspacec::iCollection_ReleaseAllObjects;
+*IsParentOf = *cspacec::iCollection_IsParentOf;
+*FindSector = *cspacec::iCollection_FindSector;
+*FindMeshObject = *cspacec::iCollection_FindMeshObject;
+*FindMeshFactory = *cspacec::iCollection_FindMeshFactory;
+*FindTexture = *cspacec::iCollection_FindTexture;
+*FindMaterial = *cspacec::iCollection_FindMaterial;
+*FindShader = *cspacec::iCollection_FindShader;
+*FindCameraPosition = *cspacec::iCollection_FindCameraPosition;
+*scfGetVersion = *cspacec::iCollection_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iCollection($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iCollectionArray ##############
+
+package cspace::iCollectionArray;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*scfGetVersion = *cspacec::iCollectionArray_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iCollectionArray($self);
         delete $OWNER{$self};
     }
 }

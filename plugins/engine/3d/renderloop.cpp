@@ -152,10 +152,14 @@ csPtr<iRenderLoop> csRenderLoopManager::Create ()
   return csPtr<iRenderLoop> (loop);
 }
   
-bool csRenderLoopManager::Register (const char* name, iRenderLoop* loop)
+bool csRenderLoopManager::Register (const char* name, iRenderLoop* loop,
+                                    bool checkDupes)
 {
   const char* myName = strings.Request (strings.Request (name));
-  if (loops.In (myName)) return false;
+  if (loops.In (myName))
+  {
+    return checkDupes;
+  }
   loops.Put (myName, loop);
   return true;
 }

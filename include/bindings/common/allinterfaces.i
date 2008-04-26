@@ -23,6 +23,8 @@
 %define IENGINE_APPLY_FOR_EACH_INTERFACE
   INTERFACE_APPLY(iCamera)
   INTERFACE_APPLY(iCameraPosition)
+  INTERFACE_APPLY(iCollection)
+  INTERFACE_APPLY(iCollectionArray)
   INTERFACE_APPLY(iEngine)
   INTERFACE_APPLY(iFrustumView)
   INTERFACE_APPLY(iFrustumViewUserdata)
@@ -54,6 +56,7 @@
   INTERFACE_APPLY(iBinaryLoaderPlugin)
   INTERFACE_APPLY(iLoader)
   INTERFACE_APPLY(iLoaderPlugin)
+  INTERFACE_APPLY(iMissingLoaderData)
 %enddef
 
 %define IMESH_APPLY_FOR_EACH_INTERFACE
@@ -122,6 +125,7 @@
 
 %define IVARIA_APPLY_FOR_EACH_INTERFACE
   INTERFACE_APPLY(iBodyGroup)
+  INTERFACE_APPLY(iBugPlug)
   INTERFACE_APPLY(iDynamics)
   INTERFACE_APPLY(iDynamicSystem)
   INTERFACE_APPLY(iJoint)

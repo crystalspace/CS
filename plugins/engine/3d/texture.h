@@ -92,6 +92,9 @@ private:
     keyColorDirty = false;
   }
 
+protected:
+  virtual void InternalRemove() { SelfDestruct(); }
+
 public:
   CS_LEAKGUARD_DECLARE (csTextureWrapper);
 
