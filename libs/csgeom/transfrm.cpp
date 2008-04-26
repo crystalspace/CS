@@ -369,6 +369,11 @@ csSphere operator/ (const csSphere &p, const csReversibleTransform &t)
   return t.This2Other (p);
 }
 
+csBox3 operator/ (const csBox3 &p, const csReversibleTransform &t)
+{
+  return t.This2Other (p);
+}
+
 csPlane3 &operator/= (csPlane3 &p, const csReversibleTransform &t)
 {
   p.DD -= p.norm * (t.m_o2t * t.v_o2t);
