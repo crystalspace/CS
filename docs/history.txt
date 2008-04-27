@@ -6,14 +6,18 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+28-Apr-2008
+	- Marten fixed win32 version of GetPhysicalMemorySize(). Atm there
+	  is a problem with computers with more than 4GB of RAM, a solution
+	  needs to be researched.
 27-Apr-2008
-        - Scott Johnson added osx stub for GetPhysicalMemorySize().
-        - Scott Johnson added win32 implementation of GetPhysicalMemorySize().
-	- Scott Johnson fixed CS::Platform::GetPhysicalMemorySize() for unix
-	  and windows variants. OSX is not guaranteed to be working yet.
 	- Marten fixed a compilation error in animesh on gcc platforms.
 	- Vincent added a 'Distributing your application' section to the
 	  manual, based on nev7n patch from #183.
+	- Scott Johnson fixed CS::Platform::GetPhysicalMemorySize() for unix
+	  and windows variants. OSX is not guaranteed to be working yet.
+        - Scott Johnson added win32 implementation of GetPhysicalMemorySize().
+        - Scott Johnson added osx stub for GetPhysicalMemorySize().
 26-Apr-2008
 	- res tweaked tangent space computation in
 	  csNormalMappingTools::CalculateTangents to avoid degenerate tangents
