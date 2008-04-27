@@ -7,6 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 27-Apr-2008
+        - Scott Johnson added osx stub for GetPhysicalMemorySize().
         - Scott Johnson added win32 implementation of GetPhysicalMemorySize().
 	- Scott Johnson fixed CS::Platform::GetPhysicalMemorySize() for unix
 	  and windows variants. OSX is not guaranteed to be working yet.
