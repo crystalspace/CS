@@ -309,7 +309,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     masterBWBuffer = csRenderBuffer::CreateInterleavedRenderBuffers (
       vertexCount, CS_BUF_STATIC, 2, bufSettings, boneWeightAndIndexBuffer);
     masterBWBuffer->CopyInto (boneInfluences.GetArray (), 
-      csMin(vertexCount, boneInfluences.GetSize ()/4));
+      csMin((size_t)vertexCount, (size_t)boneInfluences.GetSize ()/4));
     
     // Fix the bb
     factoryBB.StartBoundingBox ();
@@ -991,7 +991,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         skinBinormalLF = true;
       }
       break;
-
+    default: //Empty..
+      break;
     }    
   }
 
