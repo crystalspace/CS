@@ -7,9 +7,11 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 27-Apr-2008
-	- Scott Johnson fixed CS::Platform::GetPhysicalMemorySize() for unix and windows
-          variants.  OSX is not guaranteed to be working yet.
+	- Scott Johnson fixed CS::Platform::GetPhysicalMemorySize() for unix
+	  and windows variants. OSX is not guaranteed to be working yet.
 	- Marten fixed a compilation error in animesh on gcc platforms.
+	- Vincent added a 'Distributing your application' section to the
+	  manual, based on nev7n patch from #183.
 26-Apr-2008
 	- res tweaked tangent space computation in
 	  csNormalMappingTools::CalculateTangents to avoid degenerate tangents
