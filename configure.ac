@@ -1792,8 +1792,15 @@ CS_CHECK_BUILD([for _aligned_malloc], [cs_cv__aligned_malloc],
 	[_aligned_malloc(0, 0);])],
     [], [],
     [CS_HEADER_PROPERTY([CS_HAVE__ALIGNED_MALLOC])])
-
-
+    
+CS_CHECK_BUILD([for sysinfo()], [cs_cv_sysinfo],
+    [AC_LANG_PROGRAM(
+  [[#include <sys/sysinfo.h>]],
+   [struct sysinfo x; sysinfo(&x);])],
+   [],[],
+   [CS_HEADER_PROPERTY([CS_HAVE_SYSINFO])])
+   
+AC_CHECK_FILE([/proc/meminfo], [CS_HEADER_PROPERTY([CS_HAVE_PROC_MEMINFO])], [])
 
 #------------------------------------------------------------------------------
 # Check whether malloc.h can be included without a warning.
