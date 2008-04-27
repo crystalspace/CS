@@ -16,6 +16,7 @@ License along with this library; if not, write to the Free
 Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "cssysdef.h"
 #include "csutil/memutil.h"
 
 namespace CS {
@@ -24,11 +25,14 @@ namespace CS {
 
       size_t GetPhysicalMemorySize()
       {
-        const int kbConversion = 1024;
-        MEMORYSTATUSEX memAmount;
+/*        MEMORYSTATUSEX memAmount;
         memAmount.dwLength = sizeof(memAmount);
         GlobalMemoryStatusEx(&memAmount);
-        return (memAmount.ullTotalPhys/kbConversion);
+        return (memAmount.ullTotalPhys/kbConversion); */
+	MEMORYSTATUS memAmount;
+	memAmount.dwLength = sizeof(MEMORYSTATUS);
+	GlobalMemoryStatus(&memAmount);
+	return memAmount.dwTotalPhys / 1024;
       }
     } // End namespace Implementation
   } // End namespace Platform
