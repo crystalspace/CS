@@ -71,13 +71,13 @@ namespace RenderManager
 	// PSSM: split layers
 	
 	// @@@ FIXME: arbitrary
-	float near = SMALL_Z;
-	float far = 100.0f;
+	float _near = SMALL_Z;
+	float _far = 100.0f;
       
-	splitDists[0] = near;
+	splitDists[0] = _near;
 	for (int i = 0; i <= NUM_PARTS; i++)
 	{
-	  const float n = near, f = far;
+	  const float n = _near, f = _far;
 	  const float iFrac = (float)i/(float)NUM_PARTS;
 	  splitDists[i] = (n * pow (f/n, iFrac) + n + (f-n)*iFrac)*0.5f;
 	}
