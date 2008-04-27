@@ -585,7 +585,7 @@ and runs on all platforms supported by Crystal Space.
 
 In order to compile a Crystal Space application I recommend you look at the
 howto on compiling an external application. For @sc{msvc} 7 and later this 
-tutorial can be found at @xref{HOWTO Creating External MSVC 7 Application}, 
+tutorial can be found at @xref{HOWTO Creating External MSVC Application}, 
 for other environments based on @sc{gnu} make you can look at
 @xref{HOWTO CS Project}.
 
