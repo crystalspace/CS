@@ -16,25 +16,29 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "csutil/memutil.h"
-#include "memutil.h"
+#ifndef __CS_LIBS_CSUTIL_MEMUTIL_H__
+#define __CS_LIBS_CSUTIL_MEMUTIL_H__
+
+#include "cssysdef.h"
 
 namespace CS {
   namespace Platform {
+    namespace Implementation {
 
-    size_t GetPhysicalMemorySize()
-    {
-      static size_t memorySize = 0;
-      static bool cacheValid = false;
+     /**
+      * @brief Implementation-dependant memory retreival function.
+      *
+      * Used by CS::Platform::GetPhysicalMemorySize().  Do not call this
+      * function directly, use CS::Platform::GetPhysicalMemorySize().
+      *
+      * @returns Physical system memory (in kB) on success, or 0 on failure.
+      *
+      * @sa CS::Platform::GetPhysicalMemorySize()
+      */
+    size_t GetPhysicalMemorySize();
 
-      if (!cacheValid)
-      {
-        memorySize = CS::Platform::Implementation::GetPhysicalMemorySize();
-        cacheValid = true;
-      }
-
-      return memorySize;
-
-    } // End GetPhysicalMemorySize()      
+    } // End namespace Implementation
   } // End namespace Platform
 } // End namespace CS
+
+#endif
