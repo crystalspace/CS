@@ -299,9 +299,17 @@ namespace RenderManager
           {
 	    shadowMapCtx->renderTargets[
 	      persist.settings.targets[t]->attachment].texHandle = 
-	        texHandles[t];
+		texHandles[t];
 	  }
 	  shadowMapCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
+	  shadowMapCtx->postEffects = persist.settings.postEffects;
+	  
+	  /* @@@ FIXME: This will break as soon as the shadowmaps have
+	     different resolutions!
+	     Probably the post effects manager should be changed to handle
+	     changing resolutions well */
+	  if (shadowMapCtx->postEffects.IsValid())
+            shadowMapCtx->postEffects->SetupView (shadowMapSize, shadowMapSize);
   
 	  // Setup the new context
 	  ShadowmapContextSetup contextFunction (layerConfig,
@@ -436,22 +444,10 @@ private:
       LightingVariablesHelper::PersistentData lightVarsPersist;
       iShaderManager* shaderManager;
 
-      //TextureCache texCacheDepth;
-      //TextureCache texCacheID;
-      //bool doIDTexture;
       csString shadowType;
       ShadowSettings settings;
 
-      PersistentData() : frameNum (0), shadowType ("Depth")/*,
-        texCacheDepth (csimg2D, "d32", 
-          CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP,
-          "shadowmap", 
-          TextureCache::tcachePowerOfTwo | TextureCache::tcacheExactSizeMatch),
-        texCacheID (csimg2D, "argb8", 
-          CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP | CS_TEXTURE_NOFILTER,
-          "shadowmap", 
-          TextureCache::tcachePowerOfTwo | TextureCache::tcacheExactSizeMatch),
-        doIDTexture (false)*/
+      PersistentData() : frameNum (0), shadowType ("Depth")
       {
       }
 
