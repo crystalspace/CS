@@ -1,0 +1,53 @@
+@c -*-texinfo-*-
+@node Distributing Own Project, BugPlug, Making Own Projects, Using Crystal Space
+@section Distributing your Crystal Space Application
+@cindex packaging
+
+At some point, you'll probably want to distribute your application,
+including people without the Crystal Space development environment.
+
+This page is focusing on binary distribution. However, if you're distributing
+the source code as well, having a build system like the one created by the
+Jamtemplate's @emph{createproject.sh} script is recommended
+(@pxref{HOWTO CS Project}).
+
+@subsubheading Required set of components
+@table @asis
+@item Your application files
+That is: any executable, data and configuration file specific to your
+application.
+@item Crystal Space libraries
+Files like @file{libcrystalspace-X.Y.so} and
+@file{libcrystalspace_opengl-X.Y.so} (check for @emph{.dll} instead of
+@emph{.so} on Windows platform) provide the base for Crystal Space support.
+@item Crystal Space plugins
+Your application uses a number of them. You'll have to identify which ones, or
+provide them all if in doubt. Note that bugplug's @kbd{Ctrl-Alt-l} can help
+to check which CS plugins are loaded.
+@item Crystal Space configuration files
+
+@itemize @bullet
+@item @file{vfs.cfg}
+
+Also found in the root crystalspace build directory, this tells the VFS system
+how to map virtual to real directories. You will often want to replace the
+default with your own version that includes VFS mappings for your application.
+@xref{VFS}.
+
+@item @file{CS/data/config/}
+
+This directory contains configuration files for Crystal Space. Some of these,
+like application-specific files, are not necessary.
+Note that Crystal Space generally expects to find them in @file{/config/}
+VFS mount point.
+
+@end itemize
+@item Crystal Space shaders
+
+Your application most certainly uses some of the shaders provided with
+Crystal Space. The easiest is to copy them all in your application's package.
+They are located in @file{CS/data/shader/}.
+Note that Crystal Space generally expects to find them in @file{/shader/}
+VFS mount point. 
+@end table
+
