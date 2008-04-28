@@ -23,15 +23,16 @@
 #include "csextern.h"
 
 namespace CS {
-  namespace Memory {
+  namespace Platform {
 
-    /** @brief Retrieve the amount of physical system memory, in kB
+    /**
+     * Retrieve the number of kB of physical system memory.
      *
-     * @returns Physical system memory (in kB) on success, 0 otherwise
+     * @returns Physical system memory (in kB) on success, or 0 on failure.
      */
-   CS_CRYSTALSPACE_EXPORT size_t GetPhysicalMemory();
+   CS_CRYSTALSPACE_EXPORT size_t GetPhysicalMemorySize();
 
-  } // End namespace Memory
+  } // End namespace Platform
 } // End namespace CS
 
 #endif
