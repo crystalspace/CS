@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 
+#include "csplugincommon/rendermanager/posteffects.h"
 #include "csplugincommon/rendermanager/shadow_common.h"
 
 #include "imap/loader.h"
@@ -49,14 +50,24 @@ namespace CS
 	shadowDefaultShader = loader->LoadShader (defaultShader);
       }
       
+      const char* postEffectsLayers = cfg->GetStr (
+        csString().Format ("RenderManager.Shadows.%s.PostProcess", shadowType),
+        0);
+      if (postEffectsLayers != 0)
+      {
+	postEffects.AttachNew (new PostEffectManager);
+	postEffects->Initialize (objReg);
+	PostEffectLayersParser layerParser (objReg);
+	layerParser.AddLayersFromFile (postEffectsLayers, *postEffects);
+      }
+            
       csRef<iShaderManager> shaderManager =
 	csQueryRegistry<iShaderManager> (objReg);
       iShaderVarStringSet* svStrings = shaderManager->GetSVNameStringset();
       
-      csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objReg);
       ReadTargets (targets, cfg,
         csString().Format ("RenderManager.Shadows.%s.Texture.", shadowType),
-        svStrings, g3d);
+        svStrings, objReg);
 	
       if (provideIDs)
       {
@@ -75,8 +86,10 @@ namespace CS
     bool ShadowSettings::ReadTargets (TargetArray& targets, iConfigFile* cfg,
                                       const char* prefix,
                                       iShaderVarStringSet* svStrings,
-                                      iGraphics3D* g3d)
+                                      iObjectRegistry* objReg)
     {
+      csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objReg);
+      
       csSet<csString> seenTextures;
       csRef<iConfigIterator> texKeys = cfg->Enumerate (prefix);
       
@@ -109,6 +122,14 @@ namespace CS
             else
               return false;
               
+            if (postEffects.IsValid())
+            {
+              if (attachment == rtaColor0)
+              {
+                postEffects->SetIntermediateTargetFormat (formatStr);
+              }
+            }
+              
             CS::ShaderVarStringID svName = svStrings->Request (svNameStr);
               
             uint texFlags = 0;
@@ -120,7 +141,7 @@ namespace CS
 		csString().Format ("%s%s.NoFilter", prefix, texID.GetData()),
 		false))
 	     texFlags |= CS_TEXTURE_NOFILTER;
-            
+	     
             Target* newTarget = new Target (attachment, svName, formatStr,
               texFlags);
             newTarget->texCache.SetG3D (g3d);

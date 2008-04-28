@@ -30,6 +30,8 @@ namespace CS
 {
   namespace RenderManager
   {
+    class PostEffectManager;
+  
     class CS_CRYSTALSPACE_EXPORT ShadowSettings
     {
     public:
@@ -58,12 +60,14 @@ namespace CS
       bool provideIDs;
       CS::ShaderVarStringID svMeshIDName;
       
+      csRef<PostEffectManager> postEffects;
+      
       void ReadSettings (iObjectRegistry* objReg, const char* shadowType);
       void AdvanceFrame (csTicks time);
     protected:
       bool ReadTargets (TargetArray& targets, iConfigFile* cfg,
-        const char* prefixed, iShaderVarStringSet* svStrings,
-        iGraphics3D* g3d);
+        const char* prefixed, iShaderVarStringSet* svStrings, 
+        iObjectRegistry* objReg);
     };
   } // namespace RenderManager
 } // namespace CS
