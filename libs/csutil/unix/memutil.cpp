@@ -16,7 +16,8 @@ License along with this library; if not, write to the Free
 Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "csutil/memutil.h"
+#include "cssysdef.h"
+#include "csutil/csstring.h"
 #include "csutil/sysfunc.h"
 #include "../memutil.h"
 #include <sys/sysinfo.h>
@@ -28,51 +29,39 @@ namespace CS {
 
       size_t GetPhysicalMemorySize()
       {
-        int error = 0;
 #if defined(CS_HAVE_SYSINFO)
         struct sysinfo s_info;
-        error = sysinfo(&s_info);
+        int error = sysinfo(&s_info);
 
         if (error == 0)
         {
           return (s_info.totalram/1024);
         }
-#elif 0 
-        // this isn't working, simply because /proc/meminfo isn't a normal file
-        // I think perhaps csPhysicalFile just doesn't like it.  :)
-        //defined (CS_HAVE_PROC_MEMINFO)
-        // no sysinfo(), but we have /proc/meminfo
-        // open /proc/meminfo
-        csRef<iFile> procMeminfo;
-        procMeminfo.AttachNew(new csPhysicalFile("/proc/meminfo", "rb"));
-        csRef<iDataBuffer> allData = procMeminfo->GetAllData();
-        csStringReader lineParser(allData->GetData());
-
-        // while we haven't found the line we are looking for
-        size_t totalMem = 0;
-        while (lineParser.HasMoreLines())
-        {
-          // grab the next line
-          csString nextLine;
-          lineParser.GetLine(nextLine);
-          size_t pos = nextLine.Find(":");
-          csString sub1 = nextLine.Slice(0, pos);
-          csString sub2 = nextLine.Slice(pos+1, nextLine.Length() - 1);
-
-          // determine if the first token is MemTotal
-          if (sub1.Compare("MemTotal:"))
-          {
-            // if it is, then the next token is what we want
-            totalMem = (size_t)atol(sub2.GetData());
-            break;
-          }
-        }
-
-        // divide the amount we have to get it in kB
-        totalMem /= 1024;
-        
-        // return the scaled amount
-        return totalMem;
+#elif defined (CS_HAVE_PROC_MEMINFO)
+	FILE* f = fopen("/proc/meminfo", "r");
+	if (f != 0)
+	{
+	  size_t totalMem = 0;
+	  csString line, key, val;
+	  char buff[ 1024 ];
+	  while (fgets(buff, sizeof(buff) - 1, f) != 0)
+	  {
+	    line = buff;
+	    size_t pos = line.Find(":");
+	    if (pos > 0)
+	    {
+	      key = line.Slice(0, pos);
+	      if (key.CompareNoCase("memtotal"))
+	      {
+		val = line.Slice(pos + 1);
+		totalMem = (size_t)atol(val.GetData());
+		break;
+	      }
+	    }
+	  }
+	  fclose(f);
+	  return totalMem;
+	}
 #endif
         // everything seems to have failed, so output some information
         // and return 0

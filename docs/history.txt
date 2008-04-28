@@ -27,6 +27,18 @@ chronological order.
 	  from libs/csutil/macosx to libs/csutil/generic since it is entirely
 	  generic and is a suitable fallback for any platform for which a
 	  customized implementation is not available.
+	- Eric Sunshine fixed up the broken /proc/meminfo query implementation
+	  of CS::Platform::Implementation::GetPhysicalMemorySize() in
+	  libs/csutil/unix/memutil.cpp. It no longer employs csPhysicalFile
+	  since the GetAllData() method of that class expects the file size to
+	  be reported reliably, but most entries in /proc report size 0. Fixed
+	  string splicing boundary-case problems, such as incorrectly comparing
+	  each /proc/meminfo key against "MemTotal:" rather than "MemTotal",
+	  and asking csString::Splice() to extract characters beyond the end of
+	  string.  For robustness, now performs a case-insensitive search for
+	  "MemTotal". Fixed problem where it incorrectly assumed that the value
+	  of "MemTotal" was reported in bytes when, in fact, it is already in
+	  the desired KB unit.
 27-Apr-2008
 	- Marten fixed a compilation error in animesh on gcc platforms.
 	- Vincent added a 'Distributing your application' section to the
