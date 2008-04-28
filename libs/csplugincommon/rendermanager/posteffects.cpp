@@ -25,6 +25,7 @@
 #include "csutil/objreg.h"
 #include "csutil/xmltiny.h"
 #include "cstool/rbuflock.h"
+#include "iengine/rview.h"
 #include "imap/loader.h"
 #include "imap/services.h"
 #include "iutil/document.h"
@@ -86,6 +87,20 @@ void PostEffectManager::SetupView (iView* view)
   }
 }
 
+void PostEffectManager::SetupView (uint width, uint height)
+{
+  if (width != currentWidth || height != currentHeight)
+  {
+    currentWidth = width;
+    currentHeight = height;
+
+    UpdateTextureDistribution();
+    AllocatePingpongTextures ();
+    SetupScreenQuad (width, height);
+    UpdateSVContexts ();
+  }
+}
+
 iTextureHandle* PostEffectManager::GetScreenTarget ()
 {
   if (postLayers.GetSize () > 1)
@@ -109,7 +124,14 @@ void PostEffectManager::DrawPostEffects ()
 
     size_t bucket = GetBucketIndex (postLayers[layer]->options);
     graphics3D->SetRenderTarget (layer < postLayers.GetSize () - 1 
-      ? buckets[bucket].textures[postLayers[layer]->outTextureNum] : 0);
+      ? buckets[bucket].textures[postLayers[layer]->outTextureNum] 
+      : (iTextureHandle*)target);
+    
+    /* @@@ FIXME: Without this, screen space doesn't always work when
+       a custom proj is set */
+    graphics3D->SetPerspectiveCenter (currentWidth/2, currentHeight/2);
+    graphics3D->SetPerspectiveAspect (currentHeight);
+    
     graphics3D->BeginDraw (CSDRAW_CLEARZBUFFER | CSDRAW_3DGRAPHICS);
     graphics3D->DrawSimpleMesh (fullscreenQuad, csSimpleMeshScreenspace);
     graphics3D->FinishDraw ();

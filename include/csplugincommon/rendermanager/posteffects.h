@@ -24,11 +24,13 @@
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/parray.h"
 #include "csutil/ref.h"
+#include "imap/services.h"
 #include "ivideo/shader/shader.h"
 
 struct iGraphics3D;
 struct iLoader;
 struct iObjectRegistry;
+struct iRenderView;
 struct iShader;
 struct iSyntaxService;
 struct iTextureHandle;
@@ -44,7 +46,8 @@ namespace RenderManager
    * a number of full screen passes with settable shader to get the desired
    * effect.
    */
-  class CS_CRYSTALSPACE_EXPORT PostEffectManager
+  class CS_CRYSTALSPACE_EXPORT PostEffectManager :
+    public CS::Memory::CustomAllocatedDerived<csRefCount>
   {
   public:
     class Layer;
@@ -127,6 +130,7 @@ namespace RenderManager
 
     /// Set up post processing manager for a view
     void SetupView (iView* view);
+    void SetupView (uint width, uint height);
 
     /// Get the texture to render a scene to for post processing.
     iTextureHandle* GetScreenTarget ();
@@ -157,10 +161,18 @@ namespace RenderManager
     /// Get the layer that was added last
     Layer* GetLastLayer() { return lastLayer; }
     
+    /// Get the output texture of a layer.
     iTextureHandle* GetLayerOutput (const Layer* layer)
     {
       return GetBucket (layer->options).textures[layer->outTextureNum];
     }
+    
+    /// Set the render target used to ultimatively render to.
+    void SetEffectsOutputTarget (iTextureHandle* tex)
+    { target = tex; }
+    /// Get the render target used to ultimatively render to.
+    iTextureHandle* GetEffectsOutputTarget () const
+    { return target; }
   private:
     void SetupScreenQuad (unsigned int width, unsigned int height);
 
@@ -170,6 +182,7 @@ namespace RenderManager
     csRef<iShaderVarStringSet> svStrings;
     bool keepAllIntermediates;
     csRef<iRenderBuffer> indices;
+    csRef<iTextureHandle> target;
 
     csSimpleRenderMesh fullscreenQuad;
 
@@ -188,7 +201,7 @@ namespace RenderManager
     };
     csArray<TexturesBucket> buckets;
 
-    const char* textureFmt;
+    csString textureFmt;
     Layer* lastLayer;
     csPDelArray<Layer> postLayers;
     
