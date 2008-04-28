@@ -13,17 +13,17 @@ chronological order.
 	- Eric Sunshine made the following changes to the recently added
 	  GetPhysicalMemorySize():
 	    - Moved declaration of
-	      CS::Memory::Implementation::GetPhysicalMemorySize() out of public
-	      include/csutil/memutil.h and into private libs/csutil/memutil.h,
-	      thus eliminating pollution of public API with
-	      implementation-specific details.
+	      CS::Platform::Implementation::GetPhysicalMemorySize() out of
+	      public include/csutil/memutil.h and into private
+	      libs/csutil/memutil.h, thus eliminating pollution of public API
+	      with implementation-specific details.
 	    - Removed several implementation-specific #includes from
 	      include/csutil/memutil.h which were unnecessarily polluting this
 	      public header.
-	    - CS::Memory::GetPhysicalMemorySize() now initializes its static
+	    - CS::Platform::GetPhysicalMemorySize() now initializes its static
 	      'memorySize' and 'cacheValid' variables.
 	- Eric Sunshine moved the do-nothing
-	  CS::Memory::Implementation::GetPhysicalMemorySize() implementation
+	  CS::Platform::Implementation::GetPhysicalMemorySize() implementation
 	  from libs/csutil/macosx to libs/csutil/generic since it is entirely
 	  generic and is a suitable fallback for any platform for which a
 	  customized implementation is not available.
