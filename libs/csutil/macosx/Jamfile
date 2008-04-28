@@ -8,7 +8,7 @@ CSUTIL.GENERIC +=
   expandname.cpp
   findlib.cpp
   getopt.cpp
-  memutil.cpp
+  memutil_impl.cpp
   mmap.cpp
   pathutil.cpp 
   pluginpaths.cpp
