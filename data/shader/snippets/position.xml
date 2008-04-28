@@ -46,14 +46,20 @@
 
     <block location="cg:vertexToFragment">
       <varying type="position4" name="position" binding="POSITION" />
+      <!-- This is needed since POSITION semantics can't be used for input in an FP -->
+      <varying type="position4" name="position_screen" />
       <varying type="position4" name="position_object"/>
       <varying type="position4" name="position_world"/>
     </block>
     
     <block location="cg:vertexMain">
       position_object = Hposition;
-      position = mul (ModelViewProj, position_object);
+      position_screen = position = mul (ModelViewProj, position_object);
       position_world = mul (objectToWorld, position_object);
+    </block>
+    
+    <block location="cg:fragmentMain">
+      position = position_screen;
     </block>
     
     <output name="position" type="position4_screen" />

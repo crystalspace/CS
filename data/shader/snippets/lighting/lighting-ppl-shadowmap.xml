@@ -132,10 +132,16 @@
 	<block location="pass">
 	  <?Include /shader/snippets/lighting/lighting-tools.inc ?>
 	  
+	  <?if vars."light shadow map vsm" ?>
 	  <?Generate L 0 7?>
-	    <texture name="light shadow map[$L$]" destination="lightPropsSM.shadowMap[$L$]"
-		     comparemode="rToTexture" comparefunc="gequal" />
+	  <texture name="light shadow map vsm[$L$]" destination="lightPropsSM.shadowMap[$L$]" />
 	  <?Endgenerate?>
+	  <?else?>
+	    <?Generate L 0 7?>
+	      <texture name="light shadow map[$L$]" destination="lightPropsSM.shadowMap[$L$]"
+		      comparemode="rToTexture" comparefunc="gequal" />
+	    <?Endgenerate?>
+	  <?endif?>
 	</block>
 	
 	<block location="cg:variablemap">
@@ -170,7 +176,13 @@
 	  float4x4 world2tang = mul (obj2tang, objectToWorldInv);
 	  
 	  LightSpaceTangent lspace;
+	  <?if vars."light shadow map vsm" ?>
+	  ShadowShadowMapVSM shadow;
+	  <?elsif vars."light shadow map" ?>
 	  ShadowShadowMapDepth shadow;
+	  <?else?>
+	  ShadowNone shadow;
+	  <?endif?>
 	  <![CDATA[
           for (int l = 0; l < maxLights; l++)
 	  {
@@ -185,9 +197,19 @@
 	    float4 vp_shadowMapCoords;
 	    float vp_gradient;
 	    float3 normW = mul (objectToWorld, float4 (Normal, 0)).xyz;
+	    <?if vars."light shadow map vsm" ?>
+	    ShadowShadowMapVSM shadow;
 	    shadow.InitVP (i, positionW, normW , vp_shadowMapCoords, vp_gradient);
 	    shadowMapCoords[l] = vp_shadowMapCoords;
 	    lightDir[l].w = vp_gradient;
+	    <?elsif vars."light shadow map" ?>
+	    ShadowShadowMapDepth shadow;
+	    shadow.InitVP (i, positionW, normW , vp_shadowMapCoords, vp_gradient);
+	    shadowMapCoords[l] = vp_shadowMapCoords;
+	    lightDir[l].w = vp_gradient;
+	    <?else?>
+	    /* No shadow setup needed */
+	    <?endif?>
 	  }
 	  diffuseColor_attr_perfragment = true;
 	  specularColor_attr_perfragment = true;
@@ -207,7 +229,10 @@
 	    LightSpaceTangent lightSpace;
 	    lightSpace.Init (lightDir[l].xyz, surfToLight[l]);
 	    
-	    <?if vars."light shadow map" ?>
+	    <?if vars."light shadow map vsm" ?>
+	    ShadowShadowMapVSM shadow;
+	    shadow.Init (l, shadowMapCoords[l], lightDir[l].w);
+	    <?elsif vars."light shadow map" ?>
 	    ShadowShadowMapDepth shadow;
 	    shadow.Init (l, shadowMapCoords[l], lightDir[l].w);
 	    <?else?>
