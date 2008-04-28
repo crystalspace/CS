@@ -10,6 +10,7 @@
     float sigma = radius/3;
     int rPixels = ceil (radius);
     float coeff = 1/(sqrt(2*PI)*sigma);
+    float coeffSum = coeff;
     float4 blurred = tex2D (Texture1, TexCoord) * coeff;
     for (int r = 1; r <= rPixels; r++)
     {
@@ -17,8 +18,9 @@
       float2 offset = r*pixelSize*direction;
       blurred += (tex2D (Texture1, TexCoord + offset)
 	+ tex2D (Texture1, TexCoord - offset)) * coeff;
+      coeffSum += coeff;
     }
-    return blurred;
+    return blurred / coeffSum;
   }
 
   ]]>
