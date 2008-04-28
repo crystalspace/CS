@@ -31,3 +31,6 @@
 #undef SendMessage
 #undef UnregisterClass
 #undef Yield
+#undef near
+#undef far
+
