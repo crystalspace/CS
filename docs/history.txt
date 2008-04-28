@@ -31,8 +31,8 @@ chronological order.
 	- Sueastside added 'meshref' loading to iLoader::Load().
 21-Apr-2008
 	- Scott Johnson added implementation-dependant memutil.h and .cpp files
-	  no changes have been made to the running implementation yet. (i.e. they
-	  are all still commented out).
+	  no changes have been made to the running implementation
+	  yet. (i.e. they are all still commented out).
 20-Apr-2008
 	- Mike Gist changed the engine's collections hash to hold a reference to
 	  each collection. This fixes RemoveCollection (the collection wasn't
