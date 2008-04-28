@@ -22,6 +22,11 @@ chronological order.
 	      public header.
 	    - CS::Memory::GetPhysicalMemorySize() now initializes its static
 	      'memorySize' and 'cacheValid' variables.
+	- Eric Sunshine moved the do-nothing
+	  CS::Memory::Implementation::GetPhysicalMemorySize() implementation
+	  from libs/csutil/macosx to libs/csutil/generic since it is entirely
+	  generic and is a suitable fallback for any platform for which a
+	  customized implementation is not available.
 27-Apr-2008
 	- Marten fixed a compilation error in animesh on gcc platforms.
 	- Vincent added a 'Distributing your application' section to the

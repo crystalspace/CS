@@ -16,7 +16,6 @@ License along with this library; if not, write to the Free
 Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "csutil/memutil.h"
 #include "../memutil.h"
 
 namespace CS {
@@ -25,9 +24,9 @@ namespace CS {
 
       size_t GetPhysicalMemorySize()
       {
-        // not implemented for OSX yet
         return 0;
       }
+
     } // End namespace Implementation
   } // End namespace Platform
 } // End namespace CS
