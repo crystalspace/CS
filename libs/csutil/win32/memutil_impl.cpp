@@ -24,16 +24,12 @@ namespace CS {
   namespace Platform {
     namespace Implementation {
 
-      size_t GetPhysicalMemorySize()
+      size_t GetPhysicalMemorySize ()
       {
-/*        MEMORYSTATUSEX memAmount;
+        MEMORYSTATUSEX memAmount;
         memAmount.dwLength = sizeof(memAmount);
-        GlobalMemoryStatusEx(&memAmount);
-        return (memAmount.ullTotalPhys/kbConversion); */
-	MEMORYSTATUS memAmount;
-	memAmount.dwLength = sizeof(MEMORYSTATUS);
-	GlobalMemoryStatus(&memAmount);
-	return memAmount.dwTotalPhys / 1024;
+        GlobalMemoryStatusEx (&memAmount);
+        return (memAmount.ullTotalPhys / 1024); 
       }
     } // End namespace Implementation
   } // End namespace Platform
