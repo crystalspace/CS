@@ -10,6 +10,18 @@ chronological order.
 	- Marten fixed win32 version of GetPhysicalMemorySize(). Atm there
 	  is a problem with computers with more than 4GB of RAM, a solution
 	  needs to be researched.
+	- Eric Sunshine made the following changes to the recently added
+	  GetPhysicalMemorySize():
+	    - Moved declaration of
+	      CS::Memory::Implementation::GetPhysicalMemorySize() out of public
+	      include/csutil/memutil.h and into private libs/csutil/memutil.h,
+	      thus eliminating pollution of public API with
+	      implementation-specific details.
+	    - Removed several implementation-specific #includes from
+	      include/csutil/memutil.h which were unnecessarily polluting this
+	      public header.
+	    - CS::Memory::GetPhysicalMemorySize() now initializes its static
+	      'memorySize' and 'cacheValid' variables.
 27-Apr-2008
 	- Marten fixed a compilation error in animesh on gcc platforms.
 	- Vincent added a 'Distributing your application' section to the

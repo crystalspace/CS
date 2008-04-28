@@ -17,6 +17,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "csutil/memutil.h"
+#include "csutil/sysfunc.h"
+#include "../memutil.h"
+#include <sys/sysinfo.h>
 
 
 namespace CS {
@@ -27,7 +30,6 @@ namespace CS {
       {
         int error = 0;
 #if defined(CS_HAVE_SYSINFO)
-        // we have sysinfo(), so let's use it
         struct sysinfo s_info;
         error = sysinfo(&s_info);
 

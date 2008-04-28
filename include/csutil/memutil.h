@@ -21,38 +21,18 @@
 
 #include "cssysdef.h"
 #include "csextern.h"
-#include "csutil/physfile.h"
-#include "csutil/sysfunc.h"
-#include "csutil/stringreader.h"
 
 namespace CS {
   namespace Platform {
 
-    /** @brief Retrieve the number of kB of physical system memory
+    /**
+     * Retrieve the number of kB of physical system memory.
      *
-     * @returns Physical system memory (in kB) on success, or 0 on failure
+     * @returns Physical system memory (in kB) on success, or 0 on failure.
      */
    CS_CRYSTALSPACE_EXPORT size_t GetPhysicalMemorySize();
 
   } // End namespace Platform
 } // End namespace CS
 
-namespace CS {
-  namespace Platform {
-    namespace Implementation {
-
-     /** @brief Implementation-dependant memory retreival function.
-      *
-      * Used by CS::Platform::GetPhysicalMemorySize().  Do not call this function
-      * directly, use CS::Platform::GetPhysicalMemorySize().
-      *
-      * @returns Physical system memory (in kB) on success, or 0 on failure
-      *
-      * @sa CS::Platform::GetPhysicalMemorySize()
-      */
-     CS_CRYSTALSPACE_EXPORT size_t GetPhysicalMemorySize();
-
-    } // End namespace Implementation
-  } // End namespace Platform
-} // End namespace CS
 #endif
