@@ -57,6 +57,9 @@ chronological order.
 	  it was redundant: GetPhysicalMemorySize()'s attempt to open
 	  /proc/meminfo will either succeed or fail anyhow, and performing the
 	  test at run-time is potentially more robust.
+	- Mike Gist changed lighter2 to default to using 3/4 of detected memory
+	  as the max swap cache size. If the detection fails then the old
+	  default of 200mb is used.
 27-Apr-2008
 	- Marten fixed a compilation error in animesh on gcc platforms.
 	- Vincent added a 'Distributing your application' section to the

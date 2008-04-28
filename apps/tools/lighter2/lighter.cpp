@@ -110,9 +110,16 @@ namespace lighter
     globalConfig.Initialize ();
     globalTUI.Initialize ();
     {
-      int maxSwapSize = configMgr->GetInt ("lighter2.swapcachesize", 
-        200)*1024*1024;
-      swapManager = new SwapManager (maxSwapSize);
+      // Attempt to detect physical memory installed.
+      float maxSwapSize = (float)CS::Platform::GetPhysicalMemorySize();
+      if(maxSwapSize)
+      {
+        // Convert physical memory to megabytes, and use 3/4 of memory as the limit.
+        maxSwapSize /= (1024/0.75f);
+      }
+      // Check for override.
+      maxSwapSize = configMgr->GetFloat ("lighter2.swapcachesize", maxSwapSize)*1024*1024;
+      swapManager = new SwapManager ((size_t)maxSwapSize);
     }
 
     rayDebug.SetFilterExpression (globalConfig.GetDebugProperties().rayDebugRE);
