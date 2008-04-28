@@ -72640,29 +72640,6 @@ else
 fi
 
 
-{ echo "$as_me:$LINENO: checking for /proc/meminfo" >&5
-echo $ECHO_N "checking for /proc/meminfo... $ECHO_C" >&6; }
-if test "${ac_cv_file__proc_meminfo+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "/proc/meminfo"; then
-  ac_cv_file__proc_meminfo=yes
-else
-  ac_cv_file__proc_meminfo=no
-fi
-fi
-{ echo "$as_me:$LINENO: result: $ac_cv_file__proc_meminfo" >&5
-echo "${ECHO_T}$ac_cv_file__proc_meminfo" >&6; }
-if test $ac_cv_file__proc_meminfo = yes; then
-  cs_header_text="${cs_header_text}#define CS_HAVE_PROC_MEMINFO
-"
-fi
-
-
 
 
 #------------------------------------------------------------------------------
