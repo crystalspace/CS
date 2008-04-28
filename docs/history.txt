@@ -1211,7 +1211,10 @@ chronological order.
 	  directive "@file" in master header boilerplate rather than "\file"
 	  since "\file" ends up as "<formfeed>ile" when 'jam masterheaders' is
 	  invoked under the Dash shell. (This appears to be a bug in Dash
-	  single-quote treatment and has been reported.)
+	  single-quote treatment and has been reported.) [Follow-up: Response
+	  from Dash maintainer showed proper behavior by Dash. Single-quote
+	  treatment was in fact correctly ignoring the \f, but a subsequent
+	  "echo" command was interpreting it -- as required by POSIX.]
 	- Eric Sunshine fixed bug in configure.ac where CS_PLATFORM_UNIX was
 	  not emitted to csconfig.h on Mac OS X (for which both
 	  CS_PLATFORM_MACOSX and CS_PLATFORM_UNIX are supposed to be defined).
