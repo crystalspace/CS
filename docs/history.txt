@@ -10,6 +10,8 @@ chronological order.
 	- Marten fixed win32 version of GetPhysicalMemorySize(). Atm there
 	  is a problem with computers with more than 4GB of RAM, a solution
 	  needs to be researched.
+	- erluk hacked unittest.jam to make library unit tests
+	  buildable again.
 27-Apr-2008
 	- Marten fixed a compilation error in animesh on gcc platforms.
 	- Vincent added a 'Distributing your application' section to the

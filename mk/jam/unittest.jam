@@ -312,7 +312,9 @@ rule UnitTestDriver
   #     requires.
 
   if $($(owner)_TYPE) = library { LinkWith $(test_driver) : $(owner) ; }
-  LinkWith $(test_driver) : [ on $($(owner)_TARGET) GetVar NEEDLIBS ] ;
+  # Ugly hack: Commenting out the line below allows the tests to be built
+  # again. Plugin and application testing is still offline, tho.
+  # LinkWith $(test_driver) : [ on $($(owner)_TARGET) GetVar NEEDLIBS ] ;
 
   return $(test_driver) ;
 }
