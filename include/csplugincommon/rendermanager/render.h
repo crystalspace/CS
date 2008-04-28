@@ -19,6 +19,7 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_RENDER_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_RENDER_H__
 
+#include "csplugincommon/rendermanager/posteffects.h"
 #include "csplugincommon/rendermanager/operations.h"
 #include "csplugincommon/rendermanager/rendertree.h"
 #include "csplugincommon/rendermanager/svarrayholder.h"
@@ -73,8 +74,23 @@ namespace RenderManager
     {
       g3d->FinishDraw ();
       for (int a = 0; a < rtaNumAttachments; a++)
-        g3d->SetRenderTarget (context.renderTargets[a].texHandle, false,
-          context.renderTargets[a].subtexture, csRenderTargetAttachment (a));
+      {
+	/* @@@ Checking for rtaColor0 is ugly. Eventually, PostEffects
+	    should act on multiple targets at the same time */
+        if ((csRenderTargetAttachment (a) == rtaColor0)
+            && (context.postEffects.IsValid()))
+        {
+          context.postEffects->SetEffectsOutputTarget (
+            context.renderTargets[a].texHandle);
+	  g3d->SetRenderTarget (
+	    context.postEffects->GetScreenTarget (), false,
+	    context.renderTargets[a].subtexture, 
+	    csRenderTargetAttachment (a));
+        }
+        else
+	  g3d->SetRenderTarget (context.renderTargets[a].texHandle, false,
+	    context.renderTargets[a].subtexture, csRenderTargetAttachment (a));
+      }
     }
 
   private:
@@ -270,6 +286,9 @@ namespace RenderManager
       g3d->SetClipper (0, CS_CLIPPER_TOPLEVEL);
 
       contextStack.Empty ();
+      
+      if (context->postEffects.IsValid())
+        context->postEffects->DrawPostEffects ();
     }
 
 

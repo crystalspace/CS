@@ -33,6 +33,8 @@ namespace CS
 {
 namespace RenderManager
 {
+  class PostEffectManager;
+
   /**
    * RenderTree is the main data-structure for the rendermanagers.
    * It contains the entire setup of meshes and where to render those meshes,
@@ -173,6 +175,8 @@ namespace RenderManager
       csReversibleTransform cameraTransform;
       int drawFlags;
       iSector* sector;
+      
+      csRef<PostEffectManager> postEffects;
 
       // A sub-tree of mesh nodes
       MeshNodeTreeType meshNodes;
