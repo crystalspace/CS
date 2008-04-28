@@ -500,14 +500,33 @@ bool csTinyXmlNode::GetAttributeValueAsBool(const char* name,
     return false;
 }
 
-void csTinyXmlNode::RemoveAttribute (const csRef<iDocumentAttribute>&)
+void csTinyXmlNode::RemoveAttribute (const csRef<iDocumentAttribute>& attribute)
 {
-  // @@@ TODO
+  TiXmlElement* element = node->ToElement ();
+  if (element)
+  {
+    for (size_t i = 0 ; i < element->GetAttributeCount (); i++)
+    {
+      TiDocumentAttribute& attrib = element->GetAttribute (i);
+      if (strcmp (attribute->GetName(), attrib.Name ()) == 0)
+      {
+        element->RemoveAttribute(attrib.Name());
+      }
+    }
+  }
 }
 
 void csTinyXmlNode::RemoveAttributes ()
 {
-  // @@@ TODO
+  TiXmlElement* element = node->ToElement ();
+  if (element)
+  {
+    for (size_t i = 0; i < element->GetAttributeCount (); i++)
+    {
+      TiDocumentAttribute& attrib = element->GetAttribute (i);
+      element->RemoveAttribute(attrib.Name ());
+    }
+  }
 }
 
 void csTinyXmlNode::SetAttribute (const char* name, const char* value)
