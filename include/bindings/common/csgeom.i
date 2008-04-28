@@ -344,7 +344,13 @@ ARRAY_OBJECT_FUNCTIONS(csArray<csArray<int> >,csArray<int>)
 #ifndef SWIGIMPORTED
 #undef APPLY_FOR_ALL_INTERFACES_POST
 #define APPLY_FOR_ALL_INTERFACES_POST
-%include "bindings/common/basepost.i"
-cs_lang_include(csgeompost.i)
 #endif
+
+%include "bindings/common/basepost.i"
+
+#ifndef SWIGIMPORTED
+cs_apply_all_interfaces
+#endif
+
+cs_lang_include(csgeompost.i)
 

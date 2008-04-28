@@ -17,14 +17,15 @@
 */
 
 #include "csutil/memutil.h"
+#include "memutil.h"
 
 namespace CS {
   namespace Platform {
 
     size_t GetPhysicalMemorySize()
     {
-      static size_t memorySize;
-      static bool cacheValid;
+      static size_t memorySize = 0;
+      static bool cacheValid = false;
 
       if (!cacheValid)
       {
