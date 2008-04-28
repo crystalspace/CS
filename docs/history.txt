@@ -39,6 +39,24 @@ chronological order.
 	  "MemTotal". Fixed problem where it incorrectly assumed that the value
 	  of "MemTotal" was reported in bytes when, in fact, it is already in
 	  the desired KB unit.
+	- Eric Sunshine refactored
+	  CS::Platform::Implementation::GetPhysicalMemorySize() in
+	  libs/csutil/unix/memutil.cpp. Each technique for gleaning physical
+	  memory size from the system is now a separate function, and
+	  GetPhysicalMemorySize() merely invokes them sequentially until one
+	  returns a meaningful result.  This reorganization clarifies the fact
+	  that GetPhysicalMemorySize() will attempt mutliple techniques for
+	  retrieving the desired information. Fixed bug where
+	  GetPhysicalMemorySize() was actually only ever attempting a single
+	  technique (depending upon configuration information) and ignoring all
+	  others. Also, dropped the "error" diagnostic from
+	  GetPhysicalMemorySize(), which it emitted if all techniques failed,
+	  since it makes more sense for the client to emit an appropriate
+	  message if desired than for this low-level worker function to do so.
+	  Finally, removed the /proc/meminfo file check from configure.ac since
+	  it was redundant: GetPhysicalMemorySize()'s attempt to open
+	  /proc/meminfo will either succeed or fail anyhow, and performing the
+	  test at run-time is potentially more robust.
 27-Apr-2008
 	- Marten fixed a compilation error in animesh on gcc platforms.
 	- Vincent added a 'Distributing your application' section to the

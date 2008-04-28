@@ -1800,9 +1800,6 @@ CS_CHECK_BUILD([for sysinfo()], [cs_cv_sysinfo],
     [],[],
     [CS_HEADER_PROPERTY([CS_HAVE_SYSINFO])])
    
-AC_CHECK_FILE([/proc/meminfo],
-    [CS_HEADER_PROPERTY([CS_HAVE_PROC_MEMINFO])], [])
-
 
 
 #------------------------------------------------------------------------------

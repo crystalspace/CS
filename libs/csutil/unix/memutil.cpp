@@ -23,51 +23,60 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <sys/sysinfo.h>
 
 
+static size_t query_sysinfo()
+{
+  size_t n = 0;
+#if defined(CS_HAVE_SYSINFO)
+  struct sysinfo x;
+  if (sysinfo(&x) == 0)
+    n = x.totalram / 1024;
+#endif
+  return n;
+}
+
+
+static size_t query_proc_meminfo()
+{
+  size_t n = 0;
+  FILE* f = fopen("/proc/meminfo", "r");
+  if (f != 0)
+  {
+    csString line, key, val;
+    char buff[ 1024 ];
+    while (fgets(buff, sizeof(buff) - 1, f) != 0)
+    {
+      line = buff;
+      size_t pos = line.Find(":");
+      if (pos > 0)
+      {
+	key = line.Slice(0, pos);
+	if (key.CompareNoCase("memtotal"))
+	{
+	  val = line.Slice(pos + 1);
+	  n = static_cast<size_t>(atol(val.GetData()));
+	  break;
+	}
+      }
+    }
+    fclose(f);
+  }
+  return n;
+}
+
+
 namespace CS {
   namespace Platform {
     namespace Implementation {
 
       size_t GetPhysicalMemorySize()
       {
-#if defined(CS_HAVE_SYSINFO)
-        struct sysinfo s_info;
-        int error = sysinfo(&s_info);
-
-        if (error == 0)
-        {
-          return (s_info.totalram/1024);
-        }
-#elif defined (CS_HAVE_PROC_MEMINFO)
-	FILE* f = fopen("/proc/meminfo", "r");
-	if (f != 0)
-	{
-	  size_t totalMem = 0;
-	  csString line, key, val;
-	  char buff[ 1024 ];
-	  while (fgets(buff, sizeof(buff) - 1, f) != 0)
-	  {
-	    line = buff;
-	    size_t pos = line.Find(":");
-	    if (pos > 0)
-	    {
-	      key = line.Slice(0, pos);
-	      if (key.CompareNoCase("memtotal"))
-	      {
-		val = line.Slice(pos + 1);
-		totalMem = (size_t)atol(val.GetData());
-		break;
-	      }
-	    }
-	  }
-	  fclose(f);
-	  return totalMem;
-	}
-#endif
-        // everything seems to have failed, so output some information
-        // and return 0
-        csPrintfErr("ERROR: GetPhysicalMemorySize(): Unable to determine mechanism for finding physical memory size.\n");
-        return 0;
+	size_t s;
+	s = query_sysinfo();
+	if (s == 0)
+	  s = query_proc_meminfo();
+        return s;
       }
+
     } // End namespace Implementation
   } // End namespace Platform
 } // End namespace CS
