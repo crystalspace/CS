@@ -117,6 +117,10 @@ namespace lighter
         // Convert physical memory to megabytes, and use 3/4 of memory as the limit.
         maxSwapSize /= (1024/0.75f);
       }
+      else
+      {
+          maxSwapSize = 200.0f;
+      }
       // Check for override.
       maxSwapSize = configMgr->GetFloat ("lighter2.swapcachesize", maxSwapSize)*1024*1024;
       swapManager = new SwapManager ((size_t)maxSwapSize);
