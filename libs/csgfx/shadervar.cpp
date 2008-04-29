@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2002-2003 by Marten Svanfeldt
+    Copyright (C) 2002-2008 by Marten Svanfeldt
                   2002      by Anders Stenberg
 
     This library is free software; you can redistribute it and/or
@@ -23,44 +23,252 @@
 //CS_LEAKGUARD_IMPLEMENT (csShaderVariable);
 
 csShaderVariable::csShaderVariable () :
-  csRefCount (), Type (UNKNOWN), VectorValue (0), Int(0), MatrixValuePtr(0), 
-  TransformPtr (0), shaderVarArray(0), Name (csInvalidStringID)
+  csRefCount (), Name (csInvalidStringID), Type (UNKNOWN), VectorValue (0),
+  accessorData (0)
 {
+  // Zero out the data as good as we can
+  Int = 0;
+  texture.HandValue = 0;
+  texture.WrapValue = 0;
 }
 
 csShaderVariable::csShaderVariable (csStringID name) :
-  csRefCount (), Type (UNKNOWN), VectorValue (0), Int(0), MatrixValuePtr(0), 
-  TransformPtr (0), shaderVarArray(0), Name (name)
+  csRefCount (), Name (name), Type (UNKNOWN), VectorValue (0), accessorData (0)
 {
+  // Zero out the data as good as we can
+  Int = 0;
+  texture.HandValue = 0;
+  texture.WrapValue = 0;
+}
+
+csShaderVariable::csShaderVariable (const csShaderVariable& other)
+  : csRefCount (), Name (other.Name), Type (other.Type), VectorValue (other.VectorValue),
+  accessor (other.accessor), accessorData (other.accessorData)
+{
+  // Handle payload
+  switch (Type)
+  {
+  case UNKNOWN:
+    break;
+  case INT:      
+  case FLOAT:
+    Int = other.Int;
+    break;
+
+  case TEXTURE:
+    texture = other.texture;
+    if (texture.HandValue)
+      texture.HandValue->IncRef ();
+    if (texture.WrapValue)
+      texture.WrapValue->IncRef ();
+    break;
+
+  case RENDERBUFFER:
+    RenderBuffer = other.RenderBuffer;
+    if (RenderBuffer)
+      RenderBuffer->IncRef ();
+    break;
+
+  case VECTOR2:      
+  case VECTOR3:      
+  case VECTOR4:
+    Int = other.Int;
+    break;
+
+  case MATRIX:    
+    MatrixValuePtr = new csMatrix3 (*other.MatrixValuePtr);
+    break;
+
+  case TRANSFORM:
+    TransformPtr = new csReversibleTransform (*other.TransformPtr);
+    break;
+
+  case ARRAY:
+    ShaderVarArray = new csRefArray<csShaderVariable>;
+    *ShaderVarArray = *other.ShaderVarArray;
+    break;
+
+  default:
+    ;
+  }
+}
+
+csShaderVariable::~csShaderVariable ()
+{
+  switch (Type)
+  {
+  case UNKNOWN:     
+  case INT:      
+  case FLOAT:
+    break; //Nothing to deallocate
+
+  case TEXTURE:
+    if (texture.HandValue)
+      texture.HandValue->DecRef ();
+    if (texture.WrapValue)
+      texture.WrapValue->DecRef ();
+    break;
+
+  case RENDERBUFFER:
+    if (RenderBuffer)
+      RenderBuffer->DecRef ();
+    break;
+
+  case VECTOR2:      
+  case VECTOR3:      
+  case VECTOR4:
+    break; //Nothing to deallocate      
+
+  case MATRIX:
+    delete MatrixValuePtr;
+    break;
+
+  case TRANSFORM:
+    delete TransformPtr;
+    break;
+
+  case ARRAY:
+    delete ShaderVarArray;
+    break;
+
+  default:
+    ;
+  }
 }
 
 csShaderVariable& csShaderVariable::operator= (const csShaderVariable& copyFrom)
 {
   Name = copyFrom.Name;
-  Type = copyFrom.Type;
-  accessor = copyFrom.accessor;
-  switch (copyFrom.Type)
+  //Type = copyFrom.Type;
+  VectorValue = copyFrom.VectorValue;
+  accessor = copyFrom.accessor;  
+  accessorData = copyFrom.accessorData;
+
+  NewType (copyFrom.Type);
+
+  // Handle payload
+  switch (Type)
   {
-    case MATRIX:
-      SetValue (*copyFrom.MatrixValuePtr);
-      break;
-    case TRANSFORM:
-      SetValue (*copyFrom.TransformPtr);
-      break;
-    case ARRAY:
-      shaderVarArray = AllocateShaderVarArray();
-      *shaderVarArray = *copyFrom.shaderVarArray;
-      break;
-    default:
-      {
-	// Just copy everything that doesn't need special handling
-	TextureHandValue = copyFrom.TextureHandValue;
-	TextureWrapValue = copyFrom.TextureWrapValue;
-	RenderBuffer = copyFrom.RenderBuffer;
-	VectorValue = copyFrom.VectorValue;
-	Int = copyFrom.Int;
-      }
-      break;
+  case UNKNOWN:
+    break;
+
+  case INT:      
+  case FLOAT:
+    Int = copyFrom.Int;
+    break; 
+
+  case TEXTURE:
+    texture = copyFrom.texture;
+    if (texture.HandValue)
+      texture.HandValue->IncRef ();
+    if (texture.WrapValue)
+      texture.WrapValue->IncRef ();
+    break;
+
+  case RENDERBUFFER:
+    RenderBuffer = copyFrom.RenderBuffer;
+    if (RenderBuffer)
+      RenderBuffer->IncRef ();
+    break;
+
+  case VECTOR2:      
+  case VECTOR3:      
+  case VECTOR4:
+    break; //Nothing to copy more than whats done above      
+
+  case MATRIX:
+    MatrixValuePtr = new csMatrix3 (*copyFrom.MatrixValuePtr);
+    break;
+
+  case TRANSFORM:
+    TransformPtr = new csReversibleTransform (*copyFrom.TransformPtr);
+    break;
+
+  case ARRAY:
+    ShaderVarArray = new csRefArray<csShaderVariable>;
+    *ShaderVarArray = *copyFrom.ShaderVarArray;
+    break;
+
+  default:
+    ;
   }
+
   return *this;
 }
+
+void csShaderVariable::NewType (VariableType nt)
+{
+  if (Type == nt)
+    return;
+
+  switch (Type)
+  {
+  case UNKNOWN:     
+  case INT:      
+  case FLOAT:
+    break; //Nothing to deallocate
+
+  case TEXTURE:
+    if (texture.HandValue)
+      texture.HandValue->DecRef ();
+    if (texture.WrapValue)
+      texture.WrapValue->DecRef ();
+    break;
+  
+  case RENDERBUFFER:
+    if (RenderBuffer)
+      RenderBuffer->DecRef ();
+    break;
+
+  case VECTOR2:      
+  case VECTOR3:      
+  case VECTOR4:
+    break; //Nothing to deallocate      
+  
+  case MATRIX:
+    delete MatrixValuePtr;
+    break;
+  
+  case TRANSFORM:
+    delete TransformPtr;
+    break;
+
+  case ARRAY:
+    delete ShaderVarArray;
+    break;
+
+  default:
+    ;
+  }
+
+  switch (nt)
+  {
+  case UNKNOWN:     
+  case INT:      
+  case FLOAT:
+  case TEXTURE:    
+  case RENDERBUFFER:
+  case VECTOR2:      
+  case VECTOR3:      
+  case VECTOR4:
+    break; //Nothing to allocate      
+
+  case MATRIX:
+    MatrixValuePtr = new csMatrix3;
+    break;
+
+  case TRANSFORM:
+    TransformPtr = new csReversibleTransform;
+    break;
+
+  case ARRAY:
+    ShaderVarArray = new csRefArray<csShaderVariable>;
+    break;
+
+  default:
+    ;
+  }
+  
+  Type = nt;
+}
+

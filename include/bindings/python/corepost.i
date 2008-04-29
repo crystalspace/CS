@@ -73,6 +73,19 @@
     return CS_REQUEST_PLUGIN("crystalspace.utilities.reporter", iReporter)
 %}
 
+%extend iBase {
+  %pythoncode %{
+      def __eq__(self,other):
+          if isinstance(other,iBase):
+              return self.this == other.this
+          return False
+      def __ne__(self,other):
+          if isinstance(other,iBase):
+              return not self.this == other.this
+          return True
+    %}
+}
+
 %extend csKeyModifiers {
   unsigned int __getitem__ (size_t i) const
   {

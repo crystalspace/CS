@@ -27,6 +27,7 @@ Space for your own 3D applications.
 * Scripting Languages::
 * CEGUI:: @sc{cegui} Introduction
 * Making Own Projects:: Making Projects Using Crystal Space
+* Distributing Own Project:: Distributing your Crystal Space Application
 * BugPlug:: Using the BugPlug Debugging Plugin
 * HOWTO::
 @end menu
@@ -51,5 +52,6 @@ Space for your own 3D applications.
 @importss{usingcs,script,script.txi}
 @importss{usingcs,cegui,cegui.txi}
 @importss{usingcs,ownprojects,chapter.txi}
+@importss{usingcs,packaging,chapter.txi}
 @imports{usingcs,bugplug.txi}
 @importss{usingcs,howto,howto.txi}

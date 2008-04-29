@@ -1,0 +1,6 @@
+SubDir TOP plugins mesh animesh object ;
+
+Description animesh : "Animated mesh object plugin" ;
+Plugin animesh : [ Wildcard *.cpp *.h ] ;
+LinkWith animesh : crystalspace ;
+CompileGroups animesh : meshes ;

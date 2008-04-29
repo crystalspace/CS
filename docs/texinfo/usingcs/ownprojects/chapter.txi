@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Making Own Projects, BugPlug, CEGUI, Using Crystal Space
+@node Making Own Projects, Distributing Own Project, CEGUI, Using Crystal Space
 @section Making Projects Using Crystal Space
 @cindex external projects
 

@@ -183,10 +183,12 @@ bool csXWindow::Open ()
 //--------------------------------------------------------------------
   unsigned long cw_ctx_mask = (CWOverrideRedirect |
 			       CWBorderPixel |
+			       CWBackPixel |
 			       (cmap ? CWColormap : 0) |
 			       CWEventMask );
 
   unsigned long cw_wm_mask  = (CWBorderPixel |
+			       CWBackPixel |
 			       (cmap ? CWColormap : 0) |
 			       CWEventMask );
 

@@ -7,7 +7,7 @@
 @emph{Written Marten Svanfeldt, @email{developer@@svanfeldt.com},
 with contributions from others.}
 
-This section documents the major changes between versions 1.0 and 1.2 of of
+This section documents the major changes between versions 1.0 and 1.2 of
 Crystal Space.
 
 @menu
@@ -27,7 +27,7 @@ some outstanding issues in the code as well as making it a bit more efficient.
 
 @subsubheading Atomic operations
 A header (@file{include/csutil/atomicops.h}) containing definitions of operations
-with guranteed atomicity such as CAS (Compare-And-Set) and increment.
+with guaranteed atomicity such as CAS (Compare-And-Set) and increment.
 
 Full documentation in @pxref{Threading}.
 

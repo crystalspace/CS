@@ -1039,6 +1039,7 @@ class csQuaternion(object):
     def __iadd__(*args): return _csgeom.csQuaternion___iadd__(*args)
     def __isub__(*args): return _csgeom.csQuaternion___isub__(*args)
     def __imul__(*args): return _csgeom.csQuaternion___imul__(*args)
+    def __idiv__(*args): return _csgeom.csQuaternion___idiv__(*args)
     def GetConjugate(*args): return _csgeom.csQuaternion_GetConjugate(*args)
     def Conjugate(*args): return _csgeom.csQuaternion_Conjugate(*args)
     def Dot(*args): return _csgeom.csQuaternion_Dot(*args)

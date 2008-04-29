@@ -103,9 +103,14 @@
   #endif
 #endif
 
-#ifndef WINVER
-#define WINVER 0x0400
+#ifndef WINVER  
+  #define WINVER 0x0500
 #endif
+
+#ifndef _WIN32_WINNT
+  #define _WIN32_WINNT 0x0500
+#endif
+
 
 // So many things require this. IF you have an issue with something defined
 // in it then undef that def here.

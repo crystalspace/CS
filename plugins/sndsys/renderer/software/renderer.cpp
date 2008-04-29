@@ -162,11 +162,8 @@ csPtr<iSndSysSource> csSndSysRendererSoftware::CreateSource(iSndSysStream* strea
     source=s;
   }
 
-  // This is the reference that will belong to the render thread
-  source->IncRef();
-
   // Notify any registered callback components
-  SourceAdded(dynamic_cast<iSndSysSource *>(source));
+  SourceAdded((iSndSysSource*)source);
 
   // Queue this source for the background thread to add to its list of existent sources
   m_SourceAddQueue.QueueEntry(source);

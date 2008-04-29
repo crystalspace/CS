@@ -81,12 +81,17 @@ public:
   virtual csRef<iImage> GetMipmap (uint num) 
   { return (num == 0) ? this : 0; }
 
+  /* Commented out: should be implemented by all descendants.
   virtual const char* GetRawFormat() const { return 0; }
   virtual csRef<iDataBuffer> GetRawData() const { return 0; }
+  */
   virtual csImageType GetImageType() const { return csimg2D; }
   virtual uint HasSubImages() const { return 0; }
   virtual csRef<iImage> GetSubImage (uint num) 
   { return (num == 0) ? this : 0; }
+
+  const char* GetCookedImageFormat () { return GetRawFormat(); }
+  csRef<iDataBuffer> GetCookedImageData () { return GetCookedImageData(); }
 };
 
 /** @} */

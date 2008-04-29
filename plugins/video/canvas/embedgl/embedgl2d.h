@@ -53,6 +53,8 @@ class csGraphics2DGLEmbed : public scfImplementationExt1<
 public:
   csGraphics2DGLEmbed (iBase *iParent);
   virtual ~csGraphics2DGLEmbed () {};
+  
+  bool Open();
 
   bool PerformExtensionV (char const* command, va_list args);
   virtual void *GetProcAddress (const char *funcname)

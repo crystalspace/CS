@@ -83,8 +83,6 @@ using namespace CS_PLUGIN_NAMESPACE_NAME(Engine);
 
 CS_IMPLEMENT_PLUGIN
 
-#define DEFAULT_COLLECTION "defaultCollection"
-
 bool csEngine::doVerbose = false;
 
 //---------------------------------------------------------------------------
@@ -690,9 +688,6 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
   objectRegistry->Register (light_mgr, "iLightManager");
   light_mgr->DecRef ();
 
-  // Create the default collection.
-  CreateCollection(DEFAULT_COLLECTION);
-
   return true;
 }
 
@@ -1158,7 +1153,7 @@ void csEngine::AddMeshAndChildren (iMeshWrapper* mesh)
   }
 }
 
-void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
+void csEngine::ShineLights (iBase *base, iProgressMeter *meter)
 {
   // If we have to read from the cache then we check if the 'precalc_info'
   // file exists on the VFS. If not then we cannot use the cache.
@@ -1179,6 +1174,10 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
     float cosinus_factor;
     int lightmap_size;
   };
+
+  // Compat for collections.
+  csRef<iRegion> region (scfQueryInterfaceSafe<iRegion>(base));
+  csRef<iCollection> col (scfQueryInterfaceSafe<iCollection>(base));
 
   PrecalcInfo current;
   memset (&current, 0, sizeof (current));
@@ -1288,7 +1287,7 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
     Report ("Recalculation of lightmaps forced.");
   }
 
-  csRef<iLightIterator> lit = GetLightIterator (region);
+  csRef<iLightIterator> lit = GetLightIterator (base);
 
   // Count number of lights to process.
   iLight *l;
@@ -1323,7 +1322,8 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
     if (s->GetMovable ()->GetSectors ()->GetCount () <= 0 &&
 	s->QuerySceneNode ()->GetParent () == 0)
       continue;	// No sectors and no parent mesh, don't process lighting.
-    if (!region || region->IsInRegion (s->QueryObject ()))
+    if ((!region || region->IsInRegion (s->QueryObject ())) &&
+        (!col || col->IsParentOf (s->QueryObject ())))
     {
       iLightingInfo* linfo = s->GetLightingInfo ();
       if (linfo)
@@ -1332,10 +1332,10 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
           linfo->InitializeDefault (true);
         else
           if (!linfo->ReadFromCache (cm))
-	  {
-	    if (failed_meshes.GetSize () < max_failed_meshes)
-	      failed_meshes.Push (s);
-	    failed++;
+          {
+            if (failed_meshes.GetSize () < max_failed_meshes)
+              failed_meshes.Push (s);
+            failed++;
           }
       }
     }
@@ -1409,7 +1409,8 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
     if (s->GetMovable ()->GetSectors ()->GetCount () <= 0 &&
 	s->QuerySceneNode ()->GetParent () == 0)
       continue;	// No sectors or parent mesh, don't process lighting.
-    if (!region || region->IsInRegion (s->QueryObject ()))
+    if ((!region || region->IsInRegion (s->QueryObject ())) &&
+        (!col || col->IsParentOf (s->QueryObject ())))
     {
       iLightingInfo* linfo = s->GetLightingInfo ();
       if (linfo)
@@ -3099,33 +3100,38 @@ iSector *csEngine::CreateSector (const char *name)
 
 iCollection* csEngine::CreateCollection(const char *name)
 {
-  iCollection* collection = GetCollection(name);
+  csRef<iCollection> collection = collections.Get(name, NULL);
   if(!collection)
   {
-    csCollection* collect = new csCollection();
+    csRef<csCollection> collect;
+    collect.AttachNew(new csCollection());
     collect->SetName(name);
-    collections.Put(name, collect);
-    collection = dynamic_cast<iCollection*>(collect);
+    collection = collect;
+    collections.Put(name, collection);
   }
   return collection;
 }
 
+void csEngine::RemoveCollection(iCollection* collect)
+{
+  collections.Delete(collect->QueryObject()->GetName(), collect);
+}
+
 void csEngine::RemoveCollection(const char *name)
 {
-  csCollection* collect = collections.Get(name, NULL);
+  csRef<iCollection> collect = collections.Get(name, NULL);
   if(collect)
   {
     collections.Delete(name, collect);
-    delete collect;
   }
 }
 
 void csEngine::RemoveAllCollections()
 {
-  csHash<csCollection*, csString>::GlobalIterator itr = collections.GetIterator();
-  while(itr.HasNext())
+  csArray<csRef<iCollection> > cols = collections.GetAll();
+  for(size_t i=0; i<cols.GetSize(); i++)
   {
-    RemoveCollection(itr.Next()->GetName());
+    RemoveCollection(cols[i]->QueryObject()->GetName());
   }
 }
 
@@ -3210,14 +3216,17 @@ iRegionList *csEngine::GetRegions ()
   return &regions;
 }
 
-iCollection* csEngine::GetCollection(const char *name)
+iCollection* csEngine::GetCollection(const char *name) const
 {
-  return dynamic_cast<iCollection*>(collections.Get(name, NULL));
+  return collections.Get(name, NULL);
 }
 
-iCollection* csEngine::GetDefaultCollection()
+csPtr<iCollectionArray> csEngine::GetCollections()
 {
-  return dynamic_cast<iCollection*>(collections.Get(DEFAULT_COLLECTION, NULL));
+  csRef<iCollectionArray> colScfArr;
+  colScfArr.AttachNew(
+    new scfArray<iCollectionArray, csArray<csRef<iCollection> > >(collections.GetAll()));
+  return csPtr<iCollectionArray>(colScfArr);
 }
 
 csPtr<iCamera> csEngine::CreateCamera ()

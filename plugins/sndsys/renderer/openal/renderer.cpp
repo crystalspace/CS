@@ -197,16 +197,16 @@ csPtr<iSndSysStream> csSndSysRendererOpenAL::CreateStream(iSndSysData* data,
 
 csPtr<iSndSysSource> csSndSysRendererOpenAL::CreateSource(iSndSysStream* stream)
 {
-  SndSysSourceOpenAL2D *source = 0;
+  csRef<SndSysSourceOpenAL2D> source;
 
   // Get a lock on the context
   ScopedRendererLock lock (*this);
 
   // Create the correct type of source.
   if (stream->Get3dMode() == CS_SND3D_DISABLE)
-    source = new SndSysSourceOpenAL2D( stream, this );
+    source.AttachNew (new SndSysSourceOpenAL2D( stream, this ));
   else
-    source = new SndSysSourceOpenAL3D( stream, this );
+    source.AttachNew (new SndSysSourceOpenAL3D( stream, this ));
 
   // Add it the our list of sources:
   m_Sources.Push (source);
@@ -214,7 +214,7 @@ csPtr<iSndSysSource> csSndSysRendererOpenAL::CreateSource(iSndSysStream* stream)
   // Notify any callbacks
   size_t iMax = m_Callback.GetSize();
   for (size_t i=0;i<iMax;i++)
-    m_Callback[i]->SourceAddNotification (dynamic_cast<iSndSysSource*>(source));
+    m_Callback[i]->SourceAddNotification ((iSndSysSource*)source);
 
   return scfQueryInterface<iSndSysSource>( source );
 }
@@ -304,6 +304,11 @@ void csSndSysRendererOpenAL::Report(int severity, const char* msg, ...)
 
 void csSndSysRendererOpenAL::Update()
 {
+  // Listener is created on open, but EventHandler is setup at init,
+  // so, in some cases we can get here without the listener having been
+  // created yet.
+  if (!m_Listener)
+    return;
   // Get exclusive access to the OpenAL context.
   ScopedRendererLock lock (*this);
 
@@ -381,7 +386,7 @@ void csSndSysRendererOpenAL::Open()
   }
 
   // Create a listener
-  m_Listener = new SndSysListenerOpenAL();
+  m_Listener.AttachNew(new SndSysListenerOpenAL());
 }
 
 void csSndSysRendererOpenAL::Close()

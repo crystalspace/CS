@@ -41,6 +41,8 @@
 %include "iengine/portalcontainer.h"
 %include "iengine/rendersteps/icontainer.h"
 %include "iengine/renderloop.h"
+%template(iSwigCollectionArray) iArrayReadOnly<iCollection* >;
+%include "iengine/collection.h"
 
 %extend iVisibilityObjectIterator {
   ITERATOR_FUNCTIONS(iVisibilityObjectIterator)
@@ -68,6 +70,13 @@ LIST_OBJECT_FUNCTIONS(iTextureList,iTextureWrapper)
 #ifndef SWIGIMPORTED
 #undef APPLY_FOR_ALL_INTERFACES_POST
 #define APPLY_FOR_ALL_INTERFACES_POST IENGINE_APPLY_FOR_EACH_INTERFACE
-%include "bindings/common/basepost.i"
-cs_lang_include(ienginepost.i)
 #endif
+
+%include "bindings/common/basepost.i"
+
+#ifndef SWIGIMPORTED
+cs_apply_all_interfaces
+#endif
+
+cs_lang_include(ienginepost.i)
+

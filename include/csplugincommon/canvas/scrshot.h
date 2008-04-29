@@ -36,7 +36,7 @@ struct iGraphics2D;
 
 /// Simple iImage implementation for canvas screenshots.
 class CS_CRYSTALSPACE_EXPORT csScreenShot : 
-  public scfImplementationExt0<csScreenShot, csImageBase>
+  public scfImplementationExt1<csScreenShot, csImageBase, iDataBuffer>
 {
   int Format;
   void *Data;
@@ -64,7 +64,33 @@ public:
   virtual const csRGBpixel *GetPalette ()
   { return Palette; }
   virtual int GetClosestIndex (const csRGBpixel& color);
-  /// Get alpha map for 8-bit paletted image.
+
+  const char* GetRawFormat() const 
+  { 
+    if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
+      return "a8b8g8r8"; 
+    else
+      return 0;
+  }
+  csRef<iDataBuffer> GetRawData() const 
+  { 
+    return const_cast<csScreenShot*> (this); 
+  }
+
+  //@{
+  /// iDataBuffer implementation
+  size_t GetSize() const
+  {
+    if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
+      return Width * Height * 4;
+    else
+      return Width * Height;
+  }
+  char* GetData() const
+  {
+    return (char*)Data;
+  }
+  //@}
 };
 
 /** @} */

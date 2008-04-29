@@ -66,8 +66,7 @@ bool csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
   if (!loader || !properties)
     return false;
 
-  if (properties->heightmapSource.IsEmpty () ||
-    properties->materialmapSource.IsEmpty ())
+  if (properties->heightmapSource.IsEmpty ())
     return false;
 
   int width = cell->GetGridWidth ();
@@ -82,34 +81,37 @@ bool csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
 
   cell->UnlockHeightData ();
   
-  csRef<iImage> materialMap = loader->LoadImage (properties->materialmapSource.GetDataSafe (),
-    CS_IMGFMT_PALETTED8);
+  if (!properties->materialmapSource.IsEmpty ())
+  {  
+    csRef<iImage> materialMap = loader->LoadImage (properties->materialmapSource.GetDataSafe (),
+      CS_IMGFMT_PALETTED8);
 
-  if (!materialMap) 
-    return false;
-  
-  if (materialMap->GetWidth () != cell->GetMaterialMapWidth () ||
-      materialMap->GetHeight () != cell->GetMaterialMapHeight ())
-  {
-    materialMap = csImageManipulate::Rescale (materialMap,
-      cell->GetMaterialMapWidth (), cell->GetMaterialMapHeight ());
-  }
-  
-  int mwidth = materialMap->GetWidth ();
-  int mheight = materialMap->GetHeight ();
-
-  csLockedMaterialMap mdata = cell->LockMaterialMap (csRect (0, 0, mwidth, mheight));
-
-  const unsigned char* materialmap = (const unsigned char*)materialMap->GetImageData ();
+    if (!materialMap) 
+      return false;
     
-  for (int y = 0; y < mheight; ++y)
-  {
-    memcpy (mdata.data, materialmap, mwidth);
-    mdata.data += mdata.pitch;
-    materialmap += mwidth;
-  } 
-  
-  cell->UnlockMaterialMap ();
+    if (materialMap->GetWidth () != cell->GetMaterialMapWidth () ||
+        materialMap->GetHeight () != cell->GetMaterialMapHeight ())
+    {
+      materialMap = csImageManipulate::Rescale (materialMap,
+        cell->GetMaterialMapWidth (), cell->GetMaterialMapHeight ());
+    }
+    
+    int mwidth = materialMap->GetWidth ();
+    int mheight = materialMap->GetHeight ();
+
+    csLockedMaterialMap mdata = cell->LockMaterialMap (csRect (0, 0, mwidth, mheight));
+
+    const unsigned char* materialmap = (const unsigned char*)materialMap->GetImageData ();
+      
+    for (int y = 0; y < mheight; ++y)
+    {
+      memcpy (mdata.data, materialmap, mwidth);
+      mdata.data += mdata.pitch;
+      materialmap += mwidth;
+    } 
+    
+    cell->UnlockMaterialMap ();
+  }
 
   if (engine)
   {

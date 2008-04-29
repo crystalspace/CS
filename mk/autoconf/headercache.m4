@@ -31,10 +31,11 @@ AC_PREREQ([2.56])
 #	Prepend text to the C header text cache.  This is a cover for
 #	CS_TEXT_CACHE_PREPEND().
 #
-# CS_HEADER_PROPERTY(KEY, [VALUE])
+# CS_HEADER_PROPERTY(KEY, [VALUE], [OPTIONS])
 #	Append a line of the form "#define KEY VALUE" to the C header text
 #	cache.  If the VALUE argument is omitted, then the appended line has
-#	the simplified form "#define KEY".
+#	the simplified form "#define KEY". OPTIONS is accepted for consistency
+#	with other emitters (see emit.m4) but otherwise ignored.
 #
 # CS_HEADER_OUTPUT(FILENAME)
 #	Instruct config.status to write the C header text cache to the given

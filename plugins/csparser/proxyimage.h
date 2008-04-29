@@ -78,6 +78,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     { return GetProxiedImage()->HasSubImages (); }
     csRef<iImage> GetSubImage (uint num)
     { return GetProxiedImage()->GetSubImage (num); }
+
+    const char* GetCookedImageFormat()
+    { return GetProxiedImage()->GetCookedImageFormat (); }
+    csRef<iDataBuffer> GetCookedImageData()
+    { return GetProxiedImage()->GetCookedImageData (); }
   };
 }
 CS_PLUGIN_NAMESPACE_END(csparser)

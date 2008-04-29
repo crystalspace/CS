@@ -424,6 +424,9 @@ private:
   size_t CountPositions (int cidx, csMGCell& cell);
   size_t CountAllPositions ();
 
+protected:
+  void InternalRemove() { SelfDestruct(); }
+
 public:
   csEngine* engine;
   csStringID varTransform;

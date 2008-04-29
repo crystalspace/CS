@@ -234,6 +234,8 @@ typedef unsigned char uint8;
 %apply int * OUTPUT { int & adv };
 %apply int * OUTPUT { int & left };
 %apply int * OUTPUT { int & top };
+%apply int * OUTPUT { int & width };
+%apply int * OUTPUT { int & height };
 %apply int * OUTPUT { int & desc };
 %apply int * OUTPUT { int & nr };
 %apply int * OUTPUT { int & key };
@@ -357,6 +359,7 @@ CS_WRAP_PTR_IMPLEMENT(csWrapPtr)
 #define DEPRECATED_METHOD(classname,method,replacement)
 #define TYPEMAP_STRING(Type)
 #define TYPEMAP_STRING_PTR(Type,Type2)
+#define LANG_POST(T)
 
 #if defined(SWIGPYTHON)
   %include "bindings/python/pythpre.i"
@@ -378,6 +381,7 @@ CS_WRAP_PTR_IMPLEMENT(csWrapPtr)
     static int scfGetVersion() { return scfInterfaceTraits<T>::GetVersion(); }
     virtual ~T() { if (self) self->DecRef (); }
   }
+  LANG_POST(T)
 %enddef
 
 %define INLINE_FUNCTIONS
@@ -906,6 +910,32 @@ csEventID _csevPostProcess (iObjectRegistry *);
 #undef csevFinalProcess
 csEventID _csevFinalProcess (iObjectRegistry *);
 
+/* Canvas */
+#define _csevCanvasClose(reg, g2d) csevCanvasClose(reg, g2d)
+#undef csevCanvasClose
+csEventID csevCanvasClose(iObjectRegistry*, iGraphics2D*);
+#define _csevCanvasExposed(reg, g2d) csevCanvasExposed(reg, g2d)
+#undef csevCanvasExposed
+csEventID csevCanvasExposed(iObjectRegistry*, iGraphics2D*);
+#define _csevCanvasExposed(reg, g2d) csevCanvasExposed(reg, g2d)
+#undef csevCanvasExposed
+csEventID csevCanvasExposed(iObjectRegistry*, iGraphics2D*);
+#define _csevCanvasHidden(reg, g2d) csevCanvasHidden(reg, g2d)
+#undef csevCanvasHidden
+csEventID csevCanvasHidden(iObjectRegistry*, iGraphics2D*);
+#define _csevCanvasResize(reg, g2d) csevCanvasResize(reg, g2d)
+#undef csevCanvasResize
+csEventID csevCanvasResize(iObjectRegistry*, iGraphics2D*);
+#define _csevFocusChanged(reg) csevFocusChanged(reg)
+#undef csevFocusChanged
+csEventID csevFocusChanged(iObjectRegistry*);
+#define _csevFocusGained(reg) csevFocusGained(reg)
+#undef csevFocusGained
+csEventID csevFocusGained(iObjectRegistry*);
+#define _csevFocusLost(reg) csevFocusLost(reg)
+#undef csevFocusLost
+csEventID csevFocusLost(iObjectRegistry*);
+
 /* Keyboard */
 #define _csevKeyboardEvent(reg) csevKeyboardEvent(reg)
 #undef csevKeyboardEvent
@@ -961,7 +991,14 @@ csEventID _csevJoystickEvent (iObjectRegistry *);
 #ifndef SWIGIMPORTED
 #undef APPLY_FOR_ALL_INTERFACES_POST
 #define APPLY_FOR_ALL_INTERFACES_POST CORE_APPLY_FOR_EACH_INTERFACE
-%include "bindings/common/basepost.i"
-cs_lang_include(corepost.i)
 #endif
+
+%include "bindings/common/basepost.i"
+
+#ifndef SWIGIMPORTED
+cs_apply_all_interfaces
+#endif
+
+cs_lang_include(corepost.i)
+
 

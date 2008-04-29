@@ -1,0 +1,8 @@
+SubDir TOP plugins mesh animesh persist standard ;
+
+Description animeshldr : "Animated mesh object loader" ;
+Plugin animeshldr : [ Wildcard *.cpp *.h ] ;
+Includes animeshldr.h : $(SUBDIR)/animesh_factory.tok ;
+Includes animeshldr.h : $(SUBDIR)/animesh_meshobject.tok ;
+LinkWith animeshldr : crystalspace ;
+CompileGroups animeshldr : meshes ;

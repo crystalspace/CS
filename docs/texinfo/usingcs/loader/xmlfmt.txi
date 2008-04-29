@@ -5,7 +5,7 @@
 @cindex Map File Format
 @cindex @sc{xml}
 
-This section describes the the Crystal Space map, which uses @sc{xml}, and is a
+This section describes the Crystal Space map, which uses @sc{xml}, and is a
 companion to the @sc{xml} schema file residing at:
 
 @noindent

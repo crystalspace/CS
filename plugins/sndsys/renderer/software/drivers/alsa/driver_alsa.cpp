@@ -373,7 +373,7 @@ bool SndSysDriverALSA::Open (csSndSysRendererSoftware* pRenderer,
   // Setup various parameters of how we interact with ALSA and how ALSA should interact with the device
   if (!SetupHWParams() || !SetupSWParams())
   {
-    snd_pcm_close(m_pPCMDevice);
+    Close();
     return false;
   }
 
@@ -382,7 +382,7 @@ bool SndSysDriverALSA::Open (csSndSysRendererSoftware* pRenderer,
   {
     RecordEvent(SSEL_ERROR, "Failed to prepare sound output device for playback Error [%s]", 
             snd_strerror(result));
-    snd_pcm_close(m_pPCMDevice);
+    Close();
     return false;
   }
  

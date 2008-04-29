@@ -772,7 +772,11 @@ struct iGraphics3D : public virtual iBase
    */
   virtual iTextureManager *GetTextureManager () = 0;
 
-  /// Change the dimensions of the display.
+  /**
+   * Change the dimensions of the display.
+   * \deprecated Deprecated in 1.3. 
+   */
+  CS_DEPRECATED_METHOD
   virtual void SetDimensions (int width, int height) = 0;
   /// Get drawing buffer width.
   virtual int GetWidth () const = 0;

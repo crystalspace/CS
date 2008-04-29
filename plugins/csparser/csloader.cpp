@@ -847,8 +847,41 @@ csLoadResult csLoader::Load (iDocumentNode* node, iCollection* collection,
     return rc;
   }
 
+  csRef<iDocumentNode> meshrefnode = node->GetNode ("meshref");
+  if (meshrefnode)
+  {
+    const char* meshobjname = override_name ? override_name :
+    	meshrefnode->GetAttributeValue ("name");
+    if (ldr_context->CheckDupes () && meshobjname)
+    {
+      iMeshWrapper* mw = Engine->FindMeshObject (meshobjname);
+      if (mw)
+      {
+        AddToRegionOrCollection (ldr_context, mw->QueryObject ());
+        rc.result = mw;
+        rc.success = true;
+        return rc;
+      }
+    }
+    csRef<iMeshWrapper> mesh = LoadMeshObjectFromFactory (ldr_context, meshrefnode, ssource);
+    if (mesh)
+    {
+      AddToRegionOrCollection (ldr_context, mesh->QueryObject ());
+      rc.result = mesh;
+      rc.success = true;
+      return rc;
+    }
+    else
+    {
+      // Error is already reported.
+      rc.result = 0;
+      rc.success = false;
+      return rc;
+    }
+  }
+
   ReportError ("crystalspace.maploader.parse",
-    "File doesn't seem to be a world, library, meshfact, meshobj, portals or light file!");
+    "File doesn't seem to be a world, library, meshfact, meshobj, meshref, portals or light file!");
 
   return rc;
 }
@@ -1403,23 +1436,15 @@ bool csLoader::LoadLibrary (iDocumentNode* lib_node, iRegion* region,
 
 //---------------------------------------------------------------------------
 
-void csLoader::AddToRegionOrCollection(iLoaderContext* ldr_context, iObject* obj,
-                                       bool alwaysKeep)
+void csLoader::AddToRegionOrCollection(iLoaderContext* ldr_context, iObject* obj)
 {
   if(ldr_context->GetRegion())
   {
     ldr_context->GetRegion()->QueryObject()->ObjAdd(obj);
   }
-  else if(ldr_context->GetKeepFlags() == KEEP_ALL || alwaysKeep)
+  else if(ldr_context->GetCollection())
   {
-    if(ldr_context->GetCollection())
-    {
-      ldr_context->GetCollection()->Add(obj);
-    }
-    else
-    {
-      Engine->GetDefaultCollection()->Add(obj);
-    }
+    ldr_context->GetCollection()->Add(obj);
   }
 }
 
@@ -1842,9 +1867,20 @@ bool csLoader::LoadLibraryFromNode (iLoaderContext* ldr_context,
       AddToRegionOrCollection (ldr_context, libraryRef->QueryObject ());
     }
     
-    bool rc = LoadMapLibraryFile (file,
-	  	  ldr_context->GetRegion (), ldr_context->CurrentRegionOnly (),
-	      dupes, ssource, missingdata, loadProxyTex);
+    bool rc;
+
+    if(ldr_context->GetRegion())
+    {
+      rc = LoadMapLibraryFile (file, ldr_context->GetRegion (), 
+        ldr_context->CurrentRegionOnly (), dupes, ssource, missingdata, loadProxyTex);
+    }
+    else
+    {
+      rc = LoadMapLibraryFile (file, ldr_context->GetCollection (),
+        ldr_context->CurrentCollectionOnly (), dupes, ssource, missingdata,
+        ldr_context->GetKeepFlags(), loadProxyTex);
+    }
+
     if (path)
     {
       vfs->PopDir ();
@@ -1862,11 +1898,18 @@ bool csLoader::LoadLibraryFromNode (iLoaderContext* ldr_context,
       AddToRegionOrCollection (ldr_context, libraryRef->QueryObject ());
     }
     
-    if (!LoadMapLibraryFile (child->GetContentsValue (),
-	  	ldr_context->GetRegion (), ldr_context->CurrentRegionOnly (),
-		ldr_context->CheckDupes (), ssource, missingdata, 
-		loadProxyTex))
-    return false;
+    if(ldr_context->GetRegion())
+    {
+      return LoadMapLibraryFile (child->GetContentsValue (), ldr_context->GetRegion (),
+        ldr_context->CurrentRegionOnly (), ldr_context->CheckDupes (), ssource, missingdata, 
+		    loadProxyTex);
+    }
+    else
+    {
+      return LoadMapLibraryFile (child->GetContentsValue (), ldr_context->GetCollection (),
+        ldr_context->CurrentCollectionOnly (), ldr_context->CheckDupes (), ssource, missingdata, 
+        ldr_context->GetKeepFlags(), loadProxyTex);
+    }
   }
   return true;
 }
