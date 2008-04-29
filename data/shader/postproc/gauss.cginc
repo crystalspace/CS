@@ -18,7 +18,7 @@
       float2 offset = r*pixelSize*direction;
       blurred += (tex2D (Texture1, TexCoord + offset)
 	+ tex2D (Texture1, TexCoord - offset)) * coeff;
-      coeffSum += coeff;
+      coeffSum += coeff*2;
     }
     return blurred / coeffSum;
   }
