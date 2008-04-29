@@ -241,7 +241,11 @@ public:
 
     value = texture.HandValue;
     if (!value && texture.WrapValue)
+    {
       value = texture.HandValue = texture.WrapValue->GetTextureHandle ();
+      if(value)
+        value->IncRef();
+    }
     return true;
   }
 

@@ -10,6 +10,7 @@
 %include "imesh/genmesh.h"
 %include "imesh/skeleton.h"
 %include "imesh/gmeshskel2.h"
+
 struct csSprite2DVertex;
 %ignore iSprite2DState::GetVertices;
 ARRAY_CHANGE_ALL_TEMPLATE(csSprite2DVertex)
@@ -90,7 +91,15 @@ BUFFER_RW_FUNCTIONS(iGeneralFactoryState,GetTriangles,GetTriangleCount,
 #ifndef SWIGIMPORTED
 #undef APPLY_FOR_ALL_INTERFACES_POST
 #define APPLY_FOR_ALL_INTERFACES_POST IMESH_APPLY_FOR_EACH_INTERFACE
-%include "bindings/common/basepost.i"
-cs_lang_include(imeshpost.i)
 #endif
+
+%include "bindings/common/basepost.i"
+
+#ifndef SWIGIMPORTED
+cs_apply_all_interfaces
+#endif
+
+cs_lang_include(imeshpost.i)
+
+
 
