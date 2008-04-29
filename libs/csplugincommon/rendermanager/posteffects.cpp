@@ -43,11 +43,11 @@
 using namespace CS::RenderManager;
 
 PostEffectManager::PostEffectManager ()
-  : currentWidth (0), currentHeight (0),
-    textureFmt ("abgr8"), lastLayer (0)
+  : frameNum (0), currentDimData (0), currentWidth (0), currentHeight (0), 
+    textureFmt ("argb8"), lastLayer (0), layersDirty (true)
 {
+  SetupScreenQuad ();
   AddLayer (0, 0, 0);
-  GetBucketIndex (lastLayer->options);
 }
 
 PostEffectManager::~PostEffectManager ()
@@ -75,29 +75,33 @@ void PostEffectManager::SetupView (iView* view)
   unsigned int width = view->GetContext ()->GetWidth ();
   unsigned int height = view->GetContext ()->GetHeight ();
 
-  if (width != currentWidth || height != currentHeight)
-  {
-    currentWidth = width;
-    currentHeight = height;
-
-    UpdateTextureDistribution();
-    AllocatePingpongTextures ();
-    SetupScreenQuad (width, height);
-    UpdateSVContexts ();
-  }
+  SetupView (width, height);
 }
 
 void PostEffectManager::SetupView (uint width, uint height)
 {
   if (width != currentWidth || height != currentHeight)
   {
+    if (currentDimData != 0)
+      dimCache.GetReuseAuxiliary (currentDimData)->reusable = true;
+    
     currentWidth = width;
     currentHeight = height;
 
-    UpdateTextureDistribution();
-    AllocatePingpongTextures ();
-    SetupScreenQuad (width, height);
-    UpdateSVContexts ();
+    UpdateLayers();
+    
+    Dimensions key;
+    key.x = currentWidth; key.y = currentHeight;
+    currentDimData = dimCache.Query (key, true);
+    if (currentDimData != 0) return;
+    
+    DimensionData newData;
+    newData.dim = key;
+    currentDimData = dimCache.AddActive (newData);
+    currentDimData->buckets.SetSize (buckets.GetSize());
+    currentDimData->AllocatePingpongTextures (*this);
+    currentDimData->SetupScreenQuad (*this);
+    currentDimData->UpdateSVContexts (*this);
   }
 }
 
@@ -105,7 +109,8 @@ iTextureHandle* PostEffectManager::GetScreenTarget ()
 {
   if (postLayers.GetSize () > 1)
   {
-    return GetBucket (postLayers[0]->options).textures[postLayers[0]->outTextureNum];
+    size_t bucket = GetBucketIndex (postLayers[0]->options);
+    return currentDimData->buckets[bucket].textures[postLayers[0]->outTextureNum];
   }
 
   return 0;
@@ -114,28 +119,27 @@ iTextureHandle* PostEffectManager::GetScreenTarget ()
 void PostEffectManager::DrawPostEffects ()
 { 
   graphics3D->FinishDraw ();
+  
+  UpdateLayers();
 
   for (size_t layer = 1; layer < postLayers.GetSize (); ++layer)
   {   
     // Draw and ping-pong   
-    fullscreenQuad.dynDomain = postLayers[layer]->svContext;
+    fullscreenQuad.dynDomain = currentDimData->layerSVs[layer];
     fullscreenQuad.shader = postLayers[layer]->effectShader;
-    fullscreenQuad.renderBuffers = postLayers[layer]->buffers;
+    fullscreenQuad.renderBuffers = currentDimData->buffers[layer];
 
     size_t bucket = GetBucketIndex (postLayers[layer]->options);
     graphics3D->SetRenderTarget (layer < postLayers.GetSize () - 1 
-      ? buckets[bucket].textures[postLayers[layer]->outTextureNum] 
+      ? currentDimData->buckets[bucket].textures[postLayers[layer]->outTextureNum] 
       : (iTextureHandle*)target);
-    
-    /* @@@ FIXME: Without this, screen space doesn't always work when
-       a custom proj is set */
-    graphics3D->SetPerspectiveCenter (currentWidth/2, currentHeight/2);
-    graphics3D->SetPerspectiveAspect (currentHeight);
-    
+
     graphics3D->BeginDraw (CSDRAW_CLEARZBUFFER | CSDRAW_3DGRAPHICS);
     graphics3D->DrawSimpleMesh (fullscreenQuad, csSimpleMeshScreenspace);
     graphics3D->FinishDraw ();
   }
+  
+  dimCache.AdvanceTime (frameNum++);
 }
     
 PostEffectManager::Layer* PostEffectManager::AddLayer (iShader* shader)
@@ -169,85 +173,60 @@ PostEffectManager::Layer* PostEffectManager::AddLayer (iShader* shader, const La
   postLayers.Push (newLayer);
   textureDistributionDirty = true;
   lastLayer = newLayer;
+  layersDirty = true;
   return newLayer;
 }
 
 void PostEffectManager::ClearLayers()
 {
-  buckets.DeleteAll();
   postLayers.DeleteAll();
   currentWidth = 0; currentHeight = 0;
   lastLayer = 0;
   
   AddLayer (0, 0, 0);
-  GetBucketIndex (lastLayer->options);
 }
 
-void PostEffectManager::SetupScreenQuad (unsigned int width, unsigned int height)
+iTextureHandle* PostEffectManager::GetLayerOutput (const Layer* layer)
 {
-  indices = csRenderBuffer::CreateIndexRenderBuffer (4,
-    CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_SHORT, 0, 3);
+  size_t bucket = GetBucketIndex (layer->options);
+  return currentDimData->buckets[bucket].textures[layer->outTextureNum];
+}
+
+void PostEffectManager::SetupScreenQuad ()
+{
+  if (!indices.IsValid())
   {
-    csRenderBufferLock<unsigned short> indexLock (indices);
-    for (uint i = 0; i < 4; i++)
-      indexLock[(size_t)i] = i;
+    indices = csRenderBuffer::CreateIndexRenderBuffer (4,
+      CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_SHORT, 0, 3);
+    {
+      csRenderBufferLock<unsigned short> indexLock (indices);
+      for (uint i = 0; i < 4; i++)
+	indexLock[(size_t)i] = i;
+    }
   }
 
   fullscreenQuad.meshtype = CS_MESHTYPE_QUADS;
   fullscreenQuad.vertexCount = 4;
   fullscreenQuad.mixmode = CS_MIXMODE_BLEND(ONE, ZERO);
-  
-  for (size_t b = 0; b < buckets.GetSize(); b++)
-  {
-    iRenderBuffer* vertBuf = buckets[b].vertBuf =
-      csRenderBuffer::CreateRenderBuffer (4, CS_BUF_STATIC, 
-        CS_BUFCOMP_FLOAT, 3);
-    iRenderBuffer* texcoordBuf = buckets[b].texcoordBuf =
-      csRenderBuffer::CreateRenderBuffer (4, CS_BUF_STATIC,
-        CS_BUFCOMP_FLOAT, 2);
-        
-    csRenderBufferLock<csVector3> screenQuadVerts (vertBuf);
-    csRenderBufferLock<csVector2> screenQuadTex (texcoordBuf);
-  
-    int texW = width >> buckets[b].options.downsample;
-    int texH = height >> buckets[b].options.downsample;
-    
-    // Setup the vertices & texcoords
-    screenQuadVerts[(size_t)0].Set (0, 0, 0);
-    screenQuadTex[(size_t)0].Set (buckets[b].textureOffsetX,
-      buckets[b].textureOffsetY);
-  
-    screenQuadVerts[(size_t)1].Set (texW, 0, 0);
-    screenQuadTex[(size_t)1].Set (
-      buckets[b].textureCoordinateX + buckets[b].textureOffsetX, 
-      buckets[b].textureOffsetY);
-  
-    screenQuadVerts[(size_t)2].Set (texW, texH, 0);
-    screenQuadTex[(size_t)2].Set (
-      buckets[b].textureCoordinateX + buckets[b].textureOffsetX, 
-      buckets[b].textureCoordinateY + buckets[b].textureOffsetY);
-  
-    screenQuadVerts[(size_t)3].Set (0, texH, 0);
-    screenQuadTex[(size_t)3].Set (buckets[b].textureOffsetX, 
-      buckets[b].textureCoordinateY + buckets[b].textureOffsetY);
-  }
 }
 
-void PostEffectManager::AllocatePingpongTextures ()
+void PostEffectManager::DimensionData::AllocatePingpongTextures (
+  PostEffectManager& pfx)
 {
   for (size_t b = 0; b < buckets.GetSize(); b++)
   {
     uint texFlags =
       CS_TEXTURE_3D | CS_TEXTURE_NPOTS | CS_TEXTURE_CLAMP | CS_TEXTURE_SCALE_UP;
-    if (!buckets[b].options.mipmap)
+    if (!pfx.buckets[b].options.mipmap)
       texFlags |= CS_TEXTURE_NOMIPMAPS;
     csRef<iTextureHandle> t;
-    int texW = currentWidth >> buckets[b].options.downsample;
-    int texH = currentHeight >> buckets[b].options.downsample;
-    t = graphics3D->GetTextureManager ()->CreateTexture (texW, texH, 
-      csimg2D, textureFmt, texFlags);
-    if (buckets[b].options.maxMipmap >= 0)
-      t->SetMipmapLimits (buckets[b].options.maxMipmap);
+    int texW = dim.x >> pfx.buckets[b].options.downsample;
+    int texH = dim.y >> pfx.buckets[b].options.downsample;
+    t = pfx.graphics3D->GetTextureManager ()->CreateTexture (texW, texH, 
+      csimg2D, pfx.textureFmt, texFlags);
+    if (pfx.buckets[b].options.maxMipmap >= 0)
+      t->SetMipmapLimits (pfx.buckets[b].options.maxMipmap);
+    buckets[b].textures.SetSize (pfx.buckets[b].textureNum);
     buckets[b].textures.Put (0, t);
   
     buckets[b].textureOffsetX = buckets[b].textureOffsetY = 0;
@@ -279,20 +258,59 @@ void PostEffectManager::AllocatePingpongTextures ()
       buckets[b].textureCoordinateX = 1;
       buckets[b].textureCoordinateY = 1;
     }  
-    buckets[b].svPixelSize.AttachNew (new csShaderVariable (svStrings->Request ("pixel size")));
+    buckets[b].svPixelSize.AttachNew (new csShaderVariable (
+      pfx.svStrings->Request ("pixel size")));
     buckets[b].svPixelSize->SetValue (
       csVector2 (buckets[b].textureCoordinateX/texW, 
       buckets[b].textureCoordinateY/texH));
   
     for (size_t i = 1; i < buckets[b].textures.GetSize(); i++)
     {
-      t = graphics3D->GetTextureManager ()->CreateTexture (texW, texH, 
-	csimg2D, textureFmt, resultFlags);
+      t = pfx.graphics3D->GetTextureManager ()->CreateTexture (texW, texH, 
+	csimg2D, pfx.textureFmt, resultFlags);
       buckets[b].textures.Put (i, t);
     }
   }
 }
 
+void PostEffectManager::DimensionData::SetupScreenQuad (PostEffectManager& pfx)
+{
+  for (size_t b = 0; b < buckets.GetSize(); b++)
+  {
+    iRenderBuffer* vertBuf = buckets[b].vertBuf =
+      csRenderBuffer::CreateRenderBuffer (4, CS_BUF_STATIC, 
+        CS_BUFCOMP_FLOAT, 3);
+    iRenderBuffer* texcoordBuf = buckets[b].texcoordBuf =
+      csRenderBuffer::CreateRenderBuffer (4, CS_BUF_STATIC,
+        CS_BUFCOMP_FLOAT, 2);
+        
+    csRenderBufferLock<csVector3> screenQuadVerts (vertBuf);
+    csRenderBufferLock<csVector2> screenQuadTex (texcoordBuf);
+  
+    int texW = dim.x >> pfx.buckets[b].options.downsample;
+    int texH = dim.y >> pfx.buckets[b].options.downsample;
+    
+    // Setup the vertices & texcoords
+    screenQuadVerts[(size_t)0].Set (0, 0, 0);
+    screenQuadTex[(size_t)0].Set (buckets[b].textureOffsetX,
+      buckets[b].textureOffsetY);
+  
+    screenQuadVerts[(size_t)1].Set (texW, 0, 0);
+    screenQuadTex[(size_t)1].Set (
+      buckets[b].textureCoordinateX + buckets[b].textureOffsetX, 
+      buckets[b].textureOffsetY);
+  
+    screenQuadVerts[(size_t)2].Set (texW, texH, 0);
+    screenQuadTex[(size_t)2].Set (
+      buckets[b].textureCoordinateX + buckets[b].textureOffsetX, 
+      buckets[b].textureCoordinateY + buckets[b].textureOffsetY);
+  
+    screenQuadVerts[(size_t)3].Set (0, texH, 0);
+    screenQuadTex[(size_t)3].Set (buckets[b].textureOffsetX, 
+      buckets[b].textureCoordinateY + buckets[b].textureOffsetY);
+  }
+}
+   
 void PostEffectManager::UpdateTextureDistribution()
 {
   for (size_t l = 0; l < postLayers.GetSize (); l++)
@@ -348,44 +366,73 @@ void PostEffectManager::UpdateTextureDistribution()
   for (size_t b = 0; b < buckets.GetSize(); b++)
   {
     csArray<csBitArray>& usedTextureBits = allUsedTextureBits[b];
-    buckets[b].textures.SetSize (usedTextureBits[postLayers.GetSize()-1].GetSize());
+    //buckets[b].textures.SetSize (usedTextureBits[postLayers.GetSize()-1].GetSize());
+    buckets[b].textureNum = usedTextureBits[postLayers.GetSize()-1].GetSize();
   }
 }
 
-void PostEffectManager::UpdateSVContexts ()
+class OverlaySVC :
+  public scfImplementation1<OverlaySVC,
+                            scfFakeInterface<iShaderVariableContext> >,
+  public CS::Graphics::OverlayShaderVariableContextImpl
 {
-  for (size_t l = 0; l < postLayers.GetSize (); l++)
+public:
+  OverlaySVC (iShaderVariableContext* parent) : scfImplementationType (this)
   {
-    postLayers[l]->buffers.AttachNew (new csRenderBufferHolder);
-    for (size_t i = 0; i < postLayers[l]->inputs.GetSize(); i++)
+    SetParentContext (parent);
+  }
+};
+
+void PostEffectManager::DimensionData::UpdateSVContexts (
+  PostEffectManager& pfx)
+{
+  for (size_t l = 0; l < pfx.postLayers.GetSize (); l++)
+  {
+    csRef<csRenderBufferHolder> newBuf;
+    newBuf.AttachNew (new csRenderBufferHolder);
+    buffers.Put (l, newBuf);
+    csRef<iShaderVariableContext> newSVs;
+    newSVs.AttachNew (new OverlaySVC (pfx.postLayers[l]->svContext));
+    layerSVs.Put (l, newSVs);
+    for (size_t i = 0; i < pfx.postLayers[l]->inputs.GetSize(); i++)
     {
-      const LayerInputMap& input = postLayers[l]->inputs[i];
+      const LayerInputMap& input = pfx.postLayers[l]->inputs[i];
       
-      size_t inBucket = GetBucketIndex (input.inputLayer->options);
+      size_t inBucket = pfx.GetBucketIndex (input.inputLayer->options);
       csRef<csShaderVariable> sv;
-      sv.AttachNew (new csShaderVariable (svStrings->Request (
+      sv.AttachNew (new csShaderVariable (pfx.svStrings->Request (
         input.textureName)));
       sv->SetValue (buckets[inBucket].textures[input.inputLayer->outTextureNum]);
-      postLayers[l]->svContext->AddVariable (sv);
+      layerSVs[l]->AddVariable (sv);
       
       csRenderBufferName bufferName =
         csRenderBuffer::GetBufferNameFromDescr (input.texcoordName);
       if (bufferName != CS_BUFFER_NONE)
-        postLayers[l]->buffers->SetRenderBuffer (bufferName,
+        buffers[l]->SetRenderBuffer (bufferName,
           buckets[inBucket].texcoordBuf);
       else
       {
-        sv.AttachNew (new csShaderVariable (svStrings->Request (
+        sv.AttachNew (new csShaderVariable (pfx.svStrings->Request (
           input.texcoordName)));
-        postLayers[l]->svContext->AddVariable (sv);
+        layerSVs[l]->AddVariable (sv);
       }
     }
-    size_t thisBucket = GetBucketIndex (postLayers[l]->options);
-    postLayers[l]->svContext->AddVariable (buckets[thisBucket].svPixelSize);
-    postLayers[l]->buffers->SetRenderBuffer (CS_BUFFER_INDEX, indices);
-    postLayers[l]->buffers->SetRenderBuffer (CS_BUFFER_POSITION,
+    size_t thisBucket = pfx.GetBucketIndex (pfx.postLayers[l]->options);
+    layerSVs[l]->AddVariable (buckets[thisBucket].svPixelSize);
+    buffers[l]->SetRenderBuffer (CS_BUFFER_INDEX, pfx.indices);
+    buffers[l]->SetRenderBuffer (CS_BUFFER_POSITION,
       buckets[thisBucket].vertBuf);
   }
+}
+
+void PostEffectManager::UpdateLayers()
+{
+  if (!layersDirty) return;
+  
+  dimCache.Clear (true);
+  UpdateTextureDistribution();
+  
+  layersDirty = false;
 }
 
 size_t PostEffectManager::GetBucketIndex (const LayerOptions& options)

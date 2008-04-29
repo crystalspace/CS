@@ -22,6 +22,7 @@
 #include "csgfx/shadervarcontext.h"
 #include "csutil/array.h"
 #include "csutil/dirtyaccessarray.h"
+#include "csutil/genericresourcecache.h"
 #include "csutil/parray.h"
 #include "csutil/ref.h"
 #include "imap/services.h"
@@ -104,7 +105,6 @@ namespace RenderManager
       csArray<LayerInputMap> inputs;
       csRef<iShaderVariableContext> svContext;
       LayerOptions options;
-      csRef<csRenderBufferHolder> buffers;
       
       Layer()
       {
@@ -162,10 +162,7 @@ namespace RenderManager
     Layer* GetLastLayer() { return lastLayer; }
     
     /// Get the output texture of a layer.
-    iTextureHandle* GetLayerOutput (const Layer* layer)
-    {
-      return GetBucket (layer->options).textures[layer->outTextureNum];
-    }
+    iTextureHandle* GetLayerOutput (const Layer* layer);
     
     /// Set the render target used to ultimatively render to.
     void SetEffectsOutputTarget (iTextureHandle* tex)
@@ -174,10 +171,7 @@ namespace RenderManager
     iTextureHandle* GetEffectsOutputTarget () const
     { return target; }
   private:
-    void SetupScreenQuad (unsigned int width, unsigned int height);
-
-    void AllocatePingpongTextures ();
-    
+    uint frameNum;
     csRef<iGraphics3D> graphics3D;
     csRef<iShaderVarStringSet> svStrings;
     bool keepAllIntermediates;
@@ -185,33 +179,94 @@ namespace RenderManager
     csRef<iTextureHandle> target;
 
     csSimpleRenderMesh fullscreenQuad;
+    void SetupScreenQuad ();
 
-    unsigned int currentWidth, currentHeight;
-    struct TexturesBucket
+    struct Dimensions
     {
-      LayerOptions options;
-      csRef<iRenderBuffer> vertBuf;
-      csRef<iRenderBuffer> texcoordBuf;
-      float textureCoordinateX, textureCoordinateY, textureOffsetX, textureOffsetY;
-      csRef<csShaderVariable> svPixelSize;
-      csRefArray<iTextureHandle> textures;
-      
-      TexturesBucket() : textureCoordinateX (1), textureCoordinateY (1), 
-        textureOffsetX (0), textureOffsetY (0) { }
+      uint x, y;
     };
-    csArray<TexturesBucket> buckets;
+    /// All the data needed for one target dimension
+    struct DimensionData
+    {
+      Dimensions dim;
+      /**
+       * Textures which have the same properties are managed
+       * in one "bucket"
+       */
+      struct TexturesBucket
+      {
+	csRef<iRenderBuffer> vertBuf;
+	csRef<iRenderBuffer> texcoordBuf;
+	float textureCoordinateX, textureCoordinateY, textureOffsetX, textureOffsetY;
+	csRef<csShaderVariable> svPixelSize;
+	csRefArray<iTextureHandle> textures;
+	
+	TexturesBucket() : textureCoordinateX (1), textureCoordinateY (1), 
+	  textureOffsetX (0), textureOffsetY (0) { }
+      };
+      csArray<TexturesBucket> buckets;
+      csRefArray<iShaderVariableContext> layerSVs;
+      csRefArray<csRenderBufferHolder> buffers;
+      
+      void AllocatePingpongTextures (PostEffectManager& pfx);
+      void UpdateSVContexts (PostEffectManager& pfx);
+    
+      void SetupScreenQuad (PostEffectManager& pfx);
+    };
 
+    struct DimensionCacheSorting
+    {
+      typedef Dimensions KeyType;
+
+      static bool IsLargerEqual (const DimensionData& b1, 
+                                 const DimensionData& b2)
+      {
+	return (b1.dim.x >= b2.dim.x) && (b1.dim.y >= b2.dim.y);
+      }
+    
+      static bool IsEqual (const DimensionData& b1, 
+                           const DimensionData& b2)
+      {
+	return (b1.dim.x == b2.dim.x) && (b1.dim.y == b2.dim.y);
+      }
+    
+      static bool IsLargerEqual (const DimensionData& b1, 
+                                 const Dimensions& b2)
+      {
+	return (b1.dim.x >= b2.x) && (b1.dim.y >= b2.y);
+      }
+    
+      static bool IsEqual (const DimensionData& b1, 
+                           const Dimensions& b2)
+      {
+	return (b1.dim.x == b2.x) && (b1.dim.y == b2.y);
+      }
+    
+    };
+    CS::Utility::GenericResourceCache<DimensionData,
+      uint, DimensionCacheSorting, 
+      CS::Utility::ResourceCache::ReuseConditionFlagged> dimCache;
+    DimensionData* currentDimData;
+      
+    uint currentWidth, currentHeight;
+
+    bool textureDistributionDirty;
+    void UpdateTextureDistribution();
+      
     csString textureFmt;
     Layer* lastLayer;
     csPDelArray<Layer> postLayers;
+    bool layersDirty;
+    void UpdateLayers();
     
-    bool textureDistributionDirty;
-    void UpdateTextureDistribution();
-    
-    void UpdateSVContexts ();
-  
+    struct BucketsCommon
+    {
+      LayerOptions options;
+      size_t textureNum;
+    };
+    csArray<BucketsCommon> buckets;
     size_t GetBucketIndex (const LayerOptions& options);
-    TexturesBucket& GetBucket (const LayerOptions& options)
+    BucketsCommon& GetBucket (const LayerOptions& options)
     { return buckets[GetBucketIndex (options)]; }
   };
   
