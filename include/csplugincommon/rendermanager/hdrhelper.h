@@ -19,7 +19,12 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_HDRHELPER_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_HDRHELPER_H__
 
+#include "iutil/objreg.h"
+#include "imap/loader.h"
+
 #include "csplugincommon/rendermanager/posteffects.h"
+
+struct iConfigFile;
 
 namespace CS
 {
@@ -126,7 +131,23 @@ namespace CS
     private:
     };
   
+    /// Read HDR settings from a config file
+    class CS_CRYSTALSPACE_EXPORT HDRSettings
+    {
+      iConfigFile* config;
+      csString prefix;
+    public:
+      HDRSettings (iConfigFile* config, const char* prefix);
+      
+      /// Whether HDR rendering should be enabled
+      bool IsEnabled();
+      /// Get requested quality
+      HDRHelper::Quality GetQuality();
+      /// Get requested color range
+      int GetColorRange();
+    };
+  
   } // namespace RenderManager
 } // namespace CS
 
-#endif
+#endif // __CS_CSPLUGINCOMMON_RENDERMANAGER_HDRHELPER_H__

@@ -100,6 +100,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMUnshadowed)
 
     CS::RenderManager::PostEffectManager       postEffects;
     CS::RenderManager::HDRExposureLinear hdrExposure;
+    bool doHDRExposure;
 
     csRef<iShaderVarStringSet>  svNameStringSet;
     csRef<iStringSet>           stringSet;

@@ -136,7 +136,7 @@ private:
 
 
 RMUnshadowed::RMUnshadowed (iBase* parent)
-  : scfImplementationType (this, parent), targets (*this)
+  : scfImplementationType (this, parent), doHDRExposure (false), targets (*this)
 {
 
 }
@@ -205,7 +205,7 @@ bool RMUnshadowed::RenderView (iView* view)
 
   postEffects.DrawPostEffects ();
   
-  hdrExposure.ApplyExposure (postEffects);
+  if (doHDRExposure) hdrExposure.ApplyExposure (postEffects);
 
   return true;
 }
@@ -293,9 +293,6 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
   treePersistent.Initialize (shaderManager);
   postEffects.Initialize (objectReg);
   
-  /*csRef<iShader> logmap =
-    loader->LoadShader ("/shader/postproc/hdr/simple-log.xml");*/
-
   const char* effectsFile = cfg->GetStr ("RenderManager.Unshadowed.Effects", 0);
   if (effectsFile)
   {
@@ -303,11 +300,20 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
     postEffectsParser.AddLayersFromFile (effectsFile, postEffects);
   }
   
-  HDRHelper hdr;
-  // @@@ FIXME: pick a better intermediate format
-  hdr.Setup (objectReg, HDRHelper::qualInt8, 4, postEffects, /*true*/false);
+  HDRSettings hdrSettings (cfg, "RenderManager.Unshadowed");
+  if (hdrSettings.IsEnabled())
+  {
+    doHDRExposure = true;
+    
+    HDRHelper hdr;
+    hdr.Setup (objectReg, 
+      hdrSettings.GetQuality(), 
+      hdrSettings.GetColorRange(), 
+      postEffects, !doHDRExposure);
   
-  hdrExposure.Initialize (objectReg, postEffects);
+    // @@@ Make configurable, too
+    hdrExposure.Initialize (objectReg, postEffects);
+  }
   
   portalPersistent.Initialize (shaderManager, g3d);
   lightPersistent.Initialize (objectReg);
