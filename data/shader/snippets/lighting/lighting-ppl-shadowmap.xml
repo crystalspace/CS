@@ -133,9 +133,9 @@
 	  <?Include /shader/snippets/lighting/lighting-tools.inc ?>
 	  
 	  <?if vars."light shadow map vsm" ?>
-	  <?Generate L 0 7?>
-	  <texture name="light shadow map vsm[$L$]" destination="lightPropsSM.shadowMap[$L$]" />
-	  <?Endgenerate?>
+	    <?Generate L 0 7?>
+	      <texture name="light shadow map vsm[$L$]" destination="lightPropsSM.shadowMap[$L$]" />
+	    <?Endgenerate?>
 	  <?else?>
 	    <?Generate L 0 7?>
 	      <texture name="light shadow map[$L$]" destination="lightPropsSM.shadowMap[$L$]"

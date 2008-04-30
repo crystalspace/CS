@@ -176,7 +176,7 @@ struct ShadowShadowMapDepth : Shadow
     flipY[1] = float4 (0, -1, 0, 0);
     flipY[2] = float4 (0, 0, 1, 0);
     flipY[3] = float4 (0, 0, 0, 1);
-    shadowMapTF = mul (shadowMapTF, flipY);
+    shadowMapTF = mul (flipY, shadowMapTF);
     shadowMapCoords = mul (shadowMapTF, view_pos);
     
     vp_shadowMapCoords = shadowMapCoords;
@@ -240,7 +240,7 @@ struct ShadowShadowMapVSM : Shadow
     flipY[1] = float4 (0, -1, 0, 0);
     flipY[2] = float4 (0, 0, 1, 0);
     flipY[3] = float4 (0, 0, 0, 1);
-    shadowMapTF = mul (shadowMapTF, flipY);
+    shadowMapTF = mul (flipY, shadowMapTF);
     shadowMapCoords = mul (shadowMapTF, view_pos);
     
     vp_shadowMapCoords = shadowMapCoords;
