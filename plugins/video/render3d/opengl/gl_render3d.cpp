@@ -3171,28 +3171,30 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
 
   if (flags & csSimpleMeshScreenspace)
   {
-    csReversibleTransform camtrans;
     if (current_drawflags & CSDRAW_2DGRAPHICS)
     {
+      csReversibleTransform camtrans;
       camtrans.SetO2T (
         csMatrix3 (1.0f, 0.0f, 0.0f,
                    0.0f, -1.0f, 0.0f,
                    0.0f, 0.0f, 1.0f));
       camtrans.SetO2TTranslation (csVector3 (0, viewheight, 0));
+      SetWorldToCamera (camtrans.GetInverse ());
     } 
     else 
     {
       const float vwf = (float)(viewwidth);
       const float vhf = (float)(viewheight);
 
-      camtrans.SetO2T (
-	csMatrix3 (1.0f, 0.0f, 0.0f,
-		   0.0f, -1.0f, 0.0f,
-		   0.0f, 0.0f, 1.0f));
-      camtrans.SetO2TTranslation (csVector3 (
-	vwf / 2.0f, vhf / 2.0f, -vhf)); // @@@ FIXME: vhf doesn't seem right
+      wasProjectionExplicit = explicitProjection;
+      explicitProjection = true;
+      oldProjection = projectionMatrix;
+      
+      projectionMatrix = CS::Math::Projections::Ortho (0, vwf, vhf, 0, -1.0, 10.0);
+      
+      restoreProjection = true;
+      needProjectionUpdate = true;
     }
-    SetWorldToCamera (camtrans.GetInverse ());
   }
   
   rmesh.object2world = mesh.object2world;
