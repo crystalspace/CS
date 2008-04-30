@@ -900,6 +900,8 @@ void csGraphics2DGLCommon::SetViewport (int left, int top, int width, int height
 { 
   vpLeft = left; vpTop = top; vpWidth = width; vpHeight = height;
   glViewport (vpLeft, fbHeight - (vpTop + vpHeight), vpWidth, vpHeight);
+  glScissor (vpLeft + ClipX1, fbHeight - (vpTop + ClipY2),
+    ClipX2 - ClipX1, ClipY2 - ClipY1);
 }
 
 bool csGraphics2DGLCommon::Resize (int width, int height)
