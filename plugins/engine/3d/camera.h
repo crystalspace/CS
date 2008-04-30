@@ -480,7 +480,7 @@ public:
   {
     CS_ASSERT_MSG("SetViewportSize() not called",
                   (vp_width > 0) && (vp_height > 0));
-    Persp().PerspectiveImpl::SetFOV (a/(float)vp_height, width/(float)vp_width);
+    Persp().PerspectiveImpl::SetFOV (a/(float)vp_width, width/(float)vp_width);
     BumpCamera();
   }
   int GetFOV () const
