@@ -38,8 +38,8 @@ namespace CS
     struct Projections
     {
       /**
-       * Create an orthographic projection. \a left is mapped to x=0, \a right
-       * to x=1, \a bottom to y=0 and \a top to y=1. \a nearz specifies the near
+       * Create an orthographic projection. \a left is mapped to x=-1, \a right
+       * to x=1, \a bottom to y=-1 and \a top to y=1. \a nearz specifies the near
        * clipping distance, \a farz the far clipping distance.
        * \sa \link http://www.opengl.org/sdk/docs/man/xhtml/glOrtho.xml glOrtho \endlink
        */
