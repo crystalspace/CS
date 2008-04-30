@@ -500,6 +500,9 @@ public:
   static void OutputMarkerString (const char* function, const wchar_t* file,
     int line, MakeAString& message);
   void Report (int severity, const char* msg, ...);
+  
+  csGLRender2TextureBackend* GetR2TBackend()
+  { return r2tbackend; }
 
   ////////////////////////////////////////////////////////////////////
   //                            iGraphics3D

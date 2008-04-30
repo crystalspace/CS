@@ -38,18 +38,6 @@ csGLRender2TextureBackend::~csGLRender2TextureBackend()
 
   //-------------------------------------------------------------------------
 
-  bool csGLRender2TextureBackend::RTAttachment::operator!= (
-    const RTAttachment& other) const
-  {
-    if (texture != other.texture) return true;
-    if (subtexture != other.subtexture) return true;
-    if (persistent != other.persistent) return true;
-
-    return false;
-  }
-
-  //-------------------------------------------------------------------------
-
 void R2TViewportHelper::Set2DViewport (iGraphics3D* G3D, int txt_w, int txt_h)
 {
   iGraphics2D* g2d = G3D->GetDriver2D();

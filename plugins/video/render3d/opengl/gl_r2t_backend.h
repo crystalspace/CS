@@ -38,17 +38,22 @@ class csGLRender2TextureBackend
 protected:
   csGLGraphics3D* G3D;
 public:  
+  template<class TextureKeeper = csRef<iTextureHandle> >
   struct RTAttachment
   {
-    csRef<iTextureHandle> texture;
+    TextureKeeper texture;
     int subtexture;
     int persistent; /* 'int' to avoid uninit bytes that occur with bool */
 
     RTAttachment() : subtexture (0), persistent (false) {}
+    template<class OtherKeeper>
+    RTAttachment (const RTAttachment<OtherKeeper>& other)
+     : texture (other.texture), subtexture (other.subtexture),
+       persistent (other.persistent) { }
     
     void Clear()
     {
-      texture.Invalidate ();
+      texture = 0;
       subtexture = 0;
       persistent = false;
     }
@@ -65,7 +70,14 @@ public:
     }
 
     bool operator== (const RTAttachment& other) const;
-    bool operator!= (const RTAttachment& other) const;
+    bool operator!= (const RTAttachment& other) const
+    {
+      if (texture != other.texture) return true;
+      if (subtexture != other.subtexture) return true;
+      if (persistent != other.persistent) return true;
+  
+      return false;
+    }
   };
 
   csGLRender2TextureBackend (csGLGraphics3D* G3D);
@@ -90,6 +102,7 @@ public:
   virtual bool HasStencil() = 0;
 
   virtual void NextFrame() {}
+  virtual void CleanupFBOs() {}
 };
 
 // Helper class for viewport changes made by R2T backends

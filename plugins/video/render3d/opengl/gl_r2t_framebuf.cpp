@@ -36,7 +36,7 @@ bool csGLRender2TextureFramebuf::SetRenderTarget (iTextureHandle* handle,
 						  int subtexture,
 						  csRenderTargetAttachment attachment)
 {
-  RTAttachment* target;
+  RTAttachment<>* target;
   switch (attachment)
   {
   case rtaColor0:
@@ -121,7 +121,7 @@ bool csGLRender2TextureFramebuf::CanSetRenderTarget (const char* format,
 iTextureHandle* csGLRender2TextureFramebuf::GetRenderTarget (csRenderTargetAttachment attachment,
                                                              int* subtexture) const
 {
-  const RTAttachment* target = 0;
+  const RTAttachment<>* target = 0;
   switch (attachment)
   {
   case rtaDepth:
@@ -366,7 +366,7 @@ GLenum csGLRender2TextureFramebuf::GetInternalFormatDepth (
   }
 }
 
-void csGLRender2TextureFramebuf::GrabFramebuffer (const RTAttachment& target,
+void csGLRender2TextureFramebuf::GrabFramebuffer (const RTAttachment<>& target,
 						  InternalFormatClass fmtClass)
 {
   csGLBasicTextureHandle* tex_mm = 

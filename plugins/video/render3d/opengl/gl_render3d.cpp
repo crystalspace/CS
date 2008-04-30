@@ -3127,6 +3127,10 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   rmesh.buffers =
     mesh.renderBuffers.IsValid() ? mesh.renderBuffers : scrapBufferHolder;
 
+  bool restoreProjection = false;
+  bool wasProjectionExplicit = false;
+  CS::Math::Matrix4 oldProjection;
+
   if (flags & csSimpleMeshScreenspace)
   {
     csReversibleTransform camtrans;
@@ -3137,20 +3141,30 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
                    0.0f, -1.0f, 0.0f,
                    0.0f, 0.0f, 1.0f));
       camtrans.SetO2TTranslation (csVector3 (0, viewheight, 0));
+      SetWorldToCamera (camtrans.GetInverse ());
     } 
     else 
     {
       const float vwf = (float)(viewwidth);
       const float vhf = (float)(viewheight);
 
-      camtrans.SetO2T (
+      /*camtrans.SetO2T (
 	csMatrix3 (1.0f, 0.0f, 0.0f,
 		   0.0f, -1.0f, 0.0f,
 		   0.0f, 0.0f, 1.0f));
       camtrans.SetO2TTranslation (csVector3 (
-	vwf / 2.0f, vhf / 2.0f, -vhf)); // @@@ FIXME: vhf doesn't seem right
+	vwf / 2.0f, vhf / 2.0f, -vhf)); // @@@ FIXME: vhf doesn't seem right*/
+	
+      wasProjectionExplicit = explicitProjection;
+      explicitProjection = true;
+      oldProjection = projectionMatrix;
+      
+      projectionMatrix = CS::Math::Projections::Ortho (0, vwf, vhf, 0, -1.0, 10.0);
+      
+      restoreProjection = true;
+      needProjectionUpdate = true;
     }
-    SetWorldToCamera (camtrans.GetInverse ());
+    //SetWorldToCamera (camtrans.GetInverse ());
   }
   
   rmesh.object2world = mesh.object2world;
@@ -3236,6 +3250,13 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   }
 
   SetZMode (old_zbufmode);
+  
+  if (restoreProjection)
+  {
+    explicitProjection = wasProjectionExplicit;
+    projectionMatrix = oldProjection;
+    needProjectionUpdate = true;
+  }
 }
 
 bool csGLGraphics3D::PerformExtensionV (char const* command, va_list /*args*/)
@@ -3550,8 +3571,8 @@ bool csGLGraphics3D::HandleEvent (iEvent& Event)
     viewwidth = G2D->GetWidth();
     viewheight = G2D->GetHeight();
     G2D->GetFramebufferDimensions (scrwidth, scrheight);
-    asp_center_x = viewwidth/2;
-    asp_center_y = viewheight/2;
+    asp_center_x = viewwidth/2.0f;
+    asp_center_y = viewheight/2.0f;
     return true;
   }
   else if (Event.Name == Frame)

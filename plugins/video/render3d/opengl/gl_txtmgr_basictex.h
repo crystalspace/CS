@@ -145,6 +145,9 @@ protected:
     flagTransp = 1 << 27,
     /// Is the color valid?
     flagTranspSet = 1 << 26,
+    
+    /// Special flag to mark this texture is used in an FBO
+    flagInFBO = 1 << 25,
 
     flagLast,
     /// Mask to get only the "public" flags
@@ -226,6 +229,9 @@ public:
   {
     texFlags.SetBool (flagWasRenderTarget, b);
   }
+  
+  bool IsInFBO() const { return texFlags.Check (flagInFBO); }
+  void SetInFBO (bool b) { texFlags.SetBool (flagInFBO, b); }
 
   /// Create a texture with given dimensions
   csGLBasicTextureHandle (int width, int height, int depth,
