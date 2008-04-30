@@ -43,7 +43,10 @@
 using namespace CS::RenderManager;
 
 PostEffectManager::PostEffectManager ()
-  : frameNum (0), currentDimData (0), currentWidth (0), currentHeight (0), 
+  : frameNum (0), 
+    dimCache (CS::Utility::ResourceCache::ReuseConditionFlagged (),
+      CS::Utility::ResourceCache::PurgeConditionAfterTime<uint> (0)),
+    currentDimData (0), currentWidth (0), currentHeight (0), 
     textureFmt ("argb8"), lastLayer (0), layersDirty (true)
 {
   SetupScreenQuad ();
@@ -102,6 +105,13 @@ void PostEffectManager::SetupView (uint width, uint height)
     currentDimData->AllocatePingpongTextures (*this);
     currentDimData->SetupScreenQuad (*this);
     currentDimData->UpdateSVContexts (*this);
+    
+    /* The textures used here can take up a lot of resources, so free up
+       cache aggressively.
+       Ideally, only the dimensions that are used in one frame should
+       be kept.
+     */
+    dimCache.agedPurgeInterval = 0;
   }
 }
 
@@ -139,7 +149,9 @@ void PostEffectManager::DrawPostEffects ()
     graphics3D->FinishDraw ();
   }
   
-  dimCache.AdvanceTime (frameNum++);
+  dimCache.AdvanceTime (++frameNum);
+  // Reset to avoid purging every frame
+  dimCache.agedPurgeInterval = 60;
 }
     
 PostEffectManager::Layer* PostEffectManager::AddLayer (iShader* shader)
