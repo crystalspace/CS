@@ -87,7 +87,7 @@
 	    usedTC = texCoord;
 	    <?endif?>
 	    offset = ComputeParallaxOffset (texHeight, usedTC, 
-	      normalize (eyeVec), 0.04);
+	      -normalize (eyeVec), 0.04);
 	  <?endif?>
 	  texCoordOffset = texCoord + offset;
 	</block>
