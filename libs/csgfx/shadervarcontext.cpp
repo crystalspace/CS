@@ -98,6 +98,16 @@ bool ShaderVariableContextImpl::RemoveVariable (csShaderVariable* variable)
   return variables.Delete (variable);
 }
 
+bool ShaderVariableContextImpl::RemoveVariable (csStringID name)
+{
+  size_t index = variables.FindSortedKey (SvVarArrayCmp (name));
+  if (index != csArrayItemNotFound)
+  {
+      return variables.DeleteIndex(index);
+  }
+  return false;
+}
+
 } // namespace Graphics
 } // namespace CS
 

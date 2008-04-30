@@ -58,6 +58,7 @@ namespace CS
       virtual void ReplaceVariable (csShaderVariable *variable);
       virtual void Clear () { variables.Empty(); }
       virtual bool RemoveVariable (csShaderVariable* variable);
+      virtual bool RemoveVariable (csStringID name);
     };
     
     /**
@@ -106,6 +107,11 @@ namespace CS
       { 
 	// @@@ Also remove from parent?
 	return ShaderVariableContextImpl::RemoveVariable (variable); 
+      }
+      bool RemoveVariable (csStringID name)
+      { 
+	// @@@ Also remove from parent?
+	return ShaderVariableContextImpl::RemoveVariable (name); 
       }
     };
   } // namespace Graphics

@@ -126,6 +126,7 @@ public:
   void ReplaceVariable (csShaderVariable *variable) { }
   void Clear () { }
   bool RemoveVariable  (csShaderVariable *) { return false; }
+  bool RemoveVariable  (csStringID) { return false; }
 };
 
 /**

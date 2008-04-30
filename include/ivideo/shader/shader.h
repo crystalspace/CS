@@ -217,7 +217,7 @@ static inline csShaderVariable* csGetShaderVariableFromStack (
  */
 struct iShaderVariableContext : public virtual iBase
 {
-  SCF_INTERFACE(iShaderVariableContext, 2, 2, 1);
+  SCF_INTERFACE(iShaderVariableContext, 2, 3, 0);
 
   /**
    * Add a variable to this context
@@ -269,6 +269,9 @@ struct iShaderVariableContext : public virtual iBase
 
   /// Remove the given variable from this context.
   virtual bool RemoveVariable (csShaderVariable* variable) = 0;
+
+  /// Remove the variable with the given name from this context.
+  virtual bool RemoveVariable (csStringID name) = 0;
 };
 
 /**

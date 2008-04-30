@@ -187,6 +187,10 @@ public:
   {
     return realShader->RemoveVariable (variable);
   }
+  bool RemoveVariable (csStringID name)
+  {
+    return realShader->RemoveVariable (name);
+  }
   /** @} */
 
 public:
