@@ -445,6 +445,8 @@ public:
   { wrappedSVC.Clear(); }
   bool RemoveVariable (csShaderVariable *variable)
   { return wrappedSVC.RemoveVariable (variable); }
+  bool RemoveVariable (csStringID name)
+  { return wrappedSVC.RemoveVariable (name); }
 };
 
 void csXMLShader::ParseGlobalSVs (iLoaderContext* ldr_context,

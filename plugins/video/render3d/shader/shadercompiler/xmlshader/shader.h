@@ -364,6 +364,12 @@ public:
       return fallbackShader->RemoveVariable (variable);
     return GetUsedSVContext().RemoveVariable (variable);
   }
+  bool RemoveVariable (csStringID name)
+  {
+    if (useFallbackContext)
+      return fallbackShader->RemoveVariable (name);
+    return GetUsedSVContext().RemoveVariable (name);
+  }
   /** @} */
 
   /// Set object description

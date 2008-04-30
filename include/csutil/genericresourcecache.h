@@ -341,9 +341,9 @@ namespace CS
       
       TimeType currentTime;
       /**
-       * The next time when the momentarily available resources should be 
-       * scanned for "aged" (long time unused) resources that can be freed */
-      TimeType nextPurgeAged;
+       * The last time the momentarily available resources were 
+       * scanned for "aged" (long time unused) resources that could be freed */
+      TimeType lastPurgeAged;
       /// Whether a "clear" is pending.
       bool clearReq;
       
@@ -404,7 +404,7 @@ namespace CS
         const PurgeCondition& purge = PurgeCondition()) : 
 	availableResources (reuse, elementAlloc),
         activeResources (purge, elementAlloc), 
-        currentTime (0), nextPurgeAged (0),
+        currentTime (0), lastPurgeAged (0),
 	clearReq (false), agedPurgeInterval (60)
       {
       }
@@ -431,6 +431,30 @@ namespace CS
 	  clearReq = true;
       }
       
+#ifdef CS_DEBUG
+      class VerifyTraverser
+      {
+	Element* el;
+      public:
+	VerifyTraverser (Element* el) : el (el) {}
+	
+        bool operator() (Element* el)
+	{
+	  CS_ASSERT(el != this->el);
+	  return true;
+	}
+      };
+#endif
+
+      void VerifyElementNotInTree (Element* el)
+      {
+        (void)el;
+#ifdef CS_DEBUG
+	VerifyTraverser verify (el);
+	availableResources.v.TraverseInOrder (verify);
+#endif
+      }
+      
       /**
        * Advance the time kept by the cache. Determines what resources
        * can be reused or even freed.
@@ -445,7 +469,7 @@ namespace CS
 	
 	currentTime = time;
 	
-	if (time >= nextPurgeAged)
+	if (time >= lastPurgeAged + agedPurgeInterval)
 	{
 	  typename csRedBlackTree<ElementWrapper>::Iterator treeIt (
 	    availableResources.v.GetIterator ());
@@ -456,13 +480,16 @@ namespace CS
 		el->GetPurgeAuxiliary(), el->data))
 	    {
 	      availableResources.v.Delete (treeIt);
+	      VerifyElementNotInTree (el);
 	      elementAlloc.Free (el);
 	    }
 	    else
+	    {
 	      treeIt.Next ();
+	    }
 	  }
 	  
-	  nextPurgeAged = time + agedPurgeInterval;
+	  lastPurgeAged = time;
 	}
 	
 	typename csList<ElementWrapper>::Iterator listIt (activeResources.v);
@@ -473,6 +500,7 @@ namespace CS
 	  if (GetReuseCondition().IsReusable (*this,
 	      el->GetReuseAuxiliary(), el->data))
 	  {
+	    VerifyElementNotInTree (el);
 	    availableResources.v.Insert (el);
 	    activeResources.v.Delete (listIt);
 	  }
@@ -544,8 +572,20 @@ namespace CS
       {
 	Element* el = ElementFromData (data);
 	  
+	VerifyElementNotInTree (el);
 	availableResources.v.Insert (el);
 	activeResources.v.Delete (el);
+      }
+      
+      /**
+       * Free up a resource which is currently "active".
+       */
+      void RemoveActive (T* data)
+      {
+	Element* el = ElementFromData (data);
+	  
+        activeResources.v.Delete (el);
+        elementAlloc.Free (el);
       }
       
       /**
