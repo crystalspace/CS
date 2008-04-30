@@ -50,8 +50,7 @@ namespace RenderManager
         t1->GetRendererDimensions (tw1, th1);
         t2->GetRendererDimensions (tw2, th2);
         
-        if ((tw1 >= tw2) && (th1 >= th2)) return true;
-        return false;
+        return ((tw1 >= tw2) || (th1 >= th2));
       }
     
       static bool IsEqual (const csRef<iTextureHandle>& t1, 
@@ -71,7 +70,7 @@ namespace RenderManager
         int tw1, th1;
         t1->GetRendererDimensions (tw1, th1);
         
-        if ((tw1 >= t2.w) && (th1 >= t2.h)) return true;
+        if ((tw1 >= t2.w) || (th1 >= t2.h)) return true;
         return false;
       }
     
