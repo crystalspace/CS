@@ -69,7 +69,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
   {
     typedef csGLRender2TextureBackend::RTAttachment<TextureKeeper> RTA;
   protected:
-    template<class _TextureKeeper> friend class R2TAttachmentGroup;
+    template<class _TextureKeeper> friend struct R2TAttachmentGroup;
   
     uint hash;
   #ifdef CS_DEBUG
@@ -153,7 +153,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
     R2TAttachmentGroup& operator= (const R2TAttachmentGroup<OtherKeeper>& other)
     {
       hash = other.hash;
+    #ifdef CS_DEBUG
       hashComputed = other.hashComputed;
+    #endif
       for (int a = 0; a < rtaNumAttachments; a++)
       {
 	attachments[a] = other.attachments[a];
