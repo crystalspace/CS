@@ -93,7 +93,7 @@ public:
   inline float SquaredNorm () const
   { return x * x + y * y; }
 
-  /// Rotate vector around the origin by a given angle in radians.
+  /// Rotate vector clockwise around the origin by a given angle in radians.
   void Rotate (float angle);
 
   /**
