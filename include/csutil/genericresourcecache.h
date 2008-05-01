@@ -438,7 +438,7 @@ namespace CS
       public:
 	VerifyTraverser (Element* el) : el (el) {}
 	
-        bool operator() (Element* el)
+        bool Process (Element* el)
 	{
 	  CS_ASSERT(el != this->el);
 	  return true;
