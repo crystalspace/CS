@@ -518,6 +518,9 @@ public:
    */
   csRenderMesh** GetImposter (iRenderView *rview);
 
+  void SetLODFade (float fade);
+  void UnsetLODFade ();
+
   //---------- Bounding volume and beam functions -----------------//
 
   virtual csSphere GetRadius () const;

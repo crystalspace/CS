@@ -23,7 +23,7 @@
 
 
 csStaticLODMesh::csStaticLODMesh ()
-  : scfImplementationType (this), lod_m (0), lod_a (1)
+  : scfImplementationType (this), lod_m (0), lod_a (1), lod_f (0)
 {
 }
 
@@ -44,6 +44,16 @@ void csStaticLODMesh::ClearLODListeners ()
     lod_vara->RemoveListener (lod_vara_listener);
     lod_vara_listener = 0;
     lod_vara = 0;
+  }
+}
+
+void csStaticLODMesh::ClearLODFListeners ()
+{
+  if (lod_varf)
+  {
+    lod_vara->RemoveListener (lod_varf_listener);
+    lod_varf_listener = 0;
+    lod_varf = 0;
   }
 }
 
@@ -79,6 +89,26 @@ int csStaticLODMesh::GetLODPolygonCount (float /*lod*/) const
   return 0;
 }
 
+void csStaticLODMesh::SetLODFade (float f)
+{
+  ClearLODFListeners ();
+  lod_f = f;
+}
+
+void csStaticLODMesh::GetLODFade (float& f) const
+{
+  f = lod_f;
+}
+
+void csStaticLODMesh::SetLODFade (iSharedVariable* varf)
+{
+  ClearLODFListeners ();
+  lod_varf = varf;
+  lod_varf_listener = csPtr<csLODListener> (new csLODListener (&lod_f));
+  lod_varf->AddListener (lod_varf_listener);
+  lod_f = varf->Get ();
+}
+
 //----------------------------------------------------------------------------
 
 
@@ -112,6 +142,23 @@ void csStaticLODFactoryMesh::SetLOD (iSharedVariable* varm,
   lod_vara = vara;
   lod_m = varm->Get ();
   lod_a = vara->Get ();
+}
+
+void csStaticLODFactoryMesh::SetLODFade (float f)
+{
+  lod_f = f;
+  lod_varf = 0;
+}
+
+void csStaticLODFactoryMesh::GetLODFade (float& f) const
+{
+  f = lod_f;
+}
+
+void csStaticLODFactoryMesh::SetLODFade (iSharedVariable* varf)
+{
+  lod_varf = varf;
+  lod_f = varf->Get ();
 }
 
 
