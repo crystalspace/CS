@@ -115,12 +115,14 @@ void csGLTextureManager::read_config (iConfigFile *config)
     ("Video.OpenGL.TextureDownsample", 0);
   texture_filter_anisotropy = config->GetFloat
     ("Video.OpenGL.TextureFilterAnisotropy", 1.0);
-  disableRECTTextureCompression = config->GetBool
+  tweaks.disableRECTTextureCompression = config->GetBool
     ("Video.OpenGL.DisableRECTTextureCompression", false);
-  enableNonPowerOfTwo2DTextures = config->GetBool
+  tweaks.enableNonPowerOfTwo2DTextures = config->GetBool
     ("Video.OpenGL.EnableNonPowerOfTwo2DTextures", false);
-  disableGenerateMipmap = config->GetBool
+  tweaks.disableGenerateMipmap = config->GetBool
     ("Video.OpenGL.DisableGenerateMipmap", false);
+  tweaks.generateMipMapsExcessOne = config->GetBool
+    ("Video.OpenGL.GenerateOneExcessMipMap", false);
   
   const char* filterModeStr = config->GetStr (
     "Video.OpenGL.TextureFilter", "trilinear");
