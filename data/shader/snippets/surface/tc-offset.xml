@@ -35,6 +35,10 @@
       </block>
     </input>
     
+    <block location="shadervars">
+      <shadervar name="tex offset scale distance" type="vector4">1,1,1,1</shadervar>
+    </block>
+    
     <block location="cg:variablemap">
       <variablemap variable="tex offset scale distance" 
 		   destination="fragmentIn.texOffsetScaleDist" />
