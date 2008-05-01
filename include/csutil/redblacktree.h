@@ -211,6 +211,7 @@ protected:
     }
     root->SetColor (Black);
   }
+  
   /// Delete a node from the tree.
   void DeleteNode (Node* node)
   {
@@ -736,48 +737,19 @@ public:
   {
     Node* n = it.currentNode;
     if (n == 0) return;
-    Node* p = n->GetParent();
-    int oldSide = -1;
-    Node* oldRootLeft = 0;
-    if (p != 0)
-    {
-      if (n == p->left)
-        oldSide = 0;
-      else
-      {
-        CS_ASSERT(n == p->right);
-        oldSide = 1;
-      }
-    }
-    else
-    {
-      // Deleting root
-      oldRootLeft = n->left;
-    }
+    Node* nPred = Predecessor (n);
     DeleteNode (n);
-    
-    Node* newNode = 0;
-    if (p == 0)
+    Node* newNode;
+    if (nPred == 0)
     {
-      // Deleted root: successor is new root
-      if (root == oldRootLeft)
-        newNode = root ? root->right : 0;
-      else
-        newNode = root;
+      newNode = root;
+      if (newNode != 0)
+      {
+        while (newNode->left != 0) newNode = newNode->left;
+      }
     }
     else
-    {
-      if (oldSide == 0)
-      {
-	// Deleted node was left side: successor node is parent
-	newNode = p;
-      }
-      else if (oldSide == 1)
-      {
-	// Deleted node was right side: successor is right node of parent
-	newNode = p->right;
-      }
-    }
+      newNode = Successor (nPred);
     it.currentNode = newNode;
   }
 
