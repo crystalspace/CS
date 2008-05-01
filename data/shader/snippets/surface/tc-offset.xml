@@ -35,18 +35,43 @@
       </block>
     </input>
     
-    <block location="shadervars">
-      <shadervar name="tex offset scale distance" type="vector4">1,1,1,1</shadervar>
-    </block>
+    <input name="scale" type="float2" default="complex">
+      <block location="shadervars">
+	<shadervar name="tex offset scale distance" type="vector4">1,1,1,1</shadervar>
+      </block>
+      
+      <block location="cg:variablemap">
+	<variablemap variable="tex offset scale distance" 
+		     destination="fragmentIn.texOffsetScaleDist" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<varying type="float4" name="texOffsetScaleDist" />
+      </block>
+      
+      <block location="cg:fragmentMain">
+	scale = texOffsetScaleDist.xy;
+      </block>
+    </input>
     
-    <block location="cg:variablemap">
-      <variablemap variable="tex offset scale distance" 
-		   destination="fragmentIn.texOffsetScaleDist" />
-    </block>
-    
-    <block location="cg:fragmentIn">
-      <varying type="float4" name="texOffsetScaleDist" />
-    </block>
+    <input name="distance" type="float2" default="complex">
+      <block location="shadervars">
+	<shadervar name="tex offset scale distance" type="vector4">1,1,1,1</shadervar>
+      </block>
+      
+      <block location="cg:variablemap">
+	<variablemap variable="tex offset scale distance" 
+		     destination="fragmentIn.texOffsetScaleDist" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<varying type="float4" name="texOffsetScaleDist" />
+      </block>
+      
+      <block location="cg:fragmentMain">
+	distance = texOffsetScaleDist.zw;
+      </block>
+    </input>
       
     <block location="cg:vertexMain">
       // In case the coords are used on the VP side...
@@ -57,8 +82,8 @@
       float2 offset = float2 (0, 0);
       <?if vars."tex offset".texture ?>
 	float2 usedTC;
-	usedTC = texCoord*fragmentIn.texOffsetScaleDist.xy;
-	offset = tex2D (texOffset, usedTC) * texOffsetScaleDist.zw;
+	usedTC = texCoord*scale;
+	offset = tex2D (texOffset, usedTC) * distance;
       <?endif?>
       texCoordOffset = texCoord + offset;
     </block>
