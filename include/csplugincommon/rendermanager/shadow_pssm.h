@@ -253,8 +253,9 @@ namespace RenderManager
 	     casters closer to the light than the split plane */
 	  if (allObjsBox.MinZ() < allMinZ) allMinZ = allObjsBox.MinZ();
 	  /* Consider using DepthRange? */
-	  float n = allMinZ; //-1.0f;
-	  float f = allObjsBox.MaxZ();//10.0f;
+	  // @@@ And WTH is that inverted range needed, anyway? :P
+	  float n = -allObjsBox.MaxZ(); //-1.0f;
+	  float f = -allMinZ;//10.0f;
           CS::Math::Matrix4 Mortho = CS::Math::Projections::Ortho (-1, 1, 1, -1, n, f);
 	  CS::Math::Matrix4 matrix = Mortho * crop;
 	  
