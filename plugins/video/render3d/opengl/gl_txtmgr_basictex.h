@@ -139,15 +139,16 @@ protected:
     flagPrepared = 1 << 30,
     flagForeignHandle = 1 << 29,
     flagWasRenderTarget = 1 << 28,
+    flagExcessMaxMip = 1 << 27,
 
     // Flags below are used by csGLTextureHandle
     /// Does it have a keycolor?
-    flagTransp = 1 << 27,
+    flagTransp = 1 << 26,
     /// Is the color valid?
-    flagTranspSet = 1 << 26,
+    flagTranspSet = 1 << 25,
     
     /// Special flag to mark this texture is used in an FBO
-    flagInFBO = 1 << 25,
+    flagInFBO = 1 << 24,
 
     flagLast,
     /// Mask to get only the "public" flags

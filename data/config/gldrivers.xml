@@ -287,6 +287,13 @@
 	</OpenGL>
       </Video>
     </config>
+    <config name="generateexcessmipmap">
+      <Video>
+	<OpenGL>
+	  <GenerateOneExcessMipMap>yes</GenerateOneExcessMipMap>
+	</OpenGL>
+      </Video>
+    </config>
   </configs>
   <rules>
     <!-- rule description="Some more examples">
@@ -565,6 +572,22 @@
       </applicable>
     </rule>
 
+    <!--
+	* 2008-05-01: GeForce 8800 GTS/PCI/SSE2, Linux 64-bit, 
+	              OpenGL 2.1.2 NVIDIA 169.12
+		      When setting a max LOD level for a texture and generating
+		      mipmaps with GL_GENERATE_MIPMAPS_SGIS, the last LOD
+		      level stays black.
+	-->
+    <rule description="NVidia: GENERATE_MIPMAPS does not generate last level">
+      <conditions>
+	<regexp	string="vendor" pattern="NVIDIA" />
+      </conditions>
+      <applicable>
+	<usecfg>generateexcessmipmap</usecfg>
+      </applicable>
+    </rule>
+    
     <rule description="SiS: Text drawing only seems to work using the worst method">
       <conditions>
 	<regexp string="vendor" pattern="^SiS" />

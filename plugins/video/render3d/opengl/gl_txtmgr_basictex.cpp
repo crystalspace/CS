@@ -63,7 +63,7 @@ csGLBasicTextureHandle::csGLBasicTextureHandle (int width,
       (G3D->ext->CS_GL_ARB_texture_rectangle
       || G3D->ext->CS_GL_EXT_texture_rectangle
       || G3D->ext->CS_GL_NV_texture_rectangle
-      || txtmgr->enableNonPowerOfTwo2DTextures
+      || txtmgr->tweaks.enableNonPowerOfTwo2DTextures
       || G3D->ext->CS_GL_ARB_texture_non_power_of_two)
       // Certain additional texture flags, unless we have ARB_tnpot
       && (((flags & npotsNeededFlags) == npotsNeededFlags) 
@@ -75,7 +75,7 @@ csGLBasicTextureHandle::csGLBasicTextureHandle (int width,
     {
       flags &= ~CS_TEXTURE_NPOTS;
     }
-    else if (!txtmgr->enableNonPowerOfTwo2DTextures
+    else if (!txtmgr->tweaks.enableNonPowerOfTwo2DTextures
       && !G3D->ext->CS_GL_ARB_texture_non_power_of_two)
       /* Note that 'enableNonPowerOfTwo2DTextures' is the flag for ATI's
        * support of non-POT _2D_ textures; that is, the textures, being
@@ -380,12 +380,23 @@ void csGLBasicTextureHandle::SetupAutoMipping()
   // Set up mipmap generation
   if ((!(texFlags.Get() & CS_TEXTURE_NOMIPMAPS))
     && (!G3D->ext->CS_GL_EXT_framebuffer_object 
-      || txtmgr->disableGenerateMipmap))
+      || txtmgr->tweaks.disableGenerateMipmap))
   {
+    GLenum textarget = GetGLTextureTarget();
     if (G3D->ext->CS_GL_SGIS_generate_mipmap)
-      glTexParameteri (GetGLTextureTarget(), GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
+    {
+      glTexParameteri (textarget, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
+      if (G3D->ext->CS_GL_SGIS_texture_lod
+          && txtmgr->tweaks.generateMipMapsExcessOne)
+      {
+        texFlags.SetBool (flagExcessMaxMip, true);
+	GLint maxLevel;
+	glGetTexParameteriv (textarget, GL_TEXTURE_MAX_LEVEL_SGIS, &maxLevel);
+	glTexParameteri (textarget, GL_TEXTURE_MAX_LEVEL_SGIS, maxLevel+1);
+      }
+    }
     else
-      glTexParameteri  (GetGLTextureTarget(), GL_TEXTURE_MIN_FILTER,
+      glTexParameteri (textarget, GL_TEXTURE_MIN_FILTER,
 	txtmgr->rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
   }
 }
@@ -394,7 +405,7 @@ void csGLBasicTextureHandle::RegenerateMipmaps()
 {
   if ((!(texFlags.Get() & CS_TEXTURE_NOMIPMAPS))
     && G3D->ext->CS_GL_EXT_framebuffer_object
-    && !txtmgr->disableGenerateMipmap)
+    && !txtmgr->tweaks.disableGenerateMipmap)
   {
     G3D->ActivateTexture (this);
     G3D->ext->glGenerateMipmapEXT (GetGLTextureTarget());
@@ -890,6 +901,8 @@ void csGLBasicTextureHandle::SetMipmapLimits (int maxMip, int minMip)
   {
     GLenum textarget = GetGLTextureTarget();
     csGLGraphics3D::statecache->SetTexture (textarget, GetHandle ());
+    if (texFlags.Check (flagExcessMaxMip))
+      maxMip++;
     glTexParameteri (textarget, GL_TEXTURE_BASE_LEVEL_SGIS, minMip);
     glTexParameteri (textarget, GL_TEXTURE_MAX_LEVEL_SGIS, maxMip);
   }
@@ -906,6 +919,8 @@ void csGLBasicTextureHandle::GetMipmapLimits (int& maxMip, int& minMip)
     glGetTexParameteriv (textarget, GL_TEXTURE_MAX_LEVEL_SGIS, &maxLevel);
     minMip = baseLevel;
     maxMip = maxLevel;
+    if (texFlags.Check (flagExcessMaxMip))
+      maxMip--;
   }
   else
   {
