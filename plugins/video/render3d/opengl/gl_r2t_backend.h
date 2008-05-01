@@ -114,9 +114,17 @@ class R2TViewportHelper
   int framebufW, framebufH;
   /// Old viewport
   int vp_old_l, vp_old_t, vp_old_w, vp_old_h;
+  
+  int vpOfsX, vpOfsY;
 public:
-  void Set2DViewport (iGraphics3D* G3D, int texW, int texH);
+  void Set2DViewport (iGraphics3D* G3D, int texW, int texH,
+    bool keepOldVP = false);
   void Reset2DViewport (iGraphics3D* G3D);
+  
+  int GetVPOfsX() const { return vpOfsX; }
+  int GetVPOfsY() const { return vpOfsY; }
+  int GetVPWidth() const { return vp_old_w; }
+  int GetVPHeight() const { return vp_old_h; }
 
   int GetOriginalFramebufferWidth() const { return framebufW; }
   int GetOriginalFramebufferHeight() const { return framebufH; }

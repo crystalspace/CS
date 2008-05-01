@@ -55,6 +55,10 @@ protected:
     csGLBasicTextureHandle* tex);
   static GLenum GetInternalFormatColor (GLenum texInternalFormat);
   static GLenum GetInternalFormatDepth (GLenum texInternalFormat);
+  static GLenum GetBaseFormat (InternalFormatClass fmtClass,
+    csGLBasicTextureHandle* tex);
+  static GLenum GetBaseFormatColor (GLenum texInternalFormat);
+  static GLenum GetBaseFormatDepth (GLenum texInternalFormat);
 
   csDirtyAccessArray<uint8> pixelScratch;
   void GrabFramebuffer (const RTAttachment<>& target, InternalFormatClass fmtClass);

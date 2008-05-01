@@ -480,10 +480,7 @@ void csGLRender2TextureEXTfbo::RegenerateTargetMipmaps (const WRTAG::RTA& target
 
   csGLBasicTextureHandle* tex_mm = 
     static_cast<csGLBasicTextureHandle*> (target.texture->GetPrivateObject ());
-  if (!(tex_mm->GetFlags() & CS_TEXTURE_NOMIPMAPS))
-  {
-    tex_mm->RegenerateMipmaps();
-  }
+  tex_mm->RegenerateMipmaps();
 }
   
 void csGLRender2TextureEXTfbo::SelectCurrentFBO ()
