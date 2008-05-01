@@ -23,7 +23,7 @@
     
     <input name="texOffset" type="tex2d" default="complex">
       <block location="pass">
-	<texture name="tex offset" destination="fragmentIn.texHeight" />
+	<texture name="tex offset" destination="fragmentIn.texOffset" />
       </block>
       
       <block location="cg:fragmentIn">
