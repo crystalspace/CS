@@ -28,6 +28,7 @@
 
 #include "csutil/leakguard.h"
 #include "csutil/refarr.h"
+#include "csutil/refcount.h"
 #include "csutil/scf_implementation.h"
 
 #include "iutil/object.h"
@@ -42,7 +43,8 @@ typedef csRefArray<iObject> csObjectContainer;
  * from the child objects.
  */
 class CS_CRYSTALSPACE_EXPORT csObject : 
-  public scfImplementation1<csObject, iObject>
+  public scfImplementation1<csObject, iObject>,
+  public CS::Utility::InternalRefCount
 {
 protected:
   friend class csObjectIterator;

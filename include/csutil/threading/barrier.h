@@ -44,6 +44,14 @@ namespace Threading
       : maxCount (maxCount), currentCount (0)
     {}
 
+    /**
+     * Reset a barrier for reuse.
+     * Must not be called on a currently used barrier.
+     */
+    void Reset ()
+    {     
+      currentCount = 0;
+    }
 
     /**
      * Wait for all threads to have called Wait.
@@ -52,16 +60,17 @@ namespace Threading
     bool Wait ()
     {
       MutexScopedLock lock (mutex);
-      if (++currentCount == maxCount)
+      if (++currentCount < maxCount)
       {
-        currentCount = 0;
-        condition.NotifyAll ();
-        return true;
+        while (currentCount < maxCount)
+          condition.Wait (mutex);
+
+        return false;
       }
       else
       {
-        condition.Wait (mutex);
-        return false;
+        condition.NotifyAll ();
+        return true;
       }
     }
 
@@ -70,7 +79,7 @@ namespace Threading
     Condition condition;
 
     const size_t maxCount;
-    size_t currentCount;
+    volatile size_t currentCount;
   };
   
 }

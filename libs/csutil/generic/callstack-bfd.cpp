@@ -21,6 +21,10 @@
 #include "callstack-bfd.h"
 #include "../demangle.h"
 
+#include "csutil/custom_new_disable.h"
+#include <string>
+#include "csutil/custom_new_enable.h"
+
 #if defined(CS_PLATFORM_WIN32)
 #include "libs/csutil/win32/bfd-module-win32.h"
 typedef BfdModuleHelperWin32 BfdModuleHelper;
@@ -38,7 +42,7 @@ namespace CS
   {
     CallStackNameResolverBfd::~CallStackNameResolverBfd()
     {
-      csHash<BfdSymbols*, uint64>::GlobalIterator it = 
+      ModulesHash::GlobalIterator it = 
 	moduleBfds.GetIterator();
       while (it.HasNext())
       {
@@ -70,7 +74,7 @@ namespace CS
     }
     
     bool CallStackNameResolverBfd::GetAddressSymbol (void* addr, 
-      csString& sym)
+      char*& sym)
     {
       BfdSymbols* bfd = BfdForAddress (addr);
       if (!bfd) return false;
@@ -82,10 +86,12 @@ namespace CS
       if (bfd->FindSymbol ((uintptr_t)addr, filename, function, line))
       {
 	if (!function) return false;
-	csString tmp;
-	CS::Debug::Demangle (function, tmp);
-	sym.Format ("[%p] (%s)%s", addr, bfd->GetFileName(), 
-	  tmp.GetData());
+	char* tmp = CS::Debug::Demangle (function);
+        char buf[512];
+        snprintf (buf, sizeof (buf), "[%p] (%s)%s", addr,
+          bfd->GetFileName(), tmp);
+        sym = strdup (buf);
+        free (tmp);
 	return true;
       }
       
@@ -97,7 +103,7 @@ namespace CS
       return 0;
     }
     
-    bool CallStackNameResolverBfd::GetParamName (void*, size_t, csString&)
+    bool CallStackNameResolverBfd::GetParamName (void*, size_t, char*&)
     {
       return false;
     }
@@ -106,7 +112,7 @@ namespace CS
     {
     }
     
-    bool CallStackNameResolverBfd::GetLineNumber (void* addr, csString& str)
+    bool CallStackNameResolverBfd::GetLineNumber (void* addr, char*& str)
     {
       BfdSymbols* bfd = BfdForAddress (addr);
       if (!bfd) return false;
@@ -118,8 +124,12 @@ namespace CS
       if (bfd->FindSymbol ((uintptr_t)addr, filename, function, line))
       {
 	if (!function) return false;
-	str.Format ("%s", filename);
-	if (line > 0) str << ':' << line;
+        char buf[512];
+        if (line > 0) 
+	  snprintf (buf, sizeof (buf), "%s:%d", filename, line);
+        else
+	  snprintf (buf, sizeof (buf), "%s", filename);
+	str = strdup (buf);
 	return true;
       }
       

@@ -1492,6 +1492,9 @@ Optional Features:
   --enable-extensive-memory-debugger
                           enable the extensive memory debugger which catches
                           common memory management mistakes (default NO)
+  --enable-checking-allocations
+                          make allocations by default `checking' if the
+                          extensive memory debugger is enabled (default NO)
   --enable-memory-tracker enable the memory tracker which checks memory usage
                           per source file (default NO)
   --enable-ref-tracker    enable the reference tracker which dumps information
@@ -2056,7 +2059,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 PACKAGE_LONGNAME="Crystal Space"
-    PACKAGE_COPYRIGHT="Copyright (C)1998-2007 Jorrit Tyberghein and others"
+    PACKAGE_COPYRIGHT="Copyright (C)1998-2008 Jorrit Tyberghein and others"
     PACKAGE_HOMEPAGE="http://www.crystalspace3d.org/"
 
 
@@ -3147,15 +3150,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 	cs_build_prop_val="$CC"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.CC ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.CC ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$CPPFLAGS $CFLAGS"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
 "
 fi
 
@@ -3167,15 +3170,15 @@ fi
 
     cs_build_prop_val="$cs_compiler_name_c"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C.TYPE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C.TYPE ?= $cs_build_prop_val ;
 "
 fi
 
     cs_build_prop_val="$cs_compiler_name_c"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.TYPE = \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.TYPE = $cs_build_prop_val ;
 "
 fi
 
@@ -3186,6 +3189,7 @@ echo $ECHO_N "checking if $CC accepts -pipe... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cc_pipe_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-pipe@@ | sed 'y% %#%'`"; then
   ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -3322,10 +3326,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cc_pipe=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cc_pipe_ok="$cs_cv_prog_cc_pipe"
+		cs_cv_prog_cc_pipe_ok="$cs_cv_prog_cc_pipe"
 else
   cs_cv_prog_cc_pipe=''
-	    cs_cv_prog_cc_pipe_ok=no
+		cs_cv_prog_cc_pipe_ok=no
+fi
+
+else
+  cs_cv_prog_cc_pipe=''
+            cs_cv_prog_cc_pipe_ok=no
 fi
 
 fi
@@ -3334,8 +3343,8 @@ echo "${ECHO_T}$cs_cv_prog_cc_pipe_ok" >&6; }
     if test "$cs_cv_prog_cc_pipe_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cc_pipe"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
 "
 fi
 
@@ -3717,15 +3726,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 	cs_build_prop_val="$CXX"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.C++ ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.C++ ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$CPPFLAGS $CXXFLAGS"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS += $cs_build_prop_val ;
 "
 fi
 
@@ -3737,15 +3746,15 @@ fi
 
     cs_build_prop_val="$cs_compiler_name_cxx"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++.TYPE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++.TYPE ?= $cs_build_prop_val ;
 "
 fi
 
     cs_build_prop_val="$cs_compiler_name_cxx"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.TYPE = \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.TYPE = $cs_build_prop_val ;
 "
 fi
 
@@ -3758,6 +3767,7 @@ echo $ECHO_N "checking how to treat C++ warnings as errors... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_pic_werror_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-Werror@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -3894,10 +3904,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_pic_werror=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_pic_werror_ok="$cs_cv_prog_cxx_pic_werror"
+		cs_cv_prog_cxx_pic_werror_ok="$cs_cv_prog_cxx_pic_werror"
 else
   cs_cv_prog_cxx_pic_werror=''
-	    cs_cv_prog_cxx_pic_werror_ok=no
+		cs_cv_prog_cxx_pic_werror_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_pic_werror=''
+            cs_cv_prog_cxx_pic_werror_ok=no
 fi
 
 fi
@@ -3909,6 +3924,7 @@ echo $ECHO_N "checking how to enable C++ PIC generation... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_pic_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-fPIC@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -4055,10 +4071,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_pic=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_pic_ok="$cs_cv_prog_cxx_pic"
+		cs_cv_prog_cxx_pic_ok="$cs_cv_prog_cxx_pic"
 else
   cs_cv_prog_cxx_pic=''
-	    cs_cv_prog_cxx_pic_ok=no
+		cs_cv_prog_cxx_pic_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_pic=''
+            cs_cv_prog_cxx_pic_ok=no
 fi
 
 fi
@@ -4067,8 +4088,8 @@ echo "${ECHO_T}$cs_cv_prog_cxx_pic_ok" >&6; }
     if test "$cs_cv_prog_cxx_pic_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_pic"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS.PIC ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS.PIC ?= $cs_build_prop_val ;
 "
 fi
 
@@ -4190,8 +4211,11 @@ esac
 fi
 
     if test -n "$LD"; then
+  # Apple linker is not GNU-compatible. Further, on Leopard, -v emits
+        # to stderr rather than stdout. Handle these anomalies.
+        if echo `ld -v 2>&1` | grep GNU 2>&1 > /dev/null; then
   # binutils versions come in the flavors X.Y as well as X.Y.Z
-        { echo "$as_me:$LINENO: checking if binutils version >= 2.17" >&5
+	    { echo "$as_me:$LINENO: checking if binutils version >= 2.17" >&5
 echo $ECHO_N "checking if binutils version >= 2.17... $ECHO_C" >&6; }
 if test "${cs_cv_prog_binutils_version_2_17_ok_annotated+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -4312,11 +4336,11 @@ else
   cs_cv_binutils_true_2_17=no
 fi
 
-        if test "$cs_cv_binutils_true_2_17" = yes; then
+	    if test "$cs_cv_binutils_true_2_17" = yes; then
   cs_cv_binutils_2_17=yes
 fi
 
-	if test -z "$cs_cv_binutils_2_17"; then
+	    if test -z "$cs_cv_binutils_2_17"; then
   { echo "$as_me:$LINENO: checking if binutils version >= 2.16.91" >&5
 echo $ECHO_N "checking if binutils version >= 2.16.91... $ECHO_C" >&6; }
 if test "${cs_cv_prog_binutils_version_2_16_91_ok_annotated+set}" = set; then
@@ -4430,8 +4454,10 @@ fi
 
 fi
 
-	if test -z "$cs_cv_binutils_2_17"; then
+	    if test -z "$cs_cv_binutils_2_17"; then
   cs_cv_binutils_2_17=no
+fi
+
 fi
 
 fi
@@ -4441,16 +4467,16 @@ fi
     if test -n "$CXX"; then
   cs_build_prop_val="\$(CMD.C++)"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.LINK ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.LINK ?= $cs_build_prop_val ;
 "
 fi
 
 else
   cs_build_prop_val="\$(CMD.CC)"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.LINK ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.LINK ?= $cs_build_prop_val ;
 "
 fi
 
@@ -4570,16 +4596,16 @@ fi
 
     cs_build_prop_val="$LD"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.LD ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.LD ?= $cs_build_prop_val ;
 "
 fi
 
 
     cs_build_prop_val="$LDFLAGS"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += $cs_build_prop_val ;
 "
 fi
 
@@ -4596,6 +4622,7 @@ echo $ECHO_N "checking if -shared is accepted... $ECHO_C" >&6; }
 if test "${cs_cv_prog_link_shared_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-shared $cs_cv_prog_cxx_pic@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -4742,10 +4769,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_link_shared=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_link_shared_ok="$cs_cv_prog_link_shared"
+		cs_cv_prog_link_shared_ok="$cs_cv_prog_link_shared"
 else
   cs_cv_prog_link_shared=''
-	    cs_cv_prog_link_shared_ok=no
+		cs_cv_prog_link_shared_ok=no
+fi
+
+else
+  cs_cv_prog_link_shared=''
+            cs_cv_prog_link_shared_ok=no
 fi
 
 fi
@@ -4754,8 +4786,8 @@ echo "${ECHO_T}$cs_cv_prog_link_shared_ok" >&6; }
     if test "$cs_cv_prog_link_shared_ok" != no; then
   cs_build_prop_val="-shared"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}PLUGIN.LFLAGS += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}PLUGIN.LFLAGS += $cs_build_prop_val ;
 "
 fi
 
@@ -5069,8 +5101,8 @@ fi
     if test $cs_cv_prog_link_soname = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}PLUGIN.LFLAGS.USE_SONAME ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}PLUGIN.LFLAGS.USE_SONAME ?= $cs_build_prop_val ;
 "
 fi
 
@@ -5154,8 +5186,8 @@ echo "${ECHO_T}$cs_cv_prog_link_respfile" >&6; }
     if test $cs_cv_prog_link_respfile = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}LINKER.RESPONSEFILES ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}LINKER.RESPONSEFILES ?= $cs_build_prop_val ;
 "
 fi
 
@@ -5181,6 +5213,7 @@ echo $ECHO_N "checking if --as-needed is supported... $ECHO_C" >&6; }
 if test "${cs_cv_prog_link_as_needed_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-Wl,--as-needed@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -5317,10 +5350,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_link_as_needed=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_link_as_needed_ok="$cs_cv_prog_link_as_needed"
+		cs_cv_prog_link_as_needed_ok="$cs_cv_prog_link_as_needed"
 else
   cs_cv_prog_link_as_needed=''
-	    cs_cv_prog_link_as_needed_ok=no
+		cs_cv_prog_link_as_needed_ok=no
+fi
+
+else
+  cs_cv_prog_link_as_needed=''
+            cs_cv_prog_link_as_needed_ok=no
 fi
 
 fi
@@ -5329,8 +5367,8 @@ echo "${ECHO_T}$cs_cv_prog_link_as_needed_ok" >&6; }
     if test "$cs_cv_prog_link_as_needed_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_link_as_needed"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.LINK += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.LINK += $cs_build_prop_val ;
 "
 fi
 
@@ -5342,6 +5380,7 @@ echo $ECHO_N "checking if --no-as-needed is supported... $ECHO_C" >&6; }
 if test "${cs_cv_prog_link_no_as_needed_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-Wl,--no-as-needed@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -5478,10 +5517,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_link_no_as_needed=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_link_no_as_needed_ok="$cs_cv_prog_link_no_as_needed"
+		cs_cv_prog_link_no_as_needed_ok="$cs_cv_prog_link_no_as_needed"
 else
   cs_cv_prog_link_no_as_needed=''
-	    cs_cv_prog_link_no_as_needed_ok=no
+		cs_cv_prog_link_no_as_needed_ok=no
+fi
+
+else
+  cs_cv_prog_link_no_as_needed=''
+            cs_cv_prog_link_no_as_needed_ok=no
 fi
 
 fi
@@ -5509,6 +5553,7 @@ echo $ECHO_N "checking if --gc-sections is supported... $ECHO_C" >&6; }
 if test "${cs_cv_prog_link_gc_sections_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-Wl,--gc-sections@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -5645,10 +5690,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_link_gc_sections=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_link_gc_sections_ok="$cs_cv_prog_link_gc_sections"
+		cs_cv_prog_link_gc_sections_ok="$cs_cv_prog_link_gc_sections"
 else
   cs_cv_prog_link_gc_sections=''
-	    cs_cv_prog_link_gc_sections_ok=no
+		cs_cv_prog_link_gc_sections_ok=no
+fi
+
+else
+  cs_cv_prog_link_gc_sections=''
+            cs_cv_prog_link_gc_sections_ok=no
 fi
 
 fi
@@ -5657,8 +5707,8 @@ echo "${ECHO_T}$cs_cv_prog_link_gc_sections_ok" >&6; }
     if test "$cs_cv_prog_link_gc_sections_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_link_gc_sections"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}LINK.GC_SECTIONS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}LINK.GC_SECTIONS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -6126,8 +6176,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 cs_build_prop_val="$CXXCPP"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.C++CPP ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.C++CPP ?= $cs_build_prop_val ;
 "
 fi
 
@@ -6247,8 +6297,8 @@ fi
 
     cs_build_prop_val="$RANLIB"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}RANLIB = \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}RANLIB = $cs_build_prop_val ;
 "
 fi
 
@@ -6366,8 +6416,8 @@ fi
 
     cs_build_prop_val="$DLLTOOL"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.DLLTOOL ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.DLLTOOL ?= $cs_build_prop_val ;
 "
 fi
 
@@ -6489,8 +6539,8 @@ fi
 
     cs_build_prop_val="$DLLWRAP"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.DLLWRAP ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.DLLWRAP ?= $cs_build_prop_val ;
 "
 fi
 
@@ -6608,8 +6658,8 @@ fi
 
     cs_build_prop_val="$WINDRES"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.WINDRES ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.WINDRES ?= $cs_build_prop_val ;
 "
 fi
 
@@ -6727,8 +6777,8 @@ fi
 
     cs_build_prop_val="$STRINGS"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.STRINGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.STRINGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -6846,8 +6896,8 @@ fi
 
     cs_build_prop_val="$OBJCOPY"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJCOPY ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJCOPY ?= $cs_build_prop_val ;
 "
 fi
 
@@ -7227,15 +7277,15 @@ fi
 
     cs_build_prop_val="$LIBTOOL"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}LIBTOOL ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}LIBTOOL ?= $cs_build_prop_val ;
 "
 fi
 
     cs_build_prop_val="$APPLE_LIBTOOL"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}APPLE_LIBTOOL ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}APPLE_LIBTOOL ?= $cs_build_prop_val ;
 "
 fi
 
@@ -7350,15 +7400,15 @@ fi
 
     cs_build_prop_val="$MKDIR"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.MKDIR ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.MKDIR ?= $cs_build_prop_val ;
 "
 fi
 
     cs_build_prop_val="$MKDIRS"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.MKDIRS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.MKDIRS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -7414,8 +7464,8 @@ done
 
     cs_build_prop_val="$INSTALL"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}INSTALL ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}INSTALL ?= $cs_build_prop_val ;
 "
 fi
 
@@ -7432,8 +7482,8 @@ fi
 
     cs_build_prop_val="$LN_S"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}LN_S ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}LN_S ?= $cs_build_prop_val ;
 "
 fi
 
@@ -7488,8 +7538,8 @@ done
 
     cs_build_prop_val="$TEXI2DVI"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.TEXI2DVI ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.TEXI2DVI ?= $cs_build_prop_val ;
 "
 fi
 
@@ -7545,8 +7595,8 @@ done
 
     cs_build_prop_val="$TEXI2PDF"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.TEXI2PDF ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.TEXI2PDF ?= $cs_build_prop_val ;
 "
 fi
 
@@ -7602,8 +7652,8 @@ done
 
     cs_build_prop_val="$DVIPS"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.DVIPS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.DVIPS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -7659,8 +7709,8 @@ done
 
     cs_build_prop_val="$DVIPDF"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.DVIPDF ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.DVIPDF ?= $cs_build_prop_val ;
 "
 fi
 
@@ -7716,8 +7766,8 @@ done
 
     cs_build_prop_val="$MAKEINFO"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.MAKEINFO ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.MAKEINFO ?= $cs_build_prop_val ;
 "
 fi
 
@@ -7772,8 +7822,8 @@ done
 
     cs_build_prop_val="$DOXYGEN"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.DOXYGEN ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.DOXYGEN ?= $cs_build_prop_val ;
 "
 fi
 
@@ -7891,8 +7941,8 @@ fi
 
     cs_build_prop_val="$DOT"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.DOT ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.DOT ?= $cs_build_prop_val ;
 "
 fi
 
@@ -7948,8 +7998,8 @@ done
 
 cs_build_prop_val="$FLEX"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.FLEX ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.FLEX ?= $cs_build_prop_val ;
 "
 fi
 
@@ -8074,8 +8124,8 @@ echo "${ECHO_T}$cs_cv_prog_bison_version_1_35_ok_annotated" >&6; }
 if test "$cs_cv_prog_bison_version_1_35_ok" = yes; then
   cs_build_prop_val="$BISON"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.BISON ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.BISON ?= $cs_build_prop_val ;
 "
 fi
 
@@ -8197,8 +8247,8 @@ fi
 
 cs_build_prop_val="$HHC"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.HHC ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.HHC ?= $cs_build_prop_val ;
 "
 fi
 
@@ -8339,15 +8389,15 @@ echo "${ECHO_T}$cs_cv_prog_swig_version_1_3_21_ok_annotated" >&6; }
 if test "$cs_cv_prog_swig_version_1_3_21_ok" = yes; then
   cs_build_prop_val="$SWIG"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.SWIG ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.SWIG ?= $cs_build_prop_val ;
 "
 fi
 
         cs_build_prop_val="$cs_prog_swig_version"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.SWIG.VERSION ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.SWIG.VERSION ?= $cs_build_prop_val ;
 "
 fi
 
@@ -8408,8 +8458,8 @@ done
 
     cs_build_prop_val="$RSVG"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.RSVG ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.RSVG ?= $cs_build_prop_val ;
 "
 fi
 
@@ -8466,8 +8516,8 @@ done
 
     cs_build_prop_val="$ICOTOOL"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.ICOTOOL ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.ICOTOOL ?= $cs_build_prop_val ;
 "
 fi
 
@@ -8525,8 +8575,8 @@ done
 
     cs_build_prop_val="$CONVERT"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.CONVERT ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.CONVERT ?= $cs_build_prop_val ;
 "
 fi
 
@@ -8656,8 +8706,8 @@ fi
 
     cs_build_prop_val="$RELAYTOOL"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.RELAYTOOL ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.RELAYTOOL ?= $cs_build_prop_val ;
 "
 fi
 
@@ -8838,8 +8888,8 @@ fi
 
 cs_build_prop_val="$JAM"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}JAM ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}JAM ?= $cs_build_prop_val ;
 "
 fi
 
@@ -9107,22 +9157,22 @@ fi
 #------------------------------------------------------------------------------
 cs_build_prop_val="$CPPFLAGS $CFLAGS"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
 "
 fi
 
 cs_build_prop_val="$CPPFLAGS $CXXFLAGS"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS += $cs_build_prop_val ;
 "
 fi
 
 cs_build_prop_val="$LDFLAGS"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += $cs_build_prop_val ;
 "
 fi
 
@@ -10346,8 +10396,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 if test $ac_cv_lib_m_pow = yes || test $ac_cv_lib_m_cosf = yes; then
   cs_build_prop_val="-lm"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += $cs_build_prop_val ;
 "
 fi
 
@@ -10356,8 +10406,8 @@ fi
 if test $ac_cv_lib_mx_cosf = yes; then
   cs_build_prop_val="-lmx"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += $cs_build_prop_val ;
 "
 fi
 
@@ -10366,8 +10416,8 @@ fi
 if test $ac_cv_lib_dl_dlopen = yes; then
   cs_build_prop_val="-ldl"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += $cs_build_prop_val ;
 "
 fi
 
@@ -10442,8 +10492,8 @@ fi
 if test $ac_cv_lib_nsl_gethostbyname = yes; then
   cs_build_prop_val="-lnsl"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += $cs_build_prop_val ;
 "
 fi
 
@@ -10962,22 +11012,22 @@ fi
 if test "$cs_cv_sys_pthread" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_sys_pthread_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_sys_pthread_lflags $cs_cv_sys_pthread_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -11143,8 +11193,8 @@ fi
 
 cs_build_prop_val="$cs_cv_sys_pthread_atfork"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.ATFORK.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.ATFORK.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
@@ -11171,6 +11221,7 @@ echo $ECHO_N "checking for -static-libgcc... $ECHO_C" >&6; }
 if test "${cs_cv_prog_link_static_libgcc_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-static-libgcc@@ | sed 'y% %#%'`"; then
   ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -11307,10 +11358,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_link_static_libgcc=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_link_static_libgcc_ok="$cs_cv_prog_link_static_libgcc"
+		cs_cv_prog_link_static_libgcc_ok="$cs_cv_prog_link_static_libgcc"
 else
   cs_cv_prog_link_static_libgcc=''
-	    cs_cv_prog_link_static_libgcc_ok=no
+		cs_cv_prog_link_static_libgcc_ok=no
+fi
+
+else
+  cs_cv_prog_link_static_libgcc=''
+            cs_cv_prog_link_static_libgcc_ok=no
 fi
 
 fi
@@ -11319,8 +11375,8 @@ echo "${ECHO_T}$cs_cv_prog_link_static_libgcc_ok" >&6; }
     if test "$cs_cv_prog_link_static_libgcc_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_link_static_libgcc"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += $cs_build_prop_val ;
 "
 fi
 
@@ -11333,6 +11389,7 @@ echo $ECHO_N "checking for static libstdc++... $ECHO_C" >&6; }
 if test "${cs_cv_prog_link_static_libstdcxx_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @$libstdcxx@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -11469,10 +11526,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_link_static_libstdcxx=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_link_static_libstdcxx_ok="$cs_cv_prog_link_static_libstdcxx"
+		cs_cv_prog_link_static_libstdcxx_ok="$cs_cv_prog_link_static_libstdcxx"
 else
   cs_cv_prog_link_static_libstdcxx=''
-	    cs_cv_prog_link_static_libstdcxx_ok=no
+		cs_cv_prog_link_static_libstdcxx_ok=no
+fi
+
+else
+  cs_cv_prog_link_static_libstdcxx=''
+            cs_cv_prog_link_static_libstdcxx_ok=no
 fi
 
 fi
@@ -11481,8 +11543,8 @@ echo "${ECHO_T}$cs_cv_prog_link_static_libstdcxx_ok" >&6; }
     if test "$cs_cv_prog_link_static_libstdcxx_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_link_static_libstdcxx"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += $cs_build_prop_val ;
 "
 fi
 
@@ -11832,7 +11894,7 @@ fi
         *) cs_host_cpu=$host_cpu ;;
     esac
     cs_host_cpu_normalized="`echo "$cs_host_cpu" | $as_tr_cpp`"
-    cs_jamconfig_text="${cs_jamconfig_text}TARGET.PROCESSOR ?= \"$cs_host_cpu_normalized\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}TARGET.PROCESSOR ?= $cs_host_cpu_normalized ;
 "
 
     cs_host_os_normalized=''
@@ -11959,7 +12021,7 @@ else
 fi
 { echo "$as_me:$LINENO: result: $cs_cv_prog_objc" >&5
 echo "${ECHO_T}$cs_cv_prog_objc" >&6; }
-	cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJC ?= \"$cs_cv_prog_objc\" ;
+	cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJC ?= $cs_cv_prog_objc ;
 "
 	{ echo "$as_me:$LINENO: checking for Objective-C++ compiler" >&5
 echo $ECHO_N "checking for Objective-C++ compiler... $ECHO_C" >&6; }
@@ -11970,7 +12032,7 @@ else
 fi
 { echo "$as_me:$LINENO: result: $cs_cv_prog_objcxx" >&5
 echo "${ECHO_T}$cs_cv_prog_objcxx" >&6; }
-	cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJC++ ?= \"$cs_cv_prog_objcxx\" ;
+	cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJC++ ?= $cs_cv_prog_objcxx ;
 "
 else
   cs_host_target=unix
@@ -12011,9 +12073,9 @@ fi
     esac
 
     cs_host_os_normalized_uc="`echo "$cs_host_os_normalized" | $as_tr_cpp`"
-    cs_jamconfig_text="${cs_jamconfig_text}TARGET.OS ?= \"$cs_host_os_normalized_uc\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}TARGET.OS ?= $cs_host_os_normalized_uc ;
 "
-    cs_jamconfig_text="${cs_jamconfig_text}TARGET.OS.NORMALIZED ?= \"$cs_host_os_normalized\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}TARGET.OS.NORMALIZED ?= $cs_host_os_normalized ;
 "
 
 case $cs_host_target in
@@ -12021,15 +12083,15 @@ case $cs_host_target in
         # We assume that we always have CoreAudio available on MacOS/X.
         cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COREAUDIO.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COREAUDIO.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
         cs_build_prop_val="-framework CoreAudio -framework AudioToolbox"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COREAUDIO.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COREAUDIO.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -12061,6 +12123,7 @@ echo $ECHO_N "checking for -mmmx flag... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cc_mmmx_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-mmmx@@ | sed 'y% %#%'`"; then
   ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -12197,10 +12260,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cc_mmmx=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cc_mmmx_ok="$cs_cv_prog_cc_mmmx"
+		cs_cv_prog_cc_mmmx_ok="$cs_cv_prog_cc_mmmx"
 else
   cs_cv_prog_cc_mmmx=''
-	    cs_cv_prog_cc_mmmx_ok=no
+		cs_cv_prog_cc_mmmx_ok=no
+fi
+
+else
+  cs_cv_prog_cc_mmmx=''
+            cs_cv_prog_cc_mmmx_ok=no
 fi
 
 fi
@@ -12210,8 +12278,8 @@ echo "${ECHO_T}$cs_cv_prog_cc_mmmx_ok" >&6; }
 if test -n "$cs_cv_prog_cc_mmmx"; then
   cs_build_prop_val="$cs_cv_prog_cc_mmmx"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.MMX += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.MMX += $cs_build_prop_val ;
 "
 fi
 
@@ -12527,8 +12595,8 @@ fi
 "
         cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CS_SUPPORTS_MMX ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CS_SUPPORTS_MMX ?= $cs_build_prop_val ;
 "
 fi
 
@@ -12599,22 +12667,22 @@ done
 
 cs_build_prop_val="$PERL"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}PERL5 ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}PERL5 ?= $cs_build_prop_val ;
 "
 fi
 
 cs_build_prop_val="$PERL"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}PERL ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}PERL ?= $cs_build_prop_val ;
 "
 fi
 
 cs_build_prop_val="$PERL"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.PERL5 ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.PERL5 ?= $cs_build_prop_val ;
 "
 fi
 
@@ -12654,8 +12722,8 @@ echo "${ECHO_T}$cs_cv_perl_mod_embed" >&6; }
     if test $cs_cv_perl_mod_embed = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}PERL5.EXTUTILS.EMBED.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}PERL5.EXTUTILS.EMBED.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
@@ -12680,8 +12748,8 @@ echo "${ECHO_T}$cs_cv_perl_mod_dynaloader" >&6; }
 	if test $cs_cv_perl_mod_dynaloader = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}PERL5.DYNALOADER.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}PERL5.DYNALOADER.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
@@ -13131,22 +13199,22 @@ fi
   if test "$cs_cv_perl" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}PERL5.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}PERL5.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_perl_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}PERL5.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}PERL5.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_perl_lflags $cs_cv_perl_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}PERL5.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}PERL5.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -13154,8 +13222,8 @@ fi
 
 	    cs_build_prop_val=".$cs_cv_perl_ext"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}PERL5.MODULE_EXT ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}PERL5.MODULE_EXT ?= $cs_build_prop_val ;
 "
 fi
 
@@ -13173,11 +13241,19 @@ fi
 # required to embed Python.
 #------------------------------------------------------------------------------
 
+
+    if test "$cs_host_target" = macosx; then
+  cs_ignore_long_double_tuples=`echo @-Wno-long-double@@ | sed 'y% %#%'`
+else
+  cs_ignore_long_double_tuples=''
+fi
+
     { echo "$as_me:$LINENO: checking how to suppress C++ \`long double' warnings" >&5
 echo $ECHO_N "checking how to suppress C++ \`long double' warnings... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_ignore_long_double_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "$cs_ignore_long_double_tuples"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -13190,7 +13266,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
     cs_build_ok=no
 
 
-    for cs_build_item in `echo @-Wno-long-double@@ | sed 'y% %#%'`
+    for cs_build_item in $cs_ignore_long_double_tuples
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -13314,10 +13390,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_ignore_long_double=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_ignore_long_double_ok="$cs_cv_prog_cxx_ignore_long_double"
+		cs_cv_prog_cxx_ignore_long_double_ok="$cs_cv_prog_cxx_ignore_long_double"
 else
   cs_cv_prog_cxx_ignore_long_double=''
-	    cs_cv_prog_cxx_ignore_long_double_ok=no
+		cs_cv_prog_cxx_ignore_long_double_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_ignore_long_double=''
+            cs_cv_prog_cxx_ignore_long_double_ok=no
 fi
 
 fi
@@ -13450,8 +13531,8 @@ fi
 
     cs_build_prop_val="$PYTHON"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}PYTHON ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}PYTHON ?= $cs_build_prop_val ;
 "
 fi
 
@@ -13473,8 +13554,8 @@ else
 
 	    cs_build_prop_val="$cs_pyver"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}PYTHON.VERSION ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}PYTHON.VERSION ?= $cs_build_prop_val ;
 "
 fi
 
@@ -13515,7 +13596,7 @@ fi
   cs_cv_pybase_lflags_base="$cs_cv_pybase_lflags_base -L$cs_cv_pybase_syslib"
 fi
 
-	    cs_cv_pybase_lflags_ext='$cs_cv_pybase_lflags_base'
+	    cs_cv_pybase_lflags_ext="$cs_cv_pybase_lflags_base"
 	    if test -d "$cs_cv_pybase_syslib/config"; then
   cs_cv_pybase_lflags_ext="$cs_cv_pybase_lflags_ext -L$cs_cv_pybase_syslib/config"
 fi
@@ -13579,8 +13660,8 @@ echo "${ECHO_T}$cs_cv_python_sdk" >&6; }
 	if test $cs_cv_python_sdk = yes; then
   cs_build_prop_val="$cs_cv_python_ext"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}PYTHON.MODULE_EXT ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}PYTHON.MODULE_EXT ?= $cs_build_prop_val ;
 "
 fi
 
@@ -13907,22 +13988,22 @@ fi
   if test "$cs_cv_python" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}PYTHON.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}PYTHON.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_python_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}PYTHON.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}PYTHON.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_python_lflags $cs_cv_python_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}PYTHON.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}PYTHON.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -14013,8 +14094,8 @@ done
 
 cs_build_prop_val="$JAVA"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}JAVA ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}JAVA ?= $cs_build_prop_val ;
 "
 fi
 
@@ -14073,8 +14154,8 @@ done
 
 cs_build_prop_val="$JAVAC"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}JAVAC ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}JAVAC ?= $cs_build_prop_val ;
 "
 fi
 
@@ -14499,22 +14580,22 @@ fi
   if test "$cs_cv_java" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}JAVA.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}JAVA.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_java_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}JAVA.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}JAVA.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_java_lflags $cs_cv_java_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}JAVA.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}JAVA.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -14584,8 +14665,8 @@ done
 
 cs_build_prop_val="$ANT"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}ANT ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}ANT ?= $cs_build_prop_val ;
 "
 fi
 
@@ -14905,8 +14986,8 @@ done
 
      cs_build_prop_val="$CMD_NANT"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.NANT ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.NANT ?= $cs_build_prop_val ;
 "
 fi
 
@@ -14961,8 +15042,8 @@ done
 
 	 cs_build_prop_val="$CMD_SN"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.SN ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.SN ?= $cs_build_prop_val ;
 "
 fi
 
@@ -15124,37 +15205,37 @@ echo "${ECHO_T}$csharp_available" >&6; }
 
     cs_build_prop_val="$CMD_GACUTIL"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.GACUTIL ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.GACUTIL ?= $cs_build_prop_val ;
 "
 fi
 
     cs_build_prop_val="$csharpcompiler"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.CSC ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.CSC ?= $cs_build_prop_val ;
 "
 fi
 
     cs_build_prop_val="$csharpcompiler"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CSHARP.COMPILER ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CSHARP.COMPILER ?= $cs_build_prop_val ;
 "
 fi
 
     cs_build_prop_val="$dotnet_runtime"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}DOTNET.RUNTIME ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}DOTNET.RUNTIME ?= $cs_build_prop_val ;
 "
 fi
 
 
     cs_build_prop_val="$csharp_available"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CSHARP.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CSHARP.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
@@ -15271,8 +15352,8 @@ fi
 
 cs_build_prop_val="$GEN_CSHARP_GLOBALS"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.GEN.CSHARP.GLOBALS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.GEN.CSHARP.GLOBALS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -15590,22 +15671,22 @@ fi
   if test "$cs_cv_libstl" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}STL.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}STL.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libstl_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}STL.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}STL.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libstl_lflags $cs_cv_libstl_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}STL.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}STL.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -15630,6 +15711,7 @@ echo $ECHO_N "checking how to enable C++ compilation warnings... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_enable_warnings_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-Wmost@@ | sed 'y% %#%'` `echo @-Wall@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -15766,10 +15848,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_enable_warnings=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_enable_warnings_ok="$cs_cv_prog_cxx_enable_warnings"
+		cs_cv_prog_cxx_enable_warnings_ok="$cs_cv_prog_cxx_enable_warnings"
 else
   cs_cv_prog_cxx_enable_warnings=''
-	    cs_cv_prog_cxx_enable_warnings_ok=no
+		cs_cv_prog_cxx_enable_warnings_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_enable_warnings=''
+            cs_cv_prog_cxx_enable_warnings_ok=no
 fi
 
 fi
@@ -15778,8 +15865,8 @@ echo "${ECHO_T}$cs_cv_prog_cxx_enable_warnings_ok" >&6; }
     if test "$cs_cv_prog_cxx_enable_warnings_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_enable_warnings"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
 "
 fi
 
@@ -15791,6 +15878,7 @@ echo $ECHO_N "checking how to treat C++ warnings as errors... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_enable_errors_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-Werror@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -15927,10 +16015,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_enable_errors=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_enable_errors_ok="$cs_cv_prog_cxx_enable_errors"
+		cs_cv_prog_cxx_enable_errors_ok="$cs_cv_prog_cxx_enable_errors"
 else
   cs_cv_prog_cxx_enable_errors=''
-	    cs_cv_prog_cxx_enable_errors_ok=no
+		cs_cv_prog_cxx_enable_errors_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_enable_errors=''
+            cs_cv_prog_cxx_enable_errors_ok=no
 fi
 
 fi
@@ -15943,6 +16036,7 @@ echo $ECHO_N "checking how to suppress C++ unused variable warnings... $ECHO_C" 
 if test "${cs_cv_prog_cxx_ignore_unused_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-Wno-unused@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -16079,10 +16173,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_ignore_unused=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_ignore_unused_ok="$cs_cv_prog_cxx_ignore_unused"
+		cs_cv_prog_cxx_ignore_unused_ok="$cs_cv_prog_cxx_ignore_unused"
 else
   cs_cv_prog_cxx_ignore_unused=''
-	    cs_cv_prog_cxx_ignore_unused_ok=no
+		cs_cv_prog_cxx_ignore_unused_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_ignore_unused=''
+            cs_cv_prog_cxx_ignore_unused_ok=no
 fi
 
 fi
@@ -16091,8 +16190,8 @@ echo "${ECHO_T}$cs_cv_prog_cxx_ignore_unused_ok" >&6; }
     if test "$cs_cv_prog_cxx_ignore_unused_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_ignore_unused"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS.WARNING.NO_UNUSED ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS.WARNING.NO_UNUSED ?= $cs_build_prop_val ;
 "
 fi
 
@@ -16104,6 +16203,7 @@ echo $ECHO_N "checking how to suppress C++ uninitialized variable warnings... $E
 if test "${cs_cv_prog_cxx_ignore_uninitialized_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-Wno-uninitialized@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -16240,10 +16340,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_ignore_uninitialized=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_ignore_uninitialized_ok="$cs_cv_prog_cxx_ignore_uninitialized"
+		cs_cv_prog_cxx_ignore_uninitialized_ok="$cs_cv_prog_cxx_ignore_uninitialized"
 else
   cs_cv_prog_cxx_ignore_uninitialized=''
-	    cs_cv_prog_cxx_ignore_uninitialized_ok=no
+		cs_cv_prog_cxx_ignore_uninitialized_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_ignore_uninitialized=''
+            cs_cv_prog_cxx_ignore_uninitialized_ok=no
 fi
 
 fi
@@ -16252,8 +16357,8 @@ echo "${ECHO_T}$cs_cv_prog_cxx_ignore_uninitialized_ok" >&6; }
     if test "$cs_cv_prog_cxx_ignore_uninitialized_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_ignore_uninitialized"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS.WARNING.NO_UNINITIALIZED ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS.WARNING.NO_UNINITIALIZED ?= $cs_build_prop_val ;
 "
 fi
 
@@ -16265,6 +16370,7 @@ echo $ECHO_N "checking how to suppress C++ unknown #pragma warnings... $ECHO_C" 
 if test "${cs_cv_prog_cxx_ignore_unknown_pragmas_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-Wno-unknown-pragmas@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -16401,10 +16507,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_ignore_unknown_pragmas=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_ignore_unknown_pragmas_ok="$cs_cv_prog_cxx_ignore_unknown_pragmas"
+		cs_cv_prog_cxx_ignore_unknown_pragmas_ok="$cs_cv_prog_cxx_ignore_unknown_pragmas"
 else
   cs_cv_prog_cxx_ignore_unknown_pragmas=''
-	    cs_cv_prog_cxx_ignore_unknown_pragmas_ok=no
+		cs_cv_prog_cxx_ignore_unknown_pragmas_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_ignore_unknown_pragmas=''
+            cs_cv_prog_cxx_ignore_unknown_pragmas_ok=no
 fi
 
 fi
@@ -16413,8 +16524,8 @@ echo "${ECHO_T}$cs_cv_prog_cxx_ignore_unknown_pragmas_ok" >&6; }
     if test "$cs_cv_prog_cxx_ignore_unknown_pragmas_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_ignore_unknown_pragmas"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
 "
 fi
 
@@ -16422,11 +16533,19 @@ fi
 
 
 # On MacOS/X, use of `long double' in csutil/formatter.h causes complaints.
-{ echo "$as_me:$LINENO: checking how to suppress C++ \`long double' warnings" >&5
+
+    if test "$cs_host_target" = macosx; then
+  cs_ignore_long_double_tuples=`echo @-Wno-long-double@@ | sed 'y% %#%'`
+else
+  cs_ignore_long_double_tuples=''
+fi
+
+    { echo "$as_me:$LINENO: checking how to suppress C++ \`long double' warnings" >&5
 echo $ECHO_N "checking how to suppress C++ \`long double' warnings... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_ignore_long_double_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "$cs_ignore_long_double_tuples"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -16439,7 +16558,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
     cs_build_ok=no
 
 
-    for cs_build_item in `echo @-Wno-long-double@@ | sed 'y% %#%'`
+    for cs_build_item in $cs_ignore_long_double_tuples
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -16563,10 +16682,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_ignore_long_double=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_ignore_long_double_ok="$cs_cv_prog_cxx_ignore_long_double"
+		cs_cv_prog_cxx_ignore_long_double_ok="$cs_cv_prog_cxx_ignore_long_double"
 else
   cs_cv_prog_cxx_ignore_long_double=''
-	    cs_cv_prog_cxx_ignore_long_double_ok=no
+		cs_cv_prog_cxx_ignore_long_double_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_ignore_long_double=''
+            cs_cv_prog_cxx_ignore_long_double_ok=no
 fi
 
 fi
@@ -16575,8 +16699,8 @@ echo "${ECHO_T}$cs_cv_prog_cxx_ignore_long_double_ok" >&6; }
     if test "$cs_cv_prog_cxx_ignore_long_double_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_ignore_long_double"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.MANDATORY += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.MANDATORY += $cs_build_prop_val ;
 "
 fi
 
@@ -16588,6 +16712,7 @@ echo $ECHO_N "checking how to suppress C++ non-virtual destructor warnings... $E
 if test "${cs_cv_prog_cxx_ignore_non_virtual_dtor_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-Wno-non-virtual-dtor@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -16724,10 +16849,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_ignore_non_virtual_dtor=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_ignore_non_virtual_dtor_ok="$cs_cv_prog_cxx_ignore_non_virtual_dtor"
+		cs_cv_prog_cxx_ignore_non_virtual_dtor_ok="$cs_cv_prog_cxx_ignore_non_virtual_dtor"
 else
   cs_cv_prog_cxx_ignore_non_virtual_dtor=''
-	    cs_cv_prog_cxx_ignore_non_virtual_dtor_ok=no
+		cs_cv_prog_cxx_ignore_non_virtual_dtor_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_ignore_non_virtual_dtor=''
+            cs_cv_prog_cxx_ignore_non_virtual_dtor_ok=no
 fi
 
 fi
@@ -16736,8 +16866,8 @@ echo "${ECHO_T}$cs_cv_prog_cxx_ignore_non_virtual_dtor_ok" >&6; }
     if test "$cs_cv_prog_cxx_ignore_non_virtual_dtor_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_ignore_non_virtual_dtor"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS.WARNING.NO_NON_VIRTUAL_DTOR ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS.WARNING.NO_NON_VIRTUAL_DTOR ?= $cs_build_prop_val ;
 "
 fi
 
@@ -16756,6 +16886,7 @@ echo $ECHO_N "checking for flag to disable string-aliasing... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_no_strict_aliasing_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-fno-strict-aliasing@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -16892,10 +17023,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_no_strict_aliasing=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_no_strict_aliasing_ok="$cs_cv_prog_cxx_no_strict_aliasing"
+		cs_cv_prog_cxx_no_strict_aliasing_ok="$cs_cv_prog_cxx_no_strict_aliasing"
 else
   cs_cv_prog_cxx_no_strict_aliasing=''
-	    cs_cv_prog_cxx_no_strict_aliasing_ok=no
+		cs_cv_prog_cxx_no_strict_aliasing_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_no_strict_aliasing=''
+            cs_cv_prog_cxx_no_strict_aliasing_ok=no
 fi
 
 fi
@@ -16906,8 +17042,8 @@ echo "${ECHO_T}$cs_cv_prog_cxx_no_strict_aliasing_ok" >&6; }
 if test $cs_cv_prog_cxx_no_strict_aliasing != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_no_strict_aliasing"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS.STRICTALIASING.DISABLE += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS.STRICTALIASING.DISABLE += $cs_build_prop_val ;
 "
 fi
 
@@ -16924,6 +17060,8 @@ echo $ECHO_N "checking how to enable C++ exceptions... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_enable_exceptions_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-fexceptions -fno-omit-frame-pointer@@ | sed 'y% %#%'` \
+    `echo @-fexceptions@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -17061,10 +17199,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_enable_exceptions=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_enable_exceptions_ok="$cs_cv_prog_cxx_enable_exceptions"
+		cs_cv_prog_cxx_enable_exceptions_ok="$cs_cv_prog_cxx_enable_exceptions"
 else
   cs_cv_prog_cxx_enable_exceptions=''
-	    cs_cv_prog_cxx_enable_exceptions_ok=no
+		cs_cv_prog_cxx_enable_exceptions_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_enable_exceptions=''
+            cs_cv_prog_cxx_enable_exceptions_ok=no
 fi
 
 fi
@@ -17073,8 +17216,8 @@ echo "${ECHO_T}$cs_cv_prog_cxx_enable_exceptions_ok" >&6; }
     if test "$cs_cv_prog_cxx_enable_exceptions_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_enable_exceptions"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS.EXCEPTIONS.ENABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS.EXCEPTIONS.ENABLE ?= $cs_build_prop_val ;
 "
 fi
 
@@ -17087,6 +17230,7 @@ echo $ECHO_N "checking how to disable C++ exceptions... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_disable_exceptions_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-fno-exceptions@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -17223,10 +17367,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_disable_exceptions=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_disable_exceptions_ok="$cs_cv_prog_cxx_disable_exceptions"
+		cs_cv_prog_cxx_disable_exceptions_ok="$cs_cv_prog_cxx_disable_exceptions"
 else
   cs_cv_prog_cxx_disable_exceptions=''
-	    cs_cv_prog_cxx_disable_exceptions_ok=no
+		cs_cv_prog_cxx_disable_exceptions_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_disable_exceptions=''
+            cs_cv_prog_cxx_disable_exceptions_ok=no
 fi
 
 fi
@@ -17235,15 +17384,15 @@ echo "${ECHO_T}$cs_cv_prog_cxx_disable_exceptions_ok" >&6; }
     if test "$cs_cv_prog_cxx_disable_exceptions_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_disable_exceptions"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS.EXCEPTIONS.DISABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS.EXCEPTIONS.DISABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	    cs_build_prop_val="$cs_cv_prog_cxx_disable_exceptions"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS += $cs_build_prop_val ;
 "
 fi
 
@@ -17266,6 +17415,7 @@ echo $ECHO_N "checking how to enforce C++ standards conformance... $ECHO_C" >&6;
 if test "${cs_cv_prog_cxx_enable_pedantic_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-ansi -pedantic@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -17402,10 +17552,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_enable_pedantic=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_enable_pedantic_ok="$cs_cv_prog_cxx_enable_pedantic"
+		cs_cv_prog_cxx_enable_pedantic_ok="$cs_cv_prog_cxx_enable_pedantic"
 else
   cs_cv_prog_cxx_enable_pedantic=''
-	    cs_cv_prog_cxx_enable_pedantic_ok=no
+		cs_cv_prog_cxx_enable_pedantic_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_enable_pedantic=''
+            cs_cv_prog_cxx_enable_pedantic_ok=no
 fi
 
 fi
@@ -17414,8 +17569,8 @@ echo "${ECHO_T}$cs_cv_prog_cxx_enable_pedantic_ok" >&6; }
     if test "$cs_cv_prog_cxx_enable_pedantic_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_enable_pedantic"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS.PEDANTIC.ENABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS.PEDANTIC.ENABLE ?= $cs_build_prop_val ;
 "
 fi
 
@@ -17439,6 +17594,7 @@ echo $ECHO_N "checking if -force_cpusubtype_ALL is needed... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_force_cpusubtype_all_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @@-force_cpusubtype_ALL@ | sed 'y% %#%'`"; then
   ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -17575,10 +17731,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_force_cpusubtype_all=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_force_cpusubtype_all_ok="$cs_cv_prog_cxx_force_cpusubtype_all"
+		cs_cv_prog_cxx_force_cpusubtype_all_ok="$cs_cv_prog_cxx_force_cpusubtype_all"
 else
   cs_cv_prog_cxx_force_cpusubtype_all=''
-	    cs_cv_prog_cxx_force_cpusubtype_all_ok=no
+		cs_cv_prog_cxx_force_cpusubtype_all_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_force_cpusubtype_all=''
+            cs_cv_prog_cxx_force_cpusubtype_all_ok=no
 fi
 
 fi
@@ -17587,8 +17748,8 @@ echo "${ECHO_T}$cs_cv_prog_cxx_force_cpusubtype_all_ok" >&6; }
 
 cs_build_prop_val="$cs_cv_prog_cxx_force_cpusubtype_all"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.MANDATORY += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.MANDATORY += $cs_build_prop_val ;
 "
 fi
 
@@ -17612,6 +17773,7 @@ echo $ECHO_N "checking if -fno-common is needed... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_no_common_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @@-fno-common@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -17748,10 +17910,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_no_common=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_no_common_ok="$cs_cv_prog_cxx_no_common"
+		cs_cv_prog_cxx_no_common_ok="$cs_cv_prog_cxx_no_common"
 else
   cs_cv_prog_cxx_no_common=''
-	    cs_cv_prog_cxx_no_common_ok=no
+		cs_cv_prog_cxx_no_common_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_no_common=''
+            cs_cv_prog_cxx_no_common_ok=no
 fi
 
 fi
@@ -17760,8 +17927,8 @@ echo "${ECHO_T}$cs_cv_prog_cxx_no_common_ok" >&6; }
     if test "$cs_cv_prog_cxx_no_common_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_no_common"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.MANDATORY += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.MANDATORY += $cs_build_prop_val ;
 "
 fi
 
@@ -17790,6 +17957,7 @@ echo $ECHO_N "checking if -fvtable-thunks is needed... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_vtable_thunks_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-fvtable-thunks@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -17926,10 +18094,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_vtable_thunks=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_vtable_thunks_ok="$cs_cv_prog_cxx_vtable_thunks"
+		cs_cv_prog_cxx_vtable_thunks_ok="$cs_cv_prog_cxx_vtable_thunks"
 else
   cs_cv_prog_cxx_vtable_thunks=''
-	    cs_cv_prog_cxx_vtable_thunks_ok=no
+		cs_cv_prog_cxx_vtable_thunks_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_vtable_thunks=''
+            cs_cv_prog_cxx_vtable_thunks_ok=no
 fi
 
 fi
@@ -17938,8 +18111,8 @@ echo "${ECHO_T}$cs_cv_prog_cxx_vtable_thunks_ok" >&6; }
     if test "$cs_cv_prog_cxx_vtable_thunks_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_vtable_thunks"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS.MANDATORY += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS.MANDATORY += $cs_build_prop_val ;
 "
 fi
 
@@ -17959,6 +18132,7 @@ echo $ECHO_N "checking how to export all dynamic symbols... $ECHO_C" >&6; }
 if test "${cs_cv_prog_link_export_dynamic_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-Wl,-E@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -18095,10 +18269,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_link_export_dynamic=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_link_export_dynamic_ok="$cs_cv_prog_link_export_dynamic"
+		cs_cv_prog_link_export_dynamic_ok="$cs_cv_prog_link_export_dynamic"
 else
   cs_cv_prog_link_export_dynamic=''
-	    cs_cv_prog_link_export_dynamic_ok=no
+		cs_cv_prog_link_export_dynamic_ok=no
+fi
+
+else
+  cs_cv_prog_link_export_dynamic=''
+            cs_cv_prog_link_export_dynamic_ok=no
 fi
 
 fi
@@ -18107,8 +18286,8 @@ echo "${ECHO_T}$cs_cv_prog_link_export_dynamic_ok" >&6; }
     if test "$cs_cv_prog_link_export_dynamic_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_link_export_dynamic"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS.debug += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS.debug += $cs_build_prop_val ;
 "
 fi
 
@@ -18428,15 +18607,8 @@ fi
     if test $cs_cv_prog_link_kill_at = yes; then
   cs_build_prop_val="-Wl,--kill-at"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CSJAVA.LFLAGS ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-     cs_build_prop_val="-Wl,--kill-at"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS.KILLAT ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CSJAVA.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -18461,6 +18633,7 @@ echo $ECHO_N "checking if reporting missing symbols is supported... $ECHO_C" >&6
 if test "${cs_cv_prog_link_z_defs_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @@-Wl,-z,defs@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -18597,10 +18770,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_link_z_defs=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_link_z_defs_ok="$cs_cv_prog_link_z_defs"
+		cs_cv_prog_link_z_defs_ok="$cs_cv_prog_link_z_defs"
 else
   cs_cv_prog_link_z_defs=''
-	    cs_cv_prog_link_z_defs_ok=no
+		cs_cv_prog_link_z_defs_ok=no
+fi
+
+else
+  cs_cv_prog_link_z_defs=''
+            cs_cv_prog_link_z_defs_ok=no
 fi
 
 fi
@@ -18609,8 +18787,8 @@ echo "${ECHO_T}$cs_cv_prog_link_z_defs_ok" >&6; }
     if test "$cs_cv_prog_link_z_defs_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_link_z_defs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS.PRIVATE += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS.PRIVATE += $cs_build_prop_val ;
 "
 fi
 
@@ -18622,6 +18800,7 @@ echo $ECHO_N "checking if missing symbols can be reported as warnings... $ECHO_C
 if test "${cs_cv_prog_link_warn_unresolved_symbols_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @@-Wl,--warn-unresolved-symbols@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -18758,10 +18937,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_link_warn_unresolved_symbols=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_link_warn_unresolved_symbols_ok="$cs_cv_prog_link_warn_unresolved_symbols"
+		cs_cv_prog_link_warn_unresolved_symbols_ok="$cs_cv_prog_link_warn_unresolved_symbols"
 else
   cs_cv_prog_link_warn_unresolved_symbols=''
-	    cs_cv_prog_link_warn_unresolved_symbols_ok=no
+		cs_cv_prog_link_warn_unresolved_symbols_ok=no
+fi
+
+else
+  cs_cv_prog_link_warn_unresolved_symbols=''
+            cs_cv_prog_link_warn_unresolved_symbols_ok=no
 fi
 
 fi
@@ -18770,8 +18954,8 @@ echo "${ECHO_T}$cs_cv_prog_link_warn_unresolved_symbols_ok" >&6; }
     if test "$cs_cv_prog_link_warn_unresolved_symbols_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_link_warn_unresolved_symbols"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS.PRIVATE += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS.PRIVATE += $cs_build_prop_val ;
 "
 fi
 
@@ -18793,6 +18977,7 @@ echo $ECHO_N "checking how to disable function inlining... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_disable_inlining_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-fno-inline-functions@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -18929,10 +19114,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_disable_inlining=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_disable_inlining_ok="$cs_cv_prog_cxx_disable_inlining"
+		cs_cv_prog_cxx_disable_inlining_ok="$cs_cv_prog_cxx_disable_inlining"
 else
   cs_cv_prog_cxx_disable_inlining=''
-	    cs_cv_prog_cxx_disable_inlining_ok=no
+		cs_cv_prog_cxx_disable_inlining_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_disable_inlining=''
+            cs_cv_prog_cxx_disable_inlining_ok=no
 fi
 
 fi
@@ -18941,8 +19131,8 @@ echo "${ECHO_T}$cs_cv_prog_cxx_disable_inlining_ok" >&6; }
     if test "$cs_cv_prog_cxx_disable_inlining_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_disable_inlining"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS.INLINING.DISABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS.INLINING.DISABLE ?= $cs_build_prop_val ;
 "
 fi
 
@@ -18960,6 +19150,7 @@ echo $ECHO_N "checking how to treat C warnings as errors... $ECHO_C" >&6; }
 if test "${cs_cv_prog_c_enable_errors_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-Werror@@ | sed 'y% %#%'`"; then
   ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -19096,10 +19287,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_c_enable_errors=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_c_enable_errors_ok="$cs_cv_prog_c_enable_errors"
+		cs_cv_prog_c_enable_errors_ok="$cs_cv_prog_c_enable_errors"
 else
   cs_cv_prog_c_enable_errors=''
-	    cs_cv_prog_c_enable_errors_ok=no
+		cs_cv_prog_c_enable_errors_ok=no
+fi
+
+else
+  cs_cv_prog_c_enable_errors=''
+            cs_cv_prog_c_enable_errors_ok=no
 fi
 
 fi
@@ -19111,6 +19307,7 @@ echo $ECHO_N "checking how to treat C++ warnings as errors... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_enable_errors_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-Werror@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -19247,10 +19444,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_enable_errors=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_enable_errors_ok="$cs_cv_prog_cxx_enable_errors"
+		cs_cv_prog_cxx_enable_errors_ok="$cs_cv_prog_cxx_enable_errors"
 else
   cs_cv_prog_cxx_enable_errors=''
-	    cs_cv_prog_cxx_enable_errors_ok=no
+		cs_cv_prog_cxx_enable_errors_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_enable_errors=''
+            cs_cv_prog_cxx_enable_errors_ok=no
 fi
 
 fi
@@ -19265,6 +19467,7 @@ echo $ECHO_N "checking how to treat C++ warnings as errors... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_pic_werror_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-Werror@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -19401,10 +19604,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_pic_werror=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_pic_werror_ok="$cs_cv_prog_cxx_pic_werror"
+		cs_cv_prog_cxx_pic_werror_ok="$cs_cv_prog_cxx_pic_werror"
 else
   cs_cv_prog_cxx_pic_werror=''
-	    cs_cv_prog_cxx_pic_werror_ok=no
+		cs_cv_prog_cxx_pic_werror_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_pic_werror=''
+            cs_cv_prog_cxx_pic_werror_ok=no
 fi
 
 fi
@@ -19416,6 +19624,7 @@ echo $ECHO_N "checking how to enable C++ PIC generation... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_pic_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-fPIC@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -19562,10 +19771,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_pic=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_pic_ok="$cs_cv_prog_cxx_pic"
+		cs_cv_prog_cxx_pic_ok="$cs_cv_prog_cxx_pic"
 else
   cs_cv_prog_cxx_pic=''
-	    cs_cv_prog_cxx_pic_ok=no
+		cs_cv_prog_cxx_pic_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_pic=''
+            cs_cv_prog_cxx_pic_ok=no
 fi
 
 fi
@@ -19573,11 +19787,13 @@ fi
 echo "${ECHO_T}$cs_cv_prog_cxx_pic_ok" >&6; }
 
 
+# Check if compiler recognizes an option to set inline visibility to hidden.
 { echo "$as_me:$LINENO: checking for inline visibility flag" >&5
 echo $ECHO_N "checking for inline visibility flag... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_visibility_inlines_hidden_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-fvisibility-inlines-hidden@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -19714,10 +19930,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_visibility_inlines_hidden=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_visibility_inlines_hidden_ok="$cs_cv_prog_cxx_visibility_inlines_hidden"
+		cs_cv_prog_cxx_visibility_inlines_hidden_ok="$cs_cv_prog_cxx_visibility_inlines_hidden"
 else
   cs_cv_prog_cxx_visibility_inlines_hidden=''
-	    cs_cv_prog_cxx_visibility_inlines_hidden_ok=no
+		cs_cv_prog_cxx_visibility_inlines_hidden_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_visibility_inlines_hidden=''
+            cs_cv_prog_cxx_visibility_inlines_hidden_ok=no
 fi
 
 fi
@@ -19726,6 +19947,332 @@ echo "${ECHO_T}$cs_cv_prog_cxx_visibility_inlines_hidden_ok" >&6; }
 
 cs_prog_cxx_visibility_inlines_hidden=$cs_cv_prog_cxx_visibility_inlines_hidden
 
+# Check if compiler silently accepts option but later complains that
+# "visibility attribute is not supported in this configuration".
+if test -n "$cs_prog_cxx_visibility_inlines_hidden"; then
+  if test "" != yes; then
+  { echo "$as_me:$LINENO: checking if configuration supports $cs_prog_cxx_visibility_inlines_hidden" >&5
+echo $ECHO_N "checking if configuration supports $cs_prog_cxx_visibility_inlines_hidden... $ECHO_C" >&6; }
+if test "${cs_cv_prog_cxx_visibility_inlines_hidden_supported+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+    cs_cflags_save="$CXXFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CXXFLAGS="$cs_cflags_test $cs_prog_cxx_visibility_inlines_hidden \
+        $cs_cv_prog_cxx_enable_errors $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+template <typename T> struct X { inline void f() {} };
+int
+main ()
+{
+X<int>().f();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  cs_build_ok=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+
+    CXXFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test $cs_prog_cxx_visibility_inlines_hidden \
+        $cs_cv_prog_cxx_enable_errors | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_cxx_visibility_inlines_hidden_supported=yes
+		cs_cv_prog_cxx_visibility_inlines_hidden_supported_cflags=$cs_build_cflags
+		cs_cv_prog_cxx_visibility_inlines_hidden_supported_lflags=$cs_build_lflags
+		cs_cv_prog_cxx_visibility_inlines_hidden_supported_libs=$cs_build_libs
+else
+  cs_cv_prog_cxx_visibility_inlines_hidden_supported=no
+fi
+
+fi
+{ echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_visibility_inlines_hidden_supported" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_visibility_inlines_hidden_supported" >&6; }
+else
+  { echo "$as_me:$LINENO: checking if configuration supports $cs_prog_cxx_visibility_inlines_hidden" >&5
+echo $ECHO_N "checking if configuration supports $cs_prog_cxx_visibility_inlines_hidden... $ECHO_C" >&6; }
+	    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+    cs_cflags_save="$CXXFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CXXFLAGS="$cs_cflags_test $cs_prog_cxx_visibility_inlines_hidden \
+        $cs_cv_prog_cxx_enable_errors $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+template <typename T> struct X { inline void f() {} };
+int
+main ()
+{
+X<int>().f();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  cs_build_ok=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+
+    CXXFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test $cs_prog_cxx_visibility_inlines_hidden \
+        $cs_cv_prog_cxx_enable_errors | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_cxx_visibility_inlines_hidden_supported=yes
+		cs_cv_prog_cxx_visibility_inlines_hidden_supported_cflags=$cs_build_cflags
+		cs_cv_prog_cxx_visibility_inlines_hidden_supported_lflags=$cs_build_lflags
+		cs_cv_prog_cxx_visibility_inlines_hidden_supported_libs=$cs_build_libs
+else
+  cs_cv_prog_cxx_visibility_inlines_hidden_supported=no
+fi
+
+	    { echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_visibility_inlines_hidden_supported" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_visibility_inlines_hidden_supported" >&6; }
+fi
+
+    if test $cs_cv_prog_cxx_visibility_inlines_hidden_supported = yes; then
+  cs_cv_prog_cxx_visibility_inlines_hidden_supported=yes
+else
+  cs_cv_prog_cxx_visibility_inlines_hidden_supported_cflags=''
+	cs_cv_prog_cxx_visibility_inlines_hidden_supported_lflags=''
+	cs_cv_prog_cxx_visibility_inlines_hidden_supported_libs=''
+	cs_cv_prog_cxx_visibility_inlines_hidden_supported=no
+fi
+
+    if test $cs_cv_prog_cxx_visibility_inlines_hidden_supported != yes; then
+  cs_prog_cxx_visibility_inlines_hidden=''
+fi
+
+fi
+
+
+# Check if hidden visibility handling is buggy.
 if test -n "$cs_prog_cxx_visibility_inlines_hidden"; then
   { echo "$as_me:$LINENO: checking if $cs_prog_cxx_visibility_inlines_hidden is buggy" >&5
 echo $ECHO_N "checking if $cs_prog_cxx_visibility_inlines_hidden is buggy... $ECHO_C" >&6; }
@@ -19896,8 +20443,8 @@ fi
 if test -n "$cs_prog_cxx_visibility_inlines_hidden"; then
   cs_build_prop_val="$cs_prog_cxx_visibility_inlines_hidden"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS += $cs_build_prop_val ;
 "
 fi
 
@@ -19910,6 +20457,7 @@ echo $ECHO_N "checking for hidden symbol visibility flag... $ECHO_C" >&6; }
 if test "${cs_cv_prog_c_visibility_hidden_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-fvisibility=hidden@@ | sed 'y% %#%'`"; then
   ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -20046,10 +20594,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_c_visibility_hidden=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_c_visibility_hidden_ok="$cs_cv_prog_c_visibility_hidden"
+		cs_cv_prog_c_visibility_hidden_ok="$cs_cv_prog_c_visibility_hidden"
 else
   cs_cv_prog_c_visibility_hidden=''
-	    cs_cv_prog_c_visibility_hidden_ok=no
+		cs_cv_prog_c_visibility_hidden_ok=no
+fi
+
+else
+  cs_cv_prog_c_visibility_hidden=''
+            cs_cv_prog_c_visibility_hidden_ok=no
 fi
 
 fi
@@ -20058,8 +20611,8 @@ echo "${ECHO_T}$cs_cv_prog_c_visibility_hidden_ok" >&6; }
     if test "$cs_cv_prog_c_visibility_hidden_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_c_visibility_hidden"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
 "
 fi
 
@@ -20072,6 +20625,7 @@ echo $ECHO_N "checking for default symbol visibility flag... $ECHO_C" >&6; }
 if test "${cs_cv_prog_c_visibility_default_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-fvisibility=default@@ | sed 'y% %#%'`"; then
   ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -20208,10 +20762,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_c_visibility_default=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_c_visibility_default_ok="$cs_cv_prog_c_visibility_default"
+		cs_cv_prog_c_visibility_default_ok="$cs_cv_prog_c_visibility_default"
 else
   cs_cv_prog_c_visibility_default=''
-	    cs_cv_prog_c_visibility_default_ok=no
+		cs_cv_prog_c_visibility_default_ok=no
+fi
+
+else
+  cs_cv_prog_c_visibility_default=''
+            cs_cv_prog_c_visibility_default_ok=no
 fi
 
 fi
@@ -20220,8 +20779,8 @@ echo "${ECHO_T}$cs_cv_prog_c_visibility_default_ok" >&6; }
     if test "$cs_cv_prog_c_visibility_default_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_c_visibility_default"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.VISIBILITY_DEFAULT ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.VISIBILITY_DEFAULT ?= $cs_build_prop_val ;
 "
 fi
 
@@ -24316,8 +24875,8 @@ echo "${ECHO_T}$cs_cv_prog_cxx_code_gen" >&6; }
     if test "$cs_cv_prog_cxx_code_gen" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_code_gen"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
 "
 fi
 
@@ -24343,6 +24902,7 @@ echo $ECHO_N "checking how to enable optimizations... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_optimize_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-O3@@ | sed 'y% %#%'` `echo @-O2@@ | sed 'y% %#%'` `echo @-O@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -24479,10 +25039,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_optimize=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_optimize_ok="$cs_cv_prog_cxx_optimize"
+		cs_cv_prog_cxx_optimize_ok="$cs_cv_prog_cxx_optimize"
 else
   cs_cv_prog_cxx_optimize=''
-	    cs_cv_prog_cxx_optimize_ok=no
+		cs_cv_prog_cxx_optimize_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_optimize=''
+            cs_cv_prog_cxx_optimize_ok=no
 fi
 
 fi
@@ -24491,8 +25056,8 @@ echo "${ECHO_T}$cs_cv_prog_cxx_optimize_ok" >&6; }
     if test "$cs_cv_prog_cxx_optimize_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_optimize"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.optimize += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.optimize += $cs_build_prop_val ;
 "
 fi
 
@@ -24505,6 +25070,7 @@ echo $ECHO_N "checking if -fomit-frame-pointer is accepted... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_omit_frame_pointer_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-fomit-frame-pointer@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -24641,10 +25207,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_omit_frame_pointer=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_omit_frame_pointer_ok="$cs_cv_prog_cxx_omit_frame_pointer"
+		cs_cv_prog_cxx_omit_frame_pointer_ok="$cs_cv_prog_cxx_omit_frame_pointer"
 else
   cs_cv_prog_cxx_omit_frame_pointer=''
-	    cs_cv_prog_cxx_omit_frame_pointer_ok=no
+		cs_cv_prog_cxx_omit_frame_pointer_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_omit_frame_pointer=''
+            cs_cv_prog_cxx_omit_frame_pointer_ok=no
 fi
 
 fi
@@ -24653,8 +25224,8 @@ echo "${ECHO_T}$cs_cv_prog_cxx_omit_frame_pointer_ok" >&6; }
     if test "$cs_cv_prog_cxx_omit_frame_pointer_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_omit_frame_pointer"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.optimize += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.optimize += $cs_build_prop_val ;
 "
 fi
 
@@ -24668,6 +25239,7 @@ echo $ECHO_N "checking if -ffast-math is accepted... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_fast_math_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-ffast-math@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -24804,10 +25376,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_fast_math=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_fast_math_ok="$cs_cv_prog_cxx_fast_math"
+		cs_cv_prog_cxx_fast_math_ok="$cs_cv_prog_cxx_fast_math"
 else
   cs_cv_prog_cxx_fast_math=''
-	    cs_cv_prog_cxx_fast_math_ok=no
+		cs_cv_prog_cxx_fast_math_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_fast_math=''
+            cs_cv_prog_cxx_fast_math_ok=no
 fi
 
 fi
@@ -24816,8 +25393,8 @@ echo "${ECHO_T}$cs_cv_prog_cxx_fast_math_ok" >&6; }
     if test "$cs_cv_prog_cxx_fast_math_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_fast_math"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.optimize += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.optimize += $cs_build_prop_val ;
 "
 fi
 
@@ -24946,8 +25523,8 @@ fi
 echo "${ECHO_T}$cs_build_mode" >&6; }
 cs_build_prop_val="$cs_build_mode"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}MODE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}MODE ?= $cs_build_prop_val ;
 "
 fi
 
@@ -25069,8 +25646,11 @@ esac
 fi
 
     if test -n "$LD"; then
+  # Apple linker is not GNU-compatible. Further, on Leopard, -v emits
+        # to stderr rather than stdout. Handle these anomalies.
+        if echo `ld -v 2>&1` | grep GNU 2>&1 > /dev/null; then
   # binutils versions come in the flavors X.Y as well as X.Y.Z
-        { echo "$as_me:$LINENO: checking if binutils version >= 2.17" >&5
+	    { echo "$as_me:$LINENO: checking if binutils version >= 2.17" >&5
 echo $ECHO_N "checking if binutils version >= 2.17... $ECHO_C" >&6; }
 if test "${cs_cv_prog_binutils_version_2_17_ok_annotated+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -25191,11 +25771,11 @@ else
   cs_cv_binutils_true_2_17=no
 fi
 
-        if test "$cs_cv_binutils_true_2_17" = yes; then
+	    if test "$cs_cv_binutils_true_2_17" = yes; then
   cs_cv_binutils_2_17=yes
 fi
 
-	if test -z "$cs_cv_binutils_2_17"; then
+	    if test -z "$cs_cv_binutils_2_17"; then
   { echo "$as_me:$LINENO: checking if binutils version >= 2.16.91" >&5
 echo $ECHO_N "checking if binutils version >= 2.16.91... $ECHO_C" >&6; }
 if test "${cs_cv_prog_binutils_version_2_16_91_ok_annotated+set}" = set; then
@@ -25309,8 +25889,10 @@ fi
 
 fi
 
-	if test -z "$cs_cv_binutils_2_17"; then
+	    if test -z "$cs_cv_binutils_2_17"; then
   cs_cv_binutils_2_17=no
+fi
+
 fi
 
 fi
@@ -25342,8 +25924,8 @@ echo "${ECHO_T}$enable_separate_debug_info" >&6; }
 
 cs_build_prop_val="$enable_separate_debug_info"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}LINK.DEBUG.INFO.SEPARATE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}LINK.DEBUG.INFO.SEPARATE ?= $cs_build_prop_val ;
 "
 fi
 
@@ -25353,6 +25935,7 @@ echo $ECHO_N "checking how to enable debug mode debugging symbols... $ECHO_C" >&
 if test "${cs_cv_prog_cxx_debug_symbols_extra_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-g3@@ | sed 'y% %#%'` `echo @-g2@@ | sed 'y% %#%'` `echo @-g@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -25489,10 +26072,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_debug_symbols_extra=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_debug_symbols_extra_ok="$cs_cv_prog_cxx_debug_symbols_extra"
+		cs_cv_prog_cxx_debug_symbols_extra_ok="$cs_cv_prog_cxx_debug_symbols_extra"
 else
   cs_cv_prog_cxx_debug_symbols_extra=''
-	    cs_cv_prog_cxx_debug_symbols_extra_ok=no
+		cs_cv_prog_cxx_debug_symbols_extra_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_debug_symbols_extra=''
+            cs_cv_prog_cxx_debug_symbols_extra_ok=no
 fi
 
 fi
@@ -25501,15 +26089,15 @@ echo "${ECHO_T}$cs_cv_prog_cxx_debug_symbols_extra_ok" >&6; }
     if test "$cs_cv_prog_cxx_debug_symbols_extra_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_debug_symbols_extra"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.debug += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.debug += $cs_build_prop_val ;
 "
 fi
 
 	    cs_build_prop_val="$cs_cv_prog_cxx_debug_symbols_extra"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS.debug += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS.debug += $cs_build_prop_val ;
 "
 fi
 
@@ -25535,6 +26123,7 @@ echo $ECHO_N "checking how to enable optimize mode debugging symbols... $ECHO_C"
 if test "${cs_cv_prog_cxx_debug_symbols_normal_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-g2@@ | sed 'y% %#%'` `echo @-g@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -25671,10 +26260,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_debug_symbols_normal=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_debug_symbols_normal_ok="$cs_cv_prog_cxx_debug_symbols_normal"
+		cs_cv_prog_cxx_debug_symbols_normal_ok="$cs_cv_prog_cxx_debug_symbols_normal"
 else
   cs_cv_prog_cxx_debug_symbols_normal=''
-	    cs_cv_prog_cxx_debug_symbols_normal_ok=no
+		cs_cv_prog_cxx_debug_symbols_normal_ok=no
+fi
+
+else
+  cs_cv_prog_cxx_debug_symbols_normal=''
+            cs_cv_prog_cxx_debug_symbols_normal_ok=no
 fi
 
 fi
@@ -25683,15 +26277,15 @@ echo "${ECHO_T}$cs_cv_prog_cxx_debug_symbols_normal_ok" >&6; }
     if test "$cs_cv_prog_cxx_debug_symbols_normal_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_debug_symbols_normal"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.optimize += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.optimize += $cs_build_prop_val ;
 "
 fi
 
 	    cs_build_prop_val="$cs_cv_prog_cxx_debug_symbols_normal"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS.optimize += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS.optimize += $cs_build_prop_val ;
 "
 fi
 
@@ -25722,6 +26316,7 @@ echo $ECHO_N "checking if -I/usr/local/include is usable... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cpp_local_include_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
+  if test -n "`echo @-I/usr/local/include@@ | sed 'y% %#%'`"; then
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -25858,10 +26453,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cpp_local_include=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cpp_local_include_ok="$cs_cv_prog_cpp_local_include"
+		cs_cv_prog_cpp_local_include_ok="$cs_cv_prog_cpp_local_include"
 else
   cs_cv_prog_cpp_local_include=''
-	    cs_cv_prog_cpp_local_include_ok=no
+		cs_cv_prog_cpp_local_include_ok=no
+fi
+
+else
+  cs_cv_prog_cpp_local_include=''
+            cs_cv_prog_cpp_local_include_ok=no
 fi
 
 fi
@@ -25876,8 +26476,8 @@ fi
 if test -n "$cs_cv_prog_cpp_local_include"; then
   cs_build_prop_val="$cs_cv_prog_cpp_local_include"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
 "
 fi
 
@@ -25888,8 +26488,8 @@ fi
 if test -d /usr/local/lib; then
   cs_build_prop_val="-L/usr/local/lib"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += $cs_build_prop_val ;
 "
 fi
 
@@ -29510,22 +30110,22 @@ if test "$no_x" != yes; then
     # empty string).
     cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}X11.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}X11.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
     cs_build_prop_val="$X_CFLAGS"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}X11.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}X11.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
     cs_build_prop_val="$X_LIBS $X_LFLAGS"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}X11.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}X11.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -30742,22 +31342,22 @@ fi
     if test "$cs_cv_libxxf86vm" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}XFREE86VM.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}XFREE86VM.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libxxf86vm_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}XFREE86VM.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}XFREE86VM.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libxxf86vm_libs $cs_cv_libxxf86vm_lflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}XFREE86VM.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}XFREE86VM.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -31971,22 +32571,22 @@ fi
   if test "$cs_cv_libxaw7" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}XAW.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}XAW.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libxaw7_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}XAW.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}XAW.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libxaw7_lflags $cs_cv_libxaw7_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}XAW.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}XAW.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -32533,22 +33133,22 @@ fi
   if test "$cs_cv_libgl" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}GL.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}GL.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libgl_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}GL.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}GL.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libgl_lflags $cs_cv_libgl_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}GL.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}GL.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -33949,22 +34549,22 @@ fi
   if test "$cs_cv_libglu" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}GLU.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}GLU.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libglu_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}GLU.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}GLU.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libglu_lflags $cs_cv_libglu_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}GLU.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}GLU.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -34300,22 +34900,22 @@ fi
   if test "$cs_cv_libglx" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}GLX.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}GLX.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libglx_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}GLX.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}GLX.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libglx_lflags $cs_cv_libglx_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}GLX.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}GLX.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -35051,22 +35651,22 @@ fi
   if test "$cs_cv_libdirectx" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}DIRECTX.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}DIRECTX.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libdirectx_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}DIRECTX.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}DIRECTX.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libdirectx_lflags $cs_cv_libdirectx_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}DIRECTX.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}DIRECTX.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -35405,22 +36005,22 @@ fi
   if test "$cs_cv_libdirectx8" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}DIRECTX8.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}DIRECTX8.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libdirectx8_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}DIRECTX8.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}DIRECTX8.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libdirectx8_lflags $cs_cv_libdirectx8_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}DIRECTX8.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}DIRECTX8.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -35750,22 +36350,22 @@ fi
   if test "$cs_cv_libwaveout" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}WAVEOUT.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}WAVEOUT.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libwaveout_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}WAVEOUT.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}WAVEOUT.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libwaveout_lflags $cs_cv_libwaveout_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}WAVEOUT.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}WAVEOUT.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -36992,22 +37592,22 @@ fi
   if test "$cs_cv_libz" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}ZLIB.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}ZLIB.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libz_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}ZLIB.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}ZLIB.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libz_lflags $cs_cv_libz_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}ZLIB.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}ZLIB.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -38235,22 +38835,22 @@ fi
   if test "$cs_cv_libpng" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}PNG.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}PNG.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libpng_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}PNG.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}PNG.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libpng_lflags $cs_cv_libpng_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}PNG.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}PNG.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -39476,22 +40076,22 @@ fi
   if test "$cs_cv_libjpeg" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}JPEG.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}JPEG.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libjpeg_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}JPEG.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}JPEG.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libjpeg_lflags $cs_cv_libjpeg_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}JPEG.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}JPEG.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -41505,22 +42105,22 @@ fi
   if test "$cs_cv_libmng" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}MNG.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}MNG.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libmng_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}MNG.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}MNG.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libmng_lflags $cs_cv_libmng_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}MNG.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}MNG.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -42328,22 +42928,22 @@ fi
   if test "$cs_cv_libcairo" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CAIRO.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CAIRO.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libcairo_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CAIRO.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CAIRO.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libcairo_lflags $cs_cv_libcairo_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CAIRO.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CAIRO.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -43968,22 +44568,22 @@ fi
   if test "$cs_cv_libcairomm" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CAIROMM.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CAIROMM.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libcairomm_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CAIROMM.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CAIROMM.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libcairomm_lflags $cs_cv_libcairomm_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CAIROMM.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CAIROMM.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -44786,22 +45386,22 @@ fi
   if test "$cs_cv_libvgvm" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}VGVM.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}VGVM.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libvgvm_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}VGVM.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}VGVM.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libvgvm_lflags $cs_cv_libvgvm_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}VGVM.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}VGVM.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -45610,22 +46210,22 @@ fi
   if test "$cs_cv_libogg" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}OGG.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}OGG.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libogg_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}OGG.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}OGG.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libogg_lflags $cs_cv_libogg_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}OGG.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}OGG.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -46429,22 +47029,22 @@ fi
   if test "$cs_cv_libvorbis" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}VORBIS.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}VORBIS.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libvorbis_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}VORBIS.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}VORBIS.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libvorbis_lflags $cs_cv_libvorbis_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}VORBIS.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}VORBIS.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -47252,22 +47852,22 @@ fi
   if test "$cs_cv_libvorbisfile" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}VORBISFILE.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}VORBISFILE.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libvorbisfile_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}VORBISFILE.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}VORBISFILE.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libvorbisfile_lflags $cs_cv_libvorbisfile_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}VORBISFILE.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}VORBISFILE.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -49209,22 +49809,22 @@ fi
   if test "$cs_cv_lib3ds" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}3DS.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}3DS.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_lib3ds_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}3DS.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}3DS.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_lib3ds_lflags $cs_cv_lib3ds_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}3DS.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}3DS.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -49545,8 +50145,8 @@ fi
     if test $cs_cv_lib3ds_1_3 = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}LIB3DS.GENERIC_DATA_IO_CALLBACKS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}LIB3DS.GENERIC_DATA_IO_CALLBACKS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -50984,22 +51584,22 @@ fi
   if test "$cs_cv_libode" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}ODE.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}ODE.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libode_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}ODE.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}ODE.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libode_lflags $cs_cv_libode_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}ODE.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}ODE.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -52240,22 +52840,22 @@ fi
   if test "$cs_cv_libbullet" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}BULLET.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}BULLET.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libbullet_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}BULLET.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}BULLET.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libbullet_lflags $cs_cv_libbullet_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}BULLET.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}BULLET.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -52607,22 +53207,22 @@ fi
   if test "$cs_cv_libopenal" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}OPENAL.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}OPENAL.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libopenal_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}OPENAL.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}OPENAL.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libopenal_lflags $cs_cv_libopenal_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}OPENAL.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}OPENAL.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -54166,22 +54766,22 @@ fi
   if test "$cs_cv_libfreetype2" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}FT2.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}FT2.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libfreetype2_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}FT2.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}FT2.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libfreetype2_lflags $cs_cv_libfreetype2_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}FT2.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}FT2.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -54371,8 +54971,8 @@ echo "${ECHO_T}$cs_cv_libmingwex" >&6; }
 if test $cs_cv_libmingwex = yes; then
   cs_build_prop_val="-lmingwex"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += $cs_build_prop_val ;
 "
 fi
 
@@ -55483,22 +56083,22 @@ fi
   if test "$cs_cv_libcal3d" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CAL3D.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CAL3D.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libcal3d_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CAL3D.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CAL3D.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libcal3d_lflags $cs_cv_libcal3d_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CAL3D.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CAL3D.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -56622,22 +57222,22 @@ fi
   if test "$cs_cv_libsdl" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}SDL.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}SDL.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libsdl_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}SDL.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}SDL.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libsdl_lflags $cs_cv_libsdl_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}SDL.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}SDL.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -57830,22 +58430,22 @@ if test $cs_cv_libwx_opengl = yes; then
   if test "$cs_cv_libwx_opengl" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}WX.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}WX.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libwx_opengl_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}WX.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}WX.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libwx_opengl_lflags $cs_cv_libwx_opengl_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}WX.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}WX.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -59377,22 +59977,22 @@ fi
   if test "$cs_cv_libCEGUI" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CEGUI.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CEGUI.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libCEGUI_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CEGUI.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CEGUI.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libCEGUI_lflags $cs_cv_libCEGUI_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CEGUI.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CEGUI.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -60618,22 +61218,22 @@ fi
   if test "$cs_cv_libGTK" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}GTK.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}GTK.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libGTK_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}GTK.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}GTK.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libGTK_lflags $cs_cv_libGTK_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}GTK.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}GTK.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -60948,8 +61548,8 @@ fi
     if test $cs_cv_GTK_gtk_message_dialog_format_secondary_text = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}GTK.MESSAGE_HAS_SECONDARY ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}GTK.MESSAGE_HAS_SECONDARY ?= $cs_build_prop_val ;
 "
 fi
 
@@ -61298,8 +61898,8 @@ fi
     if test $cs_cv_sys_linux_joystick = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}LINUXJOYSTICK.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}LINUXJOYSTICK.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
@@ -66527,22 +67127,22 @@ fi
   if test "$cs_cv_libCgGL" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CG.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CG.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libCgGL_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CG.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CG.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libCgGL_lflags $cs_cv_libCgGL_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CG.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CG.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -66980,8 +67580,8 @@ fi
     if test $cs_cv_header_soundcard_h = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}OSS.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}OSS.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
@@ -67792,22 +68392,22 @@ fi
   if test "$cs_cv_libjackasyn" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}JACKASYN.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}JACKASYN.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libjackasyn_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}JACKASYN.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}JACKASYN.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libjackasyn_lflags $cs_cv_libjackasyn_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}JACKASYN.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}JACKASYN.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -68618,22 +69218,22 @@ fi
   if test "$cs_cv_libasound" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}ALSA.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}ALSA.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libasound_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}ALSA.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}ALSA.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libasound_lflags $cs_cv_libasound_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}ALSA.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}ALSA.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -69856,22 +70456,22 @@ fi
   if test "$cs_cv_libcucul" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CUCUL.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CUCUL.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libcucul_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CUCUL.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CUCUL.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libcucul_lflags $cs_cv_libcucul_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CUCUL.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CUCUL.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -71085,22 +71685,22 @@ fi
   if test "$cs_cv_libcaca" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CACA.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CACA.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libcaca_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CACA.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CACA.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libcaca_lflags $cs_cv_libcaca_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CACA.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CACA.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -71428,8 +72028,8 @@ fi
 "
     cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}REGEX.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}REGEX.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
@@ -71761,8 +72361,8 @@ fi
 "
     cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}BACKTRACE.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}BACKTRACE.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
@@ -72418,6 +73018,319 @@ else
   cs_cv__aligned_malloc_cflags=''
 	cs_cv__aligned_malloc_lflags=''
 	cs_cv__aligned_malloc_libs=''
+
+fi
+
+
+if test "" != yes; then
+  { echo "$as_me:$LINENO: checking for sysinfo()" >&5
+echo $ECHO_N "checking for sysinfo()... $ECHO_C" >&6; }
+if test "${cs_cv_sysinfo+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <sys/sysinfo.h>
+int
+main ()
+{
+struct sysinfo x; sysinfo(&x);
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  cs_build_ok=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_sysinfo=yes
+		cs_cv_sysinfo_cflags=$cs_build_cflags
+		cs_cv_sysinfo_lflags=$cs_build_lflags
+		cs_cv_sysinfo_libs=$cs_build_libs
+else
+  cs_cv_sysinfo=no
+fi
+
+fi
+{ echo "$as_me:$LINENO: result: $cs_cv_sysinfo" >&5
+echo "${ECHO_T}$cs_cv_sysinfo" >&6; }
+else
+  { echo "$as_me:$LINENO: checking for sysinfo()" >&5
+echo $ECHO_N "checking for sysinfo()... $ECHO_C" >&6; }
+	    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <sys/sysinfo.h>
+int
+main ()
+{
+struct sysinfo x; sysinfo(&x);
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  cs_build_ok=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_sysinfo=yes
+		cs_cv_sysinfo_cflags=$cs_build_cflags
+		cs_cv_sysinfo_lflags=$cs_build_lflags
+		cs_cv_sysinfo_libs=$cs_build_libs
+else
+  cs_cv_sysinfo=no
+fi
+
+	    { echo "$as_me:$LINENO: result: $cs_cv_sysinfo" >&5
+echo "${ECHO_T}$cs_cv_sysinfo" >&6; }
+fi
+
+    if test $cs_cv_sysinfo = yes; then
+  cs_header_text="${cs_header_text}#define CS_HAVE_SYSINFO
+"
+else
+  cs_cv_sysinfo_cflags=''
+	cs_cv_sysinfo_lflags=''
+	cs_cv_sysinfo_libs=''
 
 fi
 
@@ -73343,8 +74256,8 @@ done
 	if test $cs_cv_perl_tt2 = yes && test -n "$TTREE"; then
   cs_build_prop_val="$TTREE"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}TTREE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}TTREE ?= $cs_build_prop_val ;
 "
 fi
 
@@ -74460,22 +75373,22 @@ fi
   if test "$cs_cv_libcppunit" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CPPUNIT.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CPPUNIT.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libcppunit_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CPPUNIT.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CPPUNIT.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libcppunit_lflags $cs_cv_libcppunit_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CPPUNIT.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CPPUNIT.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -74951,8 +75864,8 @@ cs_header_text="${cs_header_text}#define CS_PROCESSOR_SIZE $cs_long_bits
 "
 cs_build_prop_val="$cs_long_bits"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}TARGET.PROCESSORSIZE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}TARGET.PROCESSORSIZE ?= $cs_build_prop_val ;
 "
 fi
 
@@ -74985,8 +75898,8 @@ cs_header_text="${cs_header_text}#define CS_LONG_SIZE $ac_cv_sizeof_long
     cs_host_cpu_normalized="`echo "$cs_host_cpu" | $as_tr_cpp`"
 cs_build_prop_val="$cs_host_cpu_normalized"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}TARGET.PROCESSOR ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}TARGET.PROCESSOR ?= $cs_build_prop_val ;
 "
 fi
 
@@ -78868,22 +79781,22 @@ fi
   if test "$cs_cv_sys_socket" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}SOCKET.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}SOCKET.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_sys_socket_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}SOCKET.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}SOCKET.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_sys_socket_lflags $cs_cv_sys_socket_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}SOCKET.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}SOCKET.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -84092,8 +85005,8 @@ fi
 echo "${ECHO_T}$enable_meta_info_embedding" >&6; }
     cs_build_prop_val="$enable_meta_info_embedding"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}EMBED_META ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}EMBED_META ?= $cs_build_prop_val ;
 "
 fi
 
@@ -84211,8 +85124,8 @@ fi
 
     cs_build_prop_val="$WINDRES"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.WINDRES ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.WINDRES ?= $cs_build_prop_val ;
 "
 fi
 
@@ -84331,15 +85244,15 @@ fi
     if test -n "$OBJCOPY"; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}OBJCOPY.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}OBJCOPY.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
         cs_build_prop_val="$OBJCOPY"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJCOPY ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJCOPY ?= $cs_build_prop_val ;
 "
 fi
 
@@ -84348,8 +85261,8 @@ fi
         if test $cs_header_elf_h = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}ELF.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}ELF.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
@@ -85486,22 +86399,22 @@ fi
   if test "$cs_cv_libbfd_ok" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}LIBBFD.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}LIBBFD.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libbfd_ok_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}LIBBFD.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}LIBBFD.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libbfd_ok_lflags $cs_cv_libbfd_ok_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}LIBBFD.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}LIBBFD.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -85509,15 +86422,15 @@ fi
 
 	cs_build_prop_val="$cs_cv_libbfd_ok_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}EMBED_META.CFLAGS += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}EMBED_META.CFLAGS += $cs_build_prop_val ;
 "
 fi
 
 			cs_build_prop_val="$cs_cv_libbfd_ok_lflags $cs_cv_libbfd_ok_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}EMBED_META.LFLAGS += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}EMBED_META.LFLAGS += $cs_build_prop_val ;
 "
 fi
 
@@ -85534,15 +86447,15 @@ if test $enable_meta_info_embedding = yes; then
 "
     cs_build_prop_val="\$(EMBED_META.CFLAGS)"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
 "
 fi
 
     cs_build_prop_val="\$(EMBED_META.LFLAGS)"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += $cs_build_prop_val ;
 "
 fi
 
@@ -86850,22 +87763,22 @@ fi
   if test "$cs_cv_libbfd_ok" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}LIBBFD.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}LIBBFD.AVAILABLE ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libbfd_ok_cflags"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}LIBBFD.CFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}LIBBFD.CFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
 	cs_build_prop_val="$cs_cv_libbfd_ok_lflags $cs_cv_libbfd_ok_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}LIBBFD.LFLAGS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}LIBBFD.LFLAGS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -86923,14 +87836,46 @@ fi
 echo "${ECHO_T}$enable_extensive_memory_debugger" >&6; }
 cs_build_prop_val="$enable_extensive_memory_debugger"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}EXTENSIVE_MEMDEBUG ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}EXTENSIVE_MEMDEBUG ?= $cs_build_prop_val ;
 "
 fi
 
 if test $enable_extensive_memory_debugger = yes; then
   cs_header_text="${cs_header_text}#define CS_EXTENSIVE_MEMDEBUG
 "
+fi
+
+
+
+
+#------------------------------------------------------------------------------
+# Determine if checking allocations should be enabled.
+#------------------------------------------------------------------------------
+if test $enable_extensive_memory_debugger = yes; then
+  { echo "$as_me:$LINENO: checking whether to use checking allocations" >&5
+echo $ECHO_N "checking whether to use checking allocations... $ECHO_C" >&6; }
+    # Check whether --enable-checking-allocations was given.
+if test "${enable_checking_allocations+set}" = set; then
+  enableval=$enable_checking_allocations;
+else
+  enable_checking_allocations=no
+fi
+
+    { echo "$as_me:$LINENO: result: $enable_checking_allocations" >&5
+echo "${ECHO_T}$enable_checking_allocations" >&6; }
+    cs_build_prop_val="$enable_checking_allocations"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CHECKING_ALLOCATIONS ?= $cs_build_prop_val ;
+"
+fi
+
+    if test $enable_checking_allocations = yes; then
+  cs_header_text="${cs_header_text}#define CS_CHECKING_ALLOCATIONS
+"
+fi
+
 fi
 
 
@@ -86952,8 +87897,8 @@ fi
 echo "${ECHO_T}$enable_memory_tracker" >&6; }
 cs_build_prop_val="$enable_memory_tracker"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}MEMORY_TRACKER ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}MEMORY_TRACKER ?= $cs_build_prop_val ;
 "
 fi
 
@@ -86981,8 +87926,8 @@ fi
 echo "${ECHO_T}$enable_ref_tracker" >&6; }
 cs_build_prop_val="$enable_ref_tracker"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}REF_TRACKER ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}REF_TRACKER ?= $cs_build_prop_val ;
 "
 fi
 
@@ -87036,8 +87981,8 @@ fi
 echo "${ECHO_T}$enable_shared" >&6; }
 cs_build_prop_val="$enable_shared"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}BUILD_SHARED_LIBS ?= \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}BUILD_SHARED_LIBS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -87088,21 +88033,21 @@ cs_header_text="${cs_header_text}#endif // __CS_CSCONFIG_H__
 #------------------------------------------------------------------------------
 cs_build_prop_val="\$(COMPILER.CFLAGS.MANDATORY)"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
 "
 fi
 
 cs_build_prop_val="\$(COMPILER.C++FLAGS.MANDATORY)"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS += \"$cs_build_prop_val\" ;
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS += $cs_build_prop_val ;
 "
 fi
 
-cs_jamconfig_text="${cs_jamconfig_text}PACKAGE_NAME ?= \"$PACKAGE_NAME\" ;
+cs_jamconfig_text="${cs_jamconfig_text}PACKAGE_NAME ?= $PACKAGE_NAME ;
 "
-    cs_jamconfig_text="${cs_jamconfig_text}PACKAGE_VERSION ?= \"$PACKAGE_VERSION\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PACKAGE_VERSION ?= $PACKAGE_VERSION ;
 "
     cs_jamconfig_text="${cs_jamconfig_text}PACKAGE_STRING ?= \"$PACKAGE_STRING\" ;
 "
@@ -87114,10 +88059,8 @@ cs_jamconfig_text="${cs_jamconfig_text}PACKAGE_NAME ?= \"$PACKAGE_NAME\" ;
 "
     cs_jamconfig_text="${cs_jamconfig_text}PACKAGE_COPYRIGHT ?= \"$PACKAGE_COPYRIGHT\" ;
 "
-    for cs_veritem in 1 3; do
-	cs_jamconfig_text="${cs_jamconfig_text}PACKAGE_VERSION_LIST += \"$cs_veritem\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PACKAGE_VERSION_LIST ?= 1 3 ;
 "
-    done
 
 
 # Handle the case when no prefix is given, and the special case when a path
@@ -87136,35 +88079,35 @@ else
 fi
 
 
-cs_jamconfig_text="${cs_jamconfig_text}prefix ?= \"`echo "$cs_install_prefix" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}prefix ?= `echo "$cs_install_prefix" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'` ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}exec_prefix ?= \"`echo "$cs_install_exec_prefix" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}exec_prefix ?= `echo "$cs_install_exec_prefix" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'` ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}bindir ?= \"`echo "$bindir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}bindir ?= `echo "$bindir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'` ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}sbindir ?= \"`echo "$sbindir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}sbindir ?= `echo "$sbindir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'` ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}libexecdir ?= \"`echo "$libexecdir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}libexecdir ?= `echo "$libexecdir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'` ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}datarootdir ?= \"`echo "$datarootdir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}datarootdir ?= `echo "$datarootdir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'` ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}datadir ?= \"`echo "$datadir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}datadir ?= `echo "$datadir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'` ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}sysconfdir ?= \"`echo "$sysconfdir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}sysconfdir ?= `echo "$sysconfdir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'` ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}sharedstatedir ?= \"`echo "$sharedstatedir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}sharedstatedir ?= `echo "$sharedstatedir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'` ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}localstatedir ?= \"`echo "$localstatedir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}localstatedir ?= `echo "$localstatedir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'` ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}libdir ?= \"`echo "$libdir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}libdir ?= `echo "$libdir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'` ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}includedir ?= \"`echo "$includedir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}includedir ?= `echo "$includedir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'` ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}oldincludedir ?= \"`echo "$oldincludedir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}oldincludedir ?= `echo "$oldincludedir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'` ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}infodir ?= \"`echo "$infodir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}infodir ?= `echo "$infodir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'` ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}mandir ?= \"`echo "$mandir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}mandir ?= `echo "$mandir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'` ;
 "
 
 

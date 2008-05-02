@@ -125,13 +125,15 @@ public:
   virtual void RemoveCellLoadListener (iTerrainCellLoadCallback* cb);
 
   virtual void AddCellHeightUpdateListener (iTerrainCellHeightDataCallback* cb);
-  virtual void RemoveCellHeightUpdateListener (iTerrainCellHeightDataCallback* cb);  
+  virtual void RemoveCellHeightUpdateListener (
+      iTerrainCellHeightDataCallback* cb);  
 
   // ------------ iMeshObject implementation ------------
 
   virtual iMeshObjectFactory* GetFactory () const;
-  virtual CS::Graphics::RenderMesh** GetRenderMeshes (int& num, iRenderView* rview, 
-    iMovable* movable, uint32 frustum_mask);
+  virtual CS::Graphics::RenderMesh** GetRenderMeshes (
+      int& num, iRenderView* rview, iMovable* movable,
+      uint32 frustum_mask);
 
   virtual bool HitBeamOutline (const csVector3& start,
         const csVector3& end, csVector3& isect, float* pr);

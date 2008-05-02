@@ -244,7 +244,7 @@ csPtr<iImage> csGLSuperLightmap::Dump ()
 {
   // @@@ hmm... or just return an empty image?
   if (texHandle == (GLuint)~0) return 0;
-
+    
   GLint tw, th;
   csGLGraphics3D::statecache->SetTexture (GL_TEXTURE_2D, texHandle);
 

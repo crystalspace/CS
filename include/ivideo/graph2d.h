@@ -448,6 +448,19 @@ struct iGraphics2D : public virtual iBase
   virtual void Write (iFont *font, int x, int y, int fg, int bg,
     const wchar_t* str, uint flags = 0) = 0;
 
+  /**
+   * Set the viewport (the rectangle of the framebuffer to draw to).
+   * \param left Left of the viewport. X=0 will map to this.
+   * \param top Right of the viewport. Y=0 will map to this.
+   * \param width Width of the viewport.
+   * \param height Height of the viewport.
+   */
+  virtual void SetViewport (int left, int top, int width, int height) = 0;
+  /// Get the currently set viewport.
+  virtual void GetViewport (int& left, int& top, int& width, int& height) = 0;
+  
+  /// Get the dimensions of the framebuffer.
+  virtual void GetFramebufferDimensions (int& width, int& height) = 0;
 };
 
 #include "csutil/deprecated_warn_on.h"

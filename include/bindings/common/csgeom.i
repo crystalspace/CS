@@ -182,6 +182,8 @@ namespace CS
 %ignore csBox3::operator> (const csBox3& box1, const csBox3& box2);
 %ignore csBox3::operator< (const csVector3& point, const csBox3& box);
 %include "csgeom/box.h"
+%ignore csOBB::Diameter;
+%include "csgeom/obb.h"
 
 %ignore csSegment2::Start (); // Non-const.
 %ignore csSegment2::End ();   // Non-const.
@@ -342,7 +344,13 @@ ARRAY_OBJECT_FUNCTIONS(csArray<csArray<int> >,csArray<int>)
 #ifndef SWIGIMPORTED
 #undef APPLY_FOR_ALL_INTERFACES_POST
 #define APPLY_FOR_ALL_INTERFACES_POST
-%include "bindings/common/basepost.i"
-cs_lang_include(csgeompost.i)
 #endif
+
+%include "bindings/common/basepost.i"
+
+#ifndef SWIGIMPORTED
+cs_apply_all_interfaces
+#endif
+
+cs_lang_include(csgeompost.i)
 

@@ -121,8 +121,11 @@ bool csEngineProcTex::PrepareAnim ()
 
 void csEngineProcTex::Animate (csTicks CurrentTime)
 {
-  renderTargetState = g3d->SetRenderTarget (targets[currentTarget].texh,
-    false, 0, targets[currentTarget].attachment);
+  if (!(renderTargetState = g3d->SetRenderTarget (targets[currentTarget].texh,
+    false, 0, targets[currentTarget].attachment)))
+    return;
+  if (!(renderTargetState = g3d->ValidateRenderTargets ()))
+    return;
 
   if (!View.IsValid())
   {

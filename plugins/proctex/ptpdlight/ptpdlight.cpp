@@ -188,6 +188,8 @@ void ProctexPDLight::PDMap::ComputeValueBounds (const TileHelper& tiles,
   }
 }
 
+#include "csutil/custom_new_disable.h"
+
 void ProctexPDLight::PDMap::SetImage (const TileHelper& tiles, iImage* img)
 {
   imageW = img->GetWidth();
@@ -274,6 +276,8 @@ void ProctexPDLight::PDMap::Crop ()
   imageW = nonNullArea.Width();
   imageH = nonNullArea.Height();
 }
+
+#include "csutil/custom_new_enable.h"
 
 void ProctexPDLight::PDMap::GetMaxValue (csRGBcolor& maxValue)
 {

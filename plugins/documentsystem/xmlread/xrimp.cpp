@@ -489,10 +489,14 @@ const char* csXmlReadDocument::ParseInPlace (char* buf, bool collapse)
   return 0;
 }
 
+#include "csutil/custom_new_disable.h"
+
 csXmlReadNode* csXmlReadDocument::Alloc ()
 {
   return new (*this) csXmlReadNode ();
 }
+
+#include "csutil/custom_new_enable.h"
 
 csXmlReadNode* csXmlReadDocument::Alloc (TrDocumentNode* node,
 	bool use_contents_value)

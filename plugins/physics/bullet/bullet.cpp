@@ -36,6 +36,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 
+#include "csutil/custom_new_disable.h"
+
 // Bullet includes.
 #include "btBulletDynamicsCommon.h"
 #include "btBulletCollisionCommon.h"
@@ -637,19 +639,19 @@ bool csBulletRigidBody::IsStatic (void)
 
 bool csBulletRigidBody::Disable (void)
 {
+  body->setActivationState(ISLAND_SLEEPING);
   return false;
 }
 
 bool csBulletRigidBody::Enable (void)
 {
-  //pc->SetActive (true);
+  body->setActivationState(ACTIVE_TAG);
   return true;
 }
 
 bool csBulletRigidBody::IsEnabled (void)
 {
-  //return pc->GetRigidBody()->GetActivationState() == 1;
-  return true;
+  return body->isActive();
 }
 
 csRef<iBodyGroup> csBulletRigidBody::GetGroup (void)
@@ -679,8 +681,8 @@ bool csBulletRigidBody::AttachColliderConvexMesh (iMeshWrapper* mesh,
 
   btVector3 localInertia (0, 0, 0);
   //shape->calculateLocalInertia (mass, localInertia);
-  body = new btRigidBody (mass, motionState, shape, localInertia,
-      0, 0, friction);
+  body = new btRigidBody (mass, motionState, shape, localInertia);
+  body->setFriction(friction);
   ds->GetWorld ()->addRigidBody (body);
 
   return true;
@@ -712,8 +714,8 @@ bool csBulletRigidBody::AttachColliderCylinder (
 	radius, radius, length / 2.0f));
   btVector3 localInertia (0, 0, 0);
   shape->calculateLocalInertia (mass, localInertia);
-  body = new btRigidBody (mass, motionState, shape, localInertia,
-      0, 0, friction);
+  body = new btRigidBody (mass, motionState, shape, localInertia);
+  body->setFriction(friction);
   ds->GetWorld ()->addRigidBody (body);
 
   return true;
@@ -737,8 +739,8 @@ bool csBulletRigidBody::AttachColliderBox (
 	size.x / 2.0f, size.y / 2.0f, size.z / 2.0f));
   btVector3 localInertia (0, 0, 0);
   shape->calculateLocalInertia (mass, localInertia);
-  body = new btRigidBody (mass, motionState, shape, localInertia,
-      0, 0, friction);
+  body = new btRigidBody (mass, motionState, shape, localInertia);
+  body->setFriction(friction);
   ds->GetWorld ()->addRigidBody (body);
 
   return true;
@@ -759,8 +761,8 @@ bool csBulletRigidBody::AttachColliderSphere (
   btSphereShape* shape = new btSphereShape (radius);
   btVector3 localInertia (0, 0, 0);
   shape->calculateLocalInertia (mass, localInertia);
-  body = new btRigidBody (mass, motionState, shape, localInertia,
-      0, 0, friction);
+  body = new btRigidBody (mass, motionState, shape, localInertia);
+  body->setFriction(friction);
   ds->GetWorld ()->addRigidBody (body);
 
   return true;
@@ -924,9 +926,11 @@ void csBulletRigidBody::AddRelTorque (const csVector3& /*force*/)
 {
 }
 
-void csBulletRigidBody::AddForceAtPos (const csVector3& /*force*/,
-    const csVector3& /*pos*/)
+void csBulletRigidBody::AddForceAtPos (const csVector3& force,
+    const csVector3& pos)
 {
+  body->applyForce (btVector3 (force.x, force.y, force.z),
+      btVector3 (pos.x,pos.y,pos.z));
 }
 
 void csBulletRigidBody::AddForceAtRelPos (const csVector3& /*force*/,
@@ -1084,8 +1088,8 @@ bool csBulletCollider::CreateSphereGeometry (const csSphere& sphere)
 
   btVector3 localInertia (0, 0, 0);
   //shape->calculateLocalInertia (mass, localInertia);
-  body = new btRigidBody (mass, motionState, shape, localInertia,
-      0, 0, friction);
+  body = new btRigidBody (mass, motionState, shape, localInertia);
+  body->setFriction(friction);
   ds->GetWorld ()->addRigidBody (body);
 
   return true;
@@ -1114,8 +1118,8 @@ bool csBulletCollider::CreateConvexMeshGeometry (iMeshWrapper* mesh)
 
   btVector3 localInertia (0, 0, 0);
   //shape->calculateLocalInertia (mass, localInertia);
-  body = new btRigidBody (mass, motionState, shape, localInertia,
-      0, 0, friction);
+  body = new btRigidBody (mass, motionState, shape, localInertia);
+  body->setFriction(friction);
   ds->GetWorld ()->addRigidBody (body);
 
   geom_type = TRIMESH_COLLIDER_GEOMETRY;
@@ -1141,8 +1145,8 @@ bool csBulletCollider::CreateMeshGeometry (iMeshWrapper* mesh)
 
   btVector3 localInertia (0, 0, 0);
   //shape->calculateLocalInertia (mass, localInertia);
-  body = new btRigidBody (mass, motionState, shape, localInertia,
-      0, 0, friction);
+  body = new btRigidBody (mass, motionState, shape, localInertia);
+  body->setFriction(friction);
   ds->GetWorld ()->addRigidBody (body);
 
   geom_type = TRIMESH_COLLIDER_GEOMETRY;
@@ -1164,8 +1168,8 @@ bool csBulletCollider::CreateBoxGeometry (const csVector3& size)
 
   btVector3 localInertia (0, 0, 0);
   //shape->calculateLocalInertia (mass, localInertia);
-  body = new btRigidBody (mass, motionState, shape, localInertia,
-      0, 0, friction);
+  body = new btRigidBody (mass, motionState, shape, localInertia);
+  body->setFriction(friction);
   ds->GetWorld ()->addRigidBody (body);
 
   return true;
@@ -1186,8 +1190,8 @@ bool csBulletCollider::CreateCylinderGeometry (float length,
   shape = new btCylinderShapeZ (btVector3 (radius, radius, length / 2.0f));
   btVector3 localInertia (0, 0, 0);
   shape->calculateLocalInertia (mass, localInertia);
-  body = new btRigidBody (mass, motionState, shape, localInertia,
-      0, 0, friction);
+  body = new btRigidBody (mass, motionState, shape, localInertia);
+  body->setFriction(friction);
   ds->GetWorld ()->addRigidBody (body);
 
   return true;
@@ -1340,7 +1344,7 @@ void csBulletCollider::MakeDynamic ()
 
 bool csBulletCollider::IsStatic ()
 {
-  return false;
+  return body->isStaticObject();
 }
 
 //------------------------ csBulletJoint ------------------------------------

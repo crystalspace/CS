@@ -402,6 +402,25 @@ void Name (void (*p)())                                                \
 #  define CS_DEFINE_STATICALLY_LINKED_FLAG  bool scfStaticallyLinked = false;
 #endif
 
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+#  define CS_DEFINE_MEMTRACKER_MODULE             \
+  class csMemTrackerModule;                       \
+  namespace CS                                    \
+  {                                               \
+    namespace Debug                               \
+    {                                             \
+      namespace MemTracker                        \
+      {                                           \
+	namespace Impl                            \
+	{                                         \
+	  csMemTrackerModule* thisModule = 0;     \
+	}                                         \
+      }                                           \
+    }                                             \
+  }
+#else
+#  define CS_DEFINE_MEMTRACKER_MODULE
+#endif
 
 /**\def CS_IMPLEMENT_FOREIGN_DLL
  * The CS_IMPLEMENT_FOREIGN_DLL macro should be placed at the global scope in
@@ -427,12 +446,14 @@ void Name (void (*p)())                                                \
 #    define CS_IMPLEMENT_FOREIGN_DLL					    \
        CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION(csStaticVarCleanup_local); \
        CS_DEFINE_STATICALLY_LINKED_FLAG					    \
-       CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_local);
+       CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_local);   \
+       CS_DEFINE_MEMTRACKER_MODULE
 #  else
 #    define CS_IMPLEMENT_FOREIGN_DLL					    \
        CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION			    \
        CS_DEFINE_STATICALLY_LINKED_FLAG					    \
-       CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);
+       CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);  \
+       CS_DEFINE_MEMTRACKER_MODULE
 #  endif
 #endif
 
@@ -458,7 +479,8 @@ void Name (void (*p)())                                                \
           CS_IMPLEMENT_PLATFORM_PLUGIN 					\
 	  CS_DEFINE_STATICALLY_LINKED_FLAG				\
 	  CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION		\
-	  CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);
+	  CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);   \
+          CS_DEFINE_MEMTRACKER_MODULE
 #  endif
 
 #else
@@ -468,7 +490,8 @@ void Name (void (*p)())                                                \
    CS_DEFINE_STATICALLY_LINKED_FLAG					\
    CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION(csStaticVarCleanup_local)	\
    CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_local);	\
-   CS_IMPLEMENT_PLATFORM_PLUGIN 
+   CS_IMPLEMENT_PLATFORM_PLUGIN                                         \
+   CS_DEFINE_MEMTRACKER_MODULE
 #  endif
 
 #endif
@@ -486,7 +509,8 @@ void Name (void (*p)())                                                \
   CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION			\
   CS_DEFINE_STATICALLY_LINKED_FLAG					\
   CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);	\
-  CS_IMPLEMENT_PLATFORM_APPLICATION 
+  CS_IMPLEMENT_PLATFORM_APPLICATION                                     \
+  CS_DEFINE_MEMTRACKER_MODULE
 #endif
 
 /**\def CS_REGISTER_STATIC_FOR_DESTRUCTION
@@ -697,20 +721,131 @@ extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* ptcalloc (size_t n,
   size_t s);
 //@}
 
+//@{
+/**\name 'Cookie' memory allocation
+ * Allocate memory with 'sentinel' values around the allocated block to detect
+ * overruns and freeing allocations across module boundaries.
+ */
+extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* ptmalloc_sentinel (
+  size_t n);
+extern CS_CRYSTALSPACE_EXPORT void ptfree_sentinel (void* p);
+extern CS_CRYSTALSPACE_EXPORT void* ptrealloc_sentinel (void* p, size_t n);
+extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* ptcalloc_sentinel (
+  size_t n, size_t s);
+//@}
+
+//@{
+/**\name 'Located' memory allocation
+ * Sentinel allocation, but also recording file name and line where the
+ * allocation occured.
+ */
+extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* ptmalloc_located (
+  size_t n);
+extern CS_CRYSTALSPACE_EXPORT void ptfree_located (void* p);
+extern CS_CRYSTALSPACE_EXPORT void* ptrealloc_located (void* p, size_t n);
+extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* ptcalloc_located (
+  size_t n, size_t s);
+//@}
+
+//@{
+/**\name 'Checking' memory allocation
+ * Located allocation, but additionally all allocated blocks are frequently
+ * checked for corruption, not just when a block is freed.
+ */
+extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* ptmalloc_checking (
+  size_t n);
+extern CS_CRYSTALSPACE_EXPORT void ptfree_checking (void* p);
+extern CS_CRYSTALSPACE_EXPORT void* ptrealloc_checking (void* p, size_t n);
+extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* ptcalloc_checking (
+  size_t n, size_t s);
+//@}
+
+#ifndef CS_DEBUG
+#  undef CS_EXTENSIVE_MEMDEBUG
+#  undef CS_REF_TRACKER
+#else
+#  if defined(CS_EXTENSIVE_MEMDEBUG) && defined(CS_MEMORY_TRACKER)
+#    error Do not use CS_EXTENSIVE_MEMDEBUG and CS_MEMORY_TRACKER together!
+#  endif
+#endif
+
+#if defined(CS_EXTENSIVE_MEMDEBUG)
+CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_malloc (size_t n)
+{ 
+#ifdef CS_CHECKING_ALLOCATIONS
+  return ptmalloc_checking (n);
+#else
+  return ptmalloc_located (n);
+#endif
+}
+
+CS_FORCEINLINE void cs_free (void* p)
+{ 
+#ifdef CS_CHECKING_ALLOCATIONS
+  ptfree_checking (p);
+#else
+  ptfree_located (p);
+#endif
+}
+
+CS_FORCEINLINE void* cs_realloc (void* p, size_t n)
+{ 
+#ifdef CS_CHECKING_ALLOCATIONS
+  return ptrealloc_checking (p, n);
+#else
+  return ptrealloc_located (p, n);
+#endif
+}
+
+CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_calloc (size_t n, size_t s)
+{ 
+#ifdef CS_CHECKING_ALLOCATIONS
+  return ptcalloc_checking (n, s); 
+#else
+  return ptcalloc_located (n, s); 
+#endif
+}
+
+#else // defined(CS_EXTENSIVE_MEMDEBUG)
 /**\name Default Crystal Space memory allocation
  * Always the same memory allocation functions as internally used by 
  * Crystal Space.
  */
 //@{
 CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_malloc (size_t n)
-{ return ptmalloc (n); }
+{ 
+#ifdef CS_DEBUG
+  return ptmalloc_sentinel (n);
+#else
+  return ptmalloc (n);
+#endif
+}
 CS_FORCEINLINE void cs_free (void* p)
-{ ptfree (p); }
+{ 
+#ifdef CS_DEBUG
+  ptfree_sentinel (p);
+#else
+  ptfree (p);
+#endif
+}
 CS_FORCEINLINE void* cs_realloc (void* p, size_t n)
-{ return ptrealloc (p, n); }
+{ 
+#ifdef CS_DEBUG
+  return ptrealloc_sentinel (p, n);
+#else
+  return ptrealloc (p, n);
+#endif
+}
 CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_calloc (size_t n, size_t s)
-{ return ptcalloc (n, s); }
+{ 
+#ifdef CS_DEBUG
+  return ptcalloc_sentinel (n, s); 
+#else
+  return ptcalloc (n, s); 
+#endif
+}
 //@}
+#endif
 
 #else // CS_NO_PTMALLOC
 CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_malloc (size_t n)
@@ -757,20 +892,14 @@ static inline bool isdir (const char *path, struct dirent *de)
 // defines its own 'new' operator, since this version will interfere with your
 // own.
 // CS_MEMORY_TRACKER is treated like CS_EXTENSIVE_MEMDEBUG here.
-// Same for CS_REF_TRACKER.
-#ifndef CS_DEBUG
-#  undef CS_EXTENSIVE_MEMDEBUG
-#  undef CS_REF_TRACKER
-#else
-#  if defined(CS_EXTENSIVE_MEMDEBUG) && defined(CS_MEMORY_TRACKER)
-#    error Do not use CS_EXTENSIVE_MEMDEBUG and CS_MEMORY_TRACKER together!
-#  endif
-#endif
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-extern void* CS_CRYSTALSPACE_EXPORT operator new (size_t s, 
+extern CS_CRYSTALSPACE_EXPORT void operator delete (void* p);
+extern CS_CRYSTALSPACE_EXPORT void operator delete[] (void* p);
+
+extern CS_CRYSTALSPACE_EXPORT void* operator new (size_t s, 
   void* filename, int line);
 inline void operator delete (void* p, void*, int) { operator delete (p); }
-extern void* CS_CRYSTALSPACE_EXPORT operator new[] (size_t s, 
+extern CS_CRYSTALSPACE_EXPORT void* operator new[] (size_t s, 
   void* filename, int line);
 inline void operator delete[] (void* p, void*, int) { operator delete[] (p); }
 
@@ -810,6 +939,18 @@ namespace CS
       static int x = 0; x /= x;
     #  endif
     }
+    
+    /**
+     * Verify that all memory blocks allocated with the "checking" functions
+     * did not overrun or the allocated space.
+     * \return \c true if all memory blocks are in order, \c false otherwise.
+     */
+    extern bool CS_CRYSTALSPACE_EXPORT VerifyAllMemory ();
+    /**
+     * Print all memory blocks allocated with the "checking" functions,
+     * including where they were allocated, to a file "allocations.txt".
+     */
+    extern void CS_CRYSTALSPACE_EXPORT DumpAllocateMemoryBlocks ();
   } // namespace Debug
 } // namespace CS
 

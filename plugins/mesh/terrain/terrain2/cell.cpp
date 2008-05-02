@@ -96,7 +96,8 @@ void csTerrainCell::SetLoadState(LoadState state)
           if (materialMapPersistent)
             materialmap.SetSize (materialMapWidth * materialMapHeight, 0);
          
-          loadState = terrain->GetFeeder ()->PreLoad (this) ? PreLoaded : NotLoaded;
+          loadState = terrain->GetFeeder ()->PreLoad (this)
+	    ? PreLoaded : NotLoaded;
 
           if (loadState == PreLoaded)
           {
@@ -112,7 +113,8 @@ void csTerrainCell::SetLoadState(LoadState state)
           if (materialMapPersistent)
             materialmap.SetSize (materialMapWidth * materialMapHeight, 0);
 
-          loadState = terrain->GetFeeder ()->Load (this) ? Loaded : NotLoaded;
+          loadState = terrain->GetFeeder ()->Load (this)
+	    ? Loaded : NotLoaded;
 
           if (loadState == Loaded)
           {
@@ -301,9 +303,10 @@ void csTerrainCell::UnlockMaterialMap ()
 {
   Touch();
 
-  csDirtyAccessArray<unsigned char> alpha;
-  alpha.SetSize (lockedMaterialMapRect.Width () * lockedMaterialMapRect.Height ());
-  
+  terrain->GetRenderer ()->OnMaterialMaskUpdate (this, lockedMaterialMapRect, 
+    materialmap.GetArray (), materialMapWidth);
+
+  /*
   for (unsigned int i = 0; i < terrain->GetMaterialPalette ().GetSize (); ++i)
   {
     for (int y = 0; y < lockedMaterialMapRect.Height (); ++y)
@@ -316,10 +319,8 @@ void csTerrainCell::UnlockMaterialMap ()
       }
     }
     
-    //@@TODO! Send update to renderer
-    terrain->GetRenderer ()->OnMaterialMaskUpdate (this, i, lockedMaterialMapRect, 
-      alpha.GetArray (), lockedMaterialMapRect.Width ());
-  }
+    //@@TODO! Send update to renderer   
+  }*/
 
   if (!materialMapPersistent) 
     materialmap.DeleteAll ();
@@ -338,18 +339,30 @@ void csTerrainCell::SetMaterialMask (unsigned int material, iImage* image)
     image = csImageManipulate::Rescale (image, materialMapWidth,
       materialMapHeight);
   }
-
+    
   terrain->GetRenderer ()->OnMaterialMaskUpdate (this, material,
     csRect(0, 0, image->GetWidth (), image->GetHeight ()),
     (const unsigned char*)image->GetImageData (), image->GetWidth ());
 }
 
 void csTerrainCell::SetMaterialMask (unsigned int material,
-const unsigned char* data, unsigned int width, unsigned int height)
+  const unsigned char* data, unsigned int width, unsigned int height)
 {
   csImageMemory image(width, height, (void*)data, false, CS_IMGFMT_PALETTED8);
 	
   SetMaterialMask (material, &image);
+}
+
+void csTerrainCell::SetAlphaMask (iMaterialWrapper* material, iImage* alphaMap)
+{
+  Touch();
+
+  // Make sure we have a true color image
+  csRef<iImage> image;
+  image.AttachNew (new csImageMemory (alphaMap, 
+    CS_IMGFMT_TRUECOLOR | (alphaMap->GetFormat () & ~CS_IMGFMT_MASK)));
+
+  terrain->GetRenderer ()->OnAlphaMapUpdate (this, material, image);
 }
 
 void csTerrainCell::SetBaseMaterial (iMaterialWrapper* material)

@@ -12,14 +12,16 @@
       <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <vp plugin="glcg" file="/shader/parallaxAtt/parallaxAtt.cgvp" />
       <texture destination="TexNormal" name="tex normal" />
+      <texture destination="TexNormalCompressed" name="tex normal compressed" />
       <texture destination="TexDiffuse" name="tex diffuse" />
       <texture destination="TexHeight" name="tex height" />
-	  <texture destination="TexAttn" name="light 0 attenuationtex" />
-	  <fp plugin="glcg">
-	    <cgfp>
-	      <?Include /shader/parallaxAtt/parallaxAtt.cgfp ?>
-	    </cgfp>
-	  </fp>
+      <texture destination="TexSpecular" name="tex specular" />
+	<texture destination="TexAttn" name="light 0 attenuationtex" />
+	<fp plugin="glcg">
+	  <cgfp>
+	    <?Include /shader/parallaxAtt/parallaxAtt.cgfp ?>
+	  </cgfp>
+	</fp>
     </pass>
   </technique>
   <technique priority="130">
@@ -60,8 +62,10 @@
 		  <buffer source="texture coordinate 0" destination="texture coordinate 0" />
 		  <vp plugin="glcg" file="/shader/parallaxAtt/parallax.cgvp" />
 		  <texture destination="TexNormal" name="tex normal" />
+              <texture destination="TexNormalCompressed" name="tex normal compressed" />
 		  <texture destination="TexDiffuse" name="tex diffuse" />
 		  <texture destination="TexHeight" name="tex height" />
+              <texture destination="TexSpecular" name="tex specular" />
 		  <fp plugin="glcg">
 			  <cgfp>
 				  <?Include /shader/parallaxAtt/parallax.cgfp ?>

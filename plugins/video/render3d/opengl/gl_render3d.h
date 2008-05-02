@@ -129,11 +129,13 @@ public:
 
 #ifdef CS_DEBUG
 #define GLRENDER3D_OUTPUT_STRING_MARKER(fmtParam)			    \
+  if (csGLGraphics3D::DoOutputMarkerString ())                              \
   { MakeAString mas fmtParam; csGLGraphics3D::OutputMarkerString (          \
     CS_FUNCTION_NAME, CS_STRING_TO_WIDE(__FILE__), __LINE__, mas); }
 #define GLRENDER3D_OUTPUT_LOCATION_MARKER				    \
-  csGLGraphics3D::OutputMarkerString (CS_FUNCTION_NAME, 		    \
-  CS_STRING_TO_WIDE(__FILE__), __LINE__, "")
+  if (csGLGraphics3D::DoOutputMarkerString ())                              \
+    csGLGraphics3D::OutputMarkerString (CS_FUNCTION_NAME, 		    \
+      CS_STRING_TO_WIDE(__FILE__), __LINE__, "")
 #else
 #define GLRENDER3D_OUTPUT_STRING_MARKER(fmtParam)
 #define GLRENDER3D_OUTPUT_LOCATION_MARKER
@@ -198,6 +200,7 @@ private:
   csEventID SystemOpen;
   csEventID SystemClose;
   csEventID CanvasResize;
+  csEventID Frame;
 
   csWeakRef<iBugPlug> bugplug;
 
@@ -214,6 +217,7 @@ private:
   float aspect, inv_aspect;
   bool needProjectionUpdate;
   float fov;
+  int scrwidth, scrheight;
   int viewwidth, viewheight;
   bool needViewportUpdate;
   csPoly3D frustum;
@@ -410,20 +414,25 @@ private:
   }
 
   void* RenderLock (iRenderBuffer* buffer, csGLRenderBufferLockType type, 
-    GLenum& compGLType);
+    GLenum& compGLType, bool& normalized);
   void RenderRelease (iRenderBuffer* buffer);
 
-/*  iRenderBuffer* vertattrib[16]; // @@@ Hardcoded max number of attributes
-  bool vertattribenabled[16]; // @@@ Hardcoded max number of attributes
-  bool vertattribenabled100[16]; // @@@ Hardcoded max number of attributes (for conventional)
- */ //iTextureHandle* texunit[16]; // @@@ Hardcoded max number of units
-  bool texunitenabled[16]; // @@@ Hardcoded max number of units
-  GLuint texunittarget[16]; // @@@ Hardcoded max number of units
-  csRef<csGLBasicTextureHandle> needNPOTSfixup[16]; // @@@ Hardcoded max number of units
+  struct ImageUnit : public CS::Memory::CustomAllocated
+  {
+    bool enabled;
+    GLuint target;
+    
+    csRef<csGLBasicTextureHandle> needNPOTSfixup;
+    bool npotsStatus;
+    
+    ImageUnit (): enabled (false), target (0), npotsStatus (false) {}
+  };
+  GLint numImageUnits;
+  ImageUnit* imageUnits;
+  GLint numTCUnits;
   /// Array of buffers used for NPOTS texture coord fixup
   csArray<csRef<iRenderBuffer> > npotsFixupScrap;
-  /// Whether an NPOTS scrap is attached to a TC bufer
-  bool npotsStatus[16];
+
   /// Whether the alpha channel of the color buffer should be scaled.
   bool needColorFixup;
   /// Amount to scale alpha channel of color buffer
@@ -484,6 +493,10 @@ public:
   virtual ~csGLGraphics3D ();
 
   iStringSet* GetStrings () { return strings; }
+  inline static bool DoOutputMarkerString ()
+  {
+    return ext && ext->CS_GL_GREMEDY_string_marker;
+  }
   static void OutputMarkerString (const char* function, const wchar_t* file,
     int line, const char* message);
   static void OutputMarkerString (const char* function, const wchar_t* file,
@@ -590,16 +603,7 @@ public:
   uint currentAttachments;
   bool SetRenderTarget (iTextureHandle* handle, bool persistent = false,
     int subtexture = 0, csRenderTargetAttachment attachment = rtaColor0);
-  /*{
-    render_target = handle;
-    r2tbackend->SetRenderTarget (handle, persistent, subtexture);
-
-    int hasRenderTarget = (handle != 0) ? 1 : 0;
-    G2D->PerformExtension ("userendertarget", hasRenderTarget);
-    viewwidth = G2D->GetWidth();
-    viewheight = G2D->GetHeight();
-    needViewportUpdate = true;
-  }*/
+  bool ValidateRenderTargets ();
   bool CanSetRenderTarget (const char* format,
     csRenderTargetAttachment attachment = rtaColor0);
   iTextureHandle* GetRenderTarget (

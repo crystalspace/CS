@@ -267,6 +267,10 @@ bool Simple::Initialize ()
   // Check for commandline help.
   if (csCommandLineHelper::CheckHelp (object_reg))
   {
+    csPrintf ("Usage: phystut [OPTIONS]\n");
+    csPrintf ("Physics tutorial for crystalspace\n\n");
+    csPrintf ("Options for phystut:\n");
+    csPrintf ("  -phys_engine:      specify which physics plugin to use\n");
     csCommandLineHelper::Help (object_reg);
     return false;
   }
@@ -551,8 +555,7 @@ bool Simple::CreateStarCollider ()
   starFact = engine->FindMeshFactory ("genstar");
   if (!starFact)
   {
-    iBase* rc;
-    loader->Load ("/lib/std/star.xml", rc);
+    loader->Load ("/lib/std/star.xml");
     starFact = engine->FindMeshFactory ("genstar");
     if (!starFact)
     {
@@ -653,7 +656,7 @@ iRigidBody* Simple::CreateSphere ()
 
   // Create a body and attach the mesh.
   csRef<iRigidBody> rb = dynSys->CreateBody ();
-  rb->SetProperties (radius.Norm()/2, csVector3 (0), csMatrix3 ());
+  rb->SetProperties (r, csVector3 (0), csMatrix3 ());
   rb->SetPosition (tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 1));
   rb->AttachMesh (mesh);
 

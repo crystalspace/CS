@@ -50,6 +50,9 @@ private:
   csSndSysManager* mgr;
   csRef<iSndSysData> data;
 
+protected:
+  void InternalRemove() { SelfDestruct(); }
+
 public:
   csSndSysWrapper (csSndSysManager* mgr, const char* name)
   	: scfImplementationType (this), mgr (mgr)

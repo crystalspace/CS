@@ -40,6 +40,9 @@ private:
   csRefArray<csShaderVariable> dummySVs;
   csShaderManager* mgr;
 
+protected:
+  void InternalRemove() { SelfDestruct(); }
+
 public:
   CS_LEAKGUARD_DECLARE (csNullShader);
 
@@ -79,6 +82,7 @@ public:
   void ReplaceVariable (csShaderVariable*) {}
   void Clear () { }
   bool RemoveVariable (csShaderVariable*) { return false; }
+  bool RemoveVariable (csStringID) { return false; }
   /** @} */
 
   /**\name iSelfDestruct implementation

@@ -199,6 +199,10 @@ class csXMLShader : public scfImplementationExt2<csXMLShader,
   {
     return activeTech ? activeTech->svcontext : globalSVContext;
   }
+
+protected:
+  void InternalRemove() { SelfDestruct(); }
+
 public:
   CS_LEAKGUARD_DECLARE (csXMLShader);
 
@@ -359,6 +363,12 @@ public:
     if (useFallbackContext)
       return fallbackShader->RemoveVariable (variable);
     return GetUsedSVContext().RemoveVariable (variable);
+  }
+  bool RemoveVariable (csStringID name)
+  {
+    if (useFallbackContext)
+      return fallbackShader->RemoveVariable (name);
+    return GetUsedSVContext().RemoveVariable (name);
   }
   /** @} */
 

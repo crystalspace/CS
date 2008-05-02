@@ -176,7 +176,7 @@ sector reference together with a world space coordinate to really know where
 you are.
 
 Portals in Crystal Space can solve the problem of polygon sorting if you
-structure your world strictly with convex sectors (not really recommonded for
+structure your world strictly with convex sectors (not really recommended for
 practical worlds).  All polygons
 in the current sector are certainly visible (unless they are behind the view
 plane) and do not overlap, so they can just be drawn in any order without

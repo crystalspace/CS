@@ -78,7 +78,7 @@ struct iRenderLoop : public iRenderStepContainer
  */
 struct iRenderLoopManager : public virtual iBase
 {
-  SCF_INTERFACE(iRenderLoopManager, 2,0,0);
+  SCF_INTERFACE(iRenderLoopManager, 3,0,0);
   /**
    * Create a new render loop.
    * \remark This render loop is "unnamed". To name it, use Register().
@@ -94,7 +94,7 @@ struct iRenderLoopManager : public virtual iBase
    * \return Whether the loop could be registered with the name. Fails if
    *  either the name is already used or the loop is already registered.
    */
-  virtual bool Register (const char* name, iRenderLoop* loop) = 0;
+  virtual bool Register (const char* name, iRenderLoop* loop, bool checkDupes = false) = 0;
   /**
    * Get the render loop associated with the name.
    * \param name Name for which the renderloop is to be retrieved.
@@ -120,6 +120,12 @@ struct iRenderLoopManager : public virtual iBase
    * \param fileName is the VFS path.
    */
   virtual csPtr<iRenderLoop> Load (const char* fileName) = 0;
+  /**
+   * Unregister all render loops.
+   * \param evenDefault Whether even the default render loop (identified by
+   *   the name #CS_DEFAULT_RENDERLOOP_NAME) should be unregistered.
+   */
+  virtual void UnregisterAll (bool evenDefault = false) = 0;
 };
  
 /**@}*/

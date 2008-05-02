@@ -149,10 +149,14 @@ csPtr<iRenderLoop> csRenderLoopManager::Create ()
   return csPtr<iRenderLoop> (loop);
 }
   
-bool csRenderLoopManager::Register (const char* name, iRenderLoop* loop)
+bool csRenderLoopManager::Register (const char* name, iRenderLoop* loop,
+                                    bool checkDupes)
 {
   const char* myName = strings.Request (strings.Request (name));
-  if (loops.In (myName)) return false;
+  if (loops.In (myName))
+  {
+    return checkDupes;
+  }
   loops.Put (myName, loop);
   return true;
 }
@@ -173,6 +177,37 @@ bool csRenderLoopManager::Unregister (iRenderLoop* loop)
   if ((key = loops.GetKey (loop, 0)) == 0) return false;
   loops.Delete (key, loop);
   return true;
+}
+  
+struct LoopNamePair
+{
+  const char* n;
+  iRenderLoop* l;
+    
+  LoopNamePair (const char* n, iRenderLoop* l) : n (n), l (l) {}
+};
+
+void csRenderLoopManager::UnregisterAll (bool evenDefault)
+{
+  if (evenDefault)
+  {
+    loops.DeleteAll();
+    return;
+  }
+  
+  LoopsHash::ConstGlobalIterator it (
+    const_cast<const LoopsHash*> (&loops)->GetIterator());
+  csArray<LoopNamePair> deleteList;
+  deleteList.SetCapacity (loops.GetSize());
+  while (it.HasNext())
+  {
+    const char* name;
+    iRenderLoop* loop = it.Next (name);
+    if (strcmp (name, CS_DEFAULT_RENDERLOOP_NAME) != 0)
+      deleteList.Push (LoopNamePair (name, loop));
+  }
+  for (size_t i = 0; i < deleteList.GetSize(); i++)
+    loops.Delete (deleteList[i].n, deleteList[i].l);
 }
 
 csPtr<iRenderLoop> csRenderLoopManager::Load (const char* fileName)

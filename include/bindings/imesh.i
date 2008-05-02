@@ -1,6 +1,3 @@
-#ifndef _SW_IMESH_I_
-#define _SW_IMESH_I_
-
 %module imesh
 %import "bindings/core.i"
 %import "bindings/ivaria.i"
@@ -16,4 +13,3 @@ INLINE_FUNCTIONS
 #endif
 
 %include "bindings/common/imesh.i"
-#endif //_SW_IMESH_I_

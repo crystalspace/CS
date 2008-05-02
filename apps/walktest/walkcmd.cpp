@@ -322,8 +322,8 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
     return;
   }
 
-  iBase* result;
-  if (!Sys->LevelLoader->Load (filename, result))
+  csLoadResult rc = Sys->LevelLoader->Load (filename);
+  if (!rc.success)
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
   	"There was an error reading model '%s'!", filename);
@@ -331,7 +331,7 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
   }
 
   csRef<iMeshFactoryWrapper> wrap = scfQueryInterface<iMeshFactoryWrapper> (
-  	result);
+  	rc.result);
   if (wrap)
     wrap->QueryObject ()->SetName (templatename);
 }

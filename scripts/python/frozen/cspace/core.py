@@ -179,6 +179,15 @@ class iBase(object):
     def GetInterfaceMetadata(*args): return _core.iBase_GetInterfaceMetadata(*args)
     def QueryInterface(*args): return _core.iBase_QueryInterface(*args)
     scfGetVersion = staticmethod(_core.iBase_scfGetVersion)
+    def __eq__(self,other):
+        if isinstance(other,iBase):
+            return self.this == other.this
+        return False
+    def __ne__(self,other):
+        if isinstance(other,iBase):
+            return not self.this == other.this
+        return True
+
 iBase_swigregister = _core.iBase_swigregister
 iBase_swigregister(iBase)
 iBase_scfGetVersion = _core.iBase_scfGetVersion
@@ -430,6 +439,19 @@ class csRefCount(object):
     def GetRefCount(*args): return _core.csRefCount_GetRefCount(*args)
 csRefCount_swigregister = _core.csRefCount_swigregister
 csRefCount_swigregister(csRefCount)
+
+class InternalRefCount(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _core.new_InternalRefCount(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def InternalIncRef(*args): return _core.InternalRefCount_InternalIncRef(*args)
+    def InternalDecRef(*args): return _core.InternalRefCount_InternalDecRef(*args)
+    def GetInternalRefCount(*args): return _core.InternalRefCount_GetInternalRefCount(*args)
+InternalRefCount_swigregister = _core.InternalRefCount_swigregister
+InternalRefCount_swigregister(InternalRefCount)
 
 csDefaultRunLoop = _core.csDefaultRunLoop
 csPlatformStartup = _core.csPlatformStartup
@@ -1130,10 +1152,12 @@ class iEventPlug(iBase):
     def GetPotentiallyConflictingEvents(*args): return _core.iEventPlug_GetPotentiallyConflictingEvents(*args)
     def QueryEventPriority(*args): return _core.iEventPlug_QueryEventPriority(*args)
     def EnableEvents(*args): return _core.iEventPlug_EnableEvents(*args)
+    scfGetVersion = staticmethod(_core.iEventPlug_scfGetVersion)
     __swig_destroy__ = _core.delete_iEventPlug
     __del__ = lambda self : None;
 iEventPlug_swigregister = _core.iEventPlug_swigregister
 iEventPlug_swigregister(iEventPlug)
+iEventPlug_scfGetVersion = _core.iEventPlug_scfGetVersion
 
 class iEventOutlet(iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -1146,10 +1170,12 @@ class iEventOutlet(iBase):
     def Joystick(*args): return _core.iEventOutlet_Joystick(*args)
     def Broadcast(*args): return _core.iEventOutlet_Broadcast(*args)
     def ImmediateBroadcast(*args): return _core.iEventOutlet_ImmediateBroadcast(*args)
+    scfGetVersion = staticmethod(_core.iEventOutlet_scfGetVersion)
     __swig_destroy__ = _core.delete_iEventOutlet
     __del__ = lambda self : None;
 iEventOutlet_swigregister = _core.iEventOutlet_swigregister
 iEventOutlet_swigregister(iEventOutlet)
+iEventOutlet_scfGetVersion = _core.iEventOutlet_scfGetVersion
 
 class iEventCord(iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -1956,6 +1982,8 @@ class iImage(iBase):
     def GetImageType(*args): return _core.iImage_GetImageType(*args)
     def HasSubImages(*args): return _core.iImage_HasSubImages(*args)
     def GetSubImage(*args): return _core.iImage_GetSubImage(*args)
+    def GetCookedImageFormat(*args): return _core.iImage_GetCookedImageFormat(*args)
+    def GetCookedImageData(*args): return _core.iImage_GetCookedImageData(*args)
     scfGetVersion = staticmethod(_core.iImage_scfGetVersion)
     __swig_destroy__ = _core.delete_iImage
     __del__ = lambda self : None;
@@ -2062,7 +2090,7 @@ class pycsObject(iObject):
 pycsObject_swigregister = _core.pycsObject_swigregister
 pycsObject_swigregister(pycsObject)
 
-class csObject(pycsObject):
+class csObject(pycsObject,InternalRefCount):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
@@ -2102,6 +2130,13 @@ csevAllEvents = _core.csevAllEvents
 csevFrame = _core.csevFrame
 csevInput = _core.csevInput
 csevQuit = _core.csevQuit
+csevCanvasClose = _core.csevCanvasClose
+csevCanvasExposed = _core.csevCanvasExposed
+csevCanvasHidden = _core.csevCanvasHidden
+csevCanvasResize = _core.csevCanvasResize
+csevFocusChanged = _core.csevFocusChanged
+csevFocusGained = _core.csevFocusGained
+csevFocusLost = _core.csevFocusLost
 csevKeyboardEvent = _core.csevKeyboardEvent
 csevKeyboardDown = _core.csevKeyboardDown
 csevKeyboardUp = _core.csevKeyboardUp
@@ -2197,6 +2232,34 @@ CS_LOAD_PLUGIN = _core.CS_LOAD_PLUGIN
 CS_GET_CHILD_OBJECT = _core.CS_GET_CHILD_OBJECT
 CS_GET_NAMED_CHILD_OBJECT = _core.CS_GET_NAMED_CHILD_OBJECT
 CS_GET_FIRST_NAMED_CHILD_OBJECT = _core.CS_GET_FIRST_NAMED_CHILD_OBJECT
+class csPyEventPlugParent(iEventPlug):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def IncRef(*args): return _core.csPyEventPlugParent_IncRef(*args)
+    def DecRef(*args): return _core.csPyEventPlugParent_DecRef(*args)
+    def GetRefCount(*args): return _core.csPyEventPlugParent_GetRefCount(*args)
+    def QueryInterface(*args): return _core.csPyEventPlugParent_QueryInterface(*args)
+    def AddRefOwner(*args): return _core.csPyEventPlugParent_AddRefOwner(*args)
+    def RemoveRefOwner(*args): return _core.csPyEventPlugParent_RemoveRefOwner(*args)
+    def GetInterfaceMetadata(*args): return _core.csPyEventPlugParent_GetInterfaceMetadata(*args)
+csPyEventPlugParent_swigregister = _core.csPyEventPlugParent_swigregister
+csPyEventPlugParent_swigregister(csPyEventPlugParent)
+
+class csPyEventPlug(csPyEventPlugParent):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _core.new_csPyEventPlug(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _core.delete_csPyEventPlug
+    __del__ = lambda self : None;
+    def GetPotentiallyConflictingEvents(*args): return _core.csPyEventPlug_GetPotentiallyConflictingEvents(*args)
+    def QueryEventPriority(*args): return _core.csPyEventPlug_QueryEventPriority(*args)
+csPyEventPlug_swigregister = _core.csPyEventPlug_swigregister
+csPyEventPlug_swigregister(csPyEventPlug)
+
 class csPyEventHandlerParent(iEventHandler):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
@@ -2305,6 +2368,9 @@ csInitializer.InitializeSCF = staticmethod(_csInitializer_CreateEnvironment)
 corecvar = cvar
 def CS_REQUEST_PLUGIN (name, intf):
   return (name, intf.__name__, 
+     corecvar.iSCF_SCF.GetInterfaceID(intf.__name__),intf.scfGetVersion())
+def CS_REQUEST_PLUGIN_TAG (name, intf, tag):
+  return (name+":"+tag, intf.__name__, 
      corecvar.iSCF_SCF.GetInterfaceID(intf.__name__),intf.scfGetVersion())
 def CS_REQUEST_VFS ():
   return CS_REQUEST_PLUGIN("crystalspace.kernel.vfs", iVFS)

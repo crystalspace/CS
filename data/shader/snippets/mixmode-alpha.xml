@@ -21,12 +21,24 @@
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
     <input name="inputColor" type="rgba" />
-    <input file="/shader/snippets/primaryColor.inp" private="yes"/>
-    <input file="/shader/snippets/primaryColor.inp" private="yes"/>
+    
+    <input name="mixModeAlpha" type="float" default="complex" private="yes">
+      <block location="cg:variablemap">
+	<variablemap variable="mixmode alpha" destination="fragmentIn.mixModeAlpha" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<uniform type="float" name="mixModeAlpha" />
+      </block>
+      
+      <block location="cg:fragmentMain">
+	mixModeAlpha = fragmentIn.mixModeAlpha;
+      </block>
+    </input>
     
     <block location="cg:fragmentMain">
       outputColor.rgb = inputColor.rgb;
-      outputColor.a = inputColor.a * primaryColor.a;
+      outputColor.a = inputColor.a * mixModeAlpha;
     </block>
     
     <output name="outputColor" type="rgba" />

@@ -48,7 +48,8 @@ namespace CS
     /// \brief The operation failed due to a memory allocation failure
     QUEUE_ERR_NOMEM  = -2,
 
-    /// \brief The operation failed due to another currently existing equivalent entry
+    /// \brief The operation failed due to another currently existing
+    ///   equivalent entry
     ///
     /// If the queue is configured to check for duplicate entries, then  
     ///  this result may be returned
@@ -69,28 +70,30 @@ namespace CS
   };    
 
   //////////////////////////////////////////////////////////////////////////
-  /// \brief A threadsafe, pointer-passing queue (First-In First-Out) implementation 
-  ///   for the sound system.
+  /// \brief A threadsafe, pointer-passing queue (First-In First-Out)
+  ///   implementation for the sound system.
   ///
-  /// \warning csRef<> is not threadsafe, and csPtr<> doesn't let us do anything with
-  ///   the object referenced inside so this class, which is specifically designed
-  ///   to communicate between threads, has no choice but to use raw pointers.
-  ///   If this is used to communicate between threads, the 'feeder' thread should
-  ///   incref the object before passing it into the queue.  The 'consumer' thread
-  ///   should NOT touch the refcount unless it's certain that no other thread will
-  ///   be touching the refcount.  This makes cleanup ... interesting.
-  ///   One possible method for cleanup is for the 'consumer' thread which implicitly
-  ///   holds a single reference (passed from the 'feeder') to wait for the
-  ///   refcount to reach 1 before releasing it's refcount, since
+  /// \warning csRef<> is not threadsafe, and csPtr<> doesn't let us do
+  ///   anything with the object referenced inside so this class, which is
+  ///   specifically designed to communicate between threads, has no choice
+  ///   but to use raw pointers.
+  ///   If this is used to communicate between threads, the 'feeder' thread
+  ///   should incref the object before passing it into the queue.
+  ///   The 'consumer' thread should NOT touch the refcount unless it's
+  ///   certain that no other thread will be touching the refcount.
+  ///   This makes cleanup ... interesting.
+  ///   One possible method for cleanup is for the 'consumer' thread which
+  ///   implicitly holds a single reference (passed from the 'feeder') to
+  ///   wait for the refcount to reach 1 before releasing it's refcount, since
   ///   a refcount of 1 means that it should have the only reference and thus
   ///   should be guaranteed to be the only thread working with the refcount.
-  ///   Another possibility is for the 'consumer' thread to queue this object back to
-  ///   the 'feeder' thread (through another queue), which will perform the 
-  ///   decref itself.
+  ///   Another possibility is for the 'consumer' thread to queue this object
+  ///   back to the 'feeder' thread (through another queue), which will
+  ///   perform the decref itself.
   ///
   /// \warning If an object passed through this queue is meant to be accessed
-  ///   from multiple threads at once, the object must contain threadsafe methods
-  ///   itself.
+  ///   from multiple threads at once, the object must contain threadsafe
+  ///   methods itself.
   //////////////////////////////////////////////////////////////////////////
   template<typename T>
   class Queue
@@ -111,10 +114,10 @@ namespace CS
 
     /// \brief Clear all entries in the queue.
     ///
-    /// \warning This call will NOT delete the underlying object, or release any
-    ///   reference counts. To clear the queue in a more controlled manner, consider
-    ///   calling Close(true), then fetching each queue entry and handling them as
-    ///   appropriate for your use.
+    /// \warning This call will NOT delete the underlying object, or release
+    ///   any reference counts. To clear the queue in a more controlled
+    ///   manner, consider calling Close(true), then fetching each queue entry
+    ///   and handling them as appropriate for your use.
     void Clear()
     { 
       QEntry<T> *del;

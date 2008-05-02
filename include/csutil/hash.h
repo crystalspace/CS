@@ -232,6 +232,38 @@ public:
   }
 };
 
+template <class T, class K, 
+  class ArrayMemoryAlloc, class ArrayElementHandler> class csHash;
+
+namespace CS
+{
+  namespace Container
+  {
+    /**
+     * An element of a hash.
+     * This class is internally used by csHash<>. However, it has to be used
+     * when a custom element handler needs to be used.
+     */
+    template <class T, class K>
+    class HashElement
+    {
+    private:
+      template <class _T, class _K, class ArrayMemoryAlloc,
+        class ArrayElementHandler> friend class csHash;
+      
+      const K key;
+      T value;
+
+      HashElement (const K& key0, const T &value0) : key (key0), value (value0) {}
+    public:
+      HashElement (const HashElement& other) : key (other.key), value (other.value) {}
+      
+      const K& GetKey() const { return key; }
+      const T& GetValue() const { return value; }
+      T& GetValue() { return value; }
+    };
+  } // namespace Container
+} // namespace CS
 
 /**
  * A generic hash table class,
@@ -243,36 +275,31 @@ public:
  * are already provided) or special hash algorithms. 
  */
 template <class T, class K = unsigned int, 
-  class ArrayMemoryAlloc = CS::Memory::AllocatorMalloc> 
+  class ArrayMemoryAlloc = CS::Memory::AllocatorMalloc,
+  class ArrayElementHandler = csArrayElementHandler<
+    CS::Container::HashElement<T, K> > > 
 class csHash
 {
 public:
-  typedef csHash<T, K, ArrayMemoryAlloc> ThisType;
+  typedef csHash<T, K, ArrayMemoryAlloc, ArrayElementHandler> ThisType;
   typedef T ValueType;
   typedef K KeyType;
   typedef ArrayMemoryAlloc AllocatorType;
 
 protected:
-  struct Element
-  {
-    const K key;
-    T value;
-
-    Element (const K& key0, const T &value0) : key (key0), value (value0) {}
-    Element (const Element &other) : key (other.key), value (other.value) {}
-  };
-  typedef csArray<Element, csArrayElementHandler<Element>,
-    ArrayMemoryAlloc> ElementArray;
+  typedef CS::Container::HashElement<T, K> Element;
+  typedef csArray<Element,
+    ArrayElementHandler, ArrayMemoryAlloc> ElementArray;
   csArray<ElementArray, csArrayElementHandler<ElementArray>,
     ArrayMemoryAlloc> Elements;
 
   size_t Modulo;
+  size_t Size;
 
 private:
   size_t InitModulo;
   size_t GrowRate;
   size_t MaxSize;
-  size_t Size;
 
   void Grow ()
   {
@@ -328,15 +355,16 @@ public:
    * For a bigger list go to http://www.utm.edu/research/primes/
    */
   csHash (size_t size = 23, size_t grow_rate = 5, size_t max_size = 20000)
-    : Modulo (size), InitModulo (size),
-      GrowRate (MIN (grow_rate, size)), MaxSize (max_size), Size (0)
+    : Modulo (size), Size(0), InitModulo (size),
+      GrowRate (MIN (grow_rate, size)), MaxSize (max_size)
   {
   }
 
   /// Copy constructor.
-  csHash (const csHash<T> &o) : Elements (o.Elements),
-    Modulo (o.Modulo), InitModulo (o.InitModulo),
-    GrowRate (o.GrowRate), MaxSize (o.MaxSize), Size (o.Size) {}
+  csHash (const csHash<T, K, ArrayMemoryAlloc, ArrayElementHandler> &o) : 
+    Elements (o.Elements),
+    Modulo (o.Modulo), Size(o.Size), InitModulo (o.InitModulo),
+    GrowRate (o.GrowRate), MaxSize (o.MaxSize) {}
 
   /**
    * Add an element to the hash table.
@@ -361,6 +389,21 @@ public:
       return *(GetElementPointer (key));
     }
     return values[idx].value;
+  }
+
+  /// Get all the elements, or empty if there are none.
+  csArray<T> GetAll () const
+  {
+    if (Elements.GetSize() == 0) return csArray<T> ();
+
+    ConstGlobalIterator itr = GetIterator();
+    csArray<T> ret;
+    while(itr.HasNext())
+    {
+      ret.Push(itr.Next());
+    }
+
+    return ret;
   }
 
   /// Get all the elements with the given key, or empty if there are none.
@@ -621,27 +664,28 @@ public:
   class Iterator
   {
   private:
-    csHash<T, K>* hash;
+    csHash<T, K, ArrayMemoryAlloc, ArrayElementHandler>* hash;
     const K key;
     size_t bucket, size, element;
 
     void Seek ()
     {
       while ((element < size) && 
-        (csComparator<K, K>::Compare (hash->Elements[bucket][element].key, 
+        (csComparator<K, K>::Compare (hash->Elements[bucket][element].GetKey(), 
 	key) != 0))
           element++;
     }
 
   protected:
-    Iterator (csHash<T, K>* hash0, const K& key0) :
+    Iterator (csHash<T, K, ArrayMemoryAlloc, ArrayElementHandler>* hash0, 
+      const K& key0) :
       hash(hash0),
       key(key0), 
       bucket(csHashComputer<K>::ComputeHash (key) % hash->Modulo),
       size((hash->Elements.GetSize() > 0) ? hash->Elements[bucket].GetSize () : 0)
       { Reset (); }
 
-    friend class csHash<T, K>;
+    friend class csHash<T, K, ArrayMemoryAlloc, ArrayElementHandler>;
   public:
     /// Copy constructor.
     Iterator (const Iterator &o) :
@@ -671,7 +715,7 @@ public:
     /// Get the next element's value.
     T& Next ()
     {
-      T &ret = hash->Elements[bucket][element].value;
+      T &ret = hash->Elements[bucket][element].GetValue();
       element++;
       Seek ();
       return ret;
@@ -686,7 +730,7 @@ public:
   class GlobalIterator
   {
   private:
-    csHash<T, K> *hash;
+    csHash<T, K, ArrayMemoryAlloc, ArrayElementHandler> *hash;
     size_t bucket, size, element;
 
     void Zero () { bucket = element = 0; }
@@ -713,14 +757,15 @@ public:
     }
 
   protected:
-    GlobalIterator (csHash<T, K> *hash0) : hash (hash0) 
+    GlobalIterator (csHash<T, K, ArrayMemoryAlloc, ArrayElementHandler> *hash0)
+    : hash (hash0) 
     { 
       Zero (); 
       Init (); 
       FindItem ();
     }
 
-    friend class csHash<T, K>;
+    friend class csHash<T, K, ArrayMemoryAlloc, ArrayElementHandler>;
   public:
     /// Copy constructor.
     GlobalIterator (const GlobalIterator &o) :
@@ -756,7 +801,7 @@ public:
     /// Get the next element's value, don't move the iterator.
     T& NextNoAdvance ()
     {
-      return hash->Elements[bucket][element].value;
+      return hash->Elements[bucket][element].GetValue();
     }
 
     /// Get the next element's value.
@@ -770,14 +815,14 @@ public:
     /// Get the next element's value and key, don't move the iterator.
     T& NextNoAdvance (K &key)
     {
-      key = hash->Elements[bucket][element].key;
+      key = hash->Elements[bucket][element].GetKey();
       return NextNoAdvance ();
     }
 
     /// Get the next element's value and key.
     T& Next (K &key)
     {
-      key = hash->Elements[bucket][element].key;
+      key = hash->Elements[bucket][element].GetKey();
       return Next ();
     }
 
@@ -785,7 +830,7 @@ public:
     const csTuple2<T, K> NextTuple ()
     {
       csTuple2<T, K> t (NextNoAdvance (),
-          hash->Elements[bucket][element].key);
+        hash->Elements[bucket][element].GetKey());
       Advance ();
       return t;
     }
@@ -799,7 +844,7 @@ public:
   class ConstIterator
   {
   private:
-    const csHash<T, K>* hash;
+    const csHash<T, K, ArrayMemoryAlloc, ArrayElementHandler>* hash;
     const K key;
     size_t bucket, size, element;
 
@@ -812,14 +857,15 @@ public:
     }
 
   protected:
-    ConstIterator (const csHash<T, K>* hash0, const K& key0) :
+    ConstIterator (const csHash<T, K, ArrayMemoryAlloc, ArrayElementHandler>* 
+	hash0, const K& key0) :
       hash(hash0),
       key(key0), 
       bucket(csHashComputer<K>::ComputeHash (key) % hash->Modulo),
       size((hash->Elements.GetSize() > 0) ? hash->Elements[bucket].GetSize () : 0)
       { Reset (); }
 
-    friend class csHash<T, K>;
+    friend class csHash<T, K, ArrayMemoryAlloc, ArrayElementHandler>;
   public:
     /// Copy constructor.
     ConstIterator (const ConstIterator &o) :
@@ -864,7 +910,7 @@ public:
   class ConstGlobalIterator
   {
   private:
-    const csHash<T, K> *hash;
+    const csHash<T, K, ArrayMemoryAlloc, ArrayElementHandler> *hash;
     size_t bucket, size, element;
 
     void Zero () { bucket = element = 0; }
@@ -891,14 +937,15 @@ public:
     }
 
   protected:
-    ConstGlobalIterator (const csHash<T, K> *hash0) : hash (hash0) 
+    ConstGlobalIterator (const csHash<T, K, ArrayMemoryAlloc,
+      ArrayElementHandler> *hash0) : hash (hash0) 
     { 
       Zero (); 
       Init (); 
       FindItem ();
     }
 
-    friend class csHash<T, K>;
+    friend class csHash<T, K, ArrayMemoryAlloc, ArrayElementHandler>;
   public:
     /// Copy constructor.
     ConstGlobalIterator (const ConstGlobalIterator &o) :
@@ -934,7 +981,7 @@ public:
     /// Get the next element's value, don't move the iterator.
     const T& NextNoAdvance ()
     {
-      return hash->Elements[bucket][element].value;
+      return hash->Elements[bucket][element].GetValue();
     }
 
     /// Get the next element's value.
@@ -948,14 +995,14 @@ public:
     /// Get the next element's value and key, don't move the iterator.
     const T& NextNoAdvance (K &key)
     {
-      key = hash->Elements[bucket][element].key;
+      key = hash->Elements[bucket][element].GetKey();
       return NextNoAdvance ();
     }
 
     /// Get the next element's value and key.
     const T& Next (K &key)
     {
-      key = hash->Elements[bucket][element].key;
+      key = hash->Elements[bucket][element].GetKey();
       return Next ();
     }
 
@@ -963,7 +1010,7 @@ public:
     const csTuple2<T, K> NextTuple ()
     {
       csTuple2<T, K> t (NextNoAdvance (),
-          hash->Elements[bucket][element].key);
+        hash->Elements[bucket][element].GetKey());
       Advance ();
       return t;
     }

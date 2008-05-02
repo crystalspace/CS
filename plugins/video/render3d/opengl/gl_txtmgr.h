@@ -142,6 +142,8 @@ public:
   bool enableNonPowerOfTwo2DTextures;
 
   bool hasPBO;
+  /// Some drivers seem to ignore glGenerateMipmap calls
+  bool disableGenerateMipmap;
 
   csGLTextureManager (iObjectRegistry* object_reg,
         iGraphics2D* iG2D, iConfigFile *config,
@@ -162,7 +164,7 @@ public:
   {
     return textureClassIDs.Request (classID);
   }
-
+  
   /**
    * Helper function to make sure a texture isn't selected on any TU.
    * Useful when deleting a texture.
@@ -199,6 +201,8 @@ public:
 
   /// Dump all SLMs to image files.
   void DumpSuperLightmaps (iVFS* VFS, iImageIO* iio, const char* dir);
+  
+  void DumpTextures (iVFS* VFS, iImageIO* iio, const char* dir);
 };
 
 }

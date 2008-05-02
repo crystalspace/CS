@@ -34,12 +34,6 @@
     {
       // error
     }
-    else if (!strcasecmp(command, "flush"))
-    {
-      // csGraphics2DGLCommon
-      bool ok = self->PerformExtension(command);
-      return PyInt_FromLong(long(ok));
-    }
     else if (!strcasecmp(command, "getstatecache"))
     {
       // csGraphics2DGLCommon
@@ -67,13 +61,8 @@
       PyTuple_SetItem(res, 1, PyInt_FromLong(long(yes)));
       return res;
     }
-    else if (!strcasecmp(command, "configureopengl"))
-    {
-      // csGraphics2DOpenGL
-      bool ok = self->PerformExtension(command);
-      return PyInt_FromLong(long(ok));
-    }
-  return PyInt_FromLong(0);
+    // pass through and hope the operation doesnt require parameters.
+    return PyInt_FromLong(self->PerformExtension(command));
   }
 
   %pythoncode %{

@@ -257,7 +257,7 @@ csPtr<iScriptObject> csPerl5::New(const char *name,
 void csPerl5::StoreObjectReg()
 {
   csRefArray<iScriptValue> args;
-  args.Push (csRef<iScriptValue> (RValue ((int)(iObjectRegistry*) object_reg)));
+  args.Push (csRef<iScriptValue> (RValue ((iObjectRegistry*) object_reg)));
 
   csRef<iScriptValue> discard (Call ("_SetObjectReg", args));
 }

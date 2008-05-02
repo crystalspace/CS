@@ -86,6 +86,8 @@ public:
   virtual void SetMaterialMask (unsigned int material, const unsigned char*
     data, unsigned int width, unsigned int height);
 
+  virtual void SetAlphaMask (iMaterialWrapper* material, iImage* alphaMap);
+
   virtual void SetBaseMaterial (iMaterialWrapper* material);
   virtual iMaterialWrapper* GetBaseMaterial () const;
 

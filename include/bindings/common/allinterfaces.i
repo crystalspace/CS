@@ -23,6 +23,8 @@
 %define IENGINE_APPLY_FOR_EACH_INTERFACE
   INTERFACE_APPLY(iCamera)
   INTERFACE_APPLY(iCameraPosition)
+  INTERFACE_APPLY(iCollection)
+  INTERFACE_APPLY(iCollectionArray)
   INTERFACE_APPLY(iEngine)
   INTERFACE_APPLY(iFrustumView)
   INTERFACE_APPLY(iFrustumViewUserdata)
@@ -54,6 +56,7 @@
   INTERFACE_APPLY(iBinaryLoaderPlugin)
   INTERFACE_APPLY(iLoader)
   INTERFACE_APPLY(iLoaderPlugin)
+  INTERFACE_APPLY(iMissingLoaderData)
 %enddef
 
 %define IMESH_APPLY_FOR_EACH_INTERFACE
@@ -124,6 +127,7 @@
 
 %define IVARIA_APPLY_FOR_EACH_INTERFACE
   INTERFACE_APPLY(iBodyGroup)
+  INTERFACE_APPLY(iBugPlug)
   INTERFACE_APPLY(iDynamics)
   INTERFACE_APPLY(iDynamicSystem)
   INTERFACE_APPLY(iJoint)
@@ -144,6 +148,10 @@
 /*  INTERFACE_APPLY(iReporter)
   INTERFACE_APPLY(iReporterIterator)
   INTERFACE_APPLY(iReporterListener)*/
+  INTERFACE_APPLY(iSequence)
+  INTERFACE_APPLY(iSequenceCondition)
+  INTERFACE_APPLY(iSequenceManager)
+  INTERFACE_APPLY(iSequenceOperation)
   INTERFACE_APPLY(iSimpleFormerState)
   INTERFACE_APPLY(iStandardReporterListener)
   INTERFACE_APPLY(iEngineSequenceManager)
@@ -153,6 +161,7 @@
   INTERFACE_APPLY(iDecalTemplate)
   INTERFACE_APPLY(iMovieRecorder)
   INTERFACE_APPLY(iView)
+  INTERFACE_APPLY(iTranslator)
 %enddef
 
 %define IVIDEO_APPLY_FOR_EACH_INTERFACE
@@ -188,8 +197,10 @@
   INTERFACE_APPLY(iDocumentSystem)
   INTERFACE_APPLY(iEvent)
   INTERFACE_APPLY(iEventHandler)
+  INTERFACE_APPLY(iEventPlug)
   INTERFACE_APPLY(iEventQueue)
   INTERFACE_APPLY(iEventNameRegistry)
+  INTERFACE_APPLY(iEventOutlet)
   INTERFACE_APPLY(iFactory)
   INTERFACE_APPLY(iFile)
   INTERFACE_APPLY(iImage)

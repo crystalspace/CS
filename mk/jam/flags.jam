@@ -1,5 +1,7 @@
 #============================================================================
 # Rules for specifying compiler and linker flags
+# Copyright (C)2003-2008 by Eric Sunshine <sunshine@sunshineco.com>
+# Copyright (C)2005-2007 by Frank Richter
 # Copyright (C)2003 by Matze Braun <matzebraun@users.sourceforge.net>
 #
 #    This library is free software; you can redistribute it and/or modify it
@@ -40,10 +42,14 @@ rule LinkWith
   }
 
   Depends $($(<)_TARGET) : $(rawlibs) ;
-  NEEDLIBS on $($(<)_TARGET) += $(libs) ;
+  NEEDLIBS on $($(<)_TARGET) =
+    [ MergeRemovingDups [ on $($(<)_TARGET) GetVar NEEDLIBS ] : $(libs) ] ;
   $(<).NEEDLIBS += $(rawlibs) ;
 
-  LFlags $(<) : $($($(rawlibs).EXTERNALLIBS).LFLAGS) ;
+  for l in $(rawlibs)
+  {
+    LFlags $(<) : $($($(l).EXTERNALLIBS).LFLAGS) ;
+  }
 }
 
 ##  CFlags target : flags [ : options ]
@@ -51,57 +57,30 @@ rule LinkWith
 ##    This rule affects c++ and c compiler flags.
 rule CFlags
 {
-  CheckOptions nostatic : $(3) : $(<) ;
+  local target = $(1) ;
+  local flags = [ InferFlagTuples $(2) ] ;
+  local options = $(3) ;
 
-  CCFLAGS on $($(<)_OBJECTS) += $(>) ;
-  C++FLAGS on $($(<)_OBJECTS) += $(>) ;
+  CCFLAGS on $($(target)_OBJECTS) += $(flags) ;
+  C++FLAGS on $($(target)_OBJECTS) += $(flags) ;
 
-  UnitTestCFlags $(<) : $(>) : $(3) ;
-}
-
-##  MergeLFlags flags1 : flags2
-##    Merge two arrays of linker flags. Removes duplicate entries, however,
-##    ensures that the correct relative right-to-left order of both flag arrays
-##    is kept.
-rule MergeLFlags
-{
-  local result = ;
-  local libs2 = $(2) ;
-  for l in $(1)
-  {
-    if [ IsElem $(l) : $(libs2) ]
-    {
-      # If a flag from set 1 is in set 2, add all flags from start of set 2
-      # to the occurance of the flag to result.
-      while "$(libs2[1])" != "" && $(libs2[1]) != $(l)
-      {
-        result += $(libs2[1]) ;
-        libs2 = $(libs2[2-]) ;
-      }
-      result += $(libs2[1]) ;
-      libs2 = $(libs2[2-]) ;
-    }
-    else
-    {
-      # Just add the flag.
-      result += $(l) ;
-    }
-  }
-  result += $(libs2) ;
-  return $(result) ;
+  UnitTestCFlags $(target) : $(flags) : $(options) ;
 }
 
 ##  LFlags target : flags [ : options ]
 ##    Sets linker flags for a library, plugin or application target
 rule LFlags
 {
-  CheckOptions nostatic : $(3) : $(<) ;
+  local target = $(1) ;
+  local flags = [ InferFlagTuples $(2) ] ;
+  local options = $(3) ;
 
-  NotFile $(>) ;
-  NEEDLIBS on $($(<)_TARGET) += $(>) ;
-  $(<).LFLAGS += $(>) ;
+  NotFile $(flags) ;
+  NEEDLIBS on $($(target)_TARGET) =
+    [ RemoveDupFlags [ on $($(target)_TARGET) GetVar NEEDLIBS ] $(flags) ] ;
+  $(target).LFLAGS = [ RemoveDupFlags $($(target).LFLAGS) $(flags) ] ;
 
-  UnitTestLFlags $(<) : $(>) : $(3) ;
+  UnitTestLFlags $(target) : $(flags) : $(options) ;
 }
 
 ##  ExternalLibs target : identifiers
@@ -148,19 +127,18 @@ rule ExtraObjects
   Clean clean : $(>) ;
 }
 
-##  RelayLib target : indentifier : relaylibs
+##  RelayLibs target : indentifier : relaylibs
 ##    Link external libraries identified by 'identifier' with 'target' with
 ##    the help of "relaytool". This tool provides a wrapper object file that
 ##    dynamically loads the requested library at runtime. The client code can
-##    check if a library is actually available and react gracefully if not -
-##    this is much more end-user friendly than a refusal by the application to
+##    check if a library is actually available and react gracefully if not.
+##    This is much more end-user friendly than a refusal by the application to
 ##    start due to a missing dependency.
 ##    From the external dependency identified by 'identifier' the individual
 ##    libraries specified in 'relaylibs' will be dynamically loaded. For each
-##    library 'whatever' a symbol 'libwhatever_is_present' will be provided.
+##    library 'foo' a symbol 'libfoo_is_present' will be provided.
 rule RelayLibs
 {
-  CheckOptions relay_all : $(4) : $(<) ;
   if ! $(CMD.RELAYTOOL)
   {
     # Create fake libwhatever_is_present() symbols
@@ -180,18 +158,20 @@ rule RelayLibs
   }
   else
   {
-    local extlib ;
     local relayparamslist = "--relay $(3)" ;
     local relayparam = $(relayparamslist[1]) ;
+    local r ;
     for r in $(relayparamslist[2-])
     {
       relayparam = "$(relayparam) $(r)" ;
     }
     local cflags = "$(CCFLAGS[1])" ;
+    local c ;
     for c in $(CCFLAGS[2-])
     {
       cflags = "$(cflags) $(c)" ;
     }
+    local extlib ;
     for extlib in $(>)
     {
       CFlags $(<) : $($(extlib).CFLAGS) ;
@@ -211,6 +191,62 @@ actions WriteRelayLibStub
   echo "int lib${whatever}_symbol_is_present (char* s) { return 1; }" >> $(<)
 }
 
+##  MergeLFlags flags1 : flags2
+##    Merge two arrays of linker flags.
+##    DEPRECATED: Use the generic MergeRemovingDups rule instead.
+rule MergeLFlags
+{
+  return [ MergeRemovingDups $(1) : $(2) ] ;
+}
+
+##  InferFlagTuples switches
+##    Given an array of build switches, infer which switches consist of
+##    multiple arguments, and return a list in the same order but with
+##    multiple-argument switches converted to atomic array elements. For
+##    instance, given the seven-element input array [-foo, -bar, cow, -smurf,
+##    -flub, glub, blug], returns the four-element array [-foo, -bar cow,
+##    -smurf, -flub glub blug].  Multiple-argument switches are identified by a
+##    token with "-" or "/" prefix or by the shell backtick (`) operator,
+##    followed by one or more non-prefixed tokens.  The shell backtick operator
+##    is considered a switch-introducer since it may be used by specialized
+##    build rules to determine build flags dynamically at build-time (rather
+##    than statically at configuration time).
+rule InferFlagTuples
+{
+  local tuples ;
+  local accum ;
+  local flag ;
+  for flag in $(1)
+  {
+    if [ Match ^([-/`][A-Za-z0-9]) : $(flag) ]
+    {
+      if $(accum)
+      {
+        tuples += $(accum:J=" ") ;
+        accum = ;
+      }
+    }
+    accum += $(flag) ;
+  }
+  if $(accum)
+  {
+    tuples += $(accum:J=" ") ;
+  }
+  return $(tuples) ;
+}
+
+##  RemoveDupFlags switches
+##    Remove duplicates from an array of build switches. Unlike the generic
+##    RemoveDups rule which removes all but the first duplicated item,
+##    RemoveDupFlags removes all but the last duplicated item. This makes it
+##    convenient for folding duplicates out of an array of linker switches,
+##    which typically are order-sensitive, and in which the final instance of a
+##    duplicated switch has highest precedence.
+rule RemoveDupFlags
+{
+  return [ Reverse [ RemoveDups [ Reverse $(1) ] ] ] ;
+}
+
 #----------------------------------------------------------------------------
 # private part
 
@@ -228,8 +264,5 @@ rule ResolveLibs
   {
       libs += $(i) $($(i)_depends) ;
   }
-  # We must eliminate the duplicates in reverse order in order to ensure that
-  # we do not destroy the overall library ordering since Unix linkers are
-  # order-sensitive.
-  return [ Reverse [ RemoveDups [ Reverse $(libs) ] ] ] ;
+  return [ RemoveDupFlags $(libs) ] ;
 }

@@ -354,7 +354,18 @@ IEVENTOUTLET_CSHARPCODE
 
 %enddef
 
+#undef ICOLLECTIONARRAY_CSHARPCODE
+%define ICOLLECTIONARRAY_CSHARPCODE
+%typemap(cscode) iCollectionArray
+%{
+  INTERFACE_EQUALS
+  INTERFACE_HANDLE(virtual)
+%}
+
+%enddef
+
 IBASE_CSHAPCODE
+ICOLLECTIONARRAY_CSHARPCODE
 
 #undef BUFFER_RW_FUNCTIONS
 %define BUFFER_RW_FUNCTIONS(ClassName,DataFunc,CountFunc,ElmtType,BufGetter)
@@ -519,7 +530,7 @@ ICONFIGMANAGER_CSHARPCODE
 %rename(GetNodeType) iDocumentNode::GetType;
 %rename(GetVariableType) csShaderVariable::GetType;
 %rename(SetVariableType) csShaderVariable::SetType;
-
+%rename(arguments) csSequenceOp::params;
 %ignore iDocument::Parse(iString *);
 %ignore iDocument::Parse(iString *, bool);
 %ignore iString::StartsWith;

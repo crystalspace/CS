@@ -53,8 +53,8 @@ public:
    *   are requested than available. If 0, the values {0,0,0,1} are used.
    */
   csVertexListWalker (iRenderBuffer* buffer, size_t desiredComponents = 0, 
-    const Tbase* defaultComponents = 0) : currElement (0), bufLock (buffer), 
-    defaultComponents (defaultComponents)
+    const Tbase* defaultComponents = 0) : currElement (0), 
+    bufLock (buffer, CS_BUF_LOCK_READ), defaultComponents (defaultComponents)
   {
     bufferComponents = buffer->GetComponentCount ();
     components = (desiredComponents != 0) ? desiredComponents : 

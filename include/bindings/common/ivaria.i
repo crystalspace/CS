@@ -9,6 +9,7 @@
 
 %include "ivaria/stdrep.h"
 %include "ivaria/view.h"
+%include "ivaria/bugplug.h"
 %include "ivaria/collider.h"
 ARRAY_CHANGE_ALL_TEMPLATE(csCollisionPair)
 %include "ivaria/dynamics.h"
@@ -16,6 +17,7 @@ ARRAY_CHANGE_ALL_TEMPLATE(csCollisionPair)
 %include "ivaria/engseq.h"
 %include "ivaria/movierecorder.h"
 %include "ivaria/mapnode.h"
+%include "ivaria/sequence.h"
 
 %rename(IntCall) *::Call(const char*, int&, const char*, ...);
 %rename(FloatCall) *::Call(const char*, float&, const char*, ...);
@@ -45,6 +47,7 @@ ARRAY_CHANGE_ALL_TEMPLATE(csCollisionPair)
 %include "ivaria/script.h"
 %include "ivaria/simpleformer.h"
 %include "ivaria/terraform.h"
+%include "ivaria/translator.h"
 
 
 // ivaria/collider.h
@@ -58,6 +61,13 @@ ARRAY_CHANGE_ALL_TEMPLATE(csCollisionPair)
 #ifndef SWIGIMPORTED
 #undef APPLY_FOR_ALL_INTERFACES_POST
 #define APPLY_FOR_ALL_INTERFACES_POST IVARIA_APPLY_FOR_EACH_INTERFACE
-%include "bindings/common/basepost.i"
-cs_lang_include(ivariapost.i)
 #endif
+
+%include "bindings/common/basepost.i"
+
+#ifndef SWIGIMPORTED
+cs_apply_all_interfaces
+#endif
+
+cs_lang_include(ivariapost.i)
+

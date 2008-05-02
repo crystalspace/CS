@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node BugPlug, HOWTO, Making Own Projects, Using Crystal Space
+@node BugPlug, HOWTO, Distributing Own Project, Using Crystal Space
 @section Using the BugPlug Debugging Plugin
 @cindex BugPlug
 @cindex debugging
@@ -77,6 +77,8 @@ look at @file{data/config/bugplug.key}.
 The first thing you notice when you start your application using
 BugPlug is the current framerate at the lower-left corner of the display.
 If you don't want to see this you can always press @samp{ctrl-d ctrl-alt-p}.
+To toggle between fps and frame time display, press 
+@samp{ctrl-d ctrl-alt-shift-p}.
 
 Another useful feature is the screenshot feature. Just press @samp{ctrl-d
 f12} and BugPlug will save a screenshot of the current display to the

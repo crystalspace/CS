@@ -37,6 +37,7 @@
 #include "csgeom/box.h"
 #include "csgfx/imagememory.h"
 #include "csgfx/renderbuffer.h"
+#include "csplugincommon/opengl/assumedstate.h"
 #include "csplugincommon/opengl/glhelper.h"
 #include "csplugincommon/opengl/glstates.h"
 #include "csplugincommon/render3d/normalizationcube.h"
@@ -63,6 +64,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 
 CS_DECLARE_PROFILER
 CS_DECLARE_PROFILER_ZONE(csGLGraphics3D_DrawMesh);
+CS_DECLARE_PROFILER_ZONE(csGLGraphics3D_DrawMesh_DrawElements);
 
 #define BYTE_TO_FLOAT(x) ((x) * (1.0 / 255.0))
 
@@ -104,11 +106,6 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent) :
   broken_stencil = false;
 
   unsigned int i;
-  for (i=0; i<16; i++)
-  {
-    texunittarget[i] = 0;
-    texunitenabled[i] = false;
-  }
   for (i = 0; i < CS_VATTRIB_SPECIFIC_LAST+1; i++)
   {
     scrapMapping[i] = CS_BUFFER_NONE;
@@ -129,8 +126,6 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent) :
   cliptype = CS_CLIPPER_NONE;
 
   r2tbackend = 0;
-
-  memset (npotsStatus, 0, sizeof (npotsStatus));
 }
 
 csGLGraphics3D::~csGLGraphics3D()
@@ -144,25 +139,19 @@ void csGLGraphics3D::OutputMarkerString (const char* function,
 					 const wchar_t* file,
 					 int line, const char* message)
 {
-  if (ext && ext->CS_GL_GREMEDY_string_marker)
-  {
-    csStringFast<256> marker;
-    marker.Format ("[%ls %s():%d] %s", file, function, line, message);
-    ext->glStringMarkerGREMEDY ((GLsizei)marker.Length (), marker);
-  }
+  csStringFast<256> marker;
+  marker.Format ("[%ls %s():%d] %s", file, function, line, message);
+  ext->glStringMarkerGREMEDY ((GLsizei)marker.Length (), marker);
 }
 
 void csGLGraphics3D::OutputMarkerString (const char* function, 
 					 const wchar_t* file,
 					 int line, MakeAString& message)
 {
-  if (ext && ext->CS_GL_GREMEDY_string_marker)
-  {
-    csStringFast<256> marker;
-    marker.Format ("[%ls %s():%d] %s", file, function, line, 
-      message.GetStr());
-    ext->glStringMarkerGREMEDY ((GLsizei)marker.Length (), marker);
-  }
+  csStringFast<256> marker;
+  marker.Format ("[%ls %s():%d] %s", file, function, line, 
+    message.GetStr());
+  ext->glStringMarkerGREMEDY ((GLsizei)marker.Length (), marker);
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -533,7 +522,7 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
 {
   GLRENDER3D_OUTPUT_STRING_MARKER(("(%d, %d, %d, %d)", 
     clip_portal, clip_plane, clip_z_plane, tri_count));
-
+  
   // @@@@ RETHINK!!! THIS IS A HUGE PERFORMANCE BOOST. BUT???
   clip_z_plane = CS_CLIP_NOT;
 
@@ -776,19 +765,17 @@ bool csGLGraphics3D::Open ()
     return false;
   }
 
-  SetPerspectiveAspect (G2D->GetHeight ());
-  SetPerspectiveCenter (G2D->GetWidth ()/2, G2D->GetHeight ()/2);
+  viewwidth = G2D->GetWidth();
+  viewheight = G2D->GetHeight();
+  SetPerspectiveAspect (viewheight);
+  SetPerspectiveCenter (viewwidth/2, viewheight/2);
   
   object_reg->Register( G2D, "iGraphics2D");
 
   G2D->PerformExtension ("getstatecache", &statecache);
   G2D->PerformExtension	("getextmanager", &ext);
 
-  int w = G2D->GetWidth ();
-  int h = G2D->GetHeight ();
-  SetDimensions (w, h);
-  asp_center_x = w/2;
-  asp_center_y = h/2;
+  G2D->GetFramebufferDimensions (scrwidth, scrheight);
 
   // The extension manager requires to initialize all used extensions with
   // a call to Init<ext> first.
@@ -829,7 +816,10 @@ bool csGLGraphics3D::Open ()
 #ifdef CS_DEBUG
   ext->InitGL_GREMEDY_string_marker ();
 #endif
-
+  
+  // Some 'assumed state' is for extensions, so set again
+  CS::PluginCommon::GL::SetAssumedState (statecache, ext);
+  
   rendercaps.minTexHeight = 2;
   rendercaps.minTexWidth = 2;
   GLint mts = config->GetInt ("Video.OpenGL.Caps.MaxTextureSize", -1);
@@ -949,20 +939,25 @@ bool csGLGraphics3D::Open ()
   txtmgr.AttachNew (new csGLTextureManager (
     object_reg, GetDriver2D (), config, this));
 
-  glClearDepth (0.0);
   statecache->Enable_GL_CULL_FACE ();
   statecache->SetCullFace (GL_FRONT);
 
   statecache->SetStencilMask (stencil_shadow_mask);
+
+  numImageUnits = statecache->GetNumImageUnits();
+  numTCUnits = statecache->GetNumTexCoords();
+  imageUnits = new ImageUnit[numImageUnits];
+  if (verbose)
+    Report (CS_REPORTER_SEVERITY_NOTIFY, 
+      "Available texture image units: %d texture coordinate units: %d",
+      numImageUnits, numTCUnits);
 
   // Set up texture LOD bias.
   if (ext->CS_GL_EXT_texture_lod_bias)
   {
     if (ext->CS_GL_ARB_multitexture)
     {
-      GLint texUnits;
-      glGetIntegerv (GL_MAX_TEXTURE_UNITS_ARB, &texUnits);
-      for (int u = texUnits - 1; u >= 0; u--)
+      for (int u = numImageUnits - 1; u >= 0; u--)
       {
         statecache->SetCurrentTU (u);
         statecache->ActivateTU (csGLStateCache::activateTexEnv);
@@ -1077,9 +1072,11 @@ bool csGLGraphics3D::Open ()
     r2tBackendStr = "EXT_framebuffer_object";
     r2tbackend = new csGLRender2TextureEXTfbo (this);
   }
-  else
+  
+  if ((r2tbackend == 0) || !r2tbackend->Status())
   {
     r2tBackendStr = "framebuffer";
+    delete r2tbackend;
     r2tbackend = new csGLRender2TextureFramebuf (this);
   }
   
@@ -1170,9 +1167,11 @@ void csGLGraphics3D::Close ()
   {
     if (halos[h]) halos[h]->DeleteTexture();
   }
+  vboManager.Invalidate();
 
   if (G2D)
     G2D->Close ();
+  statecache = 0;
 }
 
 bool csGLGraphics3D::SetRenderTarget (iTextureHandle* handle, bool persistent,
@@ -1208,6 +1207,11 @@ bool csGLGraphics3D::SetRenderTarget (iTextureHandle* handle, bool persistent,
   return true;
 }
 
+bool csGLGraphics3D::ValidateRenderTargets ()
+{
+  return r2tbackend->ValidateRenderTargets ();
+}
+
 bool csGLGraphics3D::CanSetRenderTarget (const char* format,
                                          csRenderTargetAttachment attachment)
 {
@@ -1238,6 +1242,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
     csBitmaskToString::GetStr (drawflags, drawflagNames)));
 
   SetWriteMask (true, true, true, true);
+  statecache->Disable_GL_POINT_SPRITE_ARB();
 
   clipportal_dirty = true;
   clipportal_floating = 0;
@@ -1246,7 +1251,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
   debug_inhibit_draw = false;
 
   int i = 0;
-  for (i = 15; i >= 0; i--)
+  for (i = numImageUnits; i-- > 0;)
     DeactivateTexture (i);
 
   // if 2D graphics is not locked, lock it
@@ -1260,6 +1265,8 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
       G2D->PerformExtension ("glflushtext");
     GLRENDER3D_OUTPUT_STRING_MARKER(("after G2D->BeginDraw()"));
   }
+  viewwidth = G2D->GetWidth();
+  viewheight = G2D->GetHeight();
   needViewportUpdate = false;
   const int old_drawflags = current_drawflags;
   current_drawflags = drawflags;
@@ -1300,6 +1307,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
   if (drawflags & CSDRAW_3DGRAPHICS)
   {
     needProjectionUpdate = true;
+    glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
 
 //    object2camera.Identity ();
     //@@@ TODO FIX
@@ -1501,7 +1509,7 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
       statecache->Disable_GL_SECONDARY_COLOR_ARRAY_EXT ();
     if (ext->CS_GL_ARB_multitexture)
     {
-      for (i = CS_GL_MAX_LAYER; i-- > 0;)
+      for (i = numTCUnits; i-- > 0;)
       {
         statecache->SetCurrentTU (i);
         statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
@@ -1521,10 +1529,10 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
       if (b) RenderRelease (b);// b->RenderRelease ();
       if (i >= CS_VATTRIB_TEXCOORD0 && i <= CS_VATTRIB_TEXCOORD7)
       {
-        if (npotsStatus[i-CS_VATTRIB_TEXCOORD0])
+	if (imageUnits[i-CS_VATTRIB_TEXCOORD0].npotsStatus)
         {
           npotsFixupScrap.Push (b);
-          npotsStatus[i-CS_VATTRIB_TEXCOORD0] = false;
+	  imageUnits[i-CS_VATTRIB_TEXCOORD0].npotsStatus = false;
         }
       }
       spec_renderBuffers[i] = 0;
@@ -1593,9 +1601,9 @@ bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
   texunittarget[unit] = gltxthandle->target;*/
   bool doNPOTS = (gltxthandle->texType == iTextureHandle::texTypeRect);
   if (doNPOTS && (unit < 8))
-    needNPOTSfixup[unit] = gltxthandle;
+    imageUnits[unit].needNPOTSfixup = gltxthandle;
   else
-    needNPOTSfixup[unit] = 0;
+    imageUnits[unit].needNPOTSfixup = 0;
   return true;
 }
 
@@ -1632,9 +1640,9 @@ void csGLGraphics3D::DeactivateTexture (int unit)
   statecache->Disable_GL_TEXTURE_3D ();
   statecache->Disable_GL_TEXTURE_CUBE_MAP ();
   statecache->Disable_GL_TEXTURE_RECTANGLE_ARB ();
-  needNPOTSfixup[unit] = 0;
+  imageUnits[unit].needNPOTSfixup = 0;
 
-  texunitenabled[unit] = false;
+  imageUnits[unit].enabled = false;
 }
 
 void csGLGraphics3D::SetTextureState (int* units, iTextureHandle** textures,
@@ -1685,12 +1693,10 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 
   SetupProjection ();
 
-  int num_tri = (mymesh->indexend-mymesh->indexstart)/3;
-
   SetupClipper (mymesh->clip_portal, 
                 mymesh->clip_plane, 
                 mymesh->clip_z_plane,
-		num_tri);
+		(mymesh->indexend-mymesh->indexstart)/3);
   if (debug_inhibit_draw) 
     return;
 
@@ -1727,76 +1733,58 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     csRenderBufferComponentSizes[iIndexbuf->GetComponentType()];
   CS_ASSERT_MSG("Expecting index buffers to have only 1 component",
     (iIndexbuf->GetComponentCount() == 1));
-  CS_ASSERT((indexCompsBytes * mymesh->indexstart) <= iIndexbuf->GetSize());
-  CS_ASSERT((indexCompsBytes * mymesh->indexend) <= iIndexbuf->GetSize());
+  if (!(mymesh->multiRanges && mymesh->rangesNum))
+  {
+    CS_ASSERT((indexCompsBytes * mymesh->indexstart) <= iIndexbuf->GetSize());
+    CS_ASSERT((indexCompsBytes * mymesh->indexend) <= iIndexbuf->GetSize());
+  }
 
   GLenum primitivetype = GL_TRIANGLES;
+  int primNum_divider = 1, primNum_sub = 0;
   switch (mymesh->meshtype)
   {
     case CS_MESHTYPE_QUADS:
-      num_tri = (mymesh->indexend-mymesh->indexstart)/2;
+      primNum_divider = 2;
       primitivetype = GL_QUADS;
       break;
     case CS_MESHTYPE_TRIANGLESTRIP:
-      num_tri = (mymesh->indexend-mymesh->indexstart)-2;
+      primNum_sub = 2;
       primitivetype = GL_TRIANGLE_STRIP;
       break;
     case CS_MESHTYPE_TRIANGLEFAN:
-      num_tri = (mymesh->indexend-mymesh->indexstart)-2;
+      primNum_sub = 2;
       primitivetype = GL_TRIANGLE_FAN;
       break;
     case CS_MESHTYPE_POINTS:
       primitivetype = GL_POINTS;
-      num_tri = (mymesh->indexend-mymesh->indexstart);
       break;
     case CS_MESHTYPE_POINT_SPRITES:
     {
-      num_tri = (mymesh->indexend-mymesh->indexstart);
       if(!(ext->CS_GL_ARB_point_sprite && ext->CS_GL_ARB_point_parameters))
       {
         break;
       }
-      float radius, scale;
-      csShaderVariable* radiusSV = csGetShaderVariableFromStack (stacks, string_point_radius);
-      CS_ASSERT (radiusSV);
-      radiusSV->GetValue (radius);
-
-      csShaderVariable* scaleSV = csGetShaderVariableFromStack (stacks, string_point_scale);
-      CS_ASSERT (scaleSV);
-      scaleSV->GetValue (scale);
-
-      glPointSize (1.0f);
-      GLfloat atten[3] = {0.0f, 0.0f, scale * scale};
-      ext->glPointParameterfvARB (GL_POINT_DISTANCE_ATTENUATION_ARB, atten);
-      ext->glPointParameterfARB (GL_POINT_SIZE_MAX_ARB, 9999.0f);
-      ext->glPointParameterfARB (GL_POINT_SIZE_MIN_ARB, 0.0f);
-      ext->glPointParameterfARB (GL_POINT_FADE_THRESHOLD_SIZE_ARB, 1.0f);
-
-      glEnable (GL_POINT_SPRITE_ARB);
       primitivetype = GL_POINTS;
-      if (ext->CS_GL_ARB_multitexture)
-      {
-        statecache->SetCurrentTU (0);
-        statecache->ActivateTU (csGLStateCache::activateTexCoord);
-      }
-      glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE);
-
       break;
     }
     case CS_MESHTYPE_LINES:
-      num_tri = (mymesh->indexend-mymesh->indexstart)/2;
+      primNum_divider = 2;
       primitivetype = GL_LINES;
       break;
     case CS_MESHTYPE_LINESTRIP:
-      num_tri = (mymesh->indexend-mymesh->indexstart)-1;
+      primNum_sub = 1;
       primitivetype = GL_LINE_STRIP;
       break;
     case CS_MESHTYPE_TRIANGLES:
     default:
-      num_tri = (mymesh->indexend-mymesh->indexstart)/3;
+      primNum_divider = 3;
       primitivetype = GL_TRIANGLES;
       break;
   }
+  if (primitivetype == GL_POINTS)
+    statecache->Enable_GL_POINT_SPRITE_ARB();
+  else
+    statecache->Disable_GL_POINT_SPRITE_ARB();
 
   // Based on the kind of clipping we need we set or clip mask.
   int clip_mask, clip_value;
@@ -1883,17 +1871,13 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 
 
   GLenum compType;
-  void* bufData = //indexbuf->RenderLock (CS_GLBUF_RENDERLOCK_ELEMENTS);
-    RenderLock (iIndexbuf, CS_GLBUF_RENDERLOCK_ELEMENTS, compType);
+  bool normalized;
+  void* bufData =
+    RenderLock (iIndexbuf, CS_GLBUF_RENDERLOCK_ELEMENTS, compType, normalized);
+  statecache->ApplyBufferBinding (csGLStateCacheContext::boIndexArray);
   if (bufData != (void*)-1)
   {
     SetMixMode (mixmode, modes.alphaType);
-
-    if (bugplug)
-    {
-      bugplug->AddCounter ("Triangle Count", num_tri);
-      bugplug->AddCounter ("Mesh Count", 1);
-    }
 
     if ((current_zmode == CS_ZBUF_MESH) || (current_zmode == CS_ZBUF_MESH2))
     {
@@ -1909,22 +1893,43 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       }*/
     }
 
-    float alpha = 1.0f;
-    if (mixmode & CS_FX_MASK_ALPHA)
-      alpha = 1.0f - (float)(mixmode & CS_FX_MASK_ALPHA) / 255.0f;
-    glColor4f (1.0f, 1.0f, 1.0f, alpha);
-    glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
-      (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
-      compType, 
-      ((uint8*)bufData) + (indexCompsBytes * mymesh->indexstart));
+    {
+      CS_PROFILER_ZONE(csGLGraphics3D_DrawMesh_DrawElements);
+      if (mymesh->multiRanges && mymesh->rangesNum)
+      {
+	size_t num_tri = 0;
+	for (size_t r = 0; r < mymesh->rangesNum; r++)
+	{
+	  CS::Graphics::RenderMeshIndexRange range = mymesh->multiRanges[r];
+	  if (bugplug) num_tri += (range.end-range.start)/primNum_divider - primNum_sub;
+	  glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
+	    (GLuint)iIndexbuf->GetRangeEnd(), range.end - range.start,
+	    compType, 
+            ((uint8*)bufData) + (indexCompsBytes * range.start));
+	}
+	if (bugplug)
+	{
+	  bugplug->AddCounter ("Triangle Count", num_tri);
+	  bugplug->AddCounter ("Mesh Count", 1);
+	}
+      }
+      else
+      {
+	if (bugplug)
+	{
+	  size_t num_tri = (mymesh->indexend-mymesh->indexstart)/primNum_divider - primNum_sub;
+	  bugplug->AddCounter ("Triangle Count", num_tri);
+	  bugplug->AddCounter ("Mesh Count", 1);
+	}
+	glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
+	  (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
+	  compType, 
+	  ((uint8*)bufData) + (indexCompsBytes * mymesh->indexstart));
+      }
+    }
     //indexbuf->Release();
   }
 
-  if (mymesh->meshtype == CS_MESHTYPE_POINT_SPRITES) 
-  {
-    glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE);
-    glDisable (GL_POINT_SPRITE_ARB);
-  }
   if (needMatrix)
     glPopMatrix ();
   //indexbuf->RenderRelease ();
@@ -2224,9 +2229,13 @@ void csGLGraphics3D::ClosePortal ()
 
 void* csGLGraphics3D::RenderLock (iRenderBuffer* buffer, 
 				  csGLRenderBufferLockType type, 
-				  GLenum& compGLType)
+                                  GLenum& compGLType, bool& normalized)
 {
-  compGLType = compGLtypes[buffer->GetComponentType()];
+  csRenderBufferComponentType compType = buffer->GetComponentType();
+  normalized = (compType != CS_BUFCOMP_FLOAT) 
+    && (compType != CS_BUFCOMP_DOUBLE)
+    && (compType & CS_BUFCOMP_NORMALIZED);
+  compGLType = compGLtypes[compType];
   if (vboManager.IsValid())
     return vboManager->RenderLock (buffer, type);
   else
@@ -2261,7 +2270,7 @@ void csGLGraphics3D::RenderRelease (iRenderBuffer* buffer)
 void csGLGraphics3D::ApplyBufferChanges()
 {
   GLRENDER3D_OUTPUT_LOCATION_MARKER;
-
+  
   for (size_t i = 0; i < changeQueue.GetSize (); i++)
   {
     const BufferChange& changeEntry = changeQueue[i];
@@ -2285,47 +2294,52 @@ void csGLGraphics3D::ApplyBufferChanges()
         if (att >= CS_VATTRIB_TEXCOORD0 && att <= CS_VATTRIB_TEXCOORD7)
         {
           unsigned int unit = att - CS_VATTRIB_TEXCOORD0;
-          if (npotsStatus[unit])
+	  if (imageUnits[unit].needNPOTSfixup)
           {
             npotsFixupScrap.Push (spec_renderBuffers[att-CS_VATTRIB_SPECIFIC_FIRST]);
             AssignSpecBuffer (att-CS_VATTRIB_SPECIFIC_FIRST, 0);
-            npotsStatus[unit] = false;
+	    imageUnits[unit].npotsStatus = false;
           }
-          if (needNPOTSfixup[unit].IsValid())
+          if (imageUnits[unit].needNPOTSfixup.IsValid())
           {
             buffer = bufferRef = DoNPOTSFixup (buffer, unit);
-            npotsStatus[unit] = true;
+	    imageUnits[unit].npotsStatus = true;
           }
         }
         AssignSpecBuffer (att-CS_VATTRIB_SPECIFIC_FIRST, buffer);
       }
 
       GLenum compType;
+      bool normalized;
       void *data =
-        RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY, compType);
+	RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY, compType, normalized);
 
       if (data == (void*)-1) continue;
 
       switch (att)
       {
       case CS_VATTRIB_POSITION:
+	// @@@ FIXME: How to deal with normalized buffers?
         statecache->Enable_GL_VERTEX_ARRAY ();
         statecache->SetVertexPointer (buffer->GetComponentCount (),
           compType, (GLsizei)buffer->GetStride (), data);
         break;
       case CS_VATTRIB_NORMAL:
-        statecache->Enable_GL_NORMAL_ARRAY ();
+	// @@@ FIXME: How to deal with unnormalized buffers?
+	statecache->Enable_GL_NORMAL_ARRAY ();
         statecache->SetNormalPointer (compType, (GLsizei)buffer->GetStride (), 
           data);
         break;
       case CS_VATTRIB_COLOR:
-        statecache->Enable_GL_COLOR_ARRAY ();
+	// @@@ FIXME: How to deal with unnormalized buffers?
+	statecache->Enable_GL_COLOR_ARRAY ();
         statecache->SetColorPointer (buffer->GetComponentCount (),
           compType, (GLsizei)buffer->GetStride (), data);
         break;
       case CS_VATTRIB_SECONDARY_COLOR:
         if (ext->CS_GL_EXT_secondary_color)
         {
+	  // @@@ FIXME: How to deal with unnormalized buffers?
 	  statecache->Enable_GL_SECONDARY_COLOR_ARRAY_EXT ();
 	  statecache->SetSecondaryColorPointerExt (buffer->GetComponentCount (),
 	    compType, (GLsizei)buffer->GetStride (), data);
@@ -2340,7 +2354,8 @@ void csGLGraphics3D::ApplyBufferChanges()
           {
             statecache->SetCurrentTU (unit);
           } 
-          statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
+	  // @@@ FIXME: How to deal with normalized buffers?
+	  statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
           statecache->SetTexCoordPointer (buffer->GetComponentCount (),
             compType, (GLsizei)buffer->GetStride (), data);
         }
@@ -2349,9 +2364,10 @@ void csGLGraphics3D::ApplyBufferChanges()
 	  if (ext->glEnableVertexAttribArrayARB)
 	  {
 	    GLuint index = att - CS_VATTRIB_GENERIC_FIRST;
+	    statecache->ApplyBufferBinding (csGLStateCacheContext::boElementArray);
 	    ext->glEnableVertexAttribArrayARB (index);
 	    ext->glVertexAttribPointerARB(index, buffer->GetComponentCount (),
-	      compType, false, (GLsizei)buffer->GetStride (), data);
+              compType, normalized, (GLsizei)buffer->GetStride (), data);
 	  }
         }
         else
@@ -2388,10 +2404,10 @@ void csGLGraphics3D::ApplyBufferChanges()
             statecache->SetCurrentTU (unit);
           }
           statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
-          if (npotsStatus[unit])
+	  if (imageUnits[unit].npotsStatus)
           {
             npotsFixupScrap.Push (spec_renderBuffers[att - CS_VATTRIB_SPECIFIC_FIRST]);
-            npotsStatus[unit] = false;
+	    imageUnits[unit].npotsStatus = false;
           }
         }
         else if (CS_VATTRIB_IS_GENERIC(att))
@@ -2464,8 +2480,8 @@ csRef<iRenderBuffer> csGLGraphics3D::DoNPOTSFixup (iRenderBuffer* buffer, int un
   }
 
   const int componentScale[] = {
-    needNPOTSfixup[unit]->actual_width, 
-    needNPOTSfixup[unit]->actual_height,
+    imageUnits[unit].needNPOTSfixup->actual_width, 
+    imageUnits[unit].needNPOTSfixup->actual_height,
     1, 1};
 
   switch (scrapBuf->GetComponentType())
@@ -2946,8 +2962,12 @@ void csGLGraphics3D::SetClipper (iClipper2D* clipper, int cliptype)
     if (currentAttachments != 0)
       r2tbackend->SetClipRect (scissorRect);
     else
-      glScissor (scissorRect.xmin, scissorRect.ymin, scissorRect.Width(),
+    {
+      GLint vp[4];
+      glGetIntegerv (GL_VIEWPORT, vp);
+      glScissor (vp[0] + scissorRect.xmin, vp[1] + scissorRect.ymin, scissorRect.Width(),
 	scissorRect.Height());
+    }
   }
   else if (hasOld2dClip)
   {
@@ -3278,7 +3298,6 @@ csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB,
     rgbaPtr += (Width - iWidth) * 4;
   }
 
-  glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
   // Create handle
   glGenTextures (1, &halohandle);
   // Activate handle
@@ -3464,11 +3483,12 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
 
   SystemOpen = csevSystemOpen(object_reg);
   SystemClose = csevSystemClose(object_reg);
+  Frame = csevFrame(object_reg);
 
   csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
   if (q)
   {
-    csEventID events[] = { SystemOpen, SystemClose, 
+    csEventID events[] = { SystemOpen, SystemClose, Frame,
 			    CS_EVENTLIST_END };
     q->RegisterListener (scfiEventHandler, events);
   }
@@ -3543,12 +3563,16 @@ bool csGLGraphics3D::HandleEvent (iEvent& Event)
   }
   else if (Event.Name == CanvasResize)
   {
-    int w = G2D->GetWidth ();
-    int h = G2D->GetHeight ();
-    SetDimensions (w, h);
-    asp_center_x = w/2;
-    asp_center_y = h/2;
+    viewwidth = G2D->GetWidth();
+    viewheight = G2D->GetHeight();
+    G2D->GetFramebufferDimensions (scrwidth, scrheight);
+    asp_center_x = viewwidth/2;
+    asp_center_y = viewheight/2;
     return true;
+  }
+  else if (Event.Name == Frame)
+  {
+    r2tbackend->NextFrame();
   }
   return false;
 }
@@ -3602,6 +3626,33 @@ bool csGLGraphics3D::DebugCommand (const char* cmdstr)
     const char* dir = 
       ((param != 0) && (*param != 0)) ? param : "/tmp/zbufdump/";
     DumpZBuffer (dir);
+
+    return true;
+  }
+  else if (strcasecmp (cmd, "dump_textures") == 0)
+  {
+    csRef<iImageIO> imgsaver = csQueryRegistry<iImageIO> (object_reg);
+    if (!imgsaver)
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING,
+	      "Could not get image saver.");
+      return false;
+    }
+
+    csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
+    if (!vfs)
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING, 
+	      "Could not get VFS.");
+      return false;
+    }
+
+    if (txtmgr)
+    {
+      const char* dir = 
+	  ((param != 0) && (*param != 0)) ? param : "/tmp/textures/";
+      txtmgr->DumpTextures (vfs, imgsaver, dir);
+    }
 
     return true;
   }

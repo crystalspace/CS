@@ -87,8 +87,11 @@
 #undef INTERFACE_APPLY
 #define INTERFACE_APPLY(x) INTERFACE_POST(x)
 
+%define cs_apply_all_interfaces
+    APPLY_FOR_ALL_INTERFACES_POST
+%enddef
+
 %define cs_lang_include(file)
-APPLY_FOR_ALL_INTERFACES_POST
   #if defined(SWIGPYTHON)
     %include bindings/python/ ## file
   #elif defined(SWIGPERL5)

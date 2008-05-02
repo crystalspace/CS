@@ -152,6 +152,15 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
     
     statecache->Enable_GL_LIGHTING ();
   }
+  
+  glPointSize (GetParamFloatVal (stacks, pointSize, 1.0f));
+  if (ext->CS_GL_ARB_point_sprite)
+  {
+    csVector4 v;
+    const csVector4 defAtten (0, 1, 0, 0);
+    v = GetParamVectorVal (stacks, pointAttenuation, defAtten);
+    ext->glPointParameterfvARB (GL_POINT_DISTANCE_ATTENUATION_ARB, (float*)&v);
+  }
 
   for (i=0; i<layers.GetSize (); i++)
   {
@@ -960,7 +969,17 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
 	    separateSpecular = b;
 	  }
 	  break;
-        default:
+	case XMLTOKEN_POINTSIZE:
+	  if (!ParseProgramParam (child, pointSize,
+	       ParamFloat | ParamShaderExp))
+	    return false;
+	  break;
+	case XMLTOKEN_POINTATTENUATION:
+	  if (!ParseProgramParam (child, pointSize,
+	       ParamVector3 | ParamShaderExp))
+	    return false;
+	  break;
+	default:
 	  {
 	    switch (commonTokens.Request (value))
 	    {
@@ -990,6 +1009,7 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
 bool csGLShaderFVP::Compile()
 {
   shaderPlug->Open ();
+  ext = shaderPlug->ext;
 
   size_t i;
 

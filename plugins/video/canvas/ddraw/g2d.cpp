@@ -120,8 +120,8 @@ bool csGraphics2DDDraw3::Open ()
 
   // Compute window size/position on desktop
   int wwidth, wheight;
-  wwidth = Width + 2 * GetSystemMetrics (SM_CXFIXEDFRAME);
-  wheight = Height + 2 * GetSystemMetrics (SM_CYFIXEDFRAME) +
+  wwidth = fbWidth + 2 * GetSystemMetrics (SM_CXFIXEDFRAME);
+  wheight = fbHeight + 2 * GetSystemMetrics (SM_CYFIXEDFRAME) +
     GetSystemMetrics (SM_CYCAPTION);
 
   // Save the window size/pos for switching modes
@@ -595,7 +595,7 @@ HRESULT csGraphics2DDDraw3::InitSurfaces ()
     LPDIRECTDRAW7 lpDD7;
     if (m_lpDD->QueryInterface (IID_IDirectDraw7, (LPVOID*)&lpDD7) == S_OK)
     {
-      hRet = lpDD7->SetDisplayMode (Width, Height, Depth, refreshRate, 0);
+      hRet = lpDD7->SetDisplayMode (fbWidth, fbHeight, Depth, refreshRate, 0);
       lpDD7->Release ();
     }
 #else
@@ -606,7 +606,7 @@ HRESULT csGraphics2DDDraw3::InitSurfaces ()
     {
       // maybe just the monitor frequency is not supported.
       // so try without setting it
-      hRet = m_lpDD->SetDisplayMode (Width, Height, Depth);
+      hRet = m_lpDD->SetDisplayMode (fbWidth, fbHeight, Depth);
     }
     if (hRet != DD_OK)
     {
@@ -640,8 +640,8 @@ HRESULT csGraphics2DDDraw3::InitSurfaces ()
     // Create the backbuffer. In fullscreen mode by default we don't
     // use the backbuffer, but we use it in single-buffered modes.
     ddsd.dwFlags = DDSD_WIDTH | DDSD_HEIGHT | DDSD_CAPS;
-    ddsd.dwWidth = Width;
-    ddsd.dwHeight = Height;
+    ddsd.dwWidth = fbWidth;
+    ddsd.dwHeight = fbHeight;
     ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN | DDSCAPS_SYSTEMMEMORY;
     if ((hRet = m_lpDD->CreateSurface (&ddsd, &m_lpddsBack, 0)) != DD_OK)
     {
@@ -726,7 +726,7 @@ HRESULT csGraphics2DDDraw3::InitSurfaces ()
 
   m_lpddsBack->GetSurfaceDesc (&ddsd);
   int i;
-  for (i = 0; i < Height; i++)
+  for (i = 0; i < fbHeight; i++)
     LineAddress [i] = i * ddsd.lPitch;
 
   m_bPalettized = (Depth == 8);
@@ -748,9 +748,9 @@ HRESULT csGraphics2DDDraw3::ChangeCoopLevel ()
   char *oldBuffer = 0;
   if (BeginDraw ())
   {
-    size_t BytesPerLine = Width * ((Depth + 7) / 8);
-    oldBuffer = new char [Height * BytesPerLine];
-    for (i = 0; i < Height; i++)
+    size_t BytesPerLine = fbWidth * ((Depth + 7) / 8);
+    oldBuffer = new char [fbHeight * BytesPerLine];
+    for (i = 0; i < fbHeight; i++)
       memcpy (oldBuffer + i * BytesPerLine, Memory + LineAddress [i], BytesPerLine);
     FinishDraw ();
   }
@@ -802,8 +802,8 @@ HRESULT csGraphics2DDDraw3::ChangeCoopLevel ()
     for (times = (m_bDoubleBuffer && FullScreen) ? 2 : 1; times; times--)
       if (BeginDraw ())
       {
-	size_t BytesPerLine = Width * ((Depth + 7) / 8);
-	for (i = 0; i < Height; i++)
+	size_t BytesPerLine = fbWidth * ((Depth + 7) / 8);
+	for (i = 0; i < fbHeight; i++)
 	  memcpy (Memory + LineAddress [i], oldBuffer + i * BytesPerLine, BytesPerLine);
 	FinishDraw ();
 	Print (0);

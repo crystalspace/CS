@@ -25,6 +25,8 @@
 
 #include "imesh/terrain2.h"
 #include "iutil/comp.h"
+#include "iengine/engine.h"
+#include "imap/loader.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
 {
@@ -36,12 +38,23 @@ struct csTerrainSimpleDataFeederProperties
   csTerrainSimpleDataFeederProperties (csTerrainSimpleDataFeederProperties& other);
 
   // ---- iTerrainCellFeederProperties ----
-  virtual void SetHeightmapSource (const char* source);
+  virtual void SetHeightmapSource (const char* source, const char* format);
+  virtual void SetMaterialMapSource (const char* source);
+  virtual void SetHeightOffset (float offset);
+  virtual void AddAlphaMap (const char* material, const char* alphaMapSource);
   virtual void SetParameter (const char* param, const char* value);
   virtual csPtr<iTerrainCellFeederProperties> Clone ();
 
   csString heightmapSource, heightmapFormat, materialmapSource;
-  float offset;
+
+  struct AlphaPair
+  {
+    csString material;
+    csString alphaSource;
+  };
+  csArray<AlphaPair> alphaMaps;
+
+  float heightOffset;
 };
 
 class csTerrainSimpleDataFeeder :
@@ -69,6 +82,7 @@ public:
 protected:
   iObjectRegistry* objectReg;
   csRef<iLoader> loader;
+  csRef<iEngine> engine;
 };
 
 }

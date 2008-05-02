@@ -22,6 +22,7 @@
 #ifndef DOXYGEN_RUN
 
 #include <pthread.h>
+#include "csutil/threading/barrier.h"
 
 namespace CS
 {
@@ -66,6 +67,7 @@ namespace Implementation
     
     int32 isRunning;
     ThreadPriority priority;
+    Barrier startupBarrier;
   };
 
 

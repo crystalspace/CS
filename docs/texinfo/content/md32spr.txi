@@ -151,7 +151,7 @@ as an example.  You should comment it out manually to reduce memory usage.
 @item
 Some @sc{md3} model converters do not write any frame number information if a
 model is not animated.  This causes garbage numbers to be read from the
-@sc{md3} file.  Subsequently, you may end up with a a large number (possibly in
+@sc{md3} file.  Subsequently, you may end up with a large number (possibly in
 the thousands or hundred-thousands) duplicate frames which actually do nothing.
 Until now I have not been able to find a solution to this problem.  Any
 comments, suggestions or corrections are welcome.

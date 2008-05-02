@@ -88,6 +88,17 @@ namespace CS
 
       CS_FORCEINLINE void operator delete(void*, void*) throw() { }
       CS_FORCEINLINE void operator delete[](void*, void*) throw() { }
+    
+    #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+      CS_FORCEINLINE void* operator new (size_t s, void*, int)
+      { return cs_malloc (s); }
+      CS_FORCEINLINE void operator delete (void* p, void*, int)
+      { cs_free (p); }
+      CS_FORCEINLINE void* operator new[] (size_t s,  void*, int)
+      { return cs_malloc (s); }
+      CS_FORCEINLINE void operator delete[] (void* p, void*, int)
+      { cs_free (p); }
+    #endif
     };
     
     /**
@@ -107,46 +118,57 @@ namespace CS
 
       // Potentially throwing versions
     #ifndef CS_NO_EXCEPTIONS
-      CS_FORCEINLINE void* operator new (size_t s) throw (std::bad_alloc)
+      CS_FORCEINLINE_TEMPLATEMETHOD void* operator new (size_t s) throw (std::bad_alloc)
       { 
 	void* p = cs_malloc (s);
 	if (!p) throw std::bad_alloc();
 	return p;
       }
-      CS_FORCEINLINE void* operator new[] (size_t s) throw (std::bad_alloc)
+      CS_FORCEINLINE_TEMPLATEMETHOD void* operator new[] (size_t s) throw (std::bad_alloc)
       { 
 	void* p = cs_malloc (s);
 	if (!p) throw std::bad_alloc();
 	return p;
       }
     #else
-      CS_FORCEINLINE void* operator new (size_t s) throw ()
+      CS_FORCEINLINE_TEMPLATEMETHOD void* operator new (size_t s) throw ()
       { return cs_malloc (s); }
-      CS_FORCEINLINE void* operator new[] (size_t s) throw ()
+      CS_FORCEINLINE_TEMPLATEMETHOD void* operator new[] (size_t s) throw ()
       { return cs_malloc (s); }
     #endif
       
-      CS_FORCEINLINE void operator delete (void* p) throw()
+      CS_FORCEINLINE_TEMPLATEMETHOD void operator delete (void* p) throw()
       { cs_free (p); }
-      CS_FORCEINLINE void operator delete[] (void* p) throw()
+      CS_FORCEINLINE_TEMPLATEMETHOD void operator delete[] (void* p) throw()
       { cs_free (p); }
       
       // Nothrow versions
-      CS_FORCEINLINE void* operator new (size_t s, const std::nothrow_t&) throw()
+      CS_FORCEINLINE_TEMPLATEMETHOD void* operator new (size_t s, const std::nothrow_t&) throw()
       { return cs_malloc (s); }
-      CS_FORCEINLINE void* operator new[] (size_t s, const std::nothrow_t&) throw()
+      CS_FORCEINLINE_TEMPLATEMETHOD void* operator new[] (size_t s, const std::nothrow_t&) throw()
       { return cs_malloc (s); }
-      CS_FORCEINLINE void operator delete (void* p, const std::nothrow_t&) throw()
+      CS_FORCEINLINE_TEMPLATEMETHOD void operator delete (void* p, const std::nothrow_t&) throw()
       { cs_free (p); }
-      CS_FORCEINLINE void operator delete[] (void* p, const std::nothrow_t&) throw()
+      CS_FORCEINLINE_TEMPLATEMETHOD void operator delete[] (void* p, const std::nothrow_t&) throw()
       { cs_free (p); }
       
       // Placement versions
-      CS_FORCEINLINE void* operator new(size_t /*s*/, void* p) throw() { return p; }
-      CS_FORCEINLINE void* operator new[](size_t /*s*/, void* p) throw() { return p; }
+      CS_FORCEINLINE_TEMPLATEMETHOD void* operator new(size_t /*s*/, void* p) throw() { return p; }
+      CS_FORCEINLINE_TEMPLATEMETHOD void* operator new[](size_t /*s*/, void* p) throw() { return p; }
 
-      CS_FORCEINLINE void operator delete(void*, void*) throw() { }
-      CS_FORCEINLINE void operator delete[](void*, void*) throw() { }
+      CS_FORCEINLINE_TEMPLATEMETHOD void operator delete(void*, void*) throw() { }
+      CS_FORCEINLINE_TEMPLATEMETHOD void operator delete[](void*, void*) throw() { }
+    
+    #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+      CS_FORCEINLINE_TEMPLATEMETHOD void* operator new (size_t s, void*, int)
+      { return cs_malloc (s); }
+      CS_FORCEINLINE_TEMPLATEMETHOD void operator delete (void* p, void*, int)
+      { cs_free (p); }
+      CS_FORCEINLINE_TEMPLATEMETHOD void* operator new[] (size_t s,  void*, int)
+      { return cs_malloc (s); }
+      CS_FORCEINLINE_TEMPLATEMETHOD void operator delete[] (void* p, void*, int)
+      { cs_free (p); }
+    #endif
     };
   } // namespace Memory
 } // namespace CS

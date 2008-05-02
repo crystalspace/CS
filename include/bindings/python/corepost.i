@@ -59,6 +59,9 @@
   def CS_REQUEST_PLUGIN (name, intf):
     return (name, intf.__name__, 
        corecvar.iSCF_SCF.GetInterfaceID(intf.__name__),intf.scfGetVersion())
+  def CS_REQUEST_PLUGIN_TAG (name, intf, tag):
+    return (name+":"+tag, intf.__name__, 
+       corecvar.iSCF_SCF.GetInterfaceID(intf.__name__),intf.scfGetVersion())
   def CS_REQUEST_VFS ():
     return CS_REQUEST_PLUGIN("crystalspace.kernel.vfs", iVFS)
   def CS_REQUEST_IMAGELOADER ():
@@ -69,6 +72,19 @@
   def CS_REQUEST_REPORTER ():
     return CS_REQUEST_PLUGIN("crystalspace.utilities.reporter", iReporter)
 %}
+
+%extend iBase {
+  %pythoncode %{
+      def __eq__(self,other):
+          if isinstance(other,iBase):
+              return self.this == other.this
+          return False
+      def __ne__(self,other):
+          if isinstance(other,iBase):
+              return not self.this == other.this
+          return True
+    %}
+}
 
 %extend csKeyModifiers {
   unsigned int __getitem__ (size_t i) const

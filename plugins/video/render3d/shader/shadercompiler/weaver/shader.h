@@ -64,6 +64,10 @@ class WeaverShader : public scfImplementationExt2<WeaverShader,
   /// Shader we actually use
   csRef<iShader> realShader;
   csString filename;
+
+protected:
+  void InternalRemove() { SelfDestruct(); }
+
 public:
   CS_LEAKGUARD_DECLARE (WeaverShader);
 
@@ -162,6 +166,10 @@ public:
   bool RemoveVariable (csShaderVariable* variable)
   {
     return realShader->RemoveVariable (variable);
+  }
+  bool RemoveVariable (csStringID name)
+  {
+    return realShader->RemoveVariable (name);
   }
   /** @} */
 

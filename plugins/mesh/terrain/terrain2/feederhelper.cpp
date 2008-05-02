@@ -37,7 +37,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
   {
     static inline void Get (char*& buf, float&f)
     {
-      f = csIEEEfloat::ToNative (Endianness::Convert (csGetFromAddress::UInt32 (buf))); 
+      f = csIEEEfloat::ToNative (Endianness::Convert (
+	    csGetFromAddress::UInt32 (buf))); 
       buf += sizeof(uint32);
     }
     static inline size_t ItemSize()
@@ -163,7 +164,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
     if (!vfs)
       return false;
 
-    csRef<iDataBuffer> buf = vfs->ReadFile (sourceLocation.GetDataSafe (), false);
+    csRef<iDataBuffer> buf = vfs->ReadFile (sourceLocation.GetDataSafe (),
+	false);
     if (!buf ||
       outputHeight * outputWidth != buf->GetSize ())
       return false;
@@ -227,8 +229,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
     return false;
   }
   
-  bool HeightFeederParser::LoadFromImage (float* outputBuffer, size_t outputWidth, 
-    size_t outputHeight, size_t outputPitch, float heightScale, float offset)
+  bool HeightFeederParser::LoadFromImage (float* outputBuffer,
+      size_t outputWidth, size_t outputHeight, size_t outputPitch,
+      float heightScale, float offset)
   {
     csRef<iImage> image = imageLoader->LoadImage (sourceLocation.GetDataSafe (),
       CS_IMGFMT_ANY);
@@ -239,7 +242,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
     if ((size_t)image->GetWidth () != outputWidth || 
       (size_t)image->GetHeight () != outputHeight)
     {
-      image = csImageManipulate::Rescale (image, (int)outputWidth, (int)outputHeight);
+      image = csImageManipulate::Rescale (image, (int)outputWidth,
+	  (int)outputHeight);
     }
 
     if ((image->GetFormat () & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)

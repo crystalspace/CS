@@ -471,6 +471,25 @@
 	<usecfg>disableMipmapGeneration</usecfg>
       </applicable>
     </rule>
+
+    <!-- 2008-02-13: texture compression is broken for Intel GMA 950 under OSX. As a result
+            the OSX distribution of Planeshift to disable texture compression
+            by default for all: http://hydlaa.com/smf/index.php?topic=29281.0
+	    * Intel GMA cards are used in in low-end x86-based Mac hardware, i.e. relevant
+	      for OSX 10.4 in MacBook, iMac and Mac mini.
+	    * problem persists with recent driver updates under OSX 10.4
+	    * has been reported for GMA 3100 under OSX 10.5, which is found in newer MacBooks.
+    -->
+    <rule description="Intel GMA 950 on OSX">
+      <conditions>
+	<regexp string="renderer" pattern="Intel GMA 950 OpenGL Engine" />
+        <regexp string="glversion" pattern="1.2 APPLE-1\.4\..*" />
+	<regexp string="platform" pattern="MacOS/X" />
+      </conditions>
+      <applicable>
+	<usecfg>disableTC</usecfg>
+      </applicable>
+    </rule>
     
     <rule description="ATI: Can't handle GL_BLEND texenv for GL_INTENSITY textures">
       <conditions>

@@ -79,8 +79,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return true;
   }
 
-  bool csLoader::ParseTextureList (iLoaderContext* ldr_context,
-    iDocumentNode* node, bool useProxyTextures)
+  bool csLoader::ParseTextureList (iLoaderContext* ldr_context, iDocumentNode* node)
   {
     if (!ImageLoader)
     {
@@ -115,7 +114,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           proctex_deprecated_warned = true;
         }
       case XMLTOKEN_TEXTURE:
-        if (!ParseTexture (ldr_context, child, useProxyTextures))
+        if (!ParseTexture (ldr_context, child))
           return false;
         break;
       case XMLTOKEN_CUBEMAP:
@@ -136,7 +135,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   }
 
   iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
-    iDocumentNode* node, bool useProxyTextures)
+    iDocumentNode* node)
   {
     const char* txtname = node->GetAttributeValue ("name");
     if (ldr_context->CheckDupes ())
@@ -144,7 +143,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       iTextureWrapper* t = Engine->FindTexture (txtname);
       if (t)
       {
-        AddToRegion (ldr_context, t->QueryObject ());
+        AddToRegionOrCollection (ldr_context, t->QueryObject ());
         return t;
       }
     }
@@ -330,7 +329,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     // Proxy texture loading if the loader isn't specified
     // and we don't need to load them immediately.
-    if(txtname && type.IsEmpty() && useProxyTextures)
+    if(txtname && type.IsEmpty() && ldr_context->GetKeepFlags() == KEEP_USED &&
+       !ldr_context->GetRegion())
     {
       if (filename.IsEmpty())
       {
@@ -366,7 +366,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
 
       proxTex.textureWrapper = tex;
-      AddToRegion (ldr_context, proxTex.textureWrapper->QueryObject());
+      AddToRegionOrCollection (ldr_context, proxTex.textureWrapper->QueryObject());
       proxyTextures.Push(proxTex);
 
       return tex;
@@ -527,7 +527,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       csRef<iProcTexture> ipt = scfQueryInterface<iProcTexture> (tex);
       if (ipt)
         ipt->SetAlwaysAnimate (always_animate);
-      AddToRegion (ldr_context, tex->QueryObject ());
+      AddToRegionOrCollection (ldr_context, tex->QueryObject ());
 
       size_t i;
       for (i = 0 ; i < key_nodes.GetSize () ; i++)
@@ -555,7 +555,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       iMaterialWrapper* m = Engine->FindMaterial (matname);
       if (m)
       {
-        AddToRegion (ldr_context, m->QueryObject ());
+        AddToRegionOrCollection (ldr_context, m->QueryObject ());
         return m;
       }
     }
@@ -700,7 +700,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       if (!ParseKey (key_nodes[i], mat->QueryObject()))
         return 0;
     }
-    AddToRegion (ldr_context, mat->QueryObject ());
+    AddToRegionOrCollection (ldr_context, mat->QueryObject ());
 
     materialArray.Push(mat);
 
@@ -736,7 +736,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     if (tex)
     {
       tex->QueryObject ()->SetName (txtname);
-      AddToRegion (ldr_context, tex->QueryObject ());
+      AddToRegionOrCollection (ldr_context, tex->QueryObject ());
       iTextureManager* tm = G3D ? G3D->GetTextureManager() : 0;
       if (tm) tex->Register (tm);
     }
@@ -772,7 +772,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     if (tex)
     {
       tex->QueryObject ()->SetName (txtname);
-      AddToRegion (ldr_context, tex->QueryObject ());
+      AddToRegionOrCollection (ldr_context, tex->QueryObject ());
       iTextureManager* tm = G3D ? G3D->GetTextureManager() : 0;
       if (tm) tex->Register (tm);
     }

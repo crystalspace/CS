@@ -366,7 +366,7 @@ void Demo::GfxWrite (int x, int y, int fg, int bg, const char *str, ...)
   myG2D->Write (font, x, y, fg, bg, buf);
 }
 
-void Demo::FileWrite (iFile* file, char *str, ...)
+void Demo::FileWrite (iFile* file, const char *str, ...)
 {
   va_list arg;
   csString buf;

@@ -1132,7 +1132,7 @@ rule LinkStaticPlugins
     for mode in debug release
     {
       MsvcLFlags $(plugin_lib_name) : 
-	[ Reverse [ RemoveDups [ Reverse $(target_lflags.$(mode)) ] ] ] : $(mode) ;
+	[ RemoveDupFlags $(target_lflags.$(mode)) ] : $(mode) ;
       MsvcCFlags $(plugin_lib_name) : $(target_cflags.$(mode)) ;
       MsvcExternalLibrary $(plugin_lib_name) : $(target_ext_libs.$(mode)) : $(mode) ;
     }
@@ -1144,7 +1144,7 @@ rule LinkStaticPlugins
     for mode in debug release
     {
       MsvcLFlags $(target) : 
-	[ Reverse [ RemoveDups [ Reverse $(target_lflags.$(mode)) ] ] ] : $(mode) ;
+	[ RemoveDupFlags $(target_lflags.$(mode)) ] : $(mode) ;
       MsvcCFlags $(target) : $(target_cflags.$(mode)) ;
       MsvcExternalLibrary $(target) : $(target_ext_libs.$(mode)) : $(mode) ;
     }
@@ -1164,7 +1164,7 @@ rule LinkStaticPlugins
     for mode in debug release
     {
       MsvcLFlags $(target) : 
-	[ Reverse [ RemoveDups [ Reverse $(target_lflags.$(mode)) ] ] ] : $(mode) ;
+	[ RemoveDupFlags $(target_lflags.$(mode)) ] : $(mode) ;
       MsvcCFlags $(target) : $(target_cflags.$(mode)) ;
       MsvcExternalLibrary $(target) : $(target_ext_libs.$(mode)) : $(mode) ;
     }

@@ -478,8 +478,9 @@ rule Filter
 }
 
 ##  RemoveDups list
-##    Removes duplicates in the list (this function tries to preserve the list
-##    order)
+##    Removes duplicate items from the list, discarding all but the first.
+##    Unlike the Jam built-in Sort rule, which removes duplicates as a
+##    side-effect, RemoveDups preserves item order.
 rule RemoveDups
 {
   local i result ;
@@ -494,6 +495,40 @@ rule RemoveDups
 
   return $(result) ;
 } 
+
+##  MergeRemovingDups list1 : list2
+##    Merge two lists. Removes duplicate entries while maintaining the
+##    relative order of the entries. This is useful when merging lists of
+##    linker switches, for instance, which typically are order sensitive.
+rule MergeRemovingDups
+{
+  local list1 = $(1) ;
+  local list2 = $(2) ;
+  local result ;
+  local l ;
+  for l in $(list1)
+  {
+    if [ IsElem $(l) : $(list2) ]
+    {
+      # If an item from set 1 is in set 2, add all items from start of set 2
+      # to the occurance of the item to result.
+      while "$(list2[1])" != "" && $(list2[1]) != $(l)
+      {
+        result += $(list2[1]) ;
+        list2 = $(list2[2-]) ;
+      }
+      result += $(list2[1]) ;
+      list2 = $(list2[2-]) ;
+    }
+    else
+    {
+      # Just add the item.
+      result += $(l) ;
+    }
+  }
+  result += $(list2) ;
+  return $(result) ;
+}
 
 ##  Reverse list
 ##    Reverse the order of items in the list.

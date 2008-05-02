@@ -1,6 +1,6 @@
 # configure.ac                                                 -*- Autoconf -*-
 #==============================================================================
-# Copyright (C)2003-2006 by Eric Sunshine <sunshine@sunshineco.com>
+# Copyright (C)2003-2008 by Eric Sunshine <sunshine@sunshineco.com>
 #
 # Autoconf input script for Crystal Space.  Process this file with
 # CS/bin/autogen.sh to produce a configure script.
@@ -24,7 +24,7 @@ m4_define([cs_version_number], [1.3])
 AC_INIT([crystalspace], [cs_version_number],
         [crystal-main@lists.sourceforge.net])
 CS_PACKAGEINFO([Crystal Space],
-    [Copyright (C)1998-2007 Jorrit Tyberghein and others],
+    [Copyright (C)1998-2008 Jorrit Tyberghein and others],
     [http://www.crystalspace3d.org/])
 AC_CONFIG_SRCDIR([libs/Jamfile])
 AC_CONFIG_AUX_DIR([mk/autoconf])
@@ -620,8 +620,7 @@ CS_EMIT_BUILD_FLAGS([how to export all dynamic symbols],
 #------------------------------------------------------------------------------
 CS_CHECK_BUILD([if --kill-at is accepted], [cs_cv_prog_link_kill_at], [],
     [CS_CREATE_TUPLE([],[-Wl,--kill-at])], [C++],
-    [CS_EMIT_BUILD_PROPERTY([CSJAVA.LFLAGS], [-Wl,--kill-at])
-     CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS.KILLAT], [-Wl,--kill-at])])
+    [CS_EMIT_BUILD_PROPERTY([CSJAVA.LFLAGS], [-Wl,--kill-at])])
 
 
 
@@ -1803,7 +1802,14 @@ CS_CHECK_BUILD([for _aligned_malloc], [cs_cv__aligned_malloc],
 	[_aligned_malloc(0, 0);])],
     [], [],
     [CS_HEADER_PROPERTY([CS_HAVE__ALIGNED_MALLOC])])
-
+    
+CS_CHECK_BUILD([for sysinfo()], [cs_cv_sysinfo],
+    [AC_LANG_PROGRAM(
+	[[#include <sys/sysinfo.h>]],
+	[struct sysinfo x; sysinfo(&x);])],
+    [],[],
+    [CS_HEADER_PROPERTY([CS_HAVE_SYSINFO])])
+   
 
 
 #------------------------------------------------------------------------------
@@ -2352,6 +2358,24 @@ CS_EMIT_BUILD_PROPERTY([EXTENSIVE_MEMDEBUG],
     [$enable_extensive_memory_debugger])
 AS_IF([test $enable_extensive_memory_debugger = yes],
     [CS_HEADER_PROPERTY([CS_EXTENSIVE_MEMDEBUG])])
+
+
+
+#------------------------------------------------------------------------------
+# Determine if checking allocations should be enabled.
+#------------------------------------------------------------------------------
+AS_IF([test $enable_extensive_memory_debugger = yes],
+    [AC_MSG_CHECKING([whether to use checking allocations])
+    AC_ARG_ENABLE([checking-allocations],
+	[AC_HELP_STRING([--enable-checking-allocations],
+	    [make allocations by default `checking' if the extensive memory
+	    debugger is enabled (default NO)])],
+	[], [enable_checking_allocations=no])
+    AC_MSG_RESULT([$enable_checking_allocations])
+    CS_EMIT_BUILD_PROPERTY([CHECKING_ALLOCATIONS],
+	[$enable_checking_allocations])
+    AS_IF([test $enable_checking_allocations = yes],
+	[CS_HEADER_PROPERTY([CS_CHECKING_ALLOCATIONS])])])
 
 
 

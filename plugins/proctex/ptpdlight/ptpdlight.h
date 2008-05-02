@@ -84,6 +84,8 @@ public:
     bool IsGray() const { return gray; }
   };
 
+#include "csutil/custom_new_disable.h"
+
   struct LumelBufferRGB : public LumelBufferBase
   {
     static CS_FORCEINLINE size_t LumelAlign (size_t n)
@@ -143,6 +145,8 @@ public:
     }
 
   };
+
+#include "csutil/custom_new_enable.h"
 
   class PDMap
   {

@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2005 by Jorrit Tyberghein
-              (C) 2005 by Frank Richter
+              (C) 2005-2008 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -37,18 +37,22 @@ class csGLRender2TextureBackend
 {
 protected:
   csGLGraphics3D* G3D;
-  
+public:  
   struct RTAttachment
   {
     csRef<iTextureHandle> texture;
-    bool persistent;
     int subtexture;
+    int persistent; /* 'int' to avoid uninit bytes that occur with bool */
+
+    RTAttachment() : subtexture (0), persistent (false) {}
     
     void Clear()
     {
       texture.Invalidate ();
+      subtexture = 0;
+      persistent = false;
     }
-    bool IsValid()
+    bool IsValid() const
     {
       return texture.IsValid();
     }
@@ -56,16 +60,21 @@ protected:
       int subtexture)
     {
       this->texture = handle;
-      this->persistent = persistent;
       this->subtexture = subtexture;
+      this->persistent = persistent;
     }
+
+    bool operator== (const RTAttachment& other) const;
+    bool operator!= (const RTAttachment& other) const;
   };
-public:
+
   csGLRender2TextureBackend (csGLGraphics3D* G3D);
   virtual ~csGLRender2TextureBackend();
+  virtual bool Status() = 0;
 
   virtual bool SetRenderTarget (iTextureHandle* handle, bool persistent,
   	int subtexture, csRenderTargetAttachment attachment) = 0;
+  virtual bool ValidateRenderTargets () = 0;
   virtual void UnsetRenderTargets() = 0;
   virtual bool CanSetRenderTarget (const char* format,
     csRenderTargetAttachment attachment) = 0;
@@ -78,6 +87,25 @@ public:
   virtual void SetClipRect (const csRect& clipRect) = 0;
   virtual void SetupClipPortalDrawing () = 0;
   virtual bool HasStencil() = 0;
+
+  virtual void NextFrame() {}
+};
+
+// Helper class for viewport changes made by R2T backends
+class R2TViewportHelper
+{
+  /// Old clip rect to restore after rendering on a proc texture.
+  int rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy;
+  /// Framebuffer dimensions
+  int framebufW, framebufH;
+  /// Old viewport
+  int vp_old_l, vp_old_t, vp_old_w, vp_old_h;
+public:
+  void Set2DViewport (iGraphics3D* G3D, int texW, int texH);
+  void Reset2DViewport (iGraphics3D* G3D);
+
+  int GetOriginalFramebufferWidth() const { return framebufW; }
+  int GetOriginalFramebufferHeight() const { return framebufH; }
 };
 
 }

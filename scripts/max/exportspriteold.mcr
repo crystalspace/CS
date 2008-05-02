@@ -18,14 +18,14 @@
 ------------------------------------------------------------
 -- Version 07
 
-macroScript Export_Sprite_CS
+macroScript Export_Sprite_CS_OLD
 category:"PlaneShift"
 internalcategory:"PlaneShift"
-ButtonText:"Export Sprite CS" 
-tooltip:"Export Sprite CS" Icon:#("Maxscript",1)
+ButtonText:"Export Old Sprite CS" 
+tooltip:"Export Old Sprite CS" Icon:#("Maxscript",1)
 (
 
-rollout Test1 "Export Sprite to CS" width:238 height:345
+rollout Test1 "Export Old Sprite to CS" width:238 height:345
 (
 	edittext edt3 "" pos:[17,32] width:192 height:21
 	label lbl1 "Export Sprite To:" pos:[21,7] width:142 height:20
