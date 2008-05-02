@@ -25,8 +25,8 @@
     
     <block location="cg:fragmentMain">
       float depth = positionProj.z*0.5 + 0.5;
-      depth = 1 - depth;
-      output = float4 (depth, depth*depth, 0, surface.a);
+      float depthInv = 1 - depth;
+      output = float4 (depth, 1-(depthInv*depthInv), 0, surface.a);
     </block>
     
     <output name="output" type="rgba" />

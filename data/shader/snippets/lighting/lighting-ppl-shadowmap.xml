@@ -151,6 +151,8 @@
 	
 	<block location="cg:definitions">
 	  <?Include /shader/snippets/lighting/lightfuncs.cginc ?>
+	  <?Include /shader/snippets/lighting/shadow-depth.cginc ?>
+	  <?Include /shader/snippets/lighting/shadow-vsm.cginc ?>
 	</block>
 	
 	<!-- @@@ The Cg combiner process the <uniform ... /> tags *before*
