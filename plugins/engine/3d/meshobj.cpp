@@ -842,6 +842,18 @@ void csMeshWrapper::SetDefaultEnvironmentTexture ()
   GetSVContext()->AddVariable(svTexEnvironment);
 }
 
+void csMeshWrapper::SetLODFade (float fade)
+{
+  csRef<csShaderVariable> sv_lod_fade =
+    GetSVContext()->GetVariableAdd (engine->id_lod_fade);
+  sv_lod_fade->SetValue (fade);
+}
+
+void csMeshWrapper::UnsetLODFade ()
+{
+  GetSVContext()->RemoveVariable (engine->id_lod_fade);
+}
+
 csHitBeamResult csMeshWrapper::HitBeamOutline (
   const csVector3 &start,
   const csVector3 &end)

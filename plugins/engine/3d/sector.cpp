@@ -372,10 +372,11 @@ public:
     csSectorVisibleMeshCallback::sector = sector;
   }
 
-  void MarkMeshAndChildrenVisible (iMeshWrapper* mesh, uint32 frustum_mask)
+  void MarkMeshAndChildrenVisible (iMeshWrapper* mesh, uint32 frustum_mask,
+                                   bool doFade = false, float fade = 1.0f)
   {
     csMeshWrapper* cmesh = (csMeshWrapper*)mesh;
-    ObjectVisible (cmesh, frustum_mask);
+    ObjectVisible (cmesh, frustum_mask, doFade, fade);
     size_t i;
     const csRefArray<iSceneNode>& children = cmesh->GetChildren ();
     for (i = 0 ; i < children.GetSize () ; i++)
@@ -383,11 +384,12 @@ public:
       iMeshWrapper* child = children[i]->QueryMesh ();
       // @@@ Traverse too in case there are lights/cameras?
       if (child)
-        MarkMeshAndChildrenVisible (child, frustum_mask);
+        MarkMeshAndChildrenVisible (child, frustum_mask, doFade, fade);
     }
   }
 
-  void ObjectVisible (csMeshWrapper* cmesh, uint32 frustum_mask)
+  void ObjectVisible (csMeshWrapper* cmesh, uint32 frustum_mask,
+                      bool doFade = false, float fade = 1.0f)
   {
     csStaticLODMesh* static_lod = cmesh->GetStaticLODMesh ();
     bool mm = cmesh->DoMinMaxRange ();
@@ -403,13 +405,32 @@ public:
         return;
     }
 
+    if (doFade)
+      cmesh->SetLODFade (fade);
+    else
+      cmesh->UnsetLODFade ();
+
     if (static_lod)
     {
       float lod = static_lod->GetLODValue (distance);
-      csArray<iMeshWrapper*>& meshes = static_lod->GetMeshesForLOD (lod);
+      csArray<iMeshWrapper*>* meshes1;
+      csArray<iMeshWrapper*>* meshes2;
+      float lodFade;
+      bool hasFade = static_lod->GetMeshesForLODFaded (lod,
+	meshes1, meshes2, lodFade);
       size_t i;
-      for (i = 0 ; i < meshes.GetSize () ; i++)
-        MarkMeshAndChildrenVisible (meshes[i], frustum_mask);
+      if (meshes1 != 0)
+      {
+	for (i = 0 ; i < meshes1->GetSize () ; i++)
+	  MarkMeshAndChildrenVisible ((*meshes1)[i], frustum_mask,
+	    hasFade, fade*lodFade);
+      }
+      if (meshes2 != 0)
+      {
+	for (i = 0 ; i < meshes2->GetSize () ; i++)
+	  MarkMeshAndChildrenVisible ((*meshes2)[i], frustum_mask,
+	    hasFade, fade*(1.0f-lodFade));
+      }
     }
 
     int num;

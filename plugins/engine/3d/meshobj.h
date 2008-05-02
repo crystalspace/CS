@@ -487,6 +487,9 @@ public:
 
   void SetDefaultEnvironmentTexture ();
 
+  void SetLODFade (float fade);
+  void UnsetLODFade ();
+
   //---------- Bounding volume and beam functions -----------------//
 
   virtual csSphere GetRadius () const;

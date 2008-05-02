@@ -713,6 +713,7 @@ bool csEngine::HandleEvent (iEvent &Event)
       frameWidth = 640;
       frameHeight = 480;
     }
+    id_lod_fade = globalStringSet->Request("lod fade");
 
     if (PerspectiveImpl::GetDefaultFOV () == 0)
       PerspectiveImpl::SetDefaultFOV (frameHeight/(float)frameWidth, 1.0f);

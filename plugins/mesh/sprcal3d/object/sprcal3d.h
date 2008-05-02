@@ -384,6 +384,12 @@ public:
   {
     first=0; second=0;
   }
+
+  // LOD fade not supported.
+  void SetLODFade (float f) { }
+  void GetLODFade (float& f) const { f = 0; }
+  void SetLODFade (iSharedVariable* varf) { }
+  void GetLODFade (iSharedVariable*& varf) const { varf = 0; }
   /** @} */
 };
 
@@ -769,6 +775,12 @@ public:
   {
     first=0; second=0;
   }
+
+  // LOD fade not supported.
+  void SetLODFade (float f) { }
+  void GetLODFade (float& f) const { f = 0; }
+  void SetLODFade (iSharedVariable* varf) { }
+  void GetLODFade (iSharedVariable*& varf) const { varf = 0; }
   /** @} */
 
   /**\name iObjectModel implementation
