@@ -9,7 +9,7 @@ INLINE_FUNCTIONS
 #endif
 
 %include "bindings/common/csgfx.i"
-#ifndef SWIGIMPORTED
+#if defined(SWIGCSHARP) && !defined(SWIGIMPORTED)
 %import "bindings/iengine.i" /* due to at least iTextureWrapper */
 %import "bindings/ivideo.i" /* due to at least iTextureHandle */
 #endif

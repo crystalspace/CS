@@ -10,9 +10,11 @@
 %}
 
 #ifndef SWIGIMPORTED
-%import "bindings/imesh.i" /* due to at least iMeshObject */
 INLINE_FUNCTIONS
 #endif
 
+#if defined(SWIGCSHARP) && !defined(SWIGIMPORTED)
+%import "bindings/imesh.i" /* due to at least iMeshObject */
+#endif
 %include "bindings/common/iengine.i"
 
