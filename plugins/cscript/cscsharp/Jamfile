@@ -93,16 +93,12 @@ if $(CSHARP.AVAILABLE) = "yes" && $(CMD.PERL5)  && $(CMD.SWIG)
 
   Depends csharpmod : $(configdotnetfinal) ;
 
-
-  # Installs pkg-config file
-  InstallBindingsModule $(cspacesharpdllfinal) : bindings csharp ;
-
   # TODO: Generate the .pc dynamically
   InstallBindingsPkgConfig [ DoSourceGrist crystalspace-dotnet.pc ] ;
 
   # Installs the bindings at the Global Assembly Cache
   # TODO: this is useful when the API is stable, and also is needed to change the api
-  #InstallGAC $(cspacesharpdllfinal) : crystalspace ;
+  InstallGAC cspacedotnet-gac : $(cspacesharpdllfinal) : crystalspace ;
 
 }
 

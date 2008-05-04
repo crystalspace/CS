@@ -1,11 +1,9 @@
 prefix=${pcfiledir}/../..
 exec_prefix=${prefix}
-bindingsdir=${exec_prefix}/share/crystalspace-1.3/bindings
-assembliesdir=${bindingsdir}/csharp
-Libraries=${assembliesdir}/crystalspace-dotnet.dll
+libdir=${exec_prefix}/lib
 
 Name: crystalspace-dotnet
 Description: Crystal Space C# bindings.
-Version: 1.0
-Libs: -r:${assembliesdir}/crystalspace-dotnet.dll
+Version: 1.3.0.0
+Libs: -r:${libdir}/mono/crystalspace/crystalspace-dotnet.dll
 

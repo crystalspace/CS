@@ -188,6 +188,14 @@ rule InstallBindingsModule
 	[ DoInstall $(1) : $(appdatadir) $(2) : $(INSTALL_PROGRAM) ] ;
 }
 
+##  InstallCSharpModule file
+##    Installs a c side module
+rule InstallCSharpModule
+{
+    Depends install_bindings :
+	[ DoInstall $(1) : $(libdir) : $(INSTALL_DATA) ] ;
+}
+
 ##  DoInstall sourcenames : directories [ : installapp : [ postinstallrules ]]
 ##    Creates a new install target for the given sources named by
 ##    `sourcenames'.  `directories' is a list of directory components

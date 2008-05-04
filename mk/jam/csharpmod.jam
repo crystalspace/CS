@@ -76,7 +76,7 @@ if $(CSHARP.AVAILABLE) = "yes"
     Depends $(target) : $(objects) ;
     LinkPlugin $(target) : $(objects) ;
 
-    InstallBindingsModule $(target) : $(4) ;
+    InstallCSharpModule $(target) ;
 
     if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
     {
@@ -85,7 +85,7 @@ if $(CSHARP.AVAILABLE) = "yes"
       cleantarget += $(debugfile) ;
       NoCare $(debugfile) ;
       Depends install_bindings :
-		 [ DoInstall $(debugfile) : $(appdatadir) $(4) : $(INSTALL_DATA) ] ;
+		 [ DoInstall $(debugfile) : $(libdir) : $(INSTALL_DATA) ] ;
     }
 
     Always $(<)clean ;
@@ -130,17 +130,17 @@ if $(CSHARP.AVAILABLE) = "yes"
     case MONO :
       actions InstallGAC1
       {
-        $(CMD.GACUTIL) -i $(<) -package $(ASSEMBLY_PACKAGE)
+        $(CMD.GACUTIL) -i $(>) -package $(ASSEMBLY_PACKAGE)
       }
     case PNET :
       actions InstallGAC1
       {
-        $(CMD.GACUTIL) -if $(<)
+        $(CMD.GACUTIL) -if $(>)
       }
     case MS :
       actions InstallGAC1
       {
-	$(CMD.GACUTIL) /if $(<)
+	$(CMD.GACUTIL) /if $(>)
       }
     case * :
       actions InstallGAC1
@@ -183,16 +183,14 @@ if $(CSHARP.AVAILABLE) = "yes"
   # InstallGAC assembly : packagename
   rule InstallGAC
   {
-    local assembly = $(1) ;
-    local packagename = $(2) ;
+    local assembly = $(2) ;
+    local packagename = $(3) ;
 
+    NotFile $(<) ;
+    Depends $(<) : $(assembly) ;
     ASSEMBLY_PACKAGE = $(packagename) ;
-    Depends install_bindings : [ InstallGAC1 $(assembly) ] ;
-  }
-
-  rule InstallCSharpMod
-  {
-    InstallBindingsModule $(1) : $(2) ;
+	InstallGAC1 $(<) : $(assembly) ;
+    Depends install_bindings : $(<) ;
   }
 }
 
