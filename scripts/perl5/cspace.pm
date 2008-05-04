@@ -298,6 +298,402 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::Vector2Array ##############
+
+package cspace::Vector2Array;
+use overload
+    "!=" => sub { $_[0]->__ne__($_[1])},
+    "==" => sub { $_[0]->__eq__($_[1])},
+    "fallback" => 1;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_Vector2Array($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_Vector2Array(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*GetSize = *cspacec::Vector2Array_GetSize;
+*Get = *cspacec::Vector2Array_Get;
+*Put = *cspacec::Vector2Array_Put;
+*Push = *cspacec::Vector2Array_Push;
+*Pop = *cspacec::Vector2Array_Pop;
+*Top = *cspacec::Vector2Array_Top;
+*Insert = *cspacec::Vector2Array_Insert;
+*Contains = *cspacec::Vector2Array_Contains;
+*DeleteAll = *cspacec::Vector2Array_DeleteAll;
+*Truncate = *cspacec::Vector2Array_Truncate;
+*Empty = *cspacec::Vector2Array_Empty;
+*IsEmpty = *cspacec::Vector2Array_IsEmpty;
+*SetMinimalCapacity = *cspacec::Vector2Array_SetMinimalCapacity;
+*DeleteIndex = *cspacec::Vector2Array_DeleteIndex;
+*DeleteIndexFast = *cspacec::Vector2Array_DeleteIndexFast;
+*DeleteRange = *cspacec::Vector2Array_DeleteRange;
+*__eq__ = *cspacec::Vector2Array___eq__;
+*__ne__ = *cspacec::Vector2Array___ne__;
+*GetAllocator = *cspacec::Vector2Array_GetAllocator;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::Vector2DirtyAccessArray ##############
+
+package cspace::Vector2DirtyAccessArray;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::Vector2Array cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_Vector2DirtyAccessArray(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*GetArray = *cspacec::Vector2DirtyAccessArray_GetArray;
+*GetArrayCopy = *cspacec::Vector2DirtyAccessArray_GetArrayCopy;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_Vector2DirtyAccessArray($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::Vector3Array ##############
+
+package cspace::Vector3Array;
+use overload
+    "!=" => sub { $_[0]->__ne__($_[1])},
+    "==" => sub { $_[0]->__eq__($_[1])},
+    "fallback" => 1;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_Vector3Array($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_Vector3Array(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*GetSize = *cspacec::Vector3Array_GetSize;
+*Get = *cspacec::Vector3Array_Get;
+*Put = *cspacec::Vector3Array_Put;
+*Push = *cspacec::Vector3Array_Push;
+*Pop = *cspacec::Vector3Array_Pop;
+*Top = *cspacec::Vector3Array_Top;
+*Insert = *cspacec::Vector3Array_Insert;
+*Contains = *cspacec::Vector3Array_Contains;
+*DeleteAll = *cspacec::Vector3Array_DeleteAll;
+*Truncate = *cspacec::Vector3Array_Truncate;
+*Empty = *cspacec::Vector3Array_Empty;
+*IsEmpty = *cspacec::Vector3Array_IsEmpty;
+*SetMinimalCapacity = *cspacec::Vector3Array_SetMinimalCapacity;
+*DeleteIndex = *cspacec::Vector3Array_DeleteIndex;
+*DeleteIndexFast = *cspacec::Vector3Array_DeleteIndexFast;
+*DeleteRange = *cspacec::Vector3Array_DeleteRange;
+*__eq__ = *cspacec::Vector3Array___eq__;
+*__ne__ = *cspacec::Vector3Array___ne__;
+*GetAllocator = *cspacec::Vector3Array_GetAllocator;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::Vector3DirtyAccessArray ##############
+
+package cspace::Vector3DirtyAccessArray;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::Vector3Array cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_Vector3DirtyAccessArray(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*GetArray = *cspacec::Vector3DirtyAccessArray_GetArray;
+*GetArrayCopy = *cspacec::Vector3DirtyAccessArray_GetArrayCopy;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_Vector3DirtyAccessArray($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::Vector4Array ##############
+
+package cspace::Vector4Array;
+use overload
+    "!=" => sub { $_[0]->__ne__($_[1])},
+    "==" => sub { $_[0]->__eq__($_[1])},
+    "fallback" => 1;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_Vector4Array($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_Vector4Array(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*GetSize = *cspacec::Vector4Array_GetSize;
+*Get = *cspacec::Vector4Array_Get;
+*Put = *cspacec::Vector4Array_Put;
+*Push = *cspacec::Vector4Array_Push;
+*Pop = *cspacec::Vector4Array_Pop;
+*Top = *cspacec::Vector4Array_Top;
+*Insert = *cspacec::Vector4Array_Insert;
+*Contains = *cspacec::Vector4Array_Contains;
+*DeleteAll = *cspacec::Vector4Array_DeleteAll;
+*Truncate = *cspacec::Vector4Array_Truncate;
+*Empty = *cspacec::Vector4Array_Empty;
+*IsEmpty = *cspacec::Vector4Array_IsEmpty;
+*SetMinimalCapacity = *cspacec::Vector4Array_SetMinimalCapacity;
+*DeleteIndex = *cspacec::Vector4Array_DeleteIndex;
+*DeleteIndexFast = *cspacec::Vector4Array_DeleteIndexFast;
+*DeleteRange = *cspacec::Vector4Array_DeleteRange;
+*__eq__ = *cspacec::Vector4Array___eq__;
+*__ne__ = *cspacec::Vector4Array___ne__;
+*GetAllocator = *cspacec::Vector4Array_GetAllocator;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::Vector4DirtyAccessArray ##############
+
+package cspace::Vector4DirtyAccessArray;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::Vector4Array cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_Vector4DirtyAccessArray(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*GetArray = *cspacec::Vector4DirtyAccessArray_GetArray;
+*GetArrayCopy = *cspacec::Vector4DirtyAccessArray_GetArrayCopy;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_Vector4DirtyAccessArray($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::UIntArray ##############
+
+package cspace::UIntArray;
+use overload
+    "!=" => sub { $_[0]->__ne__($_[1])},
+    "==" => sub { $_[0]->__eq__($_[1])},
+    "fallback" => 1;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_UIntArray($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_UIntArray(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*GetSize = *cspacec::UIntArray_GetSize;
+*Get = *cspacec::UIntArray_Get;
+*Put = *cspacec::UIntArray_Put;
+*Push = *cspacec::UIntArray_Push;
+*Pop = *cspacec::UIntArray_Pop;
+*Top = *cspacec::UIntArray_Top;
+*Insert = *cspacec::UIntArray_Insert;
+*Contains = *cspacec::UIntArray_Contains;
+*DeleteAll = *cspacec::UIntArray_DeleteAll;
+*Truncate = *cspacec::UIntArray_Truncate;
+*Empty = *cspacec::UIntArray_Empty;
+*IsEmpty = *cspacec::UIntArray_IsEmpty;
+*SetMinimalCapacity = *cspacec::UIntArray_SetMinimalCapacity;
+*DeleteIndex = *cspacec::UIntArray_DeleteIndex;
+*DeleteIndexFast = *cspacec::UIntArray_DeleteIndexFast;
+*DeleteRange = *cspacec::UIntArray_DeleteRange;
+*__eq__ = *cspacec::UIntArray___eq__;
+*__ne__ = *cspacec::UIntArray___ne__;
+*GetAllocator = *cspacec::UIntArray_GetAllocator;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::UIntDirtyAccessArray ##############
+
+package cspace::UIntDirtyAccessArray;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::UIntArray cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_UIntDirtyAccessArray(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*GetArray = *cspacec::UIntDirtyAccessArray_GetArray;
+*GetArrayCopy = *cspacec::UIntDirtyAccessArray_GetArrayCopy;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_UIntDirtyAccessArray($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::scfInterfaceMetadata ##############
 
 package cspace::scfInterfaceMetadata;
@@ -3838,6 +4234,7 @@ sub new {
 *Top = *cspacec::csImageIOFileFormatDescriptions_Top;
 *Insert = *cspacec::csImageIOFileFormatDescriptions_Insert;
 *Contains = *cspacec::csImageIOFileFormatDescriptions_Contains;
+*DeleteAll = *cspacec::csImageIOFileFormatDescriptions_DeleteAll;
 *Truncate = *cspacec::csImageIOFileFormatDescriptions_Truncate;
 *Empty = *cspacec::csImageIOFileFormatDescriptions_Empty;
 *IsEmpty = *cspacec::csImageIOFileFormatDescriptions_IsEmpty;
@@ -10132,7 +10529,6 @@ sub new {
 }
 
 *Description = *cspacec::csVector3_Description;
-*Cross = *cspacec::csVector3_Cross;
 *__neg__ = *cspacec::csVector3___neg__;
 *Set = *cspacec::csVector3_Set;
 *Get = *cspacec::csVector3_Get;
@@ -10152,6 +10548,7 @@ sub new {
 *__gt__ = *cspacec::csVector3___gt__;
 *__div__ = *cspacec::csVector3___div__;
 *project = *cspacec::csVector3_project;
+*Cross = *cspacec::csVector3_Cross;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -12797,6 +13194,7 @@ sub new {
 *Top = *cspacec::csIntArray_Top;
 *Insert = *cspacec::csIntArray_Insert;
 *Contains = *cspacec::csIntArray_Contains;
+*DeleteAll = *cspacec::csIntArray_DeleteAll;
 *Truncate = *cspacec::csIntArray_Truncate;
 *Empty = *cspacec::csIntArray_Empty;
 *IsEmpty = *cspacec::csIntArray_IsEmpty;
@@ -12855,6 +13253,7 @@ sub new {
 *Pop = *cspacec::csIntArrayArray_Pop;
 *Top = *cspacec::csIntArrayArray_Top;
 *Insert = *cspacec::csIntArrayArray_Insert;
+*DeleteAll = *cspacec::csIntArrayArray_DeleteAll;
 *Truncate = *cspacec::csIntArrayArray_Truncate;
 *Empty = *cspacec::csIntArrayArray_Empty;
 *IsEmpty = *cspacec::csIntArrayArray_IsEmpty;
@@ -15379,6 +15778,7 @@ sub new {
 *Top = *cspacec::csCharArrayArray_Top;
 *Insert = *cspacec::csCharArrayArray_Insert;
 *Contains = *cspacec::csCharArrayArray_Contains;
+*DeleteAll = *cspacec::csCharArrayArray_DeleteAll;
 *Truncate = *cspacec::csCharArrayArray_Truncate;
 *Empty = *cspacec::csCharArrayArray_Empty;
 *IsEmpty = *cspacec::csCharArrayArray_IsEmpty;
@@ -17813,6 +18213,42 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         cspacec::delete_iEngine($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iLODControl ##############
+
+package cspace::iLODControl;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*SetLOD = *cspacec::iLODControl_SetLOD;
+*GetLOD = *cspacec::iLODControl_GetLOD;
+*GetLODPolygonCount = *cspacec::iLODControl_GetLODPolygonCount;
+*SetLODFade = *cspacec::iLODControl_SetLODFade;
+*GetLODFade = *cspacec::iLODControl_GetLODFade;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iLODControl($self);
         delete $OWNER{$self};
     }
 }

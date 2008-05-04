@@ -611,6 +611,20 @@ iEngine_swigregister = _iengine.iEngine_swigregister
 iEngine_swigregister(iEngine)
 iEngine_scfGetVersion = _iengine.iEngine_scfGetVersion
 
+class iLODControl(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def SetLOD(*args): return _iengine.iLODControl_SetLOD(*args)
+    def GetLOD(*args): return _iengine.iLODControl_GetLOD(*args)
+    def GetLODPolygonCount(*args): return _iengine.iLODControl_GetLODPolygonCount(*args)
+    def SetLODFade(*args): return _iengine.iLODControl_SetLODFade(*args)
+    def GetLODFade(*args): return _iengine.iLODControl_GetLODFade(*args)
+    __swig_destroy__ = _iengine.delete_iLODControl
+    __del__ = lambda self : None;
+iLODControl_swigregister = _iengine.iLODControl_swigregister
+iLODControl_swigregister(iLODControl)
+
 class iCameraSectorListener(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
