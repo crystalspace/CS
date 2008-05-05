@@ -151,11 +151,11 @@ csBox3 csTransform::Other2This (const csBox3& box) const
 
     for (size_t i = 0; i < 3; ++i)
     {
-      const csVector3 col = m_o2t.Col (i);
+      const csVector3 row = m_o2t.Row (i);
       for (size_t j = 0; j < 3; ++j)
       {
-        float a = col[j] * minA[j];
-        float b = col[j] * maxA[j];
+        float a = row[j] * minA[j];
+        float b = row[j] * maxA[j];
         if (a < b)
         {
           minB[i] += a;
@@ -326,11 +326,11 @@ csBox3 csReversibleTransform::This2Other (const csBox3 &box) const
 
     for (size_t i = 0; i < 3; ++i)
     {
-      const csVector3 col = m_t2o.Col (i);
+      const csVector3 row = m_t2o.Row (i);
       for (size_t j = 0; j < 3; ++j)
       {
-        float a = col[j] * minA[j];
-        float b = col[j] * maxA[j];
+        float a = row[j] * minA[j];
+        float b = row[j] * maxA[j];
         if (a < b)
         {
           minB[i] += a;
