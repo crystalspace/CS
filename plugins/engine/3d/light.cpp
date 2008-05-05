@@ -296,7 +296,7 @@ void csLight::OnSetPosition ()
     lightT.GetInverse());
       
   const csVector3 lightDirW = 
-    lightT.This2OtherRelative (csVector3 (0, 0, 1));
+    lightT.This2OtherRelative (csVector3 (0, 0, -1));
   if (!lightDirW.IsZero())
   {
     GetPropertySV (csLightShaderVarCache::lightDirectionWorld)->SetValue (
@@ -571,15 +571,20 @@ void csLight::UpdateBBox ()
   switch (type)
   {
   case CS_LIGHT_DIRECTIONAL:
-      //@@TODO: Implement
+    lightBoundingBox.Set (
+      csVector3 (-directionalCutoffRadius, -directionalCutoffRadius, 0), 
+      csVector3 (directionalCutoffRadius, directionalCutoffRadius, cutoffDistance));
+    break;
   case CS_LIGHT_SPOTLIGHT:
-      //@@TODO: Implement
+    // @@@ This could be tighter if the falloff is taken into account.
+    lightBoundingBox.Set (
+      csVector3 (-cutoffDistance, -cutoffDistance, -cutoffDistance),
+      csVector3 (cutoffDistance, cutoffDistance, 0));
+    break;
   case CS_LIGHT_POINTLIGHT:
-    {
-      lightBoundingBox.SetSize (csVector3 (cutoffDistance));
-      lightBoundingBox.SetCenter (csVector3 (0));
-      break;
-    }
+    lightBoundingBox.SetSize (csVector3 (cutoffDistance*2));
+    lightBoundingBox.SetCenter (csVector3 (0));
+    break;
   }
 
   worldBoundingBox = movable.GetFullTransform ().This2Other (lightBoundingBox);

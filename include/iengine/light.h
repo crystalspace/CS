@@ -276,7 +276,14 @@ struct iLight : public virtual iBase
   CS_DEPRECATED_METHOD_MSG("Deprecated. Use GetMovable() and the iMovable interface.")
   virtual iSector *GetSector () = 0;
 
-  /// Get the movable for this light.
+  /**
+   * Get the movable for this light ('this' space = light space,
+   * 'other' space = world space).
+   * The rotation of the movable determines the direction for directional and 
+   * spot lights. Lights shine along -Z in light space; thus the direction in
+   * world space can be computed by translating the direction (0,0,-1) from\
+   * the movable's 'this' to 'other' space.
+   */
   virtual iMovable *GetMovable () = 0;
 
   /**
