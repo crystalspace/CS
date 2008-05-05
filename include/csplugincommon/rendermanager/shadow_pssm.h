@@ -110,7 +110,8 @@ namespace RenderManager
       struct Frustum
       {
         // Volume (in post-project light space)
-        csBox3 volume;
+        csBox3 volumeLS;
+        csBox3 volumePP;
 	csShaderVariable* shadowMapProjectSV;
 	csShaderVariable* shadowMapDimSV;
 	csShaderVariable** textureSVs;
@@ -129,7 +130,7 @@ namespace RenderManager
       {
         if (!frustumsSetup)
         {
-          float lightNear = 1;
+          float lightNear = SMALL_Z;
           float lightCutoff = light->GetCutoffDistance();
           CS::Math::Matrix4 lightProject;
           switch (light->GetType())
@@ -155,14 +156,14 @@ namespace RenderManager
               }
               break;
           }
-          CS::Math::Matrix4 world2light (
+          const csReversibleTransform& world2light (
             light->GetMovable()->GetFullTransform());
           CS::Math::Matrix4 world2lightProj (
             world2light * lightProject);
 	  this->lightProject = lightProject;
 	  this->world2light = world2light;
             
-          //const csBox3& lightBBoxW = light->GetWorldBBox();
+          const csBox3& lightBBox = light->GetLocalBBox();
         
 	  LightingVariablesHelper lightVarsHelper (viewSetup.persist.lightVarsPersist);
 	  /* Compute intersection of light frustum with view frustums:
@@ -179,40 +180,49 @@ namespace RenderManager
 	      csVector2 (viewSetup.rx, viewSetup.by)
 	    };
 	    Frustum& lightFrustum = lightFrustums[i];
-	    lightFrustum.volume.StartBoundingBox();
 	    // Frustum corner, camera space
 	    csVector3 cornerCam;
 	    // Frustum corner, world space
 	    csVector3 cornerWorld;
-	    csVector4 cornerLight;
-	    // Frustum corner, light space before W divide
-	    csVector4 cornerUndiv;
-	    // Frustum corner, light space after W divide
-	    csVector3 cornerDiv;
+	    // Frustum corner, light space
+	    csVector3 cornerLight;
+	    // Frustum slice bbox, light space
+	    csBox3 frustumLight;
+	    frustumLight.StartBoundingBox();
 	    for (int c = 0; c < 4; c++)
 	    {
 	      cornerCam = viewSetup.rview->GetCamera()->InvPerspective (
 		corner2D[c], viewSetup.splitDists[i]);
 	      cornerWorld = viewSetup.rview->GetCamera()->GetTransform().This2Other (
 		cornerCam);
-	      cornerLight = world2light * csVector4 (cornerWorld);
-	      if (cornerLight.z < lightNear) cornerLight.z = lightNear;
-	      cornerUndiv = lightProject * cornerLight;
-	      cornerDiv =
-		csVector3 (cornerUndiv.x, cornerUndiv.y, cornerUndiv.z);
-	      cornerDiv /= cornerUndiv.w;
-	      lightFrustum.volume.AddBoundingVertex (cornerDiv);
+	      cornerLight = world2light.Other2This (cornerWorld);
+	      frustumLight.AddBoundingVertex (cornerLight);
+	      
 	      cornerCam = viewSetup.rview->GetCamera()->InvPerspective (
 		corner2D[c], viewSetup.splitDists[i+1]);
 	      cornerWorld = viewSetup.rview->GetCamera()->GetTransform().This2Other (
 		cornerCam);
-	      cornerLight = world2light * csVector4 (cornerWorld);
-	      if (cornerLight.z < lightNear) cornerLight.z = lightNear;
+	      cornerLight = world2light.Other2This (cornerWorld);
+	      frustumLight.AddBoundingVertex (cornerLight);
+	    }
+	    frustumLight *= lightBBox;
+	    
+	    // Frustum slice corner, light space before W divide
+	    csVector4 cornerUndiv;
+	    // Frustum slice corner, light space after W divide
+	    csVector3 cornerDiv;
+	    
+	    lightFrustum.volumeLS.StartBoundingBox();
+	    lightFrustum.volumePP.StartBoundingBox();
+	    for (int c = 0; c < 7; c++)
+	    {
+	      cornerLight = frustumLight.GetCorner (c);
+	      lightFrustum.volumeLS.AddBoundingVertex (cornerLight);
 	      cornerUndiv = lightProject * cornerLight;
 	      cornerDiv =
 		csVector3 (cornerUndiv.x, cornerUndiv.y, cornerUndiv.z);
 	      cornerDiv /= cornerUndiv.w;
-	      lightFrustum.volume.AddBoundingVertex (cornerDiv);
+	      lightFrustum.volumePP.AddBoundingVertex (cornerDiv);
 	    }
 	  
 	    lightFrustum.shadowMapProjectSV = lightVarsHelper.CreateTempSV (
@@ -295,10 +305,11 @@ namespace RenderManager
 	     casters closer to the light than the split plane */
 	  if (allObjsBoxPP.MinZ() < allMinZ) allMinZ = allObjsBoxPP.MinZ();
 	  //allMinZ = csMax (allMinZ, 0.0f);
-	  float maxZ = /*csMin (*/allObjsBoxPP.MaxZ()/*, light->GetCutoffDistance())*/;
+	  float maxZ = allObjsBoxPP.MaxZ();
 	  /* Consider using DepthRange? */
-	  float n = allMinZ; //-1.0f;
-	  float f = maxZ;//10.0f;
+	  float n = allMinZ;
+	  float f = maxZ + EPSILON;
+	   /* Sometimes n==f which would result in an invalid matrix w/O EPSILON */
           CS::Math::Matrix4 Mortho = CS::Math::Projections::Ortho (-1, 1, 1, -1, -n, -f);
 	  CS::Math::Matrix4 matrix = (Mortho * crop) * lightData.lightProject;
 	  
@@ -558,8 +569,11 @@ private:
       const csReversibleTransform& world2light (
         light->GetMovable()->GetFullTransform());
       
+      csBox3 meshBboxLS;
       csVector3 vLight;
       vLight = world2light.Other2This (singleMesh.bbox.GetCorner (0));
+      meshBboxLS.StartBoundingBox (csVector3 (vLight.x,
+        vLight.y, vLight.z));
       csBox3 meshBboxLightPP;
       csVector4 vLightPP;
       vLightPP = lightData.lightProject * csVector4 (vLight);
@@ -569,17 +583,22 @@ private:
       for (int c = 1; c < 8; c++)
       {
         vLight = world2light.Other2This (singleMesh.bbox.GetCorner (c));
+	meshBboxLS.AddBoundingVertexSmart (csVector3 (vLight.x,
+          vLight.y, vLight.z));
         vLightPP = lightData.lightProject * csVector4 (vLight);
         vLightPP /= vLightPP.w;
-	meshBboxLightPP.AddBoundingVertex (csVector3 (vLightPP.x,
+	meshBboxLightPP.AddBoundingVertexSmart (csVector3 (vLightPP.x,
           vLightPP.y, vLightPP.z));
       }
       for (int f = 0; f < NUM_PARTS; f++)
       {
-        if (!lightData.lightFrustums[f].volume.TestIntersect (meshBboxLightPP))
+        if (!lightData.lightFrustums[f].volumeLS.TestIntersect (meshBboxLS))
+        {
           continue;
+        }
       
-        lightData.lightFrustums[f].containedObjectsPP.Push (meshBboxLightPP);
+        lightData.lightFrustums[f].containedObjectsPP.Push (meshBboxLightPP
+          * lightData.lightFrustums[f].volumePP);
       
 	// Add shadow map SVs
 	lightVarsHelper.MergeAsArrayItem (lightStack,
