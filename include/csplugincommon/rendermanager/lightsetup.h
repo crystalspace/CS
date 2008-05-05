@@ -221,13 +221,15 @@ namespace RenderManager
     };
     struct ShadowParameters {};
 
+    ShadowNone() {}
     ShadowNone (PersistentData& persist,
       const LayerConfigType& layerConfig,
       typename RenderTree::MeshNode* node, 
       ShadowParameters&) { }
 
+    template<typename _CachedLightData>
     void HandleOneLight (typename RenderTree::MeshNode::SingleMesh& singleMesh,
-                         iLight* light, CachedLightData& lightData,
+                         iLight* light, _CachedLightData& lightData,
                          csShaderVariableStack& lightStack,
                          uint lightNum)
     {}
@@ -255,7 +257,8 @@ namespace RenderManager
       const csRefArray<csShaderVariable>* shaderVars;
     };
     
-    size_t HandleLights (ShadowHandler& shadows,
+    template<typename _ShadowHandler>
+    size_t HandleLights (_ShadowHandler& shadows,
       LightingSorter& sortedLights,
       size_t layer, LayerHelper<RenderTree, LayerConfigType,
         PostLightingLayers>& layers, const LayerConfigType& layerConfig,
@@ -481,6 +484,7 @@ namespace RenderManager
         newLayers);
       ShadowHandler shadows (persist.shadowPersist, layerConfig,
         node, shadowParam);
+      ShadowNone<RenderTree, LayerConfigType> noShadows;
 
       for (size_t i = 0; i < node->meshes.GetSize (); ++i)
       {
@@ -515,8 +519,13 @@ namespace RenderManager
           }
 
           sortedLights.SetLightsLimit (layerLights);
-          size_t handledLights = HandleLights (shadows, sortedLights,
-            layer, layerHelper, layerConfig, mesh, node);
+          size_t handledLights;
+          if (mesh.meshFlags.Check (CS_ENTITY_NOSHADOWS))
+	    handledLights = HandleLights (noShadows, sortedLights,
+	      layer, layerHelper, layerConfig, mesh, node);
+	  else
+	    handledLights = HandleLights (shadows, sortedLights,
+	      layer, layerHelper, layerConfig, mesh, node);
           if ((handledLights == 0)
             && (!layerConfig.IsAmbientLayer (layer)))
           {
