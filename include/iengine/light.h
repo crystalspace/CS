@@ -129,12 +129,12 @@ enum csLightAttenuationMode
  * There are currently three types of lightsources:
  * - Point lights - have a position. Shines in all directions.
  * - Directional lights - have a direction and radius. Shines along it's
- *                             major axis. The direction is 0,0,1.
+ *                        major axis. The direction is 0,0,-1 in light space.
  * - Spot lights - have both position and direction. Shines with full
  *                      strength along major axis and out to the hotspot angle.
  *                      Between hotspot and outer angle it will falloff, outside
  *                      outer angle there shines no light. The direction is
- *                      0,0,1.
+ *                      0,0,-1 in light space.
  */
 enum csLightType
 {
