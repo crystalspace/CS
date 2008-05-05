@@ -232,7 +232,7 @@ struct iLightCallback : public virtual iBase
  */
 struct iLight : public virtual iBase
 {
-  SCF_INTERFACE(iLight,3,0,0);
+  SCF_INTERFACE(iLight,3,0,1);
   /// Get the id of this light. This is a 16-byte MD5.
   virtual const char* GetLightID () = 0;
 
@@ -428,10 +428,13 @@ struct iLight : public virtual iBase
    */
   virtual iShaderVariableContext* GetSVContext() = 0;
 
+  //@{
   /**
    * Get the bounding box of the light (the bounds define the influence area).
    */
   virtual const csBox3& GetLocalBBox () const = 0;
+  virtual const csBox3& GetWorldBBox () const = 0;
+  //@}
 };
 
 /**

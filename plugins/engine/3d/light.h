@@ -542,6 +542,8 @@ public:
   {
     return lightBoundingBox;
   }
+  const csBox3& GetWorldBBox () const
+  { return worldBoundingBox; }
 
   csBox3 GetBBox () const;
 
