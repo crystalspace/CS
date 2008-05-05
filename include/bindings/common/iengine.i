@@ -2,6 +2,7 @@
 %include "iengine/light.h"
 %include "iengine/sector.h"
 %include "iengine/engine.h"
+%include "iengine/lod.h"
 
 %ignore iCamera::GetTransform (); // Non-const.
 %ignore iCamera::Perspective (const csVector3&, csVector2&) const;

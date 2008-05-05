@@ -157,7 +157,7 @@ void csSector::UnlinkObjects ()
   int i;
   for (i = meshes.GetCount()-1; i >= 0; i--)
   {
-    iMeshWrapper* m = meshes.Get (i);
+    csRef<iMeshWrapper> m = meshes.Get (i);
     iSectorList* sl = m->GetMovable ()->GetSectors ();
     sl->Remove ((iSector*)this);
     m->GetMovable ()->UpdateMove ();

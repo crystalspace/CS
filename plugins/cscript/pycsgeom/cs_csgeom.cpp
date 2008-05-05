@@ -2995,6 +2995,7 @@ SWIGINTERN csVector3 &csVector3_operator_Sm__Se___SWIG_1(csVector3 *self,csTrans
 SWIGINTERN csVector3 &csVector3_operator_Sd__Se___SWIG_1(csVector3 *self,csReversibleTransform const &t){ return *self /= t; }
 SWIGINTERN csVector3 csVector3_operator_Sd___SWIG_1(csVector3 *self,csReversibleTransform const &t){ return *self / t; }
 SWIGINTERN csVector3 csVector3_project(csVector3 const *self,csVector3 const &what){ return what << *self; }
+SWIGINTERN csVector3 csVector3_Cross__SWIG_1(csVector3 const *self,csVector3 const &other){ return *self % other; }
 SWIGINTERN csVector3 csVector3___rmul__(csVector3 const *self,float f){ return f * *self; }
 SWIGINTERN float csVector3___abs__(csVector3 const *self){ return self->Norm(); }
 SWIGINTERN float csVector3___getitem__(csVector3 const *self,int i){ return self->operator[](i); }
@@ -4955,7 +4956,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csVector3_Cross(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csVector3_Cross__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csVector3 *arg1 = (csVector3 *) 0 ;
   csVector3 *arg2 = 0 ;
@@ -6280,6 +6281,87 @@ SWIGINTERN PyObject *_wrap_csVector3_project(PyObject *SWIGUNUSEDPARM(self), PyO
   resultobj = SWIG_NewPointerObj((new csVector3(static_cast< const csVector3& >(result))), SWIGTYPE_p_csVector3, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csVector3_Cross__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csVector3 *arg1 = (csVector3 *) 0 ;
+  csVector3 *arg2 = 0 ;
+  csVector3 result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csVector3_Cross",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csVector3, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csVector3_Cross" "', argument " "1"" of type '" "csVector3 const *""'"); 
+  }
+  arg1 = reinterpret_cast< csVector3 * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csVector3_Cross" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csVector3_Cross" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  arg2 = reinterpret_cast< csVector3 * >(argp2);
+  result = csVector3_Cross__SWIG_1((csVector3 const *)arg1,(csVector3 const &)*arg2);
+  resultobj = SWIG_NewPointerObj((new csVector3(static_cast< const csVector3& >(result))), SWIGTYPE_p_csVector3, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csVector3_Cross(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[4];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 3); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csVector3, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_csVector3, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_csVector3_Cross__SWIG_1(self, args);
+      }
+    }
+  }
+  if (argc == 3) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csVector3, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_csVector3, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_csVector3, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          return _wrap_csVector3_Cross__SWIG_0(self, args);
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csVector3_Cross'.\n  Possible C/C++ prototypes are:\n    Cross(csVector3 const &,csVector3 const &)\n    Cross(csVector3 const &)\n");
   return NULL;
 }
 
@@ -45097,6 +45179,27 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csIntArray_DeleteAll(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csArray<int > *arg1 = (csArray<int > *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csIntArray_DeleteAll",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csIntArray_DeleteAll" "', argument " "1"" of type '" "csArray<int > *""'"); 
+  }
+  arg1 = reinterpret_cast< csArray<int > * >(argp1);
+  (arg1)->DeleteAll();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_csIntArray_Truncate(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csArray<int > *arg1 = (csArray<int > *) 0 ;
@@ -46136,6 +46239,27 @@ SWIGINTERN PyObject *_wrap_csIntArrayArray_Insert(PyObject *SWIGUNUSEDPARM(self)
   arg3 = reinterpret_cast< csArray<int,csArrayElementHandler<int >,CS::Container::ArrayAllocDefault,CS::Container::ArrayCapacityDefault > * >(argp3);
   result = (bool)(arg1)->Insert(arg2,(csArray<int,csArrayElementHandler<int >,CS::Container::ArrayAllocDefault,CS::Container::ArrayCapacityDefault > const &)*arg3);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csIntArrayArray_DeleteAll(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csArray<csArray<int > > *arg1 = (csArray<csArray<int > > *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csIntArrayArray_DeleteAll",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csIntArrayArray_DeleteAll" "', argument " "1"" of type '" "csArray<csArray<int > > *""'"); 
+  }
+  arg1 = reinterpret_cast< csArray<csArray<int > > * >(argp1);
+  (arg1)->DeleteAll();
+  resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
   return NULL;
@@ -47735,7 +47859,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csVector3_z_get", _wrap_csVector3_z_get, METH_VARARGS, NULL},
 	 { (char *)"new_csVector3", _wrap_new_csVector3, METH_VARARGS, NULL},
 	 { (char *)"csVector3_Description", _wrap_csVector3_Description, METH_VARARGS, NULL},
-	 { (char *)"csVector3_Cross", _wrap_csVector3_Cross, METH_VARARGS, NULL},
 	 { (char *)"csVector3___iadd__", _wrap_csVector3___iadd__, METH_VARARGS, NULL},
 	 { (char *)"csVector3___isub__", _wrap_csVector3___isub__, METH_VARARGS, NULL},
 	 { (char *)"csVector3___pos__", _wrap_csVector3___pos__, METH_VARARGS, NULL},
@@ -47760,6 +47883,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csVector3___idiv__", _wrap_csVector3___idiv__, METH_VARARGS, NULL},
 	 { (char *)"csVector3___div__", _wrap_csVector3___div__, METH_VARARGS, NULL},
 	 { (char *)"csVector3_project", _wrap_csVector3_project, METH_VARARGS, NULL},
+	 { (char *)"csVector3_Cross", _wrap_csVector3_Cross, METH_VARARGS, NULL},
 	 { (char *)"csVector3___rmul__", _wrap_csVector3___rmul__, METH_VARARGS, NULL},
 	 { (char *)"csVector3___abs__", _wrap_csVector3___abs__, METH_VARARGS, NULL},
 	 { (char *)"csVector3___getitem__", _wrap_csVector3___getitem__, METH_VARARGS, NULL},
@@ -48578,6 +48702,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csIntArray_Top", _wrap_csIntArray_Top, METH_VARARGS, NULL},
 	 { (char *)"csIntArray_Insert", _wrap_csIntArray_Insert, METH_VARARGS, NULL},
 	 { (char *)"csIntArray_Contains", _wrap_csIntArray_Contains, METH_VARARGS, NULL},
+	 { (char *)"csIntArray_DeleteAll", _wrap_csIntArray_DeleteAll, METH_VARARGS, NULL},
 	 { (char *)"csIntArray_Truncate", _wrap_csIntArray_Truncate, METH_VARARGS, NULL},
 	 { (char *)"csIntArray_Empty", _wrap_csIntArray_Empty, METH_VARARGS, NULL},
 	 { (char *)"csIntArray_IsEmpty", _wrap_csIntArray_IsEmpty, METH_VARARGS, NULL},
@@ -48603,6 +48728,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csIntArrayArray_Pop", _wrap_csIntArrayArray_Pop, METH_VARARGS, NULL},
 	 { (char *)"csIntArrayArray_Top", _wrap_csIntArrayArray_Top, METH_VARARGS, NULL},
 	 { (char *)"csIntArrayArray_Insert", _wrap_csIntArrayArray_Insert, METH_VARARGS, NULL},
+	 { (char *)"csIntArrayArray_DeleteAll", _wrap_csIntArrayArray_DeleteAll, METH_VARARGS, NULL},
 	 { (char *)"csIntArrayArray_Truncate", _wrap_csIntArrayArray_Truncate, METH_VARARGS, NULL},
 	 { (char *)"csIntArrayArray_Empty", _wrap_csIntArrayArray_Empty, METH_VARARGS, NULL},
 	 { (char *)"csIntArrayArray_IsEmpty", _wrap_csIntArrayArray_IsEmpty, METH_VARARGS, NULL},

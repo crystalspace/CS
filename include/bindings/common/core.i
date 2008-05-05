@@ -462,7 +462,6 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csArray::Capacity;
 %ignore csArray::DefaultCompare;
 %ignore csArray::Delete;
-%ignore csArray::DeleteAll;
 %ignore csArray::DeleteFast;
 %ignore csArray::Find;
 %ignore csArray::FindKey;
@@ -517,7 +516,17 @@ csArrayCapacityLinear<csArrayThresholdVariable >;
 %template (typename ## ArrayChangeElements) iArrayChangeElements<typename* >;
 %template (typename ## ArrayChangeAll) iArrayChangeAll<typename* >;
 %enddef
-
+#%ignore csDirtyAccessArray::Length;
+%include "csutil/dirtyaccessarray.h"
+// Provide some useful default instantiations
+%template (Vector2Array) csArray<csVector2>;
+%template (Vector2DirtyAccessArray) csDirtyAccessArray<csVector2>;
+%template (Vector3Array) csArray<csVector3>;
+%template (Vector3DirtyAccessArray) csDirtyAccessArray<csVector3>;
+%template (Vector4Array) csArray<csVector4>;
+%template (Vector4DirtyAccessArray) csDirtyAccessArray<csVector4>;
+%template (UIntArray) csArray<unsigned int>;
+%template (UIntDirtyAccessArray) csDirtyAccessArray<unsigned int>;
 
 %ignore scfInitialize;
 %immutable iSCF::SCF;

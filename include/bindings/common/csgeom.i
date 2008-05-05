@@ -239,6 +239,8 @@ ARRAY_OBJECT_FUNCTIONS(csArray<csArray<int> >,csArray<int>)
   csVector3& operator /=(const csReversibleTransform& t) { return *self /= t; }
   csVector3 operator /(const csReversibleTransform& t) { return *self / t; }
   csVector3 project(const csVector3& what) const { return what << *self; }
+
+  csVector3 Cross (const csVector3& other) const { return *self % other; }
 }
 // csgeom/vector4.h
 %extend csVector4

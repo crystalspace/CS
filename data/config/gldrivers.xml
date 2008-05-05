@@ -763,11 +763,15 @@
     <!--
       * 2006-11-24: AFP support in Intel DRI (at least in Mesa 6.5.1) is 
                     broken.
+      * 2008-05-02: Still broken as of Mesa 7.0.3.
       -->
     <rule description="Intel DRI: Disable ARB_fragment_program">
-      <conditions>
+      <conditions fulfill="all">
         <regexp string="renderer" pattern="Mesa.*Intel" />
-        <regexp string="glversion" pattern="Mesa 6\.5\.." />
+        <conditions fulfill="one">
+          <regexp string="glversion" pattern="Mesa 6\.5\.." />
+          <regexp string="glversion" pattern="Mesa 7\.0\.." />
+        </conditions>
       </conditions>
       <applicable>
         <usecfg>noafp</usecfg>

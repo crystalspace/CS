@@ -28979,6 +28979,27 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csCharArrayArray_DeleteAll(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csArray<csArray<char > > *arg1 = (csArray<csArray<char > > *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csCharArrayArray_DeleteAll",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csCharArrayArray_DeleteAll" "', argument " "1"" of type '" "csArray<csArray<char > > *""'"); 
+  }
+  arg1 = reinterpret_cast< csArray<csArray<char > > * >(argp1);
+  (arg1)->DeleteAll();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_csCharArrayArray_Truncate(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csArray<csArray<char > > *arg1 = (csArray<csArray<char > > *) 0 ;
@@ -42096,6 +42117,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csCharArrayArray_Top", _wrap_csCharArrayArray_Top, METH_VARARGS, NULL},
 	 { (char *)"csCharArrayArray_Insert", _wrap_csCharArrayArray_Insert, METH_VARARGS, NULL},
 	 { (char *)"csCharArrayArray_Contains", _wrap_csCharArrayArray_Contains, METH_VARARGS, NULL},
+	 { (char *)"csCharArrayArray_DeleteAll", _wrap_csCharArrayArray_DeleteAll, METH_VARARGS, NULL},
 	 { (char *)"csCharArrayArray_Truncate", _wrap_csCharArrayArray_Truncate, METH_VARARGS, NULL},
 	 { (char *)"csCharArrayArray_Empty", _wrap_csCharArrayArray_Empty, METH_VARARGS, NULL},
 	 { (char *)"csCharArrayArray_IsEmpty", _wrap_csCharArrayArray_IsEmpty, METH_VARARGS, NULL},

@@ -1278,6 +1278,7 @@ class csCharArrayArray(core.CustomAllocated):
     def Top(*args): return _imesh.csCharArrayArray_Top(*args)
     def Insert(*args): return _imesh.csCharArrayArray_Insert(*args)
     def Contains(*args): return _imesh.csCharArrayArray_Contains(*args)
+    def DeleteAll(*args): return _imesh.csCharArrayArray_DeleteAll(*args)
     def Truncate(*args): return _imesh.csCharArrayArray_Truncate(*args)
     def Empty(*args): return _imesh.csCharArrayArray_Empty(*args)
     def IsEmpty(*args): return _imesh.csCharArrayArray_IsEmpty(*args)
