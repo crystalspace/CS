@@ -127,12 +127,12 @@ enum csLightAttenuationMode
  * There are currently three types of lightsources:
  * - Point lights - have a position. Shines in all directions.
  * - Directional lights - have a direction and radius. Shines along it's
- *                             major axis. The direction is 0,0,1.
+ *                        major axis. The direction is 0,0,-1 in light space.
  * - Spot lights - have both position and direction. Shines with full
  *                      strength along major axis and out to the hotspot angle.
  *                      Between hotspot and outer angle it will falloff, outside
  *                      outer angle there shines no light. The direction is
- *                      0,0,1.
+ *                      0,0,-1 in light space.
  */
 enum csLightType
 {
@@ -262,7 +262,14 @@ struct iLight : public virtual iBase
   /// Get the sector for this light.
   virtual iSector *GetSector () = 0;
 
-  /// Get the movable for this light.
+  /**
+   * Get the movable for this light ('this' space = light space,
+   * 'other' space = world space).
+   * The rotation of the movable determines the direction for directional and 
+   * spot lights. Lights shine along -Z in light space; thus the direction in
+   * world space can be computed by translating the direction (0,0,-1) from\
+   * the movable's 'this' to 'other' space.
+   */
   virtual iMovable *GetMovable () = 0;
 
   /**
