@@ -75,8 +75,21 @@ namespace CS
 	
 	return (Mortho * Mtranslate) * Mprojection;
       }
-    };
 
+      /**
+       * \sa \link http://www.opengl.org/sdk/docs/man/xhtml/glFrustum.xml glFrustum \endlink
+       */
+      static Matrix4 Frustum (float left, float right, float bottom, float top,
+        float nearz, float farz)
+      {
+        float two_n = nearz * 2;
+	return Matrix4 (two_n/(right-left), 0, -(right+left)/(right-left), 0,
+			0, two_n/(top-bottom), -(top+bottom)/(top-bottom), 0,
+			0, 0, -(farz+nearz)/(farz-nearz), -(2*farz*nearz)/(farz-nearz),
+			0, 0, -1, 0);
+      }
+    };
+      
   } // namespace Math
 } // namespace CS
 
