@@ -143,6 +143,13 @@ CSMutableArrayHelper = core.CSMutableArrayHelper
   }
 */
 
+%typemap(directorin) CS::StringID "$input = PyLong_FromUnsignedLong((unsigned long)$1_name);"
+
+%typemap(directorout) CS::StringID
+{
+    $result = ($1_type)PyLong_AsUnsignedLong($input);
+}
+
 %typemap(out) CS::StringID
 {
     $1_type stringid = $1;
