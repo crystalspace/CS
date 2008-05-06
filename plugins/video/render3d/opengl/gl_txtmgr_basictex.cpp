@@ -114,8 +114,10 @@ csGLBasicTextureHandle::~csGLBasicTextureHandle()
   Clear ();
   txtmgr->MarkTexturesDirty ();
   if (pbo != 0) txtmgr->G3D->ext->glDeleteBuffersARB (1, &pbo);
-  if (IsInFBO())
+  if (IsInFBO() && (G3D->GetR2TBackend() != 0))
+  {
     G3D->GetR2TBackend()->CleanupFBOs();
+  }
 }
 
 bool csGLBasicTextureHandle::SynthesizeUploadData (
