@@ -452,6 +452,20 @@ TYPEMAP_OUT_csWrapPtr
 // %typemap(default). The %extend-ing and extra code takes place after all
 // %include's are done, mentioning the header(s) it is related to.
 
+%ignore CS::Memory::CustomAllocated::operator new;
+%ignore CS::Memory::CustomAllocated::operator new[];
+%ignore CS::Memory::CustomAllocated::operator delete;
+%ignore CS::Memory::CustomAllocated::operator delete[];
+%ignore CS::Memory::CustomAllocatedDerived::operator new;
+%ignore CS::Memory::CustomAllocatedDerived::operator new[];
+%ignore CS::Memory::CustomAllocatedDerived::operator delete;
+%ignore CS::Memory::CustomAllocatedDerived::operator delete[];
+%ignore CS::Memory::CustomAllocatedDerivedVirtual::operator new;
+%ignore CS::Memory::CustomAllocatedDerivedVirtual::operator new[];
+%ignore CS::Memory::CustomAllocatedDerivedVirtual::operator delete;
+%ignore CS::Memory::CustomAllocatedDerivedVirtual::operator delete[];
+%include "csutil/customallocated.h"
+
 %include "iutil/array.h"
 %ignore csOrdering;
 %ignore csArrayCmp;
@@ -600,20 +614,6 @@ SET_HELPER(csStringID)
 %feature("compactdefaultargs") csInitializer::SetupConfigManager;
 %include "cstool/initapp.h"
 %typemap(default) const char * configName;
-
-%ignore CS::Memory::CustomAllocated::operator new;
-%ignore CS::Memory::CustomAllocated::operator new[];
-%ignore CS::Memory::CustomAllocated::operator delete;
-%ignore CS::Memory::CustomAllocated::operator delete[];
-%ignore CS::Memory::CustomAllocatedDerived::operator new;
-%ignore CS::Memory::CustomAllocatedDerived::operator new[];
-%ignore CS::Memory::CustomAllocatedDerived::operator delete;
-%ignore CS::Memory::CustomAllocatedDerived::operator delete[];
-%ignore CS::Memory::CustomAllocatedDerivedVirtual::operator new;
-%ignore CS::Memory::CustomAllocatedDerivedVirtual::operator new[];
-%ignore CS::Memory::CustomAllocatedDerivedVirtual::operator delete;
-%ignore CS::Memory::CustomAllocatedDerivedVirtual::operator delete[];
-%include "csutil/customallocated.h"
 
 %ignore csArray<csPluginRequest>::Capacity;
 %ignore csArray<csPluginRequest>::DefaultCompare;
