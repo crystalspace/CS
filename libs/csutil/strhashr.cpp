@@ -45,8 +45,9 @@ void csStringHashReversible::Copy(csStringHashReversible const& h)
 
 const char* csStringHashReversible::Register (const char* s, csStringID id)
 {
-  reverse.PutUnique(id, s);
-  return csStringHash::Register(s, id);
+  const char* t = csStringHash::Register(s, id);
+  reverse.PutUnique(id, t);
+  return t;
 }
 
 const char* csStringHashReversible::Request (csStringID id) const
