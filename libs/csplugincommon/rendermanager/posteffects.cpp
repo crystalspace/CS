@@ -404,17 +404,17 @@ void PostEffectManager::DimensionData::UpdateSVContexts (
     newBuf.AttachNew (new csRenderBufferHolder);
     buffers.Put (l, newBuf);
     csRef<iShaderVariableContext> newSVs;
-    newSVs.AttachNew (new OverlaySVC (pfx.postLayers[l]->svContext));
+    newSVs.AttachNew (new OverlaySVC (pfx.postLayers[l]->GetSVContext ()));
     layerSVs.Put (l, newSVs);
-    for (size_t i = 0; i < pfx.postLayers[l]->inputs.GetSize(); i++)
+    for (size_t i = 0; i < pfx.postLayers[l]->GetInputs ().GetSize(); i++)
     {
-      const LayerInputMap& input = pfx.postLayers[l]->inputs[i];
+      const LayerInputMap& input = pfx.postLayers[l]->GetInputs ()[i];
       
-      size_t inBucket = pfx.GetBucketIndex (input.inputLayer->options);
+      size_t inBucket = pfx.GetBucketIndex (input.inputLayer->GetOptions ());
       csRef<csShaderVariable> sv;
       sv.AttachNew (new csShaderVariable (pfx.svStrings->Request (
         input.textureName)));
-      sv->SetValue (buckets[inBucket].textures[input.inputLayer->outTextureNum]);
+      sv->SetValue (buckets[inBucket].textures[input.inputLayer->GetOutTextureNum ()]);
       layerSVs[l]->AddVariable (sv);
       
       csRenderBufferName bufferName =
@@ -429,7 +429,7 @@ void PostEffectManager::DimensionData::UpdateSVContexts (
         layerSVs[l]->AddVariable (sv);
       }
     }
-    size_t thisBucket = pfx.GetBucketIndex (pfx.postLayers[l]->options);
+    size_t thisBucket = pfx.GetBucketIndex (pfx.postLayers[l]->GetOptions ());
     layerSVs[l]->AddVariable (buckets[thisBucket].svPixelSize);
     buffers[l]->SetRenderBuffer (CS_BUFFER_INDEX, pfx.indices);
     buffers[l]->SetRenderBuffer (CS_BUFFER_POSITION,

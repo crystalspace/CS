@@ -114,6 +114,8 @@ namespace RenderManager
     public:
       /// Get the shader variables for this layer.
       iShaderVariableContext* GetSVContext() { return svContext; }
+      const csArray<LayerInputMap>& GetInputs() { return inputs; }
+      int GetOutTextureNum () const { return outTextureNum; }
       
       const LayerOptions& GetOptions() const { return options; }
       void SetOptions (const LayerOptions& opt) { options = opt; }
