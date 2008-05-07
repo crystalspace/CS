@@ -578,8 +578,8 @@ void csLight::UpdateBBox ()
   case CS_LIGHT_SPOTLIGHT:
     // @@@ This could be tighter if the falloff is taken into account.
     lightBoundingBox.Set (
-      csVector3 (-cutoffDistance, -cutoffDistance, -cutoffDistance),
-      csVector3 (cutoffDistance, cutoffDistance, 0));
+      csVector3 (-cutoffDistance, -cutoffDistance, 0),
+      csVector3 (cutoffDistance, cutoffDistance, cutoffDistance));
     break;
   case CS_LIGHT_POINTLIGHT:
     lightBoundingBox.SetSize (csVector3 (cutoffDistance*2));
