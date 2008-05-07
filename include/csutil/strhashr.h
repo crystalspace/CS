@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2002 by Jorrit Tyberghein
+    Copyright (C) 2008 by Jorrit Tyberghein and Michael Gist
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,48 +16,33 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_STRHASH_H__
-#define __CS_STRHASH_H__
 
-#include "csextern.h"
-#include "csutil/hash.h"
-#include "csutil/mempool.h"
-#include "iutil/strset.h"
+#ifndef __CS_UTIL_STRHASHR_H__
+#define __CS_UTIL_STRHASHR_H__
 
-/**\file
- * String-to-ID hash table.
- */
- 
+#include "csutil/strhash.h"
+
 /**
- * A string-to-ID hash table.  Useful when you need to work with strings but
- * want the performance characteristics of simple numeric comparisons.
- * Register a string with a unique numeric ID and then compare ID's rather than
- * comparing strings.  You can fetch a string's ID via Request().
- * \sa csStringSet
+ * A csStringHash providing a reverse hash for fast string lookups when given an ID.
  */
-class CS_CRYSTALSPACE_EXPORT csStringHash
+
+class CS_CRYSTALSPACE_EXPORT csStringHashReversible : public csStringHash
 {
 private:
-  typedef csHash<csStringID, char const*> HashType;
-  HashType registry;
-  csMemoryPool pool;
-
-  void Copy(csStringHash const&);
+  csHash<const char*, csStringID> reverse;
+  void Copy(csStringHashReversible const& h);
 
 public:
-  typedef HashType::ConstGlobalIterator GlobalIterator;
-
-public:
-  /// Constructor.
-  csStringHash (size_t size = 23);
+    /// Constructor.
+  csStringHashReversible (size_t size = 23);
   /// Copy constructor.
-  csStringHash (csStringHash const& h) { Copy(h); }
+  csStringHashReversible (csStringHashReversible const& h) { Copy(h); }
   /// Destructor.
-  ~csStringHash ();
+  ~csStringHashReversible ();
   /// Assignment operator.
-  csStringHash& operator=(csStringHash const& h) { Copy(h); return *this; }
+  csStringHashReversible& operator=(csStringHashReversible const& h) { Copy(h); return *this; }
 
-  /**
+    /**
    * Register a string with an ID.
    * \param s The string with which to associate the ID.
    * \param id A numeric value with which to identify this string.
@@ -83,7 +68,7 @@ public:
    * \return The string's ID or csInvalidStringID if the string has not yet
    *   been registered.
    */
-  csStringID Request (const char* s) const;
+  csStringID Request (const char* s) const { return csStringHash::Request(s); }
 
   /**
    * Request the string for a given ID.
@@ -91,30 +76,8 @@ public:
    *   the string has not yet been registered. If more than one string is
    *   associated with the ID, then one is returned (but specifically which one
    *   is unspecified).
-   * \warning This operation is slow.  If you need to perform reverse lookups
-   *   frequently, then instead consider using csStringSet or csStringHashReversible,
-   *   in which reverse lookups are optimized.
    */
   const char* Request (csStringID id) const;
-
-  /**
-   * Check if the hash contains a particular string.
-   * \remarks This is rigidly equivalent to
-   *   <tt>return Request(s) != csInvalidStringID</tt>.
-   */
-  bool Contains(char const* s) const
-  { return Request(s) != csInvalidStringID; }
-
-  /**
-   * Check if the hash contains a string with a particular ID.
-   * \remarks This is rigidly equivalent to
-   *   <tt>return Request(id) != NULL</tt>, but more idiomatic.
-   * \warning This operation is slow.  If you need to check containment of ID's
-   *   frequently, then instead consider using csStringSet, in which such
-   *   checks are optimized.
-   */
-  bool Contains(csStringID id) const
-  { return Request(id) != 0; }
 
   /**
    * Remove specified string.
@@ -134,34 +97,6 @@ public:
    * Remove all stored strings.
    */
   void Empty ();
-
-  /**
-   * Delete all stored strings.
-   * \deprecated Use Empty() instead.
-   */
-  /*CS_DEPRECATED_METHOD("Use Empty() instead.")*/
-  void Clear ()
-  { Empty(); }
-
-  /// Get the number of elements in the hash.
-  size_t GetSize () const
-  { return registry.GetSize (); }
-
-  /**
-   * Return true if the hash is empty.
-   * \remarks Rigidly equivalent to <tt>return GetSize() == 0</tt>, but more
-   *   idiomatic.
-   */
-  bool IsEmpty() const
-  { return GetSize() == 0; }
-
-  /**
-   * Return an iterator for the string hash which iterates over all elements.
-   * \warning Modifying the hash while you have open iterators will result
-   *   undefined behaviour.
-   */
-  GlobalIterator GetIterator () const
-  { return registry.GetIterator(); }
 };
 
-#endif // __CS_STRHASH_H__
+#endif // __CS_UTIL_STRHASHR_H__
