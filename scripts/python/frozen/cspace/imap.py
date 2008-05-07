@@ -58,6 +58,10 @@ def _swig_setattr_nondynamic_method(set):
 
 
 import core
+import iengine
+import ivideo
+import csgfx
+import isndsys
 _SetSCFPointer = _imap._SetSCFPointer
 _GetSCFPointer = _imap._GetSCFPointer
 if not "core" in dir():

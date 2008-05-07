@@ -2711,7 +2711,7 @@ iSCF* GetSCFPointer()
 
 
 PyObject *
-_csRef_to_Python (const csRef<iBase> & ref, void * ptr, const char * name)
+_csRef_to_Python (const csRef<iBase> & ref, void * ptr, swig_type_info * name)
 {
   if (!ref.IsValid())
   {
@@ -2719,7 +2719,7 @@ _csRef_to_Python (const csRef<iBase> & ref, void * ptr, const char * name)
     return Py_None;
   }
   ref->IncRef();
-  return SWIG_NewPointerObj((void *)ptr, SWIG_TypeQuery(name), 1);
+  return SWIG_NewPointerObj((void *)ptr, name, 1);
 }
 
 
@@ -3087,6 +3087,8 @@ SWIGINTERN int iSndSysManager_scfGetVersion(){ return scfInterfaceTraits<iSndSys
 SWIGINTERN void delete_iSndSysManager(iSndSysManager *self){ if (self) self->DecRef (); }
 SWIGINTERN int iSndSysSource_scfGetVersion(){ return scfInterfaceTraits<iSndSysSource>::GetVersion(); }
 SWIGINTERN void delete_iSndSysSource(iSndSysSource *self){ if (self) self->DecRef (); }
+SWIGINTERN int iSndSysSource3D_scfGetVersion(){ return scfInterfaceTraits<iSndSysSource3D>::GetVersion(); }
+SWIGINTERN void delete_iSndSysSource3D(iSndSysSource3D *self){ if (self) self->DecRef (); }
 
 SWIGINTERN int
 SWIG_AsVal_unsigned_SS_char (PyObject * obj, unsigned char *val)
@@ -4880,19 +4882,14 @@ SWIGINTERN PyObject *_wrap_iSndSysLoader_LoadSound__SWIG_0(PyObject *SWIGUNUSEDP
   {
     /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSndSysData> ref((csPtr<iSndSysData>&)result); /* explicit cast */
-    /*const csRef<iBase> ref = csRef<iBase>((iSndSysData *)ref1);
-      if (!ref.IsValid())
-      {
-        Py_INCREF(Py_None);
-        resultobj = Py_None;
-      }
-      else
-      {
-        ref->IncRef();
-        resultobj = SWIG_NewPointerObj((void *)(iSndSysData *)ref1, SWIG_TypeQuery("iSndSysData" " *"), 1);
-      }*/
-    resultobj = _csRef_to_Python(csRef<iBase>(
-        (iSndSysData *)ref), (void *)(iSndSysData *)ref, "iSndSysData" " *");
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iSndSysData *)ref, SWIGTYPE_p_iSndSysData, 1);
     /*@SWIG@*/
   }
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
@@ -4930,19 +4927,14 @@ SWIGINTERN PyObject *_wrap_iSndSysLoader_LoadSound__SWIG_1(PyObject *SWIGUNUSEDP
   {
     /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSndSysData> ref((csPtr<iSndSysData>&)result); /* explicit cast */
-    /*const csRef<iBase> ref = csRef<iBase>((iSndSysData *)ref1);
-      if (!ref.IsValid())
-      {
-        Py_INCREF(Py_None);
-        resultobj = Py_None;
-      }
-      else
-      {
-        ref->IncRef();
-        resultobj = SWIG_NewPointerObj((void *)(iSndSysData *)ref1, SWIG_TypeQuery("iSndSysData" " *"), 1);
-      }*/
-    resultobj = _csRef_to_Python(csRef<iBase>(
-        (iSndSysData *)ref), (void *)(iSndSysData *)ref, "iSndSysData" " *");
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iSndSysData *)ref, SWIGTYPE_p_iSndSysData, 1);
     /*@SWIG@*/
   }
   return resultobj;
@@ -5518,19 +5510,14 @@ SWIGINTERN PyObject *_wrap_iSndSysSource_GetStream(PyObject *SWIGUNUSEDPARM(self
   {
     /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSndSysStream> ref((csRef<iSndSysStream>&)result); /* explicit cast */
-    /*const csRef<iBase> ref = csRef<iBase>((iSndSysStream *)ref1);
-      if (!ref.IsValid())
-      {
-        Py_INCREF(Py_None);
-        resultobj = Py_None;
-      }
-      else
-      {
-        ref->IncRef();
-        resultobj = SWIG_NewPointerObj((void *)(iSndSysStream *)ref1, SWIG_TypeQuery("iSndSysStream" " *"), 1);
-      }*/
-    resultobj = _csRef_to_Python(csRef<iBase>(
-        (iSndSysStream *)ref), (void *)(iSndSysStream *)ref, "iSndSysStream" " *");
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iSndSysStream *)ref, SWIGTYPE_p_iSndSysStream, 1);
     /*@SWIG@*/
   }
   return resultobj;
@@ -5966,6 +5953,19 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iSndSysSource3D_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  int result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSource3D_scfGetVersion",0,0)) SWIG_fail;
+  result = (int)iSndSysSource3D_scfGetVersion();
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_delete_iSndSysSource3D(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iSndSysSource3D *arg1 = (iSndSysSource3D *) 0 ;
@@ -5979,7 +5979,7 @@ SWIGINTERN PyObject *_wrap_delete_iSndSysSource3D(PyObject *SWIGUNUSEDPARM(self)
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSndSysSource3D" "', argument " "1"" of type '" "iSndSysSource3D *""'"); 
   }
   arg1 = reinterpret_cast< iSndSysSource3D * >(argp1);
-  delete arg1;
+  delete_iSndSysSource3D(arg1);
   
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -7950,19 +7950,14 @@ SWIGINTERN PyObject *_wrap_iSndSysRenderer_CreateStream(PyObject *SWIGUNUSEDPARM
   {
     /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSndSysStream> ref((csPtr<iSndSysStream>&)result); /* explicit cast */
-    /*const csRef<iBase> ref = csRef<iBase>((iSndSysStream *)ref1);
-      if (!ref.IsValid())
-      {
-        Py_INCREF(Py_None);
-        resultobj = Py_None;
-      }
-      else
-      {
-        ref->IncRef();
-        resultobj = SWIG_NewPointerObj((void *)(iSndSysStream *)ref1, SWIG_TypeQuery("iSndSysStream" " *"), 1);
-      }*/
-    resultobj = _csRef_to_Python(csRef<iBase>(
-        (iSndSysStream *)ref), (void *)(iSndSysStream *)ref, "iSndSysStream" " *");
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iSndSysStream *)ref, SWIGTYPE_p_iSndSysStream, 1);
     /*@SWIG@*/
   }
   return resultobj;
@@ -7998,19 +7993,14 @@ SWIGINTERN PyObject *_wrap_iSndSysRenderer_CreateSource(PyObject *SWIGUNUSEDPARM
   {
     /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSndSysSource> ref((csPtr<iSndSysSource>&)result); /* explicit cast */
-    /*const csRef<iBase> ref = csRef<iBase>((iSndSysSource *)ref1);
-      if (!ref.IsValid())
-      {
-        Py_INCREF(Py_None);
-        resultobj = Py_None;
-      }
-      else
-      {
-        ref->IncRef();
-        resultobj = SWIG_NewPointerObj((void *)(iSndSysSource *)ref1, SWIG_TypeQuery("iSndSysSource" " *"), 1);
-      }*/
-    resultobj = _csRef_to_Python(csRef<iBase>(
-        (iSndSysSource *)ref), (void *)(iSndSysSource *)ref, "iSndSysSource" " *");
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iSndSysSource *)ref, SWIGTYPE_p_iSndSysSource, 1);
     /*@SWIG@*/
   }
   return resultobj;
@@ -8099,19 +8089,14 @@ SWIGINTERN PyObject *_wrap_iSndSysRenderer_GetListener(PyObject *SWIGUNUSEDPARM(
   {
     /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSndSysListener> ref((csRef<iSndSysListener>&)result); /* explicit cast */
-    /*const csRef<iBase> ref = csRef<iBase>((iSndSysListener *)ref1);
-      if (!ref.IsValid())
-      {
-        Py_INCREF(Py_None);
-        resultobj = Py_None;
-      }
-      else
-      {
-        ref->IncRef();
-        resultobj = SWIG_NewPointerObj((void *)(iSndSysListener *)ref1, SWIG_TypeQuery("iSndSysListener" " *"), 1);
-      }*/
-    resultobj = _csRef_to_Python(csRef<iBase>(
-        (iSndSysListener *)ref), (void *)(iSndSysListener *)ref, "iSndSysListener" " *");
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iSndSysListener *)ref, SWIGTYPE_p_iSndSysListener, 1);
     /*@SWIG@*/
   }
   return resultobj;
@@ -8805,6 +8790,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSndSysSource3D_SetMaximumDistance", _wrap_iSndSysSource3D_SetMaximumDistance, METH_VARARGS, NULL},
 	 { (char *)"iSndSysSource3D_GetMinimumDistance", _wrap_iSndSysSource3D_GetMinimumDistance, METH_VARARGS, NULL},
 	 { (char *)"iSndSysSource3D_GetMaximumDistance", _wrap_iSndSysSource3D_GetMaximumDistance, METH_VARARGS, NULL},
+	 { (char *)"iSndSysSource3D_scfGetVersion", _wrap_iSndSysSource3D_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSndSysSource3D", _wrap_delete_iSndSysSource3D, METH_VARARGS, NULL},
 	 { (char *)"iSndSysSource3D_swigregister", iSndSysSource3D_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iSndSysSource3DDirectionalSimple_SetDirection", _wrap_iSndSysSource3DDirectionalSimple_SetDirection, METH_VARARGS, NULL},
