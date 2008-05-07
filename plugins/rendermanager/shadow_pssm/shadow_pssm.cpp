@@ -139,9 +139,8 @@ private:
 
 
 RMShadowedPSSM::RMShadowedPSSM (iBase* parent)
-  : scfImplementationType (this, parent), targets (*this)
+  : scfImplementationType (this, parent), doHDRExposure (false), targets (*this)
 {
-
 }
 
 bool RMShadowedPSSM::RenderView (iView* view)
@@ -208,7 +207,8 @@ bool RMShadowedPSSM::RenderView (iView* view)
 
   postEffects.DrawPostEffects ();
   
-  hdrExposure.ApplyExposure (postEffects);
+  
+  if (doHDRExposure) hdrExposure.ApplyExposure (postEffects);
   
   renderTree.RenderDebugTextures (rview->GetGraphics3D ());
 
@@ -309,7 +309,20 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
   // @@@ FIXME: pick a better intermediate format
   hdr.Setup (objectReg, HDRHelper::qualInt8, 4, postEffects, /*true*/false);
   
-  hdrExposure.Initialize (objectReg, postEffects);
+  HDRSettings hdrSettings (cfg, "RenderManager.ShadowPSSM");
+  if (hdrSettings.IsEnabled())
+  {
+    doHDRExposure = true;
+    
+    HDRHelper hdr;
+    hdr.Setup (objectReg, 
+      hdrSettings.GetQuality(), 
+      hdrSettings.GetColorRange(), 
+      postEffects, !doHDRExposure);
+  
+    // @@@ Make configurable, too
+    hdrExposure.Initialize (objectReg, postEffects);
+  }
   
   portalPersistent.Initialize (shaderManager, g3d);
   lightPersistent.shadowPersist.SetShadowType (
