@@ -33,7 +33,7 @@ static void getterFunc##Init()                                 \
   new (_##getterFunc##Store) Type InitParam;                   \
   csStaticVarCleanup (Kill);                                   \
 }                                                              \
-static CS_FORCEINLINE Type& getterFunc()                       \
+static CS_FORCEINLINE_TEMPLATEMETHOD Type& getterFunc()                       \
 {                                                              \
   union                                                        \
   {                                                            \
