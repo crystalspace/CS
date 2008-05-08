@@ -89,6 +89,18 @@ def fix_args(funct):
         return funct(*args)
     return _inner
 
+class CustomAllocated(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _core.new_CustomAllocated(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _core.delete_CustomAllocated
+    __del__ = lambda self : None;
+CustomAllocated_swigregister = _core.CustomAllocated_swigregister
+CustomAllocated_swigregister(CustomAllocated)
+
 class csArrayThresholdVariable(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
@@ -128,7 +140,7 @@ class csArrayCapacityVariableGrow(csArrayThresholdVariableCapacityLinear):
 csArrayCapacityVariableGrow_swigregister = _core.csArrayCapacityVariableGrow_swigregister
 csArrayCapacityVariableGrow_swigregister(csArrayCapacityVariableGrow)
 
-class Vector2Array(object):
+class Vector2Array(CustomAllocated):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     __swig_destroy__ = _core.delete_Vector2Array
@@ -175,7 +187,7 @@ class Vector2DirtyAccessArray(object):
 Vector2DirtyAccessArray_swigregister = _core.Vector2DirtyAccessArray_swigregister
 Vector2DirtyAccessArray_swigregister(Vector2DirtyAccessArray)
 
-class Vector3Array(object):
+class Vector3Array(CustomAllocated):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     __swig_destroy__ = _core.delete_Vector3Array
@@ -220,7 +232,7 @@ class Vector3DirtyAccessArray(object):
 Vector3DirtyAccessArray_swigregister = _core.Vector3DirtyAccessArray_swigregister
 Vector3DirtyAccessArray_swigregister(Vector3DirtyAccessArray)
 
-class Vector4Array(object):
+class Vector4Array(CustomAllocated):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     __swig_destroy__ = _core.delete_Vector4Array
@@ -265,7 +277,7 @@ class Vector4DirtyAccessArray(object):
 Vector4DirtyAccessArray_swigregister = _core.Vector4DirtyAccessArray_swigregister
 Vector4DirtyAccessArray_swigregister(Vector4DirtyAccessArray)
 
-class UIntArray(object):
+class UIntArray(CustomAllocated):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     __swig_destroy__ = _core.delete_UIntArray
@@ -716,18 +728,6 @@ csInitializer_CloseApplication = _core.csInitializer_CloseApplication
 csInitializer__SetupEventHandler = _core.csInitializer__SetupEventHandler
 csInitializer_DestroyApplication = _core.csInitializer_DestroyApplication
 csInitializer_GetDefaultAppID = _core.csInitializer_GetDefaultAppID
-
-class CustomAllocated(object):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _core.new_CustomAllocated(*args)
-        try: self.this.append(this)
-        except: self.this = this
-    __swig_destroy__ = _core.delete_CustomAllocated
-    __del__ = lambda self : None;
-CustomAllocated_swigregister = _core.CustomAllocated_swigregister
-CustomAllocated_swigregister(CustomAllocated)
 
 class csPluginRequestArray(CustomAllocated):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')

@@ -2722,7 +2722,7 @@ iSCF* GetSCFPointer()
 
 
 PyObject *
-_csRef_to_Python (const csRef<iBase> & ref, void * ptr, const char * name)
+_csRef_to_Python (const csRef<iBase> & ref, void * ptr, swig_type_info * name)
 {
   if (!ref.IsValid())
   {
@@ -2730,7 +2730,7 @@ _csRef_to_Python (const csRef<iBase> & ref, void * ptr, const char * name)
     return Py_None;
   }
   ref->IncRef();
-  return SWIG_NewPointerObj((void *)ptr, SWIG_TypeQuery(name), 1);
+  return SWIG_NewPointerObj((void *)ptr, name, 1);
 }
 
 
@@ -8612,19 +8612,14 @@ SWIGINTERN PyObject *_wrap_csImageBase_GetMipmap(PyObject *SWIGUNUSEDPARM(self),
   {
     /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csRef<iImage>&)result); /* explicit cast */
-    /*const csRef<iBase> ref = csRef<iBase>((iImage *)ref1);
-      if (!ref.IsValid())
-      {
-        Py_INCREF(Py_None);
-        resultobj = Py_None;
-      }
-      else
-      {
-        ref->IncRef();
-        resultobj = SWIG_NewPointerObj((void *)(iImage *)ref1, SWIG_TypeQuery("iImage" " *"), 1);
-      }*/
-    resultobj = _csRef_to_Python(csRef<iBase>(
-        (iImage *)ref), (void *)(iImage *)ref, "iImage" " *");
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iImage *)ref, SWIGTYPE_p_iImage, 1);
     /*@SWIG@*/
   }
   return resultobj;
@@ -8704,19 +8699,14 @@ SWIGINTERN PyObject *_wrap_csImageBase_GetSubImage(PyObject *SWIGUNUSEDPARM(self
   {
     /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csRef<iImage>&)result); /* explicit cast */
-    /*const csRef<iBase> ref = csRef<iBase>((iImage *)ref1);
-      if (!ref.IsValid())
-      {
-        Py_INCREF(Py_None);
-        resultobj = Py_None;
-      }
-      else
-      {
-        ref->IncRef();
-        resultobj = SWIG_NewPointerObj((void *)(iImage *)ref1, SWIG_TypeQuery("iImage" " *"), 1);
-      }*/
-    resultobj = _csRef_to_Python(csRef<iBase>(
-        (iImage *)ref), (void *)(iImage *)ref, "iImage" " *");
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iImage *)ref, SWIGTYPE_p_iImage, 1);
     /*@SWIG@*/
   }
   return resultobj;
@@ -8765,19 +8755,14 @@ SWIGINTERN PyObject *_wrap_csImageBase_GetCookedImageData(PyObject *SWIGUNUSEDPA
   {
     /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDataBuffer> ref((csRef<iDataBuffer>&)result); /* explicit cast */
-    /*const csRef<iBase> ref = csRef<iBase>((iDataBuffer *)ref1);
-      if (!ref.IsValid())
-      {
-        Py_INCREF(Py_None);
-        resultobj = Py_None;
-      }
-      else
-      {
-        ref->IncRef();
-        resultobj = SWIG_NewPointerObj((void *)(iDataBuffer *)ref1, SWIG_TypeQuery("iDataBuffer" " *"), 1);
-      }*/
-    resultobj = _csRef_to_Python(csRef<iBase>(
-        (iDataBuffer *)ref), (void *)(iDataBuffer *)ref, "iDataBuffer" " *");
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iDataBuffer *)ref, SWIGTYPE_p_iDataBuffer, 1);
     /*@SWIG@*/
   }
   return resultobj;
@@ -9969,19 +9954,14 @@ SWIGINTERN PyObject *_wrap_csImageMemory_GetRawData(PyObject *SWIGUNUSEDPARM(sel
   {
     /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
     csRef<iDataBuffer> ref((csRef<iDataBuffer>&)result); /* explicit cast */
-    /*const csRef<iBase> ref = csRef<iBase>((iDataBuffer *)ref1);
-      if (!ref.IsValid())
-      {
-        Py_INCREF(Py_None);
-        resultobj = Py_None;
-      }
-      else
-      {
-        ref->IncRef();
-        resultobj = SWIG_NewPointerObj((void *)(iDataBuffer *)ref1, SWIG_TypeQuery("iDataBuffer" " *"), 1);
-      }*/
-    resultobj = _csRef_to_Python(csRef<iBase>(
-        (iDataBuffer *)ref), (void *)(iDataBuffer *)ref, "iDataBuffer" " *");
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iDataBuffer *)ref, SWIGTYPE_p_iDataBuffer, 1);
     /*@SWIG@*/
   }
   return resultobj;
@@ -10404,19 +10384,14 @@ SWIGINTERN PyObject *_wrap_csImageMemory_GetMipmap(PyObject *SWIGUNUSEDPARM(self
   {
     /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csRef<iImage>&)result); /* explicit cast */
-    /*const csRef<iBase> ref = csRef<iBase>((iImage *)ref1);
-      if (!ref.IsValid())
-      {
-        Py_INCREF(Py_None);
-        resultobj = Py_None;
-      }
-      else
-      {
-        ref->IncRef();
-        resultobj = SWIG_NewPointerObj((void *)(iImage *)ref1, SWIG_TypeQuery("iImage" " *"), 1);
-      }*/
-    resultobj = _csRef_to_Python(csRef<iBase>(
-        (iImage *)ref), (void *)(iImage *)ref, "iImage" " *");
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iImage *)ref, SWIGTYPE_p_iImage, 1);
     /*@SWIG@*/
   }
   return resultobj;
@@ -11083,19 +11058,14 @@ SWIGINTERN PyObject *_wrap_csImageManipulate_Rescale__SWIG_0(PyObject *SWIGUNUSE
   {
     /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csRef<iImage>&)result); /* explicit cast */
-    /*const csRef<iBase> ref = csRef<iBase>((iImage *)ref1);
-      if (!ref.IsValid())
-      {
-        Py_INCREF(Py_None);
-        resultobj = Py_None;
-      }
-      else
-      {
-        ref->IncRef();
-        resultobj = SWIG_NewPointerObj((void *)(iImage *)ref1, SWIG_TypeQuery("iImage" " *"), 1);
-      }*/
-    resultobj = _csRef_to_Python(csRef<iBase>(
-        (iImage *)ref), (void *)(iImage *)ref, "iImage" " *");
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iImage *)ref, SWIGTYPE_p_iImage, 1);
     /*@SWIG@*/
   }
   return resultobj;
@@ -11140,19 +11110,14 @@ SWIGINTERN PyObject *_wrap_csImageManipulate_Rescale__SWIG_1(PyObject *SWIGUNUSE
   {
     /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csRef<iImage>&)result); /* explicit cast */
-    /*const csRef<iBase> ref = csRef<iBase>((iImage *)ref1);
-      if (!ref.IsValid())
-      {
-        Py_INCREF(Py_None);
-        resultobj = Py_None;
-      }
-      else
-      {
-        ref->IncRef();
-        resultobj = SWIG_NewPointerObj((void *)(iImage *)ref1, SWIG_TypeQuery("iImage" " *"), 1);
-      }*/
-    resultobj = _csRef_to_Python(csRef<iBase>(
-        (iImage *)ref), (void *)(iImage *)ref, "iImage" " *");
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iImage *)ref, SWIGTYPE_p_iImage, 1);
     /*@SWIG@*/
   }
   return resultobj;
@@ -11262,19 +11227,14 @@ SWIGINTERN PyObject *_wrap_csImageManipulate_Mipmap__SWIG_0(PyObject *SWIGUNUSED
   {
     /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csRef<iImage>&)result); /* explicit cast */
-    /*const csRef<iBase> ref = csRef<iBase>((iImage *)ref1);
-      if (!ref.IsValid())
-      {
-        Py_INCREF(Py_None);
-        resultobj = Py_None;
-      }
-      else
-      {
-        ref->IncRef();
-        resultobj = SWIG_NewPointerObj((void *)(iImage *)ref1, SWIG_TypeQuery("iImage" " *"), 1);
-      }*/
-    resultobj = _csRef_to_Python(csRef<iBase>(
-        (iImage *)ref), (void *)(iImage *)ref, "iImage" " *");
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iImage *)ref, SWIGTYPE_p_iImage, 1);
     /*@SWIG@*/
   }
   return resultobj;
@@ -11310,19 +11270,14 @@ SWIGINTERN PyObject *_wrap_csImageManipulate_Mipmap__SWIG_1(PyObject *SWIGUNUSED
   {
     /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csRef<iImage>&)result); /* explicit cast */
-    /*const csRef<iBase> ref = csRef<iBase>((iImage *)ref1);
-      if (!ref.IsValid())
-      {
-        Py_INCREF(Py_None);
-        resultobj = Py_None;
-      }
-      else
-      {
-        ref->IncRef();
-        resultobj = SWIG_NewPointerObj((void *)(iImage *)ref1, SWIG_TypeQuery("iImage" " *"), 1);
-      }*/
-    resultobj = _csRef_to_Python(csRef<iBase>(
-        (iImage *)ref), (void *)(iImage *)ref, "iImage" " *");
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iImage *)ref, SWIGTYPE_p_iImage, 1);
     /*@SWIG@*/
   }
   return resultobj;
@@ -11410,19 +11365,14 @@ SWIGINTERN PyObject *_wrap_csImageManipulate_Blur__SWIG_0(PyObject *SWIGUNUSEDPA
   {
     /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csRef<iImage>&)result); /* explicit cast */
-    /*const csRef<iBase> ref = csRef<iBase>((iImage *)ref1);
-      if (!ref.IsValid())
-      {
-        Py_INCREF(Py_None);
-        resultobj = Py_None;
-      }
-      else
-      {
-        ref->IncRef();
-        resultobj = SWIG_NewPointerObj((void *)(iImage *)ref1, SWIG_TypeQuery("iImage" " *"), 1);
-      }*/
-    resultobj = _csRef_to_Python(csRef<iBase>(
-        (iImage *)ref), (void *)(iImage *)ref, "iImage" " *");
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iImage *)ref, SWIGTYPE_p_iImage, 1);
     /*@SWIG@*/
   }
   return resultobj;
@@ -11449,19 +11399,14 @@ SWIGINTERN PyObject *_wrap_csImageManipulate_Blur__SWIG_1(PyObject *SWIGUNUSEDPA
   {
     /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csRef<iImage>&)result); /* explicit cast */
-    /*const csRef<iBase> ref = csRef<iBase>((iImage *)ref1);
-      if (!ref.IsValid())
-      {
-        Py_INCREF(Py_None);
-        resultobj = Py_None;
-      }
-      else
-      {
-        ref->IncRef();
-        resultobj = SWIG_NewPointerObj((void *)(iImage *)ref1, SWIG_TypeQuery("iImage" " *"), 1);
-      }*/
-    resultobj = _csRef_to_Python(csRef<iBase>(
-        (iImage *)ref), (void *)(iImage *)ref, "iImage" " *");
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iImage *)ref, SWIGTYPE_p_iImage, 1);
     /*@SWIG@*/
   }
   return resultobj;
@@ -11564,19 +11509,14 @@ SWIGINTERN PyObject *_wrap_csImageManipulate_Crop(PyObject *SWIGUNUSEDPARM(self)
   {
     /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csRef<iImage>&)result); /* explicit cast */
-    /*const csRef<iBase> ref = csRef<iBase>((iImage *)ref1);
-      if (!ref.IsValid())
-      {
-        Py_INCREF(Py_None);
-        resultobj = Py_None;
-      }
-      else
-      {
-        ref->IncRef();
-        resultobj = SWIG_NewPointerObj((void *)(iImage *)ref1, SWIG_TypeQuery("iImage" " *"), 1);
-      }*/
-    resultobj = _csRef_to_Python(csRef<iBase>(
-        (iImage *)ref), (void *)(iImage *)ref, "iImage" " *");
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iImage *)ref, SWIGTYPE_p_iImage, 1);
     /*@SWIG@*/
   }
   return resultobj;
@@ -11621,19 +11561,14 @@ SWIGINTERN PyObject *_wrap_csImageManipulate_Sharpen__SWIG_0(PyObject *SWIGUNUSE
   {
     /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csRef<iImage>&)result); /* explicit cast */
-    /*const csRef<iBase> ref = csRef<iBase>((iImage *)ref1);
-      if (!ref.IsValid())
-      {
-        Py_INCREF(Py_None);
-        resultobj = Py_None;
-      }
-      else
-      {
-        ref->IncRef();
-        resultobj = SWIG_NewPointerObj((void *)(iImage *)ref1, SWIG_TypeQuery("iImage" " *"), 1);
-      }*/
-    resultobj = _csRef_to_Python(csRef<iBase>(
-        (iImage *)ref), (void *)(iImage *)ref, "iImage" " *");
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iImage *)ref, SWIGTYPE_p_iImage, 1);
     /*@SWIG@*/
   }
   return resultobj;
@@ -11669,19 +11604,14 @@ SWIGINTERN PyObject *_wrap_csImageManipulate_Sharpen__SWIG_1(PyObject *SWIGUNUSE
   {
     /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csRef<iImage>&)result); /* explicit cast */
-    /*const csRef<iBase> ref = csRef<iBase>((iImage *)ref1);
-      if (!ref.IsValid())
-      {
-        Py_INCREF(Py_None);
-        resultobj = Py_None;
-      }
-      else
-      {
-        ref->IncRef();
-        resultobj = SWIG_NewPointerObj((void *)(iImage *)ref1, SWIG_TypeQuery("iImage" " *"), 1);
-      }*/
-    resultobj = _csRef_to_Python(csRef<iBase>(
-        (iImage *)ref), (void *)(iImage *)ref, "iImage" " *");
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iImage *)ref, SWIGTYPE_p_iImage, 1);
     /*@SWIG@*/
   }
   return resultobj;
@@ -11784,19 +11714,14 @@ SWIGINTERN PyObject *_wrap_csImageManipulate_TransformColor(PyObject *SWIGUNUSED
   {
     /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csRef<iImage>&)result); /* explicit cast */
-    /*const csRef<iBase> ref = csRef<iBase>((iImage *)ref1);
-      if (!ref.IsValid())
-      {
-        Py_INCREF(Py_None);
-        resultobj = Py_None;
-      }
-      else
-      {
-        ref->IncRef();
-        resultobj = SWIG_NewPointerObj((void *)(iImage *)ref1, SWIG_TypeQuery("iImage" " *"), 1);
-      }*/
-    resultobj = _csRef_to_Python(csRef<iBase>(
-        (iImage *)ref), (void *)(iImage *)ref, "iImage" " *");
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iImage *)ref, SWIGTYPE_p_iImage, 1);
     /*@SWIG@*/
   }
   return resultobj;
@@ -11823,19 +11748,14 @@ SWIGINTERN PyObject *_wrap_csImageManipulate_Gray(PyObject *SWIGUNUSEDPARM(self)
   {
     /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csRef<iImage>&)result); /* explicit cast */
-    /*const csRef<iBase> ref = csRef<iBase>((iImage *)ref1);
-      if (!ref.IsValid())
-      {
-        Py_INCREF(Py_None);
-        resultobj = Py_None;
-      }
-      else
-      {
-        ref->IncRef();
-        resultobj = SWIG_NewPointerObj((void *)(iImage *)ref1, SWIG_TypeQuery("iImage" " *"), 1);
-      }*/
-    resultobj = _csRef_to_Python(csRef<iBase>(
-        (iImage *)ref), (void *)(iImage *)ref, "iImage" " *");
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iImage *)ref, SWIGTYPE_p_iImage, 1);
     /*@SWIG@*/
   }
   return resultobj;

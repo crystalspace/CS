@@ -154,7 +154,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
   }
   
   glPointSize (GetParamFloatVal (stack, pointSize, 1.0f));
-  if (ext->CS_GL_ARB_point_sprite)
+  if (ext->CS_GL_ARB_point_parameters)
   {
     csVector4 v;
     const csVector4 defAtten (0, 1, 0, 0);

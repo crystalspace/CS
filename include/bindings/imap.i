@@ -1,5 +1,7 @@
 %module imap
 %import "bindings/core.i"
+%import "bindings/iengine.i"
+%import "bindings/isndsys.i"
 %{
 #include "crystalspace.h"
 %}

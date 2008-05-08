@@ -118,8 +118,8 @@ public:
    *   associated with the ID, then one is returned (but specifically which one
    *   is unspecified).
    * \warning This operation is slow.  If you need to perform reverse lookups
-   *   frequently, then instead consider using csStringSet, in which reverse
-   *   lookups are optimized.
+   *   frequently, then instead consider using csStringSet or csStringHashReversible,
+   *   in which reverse lookups are optimized.
    */
   const char* Request (StringID<Tag> id) const
   {

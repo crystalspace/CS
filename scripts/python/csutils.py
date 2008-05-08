@@ -66,7 +66,7 @@ class CsAppBase(csPyEventHandler,CsReporterApp):
 	self.InitPlugins()
 	self.InitEventHandler()
 	self.SetupApp()
-
+        self._initialized = True
     def CheckHelp(self):
         if csCommandLineHelper.CheckHelp(self.oreg):
             csCommandLineHelper.Help(self.oreg)
@@ -101,8 +101,8 @@ class CsAppBase(csPyEventHandler,CsReporterApp):
             self.FatalError("Could not open the application!")
             
         self.view = csView(self.engine,self.g3d)
-        g2d = self.g3d.GetDriver2D()
-        self.view.SetRectangle(0, 0, g2d.GetWidth(), g2d.GetHeight ())
+        self.g2d = self.g3d.GetDriver2D()
+        self.view.SetRectangle(0, 0, self.g2d.GetWidth(), self.g2d.GetHeight ())
 	self.KeyboardDown = csevKeyboardDown(self.oreg)
 	self.Frame = csevFrame(self.oreg)
 
