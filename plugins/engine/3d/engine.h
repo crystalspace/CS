@@ -838,6 +838,7 @@ public:
 
   /// Store engine shadervar names
   csStringID id_creation_time;
+  csStringID id_lod_fade;
   /// For triangle meshes.
   csStringID colldet_id;
   csStringID viscull_id;

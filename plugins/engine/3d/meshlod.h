@@ -63,14 +63,17 @@ private:
   csArray<csArray<iMeshWrapper*> > meshes_for_lod;
 
   /// Function for lod.
-  float lod_m, lod_a;
+  float lod_m, lod_a, lod_f;
   /// Or using variables.
   csRef<iSharedVariable> lod_varm;
   csRef<iSharedVariable> lod_vara;
+  csRef<iSharedVariable> lod_varf;
   csRef<csLODListener> lod_varm_listener;
   csRef<csLODListener> lod_vara_listener;
+  csRef<csLODListener> lod_varf_listener;
 
   void ClearLODListeners ();
+  void ClearLODFListeners ();
 
 public:
   /// constructor
@@ -86,6 +89,12 @@ public:
     vara = lod_vara;
   }
   virtual int GetLODPolygonCount (float lod) const;
+
+  void SetLODFade (float f);
+  void GetLODFade (float& f) const;
+  void SetLODFade (iSharedVariable* varf);
+  void GetLODFade (iSharedVariable*& varf) const
+  { varf = lod_varf; }
 
   float GetLODValue (float distance) const
   {
@@ -112,6 +121,41 @@ public:
     return meshes_for_lod[idx];
   }
 
+  bool GetMeshesForLODFaded (float lod, csArray<iMeshWrapper*>*& meshes1,
+    csArray<iMeshWrapper*>*& meshes2, float& fade)
+  {
+    int l = (int)meshes_for_lod.GetSize ();
+    if (lod_f > EPSILON)
+    {
+      float idxF = lod * l;
+      idxF = csClamp (idxF, l-1+lod_f, -lod_f);
+      int idx = csClamp (int (idxF), l-1, 0);
+      if ((idx > 0) && ((idxF - idx) < lod_f))
+      {
+	// Fade in from prev LOD level
+	meshes1 = &(meshes_for_lod[idx]);
+	meshes2 = &(meshes_for_lod[idx-1]);
+	fade = (idxF - idx) / (lod_f * 2.0f) + 0.5f;
+	return true;
+      }
+      else if ((idx < l-1) && (((idx + 1) - idxF) < lod_f))
+      {
+	// Fade out to next LOD level
+	meshes1 = &(meshes_for_lod[idx+1]);
+	meshes2 = &(meshes_for_lod[idx]);
+	fade = 0.5f - (((idx + 1) - idxF) / (lod_f * 2.0f));
+	return true;
+      }
+    }
+    int idx = int (lod * l);
+    if (idx < 0) idx = 0;
+    else if (idx >= l) idx = l-1;
+    meshes1 = &(meshes_for_lod[idx]);
+    meshes2 = 0;
+    fade = 1;
+    return false;
+  }
+
   /// Get number of lod levels we have.
   int GetLODCount ()
   {
@@ -132,12 +176,14 @@ private:
   csArray<csArray<iMeshFactoryWrapper*> > meshes_for_lod;
 
   /// Function for lod.
-  float lod_m, lod_a;
+  float lod_m, lod_a, lod_f;
   /// Or using variables.
   csRef<iSharedVariable> lod_varm;
   csRef<iSharedVariable> lod_vara;
+  csRef<iSharedVariable> lod_varf;
   csRef<csLODListener> lod_varm_listener;
   csRef<csLODListener> lod_vara_listener;
+  csRef<csLODListener> lod_varf_listener;
 
 public:
   /// constructor
@@ -153,6 +199,12 @@ public:
     vara = lod_vara;
   }
   virtual int GetLODPolygonCount (float /*lod*/) const { return 0; }
+
+  void SetLODFade (float f);
+  void GetLODFade (float& f) const;
+  void SetLODFade (iSharedVariable* varf);
+  void GetLODFade (iSharedVariable*& varf) const
+  { varf = lod_varf; }
 
   /// Get the mesh array for the numerical lod.
   csArray<iMeshFactoryWrapper*>& GetMeshesForLOD (int lod)

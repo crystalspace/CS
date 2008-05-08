@@ -2232,6 +2232,36 @@ bool csLoader::LoadLodControl (iLODControl* lodctrl, iDocumentNode* node)
 	  }
 	}
         break;
+      case XMLTOKEN_FADE:
+	{
+	  csRef<iDocumentAttribute> at = child->GetAttribute ("varf");
+	  if (at)
+	  {
+	    // We use variables.
+	    iSharedVariable *varf = Engine->GetVariableList()->FindByName (
+	    	child->GetAttributeValue ("varf"));
+	    lodctrl->SetLODFade (varf);
+	    break;
+	  }
+
+	  at = child->GetAttribute ("f");
+	  if (at)
+	  {
+	    float lodf = child->GetAttributeValueAsFloat ("f");
+	    lodctrl->SetLODFade (lodf);
+	  }
+	  else
+	  {
+	    float d = child->GetAttributeValueAsFloat ("d");
+	    float lodm, loda;
+	    lodctrl->GetLOD (lodm, loda);
+	    float d0 = loda/-lodm;
+	    float d1 = 1.0/lodm + d0;
+	    float lodf = (d1-d0)/(2*d);
+	    lodctrl->SetLODFade (lodf);
+	  }
+	}
+        break;
       default:
 	SyntaxService->ReportBadToken (child);
         return false;
@@ -4781,7 +4811,7 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
   csVector3 pos;
 
   csVector3 attenvec (0, 0, 0);
-  float spotfalloffInner = 0, spotfalloffOuter = 1;
+  float spotfalloffInner = 1, spotfalloffOuter = 0;
   csLightType type = CS_LIGHT_POINTLIGHT;
 
   bool use_light_transf = false;

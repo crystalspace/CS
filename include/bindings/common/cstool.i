@@ -8,6 +8,7 @@
 %template (scfFakecsColliderWrapper) scfFakeInterface<csColliderWrapper >;
 %template(scfColliderWrapper) scfImplementationExt1<csColliderWrapper,csObject,scfFakeInterface<csColliderWrapper> >;
 %include "cstool/collider.h"
+%template (scfView) scfImplementation1<csView, iView >;
 %include "cstool/csview.h"
 %include "cstool/csfxscr.h"
 

@@ -521,7 +521,8 @@ namespace CS
 	if (el != 0)
 	{
 	  ElementWrapper myElement = *el;
-	  availableResources.v.Delete (myElement);
+	  availableResources.v.DeleteExact (el);
+	  VerifyElementNotInTree (myElement);
 	  activeResources.v.PushFront (myElement);
 	  GetPurgeCondition().MarkActive (*this, myElement->GetPurgeAuxiliary());
 	  GetReuseCondition().MarkActive (*this, myElement->GetReuseAuxiliary());

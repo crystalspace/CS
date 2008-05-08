@@ -184,6 +184,43 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::CustomAllocated ##############
+
+package cspace::CustomAllocated;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_CustomAllocated(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_CustomAllocated($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csArrayThresholdVariable ##############
 
 package cspace::csArrayThresholdVariable;
@@ -281,6 +318,402 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         cspacec::delete_csArrayCapacityDefault($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::Vector2Array ##############
+
+package cspace::Vector2Array;
+use overload
+    "!=" => sub { $_[0]->__ne__($_[1])},
+    "==" => sub { $_[0]->__eq__($_[1])},
+    "fallback" => 1;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::CustomAllocated cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_Vector2Array($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_Vector2Array(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*GetSize = *cspacec::Vector2Array_GetSize;
+*Get = *cspacec::Vector2Array_Get;
+*Put = *cspacec::Vector2Array_Put;
+*Push = *cspacec::Vector2Array_Push;
+*Pop = *cspacec::Vector2Array_Pop;
+*Top = *cspacec::Vector2Array_Top;
+*Insert = *cspacec::Vector2Array_Insert;
+*Contains = *cspacec::Vector2Array_Contains;
+*DeleteAll = *cspacec::Vector2Array_DeleteAll;
+*Truncate = *cspacec::Vector2Array_Truncate;
+*Empty = *cspacec::Vector2Array_Empty;
+*IsEmpty = *cspacec::Vector2Array_IsEmpty;
+*SetMinimalCapacity = *cspacec::Vector2Array_SetMinimalCapacity;
+*DeleteIndex = *cspacec::Vector2Array_DeleteIndex;
+*DeleteIndexFast = *cspacec::Vector2Array_DeleteIndexFast;
+*DeleteRange = *cspacec::Vector2Array_DeleteRange;
+*__eq__ = *cspacec::Vector2Array___eq__;
+*__ne__ = *cspacec::Vector2Array___ne__;
+*GetAllocator = *cspacec::Vector2Array_GetAllocator;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::Vector2DirtyAccessArray ##############
+
+package cspace::Vector2DirtyAccessArray;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::Vector2Array cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_Vector2DirtyAccessArray(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*GetArray = *cspacec::Vector2DirtyAccessArray_GetArray;
+*GetArrayCopy = *cspacec::Vector2DirtyAccessArray_GetArrayCopy;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_Vector2DirtyAccessArray($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::Vector3Array ##############
+
+package cspace::Vector3Array;
+use overload
+    "!=" => sub { $_[0]->__ne__($_[1])},
+    "==" => sub { $_[0]->__eq__($_[1])},
+    "fallback" => 1;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::CustomAllocated cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_Vector3Array($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_Vector3Array(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*GetSize = *cspacec::Vector3Array_GetSize;
+*Get = *cspacec::Vector3Array_Get;
+*Put = *cspacec::Vector3Array_Put;
+*Push = *cspacec::Vector3Array_Push;
+*Pop = *cspacec::Vector3Array_Pop;
+*Top = *cspacec::Vector3Array_Top;
+*Insert = *cspacec::Vector3Array_Insert;
+*Contains = *cspacec::Vector3Array_Contains;
+*DeleteAll = *cspacec::Vector3Array_DeleteAll;
+*Truncate = *cspacec::Vector3Array_Truncate;
+*Empty = *cspacec::Vector3Array_Empty;
+*IsEmpty = *cspacec::Vector3Array_IsEmpty;
+*SetMinimalCapacity = *cspacec::Vector3Array_SetMinimalCapacity;
+*DeleteIndex = *cspacec::Vector3Array_DeleteIndex;
+*DeleteIndexFast = *cspacec::Vector3Array_DeleteIndexFast;
+*DeleteRange = *cspacec::Vector3Array_DeleteRange;
+*__eq__ = *cspacec::Vector3Array___eq__;
+*__ne__ = *cspacec::Vector3Array___ne__;
+*GetAllocator = *cspacec::Vector3Array_GetAllocator;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::Vector3DirtyAccessArray ##############
+
+package cspace::Vector3DirtyAccessArray;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::Vector3Array cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_Vector3DirtyAccessArray(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*GetArray = *cspacec::Vector3DirtyAccessArray_GetArray;
+*GetArrayCopy = *cspacec::Vector3DirtyAccessArray_GetArrayCopy;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_Vector3DirtyAccessArray($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::Vector4Array ##############
+
+package cspace::Vector4Array;
+use overload
+    "!=" => sub { $_[0]->__ne__($_[1])},
+    "==" => sub { $_[0]->__eq__($_[1])},
+    "fallback" => 1;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::CustomAllocated cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_Vector4Array($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_Vector4Array(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*GetSize = *cspacec::Vector4Array_GetSize;
+*Get = *cspacec::Vector4Array_Get;
+*Put = *cspacec::Vector4Array_Put;
+*Push = *cspacec::Vector4Array_Push;
+*Pop = *cspacec::Vector4Array_Pop;
+*Top = *cspacec::Vector4Array_Top;
+*Insert = *cspacec::Vector4Array_Insert;
+*Contains = *cspacec::Vector4Array_Contains;
+*DeleteAll = *cspacec::Vector4Array_DeleteAll;
+*Truncate = *cspacec::Vector4Array_Truncate;
+*Empty = *cspacec::Vector4Array_Empty;
+*IsEmpty = *cspacec::Vector4Array_IsEmpty;
+*SetMinimalCapacity = *cspacec::Vector4Array_SetMinimalCapacity;
+*DeleteIndex = *cspacec::Vector4Array_DeleteIndex;
+*DeleteIndexFast = *cspacec::Vector4Array_DeleteIndexFast;
+*DeleteRange = *cspacec::Vector4Array_DeleteRange;
+*__eq__ = *cspacec::Vector4Array___eq__;
+*__ne__ = *cspacec::Vector4Array___ne__;
+*GetAllocator = *cspacec::Vector4Array_GetAllocator;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::Vector4DirtyAccessArray ##############
+
+package cspace::Vector4DirtyAccessArray;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::Vector4Array cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_Vector4DirtyAccessArray(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*GetArray = *cspacec::Vector4DirtyAccessArray_GetArray;
+*GetArrayCopy = *cspacec::Vector4DirtyAccessArray_GetArrayCopy;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_Vector4DirtyAccessArray($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::UIntArray ##############
+
+package cspace::UIntArray;
+use overload
+    "!=" => sub { $_[0]->__ne__($_[1])},
+    "==" => sub { $_[0]->__eq__($_[1])},
+    "fallback" => 1;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::CustomAllocated cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_UIntArray($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_UIntArray(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*GetSize = *cspacec::UIntArray_GetSize;
+*Get = *cspacec::UIntArray_Get;
+*Put = *cspacec::UIntArray_Put;
+*Push = *cspacec::UIntArray_Push;
+*Pop = *cspacec::UIntArray_Pop;
+*Top = *cspacec::UIntArray_Top;
+*Insert = *cspacec::UIntArray_Insert;
+*Contains = *cspacec::UIntArray_Contains;
+*DeleteAll = *cspacec::UIntArray_DeleteAll;
+*Truncate = *cspacec::UIntArray_Truncate;
+*Empty = *cspacec::UIntArray_Empty;
+*IsEmpty = *cspacec::UIntArray_IsEmpty;
+*SetMinimalCapacity = *cspacec::UIntArray_SetMinimalCapacity;
+*DeleteIndex = *cspacec::UIntArray_DeleteIndex;
+*DeleteIndexFast = *cspacec::UIntArray_DeleteIndexFast;
+*DeleteRange = *cspacec::UIntArray_DeleteRange;
+*__eq__ = *cspacec::UIntArray___eq__;
+*__ne__ = *cspacec::UIntArray___ne__;
+*GetAllocator = *cspacec::UIntArray_GetAllocator;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::UIntDirtyAccessArray ##############
+
+package cspace::UIntDirtyAccessArray;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::UIntArray cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_UIntDirtyAccessArray(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*GetArray = *cspacec::UIntDirtyAccessArray_GetArray;
+*GetArrayCopy = *cspacec::UIntDirtyAccessArray_GetArrayCopy;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_UIntDirtyAccessArray($self);
         delete $OWNER{$self};
     }
 }
@@ -1120,43 +1553,6 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         cspacec::delete_csInitializer($self);
-        delete $OWNER{$self};
-    }
-}
-
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::CustomAllocated ##############
-
-package cspace::CustomAllocated;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace );
-%OWNER = ();
-%ITERATORS = ();
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_CustomAllocated(@_);
-    bless $self, $pkg if defined($self);
-}
-
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_CustomAllocated($self);
         delete $OWNER{$self};
     }
 }
@@ -3838,6 +4234,7 @@ sub new {
 *Top = *cspacec::csImageIOFileFormatDescriptions_Top;
 *Insert = *cspacec::csImageIOFileFormatDescriptions_Insert;
 *Contains = *cspacec::csImageIOFileFormatDescriptions_Contains;
+*DeleteAll = *cspacec::csImageIOFileFormatDescriptions_DeleteAll;
 *Truncate = *cspacec::csImageIOFileFormatDescriptions_Truncate;
 *Empty = *cspacec::csImageIOFileFormatDescriptions_Empty;
 *IsEmpty = *cspacec::csImageIOFileFormatDescriptions_IsEmpty;
@@ -4968,6 +5365,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetMaximumDistance = *cspacec::iSndSysSource3D_SetMaximumDistance;
 *GetMinimumDistance = *cspacec::iSndSysSource3D_GetMinimumDistance;
 *GetMaximumDistance = *cspacec::iSndSysSource3D_GetMaximumDistance;
+*scfGetVersion = *cspacec::iSndSysSource3D_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -7764,15 +8162,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *IsType = *cspacec::iScriptObject_IsType;
 *GetPointer = *cspacec::iScriptObject_GetPointer;
 *SetPointer = *cspacec::iScriptObject_SetPointer;
-*IntCall = *cspacec::iScriptObject_IntCall;
-*FloatCall = *cspacec::iScriptObject_FloatCall;
-*DoubleCall = *cspacec::iScriptObject_DoubleCall;
 *Call = *cspacec::iScriptObject_Call;
-*ObjectCall = *cspacec::iScriptObject_ObjectCall;
-*SetInt = *cspacec::iScriptObject_SetInt;
-*SetFloat = *cspacec::iScriptObject_SetFloat;
-*SetDouble = *cspacec::iScriptObject_SetDouble;
-*SetString = *cspacec::iScriptObject_SetString;
 *Set = *cspacec::iScriptObject_Set;
 *SetTruth = *cspacec::iScriptObject_SetTruth;
 *Get = *cspacec::iScriptObject_Get;
@@ -7812,21 +8202,12 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *RunText = *cspacec::iScript_RunText;
 *LoadModule = *cspacec::iScript_LoadModule;
 *LoadModuleNative = *cspacec::iScript_LoadModuleNative;
+*Call = *cspacec::iScript_Call;
 *RValue = *cspacec::iScript_RValue;
 *New = *cspacec::iScript_New;
+*Store = *cspacec::iScript_Store;
 *Remove = *cspacec::iScript_Remove;
 *NewObject = *cspacec::iScript_NewObject;
-*IntCall = *cspacec::iScript_IntCall;
-*FloatCall = *cspacec::iScript_FloatCall;
-*DoubleCall = *cspacec::iScript_DoubleCall;
-*Call = *cspacec::iScript_Call;
-*ObjectCall = *cspacec::iScript_ObjectCall;
-*StoreInt = *cspacec::iScript_StoreInt;
-*StoreFloat = *cspacec::iScript_StoreFloat;
-*StoreDouble = *cspacec::iScript_StoreDouble;
-*StoreString = *cspacec::iScript_StoreString;
-*Store = *cspacec::iScript_Store;
-*SetTruth = *cspacec::iScript_SetTruth;
 *Retrieve = *cspacec::iScript_Retrieve;
 *GetTruth = *cspacec::iScript_GetTruth;
 *scfGetVersion = *cspacec::iScript_scfGetVersion;
@@ -10132,7 +10513,6 @@ sub new {
 }
 
 *Description = *cspacec::csVector3_Description;
-*Cross = *cspacec::csVector3_Cross;
 *__neg__ = *cspacec::csVector3___neg__;
 *Set = *cspacec::csVector3_Set;
 *Get = *cspacec::csVector3_Get;
@@ -10152,6 +10532,7 @@ sub new {
 *__gt__ = *cspacec::csVector3___gt__;
 *__div__ = *cspacec::csVector3___div__;
 *project = *cspacec::csVector3_project;
+*Cross = *cspacec::csVector3_Cross;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -12797,6 +13178,7 @@ sub new {
 *Top = *cspacec::csIntArray_Top;
 *Insert = *cspacec::csIntArray_Insert;
 *Contains = *cspacec::csIntArray_Contains;
+*DeleteAll = *cspacec::csIntArray_DeleteAll;
 *Truncate = *cspacec::csIntArray_Truncate;
 *Empty = *cspacec::csIntArray_Empty;
 *IsEmpty = *cspacec::csIntArray_IsEmpty;
@@ -12855,6 +13237,7 @@ sub new {
 *Pop = *cspacec::csIntArrayArray_Pop;
 *Top = *cspacec::csIntArrayArray_Top;
 *Insert = *cspacec::csIntArrayArray_Insert;
+*DeleteAll = *cspacec::csIntArrayArray_DeleteAll;
 *Truncate = *cspacec::csIntArrayArray_Truncate;
 *Empty = *cspacec::csIntArrayArray_Empty;
 *IsEmpty = *cspacec::csIntArrayArray_IsEmpty;
@@ -14084,6 +14467,725 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         cspacec::delete_iGenMeshSkeletonControlState($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csAnimatedMeshBoneInfluence ##############
+
+package cspace::csAnimatedMeshBoneInfluence;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_bone_get = *cspacec::csAnimatedMeshBoneInfluence_bone_get;
+*swig_bone_set = *cspacec::csAnimatedMeshBoneInfluence_bone_set;
+*swig_influenceWeight_get = *cspacec::csAnimatedMeshBoneInfluence_influenceWeight_get;
+*swig_influenceWeight_set = *cspacec::csAnimatedMeshBoneInfluence_influenceWeight_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csAnimatedMeshBoneInfluence(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csAnimatedMeshBoneInfluence($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iAnimatedMeshFactory ##############
+
+package cspace::iAnimatedMeshFactory;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*CreateSubMesh = *cspacec::iAnimatedMeshFactory_CreateSubMesh;
+*GetSubMesh = *cspacec::iAnimatedMeshFactory_GetSubMesh;
+*GetSubMeshCount = *cspacec::iAnimatedMeshFactory_GetSubMeshCount;
+*DeleteSubMesh = *cspacec::iAnimatedMeshFactory_DeleteSubMesh;
+*GetVertexCount = *cspacec::iAnimatedMeshFactory_GetVertexCount;
+*GetVertices = *cspacec::iAnimatedMeshFactory_GetVertices;
+*SetVertices = *cspacec::iAnimatedMeshFactory_SetVertices;
+*GetTexCoords = *cspacec::iAnimatedMeshFactory_GetTexCoords;
+*SetTexCoords = *cspacec::iAnimatedMeshFactory_SetTexCoords;
+*GetNormals = *cspacec::iAnimatedMeshFactory_GetNormals;
+*SetNormals = *cspacec::iAnimatedMeshFactory_SetNormals;
+*GetTangents = *cspacec::iAnimatedMeshFactory_GetTangents;
+*SetTangents = *cspacec::iAnimatedMeshFactory_SetTangents;
+*GetBinormals = *cspacec::iAnimatedMeshFactory_GetBinormals;
+*SetBinormals = *cspacec::iAnimatedMeshFactory_SetBinormals;
+*GetColors = *cspacec::iAnimatedMeshFactory_GetColors;
+*SetColors = *cspacec::iAnimatedMeshFactory_SetColors;
+*Invalidate = *cspacec::iAnimatedMeshFactory_Invalidate;
+*SetSkeletonFactory = *cspacec::iAnimatedMeshFactory_SetSkeletonFactory;
+*GetSkeletonFactory = *cspacec::iAnimatedMeshFactory_GetSkeletonFactory;
+*SetBoneInfluencesPerVertex = *cspacec::iAnimatedMeshFactory_SetBoneInfluencesPerVertex;
+*GetBoneInfluencesPerVertex = *cspacec::iAnimatedMeshFactory_GetBoneInfluencesPerVertex;
+*GetBoneInfluences = *cspacec::iAnimatedMeshFactory_GetBoneInfluences;
+*CreateMorphTarget = *cspacec::iAnimatedMeshFactory_CreateMorphTarget;
+*GetMorphTarget = *cspacec::iAnimatedMeshFactory_GetMorphTarget;
+*GetMorphTargetCount = *cspacec::iAnimatedMeshFactory_GetMorphTargetCount;
+*ClearMorphTargets = *cspacec::iAnimatedMeshFactory_ClearMorphTargets;
+*scfGetVersion = *cspacec::iAnimatedMeshFactory_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iAnimatedMeshFactory($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iAnimatedMeshFactorySubMesh ##############
+
+package cspace::iAnimatedMeshFactorySubMesh;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*GetIndices = *cspacec::iAnimatedMeshFactorySubMesh_GetIndices;
+*GetIndexSetCount = *cspacec::iAnimatedMeshFactorySubMesh_GetIndexSetCount;
+*GetBoneIndices = *cspacec::iAnimatedMeshFactorySubMesh_GetBoneIndices;
+*scfGetVersion = *cspacec::iAnimatedMeshFactorySubMesh_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iAnimatedMeshFactorySubMesh($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iAnimatedMesh ##############
+
+package cspace::iAnimatedMesh;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*SetSkeleton = *cspacec::iAnimatedMesh_SetSkeleton;
+*GetSkeleton = *cspacec::iAnimatedMesh_GetSkeleton;
+*GetSubMesh = *cspacec::iAnimatedMesh_GetSubMesh;
+*GetSubMeshCount = *cspacec::iAnimatedMesh_GetSubMeshCount;
+*SetMorphTargetWeight = *cspacec::iAnimatedMesh_SetMorphTargetWeight;
+*GetMorphTargetWeight = *cspacec::iAnimatedMesh_GetMorphTargetWeight;
+*scfGetVersion = *cspacec::iAnimatedMesh_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iAnimatedMesh($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iAnimatedMeshSubMesh ##############
+
+package cspace::iAnimatedMeshSubMesh;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*GetFactorySubMesh = *cspacec::iAnimatedMeshSubMesh_GetFactorySubMesh;
+*SetRendering = *cspacec::iAnimatedMeshSubMesh_SetRendering;
+*IsRendering = *cspacec::iAnimatedMeshSubMesh_IsRendering;
+*scfGetVersion = *cspacec::iAnimatedMeshSubMesh_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iAnimatedMeshSubMesh($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iAnimatedMeshMorphTarget ##############
+
+package cspace::iAnimatedMeshMorphTarget;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*SetVertexCount = *cspacec::iAnimatedMeshMorphTarget_SetVertexCount;
+*GetVertexCount = *cspacec::iAnimatedMeshMorphTarget_GetVertexCount;
+*GetIndices = *cspacec::iAnimatedMeshMorphTarget_GetIndices;
+*GetVertexOffsets = *cspacec::iAnimatedMeshMorphTarget_GetVertexOffsets;
+*Invalidate = *cspacec::iAnimatedMeshMorphTarget_Invalidate;
+*scfGetVersion = *cspacec::iAnimatedMeshMorphTarget_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iAnimatedMeshMorphTarget($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSkeletonManager2 ##############
+
+package cspace::iSkeletonManager2;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*CreateSkeletonFactory = *cspacec::iSkeletonManager2_CreateSkeletonFactory;
+*FindSkeletonFactory = *cspacec::iSkeletonManager2_FindSkeletonFactory;
+*ClearSkeletonFactories = *cspacec::iSkeletonManager2_ClearSkeletonFactories;
+*CreateAnimPacketFactory = *cspacec::iSkeletonManager2_CreateAnimPacketFactory;
+*FindAnimPacketFactory = *cspacec::iSkeletonManager2_FindAnimPacketFactory;
+*ClearAnimPacketFactories = *cspacec::iSkeletonManager2_ClearAnimPacketFactories;
+*ClearAll = *cspacec::iSkeletonManager2_ClearAll;
+*scfGetVersion = *cspacec::iSkeletonManager2_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonManager2($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSkeletonFactory2 ##############
+
+package cspace::iSkeletonFactory2;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*CreateBone = *cspacec::iSkeletonFactory2_CreateBone;
+*RemoveBone = *cspacec::iSkeletonFactory2_RemoveBone;
+*GetBoneParent = *cspacec::iSkeletonFactory2_GetBoneParent;
+*HasBone = *cspacec::iSkeletonFactory2_HasBone;
+*SetBoneName = *cspacec::iSkeletonFactory2_SetBoneName;
+*GetBoneName = *cspacec::iSkeletonFactory2_GetBoneName;
+*GetTopBoneID = *cspacec::iSkeletonFactory2_GetTopBoneID;
+*GetTransformBoneSpace = *cspacec::iSkeletonFactory2_GetTransformBoneSpace;
+*SetTransformBoneSpace = *cspacec::iSkeletonFactory2_SetTransformBoneSpace;
+*GetTransformAbsSpace = *cspacec::iSkeletonFactory2_GetTransformAbsSpace;
+*SetTransformAbsSpace = *cspacec::iSkeletonFactory2_SetTransformAbsSpace;
+*CreateSkeleton = *cspacec::iSkeletonFactory2_CreateSkeleton;
+*GetAnimationPacket = *cspacec::iSkeletonFactory2_GetAnimationPacket;
+*SetAnimationPacket = *cspacec::iSkeletonFactory2_SetAnimationPacket;
+*scfGetVersion = *cspacec::iSkeletonFactory2_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonFactory2($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSkeleton2 ##############
+
+package cspace::iSkeleton2;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*GetSceneNode = *cspacec::iSkeleton2_GetSceneNode;
+*GetTransformBoneSpace = *cspacec::iSkeleton2_GetTransformBoneSpace;
+*SetTransformBoneSpace = *cspacec::iSkeleton2_SetTransformBoneSpace;
+*GetTransformAbsSpace = *cspacec::iSkeleton2_GetTransformAbsSpace;
+*SetTransformAbsSpace = *cspacec::iSkeleton2_SetTransformAbsSpace;
+*GetTransformBindSpace = *cspacec::iSkeleton2_GetTransformBindSpace;
+*SetTransformBindSpace = *cspacec::iSkeleton2_SetTransformBindSpace;
+*GetStateAbsSpace = *cspacec::iSkeleton2_GetStateAbsSpace;
+*GetStateBoneSpace = *cspacec::iSkeleton2_GetStateBoneSpace;
+*GetStateBindSpace = *cspacec::iSkeleton2_GetStateBindSpace;
+*GetFactory = *cspacec::iSkeleton2_GetFactory;
+*GetAnimationPacket = *cspacec::iSkeleton2_GetAnimationPacket;
+*SetAnimationPacket = *cspacec::iSkeleton2_SetAnimationPacket;
+*RecreateSkeleton = *cspacec::iSkeleton2_RecreateSkeleton;
+*UpdateSkeleton = *cspacec::iSkeleton2_UpdateSkeleton;
+*GetSkeletonStateVersion = *cspacec::iSkeleton2_GetSkeletonStateVersion;
+*scfGetVersion = *cspacec::iSkeleton2_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeleton2($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csSkeletalState2 ##############
+
+package cspace::csSkeletalState2;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::csRefCount cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csSkeletalState2(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csSkeletalState2($self);
+        delete $OWNER{$self};
+    }
+}
+
+*GetVector = *cspacec::csSkeletalState2_GetVector;
+*GetQuaternion = *cspacec::csSkeletalState2_GetQuaternion;
+*IsBoneUsed = *cspacec::csSkeletalState2_IsBoneUsed;
+*SetBoneUsed = *cspacec::csSkeletalState2_SetBoneUsed;
+*GetBoneCount = *cspacec::csSkeletalState2_GetBoneCount;
+*Setup = *cspacec::csSkeletalState2_Setup;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSkeletonAnimPacketFactory2 ##############
+
+package cspace::iSkeletonAnimPacketFactory2;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*CreateInstance = *cspacec::iSkeletonAnimPacketFactory2_CreateInstance;
+*CreateAnimation = *cspacec::iSkeletonAnimPacketFactory2_CreateAnimation;
+*FindAnimation = *cspacec::iSkeletonAnimPacketFactory2_FindAnimation;
+*ClearAnimations = *cspacec::iSkeletonAnimPacketFactory2_ClearAnimations;
+*GetAnimation = *cspacec::iSkeletonAnimPacketFactory2_GetAnimation;
+*GetAnimationCount = *cspacec::iSkeletonAnimPacketFactory2_GetAnimationCount;
+*SetAnimationRoot = *cspacec::iSkeletonAnimPacketFactory2_SetAnimationRoot;
+*GetAnimationRoot = *cspacec::iSkeletonAnimPacketFactory2_GetAnimationRoot;
+*CreateBlendNode = *cspacec::iSkeletonAnimPacketFactory2_CreateBlendNode;
+*scfGetVersion = *cspacec::iSkeletonAnimPacketFactory2_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonAnimPacketFactory2($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSkeletonAnimPacket2 ##############
+
+package cspace::iSkeletonAnimPacket2;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*FindAnimation = *cspacec::iSkeletonAnimPacket2_FindAnimation;
+*GetAnimation = *cspacec::iSkeletonAnimPacket2_GetAnimation;
+*GetAnimationCount = *cspacec::iSkeletonAnimPacket2_GetAnimationCount;
+*GetAnimationRoot = *cspacec::iSkeletonAnimPacket2_GetAnimationRoot;
+*scfGetVersion = *cspacec::iSkeletonAnimPacket2_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonAnimPacket2($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSkeletonAnimNodeFactory2 ##############
+
+package cspace::iSkeletonAnimNodeFactory2;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*CreateInstance = *cspacec::iSkeletonAnimNodeFactory2_CreateInstance;
+*GetNodeName = *cspacec::iSkeletonAnimNodeFactory2_GetNodeName;
+*FindNode = *cspacec::iSkeletonAnimNodeFactory2_FindNode;
+*scfGetVersion = *cspacec::iSkeletonAnimNodeFactory2_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonAnimNodeFactory2($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSkeletonAnimNode2 ##############
+
+package cspace::iSkeletonAnimNode2;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*BlendState = *cspacec::iSkeletonAnimNode2_BlendState;
+*TickAnimation = *cspacec::iSkeletonAnimNode2_TickAnimation;
+*IsActive = *cspacec::iSkeletonAnimNode2_IsActive;
+*GetFactory = *cspacec::iSkeletonAnimNode2_GetFactory;
+*FindNode = *cspacec::iSkeletonAnimNode2_FindNode;
+*scfGetVersion = *cspacec::iSkeletonAnimNode2_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonAnimNode2($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSkeletonAnimationFactory2 ##############
+
+package cspace::iSkeletonAnimationFactory2;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iSkeletonAnimNodeFactory2 cspace );
+%OWNER = ();
+%ITERATORS = ();
+*AddChannel = *cspacec::iSkeletonAnimationFactory2_AddChannel;
+*FindChannel = *cspacec::iSkeletonAnimationFactory2_FindChannel;
+*AddKeyFrame = *cspacec::iSkeletonAnimationFactory2_AddKeyFrame;
+*GetKeyFrameCount = *cspacec::iSkeletonAnimationFactory2_GetKeyFrameCount;
+*GetKeyFrame = *cspacec::iSkeletonAnimationFactory2_GetKeyFrame;
+*GetTwoKeyFrames = *cspacec::iSkeletonAnimationFactory2_GetTwoKeyFrames;
+*scfGetVersion = *cspacec::iSkeletonAnimationFactory2_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonAnimationFactory2($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSkeletonAnimation2 ##############
+
+package cspace::iSkeletonAnimation2;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iSkeletonAnimNode2 cspace );
+%OWNER = ();
+%ITERATORS = ();
+*PlayOnce = *cspacec::iSkeletonAnimation2_PlayOnce;
+*PlayCyclic = *cspacec::iSkeletonAnimation2_PlayCyclic;
+*Stop = *cspacec::iSkeletonAnimation2_Stop;
+*Reset = *cspacec::iSkeletonAnimation2_Reset;
+*GetPlaybackPosition = *cspacec::iSkeletonAnimation2_GetPlaybackPosition;
+*SetPlaybackPosition = *cspacec::iSkeletonAnimation2_SetPlaybackPosition;
+*GetAnimationFactory = *cspacec::iSkeletonAnimation2_GetAnimationFactory;
+*scfGetVersion = *cspacec::iSkeletonAnimation2_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonAnimation2($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSkeletonBlendNodeFactory2 ##############
+
+package cspace::iSkeletonBlendNodeFactory2;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iSkeletonAnimNodeFactory2 cspace );
+%OWNER = ();
+%ITERATORS = ();
+*AddNode = *cspacec::iSkeletonBlendNodeFactory2_AddNode;
+*SetNodeWeight = *cspacec::iSkeletonBlendNodeFactory2_SetNodeWeight;
+*NormalizeWeights = *cspacec::iSkeletonBlendNodeFactory2_NormalizeWeights;
+*GetNode = *cspacec::iSkeletonBlendNodeFactory2_GetNode;
+*GetNodeCount = *cspacec::iSkeletonBlendNodeFactory2_GetNodeCount;
+*ClearNodes = *cspacec::iSkeletonBlendNodeFactory2_ClearNodes;
+*scfGetVersion = *cspacec::iSkeletonBlendNodeFactory2_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonBlendNodeFactory2($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSkeletonBlendNode2 ##############
+
+package cspace::iSkeletonBlendNode2;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iSkeletonAnimNode2 cspace );
+%OWNER = ();
+%ITERATORS = ();
+*SetNodeWeight = *cspacec::iSkeletonBlendNode2_SetNodeWeight;
+*NormalizeWeights = *cspacec::iSkeletonBlendNode2_NormalizeWeights;
+*scfGetVersion = *cspacec::iSkeletonBlendNode2_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonBlendNode2($self);
         delete $OWNER{$self};
     }
 }
@@ -15379,6 +16481,7 @@ sub new {
 *Top = *cspacec::csCharArrayArray_Top;
 *Insert = *cspacec::csCharArrayArray_Insert;
 *Contains = *cspacec::csCharArrayArray_Contains;
+*DeleteAll = *cspacec::csCharArrayArray_DeleteAll;
 *Truncate = *cspacec::csCharArrayArray_Truncate;
 *Empty = *cspacec::csCharArrayArray_Empty;
 *IsEmpty = *cspacec::csCharArrayArray_IsEmpty;
@@ -17830,6 +18933,42 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iLODControl ##############
+
+package cspace::iLODControl;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*SetLOD = *cspacec::iLODControl_SetLOD;
+*GetLOD = *cspacec::iLODControl_GetLOD;
+*GetLODPolygonCount = *cspacec::iLODControl_GetLODPolygonCount;
+*SetLODFade = *cspacec::iLODControl_SetLODFade;
+*GetLODFade = *cspacec::iLODControl_GetLODFade;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iLODControl($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iCameraSectorListener ##############
 
 package cspace::iCameraSectorListener;
@@ -19656,11 +20795,37 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::scfView ##############
+
+package cspace::scfView;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iView cspace );
+%OWNER = ();
+*IncRef = *cspacec::scfView_IncRef;
+*DecRef = *cspacec::scfView_DecRef;
+*GetRefCount = *cspacec::scfView_GetRefCount;
+*QueryInterface = *cspacec::scfView_QueryInterface;
+*AddRefOwner = *cspacec::scfView_AddRefOwner;
+*RemoveRefOwner = *cspacec::scfView_RemoveRefOwner;
+*GetInterfaceMetadata = *cspacec::scfView_GetInterfaceMetadata;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csView ##############
 
 package cspace::csView;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace );
+@ISA = qw( cspace::scfView cspace );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -21078,6 +22243,9 @@ tie %__Primitives_quadTable_hash,"cspace::csVector2", $cspacec::Primitives_quadT
 $Primitives_quadTable= \%__Primitives_quadTable_hash;
 bless $Primitives_quadTable, cspace::csVector2;
 *CS_SNDSYS_STREAM_UNKNOWN_LENGTH = *cspacec::CS_SNDSYS_STREAM_UNKNOWN_LENGTH;
+*InvalidBoneID = *cspacec::InvalidBoneID;
+*InvalidChannelID = *cspacec::InvalidChannelID;
+*InvalidKeyframeID = *cspacec::InvalidKeyframeID;
 
   use Carp;
 

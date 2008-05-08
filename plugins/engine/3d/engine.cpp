@@ -697,6 +697,7 @@ bool csEngine::HandleEvent (iEvent &Event)
   if (G3D)
   {
     id_creation_time = globalStringSet->Request("mesh creation time");
+    id_lod_fade = globalStringSet->Request("lod fade");
 
     maxAspectRatio = 4096;
     frameWidth = G3D->GetWidth ();
