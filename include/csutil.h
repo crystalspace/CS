@@ -133,6 +133,7 @@
 #include "csutil/sparse3d.h"
 #include "csutil/spinlock.h"
 #include "csutil/strhash.h"
+#include "csutil/strhashr.h"
 #include "csutil/stringarray.h"
 #include "csutil/stringreader.h"
 #include "csutil/strset.h"
