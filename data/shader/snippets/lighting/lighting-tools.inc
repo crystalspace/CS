@@ -46,6 +46,8 @@
 		 destination="lightPropsSM.shadowMapTF" />
     <variablemap variable="light shadow map pixel size" 
 		 destination="lightPropsSM.shadowMapPixels" />
+    <variablemap variable="light shadow map unscale" 
+		 destination="lightPropsSM.shadowMapUnscale" />
   <?Endtemplate?>
   
   <?SEndIf?>

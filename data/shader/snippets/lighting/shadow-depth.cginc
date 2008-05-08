@@ -30,6 +30,7 @@ struct ShadowShadowMapDepth : Shadow
   sampler2D shadowMap;
   float bias;
   float gradient;
+  float4 shadowMapUnscale;
 
   void InitVP (int lightNum, float4 surfPositionWorld,
                float3 normWorld,
@@ -64,11 +65,11 @@ struct ShadowShadowMapDepth : Shadow
     shadowMapCoords = vp_shadowMapCoords;
     shadowMap = lightPropsSM.shadowMap[lightNum];
     gradient = vp_gradient;
+    shadowMapUnscale = lightPropsSM.shadowMapUnscale[lightNum];
     
     // Project SM coordinates
     shadowMapCoordsProj = shadowMapCoords;
     shadowMapCoordsProj.xyz /= shadowMapCoordsProj.w;
-    shadowMapCoordsProj.xyz = (float3(0.5)*shadowMapCoordsProj.xyz) + float3(0.5);
     
     // @@@ FIXME: Needing such a high bias scale seems ridiculous!
     // Maybe fixing #471 would allow to reduce it.
@@ -78,10 +79,29 @@ struct ShadowShadowMapDepth : Shadow
   
   half GetVisibility()
   {
+    float3 shadowMapCoordsBiased = (float3(0.5)*shadowMapCoordsProj.xyz) + float3(0.5);
     // Depth to compare against
-    float compareDepth = shadowMapCoordsProj.z + bias;
+    float compareDepth = shadowMapCoordsBiased.z + bias;
     // Depth compare with shadow map texel
-    half inLight = h4tex2D (shadowMap, float3 (shadowMapCoordsProj.xy, compareDepth)).x;
+    half inLight = h4tex2D (shadowMap, float3 (shadowMapCoordsBiased.xy, compareDepth)).x;
+  ]]>
+  <?if (vars."light type".int != consts.CS_LIGHT_DIRECTIONAL) ?>
+  <![CDATA[
+    /* Point and spot light shadows are computed by separately lighting up 
+       to 6 pyramids with an opening of 90 degs with a shadow map for each
+       of these light volumes.
+       Clip so points outside the light volume aren't lit.
+     */
+    float2 shadowMapCoordsProjUnscaled = 
+      (shadowMapCoordsProj.xy) * shadowMapUnscale.xy + shadowMapUnscale.zw;
+    
+    float2 compResLT = shadowMapCoordsProjUnscaled.xy >= float2 (-1);
+    float2 compResBR = shadowMapCoordsProjUnscaled.xy < float2 (1);
+    inLight *= compResLT.x*compResLT.y*compResBR.x*compResBR.y;
+    inLight *= (shadowMapCoordsProj.z < 0);
+  ]]>
+  <?endif?>
+  <![CDATA[
     return inLight;
   }
 };

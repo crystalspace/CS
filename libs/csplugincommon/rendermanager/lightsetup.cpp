@@ -24,14 +24,15 @@ namespace CS
 {
 namespace RenderManager
 {
-  LightingSorter::LightingSorter (PersistentData& persist,
-				  csLightInfluence* influenceLights, 
+  LightingSorter::LightingSorter (PersistentData& persist/*,
+				  csLightInfluence* influenceLights*/, 
                                   size_t numLights)
     : persist (persist)
   {
       // Sort lights by type
     persist.lightTypeScratch.Empty();
-    for (size_t l = 0; l < numLights; l++)
+    persist.lightTypeScratch.SetCapacity (numLights);
+    /*for (size_t l = 0; l < numLights; l++)
     {
       LightInfo iltp;
       iltp.light = influenceLights[l].light;
@@ -39,7 +40,19 @@ namespace RenderManager
       iltp.isStatic =
         influenceLights[l].light->GetDynamicType() != CS_LIGHT_DYNAMICTYPE_DYNAMIC;
       persist.lightTypeScratch.Push (iltp);
-    }
+    }*/
+  }
+    
+  void LightingSorter::AddLight (const csLightInfluence& influence,
+                                 uint numSubLights)
+  {
+    LightInfo iltp;
+    iltp.light = influence.light;
+    iltp.type = influence.light->GetType();
+    iltp.isStatic =
+      influence.light->GetDynamicType() != CS_LIGHT_DYNAMICTYPE_DYNAMIC;
+    iltp.numSubLights = numSubLights;
+    persist.lightTypeScratch.Push (iltp);
   }
     
   bool LightingSorter::GetNextLight (bool skipStatic, LightInfo& out)

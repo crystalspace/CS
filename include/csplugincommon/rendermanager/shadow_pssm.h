@@ -98,44 +98,56 @@ namespace RenderManager
       }
     };
     
-    struct CachedLightData
+    struct CachedLightData :
+      public CS::Memory::CustomAllocated
     {
-      uint shadowMapCreateFrame;
-
       bool frustumsSetup;
-      // Transform world space to light space
-      CS::Math::Matrix4 world2light;
       // Transform light space to post-project light space
       CS::Math::Matrix4 lightProject;
-      struct Frustum
+      struct SuperFrustum : public CS::Utility::FastRefCount<SuperFrustum>
       {
-        // Volume (in post-project light space)
-        csBox3 volumeLS;
-        csBox3 volumePP;
-	csShaderVariable* shadowMapProjectSV;
-	csShaderVariable* shadowMapDimSV;
-	csShaderVariable** textureSVs;
-	
-	// Object bboxes in post-project light space
-	csArray<csBox3> containedObjectsPP;
-	
-	Frustum() : textureSVs (0) {}
-	~Frustum() { delete textureSVs; }
+	// Transform world space to light space
+	csReversibleTransform world2light_base;
+	csReversibleTransform world2light_rotated;
+	csMatrix3 frustumRotation;
+	struct Frustum
+	{
+	  // Volume (in post-project light space)
+	  csBox3 volumeLS;
+	  csBox3 volumePP;
+	  csShaderVariable* shadowMapProjectSV;
+	  csShaderVariable* shadowMapUnscaleSV;
+	  csShaderVariable* shadowMapDimSV;
+	  csShaderVariable** textureSVs;
+	  
+	  // Object bboxes in post-project light space
+	  csArray<csBox3> containedObjectsPP;
+	  
+	  Frustum() : textureSVs (0) {}
+	  ~Frustum() { delete[] textureSVs; }
+	};
+	Frustum frustums[NUM_PARTS];
       };
-      Frustum lightFrustums[NUM_PARTS];
+      csRefArray<SuperFrustum> lightFrustums;
       
-      CachedLightData() : shadowMapCreateFrame (~0), frustumsSetup (false) {}
+      CachedLightData() : frustumsSetup (false) {}
+      
+      uint GetSublightNum() const { return (uint)lightFrustums.GetSize(); }
 
-      void SetupFrame (ViewSetup& viewSetup, iLight* light)
+      void SetupFrame (ShadowPSSM& shadows, iLight* light)
       {
+        ViewSetup& viewSetup = shadows.viewSetup;
         if (!frustumsSetup)
         {
           float lightNear = SMALL_Z;
           float lightCutoff = light->GetCutoffDistance();
           CS::Math::Matrix4 lightProject;
-          switch (light->GetType())
+          csLightType ltype = light->GetType();
+          int numFrustums;
+          switch (ltype)
           {
             case CS_LIGHT_DIRECTIONAL:
+              numFrustums = 1;
 	      lightProject = CS::Math::Matrix4 (
 		1, 0, 0, 0,
 		0, 1, 0, 0,
@@ -144,6 +156,7 @@ namespace RenderManager
               break;
             case CS_LIGHT_POINTLIGHT:
             case CS_LIGHT_SPOTLIGHT:
+              numFrustums = (ltype == CS_LIGHT_POINTLIGHT) ? 6 : 1;
               {
 		CS::Math::Matrix4 flipZW (
 		  1, 0, 0, 0,
@@ -151,103 +164,128 @@ namespace RenderManager
 		  0, 0, -1, 0,
 		  0, 0, 0, -1);
 		lightProject = flipZW * CS::Math::Projections::Frustum (
-		  -lightNear, lightNear, -lightNear, lightNear,
+		  -lightNear, lightNear, -lightNear, lightNear, // @@@ TODO: use spot angle
 		  lightNear, lightCutoff);
               }
               break;
           }
-          const csReversibleTransform& world2light (
+          const csReversibleTransform& world2light_base (
             light->GetMovable()->GetFullTransform());
-          CS::Math::Matrix4 world2lightProj (
-            world2light * lightProject);
 	  this->lightProject = lightProject;
-	  this->world2light = world2light;
             
           const csBox3& lightBBox = light->GetLocalBBox();
-        
+
+          static const csMatrix3 frustRotationMatrices[6] =
+          {
+            csMatrix3 (), // must be identity
+            csMatrix3 (1, 0, 0,  0, 0, 1,  0, -1, 0),
+            csMatrix3 (1, 0, 0,  0, 0, -1,  0, 1, 0),
+            csMatrix3 (0, 0, -1,  0, 1, 0,  1, 0, 0),
+            csMatrix3 (0, 0, 1,  0, 1, 0,  -1, 0, 0),
+            csMatrix3 (1, 0, 0,  0, -1, 0,  0, 0, -1) // last must be 180 deg into other direction
+          };
+	  csVector2 corner2D[4] = {
+	    csVector2 (viewSetup.lx, viewSetup.ty),
+	    csVector2 (viewSetup.lx, viewSetup.by),
+	    csVector2 (viewSetup.rx, viewSetup.ty),
+	    csVector2 (viewSetup.rx, viewSetup.by)
+	  };
+
 	  LightingVariablesHelper lightVarsHelper (viewSetup.persist.lightVarsPersist);
-	  /* Compute intersection of light frustum with view frustums:
-	      1. Compute corners of split frustums
-	      2. Translate corners to light space
-	      3. Compute bounding box from corners
-	    */
-	  for (int i = 0; i < NUM_PARTS; i++)
+	  for (int f = 0; f < numFrustums; f++)
 	  {
-	    csVector2 corner2D[4] = {
-	      csVector2 (viewSetup.lx, viewSetup.ty),
-	      csVector2 (viewSetup.lx, viewSetup.by),
-	      csVector2 (viewSetup.rx, viewSetup.ty),
-	      csVector2 (viewSetup.rx, viewSetup.by)
-	    };
-	    Frustum& lightFrustum = lightFrustums[i];
-	    // Frustum corner, camera space
-	    csVector3 cornerCam;
-	    // Frustum corner, world space
-	    csVector3 cornerWorld;
-	    // Frustum corner, light space
-	    csVector3 cornerLight;
-	    // Frustum slice bbox, light space
-	    csBox3 frustumLight;
-	    frustumLight.StartBoundingBox();
-	    for (int c = 0; c < 4; c++)
-	    {
-	      cornerCam = viewSetup.rview->GetCamera()->InvPerspective (
-		corner2D[c], viewSetup.splitDists[i]);
-	      cornerWorld = viewSetup.rview->GetCamera()->GetTransform().This2Other (
-		cornerCam);
-	      cornerLight = world2light.Other2This (cornerWorld);
-	      frustumLight.AddBoundingVertex (cornerLight);
-	      
-	      cornerCam = viewSetup.rview->GetCamera()->InvPerspective (
-		corner2D[c], viewSetup.splitDists[i+1]);
-	      cornerWorld = viewSetup.rview->GetCamera()->GetTransform().This2Other (
-		cornerCam);
-	      cornerLight = world2light.Other2This (cornerWorld);
-	      frustumLight.AddBoundingVertex (cornerLight);
-	    }
-	    frustumLight *= lightBBox;
+	    /* Compute intersection of light frustum with view frustums:
+		1. Compute corners of split frustums
+		2. Translate corners to light space
+		3. Compute bounding box from corners
+	      */
+	    csRef<SuperFrustum> newFrust;
+	    newFrust.AttachNew (new SuperFrustum);
+	    SuperFrustum& superFrustum = *(lightFrustums[lightFrustums.Push (
+	      newFrust)]);
+	    superFrustum.world2light_base = world2light_base;
+	    superFrustum.world2light_rotated = world2light_base;
+	    superFrustum.frustumRotation = frustRotationMatrices[f];
+	    superFrustum.world2light_rotated.SetO2T (
+	      superFrustum.world2light_rotated.GetO2T()
+	      * frustRotationMatrices[f]);
 	    
-	    // Frustum slice corner, light space before W divide
-	    csVector4 cornerUndiv;
-	    // Frustum slice corner, light space after W divide
-	    csVector3 cornerDiv;
+	    for (int i = 0; i < NUM_PARTS; i++)
+	    {
+	      typename SuperFrustum::Frustum& lightFrustum =
+	        superFrustum.frustums[i];
 	    
-	    lightFrustum.volumeLS.StartBoundingBox();
-	    lightFrustum.volumePP.StartBoundingBox();
-	    for (int c = 0; c < 7; c++)
-	    {
-	      cornerLight = frustumLight.GetCorner (c);
-	      lightFrustum.volumeLS.AddBoundingVertex (cornerLight);
-	      cornerUndiv = lightProject * cornerLight;
-	      cornerDiv =
-		csVector3 (cornerUndiv.x, cornerUndiv.y, cornerUndiv.z);
-	      cornerDiv /= cornerUndiv.w;
-	      lightFrustum.volumePP.AddBoundingVertex (cornerDiv);
-	    }
-	  
-	    lightFrustum.shadowMapProjectSV = lightVarsHelper.CreateTempSV (
-	      viewSetup.persist.svNames.GetLightSVId (
-		csLightShaderVarCache::lightShadowMapProjection));
-	    lightFrustum.shadowMapProjectSV->SetArraySize (4);
-	    for (int i = 0; i < 4; i++)
-	    {
-	      csShaderVariable* item = lightVarsHelper.CreateTempSV (
-		CS::InvalidShaderVarStringID);
-	      lightFrustum.shadowMapProjectSV->SetArrayElement (i, item);
-	    }
-	    lightFrustum.shadowMapDimSV = lightVarsHelper.CreateTempSV (
-	      viewSetup.persist.svNames.GetLightSVId (
-		csLightShaderVarCache::lightShadowMapPixelSize));
+	      // Frustum corner, camera space
+	      csVector3 cornerCam;
+	      // Frustum corner, world space
+	      csVector3 cornerWorld;
+	      // Frustum corner, light space
+	      csVector3 cornerLight;
+	      // Frustum slice bbox, light space
+	      csBox3 frustumLight;
+	      frustumLight.StartBoundingBox();
+	      for (int c = 0; c < 4; c++)
+	      {
+		cornerCam = viewSetup.rview->GetCamera()->InvPerspective (
+		  corner2D[c], viewSetup.splitDists[i]);
+		cornerWorld = viewSetup.rview->GetCamera()->GetTransform().This2Other (
+		  cornerCam);
+		cornerLight = superFrustum.world2light_rotated.Other2This (cornerWorld);
+		frustumLight.AddBoundingVertex (cornerLight);
 		
-	    size_t numTex = viewSetup.persist.settings.targets.GetSize();
-            if (lightFrustum.textureSVs == 0)
-            {
-              lightFrustum.textureSVs = new csShaderVariable*[numTex];
-            }
-	    for (size_t t = 0; t < numTex; t++)
-	    {
-	      lightFrustum.textureSVs[t] = lightVarsHelper.CreateTempSV (
-		viewSetup.persist.settings.targets[t]->svName);
+		cornerCam = viewSetup.rview->GetCamera()->InvPerspective (
+		  corner2D[c], viewSetup.splitDists[i+1]);
+		cornerWorld = viewSetup.rview->GetCamera()->GetTransform().This2Other (
+		  cornerCam);
+		cornerLight = superFrustum.world2light_rotated.Other2This (cornerWorld);
+		frustumLight.AddBoundingVertex (cornerLight);
+	      }
+	      frustumLight *= lightBBox;
+	      
+	      // Frustum slice corner, light space before W divide
+	      csVector4 cornerUndiv;
+	      // Frustum slice corner, light space after W divide
+	      csVector3 cornerDiv;
+	      
+	      lightFrustum.volumeLS.StartBoundingBox();
+	      lightFrustum.volumePP.StartBoundingBox();
+	      for (int c = 0; c < 7; c++)
+	      {
+		cornerLight = frustumLight.GetCorner (c);
+		lightFrustum.volumeLS.AddBoundingVertex (cornerLight);
+		cornerUndiv = lightProject * cornerLight;
+		cornerDiv =
+		  csVector3 (cornerUndiv.x, cornerUndiv.y, cornerUndiv.z);
+		cornerDiv /= cornerUndiv.w;
+		lightFrustum.volumePP.AddBoundingVertex (cornerDiv);
+	      }
+	    
+	      lightFrustum.shadowMapProjectSV = lightVarsHelper.CreateTempSV (
+		viewSetup.persist.svNames.GetLightSVId (
+		  csLightShaderVarCache::lightShadowMapProjection));
+	      lightFrustum.shadowMapProjectSV->SetArraySize (4);
+	      for (int j = 0; j < 4; j++)
+	      {
+		csShaderVariable* item = lightVarsHelper.CreateTempSV (
+		  CS::InvalidShaderVarStringID);
+		lightFrustum.shadowMapProjectSV->SetArrayElement (j, item);
+	      }
+	      lightFrustum.shadowMapUnscaleSV = lightVarsHelper.CreateTempSV (
+		viewSetup.persist.unscaleSVName);
+	      lightFrustum.shadowMapDimSV = lightVarsHelper.CreateTempSV (
+		viewSetup.persist.svNames.GetLightSVId (
+		  csLightShaderVarCache::lightShadowMapPixelSize));
+		  
+	      size_t numTex = viewSetup.persist.settings.targets.GetSize();
+	      if (lightFrustum.textureSVs == 0)
+	      {
+		lightFrustum.textureSVs = new csShaderVariable*[numTex];
+	      }
+	      for (size_t t = 0; t < numTex; t++)
+	      {
+		lightFrustum.textureSVs[t] = lightVarsHelper.CreateTempSV (
+		  viewSetup.persist.settings.targets[t]->svName);
+	      }
 	    }
 	  }
         
@@ -265,123 +303,138 @@ namespace RenderManager
         CS_ALLOC_STACK_ARRAY(iTextureHandle*, texHandles,
           persist.settings.targets.GetSize());
         float allMinZ = HUGE_VALF;
-	for (int f = 0; f < NUM_PARTS; f++)
+	for (size_t l = 0; l < lightData.lightFrustums.GetSize(); l++)
 	{
-	  const Frustum& lightFrust = lightData.lightFrustums[f];
-	  if (lightFrust.containedObjectsPP.GetSize() == 0) continue;
-	  
-	  CS::RenderManager::RenderView* rview = context.renderView;
-	#include "csutil/custom_new_disable.h"
-	  csRef<CS::RenderManager::RenderView> newRenderView;
-	  newRenderView.AttachNew (new (
-	    renderTree.GetPersistentData().renderViewPool) RenderView);
-	#include "csutil/custom_new_enable.h"
-	  newRenderView->SetEngine (rview->GetEngine ());
-	  newRenderView->SetThisSector (rview->GetThisSector ());
-	  
-	  /* Fit map to the bounding box of all shadowed objects.
-	     Serves two purposes:
-	     - If some objects cut the split plane (ie extend over the initial
-	       light frustum) this makes sure they're mapped to the SM entirely.
-	       [However, this undermines the idea of PSSM ...]
-	     - If the shadowed objects are smaller than the light frustum in some
-	       dimension makes sure the shadow map is used optimally. */
-	  csBox3 allObjsBoxPP (lightFrust.containedObjectsPP[0]);
-	  for (size_t i = 1; i < lightFrust.containedObjectsPP.GetSize(); i++)
+	  const SuperFrustum& superFrust = *(lightData.lightFrustums[l]);
+	  for (int f = 0; f  < NUM_PARTS; f++)
 	  {
-	    allObjsBoxPP += lightFrust.containedObjectsPP[i];
-	  }
-	  
-	  const float frustW = allObjsBoxPP.MaxX() - allObjsBoxPP.MinX();
-	  const float frustH = allObjsBoxPP.MaxY() - allObjsBoxPP.MinY();
-	  CS::Math::Matrix4 crop (
-	    2.0f/frustW, 0, 0, 
-	      (-1.0f * (allObjsBoxPP.MaxX() + allObjsBoxPP.MinX()))/frustW,
-	    0, -2.0f/frustH, 0,
-	      (1.0f * (allObjsBoxPP.MaxY() + allObjsBoxPP.MinY()))/frustH,
-	    0, 0, 1, 0,
-	    0, 0, 0, 1);
-	  /* The minimum Z over all parts is used to avoid clipping shadows of 
-	     casters closer to the light than the split plane */
-	  if (allObjsBoxPP.MinZ() < allMinZ) allMinZ = allObjsBoxPP.MinZ();
-	  //allMinZ = csMax (allMinZ, 0.0f);
-	  float maxZ = allObjsBoxPP.MaxZ();
-	  /* Consider using DepthRange? */
-	  float n = allMinZ;
-	  float f = maxZ + EPSILON;
-	   /* Sometimes n==f which would result in an invalid matrix w/O EPSILON */
-          CS::Math::Matrix4 Mortho = CS::Math::Projections::Ortho (-1, 1, 1, -1, -n, -f);
-	  CS::Math::Matrix4 matrix = (Mortho * crop) * lightData.lightProject;
-	  
-	  int shadowMapSize;
-	  csReversibleTransform view = light->GetMovable()->GetFullTransform ();
-	  
-	  csRef<iCustomMatrixCamera> shadowViewCam =
-	    newRenderView->GetEngine()->CreateCustomMatrixCamera();
-	  newRenderView->SetCamera (shadowViewCam->GetCamera());
-	  shadowViewCam->SetProjectionMatrix (matrix);
-	  shadowViewCam->GetCamera()->SetTransform (view);
-	  
-	  CS::Math::Matrix4 viewM (view);
-	
-	  for (int i = 0; i < 4; i++)
-	  {
-	    csShaderVariable* item = lightFrust.shadowMapProjectSV->GetArrayElement (i);
-	    item->SetValue (matrix.Row (i));
-	  }
+	    const typename SuperFrustum::Frustum& lightFrust = superFrust.frustums[f];
+	    if (lightFrust.containedObjectsPP.GetSize() == 0) continue;
+	    
+	    CS::RenderManager::RenderView* rview = context.renderView;
+	  #include "csutil/custom_new_disable.h"
+	    csRef<CS::RenderManager::RenderView> newRenderView;
+	    newRenderView.AttachNew (new (
+	      renderTree.GetPersistentData().renderViewPool) RenderView);
+	  #include "csutil/custom_new_enable.h"
+	    newRenderView->SetEngine (rview->GetEngine ());
+	    newRenderView->SetThisSector (rview->GetThisSector ());
+	    
+	    /* Fit map to the bounding box of all shadowed objects.
+	      Serves two purposes:
+	      - If some objects cut the split plane (ie extend over the initial
+		light frustum) this makes sure they're mapped to the SM entirely.
+		[However, this undermines the idea of PSSM ...]
+	      - If the shadowed objects are smaller than the light frustum in some
+		dimension makes sure the shadow map is used optimally. */
+	    csBox3 allObjsBoxPP (lightFrust.containedObjectsPP[0]);
+	    for (size_t i = 1; i < lightFrust.containedObjectsPP.GetSize(); i++)
+	    {
+	      allObjsBoxPP += lightFrust.containedObjectsPP[i];
+	    }
+	    
+	    const float frustW = allObjsBoxPP.MaxX() - allObjsBoxPP.MinX();
+	    const float frustH = allObjsBoxPP.MaxY() - allObjsBoxPP.MinY();
+	    const float cropScaleX = 2.0f/frustW;
+	    const float cropScaleY = -2.0f/frustH;
+	    const float cropShiftX =
+	      (-1.0f * (allObjsBoxPP.MaxX() + allObjsBoxPP.MinX()))/frustW;
+	    const float cropShiftY =
+	      (1.0f * (allObjsBoxPP.MaxY() + allObjsBoxPP.MinY()))/frustH;
+	    CS::Math::Matrix4 crop (
+	      cropScaleX, 0, 0, cropShiftX,
+	      0, cropScaleY, 0, cropShiftY,
+	      0, 0, 1, 0,
+	      0, 0, 0, 1);
 	      
-	  shadowMapSize = 1024;
-	  lightFrust.shadowMapDimSV->SetValue (csVector4 (1.0f/shadowMapSize,
-	    1.0f/shadowMapSize, shadowMapSize, shadowMapSize));
-  
-          for (size_t t = 0; t < persist.settings.targets.GetSize(); t++)
-          {
-	    iTextureHandle* tex =
-	      persist.settings.targets[t]->texCache.QueryUnusedTexture (
-	        shadowMapSize, shadowMapSize, 0);
-	    lightFrust.textureSVs[t]->SetValue (tex);
-	    renderTree.AddDebugTexture (tex);
-	    texHandles[t] = tex;
-	  }
+	    /* The minimum Z over all parts is used to avoid clipping shadows of 
+	      casters closer to the light than the split plane */
+	    if (allObjsBoxPP.MinZ() < allMinZ) allMinZ = allObjsBoxPP.MinZ();
+	    //allMinZ = csMax (allMinZ, 0.0f);
+	    float maxZ = allObjsBoxPP.MaxZ();
+	    /* Consider using DepthRange? */
+	    float n = allMinZ;
+	    float f = maxZ + EPSILON;
+	    /* Sometimes n==f which would result in an invalid matrix w/O EPSILON */
+	    CS::Math::Matrix4 Mortho = CS::Math::Projections::Ortho (-1, 1, 1, -1, -n, -f);
+	    CS::Math::Matrix4 matrix = ((Mortho * crop) * lightData.lightProject)
+	     * CS::Math::Matrix4 (superFrust.frustumRotation);
+	    
+	    int shadowMapSize;
+	    csReversibleTransform view = superFrust.world2light_base;
+	    
+	    csRef<iCustomMatrixCamera> shadowViewCam =
+	      newRenderView->GetEngine()->CreateCustomMatrixCamera();
+	    newRenderView->SetCamera (shadowViewCam->GetCamera());
+	    shadowViewCam->SetProjectionMatrix (matrix);
+	    shadowViewCam->GetCamera()->SetTransform (view);
+	    
+	    CS::Math::Matrix4 viewM (view);
 	  
-	  csBox2 clipBox (0, 0, shadowMapSize, shadowMapSize);
-	  csRef<iClipper2D> newView;
-	  newView.AttachNew (new csBoxClipper (clipBox));
-	  newRenderView->SetClipper (newView);
-  
-	  // Create a new context for shadow map w/ computed view
-	  typename RenderTree::ContextNode* shadowMapCtx = 
-	    renderTree.CreateContext (newRenderView);
-          for (size_t t = 0; t < persist.settings.targets.GetSize(); t++)
-          {
-	    shadowMapCtx->renderTargets[
-	      persist.settings.targets[t]->attachment].texHandle = 
-		texHandles[t];
+	    for (int i = 0; i < 4; i++)
+	    {
+	      csShaderVariable* item = lightFrust.shadowMapProjectSV->GetArrayElement (i);
+	      item->SetValue (matrix.Row (i));
+	    }
+	    {
+	      const float uncropScaleX = 1.0f/cropScaleX;
+	      const float uncropScaleY = 1.0f/cropScaleY;
+	      const float uncropShiftX = -cropShiftX/cropScaleX;
+	      const float uncropShiftY = -cropShiftY/cropScaleY;
+	      lightFrust.shadowMapUnscaleSV->SetValue (csVector4 (
+	        uncropScaleX, uncropScaleY, uncropShiftX, uncropShiftY));
+	    }
+		
+	    shadowMapSize = 1024;
+	    lightFrust.shadowMapDimSV->SetValue (csVector4 (1.0f/shadowMapSize,
+	      1.0f/shadowMapSize, shadowMapSize, shadowMapSize));
+    
+	    for (size_t t = 0; t < persist.settings.targets.GetSize(); t++)
+	    {
+	      iTextureHandle* tex =
+		persist.settings.targets[t]->texCache.QueryUnusedTexture (
+		  shadowMapSize, shadowMapSize, 0);
+	      lightFrust.textureSVs[t]->SetValue (tex);
+	      renderTree.AddDebugTexture (tex);
+	      texHandles[t] = tex;
+	    }
+	    
+	    csBox2 clipBox (0, 0, shadowMapSize, shadowMapSize);
+	    csRef<iClipper2D> newView;
+	    newView.AttachNew (new csBoxClipper (clipBox));
+	    newRenderView->SetClipper (newView);
+    
+	    // Create a new context for shadow map w/ computed view
+	    typename RenderTree::ContextNode* shadowMapCtx = 
+	      renderTree.CreateContext (newRenderView);
+	    for (size_t t = 0; t < persist.settings.targets.GetSize(); t++)
+	    {
+	      shadowMapCtx->renderTargets[
+		persist.settings.targets[t]->attachment].texHandle = 
+		  texHandles[t];
+	    }
+	    shadowMapCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
+	    shadowMapCtx->postEffects = persist.settings.postEffects;
+	    
+	    /* @@@ FIXME: This will break as soon as the shadowmaps have
+	      different resolutions!
+	      Probably the post effects manager should be changed to handle
+	      changing resolutions well */
+	    if (shadowMapCtx->postEffects.IsValid())
+	      shadowMapCtx->postEffects->SetupView (shadowMapSize, shadowMapSize);
+    
+	    // Setup the new context
+	    ShadowmapContextSetup contextFunction (layerConfig,
+	      persist.shaderManager, viewSetup, persist.settings.provideIDs);
+	    contextFunction (*shadowMapCtx);
 	  }
-	  shadowMapCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
-	  shadowMapCtx->postEffects = persist.settings.postEffects;
-	  
-	  /* @@@ FIXME: This will break as soon as the shadowmaps have
-	     different resolutions!
-	     Probably the post effects manager should be changed to handle
-	     changing resolutions well */
-	  if (shadowMapCtx->postEffects.IsValid())
-            shadowMapCtx->postEffects->SetupView (shadowMapSize, shadowMapSize);
-  
-	  // Setup the new context
-	  ShadowmapContextSetup contextFunction (layerConfig,
-	    persist.shaderManager, viewSetup, persist.settings.provideIDs);
-	  contextFunction (*shadowMapCtx);
 	}
       }
 
       void ClearFrameData()
       {
         frustumsSetup = false;
-        for (int i = 0; i < NUM_PARTS; i++)
-        {
-          lightFrustums[i].containedObjectsPP.DeleteAll();
-        }
+        lightFrustums.Empty();
       }
     };
 private:
@@ -499,6 +552,7 @@ private:
     {
       uint frameNum;
       csLightShaderVarCache svNames;
+      CS::ShaderVarStringID unscaleSVName;
       LightingSorter::PersistentData lightSorterPersist;
       LightingVariablesHelper::PersistentData lightVarsPersist;
       iShaderManager* shaderManager;
@@ -529,6 +583,7 @@ private:
 	svNames.SetStrings (strings);
 	
 	settings.ReadSettings (objectReg, shadowType);
+	unscaleSVName = strings->Request ("light shadow map unscale");
       }
       void UpdateNewFrame ()
       {
@@ -547,13 +602,12 @@ private:
       : persist (persist), layerConfig (layerConfig), 
         renderTree (node->owner.owner), meshNode (node),
         viewSetup (viewSetup) { }
-
-    void HandleOneLight (typename RenderTree::MeshNode::SingleMesh& singleMesh,
+        
+    bool HandleOneLight (typename RenderTree::MeshNode::SingleMesh& singleMesh,
                          iLight* light, CachedLightData& lightData,
                          csShaderVariableStack& lightStack,
-                         uint lightNum)
+                         uint lightNum, uint subLightNum)
     {
-      lightData.SetupFrame (viewSetup, light);
       LightingVariablesHelper lightVarsHelper (viewSetup.persist.lightVarsPersist);
       
       if (persist.settings.provideIDs && !singleMesh.svMeshID.IsValid())
@@ -566,53 +620,61 @@ private:
         viewSetup.meshIDs.Put (singleMesh.meshObjSVs, singleMesh.svMeshID);
       }
       
-      const csReversibleTransform& world2light (
-        light->GetMovable()->GetFullTransform());
+      typename CachedLightData::SuperFrustum& superFrust =
+	*(lightData.lightFrustums[subLightNum]);
       
       csBox3 meshBboxLS;
       csVector3 vLight;
-      vLight = world2light.Other2This (singleMesh.bbox.GetCorner (0));
+      vLight = superFrust.world2light_rotated.Other2This (
+        singleMesh.bbox.GetCorner (0));
       meshBboxLS.StartBoundingBox (csVector3 (vLight.x,
-        vLight.y, vLight.z));
+	vLight.y, vLight.z));
       csBox3 meshBboxLightPP;
       csVector4 vLightPP;
       vLightPP = lightData.lightProject * csVector4 (vLight);
       vLightPP /= vLightPP.w;
       meshBboxLightPP.StartBoundingBox (csVector3 (vLightPP.x,
-        vLightPP.y, vLightPP.z));
+	vLightPP.y, vLightPP.z));
       for (int c = 1; c < 8; c++)
       {
-        vLight = world2light.Other2This (singleMesh.bbox.GetCorner (c));
+	vLight = superFrust.world2light_rotated.Other2This (
+	  singleMesh.bbox.GetCorner (c));
 	meshBboxLS.AddBoundingVertexSmart (csVector3 (vLight.x,
-          vLight.y, vLight.z));
-        vLightPP = lightData.lightProject * csVector4 (vLight);
-        vLightPP /= vLightPP.w;
+	  vLight.y, vLight.z));
+	vLightPP = lightData.lightProject * csVector4 (vLight);
+	vLightPP /= vLightPP.w;
 	meshBboxLightPP.AddBoundingVertexSmart (csVector3 (vLightPP.x,
-          vLightPP.y, vLightPP.z));
+	  vLightPP.y, vLightPP.z));
       }
+	
       for (int f = 0; f < NUM_PARTS; f++)
       {
-        if (!lightData.lightFrustums[f].volumeLS.TestIntersect (meshBboxLS))
-        {
-          continue;
-        }
+	typename CachedLightData::SuperFrustum::Frustum& lightFrustum =
+	  superFrust.frustums[f];
+	if (!lightFrustum.volumeLS.TestIntersect (meshBboxLS))
+	{
+	  continue;
+	}
       
-        lightData.lightFrustums[f].containedObjectsPP.Push (meshBboxLightPP
-          * lightData.lightFrustums[f].volumePP);
+	lightFrustum.containedObjectsPP.Push (meshBboxLightPP
+	  * lightFrustum.volumePP);
       
 	// Add shadow map SVs
 	lightVarsHelper.MergeAsArrayItem (lightStack,
-	  lightData.lightFrustums[f].shadowMapProjectSV, lightNum);
+	  lightFrustum.shadowMapProjectSV, lightNum);
+	lightVarsHelper.MergeAsArrayItem (lightStack,
+	  lightFrustum.shadowMapUnscaleSV, lightNum);
 	lightVarsHelper.MergeAsArrayItem (lightStack, 
-	  lightData.lightFrustums[f].shadowMapDimSV, lightNum);
+	  lightFrustum.shadowMapDimSV, lightNum);
 	  
 	for (size_t t = 0; t < persist.settings.targets.GetSize(); t++)
 	{
 	  lightVarsHelper.MergeAsArrayItem (lightStack, 
-	    lightData.lightFrustums[f].textureSVs[t], lightNum);
+	    lightFrustum.textureSVs[t], lightNum);
 	}
-	break;
+	return true;
       }
+      return false;
     }
     
     static bool NeedFinalHandleLight() { return true; }

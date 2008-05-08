@@ -161,7 +161,7 @@
 		file="/shader/snippets/lighting/lighting-cg-input.block" />
 	
 	<block location="cg:vertexToFragment">
-	  <varying type="direction" name="surfToLight[8]" />
+	  <varying type="float4" name="surfToLight[8]" />
 	  <varying type="float4" name="lightDir[8]" />
 	  <varying type="float4" name="shadowMapCoords[8]" />
 	</block>
@@ -193,8 +193,10 @@
 	    
 	    int i = lightOffset + l;
 	    half3 vp_dir;
-	    lspace.InitVP (i, world2tang, positionW, vp_dir, surfToLight[l]);
+	    float3 vp_surfToLight;
+	    lspace.InitVP (i, world2tang, positionW, vp_dir, vp_surfToLight);
 	    lightDir[l].xyz = vp_dir;
+	    surfToLight[l].xyz = vp_surfToLight;
 	    
 	    float4 vp_shadowMapCoords;
 	    float vp_gradient;
@@ -229,7 +231,7 @@
 	  ]]>
 	    int i = lightOffset + l;
 	    LightSpaceTangent lightSpace;
-	    lightSpace.Init (lightDir[l].xyz, surfToLight[l]);
+	    lightSpace.Init (lightDir[l].xyz, surfToLight[l].xyz);
 	    
 	    <?if vars."light shadow map vsm" ?>
 	    ShadowShadowMapVSM shadow;
@@ -247,6 +249,15 @@
 	    ComputeLight (lightSpace, light, myEyeToSurf, normal, 32,
 	      lightProps.colorDiffuse[i], lightProps.colorSpecular[i],
 	      lightAttenuationVec, shadow, d, s);
+	    
+	  #if 0
+	    if (l == 0)
+	      d*= float3 (1, 0, 0);
+            else if (l == 1)
+	      d*= float3 (0, 1, 0);
+	    else if (l == 2)
+	      d*= float3 (0, 0, 1);
+	  #endif
 	    
 	    diffuseColor += d;
 	    specularColor += s;

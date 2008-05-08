@@ -112,6 +112,7 @@ namespace RenderManager
       iLight* light;
       csLightType type;
       bool isStatic;
+      uint numSubLights;
     };
     
     struct PersistentData
@@ -124,8 +125,11 @@ namespace RenderManager
       }
     };
 
-    LightingSorter (PersistentData& persist,
-      csLightInfluence* influenceLights, size_t numLights);
+    LightingSorter (PersistentData& persist/*,
+      csLightInfluence* influenceLights*/, size_t numLights);
+    
+    void AddLight (const csLightInfluence& influence,
+      uint numSubLights);
 
     size_t GetSize (bool skipStatic)
     {
@@ -213,7 +217,12 @@ namespace RenderManager
   class ShadowNone
   {
   public:
-    struct CachedLightData {};
+    struct CachedLightData
+    {
+      uint GetSublightNum() const { return 1; }
+      void SetupFrame (ShadowNone&, iLight*) {}
+      void ClearFrameData() {}
+    };
     struct PersistentData
     {
       void UpdateNewFrame () {}
@@ -231,7 +240,7 @@ namespace RenderManager
     void HandleOneLight (typename RenderTree::MeshNode::SingleMesh& singleMesh,
                          iLight* light, _CachedLightData& lightData,
                          csShaderVariableStack& lightStack,
-                         uint lightNum)
+                         uint lightNum, uint sublight)
     {}
     
     static bool NeedFinalHandleLight() { return false; }
@@ -281,7 +290,8 @@ namespace RenderManager
       bool skipStatic = mesh.meshFlags.Check (CS_ENTITY_STATICLIT)
 	&& layerConfig.GetStaticLightsSettings (layer).nodraw;
 
-      size_t layerLights = sortedLights.GetSize (skipStatic);
+      size_t layerLights = csMin (sortedLights.GetSize (skipStatic),
+        layerConfig.GetMaxLightNum (layer));
       if (lastMetadata.numberOfLights == 0)
         layerLights = 0;
       if (layerLights == 0)
@@ -311,6 +321,14 @@ namespace RenderManager
       {
         // Assume at least 1 light
 	CS_ALLOC_STACK_ARRAY(LightingSorter::LightInfo, renderLights, layerLights);
+	
+	/*
+	  Applied limitations:
+	  - Sublights are not considered for the 'maximum lights' limit.
+	  - Sublights *are* considered for the 'maximum passes' limit.
+	  - If not all sublights of a light can't be drawn in the limits,
+	    skip the light.
+	 */
 	  
 	// Set up layers
 	size_t firstLight = 0;
@@ -321,35 +339,59 @@ namespace RenderManager
 	  if (totalLayers >= layerConfig.GetMaxLightPasses (layer))
 	    break;
 	
-	  size_t num = 1;
 	  sortedLights.GetNextLight (skipStatic, renderLights[firstLight]);
+	  size_t realNum = 1, virtNum = renderLights[firstLight].numSubLights;
 	  csLightType lightType;
 	  lightType = renderLights[firstLight].type;
-	  num = 1;
 	  size_t maxPassLights = lastMetadata.numberOfLights * 
 	    layerConfig.GetMaxLightPasses (layer);
 	  maxPassLights = csMin (maxPassLights, remainingLights);
-	  for (; num < maxPassLights; num++)
+	  size_t thisPassLayers = (virtNum 
+	     + lastMetadata.numberOfLights - 1) / lastMetadata.numberOfLights;
+	  if (thisPassLayers > layerConfig.GetMaxLightPasses (layer))
 	  {
-	    if (!sortedLights.GetNextLight (lightType, skipStatic, 
-		renderLights[firstLight + num]))
-	      break;
+	    /* @@@ TODO: prolly need re-insertion of a light into lights list
+	      if it can't be rendered b/c it's sublights blow the passes limit.
+	    */
 	  }
-	  /* We have a subset of the lights that are of the same type.
-	  * Check the size of it against the shader limit */
-	  size_t thisPassLayers;
-	  thisPassLayers = (num + lastMetadata.numberOfLights - 1)
-	    / lastMetadata.numberOfLights;
-	  thisPassLayers = csMin (totalLayers + thisPassLayers,
-	    layerConfig.GetMaxLightPasses (layer)) - totalLayers;
+	  for (; realNum < maxPassLights; realNum++)
+	  {
+	    uint lightSubLights = renderLights[firstLight + realNum].numSubLights;
+	    /* We have a subset of the lights that are of the same type.
+	     * Check the size of it against the shader limit */
+	    size_t newPassLayers = (virtNum + lightSubLights 
+	       + lastMetadata.numberOfLights - 1) / lastMetadata.numberOfLights;
+	    /* If the sublights for this light would blow the max passes
+	     * don't add it */
+	    if ((totalLayers + newPassLayers <
+	       layerConfig.GetMaxLightPasses (layer))
+	      && ((layerConfig.GetMaxLightPasses (layer) - 
+	        (totalLayers + newPassLayers)) < lightSubLights))
+	      break;
+	    if (!sortedLights.GetNextLight (lightType, skipStatic, 
+		renderLights[firstLight + realNum]))
+	      break;
+	    virtNum += lightSubLights;
+	    thisPassLayers = newPassLayers;
+	  }
+	  /* @@@ TODO: prolly need re-insertion of a light into lights list
+	     if it can't be rendered b/c it's sublights blow the passes limit.
+	   */
+	  //thisPassLayers = (virtNum + lastMetadata.numberOfLights - 1)
+	    /// lastMetadata.numberOfLights;
+	  if (thisPassLayers == 0)
+	    // Reached layer pass limit
+	    break;
+	  
 	  size_t neededLayers = totalLayers + thisPassLayers;
   
-	  layers.Ensure (layer, neededLayers, node);
+	  //layers.Ensure (layer, neededLayers, node);
   
-	  firstLight += num;
-	  remainingLights -= num;
+	  firstLight += realNum;
+	  remainingLights -= realNum;
 	  totalLayers = neededLayers;
 	}
+	layers.Ensure (layer, totalLayers, node);
   
 	// Now render lights for each light type
 	layerLights = remainingLights = firstLight;
@@ -357,25 +399,42 @@ namespace RenderManager
 	totalLayers = 0;
 	while (firstLight < layerLights)
 	{
+	  if (totalLayers >= layerConfig.GetMaxLightPasses (layer))
+	    break;
+	
 	  csLightType lightType = renderLights[firstLight].type;
-	  size_t num = 1;
-	  for (; num < remainingLights; num++)
+	  size_t realNum = 1, virtNum = renderLights[firstLight].numSubLights;
+	  size_t thisPassLayers = (virtNum 
+	     + lastMetadata.numberOfLights - 1) / lastMetadata.numberOfLights;
+	  for (; realNum < remainingLights; realNum++)
 	  {
-	    if (renderLights[firstLight + num].type != lightType)
+	    uint lightSubLights = renderLights[firstLight + realNum].numSubLights;
+	    size_t newPassLayers = (virtNum + lightSubLights 
+	       + lastMetadata.numberOfLights - 1) / lastMetadata.numberOfLights;
+	    if ((totalLayers + newPassLayers <
+	       layerConfig.GetMaxLightPasses (layer))
+	      && ((layerConfig.GetMaxLightPasses (layer) - 
+	        (totalLayers + newPassLayers)) < lightSubLights))
 	      break;
+	    if (renderLights[firstLight + realNum].type != lightType)
+	      break;
+	    virtNum += lightSubLights;
+	    thisPassLayers = newPassLayers;
 	  }
 	  /* We have a subset of the lights that are of the same type.
 	  * Check the size of it against the shader limit */
-	  size_t thisPassLayers;
-	  thisPassLayers = (num + lastMetadata.numberOfLights - 1)
-	    / lastMetadata.numberOfLights;
-	  thisPassLayers = csMin (totalLayers + thisPassLayers,
-	    layerConfig.GetMaxLightPasses (layer)) - totalLayers;
+	  //size_t thisPassLayers;
+	  //thisPassLayers = (virtNum + lastMetadata.numberOfLights - 1)
+	    /// lastMetadata.numberOfLights;
+	  //thisPassLayers = csMin (totalLayers + thisPassLayers,
+	    //layerConfig.GetMaxLightPasses (layer)) - totalLayers;
 	  if (thisPassLayers == 0)
 	    // Reached layer pass limit
 	    break;
 	  size_t neededLayers = totalLayers + thisPassLayers;
   
+          size_t currentLight = 0;
+          uint currentSublight = 0;
 	  csShaderVariableStack localStack;
 	  for (size_t n = 0; n < thisPassLayers; n++)
 	  {
@@ -391,8 +450,9 @@ namespace RenderManager
 	      layers.GetNewLayerIndex (layer, n + totalLayers),
 	      mesh.contextLocalId);
     
-	    size_t thisNum = csMin (num,
-	      layerConfig.GetMaxLightNum (layer));
+	    //size_t thisNum = csMin (num,
+	      //layerConfig.GetMaxLightNum (layer));
+	    size_t thisNum = virtNum;
 	    thisNum = csMin (thisNum, (size_t)lastMetadata.numberOfLights);
 	    csShaderVariable* lightNum = lightVarsHelper.CreateVarOnStack (
 	      persist.svNames.GetDefaultSVId (
@@ -408,10 +468,17 @@ namespace RenderManager
 		csLightShaderVarCache::lightType), localStack);
 	    lightTypeSV->SetValue ((int)(lightType));
     
-	    for (size_t l = thisNum; l-- > 0; )
+            CachedLightData* thisLightSVs;
+	    iLight* light;
+	    //for (size_t l = thisNum; l-- > 0; )
+	    for (size_t l = 0; l < thisNum; l++)
 	    {
-	      iLight* light = renderLights[firstLight + l].light;
-	      CachedLightData* thisLightSVs =
+	      if (currentSublight == 0)
+	      {
+	        light = renderLights[firstLight + currentLight].light;
+	        thisLightSVs = persist.lightDataCache.GetElementPointer (light);
+	      }
+	      /*CachedLightData* thisLightSVs =
 		persist.lightDataCache.GetElementPointer (light);
 	      if (thisLightSVs == 0)
 	      {
@@ -420,14 +487,24 @@ namespace RenderManager
 		  &(light->GetSVContext()->GetShaderVariables());
 		thisLightSVs = &persist.lightDataCache.Put (
 		  light, newCacheData);
-	      }
+	      }*/
 	      
-	      shadows.HandleOneLight (mesh, light, *thisLightSVs, localStack, l);
+	      //for (uint s = 0; s < thisLightSVs->GetSublightNum();, s++)
+	      //{
+	        shadows.HandleOneLight (mesh, light, *thisLightSVs, localStack, l,
+	          currentSublight);
+	      //}
+	      currentSublight++;
+	      if (currentSublight >= thisLightSVs->GetSublightNum())
+	      {
+	        currentLight++;
+	        currentLight = 0;
+	      }
     
 	      lightVarsHelper.MergeAsArrayItems (localStack,
 		*(thisLightSVs->shaderVars), l);
 	    }
-	    num -= thisNum;
+	    virtNum -= thisNum;
 	    firstLight += thisNum;
 	    remainingLights -= thisNum;
 	  }
@@ -495,8 +572,24 @@ namespace RenderManager
 	lightmgr->GetRelevantLights (node->owner.sector,
 	  mesh.bbox, influences, numLights, allMaxLights);
 	
-	LightingSorter sortedLights (persist.lightSorterPersist, influences,
+	LightingSorter sortedLights (persist.lightSorterPersist/*, influences*/,
 	  numLights);
+	for (size_t l = 0; l < numLights; l++)
+	{
+	  iLight* light = influences[l].light;
+	  CachedLightData* thisLightSVs =
+	    persist.lightDataCache.GetElementPointer (light);
+	  if (thisLightSVs == 0)
+	  {
+	    CachedLightData newCacheData;
+	    newCacheData.shaderVars =
+	      &(light->GetSVContext()->GetShaderVariables());
+	    thisLightSVs = &persist.lightDataCache.Put (
+	      light, newCacheData);
+	  }
+          thisLightSVs->SetupFrame (shadows, light);
+	  sortedLights.AddLight (influences[l], thisLightSVs->GetSublightNum());
+	}
         
         size_t lightOffset = 0;
 	for (size_t layer = 0; layer < layerConfig.GetLayerCount (); ++layer)
@@ -549,6 +642,7 @@ namespace RenderManager
 	  csPtrKey<iLight> light;
 	  CachedLightData& data = lightDataIt.Next (light);
 	  shadows.FinalHandleLight (light, data);
+          data.ClearFrameData();
 	}
       }
     }
