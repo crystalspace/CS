@@ -123,6 +123,8 @@ private:
   void *fh;
   // buffer, where read mode data is contained
   csRef<iDataBuffer> databuf;
+  // whether databuf is null-terminated
+  bool buffernt;
   // current data pointer
   size_t fpos;
   // constructor
@@ -810,6 +812,7 @@ ArchiveFile::ArchiveFile (int Mode, VfsNode *ParentNode, size_t RIndex,
   fh = 0;
   fpos = 0;
   bool const debug = IsVerbose(csVFS::VERBOSITY_DEBUG);
+  buffernt = false;
 
   CS::Threading::RecursiveMutexScopedLock lock (Archive->archive_mutex);
   Archive->UpdateTime ();
@@ -923,8 +926,20 @@ bool ArchiveFile::SetPos (size_t newpos)
   }
 }
 
-csPtr<iDataBuffer> ArchiveFile::GetAllData (bool /*nullterm*/)
+csPtr<iDataBuffer> ArchiveFile::GetAllData (bool nullterm)
 {
+  if (nullterm && !buffernt)
+  {
+    // However, a null-terminated buffer is requested,
+    // but this one isn't yet - copy data, append null
+    CS::DataBuffer<VfsHeap>* dbuf =
+      new CS::DataBuffer<VfsHeap> (Size+1, Node->vfs->heap);
+    memcpy (dbuf->GetData(), databuf->GetData(), Size);
+    dbuf->GetData()[Size] = 0;
+    databuf.AttachNew (dbuf);
+
+    buffernt = nullterm;
+  }
   return csPtr<iDataBuffer> (databuf);
 }
 
