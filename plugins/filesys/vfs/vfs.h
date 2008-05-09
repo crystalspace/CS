@@ -22,6 +22,8 @@
 
 #include "csutil/cfgfile.h"
 #include "csutil/parray.h"
+#include "csutil/memheap.h"
+#include "csutil/refcount.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/threading/mutex.h"
 #include "csutil/stringarray.h"
@@ -31,7 +33,7 @@
 
 struct iConfigFile;
 
-namespace cspluginVFS
+CS_PLUGIN_NAMESPACE_BEGIN(VFS)
 {
 
 class VfsNode;
@@ -88,6 +90,14 @@ public:
 protected:
   friend class csVFS;
 };
+
+struct HeapRefCounted :
+  public CS::Memory::CustomAllocatedDerived<CS::Memory::Heap>,
+  public CS::Utility::FastRefCount<HeapRefCounted>
+{
+};
+
+typedef CS::Memory::AllocatorHeap<csRef<HeapRefCounted> > VfsHeap;
 
 /**
  * The Virtual Filesystem Class is intended to be the only way for Crystal
@@ -148,7 +158,6 @@ private:
   int auto_name_counter;
   // Verbosity flags.
   unsigned int verbosity;
-
 public:
   enum
   {
@@ -159,6 +168,7 @@ public:
     VERBOSITY_ALL  = ~0
   };
 
+  csRef<HeapRefCounted> heap;
 public:
   /// Initialize VFS by reading contents of given INI file
   csVFS (iBase *iParent);
@@ -303,6 +313,7 @@ private:
   bool TryChDirAuto(char const* dir, char const* filename);
 };
 
-} // namespace cspluginVFS
+}
+CS_PLUGIN_NAMESPACE_END(VFS)
 
 #endif // __CS_VFS_H__
