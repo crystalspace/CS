@@ -17,10 +17,10 @@
 */
 
 #include "cssysdef.h"
-#include "csutil/sysfunc.h"
-#include "plugins/video/canvas/openglx/glx2d.h"
-#include "csutil/scf.h"
 #include "csutil/csinput.h"
+#include "csutil/scf.h"
+#include "csutil/setenv.h"
+#include "csutil/sysfunc.h"
 #include "csgeom/csrect.h"
 #include "csutil/cfgacc.h"
 #include "iutil/plugin.h"
@@ -32,6 +32,8 @@
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
+
+#include "plugins/video/canvas/openglx/glx2d.h"
 
 CS_IMPLEMENT_PLUGIN
 

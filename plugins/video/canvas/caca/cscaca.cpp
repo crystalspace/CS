@@ -27,6 +27,7 @@
 #include "csgeom/csrect.h"
 #include "csgfx/rgbpixel.h"
 #include "csutil/cfgacc.h"
+#include "csutil/setenv.h"
 #include "iutil/cfgfile.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
@@ -209,12 +210,12 @@ void csGraphics2DCaca::Print (csRect const* area)
 
   /* Get all events from keyboard and mouse and put them into system queue */
   caca_event_t event;
-  while (caca_get_event (caca_display, caca_event::CACA_EVENT_ANY, &event, 0))
+  while (caca_get_event (caca_display, CACA_EVENT_ANY, &event, 0))
   {
     switch(event.type)
     {
-    case caca_event::CACA_EVENT_KEY_PRESS:
-    case caca_event::CACA_EVENT_KEY_RELEASE:
+    case CACA_EVENT_KEY_PRESS:
+    case CACA_EVENT_KEY_RELEASE:
       {
         utf32_char raw, cooked;
         if (event.data.key.utf32 != 0)
@@ -222,18 +223,18 @@ void csGraphics2DCaca::Print (csRect const* area)
         else
           raw = cooked = MapKey (event.data.key.ch);
 	EventOutlet->Key (raw, cooked, 
-	  (event.type == caca_event::CACA_EVENT_KEY_PRESS));
+	  (event.type == CACA_EVENT_KEY_PRESS));
       }
       break;
-    case caca_event::CACA_EVENT_MOUSE_PRESS:
+    case CACA_EVENT_MOUSE_PRESS:
       EventOutlet->Mouse (event.data.mouse.button- 1, true,
         caca_get_mouse_x (caca_display), caca_get_mouse_y (caca_display));
       break;
-    case caca_event::CACA_EVENT_MOUSE_RELEASE:
+    case CACA_EVENT_MOUSE_RELEASE:
       EventOutlet->Mouse (event.data.mouse.button - 1, false,
         caca_get_mouse_x (caca_display), caca_get_mouse_y (caca_display));
       break;
-    case caca_event::CACA_EVENT_MOUSE_MOTION:
+    case CACA_EVENT_MOUSE_MOTION:
       EventOutlet->Mouse (csmbNone, false, 
         event.data.mouse.x, event.data.mouse.y);
       break;
