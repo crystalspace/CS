@@ -26,12 +26,13 @@
 
 #include "cssysdef.h"
 #include "csutil/cfgmgr.h"
+#include "csutil/csstring.h"
+#include "csutil/util.h"
+#include "csutil/scfstr.h"
+#include "csutil/setenv.h"
+#include "csutil/stringarray.h"
 #include "csutil/sysfunc.h"
 #include "csutil/syspath.h"
-#include "csutil/csstring.h"
-#include "csutil/scfstr.h"
-#include "csutil/util.h"
-#include "csutil/stringarray.h"
 #include "iutil/cmdline.h"
 #include "iutil/eventq.h"
 #include "csutil/event.h"
@@ -110,7 +111,7 @@ bool csPython::Initialize(iObjectRegistry* object_reg)
   csString pythonpath (getenv ("PYTHONPATH"));
   pythonpath.Insert (0, CS_PATH_DELIMITER);
   pythonpath.Insert (0, DEFAULT_PYTHMOD_PATH);
-  CS::Utlity::setenv ("PYTHONPATH", pythonpath, true);
+  CS::Utility::setenv ("PYTHONPATH", pythonpath, true);
 #endif
 
   Py_SetProgramName("Crystal Space -- Python");
