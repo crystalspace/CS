@@ -336,7 +336,7 @@ csPython::Value* csPython::Query (iScriptValue *val) const
 void csPython::Print(PyObject *py_obj)
 {
   PyObject_Print(py_obj,stdout,Py_PRINT_RAW);
-  printf(" ref:%d",py_obj->ob_refcnt);
+  printf(" ref: %ld", (long)py_obj->ob_refcnt);
   printf("\n");
 }
 
