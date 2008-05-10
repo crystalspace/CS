@@ -41,5 +41,6 @@ CSUTIL.GENERIC +=
   printf.cpp
   resdir.cpp
   runloop.cpp 
+  setenv.cpp
   sysroot.cpp 
   vfsplat.cpp ;

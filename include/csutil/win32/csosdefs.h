@@ -404,17 +404,6 @@ struct DIR;
 #endif
 #endif
 
-// Fake up setenv(), if necessary
-#ifndef CS_HAVE_SETENV
-  #ifdef CS_CRYSTALSPACE_LIB
-    CS_EXPORT_SYM int setenv (const char* name, const char* value, 
-      bool overwrite);
-  #else
-    CS_IMPORT_SYM int setenv (const char* name, const char* value, 
-      bool overwrite);
-  #endif
-#endif
-
 // just to avoid windows.h inclusion
 #define csSW_SHOWNORMAL 1
 

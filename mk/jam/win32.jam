@@ -339,6 +339,7 @@ rule AppResourceWin32
   LOCATE on $(versionrc) = $(LOCATE_TARGET) ;
   SEARCH on $(versionrc) = $(LOCATE_TARGET) ;
   
+  MakeLocate $(versionrc) : $(LOCATE_TARGET) ;
   MakeVersionRc $(versionrc) : $(<) ;
   Clean $(<)clean : $(versionrc) ;
   Clean clean : $(versionrc) ;
@@ -350,6 +351,7 @@ rule AppResourceWin32
     LOCATE on $(manifestrc) = $(LOCATE_TARGET) ;
     SEARCH on $(manifestrc) = $(LOCATE_TARGET) ;
   
+    MakeLocate $(manifestrc) : $(LOCATE_TARGET) ;
     MakeManifestRc $(manifestrc) : $(<) ;
     Clean $(<)clean : $(manifestrc) ;
     Clean clean : $(manifestrc) ;

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2005 by Frank Richter
+    Copyright (C) 2008 by Eric Sunshine <sunshine@sunshineco.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,29 +16,32 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-
 #include "cssysdef.h"
-#include "csutil/csstring.h"
-#include <stdlib.h>
+#include "csutil/setenv.h"
 
 namespace CS
 {
   namespace Utility
   {
 
-    int setenv (const char* name, const char* value, bool overwrite)
+    int setenv(char const* key, char const* value, bool overwrite)
     {
-#ifdef CS_HAVE_SETENV
-      return setenv (name, value, overwrite);
-#else
-      if (overwrite || getenv (name) == 0)
+#if defined(CS_HAVE_SETENV)
+      return ::setenv(key, value, overwrite);
+#elif defined(CS_HAVE_PUTENV)
+      if (overwrite || getenv(key) == 0)
 	{
-	  csString s;
-	  s.Format ("%s=%s", name, value);
-	  return _putenv (s);
+	  // The string given to putenv() becomes part of the environment and,
+	  // thus, can not be transient. Therefore, we never free the allocated
+	  // buffer.
+	  char* buff = (char*)malloc(strlen(key) + strlen(value) + 2);
+	  sprintf(buff, "%s=%s", key, value);
+	  return putenv(buff);
 	}
       return 0;
-#endif // CS_HAVE_SETENV
+#else
+#error Platform supports neither setenv() nor putenv()
+#endif
     }
 
   } // namespace Utility

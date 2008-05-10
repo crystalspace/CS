@@ -61,7 +61,7 @@ namespace CS
       : scfImplementation1<DataBuffer, iDataBuffer> (this), Data (alloc), 
       Size (iSize), do_delete (true)
     {
-      Data.p = Data.Alloc (Size);
+      Data.p = (char*)Data.Alloc (Size);
     }
 
 
