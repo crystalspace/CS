@@ -1766,7 +1766,7 @@ CS_CHECK_BUILD([for backtrace], [cs_cv_backtrace],
 
 
 #------------------------------------------------------------------------------
-# Check if setenv() is available.
+# Check if setenv() or putenv() is available.
 #------------------------------------------------------------------------------
 CS_CHECK_BUILD([for setenv], [cs_cv_setenv],
     [AC_LANG_PROGRAM(
@@ -1777,6 +1777,16 @@ CS_CHECK_BUILD([for setenv], [cs_cv_setenv],
 	[setenv(0, 0, 0);])],
     [], [],
     [CS_HEADER_PROPERTY([CS_HAVE_SETENV])])
+
+CS_CHECK_BUILD([for putenv], [cs_cv_putenv],
+    [AC_LANG_PROGRAM(
+	[[#ifdef HAVE_SYS_TYPES_H
+	#include <sys/types.h>
+	#endif
+	#include <stdlib.h>]],
+	[putenv(0);])],
+    [], [],
+    [CS_HEADER_PROPERTY([CS_HAVE_PUTENV])])
 
 
 

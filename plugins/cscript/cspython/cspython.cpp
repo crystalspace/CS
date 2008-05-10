@@ -110,7 +110,7 @@ bool csPython::Initialize(iObjectRegistry* object_reg)
   csString pythonpath (getenv ("PYTHONPATH"));
   pythonpath.Insert (0, CS_PATH_DELIMITER);
   pythonpath.Insert (0, DEFAULT_PYTHMOD_PATH);
-  setenv ("PYTHONPATH", pythonpath, true);
+  CS::Utlity::setenv ("PYTHONPATH", pythonpath, true);
 #endif
 
   Py_SetProgramName("Crystal Space -- Python");

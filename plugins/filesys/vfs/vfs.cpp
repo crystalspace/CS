@@ -45,7 +45,7 @@
 
 CS_IMPLEMENT_PLUGIN
 
-namespace cspluginVFS
+CS_PLUGIN_NAMESPACE_BEGIN(VFS)
 {
 
 // Characters ignored in VFS paths (except in middle)
@@ -121,10 +121,10 @@ private:
   VfsArchive *Archive;
   // The file handle
   void *fh;
-  // file data (for read mode)
-  char *data;
   // buffer, where read mode data is contained
   csRef<iDataBuffer> databuf;
+  // whether databuf is null-terminated
+  bool buffernt;
   // current data pointer
   size_t fpos;
   // constructor
@@ -162,8 +162,6 @@ public:
   int RefCount;
   // number of open for writing files in this archive
   int Writing;
-  // The system driver
-  iObjectRegistry *object_reg;
   // Verbosity flags.
   unsigned int verbosity;
 
@@ -191,12 +189,10 @@ public:
     return (RefCount == 0) &&
       (csGetTicks () - LastUseTime > VFS_KEEP_UNUSED_ARCHIVE_TIME);
   }
-  VfsArchive (const char *filename, iObjectRegistry *object_reg,
-	      unsigned int verbosity) : csArchive (filename)
+  VfsArchive (const char *filename, unsigned int verbosity) : csArchive (filename)
   {
     RefCount = 0;
     Writing = 0;
-    VfsArchive::object_reg = object_reg;
     VfsArchive::verbosity = verbosity;
     UpdateTime ();
     if (IsVerbose(csVFS::VERBOSITY_DEBUG))
@@ -309,13 +305,12 @@ public:
   // The array of real paths that haven't been platform expanded
   // (e.g. Cygwin paths before they get expanded to Win32 paths)
   csStringArray UPathV;
-  // The object registry.
-  iObjectRegistry *object_reg;
+  csVFS* vfs;
   // Verbosity flags.
   unsigned int verbosity;
 
   // Initialize the object
-  VfsNode (char *iPath, const char *iConfigKey, iObjectRegistry *object_reg,
+  VfsNode (char *iPath, const char *iConfigKey, csVFS* vfs, 
 	   unsigned int verbosity);
   // Destroy the object
   virtual ~VfsNode ();
@@ -753,8 +748,9 @@ csPtr<iDataBuffer> DiskFile::GetAllData (bool nullterm)
       {
 	SetPos (0);
 
-	char* data = (char*)cs_malloc (Size + 1);
-        CS::DataBuffer<>* dbuf = new CS::DataBuffer<> (data, Size);
+        CS::DataBuffer<VfsHeap>* dbuf =
+	  new CS::DataBuffer<VfsHeap> (Size+1, Node->vfs->heap);
+	char* data = dbuf->GetData();
 	Read (data, Size);
 	*(data + Size) = 0;
 
@@ -775,8 +771,11 @@ csPtr<iDataBuffer> DiskFile::GetAllData (bool nullterm)
       {
 	// However, a null-terminated buffer is requested,
 	// but this one isn't yet - copy data, append null
-	alldata = csPtr<iDataBuffer> 
-          (new CS::DataBuffer<> (alldata));
+        CS::DataBuffer<VfsHeap>* dbuf =
+	  new CS::DataBuffer<VfsHeap> (Size+1, Node->vfs->heap);
+	memcpy (dbuf->GetData(), alldata->GetData(), Size);
+	dbuf->GetData()[Size] = 0;
+	alldata.AttachNew (dbuf);
 
         buffernt = nullterm;
       }
@@ -812,9 +811,9 @@ ArchiveFile::ArchiveFile (int Mode, VfsNode *ParentNode, size_t RIndex,
   Error = VFS_STATUS_OTHER;
   Size = 0;
   fh = 0;
-  data = 0;
   fpos = 0;
   bool const debug = IsVerbose(csVFS::VERBOSITY_DEBUG);
+  buffernt = false;
 
   CS::Threading::RecursiveMutexScopedLock lock (Archive->archive_mutex);
   Archive->UpdateTime ();
@@ -829,10 +828,11 @@ ArchiveFile::ArchiveFile (int Mode, VfsNode *ParentNode, size_t RIndex,
     // If reading a file, flush all pending operations
     if (Archive->Writing == 0)
       Archive->Flush ();
-    if ((data = Archive->Read (NameSuffix, &Size)))
+    VfsHeap wrapHeap (Node->vfs->heap);
+    if ((databuf = Archive->Read (NameSuffix, wrapHeap)))
     {
+      Size = databuf->GetSize();
       Error = VFS_STATUS_OK;
-      databuf = csPtr<iDataBuffer> (new csDataBuffer (data, Size));
     }
   }
   else if ((Mode & VFS_FILE_MODE) == VFS_FILE_WRITE)
@@ -860,12 +860,12 @@ ArchiveFile::~ArchiveFile ()
 
 size_t ArchiveFile::Read (char *Data, size_t DataSize)
 {
-  if (data)
+  if (databuf.IsValid())
   {
     size_t sz = DataSize;
     if (fpos + sz > Size)
       sz = Size - fpos;
-    memcpy (Data, data + fpos, sz);
+    memcpy (Data, databuf->GetData() + fpos, sz);
     fpos += sz;
     return sz;
   }
@@ -878,7 +878,7 @@ size_t ArchiveFile::Read (char *Data, size_t DataSize)
 
 size_t ArchiveFile::Write (const char *Data, size_t DataSize)
 {
-  if (data)
+  if (databuf.IsValid())
   {
     Error = VFS_STATUS_ACCESSDENIED;
     return 0;
@@ -903,7 +903,7 @@ void ArchiveFile::Flush ()
 
 bool ArchiveFile::AtEOF ()
 {
-  if (data)
+  if (databuf.IsValid())
     return fpos + 1 >= Size;
   else
     return true;
@@ -916,7 +916,7 @@ size_t ArchiveFile::GetPos ()
 
 bool ArchiveFile::SetPos (size_t newpos)
 {
-  if (data)
+  if (databuf.IsValid())
   {
     fpos = (newpos > Size) ? Size : newpos;
     return true;
@@ -927,26 +927,30 @@ bool ArchiveFile::SetPos (size_t newpos)
   }
 }
 
-csPtr<iDataBuffer> ArchiveFile::GetAllData (bool /*nullterm*/)
+csPtr<iDataBuffer> ArchiveFile::GetAllData (bool nullterm)
 {
-  if (data)
+  if (nullterm && !buffernt)
   {
-    return csPtr<iDataBuffer> (databuf);
+    // However, a null-terminated buffer is requested,
+    // but this one isn't yet - copy data, append null
+    CS::DataBuffer<VfsHeap>* dbuf =
+      new CS::DataBuffer<VfsHeap> (Size+1, Node->vfs->heap);
+    memcpy (dbuf->GetData(), databuf->GetData(), Size);
+    dbuf->GetData()[Size] = 0;
+    databuf.AttachNew (dbuf);
+
+    buffernt = nullterm;
   }
-  else
-  {
-    return 0;
-  }
+  return csPtr<iDataBuffer> (databuf);
 }
 
 // ------------------------------------------------------------- VfsNode --- //
 
 VfsNode::VfsNode (char *iPath, const char *iConfigKey,
-		  iObjectRegistry *object_reg, unsigned int verbosity)
+		  csVFS* vfs, unsigned int verbosity) : vfs (vfs)
 {
   VPath = iPath;
   ConfigKey = CS::StrDup (iConfigKey);
-  VfsNode::object_reg = object_reg;
   VfsNode::verbosity = verbosity;
 }
 
@@ -1201,7 +1205,7 @@ void VfsNode::FindFiles (const char *Suffix, const char *Mask,
           continue;
 
         idx = ArchiveCache->Length ();
-        ArchiveCache->Push (new VfsArchive (rpath, object_reg, verbosity));
+        ArchiveCache->Push (new VfsArchive (rpath, verbosity));
       }
 
       VfsArchive *a = ArchiveCache->Get (idx);
@@ -1282,7 +1286,7 @@ iFile* VfsNode::Open (int Mode, const char *FileName)
 	}
 
         idx = ArchiveCache->Length ();
-        ArchiveCache->Push (new VfsArchive (rpath, object_reg, verbosity));
+        ArchiveCache->Push (new VfsArchive (rpath, verbosity));
       }
 
       f = new ArchiveFile (Mode, this, i, FileName, ArchiveCache->Get(idx),
@@ -1329,7 +1333,7 @@ bool VfsNode::FindFile (const char *Suffix, char *RealPath,
           continue;
 
         idx = ArchiveCache->Length ();
-        ArchiveCache->Push (new VfsArchive (rpath, object_reg, verbosity));
+        ArchiveCache->Push (new VfsArchive (rpath, verbosity));
       }
 
       VfsArchive *a = ArchiveCache->Get (idx);
@@ -1470,6 +1474,7 @@ csVFS::csVFS (iBase *iParent) :
   auto_name_counter(0),
   verbosity(VERBOSITY_NONE)
 {
+  heap.AttachNew (new HeapRefCounted);
   cwd = (char*)cs_malloc (2);
   cwd [0] = VFS_PATH_SEPARATOR;
   cwd [1] = 0;
@@ -1622,7 +1627,7 @@ bool csVFS::ReadConfig ()
 bool csVFS::AddLink (const char *VirtualPath, const char *RealPath)
 {
   char *xp = _ExpandPath (VirtualPath, true);
-  VfsNode *e = new VfsNode (xp, VirtualPath, object_reg, GetVerbosity());
+  VfsNode *e = new VfsNode (xp, VirtualPath, this, GetVerbosity());
   if (!e->AddRPath (RealPath, this))
   {
     delete e;
@@ -2029,7 +2034,7 @@ bool csVFS::Mount (const char *VirtualPath, const char *RealPath)
    || suffix [0])
   {
     char *xp = _ExpandPath (VirtualPath, true);
-    node = new VfsNode (xp, VirtualPath, object_reg, GetVerbosity());
+    node = new VfsNode (xp, VirtualPath, this, GetVerbosity());
     NodeList.Push (node);
   }
 
@@ -2397,4 +2402,5 @@ csRef<iStringArray> csVFS::GetRealMountPaths (const char *VirtualPath)
   return r;
 }
 
-} // namespace cspluginVFS
+}
+CS_PLUGIN_NAMESPACE_END(VFS)

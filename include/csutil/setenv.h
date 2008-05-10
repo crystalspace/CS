@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2005 by Frank Richter
+    Copyright (C)2008 by Eric Sunshine <sunshine@sunshineco.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,30 +16,28 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifndef __CS_CSUTIL_SETENV_H__
+#define __CS_CSUTIL_SETENV_H__
 
-#include "cssysdef.h"
-#include "csutil/csstring.h"
-#include <stdlib.h>
+#include "csextern.h"
 
 namespace CS
 {
   namespace Utility
   {
 
-    int setenv (const char* name, const char* value, bool overwrite)
-    {
-#ifdef CS_HAVE_SETENV
-      return setenv (name, value, overwrite);
-#else
-      if (overwrite || getenv (name) == 0)
-	{
-	  csString s;
-	  s.Format ("%s=%s", name, value);
-	  return _putenv (s);
-	}
-      return 0;
-#endif // CS_HAVE_SETENV
-    }
+    /**
+     * Set an environment variable, much like POSIX setenv() but portably.
+     * \param key Environment variable name.
+     * \param value Value for environment variable.
+     * \param overwrite If false, set the environment variable only if it does
+     * not already have a value, else set it unconditionally.
+     * \return 0 upon success, else -1 and errno is set with failure reason.
+     */
+    CS_CRYSTALSPACE_EXPORT int setenv(
+	char const* key, char const* value, bool overwrite);
 
   } // namespace Utility
 } // namespace CS
+
+#endif // __CS_CSUTIL_SETENV_H__
