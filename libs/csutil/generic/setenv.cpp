@@ -27,7 +27,7 @@ namespace CS
     int setenv(char const* key, char const* value, bool overwrite)
     {
 #if defined(CS_HAVE_SETENV)
-      return setenv(key, value, overwrite);
+      return ::setenv(key, value, overwrite);
 #elif defined(CS_HAVE_PUTENV)
       if (overwrite || getenv(key) == 0)
 	{
