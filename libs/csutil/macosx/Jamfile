@@ -14,5 +14,6 @@ CSUTIL.GENERIC +=
   pluginpaths.cpp
   printf.cpp
   scanplugins.cpp
+  setenv.cpp
   sysroot.cpp 
   vfsplat.cpp ;

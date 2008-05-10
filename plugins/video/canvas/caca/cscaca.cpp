@@ -96,13 +96,13 @@ bool csGraphics2DCaca::Open ()
   config.AddConfig(object_reg, "/config/video.cfg");
 
   if(config->KeyExists("Video.ASCII.Console.Size"))
-    setenv ("CACA_GEOMETRY", 
+    CS::Utility::setenv ("CACA_GEOMETRY", 
       config->GetStr("Video.ASCII.Console.Size"), false);
   if(config->KeyExists("Video.ASCII.Console.Driver"))
-    setenv ("CACA_DRIVER", 
+    CS::Utility::setenv ("CACA_DRIVER", 
       config->GetStr("Video.ASCII.Console.Driver", "x11"), false);
   if(config->KeyExists("Video.ASCII.Console.Font"))
-    setenv ("CACA_FONT", 
+    CS::Utility::setenv ("CACA_FONT", 
       config->GetStr("Video.ASCII.Console.Font", "fixed"), false);
   
   fbWidth = config->GetInt("Video.Ascii.Offscreen.Width", 320);
