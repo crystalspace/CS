@@ -95,7 +95,11 @@ bool csShaderProgram::ProgramParamParser::ParseProgramParam (
     param.valid = true;
     return true;
   }
-  else if ((strcmp (type, "float") == 0) || (strcmp (type, "int") == 0))
+  else if (strcmp (type, "int") == 0)
+  {
+    paramType = ParamInt;
+  }
+  else if (strcmp (type, "float") == 0)
   {
     paramType = ParamFloat;
   }
@@ -168,10 +172,18 @@ bool csShaderProgram::ProgramParamParser::ParseProgramParam (
     return false;
   }
 
-  switch ((paramType & 0x3F))
+  const uint directValueTypes = ParamInt | ParamFloat | ParamVector2
+    | ParamVector3 | ParamVector4 | ParamMatrix | ParamTransform;
+  switch (paramType & directValueTypes)
   {
     case ParamInvalid:
       return false;
+      break;
+    case ParamInt:
+      {
+	int x = node->GetContentsValueAsInt ();
+	var->SetValue (x);
+      }
       break;
     case ParamFloat:
       {

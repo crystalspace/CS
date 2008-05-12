@@ -84,16 +84,17 @@ public:
   enum ProgramParamType
   {
     ParamInvalid    = 0,
-    ParamFloat	    = 0x0001,
-    ParamVector2    = 0x0002,
-    ParamVector3    = 0x0004,
-    ParamVector4    = 0x0008,
-    ParamMatrix	    = 0x0010,
-    ParamTransform  = 0x0020,
-    ParamArray      = 0x0040,
-    ParamShaderExp  = 0x0080,
+    ParamInt	    = 0x0001,
+    ParamFloat	    = 0x0002,
+    ParamVector2    = 0x0004,
+    ParamVector3    = 0x0008,
+    ParamVector4    = 0x0010,
+    ParamMatrix	    = 0x0020,
+    ParamTransform  = 0x0040,
+    ParamArray      = 0x0080,
+    ParamShaderExp  = 0x0100,
     
-    ParamVector     = ParamFloat | ParamVector2 | ParamVector3 | ParamVector4
+    ParamVector     = ParamInt | ParamFloat | ParamVector2 | ParamVector3 | ParamVector4
   };
 
   /**
