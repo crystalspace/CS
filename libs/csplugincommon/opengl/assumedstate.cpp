@@ -28,7 +28,8 @@ namespace CS
       void SetAssumedState (csGLStateCache* statecache,
 			    csGLExtensionManager* ext)
       {
-	glClearDepth (0.0);
+	glClearDepth (1.0);
+	glDepthRange (1.0, 0.0);
 	statecache->SetPixelUnpackAlignment (1);
         // The texture format stuff generally assumes little endian
 #ifndef CS_LITTLE_ENDIAN
