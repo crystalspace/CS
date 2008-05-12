@@ -44,8 +44,6 @@ public:
   virtual bool Compile();
 
   virtual csVertexAttrib ResolveBufferDestination (const char* binding);
-
-  virtual const char* GetProgramType() { return "vertex"; }
 };
 
 }
