@@ -44,7 +44,7 @@ static const int assumeConstFlag = 0x80000000;
 CS_LEAKGUARD_IMPLEMENT (csShaderGLCGCommon);
 
 csShaderGLCGCommon::csShaderGLCGCommon (csGLShader_CG* shaderPlug, 
-					const char* type) :
+					ProgramType type) :
   scfImplementationType (this, shaderPlug->object_reg), programType (type),
   assumedConstParams (0)
 {
@@ -538,6 +538,32 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
   
   shaderPlug->SetCompiledSource (0);
 
+  if (programType == progFP)
+  {
+    int numVaryings = 0;
+    CGparameter param = cgGetFirstLeafParameter (program, CG_PROGRAM);
+    while (param)
+    {
+      if (cgIsParameterUsed (param, program)
+	&& cgIsParameterReferenced (param))
+      {
+	const CGenum var = cgGetParameterVariability (param);
+	if (var == CG_VARYING)
+	  numVaryings++;
+      }
+  
+      param = cgGetNextLeafParameter (param);
+    }
+    
+    /* WORKAROUND: Even NVs G80 doesn't support passing more than 16 attribs
+       into an FP, yet Cg happily generates code that uses more (and GL falls 
+       back to SW).
+       So manually check the number of varying inputs and reject more than 16.
+       
+       @@@ This should be at least configurable
+     */
+    return numVaryings <= 16;
+  }
   return true;
 }
 
@@ -650,7 +676,13 @@ bool csShaderGLCGCommon::Load (iShaderDestinationResolver* resolve,
   csRef<iShaderManager> shadermgr = 
   	csQueryRegistry<iShaderManager> (shaderPlug->object_reg);
 
-  csRef<iDocumentNode> variablesnode = program->GetNode (programType);
+  const char* progTypeNode;
+  switch (programType)
+  {
+    case progVP: progTypeNode = "cgvp"; break;
+    case progFP: progTypeNode = "cgfp"; break;
+  }
+  csRef<iDocumentNode> variablesnode = program->GetNode (progTypeNode);
   if(variablesnode)
   {
     csRef<iDocumentNodeIterator> it = variablesnode->GetNodes ();

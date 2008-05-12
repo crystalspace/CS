@@ -59,7 +59,11 @@ protected:
 
   bool validProgram;
 
-  const char* programType;
+  enum ProgramType
+  {
+    progVP, progFP
+  };
+  ProgramType programType;
   ArgumentArray compilerArgs;
   csRef<iShaderDestinationResolverCG> cgResolve;
   csSet<csString> unusedParams;
@@ -80,7 +84,15 @@ protected:
     CGprofile maxProfile, uint flags = loadLoadToGL | loadApplyVmap);
   void DoDebugDump ();
   void WriteAdditionalDumpInfo (const char* description, const char* content);
-  virtual const char* GetProgramType() = 0;
+  virtual const char* GetProgramType()
+  {
+    switch (programType)
+    {
+      case progVP: return "vertex";
+      case progFP: return "fragment";
+    }
+    return 0;
+  }
   void CollectUnusedParameters (csSet<csString>& unusedParams);
   void SetParameterValue (CGparameter param, csShaderVariable* var);
   
@@ -89,7 +101,7 @@ protected:
 public:
   CS_LEAKGUARD_DECLARE (csShaderGLCGCommon);
 
-  csShaderGLCGCommon (csGLShader_CG* shaderPlug, const char* type);
+  csShaderGLCGCommon (csGLShader_CG* shaderPlug, ProgramType type);
   virtual ~csShaderGLCGCommon ();
 
   void SetValid(bool val) { validProgram = val; }

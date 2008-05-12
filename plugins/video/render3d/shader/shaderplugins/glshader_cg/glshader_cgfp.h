@@ -44,7 +44,7 @@ public:
   CS_LEAKGUARD_DECLARE (csShaderGLCGFP);
 
   csShaderGLCGFP (csGLShader_CG* shaderPlug) : 
-    csShaderGLCGCommon (shaderPlug, "cgfp") { }
+    csShaderGLCGCommon (shaderPlug, progFP) { }
 
   /// Sets this program to be the one used when rendering
   virtual void Activate ();
@@ -64,8 +64,6 @@ public:
   virtual bool Compile();
 
   virtual int ResolveTU (const char* binding);
-
-  virtual const char* GetProgramType() { return "fragment"; }
 
   virtual void GetUsedShaderVars (csBitArray& bits) const
   {
