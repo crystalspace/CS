@@ -29,7 +29,7 @@ namespace CS
     int setenv (const char* name, const char* value, bool overwrite)
     {
 #ifdef CS_HAVE_SETENV
-      return setenv (name, value, overwrite);
+      return ::setenv (name, value, overwrite);
 #else
       if (overwrite || getenv (name) == 0)
 	{

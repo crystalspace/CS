@@ -187,7 +187,7 @@ void csGLRender2TextureFramebuf::BeginDraw (int drawflags)
     glTexParameteri (textarget, GL_TEXTURE_MIN_FILTER, oldMinFilt);
   }
   rt_onscreen = true;
-  G3D->statecache->SetCullFace (GL_BACK);
+  G3D->statecache->SetCullFace (GL_FRONT);
 }
 
 void csGLRender2TextureFramebuf::SetupProjection ()
@@ -568,7 +568,7 @@ void csGLRender2TextureFramebuf::FinishDraw ()
 {
   GLRENDER3D_OUTPUT_LOCATION_MARKER;
 
-  G3D->statecache->SetCullFace (GL_FRONT);
+  G3D->statecache->SetCullFace (GL_BACK);
 
   if (rt_onscreen)
   {
