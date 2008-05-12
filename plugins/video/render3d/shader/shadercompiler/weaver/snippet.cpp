@@ -780,9 +780,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     {
       int numComps = 0;
       csShaderVariable::VariableType svType = param.var->GetType ();
+      const char* typeStr = "float";
       switch (svType)
       {
         case csShaderVariable::INT:
+          numComps = 1; 
+          typeStr = "int";
+          break;
         case csShaderVariable::FLOAT:   numComps = 1; break;
         case csShaderVariable::VECTOR2: numComps = 2; break;
         case csShaderVariable::VECTOR3: numComps = 3; break;
@@ -795,9 +799,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
           return;
       }
       if (numComps > 1)
-        weaverType.Format ("float%d", numComps);
+        weaverType.Format ("%s%d", typeStr, numComps);
       else
-        weaverType = "float";
+        weaverType = typeStr;
 
       csVector4 v;
       param.var->GetValue (v);
