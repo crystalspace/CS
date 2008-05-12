@@ -69,6 +69,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     csRef<iDocumentNodeIterator> it = techSource->GetNodes();
   
     // Read in the passes.
+    Synthesizer::DocNodeArray nonPassNodes;
+    csArray<Synthesizer::DocNodeArray> prePassNodes;
     csPDelArray<Snippet> passSnippets;
     while (it->HasNext ())
     {
@@ -77,10 +79,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	xmltokens.Request (child->GetValue ()) == WeaverCompiler::XMLTOKEN_PASS)
       {
 	passSnippets.Push (new Snippet (compiler, child, 0, true));
+	prePassNodes.Push (nonPassNodes);
+	nonPassNodes.Empty();
       }
+      else
+        nonPassNodes.Push (child);
     }
       
-    Synthesizer synth (compiler, passSnippets);
+    Synthesizer synth (compiler, prePassNodes, passSnippets, nonPassNodes);
   
     csRef<iDocument> synthShader = synth.Synthesize (docSource);
     CS_ASSERT (synthShader.IsValid());

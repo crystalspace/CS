@@ -61,8 +61,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   //-------------------------------------------------------------------------
 
   Synthesizer::Synthesizer (WeaverCompiler* compiler, 
-                            const csPDelArray<Snippet>& outerSnippets) : 
-    compiler (compiler), xmltokens (compiler->xmltokens)
+                            const csArray<DocNodeArray>& prePassNodes,
+                            const csPDelArray<Snippet>& outerSnippets,
+                            const DocNodeArray& postPassesNodes)
+    : compiler (compiler), xmltokens (compiler->xmltokens),
+      prePassNodes (prePassNodes), postPassesNodes (postPassesNodes)
   {
     graphs.SetSize (outerSnippets.GetSize());
     for (size_t s = 0; s < outerSnippets.GetSize(); s++)
@@ -156,6 +159,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	    const TechniqueGraph& graph = graphs.Get (g)[(current % graphs[g].GetSize())];
 	    
 	    current = current / graphs[g].GetSize();
+	    
+	    for (size_t i = 0; i < prePassNodes[g].GetSize(); i++)
+	    {
+	      iDocumentNode* copyFrom = prePassNodes[g].Get (i);
+	      csRef<iDocumentNode> newNode =
+		techniqueNode->CreateNodeBefore (copyFrom->GetType());
+              CS::DocSystem::CloneNode (copyFrom, newNode);
+	    }
+	    
 	    csRef<iDocumentNode> passNode =
 	      techniqueNode->CreateNodeBefore (CS_NODE_ELEMENT);
 	    passNode->SetValue ("pass");
@@ -177,6 +189,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  }
 	  if (!aPassSucceeded)
 	    shaderNode->RemoveNode (techniqueNode);
+	  else
+	  {
+	    for (size_t i = 0; i < postPassesNodes.GetSize(); i++)
+	    {
+	      iDocumentNode* copyFrom = postPassesNodes.Get (i);
+	      csRef<iDocumentNode> newNode =
+		techniqueNode->CreateNodeBefore (copyFrom->GetType());
+              CS::DocSystem::CloneNode (copyFrom, newNode);
+	    }
+	  }
 	}
 	
 	currentTech++;

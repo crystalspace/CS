@@ -43,15 +43,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     void AddNode (iDocumentNode* node);
   };
-
+  
   class Synthesizer
   {
+  public:
+    typedef csRefArray<iDocumentNode> DocNodeArray;
+  protected:
     SnippetNumbers snipNums;
     csArray<csArray<TechniqueGraph> > graphs;
+    csArray<DocNodeArray> prePassNodes;
     csArray<Snippet*> outerSnippets;
+    DocNodeArray postPassesNodes;
   public:
     Synthesizer (WeaverCompiler* compiler, 
-      const csPDelArray<Snippet>& outerSnippets);
+      const csArray<DocNodeArray>& prePassNodes,
+      const csPDelArray<Snippet>& outerSnippets,
+      const DocNodeArray& postPassesNodes);
     
     csPtr<iDocument> Synthesize (iDocumentNode* sourceNode);
   private:
