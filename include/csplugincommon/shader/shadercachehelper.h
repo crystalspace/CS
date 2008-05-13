@@ -84,6 +84,11 @@ namespace CS
       /// Get a complete data buffer from a file
       CS_CRYSTALSPACE_EXPORT csPtr<iDataBuffer> ReadDataBuffer (iFile* file);
       
+      /// Write a character string to a file
+      CS_CRYSTALSPACE_EXPORT bool WriteString (iFile* file, const char* str);
+      /// Read a character string from a file
+      CS_CRYSTALSPACE_EXPORT csString ReadString (iFile* file);
+      
       /// Helper to write strings in an efficient way (each string once)
       class CS_CRYSTALSPACE_EXPORT StringStoreWriter
       {

@@ -290,6 +290,26 @@ namespace CS
       
       //---------------------------------------------------------------------
       
+      bool WriteString (iFile* file, const char* str)
+      {
+        CS::DataBuffer<> dbuf (const_cast<char*> (str),
+          str ? strlen (str)+1 : 0, false);
+        return WriteDataBuffer (file, &dbuf);
+      }
+      
+      csString ReadString (iFile* file)
+      {
+        csString ret;
+        
+        csRef<iDataBuffer> buf (ReadDataBuffer (file));
+        if (buf.IsValid() && (buf->GetSize() > 0))
+          ret.Replace (buf->GetData(), buf->GetSize()-1);
+        
+        return ret;
+      }
+      
+      //---------------------------------------------------------------------
+      
       bool StringStoreWriter::StartUse (iFile* file)
       {
         CS_ASSERT(!this->file.IsValid());
