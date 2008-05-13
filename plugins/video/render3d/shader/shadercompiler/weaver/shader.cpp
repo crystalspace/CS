@@ -60,6 +60,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   csRef<iDocument> WeaverShader::LoadTechsFromDoc (const csArray<TechniqueKeeper>& techniques,
 						   iLoaderContext* ldr_context, 
 						   iDocumentNode* docSource,
+						   const char* cacheID,
 						   iFile* cacheFile, bool& cacheState)
   {
     cacheState = true;
@@ -74,6 +75,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     shaderNode->SetValue ("shader");
     CS::DocSystem::CloneAttributes (docSource, shaderNode);
     shaderNode->SetAttribute ("compiler", "xmlshader");
+    if (cacheID != 0) shaderNode->SetAttribute ("_cacheid", cacheID);
 
     csRef<iDocumentNode> shadervarsNode =
       shaderNode->CreateNodeBefore (CS_NODE_ELEMENT);
@@ -201,13 +203,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     iCacheManager* shaderCache = shadermgr->GetShaderCache();
     csString shaderName (source->GetAttributeValue ("name"));
+    csString cacheID_base;
     csString cacheID_header;
     csString cacheID_tech;
     {
       csMD5::Digest sourceDigest (csMD5::Encode (CS::DocSystem::FlattenNode (source)));
-      csString digestStr (sourceDigest.HexString());
-      cacheID_header.Format ("%sWH", digestStr.GetData());
-      cacheID_tech.Format ("%sWT", digestStr.GetData());
+      cacheID_base = sourceDigest.HexString();
+      cacheID_header.Format ("%sWH", cacheID_base.GetData());
+      cacheID_tech.Format ("%sWT", cacheID_base.GetData());
     }
     bool cacheValid = (shaderCache != 0) && !shaderName.IsEmpty()
       && !cacheID_header.IsEmpty() && !cacheID_tech.IsEmpty();
@@ -276,7 +279,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       bool cacheState;
       csMemFile cacheFile;
       synthShader = LoadTechsFromDoc (techniques, ldr_context, 
-	  source, cacheValid ? &cacheFile : 0, cacheState);
+	  source, cacheID_base, cacheValid ? &cacheFile : 0, cacheState);
       if (cacheValid && cacheState)
       {
 	csRef<iDataBuffer> allCacheData = cacheFile.GetAllData();
