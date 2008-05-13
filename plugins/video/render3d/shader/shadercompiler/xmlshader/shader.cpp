@@ -403,7 +403,7 @@ csXMLShader::~csXMLShader ()
 /* Magic value for cache file.
  * The most significant byte serves as a "version", increase when the
  * cache file format changes. */
-static const uint32 cacheFileMagic = 0x01737863;
+static const uint32 cacheFileMagic = 0x02737863;
 
 void csXMLShader::Load (iDocumentNode* source)
 {
@@ -414,6 +414,7 @@ void csXMLShader::Load (iDocumentNode* source)
   
   shaderCache = shadermgr->GetShaderCache();
   cacheType = source->GetAttributeValue ("name");
+  csString cacheTag (source->GetAttributeValue ("_cachetag"));
   csString cacheID_header;
   {
     csString cacheID_base (source->GetAttributeValue ("_cacheid"));
@@ -450,6 +451,10 @@ void csXMLShader::Load (iDocumentNode* source)
 	if (read != sizeof (diskMagic)) break;
 	if (csLittleEndian::UInt32 (diskMagic) != cacheFileMagic) break;
 	
+	csString cacheFileTag =
+	  CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
+	if (cacheFileTag != cacheTag) break;
+	
 	// Extract hash stream
 	csRef<iDataBuffer> hashStream = 
 	  CS::PluginCommon::ShaderCacheHelper::ReadDataBuffer (cacheFile);
@@ -466,6 +471,7 @@ void csXMLShader::Load (iDocumentNode* source)
       // Write magic header
       uint32 diskMagic = csLittleEndian::UInt32 (cacheFileMagic);
       cacheFile->Write ((char*)&diskMagic, sizeof (diskMagic));
+      CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, cacheTag);
       // Write hash stream
       csRef<iDataBuffer> hashStream = hasher.GetHashStream ();
       if (!CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (
@@ -564,8 +570,23 @@ void csXMLShader::Load (iDocumentNode* source)
 	shaderCache->CacheData (allCacheData->GetData(),
 	  allCacheData->GetSize(), cacheType, cacheID_header, ~0);
       }
+    
+      if (cachedEvaluatorConditionNum != sharedEvaluator->GetNumConditions())
+      {
+	csMemFile cacheFile;
+	uint32 diskMagic = csLittleEndian::UInt32 (cacheFileMagic);
+	cacheFile.Write ((char*)&diskMagic, sizeof (diskMagic));
+	if (sharedEvaluator->WriteToCache (&cacheFile))
+	{
+	  csRef<iDataBuffer> cacheData = cacheFile.GetAllData();
+	  shaderCache->CacheData (cacheData->GetData(), cacheData->GetSize(),
+	    cacheType, cacheScope_evaluator, ~0);
+	}
+	cachedEvaluatorConditionNum = sharedEvaluator->GetNumConditions();
+      }
     }
   }
+  readFromCache = useShaderCache;
   
   //Load global shadervars block
   csRef<iDocumentNode> varNode = shaderRoot->GetNode(
@@ -742,7 +763,7 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
         bool useCache = false;
         uint cacheID = (t * (tvc)) + tvi;
         csRef<iFile> cacheFile;
-        if (shaderCache.IsValid())
+        if (readFromCache && shaderCache.IsValid())
         {
           csRef<iDataBuffer> cacheData (shaderCache->ReadCache (cacheType, 
             cacheScope_tech, cacheID));
@@ -833,7 +854,7 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	
 	if (compiler->do_verbose)
 	  compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    "Shader '%s'<%zu>: priority %d %zu variations",
+	    "Shader '%s'<%zu>: priority %d: %zu variations",
 	    GetName(), tvi, tech.priority, tech.resolver->GetVariantCount());
       }
       

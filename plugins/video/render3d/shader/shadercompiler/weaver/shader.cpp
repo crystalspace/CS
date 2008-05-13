@@ -38,12 +38,55 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 {
+
+  static csString EncodeBase64 (iDataBuffer* data)
+  {
+    static const char encodeChars[] =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+  
+    csString ret;
+    uint8* ptr = data->GetUint8();
+    size_t bytes = data->GetSize();
+    ret.SetCapacity (((bytes+2)/3)*4);
+    while (bytes >= 3)
+    {
+      uint v = (ptr[0] << 16) | (ptr[1] << 8) | (ptr[2]);
+      ptr += 3;
+      bytes -= 3;
+      ret << encodeChars[(v >> 18)];
+      ret << encodeChars[(v >> 12) & 0x3f];
+      ret << encodeChars[(v >> 6) & 0x3f];
+      ret << encodeChars[v & 0x3f];
+    }
+    if (bytes > 0)
+    {
+      uint v = (ptr[0] << 16);
+      if (bytes > 1)
+        v |= (ptr[1] << 8);
+      data += 3;
+      bytes -= 3;
+      ret << encodeChars[(v >> 18)];
+      ret << encodeChars[(v >> 12) & 0x3f];
+      if (bytes > 1)
+      {
+        ret << encodeChars[(v >> 6) & 0x3f];
+        ret << "=";
+      }
+      else
+        ret << "==";
+    }
+    
+    return ret;
+  }
+
+  //-------------------------------------------------------------------------
+
   CS_LEAKGUARD_IMPLEMENT (WeaverShader);
 
   /* Magic value for cache file.
   * The most significant byte serves as a "version", increase when the
   * cache file format changes. */
-  static const uint32 cacheFileMagic = 0x00727677;
+  static const uint32 cacheFileMagic = 0x01727677;
 
   WeaverShader::WeaverShader (WeaverCompiler* compiler) : 
     scfImplementationType (this), compiler (compiler), 
@@ -60,7 +103,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   csRef<iDocument> WeaverShader::LoadTechsFromDoc (const csArray<TechniqueKeeper>& techniques,
 						   iLoaderContext* ldr_context, 
 						   iDocumentNode* docSource,
-						   const char* cacheID,
+						   const char* cacheID, 
+						   const char* cacheTag,
 						   iFile* cacheFile, bool& cacheState)
   {
     cacheState = true;
@@ -76,6 +120,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     CS::DocSystem::CloneAttributes (docSource, shaderNode);
     shaderNode->SetAttribute ("compiler", "xmlshader");
     if (cacheID != 0) shaderNode->SetAttribute ("_cacheid", cacheID);
+    if (cacheTag != 0) shaderNode->SetAttribute ("_cachetag", cacheTag);
 
     csRef<iDocumentNode> shadervarsNode =
       shaderNode->CreateNodeBefore (CS_NODE_ELEMENT);
@@ -276,10 +321,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     if (!synthShader.IsValid())
     {
+      csRef<iDataBuffer> hashStream = hasher.GetHashStream ();
+      csString cacheTag = EncodeBase64 (hashStream);
+    
       bool cacheState;
       csMemFile cacheFile;
       synthShader = LoadTechsFromDoc (techniques, ldr_context, 
-	  source, cacheID_base, cacheValid ? &cacheFile : 0, cacheState);
+	source, cacheID_base, cacheTag, cacheValid ? &cacheFile : 0,
+	cacheState);
       if (cacheValid && cacheState)
       {
 	csRef<iDataBuffer> allCacheData = cacheFile.GetAllData();

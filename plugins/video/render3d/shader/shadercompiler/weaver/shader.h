@@ -70,7 +70,8 @@ protected:
 
   csRef<iDocument> LoadTechsFromDoc (const csArray<TechniqueKeeper>& techniques,
     iLoaderContext* ldr_context, iDocumentNode* docSource,
-    const char* cacheID, iFile* cacheFile, bool& cacheState);
+    const char* cacheID, const char* cacheTag, iFile* cacheFile,
+    bool& cacheState);
   csRef<iDocument> LoadTechsFromCache (iLoaderContext* ldr_context, iFile* cacheFile);
       
 public:
