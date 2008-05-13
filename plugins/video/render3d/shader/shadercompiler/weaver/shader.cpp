@@ -25,10 +25,12 @@
 
 #include "csplugincommon/shader/shadercachehelper.h"
 #include "csutil/csendian.h"
+#include "csutil/cspmeter.h"
 #include "csutil/documenthelper.h"
 #include "csutil/memfile.h"
 #include "csutil/objreg.h"
 #include "csutil/parasiticdatabuffer.h"
+#include "csutil/xmltiny.h"
 
 #include "shader.h"
 #include "weaver.h"
@@ -55,57 +57,82 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   {
   }
 
-  bool WeaverShader::LoadTechFromDoc (iLoaderContext* ldr_context, 
-                                      iDocumentNode* docSource,
-                                      iDocumentNode* techSource, size_t techNum,
-                                      iFile* cacheFile, bool& cacheState)
+  csRef<iDocument> WeaverShader::LoadTechsFromDoc (const csArray<TechniqueKeeper>& techniques,
+						   iLoaderContext* ldr_context, 
+						   iDocumentNode* docSource,
+						   iFile* cacheFile, bool& cacheState)
   {
     cacheState = true;
     realShader.Invalidate();
     
-    iDocumentSystem* cacheDocSys = compiler->binDocSys.IsValid()
-      ? compiler->binDocSys : compiler->xmlDocSys;
+    csRef<iDocumentSystem> docsys;
+    docsys.AttachNew (new csTinyDocumentSystem);
+    csRef<iDocument> synthesizedDoc = docsys->CreateDocument ();
+    
+    csRef<iDocumentNode> rootNode = synthesizedDoc->CreateRoot();
+    csRef<iDocumentNode> shaderNode = rootNode->CreateNodeBefore (CS_NODE_ELEMENT);
+    shaderNode->SetValue ("shader");
+    CS::DocSystem::CloneAttributes (docSource, shaderNode);
+    shaderNode->SetAttribute ("compiler", "xmlshader");
 
-    csRef<iDocumentNodeIterator> it = techSource->GetNodes();
-  
-    // Read in the passes.
-    Synthesizer::DocNodeArray nonPassNodes;
-    csArray<Synthesizer::DocNodeArray> prePassNodes;
-    csPDelArray<Snippet> passSnippets;
-    while (it->HasNext ())
+    csRef<iDocumentNode> shadervarsNode =
+      shaderNode->CreateNodeBefore (CS_NODE_ELEMENT);
+    shadervarsNode->SetValue ("shadervars");
+    ShaderVarNodesHelper shaderVarNodesHelper (shadervarsNode);
+	  
+    csRef<iDocumentNodeIterator> shaderVarNodes = 
+      docSource->GetNodes ("shadervar");
+    while (shaderVarNodes->HasNext ())
     {
-      csRef<iDocumentNode> child = it->Next ();
-      if (child->GetType () == CS_NODE_ELEMENT &&
-	xmltokens.Request (child->GetValue ()) == WeaverCompiler::XMLTOKEN_PASS)
-      {
-	passSnippets.Push (new Snippet (compiler, child, 0, true));
-	prePassNodes.Push (nonPassNodes);
-	nonPassNodes.Empty();
-      }
-      else
-        nonPassNodes.Push (child);
+      csRef<iDocumentNode> svNode = shaderVarNodes->Next ();
+      csRef<iDocumentNode> newNode = 
+	shadervarsNode->CreateNodeBefore (svNode->GetType ());
+      CS::DocSystem::CloneNode (svNode, newNode);
     }
+
+    csRefArray<iDocumentNode> techniqueNodes;
+    for (size_t t = 0; t < techniques.GetSize(); t++)
+    {
+      iDocumentNode* techSource = techniques[t].node;
       
-    Synthesizer synth (compiler, prePassNodes, passSnippets, nonPassNodes);
-  
-    csRef<iDocument> synthShader = synth.Synthesize (docSource);
-    CS_ASSERT (synthShader.IsValid());
+      csRef<iDocumentNodeIterator> it = techSource->GetNodes();
     
-    if (compiler->doDumpWeaved)
-    {
-      csString shaderName (docSource->GetAttributeValue ("name"));
-      if (shaderName.IsEmpty())
+      // Read in the passes.
+      Synthesizer::DocNodeArray nonPassNodes;
+      csArray<Synthesizer::DocNodeArray> prePassNodes;
+      csPDelArray<Snippet> passSnippets;
+      while (it->HasNext ())
       {
-	static size_t counter = 0;
-	shaderName.Format ("shader%zu", counter++);
+	csRef<iDocumentNode> child = it->Next ();
+	if (child->GetType () == CS_NODE_ELEMENT &&
+	  xmltokens.Request (child->GetValue ()) == WeaverCompiler::XMLTOKEN_PASS)
+	{
+	  passSnippets.Push (new Snippet (compiler, child, 0, true));
+	  prePassNodes.Push (nonPassNodes);
+	  nonPassNodes.Empty();
+	}
+	else
+	  nonPassNodes.Push (child);
       }
-      synthShader->Write (compiler->vfs, 
-	csString().Format ("/tmp/shader/generated_%s_%zu.xml",
-	  shaderName.GetData(), techNum));
+	
+      Synthesizer synth (compiler, prePassNodes, passSnippets, nonPassNodes);
+    
+      csTextProgressMeter pmeter (0);
+      synth.Synthesize (shaderNode, shaderVarNodesHelper, techniqueNodes, &pmeter);
     }
     
-    csRef<iDocumentNode> shaderNode =
-      synthShader->GetRoot()->GetNode ("shader");
+    for (size_t t = 0; t < techniqueNodes.GetSize(); t++)
+      techniqueNodes[t]->SetAttributeAsInt ("priority",
+        int (techniqueNodes.GetSize()-t));
+    
+    {
+      csRef<iDocumentNode> fallback = docSource->GetNode ("fallbackshader");
+      if (fallback.IsValid())
+      {
+        csRef<iDocumentNode> newFallback = shaderNode->CreateNodeBefore (CS_NODE_ELEMENT);
+        CS::DocSystem::CloneNode (fallback, newFallback);
+      }
+    }
     
     if (cacheFile)
     {
@@ -113,6 +140,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       uint32 diskMagic = csLittleEndian::UInt32 (cacheFileMagic);
       cacheFile->Write ((char*)&diskMagic, sizeof (diskMagic));
       
+      iDocumentSystem* cacheDocSys = compiler->binDocSys.IsValid()
+	? compiler->binDocSys : compiler->xmlDocSys;
+	
       csRef<iDocument> cacheDoc = cacheDocSys->CreateDocument();
       csRef<iDocumentNode> cacheDocRoot = cacheDoc->CreateRoot();
       csRef<iDocumentNode> cacheShaderNode = cacheDocRoot->CreateNodeBefore (
@@ -130,14 +160,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       }
     }
       
-    realShader = compiler->xmlshader->CompileShader (ldr_context,
-      shaderNode);
-
-    return realShader.IsValid();
+    return synthesizedDoc;
   }
   
-  bool WeaverShader::LoadTechFromCache (iLoaderContext* ldr_context, 
-                                        iFile* cacheFile)
+  csRef<iDocument> WeaverShader::LoadTechsFromCache (iLoaderContext* ldr_context, 
+                                                     iFile* cacheFile)
   {
     size_t read;
   
@@ -150,23 +177,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     csRef<iDataBuffer> cachedDocData = 
       CS::PluginCommon::ShaderCacheHelper::ReadDataBuffer (cacheFile);
-    if (!cachedDocData.IsValid()) return false;
+    if (!cachedDocData.IsValid()) return 0;
     
     csRef<iDocument> cacheDoc;
     cacheDoc = compiler->binDocSys->CreateDocument();
     if (cacheDoc->Parse (cachedDocData) != 0)
     {
       cacheDoc = compiler->xmlDocSys->CreateDocument();
-      if (cacheDoc->Parse (cachedDocData) != 0) return false;
+      if (cacheDoc->Parse (cachedDocData) != 0) return 0;
     }
     
-    csRef<iDocumentNode> shaderNode =
-      cacheDoc->GetRoot()->GetNode ("shader");
-    
-    realShader = compiler->xmlshader->CompileShader (ldr_context,
-      shaderNode);
-
-    return realShader.IsValid();
+    return cacheDoc;
   }
   
   bool WeaverShader::Load (iLoaderContext* ldr_context, iDocumentNode* source,
@@ -240,39 +261,56 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       }
     }
     
-    for (size_t t = 0; t < techniques.GetSize(); t++)
+    csRef<iDocument> synthShader;
+    csRef<iDataBuffer> cacheData;
+    if (useShaderCache)
+      cacheData = shaderCache->ReadCache (shaderName, cacheID_tech, ~0);
+    if (cacheData.IsValid())
     {
-      csRef<iDataBuffer> cacheData;
-      if (useShaderCache)
-        cacheData = shaderCache->ReadCache (shaderName, cacheID_tech,
-          techniques[t].priority);
-      
-      bool res = false;
-      if (cacheData.IsValid())
-      {
-        csMemFile cacheFile (cacheData, true);
-        res = LoadTechFromCache (ldr_context, &cacheFile);
-      }
-      
-      if (!res)
-      {
-        bool cacheState;
-        csMemFile cacheFile;
-        res = LoadTechFromDoc (ldr_context, 
-          source, techniques[t].node, t,
-          cacheValid ? &cacheFile : 0, cacheState);
-        if (cacheValid && cacheState)
-        {
-          csRef<iDataBuffer> allCacheData = cacheFile.GetAllData();
-	  shaderCache->CacheData (allCacheData->GetData(),
-	    allCacheData->GetSize(), shaderName, cacheID_tech,
-	    techniques[t].priority);
-	}
-      }
-    
-      if (res) break;
+      csMemFile cacheFile (cacheData, true);
+      synthShader = LoadTechsFromCache (ldr_context, &cacheFile);
     }
     
+    if (!synthShader.IsValid())
+    {
+      bool cacheState;
+      csMemFile cacheFile;
+      synthShader = LoadTechsFromDoc (techniques, ldr_context, 
+	  source, cacheValid ? &cacheFile : 0, cacheState);
+      if (cacheValid && cacheState)
+      {
+	csRef<iDataBuffer> allCacheData = cacheFile.GetAllData();
+	shaderCache->CacheData (allCacheData->GetData(),
+	  allCacheData->GetSize(), shaderName, cacheID_tech,
+	  ~0);
+      }
+    }
+    CS_ASSERT (synthShader.IsValid());
+      
+    if (compiler->doDumpWeaved)
+    {
+      csRef<iDocument> dumpDoc = compiler->xmlDocSys->CreateDocument ();
+      
+      csRef<iDocumentNode> rootNode = dumpDoc->CreateRoot();
+      CS::DocSystem::CloneNode (synthShader->GetRoot(), rootNode);
+      
+      csString shaderName (source->GetAttributeValue ("name"));
+      if (shaderName.IsEmpty())
+      {
+	static size_t counter = 0;
+	shaderName.Format ("shader%zu", counter++);
+      }
+      dumpDoc->Write (compiler->vfs, 
+	csString().Format ("/tmp/shader/generated_%s.xml",
+	  shaderName.GetData()));
+    }
+    
+    csRef<iDocumentNode> shaderNode =
+      synthShader->GetRoot()->GetNode ("shader");
+    
+    realShader = compiler->xmlshader->CompileShader (ldr_context,
+      shaderNode);
+
     return realShader.IsValid();
   }
   

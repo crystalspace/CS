@@ -29,6 +29,7 @@
 #include "weaver.h"
 
 struct iDocumentNode;
+struct iProgressMeter;
 
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 {
@@ -60,7 +61,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       const csPDelArray<Snippet>& outerSnippets,
       const DocNodeArray& postPassesNodes);
     
-    csPtr<iDocument> Synthesize (iDocumentNode* sourceNode);
+    void Synthesize (iDocumentNode* shaderNode,
+      ShaderVarNodesHelper& shaderVarNodesHelper,
+      csRefArray<iDocumentNode>& techNodes,
+      iProgressMeter* progress);
   private:
     csString annotateString;
     const char* GetAnnotation (const char* fmt, ...) CS_GNUC_PRINTF (2, 3)

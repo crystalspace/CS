@@ -68,10 +68,10 @@ class WeaverShader : public scfImplementationExt2<WeaverShader,
 protected:
   void InternalRemove() { SelfDestruct(); }
 
-  bool LoadTechFromDoc (iLoaderContext* ldr_context, iDocumentNode* docSource,
-      iDocumentNode* techSource, 
-      size_t techNum, iFile* cacheFile, bool& cacheState);
-  bool LoadTechFromCache (iLoaderContext* ldr_context, iFile* cacheFile);
+  csRef<iDocument> LoadTechsFromDoc (const csArray<TechniqueKeeper>& techniques,
+    iLoaderContext* ldr_context, iDocumentNode* docSource,
+    iFile* cacheFile, bool& cacheState);
+  csRef<iDocument> LoadTechsFromCache (iLoaderContext* ldr_context, iFile* cacheFile);
       
 public:
   CS_LEAKGUARD_DECLARE (WeaverShader);

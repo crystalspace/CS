@@ -23,6 +23,7 @@
 #include "iutil/plugin.h"
 #include "iutil/string.h"
 #include "iutil/vfs.h"
+#include "ivaria/pmeter.h"
 #include "ivaria/reporter.h"
 
 #include "csplugincommon/shader/weavertypes.h"
@@ -64,8 +65,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
                             const csArray<DocNodeArray>& prePassNodes,
                             const csPDelArray<Snippet>& outerSnippets,
                             const DocNodeArray& postPassesNodes)
-    : compiler (compiler), xmltokens (compiler->xmltokens),
-      prePassNodes (prePassNodes), postPassesNodes (postPassesNodes)
+    : prePassNodes (prePassNodes), postPassesNodes (postPassesNodes), 
+      compiler (compiler), xmltokens (compiler->xmltokens)
   {
     graphs.SetSize (outerSnippets.GetSize());
     for (size_t s = 0; s < outerSnippets.GetSize(); s++)
@@ -76,39 +77,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     }
   }
 
-  csPtr<iDocument> Synthesizer::Synthesize (iDocumentNode* sourceNode)
+  void Synthesizer::Synthesize (iDocumentNode* shaderNode,
+                                ShaderVarNodesHelper& shaderVarNodesHelper,
+                                csRefArray<iDocumentNode>& techNodes,
+                                iProgressMeter* progress)
   {
-    csRef<iDocumentSystem> docsys;
-    docsys.AttachNew (new csTinyDocumentSystem);
-    csRef<iDocument> synthesizedDoc = docsys->CreateDocument ();
-    
-    csRef<iDocumentNode> rootNode = synthesizedDoc->CreateRoot();
-    csRef<iDocumentNode> shaderNode = rootNode->CreateNodeBefore (CS_NODE_ELEMENT);
-    shaderNode->SetValue ("shader");
-    CS::DocSystem::CloneAttributes (sourceNode, shaderNode);
-    shaderNode->SetAttribute ("compiler", "xmlshader");
-
-    csRef<iDocumentNode> shadervarsNode =
-      shaderNode->CreateNodeBefore (CS_NODE_ELEMENT);
-    shadervarsNode->SetValue ("shadervars");
-    ShaderVarNodesHelper shaderVarNodesHelper (shadervarsNode);
-	  
-    csRef<iDocumentNodeIterator> shaderVarNodes = 
-      sourceNode->GetNodes ("shadervar");
-    while (shaderVarNodes->HasNext ())
-    {
-      csRef<iDocumentNode> svNode = shaderVarNodes->Next ();
-      csRef<iDocumentNode> newNode = 
-        shadervarsNode->CreateNodeBefore (svNode->GetType ());
-      CS::DocSystem::CloneNode (svNode, newNode);
-    }
-    
     if (graphs.GetSize() > 0)
     {
       size_t techNum = graphs[0].GetSize();
       for (size_t g = 1; g < graphs.GetSize(); g++)
       {
         techNum *= graphs[g].GetSize();
+      }
+      if (progress)
+      {
+	progress->SetProgressDescription (
+	  "crystalspace.graphics3d.shadercompiler.weaver.synth",
+	  "Generating %zu techniques", techNum);
+	progress->SetTotal (techNum);
       }
       size_t currentTech = 0;
       while (currentTech < techNum)
@@ -151,7 +137,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  csRef<iDocumentNode> techniqueNode =
 	    shaderNode->CreateNodeBefore (CS_NODE_ELEMENT);
 	  techniqueNode->SetValue ("technique");
-	  techniqueNode->SetAttributeAsInt ("priority", int (techNum - currentTech));
+	  //techniqueNode->SetAttributeAsInt ("priority", int (techNum - currentTech));
+	  techNodes.Push (techniqueNode);
 	  
 	  bool aPassSucceeded = false;
 	  for (size_t g = 0; g < graphs.GetSize(); g++)
@@ -202,19 +189,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	}
 	
 	currentTech++;
+	if (progress) progress->Step (1);
       }
     }
-    
-    {
-      csRef<iDocumentNode> fallback = sourceNode->GetNode ("fallbackshader");
-      if (fallback.IsValid())
-      {
-        csRef<iDocumentNode> newFallback = shaderNode->CreateNodeBefore (CS_NODE_ELEMENT);
-        CS::DocSystem::CloneNode (fallback, newFallback);
-      }
-    }
-    
-    return csPtr<iDocument> (synthesizedDoc);
   }
 
   bool Synthesizer::SynthesizeTechnique (ShaderVarNodesHelper& shaderVarNodes, 
