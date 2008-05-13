@@ -1,5 +1,7 @@
 1.2 branch log.
 
+13-May-2008
+	- Vincent merged r29582 into 1.2 (set svn:eol-style for atomicops.h).
 21-Apr-2008
 	- Vincent merged r29350 into 1.2 (fix for dynamic lights not shining
 	  on certain objects).
