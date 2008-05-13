@@ -202,6 +202,9 @@ protected:
     csHash<Template, TempString<>, TempHeapAlloc> templates;
     csArray<int, csArrayElementHandler<int>, TempHeapAlloc> ascendStack;
     csSet<TempString<>, TempHeapAlloc> defines;
+    
+    csRef<iVFS> vfs;
+    csHash<csRef<iDocumentNode>, TempString<>, TempHeapAlloc> includesCache;
   };
   csRef<GlobalProcessingState> globalState;
 

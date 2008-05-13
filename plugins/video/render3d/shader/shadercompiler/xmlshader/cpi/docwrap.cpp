@@ -669,48 +669,59 @@ void csWrappedDocumentNode::ProcessInclude (ConditionEval& eval,
 					    NodeProcessingState* state, 
 					    iDocumentNode* node)
 {
-  csRef<iVFS> vfs = csQueryRegistry<iVFS> (shared->objreg);
-  CS_ASSERT (vfs.IsValid ());
-  csRef<iFile> include = vfs->Open (filename, VFS_FILE_READ);
-  if (!include.IsValid ())
+  iVFS* vfs = globalState->vfs;
+  csRef<iDataBuffer> pathExpanded = vfs->ExpandPath (filename);
+  
+  csRef<iDocumentNode> includeNode;
+  includeNode = globalState->includesCache.Get (pathExpanded->GetData(),
+    (iDocumentNode*)0);
+  if (!includeNode.IsValid())
   {
-    Report (syntaxErrorSeverity, node,
-      "could not open '%s'", filename.GetData ());
-  }
-  else
-  {
-    csRef<iDocumentSystem> docsys (
-      csQueryRegistry<iDocumentSystem> (shared->objreg));
-    if (!docsys.IsValid())
-      docsys.AttachNew (new csTinyDocumentSystem ());
-
-    csRef<iDocument> includeDoc = docsys->CreateDocument ();
-    const char* err = includeDoc->Parse (include, false);
-    if (err != 0)
+    csRef<iFile> include = vfs->Open (filename, VFS_FILE_READ);
+    if (!include.IsValid ())
     {
       Report (syntaxErrorSeverity, node,
-	"error parsing '%s': %s", filename.GetData (), err);
+	"could not open '%s'", filename.GetData ());
     }
     else
     {
-      csRef<iDocumentNode> rootNode = includeDoc->GetRoot ();
-      csRef<iDocumentNode> includeNode = rootNode->GetNode ("include");
-      if (!includeNode)
+      csRef<iDocumentSystem> docsys (
+	csQueryRegistry<iDocumentSystem> (shared->objreg));
+      if (!docsys.IsValid())
+	docsys.AttachNew (new csTinyDocumentSystem ());
+  
+      csRef<iDocument> includeDoc = docsys->CreateDocument ();
+      const char* err = includeDoc->Parse (include, false);
+      if (err != 0)
       {
-	Report (syntaxErrorSeverity, rootNode,
-	  "%s: no <include> node", filename.GetData ());
+	Report (syntaxErrorSeverity, node,
+	  "error parsing '%s': %s", filename.GetData (), err);
 	return;
       }
-      csVfsDirectoryChanger dirChange (vfs);
-      dirChange.ChangeTo (filename);
-
-      csRef<iDocumentNodeIterator> it = includeNode->GetNodes ();
-      while (it->HasNext ())
+      else
       {
-	csRef<iDocumentNode> child = it->Next ();
-	ProcessSingleWrappedNode (eval, state, child);
+	csRef<iDocumentNode> rootNode = includeDoc->GetRoot ();
+        includeNode = rootNode->GetNode ("include");
+	if (!includeNode)
+	{
+	  Report (syntaxErrorSeverity, rootNode,
+	    "%s: no <include> node", filename.GetData ());
+	  return;
+	}
+	globalState->includesCache.Put (pathExpanded->GetData(),
+          includeNode);
       }
     }
+  }
+  
+  csVfsDirectoryChanger dirChange (vfs);
+  dirChange.ChangeTo (filename);
+
+  csRef<iDocumentNodeIterator> it = includeNode->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    ProcessSingleWrappedNode (eval, state, child);
   }
 }
 
@@ -2223,6 +2234,8 @@ csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapper (
     for (size_t i = 0; i < extraNodes.GetSize(); i++)
     {
       csRef<csWrappedDocumentNode::GlobalProcessingState> globalState;
+      globalState->vfs = csQueryRegistry<iVFS> (objreg);
+      CS_ASSERT (globalState->vfs);
       globalState.AttachNew (csWrappedDocumentNode::GlobalProcessingState::Create ());
       /* "extra nodes" here just contribute to the conditions in the condition
        * tree, so they're parsed, but not retained. */
@@ -2231,6 +2244,8 @@ csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapper (
     }
     csRef<csWrappedDocumentNode::GlobalProcessingState> globalState;
     globalState.AttachNew (csWrappedDocumentNode::GlobalProcessingState::Create ());
+    globalState->vfs = csQueryRegistry<iVFS> (objreg);
+    CS_ASSERT (globalState->vfs);
     node = new csWrappedDocumentNode (eval, 0, wrappedNode, resolver, this,
       globalState);
     eval.condTree.ToResolver (resolver);
@@ -2282,6 +2297,8 @@ csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapperStatic (
   {
     csRef<csWrappedDocumentNode::GlobalProcessingState> globalState;
     globalState.AttachNew (csWrappedDocumentNode::GlobalProcessingState::Create ());
+    globalState->vfs = csQueryRegistry<iVFS> (objreg);
+    CS_ASSERT (globalState->vfs);
     EvalStatic eval (resolver);
     node = new csWrappedDocumentNode (eval, 0, wrappedNode, resolver, this, 
       globalState);

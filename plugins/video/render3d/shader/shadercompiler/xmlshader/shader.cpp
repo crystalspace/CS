@@ -572,7 +572,11 @@ void csXMLShader::Load (iDocumentNode* source)
   csRef<iDocumentNode> fallbackNode = shaderSource->GetNode ("fallbackshader");
   if (fallbackNode.IsValid())
   {
-    fallbackShader = compiler->synldr->ParseShaderRef (ldr_context,
+    if (fallbackNode->GetAttribute ("file").IsValid())
+      fallbackShader = compiler->synldr->ParseShaderRef (ldr_context,
+	fallbackNode);
+    else
+      fallbackShader = compiler->synldr->ParseShader (ldr_context,
 	fallbackNode);
   }
 }

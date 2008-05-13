@@ -28,8 +28,8 @@
 
 #include "cpi/condition.h"
 
-struct iSyntaxService;
 struct iLoaderContext;
+struct iSyntaxService;
 struct iVFS;
 
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
