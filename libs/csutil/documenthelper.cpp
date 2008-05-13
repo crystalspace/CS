@@ -29,6 +29,7 @@ namespace DocSystem
   csString FlattenNode (iDocumentNode* node)
   {
     csString str;
+    str.SetGrowsBy (0);
     str << node->GetValue ();
     csRef<iDocumentAttributeIterator> attrIter = node->GetAttributes ();
     if (attrIter)
