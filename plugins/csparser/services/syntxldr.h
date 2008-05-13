@@ -164,6 +164,8 @@ public:
 
   virtual csRef<iShader> ParseShaderRef (iLoaderContext* ldr_context,
       iDocumentNode* node);
+  virtual csRef<iShader> ParseShader (iLoaderContext* ldr_context,
+      iDocumentNode* node);
 
   virtual void ReportError (const char* msgid, iDocumentNode* errornode,
 	const char* msg, ...);

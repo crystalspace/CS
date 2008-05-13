@@ -6115,45 +6115,13 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
       return false;
     }
   }
-
-  const char* name = shaderNode->GetAttributeValue ("name");
-  if (ldr_context->CheckDupes () && name)
+  
+  csRef<iShader> shader = SyntaxService->ParseShader (ldr_context, shaderNode);
+  if (shader.IsValid())
   {
-    iShader* shader = shaderMgr->GetShader (name);
-    if (shader)
-    {
-      AddToRegionOrCollection (ldr_context, shader->QueryObject ());
-      return true;
-    }
-  }
-
-  const char* type = shaderNode->GetAttributeValue ("compiler");
-  if (type == 0)
-    type = shaderNode->GetAttributeValue ("type");
-  if (type == 0)
-  {
-    SyntaxService->ReportError ("crystalspace.maploader", shaderNode,
-      "'compiler' attribute is missing!");
-
-    return false;
-  }
-  csRef<iShaderCompiler> shcom = shaderMgr->GetCompiler (type);
-  if (!shcom.IsValid()) 
-  {
-    SyntaxService->ReportError ("crystalspace.maploader", shaderNode,
-      "Could not get shader compiler '%s'", type);
-    return false;
-  }
-  csRef<iShader> shader = shcom->CompileShader (ldr_context, shaderNode);
-  if (shader)
-  {
-    shader->SetFileName(fileChild->GetContentsValue ());
     AddToRegionOrCollection (ldr_context, shader->QueryObject ());
-    shaderMgr->RegisterShader (shader);
   }
-  else 
-    return false;
-  return true;
+  return shader.IsValid();
 }
 
 void csLoader::CollectAllChildren (iMeshWrapper* meshWrapper,
