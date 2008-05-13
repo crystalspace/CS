@@ -215,20 +215,20 @@ protected:
     WrapperStackEntry& elseWrapper);
   template<typename ConditionEval>
   void ProcessInclude (ConditionEval& eval, const TempString<>& filename, 
-    NodeProcessingState* state, iDocumentNode* node);
+    NodeProcessingState* state, iDocumentNode* node, bool noDescend);
   /**
    * Process a node when a Template or Generate is active.
    * Returns 'true' if the node was handled.
    */
   template<typename ConditionEval>
   bool ProcessTemplate (ConditionEval& eval, iDocumentNode* templNode, 
-    NodeProcessingState* state);
+    NodeProcessingState* state, bool noDescend);
   bool InvokeTemplate (Template* templ, const Template::Params& params,
     Template::Nodes& templatedNodes);
   template<typename ConditionEval>
   bool InvokeTemplate (ConditionEval& eval, const char* name, 
     iDocumentNode* node, NodeProcessingState* state, 
-    const Template::Params& params);
+    const Template::Params& params, bool noDescend);
   /// Validate that a 'Template' was properly matched by an 'Endtemplate'
   void ValidateTemplateEnd (iDocumentNode* node, 
     NodeProcessingState* state);
@@ -261,12 +261,13 @@ protected:
 
   template<typename ConditionEval>
   void ProcessSingleWrappedNode (ConditionEval& eval, 
-    NodeProcessingState* state, iDocumentNode* wrappedNode);
+    NodeProcessingState* state, iDocumentNode* wrappedNode,
+    bool noDescend);
   template<typename ConditionEval>
   void ProcessWrappedNode (ConditionEval& eval, NodeProcessingState* state,
-  	iDocumentNode* wrappedNode);
+    iDocumentNode* wrappedNode, bool noDescend);
   template<typename ConditionEval>
-  void ProcessWrappedNode (ConditionEval& eval);
+  void ProcessWrappedNode (ConditionEval& eval, bool noDescend);
   void Report (int severity, iDocumentNode* node, const char* msg, ...);
   
   static void AppendNodeText (WrapperWalker& walker, csString& text);
@@ -277,7 +278,11 @@ protected:
     iDocumentNode* wrappedNode,
     iConditionResolver* resolver,
     csWrappedDocumentNodeFactory* shared, 
-    GlobalProcessingState* globalState);
+    GlobalProcessingState* globalState,
+    bool noDescend);
+  csWrappedDocumentNode (csWrappedDocumentNode* parent,
+    iDocumentNode* wrappedNode,
+    csWrappedDocumentNodeFactory* shared);
   csWrappedDocumentNode (csWrappedDocumentNode* parent,
     iConditionResolver* resolver,
     csWrappedDocumentNodeFactory* shared);
@@ -425,7 +430,8 @@ public:
    */
   csWrappedDocumentNode* CreateWrapper (iDocumentNode* wrappedNode,
     iConditionResolver* resolver, csConditionEvaluator& evaluator, 
-    const csRefArray<iDocumentNode>& extraNodes, csString* dumpOut);
+    const csRefArray<iDocumentNode>& extraNodes, csString* dumpOut,
+    bool noDescend = false);
   csWrappedDocumentNode* CreateWrapperStatic (iDocumentNode* wrappedNode,
     iConditionResolver* resolver, csString* dumpOut);
     
