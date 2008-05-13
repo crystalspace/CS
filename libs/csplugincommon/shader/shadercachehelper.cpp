@@ -57,9 +57,7 @@ namespace CS
           
 	if (doc != 0)
 	{
-	  DocStackEntry newEntry;
-	  newEntry.docNode = doc;
-	  scanStack.Push (newEntry);
+	  PushReferencedFiles (doc);
 	}
       }
       
@@ -256,11 +254,11 @@ namespace CS
       
       bool WriteDataBuffer (iFile* file, iDataBuffer* buf)
       {
-        size_t bufSize = buf->GetSize();
+        size_t bufSize = buf ? buf->GetSize() : 0;
 	uint32 sizeLE = csLittleEndian::UInt32 (bufSize);
 	if (file->Write ((char*)&sizeLE, sizeof (sizeLE)) != sizeof (sizeLE))
 	  return false;
-	if (file->Write (buf->GetData(), bufSize) != bufSize)
+	if (buf && (file->Write (buf->GetData(), bufSize) != bufSize))
 	  return false;
 	  
 	size_t pad = 4 - (bufSize & 3);

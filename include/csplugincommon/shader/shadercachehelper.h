@@ -44,9 +44,9 @@ namespace CS
     namespace ShaderCacheHelper
     {
       /**
-       * Computes a hash for a shader document, including all referenced
-       * documents (ie external files pulled in via "file" attributes or
-       * ?Include? PIs).
+       * Computes a hash for all referenced documents documents (ie external 
+       * files pulled in via "file" attributes or ?Include? PIs) of a shader
+       * document.
        */
       class CS_CRYSTALSPACE_EXPORT ShaderDocHasher
       {
@@ -67,7 +67,10 @@ namespace CS
         csMemFile actualHashes;
         csSet<csString> seenFiles;
       public:
-        /// Set up a hasher for the given node
+        /**
+         * Set up a hasher for the given node.
+         * \remarks A hash for \a doc itself is <b>not</b> recorded!
+         */
         ShaderDocHasher (iObjectRegistry* objReg, iDocumentNode* doc);
         
         /// Get the hash data for the given node and all included documents
