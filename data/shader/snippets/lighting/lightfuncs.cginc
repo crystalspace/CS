@@ -241,9 +241,9 @@ void ComputeLight (LightSpace lightSpace, Light light,
     attn = Attenuation_CLQ (lightDist, lightAttenuationVec.xyz);
   
   half shadowed = shadow.GetVisibility();
-  attn = shadowed;
+  attn *= shadowed;
 
-  d = lightDiffuse * /*lightCoeff.y * spot */ attn;
+  d = lightDiffuse * lightCoeff.y * spot * attn;
   s = lightSpecular * lightCoeff.z * spot * attn;
 }
 

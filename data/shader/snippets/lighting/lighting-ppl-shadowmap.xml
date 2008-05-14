@@ -129,6 +129,11 @@
 	<input name="lightOffset" type="int" default="value" defval="0"/>
 	<input name="maxLights" type="int" default="value" defval="3"/>
 	
+	<block location="shadervars">
+	  <!-- @@@ FIXME: This needs to be solved in a better way -->
+	  <!-- @@@ FIXME2: And it doesn't even work. -->
+	  <!-- shadervar name="tex shadow noise" type="texture">/data/shadow_noise.png</shadervar -->
+	</block>
 	<block location="pass">
 	  <?Include /shader/snippets/lighting/lighting-tools.inc ?>
 	  
