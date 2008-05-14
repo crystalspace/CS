@@ -16,25 +16,29 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "csutil/platform.h"
-#include "memutil.h"
+#ifndef __CSUTIL_PLATFORM_H__
+#define __CSUTIL_PLATFORM_H__
+
+#include "cssysdef.h"
+#include "csextern.h"
 
 namespace CS {
   namespace Platform {
 
-    size_t GetPhysicalMemorySize()
-    {
-      static size_t memorySize = 0;
-      static bool cacheValid = false;
+    /**
+     * Retrieve the number of kB of physical system memory.
+     *
+     * @returns Physical system memory (in kB) on success, or 0 on failure.
+     */
+   CS_CRYSTALSPACE_EXPORT size_t GetPhysicalMemorySize();
 
-      if (!cacheValid)
-      {
-        memorySize = CS::Platform::Implementation::GetPhysicalMemorySize();
-        cacheValid = true;
-      }
+   /**
+    * Retrieve the number of processors in the system.
+    * \returns Number of processors, or 0 on failure.
+    */
+   CS_CRYSTALSPACE_EXPORT uint GetProcessorCount();
 
-      return memorySize;
-
-    } // End GetPhysicalMemorySize()      
   } // End namespace Platform
 } // End namespace CS
+
+#endif // __CSUTIL_PLATFORM_H__

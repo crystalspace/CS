@@ -12,6 +12,7 @@ CSUTIL.GENERIC +=
   mmap.cpp
   pathutil.cpp 
   pluginpaths.cpp
+  processorcount.cpp
   printf.cpp
   scanplugins.cpp
   setenv.cpp

@@ -1840,6 +1840,18 @@ AC_LANG_POP([C++])
 
 
 #------------------------------------------------------------------------------
+# Check for processor count related things
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD([for sysconf(_SC_NPROCESSORS_ONLN)], [cs_cv_sysconf_processors],
+    [AC_LANG_PROGRAM(
+	[[#include <unistd.h>]],
+	[sysconf(_SC_NPROCESSORS_ONLN);])],
+    [],[],
+    [CS_HEADER_PROPERTY([CS_HAVE_SYSCONF_PROCESSORS])])
+   
+
+
+#------------------------------------------------------------------------------
 # Check if TemplateToolkit2 is installed (needed for MSVC project generation).
 #------------------------------------------------------------------------------
 CS_CHECK_TEMPLATE_TOOLKIT2([emit])

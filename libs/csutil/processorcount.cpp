@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 by Scott Johnson <scottj@cs.umn.edu>
+    Copyright (C) 2008 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -17,24 +17,28 @@
 */
 
 #include "csutil/platform.h"
-#include "memutil.h"
 
-namespace CS {
-  namespace Platform {
-
-    size_t GetPhysicalMemorySize()
+namespace CS
+{
+  namespace Platform
+  {
+    namespace Implementation
     {
-      static size_t memorySize = 0;
-      static bool cacheValid = false;
+      uint GetProcessorCount();
+    }
 
-      if (!cacheValid)
+    uint GetProcessorCount()
+    {
+      static bool processorCountCached = false;
+      static uint processorCount = 0;
+
+      if (!processorCountCached)
       {
-        memorySize = CS::Platform::Implementation::GetPhysicalMemorySize();
-        cacheValid = true;
+        processorCount = Implementation::GetProcessorCount();
+        processorCountCached = true;
       }
 
-      return memorySize;
-
-    } // End GetPhysicalMemorySize()      
-  } // End namespace Platform
-} // End namespace CS
+      return processorCount;
+    }
+  } // namespace Platform
+} // namespace CS
