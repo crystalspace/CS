@@ -831,8 +831,8 @@ private:
    * this forces the search to be global. In this case 'global' will be set
    * to true.
    */
-  char* SplitRegionName(const char* name, iRegion*& region, bool& global);
-  char* SplitCollectionName(const char* name, iCollection*& collection, bool& global);
+  const char* SplitRegionName(const char* name, iRegion*& region, bool& global);
+  const char* SplitCollectionName(const char* name, iCollection*& collection, bool& global);
 
   // Precache a single mesh
   void PrecacheMesh (iMeshWrapper* s, iRenderView* rview);

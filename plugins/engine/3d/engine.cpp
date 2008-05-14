@@ -1900,13 +1900,13 @@ void csEngine::ControlMeshes ()
   }
 }
 
-char* csEngine::SplitRegionName(const char* name, iRegion*& region,
+const char* csEngine::SplitRegionName(const char* name, iRegion*& region,
 	bool& global)
 {
   region = 0;
   global = false;
 
-  char* p = (char*)strchr (name, '/');
+  const char* p = strchr (name, '/');
   if (!p) return (char*)name;
   if (*name == '*' && *(name+1) == '/')
   {
@@ -1914,30 +1914,28 @@ char* csEngine::SplitRegionName(const char* name, iRegion*& region,
     return p+1;
   }
 
-  *p = 0;
-  region = regions.FindByName (name);
-  *p = '/';
+  csString regionPart (name, p - name);
+  region = regions.FindByName (regionPart);
   if (!region) return 0;
   return p+1;
 }
 
-char* csEngine::SplitCollectionName(const char* name, iCollection*& collection,
+const char* csEngine::SplitCollectionName(const char* name, iCollection*& collection,
 	bool& global)
 {
   collection = 0;
   global = false;
 
-  char* p = (char*)strchr (name, '/');
-  if (!p) return (char*)name;
+  const char* p = strchr (name, '/');
+  if (!p) return name;
   if (*name == '*' && *(name+1) == '/')
   {
     global = true;
     return p+1;
   }
 
-  *p = 0;
-  collection = GetCollection(name);
-  *p = '/';
+  csString collectionPart (name, p - name);
+  collection = GetCollection (collectionPart);
   if (!collection) return 0;
   return p+1;
 }
@@ -1962,7 +1960,7 @@ iMaterialWrapper* csEngine::FindMaterialRegion(const char* name,
 {
   iRegion* region;
   bool global;
-  char* n = SplitRegionName (name, region, global);
+  const char* n = SplitRegionName (name, region, global);
   if (!n) return 0;
 
   iMaterialWrapper* mat;
@@ -1980,7 +1978,7 @@ iMaterialWrapper* csEngine::FindMaterialCollection(const char* name,
 {
   iCollection* collection;
   bool global;
-  char* n = SplitCollectionName (name, collection, global);
+  const char* n = SplitCollectionName (name, collection, global);
   if (!n) return 0;
 
   iMaterialWrapper* mat;
@@ -2013,7 +2011,7 @@ iTextureWrapper* csEngine::FindTextureRegion (const char* name,
 {
   iRegion* region;
   bool global;
-  char* n = SplitRegionName (name, region, global);
+  const char* n = SplitRegionName (name, region, global);
   if (!n) return 0;
 
   iTextureWrapper* txt;
@@ -2031,7 +2029,7 @@ iTextureWrapper* csEngine::FindTextureCollection (const char* name,
 {
   iRegion* collection;
   bool global;
-  char* n = SplitRegionName (name, collection, global);
+  const char* n = SplitRegionName (name, collection, global);
   if (!n) return 0;
 
   iTextureWrapper* txt;
@@ -2064,7 +2062,7 @@ iSector* csEngine::FindSectorRegion (const char* name,
 {
   iRegion* region;
   bool global;
-  char* n = SplitRegionName (name, region, global);
+  const char* n = SplitRegionName (name, region, global);
   if (!n) return 0;
 
   iSector* sect;
@@ -2082,7 +2080,7 @@ iSector* csEngine::FindSectorCollection (const char* name,
 {
   iCollection* collection;
   bool global;
-  char* n = SplitCollectionName (name, collection, global);
+  const char* n = SplitCollectionName (name, collection, global);
   if (!n) return 0;
 
   csRef<iSector> sect;
@@ -2115,7 +2113,7 @@ iMeshWrapper* csEngine::FindMeshObjectRegion (const char* name,
 {
   iRegion* region;
   bool global;
-  char* n = SplitRegionName (name, region, global);
+  const char* n = SplitRegionName (name, region, global);
   if (!n) return 0;
 
   iMeshWrapper* mesh;
@@ -2133,7 +2131,7 @@ iMeshWrapper* csEngine::FindMeshObjectCollection (const char* name,
 {
   iCollection* collection;
   bool global;
-  char* n = SplitCollectionName(name, collection, global);
+  const char* n = SplitCollectionName(name, collection, global);
   if (!n) return 0;
 
   iMeshWrapper* mesh;
@@ -2166,7 +2164,7 @@ iMeshFactoryWrapper* csEngine::FindMeshFactoryRegion (const char* name,
 {
   iRegion* region;
   bool global;
-  char* n = SplitRegionName (name, region, global);
+  const char* n = SplitRegionName (name, region, global);
   if (!n) return 0;
 
   iMeshFactoryWrapper* fact;
@@ -2184,7 +2182,7 @@ iMeshFactoryWrapper* csEngine::FindMeshFactoryCollection (const char* name,
 {
   iCollection* collection;
   bool global;
-  char* n = SplitCollectionName (name, collection, global);
+  const char* n = SplitCollectionName (name, collection, global);
   if (!n) return 0;
 
   iMeshFactoryWrapper* fact;
@@ -2217,7 +2215,7 @@ iCameraPosition* csEngine::FindCameraPositionRegion (const char* name,
 {
   iRegion* region;
   bool global;
-  char* n = SplitRegionName (name, region, global);
+  const char* n = SplitRegionName (name, region, global);
   if (!n) return 0;
 
   iCameraPosition* campos;
@@ -2235,7 +2233,7 @@ iCameraPosition* csEngine::FindCameraPositionCollection (const char* name,
 {
   iCollection* collection;
   bool global;
-  char* n = SplitCollectionName (name, collection, global);
+  const char* n = SplitCollectionName (name, collection, global);
   if (!n) return 0;
 
   iCameraPosition* campos;
