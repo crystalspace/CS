@@ -356,6 +356,9 @@ namespace RenderManager
 	  }
 	  for (; realNum < maxPassLights; realNum++)
 	  {
+	    if (!sortedLights.GetNextLight (lightType, skipStatic, 
+		renderLights[firstLight + realNum]))
+	      break;
 	    uint lightSubLights = renderLights[firstLight + realNum].numSubLights;
 	    /* We have a subset of the lights that are of the same type.
 	     * Check the size of it against the shader limit */
@@ -367,9 +370,6 @@ namespace RenderManager
 	       layerConfig.GetMaxLightPasses (layer))
 	      && ((layerConfig.GetMaxLightPasses (layer) - 
 	        (totalLayers + newPassLayers)) < lightSubLights))
-	      break;
-	    if (!sortedLights.GetNextLight (lightType, skipStatic, 
-		renderLights[firstLight + realNum]))
 	      break;
 	    virtNum += lightSubLights;
 	    thisPassLayers = newPassLayers;
@@ -498,7 +498,7 @@ namespace RenderManager
 	      if (currentSublight >= thisLightSVs->GetSublightNum())
 	      {
 	        currentLight++;
-	        currentLight = 0;
+	        currentSublight = 0;
 	      }
     
 	      lightVarsHelper.MergeAsArrayItems (localStack,
