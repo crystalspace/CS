@@ -148,11 +148,21 @@ namespace RenderManager
           {
             case CS_LIGHT_DIRECTIONAL:
               numFrustums = 1;
-	      lightProject = CS::Math::Matrix4 (
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, -1, 0,
-		0, 0, 0, 1);
+              {
+		lightProject = CS::Math::Matrix4 (
+		  1.0f/lightCutoff, 0, 0, 0,
+		  0, 1.0f/lightCutoff, 0, 0,
+		  0, 0, -1, 0,
+		  0, 0, 0, 1);
+		/*CS::Math::Matrix4 flipZW (
+		  1, 0, 0, 0,
+		  0, 1, 0, 0,
+		  0, 0, -1, 0,
+		  0, 0, 0, -1);
+		lightProject = flipZW * CS::Math::Projections::Ortho (
+		  -lightCutoff, lightNear, -lightCutoff, lightCutoff,
+		  lightNear, lightCutoff);*/
+	      }
               break;
             case CS_LIGHT_POINTLIGHT:
             case CS_LIGHT_SPOTLIGHT:
@@ -178,10 +188,10 @@ namespace RenderManager
           static const csMatrix3 frustRotationMatrices[6] =
           {
             csMatrix3 (), // must be identity
-            csMatrix3 (1, 0, 0,  0, 0, 1,  0, -1, 0),
-            csMatrix3 (1, 0, 0,  0, 0, -1,  0, 1, 0),
-            csMatrix3 (0, 0, -1,  0, 1, 0,  1, 0, 0),
             csMatrix3 (0, 0, 1,  0, 1, 0,  -1, 0, 0),
+            csMatrix3 (1, 0, 0,  0, 0, 1,  0, -1, 0),
+            csMatrix3 (0, 0, -1,  0, 1, 0,  1, 0, 0),
+            csMatrix3 (1, 0, 0,  0, 0, -1,  0, 1, 0),
             csMatrix3 (1, 0, 0,  0, -1, 0,  0, 0, -1) // last must be 180 deg into other direction
           };
 	  csVector2 corner2D[4] = {
@@ -311,15 +321,6 @@ namespace RenderManager
 	    const typename SuperFrustum::Frustum& lightFrust = superFrust.frustums[f];
 	    if (lightFrust.containedObjectsPP.GetSize() == 0) continue;
 	    
-	    CS::RenderManager::RenderView* rview = context.renderView;
-	  #include "csutil/custom_new_disable.h"
-	    csRef<CS::RenderManager::RenderView> newRenderView;
-	    newRenderView.AttachNew (new (
-	      renderTree.GetPersistentData().renderViewPool) RenderView);
-	  #include "csutil/custom_new_enable.h"
-	    newRenderView->SetEngine (rview->GetEngine ());
-	    newRenderView->SetThisSector (rview->GetThisSector ());
-	    
 	    /* Fit map to the bounding box of all shadowed objects.
 	      Serves two purposes:
 	      - If some objects cut the split plane (ie extend over the initial
@@ -332,6 +333,31 @@ namespace RenderManager
 	    {
 	      allObjsBoxPP += lightFrust.containedObjectsPP[i];
 	    }
+	    csBox3 clipToView;
+	    if (light->GetType() == CS_LIGHT_DIRECTIONAL)
+	      clipToView = csBox3 (csVector3 (-1, -1, -HUGE_VALF),
+	        csVector3 (1, 1, 0));
+	    else
+	      clipToView = csBox3 (csVector3 (-1, -1, 0),
+	        csVector3 (1, 1, HUGE_VALF));
+	    allObjsBoxPP *= clipToView;
+	    if (allObjsBoxPP.Empty())
+	    {
+	      /*csPrintf ("lightFrust.containedObjectsPP.GetSize() = %zu\n",
+	        lightFrust.containedObjectsPP.GetSize());
+	      csPrintf ("allObjsBoxPP = %s\n",
+	        allObjsBoxPP.Description().GetData());*/
+	      //continue;
+	    }
+	    
+	    CS::RenderManager::RenderView* rview = context.renderView;
+	  #include "csutil/custom_new_disable.h"
+	    csRef<CS::RenderManager::RenderView> newRenderView;
+	    newRenderView.AttachNew (new (
+	      renderTree.GetPersistentData().renderViewPool) RenderView);
+	  #include "csutil/custom_new_enable.h"
+	    newRenderView->SetEngine (rview->GetEngine ());
+	    newRenderView->SetThisSector (rview->GetThisSector ());
 	    
 	    const float frustW = allObjsBoxPP.MaxX() - allObjsBoxPP.MinX();
 	    const float frustH = allObjsBoxPP.MaxY() - allObjsBoxPP.MinY();
@@ -346,6 +372,8 @@ namespace RenderManager
 	      0, cropScaleY, 0, cropShiftY,
 	      0, 0, 1, 0,
 	      0, 0, 0, 1);
+	    //csPrintf (" crop = %s\n", crop.Description().GetData());
+	    //csPrintf (" allObjsBoxPP = %s\n", allObjsBoxPP.Description().GetData());
 	      
 	    /* The minimum Z over all parts is used to avoid clipping shadows of 
 	      casters closer to the light than the split plane */
@@ -353,12 +381,14 @@ namespace RenderManager
 	    //allMinZ = csMax (allMinZ, 0.0f);
 	    float maxZ = allObjsBoxPP.MaxZ();
 	    /* Consider using DepthRange? */
-	    float n = allMinZ;
+	    float n = allObjsBoxPP.MinZ();//allMinZ;
 	    float f = maxZ + EPSILON;
-	    /* Sometimes n==f which would result in an invalid matrix w/O EPSILON */
+	    //csPrintf (" n = %f  f = %f\n", n, f);
+	    /* Sometimes n==f which would result in an invalid matrix w/o EPSILON */
 	    CS::Math::Matrix4 Mortho = CS::Math::Projections::Ortho (-1, 1, 1, -1, -n, -f);
 	    CS::Math::Matrix4 matrix = ((Mortho * crop) * lightData.lightProject)
 	     * CS::Math::Matrix4 (superFrust.frustumRotation);
+	    csPrintf ("matrix = %s\n", matrix.Description().GetData());
 	    
 	    int shadowMapSize;
 	    csReversibleTransform view = superFrust.world2light_base;
@@ -369,7 +399,7 @@ namespace RenderManager
 	    shadowViewCam->SetProjectionMatrix (matrix);
 	    shadowViewCam->GetCamera()->SetTransform (view);
 	    
-	    CS::Math::Matrix4 viewM (view);
+	    //CS::Math::Matrix4 viewM (view);
 	  
 	    for (int i = 0; i < 4; i++)
 	    {
@@ -385,7 +415,8 @@ namespace RenderManager
 	        uncropScaleX, uncropScaleY, uncropShiftX, uncropShiftY));
 	    }
 		
-	    shadowMapSize = 1024;
+            // @@@ FIXME: That should be configurable! Prolly per light type.
+	    shadowMapSize = 512;
 	    lightFrust.shadowMapDimSV->SetValue (csVector4 (1.0f/shadowMapSize,
 	      1.0f/shadowMapSize, shadowMapSize, shadowMapSize));
     
@@ -651,13 +682,15 @@ private:
       {
 	typename CachedLightData::SuperFrustum::Frustum& lightFrustum =
 	  superFrust.frustums[f];
+        //if (lightFrustum.volumePP.Empty()) continue;
 	if (!lightFrustum.volumeLS.TestIntersect (meshBboxLS))
+	//if (!lightFrustum.volumePP.TestIntersect (meshBboxLightPP))
 	{
 	  continue;
 	}
       
 	lightFrustum.containedObjectsPP.Push (meshBboxLightPP
-	  * lightFrustum.volumePP);
+	  /** lightFrustum.volumePP*/);
       
 	// Add shadow map SVs
 	lightVarsHelper.MergeAsArrayItem (lightStack,
