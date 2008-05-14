@@ -2283,7 +2283,6 @@ csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapper (
       globalState.AttachNew (csWrappedDocumentNode::GlobalProcessingState::Create ());
       globalState->vfs = csQueryRegistry<iVFS> (objreg);
       CS_ASSERT (globalState->vfs);
-      globalState.AttachNew (csWrappedDocumentNode::GlobalProcessingState::Create ());
       /* "extra nodes" here just contribute to the conditions in the condition
        * tree, so they're parsed, but not retained. */
       delete new csWrappedDocumentNode (eval, 0, extraNodes[i], resolver, 
