@@ -20,6 +20,7 @@
 
 #include "syntxldr.h"
 
+#include "iengine/engine.h"
 #include "imap/ldrctxt.h"
 #include "iutil/document.h"
 #include "ivaria/reporter.h"
@@ -37,6 +38,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(SyntaxService)
 bool csTextSyntaxService::ParseShaderVar (iLoaderContext* ldr_context,
     	iDocumentNode* node, csShaderVariable& var)
 {
+  csRef<iLoaderContext> engineLoaderContext;
+  if (ldr_context == 0)
+  {
+    csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
+    if (engine.IsValid())
+      engineLoaderContext = engine->CreateLoaderContext (0);
+    ldr_context = engineLoaderContext;
+  }
+
   const char *name = node->GetAttributeValue("name");
   if (name != 0)
   {
@@ -88,6 +98,7 @@ bool csTextSyntaxService::ParseShaderVar (iLoaderContext* ldr_context,
       break;
     case XMLTOKEN_TEXTURE:
       {
+        if (!ldr_context) break;
 	csRef<iTextureWrapper> tex;
         // @@@ This should be done in a better way...
 	//  @@@ E.g. lazy retrieval of the texture with an accessor?
