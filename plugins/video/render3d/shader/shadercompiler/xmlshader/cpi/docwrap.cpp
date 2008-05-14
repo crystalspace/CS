@@ -2280,6 +2280,7 @@ csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapper (
     for (size_t i = 0; i < extraNodes.GetSize(); i++)
     {
       csRef<csWrappedDocumentNode::GlobalProcessingState> globalState;
+      globalState.AttachNew (csWrappedDocumentNode::GlobalProcessingState::Create ());
       globalState->vfs = csQueryRegistry<iVFS> (objreg);
       CS_ASSERT (globalState->vfs);
       globalState.AttachNew (csWrappedDocumentNode::GlobalProcessingState::Create ());
