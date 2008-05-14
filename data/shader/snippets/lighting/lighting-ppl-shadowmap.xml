@@ -139,9 +139,10 @@
 	  <?else?>
 	    <?Generate L 0 7?>
 	      <texture name="light shadow map[$L$]" destination="lightPropsSM.shadowMap[$L$]"
-		      comparemode="rToTexture" comparefunc="gequal" />
+		      comparemode="rToTexture" comparefunc="lequal" />
 	    <?Endgenerate?>
 	  <?endif?>
+	  <texture name="tex shadow noise" destination="lightPropsSM.shadowMapNoise" />
 	</block>
 	
 	<block location="cg:variablemap">
@@ -251,11 +252,11 @@
 	      lightAttenuationVec, shadow, d, s);
 	    
 	  #if 0
-	    if (l == 0)
+	    if (i == 3)
 	      d*= float3 (1, 0, 0);
-            else if (l == 1)
+            else if (i == 4)
 	      d*= float3 (0, 1, 0);
-	    else if (l == 2)
+	    else if (i == 5)
 	      d*= float3 (0, 0, 1);
 	  #endif
 	    

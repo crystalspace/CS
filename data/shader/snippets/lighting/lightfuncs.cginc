@@ -147,6 +147,8 @@ struct LightPropertiesShadowMap
   // Shadow map pixel size + dimensions
   float4 shadowMapPixels[MAX_LIGHTS];
   float4 shadowMapUnscale[MAX_LIGHTS];
+  
+  sampler2D shadowMapNoise;
 };
 LightPropertiesShadowMap lightPropsSM;
 
@@ -241,7 +243,7 @@ void ComputeLight (LightSpace lightSpace, Light light,
   half shadowed = shadow.GetVisibility();
   attn = shadowed;
 
-  d = lightDiffuse * lightCoeff.y * spot * attn;
+  d = lightDiffuse * /*lightCoeff.y * spot */ attn;
   s = lightSpecular * lightCoeff.z * spot * attn;
 }
 
