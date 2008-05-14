@@ -30,5 +30,4 @@ CSUTIL.GENERIC +=
   getopt.cpp
   pluginpaths.cpp
   resdir.cpp
-  runloop.cpp
-  setenv.cpp ;
+  runloop.cpp ;
