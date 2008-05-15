@@ -5,4 +5,5 @@ InstallData [ Wildcard *.afp *.avp *.fvp *.xml *.cgvp ] : data shader-old ;
 SubInclude TOP data shader character ;
 SubInclude TOP data shader extrudeGlow ;
 SubInclude TOP data shader fresnelWater ;
+SubInclude TOP data shader fog ;
 
