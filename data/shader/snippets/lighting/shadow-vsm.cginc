@@ -30,6 +30,7 @@ struct ShadowShadowMapVSM : Shadow
   sampler2D shadowMap;
   float bias;
   float gradient;
+  float4 shadowMapUnscale;
 
   void InitVP (int lightNum, float4 surfPositionWorld,
                float3 normWorld,
@@ -64,11 +65,11 @@ struct ShadowShadowMapVSM : Shadow
     shadowMapCoords = vp_shadowMapCoords;
     shadowMap = lightPropsSM.shadowMap[lightNum];
     gradient = vp_gradient;
+    shadowMapUnscale = lightPropsSM.shadowMapUnscale[lightNum];
     
     // Project SM coordinates
     shadowMapCoordsProj = shadowMapCoords;
     shadowMapCoordsProj.xyz /= shadowMapCoordsProj.w;
-    shadowMapCoordsProj.xyz = (float3(0.5)*shadowMapCoordsProj.xyz) + float3(0.5);
     
     // @@@ FIXME: Needing such a high bias scale seems ridiculous!
     // Maybe fixing #471 would allow to reduce it.
@@ -78,16 +79,46 @@ struct ShadowShadowMapVSM : Shadow
   
   half GetVisibility()
   {
+    float2 shadowMapCoordsProjUnscaled = 
+      (shadowMapCoordsProj.xy) * shadowMapUnscale.xy + shadowMapUnscale.zw;
+    float3 shadowMapCoordsBiased = (float3(0.5)*shadowMapCoordsProj.xyz) + float3(0.5);
+  
+  ]]>
+    float in_frustum = 1;
+  <?if (vars."light type".int != consts.CS_LIGHT_DIRECTIONAL) ?>
+  <![CDATA[
+    /* Point and spot light shadows are computed by separately lighting up 
+       to 6 pyramids with an opening of 90 degs with a shadow map for each
+       of these light volumes.
+       Clip so points outside the light volume aren't lit.
+     */
+    float2 compResLT = shadowMapCoordsProjUnscaled.xy >= float2 (-1);
+    float2 compResBR = shadowMapCoordsProjUnscaled.xy < float2 (1);
+    in_frustum *= compResLT.x*compResLT.y*compResBR.x*compResBR.y;
+    in_frustum *= (shadowMapCoords.z <= shadowMapCoords.w);
+  ]]>
+  <?endif?>
+  <![CDATA[
+  
     // Depth to compare against
     /* @@@ TODO: Should prolly do some scaling by light cutoff
        so that depth gets 1 at the cutoff */
-    float compareDepth = saturate (1-shadowMapCoordsProj.z) - bias;
-    float2 shadowDepth = float2(1) - tex2D (shadowMap, shadowMapCoordsProj.xy).xy;
-    if (compareDepth <= shadowDepth.x) return 1;
-    float var = saturate (shadowDepth.y - shadowDepth.x*shadowDepth.x);
+    //float compareDepth = shadowMapCoordsProj.z*-0.5 - 0.5;
+    //float compareDepth = (1 - saturate (shadowMapCoordsBiased.z)) /*- bias*/;
+    float compareDepth = (1.0 - shadowMapCoordsBiased.z);
+    //float compareDepth = shadowMapCoordsBiased.z /*- bias*/;
+    float2 shadowDepth = tex2D (shadowMap, shadowMapCoordsBiased.xy).xy;
+    //debug (float4 (float3 (shadowDepth.x), 1));
+    //debug (float4 (shadowDepth.x, 1-shadowMapCoordsBiased.z, 0, 1));
+  
+    //return compareDepth * in_frustum;
+    return abs (shadowDepth.x - compareDepth) * in_frustum;
+    if (compareDepth <= shadowDepth.x) return in_frustum;
+    /*float var = saturate (shadowDepth.y - shadowDepth.x*shadowDepth.x);
     float d = (shadowDepth.x-compareDepth);
     float p_max = var/(var+d*d);
-    return p_max;
+    return p_max * in_frustum;*/
+    return 0;
   }
 };
 
