@@ -7,6 +7,5 @@ SubInclude TOP data shader lighting ;
 SubInclude TOP data shader reflect ;
 SubInclude TOP data shader shadowmap ;
 SubInclude TOP data shader snippets ;
-SubInclude TOP data shader specular ;
 SubInclude TOP data shader surface ;
 SubInclude TOP data shader uvanim ;

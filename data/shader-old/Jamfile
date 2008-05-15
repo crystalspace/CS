@@ -8,4 +8,5 @@ SubInclude TOP data shader fresnelWater ;
 SubInclude TOP data shader fog ;
 SubInclude TOP data shader parallax ;
 SubInclude TOP data shader parallaxAtt ;
+SubInclude TOP data shader specular ;
 
