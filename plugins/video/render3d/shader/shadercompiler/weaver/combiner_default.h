@@ -34,13 +34,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     public scfImplementation1<CombinerDefault,
 			      CS::PluginCommon::ShaderWeaver::iCombiner>
   {
-    WeaverCompiler* compiler;
+    const WeaverCompiler* compiler;
   
-    csStringHash& xmltokens;
+    const csStringHash& xmltokens;
     csRefArray<iDocumentNode> passNodes;
     ShaderVarNodesHelper& shaderVarNodes;
   public:
-    CombinerDefault (WeaverCompiler* compiler,
+    CombinerDefault (const WeaverCompiler* compiler,
       ShaderVarNodesHelper& shaderVarNodes);
     
     void BeginSnippet (const char* annotation);

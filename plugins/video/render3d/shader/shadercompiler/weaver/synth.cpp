@@ -169,7 +169,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 		passNode->CreateNodeBefore (srcNode->GetType());
 	      CS::DocSystem::CloneNode (srcNode, dstNode);
 	    }
-	    if (!SynthesizeTechnique (shaderVarNodesHelper, passNode, snippet, graph))
+	    SynthesizeTechnique synthTech (compiler, this);
+	    if (!synthTech (shaderVarNodesHelper, passNode, snippet, graph))
 	      techniqueNode->RemoveNode (passNode);
 	    else
 	      aPassSucceeded = true;
@@ -194,10 +195,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     }
   }
 
-  bool Synthesizer::SynthesizeTechnique (ShaderVarNodesHelper& shaderVarNodes, 
-                                         iDocumentNode* passNode,
-                                         const Snippet* snippet, 
-                                         const TechniqueGraph& techGraph)
+  bool Synthesizer::SynthesizeTechnique::operator() (
+    ShaderVarNodesHelper& shaderVarNodes, iDocumentNode* passNode,
+    const Snippet* snippet, const TechniqueGraph& techGraph)
   {
     defaultCombiner.AttachNew (new CombinerDefault (compiler, shaderVarNodes));
 
@@ -287,7 +287,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         These will be emitted.
       - For each node perform input/output renaming.
      */
-    SynthesizeNodeTree synthTree (this);
+    SynthesizeNodeTree synthTree (*this);
     synthTree.AddAllInputNodes (graph, generatedOutput, combiner);
     synthTree.AddAllInputNodes (graph, outTechniquePos, combiner);
     // The input linking works better if "top" nodes come first
@@ -676,11 +676,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     return true;
   }
   
-  bool Synthesizer::FindOutput (const TechniqueGraph& graph,
-                                const char* desiredType,
-                                WeaverCommon::iCombiner* combiner,
-                                const Snippet::Technique*& outTechnique,
-                                Snippet::Technique::Output& theOutput)
+  bool Synthesizer::SynthesizeTechnique::FindOutput (const TechniqueGraph& graph,
+    const char* desiredType, WeaverCommon::iCombiner* combiner,
+    const Snippet::Technique*& outTechnique, Snippet::Technique::Output& theOutput)
   {
     outTechnique = 0;
     /* Search for an output of a type.
@@ -751,7 +749,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     return outTechnique != 0;
   }
       
-  bool Synthesizer::FindInput (const TechniqueGraph& graph,
+  bool Synthesizer::SynthesizeTechnique::FindInput (
+    const TechniqueGraph& graph,
     WeaverCommon::iCombiner* combiner,
     csString& nodeAnnotation,
     const Snippet::Technique* receivingTech, 
@@ -869,7 +868,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     return result;
   }
       
-  bool Synthesizer::FindExplicitInput (const TechniqueGraph& graph,
+  bool Synthesizer::SynthesizeTechnique::FindExplicitInput (
+    const TechniqueGraph& graph,
     WeaverCommon::iCombiner* combiner,
     csString& nodeAnnotation,
     const Snippet::Technique* receivingTech, 
@@ -962,7 +962,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     return result;
   }
       
-  WeaverCommon::iCombiner* Synthesizer::GetCombiner (
+  WeaverCommon::iCombiner* Synthesizer::SynthesizeTechnique::GetCombiner (
       WeaverCommon::iCombiner* used, 
       const Snippet::Technique::CombinerPlugin& comb,
       const Snippet::Technique::CombinerPlugin& requested,
@@ -977,7 +977,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     return used;
   }
 
-  csString Synthesizer::GetInputTag (WeaverCommon::iCombiner* combiner,
+  csString Synthesizer::SynthesizeTechnique::GetInputTag (
+    WeaverCommon::iCombiner* combiner,
     const Snippet::Technique::CombinerPlugin& comb, 
     const Snippet::Technique::CombinerPlugin& combTech,
     const Snippet::Technique::Input& input)
@@ -1036,7 +1037,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         newName.Format ("%s_%zu", outp.name.GetData(), renameNr++);
         node.outputRenames.Put (outp.name, newName);
         combiner->AddGlobal (newName, outp.type,
-          synth->GetAnnotation ("Unique name for snippet \"%s<%d>\" output \"%s\"", 
+          synthTech.GetAnnotation ("Unique name for snippet \"%s<%d>\" output \"%s\"", 
             node.tech->snippetName, node.tech->priority, outp.name.GetData()));
       }
     }
@@ -1084,7 +1085,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   }
   
   void Synthesizer::SynthesizeNodeTree::AugmentCoerceChain (
-    WeaverCompiler* compiler, 
+    const WeaverCompiler* compiler, 
     const Snippet::Technique::CombinerPlugin& combinerPlugin,
     WeaverCommon::iCombiner* combiner, 
     WeaverCommon::iCoerceChainIterator* linkChain,  
@@ -1127,7 +1128,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       scratchSnippets.Push (snippet);
 
       Snippet::Technique* tech = 
-        snippet->LoadLibraryTechnique (compiler, link, combinerPlugin, true);
+        snippet->LoadLibraryTechnique (/*compiler, */link, combinerPlugin, true);
       augmentedTechniques.Push (tech);
       graph.AddTechnique (tech);
       TechniqueGraph::Connection conn;

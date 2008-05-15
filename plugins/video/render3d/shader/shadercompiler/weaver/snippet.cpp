@@ -60,7 +60,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 
   //-------------------------------------------------------------------
 
-  Snippet::Snippet (WeaverCompiler* compiler, iDocumentNode* node, 
+  Snippet::Snippet (const WeaverCompiler* compiler, iDocumentNode* node, 
                     const char* name, bool topLevel) : compiler (compiler), 
     xmltokens (compiler->xmltokens), name (name), isCompound (false),
     passForward (false)
@@ -105,7 +105,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     //if (techniques.GetSize() > 1) csPrintf ("snippet %s: %zu techniques\n", name, techniques.GetSize());
   }
   
-  Snippet::Snippet (WeaverCompiler* compiler, const char* name) : compiler (compiler), 
+  Snippet::Snippet (const WeaverCompiler* compiler, const char* name) : compiler (compiler), 
     xmltokens (compiler->xmltokens), name (name), isCompound (false)
   {
   }
@@ -120,12 +120,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       techniques);
   }
   
-  Snippet::Technique* Snippet::LoadLibraryTechnique (WeaverCompiler* compiler, 
+  Snippet::Technique* Snippet::LoadLibraryTechnique (/*WeaverCompiler* compiler, */
     iDocumentNode* node, const Technique::CombinerPlugin& combiner,
     bool markAsCoercion) const
   {
     Snippet::AtomTechnique* technique = 
-      ParseAtomTechnique (compiler, node, true, combiner.name);
+      ParseAtomTechnique (/*compiler, */node, true, combiner.name);
     technique->combiner = combiner;
     if (markAsCoercion)
     {
@@ -188,13 +188,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   
   void Snippet::LoadAtomTechnique (iDocumentNode* node)
   {
-    AtomTechnique* newTech = ParseAtomTechnique (compiler, node, false);
+    AtomTechnique* newTech = ParseAtomTechnique (/*compiler, */node, false);
     if (newTech != 0)
       techniques.InsertSorted (newTech, &CompareTechnique);
   }
   
   Snippet::AtomTechnique* Snippet::ParseAtomTechnique (
-    WeaverCompiler* compiler, iDocumentNode* node, bool canOmitCombiner,
+    /*WeaverCompiler* compiler, */iDocumentNode* node, bool canOmitCombiner,
     const char* defaultCombinerName) const
   {
     AtomTechnique newTech (GetName(),
@@ -423,7 +423,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 
   }
 
-  bool Snippet::ReadBlocks (WeaverCompiler* compiler, iDocumentNode* node, 
+  bool Snippet::ReadBlocks (const WeaverCompiler* compiler, 
+                            iDocumentNode* node, 
 		            csArray<Technique::Block>& blocks,
                             const char* defaultCombinerName)
   {
@@ -462,7 +463,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   }
   
   csRef<iDocumentNode> Snippet::GetNodeOrFromFile (iDocumentNode* node,
-      const char* rootName, WeaverCompiler* compiler,
+      const char* rootName, const WeaverCompiler* compiler,
       csString* outFilename)
   {
     const char* filename = node->GetAttributeValue ("file");

@@ -30,7 +30,7 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 {
-  CombinerDefault::CombinerDefault (WeaverCompiler* compiler,
+  CombinerDefault::CombinerDefault (const WeaverCompiler* compiler,
                                     ShaderVarNodesHelper& shaderVarNodes) : 
     scfImplementationType (this), compiler (compiler),
     xmltokens (compiler->xmltokens), shaderVarNodes (shaderVarNodes)

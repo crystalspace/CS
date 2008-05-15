@@ -185,9 +185,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       virtual BasicIterator<const Output>* GetOutputs() const;
     };
     
-    Snippet (WeaverCompiler* compiler, iDocumentNode* node, const char* name,
-      bool topLevel = false);
-    Snippet (WeaverCompiler* compiler, const char* name);
+    Snippet (const WeaverCompiler* compiler, iDocumentNode* node,
+      const char* name, bool topLevel = false);
+    Snippet (const WeaverCompiler* compiler, const char* name);
     virtual ~Snippet();
     
     const char* GetName() const { return name; }
@@ -195,7 +195,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     BasicIterator<const Technique*>* GetTechniques() const;
     
-    Technique* LoadLibraryTechnique (WeaverCompiler* compiler,
+    Technique* LoadLibraryTechnique (/*const WeaverCompiler* compiler,*/
       iDocumentNode* node, const Technique::CombinerPlugin& combiner,
       bool markAsCoercion = false) const;
     Technique* CreatePassthrough (const char* varName, const char* type) const;
@@ -203,8 +203,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     const csRefArray<iDocumentNode>& GetPassForwardedNodes() const
     { return passForwardedNodes; }
   private:
-    WeaverCompiler* compiler;
-    csStringHash& xmltokens;
+    const WeaverCompiler* compiler;
+    const csStringHash& xmltokens;
     csString name;
     typedef csPDelArray<Technique> TechniqueArray;
     TechniqueArray techniques;
@@ -214,7 +214,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     void LoadAtomTechniques (iDocumentNode* node);
     void LoadAtomTechnique (iDocumentNode* node);
-    AtomTechnique* ParseAtomTechnique (WeaverCompiler* compiler,
+    AtomTechnique* ParseAtomTechnique (/*WeaverCompiler* compiler,*/
       iDocumentNode* node, bool canOmitCombiner, 
       const char* defaultCombinerName = 0) const;
     bool ParseCombiner (iDocumentNode* child, 
@@ -225,11 +225,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       Technique::Output& newOutput) const;
     bool ParseAttribute (iDocumentNode* child, 
       Technique::Attribute& attr) const;
-    static bool ReadBlocks (WeaverCompiler* compiler, iDocumentNode* node,
+    static bool ReadBlocks (const WeaverCompiler* compiler, iDocumentNode* node,
       csArray<Technique::Block>& blocks, const char* defaultCombinerName = 0);
     
     static csRef<iDocumentNode> GetNodeOrFromFile (iDocumentNode* node,
-      const char* rootName, WeaverCompiler* compiler,
+      const char* rootName, const WeaverCompiler* compiler,
       csString* outFilename = 0);
     
     static int CompareTechnique (Technique* const&, Technique* const&);

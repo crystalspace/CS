@@ -57,7 +57,7 @@ WeaverCompiler::~WeaverCompiler()
 {
 }
 
-void WeaverCompiler::Report (int severity, const char* msg, ...)
+void WeaverCompiler::Report (int severity, const char* msg, ...) const
 {
   va_list args;
   va_start (args, msg);
@@ -67,7 +67,7 @@ void WeaverCompiler::Report (int severity, const char* msg, ...)
 }
 
 void WeaverCompiler::Report (int severity, iDocumentNode* node, 
-			     const char* msg, ...)
+			     const char* msg, ...) const
 {
   va_list args;
   va_start (args, msg);
@@ -80,8 +80,9 @@ void WeaverCompiler::Report (int severity, iDocumentNode* node,
 }
 
 csPtr<iDocumentNode> WeaverCompiler::LoadDocumentFromFile (
-  const char* filename, iDocumentNode* node)
+  const char* filename, iDocumentNode* node) const
 {
+  // @@@ TODO: Make thread safe
   csRef<iFile> file = vfs->Open (filename, VFS_FILE_READ);
   if (!file)
   {
@@ -91,8 +92,7 @@ csPtr<iDocumentNode> WeaverCompiler::LoadDocumentFromFile (
   }
   csRef<iDocumentSystem> docsys (
     csQueryRegistry<iDocumentSystem> (objectreg));
-  if (docsys == 0)
-    docsys.AttachNew (new csTinyDocumentSystem ());
+  if (docsys == 0) docsys = xmlDocSys;
 
   csRef<iDocument> doc = docsys->CreateDocument ();
   const char* err = doc->Parse (file);
@@ -106,8 +106,9 @@ csPtr<iDocumentNode> WeaverCompiler::LoadDocumentFromFile (
   return csPtr<iDocumentNode> (doc->GetRoot ());
 }
 
-csRef<iDocumentNode> WeaverCompiler::CreateAutoNode (csDocumentNodeType type)
+csRef<iDocumentNode> WeaverCompiler::CreateAutoNode (csDocumentNodeType type) const
 {
+  // @@@ TODO: Mutex for thread safety
   if (!autoDocRoot.IsValid ())
   {
     csRef<iDocument> autoDoc = xmlDocSys->CreateDocument ();

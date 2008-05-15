@@ -66,21 +66,68 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       csRefArray<iDocumentNode>& techNodes,
       iProgressMeter* progress);
   private:
-    csString annotateString;
-    const char* GetAnnotation (const char* fmt, ...) CS_GNUC_PRINTF (2, 3)
+    class SynthesizeNodeTree;
+    class SynthesizeTechnique
     {
-      if (!compiler->annotateCombined) return 0;
-
-      va_list args;
-      va_start (args, fmt);
-      annotateString.FormatV (fmt, args);
-      va_end (args);
-      return annotateString.GetData();
-    }
+      friend class SynthesizeNodeTree;
     
-    bool SynthesizeTechnique (
-      ShaderVarNodesHelper& shaderVarNodes, iDocumentNode* passNode,
-      const Snippet* snippet, const TechniqueGraph& graph);
+      const WeaverCompiler* compiler;
+      const Synthesizer* synth;
+      csRef<CS::PluginCommon::ShaderWeaver::iCombiner> defaultCombiner;
+    
+      csString annotateString;
+      const char* GetAnnotation (const char* fmt, ...) CS_GNUC_PRINTF (2, 3)
+      {
+	if (!compiler->annotateCombined) return 0;
+  
+	va_list args;
+	va_start (args, fmt);
+	annotateString.FormatV (fmt, args);
+	va_end (args);
+	return annotateString.GetData();
+      }
+      
+      bool FindOutput (const TechniqueGraph& graph,
+	const char* desiredType,
+	CS::PluginCommon::ShaderWeaver::iCombiner* combiner,
+	const Snippet::Technique*& outTechnique,
+	Snippet::Technique::Output& theOutput);
+	
+      typedef csSet<csConstPtrKey<Snippet::Technique::Output> > UsedOutputsHash;
+      bool FindInput (const TechniqueGraph& graph,
+	CS::PluginCommon::ShaderWeaver::iCombiner* combiner,
+	csString& nodeAnnotation,
+	const Snippet::Technique* receivingTech, 
+	const Snippet::Technique::Input& input,
+	const Snippet::Technique*& sourceTech,
+	const Snippet::Technique::Output*& output,
+	UsedOutputsHash& usedOutputs);
+      bool FindExplicitInput (const TechniqueGraph& graph,
+	CS::PluginCommon::ShaderWeaver::iCombiner* combiner,
+	csString& nodeAnnotation,
+	const Snippet::Technique* receivingTech, 
+	const Snippet::Technique::Input& input,
+	const Snippet::Technique*& sourceTech,
+	const Snippet::Technique::Output*& output,
+	UsedOutputsHash& usedOutputs);
+      CS::PluginCommon::ShaderWeaver::iCombiner* GetCombiner (
+	CS::PluginCommon::ShaderWeaver::iCombiner* used, 
+	const Snippet::Technique::CombinerPlugin& comb,
+	const Snippet::Technique::CombinerPlugin& requested,
+	const char* requestedName);
+      
+      csString GetInputTag (CS::PluginCommon::ShaderWeaver::iCombiner* combiner,
+	const Snippet::Technique::CombinerPlugin& comb,
+	const Snippet::Technique::CombinerPlugin& combTech,
+	const Snippet::Technique::Input& input);
+    public:
+      SynthesizeTechnique (WeaverCompiler* compiler,
+        const Synthesizer* synth) : compiler (compiler), synth (synth) {}
+    
+      bool operator() (
+        ShaderVarNodesHelper& shaderVarNodes, iDocumentNode* passNode,
+        const Snippet* snippet, const TechniqueGraph& graph);
+    };
     
     typedef csHash<csString, csString> StringStringHash;
     typedef csHashReversible<csString, csString> StringStringHashRev;
@@ -104,17 +151,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       /// Techs created in an augmentation, to be cleaned up later
       csPDelArray<Snippet> scratchSnippets;
       csPDelArray<Snippet::Technique> augmentedTechniques;
-      Synthesizer* synth;
+      Synthesizer::SynthesizeTechnique& synthTech;
 
       void ComputeRenames (Node& node,
         CS::PluginCommon::ShaderWeaver::iCombiner* combiner);
     public:
-      SynthesizeNodeTree (Synthesizer* synth) : renameNr (0), synth (synth) {}
+      SynthesizeNodeTree (Synthesizer::SynthesizeTechnique& synthTech)
+       : renameNr (0), synthTech (synthTech) {}
     
       void AddAllInputNodes (const TechniqueGraph& graph,
         const Snippet::Technique* tech,
         CS::PluginCommon::ShaderWeaver::iCombiner* combiner);
-      void AugmentCoerceChain (WeaverCompiler* compiler, 
+      void AugmentCoerceChain (const WeaverCompiler* compiler, 
         const Snippet::Technique::CombinerPlugin& combinerPlugin,
         CS::PluginCommon::ShaderWeaver::iCombiner* combiner,
         CS::PluginCommon::ShaderWeaver::iCoerceChainIterator* linkChain, 
@@ -176,39 +224,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       };
     };
 
-    bool FindOutput (const TechniqueGraph& graph,
-      const char* desiredType,
-      CS::PluginCommon::ShaderWeaver::iCombiner* combiner,
-      const Snippet::Technique*& outTechnique,
-      Snippet::Technique::Output& theOutput);
-  
-    typedef csSet<csConstPtrKey<Snippet::Technique::Output> > UsedOutputsHash;
-    bool FindInput (const TechniqueGraph& graph,
-      CS::PluginCommon::ShaderWeaver::iCombiner* combiner,
-      csString& nodeAnnotation,
-      const Snippet::Technique* receivingTech, 
-      const Snippet::Technique::Input& input,
-      const Snippet::Technique*& sourceTech,
-      const Snippet::Technique::Output*& output,
-      UsedOutputsHash& usedOutputs);
-    bool FindExplicitInput (const TechniqueGraph& graph,
-      CS::PluginCommon::ShaderWeaver::iCombiner* combiner,
-      csString& nodeAnnotation,
-      const Snippet::Technique* receivingTech, 
-      const Snippet::Technique::Input& input,
-      const Snippet::Technique*& sourceTech,
-      const Snippet::Technique::Output*& output,
-      UsedOutputsHash& usedOutputs);
-    CS::PluginCommon::ShaderWeaver::iCombiner* GetCombiner (
-      CS::PluginCommon::ShaderWeaver::iCombiner* used, 
-      const Snippet::Technique::CombinerPlugin& comb,
-      const Snippet::Technique::CombinerPlugin& requested,
-      const char* requestedName);
-
-    csString GetInputTag (CS::PluginCommon::ShaderWeaver::iCombiner* combiner,
-      const Snippet::Technique::CombinerPlugin& comb,
-      const Snippet::Technique::CombinerPlugin& combTech,
-      const Snippet::Technique::Input& input);
     /// Structure to track what default inputs to emit.
     struct EmittedInput
     {
@@ -221,7 +236,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     WeaverCompiler* compiler;
   
     csStringHash& xmltokens;
-    csRef<CS::PluginCommon::ShaderWeaver::iCombiner> defaultCombiner;
   };
 
 }
