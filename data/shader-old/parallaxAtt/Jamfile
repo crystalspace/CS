@@ -1,4 +1,4 @@
-SubDir TOP data shader parallaxAtt ;
+SubDir TOP data shader-old parallaxAtt ;
 
 InstallData [ Wildcard *.afp *.avp *.cgfp *.cgvp *.xml ] :
-  data shader parallaxAtt ;
+  data shader-old parallaxAtt ;

@@ -2,13 +2,13 @@ SubDir TOP data shader-old ;
 
 InstallData [ Wildcard *.afp *.avp *.fvp *.xml *.cgvp ] : data shader-old ;
 
-SubInclude TOP data shader character ;
-SubInclude TOP data shader extrudeGlow ;
-SubInclude TOP data shader fresnelWater ;
-SubInclude TOP data shader fog ;
-SubInclude TOP data shader parallax ;
-SubInclude TOP data shader parallaxAtt ;
-SubInclude TOP data shader shadowmap ;
-SubInclude TOP data shader specular ;
-SubInclude TOP data shader uvanim ;
+SubInclude TOP data shader-old character ;
+SubInclude TOP data shader-old extrudeGlow ;
+SubInclude TOP data shader-old fresnelWater ;
+SubInclude TOP data shader-old fog ;
+SubInclude TOP data shader-old parallax ;
+SubInclude TOP data shader-old parallaxAtt ;
+SubInclude TOP data shader-old shadowmap ;
+SubInclude TOP data shader-old specular ;
+SubInclude TOP data shader-old uvanim ;
 

@@ -1,3 +1,3 @@
-SubDir TOP data shader specular ;
+SubDir TOP data shader-old specular ;
 
-InstallData [ Wildcard *.cgfp *.cgvp *.xml ] : data shader specular ;
+InstallData [ Wildcard *.cgfp *.cgvp *.xml ] : data shader-old specular ;

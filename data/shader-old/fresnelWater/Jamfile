@@ -1,4 +1,4 @@
-SubDir TOP data shader fresnelWater ;
+SubDir TOP data shader-old fresnelWater ;
 
 InstallData [ Wildcard *.cgfp *.cgvp *.xml ] :
-  data shader fresnelWater ;
+  data shader-old fresnelWater ;

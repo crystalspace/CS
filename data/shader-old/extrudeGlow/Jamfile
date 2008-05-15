@@ -1,4 +1,4 @@
-SubDir TOP data shader extrudeGlow ;
+SubDir TOP data shader-old extrudeGlow ;
 
 InstallData [ Wildcard *.afp *.avp *.cgfp *.cgvp *.xml ] :
-  data shader extrudeGlow ;
+  data shader-old extrudeGlow ;
