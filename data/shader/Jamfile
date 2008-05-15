@@ -8,4 +8,4 @@ SubInclude TOP data shader reflect ;
 SubInclude TOP data shader shadowmap ;
 SubInclude TOP data shader snippets ;
 SubInclude TOP data shader surface ;
-SubInclude TOP data shader uvanim ;
+
