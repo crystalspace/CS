@@ -22,9 +22,10 @@
 
 #include "iutil/document.h"
 #include "csutil/csendian.h"
-#include "csutil/parray.h"
-#include "csutil/strset.h"
 #include "csutil/blockallocator.h"
+#include "csutil/parray.h"
+#include "csutil/pooledscfclass.h"
+#include "csutil/strset.h"
 
 struct iDataBuffer;
 class csMemFile;
@@ -185,6 +186,9 @@ struct bdNode
    * After this struct, the attribute offset table (if the attr flag is set)
    * and child offset table (if the child flag is set) follow.
    */
+   
+  bdNode () {}
+  bdNode (uint32 value, uint32 flags) : value (value), flags (flags) {}
 };
 
 /// Binary document node child table
@@ -207,6 +211,10 @@ struct bdNodeAttribute
   uint32 nameID;
   /// Attribute flags
   uint32 flags;
+  
+  bdNodeAttribute() {}
+  bdNodeAttribute (uint32 value, uint32 nameID, uint32 flags) :
+    value (value), nameID (nameID), flags (flags) {}
 };
 
 /// Binary document node attribute table
@@ -297,8 +305,8 @@ public:
 };
 
 struct csBinaryDocAttribute : 
-  public scfImplementation1<csBinaryDocAttribute, 
-                            iDocumentAttribute>
+  public scfImplementationPooled<scfImplementation1<csBinaryDocAttribute, 
+                                                    iDocumentAttribute> >
 {
 private:
   friend struct csBinaryDocument;
@@ -314,19 +322,14 @@ private:
   /// attrPtr for which vstr is valid
   csBdAttr* vsptr;
 
-  csBinaryDocAttribute* pool_next;
-
   /// Store into a file
   void Store (csMemFile* nodesFile);
 
   void CleanData ();
 public:
-  csBinaryDocAttribute ();
+  csBinaryDocAttribute (csBdAttr* ptr,
+    csBinaryDocNode* owner);
   virtual ~csBinaryDocAttribute ();
-  void DecRef ();
-
-  void SetTo (csBdAttr* ptr,
-	      csBinaryDocNode* owner);
 
   virtual const char* GetName ();
   virtual const char* GetValue ();
@@ -427,8 +430,8 @@ public:
 };
 
 struct csBinaryDocNode : 
-  public scfImplementation1<csBinaryDocNode,
-                            iDocumentNode>
+  public scfImplementationPooled<scfImplementation1<csBinaryDocNode,
+                                 iDocumentNode> >
 {
 private:
   friend struct csBinaryDocument;
@@ -442,14 +445,12 @@ private:
    *  Unmodified n. - Pointer to structure in data buffer.
    */
   csBdNode* nodeData;
-  csBinaryDocument* doc;
+  csRef<csBinaryDocument> doc;
   /// buffer for int/float values requested as strings
   char* vstr;
   /// nodeData for which vstr is valid
   csBdNode* vsptr;
-  // to save a few bytes the 'Parent' pointer also serves as
-  // 'pool_next'.
-  csBinaryDocNode* PoolNextOrParent; 
+  csRef<csBinaryDocNode> Parent; 
 
   void Store (csMemFile* nodesFile);
   int IndexOfAttr (const char* attr);
@@ -461,12 +462,11 @@ private:
   inline int nodeValueInt (csBdNode* nodeData);
   inline float nodeValueFloat (csBdNode* nodeData);
 public:
-  csBinaryDocNode ();
-  virtual ~csBinaryDocNode ();
   void DecRef ();
-
-  void SetTo (csBdNode* ptr,
-	      csBinaryDocNode* parent);
+  
+  csBinaryDocNode (csBdNode* ptr,
+    csBinaryDocNode* parent);
+  virtual ~csBinaryDocNode ();
 
   virtual csDocumentNodeType GetType ();
   virtual bool Equals (iDocumentNode* other);
@@ -515,8 +515,8 @@ private:
   csRef<iDataBuffer> data;
   uint8* dataStart;
   csBdNode* root;	
-  csBinaryDocNode* nodePool;
-  csBinaryDocAttribute* attrPool;
+  csBinaryDocNode::Pool nodePool;
+  csBinaryDocAttribute::Pool attrPool;
   
   csBlockAllocator<csBdAttr>* attrAlloc;
   csBlockAllocator<csBdNode>* nodeAlloc;
@@ -526,10 +526,10 @@ private:
   uint32 outStrTabOfs;
   uint32 inStrTabOfs;
 
-  csBinaryDocNode* GetPoolNode ();
-  void RecyclePoolNode (csBinaryDocNode *node);
-  csBinaryDocAttribute* GetPoolAttr ();
-  void RecyclePoolAttr (csBinaryDocAttribute *attr);
+  csBinaryDocNode* GetPoolNode (csBdNode* ptr,
+    csBinaryDocNode* parent);
+  csBinaryDocAttribute* GetPoolAttr (csBdAttr* ptr,
+    csBinaryDocNode* owner);
 
   csBinaryDocNode* GetRootNode ();
 public:
