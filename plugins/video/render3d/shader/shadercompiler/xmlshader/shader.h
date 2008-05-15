@@ -22,6 +22,7 @@
 
 #include "iutil/selfdestruct.h"
 #include "ivideo/shader/shader.h"
+#include "ivideo/shader/xmlshader.h"
 #include "imap/ldrctxt.h"
 
 #include "csutil/bitarray.h"
@@ -129,10 +130,11 @@ public:
   bool WriteToCache (iFile* cacheFile);
 };
 
-class csXMLShader : public scfImplementationExt2<csXMLShader,
+class csXMLShader : public scfImplementationExt3<csXMLShader,
 						 csObject,
 						 iShader,
-						 iSelfDestruct>
+						 iSelfDestruct,
+						 iXMLShader>
 {
   friend class csShaderConditionResolver;
 
@@ -448,6 +450,11 @@ public:
       return fallbackShader->RemoveVariable (name);
     return GetUsedSVContext().RemoveVariable (name);
   }
+  /** @} */
+
+  /**\name iXMLShader implementation
+   * @{ */
+  virtual iDocumentNode* GetShaderSource () { return shaderRoot; }
   /** @} */
 
   /// Set object description
