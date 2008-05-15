@@ -22,6 +22,7 @@
 
 #include "iutil/selfdestruct.h"
 #include "ivideo/shader/shader.h"
+#include "ivideo/shader/xmlshader.h"
 #include "imap/ldrctxt.h"
 
 #include "csutil/bitarray.h"
@@ -35,10 +36,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 
 class WeaverCompiler;
 
-class WeaverShader : public scfImplementationExt2<WeaverShader,
+class WeaverShader : public scfImplementationExt3<WeaverShader,
 						  csObject,
 						  iShader,
-						  iSelfDestruct>
+						  iSelfDestruct,
+						  iXMLShader>
 {
   csRef<WeaverCompiler> compiler;
   csRef<iShaderManager> shadermgr;
@@ -191,6 +193,18 @@ public:
   bool RemoveVariable (csStringID name)
   {
     return realShader->RemoveVariable (name);
+  }
+  /** @} */
+
+  /**\name iXMLShader implementation
+   * @{ */
+  iDocumentNode* GetShaderSource ()
+  { 
+    csRef<iXMLShader> wrappedShader = scfQueryInterfaceSafe<iXMLShader> (
+      realShader);
+    if (wrappedShader.IsValid())
+      return wrappedShader->GetShaderSource();
+    return 0; 
   }
   /** @} */
 
