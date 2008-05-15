@@ -6,9 +6,11 @@ SubInclude TOP data shader-old character ;
 SubInclude TOP data shader-old extrudeGlow ;
 SubInclude TOP data shader-old fresnelWater ;
 SubInclude TOP data shader-old fog ;
+SubInclude TOP data shader-old lighting ;
 SubInclude TOP data shader-old parallax ;
 SubInclude TOP data shader-old parallaxAtt ;
 SubInclude TOP data shader-old shadowmap ;
 SubInclude TOP data shader-old specular ;
+SubInclude TOP data shader-old snippets ;
 SubInclude TOP data shader-old uvanim ;
 
