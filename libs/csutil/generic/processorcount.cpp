@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 by Scott Johnson <scottj@cs.umn.edu>
+    Copyright (C) 2008 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,23 +16,18 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSUTIL_MEMUTIL_H__
-#define __CSUTIL_MEMUTIL_H__
-
 #include "cssysdef.h"
-#include "csextern.h"
 
-namespace CS {
-  namespace Platform {
-
-    /**
-     * Retrieve the number of kB of physical system memory.
-     *
-     * @returns Physical system memory (in kB) on success, or 0 on failure.
-     */
-   CS_CRYSTALSPACE_EXPORT size_t GetPhysicalMemorySize();
-
-  } // End namespace Platform
-} // End namespace CS
-
-#endif
+namespace CS
+{
+  namespace Platform
+  {
+    namespace Implementation
+    {
+      uint GetProcessorCount()
+      {
+	return 0;
+      }
+    } // namespace Implementation
+  } // namespace Platform
+} // namespace CS
