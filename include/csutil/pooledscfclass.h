@@ -66,11 +66,12 @@ class scfImplementationPooled : public Super
 {
   typedef typename Super::scfClassType scfClassType;
 public:
-  typedef scfImplementationPooled<Super, Allocator> scfPooledImplementationType;
+  typedef scfImplementationPooled<Super, Allocator, Locked>
+    scfPooledImplementationType;
 
   class Pool : public CS::Threading::OptionalMutex<Locked>
   {
-    friend class scfImplementationPooled<Super, Allocator>;
+    friend class scfImplementationPooled<Super, Allocator, Locked>;
     struct Entry
     {
       Entry* next;
