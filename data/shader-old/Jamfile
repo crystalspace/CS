@@ -7,4 +7,5 @@ SubInclude TOP data shader extrudeGlow ;
 SubInclude TOP data shader fresnelWater ;
 SubInclude TOP data shader fog ;
 SubInclude TOP data shader parallax ;
+SubInclude TOP data shader parallaxAtt ;
 
