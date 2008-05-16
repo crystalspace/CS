@@ -385,10 +385,18 @@ void csShaderGLCGCommon::EnsureDumpFile()
   if (debugFN.IsEmpty())
   {
     static int programCounter = 0;
+    
+    const char* progTypeStr ="";
+    switch (programType)
+    {
+      case progVP: progTypeStr = "cgvp"; break;
+      case progFP: progTypeStr = "cgfp"; break;
+    }
+    
     csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectReg);
     csString filename;
-    filename << shaderPlug->dumpDir << (programCounter++) << programType << 
-      ".txt";
+    filename << shaderPlug->dumpDir << (programCounter++) << 
+      progTypeStr << ".txt";
     debugFN = filename;
     vfs->DeleteFile (debugFN);
   }
