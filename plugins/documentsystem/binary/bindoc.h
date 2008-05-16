@@ -306,7 +306,9 @@ public:
 
 struct csBinaryDocAttribute : 
   public scfImplementationPooled<scfImplementation1<csBinaryDocAttribute, 
-                                                    iDocumentAttribute> >
+                                                    iDocumentAttribute>,
+                                 CS::Memory::AllocatorMalloc,
+                                 true>
 {
 private:
   friend struct csBinaryDocument;
@@ -431,7 +433,9 @@ public:
 
 struct csBinaryDocNode : 
   public scfImplementationPooled<scfImplementation1<csBinaryDocNode,
-                                 iDocumentNode> >
+                                                    iDocumentNode>,
+                                 CS::Memory::AllocatorMalloc,
+                                 true>
 {
 private:
   friend struct csBinaryDocument;

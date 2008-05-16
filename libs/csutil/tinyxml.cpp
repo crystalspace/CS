@@ -122,7 +122,7 @@ void TiXmlBase::PutString( const TiXmlString& str, TiXmlString* outString )
 }
 
 
-TiDocumentNode::TiDocumentNode( ) : refcount (1), parent (0)
+TiDocumentNode::TiDocumentNode( ) : typeAndRefCount (1), parent (0)
 {
 }
 
@@ -133,15 +133,14 @@ TiDocumentNode::~TiDocumentNode()
 
 void TiDocumentNode::DecRef ()
 {
-  csRefTrackerAccess::TrackDecRef (this, refcount);
-  refcount--;
-  if (refcount <= 0)
+  csRefTrackerAccess::TrackDecRef (this, int16 (typeAndRefCount & 0xffff));
+  if (int16 (CS::Threading::AtomicOperations::Decrement (&typeAndRefCount)  & 0xffff) <= 0)
     GetDocument()->DeleteNode (this);
 }
 
 const char* TiDocumentNode::Value() const
 {
-  switch (type)
+  switch (Type())
   {
     case DOCUMENT:
       return static_cast<const TiDocument*> (this)->Value ();
@@ -165,7 +164,7 @@ const char* TiDocumentNode::Value() const
 
 void TiDocumentNode::SetValue (const char* v)
 {
-  switch (type)
+  switch (Type())
   {
     case DOCUMENT:
       static_cast<TiDocument*> (this)->SetValue (v);
@@ -195,7 +194,7 @@ void TiDocumentNode::SetValue (const char* v)
 
 csPtr<TiDocumentNode> TiDocumentNode::Clone (TiDocument* doc) const
 {
-  switch (type)
+  switch (Type())
   {
     case DOCUMENT:
       return static_cast<const TiDocument*> (this)->Clone (doc);
@@ -219,7 +218,7 @@ csPtr<TiDocumentNode> TiDocumentNode::Clone (TiDocument* doc) const
 
 const char* TiDocumentNode::Print( PrintState& print, int depth ) const
 {
-  switch (type)
+  switch (Type())
   {
     case ELEMENT:
       return static_cast<const TiXmlElement*> (this)->Print (print, depth);
@@ -508,7 +507,7 @@ TiDocument* TiDocumentNode::GetDocument() const
 TiXmlElement::TiXmlElement ()
 {
   value = 0;
-  type = ELEMENT;
+  SetType (ELEMENT);
 }
 
 TiXmlElement::~TiXmlElement()
@@ -716,7 +715,7 @@ TiDocument::TiDocument() :
 {
   errorId = TIXML_NO_ERROR;
   //  ignoreWhiteSpace = true;
-  type = DOCUMENT;
+  SetType (DOCUMENT);
   parse.document = this;
 }
 
@@ -729,7 +728,7 @@ TiDocument::TiDocument( const char * documentName ) :
   //  ignoreWhiteSpace = true;
   value = documentName;
   errorId = TIXML_NO_ERROR;
-  type = DOCUMENT;
+  SetType (DOCUMENT);
   parse.document = this;
 }
 
@@ -978,7 +977,7 @@ TiXmlDeclaration::TiXmlDeclaration( const char * _version,
   version = _version;
   encoding = _encoding;
   standalone = _standalone;
-  type = DECLARATION;
+  SetType (DECLARATION);
 }
 
 
