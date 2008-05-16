@@ -102,18 +102,19 @@ namespace Threading
      * Atomically read value pointed to by target.
      */
     CS_FORCEINLINE_TEMPLATEMETHOD
-    static int32 Read (int32* target)
+    static int32 Read (const int32* target)
     {
-      return Impl::CompareAndSet (target, 0, 0);
+      return Impl::CompareAndSet (const_cast<int32*> (target), 0, 0);
     }
 
     /**
     * Atomically read pointer pointed to by target.
     */
     CS_FORCEINLINE_TEMPLATEMETHOD
-    static void* Read (void** target)
+    static void* Read (void* const* target)
     {
-      return Impl::CompareAndSet (target, (void*)0, (void*)0);
+      return Impl::CompareAndSet (
+        const_cast<void**> (target), (void*)0, (void*)0);
     }
   };
 }
