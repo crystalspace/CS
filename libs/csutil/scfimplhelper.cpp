@@ -22,7 +22,8 @@
 void scfImplementationHelper::EnsureAuxData()
 {
   ScfImplAuxData* newAuxData = new ScfImplAuxData;
-  if (CS::Threading::AtomicOperations::CompareAndSet ((void**)&scfAuxData,
+  // Double-cast to cheat strict-aliasing rules
+  if (CS::Threading::AtomicOperations::CompareAndSet ((void**)(void*)&scfAuxData,
       newAuxData, 0) != 0)
   {
     // A concurrent thread was faster with creating aux data

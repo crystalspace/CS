@@ -167,7 +167,10 @@ protected:
   ScfImplAuxData* scfAuxData;
 
   CS_FORCEINLINE bool HasAuxData()
-  { return CS::Threading::AtomicOperations::Read ((void**)&scfAuxData) != 0; }
+  {
+    // Double-cast to cheat strict-aliasing rules
+    return CS::Threading::AtomicOperations::Read ((void**)(void*)&scfAuxData) != 0; 
+  }
   void EnsureAuxData();
   void FreeAuxData();
 
