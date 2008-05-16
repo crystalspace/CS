@@ -305,10 +305,6 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
     postEffectsParser.AddLayersFromFile (effectsFile, postEffects);
   }
   
-  HDRHelper hdr;
-  // @@@ FIXME: pick a better intermediate format
-  hdr.Setup (objectReg, HDRHelper::qualInt8, 4, postEffects, /*true*/false);
-  
   HDRSettings hdrSettings (cfg, "RenderManager.ShadowPSSM");
   if (hdrSettings.IsEnabled())
   {
