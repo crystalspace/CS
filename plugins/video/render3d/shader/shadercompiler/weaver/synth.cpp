@@ -30,7 +30,10 @@
 #include "csutil/csstring.h"
 #include "csutil/documenthelper.h"
 #include "csutil/fifo.h"
+#include "csutil/platform.h"
 #include "csutil/scopeddelete.h"
+#include "csutil/threading/mutex.h"
+#include "csutil/threadjobqueue.h"
 #include "csutil/xmltiny.h"
 
 #include "combiner_default.h"
@@ -48,6 +51,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
   void ShaderVarNodesHelper::AddNode (iDocumentNode* node)
   {
+    CS::Threading::MutexScopedLock l (lock);
     if (node->GetType() == CS_NODE_ELEMENT)
     {
       const char* name = node->GetAttributeValue ("name");
@@ -76,7 +80,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       builder.BuildGraphs (outerSnippets[s], graphs[s]);
     }
   }
-
+  
+  //#define THREADED_TECH_SYNTHESIS
+  
   void Synthesizer::Synthesize (iDocumentNode* shaderNode,
                                 ShaderVarNodesHelper& shaderVarNodesHelper,
                                 csRefArray<iDocumentNode>& techNodes,
@@ -89,13 +95,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       {
         techNum *= graphs[g].GetSize();
       }
-      if (progress)
-      {
-	progress->SetProgressDescription (
-	  "crystalspace.graphics3d.shadercompiler.weaver.synth",
-	  "Generating %zu techniques", techNum);
-	progress->SetTotal (techNum);
-      }
+    #ifdef THREADED_TECH_SYNTHESIS
+      CS::Threading::ThreadedJobQueue synthQueue (
+	csClamp (CS::Platform::GetProcessorCount(), (uint)techNum, (uint)1));
+    #endif
+      csArray<csRefArray<SynthesizeTechnique> > synthTechs;
+      csArray<csArray<size_t> > graphIndices;
       size_t currentTech = 0;
       while (currentTech < techNum)
       {
@@ -133,70 +138,107 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	
 	if (!skipTech)
 	{
-	  current = currentTech;
-	  csRef<iDocumentNode> techniqueNode =
-	    shaderNode->CreateNodeBefore (CS_NODE_ELEMENT);
-	  techniqueNode->SetValue ("technique");
-	  //techniqueNode->SetAttributeAsInt ("priority", int (techNum - currentTech));
-	  techNodes.Push (techniqueNode);
-	  
-	  bool aPassSucceeded = false;
+	  csRefArray<SynthesizeTechnique> techPasses;
+	  csArray<size_t> techGraphIndices;
 	  for (size_t g = 0; g < graphs.GetSize(); g++)
 	  {
 	    const TechniqueGraph& graph = graphs.Get (g)[(current % graphs[g].GetSize())];
 	    
 	    current = current / graphs[g].GetSize();
 	    
-	    for (size_t i = 0; i < prePassNodes[g].GetSize(); i++)
-	    {
-	      iDocumentNode* copyFrom = prePassNodes[g].Get (i);
-	      csRef<iDocumentNode> newNode =
-		techniqueNode->CreateNodeBefore (copyFrom->GetType());
-              CS::DocSystem::CloneNode (copyFrom, newNode);
-	    }
-	    
-	    csRef<iDocumentNode> passNode =
-	      techniqueNode->CreateNodeBefore (CS_NODE_ELEMENT);
-	    passNode->SetValue ("pass");
-	    
 	    Snippet* snippet = outerSnippets[g];
-	    csRefArray<iDocumentNode> passForwardedNodes =
-	      snippet->GetPassForwardedNodes();
-	    for (size_t n = 0; n < passForwardedNodes.GetSize(); n++)
-	    {
-	      iDocumentNode* srcNode = passForwardedNodes[n];
-	      csRef<iDocumentNode> dstNode =
-		passNode->CreateNodeBefore (srcNode->GetType());
-	      CS::DocSystem::CloneNode (srcNode, dstNode);
-	    }
-	    SynthesizeTechnique synthTech (compiler, this);
-	    if (!synthTech (shaderVarNodesHelper, passNode, snippet, graph))
-	      techniqueNode->RemoveNode (passNode);
-	    else
-	      aPassSucceeded = true;
+	   
+	    csRef<SynthesizeTechnique> synthTech;
+	    synthTech.AttachNew (new SynthesizeTechnique (compiler, this,
+	      shaderVarNodesHelper, shaderNode, snippet, graph));
+	    techPasses.Push (synthTech);
+	  #ifdef THREADED_TECH_SYNTHESIS
+	    synthQueue.Enqueue (synthTech);
+	  #endif
+	    techGraphIndices.Push (g);
+          }
+          synthTechs.Push (techPasses);
+          graphIndices.Push (techGraphIndices);
+        }
+        currentTech++;
+      }
+      
+      if (progress)
+      {
+	progress->SetProgressDescription (
+	  "crystalspace.graphics3d.shadercompiler.weaver.synth",
+	  "Generating %zu techniques", synthTechs.GetSize());
+	progress->SetTotal (synthTechs.GetSize());
+      }
+      for (size_t t = 0; t < synthTechs.GetSize(); t++)
+      {
+	csRef<iDocumentNode> techniqueNode =
+	  shaderNode->CreateNodeBefore (CS_NODE_ELEMENT);
+	techniqueNode->SetValue ("technique");
+	techNodes.Push (techniqueNode);
+	
+	bool aPassSucceeded = false;
+	for (size_t p = 0; p < synthTechs[t].GetSize(); p++)
+	{
+	  size_t g = graphIndices[t].Get (p);
+	  
+	  for (size_t i = 0; i < prePassNodes[g].GetSize(); i++)
+	  {
+	    iDocumentNode* copyFrom = prePassNodes[g].Get (i);
+	    csRef<iDocumentNode> newNode =
+	      techniqueNode->CreateNodeBefore (copyFrom->GetType());
+	    CS::DocSystem::CloneNode (copyFrom, newNode);
 	  }
-	  if (!aPassSucceeded)
-	    shaderNode->RemoveNode (techniqueNode);
+	  
+	  csRef<iDocumentNode> passNode =
+	    techniqueNode->CreateNodeBefore (CS_NODE_ELEMENT);
+	  passNode->SetValue ("pass");
+	  
+	  Snippet* snippet = outerSnippets[g];
+	  csRefArray<iDocumentNode> passForwardedNodes =
+	    snippet->GetPassForwardedNodes();
+	  for (size_t n = 0; n < passForwardedNodes.GetSize(); n++)
+	  {
+	    iDocumentNode* srcNode = passForwardedNodes[n];
+	    csRef<iDocumentNode> dstNode =
+	      passNode->CreateNodeBefore (srcNode->GetType());
+	    CS::DocSystem::CloneNode (srcNode, dstNode);
+	  }
+	  
+	  SynthesizeTechnique* synthTech = synthTechs[t].Get (p);
+	#ifdef THREADED_TECH_SYNTHESIS
+	  synthQueue.Wait (synthTech);
+	#else
+	  synthTech->Run();
+	#endif
+	  if (!synthTech->GetStatus())
+	    techniqueNode->RemoveNode (passNode);
 	  else
 	  {
-	    for (size_t i = 0; i < postPassesNodes.GetSize(); i++)
-	    {
-	      iDocumentNode* copyFrom = postPassesNodes.Get (i);
-	      csRef<iDocumentNode> newNode =
-		techniqueNode->CreateNodeBefore (copyFrom->GetType());
-              CS::DocSystem::CloneNode (copyFrom, newNode);
-	    }
+	    synthTech->WriteToPass (passNode);
+	    aPassSucceeded = true;
+	  }
+	}
+	if (!aPassSucceeded)
+	  shaderNode->RemoveNode (techniqueNode);
+	else
+	{
+	  for (size_t i = 0; i < postPassesNodes.GetSize(); i++)
+	  {
+	    iDocumentNode* copyFrom = postPassesNodes.Get (i);
+	    csRef<iDocumentNode> newNode =
+	      techniqueNode->CreateNodeBefore (copyFrom->GetType());
+	    CS::DocSystem::CloneNode (copyFrom, newNode);
 	  }
 	}
 	
-	currentTech++;
 	if (progress) progress->Step (1);
       }
     }
   }
 
   bool Synthesizer::SynthesizeTechnique::operator() (
-    ShaderVarNodesHelper& shaderVarNodes, iDocumentNode* passNode,
+    ShaderVarNodesHelper& shaderVarNodes, iDocumentNode* errorNode,
     const Snippet* snippet, const TechniqueGraph& techGraph)
   {
     defaultCombiner.AttachNew (new CombinerDefault (compiler, shaderVarNodes));
@@ -222,7 +264,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
      
     CS_ASSERT(snippet->IsCompound());
     
-    csRef<WeaverCommon::iCombiner> combiner;
     const Snippet::Technique::CombinerPlugin* comb;
     {
       // Here, snippet should contain 1 tech.
@@ -238,14 +279,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  comb->classId);
       if (!loader.IsValid())
       {
-	compiler->Report (CS_REPORTER_SEVERITY_WARNING, passNode,
+	compiler->Report (CS_REPORTER_SEVERITY_WARNING, errorNode,
 	  "Could not load combiner plugin '%s'", comb->classId.GetData());
 	return false;
       }
       combiner = loader->GetCombiner (comb->params); 
       if (!combiner.IsValid())
       {
-	compiler->Report (CS_REPORTER_SEVERITY_WARNING, passNode,
+	compiler->Report (CS_REPORTER_SEVERITY_WARNING, errorNode,
 	  "Could not get combiner from '%s'", comb->classId.GetData());
 	return false;
       }
@@ -256,7 +297,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     Snippet::Technique::Output theOutput;
     if (!FindOutput (graph, "rgba", combiner, outTechnique, theOutput))
     {
-      compiler->Report (CS_REPORTER_SEVERITY_WARNING, passNode,
+      compiler->Report (CS_REPORTER_SEVERITY_WARNING, errorNode,
 	"No suitable color output found");
       return false;
     }
@@ -266,7 +307,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     Snippet::Technique::Output thePosOutput;
     if (!FindOutput (graph, "position4_screen", combiner, outTechniquePos, thePosOutput))
     {
-      compiler->Report (CS_REPORTER_SEVERITY_WARNING, passNode,
+      compiler->Report (CS_REPORTER_SEVERITY_WARNING, errorNode,
 	"No suitable position output found");
       return false;
     }
@@ -671,8 +712,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         GetAnnotation ("Map color output"));
     }
     
-    defaultCombiner->WriteToPass (passNode);
-    combiner->WriteToPass (passNode);
     return true;
   }
   

@@ -19,6 +19,7 @@
 #ifndef __CS_SYNTH_H__
 #define __CS_SYNTH_H__
 
+#include "iutil/job.h"
 #include "csplugincommon/shader/weavercombiner.h"
 #include "csutil/blockallocator.h"
 #include "csutil/hashr.h"
@@ -37,6 +38,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 
   class ShaderVarNodesHelper
   {
+    CS::Threading::Mutex lock;
     iDocumentNode* shaderVarsNode;
     csSet<csString> seenVars;
   public:
@@ -67,13 +69,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       iProgressMeter* progress);
   private:
     class SynthesizeNodeTree;
-    class SynthesizeTechnique
+    class SynthesizeTechnique :
+      public scfImplementation1<SynthesizeTechnique, iJob>
     {
       friend class SynthesizeNodeTree;
     
+      bool status;
+    
       const WeaverCompiler* compiler;
       const Synthesizer* synth;
+      csRef<CS::PluginCommon::ShaderWeaver::iCombiner> combiner;
       csRef<CS::PluginCommon::ShaderWeaver::iCombiner> defaultCombiner;
+      
+      ShaderVarNodesHelper& shaderVarNodes;
+      iDocumentNode* errorNode;
+      const Snippet* snippet;
+      const TechniqueGraph& graph;
     
       csString annotateString;
       const char* GetAnnotation (const char* fmt, ...) CS_GNUC_PRINTF (2, 3)
@@ -120,13 +131,32 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	const Snippet::Technique::CombinerPlugin& comb,
 	const Snippet::Technique::CombinerPlugin& combTech,
 	const Snippet::Technique::Input& input);
+	
+      bool operator() (ShaderVarNodesHelper& shaderVarNodes, 
+        iDocumentNode* errorNode, const Snippet* snippet,
+        const TechniqueGraph& graph);
     public:
       SynthesizeTechnique (WeaverCompiler* compiler,
-        const Synthesizer* synth) : compiler (compiler), synth (synth) {}
+        const Synthesizer* synth,
+        ShaderVarNodesHelper& shaderVarNodes, 
+        iDocumentNode* errorNode, const Snippet* snippet,
+        const TechniqueGraph& graph)
+       : scfImplementationType (this),
+         status (false), compiler (compiler), synth (synth),
+         shaderVarNodes (shaderVarNodes), errorNode (errorNode),
+         snippet (snippet), graph (graph)
+      {}
     
-      bool operator() (
-        ShaderVarNodesHelper& shaderVarNodes, iDocumentNode* passNode,
-        const Snippet* snippet, const TechniqueGraph& graph);
+      bool GetStatus() const { return status; }
+      void Run()
+      { 
+        status =  (*this) (shaderVarNodes, errorNode, snippet, graph);
+      }
+      void WriteToPass (iDocumentNode* passNode)
+      {
+        defaultCombiner->WriteToPass (passNode);
+        combiner->WriteToPass (passNode);
+      }
     };
     
     typedef csHash<csString, csString> StringStringHash;
