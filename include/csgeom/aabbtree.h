@@ -70,16 +70,16 @@ namespace Geometry //@@Right?
      * 
      */
     void AddObject (ObjectType* object)
-    {     
+    {
       AddObjectRecursive (rootNode, object);
     }
 
     /**
      * 
      */
-    void RemoveObject (const ObjectType* object)
+    bool RemoveObject (const ObjectType* object)
     {
-      RemoveObjectRec (object, rootNode);
+      return RemoveObjectRec (object, rootNode);
     }
 
     /**
@@ -658,6 +658,7 @@ namespace Geometry //@@Right?
                 }
               }
               node->SetBBox (newNodeBB);
+	      node->RemoveLeafData (i);
 
               return true; // Found it
             }
@@ -894,6 +895,13 @@ namespace Geometry //@@Right?
       leafStorage[leafObjCount++] = object;
 
       boundingBox.AddBoundingBox (object->GetBBox ());
+    }
+
+    void RemoveLeafData (size_t index)
+    {
+      CS_ASSERT(IsLeaf ());
+      CS_ASSERT(leafObjCount > 0);
+      leafStorage[index] = leafStorage[--leafObjCount];
     }
 
   private:
