@@ -18,6 +18,7 @@
 */
 
 #include "cssysdef.h"
+#include "imap/services.h"
 #include "iutil/cache.h"
 #include "iutil/databuff.h"
 #include "iutil/document.h"
@@ -101,6 +102,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   }
 
   csRef<iDocument> WeaverShader::LoadTechsFromDoc (const csArray<TechniqueKeeper>& techniques,
+						   const FileAliases& aliases,
 						   iLoaderContext* ldr_context, 
 						   iDocumentNode* docSource,
 						   const char* cacheID, 
@@ -154,7 +156,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	if (child->GetType () == CS_NODE_ELEMENT &&
 	  xmltokens.Request (child->GetValue ()) == WeaverCompiler::XMLTOKEN_PASS)
 	{
-	  passSnippets.Push (new Snippet (compiler, child, 0, true));
+	  passSnippets.Push (new Snippet (compiler, child, 0, aliases, true));
 	  prePassNodes.Push (nonPassNodes);
 	  nonPassNodes.Empty();
 	}
@@ -240,8 +242,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   bool WeaverShader::Load (iLoaderContext* ldr_context, iDocumentNode* source,
                            int forcepriority)
   {
+    FileAliases aliases;
     csArray<TechniqueKeeper> techniques;
-    ScanForTechniques (source, techniques, forcepriority);
+    Parse (source, techniques, forcepriority, aliases);
     
     CS::PluginCommon::ShaderCacheHelper::ShaderDocHasher hasher (
       compiler->objectreg, source);
@@ -326,7 +329,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
       bool cacheState;
       csMemFile cacheFile;
-      synthShader = LoadTechsFromDoc (techniques, ldr_context, 
+      synthShader = LoadTechsFromDoc (techniques, aliases, ldr_context, 
 	source, cacheID_base, cacheTag, cacheValid ? &cacheFile : 0,
 	cacheState);
       if (cacheValid && cacheState)
@@ -380,9 +383,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     return v;
   }
   
-  void WeaverShader::ScanForTechniques (iDocumentNode* templ,
-		                        csArray<TechniqueKeeper>& techniquesTmp,
-		                        int forcepriority)
+  void WeaverShader::Parse (iDocumentNode* templ,
+		            csArray<TechniqueKeeper>& techniquesTmp,
+		            int forcepriority,
+                            FileAliases& aliases)
   {
    csRef<iDocumentNodeIterator> it = templ->GetNodes();
   
@@ -390,29 +394,39 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     while (it->HasNext ())
     {
       csRef<iDocumentNode> child = it->Next ();
-      if (child->GetType () == CS_NODE_ELEMENT &&
-	xmltokens.Request (child->GetValue ()) == WeaverCompiler::XMLTOKEN_TECHNIQUE)
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      csStringID id = xmltokens.Request (child->GetValue ());
+      switch (id)
       {
-	//save it
-	int p = child->GetAttributeValueAsInt ("priority");
-	if ((forcepriority != -1) && (p != forcepriority)) continue;
-	TechniqueKeeper keeper (child, p);
-	// Compute the tag's priorities.
-	csRef<iDocumentNodeIterator> tagIt = child->GetNodes ("tag");
-	while (tagIt->HasNext ())
-	{
-	  csRef<iDocumentNode> tag = tagIt->Next ();
-	  csStringID tagID = compiler->strings->Request (tag->GetContentsValue ());
-  
-	  csShaderTagPresence presence;
-	  int priority;
-	  shadermgr->GetTagOptions (tagID, presence, priority);
-	  if (presence == TagNeutral)
+        case WeaverCompiler::XMLTOKEN_TECHNIQUE:
 	  {
-	    keeper.tagPriority += priority;
+	    //save it
+	    int p = child->GetAttributeValueAsInt ("priority");
+	    if ((forcepriority != -1) && (p != forcepriority)) continue;
+	    TechniqueKeeper keeper (child, p);
+	    // Compute the tag's priorities.
+	    csRef<iDocumentNodeIterator> tagIt = child->GetNodes ("tag");
+	    while (tagIt->HasNext ())
+	    {
+	      csRef<iDocumentNode> tag = tagIt->Next ();
+	      csStringID tagID = compiler->strings->Request (tag->GetContentsValue ());
+      
+	      csShaderTagPresence presence;
+	      int priority;
+	      shadermgr->GetTagOptions (tagID, presence, priority);
+	      if (presence == TagNeutral)
+	      {
+		keeper.tagPriority += priority;
+	      }
+	    }
+	    techniquesTmp.Push (keeper);
 	  }
-	}
-	techniquesTmp.Push (keeper);
+	  break;
+        case WeaverCompiler::XMLTOKEN_ALIAS:
+          {
+            Snippet::ParseAliasNode (compiler, child, aliases);
+          }
+          break;
       }
     }
   

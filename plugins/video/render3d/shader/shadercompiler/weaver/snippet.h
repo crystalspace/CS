@@ -33,6 +33,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 {
   class WeaverCompiler;
   class TechniqueGraphBuilder;
+  
+  typedef csHash<csString, csString> FileAliases;
 
   class Snippet : public CS::Memory::CustomAllocated
   {
@@ -186,7 +188,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     };
     
     Snippet (const WeaverCompiler* compiler, iDocumentNode* node,
-      const char* name, bool topLevel = false);
+      const char* name, const FileAliases& aliases, bool topLevel = false);
     Snippet (const WeaverCompiler* compiler, const char* name);
     virtual ~Snippet();
     
@@ -202,6 +204,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     const csRefArray<iDocumentNode>& GetPassForwardedNodes() const
     { return passForwardedNodes; }
+    
+    static bool ParseAliasNode (const WeaverCompiler* compiler,
+      iDocumentNode* node, FileAliases& aliases);
   private:
     const WeaverCompiler* compiler;
     const csStringHash& xmltokens;
@@ -212,35 +217,40 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     bool passForward;
     csRefArray<iDocumentNode> passForwardedNodes;
     
-    void LoadAtomTechniques (iDocumentNode* node);
-    void LoadAtomTechnique (iDocumentNode* node);
+    void LoadAtomTechniques (iDocumentNode* node, const FileAliases& aliases);
+    void LoadAtomTechnique (iDocumentNode* node, const FileAliases& aliases);
     AtomTechnique* ParseAtomTechnique (/*WeaverCompiler* compiler,*/
-      iDocumentNode* node, bool canOmitCombiner, 
-      const char* defaultCombinerName = 0) const;
+      iDocumentNode* node, bool canOmitCombiner,
+      const FileAliases& aliases, const char* defaultCombinerName = 0) const;
     bool ParseCombiner (iDocumentNode* child, 
       Technique::CombinerPlugin& newCombiner) const;
     bool ParseInput (iDocumentNode* child, Technique::Input& newInput, 
-      const char* defaultCombinerName) const;
+      const FileAliases& aliases, const char* defaultCombinerName) const;
     bool ParseOutput (iDocumentNode* child, 
       Technique::Output& newOutput) const;
     bool ParseAttribute (iDocumentNode* child, 
       Technique::Attribute& attr) const;
     static bool ReadBlocks (const WeaverCompiler* compiler, iDocumentNode* node,
-      csArray<Technique::Block>& blocks, const char* defaultCombinerName = 0);
+      csArray<Technique::Block>& blocks, const FileAliases& aliases, 
+      const char* defaultCombinerName = 0);
     
     static csRef<iDocumentNode> GetNodeOrFromFile (iDocumentNode* node,
       const char* rootName, const WeaverCompiler* compiler,
-      csString* outFilename = 0);
+      const FileAliases& aliases, csString* outFilename = 0);
     
     static int CompareTechnique (Technique* const&, Technique* const&);
     
-    void LoadCompoundTechniques (iDocumentNode* node, bool topLevel);
-    void LoadCompoundTechnique (iDocumentNode* node);
+    void LoadCompoundTechniques (iDocumentNode* node, 
+      const FileAliases& aliases, bool topLevel);
+    void LoadCompoundTechnique (iDocumentNode* node, 
+      const FileAliases& aliases);
     
-    void HandleSnippetNode (CompoundTechnique& tech, iDocumentNode* node);
+    void HandleSnippetNode (CompoundTechnique& tech, iDocumentNode* node,
+      const FileAliases& aliases);
     void HandleConnectionNode (CompoundTechnique& tech, iDocumentNode* node);
     void HandleCombinerNode (CompoundTechnique& tech, iDocumentNode* node);
-    void HandleParameterNode (CompoundTechnique& tech, iDocumentNode* node);
+    void HandleParameterNode (CompoundTechnique& tech, iDocumentNode* node,
+      const FileAliases& aliases);
   };
   
   /// Helper to assign a running ID to each snippet

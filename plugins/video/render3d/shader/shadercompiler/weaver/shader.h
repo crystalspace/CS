@@ -57,8 +57,9 @@ class WeaverShader : public scfImplementationExt3<WeaverShader,
   };
 
   // Scan all techniques in the document.
-  void ScanForTechniques (iDocumentNode* templ,
-    csArray<TechniqueKeeper>& techniquesTmp, int forcepriority);
+  void Parse (iDocumentNode* templ,
+    csArray<TechniqueKeeper>& techniquesTmp, int forcepriority,
+    FileAliases& aliases);
   
   static int CompareTechniqueKeeper (TechniqueKeeper const&,
 				     TechniqueKeeper const&);
@@ -71,6 +72,7 @@ protected:
   void InternalRemove() { SelfDestruct(); }
 
   csRef<iDocument> LoadTechsFromDoc (const csArray<TechniqueKeeper>& techniques,
+    const FileAliases& aliases,
     iLoaderContext* ldr_context, iDocumentNode* docSource,
     const char* cacheID, const char* cacheTag, iFile* cacheFile,
     bool& cacheState);

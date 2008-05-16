@@ -61,16 +61,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   //-------------------------------------------------------------------
 
   Snippet::Snippet (const WeaverCompiler* compiler, iDocumentNode* node, 
-                    const char* name, bool topLevel) : compiler (compiler), 
-    xmltokens (compiler->xmltokens), name (name), isCompound (false),
-    passForward (false)
+                    const char* name, const FileAliases& aliases,
+                    bool topLevel) : compiler (compiler), 
+    xmltokens (compiler->xmltokens), name (name), 
+    isCompound (false), passForward (false)
   {
     bool okay = true;
     if (topLevel)
     {
       isCompound = true;
       passForward = true;
-      LoadCompoundTechnique (node);
+      LoadCompoundTechnique (node, aliases);
     }
     else
     {
@@ -95,14 +96,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       if (okay)
       {
 	if (!isCompound)
-	  LoadAtomTechniques (node);
+	  LoadAtomTechniques (node, aliases);
 	else
 	{
-	  LoadCompoundTechniques (node, topLevel);
+	  LoadCompoundTechniques (node, aliases, topLevel);
 	}
       }
     }
-    //if (techniques.GetSize() > 1) csPrintf ("snippet %s: %zu techniques\n", name, techniques.GetSize());
   }
   
   Snippet::Snippet (const WeaverCompiler* compiler, const char* name) : compiler (compiler), 
@@ -124,8 +124,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     iDocumentNode* node, const Technique::CombinerPlugin& combiner,
     bool markAsCoercion) const
   {
+    FileAliases aliases;
     Snippet::AtomTechnique* technique = 
-      ParseAtomTechnique (/*compiler, */node, true, combiner.name);
+      ParseAtomTechnique (node, true, aliases, combiner.name);
     technique->combiner = combiner;
     if (markAsCoercion)
     {
@@ -163,9 +164,43 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     return newTech;
   }
-  
-  void Snippet::LoadAtomTechniques (iDocumentNode* node)
+    
+  bool Snippet::ParseAliasNode (const WeaverCompiler* compiler,
+                                iDocumentNode* child, 
+                                FileAliases& aliases)
   {
+    const char* aliasName = child->GetAttributeValue ("name");
+    if (aliasName == 0)
+    {
+      compiler->synldr->ReportBadToken (child);
+      return false;
+    }
+    const char* aliasFile = child->GetAttributeValue ("file");
+    if (aliasFile == 0)
+    {
+      compiler->synldr->ReportBadToken (child);
+      return false;
+    }
+    aliases.Put (aliasName, aliasFile);
+    return true;
+  }
+  
+  void Snippet::LoadAtomTechniques (iDocumentNode* node,
+                                    const FileAliases& _aliases)
+  {
+    FileAliases aliases (_aliases);
+    // Aliases
+    {
+      csRef<iDocumentNodeIterator> nodes = node->GetNodes ("alias");
+      while (nodes->HasNext ())
+      {
+	csRef<iDocumentNode> child = nodes->Next ();
+	if (child->GetType() != CS_NODE_ELEMENT) continue;
+	
+	ParseAliasNode (compiler, child, aliases);
+      }
+    }
+
     csRef<iDocumentNodeIterator> nodes = node->GetNodes ();
     while (nodes->HasNext ())
     {
@@ -177,7 +212,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       {
         case WeaverCompiler::XMLTOKEN_TECHNIQUE:
           {
-            LoadAtomTechnique (child);
+            LoadAtomTechnique (child, aliases);
           }
           break;
         default:
@@ -186,22 +221,36 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     }
   }
   
-  void Snippet::LoadAtomTechnique (iDocumentNode* node)
+  void Snippet::LoadAtomTechnique (iDocumentNode* node, 
+                                   const FileAliases& aliases)
   {
-    AtomTechnique* newTech = ParseAtomTechnique (/*compiler, */node, false);
+    AtomTechnique* newTech = ParseAtomTechnique (node, false, aliases);
     if (newTech != 0)
       techniques.InsertSorted (newTech, &CompareTechnique);
   }
   
   Snippet::AtomTechnique* Snippet::ParseAtomTechnique (
-    /*WeaverCompiler* compiler, */iDocumentNode* node, bool canOmitCombiner,
-    const char* defaultCombinerName) const
+    iDocumentNode* node, bool canOmitCombiner,
+    const FileAliases& _aliases, const char* defaultCombinerName) const
   {
+    FileAliases aliases (_aliases);
     AtomTechnique newTech (GetName(),
       csMD5::Encode (CS::DocSystem::FlattenNode (node)));
     
     newTech.priority = node->GetAttributeValueAsInt ("priority");
     
+    // Aliases
+    {
+      csRef<iDocumentNodeIterator> nodes = node->GetNodes ("alias");
+      while (nodes->HasNext ())
+      {
+	csRef<iDocumentNode> child = nodes->Next ();
+	if (child->GetType() != CS_NODE_ELEMENT) continue;
+	
+	ParseAliasNode (compiler, child, aliases);
+      }
+    }
+
     // Combiner nodes
     {
       bool hasCombiner = false;
@@ -243,7 +292,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	if (child->GetType() != CS_NODE_ELEMENT) continue;
 	
 	Technique::Input newInput;
-        if (!ParseInput (child, newInput, defaultCombinerName)) return 0;	
+        if (!ParseInput (child, newInput, aliases, defaultCombinerName))
+          return 0;	
 	newTech.AddInput (newInput);
       }
     }
@@ -262,7 +312,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       }
       
       csArray<Technique::Block> newBlocks;
-      if (!ReadBlocks (compiler, node, newBlocks, defaultCombinerName))
+      if (!ReadBlocks (compiler, node, newBlocks, aliases, defaultCombinerName))
         return 0;
       for (size_t b = 0; b < newBlocks.GetSize(); b++)
         newTech.AddBlock (newBlocks[b]);
@@ -293,7 +343,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   }
 
   bool Snippet::ParseInput (iDocumentNode* child, 
-                            Technique::Input& newInput, 
+                            Technique::Input& newInput,
+                            const FileAliases& aliases,
                             const char* defaultCombinerName) const
   {
     const char* condition = child->GetAttributeValue ("condition");
@@ -304,7 +355,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       newInput.noMerge = true;
 
     csRef<iDocumentNode> inputNode = GetNodeOrFromFile (child, "input",
-      compiler);
+      compiler, aliases);
     if (!inputNode.IsValid()) return false;
 
     newInput.node = inputNode;
@@ -329,7 +380,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       {
         newInput.defaultType = Technique::Input::Complex;
         if (!ReadBlocks (compiler, inputNode, newInput.complexBlocks, 
-            defaultCombinerName))
+            aliases, defaultCombinerName))
 	  return 0;
       }
       else if (strcmp (def, "value") == 0)
@@ -426,6 +477,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   bool Snippet::ReadBlocks (const WeaverCompiler* compiler, 
                             iDocumentNode* node, 
 		            csArray<Technique::Block>& blocks,
+		            const FileAliases& aliases,
                             const char* defaultCombinerName)
   {
     csRef<iDocumentNodeIterator> nodes = node->GetNodes ("block");
@@ -454,7 +506,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         newBlock.combinerName = defaultCombinerName;
         newBlock.location = location;
       }
-      newBlock.node = GetNodeOrFromFile (child, "block", compiler);
+      newBlock.node = GetNodeOrFromFile (child, "block", compiler, aliases);
       if (!newBlock.node) return false;
       
       blocks.Push (newBlock);
@@ -463,10 +515,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   }
   
   csRef<iDocumentNode> Snippet::GetNodeOrFromFile (iDocumentNode* node,
-      const char* rootName, const WeaverCompiler* compiler,
-      csString* outFilename)
+    const char* rootName, const WeaverCompiler* compiler,
+    const FileAliases& aliases, csString* outFilename)
   {
-    const char* filename = node->GetAttributeValue ("file");
+    const char* filename = 0;
+    const char* filenameAlias = node->GetAttributeValue ("filealias");
+    if (filenameAlias != 0)
+    {
+      filename = aliases.Get (filenameAlias, (const char*)0);
+    }
+    else
+      filename = node->GetAttributeValue ("file");
     if (filename != 0)
     {
       csRef<iDocumentNode> rootNode = 
@@ -494,8 +553,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     return v;
   }
   
-  void Snippet::LoadCompoundTechniques (iDocumentNode* node, bool topLevel)
+  void Snippet::LoadCompoundTechniques (iDocumentNode* node, 
+                                        const FileAliases& _aliases,
+                                        bool topLevel)
   {
+    FileAliases aliases (_aliases);
+  
+    // Aliases
+    {
+      csRef<iDocumentNodeIterator> nodes = node->GetNodes ("alias");
+      while (nodes->HasNext ())
+      {
+	csRef<iDocumentNode> child = nodes->Next ();
+	if (child->GetType() != CS_NODE_ELEMENT) continue;
+	
+	ParseAliasNode (compiler, child, aliases);
+      }
+    }
+
     csRef<iDocumentNodeIterator> nodes = node->GetNodes ();
     while (nodes->HasNext ())
     {
@@ -507,8 +582,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       {
         case WeaverCompiler::XMLTOKEN_TECHNIQUE:
           {
-            LoadCompoundTechnique (child);
+            LoadCompoundTechnique (child, aliases);
           }
+          break;
+        case WeaverCompiler::XMLTOKEN_ALIAS:
           break;
         default:
           compiler->synldr->ReportBadToken (child);
@@ -516,8 +593,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     }
   }
   
-  void Snippet::LoadCompoundTechnique (iDocumentNode* node)
+  void Snippet::LoadCompoundTechnique (iDocumentNode* node, 
+                                       const FileAliases& _aliases)
   {
+    FileAliases aliases (_aliases);
+  
+    // Aliases
+    {
+      csRef<iDocumentNodeIterator> nodes = node->GetNodes ("alias");
+      while (nodes->HasNext ())
+      {
+	csRef<iDocumentNode> child = nodes->Next ();
+	if (child->GetType() != CS_NODE_ELEMENT) continue;
+	
+	ParseAliasNode (compiler, child, aliases);
+      }
+    }
+
     CompoundTechnique* newTech = new CompoundTechnique (GetName());
   
     newTech->priority = node->GetAttributeValueAsInt ("priority");
@@ -542,7 +634,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
           break;
         case WeaverCompiler::XMLTOKEN_SNIPPET:
           {
-            HandleSnippetNode (*newTech, child);
+            HandleSnippetNode (*newTech, child, aliases);
           }
           break;
 	case WeaverCompiler::XMLTOKEN_CONNECTION:
@@ -552,7 +644,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  break;
         case WeaverCompiler::XMLTOKEN_PARAMETER:
           {
-            HandleParameterNode (*newTech, child);
+            HandleParameterNode (*newTech, child, aliases);
           }
           break;
         default:
@@ -567,7 +659,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   }
   
   void Snippet::HandleSnippetNode (CompoundTechnique& tech,
-                                   iDocumentNode* node)
+                                   iDocumentNode* node,
+                                   const FileAliases& aliases)
   {
     const char* id = node->GetAttributeValue ("id");
     
@@ -586,7 +679,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     csString filename;
     csRef<iDocumentNode> snippetNode = GetNodeOrFromFile (node, "snippet",
-      compiler, &filename);
+      compiler, aliases, &filename);
     if (!snippetNode.IsValid()) return;
       
     csString snippetName;
@@ -596,7 +689,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     }
     snippetName += id ? id : filename.GetData();
     Snippet* newSnippet = new Snippet (compiler, snippetNode, 
-      snippetName);
+      snippetName, aliases);
     tech.AddSnippet (id, newSnippet);
   }
     
@@ -722,7 +815,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   CS_IDENT_STRING_LIST_END(SVTypes)
   
   void Snippet::HandleParameterNode (CompoundTechnique& tech, 
-				     iDocumentNode* node)
+				     iDocumentNode* node,
+                                     const FileAliases& aliases)
   {
     if (tech.combiner.classId.IsEmpty())
     {
@@ -830,7 +924,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       outputNode->SetAttribute ("name", "output");
     }
     
-    HandleSnippetNode (tech, snippetNode);
+    HandleSnippetNode (tech, snippetNode, aliases);
   }
   
   //-------------------------------------------------------------------
