@@ -941,6 +941,7 @@ void csSCF::RegisterClassesInt(char const* pluginPath, iDocumentNode* scfnode,
 }
 
 uint64 scfImplementationHelper::stats[scfImplementationHelper::scfstatsNum];
+CS::Threading::Mutex scfImplementationHelper::statsLock;
 
 class scfImplementationHelperXS : public scfImplementationHelper
 {
