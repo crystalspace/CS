@@ -16,7 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "csutil/memutil.h"
+#include "csutil/platform.h"
 #include "memutil.h"
 
 namespace CS {

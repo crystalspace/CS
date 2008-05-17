@@ -1044,12 +1044,11 @@ bool csColliderActor::AdjustForCollisions (
     if((localvel - bounce).y > 0)
     {
         unit.y = 0;
-        unit = unit / unit.Norm();
         bounce = unit * (unit * localvel);
     }
       
     // Bounce back
-    if(bounced && (localvel - bounce).Norm() < (localvel - bestBounce).Norm())
+    if(bounced && (localvel - bounce).SquaredNorm() < (localvel - bestBounce).SquaredNorm())
         bestBounce = bounce;
     
     bounced = true;

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2005 by Frank Richter
+    Copyright (C) 2008 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,30 +16,20 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-
 #include "cssysdef.h"
-#include "csutil/csstring.h"
-#include <stdlib.h>
 
 namespace CS
 {
-  namespace Utility
+  namespace Platform
   {
-
-    int setenv (const char* name, const char* value, bool overwrite)
+    namespace Implementation
     {
-#ifdef CS_HAVE_SETENV
-      return ::setenv (name, value, overwrite);
-#else
-      if (overwrite || getenv (name) == 0)
-	{
-	  csString s;
-	  s.Format ("%s=%s", name, value);
-	  return _putenv (s);
-	}
-      return 0;
-#endif // CS_HAVE_SETENV
-    }
-
-  } // namespace Utility
+      uint GetProcessorCount()
+      {
+	SYSTEM_INFO sysinfo;
+	GetSystemInfo (&sysinfo);
+	return sysinfo.dwNumberOfProcessors;
+      }
+    } // namespace Implementation
+  } // namespace Platform
 } // namespace CS

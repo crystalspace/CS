@@ -141,25 +141,60 @@ protected:
   virtual ~iBase() {}
 public:
   SCF_INTERFACE(iBase, 1, 1, 0);
-  /// Increment the number of references to this object.
+  /**
+   * Increment the number of references to this object.
+   * Thread-safe - it is possible to manipulate the reference count from
+   * different threads at the same time.
+   */
   virtual void IncRef () = 0;
-  /// Decrement the reference count.
+  /**
+   * Decrement the number of references to this object.
+   * Thread-safe - it is possible to manipulate the reference count from
+   * different threads. If multiple threads simultaneously decrement the
+   * reference count and cause the object to be freed it's not defined on
+   * which thread the subsequent destruction happens - it may happen in any
+   * one of the decrementing thread.
+   */
   virtual void DecRef () = 0;
-  /// Get the ref count (only for debugging).
+  /**
+   * Get the ref count (only for debugging).
+   * If another thread manipulates the reference count at the same time the
+   * count may reflect the state before or after the manipulation; it is
+   * undefined which exactly.
+   */
   virtual int GetRefCount () = 0;
   /**
    * Query a particular interface implemented by this object. You are 
    * _not_ allowed to cast this to anything but a pointer to this interface
    * (not even iBase).
    * Use scfQueryInterface<interface> instead of using this method directly.
+   * Thread-safe - it is possible to query interfaces from
+   * different threads at the same time.
    */
   virtual void *QueryInterface (scfInterfaceID iInterfaceID, int iVersion) = 0;
-  /// For weak references: add a reference owner.
+  /**
+   * For weak references: add a reference owner.
+   * Thread-safe - it is possible to add reference owners from
+   * different threads at the same time. 
+   * However, if an object may be destructed on another thread, race conditions
+   * might ensue. If weak references are to be used in a multithreaded 
+   * environment each thread holding a weak reference to an object should
+   * also hold a normal reference somewhere.
+   */
   virtual void AddRefOwner (void** ref_owner) = 0;
-  /// For weak references: remove a reference owner.
+  /**
+   * For weak references: remove a reference owner.
+   * Thread-safe - it is possible to add reference owners from
+   * different threads at the same time. But the see comments in AddRefOwner()
+   * on weak references in a multithreaded environment.
+   */
   virtual void RemoveRefOwner (void** ref_owner) = 0;
 
-  /// Request the meta-data for the interfaces implemented by this object.
+  /**
+   * Request the meta-data for the interfaces implemented by this object.
+   * Thread-safe - it is possible to query the supported interfaces from
+   * different threads at the same time.
+   */
   virtual scfInterfaceMetadataList* GetInterfaceMetadata () = 0;
 };
 

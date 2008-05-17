@@ -259,7 +259,7 @@ const char* TiXmlBase::ReadText(ParseInfo& parse, const char* p,
 
 const char* TiDocumentNode::Parse( ParseInfo& parse, const char* p )
 {
-  switch (type)
+  switch (Type())
   {
     case DOCUMENT:
       return static_cast<TiDocument*> (this)->Parse (parse, p);

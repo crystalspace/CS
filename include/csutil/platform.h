@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2005 by Frank Richter
+    Copyright (C) 2008 by Scott Johnson <scottj@cs.umn.edu>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,30 +16,29 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifndef __CSUTIL_PLATFORM_H__
+#define __CSUTIL_PLATFORM_H__
 
 #include "cssysdef.h"
-#include "csutil/csstring.h"
-#include <stdlib.h>
+#include "csextern.h"
 
-namespace CS
-{
-  namespace Utility
-  {
+namespace CS {
+  namespace Platform {
 
-    int setenv (const char* name, const char* value, bool overwrite)
-    {
-#ifdef CS_HAVE_SETENV
-      return ::setenv (name, value, overwrite);
-#else
-      if (overwrite || getenv (name) == 0)
-	{
-	  csString s;
-	  s.Format ("%s=%s", name, value);
-	  return _putenv (s);
-	}
-      return 0;
-#endif // CS_HAVE_SETENV
-    }
+    /**
+     * Retrieve the number of kB of physical system memory.
+     *
+     * @returns Physical system memory (in kB) on success, or 0 on failure.
+     */
+   CS_CRYSTALSPACE_EXPORT size_t GetPhysicalMemorySize();
 
-  } // namespace Utility
-} // namespace CS
+   /**
+    * Retrieve the number of processors in the system.
+    * \returns Number of processors, or 0 on failure.
+    */
+   CS_CRYSTALSPACE_EXPORT uint GetProcessorCount();
+
+  } // End namespace Platform
+} // End namespace CS
+
+#endif // __CSUTIL_PLATFORM_H__

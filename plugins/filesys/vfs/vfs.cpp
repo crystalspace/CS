@@ -747,9 +747,9 @@ csPtr<iDataBuffer> DiskFile::GetAllData (bool nullterm)
       {
 	SetPos (0);
 
+	char* data = (char*)Node->vfs->heap->Alloc (Size+1);
         CS::DataBuffer<VfsHeap>* dbuf =
-	  new CS::DataBuffer<VfsHeap> (Size+1, Node->vfs->heap);
-	char* data = dbuf->GetData();
+	  new CS::DataBuffer<VfsHeap> (data, Size, true, Node->vfs->heap);
 	Read (data, Size);
 	*(data + Size) = 0;
 
@@ -770,10 +770,11 @@ csPtr<iDataBuffer> DiskFile::GetAllData (bool nullterm)
       {
 	// However, a null-terminated buffer is requested,
 	// but this one isn't yet - copy data, append null
+	char* data = (char*)Node->vfs->heap->Alloc (Size+1);
         CS::DataBuffer<VfsHeap>* dbuf =
-	  new CS::DataBuffer<VfsHeap> (Size+1, Node->vfs->heap);
-	memcpy (dbuf->GetData(), alldata->GetData(), Size);
-	dbuf->GetData()[Size] = 0;
+	  new CS::DataBuffer<VfsHeap> (data, Size, true, Node->vfs->heap);
+	memcpy (data, alldata->GetData(), Size);
+	data[Size] = 0;
 	alldata.AttachNew (dbuf);
 
         buffernt = nullterm;

@@ -101,6 +101,16 @@ public:
     return (a1.Delete (what) || a2.Delete (what));
   }
 
+  /**
+   * Linearly search for an item.
+   * \returns Whether the item was found.
+   */
+  bool Contains (T const& what)
+  {
+    return ((a1.Find (what) != csArrayItemNotFound)
+      || (a2.Find (what) != csArrayItemNotFound));
+  }
+
   /// Delete all items.
   void DeleteAll ()
   {
