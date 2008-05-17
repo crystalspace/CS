@@ -98,7 +98,7 @@ bool ShaderVariableContextImpl::RemoveVariable (csShaderVariable* variable)
   return variables.Delete (variable);
 }
 
-bool ShaderVariableContextImpl::RemoveVariable (csStringID name)
+bool ShaderVariableContextImpl::RemoveVariable (ShaderVarStringID name)
 {
   size_t index = variables.FindSortedKey (SvVarArrayCmp (name));
   if (index != csArrayItemNotFound)

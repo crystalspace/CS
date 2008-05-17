@@ -271,7 +271,7 @@ struct iShaderVariableContext : public virtual iBase
   virtual bool RemoveVariable (csShaderVariable* variable) = 0;
 
   /// Remove the variable with the given name from this context.
-  virtual bool RemoveVariable (csStringID name) = 0;
+  virtual bool RemoveVariable (CS::ShaderVarStringID name) = 0;
 };
 
 /**
