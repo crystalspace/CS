@@ -92,7 +92,7 @@ public:
   void ReplaceVariable (csShaderVariable*) {}
   void Clear () { }
   bool RemoveVariable (csShaderVariable*) { return false; }
-  bool RemoveVariable (csStringID) { return false; }
+  bool RemoveVariable (CS::ShaderVarStringID) { return false; }
   /** @} */
 
   /**\name iSelfDestruct implementation

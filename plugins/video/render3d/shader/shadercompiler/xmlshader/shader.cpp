@@ -696,7 +696,7 @@ public:
   { wrappedSVC.Clear(); }
   bool RemoveVariable (csShaderVariable *variable)
   { return wrappedSVC.RemoveVariable (variable); }
-  bool RemoveVariable (csStringID name)
+  bool RemoveVariable (CS::ShaderVarStringID name)
   { return wrappedSVC.RemoveVariable (name); }
 };
 

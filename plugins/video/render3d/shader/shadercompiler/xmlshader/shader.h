@@ -444,7 +444,7 @@ public:
       return fallbackShader->RemoveVariable (variable);
     return GetUsedSVContext().RemoveVariable (variable);
   }
-  bool RemoveVariable (csStringID name)
+  bool RemoveVariable (CS::ShaderVarStringID name)
   {
     if (useFallbackContext)
       return fallbackShader->RemoveVariable (name);
