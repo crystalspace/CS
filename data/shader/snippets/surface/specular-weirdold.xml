@@ -39,6 +39,10 @@
 	  </block>
 	</input>
 	
+	<input name="alpha" type="float" default="value" defval="1">
+	  <attribute name="perfragment" type="bool" defval="true" />
+	</input>
+	
 	<input name="specular" type="rgb" default="complex" private="yes">
 	  <block location="cg:variablemap">
 	    <variablemap variable="specular" destination="fragmentIn.specular" />
@@ -70,8 +74,9 @@
 	  <?if vars."tex specular".texture?>
 	    specularColor_attr_perfragment = true;
 	  <?else?>
-	    specularColor_attr_perfragment = false;
+	   specularColor_attr_perfragment = alpha_attr_perfragment;
 	  <?endif?>
+	  specularColor *= alpha;
 	</block>
 	
 	<block location="cg:fragmentMain">
@@ -80,10 +85,11 @@
 	    specularColor_attr_perfragment = true;
 	  <?else?>
 	    specularColor = specular;
-	    specularColor_attr_perfragment = false;
+	    specularColor_attr_perfragment = alpha_attr_perfragment;
 	  <?endif?>
 	  float weirdCoef = (normalMapAlpha+1)/2;
 	  specularColor *= weirdCoef;
+	  specularColor *= alpha;
 	  specularColor_attr_perfragment |= normalMapAlpha_attr_perfragment;
 	</block>
 	

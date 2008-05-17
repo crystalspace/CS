@@ -27,7 +27,8 @@
     <snippet id="normalmap" file="/shader/snippets/surface/normalmap.xml" />
     <snippet id="surface" file="/shader/snippets/surface/surface-classic.xml" />
     <snippet id="apply_mixmode_alpha" file="/shader/snippets/mixmode-alpha.xml" />
-    <snippet id="lighting" file="/shader/snippets/lighting/lighting-ppl.xml" />
+    <snippet id="apply_alpha" filealias="apply_alpha" />
+    <snippet id="lighting" filealias="lighting" />
     <snippet id="ambient" file="/shader/snippets/lighting/ambient-static.xml" />
     <snippet id="specular" file="/shader/snippets/surface/specular-weirdold.xml" />
     <snippet id="apply_lighting" file="/shader/snippets/lighting/apply-lighting.xml" />
@@ -43,7 +44,9 @@
     <connection from="parallax" to="normalmap" />
     <connection from="normalmap" to="lighting" />
     <connection from="surface" to="apply_mixmode_alpha" />
-    <connection from="apply_mixmode_alpha" to="apply_lighting">
+    <connection from="surface" to="specular" />
+    <connection from="apply_mixmode_alpha" to="apply_alpha" />
+    <connection from="apply_alpha" to="apply_lighting">
       <explicit from="outputColor" to="surfaceDiffuse" />
     </connection>
     <connection from="lighting" to="apply_lighting">

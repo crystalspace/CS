@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <!--
-  Copyright (C) 2007 by Frank Richter
+  Copyright (C) 2007-2008 by Frank Richter
 	    (C) 2007 by Jorrit Tyberghein
 
   This library is free software; you can redistribute it and/or
@@ -17,16 +17,16 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
-<shader compiler="shaderweaver" name="lighting_default" lights="6">
-  <alias name="apply_alpha" file="/shader/snippets/surface/alpha-premult.xml" />
+<shader compiler="shaderweaver" name="lighting_default_binalpha" lights="6">
+  <alias name="apply_alpha" file="/shader/snippets/surface/alpha-nochange.xml" />
   <alias name="lighting" file="/shader/snippets/lighting/lighting-ppl.xml" />
   
   <technique priority="500">
     <!-- 1 pass, 6 lights -->
     <pass>
       <mixmode>
-	<blendop src="one" dst="srcalpha_inv" />
-	<alphatest>disable</alphatest>
+	<blendop src="one" dst="zero" />
+	<alphatest>enable</alphatest>
       </mixmode>
       
       <!-- Combiner to use for this particular pass.
@@ -51,8 +51,8 @@
     <!-- 2 passes, 4+2 lights -->
     <pass>
       <mixmode>
-	<blendop src="one" dst="srcalpha_inv" />
-	<alphatest>disable</alphatest>
+	<blendop src="one" dst="zero" />
+	<alphatest>enable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -66,8 +66,8 @@
     </pass>
     <pass>
       <mixmode>
-	<blendop src="one" dst="srcalpha_inv" />
-	<alphatest>disable</alphatest>
+	<blendop src="one" dst="zero" />
+	<alphatest>enable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -85,8 +85,8 @@
     <!-- 2 passes, 3+3 lights -->
     <pass>
       <mixmode>
-	<blendop src="one" dst="srcalpha_inv" />
-	<alphatest>disable</alphatest>
+	<blendop src="one" dst="zero" />
+	<alphatest>enable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -100,8 +100,8 @@
     </pass>
     <pass>
       <mixmode>
-	<blendop src="one" dst="srcalpha_inv" />
-	<alphatest>disable</alphatest>
+	<blendop src="one" dst="zero" />
+	<alphatest>enable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -119,8 +119,8 @@
     <!-- 3 passes, 2+2+2 lights -->
     <pass>
       <mixmode>
-	<blendop src="one" dst="srcalpha_inv" />
-	<alphatest>disable</alphatest>
+	<blendop src="one" dst="zero" />
+	<alphatest>enable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -134,8 +134,8 @@
     </pass>
     <pass>
       <mixmode>
-	<blendop src="one" dst="srcalpha_inv" />
-	<alphatest>disable</alphatest>
+	<blendop src="one" dst="zero" />
+	<alphatest>enable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -149,8 +149,8 @@
     </pass>
     <pass>
       <mixmode>
-	<blendop src="one" dst="srcalpha_inv" />
-	<alphatest>disable</alphatest>
+	<blendop src="one" dst="zero" />
+	<alphatest>enable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -168,8 +168,8 @@
     <!-- 6 passes, 1+1+1+1+1+1 lights -->
     <pass>
       <mixmode>
-	<blendop src="one" dst="srcalpha_inv" />
-	<alphatest>disable</alphatest>
+	<blendop src="one" dst="zero" />
+	<alphatest>enable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -183,8 +183,8 @@
     </pass>
     <pass>
       <mixmode>
-	<blendop src="one" dst="srcalpha_inv" />
-	<alphatest>disable</alphatest>
+	<blendop src="one" dst="zero" />
+	<alphatest>enable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -198,8 +198,8 @@
     </pass>
     <pass>
       <mixmode>
-	<blendop src="one" dst="srcalpha_inv" />
-	<alphatest>disable</alphatest>
+	<blendop src="one" dst="zero" />
+	<alphatest>enable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -213,8 +213,8 @@
     </pass>
     <pass>
       <mixmode>
-	<blendop src="one" dst="srcalpha_inv" />
-	<alphatest>disable</alphatest>
+	<blendop src="one" dst="zero" />
+	<alphatest>enable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -228,8 +228,8 @@
     </pass>
     <pass>
       <mixmode>
-	<blendop src="one" dst="srcalpha_inv" />
-	<alphatest>disable</alphatest>
+	<blendop src="one" dst="zero" />
+	<alphatest>enable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -243,8 +243,8 @@
     </pass>
     <pass>
       <mixmode>
-	<blendop src="one" dst="srcalpha_inv" />
-	<alphatest>disable</alphatest>
+	<blendop src="one" dst="zero" />
+	<alphatest>enable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -259,5 +259,5 @@
   </technique>
   
   <!-- If PPL is not available, try PVL -->
-  <fallbackshader name="lighting_default_pvl" file="/shader/lighting/lighting_default_pvl.xml" />
+  <fallbackshader name="lighting_default_pvl_binalpha" file="/shader/lighting/lighting_default_pvl_binalpha.xml" />
 </shader>

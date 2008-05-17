@@ -17,16 +17,16 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
-<shader compiler="shaderweaver" name="lighting_default_pvl" lights="8">
-  <alias name="apply_alpha" file="/shader/snippets/surface/alpha-premult.xml" />
-  <alias name="lighting" file="/shader/snippets/lighting/lighting-pvl.xml" />
+<shader compiler="shaderweaver" name="lighting_default_pvl_binalpha" lights="8">
+  <alias name="apply_alpha" file="/shader/snippets/surface/alpha-nochange.xml" />
+  <alias name="lighting" file="/shader/snippets/lighting/lighting-ppl.xml" />
   
   <technique priority="500">
     <!-- 1 pass, 8 lights -->
     <pass>
       <mixmode>
-	<blendop src="one" dst="srcalpha_inv" />
-	<alphatest>disable</alphatest>
+	<blendop src="one" dst="zero" />
+	<alphatest>enable</alphatest>
       </mixmode>
       
       <!-- Combiner to use for this particular pass.
