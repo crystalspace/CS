@@ -136,6 +136,8 @@ namespace RenderManager
 
       void SetupFrame (ShadowPSSM& shadows, iLight* light)
       {
+        if (light->GetFlags().Check (CS_LIGHT_NOSHADOWS)) return;
+        
         ViewSetup& viewSetup = shadows.viewSetup;
         if (!frustumsSetup)
         {
@@ -308,6 +310,8 @@ namespace RenderManager
 	RenderTree& renderTree, iLight* light, CachedLightData& lightData,
 	ViewSetup& viewSetup)
       {
+        if (light->GetFlags().Check (CS_LIGHT_NOSHADOWS)) return;
+        
         typename RenderTree::ContextNode& context = meshNode->owner;
       
         CS_ALLOC_STACK_ARRAY(iTextureHandle*, texHandles,
@@ -388,7 +392,7 @@ namespace RenderManager
 	    CS::Math::Matrix4 Mortho = CS::Math::Projections::Ortho (-1, 1, 1, -1, -n, -f);
 	    CS::Math::Matrix4 matrix = ((Mortho * crop) * lightData.lightProject)
 	     * CS::Math::Matrix4 (superFrust.frustumRotation);
-	    csPrintf ("matrix = %s\n", matrix.Description().GetData());
+	    //csPrintf ("matrix = %s\n", matrix.Description().GetData());
 	    
 	    int shadowMapSize;
 	    csReversibleTransform view = superFrust.world2light_base;
@@ -719,6 +723,7 @@ private:
       lightData.ClearFrameData();
     }
 
+    csFlags GetLightFlagsMask () const { return csFlags (0); }
   protected:
     PersistentData& persist;
     const LayerConfigType& layerConfig;

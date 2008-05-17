@@ -4825,6 +4825,7 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
   csVector3 attenvec (0, 0, 0);
   float spotfalloffInner = 1, spotfalloffOuter = 0;
   csLightType type = CS_LIGHT_POINTLIGHT;
+  csFlags lightFlags;
 
   bool use_light_transf = false;
   bool use_light_transf_vector = false;
@@ -5180,6 +5181,14 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
 	  shader_variables.Push(var);
 	}
 	break;
+      case XMLTOKEN_NOSHADOWS:
+	{
+	  bool flag;
+	  if (!SyntaxService->ParseBool (child, flag, true))
+	    return false;
+	  lightFlags.SetBool (CS_LIGHT_NOSHADOWS, flag);
+	}
+	break;
     default:
 	SyntaxService->ReportBadToken (child);
 	return 0;
@@ -5198,6 +5207,7 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
   	dist, color, dyn);
   AddToRegionOrCollection (ldr_context, l->QueryObject ());
   l->SetType (type);
+  l->GetFlags() = lightFlags;
   l->SetSpotLightFalloff (spotfalloffInner, spotfalloffOuter);
 
   for (size_t i = 0; i < shader_variables.GetSize (); i++)

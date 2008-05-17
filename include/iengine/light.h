@@ -52,6 +52,9 @@ struct iFlareHalo;
 
 /** \name Light flags
  * @{ */
+/// Indicates that a light should not cast shadows
+#define CS_LIGHT_NOSHADOWS	0x00000001
+
 /** 
  * If this flag is set, the halo for this light is active and is in the
  * engine's queue of active halos. When halo become inactive, this flag

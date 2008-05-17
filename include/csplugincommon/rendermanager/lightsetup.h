@@ -102,6 +102,17 @@ namespace RenderManager
     const LayerConfigType& layerConfig;
     NewLayersType& newLayers;
   };
+  
+  struct LightSettings
+  {
+    csLightType type;
+    csFlags lightFlags;
+    
+    bool operator== (const LightSettings& other) const
+    { return (type == other.type) && (lightFlags == other.lightFlags); }
+    bool operator!= (const LightSettings& other) const
+    { return (type != other.type) || (lightFlags != other.lightFlags); }
+  };
 
   class CS_CRYSTALSPACE_EXPORT LightingSorter
   {
@@ -110,9 +121,9 @@ namespace RenderManager
     struct LightInfo
     {
       iLight* light;
-      csLightType type;
       bool isStatic;
       uint numSubLights;
+      LightSettings settings;
     };
     
     struct PersistentData
@@ -126,11 +137,10 @@ namespace RenderManager
       }
     };
 
-    LightingSorter (PersistentData& persist/*,
-      csLightInfluence* influenceLights*/, size_t numLights);
+    LightingSorter (PersistentData& persist, size_t numLights);
     
     void AddLight (const csLightInfluence& influence,
-      uint numSubLights);
+      uint numSubLights, const csFlags& lightFlagsMask);
 
     size_t GetSize (bool skipStatic)
     {
@@ -167,7 +177,7 @@ namespace RenderManager
     }
 
     bool GetNextLight (bool skipStatic, LightInfo& out);
-    bool GetNextLight (csLightType lightType, bool skipStatic,
+    bool GetNextLight (const LightSettings& settings, bool skipStatic,
       LightInfo& out);
       
     /// Put earlier fetched lights back into the list
@@ -263,6 +273,12 @@ namespace RenderManager
     
     static bool NeedFinalHandleLight() { return false; }
     void FinalHandleLight (iLight*, CachedLightData&) { }
+    
+    /**
+     * Return which light flags should be masked out before comparing flags
+     * of two lights.
+     */
+    csFlags GetLightFlagsMask () const { return csFlags (CS_LIGHT_NOSHADOWS); }
   };
 
   /**
@@ -358,8 +374,8 @@ namespace RenderManager
 	  {
 	    sortedLights.GetNextLight (skipStatic, renderLights[firstLight]);
 	    size_t realNum = 1;
-	    csLightType lightType;
-	    lightType = renderLights[firstLight].type;
+	    LightSettings lightSettings;
+	    lightSettings = renderLights[firstLight].settings;
 	    totalWithSublights += renderLights[firstLight].numSubLights;
 	    size_t maxPassLights = lastMetadata.numberOfLights * 
 	      layerConfig.GetMaxLightPasses (layer);
@@ -368,7 +384,7 @@ namespace RenderManager
 	    for (; realNum < maxPassLights; realNum++)
 	    {
 	      // Note that GetNextLight already does a selection on light type
-	      if (!sortedLights.GetNextLight (lightType, skipStatic, 
+	      if (!sortedLights.GetNextLight (lightSettings, skipStatic, 
 		  renderLights[firstLight + realNum]))
 		break;
 	     totalWithSublights += renderLights[firstLight + realNum].numSubLights;
@@ -417,10 +433,10 @@ namespace RenderManager
 	
 	  // Find out number of consecutive lights in the layer
 	  size_t num = 1;
-	  csLightType lightType = renderSublights[firstLight]->type;
+	  LightSettings lightSettings = renderSublights[firstLight]->settings;
 	  for (; num < maxPassLights; num++)
 	  {
-	    if (renderSublights[firstLight + num]->type != lightType)
+	    if (renderSublights[firstLight + num]->settings != lightSettings)
 	      break;
 	  }
 	  size_t thisPassLayers;
@@ -447,11 +463,11 @@ namespace RenderManager
 	  if (totalLayers >= layerConfig.GetMaxLightPasses (layer))
 	    break;
 	
-	  csLightType lightType = renderSublights[firstLight]->type;
+	  LightSettings lightSettings = renderSublights[firstLight]->settings;
 	  size_t num = 1;
 	  for (; num < remainingLights; num++)
 	  {
-	    if (renderSublights[firstLight+num]->type != lightType)
+	    if (renderSublights[firstLight+num]->settings != lightSettings)
 	      break;
 	  }
 	  /* We have a subset of the lights that are of the same type.
@@ -496,7 +512,7 @@ namespace RenderManager
 	    csShaderVariable* lightTypeSV = lightVarsHelper.CreateVarOnStack (
 	      persist.svNames.GetLightSVId (
 		csLightShaderVarCache::lightType), localStack);
-	    lightTypeSV->SetValue ((int)(lightType));
+	    lightTypeSV->SetValue ((int)(lightSettings.type));
     
             CachedLightData* thisLightSVs;
 	    iLight* light = 0;
@@ -578,8 +594,7 @@ namespace RenderManager
 	lightmgr->GetRelevantLights (node->owner.sector,
 	  mesh.bbox, influences, numLights, allMaxLights);
 	
-	LightingSorter sortedLights (persist.lightSorterPersist/*, influences*/,
-	  numLights);
+	LightingSorter sortedLights (persist.lightSorterPersist,  numLights);
 	for (size_t l = 0; l < numLights; l++)
 	{
 	  iLight* light = influences[l].light;
@@ -594,7 +609,13 @@ namespace RenderManager
 	      light, newCacheData);
 	  }
           thisLightSVs->SetupFrame (shadows, light);
-	  sortedLights.AddLight (influences[l], thisLightSVs->GetSublightNum());
+          csFlags lightFlagsMask;
+          if (mesh.meshFlags.Check (CS_ENTITY_NOSHADOWS))
+            lightFlagsMask = noShadows.GetLightFlagsMask();
+          else
+            lightFlagsMask = shadows.GetLightFlagsMask();
+	  sortedLights.AddLight (influences[l], thisLightSVs->GetSublightNum(),
+	    ~lightFlagsMask);
 	}
         
         size_t lightOffset = 0;

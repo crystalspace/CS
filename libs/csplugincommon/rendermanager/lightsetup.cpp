@@ -24,31 +24,22 @@ namespace CS
 {
 namespace RenderManager
 {
-  LightingSorter::LightingSorter (PersistentData& persist/*,
-				  csLightInfluence* influenceLights*/, 
+  LightingSorter::LightingSorter (PersistentData& persist, 
                                   size_t numLights)
     : persist (persist)
   {
-      // Sort lights by type
     persist.lightTypeScratch.Empty();
     persist.lightTypeScratch.SetCapacity (numLights);
-    /*for (size_t l = 0; l < numLights; l++)
-    {
-      LightInfo iltp;
-      iltp.light = influenceLights[l].light;
-      iltp.type = influenceLights[l].light->GetType();
-      iltp.isStatic =
-        influenceLights[l].light->GetDynamicType() != CS_LIGHT_DYNAMICTYPE_DYNAMIC;
-      persist.lightTypeScratch.Push (iltp);
-    }*/
   }
     
   void LightingSorter::AddLight (const csLightInfluence& influence,
-                                 uint numSubLights)
+                                 uint numSubLights,
+                                 const csFlags& lightFlagsMask)
   {
     LightInfo iltp;
     iltp.light = influence.light;
-    iltp.type = influence.light->GetType();
+    iltp.settings.type = influence.light->GetType();
+    iltp.settings.lightFlags = influence.light->GetFlags() & lightFlagsMask;
     iltp.isStatic =
       influence.light->GetDynamicType() != CS_LIGHT_DYNAMICTYPE_DYNAMIC;
     iltp.numSubLights = numSubLights;
@@ -95,7 +86,8 @@ namespace RenderManager
     return true;
   }
   
-  bool LightingSorter::GetNextLight (csLightType lightType, bool skipStatic,
+  bool LightingSorter::GetNextLight (const LightSettings& settings, 
+                                     bool skipStatic,
                                      LightInfo& out)
   {
     csArray<LightInfo>& putBackLights = persist.putBackLights;
@@ -111,7 +103,7 @@ namespace RenderManager
 	  putBackLights.DeleteIndex (j);
 	  continue;
 	}
-	if (putBackLights[j].type == lightType)
+	if (putBackLights[j].settings == settings)
 	  break;
       }
       else
@@ -123,7 +115,7 @@ namespace RenderManager
 	  lightLimit = csMin (persist.lightTypeScratch.GetSize(), lightLimit);
 	  continue;
 	}
-	if (persist.lightTypeScratch[j].type == lightType)
+	if (persist.lightTypeScratch[j].settings == settings)
 	  break;
       }
       i++;
