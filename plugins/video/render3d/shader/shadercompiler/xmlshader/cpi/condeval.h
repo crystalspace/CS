@@ -807,10 +807,10 @@ public:
   void GetUsedSVs (csConditionID condition, MyBitArrayTemp& affectedSVs);
 
   /// Read conditions from file
-  bool ReadFromCache (iFile* cacheFile);
+  bool ReadFromCache (iFile* cacheFile, const csString& tagStr);
   /// Write conditions to file
-  bool WriteToCache (iFile* cacheFile);
-
+  bool WriteToCache (iFile* cacheFile, const csString& tagStr);
+  
   /// Try to release unused temporary memory
   static void CompactMemory ();
 };

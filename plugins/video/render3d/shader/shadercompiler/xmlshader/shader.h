@@ -211,6 +211,7 @@ class csXMLShader : public scfImplementationExt3<csXMLShader,
   size_t cachedEvaluatorConditionNum;
   csRef<iCacheManager> shaderCache;
   bool readFromCache;
+  csString cacheTag;
   csString cacheType;
   csString cacheScope_evaluator;
   csString cacheScope_tech;

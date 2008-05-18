@@ -265,12 +265,20 @@ void csShaderConditionResolver::DumpConditionNode (csString& out,
   
 bool csShaderConditionResolver::ReadFromCache (iFile* cacheFile)
 {
+  uint32 reqCondNumLE;
+  if (cacheFile->Read ((char*)&reqCondNumLE, sizeof (reqCondNumLE))
+      != sizeof (reqCondNumLE))
+    return false;
+  if (csLittleEndian::UInt32 (reqCondNumLE)
+      > evaluator.GetNumConditions())
+    return false;
+
   uint32 nextVarLE;
   if (cacheFile->Read ((char*)&nextVarLE, sizeof (nextVarLE))
       != sizeof (nextVarLE))
     return false;
   nextVariant = csLittleEndian::UInt32 (nextVarLE);
-    
+
   if (!ReadNode (cacheFile, 0, rootNode))
   {
     delete rootNode; rootNode = 0;
@@ -283,6 +291,12 @@ bool csShaderConditionResolver::ReadFromCache (iFile* cacheFile)
 
 bool csShaderConditionResolver::WriteToCache (iFile* cacheFile)
 {
+  uint32 reqCondNumLE =
+    csLittleEndian::UInt32 (evaluator.GetNumConditions());
+  if (cacheFile->Write ((char*)&reqCondNumLE, sizeof (reqCondNumLE))
+      != sizeof (reqCondNumLE))
+    return false;
+    
   uint32 nextVarLE = nextVariant;
   nextVarLE = csLittleEndian::UInt32 (nextVarLE);
   if (cacheFile->Write ((char*)&nextVarLE, sizeof (nextVarLE))
@@ -403,7 +417,7 @@ csXMLShader::~csXMLShader ()
 /* Magic value for cache file.
  * The most significant byte serves as a "version", increase when the
  * cache file format changes. */
-static const uint32 cacheFileMagic = 0x02737863;
+static const uint32 cacheFileMagic = 0x04737863;
 
 void csXMLShader::Load (iDocumentNode* source)
 {
@@ -414,7 +428,7 @@ void csXMLShader::Load (iDocumentNode* source)
   
   shaderCache = shadermgr->GetShaderCache();
   cacheType = source->GetAttributeValue ("name");
-  csString cacheTag (source->GetAttributeValue ("_cachetag"));
+  cacheTag = source->GetAttributeValue ("_cachetag");
   csString cacheID_header;
   {
     csString cacheID_base (source->GetAttributeValue ("_cacheid"));
@@ -423,6 +437,7 @@ void csXMLShader::Load (iDocumentNode* source)
       csMD5::Digest sourceDigest (csMD5::Encode (CS::DocSystem::FlattenNode (source)));
       cacheID_base = sourceDigest.HexString();
     }
+    if (cacheTag.IsEmpty()) cacheTag = cacheID_base;
     cacheID_header.Format ("%sXH", cacheID_base.GetData());
     cacheScope_evaluator.Format ("%sXE", cacheID_base.GetData());
     cacheScope_tech.Format ("%sXT", cacheID_base.GetData());
@@ -494,7 +509,7 @@ void csXMLShader::Load (iDocumentNode* source)
       if (read != sizeof (diskMagic)) break;
       if (csLittleEndian::UInt32 (diskMagic) != cacheFileMagic) break;
       
-      useShaderCache = sharedEvaluator->ReadFromCache (&evalFile);
+      useShaderCache = sharedEvaluator->ReadFromCache (&evalFile, cacheTag);
       if (useShaderCache)
         cachedEvaluatorConditionNum = sharedEvaluator->GetNumConditions();
       else
@@ -503,6 +518,8 @@ void csXMLShader::Load (iDocumentNode* source)
         sharedEvaluator = new csConditionEvaluator (compiler->stringsSvName,
           compiler->condConstants);
       }
+      csPrintf ("shader = %s\nsharedEvaluator->GetNumConditions() = %zu\n", cacheType.GetData(),
+        sharedEvaluator->GetNumConditions());
     }
     while (false);
     
@@ -576,7 +593,7 @@ void csXMLShader::Load (iDocumentNode* source)
 	csMemFile cacheFile;
 	uint32 diskMagic = csLittleEndian::UInt32 (cacheFileMagic);
 	cacheFile.Write ((char*)&diskMagic, sizeof (diskMagic));
-	if (sharedEvaluator->WriteToCache (&cacheFile))
+	if (sharedEvaluator->WriteToCache (&cacheFile, cacheTag))
 	{
 	  csRef<iDataBuffer> cacheData = cacheFile.GetAllData();
 	  shaderCache->CacheData (cacheData->GetData(), cacheData->GetSize(),
@@ -779,6 +796,10 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	    if (read != sizeof (diskMagic)) break;
 	    if (csLittleEndian::UInt32 (diskMagic) != cacheFileMagic) break;
 	    
+	    csString cachedTag =
+	      CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
+	    if (cachedTag != cacheTag) break;
+	    
 	    if (!tech.resolver->ReadFromCache (cacheFile))
 	    {
 	      delete tech.resolver;
@@ -839,6 +860,12 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	    if (cacheFile->Write ((char*)&diskMagic, sizeof (diskMagic))
 	        != sizeof (diskMagic))
 	      cacheFile.Invalidate();
+	    
+	    if (cacheFile.IsValid()
+	        && !CS::PluginCommon::ShaderCacheHelper::WriteString (
+	          cacheFile, cacheTag))
+	      cacheFile.Invalidate();
+	      
 	    if (cacheFile.IsValid() && !tech.resolver->WriteToCache (cacheFile))
 	      cacheFile.Invalidate();
 	    if (cacheFile.IsValid() && !wrappedNode->StoreToCache (cacheFile))
@@ -860,6 +887,8 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
       
       tech.resolver->SetEvalParams (&modes, &stack);
   
+      //csPrintf ("shader = %s\nsharedEvaluator->GetNumConditions() = %zu\n", cacheType.GetData(),
+        //sharedEvaluator->GetNumConditions());
       size_t vi = tech.resolver->GetVariant ();
       if (vi != csArrayItemNotFound)
       {
@@ -943,7 +972,7 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
     csMemFile cacheFile;
     uint32 diskMagic = csLittleEndian::UInt32 (cacheFileMagic);
     cacheFile.Write ((char*)&diskMagic, sizeof (diskMagic));
-    if (sharedEvaluator->WriteToCache (&cacheFile))
+    if (sharedEvaluator->WriteToCache (&cacheFile, cacheTag))
     {
       csRef<iDataBuffer> cacheData = cacheFile.GetAllData();
       shaderCache->CacheData (cacheData->GetData(), cacheData->GetSize(),

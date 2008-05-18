@@ -1530,8 +1530,14 @@ void csConditionEvaluator::GetUsedSVs (csConditionID condition,
   GetUsedSVs2 (condition, affectedSVs);
 }
 
-bool csConditionEvaluator::ReadFromCache (iFile* cacheFile)
+bool csConditionEvaluator::ReadFromCache (iFile* cacheFile,
+                                          const csString& tagStr)
 {
+  csString cachedTag =
+    CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
+  if (cachedTag != tagStr)
+    return false;
+
   uint32 numCondsLE;
   if (cacheFile->Read ((char*)&numCondsLE, sizeof (numCondsLE))
       != sizeof (numCondsLE))
@@ -1556,11 +1562,16 @@ bool csConditionEvaluator::ReadFromCache (iFile* cacheFile)
   }
   
   strStore.EndUse ();
+  
   return true;
 }
 
-bool csConditionEvaluator::WriteToCache (iFile* cacheFile)
+bool csConditionEvaluator::WriteToCache (iFile* cacheFile,
+                                          const csString& tagStr)
 {
+  if (!CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, tagStr))
+    return false;
+
   uint32 numCondsLE = csLittleEndian::UInt32 (nextConditionID);
   if (cacheFile->Write ((char*)&numCondsLE, sizeof (numCondsLE))
       != sizeof (numCondsLE))
@@ -1578,7 +1589,7 @@ bool csConditionEvaluator::WriteToCache (iFile* cacheFile)
   strStore.EndUse ();
   return true;
 }
-
+  
 struct ConditionHeader
 {
   uint8 op;
