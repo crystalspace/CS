@@ -17,6 +17,7 @@
 -->
 <include>
 <?Include lightfuncs.cginc ?>
+<?Include shadowfuncs.cginc ?>
 <![CDATA[
 
 #ifndef __SHADOW_DEPTH_CG_INC__
@@ -28,7 +29,6 @@ struct ShadowShadowMapDepth : ShadowShadowMap
   float4 shadowMapCoords;
   float4 shadowMapCoordsProj;
   sampler2D shadowMap;
-  sampler2D shadowMapNoise;
   float bias;
   float gradient;
   float4 shadowMapUnscale;
@@ -69,11 +69,8 @@ struct ShadowShadowMapDepth : ShadowShadowMap
   
   void Init (int lightNum, float4 vp_shadowMapCoords, float vp_gradient)
   {
-    //debug (float4 (vp_shadowMapCoords.x, vp_shadowMapCoords.y, 0, 1));
-    
     shadowMapCoords = vp_shadowMapCoords;
     shadowMap = lightPropsSM.shadowMap[lightNum];
-    shadowMapNoise = lightPropsSM.shadowMapNoise;
     gradient = vp_gradient;
     shadowMapUnscale = lightPropsSM.shadowMapUnscale[lightNum];
     
@@ -88,48 +85,24 @@ struct ShadowShadowMapDepth : ShadowShadowMap
   
   half GetVisibility()
   {
-    // @@@ FIXME: These should probably be parameters
-    float2 noiseMapScale = float2(32.0);
-    float2 noiseScale = float2(1.0/256.0);
-    
-    // Noise pattern coordinates
     float2 shadowMapCoordsProjUnscaled = 
       (shadowMapCoordsProj.xy) * shadowMapUnscale.xy + shadowMapUnscale.zw;
-    float2 noiseCoords = shadowMapCoordsProjUnscaled * noiseMapScale;
-    half2 noise = h4tex2D (shadowMapNoise, noiseCoords).xy * noiseScale;
-      
+    
+    ShadowClipper clipper;
+    if (clipper.IsClipped (shadowMapCoordsProjUnscaled, shadowMapCoords))
+      return 0;
+  
     float3 shadowMapCoordsBiased = (float3(0.5)*shadowMapCoordsProj.xyz) + float3(0.5);
     // Depth to compare against
     float compareDepth = (1-shadowMapCoordsBiased.z) - bias;
     
     // Depth compare with shadow map texel
-    // @@@ The offsets could probably be better.
-    float inLight;
-    inLight = tex2D (shadowMap, float3 (shadowMapCoordsBiased.xy, compareDepth)).x;
-    /*inLight += tex2D (shadowMap, float3 (shadowMapCoordsBiased.xy+noise*half2(1,1), compareDepth)).x;
-    inLight += tex2D (shadowMap, float3 (shadowMapCoordsBiased.xy+noise*half2(-1,1), compareDepth)).x;
-    inLight += tex2D (shadowMap, float3 (shadowMapCoordsBiased.xy+noise*half2(1,-1), compareDepth)).x;
-    inLight += tex2D (shadowMap, float3 (shadowMapCoordsBiased.xy+noise*half2(-1,-1), compareDepth)).x;
-    inLight += tex2D (shadowMap, float3 (shadowMapCoordsBiased.xy+noise*half2(0.5,0.5), compareDepth)).x;
-    inLight += tex2D (shadowMap, float3 (shadowMapCoordsBiased.xy+noise*half2(-0.5,0.5), compareDepth)).x;
-    inLight += tex2D (shadowMap, float3 (shadowMapCoordsBiased.xy+noise*half2(0.5,-0.5), compareDepth)).x;
-    inLight += tex2D (shadowMap, float3 (shadowMapCoordsBiased.xy+noise*half2(-0.5,-0.5), compareDepth)).x;
-    inLight *= 1.0/9.0;*/
-  ]]>
-  <?if (vars."light type".int != consts.CS_LIGHT_DIRECTIONAL) ?>
-  <![CDATA[
-    /* Point and spot light shadows are computed by separately lighting up 
-       to 6 pyramids with an opening of 90 degs with a shadow map for each
-       of these light volumes.
-       Clip so points outside the light volume aren't lit.
-     */
-    float2 compResLT = shadowMapCoordsProjUnscaled.xy >= float2 (-1);
-    float2 compResBR = shadowMapCoordsProjUnscaled.xy < float2 (1);
-    inLight *= compResLT.x*compResLT.y*compResBR.x*compResBR.y;
-    inLight *= (shadowMapCoords.z <= shadowMapCoords.w);
-  ]]>
-  <?endif?>
-  <![CDATA[
+    half inLight;
+    ShadowSamplerSimple sampler;
+    //ShadowSamplerNoisy sampler;
+    //sampler.Init (shadowMapCoordsProjUnscaled);
+    inLight = sampler.GetVisibility (shadowMap, shadowMapCoordsBiased.xy, compareDepth);
+    
     return inLight;
   }
 };
