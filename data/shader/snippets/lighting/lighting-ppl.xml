@@ -173,19 +173,18 @@
 	  <![CDATA[
           for (int l = 0; l < maxLights; l++)
 	  {
-	    if (l >= lightProps.count) break;
-	  ]]>
 	    int i = lightOffset + l;
+	    if (i >= lightProps.count) break;
+	  ]]>
 	    LightSpaceTangent lightSpace;
 	    lightSpace.Init (lightDir[l], surfToLight[l]);
 	    
 	    Light light = GetCurrentLight (lightSpace, i, normal);
 	    float4 lightAttenuationVec = lightProps.attenuationVec[i];
-	    ShadowNone shadow;
 	    float3 d, s;
 	    ComputeLight (lightSpace, light, myEyeToSurf, normal, 32,
 	      lightProps.colorDiffuse[i], lightProps.colorSpecular[i],
-	      lightAttenuationVec, shadow, d, s);
+	      lightAttenuationVec, 1, d, s);
 	    
 	    diffuseColor += d;
 	    specularColor += s;

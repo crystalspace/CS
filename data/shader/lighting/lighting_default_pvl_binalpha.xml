@@ -24,10 +24,19 @@
   <technique priority="500">
     <!-- 1 pass, 8 lights -->
     <pass>
-      <mixmode>
-	<blendop src="one" dst="zero" />
-	<alphatest>enable</alphatest>
-      </mixmode>
+      <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
+	<!-- First pass: don't blend -->
+	<mixmode>
+	  <blendop src="one" dst="zero" />
+	  <alphatest>disable</alphatest>
+	</mixmode>
+      <?else?>
+	<!-- Later pass: blend with add -->
+	<mixmode>
+	  <blendop src="one" dst="one" />
+	  <alphatest>disable</alphatest>
+	</mixmode>
+      <?endif?>
       
       <!-- Combiner to use for this particular pass.
 	   Techniques Referenced snippets must only utilize the same 

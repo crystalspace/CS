@@ -138,6 +138,35 @@ struct ShadowNone : Shadow
   half GetVisibility() { return 1; }
 };
 
+interface ShadowShadowMap /*: Shadow*/
+{
+  half GetVisibility();
+
+  void InitVP (int lightNum, float4 surfPositionWorld,
+               float3 normWorld,
+               out float4 vp_shadowMapCoords,
+               out float vp_gradientApprox);
+  void Init (int lightNum, float4 vp_shadowMapCoords, float vp_gradient);
+};
+
+struct ShadowShadowMapNone : ShadowShadowMap
+{
+  half GetVisibility() { return 1; }
+  
+  void InitVP (int lightNum, float4 surfPositionWorld,
+               float3 normWorld,
+               out float4 vp_shadowMapCoords,
+               out float vp_gradientApprox) {}
+  void Init (int lightNum, float4 vp_shadowMapCoords, float vp_gradient) {}
+};
+
+struct ShadowShadowShadowMapWrapper : Shadow
+{
+  ShadowShadowMap shadow;
+  
+  half GetVisibility() { return shadow.GetVisibility(); }
+};
+
 struct LightPropertiesShadowMap
 {
   // Transformation from light to shadow map space
@@ -223,7 +252,8 @@ void ComputeLight (LightSpace lightSpace, Light light,
                    half surfShininess, 
                    float3 lightDiffuse, float3 lightSpecular,
                    float4 lightAttenuationVec,
-                   Shadow shadow, out float3 d, out float3 s)
+                   half shadowFactor,
+                   out float3 d, out float3 s)
 {
   half3 L = light.GetIncidence();
   half3 H = normalize (lightSpace.GetSurfaceToLight() - eyeToSurf);
@@ -240,8 +270,7 @@ void ComputeLight (LightSpace lightSpace, Light light,
   else
     attn = Attenuation_CLQ (lightDist, lightAttenuationVec.xyz);
   
-  half shadowed = shadow.GetVisibility();
-  attn *= shadowed;
+  attn *= shadowFactor;
 
   d = lightDiffuse * lightCoeff.y * spot * attn;
   s = lightSpecular * lightCoeff.z * spot * attn;

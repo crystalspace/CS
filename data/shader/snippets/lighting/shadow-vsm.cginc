@@ -22,7 +22,7 @@
 #ifndef __SHADOW_VSM_CG_INC__
 #define __SHADOW_VSM_CG_INC__
 
-struct ShadowShadowMapVSM : Shadow
+struct ShadowShadowMapVSM : ShadowShadowMap
 {
   float4x4 shadowMapTF;
   float4 shadowMapCoords;

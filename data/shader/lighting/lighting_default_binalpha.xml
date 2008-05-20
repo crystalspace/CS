@@ -24,11 +24,20 @@
   <technique priority="500">
     <!-- 1 pass, 6 lights -->
     <pass>
-      <mixmode>
-	<blendop src="one" dst="zero" />
-	<alphatest>enable</alphatest>
-      </mixmode>
-      
+      <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
+	<!-- First pass: don't blend -->
+	<mixmode>
+	  <blendop src="one" dst="zero" />
+	  <alphatest>disable</alphatest>
+	</mixmode>
+      <?else?>
+	<!-- Later pass: blend with add -->
+	<mixmode>
+	  <blendop src="one" dst="one" />
+	  <alphatest>disable</alphatest>
+	</mixmode>
+      <?endif?>
+
       <!-- Combiner to use for this particular pass.
 	   Techniques Referenced snippets must only utilize the same 
 	   combiner with compatible options specified. If a technique
@@ -50,10 +59,19 @@
   <technique priority="400">
     <!-- 2 passes, 4+2 lights -->
     <pass>
-      <mixmode>
-	<blendop src="one" dst="zero" />
-	<alphatest>enable</alphatest>
-      </mixmode>
+      <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
+	<!-- First pass: don't blend -->
+	<mixmode>
+	  <blendop src="one" dst="zero" />
+	  <alphatest>disable</alphatest>
+	</mixmode>
+      <?else?>
+	<!-- Later pass: blend with add -->
+	<mixmode>
+	  <blendop src="one" dst="one" />
+	  <alphatest>disable</alphatest>
+	</mixmode>
+      <?endif?>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
@@ -65,9 +83,10 @@
       <connection from="maxLights" to="shared" />
     </pass>
     <pass>
+      <!-- Later pass: blend with add -->
       <mixmode>
-	<blendop src="one" dst="zero" />
-	<alphatest>enable</alphatest>
+	<blendop src="one" dst="one" />
+	<alphatest>disable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -84,10 +103,19 @@
   <technique priority="300">
     <!-- 2 passes, 3+3 lights -->
     <pass>
-      <mixmode>
-	<blendop src="one" dst="zero" />
-	<alphatest>enable</alphatest>
-      </mixmode>
+      <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
+	<!-- First pass: don't blend -->
+	<mixmode>
+	  <blendop src="one" dst="zero" />
+	  <alphatest>disable</alphatest>
+	</mixmode>
+      <?else?>
+	<!-- Later pass: blend with add -->
+	<mixmode>
+	  <blendop src="one" dst="one" />
+	  <alphatest>disable</alphatest>
+	</mixmode>
+      <?endif?>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
@@ -99,9 +127,10 @@
       <connection from="maxLights" to="shared" />
     </pass>
     <pass>
+      <!-- Later pass: blend with add -->
       <mixmode>
-	<blendop src="one" dst="zero" />
-	<alphatest>enable</alphatest>
+	<blendop src="one" dst="one" />
+	<alphatest>disable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -118,10 +147,19 @@
   <technique priority="200">
     <!-- 3 passes, 2+2+2 lights -->
     <pass>
-      <mixmode>
-	<blendop src="one" dst="zero" />
-	<alphatest>enable</alphatest>
-      </mixmode>
+      <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
+	<!-- First pass: don't blend -->
+	<mixmode>
+	  <blendop src="one" dst="zero" />
+	  <alphatest>disable</alphatest>
+	</mixmode>
+      <?else?>
+	<!-- Later pass: blend with add -->
+	<mixmode>
+	  <blendop src="one" dst="one" />
+	  <alphatest>disable</alphatest>
+	</mixmode>
+      <?endif?>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
@@ -133,9 +171,10 @@
       <connection from="maxLights" to="shared" />
     </pass>
     <pass>
+      <!-- Later pass: blend with add -->
       <mixmode>
-	<blendop src="one" dst="zero" />
-	<alphatest>enable</alphatest>
+	<blendop src="one" dst="one" />
+	<alphatest>disable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -148,9 +187,10 @@
       <connection from="maxLights" to="shared" />
     </pass>
     <pass>
+      <!-- Later pass: blend with add -->
       <mixmode>
-	<blendop src="one" dst="zero" />
-	<alphatest>enable</alphatest>
+	<blendop src="one" dst="one" />
+	<alphatest>disable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -167,10 +207,19 @@
   <technique priority="100">
     <!-- 6 passes, 1+1+1+1+1+1 lights -->
     <pass>
-      <mixmode>
-	<blendop src="one" dst="zero" />
-	<alphatest>enable</alphatest>
-      </mixmode>
+      <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
+	<!-- First pass: don't blend -->
+	<mixmode>
+	  <blendop src="one" dst="zero" />
+	  <alphatest>disable</alphatest>
+	</mixmode>
+      <?else?>
+	<!-- Later pass: blend with add -->
+	<mixmode>
+	  <blendop src="one" dst="one" />
+	  <alphatest>disable</alphatest>
+	</mixmode>
+      <?endif?>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
@@ -182,9 +231,10 @@
       <connection from="maxLights" to="shared" />
     </pass>
     <pass>
+      <!-- Later pass: blend with add -->
       <mixmode>
-	<blendop src="one" dst="zero" />
-	<alphatest>enable</alphatest>
+	<blendop src="one" dst="one" />
+	<alphatest>disable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -197,9 +247,10 @@
       <connection from="maxLights" to="shared" />
     </pass>
     <pass>
+      <!-- Later pass: blend with add -->
       <mixmode>
-	<blendop src="one" dst="zero" />
-	<alphatest>enable</alphatest>
+	<blendop src="one" dst="one" />
+	<alphatest>disable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -212,9 +263,10 @@
       <connection from="maxLights" to="shared" />
     </pass>
     <pass>
+      <!-- Later pass: blend with add -->
       <mixmode>
-	<blendop src="one" dst="zero" />
-	<alphatest>enable</alphatest>
+	<blendop src="one" dst="one" />
+	<alphatest>disable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -227,9 +279,10 @@
       <connection from="maxLights" to="shared" />
     </pass>
     <pass>
+      <!-- Later pass: blend with add -->
       <mixmode>
-	<blendop src="one" dst="zero" />
-	<alphatest>enable</alphatest>
+	<blendop src="one" dst="one" />
+	<alphatest>disable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -242,9 +295,10 @@
       <connection from="maxLights" to="shared" />
     </pass>
     <pass>
+      <!-- Later pass: blend with add -->
       <mixmode>
-	<blendop src="one" dst="zero" />
-	<alphatest>enable</alphatest>
+	<blendop src="one" dst="one" />
+	<alphatest>disable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />

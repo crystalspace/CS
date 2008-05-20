@@ -45,6 +45,16 @@
 	<input name="positionW" type="position4_world" />
 	<!-- Surface normal -->
 	<input name="normal" type="normal_tangent" />
+	<input name="shadow" type="ShadowShadowMap" default="complex">
+	  <block location="cg:vertexMain">
+	    ShadowShadowMapNone noShadow;
+	    shadow = noShadow;
+	  </block>
+	  <block location="cg:fragmentMain">
+	    ShadowShadowMapNone noShadow;
+	    shadow = noShadow;
+	  </block>
+	</input>
 	
 	<input name="objectToWorld" type="float4x4" default="complex" private="yes">
 	  <block location="cg:vertexIn">
@@ -136,29 +146,14 @@
 	</block>
 	<block location="pass">
 	  <?Include /shader/snippets/lighting/lighting-tools.inc ?>
-	  
-	  <?if vars."light shadow map vsm" ?>
-	    <?Generate L 0 7?>
-	      <texture name="light shadow map vsm[$L$]" destination="lightPropsSM.shadowMap[$L$]" />
-	    <?Endgenerate?>
-	  <?else?>
-	    <?Generate L 0 7?>
-	      <texture name="light shadow map[$L$]" destination="lightPropsSM.shadowMap[$L$]"
-		      comparemode="rToTexture" comparefunc="lequal" />
-	    <?Endgenerate?>
-	  <?endif?>
-	  <texture name="tex shadow noise" destination="lightPropsSM.shadowMapNoise" />
 	</block>
 	
 	<block location="cg:variablemap">
 	  <?Lighting_Variablemaps?>
-	  <?Lighting_ShadowMap_Variablemaps?>
 	</block>
 	
 	<block location="cg:definitions">
 	  <?Include /shader/snippets/lighting/lightfuncs.cginc ?>
-	  <?Include /shader/snippets/lighting/shadow-depth.cginc ?>
-	  <?Include /shader/snippets/lighting/shadow-vsm.cginc ?>
 	</block>
 	
 	<!-- @@@ The Cg combiner process the <uniform ... /> tags *before*
@@ -184,13 +179,6 @@
 	  float4x4 world2tang = mul (obj2tang, objectToWorldInv);
 	  
 	  LightSpaceTangent lspace;
-	  <?if vars."light shadow map vsm" ?>
-	  ShadowShadowMapVSM shadow;
-	  <?elsif vars."light shadow map" ?>
-	  ShadowShadowMapDepth shadow;
-	  <?else?>
-	  ShadowNone shadow;
-	  <?endif?>
 	  <![CDATA[
           for (int l = 0; l < maxLights; l++)
 	  {
@@ -207,19 +195,9 @@
 	    float4 vp_shadowMapCoords;
 	    float vp_gradient;
 	    float3 normW = mul (objectToWorld, float4 (Normal, 0)).xyz;
-	    <?if vars."light shadow map vsm" ?>
-	    ShadowShadowMapVSM shadow;
 	    shadow.InitVP (i, positionW, normW , vp_shadowMapCoords, vp_gradient);
 	    shadowMapCoords[l] = vp_shadowMapCoords;
 	    lightDir[l].w = vp_gradient;
-	    <?elsif vars."light shadow map" ?>
-	    ShadowShadowMapDepth shadow;
-	    shadow.InitVP (i, positionW, normW , vp_shadowMapCoords, vp_gradient);
-	    shadowMapCoords[l] = vp_shadowMapCoords;
-	    lightDir[l].w = vp_gradient;
-	    <?else?>
-	    /* No shadow setup needed */
-	    <?endif?>
 	  }
 	  diffuseColor_attr_perfragment = true;
 	  specularColor_attr_perfragment = true;
@@ -233,28 +211,20 @@
 	  <![CDATA[
           for (int l = 0; l < maxLights; l++)
 	  {
-	    if (l >= lightProps.count) break;
-	  ]]>
 	    int i = lightOffset + l;
+	    if (i >= lightProps.count) break;
+	  ]]>
 	    LightSpaceTangent lightSpace;
 	    lightSpace.Init (lightDir[l].xyz, surfToLight[l].xyz);
 	    
-	    <?if vars."light shadow map vsm" ?>
-	    ShadowShadowMapVSM shadow;
 	    shadow.Init (l, shadowMapCoords[l], lightDir[l].w);
-	    <?elsif vars."light shadow map" ?>
-	    ShadowShadowMapDepth shadow;
-	    shadow.Init (l, shadowMapCoords[l], lightDir[l].w);
-	    <?else?>
-	    ShadowNone shadow;
-	    <?endif?>
 	    
 	    Light light = GetCurrentLight (lightSpace, i, normal);
 	    float4 lightAttenuationVec = lightProps.attenuationVec[i];
 	    float3 d, s;
 	    ComputeLight (lightSpace, light, myEyeToSurf, normal, 32,
 	      lightProps.colorDiffuse[i], lightProps.colorSpecular[i],
-	      lightAttenuationVec, shadow, d, s);
+	      lightAttenuationVec, shadow.GetVisibility(), d, s);
 	    
 	  #if 0
 	    if (i == 3)
