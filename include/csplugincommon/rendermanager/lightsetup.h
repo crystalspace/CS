@@ -607,6 +607,7 @@ namespace RenderManager
 	      &(light->GetSVContext()->GetShaderVariables());
 	    thisLightSVs = &persist.lightDataCache.Put (
 	      light, newCacheData);
+	    light->SetLightCallback (persist.GetLightCallback());
 	  }
           thisLightSVs->SetupFrame (shadows, light);
           csFlags lightFlagsMask;
