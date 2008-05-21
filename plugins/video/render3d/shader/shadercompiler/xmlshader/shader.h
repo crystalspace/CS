@@ -218,6 +218,9 @@ class csXMLShader : public scfImplementationExt3<csXMLShader,
 
   /// Shader we fall back to if none of the techs validate
   csRef<iShader> fallbackShader;
+  bool fallbackTried;
+  iShader* GetFallbackShader();
+  
   /// Identify whether a ticker refers to the fallback shader
   bool IsFallbackTicket (size_t ticket) const
   { 
@@ -288,7 +291,7 @@ public:
   virtual size_t GetNumberOfPasses (size_t ticket)
   {
     if (IsFallbackTicket (ticket))
-      return fallbackShader->GetNumberOfPasses (GetFallbackTicket (ticket));
+      return GetFallbackShader()->GetNumberOfPasses (GetFallbackTicket (ticket));
     csXMLShaderTech* tech = (ticket != csArrayItemNotFound) ? 
       TechForTicket (ticket) : 0;
     return tech ? tech->GetNumberOfPasses () : 0;
@@ -303,7 +306,7 @@ public:
     const csShaderVariableStack& stack)
   { 
     if (IsFallbackTicket (ticket))
-      return fallbackShader->SetupPass (GetFallbackTicket (ticket),
+      return GetFallbackShader()->SetupPass (GetFallbackTicket (ticket),
 	mesh, modes, stack);
 
     CS_ASSERT_MSG ("A pass must be activated prior calling SetupPass()",
@@ -318,7 +321,7 @@ public:
   virtual bool TeardownPass (size_t ticket)
   { 
     if (IsFallbackTicket (ticket))
-      return fallbackShader->TeardownPass (GetFallbackTicket (ticket));
+      return GetFallbackShader()->TeardownPass (GetFallbackTicket (ticket));
 
     CS_ASSERT_MSG ("A pass must be activated prior calling TeardownPass()",
       activeTech);

@@ -32,6 +32,7 @@
 #include "csutil/parasiticdatabuffer.h"
 #include "csutil/scfarray.h"
 #include "csutil/xmltiny.h"
+#include "cstool/vfsdirchange.h"
 
 #include "shader.h"
 #include "xmlshader.h"
@@ -379,7 +380,8 @@ csXMLShader::csXMLShader (csXMLShaderCompiler* compiler,
   : scfImplementationType (this), techsResolver (0),
     sharedEvaluator (new csConditionEvaluator (compiler->stringsSvName,
       compiler->condConstants)),
-    cachedEvaluatorConditionNum ((size_t)-1)
+    cachedEvaluatorConditionNum ((size_t)-1),
+    fallbackTried (false)
 {
   InitTokenTable (xmltokens);
 
@@ -611,17 +613,6 @@ void csXMLShader::Load (iDocumentNode* source)
  
   if (varNode)
     ParseGlobalSVs (ldr_context, varNode);
-    
-  csRef<iDocumentNode> fallbackNode = shaderRoot->GetNode ("fallbackshader");
-  if (fallbackNode.IsValid())
-  {
-    if (fallbackNode->GetAttribute ("file").IsValid())
-      fallbackShader = compiler->synldr->ParseShaderRef (ldr_context,
-	fallbackNode);
-    else
-      fallbackShader = compiler->synldr->ParseShader (ldr_context,
-	fallbackNode);
-  }
 }
 
 void csXMLShader::SelfDestruct ()
@@ -675,6 +666,30 @@ void csXMLShader::ScanForTechniques (iDocumentNode* templ,
   }
 
   techniquesTmp.Sort (&CompareTechniqueKeeper);
+}
+
+iShader* csXMLShader::GetFallbackShader()
+{
+  if (!fallbackTried)
+  {
+    // So external files are found correctly
+    csVfsDirectoryChanger chdir (compiler->vfs);
+    chdir.ChangeTo (vfsStartDir);
+  
+    csRef<iDocumentNode> fallbackNode = shaderRoot->GetNode ("fallbackshader");
+    if (fallbackNode.IsValid())
+    {
+      if (fallbackNode->GetAttribute ("file").IsValid())
+	fallbackShader = compiler->synldr->ParseShaderRef (ldr_context,
+	  fallbackNode);
+      else
+	fallbackShader = compiler->synldr->ParseShader (ldr_context,
+	  fallbackNode);
+    }
+  
+    fallbackTried = true;
+  }
+  return fallbackShader;
 }
 
 /**
@@ -940,7 +955,7 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
     
     if (usedTech == 0)
     {
-      if (fallbackShader.IsValid())
+      if (GetFallbackShader())
       {
 	if (compiler->do_verbose /*&& !var.prepared*/)
 	{
@@ -948,7 +963,7 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	    "No technique validated for shader '%s'<%zu>: using fallback", 
 	    GetName(), tvi);
 	}
-	size_t fallbackTicket = fallbackShader->GetTicket (modes, stack);
+	size_t fallbackTicket = GetFallbackShader()->GetTicket (modes, stack);
 	if (fallbackTicket != csArrayItemNotFound)
 	{
 	  ticket = fallbackTicket * (tvc+1);
@@ -989,7 +1004,7 @@ bool csXMLShader::ActivatePass (size_t ticket, size_t number)
   if (IsFallbackTicket (ticket))
   {
     useFallbackContext = true;
-    return fallbackShader->ActivatePass (GetFallbackTicket (ticket), number);
+    return GetFallbackShader()->ActivatePass (GetFallbackTicket (ticket), number);
   }
 
   CS_ASSERT_MSG ("ActivatePass() has already been called.",
@@ -1003,7 +1018,7 @@ bool csXMLShader::DeactivatePass (size_t ticket)
   if (IsFallbackTicket (ticket))
   {
     useFallbackContext = false;
-    return fallbackShader->DeactivatePass (GetFallbackTicket (ticket));
+    return GetFallbackShader()->DeactivatePass (GetFallbackTicket (ticket));
   }
 
   bool ret = activeTech ? activeTech->DeactivatePass() : false; 
