@@ -23,6 +23,7 @@
 #include "iutil/databuff.h"
 #include "iutil/document.h"
 #include "iutil/vfs.h"
+#include "ivaria/reporter.h"
 
 #include "csplugincommon/shader/shadercachehelper.h"
 #include "csutil/csendian.h"
@@ -140,7 +141,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     }
 
     csRefArray<iDocumentNode> techniqueNodes;
-    for (size_t t = 0; t < techniques.GetSize(); t++)
+    //for (size_t t = 0; t < techniques.GetSize(); t++)
+    for (size_t t = 0; t < 1; t++)
     {
       iDocumentNode* techSource = techniques[t].node;
       
@@ -169,11 +171,31 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       csTextProgressMeter pmeter (0);
       synth.Synthesize (shaderNode, shaderVarNodesHelper, techniqueNodes, &pmeter);
     }
-    
-    for (size_t t = 0; t < techniqueNodes.GetSize(); t++)
-      techniqueNodes[t]->SetAttributeAsInt ("priority",
-        int (techniqueNodes.GetSize()-t));
-    
+    if (techniques.GetSize() > 1)
+    {
+      csRef<iDocumentNode> newFallback = shaderNode->CreateNodeBefore (CS_NODE_ELEMENT);
+      newFallback->SetValue ("fallbackshader");
+      CS::DocSystem::CloneAttributes (docSource, newFallback);
+      
+      csString shaderNameDecorated (docSource->GetAttributeValue ("name"));
+      size_t atat = shaderNameDecorated.FindFirst ("@@");
+      if (atat != (size_t)-1)
+        shaderNameDecorated.DeleteAt (atat, shaderNameDecorated.Length()-atat);
+      shaderNameDecorated.AppendFmt ("@@%d", techniques[1].priority);
+      newFallback->SetAttribute ("name", shaderNameDecorated);
+      
+      csRef<iDocumentNodeIterator> docNodes = docSource->GetNodes ();
+      while (docNodes->HasNext())
+      {
+        csRef<iDocumentNode> orgNode = docNodes->Next();
+        if (orgNode->Equals (techniques[0].node)) continue;
+        
+        csRef<iDocumentNode> newNode = newFallback->CreateNodeBefore (
+          orgNode->GetType());
+        CS::DocSystem::CloneNode (orgNode, newNode);
+      }
+    }
+    else
     {
       csRef<iDocumentNode> fallback = docSource->GetNode ("fallbackshader");
       if (fallback.IsValid())
@@ -182,6 +204,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         CS::DocSystem::CloneNode (fallback, newFallback);
       }
     }
+    
+    for (size_t t = 0; t < techniqueNodes.GetSize(); t++)
+      techniqueNodes[t]->SetAttributeAsInt ("priority",
+        int (techniqueNodes.GetSize()-t));
     
     if (cacheFile)
     {
@@ -213,7 +239,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   }
   
   csRef<iDocument> WeaverShader::LoadTechsFromCache (iLoaderContext* ldr_context, 
-                                                     iFile* cacheFile)
+                                                     iFile* cacheFile,
+                                                     const char* cacheFailReason)
   {
     size_t read;
   
@@ -221,19 +248,35 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     // Read magic header
     uint32 diskMagic;
     read = cacheFile->Read ((char*)&diskMagic, sizeof (diskMagic));
-    if (read != sizeof (diskMagic)) return false;
-    if (csLittleEndian::UInt32 (diskMagic) != cacheFileMagic) return false;
+    if (read != sizeof (diskMagic))
+    {
+      cacheFailReason = "Read error";
+      return 0;
+    }
+    if (csLittleEndian::UInt32 (diskMagic) != cacheFileMagic)
+    {
+      cacheFailReason = "Out of date (magic)";
+      return 0;
+    }
     
     csRef<iDataBuffer> cachedDocData = 
       CS::PluginCommon::ShaderCacheHelper::ReadDataBuffer (cacheFile);
-    if (!cachedDocData.IsValid()) return 0;
+    if (!cachedDocData.IsValid())
+    {
+      cacheFailReason = "Failed to read cached doc";
+      return 0;
+    }
     
     csRef<iDocument> cacheDoc;
     cacheDoc = compiler->binDocSys->CreateDocument();
     if (cacheDoc->Parse (cachedDocData) != 0)
     {
       cacheDoc = compiler->xmlDocSys->CreateDocument();
-      if (cacheDoc->Parse (cachedDocData) != 0) return 0;
+      if (cacheDoc->Parse (cachedDocData) != 0)
+      {
+	cacheFailReason = "Failed to parse cached doc";
+	return 0;
+      }
     }
     
     return cacheDoc;
@@ -263,6 +306,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     bool cacheValid = (shaderCache != 0) && !shaderName.IsEmpty()
       && !cacheID_header.IsEmpty() && !cacheID_tech.IsEmpty();
     bool useShaderCache = cacheValid;
+    csString cacheFailReason;
       
     if (useShaderCache)
     {
@@ -281,15 +325,32 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  // Read magic header
 	  uint32 diskMagic;
 	  size_t read = cacheFile->Read ((char*)&diskMagic, sizeof (diskMagic));
-	  if (read != sizeof (diskMagic)) break;
-	  if (csLittleEndian::UInt32 (diskMagic) != cacheFileMagic) break;
+	  if (read != sizeof (diskMagic))
+	  {
+	    cacheFailReason = "Read error";
+	    break;
+	  }
+	  if (csLittleEndian::UInt32 (diskMagic) != cacheFileMagic)
+	  {
+	    cacheFailReason = "Out of date (magic)";
+	    break;
+	  }
 	  
 	  // Extract hash stream
 	  csRef<iDataBuffer> hashStream = 
 	    CS::PluginCommon::ShaderCacheHelper::ReadDataBuffer (cacheFile);
-	  if (!hashStream.IsValid()) break;
+	  if (!hashStream.IsValid())
+	  {
+	    cacheFailReason = "Read error";
+	    break;
+	  }
 	  
 	  useShaderCache = hasher.ValidateHashStream (hashStream);
+	  if (!useShaderCache)
+	  {
+	    cacheFailReason = "Out of date (hash)";
+	    break;
+	  }
 	}
 	while (false);
       }
@@ -319,7 +380,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     if (cacheData.IsValid())
     {
       csMemFile cacheFile (cacheData, true);
-      synthShader = LoadTechsFromCache (ldr_context, &cacheFile);
+      const char* techCacheFailReason = 0;
+      synthShader = LoadTechsFromCache (ldr_context, &cacheFile, techCacheFailReason);
+      if (techCacheFailReason != 0)
+        cacheFailReason.Format ("Could not get cached techniques: %s",
+          techCacheFailReason);
     }
     
     if (!synthShader.IsValid())
@@ -349,7 +414,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       csRef<iDocumentNode> rootNode = dumpDoc->CreateRoot();
       CS::DocSystem::CloneNode (synthShader->GetRoot(), rootNode);
       
-      csString shaderName (source->GetAttributeValue ("name"));
       if (shaderName.IsEmpty())
       {
 	static size_t counter = 0;
@@ -365,6 +429,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     realShader = compiler->xmlshader->CompileShader (ldr_context,
       shaderNode);
+      
+    if (compiler->do_verbose && (!cacheFailReason.IsEmpty()))
+    {
+      compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
+        "Could not get shader '%s' from cache because: %s",
+        shaderName.GetData(), cacheFailReason.GetData());
+    }
 
     return realShader.IsValid();
   }

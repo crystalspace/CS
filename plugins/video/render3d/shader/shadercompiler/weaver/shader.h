@@ -76,7 +76,8 @@ protected:
     iLoaderContext* ldr_context, iDocumentNode* docSource,
     const char* cacheID, const char* cacheTag, iFile* cacheFile,
     bool& cacheState);
-  csRef<iDocument> LoadTechsFromCache (iLoaderContext* ldr_context, iFile* cacheFile);
+  csRef<iDocument> LoadTechsFromCache (iLoaderContext* ldr_context, iFile* cacheFile,
+    const char* cacheFailReason);
       
 public:
   CS_LEAKGUARD_DECLARE (WeaverShader);
