@@ -780,7 +780,6 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	
 	techVar.techniques.Push (newTech);
       }
-      techVar.prepared = true;
     }
     
     csXMLShaderTech* usedTech = 0;
@@ -955,9 +954,9 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
     
     if (usedTech == 0)
     {
-      if (GetFallbackShader())
+      if (GetFallbackShader ())
       {
-	if (compiler->do_verbose /*&& !var.prepared*/)
+	if (compiler->do_verbose && !techVar.prepared)
 	{
 	  compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
 	    "No technique validated for shader '%s'<%zu>: using fallback", 
@@ -971,10 +970,11 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	else
 	  ticket = csArrayItemNotFound;
       }
-      else if (/*!var.prepared && */compiler->do_verbose)
+      else if (!techVar.prepared && compiler->do_verbose)
 	compiler->Report (CS_REPORTER_SEVERITY_WARNING,
 	  "No technique validated for shader '%s'<%zu>", GetName(), tvi);
     }
+    techVar.prepared = true;
   }
   
   compiler->vfs->PopDir ();
