@@ -36,11 +36,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
     typedef CS::RenderManager::ShadowPSSMExtraMeshData MeshExtraDataType;
   };
 
-  class RMShadowedPSSM : public scfImplementation4<RMShadowedPSSM, 
+  class RMShadowedPSSM : public scfImplementation5<RMShadowedPSSM, 
                                                  iRenderManager, 
                                                  iRenderManagerTargets,
                                                  iRenderManagerPostEffects,
-                                                 iComponent>
+                                                 iComponent,
+                                                 iDebugHelper>
   {
   public:
     RMShadowedPSSM (iBase* parent);
@@ -82,6 +83,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
     {
       return false;
     }
+    
+    /**\name iDebugHelper implementation
+     * @{ */
+    csTicks Benchmark (int num_iterations) { return 0; }
+    bool DebugCommand (const char *cmd);
+    void Dump (iGraphics3D *g3d) {}
+    csPtr<iString> Dump () { return 0; }
+    int GetSupportedTests () const { return 0; }
+    csPtr<iString> StateTest () { return  0; }
+    csPtr<iString> UnitTest () { return  0; }
+    /** @} */
 
     typedef CS::RenderManager::RenderTree<RenderTreeTraits> RenderTreeType;
 
@@ -124,6 +136,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
 
     TargetManagerType targets;
     csSet<RenderTreeType::ContextNode*> contextsScannedForTargets;
+    
+    bool wantDebugLockLines;
+    RenderTreeType::DebugLines* lockedDebugLines;
   };  
 
 }

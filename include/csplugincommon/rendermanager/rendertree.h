@@ -426,7 +426,80 @@ namespace RenderManager
       }
       g3d->FinishDraw ();
     }
+    
+    
+    struct DebugLines
+    {
+      csDirtyAccessArray<csVector3> verts;
+      csDirtyAccessArray<csVector4> colors;
+    };
+    /// Add debug line (world space)
+    void AddDebugLine3D (const csVector3& v1, const csVector3& v2,
+                         const csColor& color1, const csColor& color2)
+    {
+      debugLines.verts.Push (v1);
+      debugLines.verts.Push (v2);
+      debugLines.colors.Push (
+        csVector4 (color1.red, color1.green, color1.blue));
+      debugLines.colors.Push (
+        csVector4 (color2.red, color2.green, color2.blue));
+    }
+    void AddDebugBBox (const csBox3& box,
+                       const csTransform& toWorldSpace,
+                       const csColor& col)
+    {
+      static const int numEdges = 12;
+      static const int edges[numEdges] =
+      {
+        CS_BOX_EDGE_xyz_Xyz,
+        CS_BOX_EDGE_xyz_xYz,
+        CS_BOX_EDGE_Xyz_XYz,
+        CS_BOX_EDGE_xYz_XYz,
+        
+        CS_BOX_EDGE_xyZ_XyZ,
+        CS_BOX_EDGE_xyZ_xYZ,
+        CS_BOX_EDGE_XyZ_XYZ,
+        CS_BOX_EDGE_xYZ_XYZ,
+        
+        CS_BOX_EDGE_xyz_xyZ,
+        CS_BOX_EDGE_xYz_xYZ,
+        CS_BOX_EDGE_Xyz_XyZ,
+        CS_BOX_EDGE_XYz_XYZ
+      };
+      for (int e = 0; e < numEdges; e++)
+      {
+        csSegment3 edge (box.GetEdge (edges[e]));
+        AddDebugLine3D (toWorldSpace.Other2This (edge.Start()),
+          toWorldSpace.Other2This (edge.End()),
+          col, col);
+      }
+    }
 
+    void DrawDebugLines (iGraphics3D* g3d, RenderView* view)
+    {
+      if (debugLines.verts.GetSize() == 0) return;
+      
+      g3d->SetProjectionMatrix (view->GetCamera()->GetProjectionMatrix());
+      g3d->SetClipper (0, CS_CLIPPER_TOPLEVEL);
+      // [res] WTF - why does that not work, but in mesh.object2world it does?
+      //g3d->SetWorldToCamera (view->GetCamera()->GetTransform().GetInverse());
+      
+      g3d->BeginDraw (CSDRAW_3DGRAPHICS);
+      
+      csSimpleRenderMesh mesh;
+      mesh.alphaType.alphaType = csAlphaMode::alphaNone;
+      mesh.meshtype = CS_MESHTYPE_LINES;
+      mesh.vertexCount = debugLines.verts.GetSize();
+      mesh.vertices = debugLines.verts.GetArray();
+      mesh.colors = debugLines.colors.GetArray();
+      mesh.object2world = view->GetCamera()->GetTransform().GetInverse();
+      g3d->DrawSimpleMesh (mesh);
+      g3d->FinishDraw ();
+    }
+    
+    const DebugLines& GetDebugLines () const { return debugLines; }
+    void SetDebugLines (const DebugLines& lines) { debugLines = lines; }
+    
 
     PersistentData& GetPersistentData()
     {
@@ -447,6 +520,7 @@ namespace RenderManager
       float aspect;
     };
     csArray<DebugTexture> debugTextures;
+    DebugLines debugLines;
   };
 
 }

@@ -139,7 +139,8 @@ private:
 
 
 RMShadowedPSSM::RMShadowedPSSM (iBase* parent)
-  : scfImplementationType (this, parent), doHDRExposure (false), targets (*this)
+  : scfImplementationType (this, parent), doHDRExposure (false), targets (*this),
+    wantDebugLockLines (false), lockedDebugLines (0)
 {
 }
 
@@ -210,6 +211,15 @@ bool RMShadowedPSSM::RenderView (iView* view)
   
   if (doHDRExposure) hdrExposure.ApplyExposure (postEffects);
   
+  if (wantDebugLockLines)
+  {
+    lockedDebugLines =
+      new RenderTreeType::DebugLines (renderTree.GetDebugLines());
+    wantDebugLockLines = false;
+  }
+  else if (lockedDebugLines)
+    renderTree.SetDebugLines (*lockedDebugLines);
+  renderTree.DrawDebugLines (rview->GetGraphics3D (), rview);
   renderTree.RenderDebugTextures (rview->GetGraphics3D ());
 
   return true;
@@ -243,6 +253,21 @@ bool RMShadowedPSSM::HandleTarget (RenderTreeType& renderTree,
   targets.EnqueueTargets (renderTree, shaderManager, renderLayer, contextsScannedForTargets);
 
   return true;
+}
+
+bool RMShadowedPSSM::DebugCommand (const char *cmd)
+{
+  if (strcmp (cmd, "toggle_debug_lines_lock") == 0)
+  {
+    if (lockedDebugLines)
+    {
+      delete lockedDebugLines; lockedDebugLines = 0;
+    }
+    else
+      wantDebugLockLines = !wantDebugLockLines;
+    return true;
+  }
+  return false;
 }
 
 
