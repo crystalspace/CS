@@ -106,10 +106,10 @@ struct iDynamicsSystemCollider;
  * Collision detection is done in another plugin.
  *
  * Main creators of instances implementing this interface:
- * - iDynamicSystem::CreateSystem()
+ * - iDynamics::CreateSystem()
  * 
  * Main ways to get pointers to this interface:
- * - iDynamicSystem::FindSystem()
+ * - iDynamics::FindSystem()
  */
 struct iDynamicSystem : public virtual iBase
 {

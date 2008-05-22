@@ -543,13 +543,26 @@ inline void csList<T, MemoryAllocator>::Delete (Iterator &it)
   CS_ASSERT(it.HasCurrent());
   ListElement* el = it.ptr;
 
-  // Advance the iterator so we can delete the data it's using
-  if (it.IsReverse())
-    --it;
+  if (el->prev == 0)
+  {
+    // Deleting first element, reset to next
+    if (it.IsReverse())
+      --it;
+    else
+      ++it;
+    Delete(el);
+    it.visited = false;
+  }
   else
-    ++it;
-
-  Delete(el);
+  {
+    /* Make a step back so the current element can be deleted
+       and the next element returned is the one after the deleted */
+    if (it.IsReverse())
+      ++it;
+    else
+      --it;
+    Delete(el);
+  }
 }
 
 template <class T, class MemoryAllocator>

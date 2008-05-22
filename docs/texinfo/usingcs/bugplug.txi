@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node BugPlug, HOWTO, Making Own Projects, Using Crystal Space
+@node BugPlug, HOWTO, Distributing Own Project, Using Crystal Space
 @section Using the BugPlug Debugging Plugin
 @cindex BugPlug
 @cindex debugging

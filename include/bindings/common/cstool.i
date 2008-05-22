@@ -8,6 +8,7 @@
 %template (scfFakecsColliderWrapper) scfFakeInterface<csColliderWrapper >;
 %template(scfColliderWrapper) scfImplementationExt1<csColliderWrapper,csObject,scfFakeInterface<csColliderWrapper> >;
 %include "cstool/collider.h"
+%template (scfView) scfImplementation1<csView, iView >;
 %include "cstool/csview.h"
 %include "cstool/csfxscr.h"
 
@@ -32,6 +33,16 @@
 #ifndef SWIGIMPORTED
 #undef APPLY_FOR_ALL_INTERFACES_POST
 #define APPLY_FOR_ALL_INTERFACES_POST CSTOOL_APPLY_FOR_EACH_INTERFACE
-%include "bindings/common/basepost.i"
-cs_lang_include(cstoolpost.i)
 #endif
+
+%include "bindings/common/basepost.i"
+
+#ifndef SWIGIMPORTED
+cs_apply_all_interfaces
+#endif
+
+cs_lang_include(cstoolpost.i)
+
+
+
+

@@ -139,7 +139,9 @@ public:
  */
 struct csXmlReadNode :
   public scfImplementationPooled<scfImplementation1<csXmlReadNode,
-				 iDocumentNode> >
+				 iDocumentNode>,
+				 CS::Memory::AllocatorMalloc,
+				 true>
 {
 private:
   friend class csXmlReadDocument;

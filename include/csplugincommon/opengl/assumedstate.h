@@ -40,6 +40,7 @@ namespace CS
        * 
        * States set by this function are:
        * - Depth clear value (glClearDepth)
+       * - Depth range (glDepthRange)
        * - Pixel unpack alignment (GL_UNPACK_ALIGNMENT)
        * - Pixel byte swapping (GL_UNPACK_SWAP_BYTES)
        * - Vertex program point size (GL_VERTEX_PROGRAM_POINT_SIZE_ARB)

@@ -452,6 +452,20 @@ TYPEMAP_OUT_csWrapPtr
 // %typemap(default). The %extend-ing and extra code takes place after all
 // %include's are done, mentioning the header(s) it is related to.
 
+%ignore CS::Memory::CustomAllocated::operator new;
+%ignore CS::Memory::CustomAllocated::operator new[];
+%ignore CS::Memory::CustomAllocated::operator delete;
+%ignore CS::Memory::CustomAllocated::operator delete[];
+%ignore CS::Memory::CustomAllocatedDerived::operator new;
+%ignore CS::Memory::CustomAllocatedDerived::operator new[];
+%ignore CS::Memory::CustomAllocatedDerived::operator delete;
+%ignore CS::Memory::CustomAllocatedDerived::operator delete[];
+%ignore CS::Memory::CustomAllocatedDerivedVirtual::operator new;
+%ignore CS::Memory::CustomAllocatedDerivedVirtual::operator new[];
+%ignore CS::Memory::CustomAllocatedDerivedVirtual::operator delete;
+%ignore CS::Memory::CustomAllocatedDerivedVirtual::operator delete[];
+%include "csutil/customallocated.h"
+
 %include "iutil/array.h"
 %ignore csOrdering;
 %ignore csArrayCmp;
@@ -462,7 +476,6 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csArray::Capacity;
 %ignore csArray::DefaultCompare;
 %ignore csArray::Delete;
-%ignore csArray::DeleteAll;
 %ignore csArray::DeleteFast;
 %ignore csArray::Find;
 %ignore csArray::FindKey;
@@ -516,7 +529,17 @@ csArrayCapacityLinear<csArrayThresholdVariable >;
 %template (typename ## ArrayChangeElements) iArrayChangeElements<typename* >;
 %template (typename ## ArrayChangeAll) iArrayChangeAll<typename* >;
 %enddef
-
+#%ignore csDirtyAccessArray::Length;
+%include "csutil/dirtyaccessarray.h"
+// Provide some useful default instantiations
+%template (Vector2Array) csArray<csVector2>;
+%template (Vector2DirtyAccessArray) csDirtyAccessArray<csVector2>;
+%template (Vector3Array) csArray<csVector3>;
+%template (Vector3DirtyAccessArray) csDirtyAccessArray<csVector3>;
+%template (Vector4Array) csArray<csVector4>;
+%template (Vector4DirtyAccessArray) csDirtyAccessArray<csVector4>;
+%template (UIntArray) csArray<unsigned int>;
+%template (UIntDirtyAccessArray) csDirtyAccessArray<unsigned int>;
 
 %ignore scfInitialize;
 %immutable iSCF::SCF;
@@ -591,20 +614,6 @@ SET_HELPER(csStringID)
 %feature("compactdefaultargs") csInitializer::SetupConfigManager;
 %include "cstool/initapp.h"
 %typemap(default) const char * configName;
-
-%ignore CS::Memory::CustomAllocated::operator new;
-%ignore CS::Memory::CustomAllocated::operator new[];
-%ignore CS::Memory::CustomAllocated::operator delete;
-%ignore CS::Memory::CustomAllocated::operator delete[];
-%ignore CS::Memory::CustomAllocatedDerived::operator new;
-%ignore CS::Memory::CustomAllocatedDerived::operator new[];
-%ignore CS::Memory::CustomAllocatedDerived::operator delete;
-%ignore CS::Memory::CustomAllocatedDerived::operator delete[];
-%ignore CS::Memory::CustomAllocatedDerivedVirtual::operator new;
-%ignore CS::Memory::CustomAllocatedDerivedVirtual::operator new[];
-%ignore CS::Memory::CustomAllocatedDerivedVirtual::operator delete;
-%ignore CS::Memory::CustomAllocatedDerivedVirtual::operator delete[];
-%include "csutil/customallocated.h"
 
 %ignore csArray<csPluginRequest>::Capacity;
 %ignore csArray<csPluginRequest>::DefaultCompare;
@@ -991,7 +1000,14 @@ csEventID _csevJoystickEvent (iObjectRegistry *);
 #ifndef SWIGIMPORTED
 #undef APPLY_FOR_ALL_INTERFACES_POST
 #define APPLY_FOR_ALL_INTERFACES_POST CORE_APPLY_FOR_EACH_INTERFACE
-%include "bindings/common/basepost.i"
-cs_lang_include(corepost.i)
 #endif
+
+%include "bindings/common/basepost.i"
+
+#ifndef SWIGIMPORTED
+cs_apply_all_interfaces
+#endif
+
+cs_lang_include(corepost.i)
+
 

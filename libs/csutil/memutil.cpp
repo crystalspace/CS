@@ -16,37 +16,25 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "csutil/memutil.h"
-
-#if 0 // Marten temporarily disabled this until it has been sorted out
+#include "csutil/platform.h"
+#include "memutil.h"
 
 namespace CS {
-  namespace Memory {
-    
-	static size_t cachedMemory;
-	static bool memoryCached;
-	
-    size_t GetPhysicalMemory()
+  namespace Platform {
+
+    size_t GetPhysicalMemorySize()
     {
-      // determine if the amount of physical memory has been cached
-	  if (memoryCached)
-	  {
-	  	// if so, return it
-		return cachedMemory;
-	  }
-	  
-	  // otherwise, use implementation-dependant function to get memory
-	  size_t currentMem = CS::Memory::Implementation::GetPhysicalMemory();
-	  
-	  // cache it
-	  cachedMemory = currentMem;
-	  memoryCached = true;
-	  
-	  // and return it 
-      return cachedMemory;
-    }
+      static size_t memorySize = 0;
+      static bool cacheValid = false;
 
-  } // End namespace Memory
+      if (!cacheValid)
+      {
+        memorySize = CS::Platform::Implementation::GetPhysicalMemorySize();
+        cacheValid = true;
+      }
+
+      return memorySize;
+
+    } // End GetPhysicalMemorySize()      
+  } // End namespace Platform
 } // End namespace CS
-
-#endif

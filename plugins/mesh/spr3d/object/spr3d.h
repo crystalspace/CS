@@ -721,6 +721,12 @@ public:
     varm = lod_varm;
     vara = lod_vara;
   }
+
+  // LOD fade not supported.
+  void SetLODFade (float f) { }
+  void GetLODFade (float& f) const { f = 0; }
+  void SetLODFade (iSharedVariable* varf) { }
+  void GetLODFade (iSharedVariable*& varf) const { varf = 0; }
   
   iTerraFormer* GetTerraFormerColldet () { return 0; }
   virtual iTerrainSystem* GetTerrainColldet () { return 0; }
@@ -1482,6 +1488,12 @@ public:
     varm = local_lod_varm;
     vara = local_lod_vara;
   }
+
+  // LOD fade not supported.
+  void SetLODFade (float f) { }
+  void GetLODFade (float& f) const { f = 0; }
+  void SetLODFade (iSharedVariable* varf) { }
+  void GetLODFade (iSharedVariable*& varf) const { varf = 0; }
   /** @} */
 
   /**\name iRenderBufferAccessor implementation
@@ -1586,6 +1598,11 @@ public:
   {
     return 0;
   }
+  // LOD fade not supported.
+  void SetLODFade (float f) { }
+  void GetLODFade (float& f) const { f = 0; }
+  void SetLODFade (iSharedVariable* varf) { }
+  void GetLODFade (iSharedVariable*& varf) const { varf = 0; }
   /** @} */
 };
 

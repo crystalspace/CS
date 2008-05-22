@@ -268,4 +268,7 @@ void csShaderVariable::NewType (VariableType nt)
   default:
     ;
   }
+  
+  Type = nt;
 }
+

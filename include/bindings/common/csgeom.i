@@ -239,6 +239,8 @@ ARRAY_OBJECT_FUNCTIONS(csArray<csArray<int> >,csArray<int>)
   csVector3& operator /=(const csReversibleTransform& t) { return *self /= t; }
   csVector3 operator /(const csReversibleTransform& t) { return *self / t; }
   csVector3 project(const csVector3& what) const { return what << *self; }
+
+  csVector3 Cross (const csVector3& other) const { return *self % other; }
 }
 // csgeom/vector4.h
 %extend csVector4
@@ -344,7 +346,13 @@ ARRAY_OBJECT_FUNCTIONS(csArray<csArray<int> >,csArray<int>)
 #ifndef SWIGIMPORTED
 #undef APPLY_FOR_ALL_INTERFACES_POST
 #define APPLY_FOR_ALL_INTERFACES_POST
-%include "bindings/common/basepost.i"
-cs_lang_include(csgeompost.i)
 #endif
+
+%include "bindings/common/basepost.i"
+
+#ifndef SWIGIMPORTED
+cs_apply_all_interfaces
+#endif
+
+cs_lang_include(csgeompost.i)
 

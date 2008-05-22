@@ -61,7 +61,7 @@ namespace CS
       : scfImplementation1<DataBuffer, iDataBuffer> (this), Data (alloc), 
       Size (iSize), do_delete (true)
     {
-      Data.p = Data.Alloc (Size);
+      Data.p = (char*)Data.Alloc (Size);
     }
 
 
@@ -76,14 +76,34 @@ namespace CS
       Data.p = iData; 
     }
 
+    /**
+     * Construct an data buffer object given a existing pointer. The pointer
+     * must be allocated by an allocator compatible to the given.
+     */
+    DataBuffer (char *iData, size_t iSize, bool should_delete, 
+                const Allocator& alloc)
+      : scfImplementation1<DataBuffer, iDataBuffer> (this), Data (alloc),
+        Size (iSize), do_delete (should_delete)
+    {
+      Data.p = iData; 
+    }
+
     /// Duplicate an existing data buffer. Also appends a 0 char.
-    DataBuffer (iDataBuffer *source)
+    DataBuffer (iDataBuffer *source, bool appendNull = true)
       : scfImplementation1<DataBuffer, iDataBuffer> (this), Size (source->GetSize()),
         do_delete (true)
     {
-      Data.p = (char*)Data.Alloc (Size+1);
-      memcpy (Data.p, source->GetData(), Size);
-      Data.p[Size] = 0;
+      if (appendNull)
+      {
+	Data.p = (char*)Data.Alloc (Size);
+	memcpy (Data.p, source->GetData(), Size);
+      }
+      else
+      {
+	Data.p = (char*)Data.Alloc (Size+1);
+	memcpy (Data.p, source->GetData(), Size);
+	Data.p[Size] = 0;
+      }
     }
 
     /// Destroy (free) the buffer

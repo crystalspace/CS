@@ -1766,7 +1766,7 @@ CS_CHECK_BUILD([for backtrace], [cs_cv_backtrace],
 
 
 #------------------------------------------------------------------------------
-# Check if setenv() is available.
+# Check if setenv() or putenv() is available.
 #------------------------------------------------------------------------------
 CS_CHECK_BUILD([for setenv], [cs_cv_setenv],
     [AC_LANG_PROGRAM(
@@ -1777,6 +1777,16 @@ CS_CHECK_BUILD([for setenv], [cs_cv_setenv],
 	[setenv(0, 0, 0);])],
     [], [],
     [CS_HEADER_PROPERTY([CS_HAVE_SETENV])])
+
+CS_CHECK_BUILD([for putenv], [cs_cv_putenv],
+    [AC_LANG_PROGRAM(
+	[[#ifdef HAVE_SYS_TYPES_H
+	#include <sys/types.h>
+	#endif
+	#include <stdlib.h>]],
+	[putenv(0);])],
+    [], [],
+    [CS_HEADER_PROPERTY([CS_HAVE_PUTENV])])
 
 
 
@@ -1792,7 +1802,14 @@ CS_CHECK_BUILD([for _aligned_malloc], [cs_cv__aligned_malloc],
 	[_aligned_malloc(0, 0);])],
     [], [],
     [CS_HEADER_PROPERTY([CS_HAVE__ALIGNED_MALLOC])])
-
+    
+CS_CHECK_BUILD([for sysinfo()], [cs_cv_sysinfo],
+    [AC_LANG_PROGRAM(
+	[[#include <sys/sysinfo.h>]],
+	[struct sysinfo x; sysinfo(&x);])],
+    [],[],
+    [CS_HEADER_PROPERTY([CS_HAVE_SYSINFO])])
+   
 
 
 #------------------------------------------------------------------------------
@@ -1820,6 +1837,18 @@ AC_CHECK_HEADERS([cxxabi.h],
         [], [C++], [CS_HEADER_PROPERTY([CS_HAVE_ABI_CXA_DEMANGLE])])])
 AC_LANG_POP([C++])
 
+
+
+#------------------------------------------------------------------------------
+# Check for processor count related things
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD([for sysconf(_SC_NPROCESSORS_ONLN)], [cs_cv_sysconf_processors],
+    [AC_LANG_PROGRAM(
+	[[#include <unistd.h>]],
+	[sysconf(_SC_NPROCESSORS_ONLN);])],
+    [],[],
+    [CS_HEADER_PROPERTY([CS_HAVE_SYSCONF_PROCESSORS])])
+   
 
 
 #------------------------------------------------------------------------------

@@ -206,9 +206,9 @@ produce @file{.exe} files.
 
 @subsubheading Compiling Your Own Program Using Crystal Space
 
-There is a @sc{howto} which explains how to create an @sc{msvc7} project file
+There is a @sc{howto} which explains how to create an @sc{msvc} project file
 for your own program which utilizes Crystal Space.
-@xref{HOWTO Creating External MSVC 7 Application}.
+@xref{HOWTO Creating External MSVC Application}.
 
 @subsubheading Frequently Asked Questions (@sc{faq})
 @anchor{MSVC7 FAQ}

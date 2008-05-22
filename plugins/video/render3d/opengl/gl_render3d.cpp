@@ -248,13 +248,13 @@ void csGLGraphics3D::SetZModeInternal (csZBufMode mode)
       break;
     case CS_ZBUF_INVERT:
       statecache->Enable_GL_DEPTH_TEST ();
-      statecache->SetDepthFunc (GL_LESS);
+      statecache->SetDepthFunc (GL_GREATER);
       statecache->SetDepthMask (GL_FALSE);
       break;
     case CS_ZBUF_TEST:
     case CS_ZBUF_USE:
       statecache->Enable_GL_DEPTH_TEST ();
-      statecache->SetDepthFunc (GL_GEQUAL);
+      statecache->SetDepthFunc (GL_LEQUAL);
       statecache->SetDepthMask ((mode == CS_ZBUF_USE) ? GL_TRUE : GL_FALSE);
       break;
   }
@@ -940,7 +940,7 @@ bool csGLGraphics3D::Open ()
     object_reg, GetDriver2D (), config, this));
 
   statecache->Enable_GL_CULL_FACE ();
-  statecache->SetCullFace (GL_FRONT);
+  statecache->SetCullFace (GL_BACK);
 
   statecache->SetStencilMask (stencil_shadow_mask);
 
@@ -1296,7 +1296,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
   else
     delayClearFlags = clearMask;
 
-  statecache->SetCullFace (GL_FRONT);
+    statecache->SetCullFace (GL_FRONT);
 
   /* Note: this function relies on the canvas and/or the R2T backend to setup
    * matrices etc. So be careful when changing stuff. */
@@ -1309,7 +1309,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
     needProjectionUpdate = true;
     glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
 
-//    object2camera.Identity ();
+  //    object2camera.Identity ();
     //@@@ TODO FIX
     return true;
   }
@@ -2062,7 +2062,7 @@ void csGLGraphics3D::SetShadowState (int state)
       // @@@ Jorrit: to avoid flickering I had to increase the
       // values below and multiply them with 3.
       //glPolygonOffset (-0.1f, -4.0f); 
-      glPolygonOffset (-0.3f, -12.0f); 
+      glPolygonOffset (0.3f, 12.0f); 
       statecache->Enable_GL_POLYGON_OFFSET_FILL ();
       break;
     case CS_SHADOW_VOLUME_PASS1:
@@ -2836,11 +2836,11 @@ void csGLGraphics3D::SetupClipPortals ()
 	  
     cp = clipportal_stack[ffpnz];
     //map all Z-values to 0.0
-    glDepthRange(0.0, 0.0);
+    glDepthRange(1.0, 1.0);
     //Draw2DPolygon (cp->poly, cp->num_poly, cp->normal);
     DrawScreenPolygon (cp->poly, cp->num_poly);
     //restore default z-mapping
-    glDepthRange(0.0, 1.0);
+    glDepthRange(1.0, 0.0);
     
     // finish of debug coloring
     //glColorMask (false, false, false, false);

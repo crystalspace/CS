@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "csutil/cspmeter.h"
 #include "csutil/csstring.h"
+#include "csutil/sysfunc.h"
 #include "ivaria/conout.h"
 
 csTextProgressMeter::csTextProgressMeter (iConsoleOutput* cons, int n)
@@ -36,6 +37,7 @@ void csTextProgressMeter::Step(unsigned int n)
 {
   if (current < total)
   {
+    bool doFlush = false;
     current += n;
     int const units = (current == total ? 100 :
       (((100 * current) / total) / granularity) * granularity);
@@ -51,30 +53,54 @@ void csTextProgressMeter::Step(unsigned int n)
         else
           buff.AppendFmt ("%d%%", i * tick_scale);
       }
-      console->PutText ("%s", buff.GetData());
+      if (console)
+        console->PutText ("%s", buff.GetData());
+      else
+      {
+        doFlush = true;
+        csPrintf ("%s", buff.GetData());
+      }
       anchor = extent;
     }
     if (current == total)
-      console->PutText ("\n");
+    {
+      if (console)
+        console->PutText ("\n");
+      else
+      {
+        doFlush = true;
+        csPrintf ("\n");
+      }
+    }
+    if (doFlush) fflush (stdout);
   }
 }
 
 void csTextProgressMeter::Restart()
 {
   Reset();
-  console->PutText ("0%%");
+  if (console)
+    console->PutText ("0%%");
+  else
+    csPrintf ("0%%");
 }
 
 void csTextProgressMeter::Abort ()
 {
   current = total;
-  console->PutText ("\n");
+  if (console)
+    console->PutText ("\n");
+  else
+    csPrintf ("\n");
 }
 
 void csTextProgressMeter::Finalize ()
 {
   current = total;
-  console->PutText ("\n");
+  if (console)
+    console->PutText ("\n");
+  else
+    csPrintf ("\n");
 }
 
 void csTextProgressMeter::SetGranularity(int n)

@@ -103,9 +103,14 @@
   #endif
 #endif
 
-#ifndef WINVER
-#define WINVER 0x0400
+#ifndef WINVER  
+  #define WINVER 0x0500
 #endif
+
+#ifndef _WIN32_WINNT
+  #define _WIN32_WINNT 0x0500
+#endif
+
 
 // So many things require this. IF you have an issue with something defined
 // in it then undef that def here.
@@ -397,17 +402,6 @@ struct DIR;
 #ifndef _endthread
 #define _endthread()  {}
 #endif
-#endif
-
-// Fake up setenv(), if necessary
-#ifndef CS_HAVE_SETENV
-  #ifdef CS_CRYSTALSPACE_LIB
-    CS_EXPORT_SYM int setenv (const char* name, const char* value, 
-      bool overwrite);
-  #else
-    CS_IMPORT_SYM int setenv (const char* name, const char* value, 
-      bool overwrite);
-  #endif
 #endif
 
 // just to avoid windows.h inclusion

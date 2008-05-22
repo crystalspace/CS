@@ -19,31 +19,24 @@ ARRAY_CHANGE_ALL_TEMPLATE(csCollisionPair)
 %include "ivaria/mapnode.h"
 %include "ivaria/sequence.h"
 
-%rename(IntCall) *::Call(const char*, int&, const char*, ...);
-%rename(FloatCall) *::Call(const char*, float&, const char*, ...);
-%rename(DoubleCall) *::Call(const char*, double&, const char*, ...);
-%rename(StringCall) *::Call(const char*, char**, const char*, ...);
-%rename(ObjectCall) *::Call(const char*,csRef<iScriptObject>&,const char*,...);
-%rename(StoreInt) iScript::Store(const char*, int);
-%rename(StoreFloat) iScript::Store(const char*, float);
-%rename(StoreDouble) iScript::Store(const char*, double);
-%rename(StoreString) iScript::Store(const char*, const char*);
-%rename(StoreObject) iScript::Store(const char*, iStringObject*);
-%rename(RetrieveInt) iScript::Retrieve(const char*, int);
-%rename(RetrieveFloat) iScript::Retrieve(const char*, float&);
-%rename(RetrieveDouble) iScript::Retrieve(const char*, double&);
-%rename(RetrieveString) iScript::Retrieve(const char*, char**);
-%rename(RetrieveObject) iScript::Retrieve(const char*, csRef<iStringObject>&);
-%rename(SetInt) iScriptObject::Set(const char*, int);
-%rename(SetFloat) iScriptObject::Set(const char*, float);
-%rename(SetDouble) iScriptObject::Set(const char*, double);
-%rename(SetString) iScriptObject::Set(const char*, const char*);
-%rename(SetObject) iScriptObject::Set(const char*, iStringObject*);
-%rename(GetInt) iScriptObject::Get(const char*, int);
-%rename(GetFloat) iScriptObject::Get(const char*, float&);
-%rename(GetDouble) iScriptObject::Get(const char*, double&);
-%rename(GetString) iScriptObject::Get(const char*, char**);
-%rename(GetObject) iScriptObject::Get(const char*, csRef<iStringObject>&);
+%ignore *::Call (const char *name, const char *format, ...);
+%ignore *::Call (const char *name, int &ret, const char *fmt, ...);
+%ignore *::Call (const char *name, float &ret, const char *fmt, ...);
+%ignore *::Call (const char *name, double &ret, const char *fmt, ...);
+%ignore *::Call (const char *name, csRef<iString>&, const char *fmt, ...);
+%ignore *::Call (const char *name, csRef<iScriptObject> &ret, const char *fmt, ...);
+%ignore iScript::Store (const char *name, int data);
+%ignore iScript::Store (const char *name, float data);
+%ignore iScript::Store (const char *name, double data);
+%ignore iScript::Store (const char *name, char const *data);
+%ignore iScript::Store (const char *name, iScriptObject *data);
+%ignore iScript::SetTruth (const char *name, bool isTrue);
+%ignore iScript::Retrieve (const char *name, int &data);
+%ignore iScript::Retrieve (const char *name, float &data);
+%ignore iScript::Retrieve (const char *name, double &data);
+%ignore iScript::Retrieve (const char *name, csRef<iString>&);
+%ignore iScript::Retrieve (const char *name, csRef<iScriptObject>&);
+%ignore iScript::GetTruth (const char *name, bool &isTrue);
 %include "ivaria/script.h"
 %include "ivaria/simpleformer.h"
 %include "ivaria/terraform.h"
@@ -61,6 +54,13 @@ ARRAY_CHANGE_ALL_TEMPLATE(csCollisionPair)
 #ifndef SWIGIMPORTED
 #undef APPLY_FOR_ALL_INTERFACES_POST
 #define APPLY_FOR_ALL_INTERFACES_POST IVARIA_APPLY_FOR_EACH_INTERFACE
-%include "bindings/common/basepost.i"
-cs_lang_include(ivariapost.i)
 #endif
+
+%include "bindings/common/basepost.i"
+
+#ifndef SWIGIMPORTED
+cs_apply_all_interfaces
+#endif
+
+cs_lang_include(ivariapost.i)
+

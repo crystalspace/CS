@@ -2,6 +2,7 @@
 %include "iengine/light.h"
 %include "iengine/sector.h"
 %include "iengine/engine.h"
+%include "iengine/lod.h"
 
 %ignore iCamera::GetTransform (); // Non-const.
 %ignore iCamera::Perspective (const csVector3&, csVector2&) const;
@@ -70,6 +71,13 @@ LIST_OBJECT_FUNCTIONS(iTextureList,iTextureWrapper)
 #ifndef SWIGIMPORTED
 #undef APPLY_FOR_ALL_INTERFACES_POST
 #define APPLY_FOR_ALL_INTERFACES_POST IENGINE_APPLY_FOR_EACH_INTERFACE
-%include "bindings/common/basepost.i"
-cs_lang_include(ienginepost.i)
 #endif
+
+%include "bindings/common/basepost.i"
+
+#ifndef SWIGIMPORTED
+cs_apply_all_interfaces
+#endif
+
+cs_lang_include(ienginepost.i)
+

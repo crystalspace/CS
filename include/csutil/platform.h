@@ -16,29 +16,29 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSUTIL_WIN32_MEMUTIL_H__
-#define __CSUTIL_WIN32_MEMUTIL_H__
+#ifndef __CSUTIL_PLATFORM_H__
+#define __CSUTIL_PLATFORM_H__
 
 #include "cssysdef.h"
 #include "csextern.h"
 
 namespace CS {
-  namespace Memory {
-	  namespace Implementation {
+  namespace Platform {
 
-    /** @brief Implementation-dependant memory retreival function.
-	 *
-	 * Used by CS::Memory::GetPhysicalMemory().  Do not call this function
-	 * directly, use CS::Memory::GetPhysicalMemory().
+    /**
+     * Retrieve the number of kB of physical system memory.
      *
-     * @returns Physical system memory (in kB)
-	 *
-	 * @sa CS::Memory::GetPhysicalMemory()
+     * @returns Physical system memory (in kB) on success, or 0 on failure.
      */
-     CS_CRYSTALSPACE_EXPORT size_t GetPhysicalMemory();
+   CS_CRYSTALSPACE_EXPORT size_t GetPhysicalMemorySize();
 
-    } // End namespace Implementation
-  } // End namespace Memory
+   /**
+    * Retrieve the number of processors in the system.
+    * \returns Number of processors, or 0 on failure.
+    */
+   CS_CRYSTALSPACE_EXPORT uint GetProcessorCount();
+
+  } // End namespace Platform
 } // End namespace CS
 
-#endif
+#endif // __CSUTIL_PLATFORM_H__

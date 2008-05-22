@@ -29,6 +29,7 @@
  * @{ */
 
 #include "csutil/scf.h"
+#include "csutil/threading/mutex.h"
 
 #include "csutil/custom_new_disable.h"
 
@@ -36,6 +37,8 @@
  * Derive an SCF implementation from this class to have it pooled.
  * - The \a Super template argument is the scfImplementation...<> class
  *   you would normally use.
+ * - \a Locked specifies whether the pool should be locked for allocations.
+ *   Use it if allocations may be made from different threads.
  * \code
  * class csFoo : 
  *   public scfImplementationPooled<scfImplementation1<csFoo,
@@ -57,16 +60,18 @@
  *   csRef<csFoo> foo; foo.AttachNew (new (fooPool) csFoo);
  * \endcode
  */
-template<typename Super, typename Allocator = CS::Memory::AllocatorMalloc>
+template<typename Super, typename Allocator = CS::Memory::AllocatorMalloc,
+  bool Locked = false>
 class scfImplementationPooled : public Super
 {
   typedef typename Super::scfClassType scfClassType;
 public:
-  typedef scfImplementationPooled<Super, Allocator> scfPooledImplementationType;
+  typedef scfImplementationPooled<Super, Allocator, Locked>
+    scfPooledImplementationType;
 
-  class Pool
+  class Pool : public CS::Threading::OptionalMutex<Locked>
   {
-    friend class scfImplementationPooled<Super, Allocator>;
+    friend class scfImplementationPooled<Super, Allocator, Locked>;
     struct Entry
     {
       Entry* next;
@@ -103,16 +108,19 @@ public:
     CS_ASSERT_MSG ("Alloc size mismatches class size expected for pooled "
       "allocation", n == sizeof (scfClassType));
     PoolEntry* newEntry;
-    if (p.pool.p != 0)
     {
-      newEntry = p.pool.p;
-      p.pool.p = p.pool.p->next;
+      CS::Threading::ScopedLock<Pool> lock (p);
+      if (p.pool.p != 0)
+      {
+	newEntry = p.pool.p;
+	p.pool.p = p.pool.p->next;
+      }
+      else
+      {
+	newEntry = static_cast<PoolEntry*> (p.pool.Alloc (n));
+      }
+      p.allocedEntries++;
     }
-    else
-    {
-      newEntry = static_cast<PoolEntry*> (p.pool.Alloc (n));
-    }
-    p.allocedEntries++;
     scfClassType* newInst = reinterpret_cast<scfClassType*> (newEntry);
     /* A bit nasty: set scfPool member of the (still unconstructed!) 
      * instance... */
@@ -126,9 +134,12 @@ public:
   {
     typedef typename Pool::Entry PoolEntry;
     PoolEntry* entry = static_cast<PoolEntry*> (instance);
-    entry->next = p.pool.p;
-    p.pool.p = entry;
-    p.allocedEntries--;
+    {
+      CS::Threading::ScopedLock<Pool> lock (p);
+      entry->next = p.pool.p;
+      p.pool.p = entry;
+      p.allocedEntries--;
+    }
   }
   inline void operator delete (void* instance) 
   {

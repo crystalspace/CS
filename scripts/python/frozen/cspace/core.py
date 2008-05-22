@@ -89,6 +89,18 @@ def fix_args(funct):
         return funct(*args)
     return _inner
 
+class CustomAllocated(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _core.new_CustomAllocated(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _core.delete_CustomAllocated
+    __del__ = lambda self : None;
+CustomAllocated_swigregister = _core.CustomAllocated_swigregister
+CustomAllocated_swigregister(CustomAllocated)
+
 class csArrayThresholdVariable(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
@@ -128,6 +140,188 @@ class csArrayCapacityDefault(csArrayThresholdVariableCapacityLinear):
 csArrayCapacityDefault_swigregister = _core.csArrayCapacityDefault_swigregister
 csArrayCapacityDefault_swigregister(csArrayCapacityDefault)
 
+class Vector2Array(CustomAllocated):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    __swig_destroy__ = _core.delete_Vector2Array
+    __del__ = lambda self : None;
+    def __init__(self, *args): 
+        this = _core.new_Vector2Array(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def GetSize(*args): return _core.Vector2Array_GetSize(*args)
+    def Get(*args): return _core.Vector2Array_Get(*args)
+    def Put(*args): return _core.Vector2Array_Put(*args)
+    def Push(*args): return _core.Vector2Array_Push(*args)
+    def Pop(*args): return _core.Vector2Array_Pop(*args)
+    def Top(*args): return _core.Vector2Array_Top(*args)
+    def Insert(*args): return _core.Vector2Array_Insert(*args)
+    def Contains(*args): return _core.Vector2Array_Contains(*args)
+    def DeleteAll(*args): return _core.Vector2Array_DeleteAll(*args)
+    def Truncate(*args): return _core.Vector2Array_Truncate(*args)
+    def Empty(*args): return _core.Vector2Array_Empty(*args)
+    def IsEmpty(*args): return _core.Vector2Array_IsEmpty(*args)
+    def SetMinimalCapacity(*args): return _core.Vector2Array_SetMinimalCapacity(*args)
+    def DeleteIndex(*args): return _core.Vector2Array_DeleteIndex(*args)
+    def DeleteIndexFast(*args): return _core.Vector2Array_DeleteIndexFast(*args)
+    def DeleteRange(*args): return _core.Vector2Array_DeleteRange(*args)
+    def __eq__(*args): return _core.Vector2Array___eq__(*args)
+    def __ne__(*args): return _core.Vector2Array___ne__(*args)
+    def GetAllocator(*args): return _core.Vector2Array_GetAllocator(*args)
+Vector2Array_swigregister = _core.Vector2Array_swigregister
+Vector2Array_swigregister(Vector2Array)
+cvar = _core.cvar
+csArrayItemNotFound = cvar.csArrayItemNotFound
+
+class Vector2DirtyAccessArray(Vector2Array):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _core.new_Vector2DirtyAccessArray(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def GetArray(*args): return _core.Vector2DirtyAccessArray_GetArray(*args)
+    def GetArrayCopy(*args): return _core.Vector2DirtyAccessArray_GetArrayCopy(*args)
+    __swig_destroy__ = _core.delete_Vector2DirtyAccessArray
+    __del__ = lambda self : None;
+Vector2DirtyAccessArray_swigregister = _core.Vector2DirtyAccessArray_swigregister
+Vector2DirtyAccessArray_swigregister(Vector2DirtyAccessArray)
+
+class Vector3Array(CustomAllocated):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    __swig_destroy__ = _core.delete_Vector3Array
+    __del__ = lambda self : None;
+    def __init__(self, *args): 
+        this = _core.new_Vector3Array(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def GetSize(*args): return _core.Vector3Array_GetSize(*args)
+    def Get(*args): return _core.Vector3Array_Get(*args)
+    def Put(*args): return _core.Vector3Array_Put(*args)
+    def Push(*args): return _core.Vector3Array_Push(*args)
+    def Pop(*args): return _core.Vector3Array_Pop(*args)
+    def Top(*args): return _core.Vector3Array_Top(*args)
+    def Insert(*args): return _core.Vector3Array_Insert(*args)
+    def Contains(*args): return _core.Vector3Array_Contains(*args)
+    def DeleteAll(*args): return _core.Vector3Array_DeleteAll(*args)
+    def Truncate(*args): return _core.Vector3Array_Truncate(*args)
+    def Empty(*args): return _core.Vector3Array_Empty(*args)
+    def IsEmpty(*args): return _core.Vector3Array_IsEmpty(*args)
+    def SetMinimalCapacity(*args): return _core.Vector3Array_SetMinimalCapacity(*args)
+    def DeleteIndex(*args): return _core.Vector3Array_DeleteIndex(*args)
+    def DeleteIndexFast(*args): return _core.Vector3Array_DeleteIndexFast(*args)
+    def DeleteRange(*args): return _core.Vector3Array_DeleteRange(*args)
+    def __eq__(*args): return _core.Vector3Array___eq__(*args)
+    def __ne__(*args): return _core.Vector3Array___ne__(*args)
+    def GetAllocator(*args): return _core.Vector3Array_GetAllocator(*args)
+Vector3Array_swigregister = _core.Vector3Array_swigregister
+Vector3Array_swigregister(Vector3Array)
+
+class Vector3DirtyAccessArray(Vector3Array):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _core.new_Vector3DirtyAccessArray(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def GetArray(*args): return _core.Vector3DirtyAccessArray_GetArray(*args)
+    def GetArrayCopy(*args): return _core.Vector3DirtyAccessArray_GetArrayCopy(*args)
+    __swig_destroy__ = _core.delete_Vector3DirtyAccessArray
+    __del__ = lambda self : None;
+Vector3DirtyAccessArray_swigregister = _core.Vector3DirtyAccessArray_swigregister
+Vector3DirtyAccessArray_swigregister(Vector3DirtyAccessArray)
+
+class Vector4Array(CustomAllocated):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    __swig_destroy__ = _core.delete_Vector4Array
+    __del__ = lambda self : None;
+    def __init__(self, *args): 
+        this = _core.new_Vector4Array(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def GetSize(*args): return _core.Vector4Array_GetSize(*args)
+    def Get(*args): return _core.Vector4Array_Get(*args)
+    def Put(*args): return _core.Vector4Array_Put(*args)
+    def Push(*args): return _core.Vector4Array_Push(*args)
+    def Pop(*args): return _core.Vector4Array_Pop(*args)
+    def Top(*args): return _core.Vector4Array_Top(*args)
+    def Insert(*args): return _core.Vector4Array_Insert(*args)
+    def Contains(*args): return _core.Vector4Array_Contains(*args)
+    def DeleteAll(*args): return _core.Vector4Array_DeleteAll(*args)
+    def Truncate(*args): return _core.Vector4Array_Truncate(*args)
+    def Empty(*args): return _core.Vector4Array_Empty(*args)
+    def IsEmpty(*args): return _core.Vector4Array_IsEmpty(*args)
+    def SetMinimalCapacity(*args): return _core.Vector4Array_SetMinimalCapacity(*args)
+    def DeleteIndex(*args): return _core.Vector4Array_DeleteIndex(*args)
+    def DeleteIndexFast(*args): return _core.Vector4Array_DeleteIndexFast(*args)
+    def DeleteRange(*args): return _core.Vector4Array_DeleteRange(*args)
+    def __eq__(*args): return _core.Vector4Array___eq__(*args)
+    def __ne__(*args): return _core.Vector4Array___ne__(*args)
+    def GetAllocator(*args): return _core.Vector4Array_GetAllocator(*args)
+Vector4Array_swigregister = _core.Vector4Array_swigregister
+Vector4Array_swigregister(Vector4Array)
+
+class Vector4DirtyAccessArray(Vector4Array):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _core.new_Vector4DirtyAccessArray(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def GetArray(*args): return _core.Vector4DirtyAccessArray_GetArray(*args)
+    def GetArrayCopy(*args): return _core.Vector4DirtyAccessArray_GetArrayCopy(*args)
+    __swig_destroy__ = _core.delete_Vector4DirtyAccessArray
+    __del__ = lambda self : None;
+Vector4DirtyAccessArray_swigregister = _core.Vector4DirtyAccessArray_swigregister
+Vector4DirtyAccessArray_swigregister(Vector4DirtyAccessArray)
+
+class UIntArray(CustomAllocated):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    __swig_destroy__ = _core.delete_UIntArray
+    __del__ = lambda self : None;
+    def __init__(self, *args): 
+        this = _core.new_UIntArray(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def GetSize(*args): return _core.UIntArray_GetSize(*args)
+    def Get(*args): return _core.UIntArray_Get(*args)
+    def Put(*args): return _core.UIntArray_Put(*args)
+    def Push(*args): return _core.UIntArray_Push(*args)
+    def Pop(*args): return _core.UIntArray_Pop(*args)
+    def Top(*args): return _core.UIntArray_Top(*args)
+    def Insert(*args): return _core.UIntArray_Insert(*args)
+    def Contains(*args): return _core.UIntArray_Contains(*args)
+    def DeleteAll(*args): return _core.UIntArray_DeleteAll(*args)
+    def Truncate(*args): return _core.UIntArray_Truncate(*args)
+    def Empty(*args): return _core.UIntArray_Empty(*args)
+    def IsEmpty(*args): return _core.UIntArray_IsEmpty(*args)
+    def SetMinimalCapacity(*args): return _core.UIntArray_SetMinimalCapacity(*args)
+    def DeleteIndex(*args): return _core.UIntArray_DeleteIndex(*args)
+    def DeleteIndexFast(*args): return _core.UIntArray_DeleteIndexFast(*args)
+    def DeleteRange(*args): return _core.UIntArray_DeleteRange(*args)
+    def __eq__(*args): return _core.UIntArray___eq__(*args)
+    def __ne__(*args): return _core.UIntArray___ne__(*args)
+    def GetAllocator(*args): return _core.UIntArray_GetAllocator(*args)
+UIntArray_swigregister = _core.UIntArray_swigregister
+UIntArray_swigregister(UIntArray)
+
+class UIntDirtyAccessArray(UIntArray):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _core.new_UIntDirtyAccessArray(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def GetArray(*args): return _core.UIntDirtyAccessArray_GetArray(*args)
+    def GetArrayCopy(*args): return _core.UIntDirtyAccessArray_GetArrayCopy(*args)
+    __swig_destroy__ = _core.delete_UIntDirtyAccessArray
+    __del__ = lambda self : None;
+UIntDirtyAccessArray_swigregister = _core.UIntDirtyAccessArray_swigregister
+UIntDirtyAccessArray_swigregister(UIntDirtyAccessArray)
+
 SetCoreSCFPointer = _core.SetCoreSCFPointer
 scfCompatibleVersion = _core.scfCompatibleVersion
 class scfInterfaceMetadata(object):
@@ -144,8 +338,6 @@ class scfInterfaceMetadata(object):
     __del__ = lambda self : None;
 scfInterfaceMetadata_swigregister = _core.scfInterfaceMetadata_swigregister
 scfInterfaceMetadata_swigregister(scfInterfaceMetadata)
-cvar = _core.cvar
-csArrayItemNotFound = cvar.csArrayItemNotFound
 
 class scfInterfaceMetadataList(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -532,18 +724,6 @@ csInitializer_CloseApplication = _core.csInitializer_CloseApplication
 csInitializer__SetupEventHandler = _core.csInitializer__SetupEventHandler
 csInitializer_DestroyApplication = _core.csInitializer_DestroyApplication
 csInitializer_GetDefaultAppID = _core.csInitializer_GetDefaultAppID
-
-class CustomAllocated(object):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _core.new_CustomAllocated(*args)
-        try: self.this.append(this)
-        except: self.this = this
-    __swig_destroy__ = _core.delete_CustomAllocated
-    __del__ = lambda self : None;
-CustomAllocated_swigregister = _core.CustomAllocated_swigregister
-CustomAllocated_swigregister(CustomAllocated)
 
 class csPluginRequestArray(CustomAllocated):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -2008,6 +2188,7 @@ class csImageIOFileFormatDescriptions(CustomAllocated):
     def Top(*args): return _core.csImageIOFileFormatDescriptions_Top(*args)
     def Insert(*args): return _core.csImageIOFileFormatDescriptions_Insert(*args)
     def Contains(*args): return _core.csImageIOFileFormatDescriptions_Contains(*args)
+    def DeleteAll(*args): return _core.csImageIOFileFormatDescriptions_DeleteAll(*args)
     def Truncate(*args): return _core.csImageIOFileFormatDescriptions_Truncate(*args)
     def Empty(*args): return _core.csImageIOFileFormatDescriptions_Empty(*args)
     def IsEmpty(*args): return _core.csImageIOFileFormatDescriptions_IsEmpty(*args)

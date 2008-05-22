@@ -29,6 +29,8 @@
 #include "csutil/array.h"
 #include "csutil/customallocated.h"
 #include "csutil/reftrackeraccess.h"
+#include "csutil/threading/atomicops.h"
+#include "csutil/threading/mutex.h"
 
 // Needs to have iBase etc
 #include "csutil/scf_interface.h"
@@ -139,10 +141,12 @@ protected:
     scfstatsNum
   };
   static uint64 stats[scfstatsNum];
+  static CS::Threading::Mutex statsLock;
 
   CS_FORCEINLINE void BumpStat (int stat)
   {
 #ifdef SCF_TRACK_STATS
+    CS::Threading::ScopedLock<CS::Threading::Mutex> l (statsLock);
     stats[stat]++;
 #endif
   }
@@ -153,6 +157,7 @@ protected:
     csArrayCapacityLinear<csArrayThresholdFixed<4> > > WeakRefOwnerArray;
   struct ScfImplAuxData : public CS::Memory::CustomAllocated
   {
+    CS::Threading::Mutex lock;
     iBase *scfParent;
     WeakRefOwnerArray* scfWeakRefOwners;
     scfInterfaceMetadataList* metadataList;
@@ -161,7 +166,11 @@ protected:
   };
   ScfImplAuxData* scfAuxData;
 
-  CS_FORCEINLINE bool HasAuxData() const { return scfAuxData != 0; }
+  CS_FORCEINLINE bool HasAuxData()
+  {
+    // Double-cast to cheat strict-aliasing rules
+    return CS::Threading::AtomicOperations::Read ((void**)(void*)&scfAuxData) != 0; 
+  }
   void EnsureAuxData();
   void FreeAuxData();
 
@@ -171,7 +180,7 @@ protected:
 
   void scfRemoveRefOwners ();
 
-  iBase* GetSCFParent() const { return HasAuxData() ? scfAuxData->scfParent : 0; }
+  iBase* GetSCFParent() { return HasAuxData() ? scfAuxData->scfParent : 0; }
 
   // Some virtual helpers for the metadata registry
   virtual size_t GetInterfaceMetadataCount () const;
@@ -253,8 +262,7 @@ public:
     CS_ASSERT_MSG("Refcount decremented for destroyed object", 
       scfRefCount != 0);
     csRefTrackerAccess::TrackDecRef (GetSCFObject(), scfRefCount);
-    scfRefCount--;
-    if (scfRefCount == 0)
+    if (CS::Threading::AtomicOperations::Decrement (&scfRefCount) == 0)
     {
       delete GetSCFObject();
     }
@@ -266,18 +274,19 @@ public:
     CS_ASSERT_MSG("Refcount incremented from inside dtor", 
       scfRefCount != 0);
     csRefTrackerAccess::TrackIncRef (GetSCFObject(), scfRefCount);
-    scfRefCount++;
+    CS::Threading::AtomicOperations::Increment (&scfRefCount);
     BumpStat (scfstatIncRef);
   }
 
   virtual int GetRefCount ()
   {
-    return scfRefCount;
+    return CS::Threading::AtomicOperations::Read (&scfRefCount);
   }
 
   virtual void AddRefOwner (void** ref_owner)
   {
     EnsureAuxData();
+    CS::Threading::ScopedLock<CS::Threading::Mutex> l (scfAuxData->lock);
     if (!scfAuxData->scfWeakRefOwners)
     {
       scfAuxData->scfWeakRefOwners = new WeakRefOwnerArray (0);
@@ -290,6 +299,7 @@ public:
   {
     if (!HasAuxData()) return;
 
+    CS::Threading::ScopedLock<CS::Threading::Mutex> l (scfAuxData->lock);
     WeakRefOwnerArray* scfWeakRefOwners = scfAuxData->scfWeakRefOwners;
     if (!scfWeakRefOwners)
       return;
@@ -304,6 +314,7 @@ public:
   virtual scfInterfaceMetadataList* GetInterfaceMetadata ()
   {
     EnsureAuxData();
+    CS::Threading::ScopedLock<CS::Threading::Mutex> l (scfAuxData->lock);
     if (!scfAuxData->metadataList)
     {
       BumpStat (scfstatMetadata);
@@ -319,7 +330,7 @@ protected:
   Class* GetSCFObject() { return static_cast<Class*> (this); }
   const Class* GetSCFObject() const { return static_cast<const Class*> (this); }
 
-  int scfRefCount;
+  int32 scfRefCount;
 
   void *QueryInterface (scfInterfaceID iInterfaceID,
                         scfInterfaceVersion iVersion)

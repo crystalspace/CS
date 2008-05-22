@@ -259,10 +259,12 @@ class iSndSysSource3D(core.iBase):
     def SetMaximumDistance(*args): return _isndsys.iSndSysSource3D_SetMaximumDistance(*args)
     def GetMinimumDistance(*args): return _isndsys.iSndSysSource3D_GetMinimumDistance(*args)
     def GetMaximumDistance(*args): return _isndsys.iSndSysSource3D_GetMaximumDistance(*args)
+    scfGetVersion = staticmethod(_isndsys.iSndSysSource3D_scfGetVersion)
     __swig_destroy__ = _isndsys.delete_iSndSysSource3D
     __del__ = lambda self : None;
 iSndSysSource3D_swigregister = _isndsys.iSndSysSource3D_swigregister
 iSndSysSource3D_swigregister(iSndSysSource3D)
+iSndSysSource3D_scfGetVersion = _isndsys.iSndSysSource3D_scfGetVersion
 
 class iSndSysSource3DDirectionalSimple(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')

@@ -211,6 +211,7 @@ protected:
     }
     root->SetColor (Black);
   }
+  
   /// Delete a node from the tree.
   void DeleteNode (Node* node)
   {
@@ -334,6 +335,25 @@ protected:
       return LocateNode (node->left, key);
     else
       return LocateNode (node->right, key);
+  }
+  /// Find the node which has a given instance of a key
+  Node* LocateNodeExact (Node* node, const K* key) const
+  {
+    if (node == 0) return 0;
+      
+    if (key == (K*)&node->key) return node;
+    int r = csComparator<K, K>::Compare (*key, *((K*)&node->key));
+    if (r == 0)
+    {
+      // @@@ Should that be really necessary?
+      Node* n = LocateNodeExact (node->left, key);
+      if (n != 0) return n;
+      return LocateNodeExact (node->right, key);
+    }
+    else if (r < 0)
+      return LocateNodeExact (node->left, key);
+    else
+      return LocateNodeExact (node->right, key);
   }
   /// Return smallest node with a key greater than 'node's.
   static Node* Successor (const Node* node)
@@ -539,6 +559,18 @@ public:
     DeleteNode (n);
     return true;
   }
+  /**
+   * Delete a specific instance of a key.
+   * \return Whether the deletion was successful. Fails if the key is not 
+   *  in the tree.
+   */
+  bool DeleteExact (const K* key)
+  {
+    Node* n = LocateNodeExact (root, key);
+    if (n == 0) return false;
+    DeleteNode (n);
+    return true;
+  }
   /// Check whether a key is in the tree.
   bool In (const K& key) const
   {
@@ -736,48 +768,19 @@ public:
   {
     Node* n = it.currentNode;
     if (n == 0) return;
-    Node* p = n->GetParent();
-    int oldSide = -1;
-    Node* oldRootLeft = 0;
-    if (p != 0)
-    {
-      if (n == p->left)
-        oldSide = 0;
-      else
-      {
-        CS_ASSERT(n == p->right);
-        oldSide = 1;
-      }
-    }
-    else
-    {
-      // Deleting root
-      oldRootLeft = n->left;
-    }
+    Node* nPred = Predecessor (n);
     DeleteNode (n);
-    
-    Node* newNode = 0;
-    if (p == 0)
+    Node* newNode;
+    if (nPred == 0)
     {
-      // Deleted root: successor is new root
-      if (root == oldRootLeft)
-        newNode = root ? root->right : 0;
-      else
-        newNode = root;
+      newNode = root;
+      if (newNode != 0)
+      {
+        while (newNode->left != 0) newNode = newNode->left;
+      }
     }
     else
-    {
-      if (oldSide == 0)
-      {
-	// Deleted node was left side: successor node is parent
-	newNode = p;
-      }
-      else if (oldSide == 1)
-      {
-	// Deleted node was right side: successor is right node of parent
-	newNode = p->right;
-      }
-    }
+      newNode = Successor (nPred);
     it.currentNode = newNode;
   }
 

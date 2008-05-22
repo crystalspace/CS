@@ -2096,7 +2096,7 @@ physical effects controlled via @code{iParticleEffector}.
 The full documentation for the new particle systems can be found at 
 @xref{MeshObject Particles}.
 
-@imports{appendix,apimod1_0_part.txi}
+@imports{appendix,apimod10part.txi}
 
 @node Api1_0 Changes for Mesh Object Writers, Api1_0 Changes for hierarchical objects, Api1_0 Particle system changes, Release Notes 1_0
 @subsection Changes for Mesh Object Writers
