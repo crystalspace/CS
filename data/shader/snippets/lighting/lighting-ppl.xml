@@ -153,10 +153,10 @@
 	  <![CDATA[
           for (int l = 0; l < maxLights; l++)
 	  {
-	    if (l >= lightProps.count) break;
+	    int i = lightOffset + l;
+	    if (i >= lightProps.count) break;
 	  ]]>
 	    
-	    int i = lightOffset + l;
 	    half3 vp_dir;
 	    lspace.InitVP (i, world2tang, positionW, vp_dir, surfToLight[l]);
 	    lightDir[l] = vp_dir;

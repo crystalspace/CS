@@ -72,7 +72,7 @@ namespace RenderManager
 	
 	// @@@ FIXME: arbitrary
 	float _near = SMALL_Z;
-	float _far = 100.0f;
+	float _far = 300.0f;
       
 	splitDists[0] = _near;
 	for (int i = 0; i <= NUM_PARTS; i++)
@@ -118,6 +118,7 @@ namespace RenderManager
 	  csShaderVariable* shadowMapProjectSV;
 	  csShaderVariable* shadowMapUnscaleSV;
 	  csShaderVariable* shadowMapDimSV;
+	  csShaderVariable* shadowClipSV;
 	  csShaderVariable** textureSVs;
 	  
 	  // Object bboxes in post-project light space
@@ -134,11 +135,12 @@ namespace RenderManager
       
       uint GetSublightNum() const { return (uint)lightFrustums.GetSize(); }
 
-      void SetupFrame (ShadowPSSM& shadows, iLight* light)
+      void SetupFrame (RenderTree& tree, ShadowPSSM& shadows, iLight* light)
       {
         if (light->GetFlags().Check (CS_LIGHT_NOSHADOWS)) return;
         
         ViewSetup& viewSetup = shadows.viewSetup;
+        csRef<iCamera> camera (viewSetup.rview->GetCamera());
         if (!frustumsSetup)
         {
           float lightNear = SMALL_Z;
@@ -186,6 +188,13 @@ namespace RenderManager
 	  this->lightProject = lightProject;
             
           const csBox3& lightBBox = light->GetLocalBBox();
+          if (shadows.persist.debugFlags
+              & ShadowPSSM::PersistentData::dbgLightBBox)
+          {
+	    tree.AddDebugBBox (lightBBox,
+	      world2light_base.GetInverse(),
+	      csColor (1, 1, 1));
+	  }
 
           static const csMatrix3 frustRotationMatrices[6] =
           {
@@ -235,24 +244,49 @@ namespace RenderManager
 	      csVector3 cornerLight;
 	      // Frustum slice bbox, light space
 	      csBox3 frustumLight;
+	      csBox3 frustumCam;
 	      frustumLight.StartBoundingBox();
+	      frustumCam.StartBoundingBox();
 	      for (int c = 0; c < 4; c++)
 	      {
-		cornerCam = viewSetup.rview->GetCamera()->InvPerspective (
+		cornerCam = camera->InvPerspective (
 		  corner2D[c], viewSetup.splitDists[i]);
-		cornerWorld = viewSetup.rview->GetCamera()->GetTransform().This2Other (
+		frustumCam.AddBoundingVertex (cornerCam);
+		cornerWorld = camera->GetTransform().This2Other (
 		  cornerCam);
 		cornerLight = superFrustum.world2light_rotated.Other2This (cornerWorld);
 		frustumLight.AddBoundingVertex (cornerLight);
 		
-		cornerCam = viewSetup.rview->GetCamera()->InvPerspective (
+		cornerCam = camera->InvPerspective (
 		  corner2D[c], viewSetup.splitDists[i+1]);
-		cornerWorld = viewSetup.rview->GetCamera()->GetTransform().This2Other (
+		frustumCam.AddBoundingVertex (cornerCam);
+		cornerWorld = camera->GetTransform().This2Other (
 		  cornerCam);
 		cornerLight = superFrustum.world2light_rotated.Other2This (cornerWorld);
 		frustumLight.AddBoundingVertex (cornerLight);
 	      }
+	      if (shadows.persist.debugFlags
+		  & ShadowPSSM::PersistentData::dbgSplitFrustumCam)
+	      {
+		tree.AddDebugBBox (frustumCam,
+		  camera->GetTransform().GetInverse(),
+		  csColor (1, 0, 1));
+	      }
+	      if (shadows.persist.debugFlags
+		  & ShadowPSSM::PersistentData::dbgSplitFrustumLight)
+	      {
+		tree.AddDebugBBox (frustumLight,
+		  superFrustum.world2light_rotated.GetInverse(),
+		  csColor (0, 1, 0));
+	      }
 	      frustumLight *= lightBBox;
+	      if (shadows.persist.debugFlags
+		  & ShadowPSSM::PersistentData::dbgSplitFrustumLight)
+	      {
+		tree.AddDebugBBox (frustumLight,
+		  superFrustum.world2light_rotated.GetInverse(),
+		  csColor (0, 1, 1));
+	      }
 	      
 	      // Frustum slice corner, light space before W divide
 	      csVector4 cornerUndiv;
@@ -271,6 +305,9 @@ namespace RenderManager
 		cornerDiv /= cornerUndiv.w;
 		lightFrustum.volumePP.AddBoundingVertex (cornerDiv);
 	      }
+	      tree.AddDebugBBox (lightFrustum.volumeLS,
+	        superFrustum.world2light_rotated.GetInverse(),
+	        csColor (0, 0, 1));
 	    
 	      lightFrustum.shadowMapProjectSV = lightVarsHelper.CreateTempSV (
 		viewSetup.persist.svNames.GetLightSVId (
@@ -287,6 +324,11 @@ namespace RenderManager
 	      lightFrustum.shadowMapDimSV = lightVarsHelper.CreateTempSV (
 		viewSetup.persist.svNames.GetLightSVId (
 		  csLightShaderVarCache::lightShadowMapPixelSize));
+		  
+	      lightFrustum.shadowClipSV = lightVarsHelper.CreateTempSV (
+		viewSetup.persist.shadowClipSVName);
+	      lightFrustum.shadowClipSV->SetValue (csVector2 (
+		viewSetup.splitDists[i], viewSetup.splitDists[i+1]));
 		  
 	      size_t numTex = viewSetup.persist.settings.targets.GetSize();
 	      if (lightFrustum.textureSVs == 0)
@@ -320,16 +362,12 @@ namespace RenderManager
 	for (size_t l = 0; l < lightData.lightFrustums.GetSize(); l++)
 	{
 	  const SuperFrustum& superFrust = *(lightData.lightFrustums[l]);
-	  for (int f = 0; f  < NUM_PARTS; f++)
+	  for (int frustNum = 0; frustNum < NUM_PARTS; frustNum++)
 	  {
-	    const typename SuperFrustum::Frustum& lightFrust = superFrust.frustums[f];
+	    const typename SuperFrustum::Frustum& lightFrust = superFrust.frustums[frustNum];
 	    if (lightFrust.containedObjectsPP.GetSize() == 0) continue;
 	    
 	    /* Fit map to the bounding box of all shadowed objects.
-	      Serves two purposes:
-	      - If some objects cut the split plane (ie extend over the initial
-		light frustum) this makes sure they're mapped to the SM entirely.
-		[However, this undermines the idea of PSSM ...]
 	      - If the shadowed objects are smaller than the light frustum in some
 		dimension makes sure the shadow map is used optimally. */
 	    csBox3 allObjsBoxPP (lightFrust.containedObjectsPP[0]);
@@ -337,6 +375,7 @@ namespace RenderManager
 	    {
 	      allObjsBoxPP += lightFrust.containedObjectsPP[i];
 	    }
+	    allObjsBoxPP *= lightFrust.volumePP;
 	    csBox3 clipToView;
 	    if (light->GetType() == CS_LIGHT_DIRECTIONAL)
 	      clipToView = csBox3 (csVector3 (-1, -1, -HUGE_VALF),
@@ -585,9 +624,16 @@ private:
 
     struct PersistentData
     {
-      uint frameNum;
+      enum
+      {
+        dbgSplitFrustumCam = 1,
+        dbgSplitFrustumLight = 2,
+        dbgLightBBox = 4
+      };
+      uint debugFlags;
       csLightShaderVarCache svNames;
       CS::ShaderVarStringID unscaleSVName;
+      CS::ShaderVarStringID shadowClipSVName;
       LightingSorter::PersistentData lightSorterPersist;
       LightingVariablesHelper::PersistentData lightVarsPersist;
       iShaderManager* shaderManager;
@@ -595,7 +641,7 @@ private:
       csString shadowType;
       ShadowSettings settings;
 
-      PersistentData() : frameNum (0), shadowType ("Depth")
+      PersistentData() : debugFlags (0), shadowType ("Depth")
       {
       }
 
@@ -619,10 +665,10 @@ private:
 	
 	settings.ReadSettings (objectReg, shadowType);
 	unscaleSVName = strings->Request ("light shadow map unscale");
+	shadowClipSVName = strings->Request ("light shadow clip");
       }
       void UpdateNewFrame ()
       {
-        frameNum++;
         csTicks time = csGetTicks ();
         settings.AdvanceFrame (time);
       }
@@ -638,9 +684,9 @@ private:
         renderTree (node->owner.owner), meshNode (node),
         viewSetup (viewSetup) { }
         
-    bool HandleOneLight (typename RenderTree::MeshNode::SingleMesh& singleMesh,
+    uint HandleOneLight (typename RenderTree::MeshNode::SingleMesh& singleMesh,
                          iLight* light, CachedLightData& lightData,
-                         csShaderVariableStack& lightStack,
+                         csShaderVariableStack* lightStacks,
                          uint lightNum, uint subLightNum)
     {
       LightingVariablesHelper lightVarsHelper (viewSetup.persist.lightVarsPersist);
@@ -649,7 +695,7 @@ private:
       {
         singleMesh.svMeshID = lightVarsHelper.CreateTempSV (
 	  viewSetup.persist.settings.svMeshIDName);
-        lightStack[singleMesh.svMeshID->GetName()] = singleMesh.svMeshID;
+        lightStacks[0][singleMesh.svMeshID->GetName()] = singleMesh.svMeshID;
         uint meshID = ++viewSetup.lastMeshID;
         singleMesh.svMeshID->SetValue ((int)meshID);
         viewSetup.meshIDs.Put (singleMesh.meshObjSVs, singleMesh.svMeshID);
@@ -682,6 +728,8 @@ private:
 	  vLightPP.y, vLightPP.z));
       }
 	
+      uint spreadFlags = 0;
+      int s = 0;
       for (int f = 0; f < NUM_PARTS; f++)
       {
 	typename CachedLightData::SuperFrustum::Frustum& lightFrustum =
@@ -697,21 +745,27 @@ private:
 	  /** lightFrustum.volumePP*/);
       
 	// Add shadow map SVs
-	lightVarsHelper.MergeAsArrayItem (lightStack,
+	lightVarsHelper.MergeAsArrayItem (lightStacks[s],
 	  lightFrustum.shadowMapProjectSV, lightNum);
-	lightVarsHelper.MergeAsArrayItem (lightStack,
+	lightVarsHelper.MergeAsArrayItem (lightStacks[s],
 	  lightFrustum.shadowMapUnscaleSV, lightNum);
-	lightVarsHelper.MergeAsArrayItem (lightStack, 
+	lightVarsHelper.MergeAsArrayItem (lightStacks[s], 
 	  lightFrustum.shadowMapDimSV, lightNum);
+	if (lightStacks[s].GetSize() > lightFrustum.shadowClipSV->GetName())
+	{
+	  lightStacks[s][lightFrustum.shadowClipSV->GetName()] =
+	    lightFrustum.shadowClipSV;
+	 }
 	  
 	for (size_t t = 0; t < persist.settings.targets.GetSize(); t++)
 	{
-	  lightVarsHelper.MergeAsArrayItem (lightStack, 
+	  lightVarsHelper.MergeAsArrayItem (lightStacks[s], 
 	    lightFrustum.textureSVs[t], lightNum);
 	}
-	return true;
+	spreadFlags |= (1 << s);
+	s++;
       }
-      return false;
+      return spreadFlags;
     }
     
     static bool NeedFinalHandleLight() { return true; }
@@ -724,6 +778,8 @@ private:
     }
 
     csFlags GetLightFlagsMask () const { return csFlags (0); }
+    
+    size_t GetLightLayerSpread() const { return NUM_PARTS; }
   protected:
     PersistentData& persist;
     const LayerConfigType& layerConfig;

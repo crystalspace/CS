@@ -248,7 +248,7 @@ namespace RenderManager
     struct CachedLightData
     {
       uint GetSublightNum() const { return 1; }
-      void SetupFrame (ShadowNone&, iLight*) {}
+      void SetupFrame (RenderTree&, ShadowNone&, iLight*) {}
       void ClearFrameData() {}
     };
     struct PersistentData
@@ -265,11 +265,11 @@ namespace RenderManager
       ShadowParameters&) { }
 
     template<typename _CachedLightData>
-    void HandleOneLight (typename RenderTree::MeshNode::SingleMesh& singleMesh,
+    uint HandleOneLight (typename RenderTree::MeshNode::SingleMesh& singleMesh,
                          iLight* light, _CachedLightData& lightData,
-                         csShaderVariableStack& lightStack,
+                         csShaderVariableStack* lightStacks,
                          uint lightNum, uint sublight)
-    {}
+    { return 0; }
     
     static bool NeedFinalHandleLight() { return false; }
     void FinalHandleLight (iLight*, CachedLightData&) { }
@@ -279,6 +279,8 @@ namespace RenderManager
      * of two lights.
      */
     csFlags GetLightFlagsMask () const { return csFlags (CS_LIGHT_NOSHADOWS); }
+    
+    size_t GetLightLayerSpread() const { return 1; }
   };
 
   /**
@@ -450,9 +452,12 @@ namespace RenderManager
 	
 	  firstLight += num;
 	  remainingLights -= num;
-	  totalLayers += thisPassLayers;
+	  totalLayers += thisPassLayers * shadows.GetLightLayerSpread();
 	}
 	layers.Ensure (layer, totalLayers, node);
+	
+	csShaderVariableStack* localStacks =
+	  new csShaderVariableStack[shadows.GetLightLayerSpread()];
   
 	// Now render lights for each light type
 	remainingLights = firstLight;
@@ -480,9 +485,10 @@ namespace RenderManager
 	  if (thisPassLayers == 0)
 	    // Reached layer pass limit
 	    break;
-	  size_t neededLayers = totalLayers + thisPassLayers;
+	  size_t neededLayers = totalLayers
+	    + thisPassLayers*shadows.GetLightLayerSpread();
   
-	  csShaderVariableStack localStack;
+	  //csShaderVariableStack localStack;
 	  for (size_t n = 0; n < thisPassLayers; n++)
 	  {
 	    if ((totalLayers != 0) || (n > 0))
@@ -491,28 +497,34 @@ namespace RenderManager
 	       * subsequent ones don't */
 	      node->owner.CopyLayerShader (mesh.contextLocalId,
 		layers.GetNewLayerIndex (layer, 0),
-		layers.GetNewLayerIndex (layer, n + totalLayers));
+		layers.GetNewLayerIndex (layer, n*shadows.GetLightLayerSpread() + totalLayers));
 	    }
-	    node->owner.svArrays.SetupSVStack (localStack, 
-	      layers.GetNewLayerIndex (layer, n + totalLayers),
-	      mesh.contextLocalId);
-    
+	    
 	    size_t thisNum = csMin (num,
 	      layerConfig.GetMaxLightNum (layer));
 	    thisNum = csMin (thisNum, (size_t)lastMetadata.numberOfLights);
-	    csShaderVariable* lightNum = lightVarsHelper.CreateVarOnStack (
-	      persist.svNames.GetDefaultSVId (
-		csLightShaderVarCache::varLightCount), localStack);
-	    lightNum->SetValue ((int)thisNum);
-  
-	    csShaderVariable* passNum = lightVarsHelper.CreateVarOnStack (
-	      persist.svPassNum, localStack);
-	    passNum->SetValue ((int)(n + totalLayers));
+	    
+	    for (size_t s = 0; s < shadows.GetLightLayerSpread(); s++)
+	    {
+	      node->owner.svArrays.SetupSVStack (localStacks[s], 
+		layers.GetNewLayerIndex (layer,
+		  n*shadows.GetLightLayerSpread() + totalLayers) + s,
+		mesh.contextLocalId);
     
-	    csShaderVariable* lightTypeSV = lightVarsHelper.CreateVarOnStack (
-	      persist.svNames.GetLightSVId (
-		csLightShaderVarCache::lightType), localStack);
-	    lightTypeSV->SetValue ((int)(lightSettings.type));
+	      csShaderVariable* lightNum = lightVarsHelper.CreateVarOnStack (
+		persist.svNames.GetDefaultSVId (
+		  csLightShaderVarCache::varLightCount), localStacks[s]);
+	      lightNum->SetValue ((int)thisNum);
+    
+	      csShaderVariable* passNum = lightVarsHelper.CreateVarOnStack (
+		persist.svPassNum, localStacks[s]);
+	      passNum->SetValue ((int)(n + totalLayers));
+      
+	      csShaderVariable* lightTypeSV = lightVarsHelper.CreateVarOnStack (
+		persist.svNames.GetLightSVId (
+		  csLightShaderVarCache::lightType), localStacks[s]);
+	      lightTypeSV->SetValue ((int)(lightSettings.type));
+	    }
     
             CachedLightData* thisLightSVs;
 	    iLight* light = 0;
@@ -521,11 +533,21 @@ namespace RenderManager
 	      light = renderSublights[firstLight + l]->light;
 	      thisLightSVs = persist.lightDataCache.GetElementPointer (light);
 	      
-	      shadows.HandleOneLight (mesh, light, *thisLightSVs, localStack, 
-		l, renderSublightNums[firstLight + l]);
+	      uint lSpread = shadows.HandleOneLight (mesh, light, *thisLightSVs, 
+	        localStacks, l, renderSublightNums[firstLight + l]);
     
-	      lightVarsHelper.MergeAsArrayItems (localStack,
-		*(thisLightSVs->shaderVars), l);
+	      for (size_t s = 0; s < shadows.GetLightLayerSpread(); s++)
+	      {
+	        if ((s > 0) && (lSpread & (1 << s)))
+	        {
+		  node->owner.CopyLayerShader (mesh.contextLocalId,
+		    layers.GetNewLayerIndex (layer, 0),
+		    layers.GetNewLayerIndex (layer, n*shadows.GetLightLayerSpread() + s + totalLayers));
+	        }
+	      
+		lightVarsHelper.MergeAsArrayItems (localStacks[s],
+		  *(thisLightSVs->shaderVars), l);
+	      }
 	    }
 	    firstLight += thisNum;
 	    remainingLights -= thisNum;
@@ -533,6 +555,8 @@ namespace RenderManager
   
 	  totalLayers = neededLayers;
 	}
+	
+	delete[] localStacks;
 	
 	return firstLight;
       }
@@ -609,7 +633,7 @@ namespace RenderManager
 	      light, newCacheData);
 	    light->SetLightCallback (persist.GetLightCallback());
 	  }
-          thisLightSVs->SetupFrame (shadows, light);
+          thisLightSVs->SetupFrame (node->owner.owner, shadows, light);
           csFlags lightFlagsMask;
           if (mesh.meshFlags.Check (CS_ENTITY_NOSHADOWS))
             lightFlagsMask = noShadows.GetLightFlagsMask();

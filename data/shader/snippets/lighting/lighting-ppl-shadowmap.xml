@@ -43,6 +43,7 @@
 	<!-- Vector from eye to position -->
 	<input name="eyeToSurf" type="direction_tangent" />
 	<input name="positionW" type="position4_world" />
+	<input name="positionC" type="position4_camera" />
 	<!-- Surface normal -->
 	<input name="normal" type="normal_tangent" />
 	<input name="shadow" type="ShadowShadowMap" default="complex">
@@ -136,6 +137,21 @@
 	  </block>
 	</input>
 	
+	<input name="shadowClip" type="float2" default="complex" private="yes">
+	  <block location="cg:fragmentIn">
+	    <uniform type="float2" name="shadowClip" />
+	  </block>
+	  
+	  <block location="cg:variablemap">
+	    <variablemap variable="light shadow clip" 
+			 destination="fragmentIn.shadowClip" />
+	  </block>
+	  
+	  <block location="cg:fragmentMain">
+	    shadowClip = fragmentIn.shadowClip;
+	  </block>
+	</input>
+	
 	<input name="lightOffset" type="int" default="value" defval="0"/>
 	<input name="maxLights" type="int" default="value" defval="3"/>
 	
@@ -182,10 +198,10 @@
 	  <![CDATA[
           for (int l = 0; l < maxLights; l++)
 	  {
-	    if (l >= lightProps.count) break;
+	    int i = lightOffset + l;
+	    if (i >= lightProps.count) break;
 	  ]]>
 	    
-	    int i = lightOffset + l;
 	    half3 vp_dir;
 	    float3 vp_surfToLight;
 	    lspace.InitVP (i, world2tang, positionW, vp_dir, vp_surfToLight);
@@ -204,6 +220,9 @@
 	</block>
 	
 	<block location="cg:fragmentMain">
+	  clip (float4 (positionC.z-shadowClip.x, 
+	    -positionC.z+shadowClip.y, 0, 0));
+	  
 	  diffuseColor = float3(0);
 	  specularColor = float3(0);
 	  half3 myEyeToSurf = eyeToSurf;
