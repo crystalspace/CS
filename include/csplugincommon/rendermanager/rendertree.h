@@ -175,6 +175,7 @@ namespace RenderManager
       csReversibleTransform cameraTransform;
       int drawFlags;
       iSector* sector;
+      csRef<iShaderVariableContext> shadervars;
       
       csRef<PostEffectManager> postEffects;
 
