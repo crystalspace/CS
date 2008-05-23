@@ -171,7 +171,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     csArray<Snippet> snippets;
     Snippet currentSnippet;
     csRefArray<iDocumentNode> variableMaps;
-    csString outputAssign;
+    csString outputAssign[rtaNumAttachments];
     csRefArray<iDocumentNode> definitions;
     csSet<csString> globalIDs;
     csString globals;
@@ -198,7 +198,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
         
     void AddGlobal (const char* name, const char* type,
           const char* annotation = 0);
-    void SetOutput (const char* name, const char* annotation = 0);
+    void SetOutput (csRenderTargetAttachment target,
+      const char* name, const char* annotation = 0);
     
     csPtr<WeaverCommon::iCoerceChainIterator> QueryCoerceChain (
       const char* fromType, const char* toType);

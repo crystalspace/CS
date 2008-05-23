@@ -236,7 +236,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       }
     }
   }
-
+  
   bool Synthesizer::SynthesizeTechnique::operator() (
     ShaderVarNodesHelper& shaderVarNodes, iDocumentNode* errorNode,
     const Snippet* snippet, const TechniqueGraph& techGraph)
@@ -293,9 +293,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     }
     
     // Two outputs are needed: color (usually from the fragment part)...
-    const Snippet::Technique* outTechnique;
-    Snippet::Technique::Output theOutput;
-    if (!FindOutput (graph, "rgba", combiner, outTechnique, theOutput))
+    const Snippet::Technique* outTechniqueColor;
+    Snippet::Technique::Output theColorOutput;
+    if (!FindOutput (graph, "rgba", combiner, outTechniqueColor, theColorOutput))
     {
       compiler->Report (CS_REPORTER_SEVERITY_WARNING, errorNode,
 	"No suitable color output found");
@@ -312,16 +312,35 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       return false;
     }
     
+    // Optional: fragment depth
+    const Snippet::Technique* outTechniqueDepth;
+    Snippet::Technique::Output theDepthOutput;
+    bool hasOutputDepth = FindOutput (graph, "depth", combiner,
+      outTechniqueDepth, theDepthOutput);
+    
     
     // Generate special technique for output
-    CS::Utility::ScopedDelete<Snippet::Technique> generatedOutput (
-      snippet->CreatePassthrough ("output", "rgba"));
-    graph.AddTechnique (generatedOutput);
+    CS::Utility::ScopedDelete<Snippet::Technique> generatedOutputColor (
+      snippet->CreatePassthrough ("outputColor", "rgba"));
+    graph.AddTechnique (generatedOutputColor);
     {
       TechniqueGraph::Connection conn;
-      conn.from = outTechnique;
-      conn.to = generatedOutput;
+      conn.from = outTechniqueColor;
+      conn.to = generatedOutputColor;
       graph.AddConnection (conn);
+    }
+    csRef<Snippet::Technique> generatedOutputDepth;
+    generatedOutputDepth.AttachNew (
+      snippet->CreatePassthrough ("outputDepth", "depth"));
+    if (hasOutputDepth)
+    {
+      graph.AddTechnique (generatedOutputDepth);
+      {
+	TechniqueGraph::Connection conn;
+	conn.from = outTechniqueDepth;
+	conn.to = generatedOutputDepth;
+	graph.AddConnection (conn);
+      }
     }
     /*
       - Starting from our output nodes, collect all nodes that go into them.
@@ -329,7 +348,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       - For each node perform input/output renaming.
      */
     SynthesizeNodeTree synthTree (*this);
-    synthTree.AddAllInputNodes (graph, generatedOutput, combiner);
+    synthTree.AddAllInputNodes (graph, generatedOutputColor, combiner);
+    if (hasOutputDepth)
+      synthTree.AddAllInputNodes (graph, generatedOutputDepth, combiner);
     synthTree.AddAllInputNodes (graph, outTechniquePos, combiner);
     // The input linking works better if "top" nodes come first
     synthTree.ReverseNodeArray();
@@ -605,7 +626,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     synthTree.Collapse (graph);
     {
       csArray<const Snippet::Technique*> outputs;
-      outputs.Push (generatedOutput);
+      outputs.Push (generatedOutputColor);
+      if (hasOutputDepth) outputs.Push (generatedOutputDepth);
       outputs.Push (outTechniquePos);
       synthTree.Rebuild (graph, outputs);
     }
@@ -704,12 +726,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     {
       csString outputRenamed = 
-	synthTree.GetNodeForTech (generatedOutput).outputRenames.Get (
-	  "output", (const char*)0);
+	synthTree.GetNodeForTech (generatedOutputColor).outputRenames.Get (
+	  "outputColor", (const char*)0);
       CS_ASSERT(!outputRenamed.IsEmpty());
       
-      combiner->SetOutput (outputRenamed,
+      combiner->SetOutput (rtaColor0, outputRenamed,
         GetAnnotation ("Map color output"));
+    }
+    if (hasOutputDepth)
+    {
+      csString outputRenamed = 
+	synthTree.GetNodeForTech (generatedOutputDepth).outputRenames.Get (
+	  "outputDepth", (const char*)0);
+      CS_ASSERT(!outputRenamed.IsEmpty());
+      
+      combiner->SetOutput (rtaDepth, outputRenamed,
+        GetAnnotation ("Map depth output"));
     }
     
     return true;

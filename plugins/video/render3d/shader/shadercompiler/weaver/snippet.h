@@ -39,7 +39,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   class Snippet : public CS::Memory::CustomAllocated
   {
   public:
-    class Technique
+    class Technique : public CS:: Utility::FastRefCount<Technique>
     {
     public:
       const char* snippetName;
@@ -197,7 +197,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     BasicIterator<const Technique*>* GetTechniques() const;
     
-    Technique* LoadLibraryTechnique (/*const WeaverCompiler* compiler,*/
+    Technique* LoadLibraryTechnique (
       iDocumentNode* node, const Technique::CombinerPlugin& combiner,
       bool markAsCoercion = false) const;
     Technique* CreatePassthrough (const char* varName, const char* type) const;

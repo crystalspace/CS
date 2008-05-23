@@ -907,12 +907,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     }
   }
     
-  void ShaderCombinerCg::SetOutput (const char* name,
+  void ShaderCombinerCg::SetOutput (csRenderTargetAttachment target,
+                                    const char* name,
                                     const char* annotation)
   {
-    outputAssign.Empty();
-    if (annotation) outputAssign.AppendFmt (MakeComment (annotation));
-    outputAssign.AppendFmt ("outputColor = %s;\n", name);
+    const char* outputName = 0;
+    switch (target)
+    {
+      case rtaColor0: outputName = "color0"; break;
+      case rtaDepth:  outputName = "depth"; break;
+      default: CS_ASSERT_MSG ("Unsupported program output target", false);
+    }
+    outputAssign[target].Empty();
+    if (annotation) outputAssign[target].AppendFmt (MakeComment (annotation));
+    outputAssign[target].AppendFmt ("OUT.%s = %s;\n", outputName, name);
   }
   
   csPtr<WeaverCommon::iCoerceChainIterator> 
@@ -1072,11 +1080,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       }
       appender.Append ("};\n\n");
       
-      appender.Append ("float4 fragmentMain (vertex2fragment vertexToFragment, FragmentInput fragmentIn) : COLOR\n");
+      appender.Append ("struct FragmentOutput\n");
       appender.Append ("{\n");
-      if (loader->annotateCombined)
-        appender.Append ("// Fragment program output\n");
-      appender.Append ("  float4 outputColor;\n");
+      appender.Append ("  float4 color0 : COLOR0;\n");
+      appender.Append ("  float depth : DEPTH;\n");
+      appender.Append ("};\n\n");
+      
+      appender.Append ("FragmentOutput fragmentMain (vertex2fragment vertexToFragment, FragmentInput fragmentIn)\n");
+      appender.Append ("{\n");
       appender.Append (globals);
       
       for (size_t s = 0; s < snippets.GetSize(); s++)
@@ -1105,8 +1116,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
         appender.Append ("\n");
       }
       
-      appender.Append (outputAssign);
-      appender.Append ("  return outputColor;\n");
+      if (loader->annotateCombined)
+        appender.Append ("  // Fragment program output\n");
+      appender.Append ("  FragmentOutput OUT;\n");
+      for (int a = 0; a < rtaNumAttachments; a++)
+        appender.Append (outputAssign[a]);
+      appender.Append ("  return OUT;\n");
       appender.Append ("}\n");
     }
   }

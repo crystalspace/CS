@@ -60,7 +60,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     bool EndSnippet ();
     void AddGlobal (const char* name, const char* type, 
       const char* annotation) {}
-    void SetOutput (const char* name, const char* annotation) {}
+    void SetOutput (csRenderTargetAttachment,
+      const char* name, const char* annotation) {}
     csPtr<CS::PluginCommon::ShaderWeaver::iCoerceChainIterator> 
       QueryCoerceChain (const char* fromType, const char* toType) { return 0; }
     uint CoerceCost (const char* fromType, const char* toType);
