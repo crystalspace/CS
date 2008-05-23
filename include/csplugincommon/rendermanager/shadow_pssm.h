@@ -70,9 +70,9 @@ namespace RenderManager
       {
 	// PSSM: split layers
 	
-	// @@@ FIXME: arbitrary
+	// @@@ FIXME: arbitrary; make configurable
 	float _near = SMALL_Z;
-	float _far = 300.0f;
+	float _far = 100.0f;
       
 	splitDists[0] = _near;
 	for (int i = 0; i <= NUM_PARTS; i++)
@@ -293,21 +293,17 @@ namespace RenderManager
 	      // Frustum slice corner, light space after W divide
 	      csVector3 cornerDiv;
 	      
-	      lightFrustum.volumeLS.StartBoundingBox();
 	      lightFrustum.volumePP.StartBoundingBox();
 	      for (int c = 0; c < 7; c++)
 	      {
 		cornerLight = frustumLight.GetCorner (c);
-		lightFrustum.volumeLS.AddBoundingVertex (cornerLight);
 		cornerUndiv = lightProject * cornerLight;
 		cornerDiv =
 		  csVector3 (cornerUndiv.x, cornerUndiv.y, cornerUndiv.z);
 		cornerDiv /= cornerUndiv.w;
 		lightFrustum.volumePP.AddBoundingVertex (cornerDiv);
 	      }
-	      tree.AddDebugBBox (lightFrustum.volumeLS,
-	        superFrustum.world2light_rotated.GetInverse(),
-	        csColor (0, 0, 1));
+	      lightFrustum.volumeLS = frustumLight;
 	    
 	      lightFrustum.shadowMapProjectSV = lightVarsHelper.CreateTempSV (
 		viewSetup.persist.svNames.GetLightSVId (
@@ -358,7 +354,6 @@ namespace RenderManager
       
         CS_ALLOC_STACK_ARRAY(iTextureHandle*, texHandles,
           persist.settings.targets.GetSize());
-        float allMinZ = HUGE_VALF;
 	for (size_t l = 0; l < lightData.lightFrustums.GetSize(); l++)
 	{
 	  const SuperFrustum& superFrust = *(lightData.lightFrustums[l]);
@@ -375,6 +370,7 @@ namespace RenderManager
 	    {
 	      allObjsBoxPP += lightFrust.containedObjectsPP[i];
 	    }
+	    float allObjsMaxZ = allObjsBoxPP.MaxZ();
 	    allObjsBoxPP *= lightFrust.volumePP;
 	    csBox3 clipToView;
 	    if (light->GetType() == CS_LIGHT_DIRECTIONAL)
@@ -383,15 +379,11 @@ namespace RenderManager
 	    else
 	      clipToView = csBox3 (csVector3 (-1, -1, 0),
 	        csVector3 (1, 1, HUGE_VALF));
-	    allObjsBoxPP *= clipToView;
 	    if (allObjsBoxPP.Empty())
 	    {
-	      /*csPrintf ("lightFrust.containedObjectsPP.GetSize() = %zu\n",
-	        lightFrust.containedObjectsPP.GetSize());
-	      csPrintf ("allObjsBoxPP = %s\n",
-	        allObjsBoxPP.Description().GetData());*/
 	      //continue;
 	    }
+	    allObjsBoxPP *= clipToView;
 	    
 	    CS::RenderManager::RenderView* rview = context.renderView;
 	  #include "csutil/custom_new_disable.h"
@@ -415,23 +407,18 @@ namespace RenderManager
 	      0, cropScaleY, 0, cropShiftY,
 	      0, 0, 1, 0,
 	      0, 0, 0, 1);
-	    //csPrintf (" crop = %s\n", crop.Description().GetData());
-	    //csPrintf (" allObjsBoxPP = %s\n", allObjsBoxPP.Description().GetData());
 	      
 	    /* The minimum Z over all parts is used to avoid clipping shadows of 
-	      casters closer to the light than the split plane */
-	    if (allObjsBoxPP.MinZ() < allMinZ) allMinZ = allObjsBoxPP.MinZ();
-	    //allMinZ = csMax (allMinZ, 0.0f);
-	    float maxZ = allObjsBoxPP.MaxZ();
-	    /* Consider using DepthRange? */
-	    float n = allObjsBoxPP.MinZ();//allMinZ;
+	      casters closer to the light than the split plane.
+	      Ideally, allObjsBoxPP.MinZ() would be mapped to depth -1, and depths\
+	      below clamped */
+	    float n = allObjsBoxPP.MinZ();
+	    float maxZ = allObjsMaxZ;
 	    float f = maxZ + EPSILON;
-	    //csPrintf (" n = %f  f = %f\n", n, f);
 	    /* Sometimes n==f which would result in an invalid matrix w/o EPSILON */
 	    CS::Math::Matrix4 Mortho = CS::Math::Projections::Ortho (-1, 1, 1, -1, -n, -f);
 	    CS::Math::Matrix4 matrix = ((Mortho * crop) * lightData.lightProject)
 	     * CS::Math::Matrix4 (superFrust.frustumRotation);
-	    //csPrintf ("matrix = %s\n", matrix.Description().GetData());
 	    
 	    int shadowMapSize;
 	    csReversibleTransform view = superFrust.world2light_base;
@@ -442,8 +429,6 @@ namespace RenderManager
 	    shadowViewCam->SetProjectionMatrix (matrix);
 	    shadowViewCam->GetCamera()->SetTransform (view);
 	    
-	    //CS::Math::Matrix4 viewM (view);
-	  
 	    for (int i = 0; i < 4; i++)
 	    {
 	      csShaderVariable* item = lightFrust.shadowMapProjectSV->GetArrayElement (i);
