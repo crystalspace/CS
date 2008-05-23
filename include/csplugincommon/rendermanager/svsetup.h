@@ -177,6 +177,8 @@ namespace RenderManager
       context.svArrays.SetupSVStack (svStack, 0, 0);
 
       shaderManager->PushVariables (svStack);
+      if (context.shadervars.IsValid())
+        context.shadervars->PushVariables (svStack);
       sector->GetSVContext ()->PushVariables (svStack);
 
       // Replicate
