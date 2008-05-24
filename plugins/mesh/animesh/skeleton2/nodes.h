@@ -33,7 +33,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   class BaseNodeSingle
   {
   protected:
-    void FireAnimationCallback ()
+    void FireAnimationFinishedCallback ()
     {
       for (size_t i = 0; i < callbacks.GetSize (); ++i)
       {
@@ -336,9 +336,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   };
 
   class RandomNode :
-    public scfImplementation2<RandomNode,
+    public scfImplementation3<RandomNode,
                               iSkeletonRandomNode2,
-                              scfFakeInterface<iSkeletonAnimNode2> >,
+                              scfFakeInterface<iSkeletonAnimNode2>,
+                              iSkeletonAnimCallback2>,
     public BaseNodeChildren
   {
   public:
@@ -359,6 +360,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual void AddAnimationCallback (iSkeletonAnimCallback2* callback);
     virtual void RemoveAnimationCallback (iSkeletonAnimCallback2* callback);
 
+    //-- iSkeletonAnimCallback2
+    virtual void AnimationFinished ();
   private:
     size_t currentNode;
     bool active;

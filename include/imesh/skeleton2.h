@@ -424,6 +424,7 @@ public:
     delete[] boneQuats;
 
     bitSet.SetSize (numBones);
+    bitSet.Clear ();
     boneVecs = new csVector3 [numBones];
     boneQuats = new csQuaternion [numBones];
     numberOfBones = numBones;

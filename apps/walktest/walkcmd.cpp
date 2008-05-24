@@ -63,6 +63,10 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/material.h"
 
+#include "imesh/animesh.h"
+#include "imesh/skeleton2.h"
+#include "imesh/skeleton2anim.h"
+
 #include "bot.h"
 #include "command.h"
 #include "walktest.h"
@@ -2500,6 +2504,54 @@ bool CommandHandler (const char *cmd, const char *arg)
       if (!success)
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, 
         "bugplug failed to execute '%s'", arg);
+    }
+  }
+  else if (!csStrCaseCmp (cmd, "sk2"))
+  {
+    if (!arg)
+      return true;
+
+    //sk2 mesh,node,play/stop
+    char meshName[64];
+    char nodeName[64];
+    char action[64];
+    int index = 0;
+    csScanStr (arg, "%s,%s,%s,%d", meshName, nodeName, action, &index);
+
+    // Get the data
+    csRef<iMeshWrapper> mesh = Sys->Engine->FindMeshObject (meshName);   
+    csRef<iAnimatedMesh> animesh = scfQueryInterfaceSafe<iAnimatedMesh> (mesh->GetMeshObject ());
+    
+    if (!animesh)
+      return true;
+  
+    csRef<iSkeleton2> skel = animesh->GetSkeleton ();
+    if (!skel)
+      return true;
+
+    csRef<iSkeletonAnimNode2> node = skel->GetAnimationPacket ()->GetAnimationRoot ();
+    if (!node)
+      return true;
+
+    node = node->FindNode (nodeName);
+    if (!node)
+      return true;
+
+    if (!csStrCaseCmp (action, "play"))
+    {
+      node->Play ();
+    }
+    else if (!csStrCaseCmp (action, "stop"))
+    {
+      node->Stop ();
+    }
+    else if (!csStrCaseCmp (action, "state"))
+    {
+      csRef<iSkeletonFSMNode2> fsm = scfQueryInterfaceSafe<iSkeletonFSMNode2> (node);
+      if (!fsm)
+        return true;
+
+      fsm->SwitchToState (index);
     }
   }
   else

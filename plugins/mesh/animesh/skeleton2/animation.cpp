@@ -59,7 +59,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   {
     for (size_t i = 0; i < animationList.GetSize (); ++i)
     {
-      if (animationList[i]->GetName () == name)
+      if (strcmp (animationList[i]->GetName (), name) == 0)
         return animationList[i];
     }
 
@@ -291,7 +291,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       const KeyFrame& k2 = channel->keyFrames[after];
 
       // blending factor
-      const float t = (playbackTime - k1.time) / (k2.time - k1.time);
+      const float t = before == after ? 0 : (playbackTime - k1.time) / (k2.time - k1.time);
 
       // Blend together
       csQuaternion& q = state->GetQuaternion (channel->bone);

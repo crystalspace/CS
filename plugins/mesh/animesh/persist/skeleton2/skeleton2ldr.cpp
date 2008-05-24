@@ -430,7 +430,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
     csRef<iSkeletonAnimationNodeFactory2> factnode;
 
     const char* name = node->GetAttributeValue ("name");
-    factnode = packet->CreateAnimationNode (name);
 
     // Get the animation itself
     const char* animName = node->GetAttributeValue ("animation");
@@ -439,6 +438,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
       synldr->ReportError (msgid, node, "No animation specified");
       return 0;
     }
+
+    // Reuse the animation name if no node-name set
+    if (!name)
+      name = animName;
+
+    factnode = packet->CreateAnimationNode (name);
+
 
     iSkeletonAnimation2* anim = packet->FindAnimation (animName);
     if (!anim)
