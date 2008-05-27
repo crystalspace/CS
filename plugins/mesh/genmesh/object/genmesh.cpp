@@ -1281,16 +1281,17 @@ void csGenmeshMeshObjectFactory::UpdateTangentsBitangents ()
       iRenderBuffer* indexBuffer = subMeshes[i]->SubMesh::GetIndices();
       size_t scratchPos = triangleScratch.GetSize();
       size_t indexTris = indexBuffer->GetElementCount() / 3;
-      triangleScratch.SetSize (scratchPos + indexTris);
       if ((indexBuffer->GetComponentType() == CS_BUFCOMP_INT)
 	  || (indexBuffer->GetComponentType() == CS_BUFCOMP_UNSIGNED_INT))
       {
+        triangleScratch.SetSize (scratchPos + indexTris);
 	csRenderBufferLock<uint8> indexLock (indexBuffer, CS_BUF_LOCK_READ);
 	memcpy (triangleScratch.GetArray() + scratchPos,
 	  indexLock.Lock(), indexTris * sizeof (csTriangle));
       }
       else
       {
+        triangleScratch.SetCapacity (scratchPos + indexTris);
 	CS::TriangleIndicesStream<int> triangles (indexBuffer,
 	  CS_MESHTYPE_TRIANGLES);
 	while (triangles.HasNext())
