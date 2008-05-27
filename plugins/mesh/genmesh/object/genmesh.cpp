@@ -90,8 +90,8 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
   logparent = 0;
   initialized = false;
   cur_movablenr = -1;
-  material = 0;
-  MixMode = 0;
+  //material = 0;
+  //MixMode = 0;
   do_lighting = true;
   do_manual_colors = false;
   base_color.red = 0;
@@ -113,8 +113,8 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
   anim_ctrl_normals = false;
   anim_ctrl_colors = false;
 
-  num_sorted_mesh_triangles = 0;
-  sorted_mesh_triangles = 0;
+  subMeshes.GetDefaultSubmesh()->parentSubMesh =
+    factory->subMeshes.GetDefaultSubmesh();
 
   svcontext.AttachNew (new csShaderVariableContext);
   bufferHolder.AttachNew (new csRenderBufferHolder);
@@ -126,8 +126,6 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
 
 csGenmeshMeshObject::~csGenmeshMeshObject ()
 {
-  delete[] sorted_mesh_triangles;
-
   ClearPseudoDynLights ();
 }
 
@@ -199,7 +197,7 @@ void csGenmeshMeshObject::UpdateSubMeshProxies () const
       subMeshes.Empty();
     else
     {
-      SubMeshProxiesContainer newSubMeshes;
+      SubMeshProxiesContainer newSubMeshes (subMeshes.GetDefaultSubmesh());
       for (size_t i = 0; i < sm.GetSize(); i++)
       {
         const char* name = sm[i]->GetName();
@@ -502,10 +500,7 @@ void csGenmeshMeshObject::AppendShadows (iMovable* movable,
 
 bool csGenmeshMeshObject::SetMaterialWrapper (iMaterialWrapper* mat)
 {
-  material = mat;
-  iMaterialWrapper* mater = material;
-  if (!mater) mater = factory->GetMaterialWrapper ();
-  material_needs_visit = mater->IsVisitRequired ();
+  subMeshes.GetDefaultSubmesh()->SubMeshProxy::SetMaterial (mat);
   return true;
 }
 
@@ -578,9 +573,9 @@ void csGenmeshMeshObject::SetupObject ()
       legacyLighting.SetColorNum (factory->GetVertexCount ());
       legacyLighting.Clear();
     }
-    iMaterialWrapper* mater = material;
+    /*iMaterialWrapper* mater = material;
     if (!mater) mater = factory->GetMaterialWrapper ();
-    material_needs_visit = mater ? mater->IsVisitRequired () : false;
+    material_needs_visit = mater ? mater->IsVisitRequired () : false;*/
     SetupShaderVariableContext ();
   }
   if (factory->user_buffer_change != factory_user_rb_state || mesh_user_rb_dirty_flag)
@@ -629,14 +624,18 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
   UpdateSubMeshProxies ();
   SubMeshProxiesContainer& sm = subMeshes;
 
-  if (sm.GetSize () == 0 && 
-      legacySubmeshes.GetSize () == 0 &&
-      factory->GetTriangleCount () > 0)
-  {
-    renderMeshes.SetSize (1);
+  const bool factoryB2F = factory->back2front;
+  const csVector3 b2fPos (o2wt.Other2This (camera->GetTransform ().GetOrigin()));
+  uint frameNum = rview->GetCurrentFrameNumber ();
+  renderMeshes.SetSize (sm.GetSize ());
 
-    iMaterialWrapper* mater = material;
-    if (!mater) mater = factory->GetMaterialWrapper ();
+  for (size_t i = 0; i<sm.GetSize (); ++i)
+  {
+    SubMeshProxy& subMesh = *(sm[i]);
+    iMaterialWrapper* mater = subMesh.SubMeshProxy::GetMaterial();
+    if (!mater)
+      mater = subMeshes.GetDefaultSubmesh()->SubMeshProxy::GetMaterial();
+    //if (!mater) mater = factory->GetMaterialWrapper ();
     if (!mater)
     {
       csPrintf ("INTERNAL ERROR: mesh used without material!\n");
@@ -646,195 +645,45 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     if (mater->IsVisitRequired ()) mater->Visit ();
 
     bool rmCreated;
-    csRenderMesh*& meshPtr = rmHolder.GetUnusedMesh (rmCreated,
-      rview->GetCurrentFrameNumber ());
+    csRenderMesh*& meshPtr = subMesh.rmHolder.GetUnusedMesh (rmCreated,
+      frameNum);
+      
+    iRenderBuffer* index_buffer;
+    bool b2f = subMesh.SubMeshProxy::GetBack2Front () || factoryB2F;
+    if (b2f)
+      index_buffer = subMesh.SubMeshProxy::GetIndicesB2F (b2fPos, frameNum,
+	factory->GetVertices(), factory->GetVertexCount());
+    else
+      index_buffer = subMesh.SubMeshProxy::GetIndices();
+    csRenderBufferHolder* smBufferHolder =
+      subMesh.SubMeshProxy::GetBufferHolder (bufferHolder);
 
-    if (factory->back2front)
-    {
-      sorted_index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
-      	factory->GetTriangleCount() * 3, CS_BUF_DYNAMIC,
-	CS_BUFCOMP_UNSIGNED_INT, 0, factory->GetVertexCount() - 1);
-
-      if (num_sorted_mesh_triangles != factory->GetTriangleCount ())
-      {
-        delete[] sorted_mesh_triangles;
-        num_sorted_mesh_triangles = factory->GetTriangleCount ();
-        sorted_mesh_triangles = new csTriangle [num_sorted_mesh_triangles];
-      }
-
-      csBSPTree* back2front_tree = factory->back2front_tree;
-      if (!back2front_tree)
-      {
-        factory->BuildBack2FrontTree ();
-        back2front_tree = factory->back2front_tree;
-      }
-      const csDirtyAccessArray<int>& triidx = back2front_tree->Back2Front (
-        camera->GetTransform ().Other2This (wo));
-      CS_ASSERT (triidx.GetSize () == (size_t)num_sorted_mesh_triangles);
-
-      csTriangle* factory_triangles = factory->GetTriangles ();
-      int i;
-      for (i = 0 ; i < num_sorted_mesh_triangles ; i++)
-        sorted_mesh_triangles[i] = factory_triangles[triidx[i]];
-      sorted_index_buffer->CopyInto (sorted_mesh_triangles,
-        sizeof (unsigned int)*num_sorted_mesh_triangles*3);
-
-      bufferHolder->SetRenderBuffer(CS_BUFFER_INDEX, sorted_index_buffer);
-      bufferHolder->SetAccessor (renderBufferAccessor, 
-	bufferHolder->GetAccessorMask() 
-	& (~CS_BUFFER_MAKE_MASKABLE (CS_BUFFER_INDEX)));
-
-    } 
-
-    meshPtr->mixmode = MixMode;
+    uint smMixMode = subMesh.SubMeshProxy::GetMixmode();
+    meshPtr->mixmode = (smMixMode != (uint)~0) ? smMixMode 
+      : subMeshes.GetDefaultSubmesh()->SubMeshProxy::GetMixmode ();;
+    meshPtr->z_buf_mode = subMesh.SubMeshProxy::GetZMode();
+    meshPtr->renderPrio = subMesh.SubMeshProxy::GetRenderPriority();
     meshPtr->clip_portal = clip_portal;
     meshPtr->clip_plane = clip_plane;
     meshPtr->clip_z_plane = clip_z_plane;
     meshPtr->do_mirror = camera->IsMirrored ();
     meshPtr->meshtype = CS_MESHTYPE_TRIANGLES;
     meshPtr->indexstart = 0;
-    meshPtr->indexend = factory->GetTriangleCount () * 3;
+    meshPtr->indexend = (uint)index_buffer->GetElementCount();
     meshPtr->material = mater;
     CS_ASSERT (mater != 0);
     meshPtr->worldspace_origin = wo;
-    meshPtr->variablecontext = svcontext;
-    meshPtr->buffers = bufferHolder;
-    meshPtr->geometryInstance = (void*)factory;
+    csRef<MergedSVContext> mergedSVContext;
+    mergedSVContext.AttachNew (
+      new (factory->genmesh_type->mergedSVContextPool) MergedSVContext (
+      static_cast<iShaderVariableContext*> (&subMesh), svcontext));
+    meshPtr->variablecontext = mergedSVContext;
     meshPtr->object2world = o2wt;
 
-    renderMeshes[0] = meshPtr;
-  }
-  else if (legacySubmeshes.GetSize() != 0)
-  {
-    renderMeshes.SetSize (legacySubmeshes.GetSize ());
+    meshPtr->buffers = smBufferHolder;
+    meshPtr->geometryInstance = (void*)factory;
 
-    for (size_t i = 0; i<legacySubmeshes.GetSize (); ++i)
-    {
-      LegacySubmesh& subMesh = legacySubmeshes[i];
-      iMaterialWrapper* mater = subMesh.material;
-      if (!mater) mater = factory->GetMaterialWrapper ();
-      if (!mater)
-      {
-        csPrintf ("INTERNAL ERROR: mesh used without material!\n");
-        return 0;
-      }
-
-      if (mater->IsVisitRequired ()) mater->Visit ();
-
-      bool rmCreated;
-      csRenderMesh*& meshPtr = subMesh.rmHolder.GetUnusedMesh (rmCreated,
-        rview->GetCurrentFrameNumber ());
-
-      iRenderBuffer* index_buffer = subMesh.indexbuffer;
-      csRenderBufferHolder* smBufferHolder = subMesh.bufferHolder;
-
-      uint smMixMode = subMesh.mixmode;
-      meshPtr->mixmode = (smMixMode != (uint)~0) ? smMixMode : MixMode;
-      meshPtr->clip_portal = clip_portal;
-      meshPtr->clip_plane = clip_plane;
-      meshPtr->clip_z_plane = clip_z_plane;
-      meshPtr->do_mirror = camera->IsMirrored ();
-      meshPtr->meshtype = CS_MESHTYPE_TRIANGLES;
-      meshPtr->indexstart = 0;
-      meshPtr->indexend = (uint)index_buffer->GetElementCount();
-      meshPtr->material = mater;
-      CS_ASSERT (mater != 0);
-      meshPtr->worldspace_origin = wo;
-      meshPtr->variablecontext = svcontext;
-      meshPtr->object2world = o2wt;
-
-      smBufferHolder->SetAccessor (renderBufferAccessor, 
-        bufferHolder->GetAccessorMask() 
-        & (~CS_BUFFER_MAKE_MASKABLE (CS_BUFFER_INDEX)));
-
-      for (size_t b=0; b<CS_BUFFER_COUNT; ++b)
-      {
-        if (b != CS_BUFFER_INDEX)
-        {
-          smBufferHolder->SetRenderBuffer ((csRenderBufferName)b, 
-            bufferHolder->GetRenderBuffer ((csRenderBufferName)b));
-        }
-      }
-
-      meshPtr->buffers = smBufferHolder;
-      meshPtr->geometryInstance = (void*)factory;
-
-      renderMeshes[i] = meshPtr;
-    }
-  }
-  else
-  {
-    const bool factoryB2F = factory->back2front;
-    const csVector3 b2fPos (o2wt.Other2This (camera->GetTransform ().GetOrigin()));
-    uint frameNum = rview->GetCurrentFrameNumber ();
-    renderMeshes.SetSize (sm.GetSize ());
-
-    for (size_t i = 0; i<sm.GetSize (); ++i)
-    {
-      SubMeshProxy& subMesh = *(sm[i]);
-      iMaterialWrapper* mater = subMesh.SubMeshProxy::GetMaterial();
-      if (!mater) mater = factory->GetMaterialWrapper ();
-      if (!mater)
-      {
-        csPrintf ("INTERNAL ERROR: mesh used without material!\n");
-        return 0;
-      }
-
-      if (mater->IsVisitRequired ()) mater->Visit ();
-
-      bool rmCreated;
-      csRenderMesh*& meshPtr = subMesh.rmHolder.GetUnusedMesh (rmCreated,
-        frameNum);
-        
-      iRenderBuffer* index_buffer;
-      bool b2f = subMesh.SubMeshProxy::GetBack2Front () || factoryB2F;
-      if (b2f)
-        index_buffer = subMesh.SubMeshProxy::GetIndicesB2F (b2fPos, frameNum,
-          factory->GetVertices(), factory->GetVertexCount());
-      else
-        index_buffer = subMesh.SubMeshProxy::GetIndices();
-      csRenderBufferHolder* smBufferHolder = subMesh.SubMeshProxy::GetBufferHolder();
-      smBufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, index_buffer);
-
-      uint smMixMode = subMesh.SubMeshProxy::GetMixmode();
-      meshPtr->mixmode = (smMixMode != (uint)~0) ? smMixMode : MixMode;
-      meshPtr->z_buf_mode = subMesh.SubMeshProxy::GetZMode();
-      meshPtr->renderPrio = subMesh.SubMeshProxy::GetRenderPriority();
-      meshPtr->clip_portal = clip_portal;
-      meshPtr->clip_plane = clip_plane;
-      meshPtr->clip_z_plane = clip_z_plane;
-      meshPtr->do_mirror = camera->IsMirrored ();
-      meshPtr->meshtype = CS_MESHTYPE_TRIANGLES;
-      meshPtr->indexstart = 0;
-      meshPtr->indexend = (uint)index_buffer->GetElementCount();
-      meshPtr->material = mater;
-      CS_ASSERT (mater != 0);
-      meshPtr->worldspace_origin = wo;
-      csRef<MergedSVContext> mergedSVContext;
-      mergedSVContext.AttachNew (
-        new (factory->genmesh_type->mergedSVContextPool) MergedSVContext (
-        static_cast<iShaderVariableContext*> (&subMesh), svcontext));
-      meshPtr->variablecontext = mergedSVContext;
-      meshPtr->object2world = o2wt;
-
-      smBufferHolder->SetAccessor (renderBufferAccessor, 
-        bufferHolder->GetAccessorMask() 
-        & (~CS_BUFFER_MAKE_MASKABLE (CS_BUFFER_INDEX)));
-
-      for (size_t b=0; b<CS_BUFFER_COUNT; ++b)
-      {
-        if (b != CS_BUFFER_INDEX)
-        {
-          smBufferHolder->SetRenderBuffer ((csRenderBufferName)b, 
-            bufferHolder->GetRenderBuffer ((csRenderBufferName)b));
-        }
-      }
-
-      meshPtr->buffers = smBufferHolder;
-      meshPtr->geometryInstance = (void*)factory;
-
-      renderMeshes[i] = meshPtr;
-    }
+    renderMeshes[i] = meshPtr;
   }
 
   n = (int)renderMeshes.GetSize ();
@@ -934,69 +783,38 @@ bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
   dist = temp = tot_dist;
   const csVector3 *vrt = factory->GetVertices ();
   csVector3 tmp;
-  if (sm.GetSize() == 0)
+  iMaterialWrapper* mat = 0;
+  for (size_t s = 0; s < sm.GetSize(); s++)
   {
-    int i, max = factory->GetTriangleCount();
-    csTriangle *tr = factory->GetTriangles();
-    for (i = 0 ; i < max ; i++)
+    iRenderBuffer* indexBuffer = sm[s]->GetIndices();
+    csRenderBufferLock<uint> indices (indexBuffer, CS_BUF_LOCK_READ);
+    size_t n = indexBuffer->GetElementCount();
+    size_t idx = 0;
+    while (n > 0)
     {
-      if (csIntersect3::SegmentTriangle (seg, vrt[tr[i].a], vrt[tr[i].b],
-          vrt[tr[i].c], tmp))
+      if (csIntersect3::SegmentTriangle (seg, 
+	vrt[indices.Get (idx)], vrt[indices.Get (idx+1)],
+	vrt[indices.Get (idx+2)], 
+	tmp))
       {
-        temp = csSquaredDist::PointPoint (start, tmp);
-        if (temp < dist)
-        {
-          isect = tmp;
+	temp = csSquaredDist::PointPoint (start, tmp);
+	if (temp < dist)
+	{
+	  isect = tmp;
 	  dist = temp;
-	  if (polygon_idx) *polygon_idx = i;
-        }
+	  //if (polygon_idx) *polygon_idx = i; // @@@ Uh, how to handle?
+	  mat = sm[s]->GetMaterial();
+	}
       }
-    }
-    if (pr) *pr = csQsqrt (dist * itot_dist);
-    if (dist >= tot_dist)
-      return false;
-
-    if (material)
-    {
-      *material = csGenmeshMeshObject::material;
-      if (!*material) *material = factory->GetMaterialWrapper ();
+      n -= 3;
+      idx += 3;
     }
   }
-  else
-  {
-    iMaterialWrapper* mat = 0;
-    for (size_t s = 0; s < sm.GetSize(); s++)
-    {
-      iRenderBuffer* indexBuffer = sm[s]->GetIndices();
-      csRenderBufferLock<uint> indices (indexBuffer, CS_BUF_LOCK_READ);
-      size_t n = indexBuffer->GetElementCount();
-      size_t idx = 0;
-      while (n > 0)
-      {
-        if (csIntersect3::SegmentTriangle (seg, 
-          vrt[indices.Get (idx)], vrt[indices.Get (idx+1)],
-	  vrt[indices.Get (idx+2)], 
-          tmp))
-        {
-          temp = csSquaredDist::PointPoint (start, tmp);
-          if (temp < dist)
-          {
-            isect = tmp;
-	    dist = temp;
-	    //if (polygon_idx) *polygon_idx = i; // @@@ Uh, how to handle?
-            mat = sm[s]->GetMaterial();
-          }
-        }
-        n -= 3;
-        idx += 3;
-      }
-    }
-    if (pr) *pr = csQsqrt (dist * itot_dist);
-    if (dist >= tot_dist)
-      return false;
+  if (pr) *pr = csQsqrt (dist * itot_dist);
+  if (dist >= tot_dist)
+    return false;
 
-    if (material) *material = mat;
-  }
+  if (material) *material = mat;
 
   return true;
 }
@@ -1192,6 +1010,12 @@ bool csGenmeshMeshObject::AddRenderBuffer (const char *name,
   return false;
 }
 
+bool csGenmeshMeshObject::AddRenderBuffer (csRenderBufferName name,
+					   iRenderBuffer* buffer)
+{
+  return AddRenderBuffer (csRenderBuffer::GetDescrFromBufferName (name), buffer);
+}
+
 bool csGenmeshMeshObject::RemoveRenderBuffer (const char *name)
 {
   csStringID bufID = factory->GetStrings()->Request (name);
@@ -1202,6 +1026,11 @@ bool csGenmeshMeshObject::RemoveRenderBuffer (const char *name)
     return true;
   }
   return false;
+}
+
+bool csGenmeshMeshObject::RemoveRenderBuffer (csRenderBufferName name)
+{
+  return RemoveRenderBuffer (csRenderBuffer::GetDescrFromBufferName (name));
 }
 
 iRenderBuffer* csGenmeshMeshObject::GetRenderBuffer (int index)
@@ -1221,6 +1050,16 @@ csRef<iString> csGenmeshMeshObject::GetRenderBufferName (int index) const
 iRenderBuffer* csGenmeshMeshObject::GetRenderBuffer (const char* name)
 {
   csStringID bufID = factory->GetStrings()->Request (name);
+  iRenderBuffer* buf = userBuffers.GetRenderBuffer (bufID);
+  if (buf != 0) return 0;
+
+  return factory->GetRenderBuffer (name);
+}
+
+iRenderBuffer* csGenmeshMeshObject::GetRenderBuffer (csRenderBufferName name)
+{
+  const char* nameStr = csRenderBuffer::GetDescrFromBufferName (name);
+  csStringID bufID = factory->GetStrings()->Request (nameStr);
   iRenderBuffer* buf = userBuffers.GetRenderBuffer (bufID);
   if (buf != 0) return 0;
 
@@ -1250,7 +1089,7 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (
   initialized = false;
   object_bbox_valid = false;
 
-  material = 0;
+  //material = 0;
   light_mgr = csQueryRegistry<iLightManager> (object_reg);
   back2front = false;
   back2front_tree = 0;
@@ -1266,7 +1105,8 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (
   autonormals = false;
   autonormals_compress = true;
 
-  default_mixmode = 0;
+  subMeshes.GetDefaultSubmesh()->SubMesh::SetMixmode (0);
+  //default_mixmode = 0;
   default_lighting = true;
   default_color.Set (0, 0, 0);
   default_manualcolors = false;
@@ -1433,54 +1273,29 @@ void csGenmeshMeshObjectFactory::UpdateTangentsBitangents ()
     size_t triNum;
     const csTriangle* tris;
     csDirtyAccessArray<csTriangle> triangleScratch;
-    bool unlockIndices = false;
-    if (subMeshes.GetSize() == 0)
+    for (size_t i = 0; i < subMeshes.GetSize(); i++)
     {
-      if ((knownBuffers.index->GetComponentType() == CS_BUFCOMP_INT)
-          || (knownBuffers.index->GetComponentType() == CS_BUFCOMP_UNSIGNED_INT))
+      iRenderBuffer* indexBuffer = subMeshes[i]->SubMesh::GetIndices();
+      size_t scratchPos = triangleScratch.GetSize();
+      size_t indexTris = indexBuffer->GetElementCount() / 3;
+      triangleScratch.SetSize (scratchPos + indexTris);
+      if ((indexBuffer->GetComponentType() == CS_BUFCOMP_INT)
+	  || (indexBuffer->GetComponentType() == CS_BUFCOMP_UNSIGNED_INT))
       {
-        triNum = knownBuffers.index->GetElementCount() / 3;
-        tris = (csTriangle*)knownBuffers.index->Lock (CS_BUF_LOCK_READ);
-        unlockIndices = true;
+	csRenderBufferLock<uint8> indexLock (indexBuffer, CS_BUF_LOCK_READ);
+	memcpy (triangleScratch.GetArray() + scratchPos,
+	  indexLock.Lock(), indexTris * sizeof (csTriangle));
       }
       else
       {
-        size_t indexTris = knownBuffers.index->GetElementCount() / 3;
-        triangleScratch.SetCapacity (indexTris);
-	CS::TriangleIndicesStream<int> triangles (knownBuffers.index,
+	CS::TriangleIndicesStream<int> triangles (indexBuffer,
 	  CS_MESHTYPE_TRIANGLES);
 	while (triangles.HasNext())
 	  triangleScratch.Push (triangles.Next());
-	triNum = triangleScratch.GetSize ();
-	tris = triangleScratch.GetArray ();
       }
     }
-    else
-    {
-      for (size_t i = 0; i < subMeshes.GetSize(); i++)
-      {
-        iRenderBuffer* indexBuffer = subMeshes[i]->SubMesh::GetIndices();
-        size_t scratchPos = triangleScratch.GetSize();
-        size_t indexTris = indexBuffer->GetElementCount() / 3;
-        triangleScratch.SetSize (scratchPos + indexTris);
-	if ((indexBuffer->GetComponentType() == CS_BUFCOMP_INT)
-	    || (indexBuffer->GetComponentType() == CS_BUFCOMP_UNSIGNED_INT))
-	{
-	  csRenderBufferLock<uint8> indexLock (indexBuffer, CS_BUF_LOCK_READ);
-	  memcpy (triangleScratch.GetArray() + scratchPos,
-	    indexLock.Lock(), indexTris * sizeof (csTriangle));
-	}
-	else
-	{
-	  CS::TriangleIndicesStream<int> triangles (indexBuffer,
-	    CS_MESHTYPE_TRIANGLES);
-	  while (triangles.HasNext())
-	    triangleScratch.Push (triangles.Next());
-	}
-      }
-      triNum = triangleScratch.GetSize ();
-      tris = triangleScratch.GetArray ();
-    }
+    triNum = triangleScratch.GetSize ();
+    tris = triangleScratch.GetArray ();
     csVector3* tangentData = (csVector3*)cs_malloc (
       sizeof (csVector3) * vertCount * 2);
     csVector3* bitangentData = tangentData + vertCount;
@@ -1488,12 +1303,11 @@ void csGenmeshMeshObjectFactory::UpdateTangentsBitangents ()
       vertCount, GetVertices(), 
       GetNormals(), GetTexels(), 
       tangentData, bitangentData);
-
+  
     knownBuffers.tangent->CopyInto (tangentData, vertCount);
     knownBuffers.bitangent->CopyInto (bitangentData, vertCount);
-
+  
     cs_free (tangentData);
-    if (unlockIndices) knownBuffers.index->Release();
   }
 }
 
@@ -1540,60 +1354,45 @@ void csGenmeshMeshObjectFactory::Compress ()
     //printf ("From %d to %d\n", int (old_num), int (mesh_vertices.GetSize ()));
     //fflush (stdout);
 
-    if (subMeshes.GetSize () == 0)
+    for (size_t s = 0; s < subMeshes.GetSize(); s++)
     {
-      // Now we can remap the vertices in all triangles.
-      size_t i;
-      for (i = 0 ; i < legacyBuffers.mesh_triangles.GetSize () ; i++)
+      SubMesh* subMesh = subMeshes[s];
+      csRef<iRenderBuffer> indices (subMesh->GetIndices());
+      csRenderBufferComponentType compType = 
+	indices->GetComponentType ();
+      switch (compType & ~CS_BUFCOMP_NORMALIZED)
       {
-        legacyBuffers.mesh_triangles[i].a =
-          (int)vt[legacyBuffers.mesh_triangles[i].a].new_idx;
-        legacyBuffers.mesh_triangles[i].b =
-          (int)vt[legacyBuffers.mesh_triangles[i].b].new_idx;
-        legacyBuffers.mesh_triangles[i].c =
-          (int)vt[legacyBuffers.mesh_triangles[i].c].new_idx;
+	case CS_BUFCOMP_BYTE:
+	  RemapIndexBuffer<char> (indices, vt);
+	  break;
+	case CS_BUFCOMP_UNSIGNED_BYTE:
+	  RemapIndexBuffer<unsigned char> (indices, vt);
+	  break;
+	case CS_BUFCOMP_SHORT:
+	  RemapIndexBuffer<short> (indices, vt);
+	  break;
+	case CS_BUFCOMP_UNSIGNED_SHORT:
+	  RemapIndexBuffer<unsigned short> (indices, vt);
+	  break;
+	case CS_BUFCOMP_INT:
+	  RemapIndexBuffer<int> (indices, vt);
+	  break;
+	case CS_BUFCOMP_UNSIGNED_INT:
+	  RemapIndexBuffer<unsigned int> (indices, vt);
+	  break;
+	case CS_BUFCOMP_FLOAT:
+	  RemapIndexBuffer<float> (indices, vt);
+	  break;
+	case CS_BUFCOMP_DOUBLE:
+	  RemapIndexBuffer<double> (indices, vt);
+	  break;
+	default:
+	  CS_ASSERT_MSG("invalid component type", false);
       }
+      subMesh->SetIndices (indices);
     }
-    else
-    {
-      for (size_t s = 0; s < subMeshes.GetSize(); s++)
-      {
-        SubMesh* subMesh = subMeshes[s];
-        csRenderBufferComponentType compType = 
-          subMesh->index_buffer->GetComponentType ();
-        switch (compType & ~CS_BUFCOMP_NORMALIZED)
-        {
-          case CS_BUFCOMP_BYTE:
-            RemapIndexBuffer<char> (subMesh->index_buffer, vt);
-            break;
-          case CS_BUFCOMP_UNSIGNED_BYTE:
-            RemapIndexBuffer<unsigned char> (subMesh->index_buffer, vt);
-            break;
-          case CS_BUFCOMP_SHORT:
-            RemapIndexBuffer<short> (subMesh->index_buffer, vt);
-            break;
-          case CS_BUFCOMP_UNSIGNED_SHORT:
-            RemapIndexBuffer<unsigned short> (subMesh->index_buffer, vt);
-            break;
-          case CS_BUFCOMP_INT:
-            RemapIndexBuffer<int> (subMesh->index_buffer, vt);
-            break;
-          case CS_BUFCOMP_UNSIGNED_INT:
-            RemapIndexBuffer<unsigned int> (subMesh->index_buffer, vt);
-            break;
-          case CS_BUFCOMP_FLOAT:
-            RemapIndexBuffer<float> (subMesh->index_buffer, vt);
-            break;
-          case CS_BUFCOMP_DOUBLE:
-            RemapIndexBuffer<double> (subMesh->index_buffer, vt);
-            break;
-	  default:
-	    CS_ASSERT_MSG("invalid component type", false);
-        }
-      }
-    }
-    delete[] vt;
   }
+  delete[] vt;
 }
 
 class csTriangleMeshGenMesh :
@@ -1692,16 +1491,6 @@ void csGenmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder,
 	  knownBuffers.tangent : knownBuffers.bitangent);
 	return;
       }
-    case CS_BUFFER_INDEX:
-      if (!back2front)
-      {
-	if (legacyBuffers.mesh_triangle_dirty_flag)
-	{
-	  UpdateFromLegacyBuffers ();
-	}
-	holder->SetRenderBuffer (buffer, knownBuffers.index);
-	return;
-      }
     default:
       break;
   }
@@ -1722,8 +1511,8 @@ void csGenmeshMeshObjectFactory::AddVertex (const csVector3& v,
 
 void csGenmeshMeshObjectFactory::AddTriangle (const csTriangle& tri)
 {
-  CreateLegacyBuffers();
-  legacyBuffers.mesh_triangles.Push (tri);
+  subMeshes.GetDefaultSubmesh()->CreateLegacyBuffer();
+  subMeshes.GetDefaultSubmesh()->legacyTris.mesh_triangles.Push (tri);
 
   Invalidate ();
 }
@@ -1749,11 +1538,9 @@ void csGenmeshMeshObjectFactory::SetVertexCount (int n)
 
 void csGenmeshMeshObjectFactory::SetTriangleCount (int n)
 {
-  CreateLegacyBuffers();
-  legacyBuffers.mesh_triangles.SetSize (n);
-
-  //index_buffer = 0;
-  legacyBuffers.mesh_triangle_dirty_flag = true;
+  subMeshes.GetDefaultSubmesh()->CreateLegacyBuffer();
+  subMeshes.GetDefaultSubmesh()->legacyTris.mesh_triangles.SetSize (n);
+  subMeshes.GetDefaultSubmesh()->legacyTris.mesh_triangle_dirty_flag = true;
 
   initialized = false;
 }
@@ -1761,118 +1548,109 @@ void csGenmeshMeshObjectFactory::SetTriangleCount (int n)
 void csGenmeshMeshObjectFactory::CalculateNormals (bool compress)
 {
   CreateLegacyBuffers ();
-  if (subMeshes.GetSize () > 0)
+  csDirtyAccessArray<csTriangle> newTriangles;
+  csArray<size_t> submeshTriangleStarts;
+  for (size_t s = 0; s < subMeshes.GetSize (); s++)
   {
-    csDirtyAccessArray<csTriangle> newTriangles;
-    csArray<size_t> submeshTriangleStarts;
+    submeshTriangleStarts.Push (newTriangles.GetSize());
+
+    SubMesh* subMesh (subMeshes[s]);
+    csRef<iRenderBuffer> indices (subMesh->GetIndices());
+
+    CS::TriangleIndicesStream<int> triangles;
+    triangles.BeginTriangulate (indices, CS_MESHTYPE_TRIANGLES);
+    while (triangles.HasNext ())
+    {
+      csTriangle tri (triangles.Next ());
+      newTriangles.Push (tri);
+    }
+  }
+  submeshTriangleStarts.Push (newTriangles.GetSize());
+  csNormalCalculator::CalculateNormals (
+    legacyBuffers.mesh_vertices, newTriangles, legacyBuffers.mesh_normals, 
+    compress);
+  if (compress)
+  {
+    /* When compression is enabled, indices in the triangles may have 
+      * changed. Thus, refill the submesh index buffers with the new
+      * data. */
     for (size_t s = 0; s < subMeshes.GetSize (); s++)
     {
-      submeshTriangleStarts.Push (newTriangles.GetSize());
-
+      size_t smTriStart = submeshTriangleStarts[s]; 
+      size_t smTriEnd = submeshTriangleStarts[s+1]; 
+      size_t rangeMin = (size_t)~0, rangeMax = 0;
+      for (size_t t = smTriStart; t < smTriEnd; t++)
+      {
+	const csTriangle& tri = newTriangles[t];
+	int lowestIndex, highestIndex;
+	if (tri.a > tri.b)
+	{
+	  if (tri.b > tri.c)
+	  {
+	    // a > b > c
+	    highestIndex = tri.a;
+	    lowestIndex = tri.c;
+	  }
+	  else if (tri.a > tri.c)
+	  {
+	    // a > c > b
+	    highestIndex = tri.a;
+	    lowestIndex = tri.b;
+	  }
+	  else
+	  {
+	    // c > a > b
+	    highestIndex = tri.c;
+	    lowestIndex = tri.b;
+	  }
+	}
+	else
+	{
+	  if (tri.a > tri.c)
+	  {
+	    // b > a > c
+	    highestIndex = tri.b;
+	    lowestIndex = tri.c;
+	  }
+	  else if (tri.b > tri.c)
+	  {
+	    // b > c > a
+	    highestIndex = tri.b;
+	    lowestIndex = tri.a;
+	  }
+	  else
+	  {
+	    // c > b > a
+	    highestIndex = tri.c;
+	    lowestIndex = tri.a;
+	  }
+	}
+	rangeMin = csMin (rangeMin, size_t (lowestIndex));
+	rangeMax = csMax (rangeMax, size_t (highestIndex));
+      }
+      csRef<iRenderBuffer> newBuffer;
+      // FIXME: try to take original component type into account.
+      size_t triNum = smTriEnd - smTriStart;
+      newBuffer = csRenderBuffer::CreateIndexRenderBuffer (
+	triNum * 3, CS_BUF_STATIC, 
+	CS_BUFCOMP_UNSIGNED_INT, rangeMin, rangeMax);
+      newBuffer->CopyInto (newTriangles.GetArray() + smTriStart, triNum*3);
       SubMesh* subMesh (subMeshes[s]);
-      csRef<iRenderBuffer> indices (subMesh->GetIndices());
-
-      CS::TriangleIndicesStream<int> triangles;
-      triangles.BeginTriangulate (indices, CS_MESHTYPE_TRIANGLES);
-      while (triangles.HasNext ())
-      {
-        csTriangle tri (triangles.Next ());
-        newTriangles.Push (tri);
-      }
+      subMesh->SetIndices (newBuffer);
     }
-    submeshTriangleStarts.Push (newTriangles.GetSize());
-    csNormalCalculator::CalculateNormals (
-      legacyBuffers.mesh_vertices, newTriangles, legacyBuffers.mesh_normals, 
-      compress);
-    if (compress)
-    {
-      /* When compression is enabled, indices in the triangles may have 
-       * changed. Thus, refill the submesh index buffers with the new
-       * data. */
-      for (size_t s = 0; s < subMeshes.GetSize (); s++)
-      {
-        size_t smTriStart = submeshTriangleStarts[s]; 
-        size_t smTriEnd = submeshTriangleStarts[s+1]; 
-        size_t rangeMin = (size_t)~0, rangeMax = 0;
-        for (size_t t = smTriStart; t < smTriEnd; t++)
-        {
-          const csTriangle& tri = newTriangles[t];
-          int lowestIndex, highestIndex;
-          if (tri.a > tri.b)
-          {
-            if (tri.b > tri.c)
-            {
-              // a > b > c
-              highestIndex = tri.a;
-              lowestIndex = tri.c;
-            }
-            else if (tri.a > tri.c)
-            {
-              // a > c > b
-              highestIndex = tri.a;
-              lowestIndex = tri.b;
-            }
-            else
-            {
-              // c > a > b
-              highestIndex = tri.c;
-              lowestIndex = tri.b;
-            }
-          }
-          else
-          {
-            if (tri.a > tri.c)
-            {
-              // b > a > c
-              highestIndex = tri.b;
-              lowestIndex = tri.c;
-            }
-            else if (tri.b > tri.c)
-            {
-              // b > c > a
-              highestIndex = tri.b;
-              lowestIndex = tri.a;
-            }
-            else
-            {
-              // c > b > a
-              highestIndex = tri.c;
-              lowestIndex = tri.a;
-            }
-          }
-          rangeMin = csMin (rangeMin, size_t (lowestIndex));
-          rangeMax = csMax (rangeMax, size_t (highestIndex));
-        }
-        csRef<iRenderBuffer> newBuffer;
-        // FIXME: try to take original component type into account.
-        size_t triNum = smTriEnd - smTriStart;
-        newBuffer = csRenderBuffer::CreateIndexRenderBuffer (
-          triNum * 3, CS_BUF_STATIC, 
-          CS_BUFCOMP_UNSIGNED_INT, rangeMin, rangeMax);
-        newBuffer->CopyInto (newTriangles.GetArray() + smTriStart, triNum*3);
-        SubMesh* subMesh (subMeshes[s]);
-        subMesh->index_buffer = newBuffer;
-      }
-    }
-    autonormals = true;
-    autonormals_compress = compress;
   }
-  else
-  {
-    csNormalCalculator::CalculateNormals (
-        legacyBuffers.mesh_vertices, legacyBuffers.mesh_triangles, 
-        legacyBuffers.mesh_normals, compress);
-    autonormals = true;
-    autonormals_compress = compress;
-  }
+  autonormals = true;
+  autonormals_compress = compress;
 }
 
 void csGenmeshMeshObjectFactory::GenerateCapsule (float l, float r, uint sides)
 {
   CreateLegacyBuffers();
+  subMeshes.GetDefaultSubmesh()->CreateLegacyBuffer();
   CS::Geometry::Primitives::GenerateCapsule (
       l, r, sides, legacyBuffers.mesh_vertices, legacyBuffers.mesh_texels,
-      legacyBuffers.mesh_normals, legacyBuffers.mesh_triangles);
+      legacyBuffers.mesh_normals, 
+      subMeshes.GetDefaultSubmesh()->legacyTris.mesh_triangles);
   legacyBuffers.mesh_colors.DeleteAll ();
   Invalidate ();
 }
@@ -1881,10 +1659,12 @@ void csGenmeshMeshObjectFactory::GenerateSphere (const csEllipsoid& ellips,
     int num, bool cyl_mapping, bool toponly, bool reversed)
 {
   CreateLegacyBuffers();
+  subMeshes.GetDefaultSubmesh()->CreateLegacyBuffer();
   CS::Geometry::Primitives::GenerateSphere (
       ellips, num, legacyBuffers.mesh_vertices, legacyBuffers.mesh_texels,
-      legacyBuffers.mesh_normals, legacyBuffers.mesh_triangles, cyl_mapping, 
-      toponly, reversed);
+      legacyBuffers.mesh_normals, 
+      subMeshes.GetDefaultSubmesh()->legacyTris.mesh_triangles, 
+      cyl_mapping, toponly, reversed);
   legacyBuffers.mesh_colors.DeleteAll();
   Invalidate();
 }
@@ -1892,9 +1672,11 @@ void csGenmeshMeshObjectFactory::GenerateSphere (const csEllipsoid& ellips,
 void csGenmeshMeshObjectFactory::GenerateBox (const csBox3& box)
 {
   CreateLegacyBuffers();
+  subMeshes.GetDefaultSubmesh()->CreateLegacyBuffer();
   CS::Geometry::Primitives::GenerateBox (box, legacyBuffers.mesh_vertices, 
       legacyBuffers.mesh_texels,
-      legacyBuffers.mesh_normals, legacyBuffers.mesh_triangles);
+      legacyBuffers.mesh_normals, 
+      subMeshes.GetDefaultSubmesh()->legacyTris.mesh_triangles);
   legacyBuffers.mesh_colors.DeleteAll();
   Invalidate();
 }
@@ -1918,7 +1700,8 @@ bool csGenmeshMeshObjectFactory::InternalSetBuffer (csRenderBufferName name,
     switch (name)
     {
       case CS_BUFFER_INDEX:
-        knownBuffers.index = buffer;
+        //knownBuffers.index = buffer;
+	subMeshes.GetDefaultSubmesh()->SetIndices (buffer);
         break;
       case CS_BUFFER_POSITION:
         knownBuffers.position = buffer;
@@ -1964,7 +1747,53 @@ bool csGenmeshMeshObjectFactory::AddRenderBuffer (const char *name,
     switch (userName)
     {
       case CS_BUFFER_INDEX:
-        knownBuffers.index = buffer;
+        subMeshes.GetDefaultSubmesh()->SetIndices (buffer);
+        break;
+      case CS_BUFFER_POSITION:
+        knownBuffers.position = buffer;
+        break;
+      case CS_BUFFER_TEXCOORD0:
+        knownBuffers.texcoord = buffer;
+        break;
+      case CS_BUFFER_NORMAL:
+        knownBuffers.normal = buffer;
+        break;
+      case CS_BUFFER_COLOR:
+        knownBuffers.color = buffer;
+        break;
+      case CS_BUFFER_TANGENT:
+        knownBuffers.tangent = buffer;
+        break;
+      case CS_BUFFER_BINORMAL:
+        knownBuffers.bitangent = buffer;
+        break;
+      default:
+        break;
+    }
+    
+    return true;
+  }
+  return false;
+}
+
+bool csGenmeshMeshObjectFactory::AddRenderBuffer (csRenderBufferName name,
+						  iRenderBuffer* buffer)
+{
+  const char* nameStr = csRenderBuffer::GetDescrFromBufferName (name);
+  if (nameStr == 0) return false;
+
+  csStringID bufID = strings->Request (nameStr);
+  if (userBuffers.AddRenderBuffer (bufID, buffer))
+  {
+    user_buffer_names.Push (bufID);
+    user_buffer_change++;
+    
+    ClearLegacyBuffers (CS_BUFFER_MAKE_MASKABLE (name));
+    
+    switch (name)
+    {
+      case CS_BUFFER_INDEX:
+        subMeshes.GetDefaultSubmesh()->SetIndices (buffer);
         break;
       case CS_BUFFER_POSITION:
         knownBuffers.position = buffer;
@@ -2006,7 +1835,50 @@ bool csGenmeshMeshObjectFactory::RemoveRenderBuffer (const char *name)
     switch (userName)
     {
       case CS_BUFFER_INDEX:
-        knownBuffers.index.Invalidate();
+        subMeshes.GetDefaultSubmesh()->SetIndices (0);
+        break;
+      case CS_BUFFER_POSITION:
+        knownBuffers.position.Invalidate();
+        break;
+      case CS_BUFFER_TEXCOORD0:
+        knownBuffers.texcoord.Invalidate();
+        break;
+      case CS_BUFFER_NORMAL:
+        knownBuffers.normal.Invalidate();
+        break;
+      case CS_BUFFER_COLOR:
+        knownBuffers.color.Invalidate();
+        break;
+      case CS_BUFFER_TANGENT:
+        knownBuffers.tangent.Invalidate();
+        break;
+      case CS_BUFFER_BINORMAL:
+        knownBuffers.bitangent.Invalidate();
+        break;
+      default:
+        break;
+    }
+    
+    return true;
+  }
+  return false;
+}
+
+bool csGenmeshMeshObjectFactory::RemoveRenderBuffer (csRenderBufferName name)
+{
+  const char* nameStr = csRenderBuffer::GetDescrFromBufferName (name);
+  if (nameStr == 0) return false;
+
+  csStringID bufID = strings->Request (nameStr);
+  if (userBuffers.RemoveRenderBuffer (bufID))
+  {
+    user_buffer_names.Delete (bufID);
+    user_buffer_change++;
+    
+    switch (name)
+    {
+      case CS_BUFFER_INDEX:
+        subMeshes.GetDefaultSubmesh()->SetIndices (0);
         break;
       case CS_BUFFER_POSITION:
         knownBuffers.position.Invalidate();
@@ -2067,17 +1939,39 @@ iRenderBuffer* csGenmeshMeshObjectFactory::GetRenderBuffer (const char* name)
   return 0;
 }
 
+iRenderBuffer* csGenmeshMeshObjectFactory::GetRenderBuffer (csRenderBufferName name)
+{
+  const char* nameStr = csRenderBuffer::GetDescrFromBufferName (name);
+  if (nameStr == 0) return 0;
+
+  csStringID bufID = strings->Request (nameStr);
+  iRenderBuffer* buf = userBuffers.GetRenderBuffer (bufID);
+  if (buf != 0) return buf;
+
+  if (name == CS_BUFFER_TANGENT)
+  {
+    UpdateTangentsBitangents ();
+    return knownBuffers.tangent;
+  }
+  else if (name == CS_BUFFER_BINORMAL)
+  {
+    UpdateTangentsBitangents ();
+    return knownBuffers.bitangent;
+  }
+  return 0;
+}
+
+
 void csGenmeshMeshObjectFactory::Invalidate ()
 {
   object_bbox_valid = false;
-  //index_buffer = 0;
   initialized = false;
 
   legacyBuffers.mesh_vertices_dirty_flag = true;
   legacyBuffers.mesh_texels_dirty_flag = true;
   legacyBuffers.mesh_normals_dirty_flag = true;
   legacyBuffers.mesh_colors_dirty_flag = true;
-  legacyBuffers.mesh_triangle_dirty_flag = true;
+  subMeshes.GetDefaultSubmesh()->legacyTris.mesh_triangle_dirty_flag = true;
 
   ShapeChanged ();
 }
@@ -2111,7 +2005,6 @@ csPtr<iMeshObject> csGenmeshMeshObjectFactory::NewInstance ()
 {
   csRef<csGenmeshMeshObject> cm;
   cm.AttachNew (new csGenmeshMeshObject (this));
-  cm->SetMixMode (default_mixmode);
   cm->SetLighting (default_lighting);
   cm->SetColor (default_color);
   cm->SetManualColors (default_manualcolors);

@@ -30,8 +30,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
    : buffersSetup (0), mesh_vertices_dirty_flag (false),
      mesh_texels_dirty_flag (false),
      mesh_normals_dirty_flag (false),
-     mesh_colors_dirty_flag (false),
-     mesh_triangle_dirty_flag (false)
+     mesh_colors_dirty_flag (false)/*,
+     mesh_triangle_dirty_flag (false)*/
   {
   }
 
@@ -109,7 +109,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
       legacyBuffers.buffersSetup |= CS_BUFFER_COLOR_MASK;
     }
     
-    if (!(legacyBuffers.buffersSetup & CS_BUFFER_INDEX_MASK))
+    /*if (!(legacyBuffers.buffersSetup & CS_BUFFER_INDEX_MASK))
     {
       if (knownBuffers.index.IsValid())
       {
@@ -136,7 +136,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
 	
       legacyBuffers.mesh_triangle_dirty_flag = true;
       legacyBuffers.buffersSetup |= CS_BUFFER_INDEX_MASK;
-    }
+    }*/
   }
   
   void csGenmeshMeshObjectFactory::ClearLegacyBuffers (uint mask)
@@ -150,8 +150,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
       legacyBuffers.mesh_normals.Empty();
     if (mask & CS_BUFFER_COLOR_MASK)
       legacyBuffers.mesh_colors.Empty();
-    if (mask & CS_BUFFER_INDEX_MASK)
-      legacyBuffers.mesh_triangles.Empty();
+    //if (mask & CS_BUFFER_INDEX_MASK)
+      //legacyBuffers.mesh_triangles.Empty();
     legacyBuffers.buffersSetup &= ~mask;
   }
   
@@ -209,7 +209,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
 	legacyBuffers.mesh_colors_dirty_flag = false;
       }
     }
-    if (legacyBuffers.buffersSetup & CS_BUFFER_INDEX_MASK)
+    /*if (legacyBuffers.buffersSetup & CS_BUFFER_INDEX_MASK)
     {
       if (legacyBuffers.mesh_triangle_dirty_flag)
       {
@@ -222,7 +222,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
 	InternalSetBuffer (CS_BUFFER_INDEX, newBuffer);
 	legacyBuffers.mesh_triangle_dirty_flag = false;
       }
-    }
+    }*/
   }
 
   //-------------------------------------------------------------------------
@@ -268,14 +268,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
 
   int csGenmeshMeshObjectFactory::GetTriangleCount () const
   {
-    return (int)legacyBuffers.mesh_triangles.GetSize();
+    if (subMeshes.GetDefaultSubmesh()->legacyTris.triangles_setup)
+      return (int)subMeshes.GetDefaultSubmesh()->legacyTris.mesh_triangles.GetSize(); 
+    iRenderBuffer* indices = subMeshes.GetDefaultSubmesh()->GetIndices();
+    if (indices != 0)
+      return (int)(indices->GetElementCount() / 3);
+    else
+      return 0;
   }
   
   csTriangle* csGenmeshMeshObjectFactory::GetTriangles ()
   {
     SetupFactory ();
-    CreateLegacyBuffers();
-    return legacyBuffers.mesh_triangles.GetArray ();
+    subMeshes.GetDefaultSubmesh()->CreateLegacyBuffer();
+    return subMeshes.GetDefaultSubmesh()->legacyTris.mesh_triangles.GetArray ();
   }
 
   int csGenmeshMeshObjectFactory::GetVertexCount () const
