@@ -3071,6 +3071,8 @@ SWIG_From_int  (int value)
   return SWIG_From_long  (value);
 }
 
+SWIGINTERN int iShaderVarStringSet_scfGetVersion(){ return scfInterfaceTraits<iShaderVarStringSet>::GetVersion(); }
+SWIGINTERN void delete_iShaderVarStringSet(iShaderVarStringSet *self){ if (self) self->DecRef (); }
 
 SWIGINTERN int
 SWIG_AsVal_float (PyObject * obj, float *val)
@@ -5338,6 +5340,19 @@ SWIGINTERN PyObject *InvalidShaderVarStringID_get(void) {
 }
 
 
+SWIGINTERN PyObject *_wrap_iShaderVarStringSet_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  int result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iShaderVarStringSet_scfGetVersion",0,0)) SWIG_fail;
+  result = (int)iShaderVarStringSet_scfGetVersion();
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_delete_iShaderVarStringSet(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iShaderVarStringSet *arg1 = (iShaderVarStringSet *) 0 ;
@@ -5351,7 +5366,7 @@ SWIGINTERN PyObject *_wrap_delete_iShaderVarStringSet(PyObject *SWIGUNUSEDPARM(s
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iShaderVarStringSet" "', argument " "1"" of type '" "iShaderVarStringSet *""'"); 
   }
   arg1 = reinterpret_cast< iShaderVarStringSet * >(argp1);
-  delete arg1;
+  delete_iShaderVarStringSet(arg1);
   
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -11854,6 +11869,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csRGBpixel_SafeAdd", _wrap_csRGBpixel_SafeAdd, METH_VARARGS, NULL},
 	 { (char *)"delete_csRGBpixel", _wrap_delete_csRGBpixel, METH_VARARGS, NULL},
 	 { (char *)"csRGBpixel_swigregister", csRGBpixel_swigregister, METH_VARARGS, NULL},
+	 { (char *)"iShaderVarStringSet_scfGetVersion", _wrap_iShaderVarStringSet_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iShaderVarStringSet", _wrap_delete_iShaderVarStringSet, METH_VARARGS, NULL},
 	 { (char *)"iShaderVarStringSet_swigregister", iShaderVarStringSet_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iShaderVariableAccessor_PreGetValue", _wrap_iShaderVariableAccessor_PreGetValue, METH_VARARGS, NULL},

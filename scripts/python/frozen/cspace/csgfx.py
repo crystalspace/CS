@@ -138,12 +138,14 @@ class iShaderVarStringSet(iShaderVarStringSetBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
+    scfGetVersion = staticmethod(_csgfx.iShaderVarStringSet_scfGetVersion)
     __swig_destroy__ = _csgfx.delete_iShaderVarStringSet
     __del__ = lambda self : None;
 iShaderVarStringSet_swigregister = _csgfx.iShaderVarStringSet_swigregister
 iShaderVarStringSet_swigregister(iShaderVarStringSet)
 cvar = _csgfx.cvar
 InvalidShaderVarStringID = cvar.InvalidShaderVarStringID
+iShaderVarStringSet_scfGetVersion = _csgfx.iShaderVarStringSet_scfGetVersion
 
 class iShaderVariableAccessor(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
