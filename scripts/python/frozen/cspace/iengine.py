@@ -125,6 +125,7 @@ iFrustumView_swigregister = _iengine.iFrustumView_swigregister
 iFrustumView_swigregister(iFrustumView)
 iFrustumView_scfGetVersion = _iengine.iFrustumView_scfGetVersion
 
+CS_LIGHT_NOSHADOWS = _iengine.CS_LIGHT_NOSHADOWS
 CS_LIGHT_ACTIVEHALO = _iengine.CS_LIGHT_ACTIVEHALO
 CS_LIGHT_DYNAMICTYPE_STATIC = _iengine.CS_LIGHT_DYNAMICTYPE_STATIC
 CS_LIGHT_DYNAMICTYPE_PSEUDO = _iengine.CS_LIGHT_DYNAMICTYPE_PSEUDO
@@ -860,10 +861,12 @@ class iMaterialEngine(core.iBase):
     def GetTextureWrapper(*args): return _iengine.iMaterialEngine_GetTextureWrapper(*args)
     def Visit(*args): return _iengine.iMaterialEngine_Visit(*args)
     def IsVisitRequired(*args): return _iengine.iMaterialEngine_IsVisitRequired(*args)
+    scfGetVersion = staticmethod(_iengine.iMaterialEngine_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iMaterialEngine
     __del__ = lambda self : None;
 iMaterialEngine_swigregister = _iengine.iMaterialEngine_swigregister
 iMaterialEngine_swigregister(iMaterialEngine)
+iMaterialEngine_scfGetVersion = _iengine.iMaterialEngine_scfGetVersion
 
 class iMaterialList(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -1448,6 +1451,46 @@ class iRenderLoopManager(core.iBase):
 iRenderLoopManager_swigregister = _iengine.iRenderLoopManager_swigregister
 iRenderLoopManager_swigregister(iRenderLoopManager)
 iRenderLoopManager_scfGetVersion = _iengine.iRenderLoopManager_scfGetVersion
+
+class iRenderManager(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def RenderView(*args): return _iengine.iRenderManager_RenderView(*args)
+    scfGetVersion = staticmethod(_iengine.iRenderManager_scfGetVersion)
+    __swig_destroy__ = _iengine.delete_iRenderManager
+    __del__ = lambda self : None;
+iRenderManager_swigregister = _iengine.iRenderManager_swigregister
+iRenderManager_swigregister(iRenderManager)
+iRenderManager_scfGetVersion = _iengine.iRenderManager_scfGetVersion
+
+class iRenderManagerTargets(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    updateOnce = _iengine.iRenderManagerTargets_updateOnce
+    def RegisterRenderTarget(*args): return _iengine.iRenderManagerTargets_RegisterRenderTarget(*args)
+    def UnregisterRenderTarget(*args): return _iengine.iRenderManagerTargets_UnregisterRenderTarget(*args)
+    scfGetVersion = staticmethod(_iengine.iRenderManagerTargets_scfGetVersion)
+    __swig_destroy__ = _iengine.delete_iRenderManagerTargets
+    __del__ = lambda self : None;
+iRenderManagerTargets_swigregister = _iengine.iRenderManagerTargets_swigregister
+iRenderManagerTargets_swigregister(iRenderManagerTargets)
+iRenderManagerTargets_scfGetVersion = _iengine.iRenderManagerTargets_scfGetVersion
+
+class iRenderManagerPostEffects(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def ClearLayers(*args): return _iengine.iRenderManagerPostEffects_ClearLayers(*args)
+    def AddLayersFromDocument(*args): return _iengine.iRenderManagerPostEffects_AddLayersFromDocument(*args)
+    def AddLayersFromFile(*args): return _iengine.iRenderManagerPostEffects_AddLayersFromFile(*args)
+    scfGetVersion = staticmethod(_iengine.iRenderManagerPostEffects_scfGetVersion)
+    __swig_destroy__ = _iengine.delete_iRenderManagerPostEffects
+    __del__ = lambda self : None;
+iRenderManagerPostEffects_swigregister = _iengine.iRenderManagerPostEffects_swigregister
+iRenderManagerPostEffects_swigregister(iRenderManagerPostEffects)
+iRenderManagerPostEffects_scfGetVersion = _iengine.iRenderManagerPostEffects_scfGetVersion
 
 class iSwigCollectionArray(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')

@@ -1161,6 +1161,11 @@ sub ACQUIRE {
 ############# Class : cspace::csFlags ##############
 
 package cspace::csFlags;
+use overload
+    "&" => sub { $_[0]->__and__($_[1])},
+    "!=" => sub { $_[0]->__ne__($_[1])},
+    "==" => sub { $_[0]->__eq__($_[1])},
+    "fallback" => 1;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace );
 %OWNER = ();
@@ -1178,6 +1183,10 @@ sub new {
 *Get = *cspacec::csFlags_Get;
 *Check = *cspacec::csFlags_Check;
 *CheckAll = *cspacec::csFlags_CheckAll;
+*__eq__ = *cspacec::csFlags___eq__;
+*__ne__ = *cspacec::csFlags___ne__;
+*__and__ = *cspacec::csFlags___and__;
+*__invert__ = *cspacec::csFlags___invert__;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -10310,6 +10319,116 @@ sub DESTROY {
     }
 }
 
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csRefShaderStringIDHash ##############
+
+package cspace::csRefShaderStringIDHash;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csRefShaderStringIDHash(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*Put = *cspacec::csRefShaderStringIDHash_Put;
+*GetAll = *cspacec::csRefShaderStringIDHash_GetAll;
+*PutUnique = *cspacec::csRefShaderStringIDHash_PutUnique;
+*Contains = *cspacec::csRefShaderStringIDHash_Contains;
+*In = *cspacec::csRefShaderStringIDHash_In;
+*GetElementPointer = *cspacec::csRefShaderStringIDHash_GetElementPointer;
+*Get = *cspacec::csRefShaderStringIDHash_Get;
+*GetOrCreate = *cspacec::csRefShaderStringIDHash_GetOrCreate;
+*Empty = *cspacec::csRefShaderStringIDHash_Empty;
+*DeleteAll = *cspacec::csRefShaderStringIDHash_DeleteAll;
+*Delete = *cspacec::csRefShaderStringIDHash_Delete;
+*GetSize = *cspacec::csRefShaderStringIDHash_GetSize;
+*IsEmpty = *cspacec::csRefShaderStringIDHash_IsEmpty;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csRefShaderStringIDHash($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iShaderArray ##############
+
+package cspace::iShaderArray;
+use overload
+    "!=" => sub { $_[0]->__ne__($_[1])},
+    "==" => sub { $_[0]->__eq__($_[1])},
+    "fallback" => 1;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::CustomAllocated cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iShaderArray($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_iShaderArray(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*GetSize = *cspacec::iShaderArray_GetSize;
+*Get = *cspacec::iShaderArray_Get;
+*Put = *cspacec::iShaderArray_Put;
+*Push = *cspacec::iShaderArray_Push;
+*Pop = *cspacec::iShaderArray_Pop;
+*Top = *cspacec::iShaderArray_Top;
+*Insert = *cspacec::iShaderArray_Insert;
+*Contains = *cspacec::iShaderArray_Contains;
+*DeleteAll = *cspacec::iShaderArray_DeleteAll;
+*Truncate = *cspacec::iShaderArray_Truncate;
+*Empty = *cspacec::iShaderArray_Empty;
+*IsEmpty = *cspacec::iShaderArray_IsEmpty;
+*SetMinimalCapacity = *cspacec::iShaderArray_SetMinimalCapacity;
+*DeleteIndex = *cspacec::iShaderArray_DeleteIndex;
+*DeleteIndexFast = *cspacec::iShaderArray_DeleteIndexFast;
+*DeleteRange = *cspacec::iShaderArray_DeleteRange;
+*__eq__ = *cspacec::iShaderArray___eq__;
+*__ne__ = *cspacec::iShaderArray___ne__;
+*GetAllocator = *cspacec::iShaderArray_GetAllocator;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -19533,6 +19652,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetTextureWrapper = *cspacec::iMaterialEngine_GetTextureWrapper;
 *Visit = *cspacec::iMaterialEngine_Visit;
 *IsVisitRequired = *cspacec::iMaterialEngine_IsVisitRequired;
+*scfGetVersion = *cspacec::iMaterialEngine_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -22489,6 +22609,7 @@ sub CS_PARTICLE_BUILTIN_VOLUME () { $cspacec::CS_PARTICLE_BUILTIN_VOLUME }
 sub CS_PARTICLE_BUILTIN_SURFACE () { $cspacec::CS_PARTICLE_BUILTIN_SURFACE }
 sub CS_PARTICLE_BUILTIN_SPIRAL () { $cspacec::CS_PARTICLE_BUILTIN_SPIRAL }
 sub CS_PARTICLE_BUILTIN_RADIALPOINT () { $cspacec::CS_PARTICLE_BUILTIN_RADIALPOINT }
+sub CS_LIGHT_NOSHADOWS () { $cspacec::CS_LIGHT_NOSHADOWS }
 sub CS_LIGHT_ACTIVEHALO () { $cspacec::CS_LIGHT_ACTIVEHALO }
 sub CS_LIGHT_DYNAMICTYPE_STATIC () { $cspacec::CS_LIGHT_DYNAMICTYPE_STATIC }
 sub CS_LIGHT_DYNAMICTYPE_PSEUDO () { $cspacec::CS_LIGHT_DYNAMICTYPE_PSEUDO }

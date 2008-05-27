@@ -1,0 +1,129 @@
+@c -*-texinfo-*-
+@node Release Notes 1_2, Release Notes 1_0, Release Notes 1_4, Release Notes
+@appendixsec Release Notes from 1.0 to 1.2
+@cindex Release Notes
+
+@noindent
+@emph{Written Marten Svanfeldt, @email{developer@@svanfeldt.com},
+with contributions from others.}
+
+This section documents the major changes between versions 1.0 and 1.2 of
+Crystal Space.
+
+@menu
+* Api1_2 Threading:: Threading changes
+* Api1_2 Rendering:: Rendering subsystem changes
+* Api1_2 iPolygonMesh:: iPolygonMesh deprecation
+* Api1_2 Renamings:: Renamed Classes and Methods
+* Api1_2 csString Upcase and Downcase Behaviour Change:: @code{csString::Upcase()} and @code{Downcase()} Behaviour Change
+@end menu
+
+@node Api1_2 Threading, Api1_2 Rendering, Release Notes 1_2, Release Notes 1_2
+@subsection Threading changes
+
+For the 1.2 release the threading subsystem in Crystal Space have been entirely
+rewritten from scratch. The main rationale for this change is to clear up
+some outstanding issues in the code as well as making it a bit more efficient.
+
+@subsubheading Atomic operations
+A header (@file{include/csutil/atomicops.h}) containing definitions of operations
+with guaranteed atomicity such as CAS (Compare-And-Set) and increment.
+
+Full documentation in @pxref{Threading}.
+
+@node Api1_2 Rendering, Api1_2 iPolygonMesh, Api1_2 Threading, Release Notes 1_2
+@subsection Rendering subsystem changes
+
+@subsubheading Shader variable type @samp{COLOR} deprecated
+
+The shader variable type @samp{COLOR} was deprecated as it does not provide
+a significant benefit over @samp{VECTOR4}. Hence, use the latter if you intent
+to store colors. Internally, @samp{COLOR}s are the same as @samp{VECTOR4}s, so
+handling of the @samp{COLOR} type can generally be removed from code.
+
+@node Api1_2 iPolygonMesh, Api1_2 Renamings, Api1_2 Rendering, Release Notes 1_2
+@subsection iPolygonMesh deprecation
+@cindex @code{iPolygonMesh}
+@cindex @code{iTriangleMesh}
+
+The @code{iPolygonMesh} interface and everything related to that interface
+has been deprecated. This implies that the following classes, interfaces,
+and methods are now deprecated:
+
+@itemize
+@item @code{iPolygonMesh}
+Use @code{iTriangleMesh} instead.
+@item @code{csPolygonMeshTools}
+Use @code{csTriangleMeshTools} instead.
+@item @code{csPolygonMesh}
+Use @code{csTriangleMesh} instead.
+@item @code{csPolygonMeshBox}
+Use @code{csTriangleMeshBox} instead.
+@item @code{iObjectModel}
+All methods related to @code{iPolygonMesh} are deprecated. Use the
+ones with @code{iTriangleMesh} instead.
+@item @code{csColliderWrapper}
+All methods related to @code{iPolygonMesh} are deprecated. Use the
+ones with @code{iTriangleMesh} instead.
+@end itemize
+
+In addition the @samp{polymesh} keyword in world files has been
+deprecated. Instead use @samp{trimesh}:
+
+@example
+<trimesh>
+  @dots{}
+  <id>colldet</id>
+  <id>viscull</id>
+  @dots{}
+</trimesh>
+@end example
+
+Here is an example on how to fetch the collision detection triangle
+mesh:
+
+@example
+iObjectModel* model = @dots{};
+csRef<iStringSet> strset = csQueryRegistry<iStringSet> (object_reg);
+csStringID id = strset->Request ("colldet");
+iTriangleMesh* trimesh = model->GetTriangleData (id);
+@end example
+
+@node Api1_2 Renamings, Api1_2 csString Upcase and Downcase Behaviour Change, Api1_2 iPolygonMesh, Release Notes 1_2
+@subsection Renamed Classes and Methods
+@cindex @code{csSubRectangles}
+@cindex @code{IsType()}, @code{iScriptObject}
+@cindex @code{NewObject()}, @code{iScriptObject}
+
+A number of classes and methods were renamed to more clearly reflect their 
+purpose or moved inside a namespace in order to reduce pollution of the global
+namespace.
+
+@itemize @bullet
+@item @code{csSubRectangles} @result{} @code{CS::SubRectangles}
+@item @code{iScriptObject::IsType()} @result{} @code{iScriptObject::IsA()}
+@item @code{iScriptObject::NewObject()} @result{} @code{iScriptObject::New()}
+@end itemize
+
+Note that for compatibility reasons the old names are generally still available.
+However, they should be considered deprecated and not be used any more as 
+they will be removed in a future version.
+
+@node Api1_2 csString Upcase and Downcase Behaviour Change, , Api1_2 Renamings, Release Notes 1_2
+@subsection @code{csString::Upcase()} and @code{Downcase()} Behaviour Change
+
+@code{csString::Upcase()} and @code{Downcase()} used to utilize the C runtime
+casing functions (@code{toupper()}, @code{tolower()}) to perform the casing.
+This has been changed to use Crystal Space's own casing functions
+(@code{csUnicodeTransform::MapToLower()}, @code{MapToUpper()}). This has two
+effects:
+
+@itemize @bullet
+@item The data is expected to be encoded in @sc{utf-8} and not a character set
+depending on the C runtime's current locale. This is more in line with other
+@code{csString} functions and consistent across systems.
+@item The C runtime's current locale is not taken into consideration when
+doing the casing. This was desired as the casing methods are used in a number
+of scenarios that really required locale neutrality; however, if proper
+locale support is required, some other casing functions have to be used.
+@end itemize

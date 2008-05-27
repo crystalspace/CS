@@ -31,6 +31,7 @@
   INTERFACE_APPLY(iLight)
   INTERFACE_APPLY(iLightIterator)
   INTERFACE_APPLY(iLightList)
+  INTERFACE_APPLY(iMaterialEngine)
   INTERFACE_APPLY(iMaterialWrapper)
   INTERFACE_APPLY(iMeshFactoryWrapper)
   INTERFACE_APPLY(iMeshWrapper)
