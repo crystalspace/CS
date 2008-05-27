@@ -345,12 +345,6 @@ static csVector3 xyz (const csVector4 v)
   return csVector3 (v[0], v[1], v[2]);
 }
 
-// Make a plane, pointing from A to B, origin at A
-static csPlane3 MakePlane (const csVector3& A, const csVector3& B)
-{
-  return csPlane3 (csVector3::Unit (B-A), csVector3::Norm (A));
-}
-
 const csPlane3* csCameraCustomMatrix::GetVisibleVolume (uint32& mask)
 {
   if (clipPlanesDirty)
@@ -358,35 +352,35 @@ const csPlane3* csCameraCustomMatrix::GetVisibleVolume (uint32& mask)
     UpdateInvMatrix();
     
     const float A = 1.0f;
-    const csVector3 nbl (xyz (invMatrix * csVector4 (-A, -A, -A, 1)));
-    const csVector3 nbr (xyz (invMatrix * csVector4 ( A, -A, -A, 1)));
-    const csVector3 ntr (xyz (invMatrix * csVector4 ( A,  A, -A, 1)));
-    const csVector3 ntl (xyz (invMatrix * csVector4 (-A,  A, -A, 1)));
-    const csVector3 fbl (xyz (invMatrix * csVector4 (-A, -A,  A, 1)));
-    const csVector3 fbr (xyz (invMatrix * csVector4 ( A, -A,  A, 1)));
-    const csVector3 ftr (xyz (invMatrix * csVector4 ( A,  A,  A, 1)));
-    const csVector3 ftl (xyz (invMatrix * csVector4 (-A,  A,  A, 1)));
+    const csVector3 nbl (xyz (invMatrix * csVector4 (-A, -A, 1, -A)));
+    const csVector3 nbr (xyz (invMatrix * csVector4 ( A, -A, 1, -A)));
+    const csVector3 ntr (xyz (invMatrix * csVector4 ( A,  A, 1, -A)));
+    const csVector3 ntl (xyz (invMatrix * csVector4 (-A,  A, 1, -A)));
+    const csVector3 fbl (xyz (invMatrix * csVector4 (-A, -A, 1,  A)));
+    const csVector3 fbr (xyz (invMatrix * csVector4 ( A, -A, 1,  A)));
+    const csVector3 ftr (xyz (invMatrix * csVector4 ( A,  A, 1,  A)));
+    const csVector3 ftl (xyz (invMatrix * csVector4 (-A,  A, 1,  A)));
       
     int n = 0;
     csPlane3 p;
     // Back plane
-    /*p = MakePlane (nbl, fbl);
+    p = csPlane3 (nbl, nbr, ntr);
     if (!p.GetNormal().IsZero()) clipPlanes[n++] = p;
     // Far plane
-    p = MakePlane (fbl, nbl);
+    p = csPlane3 (fbl, fbr, ftr);
     if (!p.GetNormal().IsZero()) clipPlanes[n++] = p;
     // Left plane
-    p = MakePlane (nbl, nbr);
+    p = csPlane3 (nbl, fbl, ntl);
     if (!p.GetNormal().IsZero()) clipPlanes[n++] = p;
     // Right plane
-    p = MakePlane (nbr, nbl);
+    p = csPlane3 (nbr, nbl, fbr);
     if (!p.GetNormal().IsZero()) clipPlanes[n++] = p;
     // Bottom plane
-    p = MakePlane (nbl, ntl);
+    p = csPlane3 (nbl, nbr, fbl);
     if (!p.GetNormal().IsZero()) clipPlanes[n++] = p;
     // Top plane
-    p = MakePlane (ntl, nbl);
-    if (!p.GetNormal().IsZero()) clipPlanes[n++] = p;*/
+    p = csPlane3 (ntl, ftl, ntr);
+    if (!p.GetNormal().IsZero()) clipPlanes[n++] = p;
     clipPlanesMask = (1 << n) - 1;
     
     clipPlanesDirty = false;
