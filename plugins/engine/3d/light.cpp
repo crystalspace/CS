@@ -571,9 +571,12 @@ void csLight::UpdateBBox ()
   switch (type)
   {
   case CS_LIGHT_DIRECTIONAL:
-    lightBoundingBox.Set (
+    /*lightBoundingBox.Set (
       csVector3 (-directionalCutoffRadius, -directionalCutoffRadius, 0), 
-      csVector3 (directionalCutoffRadius, directionalCutoffRadius, cutoffDistance));
+      csVector3 (directionalCutoffRadius, directionalCutoffRadius, cutoffDistance));*/
+    lightBoundingBox.Set (
+      csVector3 (-cutoffDistance, -cutoffDistance, 0), 
+      csVector3 (cutoffDistance, cutoffDistance, cutoffDistance));
     break;
   case CS_LIGHT_SPOTLIGHT:
     // @@@ This could be tighter if the falloff is taken into account.

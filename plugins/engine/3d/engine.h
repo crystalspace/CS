@@ -867,7 +867,7 @@ public:
   csRef<iRenderManager> renderManager;
   EnvTex::Holder envTexHolder;
 
-  csStringID id_lod_fade;
+  CS::ShaderVarStringID id_lod_fade;
   /// For triangle meshes.
   csStringID colldet_id;
   csStringID viscull_id;

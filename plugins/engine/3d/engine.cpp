@@ -713,7 +713,6 @@ bool csEngine::HandleEvent (iEvent &Event)
       frameWidth = 640;
       frameHeight = 480;
     }
-    id_lod_fade = globalStringSet->Request("lod fade");
 
     if (PerspectiveImpl::GetDefaultFOV () == 0)
       PerspectiveImpl::SetDefaultFOV (frameHeight/(float)frameWidth, 1.0f);
@@ -1481,6 +1480,7 @@ void csEngine::StartEngine ()
   DeleteAll ();
   id_creation_time = svNameStringSet->Request("mesh creation time");
   svTexEnvironmentName = svNameStringSet->Request("tex environment");
+  id_lod_fade = svNameStringSet->Request("lod fade");
 
   lightSvNames.SetStrings (svNameStringSet);
   /* Generate light SV IDs - that way, space for them will be reserved
