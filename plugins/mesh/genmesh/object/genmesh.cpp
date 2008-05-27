@@ -47,7 +47,6 @@
 #include "iengine/movable.h"
 #include "iengine/rview.h"
 #include "iengine/sector.h"
-//#include "iengine/shadows.h"
 #include "igeom/clip2d.h"
 #include "iutil/cache.h"
 #include "iutil/databuff.h"
@@ -93,9 +92,6 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
   cur_movablenr = -1;
   material = 0;
   MixMode = 0;
-  //lit_mesh_colors = 0;
-  //num_lit_mesh_colors = 0;
-  //static_mesh_colors = 0;
   do_lighting = true;
   do_manual_colors = false;
   base_color.red = 0;
@@ -130,8 +126,6 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
 
 csGenmeshMeshObject::~csGenmeshMeshObject ()
 {
-  //delete[] lit_mesh_colors;
-  //delete[] static_mesh_colors;
   delete[] sorted_mesh_triangles;
 
   ClearPseudoDynLights ();
@@ -240,11 +234,6 @@ void csGenmeshMeshObject::CheckLitColors ()
   {
     ClearPseudoDynLights ();
     legacyLighting.SetColorNum (factory->GetVertexCount ());
-    /*num_lit_mesh_colors = factory->GetVertexCount ();
-    delete[] lit_mesh_colors;
-    lit_mesh_colors = new csColor4 [num_lit_mesh_colors];
-    delete[] static_mesh_colors;
-    static_mesh_colors = new csColor4 [num_lit_mesh_colors];*/
   }
 }
 
@@ -259,14 +248,6 @@ void csGenmeshMeshObject::InitializeDefault (bool clear)
   CheckLitColors ();
   if (clear)
   {
-    //csColor amb;
-    //factory->engine->GetAmbientLight (amb);
-    //int i;
-    /*for (i = 0 ; i < num_lit_mesh_colors ; i++)
-    {
-      lit_mesh_colors[i].Set (0, 0, 0);
-      static_mesh_colors[i].Set (0, 0, 0);
-    }*/
     legacyLighting.Clear();
   }
   lighting_dirty = true;
@@ -591,21 +572,10 @@ void csGenmeshMeshObject::SetupObject ()
   if (!initialized)
   {
     initialized = true;
-    //delete[] lit_mesh_colors;
-    //lit_mesh_colors = 0;
     legacyLighting.Free();
     if (!do_manual_colors)
     {
-      //num_lit_mesh_colors = factory->GetVertexCount ();
-      //lit_mesh_colors = new csColor4 [num_lit_mesh_colors];
       legacyLighting.SetColorNum (factory->GetVertexCount ());
-      /*int i;
-      for (i = 0 ; i <  num_lit_mesh_colors; i++)
-        lit_mesh_colors[i].Set (0, 0, 0);
-      static_mesh_colors = new csColor4 [num_lit_mesh_colors];
-      for (i = 0 ; i <  num_lit_mesh_colors; i++)
-        //static_mesh_colors[i] = base_color;	// Initialize to base color.
-        static_mesh_colors[i].Set (0, 0, 0);*/
       legacyLighting.Clear();
     }
     iMaterialWrapper* mater = material;
@@ -1289,13 +1259,6 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (
   strings = csQueryRegistryTagInterface<iStringSet>
     (object_reg, "crystalspace.shared.stringset");
 
-  /*mesh_vertices_dirty_flag = false;
-  mesh_texels_dirty_flag = false;
-  mesh_normals_dirty_flag = false;
-  mesh_colors_dirty_flag = false;
-  mesh_triangle_dirty_flag = false;
-  mesh_tangents_dirty_flag = false;*/
-
   user_buffer_change = 0;
 
   buffers_version = 0;
@@ -1778,17 +1741,10 @@ void csGenmeshMeshObjectFactory::SetVertexCount (int n)
   legacyBuffers.mesh_normals.SetCapacity (n); legacyBuffers.mesh_normals.SetSize (n, csVector3 (0));
   initialized = false;
 
-  /*vertex_buffer = 0;
-  normal_buffer = 0;
-  texel_buffer = 0;
-  color_buffer = 0;
-  tangent_buffer = 0;
-  binormal_buffer = 0;*/
   legacyBuffers.mesh_vertices_dirty_flag = true;
   legacyBuffers.mesh_texels_dirty_flag = true;
   legacyBuffers.mesh_normals_dirty_flag = true;
   legacyBuffers.mesh_colors_dirty_flag = true;
-  //legacyBuffers.mesh_tangents_dirty_flag = true;
 }
 
 void csGenmeshMeshObjectFactory::SetTriangleCount (int n)
@@ -2122,7 +2078,6 @@ void csGenmeshMeshObjectFactory::Invalidate ()
   legacyBuffers.mesh_normals_dirty_flag = true;
   legacyBuffers.mesh_colors_dirty_flag = true;
   legacyBuffers.mesh_triangle_dirty_flag = true;
-  //legacyBuffers.mesh_tangents_dirty_flag = true;
 
   ShapeChanged ();
 }

@@ -152,14 +152,8 @@ private:
   int num_sorted_mesh_triangles;
   csTriangle* sorted_mesh_triangles;
 
-  // The following three are only used in case animation control is required.
-  //csRef<iRenderBuffer> vertex_buffer;
-  //csRef<iRenderBuffer> texel_buffer;
-  //csRef<iRenderBuffer> normal_buffer;
-
   size_t factory_user_rb_state;
 
-  //csRef<iRenderBuffer> color_buffer;
   iMovable* lighting_movable;
 
   csDirtyAccessArray<csRenderMesh*> renderMeshes;
@@ -195,9 +189,6 @@ private:
   bool do_shadows;
   bool do_shadow_rec;
 
-  //csColor4* lit_mesh_colors;
-  //int num_lit_mesh_colors;	// Should be equal to factory number.
-  //csColor4* static_mesh_colors;
   struct LegacyLightingData
   {
     csColor4* lit_mesh_colors;
@@ -468,34 +459,14 @@ class csGenmeshMeshObjectFactory :
 {
 public:
   csRef<iMaterialWrapper> material;
-  //csDirtyAccessArray<csVector3> mesh_vertices;
-  //csDirtyAccessArray<csVector2> mesh_texels;
-  //csDirtyAccessArray<csVector3> mesh_normals;
 
   bool autonormals;
   bool autonormals_compress;
   bool do_fullbright;
 
-  //bool mesh_vertices_dirty_flag;
-  //bool mesh_texels_dirty_flag;
-  //bool mesh_normals_dirty_flag;
-  //bool mesh_colors_dirty_flag;
-  //bool mesh_triangle_dirty_flag;
-  //bool mesh_tangents_dirty_flag;
-
-  //csDirtyAccessArray<csTriangle> mesh_triangles;
-
   csWeakRef<iGraphics3D> g3d;
   csRef<iStringSet> strings;
 
-  //csRef<iRenderBuffer> vertex_buffer;
-  //csRef<iRenderBuffer> texel_buffer;
-  //csRef<iRenderBuffer> normal_buffer;
-  //csRef<iRenderBuffer> color_buffer;
-  //csRef<iRenderBuffer> index_buffer;
-  //csRef<iRenderBuffer> binormal_buffer;
-  //csRef<iRenderBuffer> tangent_buffer;
-  
   struct KnownBuffers
   {
     csRef<iRenderBuffer> index;
@@ -520,7 +491,6 @@ public:
     bool mesh_normals_dirty_flag;
     bool mesh_colors_dirty_flag;
     bool mesh_triangle_dirty_flag;
-    //bool mesh_tangents_dirty_flag;
    
     csDirtyAccessArray<csTriangle> mesh_triangles;
    
@@ -572,8 +542,6 @@ public:
 
   /// Update tangent and bitangent buffers
   void UpdateTangentsBitangents ();
-private:
-  //csDirtyAccessArray<csColor4> mesh_colors;
 public:
   CS_LEAKGUARD_DECLARE (csGenmeshMeshObjectFactory);
 
@@ -618,46 +586,17 @@ public:
       const csColor4& color);
   void SetVertexCount (int n);
   int GetVertexCount () const;
-  //{ return (int)knownBuffers.position->GetElementCount(); }
   csVector3* GetVertices ();
-  /*{
-    SetupFactory ();
-    return mesh_vertices.GetArray ();
-  }*/
   csVector2* GetTexels ();
-  /*{
-    SetupFactory ();
-    return mesh_texels.GetArray ();
-  }*/
   csVector3* GetNormals ();
-  /*{
-    SetupFactory ();
-    return mesh_normals.GetArray ();
-  }*/
   csColor4* GetColors (bool ensureValid);
-  /*{
-    if (ensureValid && (mesh_colors.GetSize() == 0))
-    {
-      mesh_colors.SetCapacity (mesh_vertices.Capacity());
-      mesh_colors.SetSize (mesh_vertices.GetSize(), csColor4 (0, 0, 0, 1));
-    }
-    return mesh_colors.GetArray();
-  }*/
   csColor4* GetColors ();
-  /*{
-    SetupFactory ();
-    return GetColors (true);
-  }*/
 
   void AddTriangle (const csTriangle& tri);
   void SetTriangleCount (int n);
 
-  int GetTriangleCount () const;// { return (int)mesh_triangles.GetSize (); }
+  int GetTriangleCount () const;
   csTriangle* GetTriangles ();
-  /*{
-    SetupFactory ();
-    return mesh_triangles.GetArray ();
-  }*/
 
   void Invalidate ();
   void CalculateNormals (bool compress);
