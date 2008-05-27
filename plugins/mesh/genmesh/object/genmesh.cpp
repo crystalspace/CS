@@ -1907,7 +1907,7 @@ bool csGenmeshMeshObjectFactory::InternalSetBuffer (csRenderBufferName name,
 {
   const char* nameStr = csRenderBuffer::GetDescrFromBufferName (name);
 
-  csStringID bufID = strings->Request (nameStr);
+  CS::ShaderVarStringID bufID = svstrings->Request (nameStr);
   if (userBuffers.RemoveRenderBuffer (bufID))
   {
     user_buffer_names.Delete (bufID);
