@@ -486,11 +486,18 @@
 	      for OSX 10.4 in MacBook, iMac and Mac mini.
 	    * problem persists with recent driver updates under OSX 10.4
 	    * has been reported for GMA 3100 under OSX 10.5, which is found in newer MacBooks.
+         2008-05-27: confirmed problem also for 10.5-drivers. (Trymm)
     -->
-    <rule description="Intel GMA 950 on OSX">
-      <conditions>
-	<regexp string="renderer" pattern="Intel GMA 950 OpenGL Engine" />
-        <regexp string="glversion" pattern="1.2 APPLE-1\.4\..*" />
+    <rule description="Intel GMA on OSX">
+      <conditions fulfill="all">
+        <conditions fulfill="one">
+          <regexp string="renderer" pattern="Intel GMA X3100 OpenGL Engine" />
+	  <regexp string="renderer" pattern="Intel GMA 950 OpenGL Engine" />
+        </conditions>
+        <conditions fulfill="one">
+          <regexp string="glversion" pattern="1.2 APPLE-1\.4\..*" />
+          <regexp string="glversion" pattern="1.2 APPLE-1\.5\..*" />
+        </conditions>
 	<regexp string="platform" pattern="MacOS/X" />
       </conditions>
       <applicable>
