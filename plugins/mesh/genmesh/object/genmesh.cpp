@@ -1062,7 +1062,7 @@ iRenderBuffer* csGenmeshMeshObject::GetRenderBuffer (const char* name)
 iRenderBuffer* csGenmeshMeshObject::GetRenderBuffer (csRenderBufferName name)
 {
   const char* nameStr = csRenderBuffer::GetDescrFromBufferName (name);
-  csStringID bufID = factory->GetStrings()->Request (nameStr);
+  CS::ShaderVarStringID bufID = factory->GetSVStrings()->Request (nameStr);
   iRenderBuffer* buf = userBuffers.GetRenderBuffer (bufID);
   if (buf != 0) return 0;
 
@@ -1262,7 +1262,7 @@ void csGenmeshMeshObjectFactory::UpdateTangentsBitangents ()
 {
   if (!knownBuffers.tangent.IsValid() || !knownBuffers.bitangent.IsValid())
   {
-    size_t vertCount = knownBuffers.position->GetElementCount();
+    int vertCount = GetVertexCount();
     if (!knownBuffers.tangent.IsValid())
       knownBuffers.tangent = csRenderBuffer::CreateRenderBuffer (
         vertCount, CS_BUF_STATIC,
@@ -1785,7 +1785,7 @@ bool csGenmeshMeshObjectFactory::AddRenderBuffer (csRenderBufferName name,
   const char* nameStr = csRenderBuffer::GetDescrFromBufferName (name);
   if (nameStr == 0) return false;
 
-  csStringID bufID = strings->Request (nameStr);
+  CS::ShaderVarStringID bufID = svstrings->Request (nameStr);
   if (userBuffers.AddRenderBuffer (bufID, buffer))
   {
     user_buffer_names.Push (bufID);
@@ -1872,7 +1872,7 @@ bool csGenmeshMeshObjectFactory::RemoveRenderBuffer (csRenderBufferName name)
   const char* nameStr = csRenderBuffer::GetDescrFromBufferName (name);
   if (nameStr == 0) return false;
 
-  csStringID bufID = strings->Request (nameStr);
+  CS::ShaderVarStringID bufID = svstrings->Request (nameStr);
   if (userBuffers.RemoveRenderBuffer (bufID))
   {
     user_buffer_names.Delete (bufID);
@@ -1947,7 +1947,7 @@ iRenderBuffer* csGenmeshMeshObjectFactory::GetRenderBuffer (csRenderBufferName n
   const char* nameStr = csRenderBuffer::GetDescrFromBufferName (name);
   if (nameStr == 0) return 0;
 
-  csStringID bufID = strings->Request (nameStr);
+  CS::ShaderVarStringID bufID = svstrings->Request (nameStr);
   iRenderBuffer* buf = userBuffers.GetRenderBuffer (bufID);
   if (buf != 0) return buf;
 
