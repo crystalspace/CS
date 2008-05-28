@@ -1430,6 +1430,8 @@ void csGLGraphics3D::Print (csRect const* area)
     SwapIfNeeded();
   }
   G2D->Print (area);
+  
+  r2tbackend->NextFrame();
 }
 
 void csGLGraphics3D::DrawLine (const csVector3 & v1, const csVector3 & v2,
@@ -3480,12 +3482,11 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
 
   SystemOpen = csevSystemOpen(object_reg);
   SystemClose = csevSystemClose(object_reg);
-  Frame = csevFrame(object_reg);
 
   csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
   if (q)
   {
-    csEventID events[] = { SystemOpen, SystemClose, Frame,
+    csEventID events[] = { SystemOpen, SystemClose,
 			    CS_EVENTLIST_END };
     q->RegisterListener (scfiEventHandler, events);
   }
@@ -3566,10 +3567,6 @@ bool csGLGraphics3D::HandleEvent (iEvent& Event)
     asp_center_x = viewwidth/2.0f;
     asp_center_y = viewheight/2.0f;
     return true;
-  }
-  else if (Event.Name == Frame)
-  {
-    r2tbackend->NextFrame();
   }
   return false;
 }
