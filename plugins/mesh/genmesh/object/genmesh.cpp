@@ -630,6 +630,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
   const bool factoryB2F = factory->back2front;
   const csVector3 b2fPos (o2wt.Other2This (camera->GetTransform ().GetOrigin()));
   uint frameNum = rview->GetCurrentFrameNumber ();
+  renderMeshes.Empty();
   renderMeshes.SetCapacity (sm.GetSize ());
 
   for (size_t i = 0; i<sm.GetSize (); ++i)
