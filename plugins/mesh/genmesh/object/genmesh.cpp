@@ -630,7 +630,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
   const bool factoryB2F = factory->back2front;
   const csVector3 b2fPos (o2wt.Other2This (camera->GetTransform ().GetOrigin()));
   uint frameNum = rview->GetCurrentFrameNumber ();
-  renderMeshes.SetSize (sm.GetSize ());
+  renderMeshes.SetCapacity (sm.GetSize ());
 
   for (size_t i = 0; i<sm.GetSize (); ++i)
   {
@@ -658,6 +658,9 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
 	factory->GetVertices(), factory->GetVertexCount());
     else
       index_buffer = subMesh.SubMeshProxy::GetIndices();
+    if (!index_buffer)
+      // Possible with empty submesh ...
+      continue;
     csRenderBufferHolder* smBufferHolder =
       subMesh.SubMeshProxy::GetBufferHolder (bufferHolder);
 
@@ -686,7 +689,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     meshPtr->buffers = smBufferHolder;
     meshPtr->geometryInstance = (void*)factory;
 
-    renderMeshes[i] = meshPtr;
+    renderMeshes.Push (meshPtr);
   }
 
   n = (int)renderMeshes.GetSize ();
