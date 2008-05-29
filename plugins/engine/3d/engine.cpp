@@ -4077,7 +4077,7 @@ bool csEngine::SetOption (int id, csVariant *value)
   switch (id)
   {
     case 0:
-      PerspectiveImpl::SetDefaultFOV (value->GetFloat (), G3D->GetWidth ());
+      PerspectiveImpl::SetDefaultFOV ((float)value->GetLong (), G3D->GetWidth ());
       break;
     case 1:
       if (value->GetBool ())
@@ -4101,7 +4101,7 @@ bool csEngine::GetOption (int id, csVariant *value)
   switch (id)
   {
     case 0:
-      value->SetFloat(PerspectiveImpl::GetDefaultFOV ());
+      value->SetLong ((long)PerspectiveImpl::GetDefaultFOV ());
       break;
     case 1:
       value->SetBool (csEngine::lightmapCacheMode == CS_ENGINE_CACHE_WRITE);
