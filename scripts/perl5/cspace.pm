@@ -13817,10 +13817,10 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *IsShadowCasting = *cspacec::iGeneralMeshCommonState_IsShadowCasting;
 *SetShadowReceiving = *cspacec::iGeneralMeshCommonState_SetShadowReceiving;
 *IsShadowReceiving = *cspacec::iGeneralMeshCommonState_IsShadowReceiving;
-*AddRenderBuffer = *cspacec::iGeneralMeshCommonState_AddRenderBuffer;
-*RemoveRenderBuffer = *cspacec::iGeneralMeshCommonState_RemoveRenderBuffer;
 *GetRenderBufferCount = *cspacec::iGeneralMeshCommonState_GetRenderBufferCount;
 *GetRenderBufferName = *cspacec::iGeneralMeshCommonState_GetRenderBufferName;
+*AddRenderBuffer = *cspacec::iGeneralMeshCommonState_AddRenderBuffer;
+*RemoveRenderBuffer = *cspacec::iGeneralMeshCommonState_RemoveRenderBuffer;
 *GetRenderBuffer = *cspacec::iGeneralMeshCommonState_GetRenderBuffer;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

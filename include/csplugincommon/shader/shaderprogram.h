@@ -115,6 +115,8 @@ public:
     ProgramParam() : valid (false), name (CS::InvalidShaderVarStringID) { }
     /// Returns whether this parameter 
     bool IsConstant() const { return valid && var.IsValid(); }
+    /// Returns whether this parameter 
+    bool IsConstant() const { return valid && var.IsValid(); }
   };
 
   class CS_CRYSTALSPACE_EXPORT ProgramParamParser
