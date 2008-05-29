@@ -791,14 +791,13 @@ bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
   for (size_t s = 0; s < sm.GetSize(); s++)
   {
     iRenderBuffer* indexBuffer = sm[s]->GetIndices();
-    csRenderBufferLock<uint> indices (indexBuffer, CS_BUF_LOCK_READ);
-    size_t n = indexBuffer->GetElementCount();
-    size_t idx = 0;
-    while (n > 0)
+    CS::TriangleIndicesStream<uint> triangles (indexBuffer,
+      CS_MESHTYPE_TRIANGLES);
+    while (triangles.HasNext())
     {
+      CS::TriangleT<uint> t (triangles.Next());
       if (csIntersect3::SegmentTriangle (seg, 
-	vrt[indices.Get (idx)], vrt[indices.Get (idx+1)],
-	vrt[indices.Get (idx+2)], 
+	vrt[t.a], vrt[t.b], vrt[t.c], 
 	tmp))
       {
 	temp = csSquaredDist::PointPoint (start, tmp);
@@ -810,8 +809,6 @@ bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
 	  mat = sm[s]->GetMaterial();
 	}
       }
-      n -= 3;
-      idx += 3;
     }
   }
   if (pr) *pr = csQsqrt (dist * itot_dist);
