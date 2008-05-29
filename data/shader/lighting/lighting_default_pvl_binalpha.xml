@@ -28,13 +28,13 @@
 	<!-- First pass: don't blend -->
 	<mixmode>
 	  <blendop src="one" dst="zero" />
-	  <alphatest>disable</alphatest>
+	  <alphatest>enable</alphatest>
 	</mixmode>
       <?else?>
 	<!-- Later pass: blend with add -->
 	<mixmode>
 	  <blendop src="one" dst="one" />
-	  <alphatest>disable</alphatest>
+	  <alphatest>enable</alphatest>
 	</mixmode>
       <?endif?>
       

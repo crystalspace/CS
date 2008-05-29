@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <!--
-  Copyright (C) 2007-2008 by Frank Richter
+  Copyright (C) 2007 by Frank Richter
 	    (C) 2007 by Jorrit Tyberghein
 
   This library is free software; you can redistribute it and/or
@@ -17,17 +17,19 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
-<shader compiler="shaderweaver" name="lighting_default_binalpha" lights="6">
-  <alias name="apply_alpha" file="/shader/snippets/surface/alpha-nochange.xml" />
-  <alias name="lighting" file="/shader/snippets/lighting/lighting-ppl.xml" />
+<shader compiler="shaderweaver" name="lighting_default_shadowmap_binalpha" lights="6">
+  <alias name="apply_alpha" file="/shader/snippets/surface/alpha-alpha-nochange.xml" />
+  <alias name="lighting" file="/shader/snippets/lighting/lighting-ppl-shadowmap.xml" />
+  <alias name="shadow" file="/shader/snippets/shadow/shadow-depth.xml" />
   
+  <?if vars."light shadow map" ?>
   <technique priority="500">
     <!-- 1 pass, 6 lights -->
     <pass>
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-	<!-- First pass: don't blend -->
+      <!-- First pass: blend with alpha -->
 	<mixmode>
-	  <blendop src="one" dst="zero" />
+	  <blendop src="one" dst="srcalpha_inv" />
 	  <alphatest>enable</alphatest>
 	</mixmode>
       <?else?>
@@ -37,7 +39,7 @@
 	  <alphatest>enable</alphatest>
 	</mixmode>
       <?endif?>
-
+      
       <!-- Combiner to use for this particular pass.
 	   Techniques Referenced snippets must only utilize the same 
 	   combiner with compatible options specified. If a technique
@@ -47,7 +49,7 @@
 
       <!-- The meat of the shader is actually in a snippet. to be shared more
 	   easily across all techniques -->
-      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
+      <snippet id="shared" file="/shader/snippets/lighting/lighting_default_shadowmap-shared.xml" />
       
       <parameter id="lightOffset" type="int">0</parameter>
       <parameter id="maxLights" type="int">6</parameter>
@@ -60,9 +62,9 @@
     <!-- 2 passes, 4+2 lights -->
     <pass>
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-	<!-- First pass: don't blend -->
+	<!-- First pass: blend with alpha -->
 	<mixmode>
-	  <blendop src="one" dst="zero" />
+	  <blendop src="one" dst="srcalpha_inv" />
 	  <alphatest>enable</alphatest>
 	</mixmode>
       <?else?>
@@ -75,7 +77,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
-      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
+      <snippet id="shared" file="/shader/snippets/lighting/lighting_default_shadowmap-shared.xml" />
       
       <parameter id="lightOffset" type="int">0</parameter>
       <parameter id="maxLights" type="int">4</parameter>
@@ -83,7 +85,6 @@
       <connection from="maxLights" to="shared" />
     </pass>
     <pass>
-      <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
 	<alphatest>enable</alphatest>
@@ -91,7 +92,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
-      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
+      <snippet id="shared" file="/shader/snippets/lighting/lighting_default_shadowmap-shared.xml" />
       
       <parameter id="lightOffset" type="int">4</parameter>
       <parameter id="maxLights" type="int">2</parameter>
@@ -104,13 +105,13 @@
     <!-- 2 passes, 3+3 lights -->
     <pass>
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-	<!-- First pass: don't blend -->
+      <!-- First pass: blend with alpha -->
 	<mixmode>
-	  <blendop src="one" dst="zero" />
+	  <blendop src="one" dst="srcalpha_inv" />
 	  <alphatest>enable</alphatest>
 	</mixmode>
       <?else?>
-	<!-- Later pass: blend with add -->
+      <!-- Later pass: blend with add -->
 	<mixmode>
 	  <blendop src="one" dst="one" />
 	  <alphatest>enable</alphatest>
@@ -119,7 +120,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
-      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
+      <snippet id="shared" file="/shader/snippets/lighting/lighting_default_shadowmap-shared.xml" />
       
       <parameter id="lightOffset" type="int">0</parameter>
       <parameter id="maxLights" type="int">3</parameter>
@@ -127,7 +128,6 @@
       <connection from="maxLights" to="shared" />
     </pass>
     <pass>
-      <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
 	<alphatest>enable</alphatest>
@@ -135,7 +135,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
-      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
+      <snippet id="shared" file="/shader/snippets/lighting/lighting_default_shadowmap-shared.xml" />
       
       <parameter id="lightOffset" type="int">3</parameter>
       <parameter id="maxLights" type="int">3</parameter>
@@ -148,9 +148,9 @@
     <!-- 3 passes, 2+2+2 lights -->
     <pass>
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-	<!-- First pass: don't blend -->
+	<!-- First pass: blend with alpha -->
 	<mixmode>
-	  <blendop src="one" dst="zero" />
+	  <blendop src="one" dst="srcalpha_inv" />
 	  <alphatest>enable</alphatest>
 	</mixmode>
       <?else?>
@@ -163,7 +163,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
-      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
+      <snippet id="shared" file="/shader/snippets/lighting/lighting_default_shadowmap-shared.xml" />
       
       <parameter id="lightOffset" type="int">0</parameter>
       <parameter id="maxLights" type="int">2</parameter>
@@ -171,7 +171,6 @@
       <connection from="maxLights" to="shared" />
     </pass>
     <pass>
-      <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
 	<alphatest>enable</alphatest>
@@ -179,7 +178,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
-      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
+      <snippet id="shared" file="/shader/snippets/lighting/lighting_default_shadowmap-shared.xml" />
       
       <parameter id="lightOffset" type="int">2</parameter>
       <parameter id="maxLights" type="int">2</parameter>
@@ -187,7 +186,6 @@
       <connection from="maxLights" to="shared" />
     </pass>
     <pass>
-      <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
 	<alphatest>enable</alphatest>
@@ -195,7 +193,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
-      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
+      <snippet id="shared" file="/shader/snippets/lighting/lighting_default_shadowmap-shared.xml" />
       
       <parameter id="lightOffset" type="int">4</parameter>
       <parameter id="maxLights" type="int">2</parameter>
@@ -208,9 +206,9 @@
     <!-- 6 passes, 1+1+1+1+1+1 lights -->
     <pass>
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-	<!-- First pass: don't blend -->
+	<!-- First pass: blend with alpha -->
 	<mixmode>
-	  <blendop src="one" dst="zero" />
+	  <blendop src="one" dst="srcalpha_inv" />
 	  <alphatest>enable</alphatest>
 	</mixmode>
       <?else?>
@@ -223,7 +221,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
-      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
+      <snippet id="shared" file="/shader/snippets/lighting/lighting_default_shadowmap-shared.xml" />
       
       <parameter id="lightOffset" type="int">0</parameter>
       <parameter id="maxLights" type="int">1</parameter>
@@ -231,7 +229,6 @@
       <connection from="maxLights" to="shared" />
     </pass>
     <pass>
-      <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
 	<alphatest>enable</alphatest>
@@ -239,7 +236,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
-      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
+      <snippet id="shared" file="/shader/snippets/lighting/lighting_default_shadowmap-shared.xml" />
       
       <parameter id="lightOffset" type="int">1</parameter>
       <parameter id="maxLights" type="int">1</parameter>
@@ -247,7 +244,6 @@
       <connection from="maxLights" to="shared" />
     </pass>
     <pass>
-      <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
 	<alphatest>enable</alphatest>
@@ -255,7 +251,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
-      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
+      <snippet id="shared" file="/shader/snippets/lighting/lighting_default_shadowmap-shared.xml" />
       
       <parameter id="lightOffset" type="int">2</parameter>
       <parameter id="maxLights" type="int">1</parameter>
@@ -263,7 +259,6 @@
       <connection from="maxLights" to="shared" />
     </pass>
     <pass>
-      <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
 	<alphatest>enable</alphatest>
@@ -271,7 +266,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
-      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
+      <snippet id="shared" file="/shader/snippets/lighting/lighting_default_shadowmap-shared.xml" />
       
       <parameter id="lightOffset" type="int">3</parameter>
       <parameter id="maxLights" type="int">1</parameter>
@@ -279,7 +274,6 @@
       <connection from="maxLights" to="shared" />
     </pass>
     <pass>
-      <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
 	<alphatest>enable</alphatest>
@@ -287,7 +281,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
-      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
+      <snippet id="shared" file="/shader/snippets/lighting/lighting_default_shadowmap-shared.xml" />
       
       <parameter id="lightOffset" type="int">4</parameter>
       <parameter id="maxLights" type="int">1</parameter>
@@ -295,7 +289,6 @@
       <connection from="maxLights" to="shared" />
     </pass>
     <pass>
-      <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
 	<alphatest>enable</alphatest>
@@ -303,7 +296,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
-      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
+      <snippet id="shared" file="/shader/snippets/lighting/lighting_default_shadowmap-shared.xml" />
       
       <parameter id="lightOffset" type="int">5</parameter>
       <parameter id="maxLights" type="int">1</parameter>
@@ -311,7 +304,8 @@
       <connection from="maxLights" to="shared" />
     </pass>
   </technique>
+  <?endif?>
   
-  <!-- If PPL is not available, try PVL -->
-  <fallbackshader name="lighting_default_pvl_binalpha" file="/shader/lighting/lighting_default_pvl_binalpha.xml" />
+  <!-- Try w/o shadow map -->
+  <fallbackshader name="lighting_default_binalpha" file="/shader/lighting/lighting_default_binalpha.xml" />
 </shader>
