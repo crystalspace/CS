@@ -51,9 +51,13 @@ class csGLShader_CG : public scfImplementation2<csGLShader_CG,
 {
 private:
   static void ErrorHandler (CGcontext context, CGerror err, void* appdata);
+  static void ErrorHandlerObjReg (CGcontext context, CGerror err, void* appdata);
 
   bool enable;
   bool isOpen;
+  const char* compiledProgram;
+  
+  void PrintCgListing (const char* listing);
 public:
   CS_LEAKGUARD_DECLARE (csGLShader_CG);
 
@@ -97,6 +101,9 @@ public:
     return (profile >= CG_PROFILE_PS_1_1) && (profile <= CG_PROFILE_PS_1_3);
   }
   bool IsRoutedProfileSupported (CGprofile profile);
+  
+  void SetCompiledSource (const char* prog)
+  { compiledProgram = prog; }
 };
 
 }

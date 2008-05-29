@@ -151,10 +151,10 @@ class iGeneralMeshCommonState(core.iBase):
     def IsShadowCasting(*args): return _imesh.iGeneralMeshCommonState_IsShadowCasting(*args)
     def SetShadowReceiving(*args): return _imesh.iGeneralMeshCommonState_SetShadowReceiving(*args)
     def IsShadowReceiving(*args): return _imesh.iGeneralMeshCommonState_IsShadowReceiving(*args)
-    def AddRenderBuffer(*args): return _imesh.iGeneralMeshCommonState_AddRenderBuffer(*args)
-    def RemoveRenderBuffer(*args): return _imesh.iGeneralMeshCommonState_RemoveRenderBuffer(*args)
     def GetRenderBufferCount(*args): return _imesh.iGeneralMeshCommonState_GetRenderBufferCount(*args)
     def GetRenderBufferName(*args): return _imesh.iGeneralMeshCommonState_GetRenderBufferName(*args)
+    def AddRenderBuffer(*args): return _imesh.iGeneralMeshCommonState_AddRenderBuffer(*args)
+    def RemoveRenderBuffer(*args): return _imesh.iGeneralMeshCommonState_RemoveRenderBuffer(*args)
     def GetRenderBuffer(*args): return _imesh.iGeneralMeshCommonState_GetRenderBuffer(*args)
     __swig_destroy__ = _imesh.delete_iGeneralMeshCommonState
     __del__ = lambda self : None;
