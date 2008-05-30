@@ -169,7 +169,7 @@ namespace RenderManager
           float lightCutoff = light->GetCutoffDistance();
           CS::Math::Matrix4 lightProject;
           csLightType ltype = light->GetType();
-          int numFrustums;
+          int numFrustums = 1;
           switch (ltype)
           {
             case CS_LIGHT_DIRECTIONAL:
@@ -180,14 +180,6 @@ namespace RenderManager
 		  0, 1.0f/lightCutoff, 0, 0,
 		  0, 0, -1, 0,
 		  0, 0, 0, 1);
-		/*CS::Math::Matrix4 flipZW (
-		  1, 0, 0, 0,
-		  0, 1, 0, 0,
-		  0, 0, -1, 0,
-		  0, 0, 0, -1);
-		lightProject = flipZW * CS::Math::Projections::Ortho (
-		  -lightCutoff, lightNear, -lightCutoff, lightCutoff,
-		  lightNear, lightCutoff);*/
 	      }
               break;
             case CS_LIGHT_POINTLIGHT:
@@ -390,7 +382,7 @@ namespace RenderManager
 	  for (int frustNum = 0; frustNum < viewSetup.numParts; frustNum++)
 	  {
 	    const typename SuperFrustum::Frustum& lightFrust = superFrust.frustums[frustNum];
-	    if (lightFrust.containedObjectsPP.GetSize() == 0) continue;
+	    //if (lightFrust.containedObjectsPP.GetSize() == 0) continue;
 	    
             bool partFixed = viewSetup.doFixedCloseShadow && (frustNum == 0);
 	    
@@ -399,7 +391,7 @@ namespace RenderManager
 		dimension makes sure the shadow map is used optimally. */
 	    csBox3 allObjsBoxPP;
 	    float allObjsMaxZ;
-	    if (!partFixed)
+	    if (!partFixed && (lightFrust.containedObjectsPP.GetSize() > 0))
 	    {
 	      allObjsBoxPP = lightFrust.containedObjectsPP[0];
 	      for (size_t i = 1; i < lightFrust.containedObjectsPP.GetSize(); i++)
@@ -436,19 +428,41 @@ namespace RenderManager
 	    newRenderView->SetEngine (rview->GetEngine ());
 	    newRenderView->SetThisSector (rview->GetThisSector ());
 	    
-	    const float frustW = allObjsBoxPP.MaxX() - allObjsBoxPP.MinX();
-	    const float frustH = allObjsBoxPP.MaxY() - allObjsBoxPP.MinY();
-	    const float cropScaleX = 2.0f/frustW;
-	    const float cropScaleY = -2.0f/frustH;
-	    const float cropShiftX =
-	      (-1.0f * (allObjsBoxPP.MaxX() + allObjsBoxPP.MinX()))/frustW;
-	    const float cropShiftY =
-	      (1.0f * (allObjsBoxPP.MaxY() + allObjsBoxPP.MinY()))/frustH;
-	    CS::Math::Matrix4 crop (
-	      cropScaleX, 0, 0, cropShiftX,
-	      0, cropScaleY, 0, cropShiftY,
-	      0, 0, 1, 0,
-	      0, 0, 0, 1);
+	    CS::Math::Matrix4 crop;
+	    if (lightFrust.containedObjectsPP.GetSize() == 0)
+	    {
+	      crop = CS::Math::Matrix4 (
+		0, 0, 0, 10,
+		0, 0, 0, 10,
+		0, 0, 1, 0,
+		0, 0, 0, 1);
+		
+	      lightFrust.shadowMapUnscaleSV->SetValue (csVector4 (
+	        0, 0, -10, -10));
+	    }
+	    else
+	    {
+	      const float frustW = allObjsBoxPP.MaxX() - allObjsBoxPP.MinX();
+	      const float frustH = allObjsBoxPP.MaxY() - allObjsBoxPP.MinY();
+	      const float cropScaleX = 2.0f/frustW;
+	      const float cropScaleY = -2.0f/frustH;
+	      const float cropShiftX =
+		(-1.0f * (allObjsBoxPP.MaxX() + allObjsBoxPP.MinX()))/frustW;
+	      const float cropShiftY =
+		(1.0f * (allObjsBoxPP.MaxY() + allObjsBoxPP.MinY()))/frustH;
+	      crop = CS::Math::Matrix4 (
+		cropScaleX, 0, 0, cropShiftX,
+		0, cropScaleY, 0, cropShiftY,
+		0, 0, 1, 0,
+		0, 0, 0, 1);
+		
+	      const float uncropScaleX = 1.0f/cropScaleX;
+	      const float uncropScaleY = 1.0f/cropScaleY;
+	      const float uncropShiftX = -cropShiftX/cropScaleX;
+	      const float uncropShiftY = -cropShiftY/cropScaleY;
+	      lightFrust.shadowMapUnscaleSV->SetValue (csVector4 (
+	        uncropScaleX, uncropScaleY, uncropShiftX, uncropShiftY));
+	     }
 	      
 	    /* The minimum Z over all parts is used to avoid clipping shadows of 
 	      casters closer to the light than the split plane.
@@ -462,29 +476,13 @@ namespace RenderManager
 	    CS::Math::Matrix4 matrix = ((Mortho * crop) * lightData.lightProject)
 	     * CS::Math::Matrix4 (superFrust.frustumRotation);
 	    
-	    int shadowMapSize;
-	    csReversibleTransform view = superFrust.world2light_base;
-	    
-	    csRef<iCustomMatrixCamera> shadowViewCam =
-	      newRenderView->GetEngine()->CreateCustomMatrixCamera();
-	    newRenderView->SetCamera (shadowViewCam->GetCamera());
-	    shadowViewCam->SetProjectionMatrix (matrix);
-	    shadowViewCam->GetCamera()->SetTransform (view);
-	    
 	    for (int i = 0; i < 4; i++)
 	    {
 	      csShaderVariable* item = lightFrust.shadowMapProjectSV->GetArrayElement (i);
 	      item->SetValue (matrix.Row (i));
 	    }
-	    {
-	      const float uncropScaleX = 1.0f/cropScaleX;
-	      const float uncropScaleY = 1.0f/cropScaleY;
-	      const float uncropShiftX = -cropShiftX/cropScaleX;
-	      const float uncropShiftY = -cropShiftY/cropScaleY;
-	      lightFrust.shadowMapUnscaleSV->SetValue (csVector4 (
-	        uncropScaleX, uncropScaleY, uncropShiftX, uncropShiftY));
-	    }
 		
+	    int shadowMapSize;
             if (partFixed)
               shadowMapSize = persist.shadowMapResClose;
             else
@@ -505,7 +503,24 @@ namespace RenderManager
 	    }
 	    lightFrust.shadowMapDimSV->SetValue (csVector4 (1.0f/shadowMapSize,
 	      1.0f/shadowMapSize, shadowMapSize, shadowMapSize));
+	      
+	    if (lightFrust.containedObjectsPP.GetSize() == 0)
+	    {
+	      for (size_t t = 0; t < persist.settings.targets.GetSize(); t++)
+	      {
+		lightFrust.textureSVs[t]->SetValue (0);
+	      }
+	      continue;
+	    }
     
+	    csReversibleTransform view = superFrust.world2light_base;
+	    
+	    csRef<iCustomMatrixCamera> shadowViewCam =
+	      newRenderView->GetEngine()->CreateCustomMatrixCamera();
+	    newRenderView->SetCamera (shadowViewCam->GetCamera());
+	    shadowViewCam->SetProjectionMatrix (matrix);
+	    shadowViewCam->GetCamera()->SetTransform (view);
+	    
 	    for (size_t t = 0; t < persist.settings.targets.GetSize(); t++)
 	    {
 	      iTextureHandle* tex =
