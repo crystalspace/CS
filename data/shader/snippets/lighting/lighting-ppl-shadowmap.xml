@@ -142,11 +142,6 @@
 	<input name="lightOffset" type="int" default="value" defval="0"/>
 	<input name="maxLights" type="int" default="value" defval="3"/>
 	
-	<block location="shadervars">
-	  <!-- @@@ FIXME: This needs to be solved in a better way -->
-	  <!-- @@@ FIXME2: And it doesn't even work. -->
-	  <!-- shadervar name="tex shadow noise" type="texture">/data/shadow_noise.png</shadervar -->
-	</block>
 	<block location="pass">
 	  <?Include /shader/snippets/lighting/lighting-tools.inc ?>
 	</block>
@@ -209,7 +204,7 @@
 	<block location="cg:fragmentMain">
 	  clip (float4 (positionC.z-shadowClip.x, 
 	    -positionC.z+shadowClip.y, 0, 0));
-	  
+          
 	  diffuseColor = float3(0);
 	  specularColor = float3(0);
 	  half3 myEyeToSurf = eyeToSurf;

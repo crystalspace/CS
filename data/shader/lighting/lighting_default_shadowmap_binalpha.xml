@@ -22,7 +22,7 @@
   <alias name="lighting" file="/shader/snippets/lighting/lighting-ppl-shadowmap.xml" />
   <alias name="shadow" file="/shader/snippets/shadow/shadow-depth.xml" />
   
-  <?if vars."light shadow map" ?>
+  <?if vars."light shadow map" && ((vars."light count".int &gt; 1) || (vars."light shadow map[0]".texture)) ?>
   <technique priority="500">
     <!-- 1 pass, 6 lights -->
     <pass>
