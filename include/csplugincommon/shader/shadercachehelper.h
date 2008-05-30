@@ -54,6 +54,7 @@ namespace CS
         {
           csRef<iDocumentNode> docNode;
           csRef<iDataBuffer> sourceData;
+          csString fullPath;
           
           csMD5::Digest ComputeHash ();
         };

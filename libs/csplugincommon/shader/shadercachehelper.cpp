@@ -25,7 +25,9 @@
 #include "csutil/databuf.h"
 #include "csutil/documenthelper.h"
 #include "csutil/parasiticdatabuffer.h"
+#include "csutil/sysfunc.h"
 #include "csutil/xmltiny.h"
+#include "cstool/vfsdirchange.h"
 
 namespace CS
 {
@@ -67,9 +69,20 @@ namespace CS
         if (!entry.docNode.IsValid())
         {
           csRef<iDocument> doc = docSys->CreateDocument();
-          if (doc->Parse (entry.sourceData) != 0) return;
+          const char* err = doc->Parse (entry.sourceData);
+          if (err != 0)
+          {
+	  #ifdef CS_DEBUG
+	    csPrintf ("%s: parse error '%s'\n", CS_FUNCTION_NAME,
+	      err);
+	  #endif
+            return;
+          }
           entry.docNode = doc->GetRoot();
         }
+        
+        csVfsDirectoryChanger changer (vfs);
+        if (!entry.fullPath.IsEmpty()) changer.ChangeTo (entry.fullPath);
         PushReferencedFiles (entry.docNode);
       }
       
@@ -159,10 +172,7 @@ namespace CS
             const char* fileAttr = node->GetAttributeValue ("file");
             if (fileAttr && *fileAttr)
             {
-              if (!AddFile (fileAttr))
-              {
-                // @@@ Some sort of error handling?
-              }
+              AddFile (fileAttr);
             }
 	  }
         
@@ -189,26 +199,32 @@ namespace CS
             && (cmd == "Include"))
 	  {
 	    args.Trim ();
-	    AddFile (args);
+            AddFile (args);
 	  }
         }
       }
         
       bool ShaderDocHasher::AddFile (const char* filename)
       {
-        if (seenFiles.Contains (filename)) return true;
+        csRef<iDataBuffer> fullPath (vfs->ExpandPath (filename));
+        if (seenFiles.Contains (fullPath->GetData())) return true;
       
-	csRef<iFile> file = vfs->Open (filename, VFS_FILE_READ);
+	csRef<iFile> file = vfs->Open (fullPath->GetData(), VFS_FILE_READ);
 	if (file.IsValid())
 	{
 	  DocStackEntry newEntry;
 	  newEntry.sourceData = file->GetAllData();
+	  newEntry.fullPath = fullPath->GetData();
 	  scanStack.Push (newEntry);
-          seenFiles.AddNoTest (filename);
+          seenFiles.AddNoTest (fullPath->GetData());
 	  return true;
 	}
 	else
 	{
+	#ifdef CS_DEBUG
+	  csPrintf ("%s: failed to open '%s'\n", CS_FUNCTION_NAME,
+	    fullPath->GetData());
+	#endif
 	  return false;
 	}
       }
