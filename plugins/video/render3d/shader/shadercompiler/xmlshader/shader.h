@@ -290,11 +290,11 @@ public:
   /// Get number of passes this shader have
   virtual size_t GetNumberOfPasses (size_t ticket)
   {
+    if (ticket == csArrayItemNotFound) return 0;
     if (IsFallbackTicket (ticket))
       return GetFallbackShader()->GetNumberOfPasses (GetFallbackTicket (ticket));
-    csXMLShaderTech* tech = (ticket != csArrayItemNotFound) ? 
-      TechForTicket (ticket) : 0;
-    return tech ? tech->GetNumberOfPasses () : 0;
+    csXMLShaderTech* tech = TechForTicket (ticket);
+    return tech->GetNumberOfPasses ();
   }
 
   /// Activate a pass for rendering
@@ -344,6 +344,8 @@ public:
 
   virtual void GetUsedShaderVars (size_t ticket, csBitArray& bits) const
   {
+    if (ticket == csArrayItemNotFound) return;
+    
     if (IsFallbackTicket (ticket))
     {
       fallbackShader->GetUsedShaderVars (GetFallbackTicket (ticket),
@@ -351,10 +353,8 @@ public:
       return;
     }
 
-    csXMLShaderTech* tech = (ticket != csArrayItemNotFound) ? 
-      TechForTicket (ticket) : 0;
-    if (tech != 0)
-      tech->GetUsedShaderVars (bits);
+    csXMLShaderTech* tech = TechForTicket (ticket);
+    tech->GetUsedShaderVars (bits);
   }
 
   friend class csXMLShaderCompiler;
