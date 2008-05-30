@@ -559,7 +559,8 @@ public:
       {
 	const ValuesWrapper* newVals = 0;
 	size_t subInd = *ip++;
-	if (vals->GetSubValues()->GetSize() > subInd)
+	if (vals->GetSubValues()
+	   && (vals->GetSubValues()->GetSize() > subInd))
 	  newVals = &(vals->GetSubValues()->Get (subInd));
 	vals = newVals;
       }
