@@ -26,15 +26,25 @@
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
 {
 
-LoaderContext::LoaderContext(iLoader* loader) : 
-  scfImplementationType (this), loader (loader)
+LoaderContext::LoaderContext (iLoader* loader, iTextureManager* tm) : 
+  scfImplementationType (this), loader (loader), tm (tm)
 {
+}
+
+void LoaderContext::RegisterTexture (iTextureWrapper* tex)
+{
+  if (!tex) return;
+  
+  // @@@ Guess at what this texture is likely used for ...
+  tex->SetTextureClass ("lookup");
+  if (tm) tex->Register (tm);
 }
 
 iTextureWrapper* LoaderContext::FindTexture (const char* name)
 {
   csRef<iTextureWrapper> rc = loader->LoadTexture (name, name,
-    CS_TEXTURE_3D, 0, true, false);
+    CS_TEXTURE_3D, 0, false, false);
+  RegisterTexture (rc);
   return rc;
 }
 
@@ -42,7 +52,8 @@ iTextureWrapper* LoaderContext::FindNamedTexture (const char* name,
                                                   const char *filename)
 {
   csRef<iTextureWrapper> rc = loader->LoadTexture(name, filename,
-    CS_TEXTURE_3D, 0, true, false);
+    CS_TEXTURE_3D, 0, false, false);
+  RegisterTexture (rc);
   return rc;
 }
 

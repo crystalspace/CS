@@ -24,6 +24,7 @@
 #include "csutil/scf_implementation.h"
 
 struct iLoader;
+struct iTextureManager;
 
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
 {
@@ -36,8 +37,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
   {
   private:
     iLoader* loader;
+    iTextureManager* tm;
+    
+    void RegisterTexture (iTextureWrapper* tex);
   public:
-    LoaderContext (iLoader* loader);
+    LoaderContext (iLoader* loader, iTextureManager* tm);
 
     iSector* FindSector (const char* name) { return 0; }
     iMaterialWrapper* FindMaterial (const char* name) { return 0; }

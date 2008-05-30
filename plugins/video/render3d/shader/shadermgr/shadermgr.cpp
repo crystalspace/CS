@@ -245,8 +245,14 @@ void csShaderManager::LoadDefaultVariables()
   
   csRef<iLoader> loader = csQueryRegistry<iLoader> (objectreg);
   CS_ASSERT(loader);
+  
+  csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objectreg);
+  csRef<iTextureManager> tm;
+  if (g3d.IsValid())
+    tm = g3d->GetTextureManager();
+  
   csRef<iLoaderContext> ldr_context;
-  ldr_context.AttachNew (new LoaderContext (loader));
+  ldr_context.AttachNew (new LoaderContext (loader, tm));
   
   // @@@ TODO: Should allow for more than one hardcoded defaults file
   const char* defaultsFile = "/config/shadermgr-defaults.xml";
