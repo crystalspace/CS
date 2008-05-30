@@ -137,20 +137,7 @@
 	  </block>
 	</input>
 	
-	<input name="shadowClip" type="float2" default="complex" private="yes">
-	  <block location="cg:fragmentIn">
-	    <uniform type="float2" name="shadowClip" />
-	  </block>
-	  
-	  <block location="cg:variablemap">
-	    <variablemap variable="light shadow clip" 
-			 destination="fragmentIn.shadowClip" />
-	  </block>
-	  
-	  <block location="cg:fragmentMain">
-	    shadowClip = fragmentIn.shadowClip;
-	  </block>
-	</input>
+	<input file="/shader/snippets/lighting/shadowclip.inp" private="yes" />
 	
 	<input name="lightOffset" type="int" default="value" defval="0"/>
 	<input name="maxLights" type="int" default="value" defval="3"/>

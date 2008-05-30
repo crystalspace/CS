@@ -25,36 +25,63 @@
     to 6 pyramids with an opening of 90 degs with a shadow map for each
     of these light volumes.
     Clip so points outside the light volume aren't lit.
+    
+    For directional lights, points outside the shadow map are unshadowed.
   */
 struct ShadowClipper
 {
   bool IsClipped (float2 shadowMapCoordsProjUnscaled,
+                  float2 shadowMapCoordsProj,
                   float4 shadowMapCoords)
   {
   ]]>
   <?if (vars."light type".int != consts.CS_LIGHT_DIRECTIONAL) ?>
   <![CDATA[
-    bool2 compResLT = shadowMapCoordsProjUnscaled.xy >= float2 (-1);
-    bool2 compResBR = shadowMapCoordsProjUnscaled.xy < float2 (1);
-    return compResLT.x && compResLT.y && compResBR.x && compResBR.y
-      && (shadowMapCoords.z <= shadowMapCoords.w);
+    bool2 compResLT = shadowMapCoordsProjUnscaled.xy < float2 (-1);
+    bool2 compResBR = shadowMapCoordsProjUnscaled.xy >= float2 (1);
+    return (compResLT.x || compResLT.y || compResBR.x || compResBR.y
+      || (shadowMapCoords.z > shadowMapCoords.w));
+  ]]>
+  <?else?>
+  <![CDATA[
+    bool2 compResLT = shadowMapCoordsProj.xy < float2 (-1);
+    bool2 compResBR = shadowMapCoordsProj.xy >= float2 (1);
+    return (compResLT.x || compResLT.y || compResBR.x || compResBR.y);
   ]]>
   <?endif?>
   <![CDATA[
-    return false;
   }
   
-  half ClipFactor (float2 shadowMapCoordsProjUnscaled,
-                  float4 shadowMapCoords)
+  half ClippedFactor()
   {
-    half factor = 1;
+  ]]>
+  <?if (vars."light type".int != consts.CS_LIGHT_DIRECTIONAL) ?>
+    return 0;
+  <?else?>
+    return 1;
+  <?endif?>
+  <![CDATA[
+  }
+  
+  half ClipAttenuated (half factor,
+                       float2 shadowMapCoordsProjUnscaled,
+                       float2 shadowMapCoordsProj,
+                       float4 shadowMapCoords)
+  {
   ]]>
   <?if (vars."light type".int != consts.CS_LIGHT_DIRECTIONAL) ?>
   <![CDATA[
     float2 compResLT = shadowMapCoordsProjUnscaled.xy >= float2 (-1);
     float2 compResBR = shadowMapCoordsProjUnscaled.xy < float2 (1);
-    factor = compResLT.x*compResLT.y*compResBR.x*compResBR.y;
+    factor *= compResLT.x*compResLT.y*compResBR.x*compResBR.y;
     factor *= (shadowMapCoords.z <= shadowMapCoords.w);
+  ]]>
+  <?else?>
+  <![CDATA[
+    bool2 compResLT = shadowMapCoordsProj.xy >= float2 (-1);
+    bool2 compResBR = shadowMapCoordsProj.xy < float2 (1);
+    factor = max (factor,
+      1-(compResLT.x*compResLT.y*compResBR.x*compResBR.y));
   ]]>
   <?endif?>
   <![CDATA[
@@ -93,6 +120,7 @@ struct ShadowSamplerNoisy : ShadowSampler
     
     float2 noiseCoords = shadowMapCoordsProjUnscaled * noiseMapScale;
     half2 noise = h4tex2D (lightPropsSM.shadowMapNoise, noiseCoords).xy * noiseScale;
+    //debug (float4 (noise.x, noise.y, 0, 1));
       
     // @@@ The offsets could probably be better.
     half inLight;

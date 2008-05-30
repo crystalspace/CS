@@ -26,8 +26,11 @@
 	<!-- Vector from eye to position -->
 	<input name="eyeToSurf" type="direction_world" />
 	<input name="position" type="position4_world" />
+	<input name="positionC" type="position4_camera" />
 	<!-- Surface normal -->
 	<input name="normal" type="normal_world" />
+	
+	<input file="/shader/snippets/lighting/shadowclip.inp" private="yes" />
 	
 	<input name="lightOffset" type="int" default="value" defval="0"/>
 	<input name="maxLights" type="int" default="value" defval="8"/>
@@ -84,6 +87,12 @@
 	</block>
 	
 	<block location="cg:fragmentMain">
+	  <?! Shader might be used together with shadowmap shader... ?>
+	  <?if vars."light shadow clip" ?>
+	  clip (float4 (positionC.z-shadowClip.x, 
+	    -positionC.z+shadowClip.y, 0, 0));
+	  <?endif?>
+	  
 	  diffuseColor_attr_perfragment = false;
 	  specularColor_attr_perfragment = false;
 	</block>

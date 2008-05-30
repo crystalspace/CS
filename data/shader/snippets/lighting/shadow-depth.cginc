@@ -89,8 +89,9 @@ struct ShadowShadowMapDepth : ShadowShadowMap
       (shadowMapCoordsProj.xy) * shadowMapUnscale.xy + shadowMapUnscale.zw;
     
     ShadowClipper clipper;
-    if (clipper.IsClipped (shadowMapCoordsProjUnscaled, shadowMapCoords))
-      return 0;
+    if (clipper.IsClipped (shadowMapCoordsProjUnscaled, shadowMapCoordsProj.xy,
+        shadowMapCoords))
+      return clipper.ClippedFactor ();
   
     float3 shadowMapCoordsBiased = (float3(0.5)*shadowMapCoordsProj.xyz) + float3(0.5);
     // Depth to compare against
@@ -98,9 +99,9 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     
     // Depth compare with shadow map texel
     half inLight;
-    ShadowSamplerSimple sampler;
-    //ShadowSamplerNoisy sampler;
-    //sampler.Init (shadowMapCoordsProjUnscaled);
+    //ShadowSamplerSimple sampler;
+    ShadowSamplerNoisy sampler;
+    sampler.Init (shadowMapCoordsProjUnscaled);
     inLight = sampler.GetVisibility (shadowMap, shadowMapCoordsBiased.xy, compareDepth);
     
     return inLight;

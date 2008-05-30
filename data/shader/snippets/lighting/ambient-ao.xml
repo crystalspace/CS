@@ -38,21 +38,21 @@
     
     <block location="cg:fragmentMain">
       <?if vars."tex ambient occlusion".texture ?>
-      occlusionFactor = tex2D (texAO, texCoord).x;
-      occlusionFactor_attr_perfragment = true;
-    <?else?>
-      occlusionFactor = 1;
-      occlusionFactor_attr_perfragment = false;
-    <?endif?>
+	occlusionFactor = tex2D (texAO, texCoord).x;
+	occlusionFactor_attr_perfragment = true;
+      <?else?>
+	occlusionFactor = 1;
+	occlusionFactor_attr_perfragment = false;
+      <?endif?>
     </block>
     
     <block location="cg:vertexMain">
       occlusionFactor = 1;
-    <?if vars."tex ambient occlusion".texture?>
-    occlusionFactor_attr_perfragment = true;
-    <?else?>
-    occlusionFactor_attr_perfragment = false;
-    <?endif?>
+      <?if vars."tex ambient occlusion".texture?>
+        occlusionFactor_attr_perfragment = true;
+      <?else?>
+        occlusionFactor_attr_perfragment = false;
+      <?endif?>
     </block>
     
     <output name="occlusionFactor" type="float">
