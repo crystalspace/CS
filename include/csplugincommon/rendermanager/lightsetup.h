@@ -611,6 +611,7 @@ namespace RenderManager
 
       for (size_t i = 0; i < node->meshes.GetSize (); ++i)
       {
+      
         typename RenderTree::MeshNode::SingleMesh& mesh = node->meshes[i];
 
         size_t numLights;
@@ -665,7 +666,8 @@ namespace RenderManager
 
           sortedLights.SetLightsLimit (layerLights);
           size_t handledLights;
-          if (mesh.meshFlags.Check (CS_ENTITY_NOSHADOWS))
+          if (mesh.meshFlags.CheckAll (CS_ENTITY_NOSHADOWCAST
+              | CS_ENTITY_NOSHADOWRECEIVE))
 	    handledLights = HandleLights (noShadows, sortedLights,
 	      layer, layerHelper, layerConfig, mesh, node);
 	  else

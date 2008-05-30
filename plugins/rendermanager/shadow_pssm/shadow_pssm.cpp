@@ -220,7 +220,7 @@ bool RMShadowedPSSM::RenderView (iView* view)
   else if (lockedDebugLines)
     renderTree.SetDebugLines (*lockedDebugLines);
   renderTree.DrawDebugLines (rview->GetGraphics3D (), rview);
-  renderTree.RenderDebugTextures (rview->GetGraphics3D ());
+  //renderTree.RenderDebugTextures (rview->GetGraphics3D ());
 
   return true;
 }
@@ -259,12 +259,17 @@ bool RMShadowedPSSM::DebugCommand (const char *cmd)
 {
   if (strcmp (cmd, "toggle_debug_lines_lock") == 0)
   {
+    csPrintf ("%p got toggle_debug_lines_lock: ", this);
     if (lockedDebugLines)
     {
       delete lockedDebugLines; lockedDebugLines = 0;
+      csPrintf ("unlocked\n");
     }
     else
+    {
       wantDebugLockLines = !wantDebugLockLines;
+      csPrintf ("%slocked\n", wantDebugLockLines ? "" : "un");
+    }
     return true;
   }
   return false;
@@ -346,8 +351,7 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
   }
   
   portalPersistent.Initialize (shaderManager, g3d);
-  lightPersistent.shadowPersist.SetShadowType (
-    cfg->GetStr ("RenderManager.ShadowPSSM.ShadowsType", "Depth"));
+  lightPersistent.shadowPersist.SetConfigPrefix ("RenderManager.ShadowPSSM");
   lightPersistent.Initialize (objectReg);
   
   return true;

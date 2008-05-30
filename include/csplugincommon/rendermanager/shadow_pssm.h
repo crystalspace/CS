@@ -21,6 +21,8 @@
 
 #include "ivideo/shader/shader.h"
 
+#include "cstool/meshfilter.h"
+
 #include "csplugincommon/rendermanager/operations.h"
 #include "csplugincommon/rendermanager/rendertree.h"
 #include "csplugincommon/rendermanager/shadow_common.h"
@@ -30,9 +32,6 @@
 #include "csgeom/matrix4.h"
 
 class csShaderVariable;
-
-// Number of view frustum parts
-#define NUM_PARTS 3
 
 namespace CS
 {
@@ -55,8 +54,10 @@ namespace RenderManager
       PersistentData& persist;
       
       CS::RenderManager::RenderView* rview;
-      float splitDists[NUM_PARTS+1];
+      int numParts;
+      float* splitDists;
       float lx, rx, ty, by;
+      bool doFixedCloseShadow;
       
       SingleRenderLayer depthRenderLayer;
       uint lastMeshID;
@@ -64,21 +65,36 @@ namespace RenderManager
       
       ViewSetup (PersistentData& persist, CS::RenderManager::RenderView* rview)
        : persist (persist), rview (rview),
+         doFixedCloseShadow (persist.fixedCloseShadow > 0),
          depthRenderLayer (persist.settings.shadowShaderType, 
            persist.settings.shadowDefaultShader),
          lastMeshID (0)
       {
 	// PSSM: split layers
 	
-	// @@@ FIXME: arbitrary; make configurable
 	float _near = SMALL_Z;
-	float _far = 100.0f;
+	// @@@ FIXME: arbitrary; make configurable
+	float _far = persist.farZ;
+	
+	int firstPart = 0;
+	numParts = persist.numSplits + 1;
+	if (doFixedCloseShadow)
+	{
+	  numParts++;
+	}
+	splitDists = new float[numParts];
+	if (doFixedCloseShadow)
+	{
+	  firstPart = 1;
+	  splitDists[0] = _near;
+	  _near = persist.fixedCloseShadow;
+	}
       
-	splitDists[0] = _near;
-	for (int i = 0; i <= NUM_PARTS; i++)
+	splitDists[firstPart] = _near;
+	for (int i = firstPart; i <= numParts; i++)
 	{
 	  const float n = _near, f = _far;
-	  const float iFrac = (float)i/(float)NUM_PARTS;
+	  const float iFrac = (float)(i-firstPart)/(float)(numParts-firstPart);
 	  splitDists[i] = (n * pow (f/n, iFrac) + n + (f-n)*iFrac)*0.5f;
 	}
 	// Get visible frustum in to lx/ty,rx/by
@@ -91,6 +107,8 @@ namespace RenderManager
 	  by = 0;
 	}
       }
+      
+      ~ViewSetup() { delete[] splitDists; }
     
       void PostLightSetup (typename RenderTree::ContextNode& context,
         const LayerConfigType& layerConfig)
@@ -124,10 +142,14 @@ namespace RenderManager
 	  // Object bboxes in post-project light space
 	  csArray<csBox3> containedObjectsPP;
 	  
+	  CS::Utility::MeshFilter meshFilter;
+	  
 	  Frustum() : textureSVs (0) {}
 	  ~Frustum() { delete[] textureSVs; }
 	};
-	Frustum frustums[NUM_PARTS];
+	Frustum* frustums;
+	
+	~SuperFrustum() { delete[] frustums; }
       };
       csRefArray<SuperFrustum> lightFrustums;
       
@@ -230,12 +252,19 @@ namespace RenderManager
 	    superFrustum.world2light_rotated.SetO2T (
 	      superFrustum.world2light_rotated.GetO2T()
 	      * frustRotationMatrices[f]);
-	    
-	    for (int i = 0; i < NUM_PARTS; i++)
+	   
+            superFrustum.frustums = new typename SuperFrustum::Frustum[viewSetup.numParts];
+        
+	    for (int i = 0; i < viewSetup.numParts; i++)
 	    {
+	      bool partFixed = viewSetup.doFixedCloseShadow && (i == 0);
+	      
 	      typename SuperFrustum::Frustum& lightFrustum =
 	        superFrustum.frustums[i];
-	    
+	      
+	      if (shadows.persist.limitedShadow)
+	        lightFrustum.meshFilter.SetFilterMode (CS::Utility::MESH_FILTER_INCLUDE);
+	        
 	      // Frustum corner, camera space
 	      csVector3 cornerCam;
 	      // Frustum corner, world space
@@ -279,7 +308,7 @@ namespace RenderManager
 		  superFrustum.world2light_rotated.GetInverse(),
 		  csColor (0, 1, 0));
 	      }
-	      frustumLight *= lightBBox;
+	      if (!partFixed) frustumLight *= lightBBox;
 	      if (shadows.persist.debugFlags
 		  & ShadowPSSM::PersistentData::dbgSplitFrustumLight)
 	      {
@@ -324,7 +353,8 @@ namespace RenderManager
 	      lightFrustum.shadowClipSV = lightVarsHelper.CreateTempSV (
 		viewSetup.persist.shadowClipSVName);
 	      lightFrustum.shadowClipSV->SetValue (csVector2 (
-		viewSetup.splitDists[i], viewSetup.splitDists[i+1]));
+		viewSetup.splitDists[i], 
+		(i+1 == viewSetup.numParts) ? HUGE_VALF : viewSetup.splitDists[i+1]));
 		  
 	      size_t numTex = viewSetup.persist.settings.targets.GetSize();
 	      if (lightFrustum.textureSVs == 0)
@@ -357,33 +387,45 @@ namespace RenderManager
 	for (size_t l = 0; l < lightData.lightFrustums.GetSize(); l++)
 	{
 	  const SuperFrustum& superFrust = *(lightData.lightFrustums[l]);
-	  for (int frustNum = 0; frustNum < NUM_PARTS; frustNum++)
+	  for (int frustNum = 0; frustNum < viewSetup.numParts; frustNum++)
 	  {
 	    const typename SuperFrustum::Frustum& lightFrust = superFrust.frustums[frustNum];
 	    if (lightFrust.containedObjectsPP.GetSize() == 0) continue;
 	    
+            bool partFixed = viewSetup.doFixedCloseShadow && (frustNum == 0);
+	    
 	    /* Fit map to the bounding box of all shadowed objects.
 	      - If the shadowed objects are smaller than the light frustum in some
 		dimension makes sure the shadow map is used optimally. */
-	    csBox3 allObjsBoxPP (lightFrust.containedObjectsPP[0]);
-	    for (size_t i = 1; i < lightFrust.containedObjectsPP.GetSize(); i++)
+	    csBox3 allObjsBoxPP;
+	    float allObjsMaxZ;
+	    if (!partFixed)
 	    {
-	      allObjsBoxPP += lightFrust.containedObjectsPP[i];
+	      allObjsBoxPP = lightFrust.containedObjectsPP[0];
+	      for (size_t i = 1; i < lightFrust.containedObjectsPP.GetSize(); i++)
+	      {
+		allObjsBoxPP += lightFrust.containedObjectsPP[i];
+	      }
+	      allObjsMaxZ = allObjsBoxPP.MaxZ();
+	      allObjsBoxPP *= lightFrust.volumePP;
+	      csBox3 clipToView;
+	      if (light->GetType() == CS_LIGHT_DIRECTIONAL)
+		clipToView = csBox3 (csVector3 (-1, -1, -HUGE_VALF),
+		  csVector3 (1, 1, 0));
+	      else
+		clipToView = csBox3 (csVector3 (-1, -1, 0),
+		  csVector3 (1, 1, HUGE_VALF));
+	      if (allObjsBoxPP.Empty())
+	      {
+		//continue;
+	      }
+	      allObjsBoxPP *= clipToView;
 	    }
-	    float allObjsMaxZ = allObjsBoxPP.MaxZ();
-	    allObjsBoxPP *= lightFrust.volumePP;
-	    csBox3 clipToView;
-	    if (light->GetType() == CS_LIGHT_DIRECTIONAL)
-	      clipToView = csBox3 (csVector3 (-1, -1, -HUGE_VALF),
-	        csVector3 (1, 1, 0));
 	    else
-	      clipToView = csBox3 (csVector3 (-1, -1, 0),
-	        csVector3 (1, 1, HUGE_VALF));
-	    if (allObjsBoxPP.Empty())
 	    {
-	      //continue;
+	      allObjsBoxPP = lightFrust.volumePP;
+	      allObjsMaxZ = allObjsBoxPP.MaxZ();
 	    }
-	    allObjsBoxPP *= clipToView;
 	    
 	    CS::RenderManager::RenderView* rview = context.renderView;
 	  #include "csutil/custom_new_disable.h"
@@ -410,7 +452,7 @@ namespace RenderManager
 	      
 	    /* The minimum Z over all parts is used to avoid clipping shadows of 
 	      casters closer to the light than the split plane.
-	      Ideally, allObjsBoxPP.MinZ() would be mapped to depth -1, and depths\
+	      Ideally, allObjsBoxPP.MinZ() would be mapped to depth -1, and depths
 	      below clamped */
 	    float n = allObjsBoxPP.MinZ();
 	    float maxZ = allObjsMaxZ;
@@ -443,8 +485,24 @@ namespace RenderManager
 	        uncropScaleX, uncropScaleY, uncropShiftX, uncropShiftY));
 	    }
 		
-            // @@@ FIXME: That should be configurable! Prolly per light type.
-	    shadowMapSize = 512;
+            if (partFixed)
+              shadowMapSize = persist.shadowMapResClose;
+            else
+            {
+	      switch (light->GetType())
+	      {
+		default:
+		case CS_LIGHT_DIRECTIONAL:
+		  shadowMapSize = persist.shadowMapResD;
+		  break;
+		case CS_LIGHT_POINTLIGHT:
+		  shadowMapSize = persist.shadowMapResP;
+		  break;
+		case CS_LIGHT_SPOTLIGHT:
+		  shadowMapSize = persist.shadowMapResS;
+		  break;
+	      }
+	    }
 	    lightFrust.shadowMapDimSV->SetValue (csVector4 (1.0f/shadowMapSize,
 	      1.0f/shadowMapSize, shadowMapSize, shadowMapSize));
     
@@ -462,6 +520,7 @@ namespace RenderManager
 	    csRef<iClipper2D> newView;
 	    newView.AttachNew (new csBoxClipper (clipBox));
 	    newRenderView->SetClipper (newView);
+	    newRenderView->GetMeshFilter() = lightFrust.meshFilter;
     
 	    // Create a new context for shadow map w/ computed view
 	    typename RenderTree::ContextNode* shadowMapCtx = 
@@ -623,10 +682,17 @@ private:
       LightingVariablesHelper::PersistentData lightVarsPersist;
       iShaderManager* shaderManager;
 
-      csString shadowType;
+      csString configPrefix;
       ShadowSettings settings;
+      
+      bool limitedShadow;
+      int shadowMapResD, shadowMapResP, shadowMapResS;
+      int shadowMapResClose;
+      int numSplits;
+      float farZ;
+      float fixedCloseShadow;
 
-      PersistentData() : debugFlags (0), shadowType ("Depth")
+      PersistentData() : debugFlags (0), limitedShadow (false)
       {
       }
 
@@ -634,9 +700,9 @@ private:
       {
       }
       
-      void SetShadowType (const char* shadowType)
+      void SetConfigPrefix (const char* configPrefix)
       {
-        this->shadowType = shadowType;
+        this->configPrefix = configPrefix;
       }
       
       void Initialize (iObjectRegistry* objectReg)
@@ -648,7 +714,40 @@ private:
         iShaderVarStringSet* strings = shaderManager->GetSVNameStringset();
 	svNames.SetStrings (strings);
 	
-	settings.ReadSettings (objectReg, shadowType);
+	csConfigAccess cfg (objectReg);
+	if (configPrefix.IsEmpty())
+	{
+	  settings.ReadSettings (objectReg, "Depth");
+	}
+	else
+	{
+	  settings.ReadSettings (objectReg, 
+	    cfg->GetStr (
+	      csString().Format ("%s.ShadowsType", configPrefix.GetData()), "Depth"));
+	  limitedShadow = cfg->GetBool (
+            csString().Format ("%s.LimitedShadow", configPrefix.GetData()), false);
+          numSplits = cfg->GetInt (
+            csString().Format ("%s.NumSplits", configPrefix.GetData()), 2);
+          farZ = cfg->GetFloat (
+            csString().Format ("%s.FarZ", configPrefix.GetData()), 100);
+          int shadowMapRes = cfg->GetInt (
+            csString().Format ("%s.ShadowMapResolution", configPrefix.GetData()), 512);
+          shadowMapResD = cfg->GetInt (
+            csString().Format ("%s.ShadowMapResolution.Directional", configPrefix.GetData()),
+            shadowMapRes);
+          shadowMapResP = cfg->GetInt (
+            csString().Format ("%s.ShadowMapResolution.Point", configPrefix.GetData()),
+            shadowMapRes/2);
+          shadowMapResS = cfg->GetInt (
+            csString().Format ("%s.ShadowMapResolution.Spot", configPrefix.GetData()),
+            shadowMapRes/2);
+          shadowMapResClose = cfg->GetInt (
+            csString().Format ("%s.CloseShadowMapResolution", configPrefix.GetData()),
+            shadowMapRes);
+          fixedCloseShadow = cfg->GetFloat (
+            csString().Format ("%s.FixedCloseShadow", configPrefix.GetData()), 0);
+	}
+	
 	unscaleSVName = strings->Request ("light shadow map unscale");
 	shadowClipSVName = strings->Request ("light shadow clip");
       }
@@ -667,7 +766,8 @@ private:
       ViewSetup& viewSetup) 
       : persist (persist), layerConfig (layerConfig), 
         renderTree (node->owner.owner), meshNode (node),
-        viewSetup (viewSetup) { }
+        viewSetup (viewSetup)
+    { }
         
     uint HandleOneLight (typename RenderTree::MeshNode::SingleMesh& singleMesh,
                          iLight* light, CachedLightData& lightData,
@@ -715,7 +815,7 @@ private:
 	
       uint spreadFlags = 0;
       int s = 0;
-      for (int f = 0; f < NUM_PARTS; f++)
+      for (int f = 0; f < viewSetup.numParts; f++)
       {
 	typename CachedLightData::SuperFrustum::Frustum& lightFrustum =
 	  superFrust.frustums[f];
@@ -726,8 +826,34 @@ private:
 	  continue;
 	}
       
-	lightFrustum.containedObjectsPP.Push (meshBboxLightPP
-	  /** lightFrustum.volumePP*/);
+        if (persist.limitedShadow)
+        {
+	  if (singleMesh.meshFlags.Check (CS_ENTITY_LIMITEDSHADOWCAST))
+	  {
+	    /* Default for focused shadows: only the focused meshes cast shadows;
+	      the mesh filter is inverted */
+	    lightFrustum.meshFilter.AddFilterMesh (singleMesh.meshWrapper);
+	    lightFrustum.containedObjectsPP.Push (meshBboxLightPP
+	      /** lightFrustum.volumePP*/);
+	  }
+        }
+        else
+        {
+	  if (!singleMesh.meshFlags.Check (CS_ENTITY_NOSHADOWCAST))
+	  {
+	    // Mesh casts shadow
+	    lightFrustum.containedObjectsPP.Push (meshBboxLightPP
+	      /** lightFrustum.volumePP*/);
+	  }
+	  else
+	  {
+	    // Mesh does not cast shadow
+	    lightFrustum.meshFilter.AddFilterMesh (singleMesh.meshWrapper);
+	  }
+        }
+	  
+	if (singleMesh.meshFlags.Check (CS_ENTITY_NOSHADOWRECEIVE))
+          continue;
       
 	// Add shadow map SVs
 	lightVarsHelper.MergeAsArrayItem (lightStacks[s],
@@ -764,7 +890,7 @@ private:
 
     csFlags GetLightFlagsMask () const { return csFlags (0); }
     
-    size_t GetLightLayerSpread() const { return NUM_PARTS; }
+    size_t GetLightLayerSpread() const { return viewSetup.numParts; }
   protected:
     PersistentData& persist;
     const LayerConfigType& layerConfig;

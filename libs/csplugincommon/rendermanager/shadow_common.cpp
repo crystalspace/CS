@@ -75,6 +75,8 @@ namespace CS
       }
       else
         svMeshIDName = CS::InvalidShaderVarStringID;
+        
+      this->shadowShaderType = strings->Request (shaderType);
     }
     
     void ShadowSettings::AdvanceFrame (csTicks time)
