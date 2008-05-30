@@ -103,6 +103,14 @@ private:
   csEventID SystemOpen;
   csEventID SystemClose;
 
+#define CS_TOKEN_ITEM_FILE \
+  "plugins/video/render3d/shader/shadermgr/shadermgr.tok"
+#include "cstool/tokenlist.h"
+#undef CS_TOKEN_ITEM_FILE
+  csStringHash xmltokens;
+    
+  void AddDefaultVariables();
+  void LoadDefaultVariables();
 public:
   csShaderManager(iBase* parent);
   virtual ~csShaderManager();

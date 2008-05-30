@@ -29,10 +29,12 @@
 #include "csutil/ref.h"
 #include "csutil/scf.h"
 #include "csutil/vfscache.h"
+#include "csutil/xmltiny.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
 #include "iengine/texture.h"
 #include "igeom/clip2d.h"
+#include "imap/loader.h"
 #include "imap/services.h"
 #include "iutil/comp.h"
 #include "iutil/document.h"
@@ -42,6 +44,7 @@
 #include "iutil/stringarray.h"
 #include "iutil/verbositymanager.h"
 #include "iutil/virtclk.h"
+#include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
@@ -49,6 +52,7 @@
 
 #include "shadermgr.h"
 #include "nullshader.h"
+#include "loadercontext.h"
 
 // Pluginstuff
 CS_IMPLEMENT_PLUGIN
@@ -74,6 +78,8 @@ csShaderManager::csShaderManager(iBase* parent) :
   seqnumber = 0;
   eventSucc[0] = CS_HANDLERLIST_END;
   eventSucc[1] = CS_HANDLERLIST_END;
+  
+  InitTokenTable (xmltokens);
 }
 
 csShaderManager::~csShaderManager()
@@ -217,7 +223,6 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
 
   sv_time.AttachNew (new csShaderVariable (stringsSvName->Request ("standard time")));
   sv_time->SetValue (0.0f);
-  AddVariable (sv_time);
   
   if (config->GetBool ("Video.ShaderManager.EnableShaderCache", false))
     shaderCache.AttachNew (new csVfsCacheManager (objectreg,
@@ -226,8 +231,78 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   return true;
 }
 
+void csShaderManager::AddDefaultVariables()
+{
+  AddVariable (sv_time);
+}
+
+void csShaderManager::LoadDefaultVariables()
+{
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectreg);
+  CS_ASSERT(vfs);
+  csRef<iSyntaxService> synldr = csQueryRegistry<iSyntaxService> (objectreg);
+  CS_ASSERT(synldr);
+  
+  csRef<iLoader> loader = csQueryRegistry<iLoader> (objectreg);
+  CS_ASSERT(loader);
+  csRef<iLoaderContext> ldr_context;
+  ldr_context.AttachNew (new LoaderContext (loader));
+  
+  // @@@ TODO: Should allow for more than one hardcoded defaults file
+  const char* defaultsFile = "/config/shadermgr-defaults.xml";
+  csRef<iDataBuffer> buf = vfs->ReadFile (defaultsFile, false);
+  if (!buf.IsValid())
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING,
+      "Could not open default shadervars file %s",
+      defaultsFile);
+    return;
+  }
+  
+  csRef<iDocumentSystem> docsys = csQueryRegistry<iDocumentSystem> (objectreg);
+  if (!docsys.IsValid())
+    docsys.AttachNew (new csTinyDocumentSystem);
+  csRef<iDocument> doc = docsys->CreateDocument();
+  const char* err = doc->Parse (buf);
+  if (err != 0)
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING,
+      "Error parsing default shadervars file %s: %s",
+      defaultsFile, err);
+    return;
+  }
+  
+  csRef<iDocumentNode> docRoot = doc->GetRoot();
+  csRef<iDocumentNode> docShaderVars = docRoot->GetNode ("shadervars");
+  if (!docShaderVars.IsValid()) return;
+  csRef<iDocumentNodeIterator> nodes = docShaderVars->GetNodes();
+  while (nodes->HasNext ())
+  {
+    csRef<iDocumentNode> child = nodes->Next ();
+    if (child->GetType() != CS_NODE_ELEMENT) continue;
+    
+    csStringID id = xmltokens.Request (child->GetValue());
+    switch (id)
+    {
+      case XMLTOKEN_SHADERVAR:
+        {
+          csRef<csShaderVariable> sv;
+          sv.AttachNew (new csShaderVariable);
+          if (synldr->ParseShaderVar (ldr_context, child, *sv))
+            AddVariable (sv);
+        }
+	break;
+      default:
+	synldr->ReportBadToken (child);
+    }
+  }
+}
+
 void csShaderManager::Open ()
 {
+  Clear();
+  AddDefaultVariables();
+  LoadDefaultVariables();
 }
 
 void csShaderManager::Close ()
