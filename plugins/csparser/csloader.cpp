@@ -2999,6 +2999,12 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
       case XMLTOKEN_NOSHADOWS:
         stemp->GetFlags ().Set (CS_ENTITY_NOSHADOWS, CS_ENTITY_NOSHADOWS);
         break;
+      case XMLTOKEN_NOSHADOWCAST:
+        stemp->GetFlags ().Set (CS_ENTITY_NOSHADOWCAST, CS_ENTITY_NOSHADOWCAST);
+        break;
+      case XMLTOKEN_NOSHADOWRECEIVE:
+        stemp->GetFlags ().Set (CS_ENTITY_NOSHADOWRECEIVE, CS_ENTITY_NOSHADOWRECEIVE);
+        break;
       case XMLTOKEN_NOCLIP:
         stemp->GetFlags ().Set (CS_ENTITY_NOCLIP, CS_ENTITY_NOCLIP);
         break;
@@ -3017,6 +3023,10 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
         break;
       case XMLTOKEN_STATICLIT:
         stemp->GetFlags ().Set (CS_ENTITY_STATICLIT, CS_ENTITY_STATICLIT);
+        break;
+      case XMLTOKEN_LIMITEDSHADOWCAST:
+        stemp->GetFlags ().Set (CS_ENTITY_LIMITEDSHADOWCAST,
+          CS_ENTITY_LIMITEDSHADOWCAST);
         break;
       case XMLTOKEN_IMPOSTER:
         {
@@ -3241,6 +3251,20 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       else
         mesh->GetFlags ().Set (CS_ENTITY_NOSHADOWS, CS_ENTITY_NOSHADOWS);
       break;
+    case XMLTOKEN_NOSHADOWCAST:
+      TEST_MISSING_MESH
+      if (recursive)
+        mesh->SetFlagsRecursive (CS_ENTITY_NOSHADOWCAST, CS_ENTITY_NOSHADOWCAST);
+      else
+        mesh->GetFlags ().Set (CS_ENTITY_NOSHADOWCAST, CS_ENTITY_NOSHADOWCAST);
+      break;
+    case XMLTOKEN_NOSHADOWRECEIVE:
+      TEST_MISSING_MESH
+      if (recursive)
+        mesh->SetFlagsRecursive (CS_ENTITY_NOSHADOWRECEIVE, CS_ENTITY_NOSHADOWRECEIVE);
+      else
+        mesh->GetFlags ().Set (CS_ENTITY_NOSHADOWRECEIVE, CS_ENTITY_NOSHADOWRECEIVE);
+      break;
     case XMLTOKEN_NOCLIP:
       TEST_MISSING_MESH
       if (recursive)
@@ -3278,12 +3302,21 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       else
         mesh->GetFlags ().Set (CS_ENTITY_DETAIL, CS_ENTITY_DETAIL);
       break;
-      case XMLTOKEN_STATICLIT:
+    case XMLTOKEN_STATICLIT:
       TEST_MISSING_MESH
       if (recursive)
         mesh->SetFlagsRecursive (CS_ENTITY_STATICLIT, CS_ENTITY_STATICLIT);
       else
         mesh->GetFlags ().Set (CS_ENTITY_STATICLIT, CS_ENTITY_STATICLIT);
+      break;
+    case XMLTOKEN_LIMITEDSHADOWCAST:
+      TEST_MISSING_MESH
+      if (recursive)
+        mesh->SetFlagsRecursive (CS_ENTITY_LIMITEDSHADOWCAST,
+          CS_ENTITY_LIMITEDSHADOWCAST);
+      else
+        mesh->GetFlags ().Set (CS_ENTITY_LIMITEDSHADOWCAST,
+          CS_ENTITY_LIMITEDSHADOWCAST);
       break;
     case XMLTOKEN_ZFILL:
       TEST_MISSING_MESH

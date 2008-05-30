@@ -98,11 +98,12 @@ class csReversibleTransform;
 #define CS_ENTITY_INVISIBLE (CS_ENTITY_INVISIBLEMESH+CS_ENTITY_NOHITBEAM)
 
 /**
- * If CS_ENTITY_NOSHADOWS is set then this thing will not cast
+ * If CS_ENTITY_NOSHADOWCAST is set then this mesh will not cast
  * shadows. Lighting will still be calculated for it though. Use the
  * CS_ENTITY_NOLIGHTING flag to disable that.
  */
-#define CS_ENTITY_NOSHADOWS 16
+#define CS_ENTITY_NOSHADOWCAST 16
+#define CS_ENTITY_NOSHADOWS   CS_ENTITY_NOSHADOWCAST
 
 /**
  * If CS_ENTITY_NOLIGHTING is set then this thing will not be lit.
@@ -137,6 +138,18 @@ class csReversibleTransform;
  * Indicates that static lighting was computed for this mesh.
  */
 #define CS_ENTITY_STATICLIT 512
+
+/**
+ * If CS_ENTITY_NOSHADOWRECEIVE is set then this mesh will not receive
+ * shadows. 
+ */
+#define CS_ENTITY_NOSHADOWRECEIVE 1024
+
+/**
+ * Mark a mesh as a shadow caster if a render managers allows limiting shadow
+ * casting limited to select meshes.
+ */
+#define CS_ENTITY_LIMITEDSHADOWCAST 2048
 
 /** @} */
 
