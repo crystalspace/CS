@@ -169,7 +169,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       Synthesizer synth (compiler, prePassNodes, passSnippets, nonPassNodes);
     
       csTextProgressMeter pmeter (0);
-      synth.Synthesize (shaderNode, shaderVarNodesHelper, techniqueNodes, &pmeter);
+      synth.Synthesize (shaderNode, shaderVarNodesHelper, techniqueNodes,
+        techSource, &pmeter);
     }
     if (techniques.GetSize() > 1)
     {

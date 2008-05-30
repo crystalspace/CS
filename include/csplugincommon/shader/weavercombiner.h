@@ -138,7 +138,7 @@ namespace CS
       
       struct iCombinerLoader : public virtual iBase
       {
-        SCF_INTERFACE (iCombinerLoader, 0, 0, 2);
+        SCF_INTERFACE (iCombinerLoader, 0, 0, 3);
         
         virtual csPtr<iCombiner> GetCombiner (iDocumentNode* params) = 0;
 
@@ -147,6 +147,10 @@ namespace CS
           int usedComponents, const char* outputName) = 0;
         virtual void GenerateSVInputBlocks (iDocumentNode* node,
           const char* locationPrefix, const char* svName, 
+          const char* outputType, const char* outputName, 
+          const char* uniqueTag) = 0;
+        virtual void GenerateBufferInputBlocks (iDocumentNode* node,
+          const char* locationPrefix, const char* bufName, 
           const char* outputType, const char* outputName, 
           const char* uniqueTag) = 0;
       };

@@ -66,6 +66,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     void Synthesize (iDocumentNode* shaderNode,
       ShaderVarNodesHelper& shaderVarNodesHelper,
       csRefArray<iDocumentNode>& techNodes,
+      iDocumentNode* sourceTechNode, 
       iProgressMeter* progress);
   private:
     class SynthesizeNodeTree;

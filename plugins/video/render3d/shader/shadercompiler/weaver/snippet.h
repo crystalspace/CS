@@ -251,6 +251,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     void HandleCombinerNode (CompoundTechnique& tech, iDocumentNode* node);
     void HandleParameterNode (CompoundTechnique& tech, iDocumentNode* node,
       const FileAliases& aliases);
+    void HandleVaryingNode (CompoundTechnique& tech, iDocumentNode* node,
+      const FileAliases& aliases);
   };
   
   /// Helper to assign a running ID to each snippet

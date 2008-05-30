@@ -86,6 +86,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   void Synthesizer::Synthesize (iDocumentNode* shaderNode,
                                 ShaderVarNodesHelper& shaderVarNodesHelper,
                                 csRefArray<iDocumentNode>& techNodes,
+                                iDocumentNode* sourceTechNode, 
                                 iProgressMeter* progress)
   {
     if (graphs.GetSize() > 0)
@@ -172,11 +173,42 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       }
       for (size_t t = 0; t < synthTechs.GetSize(); t++)
       {
+        csRef<iDocumentNodeIterator> siblings =
+          sourceTechNode->GetParent()->GetNodes();
+        
+        while (siblings->HasNext())
+        {
+          csRef<iDocumentNode> sibling = siblings->Next();
+          csDocumentNodeType siblType = sibling->GetType();
+          if (siblType == CS_NODE_ELEMENT)
+          {
+            if (sibling->Equals (sourceTechNode)) break;
+          }
+          else
+          {
+            csRef<iDocumentNode> siblCopy =
+              shaderNode->CreateNodeBefore (siblType);
+            CS::DocSystem::CloneNode (sibling, siblCopy);
+          }
+        }
+      
 	csRef<iDocumentNode> techniqueNode =
 	  shaderNode->CreateNodeBefore (CS_NODE_ELEMENT);
 	techniqueNode->SetValue ("technique");
 	techNodes.Push (techniqueNode);
 	
+        while (siblings->HasNext())
+        {
+          csRef<iDocumentNode> sibling = siblings->Next();
+          csDocumentNodeType siblType = sibling->GetType();
+          if (siblType != CS_NODE_ELEMENT)
+          {
+            csRef<iDocumentNode> siblCopy =
+              shaderNode->CreateNodeBefore (siblType);
+            CS::DocSystem::CloneNode (sibling, siblCopy);
+          }
+        }
+      
 	bool aPassSucceeded = false;
 	for (size_t p = 0; p < synthTechs[t].GetSize(); p++)
 	{

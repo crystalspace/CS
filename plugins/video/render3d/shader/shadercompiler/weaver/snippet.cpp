@@ -647,6 +647,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
             HandleParameterNode (*newTech, child, aliases);
           }
           break;
+        case WeaverCompiler::XMLTOKEN_VARYING:
+          {
+            HandleVaryingNode (*newTech, child, aliases);
+          }
+          break;
         default:
           if (passForward)
             passForwardedNodes.Push (child);
@@ -915,6 +920,85 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       combinerLoader->GenerateSVInputBlocks (techNode, "c", 
         compiler->svstrings->Request (param.name), weaverType, "output", id);
     }
+
+    {
+      csRef<iDocumentNode> outputNode = 
+        techNode->CreateNodeBefore (CS_NODE_ELEMENT);
+      outputNode->SetValue ("output");
+      outputNode->SetAttribute ("type", weaverType);
+      outputNode->SetAttribute ("name", "output");
+    }
+    
+    HandleSnippetNode (tech, snippetNode, aliases);
+  }
+  
+  void Snippet::HandleVaryingNode (CompoundTechnique& tech, 
+				   iDocumentNode* node,
+                                   const FileAliases& aliases)
+  {
+    if (tech.combiner.classId.IsEmpty())
+    {
+      compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
+	"Need a combiner to use <varying>");
+      return;
+    }
+
+    const char* id = node->GetAttributeValue ("id");
+    if (!id || !*id)
+    {
+	compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
+	  "Varyings must have an 'id' attribute");
+	return;
+    }
+    if (tech.GetSnippet (id) != 0)
+    {
+	compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
+	  "Duplicate snippet id '%s'", id);
+	return;
+    }
+
+    csRef<WeaverCommon::iCombinerLoader> combinerLoader = 
+      csLoadPluginCheck<WeaverCommon::iCombinerLoader> (compiler->objectreg,
+        tech.combiner.classId);
+    if (!combinerLoader.IsValid())
+    {
+      // Don't complain, will happen later anyway
+      return;
+    }
+    
+    const char* source = node->GetAttributeValue ("source");
+    if (!source || !*source)
+    {
+      compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
+	"Varyings must have a 'source' attribute");
+      return;
+    }
+
+    csRef<iDocumentNode> snippetNode = 
+      compiler->CreateAutoNode (CS_NODE_ELEMENT);
+    snippetNode->SetValue ("snippet");
+    snippetNode->SetAttribute ("id", id);
+    csRef<iDocumentNode> techNode = 
+      snippetNode->CreateNodeBefore (CS_NODE_ELEMENT);
+    techNode->SetValue ("technique");
+    {
+      csRef<iDocumentNode> combinerNode = 
+        techNode->CreateNodeBefore (CS_NODE_ELEMENT);
+      combinerNode->SetValue ("combiner");
+      combinerNode->SetAttribute ("name", "c");
+      combinerNode->SetAttribute ("plugin", tech.combiner.classId);
+    }
+    
+    csString weaverType;
+    weaverType = node->GetAttributeValue ("weavertype");
+    if (weaverType.IsEmpty())
+    {
+      compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
+	"Need a 'weavertype' attribute for varyings");
+      return;
+    }
+    combinerLoader->GenerateBufferInputBlocks (techNode, "c", 
+      source, weaverType, "output", id);
 
     {
       csRef<iDocumentNode> outputNode = 

@@ -67,6 +67,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       const char* locationPrefix, const char* svName, 
       const char* outputType, const char* outputName, 
       const char* uniqueTag);
+    void GenerateBufferInputBlocks (iDocumentNode* node,
+      const char* locationPrefix, const char* bufName, 
+      const char* outputType, const char* outputName, 
+      const char* uniqueTag);
     /** @} */
   
     /**\name iComponent implementation
