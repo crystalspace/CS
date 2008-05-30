@@ -47,6 +47,7 @@ csLight::csLight (csEngine* engine,
     scfImplementationType (this), light_id (0),
     userSpecular (false), halo (0), dynamicType (dyntype), 
     cutoffDistance (d), directionalCutoffRadius (d), 
+    userDirectionalCutoffRadius (false),
     lightnr (0), engine (engine)
 {
   //movable.scfParent = (iBase*)(csObject*)this; //@@MS: Look at this?
@@ -396,6 +397,18 @@ void csLight::SetAttenuationConstants (const csVector4& attenv)
 void csLight::SetCutoffDistance (float radius)
 {
   if (radius <= 0) return;
+  
+  size_t i = light_cb_vector.GetSize ();
+  while (i-- > 0)
+  {
+    iLightCallback* cb = light_cb_vector[i];
+    cb->OnRadiusChange (this, radius);
+  }
+  lightnr++;
+
+  cutoffDistance = radius;
+  if (!userDirectionalCutoffRadius)
+    directionalCutoffRadius = radius;
 
   // Update the AABB
   {
@@ -412,15 +425,6 @@ void csLight::SetCutoffDistance (float radius)
       }      
     }
   }
-
-  size_t i = light_cb_vector.GetSize ();
-  while (i-- > 0)
-  {
-    iLightCallback* cb = light_cb_vector[i];
-    cb->OnRadiusChange (this, radius);
-  }
-  lightnr++;
-  cutoffDistance = radius;
 
   CalculateAttenuationVector();
 }

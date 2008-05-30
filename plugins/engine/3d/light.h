@@ -139,6 +139,8 @@ protected:
 
   /// Radial cutoff radius for directional lights
   float directionalCutoffRadius;
+  // Analogue to userSpecular
+  bool userDirectionalCutoffRadius;
 
   /// Falloff coefficients for spotlight.
   float spotlightFalloffInner, spotlightFalloffOuter;
@@ -376,6 +378,7 @@ public:
   void SetDirectionalCutoffRadius (float radius)
   {
     directionalCutoffRadius = radius;
+    userDirectionalCutoffRadius = true;
     lightnr++;
   }
 
