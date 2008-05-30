@@ -73,6 +73,7 @@ namespace RenderManager
 #endif
 
           typename RenderTreeType::MeshNode::SingleMesh sm;
+          sm.meshWrapper = imesh;
           sm.meshObjSVs = imesh->GetSVContext();
           sm.zmode = zmode;
           sm.bbox = imesh->GetWorldBoundingBox(); // @@@ Use RM bbox

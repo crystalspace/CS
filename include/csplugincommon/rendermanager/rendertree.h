@@ -106,6 +106,7 @@ namespace RenderManager
       struct SingleMesh : 
         public CS::Meta::EBOptHelper<typename TreeTraitsType::MeshExtraDataType>
       {
+        iMeshWrapper* meshWrapper;
         csRenderMesh* renderMesh;
         csZBufMode zmode;
         iShaderVariableContext* meshObjSVs;
