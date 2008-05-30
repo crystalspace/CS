@@ -1701,15 +1701,21 @@ csRef<iDocumentNodeIterator> csWrappedDocumentNode::GetNodes (
 
 csRef<iDocumentNode> csWrappedDocumentNode::GetNode (const char* value)
 {
-  WrapperWalker walker (wrappedChildren, resolver);
-  while (walker.HasNext ())
+  if (wrappedChildren.GetSize() > 0)
   {
-    iDocumentNode* node = walker.Next ();
-    if (strcmp (node->GetValue (), value) == 0)
-      return node;
+    WrapperWalker walker (wrappedChildren, resolver);
+    while (walker.HasNext ())
+    {
+      iDocumentNode* node = walker.Next ();
+      if (strcmp (node->GetValue (), value) == 0)
+	return node;
+    }
+    return 0;
   }
-
-  return 0;
+  else if (wrappedNode.IsValid())
+    return wrappedNode->GetNode (value);
+  else
+    return 0;
 }
 
 const char* csWrappedDocumentNode::GetContentsValue ()
