@@ -1721,6 +1721,7 @@ bool csConditionEvaluator::ReadCondOperand (iFile* cacheFile,
 	    return false;
 	  size_t numInd = csLittleEndian::UInt32 (numIndLE);
 	  operand.svLocation.indices = AllocSVIndices (numInd);
+	  *operand.svLocation.indices = numInd;
 	  for (size_t i = 0; i < numInd; i++)
 	  {
 	    size_t& ind = operand.svLocation.indices[i+1];
