@@ -127,6 +127,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
         csRef<iView> sideView;
         sideView.AttachNew (new csView (engine, engine->G3D));
         iCamera* cam = sideView->GetCamera();
+        cam->SetViewportSize (textureSize, textureSize);
         cam->SetSector (meshSector);
         cam->GetTransform().SetOrigin (meshPos);
         cam->SetFOVAngle (90, textureSize);
