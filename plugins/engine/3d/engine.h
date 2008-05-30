@@ -23,6 +23,7 @@
 #include "csgeom/math3d.h"
 #include "csplugincommon/rendermanager/renderview.h"
 #include "csutil/array.h"
+#include "csutil/cfgacc.h"
 #include "csutil/csobject.h"
 #include "csutil/hash.h"
 #include "csutil/set.h"
@@ -840,6 +841,9 @@ private:
   iMeshObjectType* GetThingType ();
 
   iRenderManager* GetRenderManager () { return renderManager; }
+  void SetRenderManager (iRenderManager*);
+  void ReloadRenderManager (csConfigAccess& cfg);
+  void ReloadRenderManager ();
 public:
   // -- PUBLIC MEMBERS. THESE ARE FOR CONVENIANCE WITHIN ENGINE PLUGIN
 

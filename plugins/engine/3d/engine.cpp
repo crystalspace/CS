@@ -756,6 +756,42 @@ iMeshObjectType* csEngine::GetThingType ()
 
   return (iMeshObjectType*)thingMeshType;
 }
+  
+void csEngine::SetRenderManager (iRenderManager* newRM)
+{
+  if (newRM == 0) return;
+
+  if (renderManager.IsValid())
+    objectRegistry->Unregister (renderManager, "iRenderManager");
+  renderManager = newRM;
+  
+  objectRegistry->Register (renderManager, "iRenderManager");
+}
+
+void csEngine::ReloadRenderManager (csConfigAccess& cfg)
+{
+  const char fallbackRM[] = "crystalspace.rendermanager.rlcompat";
+  const char* defaultRM = cfg->GetStr ("Engine.RenderManager.Default", 0);
+  if (defaultRM == 0)
+  {
+    Warn ("No default render manager given, using '%s'", fallbackRM);
+    defaultRM = fallbackRM;
+  }
+  csRef<iRenderManager> newRM = csLoadPlugin<iRenderManager> (objectRegistry,
+    defaultRM);
+  if (!newRM)
+    Error ("No rendermanager set!");
+  else
+  {
+    csEngine::SetRenderManager (newRM);
+  }
+}
+
+void csEngine::ReloadRenderManager ()
+{
+  csConfigAccess cfg (objectRegistry, "/config/engine.cfg");
+  ReloadRenderManager (cfg);
+}
 
 csShaderVariable* csEngine::GetLightAttenuationTextureSV()
 {
@@ -899,17 +935,7 @@ void csEngine::DeleteAll ()
     renderLoopManager->Register (CS_DEFAULT_RENDERLOOP_NAME, 
       defaultRenderLoop);
 
-    const char fallbackRM[] = "crystalspace.rendermanager.rlcompat";
-    const char* defaultRM = cfg->GetStr ("Engine.RenderManager.Default", 0);
-    if (defaultRM == 0)
-    {
-      Warn ("No default render manager given, using '%s'", fallbackRM);
-      defaultRM = fallbackRM;
-    }
-    renderManager = csQueryRegistryOrLoad<iRenderManager> (objectRegistry,
-      defaultRM);
-    if (!renderManager)
-      Error ("No rendermanager set!");
+    csEngine::ReloadRenderManager();
   }
 }
 

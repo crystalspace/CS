@@ -1417,7 +1417,11 @@ struct iEngine : public virtual iBase
   
   /** @} */
   
+  /**\name Render manager
+   * @{ */
+  /// Get the default render manager
   virtual iRenderManager* GetRenderManager () = 0;
+  /** @} */
 
   /// Fire all frame callbacks
   virtual void FireStartFrame (iRenderView* rview) = 0;
@@ -1437,6 +1441,21 @@ struct iEngine : public virtual iBase
    */
   virtual csPtr<iCustomMatrixCamera> CreateCustomMatrixCamera (
     iCamera* copyFrom = 0) = 0;
+  /** @} */
+
+  /**\name Render manager
+   * @{ */
+  /**
+   * Set the default render manager.
+   * \remarks Also replaces the iRenderManager in the object registry.
+   */
+  virtual void SetRenderManager (iRenderManager*) = 0;
+  
+  /**
+   * Reload the default render manager given the current configuration
+   * settings.
+   */
+  virtual void ReloadRenderManager() = 0;
   /** @} */
 };
 
