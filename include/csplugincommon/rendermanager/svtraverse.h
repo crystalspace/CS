@@ -64,9 +64,10 @@ namespace RenderManager
           {
             names.Clear();
             shader->GetUsedShaderVars (ticket, names);
+            lastShader = shader;
           }
 
-          csShaderVariableStack varStack;        
+          csShaderVariableStack varStack;
           context.svArrays.SetupSVStack (varStack, layer, mesh.contextLocalId);
 
           size_t lastName = csMin (names.GetSize(), varStack.GetSize());
