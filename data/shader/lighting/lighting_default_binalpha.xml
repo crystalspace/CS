@@ -91,6 +91,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
+      <alias name="ambient" file="/shader/snippets/lighting/ambient-null.xml" />
       <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
       
       <parameter id="lightOffset" type="int">4</parameter>
@@ -135,6 +136,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
+      <alias name="ambient" file="/shader/snippets/lighting/ambient-null.xml" />
       <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
       
       <parameter id="lightOffset" type="int">3</parameter>
@@ -179,6 +181,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
+      <alias name="ambient" file="/shader/snippets/lighting/ambient-null.xml" />
       <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
       
       <parameter id="lightOffset" type="int">2</parameter>
@@ -195,6 +198,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
+      <alias name="ambient" file="/shader/snippets/lighting/ambient-null.xml" />
       <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
       
       <parameter id="lightOffset" type="int">4</parameter>
@@ -239,6 +243,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
+      <alias name="ambient" file="/shader/snippets/lighting/ambient-null.xml" />
       <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
       
       <parameter id="lightOffset" type="int">1</parameter>
@@ -255,6 +260,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
+      <alias name="ambient" file="/shader/snippets/lighting/ambient-null.xml" />
       <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
       
       <parameter id="lightOffset" type="int">2</parameter>
@@ -271,6 +277,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
+      <alias name="ambient" file="/shader/snippets/lighting/ambient-null.xml" />
       <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
       
       <parameter id="lightOffset" type="int">3</parameter>
@@ -287,6 +294,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
+      <alias name="ambient" file="/shader/snippets/lighting/ambient-null.xml" />
       <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
       
       <parameter id="lightOffset" type="int">4</parameter>
@@ -303,6 +311,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
+      <alias name="ambient" file="/shader/snippets/lighting/ambient-null.xml" />
       <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
       
       <parameter id="lightOffset" type="int">5</parameter>

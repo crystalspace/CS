@@ -18,6 +18,7 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
 <shader compiler="shaderweaver" name="lighting_default_shadowmap" lights="6">
+  <alias name="ambient" file="/shader/snippets/lighting/ambient-static.xml" />
   <alias name="apply_alpha" file="/shader/snippets/surface/alpha-premult.xml" />
   <alias name="lighting" file="/shader/snippets/lighting/lighting-ppl-shadowmap.xml" />
   <alias name="shadow" file="/shader/snippets/shadow/shadow-depth.xml" />
@@ -92,6 +93,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
+      <alias name="ambient" file="/shader/snippets/lighting/ambient-null.xml" />
       <snippet id="shared" file="/shader/snippets/lighting/lighting_default_shadowmap-shared.xml" />
       
       <parameter id="lightOffset" type="int">4</parameter>
@@ -135,6 +137,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
+      <alias name="ambient" file="/shader/snippets/lighting/ambient-null.xml" />
       <snippet id="shared" file="/shader/snippets/lighting/lighting_default_shadowmap-shared.xml" />
       
       <parameter id="lightOffset" type="int">3</parameter>
@@ -178,6 +181,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
+      <alias name="ambient" file="/shader/snippets/lighting/ambient-null.xml" />
       <snippet id="shared" file="/shader/snippets/lighting/lighting_default_shadowmap-shared.xml" />
       
       <parameter id="lightOffset" type="int">2</parameter>
@@ -193,6 +197,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
+      <alias name="ambient" file="/shader/snippets/lighting/ambient-null.xml" />
       <snippet id="shared" file="/shader/snippets/lighting/lighting_default_shadowmap-shared.xml" />
       
       <parameter id="lightOffset" type="int">4</parameter>
@@ -236,6 +241,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
+      <alias name="ambient" file="/shader/snippets/lighting/ambient-null.xml" />
       <snippet id="shared" file="/shader/snippets/lighting/lighting_default_shadowmap-shared.xml" />
       
       <parameter id="lightOffset" type="int">1</parameter>
@@ -251,6 +257,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
+      <alias name="ambient" file="/shader/snippets/lighting/ambient-null.xml" />
       <snippet id="shared" file="/shader/snippets/lighting/lighting_default_shadowmap-shared.xml" />
       
       <parameter id="lightOffset" type="int">2</parameter>
@@ -266,6 +273,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
+      <alias name="ambient" file="/shader/snippets/lighting/ambient-null.xml" />
       <snippet id="shared" file="/shader/snippets/lighting/lighting_default_shadowmap-shared.xml" />
       
       <parameter id="lightOffset" type="int">3</parameter>
@@ -281,6 +289,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
+      <alias name="ambient" file="/shader/snippets/lighting/ambient-null.xml" />
       <snippet id="shared" file="/shader/snippets/lighting/lighting_default_shadowmap-shared.xml" />
       
       <parameter id="lightOffset" type="int">4</parameter>
@@ -296,6 +305,7 @@
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
+      <alias name="ambient" file="/shader/snippets/lighting/ambient-null.xml" />
       <snippet id="shared" file="/shader/snippets/lighting/lighting_default_shadowmap-shared.xml" />
       
       <parameter id="lightOffset" type="int">5</parameter>

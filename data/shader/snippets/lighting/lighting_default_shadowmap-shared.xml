@@ -30,7 +30,7 @@
     <snippet id="apply_alpha" filealias="apply_alpha" />
     <snippet id="shadow" filealias="shadow" />
     <snippet id="lighting" filealias="lighting" />
-    <snippet id="ambient" file="/shader/snippets/lighting/ambient-static.xml" />
+    <snippet id="ambient" filealias="ambient" />
     <snippet id="specular" file="/shader/snippets/surface/specular-weirdold.xml" />
     <snippet id="apply_lighting" file="/shader/snippets/lighting/apply-lighting.xml" />
     <snippet id="glow" file="/shader/lighting/glow.xml" />
