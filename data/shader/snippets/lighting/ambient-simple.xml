@@ -70,8 +70,8 @@
 	<output name="ambient" type="rgb">
 	  <attribute name="perfragment" type="bool" />
 	</output>
-      </snippet>
-      <connection from="ambientOcclusion" to="ambient_simple" />
-    </technique>
+      </technique>
+    </snippet>
+    <connection from="ambientOcclusion" to="ambient_simple" />
   </technique>
 </snippet>
