@@ -2489,359 +2489,362 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_ElementHandlerType swig_types[11]
 #define SWIGTYPE_p_FileFormatDescription swig_types[12]
 #define SWIGTYPE_p_HashType swig_types[13]
-#define SWIGTYPE_p_ThisType swig_types[14]
-#define SWIGTYPE_p_ValueType swig_types[15]
-#define SWIGTYPE_p__1_basetype swig_types[16]
-#define SWIGTYPE_p__csKeyCharType swig_types[17]
-#define SWIGTYPE_p__csKeyEventType swig_types[18]
-#define SWIGTYPE_p__csKeyModifierNumType swig_types[19]
-#define SWIGTYPE_p__csKeyModifierType swig_types[20]
-#define SWIGTYPE_p__csKeyModifiers swig_types[21]
-#define SWIGTYPE_p__csMouseCursorID swig_types[22]
-#define SWIGTYPE_p__csMouseEventType swig_types[23]
-#define SWIGTYPE_p_bool swig_types[24]
-#define SWIGTYPE_p_char swig_types[25]
-#define SWIGTYPE_p_csAnimatedMeshBoneInfluence swig_types[26]
-#define SWIGTYPE_p_csArrayCapacityDefault swig_types[27]
-#define SWIGTYPE_p_csArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[28]
-#define SWIGTYPE_p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[29]
-#define SWIGTYPE_p_csArrayTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[30]
-#define SWIGTYPE_p_csArrayTcsArrayTunsigned_int_csArrayElementHandlerTunsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTunsigned_int_csArrayElementHandlerTunsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[31]
-#define SWIGTYPE_p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[32]
-#define SWIGTYPE_p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[33]
-#define SWIGTYPE_p_csArrayTcsShaderVariable_p_csArrayElementHandlerTcsShaderVariable_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[34]
-#define SWIGTYPE_p_csArrayTcsVector2_csArrayElementHandlerTcsVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[35]
-#define SWIGTYPE_p_csArrayTcsVector3_csArrayElementHandlerTcsVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[36]
-#define SWIGTYPE_p_csArrayTcsVector4_csArrayElementHandlerTcsVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[37]
-#define SWIGTYPE_p_csArrayTiImage_p_csArrayElementHandlerTiImage_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[38]
-#define SWIGTYPE_p_csArrayTiMaterialWrapper_p_csArrayElementHandlerTiMaterialWrapper_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[39]
-#define SWIGTYPE_p_csArrayTiRenderBuffer_p_csArrayElementHandlerTiRenderBuffer_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[40]
-#define SWIGTYPE_p_csArrayTiTerrainCell_p_csArrayElementHandlerTiTerrainCell_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[41]
-#define SWIGTYPE_p_csArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[42]
-#define SWIGTYPE_p_csArrayTunsigned_int_csArrayElementHandlerTunsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[43]
-#define SWIGTYPE_p_csBox2 swig_types[44]
-#define SWIGTYPE_p_csBox3 swig_types[45]
-#define SWIGTYPE_p_csColor swig_types[46]
-#define SWIGTYPE_p_csColor4 swig_types[47]
-#define SWIGTYPE_p_csConfigFile swig_types[48]
-#define SWIGTYPE_p_csDirtyAccessArrayTcsVector2_csArrayElementHandlerTcsVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[49]
-#define SWIGTYPE_p_csDirtyAccessArrayTcsVector3_csArrayElementHandlerTcsVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[50]
-#define SWIGTYPE_p_csDirtyAccessArrayTcsVector4_csArrayElementHandlerTcsVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[51]
-#define SWIGTYPE_p_csDirtyAccessArrayTunsigned_int_csArrayElementHandlerTunsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[52]
-#define SWIGTYPE_p_csEllipsoid swig_types[53]
-#define SWIGTYPE_p_csFlags swig_types[54]
-#define SWIGTYPE_p_csImageBase swig_types[55]
-#define SWIGTYPE_p_csImageMemory swig_types[56]
-#define SWIGTYPE_p_csLockedHeightData swig_types[57]
-#define SWIGTYPE_p_csLockedMaterialMap swig_types[58]
-#define SWIGTYPE_p_csMatrix3 swig_types[59]
-#define SWIGTYPE_p_csOBB swig_types[60]
-#define SWIGTYPE_p_csObject swig_types[61]
-#define SWIGTYPE_p_csOrthoTransform swig_types[62]
-#define SWIGTYPE_p_csParticle swig_types[63]
-#define SWIGTYPE_p_csParticleAux swig_types[64]
-#define SWIGTYPE_p_csParticleBuffer swig_types[65]
-#define SWIGTYPE_p_csPath swig_types[66]
-#define SWIGTYPE_p_csPlane3 swig_types[67]
-#define SWIGTYPE_p_csPolygonRange swig_types[68]
-#define SWIGTYPE_p_csPtrTcsSkeletalState2_t swig_types[69]
-#define SWIGTYPE_p_csPtrTiGenMeshAnimationControlFactory_t swig_types[70]
-#define SWIGTYPE_p_csPtrTiGenMeshAnimationControl_t swig_types[71]
-#define SWIGTYPE_p_csPtrTiParticleBuiltinEffectorVelocityField_t swig_types[72]
-#define SWIGTYPE_p_csPtrTiPolygonHandle_t swig_types[73]
-#define SWIGTYPE_p_csQuaternion swig_types[74]
-#define SWIGTYPE_p_csRandomGen swig_types[75]
-#define SWIGTYPE_p_csRect swig_types[76]
-#define SWIGTYPE_p_csRefArrayTiMaterialWrapper_t swig_types[77]
-#define SWIGTYPE_p_csRefArrayTiObject_t swig_types[78]
-#define SWIGTYPE_p_csRefCount swig_types[79]
-#define SWIGTYPE_p_csRefTiImage_t swig_types[80]
-#define SWIGTYPE_p_csReversibleTransform swig_types[81]
-#define SWIGTYPE_p_csShaderVariable swig_types[82]
-#define SWIGTYPE_p_csSkeletalState2 swig_types[83]
-#define SWIGTYPE_p_csSprite2DVertex swig_types[84]
-#define SWIGTYPE_p_csSpriteCal3DActiveAnim swig_types[85]
-#define SWIGTYPE_p_csTerrainColliderCollideSegmentResult swig_types[86]
-#define SWIGTYPE_p_csTransform swig_types[87]
-#define SWIGTYPE_p_csTriangle swig_types[88]
-#define SWIGTYPE_p_csTriangleMesh swig_types[89]
-#define SWIGTYPE_p_csTriangleMeshBox swig_types[90]
-#define SWIGTYPE_p_csTriangleMeshEdge swig_types[91]
-#define SWIGTYPE_p_csTriangleMeshPointer swig_types[92]
-#define SWIGTYPE_p_csTriangleMinMax swig_types[93]
-#define SWIGTYPE_p_csVector2 swig_types[94]
-#define SWIGTYPE_p_csVector3 swig_types[95]
-#define SWIGTYPE_p_csXRotMatrix3 swig_types[96]
-#define SWIGTYPE_p_csXScaleMatrix3 swig_types[97]
-#define SWIGTYPE_p_csYRotMatrix3 swig_types[98]
-#define SWIGTYPE_p_csYScaleMatrix3 swig_types[99]
-#define SWIGTYPE_p_csZRotMatrix3 swig_types[100]
-#define SWIGTYPE_p_csZScaleMatrix3 swig_types[101]
-#define SWIGTYPE_p_float swig_types[102]
-#define SWIGTYPE_p_iAnimTimeUpdateHandler swig_types[103]
-#define SWIGTYPE_p_iAnimatedImage swig_types[104]
-#define SWIGTYPE_p_iAnimatedMesh swig_types[105]
-#define SWIGTYPE_p_iAnimatedMeshFactory swig_types[106]
-#define SWIGTYPE_p_iAnimatedMeshFactorySubMesh swig_types[107]
-#define SWIGTYPE_p_iAnimatedMeshMorphTarget swig_types[108]
-#define SWIGTYPE_p_iAnimatedMeshSubMesh swig_types[109]
-#define SWIGTYPE_p_iArrayChangeAllTcsCollisionPair_t swig_types[110]
-#define SWIGTYPE_p_iArrayChangeAllTcsShaderVariable_p_t swig_types[111]
-#define SWIGTYPE_p_iArrayChangeAllTcsSprite2DVertex_t swig_types[112]
-#define SWIGTYPE_p_iArrayChangeAllTcsVector3_t swig_types[113]
-#define SWIGTYPE_p_iArrayChangeElementsTcsCollisionPair_t swig_types[114]
-#define SWIGTYPE_p_iArrayChangeElementsTcsShaderVariable_p_t swig_types[115]
-#define SWIGTYPE_p_iArrayChangeElementsTcsSprite2DVertex_t swig_types[116]
-#define SWIGTYPE_p_iArrayChangeElementsTcsVector3_t swig_types[117]
-#define SWIGTYPE_p_iArrayReadOnlyTcsCollisionPair_t swig_types[118]
-#define SWIGTYPE_p_iArrayReadOnlyTcsShaderVariable_p_t swig_types[119]
-#define SWIGTYPE_p_iArrayReadOnlyTcsSprite2DVertex_t swig_types[120]
-#define SWIGTYPE_p_iArrayReadOnlyTcsVector3_t swig_types[121]
-#define SWIGTYPE_p_iBase swig_types[122]
-#define SWIGTYPE_p_iBodyGroup swig_types[123]
-#define SWIGTYPE_p_iBugPlug swig_types[124]
-#define SWIGTYPE_p_iBugPlugRenderObject swig_types[125]
-#define SWIGTYPE_p_iCacheManager swig_types[126]
-#define SWIGTYPE_p_iClipper2D swig_types[127]
-#define SWIGTYPE_p_iCollideSystem swig_types[128]
-#define SWIGTYPE_p_iCollider swig_types[129]
-#define SWIGTYPE_p_iColoredVertices swig_types[130]
-#define SWIGTYPE_p_iCommandLineParser swig_types[131]
-#define SWIGTYPE_p_iComponent swig_types[132]
-#define SWIGTYPE_p_iConfigFile swig_types[133]
-#define SWIGTYPE_p_iConfigIterator swig_types[134]
-#define SWIGTYPE_p_iConfigManager swig_types[135]
-#define SWIGTYPE_p_iConsoleOutput swig_types[136]
-#define SWIGTYPE_p_iConsoleWatcher swig_types[137]
-#define SWIGTYPE_p_iDataBuffer swig_types[138]
-#define SWIGTYPE_p_iDebugHelper swig_types[139]
-#define SWIGTYPE_p_iDecalBuilder swig_types[140]
-#define SWIGTYPE_p_iDecalManager swig_types[141]
-#define SWIGTYPE_p_iDecalTemplate swig_types[142]
-#define SWIGTYPE_p_iDocument swig_types[143]
-#define SWIGTYPE_p_iDocumentAttribute swig_types[144]
-#define SWIGTYPE_p_iDocumentAttributeIterator swig_types[145]
-#define SWIGTYPE_p_iDocumentNode swig_types[146]
-#define SWIGTYPE_p_iDocumentNodeIterator swig_types[147]
-#define SWIGTYPE_p_iDocumentSystem swig_types[148]
-#define SWIGTYPE_p_iDynamicSystem swig_types[149]
-#define SWIGTYPE_p_iDynamics swig_types[150]
-#define SWIGTYPE_p_iDynamicsColliderCollisionCallback swig_types[151]
-#define SWIGTYPE_p_iDynamicsCollisionCallback swig_types[152]
-#define SWIGTYPE_p_iDynamicsMoveCallback swig_types[153]
-#define SWIGTYPE_p_iDynamicsStepCallback swig_types[154]
-#define SWIGTYPE_p_iDynamicsSystemCollider swig_types[155]
-#define SWIGTYPE_p_iEngineSequenceManager swig_types[156]
-#define SWIGTYPE_p_iEngineSequenceParameters swig_types[157]
-#define SWIGTYPE_p_iEvent swig_types[158]
-#define SWIGTYPE_p_iEventAttributeIterator swig_types[159]
-#define SWIGTYPE_p_iEventCord swig_types[160]
-#define SWIGTYPE_p_iEventHandler swig_types[161]
-#define SWIGTYPE_p_iEventNameRegistry swig_types[162]
-#define SWIGTYPE_p_iEventOutlet swig_types[163]
-#define SWIGTYPE_p_iEventPlug swig_types[164]
-#define SWIGTYPE_p_iEventQueue swig_types[165]
-#define SWIGTYPE_p_iFactory swig_types[166]
-#define SWIGTYPE_p_iFile swig_types[167]
-#define SWIGTYPE_p_iFont swig_types[168]
-#define SWIGTYPE_p_iFontDeleteNotify swig_types[169]
-#define SWIGTYPE_p_iFontServer swig_types[170]
-#define SWIGTYPE_p_iGenMeshAnimationControl swig_types[171]
-#define SWIGTYPE_p_iGenMeshAnimationControl1_4 swig_types[172]
-#define SWIGTYPE_p_iGenMeshAnimationControlFactory swig_types[173]
-#define SWIGTYPE_p_iGenMeshAnimationControlType swig_types[174]
-#define SWIGTYPE_p_iGenMeshSkeletonControlState swig_types[175]
-#define SWIGTYPE_p_iGeneralFactoryState swig_types[176]
-#define SWIGTYPE_p_iGeneralMeshCommonState swig_types[177]
-#define SWIGTYPE_p_iGeneralMeshState swig_types[178]
-#define SWIGTYPE_p_iGeneralMeshSubMesh swig_types[179]
-#define SWIGTYPE_p_iGraphics2D swig_types[180]
-#define SWIGTYPE_p_iGraphics3D swig_types[181]
-#define SWIGTYPE_p_iHalo swig_types[182]
-#define SWIGTYPE_p_iImage swig_types[183]
-#define SWIGTYPE_p_iImageIO swig_types[184]
-#define SWIGTYPE_p_iJoint swig_types[185]
-#define SWIGTYPE_p_iJoystickDriver swig_types[186]
-#define SWIGTYPE_p_iKeyComposer swig_types[187]
-#define SWIGTYPE_p_iKeyboardDriver swig_types[188]
-#define SWIGTYPE_p_iMapNode swig_types[189]
-#define SWIGTYPE_p_iMaterial swig_types[190]
-#define SWIGTYPE_p_iMaterialWrapper swig_types[191]
-#define SWIGTYPE_p_iMeshFactoryWrapper swig_types[192]
-#define SWIGTYPE_p_iMeshObject swig_types[193]
-#define SWIGTYPE_p_iMeshObjectDrawCallback swig_types[194]
-#define SWIGTYPE_p_iMeshObjectFactory swig_types[195]
-#define SWIGTYPE_p_iMeshObjectType swig_types[196]
-#define SWIGTYPE_p_iMeshWrapper swig_types[197]
-#define SWIGTYPE_p_iMouseDriver swig_types[198]
-#define SWIGTYPE_p_iMovable swig_types[199]
-#define SWIGTYPE_p_iMovieRecorder swig_types[200]
-#define SWIGTYPE_p_iNativeWindow swig_types[201]
-#define SWIGTYPE_p_iNativeWindowManager swig_types[202]
-#define SWIGTYPE_p_iODEAMotorJoint swig_types[203]
-#define SWIGTYPE_p_iODEBallJoint swig_types[204]
-#define SWIGTYPE_p_iODEDynamicState swig_types[205]
-#define SWIGTYPE_p_iODEDynamicSystemState swig_types[206]
-#define SWIGTYPE_p_iODEFrameUpdateCallback swig_types[207]
-#define SWIGTYPE_p_iODEGeneralJointState swig_types[208]
-#define SWIGTYPE_p_iODEHinge2Joint swig_types[209]
-#define SWIGTYPE_p_iODEHingeJoint swig_types[210]
-#define SWIGTYPE_p_iODEJointState swig_types[211]
-#define SWIGTYPE_p_iODESliderJoint swig_types[212]
-#define SWIGTYPE_p_iODEUniversalJoint swig_types[213]
-#define SWIGTYPE_p_iObject swig_types[214]
-#define SWIGTYPE_p_iObjectIterator swig_types[215]
-#define SWIGTYPE_p_iObjectModel swig_types[216]
-#define SWIGTYPE_p_iObjectModelListener swig_types[217]
-#define SWIGTYPE_p_iObjectNameChangeListener swig_types[218]
-#define SWIGTYPE_p_iObjectRegistry swig_types[219]
-#define SWIGTYPE_p_iObjectRegistryIterator swig_types[220]
-#define SWIGTYPE_p_iOffscreenCanvasCallback swig_types[221]
-#define SWIGTYPE_p_iParameterESM swig_types[222]
-#define SWIGTYPE_p_iParticleBuiltinEffectorFactory swig_types[223]
-#define SWIGTYPE_p_iParticleBuiltinEffectorForce swig_types[224]
-#define SWIGTYPE_p_iParticleBuiltinEffectorLinColor swig_types[225]
-#define SWIGTYPE_p_iParticleBuiltinEffectorVelocityField swig_types[226]
-#define SWIGTYPE_p_iParticleBuiltinEmitterBase swig_types[227]
-#define SWIGTYPE_p_iParticleBuiltinEmitterBox swig_types[228]
-#define SWIGTYPE_p_iParticleBuiltinEmitterCone swig_types[229]
-#define SWIGTYPE_p_iParticleBuiltinEmitterCylinder swig_types[230]
-#define SWIGTYPE_p_iParticleBuiltinEmitterFactory swig_types[231]
-#define SWIGTYPE_p_iParticleBuiltinEmitterSphere swig_types[232]
-#define SWIGTYPE_p_iParticleEffector swig_types[233]
-#define SWIGTYPE_p_iParticleEmitter swig_types[234]
-#define SWIGTYPE_p_iParticleSystem swig_types[235]
-#define SWIGTYPE_p_iParticleSystemBase swig_types[236]
-#define SWIGTYPE_p_iParticleSystemFactory swig_types[237]
-#define SWIGTYPE_p_iPath swig_types[238]
-#define SWIGTYPE_p_iPluginIterator swig_types[239]
-#define SWIGTYPE_p_iPluginManager swig_types[240]
-#define SWIGTYPE_p_iPolygonHandle swig_types[241]
-#define SWIGTYPE_p_iProcTexture swig_types[242]
-#define SWIGTYPE_p_iRenderBuffer swig_types[243]
-#define SWIGTYPE_p_iRenderView swig_types[244]
-#define SWIGTYPE_p_iRendererLightmap swig_types[245]
-#define SWIGTYPE_p_iReporter swig_types[246]
-#define SWIGTYPE_p_iReporterIterator swig_types[247]
-#define SWIGTYPE_p_iReporterListener swig_types[248]
-#define SWIGTYPE_p_iRigidBody swig_types[249]
-#define SWIGTYPE_p_iSCF swig_types[250]
-#define SWIGTYPE_p_iSceneNode swig_types[251]
-#define SWIGTYPE_p_iScript swig_types[252]
-#define SWIGTYPE_p_iScriptObject swig_types[253]
-#define SWIGTYPE_p_iScriptValue swig_types[254]
-#define SWIGTYPE_p_iSequence swig_types[255]
-#define SWIGTYPE_p_iSequenceCondition swig_types[256]
-#define SWIGTYPE_p_iSequenceManager swig_types[257]
-#define SWIGTYPE_p_iSequenceOperation swig_types[258]
-#define SWIGTYPE_p_iSequenceTimedOperation swig_types[259]
-#define SWIGTYPE_p_iSequenceTrigger swig_types[260]
-#define SWIGTYPE_p_iSequenceWrapper swig_types[261]
-#define SWIGTYPE_p_iShader swig_types[262]
-#define SWIGTYPE_p_iShaderCompiler swig_types[263]
-#define SWIGTYPE_p_iShaderManager swig_types[264]
-#define SWIGTYPE_p_iShaderPriorityList swig_types[265]
-#define SWIGTYPE_p_iShaderVarStack swig_types[266]
-#define SWIGTYPE_p_iShaderVariableAccessor swig_types[267]
-#define SWIGTYPE_p_iShaderVariableContext swig_types[268]
-#define SWIGTYPE_p_iSimpleFormerState swig_types[269]
-#define SWIGTYPE_p_iSkeleton swig_types[270]
-#define SWIGTYPE_p_iSkeleton2 swig_types[271]
-#define SWIGTYPE_p_iSkeletonAnimNode2 swig_types[272]
-#define SWIGTYPE_p_iSkeletonAnimNodeFactory2 swig_types[273]
-#define SWIGTYPE_p_iSkeletonAnimPacket2 swig_types[274]
-#define SWIGTYPE_p_iSkeletonAnimPacketFactory2 swig_types[275]
-#define SWIGTYPE_p_iSkeletonAnimation swig_types[276]
-#define SWIGTYPE_p_iSkeletonAnimation2 swig_types[277]
-#define SWIGTYPE_p_iSkeletonAnimationCallback swig_types[278]
-#define SWIGTYPE_p_iSkeletonAnimationFactory2 swig_types[279]
-#define SWIGTYPE_p_iSkeletonAnimationInstance swig_types[280]
-#define SWIGTYPE_p_iSkeletonAnimationKeyFrame swig_types[281]
-#define SWIGTYPE_p_iSkeletonBlendNode2 swig_types[282]
-#define SWIGTYPE_p_iSkeletonBlendNodeFactory2 swig_types[283]
-#define SWIGTYPE_p_iSkeletonBone swig_types[284]
-#define SWIGTYPE_p_iSkeletonBoneFactory swig_types[285]
-#define SWIGTYPE_p_iSkeletonBoneRagdollInfo swig_types[286]
-#define SWIGTYPE_p_iSkeletonBoneUpdateCallback swig_types[287]
-#define SWIGTYPE_p_iSkeletonFactory swig_types[288]
-#define SWIGTYPE_p_iSkeletonFactory2 swig_types[289]
-#define SWIGTYPE_p_iSkeletonGraveyard swig_types[290]
-#define SWIGTYPE_p_iSkeletonManager2 swig_types[291]
-#define SWIGTYPE_p_iSkeletonSocket swig_types[292]
-#define SWIGTYPE_p_iSkeletonSocketFactory swig_types[293]
-#define SWIGTYPE_p_iSkeletonUpdateCallback swig_types[294]
-#define SWIGTYPE_p_iSprite2DFactoryState swig_types[295]
-#define SWIGTYPE_p_iSprite2DState swig_types[296]
-#define SWIGTYPE_p_iSprite2DUVAnimation swig_types[297]
-#define SWIGTYPE_p_iSprite2DUVAnimationFrame swig_types[298]
-#define SWIGTYPE_p_iSprite3DFactoryState swig_types[299]
-#define SWIGTYPE_p_iSprite3DState swig_types[300]
-#define SWIGTYPE_p_iSpriteAction swig_types[301]
-#define SWIGTYPE_p_iSpriteCal3DFactoryState swig_types[302]
-#define SWIGTYPE_p_iSpriteCal3DSocket swig_types[303]
-#define SWIGTYPE_p_iSpriteCal3DState swig_types[304]
-#define SWIGTYPE_p_iSpriteFrame swig_types[305]
-#define SWIGTYPE_p_iSpriteSocket swig_types[306]
-#define SWIGTYPE_p_iStandardReporterListener swig_types[307]
-#define SWIGTYPE_p_iString swig_types[308]
-#define SWIGTYPE_p_iStringArray swig_types[309]
-#define SWIGTYPE_p_iStringSet swig_types[310]
-#define SWIGTYPE_p_iSuperLightmap swig_types[311]
-#define SWIGTYPE_p_iTerraFormer swig_types[312]
-#define SWIGTYPE_p_iTerraSampler swig_types[313]
-#define SWIGTYPE_p_iTerrainCell swig_types[314]
-#define SWIGTYPE_p_iTerrainCellCollisionProperties swig_types[315]
-#define SWIGTYPE_p_iTerrainCellFeederProperties swig_types[316]
-#define SWIGTYPE_p_iTerrainCellHeightDataCallback swig_types[317]
-#define SWIGTYPE_p_iTerrainCellLoadCallback swig_types[318]
-#define SWIGTYPE_p_iTerrainCellRenderProperties swig_types[319]
-#define SWIGTYPE_p_iTerrainCollider swig_types[320]
-#define SWIGTYPE_p_iTerrainCollisionPairArray swig_types[321]
-#define SWIGTYPE_p_iTerrainDataFeeder swig_types[322]
-#define SWIGTYPE_p_iTerrainFactory swig_types[323]
-#define SWIGTYPE_p_iTerrainFactoryCell swig_types[324]
-#define SWIGTYPE_p_iTerrainFactoryState swig_types[325]
-#define SWIGTYPE_p_iTerrainObjectState swig_types[326]
-#define SWIGTYPE_p_iTerrainRenderer swig_types[327]
-#define SWIGTYPE_p_iTerrainSystem swig_types[328]
-#define SWIGTYPE_p_iTerrainVector3Array swig_types[329]
-#define SWIGTYPE_p_iTextureHandle swig_types[330]
-#define SWIGTYPE_p_iTextureManager swig_types[331]
-#define SWIGTYPE_p_iThingEnvironment swig_types[332]
-#define SWIGTYPE_p_iThingFactoryState swig_types[333]
-#define SWIGTYPE_p_iThingState swig_types[334]
-#define SWIGTYPE_p_iTranslator swig_types[335]
-#define SWIGTYPE_p_iTriangleMesh swig_types[336]
-#define SWIGTYPE_p_iTriangleMeshIterator swig_types[337]
-#define SWIGTYPE_p_iVFS swig_types[338]
-#define SWIGTYPE_p_iView swig_types[339]
-#define SWIGTYPE_p_iVirtualClock swig_types[340]
-#define SWIGTYPE_p_int swig_types[341]
-#define SWIGTYPE_p_int16_t swig_types[342]
-#define SWIGTYPE_p_int64_t swig_types[343]
-#define SWIGTYPE_p_int8_t swig_types[344]
-#define SWIGTYPE_p_long_long swig_types[345]
-#define SWIGTYPE_p_p_CS__Graphics__RenderMesh swig_types[346]
-#define SWIGTYPE_p_p_iLight swig_types[347]
-#define SWIGTYPE_p_p_iMaterialWrapper swig_types[348]
-#define SWIGTYPE_p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[349]
-#define SWIGTYPE_p_scfImplementation1TcsImageBase_iImage_t swig_types[350]
-#define SWIGTYPE_p_scfImplementation1TcsObject_iObject_t swig_types[351]
-#define SWIGTYPE_p_scfImplementation1TcsPath_iPath_t swig_types[352]
-#define SWIGTYPE_p_scfImplementation1TcsTriangleMeshBox_iTriangleMesh_t swig_types[353]
-#define SWIGTYPE_p_scfImplementation1TcsTriangleMeshPointer_iTriangleMesh_t swig_types[354]
-#define SWIGTYPE_p_scfImplementation1TcsTriangleMesh_iTriangleMesh_t swig_types[355]
-#define SWIGTYPE_p_scfImplementationExt0TcsImageMemory_csImageBase_t swig_types[356]
-#define SWIGTYPE_p_size_t swig_types[357]
-#define SWIGTYPE_p_uint16_t swig_types[358]
-#define SWIGTYPE_p_uint32_t swig_types[359]
-#define SWIGTYPE_p_uint64_t swig_types[360]
-#define SWIGTYPE_p_unsigned_char swig_types[361]
-#define SWIGTYPE_p_unsigned_int swig_types[362]
-#define SWIGTYPE_p_unsigned_long swig_types[363]
-#define SWIGTYPE_p_unsigned_long_long swig_types[364]
-static swig_type_info *swig_types[366];
-static swig_module_info swig_module = {swig_types, 365, 0, 0, 0, 0};
+#define SWIGTYPE_p_KeyType swig_types[14]
+#define SWIGTYPE_p_ThisType swig_types[15]
+#define SWIGTYPE_p_ValueType swig_types[16]
+#define SWIGTYPE_p__1_basetype swig_types[17]
+#define SWIGTYPE_p__csKeyCharType swig_types[18]
+#define SWIGTYPE_p__csKeyEventType swig_types[19]
+#define SWIGTYPE_p__csKeyModifierNumType swig_types[20]
+#define SWIGTYPE_p__csKeyModifierType swig_types[21]
+#define SWIGTYPE_p__csKeyModifiers swig_types[22]
+#define SWIGTYPE_p__csMouseCursorID swig_types[23]
+#define SWIGTYPE_p__csMouseEventType swig_types[24]
+#define SWIGTYPE_p_bool swig_types[25]
+#define SWIGTYPE_p_char swig_types[26]
+#define SWIGTYPE_p_csAnimatedMeshBoneInfluence swig_types[27]
+#define SWIGTYPE_p_csArrayCapacityDefault swig_types[28]
+#define SWIGTYPE_p_csArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[29]
+#define SWIGTYPE_p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[30]
+#define SWIGTYPE_p_csArrayTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[31]
+#define SWIGTYPE_p_csArrayTcsArrayTunsigned_int_csArrayElementHandlerTunsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTunsigned_int_csArrayElementHandlerTunsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[32]
+#define SWIGTYPE_p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[33]
+#define SWIGTYPE_p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[34]
+#define SWIGTYPE_p_csArrayTcsRefTiShader_t_csArrayElementHandlerTcsRefTiShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[35]
+#define SWIGTYPE_p_csArrayTcsShaderVariable_p_csArrayElementHandlerTcsShaderVariable_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[36]
+#define SWIGTYPE_p_csArrayTcsVector2_csArrayElementHandlerTcsVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[37]
+#define SWIGTYPE_p_csArrayTcsVector3_csArrayElementHandlerTcsVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[38]
+#define SWIGTYPE_p_csArrayTcsVector4_csArrayElementHandlerTcsVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[39]
+#define SWIGTYPE_p_csArrayTiImage_p_csArrayElementHandlerTiImage_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[40]
+#define SWIGTYPE_p_csArrayTiMaterialWrapper_p_csArrayElementHandlerTiMaterialWrapper_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[41]
+#define SWIGTYPE_p_csArrayTiRenderBuffer_p_csArrayElementHandlerTiRenderBuffer_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[42]
+#define SWIGTYPE_p_csArrayTiTerrainCell_p_csArrayElementHandlerTiTerrainCell_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[43]
+#define SWIGTYPE_p_csArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[44]
+#define SWIGTYPE_p_csArrayTunsigned_int_csArrayElementHandlerTunsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[45]
+#define SWIGTYPE_p_csBox2 swig_types[46]
+#define SWIGTYPE_p_csBox3 swig_types[47]
+#define SWIGTYPE_p_csColor swig_types[48]
+#define SWIGTYPE_p_csColor4 swig_types[49]
+#define SWIGTYPE_p_csConfigFile swig_types[50]
+#define SWIGTYPE_p_csDirtyAccessArrayTcsVector2_csArrayElementHandlerTcsVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[51]
+#define SWIGTYPE_p_csDirtyAccessArrayTcsVector3_csArrayElementHandlerTcsVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[52]
+#define SWIGTYPE_p_csDirtyAccessArrayTcsVector4_csArrayElementHandlerTcsVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[53]
+#define SWIGTYPE_p_csDirtyAccessArrayTunsigned_int_csArrayElementHandlerTunsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t swig_types[54]
+#define SWIGTYPE_p_csEllipsoid swig_types[55]
+#define SWIGTYPE_p_csFlags swig_types[56]
+#define SWIGTYPE_p_csImageBase swig_types[57]
+#define SWIGTYPE_p_csImageMemory swig_types[58]
+#define SWIGTYPE_p_csLockedHeightData swig_types[59]
+#define SWIGTYPE_p_csLockedMaterialMap swig_types[60]
+#define SWIGTYPE_p_csMatrix3 swig_types[61]
+#define SWIGTYPE_p_csOBB swig_types[62]
+#define SWIGTYPE_p_csObject swig_types[63]
+#define SWIGTYPE_p_csOrthoTransform swig_types[64]
+#define SWIGTYPE_p_csParticle swig_types[65]
+#define SWIGTYPE_p_csParticleAux swig_types[66]
+#define SWIGTYPE_p_csParticleBuffer swig_types[67]
+#define SWIGTYPE_p_csPath swig_types[68]
+#define SWIGTYPE_p_csPlane3 swig_types[69]
+#define SWIGTYPE_p_csPolygonRange swig_types[70]
+#define SWIGTYPE_p_csPtrTcsSkeletalState2_t swig_types[71]
+#define SWIGTYPE_p_csPtrTiGenMeshAnimationControlFactory_t swig_types[72]
+#define SWIGTYPE_p_csPtrTiGenMeshAnimationControl_t swig_types[73]
+#define SWIGTYPE_p_csPtrTiParticleBuiltinEffectorVelocityField_t swig_types[74]
+#define SWIGTYPE_p_csPtrTiPolygonHandle_t swig_types[75]
+#define SWIGTYPE_p_csQuaternion swig_types[76]
+#define SWIGTYPE_p_csRandomGen swig_types[77]
+#define SWIGTYPE_p_csRect swig_types[78]
+#define SWIGTYPE_p_csRefArrayTiMaterialWrapper_t swig_types[79]
+#define SWIGTYPE_p_csRefArrayTiObject_t swig_types[80]
+#define SWIGTYPE_p_csRefCount swig_types[81]
+#define SWIGTYPE_p_csRefTiImage_t swig_types[82]
+#define SWIGTYPE_p_csRenderBufferName swig_types[83]
+#define SWIGTYPE_p_csReversibleTransform swig_types[84]
+#define SWIGTYPE_p_csShaderVariable swig_types[85]
+#define SWIGTYPE_p_csSkeletalState2 swig_types[86]
+#define SWIGTYPE_p_csSprite2DVertex swig_types[87]
+#define SWIGTYPE_p_csSpriteCal3DActiveAnim swig_types[88]
+#define SWIGTYPE_p_csTerrainColliderCollideSegmentResult swig_types[89]
+#define SWIGTYPE_p_csTransform swig_types[90]
+#define SWIGTYPE_p_csTriangle swig_types[91]
+#define SWIGTYPE_p_csTriangleMesh swig_types[92]
+#define SWIGTYPE_p_csTriangleMeshBox swig_types[93]
+#define SWIGTYPE_p_csTriangleMeshEdge swig_types[94]
+#define SWIGTYPE_p_csTriangleMeshPointer swig_types[95]
+#define SWIGTYPE_p_csTriangleMinMax swig_types[96]
+#define SWIGTYPE_p_csVector2 swig_types[97]
+#define SWIGTYPE_p_csVector3 swig_types[98]
+#define SWIGTYPE_p_csXRotMatrix3 swig_types[99]
+#define SWIGTYPE_p_csXScaleMatrix3 swig_types[100]
+#define SWIGTYPE_p_csYRotMatrix3 swig_types[101]
+#define SWIGTYPE_p_csYScaleMatrix3 swig_types[102]
+#define SWIGTYPE_p_csZRotMatrix3 swig_types[103]
+#define SWIGTYPE_p_csZScaleMatrix3 swig_types[104]
+#define SWIGTYPE_p_float swig_types[105]
+#define SWIGTYPE_p_iAnimTimeUpdateHandler swig_types[106]
+#define SWIGTYPE_p_iAnimatedImage swig_types[107]
+#define SWIGTYPE_p_iAnimatedMesh swig_types[108]
+#define SWIGTYPE_p_iAnimatedMeshFactory swig_types[109]
+#define SWIGTYPE_p_iAnimatedMeshFactorySubMesh swig_types[110]
+#define SWIGTYPE_p_iAnimatedMeshMorphTarget swig_types[111]
+#define SWIGTYPE_p_iAnimatedMeshSubMesh swig_types[112]
+#define SWIGTYPE_p_iArrayChangeAllTcsCollisionPair_t swig_types[113]
+#define SWIGTYPE_p_iArrayChangeAllTcsShaderVariable_p_t swig_types[114]
+#define SWIGTYPE_p_iArrayChangeAllTcsSprite2DVertex_t swig_types[115]
+#define SWIGTYPE_p_iArrayChangeAllTcsVector3_t swig_types[116]
+#define SWIGTYPE_p_iArrayChangeElementsTcsCollisionPair_t swig_types[117]
+#define SWIGTYPE_p_iArrayChangeElementsTcsShaderVariable_p_t swig_types[118]
+#define SWIGTYPE_p_iArrayChangeElementsTcsSprite2DVertex_t swig_types[119]
+#define SWIGTYPE_p_iArrayChangeElementsTcsVector3_t swig_types[120]
+#define SWIGTYPE_p_iArrayReadOnlyTcsCollisionPair_t swig_types[121]
+#define SWIGTYPE_p_iArrayReadOnlyTcsShaderVariable_p_t swig_types[122]
+#define SWIGTYPE_p_iArrayReadOnlyTcsSprite2DVertex_t swig_types[123]
+#define SWIGTYPE_p_iArrayReadOnlyTcsVector3_t swig_types[124]
+#define SWIGTYPE_p_iBase swig_types[125]
+#define SWIGTYPE_p_iBodyGroup swig_types[126]
+#define SWIGTYPE_p_iBugPlug swig_types[127]
+#define SWIGTYPE_p_iBugPlugRenderObject swig_types[128]
+#define SWIGTYPE_p_iCacheManager swig_types[129]
+#define SWIGTYPE_p_iClipper2D swig_types[130]
+#define SWIGTYPE_p_iCollideSystem swig_types[131]
+#define SWIGTYPE_p_iCollider swig_types[132]
+#define SWIGTYPE_p_iColoredVertices swig_types[133]
+#define SWIGTYPE_p_iCommandLineParser swig_types[134]
+#define SWIGTYPE_p_iComponent swig_types[135]
+#define SWIGTYPE_p_iConfigFile swig_types[136]
+#define SWIGTYPE_p_iConfigIterator swig_types[137]
+#define SWIGTYPE_p_iConfigManager swig_types[138]
+#define SWIGTYPE_p_iConsoleOutput swig_types[139]
+#define SWIGTYPE_p_iConsoleWatcher swig_types[140]
+#define SWIGTYPE_p_iDataBuffer swig_types[141]
+#define SWIGTYPE_p_iDebugHelper swig_types[142]
+#define SWIGTYPE_p_iDecalBuilder swig_types[143]
+#define SWIGTYPE_p_iDecalManager swig_types[144]
+#define SWIGTYPE_p_iDecalTemplate swig_types[145]
+#define SWIGTYPE_p_iDocument swig_types[146]
+#define SWIGTYPE_p_iDocumentAttribute swig_types[147]
+#define SWIGTYPE_p_iDocumentAttributeIterator swig_types[148]
+#define SWIGTYPE_p_iDocumentNode swig_types[149]
+#define SWIGTYPE_p_iDocumentNodeIterator swig_types[150]
+#define SWIGTYPE_p_iDocumentSystem swig_types[151]
+#define SWIGTYPE_p_iDynamicSystem swig_types[152]
+#define SWIGTYPE_p_iDynamics swig_types[153]
+#define SWIGTYPE_p_iDynamicsColliderCollisionCallback swig_types[154]
+#define SWIGTYPE_p_iDynamicsCollisionCallback swig_types[155]
+#define SWIGTYPE_p_iDynamicsMoveCallback swig_types[156]
+#define SWIGTYPE_p_iDynamicsStepCallback swig_types[157]
+#define SWIGTYPE_p_iDynamicsSystemCollider swig_types[158]
+#define SWIGTYPE_p_iEngineSequenceManager swig_types[159]
+#define SWIGTYPE_p_iEngineSequenceParameters swig_types[160]
+#define SWIGTYPE_p_iEvent swig_types[161]
+#define SWIGTYPE_p_iEventAttributeIterator swig_types[162]
+#define SWIGTYPE_p_iEventCord swig_types[163]
+#define SWIGTYPE_p_iEventHandler swig_types[164]
+#define SWIGTYPE_p_iEventNameRegistry swig_types[165]
+#define SWIGTYPE_p_iEventOutlet swig_types[166]
+#define SWIGTYPE_p_iEventPlug swig_types[167]
+#define SWIGTYPE_p_iEventQueue swig_types[168]
+#define SWIGTYPE_p_iFactory swig_types[169]
+#define SWIGTYPE_p_iFile swig_types[170]
+#define SWIGTYPE_p_iFont swig_types[171]
+#define SWIGTYPE_p_iFontDeleteNotify swig_types[172]
+#define SWIGTYPE_p_iFontServer swig_types[173]
+#define SWIGTYPE_p_iGenMeshAnimationControl swig_types[174]
+#define SWIGTYPE_p_iGenMeshAnimationControl1_4 swig_types[175]
+#define SWIGTYPE_p_iGenMeshAnimationControlFactory swig_types[176]
+#define SWIGTYPE_p_iGenMeshAnimationControlType swig_types[177]
+#define SWIGTYPE_p_iGenMeshSkeletonControlState swig_types[178]
+#define SWIGTYPE_p_iGeneralFactoryState swig_types[179]
+#define SWIGTYPE_p_iGeneralMeshCommonState swig_types[180]
+#define SWIGTYPE_p_iGeneralMeshState swig_types[181]
+#define SWIGTYPE_p_iGeneralMeshSubMesh swig_types[182]
+#define SWIGTYPE_p_iGraphics2D swig_types[183]
+#define SWIGTYPE_p_iGraphics3D swig_types[184]
+#define SWIGTYPE_p_iHalo swig_types[185]
+#define SWIGTYPE_p_iImage swig_types[186]
+#define SWIGTYPE_p_iImageIO swig_types[187]
+#define SWIGTYPE_p_iJoint swig_types[188]
+#define SWIGTYPE_p_iJoystickDriver swig_types[189]
+#define SWIGTYPE_p_iKeyComposer swig_types[190]
+#define SWIGTYPE_p_iKeyboardDriver swig_types[191]
+#define SWIGTYPE_p_iMapNode swig_types[192]
+#define SWIGTYPE_p_iMaterial swig_types[193]
+#define SWIGTYPE_p_iMaterialWrapper swig_types[194]
+#define SWIGTYPE_p_iMeshFactoryWrapper swig_types[195]
+#define SWIGTYPE_p_iMeshObject swig_types[196]
+#define SWIGTYPE_p_iMeshObjectDrawCallback swig_types[197]
+#define SWIGTYPE_p_iMeshObjectFactory swig_types[198]
+#define SWIGTYPE_p_iMeshObjectType swig_types[199]
+#define SWIGTYPE_p_iMeshWrapper swig_types[200]
+#define SWIGTYPE_p_iMouseDriver swig_types[201]
+#define SWIGTYPE_p_iMovable swig_types[202]
+#define SWIGTYPE_p_iMovieRecorder swig_types[203]
+#define SWIGTYPE_p_iNativeWindow swig_types[204]
+#define SWIGTYPE_p_iNativeWindowManager swig_types[205]
+#define SWIGTYPE_p_iODEAMotorJoint swig_types[206]
+#define SWIGTYPE_p_iODEBallJoint swig_types[207]
+#define SWIGTYPE_p_iODEDynamicState swig_types[208]
+#define SWIGTYPE_p_iODEDynamicSystemState swig_types[209]
+#define SWIGTYPE_p_iODEFrameUpdateCallback swig_types[210]
+#define SWIGTYPE_p_iODEGeneralJointState swig_types[211]
+#define SWIGTYPE_p_iODEHinge2Joint swig_types[212]
+#define SWIGTYPE_p_iODEHingeJoint swig_types[213]
+#define SWIGTYPE_p_iODEJointState swig_types[214]
+#define SWIGTYPE_p_iODESliderJoint swig_types[215]
+#define SWIGTYPE_p_iODEUniversalJoint swig_types[216]
+#define SWIGTYPE_p_iObject swig_types[217]
+#define SWIGTYPE_p_iObjectIterator swig_types[218]
+#define SWIGTYPE_p_iObjectModel swig_types[219]
+#define SWIGTYPE_p_iObjectModelListener swig_types[220]
+#define SWIGTYPE_p_iObjectNameChangeListener swig_types[221]
+#define SWIGTYPE_p_iObjectRegistry swig_types[222]
+#define SWIGTYPE_p_iObjectRegistryIterator swig_types[223]
+#define SWIGTYPE_p_iOffscreenCanvasCallback swig_types[224]
+#define SWIGTYPE_p_iParameterESM swig_types[225]
+#define SWIGTYPE_p_iParticleBuiltinEffectorFactory swig_types[226]
+#define SWIGTYPE_p_iParticleBuiltinEffectorForce swig_types[227]
+#define SWIGTYPE_p_iParticleBuiltinEffectorLinColor swig_types[228]
+#define SWIGTYPE_p_iParticleBuiltinEffectorVelocityField swig_types[229]
+#define SWIGTYPE_p_iParticleBuiltinEmitterBase swig_types[230]
+#define SWIGTYPE_p_iParticleBuiltinEmitterBox swig_types[231]
+#define SWIGTYPE_p_iParticleBuiltinEmitterCone swig_types[232]
+#define SWIGTYPE_p_iParticleBuiltinEmitterCylinder swig_types[233]
+#define SWIGTYPE_p_iParticleBuiltinEmitterFactory swig_types[234]
+#define SWIGTYPE_p_iParticleBuiltinEmitterSphere swig_types[235]
+#define SWIGTYPE_p_iParticleEffector swig_types[236]
+#define SWIGTYPE_p_iParticleEmitter swig_types[237]
+#define SWIGTYPE_p_iParticleSystem swig_types[238]
+#define SWIGTYPE_p_iParticleSystemBase swig_types[239]
+#define SWIGTYPE_p_iParticleSystemFactory swig_types[240]
+#define SWIGTYPE_p_iPath swig_types[241]
+#define SWIGTYPE_p_iPluginIterator swig_types[242]
+#define SWIGTYPE_p_iPluginManager swig_types[243]
+#define SWIGTYPE_p_iPolygonHandle swig_types[244]
+#define SWIGTYPE_p_iProcTexture swig_types[245]
+#define SWIGTYPE_p_iRenderBuffer swig_types[246]
+#define SWIGTYPE_p_iRenderView swig_types[247]
+#define SWIGTYPE_p_iRendererLightmap swig_types[248]
+#define SWIGTYPE_p_iReporter swig_types[249]
+#define SWIGTYPE_p_iReporterIterator swig_types[250]
+#define SWIGTYPE_p_iReporterListener swig_types[251]
+#define SWIGTYPE_p_iRigidBody swig_types[252]
+#define SWIGTYPE_p_iSCF swig_types[253]
+#define SWIGTYPE_p_iSceneNode swig_types[254]
+#define SWIGTYPE_p_iScript swig_types[255]
+#define SWIGTYPE_p_iScriptObject swig_types[256]
+#define SWIGTYPE_p_iScriptValue swig_types[257]
+#define SWIGTYPE_p_iSequence swig_types[258]
+#define SWIGTYPE_p_iSequenceCondition swig_types[259]
+#define SWIGTYPE_p_iSequenceManager swig_types[260]
+#define SWIGTYPE_p_iSequenceOperation swig_types[261]
+#define SWIGTYPE_p_iSequenceTimedOperation swig_types[262]
+#define SWIGTYPE_p_iSequenceTrigger swig_types[263]
+#define SWIGTYPE_p_iSequenceWrapper swig_types[264]
+#define SWIGTYPE_p_iShader swig_types[265]
+#define SWIGTYPE_p_iShaderCompiler swig_types[266]
+#define SWIGTYPE_p_iShaderManager swig_types[267]
+#define SWIGTYPE_p_iShaderPriorityList swig_types[268]
+#define SWIGTYPE_p_iShaderVarStack swig_types[269]
+#define SWIGTYPE_p_iShaderVariableAccessor swig_types[270]
+#define SWIGTYPE_p_iShaderVariableContext swig_types[271]
+#define SWIGTYPE_p_iSimpleFormerState swig_types[272]
+#define SWIGTYPE_p_iSkeleton swig_types[273]
+#define SWIGTYPE_p_iSkeleton2 swig_types[274]
+#define SWIGTYPE_p_iSkeletonAnimNode2 swig_types[275]
+#define SWIGTYPE_p_iSkeletonAnimNodeFactory2 swig_types[276]
+#define SWIGTYPE_p_iSkeletonAnimPacket2 swig_types[277]
+#define SWIGTYPE_p_iSkeletonAnimPacketFactory2 swig_types[278]
+#define SWIGTYPE_p_iSkeletonAnimation swig_types[279]
+#define SWIGTYPE_p_iSkeletonAnimation2 swig_types[280]
+#define SWIGTYPE_p_iSkeletonAnimationCallback swig_types[281]
+#define SWIGTYPE_p_iSkeletonAnimationFactory2 swig_types[282]
+#define SWIGTYPE_p_iSkeletonAnimationInstance swig_types[283]
+#define SWIGTYPE_p_iSkeletonAnimationKeyFrame swig_types[284]
+#define SWIGTYPE_p_iSkeletonBlendNode2 swig_types[285]
+#define SWIGTYPE_p_iSkeletonBlendNodeFactory2 swig_types[286]
+#define SWIGTYPE_p_iSkeletonBone swig_types[287]
+#define SWIGTYPE_p_iSkeletonBoneFactory swig_types[288]
+#define SWIGTYPE_p_iSkeletonBoneRagdollInfo swig_types[289]
+#define SWIGTYPE_p_iSkeletonBoneUpdateCallback swig_types[290]
+#define SWIGTYPE_p_iSkeletonFactory swig_types[291]
+#define SWIGTYPE_p_iSkeletonFactory2 swig_types[292]
+#define SWIGTYPE_p_iSkeletonGraveyard swig_types[293]
+#define SWIGTYPE_p_iSkeletonManager2 swig_types[294]
+#define SWIGTYPE_p_iSkeletonSocket swig_types[295]
+#define SWIGTYPE_p_iSkeletonSocketFactory swig_types[296]
+#define SWIGTYPE_p_iSkeletonUpdateCallback swig_types[297]
+#define SWIGTYPE_p_iSprite2DFactoryState swig_types[298]
+#define SWIGTYPE_p_iSprite2DState swig_types[299]
+#define SWIGTYPE_p_iSprite2DUVAnimation swig_types[300]
+#define SWIGTYPE_p_iSprite2DUVAnimationFrame swig_types[301]
+#define SWIGTYPE_p_iSprite3DFactoryState swig_types[302]
+#define SWIGTYPE_p_iSprite3DState swig_types[303]
+#define SWIGTYPE_p_iSpriteAction swig_types[304]
+#define SWIGTYPE_p_iSpriteCal3DFactoryState swig_types[305]
+#define SWIGTYPE_p_iSpriteCal3DSocket swig_types[306]
+#define SWIGTYPE_p_iSpriteCal3DState swig_types[307]
+#define SWIGTYPE_p_iSpriteFrame swig_types[308]
+#define SWIGTYPE_p_iSpriteSocket swig_types[309]
+#define SWIGTYPE_p_iStandardReporterListener swig_types[310]
+#define SWIGTYPE_p_iString swig_types[311]
+#define SWIGTYPE_p_iStringArray swig_types[312]
+#define SWIGTYPE_p_iStringSet swig_types[313]
+#define SWIGTYPE_p_iSuperLightmap swig_types[314]
+#define SWIGTYPE_p_iTerraFormer swig_types[315]
+#define SWIGTYPE_p_iTerraSampler swig_types[316]
+#define SWIGTYPE_p_iTerrainCell swig_types[317]
+#define SWIGTYPE_p_iTerrainCellCollisionProperties swig_types[318]
+#define SWIGTYPE_p_iTerrainCellFeederProperties swig_types[319]
+#define SWIGTYPE_p_iTerrainCellHeightDataCallback swig_types[320]
+#define SWIGTYPE_p_iTerrainCellLoadCallback swig_types[321]
+#define SWIGTYPE_p_iTerrainCellRenderProperties swig_types[322]
+#define SWIGTYPE_p_iTerrainCollider swig_types[323]
+#define SWIGTYPE_p_iTerrainCollisionPairArray swig_types[324]
+#define SWIGTYPE_p_iTerrainDataFeeder swig_types[325]
+#define SWIGTYPE_p_iTerrainFactory swig_types[326]
+#define SWIGTYPE_p_iTerrainFactoryCell swig_types[327]
+#define SWIGTYPE_p_iTerrainFactoryState swig_types[328]
+#define SWIGTYPE_p_iTerrainObjectState swig_types[329]
+#define SWIGTYPE_p_iTerrainRenderer swig_types[330]
+#define SWIGTYPE_p_iTerrainSystem swig_types[331]
+#define SWIGTYPE_p_iTerrainVector3Array swig_types[332]
+#define SWIGTYPE_p_iTextureHandle swig_types[333]
+#define SWIGTYPE_p_iTextureManager swig_types[334]
+#define SWIGTYPE_p_iThingEnvironment swig_types[335]
+#define SWIGTYPE_p_iThingFactoryState swig_types[336]
+#define SWIGTYPE_p_iThingState swig_types[337]
+#define SWIGTYPE_p_iTranslator swig_types[338]
+#define SWIGTYPE_p_iTriangleMesh swig_types[339]
+#define SWIGTYPE_p_iTriangleMeshIterator swig_types[340]
+#define SWIGTYPE_p_iVFS swig_types[341]
+#define SWIGTYPE_p_iView swig_types[342]
+#define SWIGTYPE_p_iVirtualClock swig_types[343]
+#define SWIGTYPE_p_int swig_types[344]
+#define SWIGTYPE_p_int16_t swig_types[345]
+#define SWIGTYPE_p_int64_t swig_types[346]
+#define SWIGTYPE_p_int8_t swig_types[347]
+#define SWIGTYPE_p_long_long swig_types[348]
+#define SWIGTYPE_p_p_CS__Graphics__RenderMesh swig_types[349]
+#define SWIGTYPE_p_p_iLight swig_types[350]
+#define SWIGTYPE_p_p_iMaterialWrapper swig_types[351]
+#define SWIGTYPE_p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[352]
+#define SWIGTYPE_p_scfImplementation1TcsImageBase_iImage_t swig_types[353]
+#define SWIGTYPE_p_scfImplementation1TcsObject_iObject_t swig_types[354]
+#define SWIGTYPE_p_scfImplementation1TcsPath_iPath_t swig_types[355]
+#define SWIGTYPE_p_scfImplementation1TcsTriangleMeshBox_iTriangleMesh_t swig_types[356]
+#define SWIGTYPE_p_scfImplementation1TcsTriangleMeshPointer_iTriangleMesh_t swig_types[357]
+#define SWIGTYPE_p_scfImplementation1TcsTriangleMesh_iTriangleMesh_t swig_types[358]
+#define SWIGTYPE_p_scfImplementationExt0TcsImageMemory_csImageBase_t swig_types[359]
+#define SWIGTYPE_p_size_t swig_types[360]
+#define SWIGTYPE_p_uint16_t swig_types[361]
+#define SWIGTYPE_p_uint32_t swig_types[362]
+#define SWIGTYPE_p_uint64_t swig_types[363]
+#define SWIGTYPE_p_unsigned_char swig_types[364]
+#define SWIGTYPE_p_unsigned_int swig_types[365]
+#define SWIGTYPE_p_unsigned_long swig_types[366]
+#define SWIGTYPE_p_unsigned_long_long swig_types[367]
+static swig_type_info *swig_types[369];
+static swig_module_info swig_module = {swig_types, 368, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -4192,10 +4195,10 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshSubMesh_GetIndices(PyObject *SWIGUNUSEDPA
   if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshSubMesh_GetIndices",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshSubMesh, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshSubMesh_GetIndices" "', argument " "1"" of type '" "iGeneralMeshSubMesh const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshSubMesh_GetIndices" "', argument " "1"" of type '" "iGeneralMeshSubMesh *""'"); 
   }
   arg1 = reinterpret_cast< iGeneralMeshSubMesh * >(argp1);
-  result = (iRenderBuffer *)((iGeneralMeshSubMesh const *)arg1)->GetIndices();
+  result = (iRenderBuffer *)(arg1)->GetIndices();
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iRenderBuffer, 0 |  0 );
   return resultobj;
 fail:
@@ -4722,7 +4725,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iGeneralMeshCommonState_AddRenderBuffer(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iGeneralMeshCommonState_AddRenderBuffer__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iGeneralMeshCommonState *arg1 = (iGeneralMeshCommonState *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -4765,7 +4768,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iGeneralMeshCommonState_RemoveRenderBuffer(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iGeneralMeshCommonState_RemoveRenderBuffer__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iGeneralMeshCommonState *arg1 = (iGeneralMeshCommonState *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -4929,6 +4932,228 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iGeneralMeshCommonState_AddRenderBuffer__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGeneralMeshCommonState *arg1 = (iGeneralMeshCommonState *) 0 ;
+  csRenderBufferName arg2 ;
+  iRenderBuffer *arg3 = (iRenderBuffer *) 0 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshCommonState_AddRenderBuffer",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshCommonState, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshCommonState_AddRenderBuffer" "', argument " "1"" of type '" "iGeneralMeshCommonState *""'"); 
+  }
+  arg1 = reinterpret_cast< iGeneralMeshCommonState * >(argp1);
+  {
+    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csRenderBufferName,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iGeneralMeshCommonState_AddRenderBuffer" "', argument " "2"" of type '" "csRenderBufferName""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iGeneralMeshCommonState_AddRenderBuffer" "', argument " "2"" of type '" "csRenderBufferName""'");
+    } else {
+      csRenderBufferName * temp = reinterpret_cast< csRenderBufferName * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
+  }
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_iRenderBuffer, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iGeneralMeshCommonState_AddRenderBuffer" "', argument " "3"" of type '" "iRenderBuffer *""'"); 
+  }
+  arg3 = reinterpret_cast< iRenderBuffer * >(argp3);
+  result = (bool)(arg1)->AddRenderBuffer(arg2,arg3);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGeneralMeshCommonState_AddRenderBuffer(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[4];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 3); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 3) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iGeneralMeshCommonState, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_csRenderBufferName, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_iRenderBuffer, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          return _wrap_iGeneralMeshCommonState_AddRenderBuffer__SWIG_1(self, args);
+        }
+      }
+    }
+  }
+  if (argc == 3) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iGeneralMeshCommonState, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_iRenderBuffer, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          return _wrap_iGeneralMeshCommonState_AddRenderBuffer__SWIG_0(self, args);
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iGeneralMeshCommonState_AddRenderBuffer'.\n  Possible C/C++ prototypes are:\n    AddRenderBuffer(char const *,iRenderBuffer *)\n    AddRenderBuffer(csRenderBufferName,iRenderBuffer *)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGeneralMeshCommonState_RemoveRenderBuffer__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGeneralMeshCommonState *arg1 = (iGeneralMeshCommonState *) 0 ;
+  csRenderBufferName arg2 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshCommonState_RemoveRenderBuffer",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshCommonState, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshCommonState_RemoveRenderBuffer" "', argument " "1"" of type '" "iGeneralMeshCommonState *""'"); 
+  }
+  arg1 = reinterpret_cast< iGeneralMeshCommonState * >(argp1);
+  {
+    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csRenderBufferName,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iGeneralMeshCommonState_RemoveRenderBuffer" "', argument " "2"" of type '" "csRenderBufferName""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iGeneralMeshCommonState_RemoveRenderBuffer" "', argument " "2"" of type '" "csRenderBufferName""'");
+    } else {
+      csRenderBufferName * temp = reinterpret_cast< csRenderBufferName * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
+  }
+  result = (bool)(arg1)->RemoveRenderBuffer(arg2);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGeneralMeshCommonState_RemoveRenderBuffer(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[3];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 2); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iGeneralMeshCommonState, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_csRenderBufferName, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_iGeneralMeshCommonState_RemoveRenderBuffer__SWIG_1(self, args);
+      }
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iGeneralMeshCommonState, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_iGeneralMeshCommonState_RemoveRenderBuffer__SWIG_0(self, args);
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iGeneralMeshCommonState_RemoveRenderBuffer'.\n  Possible C/C++ prototypes are:\n    RemoveRenderBuffer(char const *)\n    RemoveRenderBuffer(csRenderBufferName)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGeneralMeshCommonState_GetRenderBuffer__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGeneralMeshCommonState *arg1 = (iGeneralMeshCommonState *) 0 ;
+  csRenderBufferName arg2 ;
+  iRenderBuffer *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGeneralMeshCommonState_GetRenderBuffer",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGeneralMeshCommonState, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGeneralMeshCommonState_GetRenderBuffer" "', argument " "1"" of type '" "iGeneralMeshCommonState *""'"); 
+  }
+  arg1 = reinterpret_cast< iGeneralMeshCommonState * >(argp1);
+  {
+    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csRenderBufferName,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iGeneralMeshCommonState_GetRenderBuffer" "', argument " "2"" of type '" "csRenderBufferName""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iGeneralMeshCommonState_GetRenderBuffer" "', argument " "2"" of type '" "csRenderBufferName""'");
+    } else {
+      csRenderBufferName * temp = reinterpret_cast< csRenderBufferName * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
+  }
+  result = (iRenderBuffer *)(arg1)->GetRenderBuffer(arg2);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iRenderBuffer, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iGeneralMeshCommonState_GetRenderBuffer(PyObject *self, PyObject *args) {
   int argc;
   PyObject *argv[3];
@@ -4938,6 +5163,19 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshCommonState_GetRenderBuffer(PyObject *sel
   argc = PyObject_Length(args);
   for (ii = 0; (ii < argc) && (ii < 2); ii++) {
     argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iGeneralMeshCommonState, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_csRenderBufferName, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_iGeneralMeshCommonState_GetRenderBuffer__SWIG_2(self, args);
+      }
+    }
   }
   if (argc == 2) {
     int _v;
@@ -4969,7 +5207,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshCommonState_GetRenderBuffer(PyObject *sel
   }
   
 fail:
-  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iGeneralMeshCommonState_GetRenderBuffer'.\n  Possible C/C++ prototypes are:\n    GetRenderBuffer(int)\n    GetRenderBuffer(char const *)\n");
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iGeneralMeshCommonState_GetRenderBuffer'.\n  Possible C/C++ prototypes are:\n    GetRenderBuffer(int)\n    GetRenderBuffer(char const *)\n    GetRenderBuffer(csRenderBufferName)\n");
   return NULL;
 }
 
@@ -46724,10 +46962,10 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iGeneralMeshCommonState_IsShadowCasting", _wrap_iGeneralMeshCommonState_IsShadowCasting, METH_VARARGS, NULL},
 	 { (char *)"iGeneralMeshCommonState_SetShadowReceiving", _wrap_iGeneralMeshCommonState_SetShadowReceiving, METH_VARARGS, NULL},
 	 { (char *)"iGeneralMeshCommonState_IsShadowReceiving", _wrap_iGeneralMeshCommonState_IsShadowReceiving, METH_VARARGS, NULL},
-	 { (char *)"iGeneralMeshCommonState_AddRenderBuffer", _wrap_iGeneralMeshCommonState_AddRenderBuffer, METH_VARARGS, NULL},
-	 { (char *)"iGeneralMeshCommonState_RemoveRenderBuffer", _wrap_iGeneralMeshCommonState_RemoveRenderBuffer, METH_VARARGS, NULL},
 	 { (char *)"iGeneralMeshCommonState_GetRenderBufferCount", _wrap_iGeneralMeshCommonState_GetRenderBufferCount, METH_VARARGS, NULL},
 	 { (char *)"iGeneralMeshCommonState_GetRenderBufferName", _wrap_iGeneralMeshCommonState_GetRenderBufferName, METH_VARARGS, NULL},
+	 { (char *)"iGeneralMeshCommonState_AddRenderBuffer", _wrap_iGeneralMeshCommonState_AddRenderBuffer, METH_VARARGS, NULL},
+	 { (char *)"iGeneralMeshCommonState_RemoveRenderBuffer", _wrap_iGeneralMeshCommonState_RemoveRenderBuffer, METH_VARARGS, NULL},
 	 { (char *)"iGeneralMeshCommonState_GetRenderBuffer", _wrap_iGeneralMeshCommonState_GetRenderBuffer, METH_VARARGS, NULL},
 	 { (char *)"delete_iGeneralMeshCommonState", _wrap_delete_iGeneralMeshCommonState, METH_VARARGS, NULL},
 	 { (char *)"iGeneralMeshCommonState_swigregister", iGeneralMeshCommonState_swigregister, METH_VARARGS, NULL},
@@ -48923,6 +49161,9 @@ static void *_p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__Al
 static void *_p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated(void *x) {
     return (void *)((CS::Memory::CustomAllocated *)  ((csArray<csPluginRequest > *) x));
 }
+static void *_p_csArrayTcsRefTiShader_t_csArrayElementHandlerTcsRefTiShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated(void *x) {
+    return (void *)((CS::Memory::CustomAllocated *)  ((csArray<csRef<iShader > > *) x));
+}
 static void *_p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated(void *x) {
     return (void *)((CS::Memory::CustomAllocated *)  ((csArray<csImageIOFileFormatDescription const * > *) x));
 }
@@ -49012,14 +49253,15 @@ static swig_type_info _swigt__p_CS__Memory__AllocatorMalloc = {"_p_CS__Memory__A
 static swig_type_info _swigt__p_CS__Memory__CustomAllocated = {"_p_CS__Memory__CustomAllocated", "CS::Memory::CustomAllocated *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csTriangleMeshEdge = {"_p_csTriangleMeshEdge", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t = {"_p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t", 0, 0, 0, 0, 0};
+static swig_type_info _swigt__p_csArrayTcsRefTiShader_t_csArrayElementHandlerTcsRefTiShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t = {"_p_csArrayTcsRefTiShader_t_csArrayElementHandlerTcsRefTiShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_csArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t = {"_p_csArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_csArrayTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t = {"_p_csArrayTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_csDirtyAccessArrayTcsVector3_csArrayElementHandlerTcsVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t = {"_p_csDirtyAccessArrayTcsVector3_csArrayElementHandlerTcsVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_csDirtyAccessArrayTcsVector4_csArrayElementHandlerTcsVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t = {"_p_csDirtyAccessArrayTcsVector4_csArrayElementHandlerTcsVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_csDirtyAccessArrayTcsVector2_csArrayElementHandlerTcsVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t = {"_p_csDirtyAccessArrayTcsVector2_csArrayElementHandlerTcsVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t", 0, 0, 0, 0, 0};
-static swig_type_info _swigt__p_csArrayTcsVector3_csArrayElementHandlerTcsVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t = {"_p_csArrayTcsVector3_csArrayElementHandlerTcsVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_csArrayTcsVector4_csArrayElementHandlerTcsVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t = {"_p_csArrayTcsVector4_csArrayElementHandlerTcsVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_csArrayTcsVector2_csArrayElementHandlerTcsVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t = {"_p_csArrayTcsVector2_csArrayElementHandlerTcsVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t", 0, 0, 0, 0, 0};
+static swig_type_info _swigt__p_csArrayTcsVector3_csArrayElementHandlerTcsVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t = {"_p_csArrayTcsVector3_csArrayElementHandlerTcsVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_csDirtyAccessArrayTunsigned_int_csArrayElementHandlerTunsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t = {"_p_csDirtyAccessArrayTunsigned_int_csArrayElementHandlerTunsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_CalAnimationCallback = {"_p_CalAnimationCallback", "CalAnimationCallback *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CalCoreModel = {"_p_CalCoreModel", "CalCoreModel *", 0, 0, (void*)0, 0};
@@ -49029,6 +49271,7 @@ static swig_type_info _swigt__p_ContainedType = {"_p_ContainedType", "ContainedT
 static swig_type_info _swigt__p_ElementHandlerType = {"_p_ElementHandlerType", "ElementHandlerType *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_FileFormatDescription = {"_p_FileFormatDescription", "FileFormatDescription *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_HashType = {"_p_HashType", "HashType *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_KeyType = {"_p_KeyType", "KeyType *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_ThisType = {"_p_ThisType", "ThisType *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_ValueType = {"_p_ValueType", "ValueType *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p__1_basetype = {"_p__1_basetype", "$1_basetype *", 0, 0, (void*)0, 0};
@@ -49087,6 +49330,7 @@ static swig_type_info _swigt__p_csRefArrayTiObject_t = {"_p_csRefArrayTiObject_t
 static swig_type_info _swigt__p_csRefCount = {"_p_csRefCount", "csRefCount *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csShaderVariable = {"_p_csShaderVariable", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_csRefTiImage_t = {"_p_csRefTiImage_t", "csRef<iImage > *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_csRenderBufferName = {"_p_csRenderBufferName", "csRenderBufferName *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csReversibleTransform = {"_p_csReversibleTransform", "csReversibleTransform *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csOrthoTransform = {"_p_csOrthoTransform", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_csSkeletalState2 = {"_p_csSkeletalState2", "csSkeletalState2 *", 0, 0, (void*)0, 0};
@@ -49385,6 +49629,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_ElementHandlerType,
   &_swigt__p_FileFormatDescription,
   &_swigt__p_HashType,
+  &_swigt__p_KeyType,
   &_swigt__p_ThisType,
   &_swigt__p_ValueType,
   &_swigt__p__1_basetype,
@@ -49405,6 +49650,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_csArrayTcsArrayTunsigned_int_csArrayElementHandlerTunsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTunsigned_int_csArrayElementHandlerTunsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t,
   &_swigt__p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t,
   &_swigt__p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t,
+  &_swigt__p_csArrayTcsRefTiShader_t_csArrayElementHandlerTcsRefTiShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t,
   &_swigt__p_csArrayTcsShaderVariable_p_csArrayElementHandlerTcsShaderVariable_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t,
   &_swigt__p_csArrayTcsVector2_csArrayElementHandlerTcsVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t,
   &_swigt__p_csArrayTcsVector3_csArrayElementHandlerTcsVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t,
@@ -49452,6 +49698,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_csRefArrayTiObject_t,
   &_swigt__p_csRefCount,
   &_swigt__p_csRefTiImage_t,
+  &_swigt__p_csRenderBufferName,
   &_swigt__p_csReversibleTransform,
   &_swigt__p_csShaderVariable,
   &_swigt__p_csSkeletalState2,
@@ -49745,16 +49992,17 @@ static swig_cast_info _swigc__p_CS__Graphics__RenderMeshModes[] = {  {&_swigt__p
 static swig_cast_info _swigc__p_CS__Memory__AllocatorMalloc[] = {  {&_swigt__p_CS__Memory__AllocatorMalloc, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csTriangleMeshEdge[] = {{&_swigt__p_csTriangleMeshEdge, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t[] = {{&_swigt__p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_csArrayTcsRefTiShader_t_csArrayElementHandlerTcsRefTiShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t[] = {{&_swigt__p_csArrayTcsRefTiShader_t_csArrayElementHandlerTcsRefTiShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t[] = {{&_swigt__p_csArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csArrayTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t[] = {{&_swigt__p_csArrayTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csDirtyAccessArrayTcsVector3_csArrayElementHandlerTcsVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t[] = {{&_swigt__p_csDirtyAccessArrayTcsVector3_csArrayElementHandlerTcsVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csDirtyAccessArrayTcsVector4_csArrayElementHandlerTcsVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t[] = {{&_swigt__p_csDirtyAccessArrayTcsVector4_csArrayElementHandlerTcsVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csDirtyAccessArrayTcsVector2_csArrayElementHandlerTcsVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t[] = {{&_swigt__p_csDirtyAccessArrayTcsVector2_csArrayElementHandlerTcsVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csArrayTcsVector3_csArrayElementHandlerTcsVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t[] = {{&_swigt__p_csArrayTcsVector3_csArrayElementHandlerTcsVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csArrayTcsVector4_csArrayElementHandlerTcsVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t[] = {{&_swigt__p_csArrayTcsVector4_csArrayElementHandlerTcsVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csArrayTcsVector2_csArrayElementHandlerTcsVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t[] = {{&_swigt__p_csArrayTcsVector2_csArrayElementHandlerTcsVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_csArrayTcsVector3_csArrayElementHandlerTcsVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t[] = {{&_swigt__p_csArrayTcsVector3_csArrayElementHandlerTcsVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csDirtyAccessArrayTunsigned_int_csArrayElementHandlerTunsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t[] = {{&_swigt__p_csDirtyAccessArrayTunsigned_int_csArrayElementHandlerTunsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_CS__Memory__CustomAllocated[] = {  {&_swigt__p_csTriangleMeshEdge, _p_csTriangleMeshEdgeTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_CS__Memory__CustomAllocated, 0, 0, 0},  {&_swigt__p_csArrayTunsigned_int_csArrayElementHandlerTunsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTunsigned_int_csArrayElementHandlerTunsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csDirtyAccessArrayTcsVector3_csArrayElementHandlerTcsVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csDirtyAccessArrayTcsVector3_csArrayElementHandlerTcsVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csDirtyAccessArrayTcsVector4_csArrayElementHandlerTcsVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csDirtyAccessArrayTcsVector4_csArrayElementHandlerTcsVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csDirtyAccessArrayTcsVector2_csArrayElementHandlerTcsVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csDirtyAccessArrayTcsVector2_csArrayElementHandlerTcsVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTcsVector3_csArrayElementHandlerTcsVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsVector3_csArrayElementHandlerTcsVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTcsVector4_csArrayElementHandlerTcsVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsVector4_csArrayElementHandlerTcsVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTcsVector2_csArrayElementHandlerTcsVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsVector2_csArrayElementHandlerTcsVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csDirtyAccessArrayTunsigned_int_csArrayElementHandlerTunsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csDirtyAccessArrayTunsigned_int_csArrayElementHandlerTunsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_CS__Memory__CustomAllocated[] = {  {&_swigt__p_csTriangleMeshEdge, _p_csTriangleMeshEdgeTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTcsRefTiShader_t_csArrayElementHandlerTcsRefTiShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsRefTiShader_t_csArrayElementHandlerTcsRefTiShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTchar_csArrayElementHandlerTchar_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTint_csArrayElementHandlerTint_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_CS__Memory__CustomAllocated, 0, 0, 0},  {&_swigt__p_csArrayTunsigned_int_csArrayElementHandlerTunsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTunsigned_int_csArrayElementHandlerTunsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csDirtyAccessArrayTcsVector3_csArrayElementHandlerTcsVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csDirtyAccessArrayTcsVector3_csArrayElementHandlerTcsVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csDirtyAccessArrayTcsVector4_csArrayElementHandlerTcsVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csDirtyAccessArrayTcsVector4_csArrayElementHandlerTcsVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csDirtyAccessArrayTcsVector2_csArrayElementHandlerTcsVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csDirtyAccessArrayTcsVector2_csArrayElementHandlerTcsVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTcsVector4_csArrayElementHandlerTcsVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsVector4_csArrayElementHandlerTcsVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTcsVector2_csArrayElementHandlerTcsVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsVector2_csArrayElementHandlerTcsVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayTcsVector3_csArrayElementHandlerTcsVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csArrayTcsVector3_csArrayElementHandlerTcsVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csDirtyAccessArrayTunsigned_int_csArrayElementHandlerTunsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t, _p_csDirtyAccessArrayTunsigned_int_csArrayElementHandlerTunsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_tTo_p_CS__Memory__CustomAllocated, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CalAnimationCallback[] = {  {&_swigt__p_CalAnimationCallback, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CalCoreModel[] = {  {&_swigt__p_CalCoreModel, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CalModel[] = {  {&_swigt__p_CalModel, 0, 0, 0},{0, 0, 0, 0}};
@@ -49763,6 +50011,7 @@ static swig_cast_info _swigc__p_ContainedType[] = {  {&_swigt__p_ContainedType, 
 static swig_cast_info _swigc__p_ElementHandlerType[] = {  {&_swigt__p_ElementHandlerType, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_FileFormatDescription[] = {  {&_swigt__p_FileFormatDescription, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_HashType[] = {  {&_swigt__p_HashType, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_KeyType[] = {  {&_swigt__p_KeyType, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_ThisType[] = {  {&_swigt__p_ThisType, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_ValueType[] = {  {&_swigt__p_ValueType, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p__1_basetype[] = {  {&_swigt__p__1_basetype, 0, 0, 0},{0, 0, 0, 0}};
@@ -49821,6 +50070,7 @@ static swig_cast_info _swigc__p_csRefArrayTiObject_t[] = {  {&_swigt__p_csRefArr
 static swig_cast_info _swigc__p_csShaderVariable[] = {{&_swigt__p_csShaderVariable, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csRefCount[] = {  {&_swigt__p_csShaderVariable, _p_csShaderVariableTo_p_csRefCount, 0, 0},  {&_swigt__p_csSkeletalState2, _p_csSkeletalState2To_p_csRefCount, 0, 0},  {&_swigt__p_csRefCount, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csRefTiImage_t[] = {  {&_swigt__p_csRefTiImage_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_csRenderBufferName[] = {  {&_swigt__p_csRenderBufferName, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csOrthoTransform[] = {{&_swigt__p_csOrthoTransform, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csReversibleTransform[] = {  {&_swigt__p_csReversibleTransform, 0, 0, 0},  {&_swigt__p_csOrthoTransform, _p_csOrthoTransformTo_p_csReversibleTransform, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csSkeletalState2[] = {  {&_swigt__p_csSkeletalState2, 0, 0, 0},{0, 0, 0, 0}};
@@ -50119,6 +50369,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_ElementHandlerType,
   _swigc__p_FileFormatDescription,
   _swigc__p_HashType,
+  _swigc__p_KeyType,
   _swigc__p_ThisType,
   _swigc__p_ValueType,
   _swigc__p__1_basetype,
@@ -50139,6 +50390,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_csArrayTcsArrayTunsigned_int_csArrayElementHandlerTunsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_csArrayElementHandlerTcsArrayTunsigned_int_csArrayElementHandlerTunsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t,
   _swigc__p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t,
   _swigc__p_csArrayTcsPluginRequest_csArrayElementHandlerTcsPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t,
+  _swigc__p_csArrayTcsRefTiShader_t_csArrayElementHandlerTcsRefTiShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t,
   _swigc__p_csArrayTcsShaderVariable_p_csArrayElementHandlerTcsShaderVariable_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t,
   _swigc__p_csArrayTcsVector2_csArrayElementHandlerTcsVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t,
   _swigc__p_csArrayTcsVector3_csArrayElementHandlerTcsVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityDefault_t,
@@ -50186,6 +50438,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_csRefArrayTiObject_t,
   _swigc__p_csRefCount,
   _swigc__p_csRefTiImage_t,
+  _swigc__p_csRenderBufferName,
   _swigc__p_csReversibleTransform,
   _swigc__p_csShaderVariable,
   _swigc__p_csSkeletalState2,

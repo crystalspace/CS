@@ -10198,6 +10198,116 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csRefShaderStringIDHash ##############
+
+package cspace::csRefShaderStringIDHash;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csRefShaderStringIDHash(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*Put = *cspacec::csRefShaderStringIDHash_Put;
+*GetAll = *cspacec::csRefShaderStringIDHash_GetAll;
+*PutUnique = *cspacec::csRefShaderStringIDHash_PutUnique;
+*Contains = *cspacec::csRefShaderStringIDHash_Contains;
+*In = *cspacec::csRefShaderStringIDHash_In;
+*GetElementPointer = *cspacec::csRefShaderStringIDHash_GetElementPointer;
+*Get = *cspacec::csRefShaderStringIDHash_Get;
+*GetOrCreate = *cspacec::csRefShaderStringIDHash_GetOrCreate;
+*Empty = *cspacec::csRefShaderStringIDHash_Empty;
+*DeleteAll = *cspacec::csRefShaderStringIDHash_DeleteAll;
+*Delete = *cspacec::csRefShaderStringIDHash_Delete;
+*GetSize = *cspacec::csRefShaderStringIDHash_GetSize;
+*IsEmpty = *cspacec::csRefShaderStringIDHash_IsEmpty;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csRefShaderStringIDHash($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iShaderArray ##############
+
+package cspace::iShaderArray;
+use overload
+    "!=" => sub { $_[0]->__ne__($_[1])},
+    "==" => sub { $_[0]->__eq__($_[1])},
+    "fallback" => 1;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::CustomAllocated cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iShaderArray($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_iShaderArray(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*GetSize = *cspacec::iShaderArray_GetSize;
+*Get = *cspacec::iShaderArray_Get;
+*Put = *cspacec::iShaderArray_Put;
+*Push = *cspacec::iShaderArray_Push;
+*Pop = *cspacec::iShaderArray_Pop;
+*Top = *cspacec::iShaderArray_Top;
+*Insert = *cspacec::iShaderArray_Insert;
+*Contains = *cspacec::iShaderArray_Contains;
+*DeleteAll = *cspacec::iShaderArray_DeleteAll;
+*Truncate = *cspacec::iShaderArray_Truncate;
+*Empty = *cspacec::iShaderArray_Empty;
+*IsEmpty = *cspacec::iShaderArray_IsEmpty;
+*SetMinimalCapacity = *cspacec::iShaderArray_SetMinimalCapacity;
+*DeleteIndex = *cspacec::iShaderArray_DeleteIndex;
+*DeleteIndexFast = *cspacec::iShaderArray_DeleteIndexFast;
+*DeleteRange = *cspacec::iShaderArray_DeleteRange;
+*__eq__ = *cspacec::iShaderArray___eq__;
+*__ne__ = *cspacec::iShaderArray___ne__;
+*GetAllocator = *cspacec::iShaderArray_GetAllocator;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iTextureHandle ##############
 
 package cspace::iTextureHandle;
@@ -13569,10 +13679,10 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *IsShadowCasting = *cspacec::iGeneralMeshCommonState_IsShadowCasting;
 *SetShadowReceiving = *cspacec::iGeneralMeshCommonState_SetShadowReceiving;
 *IsShadowReceiving = *cspacec::iGeneralMeshCommonState_IsShadowReceiving;
-*AddRenderBuffer = *cspacec::iGeneralMeshCommonState_AddRenderBuffer;
-*RemoveRenderBuffer = *cspacec::iGeneralMeshCommonState_RemoveRenderBuffer;
 *GetRenderBufferCount = *cspacec::iGeneralMeshCommonState_GetRenderBufferCount;
 *GetRenderBufferName = *cspacec::iGeneralMeshCommonState_GetRenderBufferName;
+*AddRenderBuffer = *cspacec::iGeneralMeshCommonState_AddRenderBuffer;
+*RemoveRenderBuffer = *cspacec::iGeneralMeshCommonState_RemoveRenderBuffer;
 *GetRenderBuffer = *cspacec::iGeneralMeshCommonState_GetRenderBuffer;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -19319,6 +19429,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetTextureWrapper = *cspacec::iMaterialEngine_GetTextureWrapper;
 *Visit = *cspacec::iMaterialEngine_Visit;
 *IsVisitRequired = *cspacec::iMaterialEngine_IsVisitRequired;
+*scfGetVersion = *cspacec::iMaterialEngine_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
