@@ -181,7 +181,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       compiler->synldr->ReportBadToken (child);
       return false;
     }
-    aliases.Put (aliasName, aliasFile);
+    aliases.PutUnique (aliasName, aliasFile);
     return true;
   }
   
@@ -651,6 +651,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
           {
             HandleVaryingNode (*newTech, child, aliases);
           }
+          break;
+        case WeaverCompiler::XMLTOKEN_ALIAS:
           break;
         default:
           if (passForward)
