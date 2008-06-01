@@ -249,12 +249,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       bufferNode->SetAttribute ("source", bufName);
       bufferNode->SetAttribute ("destination", 
         csString().Format ("vertexIn.%s", cgIdent.GetData()));
-
-      bufferNode = blockNode->CreateNodeBefore (CS_NODE_ELEMENT);
-      bufferNode->SetValue ("buffer");
-      bufferNode->SetAttribute ("source", bufName);
-      bufferNode->SetAttribute ("destination", 
-        csString().Format ("fragmentIn.%s", cgIdent.GetData()));
     }
 
     {
@@ -263,7 +257,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       blockNode = node->CreateNodeBefore (CS_NODE_ELEMENT);
       blockNode->SetValue ("block");
       blockNode->SetAttribute ("location", 
-        csString().Format ("%s:fragmentIn", locationPrefix));
+        csString().Format ("%s:vertexToFragment", locationPrefix));
 
       varyingNode = blockNode->CreateNodeBefore (CS_NODE_ELEMENT);
       varyingNode->SetValue ("varying");
@@ -289,7 +283,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       blockNode->SetAttribute ("location", 
         csString().Format ("%s:fragmentMain", locationPrefix));
       contents = blockNode->CreateNodeBefore (CS_NODE_TEXT);
-      contents->SetValue (csString().Format ("%s = fragmentIn.%s;",
+      contents->SetValue (csString().Format ("%s = %s;\n",
         outputName, cgIdent.GetData()));
 
       blockNode = node->CreateNodeBefore (CS_NODE_ELEMENT);
@@ -297,8 +291,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       blockNode->SetAttribute ("location", 
         csString().Format ("%s:vertexMain", locationPrefix));
       contents = blockNode->CreateNodeBefore (CS_NODE_TEXT);
-      contents->SetValue (csString().Format ("%s = vertexIn.%s;",
-        outputName, cgIdent.GetData()));
+      contents->SetValue (csString().Format (
+        "%s = vertexIn.%s;\n%s = vertexIn.%s;\n",
+        outputName, cgIdent.GetData(),
+        cgIdent.GetData(), cgIdent.GetData()));
     }
   }
 
