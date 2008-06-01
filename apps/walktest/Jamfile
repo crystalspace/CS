@@ -13,11 +13,13 @@ LinkWith walktest : crystalspace ;
 # against these options on a regular basis.
 if $(COMPILER.C++FLAGS.PEDANTIC.ENABLE)
 {
-  CFlags walktest : $(COMPILER.C++FLAGS.PEDANTIC.ENABLE) ;
+  #CFlags walktest : $(COMPILER.C++FLAGS.PEDANTIC.ENABLE) ;
 }
 
 # List of plugins which should be go into walkall.
 WALKALL.PLUGINLIST =
+  animesh
+  animeshldr
   bezier
   bezierldr
   bugplug
@@ -47,6 +49,8 @@ WALKALL.PLUGINLIST =
   gmeshldr
   gmeshskelanim2
   skeleton
+  skeleton2
+  skeleton2ldr
   skelldr
   vproc_std
   haze
@@ -60,6 +64,7 @@ WALKALL.PLUGINLIST =
   reporter
   rm_rlcompat
   rm_unshadowed
+  rm_shadow_pssm
   sequence
   shadermgr
   simpleformer
