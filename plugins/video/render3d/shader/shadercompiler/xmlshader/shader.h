@@ -354,7 +354,7 @@ public:
     }
 
     csXMLShaderTech* tech = TechForTicket (ticket);
-    tech->GetUsedShaderVars (bits);
+    if (tech != 0) tech->GetUsedShaderVars (bits);
   }
 
   friend class csXMLShaderCompiler;
