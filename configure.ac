@@ -221,7 +221,26 @@ AC_DEFUN([CS_CHECK_RTLD],
 
 CS_CHECK_RTLD
 
+#------------------------------------------------------------------------------
+# Check for SIMD flags
+#------------------------------------------------------------------------------
 
+CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx], [CS_CREATE_TUPLE([-mmmx])])
+CS_CHECK_BUILD_FLAGS([for -msse flag], [cs_cv_prog_cc_msse], [CS_CREATE_TUPLE([-msse])])
+CS_CHECK_BUILD_FLAGS([for -msse2 flag], [cs_cv_prog_cc_msse2], [CS_CREATE_TUPLE([-msse2])])
+
+AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MMX], [$cs_cv_prog_cc_mmmx],[+])])
+
+
+AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
+    [CS_CHECK_BUILD([checking for mmintrin.h],
+        [cs_cv_header_mmintrin_h],
+        [AC_LANG_PROGRAM([[#include <mmintrin.h>]], [])],
+        [CS_CREATE_TUPLE([$cs_cv_prog_cc_mmmx])],
+        [C++],
+        [CS_HEADER_PROPERTY([CS_SUPPORTS_MMX])
+        CS_EMIT_BUILD_PROPERTY([CS_SUPPORTS_MMX], [yes])])])
 
 #------------------------------------------------------------------------------
 # Determine host platform.  Recognized platforms: Unix, Windows, Mac OS X.
@@ -240,6 +259,12 @@ case $cs_host_target in
         CS_EMIT_BUILD_PROPERTY([COREAUDIO.LFLAGS],
 	    [-framework CoreAudio -framework AudioToolbox])
         CS_HEADER_PROPERTY([CS_PLATFORM_MACOSX])
+        AS_IF([test -n "$cs_cv_prog_cc_msse"],
+            [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
+            [$cs_cv_prog_cc_msse], [+])])
+        AS_IF([test -n "$cs_cv_prog_cc_msse2"],
+            [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
+            [$cs_cv_prog_cc_msse2], [+])])
         ;;
 esac
 case $cs_host_family in
@@ -252,27 +277,6 @@ case $cs_host_family in
     esac
 CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
     [AS_ESCAPE(["])$cs_host_os_normalized[]AS_ESCAPE(["])])
-
-
-
-#------------------------------------------------------------------------------
-# Check for SIMD flags
-#------------------------------------------------------------------------------
-
-CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx], 
-    [CS_CREATE_TUPLE([-mmmx])])
-AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MMX], [$cs_cv_prog_cc_mmmx],[+])])
-
-
-AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
-    [CS_CHECK_BUILD([checking for mmintrin.h],
-        [cs_cv_header_mmintrin_h],
-        [AC_LANG_PROGRAM([[#include <mmintrin.h>]], [])],
-        [CS_CREATE_TUPLE([$cs_cv_prog_cc_mmmx])],
-        [C++],
-        [CS_HEADER_PROPERTY([CS_SUPPORTS_MMX])
-        CS_EMIT_BUILD_PROPERTY([CS_SUPPORTS_MMX], [yes])])])
 
 
 #------------------------------------------------------------------------------
