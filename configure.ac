@@ -261,12 +261,12 @@ case $cs_host_target in
         CS_HEADER_PROPERTY([CS_PLATFORM_MACOSX])
         AS_IF([test -n "$cs_cv_prog_cc_msse"],
             [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
-             [$cs_cv_prog_cc_msse], [+])
-	     CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
-	     ["-mfpmath=sse"], [+])])
+             [$cs_cv_prog_cc_msse], [+])])
         AS_IF([test -n "$cs_cv_prog_cc_msse2"],
             [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
-             [$cs_cv_prog_cc_msse2], [+])])
+             [$cs_cv_prog_cc_msse2], [+])
+	     CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
+	     ["-mfpmath=sse"], [+])])
         ;;
 esac
 case $cs_host_family in
