@@ -143,46 +143,56 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     const char* outputName, const char* uniqueTag)
   {
     csString cgIdent = MakeIdentifier (uniqueTag);
+    bool isTexture = false;
+    const WeaverCommon::TypeInfo* outputTypeInfo =
+      WeaverCommon::QueryTypeInfo (outputType);
+    if (outputTypeInfo != 0)
+      isTexture = outputTypeInfo->baseType == WeaverCommon::TypeInfo::Sampler;
 
     csRef<iDocumentNode> blockNode;
 
-    blockNode = node->CreateNodeBefore (CS_NODE_ELEMENT);
-    blockNode->SetValue ("block");
-    blockNode->SetAttribute ("location", "pass");
+    if (!isTexture)
     {
-      csRef<iDocumentNode> textureNode;
-
-      textureNode = blockNode->CreateNodeBefore (CS_NODE_ELEMENT);
-      textureNode->SetValue ("texture");
-      textureNode->SetAttribute ("name", svName);
-      textureNode->SetAttribute ("destination", 
-        csString().Format ("vertexIn.%s", cgIdent.GetData()));
-
-      textureNode = blockNode->CreateNodeBefore (CS_NODE_ELEMENT);
-      textureNode->SetValue ("texture");
-      textureNode->SetAttribute ("name", svName);
-      textureNode->SetAttribute ("destination", 
-        csString().Format ("fragmentIn.%s", cgIdent.GetData()));
+      blockNode = node->CreateNodeBefore (CS_NODE_ELEMENT);
+      blockNode->SetValue ("block");
+      blockNode->SetAttribute ("location", 
+	csString().Format ("%s:variablemap", locationPrefix));
+      {
+	csRef<iDocumentNode> varMapNode;
+  
+	varMapNode = blockNode->CreateNodeBefore (CS_NODE_ELEMENT);
+	varMapNode->SetValue ("variablemap");
+	varMapNode->SetAttribute ("variable", svName);
+	varMapNode->SetAttribute ("destination", 
+	  csString().Format ("vertexIn.%s", cgIdent.GetData()));
+  
+	varMapNode = blockNode->CreateNodeBefore (CS_NODE_ELEMENT);
+	varMapNode->SetValue ("variablemap");
+	varMapNode->SetAttribute ("variable", svName);
+	varMapNode->SetAttribute ("destination", 
+	  csString().Format ("fragmentIn.%s", cgIdent.GetData()));
+      }
     }
-
-    blockNode = node->CreateNodeBefore (CS_NODE_ELEMENT);
-    blockNode->SetValue ("block");
-    blockNode->SetAttribute ("location", 
-      csString().Format ("%s:variablemap", locationPrefix));
+    else
     {
-      csRef<iDocumentNode> varMapNode;
-
-      varMapNode = blockNode->CreateNodeBefore (CS_NODE_ELEMENT);
-      varMapNode->SetValue ("variablemap");
-      varMapNode->SetAttribute ("variable", svName);
-      varMapNode->SetAttribute ("destination", 
-        csString().Format ("vertexIn.%s", cgIdent.GetData()));
-
-      varMapNode = blockNode->CreateNodeBefore (CS_NODE_ELEMENT);
-      varMapNode->SetValue ("variablemap");
-      varMapNode->SetAttribute ("variable", svName);
-      varMapNode->SetAttribute ("destination", 
-        csString().Format ("fragmentIn.%s", cgIdent.GetData()));
+      blockNode = node->CreateNodeBefore (CS_NODE_ELEMENT);
+      blockNode->SetValue ("block");
+      blockNode->SetAttribute ("location", "pass");
+      {
+	csRef<iDocumentNode> textureNode;
+  
+	textureNode = blockNode->CreateNodeBefore (CS_NODE_ELEMENT);
+	textureNode->SetValue ("texture");
+	textureNode->SetAttribute ("name", svName);
+	textureNode->SetAttribute ("destination", 
+	  csString().Format ("vertexIn.%s", cgIdent.GetData()));
+  
+	textureNode = blockNode->CreateNodeBefore (CS_NODE_ELEMENT);
+	textureNode->SetValue ("texture");
+	textureNode->SetAttribute ("name", svName);
+	textureNode->SetAttribute ("destination", 
+	  csString().Format ("fragmentIn.%s", cgIdent.GetData()));
+      }
     }
 
     {
