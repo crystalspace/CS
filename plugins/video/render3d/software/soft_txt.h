@@ -40,14 +40,14 @@ class csSoftwareTextureHandle;
 
 /**
  * A software texture.
- * Every csSoftwareTextureHandle contains several csSoftwareTexture 
+ * Every csSoftwareTextureHandle contains several csSoftwareTexture
  * objects.
- * Every csSoftwareTexture is just a single image and all associated 
- * parameters - width, height, shifts and so on. For performance reasons 
- * textures are allowed to be only power-of-two sizes (both horizontal and 
+ * Every csSoftwareTexture is just a single image and all associated
+ * parameters - width, height, shifts and so on. For performance reasons
+ * textures are allowed to be only power-of-two sizes (both horizontal and
  * vertical).
  * This allows us to use simple binary shift/and instead of mul/div.
- * It is the responsability of csSoftwareTextureHandle  to resize textures 
+ * It is the responsability of csSoftwareTextureHandle  to resize textures
  * if they do not fulfil this requirement.
  */
 class csSoftwareTexture : public SoftwareTexture
@@ -62,7 +62,7 @@ public:
   csSoftwareTextureHandle* parent;
 
   /// Create a csTexture object
-  csSoftwareTexture (csSoftwareTextureHandle* Parent, iImage *Image) : 
+  csSoftwareTexture (csSoftwareTextureHandle* Parent, iImage *Image) :
     parent (Parent)
   {
     bitmap = 0;
@@ -72,7 +72,7 @@ public:
     ImageToBitmap (Image);
   }
   /// Create a csTexture object
-  csSoftwareTexture (csSoftwareTextureHandle* Parent, int w, int h) : 
+  csSoftwareTexture (csSoftwareTextureHandle* Parent, int w, int h) :
     parent (Parent)
   {
     this->w = w;
@@ -88,6 +88,9 @@ public:
     cs_free (bitmap);
   }
 };
+
+// For GetTextureTarget ()
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * csSoftwareTextureHandle represents a texture and all its mipmapped
@@ -112,6 +115,16 @@ protected:
 
   /// Create all mipmapped bitmaps from the first level.
   void CreateMipmaps ();
+
+  struct BlitBuffer
+  {
+    int x;
+    int y;
+    int width;
+    int height;
+    iTextureHandle::TextureBlitDataFormat format;
+  };
+  csHash<BlitBuffer, csPtrKey<uint8> > blitBuffers;
 public:
   /// Create the mipmapped texture object
   csSoftwareTextureHandle (csSoftwareTextureManager *texman, iImage *image,
@@ -127,7 +140,7 @@ public:
    * This depends both on whenever the original image had an alpha channel
    * and of the fact whenever the renderer supports alpha maps at all.
    */
-  virtual bool GetAlphaMap () 
+  virtual bool GetAlphaMap ()
   { return alphaType != csAlphaMode::alphaNone; }
 
   /**
@@ -137,7 +150,8 @@ public:
 
   /**\name iTextureHandle implementation
    * @{ */
-  virtual void Precache () {}
+  virtual void Precache () { }
+  virtual bool IsPrecached () { return prepared;}
 
   virtual bool GetRendererDimensions (int& /*mw*/, int& /*mh*/, int& /*md*/)
   { return false; }
@@ -152,7 +166,7 @@ public:
 
   virtual void SetTextureTarget(int /*target*/)
   { }
-  
+
   virtual int GetTextureTarget () const
   {
     return iTextureHandle::CS_TEX_IMG_2D;
@@ -177,7 +191,19 @@ public:
       delete tex[i]; tex[i] = 0;
     }
   }
+
+  virtual TextureType GetTextureType () const
+  {
+    return texType2D;
+  }
+
+  uint8* QueryBlitBuffer (int x, int y, int width, int height,
+    size_t& pitch, TextureBlitDataFormat format, uint bufFlags);
+  void ApplyBlitBuffer (uint8* buf);
+  BlitBufferNature GetBufferNature (uint8* buf) { return natureDirect; }
 };
+
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * Software version of the texture manager. This instance of the
@@ -235,7 +261,7 @@ public:
       csImageType imagetype, const char* format, int flags,
       iString* fail_reason = 0);
 
-  virtual csPtr<iSuperLightmap> CreateSuperLightmap (int width, 
+  virtual csPtr<iSuperLightmap> CreateSuperLightmap (int width,
     int height);
 
   virtual void GetMaxTextureSize (int& w, int& h, int& aspect);

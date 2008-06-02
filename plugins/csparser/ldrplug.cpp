@@ -23,6 +23,9 @@
 #include "iutil/document.h"
 #include "iutil/objreg.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(csparser)
+{
+
 struct csLoaderPluginRec
 {
   csString ShortName;
@@ -104,8 +107,8 @@ bool csLoader::csLoadedPluginVector::GetPluginFromRec (
     rec->Component = csQueryRegistryTag (object_reg, rec->ClassID);
     if (!rec->Component)
     {
-      csRef<iComponent> comp = CS_LOAD_PLUGIN (plugin_mgr,
-    	  rec->ClassID, iComponent);
+      csRef<iComponent> comp = csLoadPlugin<iComponent> (plugin_mgr,
+    	  rec->ClassID);
       rec->Component = comp;
     }
     if (rec->Component)
@@ -139,6 +142,18 @@ bool csLoader::csLoadedPluginVector::FindPlugin (
   return GetPluginFromRec (vector.Get(vector.GetSize ()-1),
   	plug, binplug);
 }
+
+const char* csLoader::csLoadedPluginVector::FindPluginClassID (const char* Name)
+{
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
+  // look if there is already a loading record for this plugin
+  csLoaderPluginRec* pl = FindPluginRec (Name);
+  if (pl)
+    return pl->ClassID;
+  
+  return 0;
+}
+    
 
 void csLoader::csLoadedPluginVector::NewPlugin
 	(const char *ShortName, iDocumentNode* child)
@@ -193,3 +208,5 @@ void csLoader::csLoadedPluginVector::NewPlugin
   }
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(csparser)

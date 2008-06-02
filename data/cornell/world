@@ -2,13 +2,6 @@
 <!-- http://projects.blender.org/projects/blend2cs -->
 <world>
   <plugins>
-    <plugin name="thing">
-      <id>crystalspace.mesh.loader.thing</id>
-      <defaults>
-        <staticshape/>
-        <staticpos/>
-      </defaults>
-    </plugin>
     <plugin name="null">crystalspace.mesh.loader.null</plugin>
     <plugin name="genmesh">
       <id>crystalspace.mesh.loader.genmesh</id>
@@ -18,12 +11,6 @@
       </defaults>
     </plugin>
     <plugin name="sprite3d">crystalspace.mesh.loader.sprite.3d</plugin>
-    <plugin name="thingfact">
-      <id>crystalspace.mesh.loader.factory.thing</id>
-      <defaults>
-        <staticshape/>
-      </defaults>
-    </plugin>
     <plugin name="genmeshfact">
       <id>crystalspace.mesh.loader.factory.genmesh</id>
       <defaults>

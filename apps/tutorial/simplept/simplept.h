@@ -27,14 +27,32 @@ class csEngineProcTex : public csProcTexture
 private:
   csRef<iEngine> Engine;
   csRef<iView> View;
+  
+  struct Target
+  {
+    csRef<iTextureHandle> texh;
+    csRenderTargetAttachment attachment;
+    const char* format;
+  };
+  csArray<Target> targets;
+  size_t currentTarget;
 
+  csString currentTargetStr;
+  csString availableFormatsStr;
+  bool renderTargetState;
 public:
   csEngineProcTex ();
   ~csEngineProcTex ();
 
   bool LoadLevel ();
+  iTextureWrapper* CreateTexture (iObjectRegistry* object_reg);
   virtual bool PrepareAnim ();
   virtual void Animate (csTicks current_time);
+  
+  const char* GetCurrentTarget () const { return currentTargetStr; }
+  const char* GetAvailableFormats() const { return availableFormatsStr; }
+  bool GetRenderTargetState() const { return renderTargetState; }
+  void CycleTarget();
 };
 
 class Simple
@@ -56,9 +74,9 @@ private:
   csEngineProcTex* ProcTexture;
   csRef<iMeshWrapper> genmesh;
   csRef<iGeneralFactoryState> factstate;
+  csRef<iFont> font;
 
-  void CreatePolygon (iThingFactoryState *th, int v1, int v2, int v3, int v4,
-    iMaterialWrapper *mat);
+  void CreatePolygon (iGeneralFactoryState *th, int v1, int v2, int v3, int v4);
 
   int genmesh_resolution;
   csVector3 genmesh_scale;

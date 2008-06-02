@@ -23,10 +23,17 @@
 #include "csextern.h"
 
 #include "csgeom/trimesh.h"
-#include "csgeom/pmtools.h"
 #include "csutil/array.h"
 
 struct csTriangle;
+
+/**
+ * A triangle with minimum/maximum information on x.
+ */
+struct CS_CRYSTALSPACE_EXPORT csTriangleMinMax : public csTriangle
+{
+  float minx, maxx;
+};
 
 /**\file 
  * Set of tools to work with iTriangleMesh instances.
@@ -42,7 +49,8 @@ struct iTriangleMesh;
 /**
  * A definition of one edge.
  */
-struct CS_CRYSTALSPACE_EXPORT csTriangleMeshEdge
+struct CS_CRYSTALSPACE_EXPORT csTriangleMeshEdge : 
+  public CS::Memory::CustomAllocated
 {
   /**
    * Indices of the two vertices forming the edge.
@@ -174,7 +182,7 @@ public:
    */
   static bool PointInClosedMesh (const csVector3& point,
   	csVector3* vertices,
-  	csTriangleMinMax* tris, int tri_count,
+  	csTriangleMinMax* tris, size_t tri_count,
 	csPlane3* planes);
 
   /**
@@ -191,7 +199,7 @@ public:
    */
   static bool LineInClosedMesh (const csVector3& p1, const csVector3& p2,
   	csVector3* vertices,
-  	csTriangleMinMax* tris, int tri_count,
+  	csTriangleMinMax* tris, size_t tri_count,
 	csPlane3* planes);
 
   /**
@@ -208,7 +216,7 @@ public:
    */
   static bool BoxInClosedMesh (const csBox3& box,
   	csVector3* vertices,
-  	csTriangleMinMax* tris, int tri_count,
+  	csTriangleMinMax* tris, size_t tri_count,
 	csPlane3* planes);
 
   /**

@@ -103,8 +103,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(BugPlug)
 #define DEBUGCMD_ILACE		1011	// Enable interlacing
 #define DEBUGCMD_MMX		1012	// Enable MMX
 #define DEBUGCMD_TRANSP		1013	// Enable transparent mode
-#define DEBUGCMD_MIPMAP		1014	// Set mipmapping mode
-#define DEBUGCMD_INTER		1015	// Set interpolation mode
 #define DEBUGCMD_GAMMA		1016	// Set gamma
 #define DEBUGCMD_DBLBUFF	1017	// Set double buffering (G2D)
 #define DEBUGCMD_DUMPCAM	1018	// Dump the camera
@@ -159,6 +157,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(BugPlug)
 #define DEBUGCMD_PROFAUTORESET	1067	// Reset profiler automagically at end of every frame
 #define DEBUGCMD_UBERSCREENSHOT 1068    // Create an "uberscreenshot"
 #define DEBUGCMD_MESHNORM       1069    // Draw normals of selected mesh
+#define DEBUGCMD_TOGGLEFPSTIME 1070 // Toggle between fps and frame time display
+#define DEBUGCMD_MESHSKEL       1080    // Draw skeleton of selected mesh
 
 // For showing of polygon meshes.
 #define BUGPLUG_POLYMESH_NO	0
@@ -238,6 +238,7 @@ private:
   csRef<iVirtualClock> vc;
   csRef<iFont> fnt;
   csRef<iStringSet> stringSet;
+  csRef<iStandardReporterListener> stdrep;
   bool initialized;
   csConfigAccess config;
   /**
@@ -299,7 +300,7 @@ private:
   void AddSelectedMesh (iMeshWrapper* m);
   void RemoveSelectedMesh (iMeshWrapper* m);
   bool HasSelectedMeshes () const { return selected_meshes.GetSize () > 0; }
-  void MoveSelectedMeshes (const csVector3& offset);
+  void MoveSelectedMeshes (const csVector3& offset);  
 
   // Shadow!
   csShadow* shadow;
@@ -520,6 +521,9 @@ public:
   CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
 
   CS_DECLARE_EVENT_SHORTCUTS;
+
+  private:
+    bool display_time;
 };
 
 }

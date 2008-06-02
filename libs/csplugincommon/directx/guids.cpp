@@ -19,6 +19,12 @@
 
 #include "cssysdef.h"
 
+/* If Lean-And-Mean is used it can happen that guiddef.h is included later
+ * which disturbs our ways. */
+#ifdef WIN32_LEAN_AND_MEAN
+#undef WIN32_LEAN_AND_MEAN
+#endif
+
 #define INITGUID
 #include "csplugincommon/directx/guids.h"
 

@@ -38,16 +38,16 @@ namespace Threading
   enum ThreadPriority
   {
     /// Reduced thread priority. Useful for background tasks.
-    THREAD_PRIO_LOW,
+    THREAD_PRIO_LOW = 0,
 
     /// Normal thread priority.
-    THREAD_PRIO_NORMAL,
+    THREAD_PRIO_NORMAL = 1,
 
     /**
      * Increased thread priority. Useful for tasks that needs precedence over
      * all other.
      */
-    THREAD_PRIO_HIGH
+    THREAD_PRIO_HIGH = 2
   };
 
   /**
@@ -205,7 +205,7 @@ namespace Threading
     /**
      * Yield Thread frees CPU time if nothing to do.
      * \remark This Yields execution time in the thread in which this function 
-     * is called. For example,  OtherThread->Yeild() will NOT have the results 
+     * is called. For example,  OtherThread->Yield() will NOT have the results 
      * that would be expected.
      */
     static void Yield ()

@@ -131,7 +131,7 @@ private:
    * origins from within the derived user application class. It should be
    * set in the derived class' constructor.
    */
-  static char* m_ApplicationStringName;
+  static const char* m_ApplicationStringName;
   
   /**
    * Flag to indicate whether the application should be restarted instead of
@@ -303,7 +303,7 @@ public:
    * The string should be in the form "vendor.application-name". Spaces should
    * be avoided.
    */
-  static void SetApplicationName (char *name)
+  static void SetApplicationName (const char *name)
   {
     m_ApplicationStringName = name;
   }

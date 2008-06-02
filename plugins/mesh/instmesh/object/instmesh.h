@@ -38,7 +38,6 @@
 #include "iengine/light.h"
 #include "iengine/lightmgr.h"
 #include "iengine/shadcast.h"
-#include "igeom/polymesh.h"
 #include "igeom/trimesh.h"
 #include "imesh/instmesh.h"
 #include "imesh/lighting.h"
@@ -53,7 +52,6 @@
 class csBSPTree;
 class csColor;
 class csColor4;
-class csPolygonMesh;
 struct iCacheManager;
 struct iEngine;
 struct iMaterialWrapper;
@@ -86,12 +84,13 @@ public:
   }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 struct csInstance
 {
   csReversibleTransform transform;
   size_t id;
+  bool lighting_dirty;
 };
 
 /**
@@ -134,6 +133,7 @@ private:
 
   // The instances.
   csArray<csInstance> instances;
+  csHash<size_t, size_t> instances_hash;
   static size_t max_instance_id;
   void CalculateInstanceArrays ();
   void UpdateInstanceGeometry (size_t id);
@@ -153,6 +153,7 @@ private:
   csColor4 base_color;
   float current_lod;
   uint32 current_features;
+  uint32 changenr;
   csFlags flags;
 
   bool do_shadows;
@@ -184,6 +185,7 @@ private:
   // If the following flag is dirty then some of the affecting lights
   // has changed and we need to recalculate.
   bool lighting_dirty;
+  bool lighting_full_dirty;
 
   // choose whether to draw shadow caps or not
   bool shadow_caps;
@@ -223,6 +225,11 @@ private:
   void UpdateLighting (
       const csArray<iLightSectorInfluence*>& lights, iMovable* movable);
 
+  /**
+   * Update instances_hash.
+   */
+  void UpdateInstancesHash ();
+
 public:
   /// Constructor.
   csInstmeshMeshObject (csInstmeshMeshObjectFactory* factory);
@@ -231,6 +238,8 @@ public:
 
   /// Destructor.
   virtual ~csInstmeshMeshObject ();
+
+  uint32 GetChangeNumber() const { return changenr; }
 
   void SetMixMode (uint mode)
   {
@@ -331,43 +340,10 @@ public:
 
   /**\name iObjectModel implementation
    * @{ */
-  virtual void GetObjectBoundingBox (csBox3& bbox)
-  {
-    bbox = GetObjectBoundingBox ();
-  }
   virtual const csBox3& GetObjectBoundingBox ();
   /** @} */
 
   virtual iObjectModel* GetObjectModel () { return this; }
-
-  //------------------ iPolygonMesh interface implementation ----------------//
-  struct PolyMesh : public scfImplementation1<PolyMesh, iPolygonMesh>
-  {
-  private:
-    csFlags flags;
-    csInstmeshMeshObject* parent;
-  public:
-    virtual int GetVertexCount ();
-    virtual csVector3* GetVertices ();
-    virtual int GetPolygonCount ();
-    virtual csMeshedPolygon* GetPolygons ();
-    virtual int GetTriangleCount ();
-    virtual csTriangle* GetTriangles ();
-    virtual void Lock () { }
-    virtual void Unlock () { }
-    
-    virtual csFlags& GetFlags () { return flags;  }
-    virtual uint32 GetChangeNumber() const { return 0; }
-
-    PolyMesh (csInstmeshMeshObject* parent) : scfImplementationType (this),
-      parent (parent)
-    {
-      flags.Set (CS_POLYMESH_TRIANGLEMESH);
-    }
-    virtual ~PolyMesh () { }
-  };
-  csRef<PolyMesh> polygonMesh;
-  friend struct PolyMesh;
 
   //------------------ iTriangleMesh interface implementation ----------------//
   struct TriMesh : public scfImplementation1<TriMesh, iTriangleMesh>
@@ -375,6 +351,7 @@ public:
   private:
     csFlags flags;
     csInstmeshMeshObject* parent;
+
   public:
     virtual size_t GetVertexCount ();
     virtual csVector3* GetVertices ();
@@ -384,7 +361,7 @@ public:
     virtual void Unlock () { }
     
     virtual csFlags& GetFlags () { return flags;  }
-    virtual uint32 GetChangeNumber() const { return 0; }
+    virtual uint32 GetChangeNumber() const { return parent->GetChangeNumber (); }
 
     TriMesh (csInstmeshMeshObject* parent) : scfImplementationType (this),
       parent (parent)
@@ -419,7 +396,7 @@ public:
   void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * Factory for general meshes.
@@ -441,6 +418,7 @@ private:
   csDirtyAccessArray<csTriangle> fact_triangles;
 
   csBox3 factory_bbox;
+  bool factory_bbox_valid;
   float factory_radius;
 
   bool autonormals;
@@ -478,9 +456,17 @@ public:
   virtual ~csInstmeshMeshObjectFactory ();
 
   /// Get the bounding box.
-  const csBox3& GetFactoryBox () const { return factory_bbox; }
+  const csBox3& GetFactoryBox ()
+  {
+    CalculateBoundingVolumes ();
+    return factory_bbox;
+  }
   /// Get the bounding radius.
-  const float GetFactoryRadius () const { return factory_radius; }
+  const float GetFactoryRadius ()
+  {
+    CalculateBoundingVolumes ();
+    return factory_radius;
+  }
 
   /// Calculate the factory bounding box and sphere.
   void CalculateBoundingVolumes ();
@@ -524,12 +510,6 @@ public:
 
   void CalculateNormals (bool compress);
   void Compress ();
-  void GenerateBox (const csBox3& box);
-  void GenerateQuad (const csVector3& v1, const csVector3& v2, 
-    const csVector3& v3, const csVector3& v4);
-  void GenerateSphere (const csEllipsoid& sphere, int rim_vertices,
-      	bool cyl_mapping = false, bool toponly = false,
-	bool reversed = false);
 
   iStringSet* GetStrings()
   { return strings; }

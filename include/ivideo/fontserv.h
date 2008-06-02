@@ -234,7 +234,7 @@ struct iFont : public virtual iBase
  * - FreeType2 Font server plugin (crystalspace.font.server.freetype2)
  *
  * Main ways to get pointers to this interface:
- * - CS_QUERY_REGISTRY()
+ * - csQueryRegistry<iFontServer>()
  *
  * Main users of this interface:
  * - iGraphics3D implementations (3D renderers).

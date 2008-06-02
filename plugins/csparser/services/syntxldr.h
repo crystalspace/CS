@@ -34,7 +34,7 @@ struct csGradientShade;
 CS_PLUGIN_NAMESPACE_BEGIN(SyntaxService)
 {
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * This component provides services for other loaders to easily parse
@@ -42,10 +42,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(SyntaxService)
  * the textual representation.
  */
 class csTextSyntaxService : 
-  public scfImplementation3<csTextSyntaxService,
+  public scfImplementation2<csTextSyntaxService,
                             iSyntaxService,
-                            iComponent,
-                            iDebugHelper>
+                            iComponent>
 {
 protected:
   iObjectRegistry* object_reg;
@@ -101,7 +100,35 @@ public:
 	iDocumentNode* child, iLoaderContext* ldr_context,
 	uint32 &flags, bool &mirror, bool &warp, int& msv,
 	csMatrix3 &m, csVector3 &before, csVector3 &after,
-	iString* destSector, bool& handled, bool& autoresolve);
+	iString* destSector, bool& handled, bool& autoresolve)
+  {
+    csRef<csRefCount> state;
+    CS::Utility::PortalParameters params;
+    params.flags = flags;
+    params.mirror = mirror;
+    params.warp = warp;
+    params.msv = msv;
+    params.m = m;
+    params.before = before;
+    params.after = after;
+    params.destSector = destSector;
+    params.autoresolve = autoresolve;
+    bool ret = HandlePortalParameter (child, ldr_context, state, params, handled);
+    flags = params.flags;
+    mirror = params.mirror;
+    warp = params.warp;
+    msv = params.msv;
+    m = params.m;
+    before = params.before;
+    after = params.after;
+    destSector = params.destSector;
+    autoresolve = params.autoresolve;
+    return ret;
+  }
+  virtual bool HandlePortalParameter (
+    iDocumentNode* child, iLoaderContext* ldr_context,
+    csRef<csRefCount>& parseState, CS::Utility::PortalParameters& params,
+    bool& handled);
   virtual bool ParseGradient (iDocumentNode* node, iGradient* gradient);
   virtual bool WriteGradient (iDocumentNode* node, iGradient* gradient);
   virtual bool ParseShaderVar (iLoaderContext* ldr_context,
@@ -122,6 +149,7 @@ public:
   virtual bool WriteKey (iDocumentNode* node, iKeyValuePair* keyvalue);
 
   virtual csRef<iRenderBuffer> ParseRenderBuffer (iDocumentNode* node);
+  virtual bool ParseRenderBuffer (iDocumentNode* node, iRenderBuffer* buffer);
   virtual bool WriteRenderBuffer (iDocumentNode* node, iRenderBuffer* buffer);
   /**
    * Read a render buffer from a data buffer. If \a filename is not 0, the
@@ -141,26 +169,9 @@ public:
   virtual void ReportBadToken (iDocumentNode* badtokennode);
   virtual void Report (const char* msgid, int severity, 
 	iDocumentNode* errornode, const char* msg, ...);
-
-public:
-  // Debugging functions.
-  csPtr<iString> UnitTest ();
-
-  virtual int GetSupportedTests () const
-  { return CS_DBGHELP_UNITTEST; }
-  virtual csPtr<iString> StateTest ()
-  { return 0; }
-  virtual csTicks Benchmark (int /*num_iterations*/)
-  { return 0; }
-  virtual csPtr<iString> Dump ()
-  { return 0; }
-  virtual void Dump (iGraphics3D* /*g3d*/)
-  { }
-  virtual bool DebugCommand (const char* /*cmd*/)
-  { return false; }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 }
 CS_PLUGIN_NAMESPACE_END(SyntaxService)

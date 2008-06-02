@@ -1,6 +1,6 @@
 # emit.m4                                                      -*- Autoconf -*-
 #==============================================================================
-# Copyright (C)2003-2005 by Eric Sunshine <sunshine@sunshineco.com>
+# Copyright (C)2003-2008 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or modify it
 #    under the terms of the GNU Library General Public License as published by
@@ -20,34 +20,50 @@
 AC_PREREQ([2.56])
 
 #------------------------------------------------------------------------------
-# CS_EMIT_BUILD_PROPERTY(KEY, VALUE, [APPEND], [EMPTY-OKAY], [EMITTER],
-#                        [UNCONDITIONAL])
+# CS_EMIT_BUILD_PROPERTY(KEY, VALUE, [EMITTER-OPTIONS], [PROPERTY-OPTIONS],
+#                        [EMITTER])
 #	A utility function which invokes an emitter to record the KEY/VALUE
 #	tuple if VALUE is not the empty string (after leading and trailing
-#	whitespace is stripped). If EMPTY-OKAY is not an empty string, then the
-#	property is emitted even if VALUE is empty; that is, it is emitted
-#	unconditionally.  If APPEND is the empty string, then the emitter sets
-#	the key's value directly (though it may be overridden by the
-#	environment), otherwise the emitter appends VALUE to the existing value
-#	of the key.  EMITTER is a macro name, such as CS_JAMCONFIG_PROPERTY or
+#	whitespace is stripped).  PROPERTY-OPTIONS is a comma-separated list of
+#	keywords which affects property emission. The following options are
+#	recognized:
+#	    conditional - Do not emit property if VALUE is empty (the default).
+#	    default - Alias for "conditional".
+#	    unconditional - Emit property even if VALUE is empty.
+#	For backward compatibility, if PROPERTY-OPTIONS is not one of the above
+#	keywords and is not the empty string, then "unconditional" is assumed.
+#	EMITTER is a macro name, such as CS_JAMCONFIG_PROPERTY or
 #	CS_MAKEFILE_PROPERTY, which performs the actual task of emitting the
-#	KEY/VALUE tuple; it should also accept APPEND as an optional third
-#	argument. If EMITTER is omitted, CS_JAMCONFIG_PROPERTY is used.  Some
-#	emitters accept an optional fourth argument, UNCONDITIONAL, which
-#	instructs it to set KEY's value unconditionally, even if KEY already
-#	had been assigned a value via some other mechanism (such as imported
-#	from the environment, or from Jambase, in the case of
-#	CS_JAMCONFIG_PROPERTY).
+#	KEY/VALUE tuple.  If EMITTER is omitted, CS_JAMCONFIG_PROPERTY is used.
+#	EMITTER should also accept an optional third OPTIONS argument to which
+#	EMITTER-OPTIONS is passed along.  Common emitter options
+#	include "append", "atomic", "conditional", "default", and
+#	"unconditional". See the emitter-specific documentation for details.
+#	For backward compatibility, if this macro is invoked with a non-empty
+#	sixth argument, then "unconditional" is added to EMITTER-OPTIONS.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_EMIT_BUILD_PROPERTY],
+    [_CS_EMIT_BUILD_PROPERTY([$1], [$2], [$4],
+        [m4_default([$5], [CS_JAMCONFIG_PROPERTY])],
+        _CSEBP_EMITTER_OPTIONS([$3],[$6]))])
+
+# _CS_EMIT_BUILD_PROPERTY(KEY, VALUE, [PROPERTY-OPTS], EMITTER, [EMITTER-OPTS])
+AC_DEFUN([_CS_EMIT_BUILD_PROPERTY],
     [cs_build_prop_val="$2"
     cs_build_prop_val=CS_TRIM([$cs_build_prop_val])
-    m4_ifval([$4],
-	[m4_default([$5],CS_JAMCONFIG_PROPERTY)(
-            [$1], [$cs_build_prop_val], [$3], [$6])],
-	AS_IF([test -n "$cs_build_prop_val"],
-	    [m4_default([$5],[CS_JAMCONFIG_PROPERTY])(
-		[$1], [$cs_build_prop_val], [$3], [$6])]))])
+    CS_MEMBERSHIP_ANY([unconditional], [$3],
+        [$4([$1], [$cs_build_prop_val], [$5])],
+	[CS_MEMBERSHIP_ANY([conditional, default], [$3],
+	    [AS_IF([test -n "$cs_build_prop_val"],
+                [$4([$1], [$cs_build_prop_val], [$5])])],
+            [m4_ifval([$3],
+                [$4([$1], [$cs_build_prop_val], [$5])], dnl Backward compat.
+	        [AS_IF([test -n "$cs_build_prop_val"],
+                    [$4([$1], [$cs_build_prop_val], [$5])])])])])])
+
+# Backward compatibility: Apply old UNCONDITIONAL argument to EMITTER-OPTIONS.
+AC_DEFUN([_CSEBP_EMITTER_OPTIONS],
+    [$1[]m4_ifval([$2], m4_ifval([$1],[[,]])[unconditional])])
 
 
 
@@ -63,7 +79,7 @@ AC_DEFUN([CS_EMIT_BUILD_PROPERTY],
 #
 #	EMITTER is a macro name, such as CS_JAMCONFIG_PROPERTY or
 #	CS_MAKEFILE_PROPERTY, which performs the actual task of emitting the
-#	KEY/VALUE tuple. If EMITTER is omitted, CS_JAMCONFIG_PROPERTY is used.
+#	KEY/VALUE tuples. If EMITTER is omitted, CS_JAMCONFIG_PROPERTY is used.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_EMIT_BUILD_RESULT],
     [AS_IF([test "$$1" = yes],
@@ -76,7 +92,7 @@ AC_DEFUN([CS_EMIT_BUILD_RESULT],
 
 #------------------------------------------------------------------------------
 # CS_EMIT_BUILD_FLAGS(MESSAGE, CACHE-VAR, FLAGS, [LANGUAGE], EMITTER-KEY,
-#                     [APPEND], [ACTION-IF-RECOGNIZED],
+#                     [EMITTER-OPTIONS], [ACTION-IF-RECOGNIZED],
 #                     [ACTION-IF-NOT-RECOGNIZED], [EMITTER])
 #	A convenience wrapper for CS_CHECK_BUILD_FLAGS() which also records the
 #	results via CS_EMIT_BUILD_PROPERTY().  Checks if the compiler or linker
@@ -88,16 +104,17 @@ AC_DEFUN([CS_EMIT_BUILD_RESULT],
 #	attempted in order until one is found which is recognized by the
 #	compiler.  After that, no further flags are checked.  LANGUAGE is
 #	typically either C or C++ and specifies which compiler to use for the
-#	test.  If LANGUAGE is omitted, C is used.  EMITTER-KEY is the name to
+#	test.  If LANGUAGE is omitted, C is used.  EMITTER is a macro name,
+#	such as CS_JAMCONFIG_PROPERTY or CS_MAKEFILE_PROPERTY, which performs
+#	the actual task of emitting the KEY/VALUE tuples.  If EMITTER is
+#	omitted, CS_JAMCONFIG_PROPERTY is used.  EMITTER-KEY is the name to
 #	pass as the emitter's "key" argument if a usable flag is encountered.
-#	If APPEND is not the empty string, then the discovered flag is appended
-#	to the existing value of the EMITTER-KEY.  If the command-line option
-#	was recognized, then ACTION-IF-RECOGNIZED is invoked, otherwise
-#	ACTION-IF-NOT-RECOGNIZED is invoked.  EMITTER is a macro name, such as
-#	CS_JAMCONFIG_PROPERTY or CS_MAKEFILE_PROPERTY, which performs the
-#	actual task of emitting the KEY/VALUE tuple; it should also accept
-#	APPEND as an optional third argument. If EMITTER is omitted,
-#	CS_JAMCONFIG_PROPERTY is used.
+#	EMITTER-OPTIONS is passed unmolested as the emitters optional third
+#	argument.  Common emitter options include "append", "atomic",
+#	"conditional", "default", and "unconditional". See the emitter-specific
+#	documentation for details.  If the command-line option was recognized,
+#	then ACTION-IF-RECOGNIZED is invoked, otherwise
+#	ACTION-IF-NOT-RECOGNIZED is invoked.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_EMIT_BUILD_FLAGS],
     [CS_CHECK_BUILD_FLAGS([$1], [$2], [$3], [$4],
@@ -137,7 +154,7 @@ AC_DEFUN([CS_EMITTER_OPTIONAL],
 
 
 #------------------------------------------------------------------------------
-# CS_NULL_EMITTER(KEY, VALUE, [APPEND])
+# CS_NULL_EMITTER(KEY, VALUE, [OPTIONS])
 #	A do-nothing emitter suitable for use as the EMITTER argument of one of
 #	the CS_EMIT_FOO() macros. Useful for cases when you are interested only
 #	in the result of a check but not any emitter side-effects.
@@ -148,27 +165,29 @@ AC_DEFUN([CS_NULL_EMITTER], [:
 
 
 #------------------------------------------------------------------------------
-# CS_SUBST_EMITTER(KEY, VALUE, [APPEND])
+# CS_SUBST_EMITTER(KEY, VALUE, [OPTIONS])
 #	An emitter wrapped around AC_SUBST(). Invokes
-#	AC_SUBST(AS_TR_SH(KEY),VALUE).  The APPEND argument is ignored.
-#	Suitable for use as the EMITTER argument of one of the CS_EMIT_FOO()
-#	macros.  The call to AS_TR_SH() ensures that KEY is transformed into a
-#	valid shell variable. For instance, if a macro attempts to emit
-#	MYLIB.CFLAGS and MYLIB.LFLAGS via CS_SUBST_EMITTER(), then the names
-#	will be transformed to MYLIB_CFLAGS and MYLIB_LFLAGS, respectively, for
-#	the invocation of AC_SUBST().
+#	AC_SUBST(AS_TR_SH(KEY),VALUE).  OPTIONS is accepted for consistency
+#	with other emitters but otherwise ignored.  Suitable for use as the
+#	EMITTER argument of one of the CS_EMIT_FOO() macros.  The call to
+#	AS_TR_SH() ensures that KEY is transformed into a valid shell
+#	variable. For instance, if a macro attempts to emit MYLIB.CFLAGS and
+#	MYLIB.LFLAGS via CS_SUBST_EMITTER(), then the names will be transformed
+#	to MYLIB_CFLAGS and MYLIB_LFLAGS, respectively, for the invocation of
+#	AC_SUBST().
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_SUBST_EMITTER], [AC_SUBST(AS_TR_SH([$1]),[$2])])
 
 
 
 #------------------------------------------------------------------------------
-# CS_DEFINE_EMITTER(KEY, VALUE, [APPEND])
+# CS_DEFINE_EMITTER(KEY, VALUE, [OPTIONS])
 #	An emitter wrapped around AC_DEFINE_UNQUOTED(). Invokes
-#	AC_DEFINE_UNQUOTED(AS_TR_CPP(KEY),VALUE).  The APPEND argument is
-#	ignored.  Suitable for use as the EMITTER argument of one of the
-#	CS_EMIT_FOO() macros. The call to AS_TR_CPP() ensures that KEY is a
-#	well-formed token for the C-preprocessor.
+#	AC_DEFINE_UNQUOTED(AS_TR_CPP(KEY),VALUE).  OPTIONS is accepted for
+#	consistency with other emitters but otherwise ignored.  Suitable for
+#	use as the EMITTER argument of one of the CS_EMIT_FOO() macros. The
+#	call to AS_TR_CPP() ensures that KEY is a well-formed token for the
+#	C-preprocessor.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_DEFINE_EMITTER],
     [AC_DEFINE_UNQUOTED(AS_TR_CPP([$1]),[$2],

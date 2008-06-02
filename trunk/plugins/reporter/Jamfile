@@ -1,8 +1,0 @@
-SubDir TOP plugins reporter ;
-
-Description reporter : "Reporter plugin" ;
-
-Plugin reporter
-	: [ Wildcard *.cpp *.h ]
-;
-LinkWith reporter : crystalspace ;

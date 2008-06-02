@@ -36,7 +36,7 @@
 
 class csSndSysManager;
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * Sound wrapper.
@@ -49,6 +49,9 @@ class csSndSysWrapper : public scfImplementationExt2<csSndSysWrapper,
 private:
   csSndSysManager* mgr;
   csRef<iSndSysData> data;
+
+protected:
+  void InternalRemove() { SelfDestruct(); }
 
 public:
   csSndSysWrapper (csSndSysManager* mgr, const char* name)
@@ -71,7 +74,7 @@ public:
   virtual void SelfDestruct ();
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * Sound manager plugin.

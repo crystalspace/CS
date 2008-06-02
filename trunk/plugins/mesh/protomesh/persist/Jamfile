@@ -1,3 +1,0 @@
-SubDir TOP plugins mesh protomesh persist ;
-
-SubInclude TOP plugins mesh protomesh persist standard ;

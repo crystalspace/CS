@@ -32,7 +32,6 @@
 #include "csutil/refarr.h"
 #include "csutil/sysfunc.h"
 #include "csutil/scf_implementation.h"
-#include "csutil/thread.h"
 #include "csutil/weakref.h"
 #include "iengine/lightmgr.h"
 #include "iengine/mesh.h"
@@ -167,7 +166,7 @@ public:
   }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 class csTerrainObject : 
   public scfImplementationExt4<csTerrainObject,
@@ -193,7 +192,9 @@ private:
   int numindices[16];
 
   csRef<iMaterialWrapper> matwrap;
-  csArray<iMaterialWrapper*> palette;	// TODO@@@ Use csRefArray!!!
+  csArray<iMaterialWrapper*> palette;
+  // Used to make sure we hold refs to materials (so the ref count is correct when we look to unload).
+  csRefArray<iMaterialWrapper> refPalette;
   csRefArray<iImage> alphas;
   csRef<iShaderVariableContext> baseContext;
   csRefArray<iShaderVariableContext> paletteContexts;
@@ -245,13 +246,12 @@ private:
   bool polymesh_valid;
   csVector3* polymesh_vertices;
   int polymesh_vertex_count;
-  csTriangle* polymesh_triangles;
-  int polymesh_tri_count;
-  csMeshedPolygon* polymesh_polygons;
-  bool ReadCDLODFromCache ();
-  void WriteCDLODToCache ();
   void SetupPolyMeshData ();
   void CleanPolyMeshData ();
+  csTriangle* polymesh_triangles;
+  int polymesh_tri_count;
+  bool ReadCDLODFromCache ();
+  void WriteCDLODToCache ();
   int cd_resolution;
   float cd_lod_cost;
 
@@ -359,7 +359,6 @@ public:
 
   int CollisionDetect (iMovable *m, csTransform *p);
 
-  void GetObjectBoundingBox (csBox3& bbox);
   const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& cent);
@@ -435,40 +434,6 @@ public:
   void DisconnectAllLights ();
   char* GenerateCacheName ();
   void SetStaticLighting (bool enable);
-
-  //------------------ iPolygonMesh interface implementation ----------------//
-  struct PolyMesh : public scfImplementation1<PolyMesh, iPolygonMesh>
-  {
-  private:
-    csTerrainObject* terrain;
-    csFlags flags;
-  public:
-    void SetTerrain (csTerrainObject* t)
-    {
-      terrain = t;
-      flags.SetAll (CS_POLYMESH_TRIANGLEMESH);
-    }
-    void Cleanup ();
-
-    virtual int GetVertexCount ();
-    virtual csVector3* GetVertices ();
-    virtual int GetPolygonCount ();
-    virtual csMeshedPolygon* GetPolygons ();
-    virtual int GetTriangleCount ();
-    virtual csTriangle* GetTriangles ();
-    virtual void Lock () { }
-    virtual void Unlock () { }
-
-    virtual csFlags& GetFlags () { return flags;  }
-    virtual uint32 GetChangeNumber() const { return 0; }
-
-    PolyMesh () : scfImplementationType (this)
-    { }
-    virtual ~PolyMesh ()
-    { }
-  };
-  csRef<PolyMesh> polygonMesh;
-  friend struct PolyMesh;
 
   //------------------ iTriangleMesh interface implementation ----------------//
   struct TriMesh : public scfImplementation1<TriMesh, iTriangleMesh>
@@ -593,7 +558,6 @@ public:
   /**\name iObjectModel implementation
    * @{ */
   iTerraFormer* GetTerraFormerColldet () { return terraformer; }
-  void GetObjectBoundingBox (csBox3& /*bbox*/) { }
   const csBox3& GetObjectBoundingBox () { return obj_bbox; }
   void SetObjectBoundingBox (const csBox3& /*bbox*/) { }
   void GetRadius (float& /*rad*/, csVector3& /*cent*/) { }
@@ -606,7 +570,7 @@ public:
   virtual uint GetMixMode () const { return 0; }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
 * TerrFunc type. This is the plugin you have to use to create instances

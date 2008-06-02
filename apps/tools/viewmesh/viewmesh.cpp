@@ -25,12 +25,14 @@
 #include "csutil/event.h"
 #include "csutil/scfstr.h"
 #include "imesh/object.h"
-#include "imesh/thing.h"
 #include "iutil/eventq.h"
 #include "iutil/object.h"
 #include "iutil/stringarray.h"
 #include "iengine/scenenode.h"
+#include "iengine/renderloop.h"
 #include "ivideo/graph2d.h"
+#include "ivideo/material.h"
+#include "cstool/genmeshbuilder.h"
 
 // Hack: work around problems caused by #defining 'new'
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
@@ -103,13 +105,17 @@ void ViewMesh::ProcessFrame()
       if (kbd->GetKeyState (CSKEY_SHIFT))
       {
         if (kbd->GetKeyState (CSKEY_UP))
-          camTarget += c->GetTransform().This2OtherRelative(csVector3(0,1,0)) * 4 * speed;
+          camTarget += c->GetTransform().This2OtherRelative(
+	      csVector3(0,1,0)) * 4 * speed;
         if (kbd->GetKeyState (CSKEY_DOWN))
-          camTarget -= c->GetTransform().This2OtherRelative(csVector3(0,1,0)) * 4 * speed;
+          camTarget -= c->GetTransform().This2OtherRelative(
+	      csVector3(0,1,0)) * 4 * speed;
         if (kbd->GetKeyState (CSKEY_RIGHT))
-          camTarget += c->GetTransform().This2OtherRelative(csVector3(1,0,0)) * 4 * speed;
+          camTarget += c->GetTransform().This2OtherRelative(
+	      csVector3(1,0,0)) * 4 * speed;
         if (kbd->GetKeyState (CSKEY_LEFT))
-          camTarget -= c->GetTransform().This2OtherRelative(csVector3(1,0,0)) * 4 * speed;
+          camTarget -= c->GetTransform().This2OtherRelative(
+	      csVector3(1,0,0)) * 4 * speed;
       }
       else
       {
@@ -203,7 +209,8 @@ void ViewMesh::ProcessFrame()
   {
     csRef<iMovable> mov = spritewrapper->GetMovable();
     csVector3 pos = mov->GetFullPosition();    
-    mov->MovePosition(csVector3(pos.x,pos.y,-move_sprite_speed*elapsed_time/1000.0f));
+    mov->MovePosition(csVector3(pos.x,pos.y,
+	  -move_sprite_speed*elapsed_time/1000.0f));
     mov->UpdateMove();
     if (pos.z > roomsize) 
     {
@@ -217,7 +224,8 @@ void ViewMesh::ProcessFrame()
     }
   }
 
-  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
+  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS
+	| CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
     return;
 
   view->Draw ();
@@ -270,7 +278,8 @@ void ViewMesh::FixCameraForOrigin(const csVector3 & desiredOrigin)
 
   camPitch = (float)asin((camTarget.y - desiredOrigin.y) / camDist);
 
-  camYaw = (float)asin((camTarget.x - desiredOrigin.x) / (camDist * (float)cos(camPitch)));
+  camYaw = (float)asin((camTarget.x - desiredOrigin.x)
+      / (camDist * (float)cos(camPitch)));
   if ((camTarget.z - desiredOrigin.z) / (camDist * (float)cos(camPitch)) < 0.0f)
       camYaw = 3.14159f - camYaw;
 }
@@ -340,8 +349,8 @@ bool ViewMesh::OnMouseUp (iEvent& e)
 
 bool ViewMesh::OnMouseMove (iEvent& e)
 {
-  int x = (float)csMouseEventHelper::GetX(&e);
-  int y = (float)csMouseEventHelper::GetY(&e);
+  int x = csMouseEventHelper::GetX(&e);
+  int y = csMouseEventHelper::GetY(&e);
   float dx = (float)(x - lastMouseX) * 0.02f;
   float dy = (float)(y - lastMouseY) * -0.02f;
   iCamera * c = view->GetCamera();
@@ -356,16 +365,16 @@ bool ViewMesh::OnMouseMove (iEvent& e)
   }
   if (camModeRotate)
   {
-      camYaw += dx;
-      camPitch += dy;
+    camYaw += dx;
+    camPitch += dy;
   }
   if (camModeZoom)
   {
-      camDist = csMax<float>(0.1f, camDist - (dx + dy));
+    camDist = csMax<float>(0.1f, camDist - (dx + dy));
   }
 
   if (camModePan || camModeRotate || camModePan)
-      UpdateCamera();
+    UpdateCamera();
 
   return false;
 }
@@ -377,6 +386,7 @@ void ViewMesh::Help ()
   csPrintf ("  -L=<file>          Load a library file (for textures/materials)\n");
   csPrintf ("  -Scale=<ratio>     Scale the Object\n");
   csPrintf ("  -RoomSize=<units>  Radius and height (4*) of the room (default 5)\n");
+  csPrintf ("  -RenderLoop=<loop> 'standard', 'diffuse', ... (default standard)\n");
   csPrintf ("  -R=<realpath>      Real path from where to load the model\n");
   csPrintf ("  -C=<vfsdir>        Current VFS directory\n");
   csPrintf ("  <file>             Load the specified mesh object from the VFS path (meshfact or library)\n");
@@ -527,8 +537,29 @@ bool ViewMesh::Application()
   region = engine->CreateRegion ("viewmesh_region");
   reloadFilename = "";
 
-  CreateRoom();
-  CreateGui ();
+  csRef<iCommandLineParser> cmdline =
+    csQueryRegistry<iCommandLineParser> (GetObjectRegistry());
+  renderLoop = cmdline->GetOption ("RenderLoop");
+
+  if (!loader->LoadShader ("/shader/light.xml"))
+    return false;
+  if (!loader->LoadShader ("/shader/light_bumpmap.xml"))
+    return false;
+  if (!loader->LoadShader ("/shader/ambient.xml"))
+    return false;
+  if (!loader->LoadShader ("/shader/reflectsphere.xml"))
+    return false;
+  if (!loader->LoadShader ("/shader/parallax/parallax.xml"))
+    return false;
+  if (!loader->LoadShader ("/shader/parallaxAtt/parallaxAtt.xml"))
+    return false;
+  if (!loader->LoadShader ("/shader/specular/light_spec_bumpmap.xml"))
+    return false;
+
+  if (!CreateRoom())
+    return false;
+  if (!CreateGui ())
+    return false;
 
   HandleCommandLine();
 
@@ -553,22 +584,61 @@ bool ViewMesh::Application()
   return true;
 }
 
-void ViewMesh::CreateRoom ()
+bool ViewMesh::CreateRoom ()
 {
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
-    ReportError("Error loading 'stone4' texture!");
+    return ReportError("Error loading 'stone4' texture!");
 
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
+  if (!renderLoop.IsEmpty ())
+  {
+    iRenderLoopManager* rloopmgr = engine->GetRenderLoopManager ();
+    csString rl = "/shader/std_rloop_";
+    rl += renderLoop;
+    rl += ".xml";
+    csRef<iRenderLoop> rloop = rloopmgr->Load (rl);
+    if (!rloop)
+      return ReportError("Bad renderloop '%s'", (const char*)renderLoop);
+    if (!engine->SetCurrentDefaultRenderloop (rloop))
+      return ReportError ("Couldn't set renderloop in engine!");
+
+    if (renderLoop != "standard")
+    {
+      csRef<iStringSet> strset = csQueryRegistryTagInterface<iStringSet> (
+      	object_reg, "crystalspace.shared.stringset");
+      csRef<iShaderManager> shadermgr = csQueryRegistry<iShaderManager> (
+      	  object_reg);
+      iMaterial* mat = tm->GetMaterial ();
+      csStringID t = strset->Request ("ambient");
+      iShader* sh = shadermgr->GetShader ("ambient");
+      mat->SetShader (t, sh);
+      t = strset->Request ("diffuse");
+      sh = shadermgr->GetShader ("light");
+      mat->SetShader (t, sh);
+    }
+  }
+
   room = engine->CreateSector ("room");
 
-  csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingFactoryState> walls_state = 
-    scfQueryInterface<iThingFactoryState> (walls->GetMeshObject ()->GetFactory());
-  walls_state->AddInsideBox (csVector3 (-roomsize, -roomsize/2, -roomsize),
+  // First we make a primitive for our geometry.
+  using namespace CS::Geometry;
+  DensityTextureMapper mapper (0.3f);
+  TesselatedBox box (
+    csVector3 (-roomsize, -roomsize/2, -roomsize),
     csVector3 (roomsize, 3*roomsize/2, roomsize));
-  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
-  walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
+  box.SetLevel (3);
+  box.SetMapper (&mapper);
+  box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
+
+  // Now we make a factory and a mesh at once.
+  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
+      engine, room, "walls", "walls_factory", &box);
+
+  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
+    iGeneralMeshState> (walls->GetMeshObject ());
+  mesh_state->SetShadowReceiving (true);
+  walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
   csRef<iLight> light;
   iLightList* ll = room->GetLights ();
@@ -584,9 +654,10 @@ void ViewMesh::CreateRoom ()
   light = engine->CreateLight
     (0, csVector3(0, roomsize/2, -roomsize/2), 2*roomsize, csColor(1, 1, 1));
   ll->Add (light);
+  return true;
 }
 
-void ViewMesh::CreateGui()
+bool ViewMesh::CreateGui()
 {
   // Initialize CEGUI wrapper
   cegui->Initialize ();
@@ -824,6 +895,7 @@ void ViewMesh::CreateGui()
   btn = winMgr->getWindow("StdDlg/Path");
   btn->setProperty("Text", vfs->GetCwd());
   StdDlgUpdateLists(vfs->GetCwd());
+  return true;
 }
 
 void ViewMesh::LoadSprite (const char* filename)
@@ -879,16 +951,15 @@ void ViewMesh::LoadSprite (const char* filename)
     meshTx = meshTy = meshTz = 0;
   }
 
-  iBase* result;
   printf ("Loading model '%s' from vfs dir '%s'\n",
 		  filename, vfs->GetCwd ()); fflush (stdout);
-  bool rc = loader->Load (filename, result, region, false, true);
+  csLoadResult rc = loader->Load (filename, region, false, true);
 
-  if (!rc)
+  if (!rc.success)
     return;
 
   csRef<iMeshFactoryWrapper> wrap;
-  if (result == 0)
+  if (rc.result == 0)
   {
     // Library file. Find the first factory in our region.
     iMeshFactoryList* factories = engine->GetMeshFactories ();
@@ -905,7 +976,7 @@ void ViewMesh::LoadSprite (const char* filename)
   }
   else
   {
-    wrap = scfQueryInterface<iMeshFactoryWrapper> (result);
+    wrap = scfQueryInterface<iMeshFactoryWrapper> (rc.result);
   }
 
   if (!wrap) return;
@@ -1056,15 +1127,14 @@ void ViewMesh::AttachMesh (const char* file)
     }
   }
 
-  iBase* result;
   iRegion* region = engine->CreateRegion ("viewmesh_region");
-  bool rc = loader->Load (file, result, region, false, true);
+  csLoadResult rc = loader->Load (file, region, false, true);
 
-  if (!rc)
+  if (!rc.success)
     return;
 
   csRef<iMeshFactoryWrapper> factory;
-  if (result == 0)
+  if (rc.result == 0)
   {
     // Library file. Find the first factory in our region.
     iMeshFactoryList* factories = engine->GetMeshFactories ();
@@ -1081,7 +1151,7 @@ void ViewMesh::AttachMesh (const char* file)
   }
   else
   {
-    factory = scfQueryInterface<iMeshFactoryWrapper> (result);
+    factory = scfQueryInterface<iMeshFactoryWrapper> (rc.result);
   }
 
   if (!factory) return;
@@ -1963,7 +2033,7 @@ void ViewMesh::StdDlgUpdateLists(const char* filename)
 
   csRef<iStringArray> files = vfs->FindFiles(filename);
   
-  for (size_t i = 0; i < files->Length(); i++)
+  for (size_t i = 0; i < files->GetSize(); i++)
   {
     char* file = (char*)files->Get(i);
     if (!file) continue;

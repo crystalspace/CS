@@ -286,7 +286,7 @@ public:
 
 class csSprite3DMeshObject;
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * A 3D sprite based on a triangle mesh with a single texture.
@@ -632,7 +632,6 @@ public:
   void SetupLODListeners (iSharedVariable* varm, iSharedVariable* vara);
 
   void SetupFactory ();
-  void GetObjectBoundingBox (csBox3& bbox);
   const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3 &cent);
@@ -649,61 +648,6 @@ public:
   virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const
   { return logparent; }
   virtual iMeshObjectType* GetMeshObjectType () const { return spr3d_type; }
-  /** @} */
-
-  /**\name iPolygonMesh implementation
-   * @{ */
-  struct PolyMesh : public scfImplementation1<PolyMesh, iPolygonMesh>
-  {
-  private:
-    csSprite3DMeshObjectFactory* factory;
-    csFlags flags;
-
-  public:
-    virtual int GetVertexCount ()
-    {
-      return factory->GetVertexCount ();
-    }
-    virtual csVector3* GetVertices ()
-    {
-      return factory->GetVertices (0);
-    }
-    virtual int GetPolygonCount ()
-    {
-      return factory->GetTriangleCount ();
-    }
-
-    virtual csMeshedPolygon* GetPolygons ();
-
-    virtual int GetTriangleCount ()
-    {
-      return factory->GetTriangleCount ();
-    }
-    virtual csTriangle* GetTriangles ()
-    {
-      return factory->GetTriangles ();
-    }
-
-    virtual void Lock () { } //PM@@@
-    virtual void Unlock () { }
- 
-    virtual csFlags& GetFlags () { return flags;  }
-    virtual uint32 GetChangeNumber() const { return 0; }
-
-    PolyMesh (csSprite3DMeshObjectFactory* Factory) : 
-      scfImplementationType (this), factory(Factory), polygons (0)
-    {
-      flags.Set (CS_POLYMESH_TRIANGLEMESH);
-    }
-    virtual ~PolyMesh ()
-    {
-      Cleanup ();
-    }
-    void Cleanup () { delete[] polygons; polygons = 0; }
-
-    csMeshedPolygon* polygons;
-  };
-  friend struct PolyMesh;
   /** @} */
 
   /**\name iTriangleMesh implementation
@@ -777,6 +721,12 @@ public:
     varm = lod_varm;
     vara = lod_vara;
   }
+
+  // LOD fade not supported.
+  void SetLODFade (float f) { }
+  void GetLODFade (float& f) const { f = 0; }
+  void SetLODFade (iSharedVariable* varf) { }
+  void GetLODFade (iSharedVariable*& varf) const { varf = 0; }
   
   iTerraFormer* GetTerraFormerColldet () { return 0; }
   virtual iTerrainSystem* GetTerrainColldet () { return 0; }
@@ -784,7 +734,7 @@ public:
   /** @} */
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * A 3D sprite based on a triangle mesh with a single texture.
@@ -1433,7 +1383,6 @@ public:
   void ClearLODListeners ();
   void SetupLODListeners (iSharedVariable* varm, iSharedVariable* vara);
 
-  void GetObjectBoundingBox (csBox3& bbox);
   const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3 &cent);
@@ -1539,6 +1488,12 @@ public:
     varm = local_lod_varm;
     vara = local_lod_vara;
   }
+
+  // LOD fade not supported.
+  void SetLODFade (float f) { }
+  void GetLODFade (float& f) const { f = 0; }
+  void SetLODFade (iSharedVariable* varf) { }
+  void GetLODFade (iSharedVariable*& varf) const { varf = 0; }
   /** @} */
 
   /**\name iRenderBufferAccessor implementation
@@ -1643,6 +1598,11 @@ public:
   {
     return 0;
   }
+  // LOD fade not supported.
+  void SetLODFade (float f) { }
+  void GetLODFade (float& f) const { f = 0; }
+  void SetLODFade (iSharedVariable* varf) { }
+  void GetLODFade (iSharedVariable*& varf) const { varf = 0; }
   /** @} */
 };
 

@@ -33,10 +33,8 @@
 #include "cstool/rendermeshholder.h"
 #include "cstool/framedataholder.h"
 #include "csgfx/shadervarcontext.h"
-#include "igeom/polymesh.h"
 #include "igeom/trimesh.h"
 #include "cstool/objmodel.h"
-#include "csgeom/pmtools.h"
 #include "iengine/mesh.h"
 #include "iengine/rview.h"
 #include "iengine/shadcast.h"
@@ -63,81 +61,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bezier)
 class csBezierMesh;
 class csBezierMeshObjectType;
 class csBezierLightPatchPool;
-
-/**
- * A helper class for iPolygonMesh implementations used by csBezierMesh.
- */
-class BezierPolyMeshHelper : public scfImplementation1<BezierPolyMeshHelper, 
-                                                       iPolygonMesh>
-{
-public:
-  /**
-   * Make a polygon mesh helper which will accept polygons which match
-   * with the given flag (one of CS_POLY_COLLDET or CS_POLY_VISCULL).
-   */
-  BezierPolyMeshHelper () : scfImplementationType (this), polygons (0), 
-    vertices (0), triangles (0) { }
-  virtual ~BezierPolyMeshHelper () { Cleanup (); }
-  void Cleanup ();
-
-  void Setup ();
-  void SetThing (csBezierMesh* thing) { BezierPolyMeshHelper::thing = thing; }
-
-  virtual int GetVertexCount ()
-  {
-    Setup ();
-    return num_verts;
-  }
-  virtual csVector3* GetVertices ()
-  {
-    Setup ();
-    return vertices;
-  }
-  virtual int GetPolygonCount ()
-  {
-    Setup ();
-    return num_poly;
-  }
-  virtual csMeshedPolygon* GetPolygons ()
-  {
-    Setup ();
-    return polygons;
-  }
-  virtual int GetTriangleCount ()
-  {
-    Setup ();
-    Triangulate ();
-    return tri_count;
-  }
-  virtual csTriangle* GetTriangles ()
-  {
-    Setup ();
-    Triangulate ();
-    return triangles;
-  }
-
-  virtual void Lock () { }
-  virtual void Unlock () { }
-  
-  virtual csFlags& GetFlags () { return flags;  }
-  virtual uint32 GetChangeNumber() const { return 0; }
-
-private:
-  csBezierMesh* thing;
-  csMeshedPolygon* polygons;	// Array of polygons.
-  csVector3* vertices;		// Array of vertices.
-  int num_poly;			// Total number of polygons.
-  int num_verts;		// Total number of vertices.
-  csFlags flags;
-  csTriangle* triangles;
-  int tri_count;
-
-  void Triangulate ()
-  {
-    if (triangles) return;
-    csPolygonMeshTools::Triangulate (this, triangles, tri_count);
-  }
-};
 
 /**
  * A helper class for iTriangleMesh implementations used by csBezierMesh.
@@ -332,7 +255,7 @@ public:
   virtual csFlags& GetFlags () { return object_flags; }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * A bezier is a set of bezier curves.
@@ -347,7 +270,6 @@ class csBezierMesh : public scfImplementationExt6<csBezierMesh,
                                                   scfFakeInterface<iMeshObject> >,
 		     public csBezierMesh2
 {
-  friend class BezierPolyMeshHelper;
   friend class BezierTriMeshHelper;
 
 public:
@@ -612,11 +534,6 @@ public:
    */
   void GetRadius (float& rad, csVector3& cent);
 
-  /**
-   * Get a write object for a vis culling system.
-   */
-  iPolygonMesh* GetWriteObject ();
-
   //----------------------------------------------------------------------
   // Drawing
   //----------------------------------------------------------------------
@@ -699,9 +616,6 @@ public:
   void LightDisconnect (iLight* light);
   void DisconnectAllLights ();
 
-  csRef<BezierPolyMeshHelper> polygonMesh;
-  csRef<BezierPolyMeshHelper> polygonMeshLOD;
-
   /** \name iBezierFactoryState implementation
    * @{ */
   virtual const csVector3& GetCurvesCenter () const
@@ -730,7 +644,6 @@ public:
 
   /** \name iObjectModel implementation
    * @{ */
-  void GetObjectBoundingBox (csBox3& box) { box = GetBoundingBox (); }
   const csBox3& GetObjectBoundingBox () { return GetBoundingBox (); }
   void SetObjectBoundingBox (const csBox3& box) { SetBoundingBox (box); }
   /** @} */
@@ -791,7 +704,7 @@ public:
   /** @} */
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * Thing type. This is the plugin you have to use to create instances

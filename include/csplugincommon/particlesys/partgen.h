@@ -53,7 +53,7 @@ struct iObjectRegistry;
 struct iEngine;
 struct iMeshWrapper;
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * This class represents a particle system. It is a set of iParticles.
@@ -285,11 +285,6 @@ public:
    */
   virtual void Update (csTicks elapsed_time);
 
-  virtual void GetObjectBoundingBox (csBox3& bbox)
-  {
-    SetupObject ();
-    bbox = csParticleSystem::bbox;
-  }
   virtual const csBox3& GetObjectBoundingBox ()
   {
     SetupObject ();
@@ -313,7 +308,7 @@ public:
   virtual csPtr<iMeshObject> Clone () { return 0; }
   virtual bool PreGetRenderMeshes (iRenderView* rview, iMovable* movable,
   	uint32 frustum_mask);
-  virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView* rview,
+  virtual CS::Graphics::RenderMesh** GetRenderMeshes (int& n, iRenderView* rview,
     iMovable* movable, uint32 frustum_mask);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
@@ -432,7 +427,7 @@ public:
   { part_accel[idx] = acl; }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /** @} */
 

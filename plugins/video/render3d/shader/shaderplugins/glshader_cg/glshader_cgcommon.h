@@ -32,7 +32,16 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 {
 
-class csShaderGLCGCommon : public csShaderProgram
+  struct iShaderDestinationResolverCG : public virtual iBase
+  {
+    SCF_INTERFACE(iShaderDestinationResolverCG, 0,0,1);
+
+    virtual const csArray<csString>& GetUnusedParameters () = 0;
+  };
+
+class csShaderGLCGCommon : public scfImplementationExt1<csShaderGLCGCommon,
+                                                        csShaderProgram,
+                                                        iShaderDestinationResolverCG>
 {
 protected:
   csStringHash xmltokens;
@@ -52,14 +61,22 @@ protected:
 
   const char* programType;
   ArgumentArray compilerArgs;
+  csRef<iShaderDestinationResolverCG> cgResolve;
+  csArray<csString> unusedParams;
 
   csString debugFN;
 
-  bool DefaultLoadProgram (const char* programStr, CGGLenum type, 
+  bool DefaultLoadProgram (iShaderDestinationResolverCG* cgResolve,
+    const char* programStr, CGGLenum type, 
     CGprofile maxProfile, bool compiled = false, bool doLoad = true);
   void DoDebugDump ();
   void WriteAdditionalDumpInfo (const char* description, const char* content);
   virtual const char* GetProgramType() = 0;
+  void CollectUnusedParameters ();
+  void SetParameterValue (CGparameter param, csShaderVariable* var);
+  
+  void SVtoCgMatrix3x3 (csShaderVariable* var, float* matrix);
+  void SVtoCgMatrix4x4 (csShaderVariable* var, float* matrix);
 public:
   CS_LEAKGUARD_DECLARE (csShaderGLCGCommon);
 
@@ -79,8 +96,8 @@ public:
   virtual void Deactivate();
 
   /// Setup states needed for proper operation of the shader
-  virtual void SetupState (const csRenderMesh* mesh,
-    csRenderMeshModes& modes,
+  virtual void SetupState (const CS::Graphics::RenderMesh* mesh,
+    CS::Graphics::RenderMeshModes& modes,
     const iShaderVarStack* stacks);
 
   /// Reset states to original
@@ -96,6 +113,9 @@ public:
   virtual bool Load (iShaderDestinationResolver*, const char*, 
     csArray<csShaderVarMapping>&)
   { return false; }
+
+  const csArray<csString>& GetUnusedParameters ()
+  { return unusedParams; }
 };
 
 }

@@ -69,6 +69,8 @@ private:
     {}
 
     ParamPairArray renderParams, collParams, feederParams;
+    ParamPairArray alphaMaps;
+    csRefArray<csShaderVariable> svs;
     csVector3 size;
     unsigned int gridWidth, gridHeight, materialmapWidth, materialmapHeight;
     bool materialmapPersist;
@@ -90,8 +92,13 @@ private:
   bool ParseDefaultCell (iDocumentNode* node, iLoaderContext* ldr_ctx,
     DefaultCellValues& defaults);
 
-  bool ParseParams (csArray<ParamPair>& pairs, iDocumentNode* node);
+  bool ParseParams (ParamPairArray& pairs, iDocumentNode* node);
 
+  bool ParseFeederParams (ParamPairArray& pairs, ParamPairArray& alphaMaps,
+    iDocumentNode* node);
+
+  bool ParseRenderParams (ParamPairArray& pairs, csRefArray<csShaderVariable>& svs,
+    iLoaderContext* ldr_context, iDocumentNode* node);
 };
 
 /**

@@ -21,7 +21,7 @@
 
 #include "csextern.h"
 #include "csgeom/box.h"
-#include "csgeom/pmtools.h"
+#include "csgeom/trimeshtools.h"
 
 /**\file
  * 3D solid space.
@@ -46,7 +46,7 @@ private:
 
   bool CheckBox (const csBox3& bbox, csSolidSpaceNode* node,
 	csVector3* vertices,
-	csTriangleMinMax* tris, int tri_count, 
+        csTriangleMinMax* tris, size_t tri_count, 
 	csPlane3* planes);
 
 public:

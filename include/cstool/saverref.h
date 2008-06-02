@@ -20,7 +20,7 @@
 #define __CS_SAVERREF_H__
 
 /**\file
- * Saver references. Includes csLibraryReference and csAddonReference.
+ * Saver reference implementations.
  */
 
 #include "csextern.h"
@@ -30,6 +30,33 @@
 #include "csutil/scf_implementation.h"
 #include "imap/saverref.h"
 #include "iutil/selfdestruct.h"
+
+/**
+ * An object representing a reference to a library.
+ */
+class CS_CRYSTALSPACE_EXPORT csPluginReference :
+  public scfImplementationExt2<csPluginReference, 
+                               csObject, 
+                               iPluginReference,
+                               iSelfDestruct>
+{
+  csString name;
+  csString id;
+  
+public:
+  /// The constructor.
+  csPluginReference (const char* name, const char* id);
+  /// The destructor
+  virtual ~csPluginReference ();
+
+  virtual const char* GetName () const;
+
+  virtual const char* GetClassID () const;
+
+  virtual iObject *QueryObject () { return (csObject*)this; }
+
+  void SelfDestruct () {}
+};
 
 /**
  * An object representing a reference to a library.

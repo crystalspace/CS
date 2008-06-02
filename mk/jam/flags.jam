@@ -33,7 +33,7 @@ rule LinkWith
   {
     # LibDepends for shared libs invokes LinkWith, so prevent recursion
     LibDepends $(<) : $(rawlibs) ;
-  }                           
+  }
   
   local i libs ;
   for i in $(rawlibs)
@@ -41,11 +41,15 @@ rule LinkWith
     libs += [ ConstructLibraryLinkTarget $(i) : $($(i)_SHARED) ] ;
   }
 
-  Depends $($(<)_TARGET) : $(libs) ;
-  NEEDLIBS on $($(<)_TARGET) += $(libs) ;
+  Depends $($(<)_TARGET) : $(rawlibs) ;
+  NEEDLIBS on $($(<)_TARGET) =
+    [ MergeRemovingDups [ on $($(<)_TARGET) GetVar NEEDLIBS ] : $(libs) ] ;
   $(<).NEEDLIBS += $(rawlibs) ;
 
-  LFlags $(<) : $($($(rawlibs).EXTERNALLIBS).LFLAGS) ;
+  for l in $(rawlibs)
+  {
+    LFlags $(<) : $($($(l).EXTERNALLIBS).LFLAGS) ;
+  }
 }
 
 ##  CFlags target : flags [ : options ]
@@ -102,6 +106,10 @@ rule ExternalLibs
     
     $(<).EXTERNALLIBS += $(extlib) ;
   }
+  for target in $($(<).PROPAGATE_EXTERNALLIBS)
+  {
+    ExternalLibs $(target) : $(>) ;
+  }
 }
 
 ##  ExtraObjects target : objectfiles [ : options ]
@@ -121,6 +129,70 @@ rule ExtraObjects
   Depends $($(<)_TARGET) : $(>) ;
   Clean $(<)clean : $(>) ;
   Clean clean : $(>) ;
+}
+
+##  RelayLibs target : indentifier : relaylibs
+##    Link external libraries identified by 'identifier' with 'target' with
+##    the help of "relaytool". This tool provides a wrapper object file that
+##    dynamically loads the requested library at runtime. The client code can
+##    check if a library is actually available and react gracefully if not.
+##    This is much more end-user friendly than a refusal by the application to
+##    start due to a missing dependency.
+##    From the external dependency identified by 'identifier' the individual
+##    libraries specified in 'relaylibs' will be dynamically loaded. For each
+##    library 'foo' a symbol 'libfoo_is_present' will be provided.
+rule RelayLibs
+{
+  if ! $(CMD.RELAYTOOL)
+  {
+    # Create fake libwhatever_is_present() symbols
+    local stubfile = [ DoObjectGrist $(>).fake_stub.c ] ;
+    MakeLocate $(stubfile) : $(LOCATE_TARGET) ;
+    WHATEVER on $(stubfile) = $(3) ;
+    WriteRelayLibStub $(stubfile) ;
+    Clean $(<)clean : $(stubfile) ;
+    
+    local stub_object = [ CompileObjects $(stubfile) ] ;
+    MakeLocate $(stub_object) : $(LOCATE_TARGET) ;
+    Depends $($(<)_TARGET) : $(stub_object) ;
+    Clean $(<)clean : $(stub_object) ;
+    EXTRAOBJECTS on $($(<)_TARGET) += $(stub_object) ;
+    
+    ExternalLibs $(<) : $(>) ;
+  }
+  else
+  {
+    local relayparamslist = "--relay $(3)" ;
+    local relayparam = $(relayparamslist[1]) ;
+    local r ;
+    for r in $(relayparamslist[2-])
+    {
+      relayparam = "$(relayparam) $(r)" ;
+    }
+    local cflags = "$(CCFLAGS[1])" ;
+    local c ;
+    for c in $(CCFLAGS[2-])
+    {
+      cflags = "$(cflags) $(c)" ;
+    }
+    local extlib ;
+    for extlib in $(>)
+    {
+      CFlags $(<) : $($(extlib).CFLAGS) ;
+      LFlags $(<) : 
+        "`CFLAGS=\"$(cflags)\" $(CMD.RELAYTOOL) --out-dir $(LOCATE_TARGET) $(relayparam) $($(extlib).LFLAGS)`" ; 
+      
+      $(<).EXTERNALLIBS += $(extlib) ;
+    }
+  }
+}
+
+actions WriteRelayLibStub
+{
+  echo "" > $(<)
+  whatever=`echo "$(WHATEVER)" | tr '-' '_' | tr '.' '_' `
+  echo "int lib${whatever}_is_present = 1;" >> $(<)
+  echo "int lib${whatever}_symbol_is_present (char* s) { return 1; }" >> $(<)
 }
 
 ##  MergeLFlags flags1 : flags2

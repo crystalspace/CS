@@ -1,3 +1,0 @@
-SubDir TOP plugins mesh emit persist ;
-
-SubInclude TOP plugins mesh emit persist standard ;

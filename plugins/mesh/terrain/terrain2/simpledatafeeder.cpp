@@ -49,7 +49,8 @@ csTerrainSimpleDataFeeder::~csTerrainSimpleDataFeeder ()
 
 csPtr<iTerrainCellFeederProperties> csTerrainSimpleDataFeeder::CreateProperties ()
 {
-  return csPtr<iTerrainCellFeederProperties> (new csTerrainSimpleDataFeederProperties);
+  return csPtr<iTerrainCellFeederProperties> (
+      new csTerrainSimpleDataFeederProperties);
 }
 
 bool csTerrainSimpleDataFeeder::PreLoad (iTerrainCell* cell)
@@ -65,8 +66,7 @@ bool csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
   if (!loader || !properties)
     return false;
 
-  if (properties->heightmapSource.IsEmpty () ||
-    properties->materialmapSource.IsEmpty ())
+  if (properties->heightmapSource.IsEmpty ())
     return false;
 
   int width = cell->GetGridWidth ();
@@ -77,38 +77,59 @@ bool csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
   HeightFeederParser mapReader (properties->heightmapSource, 
     properties->heightmapFormat, loader, objectReg);
   mapReader.Load (data.data, width, height, data.pitch, cell->GetSize ().y, 
-    properties->offset);
+    properties->heightOffset);
 
   cell->UnlockHeightData ();
   
-  csRef<iImage> material = loader->LoadImage (properties->materialmapSource.GetDataSafe (),
-    CS_IMGFMT_PALETTED8);
+  if (!properties->materialmapSource.IsEmpty ())
+  {  
+    csRef<iImage> materialMap = loader->LoadImage (properties->materialmapSource.GetDataSafe (),
+      CS_IMGFMT_PALETTED8);
 
-  if (!material) 
-    return false;
-  
-  if (material->GetWidth () != cell->GetMaterialMapWidth () ||
-      material->GetHeight () != cell->GetMaterialMapHeight ())
-  {
-    material = csImageManipulate::Rescale (material,
-      cell->GetMaterialMapWidth (), cell->GetMaterialMapHeight ());
-  }
-  
-  int mwidth = material->GetWidth ();
-  int mheight = material->GetHeight ();
-
-  csLockedMaterialMap mdata = cell->LockMaterialMap (csRect (0, 0, mwidth, mheight));
-
-  const unsigned char* materialmap = (const unsigned char*)material->GetImageData ();
+    if (!materialMap) 
+      return false;
     
-  for (int y = 0; y < mheight; ++y)
+    if (materialMap->GetWidth () != cell->GetMaterialMapWidth () ||
+        materialMap->GetHeight () != cell->GetMaterialMapHeight ())
+    {
+      materialMap = csImageManipulate::Rescale (materialMap,
+        cell->GetMaterialMapWidth (), cell->GetMaterialMapHeight ());
+    }
+    
+    int mwidth = materialMap->GetWidth ();
+    int mheight = materialMap->GetHeight ();
+
+    csLockedMaterialMap mdata = cell->LockMaterialMap (csRect (0, 0, mwidth, mheight));
+
+    const unsigned char* materialmap = (const unsigned char*)materialMap->GetImageData ();
+      
+    for (int y = 0; y < mheight; ++y)
+    {
+      memcpy (mdata.data, materialmap, mwidth);
+      mdata.data += mdata.pitch;
+      materialmap += mwidth;
+    } 
+    
+    cell->UnlockMaterialMap ();
+  }
+
+  if (engine)
   {
-    memcpy (mdata.data, materialmap, mwidth);
-    mdata.data += mdata.pitch;
-    materialmap += mwidth;
-  } 
-  
-  cell->UnlockMaterialMap ();
+    for (size_t i = 0; i < properties->alphaMaps.GetSize (); ++i)
+    {
+      iMaterialWrapper* mat = engine->FindMaterial (
+        properties->alphaMaps[i].material.GetDataSafe ());
+
+      csRef<iImage> alphaMap = loader->LoadImage (
+        properties->alphaMaps[i].alphaSource.GetDataSafe (),
+        CS_IMGFMT_ANY);
+
+      if (mat && alphaMap)
+      {
+        cell->SetAlphaMask (mat, alphaMap);
+      }
+    }
+  }
 
   return true;
 }
@@ -118,6 +139,8 @@ bool csTerrainSimpleDataFeeder::Initialize (iObjectRegistry* object_reg)
   this->objectReg = object_reg;
 
   loader = csQueryRegistry<iLoader> (objectReg);
+  engine = csQueryRegistry<iEngine> (objectReg);
+
   return true;
 }
 
@@ -127,7 +150,7 @@ void csTerrainSimpleDataFeeder::SetParameter (const char* param, const char* val
 
 
 csTerrainSimpleDataFeederProperties::csTerrainSimpleDataFeederProperties ()
-  : scfImplementationType (this), offset (0.0f)
+  : scfImplementationType (this), heightOffset (0.0f)
 {
 }
 
@@ -137,33 +160,62 @@ csTerrainSimpleDataFeederProperties::csTerrainSimpleDataFeederProperties (
     heightmapSource (other.heightmapSource),
     heightmapFormat (other.heightmapFormat),
     materialmapSource (other.materialmapSource),
-    offset (other.offset)
+    alphaMaps (other.alphaMaps),
+    heightOffset (other.heightOffset)
 {
 }
 
 
-void csTerrainSimpleDataFeederProperties::SetHeightmapSource (const char* source)
+void csTerrainSimpleDataFeederProperties::SetHeightmapSource (const char* source,
+                                                              const char* format)
 {
   heightmapSource = source;
+  heightmapFormat = format;
+}
+
+void csTerrainSimpleDataFeederProperties::SetMaterialMapSource (const char* source)
+{
+  materialmapSource = source;
+}
+
+void csTerrainSimpleDataFeederProperties::SetHeightOffset (float offset)
+{
+  heightOffset = offset;
+}
+
+void csTerrainSimpleDataFeederProperties::AddAlphaMap (const char* material, 
+                                                       const char* alphaMapSource)
+{
+  for (size_t i = 0; i < alphaMaps.GetSize (); ++i)
+  {
+    if (alphaMaps[i].material == material)
+    {
+      alphaMaps[i].alphaSource = alphaMapSource;
+      return;
+    }
+  }
+
+  AlphaPair p = {material, alphaMapSource};
+  alphaMaps.Push (p);
 }
 
 void csTerrainSimpleDataFeederProperties::SetParameter (const char* param, const char* value)
 {
-  if (strcmp (param, "heightmap source") == 0)
+  if (strcasecmp (param, "heightmap source") == 0)
   {
     heightmapSource = value;
   }
-  else if (strcmp (param, "heightmap format") == 0)
+  else if (strcasecmp (param, "heightmap format") == 0)
   {
     heightmapFormat = value;
   }
-  else if (strcmp (param, "materialmap source") == 0)
+  else if (strcasecmp (param, "materialmap source") == 0)
   {
     materialmapSource = value;
   }
-  else if (strcmp (param, "offset") == 0)
+  else if (strcasecmp (param, "offset") == 0)
   {
-    offset = atof (value);
+    heightOffset = atof (value);
   }
 }
 

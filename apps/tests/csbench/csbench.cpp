@@ -23,6 +23,7 @@
 #include "csgeom/vector3.h"
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
+#include "cstool/genmeshbuilder.h"
 #include "csutil/cmdhelp.h"
 #include "csutil/cscolor.h"
 #include "csutil/event.h"
@@ -183,12 +184,23 @@ iSector* CsBench::CreateRoom (const char* name, const char* meshname,
 	const csVector3& p1, const csVector3& p2)
 {
   iSector* room2 = engine->CreateSector (name);
-  csRef<iMeshWrapper> walls = engine->CreateSectorWallsMesh (room2, meshname);
-  csRef<iThingFactoryState> walls_state = 
-    scfQueryInterface<iThingFactoryState> (walls->GetMeshObject ()->GetFactory());
-  walls_state->AddInsideBox (p1, p2);
-  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, material);
-  walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
+
+  using namespace CS::Geometry;
+  DensityTextureMapper mapper (0.3f);
+  TesselatedBox box (p1, p2);
+  box.SetLevel (3);
+  box.SetMapper (&mapper);
+  box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
+
+  // Now we make a factory and a mesh at once.
+  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
+      engine, room2, meshname, meshname, &box);
+
+  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
+    iGeneralMeshState> (walls->GetMeshObject ());
+  mesh_state->SetShadowReceiving (true);
+  walls->GetMeshObject ()->SetMaterialWrapper (material);
+
   return room2;
 }
 
@@ -465,14 +477,12 @@ void CsBench::PerformShaderTest (const char* shaderPath, const char* shtype,
 
   csRef<iShaderPriorityList> prilist = shcom->GetPriorities (shadernode);
   size_t i;
-  iMaterialWrapper* oldmat = material;
+
   //csRef<iMeshWrapper> walls (engine->FindMeshObject ("walls"));
   //csRef<iMeshWrapper> walls (
     //view->GetCamera()->GetSector()->GetMeshes()->FindByName ("walls"));
   csRef<iMeshWrapper> walls (engine->FindMeshObject (
     view->GetCamera()->GetSector()->QueryObject()->GetName()));
-  csRef<iThingState> ws =
-    scfQueryInterface<iThingState> (walls->GetMeshObject ());
   for (i = 0 ; i < prilist->GetCount () ; i++)
   {
     int pri = prilist->GetPriority (i);
@@ -492,7 +502,7 @@ void CsBench::PerformShaderTest (const char* shaderPath, const char* shtype,
       iMaterialWrapper* mat = engine->GetMaterialList ()->NewMaterial (
       	matinput, 0);
       mesh->SetMaterialWrapper (mat);
-      ws->ReplaceMaterial (oldmat, mat);
+      walls->GetMeshObject ()->SetMaterialWrapper (mat);
 
       csString name;
       name.Format ("%s_%d", shader->QueryObject()->GetName(), pri);
@@ -500,7 +510,6 @@ void CsBench::PerformShaderTest (const char* shaderPath, const char* shtype,
       description.Format ("Shader %s with priority %d", 
 	shader->QueryObject()->GetName(), pri);
       BenchMark (name, description, CSDRAW_CLEARZBUFFER);
-      ws->ClearReplacedMaterials();
     }
   }
 }

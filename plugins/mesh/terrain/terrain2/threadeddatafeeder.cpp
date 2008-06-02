@@ -54,8 +54,10 @@ struct ThreadedFeederData : public csRefCount
   csArray<csDirtyAccessArray<unsigned char> > materialmapData;
 
   csString heightmapSource, materialmapSource, heightmapFormat;
+  float heightScale, heightOffset;
 
-  float heightScale, offset;
+  csArray<csString> alphaMapsSources;
+  csRefArray<iImage> alphaMaps;
 
   unsigned int gridWidth, gridHeight, materialMapWidth, materialMapHeight;
   size_t materialMapCount;
@@ -66,7 +68,8 @@ struct ThreadedFeederData : public csRefCount
 class ThreadedFeederJob : public scfImplementation1<ThreadedFeederJob, iJob>
 {
 public:
-  ThreadedFeederJob (ThreadedFeederData* data, iLoader* loader, iObjectRegistry* reg)
+  ThreadedFeederJob (ThreadedFeederData* data, iLoader* loader,
+      iObjectRegistry* reg)
     : scfImplementationType (this), data (data), loader (loader), objReg (reg)
   {
 
@@ -84,11 +87,11 @@ public:
     HeightFeederParser mapReader (data->heightmapSource, 
       data->heightmapFormat, loader, objReg);
     mapReader.Load (h_data, data->gridWidth, data->gridHeight, data->gridWidth, 
-      data->heightScale, data->offset);
+      data->heightScale, data->heightOffset);
 
 
-    csRef<iImage> material = loader->LoadImage (data->materialmapSource.GetDataSafe (),
-      CS_IMGFMT_PALETTED8);
+    csRef<iImage> material = loader->LoadImage (
+	data->materialmapSource.GetDataSafe (), CS_IMGFMT_PALETTED8);
 
     if (!material) return;
 
@@ -108,7 +111,7 @@ public:
 
     size_t materialMapSize = data->materialMapWidth *  data->materialMapHeight;
 
-    for (unsigned char i = 0; i < data->materialMapCount; ++i)
+    for (size_t i = 0; i < data->materialMapCount; ++i)
     {
       data->materialmapData[i].SetSize (materialMapSize);
 
@@ -121,6 +124,14 @@ public:
           *m_data++ = (*materialmap++ == i) ? 255 : 0;
         }
       }
+    }
+
+    for (size_t i = 0; i < data->alphaMapsSources.GetSize (); ++i)
+    {
+      csRef<iImage> img = loader->LoadImage (
+        data->alphaMapsSources[i].GetDataSafe (), CS_IMGFMT_ANY);
+
+      data->alphaMaps.Push (img);
     }
 
     data->haveValidData = true;  
@@ -180,7 +191,12 @@ bool csTerrainThreadedDataFeeder::PreLoad (iTerrainCell* cell)
   data->materialMapHeight = cell->GetMaterialMapHeight ();
   data->materialMapCount = cell->GetTerrain ()->GetMaterialPalette ().GetSize ();
   data->heightScale = cell->GetSize ().y;
-  data->offset = properties->offset;
+  data->heightOffset = properties->heightOffset;
+  
+  for (size_t i = 0; i < properties->alphaMaps.GetSize (); ++i)
+  {
+    data->alphaMapsSources.Push (properties->alphaMaps[i].alphaSource);
+  }
 
   csRef<ThreadedFeederJob> job;
   job.AttachNew (new ThreadedFeederJob (data, loader, objectReg));
@@ -195,6 +211,8 @@ bool csTerrainThreadedDataFeeder::Load (iTerrainCell* cell)
 {
   // Check if there is any existing state associated with it
   csRef<ThreadedFeederData> data = (ThreadedFeederData*)cell->GetFeederData ();
+  csTerrainSimpleDataFeederProperties* properties = 
+    (csTerrainSimpleDataFeederProperties*)cell->GetFeederProperties ();
 
   if (data && data->loaderJob)
   {
@@ -222,12 +240,28 @@ bool csTerrainThreadedDataFeeder::Load (iTerrainCell* cell)
 
     cell->UnlockHeightData ();
 
-    for (unsigned int m = 0; m < data->materialmapData.GetSize (); ++m)
+    for (size_t m = 0; m < data->materialmapData.GetSize (); ++m)
+    {
       cell->SetMaterialMask (m, data->materialmapData[m].GetArray (),
         data->materialMapWidth, data->materialMapHeight);
-    
-    data->heightmapData.DeleteAll ();
-    data->materialmapData.DeleteAll ();
+    }       
+
+    // Setup any alphamaps/materials
+    for (size_t i = 0; i < properties->alphaMaps.GetSize (); ++i)
+    {
+      iMaterialWrapper* mat = engine->FindMaterial (
+        properties->alphaMaps[i].material);
+
+      iImage* alphaMap = data->alphaMaps[i];
+      if (mat && alphaMap)
+      {
+        cell->SetAlphaMask (mat, alphaMap);
+      }
+    }
+
+    // Remove the data
+    cell->SetFeederData (0);
+
     // Finished
     return true;
   }

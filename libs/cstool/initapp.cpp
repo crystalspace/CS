@@ -28,6 +28,7 @@
 #include "csutil/csinput.h"
 #include "csutil/csshlib.h"
 #include "csutil/csstring.h"
+#include "csutil/memdebug.h"
 #include "csutil/objreg.h"
 #include "csutil/plugldr.h"
 #include "csutil/plugmgr.h"
@@ -123,8 +124,7 @@ iObjectRegistry* csInitializer::CreateEnvironment (
       else
         r->DecRef();
 #ifdef CS_MEMORY_TRACKER
-    extern void mtiRegisterModule (char* Class);
-    mtiRegisterModule ("app");
+    CS::Debug::MemTracker::RegisterModule ("app");
 #endif
 
     }
@@ -255,7 +255,7 @@ iVFS* csInitializer::SetupVFS(iObjectRegistry* r, const char* pluginID)
   if (!VFS)
   {
     csRef<iPluginManager> plugin_mgr (csQueryRegistry<iPluginManager> (r));
-    VFS = CS_LOAD_PLUGIN (plugin_mgr, pluginID, iVFS);
+    VFS = csLoadPlugin<iVFS> (plugin_mgr, pluginID);
     if (!VFS)
     {
       /* NB: loading the plugin should have already resulted in a message 

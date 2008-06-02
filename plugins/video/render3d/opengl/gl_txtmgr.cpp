@@ -43,18 +43,19 @@ csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
 {
   csGLTextureManager::object_reg = object_reg;
 
-  glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
-#ifndef CS_LITTLE_ENDIAN
-  // The texture format stuff generally assumes little endian
-  glPixelStorei (GL_UNPACK_SWAP_BYTES, 1);
-#endif
-
+  
   G3D = iG3D;
   max_tex_size = G3D->GetMaxTextureSize ();
 
   G3D->ext->InitGL_ARB_texture_compression ();
   if (G3D->ext->CS_GL_ARB_texture_compression)
     G3D->ext->InitGL_EXT_texture_compression_s3tc (); 
+  G3D->ext->InitGL_ARB_texture_float();
+  /*if (G3D->ext->CS_GL_ARB_texture_float)
+    G3D->ext->InitGL_ARB_half_float_pixel();*/
+
+  G3D->ext->InitGL_ARB_pixel_buffer_object();
+  hasPBO = G3D->ext->CS_GL_ARB_pixel_buffer_object;
 
 #define CS_GL_TEXTURE_FORMAT(fmt)					    \
   textureFormats.Put (#fmt, TextureFormat (fmt, true));		
@@ -115,6 +116,8 @@ void csGLTextureManager::read_config (iConfigFile *config)
     ("Video.OpenGL.DisableRECTTextureCompression", false);
   enableNonPowerOfTwo2DTextures = config->GetBool
     ("Video.OpenGL.EnableNonPowerOfTwo2DTextures", false);
+  disableGenerateMipmap = config->GetBool
+    ("Video.OpenGL.DisableGenerateMipmap", false);
   
   const char* filterModeStr = config->GetStr (
     "Video.OpenGL.TextureFilter", "trilinear");
@@ -266,11 +269,12 @@ void csGLTextureManager::Clear()
 void csGLTextureManager::UnsetTexture (GLenum target, GLuint texture)
 {
   csGLStateCache* statecache = csGLGraphics3D::statecache;
+  if (!statecache) return;
 
   if (csGLGraphics3D::ext->CS_GL_ARB_multitexture)
   {
     int oldTU = -1;
-    for (int u = 0; u < CS_GL_MAX_LAYER; u++)
+    for (int u = 0; u < statecache->GetNumImageUnits(); u++)
     {
       if (statecache->GetTexture (target, u) == texture)
       {
@@ -419,6 +423,41 @@ void csGLTextureManager::DumpSuperLightmaps (iVFS* VFS, iImageIO* iio,
 	  G3D->Report (CS_REPORTER_SEVERITY_NOTIFY,
 	    "Dumped %dx%d SLM to %s", superLMs[i]->w, superLMs[i]->h,
 	    	outfn.GetData ());
+	}
+      }
+    }
+  }
+}
+
+void csGLTextureManager::DumpTextures (iVFS* VFS, iImageIO* iio, 
+				       const char* dir)
+{
+  csString outfn;
+  for (size_t i = 0; i < textures.GetSize (); i++)
+  {
+    if (!textures[i]) continue;
+    
+    csRef<iImage> img = textures[i]->Dump ();
+    if (img)
+    {
+      csRef<iDataBuffer> buf = iio->Save (img, "image/png");
+      if (!buf)
+      {
+	G3D->Report (CS_REPORTER_SEVERITY_WARNING,
+		     "Could not save texture.");
+      }
+      else
+      {
+	outfn.Format ("%s%zu.png", dir, i);
+	if (!VFS->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
+	{
+	  G3D->Report (CS_REPORTER_SEVERITY_WARNING,
+		       "Could not write to %s.", outfn.GetData ());
+	}
+	else
+	{
+	  G3D->Report (CS_REPORTER_SEVERITY_NOTIFY,
+		       "Dumped texture to %s", outfn.GetData ());
 	}
       }
     }

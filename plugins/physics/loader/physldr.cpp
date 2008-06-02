@@ -53,6 +53,7 @@ enum
   XMLTOKEN_FRICTION,
   XMLTOKEN_ELASTICITY,
   XMLTOKEN_SOFTNESS,
+  XMLTOKEN_COLLIDERCONVEXMESH,
   XMLTOKEN_COLLIDERMESH,
   XMLTOKEN_COLLIDERSPHERE,
   XMLTOKEN_RADIUS,
@@ -111,6 +112,7 @@ bool csPhysicsLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("elasticity", XMLTOKEN_ELASTICITY);
   xmltokens.Register ("softness", XMLTOKEN_SOFTNESS);
   xmltokens.Register ("collidermesh", XMLTOKEN_COLLIDERMESH);
+  xmltokens.Register ("colliderconvexmesh", XMLTOKEN_COLLIDERCONVEXMESH);
   xmltokens.Register ("collidersphere", XMLTOKEN_COLLIDERSPHERE);
   xmltokens.Register ("collidercylinder", XMLTOKEN_COLLIDERCYLINDER);
   xmltokens.Register ("colliderbox", XMLTOKEN_COLLIDERBOX);
@@ -258,8 +260,10 @@ bool csPhysicsLoader::ParseSystem (iDocumentNode* node, iDynamicSystem* system)
         break;
       }
       case XMLTOKEN_COLLIDERMESH:
+      case XMLTOKEN_COLLIDERCONVEXMESH:
       {
-	if (!ParseSystemColliderMesh (child, system)) return false;
+	if (!ParseSystemColliderMesh (child, system,
+                            id == XMLTOKEN_COLLIDERCONVEXMESH)) return false;
 	break;
       }
       case XMLTOKEN_COLLIDERSPHERE:
@@ -429,6 +433,7 @@ bool csPhysicsLoader::ParseCollider (iDocumentNode* node, iRigidBody* body)
     switch (id)
     {
       case XMLTOKEN_COLLIDERMESH:
+      case XMLTOKEN_COLLIDERCONVEXMESH:
       {
         if (!child->GetAttributeValue ("mesh"))
 	{
@@ -442,10 +447,21 @@ bool csPhysicsLoader::ParseCollider (iDocumentNode* node, iRigidBody* body)
 	ParseTransform (child, t);
         if (m)
 	{
-          if (s > 0)
-            body->AttachColliderMesh (m, t, f, d, e, s);
-          else  //no softness parameter, so use default
-            body->AttachColliderMesh (m, t, f, d, e);
+          if (id == XMLTOKEN_COLLIDERMESH)
+          {
+            if (s > 0)
+              body->AttachColliderMesh (m, t, f, d, e, s);
+            else  //no softness parameter, so use default
+              body->AttachColliderMesh (m, t, f, d, e);
+          }
+          else
+          {
+            if (s > 0)
+              body->AttachColliderConvexMesh (m, t, f, d, e, s);
+            else  //no softness parameter, so use default
+              body->AttachColliderConvexMesh (m, t, f, d, e);
+          }
+
         }
 	else
 	{
@@ -501,7 +517,7 @@ bool csPhysicsLoader::ParseCollider (iDocumentNode* node, iRigidBody* body)
 }
 
 bool csPhysicsLoader::ParseSystemColliderMesh (
-  iDocumentNode* node, iDynamicSystem* system)
+  iDocumentNode* node, iDynamicSystem* system, bool convex)
 {
   float f = node->GetAttributeValueAsFloat ("friction");
   float e = node->GetAttributeValueAsFloat ("elasticity");
@@ -510,10 +526,20 @@ bool csPhysicsLoader::ParseSystemColliderMesh (
   iMeshWrapper *m = engine->FindMeshObject (node->GetContentsValue ());
   if (m)
   {
-    if( s > 0)
-      system->AttachColliderMesh (m, m->GetMovable()->GetTransform (), f, e, s);
-    else  //no softness parameter, so use default
-      system->AttachColliderMesh (m, m->GetMovable()->GetTransform (), f, e);
+    if (convex)
+    {
+      if( s > 0)
+        system->AttachColliderConvexMesh (m, m->GetMovable()->GetTransform (), f, e, s);
+      else  //no softness parameter, so use default
+        system->AttachColliderConvexMesh (m, m->GetMovable()->GetTransform (), f, e);
+    }
+    else
+    {
+      if( s > 0)
+        system->AttachColliderMesh (m, m->GetMovable()->GetTransform (), f, e, s);
+      else  //no softness parameter, so use default
+        system->AttachColliderMesh (m, m->GetMovable()->GetTransform (), f, e);
+    }
   }
   else
   {

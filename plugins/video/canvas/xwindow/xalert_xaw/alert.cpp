@@ -34,7 +34,7 @@ extern "C"
  * data used by xmessage
  */
 
-static String fallback_resources[] = {
+static const char* const fallback_resources[] = {
     "*baseTranslations: #override :<Key>Return: default-exit()",
     "*message.Scroll: whenNeeded",
     0};
@@ -68,15 +68,19 @@ static XtActionsRec actions_list[] = {
     {"default-exit", default_exit_action},
 };
 
-static String top_trans =
+static const char* top_trans =
     "<ClientMessage>WM_PROTOCOLS: exit(1)\n";
 
 extern "C" Widget make_queryform(Widget parent, const char* message, 
 				 const char* button, const char* title);
+				 
+extern "C" int libXaw7_is_present;
 
-bool csXWindow::AlertV (int /*type*/, const char* title, const char* okMsg, 
-			const char* msg, va_list args)
+bool csXWindow::AlertV_Xaw (int /*type*/, const char* title, const char* okMsg, 
+			    const char* msg, va_list args)
 {
+    if (!libXaw7_is_present) return false;
+
     Widget top, queryform;
     XtAppContext app_con;
     csString msgStr;
@@ -90,7 +94,7 @@ bool csXWindow::AlertV (int /*type*/, const char* title, const char* okMsg,
     top = XtAppInitialize (&app_con, "Xmessage-color",
 			   0, 0, &fake_argc, 
 			   const_cast<char**> (fake_argv), // @@@ Urgh.
-			   fallback_resources, 0, 0);
+			   const_cast<char**> (fallback_resources), 0, 0);
 
     wm_delete_window = XInternAtom(XtDisplay(top), "WM_DELETE_WINDOW", False);
     XtAppAddActions(app_con, actions_list, XtNumber(actions_list));

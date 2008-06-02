@@ -63,7 +63,6 @@
 #include "ivideo/txtmgr.h"
 #include "plugins/engine/3d/halo.h"
 #include "csutil/flags.h"
-#include "igeom/polymesh.h"
 #include "igeom/trimesh.h"
 #include "csgeom/tri.h"
 
@@ -132,6 +131,28 @@ const char* csSaver::GetPluginName (const char* plugin, const char* type)
     plugins.PutUnique (plugintype.GetData (), pluginname.GetData ());
   }
   return plugins.Get (plugin, plugin);
+}
+
+void csSaver::InitializePluginsHash ()
+{
+  plugins.DeleteAll ();
+  
+  // Fill the hash with plugin references which are stored by the loader
+  // if the saveable flag is set.
+  // If saveable wasn't set, the names will be generated.
+  csRef<iObjectRegistryIterator> it = object_reg->Get (
+      scfInterfaceTraits<iPluginReference>::GetID (),
+      scfInterfaceTraits<iPluginReference>::GetVersion ());
+  while (it->HasNext ())
+  {
+    csRef<iBase> obj = it->Next ();
+    
+    csRef<iPluginReference> plugref = scfQueryInterface <iPluginReference> (obj);
+    if (plugref.IsValid ())
+    {
+      plugins.PutUnique (plugref->GetClassID (), plugref->GetName ());
+    }
+  }
 }
 
 bool csSaver::SavePlugins (iDocumentNode* parent)
@@ -757,7 +778,7 @@ bool csSaver::SaveSectors(iDocumentNode *parent)
       synldr->WriteColor (CreateNode (sectorNode, "ambient"), ambient);
     }
     
-    // TBD: cullerp, polymesh, node
+    // TBD: cullerp, trimesh, node
 
     if (sector->HasFog ())
     {
@@ -1546,7 +1567,7 @@ bool csSaver::SaveMapFile(const char* filename)
 
 bool csSaver::SaveMapFile(csRef<iDocumentNode> &root)
 {
-  plugins.DeleteAll (); // Clear plugin list
+  InitializePluginsHash ();
   csRef<iDocumentNode> parent = root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   parent->SetValue("world");
 
@@ -1615,7 +1636,7 @@ bool csSaver::SaveRegion(iRegion* region, int type, csRef<iDocumentNode>& root)
   if (!region)
     return false;
   
-  plugins.DeleteAll (); // Clear plugin list
+  InitializePluginsHash ();
   
   curRegion = region;
   fileType = type;

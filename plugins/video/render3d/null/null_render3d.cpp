@@ -21,6 +21,7 @@
 
 #include "csgeom/plane3.h"
 #include "csgfx/imagememory.h"
+#include "csgfx/textureformatstrings.h"
 #include "cstool/initapp.h"
 #include "csutil/event.h"
 #include "csutil/scfstrset.h"
@@ -113,9 +114,10 @@ bool csNullGraphics3D::Initialize (iObjectRegistry* objreg)
   if (!driver)
     driver = config->GetStr ("Video.Null.Canvas", CS_SOFTWARE_2D_DRIVER);
 
-  G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, iGraphics2D);
+  G2D = csLoadPlugin<iGraphics2D> (plugin_mgr, driver);
   if (!G2D)
-    G2D = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.graphics2d.null", iGraphics2D);
+    G2D = csLoadPlugin<iGraphics2D> (plugin_mgr,
+      "crystalspace.graphics2d.null");
   if (!G2D)
     return false;
 
@@ -264,14 +266,63 @@ void csNullGraphics3D::Close ()
     G2D->Close ();
 }
 
-void csNullGraphics3D::SetRenderTarget (iTextureHandle*, bool, int)
+bool csNullGraphics3D::SetRenderTarget (iTextureHandle* h, bool, int subtex, 
+                                        csRenderTargetAttachment attachment)
 {
-  return;
+  if ((attachment >= rtaDepth) && (attachment <= rtaColor0))
+  {
+    render_targets[attachment] = h;
+    rt_subtex[attachment] = subtex;
+    return true;
+  }
+  else
+    return false;
+}
+  
+bool csNullGraphics3D::CanSetRenderTarget (const char* format,
+                                           csRenderTargetAttachment attachment)
+{
+  CS::StructuredTextureFormat texfmt (CS::TextureFormatStrings::ConvertStructured (format));
+  uint fmtcomp = texfmt.GetComponentMask();
+  
+  switch (attachment)
+  {
+  case rtaDepth:
+    {
+      if (((fmtcomp & CS::StructuredTextureFormat::compD) != 0)
+          && ((fmtcomp & ~CS::StructuredTextureFormat::compDepthStencil) == 0))
+        return true;
+    }
+    break;
+  case rtaColor0:
+    {
+      if (((fmtcomp & CS::StructuredTextureFormat::compRGB) != 0)
+          && ((fmtcomp & ~CS::StructuredTextureFormat::compRGBA) == 0))
+        return true;
+    }
+    break;
+  default:
+    break;
+  }
+  return false;
 }
 
-iTextureHandle* csNullGraphics3D::GetRenderTarget () const
+iTextureHandle* csNullGraphics3D::GetRenderTarget (csRenderTargetAttachment attachment,
+                                                   int* subtexture) const
 {
-  return 0;
+  if ((attachment >= rtaDepth) && (attachment <= rtaColor0))
+  {
+    if (subtexture) *subtexture = rt_subtex[attachment];
+    return render_targets[attachment];
+  }
+  else
+    return 0;
+}
+
+void csNullGraphics3D::UnsetRenderTargets()
+{
+  for (size_t i = 0; i < numTargets; i++)
+    render_targets[i] = 0;
 }
 
 bool csNullGraphics3D::BeginDraw (int DrawFlags)
@@ -297,6 +348,7 @@ void csNullGraphics3D::FinishDraw ()
     G2D->FinishDraw ();
   
   current_drawflags = 0;
+  csNullGraphics3D::UnsetRenderTargets();
 }
 
 void csNullGraphics3D::Print (csRect const*area)

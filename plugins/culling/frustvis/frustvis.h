@@ -34,14 +34,12 @@
 #include "iengine/movable.h"
 #include "iengine/shadcast.h"
 #include "iengine/mesh.h"
-#include "imesh/thing.h"
 
 class csKDTree;
 class csKDTreeChild;
 class csFrustumVis;
 struct iMovable;
 struct iMeshWrapper;
-struct iThingState;
 
 struct FrustTest_Front2BackData;
 

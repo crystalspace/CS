@@ -150,6 +150,23 @@ rule InstallSymLink
     return $(target) ;
 }
 
+##  InstallBindingsData files : search [ : subdir ]
+##    Installs bindings data files
+rule InstallBindingsData
+{
+    local files = [ GristInstall $(<) ] ;
+    SEARCH on $(files) = $(2) ;
+    Depends install_bindings : [ DoInstall $(files) : $(appdatadir) $(3) ] ;
+}
+
+##  InstallBindingsModule file [ : subdir ]
+##    Installs a bindings binary module
+rule InstallBindingsModule
+{
+    Depends install_bindings :
+	[ DoInstall $(1) : $(appdatadir) $(2) : $(INSTALL_PROGRAM) ] ;
+}
+
 ##  DoInstall sourcenames : directories [ : installapp : [ postinstallrules ]]
 ##    Creates a new install target for the given sources named by
 ##    `sourcenames'.  `directories' is a list of directory components
@@ -229,7 +246,7 @@ rule DoInstallFile
 #----------------------------------------------------------------------------
 
 INSTALLTARGETS = install_bin install_plugin install_lib install_include
-		 install_data install_config install_doc ;
+		 install_data install_config install_doc install_bindings ;
 
 Always install $(INSTALLTARGETS) ;
 NotFile install $(INSTALLTARGETS) ;

@@ -33,9 +33,9 @@
 #include "iengine/movable.h"
 #include "iengine/region.h"
 #include "iengine/sector.h"
+#include "iengine/portal.h"
 #include "iengine/sharevar.h"
 #include "imesh/objmodel.h"
-#include "igeom/polymesh.h"
 #include "imap/loader.h"
 #include "imesh/particles.h"
 #include "imesh/lighting.h"
@@ -54,7 +54,6 @@
 
 #include "bot.h"
 #include "command.h"
-#include "infmaze.h"
 #include "walktest.h"
 
 extern WalkTest* Sys;
@@ -359,7 +358,7 @@ void add_particles_fountain (iSector* sector, char* matname, int num,
 // Demo particle system (explosion).
 //===========================================================================
 void add_particles_explosion (iSector* sector, iEngine* engine,
-	const csVector3& center, char* matname)
+	const csVector3& center, const char* matname)
 {
   // First check if the material exists.
   iMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterialList ()->
@@ -561,7 +560,7 @@ bool HandleDynLight (iLight* dyn, iEngine* engine)
 	  Sys->view->GetEngine ()->GetMeshes ()->Remove (ms->sprite);
 	}
 	csRef<WalkDataObject> ido (
-		CS_GET_CHILD_OBJECT (dyn->QueryObject (), WalkDataObject));
+		CS::GetChildObject<WalkDataObject>(dyn->QueryObject()));
         dyn->QueryObject ()->ObjRemove (ido);
         if (ms->snd)
         {
@@ -578,11 +577,11 @@ bool HandleDynLight (iLight* dyn, iEngine* engine)
 	      	CreateSource (st);
 	    if (sndsource)
 	    {
-	      csRef<iSndSysSourceSoftware3D> sndsource3d
-		= scfQueryInterface<iSndSysSourceSoftware3D> (sndsource);
+	      csRef<iSndSysSource3D> sndsource3d
+		= scfQueryInterface<iSndSysSource3D> (sndsource);
 
 	      sndsource3d->SetPosition (v);
-	      sndsource3d->SetVolume (1.0f);
+	      sndsource->SetVolume (1.0f);
 	      st->SetLoopState (CS_SNDSYS_STREAM_DONTLOOP);
 	      st->Unpause ();
 	    }
@@ -612,10 +611,10 @@ bool HandleDynLight (iLight* dyn, iEngine* engine)
       if (ms->sprite) move_mesh (ms->sprite, s, v);
       if (Sys->mySound && ms->snd)
       {
-	csRef<iSndSysSourceSoftware3D> sndsource3d
-		= scfQueryInterface<iSndSysSourceSoftware3D> (ms->snd);
+	csRef<iSndSysSource3D> sndsource3d
+		= scfQueryInterface<iSndSysSource3D> (ms->snd);
 	sndsource3d->SetPosition (v);
-	sndsource3d->SetVolume (1.0f);
+	ms->snd->SetVolume (1.0f);
       }
       break;
     }
@@ -634,7 +633,7 @@ bool HandleDynLight (iLight* dyn, iEngine* engine)
 	if (es->radius < 1)
 	{
 	  csRef<WalkDataObject> ido (
-	  	CS_GET_CHILD_OBJECT (dyn->QueryObject (), WalkDataObject));
+		CS::GetChildObject<WalkDataObject>(dyn->QueryObject()));
 	  dyn->QueryObject ()->ObjRemove (ido);
 	  delete es;
 	  dyn->GetSector ()->GetLights ()->Remove (dyn);
@@ -716,11 +715,11 @@ void fire_missile ()
     ms->snd = Sys->mySound->CreateSource (ms->snd_stream);
     if (ms->snd)
     {
-      csRef<iSndSysSourceSoftware3D> sndsource3d
-		= scfQueryInterface<iSndSysSourceSoftware3D> (ms->snd);
+      csRef<iSndSysSource3D> sndsource3d
+		= scfQueryInterface<iSndSysSource3D> (ms->snd);
 
       sndsource3d->SetPosition (pos);
-      sndsource3d->SetVolume (1.0f);
+      ms->snd->SetVolume (1.0f);
       ms->snd_stream->Unpause ();
     }
   }

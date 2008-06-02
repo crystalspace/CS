@@ -96,64 +96,6 @@ void csPortalContainerTriMeshHelper::Cleanup ()
 }
 
 // ---------------------------------------------------------------------------
-// csPortalContainerPolyMeshHelper
-// ---------------------------------------------------------------------------
-
-void csPortalContainerPolyMeshHelper::SetPortalContainer (csPortalContainer* pc)
-{
-  parent = pc;
-  data_nr = pc->GetDataNumber ()-1;
-}
-
-void csPortalContainerPolyMeshHelper::Setup ()
-{
-  parent->Prepare ();
-  if (data_nr != parent->GetDataNumber () || !vertices)
-  {
-    data_nr = parent->GetDataNumber ();
-    Cleanup ();
-
-    vertices = parent->GetVertices ();
-    // Count number of needed polygons.
-    num_poly = 0;
-
-    size_t i;
-    const csRefArray<csPortal>& portals = parent->GetPortals ();
-    for (i = 0 ; i < portals.GetSize () ; i++)
-    {
-      csPortal *p = portals[i];
-      if (p->flags.CheckAll (poly_flag)) num_poly++;
-    }
-
-    if (num_poly)
-    {
-      polygons = new csMeshedPolygon[num_poly];
-      num_poly = 0;
-      for (i = 0 ; i < portals.GetSize () ; i++)
-      {
-        csPortal *p = portals[i];
-        if (p->flags.CheckAll (poly_flag))
-        {
-	  csDirtyAccessArray<int>& vidx = p->GetVertexIndices ();
-          polygons[num_poly].num_vertices = (int)vidx.GetSize ();
-          polygons[num_poly].vertices = vidx.GetArray ();
-          num_poly++;
-        }
-      }
-    }
-  }
-}
-
-void csPortalContainerPolyMeshHelper::Cleanup ()
-{
-  delete[] polygons;
-  polygons = 0;
-  vertices = 0;
-  delete[] triangles;
-  triangles = 0;
-}
-
-// ---------------------------------------------------------------------------
 // csPortalContainer
 // ---------------------------------------------------------------------------
 
@@ -162,14 +104,6 @@ csPortalContainer::csPortalContainer (iEngine* engine,
 	iObjectRegistry *object_reg) :
 	scfImplementationType (this, engine)
 {
-  polygonMesh.AttachNew (new csPortalContainerPolyMeshHelper (0));
-  polygonMeshCD.AttachNew (new csPortalContainerPolyMeshHelper (CS_PORTAL_COLLDET));
-  polygonMeshLOD.AttachNew (new csPortalContainerPolyMeshHelper (CS_PORTAL_VISCULL));
-  SetPolygonMeshBase (polygonMesh);
-  SetPolygonMeshColldet (polygonMeshCD);
-  SetPolygonMeshViscull (polygonMeshLOD);
-  SetPolygonMeshShadows (polygonMeshLOD);
-
   csRef<csPortalContainerTriMeshHelper> trimesh;
   trimesh.AttachNew (new csPortalContainerTriMeshHelper (0));
   trimesh->SetPortalContainer (this);
@@ -188,10 +122,6 @@ csPortalContainer::csPortalContainer (iEngine* engine,
   movable_identity = false;
 
   meshwrapper = 0;
-
-  polygonMesh->SetPortalContainer (this);
-  polygonMeshCD->SetPortalContainer (this);
-  polygonMeshLOD->SetPortalContainer (this);
 
   shader_man = csQueryRegistry<iShaderManager> (object_reg);
   fog_shader = shader_man->GetShader ("std_lighting_portal");
@@ -249,11 +179,22 @@ void csPortalContainer::Prepare ()
     size_t j;
     csArray<int>& vidx = prt->GetVertexIndices ();
     csPoly3D poly;
+    csBox3 box;
+    box.StartBoundingBox ();
     for (j = 0 ; j < vidx.GetSize () ; j++)
     {
       if (vt) vidx[j] = (int)vt[vidx[j]].new_idx;
       poly.AddVertex (vertices[vidx[j]]);
+      box.AddBoundingVertex (vertices[vidx[j]]);
     }
+    float max_sqradius = 0;
+    csVector3 center = box.GetCenter ();
+    for (j = 0 ; j < vidx.GetSize () ; j++)
+    {
+      float sqdist = csSquaredDist::PointPoint (center, vertices[vidx[j]]);
+      if (sqdist > max_sqradius) max_sqradius = sqdist;
+    }
+    prt->object_sphere = csSphere (center, csQsqrt (max_sqradius));
     prt->SetObjectPlane (poly.ComputePlane ());
   }
   delete[] vt;
@@ -318,6 +259,7 @@ void csPortalContainer::ObjectToWorld (const csMovable& movable,
       csPortal* prt = portals[i];
       csPlane3 wp (prt->GetIntObjectPlane ());
       prt->SetWorldPlane (wp);
+      prt->world_sphere = prt->object_sphere;
     }
   }
   else
@@ -332,6 +274,9 @@ void csPortalContainer::ObjectToWorld (const csMovable& movable,
       movtrans.This2Other (prt->GetIntObjectPlane (), world_vec, p);
       p.Normalize ();
       prt->SetWorldPlane (p);
+      prt->world_sphere = csSphere (
+	  movtrans.This2Other (prt->object_sphere.GetCenter ()),
+	  prt->object_sphere.GetRadius ());
     }
   }
 }

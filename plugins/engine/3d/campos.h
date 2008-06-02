@@ -77,6 +77,9 @@ public:
 
   virtual void SelfDestruct ();
 
+protected:
+  virtual void InternalRemove() { SelfDestruct(); }
+
 private:
   /// The sector this camera points to
   csString sector;

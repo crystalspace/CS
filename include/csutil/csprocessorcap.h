@@ -25,11 +25,18 @@
 
 #include "csextern.h"
 
+#include "csutil/deprecated_warn_off.h"
+
 /**
  * This class is used to identify capabilities in the processor such as 
  * support for MMX and SSE
+ * \deprecated Deprecated in 1.3. csProcessorCapability is deprecated.
+ *   Please use CS::Platform::ProcessorSpecDetection instead..
  */
-class CS_CRYSTALSPACE_EXPORT csProcessorCapability
+class CS_CRYSTALSPACE_EXPORT
+  CS_DEPRECATED_TYPE_MSG("csProcessorCapability is deprecated. "
+    "Please use CS::Platform::ProcessorSpecDetection instead.")
+  csProcessorCapability
 {
 public:
 
@@ -241,5 +248,7 @@ end_detect:
   static inline void CheckX86Processor() {}
 #endif //CS_PROCESSOR_X86
 };
+
+#include "csutil/deprecated_warn_on.h"
 
 #endif //__CS_PROCESSORCAP_H__

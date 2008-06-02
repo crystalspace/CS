@@ -35,6 +35,7 @@ try:    # get in CS
     from cspace import *
 except:
     print "WARNING: Failed to import module cspace"
+    traceback.print_exc()
     sys.exit(1) # die!!
 
 # utils code
@@ -54,16 +55,16 @@ def FatalError(msg="FatalError"):
     Report(CS_REPORTER_SEVERITY_ERROR,msg)
     sys.exit(1)
 
-# EventHandler
+# The application
 #############################
 class MyCsApp:
     def Init(self):
         Log('MyCsApp.Init()...')
-        self.vc = CS_QUERY_REGISTRY(object_reg, iVirtualClock)
-        self.engine = CS_QUERY_REGISTRY(object_reg, iEngine)
-        self.g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D)
-        self.loader = CS_QUERY_REGISTRY(object_reg, iLoader)
-        self.keybd = CS_QUERY_REGISTRY(object_reg, iKeyboardDriver)
+        self.vc = object_reg.Get(iVirtualClock)
+        self.engine = object_reg.Get(iEngine)
+        self.g3d = object_reg.Get(iGraphics3D)
+        self.loader = object_reg.Get(iLoader)
+        self.keybd = object_reg.Get(iKeyboardDriver)
         
         if self.vc==None or self.engine==None or self.g3d==None or self.keybd==None or self.loader==None:
             FatalError("Error: in object registry query")
@@ -96,7 +97,7 @@ class MyCsApp:
         # create the 'room'  
         room = self.engine.CreateSector("room")
         walls = self.engine.CreateSectorWallsMesh(room,"walls")
-        walls_state = SCF_QUERY_INTERFACE(walls.GetMeshObject().GetFactory(), iThingFactoryState)
+        walls_state = walls.GetMeshObject().GetFactory().QueryInterface(iThingFactoryState)
         walls_state.AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5))
         walls_state.SetPolygonMaterial (CS_POLYRANGE_LAST, material);
         walls_state.SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);        
@@ -132,7 +133,7 @@ class MyCsApp:
         m=m*5
         sprite.GetMovable().SetTransform(m)
         sprite.GetMovable().UpdateMove()
-        spstate=SCF_QUERY_INTERFACE(sprite.GetMeshObject(),iSprite3DState)
+        spstate=sprite.GetMeshObject().QueryInterface(iSprite3DState)
         spstate.SetAction("default")
         #spstate.SetMixMode(CS_FX_SETALPHA (.5))
 
@@ -182,27 +183,18 @@ class MyCsApp:
 
 # EventHandler
 #############################
-# IMPORTANT:
-# due to the nature of the event handler (its called directly from the Cs mainloop)
-# any exceptions thrown will not display error messages/ halt the interpreter
-# (including those caused by syntax errors)
-# therefore we must add in our own code to catch this
 def EventHandler(ev):
-    try:
-        #print 'EventHandler called'
-        if ((ev.Name  == KeyboardDown) and
-            (csKeyEventHelper.GetCookedCode(ev) == CSKEY_ESC)):
-            q  = CS_QUERY_REGISTRY(object_reg, iEventQueue)
-            if q:
-                q.GetEventOutlet().Broadcast(csevQuit(object_reg))
-                return 1
-        elif ev.Name == Frame:
-            app.SetupFrame()
-            app.FinishFrame()
+    #print 'EventHandler called'
+    if ((ev.Name  == KeyboardDown) and
+        (csKeyEventHelper.GetCookedCode(ev) == CSKEY_ESC)):
+        q  = object_reg.Get(iEventQueue)
+        if q:
+            q.GetEventOutlet().Broadcast(csevQuit(object_reg))
             return 1
-    except:
-        traceback.print_exc()   # prints the usual error messages
-        sys.exit(1)             # stop dead
+    elif ev.Name == Frame:
+        app.SetupFrame()
+        app.FinishFrame()
+        return 1
     return 0
 
 # startup code
@@ -223,7 +215,7 @@ if not csInitializer.SetupConfigManager(object_reg):
     FatalError("Couldn't init app!")
 
 plugin_requests = [
-    CS_REQUEST_VFS, CS_REQUEST_SOFTWARE3D, CS_REQUEST_ENGINE,
+    CS_REQUEST_VFS, CS_REQUEST_OPENGL3D, CS_REQUEST_ENGINE,
     CS_REQUEST_FONTSERVER, CS_REQUEST_IMAGELOADER, CS_REQUEST_LEVELLOADER,
 ]
 if not csInitializer.RequestPlugins(object_reg, plugin_requests):

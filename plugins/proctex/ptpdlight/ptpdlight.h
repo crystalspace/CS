@@ -22,10 +22,14 @@
 
 #include "iengine/light.h"
 #include "imesh/lighting.h"
+#include "ivideo/texture.h"
 
 #include "csgeom/csrect.h"
 #include "csgfx/rgbpixel.h"
+#include "csutil/allocator.h"
 #include "csutil/bitarray.h"
+#include "csutil/cscolor.h"
+#include "csutil/csstring.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/flags.h"
 #include "csutil/set.h"
@@ -80,11 +84,13 @@ public:
     bool IsGray() const { return gray; }
   };
 
+#include "csutil/custom_new_disable.h"
+
   struct LumelBufferRGB : public LumelBufferBase
   {
     static CS_FORCEINLINE size_t LumelAlign (size_t n)
     {
-      static const size_t align = sizeof (Lumel);
+      static const size_t align = 8; // For MMX
       return ((n + align - 1) / align) * align;
     }
   public:
@@ -140,6 +146,8 @@ public:
 
   };
 
+#include "csutil/custom_new_enable.h"
+
   class PDMap
   {
     friend class ProctexPDLight;
@@ -152,17 +160,27 @@ public:
     void ComputeValueBounds (const TileHelper& tiles);
     void ComputeValueBounds (const TileHelper& tiles, const csRect& area);
   public:
-    csArray<csRGBcolor> maxValues;
     csBitArray tileNonNull;
-    csArray<csRect> nonNullAreas;
     int imageX, imageY, imageW, imageH;
     csRef<LumelBufferBase> imageData;
+    struct Tile
+    {
+      csRGBcolor maxValue;
+
+      int tilePartX, tilePartY;
+      int tilePartW, tilePartH, tilePartPitch;
+      void* tilePartData;
+
+      Tile() : maxValue (0, 0, 0) {}
+    };
+    csArray<Tile> tiles;
+    csArray<csRect> nonNullAreas;
 
     PDMap (size_t tilesNum) : imageX (0), imageY (0), imageW (0), imageH (0),
       imageData (0) 
     { 
-      maxValues.SetSize (tilesNum, csRGBcolor (0, 0, 0));
       tileNonNull.SetSize (tilesNum);
+      tiles.SetSize (tilesNum);
       nonNullAreas.SetSize (tilesNum, 
         csRect (INT_MAX, INT_MAX, INT_MIN, INT_MIN));
     }
@@ -170,16 +188,24 @@ public:
       imageX (0), imageY (0), imageData (0)
     { 
       tileNonNull.SetSize (tilesNum);
+      this->tiles.SetSize (tilesNum);
       SetImage (tiles, img); 
     }
     void SetImage (const TileHelper& tiles, iImage* img);
     void Crop ();
     void GetMaxValue (csRGBcolor& maxValue);
+
+    void UpdateTiles (const TileHelper& helper);
+  };
+  struct LightIdentity : public CS::Memory::CustomAllocated
+  {
+    csString sectorName, lightName;
+    uint8 lightId[16];
   };
   struct MappedLight
   {
     PDMap map;
-    char* lightId;
+    LightIdentity* lightId;
     csWeakRef<iLight> light;
 
     MappedLight (size_t tilesNum, const TileHelper& tiles, iImage* img) : 
@@ -188,18 +214,14 @@ public:
     {
       if (other.lightId != 0)
       {
-        lightId = new char[16];
-        memcpy (lightId, other.lightId, 16);
+        lightId = new LightIdentity (*(other.lightId));
       }
       else
         lightId = 0;
     }
-    ~MappedLight() { delete[] lightId; }
+    ~MappedLight() { delete lightId; }
   };
 private:
-  typedef csDirtyAccessArray<Lumel> LightmapScratch;
-  CS_DECLARE_STATIC_CLASSVAR_REF(lightmapScratch, GetScratch, LightmapScratch);
-
   csRef<ProctexPDLightLoader> loader;
   TileHelper tiles;
   csBitArray tilesDirty;
@@ -212,6 +234,8 @@ private:
   {
     stateDirty = 1 << 0,
     statePrepared = 1 << 1,
+
+    stateDoMMX = 1 << 31
   };
   csFlags state;
   struct LightColorState
@@ -225,6 +249,45 @@ private:
   csHash<LightColorState, csConstPtrKey<iLight> > lightColorStates;
 
   void Report (int severity, const char* msg, ...);
+
+  struct PreApplyNoop
+  {
+    void Perform (iTextureHandle*, uint8*) {}
+  };
+
+  template<typename PreApply = PreApplyNoop>
+  struct BlitBufHelper
+  {
+  private:
+    PreApply preApply;
+    iTextureHandle* texh;
+    uint8* lastBuf;
+
+    void DoApplyLast ()
+    {
+      preApply.Perform (texh, lastBuf);
+      texh->ApplyBlitBuffer (lastBuf);
+    }
+  public:
+    BlitBufHelper (iTextureHandle* texh) : texh (texh), lastBuf (0) {}
+    ~BlitBufHelper ()
+    {
+      if (lastBuf != 0) DoApplyLast ();
+    }
+
+    uint8* QueryBlitBuffer (int x, int y, int width, int height,
+                            size_t& pitch)
+    {
+      uint8* blitBuf = texh->QueryBlitBuffer (x, y, width, height,
+        pitch, iTextureHandle::BGRA8888,
+        iTextureHandle::blitbufReadable);
+      if (lastBuf != 0) DoApplyLast ();
+      lastBuf = blitBuf;
+      return blitBuf;
+    }
+  };
+  void Animate_Generic ();
+  void Animate_MMX ();
 public:
   const char* AddLight (const MappedLight& light);
   void FinishLoad()

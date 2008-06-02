@@ -30,6 +30,13 @@ namespace lighter
     lightmapAllocator.SetGrowPO2 (true);
   }
 
+  Lightmap::Lightmap (const Lightmap& other) : colorArray (0), 
+    width (other.width), height (other.height),
+    lightmapAllocator (other.lightmapAllocator.GetRectangle()), texture (0)
+  {
+    lightmapAllocator.SetGrowPO2 (other.lightmapAllocator.GetGrowPO2());
+  }
+
   Lightmap::~Lightmap ()
   {
     Lock();
@@ -124,12 +131,14 @@ namespace lighter
 
     for (uint j = 0; j < size; j++, lmData++, mmData++)
     {
-      if (*mmData < FLT_EPSILON || *mmData >= 1.0f) continue;
+      if (*mmData == 0 /*|| *mmData >= 1.0f*/)
+        continue;
 
       *lmData *= (1.0f / *mmData);
     }
 
     // Reset
+    
     lmData = colorArray;
     mmData = mask.GetMaskData();
 

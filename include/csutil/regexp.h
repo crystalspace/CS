@@ -26,6 +26,22 @@
 #include "csextern.h"
 #include "csutil/array.h"
 
+// Include system's (if available) ...
+#ifdef CS_HAVE_REGEX
+  #include <regex.h>
+#else
+// ... resp. the one included with CS.
+  #if (defined(CS_COMPILER_MSVC) || defined(CS_COMPILER_BCC)) && \
+      !defined(__STDC__)
+    #define __STDC__  1
+    #define __STDC__DEFINED
+  #endif
+  #include "generic/regex.h"
+  #ifdef __STDC__DEFINED
+    #undef __STDC__
+  #endif
+#endif
+
 /**
  * Possible errors that can occur during matching.
  */
@@ -150,13 +166,16 @@ struct CS_CRYSTALSPACE_EXPORT csRegExpMatch
  *  previous calls cause a recompilation of the pattern. Thus, to improve 
  *  performance, same \p flags should be used for subsequent calls to Match().
  */
-class CS_CRYSTALSPACE_EXPORT csRegExpMatcher
+class CS_CRYSTALSPACE_EXPORT csRegExpMatcher : 
+  public CS::Memory::CustomAllocated
 {
-  void* regex;
+  regex_t regex;
   char* pattern;
   int compiledFlags;
-  csRegExpMatchError compileError;
-  bool extendedRE;
+
+  bool regexpSetup : 1;
+  bool extendedRE : 1;
+  csRegExpMatchError compileError : 30;
   
   bool Compile (int flags, bool nosub);
 

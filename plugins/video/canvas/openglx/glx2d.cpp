@@ -17,10 +17,10 @@
 */
 
 #include "cssysdef.h"
-#include "csutil/sysfunc.h"
-#include "plugins/video/canvas/openglx/glx2d.h"
-#include "csutil/scf.h"
 #include "csutil/csinput.h"
+#include "csutil/scf.h"
+#include "csutil/setenv.h"
+#include "csutil/sysfunc.h"
 #include "csgeom/csrect.h"
 #include "csutil/cfgacc.h"
 #include "iutil/plugin.h"
@@ -32,6 +32,8 @@
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
+
+#include "plugins/video/canvas/openglx/glx2d.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -81,15 +83,14 @@ bool csGraphics2DGLX::Initialize (iObjectRegistry *object_reg)
     config->GetBool ("Video.OpenGL.MesaForceS3TCEnable", false);
   if (mesaForceS3TCEnable && !getenv ("force_s3tc_enable"))
   {
-    //putenv ("force_s3tc_enable=true");
-    setenv ("force_s3tc_enable", "true", 1);
+    CS::Utility::setenv ("force_s3tc_enable", "true", 1);
   }
 
   csRef<iPluginManager> plugin_mgr (
   	csQueryRegistry<iPluginManager> (object_reg));
   if ((strDriver = config->GetStr ("Video.OpenGL.Display.Driver", 0)))
   {
-    dispdriver = CS_LOAD_PLUGIN (plugin_mgr, strDriver, iOpenGLDisp);
+    dispdriver = csLoadPlugin<iOpenGLDisp> (plugin_mgr, strDriver);
     if (!dispdriver)
     {
       Report (CS_REPORTER_SEVERITY_WARNING,
@@ -104,7 +105,7 @@ bool csGraphics2DGLX::Initialize (iObjectRegistry *object_reg)
     }
   }
 
-  xwin = CS_LOAD_PLUGIN (plugin_mgr, XWIN_SCF_ID, iXWindow);
+  xwin = csLoadPlugin<iXWindow> (plugin_mgr, XWIN_SCF_ID);
   if (!xwin)
   {
     Report (CS_REPORTER_SEVERITY_WARNING,

@@ -1,7 +1,0 @@
-SubDir TOP plugins engine renderloop shadow stencil ;
-
-Description rendstep_stencil : "stencil render loop steps" ;
-Plugin rendstep_stencil : [ Wildcard *.cpp *.h ] ;
-Includes stencil.h : $(SUBDIR)/stencil.tok ;
-LinkWith rendstep_stencil : crystalspace ;
-CompileGroups rendstep_stencil : renderall ;

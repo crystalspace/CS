@@ -20,7 +20,7 @@
 #define __LEVTOOL_H__
 
 #include <stdarg.h>
-#include "igeom/polymesh.h"
+#include "igeom/trimesh.h"
 #include "csgeom/vector3.h"
 #include "csgeom/box.h"
 #include "csutil/parray.h"

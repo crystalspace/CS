@@ -29,7 +29,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/event.h"
-#include "plugins/video/canvas/xwindowcommon/xwindow.h"
+#include "ivaria/xwindow.h"
 #include "plugins/video/canvas/xwindowcommon/xextf86vm.h"
 #include "ivideo/graph2d.h"
 
@@ -76,6 +76,8 @@ class csXWindow :
   Window wm_win;
   /// Dimensions
   int wm_width, wm_height;
+
+  XEvent storedEvent;
 
   // "WM_DELETE_WINDOW" atom
   Atom wm_delete_window;
@@ -124,6 +126,8 @@ public:
   virtual void SetTitle (const char* title);
   virtual void SetCanvas (iGraphics2D *canvas);
 
+  virtual XEvent GetStoredEvent()
+  { return storedEvent; }
   virtual Display *GetDisplay ()
   { return dpy; }
   virtual int GetScreen ()
@@ -148,6 +152,14 @@ public:
 
   virtual bool AlertV (int type, const char* title, const char* okMsg,
   	const char* msg, va_list arg) CS_GNUC_PRINTF (5, 0);
+#ifdef HAVE_XAW
+  bool AlertV_Xaw (int type, const char* title, const char* okMsg,
+  	const char* msg, va_list arg) CS_GNUC_PRINTF (5, 0);
+#endif
+#ifdef HAVE_GTK
+  bool AlertV_GTK (int type, const char* title, const char* okMsg,
+  	const char* msg, va_list arg) CS_GNUC_PRINTF (5, 0);
+#endif
 
   struct EventHandler : 
     public scfImplementation1<EventHandler, 

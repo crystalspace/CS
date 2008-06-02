@@ -276,6 +276,16 @@ rule LibraryShared
     MakeLocate $(target) : $(BUILDTOP) ;
     SEARCH on $(target) = $(BUILDTOP) ;
   }
+  else
+  {
+    local target_link = $(target:G=symlink) ;
+    MakeLocate $(target_link) : $(BUILDTOP) ;
+    SEARCH on $(target_link) = $(BUILDTOP) ;
+    Depends $(target_link) : $(target) ;
+    SymLink $(target_link) : $(target) ;
+    Depends $(libname) : $(target_link) ;
+    $(libname)_CLEANEXTRA += $(target_link) ;
+  }
   Depends $(target) : $(objects) ;
   $(libname)_CLEANEXTRA += $(target) ;
   Depends $(target) : $(deplibs) ;
@@ -293,6 +303,16 @@ rule LibraryShared
     {
       NoCare $(debugfile) ;
       Depends install_lib : [ DoInstall $(debugfile) : $(libdir) : $(INSTALL_DATA) ] ;
+    }
+    if $(linklib) = $(target)
+    {
+      local debugfile_link = $(debugfile:G=symlink) ;
+      MakeLocate $(debugfile_link) : $(BUILDTOP) ;
+      SEARCH on $(debugfile_link) = $(BUILDTOP) ;
+      Depends $(debugfile_link) : $(debugfile) ;
+      SymLink $(debugfile_link) : $(debugfile) ;
+      Depends $(libname) : $(debugfile_link) ;
+      $(libname)_CLEANEXTRA += $(debugfile_link) ;
     }
   }
   

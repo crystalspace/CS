@@ -1700,7 +1700,7 @@ int main (int argc, char *argv[])
     {
       canvas = "crystalspace.graphics3d." + canvas;
     }
-    System.myG3D = CS_LOAD_PLUGIN (plugin_mgr, canvas, iGraphics3D);
+    System.myG3D = csLoadPlugin<iGraphics3D> (plugin_mgr, canvas);
     if (!object_reg->Register (System.myG3D, "iGraphics3D"))
     {
       csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,

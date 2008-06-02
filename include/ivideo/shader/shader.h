@@ -40,7 +40,13 @@ struct iLight;
 struct iObject;
 struct iLoaderContext;
 
-struct csRenderMesh;
+namespace CS
+{
+  namespace Graphics
+  {
+    struct RenderMesh;
+  }
+}
 class csShaderVariable;
 
 struct iShader;
@@ -92,7 +98,7 @@ static inline csShaderVariable* csGetShaderVariableFromStack
  */
 struct iShaderVariableContext : public virtual iBase
 {
-  SCF_INTERFACE(iShaderVariableContext, 2, 1, 1);
+  SCF_INTERFACE(iShaderVariableContext, 2, 2, 0);
 
   /**
    * Add a variable to this context
@@ -144,6 +150,9 @@ struct iShaderVariableContext : public virtual iBase
 
   /// Remove the given variable from this context.
   virtual bool RemoveVariable (csShaderVariable* variable) = 0;
+
+  /// Remove the variable with the given name from this context.
+  virtual bool RemoveVariable (csStringID name) = 0;
 };
 
 /**
@@ -304,7 +313,7 @@ struct iShader : public virtual iShaderVariableContext
    * to be provided to get the actual variant, which is then identified
    * by the "ticket".
    */
-  virtual size_t GetTicket (const csRenderMeshModes& modes,
+  virtual size_t GetTicket (const CS::Graphics::RenderMeshModes& modes,
     const iShaderVarStack* stacks) = 0;
 
   /// Get number of passes this shader have
@@ -314,8 +323,8 @@ struct iShader : public virtual iShaderVariableContext
   virtual bool ActivatePass (size_t ticket, size_t number) = 0;
 
   /// Setup a pass
-  virtual bool SetupPass (size_t ticket, const csRenderMesh *mesh,
-    csRenderMeshModes& modes,
+  virtual bool SetupPass (size_t ticket, const CS::Graphics::RenderMesh *mesh,
+    CS::Graphics::RenderMeshModes& modes,
     const iShaderVarStack* stacks) = 0;
 
   /**

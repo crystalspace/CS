@@ -84,7 +84,33 @@ private:
   csHash<TextureStorageFormat, csString> specialFormats;
   void InitFormats ();
   bool FormatSupported (GLenum srcFormat, GLenum srcType);
+
   void CompactTextures ();
+public:
+  /* Format tables - maps component sizes to GL sizes.
+   * A lot of source formats have the same 'type' bit only differ in 'format'.
+   * So the tables below store the 'type' information for given component sizes
+   * and the 'format' is chosen based on the input component order.
+   */
+  struct FormatTemplate
+  {
+    /// Component sizes
+    int size[4];
+    /// Target format index
+    int targetFmtIndex;
+    /// Source type
+    GLenum srcType;
+  };
+private:
+  bool FindFormats (const CS::StructuredTextureFormat& format,
+    const FormatTemplate* templates, GLenum const* targetTable,
+    int compCount, GLenum targetFormat, GLenum sourceFormat, 
+    TextureStorageFormat& glFormat, TextureSourceFormat& srcFormat);
+
+  bool DetermineIntegerFormat (const CS::StructuredTextureFormat& format,
+    TextureStorageFormat& glFormat, TextureSourceFormat& sourceFormat);
+  bool DetermineFloatFormat (const CS::StructuredTextureFormat& format,
+    TextureStorageFormat& glFormat, TextureSourceFormat& sourceFormat);
 public:
   CS_LEAKGUARD_DECLARE (csGLTextureManager);
 
@@ -115,6 +141,10 @@ public:
    */
   bool enableNonPowerOfTwo2DTextures;
 
+  bool hasPBO;
+  /// Some drivers seem to ignore glGenerateMipmap calls
+  bool disableGenerateMipmap;
+
   csGLTextureManager (iObjectRegistry* object_reg,
         iGraphics2D* iG2D, iConfigFile *config,
         csGLGraphics3D *G3D);
@@ -134,7 +164,7 @@ public:
   {
     return textureClassIDs.Request (classID);
   }
-
+  
   /**
    * Helper function to make sure a texture isn't selected on any TU.
    * Useful when deleting a texture.
@@ -146,7 +176,7 @@ public:
    * Determine the GL texture format for a structured texture format.
    */
   bool DetermineGLFormat (const CS::StructuredTextureFormat& format,
-    TextureStorageFormat& glFormat);
+    TextureStorageFormat& glFormat, TextureSourceFormat& sourceFormat);
 
 
   virtual csPtr<iTextureHandle> RegisterTexture (iImage *image, int flags,
@@ -171,6 +201,8 @@ public:
 
   /// Dump all SLMs to image files.
   void DumpSuperLightmaps (iVFS* VFS, iImageIO* iio, const char* dir);
+  
+  void DumpTextures (iVFS* VFS, iImageIO* iio, const char* dir);
 };
 
 }

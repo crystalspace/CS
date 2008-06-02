@@ -75,6 +75,8 @@ public:
 
   /// Add a triangle to the mesh.
   void AddTriangle (int a, int b, int c);
+	/// Add another triangle mesh to this one.
+	void AddTriangleMesh(const csTriangleMesh& tm);
   /// Query the array of triangles.
   virtual csTriangle* GetTriangles () { return triangles.GetArray (); }
   /// Query the array of triangles.
@@ -97,6 +99,9 @@ public:
   virtual void Unlock () { }
   virtual csFlags& GetFlags () { return flags; }
   virtual uint32 GetChangeNumber () const { return change_nr; }
+
+	/// Adds another triangle mesh to this one
+	csTriangleMesh& operator+=(const csTriangleMesh& tm);
 };
 
 /**
@@ -159,7 +164,7 @@ public:
  * A convenience triangle mesh implementation that represents a cube.
  */
 class CS_CRYSTALSPACE_EXPORT csTriangleMeshBox :
-  public virtual scfImplementation1<csTriangleMeshBox,iTriangleMesh>
+  public scfImplementation1<csTriangleMeshBox,iTriangleMesh>
 {
 private:
   csVector3 vertices[8];
@@ -229,7 +234,7 @@ public:
  * this class is still in use.
  */
 class CS_CRYSTALSPACE_EXPORT csTriangleMeshPointer :
-  public virtual scfImplementation1<csTriangleMeshPointer,iTriangleMesh>
+  public scfImplementation1<csTriangleMeshPointer,iTriangleMesh>
 {
 private:
   csVector3* vertices;
@@ -267,67 +272,6 @@ public:
   virtual csFlags& GetFlags () { return flags; }
   virtual uint32 GetChangeNumber () const { return change_nr; }
 };
-
-#include "csutil/win32/msvc_deprecated_warn_off.h"
-
-#include "igeom/polymesh.h"
-
-/**
- * This triangle mesh is a temporary class that takes a polygon mesh
- * and wraps it so that it becomes a triangle mesh. You should not have
- * to use this mesh in production code!
- * \deprecated This class should not be used!
- */
-class CS_CRYSTALSPACE_EXPORT csTriangleMeshPolyMesh
-  : public virtual scfImplementation1<csTriangleMeshPolyMesh,iTriangleMesh>
-{
-private:
-  iPolygonMesh* polymesh;
-
-public:
-
-#ifndef CS_DEPRECATION_SUPPRESS_HACK
-  CS_DEPRECATED_METHOD_MSG("You shouldn't use this class!")
-#endif
-  csTriangleMeshPolyMesh (iPolygonMesh* polymesh)
-    : scfImplementationType(this), polymesh (polymesh)
-  {
-  }
-
-  virtual ~csTriangleMeshPolyMesh ()
-  {
-  }
-
-  virtual size_t GetVertexCount ()
-  {
-    return (size_t)polymesh->GetVertexCount ();
-  }
-  virtual csVector3* GetVertices ()
-  {
-    return polymesh->GetVertices ();
-  }
-  virtual size_t GetTriangleCount ()
-  {
-    return (size_t)polymesh->GetTriangleCount ();
-  }
-  virtual csTriangle* GetTriangles () { return polymesh->GetTriangles (); }
-  virtual void Lock () { polymesh->Lock (); }
-  virtual void Unlock () { polymesh->Unlock (); }
-  virtual csFlags& GetFlags ()
-  {
-    // This works because CS_POLYMESH flags are compatible with
-    // CS_TRIMESH flags. Since this is a temporary class that goes
-    // away once iPolygonMesh goes away this is not a problem.
-    return polymesh->GetFlags ();
-  }
-  virtual uint32 GetChangeNumber () const
-  {
-    return polymesh->GetChangeNumber ();
-  }
-};
-
-#include "csutil/win32/msvc_deprecated_warn_on.h"
-
 
 /** @} */
 

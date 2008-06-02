@@ -17,7 +17,7 @@ then
 
   if [[ $? ]]
   then
-    echo "FAILED, Trying updates"
+    echo "Connection lost; retrying..."
 
     # Set some variables
     # Shift away co and url

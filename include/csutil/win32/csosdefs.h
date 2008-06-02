@@ -34,6 +34,12 @@
 #if defined(CS_COMPILER_MSVC)
   #pragma warning(disable:4244)   // conversion from 'double' to 'float'
   #pragma warning(disable:4250)   // '...' inherits '..' via dominance
+  #pragma warning(disable:4251)	  /* 'identifier' : class 'type' needs to have
+				   * dll-interface to be used by clients of 
+				   * class 'type2' */
+  #pragma warning(disable:4275)	  /* non – DLL-interface class 'identifier'
+				   * used as base for DLL-interface class 
+				   * 'identifier' */
   #pragma warning(disable:4290)   // C++ exception specification ignored
   #pragma warning(disable:4312)	  /* 'variable' : conversion from 'type' to 
 				   * 'type' of greater size */
@@ -97,9 +103,14 @@
   #endif
 #endif
 
-#ifndef WINVER
-#define WINVER 0x0400
+#ifndef WINVER  
+  #define WINVER 0x0500
 #endif
+
+#ifndef _WIN32_WINNT
+  #define _WIN32_WINNT 0x0500
+#endif
+
 
 // So many things require this. IF you have an issue with something defined
 // in it then undef that def here.
@@ -283,6 +294,7 @@
 #if defined (CS_COMPILER_MSVC)
 #  define strcasecmp _stricmp
 #  define strncasecmp _strnicmp
+#  define snprintf _snprintf
 #endif
 
 #if defined (CS_COMPILER_MSVC)
@@ -390,17 +402,6 @@ struct DIR;
 #ifndef _endthread
 #define _endthread()  {}
 #endif
-#endif
-
-// Fake up setenv(), if necessary
-#ifndef CS_HAVE_SETENV
-  #ifdef CS_CRYSTALSPACE_LIB
-    CS_EXPORT_SYM int setenv (const char* name, const char* value, 
-      bool overwrite);
-  #else
-    CS_IMPORT_SYM int setenv (const char* name, const char* value, 
-      bool overwrite);
-  #endif
 #endif
 
 // just to avoid windows.h inclusion

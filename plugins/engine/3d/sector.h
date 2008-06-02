@@ -98,7 +98,7 @@ private:
   csSector* sector;
 };
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * A sector is a container for objects. It is one of
@@ -315,6 +315,9 @@ public:
   { return static_cast<iShaderVariableContext*> (this); }
 
   virtual void PrecacheDraw ();
+
+protected:
+  virtual void InternalRemove() { SelfDestruct(); }
 
 private:
   // -- PRIVATE METHODS
@@ -548,7 +551,7 @@ private:
   csRef<csShaderVariable> svFogDensity;
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /// List of 3D engine sectors.
 class csSectorList : public scfImplementation1<csSectorList, iSectorList>

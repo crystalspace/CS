@@ -20,7 +20,7 @@
 @cindex @code{iParticle}
 @cindex @code{csRenderView}
 
-This section documents the major changes between versions 0.17 and 0.18 of of
+This section documents the major changes between versions 0.17 and 0.18 of
 Crystal Space.
 
 @subheading Name Change: csWorld @result{} csEngine

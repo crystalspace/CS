@@ -31,7 +31,7 @@ namespace lighter
     class GlobalProgress;
 
     /// Progress for a single task.
-    class Progress
+    class Progress : public CS::Memory::CustomAllocated
     {
     protected:
       friend class GlobalProgress;
@@ -117,14 +117,11 @@ namespace lighter
     struct Raytracer
     {
       Raytracer ()
-        : numRays (0), usRaytracing (0)
+        : numRays (0)
       {}
 
       /// Number of rays traced
-      uint64 numRays;
-
-      /// Number of uS spent raytracing
-      uint64 usRaytracing;
+      uint64 numRays;      
     } raytracer;
 
     struct KDTree

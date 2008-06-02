@@ -20,6 +20,7 @@
 #ifndef __CS_SUBMESHES_H__
 #define __CS_SUBMESHES_H__
 
+#include "csgeom/bsptree.h"
 #include "csgeom/tri.h"
 #include "csgfx/shadervarcontext.h"
 #include "cstool/rendermeshholder.h"
@@ -32,9 +33,9 @@
 #include "csutil/weakref.h"
 
 #include "iengine/material.h"
-#include "igeom/polymesh.h"
 #include "igeom/trimesh.h"
 #include "imesh/genmesh.h"
+#include "ivideo/rendermesh.h"
 #include "ivideo/rndbuf.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
@@ -47,41 +48,93 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
                               scfFakeInterface<iShaderVariableContext> >,
     public CS::ShaderVariableContextImpl
   {
+    csRef<iRenderBuffer> index_buffer;
   public:
     const char* name;
-    csRef<iRenderBuffer> index_buffer;
     csRef<iMaterialWrapper> material;
+    struct LegacyTriangles
+    {
+      bool triangles_setup, mesh_triangle_dirty_flag;
+      csDirtyAccessArray<csTriangle> mesh_triangles;
 
+      LegacyTriangles();
+    };
+    LegacyTriangles legacyTris;
+    void CreateLegacyBuffer();
+    void ClearLegacyBuffer();
+    void UpdateFromLegacyBuffer();
+  
     // Override mixmode from parent.
     uint MixMode;
+    csZBufMode zmode;
+    CS::Graphics::RenderPriority renderPrio;
+    bool back2front;
+    // Cache b2f tree for rendering
+    csBSPTree* b2fTree;
+    csFrameDataHolder<csRef<iRenderBuffer> > b2fIndices;
 
-    SubMesh () : scfImplementationType (this), name (0)
+    SubMesh () : scfImplementationType (this), name (0), MixMode ((uint)~0),
+      zmode ((csZBufMode)~0), renderPrio (-1), back2front (false), b2fTree (0)
     { }
     SubMesh (const SubMesh& other) : scfImplementationType (this), 
-      name (other.name), index_buffer (other.index_buffer), 
-      material (other.material), MixMode (other.MixMode)
+      index_buffer (other.index_buffer), name (other.name), 
+      material (other.material), MixMode (other.MixMode), zmode (other.zmode),
+      renderPrio (other.renderPrio), back2front (other.back2front), b2fTree (0)
     { }
+    ~SubMesh()
+    {
+      delete b2fTree;
+    }
     const char* GetName() const { return name; }
+    
+    void ClearB2F()
+    {
+      delete b2fTree; b2fTree = 0;
+      b2fIndices.Clear ();
+    }    
+    iRenderBuffer* GetIndicesB2F (const csVector3& pos, uint frameNum,
+      const csVector3* vertices, size_t vertNum);
 
-    iRenderBuffer* GetIndices () const
-    { return index_buffer; }
+    //iRenderBuffer* GetIndices () const
+    //{ return index_buffer; }
+    iRenderBuffer* GetIndices ();
     iMaterialWrapper* GetMaterial () const
     { return material; }
     virtual uint GetMixmode () const
     { return MixMode; }
     void SetMaterial (iMaterialWrapper* material)
     { this->material = material; }
+    csZBufMode GetZMode () const
+    { return zmode; }
+    void SetZMode (csZBufMode mode) { zmode = mode; }
+    CS::Graphics::RenderPriority GetRenderPriority () const
+    { return renderPrio; }
+    void SetRenderPriority (CS::Graphics::RenderPriority prio) { renderPrio = prio; }
+    void SetMixmode (uint mode) { MixMode = mode; }
+    void SetBack2Front (bool enable)
+    { 
+      if (back2front && !enable) ClearB2F();
+      back2front = enable;
+    }
+    bool GetBack2Front () const { return back2front; }
+
+    void SetIndices (iRenderBuffer* newIndices);
   };
 
   class SubMeshesContainer
   {
+    csRef<SubMesh> defaultSubmesh;
     csRefArray<SubMesh> subMeshes;
     uint changeNum;
   public:
-    SubMeshesContainer() : changeNum (0) { }
+    SubMeshesContainer();
 
     void ClearSubMeshes ()
-    { subMeshes.DeleteAll(); changeNum++; }
+    {
+      subMeshes.DeleteAll();
+      changeNum++;
+      subMeshes.Push (defaultSubmesh);
+    }
     iGeneralMeshSubMesh* AddSubMesh (iRenderBuffer* indices, 
       iMaterialWrapper *material, const char* name, uint mixmode = (uint)~0);
     SubMesh* FindSubMesh (const char* name) const;
@@ -97,6 +150,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     { return subMeshes[index]; }
     uint GetChangeNum () const
     { return changeNum; }
+    
+    SubMesh* GetDefaultSubmesh() const { return defaultSubmesh; }
   };
 
   /**
@@ -113,13 +168,33 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     enum
     {
       bitMaterial = 0,
-      bitMixMode
+      bitMixMode,
+      bitZMode,
+      bitRenderPrio,
+      bitBack2Front
     };
     csRef<iMaterialWrapper> material;
     // Override mixmode from parent.
     uint MixMode;
+    csZBufMode zmode;
+    CS::Graphics::RenderPriority renderPrio;
     csFlags overrideFlags;
     csRef<csRenderBufferHolder> bufferHolder;
+    bool back2front;
+
+    class RenderBufferAccessor : 
+      public scfImplementation1<RenderBufferAccessor, iRenderBufferAccessor>
+    {
+    public:
+      csWeakRef<SubMeshProxy> parent;
+      csRef<iRenderBufferAccessor> wrappedHolder;
+
+      RenderBufferAccessor (SubMeshProxy* parent) :
+	scfImplementationType (this), parent (parent) { }
+      void PreGetBuffer (csRenderBufferHolder* holder,
+    	csRenderBufferName buffer);
+    };
+    csRef<RenderBufferAccessor> renderBufferAccessor;
 
     void SetOverrideFlag (uint bit, bool flag) 
     { overrideFlags.SetBool (1 << bit, flag); }
@@ -127,6 +202,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     { return overrideFlags.Check (1 << bit); }
   public:
     csWeakRef<SubMesh> parentSubMesh;
+    // Stuff below is used by GM for rendering
     csRenderMeshHolder rmHolder;
 
     SubMeshProxy () : scfImplementationType (this), overrideFlags (0)
@@ -134,44 +210,87 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     ~SubMeshProxy ()
     { }
 
-    csRenderBufferHolder* GetBufferHolder();
+    csRenderBufferHolder* GetBufferHolder (csRenderBufferHolder* copyFrom);
 
     const char* GetName() const 
     { 
-      if (parentSubMesh) return parentSubMesh->GetName();
+      if (parentSubMesh) return parentSubMesh->SubMesh::GetName();
       return 0;
     }
-    iRenderBuffer* GetIndices () const
+    iRenderBuffer* GetIndices ()
     { 
-      if (parentSubMesh) return parentSubMesh->GetIndices();
+      if (parentSubMesh) return parentSubMesh->SubMesh::GetIndices();
+      return 0;
+    }
+    iRenderBuffer* GetIndicesB2F (const csVector3& pos, uint frameNum,
+      const csVector3* vertices, size_t vertNum)
+    {
+      if (parentSubMesh) 
+        return parentSubMesh->SubMesh::GetIndicesB2F (pos, frameNum, vertices,
+          vertNum);
       return 0;
     }
     iMaterialWrapper* GetMaterial () const
     { 
       if (GetOverrideFlag (bitMaterial)) return material; 
-      return parentSubMesh->GetMaterial ();
+      return parentSubMesh->SubMesh::GetMaterial ();
     }
     virtual uint GetMixmode () const
     { 
       if (GetOverrideFlag (bitMixMode)) return MixMode; 
-      return parentSubMesh->GetMixmode ();
+      return parentSubMesh->SubMesh::GetMixmode ();
     }
     void SetMaterial (iMaterialWrapper* material)
     { 
       SetOverrideFlag (bitMaterial, material != 0);
       this->material = material; 
     }
+    csZBufMode GetZMode () const
+    { 
+      if (GetOverrideFlag (bitZMode)) return zmode; 
+      return parentSubMesh->SubMesh::GetZMode ();
+    }
+    void SetZMode (csZBufMode mode)
+    { 
+      SetOverrideFlag (bitZMode, mode != (csZBufMode)~0);
+      zmode = mode;
+    }
+    CS::Graphics::RenderPriority GetRenderPriority () const
+    { 
+      if (GetOverrideFlag (bitRenderPrio)) return renderPrio;
+      return parentSubMesh->SubMesh::GetRenderPriority (); 
+    }
+    void SetRenderPriority (CS::Graphics::RenderPriority prio)
+    {
+      SetOverrideFlag (bitRenderPrio, prio >= 0);
+      renderPrio = prio; 
+    }
+    void SetMixmode (uint mode)
+    {
+      SetOverrideFlag (bitMixMode, mode != (uint)~0);
+      MixMode = mode;
+    }
+    void SetBack2Front (bool enable)
+    {
+      SetOverrideFlag (bitBack2Front, enable);
+      back2front = enable; 
+    }
+    bool GetBack2Front () const
+    {
+      if (GetOverrideFlag (bitBack2Front)) return back2front;
+      return parentSubMesh->SubMesh::GetBack2Front ();
+    }
 
     virtual csShaderVariable* GetVariable (csStringID name) const
     {
       csShaderVariable* var = 
         CS::ShaderVariableContextImpl::GetVariable (name);
-      if (var == 0) var = parentSubMesh->GetVariable (name);
+      if (var == 0) var = parentSubMesh->SubMesh::GetVariable (name);
       return var;
     }
     virtual void PushVariables (iShaderVarStack* stacks) const
     {
-      parentSubMesh->PushVariables (stacks);
+      parentSubMesh->SubMesh::PushVariables (stacks);
       CS::ShaderVariableContextImpl::PushVariables (stacks);
     }
     virtual bool IsEmpty() const 
@@ -183,56 +302,32 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
 
   class SubMeshProxiesContainer
   {
+    csRef<SubMeshProxy> defaultSubmesh;
     csRefArray<SubMeshProxy> subMeshes;
   public:
+    SubMeshProxiesContainer ();
+    SubMeshProxiesContainer (SubMeshProxy* deflt);
+    
     void AddSubMesh (SubMeshProxy* subMesh);
     SubMeshProxy* FindSubMesh (const char* name) const;
-    void Empty() { subMeshes.Empty(); }
+    void Empty()
+    {
+      subMeshes.Empty();
+    }
     void Push (SubMeshProxy* subMesh)
-    { subMeshes.Push (subMesh); }
+    {
+      subMeshes.Push (subMesh);
+    }
 
     size_t GetSize() const
     { return subMeshes.GetSize(); }
     SubMeshProxy* operator[](size_t index)
     { return subMeshes[index]; }
+    
+    SubMeshProxy* GetDefaultSubmesh() const { return defaultSubmesh; }
   };
 
   class csGenmeshMeshObjectFactory;
-
-  struct SubMeshesPolyMesh : 
-    public scfImplementation1<SubMeshesPolyMesh, iPolygonMesh>
-  {
-  private:
-    csWeakRef<csGenmeshMeshObjectFactory> factory;
-    csFlags flags;
-    const SubMeshesContainer& subMeshes;
-    csDirtyAccessArray<csTriangle> triangleCache;
-    csDirtyAccessArray<csMeshedPolygon> polygonCache;
-    uint triChangeNum, polyChangeNum;
-
-    void CacheTriangles ();
-    void CachePolygons ();
-  public:
-    SubMeshesPolyMesh (csGenmeshMeshObjectFactory* Factory,
-      const SubMeshesContainer& subMeshes) : 
-      scfImplementationType (this), factory (Factory), subMeshes (subMeshes),
-      triChangeNum (~0), polyChangeNum (~0)
-    {
-      flags.Set (CS_POLYMESH_TRIANGLEMESH);
-    }
-
-    virtual int GetVertexCount ();
-    virtual csVector3* GetVertices ();
-    virtual int GetPolygonCount ();
-    virtual csMeshedPolygon* GetPolygons ();
-    virtual int GetTriangleCount ();
-    virtual csTriangle* GetTriangles ();
-    virtual void Lock () { }
-    virtual void Unlock () { }
-    
-    virtual csFlags& GetFlags () { return flags;  }
-    virtual uint32 GetChangeNumber() const { return subMeshes.GetChangeNum(); }
-  };
 
   struct SubMeshesTriMesh : 
     public scfImplementation1<SubMeshesTriMesh, iTriangleMesh>

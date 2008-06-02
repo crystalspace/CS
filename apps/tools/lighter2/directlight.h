@@ -21,6 +21,7 @@
 
 #include "csutil/noncopyable.h"
 
+#include "light.h"
 #include "primitive.h"
 #include "raytracer.h"
 #include "sampler.h"
@@ -30,7 +31,6 @@ namespace lighter
   class Sector;
   class Raytracer;
   class Primitive;
-  class Light;
 
   class PartialElementIgnoreCallback;  
   
@@ -39,74 +39,98 @@ namespace lighter
   {
   public:
     // Setup
-    static void Initialize ();
+    DirectLighting (const csVector3& tangentSpaceNorm, size_t subLightmapNum);
 
     // Shade by using all primitives within range
-    static void ShadeDirectLighting (Sector* sector, 
+    void ShadeDirectLighting (Sector* sector, 
       Statistics::Progress& progress);
 
     //-- Shade a point
-    typedef csColor (*PVLPointShader)(Sector* sector, 
-      const csVector3& point, const csVector3& normal, 
+    typedef csColor (DirectLighting::*PVLPointShader)(Sector* sector, 
+      Object* obj, const csVector3& point, const csVector3& normal, 
       SamplerSequence<2>& lightSampler);
 
     // Shade a single point in space with direct lighting
-    static csColor UniformShadeAllLightsNonPD (Sector* sector, const csVector3& point,
-      const csVector3& normal, SamplerSequence<2>& lightSampler);
+    csColor UniformShadeAllLightsNonPD (Sector* sector, Object* obj, 
+      const csVector3& point, const csVector3& normal, 
+      SamplerSequence<2>& lightSampler);
 
     // Shade a single point in space with direct lighting using a single light
-    static csColor UniformShadeRndLightNonPD (Sector* sector, const csVector3& point,
-      const csVector3& normal, SamplerSequence<2>& lightSampler);
+    csColor UniformShadeRndLightNonPD (Sector* sector, Object* obj,
+      const csVector3& point, const csVector3& normal, 
+      SamplerSequence<2>& lightSampler);
 
     //-- Shade a lightmap element
-    typedef csColor (*LMElementShader)(Sector* sector, ElementProxy element,
-      SamplerSequence<2>& lightSampler, 
-      PartialElementIgnoreCallback* ignoreCB);
+    typedef csColor (DirectLighting::*LMElementShader)(Sector* sector, 
+      ElementProxy element, SamplerSequence<2>& lightSampler);
 
     // Shade a primitive element with direct lighting
-    static csColor UniformShadeAllLightsNonPD (Sector* sector, ElementProxy element,
-      SamplerSequence<2>& lightSampler,
-      PartialElementIgnoreCallback* ignoreCB = 0);
+    csColor UniformShadeAllLightsNonPD (Sector* sector, ElementProxy element,
+      SamplerSequence<2>& lightSampler);
 
     // Shade a primitive element with direct lighting using a single light
-    static csColor UniformShadeRndLightNonPD (Sector* sector, ElementProxy element,
-      SamplerSequence<2>& lightSampler, 
-      PartialElementIgnoreCallback* ignoreCB = 0);
-
-    //-- Collect potentially shadowing primitives
-    typedef void (*LMElementCollectShadowPrims)(Sector* sector, ElementProxy element,
-      SamplerSequence<2>& lightSampler, PartialElementIgnoreCallback* ignoreCB);
-
-    static void CollectShadowAllLightsNonPD(Sector* sector, ElementProxy element,
-      SamplerSequence<2>& lightSampler, PartialElementIgnoreCallback* ignoreCB);
-    static void CollectShadowRndLightNonPD(Sector* sector, ElementProxy element,
-      SamplerSequence<2>& lightSampler, PartialElementIgnoreCallback* ignoreCB);
-    static void CollectShadowOneLight(Sector* sector, ElementProxy element,
-      Light* light, SamplerSequence<2>& lightSampler, 
-      PartialElementIgnoreCallback* ignoreCB);
+    csColor UniformShadeRndLightNonPD (Sector* sector, ElementProxy element,
+      SamplerSequence<2>& lightSampler);
 
     //-- Shade using one light
     // Shade a primitive element with direct lighting
-    static csColor UniformShadeOneLight (Sector* sector, const csVector3& point,
-      const csVector3& normal, Light* light, SamplerSequence<2>& lightSampler);
+    csColor UniformShadeOneLight (Sector* sector, Object* obj, 
+      const csVector3& point, const csVector3& normal, Light* light, 
+      SamplerSequence<2>& lightSampler);
 
     // Shade a primitive element with direct lighting
-    static csColor UniformShadeOneLight (Sector* sector, ElementProxy element,
-      Light* light, SamplerSequence<2>& lightSampler, 
-      PartialElementIgnoreCallback* ignoreCB = 0);
+    csColor UniformShadeOneLight (Sector* sector, ElementProxy element,
+      Light* light, SamplerSequence<2>& lightSampler);
+
+    template<typename T>
+    inline csColor UniformShadeElement (T& shade, ElementProxy element, 
+      SamplerSequence<2>& lightSampler);
 
   private:
-    // Static methods...
-    inline static csColor ShadeLight (Light* light, const csVector3& point,
-      const csVector3& normal, SamplerSequence<2>& lightSampler,
-      const Primitive* shadowIgnorePrimitive = 0);
-    inline static csColor ShadeLight (Light* light, const csVector3& point,
-      const csVector3& normal, SamplerSequence<2>& lightSampler,
-      PartialElementIgnoreCallback* ignoreCB);
+    struct ShadeAllLightsNonPD
+    {
+      DirectLighting& lighting;
+      const LightRefArray& allLights;
+      ShadeAllLightsNonPD (DirectLighting& lighting, 
+        const LightRefArray& allLights) : lighting (lighting), 
+        allLights (allLights) {}
+      inline csColor ShadeLight (Object* obj, const csVector3& point, 
+        const csVector3& normal, SamplerSequence<2>& lightSampler, 
+        const Primitive* shadowIgnorePrimitive = 0, 
+        bool fullIgnore = false);
+    };
 
-    inline static void CollectShadowLight (Light* light, const csVector3& point,
-      const csVector3& normal, SamplerSequence<2>& lightSampler, 
-      PartialElementIgnoreCallback* ignoreCB);
+    struct ShadeRndLightNonPD
+    {
+      DirectLighting& lighting;
+      const LightRefArray& allLights;
+      SamplerSequence<3>& lightSampler;
+      ShadeRndLightNonPD (DirectLighting& lighting, 
+        const LightRefArray& allLights, SamplerSequence<3>& lightSampler) : 
+        lighting (lighting), allLights (allLights), 
+        lightSampler (lightSampler) {}
+      inline csColor ShadeLight (Object* obj, const csVector3& point, 
+        const csVector3& normal, SamplerSequence<2>& sampler, 
+        const Primitive* shadowIgnorePrimitive = 0, 
+        bool fullIgnore = false);
+    };
+    struct ShadeOneLight
+    {
+      DirectLighting& lighting;
+      Light* light;
+      ShadeOneLight (DirectLighting& lighting, Light* light) : 
+        lighting (lighting), light (light) {}
+      inline csColor ShadeLight (Object* obj, const csVector3& point, 
+        const csVector3& normal, SamplerSequence<2>& sampler, 
+        const Primitive* shadowIgnorePrimitive = 0, 
+        bool fullIgnore = false);
+    };
+
+    // Methods...
+    inline csColor ShadeLight (Light* light, Object* obj, 
+      const csVector3& point, const csVector3& normal, 
+      SamplerSequence<2>& lightSampler, const Primitive* shadowIgnorePrimitive = 0, 
+      bool fullIgnore = false);
 
     class ProgressState
     {
@@ -132,16 +156,26 @@ namespace lighter
       }
     };
 
-    static void ShadeLightmap (Sector* sector, Object* obj, 
+    void ShadeLightmap (Sector* sector, Object* obj, 
       SamplerSequence<2>& masterSampler, ProgressState& progress);
 
-    static void ShadePerVertex (Sector* sector, Object* obj,
+    void ShadePerVertex (Sector* sector, Object* obj,
       SamplerSequence<2>& masterSampler, ProgressState& progress);
 
-    // Static data
-    static PVLPointShader pvlPointShader;
-    static LMElementShader lmElementShader;
-    static LMElementCollectShadowPrims lmElementCollect;
+    // Helpers
+    csVector3 ComputeElementNormal (ElementProxy element,
+      const csVector3& pt) const;
+    csVector3 ComputeVertexNormal (Object* obj, size_t index) const;
+    
+    void ComputeAffectingLights (Object* obj);
+
+    // Data...
+    csVector3 tangentSpaceNorm;
+    bool fancyTangentSpaceNorm;
+    size_t subLightmapNum;
+    PVLPointShader pvlPointShader;
+    LMElementShader lmElementShader;
+    csBitArray affectingLights;
   };
 }
 

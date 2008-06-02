@@ -25,6 +25,8 @@ CS_MASTER_HEADER_REJECTS =
   [ ConcatDirs csutil   csosdefs.h   ]
   [ ConcatDirs csutil   custom_new_disable.h ]
   [ ConcatDirs csutil   custom_new_enable.h ]
+  [ ConcatDirs csutil   deprecated_warn_off.h ]
+  [ ConcatDirs csutil   deprecated_warn_on.h ]
   [ ConcatDirs csutil   getopt.h     ]
   [ ConcatDirs csutil   mmap_dummy.h ]
   [ ConcatDirs csutil   mmap_posix.h ]
@@ -33,22 +35,39 @@ CS_MASTER_HEADER_REJECTS =
   [ ConcatDirs csutil   scf_implgen_p.h ]
   [ ConcatDirs csutil   scf_implgen_p_template.h ]
   [ ConcatDirs csutil   win32 mmap.h ]
-  [ ConcatDirs csutil   win32 msvc_deprecated_warn_off.h ]
-  [ ConcatDirs csutil   win32 msvc_deprecated_warn_on.h ]
   [ ConcatDirs csutil   win32 psdk-compat.h ]
   [ ConcatDirs csutil   zip.h        ]
   [ ConcatDirs imap     parser.h     ]
   [ ConcatDirs inetwork vosapi.h     ]
   [ ConcatDirs ivaria   icegui.h     ]
+  [ ConcatDirs ivaria   xwindow.h    ]
   [ ConcatDirs ivideo   wxwin.h      ]
   ;
 
 # List of headers that should not appear in the master-headers because they 
 # are deprecated.
 CS_MASTER_HEADER_REJECTS +=
-  [ ConcatDirs csutil  debug.h        ]
-  [ ConcatDirs csutil  profile.h      ]
   [ ConcatDirs iengine collectn.h     ]
+  [ ConcatDirs csutil   scopedmutexlock.h ]
+  [ ConcatDirs csutil   win32 msvc_deprecated_warn_off.h ]
+  [ ConcatDirs csutil   win32 msvc_deprecated_warn_on.h ]
+  ;
+  
+# List of headers that should not appear in the master-headers because they 
+# are platform-specific.
+CS_MASTER_HEADER_REJECTS +=
+  [ ConcatDirs csutil generic   regex.h             ]
+  [ ConcatDirs csutil threading atomicops_gcc_ppc.h ]
+  [ ConcatDirs csutil threading atomicops_gcc_x86.h ]
+  [ ConcatDirs csutil threading atomicops_msvc.h    ]
+  [ ConcatDirs csutil threading atomicops_sparc.h   ]
+  [ ConcatDirs csutil threading pthread_condition.h ]
+  [ ConcatDirs csutil threading pthread_mutex.h     ]
+  [ ConcatDirs csutil threading pthread_thread.h    ]
+  [ ConcatDirs csutil threading win32_apifuncs.h    ]
+  [ ConcatDirs csutil threading win32_condition.h   ]
+  [ ConcatDirs csutil threading win32_mutex.h       ]
+  [ ConcatDirs csutil threading win32_thread.h      ]  
   ;
 
 {
@@ -140,7 +159,8 @@ rule MasterHeaderCsUtil
     lines += "#endif" ;
   }
   return [ MasterHeader csutil :
-    [ Filter [ Wildcard csutil : *.h ] : $(rejects) ] :
+    [ Filter [ Wildcard csutil : *.h ] : $(rejects) ] 
+    [ Filter [ Wildcard [ ConcatDirs csutil threading ] : *.h ] : $(rejects) ] :
     $(CS_MASTER_HEADER_BOILERPLATE)
     $(CS_MASTER_HEADER_DOC_DIRECTORY) 
     $(CS_MASTER_HEADER_INCLUDE_CSSYSDEF_H) : 

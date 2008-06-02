@@ -30,12 +30,9 @@ namespace lighter
   {
   public:
     Lightmap (int width, int height);
+    Lightmap (const Lightmap& other);
 
     ~Lightmap ();
-
-    inline void Initialize ()
-    {      
-    }
 
     // Add a general ambient term
     void AddAmbientTerm (const csColor amb);

@@ -129,11 +129,13 @@ public:
 
 #ifdef CS_DEBUG
 #define GLRENDER3D_OUTPUT_STRING_MARKER(fmtParam)			    \
+  if (csGLGraphics3D::DoOutputMarkerString ())                              \
   { MakeAString mas fmtParam; csGLGraphics3D::OutputMarkerString (          \
     CS_FUNCTION_NAME, CS_STRING_TO_WIDE(__FILE__), __LINE__, mas); }
 #define GLRENDER3D_OUTPUT_LOCATION_MARKER				    \
-  csGLGraphics3D::OutputMarkerString (CS_FUNCTION_NAME, 		    \
-  CS_STRING_TO_WIDE(__FILE__), __LINE__, "")
+  if (csGLGraphics3D::DoOutputMarkerString ())                              \
+    csGLGraphics3D::OutputMarkerString (CS_FUNCTION_NAME, 		    \
+      CS_STRING_TO_WIDE(__FILE__), __LINE__, "")
 #else
 #define GLRENDER3D_OUTPUT_STRING_MARKER(fmtParam)
 #define GLRENDER3D_OUTPUT_LOCATION_MARKER
@@ -198,6 +200,7 @@ private:
   csEventID SystemOpen;
   csEventID SystemClose;
   csEventID CanvasResize;
+  csEventID Frame;
 
   csWeakRef<iBugPlug> bugplug;
 
@@ -214,6 +217,7 @@ private:
   float aspect, inv_aspect;
   bool needProjectionUpdate;
   float fov;
+  int scrwidth, scrheight;
   int viewwidth, viewheight;
   bool needViewportUpdate;
   csPoly3D frustum;
@@ -267,7 +271,6 @@ private:
   //csReversibleTransform object2camera;
   csReversibleTransform world2camera;
 
-  bool verbose;
   csGraphics3DCaps rendercaps;
   GLint maxNpotsTexSize;
 
@@ -330,8 +333,6 @@ private:
   // For debugging: inhibit all drawing of meshes till next frame.
   bool debug_inhibit_draw;
 
-  /// Current render target.
-  csRef<iTextureHandle> render_target;
   csGLRender2TextureBackend* r2tbackend;
 
   /// Should we use special buffertype (VBO) or just system memory
@@ -355,8 +356,6 @@ private:
   //                         Private helpers
   ////////////////////////////////////////////////////////////////////
 	
-  void Report (int severity, const char* msg, ...);
-
   void ParseByteSize (const char* sizeStr, size_t& size);
 
   int GetMaxTextureSize () const { return rendercaps.maxTexWidth; }
@@ -366,7 +365,7 @@ private:
   // @@@ Jorrit: to avoid flickering I had to increase the
   // values below and multiply them with 3.
   //{ glPolygonOffset (-0.05f, -2.0f); 
-  { glPolygonOffset (-0.15f, -6.0f); 
+  { glPolygonOffset (0.15f, 6.0f); 
   statecache->Enable_GL_POLYGON_OFFSET_FILL (); }
 
   // Disables offsetting of Z values
@@ -415,20 +414,25 @@ private:
   }
 
   void* RenderLock (iRenderBuffer* buffer, csGLRenderBufferLockType type, 
-    GLenum& compGLType);
+    GLenum& compGLType, bool& normalized);
   void RenderRelease (iRenderBuffer* buffer);
 
-/*  iRenderBuffer* vertattrib[16]; // @@@ Hardcoded max number of attributes
-  bool vertattribenabled[16]; // @@@ Hardcoded max number of attributes
-  bool vertattribenabled100[16]; // @@@ Hardcoded max number of attributes (for conventional)
- */ //iTextureHandle* texunit[16]; // @@@ Hardcoded max number of units
-  bool texunitenabled[16]; // @@@ Hardcoded max number of units
-  GLuint texunittarget[16]; // @@@ Hardcoded max number of units
-  csRef<csGLBasicTextureHandle> needNPOTSfixup[16]; // @@@ Hardcoded max number of units
+  struct ImageUnit : public CS::Memory::CustomAllocated
+  {
+    bool enabled;
+    GLuint target;
+    
+    csRef<csGLBasicTextureHandle> needNPOTSfixup;
+    bool npotsStatus;
+    
+    ImageUnit (): enabled (false), target (0), npotsStatus (false) {}
+  };
+  GLint numImageUnits;
+  ImageUnit* imageUnits;
+  GLint numTCUnits;
   /// Array of buffers used for NPOTS texture coord fixup
   csArray<csRef<iRenderBuffer> > npotsFixupScrap;
-  /// Whether an NPOTS scrap is attached to a TC bufer
-  bool npotsStatus[16];
+
   /// Whether the alpha channel of the color buffer should be scaled.
   bool needColorFixup;
   /// Amount to scale alpha channel of color buffer
@@ -483,15 +487,21 @@ public:
   static csGLStateCache* statecache;
   static csGLExtensionManager* ext;
   csRef<csGLTextureManager> txtmgr;
+  bool verbose;
 
   csGLGraphics3D (iBase *parent);
   virtual ~csGLGraphics3D ();
 
   iStringSet* GetStrings () { return strings; }
+  inline static bool DoOutputMarkerString ()
+  {
+    return ext && ext->CS_GL_GREMEDY_string_marker;
+  }
   static void OutputMarkerString (const char* function, const wchar_t* file,
     int line, const char* message);
   static void OutputMarkerString (const char* function, const wchar_t* file,
     int line, MakeAString& message);
+  void Report (int severity, const char* msg, ...);
 
   ////////////////////////////////////////////////////////////////////
   //                            iGraphics3D
@@ -590,26 +600,21 @@ public:
   virtual void SetWorldToCamera (const csReversibleTransform& w2c);
   virtual const csReversibleTransform& GetWorldToCamera () { return world2camera; }
 
-  /// Set the current render target (0 for screen).
-  virtual void SetRenderTarget (iTextureHandle* handle,
-	  bool persistent = false,
-	  int subtexture = 0)
-  {
-    render_target = handle;
-    r2tbackend->SetRenderTarget (handle, persistent, subtexture);
-
-    int hasRenderTarget = (handle != 0) ? 1 : 0;
-    G2D->PerformExtension ("userendertarget", hasRenderTarget);
-    viewwidth = G2D->GetWidth();
-    viewheight = G2D->GetHeight();
-    needViewportUpdate = true;
-  }
-
-  /// Get the current render target (0 for screen).
+  uint currentAttachments;
+  bool SetRenderTarget (iTextureHandle* handle, bool persistent = false,
+    int subtexture = 0, csRenderTargetAttachment attachment = rtaColor0);
+  bool ValidateRenderTargets ();
+  bool CanSetRenderTarget (const char* format,
+    csRenderTargetAttachment attachment = rtaColor0);
+  iTextureHandle* GetRenderTarget (
+    csRenderTargetAttachment attachment = rtaColor0,
+    int* subtexture = 0) const;
+  void UnsetRenderTargets();
+  /*/// Get the current render target (0 for screen).
   virtual iTextureHandle* GetRenderTarget () const
   {
     return render_target;
-  }
+  }*/
 
   /// Begin drawing in the renderer
   bool BeginDraw (int drawflags);
@@ -622,8 +627,8 @@ public:
   void Print (csRect const* area);
 
   /// Drawroutine. Only way to draw stuff
-  void DrawMesh (const csCoreRenderMesh* mymesh,
-    const csRenderMeshModes& modes,
+  void DrawMesh (const CS::Graphics::CoreRenderMesh* mymesh,
+    const CS::Graphics::RenderMeshModes& modes,
     const iShaderVarStack* stacks);
 
   /// Draw a 2D sprite

@@ -32,6 +32,7 @@
 
 #include "csgeom/vector3.h"
 
+#include "iengine/collection.h"
 #include "iengine/light.h"
 
 class csBox3;
@@ -173,7 +174,7 @@ struct iEngineSectorCallback : public virtual iBase
  */
 struct iEngine : public virtual iBase
 {
-  SCF_INTERFACE(iEngine,2,1,0);
+  SCF_INTERFACE(iEngine, 4, 0, 0);
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;
@@ -258,7 +259,7 @@ struct iEngine : public virtual iBase
    * \param meter If supplied, the meter object will be called back
    * periodically to report the progress of engine lighting calculation.
    */
-  virtual void ShineLights (iRegion* region = 0,
+  virtual void ShineLights (iBase* base = 0,
   	iProgressMeter* meter = 0) = 0;
 
   /**
@@ -427,18 +428,26 @@ struct iEngine : public virtual iBase
 
   /**
    * Find the given material. The name can be a normal
-   * name. In that case this function will look in all regions
-   * except if region is not 0 in which case it will only
-   * look in that region.
-   * If the name is specified as 'regionname/objectname' then
-   * this function will only look in the specified region and return
-   * 0 if that region doesn't contain the object or the region
-   * doesn't exist. In this case the region parameter is ignored.
+   * name. In that case this function will look in all collection
+   * except if collection is not 0 in which case it will only
+   * look in that collection.
+   * If the name is specified as 'collectionname/objectname' then
+   * this function will only look in the specified collection and return
+   * 0 if that collection doesn't contain the object or the collection
+   * doesn't exist. In this case the collection parameter is ignored.
    * \param name the engine name of the desired material
-   * \param region if specified, search only this region (also see note above)
+   * \param collection if specified, search only this collection (also see note above)
    */
+
   virtual iMaterialWrapper* FindMaterial (const char* name,
-  	iRegion* region = 0) = 0;
+  	iBase* base = 0) = 0;
+
+  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
+  virtual iMaterialWrapper* FindMaterialRegion (const char* name,
+  	iRegion* region) = 0;
+
+  virtual iMaterialWrapper* FindMaterialCollection (const char* name,
+  	iCollection* collection = 0) = 0;
 
   /** @} */
   
@@ -488,18 +497,25 @@ struct iEngine : public virtual iBase
 
   /**
    * Find the given texture. The name can be a normal
-   * name. In that case this function will look in all regions
-   * except if region is not 0 in which case it will only
-   * look in that region.
-   * If the name is specified as 'regionname/objectname' then
-   * this function will only look in the specified region and return
-   * 0 if that region doesn't contain the object or the region
-   * doesn't exist. In this case the region parameter is ignored.
+   * name. In that case this function will look in all collections
+   * except if collection is not 0 in which case it will only
+   * look in that collection.
+   * If the name is specified as 'collectionname/objectname' then
+   * this function will only look in the specified collection and return
+   * 0 if that collection doesn't contain the object or the collection
+   * doesn't exist. In this case the collection parameter is ignored.
    * \param name the engine name of the desired texture
-   * \param region if specified, search only this region (also see note above)
+   * \param collection if specified, search only this collection (also see note above)
    */
   virtual iTextureWrapper* FindTexture (const char* name,
-  	iRegion* region = 0) = 0;
+  	iBase* base = 0) = 0;
+
+  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
+  virtual iTextureWrapper* FindTextureRegion (const char* name,
+  	iRegion* region) = 0;
+
+  virtual iTextureWrapper* FindTextureCollection (const char* name,
+  	iCollection* collection = 0) = 0;
 
   /** @} */
   
@@ -547,10 +563,13 @@ struct iEngine : public virtual iBase
   /**
    * Create an iterator to iterate over all static lights of the engine.
    * Assign to a csRef.
-   * \param region only iterate over the lights in this region
+   * \param collection only iterate over the lights in this collection
    * (otherwise iterate over all lights)
    */
-  virtual csPtr<iLightIterator> GetLightIterator (iRegion* region = 0) = 0;
+  virtual csPtr<iLightIterator> GetLightIterator (iBase* base = 0) = 0;
+  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
+  virtual csPtr<iLightIterator> GetLightIteratorRegion (iRegion* region) = 0;
+  virtual csPtr<iLightIterator> GetLightIteratorCollection (iCollection* collection = 0) = 0;
 
   /**
    * Remove a light and update all lightmaps. This function only works
@@ -618,18 +637,23 @@ struct iEngine : public virtual iBase
 
   /**
    * Find the given sector. The name can be a normal
-   * name. In that case this function will look in all regions
-   * except if region is not 0 in which case it will only
-   * look in that region.
-   * If the name is specified as 'regionname/objectname' then
+   * name. In that case this function will look in all collection
+   * except if collection is not 0 in which case it will only
+   * look in that collection.
+   * If the name is specified as 'collectionname/objectname' then
    * this function will only look in the specified region and return
-   * 0 if that region doesn't contain the object or the region
-   * doesn't exist. In this case the region parameter is ignored.
+   * 0 if that region doesn't contain the object or the collection
+   * doesn't exist. In this case the collection parameter is ignored.
    * \param name the engine name of the desired sector
-   * \param region if specified, search only this region (also see note above)
+   * \param collection if specified, search only this collection (also see note above)
    */
   virtual iSector* FindSector (const char* name,
-  	iRegion* region = 0) = 0;
+  	iBase* base = 0) = 0;
+  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
+  virtual iSector* FindSectorRegion (const char* name,
+  	iRegion* region) = 0;
+  virtual iSector* FindSectorCollection (const char* name,
+  	iCollection* collection = 0) = 0;
 
   /**
    * This routine returns an iterator to iterate over all nearby sectors.
@@ -751,7 +775,10 @@ struct iEngine : public virtual iBase
    * Assign to a csRef.
    * \param sector the sector to add walls to
    * \param name the engine name of the walls mesh that will be created
+   * \deprecated Deprecated in 1.3. Use CS::Geometry::GeneralMeshBuilder
+   * instead.
    */
+  CS_DEPRECATED_METHOD_MSG("Use CS::Geometry::GeneralMeshBuilder instead")
   virtual csPtr<iMeshWrapper> CreateSectorWallsMesh (iSector* sector,
       const char* name) = 0;
 
@@ -763,7 +790,10 @@ struct iEngine : public virtual iBase
    * Assign to a csRef.
    * \param sector the sector to add the object to
    * \param name the engine name of the mesh that will be created
+   * \deprecated Deprecated in 1.3. Use CS::Geometry::GeneralMeshBuilder
+   * instead.
    */
+  CS_DEPRECATED_METHOD_MSG("Use CS::Geometry::GeneralMeshBuilder instead")
   virtual csPtr<iMeshWrapper> CreateThingMesh (iSector* sector,
   	const char* name) = 0;
 
@@ -826,18 +856,26 @@ struct iEngine : public virtual iBase
 
   /**
    * Find the given mesh object. The name can be a normal
-   * name. In that case this function will look in all regions
-   * except if region is not 0 in which case it will only
-   * look in that region.
-   * If the name is specified as 'regionname/objectname' then
-   * this function will only look in the specified region and return
-   * 0 if that region doesn't contain the object or the region
-   * doesn't exist. In this case the region parameter is ignored.
+   * name. In that case this function will look in all collections
+   * except if collection is not 0 in which case it will only
+   * look in that collection.
+   * If the name is specified as 'collectionname/objectname' then
+   * this function will only look in the specified collection and return
+   * 0 if that collection doesn't contain the object or the collection
+   * doesn't exist. In this case the collection parameter is ignored.
    * \param name the engine name of the desired mesh
-   * \param region if specified, search only this region (also see note above)
+   * \param collection if specified, search only this collection (also see note above)
    */
+
   virtual iMeshWrapper* FindMeshObject (const char* name,
-  	iRegion* region = 0) = 0;
+  	iBase* base = 0) = 0;
+
+  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
+  virtual iMeshWrapper* FindMeshObjectRegion (const char* name,
+  	iRegion* region) = 0;
+
+  virtual iMeshWrapper* FindMeshObjectCollection (const char* name,
+  	iCollection* collection = 0) = 0;
 
   /**
    * Sometimes a mesh wants to destruct itself (for example
@@ -898,18 +936,25 @@ struct iEngine : public virtual iBase
 
   /**
    * Find the given mesh factory. The name can be a normal
-   * name. In that case this function will look in all regions
-   * except if region is not 0 in which case it will only
-   * look in that region.
-   * If the name is specified as 'regionname/objectname' then
-   * this function will only look in the specified region and return
-   * 0 if that region doesn't contain the object or the region
-   * doesn't exist. In this case the region parameter is ignored.
+   * name. In that case this function will look in all collections
+   * except if collection is not 0 in which case it will only
+   * look in that collection.
+   * If the name is specified as 'collectionname/objectname' then
+   * this function will only look in the specified collection and return
+   * 0 if that collection doesn't contain the object or the collection
+   * doesn't exist. In this case the collection parameter is ignored.
    * \param name the engine name of the desired mesh factory
-   * \param region if specified, search only this region (also see note above)
+   * \param collection if specified, search only this collection (also see note above)
    */
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name,
-  	iRegion* region = 0) = 0;
+  	iBase* base = 0) = 0;
+
+  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
+  virtual iMeshFactoryWrapper* FindMeshFactoryRegion (const char* name,
+  	iRegion* region) = 0;
+
+  virtual iMeshFactoryWrapper* FindMeshFactoryCollection (const char* name,
+  	iCollection* collection = 0) = 0;
 
   /// Get the list of mesh factories
   virtual iMeshFactoryList* GetMeshFactories () = 0;
@@ -930,6 +975,21 @@ struct iEngine : public virtual iBase
   /// Get the list of all regions
   virtual iRegionList* GetRegions () = 0;
 
+  /**\name Collection handling
+   * @{ */
+
+  virtual iCollection* CreateCollection(const char* name) = 0;
+
+  virtual iCollection* GetCollection(const char* name) const = 0;
+
+  virtual csPtr<iCollectionArray> GetCollections() = 0;
+
+  virtual void RemoveCollection(iCollection* collect) = 0;
+
+  virtual void RemoveCollection(const char* name) = 0;
+
+  virtual void RemoveAllCollections() = 0;
+
   /** @} */
   
   /**\name Camera handling
@@ -943,18 +1003,26 @@ struct iEngine : public virtual iBase
 
   /**
    * Find the given camera position. The name can be a normal
-   * name. In that case this function will look in all regions
-   * except if region is not 0 in which case it will only
-   * look in that region.
-   * If the name is specified as 'regionname/objectname' then
-   * this function will only look in the specified region and return
-   * 0 if that region doesn't contain the object or the region
-   * doesn't exist. In this case the region parameter is ignored.
+   * name. In that case this function will look in all collection
+   * except if collection is not 0 in which case it will only
+   * look in that collection.
+   * If the name is specified as 'collectionname/objectname' then
+   * this function will only look in the specified collection and return
+   * 0 if that collection doesn't contain the object or the collection
+   * doesn't exist. In this case the collection parameter is ignored.
    * \param name the engine name of the desired camera position
-   * \param region if specified, search only this region (also see note above)
+   * \param collection if specified, search only this collection (also see note above)
    */
+
   virtual iCameraPosition* FindCameraPosition (const char* name,
-  	iRegion* region = 0) = 0;
+    iBase* base = 0) = 0;
+
+  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
+  virtual iCameraPosition* FindCameraPositionRegion (const char* name,
+  	iRegion* region) = 0;
+
+  virtual iCameraPosition* FindCameraPositionCollection (const char* name,
+  	iCollection* collection = 0) = 0;
 
   /// Get the list of camera positions.
   virtual iCameraPositionList* GetCameraPositions () = 0;
@@ -966,8 +1034,8 @@ struct iEngine : public virtual iBase
   
   /**
    * Convenience function to create a portal from one sector to another
-   * and make this portal a child mesh of another mesh. Use SCF_QUERY_INTERFACE
-   * with iPortalContainer on the returned mesh for more control over the
+   * and make this portal a child mesh of another mesh. Use scfQueryInterface<
+   * iPortalContainer> on the returned mesh for more control over the
    * portal(s) in the portal object.
    * \param name is the name of the portal container mesh to create the portal
    * in. If the parentMesh already has a mesh with that name then that will
@@ -991,7 +1059,7 @@ struct iEngine : public virtual iBase
 
   /**
    * Convenience function to create a portal from one sector to another.
-   * Use SCF_QUERY_INTERFACE with iPortalContainer on the returned mesh for
+   * Use scfQueryInterface<iPortalContainer> on the returned mesh for
    * more control over the portal(s) in the portal object.
    * \param name is the name of the portal container mesh to create the portal
    * in. If the sourceSector already has a mesh with that name then that will
@@ -1017,8 +1085,8 @@ struct iEngine : public virtual iBase
 
   /**
    * Create an empty portal container in some sector. Use this portal
-   * container to create portals to other sectors. Use SCF_QUERY_INTERFACE with
-   * iPortalContainer on the mesh object inside the returned mesh to
+   * container to create portals to other sectors. Use scfQueryInterface<
+   * iPortalContainer> on the mesh object inside the returned mesh to
    * control the portals.
    * \param name of the portal mesh.
    * \param sector is the location of the portal object and not the sector
@@ -1098,10 +1166,21 @@ struct iEngine : public virtual iBase
    * on them. By doing this the level will run smoother if you walk
    * through it because all meshes will have had a chance to update
    * caches and stuff.
+   * \param collection is an optional collection. If given then only objects
+   *        in that collection will be precached.
+   */
+  virtual void PrecacheDraw (iBase* base = 0) = 0;
+  virtual void PrecacheDrawCollection (iCollection* collection = 0) = 0;
+
+  /**
+   * This function precaches all meshes by calling GetRenderMeshes()
+   * on them. By doing this the level will run smoother if you walk
+   * through it because all meshes will have had a chance to update
+   * caches and stuff.
    * \param region is an optional region. If given then only objects
    *        in that region will be precached.
    */
-  virtual void PrecacheDraw (iRegion* region = 0) = 0;
+  virtual void PrecacheDrawRegion (iRegion* region) = 0;
 
   /**
    * Draw the 3D world given a camera and a clipper. Note that
@@ -1182,13 +1261,13 @@ struct iEngine : public virtual iBase
   /**
    * Create a loader context that you can give to loader plugins.
    * It will basically allow loader plugins to find materials.
-   * \param region optional loader region
+   * \param base optional loader region or collection
    * \param curRegOnly if region is valid and and curRegOnly is true 
    * then only that region will be searched. 
    * Assign to a csRef.
    */
   virtual csPtr<iLoaderContext> CreateLoaderContext (
-  	iRegion* region = 0, bool curRegOnly = true) = 0;
+  	iBase* base = 0, bool curRegOnly = true) = 0;
 
   /** @} */
   
@@ -1200,12 +1279,12 @@ struct iEngine : public virtual iBase
    * all objects that are within a radius of a given position.
    * The current implementation only does meshes but in future
    * lights will also be supported.
-   * You can use #SCF_QUERY_INTERFACE to get any interface from the
+   * You can use #scfQueryInterface to get any interface from the
    * returned objects. If crossPortals is true it will search through
    * portals. Otherwise it will limit the search to the sector passed in.
    * If you only want to have meshes then it is more efficient to
    * call GetNearbyMeshes() as you can then avoid the call to
-   * #SCF_QUERY_INTERFACE.
+   * #scfQueryInterface.
    */
   virtual csPtr<iObjectIterator> GetNearbyObjects (iSector* sector,
     const csVector3& pos, float radius, bool crossPortals = true ) = 0;
@@ -1216,7 +1295,7 @@ struct iEngine : public virtual iBase
    * This routine returns an iterator to iterate over
    * all objects that are potentially visible as seen from a given position.
    * This routine assumes full 360 degree visibility.
-   * You can use #SCF_QUERY_INTERFACE to get any interface from the
+   * You can use #scfQueryInterface to get any interface from the
    * returned objects.<p>
    * If you only want meshes then use GetVisibleMeshes().
    * CURRENTLY NOT IMPLEMENTED!
@@ -1237,7 +1316,7 @@ struct iEngine : public virtual iBase
    * This routine returns an iterator to iterate over
    * all objects that are potentially visible as seen from a given position.
    * This routine has a frustum restricting the view.
-   * You can use #SCF_QUERY_INTERFACE to get any interface from the
+   * You can use #scfQueryInterface to get any interface from the
    * returned objects.<p>
    * If you only want meshes then use GetVisibleMeshes().
    * CURRENTLY NOT IMPLEMENTED!
@@ -1275,7 +1354,7 @@ struct iEngine : public virtual iBase
    * Convenience function to 'remove' a CS object from the engine.
    * This will not clear the object but it will remove all references
    * to that object that the engine itself keeps. This function works
-   * for: iCameraPosition, iCollection, iLight, iMaterialWrapper, 
+   * for: iCameraPosition, iLight, iMaterialWrapper, 
    * iMeshFactoryWrapper,iMeshWrapper, iRegion, iSector and iTextureWrapper.
    * Note that the object is only removed if the resulting ref count will
    * become zero. So basically this function only releases the references
@@ -1317,6 +1396,22 @@ struct iEngine : public virtual iBase
    */
   virtual void ResetWorldSpecificSettings() = 0;  
   
+  /** @} */
+
+  /**\name Saving/loading
+   * @{ */
+
+  /**
+   * Set the default value for the "keep image" flag of texture wrappers.
+   */
+  virtual void SetDefaultKeepImage (bool enable) = 0;
+
+  /**
+   * Get the default value for the "keep image" flag of texture wrappers 
+    *(default OFF).
+   */
+  virtual bool GetDefaultKeepImage () = 0;
+
   /** @} */
 };
 

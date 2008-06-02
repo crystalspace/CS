@@ -51,7 +51,6 @@ class csCoverageBuffer;
 class csTiledCoverageBuffer;
 class csDynaVis;
 struct csTestRectData;
-struct iPolygonMesh;
 struct iMovable;
 struct iMeshWrapper;
 struct iBugPlug;
@@ -278,7 +277,6 @@ private:
 
   // Given an occluder, update it in the coverage buffer.
   void UpdateCoverageBuffer (csVisibilityObjectWrapper* obj);
-  void UpdateCoverageBufferPoly (csVisibilityObjectWrapper* obj);
   void UpdateCoverageBufferTri (csVisibilityObjectWrapper* obj);
 
   // Given an occluder, update it in the coverage buffer. Using the outline.
@@ -365,7 +363,7 @@ public:
 
   virtual int GetSupportedTests () const
   {
-    return CS_DBGHELP_UNITTEST | CS_DBGHELP_TXTDUMP |
+    return CS_DBGHELP_TXTDUMP |
       CS_DBGHELP_STATETEST | CS_DBGHELP_BENCHMARK |
       CS_DBGHELP_GFXDUMP;
   }

@@ -24,6 +24,7 @@
  */ 
 
 #include "csutil/scf_interface.h"
+#include "ivideo/rendermesh.h"
 
 struct iDocumentNode;
 struct iGenMeshAnimationControl;
@@ -46,10 +47,10 @@ class csEllipsoid;
 
 struct iGeneralMeshSubMesh : public virtual iBase
 {
-  SCF_INTERFACE (iGeneralMeshSubMesh, 1, 0, 1);
+  SCF_INTERFACE (iGeneralMeshSubMesh, 1, 0, 3);
   
   /// Get the index render buffer
-  virtual iRenderBuffer* GetIndices () const = 0;
+  virtual iRenderBuffer* GetIndices () = 0;
 
   /// Get the material
   virtual iMaterialWrapper* GetMaterial () const = 0;
@@ -62,6 +63,30 @@ struct iGeneralMeshSubMesh : public virtual iBase
 
   /// Set the material, or 0 to use default.
   virtual void SetMaterial (iMaterialWrapper* material) = 0;
+  
+  /// Get the Z buffer mode (or (csZBufMode)~0 if none was specified)
+  virtual csZBufMode GetZMode () const = 0;
+  
+  /// Set the Z buffer mode ((csZBufMode)~0 to use default)
+  virtual void SetZMode (csZBufMode mode) = 0;
+  
+  /// Get the render priority (or -1 if none was specified)
+  virtual CS::Graphics::RenderPriority GetRenderPriority () const = 0;
+
+  /// Set the render priority (-1 to use default)
+  virtual void SetRenderPriority (CS::Graphics::RenderPriority prio) = 0;
+
+  /// Set the mixmode (or (uint)~0 to use default)
+  virtual void SetMixmode (uint mode) = 0;
+
+  /**
+   * Set back-to-front sorting for submesh. If 'false', factory setting will be
+   * used.
+   */
+  virtual void SetBack2Front (bool enable) = 0;
+  
+  /// Get back-to-front sorting for submesh.
+  virtual bool GetBack2Front () const = 0;
 };
 
 /**
@@ -71,7 +96,7 @@ struct iGeneralMeshSubMesh : public virtual iBase
  */
 struct iGeneralMeshCommonState : public virtual iBase
 {
-  SCF_INTERFACE (iGeneralMeshCommonState, 1, 2, 0);
+  SCF_INTERFACE (iGeneralMeshCommonState, 1, 2, 2);
   
   /// Set lighting.
   virtual void SetLighting (bool l) = 0;
@@ -124,12 +149,32 @@ struct iGeneralMeshCommonState : public virtual iBase
   /**
    * Get independent render buffer by index
    */
-  virtual csRef<iRenderBuffer> GetRenderBuffer (int index) = 0;
+  virtual iRenderBuffer* GetRenderBuffer (int index) = 0;
 
   /**
    * Get the name of an independent render buffer by index
    */
   virtual csRef<iString> GetRenderBufferName (int index) const = 0;
+  
+  /**
+   * Get independent render buffer by name
+   */
+  virtual iRenderBuffer* GetRenderBuffer (const char* name) = 0;
+
+  /**
+   * Adds an independently named render buffer.
+   */
+  virtual bool AddRenderBuffer (csRenderBufferName name, iRenderBuffer* buffer) = 0;
+
+  /**
+   * Removes an independently named render buffer.
+   */
+  virtual bool RemoveRenderBuffer (csRenderBufferName name) = 0;
+
+  /**
+   * Get independent render buffer by name
+   */
+  virtual iRenderBuffer* GetRenderBuffer (csRenderBufferName name) = 0;
   /** @} */
 };
 
@@ -149,7 +194,7 @@ struct iGeneralMeshCommonState : public virtual iBase
  */
 struct iGeneralMeshState : public virtual iGeneralMeshCommonState
 {
-  SCF_INTERFACE (iGeneralMeshState, 1, 1, 1);
+  SCF_INTERFACE (iGeneralMeshState, 2, 0, 0);
   
   /**
    * Set the animation control to use for this mesh object.
@@ -174,46 +219,6 @@ struct iGeneralMeshState : public virtual iGeneralMeshCommonState
    *  - Shader variables (by querying the iShaderVariableContext interface)
    */
   virtual iGeneralMeshSubMesh* FindSubMesh (const char* name) const = 0;
-  /** @} */
-
-  /**\name Legacy submesh support
-   * @{ */
-  /**
-   * Add a submesh to this object. A submesh is a subset of the mesh triangles
-   * rendered with a certain material. When a mesh has one or more submeshes,
-   * only submeshes are drawn and not original geometry. That means submeshes
-   * should cover all original triangles to avoid holes in the mesh.
-   * triangles is an array of indices into the factory triangle list
-   * tricount is the number of triangles in "triangles"
-   * material is a material to assign to the mesh
-   * Note! SubMeshes added to an instance of a genmesh will override
-   * the submeshes from the factory (i.e. the submeshes of the factory will
-   * be completely ignored as soon as the instance has submeshes).
-   * \deprecated Use AddSubMesh from iGeneralFactoryState instead
-   */
-  CS_DEPRECATED_METHOD_MSG("Use AddSubMesh from iGeneralFactoryState instead")
-  virtual void AddSubMesh (unsigned int *triangles,
-    int tricount,
-    iMaterialWrapper *material) = 0;
-
-  /**
-   * Add a submesh to this object. A submesh is a subset of the mesh triangles
-   * rendered with a certain material. When a mesh has one or more submeshes,
-   * only submeshes are drawn and not original geometry. That means submeshes
-   * should cover all original triangles to avoid holes in the mesh.
-   * triangles is an array of indices into the factory triangle list
-   * tricount is the number of triangles in "triangles"
-   * material is a material to assign to the mesh
-   * Note! SubMeshes added to an instance of a genmesh will override
-   * the submeshes from the factory (i.e. the submeshes of the factory will
-   * be completely ignored as soon as the instance has submeshes).
-   * This version overrides the parent mixmode.
-   * \deprecated Use AddSubMesh from iGeneralFactoryState instead
-   */
-  CS_DEPRECATED_METHOD_MSG("Use AddSubMesh from iGeneralFactoryState instead")
-  virtual void AddSubMesh (unsigned int *triangles,
-    int tricount,
-    iMaterialWrapper *material, uint mixmode) = 0;
   /** @} */
 };
 
@@ -241,7 +246,7 @@ struct iGeneralMeshState : public virtual iGeneralMeshCommonState
  */
 struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
 {
-  SCF_INTERFACE (iGeneralFactoryState, 1, 1, 1);
+  SCF_INTERFACE (iGeneralFactoryState, 2, 0, 0);
   
   /// Set the color to use. Will be added to the lighting values.
   virtual void SetColor (const csColor& col) = 0;
@@ -475,6 +480,7 @@ struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
  * Main users of this interface:
  * - Genmesh plugin (crystalspace.mesh.object.genmesh)
  *   
+ * \sa iGenMeshAnimationControl1_4
  */
 struct iGenMeshAnimationControl : public virtual iBase
 {
@@ -490,7 +496,10 @@ struct iGenMeshAnimationControl : public virtual iBase
   virtual bool AnimatesColors () const = 0;
 
   /**
-   * General update method
+   * General update method.
+   * \remarks You can get vertex count and mesh ID by implementing the
+   *   iGenMeshAnimationControl1_4 interface. If that interface is
+   *   implemented, this method is not called.
    */
   virtual void Update (csTicks current) = 0;
 
@@ -543,6 +552,22 @@ struct iGenMeshAnimationControl : public virtual iBase
    */
   virtual const csColor4* UpdateColors (csTicks current,
   	const csColor4* colors, int num_colors, uint32 version_id) = 0;
+};
+
+/**
+ * Enhanced Update() for genmesh animation plugins.
+ * This interface must be implemented in addition to iGenMeshAnimationControl.
+ */
+struct iGenMeshAnimationControl1_4 : public virtual iBase
+{
+  SCF_INTERFACE(iGenMeshAnimationControl1_4, 0, 1, 0);
+
+  /**
+   * General update method.
+   * \remarks Takes precedence over iGenMeshAnimationControl::Update().
+   */
+  virtual void Update (csTicks current, int num_verts, 
+    uint32 version_id) = 0;
 };
 
 /**

@@ -92,6 +92,13 @@
 # define CS_ATTRIBUTE_MALLOC
 #endif
 
+// Set up deprecation macros
+#ifdef CS_COMPILER_GCC
+#  define CS_DEPRECATED_METHOD    CS_ATTRIBUTE_DEPRECATED
+#  define CS_DEPRECATED_TYPE      CS_ATTRIBUTE_DEPRECATED
+#  define CS_DEPRECATED_VAR(decl) decl CS_ATTRIBUTE_DEPRECATED
+#endif
+
 /**\def CS_DEPRECATED_METHOD
  * Use the CS_DEPRECATED_METHOD macro in front of method declarations to
  * indicate that they are deprecated. Example:
@@ -158,6 +165,39 @@
 #  endif
 #endif
 
+/**\def CS_DEPRECATED_VAR
+ * Use the CS_DEPRECATED_VAR macro tol indicate that a variable or 
+ * class/struct is deprecated. Example:
+ * \code
+ * struct MyStuff
+ * {
+ *   int newStuff;
+ *   CS_DEPRECATED_VAR(int oldStuff);
+ * };
+ * \endcode
+ * Compilers which are capable of flagging deprecation will exhibit a warning
+ * when it encounters client code using types so tagged.
+ */
+#if !defined(CS_DEPRECATED_VAR) || defined(DOXYGEN_RUN)
+#  if defined(CS_COMPILER_MSVC)
+#    define CS_DEPRECATED_VAR(decl) __declspec(deprecated) decl
+#  else
+#    define CS_DEPRECATED_VAR(decl) decl
+#  endif
+#endif
+
+/**\def CS_DEPRECATED_VAR_MSG
+ * A variant of CS_DEPRECATED_VAR that also emits the message \a msg
+ * on compilers that support it.
+ */
+#if !defined(CS_DEPRECATED_VAR_MSG) || defined(DOXYGEN_RUN)
+#  if defined(CS_COMPILER_MSVC) && _MSC_VER >= 1400
+#    define CS_DEPRECATED_VAR_MSG(msg, decl) __declspec(deprecated(msg)) decl
+#  else
+#    define CS_DEPRECATED_VAR_MSG(msg, decl) CS_DEPRECATED_VAR(decl)
+#  endif
+#endif
+
 /**\def CS_NO_EXCEPTIONS
  * This is defined when the project was compiled without support for 
  * exceptions.
@@ -202,45 +242,6 @@
 #  endif
 #endif
 
-
-
-
-/**\def CS_TEMP_DIR
- * Directory for temporary files
- * \deprecated Use CS::Platform::GetTempDirectory () from syspath.h
- */
-#ifndef CS_TEMP_DIR
-class csString;
-
-namespace CS
-{
-  namespace Macros
-  {
-    CS_DEPRECATED_METHOD_MSG("Use CS::Platform::GetTempDirectory () from "
-      "syspath.h") CS_CRYSTALSPACE_EXPORT csString CS_TEMP_DIR ();
-  }
-}
-#  define CS_TEMP_DIR CS::Macros::CS_TEMP_DIR.GetDataSafe()
-#endif
-
-
-/**\def CS_TEMP_FILE
- * Name for temporary files
- * \deprecated Use CS::Platform::GetTempFilename () from syspath.h
- */
-#ifndef CS_TEMP_FILE
-class csString;
-
-namespace CS
-{
-  namespace Macros
-  {
-    CS_DEPRECATED_METHOD_MSG("Use CS::Platform::GetTempFilename () from "
-      "syspath.h") CS_CRYSTALSPACE_EXPORT csString CS_TEMP_FILE ();
-  }
-}
-#  define CS_TEMP_FILE CS::Macros::CS_TEMP_FILE.GetDataSafe()
-#endif
 
 /**\def CS_HAVE_POSIX_MMAP
  * Platforms which support POSIX mmap() should #define CS_HAVE_POSIX_MMAP. This
@@ -401,6 +402,25 @@ void Name (void (*p)())                                                \
 #  define CS_DEFINE_STATICALLY_LINKED_FLAG  bool scfStaticallyLinked = false;
 #endif
 
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+#  define CS_DEFINE_MEMTRACKER_MODULE             \
+  class csMemTrackerModule;                       \
+  namespace CS                                    \
+  {                                               \
+    namespace Debug                               \
+    {                                             \
+      namespace MemTracker                        \
+      {                                           \
+	namespace Impl                            \
+	{                                         \
+	  csMemTrackerModule* thisModule = 0;     \
+	}                                         \
+      }                                           \
+    }                                             \
+  }
+#else
+#  define CS_DEFINE_MEMTRACKER_MODULE
+#endif
 
 /**\def CS_IMPLEMENT_FOREIGN_DLL
  * The CS_IMPLEMENT_FOREIGN_DLL macro should be placed at the global scope in
@@ -426,12 +446,14 @@ void Name (void (*p)())                                                \
 #    define CS_IMPLEMENT_FOREIGN_DLL					    \
        CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION(csStaticVarCleanup_local); \
        CS_DEFINE_STATICALLY_LINKED_FLAG					    \
-       CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_local);
+       CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_local);   \
+       CS_DEFINE_MEMTRACKER_MODULE
 #  else
 #    define CS_IMPLEMENT_FOREIGN_DLL					    \
        CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION			    \
        CS_DEFINE_STATICALLY_LINKED_FLAG					    \
-       CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);
+       CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);  \
+       CS_DEFINE_MEMTRACKER_MODULE
 #  endif
 #endif
 
@@ -457,7 +479,8 @@ void Name (void (*p)())                                                \
           CS_IMPLEMENT_PLATFORM_PLUGIN 					\
 	  CS_DEFINE_STATICALLY_LINKED_FLAG				\
 	  CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION		\
-	  CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);
+	  CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);   \
+          CS_DEFINE_MEMTRACKER_MODULE
 #  endif
 
 #else
@@ -467,7 +490,8 @@ void Name (void (*p)())                                                \
    CS_DEFINE_STATICALLY_LINKED_FLAG					\
    CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION(csStaticVarCleanup_local)	\
    CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_local);	\
-   CS_IMPLEMENT_PLATFORM_PLUGIN 
+   CS_IMPLEMENT_PLATFORM_PLUGIN                                         \
+   CS_DEFINE_MEMTRACKER_MODULE
 #  endif
 
 #endif
@@ -485,7 +509,8 @@ void Name (void (*p)())                                                \
   CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION			\
   CS_DEFINE_STATICALLY_LINKED_FLAG					\
   CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);	\
-  CS_IMPLEMENT_PLATFORM_APPLICATION 
+  CS_IMPLEMENT_PLATFORM_APPLICATION                                     \
+  CS_DEFINE_MEMTRACKER_MODULE
 #endif
 
 /**\def CS_REGISTER_STATIC_FOR_DESTRUCTION
@@ -683,60 +708,6 @@ Type &Class::getterFunc ()                                     \
 #endif
 #include <new>
 
-/**\name Platform-specific memory allocation
- * If built with ptmalloc support, these functions can be used to explicitly
- * call the platform's default malloc/free resp. operator new/operator delete
- * implementations. Useful when interfacing with third party libraries.
- */
-//@{
-CS_DEPRECATED_METHOD_MSG("malloc override was removed; "
-  "platform_malloc() unnecessary, use normal malloc() instead")
-CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* platform_malloc (size_t n)
-{ return malloc (n); }
-CS_DEPRECATED_METHOD_MSG("malloc override was removed; "
-  "platform_free() unnecessary, use normal free() instead")
-CS_FORCEINLINE void platform_free (void* p)
-{ return free (p); }
-CS_DEPRECATED_METHOD_MSG("malloc override was removed; "
-  "platform_realloc() unnecessary, use normal realloc() instead")
-CS_FORCEINLINE void* platform_realloc (void* p, size_t n)
-{ return realloc (p, n); }
-CS_DEPRECATED_METHOD_MSG("malloc override was removed; "
-  "platform_calloc() unnecessary, use normal calloc() instead")
-CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* platform_calloc (size_t n, size_t s)
-{ return calloc (n, s); }
-
-namespace CS
-{
-  struct AllocPlatform {};
-  extern CS_CRYSTALSPACE_EXPORT const AllocPlatform allocPlatform;
-}
-/**
- * Platform-dependent operator new.
- * \remarks Won't throw an exception if allocation fails.
- */
-CS_DEPRECATED_METHOD_MSG("operator new override was removed; "
-  "using 'platform new' should be unnecessary")
-extern CS_CRYSTALSPACE_EXPORT void* operator new (size_t s, 
-  const CS::AllocPlatform&) throw();
-/**
- * Platform-dependent operator new.
- * \remarks Won't throw an exception if allocation fails.
- */
-CS_DEPRECATED_METHOD_MSG("operator new override was removed; "
-  "using 'platform new' should be unnecessary")
-extern CS_CRYSTALSPACE_EXPORT void* operator new[] (size_t s, 
-  const CS::AllocPlatform&) throw();
-CS_DEPRECATED_METHOD_MSG("operator new override was removed; "
-  "using 'platform delete' should be unnecessary")
-extern CS_CRYSTALSPACE_EXPORT void operator delete (void* p, 
-  const CS::AllocPlatform&) throw();
-CS_DEPRECATED_METHOD_MSG("operator new override was removed; "
-  "using 'platform delete' should be unnecessary")
-extern CS_CRYSTALSPACE_EXPORT void operator delete[] (void* p, 
-  const CS::AllocPlatform&) throw();
-//@}
-
 #ifndef CS_NO_PTMALLOC
 //@{
 /**\name ptmalloc memory allocation
@@ -750,20 +721,131 @@ extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* ptcalloc (size_t n,
   size_t s);
 //@}
 
+//@{
+/**\name 'Cookie' memory allocation
+ * Allocate memory with 'sentinel' values around the allocated block to detect
+ * overruns and freeing allocations across module boundaries.
+ */
+extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* ptmalloc_sentinel (
+  size_t n);
+extern CS_CRYSTALSPACE_EXPORT void ptfree_sentinel (void* p);
+extern CS_CRYSTALSPACE_EXPORT void* ptrealloc_sentinel (void* p, size_t n);
+extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* ptcalloc_sentinel (
+  size_t n, size_t s);
+//@}
+
+//@{
+/**\name 'Located' memory allocation
+ * Sentinel allocation, but also recording file name and line where the
+ * allocation occured.
+ */
+extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* ptmalloc_located (
+  size_t n);
+extern CS_CRYSTALSPACE_EXPORT void ptfree_located (void* p);
+extern CS_CRYSTALSPACE_EXPORT void* ptrealloc_located (void* p, size_t n);
+extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* ptcalloc_located (
+  size_t n, size_t s);
+//@}
+
+//@{
+/**\name 'Checking' memory allocation
+ * Located allocation, but additionally all allocated blocks are frequently
+ * checked for corruption, not just when a block is freed.
+ */
+extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* ptmalloc_checking (
+  size_t n);
+extern CS_CRYSTALSPACE_EXPORT void ptfree_checking (void* p);
+extern CS_CRYSTALSPACE_EXPORT void* ptrealloc_checking (void* p, size_t n);
+extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* ptcalloc_checking (
+  size_t n, size_t s);
+//@}
+
+#ifndef CS_DEBUG
+#  undef CS_EXTENSIVE_MEMDEBUG
+#  undef CS_REF_TRACKER
+#else
+#  if defined(CS_EXTENSIVE_MEMDEBUG) && defined(CS_MEMORY_TRACKER)
+#    error Do not use CS_EXTENSIVE_MEMDEBUG and CS_MEMORY_TRACKER together!
+#  endif
+#endif
+
+#if defined(CS_EXTENSIVE_MEMDEBUG)
+CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_malloc (size_t n)
+{ 
+#ifdef CS_CHECKING_ALLOCATIONS
+  return ptmalloc_checking (n);
+#else
+  return ptmalloc_located (n);
+#endif
+}
+
+CS_FORCEINLINE void cs_free (void* p)
+{ 
+#ifdef CS_CHECKING_ALLOCATIONS
+  ptfree_checking (p);
+#else
+  ptfree_located (p);
+#endif
+}
+
+CS_FORCEINLINE void* cs_realloc (void* p, size_t n)
+{ 
+#ifdef CS_CHECKING_ALLOCATIONS
+  return ptrealloc_checking (p, n);
+#else
+  return ptrealloc_located (p, n);
+#endif
+}
+
+CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_calloc (size_t n, size_t s)
+{ 
+#ifdef CS_CHECKING_ALLOCATIONS
+  return ptcalloc_checking (n, s); 
+#else
+  return ptcalloc_located (n, s); 
+#endif
+}
+
+#else // defined(CS_EXTENSIVE_MEMDEBUG)
 /**\name Default Crystal Space memory allocation
  * Always the same memory allocation functions as internally used by 
  * Crystal Space.
  */
 //@{
 CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_malloc (size_t n)
-{ return ptmalloc (n); }
+{ 
+#ifdef CS_DEBUG
+  return ptmalloc_sentinel (n);
+#else
+  return ptmalloc (n);
+#endif
+}
 CS_FORCEINLINE void cs_free (void* p)
-{ ptfree (p); }
+{ 
+#ifdef CS_DEBUG
+  ptfree_sentinel (p);
+#else
+  ptfree (p);
+#endif
+}
 CS_FORCEINLINE void* cs_realloc (void* p, size_t n)
-{ return ptrealloc (p, n); }
+{ 
+#ifdef CS_DEBUG
+  return ptrealloc_sentinel (p, n);
+#else
+  return ptrealloc (p, n);
+#endif
+}
 CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_calloc (size_t n, size_t s)
-{ return ptcalloc (n, s); }
+{ 
+#ifdef CS_DEBUG
+  return ptcalloc_sentinel (n, s); 
+#else
+  return ptcalloc (n, s); 
+#endif
+}
 //@}
+#endif
 
 #else // CS_NO_PTMALLOC
 CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_malloc (size_t n)
@@ -810,20 +892,14 @@ static inline bool isdir (const char *path, struct dirent *de)
 // defines its own 'new' operator, since this version will interfere with your
 // own.
 // CS_MEMORY_TRACKER is treated like CS_EXTENSIVE_MEMDEBUG here.
-// Same for CS_REF_TRACKER.
-#ifndef CS_DEBUG
-#  undef CS_EXTENSIVE_MEMDEBUG
-#  undef CS_REF_TRACKER
-#else
-#  if defined(CS_EXTENSIVE_MEMDEBUG) && defined(CS_MEMORY_TRACKER)
-#    error Do not use CS_EXTENSIVE_MEMDEBUG and CS_MEMORY_TRACKER together!
-#  endif
-#endif
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-extern void* CS_CRYSTALSPACE_EXPORT operator new (size_t s, 
+extern CS_CRYSTALSPACE_EXPORT void operator delete (void* p);
+extern CS_CRYSTALSPACE_EXPORT void operator delete[] (void* p);
+
+extern CS_CRYSTALSPACE_EXPORT void* operator new (size_t s, 
   void* filename, int line);
 inline void operator delete (void* p, void*, int) { operator delete (p); }
-extern void* CS_CRYSTALSPACE_EXPORT operator new[] (size_t s, 
+extern CS_CRYSTALSPACE_EXPORT void* operator new[] (size_t s, 
   void* filename, int line);
 inline void operator delete[] (void* p, void*, int) { operator delete[] (p); }
 
@@ -842,23 +918,44 @@ namespace CS
   {
     extern void CS_CRYSTALSPACE_EXPORT AssertMessage (const char* expr, 
       const char* filename, int line, const char* msg = 0);
+    
+    /**
+     * Break execution for debugging purposes.
+     * Causes a signal/exception/fault (which depends on the exact 
+     * nomenclature used on a platform) with the intention to break into an
+     * attached debugger.
+     */
+    static inline void DebugBreak ()
+    {
+    #  if defined (CS_PLATFORM_WIN32)
+      ::DebugBreak();
+    #  elif defined (CS_PROCESSOR_X86)
+    #    if defined (CS_COMPILER_GCC)
+      asm ("int $3");
+    #    else
+      _asm int 3;
+    #    endif
+    #  else
+      static int x = 0; x /= x;
+    #  endif
+    }
+    
+    /**
+     * Verify that all memory blocks allocated with the "checking" functions
+     * did not overrun or the allocated space.
+     * \return \c true if all memory blocks are in order, \c false otherwise.
+     */
+    extern bool CS_CRYSTALSPACE_EXPORT VerifyAllMemory ();
+    /**
+     * Print all memory blocks allocated with the "checking" functions,
+     * including where they were allocated, to a file "allocations.txt".
+     */
+    extern void CS_CRYSTALSPACE_EXPORT DumpAllocateMemoryBlocks ();
   } // namespace Debug
 } // namespace CS
 
-#ifdef CS_DEBUG
-#  if !defined (CS_DEBUG_BREAK)
-#    if defined (CS_PLATFORM_WIN32)
-#      define CS_DEBUG_BREAK ::DebugBreak()
-#    elif defined (CS_PROCESSOR_X86)
-#      if defined (CS_COMPILER_GCC)
-#        define CS_DEBUG_BREAK asm ("int $3")
-#      else
-#        define CS_DEBUG_BREAK _asm int 3
-#      endif
-#    else
-#      define CS_DEBUG_BREAK { static int x = 0; x /= x; }
-#    endif
-#  endif
+#if defined(CS_DEBUG) || defined(CS_WITH_ASSERTIONS)
+#  define CS_DEBUG_BREAK	CS::Debug::DebugBreak()
 #  if !defined (CS_ASSERT_MSG)
 #   define CS_ASSERT_MSG(msg,x) 					\
       if (!(x)) CS::Debug::AssertMessage (#x, __FILE__, __LINE__, msg);

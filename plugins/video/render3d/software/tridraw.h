@@ -217,6 +217,29 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
 	outPersp[prevVert].y - outPersp[closestVert].y);
       csVector2 screenDiff2 (outPersp[nextVert].x - outPersp[closestVert].x,
 	outPersp[nextVert].y - outPersp[closestVert].y);
+
+#if 0
+      csVector2 tcDiff1 (tcPrev - tc);
+      csVector2 tcDiff2 (tcNext - tc);
+      float d1udx = tcDiff1.x / screenDiff1.x;
+      float d1vdx = tcDiff1.y / screenDiff1.x;
+      float d1udy = tcDiff1.x / screenDiff1.y;
+      float d1vdy = tcDiff1.y / screenDiff1.y;
+      float d2udx = tcDiff2.x / screenDiff2.x;
+      float d2vdx = tcDiff2.y / screenDiff2.x;
+      float d2udy = tcDiff2.x / screenDiff2.y;
+      float d2vdy = tcDiff2.y / screenDiff2.y;
+
+      float d1 = (tcDiff1 * tcDiff1) / screenDiff1.SquaredNorm();
+      float d2 = (tcDiff1 * tcDiff1) / screenDiff1.SquaredNorm();
+      float d = d1+d2;
+      if (d >= 16)
+	return 3;
+      else if (d >= 8)
+	return 2;
+      else if (d >= 4)
+	return 1;
+#else
       // Compute TCs for pixels at one step towards 'prev' resp. 'next'
       const csVector2 tcIz (tc * outPersp[closestVert].z);
       const float n1 = screenDiff1.Norm();
@@ -239,6 +262,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
 	return 2;
       else if (texelSide >= 2)
 	return 1;
+#endif
 
       return 0;
     }
@@ -300,6 +324,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
 
     void NextTri (csVector3*& clippedPersp, size_t& num)
     {
+      clippedPersp = 0;
+      num = 0;
+
       if (nearClipTri2)
       {
 	nearClipTri2 = false;

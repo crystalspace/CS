@@ -71,6 +71,9 @@ public:
   csTransform (const csMatrix3& other2this, const csVector3& origin_pos) :
   	m_o2t (other2this), v_o2t (origin_pos) {}
 
+  /// Return a textual representation of the transform
+  csString Description() const;
+  
   /**
    * Reset this transform to the identity transform.
    */

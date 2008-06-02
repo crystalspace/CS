@@ -204,13 +204,6 @@ namespace Utility
   
 } // namespace Utility
   
-  /**
-   * Import kit, old name
-   * \deprecated Use CS::Utility::ImportKit instead.
-   */
-  CS_DEPRECATED_TYPE_MSG("Use CS::Utility::ImportKit")
-  typedef CS::Utility::ImportKit ImportKit;
-
 } // namespace CS
 
 #endif // __CS_CSTOOL_IMPORTKIT_H__

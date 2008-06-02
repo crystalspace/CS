@@ -76,7 +76,7 @@ private:
   csFlags factory_flags;
 };
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * Nullmesh version of mesh object.
@@ -93,7 +93,6 @@ public:
   /// Destructor.
   virtual ~csNullmeshMeshObject ();
 
-  void GetObjectBoundingBox (csBox3& bbox);
   const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& cent);
@@ -133,7 +132,7 @@ public:
   virtual void SetMeshWrapper (iMeshWrapper* lp) { logparent = lp; }
   virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }
 
-  virtual csRenderMesh **GetRenderMeshes (int &num, iRenderView*, 
+  virtual CS::Graphics::RenderMesh **GetRenderMeshes (int &num, iRenderView*, 
     iMovable*, uint32)
   {
     num = 0;
@@ -168,7 +167,7 @@ private:
   csFlags object_flags;
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * Genmesh type. This is the plugin you have to use to create instances

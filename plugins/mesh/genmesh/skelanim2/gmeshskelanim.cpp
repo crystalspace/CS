@@ -92,16 +92,16 @@ csGenmeshSkelAnimationControl::csGenmeshSkelAnimationControl (
 
   if (!use_parent)
   {
-    skeleton = factory->gr->CreateSkeleton(factory->GetSkeletonFactory(), "");
+    skeleton = factory->GetSkeletonGraveyard()->CreateSkeleton(factory->GetSkeletonFactory(), "");
   }
 
 }
 
 csGenmeshSkelAnimationControl::~csGenmeshSkelAnimationControl ()
 {
-  if (skeleton && factory && factory->gr)
+  if (skeleton && factory && factory->GetSkeletonGraveyard())
   {
-    factory->gr->RemoveSkeleton (skeleton);
+    factory->GetSkeletonGraveyard()->RemoveSkeleton (skeleton);
   }
   delete[] animated_verts;
   delete[] animated_colors;
@@ -227,11 +227,7 @@ void csGenmeshSkelAnimationControl::Update (csTicks current)
       csRef<csShaderVariable> boneQuat;
       boneQuat.AttachNew(new csShaderVariable(csInvalidStringID));
       _bones->SetArrayElement (i*2+0, boneQuat);
-      csQuaternion quat;
-      if (quat.v.x != 0 || quat.v.y != 0 || quat.v.z != 0 || quat.w != 0)
-      {
-        boneQuat->SetValue(csVector4 (quat.v.x, quat.v.y, quat.v.z, quat.w));
-      }
+      boneQuat->SetValue(csVector4 (0, 0, 0, 1));
 
       csRef<csShaderVariable> boneOffs;
        boneOffs.AttachNew(new csShaderVariable(csInvalidStringID));
@@ -298,7 +294,7 @@ csGenmeshSkelAnimationControlFactory::csGenmeshSkelAnimationControlFactory (
   flags.SetAll(0);
   skeleton_factory = 0;
   use_parent = false;
-  gr = 0;
+  the_graveyard = 0;
 }
 
 csGenmeshSkelAnimationControlFactory::~csGenmeshSkelAnimationControlFactory ()
@@ -326,8 +322,8 @@ const char* csGenmeshSkelAnimationControlFactory::Load (iDocumentNode* node)
 
   if (!ldr_plg)
   {
-    ldr_plg = CS_LOAD_PLUGIN(plugin_mgr, 
-      "crystalspace.graveyard.loader", iLoaderPlugin);
+    ldr_plg = csLoadPlugin<iLoaderPlugin> (plugin_mgr, 
+      "crystalspace.graveyard.loader");
     if (!ldr_plg )
     {
       printf("Missing <crystalspace.graveyard.loader> plugin!\n");
@@ -366,7 +362,7 @@ const char* csGenmeshSkelAnimationControlFactory::Load (iDocumentNode* node)
         {
           csRef<iBase> skf = ldr_plg->Parse(child, 0, 0, 0);
           skeleton_factory = scfQueryInterface<iSkeletonFactory> (skf);
-          gr = skeleton_factory->GetGraveyard();
+          the_graveyard = skeleton_factory->GetGraveyard();
         }
       }
       break;
@@ -393,7 +389,7 @@ const char* csGenmeshSkelAnimationControlFactory::Load (iDocumentNode* node)
           {
             csRef<iBase> skf = ldr_plg->Parse(doc->GetRoot(), 0, 0, 0);
             skeleton_factory = scfQueryInterface<iSkeletonFactory> (skf);
-            gr = skeleton_factory->GetGraveyard();
+            the_graveyard = skeleton_factory->GetGraveyard();
           }
           else
           {

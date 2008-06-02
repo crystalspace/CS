@@ -76,12 +76,12 @@ void SndTest::ProcessFrame ()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
-  // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.0) * (0.06 * 20);
-
+  // Now rotate the sound source around the camera/listener
   cur_angle += speed;
   csVector3 sndpos = GetSoundPos (cur_angle);
-  sndsource3d->SetPosition (sndpos);
+  if (sndsource3d)
+    sndsource3d->SetPosition (sndpos);
   sprite->GetMovable ()->GetTransform ().SetOrigin (sndpos);
   sprite->GetMovable ()->UpdateMove ();
 
@@ -153,29 +153,56 @@ bool SndTest::CreateSprites ()
 
 bool SndTest::LoadSound ()
 {
-  const char* fname = "/lib/std/loopbzzt.wav";
+  csRef<iCommandLineParser> cmdline (
+        csQueryRegistry<iCommandLineParser> (GetObjectRegistry ()));
+
+  csString fname = cmdline->GetOption ("sndfile");
+  if (fname.IsEmpty ())
+  {
+    fname = "/lib/std/loopbzzt.wav";
+    printf("You can override sound file using -sndfile option (VFS path)\n");
+  }
+  printf("Sound file  : %s\n", fname.GetData ());
+
   csRef<iVFS> vfs = csQueryRegistry<iVFS> (GetObjectRegistry ());
 
-  csRef<iDataBuffer> soundbuf = vfs->ReadFile (fname);
+  csRef<iDataBuffer> soundbuf = vfs->ReadFile (fname.GetData ());
   if (!soundbuf)
-    return ReportError ("Can't load file '%s'!", fname);
+    return ReportError ("Can't load file '%s'!", fname.GetData ());
 
   csRef<iSndSysData> snddata = sndloader->LoadSound (soundbuf);
   if (!snddata)
-    return ReportError ("Can't load sound '%s'!", fname);
+    return ReportError ("Can't load sound '%s'!", fname.GetData ());
+
+  const csSndSysSoundFormat* format = snddata->GetFormat ();
+  printf("=== iSndSysData format informations ===\n");
+  printf("Format      : %d bits, %d channel(s), %d Hz\n",
+        format->Bits, format->Channels, format->Freq);
+  printf("Sample Size : %zu bytes, %zu frames\n", snddata->GetDataSize (),
+        snddata->GetFrameCount ());
+  printf("Description : %s\n", snddata->GetDescription ());
+  fflush(stdout);
 
   csRef<iSndSysStream> sndstream = sndrenderer->CreateStream (snddata,
-  	CS_SND3D_ABSOLUTE);
+        cmdline->GetBoolOption("no3d") ? CS_SND3D_DISABLE : CS_SND3D_ABSOLUTE);
   if (!sndstream)
-    return ReportError ("Can't create stream for '%s'!", fname);
+    return ReportError ("Can't create stream for '%s'!", fname.GetData ());
+
+  const csSndSysSoundFormat* rformat = sndstream->GetRenderedFormat ();
+  printf("=== iSndSysStream \"rendered\" format informations ===\n");
+  printf("Format      : %d bits, %d channel(s), %d Hz\n",
+        rformat->Bits, rformat->Channels, rformat->Freq);
+  printf("Stream Size : %zu frames\n", sndstream->GetFrameCount ());
+  printf("Description : %s\n", sndstream->GetDescription ());
+  fflush(stdout);
 
   sndsource = sndrenderer->CreateSource (sndstream);
   if (!sndsource)
-    return ReportError ("Can't create source for '%s'!", fname);
-  sndsource3d = scfQueryInterface<iSndSysSourceSoftware3D> (sndsource);
-
-  sndsource3d->SetPosition (GetSoundPos (0));
-  sndsource3d->SetVolume (1.0f);
+    return ReportError ("Can't create source for '%s'!", fname.GetData ());
+  sndsource3d = scfQueryInterface<iSndSysSource3D> (sndsource);
+  if (sndsource3d)
+    sndsource3d->SetPosition (GetSoundPos (0));
+  sndsource->SetVolume (1.0f);
 
   sndstream->SetLoopState (CS_SNDSYS_STREAM_LOOP);
   sndstream->Unpause ();
@@ -271,13 +298,22 @@ bool SndTest::CreateRoom ()
   // We create a new sector called "room".
   room = engine->CreateSector ("room");
 
-  // Creating the walls for our room.
-  csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingFactoryState> walls_state = 
-    scfQueryInterface<iThingFactoryState> (walls->GetMeshObject ()->GetFactory());
-  walls_state->AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
-  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
-  walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
+  // First we make a primitive for our geometry.
+  using namespace CS::Geometry;
+  DensityTextureMapper mapper (0.3f);
+  TesselatedBox box (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
+  box.SetLevel (3);
+  box.SetMapper (&mapper);
+  box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
+
+  // Now we make a factory and a mesh at once.
+  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
+      engine, room, "walls", "walls_factory", &box);
+
+  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
+    iGeneralMeshState> (walls->GetMeshObject ());
+  mesh_state->SetShadowReceiving (true);
+  walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
   // Now we need light to see something.
   csRef<iLight> light;

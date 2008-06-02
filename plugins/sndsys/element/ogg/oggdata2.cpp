@@ -149,7 +149,7 @@ void SndSysOggSoundData::Initialize()
   // Retrieve and store the sound format information
   v_info=ov_info(&f,-1);
   m_SoundFormat.Freq=v_info->rate;
-  m_SoundFormat.Bits=v_info->bitrate_nominal;
+  //m_SoundFormat.Bits=v_info->bitrate_nominal; //(vk) non-sense... keep 16bits
   m_SoundFormat.Channels=v_info->channels;
 
   m_FrameCount=(long)(pcm_count & 0x7FFFFFFF);

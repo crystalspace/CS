@@ -1,8 +1,0 @@
-SubDir TOP plugins stdrep ;
-
-Description stdrep : "Standard Report Listener Plugin" ;
-
-Plugin stdrep
-	: [ Wildcard *.cpp *.h ]
-;
-LinkWith stdrep : crystalspace ;

@@ -1,3 +1,0 @@
-SubDir TOP mk autoconf ;
-
-InstallData [ Wildcard *.m4 config.* ] install-sh : build autoconf ;

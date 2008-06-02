@@ -29,12 +29,16 @@
 #include "csutil/array.h"
 #include "csutil/customallocated.h"
 #include "csutil/reftrackeraccess.h"
+#include "csutil/threading/atomicops.h"
+#include "csutil/threading/mutex.h"
 
 // Needs to have iBase etc
 #include "csutil/scf_interface.h"
 
 // Control if we want to use preprocessed file or run generation each time
 #define SCF_IMPLGEN_PREPROCESSED
+// Track some simple SCF-related stats
+//#define SCF_TRACK_STATS
 
 #ifndef CS_TYPENAME
   #ifdef CS_REF_TRACKER
@@ -121,13 +125,78 @@ public:
   };
 };
 
+/// Various helpers for scfImplementation
+class CS_CRYSTALSPACE_EXPORT scfImplementationHelper
+{
+protected:
+  enum
+  {
+    scfstatTotal,
+    scfstatParented,
+    scfstatWeakreffed,
+    scfstatMetadata,
+    scfstatIncRef,
+    scfstatDecRef,
+
+    scfstatsNum
+  };
+  static uint64 stats[scfstatsNum];
+  static CS::Threading::Mutex statsLock;
+
+  CS_FORCEINLINE void BumpStat (int stat)
+  {
+#ifdef SCF_TRACK_STATS
+    CS::Threading::ScopedLock<CS::Threading::Mutex> l (statsLock);
+    stats[stat]++;
+#endif
+  }
+
+  typedef csArray<void**,
+    csArrayElementHandler<void**>,
+    CS::Memory::AllocatorMalloc,
+    csArrayCapacityLinear<csArrayThresholdFixed<4> > > WeakRefOwnerArray;
+  struct ScfImplAuxData : public CS::Memory::CustomAllocated
+  {
+    CS::Threading::Mutex lock;
+    iBase *scfParent;
+    WeakRefOwnerArray* scfWeakRefOwners;
+    scfInterfaceMetadataList* metadataList;
+
+    ScfImplAuxData () : scfParent (0), scfWeakRefOwners (0), metadataList (0) {}
+  };
+  ScfImplAuxData* scfAuxData;
+
+  CS_FORCEINLINE bool HasAuxData()
+  {
+    // Double-cast to cheat strict-aliasing rules
+    return CS::Threading::AtomicOperations::Read ((void**)(void*)&scfAuxData) != 0; 
+  }
+  void EnsureAuxData();
+  void FreeAuxData();
+
+  //-- Metadata handling
+  void AllocMetadata (size_t numEntries);
+  void CleanupMetadata ();
+
+  void scfRemoveRefOwners ();
+
+  iBase* GetSCFParent() { return HasAuxData() ? scfAuxData->scfParent : 0; }
+
+  // Some virtual helpers for the metadata registry
+  virtual size_t GetInterfaceMetadataCount () const;
+
+  scfImplementationHelper() : scfAuxData (0) {}
+  virtual ~scfImplementationHelper() { if (HasAuxData()) FreeAuxData(); }
+};
+
 /**
  * Baseclass for the SCF implementation templates.
  * Provides common methods such as reference counting and handling of
  * weak references.
  */
 template<class Class>
-class CS_CRYSTALSPACE_EXPORT scfImplementation : public virtual iBase,
+class scfImplementation : public virtual iBase,
+  public scfImplementationHelper,
   public CS::Memory::CustomAllocated
 {
 public:
@@ -136,11 +205,17 @@ public:
    * Will be called from scfImplementation(Ext)N constructor
    */
   scfImplementation (Class *object, iBase *parent = 0) :
-      scfObject (object), scfRefCount (1), scfParent (parent), 
-        scfWeakRefOwners (0)
+      scfRefCount (1)
   {
+    BumpStat (scfstatTotal);
+    if (parent) BumpStat (scfstatParented);
     csRefTrackerAccess::TrackConstruction (object);
-    if (scfParent) scfParent->IncRef ();
+    if (parent) 
+    {
+      EnsureAuxData();
+      scfAuxData->scfParent = parent;
+      parent->IncRef ();
+    }
   }
 
   /**
@@ -162,8 +237,14 @@ public:
   // Cleanup
   virtual ~scfImplementation()
   {
-    csRefTrackerAccess::TrackDestruction (scfObject, scfRefCount);
-    scfRemoveRefOwners ();
+    csRefTrackerAccess::TrackDestruction (GetSCFObject(), scfRefCount);
+    if (HasAuxData())
+    {
+      scfRemoveRefOwners ();
+      CleanupMetadata ();
+      iBase *scfParent = scfAuxData->scfParent;
+      if (scfParent) scfParent->DecRef();
+    }
   }
 
   /**
@@ -180,38 +261,46 @@ public:
   {
     CS_ASSERT_MSG("Refcount decremented for destroyed object", 
       scfRefCount != 0);
-    csRefTrackerAccess::TrackDecRef (scfObject, scfRefCount);
-    scfRefCount--;
-    if (scfRefCount == 0)
+    csRefTrackerAccess::TrackDecRef (GetSCFObject(), scfRefCount);
+    if (CS::Threading::AtomicOperations::Decrement (&scfRefCount) == 0)
     {
-      scfRemoveRefOwners ();
-      if (scfParent) scfParent->DecRef();
-      delete scfObject;
+      delete GetSCFObject();
     }
+    BumpStat (scfstatDecRef);
   }
 
   virtual void IncRef ()
   {
     CS_ASSERT_MSG("Refcount incremented from inside dtor", 
       scfRefCount != 0);
-    csRefTrackerAccess::TrackIncRef (scfObject, scfRefCount);
-    scfRefCount++;
+    csRefTrackerAccess::TrackIncRef (GetSCFObject(), scfRefCount);
+    CS::Threading::AtomicOperations::Increment (&scfRefCount);
+    BumpStat (scfstatIncRef);
   }
 
   virtual int GetRefCount ()
   {
-    return scfRefCount;
+    return CS::Threading::AtomicOperations::Read (&scfRefCount);
   }
 
   virtual void AddRefOwner (void** ref_owner)
   {
-    if (!this->scfWeakRefOwners)
-      scfWeakRefOwners = new WeakRefOwnerArray (0);
-    scfWeakRefOwners->InsertSorted (ref_owner);
+    EnsureAuxData();
+    CS::Threading::ScopedLock<CS::Threading::Mutex> l (scfAuxData->lock);
+    if (!scfAuxData->scfWeakRefOwners)
+    {
+      scfAuxData->scfWeakRefOwners = new WeakRefOwnerArray (0);
+      BumpStat (scfstatWeakreffed);
+    }
+    scfAuxData->scfWeakRefOwners->InsertSorted (ref_owner);
   }
 
   virtual void RemoveRefOwner (void** ref_owner)
   {
+    if (!HasAuxData()) return;
+
+    CS::Threading::ScopedLock<CS::Threading::Mutex> l (scfAuxData->lock);
+    WeakRefOwnerArray* scfWeakRefOwners = scfAuxData->scfWeakRefOwners;
     if (!scfWeakRefOwners)
       return;
 
@@ -222,48 +311,65 @@ public:
       scfWeakRefOwners->DeleteIndex (index);
   }
 
-protected:
-  Class *scfObject;
-
-  int scfRefCount;
-  iBase *scfParent;
-  typedef csArray<void**,
-    csArrayElementHandler<void**>,
-    CS::Memory::AllocatorMalloc,
-    csArrayCapacityLinear<csArrayThresholdFixed<4> > > WeakRefOwnerArray;
-  WeakRefOwnerArray* scfWeakRefOwners;
-
-  void scfRemoveRefOwners ()
+  virtual scfInterfaceMetadataList* GetInterfaceMetadata ()
   {
-    if (!scfWeakRefOwners)
-      return;
-
-    for (size_t i = 0; i < scfWeakRefOwners->GetSize (); i++)
+    EnsureAuxData();
+    CS::Threading::ScopedLock<CS::Threading::Mutex> l (scfAuxData->lock);
+    if (!scfAuxData->metadataList)
     {
-      void** p = (*scfWeakRefOwners)[i];
-      *p = 0;
+      BumpStat (scfstatMetadata);
+      // Need to set it up, do so
+      AllocMetadata (GetInterfaceMetadataCount ());
+      FillInterfaceMetadata (0);
     }
-    delete scfWeakRefOwners;
-    scfWeakRefOwners = 0;
+
+    return scfAuxData->metadataList;
   }
+
+protected:
+  Class* GetSCFObject() { return static_cast<Class*> (this); }
+  const Class* GetSCFObject() const { return static_cast<const Class*> (this); }
+
+  int32 scfRefCount;
 
   void *QueryInterface (scfInterfaceID iInterfaceID,
                         scfInterfaceVersion iVersion)
   {
-    // Default, just check iBase.. all objects have iBase
+    // Default, just check iBase.. all objects have iBase    
     if (iInterfaceID == scfInterfaceTraits<iBase>::GetID () &&
       scfCompatibleVersion (iVersion, scfInterfaceTraits<iBase>::GetVersion ()))
     {
-      scfObject->IncRef ();
-      return static_cast<iBase*> (scfObject);
+      GetSCFObject()->IncRef ();
+      return static_cast<iBase*> (GetSCFObject());
     }
 
     // For embedded interfaces
-    if (scfParent)
-      return scfParent->QueryInterface (iInterfaceID, iVersion);
+    if (HasAuxData() && scfAuxData->scfParent)
+      return scfAuxData->scfParent->QueryInterface (iInterfaceID, iVersion);
 
     return 0;
   }
+
+
+  // Fill in interface metadata in the metadata table, starting at offset N
+  virtual void FillInterfaceMetadata (size_t n)
+  {
+    scfInterfaceMetadataList* metadataList = scfAuxData->metadataList;
+    if (!metadataList)
+      return;
+
+    FillInterfaceMetadataIf<iBase> (metadataList->metadata, n);
+  }
+
+  template<typename IF>
+  CS_FORCEINLINE_TEMPLATEMETHOD static void FillInterfaceMetadataIf (
+    scfInterfaceMetadata* metadataArray, size_t pos)
+  {
+    metadataArray[pos].interfaceName = scfInterfaceTraits<IF>::GetName ();
+    metadataArray[pos].interfaceID = scfInterfaceTraits<IF>::GetID ();
+    metadataArray[pos].interfaceVersion = scfInterfaceTraits<IF>::GetVersion ();
+  }
+
 };
 
 

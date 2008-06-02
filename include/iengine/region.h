@@ -36,6 +36,7 @@ struct iMeshFactoryWrapper;
 struct iObject;
 struct iSector;
 struct iTextureWrapper;
+struct iShader;
 
 /**
  * A region. A region is basically a collection of objects in the
@@ -47,9 +48,13 @@ struct iTextureWrapper;
  * Main ways to get pointers to this interface:
  * - iEngine::CreateRegion()
  */
-struct iRegion : public virtual iBase
+
+#include "csutil/deprecated_warn_off.h"
+
+struct CS_DEPRECATED_TYPE_MSG ("iRegion is deprecated. Use iCollection instead.")
+       iRegion : public virtual iBase
 {
-  SCF_INTERFACE(iRegion, 2,1,0);
+  SCF_INTERFACE(iRegion, 2,2,0);
   /// Get the iObject for this region.
   virtual iObject *QueryObject() = 0;
 
@@ -102,6 +107,8 @@ struct iRegion : public virtual iBase
   virtual iTextureWrapper *FindTexture (const char *iName) = 0;
   /// Find a material in this region by name
   virtual iMaterialWrapper *FindMaterial (const char *iName) = 0;
+  /// Find a shader in this region by name
+  virtual iShader *FindShader (const char *iName) = 0;
   /// Find a camera position in this region by name
   virtual iCameraPosition *FindCameraPosition (const char *iName) = 0;
 
@@ -146,6 +153,8 @@ struct iRegionList : public virtual iBase
   /// Find a region by name.
   virtual iRegion *FindByName (const char *Name) const = 0;
 };
+
+#include "csutil/deprecated_warn_on.h"
 
 /** @} */
 

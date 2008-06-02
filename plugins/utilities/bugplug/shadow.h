@@ -30,7 +30,7 @@ struct iEngine;
 struct iMeshWrapper;
 struct iCamera;
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * BugPlug is the hiding place for many dark creatures. While Spider only
@@ -56,6 +56,7 @@ private:
   bool do_bbox;	// Show bounding box.
   bool do_rad;	// Show bounding sphere.
   bool do_normals; // Show normals
+  bool do_skeleton; // Show skeleton
   csFlags flags;
   csRef<iRenderView> keep_view;
   csBox3 bbox;
@@ -88,27 +89,25 @@ public:
   /**
    * Set what we are showing.
    */
-  void SetShowOptions (bool bbox, bool rad, bool norm)
+  void SetShowOptions (bool bbox, bool rad, bool norm, bool skel)
   {
     do_bbox = bbox;
     do_rad = rad;
     do_normals = norm;
+    do_skeleton = skel;
   }
 
   /**
    * Get what we are showing.
    */
-  void GetShowOptions (bool& bbox, bool& rad, bool& norm) const
+  void GetShowOptions (bool& bbox, bool& rad, bool& norm, bool& skel) const
   {
     bbox = do_bbox;
     rad = do_rad;
     norm = do_normals;
+    skel = do_skeleton;
   }
 
-  void GetObjectBoundingBox (csBox3& bbox)
-  {
-    bbox.Set (-100000, -100000, -100000, 100000, 100000, 100000);
-  }
   const csBox3& GetObjectBoundingBox ()
   {
     bbox.Set (-100000, -100000, -100000, 100000, 100000, 100000);
@@ -124,7 +123,7 @@ public:
   virtual iMeshObjectFactory* GetFactory () const { return 0; }
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> Clone () { return 0; }
-  virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView* rview, 
+  virtual CS::Graphics::RenderMesh** GetRenderMeshes (int& n, iRenderView* rview, 
     iMovable* movable, uint32);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback*) { }
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const { return 0; }
@@ -148,17 +147,8 @@ public:
   virtual void SetTriangleData (csStringID, iTriangleMesh*) { }
   virtual bool IsTriangleDataSet (csStringID) { return false; }
   virtual void ResetTriangleData (csStringID) { }
-  virtual iPolygonMesh* GetPolygonMeshBase () { return 0; }
-  virtual iPolygonMesh* GetPolygonMeshColldet () { return 0; }
   virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
   virtual iTerrainSystem* GetTerrainColldet () { return 0; }
-  virtual void SetPolygonMeshColldet (iPolygonMesh*) { }
-  virtual iPolygonMesh* GetPolygonMeshViscull () { return 0; }
-  virtual void SetPolygonMeshViscull (iPolygonMesh*) { }
-  virtual iPolygonMesh* GetPolygonMeshShadows () { return 0; }
-  virtual void SetPolygonMeshShadows (iPolygonMesh*) { }
-  virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
-  { return 0; }
   virtual void AddListener (iObjectModelListener*) { }
   virtual void RemoveListener (iObjectModelListener*) { }
 
@@ -183,6 +173,6 @@ public:
 
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 #endif // __CS_SHADOW_H__

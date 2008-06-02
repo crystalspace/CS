@@ -91,7 +91,7 @@ public:
     int  ReadRawBytes(int iBytes,void *pBuff);
 
     int ReadLine(csString& str);
-    csString& ReadWord(char *pCharList="",int iWantTrailingSpace=0);
+    csString& ReadWord(const char *pCharList="",int iWantTrailingSpace=0);
     int Read(void *pPtr,int iNum);
 };
 

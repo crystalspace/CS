@@ -286,6 +286,56 @@ bool csSoftwareTextureHandle::GetRendererDimensions (int &mw, int &mh)
   return true;
 }
 
+uint8* csSoftwareTextureHandle::QueryBlitBuffer (int x, int y, 
+                                                 int width, int height,
+                                                 size_t& pitch, 
+                                                 TextureBlitDataFormat format,
+                                                 uint bufFlags)
+{
+  PrepareInt ();
+  csSoftwareTexture *tex0 = (csSoftwareTexture *)tex[0];
+  if (!tex0) return 0;
+
+  // We don't generate mipmaps or so...
+  flags |= CS_TEXTURE_NOMIPMAPS;
+
+#ifdef CS_LITTLE_ENDIAN
+  if (format == RGBA8888)
+  {
+    pitch = tex0->w * 4;
+    uint8* p = (uint8*)(tex0->bitmap + y * tex0->w + x);
+    return p;
+  }
+  else
+#endif
+  {
+    BlitBuffer blitBuf;
+    blitBuf.x = x;
+    blitBuf.y = y;
+    blitBuf.width = width;
+    blitBuf.height = height;
+    blitBuf.format = format;
+    /* @@@ FIXME: Improve - prolly makes sense to reuse allocated blocks of 
+       memory. */
+    uint8* p = (uint8*)cs_malloc (width * height * 4);
+    blitBuffers.Put (p, blitBuf);
+    pitch = width * 4;
+    return p;
+  }
+}
+
+void csSoftwareTextureHandle::ApplyBlitBuffer (uint8* buf)
+{
+  BlitBuffer* blitBuf = blitBuffers.GetElementPointer (buf);
+  if (blitBuf != 0)
+  {
+    Blit (blitBuf->x, blitBuf->y, blitBuf->width, blitBuf->height, buf, 
+      blitBuf->format);
+    blitBuffers.DeleteAll (buf);
+    cs_free (buf);
+  }
+}
+
 //----------------------------------------------- csSoftwareTextureManager ---//
 
 csSoftwareTextureManager::csSoftwareTextureManager (

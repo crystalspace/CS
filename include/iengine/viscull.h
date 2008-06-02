@@ -244,7 +244,7 @@ struct iVisibilityCuller : public virtual iBase
  * - Mesh wrapper in the engine implements this.
  *
  * Main ways to get pointers to this interface:
- * - SCF_QUERY_INTERFACE() from iMeshWrapper.
+ * - scfQueryInterface<iMeshWrapper>
  *
  * Main users of this interface:
  * - Visibility culler plugins (iVisibilityCuller).

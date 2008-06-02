@@ -1,11 +1,9 @@
 %define name     crystalspace
-%define version  1.2
-%define release  1
+%define version  1.3
+%define release  0.svn20070721.1
 %define prefix   /usr
 %define csprefix crystalspace-%{version}
 
-# (vk) full version number is used for doc directory naming
-%define fullversion 1.2.0
 
 %{?dist: %{expand: %%define %dist 1}}
 
@@ -35,7 +33,7 @@
 %{?_with_shared: %{expand: %%global with_SHARED 1}}
 
 Group: Development/C++
-Source: http://www.crystalspace3d.org/downloads/release/crystalspace-src-1.2.tar.bz2
+Source: http://www.crystalspace3d.org/cvs-snapshots/bzip2/cs-current-snapshot.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 URL: http://www.crystalspace3d.org/
 
@@ -100,7 +98,7 @@ Documentation (manual and public API reference)
 for Crystal Space free 3D SDK.
 
 %prep
-%setup -n %{name}-src-%{version}
+%setup -n CS
 
 %build
 sh  configure \
@@ -192,7 +190,7 @@ for map in castle flarge partsys terrain terrainf ; \
 %defattr(-,root,root)
 
 %docdir docs
-%{_datadir}/doc/%{name}-%{fullversion}/*
+%{_datadir}/doc/%{csprefix}/*
 
 %files -n %{name}-devel
 %defattr(-,root,root)
@@ -208,11 +206,7 @@ for map in castle flarge partsys terrain terrainf ; \
 %{_includedir}/%{csprefix}/*
 
 %changelog
-* Thu Aug 16 2007 Vincent Knecht <vknecht@users.sourceforge.net> 1.2-1
-- Updated for 1.2 release.
-- Added 'fullversion' variable for doc directory naming.
-
-* Sat Jul 21 2007 Vincent Knecht <vknecht@users.sourceforge.net> 1.1-0.svn20070721.1
+* Sat Jul 21 2007 Vincent Knecht <vknecht@users.sourceforge.net> 1.3-0.svn20070721.1
 - Updated for AWS stuff removal and lighter2 addition.
 - Updated for multiple install support (versioned directories and cs-config).
 

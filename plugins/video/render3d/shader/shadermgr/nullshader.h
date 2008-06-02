@@ -40,6 +40,9 @@ private:
   csRefArray<csShaderVariable> dummySVs;
   csShaderManager* mgr;
 
+protected:
+  void InternalRemove() { SelfDestruct(); }
+
 public:
   CS_LEAKGUARD_DECLARE (csNullShader);
 
@@ -53,13 +56,13 @@ public:
   const char* GetFileName () { return 0; }
   void SetFileName (const char* /*filename*/) {  }
 
-  virtual size_t GetTicket (const csRenderMeshModes&, 
+  virtual size_t GetTicket (const CS::Graphics::RenderMeshModes&, 
     const iShaderVarStack*) { return 0; }
 
   virtual size_t GetNumberOfPasses (size_t) { return 0; }
   virtual bool ActivatePass (size_t, size_t) { return false; }
-  virtual bool SetupPass (size_t, const csRenderMesh*,
-    csRenderMeshModes&, const iShaderVarStack*)
+  virtual bool SetupPass (size_t, const CS::Graphics::RenderMesh*,
+    CS::Graphics::RenderMeshModes&, const iShaderVarStack*)
   { return false; }
   virtual bool TeardownPass (size_t)
   { return false; }
@@ -79,6 +82,7 @@ public:
   void ReplaceVariable (csShaderVariable*) {}
   void Clear () { }
   bool RemoveVariable (csShaderVariable*) { return false; }
+  bool RemoveVariable (csStringID) { return false; }
   /** @} */
 
   /**\name iSelfDestruct implementation

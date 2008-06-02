@@ -23,6 +23,22 @@
     
     The rules are evaluated in the order they appear in the database.
   -->
+
+<!--
+    IMPORTANT: PLEASE COMMENT RULES
+    
+    When you add or change a tweak please make sure to add a small comment
+    on that change above the rule! (If there's no comment yet, add one ;)
+    The comment should include the date, who discovered the issue(or tweak),
+    the hardware it happened on, platform, and driver version (practically
+    all that information can be cut from CS --verbose=-scf output); when 
+    adding a new tweak spend a few words on the issue that is worked around.
+    These comments are currently the closest thing to a "database" of HW/driver
+    issues we have; without them we'd quickly lose track of why certain tweaks
+    were introduced and it'd be much harder to determine whether a certain
+    tweak could be disabled for e.g. newer drivers. So please _always_ update
+    the comments!
+  -->
 <gldriverdb>
   <configs>
     <config name="brokenstencil">
@@ -262,6 +278,15 @@
 	</OpenGL>
       </Video>
     </config>
+    <config name="nopbo">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <GL_ARB_pixel_buffer_object>no</GL_ARB_pixel_buffer_object>
+	  </UseExtension>
+	</OpenGL>
+      </Video>
+    </config>
   </configs>
   <rules>
     <!-- rule description="Some more examples">
@@ -454,11 +479,18 @@
 	      for OSX 10.4 in MacBook, iMac and Mac mini.
 	    * problem persists with recent driver updates under OSX 10.4
 	    * has been reported for GMA 3100 under OSX 10.5, which is found in newer MacBooks.
+         2008-05-27: confirmed problem also for 10.5-drivers. (Trymm)
     -->
-    <rule description="Intel GMA 950 on OSX">
-      <conditions>
-	<regexp string="renderer" pattern="Intel GMA 950 OpenGL Engine" />
-        <regexp string="glversion" pattern="1.2 APPLE-1\.4\..*" />
+    <rule description="Intel GMA on OSX">
+      <conditions fulfill="all">
+        <conditions fulfill="one">
+          <regexp string="renderer" pattern="Intel GMA X3100 OpenGL Engine" />
+	  <regexp string="renderer" pattern="Intel GMA 950 OpenGL Engine" />
+        </conditions>
+        <conditions fulfill="one">
+          <regexp string="glversion" pattern="1.2 APPLE-1\.4\..*" />
+          <regexp string="glversion" pattern="1.2 APPLE-1\.5\..*" />
+        </conditions>
 	<regexp string="platform" pattern="MacOS/X" />
       </conditions>
       <applicable>
@@ -612,6 +644,26 @@
       </applicable>
     </rule>
     
+    <!--
+      * 2007-10-19: RADEON 9700 PRO x86/MMX/3DNow!/SSE, Win32, 
+                    OpenGL 2.0.6956, GL driver: atioglxx.dll 6.14.10.6956
+		    When setting texture data with ARB_pixel_buffer_object,
+		    the first 512 lines of the texture are repeted every
+		    512 lines (in other words, data past line 512 is invalid).
+      * 2008-01-14: RADEON 9700 PRO x86/MMX/3DNow!/SSE, Win32, 
+                    OpenGL 2.1.7169, GL driver: atioglxx.dll 6.14.10.7169
+		    Issue has been fixed.
+      -->
+    <rule description="ATI: Disable broken pixel buffer objects">
+      <conditions>
+	<regexp string="vendor" pattern="^ATI" />
+	<comparever version="gl" relation="lt 2.1.7169" />
+      </conditions>
+      <applicable>
+	<usecfg>nopbo</usecfg>
+      </applicable>
+    </rule>
+    
     <rule description="Software GL tweaks">
       <conditions fulfill="one">
 	<regexp string="renderer" pattern="Mesa GLX Indirect" />
@@ -672,11 +724,15 @@
     <!--
       * 2006-11-24: AFP support in Intel DRI (at least in Mesa 6.5.1) is 
                     broken.
+      * 2008-05-02: Still broken as of Mesa 7.0.3.
       -->
     <rule description="Intel DRI: Disable ARB_fragment_program">
-      <conditions>
+      <conditions fulfill="all">
         <regexp string="renderer" pattern="Mesa.*Intel" />
-        <regexp string="glversion" pattern="Mesa 6\.5\.." />
+        <conditions fulfill="one">
+          <regexp string="glversion" pattern="Mesa 6\.5\.." />
+          <regexp string="glversion" pattern="Mesa 7\.0\.." />
+        </conditions>
       </conditions>
       <applicable>
         <usecfg>noafp</usecfg>

@@ -1,3 +1,0 @@
-SubDir TOP scripts hammer ;
-
-InstallData [ Wildcard *.fgd README ] : conversion hammer ;

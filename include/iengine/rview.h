@@ -206,51 +206,6 @@ struct iRenderView : public virtual iBase
   virtual iCamera* GetCamera () = 0;
 
   /**
-   * Given a frustum_mask, calculate the clip settings.
-   * \deprecated Use CS::RenderViewClipper::CalculateClipSettings() instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use CS::RenderViewClipper::CalculateClipSettings() instead.")
-  virtual void CalculateClipSettings (uint32 frustum_mask,
-    int &clip_portal, int &clip_plane, int &clip_z_plane) = 0;
-
-  /**
-   * Test if the given bounding sphere (in world space coordinates)
-   * is visible in this render view. The optional will
-   * transform world to camera space.
-   * \deprecated Use CS::RenderViewClipper::TestBSphere() instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use CS::RenderViewClipper::TestBSphere() instead.")
-  virtual bool TestBSphere (const csReversibleTransform& w2c,
-  	const csSphere& sphere) = 0;
-
-  /**
-   * Check if the object space bounding box of an object is visible in this
-   * render view. If true is returned (visible) then clip_plane,
-   * clip_z_plane, and clip_portal will be set to the right value depending
-   * on wether or not clipping is wanted. This function also does far
-   * plane clipping. Use SetupClipPlanes() to get the clipping planes
-   * for this function.
-   * The frustum_mask will be modified according to all clip planes
-   * that were relevant for the given box. That can be used to hierarchically
-   * cull smaller objects.
-   * \deprecated Use CS::RenderViewClipper::CullBBox() instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use CS::RenderViewClipper::CullBBox() instead.")
-  virtual bool ClipBBox (const csPlane3* planes, uint32& frustum_mask,
-  	const csBox3& obox,
-      	int& clip_portal, int& clip_plane, int& clip_z_plane) = 0;
-
-  /**
-   * Setup clipping planes in object space. The input arrays for planes
-   * should each be able to hold 10 planes. Returns a mask that you can
-   * use for the csIntersect3::BoxFrustum() function.
-   * \deprecated Use CS::RenderViewClipper::SetupClipPlanes() instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use CS::RenderViewClipper::SetupClipPlanes() instead.")
-  virtual void SetupClipPlanes (const csReversibleTransform& tr_o2c,
-  	csPlane3* planes, uint32& frustum_mask) = 0;
-
-  /**
    * Get current sector.
    */
   virtual iSector* GetThisSector () = 0;
@@ -275,19 +230,6 @@ struct iRenderView : public virtual iBase
    * Get the number of the current frame.
    */
   virtual uint GetCurrentFrameNumber () const = 0;
-
-  /**
-   * Check if the given bounding sphere (in camera and world space coordinates)
-   * is visibile in this render view. If the sphere is visible this
-   * function will also initialize the clip_plane, clip_z_plane, and
-   * clip_portal fields which can be used for the renderer.
-   * \deprecated Use CS::RenderViewClipper::CullBSphere() instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use CS::RenderViewClipper::CullBSphere() instead.")
-  virtual bool ClipBSphere (
-	const csSphere &cam_sphere,
-	const csSphere &world_sphere,
-	int& clip_portal, int& clip_plane, int& clip_z_plane) = 0;
 };
 
 /** @} */

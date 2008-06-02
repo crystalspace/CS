@@ -25,21 +25,27 @@
 
 #include "ivideo/graph3d.h"
 
+#include "csqint.h"
 #include "csgeom/math.h"
 #include "csgfx/imagecubemapmaker.h"
 #include "csgfx/imagememory.h"
 #include "csgfx/imagevolumemaker.h"
 #include "csgfx/rgbpixel.h"
+#include "csgfx/shadervar.h"
 #include "csgfx/xorpat.h"
+#include "cstool/unusedresourcehelper.h"
 #include "csutil/cscolor.h"
 #include "csutil/scfstr.h"
+#include "iengine/collection.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
 #include "iengine/region.h"
 #include "iengine/texture.h"
+#include "igraphic/animimg.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
 #include "imap/reader.h"
+#include "itexture/iproctex.h"
 #include "iutil/databuff.h"
 #include "iutil/document.h"
 #include "iutil/object.h"
@@ -51,6 +57,9 @@
 #include "csloader.h"
 #include "loadtex.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(csparser)
+{
+
 static void ReportError (iObjectRegistry* object_reg,
     const char* id, const char* description, ...)
 {
@@ -60,7 +69,7 @@ static void ReportError (iObjectRegistry* object_reg,
   va_end (arg);
 }
 
-static csPtr<iImage> GenerateErrorTexture (int width, int height)
+csPtr<iImage> csLoader::GenerateErrorTexture (int width, int height)
 {
   static const csRGBpixel colorTable[] = 
     {csRGBpixel (0,0,0,255), csRGBpixel (255,0,0,255),
@@ -272,6 +281,52 @@ csPtr<iTextureHandle> csLoader::LoadTexture (const char *fname, int Flags,
 
 iTextureWrapper* csLoader::LoadTexture (const char *name,
 	const char *fname, int Flags, iTextureManager *tm, bool reg,
+	bool create_material, bool free_image, iCollection* collection,
+  uint keepFlags)
+{
+  if (!Engine)
+    return 0;
+
+  csRef<iImage> img;
+  if (!tm && G3D) tm = G3D->GetTextureManager();
+  csRef<iTextureHandle> TexHandle = LoadTexture (fname, Flags, tm, &img);
+  if (!TexHandle)
+    return 0;
+
+  iTextureWrapper *TexWrapper =
+    Engine->GetTextureList ()->NewTexture(TexHandle);
+  TexWrapper->QueryObject ()->SetName (name);
+  TexWrapper->SetImageFile(img);
+  if(collection)
+  {
+    collection->Add(TexWrapper->QueryObject());
+  }
+
+  iMaterialWrapper* matwrap = 0;
+  if (create_material)
+  {
+    csRef<iMaterial> material (Engine->CreateBaseMaterial (TexWrapper));
+    matwrap = Engine->GetMaterialList ()->NewMaterial (material, name);
+    if(collection)
+    {
+      collection->Add(matwrap->QueryObject());
+    }
+  }
+
+  if (reg && tm)
+  {
+    // If we already have a texture handle then we don't register again.
+    if (!TexWrapper->GetTextureHandle ())
+      TexWrapper->Register (tm);
+    if (free_image)
+      TexWrapper->SetImageFile (0);
+  }
+
+  return TexWrapper;
+}
+
+iTextureWrapper* csLoader::LoadTexture (const char *name,
+	const char *fname, int Flags, iTextureManager *tm, bool reg,
 	bool create_material, bool free_image, iRegion* region)
 {
   if (!Engine)
@@ -307,6 +362,98 @@ iTextureWrapper* csLoader::LoadTexture (const char *name,
   }
 
   return TexWrapper;
+}
+
+bool csLoader::LoadProxyTextures()
+{
+  // Remove all unused textures and materials.
+  csWeakRefArray<iTextureWrapper> texArray;
+
+  for(uint i=0; i<proxyTextures.GetSize(); i++)
+  {
+    ProxyTexture& proxTex = proxyTextures.Get(i);
+    if(!proxTex.textureWrapper)
+    {
+      proxyTextures.DeleteIndex(i);
+      i--;
+      continue;
+    }
+
+    texArray.Push(proxTex.textureWrapper);
+  }
+
+  CS::Utility::UnusedResourceHelper::UnloadUnusedMaterials(Engine,
+    materialArray);
+  CS::Utility::UnusedResourceHelper::UnloadUnusedTextures(Engine, texArray);
+  materialArray.Empty();
+
+  // Load the remaining textures.
+  iTextureManager *tm = G3D->GetTextureManager();
+  size_t i = proxyTextures.GetSize();
+  while (i-- > 0)
+  {
+    ProxyTexture& proxTex = proxyTextures.Get(i);
+
+    if(!proxTex.textureWrapper)
+    {
+      continue;
+    }
+
+    csRef<iImage> img = proxTex.img->GetProxiedImage();
+
+    csRef<iAnimatedImage> anim = scfQueryInterface<iAnimatedImage>(img);
+    if (anim && anim->IsAnimated())
+    {
+      iLoaderPlugin* plugin = NULL;
+      iBinaryLoaderPlugin* Binplug = NULL;
+      iDocumentNode* defaults = NULL;
+
+      loaded_plugins.FindPlugin(PLUGIN_TEXTURELOADER_ANIMIMG, plugin, Binplug, defaults);
+      if(plugin)
+      {
+        TextureLoaderContext context(proxTex.textureWrapper->QueryObject()->GetName());
+        context.SetClass(proxTex.textureWrapper->GetTextureClass());
+        context.SetFlags(proxTex.textureWrapper->GetFlags());
+        context.SetImage(img);
+
+        csRef<iBase> b = plugin->Parse(0, 0, 0, static_cast<iBase*>(&context));
+        if (b)
+        {
+          csWeakRef<iTextureWrapper> newTex = scfQueryInterface<iTextureWrapper>(b);
+          newTex->QueryObject()->SetName(proxTex.textureWrapper->QueryObject()->GetName());
+          newTex->SetTextureClass(context.GetClass());
+
+          proxTex.textureWrapper->SetTextureHandle(newTex->GetTextureHandle());
+          proxTex.textureWrapper->SetUseCallback(newTex->GetUseCallback());
+
+          csRef<iProcTexture> ipt = scfQueryInterface<iProcTexture> (proxTex.textureWrapper);
+          if(ipt)
+            ipt->SetAlwaysAnimate (proxTex.always_animate);
+        }
+      }
+
+    }
+    else
+    {
+      proxTex.textureWrapper->SetImageFile (img);
+      proxTex.textureWrapper->Register (tm);
+    }
+
+    if(proxTex.keyColour.do_transp)
+    {
+      proxTex.textureWrapper->SetKeyColor(csQint(proxTex.keyColour.colours.red * 255.99),
+        csQint(proxTex.keyColour.colours.green * 255.99),
+        csQint(proxTex.keyColour.colours.blue * 255.99));
+    }
+
+    if(proxTex.alphaType != csAlphaMode::alphaNone)
+    {
+      proxTex.textureWrapper->GetTextureHandle()->SetAlphaType(proxTex.alphaType);
+    }
+  }
+  proxyTextures.Empty ();
+
+  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -533,8 +680,7 @@ csPtr<iBase> csCheckerTextureLoader::Parse (iDocumentNode* node,
 	Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->SetImageFile (Image);
 
-  TexWrapper->IncRef ();
-  return csPtr<iBase> ((iBase*)TexWrapper);
+  return csPtr<iBase> (TexWrapper);
 }
 
 
@@ -684,7 +830,6 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->SetImageFile (cube);
 
-  TexWrapper->IncRef ();
   return csPtr<iBase> (TexWrapper);
 }
 
@@ -774,7 +919,6 @@ csPtr<iBase> csTexture3DLoader::Parse (iDocumentNode* node,
 	Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->SetImageFile (vol);
 
-  TexWrapper->IncRef ();
   return csPtr<iBase> (TexWrapper);
 }
 
@@ -810,7 +954,7 @@ csPtr<iBase> csMissingTextureLoader::Parse (iDocumentNode* node,
     }
   }
  
-  csRef<iImage> image = GenerateErrorTexture (width, height);
+  csRef<iImage> image = csLoader::GenerateErrorTexture (width, height);
 
 
   csRef<iGraphics3D> G3D = csQueryRegistry<iGraphics3D> (object_reg);
@@ -836,6 +980,8 @@ csPtr<iBase> csMissingTextureLoader::Parse (iDocumentNode* node,
     Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->SetImageFile (image);
 
-  TexWrapper->IncRef ();
-  return csPtr<iBase> ((iBase*)TexWrapper);
+  return csPtr<iBase> (TexWrapper);
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(csparser)

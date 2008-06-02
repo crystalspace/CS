@@ -136,8 +136,12 @@ struct csImageArea
  * When you create an offscreen canvas (CreateOffscreenCanvas()) then
  * you can use this callback to get informed when the texture has
  * been modified (FinishDraw() called) or a palette entry is modified.
+ * \deprecated Deprecated in 1.3. Offscreen canvases are deprecated, use 
+ *   iGraphics3D::SetRenderTarget()
  */
-struct iOffscreenCanvasCallback : public virtual iBase
+struct CS_DEPRECATED_TYPE_MSG("Offscreen canvases are deprecated, use "
+  "iGraphics3D::SetRenderTarget()")
+iOffscreenCanvasCallback : public virtual iBase
 {
   SCF_INTERFACE (iOffscreenCanvasCallback, 1, 0, 0);
 
@@ -146,6 +150,9 @@ struct iOffscreenCanvasCallback : public virtual iBase
   /// Palette entry has been modified.
   virtual void SetRGB (iGraphics2D* canvas, int idx, int r, int g, int b) = 0;
 };
+
+// For CreateOffscreenCanvas()
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * This is the interface for 2D renderer. The 2D renderer is responsible
@@ -164,7 +171,7 @@ struct iOffscreenCanvasCallback : public virtual iBase
  *       the right instance of the canvas that it requires.
  *
  * Main ways to get pointers to this interface:
- * - CS_QUERY_REGISTRY()
+ * - csQueryRegistry<iGraphics2D>()
  * - iGraphics3D::GetDriver2D()
  *
  * Main users of this interface:
@@ -422,7 +429,11 @@ struct iGraphics2D : public virtual iBase
    * The callback interface (if given) is used to communicate from the
    * canvas back to the caller. You can use this to detect when the
    * texture data has changed for example.
+   * \deprecated Deprecated in 1.3. Offscreen canvases are deprecated, use 
+   *   iGraphics3D::SetRenderTarget()
    */
+  CS_DEPRECATED_METHOD_MSG("Offscreen canvases are deprecated, use "
+    "iGraphics3D::SetRenderTarget()") 
   virtual csPtr<iGraphics2D> CreateOffscreenCanvas (
   	void* memory, int width, int height, int depth,
 	iOffscreenCanvasCallback* ofscb) = 0;
@@ -437,7 +448,22 @@ struct iGraphics2D : public virtual iBase
   virtual void Write (iFont *font, int x, int y, int fg, int bg,
     const wchar_t* str, uint flags = 0) = 0;
 
+  /**
+   * Set the viewport (the rectangle of the framebuffer to draw to).
+   * \param left Left of the viewport. X=0 will map to this.
+   * \param top Right of the viewport. Y=0 will map to this.
+   * \param width Width of the viewport.
+   * \param height Height of the viewport.
+   */
+  virtual void SetViewport (int left, int top, int width, int height) = 0;
+  /// Get the currently set viewport.
+  virtual void GetViewport (int& left, int& top, int& width, int& height) = 0;
+  
+  /// Get the dimensions of the framebuffer.
+  virtual void GetFramebufferDimensions (int& width, int& height) = 0;
 };
+
+#include "csutil/deprecated_warn_on.h"
 
 /** @} */
 

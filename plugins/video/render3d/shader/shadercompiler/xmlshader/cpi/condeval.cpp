@@ -833,7 +833,7 @@ bool csConditionEvaluator::IsConditionPartOf (csConditionID condition,
 }
 
 bool csConditionEvaluator::Evaluate (csConditionID condition, 
-				     const csRenderMeshModes& modes,
+				     const CS::Graphics::RenderMeshModes& modes,
 				     const iShaderVarStack* stacks)
 {
   if (condition == csCondAlwaysTrue)
@@ -845,10 +845,10 @@ bool csConditionEvaluator::Evaluate (csConditionID condition,
    * are added (notably when a shader source is retrieved from an
    * external source). Make sure the cache is large enough.
    */
-  if (condChecked.Length() < GetNumConditions ())
+  if (condChecked.GetSize() < GetNumConditions ())
   {
-    condChecked.SetLength (GetNumConditions ());
-    condResult.SetLength (GetNumConditions ());
+    condChecked.SetSize (GetNumConditions ());
+    condResult.SetSize (GetNumConditions ());
   }
 
   if (condChecked.IsBitSet (condition))
@@ -1201,9 +1201,9 @@ typename Evaluator::EvalResult csConditionEvaluator::Evaluate (
 
 void csConditionEvaluator::ResetEvaluationCache()
 {
-  condChecked.SetLength (GetNumConditions ());
+  condChecked.SetSize (GetNumConditions ());
   condChecked.Clear();
-  condResult.SetLength (GetNumConditions ());
+  condResult.SetSize (GetNumConditions ());
 }
 
 bool csConditionEvaluator::EvaluateConst (const CondOperation& op, bool& result)
@@ -1549,6 +1549,19 @@ EvaluatorShadervarValuesSimple::BoolType EvaluatorShadervarValuesSimple::Boolean
 {
   switch (operand.type)
   {
+    case operandOperation:
+      {
+        ValueSet& vs = CreateValue();
+        Logic3 result (evaluator.Evaluate (*this, operand.operation));
+        switch (result.state)
+        {
+        case Logic3::Truth: vs = 1.0f; break;
+        case Logic3::Lie:   vs = 0.0f; break;
+        default:
+          vs = boolMask;
+        }
+        return ValueSetWrapper (vs);
+      }
     case operandBoolean:
       {
         ValueSet& vs = CreateValue();
@@ -1893,6 +1906,30 @@ EvaluatorShadervarValues::BoolType EvaluatorShadervarValues::Boolean (
 {
   switch (operand.type)
   {
+    case operandOperation:
+    {
+      /* Don't use the local trueVars/falseVars since the condition
+      checking may change them to something which is not correct for
+      the whole condition. */
+      Variables trueVars;
+      Variables falseVars;
+      Logic3 result (evaluator.CheckConditionResults (operand.operation,
+        vars, trueVars, falseVars));
+
+      ValueSet& vs = CreateValue();
+      ValueSet& vsTrue = CreateValue();
+      ValueSet& vsFalse = CreateValue();
+      switch (result.state)
+      {
+      case Logic3::Truth: vs = 1.0f; break;
+      case Logic3::Lie:   vs = 0.0f; break;
+      default:
+        vs = boolMask;
+        vsTrue = 1.0f;
+        vsFalse = 0.0f;
+      }
+      return JanusValueSet (vs, vsTrue, vsFalse);
+    }
     case operandBoolean:
       {
         ValueSet& vs = CreateValue();

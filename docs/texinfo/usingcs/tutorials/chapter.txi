@@ -15,11 +15,11 @@ find information about this:
 
 @itemize @bullet
 @item
-For MSVC 7 or higher (@pxref{HOWTO Creating External MSVC 7 Application}).
+For MSVC 7 or higher (@pxref{HOWTO Creating External MSVC Application}).
 @item
 Using Dev-@sc{cpp} (@pxref{HOWTO CS Project DevCPP}).
 @item
-Using gcc based compiler (MingW or GNU/Linux based) (@pxref{HOWTO CS Project}).
+Using GCC based compiler (MingW or GNU/Linux based) (@pxref{HOWTO CS Project}).
 @end itemize
 
 Here are the tutorials:

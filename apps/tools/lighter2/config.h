@@ -31,13 +31,17 @@ namespace lighter
     Configuration ();
 
     // Initialize configuration
-    void Initialize ();
+    void Initialize (iConfigFile* cfgFile = 0);
    
     // Settings of what to do
     struct LighterProperties
     {
       // Direct lighting from light sources
       bool doDirectLight;
+      // HL2-style directional LMs
+      bool directionalLMs;
+      // Number of threads to use for multicore parts
+      uint numThreads;
     };
 
     // Lightmap and lightmap layout properties
@@ -88,6 +92,13 @@ namespace lighter
       
     };
 
+    struct DebugProperties
+    {
+      /* Regular expression for meshes for which to generate "debug occlusion"
+         visualiuzation. */
+      csString rayDebugRE;
+    };
+
 
     // Public accessible (readable) properties
     const LighterProperties& GetLighterProperties () const
@@ -105,11 +116,17 @@ namespace lighter
       return diProperties;
     }
 
+    const DebugProperties& GetDebugProperties() const
+    {
+      return debugProperties;
+    }
+
   protected:
     // Properties
     LighterProperties     lighterProperties;
     LightmapProperties    lmProperties;
     DIProperties          diProperties;
+    DebugProperties       debugProperties;
   };
 
 }

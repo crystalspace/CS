@@ -32,7 +32,7 @@
   END;
 END -%]
 Microsoft Visual Studio Solution File, Format Version [% my.doc.formatversion.0 %]
-# Visual C++ Express 2005
+[% my.doc.headercomment.0 %]
 [% FOREACH project IN projects -%]
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "[% project %]", "
     [%- project %].vcproj", "{[% guids.$project %]}"
@@ -41,7 +41,9 @@ EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 [% n = 0; FOREACH build IN builds -%]
-		ConfigName.[% n; n = n + 1 %] = [% build.name %]
+  [% FOREACH mutator IN mutators -%]
+		ConfigName.[% n; n = n + 1 %] = [% build.name %][% mutator.namesuffix %]
+  [% END -%]
 [% END -%]
 	EndGlobalSection
 	GlobalSection(ProjectDependencies) = postSolution
@@ -54,8 +56,10 @@ Global
 	GlobalSection(ProjectConfiguration) = postSolution
 [% FOREACH project IN projects; g = guids.$project -%]
 [% FOREACH build IN builds -%]
-		{[% g %]}.[% build.name %].ActiveCfg = [% build.name %]|Win32
-		{[% g %]}.[% build.name %].Build.0 = [% build.name %]|Win32
+  [% FOREACH mutator IN mutators -%]
+		{[% g %]}.[% build.name %][% mutator.namesuffix %].ActiveCfg = [% build.name %][% mutator.namesuffix %]|Win32
+		{[% g %]}.[% build.name %][% mutator.namesuffix %].Build.0 = [% build.name %][% mutator.namesuffix %]|Win32
+  [% END -%]
 [% END -%]
 [% END -%]
 	EndGlobalSection

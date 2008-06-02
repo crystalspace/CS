@@ -65,7 +65,10 @@ namespace lighter
 
 
   //--
-  VisibilityTester::VisibilityTester ()
+  size_t VisibilityTester::rayID;
+
+  VisibilityTester::VisibilityTester (Light* light, Object* obj) : 
+    light (light), obj (obj)
   {
   }
 
@@ -87,38 +90,72 @@ namespace lighter
     s.ray.minLength = FLT_EPSILON*10.0f;
     s.ray.maxLength = maxL - FLT_EPSILON*10.0f;
     s.ray.ignoreFlags = KDPRIM_FLAG_NOSHADOW; // Ignore primitives that don't cast shadows
+    s.ray.rayID = ++rayID; // Give unique IDs to rays; needed for the ray debugger.
     s.tree = tree;
 
     allSegments.Push (s);
   }
 
-  bool VisibilityTester::Unoccluded (const Primitive* ignorePrim)
+  VisibilityTester::OcclusionState VisibilityTester::Occlusion (
+    const Primitive* ignorePrim)
   {
-    HitPoint hp;
+    HitCallback hitcb (*this);
+    size_t lastHitCount = transparentHits.GetSize();
     for (size_t i = 0; i < allSegments.GetSize (); ++i)
     {
       Segment& s = allSegments[i];
       s.ray.ignorePrimitive = ignorePrim;
 
-      if (Raytracer::TraceAnyHit (s.tree, s.ray, hp))
-        return false;
+      if (Raytracer::TraceAllHits (s.tree, s.ray, &hitcb))
+      {
+        if (transparentHits.GetSize() == 0) return occlOccluded;
+      }
+
+      if (transparentHits.GetSize() == lastHitCount)
+        globalLighter->rayDebug.RegisterUnhit (light, obj, s.ray);
+      lastHitCount = transparentHits.GetSize();
     }
 
-    return true;    
+    return (transparentHits.GetSize() != 0) ? occlPartial : occlUnoccluded;
   }
 
-  bool VisibilityTester::Unoccluded (HitIgnoreCallback* ignoreCB)
+  VisibilityTester::OcclusionState VisibilityTester::Occlusion (
+    HitIgnoreCallback* ignoreCB)
   {
-    HitPoint hp;
+    HitCallback hitcb (*this);
+    size_t lastHitCount = transparentHits.GetSize();
     for (size_t i = 0; i < allSegments.GetSize (); ++i)
     {
       Segment& s = allSegments[i];
 
-      if (Raytracer::TraceAnyHit (s.tree, s.ray, hp, ignoreCB))
-        return false;
+      if (Raytracer::TraceAllHits (s.tree, s.ray, &hitcb, ignoreCB))
+      {
+        if (transparentHits.GetSize() == 0) return occlOccluded;
+      }
+
+      if (transparentHits.GetSize() == lastHitCount)
+        globalLighter->rayDebug.RegisterUnhit (light, obj, s.ray);
+      lastHitCount = transparentHits.GetSize();
     }
 
-    return true;
+    return (transparentHits.GetSize() != 0) ? occlPartial : occlUnoccluded;
+  }
+    
+  csColor VisibilityTester::GetFilterColor ()
+  {
+    csColor c (1, 1, 1);
+    transparentHits.Sort ();
+    for (size_t i = transparentHits.GetSize(); i-- > 0; )
+    {
+      const HitPoint& hit = transparentHits[i];
+      csVector2 uv = hit.primitive->ComputeUV (hit.hitPoint);
+      const RadMaterial* mat = hit.primitive->GetMaterial ();
+      if (mat == 0) continue;
+      if (!mat->filterImage.IsValid()) continue;
+      ScopedSwapLock<MaterialImage<csColor> > (*(mat->filterImage));
+      c *= mat->filterImage->GetInterpolated (uv);
+    }
+    return c;
   }
 
   void VisibilityTester::CollectHits (HitPointCallback* hitCB, 
@@ -133,6 +170,25 @@ namespace lighter
   }
 
 
+  class LightingBorderIgnoreCb : public HitIgnoreCallback
+  {
+  public:
+    explicit LightingBorderIgnoreCb (const Primitive* ignorePrim)
+      : ignorePrim (ignorePrim)
+    {}
+
+    virtual bool IgnoreHit (const Primitive* prim)
+    {
+      return (prim != ignorePrim) ||
+             (ignorePrim && 
+               !(prim->GetPlane () == ignorePrim->GetPlane ()));
+    }
+
+  private:
+    const Primitive* ignorePrim;
+  };
+  
+  
   //--
   PointLight::PointLight (Sector* o)
     : Light (o, true)
@@ -181,6 +237,8 @@ namespace lighter
   }
 
 
+
+
   ProxyLight::ProxyLight (Sector* owner, Light* parentLight, const csFrustum& frustum,
     const csReversibleTransform& transform, const csPlane3& portalPlane)
     : Light (owner, parentLight->IsDeltaLight ()), parent (parentLight),
@@ -191,7 +249,9 @@ namespace lighter
     SetPDLight (parent->IsPDLight ());
     SetColor (parent->GetColor ());
     SetLightID ((const char*)parent->GetLightID ().data);
+    SetName (parent->GetName ());
     lightFrustum = frustum;
+    boundingSphere = transform.Other2This (parentLight->GetBoundingSphere ());
 
     csPlane3 bp (portalPlane);
     bp.DD += bp.norm * lightFrustum.GetOrigin ();
@@ -230,7 +290,8 @@ namespace lighter
     csPlane3 transformedPlane;
     transformedPlane = proxyTransform.Other2This (portalPlane);
 
-    const csColor parentLight = parent->SampleLight (point, n, u1, u2, parentLightVec, pdf, vistest, &transformedPlane);
+    const csColor parentLight = parent->SampleLight (point, n, u1, u2, 
+      parentLightVec, pdf, vistest, &transformedPlane);
     lightVec = proxyTransform.Other2ThisRelative (parentLightVec);
 
     return parentLight;

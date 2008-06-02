@@ -78,5 +78,110 @@ public:
   int GetRefCount () const { return ref_count; }
 };
 
+namespace CS
+{
+  namespace Utility
+  {
+    /**
+     * This is a class which provides basic reference-counting semantics.  It can
+     * be used in conjunction with the smart pointer template class csRef (see
+     * <ref.h>).  This class itself provides no functionality beyond
+     * reference counting.  It is intended that you should subclass FastRefCount
+     * and add needed functionality.
+     *
+     * This class has slightly less overhead than csRefCount, but is also less
+     * generally useable: 
+     *  - Pointers can *not* be passed across plugin boundaries.
+     *  - Deriving from a class C derived from \a ActualClass without using a
+     *    virtual destructor in C can lead to the wrong destructor being
+     *    called.
+     *  - Using virtual methods eliminates the overhead advantage.
+     */
+    template<typename ActualClass>
+    class FastRefCount
+    {
+    protected:
+      int ref_count;
+
+      ~FastRefCount () 
+      {
+        csRefTrackerAccess::TrackDestruction (this, ref_count);
+      }
+
+    public:
+      /// Initialize object and set reference to 1.
+      FastRefCount () : ref_count (1) 
+      {
+        csRefTrackerAccess::TrackConstruction (this);
+      }
+
+      /// Increase the number of references to this object.
+      void IncRef () 
+      { 
+        csRefTrackerAccess::TrackIncRef (this, ref_count); 
+        ref_count++; 
+      }
+      /// Decrease the number of references to this object.
+      void DecRef ()
+      {
+        csRefTrackerAccess::TrackDecRef (this, ref_count);
+        ref_count--;
+        if (ref_count <= 0)
+          delete static_cast<ActualClass*> (this);
+      }
+      /// Get the reference count (only for debugging).
+      int GetRefCount () const { return ref_count; }
+    };
+
+    /**
+     * This class is used to hold a reference count seperate to the normal one.
+     * It allows the tracking of 'internal' references (such as those held by a
+     * collection), and the execution of some action when the ref count decrements
+     * to 0.
+     */
+    class InternalRefCount
+    {
+    protected:
+      int internal_ref_count;
+
+      // To be implemented as needed.
+      virtual void InternalRemove() { return; }
+
+      virtual ~InternalRefCount ()
+      {
+        csRefTrackerAccess::TrackDestruction (this, internal_ref_count);
+      }
+
+    public:
+      /// Initialize object and set internal references to 0.
+      InternalRefCount () : internal_ref_count (0)
+      {
+        csRefTrackerAccess::TrackConstruction (this);
+      }
+
+      /// Increase the number of internal references to this object.
+      void InternalIncRef()
+      {
+        csRefTrackerAccess::TrackIncRef (this, internal_ref_count);
+        internal_ref_count++;
+      }
+
+      /// Decrease the number of internal references to this object.
+      void InternalDecRef ()
+      {
+        csRefTrackerAccess::TrackDecRef (this, internal_ref_count);
+        internal_ref_count--;
+        if (internal_ref_count <= 0)
+        {
+          InternalRemove();
+        }
+      }
+
+      /// Get the reference count (only for debugging).
+      int GetInternalRefCount () const { return internal_ref_count; }
+    };
+  } // namespace Utility
+} // namespace CS
+
 #endif // __CS_REFCOUNT_H__
 

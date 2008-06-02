@@ -141,9 +141,11 @@ rule CompileObject
     # different from $(SEARCH_SOURCE).
     HDRS on $(<) = $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ;
 
-    # propagate target specific-defines
+    # propagate target specific defines
     DEFINES on $(<) += $(DEFINES) ;
   }
+  
+  $(<)_OBJECTS += $(targets) ;
 
   return $(targets) ;
 }
@@ -174,7 +176,7 @@ rule HeaderRule
     HDRGRIST on $(i) = $(HDRGRIST) ;
     HDRSEARCH on $(i) = $(HDRSEARCH) ;
     HDRRULE on $(i) = [ on $(<) GetVar HDRRULE ] ;
-    HDRSCAN on $(i) = [ on $(<) GetVar HDRPATTERN ] ;
+    HDRSCAN on $(i) = [ on $(<) GetVar HDRSCAN ] ;
   }
 }
 

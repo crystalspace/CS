@@ -642,9 +642,6 @@ void csMouseDriver::DoButton (uint number, int button, bool down,
     return;
 
   iKeyboardDriver* k = GetKeyboardDriver();
-  int smask = (k->GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
-            | (k->GetKeyState (CSKEY_ALT  ) ? CSMASK_ALT   : 0)
-            | (k->GetKeyState (CSKEY_CTRL ) ? CSMASK_CTRL  : 0);
 
   Button [number][button] = down;
 
@@ -665,7 +662,8 @@ void csMouseDriver::DoButton (uint number, int button, bool down,
 			  csevMouseDown(NameRegistry, number):
 			  csevMouseUp(NameRegistry, number)),
 		 number, down?csMouseEventTypeDown:csMouseEventTypeUp,
-		 axes, numAxes, 0, button, down, buttonMask, smask));
+		 axes, numAxes, 0, button, down, buttonMask, 
+                 k->GetModifiersState()));
   Post(ev);
 
   if ((button == LastClickButton[number])
@@ -685,7 +683,8 @@ void csMouseDriver::DoButton (uint number, int button, bool down,
 		   number, (down?csMouseEventTypeDoubleClick:
 			    csMouseEventTypeClick),
 		   axes, numAxes, 0, button, down, 
-		   buttonMask, smask));
+		   buttonMask, 
+                   k->GetModifiersState()));
     Post (ev);
     // Don't allow for sequential double click events
     if (down)
@@ -722,9 +721,6 @@ void csMouseDriver::DoMotion (uint number, const int32 *axes, uint numAxes)
     return; /* no change to report */
 
   iKeyboardDriver* k = GetKeyboardDriver();
-  int smask = (k->GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
-    | (k->GetKeyState (CSKEY_ALT  ) ? CSMASK_ALT   : 0)
-    | (k->GetKeyState (CSKEY_CTRL ) ? CSMASK_CTRL  : 0);
   memcpy(Last [number], axes, numAxes * sizeof(int));
   Axes [number] = numAxes;
 
@@ -742,7 +738,8 @@ void csMouseDriver::DoMotion (uint number, const int32 *axes, uint numAxes)
 		 csGetTicks (), csevMouseMove(NameRegistry, number),
 		 number, csMouseEventTypeMove,
 		 axes, numAxes, cflags, 0, false, 
-		 buttonMask, smask));
+		 buttonMask,
+                 k->GetModifiersState()));
   Post (ev);
 }
 
@@ -805,9 +802,6 @@ void csJoystickDriver::DoButton (uint number, int button, bool down,
     return;
 
   iKeyboardDriver* k = GetKeyboardDriver();
-  int smask = (k->GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
-            | (k->GetKeyState (CSKEY_ALT)   ? CSMASK_ALT   : 0)
-            | (k->GetKeyState (CSKEY_CTRL)  ? CSMASK_CTRL  : 0);
 
   Button [number][button] = down;
 
@@ -826,7 +820,8 @@ void csJoystickDriver::DoButton (uint number, int button, bool down,
 				 csevJoystickDown(NameRegistry, number):
 				 csevJoystickUp(NameRegistry, number)),
 		 number, axes, numAxes, 0, button, down, 
-		 buttonMask, smask));
+		 buttonMask,
+                 k->GetModifiersState()));
   Post(ev);
 }
 
@@ -853,9 +848,6 @@ void csJoystickDriver::DoMotion (uint number, const int32 *axes, uint numAxes)
     return; /* no change to report */
 
   iKeyboardDriver* k = GetKeyboardDriver();
-  int smask = (k->GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
-    | (k->GetKeyState (CSKEY_ALT)   ? CSMASK_ALT   : 0)
-    | (k->GetKeyState (CSKEY_CTRL)  ? CSMASK_CTRL  : 0);
   Axes [number] = numAxes;
 
   uint32 buttonMask = 0;
@@ -871,6 +863,6 @@ void csJoystickDriver::DoMotion (uint number, const int32 *axes, uint numAxes)
 		(NameRegistry,
 		 csGetTicks(), csevJoystickMove(NameRegistry, number),
 		 number, axes, numAxes, cflags, 0, false, 
-		 buttonMask, smask));
+		 buttonMask, k->GetModifiersState()));
   Post(ev);
 }

@@ -47,7 +47,7 @@ CS_IMPLEMENT_STATIC_VAR (GetRLMAlloc, csRLMAlloc, ())
 
 void csGLRendererLightmap::DecRef ()
 {
-  csRefTrackerAccess::TrackDecRef (scfObject, scfRefCount);
+  csRefTrackerAccess::TrackDecRef (GetSCFObject(), scfRefCount);
   scfRefCount--;							
   if (scfRefCount == 0)							
   {									
@@ -122,7 +122,7 @@ void csGLRendererLightmap::SetLightCellSize (int size)
 
 void csGLSuperLightmap::DecRef ()
 {
-  csRefTrackerAccess::TrackDecRef (scfObject, scfRefCount);
+  csRefTrackerAccess::TrackDecRef (GetSCFObject(), scfRefCount);
   scfRefCount--;							
   if (scfRefCount == 0)							
   {
@@ -244,7 +244,7 @@ csPtr<iImage> csGLSuperLightmap::Dump ()
 {
   // @@@ hmm... or just return an empty image?
   if (texHandle == (GLuint)~0) return 0;
-
+    
   GLint tw, th;
   csGLGraphics3D::statecache->SetTexture (GL_TEXTURE_2D, texHandle);
 
@@ -268,7 +268,7 @@ iTextureHandle* csGLSuperLightmap::GetTexture ()
   {
     CreateTexture ();
     th.AttachNew (new csGLBasicTextureHandle (
-      txtmgr->G3D, iTextureHandle::CS_TEX_IMG_2D, texHandle));
+      txtmgr->G3D, iTextureHandle::texType2D, texHandle));
   }
   return th;
 }

@@ -311,7 +311,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     csRefArray<iParticleEffector> effectors;
   };
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
   /**
   * Particle mesh object
@@ -461,11 +461,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     /**\name iObjectModel implementation
      * @{ */
     virtual const csBox3& GetObjectBoundingBox ();
-
-    virtual void GetObjectBoundingBox (csBox3& bbox)
-    {
-      bbox = GetObjectBoundingBox ();
-    }
 
     virtual void SetObjectBoundingBox (const csBox3& bbox);
 
@@ -724,7 +719,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 
   };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 }
 CS_PLUGIN_NAMESPACE_END(Particles)

@@ -34,6 +34,7 @@ WALKALL.PLUGINLIST =
   dynavis
   particles
   particlesldr
+  ptpdlight
   emit
   emitldr
   engine
@@ -42,6 +43,7 @@ WALKALL.PLUGINLIST =
   frustvis
   genmesh
   gmeshanim
+  gmeshanimpdl
   gmeshldr
   gmeshskelanim2
   skeleton
@@ -62,6 +64,7 @@ WALKALL.PLUGINLIST =
   simpleformerldr
   bruteblock
   terrainldr
+  shaderweaver
   spr2d
   spr2dldr
   spr3d

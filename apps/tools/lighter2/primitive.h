@@ -22,44 +22,21 @@
 #include "csutil/set.h"
 
 #include "common.h"
+#include "swappable.h"
 #include "vertexdata.h"
 
 namespace lighter
 {
   class Object;
   struct ElementProxy;
+  struct RadMaterial;
 
   class Primitive;
-
-  class ElementAreas: public CS::Memory::CustomAllocated
+  
+  enum PrimitiveFlags
   {
-    friend class Primitive;
-    
-    float fullArea;
-    size_t elementCount;
-
-    csBitArray elementsBits;
-    struct ElementFloatPair
-    {
-      size_t element;
-      float area;
-    };
-    csArray<ElementFloatPair> fractionalElements;
-
-    void DeleteAll();
-    void SetFullArea (float fullArea) { this->fullArea = fullArea; }
-    void SetSize (size_t count);
-    void SetElementArea (size_t element, float area);
-    void ShrinkBestFit ();
-
-    static int ElementFloatPairCompare (const ElementFloatPair& i1,
-      const ElementFloatPair& i2);
-    static int ElementFloatPairSearch (const ElementFloatPair& item,
-      const size_t& key);
-  public:
-    float GetElementArea (size_t element) const;
-    size_t GetSize() const { return elementCount; }
   };
+
 
   /**
    * Primitive in the radiosity world.
@@ -117,6 +94,8 @@ namespace lighter
     inline const ObjectBaseVertexData& GetVertexData () const 
     { return *vertexData; }
 
+    inline csFlags& GetFlags () { return flags; }
+    inline const csFlags& GetFlags () const { return flags; }
   protected:
     /// Vertex data holder
     ObjectBaseVertexData* vertexData;
@@ -128,6 +107,8 @@ namespace lighter
     /* Plane normal seems to point into opposite direction compared to e.g.
      * auto-computed vertex normals. (FIXME?) */
     csPlane3 plane;
+    
+    csFlags flags;
   };
 
   class FactoryPrimitive : public PrimitiveBase
@@ -149,6 +130,9 @@ namespace lighter
   class Primitive : public PrimitiveBase
   {
   public:
+    enum ElementType
+    {ELEMENT_EMPTY, ELEMENT_BORDER, ELEMENT_INSIDE};
+
     inline Primitive (ObjectVertexData &dataHolder) 
       : PrimitiveBase (&dataHolder), uFormVector (0), vFormVector (0), 
         /*illuminationColor (0,0,0), reflectanceColor (1.0f,1.0f,1.0f), */
@@ -157,11 +141,12 @@ namespace lighter
     {
     }
     inline Primitive (const Primitive& other) 
-      : PrimitiveBase (other), elementAreas (other.elementAreas), 
+      : PrimitiveBase (other), elementClassification (other.elementClassification), 
         uFormVector (other.uFormVector), vFormVector (other.uFormVector), 
         minCoord (other.minCoord), minUV (other.minUV), maxUV (other.maxUV), 
         radObject (other.radObject), globalLightmapID (other.globalLightmapID),
-        lambdaCoeffTV (other.lambdaCoeffTV), myCoeffTV (other.myCoeffTV)
+        lambdaCoeffTV (other.lambdaCoeffTV), myCoeffTV (other.myCoeffTV),
+        material (0)
     {
     }
     inline ~Primitive () { }
@@ -177,8 +162,26 @@ namespace lighter
     /// Given an element index, compute center point
     csVector3 ComputeElementCenter (size_t index) const;
 
+    /// Given an element index, compute the fractional size of it
+    float ComputeElementFraction (size_t index) const;
+
     /// Get interpolated normal at point
     csVector3 ComputeNormal (const csVector3& point) const;
+
+    /// Get interpolated UV coords at point
+    csVector2 ComputeUV (const csVector3& point) const;
+
+    void ComputeCustomData (const csVector3& point, 
+      size_t customData, size_t numComps, float* out) const;
+
+    template<typename T>
+    T ComputeCustomData (const csVector3& point, size_t customData) const
+    {
+      const size_t comps = sizeof (T) / sizeof (float);
+      T r;
+      ComputeCustomData (point, customData, comps, (float*)&r);
+      return r;
+    }
 
     /// Calculate min-max UV-coords
     void ComputeMinMaxUV (csVector2 &min, csVector2 &max) const;
@@ -188,16 +191,20 @@ namespace lighter
     {
       csVector2 min, max;
       ComputeMinMaxUV (min, max);
-      minU = (int)floor (min.x);
-      minV = (int)floor (min.y);
-      maxU = (int)ceil (max.x);
-      maxV = (int)ceil (max.y);
+      minU = (int)floorf (min.x);
+      minV = (int)floorf (min.y);
+      maxU = (int)ceilf (max.x);
+      maxV = (int)ceilf (max.y);
     }
 
     using PrimitiveBase::ComputeMinMaxUV;
 
     /// Calculate the u/v form vectors
     void ComputeUVTransform ();
+
+    /// Update quadrant offsets
+    uint RecomputeQuadrantOffset (size_t element, 
+      const csVector2 inOffsets[4], csVector2 outOffsets[4]) const;
 
     /// Compute if point is inside primitive or not
     bool PointInside (const csVector3& pt) const;
@@ -208,16 +215,23 @@ namespace lighter
     /// Get number of elements
     size_t GetElementCount () const
     {
-      return elementAreas.GetSize ();
+      return elementClassification.GetSize () / 2;
     }
 
     /// Get u/v offset of element
     inline void GetElementUV (size_t elementIndex, size_t &u, size_t &v) const
     {
-      size_t uWidth = size_t (maxUV.x - minUV.x + 1);
+      u = (elementIndex % countU);
+      v = (elementIndex / countU);
+    }
 
-      u = (elementIndex % uWidth);
-      v = (elementIndex / uWidth);
+    /// Get classification of element
+    inline ElementType GetElementType (size_t elementIndex) const
+    {
+      bool isSet = elementClassification.IsBitSet (2*(elementIndex));
+      bool isFull = elementClassification.IsBitSet (2*(elementIndex)+1);
+
+      return isSet ? (isFull ? ELEMENT_INSIDE : ELEMENT_BORDER) : ELEMENT_EMPTY;
     }
 
     /// Get an element proxy given element index
@@ -234,11 +248,6 @@ namespace lighter
     inline const csVector3& GetuFormVector () const { return uFormVector; }
     inline const csVector3& GetvFormVector () const { return vFormVector; }
 
-    /*inline const csColor& GetIlluminationColor () const { return illuminationColor; }
-    inline const csColor& GetReflectanceColor () const { return reflectanceColor; }*/
-
-    inline const ElementAreas& GetElementAreas () const { return elementAreas; }
-
     inline const csVector3& GetMinCoord () const { return minCoord; }
     inline const csVector2& GetMinUV () const { return minUV; }
     inline const csVector2& GetMaxUV () const { return maxUV; }
@@ -250,11 +259,13 @@ namespace lighter
     inline uint GetGlobalLightmapID () const { return globalLightmapID; }
     inline void SetGlobalLightmapID (uint id) { globalLightmapID = id; }
 
-    
+    inline const RadMaterial* GetMaterial () const { return material; }
+    inline void SetMaterial (const RadMaterial* mat) { material = mat; }
 protected:
     //@{
     /// Elements
-    ElementAreas elementAreas;
+    //ElementAreas elementAreas;
+    csBitArray elementClassification;
     //@}
 
     /// Mapping vectors
@@ -269,6 +280,8 @@ protected:
     csVector3 minCoord;
     csVector2 minUV;
     csVector2 maxUV;
+
+    size_t countU, countV;
 
     /// Original object
     Object* radObject;
@@ -287,6 +300,8 @@ protected:
     csVector3 lambdaCoeffTV, myCoeffTV;
 
     void ComputeBaryCoeffs ();
+    
+    const RadMaterial* material;
   };
 
   typedef csArray<FactoryPrimitive> FactoryPrimitiveArray;

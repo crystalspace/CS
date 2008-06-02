@@ -29,7 +29,6 @@
 #include "csutil/sysfunc.h"
 #include "iengine/camera.h"
 #include "iengine/movable.h"
-#include "igeom/polymesh.h"
 #include "iutil/string.h"
 
 #include "exvis.h"
@@ -290,126 +289,6 @@ void csExactCuller::AddObject (void* obj,
       csPoly3D front, back;
       csPoly3D* spoly;
       if (!(vis[tri->a] && vis[tri->b] && vis[tri->c]))
-      {
-        clippoly.SplitWithPlaneZ (front, back, 0.1f);
-	spoly = &back;
-      }
-      else
-      {
-        spoly = &clippoly;
-      }
-      csVector2 clipped[100];
-      size_t num_clipped = spoly->GetVertexCount ();
-      csBox2 out_box;
-      out_box.StartBoundingBox ();
-      for (size_t k = 0 ; k < spoly->GetVertexCount () ; k++)
-      {
-        Perspective ((*spoly)[k], clipped[k], fov, sx, sy);
-	out_box.AddBoundingVertex (clipped[k]);
-      }
-      if (boxclip->ClipInPlace (clipped, num_clipped, out_box)
-      	!= CS_CLIP_OUTSIDE)
-      {
-	//csPlane3 camplane = trans.Other2This (planes[i]);
-        csPlane3 camplane;
-	trans.Other2This (planes[i], (*spoly)[0], camplane);
-//csPrintf ("    %g,%g,%g\n", (*spoly)[0].x, (*spoly)[0].y, (*spoly)[0].z);
-//csPrintf ("    planes[i] %g,%g,%g,%g\n",
-//planes[i].A (), planes[i].B (), planes[i].C (), planes[i].D ());
-//csPrintf ("    camplane %g,%g,%g,%g\n",
-//camplane.A (), camplane.B (), camplane.C (), camplane.D ());
-	if (ABS (camplane.D ()) < 0.001)
-	  continue;
-	float M, N, O;
-	float inv_D = 1.0 / camplane.D ();
-	M = -camplane.A () * inv_D / fov;
-	N = -camplane.B () * inv_D / fov;
-	O = -camplane.C () * inv_D;
-//csPrintf ("    MNO %g,%g,%g\n", M, N, O);
-//fflush (stdout);
-
-        int totpix;
-        InsertPolygon (clipped, num_clipped, M, N, O,
-		num_objects-1, totpix);
-        objects[num_objects-1].totpix += totpix;
-      }
-    }
-  }
-
-  delete[] vis;
-}
-
-void csExactCuller::AddObject (void* obj,
-	iPolygonMesh* polymesh, iMovable* movable, iCamera* camera,
-	const csPlane3* planes)
-{
-  if (num_objects >= max_objects)
-  {
-    if (max_objects < 10000)
-      max_objects += max_objects+1;
-    else
-      max_objects += 2000;
-    csExVisObj* new_objects = new csExVisObj [max_objects];
-    memcpy (new_objects, objects, sizeof (csExVisObj)*num_objects);
-    delete[] objects;
-    objects = new_objects;
-  }
-
-  objects[num_objects].obj = obj;
-  objects[num_objects].totpix = 0;
-  objects[num_objects].vispix = 0;
-  num_objects++;
-
-  const csVector3* verts = polymesh->GetVertices ();
-  int vertex_count = polymesh->GetVertexCount ();
-  int poly_count = polymesh->GetPolygonCount ();
-
-  csReversibleTransform movtrans = movable->GetFullTransform ();
-  const csReversibleTransform& camtrans = camera->GetTransform ();
-  csReversibleTransform trans = camtrans / movtrans;
-  float fov = camera->GetFOV ();
-  float sx = camera->GetShiftX ();
-  float sy = camera->GetShiftY ();
-
-  // Calculate camera position in object space.
-  csVector3 campos_object = movtrans.Other2This (camtrans.GetOrigin ());
-
-  int i;
-  // First check visibility of all vertices.
-  bool* vis = new bool[vertex_count];
-  for (i = 0 ; i < vertex_count ; i++)
-  {
-    csVector3 camv = trans.Other2This (verts[i]);
-    vis[i] = (camv.z > 0.1);
-  }
-
-  // Then insert all polygons.
-  csMeshedPolygon* poly = polymesh->GetPolygons ();
-  for (i = 0 ; i < poly_count ; i++, poly++)
-  {
-    if (planes[i].Classify (campos_object) >= 0.0)
-      continue;
-
-    int num_verts = poly->num_vertices;
-    int* vi = poly->vertices;
-    int j;
-    int cnt_vis = 0;
-    for (j = 0 ; j < num_verts ; j++)
-    {
-      if (vis[vi[j]]) cnt_vis++;
-    }
-    if (cnt_vis > 0)
-    {
-      // Here we need to clip the polygon.
-      csPoly3D clippoly;
-      for (j = 0 ; j < num_verts ; j++)
-      {
-        csVector3 camv = trans.Other2This (verts[vi[j]]);
-        clippoly.AddVertex (camv);
-      }
-      csPoly3D front, back;
-      csPoly3D* spoly;
-      if (cnt_vis < num_verts)
       {
         clippoly.SplitWithPlaneZ (front, back, 0.1f);
 	spoly = &back;

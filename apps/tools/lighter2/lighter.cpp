@@ -40,7 +40,7 @@ namespace lighter
   Lighter* globalLighter;
 
   Lighter::Lighter (iObjectRegistry *objectRegistry)
-    : objectRegistry (objectRegistry), scene (new Scene),
+    : objectRegistry (objectRegistry), swapManager (0), scene (new Scene),
       progStartup ("Starting up", 5),
       progLoadFiles ("Loading files", 2),
       progLightmapLayout ("Lightmap layout", 5),
@@ -48,7 +48,6 @@ namespace lighter
       progInitializeMain ("Initialize objects", 10),
         progInitialize (0, 3, &progInitializeMain),
         progInitializeLightmaps ("Lightmaps", 3, &progInitializeMain),
-          progInitializeLM (0, 3, &progInitializeLightmaps),
           progPrepareLighting (0, 5, &progInitializeLightmaps),
             progPrepareLightingUVL (0, 95, &progPrepareLighting),
             progPrepareLightingSector (0, 5, &progPrepareLighting),
@@ -78,9 +77,10 @@ namespace lighter
     // Initialize it
     if (!Initialize ()) return 1;
 
-    // Common baby light my fire
+    // Come on baby light my fire
     if (!LightEmUp ()) return 1;
 
+    // We couldn't get much higher
     return 0;
   }
 
@@ -93,7 +93,7 @@ namespace lighter
     if (csCommandLineHelper::CheckHelp (objectRegistry, cmdLine))
     {
       CommandLineHelp ();
-      return true;
+      return false;
     }
 
     // Load config
@@ -110,9 +110,33 @@ namespace lighter
     globalConfig.Initialize ();
     globalTUI.Initialize ();
     {
-      int maxSwapSize = configMgr->GetInt ("lighter2.swapcachesize", 
-        200)*1024*1024;
+      // Attempt to detect physical memory installed.
+      size_t maxSwapSize = CS::Platform::GetPhysicalMemorySize();
+      if(maxSwapSize)
+      {
+        // Convert physical memory to megabytes, and use 3/4 of memory as the limit.
+        maxSwapSize /= size_t (1024/0.75f);
+      }
+      else
+      {
+          maxSwapSize = 200;
+      }
+      // Check for override.
+      maxSwapSize = (size_t)(configMgr->GetInt ("lighter2.swapcachesize", (int)maxSwapSize)*1024*1024);
       swapManager = new SwapManager (maxSwapSize);
+    }
+
+    rayDebug.SetFilterExpression (globalConfig.GetDebugProperties().rayDebugRE);
+
+    // Setup the job manager
+    if (globalConfig.GetLighterProperties ().numThreads <= 1)
+    {
+      jobManager.AttachNew (new CS::Utility::SimpleJobQueue);
+    }
+    else
+    {
+      jobManager.AttachNew (new CS::Threading::ThreadedJobQueue (
+        globalConfig.GetLighterProperties ().numThreads));
     }
 
     // Initialize the TUI
@@ -130,6 +154,22 @@ namespace lighter
 
       // Set ourselves up as a reporterlistener
       rep->AddReporterListener (&globalTUI);
+      
+      csRef<iStandardReporterListener> stdrep = 
+        csQueryRegistryOrLoad<iStandardReporterListener> (objectRegistry, 
+        "crystalspace.utilities.stdrep");
+      // Set up standard listener to also report to lighter2.log
+      stdrep->SetDebugFile ("/this/lighter2.log");
+      stdrep->SetMessageDestination (CS_REPORTER_SEVERITY_BUG, false, false, 
+        false, false, true, false);
+      stdrep->SetMessageDestination (CS_REPORTER_SEVERITY_ERROR, false, false, 
+        false, false, true, false);
+      stdrep->SetMessageDestination (CS_REPORTER_SEVERITY_WARNING, false, false, 
+        false, false, true, false);
+      stdrep->SetMessageDestination (CS_REPORTER_SEVERITY_NOTIFY, false, false, 
+        false, false, true, false);
+      stdrep->SetMessageDestination (CS_REPORTER_SEVERITY_DEBUG, false, false, 
+        false, false, true, false);
     }
     
     // Get plugins
@@ -151,6 +191,7 @@ namespace lighter
     engine = csQueryRegistry<iEngine> (objectRegistry);
     if (!engine) return Report ("No iEngine!");
     engine->SetSaveableFlag (true);
+    engine->SetDefaultKeepImage (true);
 
     imageIO = csQueryRegistry<iImageIO> (objectRegistry);
     if (!imageIO) return Report ("No iImageIO!");
@@ -169,8 +210,9 @@ namespace lighter
     if (!csInitializer::OpenApplication (objectRegistry))
       return Report ("Error opening system!");
 
-    // For now, force the use of TinyXML to be able to write
-    docSystem.AttachNew (new csTinyDocumentSystem);
+    docSystem = csQueryRegistry<iDocumentSystem> (objectRegistry);
+    if (!docSystem) 
+      docSystem.AttachNew (new csTinyDocumentSystem);
 
     progStartup.SetProgress (1);
     return true;
@@ -179,7 +221,9 @@ namespace lighter
   void Lighter::CleanUp ()
   {
     delete scene; scene = 0;
+    
     delete swapManager; swapManager = 0;
+    
     engine.Invalidate ();
   }
 
@@ -189,199 +233,55 @@ namespace lighter
     if (!LoadFiles (progLoadFiles)) 
       return false;
 
-    size_t updateFreq, u;
-    float progressStep;
-
-    progLightmapLayout.SetProgress (0);
     // Calculate lightmapping coordinates
-    csRef<LightmapUVFactoryLayouter> uvLayout;
-    uvLayout.AttachNew (new SimpleUVFactoryLayouter (scene->GetLightmaps()));
-
-    u = updateFreq = progLightmapLayout.GetUpdateFrequency (
-      scene->GetFactories ().GetSize ());
-    progressStep = updateFreq * (1.0f / scene->GetFactories ().GetSize ());
-    ObjectFactoryHash::GlobalIterator factIt = 
-      scene->GetFactories ().GetIterator ();
-    while (factIt.HasNext ())
-    {
-      csRef<ObjectFactory> fact = factIt.Next ();
-      fact->PrepareLightmapUV (uvLayout);
-      if (--u == 0)
-      {
-        progLightmapLayout.IncProgress (progressStep);
-        u = updateFreq;
-      }
-    }
-    progLightmapLayout.SetProgress (1);
-
-    if (!scene->SaveWorldFactories (progSaveFactories)) return false;
+    CalculateLightmaps ();
+   
+    if (!scene->SaveWorldFactories (progSaveFactories)) 
+      return false;
     scene->GetFactories ().DeleteAll();
 
     // Initialize all objects
-    progInitialize.SetProgress (0);
-    progressStep = 1.0f / scene->GetSectors ().GetSize();
-    SectorHash::GlobalIterator sectIt = 
-      scene->GetSectors ().GetIterator ();
-    while (sectIt.HasNext ())
-    {
-      csRef<Sector> sect = sectIt.Next ();
-
-      Statistics::Progress* progSector = 
-        progInitialize.CreateProgress (progressStep);
-      sect->Initialize (*progSector);
-      delete progSector;
-    }
-    progInitialize.SetProgress (1);
-
-    progInitializeLM.SetProgress (0);
-    u = updateFreq = progInitializeLM.GetUpdateFrequency (
-      scene->GetLightmaps().GetSize());
-    progressStep = updateFreq * (1.0f / scene->GetLightmaps().GetSize());
-    for (size_t i = 0; i < scene->GetLightmaps().GetSize(); i++)
-    {
-      Lightmap * lm = scene->GetLightmaps ()[i];
-      lm->Initialize();
-      if (--u == 0)
-      {
-        progInitializeLM.IncProgress (progressStep);
-        u = updateFreq;
-      }
-    }
-    progInitializeLM.SetProgress (1);
-
-    uvLayout->PrepareLighting (progPrepareLightingUVL);
-    uvLayout.Invalidate();
+    InitializeObjects ();    
     
-    progPrepareLightingSector.SetProgress (0);
-    progressStep = 1.0f / scene->GetSectors ().GetSize();
-    sectIt.Reset();
-    while (sectIt.HasNext ())
-    {
-      csRef<Sector> sect = sectIt.Next ();
+    // Prepare lighting of all objects
+    PrepareLighting ();
 
-      Statistics::Progress* progSector = 
-        progPrepareLightingSector.CreateProgress (progressStep);
-      sect->PrepareLighting (*progSector);
-      delete progSector;
-    }
-    progPrepareLightingSector.SetProgress (1);
-
-    if (!scene->SaveWorldMeshes (progSaveMeshes)) return false;
-    if (!scene->FinishWorldSaving (progSaveFinish)) return false;
+    // Save all data to the meshes
+    if (!scene->SaveWorldMeshes (progSaveMeshes)) 
+      return false;
+    if (!scene->FinishWorldSaving (progSaveFinish)) 
+      return false;
 
     /* TODO: the global lightmaps' subrect allocators are not needed any
 	     more, discard contents. */
 
-    progBuildKDTree.SetProgress (0);
-    progressStep = 1.0f / scene->GetSectors ().GetSize();
-    sectIt.Reset();
-    while (sectIt.HasNext ())
-    {
-      csRef<Sector> sect = sectIt.Next ();
-
-      Statistics::Progress* progSector = 
-        progBuildKDTree.CreateProgress (progressStep);
-      sect->BuildKDTree (*progSector);
-      delete progSector;
-    }
-    progBuildKDTree.SetProgress (1);
+    // Build the KD-trees
+    BuildKDTrees ();
    
     // Shoot direct lighting
-    if (globalConfig.GetLighterProperties ().doDirectLight)
-    {
-      DirectLighting::Initialize ();
-      progDirectLighting.SetProgress (0);
-      float sectorProgress = 1.0f / scene->GetSectors ().GetSize();
-      sectIt.Reset ();
-      while (sectIt.HasNext ())
-      {
-        csRef<Sector> sect = sectIt.Next ();
-        Statistics::Progress* lightProg = 
-          progDirectLighting.CreateProgress (sectorProgress);
-        DirectLighting::ShadeDirectLighting (sect, *lightProg);
-        delete lightProg;
-      }
-      progDirectLighting.SetProgress (1);
-    }
+    DoDirectLighting ();   
 
     //@@ DO OTHER LIGHTING
 
-    progPostproc.SetProgress (0);
-    // De-antialias the lightmaps
-    {
-      LightmapMaskPtrDelArray lmMasks;
-      LightmapPtrDelArray::Iterator lmIt = scene->GetLightmaps ().GetIterator ();
-      while (lmIt.HasNext ())
-      {
-        const Lightmap* lm = lmIt.Next ();
-        lmMasks.Push (new LightmapMask (*lm));
-      }
-
-      progPostprocSector.SetProgress (0);
-      float sectorProgress = 1.0f / scene->GetSectors ().GetSize();
-      sectIt.Reset ();
-      while (sectIt.HasNext ())
-      {
-        csRef<Sector> sect = sectIt.Next ();
-        Statistics::Progress* progSector = 
-          progPostprocSector.CreateProgress (sectorProgress);
-
-        u = updateFreq = 
-          progSector->GetUpdateFrequency (sect->allObjects.GetSize());
-        progressStep = updateFreq * (1.0f / sect->allObjects.GetSize());
-        ObjectHash::GlobalIterator objIt = sect->allObjects.GetIterator ();
-        while (objIt.HasNext ())
-        {
-          csRef<Object> obj = objIt.Next ();
-          obj->FillLightmapMask (lmMasks);
-          if (--u == 0)
-          {
-            progSector->IncProgress (progressStep);
-            u = updateFreq;
-          }
-        }
-        progSector->SetProgress (1);
-        delete progSector;
-      }
-      progPostprocSector.SetProgress (1);
-
-      progPostprocLM.SetProgress (0);
-      csArray<LightmapPtrDelArray*> allLightmaps (scene->GetAllLightmaps());
-      float lightmapStep = 1.0f / allLightmaps.GetSize();
-      for (size_t li = 0; li < allLightmaps.GetSize (); ++li)
-      {
-        LightmapPtrDelArray& lightmaps = *allLightmaps[li];
-
-        Statistics::Progress* progLM = 
-          progPostprocLM.CreateProgress (lightmapStep);
-        u = updateFreq = progLM->GetUpdateFrequency (lightmaps.GetSize());
-        progressStep = updateFreq * (1.0f / lightmaps.GetSize());
-
-        for (size_t lmI = 0; lmI < lightmaps.GetSize (); ++lmI)
-        {
-          lightmaps[lmI]->FixupLightmap (*(lmMasks[lmI]));
-          if (--u == 0)
-          {
-            progLM->IncProgress (progressStep);
-            u = updateFreq;
-          }
-        }
-        progLM->SetProgress (1);
-        delete progLM;
-      }
-      progPostprocLM.SetProgress (1);
-    }
+    // Postprocessing of ligthmaps
+    PostprocessLightmaps ();
 
     //Save the result
-    if (!scene->SaveLightmaps (progSaveResult)) return false;
-    if (!scene->SaveMeshesPostLighting (progSaveMeshesPostLight)) return false;
-    if (!scene->ApplyWorldChanges (progApplyWorldChanges)) return false;
+    if (!scene->SaveLightmaps (progSaveResult)) 
+      return false;
+    if (!scene->SaveMeshesPostLighting (progSaveMeshesPostLight)) 
+      return false;
+    scene->CleanLightingData ();
+    if (!scene->ApplyWorldChanges (progApplyWorldChanges)) 
+      return false;
 
     progCleanup.SetProgress (0);
     CleanUp ();
     progCleanup.SetProgress (1);
 
     progFinished.SetProgress (1);
+
+    globalTUI.FinishDraw ();
 
     return true;  
   }
@@ -421,6 +321,198 @@ namespace lighter
     
     // Load the files
     return scene->LoadFiles (progress);
+  }
+
+  void Lighter::CalculateLightmaps ()
+  {
+    size_t updateFreq, u;
+    float progressStep;
+
+    progLightmapLayout.SetProgress (0);
+    // Calculate lightmapping coordinates  
+    uvLayout.AttachNew (new SimpleUVFactoryLayouter (scene->GetLightmaps()));
+
+    u = updateFreq = progLightmapLayout.GetUpdateFrequency (
+      scene->GetFactories ().GetSize ());
+    progressStep = updateFreq * (1.0f / scene->GetFactories ().GetSize ());
+    ObjectFactoryHash::GlobalIterator factIt = 
+      scene->GetFactories ().GetIterator ();
+    while (factIt.HasNext ())
+    {
+      csRef<ObjectFactory> fact = factIt.Next ();
+      fact->PrepareLightmapUV (uvLayout);
+      if (--u == 0)
+      {
+        progLightmapLayout.IncProgress (progressStep);
+        u = updateFreq;
+      }
+    }
+    progLightmapLayout.SetProgress (1);
+  }
+
+  void Lighter::InitializeObjects ()
+  {
+    progInitialize.SetProgress (0);
+    const float progressStep = 1.0f / scene->GetSectors ().GetSize();
+    SectorHash::GlobalIterator sectIt = 
+      scene->GetSectors ().GetIterator ();
+    while (sectIt.HasNext ())
+    {
+      csRef<Sector> sect = sectIt.Next ();
+
+      Statistics::Progress* progSector = 
+        progInitialize.CreateProgress (progressStep);
+      sect->Initialize (*progSector);
+      delete progSector;
+    }
+    progInitialize.SetProgress (1);
+  }
+
+  void Lighter::PrepareLighting ()
+  {
+    uvLayout->PrepareLighting (progPrepareLightingUVL);
+    uvLayout.Invalidate();
+
+    progPrepareLightingSector.SetProgress (0);
+    const float progressStep = 1.0f / scene->GetSectors ().GetSize();
+    SectorHash::GlobalIterator sectIt = 
+      scene->GetSectors ().GetIterator ();
+    while (sectIt.HasNext ())
+    {
+      csRef<Sector> sect = sectIt.Next ();
+
+      Statistics::Progress* progSector = 
+        progPrepareLightingSector.CreateProgress (progressStep);
+      sect->PrepareLighting (*progSector);
+      delete progSector;
+    }
+    progPrepareLightingSector.SetProgress (1);
+  }
+
+  void Lighter::BuildKDTrees ()
+  {
+    progBuildKDTree.SetProgress (0);
+    const float progressStep = 1.0f / scene->GetSectors ().GetSize();
+    SectorHash::GlobalIterator sectIt = 
+      scene->GetSectors ().GetIterator ();
+    while (sectIt.HasNext ())
+    {
+      csRef<Sector> sect = sectIt.Next ();
+
+      Statistics::Progress* progSector = 
+        progBuildKDTree.CreateProgress (progressStep);
+      sect->BuildKDTree (*progSector);
+      delete progSector;
+    }
+    progBuildKDTree.SetProgress (1);
+  }
+
+  void Lighter::DoDirectLighting ()
+  {
+    progDirectLighting.SetProgress (0);
+    if (globalConfig.GetLighterProperties ().doDirectLight)
+    {
+      int numDLPasses = 
+        globalConfig.GetLighterProperties().directionalLMs ? 4 : 1;
+      const csVector3 bases[4] =
+      {
+        csVector3 (0, 0, 1),
+        csVector3 (/* -1/sqrt(6) */ -0.408248f, /* 1/sqrt(2) */ 0.707107f, /* 1/sqrt(3) */ 0.577350f),
+        csVector3 (/* sqrt(2/3) */ 0.816497f, 0, /* 1/sqrt(3) */ 0.577350f),
+        csVector3 (/* -1/sqrt(6) */ -0.408248f, /* -1/sqrt(2) */ -0.707107f, /* 1/sqrt(3) */ 0.577350f)
+      };
+      float sectorProgress = 
+        1.0f / (numDLPasses * scene->GetSectors ().GetSize());
+      for (int p = 0; p < numDLPasses; p++)
+      {
+        DirectLighting lighting (bases[p], p);
+
+        SectorHash::GlobalIterator sectIt = 
+          scene->GetSectors ().GetIterator ();
+        while (sectIt.HasNext ())
+        {
+          csRef<Sector> sect = sectIt.Next ();
+          Statistics::Progress* lightProg = 
+            progDirectLighting.CreateProgress (sectorProgress);
+          lighting.ShadeDirectLighting (sect, *lightProg);
+          delete lightProg;
+        }
+      }
+      progDirectLighting.SetProgress (1);
+    }
+  }
+
+  void Lighter::PostprocessLightmaps ()
+  {
+    size_t realNumLMs = scene->GetLightmaps ().GetSize ();
+    if (globalConfig.GetLighterProperties().directionalLMs)
+      realNumLMs /= 4;
+    progPostproc.SetProgress (0);
+    // De-antialias the lightmaps
+    LightmapMaskPtrDelArray lmMasks;
+    for (size_t l = 0; l < realNumLMs; l++)
+    {
+      const Lightmap* lm = scene->GetLightmaps ()[l];
+      lmMasks.Push (new LightmapMask (*lm));
+    }
+
+    progPostprocSector.SetProgress (0);
+    const float sectorProgress = 1.0f / scene->GetSectors ().GetSize();
+    SectorHash::GlobalIterator sectIt = 
+      scene->GetSectors ().GetIterator ();
+
+    while (sectIt.HasNext ())
+    {
+      csRef<Sector> sect = sectIt.Next ();
+      Statistics::Progress* progSector = 
+        progPostprocSector.CreateProgress (sectorProgress);
+
+      size_t u, updateFreq;
+      u = updateFreq = 
+        progSector->GetUpdateFrequency (sect->allObjects.GetSize());
+      const float progressStep = updateFreq * (1.0f / sect->allObjects.GetSize());
+      ObjectHash::GlobalIterator objIt = sect->allObjects.GetIterator ();
+      while (objIt.HasNext ())
+      {
+        csRef<Object> obj = objIt.Next ();
+        obj->FillLightmapMask (lmMasks);
+        if (--u == 0)
+        {
+          progSector->IncProgress (progressStep);
+          u = updateFreq;
+        }
+      }
+      progSector->SetProgress (1);
+      delete progSector;
+    }
+    progPostprocSector.SetProgress (1);
+
+    progPostprocLM.SetProgress (0);
+    csArray<LightmapPtrDelArray*> allLightmaps (scene->GetAllLightmaps());
+    float lightmapStep = 1.0f / allLightmaps.GetSize();
+    for (size_t li = 0; li < allLightmaps.GetSize (); ++li)
+    {
+      LightmapPtrDelArray& lightmaps = *allLightmaps[li];
+
+      Statistics::Progress* progLM = 
+        progPostprocLM.CreateProgress (lightmapStep);
+      size_t u, updateFreq;
+      u = updateFreq = progLM->GetUpdateFrequency (lightmaps.GetSize());
+      const float progressStep = updateFreq * (1.0f / lightmaps.GetSize());
+
+      for (size_t lmI = 0; lmI < lightmaps.GetSize (); ++lmI)
+      {
+        lightmaps[lmI]->FixupLightmap (*(lmMasks[lmI % realNumLMs]));
+        if (--u == 0)
+        {
+          progLM->IncProgress (progressStep);
+          u = updateFreq;
+        }
+      }
+      progLM->SetProgress (1);
+      delete progLM;
+    }
+    progPostprocLM.SetProgress (1);    
   }
 
   void Lighter::LoadConfiguration ()
@@ -473,31 +565,39 @@ namespace lighter
     csPrintf (" --swapcachesize=<megabyte>\n");
     csPrintf ("  Set the size of the in memory swappable data cache in number "
       "of megabytes\n");
+    csPrintf ("   Default: 200\n");
 
     csPrintf (" --[no]directlight\n");
     csPrintf ("  Calculate direct lighting using per lumel/vertex sampling\n");
+    csPrintf ("   Default: True\n");
 
     csPrintf (" --[no]directlightrandom\n");
     csPrintf ("  Use random sampling for direct lighting instead of sampling\n"
               "  every light source.\n");
+    csPrintf ("   Default: False\n");
 
     csPrintf (" --lmdensity=<number>\n");
     csPrintf ("  Set scaling between world space units and lightmap pixels\n");
+    csPrintf ("   Default: %f\n", globalConfig.GetLMProperties ().lmDensity);
 
     csPrintf (" --maxlightmapu=<number>\n");
     csPrintf ("  Set maximum lightmap size in u-mapping direction\n");
+    csPrintf ("   Default: %d\n", globalConfig.GetLMProperties ().maxLightmapU);
 
     csPrintf (" --maxlightmapv=<number>\n");
     csPrintf ("  Set maximum lightmap size in v-mapping direction\n");
+    csPrintf ("   Default: %d\n", globalConfig.GetLMProperties ().maxLightmapV);
 
     csPrintf (" --blackthreshold=<threshold>\n");
     csPrintf ("  Set the normalized threshold for lightmap pixels to be "
                 "considered black.\n");
+    csPrintf ("   Default: %f\n", globalConfig.GetLMProperties ().blackThreshold);
 
     csPrintf (" --normalstolerance=<angle>\n");
     csPrintf ("  Set the angle between two normals to be considered equal by "
                 "the\n");
     csPrintf ("  lightmap layouter.\n");
+    csPrintf ("   Default: 1\n");
 
     csPrintf ("\n");
   }

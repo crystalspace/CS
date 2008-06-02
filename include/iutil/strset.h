@@ -86,7 +86,7 @@ struct iStringSet : public virtual iBase
   /**
    * Check if the set contains a string with a particular ID.
    * \remarks This is rigidly equivalent to
-   *   <tt>return Request(id) != NULL</tt>, but more idomatic.
+   *   <tt>return Request(id) != NULL</tt>, but more idiomatic.
    */
   virtual bool Contains(csStringID) const = 0;
 
@@ -110,9 +110,9 @@ struct iStringSet : public virtual iBase
 
   /**
    * Remove all stored strings.
-   * \deprecated Use Empty() instead.
+   * \deprecated Deprecated in 1.3. Use Empty() instead.
    */
-  /*CS_DEPRECATED_METHOD_MSG("Use Empty() instead.")*/
+  CS_DEPRECATED_METHOD_MSG("Use Empty() instead.")
   virtual void Clear() = 0;
 
   /// Get the number of elements in the hash.

@@ -30,7 +30,6 @@
 #include "cssysdef.h"
 #include "CSopcode.h"
 #include "csqsqrt.h"
-#include "igeom/polymesh.h"
 #include "csgeom/transfrm.h"
 #include "csutil/scfstr.h"
 #include "iutil/string.h"
@@ -107,13 +106,6 @@ bool csOPCODECollideSystem::Initialize (iObjectRegistry* iobject_reg)
 }
 
 csPtr<iCollider> csOPCODECollideSystem::CreateCollider (iTriangleMesh* mesh)
-{
-  csOPCODECollider* col = new csOPCODECollider (mesh);
-  // here we must store the caches (and the trees)?
-  return csPtr<iCollider> (col);
-}
-
-csPtr<iCollider> csOPCODECollideSystem::CreateCollider (iPolygonMesh* mesh)
 {
   csOPCODECollider* col = new csOPCODECollider (mesh);
   // here we must store the caches (and the trees)?

@@ -30,6 +30,7 @@
 #include "csgeom/polyclip.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/tri.h"
+#include "csgfx/textureformatstrings.h"
 #include "cstool/rbuflock.h"
 #include "csutil/cscolor.h"
 #include "csutil/event.h"
@@ -629,7 +630,7 @@ void csSoftwareGraphics3DCommon::FinishDraw ()
         }
       }
     
-      SetRenderTarget (0, false, 0);
+      UnsetRenderTargets();
       if (oldIlaceMode != -1) do_interlaced = oldIlaceMode;
     }
   }
@@ -758,10 +759,13 @@ float csSoftwareGraphics3DCommon::GetZBuffValue (int x, int y)
   return 16777216.0 / float (zbf);
 }
 
-void csSoftwareGraphics3DCommon::SetRenderTarget (iTextureHandle* handle,
+bool csSoftwareGraphics3DCommon::SetRenderTarget (iTextureHandle* handle,
 	bool persistent,
-	int subtexture)
+	int subtexture,
+	csRenderTargetAttachment attachment)
 {
+  if (attachment != rtaColor0) return false;
+
   render_target = handle;
   rt_onscreen = !persistent;
   rt_cliprectset = false;
@@ -795,6 +799,23 @@ void csSoftwareGraphics3DCommon::SetRenderTarget (iTextureHandle* handle,
 
     SetDimensions (G2D->GetWidth(), G2D->GetHeight());
   }
+  
+  return true;
+}
+  
+bool csSoftwareGraphics3DCommon::CanSetRenderTarget (const char* format,
+  csRenderTargetAttachment attachment)
+{
+  if (attachment != rtaColor0) return false;
+  
+  CS::StructuredTextureFormat texfmt (CS::TextureFormatStrings::ConvertStructured (format));
+  uint fmtcomp = texfmt.GetComponentMask();
+  
+  if (((fmtcomp & CS::StructuredTextureFormat::compRGB) != 0)
+      && ((fmtcomp & ~CS::StructuredTextureFormat::compRGBA) == 0))
+    return true;
+    
+  return false;
 }
 
 void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
@@ -960,12 +981,11 @@ static csZBufMode GetZModePass2 (csZBufMode mode)
 
 static iRenderBuffer* ColorFixup (iRenderBuffer* srcBuffer, 
 				  csRef<csRenderBuffer>& dstBuffer,
-				  bool swapRB, bool doAlphaScale,
-				  float alphaScale)
+				  bool swapRB)
 {
   CS_ASSERT(srcBuffer->GetComponentType() == CS_BUFCOMP_FLOAT);
   const size_t elemCount = srcBuffer->GetElementCount();
-  const uint comps = doAlphaScale ? 4 : 3;
+  const uint comps = 3;
   const size_t srcComps = srcBuffer->GetComponentCount();
   if (!dstBuffer.IsValid()
     || (dstBuffer->GetSize() < (elemCount * comps * sizeof (float))))
@@ -996,8 +1016,6 @@ static iRenderBuffer* ColorFixup (iRenderBuffer* srcBuffer,
     d.x = swapRB ? sv[2] : sv[0];
     d.y = sv[1];
     d.z = swapRB ? sv[0] : sv[2];
-    if (doAlphaScale)
-      d.w = sv[3] * alphaScale;
   }
   return dstBuffer;
 }
@@ -1071,20 +1089,16 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
 
   size_t rangeStart = indexbuf->GetRangeStart();
   size_t rangeEnd = indexbuf->GetRangeEnd();
-
+  
   // @@@ Hm... color processing, probably *after* TransformVertices()...
-  const bool alphaScale = ((modes.mixmode & CS_FX_MASK_ALPHA) != 0);
-  if (pixelBGR || alphaScale)
+  if (pixelBGR)
   {
-    const float alpha = 
-      1.0f - ((modes.mixmode & CS_FX_MASK_ALPHA) / 255.0f);
-
     if ((activebuffers[VATTR_SPEC(PRIMARY_COLOR)] != 0)
       && (!processedColorsFlag[0]))
     {
       activebuffers[VATTR_SPEC(PRIMARY_COLOR)] = ColorFixup (
 	activebuffers[VATTR_SPEC(PRIMARY_COLOR)], processedColors[0],
-	pixelBGR, alphaScale, alpha);
+	pixelBGR);
       processedColorsFlag[0] = true;
     }
 
@@ -1093,7 +1107,7 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
     {
       activebuffers[VATTR_SPEC(SECONDARY_COLOR)] = ColorFixup (
 	activebuffers[VATTR_SPEC(SECONDARY_COLOR)], processedColors[1],
-	pixelBGR, alphaScale, alpha);
+	pixelBGR);
       processedColorsFlag[1] = true;
     }
   }

@@ -55,9 +55,14 @@ class csVector2;
 class csVector3;
 class csVector4;
 
-
-struct csCoreRenderMesh;
-struct csRenderMeshModes;
+namespace CS
+{
+  namespace Graphics
+  {
+    struct CoreRenderMesh;
+    struct RenderMeshModes;
+  } // namespace Graphics
+} // namespace CS
 class csRenderBufferHolder;
 
 
@@ -235,6 +240,11 @@ enum csVertexAttrib
  */
 #define CS_MIXMODE_TYPE_BLENDOP (0x40000000)
 /**
+ * When blending with a blending operation, signinify that separate factors
+ * for the alpha channel are present.
+ */
+#define CS_MIXMODE_FLAG_BLENDOP_ALPHA (0x08000000)
+/**
  * Use the mix mode of the mesh mix mode.
  * \warning NOT VALID AS MESH MIXMODE - only for shader pass mixmodes.
  */
@@ -314,6 +324,26 @@ enum
 #define CS_MIXMODE_BLENDOP_SRC(mode)	((mode >> 20) & CS_MIXMODE_FACT_MASK)
 /// Helper macro to extract the \c dstFactor from a blending op mixmode.
 #define CS_MIXMODE_BLENDOP_DST(mode)	((mode >> 16) & CS_MIXMODE_FACT_MASK)
+
+/**
+ * Helper macro to construct alpha factoes for a blending operation mixmode
+ * \a Src and \a Dst are 
+ * \link #CS_MIXMODE_FACT_ZERO blending op factors \endlink, however sans the
+ * CS_MIXMODE_FACT_ prefix. E.g.:
+ * \code
+ * uint mixmode = CS_MIXMODE_BLEND(SRCALPHA, SRCALPHA_INV)
+ *   | CS_MIXMODE_BLEND_ALPHA(ONE, SRCALPHA_INV);
+ * \endcode
+ * will generate a blending operation for alpha blending with the written
+ * destination alpha values suitable for use for premultiplied alpha blending.
+ */
+#define CS_MIXMODE_BLEND_ALPHA(Src, Dst)				\
+  (CS_MIXMODE_FLAG_BLENDOP_ALPHA					\
+  | (CS_MIXMODE_FACT_ ## Src << 12) | (CS_MIXMODE_FACT_ ## Dst << 8))
+/// Helper macro to extract the alpha \c srcFactor from a blending op mixmode.
+#define CS_MIXMODE_BLENDOP_ALPHA_SRC(mode)	((mode >> 12) & CS_MIXMODE_FACT_MASK)
+/// Helper macro to extract the alpha \c dstFactor from a blending op mixmode.
+#define CS_MIXMODE_BLENDOP_ALPHA_DST(mode)	((mode >> 8) & CS_MIXMODE_FACT_MASK)
 /** @} */
 
 /**\name Mix mode: Default modes
@@ -345,7 +375,8 @@ enum
  *  \see CS_FX_MASK_ALPHA, \see CS_FX_SETALPHA
  */
 #define CS_FX_ALPHA \
-    (CS_MIXMODE_BLEND(SRCALPHA, SRCALPHA_INV) | CS_MIXMODE_ALPHATEST_DISABLE)
+    (CS_MIXMODE_BLEND(SRCALPHA, SRCALPHA_INV) \
+    | CS_MIXMODE_BLEND_ALPHA(ONE, SRCALPHA_INV) | CS_MIXMODE_ALPHATEST_DISABLE)
 /**
  * Transparent blending (keep framebuffer unmodified). 
  * Formula: <tt>=DST</tt>
@@ -375,7 +406,8 @@ enum
  *  those two "extremes" by appropriate choice of the color and alpha values.
  */
 #define CS_FX_PREMULTALPHA \
-    (CS_MIXMODE_BLEND(ONE, SRCALPHA_INV) | CS_MIXMODE_ALPHATEST_DISABLE)
+    (CS_MIXMODE_BLEND(ONE, SRCALPHA_INV) | \
+    CS_MIXMODE_BLEND_ALPHA(ONE, SRCALPHA_INV) | CS_MIXMODE_ALPHATEST_DISABLE)
 /**
  * Use the mix mode of the mesh mix mode.
  * \warning NOT VALID AS MESH MIXMODE - only for shader pass mixmodes.
@@ -399,7 +431,7 @@ enum
  * Bit mask for bits relevant to mix mode comparison; contains type, alpha
  * test flags and blending op factors.
  */
-#define CS_FX_MASK_MIXMODE (0xf0ff0000)
+#define CS_FX_MASK_MIXMODE (0xf8ffff00)
 /** @} */
 
 /**\name Mix mode: alpha helpers
@@ -685,6 +717,21 @@ struct csSimpleRenderMesh
 };
 
 /**
+ * Render target attachment - selects which result of the rasterization gets
+ * output to the given texture when setting a render target.
+ */
+enum csRenderTargetAttachment
+{
+  /// Depth
+  rtaDepth,
+  /// Color
+  rtaColor0,
+
+  /// Number of supported attachments
+  rtaNumAttachments
+};
+
+/**
  * This is the standard 3D graphics interface.
  * All 3D graphics rasterizer servers for Crystal Space should implement this
  * interface, as well as the iGraphics2D interface.  The standard
@@ -700,7 +747,7 @@ struct csSimpleRenderMesh
  */
 struct iGraphics3D : public virtual iBase
 {
-  SCF_INTERFACE(iGraphics3D, 2, 1, 1);
+  SCF_INTERFACE(iGraphics3D, 3, 0, 0);
   
   /// Open the 3D graphics display.
   virtual bool Open () = 0;
@@ -724,7 +771,11 @@ struct iGraphics3D : public virtual iBase
    */
   virtual iTextureManager *GetTextureManager () = 0;
 
-  /// Change the dimensions of the display.
+  /**
+   * Change the dimensions of the display.
+   * \deprecated Deprecated in 1.3. 
+   */
+  CS_DEPRECATED_METHOD
   virtual void SetDimensions (int width, int height) = 0;
   /// Get drawing buffer width.
   virtual int GetWidth () const = 0;
@@ -762,28 +813,67 @@ struct iGraphics3D : public virtual iBase
   virtual float GetPerspectiveAspect () const = 0;
  
   /**
-   * Set the target of rendering. If this is 0 then the target will
-   * be the main screen. Otherwise it is a texture. After calling
-   * g3d->FinishDraw() the target will automatically be reset to 0 (main
-   * screen). Note that on some implementions rendering on a texture
-   * will overwrite the screen. So you should only do this BEFORE you
-   * start rendering your frame.
-   * <p>
+   * Set the target of rendering for a certain rasterization result.
+   * If all result attachments have a 0 target rendering is performed to the
+   * framebuffer (ie main screen). If at least one texture is attached
+   * rendering is performed off-screen to the given texture(s).
+   * After calling FinishDraw() the targets will automatically be unset. 
+   * Note that on some implementions rendering on a texture
+   * will overwrite the framebuffer contents. So you should only do this 
+   * BEFORE you start rendering your frame.
+   *
    * \param persistent If this is true then the current contents of the texture
-   * will be copied on screen before drawing occurs (in the first
-   * call to BeginDraw). Otherwise it is assumed that you fully render
-   * the texture.
+   *   will be preserved when drawing occurs (in the first call to BeginDraw). 
+   *   Otherwise it is assumed that you fully render the texture - untouched 
+   *   parts may be undefined. Using persistence may incur a performance
+   *   penalty so it's recommended to avoid this flag.
    * \param subtexture this specifies the subtexture index if the texture
-   * is a cubemap. It is in the range 0 to 5.
+   *   is a cubemap or volume texture. It is in the range 0 to 5 for cubemaps
+   *   (\sa iTextureHandle::CS_TEXTURE_CUBE_POS_X et al) or the depth index
+   *   for volume textures.
+   * \param attachment Specifies to what result of the rasterization the
+   *   texture should be attached to.
+   * \returns Whether setting the render target was successful. However, even
+   *   if 'true' is returned, it may be possible that rendering to the eventual
+   *   set of render targets is \em not possible. Only if ValidateRenderTargets
+   *   returns 'true' the set of targets can really be used as a render target.
+   * \sa UnsetRenderTargets
    */
-  virtual void SetRenderTarget (iTextureHandle* handle,
+  virtual bool SetRenderTarget (iTextureHandle* handle,
 	bool persistent = false,
-	int subtexture = 0) = 0;
+	int subtexture = 0,
+	csRenderTargetAttachment attachment = rtaColor0) = 0;
+
+  /**
+   * Check if the current set of render targets is valid.
+   * \returns Whether the current set of render targets is valid and useable. 
+   *   Reasons for invalidity/unusability can include:
+   *   - The hardware or driver does not support the given attachment with
+   *     the given texture or not at all.
+   *   - The dimensions of the various attachments don't match.
+   */
+  virtual bool ValidateRenderTargets () = 0;
+	
+  /**
+   * Check if a texture with the given format can be set as a render target for
+   * the given attachment.
+   * \remarks Texture formats may be reported as supported even though textures
+   *   with that format can't be created.
+   */
+  virtual bool CanSetRenderTarget (const char* format,
+    csRenderTargetAttachment attachment = rtaColor0) = 0;
 
   /**
    * Get the current render target (0 for screen).
+   * \param attachment The attachment for which to return the render target.
+   * \param subtexture Optionally returns the subtexture index.
    */
-  virtual iTextureHandle* GetRenderTarget () const = 0;
+  virtual iTextureHandle* GetRenderTarget (
+    csRenderTargetAttachment attachment = rtaColor0,
+    int* subtexture = 0) const = 0;
+  
+  /// Clear render targets for all rasterization result attachments.
+  virtual void UnsetRenderTargets() = 0;
 
   /// Start a new frame (see CSDRAW_XXX bit flags)
   virtual bool BeginDraw (int DrawFlags) = 0;
@@ -799,8 +889,8 @@ struct iGraphics3D : public virtual iBase
   virtual void Print (csRect const* area) = 0;
 
   /// Drawroutine. Only way to draw stuff
-  virtual void DrawMesh (const csCoreRenderMesh* mymesh,
-                         const csRenderMeshModes& modes,
+  virtual void DrawMesh (const CS::Graphics::CoreRenderMesh* mymesh,
+                         const CS::Graphics::RenderMeshModes& modes,
                          const iShaderVarStack* stacks) = 0;
   /**
   * Draw a csSimpleRenderMesh on the screen.

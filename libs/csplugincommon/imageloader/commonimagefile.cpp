@@ -93,6 +93,7 @@ void csCommonImageFile::LoaderJob::Run()
 
 //---------------------------------------------------------------------------
 
+#include "csutil/custom_new_disable.h"
 csCommonImageFile::csCommonImageFile (iObjectRegistry* object_reg, int format) 
   : scfImplementationType (this, format), object_reg (object_reg) 
 {
@@ -106,6 +107,7 @@ csCommonImageFile::csCommonImageFile (iObjectRegistry* object_reg, int format)
   }
 #endif
 }
+#include "csutil/custom_new_enable.h"
 
 csCommonImageFile::~csCommonImageFile()
 {
@@ -115,6 +117,7 @@ csCommonImageFile::~csCommonImageFile()
 #endif
 }
 
+#include "csutil/custom_new_disable.h"
 bool csCommonImageFile::Load (csRef<iDataBuffer> source)
 {
 #ifdef THREADED_LOADING
@@ -137,6 +140,7 @@ bool csCommonImageFile::Load (csRef<iDataBuffer> source)
   return currentLoader->LoadData();
 #endif
 }
+#include "csutil/custom_new_enable.h"
 
 void csCommonImageFile::WaitForJob() const
 {

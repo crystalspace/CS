@@ -64,6 +64,7 @@ csXMLShaderTech::csXMLShaderTech (csXMLShader* parent) :
 csXMLShaderTech::~csXMLShaderTech()
 {
   delete[] passes;
+  cs_free (metadata.description);
 }
 
 static inline bool IsDestalphaMixmode (uint mode)
@@ -560,7 +561,7 @@ bool csXMLShaderTech::Load (iLoaderContext* ldr_context,
     parent->compiler->LoadSVBlock (ldr_context, varNode, &svcontext);
 
   // copy over metadata from parent
-  metadata.description = csStrNew (parent->allShaderMeta.description);
+  metadata.description = CS::StrDup (parent->allShaderMeta.description);
   metadata.numberOfLights = node->GetAttributeValueAsInt ("lights");
 
   //alloc passes
@@ -741,6 +742,14 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
     modes.mixmode = thispass->mixMode;
 
   modes.flipCulling = thispass->flipCulling;
+  
+  float alpha = 1.0f;
+  if (modes.mixmode & CS_FX_MASK_ALPHA)
+  {
+    alpha = 1.0f - (float)(modes.mixmode & CS_FX_MASK_ALPHA) / 255.0f;
+  }
+  parent->shadermgr->GetVariableAdd (
+    parent->compiler->string_mixmode_alpha)->SetValue (alpha);
 
   if(thispass->vp) thispass->vp->SetupState (mesh, modes, stacks);
   if(thispass->fp) thispass->fp->SetupState (mesh, modes, stacks);

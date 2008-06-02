@@ -45,7 +45,7 @@ csImageIOMultiplexer::csImageIOMultiplexer (iBase *pParent) :
 
 csImageIOMultiplexer::~csImageIOMultiplexer ()
 {
-  if (classlist) classlist->DeleteAll ();
+  if (classlist) classlist->Empty ();
 }
 
 bool csImageIOMultiplexer::Initialize (iObjectRegistry *object_reg)
@@ -73,6 +73,9 @@ void csImageIOMultiplexer::StoreDesc (
     formats.Push (format[i]);
 }
 
+// For SetDithering()
+#include "csutil/deprecated_warn_off.h"
+
 bool csImageIOMultiplexer::LoadNextPlugin ()
 {
   if (!classlist) return false;
@@ -84,7 +87,7 @@ bool csImageIOMultiplexer::LoadNextPlugin ()
     do
     {
       if (classname) classlist->DeleteIndex (0);
-      if (classlist->Length() == 0)
+      if (classlist->GetSize () == 0)
       {
 	classlist = 0;
 	plugin_mgr = 0;
@@ -107,6 +110,8 @@ bool csImageIOMultiplexer::LoadNextPlugin ()
   return true;
 }
 
+#include "csutil/deprecated_warn_on.h"
+
 const csImageIOFileFormatDescriptions& csImageIOMultiplexer::GetDescription ()
 {
   // need all plugins.
@@ -114,12 +119,17 @@ const csImageIOFileFormatDescriptions& csImageIOMultiplexer::GetDescription ()
   return formats;
 }
 
+// For SetDithering()
+#include "csutil/deprecated_warn_off.h"
+
 void csImageIOMultiplexer::SetDithering (bool iEnable)
 {
   global_dither = iEnable;
   for (size_t i = 0; i < list.GetSize (); i++)
     list[i]->SetDithering (global_dither);
 }
+
+#include "csutil/deprecated_warn_on.h"
 
 csPtr<iImage> csImageIOMultiplexer::Load (iDataBuffer* buf, int iFormat)
 {

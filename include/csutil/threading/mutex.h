@@ -100,13 +100,6 @@ namespace Threading
       BaseMutex::Unlock ();
     }
 
-    /**
-     * Query lock status.
-     */
-    bool IsLocked ()
-    {
-      return BaseMutex::IsLocked ();
-    }
   protected:
     friend class ConditionBase;
   };
@@ -123,6 +116,33 @@ namespace Threading
    */
   typedef MutexImpl<Implementation::RecursiveMutexBase> RecursiveMutex;
 
+  /**
+   * Helper that is a (non-recursive) mutex if \a _Lock is \c true or does 
+   * nothing if \a _Lock is \c false. Intended to provide compile-time 
+   * switching of locking behaviour.
+   */
+  template<bool _Lock>
+  class OptionalMutex
+  {
+    Mutex theMutex;
+  public:
+    /// \sa Mutex::Lock
+    bool Lock () { return theMutex.Lock(); }
+    /// \sa Mutex::TryLock
+    bool TryLock() { return theMutex.TryLock(); }
+    /// \sa Mutex::Unlock
+    void Unlock() { theMutex.Unlock(); }
+  };
+  
+  template<>
+  class OptionalMutex<false>
+  {
+  public:
+    bool Lock () { return true; }
+    bool TryLock() { return true; }
+    void Unlock() { }
+  };
+  
 
   /**
    * This is a utility class for locking a Mutex. If a ScopedLock class is
@@ -151,14 +171,11 @@ namespace Threading
 
     ~ScopedLock ()
     {
-      if (lockObj.IsLocked ())
-      {
-        lockObj.Unlock ();
-      }
+      lockObj.Unlock ();
     }
 
   private:
-    T& lockObj;
+    T& lockObj;    
   };
 
   // Standard lock

@@ -30,7 +30,6 @@
 #include "csutil/ref.h"
 #include "iutil/strset.h"
 
-struct iPolygonMesh;
 struct iTriangleMesh;
 struct iTerraFormer;
 struct iMeshObject;
@@ -95,9 +94,6 @@ struct iCollider : public virtual iBase
   virtual csColliderType GetColliderType () = 0;
 };
 
-// for iPolygonMesh
-#include "csutil/win32/msvc_deprecated_warn_off.h"
-
 /**
  * This is the Collide plug-in. This plugin is a factory for creating
  * iCollider entities. A collider represents an entity in the
@@ -116,7 +112,7 @@ struct iCollider : public virtual iBase
  */
 struct iCollideSystem : public virtual iBase
 {
-  SCF_INTERFACE (iCollideSystem, 2, 1, 1);
+  SCF_INTERFACE (iCollideSystem, 2, 2, 1);
 
   /**
    * Get the ID that the collision detection system prefers for getting
@@ -133,19 +129,6 @@ struct iCollideSystem : public virtual iBase
    * is a reference to the standard string set.
    */
   virtual csStringID GetBaseDataID () = 0;
-
-  /**
-   * Create a iCollider for the given mesh geometry.
-   * \param mesh is a structure describing the geometry from which the
-   * collider will be made. You can get such a mesh either by making your
-   * own subclass of iPolygonMesh, by getting a mesh from
-   * iMeshObject->GetObjectModel()->GetPolygonMeshColldet(), or else
-   * by using csPolygonMesh, or csPolygonMeshBox.
-   * \return a reference to a collider that you have to store.
-   * \deprecated Use CreateCollider(iTriangleMesh*) instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use CreateCollider(iTriangleMesh*) instead.")
-  virtual csPtr<iCollider> CreateCollider (iPolygonMesh* mesh) = 0;
 
   /**
    * Create a iCollider for the given mesh geometry.
@@ -221,22 +204,23 @@ struct iCollideSystem : public virtual iBase
   virtual void ResetCollisionPairs () = 0;
 
   /**
-   * Collide a collider with a world space ray.
+   * Collide a collider with a (infinite) world space ray.
    * \param collider is the collider to test with.
    * \param trans is the transform for the object represented by the
    * collider. If the collider belongs to a mesh object then you can get
    * the transform by calling mesh->GetMovable()->GetFullTransform().
    * \param start is the start of the ray.
-   * \param end is the end of the ray.
+   * \param pointOnRay A point on the ray other than \a start, used to
+   *   compute the ray's direction.
    * \return true if there was a collision. The array with intersecting
    * triangles will be updated (see GetIntersectingTriangles()).
    */
   virtual bool CollideRay (
   	iCollider* collider, const csReversibleTransform* trans,
-	const csVector3& start, const csVector3& end) = 0;
+	const csVector3& start, const csVector3& pointOnRay) = 0;
 
   /**
-   * Collide a collider with a world space segment. This will not
+   * Collide a collider with a (finite) world space segment. This will not
    * return collisions with triangles behind the end of the segment.
    * \param collider is the collider to test with.
    * \param trans is the transform for the object represented by the
@@ -279,9 +263,6 @@ struct iCollideSystem : public virtual iBase
    */
   virtual bool GetOneHitOnly () = 0;
 };
-
-// for iPolygonMesh
-#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_IVARIA_COLLIDER_H__
 

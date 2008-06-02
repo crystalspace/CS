@@ -126,7 +126,7 @@
 
 
 template<class Class SCF_IMPL_TYPES>
-class CS_CRYSTALSPACE_EXPORT SCF_IMPL_NAME :
+class SCF_IMPL_NAME :
   public SCF_IMPL_SUPER
   SCF_IMPL_INTERFACES
 {
@@ -135,34 +135,34 @@ public:
   {
 #if SCF_IMPL_N >= 1
     void *x; // Inside #if avoids unused variable warnings for SCF_IMPL_N == 0
-    if((x = GetInterface<I1>(this->scfObject, id, version)) != 0) return x;
+    if((x = GetInterface<I1>(this->GetSCFObject(), id, version)) != 0) return x;
 #endif
 #if SCF_IMPL_N >= 2
-    if((x = GetInterface<I2>(this->scfObject, id, version)) != 0) return x;
+    if((x = GetInterface<I2>(this->GetSCFObject(), id, version)) != 0) return x;
 #endif
 #if SCF_IMPL_N >= 3
-    if((x = GetInterface<I3>(this->scfObject, id, version)) != 0) return x;
+    if((x = GetInterface<I3>(this->GetSCFObject(), id, version)) != 0) return x;
 #endif
 #if SCF_IMPL_N >= 4
-    if((x = GetInterface<I4>(this->scfObject, id, version)) != 0) return x;
+    if((x = GetInterface<I4>(this->GetSCFObject(), id, version)) != 0) return x;
 #endif
 #if SCF_IMPL_N >= 5
-    if((x = GetInterface<I5>(this->scfObject, id, version)) != 0) return x;
+    if((x = GetInterface<I5>(this->GetSCFObject(), id, version)) != 0) return x;
 #endif
 #if SCF_IMPL_N >= 6
-    if((x = GetInterface<I6>(this->scfObject, id, version)) != 0) return x;
+    if((x = GetInterface<I6>(this->GetSCFObject(), id, version)) != 0) return x;
 #endif
 #if SCF_IMPL_N >= 7
-    if((x = GetInterface<I7>(this->scfObject, id, version)) != 0) return x;
+    if((x = GetInterface<I7>(this->GetSCFObject(), id, version)) != 0) return x;
 #endif
 #if SCF_IMPL_N >= 8
-    if((x = GetInterface<I8>(this->scfObject, id, version)) != 0) return x;
+    if((x = GetInterface<I8>(this->GetSCFObject(), id, version)) != 0) return x;
 #endif
 #if SCF_IMPL_N >= 9
-    if((x = GetInterface<I9>(this->scfObject, id, version)) != 0) return x;
+    if((x = GetInterface<I9>(this->GetSCFObject(), id, version)) != 0) return x;
 #endif
 #if SCF_IMPL_N >= 10
-    if((x = GetInterface<I10>(this->scfObject, id, version)) != 0) return x;
+    if((x = GetInterface<I10>(this->GetSCFObject(), id, version)) != 0) return x;
 #endif
 
     return SCF_IMPL_SUPER::QueryInterface(id, version);
@@ -177,8 +177,12 @@ protected:
     AddReftrackerAliases(); 
   }
 #else /* SCF_IMPL_EXT */
-  SCF_IMPL_NAME(Class *object)
-    : SCF_IMPL_SUPER(), scfObject(object) 
+  /* The template<...> is a peculiar hack to prevent MSVC from trying to 
+   * instance this ctor when inheriting from a dllexport class (ie if 'Super'
+   * is dllexport). */
+  template<class Class_>
+  SCF_IMPL_NAME(Class_ *object)
+    : SCF_IMPL_SUPER()
   { 
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
     AddReftrackerAliases(); 
@@ -186,7 +190,7 @@ protected:
 
   template<class T1>
   SCF_IMPL_NAME(Class *object, T1 t1)
-    : SCF_IMPL_SUPER(t1), scfObject(object) 
+    : SCF_IMPL_SUPER(t1)
   { 
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
     AddReftrackerAliases(); 
@@ -194,7 +198,7 @@ protected:
 
   template<class T1, class T2>
   SCF_IMPL_NAME(Class *object, T1 t1, T2 t2)
-    : SCF_IMPL_SUPER(t1, t2), scfObject(object) 
+    : SCF_IMPL_SUPER(t1, t2)
   { 
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
     AddReftrackerAliases(); 
@@ -202,7 +206,7 @@ protected:
 
   template<class T1, class T2, class T3>
   SCF_IMPL_NAME(Class *object, T1 t1, T2 t2, T3 t3)
-    : SCF_IMPL_SUPER(t1, t2, t3), scfObject(object) 
+    : SCF_IMPL_SUPER(t1, t2, t3)
   { 
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
     AddReftrackerAliases(); 
@@ -210,7 +214,7 @@ protected:
 
   template<class T1, class T2, class T3, class T4>
   SCF_IMPL_NAME(Class *object, T1 t1, T2 t2, T3 t3, T4 t4)
-    : SCF_IMPL_SUPER(t1, t2, t3, t4), scfObject(object) 
+    : SCF_IMPL_SUPER(t1, t2, t3, t4)
   {
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
     AddReftrackerAliases(); 
@@ -218,7 +222,7 @@ protected:
 
   template<class T1, class T2, class T3, class T4, class T5>
   SCF_IMPL_NAME(Class *object, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5)
-    : SCF_IMPL_SUPER(t1, t2, t3, t4, t5), scfObject(object) 
+    : SCF_IMPL_SUPER(t1, t2, t3, t4, t5)
   {
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
     AddReftrackerAliases(); 
@@ -226,13 +230,14 @@ protected:
 
   template<class T1, class T2, class T3, class T4, class T5, class T6>
   SCF_IMPL_NAME(Class *object, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6)
-    : SCF_IMPL_SUPER(t1, t2, t3, t4, t5, t6), scfObject(object) 
+    : SCF_IMPL_SUPER(t1, t2, t3, t4, t5, t6)
   {
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
     AddReftrackerAliases(); 
   }
 
-  Class *scfObject;
+  Class* GetSCFObject() { return static_cast<Class*> (this); }
+  const Class* GetSCFObject() const { return static_cast<const Class*> (this); }
 #endif
 
   virtual ~SCF_IMPL_NAME() 
@@ -243,7 +248,126 @@ protected:
   typedef SCF_IMPL_NAME<Class SCF_IMPL_ARGS> scfImplementationType;
   typedef Class scfClassType; 
 
+
+  // Metadata handling
+  virtual size_t GetInterfaceMetadataCount () const
+  {
+    return SCF_IMPL_N + SCF_IMPL_SUPER::GetInterfaceMetadataCount ();
+  }
+
+  virtual void FillInterfaceMetadata (size_t n)
+  {
+#if SCF_IMPL_N >= 1
+    FillInterfaceMetadataIf<I1> (this->scfAuxData->metadataList->metadata, n++);
+#endif
+#if SCF_IMPL_N >= 2
+    FillInterfaceMetadataIf<I2> (this->scfAuxData->metadataList->metadata, n++);
+#endif
+#if SCF_IMPL_N >= 3
+    FillInterfaceMetadataIf<I3> (this->scfAuxData->metadataList->metadata, n++);
+#endif
+#if SCF_IMPL_N >= 4
+    FillInterfaceMetadataIf<I4> (this->scfAuxData->metadataList->metadata, n++);
+#endif
+#if SCF_IMPL_N >= 5
+    FillInterfaceMetadataIf<I5> (this->scfAuxData->metadataList->metadata, n++);
+#endif
+#if SCF_IMPL_N >= 6
+    FillInterfaceMetadataIf<I6> (this->scfAuxData->metadataList->metadata, n++);
+#endif
+#if SCF_IMPL_N >= 7
+    FillInterfaceMetadataIf<I7> (this->scfAuxData->metadataList->metadata, n++);
+#endif
+#if SCF_IMPL_N >= 8
+    FillInterfaceMetadataIf<I8> (this->scfAuxData->metadataList->metadata, n++);
+#endif
+#if SCF_IMPL_N >= 9
+    FillInterfaceMetadataIf<I9> (this->scfAuxData->metadataList->metadata, n++);
+#endif
+#if SCF_IMPL_N >= 10
+    FillInterfaceMetadataIf<I10> (this->scfAuxData->metadataList->metadata, n++);
+#endif
+
+    SCF_IMPL_SUPER::FillInterfaceMetadata (n);
+  }
+
 private:
+  
+ 
+  void AddReftrackerAliases ()
+  {
+#ifndef SCF_IMPL_EXT
+    AddReftrackerAlias<iBase>(this->GetSCFObject());
+#endif
+#if SCF_IMPL_N >= 1
+    AddReftrackerAlias<I1>(this->GetSCFObject());
+#endif
+#if SCF_IMPL_N >= 2
+    AddReftrackerAlias<I2>(this->GetSCFObject());
+#endif
+#if SCF_IMPL_N >= 3
+    AddReftrackerAlias<I3>(this->GetSCFObject());
+#endif
+#if SCF_IMPL_N >= 4
+    AddReftrackerAlias<I4>(this->GetSCFObject());
+#endif
+#if SCF_IMPL_N >= 5
+    AddReftrackerAlias<I5>(this->GetSCFObject());
+#endif
+#if SCF_IMPL_N >= 6
+    AddReftrackerAlias<I6>(this->GetSCFObject());
+#endif
+#if SCF_IMPL_N >= 7
+    AddReftrackerAlias<I7>(this->GetSCFObject());
+#endif
+#if SCF_IMPL_N >= 8
+    AddReftrackerAlias<I8>(this->GetSCFObject());
+#endif
+#if SCF_IMPL_N >= 9
+    AddReftrackerAlias<I9>(this->GetSCFObject());
+#endif
+#if SCF_IMPL_N >= 10
+    AddReftrackerAlias<I10>(this->GetSCFObject());
+#endif
+  }
+
+  void RemoveReftrackerAliases ()
+  {
+#ifndef SCF_IMPL_EXT
+    RemoveReftrackerAlias<iBase>(this->GetSCFObject());
+#endif
+#if SCF_IMPL_N >= 1
+    RemoveReftrackerAlias<I1>(this->GetSCFObject());
+#endif
+#if SCF_IMPL_N >= 2
+    RemoveReftrackerAlias<I2>(this->GetSCFObject());
+#endif
+#if SCF_IMPL_N >= 3
+    RemoveReftrackerAlias<I3>(this->GetSCFObject());
+#endif
+#if SCF_IMPL_N >= 4
+    RemoveReftrackerAlias<I4>(this->GetSCFObject());
+#endif
+#if SCF_IMPL_N >= 5
+    RemoveReftrackerAlias<I5>(this->GetSCFObject());
+#endif
+#if SCF_IMPL_N >= 6
+    RemoveReftrackerAlias<I6>(this->GetSCFObject());
+#endif
+#if SCF_IMPL_N >= 7
+    RemoveReftrackerAlias<I7>(this->GetSCFObject());
+#endif
+#if SCF_IMPL_N >= 8
+    RemoveReftrackerAlias<I8>(this->GetSCFObject());
+#endif
+#if SCF_IMPL_N >= 9
+    RemoveReftrackerAlias<I9>(this->GetSCFObject());
+#endif
+#if SCF_IMPL_N >= 10
+    RemoveReftrackerAlias<I10>(this->GetSCFObject());
+#endif
+  }
+
   template<typename I>
   CS_FORCEINLINE_TEMPLATEMETHOD static void* GetInterface (
     Class* scfObject, scfInterfaceID id, scfInterfaceVersion version)
@@ -267,7 +391,7 @@ private:
   {
     csRefTrackerAccess::AddAlias(
       static_cast<
-        typename scfInterfaceTraits<I>::InterfaceType*> (scfObject),
+      typename scfInterfaceTraits<I>::InterfaceType*> (scfObject),
       scfObject);
   }
 
@@ -277,83 +401,19 @@ private:
   {
     csRefTrackerAccess::RemoveAlias(
       static_cast<
-        typename scfInterfaceTraits<I>::InterfaceType*> (scfObject),
+      typename scfInterfaceTraits<I>::InterfaceType*> (scfObject),
       scfObject);
   }
- 
-  void AddReftrackerAliases ()
-  {
-#ifndef SCF_IMPL_EXT
-    AddReftrackerAlias<iBase>(this->scfObject);
-#endif
-#if SCF_IMPL_N >= 1
-    AddReftrackerAlias<I1>(this->scfObject);
-#endif
-#if SCF_IMPL_N >= 2
-    AddReftrackerAlias<I2>(this->scfObject);
-#endif
-#if SCF_IMPL_N >= 3
-    AddReftrackerAlias<I3>(this->scfObject);
-#endif
-#if SCF_IMPL_N >= 4
-    AddReftrackerAlias<I4>(this->scfObject);
-#endif
-#if SCF_IMPL_N >= 5
-    AddReftrackerAlias<I5>(this->scfObject);
-#endif
-#if SCF_IMPL_N >= 6
-    AddReftrackerAlias<I6>(this->scfObject);
-#endif
-#if SCF_IMPL_N >= 7
-    AddReftrackerAlias<I7>(this->scfObject);
-#endif
-#if SCF_IMPL_N >= 8
-    AddReftrackerAlias<I8>(this->scfObject);
-#endif
-#if SCF_IMPL_N >= 9
-    AddReftrackerAlias<I9>(this->scfObject);
-#endif
-#if SCF_IMPL_N >= 10
-    AddReftrackerAlias<I10>(this->scfObject);
-#endif
-  }
 
-  void RemoveReftrackerAliases ()
+  template<typename IF>
+  CS_FORCEINLINE_TEMPLATEMETHOD static void FillInterfaceMetadataIf (
+    scfInterfaceMetadata* metadataArray, size_t pos)
   {
-#ifndef SCF_IMPL_EXT
-    RemoveReftrackerAlias<iBase>(this->scfObject);
-#endif
-#if SCF_IMPL_N >= 1
-    RemoveReftrackerAlias<I1>(this->scfObject);
-#endif
-#if SCF_IMPL_N >= 2
-    RemoveReftrackerAlias<I2>(this->scfObject);
-#endif
-#if SCF_IMPL_N >= 3
-    RemoveReftrackerAlias<I3>(this->scfObject);
-#endif
-#if SCF_IMPL_N >= 4
-    RemoveReftrackerAlias<I4>(this->scfObject);
-#endif
-#if SCF_IMPL_N >= 5
-    RemoveReftrackerAlias<I5>(this->scfObject);
-#endif
-#if SCF_IMPL_N >= 6
-    RemoveReftrackerAlias<I6>(this->scfObject);
-#endif
-#if SCF_IMPL_N >= 7
-    RemoveReftrackerAlias<I7>(this->scfObject);
-#endif
-#if SCF_IMPL_N >= 8
-    RemoveReftrackerAlias<I8>(this->scfObject);
-#endif
-#if SCF_IMPL_N >= 9
-    RemoveReftrackerAlias<I9>(this->scfObject);
-#endif
-#if SCF_IMPL_N >= 10
-    RemoveReftrackerAlias<I10>(this->scfObject);
-#endif
+    metadataArray[pos].interfaceName = scfInterfaceTraits<IF>::GetName ();
+    metadataArray[pos].interfaceID = scfInterfaceTraits<IF>::GetID ();
+    metadataArray[pos].interfaceVersion = scfInterfaceTraits<IF>::GetVersion ();
   }
+  
 };
 
 #undef SCF_IMPL_NAME

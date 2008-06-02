@@ -27,7 +27,6 @@
 #ifdef CS_BUILD_SHARED_LIBS
 #define GUID_NULL	_DEFAULT_GUID_NULL
 #endif
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #ifdef CS_BUILD_SHARED_LIBS
 #undef GUID_NULL
@@ -44,9 +43,9 @@
 #else
 #define DEFINE_GUID(n,l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8) GUID_EXT const GUID n
 #endif
-
-GUID_EXT const GUID GUID_NULL;
-
+extern "C"{
+	GUID_EXT const GUID GUID_NULL;
+}
 #endif // CS_BUILD_SHARED_LIBS
 
 #endif // __CS_CSPLUGINCOMMON_DIRECTX_GUIDS_H__

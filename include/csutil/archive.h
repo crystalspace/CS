@@ -26,8 +26,11 @@
 
 #include "csextern.h"
 
+#include "iutil/databuff.h"
 #include "csutil/csstring.h"
+#include "csutil/databuf.h"
 #include "csutil/parray.h"
+#include "csutil/ref.h"
 #include "csutil/stringarray.h"
 #include "csutil/zip.h"
 
@@ -38,12 +41,12 @@ struct csFileTime;
  * Constructor accepts a file name - if such a file is not found, it is
  * created. After this you can examine archive directory, read files,
  * delete or write files in archive.
- * <p>
+ * 
  * Operations which changes archive file will be deferred until Flush()
  * method is called. Before calling Flush() you can do any number of
  * deletions and writes, but read operations will not be affected by
  * these until Flush() will be called.
- * <p>
+ * 
  * Known quirks:
  * - No CRC check is done on reading, although ZIP file format allows it.
  *   This design 'flaw' was allowed to achieve maximal speed. However, when
@@ -123,7 +126,7 @@ private:
   ArchiveEntry *InsertEntry (const char *name,
     ZIP_central_directory_file_header &cdfh);
   void ReadZipEntries (FILE *infile);
-  char *ReadEntry (FILE *infile, ArchiveEntry *f);
+  bool ReadEntry (FILE *infile, ArchiveEntry *f, char* buf);
   ArchiveEntry *CreateArchiveEntry (const char *name,
     size_t size = 0, bool pack = true);
   void ResetArchiveEntry (ArchiveEntry *f, size_t size, bool pack);
@@ -140,11 +143,11 @@ public:
   /**
    * Create a new file in the archive. If the file already exists
    * it will be overwritten.
-   * <p>
+   * 
    * Returns 0 if not succesful. Otherwise it returns a pointer
    * that can be passed to 'Write' routine. You won't see any changes
    * to archive until 'Flush' will be called.
-   * <p>
+   * 
    * 'size' is the _advisory_ file size. There is no problem if you will
    * write more or less bytes, its just a matter of performance - if you
    * set the right size, archive manager will have to allocate memory
@@ -172,6 +175,35 @@ public:
    * to unpacked size of the file.
    */
   char *Read (const char *name, size_t *size = 0);
+
+  /**
+   * Read a file completely into a buffer allocated with the given
+   * allocator. If the file does not exists this function returns 0. 
+   */
+  template<typename Allocator>
+  csPtr<iDataBuffer> Read (const char *name, Allocator& alloc)
+  {
+    ArchiveEntry *f = (ArchiveEntry *) FindName (name);
+  
+    if (!f)
+      return 0;
+
+    csRef<iDataBuffer> buf;
+    buf.AttachNew (new CS::DataBuffer<Allocator> (f->info.ucsize, alloc));
+    if (!ReadEntry (file, f, buf->GetData()))
+      return 0;
+    return csPtr<iDataBuffer> (buf);
+  }
+
+  /**
+   * Read a file completely. If the file does not exists
+   * this function returns 0. 
+   */
+  csPtr<iDataBuffer> Read (const char *name)
+  {
+    CS::Memory::AllocatorMalloc alloc;
+    return Read (name, alloc);
+  }
 
   /**
    * Write data to a file. Note that 'size' need not be

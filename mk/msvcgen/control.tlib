@@ -154,15 +154,42 @@ projtypes = {
   group =>
   {
   },
-  library =>
+  library_static =>
   {
     defines = ['_LIB', '_WINDOWS']
+  },
+  library_shared =>
+  {
+    defines = ['_WINDOWS']
   },
   plugin =>
   {
     defines = ['_WINDOWS'],
     libs = ['delayimp.lib']
+  },
+  dll =>
+  {
+    defines = ['_WINDOWS'],
+    libs = ['delayimp.lib']
   }
 };
+
+#------------------------------------------------------------------------------
+# "Mutators" create additional configurations where project types can be 
+# replaced with some other types. 
+#------------------------------------------------------------------------------
+mutators = [
+  {
+    namesuffix => ' (with static libs)',
+    defines => [],
+    library_static => 'library',
+    library_shared => 'library'
+  },
+  {
+    namesuffix => ' (with DLLs)',
+    defines => ['CS_BUILD_SHARED_LIBS'],
+    library_static => 'library'
+  }
+];
 
 END %]
