@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- bindoc.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.documentsystem.binary</name>
+        <implementation>csBinaryDocumentSystem</implementation>
+        <description>Binary document system</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

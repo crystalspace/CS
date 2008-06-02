@@ -1,0 +1,78 @@
+CSEP: 1
+Title: CSEP Guidelines
+Version: $Revision$
+Last-changed: $Date$
+Author: Marten Svanfeldt
+Status: Draft
+Type: Informational
+Content-Type: text/x-rst
+Created: 2005-07-17
+
+What is a CSEP?
+===============
+
+CSEP stands for Crystal Space 3D Enhancement Proposal and is a concept derived from Python project [1]_ and is intended to be a way of collecting, evaluating and documenting design and implementational enhancement proposals within the Crystal Space 3D project (shortened to CS) [2]_
+
+The CSEPs are under revision control and version and last-modified-date should match the revision control information.
+
+Kinds of CSEPs
+==============
+
+There are two main types of CSEPs. The first type is the informational CSEPs and contain general information about CSEPs themselves or parts of Crystal Space.
+
+The other type is the proposal CSEPs. These are written when someone have a proposal for a central change in CS and want to get some consensus within the CS community that the change is indeed a good one.
+
+
+What should a proposal CSEP contain
+===================================
+
+Each CSEP proposing a design change should contain but is not limited to the following parts (guidelines):
+
+1. Preamble -- RFC 822 style header with meta-information, a short title and name of the author(s).
+
+2. Abstract -- a short description of the issue being addressed.
+
+3. Motivation -- should clearly explain why this change is needed.
+
+4. Technical specification -- a technical description of how the issue is solved. It should be detailed enough to allow anyone to implement it.
+
+5. Rationale -- the rationale should provide a background for the proposed technical specification with motivation of choosen algorithms, alternatives evaluated etc
+
+6. Compatibility -- how the change relate to current code and users. This is one of the most important sections. Any change which results in a syntax or semantic incompatibility should be well motivated and ways to provide backward compatibility should be considered.'
+
+7. Performance -- any performance implications by the design change should be examined and explained.
+
+8. Implementation -- the implementation is needed before a CSEP can be finalized but not crucial for it's acceptance.
+
+9. Copyright -- all CSEPs must be placed in the public domain or have their copyright transfered to the Crystal Space 3D project.
+
+CSEP Header
+===========
+Each CSEP must begin with a RFC 822 style header preamble. Headers marked '*' are optional::
+
+    CSEP: <number>
+    Title: <csep title, max 40 characters>
+    Version: $Revision$
+    Last-changed: $Date$
+    Author: <list of authors name and optionally email>
+   *Discussions-To: <email address of list with discussions>
+    Type: <Informational | Proposal>
+   *Content-Type: <text/plain | text/x-rst>
+   *Requires: <csep numbers>
+    Created: <date created on, in yyyy-mm-dd format>
+   *Replaces: <csep number>
+   *Replaced-By: <csep number>
+
+
+References and Footnotes
+========================
+
+.. [1] Python PEP Archive at http://www.python.org/peps/
+
+.. [2] Crystal Space 3D at http://www.crystalspace3d.org/
+
+   
+
+Copyright
+=========
+This document has been placed in the public domain.

@@ -1,0 +1,49 @@
+@c -*-texinfo-*-
+@node Libraries, VFS, Options, Using Crystal Space
+@section Basic Libraries
+@cindex libraries
+
+This chapter describes the features of the libraries which are linked into
+typical Crystal Space applications and plugins. For convenience, all of these
+libraries are contained in the primary @file{crystalspace} library, so it is
+not strictly necessary to distinguish them for actual usage, however, for
+developers working on Crystal Space itself, it is helpful to understand how
+these libraries are broken down and the relationship between them.
+
+@menu
+* csGeom:: Geometry Library (@code{csGeom})
+* csUtil:: Utility Library (@code{csUtil})
+@end menu
+
+This section presents a quick overview of the libraries provided by Crystal
+Space. More detailed descriptions of these libraries may be found in later
+sections.
+
+@table @asis
+@item cstool
+This library contains various high-level classes and utilities. They tend to
+be much more specialized than the general-purpose tools provided elsewhere and
+may even depend upon plugin modules (unlike the other libraries mentioned
+here).
+
+@item csutil
+This library contains many low-level utilities including string and hash
+classes, to @sc{zip} manipulation tools, plugin management and Unicode support
+modules.
+
+@item @sc{scf} (Shared Class Facility)
+@sc{scf} is actually a component of ``csutil'', however, it is explained
+separately since it is both complex (compared to the rest of ``csutil'') and
+fundamental to the understanding of plugin modules. @xref{SCF}.
+
+@item csgeom
+A library for geometric operations. It provides 2D and 3D vectors, polygons
+and bounding boxes, 3D matrices and some other useful tools. @xref{csGeom}.
+
+@item csgfx
+Basic image support and graphical manipulation tools.
+@end table
+
+@importss{usingcs,libs,csgeom.txi}
+@importss{usingcs,libs,csutil.txi}
+

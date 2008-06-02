@@ -1,0 +1,106 @@
+<arbvp>
+  <description>bump_ppl_diffuse_attn.avp</description>
+
+  <variablemap variable="light 0 position" destination="register 0"/>
+  <variablemap variable="light 0 diffuse" destination="register 1"/>
+  <variablemap variable="light 0 specular" destination="register 2"/>
+  <variablemap variable="light 0 attenuation" destination="register 3"/>
+  
+  <variablemap variable="mat diffuse" destination="register 4"/>
+  <variablemap variable="mat ambient" destination="register 5"/>
+  <variablemap variable="mat reflection" destination="register 6"/>
+  <variablemap variable="mat flatcolor" destination="register 7"/>
+  
+  <variablemap variable="mat specular" destination="register 8"/>
+  <program>
+    <![CDATA[
+      !!ARBvp1.0
+      #---------------------------------------
+      # VP for single pass PPL w/ dot3 bumps
+      #---------------------------------------
+      #Parameter definition
+      PARAM mv[4]	     	= { state.matrix.modelview };
+      PARAM mvi[4]	 	= { state.matrix.modelview.inverse };
+      PARAM mvp[4]	     	= { state.matrix.mvp };
+      PARAM lightPos   		= program.local[0];
+      PARAM lightDiffuse 	= program.local[1];
+      PARAM lightSpecular 	= program.local[2];
+      PARAM lightAtt 	        = program.local[3];
+      PARAM z 	= {0, 0, 1, 0};
+      PARAM const = {0.5, 0.16666666666667, 1, 1};
+      
+      PARAM materialDiffuse	= program.local[4];
+      PARAM materialAmbient	= program.local[5];
+      PARAM materialReflection	= program.local[6];
+      PARAM materialFlatColor 	= program.local[7];
+      PARAM materialSpecular 	= program.local[8];
+      # Per vertex inputs
+      ATTRIB iPos		= vertex.position;
+      ATTRIB iCol0		= vertex.color;
+      ATTRIB iNorm		= vertex.normal;
+      ATTRIB iTex0		= vertex.texcoord[0];
+      ATTRIB iTang		= vertex.texcoord[1];
+      ATTRIB iBiNorm	        = vertex.texcoord[2];
+      # Outputs
+      OUTPUT oPos		= result.position;
+      OUTPUT oCol0		= result.color;
+      OUTPUT oAttMapXY          = result.texcoord[0];
+      OUTPUT oAttMapZ           = result.texcoord[1];
+      OUTPUT oLightDir	        = result.texcoord[2];
+      OUTPUT oNormal		= result.texcoord[3];
+      OUTPUT oTex0		= result.texcoord[4];
+      # Temporaries
+      TEMP objLight;
+      TEMP tangLight;
+      TEMP invRadius;
+      
+      #Transform vertex to viewspace
+      DP4 oPos.x, mvp[0], iPos;
+      DP4 oPos.y, mvp[1], iPos;
+      DP4 oPos.z, mvp[2], iPos;
+      DP4 oPos.w, mvp[3], iPos;
+      
+      #Just pass on texture-coordinate
+      MOV oTex0, iTex0;
+      
+      #Transform light to object space
+      DP4 objLight.x, mvi[0], lightPos;
+      DP4 objLight.y, mvi[1], lightPos;
+      DP4 objLight.z, mvi[2], lightPos;
+      DP4 objLight.w, mvi[3], lightPos;
+
+      #calculate vector from vertex to light in object-space
+      ADD objLight, objLight, -iPos;
+
+      #Transform light to tangent space
+      DP4 tangLight.x, iTang, objLight;
+      DP4 tangLight.y, iBiNorm, objLight;
+      DP4 tangLight.z, iNorm, objLight;
+      SGE tangLight.w, tangLight.x, tangLight.x;
+
+      #Just pass on normal
+      MOV oNormal, iTex0;
+      
+      #calculate vector from vertex to light in object-space
+      MOV oLightDir, tangLight;
+      
+      #Calculate attenuation map coordinates
+      #Assume .y or .z contains 1/radius
+      ADD invRadius.x, lightAtt.y, lightAtt.z;
+      MUL invRadius.x, invRadius.x, const.y;
+      MAD oAttMapXY, objLight, invRadius.xxxx, const.xxxx;
+      MOV oAttMapXY.z, const.w;
+      MOV oAttMapXY.w, const.w;
+      MAD oAttMapZ.x, objLight.z, invRadius.x, const.x;
+      MOV oAttMapZ.y, const.x;
+      MOV oAttMapZ.z, const.w;
+      MOV oAttMapZ.w, const.w;
+      
+      #Just pass on diffuse color
+      MOV oCol0.xyz, lightDiffuse;
+      MOV oCol0.w, const.w;
+      
+      END
+    ]]>
+  </program>
+</arbvp>

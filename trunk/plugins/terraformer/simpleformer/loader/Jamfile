@@ -1,0 +1,11 @@
+SubDir TOP plugins terraformer simpleformer loader ;
+
+Description simpleformer : "simple terraformer loader" ;
+
+Plugin simpleformerldr
+	: [ Wildcard *.cpp *.h ]
+;
+Includes loader.h : $(SUBDIR)/loader.tok ;
+LinkWith simpleformerldr : crystalspace ;
+
+CompileGroups simpleformerldr :  meshes ;

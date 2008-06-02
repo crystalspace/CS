@@ -1,0 +1,11 @@
+SubDir TOP apps ;
+
+SubInclude TOP apps demo ;
+SubInclude TOP apps import ;
+SubInclude TOP apps isotest ;
+SubInclude TOP apps pysimp ;
+SubInclude TOP apps tests ;
+SubInclude TOP apps tools ;
+SubInclude TOP apps tutorial ;
+SubInclude TOP apps walktest ;
+SubInclude TOP apps waterdemo ;

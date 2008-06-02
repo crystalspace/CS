@@ -1,0 +1,6 @@
+SubDir TOP plugins proctex ;
+
+SubInclude TOP plugins proctex ptanimimg ;
+SubInclude TOP plugins proctex ptpdlight ;
+SubInclude TOP plugins proctex standard ;
+SubInclude TOP plugins proctex tlfunc ;

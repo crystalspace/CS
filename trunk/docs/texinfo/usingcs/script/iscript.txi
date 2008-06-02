@@ -1,0 +1,28 @@
+@node iScript Interface, Java Bindings, Scripting Languages, Scripting Languages
+@subsection The iScript Interface
+@cindex @code{iScript}
+
+The @samp{iScript} interface is used from C++ code to interact with scripting
+language interpreters. It enables one to create and destroy variables and
+set and get their values, call subroutines, and create new objects in the
+scripting language.
+
+The @samp{iScriptObject} interface represents an object in the scripting
+language, and enables one to call its methods and set and get its properties.
+It can also provide the name of the object's class (returned as a string),
+test for membership of a certain class (the "is-a" relationship, returning
+true if the object in question is an instance of the specified class or one of
+its subclasses), and if the object is a scripting language wrapper around a
+C++ object (i.e. it is part of the Crystal Space bindings) then it can provide
+a pointer to the underlying C++ object.
+
+The @samp{iScriptValue} interface represents a constant expression as used by
+the scripting language, such as 3.14159 or "hello". Pointers to implementations
+of this interface are used with variable accessors and subroutine calls in
+@samp{iScript} and with property accessors and method calls in
+@samp{iScriptObject}. New instances are returned by @samp{iScript::RValue()}.
+The storable types are @samp{int}, @samp{float}, @samp{double}, @samp{bool},
+@samp{const char*} (string) and @samp{iScriptObject*}.
+
+These interfaces are defined in @file{include/ivaria/script.h}, and fully
+documented in the Public @sc{api} Reference.

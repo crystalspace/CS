@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!-- sndsysogg.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.sndsys.element.ogg</name>
+        <implementation>SndSysOggLoader</implementation>
+        <description>Ogg Vorbis Sound System Element</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
+

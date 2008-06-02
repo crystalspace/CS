@@ -1,0 +1,4 @@
+SubDir TOP plugins console output ;
+
+SubInclude TOP plugins console output fancy ;
+SubInclude TOP plugins console output standard ;

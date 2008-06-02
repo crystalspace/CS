@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!-- particles.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.object.particles</name>
+        <implementation>ParticlesMeshObjectType</implementation>
+        <description>Crystal Space Particle System</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.object.particles.emitter</name>
+        <implementation>ParticleEmitterFactory</implementation>
+        <description>Crystal Space Particle System - Emitters</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.object.particles.effector</name>
+        <implementation>ParticleEffectorFactory</implementation>
+        <description>Crystal Space Particle System - Effectors</description>
+      </class>      
+    </classes>
+  </scf>
+</plugin>

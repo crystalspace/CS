@@ -1,0 +1,10 @@
+SubDir TOP plugins mesh null persist standard ;
+
+Description nullmeshldr : "Null mesh object loader" ;
+
+Plugin nullmeshldr
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith nullmeshldr : crystalspace ;
+
+CompileGroups nullmeshldr :  meshes ;

@@ -1,0 +1,26 @@
+@c -*-texinfo-*-
+@node Platform Instructions, Problems, External Libraries, Building
+@section Platform Specific Instructions
+
+When working with Crystal Space, always keep in mind that this is a
+multi-platform project.  Sometimes not all features will work correctly or be
+available on all platforms.  If you are using the @sc{svn} version of Crystal
+Space and run across a problem, it usually pays off to post a message to the
+Crystal Space mailing list describing you problem along with relevant
+diagnostic messages.  @xref{Mailing Lists}.
+
+For some ports there is additional reference information explaining the
+internal workings of the port. When such detailed information exists, you will
+find a reference to it from within the instructions in this section.
+
+@menu
+* Unix::
+* MSVC7:: Microsoft Visual C++ 7, 7.1 or 8
+* MinGW:: Windows using MinGW
+* Cygwin:: Windows using Cygwin
+* MacOS/X::
+@end menu
+
+@importss{build,platform,unix.txi}
+@importsss{build,platform,win32,win32.txi}
+@importss{build,platform,macosx.txi}

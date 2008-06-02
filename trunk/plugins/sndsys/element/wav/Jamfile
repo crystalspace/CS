@@ -1,0 +1,9 @@
+SubDir TOP plugins sndsys element wav ;
+
+Plugin sndsyswav :
+	[ Wildcard *.cpp *.h ]
+;
+Description sndsyswav : "PCM Wave sound element for sndsys" ;
+LinkWith sndsyswav : crystalspace ;
+CompileGroups sndsyswav : sndsys ;
+

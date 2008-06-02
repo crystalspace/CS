@@ -1,0 +1,4 @@
+SubDir TOP plugins mesh protomesh ;
+
+SubInclude TOP plugins mesh protomesh object ;
+SubInclude TOP plugins mesh protomesh persist ;

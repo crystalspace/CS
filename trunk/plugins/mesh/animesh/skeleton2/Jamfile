@@ -1,0 +1,6 @@
+SubDir TOP plugins mesh animesh skeleton2 ;
+
+Description skeleton2 : "Animated skeleton plugin" ;
+Plugin skeleton2 : [ Wildcard *.cpp *.h ] ;
+LinkWith skeleton2 : crystalspace ;
+CompileGroups skeleton2 : meshes ;

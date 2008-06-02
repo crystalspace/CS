@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- physldr.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.dynamics.loader</name>
+        <implementation>csPhysicsLoader</implementation>
+        <description>Crystal Space dynamics loader</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

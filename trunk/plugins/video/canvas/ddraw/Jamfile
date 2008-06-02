@@ -1,0 +1,10 @@
+SubDir TOP plugins video canvas ddraw ;
+
+if $(DIRECTX.AVAILABLE) = "yes"
+{
+Description ddraw2d : "DirectDraw 2D driver" ;
+Plugin ddraw2d : [ Wildcard *.cpp *.h ] ;
+LinkWith ddraw2d : crystalspace_windows crystalspace_directx crystalspace ;
+ExternalLibs ddraw2d : DIRECTX ;
+CompileGroups ddraw2d : canvases softcanvas ;
+}

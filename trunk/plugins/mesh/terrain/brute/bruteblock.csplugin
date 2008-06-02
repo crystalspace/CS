@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- bruteblock.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.object.terrain.bruteblock</name>
+        <implementation>csTerrainObjectType</implementation>
+        <description>Brute Block Terrain Mesh Type</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

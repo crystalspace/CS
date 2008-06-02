@@ -1,0 +1,25 @@
+# ! /bin/sh
+CURDIR=$1
+cp -r $CURDIR/CS/scripts/lua \
+	$CURDIR/debian/tmp/usr/lib/crystalspace/scripts
+cp -r $CURDIR/CS/scripts/blender \
+	$CURDIR/debian/tmp/usr/lib/crystalspace/scripts
+cp -r $CURDIR/CS/scripts/cs-config \
+	$CURDIR/debian/tmp/usr/lib/crystalspace/scripts
+
+for level in flarge partsys
+do
+	[ -d $CURDIR/CS/data/$level ] && \
+	cd $CURDIR/CS/data/$level ; \
+	zip $CURDIR/debian/tmp/usr/lib/crystalspace/data/$level.zip world
+done
+[ -d $CURDIR/debian/tmp/usr/lib/crystalspace/data/mdltest ] \
+|| mkdir $CURDIR/debian/tmp/usr/lib/crystalspace/data/mdltest
+cp $CURDIR/CS/data/mdltest/?o* $CURDIR/debian/tmp/usr/lib/crystalspace/data/mdltest
+
+[ ! -f $CURDIR/debian/tmp/usr/lib/crystalspace/data/config/csbumptest.cfg ] && \
+echo "Compensate missing csbumptest.cfg file" && \
+cp $CURDIR/CS/data/config/csbumptest.cfg $CURDIR/debian/tmp/usr/lib/crystalspace/data/config
+[ ! -f $CURDIR/debian/tmp/usr/lib/crystalspace/data/config/csdemo.cfg ] && \
+echo "Compensate missing csdemo.cfg file" && \
+cp $CURDIR/CS/data/config/csdemo.cfg $CURDIR/debian/tmp/usr/lib/crystalspace/data/config

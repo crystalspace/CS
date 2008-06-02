@@ -1,0 +1,109 @@
+TOP ?= "@top_srcdir@" ;
+BUILDTOP ?= "@top_builddir@" ;
+
+SubDir TOP ;
+
+IncludeDir ;
+IncludeDir src ;
+IncludeDir $(BUILDTOP) : : literal transient ;
+
+CleanDir clean :
+    out ;
+Clean distclean :
+    aclocal.m4
+    config.h
+    config.h.in~
+    config.log
+    config.status
+    config.status.lineno
+    config.cache
+    configure.lineno
+    Jamconfig
+    Jamfile ;
+CleanDir distclean :
+    autom4te.cache ;
+Depends distclean : clean ;
+
+Clean maintainerclean :
+  config.h.in
+  configure ;
+Depends maintainerclean : distclean ;
+
+Help distclean : "Remove built targets and configuration" ;
+Help maintainerclean :
+    "Remove built targets, configuration, and generated files." ;
+
+# Set up subdirectories into which the different generated project for 
+# different go.
+MsvcGenSubDir TOP msvc : common ;
+MsvcGenSubDir TOP msvc 7 : 7 ;
+MsvcGenSubDir TOP msvc 71 : 71 ;
+MsvcGenSubDir TOP msvc 8 : 8 ;
+MsvcGenTemplateDir TOP mk msvcgen ;
+
+# Customize the build configurations to contain some defines required by
+# CrystalSpace.  NOTE: The file with the customization options is assumed
+# to reside in mk/msvcgen/.
+MsvcGenVariable customize : custom.cslib ;
+
+# Set up the workspace we want msvcgen to synthesize.
+MsvcGenWorkspace #PROJECTNAME# ;
+
+local hash = "\$" ;
+MsvcGenConfig CRYSTAL.AVAILABLE : yes ;
+MsvcGenConfig CRYSTAL.DEFINES ;
+MsvcGenConfig CRYSTAL.CFLAGS ;
+MsvcGenConfig CRYSTAL.LFLAGS ;
+MsvcGenConfig CRYSTAL.LIBS : "libcrystalspace.lib" ;
+MsvcGenConfig CRYSTAL.LIBS.DEBUG : "libcrystalspace_d.lib" ;
+MsvcGenConfig CRYSTAL.INCDIRS :
+  [ ConcatDirs .. .. .. CS include ]
+  [ ConcatDirs .. .. .. CS include csutil win32 ]
+  [ ConcatDirs "$(hash)(CRYSTAL)" include ]
+  [ ConcatDirs "$(hash)(CRYSTAL)" include csutil win32 ] ;
+MsvcGenConfig CRYSTAL.LIBDIRS :
+  [ ConcatDirs .. .. .. CS out release$(MSVC_VERSION) libs ]
+  [ ConcatDirs .. .. .. CS libs csutil win32 libs ]
+  [ ConcatDirs "$(hash)(CRYSTAL)" out release$(MSVC_VERSION) libs ]
+  [ ConcatDirs "$(hash)(CRYSTAL)" libs csutil win32 libs ] ;
+MsvcGenConfig CRYSTAL.LIBDIRS.DEBUG :
+  [ ConcatDirs .. .. .. CS out debug$(MSVC_VERSION) libs ]
+  [ ConcatDirs .. .. .. CS libs csutil win32 libs ]
+  [ ConcatDirs "$(hash)(CRYSTAL)" out debug$(MSVC_VERSION) libs ]
+  [ ConcatDirs "$(hash)(CRYSTAL)" libs csutil win32 libs ] ;
+
+if $(CEL.DESIRED) = yes
+{
+  MsvcGenConfig CEL.AVAILABLE : yes ;
+  MsvcGenConfig CEL.DEFINES : USE_CEL ;
+  MsvcGenConfig CEL.CFLAGS ;
+  MsvcGenConfig CEL.LFLAGS ;
+  MsvcGenConfig CEL.LIBS : "libceltool.lib" ;
+  MsvcGenConfig CEL.LIBS.DEBUG : "libceltool_d.lib" ;
+  MsvcGenConfig CEL.INCDIRS :
+    [ ConcatDirs .. .. .. cel include ]
+    [ ConcatDirs "$(hash)(CEL)" include ]
+    [ ConcatDirs "$(hash)(CEL)" include cel ] ;
+  MsvcGenConfig CEL.LIBDIRS :
+    [ ConcatDirs .. .. .. cel out release libs ]
+    [ ConcatDirs "$(hash)(CEL)" out release libs ]
+    [ ConcatDirs "$(hash)(CEL)" libs ] ;
+  MsvcGenConfig CEL.LIBDIRS.DEBUG :
+    [ ConcatDirs .. .. .. cel out debug libs ]
+    [ ConcatDirs "$(hash)(CEL)" out debug libs ]
+    [ ConcatDirs "$(hash)(CEL)" libs ] ;
+}
+
+# Set project-specific compiler and linker options for msvcgen.
+#MsvcDefine MY_DEFINE : "my value" ;
+#MsvcDefine MY_RELEASE_DEFINE : "my release value" : release ;
+#MsvcDefine MY_DEBUG_DEFINE : "my debug value" : debug ;
+#MsvcCFlags : "/I \"my\\inc\\path\"" : release ;
+#MsvcCFlags : "/I \"my\\debuginc\\path\"" : debug ;
+#MsvcLFlags : "/libpath:\"my\\lib\\path\"" : release ;
+#MsvcLFlags : "/libpath:\"my\\debuglib\\path\"" : debug ;
+#MsvcGenConfig SUPERCOOL.AVAILABLE : yes ;
+#MsvcGenConfig SUPERCOOL.LIBS : supercool.lib ;
+#MsvcGenConfig SUPERCOOL.LIBS.DEBUG : supercooldebug.lib ;
+
+SubInclude TOP src ;

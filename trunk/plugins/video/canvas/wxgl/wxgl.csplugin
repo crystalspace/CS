@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- wxgl.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphics2d.wxgl</name>
+        <implementation>csGraphics2DWX</implementation>
+        <description>wxWidgets OpenGL canvas</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

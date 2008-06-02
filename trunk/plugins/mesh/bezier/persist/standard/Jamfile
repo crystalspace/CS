@@ -1,0 +1,11 @@
+SubDir TOP plugins mesh bezier persist standard ;
+
+Description bezierldr : "Bezier mesh object loader" ;
+
+Plugin bezierldr
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith bezierldr : crystalspace ;
+
+CompileGroups bezierldr :  meshes ;
+

@@ -1,0 +1,12 @@
+SubDir TOP plugins physics loader ;
+
+if $(ODE.AVAILABLE) = "yes" || $(BULLET.AVAILABLE) = "yes"
+{
+Description physldr : "Physics Loader plugin" ;
+
+Plugin physldr
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith physldr : crystalspace ;
+
+}

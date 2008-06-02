@@ -1,0 +1,74 @@
+SubDir TOP docs texinfo ;
+
+{
+local alltexi = cs-unix.txi [ Filter [ Recurse : .txi ] :
+  cs-unix.txi cs-dos.txi cs-mac.txi dosdef.txi macdef.txi unixdef.txi ] ;
+
+RepairNodes repairdoc : $(alltexi[1]) ;
+Help repairdoc : "Repair Texinfo @node and @menu directives" ;
+
+Texi2Info manualinfo : $(alltexi) : info : info manual : crystalspace.info ;
+Help manualinfo : "Convert user manual to Info format" ;
+
+Texi2DVI manualdvi : $(alltexi) : dvi manual : csmanual.dvi ;
+Help manualdvi : "Convert user manual to DVI format" ;
+
+Texi2PS manualps : $(alltexi) : ps manual : csmanual.ps ;
+Help manualps : "Convert user manual to PostScript format" ;
+
+Texi2PDF manualpdf : $(alltexi) : pdf manual : csmanual.pdf ;
+Help manualpdf : "Convert user manual to PDF format" ;
+
+local htmlroot = [ Texi2HTML manualhtml : $(alltexi) : html manual :
+  index.html : -prefix=cs ] ;
+Help manualhtml : "Convert user manual to HTML format" ;
+
+if $(PERL) && $(CMD.HHC)
+{
+  GENDOCTOC ?= [ ConcatDirs $(TOP) docs support winhelp gendoctoc.pl ] ;
+
+  actions GenDocToc
+  {
+    $(PERL) -I"$(GENDOCTOC:D)" "$(GENDOCTOC)" manual $(>:D) $(<)
+  }
+
+  actions CompileCHM
+  {
+    cd $(<:D) ; $(CMD.HHC) $(>:BS)
+  }
+
+  local outtmp = [ on $(htmlroot) GetVar LOCATE ] ;
+  local hhcfile = manualtoc.hhc ;
+  local hhkfile = manualindex.hhk ;
+  MakeLocate $(hhcfile) $(hhkfile) : $(outtmp) ;
+  GenDocToc $(hhcfile) $(hhkfile) : $(htmlroot) ;
+  Depends $(hhcfile) $(hhkfile) : $(htmlroot) ;
+
+  local hhpfile = csmanual.hhp ;
+  local hhpcopy = $(hhpfile:G=copy) ;
+  SEARCH on $(hhpfile) = $(GENDOCTOC:D) ;
+  MakeLocate $(hhpcopy) : $(outtmp) ;
+  Copy $(hhpcopy) : $(hhpfile) ;
+  Depends $(hhpcopy) : $(hhpfile) ;
+
+  local chmtmp = csmanual.chm ;
+  MakeLocate $(chmtmp) : $(outtmp) ;
+  CompileCHM $(chmtmp) : $(hhpcopy) ;
+  Depends $(chmtmp) : $(hhpcopy) $(hhcfile) $(hhkfile) ;
+
+  local outdir = [ FDirName $(LOCATE.DOCS) chm manual ] ;
+  local chmfile = $(chmtmp:G=final) ;
+  MakeLocate $(chmfile) : $(outdir) ;
+  Copy $(chmfile) : $(chmtmp) ;
+  Depends $(chmfile) : $(chmtmp) ;
+
+  RmTemps $(chmtmp) : $(hhpcopy) $(hhcfile) $(hhkfile) ;
+  RmTemps $(chmfile) : $(chmtmp) ;
+  Depends manualchm : $(chmfile) ;
+  NotFile manualchm ;
+  Help manualchm : "Convert user manual to CHM format" ;
+  Clean manualchmclean : $(chmfile) ;
+  CleanDir manualchmclean : $(outdir) ;
+  Depends clean : manualchmclean ;
+}
+}

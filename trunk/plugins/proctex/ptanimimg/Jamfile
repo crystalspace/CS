@@ -1,0 +1,10 @@
+SubDir TOP plugins proctex ptanimimg ;
+
+Description ptanimimg : "animated image procedural texture" ;
+
+Plugin ptanimimg
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith ptanimimg : crystalspace ;
+
+CompileGroups ptanimimg : proctexes ;

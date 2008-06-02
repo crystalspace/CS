@@ -1,0 +1,64 @@
+Crystal Space 3D SDK
+http://www.crystalspace3d.org/
+
+Complete instructions for building and installing Crystal Space are available
+in the "Building and Installing" chapter of the Crystal Space manual, which can
+be found in the source tree at CS/docs/html/manual/index.html, or online at:
+
+http://www.crystalspace3d.org/docs/online/manual/
+
+The especially impatient can follow the quick-start instructions below.  It is
+strongly recommended, however, that you consult the much more detailed build
+instructions in the manual, particularly if you are using Microsoft Windows.
+
+
+Unix-like Platforms (including MacOS/X, GNU/Linux, BSD, Darwin, etc.)
+===================
+
+Crystal Space is built and installed in the same fashion as most other open
+source projects using the following idiom:
+
+% ./configure
+% make
+% sudo make install
+
+
+Microsoft Windows
+=================
+
+Download and install the cs-win32libs support package. This is a convenience
+package containing many of the 3rd-party supporting libraries utilized by
+Crystal Space, and which are commonly already installed on Unix platforms, but
+not on Microsoft Windows.
+
+http://www.crystalspace3d.org/support/win32/cs-win32libs-x.xxry_yyy.exe
+
+You will find versions of cs-win32libs for the stable release of Crystal Space,
+as well as for the bleeding-edge developer version of Crystal Space.  Download
+the package which has a version number (the `x.xx' in the example) which
+corresponds to the version number of the Crystal Space package which you are
+using.
+
+
+MSVC / Visual-C++
+-----------------
+
+Navigate to one of the directories CS\mk\msvc7, CS\mk\msvc71, or CS\mk\msvc8,
+depending upon your version of MSVC, and open the `wkstypical.sln' solution
+file.  From the "Build" menu, invoke "Build Solution".
+
+
+MinGW and Cygwin
+----------------
+
+MinGW users should also install the MSYS adjunct package (available from
+http://www.mingw.org/), which provides a handy Unix-like shell environment and
+other useful command-line utilities.
+
+For MingW and Cygwin, after installing cs-win32libs (described above), open a
+shell window, and then perform the typical Unix idiom for building and
+installing:
+
+% ./configure
+% make
+% make install

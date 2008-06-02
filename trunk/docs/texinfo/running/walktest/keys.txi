@@ -1,0 +1,88 @@
+@c -*-texinfo-*-
+@node Walktest Keyboard, Console, Walktest, Walktest
+@subsection Keyboard Interface
+@cindex Walktest Keys
+@cindex Keyboard Control, Walktest
+
+To navigate through a map in the Walktest application, use these keys:
+
+@table @kbd
+@item b
+Turn camera the other way around (by 180 degrees).
+
+@item @key{SHIFT}
+Makes the following movement commands faster.
+
+@item @key{CTRL}
+Makes the following movement commands very slow (for debugging).
+
+@item @key{UP}, @key{DOWN}
+Move forward or backward.
+
+@item @key{LEFT}, @key{RIGHT}
+Turn left or right.
+
+@item @key{ALT}-@key{UP}, @key{ALT}-@key{DOWN}
+Move up or down.
+
+@item @key{ALT}-@key{LEFT}, @key{ALT}-@key{RIGHT}
+Strafe left or right.
+
+@item @key{PAGE-UP}, @key{PAGE-DOWN}
+Rotate upwards or downwards.
+
+@item 3
+Change mode of movement. Default is like most 3D games do (Quake-like). If
+you press this then movement will be fully 3D (Descent-like). This affects
+the left and right arrow keys only.
+
+@item \
+Enable freelook mode (press once to enable, press again to disable).
+
+@item a
+Activate a trigger.
+
+@item @key{SPACE}
+Fire a missile (a moving sprite and a dynamic light).
+
+@item c
+Load coordinates from the @file{coord} file and jump camera to that
+location.
+
+@item @key{SHIFT}-c
+Save current coordinates to the @file{coord} file.
+
+@item @key{ALT}-c
+Show where we are (current sector and coordinates). Output is sent to the file
+@file{debug.txt}.
+
+@item @key{CTRL}-c
+Toggle display of coordinates while we are running.
+
+@item q
+Quit program.
+
+@item p
+Do a performance test on the current location.
+
+@item @key{TAB}
+Toggle input console.  For a list of commands, @xref{Console}.
+
+@item 1
+Create a new pulsating dynamic light at your location.
+
+@item @key{SHIFT}-1
+Delete the last created dynamic light.
+
+@item @key{ALT}-1
+Delete all dynamic lights.
+
+@item d
+Assigned to @samp{debug0 toggle}.
+
+@item @key{SHIFT}-d
+Assigned to @samp{debug1}.
+
+@item *
+Enable/disable collision detection.
+@end table

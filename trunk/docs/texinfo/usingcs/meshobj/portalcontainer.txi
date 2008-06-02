@@ -1,0 +1,145 @@
+@c -*-texinfo-*-
+@node MeshObject Portal Container, MeshObject SprCal3D, MeshObject Particles, MeshObject
+@subsection Portal Container Mesh Object
+@cindex MeshObject
+@cindex Portal Container
+@cindex @code{iMeshObject}
+@cindex @code{iMeshObjectFactory}
+@cindex @code{iMeshObjectType}
+@cindex @code{iPortalContainer}
+@cindex @code{iPortal}
+
+@emph{Written by Jorrit Tyberghein,
+(@email{jorrit.tyberghein@@gmail.com}).}
+
+This is a special type of mesh object which basically represents a collection
+of portals. The portal container is not implemented as a seperate plugin
+but is built-in into the engine plugin. There is no type or factory
+interface for portal containers. They are created by the engine directly
+as mesh objects.
+
+@subsubheading Object State Interface
+
+@samp{iPortalContainer} (residing in
+@file{CS/include/iengine/portalcontainer.h}) is the @sc{scf} interface
+that you can use to manipulate settings for a portal container. By using
+this interface you can access the portals contained in this portal
+container.
+
+To create a portal container you need to use @sc{api} calls in the engine:
+@code{iEngine::CreatePortalContainer()} and @code{iEngine::CreatePortal()}.
+Portal containers are normal mesh objects otherwise. They implement
+@code{iMeshObject} and are put in a sector like other mesh objects.
+
+@subsubheading Object Loader
+
+With normal mesh objects you have a specific loader plugin to load
+the mesh. Portal containers are loaded by the standard map loader instead.
+There are two basic ways to add a portal container to a sector. Either
+you use @samp{portals} to define multiple portals at once (in one portal
+container) or else you use a single @samp{portal} statement to create
+a portal container with one portal. In both cases you place it in
+a sector (it becomes a normal mesh object). In the case of @samp{portals}
+you can also add many regular mesh object statement like @samp{move} to
+move the portal and others. Here is an example:
+
+@example
+<portals name="myPortal">
+  <portal>
+    <v x="0.2" y="2.8" z="-0.8" />
+    <v x="0.2" y="2.8" z="0.8" />
+    <v x="0.2" y="-1" z="0.8" />
+    <v x="0.2" y="-1" z="-0.8" />
+    <sector>destSector</sector>
+    <float />
+    <clip />
+  </portal>
+  <hardmove>
+    <v x="13" y="0" z="12" />
+  </hardmove>
+  <priority>object</priority>
+</portals>
+@end example
+
+Here you see how a portal container with a single portal is created.
+The destination sector is @samp{destSector}.
+
+When you use the short-hand @samp{portal} statement you can't set mesh
+parameters like the position of the portal (you'll have to encode position
+in the vertices) and render priority.
+
+Here is a list of all the tags supported by a portal object and their
+meaning (these tags are for usage inside the @samp{portal} statement and
+not directly inside @samp{portals}):
+@itemize @bullet
+@item @samp{sector}
+The name of the destination sector for this portal.
+@item @samp{autoresolve}
+With this flag set (default) the portal will automatically connect
+to the sector as soon as it is created. That means you can create a portal
+to a sector that doesn't yet exist. As soon as the sector is created it
+will connect to it. If the sector is then removed again the portal
+will become a @samp{null-portal} again. With this flag not set you can
+also create a portal that will connect to a sector as soon as it is created
+but it will not be able to reconnect later if the sectors goes away
+and is created again. i.e. connection is one-time only.
+@item @samp{key}
+Add a key-value item to this portal container.
+@item @samp{v}
+Add a vertex to the portal polygon.
+@item @samp{maxvisit}
+If you use space-warping portals it is easy to get in a situation where
+you have infinite recursion (i.e. imagine two mirroring portals facing
+each other). To avoid this problem there is a maximum recursion limit
+per portal. By default this is set to 5. You can change this value here.
+@item @samp{matrix}
+If you use this then the portal will be a space warping portal. That
+means that it will change the camera transform. Using this you can
+do various tricks like mirrors and othes.
+@item @samp{wv}
+This vector is added to the camera transform before the matrix is
+applied. It enables space warping.
+@item @samp{ww}
+This vector is added to the camera transform after the matrix is
+applied. It enables space warping.
+@item @samp{mirror}
+This is a shortcut to enable a space warping camera that mirrors space
+(like a mirror would work).
+@item @samp{clipstraddling}
+With this flag set the portal will clip geometry of an object that
+is straddling this portal (i.e. the object is both in the source and
+destination sector and the portal 'cuts' the object). This is only needed
+if the portal is on a surface that is transparent. A space warping portal
+will have the effect of this flag automatically.
+@item @samp{clip}
+If this flag is set then this portal will clip all geometry in the
+destination sector. This must be used for portals which arrive in the middle
+of a sector. Otherwise objects that are in the destination sector and are
+between the camera and the position of where the portal is in the source
+sector might be rendered in front of the portal incorrectly.
+@item @samp{zfill}
+With this flag set the portal will do a Z-fill after rendering the contents
+(as if it was a normal polygon). this is mainly useful for floating portals
+where it is possible that there is geometry in the same sector that will
+be rendered behind the portal (and thus could accidently get written in the
+portal sector because the Z-buffer cannot be trusted).
+@item @samp{float}
+If this flag is used then the portal will use possible available stencil
+buffer hardware to do good clipping. This flag should be used if you have
+a portal that is not at the boundary of a sector (i.e. there can be geometry
+behind the portal but in the same source sector as the portal) and that can
+be covered (or itself covers) other objects. It is usually used in
+combination with @samp{zfill} and sometimes with @samp{clip} if the
+destination of the portal enters in the middle of a sector.
+@item @samp{colldet}
+If this flag is set then this portal is used for collision detection.
+@item @samp{viscull}
+If this flag is set then this portal can be used for visibility culling (i.e.
+it acts as an occluder for objects behind the portal but in the same sector
+as the portal itself).
+@item @samp{static}
+This flag indicates if the destination of this portal should not
+be transformed from object to world space. For mirrors you should disable
+this flag because you want the destination to move with the source.
+@end itemize
+

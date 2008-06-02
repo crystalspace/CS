@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!-- csparser.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.level.loader</name>
+        <implementation>csLoader</implementation>
+        <description>Level and library file loader</description>
+        <requires>
+          <class>crystalspace.kernel.</class>
+          <class>crystalspace.sound.loader.</class>
+          <class>crystalspace.sndsys.element.loader</class>
+          <class>crystalspace.image.loader</class>
+          <class>crystalspace.mesh.loader.</class>
+          <class>crystalspace.engine.3d</class>
+          <class>crystalspace.graphics3d.</class>
+          <class>crystalspace.sound.render.</class>
+          <class>crystalspace.sndsys.renderer.</class>
+          <class>crystalspace.documentsystem.</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.texture.loader.checkerboard</name>
+        <implementation>csCheckerTextureLoader</implementation>
+        <description>Checkerboard texture loader</description>
+        <requires>
+          <class>crystalspace.level.loader</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.texture.loader.image</name>
+        <implementation>csImageTextureLoader</implementation>
+        <description>Image texture loader</description>
+        <requires>
+          <class>crystalspace.level.loader</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.texture.loader.cubemap</name>
+        <implementation>csCubemapTextureLoader</implementation>
+        <description>Cube map texture loader</description>
+        <requires>
+          <class>crystalspace.level.loader</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.texture.loader.tex3d</name>
+        <implementation>csTexture3DLoader</implementation>
+        <description>3D texture loader</description>
+        <requires>
+          <class>crystalspace.level.loader</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>

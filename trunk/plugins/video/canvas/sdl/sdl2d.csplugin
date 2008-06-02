@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- sdl2d.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphics2d.sdl2d</name>
+        <implementation>csGraphics2DSDL</implementation>
+        <description>Simple Direct Media Layer 2D graphics driver for Crystal Space</description>
+        <requires>
+          <class>crystalspace.font.server.</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>

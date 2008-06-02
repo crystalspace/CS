@@ -1,0 +1,22 @@
+@c -*-texinfo-*-
+@node Using lighter2, md32spr Tutorial, 3DSMax, Working with Engine Content
+@section Using @code{lighter2}
+@cindex Using @code{lighter2}
+
+The @code{lighter2} documentation consists of two parts: The first one, the
+``User's Manual'', which generally describes the options @code{lighter2}
+offers.  The intended audience are artists who design a level which should
+feature static lighting computed by @code{lighter2}.
+
+The second part, the ``Developer's Manual'', describes how the available 
+options can be set from inside a CS @file{world} file.  The intended audience
+are developers who write level exporters and converters and need to know how
+a certain user-configured option has to be specified.
+
+@menu
+* lighter2 User's Manual:: @code{lighter2} User's Manual
+* lighter2 Developer's Manual:: @code{lighter2} Developer's Manual
+@end menu
+
+@importss{content,lighter2,users.txi}
+@importss{content,lighter2,developers.txi}

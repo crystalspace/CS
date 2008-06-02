@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!-- sndsysnull.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.sndsys.software.driver.null</name>
+        <implementation>SndSysDriverNull</implementation>
+        <description>Sound System Null (no output) Software Driver</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
+

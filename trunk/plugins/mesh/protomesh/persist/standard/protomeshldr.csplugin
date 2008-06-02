@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!-- protomeshldr.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.loader.factory.protomesh</name>
+        <implementation>csProtoFactoryLoader</implementation>
+        <description>Crystal Space Proto Mesh Factory Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.loader.protomesh</name>
+        <implementation>csProtoMeshLoader</implementation>
+        <description>Crystal Space Proto Mesh Mesh Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.factory.protomesh</name>
+        <implementation>csProtoFactorySaver</implementation>
+        <description>Crystal Space Proto Mesh Factory Saver</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.protomesh</name>
+        <implementation>csProtoMeshSaver</implementation>
+        <description>Crystal Space Proto Mesh Mesh Saver</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

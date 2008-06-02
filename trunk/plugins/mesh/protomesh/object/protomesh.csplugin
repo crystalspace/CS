@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- protomesh.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.object.protomesh</name>
+        <implementation>csProtoMeshObjectType</implementation>
+        <description>Crystal Space Proto Mesh Type</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

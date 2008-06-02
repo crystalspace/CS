@@ -1,0 +1,9 @@
+SubDir TOP plugins console output fancy ;
+
+Description fancycon : "fancy output console" ;
+
+Plugin fancycon
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith fancycon : crystalspace ;
+

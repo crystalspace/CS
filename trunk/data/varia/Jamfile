@@ -1,0 +1,3 @@
+SubDir TOP data varia ;
+
+InstallData [ Wildcard *.def *.cam ] : data varia ;

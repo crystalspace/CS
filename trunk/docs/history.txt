@@ -1,0 +1,15 @@
+Crystal Space detailed change log.
+http://www.crystalspace3d.org/
+
+This used to be the history entries for Crystal Space. To lessen the maintence
+burden this have now been fully migrated into subversion. There are a number of
+ways to access recent log information
+
+1. svn log
+	Tips: Use svn log --limit 10 to get the 10 latest changes or 
+	svn log -r {2008-04-20} to get them from a specific day until today.
+
+2. trac timeline at http://crystalspace3d.org/trac/CS/timeline
+
+Please see "history.old" for less recent historical entries.
+

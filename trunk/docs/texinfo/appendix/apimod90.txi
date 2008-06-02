@@ -1,0 +1,964 @@
+@c -*-texinfo-*-
+@node Release Notes 90, Release Notes 18, Release Notes 92, Release Notes
+@appendixsec Release Notes from 0.18 to 0.90
+@cindex Release Notes
+
+This section documents the major changes between versions 0.18 and 0.90 of
+Crystal Space.
+
+@subheading @sc{scf}
+@cindex @sc{scf}
+
+The set of @sc{scf} functions has been removed except for
+@code{scfInitialize()}.  This function creates a global instance of the
+@samp{iSCF} interface which is always available to the application and to
+plugin modules as @samp{iSCF::SCF}.  All other @sc{scf} functionality should be
+accessed via this shared object.  This change makes it possible to call
+@sc{scf} functions from within dynamic libraries (i.e. from plugins), which
+was not possible before.  The only thing that is still not allowed is to use
+the @code{SCF_REGISTER_STATIC()} family of macros in dynamic libraries.
+
+@sc{scf} now associates a so-called @dfn{Interface @sc{id} Number} with every
+interface name.  You can get the number for an interface by calling
+@samp{iSCF::SCF->GetInterfaceID("iInterface")}.  It is currently not possible
+to get the interface name for a given number, but this should not be needed
+anyway (see below).
+
+@code{iBase::QueryInterface()} now takes the interface @sc{id} as its parameter
+instead of the interface name. This makes a lot of optimization possible,
+because interfaces can be compared using simple integer comparison instead
+of string comparison. You will not see anything of this because the
+@code{SCF_QUERY_INTERFACE()} macro shields you from it. As a result, your
+program should not require any changes.
+
+However, you can increase performance in critical areas by using two new macros
+which have been introduced.  Place @code{SCF_DECLARE_FAST_INTERFACE()}
+somewhere at top-level in your source files (or in one of your header files).
+For every interface you do this you can then use
+@code{SCF_QUERY_INTERFACE_FAST()}.  The advantage of this is a performance
+gain.  The disadvantage is that you have to use
+@code{SCF_DECLARE_FAST_INTERFACE()} and that the name of the interface must be
+hard-coded (e.g. you cannot use @code{SCF_QUERY_INTERFACE_FAST()} if the name
+of the interface is given to your function as a parameter).
+
+Three other changes have been done to @sc{scf}.  First, it is now possible to
+get a list of registered classes using @code{iSCF::SCF->QueryClassList()}.
+Second, @code{scfGetRefCount()} has been introduced which allows access to an
+object's reference count without accessing the reference count variable
+directly.  This function should only be used for debugging, however.  Third,
+the macros which implement @samp{iBase} functions have been split up.  For
+example, @samp{SCF_IMPLEMENT_IBASE()} is now composed from these components:
+
+@example
+SCF_IMPLEMENT_IBASE_INCREF()
+SCF_IMPLEMENT_IBASE_DECREF()
+SCF_IMPLEMENT_IBASE_GETREFCOUNT()
+SCF_IMPLEMENT_IBASE_QUERY()
+@end example
+
+This decomposition makes it easier to replace iBase methods individually in a
+particular implementation.
+
+@subheading csObject and @sc{rtti}
+
+The pseudo-@sc{rtti} system has been removed from @code{csObject}.  Instead,
+@sc{scf} functions are now used to identify an object's type.  As an example of
+how this affects your code, if your old code was checking an object's type in
+this fashion:
+
+@example
+csObject* obj = @dots{};
+if (obj->Type == csMyClass::Type)
+@{
+  csMyClass* a = (csMyClass*)obj;
+  @dots{}
+@}
+@end example
+
+Then it should now do so in this fashion:
+
+@example
+csObject *obj = @dots{};
+iMyInterface* a = SCF_QUERY_INTERFACE(obj, iMyInterface);
+if (a != NULL)
+@{
+  @dots{}
+@}
+@end example
+
+In performance-critical areas, you should use @code{SCF_QUERY_INTERFACE_FAST()}
+rather than @code{SCF_QUERY_INTERFACE()}.
+
+A result of this change is that child object iterators cannot easily iterate
+over objects of a certain type anymore.  To achieve the same effect, you should
+create an iterator for all children and then use @code{SCF_QUERY_INTERFACE()}
+to test if an object implements a certain interface.
+
+Note that if you don't want to create proper interfaces for all your classes,
+it is possible to query the class itself instead of an interface.  Assuming
+that @code{csMyClass} is just a set of values, and you don't want to create an
+interface with accessor functions for it.  Then you may place
+@code{SCF_DECLARE_IBASE_EXT()} into the class as usual (note the @samp{EXT}
+version of the macro because it extends the interface list of @samp{csObject}).
+In addition, you must set a version number for the class using
+@code{SCF_VERSION(csMyClass, ?, ?, ?)}.  The interface list then looks like
+this:
+
+@example
+SCF_IMPLEMENT_IBASE_EXT (csMyClass)
+  SCF_IMPLEMENTS_INTERFACE (csMyClass)
+SCF_IMPLEMENT_IBASE_EXT_END
+@end example
+
+Using this you can use @code{SCF_QUERY_INTERFACE(object, csMyClass)}, i.e.
+use the class without an interface.
+
+Another change is that @samp{csObject} stores its children as @samp{iObject}
+references now.  It does not deal with @samp{csObject} pointers any longer.
+All children are correctly reference-counted.  Also, all objects maintain a
+pointer to their ``parent'' object.  How this pointer is used is left to you.
+The pointer is not reference-counted in order to avoid circular referencing.
+Consequently, the classes @samp{csPObject} and @samp{csObjNoDel}, and the
+member function @code{ObjRelease()} have been removed.
+
+This usually means that after calling @code{ObjAdd()}, you have to call
+@code{DecRef()} on the added child because you don't want to use the reference
+anymore.  Of course, this only applies if you possess a valid reference.
+Similarly, if you want to unlink the object from its parent without deleting it
+(i.e.  wherever you used @code{ObjRelease()} before), you should now call
+@code{IncRef()} on the child before removing it from its parent.
+
+@subheading Platform Portability Encapsulation
+
+The new macro @samp{CS_IMPLEMENT_APPLICATION} must now be invoked by exactly
+one compilation unit of each application.  This macro encapsulates
+platform-specific implementation details for any given platform.  For instance,
+on Windows, this macro defines the @code{WinMain()} function required by all
+Windows @sc{gui} applications.
+
+The new macro @samp{CS_IMPLEMENT_PLUGIN} must now be invoked by exactly one
+compilation unit of each plugin module.  This macro encapsulates
+platform-specific implementation details for any given platform.  For instance,
+on Windows, this macro defines the @code{DllMain()} function required by all
+Windows @sc{dll} modules.
+
+These macros alleviate the need to link applications with specially prepared
+object files or libraries.  The summary below explains what this means for
+various platforms.
+
+@table @asis
+@item Unix
+No longer required to link plugin modules against the @file{dummy.o} file.
+
+@item Visual-C++
+No longer required to link applications against Crystal Space's
+@file{win32exe.lib} library.  No longer required to link plugin modules
+(@sc{dll}'s) against the @file{win32dll.lib} library.  Also, the
+@file{libwin32exe.dsp} and @file{libwin32dll.dsp} project files have been
+removed.
+
+@item Mingw
+No longer required to link applications with the @file{exeentry.o} object file.
+No longer required to link plugin modules (@sc{dll}'s) with the
+@file{dllentry.o} object file.
+
+@item @sc{os/2}
+No longer required to link plugin modules with the @file{dllentry.o} object
+file.
+@end table
+
+@subheading System Driver Removal and Application Structure
+@cindex @code{SysSystemDriver}
+@cindex @code{csSystemDriver}
+@cindex @code{iSystem}
+@cindex @code{csInitializer}
+@cindex @code{iObjectRegistry}
+@cindex object registry
+@cindex @code{CS_QUERY_REGISTRY}
+@cindex @code{CS_QUERY_PLUGIN}
+
+The classes @code{SysSystemDriver}, and @code{csSystemDriver}, and
+the interface @code{iSystem} have been removed. All the functionality
+that used to be present in the system driver has moved to smaller
+components (plugin manager, event queue, configuration manager, commandline
+parser, virtual clock, etc.).
+
+There is now a new concept called the @dfn{object registry} which is
+the central repository where all objects can register themselves.
+When you used to do @code{CS_QUERY_PLUGIN} you now have to do
+@code{CS_QUERY_REGISTRY} instead.
+
+Applications can no longer inherit from @code{SysSystemDriver}. Instead
+there is now a new @code{csInitializer} class which helps in the
+initialization of an application. Check out the simple tutorial
+(@pxref{Tutorial Simple}) to see how this works. This tutorial also explains
+all the new concepts very clearly.
+
+@subheading Removal of Function @sc{id}'s
+
+Function ID's (a concept of the old plugin system) have been removed.
+This has an effect on configuration files where you now must replace things
+like:
+
+@example
+System.PlugIns.LevelLoader = crystalspace.level.loader
+@end example
+
+with:
+
+@example
+System.PlugIns.iLoader = crystalspace.level.loader
+@end example
+
+So in general use the interface name. This interface name will be the
+tag with which the loaded plugin is registered in the object registry.
+
+@subheading Image Loading
+@cindex @code{csImageLoader}
+@cindex @code{iImageIO}
+
+@samp{csImageLoader} is gone and has now become a plugin which implements
+the @samp{iImageIO} interface. To use it you typically use the following
+code:
+
+@example
+#include "igraphic/imageio.h"
+@dots{}
+iDataBuffer* buf = @dots{};
+iImageIO* imgldr = CS_QUERY_PLUGIN (System, iImageIO);
+imgldr->Load (buf->GetUint8 (), buf->GetSize (),
+txtmgr->GetTextureFormat ());
+@dots{}
+imgldr->DecRef ();
+@end example
+
+@subheading Map Loading (csLoader)
+@cindex @code{csLoader}
+@cindex @code{iLoader}
+@cindex Level Loading
+
+The level loader is now a plugin. Make sure you have it loaded by putting the
+following in your configuration file:
+
+@example
+System.PlugIns.iLoader = crystalspace.level.loader
+@end example
+
+@noindent
+Or you can add @samp{CS_REQUEST_LEVELLOADER} to the list of requested plugin
+in the call to @code{csInitializer::RequestPlugins()}.  Then you can get the
+level loader with:
+
+@example
+iLoader* level_loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+@end example
+
+When you don't need it anymore you must call @code{level_loader->DecRef ()}.
+Check the API reference to see what functions you can use on level_loader.
+There are functions to load a map, textures, mesh objects, etc. Many of
+these functions have been renamed as well.
+
+@subheading Things are Mesh Objects
+@cindex @code{csThing}
+@cindex mesh objects
+@cindex @code{iThing}
+@cindex @code{iThingState}
+
+Things are now mesh objects which means that you can no longer access
+@code{csThing} directly.
+@code{iThing} has been removed. Instead there is @code{iThingState}.
+Check out the simple tutorial (@pxref{Tutorial Simple}) for more information
+about this.
+
+@subheading Map File Changes
+
+The following map file elements have changed:
+
+@itemize @bullet
+@item
+@code{PLANE} @result{} @code{ADDON}
+@item
+@code{THING} @result{} @code{MESHOBJ}
+@item
+@code{SKY} @result{} @code{MESHOBJ + RENDPRI}
+@item
+@code{MESHOBJ} @result{} @code{MESHFACT} --- (for factories)
+@item
+@code{BEZIER} @result{} @code{ADDON}
+@item
+@code{MATERIALS}
+@item
+@code{RENDERPRIORITIES}
+@item
+@code{PLUGINS}
+@end itemize
+
+@subheading Sky Objects Removed
+
+Sky objects must now be created the same as normal mesh objects
+but you need to give them a low render priority (i.e. 'sky' render
+priority).
+
+@subheading Using the Engine as a Plugin
+@cindex Engine Plugin
+@cindex Plugin, Engine
+
+It is now recommended to use the engine as a plugin. Linking directly
+to the @file{csengine} library is still possible but strongly discouraged.
+We will not be able to guarantee @sc{api} compatibility on this level.
+
+Using the engine as a plugin means in the first loading the engine plugin
+instead of linking to the @file{csengine} library.  You can do this with:
+
+@example
+csInitializer::RequestPlugins (object_reg,
+  CS_REQUEST_ENGINE,
+  @dots{},
+  CS_REQUEST_END);
+iEngine* engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+@end example
+
+You then use the engine through @sc{scf} interfaces.  Therefore, your programs
+should include header files from @file{CS/include/iengine} rather than
+@file{CS/include/csengine}.  Importing files from @file{CS/include/csengine}
+is discouraged.
+
+@subheading Sectors Have No Polygons
+@cindex @code{csSector}
+@cindex @code{iSector}
+
+Sectors can no longer contain polygons. All geometry is now represented
+with mesh objects (see the section above about how to create csThing
+mesh objects). To create the outer walls of a sector (i.e. the geometry
+that used to go to the sector in 0.18 or earlier) you create a csThing
+mesh object. In a world file this happens like this:
+
+@example
+SECTOR 'room' (
+  MESHOBJ 'walls' (
+    PLUGIN ('crystalspace.mesh.loader.thing')
+    PARAMS (
+      VERTEX (@dots{}) @dots{}
+      POLYGON (@dots{}) @dots{}
+    )
+    ZFILL ()
+    PRIORITY ('wall')
+  )
+  @dots{}
+)
+@end example
+
+In code you can use @code{iEngine::CreateSectorWallsMesh()} like this:
+
+@example
+iMeshWrapper* mesh =
+  engine->CreateSectorWallsMesh (sector, "walls");
+@end example
+
+@subheading Header Directory Changes
+@cindex @sc{scf}
+
+All @sc{scf} interfaces (class names starting with the letter @samp{i} such as
+@samp{iPolygon3D}) have moved from @file{CS/include} to individual
+subddirectories of @file{CS/include}.  A few brief examples:
+
+@itemize @bullet
+@item
+@code{imeshobj.h} @result{} @code{imesh/object.h} and @code{iengine/mesh.h}
+@item
+@code{light.h} @result{} @code{iengine/light.h}
+@end itemize
+
+The following new header directories exist:
+
+@table @code
+@item include/iengine
+Everything related to the engine itself
+(@code{view.h}, @code{camera.h}, @code{light.h}, @code{sector.h},
+@code{engine.h}, @code{texture.h}, @dots{}).
+@item include/igame
+For the @file{csgame} plugin (@code{csgame.h}).
+@item include/igeom
+For the @file{csgeom} library (@code{clip2d.h}).
+@item include/igraphic
+For the @file{csgfx} library and the image loader
+plugins (@code{image.h}, @code{imageio.h}, and @code{loader.h}).
+@item include/imap
+For the map loader and mesh object loaders and
+savers (@code{parser.h}, @code{reader.h}, and @code{writer.h}).
+@item include/imesh
+For everything related to mesh objects and the
+state interfaces of mesh objects (@code{object.h}, @code{spr3d.h},
+@code{ball.h}, @code{thing.h}, @dots{}).
+@item include/inetwork
+For networking plugins (@code{driver.h} and @code{socket.h}).
+@item include/isound
+For sound (@code{listener.h}, @code{renderer.h}, @dots{}).
+@item include/isys
+Everything related to the system driver and its facilities (@code{event.h},
+@code{evdefs.h}, @code{plugin.h}, @code{vfs.h}, and @code{system.h}).
+@item include/iutil
+For the @file{csutil} library (@code{string.h}, @code{object.h},
+@code{config.h}, @dots{}).
+@item include/ivideo
+Everything for the 3D and 2D driver subsystems (@code{graph2d.h},
+@code{graph3d.h}, @code{texture.h}, @code{fontserv.h}, @code{txtmgr.h},
+@dots{}).
+@item include/ivaria
+Everything that does not fit anywhere else
+(@code{collider.h}, @code{conin.h}, @code{conout.h}, @code{iso.h},
+@code{keyval.h}, @code{script.h}, @dots{}).
+@end table
+
+@subheading Global @sc{api} Changes
+
+All @sc{scf} macro names are now prefixed with @samp{SCF_} in order to avoid
+polluting the global namespace.
+
+@itemize @bullet
+@item
+@code{CONSTRUCT_EMBEDDED_IBASE} @result{} @code{SCF_CONSTRUCT_EMBEDDED_IBASE}
+@item
+@code{CONSTRUCT_IBASE} @result{} @code{SCF_CONSTRUCT_IBASE}
+@item
+@code{CREATE_INSTANCE} @result{} @code{SCF_CREATE_INSTANCE}
+@item
+@code{DECLARE_EMBEDDED_IBASE} @result{} @code{SCF_DECLARE_EMBEDDED_IBASE}
+@item
+@code{DECLARE_FACTORY} @result{} @code{SCF_DECLARE_FACTORY}
+@item
+@code{DECLARE_FAST_INTERFACE} @result{} @code{SCF_DECLARE_FAST_INTERFACE}
+@item
+@code{DECLARE_IBASE_EXT} @result{} @code{SCF_DECLARE_IBASE_EXT}
+@item
+@code{DECLARE_IBASE} @result{} @code{SCF_DECLARE_IBASE}
+@item
+@code{DEC_REF} @result{} @code{SCF_DEC_REF}
+@item
+@code{EXPORT_CLASS_DEP} @result{} @code{SCF_EXPORT_CLASS_DEP}
+@item
+@code{EXPORT_CLASS_TABLE_END} @result{} @code{SCF_EXPORT_CLASS_TABLE_END}
+@item
+@code{EXPORT_CLASS_TABLE} @result{} @code{SCF_EXPORT_CLASS_TABLE}
+@item
+@code{EXPORT_CLASS} @result{} @code{SCF_EXPORT_CLASS}
+@item
+@code{IMPLEMENTS_EMBEDDED_INTERFACE} @result{} @code{SCF_IMPLEMENTS_EMBEDDED_INTERFACE}
+@item
+@code{IMPLEMENTS_INTERFACE_COMMON} @result{} @code{SCF_IMPLEMENTS_INTERFACE_COMMON}
+@item
+@code{IMPLEMENTS_INTERFACE} @result{} @code{SCF_IMPLEMENTS_INTERFACE}
+@item
+@code{IMPLEMENT_EMBEDDED_IBASE_DECREF} @result{} @code{SCF_IMPLEMENT_EMBEDDED_IBASE_DECREF}
+@item
+@code{IMPLEMENT_EMBEDDED_IBASE_END} @result{} @code{SCF_IMPLEMENT_EMBEDDED_IBASE_END}
+@item
+@code{IMPLEMENT_EMBEDDED_IBASE_GETREFCOUNT} @result{}@*@code{SCF_IMPLEMENT_EMBEDDED_IBASE_GETREFCOUNT}
+@item
+@code{IMPLEMENT_EMBEDDED_IBASE_INCREF} @result{} @code{SCF_IMPLEMENT_EMBEDDED_IBASE_INCREF}
+@item
+@code{IMPLEMENT_EMBEDDED_IBASE_QUERY_END} @result{}@*@code{SCF_IMPLEMENT_EMBEDDED_IBASE_QUERY_END}
+@item
+@code{IMPLEMENT_EMBEDDED_IBASE_QUERY} @result{} @code{SCF_IMPLEMENT_EMBEDDED_IBASE_QUERY}
+@item
+@code{IMPLEMENT_EMBEDDED_IBASE} @result{} @code{SCF_IMPLEMENT_EMBEDDED_IBASE}
+@item
+@code{IMPLEMENT_FACTORY} @result{} @code{SCF_IMPLEMENT_FACTORY}
+@item
+@code{IMPLEMENT_IBASE_DECREF} @result{} @code{SCF_IMPLEMENT_IBASE_DECREF}
+@item
+@code{IMPLEMENT_IBASE_END} @result{} @code{SCF_IMPLEMENT_IBASE_END}
+@item
+@code{IMPLEMENT_IBASE_EXT_DECREF} @result{} @code{SCF_IMPLEMENT_IBASE_EXT_DECREF}
+@item
+@code{IMPLEMENT_IBASE_EXT_END} @result{} @code{SCF_IMPLEMENT_IBASE_EXT_END}
+@item
+@code{IMPLEMENT_IBASE_EXT_GETREFCOUNT} @result{} @code{SCF_IMPLEMENT_IBASE_EXT_GETREFCOUNT}
+@item
+@code{IMPLEMENT_IBASE_EXT_INCREF} @result{} @code{SCF_IMPLEMENT_IBASE_EXT_INCREF}
+@item
+@code{IMPLEMENT_IBASE_EXT_QUERY_END} @result{} @code{SCF_IMPLEMENT_IBASE_EXT_QUERY_END}
+@item
+@code{IMPLEMENT_IBASE_EXT_QUERY} @result{} @code{SCF_IMPLEMENT_IBASE_EXT_QUERY}
+@item
+@code{IMPLEMENT_IBASE_EXT} @result{} @code{SCF_IMPLEMENT_IBASE_EXT}
+@item
+@code{IMPLEMENT_IBASE_GETREFCOUNT} @result{} @code{SCF_IMPLEMENT_IBASE_GETREFCOUNT}
+@item
+@code{IMPLEMENT_IBASE_INCREF} @result{} @code{SCF_IMPLEMENT_IBASE_INCREF}
+@item
+@code{IMPLEMENT_IBASE_QUERY_END} @result{} @code{SCF_IMPLEMENT_IBASE_QUERY_END}
+@item
+@code{IMPLEMENT_IBASE_QUERY} @result{} @code{SCF_IMPLEMENT_IBASE_QUERY}
+@item
+@code{IMPLEMENT_IBASE} @result{} @code{SCF_IMPLEMENT_IBASE}
+@item
+@code{INC_REF} @result{} @code{SCF_INC_REF}
+@item
+@code{QUERY_INTERFACE_FAST} @result{} @code{SCF_QUERY_INTERFACE_FAST}
+@item
+@code{QUERY_INTERFACE_SAFE} @result{} @code{SCF_QUERY_INTERFACE_SAFE}
+@item
+@code{QUERY_INTERFACE} @result{} @code{SCF_QUERY_INTERFACE}
+@item
+@code{REGISTER_STATIC_CLASS_DEP} @result{} @code{SCF_REGISTER_STATIC_CLASS_DEP}
+@item
+@code{REGISTER_STATIC_CLASS} @result{} @code{SCF_REGISTER_STATIC_CLASS}
+@item
+@code{REGISTER_STATIC_LIBRARY} @result{} @code{SCF_REGISTER_STATIC_LIBRARY}
+@end itemize
+
+Plugin management macro names are now prefixed with @samp{CS_} in order to
+avoid polluting the global namespace.
+
+@itemize @bullet
+@item
+@code{QUERY_PLUGIN_CLASS} @result{} @code{CS_QUERY_PLUGIN_CLASS}
+@item
+@code{LOAD_PLUGIN} @result{} @code{CS_LOAD_PLUGIN}
+@item
+@code{_LOAD_PLUGIN} @result{} @code{CS_LOAD_PLUGIN_ALWAYS}
+@end itemize
+
+Macros for classifying events are now prefixed with @samp{CS_} in order to
+avoid polluting the global namespace.
+
+@itemize @bullet
+@item
+@code{IS_KEYBOARD_EVENT} @result{} @code{CS_IS_KEYBOARD_EVENT}
+@item
+@code{IS_MOUSE_EVENT} @result{} @code{CS_IS_MOUSE_EVENT}
+@item
+@code{IS_JOYSTICK_EVENT} @result{} @code{CS_IS_JOYSTICK_EVENT}
+@item
+@code{IS_NETWORK_EVENT} @result{} @code{CS_IS_NETWORK_EVENT}
+@end itemize
+
+Platform-specific configuration macros are now prefixed with @samp{CS_} in
+order to avoid polluting the global namespace.
+
+@itemize @bullet
+@item
+@code{SOFTWARE_2D_DRIVER} @result{} @code{CS_SOFTWARE_2D_DRIVER}
+@item
+@code{OPENGL_2D_DRIVER} @result{} @code{CS_OPENGL_2D_DRIVER}
+@item
+@code{GLIDE_2D_DRIVER} @result{} @code{CS_GLIDE_2D_DRIVER}
+@item
+@code{SOUND_DRIVER} @result{} @code{CS_SOUND_DRIVER}
+@end itemize
+
+All @samp{csVector}-related macros are now prefixed with @samp{CS_} in order to
+avoid polluting the global namespace.  Furthermore,
+@code{DECLARE_TYPED_SCF_VECTOR()} has been renamed to
+@code{CS_DECLARE_TYPED_IBASE_VECTOR()} in order to more clearly indicate that
+this array type works with reference-counted @samp{iBase} objects.
+
+@itemize @bullet
+@item
+@code{BEGIN_TYPED_VECTOR()} @result{} @code{CS_BEGIN_TYPED_VECTOR()}
+@item
+@code{FINISH_TYPED_VECTOR()} @result{} @code{CS_FINISH_TYPED_VECTOR()}
+@item
+@code{DECLARE_TYPED_VECTOR()} @result{} @code{CS_DECLARE_TYPED_VECTOR()}
+@item
+@code{DECLARE_TYPED_VECTOR_HELPER()} @result{} @code{CS_CS_DECLARE_TYPED_VECTOR_HELPER()}
+@item
+@code{DECLARE_TYPED_VECTOR_NODELETE()} @result{} @code{CS_CS_DECLARE_TYPED_VECTOR_NODELETE()}
+@item
+@code{DECLARE_TYPED_SCF_VECTOR()} @result{} @code{CS_DECLARE_TYPED_IBASE_VECTOR()}
+@end itemize
+
+All @samp{SYSDEF_BLAH} request macros are now prefixed with @samp{CS_} in order
+to avoid polluting the global namespace.  Furthermore, each macro name now
+contains the word ``provide'' since these macros are used by client code to
+request that @file{cssysdef.h} @emph{provides} certain facilities.
+
+@itemize @bullet
+@item
+@code{SYSDEF_ACCESS} @result{} @code{CS_SYSDEF_PROVIDE_ACCESS}
+@item
+@code{SYSDEF_ALLOCA} @result{} @code{CS_SYSDEF_PROVIDE_ALLOCA}
+@item
+@code{SYSDEF_CASE} @result{} @code{CS_SYSDEF_PROVIDE_CASE}
+@item
+@code{SYSDEF_DIR} @result{} @code{CS_SYSDEF_PROVIDE_DIR}
+@item
+@code{SYSDEF_GETCWD} @result{} @code{CS_SYSDEF_PROVIDE_GETCWD}
+@item
+@code{SYSDEF_GETOPT} @result{} @code{CS_SYSDEF_PROVIDE_GETOPT}
+@item
+@code{SYSDEF_MKDIR} @result{} @code{CS_SYSDEF_PROVIDE_MKDIR}
+@item
+@code{SYSDEF_PATH} @result{} @code{CS_SYSDEF_PROVIDE_PATH}
+@item
+@code{SYSDEF_SELECT} @result{} @code{CS_SYSDEF_PROVIDE_SELECT}
+@item
+@code{SYSDEF_SOCKETS} @result{} @code{CS_SYSDEF_PROVIDE_SOCKETS}
+@item
+@code{SYSDEF_TEMP} @result{} @code{CS_SYSDEF_PROVIDE_TEMP}
+@item
+@code{SYSDEF_UNLINK} @result{} @code{CS_SYSDEF_PROVIDE_UNLINK}
+@end itemize
+
+Methods in many classes and @sc{scf} interfaces have been renamed in order to
+improve naming consistency throughout the project.
+The following method name changes follow the pattern where
+@code{GetNumSomething()} or @code{GetNumberSomething()} became
+@code{GetSomethingCount()}.
+
+@itemize @bullet
+@item
+@code{GetMiniBspNumVerts()} @result{} @code{GetMiniBspVertexCount()}
+@item
+@code{GetNumActions()} @result{} @code{GetActionCount()}
+@item
+@code{GetNumberAging()} @result{} @code{GetAgingCount()}
+@item
+@code{GetNumberEmitters()} @result{} @code{GetEmitterCount()}
+@item
+@code{GetNumberMetaBalls()} @result{} @code{GetMetaBallCount()}
+@item
+@code{GetNumberParticles()} @result{} @code{GetParticleCount()}
+@item
+@code{GetNumCameraPositions()} @result{} @code{GetCameraPositionCount()}
+@item
+@code{GetNumChars()} @result{} @code{GetCharCount()}
+@item
+@code{GetNumCollections()} @result{} @code{GetCollectionCount()}
+@item
+@code{GetNumCollisionPairs()} @result{} @code{GetCollisionPairCount()}
+@item
+@code{GetNumCurves()} @result{} @code{GetCurveCount()}
+@item
+@code{GetNumCurveVertices()} @result{} @code{GetCurveVertexCount()}
+@item
+@code{GetNumDimensions()} @result{} @code{GetDimensionCount()}
+@item
+@code{GetNumEdges()} @result{} @code{GetEdgeCount()}
+@item
+@code{GetNumElements()} @result{} @code{GetElementCount()}
+@item
+@code{GetNumFonts()} @result{} @code{GetFontCount()}
+@item
+@code{GetNumFormats()} @result{} @code{GetFormatCount()}
+@item
+@code{GetNumFrames()} @result{} @code{GetFrameCount()}
+@item
+@code{GetNumMaterials()} @result{} @code{GetMaterialCount()}
+@item
+@code{GetNumMeshFactories()} @result{} @code{GetMeshFactoryCount()}
+@item
+@code{GetNumMeshObjects()} @result{} @code{GetMeshObjectCount()}
+@item
+@code{GetNumNormals()} @result{} @code{GetNormalCount()}
+@item
+@code{GetNumObjects()} @result{} @code{GetObjectCount()}
+@item
+@code{GetNumPalEntries()} @result{} @code{GetPalEntryCount()}
+@item
+@code{GetNumPlanes()} @result{} @code{GetPlaneCount()}
+@item
+@code{GetNumPlugIns()} @result{} @code{GetPlugInCount()}
+@item
+@code{GetNumPoints()} @result{} @code{GetPointCount()}
+@item
+@code{GetNumPolygons()} @result{} @code{GetPolygonCount()}
+@item
+@code{GetNumPolyTxtPlanes()} @result{} @code{GetPolyTxtPlaneCount()}
+@item
+@code{GetNumRepeats()} @result{} @code{GetRepeatCount()}
+@item
+@code{GetNumShadows()} @result{} @code{GetShadowCount()}
+@item
+@code{GetNumSpokes()} @result{} @code{GetSpokeCount()}
+@item
+@code{GetNumTexels()} @result{} @code{GetTexelCount()}
+@item
+@code{GetNumTextureLayers()} @result{} @code{GetTextureLayerCount()}
+@item
+@code{GetNumTextures()} @result{} @code{GetTextureCount()}
+@item
+@code{GetNumTriangles()} @result{} @code{GetTriangleCount()}
+@item
+@code{GetNumVertices()} @result{} @code{GetVertexCount()}
+@item
+@code{GetNumVertsToLight()} @result{} @code{GetVertexToLightCount()}
+@item
+@code{GetStaticNumSamples()} @result{} @code{GetStaticSampleCount()}
+@item
+@code{NumVertices()} @result{} @code{GetVertexCount()}
+@item
+@code{ReportNumberTriangles()} @result{} @code{ReportTriangleCount()}
+@item
+@code{SetNumber()} @result{} @code{SetCount()}
+@item
+@code{SetNumberMetaBalls()} @result{} @code{SetMetaBallCount()}
+@item
+@code{SetNumberParticles()} @result{} @code{SetParticleCount()}
+@item
+@code{SetNumEdges()} @result{} @code{SetEdgeCount()}
+@item
+@code{SetNumPolygons()} @result{} @code{SetPolygonCount()}
+@item
+@code{SetNumSpokes()} @result{} @code{SetSpokeCount()}
+@item
+@code{SetNumVertices()} @result{} @code{SetVertexCount()}
+@item
+@code{Update_Num()} @result{} @code{UpdateCount()}
+@end itemize
+
+The prefix @samp{cs} was added to the following list of functions, and their
+names were also normalized.
+
+@itemize @bullet
+@item
+@code{ByteSwap16bit()} @result{} @code{csByteSwap16bit()}
+@item
+@code{ByteSwap16bitBuffer()} @result{} @code{csByteSwap16bitBuffer()}
+@item
+@code{ByteSwap32bit()} @result{} @code{csByteSwap32bit()}
+@item
+@code{ByteSwap32bitBuffer()} @result{} @code{csByteSwap32bitBuffer()}
+@item
+@code{Combinations()} @result{} @code{csCombinations()}
+@item
+@code{expandname()} @result{} @code{csExpandName()}
+@item
+@code{FindNearestPowerOf2()} @result{} @code{csFindNearestPowerOf2()}
+@item
+@code{fnamematches()} @result{} @code{csFilenameMatches()}
+@item
+@code{fSquare()} @result{} @code{csSquareFloat()}
+@item
+@code{fSwap()} @result{} @code{csSwapFloat()}
+@item
+@code{GenerateHalo()} @result{} @code{csGenerateHalo()}
+@item
+@code{GenerateNova()} @result{} @code{csGenerateNova()}
+@item
+@code{get_token()} @result{} @code{csGetToken()}
+@item
+@code{get_token_float()} @result{} @code{csGetTokenFloat()}
+@item
+@code{get_token_int()} @result{} @code{csGetTokenInt()}
+@item
+@code{IsPowerOf2()} @result{} @code{csIsPowerOf2()}
+@item
+@code{iSwap()} @result{} @code{csSwapInt()}
+@item
+@code{RndNum()} @result{} @code{csRndNum()}
+@item
+@code{ScanStr()} @result{} @code{csScanStr()}
+@item
+@code{skip_token()} @result{} @code{csSkipToken()}
+@item
+@code{splitpath()} @result{} @code{csSplitPath()}
+@item
+@code{strnew()} @result{} @code{csStrNew()}
+@end itemize
+
+@subheading Library Renamed: csfx
+
+The @samp{csfx} library was renamed to @samp{cstool}.
+
+@subheading Library Removed: csobject
+
+The @file{csobject} library has been removed. All files in that
+library have moved to @file{csutil}.
+
+@subheading csCollider
+@cindex @code{csCollider}
+@cindex @code{csColliderWrapper}
+
+The @samp{csCollider} facility moved from @samp{csengine} to @samp{cstool} and
+was renamed to @samp{csColliderWrapper}.
+
+@subheading Key/Node Mechanism
+@cindex @code{csKeyValuePair}
+
+The @samp{csKeyValuePair} and @samp{csMapNode} classes moved from
+@file{csengine} to @file{cstool}.
+
+@subheading csView
+@cindex @code{csView}
+
+The @samp{csView} class moved from @samp{csengine} to @samp{cstool}.
+
+@subheading @sc{ddg} Terrain Engine Removed
+@cindex @sc{ddg} Terrain Engine
+
+The @sc{ddg} landscape engine which used to be featured in Crystal Space has
+been removed and was replaced with a simpler landscape engine, but one which is
+better integrated with the project. It is now also a mesh object.
+
+@subheading @sc{csws} Modal Session Paradigm Shift
+@cindex @code{csMessageBox()}
+@cindex @code{csApp.Execute()}
+@cindex @code{csApp.StartModal()}
+@cindex @code{csApp.StopModal()}
+@cindex @code{csApp.GetTopModalUserdata()}
+@cindex @code{csApp.GetTopModalComponent()}
+@cindex @code{iMessageBoxData}
+
+@code{csApp::Execute()} has been removed.  This method ran a modal session for
+dialog panels, and would only return control to the caller when the dialog was
+dismissed.  As a replacement for @code{Execute()}, @code{csApp::StartModal()}
+and @code{csApp::StopModal()} have been introduced.  @code{StartModal()} sets
+up modality for the given component and then immediately returns to the
+caller.  From the perspective of the @sc{gui} user the component behaves in the
+standard modal fashion, but from the perspective of the application programmer
+this represents a paradigm shift since the application must now watch events
+arriving in its @code{csApp::HandleEvent()} method in order to determine when
+the modal session has terminated.  Notification arrives in the form of a
+@samp{csevCommand} event with command code @code{cscmdStopModal}.  This is sent
+when then component's modal session terminates, such as when the ``@sc{ok}'' or
+``Cancel'' button is pressed.
+
+With @code{StartModal()} you can provide a @dfn{userdata} argument (which is an
+@sc{scf} interface that you can implement on your own).  The userdata will be
+available at any time while the modal session is active by calling
+@code{csApp::GetTopModalUserdata()}.  The modal component can be retrieved with
+@code{csApp::GetTopModalComponent()}.  The @samp{Event.Command.Info} field will
+be an integer containing the @sc{id} of the pressed button (i.e.
+@code{cscmdOK}, @code{cscmdCancel}, etc.).
+
+A related change was made to @code{csMessageBox()}.  It also now returns
+immediately.  It nows sends a similar message to the application when the
+message box is closed (via ``@sc{ok}'' or ``Cancel'').  In this case, the
+userdata object will implement the @sc{scf} interface @code{iMessageBoxData},
+so you can use @code{SCF_QUERY_INTERFACE()} to check for this.
+
+Here is an example on how to define your own userdata object.
+
+@example
+struct ModalData : public iBase
+@{
+  @dots{}
+  SCF_DECLARE_IBASE;
+  ModalData ()
+  @{
+    SCF_CONSTRUCT_IBASE (NULL);
+  @}
+@};
+
+SCF_IMPLEMENT_IBASE (ModalData)
+SCF_IMPLEMENT_IBASE_END
+
+bool MyApp::HandleEvent (iEvent &Event)
+@{
+  switch (Event.Type)
+  @{
+    case csevCommand:
+      switch (Event.Command.Code)
+      @{
+        case APP_OPEN_FILE:
+        @{ // Allow user to select a file with csFileDialog.
+          csWindow* d = csFileDialog (this, "test file dialog");
+          ModalData* data = new ModalData ();
+          @dots{}
+          StartModal (d, data);
+          data->DecRef ();
+          return true;
+        @}
+        case cscmdStopModal:
+        @{
+          csComponent* d = GetTopModalComponent ();
+          int rc = (int)Event.Command.Info;
+          if (rc == 0 || rc == cscmdCancel)
+          @{
+            delete d;
+            return true;
+          @}
+          iMessageBoxData* mbd =
+            SCF_QUERY_INTERFACE (d, iMessageBoxData);
+          if (mbd)
+          @{
+            mbd->DecRef ();
+            delete d;
+            return true;
+          @}
+          ModalData* md = (ModalData*)GetTopModalUserdata ();
+          @dots{} // csFileDialog was closed.
+          return true;
+        @}
+        @dots{}
+@}
+@end example
+
+@subheading 3D Sprite Factories
+@cindex @code{iSprite3DFactory}
+
+The sprite factory interface has been modified to show the restrictions of 3D
+sprites and to clean it up:
+
+@itemize @bullet
+@item
+@code{GetNormalCount()} and @code{GetTexelCount()} have been removed. Sprites
+do not allow to have different numbers of vertices, normals and texels. So
+@code{GetVertexCount()} should be used instead.
+
+@item
+The @samp{count} parameter has been removed from @code{SetVertices()},
+@code{SetNormals()} and @code{SetTexels()}. These functions only worked
+properly if the current number of vertices was passed for @samp{count}, so
+passing the parameter at all makes no sense.
+
+@item
+@code{GetVertex()}, @code{GetNormal()} and @code{GetTexel()} now return
+@samp{const} objects. To modify these objects, @code{SetVertex()},
+@code{SetNormal()} and @code{SetTexel()} have been added.
+@end itemize
+
+@subheading Miscellaneous Changes
+@cindex @code{iPortal}
+@cindex @code{csMeshWrapper}
+@cindex @code{csEngine.NextFrame()}
+@cindex @code{iEngine.NextFrame()}
+@cindex @code{csFilenameMatches()}
+@cindex @code{csGlobMatches()}
+
+The @sc{scf} name of the 3D engine changed:
+
+@noindent
+@code{crystalspace.engine.core} @result{} @code{crystalspace.engine.3d}
+
+@code{csEngine::NextFrame()} and @code{iEngine::NextFrame()} are removed.
+This is now done automatically in @code{csEngine::Draw()}.
+
+Renamed @code{iPortal::GetPortal()} to @code{GetSector()} and
+@code{iPortal::SetPortal()} to @code{SetSector()}.
+
+Removed @code{csMeshWrapper::GetChildren()}.  Instead use
+@code{csMeshWrapper::AddChild()} and @code{csMeshWrapper::RemoveChild()}.
+
+Renamed @code{iEngine::CreateMeshObject()} to
+@code{iEngine::CreateMeshWrapper()}. In general all iEngine functions that
+work mesh wrappers will be renamed like that.
+
+Renamed @code{csFilenameMatches()} to @code{csGlobMatches()} (from
+@file{csutil} library).
+
+From the @samp{iEngine} interface, these two methods were removed:
+
+@itemize @bullet
+@item
+@code{iEngine::EnableLightingCache()}
+@item
+@code{iEngine::IsLightingCacheEnabled()}
+@end itemize
+
+@noindent
+They were replaced by these methods:
+
+@itemize @bullet
+@item
+@code{iEngine::SetLightingCacheMode()}
+@item
+@code{GetLightingCacheMode()}
+@end itemize
+
+@samp{FrameWidth} and @samp{FrameHeight} are no longer available
+in @samp{SysSystemDriver} (entire system driver is gone, in fact). Instead
+you have to call @code{GetWidth()} and @code{GetHeight()} on the pointer
+to the canvas (@samp{iGraphics2D}).

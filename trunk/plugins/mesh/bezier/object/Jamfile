@@ -1,0 +1,11 @@
+SubDir TOP plugins mesh bezier object ;
+
+Description bezier : "Bezier mesh object plugin" ;
+
+Plugin bezier
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith bezier : crystalspace ;
+
+CompileGroups bezier :  meshes ;
+

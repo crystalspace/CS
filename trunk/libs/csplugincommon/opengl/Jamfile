@@ -1,0 +1,16 @@
+SubDir TOP libs csplugincommon opengl ;
+
+if $(GL.AVAILABLE) = "yes"
+{
+  Description crystalspace_opengl : "OpenGL-specific plugin support" ;
+  Library crystalspace_opengl : 
+    [ Wildcard *.cpp *.h ] 
+    [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) $(DOTDOT) include
+		 csplugincommon opengl ] : *.h ]
+    : shared ;
+  Includes driverdb.cpp : $(SUBDIR)/driverdb.tok ;
+  LibDepends crystalspace_opengl : crystalspace ;
+  ExternalLibs crystalspace_opengl : GL ;
+  CFlags crystalspace_opengl : [ FDefines CS_CSPLUGINCOMMON_GL_LIB ] ;
+  MsvcDefine crystalspace_opengl : CS_CSPLUGINCOMMON_GL_LIB ;
+}

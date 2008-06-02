@@ -1,0 +1,22 @@
+<lighter>
+
+  <select_portals>
+    <all />
+  </select_portals>
+
+  <select_sectors>
+    <all />
+  </select_sectors>
+
+  <select_lights>
+    <all />
+  </select_lights>
+
+  <select_meshes>
+    <and>
+      <all />
+    </and>
+  </select_meshes>
+
+  
+</lighter>

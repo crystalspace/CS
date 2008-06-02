@@ -1,0 +1,649 @@
+<world>
+    <addon>
+        <plugin>crystalspace.renderloop.loop.loader</plugin>
+        <params>
+            <name>ourloop</name>
+            <steps>
+                <step plugin="crystalspace.renderloop.step.generic">
+                    <shadertype>diffuse</shadertype>
+                    <zoffset>yes</zoffset>
+                    <portaltraversal />
+                    <zuse />
+                </step>
+                <step plugin="crystalspace.renderloop.step.lightiter">
+                    <steps>
+                        <!-- diffuse lighting -->
+                        <step plugin="crystalspace.renderloop.step.generic">
+                            <shadertype>light</shadertype>
+                            <zoffset>no</zoffset>
+                            <ztest />
+                        </step>
+                    </steps>
+                </step>
+            </steps>
+        </params>
+    </addon>
+    <settings>
+        <clearzbuf>yes</clearzbuf>
+        <clearscreen>yes</clearscreen>
+        <lightmapcellsize>16</lightmapcellsize>
+        <renderloop>ourloop</renderloop>
+    </settings>
+    <plugins />
+    <shaders>
+        <shader>
+            <file>/shader/std_lighting.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/light.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/ambient.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/parallax/parallax.xml</file>
+        </shader>
+    </shaders>
+    <textures>
+        <texture name="walls.jpg">
+            <file>walls.jpg</file>
+        </texture>
+        <texture name="floor.jpg">
+            <file>floor.jpg</file>
+        </texture>
+        <texture name="box.jpg">
+            <file>box.jpg</file>
+        </texture>
+        <texture name="boxn.jpg">
+            <file>boxn.png</file>
+            <class>normalmap</class>
+        </texture>
+        <texture name="boxh.jpg">
+            <file>boxh.jpg</file>
+        </texture>
+        <texture name="lightmap_Scene_Cube_0">
+            <file>lightmaps/lightmap_Scene_Cube_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_Scene_Cube_1">
+            <file>lightmaps/lightmap_Scene_Cube_1.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_Scene_Cube_2">
+            <file>lightmaps/lightmap_Scene_Cube_2.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_Scene_Cube_3">
+            <file>lightmaps/lightmap_Scene_Cube_3.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_Scene_Cube.001_0">
+            <file>lightmaps/lightmap_Scene_Cube.001_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_Scene_Cube.001_1">
+            <file>lightmaps/lightmap_Scene_Cube.001_1.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_Scene_Cube.002_0">
+            <file>lightmaps/lightmap_Scene_Cube.002_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_Scene_Cube.002_1">
+            <file>lightmaps/lightmap_Scene_Cube.002_1.png</file>
+            <class>lightmap</class>
+        </texture>
+    </textures>
+    <materials>
+        <material name="walls.jpg">
+            <texture>walls.jpg</texture>
+            <shader type="diffuse">light</shader>
+        </material>
+        <material name="floor.jpg">
+            <texture>floor.jpg</texture>
+            <shader type="diffuse">light</shader>
+        </material>
+        <material name="box.jpg">
+            <texture>box.jpg</texture>
+            <shadervar name="tex normal" type="texture">boxn.jpg</shadervar>
+            <shadervar name="tex height" type="texture">boxh.jpg</shadervar>
+            <shader type="light">parallax</shader>
+            <shader type="diffuse">ambient</shader>
+        </material>
+        <material name="box_spec.jpg">
+            <texture>box.jpg</texture>
+            <shadervar name="tex normal" type="texture">boxn.jpg</shadervar>
+            <shadervar name="tex height" type="texture">boxh.jpg</shadervar>
+            <shadervar name="specular" type="vector4">0.6, 0.8, 1, 1</shadervar>
+            <shader type="light">parallax</shader>
+            <shader type="diffuse">ambient</shader>
+        </material>
+    </materials>
+    <start name="Camera">
+        <sector>Scene</sector>
+        <position x="0.00333691" y="-0.00952018" z="-0.00766289" />
+    </start>
+    <meshfact name="factory_Scene_Cube">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <numvt>24</numvt>
+            <v x="6.51433" y="-2.10426" z="-3.51433" u="0" v="1" />
+            <v x="-3.51433" y="-2.10426" z="-3.51433" u="1" v="1" />
+            <v x="-3.51433" y="-2.10426" z="3.51433" u="1" v="0" />
+            <v x="6.51433" y="-2.10426" z="3.51433" u="0" v="0" />
+            <v x="6.51433" y="2.10426" z="-3.51433" u="0" v="1" />
+            <v x="-3.51433" y="2.10426" z="-3.51433" u="1" v="1" />
+            <v x="-3.51433" y="-2.10426" z="-3.51433" u="1" v="0" />
+            <v x="6.51433" y="-2.10426" z="-3.51433" u="0" v="0" />
+            <v x="-3.51433" y="2.10426" z="-3.51433" u="0" v="1" />
+            <v x="-3.51433" y="2.10426" z="3.51433" u="1" v="1" />
+            <v x="-3.51433" y="-2.10426" z="3.51433" u="1" v="0" />
+            <v x="-3.51433" y="-2.10426" z="-3.51433" u="0" v="0" />
+            <v x="-3.51433" y="2.10426" z="3.51433" u="1" v="0" />
+            <v x="6.51433" y="2.10426" z="3.51433" u="0" v="0" />
+            <v x="6.51433" y="-2.10426" z="3.51433" u="0" v="1" />
+            <v x="-3.51433" y="-2.10426" z="3.51433" u="1" v="1" />
+            <v x="6.51433" y="2.10426" z="3.51433" u="0" v="1" />
+            <v x="6.51433" y="2.10426" z="-3.51433" u="1" v="1" />
+            <v x="6.51433" y="-2.10426" z="-3.51433" u="1" v="0" />
+            <v x="6.51433" y="-2.10426" z="3.51433" u="0" v="0" />
+            <v x="-3.51433" y="2.10426" z="3.51433" u="0" v="1" />
+            <v x="-3.51433" y="2.10426" z="-3.51433" u="1" v="1" />
+            <v x="6.51433" y="2.10426" z="-3.51433" u="1" v="0" />
+            <v x="6.51433" y="2.10426" z="3.51433" u="0" v="0" />
+            <mixmode>
+                <copy />
+            </mixmode>
+            <n x="0" y="1" z="2.98398e-009" />
+            <n x="0" y="1" z="2.98398e-009" />
+            <n x="0" y="1" z="2.98398e-009" />
+            <n x="0" y="1" z="2.98398e-009" />
+            <n x="6.31434e-009" y="0" z="1" />
+            <n x="6.31434e-009" y="0" z="1" />
+            <n x="6.31434e-009" y="0" z="1" />
+            <n x="6.31434e-009" y="0" z="1" />
+            <n x="1" y="-2.07132e-008" z="0" />
+            <n x="1" y="-2.07132e-008" z="0" />
+            <n x="1" y="-2.07132e-008" z="0" />
+            <n x="1" y="-2.07132e-008" z="0" />
+            <n x="-6.31434e-009" y="0" z="-1" />
+            <n x="-6.31434e-009" y="0" z="-1" />
+            <n x="-6.31434e-009" y="0" z="-1" />
+            <n x="-6.31434e-009" y="0" z="-1" />
+            <n x="-1" y="4.37673e-008" z="0" />
+            <n x="-1" y="4.37673e-008" z="0" />
+            <n x="-1" y="4.37673e-008" z="0" />
+            <n x="-1" y="4.37673e-008" z="0" />
+            <n x="0" y="-1" z="-2.98398e-009" />
+            <n x="0" y="-1" z="-2.98398e-009" />
+            <n x="0" y="-1" z="-2.98398e-009" />
+            <n x="0" y="-1" z="-2.98398e-009" />
+            <submesh name="floor.jpg_1">
+                <material>floor.jpg</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="0" />
+                    <e c0="1" />
+                    <e c0="2" />
+                    <e c0="0" />
+                    <e c0="2" />
+                    <e c0="3" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="walls.jpg_0">
+                <material>walls.jpg</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="4" />
+                    <e c0="5" />
+                    <e c0="6" />
+                    <e c0="4" />
+                    <e c0="6" />
+                    <e c0="7" />
+                    <e c0="8" />
+                    <e c0="9" />
+                    <e c0="10" />
+                    <e c0="8" />
+                    <e c0="10" />
+                    <e c0="11" />
+                    <e c0="12" />
+                    <e c0="13" />
+                    <e c0="14" />
+                    <e c0="12" />
+                    <e c0="14" />
+                    <e c0="15" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="walls.jpg_2">
+                <material>walls.jpg</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="20" />
+                    <e c0="21" />
+                    <e c0="22" />
+                    <e c0="20" />
+                    <e c0="22" />
+                    <e c0="23" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="walls.jpg_3">
+                <material>walls.jpg</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="16" />
+                    <e c0="17" />
+                    <e c0="18" />
+                    <e c0="16" />
+                    <e c0="18" />
+                    <e c0="19" />
+                </indexbuffer>
+            </submesh>
+            <renderbuffer name="texture coordinate lightmap" components="2" type="float">
+                <e c0="0.015625" c1="0.5" />
+                <e c0="0.5" c1="0.5" />
+                <e c0="0.5" c1="0.015625" />
+                <e c0="0.015625" c1="0.015625" />
+                <e c0="0.539063" c1="0.5" />
+                <e c0="0.78125" c1="0.5" />
+                <e c0="0.78125" c1="0.015625" />
+                <e c0="0.539063" c1="0.015625" />
+                <e c0="0.0078125" c1="0.5" />
+                <e c0="0.25" c1="0.5" />
+                <e c0="0.25" c1="0.015625" />
+                <e c0="0.0078125" c1="0.015625" />
+                <e c0="0.515625" c1="0.015625" />
+                <e c0="0.273438" c1="0.015625" />
+                <e c0="0.273438" c1="0.5" />
+                <e c0="0.515625" c1="0.5" />
+                <e c0="0.015625" c1="0.5" />
+                <e c0="0.5" c1="0.5" />
+                <e c0="0.5" c1="0.015625" />
+                <e c0="0.015625" c1="0.015625" />
+                <e c0="0.015625" c1="0.5" />
+                <e c0="0.5" c1="0.5" />
+                <e c0="0.5" c1="0.015625" />
+                <e c0="0.015625" c1="0.015625" />
+            </renderbuffer>
+        </params>
+    </meshfact>
+    <meshfact name="factory_Scene_Cube.001">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <numvt>24</numvt>
+            <v x="-0.493757" y="-0.493757" z="0.493757" u="1" v="0" />
+            <v x="-0.493757" y="-0.493757" z="-0.493757" u="1" v="1" />
+            <v x="0.493757" y="-0.493757" z="-0.493757" u="0" v="1" />
+            <v x="0.493757" y="-0.493757" z="0.493757" u="0" v="0" />
+            <v x="0.493757" y="0.493757" z="-0.493757" u="1" v="0" />
+            <v x="-0.493757" y="0.493757" z="-0.493757" u="1" v="1" />
+            <v x="-0.493757" y="0.493757" z="0.493757" u="0" v="1" />
+            <v x="0.493757" y="0.493757" z="0.493757" u="0" v="0" />
+            <v x="0.493757" y="-0.493757" z="-0.493757" u="1" v="0" />
+            <v x="0.493757" y="0.493757" z="-0.493757" u="1" v="1" />
+            <v x="0.493757" y="0.493757" z="0.493757" u="0" v="1" />
+            <v x="0.493757" y="-0.493757" z="0.493757" u="0" v="0" />
+            <v x="-0.493757" y="-0.493757" z="0.493757" u="0.5" v="0.5" />
+            <v x="-0.493757" y="0.493757" z="0.493757" u="0.5" v="0" />
+            <v x="-0.493757" y="0.493757" z="-0.493757" u="1" v="0" />
+            <v x="-0.493757" y="-0.493757" z="-0.493757" u="1" v="0.5" />
+            <v x="-0.493757" y="0.493757" z="0.493757" u="0.5" v="0" />
+            <v x="-0.493757" y="-0.493757" z="0.493757" u="0.5" v="0.5" />
+            <v x="0.493757" y="-0.493757" z="0.493757" u="0" v="0.5" />
+            <v x="0.493757" y="0.493757" z="0.493757" u="0" v="0" />
+            <v x="-0.493757" y="-0.493757" z="-0.493757" u="1" v="0" />
+            <v x="-0.493757" y="0.493757" z="-0.493757" u="1" v="1" />
+            <v x="0.493757" y="0.493757" z="-0.493757" u="0" v="1" />
+            <v x="0.493757" y="-0.493757" z="-0.493757" u="0" v="0" />
+            <mixmode>
+                <copy />
+            </mixmode>
+            <n x="0" y="-1" z="-1.33459e-008" />
+            <n x="0" y="-1" z="-1.33459e-008" />
+            <n x="0" y="-1" z="-1.33459e-008" />
+            <n x="0" y="-1" z="-1.33459e-008" />
+            <n x="0" y="1" z="1.33459e-008" />
+            <n x="0" y="1" z="1.33459e-008" />
+            <n x="0" y="1" z="1.33459e-008" />
+            <n x="0" y="1" z="1.33459e-008" />
+            <n x="1" y="1.33459e-008" z="0" />
+            <n x="1" y="1.33459e-008" z="0" />
+            <n x="1" y="1.33459e-008" z="0" />
+            <n x="1" y="1.33459e-008" z="0" />
+            <n x="-1" y="1.33459e-008" z="0" />
+            <n x="-1" y="1.33459e-008" z="0" />
+            <n x="-1" y="1.33459e-008" z="0" />
+            <n x="-1" y="1.33459e-008" z="0" />
+            <n x="1.33459e-008" y="0" z="1" />
+            <n x="1.33459e-008" y="0" z="1" />
+            <n x="1.33459e-008" y="0" z="1" />
+            <n x="1.33459e-008" y="0" z="1" />
+            <n x="1.33459e-008" y="0" z="-1" />
+            <n x="1.33459e-008" y="0" z="-1" />
+            <n x="1.33459e-008" y="0" z="-1" />
+            <n x="1.33459e-008" y="0" z="-1" />
+            <submesh name="box.jpg_0">
+                <material>box.jpg</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="0" />
+                    <e c0="1" />
+                    <e c0="2" />
+                    <e c0="0" />
+                    <e c0="2" />
+                    <e c0="3" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="box.jpg_0">
+                <material>box.jpg</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="4" />
+                    <e c0="5" />
+                    <e c0="6" />
+                    <e c0="4" />
+                    <e c0="6" />
+                    <e c0="7" />
+                    <e c0="8" />
+                    <e c0="9" />
+                    <e c0="10" />
+                    <e c0="8" />
+                    <e c0="10" />
+                    <e c0="11" />
+                    <e c0="12" />
+                    <e c0="13" />
+                    <e c0="14" />
+                    <e c0="12" />
+                    <e c0="14" />
+                    <e c0="15" />
+                    <e c0="16" />
+                    <e c0="17" />
+                    <e c0="18" />
+                    <e c0="16" />
+                    <e c0="18" />
+                    <e c0="19" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="box.jpg_1">
+                <material>box.jpg</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="20" />
+                    <e c0="21" />
+                    <e c0="22" />
+                    <e c0="20" />
+                    <e c0="22" />
+                    <e c0="23" />
+                </indexbuffer>
+            </submesh>
+            <renderbuffer name="texture coordinate lightmap" components="2" type="float">
+                <e c0="0.25" c1="0.015625" />
+                <e c0="0.25" c1="0.5" />
+                <e c0="0.0078125" c1="0.5" />
+                <e c0="0.0078125" c1="0.015625" />
+                <e c0="0.515625" c1="0.015625" />
+                <e c0="0.515625" c1="0.5" />
+                <e c0="0.273438" c1="0.5" />
+                <e c0="0.273438" c1="0.015625" />
+                <e c0="0.78125" c1="0.015625" />
+                <e c0="0.78125" c1="0.5" />
+                <e c0="0.539063" c1="0.5" />
+                <e c0="0.539063" c1="0.015625" />
+                <e c0="0.148438" c1="0.78125" />
+                <e c0="0.148438" c1="0.546875" />
+                <e c0="0.265625" c1="0.546875" />
+                <e c0="0.265625" c1="0.78125" />
+                <e c0="0.125" c1="0.546875" />
+                <e c0="0.125" c1="0.78125" />
+                <e c0="0.0078125" c1="0.78125" />
+                <e c0="0.0078125" c1="0.546875" />
+                <e c0="0.5" c1="0.015625" />
+                <e c0="0.5" c1="0.5" />
+                <e c0="0.015625" c1="0.5" />
+                <e c0="0.015625" c1="0.015625" />
+            </renderbuffer>
+        </params>
+    </meshfact>
+    <meshfact name="factory_Scene_Cube.002">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <numvt>24</numvt>
+            <v x="-0.493757" y="-0.493757" z="0.493757" u="1" v="0" />
+            <v x="-0.493757" y="-0.493757" z="-0.493757" u="1" v="1" />
+            <v x="0.493757" y="-0.493757" z="-0.493757" u="0" v="1" />
+            <v x="0.493757" y="-0.493757" z="0.493757" u="0" v="0" />
+            <v x="0.493757" y="0.493757" z="-0.493757" u="1" v="0" />
+            <v x="-0.493757" y="0.493757" z="-0.493757" u="1" v="1" />
+            <v x="-0.493757" y="0.493757" z="0.493757" u="0" v="1" />
+            <v x="0.493757" y="0.493757" z="0.493757" u="0" v="0" />
+            <v x="0.493757" y="-0.493757" z="-0.493757" u="1" v="0" />
+            <v x="0.493757" y="0.493757" z="-0.493757" u="1" v="1" />
+            <v x="0.493757" y="0.493757" z="0.493757" u="0" v="1" />
+            <v x="0.493757" y="-0.493757" z="0.493757" u="0" v="0" />
+            <v x="-0.493757" y="-0.493757" z="-0.493757" u="1" v="0" />
+            <v x="-0.493757" y="0.493757" z="-0.493757" u="1" v="1" />
+            <v x="0.493757" y="0.493757" z="-0.493757" u="0" v="1" />
+            <v x="0.493757" y="-0.493757" z="-0.493757" u="0" v="0" />
+            <v x="-0.493757" y="-0.493757" z="0.493757" u="0.5" v="0.5" />
+            <v x="-0.493757" y="0.493757" z="0.493757" u="0.5" v="0" />
+            <v x="-0.493757" y="0.493757" z="-0.493757" u="1" v="0" />
+            <v x="-0.493757" y="-0.493757" z="-0.493757" u="1" v="0.5" />
+            <v x="-0.493757" y="0.493757" z="0.493757" u="0.5" v="0" />
+            <v x="-0.493757" y="-0.493757" z="0.493757" u="0.5" v="0.5" />
+            <v x="0.493757" y="-0.493757" z="0.493757" u="0" v="0.5" />
+            <v x="0.493757" y="0.493757" z="0.493757" u="0" v="0" />
+            <mixmode>
+                <copy />
+            </mixmode>
+            <n x="0" y="-1" z="-1.33459e-008" />
+            <n x="0" y="-1" z="-1.33459e-008" />
+            <n x="0" y="-1" z="-1.33459e-008" />
+            <n x="0" y="-1" z="-1.33459e-008" />
+            <n x="0" y="1" z="1.33459e-008" />
+            <n x="0" y="1" z="1.33459e-008" />
+            <n x="0" y="1" z="1.33459e-008" />
+            <n x="0" y="1" z="1.33459e-008" />
+            <n x="1" y="1.33459e-008" z="0" />
+            <n x="1" y="1.33459e-008" z="0" />
+            <n x="1" y="1.33459e-008" z="0" />
+            <n x="1" y="1.33459e-008" z="0" />
+            <n x="1.33459e-008" y="0" z="-1" />
+            <n x="1.33459e-008" y="0" z="-1" />
+            <n x="1.33459e-008" y="0" z="-1" />
+            <n x="1.33459e-008" y="0" z="-1" />
+            <n x="-1" y="1.33459e-008" z="0" />
+            <n x="-1" y="1.33459e-008" z="0" />
+            <n x="-1" y="1.33459e-008" z="0" />
+            <n x="-1" y="1.33459e-008" z="0" />
+            <n x="1.33459e-008" y="0" z="1" />
+            <n x="1.33459e-008" y="0" z="1" />
+            <n x="1.33459e-008" y="0" z="1" />
+            <n x="1.33459e-008" y="0" z="1" />
+            <submesh name="box_spec.jpg_0">
+                <material>box_spec.jpg</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="4" />
+                    <e c0="5" />
+                    <e c0="6" />
+                    <e c0="4" />
+                    <e c0="6" />
+                    <e c0="7" />
+                    <e c0="8" />
+                    <e c0="9" />
+                    <e c0="10" />
+                    <e c0="8" />
+                    <e c0="10" />
+                    <e c0="11" />
+                    <e c0="12" />
+                    <e c0="13" />
+                    <e c0="14" />
+                    <e c0="12" />
+                    <e c0="14" />
+                    <e c0="15" />
+                    <e c0="16" />
+                    <e c0="17" />
+                    <e c0="18" />
+                    <e c0="16" />
+                    <e c0="18" />
+                    <e c0="19" />
+                    <e c0="20" />
+                    <e c0="21" />
+                    <e c0="22" />
+                    <e c0="20" />
+                    <e c0="22" />
+                    <e c0="23" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="box_spec.jpg_1">
+                <material>box_spec.jpg</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="0" />
+                    <e c0="1" />
+                    <e c0="2" />
+                    <e c0="0" />
+                    <e c0="2" />
+                    <e c0="3" />
+                </indexbuffer>
+            </submesh>
+            <renderbuffer name="texture coordinate lightmap" components="2" type="float">
+                <e c0="0.5" c1="0.125" />
+                <e c0="0.5" c1="0.5" />
+                <e c0="0.125" c1="0.5" />
+                <e c0="0.125" c1="0.125" />
+                <e c0="0.25" c1="0.0625" />
+                <e c0="0.25" c1="0.25" />
+                <e c0="0.0625" c1="0.25" />
+                <e c0="0.0625" c1="0.0625" />
+                <e c0="0.25" c1="0.4375" />
+                <e c0="0.25" c1="0.625" />
+                <e c0="0.0625" c1="0.625" />
+                <e c0="0.0625" c1="0.4375" />
+                <e c0="0.625" c1="0.0625" />
+                <e c0="0.625" c1="0.25" />
+                <e c0="0.4375" c1="0.25" />
+                <e c0="0.4375" c1="0.0625" />
+                <e c0="0.8125" c1="0.125" />
+                <e c0="0.8125" c1="0.0625" />
+                <e c0="0.875" c1="0.0625" />
+                <e c0="0.875" c1="0.125" />
+                <e c0="0.125" c1="0.8125" />
+                <e c0="0.125" c1="0.875" />
+                <e c0="0.0625" c1="0.875" />
+                <e c0="0.0625" c1="0.8125" />
+            </renderbuffer>
+        </params>
+    </meshfact>
+    <sector name="Scene">
+        <meshobj name="Cube">
+            <plugin>crystalspace.mesh.loader.genmesh</plugin>
+            <params>
+                <factory>factory_Scene_Cube</factory>
+                <color red="1" green="1" blue="1" />
+                <manualcolors />
+                <mixmode>
+                    <copy />
+                </mixmode>
+                <submesh name="floor.jpg_1">
+                    <material>floor.jpg</material>
+                    <shadervar name="tex lightmap" type="texture">lightmap_Scene_Cube_1</shadervar>
+                </submesh>
+                <submesh name="walls.jpg_0">
+                    <material>walls.jpg</material>
+                    <shadervar name="tex lightmap" type="texture">lightmap_Scene_Cube_0</shadervar>
+                </submesh>
+                <submesh name="walls.jpg_2">
+                    <material>walls.jpg</material>
+                    <shadervar name="tex lightmap" type="texture">lightmap_Scene_Cube_2</shadervar>
+                </submesh>
+                <submesh name="walls.jpg_3">
+                    <material>walls.jpg</material>
+                    <shadervar name="tex lightmap" type="texture">lightmap_Scene_Cube_3</shadervar>
+                </submesh>
+            </params>
+            <zuse />
+            <move>
+                <v x="0.00333691" y="-0.00952018" z="0.000414791" />
+            </move>
+        </meshobj>
+        <meshobj name="Cube.001">
+            <plugin>crystalspace.mesh.loader.genmesh</plugin>
+            <params>
+                <factory>factory_Scene_Cube.001</factory>
+                <color red="1" green="1" blue="1" />
+                <manualcolors />
+                <mixmode>
+                    <copy />
+                </mixmode>
+                <submesh name="box.jpg_0">
+                    <material>box.jpg</material>
+                    <shadervar name="tex lightmap" type="texture">lightmap_Scene_Cube.001_0</shadervar>
+                </submesh>
+                <submesh name="box.jpg_0">
+                    <material>box.jpg</material>
+                    <shadervar name="tex lightmap" type="texture">lightmap_Scene_Cube.001_0</shadervar>
+                </submesh>
+                <submesh name="box.jpg_1">
+                    <material>box.jpg</material>
+                    <shadervar name="tex lightmap" type="texture">lightmap_Scene_Cube.001_1</shadervar>
+                </submesh>
+            </params>
+            <zuse />
+            <move>
+                <v x="3.79896" y="0.0553295" z="-2.0295588" />
+            </move>
+        </meshobj>
+        <meshobj name="Cube.002">
+            <plugin>crystalspace.mesh.loader.genmesh</plugin>
+            <params>
+                <factory>factory_Scene_Cube.002</factory>
+                <color red="1" green="1" blue="1" />
+                <manualcolors />
+                <mixmode>
+                    <copy />
+                </mixmode>
+                <submesh name="box_spec.jpg_0">
+                    <material>box_spec.jpg</material>
+                    <shadervar name="tex lightmap" type="texture">lightmap_Scene_Cube.002_0</shadervar>
+                </submesh>
+                <submesh name="box_spec.jpg_1">
+                    <material>box_spec.jpg</material>
+                    <shadervar name="tex lightmap" type="texture">lightmap_Scene_Cube.002_1</shadervar>
+                </submesh>
+            </params>
+            <zuse />
+            <move>
+                <v x="3.79896" y="0.0553295" z="2.0295588" />
+            </move>
+        </meshobj>
+        <light name="Lamp">
+            <center x="-.05294" y="0" z="0" />
+            <color red="0.9" green="0.9" blue="1.0" />
+            <radius>50</radius>
+            <attenuation c="0" l="0" q="0.1" />
+        </light>
+    </sector>
+    <sequences>
+        <sequence name="rotateCube">
+            <rotate mesh="Cube.001" duration="2000">
+                <rotx>1.8</rotx>
+                <v x="3.79896" y="0.0553295" z="-2.0295588" />
+            </rotate>
+            <delay time="2000" />
+            <rotate mesh="Cube.001" duration="2000">
+                <roty>1.4</roty>
+                <v x="3.79896" y="0.0553295" z="-2.0295588" />
+            </rotate>
+            <delay time="2000" />
+            <enable trigger="rotateCube" />
+        </sequence>
+        <sequence name="moveCube">
+            <move mesh="Cube.002" duration="2000" x="-6" y="0" z="0" />
+            <delay time="2000" />
+            <move mesh="Cube.002" duration="2000" x="6" y="0" z="0" />
+            <delay time="2000" />
+            <enable trigger="moveCube" />
+        </sequence>
+    </sequences>
+    <triggers>
+        <trigger name="rotateCube">
+            <sectorvis sector="Scene" />
+            <fire delay="20" sequence="rotateCube" />
+        </trigger>
+        <trigger name="moveCube">
+            <sectorvis sector="Scene" />
+            <fire delay="20" sequence="moveCube" />
+        </trigger>
+    </triggers>
+</world>

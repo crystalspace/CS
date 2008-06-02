@@ -1,0 +1,14 @@
+SubDir TOP plugins video render3d opengl ;
+
+if $(GL.AVAILABLE) = "yes"
+{
+Description gl3d : "3D OpenGL renderer" ;
+Plugin gl3d : [ Wildcard *.cpp *.h ] ;
+LinkWith gl3d : crystalspace_opengl crystalspace ;
+ExternalLibs gl3d : GL ;
+CompileGroups gl3d : renderers renderall openglrenderer ;
+
+# Historic alias.
+NotFile glrender3d ;
+Depends glrender3d gl3d ;
+}

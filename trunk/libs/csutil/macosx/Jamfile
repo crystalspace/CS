@@ -1,0 +1,20 @@
+SubDir TOP libs csutil macosx ;
+
+CsLibAddModule ;
+
+CSUTIL.GENERIC +=
+  apppath.cpp
+  csprocessorcap.cpp  
+  expandname.cpp
+  findlib.cpp
+  getopt.cpp
+  memutil_impl.cpp
+  mmap.cpp
+  pathutil.cpp 
+  pluginpaths.cpp
+  processorcount.cpp
+  printf.cpp
+  scanplugins.cpp
+  setenv.cpp
+  sysroot.cpp 
+  vfsplat.cpp ;

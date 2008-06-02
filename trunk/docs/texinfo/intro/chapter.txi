@@ -1,0 +1,52 @@
+@c -*-texinfo-*-
+@node CS Introduction, Building, Top, Top
+@chapter Introduction
+@cindex Introduction
+
+CrystalSpace is a portable modular 3D @sc{sdk}, including many components
+for building various applications and games - these are still quite
+useful for projects that do not involve 3D. @sc{cs} is still very much in 
+development, so anyone who feels inclined to do so can contribute to the
+source. There are a number of incomplete components still needing to be 
+finished, and a wide array of possibilities for new contributions; for
+more information about what is missing and a list of currently known
+bugs, please visit the Developer's Project page at SourceForge:  
+
+@noindent
+@uref{http://sourceforge.net/projects/crystal/}
+
+CrystalSpace is free and should remain free.  CrystalSpace falls under the
+@sc{gnu} copyleft license for libraries @sc{lgpl}.  A copy of the @sc{lgpl}
+is included in this manual for your perusal (@pxref{Licenses}). In short, the
+@sc{lgpl} allows you to use CrystalSpace as a library in your products, even 
+commercial products, but modifications to the library or derivative
+works incorporating parts of the library must be made freely available
+to everyone, under the @sc{lgpl}'s terms.
+
+Please read the @sc{faq} if you have any questions.  If you don't find the
+answer there you can always email the mailing lists. @xref{FAQ}, or
+@ref{Mailing Lists}.
+
+@menu
+* HowToRead:: How To Read This Manual
+* Current Status::
+* UsingForProject:: Using Crystal Space For Your Project
+* DocGuide:: A Guide to This Documentation
+* Feature List::
+* Where to Get:: Where to Get Crystal Space
+* Mailing Lists::
+* IRC:: Internet Relay Chat (@sc{irc})
+* Feedback:: Feedback and Bug Reporting
+* Genesis:: Genesis of Crystal Space
+* Authors:: Documentation Authors & Contributors
+* Contributors:: Crystal Space Contributors
+@end menu
+
+@imports{intro,foreword.txi}
+@imports{intro,guide.txi}
+@imports{intro,features.txi}
+@imports{intro,resource.txi}
+@imports{intro,feedback.txi}
+@imports{intro,genesis.txi}
+@imports{intro,authors.txi}
+@imports{intro,contrib.txi}

@@ -1,0 +1,274 @@
+@c -*-texinfo-*-
+@node MeshObject Emit, MeshObject Haze, MeshObject Spr3D, MeshObject
+@subsection Emitter Mesh Object
+@cindex MeshObject
+@cindex Emitter Particle System
+@cindex @code{iMeshObject}
+@cindex @code{iMeshObjectFactory}
+@cindex @code{iMeshObjectType}
+@cindex @code{iEmitState}
+@cindex @code{iEmitFactoryState}
+@cindex @code{iParticleState}
+
+@emph{Written by Wouter Wijngaards,
+@email{wouterw@@cs.vu.nl}.}
+
+An emitter particle system is a very general particle system, that
+can do a variety of things. It is considered mostly deprecated and if possible
+you should use the new particle system instead. In the future we will
+extend the new particles mesh object so that all features of emit are
+supported. @xref{MeshObject Particles}.
+
+The emitter can be customized to a high degree, using the @samp{iEmitGen3D}
+objects. Particles are emitted from position you choose, with speeds
+and accelerations you choose. During their lifetime they age and change
+as you choose.
+
+@subsubheading Basic Structure
+
+The following @sc{scf} class names are used (for @code{csLoadPlugin}):
+
+@itemize @bullet
+@item
+Type plugin: @samp{crystalspace.mesh.object.emit}
+@item
+Loader plugin: @samp{crystalspace.mesh.loader.emit}
+@item
+Factory loader plugin: @samp{crystalspace.mesh.loader.factory.emit}
+@end itemize
+
+Objects in this plugin implement the following @sc{scf} interfaces (acquire
+with @code{scfQueryInterface}):
+
+@itemize @bullet
+@item
+@emph{MeshObject}
+@itemize @bullet
+@item
+Implements @samp{iMeshObject}
+@item
+Implements @samp{iParticleState}
+@item
+Implements @samp{iEmitState}
+@end itemize
+@item
+@emph{MeshObjectFactory}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectFactory}
+@item
+Implements @samp{iEmitFactoryState}
+@end itemize
+@item
+@emph{MeshObjectFactory}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectType}
+@end itemize
+@end itemize
+
+@subsubheading Factory State Interface
+
+The factory state interface has methods to create new emitter objects,
+that implement the @samp{iEmitGen3D} interface. These objects return a random
+3D x,y,z value. They are used to specify starting position, speed and
+acceleration for the particles. Several exist:
+
+@table @code
+@item iEmitFixed
+This emitter returns a fixed x,y,z value. Corresponds to a point in space,
+a fixed speed, or fixed acceleration.
+
+@item iEmitBox
+Returns a value with each component between a min and max.  Corresponds to
+points from a box in space.  Use it to variate x,y,z for speed and
+acceleration, or to get positions inside a box.
+
+@item iEmitSphere
+Returns a point in a sphere. The center of the sphere and a min and max radius
+must be given. The point is between the min and max radius from the center.
+Thus you can generate points from a hollowed sphere if you like.
+The points are evenly distributed across the entire volume of the sphere.
+
+@item iEmitCone
+Returns a point inside a cone. Give a start point, aperture angle, azimuth
+and elevation just like in the fountain particle system. The points are
+chosen between a min and max distance from the origin.
+
+@item iEmitMix
+The mix has a set of other @samp{iEmitGen3D} objects, and samples a weighted
+distribution from them. You can give some other emitgen3ds and a weight
+for each one. Items with a heavier weight will be asked to return a 
+point more often.
+
+For example, you could add several EmitLine objects to the mix, each 
+with a weight equal to its length. Then the mix will return points from
+a random line, but those points will be evenly distributed in space.
+
+@item iEmitLine
+Returns points from the line between start and end position.
+
+@item iEmitCylinder
+Give the start and end of the middle line of the cylinder, the two end
+points. Returns points between min and max radius from the middle line.
+The points are evenly distributed in space. Also, when the start = end point,
+points from a circle are returned.
+
+@item iEmitSphereTangent
+The position point that is passed is used to compute a vector that is
+tangential to a sphere, relative to given origin. Use it to give a speed
+or acceleration tangential to a sphere. Speed is between min and max.
+
+@item iEmitCylinderTangent
+The position point that is passed is used to compute a vector that is
+tangential to a cylinder, relative to given start and end of the middle line. 
+Use it to give a speed or acceleration tangential to a cylinder. Speed is 
+between min and max.
+@end table
+
+@subsubheading Factory Loader
+
+The emitter mesh factory loader has no parameters.
+
+@subsubheading Object State Interface
+
+@samp{iEmitState} is the @sc{scf} interface that you can
+use to set/get settings for a emitter object. The definition of this
+interface can be found in @file{CS/include/imesh/emit.h} and that's also the
+header file you need to include in your applications to use this plugin.
+Using this interface you can access the number of particles, the size
+of the particles, and various other emitter parameters.
+You can set:
+
+@itemize @bullet
+@item
+The number of particles
+
+@item
+If particles are lighted
+
+@item
+The time a particle lives, in msec (1/1000). This is the maximum age 
+of the particles.
+
+@item
+The starting position @samp{iEmitGen3D}.
+
+@item
+The starting speed @samp{iEmitGen3D}.
+
+@item
+The starting acceleration @samp{iEmitGen3D}.
+
+@item
+The attractor @samp{iEmitGen3D}. You can also leave this at @sc{null}, and 
+no attractor is used. If given, each point is mysteriously attracted
+to a point generated by the attractor @samp{iEmitGen3D}. 
+
+@item
+The force of the attractor, higher means a faster acceleration
+towards the attractor. Negative will repel.
+
+@item
+The shape of the particles, either rectangular (given width, height)
+or regular shaped (given number of sides and radius).
+
+@item
+Also a table a ages and settings can be given. The particles will
+have their settings interpolated from the table in their lifetime.
+At a particular time (in milliseconds), you can set the colour of the particle,
+the alpha value of the particle (1=transparent), the swirliness of the
+particle (it will jiggle around a bit), the rotationspeed (positive or
+negative) in radians per second, and the scale (relative to the starting
+scale) of the particle.
+@end itemize
+
+In addition you can use @samp{iParticleState}.
+
+@subsubheading Object Loader
+
+@table @code
+@item <rectparticles w="" h="" />
+Set the width and height of the particles rectangular shape.
+@item <regularparticles sides="" radius="" />
+Set the number of sides and a radius of the regular shaped particles.
+@item <totaltime>milliseconds</totaltime>
+Set the maximum age in milliseconds.
+@item <lighting>yes/no</lighting>
+Disable or enable lighting for the particles
+@item <number>numberparticles</number>
+Set the number of particles
+@item <startpos> @dots{}
+Give an @sc{emit} object for starting position.
+@item <startspeed> @dots{}
+Give the starting speed @sc{emit}.
+@item <startaccel> @dots{}
+Give the starting acceleration @sc{emit}.
+@item <attractorforce>forcevalue</attractorforce>
+Give the attractor force value.
+@item <attractor> @dots{}
+Give the @sc{emit} that makes attracting points (per particle).
+@item <aging> @dots{}
+@example
+<aging>
+  <color red="" green="" blue="" />
+  <time>time</time>
+  <alpha>alpha</alpha>
+  <swirl>swirl</swirl>
+  <rotspeed>rotspeed</rotspeed>
+  <scale>scale</scale>
+</aging>
+@end example
+Give a colour red, colour green, colour blue, age time, alpha, swirl, 
+rotationspeed and scale. 
+@item <emitfixed x="" y="" z="" />
+Fixed (x, y, z) emitter.
+@item <emitbox> @dots{}
+Box emitter, min x,y,z, max x,y,z.
+@example
+<emitbox>
+  <min x="" y="" z="" />
+  <max x="" y="" z="" />
+</emitbox>
+@end example
+@item <emitsphere x="" y="" z="" p="" q="" r="" />
+Sphere emitter, origin x,y,z, min, max.
+@item <emitcone x="" y="" z="" p="" q="" r="" s="" t="" />
+Cone emitter, start x,y,z, elevation, azimuth, aperture, min,max radius.
+@item <emitmix> @dots{}
+Use several @samp{emitmix} keywords in a row to create a mix with several
+@sc{emit}s.  Inside each @samp{emitmix}, @code{WEIGHT(value)} can be used to
+set the weight.
+@item <emitline>
+Line emitter, start, end point.
+@example
+<emitline>
+  <min x="" y="" z="" />
+  <max x="" y="" z="" />
+</emitline>
+@end example
+@item <emitcylinder p="" q="" />
+Cylinder emitter, min, max distance, start, end point.
+@example
+<emitcylinder>
+  <min x="" y="" z="" />
+  <max x="" y="" z="" />
+</emitcylinder>
+@end example
+@item <emitcylindertangent p="" q="" />
+CylinderTangent emitter. Give start, end point, min, max speed.
+@example
+<emitcylindertangent>
+  <min x="" y="" z="" />
+  <max x="" y="" z="" />
+</emitcylindertangent>
+@end example
+@item <emitspheretangent p="" q="" />
+SphereTangent emitter. Give origin, min, max speed.
+@example
+<emitspheretangent>
+  <min x="" y="" z="" />
+  <max x="" y="" z="" />
+</emitspheretangent>
+@end example
+@end table

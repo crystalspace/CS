@@ -1,0 +1,1636 @@
+@c -*-texinfo-*-
+@node Release Notes 98, Release Notes 96, Release Notes 1_0, Release Notes
+@appendixsec Release Notes from 0.96 to 0.98
+@cindex Release Notes
+
+This section documents the major changes between versions 0.96 and 0.98 of
+Crystal Space.
+
+@subheading Lighting Changes
+@cindex @code{DeferUpdateLighting}
+@cindex @code{UpdateLighting}
+@cindex @code{SetLightingUpdate}
+@cindex @code{GetNearbyLights}
+
+The following methods have been removed:
+
+@itemize @bullet
+@item
+@code{iMeshWrapper::DeferUpdateLighting()}
+@item
+@code{iMeshWrapper::UpdateLighting()}
+@end itemize
+
+@noindent
+Instead there is a new function @code{iMeshWrapper::SetLightingUpdate()} with
+which you can exhibit the same control.  The big difference is that you don't
+have to call this function every time a light or object moves.  This is all
+updated automatically now.
+
+Also removed the @code{CS_NLIGHT_} flags. @code{iEngine::GetNearbyLights()}
+has been modified so that the flags parameter is no longer accepted.
+
+@subheading Bezier Curve Changes
+@cindex Bezier Curve Changes
+@cindex @code{iCurveTemplate}
+@cindex @code{iCurve}
+@cindex @code{iBezierState}
+@cindex @code{iBezierFactoryState}
+
+The notion of curve templates has been reworked. @samp{iCurveTemplate} has
+been removed and it's functionality has moved to @samp{iCurve} itself.
+As a consequence of this change the bezier addon loader has been removed.
+Also curves have been separated from the thing plugin and now live in the
+@file{bezier} plugin. So, a curve like this in the past:
+
+@example
+<addon>
+  <plugin>crystalspace.mesh.loader.thing.bezier</plugin>
+  <params>
+    <name>b1</name>
+    <material>mosaic</material>
+    <v>0</v> <v>1</v> <v>2</v>
+    <v>3</v> <v>4</v> <v>5</v>
+    <v>6</v> <v>7</v> <v>8</v>
+  </params>
+</addon>
+<meshfact name="tunnel">
+  <plugin>crystalspace.mesh.loader.factory.thing</plugin>
+  <params>
+    <curvecenter x="0" y="0" z="0" />
+    <curvescale>80</curvescale>
+    <curvecontrol x="5" y="2" z="0" u="1" v="0" />
+    @dots{}
+    <curve name="bez">b1</curve>
+  </params>
+</meshfact>
+@end example
+
+@noindent
+should now become (note the new plugin line):
+
+@example
+<meshfact name="tunnel">
+  <plugin>crystalspace.mesh.loader.factory.bezier</plugin>
+  <params>
+    <curvecenter x="0" y="0" z="0" />
+    <curvescale>80</curvescale>
+    <curvecontrol x="5" y="2" z="0" u="1" v="0" />
+    @dots{}
+    <curve name="b1">
+      <material>mosaic</material>
+      <v>0</v> <v>1</v> <v>2</v>
+      <v>3</v> <v>4</v> <v>5</v>
+      <v>6</v> <v>7</v> <v>8</v>
+    </curve>
+  </params>
+</meshfact>
+@end example
+
+On the @sc{api} side nothing much changes except that when you use
+the bezier mesh plugin you need to use @samp{iBezierState} and
+@samp{iBezierFactoryState}.
+
+The @samp{iThingEnvironment} no longer has code to maintain bezier curve
+templates.
+
+@subheading iThingState and iPolygon3D Changes
+@cindex @code{iThingState}
+@cindex @code{iThingFactoryState}
+@cindex @code{iPolygon3D}
+@cindex @code{iObject}
+@cindex @code{iMeshObject}
+@cindex @code{iMeshObjectFactory}
+
+The interface @samp{iThingState} no longer inherits from
+@samp{iObject}, thus the @code{QueryObject()} function has been removed.
+
+@samp{iThingState} has been split into @samp{iThingState} and
+@samp{iThingFactoryState}. A thing mesh no longer implements both a mesh
+object and a mesh object factory. Instead things now work like usual
+mesh objects where @code{iMeshObjectType::NewFactory()} creates a
+factory that implements @samp{iThingFactoryState} and
+@code{iMeshObjectFactory::NewInstance()} creates an instance that implements
+@samp{iThingState}. The engine convenience functions to create a thing
+mesh will automatically create both the factory and mesh so you don't
+have to worry about that. You can use @code{iThingState::GetFactory()}
+from a thing mesh object to get the @samp{iThingFactoryState} so you can
+build the polygons. Note that @code{SCF_QUERY_INTERFACE()} of
+@samp{iThingFactoryState} no longer works on a thing mesh object. You must
+use @code{GetFactory()}.
+
+@code{iThingState::GetVertexC()} has been removed. It is no longer possible
+to get camera space information from a thing.
+
+The method @code{iThingFactoryState::GetFlags()} has been removed.  Use the new
+method @code{iMeshObjectFactory::GetFlags()} instead.
+
+The interface @samp{iPolygon3D} is completely removed.  The
+@samp{iThingFactoryState} now contains a lot of new functions to create and
+manipulate polygons.  Here is an example:
+
+First the old code:
+
+@example
+  iPolygon3D* p;
+  p = state->CreatePolygon ("First one");
+  p->CreateVertex (csVector3 (@dots{}));
+  p->CreateVertex (csVector3 (@dots{}));
+  p->CreateVertex (csVector3 (@dots{}));
+  p->CreateVertex (csVector3 (@dots{}));
+  p->SetMaterial (mat);
+  p = state->CreatePolygon ("Second one");
+  p->CreateVertex (csVector3 (@dots{}));
+  p->CreateVertex (csVector3 (@dots{}));
+  p->CreateVertex (csVector3 (@dots{}));
+  p->CreateVertex (csVector3 (@dots{}));
+  p->SetMaterial (mat);
+  @dots{}
+@end example
+
+Here is the new code:
+
+@example
+  state->AddQuad (
+    csVector3 (@dots{}),
+    csVector3 (@dots{}),
+    csVector3 (@dots{}),
+    csVector3 (@dots{}));
+  state->SetPolygonName (CS_POLYRANGE_LAST, "First one");
+  state->AddQuad (
+    csVector3 (@dots{}),
+    csVector3 (@dots{}),
+    csVector3 (@dots{}),
+    csVector3 (@dots{}));
+  state->SetPolygonName (CS_POLYRANGE_LAST, "Second one");
+  state->SetPolygonMaterial (CS_POLYRANGE_ALL, mat);
+@end example
+
+If you want to add a box that can be seen from the inside (typically a room)
+then you can do it like this:
+
+@example
+  state->AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
+  state->SetPolygonMaterial (CS_POLYRANGE_LAST, mat);
+  state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
+@end example
+
+@subheading Light Changes
+@cindex @code{iLight}
+@cindex @code{iStatLight}
+@cindex @code{iDynLight}
+
+The interfaces @samp{iStatLight} and @samp{iDynLight} have been removed
+and their functionality has been merged into @samp{iLight} (this includes
+the function @code{iDynLight::Setup()}. There is now a new function
+@code{iLight::GetDynamicType()} which returns one of the following
+constants depending on the type of the light:
+
+@itemize
+@item
+@code{CS_LIGHT_DYNAMICTYPE_STATIC}: for static lights.
+@item
+@code{CS_LIGHT_DYNAMICTYPE_PSEUDO}: for pseudo-dynamic lights.
+@item
+@code{CS_LIGHT_DYNAMICTYPE_DYNAMIC}: for fully dynamic lights.
+@end itemize
+
+The method @code{iLight::IsDynamic()} was removed;
+use @code{iLight::GetDynamicType()} to get the same information.
+
+The following functions have been modified to work with @samp{iLight}
+instead of @samp{iStatLight} and @samp{iDynLight}:
+
+@itemize
+@item
+@code{iEngine::CreateLight()}.
+@item
+@code{iEngine::FindLight()}.
+@item
+@code{iEngine::FindLightID()}.
+@item
+@code{iEngine::ForceRelight()}.
+@end itemize
+
+The last parameter of @code{iEngine::CreateLight()} routine has
+changed to be the dynamic type of the light (one of the above
+@samp{CS_LIGHT_DYNAMICTYPE} constants) instead of a boolean. Thus, the
+@code{iEngine::CreateDynLight()} method has been superceded by this
+function.
+
+All functions related to dynamic lights have been removed. Dynamic
+lights are now treated exactly like static lights. For example, you have to
+call @code{iSector::GetLights()} and then @code{Add()} to add the light to the
+sector. The @code{iLight::Setup()} function remains, however, and is
+specific to dynamic lights.
+
+@subheading Polygon Texture Mapping Changes
+@cindex @code{iPolyTexNone}
+@cindex @code{iPolyTexGouraud}
+@cindex @code{iPolyTexFlat}
+@cindex @code{iPolyTexLightMap}
+@cindex Shading
+
+The following interfaces have been removed: @samp{iPolyTexNone},
+@samp{iPolyTexGouraud}, @samp{iPolyTexFlat}, and  @samp{iPolyTexLightMap}.
+The combined @sc{api} from @samp{iPolyTexNone} and the @samp{iPolyTexLightMap}
+have moved to @samp{iThingFactoryState}.
+
+It is no longer possible to set mixmode and alpha for individual polygons
+Instead use the new @code{iThingState::SetMixMode()} function to set the
+mixmode globally.  If needed you will have to separate the transparent polygon
+in a separate thing mesh.
+
+It is also no longer possible to get camera space information from polygons.
+
+The @code{<shading>} keyword in polygons in map files now accepts a boolean
+value instead of @samp{NONE}, @samp{FLAT}, @samp{GOURAUD}, or @samp{LIGHTMAP}.
+With this you can enable/disable lightmapping.
+
+If you want gouraud shaded polygons you should use the @file{genmesh}
+mesh object plugin instead.
+
+@subheading Polygon Planes
+@cindex @code{iPolyTxtPlane}
+@cindex @code{iThingEnvironment}
+
+Polygon planes are removed. So it is no longer possible to use
+the plane addon loader to define texture mapping for a polygon outside
+of the polygon itself. To fix this you must specify all texture mapping
+information in the @samp{texmap} statement of the polygon. @file{map2cs}
+now correctly outputs polygons like this (no longer outputs planes) and
+@file{levtool} can convert old style maps to new format like this:
+
+@example
+levtool -planes yourmap.zip
+@end example
+
+@samp{iThingEnvironment} no longer has code to maintain polygon texture
+mapping planes.
+
+The plane loader and saver addons have been removed from the thing
+loader plugin.
+
+Removed @samp{iPolyTxtPlane} interface.
+
+@subheading Portal Changes
+@cindex @code{iPortal}
+
+Several methods in @samp{iPortal} have changed slightly. For example,
+@code{SetMirror()} now expects a plane instead of a polygon.
+
+In the map loader the syntax for specifying warp vectors for portals has
+changed from @samp{v} to @samp{wv} and @samp{w} to @samp{ww}.
+
+Portals in thing have been removed completely! Instead there is now a separate
+portal container object which belongs in the engine (otherwise it is just
+a mesh like any other mesh). To create a portal you can use the convenience
+functions @code{iEngine::CreatePortal()} and
+@code{iEngine::CreatePortalContainer()}. Here is an example of old code
+and how to change it to new code:
+
+@example
+  @dots{} create thing in sourceSector @dots{}
+  iPolygon3D* p = state->CreatePolygon ();
+  p->CreateVertex (csVector3 (@dots{}));
+  p->CreateVertex (csVector3 (@dots{}));
+  p->CreateVertex (csVector3 (@dots{}));
+  p->CreateVertex (csVector3 (@dots{}));
+  iPortal* portal = p->CreatePortal (destSector);
+@end example
+
+New code:
+
+@example
+  csPoly3D poly;
+  poly.AddVertex (csVector3 (@dots{}));
+  poly.AddVertex (csVector3 (@dots{}));
+  poly.AddVertex (csVector3 (@dots{}));
+  poly.AddVertex (csVector3 (@dots{}));
+  iPortal* portal;
+  csRef<iMeshWrapper> portal_mesh = engine->CreatePortal (
+        "my_portal", sourceSector, csVector3 (0, 0, 0),
+        destSector, poly.GetVertices (), poly.GetVertexCount (),
+        portal);
+@end example
+
+In map files the old way to create portals in a polygon is still supported.
+Internally it will also create a portal container (as a child mesh of
+the thing it is in). The new way to create portals is by using the new
+@samp{portals} and @samp{portal} keywords in sectors or as children of
+other meshes.
+
+@subheading Datatype Changes
+
+The @samp{csSome}, @samp{csConstSome} and @samp{uint} types have been removed.
+Use @samp{void*}, @samp{const void*} and @samp{unsigned int} instead.
+
+@subheading Procedural Textures
+
+Instead of only built-in types, procedural textures have been moved into 
+plugins. That means that the @code{<type>} token now works the same way
+as the @code{<plugin>} token for meshes. That is, either specify a full
+class ID (e.g. @samp{crystalspace.proctex.loader.fire}), or a shortcut
+specified in the @code{<plugins>} token of the world. To simulate the
+old @code{<type>} behaviour, paste the following lines into a map's 
+@code{<plugin>} section:
+
+@example
+<plugin name="dots">crystalspace.texture.loader.dots</plugin>
+<plugin name="fire">crystalspace.texture.loader.fire</plugin>
+<plugin name="water">crystalspace.texture.loader.water</plugin>
+<plugin name="plasma">crystalspace.texture.loader.plasma</plugin>
+@end example
+
+This requires that you move the @code{<plugin>} block in front of the 
+@code{<textures>} block, as otherwise the shortcuts won't be recognised.
+
+The behaviour of procedural textures also differs as a material of the same
+name was created along with the texture; this isn't the case any more, you
+have to create a material which uses the procedural texture manually.
+
+In addition, the loader now doesn't distinguish between normal and procedural
+textures any more, both are loaded with the same @code{<texture>} block. The 
+syntax recognized is a combination of both old @code{<texture>} and 
+@code{<proctex>} tokens---so renaming all @code{<proctex>} to @code{<texture>}
+tags is sufficient to convert a level (apart from fixing the @code{<type>}
+tokens.)
+
+@subheading Regions
+@cindex @code{iRegion}
+@cindex @code{iEngine}
+@cindex @code{iLoader}
+
+Region handling has changed considerably. The engine no longer has the
+concept of a current region. The engine still manages all regions though.
+Objects also no longer register themselves to the current region. It is
+the responsability of the object creator to do that. The standard loader
+has support for adding objects to a region now.
+
+The following functions have been removed from @samp{iEngine}:
+
+@itemize
+@item
+@code{SelectRegion()}
+@item
+@code{GetCurrentRegion()}
+@item
+@code{AddToCurrentRegion()}
+@end itemize
+
+There is one new function @code{iEngine::CreateRegion()} which will create
+a new region.
+
+In @samp{iLoader} the functions @code{LoadMapFile()} and
+@code{ThreadedLoadMapFile()} now expect an optional pointer to a region
+in addition with a boolean to restrict searching to that region.
+
+In addition to all these changes the @code{<region>} keyword in map files is no
+longer supported.
+
+@subheading Mesh Objects / Factories and iPolygonMesh
+
+Some mesh factories used to support the querying of the @samp{iPolygonMesh}
+interface (e.g. Thing, Sprite3D, Genmesh). Due to the way this was 
+implemented internally this caused leaks. So, querying @samp{iPolygonMesh} 
+directly from the object is now discouraged. Although it may still work in 
+some cases, this feature may be dropped without further notice and may not 
+work in all cases. 
+
+Similar for mesh objects. Querying @samp{iPolygonMesh} is discouraged here,
+as well.
+
+Instead, if you want the polygon mesh from an object, use the
+@code{GetObjectModel()} method from the @samp{iMeshObject} interface;
+respectively query for the @samp{iObjectModel} interface in case of a factory,
+and utilize one of the @code{GetPolygonMeshXXX()} methods, depending on what
+you need (the old interface query returned the collision detection mesh.) This
+has also the advantages that you can get different meshes for different
+purposes (currently, visibility culling and collision detection in addition the
+the base mesh), and that those meshes can be overridden by user-defined meshes
+(e.g. if the collision detection mesh needs to have a shape different from the
+visible mesh.)
+
+In @samp{iPolygonMesh} the @code{IsDeformable()} method has been replaced
+with the more general @code{GetFlags()}. In addition to that @code{Cleanup()}
+is removed and instead @code{Lock()} and @code{Unlock()} are added.
+
+@samp{iPolygonMesh} now has @code{GetTriangles()} and @code{GetTriangleCount()}.
+Check out the @sc{api} docs for implementation details.
+
+@subheading Iterator Changes
+@cindex @code{iVisibilityObjectIterator}
+@cindex @code{iLightIterator}
+@cindex @code{iSectorIterator}
+@cindex @code{iObjectIterator}
+@cindex @code{iObjectRegistryIterator}
+@cindex @code{iStreamIterator}
+@cindex @code{csTypedObjectIterator}
+@cindex @code{csModelDataActionIterator}
+@cindex @code{csModelDataPolygonIterator}
+@cindex @code{csModelDataTextureIterator}
+@cindex @code{csModelDataMaterialIterator}
+@cindex @code{csModelDataObjectIterator}
+@cindex @code{csNodeIterator}
+
+Changed the following iterators to conform to the following iterator standard:
+
+@example
+bool iterator->HasNext() // returns true if there are more items.
+T* iterator->Next()      // returns next element or 0.
+void Reset()             // resets iterator (not all implement this).
+@end example
+
+@itemize
+@item
+@code{iVisibilityObjectIterator}
+@item
+@code{iLightIterator}
+@item
+@code{iSectorIterator}
+@item
+@code{iObjectIterator}
+@item
+@code{iStreamIterator}
+@item
+@code{iObjectRegistryIterator}
+@item
+@code{csTypedObjectIterator}
+@item
+@code{csModelDataActionIterator}
+@item
+@code{csModelDataPolygonIterator}
+@item
+@code{csModelDataTextureIterator}
+@item
+@code{csModelDataMaterialIterator}
+@item
+@code{csModelDataObjectIterator}
+@item
+@code{csNodeIterator}
+@end itemize
+
+@subheading @sc{aws} Changes
+
+@code{iAWS::CreateCustomCanvas()} was removed.  To set up @sc{aws} with a
+canvas, use @code{iAWS::SetupCanvas()} instead. 
+
+@code{iAWS::CreateTransition()} and @code{iAWS::CreateTransitionEx()} have been
+changed to take a @var{delay} parameter specified in @samp{csTicks} instead of
+using a @var{step_size} parameter.  This change ensures that transitions take
+the same amount of time on computers having different processor speeds.
+@code{iAWS::ComponentIsInTransition()} has been added to allow users to query
+if a specified @samp{iAwsComponent} is in the midst of a transition.
+
+@subheading Array Changes
+@cindex @code{csArray}
+@cindex @code{csPDelArray}
+@cindex @code{csRefArray}
+@cindex @code{csStringArray}
+@cindex @code{csGrowingArray}
+@cindex @code{csDirtyAccessArray}
+
+All arrays have been modified to inherit from @samp{csArray}. This means
+that there are some slight @sc{api} changes because some methods were
+not consistent with @samp{csArray}.
+
+@samp{csGrowingArray} has been renamed to @samp{csDirtyAccessArray} in order to
+better reflect its intention, which is that it publishes a method allowing the
+client to obtain access to the raw memory block containing the items in
+contiguous memory.  This potentially unsafe operation is not available in the
+other array templates.  Use this class only in very special-purpose cases where
+you need to construct a list of objects dynamically and then pass the address
+of the raw memory containing those objects to some foreign function which does
+not understand @code{csArray<>}.
+
+@subheading csPArray Removed
+@cindex @code{csPArray}
+@cindex @code{csArray}
+
+@samp{csPArray} has been removed in favor of the @code{csArray<>} template.
+So, use @code{csArray<T*>} instead of @code{csPArray<T>}.
+
+@subheading csStrVector and iStrVector Removed
+@cindex @code{csStrVector}
+@cindex @code{iStrVector}
+@cindex @code{csStringArray}
+@cindex @code{iStringArray}
+@cindex @code{FindFiles}
+@cindex @code{MountRoot}
+
+@samp{csStrVector} and @samp{iStrVector} have been removed in favor of
+@samp{csStringArray} and @samp{iStringArray}.  This means that functions like
+@code{iVFS::MountRoot()} and @code{iVFS::FindFiles()} now return an
+@samp{iStringArray}.
+
+@subheading csVector and csBasicVector Removed
+@cindex @code{csVector}
+@cindex @code{csBasicVector}
+@cindex @code{csArray}
+@cindex @code{csRefArray}
+@cindex @code{csPDelArray}
+
+@samp{csVector} and @samp{csBasicVector} have been removed. Instead you
+should use one of the templated arrays: @code{csArray<>}, @code{csPDelArray<>},
+or @code{csRefArray<>}.
+
+If you were using a regular @samp{csVector} then this can usually be
+replaced directly by @code{csArray<type*>} with @samp{type} the type you
+were storing in the vector.
+
+If you subclassed from @samp{csVector} in order to override @code{FreeItem()}
+then you have to decide what to do depending on the code in @code{FreeItem()}.
+If that code performed a @samp{delete} then you can use @code{csPDelArray<>}.
+If that code performed a @code{DecRef()} then you can use @code{csRefArray<>}
+but you still have to be careful because @code{csRefArray<>} will automatically
+invoke @code{IncRef()} for objects that are pushed on the array. In other cases
+you probably need to handle deletion manually.
+
+@samp{csVector} also allowed you to override @code{Compare()} and
+@code{CompareKey()}, and these methods were utilized automatically by
+@code{QuickSort()}, @code{FindSortedKey()}, @code{InsertSorted()}, and
+@code{FindKey()}.  @code{csArray<>}, on the other hand, accepts a comparison
+function as an argument to its sorting and searching methods, thus providing
+much greater flexibility than @samp{csVector}.  You can transform your
+@code{csVector}-based code as follows.  First, the old code:
+
+@example
+class MyVector : public csVector
+@{
+public:
+  virtual ~MyVector ()
+  @{
+    DeleteAll ();
+  @}
+  virtual void FreeItem (void* item)
+  @{
+    delete (MyType*)item;
+  @}
+  virtual int Compare (void* i1, void* i2, int mode) const
+  @{
+    @dots{}
+  @}
+  virtual int CompareKey (void* i, const void* key, int mode) const
+  @{
+    @dots{}
+  @}
+@};
+@end example
+
+@noindent
+This can be transformed roughly to the following class:
+
+@example
+class MyVector : public csPDelArray<MyType>
+@{
+public:
+  static int Compare (MyType const& i1, MyType const& i2)
+  @{
+    @dots{}
+  @}
+  static int CompareKey (MyType const& i, MyKey const& key)
+  @{
+    @dots{}
+  @}
+@};
+@end example
+
+The methods @code{csArray<>::Sort()} and @code{csArray<>::InsertSorted()}
+accept an optional comparison function (@code{MyVector::Compare()}, in the
+example).  To use a custom comparison function, invoke these functions like
+this:
+
+@example
+MyVector v = @dots{};
+v.Sort(MyVector::Compare);
+@dots{}
+MyType o = @dots{};
+v.InsertSorted(o, MyVector::Compare);
+@end example
+
+@noindent
+If you do not provide a comparison function, then the array elements are
+compared against each other with @code{T::operator<(T)} where @samp{T} is the
+type of the element contained in the array.  This default comparison semantic
+works nicely for all built-in types, as well as for complex types which define
+a @samp{<} operator.
+
+The methods @code{csArray<>::FindKey()} and @code{csArray<>::FindSortedKey()}
+accept a comparison @dfn{functor} which is constructed from the key for which
+you are searching and an optional comparison function
+(@code{MyVector::CompareKey()}, in the example).  Invoke these functions like
+this:
+
+@example
+int r;
+MyKey key = @dots{};
+MyVector v = @dots{};
+r = v.FindKey(csArrayCmp<MyType,MyKey>(key, MyVector::CompareKey));
+r = v.FindSortedKey(
+              csArrayCmp<MyType,MyKey>(key, MyVector::CompareKey));
+@end example
+
+@noindent
+In this example, the key's type is @samp{MyKey} (the type expected by
+@code{MyVector::CompareKey()}).  It is possible and often convenient for
+@samp{MyType} and @samp{MyKey} to be the same type (for instance, you might
+search for an integer in an array of integers).  When the types of
+@samp{MyType} and @samp{MyKey} differ, @samp{MyType} is often a composite type,
+and @samp{MyKey} is the type of one attribute of @samp{MyType}, however you are
+not in any way limited to this arrangements.  If you do not provide a
+comparison function when constructing the functor, then the elements are
+compared with the search key via @code{T::operator<(K)} and
+@code{K::operator<(T)} where @samp{T} and @samp{K} are the type of the
+contained element and the type of the key, respectively.  This default
+comparison semantic is especially useful when the contained elements and key
+have the same type, provided that the type supports a useful @samp{<} operator.
+For example, if you have an array of integers which you want to sort and then
+search, you can use the default comparison semantics, rather than writing a
+custom comparison function, as shown here:
+
+@example
+csArray<int> v = @dots{};
+v.Sort();
+int r = v.FindSortedKey(csArrayCmp<int,int>(33));
+@end example
+
+@subheading Hash and Set Templates
+@cindex @code{csHash}
+@cindex @code{csSet}
+
+The new template classes @code{csHash<>} and @code{csSet<>} are available for
+use by new code; and older code will be upgraded over time to use these
+template classes.  The older @samp{csHashMap} and @samp{csHashSet} classes are
+now deprecated.
+
+@subheading csHashMap Changes
+@cindex @code{csHashMap}
+@cindex @code{csHashIterator}
+@cindex @code{csGlobalHashIterator}
+
+The deprecated @samp{csHashIterator} can no longer iterate over all objects.
+To do that you need to use @samp{csGlobalHashIterator}.
+
+@subheading Event-Related Changes
+@cindex @code{csEventQueue}
+@cindex @code{iEventQueue}
+@cindex @code{csEvent}
+@cindex @code{iEvent}
+@cindex @code{csPoolEvent}
+@cindex @code{csEventOutlet}
+@cindex @code{iEventOutlet}
+@cindex @code{csEventCord}
+@cindex @code{iEventCord}
+
+Signatures of the @code{iEvent::Find()} methods have been unified so that they
+all now accept a reference into which to store the found item.  Previously,
+some @code{Find()} methods used a reference for this purpose, while others used
+a pointer.  In addition, rather than accepting a pointer to a pointer of type
+@samp{iEvent}, the @code{Find()} method for finding an event now takes a
+reference to a @code{csRef<iEvent>}.
+
+Previously, @code{iEventQueue::Post()} had a special case where it assumed that
+the caller was giving up ownership of the posted @samp{iEvent} if the caller
+had allocated the event manually, rather than obtaining the event via
+@code{iEventQueue::CreateEvent()} or @code{iEventOutlet::CreateEvent()}. In
+this case, @code{Post()} would hijack the caller's reference to the
+@samp{iEvent} for itself.  This special case allowed the caller to write code,
+such as the following, which appeared to leak a reference to the event, but
+which did not in fact do so.
+
+@example
+iEvent* e = new csEvent(...);
+eventq->Post(e);
+@end example
+
+Now, however, @code{iEventQueue::Post()} takes the more sane approach of
+treating all incoming events identically.  It never hijacks ownership of the
+event by stealing the caller's reference.  Instead, @code{Post()} uniformly
+invokes @code{IncRef()} on each incoming event in order to claim its own
+reference.  This means that callers are no longer burdened by having to
+determine whether or not the caller's reference is going to be hijacked.
+Thus, the above code should now be re-written as:
+
+@example
+csRef<iEvent> e;
+e.AttachNew(new csEvent(...));
+eventq->Post(e);
+@end example
+
+Events created with @code{iEventQueue::CreateEvent()} or
+@code{iEventOutlet::CreateEvent()} are unaffected by this change since the
+client has never had to worry about @code{Post()} hijacking the reference in
+these cases.
+
+@subheading New Renderer-Related Changes
+
+The mesh object @sc{api} has changed considerably, thus we recommend looking
+at the documentation on that to see how to modify your own mesh object for
+the new @sc{api}.  In this section we describe @sc{api} modifications that
+are relevant for user applications.
+
+For @samp{iLight}: @code{SetRadius()}, @code{GetRadius()}, and
+@code{GetSquaredRadius()} have been replaced with @code{SetInfluenceRadius()},
+@code{GetInfluenceRadius()}, and @code{GetInfluenceRadiusSq()}.
+
+For @samp{iMaterialEngine} and related: @code{GetTextureWrapper()} for
+layers now expects a @samp{csStringID} instead of an integer.
+
+@subheading @sc{scf} Changes
+@cindex @sc{scf}
+@cindex meta-information
+@cindex plugins
+@cindex @file{.csplugin} files
+
+@noindent
+@emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.}
+
+The monolithic and inflexible plugin-registry database, @file{scf.cfg}, has
+been eliminated.  Instead, plugin modules are now self-describing via a
+meta-information resource associated with each module.  It is possible to
+access this meta-information without actually loading the plugin, thus avoiding
+a time-consuming and costly operation.
+
+A plugin's meta-information is now stored in an @sc{xml}-format file rather
+than being hard-coded via the plugin's C++ code.  The meta-information file is
+named after the associated plugin module, except with filename extension
+@file{.csplugin}.  For instance, the meta-information for the @file{vfs.so} (or
+@file{vfs.dll}) plugin will be named @file{vfs.csplugin}.
+
+Since the meta-information is now maintained via an external resource, the
+following @sc{scf} macros, which were used to export this information from the
+C++ code, have been removed:
+
+@itemize @bullet
+@item
+@code{SCF_EXPORT_CLASS_TABLE()}
+@item
+@code{SCF_EXPORT_CLASS()}
+@item
+@code{SCF_EXPORT_CLASS_DEP()}
+@item
+@code{SCF_EXPORT_CLASS_TABLE_END}
+@end itemize
+
+To deal with this change in your own code, simply remove the entire
+@code{SCF_EXPORT_CLASS_TABLE()} block from the C++ code which implements the
+plugin module.
+
+Creation of the meta-information resource file involves a straight-forward
+translation of the information from the obsolete @sc{scf} macros into a
+structured @sc{xml}-format file.  For example:
+
+@example
+SCF_EXPORT_CLASS_TABLE(foo)
+  SCF_EXPORT_CLASS(
+    MyClass1,
+    "myproj.myplugin.foo1",
+    "My first custom foo class")
+  SCF_EXPORT_CLASS_DEP(
+    MyClass2,
+    "myproj.myplugin.foo2",
+    "My second custom foo class",
+    "myproj.myplugin.bar1,myproj.myplugin.bar2")
+SCF_EXPORT_CLASS_TABLE_END
+@end example
+
+This table exports two C++ classes, @samp{MyClass1} and @samp{MyClass2} under
+the @sc{scf} class names @samp{myproj.myplugin.foo1} and
+@samp{myproj.myplugin.foo2}, respectively.  Furthermore, the second exported
+class has a dependency upon two other @sc{scf} classes,
+@samp{myproj.myplugin.bar1} and @samp{myproj.myplugin.bar2}.  To convert
+this to an @sc{xml}-format meta-information resource, just copy the above
+values into the appropriate @sc{xml} nodes.  For instance:
+
+@example
+<?xml version="1.0"?>
+<!-- myplugin.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>myproj.myplugin.foo1</name>
+        <implementation>MyClass1</implementation>
+        <description>My first custom foo class</description>
+      </class>
+      <class>
+        <name>myproj.myplugin.foo2</name>
+        <implementation>MyClass2</implementation>
+        <description>My second custom foo class</description>
+        <requires>
+          <class>myproj.myplugin.bar1</class>
+          <class>myproj.myplugin.bar2</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>
+@end example
+
+The top-level node of a meta-information file is named @code{<plugin>}.  All
+@sc{scf}-related information is contained within an @code{<scf>} child node.
+Plugin modules can export multiple named @sc{scf} classes.  Each exported class
+is represented by a @code{<class>} node within the @code{<classes>} group.  The
+@code{<name>} node of a @code{<class>} is the class' @sc{scf} name.  The
+@code{<implementation>} node references the C++ class which actually implements
+the named @sc{scf} class.  This is the same name that is provided as an
+argument to the @code{SCF_IMPLEMENT_FACTORY()} macro.  When an @sc{scf} class
+depends upon other @sc{scf} classes, the dependencies are indicated via the
+optional @code{<requires>} group, which contains one @code{<class>} node per
+dependency.
+
+Meta-information in the @file{.csplugin} file is extensible; it is not
+restricted to @sc{scf}-only usage.  Plugin authors can choose to publish
+supplementary information about plugins in addition to the @sc{scf} information
+already published.  As a hypothetical example, image loading plugins might
+desire to publish @dfn{image indentification} information which would allow the
+image loading multiplexor to selectively request image loading plugins
+@emph{on-demand}, rather than requesting all plugins unconditionally, even if
+they are not needed.  Here is a possible meta-information table for a @sc{png}
+image loader (with the @code{<scf>} node collapsed to @samp{@dots{}} for the
+sake of illustration):
+
+@example
+<?xml version="1.0"?>
+<!-- cspngimg.csplugin -->
+<plugin>
+  <scf>...</scf>
+  <imageloader>
+    <imagetype>
+      <class>crystalspace.graphic.image.io.png</class>
+      <identify>
+        <mimetype>image/png</mimetype>
+        <extension>png</extension>
+        <extension>PNG</extension>
+        <scan length="4" bytes="\0x89PNG"/>
+     </identify>
+    </imagetype>
+  </imageloader>
+</plugin>
+@end example
+
+In this example, the @sc{png} loader meta-information tells the multiplexor
+several different ways to identify a @sc{png} image:
+
+@itemize @bullet
+@item
+By checking @sc{mime} type, if available.
+@item
+By checking file extension, if available.
+@item
+By checking for the @dfn{magic} identification string @samp{\0x89PNG} in the
+raw image data.
+@end itemize
+
+@noindent
+If the hypothetical multiplexor identifies the image as @sc{png}, only then
+will it actually request the @sc{png} loader plugin.
+
+If you know the physical pathname of a plugin module, then you can retrieve its
+meta-information via @code{csGetPluginMetadata()} (@file{csutil/csshlib.h}),
+which returns an @samp{iDocument}.  Alternately, if you know the name of an
+@sc{scf} class which a plugin exports, then you can retrieve the plugin's
+meta-information, by calling @code{iSCF::GetPluginMetadata()}.
+
+At program launch time, @sc{scf} discovers plugins automatically by searching a
+set of directories, and creates an internal database associating available
+@sc{scf} class names with the plugin modules which implement them.  The
+directories which @sc{scf} searches by default are:
+
+@itemize @bullet
+@item
+The application resource directory as returned by @code{csGetResourceDir()}.
+On most platforms, this is the same as the directory containing the
+application, however, on MacOS/X, it is the @file{Resources} directory within
+the Cocoa application wrapper.
+
+@item
+The directory containing the application (or containing the Cocoa application
+wrapper for MacOS/X) as returned by @code{csGetAppDir()}.
+
+@item
+The installed Crystal Space resource directories as returned by
+@code{csGetConfigPath()}.  This is often the value of the @samp{CRYSTAL}
+environment variable, or the @samp{CrystalSpaceRoot} default setting on MacOS/X
+(which is often stored within the @samp{NSGlobalDomain} domain).
+@end itemize
+
+If you would like @sc{scf} to scan additional directories, you can invoke
+either of these two functions (multiple times, if necessary):
+
+@itemize @bullet
+@item
+@code{scfInitialize(csPluginPaths const*)}
+@item
+@code{iSCF::ScanPluginsPath(char const*, bool, char const*)}
+@end itemize
+
+Finally, if you need to manually register a single plugin module with @sc{scf}
+for which you know the native pathname (not a @sc{vfs} pathname), you can
+invoke @code{iSCF::RegisterPlugin()}.
+
+For those relatively rare cases when a @emph{named} @sc{scf} class is built
+directly into an application, rather than being implemented via a plugin, the
+class must be registered with @sc{scf} manually since @sc{scf} will not
+otherwise be able to discover it automatically as is the case with named
+classes exported from plugin modules.  Manual registration is accomplished with
+the @code{SCF_REGISTER_STATIC_CLASS()} macro.  This macro existed previously,
+but accepted a different set of arguments.  The new arguments are:
+
+@example
+SCF_REGISTER_STATIC_CLASS(
+  C++Class,
+  "scf.class.name",
+  "description",
+  "comma-separated dependency list" or NULL)
+@end example
+
+@noindent
+Invoke this macro in one of the source files of your application; usually in
+the source file which implements the class.  This macro should be invoked at
+file scope (that is, not from inside a function).  For instance:
+
+@example
+SCF_REGISTER_STATIC_CLASS(
+  MyClass2,
+  "myproj.myplugin.foo2",
+  "My second custom foo class",
+  "myproj.myplugin.bar1,myproj.myplugin.bar2")
+@end example
+
+If you used to use @code{SCF_REGISTER_STATIC_LIBRARY()} or
+@code{SCF_REGISTER_STATIC_CLASS_DEP()} for this same purpose, you must now
+instead use @code{SCF_REGISTER_STATIC_CLASS()}.  (A macro named
+@code{SCF_REGISTER_STATIC_LIBRARY()} still exists, but it has a completely
+different purpose than the original version, and is typically only used by very
+low-level mechanisms, rather than by end-users.  See
+@file{CS/include/csutil/scf.h} for the gory details, if you are curious.)
+
+The Crystal Space @file{configure} script option
+@samp{--enable-meta-info-embedding} controls whether or not the build system
+embeds the plugin meta-information into plugin modules (if supported by the
+platform), and whether or not the plugin loader looks for embedded
+meta-information.  If this option is disabled, or if embedding is not supported
+by the platform, then the meta-information is laid down alongside the built
+plugin module (@file{.so} or @file{.dll}) in a text file with the same name as
+the plugin module, except with extension @file{.csplugin}.  The
+meta-information embedding option is enabled by default for most platforms, but
+is disabled by default for Unix platforms.
+
+@emph{Warning}: Meta-information embedding on Unix is accomplished via the
+@file{libbfd} library which carries a @sc{gpl} license.  This license is
+incompatible with Crystal Space's @sc{lgpl} license.  Unlike the @sc{lgpl}
+which is compatible with closed-source projects, the @sc{gpl} license is not.
+For this reason, embedding is disabled by default on Unix, and must be enabled
+explicitly with the @file{configure} script's
+@samp{--enable-meta-info-embedding} option.  Enable this option on Unix only if
+you are certain that your project is compatible with the @sc{gpl} license.
+
+The platform-specific plugin loaders are capable of reading embedded plugin
+meta-information, as well as meta-information in stand-alone @file{.csplugin}
+files.  Even when configured for embedding, the plugin loaders will still be
+able to recognize and utilize external @file{.csplugin} resources.  This means
+that Crystal Space-based projects with unsophisticated build systems, which are
+incapable of embedding meta-information into the plugin module, can still
+create usable plugins simply by placing a copy of the @file{.csplugin} file
+alongside the plugin executable (@file{.so} or @file{.dll}).
+
+External projects which are based upon Crystal Space's Jam build system
+(@file{CS/mk/jam}) inherit, for free, the capability of embedding
+meta-information within plugin modules (if supported by the platform).  Simply
+grab the newer @file{.jam} files from @file{CS/mk/jam}, and add a few
+definitions to the project's @file{Jamconfig} file.  The exact set of
+definitions is platform-specific, so consult the appropriate Jam file
+(@file{unix.jam}, @file{win32.jam}, or @file{macosx.jam}) to determine
+precisely which which definitions are required.  Here is a list of definitions
+required at the time of writing:
+
+@table @asis
+@item Unix
+@code{EMBED_META = yes}@*
+@code{LIBBFD.AVAILABLE = yes}@*
+@code{OBJCOPY.AVAILABLE = yes}@*
+@code{CMD.OBJCOPY = objcopy}
+
+@item Windows
+@code{EMBED_META = yes}
+
+@item MacOS/X (not yet supported)
+@code{EMBED_META = yes}
+@end table
+
+The @file{scfreg} tool whose job was to manipulate the monolithic @sc{scf}
+plugin-registry database, @file{scf.cfg}, has been eliminated since it is no
+longer required.
+
+@subsubheading Other @sc{scf} Changes
+
+The macros @code{SCF_DESTRUCT_IBASE()} and @code{SCF_DESTRUCT_EMBEDDED_IBASE()}
+have been introduced.  Just as a destructor reverses initialization performed
+by a constructor, these new macros reverse the initialization performed by the
+corresponding @code{SCF_CONSTRUCT_IBASE()} and
+@code{SCF_CONSTRUCT_EMBEDDED_IBASE()} macros.  Typically, you should invoke
+these macros within your class' destructor, just as you invoke the
+corresponding @sc{scf} construction macros in your class' constructor.
+
+The @code{SCF_CREATE_INSTANCE()} macro now returns @code{csPtr<>} to be
+consistent with the other @sc{scf} instantiation and query macros.  This means
+that you should now assign the result of @code{SCF_CREATE_INSTANCE()} to a
+@code{csRef<>}.
+
+The method @code{iSCF::QueryClassList()}, which used to return a raw
+@samp{iStringArray*} that the client had to dispose of manually, now returns a
+@code{csRef<iStringArray>}.
+
+The macros @code{SCF_SET_REF()}, @code{SCF_INC_REF()}, and @code{SCF_DEC_REF()}
+have been removed. Instead you should use @code{csRef<>}.
+
+The method @code{iSCF::GetInterfaceName(scfInterfaceID)} has been added to
+complement the existing @code{iSCF::GetInterfaceID()}.
+
+The query template class @code{scfInterface<>} has been introduced.  This class
+provides a means to query static information about @sc{scf} interfaces, such as
+an interface's version number.  Presently, this class allows access to the
+following static information:
+
+@itemize @bullet
+@item
+@code{GetID()}---Retrieves the interface's low-level identifier as an
+@samp{scfInterfaceID}, which is typically a small integer.  @sc{scf} identifies
+interfaces internally by an @sc{id} for performance reasons.
+
+@item
+@code{GetName()}---Retrieves the interface's name as a null-terminated
+C-string.
+
+@item
+@code{GetVersion()}---Retrieves the interface's current version number.
+@end itemize
+
+Here is an example illustrating how to retrieve various pieces of information
+about an interface.
+
+@example
+int ver = scfInterface<iFoo>::GetVersion();
+scfInterfaceID ident = scfInterface<iFoo>::GetID();
+char const* name = scfInterface<iFoo>::GetName();
+@end example
+
+An important benefit of the new @code{scfInterface<>} template class is that it
+is now possible for template authors to perform queries for interface-related
+information.  For example, the author of a new template class may know an
+@sc{scf} interface via only the opaque identifier @code{T}, yet it is still
+possible to query @code{T}'s version using
+@code{scfInterface<T>::GetVersion()}.
+
+The old hidden, semi-private @sc{api} for obtaining interface information via
+the global @samp{name_VERSION} constant and global @code{name_scfGetID()}
+function has been removed.  Conversion from the old @sc{api} to the new is
+straight forward.  For example:
+
+@itemize @bullet
+@item
+@code{iFoo_VERSION} @result{} @code{scfInterface<iFoo>::GetVersion()}
+@item
+@code{iFoo_scfGetID()} @result{} @code{scfInterface<iFoo>::GetID()}
+@end itemize
+
+A consequence of this change is that it is no longer possible to invoke the
+@code{SCF_VERSION()} macro inside an alternate namespace.  If previously you
+were invoking this macro within your project's own namespace, you must relocate
+the invocation so that it appears outside the namespace.  For example:
+
+@example
+#include <csutil/scf.h>
+
+namespace MyProject
+@{
+  struct iMyInterface : public iBase
+  @{
+    @dots{}
+  @};
+@}
+
+SCF_VERSION(MyProject::iMyInterface, 1, 0, 0);
+@end example
+
+@subheading csSys Library Removed
+
+The @file{cssys} library has been merged into the @file{csutil} library.  This
+eliminates many problems resulting from the large number of circular
+dependencies which existed between these two libraries.  From the client
+viewpoint, this change manifests in two ways:
+
+@itemize @bullet
+@item
+Disappearance of the static link library @file{libcssys.a} (Unix) or
+@file{cssys.lib} (Windows).  To account for this change, simply eliminate the
+reference to this library from your build scripts, makefiles, or project files.
+
+@item
+Disappearance of the @file{CS/include/cssys} directory.  Headers have been
+moved to the @file{csutil} include directory.  To account for this change,
+simply change @code{#include <cssys/header.h>} to
+@code{#include <csutil/header.h>}.
+
+@end itemize
+
+@subheading csEngine Library Removed
+
+The @file{csengine} library has been removed.  Direct use of this library has
+long been deprecated, so its removal will probably go unnoticed by most or all
+projects.  Any projects which were using this library must now instead interact
+with the 3D engine via the @file{engine} plugin and the @sc{scf} interfaces in
+the @file{CS/include/iengine} directory.
+
+@subheading csAppFrame Library Removed
+
+The @file{csappframe} library has been merged into the @file{cstool} library.
+Furthermore, the @code{main()} function, which client application's got for
+free when linking against this library, has been removed since it proved to be
+an obstacle to making Crystal Space libraries available as @dfn{shared}
+libraries. Instead, you must now provide your own @code{main()} function, like
+this:
+
+@example
+// main.cpp
+CS_IMPLEMENT_APPLICATION
+
+class MyApp : public csApplicationFramework
+@{
+  /* @dots{} */
+@};
+
+int main (int argc, char* argv[]) 
+@{
+  MyApp myApp;
+  return myApp.Main (argc, argv);
+@}
+@end example
+
+@subheading csString and iString Changes
+
+The @code{csString::strlwr()} method was renamed to @code{Downcase()}.  A
+complementary @code{Upcase()} method was added for completeness.  These methods
+were also added to @samp{iString}.  A @code{Slice()} method was added to
+@samp{iString} and @samp{csString} which copies a sub-portion of a string.
+@code{Slice()} is similar to the existing @code{SubString()} method, but
+follows a more natural calling convention.  Several @samp{iString} methods
+which were incorrectly returning raw @samp{iString*} or @samp{iString&} now
+correctly return @code{csRef<iString>}.
+
+@samp{csString} now makes a distinction between a null-string (think
+@samp{(char const*)0}), and a zero-length string (think @code{""}).  Client
+code can check for these conditions in the normal fashion by invoking
+@code{csString::GetData()} or @code{operator char const*()} to retrieve a
+C-string representation of the string.  If the result is zero, then it is a
+null-string.  If the result is non-zero but @code{csString::Length()} returns
+zero, then it is a zero-length string.  The new convenience method
+@code{csString::GetDataSafe()} will always return a valid C-string, even if the
+underlying @samp{csString} represents a null-string (in which case a
+zero-length C-string @code{""} will be returned).  This means that the result
+of @code{GetDataSafe()} can be used directly without performing a null check.
+
+In previous releases, @samp{csString} would also sometimes return a null
+pointer or a zero-length string from @code{csString::GetData()} or
+@code{operator char const*()}, but there was no controlled way to know when one
+or the other would be returned since @samp{csString} was doing so haphazardly.
+Worse, several of the @samp{csString} methods failed to check the underlying
+representation, and would crash if the string's state was not what the methods
+expected.  Now, however, @samp{csString} itself makes a proper distinction
+between these cases, and the user has direct (and documented) control over when
+a @samp{csString} will represent a null-string or a zero-length string.
+
+@subheading csMD5 Changes
+
+A @code{csMD5(csString const&)} constructor was added to complement the
+existing @code{csMD5(char const*)} constructor.  The new method
+@code{csMD5::Digest:HexString()} returns a hexadecimal string representation of
+the @sc{md5} digest using lowercase hexadecimal characters.
+@code{csMD5::Digest::HEXString()} returns uppercase hexadecimal characters.
+
+@subheading Beam Intersection Changes
+
+@code{IntersectSegment()} for @samp{iThingFactoryState} and @samp{iThingState}
+has been removed. Use @code{iMeshObject::HitBeamObject()} instead.
+
+@code{iMeshObject::HitBeamObject()} now has an optional polygon index
+parameter so you can get the index of the polygon that was hit.
+
+@code{iSector::HitBeam()} which doesn't support portals now returns a polygon
+index instead of a polygon pointer.
+
+@code{iSector::HitBeam()} that supports portals has been renamed
+to @code{HitBeamPortals()}. It additionally returns a polygon index.
+Same for @code{iPortal::HitBeam()} which has also been renamed
+to @code{HitBeamPortals()}.
+
+@code{iCamera::GetHit()} has been removed.  Instead, use the completely
+equivalent function @code{iSector::HitBeamPortals()}.
+
+@code{iVisibilityCuller::IntersectSegment()} now returns a polygon index
+instead of a portal.
+
+@subheading Directory and Path Queries
+
+The following low-level functions, declared in @file{csutil/syspath.h} can be
+used to query various directories and paths.  Each of these functions expects
+to be passed @code{argv[0]} obtained from the program's @code{main()} function.
+
+@table @code
+@item csGetAppPath()
+Returns the absolute path of the application executable file.
+
+@item csGetAppDir()
+Returns the absolute path of the directory containing the application
+executable file; or the path of the directory containing the Cocoa application
+wrapper on MacOS/X for @sc{gui} applications.
+
+@item csGetResourceDir()
+Returns the absolute path of the directory in which the application's resources
+reside.  On many platforms, resources, such as configuration files, data files,
+etc., reside in the same directory as the application itself.  On such
+platforms, this function will typically return the same directory as
+@code{csGetAppDir()}.  On MacOS/X, however, for @sc{gui} applications, this
+function will return the @file{Resources} directory within the Cocoa
+application wrapper.
+@end table
+
+Since it is rarely convenient to squirrel-away @code{argv[0]}, the following
+higher-level methods, declared in @file{iutil/cmdline.h}, are also available
+for obtaining the same information once the application has been initialized.
+These methods do not require access to @code{argv[0]}.  You can obtain a handle
+to the shared @samp{iCommandLineParser} from the object registry,
+@samp{iObjectRegistry}, which is declared in @file{iutil/objreg.h}.
+
+@itemize @bullet
+@item
+@code{iCommandLineParser::GetAppPath()}
+@item
+@code{iCommandLineParser::GetAppDir()}
+@item
+@code{iCommandLineParser::GetResourceDir()}
+@end itemize
+
+@subheading @sc{vfs} Changes
+@cindex @sc{vfs} Configuration File
+@cindex @file{vfs.cfg}, @sc{vfs} Configuration File
+
+@sc{vfs} (@pxref{VFS}) now understands two new pseudo-variables, @samp{$*} and
+@samp{$^}, in its configuration file, @file{vfs.cfg}, and during programmatic
+mounts.  The full list of pseudo-variables is:
+
+@table @code
+@item $/
+Platform-specific path delimiter (@file{/} on Unix and MacOS/X; @file{\} on
+Windows).
+
+@item $@@
+Crystal Space installation directory; same as @code{csGetConfigPath()}.
+
+@item $*
+Application resource directory; same as @code{csGetResourceDir()}.
+
+@item $^
+Directory where application resides, or directory containing Cocoa application
+wrapper on MacOS/X; same as @code{csGetAppDir()}.
+@end table
+
+@noindent
+The expansions of the @samp{$@@}, @samp{$*}, and @samp{$^} variables always
+contain a trailing path delimiter.
+
+At initialization time, @sc{vfs} now searches for its configuration file,
+@file{vfs.cfg}, in the application resource directory
+(@code{csGetResourceDir()}), then in the directory containing the application
+(@code{csGetAppDir()}), and finally in the Crystal Space installation directory
+(@code{csGetConfigPath()}).  The first @file{vfs.cfg} file found during this
+search is the one used to initialize the facility.  In the past, @sc{vfs}
+searched for @file{vfs.cfg} only in the Crystal Space installation directory.
+
+The @sc{vfs} volume @file{/temp} has been renamed to @file{/varia} in the
+default @file{vfs.cfg} file in order to avoid confusion with the like-named
+@sc{vfs} volume @file{/tmp}, which represents user-writable temporary storage.
+The @file{/varia} volume (n@'ee @file{/temp}), on the other hand, resides
+within @file{$@{prefix@}/etc/crystal} (where @file{$@{prefix@}} is the
+installation location), and this location usually is not writable by the
+typical user.  External projects may, of course, still create any @sc{vfs}
+volume desired, including @file{/temp}, by supplying a project-specific
+@file{vfs.cfg}.
+
+@subheading Internationalization
+
+Some work to improve internationalization support in Crystal Space has been
+performed.  Crystal Space now has more complete support for Unicode input and
+output.
+
+@subsubheading Unicode Helpers
+
+The @samp{csUnicodeTransform} class provides functions to deal with and convert
+between @sc{utf}-8, @sc{utf}-16, and @sc{utf}-32 encoded strings.
+
+@subsubheading UTF-8 strings
+
+Several portions of the CrystalSpace @sc{api} now accept @sc{utf}-8-encoded
+strings. These include:
+
+@itemize @bullet
+@item
+Console
+@itemize @bullet
+@item
+@code{csPrintf()}
+@item
+@code{csPrintfV()}
+@item @code{csFPutErr()}
+@end itemize
+@item
+Canvas
+@itemize @bullet
+@item
+@code{iGraphics2D::Write()}
+@end itemize
+@item
+Reporter
+@itemize @bullet
+@item
+@code{csReport()}
+@item
+@code{csReportV()}
+@item
+@code{iReporter::Report()}
+@item
+@code{iReporter::ReportV()}
+@end itemize
+@item
+Native Window
+@itemize @bullet
+@item
+@code{iNativeWindowManager::Alert()}
+@item
+@code{iNativeWindowManager::AlertV()}
+@item
+@code{iNativeWindow::SetTitle()}
+@end itemize
+@end itemize
+
+@subheading Keyboard Events
+
+Keyboard events have changed.  The event data related to keyboard events is no
+longer stored in a structure inside @samp{iEvent}, but instead now resides
+within @samp{iEvent}'s property bag.  That means the way to access the event
+data has changed slightly; you now either query for the data via
+@code{iEvent::Find()} to get a specific property, or you access it via the the
+@samp{csKeyEventHelper} class.
+
+Another change is that the @samp{csevKeyDown} and @samp{csevKeyUp} events have
+been collapsed to a single @samp{csevKeyboard} event; the up/down information
+is transported along with the event data.
+
+The notion of @dfn{scan code} and @dfn{characters} has been replaced with
+@dfn{raw} and @dfn{cooked} codes.  Basically, the raw code identifies the key
+uniquely, while the cooked code is a processed version of it.  An important
+aspect of this is that both the raw and cooked codes are Unicode characters.
+Special keys (such as function keys) are encoded as characters from a Unicode
+private use area.  Almost all event handling code should consult the raw code
+because the raw code is invariant; that is, an @key{a} is an `a' even if the
+@kbd{ALT} or @kbd{SHIFT} key, or both, are depressed.  This is useful for
+games, for instance, which need to map keys to particular actions.  Cooked
+codes are useful typically only for text input, such as within a text input
+field.
+
+You can find additional information in Crystal Space's public @sc{api}
+documentation in the Event Handling and Keyboard Events sections.
+
+To understand how to adjust your code for these changes, see the following
+examples.
+
+@example
+iEvent& e = @dots{};
+if (e.Type == csevKeyDown && e.Key.Code == CSKEY_ESC)
+@{
+@end example
+
+@noindent
+Change to:
+
+@example
+if (e.Type == csevKeyboard &&
+    csKeyEventHelper::GetEventType(&e) == csKeyEventTypeDown) &&
+    csKeyEventHelper::GetCookedCode(&e) == CSKEY_ESC))
+@{
+@end example
+
+Another example:
+@example
+iEvent& e = @dots{};
+switch (e.Type)
+@{
+  case csevKeyDown:
+    Foo();
+    break;
+  case csevKeyUp:
+    Bar();
+    break;
+@}
+@end example
+
+@noindent
+Change to:
+
+@example
+switch (e.Type)
+@{
+  case csevKeyboard:
+    if (csKeyEventHelper::GetEventType(&e) == csKeyEventTypeDown)
+      Foo();
+    else
+      Bar();
+    break;
+@}
+@end example
+
+@subheading iGraphics2D::WriteBaseline() Deprecated
+
+The functionality provided by @code{WriteBaseline()} is now available by 
+specifying the @samp{CS_WRITE_BASELINE} flag when calling 
+@code{iGraphics2D::Write()}. Hence, @code{WriteBaseline()} is superfluous and
+has been deprecated.
+
+@subheading csInitializer Changes
+
+@code{csInitializer::RequestPlugins(csArray<csPluginRequest>)} has been added
+to complement the existing @code{RequestPlugins(...)} which accepts a variable
+number of arguments.  The new overload allows the list of requested plugins to
+be composed at run-time, whereas the older variable-argument method required
+the list be known at compile-time, which was not always convenient or possible.
+
+@subheading Pollution Reduction
+
+The following symbols have been renamed in order to avoid pollution of the
+global namespace.
+
+@itemize @bullet
+@item
+@code{STATIC_CAST()} @result{} @code{CS_STATIC_CAST()}
+@item
+@code{DYNAMIC_CAST()} @result{} @code{CS_DYNAMIC_CAST()}
+@item
+@code{REINTERPRET_CAST()} @result{} @code{CS_REINTERPRET_CAST()}
+@item
+@code{CONST_CAST()} @result{} @code{CS_CONST_CAST()}
+@end itemize
+
+@subheading Texture manager change
+@cindex @code{iTextureManager}
+@cindex @code{SetVerbose}
+
+The @code{iTextureManager::SetVerbose()} function has been removed. It
+was not useful.
+
+@subheading Font changes
+@cindex @code{iFontServer}
+@cindex @code{LoadFont}
+@cindex @code{iFont}
+@cindex @code{SetSize}
+
+@code{iFont::SetSize()} has been removed. Instead, the font size is 
+supplied when the font is created with @code{iFontServer::LoadFont()}.
+This change has been made to fix the problem that multiple LoadFont()
+calls were returning the same instance of a font, and thus subsequent calls 
+of @code{SetSize()} affected a font globally (e.g. all Arial fonts would
+be the same size). The new behaviour is to return only an existing
+instance of a font when both the font name and font size match.  If there is
+no existing instance with the requested name and size, then a new instance
+is created and returned.
+
+Font-related client code, such as the following:
+
+@example
+csRef<iFont> font = fontserver->LoadFont ("myfont.ttf");
+font->SetSize (23);
+g2d->Write (font, @dots{});
+@end example
+
+@noindent
+Should be changed to:
+
+@example
+csRef<iFont> font = fontserver->LoadFont ("myfont.ttf", 23);
+g2d->Write (font, @dots{});
+@end example
+
+@subheading Mesh flag change
+@cindex @code{CS_ENTITY_INVISIBLE}
+@cindex @code{CS_ENTITY_INVISIBLEMESH}
+@cindex @code{CS_ENTITY_NOHITBEAM}
+
+There is a new flag @code{CS_ENTITY_INVISIBLEMESH} which controls visibility
+(and ONLY visibility) of a mesh. There is also a new flag
+@code{CS_ENTITY_NOHITBEAM} which controls if calling @code{HitBeam()} will
+ever return that mesh. The old @code{CS_ENTITY_INVISIBLE} has been changed
+so that it is now a combination of both flags.
+
+An important change is that setting the @code{CS_ENTITY_INVISIBLEMESH} flag
+on a parent in a hierarchy will no longer make the children invisible. You
+now have to set the invisible flag manually on all children in the hierarchy.
+
+@subheading Skeletal Sprites
+@cindex @code{iSkeletonState}
+@cindex @code{iSkeletonState}
+@cindex @code{iSkeletonLimbState}
+@cindex @code{iSkeletonConnection}
+@cindex @code{iSkeletonConnectionState}
+@cindex @code{iMotionTemplate}
+@cindex @code{iMotionManager}
+@cindex @code{iSkeletonBone}
+
+Support for skeletal sprites has been removed, along with the following related
+interfaces.  Use the @samp{sprcal3d} mesh object instead.  It is more flexible
+and works correctly.  These interfaces have been retired:
+
+@itemize @bullet
+@item
+@code{iSkeletonState}
+@item
+@code{iSkeletonLimbState}
+@item
+@code{iSkeletonConnection}
+@item
+@code{iSkeletonConnectionState}
+@item
+@code{iSkeletonLimb}
+@end itemize
+
+In addition, the motion manager plugin has been removed, along with the
+following related interfaces:
+
+@itemize @bullet
+@item
+@code{iMotionTemplate}
+@item
+@code{iMotionManager}
+@item
+@code{iSkeletonBone}
+@end itemize
+
+@subheading Skyboxes
+@cindex @code{CS_ENTITY_CAMERA}
+
+Meshes that use the @code{CS_ENTITY_CAMERA} flag no longer have to be placed
+in a render priority that has the @samp{camera} flag set. This render
+priority flag is no longer required (but @code{CS_ENTITY_CAMERA} still is!).
+
+@subheading CS_FX_GOURAUD removed
+@cindex @code{CS_FX_GOURAUD}
+
+Gouraud is much more commonly used than flat shading and is thus the default 
+now. To achieve the opposite behaviour (ie the behaviour when 
+@code{CS_FX_GOURAUD} was not present), use the @code{CS_FX_FLAT} flag.
+
+@subheading Collision Detection Changes
+@cindex @sc{rapid}
+@cindex @sc{opcode}
+@cindex @code{iCollideSystem}
+
+The most important change is that @sc{opcode} is now prefered over
+@sc{rapid}. The @sc{opcode} plugin is free of restrictions (as opposed
+to @sc{rapid} which can't be used in commercial programs), it is faster,
+and uses a lot less memory. In future we will remove the @sc{rapid} plugin.
+
+The @code{iCollideSystem::CollidePath()} utility method has been relocated to
+@code{csColliderHelper::CollidePath()}. In addition there are a few extra
+overloads that can make life easier for calculating collisions on a path.
+
+@subheading Isometric Engine
+
+The isometric engine has been removed.  It was beyond repair.  The
+@samp{isotest} application remains, though, and demonstrates how you can
+simulate an isometric look with the normal 3D engine.
+
+@subheading Some Plugins Removed
+
+The following plugins and programs also have been removed (along with any 
+parts of the @sc{api} they provided exclusively), because they are unmaintained
+and not currently usable. For more discussion see mailing list posts at:
+
+@noindent
+@uref{http://sourceforge.net/mailarchive/message.php?msg_id=8645194}@*
+@uref{http://sourceforge.net/mailarchive/message.php?msg_id=8296024}@*
+@uref{http://sourceforge.net/mailarchive/message.php?msg_id=8296017}@*
+@uref{http://sourceforge.net/mailarchive/message.php?msg_id=8295883}@*
+
+@itemize @bullet
+@item @code{terrbig} (use new terrain features in the new renderer)
+@item skeletal sprites (use cal3d)
+@item @code{cloth}
+@item @code{cocoa2d} graphics driver for MacOSX
+@item @code{rle} video codec
+@item @code{milk2spr} (use the cal3d conversion)
+@item @code{svgalib} graphics driver
+@item @code{cssocket} (provided @code{iNetworkDriver}, @code{iNetworkListener}, and @code{iNetworkConnection})
+@item @code{ensocket} (provided @code{iNetworkDriver2} and @code{iNetworkSocket2})
+@item @code{netman}
+@item @code{picogui}
+@end itemize
+

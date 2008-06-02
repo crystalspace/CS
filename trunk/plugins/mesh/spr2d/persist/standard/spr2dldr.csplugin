@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!-- spr2dldr.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.loader.factory.sprite.2d</name>
+        <implementation>csSprite2DFactoryLoader</implementation>
+        <description>Crystal Space Sprite2D Mesh Factory Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.loader.sprite.2d</name>
+        <implementation>csSprite2DLoader</implementation>
+        <description>Crystal Space Sprite2D Mesh Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.factory.sprite.2d</name>
+        <implementation>csSprite2DFactorySaver</implementation>
+        <description>Crystal Space Sprite2D Mesh Factory Saver</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.sprite.2d</name>
+        <implementation>csSprite2DSaver</implementation>
+        <description>Crystal Space Sprite2D Mesh Saver</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

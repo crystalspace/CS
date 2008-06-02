@@ -1,0 +1,238 @@
+
+/*
+    Maya exporter for Crystal Space model
+    Version 1.0
+    Authors: Hristo Hristov <hhristov@delin.org>, Boyan Hristov <bhristov@delin.com>
+*/
+
+proc int Export()
+{
+	flushUndo;
+
+	string $action_name = `textField -q -tx faction`;
+	int $allframes = `checkBox -q -value cballframes`;
+	float $scale=`floatField -q -v fscale`;
+	string $outfile = `textField -q -tx foutfile`;
+	int $counter=0;
+
+	//get selected object
+
+	string $object[]=`ls -tr -sl`;
+
+	if($object[0]=="")
+	{
+		string $message="No object selected!";
+		progressWindow -ep; 
+		confirmDialog -t "warning" -m $message -b "ok"; 
+		error $message;
+	}
+
+	int $numverts[]=`polyEvaluate -v`;
+	int $numtris[]=`polyEvaluate -t`;
+	int $numuvs[]=`polyEvaluate -uv`;
+	int $numframes=`playbackOptions -q -max`;
+	int $frame_time=(int)(1000/$numframes);
+
+	int $current_frame;
+
+	int $maxprogress;
+	if ($allframes == 1)
+	{
+		$current_frame=0;
+		$maxprogress =($numframes + $numframes*($numtris[0] + $numuvs[0]) + $numtris[0]);
+	}
+	else
+	{
+		$current_frame = `currentTime -q`;
+		$numframes = $current_frame + 1;
+		$maxprogress =($numtris[0] + $numuvs[0] + $numtris[0]);
+	}
+	
+	int $progress=0;
+	progressWindow -t "exporting..." -pr $progress -st "0%" -ii false -min 0 -max $maxprogress;
+
+	currentTime $current_frame;
+
+	float $step=1;
+	
+	//----------------------------- write to $tempfile
+
+	string $tempfile="";
+
+	$tempfile+="<meshfact name=\"" + $object[0] +"\">\n";
+	$tempfile+="  <plugin>crystalspace.mesh.loader.factory.sprite.3d</plugin>\n";
+	$tempfile+="  <params>\n";
+
+	string $obj_texture[] = `uvLink -query -uvSet ($object[0] + ".uvSet[0].uvSetName")`;
+	string $texture_path = `getAttr ($obj_texture[0] + ".fileTextureName")`;
+	string $texture_filename = basename($texture_path, "" );
+
+	$tempfile+="    <material>" + $texture_filename + "</material>\n";
+
+	//----------------------------- write animation frames
+
+	$step=$numtris[0]/10;
+	if($step < 1)$step = 1;
+	string $action = "       <action name=\"default\">\n";
+	while($current_frame < $numframes)
+	{
+		string $sname= $action_name + (string)($current_frame);
+		$action +="         <f name=\"" + $sname + "\" delay=\"" + $frame_time + "\" />\n";
+		$tempfile+="      <frame name=\"" + $sname+"\">\n";
+
+		$counter=0;
+		int $verTtinfo[];
+		while($counter<$numtris[0])
+		{
+			int $faceindeces[3];
+			int $tfaceindeces[3];
+			string $face[] = `polyListComponentConversion -ff -tvf ($object[0]+".f["+$counter+"]")`;
+			int $i;
+
+			$face=`filterExpand -sm 70 -expand true $face`;
+			if(size($face) > 3)
+			{
+				string $message="Model is not triangulated!";
+				progressWindow -ep;
+				confirmDialog -t "warning" -m $message -b "ok";
+				error $message;
+			}
+
+			$i = 0;
+			for ($vf in $face)
+			{
+				string $vert[]=`polyListComponentConversion -fromVertexFace -toVertex $vf`;
+				$faceindeces[$i] = match("[0-9]+",match("[0-9]+\]",$vert[0]))+" ";
+				$i++;
+			}
+
+			$i = 0;
+			for ($vf in $face)
+			{
+				string $vert[]=`polyListComponentConversion -fromVertexFace -toUV $vf`;
+				$tfaceindeces[$i] = match("[0-9]+",match("[0-9]+\]",$vert[0]))+" ";
+				$i++;
+			}
+
+			$verTtinfo[$tfaceindeces[0]] = $faceindeces[0];
+			$verTtinfo[$tfaceindeces[1]] = $faceindeces[1];
+			$verTtinfo[$tfaceindeces[2]] = $faceindeces[2];
+
+			$counter++;
+			if($counter%$step==0)
+				UpdateProgress($progress+=$step,$maxprogress,"writing frame "+$sname+"...");
+		}
+		
+		$step=$numuvs[0]/10;
+		if($step < 1)$step = 1;
+		$counter = 0;
+		while($counter<$numuvs[0])
+		{
+			
+			float $vtx[]=`pointPosition ($object[0]+".vtx["+$verTtinfo[$counter]+"]")`;
+			float $uv[]=`polyEditUV -q -u -v ($object[0]+".map["+$counter+"]")`;
+			$tempfile+=("        <v x=\"" + $vtx[2]*$scale
+					+   "\" y=\"" + $vtx[1]*$scale
+					+   "\" z=\"" + $vtx[0]*$scale
+					+   "\" u=\"" + $uv[0] 
+					+   "\" v=\"" + (1 - $uv[1]) 
+					+   "\"/>\n");
+			$counter++;
+			if($counter%$step==0)
+				UpdateProgress($progress+=$step,$maxprogress,"writing frame "+$sname+"...");
+		}
+
+		$tempfile+="      </frame>\n\n";
+
+		if ($allframes == 0)
+			break;
+
+		$current_frame++;
+		currentTime $current_frame;
+	}
+	$action += "       </action>\n\n";
+	$tempfile+=$action;
+
+	//----------------------------------------write triangles indeces
+
+	$step=$numtris[0]/10;
+	if($step < 1)$step = 1;
+	$counter = 0;
+	while($counter<$numtris[0])
+	{
+		string $face[] = `polyListComponentConversion -ff -tvf ($object[0]+".f["+$counter+"]")`;
+
+		$face=`filterExpand -sm 70 -expand true $face`;
+		if(size($face)>3)
+		{
+			string $message="Model is not triangulated!";
+			progressWindow -ep; 
+			confirmDialog -t "warning" -m $message -b "ok"; 
+			error $message;
+		}
+
+		string $vert[]=`polyListComponentConversion -fromVertexFace -toUV $face[0]`;
+		$tempfile+= "      <t v1=\"" + match("[0-9]+",match("[0-9]+\]",$vert[0]))+"\" ";
+
+		$vert =`polyListComponentConversion -fromVertexFace -toUV $face[2]`;
+		$tempfile+= "v2=\"" + match("[0-9]+",match("[0-9]+\]",$vert[0]))+"\" ";
+
+		$vert =`polyListComponentConversion -fromVertexFace -toUV $face[1]`;
+		$tempfile+= "v3=\"" + match("[0-9]+",match("[0-9]+\]",$vert[0]))+"\" />\n";
+		$counter++;
+		if($counter%$step==0)
+			UpdateProgress($progress+=$step,$maxprogress,"writing triangles...");
+	}
+
+	$tempfile+="      <smooth>yes</smooth>\n";
+	$tempfile+="    </params>\n";
+	$tempfile+="</meshfact>";
+
+	//----------------------------------------write data into physical file
+
+	$fileId= `fopen $outfile "w"`;
+	fwrite $fileId $tempfile;
+	fclose $fileId;
+
+	progressWindow -ep;
+	
+	confirmDialog -t "Done!" -m "Done!" -b "ok" -db "ok" -ds "ok" -p ewindow;
+
+	return 1;
+}
+
+proc int UpdateProgress(int $value, int $maxvalue, string $status)
+{
+	float $div=(float)$maxvalue/(float)100;
+	float $percent=(float)$value/$div;
+	progressWindow -e -pr $value -st ((int)$percent + "% " + $status);
+	return 1;
+}
+
+proc int CreateGUI()
+{
+	if(`window -exists ewindow`)
+		deleteUI ewindow;
+	window -wh 100 100 -te 100 -le 100 -s true -mxb false -t "Maya Crystal Space model exporter" ewindow;
+	rowColumnLayout -nr 6 -rh 1 10 -rh 2 25 -rh 3 25 -rh 4 25 -rh 5 25 -rh 6 25 rcl1;
+		rowLayout -nc 2 -cw2 50 200 -p rcl1 rl1;
+		rowLayout -nc 2 -cw2 50 200 -p rcl1 rl2;
+			text -l "   Action:" tx1;
+			textField -tx "default" faction;
+		rowLayout -nc 2 -cw2 50 200 -p rcl1 rl3;
+			text -l "";
+			checkBox -label "All frames" cballframes;
+		rowLayout -nc 2 -cw2 50 200 -p rcl1 rl4;
+			text -l "   Scale:";
+			floatField -pre 1 -v 1 fscale;
+		rowLayout -nc 2 -cw2 50 200 -p rcl1 rl5;
+			text -l "   Outfile:";
+			textField -tx "C:/spr" -w 150 foutfile;
+		rowLayout -nc 2 -cw2 50 200 -p rcl1 rl6;
+			text -l "";
+			button -l "Export CS model" -al "center" -w 150 -c "Export()";
+	showWindow ewindow;
+	return 1;
+}
+
+CreateGUI();

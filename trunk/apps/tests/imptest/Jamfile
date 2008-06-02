@@ -1,0 +1,5 @@
+SubDir TOP apps tests imptest ;
+
+Description imptest : "Imposter testing application" ;
+Application imptest : [ Wildcard *.cpp *.h ] : noinstall ;
+LinkWith imptest : crystalspace ;

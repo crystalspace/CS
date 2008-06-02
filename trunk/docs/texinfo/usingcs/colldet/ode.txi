@@ -1,0 +1,20 @@
+@c -*-texinfo-*-
+@node Physics ODE, , Physics Bullet, Collision Detection
+@subsection Physics using ODE
+@cindex physics
+@cindex @sc{ode}
+
+The @samp{odedynam} plugin implements physics for Crystal Space using
+the @sc{ode} library.
+
+@subsubheading Doing the Timed Physics Simulation
+
+To make sure the physics simulation proceeds correctly in time you must
+tell @sc{ode} how much time has elapsed since previous frame so that
+it can calculate the collisions and physical interactions that happened
+during that time. The @code{iDynamics->Step()} function is responsable for
+that. As a parameter it has a delta which is a floating point number that
+represents the number of seconds to calculate. The @sc{ode} plugin will
+automatically make sure that @sc{ode} simulation is called in fixed
+time steps. This increases stability of the physics simulation.
+

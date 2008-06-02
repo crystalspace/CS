@@ -1,0 +1,11 @@
+SubDir TOP plugins video loader mplex ;
+
+Description imgplex : "imgplex image I/O multiplexer" ;
+
+Plugin imgplex
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith imgplex : crystalspace ;
+
+CompileGroups imgplex :  imageloaders ;
+

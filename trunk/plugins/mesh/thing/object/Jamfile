@@ -1,0 +1,10 @@
+SubDir TOP plugins mesh thing object ;
+
+Description thing : "Thing mesh object plugin" ;
+
+Plugin thing
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith thing : crystalspace ;
+
+CompileGroups thing :  meshes ;

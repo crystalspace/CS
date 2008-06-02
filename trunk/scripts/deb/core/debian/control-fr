@@ -1,0 +1,59 @@
+Source: crystalspace
+Section: games
+Priority: optional
+Maintainer: Christian Bayle <bayle@aist.enst.fr>
+Build-Depends: debhelper (>> 3.0.0), python-dev (>= 2.0), nasm (>= 0.98.08-1), lib3ds-dev (>= 1.2-010724-1), libogg-dev (>= 1.0rc2-1), libttf-dev (>= 1.4pre.20010424-1), libmikmod2-dev, libvorbis-dev, docbook-to-man, xlibmesa-dev, zip, libpng-dev, libjpeg62-dev, libfreetype6-dev
+Standards-Version: 3.5.2
+
+Package: crystalspace
+Architecture: any
+Depends: ${shlibs:Depends} 
+Suggests: crystalspace-demos, crystalspace-doc, crystalspace-dev
+Description: Multiplatform 3D Game Development Kit
+ Crystal Space is a free 3D game toolkit. It can be used for a variety
+ of 3D visualization tasks. Many people will probably be interested in using
+ Crystal Space as the basis of a 3D game, for which it is well suited. 
+Description-fr: Kit de développement 3D Multi-Plateformes
+ Crystal Space est un kit de jeu 3D libre. Il peut etre utilisé pour 
+ beaucoup de taches de visualisation 3D. Beaucoup de programmeurs seront sans 
+ doute interéssés pour l'utiliser comme base d'un jeu 3D, pour lequel il
+ convient bien.
+
+Package: crystalspace-dev
+Architecture: any
+Depends: crystalspace (= ${Source-Version}), libc6-dev
+Description: Multiplatform 3D Game Development Kit dev files
+ Crystal Space is a free 3D game toolkit. It can be used for a variety
+ of 3D visualization tasks. Many people will probably be interested in using
+ Crystal Space as the basis of a 3D game, for which it is well suited. 
+Description-fr: Kit de développement 3D Multi-Plateformes (Fichiers dev)
+ Crystal Space est un kit de jeu 3D libre. Il peut etre utilisé pour 
+ beaucoup de taches de visualisation 3D. Beaucoup de programmeurs seront sans 
+ doute interéssés pour l'utiliser comme base d'un jeu 3D, pour lequel il
+ convient bien.
+
+Package: crystalspace-doc
+Architecture: all
+Description: Multiplatform 3D Game Development Kit Documentation
+ Crystal Space is a free 3D game toolkit. It can be used for a variety
+ of 3D visualization tasks. Many people will probably be interested in using
+ Crystal Space as the basis of a 3D game, for which it is well suited. 
+Description-fr: Kit de développement 3D Multi-Plateformes (Documentations)
+ Crystal Space est un kit de jeu 3D libre. Il peut etre utilisé pour 
+ beaucoup de taches de visualisation 3D. Beaucoup de programmeurs seront sans 
+ doute interéssés pour l'utiliser comme base d'un jeu 3D, pour lequel il
+ convient bien.
+
+Package: crystalspace-demos
+Architecture: any
+Depends: crystalspace (= ${Source-Version})
+Description: Multiplatform 3D Game Development Kit Demos
+ Crystal Space is a free 3D game toolkit. It can be used for a variety
+ of 3D visualization tasks. Many people will probably be interested in using
+ Crystal Space as the basis of a 3D game, for which it is well suited. 
+Description-fr: Kit de développement 3D Multi-Plateformes (Demos)
+ Crystal Space est un kit de jeu 3D libre. Il peut etre utilisé pour 
+ beaucoup de taches de visualisation 3D. Beaucoup de programmeurs seront sans 
+ doute interéssés pour l'utiliser comme base d'un jeu 3D, pour lequel il
+ convient bien.
+

@@ -1,0 +1,36 @@
+@node Config Console, Config Mouse, Config Sound, Specific Options
+@subsubsection Console Configuration
+@cindex Configuration, Console
+
+The following options can be used to configure the simple console plug-in.
+The default values are stored in @file{CS/data/config/simpcon.cfg}.
+
+@table @code
+@item SimpleConsole.ConFG = <red>,<green>,<blue>
+Set the color that is used for console output and the frame rate counter.
+Default is 255,255,255 (white).
+
+@item SimpleConsole.ConBG = <red>,<green>,<blue>
+Set the color that is used for console background. Default is
+0,0,0 (black).
+
+@item SimpleConsole.ConFont = <font name>
+Set the font to use for the console and frame rate counter. Default is
+@samp{auto} which uses an auto-selected font depending on display size.
+However, this font may be a tad small (especially if running at 320x200).
+So you can also choose: @samp{tiny} (very small font), @samp{courier}, or
+@samp{police} (fixed font).
+
+@item SimpleConsole.LineMax = <number>
+Set the maximum number of lines that will be displayed in the output
+console at the top of the screen. This console is used for output of
+several diagnostics commands (but not for the frame rate, this appears at
+the bottom).
+
+@item SimpleConsole.LineHistory = <number>
+Control the size of the history in the console (the history is the number
+of commands that you can go back to). Default is 32.
+
+@item SimpleConsole.TranspBG = <yes/no>
+Enable/disable transparent console.
+@end table

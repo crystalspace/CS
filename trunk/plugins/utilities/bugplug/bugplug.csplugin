@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- bugplug.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.utilities.bugplug</name>
+        <implementation>csBugPlug</implementation>
+        <description>Debugging utility</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

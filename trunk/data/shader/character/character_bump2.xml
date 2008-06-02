@@ -1,0 +1,78 @@
+<shader compiler="xmlshader" name="character_bump2">
+  <!--
+  <technique priority="150">
+    <pass>
+        <mixmode><srcalphaadd /></mixmode>
+        <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+        <buffer source="normal" destination="normal" />
+        <buffer source="tangent" destination="texture coordinate 1" />
+        <buffer source="bones indices" destination="IN.BonesIndices" />
+        <buffer source="bones weights" destination="IN.BonesWeights" />
+        <vp plugin="glcg" file="/shader/character/character_bump2.cgvp" />
+        <texture destination="TexNormal" name="tex normal" />
+        <texture destination="TexDiffuse" name="tex diffuse" />
+        <texture destination="TexAttn" name="light 0 attenuationtex" />
+	  <fp plugin="glcg">
+	    <cgfp>
+	      <?Include /shader/specular/specular.cgfp ?>
+	    </cgfp>
+	  </fp>
+     </pass>
+  </technique>
+  -->
+  <technique priority="100">
+    <pass>
+	  <mixmode><srcalphaadd /></mixmode>
+	  <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+	  <buffer source="generic 0" destination="position" />
+	  <buffer source="generic 1" destination="normal" />
+	  <buffer source="generic 2" destination="texture coordinate 1" />
+	  <buffer source="generic 3" destination="texture coordinate 2" />
+	  <vproc plugin="vproc_std">
+	  <vproc_std>
+	    <skinned_position buffer="generic 0" />
+	    <skinned_normal buffer="generic 1" />
+	    <skinned_tangent buffer="generic 2" />
+	    <skinned_bitangent buffer="generic 3" />
+	  </vproc_std>
+	  </vproc>
+	  <vp plugin="glcg" file="/shader/specular/bump.cgvp" />
+	  <texture destination="TexNormal" name="tex normal" />
+	  <texture destination="TexDiffuse" name="tex diffuse" />
+	  <texture destination="TexAttn" name="light 0 attenuationtex" />
+	  <fp plugin="glcg">
+	    <cgfp>
+	      <?Include /shader/specular/specular.cgfp ?>
+	    </cgfp>
+	  </fp>
+    </pass>
+  </technique>
+        
+  <technique priority="50" lights="1">
+          <pass>
+            <mixmode><srcalphaadd /></mixmode>
+            <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+
+            <vproc plugin="vproc_std">
+              <vproc_std>
+                <skinned_position buffer="generic 0" />
+                <skinned_normal buffer="generic 1" />
+              </vproc_std>
+	    </vproc>
+            <buffer source="generic 0" destination="position" />
+            <buffer source="generic 1" destination="normal" />
+            <vp plugin="glcg" file="/shader/vertexlight.cgvp" />
+            <texture destination="unit 0" name="tex diffuse" />
+            <fp plugin="glfixed">
+              <fixedfp>
+                <layer>
+                  <colorsource num="0" source="primary color" modifier="color" />
+                  <colorsource num="1" source="texture" modifier="color" />
+                  <coloroperation operation="modulate" />
+                </layer>
+              </fixedfp>
+            </fp>
+          </pass>
+  </technique>
+
+</shader>

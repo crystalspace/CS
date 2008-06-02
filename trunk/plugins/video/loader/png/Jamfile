@@ -1,0 +1,10 @@
+SubDir TOP plugins video loader png ;
+
+if $(PNG.AVAILABLE) = "yes"
+{
+Description cspngimg : "png image loader" ;
+Plugin cspngimg : [ Wildcard *.cpp *.h ] ;
+LinkWith cspngimg : crystalspace ;
+ExternalLibs cspngimg : PNG ;
+CompileGroups cspngimg : imageloaders ;
+}

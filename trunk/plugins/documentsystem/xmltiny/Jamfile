@@ -1,0 +1,8 @@
+SubDir TOP plugins documentsystem xmltiny ;
+
+Description xmltiny : "TinyXML document system" ;
+
+Plugin xmltiny
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith xmltiny : crystalspace ;

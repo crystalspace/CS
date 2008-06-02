@@ -1,0 +1,20 @@
+@c -*-texinfo-*-
+@node Shaders, Alpha Textures, Materials, Materials
+@subsection Shaders
+@cindex Shader
+@cindex @code{iShader}
+
+A shader is a piece of code that is typically run on
+the 3D card. It is this code that is responsible for actually rendering
+the surface attributes using the material data. A material and a shader
+work closely together.
+
+@menu
+* Shader System Overview::
+* Shader Variables::
+* Shader Conditions and Processing Instructions Reference::
+@end menu
+
+@importss{usingcs,materials,shadersoverview.txi}
+@importss{usingcs,materials,shadersvariables.txi}
+@importss{usingcs,materials,shaderscpiref.txi}

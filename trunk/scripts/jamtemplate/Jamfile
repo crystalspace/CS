@@ -1,0 +1,6 @@
+SubDir TOP scripts jamtemplate ;
+
+InstallData [ Wildcard *.m4 ] : build autoconf ;
+InstallData [ Wildcard *.template README ] : build jamtemplate ;
+Depends install_data :
+  [ InstallProgram [ Wildcard *.sh ] : $(appdatadir) build jamtemplate ] ;
