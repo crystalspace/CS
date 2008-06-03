@@ -28,8 +28,7 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 {
-  struct float1 { float f; };
-  typedef csVertexListWalker<float, float1> MorphTargetOffsetsWalker;
+  typedef csVertexListWalker<float, csVector3> MorphTargetOffsetsWalker;
   
   void AnimeshObject::SkinVertices ()
   {
@@ -101,7 +100,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       for (size_t m = 0; m < numMorphTargets; m++)
       {
 	MorphTargetOffsetsWalker& walk = morphWalkers[m];
-	srcVert += (*walk).f * morphTargetWeights[m];
+	srcVert += (*walk) * morphTargetWeights[m];
 	++walk;
       }
       
