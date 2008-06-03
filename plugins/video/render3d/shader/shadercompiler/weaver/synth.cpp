@@ -1406,33 +1406,43 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
             /* Inputs are the same - we can remove the new node, but have to 
                make sure the nodes that depend on it get fixed up. */
             csArray<const Snippet::Technique*> deps;
-            graph.GetDependants (node->tech, deps);
-            for (size_t d = 0; d < deps.GetSize(); d++)
-            {
-              Node& dependentNode = GetNodeForTech (deps[d]);
-              StringStringHash::GlobalIterator inputLinkIt (
-                dependentNode.inputLinks.GetIterator());
-              while (inputLinkIt.HasNext ())
-              {
-                csString inputName;
-                csString& outputName = inputLinkIt.Next (inputName);
-
-                const csString* orgOutput = node->outputRenames.GetKeyPointer (
-                  outputName);
-                if (orgOutput)
-                {
-                  outputName = seenNode->outputRenames.Get (*orgOutput, 
-                    (const char*)0);
-                }
-              }
-
-              TechniqueGraph::Connection newConn;
-              newConn.from = seenNode->tech;
-              newConn.to = deps[d];
-              graph.AddConnection (newConn);
-            }
-            graph.RemoveTechnique (node->tech);
-            node->tech = 0;
+	    csFIFO<Node*> nodesToCheck;
+	    nodesToCheck.Push (node);
+	    while (nodesToCheck.GetSize() > 0)
+	    {
+	      Node* checkNode = nodesToCheck.PopTop();
+	      if (checkNode->tech == 0) continue;
+	      deps.Empty();
+	      graph.GetDependants (checkNode->tech, deps);
+	      for (size_t d = 0; d < deps.GetSize(); d++)
+	      {
+		Node& dependentNode = GetNodeForTech (deps[d]);
+		StringStringHash::GlobalIterator inputLinkIt (
+		  dependentNode.inputLinks.GetIterator());
+		while (inputLinkIt.HasNext ())
+		{
+		  csString inputName;
+		  csString& outputName = inputLinkIt.Next (inputName);
+  
+		  const csString* orgOutput = node->outputRenames.GetKeyPointer (
+		    outputName);
+		  if (orgOutput)
+		  {
+		    outputName = seenNode->outputRenames.Get (*orgOutput, 
+		      (const char*)0);
+		  }
+		}
+  
+		TechniqueGraph::Connection newConn;
+		newConn.from = seenNode->tech;
+		newConn.to = deps[d];
+		graph.AddConnection (newConn);
+		
+		nodesToCheck.Push (&dependentNode);
+	      }
+	    }
+	    graph.RemoveTechnique (node->tech);
+	    node->tech = 0;
 
             // We changed the tree, so do another collapse pass
             tryCollapse = true;

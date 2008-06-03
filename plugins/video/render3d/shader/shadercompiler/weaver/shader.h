@@ -30,6 +30,7 @@
 #include "csutil/dirtyaccessarray.h"
 
 #include "snippet.h"
+#include "synth.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 {
@@ -70,6 +71,12 @@ class WeaverShader : public scfImplementationExt3<WeaverShader,
 
 protected:
   void InternalRemove() { SelfDestruct(); }
+
+  bool GeneratePasses (iDocumentNode* passgenNode,
+    const FileAliases& aliases, 
+    Synthesizer::DocNodeArray& nonPassNodes,
+    csArray<Synthesizer::DocNodeArray>& prePassNodes,
+    csPDelArray<Snippet>& passSnippets);
 
   csRef<iDocument> LoadTechsFromDoc (const csArray<TechniqueKeeper>& techniques,
     const FileAliases& aliases,

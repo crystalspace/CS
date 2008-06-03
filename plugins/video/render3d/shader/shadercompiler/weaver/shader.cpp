@@ -102,6 +102,89 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   {
   }
 
+  bool WeaverShader::GeneratePasses (iDocumentNode* passgenNode, 
+                                     const FileAliases& aliases,
+                                     Synthesizer::DocNodeArray& nonPassNodes, 
+                                     csArray<Synthesizer::DocNodeArray>& prePassNodes,
+                                     csPDelArray<Snippet>& passSnippets)
+  {
+    const char* counterParam = passgenNode->GetAttributeValue ("param");
+    if (!counterParam || !*counterParam)
+    {
+      compiler->Report (CS_REPORTER_SEVERITY_WARNING,
+        passgenNode, "<passgen> node needs 'param' attribute");
+      return false;
+    }
+    const char* sequence = passgenNode->GetAttributeValue ("sequence");
+    if (!sequence || !*sequence)
+    {
+      compiler->Report (CS_REPORTER_SEVERITY_WARNING,
+        passgenNode, "<passgen> node needs 'sequence' attribute");
+      return false;
+    }
+    const char* compareSV = passgenNode->GetAttributeValue ("comparesv");
+    
+    csStringArray seqSplit;
+    seqSplit.SplitString (sequence, ",");
+    for (size_t i = 0; i < seqSplit.GetSize(); i++)
+    {
+      const char* seqStr = seqSplit[i];
+      if (!seqStr || !*seqStr) continue;
+      
+      if (compareSV != 0)
+      {
+        csRef<iDocumentNode> compNode = compiler->CreateAutoNode (CS_NODE_UNKNOWN);
+        compNode->SetValue (csString().Format ("?if vars.\"%s\".int >= %s ?",
+          compareSV, seqStr));
+        
+        nonPassNodes.Push (compNode);
+      }
+      
+      csRef<iDocumentNode> passNode = compiler->CreateAutoNode (CS_NODE_ELEMENT);
+      passNode->SetValue ("pass");
+      
+      {
+        bool hasParamNode = false;
+	csRef<iDocumentNodeIterator> childNodes = passgenNode->GetNodes ();
+	while (childNodes->HasNext ())
+	{
+	  csRef<iDocumentNode> node = childNodes->Next ();
+	  csRef<iDocumentNode> newNode = 
+	    passNode->CreateNodeBefore (node->GetType ());
+	  CS::DocSystem::CloneNode (node, newNode);
+	  
+	  if (!hasParamNode
+	     && (node->GetType() == CS_NODE_ELEMENT)
+	     && (strcmp (node->GetValue(), "combiner") == 0))
+	  {
+	    csRef<iDocumentNode> paramNode =
+	      passNode->CreateNodeBefore (CS_NODE_ELEMENT);
+	    paramNode->SetValue ("parameter");
+	    paramNode->SetAttribute ("id", counterParam);
+	    paramNode->SetAttribute ("type", "int");
+	    csRef<iDocumentNode> paramValueNode =
+	      paramNode->CreateNodeBefore (CS_NODE_TEXT);
+	    paramValueNode->SetValue (seqStr);
+	    
+	    hasParamNode = true;
+	  }
+	}
+      }
+      passSnippets.Push (new Snippet (compiler, passNode, 0, aliases, true));
+      prePassNodes.Push (nonPassNodes);
+      nonPassNodes.Empty();
+      
+      if (compareSV != 0)
+      {
+        csRef<iDocumentNode> compNode = compiler->CreateAutoNode (CS_NODE_UNKNOWN);
+        compNode->SetValue ("?endif?");
+        nonPassNodes.Push (compNode);
+      }
+    }
+    
+    return true;
+  }
+
   csRef<iDocument> WeaverShader::LoadTechsFromDoc (const csArray<TechniqueKeeper>& techniques,
 						   const FileAliases& aliases,
 						   iLoaderContext* ldr_context, 
@@ -155,14 +238,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       while (it->HasNext ())
       {
 	csRef<iDocumentNode> child = it->Next ();
-	if (child->GetType () == CS_NODE_ELEMENT &&
-	  xmltokens.Request (child->GetValue ()) == WeaverCompiler::XMLTOKEN_PASS)
+	bool handled = false;
+	if (child->GetType () == CS_NODE_ELEMENT)
 	{
-	  passSnippets.Push (new Snippet (compiler, child, 0, aliases, true));
-	  prePassNodes.Push (nonPassNodes);
-	  nonPassNodes.Empty();
+	  switch (xmltokens.Request (child->GetValue ()))
+	  {
+	    case WeaverCompiler::XMLTOKEN_PASS:
+	      passSnippets.Push (new Snippet (compiler, child, 0, aliases, true));
+	      prePassNodes.Push (nonPassNodes);
+	      nonPassNodes.Empty();
+	      handled = true;
+	      break;
+	    case WeaverCompiler::XMLTOKEN_PASSGEN:
+	      GeneratePasses (child, aliases, nonPassNodes, prePassNodes, passSnippets);
+	      handled = true;
+	      break;
+	  }
 	}
-	else
+	if (!handled)
 	  nonPassNodes.Push (child);
       }
 	
