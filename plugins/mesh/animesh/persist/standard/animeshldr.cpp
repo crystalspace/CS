@@ -49,18 +49,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
   {
   }
 
+  static const char* msgidFactory = "crystalspace.animeshfactoryloader";
+
   csPtr<iBase> AnimeshFactoryLoader::Parse (iDocumentNode* node,
     iStreamSource* ssource, iLoaderContext* ldr_context,
     iBase* context)
   {
-    static const char* msgid = "crystalspace.animeshfactoryloader";
-
     csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
       object_reg, "crystalspace.mesh.object.animesh", false);
 
     if (!type)
     {
-      synldr->ReportError (msgid, node, 
+      synldr->ReportError (msgidFactory, node, 
         "Could not load the animesh object plugin!");
       return 0;
     }
@@ -72,7 +72,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
 
     if (!amfact)
     {
-      synldr->ReportError (msgid, node, 
+      synldr->ReportError (msgidFactory, node, 
         "Could not load the animesh object plugin!");
       return 0;
     }
@@ -92,7 +92,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
           if (!mat)
           {
-            synldr->ReportError (msgid, child, "Couldn't find material '%s'!", 
+            synldr->ReportError (msgidFactory, child, "Couldn't find material '%s'!", 
               matname);
             return 0;
           }
@@ -112,7 +112,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           csRef<iRenderBuffer> rb = synldr->ParseRenderBuffer (child);
           if (!rb)
           {
-            synldr->ReportError (msgid, child, "Could not parse render buffer!");
+            synldr->ReportError (msgidFactory, child, "Could not parse render buffer!");
             return 0;
           }
           amfact->SetVertices (rb);
@@ -123,7 +123,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           csRef<iRenderBuffer> rb = synldr->ParseRenderBuffer (child);
           if (!rb)
           {
-            synldr->ReportError (msgid, child, "Could not parse render buffer!");
+            synldr->ReportError (msgidFactory, child, "Could not parse render buffer!");
             return 0;
           }
           amfact->SetTexCoords (rb);
@@ -134,7 +134,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           csRef<iRenderBuffer> rb = synldr->ParseRenderBuffer (child);
           if (!rb)
           {
-            synldr->ReportError (msgid, child, "Could not parse render buffer!");
+            synldr->ReportError (msgidFactory, child, "Could not parse render buffer!");
             return 0;
           }
           amfact->SetNormals (rb);
@@ -145,7 +145,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           csRef<iRenderBuffer> rb = synldr->ParseRenderBuffer (child);
           if (!rb)
           {
-            synldr->ReportError (msgid, child, "Could not parse render buffer!");
+            synldr->ReportError (msgidFactory, child, "Could not parse render buffer!");
             return 0;
           }
           amfact->SetTangents (rb);
@@ -156,7 +156,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           csRef<iRenderBuffer> rb = synldr->ParseRenderBuffer (child);
           if (!rb)
           {
-            synldr->ReportError (msgid, child, "Could not parse render buffer!");
+            synldr->ReportError (msgidFactory, child, "Could not parse render buffer!");
             return 0;
           }
           amfact->SetBinormals (rb);
@@ -167,7 +167,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           csRef<iRenderBuffer> rb = synldr->ParseRenderBuffer (child);
           if (!rb)
           {
-            synldr->ReportError (msgid, child, "Could not parse render buffer!");
+            synldr->ReportError (msgidFactory, child, "Could not parse render buffer!");
             return 0;
           }
           amfact->SetColors (rb);
@@ -198,7 +198,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
               {
                 if (currInfl > numVerts*realPerVertex)
                 {
-                  synldr->ReportError (msgid, child, 
+                  synldr->ReportError (msgidFactory, child, 
                     "Too many bone vertex influences %d, expected %d", currInfl, numVerts*realPerVertex);
                   return 0;
                 }
@@ -234,7 +234,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
                 indexBuffer = synldr->ParseRenderBuffer (child2);
                 if (!indexBuffer)
                 {
-                  synldr->ReportError (msgid, child2, "Could not parse render buffer!");
+                  synldr->ReportError (msgidFactory, child2, "Could not parse render buffer!");
                   return 0;
                 }
               }
@@ -260,7 +260,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
 
             if (!skelMgr)
             {
-              synldr->ReportError (msgid, child, "Could not find any loaded skeletons");
+              synldr->ReportError (msgidFactory, child, "Could not find any loaded skeletons");
               return 0;
             }
           }
@@ -269,13 +269,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           iSkeletonFactory2* skelFact = skelMgr->FindSkeletonFactory (skelName);
           if (!skelFact)
           {
-            synldr->ReportError (msgid, child, "Could not find skeleton %s", skelName);
+            synldr->ReportError (msgidFactory, child, "Could not find skeleton %s", skelName);
             return 0;
           }
 
           amfact->SetSkeletonFactory (skelFact);
         }
         break;
+      case XMLTOKEN_MORPHTARGET:
+        if (!ParseMorphTarget (child, amfact))
+	  return 0;
+	break;
       default:
         synldr->ReportBadToken (child);
         return 0;
@@ -286,6 +290,44 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
     amfact->Invalidate ();
 
     return csPtr<iBase> (fact);
+  }
+
+  bool AnimeshFactoryLoader::ParseMorphTarget (iDocumentNode* child,
+					       iAnimatedMeshFactory* amfact)
+  {
+    const char* name = child->GetAttributeValue ("name");
+
+    csRef<iRenderBuffer> offsetsBuffer;
+
+    csRef<iDocumentNodeIterator> it = child->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child2 = it->Next ();
+      if (child2->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child2->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch (id)
+      {
+      case XMLTOKEN_OFFSETS:
+	{
+	  offsetsBuffer = synldr->ParseRenderBuffer (child2);
+	  if (!offsetsBuffer)
+	  {
+	    synldr->ReportError (msgidFactory, child2, "Could not parse render buffer!");
+	    return false;
+	  }
+	}
+	break;
+      default:
+	synldr->ReportBadToken (child2);
+	return false;
+      }
+    }
+
+    iAnimatedMeshMorphTarget* morphTarget = amfact->CreateMorphTarget (name);
+    morphTarget->SetVertexOffsets (offsetsBuffer);
+    morphTarget->Invalidate();
+    return true;
   }
   
   bool AnimeshFactoryLoader::Initialize (iObjectRegistry* objReg)
@@ -298,7 +340,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
     return true;
   }
 
-
+  //-------------------------------------------------------------------------
 
   AnimeshFactorySaver::AnimeshFactorySaver (iBase* parent)
     : scfImplementationType (this, parent)
