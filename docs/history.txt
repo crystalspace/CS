@@ -13,3 +13,4 @@ ways to access recent log information
 
 Please see "history.old" for less recent historical entries.
 
+3. test
