@@ -263,7 +263,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       }
       else
       {
-        playbackPosition = duration;
+        if (factory->automaticReset)
+          playbackPosition = 0;
+        else
+          playbackPosition = duration;
+
         isPlaying = false;        
 
         BaseNodeSingle::FireAnimationFinishedCb ();
