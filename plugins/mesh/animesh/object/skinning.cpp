@@ -28,6 +28,7 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 {
+  typedef csVertexListWalker<float, csVector3> MorphTargetOffsetsWalker;
   
   void AnimeshObject::SkinVertices ()
   {
@@ -40,7 +41,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     // Setup some local data
     csVertexListWalker<float, csVector3> srcVerts (factory->vertexBuffer);
     csRenderBufferLock<csVector3> dstVerts (skinnedVertices);
-    csSkeletalState2* skeletonState = lastSkeletonState;    
+    csSkeletalState2* skeletonState = lastSkeletonState;
+
+    bool hasMorphing = false;
+    for (size_t i = 0; i < morphTargetWeights.GetSize(); i++)
+    {
+      if (morphTargetWeights[i] != 0)
+      {
+	hasMorphing = true;
+	break;
+      }
+    }
+    size_t numMorphTargets = hasMorphing ? morphTargetWeights.GetSize() : 0;
+    CS_ALLOC_STACK_ARRAY(uint8, morphWalkersRaw,
+      numMorphTargets * sizeof (MorphTargetOffsetsWalker));
+    MorphTargetOffsetsWalker* morphWalkers =
+      (MorphTargetOffsetsWalker*)(void*)morphWalkersRaw;
+    for (size_t m = 0; m < numMorphTargets; m++)
+    {
+      new (morphWalkers + m) MorphTargetOffsetsWalker (
+	factory->morphTargets[m]->offsets);
+    }
 
     csAnimatedMeshBoneInfluence* influence = factory->boneInfluences.GetArray ();
 
@@ -74,19 +95,32 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
           dq += inflQuat * influence->influenceWeight;
         }
       }
+
+      csVector3 srcVert = *srcVerts;
+      for (size_t m = 0; m < numMorphTargets; m++)
+      {
+	MorphTargetOffsetsWalker& walk = morphWalkers[m];
+	srcVert += (*walk) * morphTargetWeights[m];
+	++walk;
+      }
       
       if (numInfluences == 0)
       {
-        dstVerts[i] = *srcVerts;
+        dstVerts[i] = srcVert;
       }
       else
       {
         dq = dq.Unit ();
 
-        dstVerts[i] = dq.TransformPoint (*srcVerts);        
+        dstVerts[i] = dq.TransformPoint (srcVert);
       }  
 
       ++srcVerts;      
+    }
+
+    for (size_t m = 0; m < numMorphTargets; m++)
+    {
+      morphWalkers[m].~MorphTargetOffsetsWalker();
     }
   }
 

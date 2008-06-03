@@ -324,7 +324,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   Skeleton::Skeleton (SkeletonFactory* factory)
     : scfImplementationType (this, factory), factory (factory), 
-    cachedTransformsDirty (true), version (0)
+    cachedTransformsDirty (true), version (0), versionLastReset (0)
   {
     // Setup the bones from the parent setup
     RecreateSkeletonP ();
@@ -550,10 +550,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     iSkeletonAnimNode2* rootNode = animationPacket->GetAnimationRoot ();
     // 
     rootNode->TickAnimation (dt);
-    if (!rootNode->IsActive ())
-      return;
-
+   
     //
+    if (rootNode->IsActive ())
     {
       // Use a pool for these...
       csRef<csSkeletalState2> finalState;
@@ -585,8 +584,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
         }
       }
       
-      version++;
+      version++;      
     }    
+    else if (versionLastReset != version)
+    {      
+      for (size_t i = 0; i < allBones.GetSize (); ++i)
+      {
+        Bone& boneRef = allBones[i];
+
+        if (boneRef.created)
+        {
+          boneRef.boneOffset = factory->allBones[i].boneOffset;
+          boneRef.boneRotation = factory->allBones[i].boneRotation;
+        }
+      }
+
+      version++;
+      versionLastReset = version;
+
+      cachedTransformsDirty = true;
+    }
   }
 
   unsigned int Skeleton::GetSkeletonStateVersion () const

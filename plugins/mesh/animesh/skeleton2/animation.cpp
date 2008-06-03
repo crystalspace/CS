@@ -37,38 +37,30 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     csRef<AnimationPacket> newP;
     newP.AttachNew (new AnimationPacket (this));
 
-    // Setup all animations
-    for (size_t i = 0; i < animFactoryList.GetSize (); ++i)
-    {
-      csRef<Animation> newAnim;
-      newAnim.AttachNew (new Animation (animFactoryList[i]));
-      newP->animList.Push (newAnim);
-    }
-
     // Setup the root
     newP->animRoot = animRoot->CreateInstance (newP, skeleton);
 
     return csPtr<iSkeletonAnimPacket2> (newP);
   }
 
-  iSkeletonAnimationFactory2* AnimationPacketFactory::CreateAnimation (
+  iSkeletonAnimation2* AnimationPacketFactory::CreateAnimation (
     const char* name)
   {
-    csRef<AnimationFactory> newFact;
-    newFact.AttachNew(new AnimationFactory (name));
+    csRef<Animation> newFact;
+    newFact.AttachNew(new Animation (name));
 
-    animFactoryList.Push (newFact);
+    animationList.Push (newFact);
 
     return newFact;
   }
 
-  iSkeletonAnimationFactory2* AnimationPacketFactory::FindAnimation (
+  iSkeletonAnimation2* AnimationPacketFactory::FindAnimation (
     const char* name)
   {
-    for (size_t i = 0; i < animFactoryList.GetSize (); ++i)
+    for (size_t i = 0; i < animationList.GetSize (); ++i)
     {
-      if (animFactoryList[i]->GetName () == name)
-        return animFactoryList[i];
+      if (strcmp (animationList[i]->GetName (), name) == 0)
+        return animationList[i];
     }
 
     return 0;
@@ -76,17 +68,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   void AnimationPacketFactory::ClearAnimations ()
   {
-    animFactoryList.DeleteAll ();
+    animationList.DeleteAll ();
   }
 
-  iSkeletonAnimationFactory2* AnimationPacketFactory::GetAnimation (size_t index)
+  iSkeletonAnimation2* AnimationPacketFactory::GetAnimation (size_t index)
   {
-    return animFactoryList[index];
+    return animationList[index];
   }
 
   size_t AnimationPacketFactory::GetAnimationCount () const
   {
-    return animFactoryList.GetSize ();
+    return animationList.GetSize ();
   }
 
   void AnimationPacketFactory::SetAnimationRoot (iSkeletonAnimNodeFactory2* root)
@@ -99,37 +91,47 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return animRoot;
   }
 
+  csPtr<iSkeletonAnimationNodeFactory2> AnimationPacketFactory::CreateAnimationNode (
+    const char* name)
+  {
+    return new AnimationNodeFactory (name);
+  }
+  
   csPtr<iSkeletonBlendNodeFactory2> AnimationPacketFactory::CreateBlendNode (
     const char* name)
   {
     return new BlendNodeFactory (name);
   }
 
+  csPtr<iSkeletonPriorityNodeFactory2> AnimationPacketFactory::CreatePriorityNode (
+    const char* name)
+  {
+    return new PriorityNodeFactory (name);
+  }
+
+  csPtr<iSkeletonRandomNodeFactory2> AnimationPacketFactory::CreateRandomNode (
+    const char* name)
+  {
+    return new RandomNodeFactory (name);
+  }
+
+  csPtr<iSkeletonFSMNodeFactory2> AnimationPacketFactory::CreateFSMNode (
+    const char* name)
+  {
+    return new FSMNodeFactory (name);
+  }
+
+
+
 
   AnimationPacket::AnimationPacket (AnimationPacketFactory* factory)
-    : scfImplementationType (this)
+    : scfImplementationType (this), factory (factory)
   {    
   }
   
-  iSkeletonAnimation2* AnimationPacket::FindAnimation (const char* name)
+  iSkeletonAnimPacketFactory2* AnimationPacket::GetFactory () const
   {
-    for (size_t i = 0; i < animList.GetSize (); ++i)
-    {
-      if (animList[i]->GetName () == name)
-        return animList[i];
-    }
-
-    return 0; 
-  }
-
-  iSkeletonAnimation2* AnimationPacket::GetAnimation (size_t index)
-  {
-    return animList[index];
-  }
-
-  size_t AnimationPacket::GetAnimationCount () const
-  {
-    return animList.GetSize ();
+    return factory;
   }
 
   iSkeletonAnimNode2* AnimationPacket::GetAnimationRoot () const
@@ -139,12 +141,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   
 
 
-  AnimationFactory::AnimationFactory (const char* name)
+  Animation::Animation (const char* name)
     : scfImplementationType (this), name (name), duration (0)
   {
   }
 
-  ChannelID AnimationFactory::AddChannel (BoneID bone)
+  const char* Animation::GetName () const
+  {
+    return name;
+  }
+
+  ChannelID Animation::AddChannel (BoneID bone)
   {
     // Check if there is any channel with this bone before
     ChannelID channelId = FindChannel (bone);
@@ -159,7 +166,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return channelId;
   }
 
-  ChannelID AnimationFactory::FindChannel (BoneID bone) const
+  ChannelID Animation::FindChannel (BoneID bone) const
   {
     for (size_t i = 0; i < channels.GetSize (); ++i)
     {
@@ -170,7 +177,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return InvalidChannelID;
   }
 
-  void AnimationFactory::AddKeyFrame (ChannelID channel, float time, 
+  void Animation::AddKeyFrame (ChannelID channel, float time, 
     const csQuaternion& rotation, const csVector3& offset)
   {
     CS_ASSERT(channel < channels.GetSize ());
@@ -188,14 +195,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     ch->keyFrames.InsertSorted (k, KeyFrameCompare);
   }
 
-  size_t AnimationFactory::GetKeyFrameCount (ChannelID channel) const
+  size_t Animation::GetKeyFrameCount (ChannelID channel) const
   {
     CS_ASSERT(channel < channels.GetSize ());
 
     return channels[channel]->keyFrames.GetSize ();
   }
 
-  void AnimationFactory::GetKeyFrame (ChannelID channel, KeyFrameID keyframe, BoneID& bone,
+  void Animation::GetKeyFrame (ChannelID channel, KeyFrameID keyframe, BoneID& bone,
     float& time, csQuaternion& rotation, csVector3& offset)
   {
     CS_ASSERT(channel < channels.GetSize ());
@@ -211,7 +218,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     offset = k.offset;
   }
 
-  void AnimationFactory::GetTwoKeyFrames (ChannelID channel, float time, BoneID& bone,
+  void Animation::GetTwoKeyFrames (ChannelID channel, float time, BoneID& bone,
     float& timeBefore, csQuaternion& beforeRot, csVector3& beforeOffset,
     float& timeAfter, csQuaternion& afterRot, csVector3& afterOffset)
   {
@@ -248,51 +255,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     timeAfter = k2.time;
     afterRot = k2.rotation;
     afterOffset = k2.offset;
-  }
+  }  
 
-  csPtr<iSkeletonAnimNode2> AnimationFactory::CreateInstance (
-    iSkeletonAnimPacket2* packet, iSkeleton2* skeleton)
+  void Animation::BlendState (csSkeletalState2* state, 
+    float baseWeight, float playbackTime, bool isPlayingCyclic) const
   {
-    iSkeletonAnimNode2* node = packet->FindAnimation (name);
-    
-    if (node)
-    {      
-      CS_ASSERT (node->GetFactory () == static_cast<iSkeletonAnimNodeFactory2*> (this));
-
-      // Reuse old node
-      return csPtr<iSkeletonAnimNode2> (node);
-    }
-
-    return csPtr<iSkeletonAnimNode2> (new Animation (this));
-  }
-
-  const char* AnimationFactory::GetNodeName () const
-  {
-    return GetName();
-  }
-
-  iSkeletonAnimNodeFactory2* AnimationFactory::FindNode (const char* name)
-  {
-    if (name == this->name)
-      return this;
-
-    return 0;
-  }
-
-  int AnimationFactory::KeyFrameCompare (KeyFrame const& k1, KeyFrame const& k2)
-  {
-    return csComparator<float, float>::Compare (k1.time, k2.time);    
-  }
-
-  int AnimationFactory::KeyFrameTimeCompare (KeyFrame const& k, float const& time)
-  {
-    return csComparator<float, float>::Compare (k.time, time);
-  }
-
-  void AnimationFactory::BlendState (csSkeletalState2* state, float baseWeight, 
-    float time, bool cycle)
-  {
-    csArrayCmp<KeyFrame, float> cmp (time, KeyFrameTimeCompare);
+    csArrayCmp<KeyFrame, float> cmp (playbackTime, KeyFrameTimeCompare);
 
     for (size_t c = 0; c < channels.GetSize (); ++c)
     {
@@ -308,22 +276,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
         before = ki;
       }
 
-      if (channel->keyFrames[before].time > time && before > 0)
+      if (channel->keyFrames[before].time > playbackTime && before > 0)
         before--;
-      
+
       // Second
       after = before + 1;
       if (after == channel->keyFrames.GetSize ())
       {
         // Handle end-of-frame
-        after = cycle ? after = 0 : after = before;
+        after = isPlayingCyclic ? after = 0 : after = before;
       }      
 
       const KeyFrame& k1 = channel->keyFrames[before];
       const KeyFrame& k2 = channel->keyFrames[after];
 
       // blending factor
-      const float t = (time - k1.time) / (k2.time - k1.time);
+      const float t = before == after ? 0 : (playbackTime - k1.time) / (k2.time - k1.time);
 
       // Blend together
       csQuaternion& q = state->GetQuaternion (channel->bone);
@@ -355,111 +323,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     }
   }
 
-
-  Animation::Animation (AnimationFactory* factory)
-    : scfImplementationType (this, factory), factory (factory),
-    playbackPosition (0), playSpeed (1.0f), isPlaying (false), 
-    isPlayingCyclic (false)
+  float Animation::GetDuration () const
   {
+    return duration;
   }
 
-  void Animation::PlayOnce (float speed)
+  int Animation::KeyFrameCompare (KeyFrame const& k1, KeyFrame const& k2)
   {
-    if (isPlaying)
-      return;
-
-    isPlaying = true;
-    isPlayingCyclic = false;
-    playSpeed = speed;
+    return csComparator<float, float>::Compare (k1.time, k2.time);    
   }
 
-  void Animation::PlayCyclic (float speed)
+  int Animation::KeyFrameTimeCompare (KeyFrame const& k, float const& time)
   {
-    if (isPlaying)
-      return;
-
-    isPlaying = true;
-    isPlayingCyclic = true;
-    playSpeed = speed;
+    return csComparator<float, float>::Compare (k.time, time);
   }
-
-  void Animation::Stop ()
-  {
-    isPlaying = false;
-    isPlayingCyclic = false;
-  }
-
-  void Animation::Reset ()
-  {
-    playbackPosition = 0;
-  }
-
-  float Animation::GetPlaybackPosition () const
-  {
-    return playbackPosition;
-  }
-
-  void Animation::SetPlaybackPosition (float time)
-  {
-    if (time > factory->GetDuration ())
-      time = factory->GetDuration ();
-
-    playbackPosition = time;
-  }
-
-  iSkeletonAnimationFactory2* Animation::GetAnimationFactory ()
-  {
-    return factory;
-  }
-
-  void Animation::BlendState (csSkeletalState2* state, float baseWeight)
-  {
-    factory->BlendState (state, baseWeight, playbackPosition, isPlayingCyclic);
-  }
-
-  void Animation::TickAnimation (float dt)
-  {
-    if (!isPlaying)
-      return;
-
-    playbackPosition += dt * playSpeed;
-
-    const float duration = factory->GetDuration ();
-    if (playbackPosition > duration)
-    {
-      if (isPlayingCyclic)
-      {
-        while (playbackPosition > duration)
-        {
-          playbackPosition -= duration;
-        }
-      }
-      else
-      {
-        playbackPosition = duration;
-        isPlaying = false;
-      }      
-    }
-  }
-
-  bool Animation::IsActive () const
-  {
-    return isPlaying;
-  }
-
-  iSkeletonAnimNodeFactory2* Animation::GetFactory () const
-  {
-    return factory;
-  }
-
-  iSkeletonAnimNode2* Animation::FindNode (const char* name)
-  {
-    if (name == factory->GetName ())
-      return this;
-
-    return 0;
-  }
-
 
 }
 CS_PLUGIN_NAMESPACE_END(Skeleton2)
