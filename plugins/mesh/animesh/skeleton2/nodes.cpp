@@ -32,16 +32,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   void BaseNodeChildren::AddAnimationCallback (iSkeletonAnimCallback2* callback)
   {
-    if (callbacks.GetSize() == 0)
-    {
-      // First CB, install sub-callback
-      cb.AttachNew (new InnerCallback (this));
-
-      for (size_t i = 0; i < subNodes.GetSize (); ++i)
-      {
-        subNodes[i]->AddAnimationCallback (cb);
-      }
-    }
+    // First CB, install sub-callback
+    InstallInnerCb (false);
 
     BaseNodeSingle::AddAnimationCallback (callback);
   }
@@ -50,9 +42,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   {
     BaseNodeSingle::RemoveAnimationCallback (callback);
 
-    if (callbacks.GetSize() == 0)
+    // Last CB, remove sub-callback
+    RemoveInnerCb (false);    
+  }
+
+  void BaseNodeChildren::InstallInnerCb (bool manual)
+  {
+    if (!cb)
     {
-      // Last CB, remove sub-callback
+      cb.AttachNew (new InnerCallback (this));
+
+      for (size_t i = 0; i < subNodes.GetSize (); ++i)
+      {
+        subNodes[i]->AddAnimationCallback (cb);
+      }
+    }
+    manualCbInstall |= manual;
+  }
+
+  void BaseNodeChildren::RemoveInnerCb (bool manual)
+  {
+    if (callbacks.GetSize () == 0 && manual == manualCbInstall)
+    {
       for (size_t i = 0; i < subNodes.GetSize (); ++i)
       {
         subNodes[i]->RemoveAnimationCallback (cb);
@@ -62,7 +73,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     }
   }
 
-  void BaseNodeChildren::HandleAnimationFinished ()
+  void BaseNodeChildren::AnimationFinished (iSkeletonAnimNode2* node)
   {
     // If all subnodes are inactive, call the upper CBs
     for (size_t i = 0; i < subNodes.GetSize (); ++i)
@@ -71,16 +82,43 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
         return;
     }
 
-    BaseNodeSingle::FireAnimationFinishedCallback ();
+    BaseNodeSingle::FireAnimationFinishedCb ();
   }
+
+  void BaseNodeChildren::AnimationCycled (iSkeletonAnimNode2* node)
+  {
+    BaseNodeSingle::FireAnimationCycleCb ();
+  }
+
+  void BaseNodeChildren::PlayStateChanged (iSkeletonAnimNode2* node, bool isPlaying)
+  {}
+
+  void BaseNodeChildren::DurationChanged (iSkeletonAnimNode2* node)
+  {}
 
   BaseNodeChildren::InnerCallback::InnerCallback (BaseNodeChildren* parent)
     : scfImplementationType (this), parent (parent)
   {}
 
-  void BaseNodeChildren::InnerCallback::AnimationFinished ()
+  void BaseNodeChildren::InnerCallback::AnimationFinished (iSkeletonAnimNode2* node)
   {
-    parent->HandleAnimationFinished ();
+    parent->AnimationFinished (node);
+  }
+
+  void BaseNodeChildren::InnerCallback::AnimationCycled (iSkeletonAnimNode2* node)
+  {
+    parent->AnimationCycled (node);
+  }
+
+  void BaseNodeChildren::InnerCallback::PlayStateChanged (
+    iSkeletonAnimNode2* node, bool isPlaying)
+  {
+    parent->PlayStateChanged (node, isPlaying);
+  }
+
+  void BaseNodeChildren::InnerCallback::DurationChanged (iSkeletonAnimNode2* node)
+  {
+    parent->DurationChanged (node);
   }
 
 
@@ -156,9 +194,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
 
   AnimationNode::AnimationNode (AnimationNodeFactory* factory)
-    : scfImplementationType (this), factory (factory), isPlaying (false),
-    playbackPosition (0)
+    : scfImplementationType (this), BaseNodeSingle (this), factory (factory), 
+    isPlaying (false), playbackPosition (0), playbackSpeed (factory->playbackSpeed)
   {}
+  
+  void AnimationNode::Play ()
+  {
+    isPlaying = true;
+    FireStateChangeCb (isPlaying);
+  }
+
+  void AnimationNode::Stop ()
+  {
+    if(isPlaying && factory->automaticReset)
+      playbackPosition = 0;
+
+    isPlaying = false;
+    FireStateChangeCb (isPlaying);
+  }
 
   void AnimationNode::SetPlaybackPosition (float time)
   {
@@ -170,23 +223,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return playbackPosition;
   }
 
-  void AnimationNode::Play ()
+  float AnimationNode::GetDuration () const
   {
-    isPlaying = true;
+    return factory->animation->GetDuration ();
   }
 
-  void AnimationNode::Stop ()
+  void AnimationNode::SetPlaybackSpeed (float speed)
   {
-    if(isPlaying && factory->automaticReset)
-      playbackPosition = 0;
+    playbackSpeed = speed;
+  }
 
-    isPlaying = false;
+  float AnimationNode::GetPlaybackSpeed () const
+  {
+    return playbackSpeed;
   }
 
   void AnimationNode::BlendState (csSkeletalState2* state, float baseWeight)
   {
-    if (factory->animation)
-      factory->animation->BlendState (state, baseWeight, playbackPosition, factory->cyclic);
+    factory->animation->BlendState (state, baseWeight, playbackPosition, factory->cyclic);
   }
   
   void AnimationNode::TickAnimation (float dt)
@@ -194,7 +248,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     if (!isPlaying)
       return;
 
-    playbackPosition += dt * factory->playbackSpeed;
+    playbackPosition += dt * playbackSpeed;
 
     const float duration = factory->animationDuration;
     if (playbackPosition > duration)
@@ -204,6 +258,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
         while (playbackPosition > duration)
         {
           playbackPosition -= duration;
+          BaseNodeSingle::FireAnimationCycleCb ();
         }
       }
       else
@@ -211,7 +266,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
         playbackPosition = duration;
         isPlaying = false;        
 
-        BaseNodeSingle::FireAnimationFinishedCallback ();
+        BaseNodeSingle::FireAnimationFinishedCb ();
       }
     }
   }
@@ -247,7 +302,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   //----------------------------------------
 
   BlendNodeFactory::BlendNodeFactory (const char* name)
-    : scfImplementationType (this), name (name)
+    : scfImplementationType (this), name (name), syncMode (CS::Animation::SYNC_NONE)
   {
   }
 
@@ -326,18 +381,41 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return 0;
   }
 
+  void BlendNodeFactory::SetSynchronizationMode (CS::Animation::SynchronizationMode mode)
+  {
+    syncMode = mode;
+  }
+
+  CS::Animation::SynchronizationMode BlendNodeFactory::GetSynchronizationMode () const
+  {
+    return syncMode;
+  }
 
   BlendNode::BlendNode (BlendNodeFactory* factory)
-    : scfImplementationType (this), factory (factory)
-  {
-    if (factory)
-      weightList = factory->weightList;
+    : scfImplementationType (this), BaseNodeChildren (this), factory (factory), 
+    playbackSpeed (1.0f), virtualDuration (0.0f)
+  { 
+    weightList = factory->weightList;
+    
+    virtualSubSpeed.SetSize (weightList.GetSize ());
+    lastSyncNodes.SetSize (subNodes.GetSize ());
+
+    for (size_t i = 0; i < subNodes.GetSize (); ++i)
+    {
+      // Use longest duration
+      virtualDuration = csMax (virtualDuration, subNodes[i]->GetDuration ());
+      virtualSubSpeed[i] = 1.0f;
+    }
+
+    SynchronizeSubnodes ();
   }
 
   void BlendNode::SetNodeWeight (uint node, float weight)
   {
     CS_ASSERT(node < weightList.GetSize ());
     weightList[node] = weight;
+
+    SynchronizeSubnodes ();
   }
 
   void BlendNode::NormalizeWeights ()
@@ -375,6 +453,43 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     }
   }
 
+  void BlendNode::SetPlaybackPosition (float time)
+  {
+    for (size_t i = 0; i < subNodes.GetSize (); ++i)
+    {
+      const float nodeWeight = weightList[i];
+      if (nodeWeight != 0)
+        subNodes[i]->SetPlaybackPosition (time*virtualSubSpeed[i]);
+    }
+  }
+
+  float BlendNode::GetPlaybackPosition () const
+  {    
+    for (size_t i = 0; i < subNodes.GetSize (); ++i)
+    {
+      const float nodeWeight = weightList[i];
+      if (nodeWeight != 0)
+        return subNodes[i]->GetPlaybackPosition () / virtualSubSpeed[i];
+    }
+
+    return 0;
+  }
+
+  float BlendNode::GetDuration () const
+  {
+    return virtualDuration;
+  }
+
+  void BlendNode::SetPlaybackSpeed (float speed)
+  {
+    playbackSpeed = speed;
+  }
+
+  float BlendNode::GetPlaybackSpeed () const
+  {
+    return playbackSpeed;
+  }
+
   void BlendNode::BlendState (csSkeletalState2* state, float baseWeight)
   {
     float accWeight = 0.0f;
@@ -396,7 +511,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   {
     for (size_t i = 0; i < subNodes.GetSize (); ++i)
     {
-      subNodes[i]->TickAnimation (dt);
+      subNodes[i]->TickAnimation (dt*playbackSpeed);
     }
   }
 
@@ -443,6 +558,106 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     BaseNodeChildren::RemoveAnimationCallback (callback);
   }
 
+  void BlendNode::SynchronizeSubnodes ()
+  {
+    switch (factory->syncMode)
+    {
+    case CS::Animation::SYNC_NONE:
+      break;
+
+    case CS::Animation::SYNC_FIRSTFRAME:
+      {
+        // Make sure the first frames match up
+        csBitArray newNodes;
+        newNodes.SetSize (subNodes.GetSize ());
+
+        // Start by computing the virtual duration
+        const float oldVirtualDuration = virtualDuration;
+        float accWeight = 0;
+        virtualDuration = 0;
+
+        for (size_t i = 0; i < subNodes.GetSize (); ++i)
+        {
+          const float nodeWeight = weightList[i];
+          if (nodeWeight == 0 || !subNodes[i]->IsActive())
+            continue;
+
+          newNodes.SetBit (i);
+
+          accWeight += nodeWeight;
+          virtualDuration += nodeWeight * subNodes[i]->GetDuration ();
+        }
+        virtualDuration /= accWeight;
+
+        // Compute the virtual speeds of the sub-nodes to match them up
+        for (size_t i = 0; i < subNodes.GetSize (); ++i)
+        {
+          if (!newNodes.IsBitSet (i))
+            continue;
+
+          virtualSubSpeed[i] = virtualDuration / subNodes[i]->GetDuration ();
+          subNodes[i]->SetPlaybackSpeed (virtualSubSpeed[i]);
+        }
+
+        // Then finally match up the positions. 
+        // Use the nodes active last synchronization to work out the current position
+        accWeight = 0;
+        float currentPosition = 0;
+
+        for (size_t i = 0; i < subNodes.GetSize (); ++i)
+        {
+          if (!newNodes.IsBitSet (i))
+            continue;
+
+          if (!lastSyncNodes.IsBitSet (i))
+            continue;
+
+          const float nodeWeight = weightList[i];
+          accWeight += nodeWeight;
+          currentPosition += nodeWeight * subNodes[i]->GetPlaybackPosition ();
+        }
+        currentPosition /= accWeight;
+
+        for (size_t i = 0; i < subNodes.GetSize (); ++i)
+        {
+          if (!newNodes.IsBitSet (i))
+            continue;
+
+          subNodes[i]->SetPlaybackPosition (currentPosition * virtualSubSpeed[i]);
+        }
+
+        lastSyncNodes = newNodes;
+
+        if (oldVirtualDuration != virtualDuration)
+        {
+          FireDurationChangeCb ();
+        }
+
+        // Make sure we're notified about changes
+        InstallInnerCb (true);
+      }
+      break;
+    }
+  }
+
+  void BlendNode::PlayStateChanged (iSkeletonAnimNode2* node, bool isPlaying)
+  {
+    FireStateChangeCb (isPlaying);
+
+    if (IsActive ())
+    {
+      SynchronizeSubnodes ();
+    }
+    else
+    {
+      FireAnimationFinishedCb ();
+    }    
+  }
+
+  void BlendNode::DurationChanged (iSkeletonAnimNode2* node)
+  {
+    SynchronizeSubnodes ();
+  }
 
   //----------------------------------------
   PriorityNodeFactory::PriorityNodeFactory (const char* name)
@@ -514,7 +729,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   }
 
   PriorityNode::PriorityNode (PriorityNodeFactory* factory)
-    : scfImplementationType (this), factory (factory)
+    : scfImplementationType (this), factory (factory),
+    BaseNodeChildren (this)
   {
     if (factory)
     {
@@ -545,6 +761,58 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     {
       subNodes[i]->Stop ();
     }
+  }
+
+  void PriorityNode::SetPlaybackPosition (float time)
+  {
+    for (size_t i = 0; i < subNodes.GetSize (); ++i)
+    {
+      if (!subNodes[i]->IsActive())
+        continue;
+
+      subNodes[i]->SetPlaybackPosition (time);      
+    }
+  }
+
+  float PriorityNode::GetPlaybackPosition () const
+  {
+    float num = 0;
+    float pos = 0;
+
+    for (size_t i = 0; i < subNodes.GetSize (); ++i)
+    {
+      if (!subNodes[i]->IsActive())
+        continue;
+
+      pos += subNodes[i]->GetPlaybackPosition ();
+      num++;
+    }
+
+    return pos / num;
+  }
+
+  float PriorityNode::GetDuration () const
+  {
+    float duration = 0;
+    for (size_t i = 0; i < subNodes.GetSize (); ++i)
+    {
+      if (!subNodes[i]->IsActive())
+        continue;
+
+      duration = csMax (duration, subNodes[i]->GetDuration ());
+    }
+
+    return duration;
+  }
+
+  void PriorityNode::SetPlaybackSpeed (float speed)
+  {
+    playbackSpeed = speed;
+  }
+
+  float PriorityNode::GetPlaybackSpeed () const
+  {
+    return playbackSpeed;
   }
 
   void PriorityNode::BlendState (csSkeletalState2* state, float baseWeight)
@@ -595,7 +863,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   {
     for (size_t i = 0; i < subNodes.GetSize (); ++i)
     {
-      subNodes[i]->TickAnimation (dt);
+      subNodes[i]->TickAnimation (dt * playbackSpeed);
     }
   }
 
@@ -774,9 +1042,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   }
 
   RandomNode::RandomNode (RandomNodeFactory* factory)
-    : scfImplementationType (this), factory (factory), currentNode (0),
-    active (false)
+    : scfImplementationType (this), BaseNodeChildren (this), factory (factory), 
+    currentNode (0), active (false)
   {
+    // Need CB for possible automatic switch
+    InstallInnerCb (true);
     Switch ();
   }
 
@@ -797,19 +1067,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       }
     }
 
-    if (newNode != currentNode && active)
-    {
-      if (factory->autoSwitch)
-      {
-        subNodes[newNode]->AddAnimationCallback (this);
-        subNodes[currentNode]->RemoveAnimationCallback (this);
-      }
 
+    const bool nodeSwitched = newNode != currentNode;
+    if (nodeSwitched && active)
+    {
       subNodes[currentNode]->Stop ();
       subNodes[newNode]->Play ();      
     }
 
     currentNode = newNode;
+
+    if (nodeSwitched)
+    {
+      FireDurationChangeCb ();
+    }
   }
 
   iSkeletonAnimNode2* RandomNode::GetCurrentNode () const
@@ -822,14 +1093,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     if (active)
       return;
 
-    // Handle auto-switching
-    if (factory->autoSwitch)
-    {
-      subNodes[currentNode]->AddAnimationCallback (this);
-    }
-
     active = true;
     subNodes[currentNode]->Play ();
+    FireStateChangeCb (true);
   }
 
   void RandomNode::Stop ()
@@ -837,13 +1103,34 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     if (!active)
       return;
 
-    if (factory->autoSwitch)
-    {
-      subNodes[currentNode]->RemoveAnimationCallback (this);
-    }
-
     active = false;
     subNodes[currentNode]->Stop ();
+    FireStateChangeCb (false);
+  }
+
+  void RandomNode::SetPlaybackPosition (float time)
+  {
+    subNodes[currentNode]->SetPlaybackPosition (time);
+  }
+
+  float RandomNode::GetPlaybackPosition () const
+  {
+    return subNodes[currentNode]->GetPlaybackPosition ();
+  }
+
+  float RandomNode::GetDuration () const
+  {
+    return subNodes[currentNode]->GetDuration ();
+  }
+
+  void RandomNode::SetPlaybackSpeed (float speed)
+  {
+    subNodes[currentNode]->SetPlaybackSpeed (speed);
+  }
+
+  float RandomNode::GetPlaybackSpeed () const
+  {
+    return subNodes[currentNode]->GetPlaybackSpeed ();
   }
 
   void RandomNode::BlendState (csSkeletalState2* state, float baseWeight)
@@ -897,12 +1184,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     BaseNodeChildren::RemoveAnimationCallback (callback);
   }
 
-  void RandomNode::AnimationFinished ()
+  void RandomNode::AnimationFinished (iSkeletonAnimNode2* node)
   {
-    if (factory->autoSwitch)
+    if (node == subNodes[currentNode] && factory->autoSwitch)
     {
       Switch ();
     }
+  }
+
+  void RandomNode::PlayStateChanged (iSkeletonAnimNode2* node, bool isPlaying)
+  {
+    if (node == subNodes[currentNode] && !isPlaying)
+    {
+      active == false;
+      FireStateChangeCb (false);
+    }
+  }
+
+  void RandomNode::DurationChanged (iSkeletonAnimNode2* node)
+  {
+    FireDurationChangeCb ();
   }
 
  
@@ -1031,8 +1332,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
 
   FSMNode::FSMNode (FSMNodeFactory* factory)
-    : scfImplementationType (this), factory (factory),
-    currentState (factory->startState), isActive (false)
+    : scfImplementationType (this), BaseNodeSingle (this), factory (factory),
+    currentState (factory->startState), isActive (false), playbackSpeed (1.0f)
   {}
 
   void FSMNode::SwitchToState (CS::Animation::StateID newState)
@@ -1076,6 +1377,31 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     stateList[currentState].stateNode->Stop ();
   }
 
+  void FSMNode::SetPlaybackPosition (float time)
+  {
+    stateList[currentState].stateNode->SetPlaybackPosition (time);
+  }
+  
+  float FSMNode::GetPlaybackPosition () const
+  {
+    return stateList[currentState].stateNode->GetPlaybackPosition ();
+  }
+
+  float FSMNode::GetDuration () const
+  {
+    return stateList[currentState].stateNode->GetDuration ();
+  }
+  
+  void FSMNode::SetPlaybackSpeed (float speed)
+  {
+    playbackSpeed = speed;
+  }
+  
+  float FSMNode::GetPlaybackSpeed () const
+  {
+    return playbackSpeed;
+  }
+
   void FSMNode::BlendState (csSkeletalState2* state, float baseWeight)
   {
     if (!isActive)
@@ -1089,7 +1415,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     if (!isActive)
       return;
 
-    stateList[currentState].stateNode->TickAnimation (dt);
+    stateList[currentState].stateNode->TickAnimation (dt * playbackSpeed);
   }
 
   bool FSMNode::IsActive () const

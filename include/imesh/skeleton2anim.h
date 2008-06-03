@@ -88,6 +88,15 @@ namespace Animation
 
   /// ID for an invalid state
   static const StateID InvalidStateID = (CS::Animation::StateID)~0;
+
+  /// Different synchronization modes
+  enum SynchronizationMode
+  {
+    /// No syncing at all
+    SYNC_NONE,
+    /// Synchronize first frame
+    SYNC_FIRSTFRAME
+  };
 }
 }
 
@@ -280,7 +289,22 @@ struct iSkeletonAnimCallback2 : public virtual iBase
    * Function called when an animation node (or all its sub-nodes) finished
    * playing.
    */
-  virtual void AnimationFinished () = 0;
+  virtual void AnimationFinished (iSkeletonAnimNode2* node) = 0;
+
+  /**
+   * Function called when a cyclic animation cycles around
+   */
+  virtual void AnimationCycled (iSkeletonAnimNode2* node) = 0;
+
+  /**
+   * Function called when animation play state changes
+   */
+  virtual void PlayStateChanged (iSkeletonAnimNode2* node, bool isPlaying) = 0;
+
+  /**
+   * Function called when an animation changes duration for any reason.
+   */
+  virtual void DurationChanged (iSkeletonAnimNode2* node) = 0;
 };
 
 
@@ -326,6 +350,32 @@ struct iSkeletonAnimNode2 : public virtual iBase
    * Stop playing the node (deactivate it).
    */
   virtual void Stop () = 0;
+
+  /**
+   * Set the current playback position. If set beyond the end of the
+   * animation it will be capped.
+   */
+  virtual void SetPlaybackPosition (float time) = 0;
+
+  /**
+   * Get the current playback position (time).
+   */
+  virtual float GetPlaybackPosition () const = 0;
+
+  /**
+   * Get the length of the node
+   */
+  virtual float GetDuration () const = 0;
+
+  /**
+   * Set the playback speed.
+   */
+  virtual void SetPlaybackSpeed (float speed) = 0;
+
+  /**
+   * Get the playback speed.
+   */
+  virtual float GetPlaybackSpeed () const = 0;
 
   /**
    * Blend the state of this node into the global state.
@@ -425,18 +475,7 @@ struct iSkeletonAnimationNodeFactory2 : public iSkeletonAnimNodeFactory2
  */
 struct iSkeletonAnimationNode2 : public iSkeletonAnimNode2
 {
-  SCF_INTERFACE(iSkeletonAnimationNode2, 1, 0, 0);
-
-  /**
-   * Set the current playback position. If set beyond the end of the
-   * animation it will be capped.
-   */
-  virtual void SetPlaybackPosition (float time) = 0;
-
-  /**
-   * Get the current playback position (time).
-   */
-  virtual float GetPlaybackPosition () const = 0;
+  SCF_INTERFACE(iSkeletonAnimationNode2, 1, 0, 0);  
 };
 
 /**
@@ -475,9 +514,19 @@ struct iSkeletonBlendNodeFactory2 : public iSkeletonAnimNodeFactory2
   virtual uint GetNodeCount () const = 0;
 
   /**
-   * Remove all noodes
+   * Remove all nodes
    */
   virtual void ClearNodes () = 0;
+
+  /**
+   * Set the synchronization mode
+   */
+  virtual void SetSynchronizationMode (CS::Animation::SynchronizationMode mode) = 0;
+
+  /**
+   * Get the current synchronization mode
+   */
+  virtual CS::Animation::SynchronizationMode GetSynchronizationMode () const = 0;
 };
 
 

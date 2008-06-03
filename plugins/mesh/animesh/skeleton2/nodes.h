@@ -33,12 +33,40 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   class BaseNodeSingle
   {
   protected:
-    void FireAnimationFinishedCallback ()
+    BaseNodeSingle (iSkeletonAnimNode2* owner)
+      : owner (owner)
+    {}
+    
+    void FireAnimationFinishedCb ()
     {
       for (size_t i = 0; i < callbacks.GetSize (); ++i)
       {
-        callbacks[i]->AnimationFinished ();
-      }      
+        callbacks[i]->AnimationFinished (owner);
+      }
+    }
+
+    void FireAnimationCycleCb ()
+    {
+      for (size_t i = 0; i < callbacks.GetSize (); ++i)
+      {
+        callbacks[i]->AnimationCycled (owner);
+      }
+    }
+
+    void FireStateChangeCb (bool playing)
+    {
+      for (size_t i = 0; i < callbacks.GetSize (); ++i)
+      {
+        callbacks[i]->PlayStateChanged (owner, playing);
+      }
+    }
+
+    void FireDurationChangeCb ()
+    {
+      for (size_t i = 0; i < callbacks.GetSize (); ++i)
+      {
+        callbacks[i]->DurationChanged (owner);
+      }
     }
 
     void AddAnimationCallback (iSkeletonAnimCallback2* callback)
@@ -52,6 +80,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     }    
     
     csRefArray<iSkeletonAnimCallback2> callbacks;
+    iSkeletonAnimNode2* owner;
   };
 
 
@@ -61,10 +90,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   class BaseNodeChildren : public BaseNodeSingle
   {
   protected:
+    BaseNodeChildren (iSkeletonAnimNode2* owner)
+      : BaseNodeSingle (owner), manualCbInstall (false)
+    {}
+
     void AddAnimationCallback (iSkeletonAnimCallback2* callback);
     void RemoveAnimationCallback (iSkeletonAnimCallback2* callback);
 
-    void HandleAnimationFinished ();
+    void InstallInnerCb (bool manual);
+    void RemoveInnerCb (bool manual);
+
+    virtual void AnimationFinished (iSkeletonAnimNode2* node);
+    virtual void AnimationCycled (iSkeletonAnimNode2* node);
+    virtual void PlayStateChanged (iSkeletonAnimNode2* node, bool isPlaying);
+    virtual void DurationChanged (iSkeletonAnimNode2* node);
 
     class InnerCallback : public scfImplementation1<InnerCallback,
                                                     iSkeletonAnimCallback2>
@@ -73,7 +112,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       InnerCallback (BaseNodeChildren* parent);
 
       //-- iSkeletonAnimCallback2
-      virtual void AnimationFinished ();
+      virtual void AnimationFinished (iSkeletonAnimNode2* node);
+      virtual void AnimationCycled (iSkeletonAnimNode2* node);
+      virtual void PlayStateChanged (iSkeletonAnimNode2* node, bool isPlaying);
+      virtual void DurationChanged (iSkeletonAnimNode2* node);
 
     private:
       BaseNodeChildren* parent;
@@ -81,6 +123,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     csRef<InnerCallback> cb;
     csRefArray<iSkeletonAnimNode2> subNodes;
+    bool manualCbInstall;
     friend class BaseFactoryChildren; 
   };
 
@@ -154,12 +197,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     AnimationNode (AnimationNodeFactory* factory);
 
     //-- iSkeletonAnimationNode2
-    virtual void SetPlaybackPosition (float time);
-    virtual float GetPlaybackPosition () const;
+    
 
     //-- iSkeletonAnimNode2
     virtual void Play ();
     virtual void Stop ();
+    virtual void SetPlaybackPosition (float time);
+    virtual float GetPlaybackPosition () const;
+    virtual float GetDuration () const;
+    virtual void SetPlaybackSpeed (float speed);
+    virtual float GetPlaybackSpeed () const;
     virtual void BlendState (csSkeletalState2* state, float baseWeight = 1.0f);
     virtual void TickAnimation (float dt);
     virtual bool IsActive () const;
@@ -173,6 +220,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     bool isPlaying;
     float playbackPosition;
+    float playbackSpeed;
   };
 
   //----------------------------------------
@@ -193,6 +241,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual iSkeletonAnimNodeFactory2* GetNode (uint node);
     virtual uint GetNodeCount () const;
     virtual void ClearNodes ();
+    virtual void SetSynchronizationMode (CS::Animation::SynchronizationMode mode);
+    virtual CS::Animation::SynchronizationMode GetSynchronizationMode () const;
 
     //-- iSkeletonAnimationNodeFactory2
     virtual csPtr<iSkeletonAnimNode2> CreateInstance (
@@ -202,7 +252,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   private:    
     csString name;
-    
+    CS::Animation::SynchronizationMode syncMode;
     csArray<float> weightList;
     friend class BlendNode;
   };
@@ -223,6 +273,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     //-- iSkeletonAnimationNode2
     virtual void Play ();
     virtual void Stop ();
+    virtual void SetPlaybackPosition (float time);
+    virtual float GetPlaybackPosition () const;
+    virtual float GetDuration () const;
+    virtual void SetPlaybackSpeed (float speed);
+    virtual float GetPlaybackSpeed () const;
     virtual void BlendState (csSkeletalState2* state, float baseWeight = 1.0f);
     virtual void TickAnimation (float dt);
     virtual bool IsActive () const;
@@ -231,9 +286,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual void AddAnimationCallback (iSkeletonAnimCallback2* callback);
     virtual void RemoveAnimationCallback (iSkeletonAnimCallback2* callback);
   
+    //-- BaseNodeChildren
+    virtual void PlayStateChanged (iSkeletonAnimNode2* node, bool isPlaying);
+    virtual void DurationChanged (iSkeletonAnimNode2* node);
+
   private:    
+    void SynchronizeSubnodes ();
+
     csArray<float> weightList;
+    csArray<float> virtualSubSpeed;
+    csBitArray lastSyncNodes;
+
     csRef<BlendNodeFactory> factory;
+
+    float playbackSpeed;
+    float virtualDuration;
   };
 
 
@@ -282,6 +349,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     //-- iSkeletonAnimationNode2
     virtual void Play ();
     virtual void Stop ();
+    virtual void SetPlaybackPosition (float time);
+    virtual float GetPlaybackPosition () const;
+    virtual float GetDuration () const;
+    virtual void SetPlaybackSpeed (float speed);
+    virtual float GetPlaybackSpeed () const;
     virtual void BlendState (csSkeletalState2* state, float baseWeight = 1.0f);
     virtual void TickAnimation (float dt);
     virtual bool IsActive () const;
@@ -295,6 +367,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     csArray<size_t> priorityList;
     csArray<size_t> indexList;
+    float playbackSpeed;
 
     csRef<PriorityNodeFactory> factory;
   };
@@ -336,10 +409,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   };
 
   class RandomNode :
-    public scfImplementation3<RandomNode,
+    public scfImplementation2<RandomNode,
                               iSkeletonRandomNode2,
-                              scfFakeInterface<iSkeletonAnimNode2>,
-                              iSkeletonAnimCallback2>,
+                              scfFakeInterface<iSkeletonAnimNode2> >,
     public BaseNodeChildren
   {
   public:
@@ -352,6 +424,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     //-- iSkeletonAnimationNode2
     virtual void Play ();
     virtual void Stop ();
+    virtual void SetPlaybackPosition (float time);
+    virtual float GetPlaybackPosition () const;
+    virtual float GetDuration () const;
+    virtual void SetPlaybackSpeed (float speed);
+    virtual float GetPlaybackSpeed () const;
     virtual void BlendState (csSkeletalState2* state, float baseWeight = 1.0f);
     virtual void TickAnimation (float dt);
     virtual bool IsActive () const;
@@ -360,8 +437,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual void AddAnimationCallback (iSkeletonAnimCallback2* callback);
     virtual void RemoveAnimationCallback (iSkeletonAnimCallback2* callback);
 
-    //-- iSkeletonAnimCallback2
-    virtual void AnimationFinished ();
+    //-- BaseNodeChildren
+    virtual void AnimationFinished (iSkeletonAnimNode2* node);
+    virtual void PlayStateChanged (iSkeletonAnimNode2* node, bool isPlaying);
+    virtual void DurationChanged (iSkeletonAnimNode2* node);
+
   private:
     size_t currentNode;
     bool active;
@@ -429,6 +509,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     //-- iSkeletonAnimationNode2
     virtual void Play ();
     virtual void Stop ();
+    virtual void SetPlaybackPosition (float time);
+    virtual float GetPlaybackPosition () const;
+    virtual float GetDuration () const;
+    virtual void SetPlaybackSpeed (float speed);
+    virtual float GetPlaybackSpeed () const;
     virtual void BlendState (csSkeletalState2* state, float baseWeight = 1.0f);
     virtual void TickAnimation (float dt);
     virtual bool IsActive () const;
@@ -448,6 +533,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     CS::Animation::StateID currentState;
     bool isActive;
 
+    float playbackSpeed;
 
     friend class FSMNodeFactory;
   };
