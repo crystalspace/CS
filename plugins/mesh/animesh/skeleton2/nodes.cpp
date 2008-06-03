@@ -734,7 +734,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   PriorityNode::PriorityNode (PriorityNodeFactory* factory)
     : scfImplementationType (this), factory (factory),
-    BaseNodeChildren (this)
+    BaseNodeChildren (this), playbackSpeed (1.0f)
   {
     if (factory)
     {
@@ -1047,7 +1047,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   RandomNode::RandomNode (RandomNodeFactory* factory)
     : scfImplementationType (this), BaseNodeChildren (this), factory (factory), 
-    currentNode (0), active (false)
+    currentNode (0), active (false), playbackSpeed (1.0f)
   {
     // Need CB for possible automatic switch
     InstallInnerCb (true);
@@ -1129,12 +1129,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   void RandomNode::SetPlaybackSpeed (float speed)
   {
-    subNodes[currentNode]->SetPlaybackSpeed (speed);
+    playbackSpeed = speed;
   }
 
   float RandomNode::GetPlaybackSpeed () const
   {
-    return subNodes[currentNode]->GetPlaybackSpeed ();
+    return playbackSpeed;
   }
 
   void RandomNode::BlendState (csSkeletalState2* state, float baseWeight)
@@ -1150,7 +1150,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     if (!active)
       return;
 
-    subNodes[currentNode]->TickAnimation (dt);
+    subNodes[currentNode]->TickAnimation (dt * playbackSpeed);
   }
 
   bool RandomNode::IsActive () const

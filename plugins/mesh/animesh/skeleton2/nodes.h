@@ -446,6 +446,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     size_t currentNode;
     bool active;
 
+    float playbackSpeed;
+
     csRef<RandomNodeFactory> factory;
   };
 

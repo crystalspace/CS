@@ -482,8 +482,29 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
 
     csRef<iSkeletonBlendNodeFactory2> factnode;
 
+    // Name & node creation
     const char* name = node->GetAttributeValue ("name");
     factnode = packet->CreateBlendNode (name);
+
+    // Get sync mode
+    const char* sync = node->GetAttributeValue ("sync");
+    if (sync)
+    {
+      csStringID id = xmltokens.Request (sync);
+      CS::Animation::SynchronizationMode mode;
+
+      switch (id)
+      {
+      case XMLTOKEN_NONE:
+        mode = CS::Animation::SYNC_NONE;
+        break;
+      case XMLTOKEN_FIRSTFRAME:
+        mode = CS::Animation::SYNC_FIRSTFRAME;
+        break;
+      }
+
+      factnode->SetSynchronizationMode (mode);
+    }
 
     csRef<iDocumentNodeIterator> it = node->GetNodes ();
     while (it->HasNext ())
