@@ -22,6 +22,7 @@
 
 #include "csgeom/math.h"
 #include "csgeom/vector3.h"
+#include "csplugincommon/opengl/glextmanager.h"
 #include "csplugincommon/opengl/glhelper.h"
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
@@ -61,6 +62,7 @@ csShaderGLCGCommon::~csShaderGLCGCommon ()
 void csShaderGLCGCommon::Activate()
 {
   cgGLEnableProfile (programProfile);
+  if (!cgGLIsProgramLoaded (program)) cgGLLoadProgram (program);
   cgGLBindProgram (program);
 }
 
@@ -404,6 +406,21 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
   shaderPlug->GetProfileCompilerArgs (GetProgramType(), profile, args);
   for (i = 0; i < compilerArgs.GetSize(); i++) 
     args.Push (compilerArgs[i]);
+  /* Work around Cg 2.0 bug: it emits "OPTION ARB_position_invariant;"
+     AND computes result.position in the VP - doing both is verboten.
+     Remedy: remove -posinv argument 
+     (cgc version 2.0.0010)
+   */
+  if (strcmp (cgGetProfileString (profile), "gp4vp") == 0)
+  {
+    for (i = 0; i < args.GetSize(); ) 
+    {
+      if (strcmp (args[i], "-posinv") == 0)
+	args.DeleteIndex (i);
+      else
+	i++;
+    }
+  }
   args.Push (0);
  
   if (program)
@@ -414,10 +431,13 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
   program = cgCreateProgram (shaderPlug->context, 
     compiled ? CG_OBJECT : CG_SOURCE, programStr, 
     profile, !entrypoint.IsEmpty() ? entrypoint : "main", args.GetArray());
-  shaderPlug->SetCompiledSource (0);
+  shaderPlug->PrintAnyListing();
 
   if (!program)
+  {
+    shaderPlug->SetCompiledSource (0);
     return false;
+  }
   programProfile = cgGetProgramProfile (program);
 
   if (shaderPlug->debugDump)
@@ -427,15 +447,20 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
   {
     cgGetError(); // Clear error
     cgGLLoadProgram (program);
-    if (cgGetError() != CG_NO_ERROR) return false;
-    if (!cgGLIsProgramLoaded (program)) return false;
-  }
-
-  const char* listing = cgGetLastListing (shaderPlug->context);
-  if (listing && *listing && shaderPlug->doVerbose)
-  {
-    shaderPlug->Report (CS_REPORTER_SEVERITY_WARNING,
-      "%s", listing);
+    shaderPlug->PrintAnyListing();
+    if ((cgGetError() != CG_NO_ERROR)
+	|| (!cgGLIsProgramLoaded (program)))
+    {
+      if (shaderPlug->doVerbose
+	  && ((type == CG_GL_VERTEX) && (profile >= CG_PROFILE_ARBVP1))
+	    || ((type == CG_GL_FRAGMENT) && (profile >= CG_PROFILE_ARBFP1)))
+      {
+	const char* err = (char*)glGetString (GL_PROGRAM_ERROR_STRING_ARB);
+	shaderPlug->Report (CS_REPORTER_SEVERITY_WARNING,
+	  "OpenGL error string: %s", err);
+      }
+      return false;
+    }
   }
 
   i = 0;
@@ -501,7 +526,8 @@ void csShaderGLCGCommon::DoDebugDump ()
       cgGetResourceString (cgGetParameterResource (param)) << "\n";
     output << " Resource index: " <<
       cgGetParameterResourceIndex (param) << "\n";
-    if ((var == CG_UNIFORM) || (var == CG_CONSTANT))
+    // Cg 2.0 seems to not like CG_DEFAULT for uniforms
+    if (/*(var == CG_UNIFORM) || */(var == CG_CONSTANT))
     {
       int nValues;
       const double* values = cgGetParameterValues (param, 

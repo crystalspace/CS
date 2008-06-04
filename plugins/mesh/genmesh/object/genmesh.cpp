@@ -724,43 +724,21 @@ bool csGenmeshMeshObject::HitBeamOutline (const csVector3& start,
 
   csSegment3 seg (start, end);
   const csVector3 *vrt = factory->GetVertices ();
-  if (sm.GetSize() == 0)
+  for (size_t s = 0; s < sm.GetSize(); s++)
   {
-    int i, max = factory->GetTriangleCount();
-    csTriangle *tr = factory->GetTriangles();
-    for (i = 0 ; i < max ; i++)
+    iRenderBuffer* indexBuffer = sm[s]->GetIndices();
+    CS::TriangleIndicesStream<uint> triangles (indexBuffer,
+      CS_MESHTYPE_TRIANGLES);
+    while (triangles.HasNext())
     {
-      if (csIntersect3::SegmentTriangle (seg, vrt[tr[i].a], vrt[tr[i].b],
-          vrt[tr[i].c], isect))
+      CS::TriangleT<uint> t (triangles.Next());
+      if (csIntersect3::SegmentTriangle (seg, 
+	vrt[t.a], vrt[t.b], vrt[t.c], 
+	isect))
       {
-        if (pr) *pr = csQsqrt (csSquaredDist::PointPoint (start, isect) /
-          csSquaredDist::PointPoint (start, end));
-
-        return true;
-      }
-    }
-  }
-  else
-  {
-    for (size_t s = 0; s < sm.GetSize(); s++)
-    {
-      iRenderBuffer* indexBuffer = sm[s]->GetIndices();
-      csRenderBufferLock<uint, iRenderBuffer*> indices (indexBuffer, CS_BUF_LOCK_READ);
-      size_t n = indexBuffer->GetElementCount();
-      size_t idx = 0;
-      while (n > 0)
-      {
-        if (csIntersect3::SegmentTriangle (seg, 
-          vrt[indices.Get (idx)], vrt[indices.Get (idx+1)],
-	  vrt[indices.Get (idx+2)], 
-          isect))
-        {
-          if (pr) *pr = csQsqrt (csSquaredDist::PointPoint (start, isect) /
-            csSquaredDist::PointPoint (start, end));
-          return true;
-        }
-        n -= 3;
-        idx += 3;
+	if (pr) *pr = csQsqrt (csSquaredDist::PointPoint (start, isect) /
+	  csSquaredDist::PointPoint (start, end));
+	return true;
       }
     }
   }
@@ -791,14 +769,13 @@ bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
   for (size_t s = 0; s < sm.GetSize(); s++)
   {
     iRenderBuffer* indexBuffer = sm[s]->GetIndices();
-    csRenderBufferLock<uint> indices (indexBuffer, CS_BUF_LOCK_READ);
-    size_t n = indexBuffer->GetElementCount();
-    size_t idx = 0;
-    while (n > 0)
+    CS::TriangleIndicesStream<uint> triangles (indexBuffer,
+      CS_MESHTYPE_TRIANGLES);
+    while (triangles.HasNext())
     {
+      CS::TriangleT<uint> t (triangles.Next());
       if (csIntersect3::SegmentTriangle (seg, 
-	vrt[indices.Get (idx)], vrt[indices.Get (idx+1)],
-	vrt[indices.Get (idx+2)], 
+	vrt[t.a], vrt[t.b], vrt[t.c], 
 	tmp))
       {
 	temp = csSquaredDist::PointPoint (start, tmp);
@@ -810,8 +787,6 @@ bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
 	  mat = sm[s]->GetMaterial();
 	}
       }
-      n -= 3;
-      idx += 3;
     }
   }
   if (pr) *pr = csQsqrt (dist * itot_dist);
@@ -833,42 +808,20 @@ void csGenmeshMeshObject::BuildDecal(const csVector3* pos, float decalRadius,
   poly.SetVertexCount(3);
   csVector3* vertices = factory->GetVertices();
 
-  if (sm.GetSize() == 0)
+  for (size_t s = 0; s < sm.GetSize(); s++)
   {
-    size_t a;
-    size_t triCount = factory->GetTriangleCount();
-    csTriangle* tris = factory->GetTriangles();
-    
-    for (a=0; a<triCount; ++a)
+    iRenderBuffer* indexBuffer = sm[s]->GetIndices();
+    CS::TriangleIndicesStream<uint> triangles (indexBuffer,
+      CS_MESHTYPE_TRIANGLES);
+    while (triangles.HasNext())
     {
-      poly[0] = vertices[tris[a].a];
-      poly[1] = vertices[tris[a].b];
-      poly[2] = vertices[tris[a].c];
+      CS::TriangleT<uint> t (triangles.Next());
+      poly[0] = vertices[t.a];
+      poly[1] = vertices[t.b];
+      poly[2] = vertices[t.c];
 
       if (poly.InSphere(*pos, decalRadius))
-        decalBuilder->AddStaticPoly(poly);
-    }
-  }
-  else
-  {
-    for (size_t s = 0; s < sm.GetSize(); s++)
-    {
-      iRenderBuffer* indexBuffer = sm[s]->GetIndices();
-      csRenderBufferLock<uint> indices (indexBuffer, CS_BUF_LOCK_READ);
-      size_t n = indexBuffer->GetElementCount();
-      size_t idx = 0;
-      while (n > 0)
-      {
-        poly[0] = vertices[indices.Get (idx)];
-        poly[1] = vertices[indices.Get (idx+1)];
-        poly[2] = vertices[indices.Get (idx+2)];
-
-        if (poly.InSphere(*pos, decalRadius))
-          decalBuilder->AddStaticPoly(poly);
-
-        n -= 3;
-        idx += 3;
-      }
+	decalBuilder->AddStaticPoly(poly);
     }
   }
 }

@@ -33,6 +33,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet)
 
 class csBulletMotionState;
 class csBulletDebugDraw;
+class csBulletRigidBody;
 
 /**
 * This is the implementation for a default dynamics move callback.
@@ -103,7 +104,8 @@ private:
   csStringID colldet_id;
 
   csBulletDebugDraw* debugDraw;
-
+  void CheckCollisions();
+  void CheckCollision(csBulletRigidBody& cs_obA,btCollisionObject *obB,btPersistentManifold &contactManifold);
 public:
   csBulletDynamicsSystem (btDynamicsWorld* world,
       iObjectRegistry* object_reg);
@@ -181,6 +183,7 @@ class csBulletRigidBody : public scfImplementationExt1<csBulletRigidBody,
   btRigidBody* body; 
   csRef<iMeshWrapper> mesh;
   csBulletDynamicsSystem* ds;
+  csRef<iDynamicsCollisionCallback> coll_cb;
   float mass;
   csBulletMotionState* motionState;
 
@@ -188,7 +191,7 @@ class csBulletRigidBody : public scfImplementationExt1<csBulletRigidBody,
   // later.
   btVector3* vertices;
   int* indices;
-
+  bool is_static;
 public: 
   csBulletRigidBody (csBulletDynamicsSystem* ds);
   virtual ~csBulletRigidBody ();
@@ -196,6 +199,8 @@ public:
   btRigidBody* GetBulletBody () { return body; }
 
   virtual iObject* QueryObject (void) { return (iObject*)this; }
+  csArray<btCollisionObject*> contactObjects;
+  csArray<btCollisionObject*> lastContactObjects;
 
   virtual bool MakeStatic (void);
   virtual bool MakeDynamic (void);
@@ -304,6 +309,7 @@ class csBulletCollider : public scfImplementation1<csBulletCollider,
   // later.
   btVector3* vertices;
   int* indices;
+  csRef<iDynamicsColliderCollisionCallback> coll_cb;
 
 public:
   csBulletCollider (csBulletDynamicsSystem* dynsys);
