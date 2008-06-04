@@ -61,6 +61,7 @@ csShaderGLCGCommon::~csShaderGLCGCommon ()
 void csShaderGLCGCommon::Activate()
 {
   cgGLEnableProfile (programProfile);
+  if (!cgGLIsProgramLoaded (program)) cgGLLoadProgram (program);
   cgGLBindProgram (program);
 }
 
