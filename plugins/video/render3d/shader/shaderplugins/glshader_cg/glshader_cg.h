@@ -56,8 +56,6 @@ private:
   bool enable;
   bool isOpen;
   const char* compiledProgram;
-  
-  void PrintCgListing (const char* listing);
 public:
   CS_LEAKGUARD_DECLARE (csGLShader_CG);
 
@@ -104,6 +102,15 @@ public:
   
   void SetCompiledSource (const char* prog)
   { compiledProgram = prog; }
+  void PrintCgListing (const char* listing);
+  void PrintAnyListing ()
+  {
+    const char* listing = cgGetLastListing (context);
+    if (listing && *listing && doVerbose)
+    {
+      PrintCgListing (listing);
+    }
+  }
 };
 
 }
