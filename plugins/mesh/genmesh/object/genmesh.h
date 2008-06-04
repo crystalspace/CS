@@ -148,42 +148,21 @@ private:
   bool mesh_user_rb_dirty_flag;
 
   uint buffers_version;
-  csRef<iRenderBuffer> sorted_index_buffer;	// Only if factory back2front
-  int num_sorted_mesh_triangles;
-  csTriangle* sorted_mesh_triangles;
-
-  // The following three are only used in case animation control is required.
-  csRef<iRenderBuffer> vertex_buffer;
-  csRef<iRenderBuffer> texel_buffer;
-  csRef<iRenderBuffer> normal_buffer;
 
   size_t factory_user_rb_state;
 
-  csRef<iRenderBuffer> color_buffer;
   iMovable* lighting_movable;
 
   csDirtyAccessArray<csRenderMesh*> renderMeshes;
   mutable SubMeshProxiesContainer subMeshes;
   mutable uint factorySubMeshesChangeNum;
   void UpdateSubMeshProxies () const;
-  struct LegacySubmesh
-  {
-    csRef<iRenderBuffer> indexbuffer;
-    csRef<iMaterialWrapper> material;
-    uint mixmode;
-    csRenderMeshHolder rmHolder;
-    csRef<csRenderBufferHolder> bufferHolder;
-  };
-  csArray<LegacySubmesh> legacySubmeshes;
 
   csUserRenderBufferManager userBuffers;
   csArray<csStringID> user_buffer_names;
 
   csGenmeshMeshObjectFactory* factory;
   iMeshWrapper* logparent;
-  csRef<iMaterialWrapper> material;
-  bool material_needs_visit;
-  uint MixMode;
   csRef<iMeshObjectDrawCallback> vis_cb;
   bool do_lighting;
   bool do_manual_colors;
@@ -195,9 +174,22 @@ private:
   bool do_shadows;
   bool do_shadow_rec;
 
-  csColor4* lit_mesh_colors;
-  int num_lit_mesh_colors;	// Should be equal to factory number.
-  csColor4* static_mesh_colors;
+  struct LegacyLightingData
+  {
+    csColor4* lit_mesh_colors;
+    int num_lit_mesh_colors;	// Should be equal to factory number.
+    csColor4* static_mesh_colors;
+    
+    csRef<iRenderBuffer> color_buffer;
+    
+    LegacyLightingData();
+    ~LegacyLightingData();
+    
+    void SetColorNum (int num);
+    void Free();
+    void Clear();
+  };
+  LegacyLightingData legacyLighting;
 
   /**
    * Global sector wide dynamic ambient version.
@@ -268,9 +260,10 @@ public:
    * @{ */
   void SetMixMode (uint mode)
   {
-    MixMode = mode;
+    subMeshes.GetDefaultSubmesh()->SubMeshProxy::SetMixmode (mode);
   }
-  uint GetMixMode () const { return MixMode; }
+  uint GetMixMode () const
+  { return subMeshes.GetDefaultSubmesh()->SubMeshProxy::GetMixmode(); }
   const csColor& GetColor () const { return base_color; }
   /** @} */
   
@@ -303,6 +296,13 @@ public:
   bool anim_ctrl_texels;
   bool anim_ctrl_normals;
   bool anim_ctrl_colors;
+  struct AnimBuffers
+  {
+    csRef<iRenderBuffer> position;
+    csRef<iRenderBuffer> texcoord;
+    csRef<iRenderBuffer> normal;
+  };
+  AnimBuffers animBuffers;
 
   // This function sets up the shader variable context depending on
   // the existance of an animation control. If there is no animation control
@@ -311,7 +311,9 @@ public:
   void SetupShaderVariableContext ();
 
   bool AddRenderBuffer (const char *name, iRenderBuffer* buffer);
+  bool AddRenderBuffer (csRenderBufferName name, iRenderBuffer* buffer);
   bool RemoveRenderBuffer (const char *name);
+  bool RemoveRenderBuffer (csRenderBufferName name);
   int GetRenderBufferCount () const
   {
     return (int)this->user_buffer_names.GetSize ();
@@ -319,6 +321,7 @@ public:
   iRenderBuffer* GetRenderBuffer (int index); 
   csRef<iString> GetRenderBufferName (int index) const;
   iRenderBuffer* GetRenderBuffer (const char* name);
+  iRenderBuffer* GetRenderBuffer (csRenderBufferName name);
 
   /**\name Shadow and lighting system
    * @{ */
@@ -376,7 +379,8 @@ public:
   }
   virtual bool GetColor (csColor& col) const { col = base_color; return true; }
   virtual bool SetMaterialWrapper (iMaterialWrapper* mat);
-  virtual iMaterialWrapper* GetMaterialWrapper () const { return material; }
+  virtual iMaterialWrapper* GetMaterialWrapper () const
+  { return subMeshes.GetDefaultSubmesh()->SubMeshProxy::GetMaterial(); }
   virtual void InvalidateMaterialHandles () { }
   /**
    * see imesh/object.h for specification. The default implementation
@@ -444,41 +448,50 @@ class csGenmeshMeshObjectFactory :
                                iGeneralFactoryState>
 {
 public:
-  csRef<iMaterialWrapper> material;
-  csDirtyAccessArray<csVector3> mesh_vertices;
-  csDirtyAccessArray<csVector2> mesh_texels;
-  csDirtyAccessArray<csVector3> mesh_normals;
-
   bool autonormals;
   bool autonormals_compress;
   bool do_fullbright;
 
-  bool mesh_vertices_dirty_flag;
-  bool mesh_texels_dirty_flag;
-  bool mesh_normals_dirty_flag;
-  bool mesh_colors_dirty_flag;
-  bool mesh_triangle_dirty_flag;
-  bool mesh_tangents_dirty_flag;
-
-  csDirtyAccessArray<csTriangle> mesh_triangles;
-
   csWeakRef<iGraphics3D> g3d;
   csRef<iStringSet> strings;
 
-  csRef<iRenderBuffer> vertex_buffer;
-  csRef<iRenderBuffer> texel_buffer;
-  csRef<iRenderBuffer> normal_buffer;
-  csRef<iRenderBuffer> color_buffer;
-  csRef<iRenderBuffer> index_buffer;
-  csRef<iRenderBuffer> binormal_buffer;
-  csRef<iRenderBuffer> tangent_buffer;
-  
+  struct KnownBuffers
+  {
+    csRef<iRenderBuffer> position;
+    csRef<iRenderBuffer> texcoord;
+    csRef<iRenderBuffer> normal;
+    csRef<iRenderBuffer> color;
+    
+    csRef<iRenderBuffer> tangent;
+    csRef<iRenderBuffer> bitangent;
+  };
+  KnownBuffers knownBuffers;
+    
   csUserRenderBufferManager userBuffers;
   csArray<csStringID> user_buffer_names;
-
+   
+  struct LegacyBuffers
+  {
+    uint buffersSetup;
+    bool mesh_vertices_dirty_flag;
+    bool mesh_texels_dirty_flag;
+    bool mesh_normals_dirty_flag;
+    bool mesh_colors_dirty_flag;
+   
+    csDirtyAccessArray<csVector3> mesh_vertices;
+    csDirtyAccessArray<csVector2> mesh_texels;
+    csDirtyAccessArray<csVector3> mesh_normals;
+    csDirtyAccessArray<csColor4> mesh_colors;
+     
+    LegacyBuffers();
+  };
+  LegacyBuffers legacyBuffers;
+  void CreateLegacyBuffers();
+  void ClearLegacyBuffers (uint mask = CS_BUFFER_ALL_MASK);
+  void UpdateFromLegacyBuffers();
+  
   SubMeshesContainer subMeshes;
 
-  uint default_mixmode;
   bool default_lighting;
   csColor default_color;
   bool default_manualcolors;
@@ -511,8 +524,6 @@ public:
 
   /// Update tangent and bitangent buffers
   void UpdateTangentsBitangents ();
-private:
-  csDirtyAccessArray<csColor4> mesh_colors;
 public:
   CS_LEAKGUARD_DECLARE (csGenmeshMeshObjectFactory);
 
@@ -548,54 +559,27 @@ public:
 
   bool SetMaterialWrapper (iMaterialWrapper* material)
   {
-    csGenmeshMeshObjectFactory::material = material;
+    subMeshes.GetDefaultSubmesh()->SubMesh::SetMaterial (material);
     return true;
   }
-  iMaterialWrapper* GetMaterialWrapper () const { return material; }
+  iMaterialWrapper* GetMaterialWrapper () const
+  { return subMeshes.GetDefaultSubmesh()->SubMesh::GetMaterial(); }
   void AddVertex (const csVector3& v,
       const csVector2& uv, const csVector3& normal,
       const csColor4& color);
   void SetVertexCount (int n);
-  int GetVertexCount () const { return (int)mesh_vertices.GetSize (); }
-  csVector3* GetVertices ()
-  {
-    SetupFactory ();
-    return mesh_vertices.GetArray ();
-  }
-  csVector2* GetTexels ()
-  {
-    SetupFactory ();
-    return mesh_texels.GetArray ();
-  }
-  csVector3* GetNormals ()
-  {
-    SetupFactory ();
-    return mesh_normals.GetArray ();
-  }
-  csColor4* GetColors (bool ensureValid)
-  {
-    if (ensureValid && (mesh_colors.GetSize() == 0))
-    {
-      mesh_colors.SetCapacity (mesh_vertices.Capacity());
-      mesh_colors.SetSize (mesh_vertices.GetSize(), csColor4 (0, 0, 0, 1));
-    }
-    return mesh_colors.GetArray();
-  }
-  csColor4* GetColors ()
-  {
-    SetupFactory ();
-    return GetColors (true);
-  }
+  int GetVertexCount () const;
+  csVector3* GetVertices ();
+  csVector2* GetTexels ();
+  csVector3* GetNormals ();
+  csColor4* GetColors (bool ensureValid);
+  csColor4* GetColors ();
 
   void AddTriangle (const csTriangle& tri);
   void SetTriangleCount (int n);
 
-  int GetTriangleCount () const { return (int)mesh_triangles.GetSize (); }
-  csTriangle* GetTriangles ()
-  {
-    SetupFactory ();
-    return mesh_triangles.GetArray ();
-  }
+  int GetTriangleCount () const;
+  csTriangle* GetTriangles ();
 
   void Invalidate ();
   void CalculateNormals (bool compress);
@@ -612,8 +596,12 @@ public:
   bool IsBack2Front () const { return back2front; }
   void BuildBack2FrontTree ();
 
+  bool InternalSetBuffer (csRenderBufferName name, iRenderBuffer* buffer);
+  
   bool AddRenderBuffer (const char *name, iRenderBuffer* buffer);
+  bool AddRenderBuffer (csRenderBufferName name, iRenderBuffer* buffer);
   bool RemoveRenderBuffer (const char *name);
+  bool RemoveRenderBuffer (csRenderBufferName name);
   int GetRenderBufferCount () const
   {
     return (int)this->user_buffer_names.GetSize ();
@@ -621,6 +609,7 @@ public:
   iRenderBuffer* GetRenderBuffer (int index); 
   csRef<iString> GetRenderBufferName (int index) const;
   iRenderBuffer* GetRenderBuffer (const char* name);
+  iRenderBuffer* GetRenderBuffer (csRenderBufferName name);
 
   /**
    * Get the string ID's for the anonymous buffers
@@ -675,11 +664,11 @@ public:
 
   void SetMixMode (uint mode)
   {
-    default_mixmode = mode;
+    subMeshes.GetDefaultSubmesh()->SubMesh::SetMixmode (mode);
   }
   uint GetMixMode () const
   {
-    return default_mixmode;
+    return subMeshes.GetDefaultSubmesh()->SubMesh::GetMixmode();
   }
   void SetLighting (bool l)
   {
@@ -752,19 +741,11 @@ public:
     public scfImplementation1<ShaderVariableAccessor, iShaderVariableAccessor>
   {
   public:
-    //SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObjectFactory);
     csWeakRef<csGenmeshMeshObjectFactory> parent;
-    virtual ~ShaderVariableAccessor ()
-    {
-    }
     ShaderVariableAccessor (csGenmeshMeshObjectFactory* parent) :
-      scfImplementationType (this)
-    {
-      this->parent = parent;
-    }
+      scfImplementationType (this), parent (parent) {}
     virtual void PreGetValue (csShaderVariable* variable)
     {
-      //scfParent->PreGetShaderVariableValue (variable);
       if (parent) parent->PreGetShaderVariableValue (variable);
     }
   };
@@ -780,14 +761,8 @@ public:
   public:
     CS_LEAKGUARD_DECLARE (RenderBufferAccessor);
     csWeakRef<csGenmeshMeshObjectFactory> parent;
-    virtual ~RenderBufferAccessor ()
-    {
-    }
     RenderBufferAccessor (csGenmeshMeshObjectFactory* parent) :
-      scfImplementationType (this)
-    {
-      this->parent = parent;
-    }
+      scfImplementationType (this), parent (parent) {}
     virtual void PreGetBuffer (csRenderBufferHolder* holder,
     	csRenderBufferName buffer)
     {

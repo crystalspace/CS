@@ -71,7 +71,7 @@ static inline void makeGLMatrix (const csReversibleTransform& t,
 
 /// Make an OpenGL matrix from a CS matrix
 static inline void makeGLMatrix (const csMatrix3& m, float matrix[16], 
-                                 bool rowMajor = false)
+				 bool rowMajor = false)
 {
   int row, col;
   if (rowMajor)
@@ -103,6 +103,40 @@ static inline void makeGLMatrix (const csMatrix3& m, float matrix[16],
   matrix[col*3+row*2] = 0.0f;
   matrix[col*3+row*3] = 1.0f;
 }
+
+namespace CS
+{
+  namespace PluginCommon
+  {
+    /// Make an OpenGL matrix from a CS matrix
+    static inline void MakeGLMatrix3x3 (const csMatrix3& m, float matrix[9], 
+				        bool rowMajor = false)
+    {
+      int row, col;
+      if (rowMajor)
+      {
+	col = 1; row = 3;
+      }
+      else
+      {
+	col = 3; row = 1;
+      }
+    
+      matrix[col*0+row*0] = m.m11;
+      matrix[col*0+row*1] = m.m12;
+      matrix[col*0+row*2] = m.m13;
+    
+      matrix[col*1+row*0] = m.m21;
+      matrix[col*1+row*1] = m.m22;
+      matrix[col*1+row*2] = m.m23;
+    
+      matrix[col*2+row*0] = m.m31;
+      matrix[col*2+row*1] = m.m32;
+      matrix[col*2+row*2] = m.m33;
+    }
+
+  } // namespace PluginCommon
+} // namespace CS
 
 /** @} */
 

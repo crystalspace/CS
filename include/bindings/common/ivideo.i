@@ -19,6 +19,8 @@
 
 %include "ivideo/halo.h"
 %include "ivideo/shader/shader.h"
+%template(csRefShaderStringIDHash) csHash<csRef<iShader>, csStringID > ;
+%template(iShaderArray) csArray<csRef<iShader> > ;
 
 %rename(GetKeyColorStatus) iTextureHandle::GetKeyColor() const;
 %include "ivideo/texture.h"

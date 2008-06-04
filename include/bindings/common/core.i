@@ -741,6 +741,14 @@ APPLY_TYPEMAP_ARGOUT_PTR(csCommandEventData,csCommandEventData& data)
 %ignore csHash::Get (const K& key, T& fallback);
 %ignore csHash::csHash (const csHash<T> &o);
 %ignore csHash::operator [];
+
+/* We have to declare this here, otherwise swig gets confused about a
+forward declaration of the csHash template without default parameters */
+template <class T, class K = unsigned int,
+  class ArrayMemoryAlloc = CS::Memory::AllocatorMalloc,
+  class ArrayElementHandler = csArrayElementHandler<
+    CS::Container::HashElement<T, K> > > class csHash;
+
 %include "csutil/hash.h"
 %include "iutil/eventnames.h"
 %include "csutil/eventnames.h"
