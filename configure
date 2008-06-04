@@ -12904,17 +12904,17 @@ fi
 "
 fi
 
-	     cs_build_prop_val=""-mfpmath=sse""
+fi
+
+        if test -n "$cs_cv_prog_cc_msse2"; then
+  cs_build_prop_val="$cs_cv_prog_cc_msse2"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     	        if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
 "
 fi
 
-fi
-
-        if test -n "$cs_cv_prog_cc_msse2"; then
-  cs_build_prop_val="$cs_cv_prog_cc_msse2"
+	     cs_build_prop_val=""-mfpmath=sse""
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     	        if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
