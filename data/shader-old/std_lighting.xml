@@ -18,6 +18,14 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
 <shader compiler="xmlshader" name="std_lighting">
+  
+  <inputs>
+    <texture name="tex diffuse" short="Diffuse texture">
+      Diffuse texture. If not provided, 'mat flatcolor' is used.
+    </texture>
+    <texture name="tex lightmap" hidden="yes" />
+  </inputs>
+  
 
   <!-- Standard lighting shader. Supports "classic" surfaces (a diffuse 
        texture or a flat color), "classic" lighting (lightmap or mesh-provided

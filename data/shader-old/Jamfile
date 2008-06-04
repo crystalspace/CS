@@ -12,5 +12,6 @@ SubInclude TOP data shader-old parallaxAtt ;
 SubInclude TOP data shader-old shadowmap ;
 SubInclude TOP data shader-old specular ;
 SubInclude TOP data shader-old snippets ;
+SubInclude TOP data shader-old surface ;
 SubInclude TOP data shader-old uvanim ;
 

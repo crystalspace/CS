@@ -6,5 +6,4 @@ SubInclude TOP data shader combiner-cg ;
 SubInclude TOP data shader lighting ;
 SubInclude TOP data shader reflect ;
 SubInclude TOP data shader snippets ;
-SubInclude TOP data shader surface ;
 
