@@ -13,7 +13,7 @@ VFS.Mount.cdrom = $(CS_CDROM)$/
 VFS.Mount.tmp = $(CS_TMP)$/
 
 ; Configuration repository
-VFS.Mount.config = $(CS_CONFIGDIR)$/
+VFS.Mount.config = $@data$/config-app$/, $@data$/config-plugins$/
 VFS.Mount.data = $(CS_DATADIR)$/
 
 ; Miscellaneous resources.
