@@ -501,7 +501,8 @@ void csShaderGLCGCommon::DoDebugDump ()
       cgGetResourceString (cgGetParameterResource (param)) << "\n";
     output << " Resource index: " <<
       cgGetParameterResourceIndex (param) << "\n";
-    if ((var == CG_UNIFORM) || (var == CG_CONSTANT))
+    // Cg 2.0 seems to not like CG_DEFAULT for uniforms
+    if (/*(var == CG_UNIFORM) || */(var == CG_CONSTANT))
     {
       int nValues;
       const double* values = cgGetParameterValues (param, 
