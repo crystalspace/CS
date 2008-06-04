@@ -22,6 +22,7 @@
 
 #include "csgeom/math.h"
 #include "csgeom/vector3.h"
+#include "csplugincommon/opengl/glextmanager.h"
 #include "csplugincommon/opengl/glhelper.h"
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
