@@ -511,7 +511,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   float AnimeshObject::GetMorphTargetWeight (uint target) const
   {
-    return morphTargetWeights[target];
+    if (morphTargetWeights.GetSize()>target)
+      return morphTargetWeights[target];
+    else
+      return 0.0;
   }
 
   iMeshObjectFactory* AnimeshObject::GetFactory () const
