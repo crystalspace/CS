@@ -15266,6 +15266,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetPlaybackSpeed = *cspacec::iSkeletonAnimationNodeFactory2_GetPlaybackSpeed;
 *SetAutomaticReset = *cspacec::iSkeletonAnimationNodeFactory2_SetAutomaticReset;
 *GetAutomaticReset = *cspacec::iSkeletonAnimationNodeFactory2_GetAutomaticReset;
+*scfGetVersion = *cspacec::iSkeletonAnimationNodeFactory2_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -15297,6 +15298,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::iSkeletonAnimNode2 cspace );
 %OWNER = ();
 %ITERATORS = ();
+*scfGetVersion = *cspacec::iSkeletonAnimationNode2_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -15407,6 +15409,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetNode = *cspacec::iSkeletonPriorityNodeFactory2_GetNode;
 *GetNodeCount = *cspacec::iSkeletonPriorityNodeFactory2_GetNodeCount;
 *ClearNodes = *cspacec::iSkeletonPriorityNodeFactory2_ClearNodes;
+*scfGetVersion = *cspacec::iSkeletonPriorityNodeFactory2_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -15439,6 +15442,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %OWNER = ();
 %ITERATORS = ();
 *SetNodePriority = *cspacec::iSkeletonPriorityNode2_SetNodePriority;
+*scfGetVersion = *cspacec::iSkeletonPriorityNode2_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -15550,6 +15554,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetStartState = *cspacec::iSkeletonFSMNodeFactory2_GetStartState;
 *GetStateCount = *cspacec::iSkeletonFSMNodeFactory2_GetStateCount;
 *ClearStates = *cspacec::iSkeletonFSMNodeFactory2_ClearStates;
+*scfGetVersion = *cspacec::iSkeletonFSMNodeFactory2_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -15583,6 +15588,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %ITERATORS = ();
 *SwitchToState = *cspacec::iSkeletonFSMNode2_SwitchToState;
 *GetCurrentState = *cspacec::iSkeletonFSMNode2_GetCurrentState;
+*scfGetVersion = *cspacec::iSkeletonFSMNode2_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
