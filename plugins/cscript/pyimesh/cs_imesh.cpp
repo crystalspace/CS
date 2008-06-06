@@ -2563,314 +2563,311 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_csPtrTiGenMeshAnimationControl_t swig_types[73]
 #define SWIGTYPE_p_csPtrTiParticleBuiltinEffectorVelocityField_t swig_types[74]
 #define SWIGTYPE_p_csPtrTiPolygonHandle_t swig_types[75]
-#define SWIGTYPE_p_csPtrTiSkeletonAnimationNodeFactory2_t swig_types[76]
-#define SWIGTYPE_p_csPtrTiSkeletonFSMNodeFactory2_t swig_types[77]
-#define SWIGTYPE_p_csPtrTiSkeletonPriorityNodeFactory2_t swig_types[78]
-#define SWIGTYPE_p_csPtrTiSkeletonRandomNodeFactory2_t swig_types[79]
-#define SWIGTYPE_p_csQuaternion swig_types[80]
-#define SWIGTYPE_p_csRandomGen swig_types[81]
-#define SWIGTYPE_p_csRect swig_types[82]
-#define SWIGTYPE_p_csRefArrayTiMaterialWrapper_t swig_types[83]
-#define SWIGTYPE_p_csRefArrayTiObject_t swig_types[84]
-#define SWIGTYPE_p_csRefCount swig_types[85]
-#define SWIGTYPE_p_csRefTiImage_t swig_types[86]
-#define SWIGTYPE_p_csRenderBufferName swig_types[87]
-#define SWIGTYPE_p_csReversibleTransform swig_types[88]
-#define SWIGTYPE_p_csShaderVariable swig_types[89]
-#define SWIGTYPE_p_csSkeletalState2 swig_types[90]
-#define SWIGTYPE_p_csSprite2DVertex swig_types[91]
-#define SWIGTYPE_p_csSpriteCal3DActiveAnim swig_types[92]
-#define SWIGTYPE_p_csTerrainColliderCollideSegmentResult swig_types[93]
-#define SWIGTYPE_p_csTransform swig_types[94]
-#define SWIGTYPE_p_csTriangle swig_types[95]
-#define SWIGTYPE_p_csTriangleMesh swig_types[96]
-#define SWIGTYPE_p_csTriangleMeshBox swig_types[97]
-#define SWIGTYPE_p_csTriangleMeshEdge swig_types[98]
-#define SWIGTYPE_p_csTriangleMeshPointer swig_types[99]
-#define SWIGTYPE_p_csTriangleMinMax swig_types[100]
-#define SWIGTYPE_p_csVector2 swig_types[101]
-#define SWIGTYPE_p_csVector3 swig_types[102]
-#define SWIGTYPE_p_csXRotMatrix3 swig_types[103]
-#define SWIGTYPE_p_csXScaleMatrix3 swig_types[104]
-#define SWIGTYPE_p_csYRotMatrix3 swig_types[105]
-#define SWIGTYPE_p_csYScaleMatrix3 swig_types[106]
-#define SWIGTYPE_p_csZRotMatrix3 swig_types[107]
-#define SWIGTYPE_p_csZScaleMatrix3 swig_types[108]
-#define SWIGTYPE_p_float swig_types[109]
-#define SWIGTYPE_p_iAnimTimeUpdateHandler swig_types[110]
-#define SWIGTYPE_p_iAnimatedImage swig_types[111]
-#define SWIGTYPE_p_iAnimatedMesh swig_types[112]
-#define SWIGTYPE_p_iAnimatedMeshFactory swig_types[113]
-#define SWIGTYPE_p_iAnimatedMeshFactorySubMesh swig_types[114]
-#define SWIGTYPE_p_iAnimatedMeshMorphTarget swig_types[115]
-#define SWIGTYPE_p_iAnimatedMeshSubMesh swig_types[116]
-#define SWIGTYPE_p_iArrayChangeAllTcsCollisionPair_t swig_types[117]
-#define SWIGTYPE_p_iArrayChangeAllTcsShaderVariable_p_t swig_types[118]
-#define SWIGTYPE_p_iArrayChangeAllTcsSprite2DVertex_t swig_types[119]
-#define SWIGTYPE_p_iArrayChangeAllTcsVector3_t swig_types[120]
-#define SWIGTYPE_p_iArrayChangeElementsTcsCollisionPair_t swig_types[121]
-#define SWIGTYPE_p_iArrayChangeElementsTcsShaderVariable_p_t swig_types[122]
-#define SWIGTYPE_p_iArrayChangeElementsTcsSprite2DVertex_t swig_types[123]
-#define SWIGTYPE_p_iArrayChangeElementsTcsVector3_t swig_types[124]
-#define SWIGTYPE_p_iArrayReadOnlyTcsCollisionPair_t swig_types[125]
-#define SWIGTYPE_p_iArrayReadOnlyTcsShaderVariable_p_t swig_types[126]
-#define SWIGTYPE_p_iArrayReadOnlyTcsSprite2DVertex_t swig_types[127]
-#define SWIGTYPE_p_iArrayReadOnlyTcsVector3_t swig_types[128]
-#define SWIGTYPE_p_iBase swig_types[129]
-#define SWIGTYPE_p_iBodyGroup swig_types[130]
-#define SWIGTYPE_p_iBugPlug swig_types[131]
-#define SWIGTYPE_p_iBugPlugRenderObject swig_types[132]
-#define SWIGTYPE_p_iCacheManager swig_types[133]
-#define SWIGTYPE_p_iClipper2D swig_types[134]
-#define SWIGTYPE_p_iCollideSystem swig_types[135]
-#define SWIGTYPE_p_iCollider swig_types[136]
-#define SWIGTYPE_p_iColoredVertices swig_types[137]
-#define SWIGTYPE_p_iCommandLineParser swig_types[138]
-#define SWIGTYPE_p_iComponent swig_types[139]
-#define SWIGTYPE_p_iConfigFile swig_types[140]
-#define SWIGTYPE_p_iConfigIterator swig_types[141]
-#define SWIGTYPE_p_iConfigManager swig_types[142]
-#define SWIGTYPE_p_iConsoleOutput swig_types[143]
-#define SWIGTYPE_p_iConsoleWatcher swig_types[144]
-#define SWIGTYPE_p_iDataBuffer swig_types[145]
-#define SWIGTYPE_p_iDebugHelper swig_types[146]
-#define SWIGTYPE_p_iDecalBuilder swig_types[147]
-#define SWIGTYPE_p_iDecalManager swig_types[148]
-#define SWIGTYPE_p_iDecalTemplate swig_types[149]
-#define SWIGTYPE_p_iDocument swig_types[150]
-#define SWIGTYPE_p_iDocumentAttribute swig_types[151]
-#define SWIGTYPE_p_iDocumentAttributeIterator swig_types[152]
-#define SWIGTYPE_p_iDocumentNode swig_types[153]
-#define SWIGTYPE_p_iDocumentNodeIterator swig_types[154]
-#define SWIGTYPE_p_iDocumentSystem swig_types[155]
-#define SWIGTYPE_p_iDynamicSystem swig_types[156]
-#define SWIGTYPE_p_iDynamics swig_types[157]
-#define SWIGTYPE_p_iDynamicsColliderCollisionCallback swig_types[158]
-#define SWIGTYPE_p_iDynamicsCollisionCallback swig_types[159]
-#define SWIGTYPE_p_iDynamicsMoveCallback swig_types[160]
-#define SWIGTYPE_p_iDynamicsStepCallback swig_types[161]
-#define SWIGTYPE_p_iDynamicsSystemCollider swig_types[162]
-#define SWIGTYPE_p_iEngineSequenceManager swig_types[163]
-#define SWIGTYPE_p_iEngineSequenceParameters swig_types[164]
-#define SWIGTYPE_p_iEvent swig_types[165]
-#define SWIGTYPE_p_iEventAttributeIterator swig_types[166]
-#define SWIGTYPE_p_iEventCord swig_types[167]
-#define SWIGTYPE_p_iEventHandler swig_types[168]
-#define SWIGTYPE_p_iEventNameRegistry swig_types[169]
-#define SWIGTYPE_p_iEventOutlet swig_types[170]
-#define SWIGTYPE_p_iEventPlug swig_types[171]
-#define SWIGTYPE_p_iEventQueue swig_types[172]
-#define SWIGTYPE_p_iFactory swig_types[173]
-#define SWIGTYPE_p_iFile swig_types[174]
-#define SWIGTYPE_p_iFont swig_types[175]
-#define SWIGTYPE_p_iFontDeleteNotify swig_types[176]
-#define SWIGTYPE_p_iFontServer swig_types[177]
-#define SWIGTYPE_p_iGenMeshAnimationControl swig_types[178]
-#define SWIGTYPE_p_iGenMeshAnimationControl1_4 swig_types[179]
-#define SWIGTYPE_p_iGenMeshAnimationControlFactory swig_types[180]
-#define SWIGTYPE_p_iGenMeshAnimationControlType swig_types[181]
-#define SWIGTYPE_p_iGenMeshSkeletonControlState swig_types[182]
-#define SWIGTYPE_p_iGeneralFactoryState swig_types[183]
-#define SWIGTYPE_p_iGeneralMeshCommonState swig_types[184]
-#define SWIGTYPE_p_iGeneralMeshState swig_types[185]
-#define SWIGTYPE_p_iGeneralMeshSubMesh swig_types[186]
-#define SWIGTYPE_p_iGraphics2D swig_types[187]
-#define SWIGTYPE_p_iGraphics3D swig_types[188]
-#define SWIGTYPE_p_iHalo swig_types[189]
-#define SWIGTYPE_p_iImage swig_types[190]
-#define SWIGTYPE_p_iImageIO swig_types[191]
-#define SWIGTYPE_p_iJoint swig_types[192]
-#define SWIGTYPE_p_iJoystickDriver swig_types[193]
-#define SWIGTYPE_p_iKeyComposer swig_types[194]
-#define SWIGTYPE_p_iKeyboardDriver swig_types[195]
-#define SWIGTYPE_p_iMapNode swig_types[196]
-#define SWIGTYPE_p_iMaterial swig_types[197]
-#define SWIGTYPE_p_iMaterialWrapper swig_types[198]
-#define SWIGTYPE_p_iMeshFactoryWrapper swig_types[199]
-#define SWIGTYPE_p_iMeshObject swig_types[200]
-#define SWIGTYPE_p_iMeshObjectDrawCallback swig_types[201]
-#define SWIGTYPE_p_iMeshObjectFactory swig_types[202]
-#define SWIGTYPE_p_iMeshObjectType swig_types[203]
-#define SWIGTYPE_p_iMeshWrapper swig_types[204]
-#define SWIGTYPE_p_iMouseDriver swig_types[205]
-#define SWIGTYPE_p_iMovable swig_types[206]
-#define SWIGTYPE_p_iMovieRecorder swig_types[207]
-#define SWIGTYPE_p_iNativeWindow swig_types[208]
-#define SWIGTYPE_p_iNativeWindowManager swig_types[209]
-#define SWIGTYPE_p_iODEAMotorJoint swig_types[210]
-#define SWIGTYPE_p_iODEBallJoint swig_types[211]
-#define SWIGTYPE_p_iODEDynamicState swig_types[212]
-#define SWIGTYPE_p_iODEDynamicSystemState swig_types[213]
-#define SWIGTYPE_p_iODEFrameUpdateCallback swig_types[214]
-#define SWIGTYPE_p_iODEGeneralJointState swig_types[215]
-#define SWIGTYPE_p_iODEHinge2Joint swig_types[216]
-#define SWIGTYPE_p_iODEHingeJoint swig_types[217]
-#define SWIGTYPE_p_iODEJointState swig_types[218]
-#define SWIGTYPE_p_iODESliderJoint swig_types[219]
-#define SWIGTYPE_p_iODEUniversalJoint swig_types[220]
-#define SWIGTYPE_p_iObject swig_types[221]
-#define SWIGTYPE_p_iObjectIterator swig_types[222]
-#define SWIGTYPE_p_iObjectModel swig_types[223]
-#define SWIGTYPE_p_iObjectModelListener swig_types[224]
-#define SWIGTYPE_p_iObjectNameChangeListener swig_types[225]
-#define SWIGTYPE_p_iObjectRegistry swig_types[226]
-#define SWIGTYPE_p_iObjectRegistryIterator swig_types[227]
-#define SWIGTYPE_p_iOffscreenCanvasCallback swig_types[228]
-#define SWIGTYPE_p_iParameterESM swig_types[229]
-#define SWIGTYPE_p_iParticleBuiltinEffectorFactory swig_types[230]
-#define SWIGTYPE_p_iParticleBuiltinEffectorForce swig_types[231]
-#define SWIGTYPE_p_iParticleBuiltinEffectorLinColor swig_types[232]
-#define SWIGTYPE_p_iParticleBuiltinEffectorVelocityField swig_types[233]
-#define SWIGTYPE_p_iParticleBuiltinEmitterBase swig_types[234]
-#define SWIGTYPE_p_iParticleBuiltinEmitterBox swig_types[235]
-#define SWIGTYPE_p_iParticleBuiltinEmitterCone swig_types[236]
-#define SWIGTYPE_p_iParticleBuiltinEmitterCylinder swig_types[237]
-#define SWIGTYPE_p_iParticleBuiltinEmitterFactory swig_types[238]
-#define SWIGTYPE_p_iParticleBuiltinEmitterSphere swig_types[239]
-#define SWIGTYPE_p_iParticleEffector swig_types[240]
-#define SWIGTYPE_p_iParticleEmitter swig_types[241]
-#define SWIGTYPE_p_iParticleSystem swig_types[242]
-#define SWIGTYPE_p_iParticleSystemBase swig_types[243]
-#define SWIGTYPE_p_iParticleSystemFactory swig_types[244]
-#define SWIGTYPE_p_iPath swig_types[245]
-#define SWIGTYPE_p_iPluginIterator swig_types[246]
-#define SWIGTYPE_p_iPluginManager swig_types[247]
-#define SWIGTYPE_p_iPolygonHandle swig_types[248]
-#define SWIGTYPE_p_iProcTexture swig_types[249]
-#define SWIGTYPE_p_iRenderBuffer swig_types[250]
-#define SWIGTYPE_p_iRenderView swig_types[251]
-#define SWIGTYPE_p_iRendererLightmap swig_types[252]
-#define SWIGTYPE_p_iReporter swig_types[253]
-#define SWIGTYPE_p_iReporterIterator swig_types[254]
-#define SWIGTYPE_p_iReporterListener swig_types[255]
-#define SWIGTYPE_p_iRigidBody swig_types[256]
-#define SWIGTYPE_p_iSCF swig_types[257]
-#define SWIGTYPE_p_iSceneNode swig_types[258]
-#define SWIGTYPE_p_iScript swig_types[259]
-#define SWIGTYPE_p_iScriptObject swig_types[260]
-#define SWIGTYPE_p_iScriptValue swig_types[261]
-#define SWIGTYPE_p_iSequence swig_types[262]
-#define SWIGTYPE_p_iSequenceCondition swig_types[263]
-#define SWIGTYPE_p_iSequenceManager swig_types[264]
-#define SWIGTYPE_p_iSequenceOperation swig_types[265]
-#define SWIGTYPE_p_iSequenceTimedOperation swig_types[266]
-#define SWIGTYPE_p_iSequenceTrigger swig_types[267]
-#define SWIGTYPE_p_iSequenceWrapper swig_types[268]
-#define SWIGTYPE_p_iShader swig_types[269]
-#define SWIGTYPE_p_iShaderCompiler swig_types[270]
-#define SWIGTYPE_p_iShaderManager swig_types[271]
-#define SWIGTYPE_p_iShaderPriorityList swig_types[272]
-#define SWIGTYPE_p_iShaderVarStringSet swig_types[273]
-#define SWIGTYPE_p_iShaderVariableAccessor swig_types[274]
-#define SWIGTYPE_p_iShaderVariableContext swig_types[275]
-#define SWIGTYPE_p_iSimpleFormerState swig_types[276]
-#define SWIGTYPE_p_iSkeleton swig_types[277]
-#define SWIGTYPE_p_iSkeleton2 swig_types[278]
-#define SWIGTYPE_p_iSkeletonAnimCallback2 swig_types[279]
-#define SWIGTYPE_p_iSkeletonAnimNode2 swig_types[280]
-#define SWIGTYPE_p_iSkeletonAnimNodeFactory2 swig_types[281]
-#define SWIGTYPE_p_iSkeletonAnimPacket2 swig_types[282]
-#define SWIGTYPE_p_iSkeletonAnimPacketFactory2 swig_types[283]
-#define SWIGTYPE_p_iSkeletonAnimation swig_types[284]
-#define SWIGTYPE_p_iSkeletonAnimation2 swig_types[285]
-#define SWIGTYPE_p_iSkeletonAnimationCallback swig_types[286]
-#define SWIGTYPE_p_iSkeletonAnimationInstance swig_types[287]
-#define SWIGTYPE_p_iSkeletonAnimationKeyFrame swig_types[288]
-#define SWIGTYPE_p_iSkeletonAnimationNode2 swig_types[289]
-#define SWIGTYPE_p_iSkeletonAnimationNodeFactory2 swig_types[290]
-#define SWIGTYPE_p_iSkeletonBlendNode2 swig_types[291]
-#define SWIGTYPE_p_iSkeletonBlendNodeFactory2 swig_types[292]
-#define SWIGTYPE_p_iSkeletonBone swig_types[293]
-#define SWIGTYPE_p_iSkeletonBoneFactory swig_types[294]
-#define SWIGTYPE_p_iSkeletonBoneRagdollInfo swig_types[295]
-#define SWIGTYPE_p_iSkeletonBoneUpdateCallback swig_types[296]
-#define SWIGTYPE_p_iSkeletonFSMNode2 swig_types[297]
-#define SWIGTYPE_p_iSkeletonFSMNodeFactory2 swig_types[298]
-#define SWIGTYPE_p_iSkeletonFactory swig_types[299]
-#define SWIGTYPE_p_iSkeletonFactory2 swig_types[300]
-#define SWIGTYPE_p_iSkeletonGraveyard swig_types[301]
-#define SWIGTYPE_p_iSkeletonManager2 swig_types[302]
-#define SWIGTYPE_p_iSkeletonPriorityNode2 swig_types[303]
-#define SWIGTYPE_p_iSkeletonPriorityNodeFactory2 swig_types[304]
-#define SWIGTYPE_p_iSkeletonRandomNode2 swig_types[305]
-#define SWIGTYPE_p_iSkeletonRandomNodeFactory2 swig_types[306]
-#define SWIGTYPE_p_iSkeletonSocket swig_types[307]
-#define SWIGTYPE_p_iSkeletonSocketFactory swig_types[308]
-#define SWIGTYPE_p_iSkeletonUpdateCallback swig_types[309]
-#define SWIGTYPE_p_iSprite2DFactoryState swig_types[310]
-#define SWIGTYPE_p_iSprite2DState swig_types[311]
-#define SWIGTYPE_p_iSprite2DUVAnimation swig_types[312]
-#define SWIGTYPE_p_iSprite2DUVAnimationFrame swig_types[313]
-#define SWIGTYPE_p_iSprite3DFactoryState swig_types[314]
-#define SWIGTYPE_p_iSprite3DState swig_types[315]
-#define SWIGTYPE_p_iSpriteAction swig_types[316]
-#define SWIGTYPE_p_iSpriteCal3DFactoryState swig_types[317]
-#define SWIGTYPE_p_iSpriteCal3DSocket swig_types[318]
-#define SWIGTYPE_p_iSpriteCal3DState swig_types[319]
-#define SWIGTYPE_p_iSpriteFrame swig_types[320]
-#define SWIGTYPE_p_iSpriteSocket swig_types[321]
-#define SWIGTYPE_p_iStandardReporterListener swig_types[322]
-#define SWIGTYPE_p_iString swig_types[323]
-#define SWIGTYPE_p_iStringArray swig_types[324]
-#define SWIGTYPE_p_iStringSet swig_types[325]
-#define SWIGTYPE_p_iStringSetBaseTCS__StringSetTag__General_t swig_types[326]
-#define SWIGTYPE_p_iStringSetBaseTCS__StringSetTag__ShaderVar_t swig_types[327]
-#define SWIGTYPE_p_iSuperLightmap swig_types[328]
-#define SWIGTYPE_p_iTerraFormer swig_types[329]
-#define SWIGTYPE_p_iTerraSampler swig_types[330]
-#define SWIGTYPE_p_iTerrainCell swig_types[331]
-#define SWIGTYPE_p_iTerrainCellCollisionProperties swig_types[332]
-#define SWIGTYPE_p_iTerrainCellFeederProperties swig_types[333]
-#define SWIGTYPE_p_iTerrainCellHeightDataCallback swig_types[334]
-#define SWIGTYPE_p_iTerrainCellLoadCallback swig_types[335]
-#define SWIGTYPE_p_iTerrainCellRenderProperties swig_types[336]
-#define SWIGTYPE_p_iTerrainCollider swig_types[337]
-#define SWIGTYPE_p_iTerrainCollisionPairArray swig_types[338]
-#define SWIGTYPE_p_iTerrainDataFeeder swig_types[339]
-#define SWIGTYPE_p_iTerrainFactory swig_types[340]
-#define SWIGTYPE_p_iTerrainFactoryCell swig_types[341]
-#define SWIGTYPE_p_iTerrainFactoryState swig_types[342]
-#define SWIGTYPE_p_iTerrainObjectState swig_types[343]
-#define SWIGTYPE_p_iTerrainRenderer swig_types[344]
-#define SWIGTYPE_p_iTerrainSystem swig_types[345]
-#define SWIGTYPE_p_iTerrainVector3Array swig_types[346]
-#define SWIGTYPE_p_iTextureHandle swig_types[347]
-#define SWIGTYPE_p_iTextureManager swig_types[348]
-#define SWIGTYPE_p_iThingEnvironment swig_types[349]
-#define SWIGTYPE_p_iThingFactoryState swig_types[350]
-#define SWIGTYPE_p_iThingState swig_types[351]
-#define SWIGTYPE_p_iTranslator swig_types[352]
-#define SWIGTYPE_p_iTriangleMesh swig_types[353]
-#define SWIGTYPE_p_iTriangleMeshIterator swig_types[354]
-#define SWIGTYPE_p_iVFS swig_types[355]
-#define SWIGTYPE_p_iView swig_types[356]
-#define SWIGTYPE_p_iVirtualClock swig_types[357]
-#define SWIGTYPE_p_int swig_types[358]
-#define SWIGTYPE_p_int16_t swig_types[359]
-#define SWIGTYPE_p_int64_t swig_types[360]
-#define SWIGTYPE_p_int8_t swig_types[361]
-#define SWIGTYPE_p_long_long swig_types[362]
-#define SWIGTYPE_p_p_CS__Graphics__RenderMesh swig_types[363]
-#define SWIGTYPE_p_p_iLight swig_types[364]
-#define SWIGTYPE_p_p_iMaterialWrapper swig_types[365]
-#define SWIGTYPE_p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[366]
-#define SWIGTYPE_p_scfImplementation1TcsImageBase_iImage_t swig_types[367]
-#define SWIGTYPE_p_scfImplementation1TcsObject_iObject_t swig_types[368]
-#define SWIGTYPE_p_scfImplementation1TcsPath_iPath_t swig_types[369]
-#define SWIGTYPE_p_scfImplementation1TcsTriangleMeshBox_iTriangleMesh_t swig_types[370]
-#define SWIGTYPE_p_scfImplementation1TcsTriangleMeshPointer_iTriangleMesh_t swig_types[371]
-#define SWIGTYPE_p_scfImplementation1TcsTriangleMesh_iTriangleMesh_t swig_types[372]
-#define SWIGTYPE_p_scfImplementationExt0TcsImageMemory_csImageBase_t swig_types[373]
-#define SWIGTYPE_p_size_t swig_types[374]
-#define SWIGTYPE_p_uint16_t swig_types[375]
-#define SWIGTYPE_p_uint32_t swig_types[376]
-#define SWIGTYPE_p_uint64_t swig_types[377]
-#define SWIGTYPE_p_unsigned_char swig_types[378]
-#define SWIGTYPE_p_unsigned_int swig_types[379]
-#define SWIGTYPE_p_unsigned_long swig_types[380]
-#define SWIGTYPE_p_unsigned_long_long swig_types[381]
-static swig_type_info *swig_types[383];
-static swig_module_info swig_module = {swig_types, 382, 0, 0, 0, 0};
+#define SWIGTYPE_p_csPtrTiSkeletonRandomNodeFactory2_t swig_types[76]
+#define SWIGTYPE_p_csQuaternion swig_types[77]
+#define SWIGTYPE_p_csRandomGen swig_types[78]
+#define SWIGTYPE_p_csRect swig_types[79]
+#define SWIGTYPE_p_csRefArrayTiMaterialWrapper_t swig_types[80]
+#define SWIGTYPE_p_csRefArrayTiObject_t swig_types[81]
+#define SWIGTYPE_p_csRefCount swig_types[82]
+#define SWIGTYPE_p_csRefTiImage_t swig_types[83]
+#define SWIGTYPE_p_csRenderBufferName swig_types[84]
+#define SWIGTYPE_p_csReversibleTransform swig_types[85]
+#define SWIGTYPE_p_csShaderVariable swig_types[86]
+#define SWIGTYPE_p_csSkeletalState2 swig_types[87]
+#define SWIGTYPE_p_csSprite2DVertex swig_types[88]
+#define SWIGTYPE_p_csSpriteCal3DActiveAnim swig_types[89]
+#define SWIGTYPE_p_csTerrainColliderCollideSegmentResult swig_types[90]
+#define SWIGTYPE_p_csTransform swig_types[91]
+#define SWIGTYPE_p_csTriangle swig_types[92]
+#define SWIGTYPE_p_csTriangleMesh swig_types[93]
+#define SWIGTYPE_p_csTriangleMeshBox swig_types[94]
+#define SWIGTYPE_p_csTriangleMeshEdge swig_types[95]
+#define SWIGTYPE_p_csTriangleMeshPointer swig_types[96]
+#define SWIGTYPE_p_csTriangleMinMax swig_types[97]
+#define SWIGTYPE_p_csVector2 swig_types[98]
+#define SWIGTYPE_p_csVector3 swig_types[99]
+#define SWIGTYPE_p_csXRotMatrix3 swig_types[100]
+#define SWIGTYPE_p_csXScaleMatrix3 swig_types[101]
+#define SWIGTYPE_p_csYRotMatrix3 swig_types[102]
+#define SWIGTYPE_p_csYScaleMatrix3 swig_types[103]
+#define SWIGTYPE_p_csZRotMatrix3 swig_types[104]
+#define SWIGTYPE_p_csZScaleMatrix3 swig_types[105]
+#define SWIGTYPE_p_float swig_types[106]
+#define SWIGTYPE_p_iAnimTimeUpdateHandler swig_types[107]
+#define SWIGTYPE_p_iAnimatedImage swig_types[108]
+#define SWIGTYPE_p_iAnimatedMesh swig_types[109]
+#define SWIGTYPE_p_iAnimatedMeshFactory swig_types[110]
+#define SWIGTYPE_p_iAnimatedMeshFactorySubMesh swig_types[111]
+#define SWIGTYPE_p_iAnimatedMeshMorphTarget swig_types[112]
+#define SWIGTYPE_p_iAnimatedMeshSubMesh swig_types[113]
+#define SWIGTYPE_p_iArrayChangeAllTcsCollisionPair_t swig_types[114]
+#define SWIGTYPE_p_iArrayChangeAllTcsShaderVariable_p_t swig_types[115]
+#define SWIGTYPE_p_iArrayChangeAllTcsSprite2DVertex_t swig_types[116]
+#define SWIGTYPE_p_iArrayChangeAllTcsVector3_t swig_types[117]
+#define SWIGTYPE_p_iArrayChangeElementsTcsCollisionPair_t swig_types[118]
+#define SWIGTYPE_p_iArrayChangeElementsTcsShaderVariable_p_t swig_types[119]
+#define SWIGTYPE_p_iArrayChangeElementsTcsSprite2DVertex_t swig_types[120]
+#define SWIGTYPE_p_iArrayChangeElementsTcsVector3_t swig_types[121]
+#define SWIGTYPE_p_iArrayReadOnlyTcsCollisionPair_t swig_types[122]
+#define SWIGTYPE_p_iArrayReadOnlyTcsShaderVariable_p_t swig_types[123]
+#define SWIGTYPE_p_iArrayReadOnlyTcsSprite2DVertex_t swig_types[124]
+#define SWIGTYPE_p_iArrayReadOnlyTcsVector3_t swig_types[125]
+#define SWIGTYPE_p_iBase swig_types[126]
+#define SWIGTYPE_p_iBodyGroup swig_types[127]
+#define SWIGTYPE_p_iBugPlug swig_types[128]
+#define SWIGTYPE_p_iBugPlugRenderObject swig_types[129]
+#define SWIGTYPE_p_iCacheManager swig_types[130]
+#define SWIGTYPE_p_iClipper2D swig_types[131]
+#define SWIGTYPE_p_iCollideSystem swig_types[132]
+#define SWIGTYPE_p_iCollider swig_types[133]
+#define SWIGTYPE_p_iColoredVertices swig_types[134]
+#define SWIGTYPE_p_iCommandLineParser swig_types[135]
+#define SWIGTYPE_p_iComponent swig_types[136]
+#define SWIGTYPE_p_iConfigFile swig_types[137]
+#define SWIGTYPE_p_iConfigIterator swig_types[138]
+#define SWIGTYPE_p_iConfigManager swig_types[139]
+#define SWIGTYPE_p_iConsoleOutput swig_types[140]
+#define SWIGTYPE_p_iConsoleWatcher swig_types[141]
+#define SWIGTYPE_p_iDataBuffer swig_types[142]
+#define SWIGTYPE_p_iDebugHelper swig_types[143]
+#define SWIGTYPE_p_iDecalBuilder swig_types[144]
+#define SWIGTYPE_p_iDecalManager swig_types[145]
+#define SWIGTYPE_p_iDecalTemplate swig_types[146]
+#define SWIGTYPE_p_iDocument swig_types[147]
+#define SWIGTYPE_p_iDocumentAttribute swig_types[148]
+#define SWIGTYPE_p_iDocumentAttributeIterator swig_types[149]
+#define SWIGTYPE_p_iDocumentNode swig_types[150]
+#define SWIGTYPE_p_iDocumentNodeIterator swig_types[151]
+#define SWIGTYPE_p_iDocumentSystem swig_types[152]
+#define SWIGTYPE_p_iDynamicSystem swig_types[153]
+#define SWIGTYPE_p_iDynamics swig_types[154]
+#define SWIGTYPE_p_iDynamicsColliderCollisionCallback swig_types[155]
+#define SWIGTYPE_p_iDynamicsCollisionCallback swig_types[156]
+#define SWIGTYPE_p_iDynamicsMoveCallback swig_types[157]
+#define SWIGTYPE_p_iDynamicsStepCallback swig_types[158]
+#define SWIGTYPE_p_iDynamicsSystemCollider swig_types[159]
+#define SWIGTYPE_p_iEngineSequenceManager swig_types[160]
+#define SWIGTYPE_p_iEngineSequenceParameters swig_types[161]
+#define SWIGTYPE_p_iEvent swig_types[162]
+#define SWIGTYPE_p_iEventAttributeIterator swig_types[163]
+#define SWIGTYPE_p_iEventCord swig_types[164]
+#define SWIGTYPE_p_iEventHandler swig_types[165]
+#define SWIGTYPE_p_iEventNameRegistry swig_types[166]
+#define SWIGTYPE_p_iEventOutlet swig_types[167]
+#define SWIGTYPE_p_iEventPlug swig_types[168]
+#define SWIGTYPE_p_iEventQueue swig_types[169]
+#define SWIGTYPE_p_iFactory swig_types[170]
+#define SWIGTYPE_p_iFile swig_types[171]
+#define SWIGTYPE_p_iFont swig_types[172]
+#define SWIGTYPE_p_iFontDeleteNotify swig_types[173]
+#define SWIGTYPE_p_iFontServer swig_types[174]
+#define SWIGTYPE_p_iGenMeshAnimationControl swig_types[175]
+#define SWIGTYPE_p_iGenMeshAnimationControl1_4 swig_types[176]
+#define SWIGTYPE_p_iGenMeshAnimationControlFactory swig_types[177]
+#define SWIGTYPE_p_iGenMeshAnimationControlType swig_types[178]
+#define SWIGTYPE_p_iGenMeshSkeletonControlState swig_types[179]
+#define SWIGTYPE_p_iGeneralFactoryState swig_types[180]
+#define SWIGTYPE_p_iGeneralMeshCommonState swig_types[181]
+#define SWIGTYPE_p_iGeneralMeshState swig_types[182]
+#define SWIGTYPE_p_iGeneralMeshSubMesh swig_types[183]
+#define SWIGTYPE_p_iGraphics2D swig_types[184]
+#define SWIGTYPE_p_iGraphics3D swig_types[185]
+#define SWIGTYPE_p_iHalo swig_types[186]
+#define SWIGTYPE_p_iImage swig_types[187]
+#define SWIGTYPE_p_iImageIO swig_types[188]
+#define SWIGTYPE_p_iJoint swig_types[189]
+#define SWIGTYPE_p_iJoystickDriver swig_types[190]
+#define SWIGTYPE_p_iKeyComposer swig_types[191]
+#define SWIGTYPE_p_iKeyboardDriver swig_types[192]
+#define SWIGTYPE_p_iMapNode swig_types[193]
+#define SWIGTYPE_p_iMaterial swig_types[194]
+#define SWIGTYPE_p_iMaterialWrapper swig_types[195]
+#define SWIGTYPE_p_iMeshFactoryWrapper swig_types[196]
+#define SWIGTYPE_p_iMeshObject swig_types[197]
+#define SWIGTYPE_p_iMeshObjectDrawCallback swig_types[198]
+#define SWIGTYPE_p_iMeshObjectFactory swig_types[199]
+#define SWIGTYPE_p_iMeshObjectType swig_types[200]
+#define SWIGTYPE_p_iMeshWrapper swig_types[201]
+#define SWIGTYPE_p_iMouseDriver swig_types[202]
+#define SWIGTYPE_p_iMovable swig_types[203]
+#define SWIGTYPE_p_iMovieRecorder swig_types[204]
+#define SWIGTYPE_p_iNativeWindow swig_types[205]
+#define SWIGTYPE_p_iNativeWindowManager swig_types[206]
+#define SWIGTYPE_p_iODEAMotorJoint swig_types[207]
+#define SWIGTYPE_p_iODEBallJoint swig_types[208]
+#define SWIGTYPE_p_iODEDynamicState swig_types[209]
+#define SWIGTYPE_p_iODEDynamicSystemState swig_types[210]
+#define SWIGTYPE_p_iODEFrameUpdateCallback swig_types[211]
+#define SWIGTYPE_p_iODEGeneralJointState swig_types[212]
+#define SWIGTYPE_p_iODEHinge2Joint swig_types[213]
+#define SWIGTYPE_p_iODEHingeJoint swig_types[214]
+#define SWIGTYPE_p_iODEJointState swig_types[215]
+#define SWIGTYPE_p_iODESliderJoint swig_types[216]
+#define SWIGTYPE_p_iODEUniversalJoint swig_types[217]
+#define SWIGTYPE_p_iObject swig_types[218]
+#define SWIGTYPE_p_iObjectIterator swig_types[219]
+#define SWIGTYPE_p_iObjectModel swig_types[220]
+#define SWIGTYPE_p_iObjectModelListener swig_types[221]
+#define SWIGTYPE_p_iObjectNameChangeListener swig_types[222]
+#define SWIGTYPE_p_iObjectRegistry swig_types[223]
+#define SWIGTYPE_p_iObjectRegistryIterator swig_types[224]
+#define SWIGTYPE_p_iOffscreenCanvasCallback swig_types[225]
+#define SWIGTYPE_p_iParameterESM swig_types[226]
+#define SWIGTYPE_p_iParticleBuiltinEffectorFactory swig_types[227]
+#define SWIGTYPE_p_iParticleBuiltinEffectorForce swig_types[228]
+#define SWIGTYPE_p_iParticleBuiltinEffectorLinColor swig_types[229]
+#define SWIGTYPE_p_iParticleBuiltinEffectorVelocityField swig_types[230]
+#define SWIGTYPE_p_iParticleBuiltinEmitterBase swig_types[231]
+#define SWIGTYPE_p_iParticleBuiltinEmitterBox swig_types[232]
+#define SWIGTYPE_p_iParticleBuiltinEmitterCone swig_types[233]
+#define SWIGTYPE_p_iParticleBuiltinEmitterCylinder swig_types[234]
+#define SWIGTYPE_p_iParticleBuiltinEmitterFactory swig_types[235]
+#define SWIGTYPE_p_iParticleBuiltinEmitterSphere swig_types[236]
+#define SWIGTYPE_p_iParticleEffector swig_types[237]
+#define SWIGTYPE_p_iParticleEmitter swig_types[238]
+#define SWIGTYPE_p_iParticleSystem swig_types[239]
+#define SWIGTYPE_p_iParticleSystemBase swig_types[240]
+#define SWIGTYPE_p_iParticleSystemFactory swig_types[241]
+#define SWIGTYPE_p_iPath swig_types[242]
+#define SWIGTYPE_p_iPluginIterator swig_types[243]
+#define SWIGTYPE_p_iPluginManager swig_types[244]
+#define SWIGTYPE_p_iPolygonHandle swig_types[245]
+#define SWIGTYPE_p_iProcTexture swig_types[246]
+#define SWIGTYPE_p_iRenderBuffer swig_types[247]
+#define SWIGTYPE_p_iRenderView swig_types[248]
+#define SWIGTYPE_p_iRendererLightmap swig_types[249]
+#define SWIGTYPE_p_iReporter swig_types[250]
+#define SWIGTYPE_p_iReporterIterator swig_types[251]
+#define SWIGTYPE_p_iReporterListener swig_types[252]
+#define SWIGTYPE_p_iRigidBody swig_types[253]
+#define SWIGTYPE_p_iSCF swig_types[254]
+#define SWIGTYPE_p_iSceneNode swig_types[255]
+#define SWIGTYPE_p_iScript swig_types[256]
+#define SWIGTYPE_p_iScriptObject swig_types[257]
+#define SWIGTYPE_p_iScriptValue swig_types[258]
+#define SWIGTYPE_p_iSequence swig_types[259]
+#define SWIGTYPE_p_iSequenceCondition swig_types[260]
+#define SWIGTYPE_p_iSequenceManager swig_types[261]
+#define SWIGTYPE_p_iSequenceOperation swig_types[262]
+#define SWIGTYPE_p_iSequenceTimedOperation swig_types[263]
+#define SWIGTYPE_p_iSequenceTrigger swig_types[264]
+#define SWIGTYPE_p_iSequenceWrapper swig_types[265]
+#define SWIGTYPE_p_iShader swig_types[266]
+#define SWIGTYPE_p_iShaderCompiler swig_types[267]
+#define SWIGTYPE_p_iShaderManager swig_types[268]
+#define SWIGTYPE_p_iShaderPriorityList swig_types[269]
+#define SWIGTYPE_p_iShaderVarStringSet swig_types[270]
+#define SWIGTYPE_p_iShaderVariableAccessor swig_types[271]
+#define SWIGTYPE_p_iShaderVariableContext swig_types[272]
+#define SWIGTYPE_p_iSimpleFormerState swig_types[273]
+#define SWIGTYPE_p_iSkeleton swig_types[274]
+#define SWIGTYPE_p_iSkeleton2 swig_types[275]
+#define SWIGTYPE_p_iSkeletonAnimCallback2 swig_types[276]
+#define SWIGTYPE_p_iSkeletonAnimNode2 swig_types[277]
+#define SWIGTYPE_p_iSkeletonAnimNodeFactory2 swig_types[278]
+#define SWIGTYPE_p_iSkeletonAnimPacket2 swig_types[279]
+#define SWIGTYPE_p_iSkeletonAnimPacketFactory2 swig_types[280]
+#define SWIGTYPE_p_iSkeletonAnimation swig_types[281]
+#define SWIGTYPE_p_iSkeletonAnimation2 swig_types[282]
+#define SWIGTYPE_p_iSkeletonAnimationCallback swig_types[283]
+#define SWIGTYPE_p_iSkeletonAnimationInstance swig_types[284]
+#define SWIGTYPE_p_iSkeletonAnimationKeyFrame swig_types[285]
+#define SWIGTYPE_p_iSkeletonAnimationNode2 swig_types[286]
+#define SWIGTYPE_p_iSkeletonAnimationNodeFactory2 swig_types[287]
+#define SWIGTYPE_p_iSkeletonBlendNode2 swig_types[288]
+#define SWIGTYPE_p_iSkeletonBlendNodeFactory2 swig_types[289]
+#define SWIGTYPE_p_iSkeletonBone swig_types[290]
+#define SWIGTYPE_p_iSkeletonBoneFactory swig_types[291]
+#define SWIGTYPE_p_iSkeletonBoneRagdollInfo swig_types[292]
+#define SWIGTYPE_p_iSkeletonBoneUpdateCallback swig_types[293]
+#define SWIGTYPE_p_iSkeletonFSMNode2 swig_types[294]
+#define SWIGTYPE_p_iSkeletonFSMNodeFactory2 swig_types[295]
+#define SWIGTYPE_p_iSkeletonFactory swig_types[296]
+#define SWIGTYPE_p_iSkeletonFactory2 swig_types[297]
+#define SWIGTYPE_p_iSkeletonGraveyard swig_types[298]
+#define SWIGTYPE_p_iSkeletonManager2 swig_types[299]
+#define SWIGTYPE_p_iSkeletonPriorityNode2 swig_types[300]
+#define SWIGTYPE_p_iSkeletonPriorityNodeFactory2 swig_types[301]
+#define SWIGTYPE_p_iSkeletonRandomNode2 swig_types[302]
+#define SWIGTYPE_p_iSkeletonRandomNodeFactory2 swig_types[303]
+#define SWIGTYPE_p_iSkeletonSocket swig_types[304]
+#define SWIGTYPE_p_iSkeletonSocketFactory swig_types[305]
+#define SWIGTYPE_p_iSkeletonUpdateCallback swig_types[306]
+#define SWIGTYPE_p_iSprite2DFactoryState swig_types[307]
+#define SWIGTYPE_p_iSprite2DState swig_types[308]
+#define SWIGTYPE_p_iSprite2DUVAnimation swig_types[309]
+#define SWIGTYPE_p_iSprite2DUVAnimationFrame swig_types[310]
+#define SWIGTYPE_p_iSprite3DFactoryState swig_types[311]
+#define SWIGTYPE_p_iSprite3DState swig_types[312]
+#define SWIGTYPE_p_iSpriteAction swig_types[313]
+#define SWIGTYPE_p_iSpriteCal3DFactoryState swig_types[314]
+#define SWIGTYPE_p_iSpriteCal3DSocket swig_types[315]
+#define SWIGTYPE_p_iSpriteCal3DState swig_types[316]
+#define SWIGTYPE_p_iSpriteFrame swig_types[317]
+#define SWIGTYPE_p_iSpriteSocket swig_types[318]
+#define SWIGTYPE_p_iStandardReporterListener swig_types[319]
+#define SWIGTYPE_p_iString swig_types[320]
+#define SWIGTYPE_p_iStringArray swig_types[321]
+#define SWIGTYPE_p_iStringSet swig_types[322]
+#define SWIGTYPE_p_iStringSetBaseTCS__StringSetTag__General_t swig_types[323]
+#define SWIGTYPE_p_iStringSetBaseTCS__StringSetTag__ShaderVar_t swig_types[324]
+#define SWIGTYPE_p_iSuperLightmap swig_types[325]
+#define SWIGTYPE_p_iTerraFormer swig_types[326]
+#define SWIGTYPE_p_iTerraSampler swig_types[327]
+#define SWIGTYPE_p_iTerrainCell swig_types[328]
+#define SWIGTYPE_p_iTerrainCellCollisionProperties swig_types[329]
+#define SWIGTYPE_p_iTerrainCellFeederProperties swig_types[330]
+#define SWIGTYPE_p_iTerrainCellHeightDataCallback swig_types[331]
+#define SWIGTYPE_p_iTerrainCellLoadCallback swig_types[332]
+#define SWIGTYPE_p_iTerrainCellRenderProperties swig_types[333]
+#define SWIGTYPE_p_iTerrainCollider swig_types[334]
+#define SWIGTYPE_p_iTerrainCollisionPairArray swig_types[335]
+#define SWIGTYPE_p_iTerrainDataFeeder swig_types[336]
+#define SWIGTYPE_p_iTerrainFactory swig_types[337]
+#define SWIGTYPE_p_iTerrainFactoryCell swig_types[338]
+#define SWIGTYPE_p_iTerrainFactoryState swig_types[339]
+#define SWIGTYPE_p_iTerrainObjectState swig_types[340]
+#define SWIGTYPE_p_iTerrainRenderer swig_types[341]
+#define SWIGTYPE_p_iTerrainSystem swig_types[342]
+#define SWIGTYPE_p_iTerrainVector3Array swig_types[343]
+#define SWIGTYPE_p_iTextureHandle swig_types[344]
+#define SWIGTYPE_p_iTextureManager swig_types[345]
+#define SWIGTYPE_p_iThingEnvironment swig_types[346]
+#define SWIGTYPE_p_iThingFactoryState swig_types[347]
+#define SWIGTYPE_p_iThingState swig_types[348]
+#define SWIGTYPE_p_iTranslator swig_types[349]
+#define SWIGTYPE_p_iTriangleMesh swig_types[350]
+#define SWIGTYPE_p_iTriangleMeshIterator swig_types[351]
+#define SWIGTYPE_p_iVFS swig_types[352]
+#define SWIGTYPE_p_iView swig_types[353]
+#define SWIGTYPE_p_iVirtualClock swig_types[354]
+#define SWIGTYPE_p_int swig_types[355]
+#define SWIGTYPE_p_int16_t swig_types[356]
+#define SWIGTYPE_p_int64_t swig_types[357]
+#define SWIGTYPE_p_int8_t swig_types[358]
+#define SWIGTYPE_p_long_long swig_types[359]
+#define SWIGTYPE_p_p_CS__Graphics__RenderMesh swig_types[360]
+#define SWIGTYPE_p_p_iLight swig_types[361]
+#define SWIGTYPE_p_p_iMaterialWrapper swig_types[362]
+#define SWIGTYPE_p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[363]
+#define SWIGTYPE_p_scfImplementation1TcsImageBase_iImage_t swig_types[364]
+#define SWIGTYPE_p_scfImplementation1TcsObject_iObject_t swig_types[365]
+#define SWIGTYPE_p_scfImplementation1TcsPath_iPath_t swig_types[366]
+#define SWIGTYPE_p_scfImplementation1TcsTriangleMeshBox_iTriangleMesh_t swig_types[367]
+#define SWIGTYPE_p_scfImplementation1TcsTriangleMeshPointer_iTriangleMesh_t swig_types[368]
+#define SWIGTYPE_p_scfImplementation1TcsTriangleMesh_iTriangleMesh_t swig_types[369]
+#define SWIGTYPE_p_scfImplementationExt0TcsImageMemory_csImageBase_t swig_types[370]
+#define SWIGTYPE_p_size_t swig_types[371]
+#define SWIGTYPE_p_uint16_t swig_types[372]
+#define SWIGTYPE_p_uint32_t swig_types[373]
+#define SWIGTYPE_p_uint64_t swig_types[374]
+#define SWIGTYPE_p_unsigned_char swig_types[375]
+#define SWIGTYPE_p_unsigned_int swig_types[376]
+#define SWIGTYPE_p_unsigned_long swig_types[377]
+#define SWIGTYPE_p_unsigned_long_long swig_types[378]
+static swig_type_info *swig_types[380];
+static swig_module_info swig_module = {swig_types, 379, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -3451,10 +3448,22 @@ SWIGINTERN int iSkeletonAnimNodeFactory2_scfGetVersion(){ return scfInterfaceTra
 SWIGINTERN void delete_iSkeletonAnimNodeFactory2(iSkeletonAnimNodeFactory2 *self){ if (self) self->DecRef (); }
 SWIGINTERN int iSkeletonAnimNode2_scfGetVersion(){ return scfInterfaceTraits<iSkeletonAnimNode2>::GetVersion(); }
 SWIGINTERN void delete_iSkeletonAnimNode2(iSkeletonAnimNode2 *self){ if (self) self->DecRef (); }
+SWIGINTERN int iSkeletonAnimationNodeFactory2_scfGetVersion(){ return scfInterfaceTraits<iSkeletonAnimationNodeFactory2>::GetVersion(); }
+SWIGINTERN void delete_iSkeletonAnimationNodeFactory2(iSkeletonAnimationNodeFactory2 *self){ if (self) self->DecRef (); }
+SWIGINTERN int iSkeletonAnimationNode2_scfGetVersion(){ return scfInterfaceTraits<iSkeletonAnimationNode2>::GetVersion(); }
+SWIGINTERN void delete_iSkeletonAnimationNode2(iSkeletonAnimationNode2 *self){ if (self) self->DecRef (); }
 SWIGINTERN int iSkeletonBlendNodeFactory2_scfGetVersion(){ return scfInterfaceTraits<iSkeletonBlendNodeFactory2>::GetVersion(); }
 SWIGINTERN void delete_iSkeletonBlendNodeFactory2(iSkeletonBlendNodeFactory2 *self){ if (self) self->DecRef (); }
 SWIGINTERN int iSkeletonBlendNode2_scfGetVersion(){ return scfInterfaceTraits<iSkeletonBlendNode2>::GetVersion(); }
 SWIGINTERN void delete_iSkeletonBlendNode2(iSkeletonBlendNode2 *self){ if (self) self->DecRef (); }
+SWIGINTERN int iSkeletonPriorityNodeFactory2_scfGetVersion(){ return scfInterfaceTraits<iSkeletonPriorityNodeFactory2>::GetVersion(); }
+SWIGINTERN void delete_iSkeletonPriorityNodeFactory2(iSkeletonPriorityNodeFactory2 *self){ if (self) self->DecRef (); }
+SWIGINTERN int iSkeletonPriorityNode2_scfGetVersion(){ return scfInterfaceTraits<iSkeletonPriorityNode2>::GetVersion(); }
+SWIGINTERN void delete_iSkeletonPriorityNode2(iSkeletonPriorityNode2 *self){ if (self) self->DecRef (); }
+SWIGINTERN int iSkeletonFSMNodeFactory2_scfGetVersion(){ return scfInterfaceTraits<iSkeletonFSMNodeFactory2>::GetVersion(); }
+SWIGINTERN void delete_iSkeletonFSMNodeFactory2(iSkeletonFSMNodeFactory2 *self){ if (self) self->DecRef (); }
+SWIGINTERN int iSkeletonFSMNode2_scfGetVersion(){ return scfInterfaceTraits<iSkeletonFSMNode2>::GetVersion(); }
+SWIGINTERN void delete_iSkeletonFSMNode2(iSkeletonFSMNode2 *self){ if (self) self->DecRef (); }
 SWIGINTERN csSprite2DVertex *iSprite2DState_GetVertexByIndex(iSprite2DState *self,int index){ return &self->GetVertices()->Get(index); }
 SWIGINTERN int iSprite2DState_GetVertexCount(iSprite2DState *self){ return self->GetVertices()->GetSize(); }
 SWIGINTERN int iSprite2DState_scfGetVersion(){ return scfInterfaceTraits<iSprite2DState>::GetVersion(); }
@@ -15774,16 +15783,16 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory2_GetTransformBoneSpace(PyObject *SWI
   int res1 = 0 ;
   unsigned int val2 ;
   int ecode2 = 0 ;
-  void *argp3 = 0 ;
-  int res3 = 0 ;
-  void *argp4 = 0 ;
-  int res4 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFactory2_GetTransformBoneSpace",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  {
+    arg3 = new csQuaternion();
+  }
+  {
+    arg4 = new csVector3();
+  }
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFactory2_GetTransformBoneSpace",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonFactory2, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory2_GetTransformBoneSpace" "', argument " "1"" of type '" "iSkeletonFactory2 const *""'"); 
@@ -15794,24 +15803,14 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory2_GetTransformBoneSpace(PyObject *SWI
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeletonFactory2_GetTransformBoneSpace" "', argument " "2"" of type '" "BoneID""'");
   } 
   arg2 = static_cast< BoneID >(val2);
-  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csQuaternion,  0 );
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iSkeletonFactory2_GetTransformBoneSpace" "', argument " "3"" of type '" "csQuaternion &""'"); 
-  }
-  if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iSkeletonFactory2_GetTransformBoneSpace" "', argument " "3"" of type '" "csQuaternion &""'"); 
-  }
-  arg3 = reinterpret_cast< csQuaternion * >(argp3);
-  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csVector3,  0 );
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iSkeletonFactory2_GetTransformBoneSpace" "', argument " "4"" of type '" "csVector3 &""'"); 
-  }
-  if (!argp4) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iSkeletonFactory2_GetTransformBoneSpace" "', argument " "4"" of type '" "csVector3 &""'"); 
-  }
-  arg4 = reinterpret_cast< csVector3 * >(argp4);
   ((iSkeletonFactory2 const *)arg1)->GetTransformBoneSpace(arg2,*arg3,*arg4);
   resultobj = SWIG_Py_Void();
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg3, SWIG_TypeQuery("csQuaternion" " *"), 1);
+  }
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg4, SWIG_TypeQuery("csVector3" " *"), 1);
+  }
   return resultobj;
 fail:
   return NULL;
@@ -15828,16 +15827,16 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory2_SetTransformBoneSpace(PyObject *SWI
   int res1 = 0 ;
   unsigned int val2 ;
   int ecode2 = 0 ;
-  void *argp3 = 0 ;
-  int res3 = 0 ;
-  void *argp4 = 0 ;
-  int res4 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFactory2_SetTransformBoneSpace",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  {
+    arg3 = new csQuaternion();
+  }
+  {
+    arg4 = new csVector3();
+  }
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFactory2_SetTransformBoneSpace",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonFactory2, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory2_SetTransformBoneSpace" "', argument " "1"" of type '" "iSkeletonFactory2 *""'"); 
@@ -15848,24 +15847,14 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory2_SetTransformBoneSpace(PyObject *SWI
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeletonFactory2_SetTransformBoneSpace" "', argument " "2"" of type '" "BoneID""'");
   } 
   arg2 = static_cast< BoneID >(val2);
-  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csQuaternion,  0  | 0);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iSkeletonFactory2_SetTransformBoneSpace" "', argument " "3"" of type '" "csQuaternion const &""'"); 
-  }
-  if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iSkeletonFactory2_SetTransformBoneSpace" "', argument " "3"" of type '" "csQuaternion const &""'"); 
-  }
-  arg3 = reinterpret_cast< csQuaternion * >(argp3);
-  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csVector3,  0  | 0);
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iSkeletonFactory2_SetTransformBoneSpace" "', argument " "4"" of type '" "csVector3 const &""'"); 
-  }
-  if (!argp4) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iSkeletonFactory2_SetTransformBoneSpace" "', argument " "4"" of type '" "csVector3 const &""'"); 
-  }
-  arg4 = reinterpret_cast< csVector3 * >(argp4);
   (arg1)->SetTransformBoneSpace(arg2,(csQuaternion const &)*arg3,(csVector3 const &)*arg4);
   resultobj = SWIG_Py_Void();
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg3, SWIG_TypeQuery("csQuaternion" " *"), 1);
+  }
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg4, SWIG_TypeQuery("csVector3" " *"), 1);
+  }
   return resultobj;
 fail:
   return NULL;
@@ -15882,16 +15871,16 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory2_GetTransformAbsSpace(PyObject *SWIG
   int res1 = 0 ;
   unsigned int val2 ;
   int ecode2 = 0 ;
-  void *argp3 = 0 ;
-  int res3 = 0 ;
-  void *argp4 = 0 ;
-  int res4 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFactory2_GetTransformAbsSpace",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  {
+    arg3 = new csQuaternion();
+  }
+  {
+    arg4 = new csVector3();
+  }
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFactory2_GetTransformAbsSpace",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonFactory2, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory2_GetTransformAbsSpace" "', argument " "1"" of type '" "iSkeletonFactory2 const *""'"); 
@@ -15902,24 +15891,14 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory2_GetTransformAbsSpace(PyObject *SWIG
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeletonFactory2_GetTransformAbsSpace" "', argument " "2"" of type '" "BoneID""'");
   } 
   arg2 = static_cast< BoneID >(val2);
-  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csQuaternion,  0 );
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iSkeletonFactory2_GetTransformAbsSpace" "', argument " "3"" of type '" "csQuaternion &""'"); 
-  }
-  if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iSkeletonFactory2_GetTransformAbsSpace" "', argument " "3"" of type '" "csQuaternion &""'"); 
-  }
-  arg3 = reinterpret_cast< csQuaternion * >(argp3);
-  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csVector3,  0 );
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iSkeletonFactory2_GetTransformAbsSpace" "', argument " "4"" of type '" "csVector3 &""'"); 
-  }
-  if (!argp4) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iSkeletonFactory2_GetTransformAbsSpace" "', argument " "4"" of type '" "csVector3 &""'"); 
-  }
-  arg4 = reinterpret_cast< csVector3 * >(argp4);
   ((iSkeletonFactory2 const *)arg1)->GetTransformAbsSpace(arg2,*arg3,*arg4);
   resultobj = SWIG_Py_Void();
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg3, SWIG_TypeQuery("csQuaternion" " *"), 1);
+  }
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg4, SWIG_TypeQuery("csVector3" " *"), 1);
+  }
   return resultobj;
 fail:
   return NULL;
@@ -15936,16 +15915,16 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory2_SetTransformAbsSpace(PyObject *SWIG
   int res1 = 0 ;
   unsigned int val2 ;
   int ecode2 = 0 ;
-  void *argp3 = 0 ;
-  int res3 = 0 ;
-  void *argp4 = 0 ;
-  int res4 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFactory2_SetTransformAbsSpace",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  {
+    arg3 = new csQuaternion();
+  }
+  {
+    arg4 = new csVector3();
+  }
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFactory2_SetTransformAbsSpace",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonFactory2, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory2_SetTransformAbsSpace" "', argument " "1"" of type '" "iSkeletonFactory2 *""'"); 
@@ -15956,24 +15935,14 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory2_SetTransformAbsSpace(PyObject *SWIG
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeletonFactory2_SetTransformAbsSpace" "', argument " "2"" of type '" "BoneID""'");
   } 
   arg2 = static_cast< BoneID >(val2);
-  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csQuaternion,  0  | 0);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iSkeletonFactory2_SetTransformAbsSpace" "', argument " "3"" of type '" "csQuaternion const &""'"); 
-  }
-  if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iSkeletonFactory2_SetTransformAbsSpace" "', argument " "3"" of type '" "csQuaternion const &""'"); 
-  }
-  arg3 = reinterpret_cast< csQuaternion * >(argp3);
-  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csVector3,  0  | 0);
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iSkeletonFactory2_SetTransformAbsSpace" "', argument " "4"" of type '" "csVector3 const &""'"); 
-  }
-  if (!argp4) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iSkeletonFactory2_SetTransformAbsSpace" "', argument " "4"" of type '" "csVector3 const &""'"); 
-  }
-  arg4 = reinterpret_cast< csVector3 * >(argp4);
   (arg1)->SetTransformAbsSpace(arg2,(csQuaternion const &)*arg3,(csVector3 const &)*arg4);
   resultobj = SWIG_Py_Void();
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg3, SWIG_TypeQuery("csQuaternion" " *"), 1);
+  }
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg4, SWIG_TypeQuery("csVector3" " *"), 1);
+  }
   return resultobj;
 fail:
   return NULL;
@@ -16140,16 +16109,16 @@ SWIGINTERN PyObject *_wrap_iSkeleton2_GetTransformBoneSpace(PyObject *SWIGUNUSED
   int res1 = 0 ;
   unsigned int val2 ;
   int ecode2 = 0 ;
-  void *argp3 = 0 ;
-  int res3 = 0 ;
-  void *argp4 = 0 ;
-  int res4 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton2_GetTransformBoneSpace",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  {
+    arg3 = new csQuaternion();
+  }
+  {
+    arg4 = new csVector3();
+  }
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton2_GetTransformBoneSpace",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton2, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton2_GetTransformBoneSpace" "', argument " "1"" of type '" "iSkeleton2 const *""'"); 
@@ -16160,24 +16129,14 @@ SWIGINTERN PyObject *_wrap_iSkeleton2_GetTransformBoneSpace(PyObject *SWIGUNUSED
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeleton2_GetTransformBoneSpace" "', argument " "2"" of type '" "BoneID""'");
   } 
   arg2 = static_cast< BoneID >(val2);
-  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csQuaternion,  0 );
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iSkeleton2_GetTransformBoneSpace" "', argument " "3"" of type '" "csQuaternion &""'"); 
-  }
-  if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iSkeleton2_GetTransformBoneSpace" "', argument " "3"" of type '" "csQuaternion &""'"); 
-  }
-  arg3 = reinterpret_cast< csQuaternion * >(argp3);
-  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csVector3,  0 );
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iSkeleton2_GetTransformBoneSpace" "', argument " "4"" of type '" "csVector3 &""'"); 
-  }
-  if (!argp4) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iSkeleton2_GetTransformBoneSpace" "', argument " "4"" of type '" "csVector3 &""'"); 
-  }
-  arg4 = reinterpret_cast< csVector3 * >(argp4);
   ((iSkeleton2 const *)arg1)->GetTransformBoneSpace(arg2,*arg3,*arg4);
   resultobj = SWIG_Py_Void();
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg3, SWIG_TypeQuery("csQuaternion" " *"), 1);
+  }
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg4, SWIG_TypeQuery("csVector3" " *"), 1);
+  }
   return resultobj;
 fail:
   return NULL;
@@ -16194,16 +16153,16 @@ SWIGINTERN PyObject *_wrap_iSkeleton2_SetTransformBoneSpace(PyObject *SWIGUNUSED
   int res1 = 0 ;
   unsigned int val2 ;
   int ecode2 = 0 ;
-  void *argp3 = 0 ;
-  int res3 = 0 ;
-  void *argp4 = 0 ;
-  int res4 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton2_SetTransformBoneSpace",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  {
+    arg3 = new csQuaternion();
+  }
+  {
+    arg4 = new csVector3();
+  }
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton2_SetTransformBoneSpace",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton2, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton2_SetTransformBoneSpace" "', argument " "1"" of type '" "iSkeleton2 *""'"); 
@@ -16214,24 +16173,14 @@ SWIGINTERN PyObject *_wrap_iSkeleton2_SetTransformBoneSpace(PyObject *SWIGUNUSED
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeleton2_SetTransformBoneSpace" "', argument " "2"" of type '" "BoneID""'");
   } 
   arg2 = static_cast< BoneID >(val2);
-  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csQuaternion,  0  | 0);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iSkeleton2_SetTransformBoneSpace" "', argument " "3"" of type '" "csQuaternion const &""'"); 
-  }
-  if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iSkeleton2_SetTransformBoneSpace" "', argument " "3"" of type '" "csQuaternion const &""'"); 
-  }
-  arg3 = reinterpret_cast< csQuaternion * >(argp3);
-  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csVector3,  0  | 0);
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iSkeleton2_SetTransformBoneSpace" "', argument " "4"" of type '" "csVector3 const &""'"); 
-  }
-  if (!argp4) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iSkeleton2_SetTransformBoneSpace" "', argument " "4"" of type '" "csVector3 const &""'"); 
-  }
-  arg4 = reinterpret_cast< csVector3 * >(argp4);
   (arg1)->SetTransformBoneSpace(arg2,(csQuaternion const &)*arg3,(csVector3 const &)*arg4);
   resultobj = SWIG_Py_Void();
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg3, SWIG_TypeQuery("csQuaternion" " *"), 1);
+  }
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg4, SWIG_TypeQuery("csVector3" " *"), 1);
+  }
   return resultobj;
 fail:
   return NULL;
@@ -16248,16 +16197,16 @@ SWIGINTERN PyObject *_wrap_iSkeleton2_GetTransformAbsSpace(PyObject *SWIGUNUSEDP
   int res1 = 0 ;
   unsigned int val2 ;
   int ecode2 = 0 ;
-  void *argp3 = 0 ;
-  int res3 = 0 ;
-  void *argp4 = 0 ;
-  int res4 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton2_GetTransformAbsSpace",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  {
+    arg3 = new csQuaternion();
+  }
+  {
+    arg4 = new csVector3();
+  }
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton2_GetTransformAbsSpace",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton2, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton2_GetTransformAbsSpace" "', argument " "1"" of type '" "iSkeleton2 const *""'"); 
@@ -16268,24 +16217,14 @@ SWIGINTERN PyObject *_wrap_iSkeleton2_GetTransformAbsSpace(PyObject *SWIGUNUSEDP
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeleton2_GetTransformAbsSpace" "', argument " "2"" of type '" "BoneID""'");
   } 
   arg2 = static_cast< BoneID >(val2);
-  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csQuaternion,  0 );
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iSkeleton2_GetTransformAbsSpace" "', argument " "3"" of type '" "csQuaternion &""'"); 
-  }
-  if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iSkeleton2_GetTransformAbsSpace" "', argument " "3"" of type '" "csQuaternion &""'"); 
-  }
-  arg3 = reinterpret_cast< csQuaternion * >(argp3);
-  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csVector3,  0 );
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iSkeleton2_GetTransformAbsSpace" "', argument " "4"" of type '" "csVector3 &""'"); 
-  }
-  if (!argp4) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iSkeleton2_GetTransformAbsSpace" "', argument " "4"" of type '" "csVector3 &""'"); 
-  }
-  arg4 = reinterpret_cast< csVector3 * >(argp4);
   ((iSkeleton2 const *)arg1)->GetTransformAbsSpace(arg2,*arg3,*arg4);
   resultobj = SWIG_Py_Void();
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg3, SWIG_TypeQuery("csQuaternion" " *"), 1);
+  }
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg4, SWIG_TypeQuery("csVector3" " *"), 1);
+  }
   return resultobj;
 fail:
   return NULL;
@@ -16302,16 +16241,16 @@ SWIGINTERN PyObject *_wrap_iSkeleton2_SetTransformAbsSpace(PyObject *SWIGUNUSEDP
   int res1 = 0 ;
   unsigned int val2 ;
   int ecode2 = 0 ;
-  void *argp3 = 0 ;
-  int res3 = 0 ;
-  void *argp4 = 0 ;
-  int res4 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton2_SetTransformAbsSpace",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  {
+    arg3 = new csQuaternion();
+  }
+  {
+    arg4 = new csVector3();
+  }
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton2_SetTransformAbsSpace",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton2, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton2_SetTransformAbsSpace" "', argument " "1"" of type '" "iSkeleton2 *""'"); 
@@ -16322,24 +16261,14 @@ SWIGINTERN PyObject *_wrap_iSkeleton2_SetTransformAbsSpace(PyObject *SWIGUNUSEDP
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeleton2_SetTransformAbsSpace" "', argument " "2"" of type '" "BoneID""'");
   } 
   arg2 = static_cast< BoneID >(val2);
-  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csQuaternion,  0  | 0);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iSkeleton2_SetTransformAbsSpace" "', argument " "3"" of type '" "csQuaternion const &""'"); 
-  }
-  if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iSkeleton2_SetTransformAbsSpace" "', argument " "3"" of type '" "csQuaternion const &""'"); 
-  }
-  arg3 = reinterpret_cast< csQuaternion * >(argp3);
-  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csVector3,  0  | 0);
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iSkeleton2_SetTransformAbsSpace" "', argument " "4"" of type '" "csVector3 const &""'"); 
-  }
-  if (!argp4) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iSkeleton2_SetTransformAbsSpace" "', argument " "4"" of type '" "csVector3 const &""'"); 
-  }
-  arg4 = reinterpret_cast< csVector3 * >(argp4);
   (arg1)->SetTransformAbsSpace(arg2,(csQuaternion const &)*arg3,(csVector3 const &)*arg4);
   resultobj = SWIG_Py_Void();
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg3, SWIG_TypeQuery("csQuaternion" " *"), 1);
+  }
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg4, SWIG_TypeQuery("csVector3" " *"), 1);
+  }
   return resultobj;
 fail:
   return NULL;
@@ -16356,16 +16285,16 @@ SWIGINTERN PyObject *_wrap_iSkeleton2_GetTransformBindSpace(PyObject *SWIGUNUSED
   int res1 = 0 ;
   unsigned int val2 ;
   int ecode2 = 0 ;
-  void *argp3 = 0 ;
-  int res3 = 0 ;
-  void *argp4 = 0 ;
-  int res4 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton2_GetTransformBindSpace",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  {
+    arg3 = new csQuaternion();
+  }
+  {
+    arg4 = new csVector3();
+  }
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton2_GetTransformBindSpace",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton2, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton2_GetTransformBindSpace" "', argument " "1"" of type '" "iSkeleton2 const *""'"); 
@@ -16376,24 +16305,14 @@ SWIGINTERN PyObject *_wrap_iSkeleton2_GetTransformBindSpace(PyObject *SWIGUNUSED
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeleton2_GetTransformBindSpace" "', argument " "2"" of type '" "BoneID""'");
   } 
   arg2 = static_cast< BoneID >(val2);
-  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csQuaternion,  0 );
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iSkeleton2_GetTransformBindSpace" "', argument " "3"" of type '" "csQuaternion &""'"); 
-  }
-  if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iSkeleton2_GetTransformBindSpace" "', argument " "3"" of type '" "csQuaternion &""'"); 
-  }
-  arg3 = reinterpret_cast< csQuaternion * >(argp3);
-  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csVector3,  0 );
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iSkeleton2_GetTransformBindSpace" "', argument " "4"" of type '" "csVector3 &""'"); 
-  }
-  if (!argp4) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iSkeleton2_GetTransformBindSpace" "', argument " "4"" of type '" "csVector3 &""'"); 
-  }
-  arg4 = reinterpret_cast< csVector3 * >(argp4);
   ((iSkeleton2 const *)arg1)->GetTransformBindSpace(arg2,*arg3,*arg4);
   resultobj = SWIG_Py_Void();
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg3, SWIG_TypeQuery("csQuaternion" " *"), 1);
+  }
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg4, SWIG_TypeQuery("csVector3" " *"), 1);
+  }
   return resultobj;
 fail:
   return NULL;
@@ -16410,16 +16329,16 @@ SWIGINTERN PyObject *_wrap_iSkeleton2_SetTransformBindSpace(PyObject *SWIGUNUSED
   int res1 = 0 ;
   unsigned int val2 ;
   int ecode2 = 0 ;
-  void *argp3 = 0 ;
-  int res3 = 0 ;
-  void *argp4 = 0 ;
-  int res4 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton2_SetTransformBindSpace",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  {
+    arg3 = new csQuaternion();
+  }
+  {
+    arg4 = new csVector3();
+  }
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeleton2_SetTransformBindSpace",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeleton2, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton2_SetTransformBindSpace" "', argument " "1"" of type '" "iSkeleton2 *""'"); 
@@ -16430,24 +16349,14 @@ SWIGINTERN PyObject *_wrap_iSkeleton2_SetTransformBindSpace(PyObject *SWIGUNUSED
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeleton2_SetTransformBindSpace" "', argument " "2"" of type '" "BoneID""'");
   } 
   arg2 = static_cast< BoneID >(val2);
-  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csQuaternion,  0  | 0);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iSkeleton2_SetTransformBindSpace" "', argument " "3"" of type '" "csQuaternion const &""'"); 
-  }
-  if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iSkeleton2_SetTransformBindSpace" "', argument " "3"" of type '" "csQuaternion const &""'"); 
-  }
-  arg3 = reinterpret_cast< csQuaternion * >(argp3);
-  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csVector3,  0  | 0);
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iSkeleton2_SetTransformBindSpace" "', argument " "4"" of type '" "csVector3 const &""'"); 
-  }
-  if (!argp4) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iSkeleton2_SetTransformBindSpace" "', argument " "4"" of type '" "csVector3 const &""'"); 
-  }
-  arg4 = reinterpret_cast< csVector3 * >(argp4);
   (arg1)->SetTransformBindSpace(arg2,(csQuaternion const &)*arg3,(csVector3 const &)*arg4);
   resultobj = SWIG_Py_Void();
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg3, SWIG_TypeQuery("csQuaternion" " *"), 1);
+  }
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg4, SWIG_TypeQuery("csVector3" " *"), 1);
+  }
   return resultobj;
 fail:
   return NULL;
@@ -17398,7 +17307,19 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimPacketFactory2_CreateAnimationNode(PyObj
   }
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->CreateAnimationNode((char const *)arg2);
-  resultobj = SWIG_NewPointerObj((new csPtr<iSkeletonAnimationNodeFactory2 >(static_cast< const csPtr<iSkeletonAnimationNodeFactory2 >& >(result))), SWIGTYPE_p_csPtrTiSkeletonAnimationNodeFactory2_t, SWIG_POINTER_OWN |  0 );
+  {
+    /*@SWIG:./include/bindings/python/pythpre.i,117,TYPEMAP_OUT_csRef_BODY@*/
+    csRef<iSkeletonAnimationNodeFactory2> ref((csPtr<iSkeletonAnimationNodeFactory2>&)result); /* explicit cast */
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iSkeletonAnimationNodeFactory2 *)ref, SWIGTYPE_p_iSkeletonAnimationNodeFactory2, 1);
+    /*@SWIG@*/
+  }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
 fail:
@@ -17478,7 +17399,19 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimPacketFactory2_CreatePriorityNode(PyObje
   }
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->CreatePriorityNode((char const *)arg2);
-  resultobj = SWIG_NewPointerObj((new csPtr<iSkeletonPriorityNodeFactory2 >(static_cast< const csPtr<iSkeletonPriorityNodeFactory2 >& >(result))), SWIGTYPE_p_csPtrTiSkeletonPriorityNodeFactory2_t, SWIG_POINTER_OWN |  0 );
+  {
+    /*@SWIG:./include/bindings/python/pythpre.i,117,TYPEMAP_OUT_csRef_BODY@*/
+    csRef<iSkeletonPriorityNodeFactory2> ref((csPtr<iSkeletonPriorityNodeFactory2>&)result); /* explicit cast */
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iSkeletonPriorityNodeFactory2 *)ref, SWIGTYPE_p_iSkeletonPriorityNodeFactory2, 1);
+    /*@SWIG@*/
+  }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
 fail:
@@ -17546,7 +17479,19 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimPacketFactory2_CreateFSMNode(PyObject *S
   }
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->CreateFSMNode((char const *)arg2);
-  resultobj = SWIG_NewPointerObj((new csPtr<iSkeletonFSMNodeFactory2 >(static_cast< const csPtr<iSkeletonFSMNodeFactory2 >& >(result))), SWIGTYPE_p_csPtrTiSkeletonFSMNodeFactory2_t, SWIG_POINTER_OWN |  0 );
+  {
+    /*@SWIG:./include/bindings/python/pythpre.i,117,TYPEMAP_OUT_csRef_BODY@*/
+    csRef<iSkeletonFSMNodeFactory2> ref((csPtr<iSkeletonFSMNodeFactory2>&)result); /* explicit cast */
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iSkeletonFSMNodeFactory2 *)ref, SWIGTYPE_p_iSkeletonFSMNodeFactory2, 1);
+    /*@SWIG@*/
+  }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
 fail:
@@ -17782,15 +17727,15 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation2_AddKeyFrame(PyObject *SWIGUNUSEDP
   int ecode3 = 0 ;
   void *argp4 = 0 ;
   int res4 = 0 ;
-  void *argp5 = 0 ;
-  int res5 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
-  PyObject * obj4 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimation2_AddKeyFrame",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  {
+    arg5 = new csVector3();
+  }
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimation2_AddKeyFrame",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimation2, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimation2_AddKeyFrame" "', argument " "1"" of type '" "iSkeletonAnimation2 *""'"); 
@@ -17814,16 +17759,11 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation2_AddKeyFrame(PyObject *SWIGUNUSEDP
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iSkeletonAnimation2_AddKeyFrame" "', argument " "4"" of type '" "csQuaternion const &""'"); 
   }
   arg4 = reinterpret_cast< csQuaternion * >(argp4);
-  res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_csVector3,  0  | 0);
-  if (!SWIG_IsOK(res5)) {
-    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "iSkeletonAnimation2_AddKeyFrame" "', argument " "5"" of type '" "csVector3 const &""'"); 
-  }
-  if (!argp5) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iSkeletonAnimation2_AddKeyFrame" "', argument " "5"" of type '" "csVector3 const &""'"); 
-  }
-  arg5 = reinterpret_cast< csVector3 * >(argp5);
   (arg1)->AddKeyFrame(arg2,arg3,(csQuaternion const &)*arg4,(csVector3 const &)*arg5);
   resultobj = SWIG_Py_Void();
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg5, SWIG_TypeQuery("csVector3" " *"), 1);
+  }
   return resultobj;
 fail:
   return NULL;
@@ -17882,17 +17822,17 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation2_GetKeyFrame(PyObject *SWIGUNUSEDP
   int res5 = 0 ;
   void *argp6 = 0 ;
   int res6 = 0 ;
-  void *argp7 = 0 ;
-  int res7 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
   PyObject * obj5 = 0 ;
-  PyObject * obj6 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimation2_GetKeyFrame",7,7,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
+  {
+    arg7 = new csVector3();
+  }
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimation2_GetKeyFrame",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimation2, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimation2_GetKeyFrame" "', argument " "1"" of type '" "iSkeletonAnimation2 *""'"); 
@@ -17932,16 +17872,11 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation2_GetKeyFrame(PyObject *SWIGUNUSEDP
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iSkeletonAnimation2_GetKeyFrame" "', argument " "6"" of type '" "csQuaternion &""'"); 
   }
   arg6 = reinterpret_cast< csQuaternion * >(argp6);
-  res7 = SWIG_ConvertPtr(obj6, &argp7, SWIGTYPE_p_csVector3,  0 );
-  if (!SWIG_IsOK(res7)) {
-    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "iSkeletonAnimation2_GetKeyFrame" "', argument " "7"" of type '" "csVector3 &""'"); 
-  }
-  if (!argp7) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iSkeletonAnimation2_GetKeyFrame" "', argument " "7"" of type '" "csVector3 &""'"); 
-  }
-  arg7 = reinterpret_cast< csVector3 * >(argp7);
   (arg1)->GetKeyFrame(arg2,arg3,*arg4,*arg5,*arg6,*arg7);
   resultobj = SWIG_Py_Void();
+  {
+    resultobj = SWIG_NewPointerObj((void*)arg7, SWIG_TypeQuery("csVector3" " *"), 1);
+  }
   return resultobj;
 fail:
   return NULL;
@@ -19206,6 +19141,19 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iSkeletonAnimationNodeFactory2_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  int result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimationNodeFactory2_scfGetVersion",0,0)) SWIG_fail;
+  result = (int)iSkeletonAnimationNodeFactory2_scfGetVersion();
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_delete_iSkeletonAnimationNodeFactory2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iSkeletonAnimationNodeFactory2 *arg1 = (iSkeletonAnimationNodeFactory2 *) 0 ;
@@ -19219,7 +19167,7 @@ SWIGINTERN PyObject *_wrap_delete_iSkeletonAnimationNodeFactory2(PyObject *SWIGU
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSkeletonAnimationNodeFactory2" "', argument " "1"" of type '" "iSkeletonAnimationNodeFactory2 *""'"); 
   }
   arg1 = reinterpret_cast< iSkeletonAnimationNodeFactory2 * >(argp1);
-  delete arg1;
+  delete_iSkeletonAnimationNodeFactory2(arg1);
   
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -19235,6 +19183,19 @@ SWIGINTERN PyObject *iSkeletonAnimationNodeFactory2_swigregister(PyObject *SWIGU
   return SWIG_Py_Void();
 }
 
+SWIGINTERN PyObject *_wrap_iSkeletonAnimationNode2_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  int result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimationNode2_scfGetVersion",0,0)) SWIG_fail;
+  result = (int)iSkeletonAnimationNode2_scfGetVersion();
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_delete_iSkeletonAnimationNode2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iSkeletonAnimationNode2 *arg1 = (iSkeletonAnimationNode2 *) 0 ;
@@ -19248,7 +19209,7 @@ SWIGINTERN PyObject *_wrap_delete_iSkeletonAnimationNode2(PyObject *SWIGUNUSEDPA
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSkeletonAnimationNode2" "', argument " "1"" of type '" "iSkeletonAnimationNode2 *""'"); 
   }
   arg1 = reinterpret_cast< iSkeletonAnimationNode2 * >(argp1);
-  delete arg1;
+  delete_iSkeletonAnimationNode2(arg1);
   
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -19785,6 +19746,19 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iSkeletonPriorityNodeFactory2_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  int result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonPriorityNodeFactory2_scfGetVersion",0,0)) SWIG_fail;
+  result = (int)iSkeletonPriorityNodeFactory2_scfGetVersion();
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_delete_iSkeletonPriorityNodeFactory2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iSkeletonPriorityNodeFactory2 *arg1 = (iSkeletonPriorityNodeFactory2 *) 0 ;
@@ -19798,7 +19772,7 @@ SWIGINTERN PyObject *_wrap_delete_iSkeletonPriorityNodeFactory2(PyObject *SWIGUN
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSkeletonPriorityNodeFactory2" "', argument " "1"" of type '" "iSkeletonPriorityNodeFactory2 *""'"); 
   }
   arg1 = reinterpret_cast< iSkeletonPriorityNodeFactory2 * >(argp1);
-  delete arg1;
+  delete_iSkeletonPriorityNodeFactory2(arg1);
   
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -19853,6 +19827,19 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iSkeletonPriorityNode2_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  int result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonPriorityNode2_scfGetVersion",0,0)) SWIG_fail;
+  result = (int)iSkeletonPriorityNode2_scfGetVersion();
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_delete_iSkeletonPriorityNode2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iSkeletonPriorityNode2 *arg1 = (iSkeletonPriorityNode2 *) 0 ;
@@ -19866,7 +19853,7 @@ SWIGINTERN PyObject *_wrap_delete_iSkeletonPriorityNode2(PyObject *SWIGUNUSEDPAR
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSkeletonPriorityNode2" "', argument " "1"" of type '" "iSkeletonPriorityNode2 *""'"); 
   }
   arg1 = reinterpret_cast< iSkeletonPriorityNode2 * >(argp1);
-  delete arg1;
+  delete_iSkeletonPriorityNode2(arg1);
   
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -20459,6 +20446,19 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iSkeletonFSMNodeFactory2_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  int result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFSMNodeFactory2_scfGetVersion",0,0)) SWIG_fail;
+  result = (int)iSkeletonFSMNodeFactory2_scfGetVersion();
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_delete_iSkeletonFSMNodeFactory2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iSkeletonFSMNodeFactory2 *arg1 = (iSkeletonFSMNodeFactory2 *) 0 ;
@@ -20472,7 +20472,7 @@ SWIGINTERN PyObject *_wrap_delete_iSkeletonFSMNodeFactory2(PyObject *SWIGUNUSEDP
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSkeletonFSMNodeFactory2" "', argument " "1"" of type '" "iSkeletonFSMNodeFactory2 *""'"); 
   }
   arg1 = reinterpret_cast< iSkeletonFSMNodeFactory2 * >(argp1);
-  delete arg1;
+  delete_iSkeletonFSMNodeFactory2(arg1);
   
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -20540,6 +20540,19 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iSkeletonFSMNode2_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  int result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFSMNode2_scfGetVersion",0,0)) SWIG_fail;
+  result = (int)iSkeletonFSMNode2_scfGetVersion();
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_delete_iSkeletonFSMNode2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iSkeletonFSMNode2 *arg1 = (iSkeletonFSMNode2 *) 0 ;
@@ -20553,7 +20566,7 @@ SWIGINTERN PyObject *_wrap_delete_iSkeletonFSMNode2(PyObject *SWIGUNUSEDPARM(sel
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSkeletonFSMNode2" "', argument " "1"" of type '" "iSkeletonFSMNode2 *""'"); 
   }
   arg1 = reinterpret_cast< iSkeletonFSMNode2 * >(argp1);
-  delete arg1;
+  delete_iSkeletonFSMNode2(arg1);
   
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -48954,8 +48967,10 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSkeletonAnimationNodeFactory2_GetPlaybackSpeed", _wrap_iSkeletonAnimationNodeFactory2_GetPlaybackSpeed, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonAnimationNodeFactory2_SetAutomaticReset", _wrap_iSkeletonAnimationNodeFactory2_SetAutomaticReset, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonAnimationNodeFactory2_GetAutomaticReset", _wrap_iSkeletonAnimationNodeFactory2_GetAutomaticReset, METH_VARARGS, NULL},
+	 { (char *)"iSkeletonAnimationNodeFactory2_scfGetVersion", _wrap_iSkeletonAnimationNodeFactory2_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSkeletonAnimationNodeFactory2", _wrap_delete_iSkeletonAnimationNodeFactory2, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonAnimationNodeFactory2_swigregister", iSkeletonAnimationNodeFactory2_swigregister, METH_VARARGS, NULL},
+	 { (char *)"iSkeletonAnimationNode2_scfGetVersion", _wrap_iSkeletonAnimationNode2_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSkeletonAnimationNode2", _wrap_delete_iSkeletonAnimationNode2, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonAnimationNode2_swigregister", iSkeletonAnimationNode2_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonBlendNodeFactory2_AddNode", _wrap_iSkeletonBlendNodeFactory2_AddNode, METH_VARARGS, NULL},
@@ -48979,9 +48994,11 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSkeletonPriorityNodeFactory2_GetNode", _wrap_iSkeletonPriorityNodeFactory2_GetNode, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonPriorityNodeFactory2_GetNodeCount", _wrap_iSkeletonPriorityNodeFactory2_GetNodeCount, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonPriorityNodeFactory2_ClearNodes", _wrap_iSkeletonPriorityNodeFactory2_ClearNodes, METH_VARARGS, NULL},
+	 { (char *)"iSkeletonPriorityNodeFactory2_scfGetVersion", _wrap_iSkeletonPriorityNodeFactory2_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSkeletonPriorityNodeFactory2", _wrap_delete_iSkeletonPriorityNodeFactory2, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonPriorityNodeFactory2_swigregister", iSkeletonPriorityNodeFactory2_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonPriorityNode2_SetNodePriority", _wrap_iSkeletonPriorityNode2_SetNodePriority, METH_VARARGS, NULL},
+	 { (char *)"iSkeletonPriorityNode2_scfGetVersion", _wrap_iSkeletonPriorityNode2_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSkeletonPriorityNode2", _wrap_delete_iSkeletonPriorityNode2, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonPriorityNode2_swigregister", iSkeletonPriorityNode2_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonRandomNodeFactory2_AddNode", _wrap_iSkeletonRandomNodeFactory2_AddNode, METH_VARARGS, NULL},
@@ -49006,10 +49023,12 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSkeletonFSMNodeFactory2_GetStartState", _wrap_iSkeletonFSMNodeFactory2_GetStartState, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFSMNodeFactory2_GetStateCount", _wrap_iSkeletonFSMNodeFactory2_GetStateCount, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFSMNodeFactory2_ClearStates", _wrap_iSkeletonFSMNodeFactory2_ClearStates, METH_VARARGS, NULL},
+	 { (char *)"iSkeletonFSMNodeFactory2_scfGetVersion", _wrap_iSkeletonFSMNodeFactory2_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSkeletonFSMNodeFactory2", _wrap_delete_iSkeletonFSMNodeFactory2, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFSMNodeFactory2_swigregister", iSkeletonFSMNodeFactory2_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFSMNode2_SwitchToState", _wrap_iSkeletonFSMNode2_SwitchToState, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFSMNode2_GetCurrentState", _wrap_iSkeletonFSMNode2_GetCurrentState, METH_VARARGS, NULL},
+	 { (char *)"iSkeletonFSMNode2_scfGetVersion", _wrap_iSkeletonFSMNode2_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSkeletonFSMNode2", _wrap_delete_iSkeletonFSMNode2, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFSMNode2_swigregister", iSkeletonFSMNode2_swigregister, METH_VARARGS, NULL},
 	 { (char *)"csSprite2DVertexArrayReadOnly_GetSize", _wrap_csSprite2DVertexArrayReadOnly_GetSize, METH_VARARGS, NULL},
@@ -50928,9 +50947,6 @@ static swig_type_info _swigt__p_csPtrTiGenMeshAnimationControlFactory_t = {"_p_c
 static swig_type_info _swigt__p_csPtrTiGenMeshAnimationControl_t = {"_p_csPtrTiGenMeshAnimationControl_t", "csPtr<iGenMeshAnimationControl > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csPtrTiParticleBuiltinEffectorVelocityField_t = {"_p_csPtrTiParticleBuiltinEffectorVelocityField_t", "csPtr<iParticleBuiltinEffectorVelocityField > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csPtrTiPolygonHandle_t = {"_p_csPtrTiPolygonHandle_t", "csPtr<iPolygonHandle > *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_csPtrTiSkeletonAnimationNodeFactory2_t = {"_p_csPtrTiSkeletonAnimationNodeFactory2_t", "csPtr<iSkeletonAnimationNodeFactory2 > *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_csPtrTiSkeletonFSMNodeFactory2_t = {"_p_csPtrTiSkeletonFSMNodeFactory2_t", "csPtr<iSkeletonFSMNodeFactory2 > *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_csPtrTiSkeletonPriorityNodeFactory2_t = {"_p_csPtrTiSkeletonPriorityNodeFactory2_t", "csPtr<iSkeletonPriorityNodeFactory2 > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csPtrTiSkeletonRandomNodeFactory2_t = {"_p_csPtrTiSkeletonRandomNodeFactory2_t", "csPtr<iSkeletonRandomNodeFactory2 > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csQuaternion = {"_p_csQuaternion", "csQuaternion *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csRandomGen = {"_p_csRandomGen", "csRandomGen *", 0, 0, (void*)0, 0};
@@ -51311,9 +51327,6 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_csPtrTiGenMeshAnimationControl_t,
   &_swigt__p_csPtrTiParticleBuiltinEffectorVelocityField_t,
   &_swigt__p_csPtrTiPolygonHandle_t,
-  &_swigt__p_csPtrTiSkeletonAnimationNodeFactory2_t,
-  &_swigt__p_csPtrTiSkeletonFSMNodeFactory2_t,
-  &_swigt__p_csPtrTiSkeletonPriorityNodeFactory2_t,
   &_swigt__p_csPtrTiSkeletonRandomNodeFactory2_t,
   &_swigt__p_csQuaternion,
   &_swigt__p_csRandomGen,
@@ -51696,9 +51709,6 @@ static swig_cast_info _swigc__p_csPtrTiGenMeshAnimationControlFactory_t[] = {  {
 static swig_cast_info _swigc__p_csPtrTiGenMeshAnimationControl_t[] = {  {&_swigt__p_csPtrTiGenMeshAnimationControl_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csPtrTiParticleBuiltinEffectorVelocityField_t[] = {  {&_swigt__p_csPtrTiParticleBuiltinEffectorVelocityField_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csPtrTiPolygonHandle_t[] = {  {&_swigt__p_csPtrTiPolygonHandle_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csPtrTiSkeletonAnimationNodeFactory2_t[] = {  {&_swigt__p_csPtrTiSkeletonAnimationNodeFactory2_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csPtrTiSkeletonFSMNodeFactory2_t[] = {  {&_swigt__p_csPtrTiSkeletonFSMNodeFactory2_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csPtrTiSkeletonPriorityNodeFactory2_t[] = {  {&_swigt__p_csPtrTiSkeletonPriorityNodeFactory2_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csPtrTiSkeletonRandomNodeFactory2_t[] = {  {&_swigt__p_csPtrTiSkeletonRandomNodeFactory2_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csQuaternion[] = {  {&_swigt__p_csQuaternion, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csRandomGen[] = {  {&_swigt__p_csRandomGen, 0, 0, 0},{0, 0, 0, 0}};
@@ -52079,9 +52089,6 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_csPtrTiGenMeshAnimationControl_t,
   _swigc__p_csPtrTiParticleBuiltinEffectorVelocityField_t,
   _swigc__p_csPtrTiPolygonHandle_t,
-  _swigc__p_csPtrTiSkeletonAnimationNodeFactory2_t,
-  _swigc__p_csPtrTiSkeletonFSMNodeFactory2_t,
-  _swigc__p_csPtrTiSkeletonPriorityNodeFactory2_t,
   _swigc__p_csPtrTiSkeletonRandomNodeFactory2_t,
   _swigc__p_csQuaternion,
   _swigc__p_csRandomGen,
