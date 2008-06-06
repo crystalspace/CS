@@ -20,6 +20,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __GLSHADER_CGCOMMON_H__
 #define __GLSHADER_CGCOMMON_H__
 
+#include "cg_common.h"
+
 #include "csplugincommon/shader/shaderplugin.h"
 #include "csplugincommon/shader/shaderprogram.h"
 #include "csgfx/shadervarcontext.h"
@@ -27,16 +29,30 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/strhash.h"
 #include "csutil/leakguard.h"
 
-#include "glshader_cg.h"
+//#include "glshader_cg.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 {
+
+class csGLShader_CG;
 
   struct iShaderDestinationResolverCG : public virtual iBase
   {
     SCF_INTERFACE(iShaderDestinationResolverCG, 0,0,1);
 
     virtual const csSet<csString>& GetUnusedParameters () = 0;
+  };
+  
+  struct ShaderParameter
+  {
+    bool assumeConstant;
+    CGparameter param;
+    CGtype paramType;
+    CGtype arrayInnerType;
+    uint arraySize;
+    
+    ShaderParameter() : assumeConstant (false), param (0),
+      paramType ((CGtype)0), arrayInnerType ((CGtype)0), arraySize (0) {}
   };
 
 class csShaderGLCGCommon : public scfImplementationExt1<csShaderGLCGCommon,
@@ -94,7 +110,7 @@ protected:
     return 0;
   }
   void CollectUnusedParameters (csSet<csString>& unusedParams);
-  void SetParameterValue (CGparameter param, csShaderVariable* var);
+  void SetParameterValue (ShaderParameter* sparam, csShaderVariable* var);
   
   void SVtoCgMatrix3x3 (csShaderVariable* var, float* matrix);
   void SVtoCgMatrix4x4 (csShaderVariable* var, float* matrix);

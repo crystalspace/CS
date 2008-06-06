@@ -35,6 +35,7 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
 
+#include "glshader_cg.h"
 #include "glshader_cgcommon.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
@@ -60,7 +61,30 @@ csShaderGLCGCommon::~csShaderGLCGCommon ()
 {
   if (program)
     cgDestroyProgram (program);
-  delete assumedConstParams;
+    
+  if (assumedConstParams != 0)
+  {
+    for(size_t i = 0; i < assumedConstParams->GetSize (); ++i)
+    {
+      VariableMapEntry& mapping = assumedConstParams->Get (i);
+      
+      ShaderParameter* param =
+	reinterpret_cast<ShaderParameter*> (mapping.userVal);
+      
+      shaderPlug->paramAlloc.Free (param);
+    }
+    delete assumedConstParams;
+  }
+
+  for(size_t i = 0; i < variablemap.GetSize (); ++i)
+  {
+    VariableMapEntry& mapping = variablemap[i];
+    
+    ShaderParameter* param =
+      reinterpret_cast<ShaderParameter*> (mapping.userVal);
+    
+    shaderPlug->paramAlloc.Free (param);
+  }
 }
 
 void csShaderGLCGCommon::Activate()
@@ -75,10 +99,11 @@ void csShaderGLCGCommon::Deactivate()
   cgGLDisableProfile (programProfile);
 }
 
-void csShaderGLCGCommon::SetParameterValue (CGparameter param,
+void csShaderGLCGCommon::SetParameterValue (ShaderParameter* sparam,
                                             csShaderVariable* var)
 {
-  CGtype paramType = cgGetParameterType (param);
+  CGparameter param = sparam->param;
+  CGtype paramType = sparam->paramType;
   
   switch (paramType)
   {
@@ -124,12 +149,12 @@ void csShaderGLCGCommon::SetParameterValue (CGparameter param,
       break;
     case CG_ARRAY:
       {
-	CGtype innerType = cgGetArrayType (param);
+	CGtype innerType = sparam->arrayInnerType;
 	if (var->GetArraySize () == 0) 
 	  break;
 
 	uint numElements = csMin ((uint)cgGetArraySize (param, 0), 
-				  (uint)var->GetArraySize ());
+				  sparam->arraySize);
 
 	if (numElements == 0) 
 	  break;
@@ -349,7 +374,8 @@ void csShaderGLCGCommon::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
     if (!var.IsValid ())
       continue;
 
-    CGparameter param = (CGparameter)mapping.userVal;
+    ShaderParameter* param =
+      reinterpret_cast<ShaderParameter*> (mapping.userVal);
     SetParameterValue (param, var);
   }
   
@@ -366,9 +392,11 @@ void csShaderGLCGCommon::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
       if (!var.IsValid ())
 	continue;
   
-      CGparameter param = (CGparameter)mapping.userVal;
+      ShaderParameter* param =
+	reinterpret_cast<ShaderParameter*> (mapping.userVal);
       SetParameterValue (param, var);
-      cgSetParameterVariability (param, CG_LITERAL);
+      cgSetParameterVariability (param->param, CG_LITERAL);
+      shaderPlug->paramAlloc.Free (param);
     }
     delete assumedConstParams; assumedConstParams = 0;
     cgCompileProgram (program);
@@ -480,11 +508,11 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
   if (!program)
   {
     shaderPlug->SetCompiledSource (0);
-    if (shaderPlug->debugDump)
+    /*if (shaderPlug->debugDump)
     {
       EnsureDumpFile();
       WriteAdditionalDumpInfo ("Failed program source", programStr);
-    }
+    }*/
     return false;
   }
   programProfile = cgGetProgramProfile (program);
@@ -504,9 +532,16 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
 	variablemap.DeleteIndex (i);
 	continue;
       }
-      bool assumeConst = variablemap[i].userVal & assumeConstFlag;
-      variablemap[i].userVal = (intptr_t)param
-        | (assumeConst ? assumeConstFlag : 0);
+      ShaderParameter* sparam =
+	reinterpret_cast<ShaderParameter*> (variablemap[i].userVal);
+      sparam->param = param;
+      sparam->paramType = cgGetParameterType (param);
+      if (sparam->paramType == CG_ARRAY)
+      {
+        sparam->arrayInnerType = cgGetArrayType (param);
+        sparam->arraySize = cgGetArraySize (param, 0);
+      }
+      bool assumeConst = sparam->assumeConstant;
       if (assumeConst)
       {
         if (assumedConstParams == 0)
@@ -520,9 +555,10 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
       {
 	csShaderVariable* var = variablemap[i].mappingParam.var;
 	if (var != 0)
-	  SetParameterValue (param, var);
+	  SetParameterValue (sparam, var);
 	cgSetParameterVariability (param, CG_LITERAL);
 	variablemap.DeleteIndex (i);
+	shaderPlug->paramAlloc.Free (sparam);
 	continue;
       }
       i++;
@@ -549,8 +585,8 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
     if ((cgGetError() != CG_NO_ERROR)
       || !cgGLIsProgramLoaded (program)) 
     {
-      if (shaderPlug->debugDump)
-	DoDebugDump();
+      //if (shaderPlug->debugDump)
+	//DoDebugDump();
 
       if (shaderPlug->doVerbose
 	  && ((type == CG_GL_VERTEX) && (profile >= CG_PROFILE_ARBVP1))
@@ -571,6 +607,7 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
   
   shaderPlug->SetCompiledSource (0);
 
+  bool result = true;
   if (programType == progFP)
   {
     int numVaryings = 0;
@@ -595,9 +632,14 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
        
        @@@ This should be at least configurable
      */
-    return numVaryings <= 16;
+    result = numVaryings <= 16;
   }
-  return true;
+  if (!result && !debugFN.IsEmpty())
+  {
+    csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectReg);
+    vfs->DeleteFile (debugFN);
+  }
+  return result;
 }
 
 void csShaderGLCGCommon::DoDebugDump ()
@@ -761,7 +803,9 @@ bool csShaderGLCGCommon::Load (iShaderDestinationResolver* resolve,
 	      if (!ParseProgramParam (child, vme.mappingParam,
 		ParamFloat | ParamVector2 | ParamVector3 | ParamVector4))
 		return false;
-	      vme.userVal = assumeConst ? assumeConstFlag : 0;
+	      ShaderParameter* sparam = shaderPlug->paramAlloc.Alloc();
+	      sparam->assumeConstant = assumeConst;
+	      vme.userVal = reinterpret_cast<intptr_t> (sparam);
 	      variablemap.Push (vme);
 	    }
 	    else
@@ -775,7 +819,9 @@ bool csShaderGLCGCommon::Load (iShaderDestinationResolver* resolve,
 	      {
 		vme.mappingParam.indices.Push (nameParse.GetIndexValue (n));
 	      }
-	      vme.userVal = (int)assumeConst;
+	      ShaderParameter* sparam = shaderPlug->paramAlloc.Alloc();
+	      sparam->assumeConstant = assumeConst;
+	      vme.userVal = reinterpret_cast<intptr_t> (sparam);
 	      variablemap.Push (vme);
 	    }
 	  }
