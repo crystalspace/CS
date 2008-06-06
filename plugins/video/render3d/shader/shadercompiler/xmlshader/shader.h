@@ -397,7 +397,7 @@ public:
   {
     if (IsFallbackTicket (t))
     {
-      fallbackShader->PushVariables (s);
+      if (fallbackShader) fallbackShader->PushVariables (s);
       return;
     }
     GetUsedSVContext().PushVariables (s);
