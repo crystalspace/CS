@@ -25,6 +25,7 @@
  */
 /**\addtogroup loadsave
  * @{ */
+#include "csutil/refcount.h"
 #include "csutil/scf_interface.h"
 
 #include "iengine/region.h"
@@ -146,11 +147,27 @@ struct csLoadResult
 };
 
 /**
+* This interface represents the threaded map loader methods.
+*/
+struct iThreadedLoader : public csRefCount
+{
+  virtual void LoadMapFile (const char* filename, bool clearEngine,
+    iRegion* region, bool curRegOnly = true,
+    bool checkDupes = false, iStreamSource* ssource = 0,
+    iMissingLoaderData* missingdata = 0) = 0;
+
+  virtual void Load (iDocumentNode* node, iCollection* collection = 0,
+    bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    const char* override_name = 0, iMissingLoaderData* missingdata = 0,
+    uint keepFlags = KEEP_ALL) = 0;
+};
+
+/**
 * This interface represents the map loader.
 */
 struct iLoader : public virtual iBase
 {
-  SCF_INTERFACE (iLoader, 4, 0, 0);
+  SCF_INTERFACE (iLoader, 4, 1, 0);
 
   /////////////////////////// Generic ///////////////////////////
 
@@ -760,6 +777,8 @@ struct iLoader : public virtual iBase
   */
   CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
     virtual bool GetAutoRegions () = 0;
+
+  virtual iThreadedLoader* GetThreadedLoader() = 0;
 };
 
 /** @} */

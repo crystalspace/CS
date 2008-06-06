@@ -1649,6 +1649,8 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   stringSet = csQueryRegistryTagInterface<iStringSet> (
     object_reg, "crystalspace.shared.stringset");
 
+  threadedloader.AttachNew(new csThreadedLoader(this));
+
   return true;
 }
 
@@ -6204,6 +6206,88 @@ bool csLoader::ParseKey (iDocumentNode* node, iObject* obj)
     obj->ObjAdd (kvp->QueryObject ());
 
   return true;
+}
+
+void csLoader::RunMethod(uint methodIndex, csArray<void*> args)
+{
+  switch(methodIndex)
+  {
+  case 0:
+    {
+      const char* filename = (const char*)args.Pop();
+      bool clearEngine = args.Pop()?true:false;
+      iRegion* region = (iRegion*)args.Pop();
+      bool curRegOnly = args.Pop()?true:false;
+      bool checkDupes = args.Pop()?true:false;
+      iStreamSource* ssource = (iStreamSource*)args.Pop();
+      iMissingLoaderData* missingdata = (iMissingLoaderData*)args.Pop();
+
+      LoadMapFile(filename, clearEngine, region, curRegOnly, checkDupes,
+        ssource, missingdata);
+      break;
+    }
+  case 1:
+    {
+      iDocumentNode* node = (iDocumentNode*)args.Pop();
+      iCollection* collection = (iCollection*)args.Pop();
+      bool searchCollectionOnly = args.Pop()?true:false;
+      bool checkDupes = args.Pop()?true:false;
+      iStreamSource* ssource = (iStreamSource*)args.Pop();
+      const char* override_name = (const char* )args.Pop();
+      iMissingLoaderData* missingdata = (iMissingLoaderData*)args.Pop();
+      uintptr_t keepFlags = (uintptr_t)args.Pop();
+
+      Load(node, collection, searchCollectionOnly, checkDupes, ssource,
+        override_name, missingdata, keepFlags);
+      node->DecRef();
+      break;
+    }
+  default:
+    {
+      break;
+    }
+  }
+}
+
+csThreadedLoader::csThreadedLoader(csLoader *loader) : loader(loader)
+{
+}
+
+csThreadedLoader::~csThreadedLoader()
+{
+}
+
+void csThreadedLoader::LoadMapFile(const char* filename, bool clearEngine,
+                                  iRegion* region, bool curRegOnly,
+                                  bool checkDupes, iStreamSource* ssource,
+                                  iMissingLoaderData* missingdata)
+{
+  csArray<void*> args;
+  args.Push((void*)missingdata);
+  args.Push((void*)ssource);
+  args.Push((void*)checkDupes);
+  args.Push((void*)curRegOnly);
+  args.Push((void*)region);
+  args.Push((void*)clearEngine);
+  args.Push((void*)filename);
+  EXECUTE_METHOD(0, loader->GetThreadedCallable(), args);
+}
+
+void csThreadedLoader::Load (iDocumentNode* node, iCollection* collection,
+    bool searchCollectionOnly, bool checkDupes, iStreamSource* ssource,
+    const char* override_name, iMissingLoaderData* missingdata, uint keepFlags)
+{
+  csArray<void*> args;
+  args.Push((void*)keepFlags);
+  args.Push((void*)missingdata);
+  args.Push((void*)override_name);
+  args.Push((void*)ssource);
+  args.Push((void*)checkDupes);
+  args.Push((void*)searchCollectionOnly);
+  args.Push((void*)collection);
+  args.Push((void*)node);
+  node->IncRef();
+  EXECUTE_METHOD(1, loader->GetThreadedCallable(), args);
 }
 
 }
