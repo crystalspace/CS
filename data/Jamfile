@@ -31,7 +31,8 @@ for map in $(maps)
 
 SubInclude TOP data castle ;
 SubInclude TOP data ceguitest ;
-SubInclude TOP data config ;
+SubInclude TOP data config-app ;
+SubInclude TOP data config-plugin ;
 SubInclude TOP data cube ;
 SubInclude TOP data flarge ;
 SubInclude TOP data shader ;
