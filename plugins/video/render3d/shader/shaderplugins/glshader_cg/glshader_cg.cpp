@@ -43,6 +43,45 @@ CS_LEAKGUARD_IMPLEMENT (csGLShader_CG);
 
 SCF_IMPLEMENT_FACTORY (csGLShader_CG)
 
+bool ParamValueCache::ValueChanged (uint slot, float* values, int numValues)
+{
+  bool ret = true;
+  if ((entries.GetSize() > slot)
+    && (entries[slot].timeStamp == currentTime)
+    && (entries[slot].usedValues == numValues)
+    && (memcmp (values, entries[slot].fValues, numValues * sizeof (float)) == 0))
+  {
+    ret = false;
+  }
+  if (ret)
+  {
+    Entry& entry = entries.GetExtend (slot);
+    entry.timeStamp = currentTime;
+    entry.usedValues = numValues;
+    memcpy (entry.fValues, values, numValues * sizeof (float));
+  }
+  return ret;
+}
+
+bool ParamValueCache::ValueChanged (uint slot, int value)
+{
+  bool ret = true;
+  if ((entries.GetSize() > slot)
+    && (entries[slot].timeStamp == currentTime)
+    && (entries[slot].intValue == value))
+  {
+    ret = false;
+  }
+  if (ret)
+  {
+    Entry& entry = entries.GetExtend (slot);
+    entry.timeStamp = currentTime;
+    entry.intValue = value;
+  }
+  return ret;
+}
+
+
 csGLShader_CG::csGLShader_CG (iBase* parent) : 
   scfImplementationType (this, parent), compiledProgram (0)
 {

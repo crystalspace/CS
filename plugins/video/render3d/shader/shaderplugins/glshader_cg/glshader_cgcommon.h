@@ -47,13 +47,18 @@ class csGLShader_CG;
   {
     bool assumeConstant;
     CGparameter param;
+    uint baseSlot;
     CGtype paramType;
-    CGtype arrayInnerType;
-    uint arraySize;
+    //CGtype arrayInnerType;
+    //uint arraySize;
+    csArray<ShaderParameter*> arrayItems;
     
     ShaderParameter() : assumeConstant (false), param (0),
-      paramType ((CGtype)0), arrayInnerType ((CGtype)0), arraySize (0) {}
+      baseSlot ((uint)~0),
+      paramType ((CGtype)0)/*, arrayInnerType ((CGtype)0), arraySize (0)*/ {}
   };
+  
+  class ParamValueCache;
 
 class csShaderGLCGCommon : public scfImplementationExt1<csShaderGLCGCommon,
                                                         csShaderProgram,
@@ -67,6 +72,7 @@ protected:
 #undef CS_TOKEN_ITEM_FILE
 
   csGLShader_CG* shaderPlug;
+  ParamValueCache* valueCache;
 
   CGprogram program;
   CGprofile programProfile;
@@ -87,6 +93,12 @@ protected:
 
   csString debugFN;
   void EnsureDumpFile();
+
+  void FreeShaderParam (ShaderParameter* sparam);
+  void FillShaderParam (ShaderParameter* sparam, CGparameter param);
+  void GetShaderParamSlot (ShaderParameter* sparam);
+  void PostCompileVmapProcess ();
+  bool PostCompileVmapProcess (ShaderParameter* sparam);
 
   enum
   {
