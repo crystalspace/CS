@@ -335,60 +335,65 @@ namespace Geometry //@@Right?
      * 
      */
     template<typename InnerFn, typename LeafFn>
-    void TraverseRec (InnerFn& inner, LeafFn& leaf, Node* node)
+    bool TraverseRec (InnerFn& inner, LeafFn& leaf, Node* node)
     {
+      bool ret = true;
       if (!node) 
-        return;
+        return ret;
 
       if (node->IsLeaf ())
       {
-        leaf (node);
+        ret = leaf (node);
       }
       else
       {
         if (inner (node))
         {
-          TraverseRec (inner, leaf, node->GetChild1 ());
-          TraverseRec (inner, leaf, node->GetChild2 ());
+          ret = TraverseRec (inner, leaf, node->GetChild1 ());
+          if (ret) ret = TraverseRec (inner, leaf, node->GetChild2 ());
         }
       }
+      return ret;
     }
 
     /**
      * 
      */
     template<typename InnerFn, typename LeafFn>
-    void TraverseRec (InnerFn& inner, LeafFn& leaf, const Node* node) const
+    bool TraverseRec (InnerFn& inner, LeafFn& leaf, const Node* node) const
     {
+      bool ret = true;
       if (!node) 
-        return;
+        return ret;
 
       if (node->IsLeaf ())
       {
-        leaf (node);
+        ret = leaf (node);
       }
       else
       {
         if (inner (node))
         {
-          TraverseRec (inner, leaf, node->GetChild1 ());
-          TraverseRec (inner, leaf, node->GetChild2 ());
+          ret = TraverseRec (inner, leaf, node->GetChild1 ());
+          if (ret) ret = TraverseRec (inner, leaf, node->GetChild2 ());
         }
       }
+      return ret;
     }
 
     /**
      * 
      */
     template<typename InnerFn, typename LeafFn>
-    void TraverseRecF2B (InnerFn& inner, LeafFn& leaf, const csVector3& direction, Node* node)
+    bool TraverseRecF2B (InnerFn& inner, LeafFn& leaf, const csVector3& direction, Node* node)
     {
+      bool ret = true;
       if (!node) 
         return;
 
       if (node->IsLeaf ())
       {
-        leaf (node);
+        ret = leaf (node);
       }
       else
       {
@@ -399,10 +404,11 @@ namespace Geometry //@@Right?
 
           const size_t firstIdx = (centerDiff * direction > 0) ? 0 : 1;
 
-          TraverseRecF2B (inner, leaf, direction, node->GetChild (firstIdx));
-          TraverseRecF2B (inner, leaf, direction, node->GetChild (1-firstIdx));
+          ret = TraverseRecF2B (inner, leaf, direction, node->GetChild (firstIdx));
+          if (ret) ret = TraverseRecF2B (inner, leaf, direction, node->GetChild (1-firstIdx));
         }
       }
+      return ret;
     }
 
 
@@ -412,12 +418,13 @@ namespace Geometry //@@Right?
     template<typename InnerFn, typename LeafFn>
     void TraverseRecF2B (InnerFn& inner, LeafFn& leaf, const csVector3& direction, const Node* node) const 
     {
+      bool ret = true;
       if (!node) 
         return;
 
       if (node->IsLeaf ())
       {
-        leaf (node);
+        ret = leaf (node);
       }
       else
       {
@@ -428,10 +435,11 @@ namespace Geometry //@@Right?
 
           const size_t firstIdx = (centerDiff * direction > 0) ? 0 : 1;
 
-          TraverseRecF2B (inner, leaf, direction, node->GetChild (firstIdx));
-          TraverseRecF2B (inner, leaf, direction, node->GetChild (1-firstIdx));
+          ret = TraverseRecF2B (inner, leaf, direction, node->GetChild (firstIdx));
+          if (ret) ret = TraverseRecF2B (inner, leaf, direction, node->GetChild (1-firstIdx));
         }
       }
+      return ret;
     }
 
 
@@ -441,12 +449,13 @@ namespace Geometry //@@Right?
     template<typename InnerFn, typename LeafFn>
     void TraverseRecOut (InnerFn& inner, LeafFn& leaf, const csVector3& point, Node* node)
     {
+      bool ret = true;
       if (!node) 
         return;
 
       if (node->IsLeaf ())
       {
-        leaf (node);
+        ret = leaf (node);
       }
       else
       {
@@ -457,24 +466,26 @@ namespace Geometry //@@Right?
 
           const size_t firstIdx = (ch1LenSq > ch2LenSq) ? 0 : 1;
 
-          TraverseRecOut (inner, leaf, point, node->GetChild (firstIdx));
-          TraverseRecOut (inner, leaf, point, node->GetChild (1-firstIdx));
+          ret = TraverseRecOut (inner, leaf, point, node->GetChild (firstIdx));
+          if (ret) ret = TraverseRecOut (inner, leaf, point, node->GetChild (1-firstIdx));
         }
       }
+      return ret;
     }
 
     /**
      * 
      */
     template<typename InnerFn, typename LeafFn>
-    void TraverseRecOut (InnerFn& inner, LeafFn& leaf, const csVector3& point, const Node* node) const
+    bool TraverseRecOut (InnerFn& inner, LeafFn& leaf, const csVector3& point, const Node* node) const
     {
+      bool ret = true;
       if (!node) 
-        return;
+        return ret;
 
       if (node->IsLeaf ())
       {
-        leaf (node);
+        ret = leaf (node);
       }
       else
       {
@@ -485,10 +496,11 @@ namespace Geometry //@@Right?
 
           const size_t firstIdx = (ch1LenSq > ch2LenSq) ? 0 : 1;
 
-          TraverseRecOut (inner, leaf, point, node->GetChild (firstIdx));
-          TraverseRecOut (inner, leaf, point, node->GetChild (1-firstIdx));
+          ret = TraverseRecOut (inner, leaf, point, node->GetChild (firstIdx));
+          if (ret) ret = TraverseRecOut (inner, leaf, point, node->GetChild (1-firstIdx));
         }
       }
+      return ret;
     }
   
     /**
