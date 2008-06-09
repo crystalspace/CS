@@ -65,7 +65,7 @@
       
     <block location="cg:vertexMain">
       surfaceColor = flatColor;
-      <?if vars."tex specular".texture?>
+      <?if vars."tex diffuse".texture?>
         surfaceColor_attr_perfragment = true;
       <?else?>
         surfaceColor_attr_perfragment = false;
