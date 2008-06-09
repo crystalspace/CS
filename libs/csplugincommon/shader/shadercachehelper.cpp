@@ -73,8 +73,8 @@ namespace CS
           if (err != 0)
           {
 	  #ifdef CS_DEBUG
-	    csPrintf ("%s: parse error '%s'\n", CS_FUNCTION_NAME,
-	      err);
+	    csPrintf ("%s: parse error '%s' in '%s'\n", CS_FUNCTION_NAME,
+	      err, entry.fullPath.GetData());
 	  #endif
             return;
           }
