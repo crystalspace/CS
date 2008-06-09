@@ -17,14 +17,30 @@
 */
 
 #include "cssysdef.h"
+#include "plugins/engine/3d/light.h"
 #include "plugins/engine/3d/lightmgr.h"
 #include "plugins/engine/3d/meshobj.h"
 #include "plugins/engine/3d/sector.h"
 
+using namespace CS_PLUGIN_NAMESPACE_NAME(Engine);
+
+static csLightInfluence MakeInfluence (csLight* light)
+{
+  csLightInfluence l;
+  l.light = light;
+  if (light != 0)
+  {
+    l.type = light->csLight::GetType();
+    l.flags = light->csLight::GetFlags();
+    l.dynamicType = light->csLight::GetDynamicType();
+  }
+  return l;
+}
+
 // ---------------------------------------------------------------------------
 
 csLightManager::csLightManager ()
-  : scfImplementationType (this)
+  : scfImplementationType (this), tempInfluencesUsed (false)
 {
 }
 
@@ -94,17 +110,18 @@ struct LightCollectArray
     : testBox (box), lightArray (lightArray)
   {}
 
-  void operator() (const csSectorLightList::LightAABBTree::Node* node)
+  bool operator() (const csSectorLightList::LightAABBTree::Node* node)
   {
     if (!testBox.TestIntersect (node->GetBBox ()))
-      return;
+      return true;
 
     for (size_t i = 0; i < node->GetObjectCount (); ++i)
     {
-      csLightInfluence newInfluence;
-      newInfluence.light = node->GetLeafData (i);
+      csLightInfluence newInfluence = MakeInfluence (node->GetLeafData (i));
       lightArray->Push (newInfluence);
     }
+      
+    return true;
   }
 
   const csBox3& testBox;
@@ -117,17 +134,17 @@ struct LightCollectCallback
     : testBox (box), lightCallback (lightCallback)
   {}
 
-  void operator() (const csSectorLightList::LightAABBTree::Node* node)
+  bool operator() (const csSectorLightList::LightAABBTree::Node* node)
   {
     if (!testBox.TestIntersect (node->GetBBox ()))
-      return;
+      return true;
 
     for (size_t i = 0; i < node->GetObjectCount (); ++i)
     {
-      csLightInfluence newInfluence;
-      newInfluence.light = node->GetLeafData (i);
+      csLightInfluence newInfluence = MakeInfluence (node->GetLeafData (i));
       lightCallback->LightInfluence (newInfluence);
     }
+    return true;
   }
 
   const csBox3& testBox;
@@ -169,7 +186,15 @@ void csLightManager::GetRelevantLights (iSector* sector, const csBox3& boundingB
 
 void csLightManager::FreeInfluenceArray (csLightInfluence* Array)
 {
-  cs_free (Array);
+  if (Array == 0) return;
+
+  if (tempInfluencesUsed && (Array == tempInfluences.GetArray()))
+  {
+    tempInfluences.Empty();
+    tempInfluencesUsed = false;
+  }
+  else
+    cs_free (Array);
 }
 
 template<typename T>
@@ -188,30 +213,33 @@ public:
 
 typedef csDirtyAccessArrayDetach<csLightInfluence> LightInfluenceArray;
 
+template<typename ArrayType>
 struct LightCollectArrayPtr
 {
-  LightCollectArrayPtr (const csBox3& box, LightInfluenceArray& arr, size_t max)
+  LightCollectArrayPtr (const csBox3& box, ArrayType& arr, size_t max)
     : testBox (box), arr (arr), max (max)
   {}
 
-  void operator() (const csSectorLightList::LightAABBTree::Node* node)
+  bool operator() (const csSectorLightList::LightAABBTree::Node* node)
   {
     if (!testBox.TestIntersect (node->GetBBox ()))
-      return;
+      return true;
 
     for (size_t i = 0; i < node->GetObjectCount (); ++i)
     {
       if (arr.GetSize() < max)
       {
-        csLightInfluence newInfluence;
-        newInfluence.light = node->GetLeafData (i);
+        csLightInfluence newInfluence = MakeInfluence (node->GetLeafData (i));
         arr.Push (newInfluence);
       }
+      else
+        return false;
     }
+    return true;
   }
 
   const csBox3& testBox;
-  LightInfluenceArray& arr;
+  ArrayType& arr;
   size_t max;
 };
 
@@ -240,18 +268,36 @@ void csLightManager::GetRelevantLights (iSector* sector,
   csSectorLightList* sectorLightList = static_cast<csSectorLightList*> (llist);
 
   // Get the primary lights from same sector
+  //@@TODO: Implement cross-sector lookups
   const csSectorLightList::LightAABBTree& aabbTree = sectorLightList->GetLightAABBTree ();
   IntersectInnerBBox inner (boundingBox);
-  LightInfluenceArray tmpLightArray;
-  LightCollectArrayPtr leaf (boundingBox, tmpLightArray, maxLights);
-  aabbTree.Traverse (inner, leaf);
-
-  //@@TODO: Implement cross-sector lookups
-  numLights = tmpLightArray.GetSize();
-  if (numLights > 0)
-    lightArray = tmpLightArray.Detach();
+  if (!tempInfluencesUsed)
+  {
+    tempInfluencesUsed = true;
+    LightCollectArrayPtr<TempInfluences> leaf (boundingBox, tempInfluences, maxLights);
+    aabbTree.Traverse (inner, leaf);
+    
+    numLights = tempInfluences.GetSize();
+    if (numLights > 0)
+      lightArray = tempInfluences.GetArray();
+    else
+    {
+      lightArray = 0;
+      tempInfluencesUsed = false;
+    }
+  }
   else
-    lightArray = 0;
+  {
+    LightInfluenceArray tmpLightArray;
+    LightCollectArrayPtr<LightInfluenceArray> leaf (boundingBox, tmpLightArray, maxLights);
+    aabbTree.Traverse (inner, leaf);
+    
+    numLights = tmpLightArray.GetSize();
+    if (numLights > 0)
+      lightArray = tmpLightArray.Detach();
+    else
+      lightArray = 0;
+  }
 }
   
 void csLightManager::GetRelevantLights (iSector* sector, 
