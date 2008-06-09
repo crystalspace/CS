@@ -93,7 +93,6 @@ public:
   struct Values
   {
     void IncRef () { refcount++; }
-    static size_t deallocCount;
     void DecRef () 
     { 
       refcount--; 
@@ -638,25 +637,41 @@ public:
   }
 };
 
+class ConditionIDMapper
+{
+  csConditionID nextConditionID;
+  csHashReversible<csConditionID, CondOperation> conditions;
+
+public:
+  ConditionIDMapper() : nextConditionID (0) {}
+
+  /// Get number of conditions allocated so far
+  size_t GetNumConditions() { return nextConditionID; }
+
+  csConditionID GetConditionID (const CondOperation& operation,
+    bool get_new = true);
+  const CondOperation& GetCondition (csConditionID condition);
+};
+
 /**
  * Processes an expression tree and converts it into an internal 
  * representation and allows later evaluation of this expression.
  */
-class csConditionEvaluator
+class csConditionEvaluator :
+  public csRefCount,
+  public CS::Memory::CustomAllocated
 {
   /// Used to resolve SV names.
   csRef<iShaderVarStringSet> strings;
-
-  csConditionID nextConditionID;
-  csHashReversible<csConditionID, CondOperation> conditions;
+  
+  ConditionIDMapper conditions;
 
   // Evaluation cache
   MyBitArrayMalloc condChecked;
   MyBitArrayMalloc condResult;
+  uint evalDepth;
   
   csMemoryPool scratch;
-  size_t* AllocSVIndices (const CS::Graphics::ShaderVarNameParser& parser);
-  size_t* AllocSVIndices (size_t num);
 
   // Constants
   const csConditionConstants& constants;
@@ -740,26 +755,16 @@ class csConditionEvaluator
       return sv;
     }
   };
-  
-  bool ReadCondition (iFile* cacheFile,
-    const CS::PluginCommon::ShaderCacheHelper::StringStoreReader& strStore,
-    CondOperation& cond);
-  bool WriteCondition (iFile* cacheFile,
-    CS::PluginCommon::ShaderCacheHelper::StringStoreWriter& strStore,
-    const CondOperation& cond);
-    
-  bool ReadCondOperand (iFile* cacheFile,
-    const CS::PluginCommon::ShaderCacheHelper::StringStoreReader& strStore,
-    CondOperand& operand, bool hasIndices);
-  bool WriteCondOperand (iFile* cacheFile,
-    CS::PluginCommon::ShaderCacheHelper::StringStoreWriter& strStore,
-    const CondOperand& operand);
 public:
   template<typename Evaluator>
   typename Evaluator::EvalResult Evaluate (Evaluator& eval, csConditionID condition);
 
   csConditionEvaluator (iShaderVarStringSet* strings, 
     const csConditionConstants& constants);
+    
+  iShaderVarStringSet* GetStrings() const { return strings; }
+  size_t* AllocSVIndices (const CS::Graphics::ShaderVarNameParser& parser);
+  size_t* AllocSVIndices (size_t num);
 
   /// Convert expression into internal representation.
   const char* ProcessExpression (csExpression* expression, 
@@ -769,13 +774,25 @@ public:
   bool Evaluate (csConditionID condition, const CS::Graphics::RenderMeshModes& modes,
     const csShaderVariableStack* stack);
   /**
-   * Reset the evaluation cache. Prevents same conditions from being evaled 
-   * twice.
+   * Start an evaluation. If this is the first nested evaluation the evaluation cache
+   * (which prevents same conditions from being evaled twice) is reset.
    */
-  void ResetEvaluationCache();
+  void EnterEvaluation();
+  /// End an evaluation
+  void LeaveEvaluation();
+  /// Helper to automatically start/end an evaluation
+  class ScopedEvaluation
+  {
+    csConditionEvaluator& eval;
+  public:
+    ScopedEvaluation (csConditionEvaluator& eval) : eval (eval)
+    { eval.EnterEvaluation(); }
+    ~ScopedEvaluation()
+    { eval.LeaveEvaluation(); }
+  };
 
   /// Get number of conditions allocated so far
-  size_t GetNumConditions() { return nextConditionID; }
+  size_t GetNumConditions() { return conditions.GetNumConditions(); }
 
   /*
    * Check whether a condition, given a set of possible values for
@@ -796,6 +813,9 @@ public:
    * expression. 
    */
   csConditionID FindOptimizedCondition (const CondOperation& operation);
+  
+  const CondOperation& GetCondition (csConditionID condition)
+  { return conditions.GetCondition (condition); }
 
   /**
    * Test if \c condition is a sub-condition of \c containerCondition 
@@ -807,13 +827,55 @@ public:
   /// Determine which SVs are used in some condition.
   void GetUsedSVs (csConditionID condition, MyBitArrayTemp& affectedSVs);
 
-  /// Read conditions from file
-  bool ReadFromCache (iFile* cacheFile, const csString& tagStr);
-  /// Write conditions to file
-  bool WriteToCache (iFile* cacheFile, const csString& tagStr);
-  
   /// Try to release unused temporary memory
   static void CompactMemory ();
+};
+
+class ConditionsWriter
+{
+  csConditionEvaluator& evaluator;
+  
+  csMemFile* savedConds;
+  CS::PluginCommon::ShaderCacheHelper::StringStoreWriter stringStore;
+  csHash<uint32, csConditionID> condToDiskID;
+  uint32 currentDiskID;
+
+  bool WriteCondition (iFile* cacheFile,
+    CS::PluginCommon::ShaderCacheHelper::StringStoreWriter& strStore,
+    const CondOperation& cond);
+    
+  bool WriteCondOperand (iFile* cacheFile,
+    CS::PluginCommon::ShaderCacheHelper::StringStoreWriter& strStore,
+    const CondOperand& operand, uint32 operationID);
+public:
+  ConditionsWriter (csConditionEvaluator& evaluator);
+  ~ConditionsWriter();
+  
+  uint32 GetDiskID (csConditionID cond);
+  uint32 GetDiskID (csConditionID cond) const;
+  
+  csPtr<iDataBuffer> GetPersistentData ();
+};
+
+class ConditionsReader
+{
+  csConditionEvaluator& evaluator;
+  
+  csHash<csConditionID, uint32> diskIDToCond;
+
+  bool ReadCondition (iFile* cacheFile,
+    const CS::PluginCommon::ShaderCacheHelper::StringStoreReader& strStore,
+    CondOperation& cond);
+  
+  bool ReadCondOperand (iFile* cacheFile,
+    const CS::PluginCommon::ShaderCacheHelper::StringStoreReader& strStore,
+    CondOperand& operand, bool hasIndices);
+public:
+  ConditionsReader (csConditionEvaluator& evaluator,
+    iDataBuffer* src);
+  ~ConditionsReader ();
+  
+  csConditionID GetConditionID (uint32 diskID) const;
 };
 
 }

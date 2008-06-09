@@ -159,15 +159,120 @@ void Variables::ValAllocKill()
   ValAlloc().~csBlockAllocator();
 }
 
-size_t Variables::Values::deallocCount = 0;
 CS_IMPLEMENT_STATIC_CLASSVAR(Variables, def,
   Def, Variables::Values, ());
 CS_IMPLEMENT_STATIC_CLASSVAR_REF(Variables::CowBlockAllocator, 
   allocator, Allocator, Variables::CowBlockAllocator::BlockAlloc, (256));
 
+//---------------------------------------------------------------------------
+  
+// Handy for debugging
+#if 0
+static csString OperandToString (const CondOperand& operand);
+
+static csString OperationToString (const CondOperation& operation)
+{
+  const char* opStr;
+  switch (operation.operation)
+  {
+    case opAnd:       opStr = "&&"; break;
+    case opOr:        opStr = "||"; break;
+    case opEqual:     opStr = "=="; break;
+    case opNEqual:    opStr = "!="; break;
+    case opLesser:    opStr = "<"; break;
+    case opLesserEq:  opStr = "<="; break;
+    default:
+      return (const char*)0;
+  }
+  
+  csString ret;
+  ret.Format ("%s %s %s",
+    OperandToString (operation.left).GetData(),
+    opStr,
+    OperandToString (operation.right).GetData());
+  return ret;
+}
+
+static csString OperandToString (const CondOperand& operand)
+{
+  csString ret;
+  
+  switch (operand.type)
+  {
+    case operandOperation:
+      ret.Format ("<op %zu>", operand.operation);
+      break;
+    case operandFloat:
+      ret.Format ("%g", operand.floatVal);
+      break;
+    case operandInt:
+      ret.Format ("%d", operand.intVal);
+      break;
+    case operandBoolean:
+      ret = operand.boolVal ? "true" : "false";
+      break;
+    case operandSV:
+    case operandSVValueInt:
+    case operandSVValueFloat:
+    case operandSVValueX:
+    case operandSVValueY:
+    case operandSVValueZ:
+    case operandSVValueW:
+    case operandSVValueTexture:
+    case operandSVValueBuffer:
+      {
+        ret.Format ("vars.<#%u>", operand.svLocation.svName);
+        if (operand.svLocation.indices != 0)
+        {
+          size_t n = *operand.svLocation.indices;
+          for (size_t i = 0; i < n; i++)
+            ret.AppendFmt ("[%zu]", operand.svLocation.indices[i+1]);
+        }
+	switch (operand.type)
+	{
+	  case operandSVValueInt:      ret.Append (".int"); break;
+	  case operandSVValueFloat:    ret.Append (".float"); break;
+	  case operandSVValueX:        ret.Append (".x"); break;
+	  case operandSVValueY:        ret.Append (".y"); break;
+	  case operandSVValueZ:        ret.Append (".z"); break;
+	  case operandSVValueW:        ret.Append (".w"); break;
+	  case operandSVValueTexture:  ret.Append (".texture"); break;
+	  case operandSVValueBuffer:   ret.Append (".buffer"); break;
+	  default: break;
+        }
+        break;
+      }
+    default: break;
+  }
+  
+  return ret;
+}
+#endif
+
+csConditionID ConditionIDMapper::GetConditionID (const CondOperation& operation,
+                                                 bool get_new)
+{
+  csConditionID id = conditions.Get (operation, (csConditionID)~0);
+  if ((id == (csConditionID)~0) && get_new)
+  {
+    id = nextConditionID++;
+    conditions.Put (operation, id);
+  }
+  return id;
+}
+
+const CondOperation& ConditionIDMapper::GetCondition (csConditionID condition)
+{
+  const CondOperation* op = conditions.GetKeyPointer (condition);
+  CS_ASSERT(op != 0);
+  return *op;
+}
+
+//---------------------------------------------------------------------------
+
 csConditionEvaluator::csConditionEvaluator (iShaderVarStringSet* strings, 
     const csConditionConstants& constants) :
-    strings(strings), nextConditionID(0), constants(constants)
+    strings(strings), evalDepth (0), constants(constants)
 {
 }
   
@@ -287,89 +392,6 @@ const char* csConditionEvaluator::OperandTypeDescription (OperandType t)
   }
 }
 
-// Handy for debugging
-#if 0
-static csString OperandToString (const CondOperand& operand);
-
-static csString OperationToString (const CondOperation& operation)
-{
-  const char* opStr;
-  switch (operation.operation)
-  {
-    case opAnd:       opStr = "&&"; break;
-    case opOr:        opStr = "||"; break;
-    case opEqual:     opStr = "=="; break;
-    case opNEqual:    opStr = "!="; break;
-    case opLesser:    opStr = "<"; break;
-    case opLesserEq:  opStr = "<="; break;
-    default:
-      return (const char*)0;
-  }
-  
-  csString ret;
-  ret.Format ("%s %s %s",
-    OperandToString (operation.left).GetData(),
-    opStr,
-    OperandToString (operation.right).GetData());
-  return ret;
-}
-
-static csString OperandToString (const CondOperand& operand)
-{
-  csString ret;
-  
-  switch (operand.type)
-  {
-    case operandOperation:
-      ret.Format ("<op %zu>", operand.operation);
-      break;
-    case operandFloat:
-      ret.Format ("%g", operand.floatVal);
-      break;
-    case operandInt:
-      ret.Format ("%d", operand.intVal);
-      break;
-    case operandBoolean:
-      ret = operand.boolVal ? "true" : "false";
-      break;
-    case operandSV:
-    case operandSVValueInt:
-    case operandSVValueFloat:
-    case operandSVValueX:
-    case operandSVValueY:
-    case operandSVValueZ:
-    case operandSVValueW:
-    case operandSVValueTexture:
-    case operandSVValueBuffer:
-      {
-        ret.Format ("vars.<#%u>", operand.svLocation.svName);
-        if (operand.svLocation.indices != 0)
-        {
-          size_t n = *operand.svLocation.indices;
-          for (size_t i = 0; i < n; i++)
-            ret.AppendFmt ("[%zu]", operand.svLocation.indices[i+1]);
-        }
-	switch (operand.type)
-	{
-	  case operandSVValueInt:      ret.Append (".int"); break;
-	  case operandSVValueFloat:    ret.Append (".float"); break;
-	  case operandSVValueX:        ret.Append (".x"); break;
-	  case operandSVValueY:        ret.Append (".y"); break;
-	  case operandSVValueZ:        ret.Append (".z"); break;
-	  case operandSVValueW:        ret.Append (".w"); break;
-	  case operandSVValueTexture:  ret.Append (".texture"); break;
-	  case operandSVValueBuffer:   ret.Append (".buffer"); break;
-	  default: break;
-        }
-        break;
-      }
-    default: break;
-  }
-  
-  return ret;
-}
-#endif
-
 csConditionID csConditionEvaluator::FindOptimizedCondition (
   const CondOperation& operation)
 {
@@ -468,13 +490,7 @@ csConditionID csConditionEvaluator::FindOptimizedCondition (
     }
   }
 
-  csConditionID id = conditions.Get (operation, (csConditionID)~0);
-  if (id == (csConditionID)~0)
-  {
-    id = nextConditionID++;
-    conditions.Put (operation, id);
-  }
-  return id;
+  return conditions.GetConditionID (operation);
 }
 
 const char* csConditionEvaluator::ResolveExpValue (const csExpressionToken& value,
@@ -975,7 +991,8 @@ bool csConditionEvaluator::IsConditionPartOf (csConditionID condition,
 {
   if (condition == containerCondition) return true;
 
-  const CondOperation* op = conditions.GetKeyPointer (containerCondition);
+  const CondOperation* op = //conditions.GetKeyPointer (containerCondition);
+    &conditions.GetCondition (containerCondition);
   CS_ASSERT (op != 0);
 
   if (op->left.type == operandOperation)
@@ -1196,7 +1213,8 @@ typename Evaluator::EvalResult csConditionEvaluator::Evaluate (
   typedef typename Evaluator::IntType EvInt;
   EvResult result (eval.GetDefaultResult());
 
-  const CondOperation* op = conditions.GetKeyPointer (condition);
+  const CondOperation* op = //conditions.GetKeyPointer (condition);
+    &conditions.GetCondition (condition);
   CS_ASSERT (op != 0);
 
   switch (op->operation)
@@ -1336,11 +1354,20 @@ typename Evaluator::EvalResult csConditionEvaluator::Evaluate (
   return result;
 }
 
-void csConditionEvaluator::ResetEvaluationCache()
+void csConditionEvaluator::EnterEvaluation()
 {
-  condChecked.SetSize (GetNumConditions ());
-  condChecked.Clear();
-  condResult.SetSize (GetNumConditions ());
+  if (evalDepth == 0)
+  {
+    condChecked.SetSize (GetNumConditions ());
+    condChecked.Clear();
+    condResult.SetSize (GetNumConditions ());
+  }
+  evalDepth++;
+}
+
+void csConditionEvaluator::LeaveEvaluation()
+{
+  evalDepth--;
 }
 
 bool csConditionEvaluator::EvaluateConst (const CondOperation& op, bool& result)
@@ -1442,8 +1469,8 @@ bool csConditionEvaluator::EvaluateOperandBConst (const CondOperand& operand,
 	  result = false;
 	else
 	{
-	  const CondOperation* op = 
-	    conditions.GetKeyPointer (operand.operation);
+	  const CondOperation* op = //conditions.GetKeyPointer (operand.operation);
+	    &conditions.GetCondition (operand.operation);
 	  CS_ASSERT (op != 0);
 	  if (!EvaluateConst (*op, result)) return false;
 	}
@@ -1497,7 +1524,8 @@ bool csConditionEvaluator::EvaluateOperandFConst (const CondOperand& operand,
 void csConditionEvaluator::GetUsedSVs2 (csConditionID condition, 
                                         MyBitArrayTemp& affectedSVs)
 {
-  const CondOperation* op = conditions.GetKeyPointer (condition);
+  const CondOperation* op = //conditions.GetKeyPointer (condition);
+    &conditions.GetCondition (condition);
   CS_ASSERT (op != 0);
 
   if (op->left.type == operandOperation)
@@ -1530,64 +1558,28 @@ void csConditionEvaluator::GetUsedSVs (csConditionID condition,
   GetUsedSVs2 (condition, affectedSVs);
 }
 
-bool csConditionEvaluator::ReadFromCache (iFile* cacheFile,
-                                          const csString& tagStr)
+void csConditionEvaluator::CompactMemory ()
 {
-  csString cachedTag =
-    CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
-  if (cachedTag != tagStr)
-    return false;
-
-  uint32 numCondsLE;
-  if (cacheFile->Read ((char*)&numCondsLE, sizeof (numCondsLE))
-      != sizeof (numCondsLE))
-    return false;
-    
-  nextConditionID = csLittleEndian::UInt32 (numCondsLE);
-  
-  CS::PluginCommon::ShaderCacheHelper::StringStoreReader strStore;
-  strStore.StartUse (cacheFile);
-  
-  conditions.DeleteAll();
-  for (csConditionID c = 0; c < nextConditionID; c++)
-  {
-    CondOperation op;
-    if (!ReadCondition (cacheFile, strStore, op))
-    {
-      conditions.DeleteAll();
-      nextConditionID = 0;
-      return false;
-    }
-    conditions.Put (op, c);
-  }
-  
-  strStore.EndUse ();
-  
-  return true;
+  Variables::Values::CompactAllocator();
+  SliceAllocator::CompactAllocator();
+  MyBitArrayAllocatorTemp::CompactAllocators();
 }
 
-bool csConditionEvaluator::WriteToCache (iFile* cacheFile,
-                                          const csString& tagStr)
-{
-  if (!CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, tagStr))
-    return false;
+//---------------------------------------------------------------------------
 
-  uint32 numCondsLE = csLittleEndian::UInt32 (nextConditionID);
-  if (cacheFile->Write ((char*)&numCondsLE, sizeof (numCondsLE))
-      != sizeof (numCondsLE))
-    return false;
-    
-  CS::PluginCommon::ShaderCacheHelper::StringStoreWriter strStore;
-  strStore.StartUse (cacheFile);
+ConditionsWriter::ConditionsWriter (csConditionEvaluator& evaluator)
+ : evaluator (evaluator), currentDiskID (0)
+{
+  condToDiskID.Put (csCondAlwaysFalse, (uint32)csCondAlwaysFalse);
+  condToDiskID.Put (csCondAlwaysTrue, (uint32)csCondAlwaysTrue);
   
-  for (csConditionID c = 0; c < nextConditionID; c++)
-  {
-    const CondOperation* op = conditions.GetKeyPointer (c);
-    if (!WriteCondition (cacheFile, strStore, *op)) return false;
-  }
-  
-  strStore.EndUse ();
-  return true;
+  savedConds = new csMemFile();
+  stringStore.StartUse (savedConds);
+}
+
+ConditionsWriter::~ConditionsWriter ()
+{
+  delete savedConds;
 }
   
 struct ConditionHeader
@@ -1606,7 +1598,179 @@ struct ConditionHeader
   ConditionHeader() : op (0), leftType (0), rightType (0), flags (0) {}
 };
 
-bool csConditionEvaluator::ReadCondition (iFile* cacheFile,
+bool ConditionsWriter::WriteCondition (iFile* cacheFile,
+  CS::PluginCommon::ShaderCacheHelper::StringStoreWriter& strStore,
+  const CondOperation& cond)
+{
+  uint32 leftOperation = 0;
+  uint32 rightOperation = 0;
+  if (cond.left.type == operandOperation)
+    leftOperation = GetDiskID (cond.left.operation);
+  if (cond.right.type == operandOperation)
+    rightOperation = GetDiskID (cond.right.operation);
+
+  ConditionHeader head;
+  head.op = cond.operation;
+  head.leftType = cond.left.type;
+  if ((cond.left.type >= operandSV) && (cond.left.svLocation.indices != 0))
+    head.flags |= ConditionHeader::leftHasIndices;
+  head.rightType = cond.right.type;
+  if ((cond.right.type >= operandSV) && (cond.right.svLocation.indices != 0))
+    head.flags |= ConditionHeader::rightHasIndices;
+    
+  if (cacheFile->Write ((char*)&head, sizeof (head)) != sizeof (head))
+    return false;
+    
+  if (!WriteCondOperand (cacheFile, strStore, cond.left, leftOperation))
+    return false;
+  if (!WriteCondOperand (cacheFile, strStore, cond.right, rightOperation))
+    return false;
+  return true;
+}
+  
+bool ConditionsWriter::WriteCondOperand (iFile* cacheFile,
+  CS::PluginCommon::ShaderCacheHelper::StringStoreWriter& strStore,
+  const CondOperand& operand, uint32 operationID)
+{
+  switch (operand.type)
+  {
+    case operandOperation:
+      {
+        uint32 condLE = csLittleEndian::UInt32 (operationID);
+        return (cacheFile->Write ((char*)&condLE, sizeof (condLE))
+          == sizeof (condLE));
+      }
+      break;
+    case operandFloat:
+      {
+        uint32 valLE = csLittleEndian::UInt32 (
+          csIEEEfloat::FromNative (operand.floatVal));
+        return (cacheFile->Write ((char*)&valLE, sizeof (valLE))
+          == sizeof (valLE));
+      }
+      break;
+    case operandInt:
+      {
+        int32 valLE = csLittleEndian::Int32 (operand.intVal);
+        return (cacheFile->Write ((char*)&valLE, sizeof (valLE))
+          == sizeof (valLE));
+      }
+      break;
+    case operandBoolean:
+      {
+        int32 valLE = csLittleEndian::Int32 (int (operand.boolVal));
+        return (cacheFile->Write ((char*)&valLE, sizeof (valLE))
+          == sizeof (valLE));
+      }
+      break;
+    case operandSV:
+    case operandSVValueInt:
+    case operandSVValueFloat:
+    case operandSVValueX:
+    case operandSVValueY:
+    case operandSVValueZ:
+    case operandSVValueW:
+    case operandSVValueTexture:
+    case operandSVValueBuffer:
+      {
+        const char* nameStr = evaluator.GetStrings()->Request (operand.svLocation.svName);
+        uint32 nameIDLE = csLittleEndian::UInt32 (strStore.GetID (nameStr));
+        if (cacheFile->Write ((char*)&nameIDLE, sizeof (nameIDLE))
+            != sizeof (nameIDLE))
+          return false;
+        if (operand.svLocation.indices != 0)
+        {
+          size_t numInd = *operand.svLocation.indices;
+          uint32 numIndLE = csLittleEndian::UInt32 (numInd);
+	  if (cacheFile->Write ((char*)&numIndLE, sizeof (numIndLE))
+	      != sizeof (numIndLE))
+	    return false;
+	  for (size_t i = 0; i < numInd; i++)
+	  {
+	   size_t ind = operand.svLocation.indices[i+1];
+	    uint32 indLE = csLittleEndian::UInt32 (ind);
+	    if (cacheFile->Write ((char*)&indLE, sizeof (indLE))
+		!= sizeof (indLE))
+	      return false;
+	  }
+        }
+        return true;
+      }
+      break;
+    default:
+      CS_ASSERT(false);
+  }
+  return false;
+}
+
+uint32 ConditionsWriter::GetDiskID (csConditionID cond)
+{
+  const uint32* diskID = condToDiskID.GetElementPointer (cond);
+  if (diskID == 0)
+  {
+    WriteCondition (savedConds, stringStore,
+      evaluator.GetCondition (cond));
+    uint32 newID = currentDiskID++;
+    condToDiskID.Put (cond, newID);
+    return newID;
+  }
+  return *diskID;
+}
+
+uint32 ConditionsWriter::GetDiskID (csConditionID cond) const
+{
+  const uint32* diskID = condToDiskID.GetElementPointer (cond);
+  CS_ASSERT(diskID != 0);
+  return *diskID;
+}
+
+csPtr<iDataBuffer> ConditionsWriter::GetPersistentData ()
+{
+  stringStore.EndUse();
+  
+  uint32 numCondsLE = csLittleEndian::UInt32 (currentDiskID);
+  savedConds->Write ((char*)&numCondsLE, sizeof (currentDiskID));
+  
+  csPtr<iDataBuffer> buf (savedConds->GetAllData());
+  delete savedConds; savedConds = 0;
+  return buf;
+}
+
+
+ConditionsReader::ConditionsReader (csConditionEvaluator& evaluator,
+                                    iDataBuffer* src)
+ : evaluator (evaluator)
+{
+  diskIDToCond.Put ((uint32)csCondAlwaysFalse, csCondAlwaysFalse);
+  diskIDToCond.Put ((uint32)csCondAlwaysTrue, csCondAlwaysTrue);
+
+  csMemFile savedConds (src, true);
+  
+  savedConds.SetPos (savedConds.GetSize() - sizeof (uint32));
+  uint32 numCondsLE;
+  savedConds.Read ((char*)&numCondsLE, sizeof (numCondsLE));
+  numCondsLE = csLittleEndian::UInt32 (numCondsLE);
+  savedConds.SetPos (0);
+  
+  CS::PluginCommon::ShaderCacheHelper::StringStoreReader stringStore;
+  stringStore.StartUse (&savedConds);
+  
+  for (uint32 currentID = 0; currentID < numCondsLE; currentID++)
+  {
+    CondOperation newCond;
+    ReadCondition (&savedConds, stringStore, newCond);
+    diskIDToCond.Put (currentID,
+      evaluator.FindOptimizedCondition (newCond));
+  }
+  
+  stringStore.EndUse();
+}
+
+ConditionsReader::~ConditionsReader ()
+{
+}
+  
+bool ConditionsReader::ReadCondition (iFile* cacheFile,
   const CS::PluginCommon::ShaderCacheHelper::StringStoreReader& strStore,
   CondOperation& cond)
 {
@@ -1626,28 +1790,7 @@ bool csConditionEvaluator::ReadCondition (iFile* cacheFile,
   return true;
 }
   
-bool csConditionEvaluator::WriteCondition (iFile* cacheFile,
-  CS::PluginCommon::ShaderCacheHelper::StringStoreWriter& strStore,
-  const CondOperation& cond)
-{
-  ConditionHeader head;
-  head.op = cond.operation;
-  head.leftType = cond.left.type;
-  if ((cond.left.type >= operandSV) && (cond.left.svLocation.indices != 0))
-    head.flags |= ConditionHeader::leftHasIndices;
-  head.rightType = cond.right.type;
-  if ((cond.right.type >= operandSV) && (cond.right.svLocation.indices != 0))
-    head.flags |= ConditionHeader::rightHasIndices;
-    
-  if (cacheFile->Write ((char*)&head, sizeof (head)) != sizeof (head))
-    return false;
-    
-  if (!WriteCondOperand (cacheFile, strStore, cond.left)) return false;
-  if (!WriteCondOperand (cacheFile, strStore, cond.right)) return false;
-  return true;
-}
-  
-bool csConditionEvaluator::ReadCondOperand (iFile* cacheFile,
+bool ConditionsReader::ReadCondOperand (iFile* cacheFile,
   const CS::PluginCommon::ShaderCacheHelper::StringStoreReader& strStore,
   CondOperand& operand, bool hasIndices)
 {
@@ -1655,11 +1798,11 @@ bool csConditionEvaluator::ReadCondOperand (iFile* cacheFile,
   {
     case operandOperation:
       {
-        int32 condLE;
+        uint32 condLE;
         if (cacheFile->Read ((char*)&condLE, sizeof (condLE))
             != sizeof (condLE))
           return false;
-        operand.operation = (long)csLittleEndian::Int32 (condLE);
+        operand.operation = GetConditionID (csLittleEndian::UInt32 (condLE));
         return true;
       }
       break;
@@ -1710,7 +1853,7 @@ bool csConditionEvaluator::ReadCondOperand (iFile* cacheFile,
           return false;
         const char* nameStr = strStore.GetString (
           csLittleEndian::UInt32 (nameIDLE));
-	operand.svLocation.svName = strings->Request (nameStr);
+	operand.svLocation.svName = evaluator.GetStrings()->Request (nameStr);
 	operand.svLocation.bufferName = csRenderBuffer::GetBufferNameFromDescr (
 	  nameStr);
         if (hasIndices)
@@ -1720,7 +1863,7 @@ bool csConditionEvaluator::ReadCondOperand (iFile* cacheFile,
 	      != sizeof (numIndLE))
 	    return false;
 	  size_t numInd = csLittleEndian::UInt32 (numIndLE);
-	  operand.svLocation.indices = AllocSVIndices (numInd);
+	  operand.svLocation.indices = evaluator.AllocSVIndices (numInd);
 	  *operand.svLocation.indices = numInd;
 	  for (size_t i = 0; i < numInd; i++)
 	  {
@@ -1741,87 +1884,14 @@ bool csConditionEvaluator::ReadCondOperand (iFile* cacheFile,
   return false;
 }
   
-bool csConditionEvaluator::WriteCondOperand (iFile* cacheFile,
-  CS::PluginCommon::ShaderCacheHelper::StringStoreWriter& strStore,
-  const CondOperand& operand)
+csConditionID ConditionsReader::GetConditionID (uint32 diskID) const
 {
-  switch (operand.type)
-  {
-    case operandOperation:
-      {
-        int32 condLE = csLittleEndian::Int32 ((long)operand.operation);
-        return (cacheFile->Write ((char*)&condLE, sizeof (condLE))
-          == sizeof (condLE));
-      }
-      break;
-    case operandFloat:
-      {
-        uint32 valLE = csLittleEndian::UInt32 (
-          csIEEEfloat::FromNative (operand.floatVal));
-        return (cacheFile->Write ((char*)&valLE, sizeof (valLE))
-          == sizeof (valLE));
-      }
-      break;
-    case operandInt:
-      {
-        int32 valLE = csLittleEndian::Int32 (operand.intVal);
-        return (cacheFile->Write ((char*)&valLE, sizeof (valLE))
-          == sizeof (valLE));
-      }
-      break;
-    case operandBoolean:
-      {
-        int32 valLE = csLittleEndian::Int32 (int (operand.boolVal));
-        return (cacheFile->Write ((char*)&valLE, sizeof (valLE))
-          == sizeof (valLE));
-      }
-      break;
-    case operandSV:
-    case operandSVValueInt:
-    case operandSVValueFloat:
-    case operandSVValueX:
-    case operandSVValueY:
-    case operandSVValueZ:
-    case operandSVValueW:
-    case operandSVValueTexture:
-    case operandSVValueBuffer:
-      {
-        const char* nameStr = strings->Request (operand.svLocation.svName);
-        uint32 nameIDLE = csLittleEndian::UInt32 (strStore.GetID (nameStr));
-        if (cacheFile->Write ((char*)&nameIDLE, sizeof (nameIDLE))
-            != sizeof (nameIDLE))
-          return false;
-        if (operand.svLocation.indices != 0)
-        {
-          size_t numInd = *operand.svLocation.indices;
-          uint32 numIndLE = csLittleEndian::UInt32 (numInd);
-	  if (cacheFile->Write ((char*)&numIndLE, sizeof (numIndLE))
-	      != sizeof (numIndLE))
-	    return false;
-	  for (size_t i = 0; i < numInd; i++)
-	  {
-	   size_t ind = operand.svLocation.indices[i+1];
-	    uint32 indLE = csLittleEndian::UInt32 (ind);
-	    if (cacheFile->Write ((char*)&indLE, sizeof (indLE))
-		!= sizeof (indLE))
-	      return false;
-	  }
-        }
-        return true;
-      }
-      break;
-    default:
-      CS_ASSERT(false);
-  }
-  return false;
+  const csConditionID* cond = diskIDToCond.GetElementPointer (diskID);
+  CS_ASSERT(cond != 0);
+  return *cond;
 }
 
-void csConditionEvaluator::CompactMemory ()
-{
-  Variables::Values::CompactAllocator();
-  SliceAllocator::CompactAllocator();
-  MyBitArrayAllocatorTemp::CompactAllocators();
-}
+//---------------------------------------------------------------------------
 
 struct ValueSetWrapper
 {
