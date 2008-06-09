@@ -53,8 +53,6 @@
 
     <input file="/shader/snippets/objectToWorld.inp" private="yes" />
 
-    <input file="/shader/snippets/objectToWorld.inp" private="yes" />
-
     <block location="cg:vertexToFragment">
       <varying type="position4" name="position" binding="POSITION" />
       <!-- This is needed since POSITION semantics can't be used for input in an FP -->
