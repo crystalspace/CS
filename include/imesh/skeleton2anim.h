@@ -467,6 +467,17 @@ struct iSkeletonAnimationNodeFactory2 : public iSkeletonAnimNodeFactory2
    * playing from the beginning. 
    */
   virtual bool GetAutomaticReset () const = 0;
+
+  /**
+   * Set if animation should automatically stop when finishing.
+   */
+  virtual void SetAutomaticStop (bool enabed) = 0;
+
+  /**
+   * Get if animation should automatically stop when finishing.
+   */
+  virtual bool GetAutomaticStop () const = 0;
+
 };
 
 /**

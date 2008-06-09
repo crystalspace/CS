@@ -170,6 +170,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual float GetPlaybackSpeed () const;
     virtual void SetAutomaticReset (bool reset);
     virtual bool GetAutomaticReset () const;
+    virtual void SetAutomaticStop (bool enabled);
+    virtual bool GetAutomaticStop () const;
 
     //-- iSkeletonAnimNodeFactory2
     virtual csPtr<iSkeletonAnimNode2> CreateInstance (
@@ -181,7 +183,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     csString name;
 
     csRef<iSkeletonAnimation2> animation;
-    bool cyclic, automaticReset;
+    bool cyclic, automaticReset, automaticStop;
     float playbackSpeed, animationDuration;
 
     friend class AnimationNode;

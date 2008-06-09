@@ -123,7 +123,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   AnimationNodeFactory::AnimationNodeFactory (const char* name)
     : scfImplementationType (this), name (name), cyclic (false),
-    automaticReset (false), playbackSpeed (1.0f), animationDuration (0.0f)
+    automaticReset (false), automaticStop (true), playbackSpeed (1.0f), 
+    animationDuration (0.0f)
   {}
 
   void AnimationNodeFactory::SetAnimation (iSkeletonAnimation2* animation)
@@ -168,6 +169,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return automaticReset;
   }
 
+  void AnimationNodeFactory::SetAutomaticStop (bool enabled)
+  { 
+    automaticStop = enabled; 
+  }
+
+  bool AnimationNodeFactory::GetAutomaticStop () const 
+  { 
+    return automaticStop; 
+  }
+
   csPtr<iSkeletonAnimNode2> AnimationNodeFactory::CreateInstance (
     iSkeletonAnimPacket2* packet, iSkeleton2* skeleton)
   {
@@ -195,15 +206,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   
   void AnimationNode::Play ()
   {
+    if (!isPlaying && factory->automaticReset)
+      playbackPosition = 0;
+
     isPlaying = true;
     FireStateChangeCb (isPlaying);
   }
 
   void AnimationNode::Stop ()
   {
-    if(isPlaying && factory->automaticReset)
-      playbackPosition = 0;
-
     isPlaying = false;
     FireStateChangeCb (isPlaying);
   }
@@ -258,12 +269,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       }
       else
       {
-        if (factory->automaticReset)
-          playbackPosition = 0;
-        else
-          playbackPosition = duration;
-
-        isPlaying = false;        
+        playbackPosition = duration;
+        if (factory->automaticStop)
+          isPlaying = false;
 
         BaseNodeSingle::FireAnimationFinishedCb ();
       }
