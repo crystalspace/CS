@@ -33,6 +33,7 @@
 #include "csgeom/vector3.h"
 #include "csgeom/vector4.h"
 #include "csgfx/rgbpixel.h"
+#include "csutil/blockallocator.h"
 #include "csutil/cscolor.h"
 #include "csutil/leakguard.h"
 #include "csutil/refarr.h"
@@ -550,6 +551,7 @@ public:
    */
   void SetArrayElement (size_t element, csShaderVariable *variable)
   {
+    if (Type != ARRAY) NewType (ARRAY);
     ShaderVarArray->Put (element, variable);
   }
 
@@ -558,6 +560,10 @@ private:
   VariableType Type;
 
   // Storage for types that can be combined..
+  typedef csRefArray<csShaderVariable,
+    CS::Memory::LocalBufferAllocator<csShaderVariable*, 8,
+      CS::Memory::AllocatorMalloc, true>,
+    csArrayCapacityFixedGrow<8> > SvArrayType;
   union
   {
     // Refcounted
@@ -571,12 +577,19 @@ private:
     int Int;
     csMatrix3* MatrixValuePtr;
     csReversibleTransform* TransformPtr;
-    csRefArray<csShaderVariable> *ShaderVarArray;
+    SvArrayType* ShaderVarArray;
   };
 
   csVector4 VectorValue;  
   csRef<iShaderVariableAccessor> accessor;
   intptr_t accessorData;
+  
+  CS_DECLARE_STATIC_CLASSVAR (matrixAlloc, MatrixAlloc,
+    csBlockAllocator<csMatrix3>)
+  CS_DECLARE_STATIC_CLASSVAR (transformAlloc, TransformAlloc,
+    csBlockAllocator<csReversibleTransform>)
+  CS_DECLARE_STATIC_CLASSVAR (arrayAlloc, ShaderVarArrayAlloc,
+    csBlockAllocator<SvArrayType>)
 
   virtual void NewType (VariableType nt);
 };

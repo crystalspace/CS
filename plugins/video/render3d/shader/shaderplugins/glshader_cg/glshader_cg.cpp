@@ -329,6 +329,11 @@ bool csGLShader_CG::Open()
     enable = false;
     return false;
   }
+  
+  ext->InitGL_ARB_vertex_program();
+  ext->InitGL_ARB_fragment_program();
+  ext->InitGL_NV_gpu_program4();
+  ext->InitGL_EXT_gpu_program_parameters();
 
   enableVP = config->GetBool ("Video.OpenGL.Shader.Cg.Enable.Vertex", true);
   enableFP = config->GetBool ("Video.OpenGL.Shader.Cg.Enable.Fragment", true);

@@ -200,6 +200,8 @@ namespace RenderManager
       * of the actual step */
       csRefArray<csShaderVariable> svKeeper;
       
+      PersistentData() : svAlloc (32*1024) {}
+      
       void UpdateNewFrame ()
       {
 	svKeeper.Empty();

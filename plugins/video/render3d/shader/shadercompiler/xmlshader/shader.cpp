@@ -264,23 +264,37 @@ void csShaderConditionResolver::DumpConditionNode (csString& out,
   }
 }
   
-bool csShaderConditionResolver::ReadFromCache (iFile* cacheFile)
+void csShaderConditionResolver::CollectUsedConditions (csConditionNode* node,
+  ConditionsWriter& condWrite)
 {
-  uint32 reqCondNumLE;
-  if (cacheFile->Read ((char*)&reqCondNumLE, sizeof (reqCondNumLE))
-      != sizeof (reqCondNumLE))
-    return false;
-  if (csLittleEndian::UInt32 (reqCondNumLE)
-      > evaluator.GetNumConditions())
-    return false;
+  if (node == 0) return;
+  if (node->condition == csCondAlwaysTrue) return;
+  if (node->condition == csCondAlwaysFalse) return;
+  
+  csFIFO<csConditionID> condStack;
+  condStack.Push (node->condition);
+  while (condStack.GetSize() > 0)
+  {
+    csConditionID cond = condStack.PopTop();
+    condWrite.GetDiskID (cond);
+    const CondOperation& op = evaluator.GetCondition (cond);
+    if (op.left.type == operandOperation) condStack.Push (op.left.operation);
+    if (op.right.type == operandOperation) condStack.Push (op.right.operation);
+  }
+  CollectUsedConditions (node->falseNode, condWrite);
+  CollectUsedConditions (node->trueNode, condWrite);
+}
 
+bool csShaderConditionResolver::ReadFromCache (iFile* cacheFile,
+                                               ConditionsReader& condReader)
+{
   uint32 nextVarLE;
   if (cacheFile->Read ((char*)&nextVarLE, sizeof (nextVarLE))
       != sizeof (nextVarLE))
     return false;
   nextVariant = csLittleEndian::UInt32 (nextVarLE);
 
-  if (!ReadNode (cacheFile, 0, rootNode))
+  if (!ReadNode (cacheFile, condReader, 0, rootNode))
   {
     delete rootNode; rootNode = 0;
     nextVariant = 0;
@@ -290,14 +304,9 @@ bool csShaderConditionResolver::ReadFromCache (iFile* cacheFile)
   return true;
 }
 
-bool csShaderConditionResolver::WriteToCache (iFile* cacheFile)
+bool csShaderConditionResolver::WriteToCache (iFile* cacheFile,
+                                              ConditionsWriter& condWriter)
 {
-  uint32 reqCondNumLE =
-    csLittleEndian::UInt32 (evaluator.GetNumConditions());
-  if (cacheFile->Write ((char*)&reqCondNumLE, sizeof (reqCondNumLE))
-      != sizeof (reqCondNumLE))
-    return false;
-    
   uint32 nextVarLE = nextVariant;
   nextVarLE = csLittleEndian::UInt32 (nextVarLE);
   if (cacheFile->Write ((char*)&nextVarLE, sizeof (nextVarLE))
@@ -313,14 +322,15 @@ bool csShaderConditionResolver::WriteToCache (iFile* cacheFile)
   }
   else
   {
-    if (!WriteNode (cacheFile, rootNode)) return false;
+    if (!WriteNode (cacheFile, rootNode, condWriter)) return false;
   }
   
   return true;
 }
   
 bool csShaderConditionResolver::ReadNode (iFile* cacheFile, 
-  csConditionNode* parent, csConditionNode*& node)
+  const ConditionsReader& condRead, csConditionNode* parent,
+  csConditionNode*& node)
 {
   uint32 condLE;
   if (cacheFile->Read ((char*)&condLE, sizeof (condLE)) != sizeof (condLE))
@@ -342,25 +352,27 @@ bool csShaderConditionResolver::ReadNode (iFile* cacheFile,
   else
   {
     // Node, ie condition
-    node->condition = condLE;
-    return ReadNode (cacheFile, node, node->trueNode)
-      && ReadNode (cacheFile, node, node->falseNode);
+    node->condition = condRead.GetConditionID (condLE);
+    if (node->condition == (csConditionID)~0) return false;
+    return ReadNode (cacheFile, condRead, node, node->trueNode)
+      && ReadNode (cacheFile, condRead, node, node->falseNode);
   }
 }
 
-bool csShaderConditionResolver::WriteNode (iFile* cacheFile, csConditionNode* node)
+bool csShaderConditionResolver::WriteNode (iFile* cacheFile, csConditionNode* node,
+                                           const ConditionsWriter& condWrite)
 {
   if (node->variant == csArrayItemNotFound)
   {
     CS_ASSERT(node->condition != csCondAlwaysTrue);
     CS_ASSERT(node->condition != csCondAlwaysFalse);
     
-    uint32 condLE = node->condition;
+    uint32 condLE = condWrite.GetDiskID (node->condition);
     condLE = csLittleEndian::UInt32 (condLE);
     if (cacheFile->Write ((char*)&condLE, sizeof (condLE)) != sizeof (condLE))
       return false;
-    return WriteNode (cacheFile, node->trueNode)
-      && WriteNode (cacheFile, node->falseNode);
+    return WriteNode (cacheFile, node->trueNode, condWrite)
+      && WriteNode (cacheFile, node->falseNode, condWrite);
   }
   else
   {
@@ -378,9 +390,7 @@ csXMLShader::csXMLShader (csXMLShaderCompiler* compiler,
 			  iDocumentNode* source,
 			  int forcepriority)
   : scfImplementationType (this), techsResolver (0),
-    sharedEvaluator (new csConditionEvaluator (compiler->stringsSvName,
-      compiler->condConstants)),
-    cachedEvaluatorConditionNum ((size_t)-1),
+    sharedEvaluator (compiler->sharedEvaluator),
     fallbackTried (false)
 {
   InitTokenTable (xmltokens);
@@ -419,7 +429,7 @@ csXMLShader::~csXMLShader ()
 /* Magic value for cache file.
  * The most significant byte serves as a "version", increase when the
  * cache file format changes. */
-static const uint32 cacheFileMagic = 0x04737863;
+static const uint32 cacheFileMagic = 0x05737863;
 
 void csXMLShader::Load (iDocumentNode* source)
 {
@@ -441,7 +451,6 @@ void csXMLShader::Load (iDocumentNode* source)
     }
     if (cacheTag.IsEmpty()) cacheTag = cacheID_base;
     cacheID_header.Format ("%sXH", cacheID_base.GetData());
-    cacheScope_evaluator.Format ("%sXE", cacheID_base.GetData());
     cacheScope_tech.Format ("%sXT", cacheID_base.GetData());
   }
   bool cacheValid = (shaderCache != 0) && !cacheType.IsEmpty()
@@ -497,44 +506,31 @@ void csXMLShader::Load (iDocumentNode* source)
     }
   }
   
+  ConditionsReader* condReader = 0;
   if (useShaderCache)
   {
-    useShaderCache = false;
     do
     {
-      csRef<iDataBuffer> evalData;
-      evalData = shaderCache->ReadCache (cacheType, cacheScope_evaluator, ~0);
-      if (!evalData.IsValid()) break;
-      csMemFile evalFile (evalData, true);
-      uint32 diskMagic;
-      size_t read = evalFile.Read ((char*)&diskMagic, sizeof (diskMagic));
-      if (read != sizeof (diskMagic)) break;
-      if (csLittleEndian::UInt32 (diskMagic) != cacheFileMagic) break;
-      
-      useShaderCache = sharedEvaluator->ReadFromCache (&evalFile, cacheTag);
-      if (useShaderCache)
-        cachedEvaluatorConditionNum = sharedEvaluator->GetNumConditions();
-      else
-      {
-        delete sharedEvaluator;
-        sharedEvaluator = new csConditionEvaluator (compiler->stringsSvName,
-          compiler->condConstants);
-      }
-      csPrintf ("shader = %s\nsharedEvaluator->GetNumConditions() = %zu\n", cacheType.GetData(),
-        sharedEvaluator->GetNumConditions());
+      useShaderCache = false;
+      csRef<iDataBuffer> conditionsBuf =
+        CS::PluginCommon::ShaderCacheHelper::ReadDataBuffer (cacheFile);
+      if (!conditionsBuf.IsValid()) break;;
+      condReader = new ConditionsReader (*sharedEvaluator, conditionsBuf);
+      useShaderCache = true;
     }
     while (false);
-    
+  
     if (useShaderCache)
     {
       // Read condition tree from cache
-      useShaderCache = techsResolver->ReadFromCache (cacheFile);
+      useShaderCache = techsResolver->ReadFromCache (cacheFile, *condReader);
     }
+    
     if (useShaderCache)
     {
       csRef<iDocumentNode> wrappedNode;
       wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapperFromCache (
-	cacheFile, techsResolver, techsResolver->evaluator));
+	cacheFile, techsResolver, techsResolver->evaluator, *condReader));
       useShaderCache = wrappedNode.IsValid ();
       shaderRoot = wrappedNode;
       
@@ -579,29 +575,25 @@ void csXMLShader::Load (iDocumentNode* source)
     
     if (cacheValid)
     {
-      bool cacheState = techsResolver->WriteToCache (cacheFile);
+      bool cacheState;
+      ConditionsWriter condWriter (*sharedEvaluator);
+      techsResolver->CollectUsedConditions (condWriter);
+      {
+	csRef<iDataBuffer> conditionsBuf = condWriter.GetPersistentData();
+	cacheState = CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (
+          cacheFile, conditionsBuf);
+      }
+    
       if (cacheState)
-        cacheState = wrappedNode->StoreToCache (cacheFile);
+        cacheState = techsResolver->WriteToCache (cacheFile, condWriter);
+      if (cacheState)
+        cacheState = wrappedNode->StoreToCache (cacheFile, condWriter);
       
       if (cacheState)
       {
         csRef<iDataBuffer> allCacheData = cacheFile->GetAllData();
 	shaderCache->CacheData (allCacheData->GetData(),
 	  allCacheData->GetSize(), cacheType, cacheID_header, ~0);
-      }
-    
-      if (cachedEvaluatorConditionNum != sharedEvaluator->GetNumConditions())
-      {
-	csMemFile cacheFile;
-	uint32 diskMagic = csLittleEndian::UInt32 (cacheFileMagic);
-	cacheFile.Write ((char*)&diskMagic, sizeof (diskMagic));
-	if (sharedEvaluator->WriteToCache (&cacheFile, cacheTag))
-	{
-	  csRef<iDataBuffer> cacheData = cacheFile.GetAllData();
-	  shaderCache->CacheData (cacheData->GetData(), cacheData->GetSize(),
-	    cacheType, cacheScope_evaluator, ~0);
-	}
-	cachedEvaluatorConditionNum = sharedEvaluator->GetNumConditions();
       }
     }
   }
@@ -613,6 +605,8 @@ void csXMLShader::Load (iDocumentNode* source)
  
   if (varNode)
     ParseGlobalSVs (ldr_context, varNode);
+    
+  delete condReader;
 }
 
 void csXMLShader::SelfDestruct ()
@@ -736,23 +730,22 @@ void csXMLShader::ParseGlobalSVs (iLoaderContext* ldr_context,
     iDocumentNode* node)
 {
   SVCWrapper wrapper (globalSVContext, shadermgr->GetSVNameStringset ()->GetSize ());
-  sharedEvaluator->ResetEvaluationCache();
+  //sharedEvaluator->ResetEvaluationCache();
+  sharedEvaluator->EnterEvaluation();
   techsResolver->SetEvalParams (0, &wrapper.svStack);
   compiler->LoadSVBlock (ldr_context, node, &wrapper);
   techsResolver->SetEvalParams (0, 0);
+  sharedEvaluator->LeaveEvaluation();
 }
 
 size_t csXMLShader::GetTicket (const csRenderMeshModes& modes, 
 			       const csShaderVariableStack& stack)
 {
   size_t ticket = csArrayItemNotFound;
-  sharedEvaluator->ResetEvaluationCache();
+  //sharedEvaluator->ResetEvaluationCache();
+  csConditionEvaluator::ScopedEvaluation scope (*sharedEvaluator);
   techsResolver->SetEvalParams (&modes, &stack);
   
-  // So external files are found correctly
-  compiler->vfs->PushDir ();
-  compiler->vfs->ChDir (vfsStartDir);
-
   size_t tvc = techsResolver->GetVariantCount();
   if (tvc == 0) tvc = 1;
   
@@ -814,7 +807,13 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	      CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
 	    if (cachedTag != cacheTag) break;
 	    
-	    if (!tech.resolver->ReadFromCache (cacheFile))
+	    csRef<iDataBuffer> conditionsBuf =
+	      CS::PluginCommon::ShaderCacheHelper::ReadDataBuffer (cacheFile);
+	    if (!conditionsBuf.IsValid()) break;;
+	    
+	    ConditionsReader condReader (*sharedEvaluator, conditionsBuf);
+	    
+	    if (!tech.resolver->ReadFromCache (cacheFile, condReader))
 	    {
 	      delete tech.resolver;
 	      tech.resolver = new csShaderConditionResolver (*sharedEvaluator);
@@ -823,7 +822,7 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	    
 	    csRef<csWrappedDocumentNode> wrappedNode;
 	    wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapperFromCache (cacheFile,
-	      tech.resolver, *sharedEvaluator));
+	      tech.resolver, *sharedEvaluator, condReader));
 	    if (!wrappedNode.IsValid()) break;
 	    tech.techNode = wrappedNode;
 	    tech.srcNode.Invalidate();
@@ -858,13 +857,29 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	    }
 	  }
 	  
+	  // So external files are found correctly
+	  csVfsDirectoryChanger dirChange (compiler->vfs);
+	  dirChange.ChangeTo (vfsStartDir);
+	
 	  /* @@@ TODO: Some SV values are fixed from the tech determination;
-	  * treat them as constant in the technique */
+	   * treat them as constant in the technique */
 	  csRef<csWrappedDocumentNode> wrappedNode;
 	  wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (tech.srcNode, 
 	    tech.resolver, tech.resolver->evaluator, extraNodes, 0));
 	  tech.techNode = wrappedNode;
 	  tech.srcNode.Invalidate();
+	  
+	  if (compiler->doDumpConds)
+	  {
+	    csString tree;
+	    tree.SetGrowsBy (0);
+	    tech.resolver->DumpConditionTree (tree);
+	    csString filename;
+	    filename.Format ("/tmp/shader/cond_%s_%zu.txt",
+	      shaderRoot->GetAttributeValue ("name"),
+	      tvi);
+	    compiler->vfs->WriteFile (filename, tree.GetData(), tree.Length ());
+	  }
 	  
 	  if (shaderCache.IsValid())
 	  {
@@ -880,15 +895,30 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	          cacheFile, cacheTag))
 	      cacheFile.Invalidate();
 	      
-	    if (cacheFile.IsValid() && !tech.resolver->WriteToCache (cacheFile))
-	      cacheFile.Invalidate();
-	    if (cacheFile.IsValid() && !wrappedNode->StoreToCache (cacheFile))
-	      cacheFile.Invalidate();
 	    if (cacheFile.IsValid())
 	    {
-	      csRef<iDataBuffer> cacheData (cacheFile->GetAllData());
-	      shaderCache->CacheData (cacheData->GetData(), cacheData->GetSize(),
-	        cacheType, cacheScope_tech, cacheID);
+	      ConditionsWriter condWriter (*sharedEvaluator);
+	      tech.resolver->CollectUsedConditions (condWriter);
+	      wrappedNode->CollectUsedConditions (condWriter);
+	      {
+		csRef<iDataBuffer> conditionsBuf = condWriter.GetPersistentData();
+		if (!CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (
+		    cacheFile, conditionsBuf))
+		  cacheFile.Invalidate();
+	      }
+		
+	      if (cacheFile.IsValid() && !tech.resolver->WriteToCache (cacheFile,
+	          condWriter))
+		cacheFile.Invalidate();
+	      if (cacheFile.IsValid() && !wrappedNode->StoreToCache (cacheFile,
+	          condWriter))
+		cacheFile.Invalidate();
+	      if (cacheFile.IsValid())
+	      {
+		csRef<iDataBuffer> cacheData (cacheFile->GetAllData());
+		shaderCache->CacheData (cacheData->GetData(), cacheData->GetSize(),
+		  cacheType, cacheScope_tech, cacheID);
+	      }
 	    }
 	  }
 	}
@@ -921,6 +951,10 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	      GetName(), tvi, vi));
 	  }
     
+	  // So external files are found correctly
+	  csVfsDirectoryChanger dirChange (compiler->vfs);
+	  dirChange.ChangeTo (vfsStartDir);
+	
 	  var.tech = new csXMLShaderTech (this);
 	  if (var.tech->Load (ldr_context, tech.techNode, shaderRoot, ticket))
 	  {
@@ -977,24 +1011,7 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
     techVar.prepared = true;
   }
   
-  compiler->vfs->PopDir ();
-
   techsResolver->SetEvalParams (0, 0);
-  
-  if (shaderCache.IsValid()
-      && (cachedEvaluatorConditionNum != sharedEvaluator->GetNumConditions()))
-  {
-    csMemFile cacheFile;
-    uint32 diskMagic = csLittleEndian::UInt32 (cacheFileMagic);
-    cacheFile.Write ((char*)&diskMagic, sizeof (diskMagic));
-    if (sharedEvaluator->WriteToCache (&cacheFile, cacheTag))
-    {
-      csRef<iDataBuffer> cacheData = cacheFile.GetAllData();
-      shaderCache->CacheData (cacheData->GetData(), cacheData->GetSize(),
-        cacheType, cacheScope_evaluator, ~0);
-    }
-    cachedEvaluatorConditionNum = sharedEvaluator->GetNumConditions();
-  }
   
   return ticket;
 }

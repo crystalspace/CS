@@ -26,10 +26,12 @@
  * \addtogroup engine3d_light
  * @{ */
  
+#include "csutil/flags.h"
+#include "csutil/ref.h"
 #include "csutil/scf.h"
 #include "csutil/weakref.h"
-#include "csutil/ref.h"
 
+#include "iengine/light.h"
 #include "iutil/array.h"
 
 struct iLight;
@@ -58,11 +60,18 @@ enum csLightQueryFlags
  */
 struct csLightInfluence
 {
-  iLight* light;  
-
+  iLight* light;
+  /// Other useful information in one handy package
+  csLightType type;
+  csFlags flags;
+  csLightDynamicType dynamicType;
+  
   inline friend bool operator == (const csLightInfluence& r1, const csLightInfluence& r2) 
   {
-    return r1.light == r2.light;
+    return (r1.light == r2.light)
+      && (r1.type == r2.type)
+      && (r1.flags == r2.flags)
+      && (r1.dynamicType == r2.dynamicType);
   }
 };
 
@@ -212,7 +221,8 @@ struct iLightManager : public virtual iBase
     uint flags = CS_LIGHTQUERY_GET_ALL) = 0;
 
   /**
-   * Free a light influence array earlier allocated by 
+   * Free a light influence array earlier allocated by GetRelevantLights 
+   * \param Array The light influences array returned by GetRelevantLights().
    */
   virtual void FreeInfluenceArray (csLightInfluence* Array) = 0;
 
