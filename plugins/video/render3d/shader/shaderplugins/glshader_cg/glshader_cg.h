@@ -36,32 +36,6 @@ struct csGLExtensionManager;
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 {
 
-class ParamValueCache
-{
-public:
-  struct Entry
-  {
-    uint timeStamp;
-    union
-    {
-      float fValues[16];
-      int intValue;
-    };
-    int usedValues;
-    
-    Entry() : timeStamp (0) {}
-  };
-  
-  ParamValueCache() : currentTime (0) {}
-  void Reset() { ++currentTime; }
-  bool ValueChanged (uint slot, float* values, int numValues);
-  bool ValueChanged (uint slot, int value);
-private:
-  uint currentTime;
-  csArray<Entry> entries;
-};
-
-
 class csGLShader_CG : public scfImplementation2<csGLShader_CG, 
 						iShaderProgramPlugin,
 					        iComponent>
@@ -91,8 +65,6 @@ public:
   CGprofile maxProfileFragment;
   
   csBlockAllocator<ShaderParameter> paramAlloc;
-  ParamValueCache valueCacheVP;
-  ParamValueCache valueCacheFP;
 
   csGLShader_CG (iBase *parent);
   virtual ~csGLShader_CG ();
