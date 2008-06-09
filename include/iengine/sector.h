@@ -32,6 +32,7 @@
 #include "csutil/scf.h"
 #include "csutil/set.h"
 #include "csgeom/vector3.h"
+#include "csgeom/aabbtree.h"
 
 struct iMeshWrapper;
 struct iMeshGenerator;
@@ -39,7 +40,6 @@ struct iMeshList;
 struct iLightList;
 struct iLight;
 struct iVisibilityCuller;
-struct iLightSectorInfluence;
 
 struct iObject;
 
@@ -55,6 +55,7 @@ class csBox3;
 class csRenderMeshList;
 class csReversibleTransform;
 class csVector3;
+
 
 enum csFogMode
 {
@@ -187,7 +188,7 @@ struct csSectorHitBeamResult
  */
 struct iSector : public virtual iBase
 {
-  SCF_INTERFACE(iSector,2,2,0);
+  SCF_INTERFACE(iSector,2,3,0);
   /// Get the iObject for this sector.
   virtual iObject *QueryObject () = 0;
 
@@ -476,6 +477,11 @@ struct iSector : public virtual iBase
    * with this sector visible. This will speed up later rendering.
    */
   virtual void PrecacheDraw () = 0;
+
+  /**
+   * Call all the sector callback functions
+   */
+  virtual void CallSectorCallbacks (iRenderView* rview) = 0;
 };
 
 

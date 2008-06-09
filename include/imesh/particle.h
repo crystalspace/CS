@@ -32,11 +32,11 @@
 struct iLight;
 struct iMovable;
 struct iRenderView;
-struct iLightSectorInfluence;
 
 class csColor;
 class csReversibleTransform;
 class csVector3;
+struct csLightInfluence;
 
 /**
  * A iParticle can be used in particle Systems.
@@ -47,7 +47,7 @@ class csVector3;
  */
 struct iParticle : public virtual iBase
 {
-  SCF_INTERFACE (iParticle, 1, 0, 0);
+  SCF_INTERFACE (iParticle, 2, 0, 0);
 
   /**
    * Set the position of this particle in coordinates relative
@@ -72,7 +72,7 @@ struct iParticle : public virtual iBase
    * The given transform is the transform of the parent particle system.
    * The position of this particle should be relative to that transform.
    */
-  virtual void UpdateLighting (const csArray<iLightSectorInfluence*>& lights,
+  virtual void UpdateLighting (const csSafeCopyArray<csLightInfluence>& lights,
       const csReversibleTransform& transform) = 0;
 };
 

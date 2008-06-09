@@ -98,11 +98,12 @@ class csReversibleTransform;
 #define CS_ENTITY_INVISIBLE (CS_ENTITY_INVISIBLEMESH+CS_ENTITY_NOHITBEAM)
 
 /**
- * If CS_ENTITY_NOSHADOWS is set then this thing will not cast
+ * If CS_ENTITY_NOSHADOWCAST is set then this mesh will not cast
  * shadows. Lighting will still be calculated for it though. Use the
  * CS_ENTITY_NOLIGHTING flag to disable that.
  */
-#define CS_ENTITY_NOSHADOWS 16
+#define CS_ENTITY_NOSHADOWCAST 16
+#define CS_ENTITY_NOSHADOWS   CS_ENTITY_NOSHADOWCAST
 
 /**
  * If CS_ENTITY_NOLIGHTING is set then this thing will not be lit.
@@ -132,6 +133,23 @@ class csReversibleTransform;
  * If CS_ENTITY_NODECAL is set then this entity will not accept decals.
  */
 #define CS_ENTITY_NODECAL 256
+
+/**
+ * Indicates that static lighting was computed for this mesh.
+ */
+#define CS_ENTITY_STATICLIT 512
+
+/**
+ * If CS_ENTITY_NOSHADOWRECEIVE is set then this mesh will not receive
+ * shadows. 
+ */
+#define CS_ENTITY_NOSHADOWRECEIVE 1024
+
+/**
+ * Mark a mesh as a shadow caster if a render managers allows limiting shadow
+ * casting limited to select meshes.
+ */
+#define CS_ENTITY_LIMITEDSHADOWCAST 2048
 
 /** @} */
 
@@ -648,6 +666,12 @@ struct iMeshWrapper : public virtual iBase
    * Get the shader variable context of the mesh object.
    */
   virtual iShaderVariableContext* GetSVContext() = 0;
+
+  /**
+   * Get the render mesh list for this mesh wrapper and given view
+   */
+  virtual csRenderMesh** GetRenderMeshes (int& num, iRenderView* rview,
+    uint32 frustum_mask) = 0;
 
   /**
    * Adds a render mesh to the list of extra render meshes.

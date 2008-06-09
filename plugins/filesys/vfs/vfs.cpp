@@ -215,10 +215,11 @@ public:
 class VfsArchiveCache : public CS::Memory::CustomAllocated
 {
 private:
-  csPDelArray<VfsArchive> array;
+  csPDelArray<VfsArchive, CS::Container::ArrayAllocDefault,
+    csArrayCapacityFixedGrow<8> > array;
 
 public:
-  VfsArchiveCache () : array (8, 8)
+  VfsArchiveCache () : array (8)
   {
   }
   virtual ~VfsArchiveCache ()

@@ -79,6 +79,8 @@
 #include "plugins/engine/3d/texture.h"
 #include "plugins/engine/3d/meshgen.h"
 
+using namespace CS_PLUGIN_NAMESPACE_NAME(Engine);
+
 CS_IMPLEMENT_PLUGIN
 
 bool csEngine::doVerbose = false;
@@ -561,6 +563,7 @@ SCF_IMPLEMENT_FACTORY (csEngine)
 
 csEngine::csEngine (iBase *iParent) :
   scfImplementationType (this, iParent), objectRegistry (0),
+  envTexHolder (this),
   frameWidth (0), frameHeight (0), 
   lightAmbientRed (CS_DEFAULT_LIGHT_LEVEL),
   lightAmbientGreen (CS_DEFAULT_LIGHT_LEVEL),
@@ -610,6 +613,10 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
 
   globalStringSet = csQueryRegistryTagInterface<iStringSet> (
       objectRegistry, "crystalspace.shared.stringset");
+
+  svNameStringSet = csQueryRegistryTagInterface<iShaderVarStringSet> (
+    objectRegistry, "crystalspace.shader.variablenameset");
+
   colldet_id = globalStringSet->Request ("colldet");
   viscull_id = globalStringSet->Request ("viscull");
   base_id = globalStringSet->Request ("base");
@@ -694,31 +701,25 @@ bool csEngine::HandleEvent (iEvent &Event)
 {
   if (Event.Name == SystemOpen)
   {
-  if (G3D)
-  {
-    id_creation_time = globalStringSet->Request("mesh creation time");
-    id_lod_fade = globalStringSet->Request("lod fade");
+    if (G3D)
+    {
+      maxAspectRatio = 4096;
+      frameWidth = G3D->GetWidth ();
+      frameHeight = G3D->GetHeight ();
+    }
+    else
+    {
+      maxAspectRatio = 4096;
+      frameWidth = 640;
+      frameHeight = 480;
+    }
 
-    maxAspectRatio = 4096;
-    frameWidth = G3D->GetWidth ();
-    frameHeight = G3D->GetHeight ();
-  }
-  else
-  {
-    maxAspectRatio = 4096;
-    frameWidth = 640;
-    frameHeight = 480;
-  }
+    if (PerspectiveImpl::GetDefaultFOV () == 0)
+      PerspectiveImpl::SetDefaultFOV (frameHeight/(float)frameWidth, 1.0f);
 
-  if (csCamera::GetDefaultFOV () == 0)
-    csCamera::SetDefaultFOV (frameHeight, frameWidth);
+    StartEngine ();
 
-  // Allow context resizing since we handle CanvasResize(G2D)
-  if (G2D) G2D->AllowResize (true);
-
-  StartEngine ();
-
-  return true;
+    return true;
   }
   else if (Event.Name == SystemClose)
   {
@@ -755,6 +756,56 @@ iMeshObjectType* csEngine::GetThingType ()
 
   return (iMeshObjectType*)thingMeshType;
 }
+  
+void csEngine::SetRenderManager (iRenderManager* newRM)
+{
+  if (newRM == 0) return;
+
+  if (renderManager.IsValid())
+    objectRegistry->Unregister (renderManager, "iRenderManager");
+  renderManager = newRM;
+  
+  objectRegistry->Register (renderManager, "iRenderManager");
+}
+
+void csEngine::ReloadRenderManager (csConfigAccess& cfg)
+{
+  const char fallbackRM[] = "crystalspace.rendermanager.rlcompat";
+  const char* defaultRM = cfg->GetStr ("Engine.RenderManager.Default", 0);
+  if (defaultRM == 0)
+  {
+    Warn ("No default render manager given, using '%s'", fallbackRM);
+    defaultRM = fallbackRM;
+  }
+  csRef<iRenderManager> newRM = csLoadPlugin<iRenderManager> (objectRegistry,
+    defaultRM);
+  if (!newRM)
+    Error ("No rendermanager set!");
+  else
+  {
+    csEngine::SetRenderManager (newRM);
+  }
+}
+
+void csEngine::ReloadRenderManager ()
+{
+  csConfigAccess cfg (objectRegistry, "/config/engine.cfg");
+  ReloadRenderManager (cfg);
+}
+
+csShaderVariable* csEngine::GetLightAttenuationTextureSV()
+{
+  if (!lightAttenuationTexture)
+  {
+    lightAttenuationTexture.AttachNew (new csShaderVariable (
+      lightSvNames.GetLightSVId (csLightShaderVarCache::lightAttenuationTex)));
+    lightAttenuationTexture->SetType (csShaderVariable::TEXTURE);
+    csRef<LightAttenuationTextureAccessor> accessor;
+    accessor.AttachNew (new LightAttenuationTextureAccessor (this));
+    lightAttenuationTexture->SetAccessor (accessor);
+  }
+  return lightAttenuationTexture;
+}
 
 void csEngine::DeleteAllForce ()
 {
@@ -773,6 +824,7 @@ void csEngine::DeleteAllForce ()
   sectors.RemoveAll ();
   cameraPositions.RemoveAll ();
 
+  defaultPortalMaterial.Invalidate ();
   delete materials;
   materials = new csMaterialList ();
   delete textures;
@@ -804,6 +856,10 @@ void csEngine::DeleteAllForce ()
 
   // remove objects
   QueryObject ()->ObjRemoveAll ();
+
+  envTexHolder.Clear ();
+  
+  lightAttenuationTexture.Invalidate ();
 }
 
 void csEngine::DeleteAll ()
@@ -840,6 +896,15 @@ void csEngine::DeleteAll ()
     csRef<iShader> portal_shader = LoadShader (docsys, shaderPath);
     if (!portal_shader.IsValid())
       Warn ("Default shader %s not available", shaderPath);
+      
+    csRef<csMaterial> portalMat;
+    portalMat.AttachNew (new csMaterial (this));
+    // FIXME: hardcoded shader type; prolly move to render manager
+    portalMat->SetShader (globalStringSet->Request ("standard"),
+      portal_shader);
+    csRef<iMaterialWrapper> portalMaterialWrapper;
+    portalMaterialWrapper = materials->NewMaterial (portalMat, 0);
+    defaultPortalMaterial = portalMaterialWrapper;
 
     // Now, try to load the user-specified default render loop.
     const char* configLoop = cfg->GetStr ("Engine.RenderLoop.Default", 0);
@@ -869,6 +934,8 @@ void csEngine::DeleteAll ()
     // Register it.
     renderLoopManager->Register (CS_DEFAULT_RENDERLOOP_NAME, 
       defaultRenderLoop);
+
+    csEngine::ReloadRenderManager();
   }
 }
 
@@ -1437,6 +1504,21 @@ bool csEngine::CheckConsistency ()
 void csEngine::StartEngine ()
 {
   DeleteAll ();
+  id_creation_time = svNameStringSet->Request("mesh creation time");
+  svTexEnvironmentName = svNameStringSet->Request("tex environment");
+  id_lod_fade = svNameStringSet->Request("lod fade");
+
+  lightSvNames.SetStrings (svNameStringSet);
+  /* Generate light SV IDs - that way, space for them will be reserved
+   * when shader stacks are set up */
+  for (int p = 0; p < csLightShaderVarCache::_lightCount; p++)
+  {
+    lightSvNames.GetLightSVId (csLightShaderVarCache::LightProperty (p));
+  }
+  for (int p = 0; p < csLightShaderVarCache::_varCount; p++)
+  {
+    lightSvNames.GetDefaultSVId (csLightShaderVarCache::DefaultSV (p));
+  }
 }
 
 void csEngine::PrecacheMesh (iMeshWrapper* s, iRenderView* rview)
@@ -1580,6 +1662,7 @@ void csEngine::Draw (iCamera *c, iClipper2D *view, iMeshWrapper* mesh)
     bugplug->ResetCounter ("Sector Count");
 
   currentFrameNumber++;
+  c->SetViewportSize (frameWidth, frameHeight);
   ControlMeshes ();
   csRef<csRenderView> rview;
   rview.AttachNew (new (rviewPool) csRenderView (c, view, G3D, G2D));
@@ -1588,16 +1671,21 @@ void csEngine::Draw (iCamera *c, iClipper2D *view, iMeshWrapper* mesh)
   // First initialize G3D with the right clipper.
   G3D->SetClipper (view, CS_CLIPPER_TOPLEVEL);  // We are at top-level.
   G3D->ResetNearPlane ();
-  G3D->SetPerspectiveAspect (c->GetFOV ());
+  G3D->SetProjectionMatrix (c->GetProjectionMatrix ());
 
   FireStartFrame (rview);
 
   iSector *s = c->GetSector ();
   if (s) 
   {
+    csShaderVariableStack& varStack = shaderManager->GetShaderVariableStack ();
+    varStack.Setup (shaderManager->GetSVNameStringset ()->GetSize ());
+
     iRenderLoop* rl = s->GetRenderLoop ();
     if (!rl) rl = defaultRenderLoop;
     rl->Draw (rview, s, mesh);
+
+    varStack.Setup (0);
   }
 
   // draw all halos on the screen
@@ -1838,13 +1926,13 @@ void csEngine::ControlMeshes ()
   }
 }
 
-char* csEngine::SplitRegionName(const char* name, iRegion*& region,
+const char* csEngine::SplitRegionName(const char* name, iRegion*& region,
 	bool& global)
 {
   region = 0;
   global = false;
 
-  char* p = (char*)strchr (name, '/');
+  const char* p = strchr (name, '/');
   if (!p) return (char*)name;
   if (*name == '*' && *(name+1) == '/')
   {
@@ -1852,30 +1940,28 @@ char* csEngine::SplitRegionName(const char* name, iRegion*& region,
     return p+1;
   }
 
-  *p = 0;
-  region = regions.FindByName (name);
-  *p = '/';
+  csString regionPart (name, p - name);
+  region = regions.FindByName (regionPart);
   if (!region) return 0;
   return p+1;
 }
 
-char* csEngine::SplitCollectionName(const char* name, iCollection*& collection,
+const char* csEngine::SplitCollectionName(const char* name, iCollection*& collection,
 	bool& global)
 {
   collection = 0;
   global = false;
 
-  char* p = (char*)strchr (name, '/');
-  if (!p) return (char*)name;
+  const char* p = strchr (name, '/');
+  if (!p) return name;
   if (*name == '*' && *(name+1) == '/')
   {
     global = true;
     return p+1;
   }
 
-  *p = 0;
-  collection = GetCollection(name);
-  *p = '/';
+  csString collectionPart (name, p - name);
+  collection = GetCollection (collectionPart);
   if (!collection) return 0;
   return p+1;
 }
@@ -1900,7 +1986,7 @@ iMaterialWrapper* csEngine::FindMaterialRegion(const char* name,
 {
   iRegion* region;
   bool global;
-  char* n = SplitRegionName (name, region, global);
+  const char* n = SplitRegionName (name, region, global);
   if (!n) return 0;
 
   iMaterialWrapper* mat;
@@ -1918,7 +2004,7 @@ iMaterialWrapper* csEngine::FindMaterialCollection(const char* name,
 {
   iCollection* collection;
   bool global;
-  char* n = SplitCollectionName (name, collection, global);
+  const char* n = SplitCollectionName (name, collection, global);
   if (!n) return 0;
 
   iMaterialWrapper* mat;
@@ -1951,7 +2037,7 @@ iTextureWrapper* csEngine::FindTextureRegion (const char* name,
 {
   iRegion* region;
   bool global;
-  char* n = SplitRegionName (name, region, global);
+  const char* n = SplitRegionName (name, region, global);
   if (!n) return 0;
 
   iTextureWrapper* txt;
@@ -1969,7 +2055,7 @@ iTextureWrapper* csEngine::FindTextureCollection (const char* name,
 {
   iRegion* collection;
   bool global;
-  char* n = SplitRegionName (name, collection, global);
+  const char* n = SplitRegionName (name, collection, global);
   if (!n) return 0;
 
   iTextureWrapper* txt;
@@ -2002,7 +2088,7 @@ iSector* csEngine::FindSectorRegion (const char* name,
 {
   iRegion* region;
   bool global;
-  char* n = SplitRegionName (name, region, global);
+  const char* n = SplitRegionName (name, region, global);
   if (!n) return 0;
 
   iSector* sect;
@@ -2020,7 +2106,7 @@ iSector* csEngine::FindSectorCollection (const char* name,
 {
   iCollection* collection;
   bool global;
-  char* n = SplitCollectionName (name, collection, global);
+  const char* n = SplitCollectionName (name, collection, global);
   if (!n) return 0;
 
   csRef<iSector> sect;
@@ -2053,7 +2139,7 @@ iMeshWrapper* csEngine::FindMeshObjectRegion (const char* name,
 {
   iRegion* region;
   bool global;
-  char* n = SplitRegionName (name, region, global);
+  const char* n = SplitRegionName (name, region, global);
   if (!n) return 0;
 
   iMeshWrapper* mesh;
@@ -2071,7 +2157,7 @@ iMeshWrapper* csEngine::FindMeshObjectCollection (const char* name,
 {
   iCollection* collection;
   bool global;
-  char* n = SplitCollectionName(name, collection, global);
+  const char* n = SplitCollectionName(name, collection, global);
   if (!n) return 0;
 
   iMeshWrapper* mesh;
@@ -2104,7 +2190,7 @@ iMeshFactoryWrapper* csEngine::FindMeshFactoryRegion (const char* name,
 {
   iRegion* region;
   bool global;
-  char* n = SplitRegionName (name, region, global);
+  const char* n = SplitRegionName (name, region, global);
   if (!n) return 0;
 
   iMeshFactoryWrapper* fact;
@@ -2122,7 +2208,7 @@ iMeshFactoryWrapper* csEngine::FindMeshFactoryCollection (const char* name,
 {
   iCollection* collection;
   bool global;
-  char* n = SplitCollectionName (name, collection, global);
+  const char* n = SplitCollectionName (name, collection, global);
   if (!n) return 0;
 
   iMeshFactoryWrapper* fact;
@@ -2155,7 +2241,7 @@ iCameraPosition* csEngine::FindCameraPositionRegion (const char* name,
 {
   iRegion* region;
   bool global;
-  char* n = SplitRegionName (name, region, global);
+  const char* n = SplitRegionName (name, region, global);
   if (!n) return 0;
 
   iCameraPosition* campos;
@@ -2173,7 +2259,7 @@ iCameraPosition* csEngine::FindCameraPositionCollection (const char* name,
 {
   iCollection* collection;
   bool global;
-  char* n = SplitCollectionName (name, collection, global);
+  const char* n = SplitCollectionName (name, collection, global);
   if (!n) return 0;
 
   iCameraPosition* campos;
@@ -2291,51 +2377,6 @@ static int compare_light (const void *p1, const void *p2)
 // in csEngine so that it will be freed later.
 static csLightArray *light_array = 0;
 
-static bool FindLightPos_Front2Back (csKDTree* treenode,
-	void* userdata, uint32 cur_timestamp, uint32&)
-{
-  csVector3 pos = *(csVector3*)userdata;
-
-  const csBox3& node_bbox = treenode->GetNodeBBox ();
-
-  // In the first part of this test we are going to test if the
-  // position is inside the node. If not then we don't need to continue.
-  if (!node_bbox.In (pos))
-  {
-    return false;
-  }
-
-  treenode->Distribute ();
-
-  int num_objects;
-  csKDTreeChild** objects;
-  num_objects = treenode->GetObjectCount ();
-  objects = treenode->GetObjects ();
-
-  int i;
-  for (i = 0 ; i < num_objects ; i++)
-  {
-    if (objects[i]->timestamp != cur_timestamp)
-    {
-      objects[i]->timestamp = cur_timestamp;
-      // First test the bounding box of the object.
-      const csBox3& obj_bbox = objects[i]->GetBBox ();
-
-      if (obj_bbox.In (pos))
-      {
-        iLight* light = (iLight*)objects[i]->GetObject ();
-	float sqdist = csSquaredDist::PointPoint (pos,
-		light->GetMovable ()->GetFullPosition ());
-	if (sqdist < csSquare(light->GetCutoffDistance ()))
-	{
-	  light_array->AddLight (light, sqdist);
-	}
-      }
-    }
-  }
-  return true;
-}
-
 static bool FindLightBox_Front2Back (csKDTree* treenode,
 	void* userdata, uint32 cur_timestamp, uint32&)
 {
@@ -2382,6 +2423,90 @@ static bool FindLightBox_Front2Back (csKDTree* treenode,
   return true;
 }
 
+struct LightCollectPoint
+{
+  LightCollectPoint (csLightArray* lightArray, const csVector3& pos)
+    : lightArray (lightArray), pos (pos)
+  {}
+
+  void operator() (const csSectorLightList::LightAABBTree::Node* node)
+  {
+    if (!node->GetBBox ().In (pos))
+      return;
+
+    for (size_t i = 0; i < node->GetObjectCount (); ++i)
+    {
+      csLight* light = node->GetLeafData (i);
+      
+      float sqdist = csSquaredDist::PointPoint (pos,
+        light->GetMovable ()->GetFullPosition ());
+      if (sqdist < csSquare(light->GetCutoffDistance ()))
+      {
+        lightArray->AddLight (light, sqdist);
+      }
+    }
+  }
+
+  csLightArray* lightArray;
+  const csVector3& pos;
+};
+
+struct LightCollectInnerPoint
+{
+  LightCollectInnerPoint (const csVector3& pos)
+    : pos (pos)
+  {}
+
+  bool operator() (const csSectorLightList::LightAABBTree::Node* node)
+  {
+    return node->GetBBox ().In (pos);
+  }
+
+  const csVector3& pos;
+};
+
+struct LightCollectBox
+{
+  LightCollectBox (csLightArray* lightArray, const csBox3& box)
+    : lightArray (lightArray), box (box)
+  {}
+
+  void operator() (const csSectorLightList::LightAABBTree::Node* node)
+  {
+    if (!node->GetBBox ().TestIntersect (box))
+      return;
+
+    for (size_t i = 0; i < node->GetObjectCount (); ++i)
+    {
+      csLight* light = node->GetLeafData (i);
+      csVector3 light_pos = light->GetMovable ()->GetFullPosition ();
+      csBox3 b (box.Min () - light_pos, box.Max () - light_pos);
+      float sqdist = b.SquaredOriginDist ();
+      if (sqdist < csSquare (light->GetCutoffDistance ()))
+      {
+        lightArray->AddLight (light, sqdist);
+      }
+    }
+  }
+
+  csLightArray* lightArray;
+  const csBox3& box;
+};
+
+struct LightCollectInnerBox
+{
+  LightCollectInnerBox (const csBox3& box)
+    : box (box)
+  {}
+
+  bool operator() (const csSectorLightList::LightAABBTree::Node* node)
+  {
+    return node->GetBBox ().TestIntersect (box);
+  }
+
+  const csBox3& box;
+};
+
 
 int csEngine::GetNearbyLights (
   iSector *sector,
@@ -2399,10 +2524,11 @@ int csEngine::GetNearbyLights (
   }
 
   light_array->Reset ();
-
-  csKDTree* kdtree = ((csSector*)sector)->GetLightKDTree ();
-  csVector3 position = pos;
-  kdtree->Front2Back (pos, FindLightPos_Front2Back, &position, 0);
+  
+  const csSectorLightList::LightAABBTree& tree = (static_cast<csSector*> (sector))->GetLightAABBTree ();
+  LightCollectPoint collector (light_array, pos);
+  LightCollectInnerPoint inner (pos);
+  tree.TraverseOut (inner, collector, pos);
 
   if (light_array->num_lights <= max_num_lights)
   {
@@ -2445,9 +2571,10 @@ int csEngine::GetNearbyLights (
 
   light_array->Reset ();
 
-  csKDTree* kdtree = ((csSector*)sector)->GetLightKDTree ();
-  csBox3 bbox = box;
-  kdtree->Front2Back (box.Min (), FindLightBox_Front2Back, &bbox, 0);
+  const csSectorLightList::LightAABBTree& tree = (static_cast<csSector*> (sector))->GetLightAABBTree ();
+  LightCollectBox collector (light_array, box);
+  LightCollectInnerBox inner (box);
+  tree.Traverse (inner, collector);
 
   if (light_array->num_lights <= max_num_lights)
   {
@@ -3229,7 +3356,25 @@ csPtr<iCollectionArray> csEngine::GetCollections()
 
 csPtr<iCamera> csEngine::CreateCamera ()
 {
-  return csPtr<iCamera> (new csCamera (frameWidth, frameHeight));
+  csCameraPerspective* cam = new csCameraPerspective ();
+  return csPtr<iCamera> ((iCamera*)cam);
+}
+
+csPtr<iPerspectiveCamera> csEngine::CreatePerspectiveCamera ()
+{
+  csCameraPerspective* cam = new csCameraPerspective ();
+  return csPtr<iPerspectiveCamera> (cam);
+}
+
+csPtr<iCustomMatrixCamera> csEngine::CreateCustomMatrixCamera (
+  iCamera* copyFrom)
+{
+  csCameraCustomMatrix* cam;
+  if (copyFrom)
+    cam = new csCameraCustomMatrix (static_cast<csCameraBase*> (copyFrom));
+  else
+    cam = new csCameraCustomMatrix ();
+  return csPtr<iCustomMatrixCamera> (cam);
 }
 
 csPtr<iLight> csEngine::CreateLight (
@@ -3958,7 +4103,7 @@ bool csEngine::SetOption (int id, csVariant *value)
   switch (id)
   {
     case 0:
-      csCamera::SetDefaultFOV (value->GetLong (), G3D->GetWidth ());
+      PerspectiveImpl::SetDefaultFOV ((float)value->GetLong (), G3D->GetWidth ());
       break;
     case 1:
       if (value->GetBool ())
@@ -3982,7 +4127,7 @@ bool csEngine::GetOption (int id, csVariant *value)
   switch (id)
   {
     case 0:
-      value->SetLong (csCamera::GetDefaultFOV ());
+      value->SetLong ((long)PerspectiveImpl::GetDefaultFOV ());
       break;
     case 1:
       value->SetBool (csEngine::lightmapCacheMode == CS_ENGINE_CACHE_WRITE);

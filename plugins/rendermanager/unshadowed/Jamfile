@@ -1,0 +1,10 @@
+SubDir TOP plugins rendermanager unshadowed ;
+
+Description rm_unshadowed : "Rendermanager (unshadowed)" ;
+
+Plugin rm_unshadowed : 
+  [ Wildcard *.cpp *.h ]
+  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) $(DOTDOT) include csplugincommon rendermanager ] : *.h ]
+;
+CompileGroups rm_unshadowed : rendermanagers ;
+LinkWith rm_unshadowed : crystalspace ;

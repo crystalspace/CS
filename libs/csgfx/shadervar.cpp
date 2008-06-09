@@ -32,7 +32,7 @@ csShaderVariable::csShaderVariable () :
   texture.WrapValue = 0;
 }
 
-csShaderVariable::csShaderVariable (csStringID name) :
+csShaderVariable::csShaderVariable (CS::ShaderVarStringID name) :
   csRefCount (), Name (name), Type (UNKNOWN), VectorValue (0), accessorData (0)
 {
   // Zero out the data as good as we can

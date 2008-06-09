@@ -63,7 +63,9 @@ private:
   csRef<iVirtualClock> vc;
   csRef<iTextureManager> txtmgr;
   csRef<iStringSet> strings;
+  csRef<iShaderVarStringSet> stringsSvName;
   csRef<iEventHandler> weakEventHandler;
+  csRef<iCacheManager> shaderCache;
 
   bool do_verbose;
 
@@ -79,7 +81,7 @@ private:
   csRef<csShaderVariable> sv_time;
   void UpdateStandardVariables();
 
-  csRef<iShaderVarStack> shaderVarStack;
+  csShaderVariableStack shaderVarStack;
 
   csSet<csStringID> neutralTags;
   csSet<csStringID> forbiddenTags;
@@ -101,6 +103,14 @@ private:
   csEventID SystemOpen;
   csEventID SystemClose;
 
+#define CS_TOKEN_ITEM_FILE \
+  "plugins/video/render3d/shader/shadermgr/shadermgr.tok"
+#include "cstool/tokenlist.h"
+#undef CS_TOKEN_ITEM_FILE
+  csStringHash xmltokens;
+    
+  void AddDefaultVariables();
+  void LoadDefaultVariables();
 public:
   csShaderManager(iBase* parent);
   virtual ~csShaderManager();
@@ -141,7 +151,7 @@ public:
   void Report (int severity, const char* msg, ...);
 
   /// Get the shadervariablestack used to handle shadervariables on rendering
-  virtual iShaderVarStack* GetShaderVariableStack ()
+  virtual csShaderVariableStack& GetShaderVariableStack ()
   {
     return shaderVarStack;
   }
@@ -167,6 +177,14 @@ public:
   {
     return activeLights;
   }
+
+  virtual iShaderVarStringSet* GetSVNameStringset () const
+  {
+    return stringsSvName;
+  }
+  
+  iCacheManager* GetShaderCache()
+  { return shaderCache; }
   /** @} */
 
   /**\name iComponent implementation

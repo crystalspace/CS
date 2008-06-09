@@ -29,17 +29,45 @@ class csLightManager : public scfImplementation1<csLightManager,
                                                  iLightManager>
 {
 private:
-  // A dummy empty list used in cases where there is no logObject.
-  csArray<iLightSectorInfluence*> nolights;
 
 public:
   csLightManager ();
   virtual ~csLightManager ();
 
-  virtual const csArray<iLightSectorInfluence*>& GetRelevantLights (
-      	iMeshWrapper* logObject, int maxLights, bool desireSorting);
-  virtual const csArray<iLightSectorInfluence*>& GetRelevantLights (
-      	iSector* sector, int maxLights, bool desireSorting);
+  virtual void GetRelevantLights (iMeshWrapper* meshObject, 
+    iLightInfluenceArray* lightArray, int maxLights, uint flags);
+  virtual void GetRelevantLights (iMeshWrapper* meshObject, 
+    iLightInfluenceCallback* lightCallback, int maxLights, 
+    uint flags);
+
+  virtual void GetRelevantLights (iSector* sector, 
+    iLightInfluenceArray* lightArray, int maxLights, 
+    uint flags);
+  virtual void GetRelevantLights (iSector* sector, 
+    iLightInfluenceCallback* lightCallback, int maxLights, 
+    uint flags);
+
+  virtual void GetRelevantLights (iSector* sector, const csBox3& boundingBox,
+    iLightInfluenceArray* lightArray, int maxLights, 
+    uint flags);
+  virtual void GetRelevantLights (iSector* sector, const csBox3& boundingBox,
+    iLightInfluenceCallback* lightCallback, int maxLights, 
+    uint flags);
+
+  virtual void FreeInfluenceArray (csLightInfluence* Array);
+
+  virtual void GetRelevantLights (iMeshWrapper* meshObject, 
+    csLightInfluence*& lightArray, size_t& numLights, 
+    size_t maxLights = (size_t)~0,
+    uint flags = CS_LIGHTQUERY_GET_ALL);
+  virtual void GetRelevantLights (iSector* sector, 
+    csLightInfluence*& lightArray, 
+    size_t& numLights, size_t maxLights = (size_t)~0,
+    uint flags = CS_LIGHTQUERY_GET_ALL);
+  virtual void GetRelevantLights (iSector* sector, 
+    const csBox3& boundingBox, csLightInfluence*& lightArray, 
+    size_t& numLights, size_t maxLights = (size_t)~0,
+    uint flags = CS_LIGHTQUERY_GET_ALL);
 };
 
 #endif // __CS_CSENGINE_LIGHTMGR_H__

@@ -270,60 +270,28 @@ namespace CS
       const csReversibleTransform& tr_o2c,
       csPlane3* planes, uint32& frustum_mask)
   {
-    csPlane3* frust = ctxt->frustum;
+    csMatrix3 t2o = tr_o2c.GetT2O();
     csVector3 o2tmult = tr_o2c.GetO2T () * tr_o2c.GetO2TTranslation ();
-    planes[0].Set (tr_o2c.GetT2O() * frust[0].norm, -frust[0].norm*o2tmult);
-    planes[1].Set (tr_o2c.GetT2O() * frust[1].norm, -frust[1].norm*o2tmult);
-    planes[2].Set (tr_o2c.GetT2O() * frust[2].norm, -frust[2].norm*o2tmult);
-    planes[3].Set (tr_o2c.GetT2O() * frust[3].norm, -frust[3].norm*o2tmult);
-    csPlane3 pz0 (0, 0, 1, 0);	// Inverted!!!.
-    planes[4] = tr_o2c.This2Other (pz0);
-
-    // Even if we don't need the clip plane we will still add it to the
-    // frustum_mask so that the cullers will use it to trivially reject
-    // objects and nodes.
+    uint32 camMask;
+    const csPlane3* frust = ctxt->icamera->GetVisibleVolume (camMask);
+    frustum_mask = 0;
+    uint i;
+    for (i = 0; (1 << i) <= camMask; i++)
+    {
+      if (!(camMask & (1 << i))) continue;
+      frustum_mask |= (1 << i);
+      planes[i].Set (tr_o2c.GetT2O() * frust[i].norm, -frust[i].norm*o2tmult);
+    }
     csPlane3 pznear = ctxt->clip_plane;
     pznear.Invert ();
-    planes[5] = tr_o2c.This2Other (pznear);
-    frustum_mask = 0x3f;
-
-    csPlane3 *far_plane = ctxt->icamera->GetFarPlane ();
-    if (far_plane)
-    {
-      csPlane3 fp = *far_plane;
-      planes[6] = tr_o2c.This2Other (fp);
-      frustum_mask |= 0x40;
-    }
+    planes[i] = tr_o2c.This2Other (pznear);
+    frustum_mask |= (1 << i);
   }
 
   void RenderViewClipper::SetupClipPlanes (csRenderContext* ctxt)
   {
-    csPlane3* frust = ctxt->frustum;
-    const csReversibleTransform& tr = ctxt->icamera->GetTransform ();
-    csVector3 o2tmult = tr.GetO2T () * tr.GetO2TTranslation ();
-    csPlane3* clip_planes = ctxt->clip_planes;
-    clip_planes[0].Set (tr.GetT2O() * frust[0].norm, -frust[0].norm*o2tmult);
-    clip_planes[1].Set (tr.GetT2O() * frust[1].norm, -frust[1].norm*o2tmult);
-    clip_planes[2].Set (tr.GetT2O() * frust[2].norm, -frust[2].norm*o2tmult);
-    clip_planes[3].Set (tr.GetT2O() * frust[3].norm, -frust[3].norm*o2tmult);
-    csPlane3 pz0 (0, 0, 1, 0);	// Inverted!!!.
-    clip_planes[4] = tr.This2Other (pz0);
-
-    // Even if we don't need the clip plane we will still add it to the
-    // frustum_mask so that the cullers will use it to trivially reject
-    // objects and nodes.
-    csPlane3 pznear = ctxt->clip_plane;
-    pznear.Invert ();
-    clip_planes[5] = tr.This2Other (pznear);
-    ctxt->clip_planes_mask = 0x3f;
-
-    csPlane3 *far_plane = ctxt->icamera->GetFarPlane ();
-    if (far_plane)
-    {
-      csPlane3 fp = *far_plane;
-      clip_planes[6] = tr.This2Other (fp);
-      ctxt->clip_planes_mask |= 0x40;
-    }
+    SetupClipPlanes (ctxt, ctxt->icamera->GetTransform (), ctxt->clip_planes,
+      ctxt->clip_planes_mask);
   }
 
 }

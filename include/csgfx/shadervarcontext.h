@@ -52,13 +52,13 @@ namespace CS
       const csRefArray<csShaderVariable>& GetShaderVariables () const
       { return variables; }
       virtual void AddVariable (csShaderVariable *variable);
-      virtual csShaderVariable* GetVariable (csStringID name) const;
-      virtual void PushVariables (iShaderVarStack* stacks) const;
+      virtual csShaderVariable* GetVariable (ShaderVarStringID name) const;
+      virtual void PushVariables (csShaderVariableStack& stacks) const;
       virtual bool IsEmpty() const { return variables.GetSize () == 0; }  
       virtual void ReplaceVariable (csShaderVariable *variable);
       virtual void Clear () { variables.Empty(); }
       virtual bool RemoveVariable (csShaderVariable* variable);
-      virtual bool RemoveVariable (csStringID name);
+      virtual bool RemoveVariable (ShaderVarStringID name);
     };
     
     /**
@@ -78,7 +78,7 @@ namespace CS
   
       void AddVariable (csShaderVariable *variable)
       { ShaderVariableContextImpl::AddVariable (variable); }
-      csShaderVariable* GetVariable (csStringID name) const
+      csShaderVariable* GetVariable (ShaderVarStringID name) const
       { 
 	csShaderVariable* sv = ShaderVariableContextImpl::GetVariable (name); 
 	if ((sv == 0) && (parentSVC.IsValid()))
@@ -90,7 +90,7 @@ namespace CS
 	// @@@ Will not return parent SVs
 	return ShaderVariableContextImpl::GetShaderVariables (); 
       }
-      void PushVariables (iShaderVarStack* stacks) const
+      void PushVariables (csShaderVariableStack& stacks) const
       { 
 	if (parentSVC.IsValid()) parentSVC->PushVariables (stacks);
 	ShaderVariableContextImpl::PushVariables (stacks); 
@@ -108,7 +108,7 @@ namespace CS
 	// @@@ Also remove from parent?
 	return ShaderVariableContextImpl::RemoveVariable (variable); 
       }
-      bool RemoveVariable (csStringID name)
+      bool RemoveVariable (ShaderVarStringID name)
       { 
 	// @@@ Also remove from parent?
 	return ShaderVariableContextImpl::RemoveVariable (name); 

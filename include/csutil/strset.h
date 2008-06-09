@@ -25,7 +25,11 @@
 /**\file
  * String-to-ID hash table.
  */
- 
+
+namespace CS
+{
+namespace Utility
+{
 /**
  * The string set is a collection of unique strings. Each string has an ID
  * number. The most important operation is to request a string, which means to
@@ -36,27 +40,36 @@
  * \sa csStringHash
  * \sa iStringSet
  */
-class CS_CRYSTALSPACE_EXPORT csStringSet
+template<typename Tag>
+class StringSet
 {
  private:
-  csStringHash registry;
-  csHash<const char*, csStringID> reverse; // ID to string mapping.
-  csStringID next_id;
+  StringHash<Tag> registry;
+  csHash<const char*, CS::StringID<Tag> > reverse; // ID to string mapping.
+  unsigned int next_id;
 
-  void Copy(csStringSet const&);
+  void Copy(StringSet const& s)
+  {
+    if (&s != this)
+    {
+      registry = s.registry;
+      reverse  = s.reverse;
+      next_id  = s.next_id;
+    }
+  }
 
 public:
   typedef csStringHash::GlobalIterator GlobalIterator;
 
 public:
   /// Constructor.
-  csStringSet (size_t size = 23);
+  StringSet (size_t size = 23) : registry(size), reverse(size), next_id(0) {}
   /// Copy constructor.
-  csStringSet (csStringSet const& s) { Copy(s); }
+  StringSet (StringSet const& s) { Copy(s); }
   /// Destructor.
-  ~csStringSet ();
+  ~StringSet () {}
   /// Assignment operator.
-  csStringSet& operator=(csStringSet const& s) { Copy(s); return *this; }
+  StringSet& operator=(StringSet const& s) { Copy(s); return *this; }
 
   /**
    * Request the numeric ID for the given string.
@@ -64,45 +77,85 @@ public:
    * \remarks Creates a new ID if the string is not yet present in the set,
    *   else returns the previously assigned ID.
    */
-  csStringID Request (const char*);
+  CS::StringID<Tag> Request (const char* s)
+  {
+    CS::StringID<Tag> id = registry.Request(s);
+    if (id == CS::InvalidStringID<Tag> ())
+    {
+      const char* t = registry.Register(s, next_id);
+      id = next_id++;
+      reverse.Put (id, t);
+    }
+    return id;
+  }
 
   /**
    * Request the string corresponding to the given ID.
    * \return Null if the string * has not been requested (yet), else the string
    *   corresponding to the ID.
    */
-  char const* Request (csStringID) const;
+  char const* Request (CS::StringID<Tag> id) const
+  {
+    return reverse.Get(id, 0);
+  }
 
   /**
    * Check if the set contains a particular string.
    */
-  bool Contains(char const*) const;
+  bool Contains(char const* s) const
+  {
+    return registry.Request(s) != CS::InvalidStringID<Tag> ();
+  }
 
   /**
    * Check if the set contains a string with a particular ID.
    * \remarks This is rigidly equivalent to
    *   <tt>return Request(id) != NULL</tt>, but more idomatic.
    */
-  bool Contains(csStringID id) const
+  bool Contains(CS::StringID<Tag> id) const
   { return Request(id) != 0; }
 
   /**
    * Remove specified string.
    * \return True if a matching string was in thet set; else false.
    */
-  bool Delete(char const* s);
+  bool Delete(char const* s)
+  {
+    CS::StringID<Tag> const id = registry.Request(s);
+    bool const ok = (id != csInvalidStringID);
+    if (ok)
+    {
+      registry.Delete(s);
+      reverse.DeleteAll(id);
+    }
+    return ok;
+  }
 
   /**
    * Remove a string with the specified ID.
    * \return True if a matching string was in thet set; else false.
    */
-  bool Delete(csStringID id);
+  bool Delete(CS::StringID<Tag> id)
+  {
+    char const* s = reverse.Get(id,0);
+    bool const ok = (s != 0);
+    if (ok)
+    {
+      registry.Delete(s);
+      reverse.DeleteAll(id);
+    }
+    return ok;
+  }
 
   /**
    * Remove all stored strings. When new strings are registered again, new
    * ID values will be used; the old ID's will not be re-used.
    */
-  void Empty ();
+  void Empty ()
+  {
+    registry.Empty();
+    reverse.Empty();
+  }
 
   /**
    * Remove all stored strings.
@@ -132,5 +185,9 @@ public:
   GlobalIterator GetIterator () const
   { return registry.GetIterator(); }
 };
+} // namespace Utility
+} // namespace CS
+
+typedef CS::Utility::StringSet<CS::StringSetTag::General> csStringSet;
 
 #endif // __CS_STRSET_H__

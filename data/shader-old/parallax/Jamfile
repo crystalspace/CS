@@ -1,0 +1,4 @@
+SubDir TOP data shader-old parallax ;
+
+InstallData [ Wildcard *.afp *.avp *.cgfp *.cgvp *.xml ] :
+  data shader-old parallax ;

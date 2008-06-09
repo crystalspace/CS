@@ -1,0 +1,37 @@
+<shader compiler="xmlshader" name="postproc_blur">
+  <technique priority="200">
+    <pass>
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+      <!-- vp plugin="glfixed" / -->
+      <texture destination="Texture1" name="tex diffuse" />
+      <fp plugin="glcg">
+	<cgfp>
+	  <variablemap variable="pixel size" destination="pixelSize" />
+	  <program>
+	      <![CDATA[
+
+	      float4 main (in float2 TexCoord : TEXCOORD0,
+			uniform sampler2D Texture1,
+			uniform float2 pixelSize) : COLOR
+	      {
+		float coeffs[3] = {0.25, 0.5, 0.25};
+		float4 blurred = float4 (0);
+		for (int x = -1; x < 2; x++)
+		{
+		  for (int y = -1; y < 2; y++)
+		  {
+		    float2 offset = pixelSize * float2(x, y);
+		    float coeff = coeffs[x+1] * coeffs[y+1];
+		    blurred += tex2D (Texture1, TexCoord + offset) * coeff;
+		  }
+		}
+		return blurred;
+	      }
+
+	      ]]>
+	  </program>
+	</cgfp>
+      </fp>
+    </pass>
+  </technique>
+</shader>

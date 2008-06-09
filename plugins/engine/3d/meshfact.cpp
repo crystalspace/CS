@@ -244,7 +244,7 @@ void csMeshFactoryWrapper::SetImposterActive (bool flag)
 // csMeshFactoryList
 //--------------------------------------------------------------------------
 csMeshFactoryList::csMeshFactoryList ()
-  : scfImplementationType (this), list (64, 64)
+  : scfImplementationType (this), list (64)
 {
   listener.AttachNew (new NameChangeListener (this));
 }

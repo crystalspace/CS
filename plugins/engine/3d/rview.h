@@ -259,6 +259,11 @@ public:
 
   /// Get the number of the current frame.
   virtual uint GetCurrentFrameNumber () const;
+
+  /**
+  * Destroy a specific render context (and unlink it from the previous-links)
+  */
+  virtual void DestroyRenderContext (csRenderContext* context);
 };
 
 #endif // __CS_RVIEW_H__

@@ -49,7 +49,7 @@ public:
   /// Setup states needed for proper operation of the shader
   virtual void SetupState (const CS::Graphics::RenderMesh* mesh,
                            CS::Graphics::RenderMeshModes& modes,
-                           const iShaderVarStack* stacks);
+                           const csShaderVariableStack& stack);
 
   /// Reset states to original
   virtual void ResetState ();
@@ -68,6 +68,8 @@ public:
 
   /// Compile a program
   virtual bool Compile();
+
+  virtual void GetUsedShaderVars (csBitArray& bits) const;
 private:
   csVProc_Std *shaderPlugin;
 
@@ -86,10 +88,12 @@ private:
   };
   LightMixmode lightMixMode;
   LightMixmode colorMixMode;
+  bool specularOnDiffuse;
 
   ProgramParam finalLightFactor;
   size_t numLights;
   bool useAttenuation;
+  bool doDiffuse;
   bool doSpecular;
   bool doVertexSkinning;
   bool doNormalSkinning;
@@ -102,17 +106,17 @@ private:
   csRenderBufferName skinnedBiTangentOutputBuffer;
   ProgramParam shininessParam;
 
-  csStringID bones_indices_name;
-  csStringID bones_weights_name;
-  csStringID bones_name;
+  CS::ShaderVarStringID bones_indices_name;
+  CS::ShaderVarStringID bones_weights_name;
+  CS::ShaderVarStringID bones_name;
 
   struct BufferName
   {
     csRenderBufferName defaultName;
-    csStringID userName;
+    CS::ShaderVarStringID userName;
 
     BufferName (csRenderBufferName name = CS_BUFFER_NONE) : 
-    defaultName (name), userName (csInvalidStringID) {}
+    defaultName (name), userName (CS::InvalidShaderVarStringID) {}
   };
   BufferName positionBuffer;
   BufferName normalBuffer;
@@ -122,17 +126,15 @@ private:
 
   csBitArray disableMask;
 
-  void FixupLightWorldPos (csLightProperties& light, size_t lightNum,
-    const iArrayReadOnly<csShaderVariable*>* stacks, 
-    const csReversibleTransform& object2world);
-
   bool ParseLightMixMode (iDocumentNode* child, LightMixmode& mixmode);
   bool ParseBufferName (iDocumentNode* child, BufferName& name);
   iRenderBuffer* GetBuffer (const BufferName& name,
     CS::Graphics::RenderMeshModes& modes, 
-    const iArrayReadOnly<csShaderVariable*>* stacks);
+    const csShaderVariableStack& stack);
+  void TryAddUsedShaderVarBufferName (const BufferName& name,
+    csBitArray& bits) const;
   bool UpdateSkinnedVertices (CS::Graphics::RenderMeshModes& modes,
-                           const iShaderVarStack* stacks);
+                           const csShaderVariableStack& stack);
 };
 
 }

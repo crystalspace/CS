@@ -35,16 +35,20 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
 
+#include "glshader_cg.h"
 #include "glshader_cgcommon.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 {
 
+static const int assumeConstFlag = 0x80000000;
+
 CS_LEAKGUARD_IMPLEMENT (csShaderGLCGCommon);
 
 csShaderGLCGCommon::csShaderGLCGCommon (csGLShader_CG* shaderPlug, 
-					const char* type) :
-  scfImplementationType (this, shaderPlug->object_reg), programType (type)
+					ProgramType type) :
+  scfImplementationType (this, shaderPlug->object_reg), programType (type),
+  assumedConstParams (0)
 {
   validProgram = true;
   this->shaderPlug = shaderPlug;
@@ -57,6 +61,30 @@ csShaderGLCGCommon::~csShaderGLCGCommon ()
 {
   if (program)
     cgDestroyProgram (program);
+    
+  if (assumedConstParams != 0)
+  {
+    for(size_t i = 0; i < assumedConstParams->GetSize (); ++i)
+    {
+      VariableMapEntry& mapping = assumedConstParams->Get (i);
+      
+      ShaderParameter* param =
+	reinterpret_cast<ShaderParameter*> (mapping.userVal);
+      
+      shaderPlug->paramAlloc.Free (param);
+    }
+    delete assumedConstParams;
+  }
+
+  for(size_t i = 0; i < variablemap.GetSize (); ++i)
+  {
+    VariableMapEntry& mapping = variablemap[i];
+    
+    ShaderParameter* param =
+      reinterpret_cast<ShaderParameter*> (mapping.userVal);
+    
+    shaderPlug->paramAlloc.Free (param);
+  }
 }
 
 void csShaderGLCGCommon::Activate()
@@ -71,10 +99,11 @@ void csShaderGLCGCommon::Deactivate()
   cgGLDisableProfile (programProfile);
 }
 
-void csShaderGLCGCommon::SetParameterValue (CGparameter param,
+void csShaderGLCGCommon::SetParameterValue (ShaderParameter* sparam,
                                             csShaderVariable* var)
 {
-  CGtype paramType = cgGetParameterType (param);
+  CGparameter param = sparam->param;
+  CGtype paramType = sparam->paramType;
   
   switch (paramType)
   {
@@ -120,12 +149,12 @@ void csShaderGLCGCommon::SetParameterValue (CGparameter param,
       break;
     case CG_ARRAY:
       {
-	CGtype innerType = cgGetArrayType (param);
+	CGtype innerType = sparam->arrayInnerType;
 	if (var->GetArraySize () == 0) 
 	  break;
 
 	uint numElements = csMin ((uint)cgGetArraySize (param, 0), 
-				  (uint)var->GetArraySize ());
+				  sparam->arraySize);
 
 	if (numElements == 0) 
 	  break;
@@ -330,7 +359,7 @@ void csShaderGLCGCommon::SVtoCgMatrix4x4  (csShaderVariable* var, float* matrix)
 
 void csShaderGLCGCommon::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
                                      CS::Graphics::RenderMeshModes& /*modes*/,
-                                     const iShaderVarStack* stacks)
+                                     const csShaderVariableStack& stack)
 {
   size_t i;
   csRef<csShaderVariable> var;
@@ -340,16 +369,39 @@ void csShaderGLCGCommon::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
   {
     VariableMapEntry& mapping = variablemap[i];
     
-    var = csGetShaderVariableFromStack (stacks, mapping.name);
-    if (!var.IsValid ())
-      var = mapping.mappingParam.var;
-
+    var = GetParamSV (stack, mapping.mappingParam);
     // If var is null now we have no const nor any passed value, ignore it
     if (!var.IsValid ())
       continue;
 
-    CGparameter param = (CGparameter)mapping.userVal;
+    ShaderParameter* param =
+      reinterpret_cast<ShaderParameter*> (mapping.userVal);
     SetParameterValue (param, var);
+  }
+  
+  /* "Assumed constant" parameters are set here b/c all needed shader 
+   * vars are available */
+  if (assumedConstParams != 0)
+  {
+    for(i = 0; i < assumedConstParams->GetSize (); ++i)
+    {
+      VariableMapEntry& mapping = assumedConstParams->Get (i);
+      
+      var = GetParamSV (stack, mapping.mappingParam);
+      // If var is null now we have no const nor any passed value, ignore it
+      if (!var.IsValid ())
+	continue;
+  
+      ShaderParameter* param =
+	reinterpret_cast<ShaderParameter*> (mapping.userVal);
+      SetParameterValue (param, var);
+      cgSetParameterVariability (param->param, CG_LITERAL);
+      shaderPlug->paramAlloc.Free (param);
+    }
+    delete assumedConstParams; assumedConstParams = 0;
+    cgCompileProgram (program);
+    if (shaderPlug->debugDump)
+      DoDebugDump();
   }
 }
 
@@ -357,32 +409,51 @@ void csShaderGLCGCommon::ResetState()
 {
 }
 
+void csShaderGLCGCommon::EnsureDumpFile()
+{
+  if (debugFN.IsEmpty())
+  {
+    static int programCounter = 0;
+    
+    const char* progTypeStr ="";
+    switch (programType)
+    {
+      case progVP: progTypeStr = "cgvp"; break;
+      case progFP: progTypeStr = "cgfp"; break;
+    }
+    
+    csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectReg);
+    csString filename;
+    filename << shaderPlug->dumpDir << (programCounter++) << 
+      progTypeStr << ".txt";
+    debugFN = filename;
+    vfs->DeleteFile (debugFN);
+  }
+}
+
 bool csShaderGLCGCommon::DefaultLoadProgram (
   iShaderDestinationResolverCG* cgResolve,
   const char* programStr, CGGLenum type, CGprofile maxProfile, 
-  bool compiled, bool doLoad)
+  uint flags)
 {
   if (!programStr || !*programStr) return false;
 
   size_t i;
   csString augmentedProgramStr;
+  const csSet<csString>* unusedParams = &this->unusedParams;
   if (cgResolve != 0)
   {
-    const csArray<csString>& unusedParams = cgResolve->GetUnusedParameters ();
-    for (size_t i = 0; i < unusedParams.GetSize(); i++)
-    {
-      csString param (unusedParams[i]);
-      for (size_t j = 0; j < param.Length(); j++)
-      {
-        if ((param[j] == '.') || (param[j] == '[') || (param[j] == ']'))
-          param[j] = '_';
-      }
-      augmentedProgramStr.AppendFmt ("#define PARAM_%s_UNUSED\n",
-        param.GetData());
-    }
-    augmentedProgramStr.Append (programStr);
-    programStr = augmentedProgramStr;
+    unusedParams = &cgResolve->GetUnusedParameters ();
   }
+  csSet<csString>::GlobalIterator unusedIt (unusedParams->GetIterator());
+  while (unusedIt.HasNext())
+  {
+    const csString& param = unusedIt.Next ();
+    augmentedProgramStr.AppendFmt ("#define %s\n",
+      param.GetData());
+  }
+  augmentedProgramStr.Append (programStr);
+  programStr = augmentedProgramStr;
 
   CGprofile profile = CG_PROFILE_UNKNOWN;
 
@@ -429,28 +500,94 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
   }
   shaderPlug->SetCompiledSource (programStr);
   program = cgCreateProgram (shaderPlug->context, 
-    compiled ? CG_OBJECT : CG_SOURCE, programStr, 
+    (flags & loadPrecompiled) ? CG_OBJECT : CG_SOURCE, programStr, 
     profile, !entrypoint.IsEmpty() ? entrypoint : "main", args.GetArray());
-  shaderPlug->PrintAnyListing();
+  
+  if (!(flags & loadIgnoreErrors)) shaderPlug->PrintAnyListing();
 
   if (!program)
   {
     shaderPlug->SetCompiledSource (0);
+    /*if (shaderPlug->debugDump)
+    {
+      EnsureDumpFile();
+      WriteAdditionalDumpInfo ("Failed program source", programStr);
+    }*/
     return false;
   }
   programProfile = cgGetProgramProfile (program);
 
-  if (shaderPlug->debugDump)
-    DoDebugDump();
+  if (flags & loadApplyVmap)
+  {
+    i = 0;
+    while (i < variablemap.GetSize ())
+    {
+      // Get the Cg parameter
+      CGparameter param = cgGetNamedParameter (program, 
+	variablemap[i].destination);
+  
+      if (!param ||
+	  (cgGetParameterType (param) != CG_ARRAY && !cgIsParameterReferenced (param)))
+      {
+	variablemap.DeleteIndex (i);
+	continue;
+      }
+      ShaderParameter* sparam =
+	reinterpret_cast<ShaderParameter*> (variablemap[i].userVal);
+      sparam->param = param;
+      sparam->paramType = cgGetParameterType (param);
+      if (sparam->paramType == CG_ARRAY)
+      {
+        sparam->arrayInnerType = cgGetArrayType (param);
+        sparam->arraySize = cgGetArraySize (param, 0);
+      }
+      bool assumeConst = sparam->assumeConstant;
+      if (assumeConst)
+      {
+        if (assumedConstParams == 0)
+          assumedConstParams = new csSafeCopyArray<VariableMapEntry>;
+	assumedConstParams->Push (variablemap[i]);
+	variablemap.DeleteIndex (i);
+	continue;
+      }
+      // Mark constants as to be folded in
+      if (variablemap[i].mappingParam.IsConstant())
+      {
+	csShaderVariable* var = variablemap[i].mappingParam.var;
+	if (var != 0)
+	  SetParameterValue (sparam, var);
+	cgSetParameterVariability (param, CG_LITERAL);
+	variablemap.DeleteIndex (i);
+	shaderPlug->paramAlloc.Free (sparam);
+	continue;
+      }
+      i++;
+    }
+  
+    variablemap.ShrinkBestFit();
+  }
 
-  if (doLoad)
+  if (assumedConstParams == 0)
+  {
+    if (flags & loadIgnoreErrors) shaderPlug->SetIgnoreErrors (true);
+    cgCompileProgram (program);
+    if (flags & loadIgnoreErrors)
+      shaderPlug->SetIgnoreErrors (false);
+    else
+      shaderPlug->PrintAnyListing();
+  }
+
+  if (flags & loadLoadToGL)
   {
     cgGetError(); // Clear error
     cgGLLoadProgram (program);
-    shaderPlug->PrintAnyListing();
+    if (!(flags & loadIgnoreErrors)) shaderPlug->PrintAnyListing();
     if ((cgGetError() != CG_NO_ERROR)
-	|| (!cgGLIsProgramLoaded (program)))
+      || !cgGLIsProgramLoaded (program)) 
     {
+      //if (shaderPlug->debugDump)
+	//DoDebugDump();
+
       if (shaderPlug->doVerbose
 	  && ((type == CG_GL_VERTEX) && (profile >= CG_PROFILE_ARBVP1))
 	    || ((type == CG_GL_FRAGMENT) && (profile >= CG_PROFILE_ARBFP1)))
@@ -459,40 +596,50 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
 	shaderPlug->Report (CS_REPORTER_SEVERITY_WARNING,
 	  "OpenGL error string: %s", err);
       }
+
+      shaderPlug->SetCompiledSource (0);
       return false;
     }
   }
 
-  i = 0;
-  while (i < variablemap.GetSize ())
+  if (shaderPlug->debugDump)
+    DoDebugDump();
+  
+  shaderPlug->SetCompiledSource (0);
+
+  bool result = true;
+  if (programType == progFP)
   {
-    // Get the Cg parameter
-    CGparameter param = cgGetNamedParameter (program, 
-      variablemap[i].destination);
-
-    if (!param ||
-        (cgGetParameterType (param) != CG_ARRAY && !cgIsParameterReferenced (param)))
+    int numVaryings = 0;
+    CGparameter param = cgGetFirstLeafParameter (program, CG_PROGRAM);
+    while (param)
     {
-      variablemap.DeleteIndex (i);
-      continue;
+      if (cgIsParameterUsed (param, program)
+	&& cgIsParameterReferenced (param))
+      {
+	const CGenum var = cgGetParameterVariability (param);
+	if (var == CG_VARYING)
+	  numVaryings++;
+      }
+  
+      param = cgGetNextLeafParameter (param);
     }
-    // Mark constants as to be folded in
-    if (variablemap[i].mappingParam.IsConstant())
-    {
-      csShaderVariable* var = variablemap[i].mappingParam.var;
-      if (var != 0)
-        SetParameterValue (param, var);
-      cgSetParameterVariability (param, CG_LITERAL);
-      variablemap.DeleteIndex (i);
-      continue;
-    }
-    variablemap[i].userVal = (intptr_t)param;
-    i++;
+    
+    /* WORKAROUND: Even NVs G80 doesn't support passing more than 16 attribs
+       into an FP, yet Cg happily generates code that uses more (and GL falls 
+       back to SW).
+       So manually check the number of varying inputs and reject more than 16.
+       
+       @@@ This should be at least configurable
+     */
+    result = numVaryings <= 16;
   }
-
-  variablemap.ShrinkBestFit();
-
-  return true;
+  if (!result && !debugFN.IsEmpty())
+  {
+    csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectReg);
+    vfs->DeleteFile (debugFN);
+  }
+  return result;
 }
 
 void csShaderGLCGCommon::DoDebugDump ()
@@ -558,15 +705,7 @@ void csShaderGLCGCommon::DoDebugDump ()
   output << "\n";
 
   csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectReg);
-  if (debugFN.IsEmpty())
-  {
-    static int programCounter = 0;
-    csString filename;
-    filename << shaderPlug->dumpDir << (programCounter++) << programType << 
-      ".txt";
-    debugFN = filename;
-    vfs->DeleteFile (debugFN);
-  }
+  EnsureDumpFile();
 
   csRef<iFile> debugFile = vfs->Open (debugFN, VFS_FILE_APPEND);
   if (!debugFile)
@@ -592,7 +731,7 @@ void csShaderGLCGCommon::WriteAdditionalDumpInfo (const char* description,
   csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectReg);
   csRef<iDataBuffer> oldDump = vfs->ReadFile (debugFN, true);
 
-  csString output ((char*)oldDump->GetData());
+  csString output (oldDump ? (char*)oldDump->GetData() : 0);
   output << description << ":\n";
   output << content;
   output << "\n";
@@ -613,7 +752,13 @@ bool csShaderGLCGCommon::Load (iShaderDestinationResolver* resolve,
   csRef<iShaderManager> shadermgr = 
   	csQueryRegistry<iShaderManager> (shaderPlug->object_reg);
 
-  csRef<iDocumentNode> variablesnode = program->GetNode (programType);
+  const char* progTypeNode;
+  switch (programType)
+  {
+    case progVP: progTypeNode = "cgvp"; break;
+    case progFP: progTypeNode = "cgfp"; break;
+  }
+  csRef<iDocumentNode> variablesnode = program->GetNode (progTypeNode);
   if(variablesnode)
   {
     csRef<iDocumentNodeIterator> it = variablesnode->GetNodes ();
@@ -635,6 +780,52 @@ bool csShaderGLCGCommon::Load (iShaderDestinationResolver* resolve,
           shaderPlug->SplitArgsString (child->GetContentsValue (), 
             compilerArgs);
           break;
+	case XMLTOKEN_VARIABLEMAP:
+	  {
+	    //@@ REWRITE
+	    const char* destname = child->GetAttributeValue ("destination");
+	    if (!destname)
+	    {
+	      synsrv->Report ("crystalspace.graphics3d.shader.common",
+		CS_REPORTER_SEVERITY_WARNING, child,
+		"<variablemap> has no 'destination' attribute");
+	      return false;
+	    }
+	    
+	    bool assumeConst = child->GetAttributeValueAsBool ("assumeconst",
+	      false);
+    
+	    const char* varname = child->GetAttributeValue ("variable");
+	    if (!varname)
+	    {
+	      // "New style" variable mapping
+	      VariableMapEntry vme (CS::InvalidShaderVarStringID, destname);
+	      if (!ParseProgramParam (child, vme.mappingParam,
+		ParamFloat | ParamVector2 | ParamVector3 | ParamVector4))
+		return false;
+	      ShaderParameter* sparam = shaderPlug->paramAlloc.Alloc();
+	      sparam->assumeConstant = assumeConst;
+	      vme.userVal = reinterpret_cast<intptr_t> (sparam);
+	      variablemap.Push (vme);
+	    }
+	    else
+	    {
+	      // "Classic" variable mapping
+	      CS::Graphics::ShaderVarNameParser nameParse (varname);
+	      VariableMapEntry vme (
+		stringsSvName->Request (nameParse.GetShaderVarName()),
+		destname);
+	      for (size_t n = 0; n < nameParse.GetIndexNum(); n++)
+	      {
+		vme.mappingParam.indices.Push (nameParse.GetIndexValue (n));
+	      }
+	      ShaderParameter* sparam = shaderPlug->paramAlloc.Alloc();
+	      sparam->assumeConstant = assumeConst;
+	      vme.userVal = reinterpret_cast<intptr_t> (sparam);
+	      variablemap.Push (vme);
+	    }
+	  }
+	  break;
         default:
 	  if (!ParseCommon (child))
 	    return false;
@@ -647,18 +838,25 @@ bool csShaderGLCGCommon::Load (iShaderDestinationResolver* resolve,
   return true;
 }
 
-void csShaderGLCGCommon::CollectUnusedParameters ()
+void csShaderGLCGCommon::CollectUnusedParameters (csSet<csString>& unusedParams)
 {
-  unusedParams.DeleteAll ();
-  CGparameter param = cgGetFirstLeafParameter (program, CG_PROGRAM);
-  while (param)
+  CGparameter cgParam = cgGetFirstLeafParameter (program, CG_PROGRAM);
+  while (cgParam)
   {
-    if (!cgIsParameterUsed (param, program))
+    if (!cgIsParameterUsed (cgParam, program))
     {
-      unusedParams.Push (cgGetParameterName (param));
+      csString param (cgGetParameterName (cgParam));
+      for (size_t j = 0; j < param.Length(); j++)
+      {
+        if ((param[j] == '.') || (param[j] == '[') || (param[j] == ']'))
+          param[j] = '_';
+      }
+      csString s;
+      s.Format ("PARAM_%s_UNUSED", param.GetData());
+      unusedParams.Add (s);
     }
 
-    param = cgGetNextLeafParameter (param);
+    cgParam = cgGetNextLeafParameter (cgParam);
   }
 }
 

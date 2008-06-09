@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2006 by Søren Bøg
+	Copyright (C) 2006 by SÃ¸ren BÃ¸g
 
 	This library is free software; you can redistribute it and/or
 	modify it under the terms of the GNU Library General Public

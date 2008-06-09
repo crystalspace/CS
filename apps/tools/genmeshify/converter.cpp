@@ -39,7 +39,7 @@ namespace genmeshify
         "crystalspace.mesh.loader.thing", true);
     }
 
-    idTexLightmap = app->strings->Request ("tex lightmap");
+    idTexLightmap = app->svStrings->Request ("tex lightmap");
   }
 
   bool Converter::ConvertMeshFact (const char* factoryName, 

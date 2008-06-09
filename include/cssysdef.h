@@ -1092,6 +1092,8 @@ namespace CS
 #if defined(CS_COMPILER_MSVC)
   #define CS_ALIGNED_MEMBER(Member, Align)				\
     __declspec(align(Align)) Member
+  #define CS_ALIGNED_STRUCT(Kind, Align)	                        \
+    __declspec(align(Align)) Kind
 #elif defined(CS_COMPILER_GCC)
   /**
    * Macro to align a class member (or local variable) to a specific byte
@@ -1106,9 +1108,23 @@ namespace CS
    * \endcode
    */
   #define CS_ALIGNED_MEMBER(Member, Align)				\
-    Member __attribute((aligned(Align)))
+    Member __attribute__((aligned(Align)))
+  /**
+   * Macro to declare a struct aligned to a specific byte boundary.
+   *
+   * Example:
+   * \code
+   * CS_STRUCT_ALIGN(struct, 16) MyStruct
+   * {
+   *   int x;
+   * };
+   * \endcode
+   */
+  #define CS_ALIGNED_STRUCT(Kind, Align)	                        \
+    Kind __attribute__((aligned(Align)))
 #else
   #define CS_ALIGNED_MEMBER(Member, Align)	Member
+  #define CS_ALIGNED_STRUCT(Kind, Align)	        Kind
 #endif
 
 // Macro used to define static implicit pointer conversion function.

@@ -22,6 +22,7 @@
 
 #include "iutil/selfdestruct.h"
 #include "ivideo/shader/shader.h"
+#include "ivideo/shader/xmlshader.h"
 #include "imap/ldrctxt.h"
 
 #include "csutil/bitarray.h"
@@ -85,7 +86,7 @@ class csShaderConditionResolver : public iConditionResolver
   csHash<size_t, MyBitArrayTemp, TempHeapAlloc> variantIDs;
 
   const CS::Graphics::RenderMeshModes* modes;
-  const iShaderVarStack* stacks;
+  const csShaderVariableStack* stack;
 
   csString lastError;
   const char* SetLastError (const char* msg, ...) CS_GNUC_PRINTF (2, 3);
@@ -94,10 +95,14 @@ class csShaderConditionResolver : public iConditionResolver
   
   void DumpConditionNode (csString& out, csConditionNode* node, int level);
   size_t GetVariant (csConditionNode* node);
+  
+  bool ReadNode (iFile* cacheFile, csConditionNode* parent,
+    csConditionNode*& node);
+  bool WriteNode (iFile* cacheFile, csConditionNode* node);
 public:
-  csConditionEvaluator evaluator;
+  csConditionEvaluator& evaluator;
 
-  csShaderConditionResolver (csXMLShaderCompiler* compiler);
+  csShaderConditionResolver (csConditionEvaluator& evaluator);
   virtual ~csShaderConditionResolver ();
 
   virtual const char* ParseCondition (const char* str, size_t len, 
@@ -112,27 +117,30 @@ public:
     csConditionNode*& falseNode);
   virtual void FinishAdding ();
 
-  void ResetEvaluationCache() { evaluator.ResetEvaluationCache(); }
-
   void SetEvalParams (const CS::Graphics::RenderMeshModes* modes,
-    const iShaderVarStack* stacks);
+    const csShaderVariableStack* stack);
   size_t GetVariant ();
   size_t GetVariantCount () const
   { return nextVariant; }
   void DumpConditionTree (csString& out);
+  
+  uint GetConditionsVersion();
+  
+  bool ReadFromCache (iFile* cacheFile);
+  bool WriteToCache (iFile* cacheFile);
 };
 
-class csXMLShader : public scfImplementationExt2<csXMLShader,
+class csXMLShader : public scfImplementationExt3<csXMLShader,
 						 csObject,
 						 iShader,
-						 iSelfDestruct>
+						 iSelfDestruct,
+						 iXMLShader>
 {
   friend class csShaderConditionResolver;
 
-  csRef<iDocumentNode> shaderSource;
+  csRef<iDocumentNode> shaderRoot;
   char* vfsStartDir;
   int forcepriority;
-  csHash<csRef<iDocumentNode>, csString> programSources;
 
   // We need a reference to the loader context for delayed loading.
   csRef<iLoaderContext> ldr_context;
@@ -154,39 +162,92 @@ class csXMLShader : public scfImplementationExt2<csXMLShader,
   
   static int CompareTechniqueKeeper (TechniqueKeeper const&,
 				     TechniqueKeeper const&);
-
+				     
   csXMLShaderTech* activeTech;
-  csShaderConditionResolver* resolver;
+  csShaderConditionResolver* techsResolver;
   struct ShaderVariant
   {
     csXMLShaderTech* tech;
     bool prepared;
 
-    ShaderVariant() 
+    ShaderVariant() : tech (0), prepared (false) { }
+  };
+  struct ShaderTechVariant
+  {
+    struct Technique
     {
-      tech = 0;
-      prepared = false;
+      int priority;
+      csRef<iDocumentNode> srcNode;
+      
+      csShaderConditionResolver* resolver;
+      csRef<iDocumentNode> techNode;
+      csArray<ShaderVariant> variants;
+    
+      Technique() : resolver (0) {}
+      void Free ()
+      {
+	for (size_t i = 0; i < variants.GetSize(); i++)
+	{
+	  delete variants[i].tech;
+	}
+        delete resolver;
+      }
+    };
+  
+    bool prepared;
+    csArray<Technique> techniques;
+    
+    ShaderTechVariant() : /*resolver (0)*/prepared(false) {}
+    void Free ()
+    {
+      for (size_t i = 0; i < techniques.GetSize(); i++)
+      {
+        techniques[i].Free();
+      }
     }
   };
-  csArray<ShaderVariant> variants;
+  csArray<ShaderTechVariant> techVariants;
+  csConditionEvaluator* sharedEvaluator;
+  size_t cachedEvaluatorConditionNum;
+  csRef<iCacheManager> shaderCache;
+  bool readFromCache;
+  csString cacheTag;
+  csString cacheType;
+  csString cacheScope_evaluator;
+  csString cacheScope_tech;
 
   /// Shader we fall back to if none of the techs validate
   csRef<iShader> fallbackShader;
+  bool fallbackTried;
+  iShader* GetFallbackShader();
+  
   /// Identify whether a ticker refers to the fallback shader
   bool IsFallbackTicket (size_t ticket) const
   { 
-    size_t vc = resolver->GetVariantCount();
-    if (vc == 0) vc = 1;
-    return ticket >= vc;
+    size_t tvc = techsResolver->GetVariantCount();
+    if (tvc == 0) tvc = 1;
+    return (ticket % (tvc+1)) == 0;
   }
-  /// Extract the fallback's ticker number
+  /// Extract the fallback's ticket number
   size_t GetFallbackTicket (size_t ticket) const
   { 
-    size_t vc = resolver->GetVariantCount();
-    if (vc == 0) vc = 1;
-    return ticket - vc;
+    size_t tvc = techsResolver->GetVariantCount();
+    if (tvc == 0) tvc = 1;
+    return (ticket / (tvc+1));
   }
   bool useFallbackContext;
+  
+  csXMLShaderTech* TechForTicket (size_t ticket) const
+  {
+    size_t tvc = techsResolver->GetVariantCount();
+    if (tvc == 0) tvc = 1;
+    size_t techVar = (ticket % (tvc+1))-1;
+    size_t techAndVar = ticket / (tvc+1);
+    const csArray<ShaderTechVariant::Technique>& techniques =
+      techVariants[techVar].techniques;
+    return techniques[techAndVar % techniques.GetSize()]
+      .variants[techAndVar / techniques.GetSize()].tech;
+  }
 
   csShaderVariableContext globalSVContext;
   void ParseGlobalSVs (iLoaderContext* ldr_context, iDocumentNode* node);
@@ -203,6 +264,7 @@ class csXMLShader : public scfImplementationExt2<csXMLShader,
 protected:
   void InternalRemove() { SelfDestruct(); }
 
+  void Load (iDocumentNode* source);
 public:
   CS_LEAKGUARD_DECLARE (csXMLShader);
 
@@ -223,16 +285,16 @@ public:
   { this->filename = CS::StrDup(filename); }
 
   virtual size_t GetTicket (const CS::Graphics::RenderMeshModes& modes,
-      const iShaderVarStack* stacks);
+      const csShaderVariableStack& stack);
 
   /// Get number of passes this shader have
   virtual size_t GetNumberOfPasses (size_t ticket)
   {
+    if (ticket == csArrayItemNotFound) return 0;
     if (IsFallbackTicket (ticket))
-      return fallbackShader->GetNumberOfPasses (GetFallbackTicket (ticket));
-    csXMLShaderTech* tech = (ticket != csArrayItemNotFound) ? 
-      variants[ticket].tech : 0;
-    return tech ? tech->GetNumberOfPasses () : 0;
+      return GetFallbackShader()->GetNumberOfPasses (GetFallbackTicket (ticket));
+    csXMLShaderTech* tech = TechForTicket (ticket);
+    return tech->GetNumberOfPasses ();
   }
 
   /// Activate a pass for rendering
@@ -241,15 +303,15 @@ public:
   /// Setup a pass.
   virtual bool SetupPass (size_t ticket, const CS::Graphics::RenderMesh *mesh,
     CS::Graphics::RenderMeshModes& modes,
-    const iShaderVarStack* stacks)
+    const csShaderVariableStack& stack)
   { 
     if (IsFallbackTicket (ticket))
-      return fallbackShader->SetupPass (GetFallbackTicket (ticket),
-	mesh, modes, stacks);
+      return GetFallbackShader()->SetupPass (GetFallbackTicket (ticket),
+	mesh, modes, stack);
 
     CS_ASSERT_MSG ("A pass must be activated prior calling SetupPass()",
       activeTech);
-    return activeTech->SetupPass (mesh, modes, stacks); 
+    return activeTech->SetupPass (mesh, modes, stack); 
   }
 
   /**
@@ -259,7 +321,7 @@ public:
   virtual bool TeardownPass (size_t ticket)
   { 
     if (IsFallbackTicket (ticket))
-      return fallbackShader->TeardownPass (GetFallbackTicket (ticket));
+      return GetFallbackShader()->TeardownPass (GetFallbackTicket (ticket));
 
     CS_ASSERT_MSG ("A pass must be activated prior calling TeardownPass()",
       activeTech);
@@ -272,15 +334,27 @@ public:
   /// Get shader metadata
   virtual const csShaderMetadata& GetMetadata (size_t ticket) const
   {
-    if (IsFallbackTicket (ticket))
-      return fallbackShader->GetMetadata (GetFallbackTicket (ticket));
+    return GetMetadata();
+  }
 
-    csXMLShaderTech* tech;
-    if ((ticket != csArrayItemNotFound)
-      && ((tech = variants[ticket].tech) != 0))
-      return tech->metadata;
-    else
-      return allShaderMeta;
+  virtual const csShaderMetadata& GetMetadata () const
+  {
+    return allShaderMeta;
+  }
+
+  virtual void GetUsedShaderVars (size_t ticket, csBitArray& bits) const
+  {
+    if (ticket == csArrayItemNotFound) return;
+    
+    if (IsFallbackTicket (ticket))
+    {
+      fallbackShader->GetUsedShaderVars (GetFallbackTicket (ticket),
+        bits);
+      return;
+    }
+
+    csXMLShaderTech* tech = TechForTicket (ticket);
+    if (tech != 0) tech->GetUsedShaderVars (bits);
   }
 
   friend class csXMLShaderCompiler;
@@ -304,7 +378,7 @@ public:
   }
 
   /// Get a named variable from this context
-  csShaderVariable* GetVariable (csStringID name) const
+  csShaderVariable* GetVariable (CS::ShaderVarStringID name) const
   { 
     if (useFallbackContext)
       return fallbackShader->GetVariable (name);
@@ -319,18 +393,28 @@ public:
     return GetUsedSVContext().GetShaderVariables(); 
   }
 
+  void PushShaderVariables (csShaderVariableStack& s, size_t t) const
+  {
+    if (IsFallbackTicket (t))
+    {
+      if (fallbackShader) fallbackShader->PushVariables (s);
+      return;
+    }
+    GetUsedSVContext().PushVariables (s);
+  }
+
   /**
    * Push the variables of this context onto the variable stacks
    * supplied in the "stacks" argument
    */
-  void PushVariables (iShaderVarStack* stacks) const
+  void PushVariables (csShaderVariableStack& stack) const
   { 
     if (useFallbackContext)
     {
-      fallbackShader->PushVariables (stacks);
+      fallbackShader->PushVariables (stack);
       return;
     }
-    GetUsedSVContext().PushVariables (stacks); 
+    GetUsedSVContext().PushVariables (stack); 
   }
 
   bool IsEmpty() const
@@ -364,7 +448,7 @@ public:
       return fallbackShader->RemoveVariable (variable);
     return GetUsedSVContext().RemoveVariable (variable);
   }
-  bool RemoveVariable (csStringID name)
+  bool RemoveVariable (CS::ShaderVarStringID name)
   {
     if (useFallbackContext)
       return fallbackShader->RemoveVariable (name);
@@ -372,10 +456,15 @@ public:
   }
   /** @} */
 
+  /**\name iXMLShader implementation
+   * @{ */
+  virtual iDocumentNode* GetShaderSource () { return shaderRoot; }
+  /** @} */
+
   /// Set object description
   void SetDescription (const char *desc)
   {
-    cs_free (allShaderMeta.description);
+    cs_free (const_cast<char*> (allShaderMeta.description));
     allShaderMeta.description = CS::StrDup (desc);
   }
 
