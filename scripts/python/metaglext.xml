@@ -7435,4 +7435,124 @@
   <extension name="GL_ARB_half_float_pixel" type="GL">
     <token name="GL_HALF_FLOAT_ARB" value="0x140B" />
   </extension>
+  <extension name="GL_NV_gpu_program4" type="GL">
+    <token name="GL_MIN_PROGRAM_TEXEL_OFFSET_EXT" value="0x8904" />
+    <token name="GL_MAX_PROGRAM_TEXEL_OFFSET_EXT" value="0x8905" />
+    <token name="GL_PROGRAM_ATTRIB_COMPONENTS_NV" value="0x8906" />
+    <token name="GL_PROGRAM_RESULT_COMPONENTS_NV" value="0x8907" />
+    <token name="GL_MAX_PROGRAM_ATTRIB_COMPONENTS_NV" value="0x8908" />
+    <token name="GL_MAX_PROGRAM_RESULT_COMPONENTS_NV" value="0x8909" />
+    <token name="GL_MAX_PROGRAM_GENERIC_ATTRIBS_NV" value="0x89A5" />
+    <token name="GL_MAX_PROGRAM_GENERIC_RESULTS_NV" value="0x89A6" />
+    <function name="glProgramLocalParameterI4iNV" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLint" const="false" pointer="false" />
+      <arg name="y" type="GLint" const="false" pointer="false" />
+      <arg name="z" type="GLint" const="false" pointer="false" />
+      <arg name="w" type="GLint" const="false" pointer="false" />
+    </function>
+    <function name="glProgramLocalParameterI4ivNV" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="params" type="GLint" const="true" pointer="true" />
+    </function>
+    <function name="glProgramLocalParametersI4ivNV" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="count" type="GLsizei" const="false" pointer="false" />
+      <arg name="params" type="GLint" const="true" pointer="true" />
+    </function>
+    <function name="glProgramLocalParameterI4uiNV" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLuint" const="false" pointer="false" />
+      <arg name="y" type="GLuint" const="false" pointer="false" />
+      <arg name="z" type="GLuint" const="false" pointer="false" />
+      <arg name="w" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glProgramLocalParameterI4uivNV" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="params" type="GLuint" const="true" pointer="true" />
+    </function>
+    <function name="glProgramLocalParametersI4uivNV" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="count" type="GLsizei" const="false" pointer="false" />
+      <arg name="params" type="GLuint" const="true" pointer="true" />
+    </function>
+    <function name="glProgramEnvParameterI4iNV" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLint" const="false" pointer="false" />
+      <arg name="y" type="GLint" const="false" pointer="false" />
+      <arg name="z" type="GLint" const="false" pointer="false" />
+      <arg name="w" type="GLint" const="false" pointer="false" />
+    </function>
+    <function name="glProgramEnvParameterI4ivNV" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="params" type="GLint" const="true" pointer="true" />
+    </function>
+    <function name="glProgramEnvParametersI4ivNV" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="count" type="GLsizei" const="false" pointer="false" />
+      <arg name="params" type="GLint" const="true" pointer="true" />
+    </function>
+    <function name="glProgramEnvParameterI4uiNV" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLuint" const="false" pointer="false" />
+      <arg name="y" type="GLuint" const="false" pointer="false" />
+      <arg name="z" type="GLuint" const="false" pointer="false" />
+      <arg name="w" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glProgramEnvParameterI4uivNV" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="params" type="GLuint" const="true" pointer="true" />
+    </function>
+    <function name="glProgramEnvParametersI4uivNV" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="count" type="GLsizei" const="false" pointer="false" />
+      <arg name="params" type="GLuint" const="true" pointer="true" />
+    </function>
+    <function name="glGetProgramLocalParameterIivNV" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="params" type="GLint" const="false" pointer="true" />
+    </function>
+    <function name="glGetProgramLocalParameterIuivNV" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="params" type="GLuint" const="false" pointer="true" />
+    </function>
+    <function name="glGetProgramEnvParameterIivNV" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="params" type="GLint" const="false" pointer="true" />
+    </function>
+    <function name="glGetProgramEnvParameterIuivNV" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="params" type="GLuint" const="false" pointer="true" />
+    </function>
+  </extension>
+  <extension name="GL_EXT_gpu_program_parameters" type="GL">
+    <function name="glProgramLocalParameters4fvEXT" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="count" type="GLsizei" const="false" pointer="false" />
+      <arg name="params" type="GLfloat" const="true" pointer="true" />
+    </function>
+    <function name="glProgramEnvParameters4fvEXT" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="count" type="GLsizei" const="false" pointer="false" />
+      <arg name="params" type="GLfloat" const="true" pointer="true" />
+    </function>
+  </extension>
 </extensionlist>
