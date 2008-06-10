@@ -18,7 +18,11 @@
 
 #include "cssysdef.h"
 #include "animation.h"
+
 #include "nodes.h"
+#include "blendnode.h"
+#include "fsmnode.h"
+#include "othernodes.h"
 
 #include "csgeom/math.h"
 

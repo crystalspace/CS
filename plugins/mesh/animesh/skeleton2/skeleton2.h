@@ -68,6 +68,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     //-- iSkeletonFactory2
     virtual BoneID CreateBone (BoneID parent = InvalidBoneID);
+    virtual BoneID FindBone (const char *name) const;
     virtual void RemoveBone (BoneID bone);
     virtual BoneID GetBoneParent (BoneID bone) const;
     virtual bool HasBone (BoneID bone) const;
