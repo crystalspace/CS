@@ -217,9 +217,9 @@ void csShaderGLCGCommon::SVtoCgMatrix3x3  (csShaderVariable* var, float* matrix)
 	var->GetArrayElement (idx);
       if (element != 0 && element->GetValue (v))
       {
-	matrix[idx] = v[0]; 
-	matrix[idx + 3] = v[1];
-	matrix[idx + 6] = v[2];
+	matrix[idx*3+0] = v[0]; 
+	matrix[idx*3+1] = v[1];
+	matrix[idx*3+2] = v[2];
       }
     }
   }
@@ -260,10 +260,10 @@ void csShaderGLCGCommon::SVtoCgMatrix4x4  (csShaderVariable* var, float* matrix)
 	var->GetArrayElement (idx);
       if (element != 0 && element->GetValue (v))
       {
-	matrix[idx] = v[0]; 
-	matrix[idx + 4] = v[1];
-	matrix[idx + 8] = v[2];
-	matrix[idx + 12] = v[3];
+	matrix[idx*4+0] = v[0]; 
+	matrix[idx*4+1] = v[1];
+	matrix[idx*4+2] = v[2];
+	matrix[idx*4+3] = v[3];
       }
     }
   }
@@ -805,7 +805,28 @@ void csShaderGLCGCommon::DoDebugDump ()
   output << "\n";
 
   output << "Variable mappings:\n";
-  DumpVariableMappings (output);
+  for (size_t v = 0; v < variablemap.GetSize (); v++)
+  {
+    const VariableMapEntry& vme = variablemap[v];
+    ShaderParameter* sparam =
+      reinterpret_cast<ShaderParameter*> (vme.userVal);
+
+    output << stringsSvName->Request (vme.name);
+    output << '(' << vme.name << ") -> ";
+    output << vme.destination << ' ';
+    if (sparam == 0)
+    {
+      output << "(null)";
+    }
+    else
+    {
+      if (sparam->paramType != 0) output << cgGetTypeString (sparam->paramType) << ' ';
+      if (sparam->param != 0) output << cgGetParameterName (sparam->param) << "  ";
+      output << "baseslot " << sparam->baseSlot;
+      if (sparam->assumeConstant) output << "  assumed constant";
+    }
+    output << '\n'; 
+  }
   output << "\n";
 
   CGparameter param = cgGetFirstLeafParameter (program, CG_PROGRAM);
