@@ -196,7 +196,7 @@ namespace CS
       typename _PurgeCondition = ResourceCache::PurgeConditionAfterTime<_TimeType> >
     class GenericResourceCache
     {
-    public:      
+    public:
       typedef T CachedType;
       typedef _TimeType TimeType;
       typedef _ResourceSorting ResourceSorting;
@@ -438,7 +438,7 @@ namespace CS
       public:
 	VerifyTraverser (Element* el) : el (el) {}
 	
-        bool Process (Element* el)
+        bool operator() (Element* el)
 	{
 	  CS_ASSERT(el != this->el);
 	  return true;
