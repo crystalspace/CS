@@ -1104,51 +1104,51 @@ csLoadResult csLoader::Load (iDataBuffer* buffer, const char* fname,
 }
 
 csLoadResult csLoader::Load (const char* fname, iRegion* region,
-       bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-       const char* override_name, iMissingLoaderData* missingdata)
+  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+	const char* override_name, iMissingLoaderData* missingdata)
 {
   csRef<iDataBuffer> buf = VFS->ReadFile (fname);
 
   if (!buf)
   {
     ReportError (
-             "crystalspace.maploader.parse",
-             "Could not open map file '%s' on VFS!", fname);
+	      "crystalspace.maploader.parse",
+    	      "Could not open map file '%s' on VFS!", fname);
     csLoadResult rc;
     rc.success = false;
     rc.result = 0;
     return rc;
- }
+  }
   
   return Load (buf, fname, region, curRegOnly, checkDupes, ssource,
-       override_name, missingdata);
+  	override_name, missingdata);
 }
 
 csLoadResult csLoader::Load (iDataBuffer* buffer, iRegion* region,
-       bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-       const char* override_name, iMissingLoaderData* missingdata)
+  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+	const char* override_name, iMissingLoaderData* missingdata)
 {
   return Load (buffer, 0, region, curRegOnly, checkDupes, ssource,
-       override_name, missingdata);
+  	override_name, missingdata);
 }
 
 csLoadResult csLoader::Load (iDocumentNode* node, iRegion* region,
-       bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-       const char* override_name, iMissingLoaderData* missingdata)
+  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+	const char* override_name, iMissingLoaderData* missingdata)
 {
   csLoadResult rc;
   rc.success = false;
   rc.result = 0;
 
   csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-       new StdLoaderContext (Engine, region, curRegOnly, this, checkDupes,
-         missingdata));
+	new StdLoaderContext (Engine, region, curRegOnly, this, checkDupes,
+	  missingdata));
 
   csRef<iDocumentNode> meshfactnode = node->GetNode ("meshfact");
   if (meshfactnode)
   {
     const char* meshfactname = override_name ? override_name :
-       meshfactnode->GetAttributeValue ("name");
+    	meshfactnode->GetAttributeValue ("name");
     if (ldr_context->CheckDupes () && meshfactname)
     {
       iMeshFactoryWrapper* mfw = Engine->FindMeshFactory (meshfactname);
@@ -1182,7 +1182,7 @@ csLoadResult csLoader::Load (iDocumentNode* node, iRegion* region,
   if (meshobjnode)
   {
     const char* meshobjname = override_name ? override_name :
-       meshobjnode->GetAttributeValue ("name");
+    	meshobjnode->GetAttributeValue ("name");
     if (ldr_context->CheckDupes () && meshobjname)
     {
       iMeshWrapper* mw = Engine->FindMeshObject (meshobjname);
@@ -1231,7 +1231,7 @@ csLoadResult csLoader::Load (iDocumentNode* node, iRegion* region,
   if (portalsnode)
   {
     const char* portalsname = override_name ? override_name :
-       portalsnode->GetAttributeValue ("name");
+    	portalsnode->GetAttributeValue ("name");
     if (ldr_context->CheckDupes () && portalsname)
     {
       iMeshWrapper* mw = Engine->FindMeshObject (portalsname);
@@ -1274,7 +1274,7 @@ csLoadResult csLoader::Load (iDocumentNode* node, iRegion* region,
   if (lightnode)
   {
     const char* lightname = override_name ? override_name :
-       lightnode->GetAttributeValue ("name");
+    	lightnode->GetAttributeValue ("name");
     iLight* light = ParseStatlight (ldr_context, lightnode);
     if (light)
     {
@@ -1284,9 +1284,9 @@ csLoadResult csLoader::Load (iDocumentNode* node, iRegion* region,
       return rc;
     }
 
-   rc.result = 0;
+    rc.result = 0;
     rc.success = false;
-   return rc;
+    return rc;
   }
 
   ReportError ("crystalspace.maploader.parse",
@@ -1424,12 +1424,12 @@ bool csLoader::LoadMapLibraryFile (const char* fname, iRegion* region,
 }
 
 bool csLoader::LoadLibrary (iDocumentNode* lib_node, iRegion* region,
-       bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-       iMissingLoaderData* missingdata)
+	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+	iMissingLoaderData* missingdata)
 {
   csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-       new StdLoaderContext (Engine, region, curRegOnly, this, checkDupes,
-         missingdata));
+	new StdLoaderContext (Engine, region, curRegOnly, this, checkDupes,
+	  missingdata));
 
   return LoadLibrary (ldr_context, lib_node, ssource, missingdata, true);
 }
@@ -3021,6 +3021,13 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
       case XMLTOKEN_DETAIL:
         stemp->GetFlags ().Set (CS_ENTITY_DETAIL, CS_ENTITY_DETAIL);
         break;
+      case XMLTOKEN_STATICLIT:
+        stemp->GetFlags ().Set (CS_ENTITY_STATICLIT, CS_ENTITY_STATICLIT);
+        break;
+      case XMLTOKEN_LIMITEDSHADOWCAST:
+        stemp->GetFlags ().Set (CS_ENTITY_LIMITEDSHADOWCAST,
+          CS_ENTITY_LIMITEDSHADOWCAST);
+        break;
       case XMLTOKEN_IMPOSTER:
         {
           csRef<iImposter> imposter = scfQueryInterface<iImposter> (stemp);
@@ -3244,6 +3251,20 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       else
         mesh->GetFlags ().Set (CS_ENTITY_NOSHADOWS, CS_ENTITY_NOSHADOWS);
       break;
+    case XMLTOKEN_NOSHADOWCAST:
+      TEST_MISSING_MESH
+      if (recursive)
+        mesh->SetFlagsRecursive (CS_ENTITY_NOSHADOWCAST, CS_ENTITY_NOSHADOWCAST);
+      else
+        mesh->GetFlags ().Set (CS_ENTITY_NOSHADOWCAST, CS_ENTITY_NOSHADOWCAST);
+      break;
+    case XMLTOKEN_NOSHADOWRECEIVE:
+      TEST_MISSING_MESH
+      if (recursive)
+        mesh->SetFlagsRecursive (CS_ENTITY_NOSHADOWRECEIVE, CS_ENTITY_NOSHADOWRECEIVE);
+      else
+        mesh->GetFlags ().Set (CS_ENTITY_NOSHADOWRECEIVE, CS_ENTITY_NOSHADOWRECEIVE);
+      break;
     case XMLTOKEN_NOCLIP:
       TEST_MISSING_MESH
       if (recursive)
@@ -3280,6 +3301,22 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
         mesh->SetFlagsRecursive (CS_ENTITY_DETAIL, CS_ENTITY_DETAIL);
       else
         mesh->GetFlags ().Set (CS_ENTITY_DETAIL, CS_ENTITY_DETAIL);
+      break;
+    case XMLTOKEN_STATICLIT:
+      TEST_MISSING_MESH
+      if (recursive)
+        mesh->SetFlagsRecursive (CS_ENTITY_STATICLIT, CS_ENTITY_STATICLIT);
+      else
+        mesh->GetFlags ().Set (CS_ENTITY_STATICLIT, CS_ENTITY_STATICLIT);
+      break;
+    case XMLTOKEN_LIMITEDSHADOWCAST:
+      TEST_MISSING_MESH
+      if (recursive)
+        mesh->SetFlagsRecursive (CS_ENTITY_LIMITEDSHADOWCAST,
+          CS_ENTITY_LIMITEDSHADOWCAST);
+      else
+        mesh->GetFlags ().Set (CS_ENTITY_LIMITEDSHADOWCAST,
+          CS_ENTITY_LIMITEDSHADOWCAST);
       break;
     case XMLTOKEN_ZFILL:
       TEST_MISSING_MESH
@@ -4821,6 +4858,7 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
   csVector3 attenvec (0, 0, 0);
   float spotfalloffInner = 1, spotfalloffOuter = 0;
   csLightType type = CS_LIGHT_POINTLIGHT;
+  csFlags lightFlags;
 
   bool use_light_transf = false;
   bool use_light_transf_vector = false;
@@ -5176,6 +5214,14 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
 	  shader_variables.Push(var);
 	}
 	break;
+      case XMLTOKEN_NOSHADOWS:
+	{
+	  bool flag;
+	  if (!SyntaxService->ParseBool (child, flag, true))
+	    return false;
+	  lightFlags.SetBool (CS_LIGHT_NOSHADOWS, flag);
+	}
+	break;
     default:
 	SyntaxService->ReportBadToken (child);
 	return 0;
@@ -5194,6 +5240,7 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
   	dist, color, dyn);
   AddToRegionOrCollection (ldr_context, l->QueryObject ());
   l->SetType (type);
+  l->GetFlags() = lightFlags;
   l->SetSpotLightFalloff (spotfalloffInner, spotfalloffOuter);
 
   for (size_t i = 0; i < shader_variables.GetSize (); i++)
@@ -6111,45 +6158,13 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
       return false;
     }
   }
-
-  const char* name = shaderNode->GetAttributeValue ("name");
-  if (ldr_context->CheckDupes () && name)
+  
+  csRef<iShader> shader = SyntaxService->ParseShader (ldr_context, shaderNode);
+  if (shader.IsValid())
   {
-    iShader* shader = shaderMgr->GetShader (name);
-    if (shader)
-    {
-      AddToRegionOrCollection (ldr_context, shader->QueryObject ());
-      return true;
-    }
-  }
-
-  const char* type = shaderNode->GetAttributeValue ("compiler");
-  if (type == 0)
-    type = shaderNode->GetAttributeValue ("type");
-  if (type == 0)
-  {
-    SyntaxService->ReportError ("crystalspace.maploader", shaderNode,
-      "'compiler' attribute is missing!");
-
-    return false;
-  }
-  csRef<iShaderCompiler> shcom = shaderMgr->GetCompiler (type);
-  if (!shcom.IsValid()) 
-  {
-    SyntaxService->ReportError ("crystalspace.maploader", shaderNode,
-      "Could not get shader compiler '%s'", type);
-    return false;
-  }
-  csRef<iShader> shader = shcom->CompileShader (ldr_context, shaderNode);
-  if (shader)
-  {
-    shader->SetFileName(fileChild->GetContentsValue ());
     AddToRegionOrCollection (ldr_context, shader->QueryObject ());
-    shaderMgr->RegisterShader (shader);
   }
-  else 
-    return false;
-  return true;
+  return shader.IsValid();
 }
 
 void csLoader::CollectAllChildren (iMeshWrapper* meshWrapper,
