@@ -219,6 +219,7 @@ class csView(scfView):
     def UpdateClipper(*args): return _cstool.csView_UpdateClipper(*args)
     def GetClipper(*args): return _cstool.csView_GetClipper(*args)
     def Draw(*args): return _cstool.csView_Draw(*args)
+    def GetMeshFilter(*args): return _cstool.csView_GetMeshFilter(*args)
 csView_swigregister = _cstool.csView_swigregister
 csView_swigregister(csView)
 
