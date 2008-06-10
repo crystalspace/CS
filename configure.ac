@@ -282,26 +282,6 @@ CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
 
 
 #------------------------------------------------------------------------------
-# Check for SIMD flags
-#------------------------------------------------------------------------------
-
-CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx], 
-    [CS_CREATE_TUPLE([-mmmx])])
-AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MMX], [$cs_cv_prog_cc_mmmx],[+])])
-
-
-AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
-    [CS_CHECK_BUILD([checking for mmintrin.h],
-        [cs_cv_header_mmintrin_h],
-        [AC_LANG_PROGRAM([[#include <mmintrin.h>]], [])],
-        [CS_CREATE_TUPLE([$cs_cv_prog_cc_mmmx])],
-        [C++],
-        [CS_HEADER_PROPERTY([CS_SUPPORTS_MMX])
-        CS_EMIT_BUILD_PROPERTY([CS_SUPPORTS_MMX], [yes])])])
-
-
-#------------------------------------------------------------------------------
 # Check if Perl SDK is installed and which compiler and linker flags are
 # required to embed Perl.  Also determine if the glue file can be created with
 # ExtUtils::Embed or if it must be created manually.
