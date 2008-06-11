@@ -15026,6 +15026,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %OWNER = ();
 %ITERATORS = ();
 *CreateBone = *cspacec::iSkeletonFactory2_CreateBone;
+*FindBone = *cspacec::iSkeletonFactory2_FindBone;
 *RemoveBone = *cspacec::iSkeletonFactory2_RemoveBone;
 *GetBoneParent = *cspacec::iSkeletonFactory2_GetBoneParent;
 *HasBone = *cspacec::iSkeletonFactory2_HasBone;
@@ -15406,6 +15407,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetPlaybackSpeed = *cspacec::iSkeletonAnimationNodeFactory2_GetPlaybackSpeed;
 *SetAutomaticReset = *cspacec::iSkeletonAnimationNodeFactory2_SetAutomaticReset;
 *GetAutomaticReset = *cspacec::iSkeletonAnimationNodeFactory2_GetAutomaticReset;
+*SetAutomaticStop = *cspacec::iSkeletonAnimationNodeFactory2_SetAutomaticStop;
+*GetAutomaticStop = *cspacec::iSkeletonAnimationNodeFactory2_GetAutomaticStop;
 *scfGetVersion = *cspacec::iSkeletonAnimationNodeFactory2_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

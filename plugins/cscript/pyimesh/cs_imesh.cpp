@@ -15583,6 +15583,40 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iSkeletonFactory2_FindBone(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iSkeletonFactory2 *arg1 = (iSkeletonFactory2 *) 0 ;
+  char *arg2 = (char *) 0 ;
+  BoneID result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFactory2_FindBone",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonFactory2, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory2_FindBone" "', argument " "1"" of type '" "iSkeletonFactory2 const *""'"); 
+  }
+  arg1 = reinterpret_cast< iSkeletonFactory2 * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iSkeletonFactory2_FindBone" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  result = (BoneID)((iSkeletonFactory2 const *)arg1)->FindBone((char const *)arg2);
+  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iSkeletonFactory2_RemoveBone(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iSkeletonFactory2 *arg1 = (iSkeletonFactory2 *) 0 ;
@@ -19131,6 +19165,58 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimationNodeFactory2_GetAutomaticReset(PyOb
   }
   arg1 = reinterpret_cast< iSkeletonAnimationNodeFactory2 * >(argp1);
   result = (bool)((iSkeletonAnimationNodeFactory2 const *)arg1)->GetAutomaticReset();
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iSkeletonAnimationNodeFactory2_SetAutomaticStop(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iSkeletonAnimationNodeFactory2 *arg1 = (iSkeletonAnimationNodeFactory2 *) 0 ;
+  bool arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  bool val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimationNodeFactory2_SetAutomaticStop",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimationNodeFactory2, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimationNodeFactory2_SetAutomaticStop" "', argument " "1"" of type '" "iSkeletonAnimationNodeFactory2 *""'"); 
+  }
+  arg1 = reinterpret_cast< iSkeletonAnimationNodeFactory2 * >(argp1);
+  ecode2 = SWIG_AsVal_bool(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeletonAnimationNodeFactory2_SetAutomaticStop" "', argument " "2"" of type '" "bool""'");
+  } 
+  arg2 = static_cast< bool >(val2);
+  (arg1)->SetAutomaticStop(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iSkeletonAnimationNodeFactory2_GetAutomaticStop(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iSkeletonAnimationNodeFactory2 *arg1 = (iSkeletonAnimationNodeFactory2 *) 0 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimationNodeFactory2_GetAutomaticStop",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSkeletonAnimationNodeFactory2, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimationNodeFactory2_GetAutomaticStop" "', argument " "1"" of type '" "iSkeletonAnimationNodeFactory2 const *""'"); 
+  }
+  arg1 = reinterpret_cast< iSkeletonAnimationNodeFactory2 * >(argp1);
+  result = (bool)((iSkeletonAnimationNodeFactory2 const *)arg1)->GetAutomaticStop();
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -48850,6 +48936,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"delete_iSkeletonManager2", _wrap_delete_iSkeletonManager2, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonManager2_swigregister", iSkeletonManager2_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFactory2_CreateBone", _wrap_iSkeletonFactory2_CreateBone, METH_VARARGS, NULL},
+	 { (char *)"iSkeletonFactory2_FindBone", _wrap_iSkeletonFactory2_FindBone, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFactory2_RemoveBone", _wrap_iSkeletonFactory2_RemoveBone, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFactory2_GetBoneParent", _wrap_iSkeletonFactory2_GetBoneParent, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFactory2_HasBone", _wrap_iSkeletonFactory2_HasBone, METH_VARARGS, NULL},
@@ -48964,6 +49051,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSkeletonAnimationNodeFactory2_GetPlaybackSpeed", _wrap_iSkeletonAnimationNodeFactory2_GetPlaybackSpeed, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonAnimationNodeFactory2_SetAutomaticReset", _wrap_iSkeletonAnimationNodeFactory2_SetAutomaticReset, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonAnimationNodeFactory2_GetAutomaticReset", _wrap_iSkeletonAnimationNodeFactory2_GetAutomaticReset, METH_VARARGS, NULL},
+	 { (char *)"iSkeletonAnimationNodeFactory2_SetAutomaticStop", _wrap_iSkeletonAnimationNodeFactory2_SetAutomaticStop, METH_VARARGS, NULL},
+	 { (char *)"iSkeletonAnimationNodeFactory2_GetAutomaticStop", _wrap_iSkeletonAnimationNodeFactory2_GetAutomaticStop, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonAnimationNodeFactory2_scfGetVersion", _wrap_iSkeletonAnimationNodeFactory2_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSkeletonAnimationNodeFactory2", _wrap_delete_iSkeletonAnimationNodeFactory2, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonAnimationNodeFactory2_swigregister", iSkeletonAnimationNodeFactory2_swigregister, METH_VARARGS, NULL},
