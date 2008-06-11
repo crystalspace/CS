@@ -194,7 +194,7 @@ public:
   {
     fog.mode = CS_FOG_MODE_CRYSTALSPACE;
     fog.density = density;
-    fog.color = color;
+    fog.color.Set(color);
     UpdateFogSVs ();
   }
   virtual void SetFog (const csFog& fog)
