@@ -346,7 +346,7 @@ namespace RenderManager
 		viewSetup.persist.shadowClipSVName);
 	      lightFrustum.shadowClipSV->SetValue (csVector2 (
 		viewSetup.splitDists[i], 
-		(i+1 == viewSetup.numParts) ? HUGE_VALF : viewSetup.splitDists[i+1]));
+		(i+1 == viewSetup.numParts) ? FLT_MAX : viewSetup.splitDists[i+1]));
 		  
 	      size_t numTex = viewSetup.persist.settings.targets.GetSize();
 	      if (lightFrustum.textureSVs == 0)
@@ -402,11 +402,11 @@ namespace RenderManager
 	      allObjsBoxPP *= lightFrust.volumePP;
 	      csBox3 clipToView;
 	      if (light->GetType() == CS_LIGHT_DIRECTIONAL)
-		clipToView = csBox3 (csVector3 (-1, -1, -HUGE_VALF),
+		clipToView = csBox3 (csVector3 (-1, -1, -FLT_MAX),
 		  csVector3 (1, 1, 0));
 	      else
 		clipToView = csBox3 (csVector3 (-1, -1, 0),
-		  csVector3 (1, 1, HUGE_VALF));
+		  csVector3 (1, 1, FLT_MAX));
 	      if (allObjsBoxPP.Empty())
 	      {
 		//continue;
