@@ -280,7 +280,7 @@ namespace CS
     {
       if (!(camMask & (1 << i))) continue;
       frustum_mask |= (1 << i);
-      planes[i].Set (tr_o2c.GetT2O() * frust[i].norm, -frust[i].norm*o2tmult);
+      planes[i] = tr_o2c.This2Other (frust[i]);
     }
     csPlane3 pznear = ctxt->clip_plane;
     pznear.Invert ();
