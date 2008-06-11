@@ -61,9 +61,9 @@ enum csFogMode
 {
   CS_FOG_MODE_NONE = 0,
   CS_FOG_MODE_LINEAR,
-  CS_FOG_MODE_EXP,
-  CS_FOG_MODE_EXP2,
-  CS_FOG_MODE_CRYSTALSPACE
+  CS_FOG_MODE_CRYSTALSPACE,
+  CS_FOG_MODE_EXP, // Not implemented
+  CS_FOG_MODE_EXP2, // Not implemented
 };
 
 /**
@@ -71,7 +71,7 @@ enum csFogMode
  */
 struct csFog
 {
-  /// Density (for CS_FOG_MODE_EXP, CS_FOG_MODE_EXP2, CS_FOG_MODE_CRYSTALSPACE)
+  /// Density (for CS_FOG_MODE_LINEAR, CS_FOG_MODE_EXP, CS_FOG_MODE_EXP2, CS_FOG_MODE_CRYSTALSPACE)
   float density;
   /// Color
   csColor4 color;
@@ -81,8 +81,11 @@ struct csFog
   float end;
   /// Fog mode.
   csFogMode mode;
+  /// The limit after which the fog is no longer shown (for rings of fog) (for CS_FOG_MODE_LINEAR).
+  /// 0 means limit will be ignored.
+  float limit;
 
-  csFog() : density (0), color (0, 0, 0, 1.0f), start (0), end (0), 
+  csFog() : density (0), color (0, 0, 0, 1.0f), start (0), end (0), limit (0),
     mode (CS_FOG_MODE_NONE) {}
 };
 
