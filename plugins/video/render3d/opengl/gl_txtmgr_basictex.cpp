@@ -931,6 +931,8 @@ void csGLBasicTextureHandle::GetMipmapLimits (int& maxMip, int& minMip)
   }
 }
   
+#include "csutil/custom_new_disable.h"
+
 csPtr<iDataBuffer> csGLBasicTextureHandle::Readback (
   const CS::StructuredTextureFormat& format, int mip)
 {
@@ -963,6 +965,8 @@ csPtr<iDataBuffer> csGLBasicTextureHandle::Readback (
     data, byteSize));
   return csPtr<iDataBuffer> (db);
 }
+
+#include "csutil/custom_new_enable.h"
 
 csPtr<iImage> csGLBasicTextureHandle::Dump ()
 {

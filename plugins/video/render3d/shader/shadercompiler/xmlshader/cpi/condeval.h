@@ -87,6 +87,8 @@ struct ValueSetArray<1>
   }
 };
 
+#include "csutil/custom_new_disable.h"
+
 class Variables
 {
 public:
@@ -636,6 +638,8 @@ public:
     return newVars;
   }
 };
+
+#include "csutil/custom_new_enable.h"
 
 class ConditionIDMapper
 {

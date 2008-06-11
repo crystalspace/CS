@@ -2024,6 +2024,8 @@ struct ValueSetBoolWrapper
   operator Logic3 () const;
 };
 
+#include "csutil/custom_new_disable.h"
+
 class ValueSetBoolAlloc
 {
   // Abuse the fact ValueSetBool doesn't need to be destructed
@@ -2052,6 +2054,8 @@ public:
     return new (r) ValueSetBool;
   }
 };
+
+#include "csutil/custom_new_enable.h"
 
 struct EvaluatorShadervarValuesSimple
 {
