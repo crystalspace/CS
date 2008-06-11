@@ -77,6 +77,8 @@ public:
     sector->CallSectorCallbacks (rview);
     // Make sure the clip-planes are ok
     CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext ());
+    
+    context.owner.AddDebugClipPlanes (rview);
 
     // Do the culling
     iVisibilityCuller* culler = sector->GetVisibilityCuller ();
@@ -139,8 +141,7 @@ private:
 
 
 RMShadowedPSSM::RMShadowedPSSM (iBase* parent)
-  : scfImplementationType (this, parent), doHDRExposure (false), targets (*this),
-    wantDebugLockLines (false), lockedDebugLines (0)
+  : scfImplementationType (this, parent), doHDRExposure (false), targets (*this)
 {
 }
 
@@ -211,16 +212,7 @@ bool RMShadowedPSSM::RenderView (iView* view)
   
   if (doHDRExposure) hdrExposure.ApplyExposure (postEffects);
   
-  if (wantDebugLockLines)
-  {
-    lockedDebugLines =
-      new RenderTreeType::DebugLines (renderTree.GetDebugLines());
-    wantDebugLockLines = false;
-  }
-  else if (lockedDebugLines)
-    renderTree.SetDebugLines (*lockedDebugLines);
-  renderTree.DrawDebugLines (rview->GetGraphics3D (), rview);
-  //renderTree.RenderDebugTextures (rview->GetGraphics3D ());
+  DebugFrameRender (rview, renderTree);
 
   return true;
 }
@@ -254,27 +246,6 @@ bool RMShadowedPSSM::HandleTarget (RenderTreeType& renderTree,
 
   return true;
 }
-
-bool RMShadowedPSSM::DebugCommand (const char *cmd)
-{
-  if (strcmp (cmd, "toggle_debug_lines_lock") == 0)
-  {
-    csPrintf ("%p got toggle_debug_lines_lock: ", this);
-    if (lockedDebugLines)
-    {
-      delete lockedDebugLines; lockedDebugLines = 0;
-      csPrintf ("unlocked\n");
-    }
-    else
-    {
-      wantDebugLockLines = !wantDebugLockLines;
-      csPrintf ("%slocked\n", wantDebugLockLines ? "" : "un");
-    }
-    return true;
-  }
-  return false;
-}
-
 
 bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
 {

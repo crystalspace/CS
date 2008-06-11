@@ -19,6 +19,7 @@
 #ifndef __CS_RM_UNSHADOWED_H__
 #define __CS_RM_UNSHADOWED_H__
 
+#include "csplugincommon/rendermanager/debugcommon.h"
 #include "csplugincommon/rendermanager/hdrexposure.h"
 #include "csutil/scf_implementation.h"
 #include "iutil/comp.h"
@@ -26,14 +27,18 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(RMUnshadowed)
 {
+  typedef CS::RenderManager::RenderTree<> RenderTreeType;
+    
   template<typename RenderTreeType, typename LayerConfigType>
   class StandardContextSetup;
 
-  class RMUnshadowed : public scfImplementation4<RMUnshadowed, 
+  class RMUnshadowed : public scfImplementation5<RMUnshadowed, 
                                                  iRenderManager, 
                                                  iRenderManagerTargets,
                                                  iRenderManagerPostEffects,
-                                                 iComponent>
+                                                 iComponent,
+                                                 scfFakeInterface<iDebugHelper> >,
+                       public CS::RenderManager::RMDebugCommon<RenderTreeType>
   {
   public:
     RMUnshadowed (iBase* parent);
@@ -73,8 +78,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMUnshadowed)
     {
       return false;
     }
-
-    typedef CS::RenderManager::RenderTree<> RenderTreeType;
 
     typedef StandardContextSetup<RenderTreeType, 
       CS::RenderManager::MultipleRenderLayer> ContextSetupType;
@@ -118,8 +121,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMUnshadowed)
 CS_PLUGIN_NAMESPACE_END(RMUnshadowed)
 
 template<>
-class csHashComputer<CS_PLUGIN_NAMESPACE_NAME(RMUnshadowed)::RMUnshadowed::RenderTreeType::ContextNode*> : 
-  public csHashComputerIntegral<CS_PLUGIN_NAMESPACE_NAME(RMUnshadowed)::RMUnshadowed::RenderTreeType::ContextNode*> 
+class csHashComputer<CS_PLUGIN_NAMESPACE_NAME(RMUnshadowed)::RenderTreeType::ContextNode*> : 
+  public csHashComputerIntegral<CS_PLUGIN_NAMESPACE_NAME(RMUnshadowed)::RenderTreeType::ContextNode*> 
 {};
 
 #endif // __CS_RM_UNSHADOWED_H__

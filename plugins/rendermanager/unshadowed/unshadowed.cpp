@@ -74,6 +74,8 @@ public:
     sector->CallSectorCallbacks (rview);
     // Make sure the clip-planes are ok
     CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext ());
+    
+    context.owner.AddDebugClipPlanes (rview);
 
     // Do the culling
     iVisibilityCuller* culler = sector->GetVisibilityCuller ();
@@ -206,6 +208,8 @@ bool RMUnshadowed::RenderView (iView* view)
   postEffects.DrawPostEffects ();
   
   if (doHDRExposure) hdrExposure.ApplyExposure (postEffects);
+  
+  DebugFrameRender (rview, renderTree);
 
   return true;
 }
