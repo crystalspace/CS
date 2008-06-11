@@ -78,7 +78,8 @@ public:
     // Make sure the clip-planes are ok
     CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext ());
     
-    context.owner.AddDebugClipPlanes (rview);
+    if (context.owner.IsDebugFlagEnabled (rmanager->dbgFlagClipPlanes))
+      context.owner.AddDebugClipPlanes (rview);
 
     // Do the culling
     iVisibilityCuller* culler = sector->GetVisibilityCuller ();
@@ -297,6 +298,8 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
   
   csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objectReg);
   treePersistent.Initialize (shaderManager);
+  dbgFlagClipPlanes =
+    treePersistent.debugPersist.RegisterDebugFlag ("draw.clipplanes");
   postEffects.Initialize (objectReg);
   
   const char* effectsFile = cfg->GetStr ("RenderManager.ShadowPSSM.Effects", 0);
@@ -323,7 +326,7 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
   
   portalPersistent.Initialize (shaderManager, g3d);
   lightPersistent.shadowPersist.SetConfigPrefix ("RenderManager.ShadowPSSM");
-  lightPersistent.Initialize (objectReg);
+  lightPersistent.Initialize (objectReg, treePersistent.debugPersist);
   
   return true;
 }

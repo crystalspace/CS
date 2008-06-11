@@ -202,8 +202,7 @@ namespace RenderManager
 	  this->lightProject = lightProject;
             
           const csBox3& lightBBox = light->GetLocalBBox();
-          if (shadows.persist.debugFlags
-              & ShadowPSSM::PersistentData::dbgLightBBox)
+          if (tree.IsDebugFlagEnabled (shadows.persist.dbgLightBBox))
           {
 	    tree.AddDebugBBox (lightBBox,
 	      world2light_base.GetInverse(),
@@ -286,23 +285,20 @@ namespace RenderManager
 		cornerLight = superFrustum.world2light_rotated.Other2This (cornerWorld);
 		frustumLight.AddBoundingVertex (cornerLight);
 	      }
-	      if (shadows.persist.debugFlags
-		  & ShadowPSSM::PersistentData::dbgSplitFrustumCam)
+	      if (tree.IsDebugFlagEnabled (shadows.persist.dbgSplitFrustumCam))
 	      {
 		tree.AddDebugBBox (frustumCam,
 		  camera->GetTransform().GetInverse(),
 		  csColor (1, 0, 1));
 	      }
-	      if (shadows.persist.debugFlags
-		  & ShadowPSSM::PersistentData::dbgSplitFrustumLight)
+	      if (tree.IsDebugFlagEnabled (shadows.persist.dbgSplitFrustumLight))
 	      {
 		tree.AddDebugBBox (frustumLight,
 		  superFrustum.world2light_rotated.GetInverse(),
 		  csColor (0, 1, 0));
 	      }
 	      if (!partFixed) frustumLight *= lightBBox;
-	      if (shadows.persist.debugFlags
-		  & ShadowPSSM::PersistentData::dbgSplitFrustumLight)
+	      if (tree.IsDebugFlagEnabled (shadows.persist.dbgSplitFrustumLight))
 	      {
 		tree.AddDebugBBox (frustumLight,
 		  superFrustum.world2light_rotated.GetInverse(),
@@ -527,7 +523,8 @@ namespace RenderManager
 		persist.settings.targets[t]->texCache.QueryUnusedTexture (
 		  shadowMapSize, shadowMapSize, 0);
 	      lightFrust.textureSVs[t]->SetValue (tex);
-	      renderTree.AddDebugTexture (tex);
+	      if (renderTree.IsDebugFlagEnabled (persist.dbgShadowTex))
+	        renderTree.AddDebugTexture (tex);
 	      texHandles[t] = tex;
 	    }
 	    
@@ -628,6 +625,8 @@ private:
 	// Make sure the clip-planes are ok
 	CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext ());
     
+	context.owner.AddDebugClipPlanes (rview);
+	
 	// Do the culling
 	iVisibilityCuller* culler = sector->GetVisibilityCuller ();
 	Viscull<RenderTree> (context, rview, culler);
@@ -683,13 +682,10 @@ private:
 
     struct PersistentData
     {
-      enum
-      {
-        dbgSplitFrustumCam = 1,
-        dbgSplitFrustumLight = 2,
-        dbgLightBBox = 4
-      };
-      uint debugFlags;
+      uint dbgSplitFrustumCam;
+      uint dbgSplitFrustumLight;
+      uint dbgLightBBox;
+      uint dbgShadowTex;
       csLightShaderVarCache svNames;
       CS::ShaderVarStringID unscaleSVName;
       CS::ShaderVarStringID shadowClipSVName;
@@ -707,7 +703,7 @@ private:
       float farZ;
       float fixedCloseShadow;
 
-      PersistentData() : debugFlags (0), limitedShadow (false)
+      PersistentData() : limitedShadow (false)
       {
       }
 
@@ -720,7 +716,8 @@ private:
         this->configPrefix = configPrefix;
       }
       
-      void Initialize (iObjectRegistry* objectReg)
+      void Initialize (iObjectRegistry* objectReg,
+                       RenderTreeBase::DebugPersistent& dbgPersist)
       {
         csRef<iShaderManager> shaderManager =
           csQueryRegistry<iShaderManager> (objectReg);
@@ -765,6 +762,11 @@ private:
 	
 	unscaleSVName = strings->Request ("light shadow map unscale");
 	shadowClipSVName = strings->Request ("light shadow clip");
+	
+	dbgSplitFrustumCam = dbgPersist.RegisterDebugFlag ("draw.pssm.split.frustum.cam");
+	dbgSplitFrustumLight = dbgPersist.RegisterDebugFlag ("draw.pssm.split.frustum.light");
+	dbgLightBBox = dbgPersist.RegisterDebugFlag ("draw.pssm.lightbbox");
+	dbgShadowTex = dbgPersist.RegisterDebugFlag ("textures.shadow");
       }
       void UpdateNewFrame ()
       {

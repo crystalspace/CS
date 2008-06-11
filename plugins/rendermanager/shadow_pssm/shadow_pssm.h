@@ -127,6 +127,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
 
     TargetManagerType targets;
     csSet<RenderTreeType::ContextNode*> contextsScannedForTargets;
+    
+    uint dbgFlagClipPlanes;
   };  
 
 }

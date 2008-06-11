@@ -24,9 +24,9 @@ namespace CS
 {
   namespace RenderManager
   {
-    RenderTreeBase::RenderTreeBase () : nextDebugId (0) {}
+    RenderTreeBase::DebugPersistent::DebugPersistent () : nextDebugId (0) {}
       
-    uint RenderTreeBase::RegisterDebugFlag (const char* string)
+    uint RenderTreeBase::DebugPersistent::RegisterDebugFlag (const char* string)
     {
       uint* id = debugIdMappings.GetElementPointer (string);
       if (id != 0) return *id;
@@ -35,20 +35,20 @@ namespace CS
       return newID;
     }
   
-    uint RenderTreeBase::QueryDebugFlag (const char* string)
+    uint RenderTreeBase::DebugPersistent::QueryDebugFlag (const char* string)
     {
       uint* id = debugIdMappings.GetElementPointer (string);
       if (id != 0) return *id;
       return (uint)-1;
     }
   
-    bool RenderTreeBase::IsDebugFlagEnabled (uint flag)
+    bool RenderTreeBase::DebugPersistent::IsDebugFlagEnabled (uint flag)
     {
       if (flag >= debugFlags.GetSize()) return false;
       return debugFlags.IsBitSet (flag);
     }
     
-    void RenderTreeBase::EnableDebugFlag (uint flag, bool state)
+    void RenderTreeBase::DebugPersistent::EnableDebugFlag (uint flag, bool state)
     {
       if (flag >= debugFlags.GetSize()) debugFlags.SetSize (flag+1);
       debugFlags.Set (flag, state);

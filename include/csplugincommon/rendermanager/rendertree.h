@@ -40,37 +40,29 @@ namespace RenderManager
    */
   class CS_CRYSTALSPACE_EXPORT RenderTreeBase
   {
-  protected:
-    uint nextDebugId;
-    csHash<uint, csString> debugIdMappings;
-    csBitArray debugFlags;
+    struct CS_CRYSTALSPACE_EXPORT DebugPersistent
+    {
+      DebugPersistent ();
+      
+      uint RegisterDebugFlag (const char* string);
+      uint QueryDebugFlag (const char* string);
+    
+      bool IsDebugFlagEnabled (uint flag);
+      void EnableDebugFlag (uint flag, bool state);
+    protected:
+      uint nextDebugId;
+      csHash<uint, csString> debugIdMappings;
+      csBitArray debugFlags;
+    };
   
+  protected:
     struct DebugTexture
     {
       csRef<iTextureHandle> texh;
       float aspect;
     };
     csArray<DebugTexture> debugTextures;
-    
-    RenderTreeBase ();
   public:
-    //@{
-    /**\name Debugging helpers: toggling of debugging features
-     */
-    /// Register a debug flag, returns a numeric ID
-    uint RegisterDebugFlag (const char* string);
-    /**
-     * Query whether a debug flag was registered and return its ID or
-     * (uint)-1 if not registered.
-     */
-    uint QueryDebugFlag (const char* string);
-    
-    /// Check whether a debug flag is enabled
-    bool IsDebugFlagEnabled (uint flag);
-    /// Enable or disable a debug flag
-    void EnableDebugFlag (uint flag, bool state);
-    //@}
-    
     //@{
     /**\name Debugging helpers: debugging textures
      */
@@ -197,6 +189,8 @@ namespace RenderManager
     
       RenderView::Pool renderViewPool;
       csRenderMeshHolder rmHolder;
+      
+      DebugPersistent debugPersist;
     };
 
     /**
@@ -474,6 +468,29 @@ namespace RenderManager
       persistentData.meshNodeAllocator.Free (meshNode);
     }
 
+
+    //@{
+    /**\name Debugging helpers: toggling of debugging features
+     */
+    /// Register a debug flag, returns a numeric ID
+    uint RegisterDebugFlag (const char* string)
+    { return persistentData.debugPersist.RegisterDebugFlag (string); }
+    /**
+     * Query whether a debug flag was registered and return its ID or
+     * (uint)-1 if not registered.
+     */
+    uint QueryDebugFlag (const char* string)
+    { return persistentData.debugPersist.QueryDebugFlag (string); }
+    
+    /// Check whether a debug flag is enabled
+    bool IsDebugFlagEnabled (uint flag)
+    { return persistentData.debugPersist.IsDebugFlagEnabled (flag); }
+    /// Enable or disable a debug flag
+    void EnableDebugFlag (uint flag, bool state)
+    { persistentData.debugPersist.EnableDebugFlag (flag, state); }
+    //@}
+    
+    
     PersistentData& GetPersistentData()
     {
       return persistentData;
