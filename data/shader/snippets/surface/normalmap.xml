@@ -20,11 +20,9 @@
   <technique priority="100">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
-    <input file="/shader/snippets/texCoord.inp"	
-      condition='vars."tex normal".texture' />
+    <input file="/shader/snippets/texCoord.inp" />
     
-    <input name="texNormal" type="tex2d" default="complex"
-	condition='vars."tex normal".texture'>
+    <input name="texNormal" type="tex2d" default="complex">
       <block location="pass">
 	<texture name="tex normal" destination="fragmentIn.texNormal" />
       </block>
@@ -38,26 +36,44 @@
       </block>
     </input>
     
+    <input name="texNormalCompressed" type="tex2d" default="complex">
+      <block location="pass">
+	<texture name="tex normal compressed" destination="fragmentIn.texNormalCompressed" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<uniform type="tex2d" name="texNormalCompressed" />
+      </block>
+      
+      <block location="cg:fragmentMain">
+	texNormalCompressed = fragmentIn.texNormalCompressed;
+      </block>
+    </input>
+    
     <block location="cg:fragmentMain">
-    <?if vars."tex normal".texture ?>
-      normal = tex2D (texNormal, texCoord).xyz*2-1;
+    <?if vars."tex normal compressed".texture ?>
+      normal = half3 (h4tex2D (texNormalCompressed, texCoord).wy*2-1, 0);
+      normal.z = sqrt (1 - dot (normal.xy, normal.xy));
+      normal_attr_perfragment = true;
+    <?elsif vars."tex normal".texture ?>
+      normal = normalize (h4tex2D (texNormal, texCoord).xyz*2-1);
       normal_attr_perfragment = true;
     <?else?>
-      normal = float3 (0, 0, 1);
+      normal = half3 (0, 0, 1);
       normal_attr_perfragment = false;
     <?endif?>
     </block>
     
     <block location="cg:vertexMain">
-      normal = float3 (0, 0, 1);
-    <?if vars."tex normal".texture ?>
+      normal = half3 (0, 0, 1);
+    <?if vars."tex normal".texture || vars."tex normal compressed".texture?>
       normal_attr_perfragment = true;
     <?else?>
       normal_attr_perfragment = false;
     <?endif?>
     </block>
     
-    <output name="normal" type="direction_tangent">
+    <output name="normal" type="normal_tangent">
       <attribute name="perfragment" type="bool" />
     </output>
   </technique>

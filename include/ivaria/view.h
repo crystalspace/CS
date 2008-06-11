@@ -25,6 +25,7 @@
  */
 
 #include "csutil/scf_interface.h"
+#include "cstool/meshfilter.h"
 
 struct iCamera;
 struct iEngine;
@@ -48,7 +49,7 @@ struct iMeshWrapper;
  */
 struct iView : public virtual iBase
 {
-  SCF_INTERFACE(iView, 2,0,0);
+  SCF_INTERFACE(iView, 2,0,1);
   /// Get engine handle.
   virtual iEngine* GetEngine () = 0;
   /// Set engine handle.
@@ -99,6 +100,8 @@ struct iView : public virtual iBase
    * then you can disable this.
    */
   virtual void SetAutoResize (bool state) = 0;
+
+  virtual CS::Utility::MeshFilter& GetMeshFilter () = 0;
 };
 
 #endif // __CS_IVARIA_VIEW_H__

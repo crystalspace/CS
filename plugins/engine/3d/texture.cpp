@@ -188,7 +188,7 @@ const char* csTextureWrapper::GetTextureClass ()
 //------------------------------------------------------- csTextureList -----//
 
 csTextureList::csTextureList (csEngine* engine) : scfImplementationType (this),
-  csRefArrayObject<iTextureWrapper> (16, 16), engine (engine)
+  csRefArrayObject<iTextureWrapper> (16), engine (engine)
 {
 }
 

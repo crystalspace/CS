@@ -30,22 +30,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
 
 class ClipMeatZNear
 {
-  int width2;
-  int height2;
-  float aspect;
+  int width;
+  int height;
+  const CS::Math::Matrix4* projection;
 
-  CS_FORCEINLINE void Project (csVector3& v, const float com_iz)
+  CS_FORCEINLINE void ProjectNear (csVector3& v)
   {
     const float clipPos = Z_NEAR;
     const float com_zv = 1.0f / clipPos;
-    v.Set (v.x * com_iz + width2, v.y * com_iz + height2, com_zv);
+    csVector4 projected = *projection * csVector4 (v.x, v.y, clipPos);
+    projected /= projected.w;
+    v.Set ((projected.x+0.5f)*width, (projected.y+0.5f)*height, com_zv);
   }
 public:
-  void Init (int w2, int h2, float a)
+  void Init (int w, int h, const CS::Math::Matrix4& projection)
   {
-    width2 = w2;
-    height2 = h2;
-    aspect = a;
+    width = w;
+    height = h;
+    this->projection = &projection;
   }
 
   size_t DoClip (const csTriangle& tri, const csVector3* inPersp,
@@ -53,8 +55,6 @@ public:
     const VerticesLTN* inBuffers, VerticesLTN* outBuffers)
   {
     const float clipPos = Z_NEAR;
-    const float com_zv = 1.0f / clipPos;
-    const float com_iz = aspect * com_zv;
     csVector3 v;
 
     const float* inData = inBuffers->GetData();
@@ -112,13 +112,13 @@ public:
 
         inBuffers->LerpTo (v2, tri.a, tri.b, r1);
         v.Set (v2[posOffs + 0], v2[posOffs + 1], v2[posOffs + 2]);
-	Project (v, com_iz);
+	ProjectNear (v);
 	voutPersp.Write (v);
         outBuffers->AddVertex (v2);
 
         inBuffers->LerpTo (v2, tri.a, tri.c, r2);
         v.Set (v2[posOffs + 0], v2[posOffs + 1], v2[posOffs + 2]);
-	Project (v, com_iz);
+	ProjectNear (v);
 	voutPersp.Write (v);
         outBuffers->AddVertex (v2);
       }
@@ -133,7 +133,7 @@ public:
 
         inBuffers->LerpTo (v2, tri.b, tri.a, r1);
         v.Set (v2[posOffs + 0], v2[posOffs + 1], v2[posOffs + 2]);
-	Project (v, com_iz);
+	ProjectNear (v);
 	voutPersp.Write (v);
         outBuffers->AddVertex (v2);
 
@@ -142,7 +142,7 @@ public:
 
         inBuffers->LerpTo (v2, tri.b, tri.c, r2);
         v.Set (v2[posOffs + 0], v2[posOffs + 1], v2[posOffs + 2]);
-	Project (v, com_iz);
+	ProjectNear (v);
 	voutPersp.Write (v);
         outBuffers->AddVertex (v2);
       }
@@ -157,13 +157,13 @@ public:
 
         inBuffers->LerpTo (v2, tri.c, tri.a, r1);
         v.Set (v2[posOffs + 0], v2[posOffs + 1], v2[posOffs + 2]);
-	Project (v, com_iz);
+	ProjectNear (v);
 	voutPersp.Write (v);
         outBuffers->AddVertex (v2);
 
         inBuffers->LerpTo (v2, tri.c, tri.b, r2);
         v.Set (v2[posOffs + 0], v2[posOffs + 1], v2[posOffs + 2]);
-	Project (v, com_iz);
+	ProjectNear (v);
 	voutPersp.Write (v);
         outBuffers->AddVertex (v2);
 
@@ -193,7 +193,7 @@ public:
 
         inBuffers->LerpTo (v2, tri.a, tri.b, r1);
         v.Set (v2[posOffs + 0], v2[posOffs + 1], v2[posOffs + 2]);
-	Project (v, com_iz);
+	ProjectNear (v);
 	voutPersp.Write (v);
         outBuffers->AddVertex (v2);
 
@@ -204,7 +204,7 @@ public:
 
         inBuffers->LerpTo (v2, tri.a, tri.c, r2);
         v.Set (v2[posOffs + 0], v2[posOffs + 1], v2[posOffs + 2]);
-	Project (v, com_iz);
+	ProjectNear (v);
 	voutPersp.Write (v);
         outBuffers->AddVertex (v2);
       }
@@ -222,13 +222,13 @@ public:
 
         inBuffers->LerpTo (v2, tri.b, tri.a, r1);
         v.Set (v2[posOffs + 0], v2[posOffs + 1], v2[posOffs + 2]);
-	Project (v, com_iz);
+	ProjectNear (v);
 	voutPersp.Write (v);
         outBuffers->AddVertex (v2);
 
         inBuffers->LerpTo (v2, tri.b, tri.c, r2);
         v.Set (v2[posOffs + 0], v2[posOffs + 1], v2[posOffs + 2]);
-	Project (v, com_iz);
+	ProjectNear (v);
 	voutPersp.Write (v);
         outBuffers->AddVertex (v2);
 
@@ -251,13 +251,13 @@ public:
 
         inBuffers->LerpTo (v2, tri.c, tri.b, r1);
         v.Set (v2[posOffs + 0], v2[posOffs + 1], v2[posOffs + 2]);
-	Project (v, com_iz);
+	ProjectNear (v);
 	voutPersp.Write (v);
         outBuffers->AddVertex (v2);
 
         inBuffers->LerpTo (v2, tri.c, tri.a, r2);
         v.Set (v2[posOffs + 0], v2[posOffs + 1], v2[posOffs + 2]);
-	Project (v, com_iz);
+	ProjectNear (v);
 	voutPersp.Write (v);
         outBuffers->AddVertex (v2);
       }

@@ -296,7 +296,7 @@ namespace CS
 	  RBTraverser (csBlockAllocator<Element>& elementAlloc) :
 	    elementAlloc (elementAlloc) {}
 	  
-	  void Process (Element* el)
+	  void operator() (Element* el)
 	  {
 	    elementAlloc.Free (el);
 	  }
@@ -361,7 +361,7 @@ namespace CS
 	SearchDataTraverser (T* entry, Element*& ret) 
 	  : entry (entry), ret (ret) {}
 	
-        bool Process (Element* el)
+        bool operator() (Element* el)
 	{
 	  if (&(el->data) == entry)
 	  {
@@ -438,7 +438,7 @@ namespace CS
       public:
 	VerifyTraverser (Element* el) : el (el) {}
 	
-        bool Process (Element* el)
+        bool operator() (Element* el)
 	{
 	  CS_ASSERT(el != this->el);
 	  return true;

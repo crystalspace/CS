@@ -232,7 +232,7 @@ private:
   bool UpdateBinormals ();
   bool UpdateTangents ();
 
-  csHash<csRef<iRenderBuffer>, csStringID> extraBufferData;
+  csHash<csRef<iRenderBuffer>, CS::ShaderVarStringID> extraBufferData;
 
   class BufferAccessor : 
     public scfImplementation1<BufferAccessor, 

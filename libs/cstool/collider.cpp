@@ -27,6 +27,7 @@
 
 #include "cstool/collider.h"
 #include "iengine/collection.h"
+#include "cstool/collider.h"
 #include "iengine/camera.h"
 #include "iengine/engine.h"
 #include "iengine/mesh.h"

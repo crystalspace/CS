@@ -35,6 +35,7 @@
 #include "ivideo/rendermesh.h"
 
 #include "csgeom/box.h"
+#include "csgeom/projections.h"
 #include "csgfx/imagememory.h"
 #include "csgfx/renderbuffer.h"
 #include "csplugincommon/opengl/assumedstate.h"
@@ -81,6 +82,7 @@ SCF_IMPLEMENT_FACTORY (csGLGraphics3D)
 
 csGLGraphics3D::csGLGraphics3D (iBase *parent) : 
   scfImplementationType (this, parent), isOpen (false), 
+  explicitProjection (false), needMatrixUpdate (true), imageUnits (0),
   wantToSwap (false), delayClearFlags (0), currentAttachments (0)
 {
   verbose = false;
@@ -210,6 +212,16 @@ void csGLGraphics3D::SetGlOrtho (bool inverted)
     glOrtho (0., (GLdouble) viewwidth, (GLdouble) viewheight, 0., -1.0, 10.0);
   else
     glOrtho (0., (GLdouble) viewwidth, 0., (GLdouble) viewheight, -1.0, 10.0);
+}
+  
+void csGLGraphics3D::ComputeProjectionMatrix()
+{
+  if (!needMatrixUpdate) return;
+  
+  projectionMatrix = CS::Math::Projections::CSPerspective (
+    viewwidth, viewheight, asp_center_x, asp_center_y, inv_aspect);
+  
+  needMatrixUpdate = false;
 }
 
 csZBufMode csGLGraphics3D::GetZModePass2 (csZBufMode mode)
@@ -688,23 +700,37 @@ void csGLGraphics3D::SetupProjection ()
   if (!needProjectionUpdate) return;
 
   statecache->SetMatrixMode (GL_PROJECTION);
-  glLoadIdentity ();
-  if (currentAttachments != 0)
-    r2tbackend->SetupProjection();
+  if (explicitProjection)
+  {
+    if (currentAttachments != 0)
+      r2tbackend->SetupProjection (projectionMatrix);
+    else
+    {
+      GLfloat matrixholder[16];
+      CS::PluginCommon::MakeGLMatrix4x4 (projectionMatrix, matrixholder);
+      glLoadMatrixf (matrixholder);
+    }
+  }
   else
   {
-    SetGlOrtho (false);
-    //glTranslatef (asp_center_x, asp_center_y, 0);
+    glLoadIdentity ();
+    if (currentAttachments != 0)
+      r2tbackend->SetupProjection();
+    else
+    {
+      SetGlOrtho (false);
+      //glTranslatef (asp_center_x, asp_center_y, 0);
+    }
+    glTranslatef (asp_center_x, asp_center_y, 0);
+  
+    GLfloat matrixholder[16];
+    for (int i = 0 ; i < 16 ; i++) matrixholder[i] = 0.0;
+    matrixholder[0] = matrixholder[5] = 1.0;
+    matrixholder[11] = 1.0/aspect;
+    matrixholder[14] = -matrixholder[11];
+    glMultMatrixf (matrixholder);
   }
-  glTranslatef (asp_center_x, asp_center_y, 0);
-
-  GLfloat matrixholder[16];
-  for (int i = 0 ; i < 16 ; i++) matrixholder[i] = 0.0;
-  matrixholder[0] = matrixholder[5] = 1.0;
-  matrixholder[11] = 1.0/aspect;
-  matrixholder[14] = -matrixholder[11];
-  glMultMatrixf (matrixholder);
-
+  
   statecache->SetMatrixMode (GL_MODELVIEW);
   needProjectionUpdate = false;
 }
@@ -753,8 +779,7 @@ bool csGLGraphics3D::Open ()
   if (verbosemgr) verbose = verbosemgr->Enabled ("renderer");
   if (!verbose) bugplug = 0;
 
-  textureLodBias = config->GetFloat ("Video.OpenGL.TextureLODBias",
-    -0.3f);
+  textureLodBias = config->GetFloat ("Video.OpenGL.TextureLODBias", 0.0f);
   if (verbose)
     Report (CS_REPORTER_SEVERITY_NOTIFY,
       "Texture LOD bias %g", textureLodBias);
@@ -1147,7 +1172,7 @@ bool csGLGraphics3D::Open ()
     Report (CS_REPORTER_SEVERITY_NOTIFY, 
       LQUOT "Forceful" RQUOT " fixed function enable: %s",
       fixedFunctionForcefulEnable ? "yes" : "no");
-
+      
   return true;
 }
 
@@ -1162,6 +1187,7 @@ void csGLGraphics3D::Close ()
 
   txtmgr = 0;
   shadermgr = 0;
+  delete[] imageUnits;
   delete r2tbackend; r2tbackend = 0;
   for (size_t h = 0; h < halos.GetSize (); h++)
   {
@@ -1296,7 +1322,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
   else
     delayClearFlags = clearMask;
 
-    statecache->SetCullFace (GL_FRONT);
+  statecache->SetCullFace (GL_FRONT);
 
   /* Note: this function relies on the canvas and/or the R2T backend to setup
    * matrices etc. So be careful when changing stuff. */
@@ -1306,6 +1332,10 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
 
   if (drawflags & CSDRAW_3DGRAPHICS)
   {
+    // @@@ Jorrit: to avoid flickering I had to increase the
+    // values below and multiply them with 3.
+    // glPolygonOffset (-0.05f, -2.0f); 
+    glPolygonOffset (-0.15f, -6.0f); 
     needProjectionUpdate = true;
     glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -1331,6 +1361,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
         statecache->ActivateTU (csGLStateCache::activateImage
           | csGLStateCache::activateTexCoord);
       }
+      statecache->Disable_GL_POLYGON_OFFSET_FILL ();
 
       if (fixedFunctionForcefulEnable)
       {
@@ -1399,6 +1430,8 @@ void csGLGraphics3D::Print (csRect const* area)
     SwapIfNeeded();
   }
   G2D->Print (area);
+  
+  r2tbackend->NextFrame();
 }
 
 void csGLGraphics3D::DrawLine (const csVector3 & v1, const csVector3 & v2,
@@ -1527,15 +1560,6 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
     {
       iRenderBuffer *b = spec_renderBuffers[i];
       if (b) RenderRelease (b);// b->RenderRelease ();
-      if (i >= CS_VATTRIB_TEXCOORD0 && i <= CS_VATTRIB_TEXCOORD7)
-      {
-	if (imageUnits[i-CS_VATTRIB_TEXCOORD0].npotsStatus)
-        {
-          npotsFixupScrap.Push (b);
-	  imageUnits[i-CS_VATTRIB_TEXCOORD0].npotsStatus = false;
-        }
-      }
-      spec_renderBuffers[i] = 0;
     }
     for (i = 0; i < CS_VATTRIB_GENERIC_LAST-CS_VATTRIB_GENERIC_FIRST+1; i++)
     {
@@ -1597,21 +1621,13 @@ bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
       DeactivateTexture (unit);
       return false;
   }
-  /*texunitenabled[unit] = true;
-  texunittarget[unit] = gltxthandle->target;*/
-  bool doNPOTS = (gltxthandle->texType == iTextureHandle::texTypeRect);
-  if (doNPOTS && (unit < 8))
-    imageUnits[unit].needNPOTSfixup = gltxthandle;
-  else
-    imageUnits[unit].needNPOTSfixup = 0;
+  imageUnits[unit].texture = gltxthandle;
+  
   return true;
 }
 
 void csGLGraphics3D::DeactivateTexture (int unit)
 {
-  /*if (!texunitenabled[unit])
-    return;*/
-
   if (ext->CS_GL_ARB_multitexture)
   {
     statecache->SetCurrentTU (unit);
@@ -1619,45 +1635,78 @@ void csGLGraphics3D::DeactivateTexture (int unit)
   }
   else if (unit != 0) return;
 
-  /*switch (texunittarget[unit])
-  {
-    case iTextureHandle::CS_TEX_IMG_1D:
-      statecache->Disable_GL_TEXTURE_1D ();
-      break;
-    case iTextureHandle::CS_TEX_IMG_2D:
-      statecache->Disable_GL_TEXTURE_2D ();
-      break;
-    case iTextureHandle::CS_TEX_IMG_3D:
-      statecache->Disable_GL_TEXTURE_3D ();
-      break;
-    case iTextureHandle::CS_TEX_IMG_CUBEMAP:
-      statecache->Disable_GL_TEXTURE_CUBE_MAP ();
-      break;
-  }*/
-
   statecache->Disable_GL_TEXTURE_1D ();
   statecache->Disable_GL_TEXTURE_2D ();
   statecache->Disable_GL_TEXTURE_3D ();
   statecache->Disable_GL_TEXTURE_CUBE_MAP ();
   statecache->Disable_GL_TEXTURE_RECTANGLE_ARB ();
-  imageUnits[unit].needNPOTSfixup = 0;
 
-  imageUnits[unit].enabled = false;
+  imageUnits[unit].texture = 0;
 }
 
 void csGLGraphics3D::SetTextureState (int* units, iTextureHandle** textures,
 	int count)
 {
-  int i;
-  int unit = 0;
-  for (i = 0 ; i < count ; i++)
+  if (!textures)
   {
-    unit = units[i];
-    iTextureHandle* txt = textures[i];
-    if (txt)
-      ActivateTexture (txt, unit);
-    else
+    for (int i = 0 ; i < count ; i++)
+    {
+      int unit = units[i];
       DeactivateTexture (unit);
+    }
+  }
+  else
+  {
+    for (int i = 0 ; i < count ; i++)
+    {
+      int unit = units[i];
+      iTextureHandle* txt = textures[i];
+      if (txt)
+	ActivateTexture (txt, unit);
+      else
+	DeactivateTexture (unit);
+    }
+  }
+}
+  
+void csGLGraphics3D::SetTextureComparisonModes (int* units,
+  CS::Graphics::TextureComparisonMode* modes, int count)
+{
+  if (modes == 0)
+  {
+    CS::Graphics::TextureComparisonMode modeDisabled;
+    for (int i = 0 ; i < count ; i++)
+    {
+      int unit = units[i];
+      
+      if (imageUnits[unit].texture == 0) continue;
+      
+      if (ext->CS_GL_ARB_multitexture)
+      {
+	statecache->SetCurrentTU (unit);
+	statecache->ActivateTU (csGLStateCache::activateImage);
+      }
+      else if (unit != 0) continue;
+      
+      imageUnits[unit].texture->ChangeTextureCompareMode (modeDisabled);
+    }
+  }
+  else
+  {
+    for (int i = 0 ; i < count ; i++)
+    {
+      int unit = units[i];
+      if (imageUnits[unit].texture == 0) continue;
+      
+      if (ext->CS_GL_ARB_multitexture)
+      {
+	statecache->SetCurrentTU (unit);
+	statecache->ActivateTU (csGLStateCache::activateTexEnv);
+      }
+      else if (unit != 0) continue;
+      
+      imageUnits[unit].texture->ChangeTextureCompareMode (modes[i]);
+    }
   }
 }
 
@@ -1669,6 +1718,8 @@ GLvoid csGLGraphics3D::myDrawRangeElements (GLenum mode, GLuint /*start*/,
 
 void csGLGraphics3D::SetWorldToCamera (const csReversibleTransform& w2c)
 {
+  GLRENDER3D_OUTPUT_LOCATION_MARKER;
+
   world2camera = w2c;
   float m[16];
 
@@ -1681,7 +1732,7 @@ void csGLGraphics3D::SetWorldToCamera (const csReversibleTransform& w2c)
 
 void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     const csRenderMeshModes& modes,
-    const iShaderVarStack* stacks)
+    const csShaderVariableStack& stacks)
 {
   if (cliptype == CS_CLIPPER_EMPTY) 
     return;
@@ -1869,6 +1920,10 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   const uint mixmode = modes.mixmode;
   statecache->SetShadeModel ((mixmode & CS_FX_FLAT) ? GL_FLAT : GL_SMOOTH);
 
+  if (modes.zoffset)
+    statecache->Enable_GL_POLYGON_OFFSET_FILL ();
+  else
+    statecache->Disable_GL_POLYGON_OFFSET_FILL ();
 
   GLenum compType;
   bool normalized;
@@ -2289,25 +2344,8 @@ void csGLGraphics3D::ApplyBufferChanges()
 
       if (CS_VATTRIB_IS_GENERIC (att)) 
         AssignGenericBuffer (att-CS_VATTRIB_GENERIC_FIRST, buffer);
-      else 
-      {
-        if (att >= CS_VATTRIB_TEXCOORD0 && att <= CS_VATTRIB_TEXCOORD7)
-        {
-          unsigned int unit = att - CS_VATTRIB_TEXCOORD0;
-	  if (imageUnits[unit].needNPOTSfixup)
-          {
-            npotsFixupScrap.Push (spec_renderBuffers[att-CS_VATTRIB_SPECIFIC_FIRST]);
-            AssignSpecBuffer (att-CS_VATTRIB_SPECIFIC_FIRST, 0);
-	    imageUnits[unit].npotsStatus = false;
-          }
-          if (imageUnits[unit].needNPOTSfixup.IsValid())
-          {
-            buffer = bufferRef = DoNPOTSFixup (buffer, unit);
-	    imageUnits[unit].npotsStatus = true;
-          }
-        }
-        AssignSpecBuffer (att-CS_VATTRIB_SPECIFIC_FIRST, buffer);
-      }
+      else               
+        AssignSpecBuffer (att-CS_VATTRIB_SPECIFIC_FIRST, buffer);      
 
       GLenum compType;
       bool normalized;
@@ -2404,11 +2442,6 @@ void csGLGraphics3D::ApplyBufferChanges()
             statecache->SetCurrentTU (unit);
           }
           statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
-	  if (imageUnits[unit].npotsStatus)
-          {
-            npotsFixupScrap.Push (spec_renderBuffers[att - CS_VATTRIB_SPECIFIC_FIRST]);
-	    imageUnits[unit].npotsStatus = false;
-          }
         }
         else if (CS_VATTRIB_IS_GENERIC(att))
         {
@@ -2464,65 +2497,6 @@ static void DoFixup (iRenderBuffer* src, T* dest, const T2 scales[],
       *dest++ = (T)((c < srcComps ? *s++ : defaultComps[c]) * scales[c]);
     }
   }
-}
-
-csRef<iRenderBuffer> csGLGraphics3D::DoNPOTSFixup (iRenderBuffer* buffer, int unit)
-{
-  csRef<iRenderBuffer> scrapBuf;
-  if (npotsFixupScrap.GetSize () > 0) scrapBuf = npotsFixupScrap.Pop();
-  if (!scrapBuf.IsValid()
-    || (scrapBuf->GetElementCount() < buffer->GetElementCount())
-    || (scrapBuf->GetComponentCount() != buffer->GetComponentCount())
-    || (scrapBuf->GetComponentType() != buffer->GetComponentType()))
-  {
-    scrapBuf = csRenderBuffer::CreateRenderBuffer (buffer->GetElementCount(),
-      CS_BUF_STREAM, buffer->GetComponentType(), buffer->GetComponentCount());
-  }
-
-  const int componentScale[] = {
-    imageUnits[unit].needNPOTSfixup->actual_width, 
-    imageUnits[unit].needNPOTSfixup->actual_height,
-    1, 1};
-
-  switch (scrapBuf->GetComponentType())
-  {
-    case CS_BUFCOMP_BYTE:
-      DoFixup (buffer, csRenderBufferLock<char> (scrapBuf).Lock(),
-        componentScale);
-      break;
-    case CS_BUFCOMP_UNSIGNED_BYTE:
-      DoFixup (buffer, csRenderBufferLock<unsigned char> (scrapBuf).Lock(),
-        componentScale);
-      break;
-    case CS_BUFCOMP_SHORT:
-      DoFixup (buffer, csRenderBufferLock<short> (scrapBuf).Lock(),
-        componentScale);
-      break;
-    case CS_BUFCOMP_UNSIGNED_SHORT:
-      DoFixup (buffer, csRenderBufferLock<unsigned short> (scrapBuf).Lock(),
-        componentScale);
-      break;
-    case CS_BUFCOMP_INT:
-      DoFixup (buffer, csRenderBufferLock<int> (scrapBuf).Lock(),
-        componentScale);
-      break;
-    case CS_BUFCOMP_UNSIGNED_INT:
-      DoFixup (buffer, csRenderBufferLock<unsigned int> (scrapBuf).Lock(),
-        componentScale);
-      break;
-    case CS_BUFCOMP_FLOAT:
-      DoFixup (buffer, csRenderBufferLock<float> (scrapBuf).Lock(),
-        componentScale);
-      break;
-    case CS_BUFCOMP_DOUBLE:
-      DoFixup (buffer, csRenderBufferLock<double> (scrapBuf).Lock(),
-        componentScale);
-      break;
-    default:
-      CS_ASSERT(false); // Should never happen.
-      break;
-  }
-  return scrapBuf;
 }
 
 csRef<iRenderBuffer> csGLGraphics3D::DoColorFixup (iRenderBuffer* buffer)
@@ -3019,89 +2993,95 @@ bool csGLGraphics3D::SetOption (const char* name, const char* value)
 void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh, 
 				     uint flags)
 {  
+  
   if (current_drawflags & CSDRAW_2DGRAPHICS)
   {
     // Try to be compatible with 2D drawing mode
     G2D->PerformExtension ("glflushtext");
   }
 
-  uint indexCount = mesh.indices ? mesh.indexCount : mesh.vertexCount;
-  if (scrapIndicesSize < indexCount)
-  {
-    scrapIndices = csRenderBuffer::CreateIndexRenderBuffer (indexCount,
-      CS_BUF_STREAM, CS_BUFCOMP_UNSIGNED_INT, 0, mesh.vertexCount - 1);
-    scrapIndicesSize = indexCount;
-  }
-  if (scrapVerticesSize < mesh.vertexCount)
-  {
-    scrapVertices = csRenderBuffer::CreateRenderBuffer (
-      mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
-    scrapTexcoords = csRenderBuffer::CreateRenderBuffer (
-      mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 2);
-    scrapColors = csRenderBuffer::CreateRenderBuffer (
-      mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 4);
-
-    scrapVerticesSize = mesh.vertexCount;
-  }
-
   bool useShader = (mesh.shader != 0);
+  uint indexCount = mesh.indices ? mesh.indexCount : mesh.vertexCount;
+  if (!mesh.renderBuffers.IsValid())
+  {
+    if (scrapIndicesSize < indexCount)
+    {
+      scrapIndices = csRenderBuffer::CreateIndexRenderBuffer (indexCount,
+	CS_BUF_STREAM, CS_BUFCOMP_UNSIGNED_INT, 0, mesh.vertexCount - 1);
+      scrapIndicesSize = indexCount;
+    }
+    if (scrapVerticesSize < mesh.vertexCount)
+    {
+      scrapVertices = csRenderBuffer::CreateRenderBuffer (
+	mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
+      scrapTexcoords = csRenderBuffer::CreateRenderBuffer (
+	mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 2);
+      scrapColors = csRenderBuffer::CreateRenderBuffer (
+	mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 4);
+  
+      scrapVerticesSize = mesh.vertexCount;
+    }
+  }
 
   csShaderVariable* sv;
-  sv = scrapContext.GetVariableAdd (string_indices);
-  if (mesh.indices)
+  if (!mesh.renderBuffers.IsValid())
   {
-    scrapIndices->CopyInto (mesh.indices, indexCount);
-  }
-  else
-  {
-    csRenderBufferLock<uint> indexLock (scrapIndices);
-    for (uint i = 0; i < mesh.vertexCount; i++)
-      indexLock[(size_t)i] = i;
-  }
-  sv->SetValue (scrapIndices);
-  scrapBufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, scrapIndices);
-
-  sv = scrapContext.GetVariableAdd (string_vertices);
-  if (mesh.vertices)
-  {
-    scrapVertices->CopyInto (mesh.vertices, mesh.vertexCount);
-    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, scrapVertices);
-    if (useShader)
-      sv->SetValue (scrapVertices);
-  }
-  else
-  {
-    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, 0);
-    if (useShader)
-      sv->SetValue (0);
-  }
-  sv = scrapContext.GetVariableAdd (string_texture_coordinates);
-  if (mesh.texcoords)
-  {
-    scrapTexcoords->CopyInto (mesh.texcoords, mesh.vertexCount);
-    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, scrapTexcoords);
-    if (useShader)
-      sv->SetValue (scrapTexcoords);
-  }
-  else
-  {
-    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, 0);
-    if (useShader)
-      sv->SetValue (0);
-  }
-  sv = scrapContext.GetVariableAdd (string_colors);
-  if (mesh.colors)
-  {
-    scrapColors->CopyInto (mesh.colors, mesh.vertexCount);
-    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, scrapColors);
-    if (useShader)
-      sv->SetValue (scrapColors);
-  }
-  else
-  {
-    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, 0);
-    if (useShader)
-      sv->SetValue (0);
+    sv = scrapContext.GetVariableAdd (string_indices);
+    if (mesh.indices)
+    {
+      scrapIndices->CopyInto (mesh.indices, indexCount);
+    }
+    else
+    {
+      csRenderBufferLock<uint> indexLock (scrapIndices);
+      for (uint i = 0; i < mesh.vertexCount; i++)
+	indexLock[(size_t)i] = i;
+    }
+    sv->SetValue (scrapIndices);
+    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, scrapIndices);
+  
+    sv = scrapContext.GetVariableAdd (string_vertices);
+    if (mesh.vertices)
+    {
+      scrapVertices->CopyInto (mesh.vertices, mesh.vertexCount);
+      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, scrapVertices);
+      if (useShader)
+	sv->SetValue (scrapVertices);
+    }
+    else
+    {
+      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, 0);
+      if (useShader)
+	sv->SetValue (0);
+    }
+    sv = scrapContext.GetVariableAdd (string_texture_coordinates);
+    if (mesh.texcoords)
+    {
+      scrapTexcoords->CopyInto (mesh.texcoords, mesh.vertexCount);
+      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, scrapTexcoords);
+      if (useShader)
+	sv->SetValue (scrapTexcoords);
+    }
+    else
+    {
+      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, 0);
+      if (useShader)
+	sv->SetValue (0);
+    }
+    sv = scrapContext.GetVariableAdd (string_colors);
+    if (mesh.colors)
+    {
+      scrapColors->CopyInto (mesh.colors, mesh.vertexCount);
+      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, scrapColors);
+      if (useShader)
+	sv->SetValue (scrapColors);
+    }
+    else
+    {
+      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, 0);
+      if (useShader)
+	sv->SetValue (0);
+    }
   }
   if (useShader)
   {
@@ -3125,7 +3105,11 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
         | csGLStateCache::activateTexCoord);
     }
     if (mesh.texture)
+    {
       ActivateTexture (mesh.texture);
+      imageUnits[0].texture->ChangeTextureCompareMode (
+        CS::Graphics::TextureComparisonMode ());
+    }
     else
       DeactivateTexture ();
   }
@@ -3141,49 +3125,56 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   rmesh.indexstart = 0;
   rmesh.indexend = indexCount;
   rmesh.variablecontext = &scrapContext;
-  rmesh.buffers = scrapBufferHolder;
+  rmesh.buffers =
+    mesh.renderBuffers.IsValid() ? mesh.renderBuffers : scrapBufferHolder;
+
+  bool restoreProjection = false;
+  bool wasProjectionExplicit = false;
+  CS::Math::Matrix4 oldProjection;
 
   if (flags & csSimpleMeshScreenspace)
   {
-    csReversibleTransform camtrans;
     if (current_drawflags & CSDRAW_2DGRAPHICS)
     {
+      csReversibleTransform camtrans;
       camtrans.SetO2T (
         csMatrix3 (1.0f, 0.0f, 0.0f,
                    0.0f, -1.0f, 0.0f,
                    0.0f, 0.0f, 1.0f));
       camtrans.SetO2TTranslation (csVector3 (0, viewheight, 0));
+      SetWorldToCamera (camtrans.GetInverse ());
     } 
     else 
     {
       const float vwf = (float)(viewwidth);
       const float vhf = (float)(viewheight);
 
-      camtrans.SetO2T (
-	csMatrix3 (1.0f, 0.0f, 0.0f,
-		   0.0f, -1.0f, 0.0f,
-		   0.0f, 0.0f, 1.0f));
-      camtrans.SetO2TTranslation (csVector3 (
-	vwf / 2.0f, vhf / 2.0f, -aspect));
+      wasProjectionExplicit = explicitProjection;
+      explicitProjection = true;
+      oldProjection = projectionMatrix;
+      
+      projectionMatrix = CS::Math::Projections::Ortho (0, vwf, vhf, 0, -1.0, 10.0);
+      
+      restoreProjection = true;
+      needProjectionUpdate = true;
     }
-    SetWorldToCamera (camtrans.GetInverse ());
   }
   
   rmesh.object2world = mesh.object2world;
 
-  csRef<iShaderVarStack> stacks;
-  stacks.AttachNew(new scfArray<iShaderVarStack>);
-  shadermgr->PushVariables (stacks);
-  scrapContext.PushVariables (stacks);
-  if (mesh.shader != 0) mesh.shader->PushVariables (stacks);
-  if (mesh.dynDomain != 0) mesh.dynDomain->PushVariables (stacks);
+  csShaderVariableStack stack;
+  stack.Setup (strings->GetSize ());
+  if (mesh.shader != 0) mesh.shader->PushVariables (stack);
+  shadermgr->PushVariables (stack);
+  scrapContext.PushVariables (stack);
+  if (mesh.dynDomain != 0) mesh.dynDomain->PushVariables (stack);
 
   if (mesh.alphaType.autoAlphaMode)
   {
     csAlphaMode::AlphaType autoMode = csAlphaMode::alphaNone;
 
     iTextureHandle* tex = 0;
-    csShaderVariable *texVar = csGetShaderVariableFromStack (stacks, 
+    csShaderVariable *texVar = csGetShaderVariableFromStack (stack, 
       mesh.alphaType.autoModeTexture);
     if (texVar)
       texVar->GetValue (tex);
@@ -3208,7 +3199,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   size_t passCount = 1;
   if (mesh.shader != 0)
   {
-    shaderTicket = mesh.shader->GetTicket (modes, stacks);
+    shaderTicket = mesh.shader->GetTicket (modes, stack);
     passCount = mesh.shader->GetNumberOfPasses (shaderTicket);
   }
 
@@ -3217,13 +3208,13 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
     if (mesh.shader != 0)
     {
       mesh.shader->ActivatePass (shaderTicket, p);
-      mesh.shader->SetupPass (shaderTicket, &rmesh, modes, stacks);
+      mesh.shader->SetupPass (shaderTicket, &rmesh, modes, stack);
     }
     else
     {
       ActivateBuffers (scrapBufferHolder, scrapMapping);
     }
-    DrawMesh (&rmesh, modes, stacks);
+    DrawMesh (&rmesh, modes, stack);
     if (mesh.shader != 0)
     {
       mesh.shader->TeardownPass (shaderTicket);
@@ -3252,6 +3243,13 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   }
 
   SetZMode (old_zbufmode);
+  
+  if (restoreProjection)
+  {
+    explicitProjection = wasProjectionExplicit;
+    projectionMatrix = oldProjection;
+    needProjectionUpdate = true;
+  }
 }
 
 bool csGLGraphics3D::PerformExtensionV (char const* command, va_list /*args*/)
@@ -3483,12 +3481,11 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
 
   SystemOpen = csevSystemOpen(object_reg);
   SystemClose = csevSystemClose(object_reg);
-  Frame = csevFrame(object_reg);
 
   csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
   if (q)
   {
-    csEventID events[] = { SystemOpen, SystemClose, Frame,
+    csEventID events[] = { SystemOpen, SystemClose,
 			    CS_EVENTLIST_END };
     q->RegisterListener (scfiEventHandler, events);
   }
@@ -3496,8 +3493,8 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
   
   bugplug = csQueryRegistry<iBugPlug> (object_reg);
 
-  strings = csQueryRegistryTagInterface<iStringSet> (
-    object_reg, "crystalspace.shared.stringset");
+  strings = csQueryRegistryTagInterface<iShaderVarStringSet> (
+    object_reg, "crystalspace.shader.variablenameset");
 
   csRef<iPluginManager> plugin_mgr = 
   	csQueryRegistry<iPluginManager> (object_reg);
@@ -3566,13 +3563,9 @@ bool csGLGraphics3D::HandleEvent (iEvent& Event)
     viewwidth = G2D->GetWidth();
     viewheight = G2D->GetHeight();
     G2D->GetFramebufferDimensions (scrwidth, scrheight);
-    asp_center_x = viewwidth/2;
-    asp_center_y = viewheight/2;
+    asp_center_x = viewwidth/2.0f;
+    asp_center_y = viewheight/2.0f;
     return true;
-  }
-  else if (Event.Name == Frame)
-  {
-    r2tbackend->NextFrame();
   }
   return false;
 }

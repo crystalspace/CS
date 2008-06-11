@@ -25,6 +25,7 @@
 #include "cstool/csview.h"
 #include "iengine/camera.h"
 #include "iengine/engine.h"
+#include "iengine/rendermanager.h"
 
 
 csView::csView (iEngine *e, iGraphics3D* ig3d) 
@@ -153,11 +154,7 @@ void csView::UpdateView ()
 
 void csView::Draw (iMeshWrapper* mesh)
 {
-  UpdateClipper();
-  G3D->SetPerspectiveCenter ( (int)Camera->GetShiftX (),
-			      (int)Camera->GetShiftY () );
-
-  Engine->Draw (Camera, Clipper, mesh);
+  Engine->GetRenderManager()->RenderView (this);
 }
 
 void csView::UpdateClipper ()
@@ -202,4 +199,3 @@ iClipper2D* csView::GetClipper ()
   UpdateClipper ();
   return Clipper;
 }
-

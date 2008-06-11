@@ -40,6 +40,7 @@ class csSaver : public scfImplementation2<csSaver, iSaver, iComponent>
   csRef<iEngine> engine;
   csRef<iSyntaxService> synldr;
   csRef<iStringSet> strings;
+  csRef<iShaderVarStringSet> stringsSvName;
   csRef<iPluginManager> plugin_mgr;
   csHash<csString, csString> plugins;
   csRef<iDocumentNode> before;

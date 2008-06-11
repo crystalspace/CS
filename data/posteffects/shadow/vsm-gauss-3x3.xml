@@ -1,0 +1,4 @@
+<posteffect>
+  <layer name="blur_h" shader="/shader/postproc/shadow/vsm-gauss-3x3-h.xml" />
+  <layer name="blur_v" shader="/shader/postproc/shadow/vsm-gauss-3x3-v.xml" />
+</posteffect>

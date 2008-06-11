@@ -1398,6 +1398,7 @@ class csPath(core.scfPath):
     __swig_destroy__ = _csgeom.delete_csPath
     __del__ = lambda self : None;
     def Length(*args): return _csgeom.csPath_Length(*args)
+    def QueryObject(*args): return _csgeom.csPath_QueryObject(*args)
     def CalculateAtTime(*args): return _csgeom.csPath_CalculateAtTime(*args)
     def GetCurrentIndex(*args): return _csgeom.csPath_GetCurrentIndex(*args)
     def GetTime(*args): return _csgeom.csPath_GetTime(*args)

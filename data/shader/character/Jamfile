@@ -1,3 +1,0 @@
-SubDir TOP data shader character ;
-
-InstallData [ Wildcard *.cgfp *.cgvp *.inc *.xml ] : data shader character ;

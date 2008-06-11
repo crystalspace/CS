@@ -43,6 +43,9 @@
   INTERFACE_APPLY(iProcTexture)
   INTERFACE_APPLY(iRenderLoop)
   INTERFACE_APPLY(iRenderLoopManager)
+  INTERFACE_APPLY(iRenderManager)
+  INTERFACE_APPLY(iRenderManagerPostEffects)
+  INTERFACE_APPLY(iRenderManagerTargets)
   INTERFACE_APPLY(iSceneNode)
   INTERFACE_APPLY(iSceneNodeArray)
   INTERFACE_APPLY(iSector)
@@ -251,7 +254,9 @@
 
 #define CSTOOL_APPLY_FOR_EACH_INTERFACE
 
-#define CSGFX_APPLY_FOR_EACH_INTERFACE
+%define CSGFX_APPLY_FOR_EACH_INTERFACE
+  INTERFACE_APPLY(iShaderVarStringSet)
+%enddef
 
 
 %define APPLY_FOR_ALL_INTERFACES

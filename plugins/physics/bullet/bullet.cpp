@@ -36,7 +36,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 
-#include "csutil/custom_new_disable.h"
+// Bullet includes.
+#include "btBulletDynamicsCommon.h"
+#include "btBulletCollisionCommon.h"
 
 // Bullet includes.
 #include "btBulletDynamicsCommon.h"

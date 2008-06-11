@@ -139,6 +139,7 @@ void csRenderView::UpdateFrustum ()
 {
   size_t i;
   csBox2 bbox;
+  ctxt->icamera->SetViewportSize (g3d->GetWidth(), g3d->GetHeight());
   csVector2 shift (ctxt->icamera->GetShiftX (), ctxt->icamera->GetShiftY ());
   float inv_fov = ctxt->icamera->GetInvFOV ();
   iClipper2D* clip = ctxt->iview;
@@ -214,8 +215,7 @@ void csRenderView::RestoreRenderContext ()
 iCamera *csRenderView::CreateNewCamera ()
 {
   // A pool for cameras?
-  csRef<iCamera> newcam;
-  newcam.AttachNew (ctxt->icamera->Clone ());
+  csRef<iCamera> newcam = ctxt->icamera->Clone ();
   ctxt->icamera = newcam;
   return ctxt->icamera;
 }
@@ -223,4 +223,28 @@ iCamera *csRenderView::CreateNewCamera ()
 uint csRenderView::GetCurrentFrameNumber () const
 {
   return engine->GetCurrentFrameNumber ();
+}
+
+void csRenderView::DestroyRenderContext (csRenderContext* context)
+{
+  if (context == ctxt)
+  {
+    ctxt = context->previous;
+  }
+  else
+  {
+    // Its somewhere in the middle, scan starting from ctxt
+    csRenderContext* localctxt = ctxt;
+    while (localctxt)
+    {
+      if (localctxt->previous == context)
+      {
+        localctxt->previous = context->previous;
+        break;
+      }
+      localctxt = localctxt->previous;
+    }
+  }
+
+  delete context;
 }

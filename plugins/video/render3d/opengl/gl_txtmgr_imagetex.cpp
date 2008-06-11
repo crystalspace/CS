@@ -137,7 +137,7 @@ void csGLTextureHandle::CreateMipMaps()
   bool compressedTarget;
   GLenum targetFormat; 
   if ((texType == iTextureHandle::texTypeRect)
-    && (txtmgr->disableRECTTextureCompression))
+    && (txtmgr->tweaks.disableRECTTextureCompression))
     /* @@@ Hack: Some ATI drivers can't grok generic compressed formats for 
      * RECT textures, so force an uncompressed format in this case. */
     targetFormat = (alphaType != csAlphaMode::alphaNone) ? 

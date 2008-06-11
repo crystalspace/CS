@@ -197,14 +197,14 @@ bool csPixelShaderParser::GetInstruction (const char *str,
   csString istr;
   line.SubString (istr, 0, line.FindFirst (' '));
   istr.Upcase();
-  csStringID inst_id = (csStringID)~0;
+  csStringID inst_id = csInvalidStringID;
 
   if(version == CS_PS_INVALID) 
   {
     inst_id = instrStrings.Request (istr);
     if (inst_id != csInvalidStringID)
     {
-      inst.instruction = (csPixelShaderInstruction)inst_id;
+      inst.instruction = (csPixelShaderInstruction)(CS::StringIDValue)inst_id;
       return true;
     }
   }
@@ -256,7 +256,7 @@ bool csPixelShaderParser::GetInstruction (const char *str,
     return false;
   }
   
-  inst.instruction = (csPixelShaderInstruction)inst_id;
+  inst.instruction = (csPixelShaderInstruction)(CS::StringIDValue)inst_id;
 
   // Find the instruction modifier(s)
 

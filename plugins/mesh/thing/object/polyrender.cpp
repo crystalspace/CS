@@ -194,7 +194,7 @@ void csPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
 	while (extraBuffers[i]->HasNext())
 	{
 	  csRef<iRenderBuffer> srcBuf;
-	  csStringID name = extraBuffers[i]->Next (&srcBuf);
+	  CS::ShaderVarStringID name = extraBuffers[i]->Next (&srcBuf);
 	  csRef<iRenderBuffer> dstBuf = extraBufferData.Get (name, 
 	    (iRenderBuffer*)0);
 	  if (dstBuf == 0)
@@ -285,15 +285,15 @@ void csPolygonRenderer::SetupBufferHolder (csThing* instance,
     CS_BUFFER_NORMAL_MASK | CS_BUFFER_TANGENT_MASK | CS_BUFFER_BINORMAL_MASK |
     (lit ? CS_BUFFER_COLOR_MASK : 0);
 
-  csHash<csRef<iRenderBuffer>, csStringID>::GlobalIterator userBufIt =
+  csHash<csRef<iRenderBuffer>, CS::ShaderVarStringID>::GlobalIterator userBufIt =
     extraBufferData.GetIterator();
 
   while (userBufIt.HasNext())
   {
-    csStringID name;
+    CS::ShaderVarStringID name;
     csRef<iRenderBuffer> buf = userBufIt.Next (name);
     csRenderBufferName bufName = 
-      csRenderBuffer::GetBufferNameFromDescr (parent->stringset->Request (name));
+      csRenderBuffer::GetBufferNameFromDescr (parent->stringsetSvName->Request (name));
     if (bufName >= CS_BUFFER_POSITION)
     {
       accessorMask &= ~(1 << bufName);

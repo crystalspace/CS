@@ -41,6 +41,24 @@
  */
 struct csLightProperties
 {
+protected:
+  csShaderVariable* LookupSVArrayItem (const csShaderVariableStack& stack,
+    CS::ShaderVarStringID id, size_t index)
+  {
+    csShaderVariable* sv;
+    if ((stack.GetSize () > id) && ((sv = stack[id]) != 0))
+      return sv->GetArrayElement (index);
+    return 0;
+  }
+  csShaderVariable* LookupSV (const csShaderVariableStack& stack,
+    CS::ShaderVarStringID id)
+  {
+    csShaderVariable* sv;
+    if (stack.GetSize () > id)
+      sv = stack[id];
+    return sv;
+  }
+public:
   /// Attenuation coefficients (for CLQ attenuation)
   csVector3 attenuationConsts;
   /// Light position (object space)
@@ -70,61 +88,59 @@ struct csLightProperties
    * variables.
    */
   csLightProperties (size_t lightNum, csLightShaderVarCache& svcache,
-    const iShaderVarStack* Stacks)
+    const csShaderVariableStack& stack,
+    const csReversibleTransform& objectToWorld = csReversibleTransform ())
   {
-    csStringID id;
+    CS::ShaderVarStringID id;
     csShaderVariable* sv;
-    const iArrayReadOnly<csShaderVariable*>* stacks = Stacks;
+    csVector3 tmp;
 
-    id = svcache.GetLightSVId (lightNum, 
-      csLightShaderVarCache::lightAttenuation);
-    if ((stacks->GetSize() > id) && ((sv = stacks->Get (id)) != 0))
+    id = svcache.GetLightSVId (csLightShaderVarCache::lightAttenuation);
+    if (((sv = LookupSVArrayItem (stack, id, lightNum)) != 0))
       sv->GetValue (attenuationConsts);
 
-    id = svcache.GetLightSVId (lightNum, 
-      csLightShaderVarCache::lightPosition);
-    if ((stacks->GetSize() > id) && ((sv = stacks->Get (id)) != 0))
-      sv->GetValue (posObject);
+    id = svcache.GetLightSVId (csLightShaderVarCache::lightPositionWorld);
+    if (((sv = LookupSVArrayItem (stack, id, lightNum)) != 0))
+    {
+      sv->GetValue (tmp);
+      posObject = objectToWorld.Other2This (tmp);
+    }
 
-    id = svcache.GetLightSVId (lightNum, 
-      csLightShaderVarCache::lightDirection);
-    if ((stacks->GetSize() > id) && ((sv = stacks->Get (id)) != 0))
-      sv->GetValue (dirObject);
+    id = svcache.GetLightSVId (csLightShaderVarCache::lightDirectionWorld);
+    if (((sv = LookupSVArrayItem (stack, id, lightNum)) != 0))
+    {
+      sv->GetValue (tmp);
+      dirObject = objectToWorld.Other2ThisRelative (tmp);
+    }
 
-    id = svcache.GetLightSVId (lightNum, 
-      csLightShaderVarCache::lightDiffuse);
-    if ((stacks->GetSize() > id) && ((sv = stacks->Get (id)) != 0))
+    id = svcache.GetLightSVId (csLightShaderVarCache::lightDiffuse);
+    if (((sv = LookupSVArrayItem (stack, id, lightNum)) != 0))
       sv->GetValue (color);
 
-    id = svcache.GetLightSVId (lightNum, 
-      csLightShaderVarCache::lightInnerFalloff);
-    if ((stacks->GetSize() > id) && ((sv = stacks->Get (id)) != 0))
+    id = svcache.GetLightSVId (csLightShaderVarCache::lightInnerFalloff);
+    if (((sv = LookupSVArrayItem (stack, id, lightNum)) != 0))
       sv->GetValue (spotFalloffInner);
 
-    id = svcache.GetLightSVId (lightNum, 
-      csLightShaderVarCache::lightOuterFalloff);
-    if ((stacks->GetSize() > id) && ((sv = stacks->Get (id)) != 0))
+    id = svcache.GetLightSVId (csLightShaderVarCache::lightOuterFalloff);
+    if (((sv = LookupSVArrayItem (stack, id, lightNum)) != 0))
       sv->GetValue (spotFalloffOuter);
 
     int t = CS_LIGHT_POINTLIGHT;
-    id = svcache.GetLightSVId (lightNum, 
-      csLightShaderVarCache::lightType);
-    if ((stacks->GetSize() > id) && ((sv = stacks->Get (id)) != 0))
+    id = svcache.GetLightSVId (csLightShaderVarCache::lightType);
+    if (((sv = LookupSV (stack, id)) != 0))
       sv->GetValue (t);
     type = (csLightType)t;
 
     t = CS_ATTN_NONE;
-    id = svcache.GetLightSVId (lightNum, 
-      csLightShaderVarCache::lightAttenuationMode);
-    if ((stacks->GetSize() > id) && ((sv = stacks->Get (id)) != 0))
+    id = svcache.GetLightSVId (csLightShaderVarCache::lightAttenuationMode);
+    if (((sv = LookupSVArrayItem (stack, id, lightNum)) != 0))
       sv->GetValue (t);
     attenuationMode = (csLightAttenuationMode)t;
   
-    id = svcache.GetLightSVId (lightNum, 
-      csLightShaderVarCache::lightSpecular);
-    if ((stacks->GetSize() > id) && ((sv = stacks->Get (id)) != 0))
+    id = svcache.GetLightSVId (csLightShaderVarCache::lightSpecular);
+    if (((sv = LookupSVArrayItem (stack, id, lightNum)) != 0))
       sv->GetValue (specular);
-}
+  }
 };
 
 /**
@@ -462,7 +478,34 @@ class csVertexLightCalculator : public iVertexLightCalculator
   {
     OpMul (csColor& d, const csColor& x) { d *= x; }
   };
-  template<typename Op, int zeroDest, int diffuse, int specular>
+  
+#include "csutil/custom_new_disable.h"
+
+  template<typename T, bool B>
+  class ConditionalAlloc
+  {
+    uint32 _data[(sizeof(T) + sizeof(uint32) - 1) / sizeof(uint32)];
+  public:
+    template<typename P1>
+    ConditionalAlloc (const P1& a)
+    {
+      if (B) new (&_data) T (a);
+    }
+    ~ConditionalAlloc()
+    {
+      if (B) GetObject().~T();
+    }
+  
+    T& GetObject()
+    {
+      CS_ASSERT(B);
+      return *(reinterpret_cast<T*> (&_data));
+    }
+  };
+  
+#include "csutil/custom_new_enable.h"
+
+  template<typename Op, bool zeroDest, bool diffuse, bool specular>
   void CalculateLightingODS (const csLightProperties& light,
     const csVector3& eyePos, float shininess,
     size_t numvert, iRenderBuffer* vb, iRenderBuffer* nb, 
@@ -474,8 +517,10 @@ class csVertexLightCalculator : public iVertexLightCalculator
     LightProc lighter (light);
     csVertexListWalker<float, csVector3> vbLock (vb, 3);
     csVertexListWalker<float, csVector3> nbLock (nb, 3);
-    csRenderBufferLock<csColor, iRenderBuffer*> color (litColor);
-    csRenderBufferLock<csColor, iRenderBuffer*> spec (specColor);
+    ConditionalAlloc<csRenderBufferLock<csColor, iRenderBuffer*>,
+      diffuse> color (litColor);
+    ConditionalAlloc<csRenderBufferLock<csColor, iRenderBuffer*>,
+      specular> spec (specColor);
 
     for (size_t i = 0; i < numvert; i++)
     {
@@ -486,7 +531,7 @@ class csVertexLightCalculator : public iVertexLightCalculator
       {
         if (diffuse)
         {
-          Op op (color[i], pv.DiffuseAttenuated() * light.color);
+          Op op (color.GetObject()[i], pv.DiffuseAttenuated() * light.color);
         }
         if (specular)
         {
@@ -494,7 +539,7 @@ class csVertexLightCalculator : public iVertexLightCalculator
 	  csVector3 halfvec = pv.LightDirection() * pv.LightInvDistance();
 	  halfvec += vertToEye.Unit();
 	  float specDP = halfvec.Unit() * n;
-          Op op (spec[i], pow (specDP, shininess) * light.specular * pv.Attenuation());
+          Op op (spec.GetObject()[i], pow (specDP, shininess) * light.specular * pv.Attenuation());
         }
       }
       else if (zeroDest)
@@ -502,41 +547,41 @@ class csVertexLightCalculator : public iVertexLightCalculator
         csColor nullColor (0.0f, 0.0f, 0.0f);
         if (diffuse)
         {
-          Op op (color[i], nullColor);
+          Op op (color.GetObject()[i], nullColor);
 	}
         if (specular)
         {
-          Op op (spec[i],  nullColor);
+          Op op (spec.GetObject()[i],  nullColor);
 	}
       }
       ++vbLock; ++nbLock;
     }
   }
-  template<typename Op, int zeroDest, int diffuse>
+  template<typename Op, bool zeroDest, bool diffuse>
   void CalculateLightingOD (const csLightProperties& light,
     const csVector3& eyePos, float shininess,
     size_t numvert, iRenderBuffer* vb, iRenderBuffer* nb, 
     iRenderBuffer* litColor, iRenderBuffer* specColor) const
   {
     if (specColor != 0)
-      CalculateLightingODS<Op, zeroDest, diffuse, 1> (light, eyePos, shininess,
-        numvert, vb, nb, litColor, specColor);
+      CalculateLightingODS<Op, zeroDest, diffuse, true> (light, eyePos,
+        shininess, numvert, vb, nb, litColor, specColor);
     else
-      CalculateLightingODS<Op, zeroDest, diffuse, 0> (light, eyePos, shininess,
-        numvert, vb, nb, litColor, specColor);
+      CalculateLightingODS<Op, zeroDest, diffuse, false> (light, eyePos,
+        shininess, numvert, vb, nb, litColor, specColor);
   }
-  template<typename Op, int zeroDest>
+  template<typename Op, bool zeroDest>
   void CalculateLightingO (const csLightProperties& light,
     const csVector3& eyePos, float shininess,
     size_t numvert, iRenderBuffer* vb, iRenderBuffer* nb, 
     iRenderBuffer* litColor, iRenderBuffer* specColor) const
   {
     if (litColor != 0)
-      CalculateLightingOD<Op, zeroDest, 1> (light, eyePos, shininess, numvert, 
-        vb, nb, litColor, specColor);
+      CalculateLightingOD<Op, zeroDest, true> (light, eyePos, shininess,
+        numvert, vb, nb, litColor, specColor);
     else
-      CalculateLightingOD<Op, zeroDest, 0> (light, eyePos, shininess, numvert, 
-        vb, nb, litColor, specColor);
+      CalculateLightingOD<Op, zeroDest, false> (light, eyePos, shininess,
+        numvert, vb, nb, litColor, specColor);
   }
 public:
   virtual void CalculateLighting (const csLightProperties& light,
@@ -544,7 +589,7 @@ public:
     size_t numvert, iRenderBuffer* vb, iRenderBuffer* nb, 
     iRenderBuffer* litColor, iRenderBuffer* specColor = 0) const
   {
-    CalculateLightingO<OpAssign, 1> (light, eyePos, shininess, 
+    CalculateLightingO<OpAssign, true> (light, eyePos, shininess, 
       numvert, vb, nb, litColor, specColor);
   }
 
@@ -553,8 +598,8 @@ public:
     size_t numvert, iRenderBuffer* vb, iRenderBuffer* nb, 
     iRenderBuffer* litColor, iRenderBuffer* specColor = 0) const
   {
-    CalculateLightingO<OpAdd, 0> (light, eyePos, shininess, numvert, vb, nb, 
-      litColor, specColor);
+    CalculateLightingO<OpAdd, false> (light, eyePos, shininess, numvert, 
+      vb, nb, litColor, specColor);
   }
 
   virtual void CalculateLightingMul (const csLightProperties& light,
@@ -562,8 +607,8 @@ public:
     size_t numvert, iRenderBuffer* vb, iRenderBuffer* nb, 
     iRenderBuffer* litColor, iRenderBuffer* specColor = 0) const
   {
-    CalculateLightingO<OpMul, 0> (light, eyePos, shininess, numvert, vb, nb, 
-      litColor, specColor);
+    CalculateLightingO<OpMul, false> (light, eyePos, shininess, numvert,
+      vb, nb, litColor, specColor);
   }
 };
 

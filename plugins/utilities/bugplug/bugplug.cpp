@@ -241,7 +241,9 @@ bool csBugPlug::Initialize (iObjectRegistry *object_reg)
   }
 
   stringSet = csQueryRegistryTagInterface<iStringSet> (object_reg,
-      "crystalspace.shared.stringset");
+    "crystalspace.shared.stringset");
+  stringSetSvName = csQueryRegistryTagInterface<iShaderVarStringSet> (object_reg,
+    "crystalspace.shader.variablenameset");
   return true;
 }
 
@@ -2746,7 +2748,7 @@ iMaterialWrapper* csBugPlug::FindColor (float r, float g, float b)
   csRef<iMaterial> mat (Engine->CreateBaseMaterial (0));
 
   // Attach a new SV to it
-  csShaderVariable* var = mat->GetVariableAdd (stringSet->Request (CS_MATERIAL_VARNAME_FLATCOLOR));
+  csShaderVariable* var = mat->GetVariableAdd (stringSetSvName->Request (CS_MATERIAL_VARNAME_FLATCOLOR));
   var->SetValue (csColor (r,g,b));
 
   mw = Engine->GetMaterialList ()->NewMaterial (mat, name);

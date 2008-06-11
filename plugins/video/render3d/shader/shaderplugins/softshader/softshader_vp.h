@@ -52,7 +52,7 @@ public:
 
   virtual void SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
     CS::Graphics::RenderMeshModes& /*modes*/,
-    const iShaderVarStack* /*stacks*/) {}
+    const csShaderVariableStack& /*stacks*/) {}
 
   virtual void ResetState () {}
 
