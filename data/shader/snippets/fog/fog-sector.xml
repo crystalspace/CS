@@ -95,10 +95,10 @@
     </block>
     
     <block location="cg:fragmentMain">
-      float intensity = tex2D (fragmentIn.fogTex, vertexToFragment.fogTC).a;
-      float distance = length(eyePos);
-      foggedColor = litColor;
       <?if vars."fog density".float &gt; 0 ?>
+        float intensity = tex2D (fragmentIn.fogTex, vertexToFragment.fogTC).a;
+        float distance = length(eyePos);
+        foggedColor = litColor;
         /* CS_FOG_MODE_LINEAR */
         <?if vars."fog mode".int == 1 ?>
           if(distance >= fragmentIn.fogFadeEnd && (fragmentIn.fogLimit > distance || fragmentIn.fogFadeEnd >= fragmentIn.fogLimit))
