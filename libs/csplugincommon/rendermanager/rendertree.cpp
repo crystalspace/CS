@@ -32,6 +32,18 @@ namespace CS
       if (id != 0) return *id;
       uint newID = nextDebugId++;
       debugIdMappings.Put (string, newID);
+      
+      csString strToSplit (string);
+      while (!strToSplit.IsEmpty())
+      {
+	size_t dot = strToSplit.FindLast ('.');
+	if (dot == (size_t)-1) break;
+	strToSplit.Truncate (dot);
+	uint parentID = RegisterDebugFlag (strToSplit);
+	csArray<uint> parentChildren = debugIdChildren.GetOrCreate (parentID);
+	parentChildren.Push (newID);
+      }
+
       return newID;
     }
   
@@ -52,6 +64,14 @@ namespace CS
     {
       if (flag >= debugFlags.GetSize()) debugFlags.SetSize (flag+1);
       debugFlags.Set (flag, state);
+      csArray<uint>* children = debugIdChildren.GetElementPointer (flag);
+      if (children == 0) return;
+      for (size_t i = 0; i < children->GetSize(); i++)
+      {
+	uint child = (*children)[i];
+	if (child >= debugFlags.GetSize()) debugFlags.SetSize (child+1);
+	debugFlags.Set (child, state);
+      }
     }
     
     void RenderTreeBase::AddDebugTexture (iTextureHandle* tex, float aspect)

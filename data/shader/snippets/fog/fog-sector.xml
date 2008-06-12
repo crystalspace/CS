@@ -107,7 +107,7 @@
             foggedColor = lerp (litColor, fragmentIn.fogColor, intensity *
                                 (fragmentIn.fogFadeEnd - distance) /
                                 (fragmentIn.fogFadeEnd - fragmentIn.fogFadeStart));
-        <?elsif vars."fog mode".int == consts.CS_FOG_MODE_CRYSTALSPACE  ?>
+        <?elsif vars."fog mode".int == consts.CS_FOG_MODE_CRYSTALSPACE ?>
           foggedColor = lerp (litColor, fragmentIn.fogColor, intensity);
         <?endif?>
       <?endif?>

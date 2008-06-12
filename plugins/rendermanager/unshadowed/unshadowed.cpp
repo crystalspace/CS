@@ -76,7 +76,8 @@ public:
     // Make sure the clip-planes are ok
     CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext ());
     
-    context.owner.AddDebugClipPlanes (rview);
+    if (context.owner.IsDebugFlagEnabled (rmanager->dbgFlagClipPlanes))
+      context.owner.AddDebugClipPlanes (rview);
 
     // Do the culling
     iVisibilityCuller* culler = sector->GetVisibilityCuller ();
@@ -141,7 +142,7 @@ private:
 RMUnshadowed::RMUnshadowed (iBase* parent)
   : scfImplementationType (this, parent), doHDRExposure (false), targets (*this)
 {
-
+  SetTreePersistent (treePersistent);
 }
 
 bool RMUnshadowed::RenderView (iView* view)
@@ -296,6 +297,8 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
   
   csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objectReg);
   treePersistent.Initialize (shaderManager);
+  dbgFlagClipPlanes =
+    treePersistent.debugPersist.RegisterDebugFlag ("draw.clipplanes.view");
   postEffects.Initialize (objectReg);
   
   const char* effectsFile = cfg->GetStr ("RenderManager.Unshadowed.Effects", 0);

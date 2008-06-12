@@ -145,6 +145,7 @@ private:
 RMShadowedPSSM::RMShadowedPSSM (iBase* parent)
   : scfImplementationType (this, parent), doHDRExposure (false), targets (*this)
 {
+  SetTreePersistent (treePersistent);
 }
 
 bool RMShadowedPSSM::RenderView (iView* view)

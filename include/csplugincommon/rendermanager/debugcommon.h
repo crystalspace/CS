@@ -20,6 +20,7 @@
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_DEBUGCOMMON_H__
 
 #include "iutil/dbghelp.h"
+#include "csplugincommon/rendermanager/rendertree.h"
 #include "csplugincommon/rendermanager/renderview.h"
 
 namespace CS
@@ -36,6 +37,7 @@ namespace CS
       
       virtual bool HasDebugLockLines() = 0;
       virtual void DeleteDebugLockLines() = 0;
+      virtual RenderTreeBase::DebugPersistent& GetDebugPersistent() = 0;
     public:
       RMDebugCommonBase();
     
@@ -62,15 +64,24 @@ namespace CS
     template<typename RenderTreeType>
     class RMDebugCommon : public RMDebugCommonBase
     {
+      typename RenderTreeType::PersistentData* treePersist;
       typedef typename RenderTreeType::DebugLines DebugLinesType;
       DebugLinesType* lockedDebugLines;
       
       bool HasDebugLockLines() { return lockedDebugLines != 0; }
       void DeleteDebugLockLines()
       { delete lockedDebugLines; lockedDebugLines = 0; }
+      RenderTreeBase::DebugPersistent& GetDebugPersistent()
+      {
+	CS_ASSERT_MSG ("SetTreePersistent() not called", treePersist);
+	return treePersist->debugPersist;
+      }
     public:
-      RMDebugCommon() : lockedDebugLines (0) {}
+      RMDebugCommon() : treePersist (0), lockedDebugLines (0) {}
       ~RMDebugCommon() { delete lockedDebugLines; }
+
+      void SetTreePersistent (typename 	RenderTreeType::PersistentData& treePersist)
+      { this->treePersist = &treePersist; }
     
       void DebugFrameRender (CS::RenderManager::RenderView* rview,
                              RenderTreeType& renderTree)

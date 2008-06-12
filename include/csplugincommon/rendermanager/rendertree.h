@@ -40,6 +40,7 @@ namespace RenderManager
    */
   class CS_CRYSTALSPACE_EXPORT RenderTreeBase
   {
+  public:
     struct CS_CRYSTALSPACE_EXPORT DebugPersistent
     {
       DebugPersistent ();
@@ -51,12 +52,8 @@ namespace RenderManager
       void EnableDebugFlag (uint flag, bool state);
     protected:
       uint nextDebugId;
-      struct DebugID
-      {
-	uint id;
-	csArray<uint> children;
-      };
       csHash<uint, csString> debugIdMappings;
+      csHash<csArray<uint>, uint> debugIdChildren;
       csBitArray debugFlags;
     };
   
@@ -477,7 +474,12 @@ namespace RenderManager
     //@{
     /**\name Debugging helpers: toggling of debugging features
      */
-    /// Register a debug flag, returns a numeric ID
+    /**
+     * Register a debug flag, returns a numeric ID.
+     * \remark Flag names are hierarchical. The hierarchy levels are
+     *   separated by dots. If a flag is set or unset, all flags below in the
+     *   hierarchy are set or unset as well.
+     */
     uint RegisterDebugFlag (const char* string)
     { return persistentData.debugPersist.RegisterDebugFlag (string); }
     /**
@@ -490,9 +492,21 @@ namespace RenderManager
     /// Check whether a debug flag is enabled
     bool IsDebugFlagEnabled (uint flag)
     { return persistentData.debugPersist.IsDebugFlagEnabled (flag); }
-    /// Enable or disable a debug flag
+    //@{
+    /**
+     * Enable or disable a debug flag.
+     * \remark Flag names are hierarchical. The hierarchy levels are
+     *   separated by dots. If a flag is set or unset, all flags below in the
+     *   hierarchy are set or unset as well.
+     */
     void EnableDebugFlag (uint flag, bool state)
     { persistentData.debugPersist.EnableDebugFlag (flag, state); }
+    void EnableDebugFlag (const char* flagStr, bool state)
+    {
+      uint flag = RegisterDebugFlag (flag);
+      EnableDebugFlag (flag, state); 
+    }
+    //@}
     //@}
     
     

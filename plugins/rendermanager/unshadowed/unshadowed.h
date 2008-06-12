@@ -116,7 +116,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMUnshadowed)
 
     TargetManagerType targets;
     csSet<RenderTreeType::ContextNode*> contextsScannedForTargets;
-  };  
+    
+    uint dbgFlagClipPlanes;
+  };
 
 }
 CS_PLUGIN_NAMESPACE_END(RMUnshadowed)
