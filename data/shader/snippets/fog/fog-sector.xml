@@ -95,21 +95,19 @@
     </block>
     
     <block location="cg:fragmentMain">
+      foggedColor = litColor;
       <?if vars."fog density".float &gt; 0 ?>
         float intensity = tex2D (fragmentIn.fogTex, vertexToFragment.fogTC).a;
         float distance = length(eyePos);
-        foggedColor = litColor;
         /* CS_FOG_MODE_LINEAR */
-        <?if vars."fog mode".int == 1 ?>
+        <?if vars."fog mode".int == consts.CS_FOG_MODE_LINEAR ?>
           if(distance >= fragmentIn.fogFadeEnd && (fragmentIn.fogLimit > distance || fragmentIn.fogFadeEnd >= fragmentIn.fogLimit))
             foggedColor = lerp (litColor, fragmentIn.fogColor, intensity);
           else if(distance >= fragmentIn.fogFadeStart && fragmentIn.fogFadeEnd > distance)
             foggedColor = lerp (litColor, fragmentIn.fogColor, intensity *
                                 (fragmentIn.fogFadeEnd - distance) /
                                 (fragmentIn.fogFadeEnd - fragmentIn.fogFadeStart));
-        <?endif?>
-        /* CS_FOG_MODE_CRYSTALSPACE */
-        <?if vars."fog mode".int == 2 ?>
+        <?elsif vars."fog mode".int == consts.CS_FOG_MODE_CRYSTALSPACE  ?>
           foggedColor = lerp (litColor, fragmentIn.fogColor, intensity);
         <?endif?>
       <?endif?>
