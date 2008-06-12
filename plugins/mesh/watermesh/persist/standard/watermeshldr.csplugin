@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!-- watermeshldr.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.loader.factory.watermesh</name>
+        <implementation>csWaterFactoryLoader</implementation>
+        <description>Crystal Space Water Mesh Factory Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.loader.watermesh</name>
+        <implementation>csWaterMeshLoader</implementation>
+        <description>Crystal Space Water Mesh Mesh Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.factory.watermesh</name>
+        <implementation>csWaterFactorySaver</implementation>
+        <description>Crystal Space Water Mesh Factory Saver</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.watermesh</name>
+        <implementation>csWaterMeshSaver</implementation>
+        <description>Crystal Space Water Mesh Mesh Saver</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
