@@ -445,6 +445,17 @@ public:
     return true; 
   }
 
+  /// Store a csColor4
+  bool SetValue (const csColor4& value)
+  { 
+    if (Type != VECTOR4)
+      NewType (VECTOR4);
+
+    VectorValue.Set (value.red, value.green, value.blue, value.alpha);
+    Int = (int)value.red;
+    return true; 
+  }
+
   /// Store a csVector4
   bool SetValue (const csVector4 &value)
   { 
