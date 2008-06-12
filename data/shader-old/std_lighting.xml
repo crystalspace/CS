@@ -147,7 +147,7 @@
     /// If we have fog, apply it.
     if (V2F.fog.HasFog())
     {
-      color.rgb = lerp(color.rgb, V2F.fog.GetColor(), V2F.fog.GetIntensity());
+      color = lerp(color, V2F.fog.GetColor(), V2F.fog.GetIntensity());
     }
     <?! If a glow texture is present ... ?>
     <?if vars."tex glow".texture ?>
@@ -222,7 +222,7 @@
 	GetMixmodeAlpha());
     if (V2F.fog.HasFog())
     {
-      color.rgb = lerp(color.rgb, V2F.fog.GetColor(), V2F.fog.GetIntensity());
+      color = lerp(color, V2F.fog.GetColor(), V2F.fog.GetIntensity());
     }
     <?if vars."tex glow".texture ?>
       color.rgb += tex2D (texGlow, texCoord).rgb;

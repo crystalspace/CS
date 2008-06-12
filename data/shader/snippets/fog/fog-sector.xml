@@ -99,7 +99,8 @@
       float distance = length(eyePos);
       foggedColor = litColor;
       <?if vars."fog density".float &gt; 0 ?>
-        <?if vars."fog mode".int == 1 ?> <!-- CS_FOG_MODE_LINEAR -->
+        /* CS_FOG_MODE_LINEAR */
+        <?if vars."fog mode".int == 1 ?>
           if(distance >= fragmentIn.fogFadeEnd && (fragmentIn.fogLimit > distance || fragmentIn.fogFadeEnd >= fragmentIn.fogLimit))
             foggedColor = lerp (litColor, fragmentIn.fogColor, intensity);
           else if(distance >= fragmentIn.fogFadeStart && fragmentIn.fogFadeEnd > distance)
@@ -107,7 +108,8 @@
                                 (fragmentIn.fogFadeEnd - distance) /
                                 (fragmentIn.fogFadeEnd - fragmentIn.fogFadeStart));
         <?endif?>
-        <?if vars."fog mode".int == 2 ?> <!-- CS_FOG_MODE_CRYSTALSPACE -->
+        /* CS_FOG_MODE_CRYSTALSPACE */
+        <?if vars."fog mode".int == 2 ?>
           foggedColor = lerp (litColor, fragmentIn.fogColor, intensity);
         <?endif?>
       <?endif?>
