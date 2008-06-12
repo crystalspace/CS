@@ -625,7 +625,9 @@ private:
 	// Make sure the clip-planes are ok
 	CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext ());
     
-	context.owner.AddDebugClipPlanes (rview);
+	if (context.owner.IsDebugFlagEnabled (
+	    viewSetup.persist.dbgSplitFrustumLight))
+	  context.owner.AddDebugClipPlanes (rview);
 	
 	// Do the culling
 	iVisibilityCuller* culler = sector->GetVisibilityCuller ();
@@ -686,6 +688,7 @@ private:
       uint dbgSplitFrustumLight;
       uint dbgLightBBox;
       uint dbgShadowTex;
+      uint dbgFlagShadowClipPlanes;
       csLightShaderVarCache svNames;
       CS::ShaderVarStringID unscaleSVName;
       CS::ShaderVarStringID shadowClipSVName;
@@ -767,6 +770,8 @@ private:
 	dbgSplitFrustumLight = dbgPersist.RegisterDebugFlag ("draw.pssm.split.frustum.light");
 	dbgLightBBox = dbgPersist.RegisterDebugFlag ("draw.pssm.lightbbox");
 	dbgShadowTex = dbgPersist.RegisterDebugFlag ("textures.shadow");
+	dbgFlagShadowClipPlanes =
+	  dbgPersist.RegisterDebugFlag ("draw.clipplanes.shadow");
       }
       void UpdateNewFrame ()
       {

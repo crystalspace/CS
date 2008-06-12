@@ -300,7 +300,7 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
   csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objectReg);
   treePersistent.Initialize (shaderManager);
   dbgFlagClipPlanes =
-    treePersistent.debugPersist.RegisterDebugFlag ("draw.clipplanes");
+    treePersistent.debugPersist.RegisterDebugFlag ("draw.clipplanes.view");
   postEffects.Initialize (objectReg);
   
   const char* effectsFile = cfg->GetStr ("RenderManager.ShadowPSSM.Effects", 0);
