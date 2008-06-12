@@ -100,7 +100,7 @@
       foggedColor = litColor;
       <?if vars."fog density".float &gt; 0 ?>
         <?if vars."fog mode".int == 1 ?> <!-- CS_FOG_MODE_LINEAR -->
-          if(distance >= fragmentIn.fogFadeEnd && (fogLimit > distance || fragmentIn.fogFadeEnd >= fogLimit))
+          if(distance >= fragmentIn.fogFadeEnd && (fragmentIn.fogLimit > distance || fragmentIn.fogFadeEnd >= fragmentIn.fogLimit))
             foggedColor = lerp (litColor, fragmentIn.fogColor, intensity);
           else if(distance >= fragmentIn.fogFadeStart && fragmentIn.fogFadeEnd > distance)
             foggedColor = lerp (litColor, fragmentIn.fogColor, intensity *
