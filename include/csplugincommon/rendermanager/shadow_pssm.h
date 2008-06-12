@@ -82,7 +82,7 @@ namespace RenderManager
 	{
 	  numParts++;
 	}
-	splitDists = new float[numParts];
+	splitDists = new float[numParts+1];
 	if (doFixedCloseShadow)
 	{
 	  firstPart = 1;
