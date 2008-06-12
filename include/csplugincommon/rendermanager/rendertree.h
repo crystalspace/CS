@@ -51,6 +51,11 @@ namespace RenderManager
       void EnableDebugFlag (uint flag, bool state);
     protected:
       uint nextDebugId;
+      struct DebugID
+      {
+	uint id;
+	csArray<uint> children;
+      };
       csHash<uint, csString> debugIdMappings;
       csBitArray debugFlags;
     };

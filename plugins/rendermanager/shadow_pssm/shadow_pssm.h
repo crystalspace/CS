@@ -114,6 +114,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
     LightSetupType::PersistentData lightPersistent;
 
     CS::RenderManager::PostEffectManager       postEffects;
+    CS::RenderManager::HDRHelper hdr;
     CS::RenderManager::HDRExposureLinear hdrExposure;
     bool doHDRExposure;
 
