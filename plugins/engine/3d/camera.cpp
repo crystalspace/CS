@@ -344,9 +344,6 @@ const csPlane3* csCameraCustomMatrix::GetVisibleVolume (uint32& mask)
 {
   if (clipPlanesDirty)
   {
-    csPrintf ("matrix.GetTranspose() = %s\n", matrix.GetTranspose().Description().GetData());
-    UpdateInvMatrix ();
-    csPrintf ("invMatrix.GetInverse().GetTranspose() = %s\n", invMatrix.GetInverse().GetTranspose().Description().GetData());
     CS::Math::Matrix4 invMatrix_inv_t = matrix.GetTranspose();
       
     int n = 0;
@@ -355,37 +352,31 @@ const csPlane3* csCameraCustomMatrix::GetVisibleVolume (uint32& mask)
     p.Set (0, 0, 1, 1);
     clipPlanes[n] = invMatrix_inv_t * p;
     clipPlanes[n].Normalize();
-    csPrintf ("%d: %s\n", n, clipPlanes[n].Description().GetData());
     n++;
     // Far plane
     p.Set (0, 0, -1, 1);
     clipPlanes[n] = invMatrix_inv_t * p;
     clipPlanes[n].Normalize();
-    csPrintf ("%d: %s\n", n, clipPlanes[n].Description().GetData());
     n++;
     // Left plane
     p.Set (1, 0, 0, 1);
     clipPlanes[n] = invMatrix_inv_t * p;
     clipPlanes[n].Normalize();
-    csPrintf ("%d: %s\n", n, clipPlanes[n].Description().GetData());
     n++;
     // Right plane
     p.Set (-1, 0, 0, 1);
     clipPlanes[n] = invMatrix_inv_t * p;
     clipPlanes[n].Normalize();
-    csPrintf ("%d: %s\n", n, clipPlanes[n].Description().GetData());
     n++;
     // Bottom plane
     p.Set (0, 1, 0, 1);
     clipPlanes[n] = invMatrix_inv_t * p;
     clipPlanes[n].Normalize();
-    csPrintf ("%d: %s\n", n, clipPlanes[n].Description().GetData());
     n++;
     // Top plane
     p.Set (0, -1, 0, 1);
     clipPlanes[n] = invMatrix_inv_t * p;
     clipPlanes[n].Normalize();
-    csPrintf ("%d: %s\n", n, clipPlanes[n].Description().GetData());
     n++;
     
     clipPlanesMask = (1 << n) - 1;
