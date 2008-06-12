@@ -7019,7 +7019,7 @@ fail:
 SWIGINTERN PyObject *_wrap_csFog_color_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csFog *arg1 = (csFog *) 0 ;
-  csColor *arg2 = (csColor *) 0 ;
+  csColor4 *arg2 = (csColor4 *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -7033,11 +7033,11 @@ SWIGINTERN PyObject *_wrap_csFog_color_set(PyObject *SWIGUNUSEDPARM(self), PyObj
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csFog_color_set" "', argument " "1"" of type '" "csFog *""'"); 
   }
   arg1 = reinterpret_cast< csFog * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_csColor, 0 |  0 );
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_csColor4, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csFog_color_set" "', argument " "2"" of type '" "csColor *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csFog_color_set" "', argument " "2"" of type '" "csColor4 *""'"); 
   }
-  arg2 = reinterpret_cast< csColor * >(argp2);
+  arg2 = reinterpret_cast< csColor4 * >(argp2);
   if (arg1) (arg1)->color = *arg2;
   
   resultobj = SWIG_Py_Void();
@@ -7050,7 +7050,7 @@ fail:
 SWIGINTERN PyObject *_wrap_csFog_color_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csFog *arg1 = (csFog *) 0 ;
-  csColor *result = 0 ;
+  csColor4 *result = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
@@ -7061,8 +7061,8 @@ SWIGINTERN PyObject *_wrap_csFog_color_get(PyObject *SWIGUNUSEDPARM(self), PyObj
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csFog_color_get" "', argument " "1"" of type '" "csFog *""'"); 
   }
   arg1 = reinterpret_cast< csFog * >(argp1);
-  result = (csColor *)& ((arg1)->color);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csColor, 0 |  0 );
+  result = (csColor4 *)& ((arg1)->color);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csColor4, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -7222,6 +7222,59 @@ SWIGINTERN PyObject *_wrap_csFog_mode_get(PyObject *SWIGUNUSEDPARM(self), PyObje
   arg1 = reinterpret_cast< csFog * >(argp1);
   result = (csFogMode) ((arg1)->mode);
   resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csFog_limit_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csFog *arg1 = (csFog *) 0 ;
+  float arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  float val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csFog_limit_set",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csFog, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csFog_limit_set" "', argument " "1"" of type '" "csFog *""'"); 
+  }
+  arg1 = reinterpret_cast< csFog * >(argp1);
+  ecode2 = SWIG_AsVal_float(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csFog_limit_set" "', argument " "2"" of type '" "float""'");
+  } 
+  arg2 = static_cast< float >(val2);
+  if (arg1) (arg1)->limit = arg2;
+  
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csFog_limit_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csFog *arg1 = (csFog *) 0 ;
+  float result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csFog_limit_get",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csFog, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csFog_limit_get" "', argument " "1"" of type '" "csFog *""'"); 
+  }
+  arg1 = reinterpret_cast< csFog * >(argp1);
+  result = (float) ((arg1)->limit);
+  resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
   return NULL;
@@ -39020,6 +39073,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csFog_end_get", _wrap_csFog_end_get, METH_VARARGS, NULL},
 	 { (char *)"csFog_mode_set", _wrap_csFog_mode_set, METH_VARARGS, NULL},
 	 { (char *)"csFog_mode_get", _wrap_csFog_mode_get, METH_VARARGS, NULL},
+	 { (char *)"csFog_limit_set", _wrap_csFog_limit_set, METH_VARARGS, NULL},
+	 { (char *)"csFog_limit_get", _wrap_csFog_limit_get, METH_VARARGS, NULL},
 	 { (char *)"new_csFog", _wrap_new_csFog, METH_VARARGS, NULL},
 	 { (char *)"delete_csFog", _wrap_delete_csFog, METH_VARARGS, NULL},
 	 { (char *)"csFog_swigregister", csFog_swigregister, METH_VARARGS, NULL},
@@ -40320,7 +40375,7 @@ static swig_type_info _swigt__p_csArrayTcsImageIOFileFormatDescription_const_p_c
 static swig_type_info _swigt__p_csBox2 = {"_p_csBox2", "csBox2 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csBox3 = {"_p_csBox3", "csBox3 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csColor = {"_p_csColor", "csColor *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_csColor4 = {"_p_csColor4", 0, 0, 0, 0, 0};
+static swig_type_info _swigt__p_csColor4 = {"_p_csColor4", "csColor4 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csFlags = {"_p_csFlags", "csFlags *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csFog = {"_p_csFog", "csFog *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csFrustum = {"_p_csFrustum", "csFrustum *", 0, 0, (void*)0, 0};
@@ -40823,8 +40878,8 @@ static swig_cast_info _swigc__p_csArrayCapacityVariableGrow[] = {  {&_swigt__p_c
 static swig_cast_info _swigc__p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT16_t_t[] = {  {&_swigt__p_csArrayTcsImageIOFileFormatDescription_const_p_csArrayElementHandlerTcsImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT16_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csBox2[] = {  {&_swigt__p_csBox2, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csBox3[] = {  {&_swigt__p_csBox3, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csColor4[] = {{&_swigt__p_csColor4, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csColor[] = {  {&_swigt__p_csColor, 0, 0, 0},  {&_swigt__p_csColor4, _p_csColor4To_p_csColor, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_csColor4[] = {  {&_swigt__p_csColor4, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csFlags[] = {  {&_swigt__p_csFlags, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csFog[] = {  {&_swigt__p_csFog, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csFrustum[] = {  {&_swigt__p_csFrustum, 0, 0, 0},{0, 0, 0, 0}};
@@ -41829,9 +41884,9 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "CS_LIGHT_SPOTLIGHT",SWIG_From_int(static_cast< int >(CS_LIGHT_SPOTLIGHT)));
   SWIG_Python_SetConstant(d, "CS_FOG_MODE_NONE",SWIG_From_int(static_cast< int >(CS_FOG_MODE_NONE)));
   SWIG_Python_SetConstant(d, "CS_FOG_MODE_LINEAR",SWIG_From_int(static_cast< int >(CS_FOG_MODE_LINEAR)));
+  SWIG_Python_SetConstant(d, "CS_FOG_MODE_CRYSTALSPACE",SWIG_From_int(static_cast< int >(CS_FOG_MODE_CRYSTALSPACE)));
   SWIG_Python_SetConstant(d, "CS_FOG_MODE_EXP",SWIG_From_int(static_cast< int >(CS_FOG_MODE_EXP)));
   SWIG_Python_SetConstant(d, "CS_FOG_MODE_EXP2",SWIG_From_int(static_cast< int >(CS_FOG_MODE_EXP2)));
-  SWIG_Python_SetConstant(d, "CS_FOG_MODE_CRYSTALSPACE",SWIG_From_int(static_cast< int >(CS_FOG_MODE_CRYSTALSPACE)));
   SWIG_Python_SetConstant(d, "CS_ENGINE_CACHE_READ",SWIG_From_int(static_cast< int >(1)));
   SWIG_Python_SetConstant(d, "CS_ENGINE_CACHE_WRITE",SWIG_From_int(static_cast< int >(2)));
   SWIG_Python_SetConstant(d, "CS_ENGINE_CACHE_NOUPDATE",SWIG_From_int(static_cast< int >(4)));

@@ -282,9 +282,9 @@ iLightIterator_scfGetVersion = _iengine.iLightIterator_scfGetVersion
 
 CS_FOG_MODE_NONE = _iengine.CS_FOG_MODE_NONE
 CS_FOG_MODE_LINEAR = _iengine.CS_FOG_MODE_LINEAR
+CS_FOG_MODE_CRYSTALSPACE = _iengine.CS_FOG_MODE_CRYSTALSPACE
 CS_FOG_MODE_EXP = _iengine.CS_FOG_MODE_EXP
 CS_FOG_MODE_EXP2 = _iengine.CS_FOG_MODE_EXP2
-CS_FOG_MODE_CRYSTALSPACE = _iengine.CS_FOG_MODE_CRYSTALSPACE
 class csFog(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
@@ -293,6 +293,7 @@ class csFog(object):
     start = _swig_property(_iengine.csFog_start_get, _iengine.csFog_start_set)
     end = _swig_property(_iengine.csFog_end_get, _iengine.csFog_end_set)
     mode = _swig_property(_iengine.csFog_mode_get, _iengine.csFog_mode_set)
+    limit = _swig_property(_iengine.csFog_limit_get, _iengine.csFog_limit_set)
     def __init__(self, *args): 
         this = _iengine.new_csFog(*args)
         try: self.this.append(this)
