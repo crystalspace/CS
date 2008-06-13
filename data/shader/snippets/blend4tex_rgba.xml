@@ -29,8 +29,6 @@
       
     <block location="cg:fragmentMain">
       float4 weights = tex2D (texMask, texCoord);
-      v3 = float4(0.5, 0, 0, 1);
-      v4 = float4(0, 0, 0, 1);
       result = v1*weights.r + v2*weights.g + v3*weights.b + v4*weights.a;
       result_attr_perfragment = true;
     </block>
