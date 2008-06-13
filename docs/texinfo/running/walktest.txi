@@ -115,8 +115,8 @@ Collision detection system (default 'colldet').
 @item -[no]logo
 Draw logo (default 'logo').  This controls display of the Crystal Space logo in
 the top right of the display.
-@item -regions
-Load every map in a separate region (default off).
+@item -collections
+Load every map in a separate collection (default off).
 @item -dupes
 Check for duplicate objects in multiple maps (default off).
 @item -infinite
