@@ -28,7 +28,6 @@
 #include "iengine/light.h"
 #include "iengine/material.h"
 #include "iengine/mesh.h"
-#include "iengine/region.h"
 #include "iengine/sector.h"
 #include "iengine/sharevar.h"
 #include "imap/ldrctxt.h"
@@ -156,7 +155,7 @@ csPtr<iParameterESM> csLoader::ResolveOperationParameter (
 	{
 	  iSequenceTrigger* trig = CreateTrigger (
 	  	GetEngineSequenceManager (), parname);
-	  AddToRegionOrCollection (ldr_context, trig->QueryObject ());
+	  AddToCollection (ldr_context, trig->QueryObject ());
 	  value = trig;
 	}
         break;
@@ -466,7 +465,7 @@ iSequenceTrigger* csLoader::LoadTrigger (iLoaderContext* ldr_context,
   if (!trigger)
   {
     trigger = CreateTrigger (GetEngineSequenceManager (), trigname);
-    AddToRegionOrCollection (ldr_context, trigger->QueryObject ());
+    AddToCollection (ldr_context, trigger->QueryObject ());
   }
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -1314,7 +1313,7 @@ bool csLoader::LoadSequences (iLoaderContext* ldr_context, iDocumentNode* node)
         {
           iSequenceWrapper* sequence = CreateSequence (child);
           if (!sequence) return false;
-	  AddToRegionOrCollection (ldr_context, sequence->QueryObject ());
+	  AddToCollection (ldr_context, sequence->QueryObject ());
 	}
         break;
       default:

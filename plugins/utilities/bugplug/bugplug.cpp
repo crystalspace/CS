@@ -57,7 +57,6 @@
 #include "iengine/material.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
-#include "iengine/region.h"
 #include "iengine/rview.h"
 #include "iengine/sector.h"
 #include "iengine/viscull.h"
@@ -2705,11 +2704,7 @@ void csBugPlug::OneSector (iCamera* camera)
 void csBugPlug::CleanDebugSector ()
 {
   if (!debug_sector.sector) return;
-  iRegion* db_region = Engine->CreateRegion ("__BugPlug_region__");
-  db_region->DeleteAll ();
-
-  iRegionList* reglist = Engine->GetRegions ();
-  reglist->Remove (db_region);
+  Engine->RemoveCollection ("__BugPlug_region__");
 
   delete debug_sector.view;
 
@@ -2726,9 +2721,9 @@ void csBugPlug::SetupDebugSector ()
     return;
   }
 
-  iRegion* db_region = Engine->CreateRegion ("__BugPlug_region__");
+  iCollection* db_collection = Engine->CreateCollection ("__BugPlug_collection__");
   debug_sector.sector = Engine->CreateSector ("__BugPlug_sector__");
-  db_region->QueryObject ()->ObjAdd (debug_sector.sector->QueryObject ());
+  db_collection->Add (debug_sector.sector->QueryObject ());
 
   debug_sector.view = new csView (Engine, G3D);
   int w3d = G3D->GetWidth ();

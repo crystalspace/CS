@@ -36,7 +36,7 @@ namespace genmeshify
     App* app;
     Converter* converter;
 
-    csRef<iRegion> region;
+    csRef<iCollection> collection;
     csRef<iLoaderContext> loaderContext;
 
     csRef<iDocumentNode> texturesNode;
