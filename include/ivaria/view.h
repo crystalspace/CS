@@ -28,10 +28,11 @@
 #include "cstool/meshfilter.h"
 
 struct iCamera;
+struct iClipper2D;
 struct iEngine;
 struct iGraphics3D;
-struct iClipper2D;
 struct iMeshWrapper;
+struct iPerspectiveCamera;
 
 /**
  * The iView class encapsulates the top-level Crystal Space
@@ -59,6 +60,11 @@ struct iView : public virtual iBase
   virtual iCamera* GetCamera () = 0;
   /// Set current camera.
   virtual void SetCamera (iCamera* c) = 0;
+
+  /// Get current perspective camera.
+  virtual iPerspectiveCamera* GetPerspectiveCamera () = 0;
+  /// Set current perspective camera.
+  virtual void SetPerspectiveCamera (iPerspectiveCamera* c) = 0;
 
   /// Get Context
   virtual iGraphics3D* GetContext () = 0;
