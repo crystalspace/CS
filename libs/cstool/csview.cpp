@@ -62,6 +62,7 @@ iCamera *csView::GetCamera ()
 
 void csView::SetCamera (iCamera* c)
 {
+  CS_ASSERT_MSG("Null camera not allowed.", c != NULL); 
   Camera = c;
 }
 
@@ -73,7 +74,8 @@ iPerspectiveCamera *csView::GetPerspectiveCamera ()
 
 void csView::SetPerspectiveCamera (iPerspectiveCamera* c)
 {
-  Camera = scfQueryInterfaceSafe<iCamera>(c);
+  CS_ASSERT_MSG("Null camera not allowed.", c != NULL); 
+  Camera = scfQueryInterface<iCamera>(c);
 }
 
 
