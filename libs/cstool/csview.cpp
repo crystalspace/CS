@@ -32,7 +32,7 @@ csView::csView (iEngine *e, iGraphics3D* ig3d)
   : scfImplementationType (this),
   Engine (e), G3D (ig3d), RectView (0), PolyView (0), AutoResize (true)
 {
-  Camera = e->CreatePerspectiveCamera ();
+  Camera = e->CreateCamera ();
 
   OldWidth = G3D->GetWidth ();
   OldHeight = G3D->GetHeight ();
@@ -54,25 +54,14 @@ void csView::SetEngine (iEngine* e)
   Engine = e;
 }
 
-iPerspectiveCamera *csView::GetPerspectiveCamera ()
+iCamera *csView::GetCamera ()
 {
   return Camera;
 }
 
-iCamera *csView::GetCamera ()
-{
-  csRef<iCamera> cam = scfQueryInterface<iCamera>(Camera);
-  return cam;
-}
-
-void csView::SetPerspectiveCamera (iPerspectiveCamera* c)
-{
-  Camera = c;
-}
-
 void csView::SetCamera (iCamera* c)
 {
-  Camera = scfQueryInterface<iPerspectiveCamera>(c);
+  Camera = c;
 }
 
 iGraphics3D* csView::GetContext ()

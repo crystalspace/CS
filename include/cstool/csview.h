@@ -36,8 +36,6 @@
 class csBox2;
 class csPoly2D;
 
-#include "csutil/deprecated_warn_off.h"
-
 /**
  * The csView class encapsulates the top-level Crystal Space
  * renderer interface. It is basically a camera and a clipper.
@@ -53,8 +51,8 @@ private:
   /// context size at the time the clipper was created
   int OldWidth, OldHeight;
 
-  /// the Perspective camera
-  csRef<iPerspectiveCamera> Camera;
+  /// the camera
+  csRef<iCamera> Camera;
 
   /// Rect clipping region (0 if this is a polygon-based clipper)
   csBox2* RectView;
@@ -81,12 +79,8 @@ public:
   /// Set engine handle.
   virtual void SetEngine (iEngine* e);
 
-  /// Get current perspective camera.
-  virtual iPerspectiveCamera* GetPerspectiveCamera ();
   /// Get current camera.
   virtual iCamera* GetCamera ();
-  /// Set current perspective camera.
-  virtual void SetPerspectiveCamera (iPerspectiveCamera* c);
   /// Set current camera.
   virtual void SetCamera (iCamera* c);
 
@@ -120,7 +114,5 @@ public:
     return meshFilter;
   }
 };
-
-#include "csutil/deprecated_warn_on.h"
 
 #endif // __CS_CSVIEW_H__
