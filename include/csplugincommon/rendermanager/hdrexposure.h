@@ -20,6 +20,7 @@
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_HDREXPOSURE_H__
 
 #include "csgfx/textureformatstrings.h"
+#include "csplugincommon/rendermanager/hdrhelper.h"
 #include "csplugincommon/rendermanager/posteffects.h"
 #include "csutil/ref.h"
 
@@ -47,6 +48,7 @@ namespace CS
       csRef<csShaderVariable> svHDRScale;
       CS::StructuredTextureFormat readbackFmt;
       PostEffectManager::Layer* measureLayer;
+      HDRHelper* hdr;
       
       csRef<iDataBuffer> lastData;
       int lastW, lastH;
@@ -59,16 +61,17 @@ namespace CS
     public:
       HDRExposureLinear () : exposure (1.0f), 
         readbackFmt (CS::TextureFormatStrings::ConvertStructured ("argb8")),
+	measureLayer (0), hdr (0),
         lastTime (0), targetAvgLum (0.8f), targetAvgLumTolerance (0.1f),
         minExposure (0.1f), maxExposure (10.0f), exposureChangeRate (0.5f)
       {}
     
       /// Set up HDR exposure control for a post effects manager
       void Initialize (iObjectRegistry* objReg,
-        PostEffectManager& postEffects);
+        HDRHelper& hdr);
       
       /// Obtain rendered image and apply exposure correction
-      void ApplyExposure (PostEffectManager& postEffects);
+      void ApplyExposure ();
       
       /// Set target average luminance
       void SetTargetAverageLuminance (float f) { targetAvgLum = f; }

@@ -92,5 +92,5 @@
     </passgen>
   </technique>
   
-  <fallbackshader name="furshell8_pvl" file="/shader/surface/furshell8_pvl.xml" />
+  <fallbackshader name="furshell8_pvl" file="/shader/fur/furshell8_pvl.xml" />
 </shader>

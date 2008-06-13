@@ -358,6 +358,8 @@ void csSoftwareTextureHandle::ApplyBlitBuffer (uint8* buf)
   }
 }
   
+#include "csutil/custom_new_disable.h"
+
 csPtr<iDataBuffer> csSoftwareTextureHandle::Readback (
   const CS::StructuredTextureFormat& format, int mip)
 {
@@ -369,6 +371,8 @@ csPtr<iDataBuffer> csSoftwareTextureHandle::Readback (
     tex[mip]));
   return csPtr<iDataBuffer> (db);
 }
+
+#include "csutil/custom_new_enable.h"
 
 //----------------------------------------------- csSoftwareTextureManager ---//
 

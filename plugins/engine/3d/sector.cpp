@@ -133,10 +133,12 @@ csSector::csSector (csEngine *engine) :
   AddVariable (svFogColor);
   svFogMode.AttachNew (new csShaderVariable (SVNames().fogMode));
   AddVariable (svFogMode);
-  svFogStart.AttachNew (new csShaderVariable (SVNames().fogStart));
-  AddVariable (svFogStart);
-  svFogEnd.AttachNew (new csShaderVariable (SVNames().fogEnd));
-  AddVariable (svFogEnd);
+  svFogFadeStart.AttachNew (new csShaderVariable (SVNames().fogFadeStart));
+  AddVariable (svFogFadeStart);
+  svFogFadeEnd.AttachNew (new csShaderVariable (SVNames().fogFadeEnd));
+  AddVariable (svFogFadeEnd);
+  svFogLimit.AttachNew (new csShaderVariable (SVNames().fogLimit));
+  AddVariable (svFogLimit);
   svFogDensity.AttachNew (new csShaderVariable (SVNames().fogDensity));
   AddVariable (svFogDensity);
   UpdateFogSVs();
@@ -1070,8 +1072,9 @@ void csSector::UpdateFogSVs ()
 {
   svFogColor->SetValue (fog.color);
   svFogMode->SetValue (int (fog.mode));
-  svFogStart->SetValue (fog.start);
-  svFogEnd->SetValue (fog.end);
+  svFogFadeStart->SetValue (fog.start);
+  svFogFadeEnd->SetValue (fog.end);
+  svFogLimit->SetValue (fog.limit);
   svFogDensity->SetValue (fog.density);
 }
 
@@ -1087,10 +1090,12 @@ void csSector::SetupSVNames()
       "fog color");
     SVNames().fogMode = CS::ShaderVarName (engine->svNameStringSet,
       "fog mode");
-    SVNames().fogStart = CS::ShaderVarName (engine->svNameStringSet,
-      "fog start");
-    SVNames().fogEnd = CS::ShaderVarName (engine->svNameStringSet,
-      "fog end");
+    SVNames().fogFadeStart = CS::ShaderVarName (engine->svNameStringSet,
+      "fog fade start");
+    SVNames().fogFadeEnd = CS::ShaderVarName (engine->svNameStringSet,
+      "fog fade end");
+    SVNames().fogLimit = CS::ShaderVarName (engine->svNameStringSet,
+      "fog limit");
     SVNames().fogDensity = CS::ShaderVarName (engine->svNameStringSet,
       "fog density");
   }

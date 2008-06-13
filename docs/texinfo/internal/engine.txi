@@ -67,18 +67,18 @@ mesh objects are not in this list.
 they will be placed into this list.
 
 @item
-@code{regions}: Class @samp{csRegion}, interface @samp{iRegion}.  Regions
-provide a way to organize your objects.  Every object (mesh, factory, material,
-light, sector, etc.) can be placed into a region. Note that a region is not
-a geometrical concept. You can use one region to contain all materials,
-and another to contain all mesh objects, for example. On the other hand, it is
-probably most useful to have regions that represent geometrical areas which
-you can load and unload from the engine (useful for making huge maps).
-
-@item
 @code{textures}: Class @samp{csTextureWrapper}, interface
 @samp{iTextureWrapper}.  A texture is a processed image that can be used by the
 renderer.
+
+@item
+@code{collections}: Class @samp{csCollection}, interface @samp{iCollection}.  Collections
+provide a way to organize your objects.  Every object (mesh, factory, material,
+light, sector, etc.) can be placed into a collection. Note that a collection is not
+a geometrical concept. You can use one collection to contain all materials,
+and another to contain all mesh objects, for example. On the other hand, it is
+probably most useful to have collections that represent geometrical areas which
+you can load and unload from the engine (useful for making huge maps).
 
 @item
 @code{materials}: Class @samp{csMaterialWrapper}, interface
@@ -359,15 +359,15 @@ points is deleted.)
 Several imposter variables: not yet implemented.
 @end itemize
 
-@subheading Engine Data Structures: csRegion
+@subheading Engine Data Structures: csCollection
 
-A region is a collection of objects.  It utilizes @samp{csObject} to hold all
-objects that are in the region.  The region class implements the following
+A collection is a group of iObjects.  It utilizes @samp{csObject} to hold all
+objects that are in the collection.  The collection class implements the following
 interfaces:
 
 @itemize @bullet
 @item
-@code{iRegion}: The main entry point for the region.
+@code{iCollection}: The main entry point for the collection.
 @item
 @code{iObject}: Allows attachment of game-specific data.
 @end itemize

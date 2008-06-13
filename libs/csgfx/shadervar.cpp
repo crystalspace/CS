@@ -31,8 +31,8 @@ CS_IMPLEMENT_STATIC_CLASSVAR (csShaderVariable, arrayAlloc,
 
 
 csShaderVariable::csShaderVariable () :
-  csRefCount (), Name (csInvalidStringID), Type (UNKNOWN), VectorValue (0),
-  accessorData (0)
+  csRefCount (), Name (CS::InvalidShaderVarStringID), Type (UNKNOWN),
+  VectorValue (0), accessorData (0)
 {
   // Zero out the data as good as we can
   Int = 0;

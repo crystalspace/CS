@@ -45,7 +45,6 @@ class csPixmap;
 class csWireFrameCam;
 class InfiniteMaze;
 struct iEngine;
-struct iRegion;
 struct iCollideSystem;
 struct iObjectRegistry;
 struct iPluginManager;
@@ -490,7 +489,7 @@ public:
   virtual void DrawFullScreenFX2D (csTicks elapsed_time, csTicks current_time);
 
   /// Load all the graphics libraries needed
-  virtual void LoadLibraryData (iRegion* region);
+  virtual void LoadLibraryData (iCollection* collection);
   virtual void Inititalize2DTextures ();
   virtual void Create2DSprites ();
 
@@ -503,7 +502,7 @@ public:
   void Help ();
 
   /// Inits all the collision detection stuff
-  virtual void InitCollDet (iEngine* engine, iRegion* region);
+  virtual void InitCollDet (iEngine* engine, iCollection* collection);
 
   /// Destroys all the collision detection stuff
   virtual void EndEngine();

@@ -50,7 +50,6 @@ struct iMeshWrapper;
 struct iObjectRegistry;
 struct iObjectRegistry;
 struct iPluginManager;
-struct iRegion;
 struct iSector;
 struct iTextureManager;
 struct iThingFactoryState;

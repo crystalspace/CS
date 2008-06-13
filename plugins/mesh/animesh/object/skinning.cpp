@@ -30,6 +30,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 {
   typedef csVertexListWalker<float, csVector3> MorphTargetOffsetsWalker;
   
+#include "csutil/custom_new_disable.h"
+
   void AnimeshObject::SkinVertices ()
   {
     if (!skeleton)
@@ -123,6 +125,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       morphWalkers[m].~MorphTargetOffsetsWalker();
     }
   }
+
+#include "csutil/custom_new_enable.h"
 
 
   void AnimeshObject::SkinNormals ()
