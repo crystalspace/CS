@@ -51,8 +51,8 @@ private:
   /// context size at the time the clipper was created
   int OldWidth, OldHeight;
 
-  /// the camera
-  csRef<iCamera> Camera;
+  /// the Perspective camera
+  csRef<iPerspectiveCamera> Camera;
 
   /// Rect clipping region (0 if this is a polygon-based clipper)
   csBox2* RectView;
@@ -79,8 +79,12 @@ public:
   /// Set engine handle.
   virtual void SetEngine (iEngine* e);
 
+  /// Get current perspective camera.
+  virtual iPerspectiveCamera* GetPerspectiveCamera ();
   /// Get current camera.
   virtual iCamera* GetCamera ();
+  /// Set current perspective camera.
+  virtual void SetPerspectiveCamera (iPerspectiveCamera* c);
   /// Set current camera.
   virtual void SetCamera (iCamera* c);
 

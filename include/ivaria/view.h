@@ -28,10 +28,11 @@
 #include "cstool/meshfilter.h"
 
 struct iCamera;
+struct iClipper2D;
 struct iEngine;
 struct iGraphics3D;
-struct iClipper2D;
 struct iMeshWrapper;
+struct iPerspectiveCamera;
 
 /**
  * The iView class encapsulates the top-level Crystal Space
@@ -49,15 +50,21 @@ struct iMeshWrapper;
  */
 struct iView : public virtual iBase
 {
-  SCF_INTERFACE(iView, 2,0,1);
+  SCF_INTERFACE(iView, 3,0,0);
   /// Get engine handle.
   virtual iEngine* GetEngine () = 0;
   /// Set engine handle.
   virtual void SetEngine (iEngine* e) = 0;
 
+  /// Get current perspective camera.
+  virtual iPerspectiveCamera* GetPerspectiveCamera () = 0;
   /// Get current camera.
+  CS_DEPRECATED_METHOD_MSG("Use iPerspectiveCamera::GetCamera() instead")
   virtual iCamera* GetCamera () = 0;
+  /// Set current perspective camera.
+  virtual void SetPerspectiveCamera (iPerspectiveCamera* c) = 0;
   /// Set current camera.
+  CS_DEPRECATED_METHOD_MSG("Use iPerspectiveCamera instead")
   virtual void SetCamera (iCamera* c) = 0;
 
   /// Get Context
