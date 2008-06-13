@@ -62,7 +62,7 @@ enum csFogMode
   CS_FOG_MODE_LINEAR,
   CS_FOG_MODE_CRYSTALSPACE,
   CS_FOG_MODE_EXP, // Not implemented
-  CS_FOG_MODE_EXP2, // Not implemented
+  CS_FOG_MODE_EXP2 // Not implemented
 };
 
 /**
