@@ -76,7 +76,6 @@ class csLightPatchPool;
 class csMaterialList;
 class csMeshWrapper;
 class csPolygon3D;
-class csRegion;
 class csRenderView;
 class csSector;
 class csSectorList;

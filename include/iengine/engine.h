@@ -67,7 +67,6 @@ struct iObjectWatcher;
 struct iPerspectiveCamera;
 struct iPortal;
 struct iProgressMeter;
-struct iRegionList;
 struct iRenderLoop;
 struct iRenderLoopManager;
 struct iRenderManager;
@@ -1271,7 +1270,7 @@ struct iEngine : public virtual iBase
    * This will not clear the object but it will remove all references
    * to that object that the engine itself keeps. This function works
    * for: iCameraPosition, iLight, iMaterialWrapper, 
-   * iMeshFactoryWrapper,iMeshWrapper, iRegion, iSector and iTextureWrapper.
+   * iMeshFactoryWrapper,iMeshWrapper, iSector and iTextureWrapper.
    * Note that the object is only removed if the resulting ref count will
    * become zero. So basically this function only releases the references
    * that the engine holds.
