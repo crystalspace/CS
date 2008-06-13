@@ -73,7 +73,7 @@ iPerspectiveCamera *csView::GetPerspectiveCamera ()
 
 void csView::SetPerspectiveCamera (iPerspectiveCamera* c)
 {
-  Camera = scfQueryInterface<iCamera>(c);
+  Camera = scfQueryInterfaceSafe<iCamera>(c);
 }
 
 
