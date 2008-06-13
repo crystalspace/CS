@@ -36,6 +36,8 @@
 class csBox2;
 class csPoly2D;
 
+#include "csutil/deprecated_warn_off.h"
+
 /**
  * The csView class encapsulates the top-level Crystal Space
  * renderer interface. It is basically a camera and a clipper.
@@ -118,5 +120,7 @@ public:
     return meshFilter;
   }
 };
+
+#include "csutil/deprecated_warn_on.h"
 
 #endif // __CS_CSVIEW_H__
