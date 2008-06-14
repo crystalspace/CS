@@ -6165,6 +6165,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetEngine = *cspacec::iView_SetEngine;
 *GetCamera = *cspacec::iView_GetCamera;
 *SetCamera = *cspacec::iView_SetCamera;
+*GetPerspectiveCamera = *cspacec::iView_GetPerspectiveCamera;
+*SetPerspectiveCamera = *cspacec::iView_SetPerspectiveCamera;
 *GetContext = *cspacec::iView_GetContext;
 *SetContext = *cspacec::iView_SetContext;
 *SetRectangle = *cspacec::iView_SetRectangle;
@@ -21494,6 +21496,8 @@ sub DESTROY {
 *SetEngine = *cspacec::csView_SetEngine;
 *GetCamera = *cspacec::csView_GetCamera;
 *SetCamera = *cspacec::csView_SetCamera;
+*GetPerspectiveCamera = *cspacec::csView_GetPerspectiveCamera;
+*SetPerspectiveCamera = *cspacec::csView_SetPerspectiveCamera;
 *GetContext = *cspacec::csView_GetContext;
 *SetContext = *cspacec::csView_SetContext;
 *SetRectangle = *cspacec::csView_SetRectangle;

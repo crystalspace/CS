@@ -234,6 +234,8 @@ class iView(core.iBase):
     def SetEngine(*args): return _ivaria.iView_SetEngine(*args)
     def GetCamera(*args): return _ivaria.iView_GetCamera(*args)
     def SetCamera(*args): return _ivaria.iView_SetCamera(*args)
+    def GetPerspectiveCamera(*args): return _ivaria.iView_GetPerspectiveCamera(*args)
+    def SetPerspectiveCamera(*args): return _ivaria.iView_SetPerspectiveCamera(*args)
     def GetContext(*args): return _ivaria.iView_GetContext(*args)
     def SetContext(*args): return _ivaria.iView_SetContext(*args)
     def SetRectangle(*args): return _ivaria.iView_SetRectangle(*args)

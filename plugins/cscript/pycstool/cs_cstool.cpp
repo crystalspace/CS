@@ -6934,6 +6934,58 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csView_GetPerspectiveCamera(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csView *arg1 = (csView *) 0 ;
+  iPerspectiveCamera *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csView_GetPerspectiveCamera",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csView, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csView_GetPerspectiveCamera" "', argument " "1"" of type '" "csView *""'"); 
+  }
+  arg1 = reinterpret_cast< csView * >(argp1);
+  result = (iPerspectiveCamera *)(arg1)->GetPerspectiveCamera();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iPerspectiveCamera, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csView_SetPerspectiveCamera(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csView *arg1 = (csView *) 0 ;
+  iPerspectiveCamera *arg2 = (iPerspectiveCamera *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csView_SetPerspectiveCamera",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csView, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csView_SetPerspectiveCamera" "', argument " "1"" of type '" "csView *""'"); 
+  }
+  arg1 = reinterpret_cast< csView * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iPerspectiveCamera, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csView_SetPerspectiveCamera" "', argument " "2"" of type '" "iPerspectiveCamera *""'"); 
+  }
+  arg2 = reinterpret_cast< iPerspectiveCamera * >(argp2);
+  (arg1)->SetPerspectiveCamera(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_csView_GetContext(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csView *arg1 = (csView *) 0 ;
@@ -18008,6 +18060,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csView_SetEngine", _wrap_csView_SetEngine, METH_VARARGS, NULL},
 	 { (char *)"csView_GetCamera", _wrap_csView_GetCamera, METH_VARARGS, NULL},
 	 { (char *)"csView_SetCamera", _wrap_csView_SetCamera, METH_VARARGS, NULL},
+	 { (char *)"csView_GetPerspectiveCamera", _wrap_csView_GetPerspectiveCamera, METH_VARARGS, NULL},
+	 { (char *)"csView_SetPerspectiveCamera", _wrap_csView_SetPerspectiveCamera, METH_VARARGS, NULL},
 	 { (char *)"csView_GetContext", _wrap_csView_GetContext, METH_VARARGS, NULL},
 	 { (char *)"csView_SetContext", _wrap_csView_SetContext, METH_VARARGS, NULL},
 	 { (char *)"csView_SetRectangle", _wrap_csView_SetRectangle, METH_VARARGS, NULL},
@@ -19183,7 +19237,6 @@ static swig_type_info _swigt__p_iDynamicsCollisionCallback = {"_p_iDynamicsColli
 static swig_type_info _swigt__p_iDynamicsColliderCollisionCallback = {"_p_iDynamicsColliderCollisionCallback", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iODEFrameUpdateCallback = {"_p_iODEFrameUpdateCallback", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iVisibilityObject = {"_p_iVisibilityObject", 0, 0, 0, 0, 0};
-static swig_type_info _swigt__p_iPerspectiveCamera = {"_p_iPerspectiveCamera", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iCommandLineParser = {"_p_iCommandLineParser", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iBugPlug = {"_p_iBugPlug", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iMeshFactoryList = {"_p_iMeshFactoryList", 0, 0, 0, 0, 0};
@@ -19276,6 +19329,7 @@ static swig_type_info _swigt__p_iMeshWrapper = {"_p_iMeshWrapper", "iMeshWrapper
 static swig_type_info _swigt__p_iObject = {"_p_iObject", "iObject *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iObjectRegistry = {"_p_iObjectRegistry", "iObjectRegistry *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iPen = {"_p_iPen", "iPen *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_iPerspectiveCamera = {"_p_iPerspectiveCamera", "iPerspectiveCamera *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iProcTexCallback = {"_p_iProcTexCallback", "iProcTexCallback *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iProcTexture = {"_p_iProcTexture", "iProcTexture *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iSCF = {"_p_iSCF", "iSCF *", 0, 0, (void*)0, 0};
@@ -19766,7 +19820,6 @@ static swig_cast_info _swigc__p_iDynamicsCollisionCallback[] = {{&_swigt__p_iDyn
 static swig_cast_info _swigc__p_iDynamicsColliderCollisionCallback[] = {{&_swigt__p_iDynamicsColliderCollisionCallback, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iODEFrameUpdateCallback[] = {{&_swigt__p_iODEFrameUpdateCallback, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iVisibilityObject[] = {{&_swigt__p_iVisibilityObject, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_iPerspectiveCamera[] = {{&_swigt__p_iPerspectiveCamera, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iCommandLineParser[] = {{&_swigt__p_iCommandLineParser, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iBugPlug[] = {{&_swigt__p_iBugPlug, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iMeshFactoryList[] = {{&_swigt__p_iMeshFactoryList, 0, 0, 0},{0, 0, 0, 0}};
@@ -19860,6 +19913,7 @@ static swig_cast_info _swigc__p_iMeshWrapper[] = {  {&_swigt__p_iMeshWrapper, 0,
 static swig_cast_info _swigc__p_iObject[] = {  {&_swigt__p_csProcAnimated, _p_csProcAnimatedTo_p_iObject, 0, 0},  {&_swigt__p_scfImplementationExt1TcsPath_csObject_iPath_t, _p_scfImplementationExt1TcsPath_csObject_iPath_tTo_p_iObject, 0, 0},  {&_swigt__p_iObject, 0, 0, 0},  {&_swigt__p_csObject, _p_csObjectTo_p_iObject, 0, 0},  {&_swigt__p_csColliderWrapper, _p_csColliderWrapperTo_p_iObject, 0, 0},  {&_swigt__p_scfImplementationExt1TcsColliderWrapper_csObject_scfFakeInterfaceTcsColliderWrapper_t_t, _p_scfImplementationExt1TcsColliderWrapper_csObject_scfFakeInterfaceTcsColliderWrapper_t_tTo_p_iObject, 0, 0},  {&_swigt__p_csProcTexture, _p_csProcTextureTo_p_iObject, 0, 0},  {&_swigt__p_scfImplementationExt2TcsProcTexture_csObject_iTextureWrapper_iProcTexture_t, _p_scfImplementationExt2TcsProcTexture_csObject_iTextureWrapper_iProcTexture_tTo_p_iObject, 0, 0},  {&_swigt__p_scfImplementation1TcsObject_iObject_t, _p_scfImplementation1TcsObject_iObject_tTo_p_iObject, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iObjectRegistry[] = {  {&_swigt__p_iObjectRegistry, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iPen[] = {  {&_swigt__p_csMemoryPen, _p_csMemoryPenTo_p_iPen, 0, 0},  {&_swigt__p_iPen, 0, 0, 0},  {&_swigt__p_csPen, _p_csPenTo_p_iPen, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_iPerspectiveCamera[] = {  {&_swigt__p_iPerspectiveCamera, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iProcTexCallback[] = {  {&_swigt__p_iProcTexCallback, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iProcTexture[] = {  {&_swigt__p_csProcAnimated, _p_csProcAnimatedTo_p_iProcTexture, 0, 0},  {&_swigt__p_iProcTexture, 0, 0, 0},  {&_swigt__p_csProcTexture, _p_csProcTextureTo_p_iProcTexture, 0, 0},  {&_swigt__p_scfImplementationExt2TcsProcTexture_csObject_iTextureWrapper_iProcTexture_t, _p_scfImplementationExt2TcsProcTexture_csObject_iTextureWrapper_iProcTexture_tTo_p_iProcTexture, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iSCF[] = {  {&_swigt__p_iSCF, 0, 0, 0},{0, 0, 0, 0}};

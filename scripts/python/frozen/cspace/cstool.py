@@ -209,6 +209,8 @@ class csView(scfView):
     def SetEngine(*args): return _cstool.csView_SetEngine(*args)
     def GetCamera(*args): return _cstool.csView_GetCamera(*args)
     def SetCamera(*args): return _cstool.csView_SetCamera(*args)
+    def GetPerspectiveCamera(*args): return _cstool.csView_GetPerspectiveCamera(*args)
+    def SetPerspectiveCamera(*args): return _cstool.csView_SetPerspectiveCamera(*args)
     def GetContext(*args): return _cstool.csView_GetContext(*args)
     def SetContext(*args): return _cstool.csView_SetContext(*args)
     def SetRectangle(*args): return _cstool.csView_SetRectangle(*args)
