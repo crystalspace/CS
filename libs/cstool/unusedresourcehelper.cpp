@@ -35,13 +35,13 @@ namespace CS
       {
         static inline void UnloadHelper(iObject* object, iEngine* engine)
         {
-          csObject* obj = (csObject*)object;
+          csWeakRef<csObject> obj = (csObject*)object;
 
           size_t realRefCount = obj->GetRefCount() - obj->GetInternalRefCount();
           if(realRefCount == 1)
           {
             csRef<iCollectionArray> colArr = engine->GetCollections();
-            for(size_t i=0; i<colArr->GetSize(); i++)
+            for(size_t i=0; i<colArr->GetSize() && obj.IsValid(); i++)
             {
               colArr->Get(i)->Remove(object);
             }
