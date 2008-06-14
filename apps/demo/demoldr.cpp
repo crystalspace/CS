@@ -395,7 +395,7 @@ void DemoSequenceLoader::LoadSequences (iDocumentNode* node)
     {
       case XMLTOKEN_PATH:
       {
-	csNamedPath* p = LoadPath (child, child->GetAttributeValue ("name"));
+	csPath* p = LoadPath (child, child->GetAttributeValue ("name"));
 	demoseq->RegisterPath (p);
         break;
       }
@@ -486,10 +486,10 @@ bool DemoSequenceLoader::ParseVectorList (iDocumentNode* node,
   return true;
 }
 
-csNamedPath* DemoSequenceLoader::LoadPath (iDocumentNode* node,
+csPath* DemoSequenceLoader::LoadPath (iDocumentNode* node,
 	const char* pName)
 {
-  csNamedPath* np = 0;
+  csPath* np = 0;
 
   int seq = 0;
   int num = 0;
@@ -545,7 +545,8 @@ csNamedPath* DemoSequenceLoader::LoadPath (iDocumentNode* node,
 	}
 	seq++;
 	num = child->GetContentsValueAsInt ();
-	np = new csNamedPath (num, pName);
+	np = new csPath (num);
+	np->SetName(pName);
 	break;
       }
       case XMLTOKEN_SPEED:

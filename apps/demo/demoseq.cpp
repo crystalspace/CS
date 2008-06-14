@@ -216,7 +216,7 @@ void DemoSequenceManager::SetupFade (float start_fade, float end_fade,
   }
 }
 
-void DemoSequenceManager::ReplacePathObject (csNamedPath* path,
+void DemoSequenceManager::ReplacePathObject (csPath* path,
 	iMeshWrapper* mesh)
 {
   size_t i;
@@ -231,7 +231,7 @@ void DemoSequenceManager::ReplacePathObject (csNamedPath* path,
   }
 }
 
-void DemoSequenceManager::SetupPath (csNamedPath* path,
+void DemoSequenceManager::SetupPath (csPath* path,
 	iMeshWrapper* mesh,
 	csTicks total_path_time,
   	csTicks already_elapsed)
@@ -367,7 +367,7 @@ void DemoSequenceManager::DebugPositionObjects (iCamera* camera,
   }
 }
 
-void DemoSequenceManager::DebugDrawPath (csNamedPath* np, bool hi,
+void DemoSequenceManager::DebugDrawPath (csPath* np, bool hi,
 	const csVector2& tl, const csVector2& br, int selpoint)
 {
   int dim = demo->myG2D->GetHeight ()-10;
@@ -472,7 +472,7 @@ void DemoSequenceManager::DebugDrawPaths (iCamera* camera,
   // Get the current selected path.
   //=====
   csTicks start = 0, total = 0, seltime = 0;
-  csNamedPath* selnp = 0;
+  csPath* selnp = 0;
   if (hilight) selnp = GetSelectedPath (hilight, start, total);
   if (selnp)
   {
@@ -557,7 +557,7 @@ void DemoSequenceManager::SelectLastPath (char* hilight)
 
 void DemoSequenceManager::SelectPreviousPath (char* hilight)
 {
-  csNamedPath* np = GetSelectedPath (hilight);
+  csPath* np = GetSelectedPath (hilight);
   if (!np)
   {
     SelectLastPath (hilight);
@@ -586,7 +586,7 @@ void DemoSequenceManager::SelectPreviousPath (char* hilight)
 
 void DemoSequenceManager::SelectNextPath (char* hilight)
 {
-  csNamedPath* np = GetSelectedPath (hilight);
+  csPath* np = GetSelectedPath (hilight);
   if (!np)
   {
     SelectFirstPath (hilight);
@@ -611,13 +611,13 @@ void DemoSequenceManager::SelectNextPath (char* hilight)
   return;
 }
 
-csNamedPath* DemoSequenceManager::GetSelectedPath (const char* hilight)
+csPath* DemoSequenceManager::GetSelectedPath (const char* hilight)
 {
   csTicks s, t;
   return GetSelectedPath (hilight, s, t);
 }
 
-csNamedPath* DemoSequenceManager::GetSelectedPath (const char* hilight,
+csPath* DemoSequenceManager::GetSelectedPath (const char* hilight,
 	csTicks& start, csTicks& total)
 {
   size_t i = 0;
@@ -625,7 +625,7 @@ csNamedPath* DemoSequenceManager::GetSelectedPath (const char* hilight,
   while (i < len)
   {
     PathForMesh* pfm = pathForMesh[i];
-    csNamedPath* np = pfm->path;
+    csPath* np = pfm->path;
     bool hi = (hilight && !strcmp (np->GetName (), hilight));
     if (hi)
     {

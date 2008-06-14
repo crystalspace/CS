@@ -520,7 +520,7 @@ void Demo::SetupFrame ()
   {
     csTicks debug_time;
     csTicks start, total;
-    csNamedPath* np = seqmgr->GetSelectedPath (map_selpath, start, total);
+    csPath* np = seqmgr->GetSelectedPath (map_selpath, start, total);
     if (np)
     {
       float r = np->GetTime (map_selpoint);
@@ -534,7 +534,7 @@ void Demo::SetupFrame ()
 
   if (map_enabled == MAP_EDIT_FORWARD)
   {
-    csNamedPath* np = seqmgr->GetSelectedPath (map_selpath);
+    csPath* np = seqmgr->GetSelectedPath (map_selpath);
     if (np)
     {
       float r = np->GetTime (map_selpoint);
@@ -623,7 +623,7 @@ void Demo::DrawEditInfo ()
   myG2D->DrawBox (dim+5, 0, myG2D->GetWidth ()-dim-5,
   	myG2D->GetHeight (), col_white);
   csTicks start, total;
-  csNamedPath* np = seqmgr->GetSelectedPath (map_selpath, start, total);
+  csPath* np = seqmgr->GetSelectedPath (map_selpath, start, total);
   if (np)
   {
     int ww = dim+10;
@@ -710,7 +710,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
       //==============================
       // Handle keys in path_edit_forward mode.
       //==============================
-      csNamedPath* np = seqmgr->GetSelectedPath (map_selpath);
+      csPath* np = seqmgr->GetSelectedPath (map_selpath);
       if (np)
       {
         float dx = map_br.x - map_tl.x;
@@ -898,7 +898,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
       //==============================
       // Handle keys in path editing mode.
       //==============================
-      csNamedPath* np = seqmgr->GetSelectedPath (map_selpath);
+      csPath* np = seqmgr->GetSelectedPath (map_selpath);
       float dx = map_br.x - map_tl.x;
       float dy = map_br.y - map_tl.y;
       float speed;
@@ -1292,7 +1292,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
       csVector3 vw = view->GetCamera ()->GetTransform ().This2Other (v);
       if (map_enabled == MAP_EDIT_FORWARD)
       {
-        csNamedPath* np = seqmgr->GetSelectedPath (map_selpath);
+        csPath* np = seqmgr->GetSelectedPath (map_selpath);
 	if (np)
 	{
 	  vw -= view->GetCamera ()->GetTransform ().GetOrigin ();
