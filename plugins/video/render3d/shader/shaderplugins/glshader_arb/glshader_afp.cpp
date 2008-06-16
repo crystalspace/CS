@@ -60,7 +60,7 @@ void csShaderGLAFP::Deactivate()
 
 void csShaderGLAFP::SetupState (const CS::Graphics::RenderMesh* /*mesh*/, 
                                 CS::Graphics::RenderMeshModes& /*modes*/,
-	                        const iShaderVarStack* stacks)
+	                        const csShaderVariableStack& stack)
 {
   size_t i;
   const csGLExtensionManager* ext = shaderPlug->ext;
@@ -71,7 +71,7 @@ void csShaderGLAFP::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
   {
     VariableMapEntry& mapping = variablemap[i];
 
-    var = csGetShaderVariableFromStack (stacks, mapping.name);
+    var = csGetShaderVariableFromStack (stack, mapping.name);
     if (!var.IsValid ())
       var = mapping.mappingParam.var;
 

@@ -88,8 +88,6 @@ public:
  */
 class csRenderContext
 {
-  friend class csRenderView;
-
 public:
   /// A pointer back to the previous render context.
   csRenderContext* previous;
@@ -180,7 +178,7 @@ public:
  */
 struct iRenderView : public virtual iBase
 {
-  SCF_INTERFACE(iRenderView, 2,1,0);
+  SCF_INTERFACE(iRenderView, 2,2,0);
   /// Get the current render context.
   virtual csRenderContext* GetRenderContext () = 0;
 
@@ -190,7 +188,11 @@ struct iRenderView : public virtual iBase
   virtual iGraphics2D* GetGraphics2D () = 0;
   /// Get the 3D graphics subsystem.
   virtual iGraphics3D* GetGraphics3D () = 0;
-  /// Get the frustum.
+  /**
+   * Get the frustum.
+   * \deprecated Deprecated in 1.3. Use visible volume from camera
+   */
+  CS_DEPRECATED_METHOD_MSG("Use visible volume from camera")
   virtual void GetFrustum (float& lx, float& rx, float& ty, float& by) = 0;
 
   //-----------------------------------------------------------------
@@ -230,6 +232,26 @@ struct iRenderView : public virtual iBase
    * Get the number of the current frame.
    */
   virtual uint GetCurrentFrameNumber () const = 0;
+
+  /**
+   * Create a new render context. This is typically used
+   * when going through a portal. Note that you should remember
+   * the old render context if you want to restore it later.
+   * The render context will get all the values from the current context
+   * (with SCF references properly incremented).
+   */
+  virtual void CreateRenderContext () = 0;
+  /**
+   * Restore a render context. Use this to restore a previously overwritten
+   * render context. This function will take care of properly cleaning
+   * up the current render context.
+   */
+  virtual void RestoreRenderContext () = 0;
+
+  /**
+   * Destroy a specific render context (and unlink it from the previous-links)
+   */
+  virtual void DestroyRenderContext (csRenderContext* context) = 0;
 };
 
 /** @} */

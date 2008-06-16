@@ -227,7 +227,7 @@ csFullScreenQuadRenderStep::csFullScreenQuadRenderStep (
   csRef<iGraphics3D> g3d = 
     csQueryRegistry<iGraphics3D> (object_reg);
   csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> 
-    (object_reg, "crystalspace.shared.stringset");
+    (object_reg, "crystalspace.shader.variablenameset");
   csFullScreenQuadRenderStep::object_reg = object_reg;
 
   engine = csQueryRegistry<iEngine> (object_reg);
@@ -251,7 +251,7 @@ csFullScreenQuadRenderStep::~csFullScreenQuadRenderStep ()
 }
 
 void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* /*sector*/,
-  iShaderVarStack* /*stacks*/)
+  csShaderVariableStack& /*stacks*/)
 {
   csRef<iGraphics3D> g3d = rview->GetGraphics3D();
   if (!shaderMgr.IsValid())

@@ -666,7 +666,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     if (col_set)
     {
       csShaderVariable* flatSV = material->GetVariableAdd (
-        stringSet->Request (CS_MATERIAL_VARNAME_FLATCOLOR));
+        stringSetSvName->Request (CS_MATERIAL_VARNAME_FLATCOLOR));
       flatSV->SetValue (col);
     }
 

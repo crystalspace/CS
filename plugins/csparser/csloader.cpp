@@ -1104,51 +1104,51 @@ csLoadResult csLoader::Load (iDataBuffer* buffer, const char* fname,
 }
 
 csLoadResult csLoader::Load (const char* fname, iRegion* region,
-  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-	const char* override_name, iMissingLoaderData* missingdata)
+       bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+       const char* override_name, iMissingLoaderData* missingdata)
 {
   csRef<iDataBuffer> buf = VFS->ReadFile (fname);
 
   if (!buf)
   {
     ReportError (
-	      "crystalspace.maploader.parse",
-    	      "Could not open map file '%s' on VFS!", fname);
+             "crystalspace.maploader.parse",
+             "Could not open map file '%s' on VFS!", fname);
     csLoadResult rc;
     rc.success = false;
     rc.result = 0;
     return rc;
-  }
+ }
   
   return Load (buf, fname, region, curRegOnly, checkDupes, ssource,
-  	override_name, missingdata);
+       override_name, missingdata);
 }
 
 csLoadResult csLoader::Load (iDataBuffer* buffer, iRegion* region,
-  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-	const char* override_name, iMissingLoaderData* missingdata)
+       bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+       const char* override_name, iMissingLoaderData* missingdata)
 {
   return Load (buffer, 0, region, curRegOnly, checkDupes, ssource,
-  	override_name, missingdata);
+       override_name, missingdata);
 }
 
 csLoadResult csLoader::Load (iDocumentNode* node, iRegion* region,
-  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-	const char* override_name, iMissingLoaderData* missingdata)
+       bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+       const char* override_name, iMissingLoaderData* missingdata)
 {
   csLoadResult rc;
   rc.success = false;
   rc.result = 0;
 
   csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-	new StdLoaderContext (Engine, region, curRegOnly, this, checkDupes,
-	  missingdata));
+       new StdLoaderContext (Engine, region, curRegOnly, this, checkDupes,
+         missingdata));
 
   csRef<iDocumentNode> meshfactnode = node->GetNode ("meshfact");
   if (meshfactnode)
   {
     const char* meshfactname = override_name ? override_name :
-    	meshfactnode->GetAttributeValue ("name");
+       meshfactnode->GetAttributeValue ("name");
     if (ldr_context->CheckDupes () && meshfactname)
     {
       iMeshFactoryWrapper* mfw = Engine->FindMeshFactory (meshfactname);
@@ -1182,7 +1182,7 @@ csLoadResult csLoader::Load (iDocumentNode* node, iRegion* region,
   if (meshobjnode)
   {
     const char* meshobjname = override_name ? override_name :
-    	meshobjnode->GetAttributeValue ("name");
+       meshobjnode->GetAttributeValue ("name");
     if (ldr_context->CheckDupes () && meshobjname)
     {
       iMeshWrapper* mw = Engine->FindMeshObject (meshobjname);
@@ -1231,7 +1231,7 @@ csLoadResult csLoader::Load (iDocumentNode* node, iRegion* region,
   if (portalsnode)
   {
     const char* portalsname = override_name ? override_name :
-    	portalsnode->GetAttributeValue ("name");
+       portalsnode->GetAttributeValue ("name");
     if (ldr_context->CheckDupes () && portalsname)
     {
       iMeshWrapper* mw = Engine->FindMeshObject (portalsname);
@@ -1274,7 +1274,7 @@ csLoadResult csLoader::Load (iDocumentNode* node, iRegion* region,
   if (lightnode)
   {
     const char* lightname = override_name ? override_name :
-    	lightnode->GetAttributeValue ("name");
+       lightnode->GetAttributeValue ("name");
     iLight* light = ParseStatlight (ldr_context, lightnode);
     if (light)
     {
@@ -1284,9 +1284,9 @@ csLoadResult csLoader::Load (iDocumentNode* node, iRegion* region,
       return rc;
     }
 
-    rc.result = 0;
+   rc.result = 0;
     rc.success = false;
-    return rc;
+   return rc;
   }
 
   ReportError ("crystalspace.maploader.parse",
@@ -1424,12 +1424,12 @@ bool csLoader::LoadMapLibraryFile (const char* fname, iRegion* region,
 }
 
 bool csLoader::LoadLibrary (iDocumentNode* lib_node, iRegion* region,
-	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-	iMissingLoaderData* missingdata)
+       bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+       iMissingLoaderData* missingdata)
 {
   csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-	new StdLoaderContext (Engine, region, curRegOnly, this, checkDupes,
-	  missingdata));
+       new StdLoaderContext (Engine, region, curRegOnly, this, checkDupes,
+         missingdata));
 
   return LoadLibrary (ldr_context, lib_node, ssource, missingdata, true);
 }
@@ -1648,6 +1648,8 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
 
   stringSet = csQueryRegistryTagInterface<iStringSet> (
     object_reg, "crystalspace.shared.stringset");
+  stringSetSvName = csQueryRegistryTagInterface<iShaderVarStringSet> (
+    object_reg, "crystalspace.shader.variablenameset");
 
   return true;
 }
@@ -2997,6 +2999,12 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
       case XMLTOKEN_NOSHADOWS:
         stemp->GetFlags ().Set (CS_ENTITY_NOSHADOWS, CS_ENTITY_NOSHADOWS);
         break;
+      case XMLTOKEN_NOSHADOWCAST:
+        stemp->GetFlags ().Set (CS_ENTITY_NOSHADOWCAST, CS_ENTITY_NOSHADOWCAST);
+        break;
+      case XMLTOKEN_NOSHADOWRECEIVE:
+        stemp->GetFlags ().Set (CS_ENTITY_NOSHADOWRECEIVE, CS_ENTITY_NOSHADOWRECEIVE);
+        break;
       case XMLTOKEN_NOCLIP:
         stemp->GetFlags ().Set (CS_ENTITY_NOCLIP, CS_ENTITY_NOCLIP);
         break;
@@ -3518,7 +3526,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
         //create a new variable
         const char* varname = child->GetAttributeValue ("name");
 	csRef<csShaderVariable> var;
-	var.AttachNew (new csShaderVariable (stringSet->Request (varname)));
+	var.AttachNew (new csShaderVariable (stringSetSvName->Request (varname)));
 	if (!SyntaxService->ParseShaderVar (ldr_context, child, *var))
         {
 	  SyntaxService->ReportError (
@@ -5155,7 +5163,7 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
 	{
 	  const char* varname = child->GetAttributeValue ("name");
 	  csRef<csShaderVariable> var;
-	  var.AttachNew (new csShaderVariable (stringSet->Request (varname)));
+	  var.AttachNew (new csShaderVariable (stringSetSvName->Request (varname)));
 	  if (!SyntaxService->ParseShaderVar (ldr_context, child, *var))
 	  {
 	    SyntaxService->ReportError (

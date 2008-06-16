@@ -35,6 +35,7 @@
 
 class csPlane3;
 class csSphere;
+class csBox3;
 
 class csReversibleTransform;
 
@@ -199,6 +200,11 @@ public:
   csSphere Other2This (const csSphere& s) const;
 
   /**
+   * Convert a box in 'other' space to 'this' space.
+   */
+  csBox3 Other2This (const csBox3& box) const;
+
+  /**
    * Apply a transformation to a 3D vector. This corresponds exactly
    * to calling t.Other2This (v).
    */
@@ -259,6 +265,27 @@ public:
    * to calling p = t.Other2This(p).
    */
   friend CS_CRYSTALSPACE_EXPORT csSphere& operator*= (csSphere& p, 
+    const csTransform& t);
+
+  /**
+   * Apply a transformation to a box. This corresponds exactly
+   * to calling t.Other2This(p).
+   */
+  friend CS_CRYSTALSPACE_EXPORT csBox3 operator* (const csBox3& p, 
+    const csTransform& t);
+
+  /**
+   * Apply a transformation to a box. This corresponds exactly
+   * to calling t.Other2This(p).
+   */
+  friend CS_CRYSTALSPACE_EXPORT csBox3 operator* (const csTransform& t, 
+    const csBox3& p);
+
+  /**
+   * Apply a transformation to a box. This corresponds exactly
+   * to calling p = t.Other2This(p).
+   */
+  friend CS_CRYSTALSPACE_EXPORT csBox3& operator*= (csBox3& p, 
     const csTransform& t);
 
   /**
@@ -466,6 +493,11 @@ public:
   csSphere This2Other (const csSphere& s) const;
 
   /**
+   * Converts a box in 'this' space to 'other' space.
+   */
+  csBox3 This2Other (const csBox3& box) const;
+
+  /**
    * Rotate the transform by the angle (radians) around the given vector,
    * in other coordinates. Note: this function rotates the transform, not
    * the coordinate system.
@@ -540,6 +572,13 @@ public:
    * calling t.This2Other(p).
    */
   friend CS_CRYSTALSPACE_EXPORT csSphere operator/ (const csSphere& p, 
+    const csReversibleTransform& t);
+
+  /**
+   * Reverse a transformation on a box. This corresponds exactly to
+   * calling t.This2Other(p).
+   */
+  friend CS_CRYSTALSPACE_EXPORT csBox3 operator/ (const csBox3& p, 
     const csReversibleTransform& t);
 
   /**

@@ -304,7 +304,7 @@ namespace lighter
       else
         svName.Format ("tex lightmap dir %d", i);
       csShaderVariable* sv = svc->GetVariable (
-        globalLighter->strings->Request (svName));
+        globalLighter->svStrings->Request (svName));
       if (sv != 0)
       {
         iTextureWrapper* tex;
@@ -391,6 +391,27 @@ namespace lighter
           }
         }
         node->RemoveNode (paramChild);
+      }
+      // Add <staticlit> node
+      bool hasStaticLit = false;
+      {
+        csRef<iDocumentNodeIterator> nodes = node->GetNodes();
+        while (nodes->HasNext())
+        {
+	  csRef<iDocumentNode> child = nodes->Next();
+	  if ((child->GetType() == CS_NODE_ELEMENT)
+	    && (strcmp (child->GetValue(), "staticlit") == 0))
+	  {
+	    hasStaticLit = true;
+	    break;
+	  }
+        }
+        if (!hasStaticLit)
+        {
+	  csRef<iDocumentNode> newNode = node->CreateNodeBefore (
+	    CS_NODE_ELEMENT, 0);
+	  newNode->SetValue ("staticlit");
+        }
       }
     }
   }

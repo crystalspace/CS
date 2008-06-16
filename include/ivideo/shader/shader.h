@@ -31,10 +31,13 @@
 
 #include "csgfx/shadervar.h"
 #include "csutil/array.h"
+#include "csutil/bitarray.h"
 #include "csutil/refarr.h"
 #include "csutil/set.h"
 #include "csutil/strset.h"
+#include "csutil/noncopyable.h"
 
+struct iCacheManager;
 struct iDocumentNode;
 struct iLight;
 struct iObject;
@@ -58,10 +61,136 @@ struct iShaderManager;
  * A "shader variable stack".
  * Stores a list of shader variables, indexed by it's name.
  */
-typedef csArray<csShaderVariable*> csShaderVarStack;
-struct iShaderVarStack : public iArrayChangeAll<csShaderVariable*>
+class csShaderVariableStack
 {
-  SCF_IARRAYCHANGEALL_INTERFACE (iShaderVarStack);
+public:
+  /// Construct an empty stack
+  csShaderVariableStack ()
+    : varArray (0), size (0), ownArray (false)
+  {}
+
+  /**
+   * Copies from another stack.
+   * If the other stack was created from a preallocated array, the new stack
+   * points to that same array. If the other stack used internal storage the
+   * new stack will allocate it's own internal array and copy over the contents.
+   */
+  csShaderVariableStack (const csShaderVariableStack& other)
+    : size (other.size), ownArray (false)
+  {
+    if (other.ownArray)
+    {
+      Setup (size);
+      memcpy (varArray, other.varArray, size * sizeof (csShaderVariable*));
+    }
+    else
+    {
+      varArray = other.varArray;
+    }
+  }
+
+  /// Construct a stack from a preallocated array of shader variables
+  csShaderVariableStack (csShaderVariable** va, size_t size)
+    : varArray (va), size (size), ownArray (false)
+  {}
+  
+  ~csShaderVariableStack ()
+  {
+    if (ownArray)
+      cs_free (varArray);
+  }
+
+  /// Initialize stack internal storage
+  void Setup (size_t size)
+  {
+    if (ownArray)
+      cs_free (varArray);
+
+    csShaderVariableStack::size = size;
+    varArray = 0;
+
+    if (size > 0)
+    {      
+      varArray = (csShaderVariable**)cs_malloc (size * sizeof(csShaderVariable*));
+      ownArray = true;
+
+      memset (varArray, 0, size * sizeof(csShaderVariable*));
+    }
+  }
+
+  /// Initialize stack with external storage
+  void Setup (csShaderVariable** stack, size_t size)
+  {
+    if (ownArray)
+      cs_free (varArray);
+
+    varArray = stack;
+    csShaderVariableStack::size = size;
+    ownArray = false;
+  }
+
+  /// Make a local copy if the array was preallocated.
+  void MakeOwnArray ()
+  {
+    if (ownArray) return;
+    csShaderVariable** newArray =
+      (csShaderVariable**)cs_malloc (size * sizeof(csShaderVariable*));
+    memcpy (newArray, varArray, size * sizeof(csShaderVariable*));
+    varArray = newArray;
+    ownArray = true;
+  }
+
+  /// Get the number of variable slots in the stack
+  inline size_t GetSize () const
+  {
+    return size;
+  }
+
+  /// Access a single element in the stack
+  csShaderVariable*& operator[] (size_t index)
+  {
+    CS_ASSERT(index < size);
+    return varArray[index];
+  }
+
+  csShaderVariable* const& operator[] (size_t index) const
+  {
+    CS_ASSERT(index < size);
+    return varArray[index];
+  }
+
+  /// Clear the current array
+  void Clear ()
+  {
+    if(varArray && size > 0)
+      memset (varArray, 0, sizeof(csShaderVariable*)*size);
+  }
+
+  /// Merge one stack onto the "front" of this one
+  void MergeFront (const csShaderVariableStack& other)
+  {
+    CS_ASSERT(other.size >= size);
+    for (size_t i = 0; i < size; ++i)
+    {
+      if (!varArray[i])
+        varArray[i] = other.varArray[i];
+    }
+  }
+
+  /// Merge one stack onto the "back" of this one
+  void MergeBack (const csShaderVariableStack& other)
+  {
+    CS_ASSERT(other.size >= size);
+    for (size_t i = 0; i < size; ++i)
+    {
+      if (other.varArray[i])
+        varArray[i] = other.varArray[i];
+    }
+  }
+private:
+  csShaderVariable** varArray;
+  size_t size;
+  bool ownArray;
 };
 //@}
 
@@ -69,24 +198,14 @@ struct iShaderVarStack : public iArrayChangeAll<csShaderVariable*>
 /**
  * Helper function to retrieve a single value from a shader variable stack.
  */
-static inline csShaderVariable* csGetShaderVariableFromStack 
-  (const csShaderVarStack& stack, const csStringID &name)
+static inline csShaderVariable* csGetShaderVariableFromStack (
+  const csShaderVariableStack& stack,
+  const CS::ShaderVarStringID &name)
 {
-  if ((name != csInvalidStringID) &&
-      (name < (csStringID)stack.GetSize ()))
+  if ((name != CS::InvalidShaderVarStringID)
+    && (size_t (name) < stack.GetSize ()))
   {
     return stack[name];
-  }
-  return 0;
-}
-static inline csShaderVariable* csGetShaderVariableFromStack 
-  (const iShaderVarStack* stack, const csStringID &name)
-{
-  if ((name != csInvalidStringID) &&
-      (name < (csStringID)stack->GetSize ()))
-  {
-    return static_cast<const iArrayReadOnly<csShaderVariable*>*> (stack)
-      ->Get (name);
   }
   return 0;
 }
@@ -98,7 +217,7 @@ static inline csShaderVariable* csGetShaderVariableFromStack
  */
 struct iShaderVariableContext : public virtual iBase
 {
-  SCF_INTERFACE(iShaderVariableContext, 2, 2, 0);
+  SCF_INTERFACE(iShaderVariableContext, 2, 2, 1);
 
   /**
    * Add a variable to this context
@@ -108,10 +227,10 @@ struct iShaderVariableContext : public virtual iBase
   virtual void AddVariable (csShaderVariable *variable) = 0;
   
   /// Get a named variable from this context
-  virtual csShaderVariable* GetVariable (csStringID name) const = 0;
+  virtual csShaderVariable* GetVariable (CS::ShaderVarStringID name) const = 0;
 
   /// Like GetVariable(), but it also adds it if doesn't exist already.
-  csShaderVariable* GetVariableAdd (csStringID name)
+  csShaderVariable* GetVariableAdd (CS::ShaderVarStringID name)
   {
     csShaderVariable* sv;
     sv = GetVariable (name);
@@ -132,7 +251,7 @@ struct iShaderVariableContext : public virtual iBase
    * Push the variables of this context onto the variable stacks
    * supplied in the "stacks" argument
    */
-  virtual void PushVariables (iShaderVarStack* stacks) const = 0;
+  virtual void PushVariables (csShaderVariableStack& stack) const = 0;  
 
   /// Determine whether this SV context contains any variables at all.
   virtual bool IsEmpty () const = 0;
@@ -152,7 +271,7 @@ struct iShaderVariableContext : public virtual iBase
   virtual bool RemoveVariable (csShaderVariable* variable) = 0;
 
   /// Remove the variable with the given name from this context.
-  virtual bool RemoveVariable (csStringID name) = 0;
+  virtual bool RemoveVariable (CS::ShaderVarStringID name) = 0;
 };
 
 /**
@@ -182,7 +301,7 @@ enum csShaderTagPresence
  */
 struct iShaderManager : public virtual iShaderVariableContext
 {
-  SCF_INTERFACE (iShaderManager, 2, 0, 0);
+  SCF_INTERFACE (iShaderManager, 2, 1, 1);
   /**
    * Register a shader to the shadermanager.
    * Compiler should register all shaders
@@ -224,7 +343,7 @@ struct iShaderManager : public virtual iShaderVariableContext
   virtual void UnregisterShaderVariableAcessors () = 0;
 
   /// Get the shadervariablestack used to handle shadervariables on rendering
-  virtual iShaderVarStack* GetShaderVariableStack () = 0;
+  virtual csShaderVariableStack& GetShaderVariableStack () = 0;
 
   /**
    * Set a technique tag's options.
@@ -259,6 +378,13 @@ struct iShaderManager : public virtual iShaderVariableContext
    * Get the list of active lights. 
    */
   virtual const csArray<iLight*>& GetActiveLights () const = 0;
+
+  /**
+   * Get the stringset used for shader variable names
+   */
+  virtual iShaderVarStringSet* GetSVNameStringset () const = 0;
+  
+  virtual iCacheManager* GetShaderCache() = 0;
 };
 
 /**
@@ -271,7 +397,7 @@ struct iShaderManager : public virtual iShaderVariableContext
 struct csShaderMetadata
 {
   /// Descriptive string
-  char *description;
+  const char *description;
 
   /**
    * Number of lights this shader can process in a pass. 
@@ -292,7 +418,7 @@ struct csShaderMetadata
  */
 struct iShader : public virtual iShaderVariableContext
 {
-  SCF_INTERFACE(iShader, 3, 1, 0);
+  SCF_INTERFACE(iShader, 3, 2, 2);
 
   /// Query the object.
   virtual iObject* QueryObject () = 0;
@@ -314,7 +440,7 @@ struct iShader : public virtual iShaderVariableContext
    * by the "ticket".
    */
   virtual size_t GetTicket (const CS::Graphics::RenderMeshModes& modes,
-    const iShaderVarStack* stacks) = 0;
+    const csShaderVariableStack& stack) = 0;
 
   /// Get number of passes this shader have
   virtual size_t GetNumberOfPasses (size_t ticket) = 0;
@@ -325,7 +451,7 @@ struct iShader : public virtual iShaderVariableContext
   /// Setup a pass
   virtual bool SetupPass (size_t ticket, const CS::Graphics::RenderMesh *mesh,
     CS::Graphics::RenderMeshModes& modes,
-    const iShaderVarStack* stacks) = 0;
+    const csShaderVariableStack& stack) = 0;
 
   /**
    * Tear down current state, and prepare for a new mesh 
@@ -336,8 +462,36 @@ struct iShader : public virtual iShaderVariableContext
   /// Completly deactivate a pass
   virtual bool DeactivatePass (size_t ticket) = 0;
 
-  /// Get shader metadata
+  /** 
+   * Get shader metadata
+   * \deprecated Deprecated in 1.3. Metadata is now same for all tickets
+   */
+  CS_DEPRECATED_METHOD_MSG("Metadata is now same for all tickets")
   virtual const csShaderMetadata& GetMetadata (size_t ticket) const = 0;
+  
+  /**
+   * Request all shader variables used by a certain shader ticket.
+   * \param ticket The ticket for which to retrieve the information.
+   * \param bits Bit array with one bit for each shader variable set; if a 
+   *   shader variable is used, the bit corresponding to the name of the
+   *   variable is note set. Please note: first, the array passed in must 
+   *   initially have enough bits for all possible shader variables, it will 
+   *   not be resized - thus a good size would be the number of strings in the
+   *   shader variable string set. Second, bits corresponding to unused
+   *   shader variables will not be reset. It is the responsibility of the 
+   *   caller to do so.
+   */
+  virtual void GetUsedShaderVars (size_t ticket, csBitArray& bits) const = 0;
+  
+  /// Get shader metadata
+  virtual const csShaderMetadata& GetMetadata () const = 0;
+
+  /**
+   * Push the variables of this shader onto the variable stack
+   * supplied in the "stack" argument
+   */
+  virtual void PushShaderVariables (csShaderVariableStack& stack,
+    size_t ticket) const = 0;  
 };
 
 

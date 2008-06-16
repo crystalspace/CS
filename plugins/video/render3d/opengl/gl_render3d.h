@@ -178,6 +178,9 @@ public:
     csVector2 *iVertices, size_t iVertCount);
 };
 
+// To silence EnableZOffset/DisableZOffset
+#include "csutil/deprecated_warn_off.h"
+
 class csGLGraphics3D : public scfImplementation3<csGLGraphics3D, 
 						 iGraphics3D,
 						 iComponent,
@@ -200,7 +203,6 @@ private:
   csEventID SystemOpen;
   csEventID SystemClose;
   csEventID CanvasResize;
-  csEventID Frame;
 
   csWeakRef<iBugPlug> bugplug;
 
@@ -219,6 +221,9 @@ private:
   float fov;
   int scrwidth, scrheight;
   int viewwidth, viewheight;
+  CS::Math::Matrix4 projectionMatrix;
+  bool explicitProjection, needMatrixUpdate;
+  
   bool needViewportUpdate;
   csPoly3D frustum;
   bool frustum_valid;
@@ -274,17 +279,17 @@ private:
   csGraphics3DCaps rendercaps;
   GLint maxNpotsTexSize;
 
-  csRef<iStringSet> strings;
+  csRef<iShaderVarStringSet> strings;
 
-  csStringID string_vertices;
-  csStringID string_texture_coordinates;
-  csStringID string_normals;
-  csStringID string_colors;
-  csStringID string_indices;
-  csStringID string_point_radius;
-  csStringID string_point_scale;
-  csStringID string_texture_diffuse;
-  csStringID string_world2camera;
+  CS::ShaderVarStringID string_vertices;
+  CS::ShaderVarStringID string_texture_coordinates;
+  CS::ShaderVarStringID string_normals;
+  CS::ShaderVarStringID string_colors;
+  CS::ShaderVarStringID string_indices;
+  CS::ShaderVarStringID string_point_radius;
+  CS::ShaderVarStringID string_point_scale;
+  CS::ShaderVarStringID string_texture_diffuse;
+  CS::ShaderVarStringID string_world2camera;
 
   csConfigAccess config;
 
@@ -333,6 +338,7 @@ private:
   // For debugging: inhibit all drawing of meshes till next frame.
   bool debug_inhibit_draw;
 
+  int rt_subtex;
   csGLRender2TextureBackend* r2tbackend;
 
   /// Should we use special buffertype (VBO) or just system memory
@@ -365,12 +371,11 @@ private:
   // @@@ Jorrit: to avoid flickering I had to increase the
   // values below and multiply them with 3.
   //{ glPolygonOffset (-0.05f, -2.0f); 
-  { glPolygonOffset (0.15f, 6.0f); 
-  statecache->Enable_GL_POLYGON_OFFSET_FILL (); }
+  {  }
 
   // Disables offsetting of Z values
   void DisableZOffset ()
-  { statecache->Disable_GL_POLYGON_OFFSET_FILL (); }
+  { }
 
   // Debug function to visualize the stencil with the given mask.
   void DebugVisualizeStencil (uint32 mask);
@@ -419,19 +424,14 @@ private:
 
   struct ImageUnit : public CS::Memory::CustomAllocated
   {
-    bool enabled;
-    GLuint target;
+    GLuint target;    
+    csGLBasicTextureHandle* texture;
     
-    csRef<csGLBasicTextureHandle> needNPOTSfixup;
-    bool npotsStatus;
-    
-    ImageUnit (): enabled (false), target (0), npotsStatus (false) {}
+    ImageUnit (): target (0) {}
   };
   GLint numImageUnits;
   ImageUnit* imageUnits;
   GLint numTCUnits;
-  /// Array of buffers used for NPOTS texture coord fixup
-  csArray<csRef<iRenderBuffer> > npotsFixupScrap;
 
   /// Whether the alpha channel of the color buffer should be scaled.
   bool needColorFixup;
@@ -453,7 +453,6 @@ private:
   void ApplyBufferChanges();
   //@}
 
-  csRef<iRenderBuffer> DoNPOTSFixup (iRenderBuffer* buffer, int unit);
   csRef<iRenderBuffer> DoColorFixup (iRenderBuffer* buffer);
 
   // Minimal float depth(z) difference to store
@@ -483,6 +482,8 @@ private:
    */
   bool drawPixmapAFP;
   GLuint drawPixmapProgram;
+  
+  void ComputeProjectionMatrix();
 public:
   static csGLStateCache* statecache;
   static csGLExtensionManager* ext;
@@ -492,7 +493,7 @@ public:
   csGLGraphics3D (iBase *parent);
   virtual ~csGLGraphics3D ();
 
-  iStringSet* GetStrings () { return strings; }
+  iShaderVarStringSet* GetStrings () { return strings; }
   inline static bool DoOutputMarkerString ()
   {
     return ext && ext->CS_GL_GREMEDY_string_marker;
@@ -502,6 +503,9 @@ public:
   static void OutputMarkerString (const char* function, const wchar_t* file,
     int line, MakeAString& message);
   void Report (int severity, const char* msg, ...);
+  
+  csGLRender2TextureBackend* GetR2TBackend()
+  { return r2tbackend; }
 
   ////////////////////////////////////////////////////////////////////
   //                            iGraphics3D
@@ -539,6 +543,8 @@ public:
   void DeactivateTexture (int unit = 0);
   virtual void SetTextureState (int* units, iTextureHandle** textures,
   	int count);
+  void SetTextureComparisonModes (int*, CS::Graphics::TextureComparisonMode*,
+    int);
 
   /// Set dimensions of window
   void SetDimensions (int width, int height)
@@ -563,6 +569,7 @@ public:
     asp_center_y = y;
     frustum_valid = false;
     needProjectionUpdate = true;
+    explicitProjection = false;
   }
   
   /// Get center of projection.
@@ -579,12 +586,24 @@ public:
     inv_aspect = 1.0f / aspect;
     frustum_valid = false;
     needProjectionUpdate = true;
+    explicitProjection = false;
   }
 
   /// Get perspective aspect.
   virtual float GetPerspectiveAspect () const
   {
     return aspect;
+  }
+  
+  const CS::Math::Matrix4& GetProjectionMatrix()
+  {
+    if (!explicitProjection && needMatrixUpdate) ComputeProjectionMatrix();
+    return projectionMatrix;
+  }
+  void SetProjectionMatrix (const CS::Math::Matrix4& m)
+  {
+    projectionMatrix = m;
+    explicitProjection = true;
   }
 
   /// Set the z buffer write/test mode
@@ -610,11 +629,7 @@ public:
     csRenderTargetAttachment attachment = rtaColor0,
     int* subtexture = 0) const;
   void UnsetRenderTargets();
-  /*/// Get the current render target (0 for screen).
-  virtual iTextureHandle* GetRenderTarget () const
-  {
-    return render_target;
-  }*/
+
 
   /// Begin drawing in the renderer
   bool BeginDraw (int drawflags);
@@ -629,7 +644,7 @@ public:
   /// Drawroutine. Only way to draw stuff
   void DrawMesh (const CS::Graphics::CoreRenderMesh* mymesh,
     const CS::Graphics::RenderMeshModes& modes,
-    const iShaderVarStack* stacks);
+    const csShaderVariableStack& stack);
 
   /// Draw a 2D sprite
   virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy,
@@ -771,6 +786,9 @@ public:
   virtual void Dump (iGraphics3D* /*g3d*/)
   { }
 };
+
+// To silence EnableZOffset/DisableZOffset
+#include "csutil/deprecated_warn_on.h"
 
 }
 CS_PLUGIN_NAMESPACE_END(gl3d)

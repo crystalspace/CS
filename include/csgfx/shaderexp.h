@@ -29,6 +29,7 @@
 #include "csutil/array.h"
 #include "csutil/leakguard.h"
 #include "csgeom/vector4.h"
+#include "csgfx/shadervarnameparser.h"
 #include "ivideo/shader/shader.h"
 
 struct iObjectRegistry;
@@ -50,10 +51,15 @@ public:
   { 
     uint8 type;
     
+    struct SvVarValue
+    {
+      CS::StringIDValue id;
+      size_t* indices;
+    };
     union 
     {
       float num;
-      csStringID var;
+      SvVarValue var;
       
       // Illegal outside of a cons cell
       int oper;
@@ -78,9 +84,11 @@ public:
 private:
   iObjectRegistry * obj_reg;
   /// Variables used for evaluation
-  csRef<iShaderVarStack> stacks;
+  csShaderVariableStack* stack;
   /// String set for producing String IDs
-  csRef<iStringSet> strset;
+  csRef<iShaderVarStringSet> strset;
+  /// Storage for SV sub-indices
+  csMemoryPool svIndicesScratch;
   /// Compiled array of opcodes for evaluation
   oper_array opcodes;
   /**
@@ -201,17 +209,19 @@ private:
   /// Dump the result of an operation
   void print_result(const oper_arg &) const;
 
-  /*inline*/static const char * GetTypeName (csStringID id)/* const*/;
+  /*inline*/static const char * GetTypeName (unsigned int id)/* const*/;
   /*{
     return xmltypes.Request(id);
   }*/
-  static const char* GetOperName (csStringID id);
+  static const char* GetOperName (unsigned int id);
   static csStringID GetCommonTokenOp (const char* token);
   static csStringID GetXmlTokenOp (const char* token);
   static csStringID GetSexpTokenOp (const char* token);
   static csStringID GetXmlType (const char* token);
 
-  csShaderVariable* ResolveVar (csStringID name);
+  /// Helper to allocate a number of SV sub-indices from the mem pool
+  size_t* AllocSVIndices (const CS::Graphics::ShaderVarNameParser& parser);
+  csShaderVariable* ResolveVar (const oper_arg::SvVarValue& var);
 
   mutable csString errorMsg;
   void ParseError (const char* message, ...) const;
@@ -227,8 +237,7 @@ public:
    * Evaluate this expression into a variable.
    * It will use the symbol table it was initialized with.
    */
-  bool Evaluate(csShaderVariable *, csShaderVarStack& stacks);
-  bool Evaluate(csShaderVariable *, iShaderVarStack* stacks);
+  bool Evaluate(csShaderVariable *, csShaderVariableStack& stacks);
   //@}
 
   /// Retrieve the error message if the evaluation or parsing failed.

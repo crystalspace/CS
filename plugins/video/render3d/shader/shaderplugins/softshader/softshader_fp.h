@@ -71,7 +71,7 @@ public:
 
   virtual void SetupState (const csRenderMesh* mesh,
     csRenderMeshModes& modes,
-    const iShaderVarStack* stacks);
+    const csShaderVariableStack& stacks);
 
   virtual void ResetState () {}
 
@@ -85,6 +85,8 @@ public:
 
   /// Compile a program
   virtual bool Compile();
+
+  virtual void GetUsedShaderVars (csBitArray& bits) const;
 };
 
 }

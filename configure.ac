@@ -13,7 +13,7 @@ AC_PREREQ([2.56])
 #	Keep this value synchronized with CS/include/csver.h,
 #	CS/docs/texinfo/version.txi, and CS/mk/autoconf/crystal.m4.
 #------------------------------------------------------------------------------
-m4_define([cs_version_number], [1.3])
+m4_define([cs_version_number], [1.9])
 
 
 
@@ -279,6 +279,26 @@ case $cs_host_family in
     esac
 CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
     [AS_ESCAPE(["])$cs_host_os_normalized[]AS_ESCAPE(["])])
+
+
+#------------------------------------------------------------------------------
+# Check for SIMD flags
+#------------------------------------------------------------------------------
+
+CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx], 
+    [CS_CREATE_TUPLE([-mmmx])])
+AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MMX], [$cs_cv_prog_cc_mmmx],[+])])
+
+
+AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
+    [CS_CHECK_BUILD([checking for mmintrin.h],
+        [cs_cv_header_mmintrin_h],
+        [AC_LANG_PROGRAM([[#include <mmintrin.h>]], [])],
+        [CS_CREATE_TUPLE([$cs_cv_prog_cc_mmmx])],
+        [C++],
+        [CS_HEADER_PROPERTY([CS_SUPPORTS_MMX])
+        CS_EMIT_BUILD_PROPERTY([CS_SUPPORTS_MMX], [yes])])])
 
 
 #------------------------------------------------------------------------------
@@ -653,7 +673,30 @@ CS_EMIT_BUILD_FLAGS([how to disable function inlining],
 #------------------------------------------------------------------------------
 # Check how to declare symbol visibility.
 #------------------------------------------------------------------------------
+<<<<<<< .working
 CS_VISIBILITY_FLAG_INLINES_HIDDEN(
+=======
+CS_CHECK_BUILD_FLAGS([for inline visibility flag],
+    [cs_cv_prog_cxx_visibility_inlines_hidden],
+    [CS_CREATE_TUPLE([-fvisibility-inlines-hidden])],[C++])
+
+AS_IF([test -n "$cs_cv_prog_cxx_visibility_inlines_hidden"],
+    [# The test below can be uncommented and adjusted once a non-buggy gcc 
+    # version is found.
+    #CS_CHECK_PROG_VERSION([g++], [$CXX --version], [4.1], [9.9|.9],
+    #   [cs_cv_gxx_version_buggy=no],
+    #   [cs_cv_gxx_version_buggy=yes])
+    AC_CACHE_CHECK([if $cs_cv_prog_cxx_visibility_inlines_hidden is buggy],
+	[cs_cv_prog_cxx_visibility_inlines_hidden_buggy],
+	[AS_IF([test $ac_compiler_gnu = yes],
+	    [AS_IF([test $host_cpu = x86_64 || test x$cs_host_macosx = xyes], 
+		[cs_cv_prog_cxx_visibility_inlines_hidden_buggy=yes],
+		[cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])],
+	    [cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])])],
+    [cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])
+
+AS_IF([test $cs_cv_prog_cxx_visibility_inlines_hidden_buggy != yes],
+>>>>>>> .merge-right.r28046
     [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS],
 	[$cs_prog_cxx_visibility_inlines_hidden], [+])])
 
@@ -1337,10 +1380,21 @@ CS_CHECK_LIB_WITH([bullet],
       btSequentialImpulseConstraintSolver* s;
       btDefaultCollisionConfiguration* c;
       btDynamicsWorld* world = new btDiscreteDynamicsWorld (d, b, s, c)])],
-    [], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libbullet], [BULLET])], [],
+    [], [C++], [], [],
     [], [], [-lbulletdynamics -lbulletcollision -lbulletmath],
     [bulletdynamics])
 
+AS_IF([test $cs_cv_libbullet = yes],
+    [CS_CHECK_BUILD([if bullet is sufficiently recent (>=2.68)], [cs_cv_bullet_recent],
+	[AC_LANG_PROGRAM(
+	    [[#include "btBulletDynamicsCommon.h"]],
+	    [btManifoldPoint *p = new btManifoldPoint();
+             p->m_appliedImpulse;])],
+	[], [C++],
+	[CS_EMIT_BUILD_RESULT([cs_cv_bullet_recent], [BULLET])], [], [],
+	[$cs_cv_libbullet_cflags],
+	[$cs_cv_libbullet_lflags],
+	[$cs_cv_libbullet_libs])])
 
 
 #------------------------------------------------------------------------------

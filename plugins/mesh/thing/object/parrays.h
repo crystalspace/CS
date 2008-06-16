@@ -34,15 +34,22 @@ class csThingObjectType;
  * This class is used in polygon set class and thing template class
  * for storing the polygons that the model consists of.
  */
-class csPolygonStaticArray : public csArray<csPolygon3DStatic*>
+class csPolygonStaticArray :
+  public csArray<csPolygon3DStatic*,
+                 csArrayElementHandler<csPolygon3DStatic*>,
+                 CS::Container::ArrayAllocDefault,
+                 csArrayCapacityFixedGrow<64> >
 {
 private:
   csThingObjectType* thing_type;
 
 public:
   /// Create the polygon array object
-  csPolygonStaticArray (int iLimit, int iDelta)
-  	: csArray<csPolygon3DStatic*> (iLimit, iDelta)
+  csPolygonStaticArray (int iLimit)
+  	: csArray<csPolygon3DStatic*,
+                  csArrayElementHandler<csPolygon3DStatic*>,
+                  CS::Container::ArrayAllocDefault,
+                  csArrayCapacityFixedGrow<64> > (iLimit)
   {
     thing_type = 0;
   }
@@ -77,15 +84,22 @@ public:
  * This class is used in polygon set class and thing template class
  * for storing the polygons that the model consists of.
  */
-class csPolygonArray : public csArray<csPolygon3D>
+class csPolygonArray :
+  public csArray<csPolygon3D,
+                 csArrayElementHandler<csPolygon3D>,
+                 CS::Container::ArrayAllocDefault,
+                 csArrayCapacityFixedGrow<64> >
 {
 private:
   csThingObjectType* thing_type;
 
 public:
   /// Create the polygon array object
-  csPolygonArray (int iLimit, int iDelta)
-  	: csArray<csPolygon3D> (iLimit, iDelta)
+  csPolygonArray (int iLimit) 
+        : csArray<csPolygon3D,
+                  csArrayElementHandler<csPolygon3D>,
+                  CS::Container::ArrayAllocDefault,
+                  csArrayCapacityFixedGrow<64> > (iLimit)
   {
     thing_type = 0;
   }

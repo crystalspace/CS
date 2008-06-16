@@ -54,9 +54,9 @@ bool csVProc_Std::Initialize (iObjectRegistry *reg)
   objreg = reg;
 
   shaderManager = csQueryRegistry<iShaderManager> (objreg);
-  csRef<iStringSet> strings = 
-    csQueryRegistryTagInterface<iStringSet> 
-    (objreg, "crystalspace.shared.stringset");
+  csRef<iShaderVarStringSet> strings = 
+    csQueryRegistryTagInterface<iShaderVarStringSet> 
+    (objreg, "crystalspace.shader.variablenameset");
   string_object2world = strings->Request ("object2world transform");
   string_world2camera = strings->Request ("world2camera transform");
 

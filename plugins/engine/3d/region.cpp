@@ -48,7 +48,9 @@ void csRegion::DeleteAll ()
 {
   // First we need to copy the objects to a vector to avoid
   // messing up the iterator while we are deleting them.
-  csArray<iObject*> copy (1024, 256);
+  csArray<iObject*, csArrayElementHandler<iObject*>,
+    CS::Container::ArrayAllocDefault,
+    csArrayCapacityFixedGrow<256> > copy (1024);
   csRef<iObjectIterator> iter = GetIterator ();
   while (iter->HasNext ())
   {
@@ -232,8 +234,7 @@ bool csRegion::IsInRegion (iObject *iobj)
 // ---------------------------------------------------------------------------
 
 csRegionList::csRegionList () 
-  : scfImplementationType (this),
-  regionList (16, 16)
+  : scfImplementationType (this), regionList (16)
 {
 }
 

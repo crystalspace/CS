@@ -161,7 +161,7 @@ public:
   /// Pixel format.
   csPixelFormat pfmt;
 
-  csStringID nameDiffuseTexture;
+  CS::ShaderVarStringID nameDiffuseTexture;
 
   csStringSet texClassIDs;
 

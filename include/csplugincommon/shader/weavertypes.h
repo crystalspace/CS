@@ -66,7 +66,9 @@ namespace CS
           /// Position
           Position,
           /// Direction (surface normal, tangent/bitangent, light direction...)
-          Direction
+          Direction,
+          /// Fragment depth value
+          Depth
         } semantics;
         /// Space of direction/position
         enum

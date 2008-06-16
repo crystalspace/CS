@@ -178,7 +178,7 @@ public:
   /// Get the number of particles
   size_t GetParticleCount () const { return number; }
 
-  void UpdateLighting (const csArray<iLightSectorInfluence*>& lights,
+  void UpdateLighting (const csSafeCopyArray<csLightInfluence>& lights,
       iMovable* movable);
 
   /// How many particles the system currently has.

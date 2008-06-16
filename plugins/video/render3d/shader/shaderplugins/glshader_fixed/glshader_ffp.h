@@ -65,9 +65,6 @@ private:
   // Layers of multitexturing
   struct mtexlayer
   {
-    // texture to use
-    csRef<iTextureHandle> texturehandle;
-
     struct TexFunc
     {
       // Argument sources
@@ -150,7 +147,7 @@ public:
   /// Setup states needed for proper operation of the shader
   virtual void SetupState (const CS::Graphics::RenderMesh* mesh,
     CS::Graphics::RenderMeshModes& modes,
-    const iShaderVarStack* stacks);
+    const csShaderVariableStack& stack);
 
   /// Reset states to original
   virtual void ResetState ();
@@ -168,6 +165,8 @@ public:
 
   virtual int ResolveTU (const char* binding)
   { return layerNames.Get (binding, -1); }
+
+  virtual void GetUsedShaderVars (csBitArray& bits) const;
 };
 
 

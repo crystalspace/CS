@@ -18,6 +18,8 @@ if $(COMPILER.C++FLAGS.PEDANTIC.ENABLE)
 
 # List of plugins which should be go into walkall.
 WALKALL.PLUGINLIST =
+  animesh
+  animeshldr
   bezier
   bezierldr
   bugplug
@@ -47,6 +49,8 @@ WALKALL.PLUGINLIST =
   gmeshldr
   gmeshskelanim2
   skeleton
+  skeleton2
+  skeleton2ldr
   skelldr
   vproc_std
   haze
@@ -58,6 +62,9 @@ WALKALL.PLUGINLIST =
   rendloop_loader
   rendstep_std
   reporter
+  rm_rlcompat
+  rm_unshadowed
+  rm_shadow_pssm
   sequence
   shadermgr
   simpleformer

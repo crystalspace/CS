@@ -68,9 +68,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
   
       csDirtyAccessArray<csVector3>& persp = g3d->persp;
       persp.SetSize (num_vertices);
-      const int width2 = g3d->persp_center_x;
-      const int height2 = g3d->persp_center_y;
-      const float aspect = g3d->aspect;
+      const int width = g3d->width;
+      const int height = g3d->height;
+      const CS::Math::Matrix4& projection = g3d->projectionMatrix;
       const float* work_verts = clipInZNear->GetData() +
         clipInZNear->GetOffset (CS_SOFT3D_VA_BUFINDEX(POSITION));
       const size_t stride = clipInZNear->GetStride();
@@ -80,10 +80,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
       {
 	if (work_verts[2] >= SMALL_Z)
 	{
-	  persp[i].z = 1.0f / work_verts[2];
-	  float iz = aspect * persp[i].z;
-	  persp[i].x = work_verts[0] * iz + width2;
-	  persp[i].y = work_verts[1] * iz + height2;
+	  csVector4 vertProj = projection
+	    * csVector4 (work_verts[0], work_verts[1], work_verts[2]);
+	  vertProj /= vertProj.w;
+	  persp[i].x = (vertProj[0]+0.5f)*width;
+	  persp[i].y = (vertProj[1]+0.5f)*height;
+	  persp[i].z = vertProj[2];
 	}
 	else
           persp[i].Set (work_verts[0], work_verts[1], work_verts[2]);
@@ -375,7 +377,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
   
       bclipperZNear.Init (g3d->persp.GetArray(), outPersp,
 	clipInZNear, &clipOutZNear);
-      clipZNear.Init (g3d->persp_center_x, g3d->persp_center_y, g3d->aspect);
+      clipZNear.Init (g3d->width, g3d->height, g3d->projectionMatrix);
 
       this->triangle = triangles;
       this->triangleCount = triangleCount;
