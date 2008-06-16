@@ -377,6 +377,47 @@ void csWaterMeshObjectFactory::SetupFactory ()
   {
     initialized = true;
     object_bbox_valid = false;
+	  
+  	int i = 0;
+  	
+    int rtWVs = (int)sqrt(WATER_VERTS);
+    
+  	for(i = 0; i < WATER_VERTS; i++)
+  	{
+//		printf("Setting vertex %d to: <%d, %d, %d>\n", i, i % rtWVs, 0, i / rtWVs);
+	    vertices[i].Set((int)(i % rtWVs), 0, (int)(i / rtWVs));
+  	}
+   
+   
+   // SET TEXELS!!!
+   
+    for(i = 0; i < WATER_VERTS; i++)
+    {
+  	  normals[i].Set((int)rand(), (int)rand(), (int)rand());
+  	  colors[i].Set(0, 0, 1);
+    }
+    
+    for(i = 0; i < WATER_TRIS; i+=2)
+    {
+    	int j = i / 2;
+    	int x = j % (rtWVs - 1);
+    	int y = j / (rtWVs - 1);
+    	
+//    	printf("Setting triangle %d to: <%d %d %d>\n", i, x + y * rtWVs, 
+//    					x + (y + 1) * rtWVs, 
+//    					(x + 1) + y * rtWVs);
+    	triangles[i].Set(x + y * rtWVs, 
+    					x + (y + 1) * rtWVs, 
+    					(x + 1) + y * rtWVs);
+    	
+//    	printf("Setting triangle %d to: <%d %d %d>\n", i + 1, (x + 1) + y * rtWVs, 
+//    					x + (y + 1) * rtWVs, 
+//    					(x + 1) + (y + 1) * rtWVs);
+    	triangles[i + 1].Set((x + 1) + y * rtWVs, 
+    					x + (y + 1) * rtWVs, 
+    					(x + 1) + (y + 1) * rtWVs);
+    }
+    
     PrepareBuffers ();
   }
 }

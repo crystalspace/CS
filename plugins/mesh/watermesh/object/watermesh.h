@@ -46,8 +46,9 @@ namespace WaterMesh
 
 class csWaterMeshObjectFactory;
 
-#define WATER_TRIS 12
-#define WATER_VERTS 8
+#define WATER_SIZE	16
+#define WATER_VERTS (WATER_SIZE * WATER_SIZE)
+#define WATER_TRIS (2 * (WATER_SIZE - 1) * (WATER_SIZE - 1)) 
 
 /**
  * Watermesh version of mesh object.
