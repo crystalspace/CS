@@ -3117,8 +3117,8 @@ public:
 
 EngineLoaderContext::EngineLoaderContext (csEngine* Engine,
 	iCollection *collection, bool searchCollectionOnly)
-  : scfImplementationType (this), Engine (Engine), keepFlags (0),
-    collection(collection), searchCollectionOnly(searchCollectionOnly)
+  : scfImplementationType (this), Engine (Engine), collection(collection),
+    searchCollectionOnly(searchCollectionOnly), keepFlags (0)
 {
 }
 
