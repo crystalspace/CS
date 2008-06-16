@@ -78,10 +78,10 @@ struct csFog
   float start;
   /// Fog fade end distance (for CS_FOG_MODE_LINEAR).
   float end;
-  /// Fog mode.
-  csFogMode mode;
   /// The limit after which the fog is no longer shown (for rings of fog) (for CS_FOG_MODE_LINEAR).
   float limit;
+  /// Fog mode.
+  csFogMode mode;
 
   csFog() : density (0), color (0, 0, 0, 1.0f), start (0), end (0), limit (0),
     mode (CS_FOG_MODE_NONE) {}
