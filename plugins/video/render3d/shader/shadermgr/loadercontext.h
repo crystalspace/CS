@@ -55,8 +55,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
     iLight* FindLight (const char *name) { return 0; }
     iShader* FindShader (const char *name) { return 0; }
     bool CheckDupes () const { return false; }
-    iRegion* GetRegion () const { return 0; }
-    bool CurrentRegionOnly () const { return false; }
     iCollection* GetCollection() const { return 0; }
     bool CurrentCollectionOnly() const { return false; }
     uint GetKeepFlags() const { return 0; }

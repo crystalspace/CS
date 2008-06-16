@@ -98,5 +98,5 @@
   </technique>
   <?endif?>
   
-  <fallbackshader name="furshell8" file="/shader/surface/furshell8.xml" />
+  <fallbackshader name="furshell8" file="/shader/fur/furshell8.xml" />
 </shader>

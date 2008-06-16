@@ -24,8 +24,8 @@
 
 namespace genmeshify
 {
-  Converter::Converter (App* app, iLoaderContext* context, iRegion* region) : 
-    app (app), context (context), region (region)
+  Converter::Converter (App* app, iLoaderContext* context, iCollection* collection) : 
+    app (app), context (context), collection (collection)
   {
     gmfactSaver = csLoadPluginCheck<iSaverPlugin> (app->objectRegistry,
       "crystalspace.mesh.saver.factory.genmesh", true);
@@ -72,7 +72,7 @@ namespace genmeshify
       csRef<iMeshFactoryWrapper> thingmfw = app->engine->CreateMeshFactory (
         factoryName);
       thingmfw->SetMeshObjectFactory (mfact);
-      region->QueryObject ()->ObjAdd (thingmfw->QueryObject());
+      collection->Add (thingmfw->QueryObject());
     }
 
     csRef<iMeshFactoryWrapper> mfw = app->engine->CreateMeshFactory (
@@ -82,7 +82,7 @@ namespace genmeshify
       app->Report ("Could not create genmesh factory");
       return false;
     }
-    region->QueryObject ()->ObjAdd (mfw->QueryObject());
+    collection->Add (mfw->QueryObject());
     csRef<iMeshObjectFactory> mof = mfw->GetMeshObjectFactory();
     csRef<iGeneralFactoryState> gmfact = 
       scfQueryInterface<iGeneralFactoryState> (mof);
@@ -128,7 +128,7 @@ namespace genmeshify
     if (!paramsNode) return false;
 
     csRef<iMeshWrapper> meshWrap = app->engine->CreateMeshWrapper (meshName);
-    region->QueryObject ()->ObjAdd (meshWrap->QueryObject());
+    collection->Add (meshWrap->QueryObject());
 
     csRef<iBase> obj = thingObjLoader->Parse (paramsNode, 0, context, meshWrap);
     if (!obj) return false;
@@ -213,7 +213,7 @@ namespace genmeshify
         app->Report ("Could not create genmesh factory");
         return false;
       }
-      region->QueryObject ()->ObjAdd (mfw->QueryObject());
+      collection->Add (mfw->QueryObject());
       mof = mfw->GetMeshObjectFactory();
       gmfact = scfQueryInterface<iGeneralFactoryState> (mof);
       if (!gmfact)
@@ -272,12 +272,12 @@ namespace genmeshify
     {
       const LMLayout::SubMesh& layoutSM = lmLayout.subMeshes[i];
       csRef<iTextureWrapper> dummyTex = 
-        app->engine->FindTexture (slmNames[layoutSM.slm], region);
+        app->engine->FindTexture (slmNames[layoutSM.slm], collection);
       if (!dummyTex.IsValid())
       {
         dummyTex = app->engine->CreateBlackTexture (
           slmNames[layoutSM.slm], 1, 1, 0, 0);
-        region->Add (dummyTex->QueryObject());
+        collection->Add (dummyTex->QueryObject());
       }
 
       iGeneralMeshSubMesh* submesh = 

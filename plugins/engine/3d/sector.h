@@ -194,7 +194,7 @@ public:
   {
     fog.mode = CS_FOG_MODE_CRYSTALSPACE;
     fog.density = density;
-    fog.color = color;
+    fog.color.Set(color);
     UpdateFogSVs ();
   }
   virtual void SetFog (const csFog& fog)
@@ -530,8 +530,9 @@ private:
     CS::ShaderVarName lightAmbient;
     CS::ShaderVarName fogColor;
     CS::ShaderVarName fogMode;
-    CS::ShaderVarName fogStart;
-    CS::ShaderVarName fogEnd;
+    CS::ShaderVarName fogFadeStart;
+    CS::ShaderVarName fogFadeEnd;
+    CS::ShaderVarName fogLimit;
     CS::ShaderVarName fogDensity;
   };
   CS_DECLARE_STATIC_CLASSVAR_REF(svNames, SVNames, SVNamesHolder);
@@ -539,8 +540,9 @@ private:
   csRef<csShaderVariable> svLightAmbient;
   csRef<csShaderVariable> svFogColor;
   csRef<csShaderVariable> svFogMode;
-  csRef<csShaderVariable> svFogStart;
-  csRef<csShaderVariable> svFogEnd;
+  csRef<csShaderVariable> svFogFadeStart;
+  csRef<csShaderVariable> svFogFadeEnd;
+  csRef<csShaderVariable> svFogLimit;
   csRef<csShaderVariable> svFogDensity;
   
   class LightAmbientAccessor :

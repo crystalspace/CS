@@ -27,7 +27,6 @@
 #include "iengine/renderloop.h"
 #include "imap/services.h"
 #include "imap/ldrctxt.h"
-#include "iengine/region.h"
 #include "ivaria/reporter.h"
 #include "iengine/rendersteps/irenderstep.h"
 #include "iengine/rendersteps/icontainer.h"
@@ -113,10 +112,6 @@ csPtr<iBase> csRenderLoopLoader::Parse (iDocumentNode* node,
     if(ldr_context->GetCollection ())
     {
       ldr_context->GetCollection ()->Add (obj);
-    }
-    else if(ldr_context->GetRegion ())
-    {
-      ldr_context->GetRegion ()->QueryObject ()->ObjAdd (obj);
     }
   }
   

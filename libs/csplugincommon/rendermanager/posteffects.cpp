@@ -43,7 +43,7 @@
 using namespace CS::RenderManager;
 
 PostEffectManager::PostEffectManager ()
-  : frameNum (0), 
+  : frameNum (0), chainedEffects (0),
     dimCache (CS::Utility::ResourceCache::ReuseConditionFlagged (),
       CS::Utility::ResourceCache::PurgeConditionAfterTime<uint> (0)),
     currentDimData (0), currentWidth (0), currentHeight (0), 
@@ -73,16 +73,17 @@ void PostEffectManager::SetIntermediateTargetFormat (const char* textureFmt)
   this->textureFmt = textureFmt;
 }
 
-void PostEffectManager::SetupView (iView* view)
+bool PostEffectManager::SetupView (iView* view)
 {
   unsigned int width = view->GetContext ()->GetWidth ();
   unsigned int height = view->GetContext ()->GetHeight ();
 
-  SetupView (width, height);
+  return SetupView (width, height);
 }
 
-void PostEffectManager::SetupView (uint width, uint height)
+bool PostEffectManager::SetupView (uint width, uint height)
 {
+  bool result = false;
   if (width != currentWidth || height != currentHeight)
   {
     if (currentDimData != 0)
@@ -96,7 +97,7 @@ void PostEffectManager::SetupView (uint width, uint height)
     Dimensions key;
     key.x = currentWidth; key.y = currentHeight;
     currentDimData = dimCache.Query (key, true);
-    if (currentDimData != 0) return;
+    if (currentDimData != 0) return true;
     
     DimensionData newData;
     newData.dim = key;
@@ -112,7 +113,11 @@ void PostEffectManager::SetupView (uint width, uint height)
        be kept.
      */
     dimCache.agedPurgeInterval = 0;
+
+    result = true;
   }
+  if (chainedEffects) chainedEffects->SetupView (width, height);
+  return result;
 }
 
 iTextureHandle* PostEffectManager::GetScreenTarget ()
@@ -148,6 +153,8 @@ void PostEffectManager::DrawPostEffects ()
     graphics3D->DrawSimpleMesh (fullscreenQuad, csSimpleMeshScreenspace);
     graphics3D->FinishDraw ();
   }
+
+  if (chainedEffects) chainedEffects->DrawPostEffects ();
   
   dimCache.AdvanceTime (++frameNum);
   // Reset to avoid purging every frame
@@ -202,6 +209,18 @@ iTextureHandle* PostEffectManager::GetLayerOutput (const Layer* layer)
 {
   size_t bucket = GetBucketIndex (layer->options);
   return currentDimData->buckets[bucket].textures[layer->outTextureNum];
+}
+
+void PostEffectManager::SetChainedOutput (PostEffectManager* nextEffects)
+{
+  if (chainedEffects)
+    target = chainedEffects->GetEffectsOutputTarget();
+  chainedEffects = nextEffects;
+  if (chainedEffects)
+  {
+    chainedEffects->SetEffectsOutputTarget (target);
+    target = chainedEffects->GetScreenTarget();
+  }
 }
 
 void PostEffectManager::SetupScreenQuad ()

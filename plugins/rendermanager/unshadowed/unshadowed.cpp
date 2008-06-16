@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2007 by Marten Svanfeldt
+	      (C) 2008 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -74,6 +75,9 @@ public:
     sector->CallSectorCallbacks (rview);
     // Make sure the clip-planes are ok
     CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext ());
+    
+    if (context.owner.IsDebugFlagEnabled (rmanager->dbgFlagClipPlanes))
+      context.owner.AddDebugClipPlanes (rview);
 
     // Do the culling
     iVisibilityCuller* culler = sector->GetVisibilityCuller ();
@@ -138,7 +142,7 @@ private:
 RMUnshadowed::RMUnshadowed (iBase* parent)
   : scfImplementationType (this, parent), doHDRExposure (false), targets (*this)
 {
-
+  SetTreePersistent (treePersistent);
 }
 
 bool RMUnshadowed::RenderView (iView* view)
@@ -205,7 +209,9 @@ bool RMUnshadowed::RenderView (iView* view)
 
   postEffects.DrawPostEffects ();
   
-  if (doHDRExposure) hdrExposure.ApplyExposure (postEffects);
+  if (doHDRExposure) hdrExposure.ApplyExposure ();
+  
+  DebugFrameRender (rview, renderTree);
 
   return true;
 }
@@ -291,6 +297,8 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
   
   csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objectReg);
   treePersistent.Initialize (shaderManager);
+  dbgFlagClipPlanes =
+    treePersistent.debugPersist.RegisterDebugFlag ("draw.clipplanes.view");
   postEffects.Initialize (objectReg);
   
   const char* effectsFile = cfg->GetStr ("RenderManager.Unshadowed.Effects", 0);
@@ -305,18 +313,17 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
   {
     doHDRExposure = true;
     
-    HDRHelper hdr;
     hdr.Setup (objectReg, 
       hdrSettings.GetQuality(), 
-      hdrSettings.GetColorRange(), 
-      postEffects, !doHDRExposure);
+      hdrSettings.GetColorRange());
+    postEffects.SetChainedOutput (hdr.GetHDRPostEffects());
   
     // @@@ Make configurable, too
-    hdrExposure.Initialize (objectReg, postEffects);
+    hdrExposure.Initialize (objectReg, hdr);
   }
   
   portalPersistent.Initialize (shaderManager, g3d);
-  lightPersistent.Initialize (objectReg);
+  lightPersistent.Initialize (objectReg, treePersistent.debugPersist);
   
   return true;
 }

@@ -25,6 +25,8 @@
 #include "csutil/ref.h"
 #include "csutil/refcount.h"
 
+#include "csutil/custom_new_disable.h"
+
 #define DECLARE_STATIC_CLASSVAR_DIRECT(getterFunc,Type,Kill, InitParam)   \
 enum { _##getterFunc##StorageUnits = (sizeof (Type) + sizeof (void*) - 1)/sizeof (void*) };   \
 static void* _##getterFunc##Store[_##getterFunc##StorageUnits];\
@@ -47,7 +49,6 @@ static void getterFunc ## _kill ();
 
 #define IMPLEMENT_STATIC_CLASSVAR_DIRECT(Class,getterFunc) \
 void* Class::_##getterFunc##Store[Class::_##getterFunc##StorageUnits];
-
 
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
@@ -293,5 +294,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
   };
 }
 CS_PLUGIN_NAMESPACE_END(XMLShader)
+
+#include "csutil/custom_new_enable.h"
 
 #endif // __CS_TEMPHEAP_H__

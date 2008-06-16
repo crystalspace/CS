@@ -71,11 +71,6 @@
     <?else?>
       normal_attr_perfragment = false;
     <?endif?>
-    <?if vars."tex normal".texture ?>
-      normal_attr_perfragment = true;
-    <?else?>
-      normal_attr_perfragment = false;
-    <?endif?>
     </block>
     
     <output name="normal" type="normal_tangent">

@@ -256,7 +256,8 @@ namespace RenderManager
     struct PersistentData
     {
       void UpdateNewFrame () {}
-      void Initialize (iObjectRegistry*) {}
+      void Initialize (iObjectRegistry*,
+        RenderTreeBase::DebugPersistent&) {}
     };
     struct ShadowParameters {};
 
@@ -779,7 +780,8 @@ namespace RenderManager
         if (lcb.IsValid()) lcb->parent = 0;
       }
       
-      void Initialize (iObjectRegistry* objReg)
+      void Initialize (iObjectRegistry* objReg,
+                       RenderTreeBase::DebugPersistent& dbgPersist)
       {
         csRef<iShaderManager> shaderManager =
           csQueryRegistry<iShaderManager> (objReg);
@@ -787,7 +789,7 @@ namespace RenderManager
 	iShaderVarStringSet* strings = shaderManager->GetSVNameStringset();
 	svNames.SetStrings (strings);
         svPassNum = strings->Request ("pass number");
-	shadowPersist.Initialize (objReg);
+	shadowPersist.Initialize (objReg, dbgPersist);
       }
       void UpdateNewFrame ()
       {

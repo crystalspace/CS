@@ -30,17 +30,16 @@ namespace genmeshify
     InitTokenTable (xmltokens);
 
     static int n = 0;
-    region = app->engine->CreateRegion (
+    collection = app->engine->CreateCollection (
       csString().Format ("__genmeshify_region_%d__", n++));
-    loaderContext.AttachNew (new StdLoaderContext (app, app->engine, region));
-    converter = new Converter (app, loaderContext, region);
+    loaderContext.AttachNew (new StdLoaderContext (app, app->engine, collection));
+    converter = new Converter (app, loaderContext, collection);
   }
 
   Processor::~Processor ()
   {
     delete converter;
-    app->engine->RemoveObject (region);
-    region->DeleteAll();
+    app->engine->RemoveCollection(collection);
   }
 
   csRef<iFile> Processor::OpenPath (App* app, const char* path, 
@@ -343,7 +342,7 @@ namespace genmeshify
     if (!sector)
     {
       sector = app->engine->CreateSector (0); 
-      region->QueryObject()->ObjAdd (sector->QueryObject());
+      collection->Add (sector->QueryObject());
     }
 
     csRef<iDocumentNodeIterator> it = from->GetNodes ();
@@ -514,7 +513,7 @@ namespace genmeshify
       }
     }
 
-    return app->loader->LoadMap (to, false, region, false);
+    return app->loader->LoadMap (to, false, collection, false);
   }
 
   bool Processor::PreloadSectors (iDocumentNode* from)
@@ -546,6 +545,6 @@ namespace genmeshify
       }
     }
 
-    return app->loader->LoadMap (to, false, region, false);
+    return app->loader->LoadMap (to, false, collection, false);
   }
 }
