@@ -39,29 +39,12 @@ struct iMeshWrapper;
 struct iParticle;
 
 /**
- * A subclass of csPath so that paths can have a name.
- */
-class csNamedPath : public csPath
-{
-private:
-  char* name;
-
-public:
-  csNamedPath (int p, const char* name) : csPath (p)
-  {
-    csNamedPath::name = csStrNew (name);
-  }
-  virtual ~csNamedPath () { delete[] name; }
-  char* GetName () const { return name; }
-};
-
-/**
  * A path connected with a mesh.
  */
 class PathForMesh
 {
 public:
-  csNamedPath* path;
+  csPath* path;
   iMeshWrapper* mesh;	// If 0 this path controls a camera.
   csTicks total_path_time;
   csTicks start_path_time;
@@ -111,7 +94,7 @@ private:
   //=====
   // For path handling.
   //=====
-  csPDelArray<csNamedPath> paths;
+  csPDelArray<csPath> paths;
   csPDelArray<PathForMesh> pathForMesh;
 
   //=====
@@ -120,7 +103,7 @@ private:
   csPDelArray<MeshRotation> meshRotation;
 
 private:
-  void DebugDrawPath (csNamedPath* np, bool hi,
+  void DebugDrawPath (csPath* np, bool hi,
 	const csVector2& tl, const csVector2& br, int selpoint);
   void DrawSelPoint (
 	const csVector3& pos, const csVector3& forward,
@@ -193,12 +176,12 @@ public:
   /**
    * Get the selected path.
    */
-  csNamedPath* GetSelectedPath (const char* hilight);
+  csPath* GetSelectedPath (const char* hilight);
 
   /**
    * Get the start and total time for the selected path.
    */
-  csNamedPath* GetSelectedPath (const char* hilight, csTicks& start,
+  csPath* GetSelectedPath (const char* hilight, csTicks& start,
   	csTicks& total);
 
   /**
@@ -235,7 +218,7 @@ public:
   /**
    * Setup a path. If mesh == 0 we are setting up a path for the camera.
    */
-  void SetupPath (csNamedPath* path, iMeshWrapper* mesh,
+  void SetupPath (csPath* path, iMeshWrapper* mesh,
   	csTicks total_path_time,
   	csTicks already_elapsed);
 
@@ -244,12 +227,12 @@ public:
    * that is attached to the running path with this one (mesh can be 0
    * for the camera).
    */
-  void ReplacePathObject (csNamedPath* path, iMeshWrapper* mesh);
+  void ReplacePathObject (csPath* path, iMeshWrapper* mesh);
 
   /**
    * Register a named path with the sequencer.
    */
-  void RegisterPath (csNamedPath* path)
+  void RegisterPath (csPath* path)
   {
     paths.Push (path);
   }
@@ -257,12 +240,12 @@ public:
   /**
    * Find a path by name.
    */
-  csNamedPath* FindPath (const char* name)
+  csPath* FindPath (const char* name)
   {
     size_t i;
     for (i = 0 ; i < paths.GetSize () ; i++)
     {
-      csNamedPath* p = paths[i];
+      csPath* p = paths[i];
       if (!strcmp (p->GetName (), name)) return p;
     }
     return 0;
