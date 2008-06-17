@@ -22,6 +22,7 @@
 
 #include "csplugincommon/render3d/txtmgr.h"
 #include "igraphic/image.h"
+#include "iutil/databuff.h"
 
 class csTextureManagerNull;
 

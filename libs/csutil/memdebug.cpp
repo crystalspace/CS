@@ -998,7 +998,8 @@ namespace CS
 	{
 	  if (!iSCF::SCF)
 	  {
-	    csPrintf ("iSCF::SCF not set yet!\n");
+	    csPrintf ("%s for %s: iSCF::SCF not set yet!\n",
+	      CS_FUNCTION_NAME, Class);
 	    return;
 	  }
 	

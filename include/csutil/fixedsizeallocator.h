@@ -380,6 +380,9 @@ public:
     elcount (other.elcount), elsize (other.elsize), 
     blocksize (other.blocksize), freenode (0), insideDisposeAll (false)
   {
+#ifdef CS_MEMORY_TRACKER
+    blocks.SetMemTrackerInfo (typeid(*this).name());
+#endif
     /* Technically, an allocator can be empty even with freenode != 0 */
     CS_ASSERT(other.freenode == 0);
   }

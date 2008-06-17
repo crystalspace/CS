@@ -1592,7 +1592,7 @@ bool csSaver::SaveAllCollections()
 {
   // Get list of regions
   csRef<iCollectionArray> collections = engine->GetCollections ();
-  for (int i = 0; i < collections->GetSize (); i++)
+  for (size_t i = 0; i < collections->GetSize (); i++)
   {
     iCollection* collection = collections->Get (i);
     
@@ -1602,7 +1602,8 @@ bool csSaver::SaveAllCollections()
       scfInterfaceTraits<iSaverFile>::GetVersion ());
     csRef<iSaverFile> saverFile = scfQueryInterface<iSaverFile> (obj);
     
-    SaveCollectionFile (collection, saverFile->GetFile (), saverFile->GetFileType ());
+    SaveCollectionFile (collection, saverFile->GetFile (),
+      saverFile->GetFileType ());
   }
   
   return true;

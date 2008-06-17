@@ -69,7 +69,7 @@ protected:
 #include "cstool/tokenlist.h"
 #undef CS_TOKEN_ITEM_FILE
 
-  csGLShader_CG* shaderPlug;
+  csRef<csGLShader_CG> shaderPlug;
 
   CGprogram program;
   CGprofile programProfile;
