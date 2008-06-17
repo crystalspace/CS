@@ -880,29 +880,29 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 
     if (param.name == csInvalidStringID)
     {
+      int numComps = 0;
+      csShaderVariable::VariableType svType = param.var->GetType ();
+      const char* typeStr = "float";
+      switch (svType)
+      {
+	case csShaderVariable::INT:
+	  numComps = 1; 
+	  typeStr = "int";
+	  break;
+	case csShaderVariable::FLOAT:   numComps = 1; break;
+	case csShaderVariable::VECTOR2: numComps = 2; break;
+	case csShaderVariable::VECTOR3: numComps = 3; break;
+	case csShaderVariable::VECTOR4: numComps = 4; break;
+	default:
+	  // Should not happen really, but who knows...
+	  compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
+	    "Constant parameter of unsupported type %s", 
+	    SVTypes.StringForIdent (svType));
+	  return;
+      }
       weaverType = node->GetAttributeValue ("weavertype");
       if (weaverType.IsEmpty())
       {
-	int numComps = 0;
-	csShaderVariable::VariableType svType = param.var->GetType ();
-	const char* typeStr = "float";
-	switch (svType)
-	{
-	  case csShaderVariable::INT:
-	    numComps = 1; 
-	    typeStr = "int";
-	    break;
-	  case csShaderVariable::FLOAT:   numComps = 1; break;
-	  case csShaderVariable::VECTOR2: numComps = 2; break;
-	  case csShaderVariable::VECTOR3: numComps = 3; break;
-	  case csShaderVariable::VECTOR4: numComps = 4; break;
-	  default:
-	    // Should not happen really, but who knows...
-	    compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
-	      "Constant parameter of unsupported type %s", 
-	      SVTypes.StringForIdent (svType));
-	    return;
-	}
 	if (numComps > 1)
 	  weaverType.Format ("%s%d", typeStr, numComps);
 	else
