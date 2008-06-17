@@ -24,6 +24,7 @@
 #include "raydebug.h"
 #include "statistics.h"
 
+
 namespace lighter
 {
   class ElementAreasAlloc;
