@@ -20,7 +20,7 @@
 AC_PREREQ([2.56])
 
 # Should stay in sync with csver.h
-m4_define([cs_min_version_default], [1.3])
+m4_define([cs_min_version_default], [1.4])
 
 #------------------------------------------------------------------------------
 # CS_PATH_CRYSTAL_CHECK([DESIRED-VERSION], [ACTION-IF-FOUND],
