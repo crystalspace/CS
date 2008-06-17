@@ -22,6 +22,7 @@
 #include "csutil/scf_implementation.h"
 #include "imesh/skeleton2.h"
 #include "imesh/skeleton2anim.h"
+#include "csutil/leakguard.h"
 #include "csutil/refarr.h"
 #include "csutil/csstring.h"
 
@@ -33,6 +34,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   class BaseNodeSingle
   {
   protected:
+    CS_LEAKGUARD_DECLARE(BaseNodeSingle);
+  
     BaseNodeSingle (iSkeletonAnimNode2* owner)
       : owner (owner)
     {}
@@ -90,6 +93,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   class BaseNodeChildren : public BaseNodeSingle
   {
   protected:
+    CS_LEAKGUARD_DECLARE(BaseNodeChildren);
+  
     BaseNodeChildren (iSkeletonAnimNode2* owner)
       : BaseNodeSingle (owner), manualCbInstall (false)
     {}
@@ -133,6 +138,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   class BaseFactoryChildren
   {
   protected:
+    CS_LEAKGUARD_DECLARE(BaseFactoryChildren);
+  
     void SetupInstance (BaseNodeChildren* child, iSkeletonAnimPacket2* packet, 
       iSkeleton2* skeleton)
     {
@@ -159,6 +166,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
                               scfFakeInterface<iSkeletonAnimNodeFactory2> >
   {
   public:
+    CS_LEAKGUARD_DECLARE(AnimationNodeFactory);
+  
     AnimationNodeFactory (const char* name);
 
     //-- iSkeletonAnimationNodeFactory2
@@ -196,6 +205,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     public BaseNodeSingle
   {
   public:
+    CS_LEAKGUARD_DECLARE(AnimationNode);
+  
     AnimationNode (AnimationNodeFactory* factory);
 
     //-- iSkeletonAnimationNode2
