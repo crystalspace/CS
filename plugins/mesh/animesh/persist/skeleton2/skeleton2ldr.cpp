@@ -676,6 +676,45 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
           };
         }
         break;
+      case XMLTOKEN_TRANSITION:
+        {
+          const char* fromStateName = child->GetAttributeValue ("from");
+          const char* toStateName = child->GetAttributeValue ("to");
+
+          CS::Animation::StateID fromState = factnode->FindState (fromStateName);
+          CS::Animation::StateID toState = factnode->FindState (toStateName);
+
+          if (fromState == CS::Animation::InvalidStateID)
+          {
+            synldr->ReportError (msgid, child, 
+              "Invalid from state %s", fromStateName);
+          }
+
+          if (toState == CS::Animation::InvalidStateID)
+          {
+            synldr->ReportError (msgid, child, 
+              "Invalid to state %s", toStateName);
+          }
+
+          csRef<iDocumentNode> nodedoc = child->GetNode (
+            xmltokens.Request (XMLTOKEN_NODE));
+          if (nodedoc)
+          {
+            csRef<iSkeletonAnimNodeFactory2> node =
+              ParseAnimTreeNode (nodedoc, packet);
+
+            factnode->SetStateTransition (fromStateName, toState, node);
+          }
+
+          const float time1 = child->GetAttributeValueAsFloat ("time1");
+          const float time2 = child->GetAttributeValueAsFloat ("time2");
+
+          if(time1 > 0.0f || time2 > 0.0f)
+          {
+            factnode->SetTransitionCrossfade (fromState, toState, time1, time2);
+          }
+        }
+        break;
       default:
         synldr->ReportBadToken (child);
         return 0;
