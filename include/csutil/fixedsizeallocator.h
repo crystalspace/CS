@@ -451,6 +451,15 @@ public:
       freenode = nextfree;
     }
   }
+  
+  /**
+   * Return number of allocated elements (potentially slow).
+   */
+  size_t GetAllocatedElems() const
+  {
+    csBitArray mask(GetAllocationMap());
+    return mask.NumBitsSet();
+  }
 
   /**
    * Allocate a chunk of memory. 
