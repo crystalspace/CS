@@ -178,7 +178,7 @@ csRenderMesh** csWaterMeshObject::GetRenderMeshes (
   meshPtr->do_mirror = camera->IsMirrored ();
   meshPtr->meshtype = CS_MESHTYPE_TRIANGLES;
   meshPtr->indexstart = 0;
-  meshPtr->indexend = factory->tris.GetSize() * 3;
+  meshPtr->indexend = factory->numTris * 3;
   meshPtr->material = material;
   meshPtr->worldspace_origin = wo;
   meshPtr->object2world = o2wt;
@@ -202,7 +202,7 @@ bool csWaterMeshObject::HitBeamOutline (const csVector3& start,
   // will be a bit faster than its more accurate cousin (below).
 
   csSegment3 seg (start, end);
-  int i, max = factory->tris.GetSize();
+  int i, max = factory->numTris;
   csTriangle *tr = factory->tris.GetArray();
   csVector3 *vrt = factory->verts.GetArray();
   for (i = 0 ; i < max ; i++)
@@ -231,7 +231,7 @@ bool csWaterMeshObject::HitBeamObject (const csVector3& start,
   // Usage is optional.
 
   csSegment3 seg (start, end);
-  int i, max = factory->tris.GetSize();
+  int i, max = factory->numTris;
   float tot_dist = csSquaredDist::PointPoint (start, end);
   float dist, temp;
   float itot_dist = 1 / tot_dist;
@@ -273,18 +273,18 @@ void csWaterMeshObject::PreGetBuffer (csRenderBufferHolder *holder,
       if (!color_buffer)
       {
         color_buffer = csRenderBuffer::CreateRenderBuffer (
-          factory->verts.GetSize(), CS_BUF_STATIC,
+          factory->numVerts, CS_BUF_STATIC,
           CS_BUFCOMP_FLOAT, 3);
       }
       mesh_colors_dirty_flag = false;
       const csColor* factory_colors = factory->cols.GetArray();
       uint i;
-      csColor colors[factory->verts.GetSize()];
-      for (i = 0 ; i < factory->verts.GetSize() ; i++)
+      csColor colors[factory->numVerts];
+      for (i = 0 ; i < factory->numVerts ; i++)
         colors[i] = factory_colors[i]+color;
       // Copy the data into the render buffer
       // since we don't keep a local copy of the color buffer here.
-      color_buffer->CopyInto (colors, factory->verts.GetSize());
+      color_buffer->CopyInto (colors, factory->numVerts);
     }
     holder->SetRenderBuffer (CS_BUFFER_COLOR, color_buffer);
   } 
@@ -305,7 +305,7 @@ csWaterMeshObjectFactory::csWaterMeshObjectFactory (
   csStringID base_mesh_id = GetBaseID (object_reg);
   csRef<csTriangleMeshPointer> trimesh_base;
   trimesh_base.AttachNew (new csTriangleMeshPointer (
-	verts.GetArray(), verts.GetSize(), tris.GetArray(), tris.GetSize()));
+	verts.GetArray(), numVerts, tris.GetArray(), numTris));
   SetTriangleData (base_mesh_id, trimesh_base);
 
   logparent = 0;
@@ -321,9 +321,13 @@ csWaterMeshObjectFactory::csWaterMeshObjectFactory (
   mesh_normals_dirty_flag = true;
   mesh_triangle_dirty_flag = true;
 
-	len = 10;
-	wid = 5;
-	gran = 2;
+	len = 2;
+	wid = 2;
+	gran = 1;
+	
+	numVerts = 4;
+	numTris = 2;
+	
 	size_changed = false;
 }
 
@@ -337,7 +341,7 @@ void csWaterMeshObjectFactory::CalculateBBoxRadius ()
   csVector3& v0 = verts[0];
   object_bbox.StartBoundingBox (v0);
   uint i;
-  for (i = 1 ; i < verts.GetSize() ; i++)
+  for (i = 1 ; i < numVerts ; i++)
   {
     csVector3& v = verts[i];
     object_bbox.AddBoundingVertexSmart (v);
@@ -345,7 +349,7 @@ void csWaterMeshObjectFactory::CalculateBBoxRadius ()
 
   const csVector3& center = object_bbox.GetCenter ();
   float max_sqradius = 0.0f;
-  for (i = 0 ; i < verts.GetSize() ; i++)
+  for (i = 0 ; i < numVerts ; i++)
   {
     csVector3& v = verts[i];
     float sqradius = csSquaredDist::PointPoint (center, v);
@@ -393,12 +397,9 @@ void csWaterMeshObjectFactory::SetupFactory ()
 	{
 		for(uint i = 0; i < wid * gran; i++)
 		{
-			verts.Push(csVector3 (i / gran, (((i+j) % 2) == 0)? -1 : 1, j / gran));
+			verts.Push(csVector3 (i / gran, 0, j / gran));
 			norms.Push(csVector3 (0, 1, 0));
-			if((i + j) % 2 == 0)
-				cols.Push(csColor (0, 0, 1));
-			else
-				cols.Push(csColor (1, 0, 0));
+			cols.Push(csColor (0, 0, 1));
 		}
 	}
 	
@@ -415,15 +416,8 @@ void csWaterMeshObjectFactory::SetupFactory ()
 		}
 	}
 	
-	// printf("wid: %d\n", wid);
-	// printf("len: %d\n", len);
-	// printf("gran: %d\n", gran);
-	// printf("tris.GetSize(): %d\n", tris.GetSize());
-	// printf("verts.GetSize(): %d\n", verts.GetSize());
-	// printf("norms.GetSize(): %d\n", norms.GetSize());
-
-  	// 
-  	//     int rtWVs = (int)sqrt(WATER_VERTS);
+	numVerts = verts.GetSize();
+	numTris = tris.GetSize();
     
 	Invalidate();
 
@@ -442,7 +436,7 @@ void csWaterMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder,
       if (!normal_buffer)
       {
         normal_buffer = csRenderBuffer::CreateRenderBuffer (
-          norms.GetSize(), CS_BUF_STATIC,
+          numVerts, CS_BUF_STATIC,
           CS_BUFCOMP_FLOAT, 3);
       }
       // Don't copy the data, have the buffer store a pointer instead.
@@ -475,10 +469,10 @@ void csWaterMeshObjectFactory::PrepareBuffers ()
     {
       // Create a buffer that doesn't copy the data.
       vertex_buffer = csRenderBuffer::CreateRenderBuffer (
-        verts.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
+        numVerts, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
         3);
     }
-    vertex_buffer->CopyInto (verts.GetArray(), verts.GetSize());
+    vertex_buffer->CopyInto (verts.GetArray(), numVerts);
   }
   if (mesh_texels_dirty_flag)
   {
@@ -497,10 +491,10 @@ void csWaterMeshObjectFactory::PrepareBuffers ()
     mesh_triangle_dirty_flag = false;
     if (!index_buffer)
       index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
-      tris.GetSize()*3,
+      numTris*3,
       CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT,
-      0, verts.GetSize()-1);
-    index_buffer->CopyInto (tris.GetArray(), tris.GetSize()*3);
+      0, numVerts-1);
+    index_buffer->CopyInto (tris.GetArray(), numTris*3);
   }
 }
 

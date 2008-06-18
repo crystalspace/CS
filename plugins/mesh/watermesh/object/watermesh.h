@@ -246,6 +246,8 @@ private:
 	csDirtyAccessArray<csVector2> texs;
 	csDirtyAccessArray<csColor>	cols;
 	csDirtyAccessArray<csTriangle> tris;
+	
+	uint numVerts, numTris;
 
   csVector3 vertices[WATER_VERTS];
   csVector3 normals[WATER_VERTS];
