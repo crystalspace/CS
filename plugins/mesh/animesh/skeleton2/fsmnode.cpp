@@ -25,6 +25,8 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 {
+  CS_LEAKGUARD_IMPLEMENT(FSMNodeFactory);
+
   AnimationFifo::AnimationFifo (AnimationFifoCb* cb)
     : currentState (STATE_STOPPED), cb (cb)
   {}
@@ -313,6 +315,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   //----------------------------------------
 
+
+  CS_LEAKGUARD_IMPLEMENT(FSMNode);
 
   FSMNode::FSMNode (FSMNodeFactory* factory)
     : scfImplementationType (this), BaseNodeSingle (this), factory (factory),

@@ -33,6 +33,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   SCF_IMPLEMENT_FACTORY(SkeletonSystem)
 
 
+  CS_LEAKGUARD_IMPLEMENT(SkeletonSystem);
+
   SkeletonSystem::SkeletonSystem (iBase* parent)
     : scfImplementationType (this, parent)
   {}
@@ -86,6 +88,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   }
 
 
+
+  CS_LEAKGUARD_IMPLEMENT(SkeletonFactory);
 
   SkeletonFactory::SkeletonFactory ()
     : scfImplementationType (this), cachedTransformsDirty (true), 
@@ -331,6 +335,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
 
 
+
+  CS_LEAKGUARD_IMPLEMENT(Skeleton);
 
   Skeleton::Skeleton (SkeletonFactory* factory)
     : scfImplementationType (this, factory), factory (factory), 

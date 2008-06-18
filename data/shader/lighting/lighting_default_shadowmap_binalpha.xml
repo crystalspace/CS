@@ -30,7 +30,7 @@
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
       <!-- First pass: blend with alpha -->
 	<mixmode>
-	  <blendop src="one" dst="srcalpha_inv" />
+	  <blendop src="one" dst="zero" />
 	  <alphatest>enable</alphatest>
 	</mixmode>
       <?else?>
@@ -65,7 +65,7 @@
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
 	<!-- First pass: blend with alpha -->
 	<mixmode>
-	  <blendop src="one" dst="srcalpha_inv" />
+	  <blendop src="one" dst="zero" />
 	  <alphatest>enable</alphatest>
 	</mixmode>
       <?else?>
@@ -110,7 +110,7 @@
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
       <!-- First pass: blend with alpha -->
 	<mixmode>
-	  <blendop src="one" dst="srcalpha_inv" />
+	  <blendop src="one" dst="zero" />
 	  <alphatest>enable</alphatest>
 	</mixmode>
       <?else?>
@@ -217,7 +217,7 @@
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
 	<!-- First pass: blend with alpha -->
 	<mixmode>
-	  <blendop src="one" dst="srcalpha_inv" />
+	  <blendop src="one" dst="zero" />
 	  <alphatest>enable</alphatest>
 	</mixmode>
       <?else?>

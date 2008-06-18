@@ -19,13 +19,15 @@
 #ifndef __CS_FSMNODE_H__
 #define __CS_FSMNODE_H__
 
-#include "csutil/fifo.h"
 #include "csutil/csstring.h"
+#include "csutil/fifo.h"
 #include "csutil/hash.h"
+#include "csutil/leakguard.h"
 #include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
 #include "imesh/skeleton2.h"
 #include "imesh/skeleton2anim.h"
+
 
 #include "nodes.h"
 
@@ -78,6 +80,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
                               scfFakeInterface<iSkeletonAnimNodeFactory2> >
   {
   public:
+    CS_LEAKGUARD_DECLARE(FSMNodeFactory);
+  
     FSMNodeFactory (const char* name);
 
     //-- iSkeletonFSMNodeFactory2
@@ -149,6 +153,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     public AnimationFifoCb
   {
   public:
+    CS_LEAKGUARD_DECLARE(FSMNode);
+  
     FSMNode (FSMNodeFactory* factory);
 
     //-- iSkeletonFSMNode2

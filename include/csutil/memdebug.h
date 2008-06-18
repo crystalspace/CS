@@ -85,6 +85,7 @@ namespace CS
 	  void* newP, size_t newSize);
 	CS_CRYSTALSPACE_EXPORT void UpdateAmount (csMemTrackerModule* m, const char* info,
 	  int dcount, int dsize);
+	CS_CRYSTALSPACE_EXPORT const char* GetInfo (csMemTrackerModule* m, void* p);
 	  
 	extern csMemTrackerModule* thisModule;
       } // namespace Impl
@@ -99,6 +100,8 @@ namespace CS
       { Impl::UpdateSize (Impl::thisModule, p, newP, newSize); }
       inline void UpdateAmount (const char* info, int dcount, int dsize)
       { Impl::UpdateAmount (Impl::thisModule, info, dcount, dsize); }
+      inline const char* GetInfo (void* p)
+      { return Impl::GetInfo  (Impl::thisModule, p); }
     } // namespace MemTracker
   } // namespace Debug
 } // namespace CS

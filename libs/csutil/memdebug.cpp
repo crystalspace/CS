@@ -1070,6 +1070,14 @@ namespace CS
 	  else if (dcount < 0)
 	    mti->totalDeallocCount++;
 	}
+	const char* GetInfo (csMemTrackerModule* m, void* p)
+	{
+	  if (!m) return 0;
+	  csMemTrackerModule::BlockInfo* bi =
+	    m->blockSizes.GetElementPointer (p);
+	  if (!bi) return 0;
+	  return bi->info;
+	}
       } // namespace Impl
     } // namespace MemTracker
   } // namespace Debug
