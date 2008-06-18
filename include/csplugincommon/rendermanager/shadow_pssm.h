@@ -777,6 +777,7 @@ private:
       {
         csTicks time = csGetTicks ();
         settings.AdvanceFrame (time);
+        lightVarsPersist.UpdateNewFrame();
       }
     };
     
