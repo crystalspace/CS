@@ -241,11 +241,22 @@ class csWaterMeshObjectFactory :
 
 private:
   // The actual data.
+	csDirtyAccessArray<csVector3> verts;
+	csDirtyAccessArray<csVector3> norms;
+	csDirtyAccessArray<csVector2> texs;
+	csDirtyAccessArray<csColor>	cols;
+	csDirtyAccessArray<csTriangle> tris;
+
   csVector3 vertices[WATER_VERTS];
   csVector3 normals[WATER_VERTS];
   csVector2 texels[WATER_VERTS];
   csColor colors[WATER_VERTS];
   csTriangle triangles[WATER_TRIS];
+
+  //size vars
+  uint len, wid;
+  uint gran;
+  bool size_changed;
 
   // If the colors change we increase this number
   // so that the meshes know that they have to update
@@ -307,6 +318,16 @@ public:
   csColor* GetColors () { return colors; }
   csTriangle* GetTriangles () { return triangles; }
   void Invalidate ();
+
+	void SetLength(uint length) { len = length; size_changed = true; }
+	uint GetLength() { return len; }
+
+	void SetWidth(uint width) { wid = width; size_changed = true; }
+	uint GetWidth() { return wid; }
+	
+	void SetGranularity(uint granularity) { gran = granularity; size_changed = true; }
+	uint GetGranularity() { return gran; }
+	
   /** @} */
 
   const csBox3& GetObjectBoundingBox ();
