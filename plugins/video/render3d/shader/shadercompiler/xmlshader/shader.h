@@ -182,7 +182,7 @@ class csXMLShader : public scfImplementationExt3<csXMLShader,
     struct Technique
     {
       int priority;
-      csRef<iDocumentNode> srcNode;
+      csRef<csWrappedDocumentNode> srcNode;
       
       csShaderConditionResolver* resolver;
       csRef<iDocumentNode> techNode;
@@ -477,7 +477,7 @@ public:
   csRef<iDocumentNode> LoadProgramFile (const char* filename, size_t variant);
 public:
   //Holders
-  csXMLShaderCompiler* compiler;
+  csRef<csXMLShaderCompiler> compiler;
   csWeakRef<iGraphics3D> g3d;
   csWeakRef<iShaderManager> shadermgr;
   char* filename;
