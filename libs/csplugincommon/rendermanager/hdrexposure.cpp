@@ -34,7 +34,7 @@ namespace CS
       HDRHelper& hdr)
     {
       this->hdr = &hdr;
-      measureLayer = hdr.GetHDRPostEffects().GetLastLayer();
+      measureLayer = hdr.GetMeasureLayer();
       PostEffectManager::LayerOptions measureOpts = measureLayer->GetOptions();
       measureOpts.mipmap = true;
       measureOpts.maxMipmap = csMax (measureOpts.maxMipmap, 2);

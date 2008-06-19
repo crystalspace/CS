@@ -116,7 +116,11 @@ bool PostEffectManager::SetupView (uint width, uint height)
 
     result = true;
   }
-  if (chainedEffects) chainedEffects->SetupView (width, height);
+  if (chainedEffects)
+  {
+    if (chainedEffects->SetupView (width, height))
+      target = chainedEffects->GetScreenTarget();
+  }
   return result;
 }
 
@@ -219,7 +223,6 @@ void PostEffectManager::SetChainedOutput (PostEffectManager* nextEffects)
   if (chainedEffects)
   {
     chainedEffects->SetEffectsOutputTarget (target);
-    target = chainedEffects->GetScreenTarget();
   }
 }
 
