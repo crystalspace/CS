@@ -23,19 +23,41 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgeom/frustum.h"
 #include "csgeom/math3d.h"
 #include "csgeom/trimesh.h"
+#include "csgeom/polyclip.h"
+#include "csgeom/transfrm.h"
+#include "csgeom/tri.h"
 #include "csgfx/renderbuffer.h"
 #include "csgfx/shadervarcontext.h"
+#include "csgfx/imagecubemapmaker.h"
 #include "cstool/rviewclipper.h"
 #include "iengine/camera.h"
 #include "iengine/material.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
+#include "iengine/rendersteps/igeneric.h"
+#include "iengine/rendersteps/irenderstep.h"
+#include "iengine/rendersteps/irsfact.h"
+#include "iengine/sector.h"
+#include "igeom/clip2d.h"
+#include "igraphic/imageio.h"
+#include "imap/loader.h"
+#include "imap/ldrctxt.h"
 #include "iutil/objreg.h"
+#include "iutil/document.h"
+#include "iutil/plugin.h"
+#include "iutil/vfs.h"
+#include "iutil/virtclk.h"
+#include "iutil/strset.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/material.h"
 #include "ivideo/rendermesh.h"
+#include "ivideo/fontserv.h"
+#include "ivideo/rndbuf.h"
+#include "ivideo/shader/shader.h"
+#include "ivideo/texture.h"
+#include "ivideo/txtmgr.h"
 
 #include "watermesh.h"
 
@@ -67,6 +89,8 @@ csWaterMeshObject::csWaterMeshObject (csWaterMeshObjectFactory* factory) :
 
   g3d = csQueryRegistry<iGraphics3D> (factory->object_reg);
 
+  shader = factory->shader;
+
   variableContext.AttachNew (new csShaderVariableContext);
 }
 
@@ -82,6 +106,10 @@ iMeshObjectFactory* csWaterMeshObject::GetFactory () const
 bool csWaterMeshObject::SetMaterialWrapper (iMaterialWrapper* mat)
 {
   material = mat;
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> 
+  		(factory->object_reg, "crystalspace.shared.stringset");
+  if(shader != 0)
+  	material->GetMaterial()->SetShader(strings->Request("general"), shader);
   return true;
 }
 
@@ -179,7 +207,7 @@ csRenderMesh** csWaterMeshObject::GetRenderMeshes (
   meshPtr->meshtype = CS_MESHTYPE_TRIANGLES;
   meshPtr->indexstart = 0;
   meshPtr->indexend = factory->numTris * 3;
-  meshPtr->material = material;
+  meshPtr->material = material;		
   meshPtr->worldspace_origin = wo;
   meshPtr->object2world = o2wt;
   if (rmCreated)
@@ -315,6 +343,7 @@ csWaterMeshObjectFactory::csWaterMeshObjectFactory (
   color_nr = 0;
 
   g3d = csQueryRegistry<iGraphics3D> (object_reg);
+  engine = csQueryRegistry<iEngine> (object_reg);
 
   mesh_vertices_dirty_flag = true;
   mesh_texels_dirty_flag = true;
@@ -329,6 +358,23 @@ csWaterMeshObjectFactory::csWaterMeshObjectFactory (
 	numTris = 2;
 	
 	size_changed = false;
+	
+	// Load in lighting shaders
+	csRef<iVFS> vfs (csQueryRegistry<iVFS> (object_reg));
+	csRef<iFile> shaderFile = vfs->Open ("/shader/water.xml", VFS_FILE_READ);
+	
+	csRef<iPluginManager> plugin_mgr (csQueryRegistry<iPluginManager> (object_reg));
+	csRef<iDocumentSystem> docsys = csLoadPlugin<iDocumentSystem > (plugin_mgr, "crystalspace.documentsystem.tinyxml");
+	if (docsys.IsValid())
+	    object_reg->Register (docsys, "iDocumentSystem ");
+	
+	csRef<iDocument> shaderDoc = docsys->CreateDocument ();
+	shaderDoc->Parse (shaderFile, true);
+
+	csRef<iShaderManager> shmgr (csQueryRegistry<iShaderManager> (object_reg));
+	csRef<iShaderCompiler> shcom (shmgr->GetCompiler ("XMLShader"));
+	csRef<iLoaderContext> ldr_context = engine->CreateLoaderContext();
+	shader = shcom->CompileShader (ldr_context, shaderDoc->GetRoot()->GetNode("shader"));
 }
 
 csWaterMeshObjectFactory::~csWaterMeshObjectFactory ()

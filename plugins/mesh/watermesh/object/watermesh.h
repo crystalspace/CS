@@ -24,6 +24,7 @@
 #include "csutil/leakguard.h"
 #include "csutil/weakref.h"
 #include "cstool/rendermeshholder.h"
+#include "iengine/engine.h"
 #include "imesh/objmodel.h"
 #include "iutil/comp.h"
 #include "imesh/watermesh.h"
@@ -84,6 +85,9 @@ private:
   csWeakRef<iGraphics3D> g3d;
   csRef<csWaterMeshObjectFactory> factory;
   iMeshWrapper* logparent;
+
+  // Shader stuff
+  csRef<iShader> shader;
 
   // Callback when object is rendered (in GetRenderMeshes()).
   csRef<iMeshObjectDrawCallback> vis_cb;
@@ -275,6 +279,10 @@ private:
   // Admin.
   bool initialized;
   csWeakRef<iGraphics3D> g3d;
+  csWeakRef<iEngine> engine;
+
+  // Shader stuff
+  csRef<iShader> shader;
 
   // Buffers for the renderers.
   csRef<iRenderBuffer> vertex_buffer;
