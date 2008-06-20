@@ -1,0 +1,19 @@
+<shader compiler="xmlshader" name="water">
+  <technique priority="250">
+    <pass>
+      <mixmode><copy/></mixmode>
+      <buffer source="normal" destination="normal"/>
+      <vp plugin="glcg" name="Water Vertices">
+		<cgvp>
+			<program file="/shader/water/water.cgvp">
+		</cgvp>
+      </vp>
+      <!--<texture name="tex diffuse" destination="unit 0" />-->
+      <fp plugin="glcg" name="Water pixels">
+		<cgfp>
+			<program file="/shader/water/water.cgfp">
+		</cgfp>
+      </fp>
+    </pass>
+  </technique>
+</shader>

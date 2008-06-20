@@ -75,8 +75,13 @@ csWaterMeshObject::csWaterMeshObject (csWaterMeshObjectFactory* factory) :
   logparent = 0;
   initialized = false;
 
-  material = 0;
-  MixMode = 0;
+  material = factory->waterMatW; //engine->CreateMaterial ("watermat", 0);	
+	//   csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> 
+	// (factory->object_reg, "crystalspace.shared.stringset");
+	//   if(shader != 0)
+	//     material->GetMaterial()->SetShader(strings->Request("general"), shader);
+
+  MixMode = CS_FX_COPY;
 
   color.red = 0;
   color.green = 0;
@@ -105,11 +110,11 @@ iMeshObjectFactory* csWaterMeshObject::GetFactory () const
 
 bool csWaterMeshObject::SetMaterialWrapper (iMaterialWrapper* mat)
 {
-  material = mat;
-  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> 
-  		(factory->object_reg, "crystalspace.shared.stringset");
-  if(shader != 0)
-  	material->GetMaterial()->SetShader(strings->Request("general"), shader);
+  //material = mat;
+  // csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> 
+  // 	(factory->object_reg, "crystalspace.shared.stringset");
+  //   if(shader != 0)
+  //   	material->GetMaterial()->SetShader(strings->Request("general"), shader);
   return true;
 }
 
@@ -201,8 +206,8 @@ csRenderMesh** csWaterMeshObject::GetRenderMeshes (
 
   meshPtr->mixmode = MixMode;
   meshPtr->clip_portal = clip_portal;
-  meshPtr->clip_plane = clip_plane;
-  meshPtr->clip_z_plane = clip_z_plane;
+meshPtr->clip_plane = 0;//clip_plane;
+meshPtr->clip_z_plane = 0;//clip_z_plane;
   meshPtr->do_mirror = camera->IsMirrored ();
   meshPtr->meshtype = CS_MESHTYPE_TRIANGLES;
   meshPtr->indexstart = 0;
@@ -361,20 +366,29 @@ csWaterMeshObjectFactory::csWaterMeshObjectFactory (
 	
 	// Load in lighting shaders
 	csRef<iVFS> vfs (csQueryRegistry<iVFS> (object_reg));
-	csRef<iFile> shaderFile = vfs->Open ("/shader/water.xml", VFS_FILE_READ);
+	csRef<iFile> shaderFile = vfs->Open ("/shader/water/water.xml", VFS_FILE_READ);
 	
 	csRef<iPluginManager> plugin_mgr (csQueryRegistry<iPluginManager> (object_reg));
-	csRef<iDocumentSystem> docsys = csLoadPlugin<iDocumentSystem > (plugin_mgr, "crystalspace.documentsystem.tinyxml");
+	csRef<iDocumentSystem> docsys = csLoadPlugin<iDocumentSystem > 
+		(plugin_mgr, "crystalspace.documentsystem.xmlread");
 	if (docsys.IsValid())
 	    object_reg->Register (docsys, "iDocumentSystem ");
 	
 	csRef<iDocument> shaderDoc = docsys->CreateDocument ();
 	shaderDoc->Parse (shaderFile, true);
-
+	
 	csRef<iShaderManager> shmgr (csQueryRegistry<iShaderManager> (object_reg));
 	csRef<iShaderCompiler> shcom (shmgr->GetCompiler ("XMLShader"));
 	csRef<iLoaderContext> ldr_context = engine->CreateLoaderContext();
 	shader = shcom->CompileShader (ldr_context, shaderDoc->GetRoot()->GetNode("shader"));
+	
+	csRef<iMaterial> mat = engine->CreateBaseMaterial (0);
+	
+	csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> 
+	 	(object_reg, "crystalspace.shared.stringset");
+	mat->SetShader (strings->Request ("standard"), shader);
+	
+	waterMatW = engine->GetMaterialList ()->NewMaterial (mat, "waterMaterial");
 }
 
 csWaterMeshObjectFactory::~csWaterMeshObjectFactory ()

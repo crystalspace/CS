@@ -282,6 +282,7 @@ private:
   csWeakRef<iEngine> engine;
 
   // Shader stuff
+  csRef<iMaterialWrapper> waterMatW;
   csRef<iShader> shader;
 
   // Buffers for the renderers.
