@@ -314,7 +314,7 @@ namespace RenderManager
 	      for (int c = 0; c < 7; c++)
 	      {
 		cornerLight = frustumLight.GetCorner (c);
-		cornerUndiv = lightProject * cornerLight;
+		cornerUndiv = lightProject * csVector4 (cornerLight);
 		cornerDiv =
 		  csVector3 (cornerUndiv.x, cornerUndiv.y, cornerUndiv.z);
 		cornerDiv /= cornerUndiv.w;
