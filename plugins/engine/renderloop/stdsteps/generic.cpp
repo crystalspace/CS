@@ -328,7 +328,7 @@ void csGenericRenderStep::ToggleStepSettings (iGraphics3D* g3d,
 class ShaderTicketHelper
 {
 private:
-  csShaderVariableStack& stack;
+  csShaderVariableStack stack;
   const csArray<csShaderVariableContext>& shadervars;
   size_t shadervars_idx;
   //csShaderVariableContext& shadervars;
@@ -345,11 +345,12 @@ private:
   }
 
 public:
-  ShaderTicketHelper (csShaderVariableStack& stack,
+  ShaderTicketHelper (csShaderVariableStack& _stack,
     const csArray<csShaderVariableContext>& sv,
-    size_t sv_idx) : stack (stack), shadervars (sv), shadervars_idx (sv_idx),
+    size_t sv_idx) : stack (_stack), shadervars (sv), shadervars_idx (sv_idx),
       lastMat (0), lastShader (0), lastMeshContext (0), lastSectorContext (0)
   {
+    stack.MakeOwnArray();
     Reset ();
   }
 
