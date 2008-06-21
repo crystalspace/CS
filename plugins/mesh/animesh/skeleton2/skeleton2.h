@@ -26,6 +26,7 @@
 #include "csgeom/vector3.h"
 #include "csgeom/quaternion.h"
 #include "csutil/hash.h"
+#include "csutil/leakguard.h"
 #include "csutil/csstring.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
@@ -36,6 +37,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
                                                    iComponent>
   {
   public:
+    CS_LEAKGUARD_DECLARE(SkeletonSystem);
+  
     SkeletonSystem (iBase* parent);
 
     //-- iSkeletonManager2
@@ -64,6 +67,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
                                                     iSkeletonFactory2>
   {
   public:
+    CS_LEAKGUARD_DECLARE(SkeletonFactory);
+  
     SkeletonFactory ();
 
     //-- iSkeletonFactory2
@@ -136,6 +141,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   class Skeleton : public scfImplementation1<Skeleton, iSkeleton2>
   {
   public:
+    CS_LEAKGUARD_DECLARE(Skeleton);
+  
     Skeleton (SkeletonFactory* factory);
 
 

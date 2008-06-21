@@ -429,7 +429,7 @@ csXMLShader::~csXMLShader ()
 /* Magic value for cache file.
  * The most significant byte serves as a "version", increase when the
  * cache file format changes. */
-static const uint32 cacheFileMagic = 0x05737863;
+static const uint32 cacheFileMagic = 0x06737863;
 
 void csXMLShader::Load (iDocumentNode* source)
 {
@@ -561,7 +561,8 @@ void csXMLShader::Load (iDocumentNode* source)
       csString tree;
       tree.SetGrowsBy (0);
       wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (source, 
-	techsResolver, techsResolver->evaluator, extraNodes, &tree, true));
+	techsResolver, techsResolver->evaluator, extraNodes, &tree, 
+	wdnfpoOnlyOneLevelConditions | wdnfpoExpandTemplates));
       techsResolver->DumpConditionTree (tree);
       csString filename;
       filename.Format ("/tmp/shader/cond_%s_techs.txt",
@@ -570,7 +571,8 @@ void csXMLShader::Load (iDocumentNode* source)
     }
     else
       wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (source, 
-        techsResolver, techsResolver->evaluator, extraNodes, 0, true));
+        techsResolver, techsResolver->evaluator, extraNodes, 0,
+        wdnfpoOnlyOneLevelConditions | wdnfpoExpandTemplates));
     shaderRoot = wrappedNode;
     
     if (cacheValid)
@@ -769,7 +771,10 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	const TechniqueKeeper& tk = techIt.Next();
 	ShaderTechVariant::Technique newTech;
 	newTech.priority = tk.priority;
-	newTech.srcNode = tk.node;
+	csRef<iWrappedDocumentNode> wrappedNode =
+	  scfQueryInterface<iWrappedDocumentNode> (tk.node);
+	newTech.srcNode = static_cast<csWrappedDocumentNode*> (
+	  (iWrappedDocumentNode*)wrappedNode);
 	
 	techVar.techniques.Push (newTech);
       }
@@ -864,15 +869,16 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	  /* @@@ TODO: Some SV values are fixed from the tech determination;
 	   * treat them as constant in the technique */
 	  csRef<csWrappedDocumentNode> wrappedNode;
-	  wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (tech.srcNode, 
-	    tech.resolver, tech.resolver->evaluator, extraNodes, 0));
-	  tech.techNode = wrappedNode;
-	  tech.srcNode.Invalidate();
 	  
 	  if (compiler->doDumpConds)
 	  {
 	    csString tree;
 	    tree.SetGrowsBy (0);
+	    
+	    wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (tech.srcNode, 
+	      tech.resolver, tech.resolver->evaluator, extraNodes, &tree,
+	      wdnfpoHandleConditions));
+	    
 	    tech.resolver->DumpConditionTree (tree);
 	    csString filename;
 	    filename.Format ("/tmp/shader/cond_%s_%zu.txt",
@@ -880,6 +886,13 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	      tvi);
 	    compiler->vfs->WriteFile (filename, tree.GetData(), tree.Length ());
 	  }
+	  else
+	    wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (tech.srcNode, 
+	      tech.resolver, tech.resolver->evaluator, extraNodes, 0,
+	      wdnfpoHandleConditions));
+	  
+	  tech.techNode = wrappedNode;
+	  tech.srcNode.Invalidate();
 	  
 	  if (shaderCache.IsValid())
 	  {

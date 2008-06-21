@@ -48,6 +48,12 @@ csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine,
   render_priority = engine->GetObjectRenderPriority ();
   imposter_active = false;
   imposter_factory = 0;
+  
+  /* Work around iShaderVariableContext cast not working before 
+     CS::ShaderVariableContextImpl construction */
+  csRefTrackerAccess::AddAlias (
+    static_cast<iShaderVariableContext*> (this),
+    this);
 }
 
 csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine)
@@ -59,6 +65,12 @@ csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine)
   render_priority = engine->GetObjectRenderPriority ();
   imposter_active = false;
   imposter_factory = 0;
+  
+  /* Work around iShaderVariableContext cast not working before 
+     CS::ShaderVariableContextImpl construction */
+  csRefTrackerAccess::AddAlias (
+    static_cast<iShaderVariableContext*> (this),
+    this);
 }
 
 csMeshFactoryWrapper::~csMeshFactoryWrapper ()

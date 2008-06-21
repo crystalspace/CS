@@ -275,8 +275,9 @@ public:
    * The second string set is used for shader variable names and can be
    * requested by:
    * \code
-   * csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
-   *   objectRegistry, "crystalspace.shader.variablenameset");
+   * csRef<iShaderVarStringSet> strings =
+   *   csQueryRegistryTagInterface<iShaderVarStringSet> (
+   *     objectRegistry, "crystalspace.shader.variablenameset");
    * \endcode
    */
   static bool CreateStringSet (iObjectRegistry*);

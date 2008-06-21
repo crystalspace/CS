@@ -25,6 +25,8 @@
 CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 {
 
+  CS_LEAKGUARD_IMPLEMENT(BlendNodeFactory);
+
   BlendNodeFactory::BlendNodeFactory (const char* name)
     : scfImplementationType (this), name (name), syncMode (CS::Animation::SYNC_NONE)
   {
@@ -114,6 +116,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   {
     return syncMode;
   }
+
+  
+  CS_LEAKGUARD_IMPLEMENT(BlendNode);
 
   BlendNode::BlendNode (BlendNodeFactory* factory)
     : scfImplementationType (this), BaseNodeChildren (this), factory (factory), 

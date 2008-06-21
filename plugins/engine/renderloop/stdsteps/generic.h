@@ -127,6 +127,7 @@ private:
 
   static CS::ShaderVarStringID fogplane_name;
   static CS::ShaderVarStringID string_object2world;
+  static CS::ShaderVarStringID string_object2worldInv;
   static CS::ShaderVarStringID light_0_type;
   static CS::ShaderVarStringID light_ambient;
 

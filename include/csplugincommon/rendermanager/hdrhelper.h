@@ -96,8 +96,16 @@ namespace CS
       iShader* GetMappingShader ();
       /// Get the shader variable context for the tonemapping stage.
       iShaderVariableContext* GetMapppingShaderVarContext();
+      
+      /**
+       * Get the post processing effects layer that can be used for measuring
+       * image colors (before tonemapping).
+       */
+      PostEffectManager::Layer* GetMeasureLayer() const
+      { return measureLayer; }
     private:
       PostEffectManager postEffects;
+      PostEffectManager::Layer* measureLayer;
       PostEffectManager::Layer* mappingLayer;
     };
   

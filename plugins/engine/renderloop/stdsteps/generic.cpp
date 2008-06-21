@@ -154,6 +154,7 @@ csPtr<iRenderStep> csGenericRenderStepFactory::Create ()
 
 CS::ShaderVarStringID csGenericRenderStep::fogplane_name;
 CS::ShaderVarStringID csGenericRenderStep::string_object2world;
+CS::ShaderVarStringID csGenericRenderStep::string_object2worldInv;
 CS::ShaderVarStringID csGenericRenderStep::light_ambient;
 
 csGenericRenderStep::csGenericRenderStep (
@@ -175,6 +176,7 @@ csGenericRenderStep::csGenericRenderStep (
   currentSettings = false;
   fogplane_name = stringsSvName->Request ("fogplane");
   string_object2world = stringsSvName->Request ("object2world transform");
+  string_object2worldInv = stringsSvName->Request ("object2world transform inverse");
   light_ambient = stringsSvName->Request ("light ambient");
 
   visible_meshes_index = 0;
@@ -229,6 +231,8 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
   }
   csRef<csShaderVariable> svO2W = 
     shadervars.Top ().GetVariable(string_object2world);
+  csRef<csShaderVariable> svO2WI = 
+    shadervars.Top ().GetVariable(string_object2worldInv);
 
   ShaderVarPusher pusher (Pusher);
   iShader* shader = pusher.shader;
@@ -253,6 +257,7 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
       if ((!portalTraversal) && mesh->portal != 0) continue;
 
       svO2W->SetValue (mesh->object2world);
+      svO2WI->SetValue (mesh->object2world.GetInverse());
 
       pusher.meshContext = meshContext;
       pusher.mesh = mesh;
@@ -323,7 +328,7 @@ void csGenericRenderStep::ToggleStepSettings (iGraphics3D* g3d,
 class ShaderTicketHelper
 {
 private:
-  csShaderVariableStack& stack;
+  csShaderVariableStack stack;
   const csArray<csShaderVariableContext>& shadervars;
   size_t shadervars_idx;
   //csShaderVariableContext& shadervars;
@@ -340,11 +345,12 @@ private:
   }
 
 public:
-  ShaderTicketHelper (csShaderVariableStack& stack,
+  ShaderTicketHelper (csShaderVariableStack& _stack,
     const csArray<csShaderVariableContext>& sv,
-    size_t sv_idx) : stack (stack), shadervars (sv), shadervars_idx (sv_idx),
+    size_t sv_idx) : stack (_stack), shadervars (sv), shadervars_idx (sv_idx),
       lastMat (0), lastShader (0), lastMeshContext (0), lastSectorContext (0)
   {
+    stack.MakeOwnArray();
     Reset ();
   }
 
@@ -433,6 +439,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
 
   shadervars.Push (csShaderVariableContext ());
   shadervars.Top ().GetVariableAdd (string_object2world);
+  shadervars.Top ().GetVariableAdd (string_object2worldInv);
 
   csRef<csShaderVariable> sv;
   sv = shadervars.Top ().GetVariableAdd (light_ambient);

@@ -128,7 +128,7 @@ private:
   csWeakRef<iGraphics3D> g3d;
   csWeakRef<iShaderManager> shmgr;
   csRef<csStencilShadowType> type;
-  csRef<iStringSet> svNameStringset;
+  csRef<iShaderVarStringSet> svNameStringset;
 
   // ID's for the triangle mesh system.
   csStringID base_id;
