@@ -60,6 +60,7 @@ namespace CS
 	{
 	  persist.EnableDebugFlag (flag, !persist.IsDebugFlagEnabled (flag));
 	}
+	return true;
       }
       return false;
     }
