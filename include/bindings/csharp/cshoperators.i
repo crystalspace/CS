@@ -75,7 +75,7 @@
   {
     // This probably isn't the best form for calculate the hash code
     csVector2 v = this;
-    return (int)((v.x.GetHashCode() & 0xff00ff) | ((v.y.GetHashCode() & 0xff00ff)<<8));
+    return v.x.GetHashCode() ^ v.y.GetHashCode();
   }
 
   public static bool operator==(csVector2 v1, csVector2 v2)
@@ -194,7 +194,7 @@ VECTOR2_CSHARP_CODE
     csVector3 v = this;
 
     // This probably isn't the best form for calculate the hash code
-	return (int)((v.x.GetHashCode() & 0xfff) | ((v.y.GetHashCode() & 0xfff)<<12) | (v.y.GetHashCode() &0xff000000));
+	return v.x.GetHashCode() ^ v.y.GetHashCode() ^ v.z.GetHashCode();
   }
 
   // Are the two vectors equal?
@@ -297,8 +297,7 @@ VECTOR3_CSHARP_CODE
   {
     csMatrix2 m = this;
 
-    return (int)((m.m11.GetHashCode()&0x000000ff) | (m.m12.GetHashCode()&0x0000ff00) 
-	 | (m.m21.GetHashCode()&0x00ff0000) | (m.m22.GetHashCode()&0xff000000));
+    return m.m11.GetHashCode() ^ m.m12.GetHashCode() ^ m.m21.GetHashCode() ^ m.m22.GetHashCode();
   }
 
   public static bool operator==(csMatrix2 m1, csMatrix2 m2)
@@ -370,9 +369,9 @@ MATRIX2_CSHARP_CODE
   {
     csMatrix3 m = this;
 
-    return (int)((m.m11.GetHashCode()&0x0000000f) | (m.m12.GetHashCode()&0x000000f0) | (m.m13.GetHashCode()&0x00000f00) 
-	 | (m.m21.GetHashCode()&0x0000f000) | (m.m22.GetHashCode()&0x0000f000) | (m.m23.GetHashCode()&0x000f0000)
-	 | (m.m31.GetHashCode()&0x00f00000) | (m.m32.GetHashCode()&0x0f000000) | (m.m33.GetHashCode()&0xf0000000));
+    return m.m11.GetHashCode() ^ m.m12.GetHashCode() ^ m.m13.GetHashCode()
+	^  m.m21.GetHashCode() ^ m.m22.GetHashCode() ^ m.m23.GetHashCode()
+	^  m.m31.GetHashCode() ^ m.m32.GetHashCode() ^ m.m33.GetHashCode();
   }
 
   public static bool operator==(csMatrix3 m1, csMatrix3 m2)
@@ -604,6 +603,22 @@ SPHERE_CSHARP_CODE
     float invS = 1.0f / s;
     return new csQuaternion(q.v * invS, q.w * invS);
   }
+
+  public override bool Equals(object o)
+  {
+    if(!(o is csQuaternion) || o == null)
+      return false;
+    csQuaternion q1 = this;
+    csQuaternion q2 = (csQuaternion)o;
+
+    // If one of the objects is null, then compares by reference
+    return q1.v == q2.v && q1.w == q2.w;
+  }
+
+  public override int GetHashCode()
+  {
+    return v.GetHashCode() ^ w.GetHashCode();
+  }
 %}
 %enddef
 QUATERNION_CSHARP_CODE
@@ -686,7 +701,7 @@ QUATERNION_CSHARP_CODE
   {
     csBox2 b = (csBox2) this;
 
-    return (int)((b.BoxMin.GetHashCode()&0x0000ffff) |(b.BoxMax.GetHashCode()&0xffff0000));
+    return b.BoxMin.GetHashCode() ^b.BoxMax.GetHashCode();
   }
 
   public static bool operator==(csBox2 b1, csBox2 b2)
@@ -797,9 +812,9 @@ BOX2_CSHARP_CODE
 
   public override int GetHashCode()
   {
-    csBox3 b = (csBox3) this;
+    csBox3 b = this;
 
-    return (int)((b.BoxMin.GetHashCode()&0x0000ffff) |(b.BoxMax.GetHashCode()&0xffff0000));
+    return b.BoxMin.GetHashCode() ^b.BoxMax.GetHashCode();
   }
 
   public static csBox3 operator+(csBox3 b1, csBox3 b2)

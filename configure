@@ -18612,6 +18612,13 @@ fi
 "
 fi
 
+     cs_build_prop_val="-Wl,--kill-at"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS.KILLAT ?= $cs_build_prop_val ;
+"
+fi
+
 else
   cs_cv_prog_link_kill_at_cflags=''
 	cs_cv_prog_link_kill_at_lflags=''

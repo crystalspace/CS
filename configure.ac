@@ -620,7 +620,8 @@ CS_EMIT_BUILD_FLAGS([how to export all dynamic symbols],
 #------------------------------------------------------------------------------
 CS_CHECK_BUILD([if --kill-at is accepted], [cs_cv_prog_link_kill_at], [],
     [CS_CREATE_TUPLE([],[-Wl,--kill-at])], [C++],
-    [CS_EMIT_BUILD_PROPERTY([CSJAVA.LFLAGS], [-Wl,--kill-at])])
+    [CS_EMIT_BUILD_PROPERTY([CSJAVA.LFLAGS], [-Wl,--kill-at])
+     CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS.KILLAT], [-Wl,--kill-at])])
 
 
 
