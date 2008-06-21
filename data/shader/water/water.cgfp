@@ -14,7 +14,7 @@ struct INPUT
 
 float4 main (INPUT IN) : COLOR        
 {       
-     fColor = {1.0, 0.0, 0.0, 1.0};
+     float4 fColor = {1.0, 0.0, 0.0, 1.0};
 
      return fColor; 
 }

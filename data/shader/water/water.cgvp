@@ -34,7 +34,6 @@ OUTPUT main (INPUT IN,
     //----------------------------------------------------------------------
 
     float4 Pos        = IN.Position;
-    Pos.y += Pos.x;
 
     OUT.Position = mul (ModelViewProj, Pos);
 
