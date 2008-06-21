@@ -40,7 +40,7 @@ namespace CS
 	if (dot == (size_t)-1) break;
 	strToSplit.Truncate (dot);
 	uint parentID = RegisterDebugFlag (strToSplit);
-	csArray<uint> parentChildren = debugIdChildren.GetOrCreate (parentID);
+	csArray<uint>& parentChildren = debugIdChildren.GetOrCreate (parentID);
 	parentChildren.Push (newID);
       }
 
