@@ -127,32 +127,31 @@ There are different ways how lighting is applied to objects. @xref{Lighting}.
 (@code{iSceneNode}). A scene node is a generic representation of an
 object in a hierarchy. Currently mesh objects and lights are scene nodes.
 
-@subsubheading Regions
-@cindex region
+@subsubheading Collections
+@cindex collection
 @cindex dynamic loading
-@cindex @code{iRegion}
+@cindex @code{iCollection}
 
-(@code{iRegion}). A region is also a collection of objects but the purpose
-is different (as opposed to collections). A region can contain
+(@code{iCollection}). A collection is a group of iObjects. A collection can contain
 textures, materials, mesh objects, mesh factories, lights, collections, sectors,
-sequences, triggers, shared variables, @dots{}. Regions are useful when you
+sequences, triggers, shared variables, @dots{}. Collections are useful when you
 want to load/unload big parts of a world dynamically. This can be used in
 cases where the world is too big to fit in memory and you want to use dynamic
-loading. It is important to realize that the concept of a region is not
-geometrical. A region is typically a collection of objects that are located
-close to each other in 3D but it doesn't have to be that way. Regions can
+loading. It is important to realize that the concept of a collection is not
+geometrical. A collection is typically a group of objects that are located
+close to each other in 3D but it doesn't have to be that way. Collections can
 be organized in any way you want. Some examples:
 
 @itemize @bullet
 @item
-One region represents a geometrical part of the world, including sectors,
-meshes, lights, materials, @dots{}) used in that region. This is probably
+One collection represents a geometrical part of the world, including sectors,
+meshes, lights, materials, @dots{}) used in that area. This is probably
 the most common usage.
 @item
-One region represents objects of a given type. For example, all materials
-are in one region. Meshes in another.
+One collection represents objects of a given type. For example, all materials
+are in one collection. Meshes in another.
 @item
-One region represents the static objects of your world. The other region
+One collection represents the static objects of your world. The other collection
 represents the dynamic objects (moving objects).
 @end itemize
 

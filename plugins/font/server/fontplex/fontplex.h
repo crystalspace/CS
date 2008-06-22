@@ -41,14 +41,16 @@ class csFontPlexer;
 struct csFontLoadOrderEntry
 {
   csString fontName;
-  csRefArray<iFontServer> servers;
+  typedef csRefArray<iFontServer, CS::Container::ArrayAllocDefault,
+    csArrayCapacityFixedGrow<1> > ServersArray;
+  ServersArray servers;
   bool fallback;
 
   bool loaded;
   csRef<iFont> font;
   float scale;
 
-  csFontLoadOrderEntry (csRefArray<iFontServer> servers, const char* fontName,
+  csFontLoadOrderEntry (const ServersArray& servers, const char* fontName,
     float scale, bool fallback);
   csFontLoadOrderEntry (const csFontLoadOrderEntry& other);
   ~csFontLoadOrderEntry ();
@@ -132,7 +134,7 @@ class csFontServerMultiplexer :
 {
 private:
   iObjectRegistry* object_reg;
-  csRefArray<iFontServer> fontservers;
+  csFontLoadOrderEntry::ServersArray fontservers;
 
   csConfigAccess config;
   csString fontset;

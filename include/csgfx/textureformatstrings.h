@@ -192,6 +192,13 @@ namespace CS
       return (special == other.special);
     }
 
+    bool operator!= (const StructuredTextureFormat& other) const
+    {
+      if (coded_components != other.coded_components) return true;
+      if (format != other.format) return true;
+      return (special != other.special);
+    }
+
     /// Returns whether the contained format is a valid texture format.
     bool IsValid () { return format != Invalid; }
 

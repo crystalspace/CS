@@ -61,6 +61,7 @@ import core
 import iengine
 import ivideo
 import csgfx
+import ivaria
 _SetSCFPointer = _cstool._SetSCFPointer
 _GetSCFPointer = _cstool._GetSCFPointer
 if not "core" in dir():
@@ -181,7 +182,21 @@ class csColliderActor(object):
 csColliderActor_swigregister = _cstool.csColliderActor_swigregister
 csColliderActor_swigregister(csColliderActor)
 
-class csView(object):
+class scfView(ivaria.iView):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def IncRef(*args): return _cstool.scfView_IncRef(*args)
+    def DecRef(*args): return _cstool.scfView_DecRef(*args)
+    def GetRefCount(*args): return _cstool.scfView_GetRefCount(*args)
+    def QueryInterface(*args): return _cstool.scfView_QueryInterface(*args)
+    def AddRefOwner(*args): return _cstool.scfView_AddRefOwner(*args)
+    def RemoveRefOwner(*args): return _cstool.scfView_RemoveRefOwner(*args)
+    def GetInterfaceMetadata(*args): return _cstool.scfView_GetInterfaceMetadata(*args)
+scfView_swigregister = _cstool.scfView_swigregister
+scfView_swigregister(scfView)
+
+class csView(scfView):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
@@ -194,6 +209,8 @@ class csView(object):
     def SetEngine(*args): return _cstool.csView_SetEngine(*args)
     def GetCamera(*args): return _cstool.csView_GetCamera(*args)
     def SetCamera(*args): return _cstool.csView_SetCamera(*args)
+    def GetPerspectiveCamera(*args): return _cstool.csView_GetPerspectiveCamera(*args)
+    def SetPerspectiveCamera(*args): return _cstool.csView_SetPerspectiveCamera(*args)
     def GetContext(*args): return _cstool.csView_GetContext(*args)
     def SetContext(*args): return _cstool.csView_SetContext(*args)
     def SetRectangle(*args): return _cstool.csView_SetRectangle(*args)
@@ -204,6 +221,7 @@ class csView(object):
     def UpdateClipper(*args): return _cstool.csView_UpdateClipper(*args)
     def GetClipper(*args): return _cstool.csView_GetClipper(*args)
     def Draw(*args): return _cstool.csView_Draw(*args)
+    def GetMeshFilter(*args): return _cstool.csView_GetMeshFilter(*args)
 csView_swigregister = _cstool.csView_swigregister
 csView_swigregister(csView)
 

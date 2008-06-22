@@ -336,6 +336,25 @@ protected:
     else
       return LocateNode (node->right, key);
   }
+  /// Find the node which has a given instance of a key
+  Node* LocateNodeExact (Node* node, const K* key) const
+  {
+    if (node == 0) return 0;
+      
+    if (key == (K*)&node->key) return node;
+    int r = csComparator<K, K>::Compare (*key, *((K*)&node->key));
+    if (r == 0)
+    {
+      // @@@ Should that be really necessary?
+      Node* n = LocateNodeExact (node->left, key);
+      if (n != 0) return n;
+      return LocateNodeExact (node->right, key);
+    }
+    else if (r < 0)
+      return LocateNodeExact (node->left, key);
+    else
+      return LocateNodeExact (node->right, key);
+  }
   /// Return smallest node with a key greater than 'node's.
   static Node* Successor (const Node* node)
   {
@@ -469,7 +488,7 @@ protected:
   void RecursiveTraverseInOrder (Node* node, CB& callback) const
   {
     if (node->left != 0) RecursiveTraverseInOrder (node->left, callback);
-    callback.Process (*((K*)&node->key));
+    callback (*((K*)&node->key));
     if (node->right != 0) RecursiveTraverseInOrder (node->right, callback);
   }
 
@@ -536,6 +555,18 @@ public:
   bool Delete (const K& key)
   {
     Node* n = LocateNode (root, key);
+    if (n == 0) return false;
+    DeleteNode (n);
+    return true;
+  }
+  /**
+   * Delete a specific instance of a key.
+   * \return Whether the deletion was successful. Fails if the key is not 
+   *  in the tree.
+   */
+  bool DeleteExact (const K* key)
+  {
+    Node* n = LocateNodeExact (root, key);
     if (n == 0) return false;
     DeleteNode (n);
     return true;
@@ -804,9 +835,9 @@ class csRedBlackTreeMap : protected csRedBlackTree<csRedBlackTreePayload<K, T> >
     CB callback;
   public:
     TraverseCB (const CB& callback) : callback(callback) {}
-    void Process (csRedBlackTreePayload<K, T>& value)
+    void operator() (csRedBlackTreePayload<K, T>& value)
     {
-      callback.Process (value.GetKey(), value.GetValue());
+      callback (value.GetKey(), value.GetValue());
     }
   };
 public:

@@ -66,7 +66,7 @@ bool csShaderGLCGVP::Compile ()
     cg_profile = "arbvp1";
   
   if (!DefaultLoadProgram (cgResolve, programStr, CG_GL_VERTEX, 
-      shaderPlug->maxProfileVertex, false, true))
+      shaderPlug->maxProfileVertex))
     return false;
 
   return true;

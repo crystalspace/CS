@@ -1055,6 +1055,95 @@ bool csBox3::ProjectBoxAndOutline (const csTransform& trans, float fov,
   return max_z >= .1;
 }
 
+static void Perspective (const csVector3& v, csVector2& p,
+  const CS::Math::Matrix4& proj, int screenWidth, int screenHeight)
+{
+  csVector4 v_proj (proj * csVector4 (v, 1));
+  float inv_w = 1.0f/v_proj.w;
+  p.x = (v_proj.x * inv_w + 1) * screenWidth/2;
+  p.y = (v_proj.y * inv_w + 1) * screenHeight/2;
+}
+
+// Version to cope with z <= 0. This is wrong but it in the places where
+// it is used below the result is acceptable because it generates a
+// conservative result (i.e. a box or outline that is bigger then reality).
+static void PerspectiveWrong (const csVector3& v, csVector2& p,
+  const CS::Math::Matrix4& proj, int screenWidth, int screenHeight)
+{
+  csVector3 v_new (v.x, v.y, 0.1f);
+  Perspective (v_new, p, proj, screenWidth, screenHeight);
+}
+
+bool csBox3::ProjectBox (const csTransform& trans, 
+  const CS::Math::Matrix4& projection, csBox2& sbox,
+  float& min_z, float& max_z, int screenWidth, int screenHeight) const
+{
+  const csVector3& origin = trans.GetOrigin ();
+  int idx = CalculatePointSegment (origin);
+  const Outline &ol = outlines[idx];
+  int num_array = MIN (ol.num, 6);
+
+  csBox3 cbox (trans * GetCorner (ol.vertices[0]));
+  int i;
+  // We go to 8 so that we can calculate the correct min_z/max_z.
+  // If we only go to num_array we will only calculate min_z/max_z
+  // for the outine vertices.
+  for (i = 1; i < 8; i++)
+  {
+    csVector3 v = trans * GetCorner (ol.vertices[i]);
+    if (i < num_array)
+    {
+      cbox.AddBoundingVertexSmart (v);
+      min_z = cbox.MinZ ();
+      max_z = cbox.MaxZ ();
+    }
+    else
+    {
+      if (v.z < min_z) min_z = v.z;
+      if (v.z > max_z) max_z = v.z;
+    }
+  }
+
+  if (max_z < 0.01) return false;
+
+// @@@ In theory we can optimize here again by calling CalculatePointSegment
+// again for the new box and the 0,0,0 point. By doing that we could
+// avoid doing four perspective projections.
+
+  // If z < .1 we do conservative clipping. Not correct but it will generate
+  // a box that is bigger then the real one which is ok for testing culling.
+  csVector2 oneCorner;
+  if (cbox.Max ().z < .1)
+    PerspectiveWrong (cbox.Max (), oneCorner, projection, 
+      screenWidth, screenHeight);
+  else
+    Perspective (cbox.Max (), oneCorner, projection, screenWidth, screenHeight);
+  sbox.StartBoundingBox (oneCorner);
+
+  csVector3 v (cbox.MinX (), cbox.MinY (), cbox.MaxZ ());
+  if (v.z < .1)
+    PerspectiveWrong (v, oneCorner, projection, screenWidth, screenHeight);
+  else
+    Perspective (v, oneCorner, projection, screenWidth, screenHeight);
+  sbox.AddBoundingVertexSmart (oneCorner);
+
+  if (cbox.Min ().z < .1)
+    PerspectiveWrong (cbox.Min (), oneCorner, projection, 
+      screenWidth, screenHeight);
+  else
+    Perspective (cbox.Min (), oneCorner, projection, screenWidth, screenHeight);
+  sbox.AddBoundingVertexSmart (oneCorner);
+
+  v.Set (cbox.MaxX (), cbox.MaxY (), cbox.MinZ ());
+  if (v.z < .1)
+    PerspectiveWrong (v, oneCorner, projection, screenWidth, screenHeight);
+  else
+    Perspective (v, oneCorner, projection, screenWidth, screenHeight);
+  sbox.AddBoundingVertexSmart (oneCorner);
+
+  return true;
+}
+
 csBox3 &csBox3::operator+= (const csBox3 &box)
 {
   if (box.minbox.x < minbox.x) minbox.x = box.minbox.x;

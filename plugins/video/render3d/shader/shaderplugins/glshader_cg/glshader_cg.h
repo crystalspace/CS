@@ -20,30 +20,21 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __GLSHADER_CG_H__
 #define __GLSHADER_CG_H__
 
+#include "cg_common.h"
+
 #include "csplugincommon/shader/shaderplugin.h"
-#include "csutil/dirtyaccessarray.h"
+#include "csutil/blockallocator.h"
 #include "csutil/leakguard.h"
 
 #include "iutil/comp.h"
 #include "ivideo/shader/shader.h"
 
-#define WIN32_LEAN_AND_MEAN
-#include <Cg/cg.h>
-/* WIN32 is used in an "#if" inside <cgGL.h>, however, it is sometimes defined
-* without value. */
-#ifdef WIN32
-#undef WIN32
-#define WIN32 1
-#endif 
-#include <Cg/cgGL.h>
+#include "glshader_cgcommon.h"
 
 struct csGLExtensionManager;
 
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 {
-
-typedef csDirtyAccessArray<const char*, csStringArrayElementHandler>
-  ArgumentArray;
 
 class csGLShader_CG : public scfImplementation2<csGLShader_CG, 
 						iShaderProgramPlugin,
@@ -51,9 +42,12 @@ class csGLShader_CG : public scfImplementation2<csGLShader_CG,
 {
 private:
   static void ErrorHandler (CGcontext context, CGerror err, void* appdata);
+  static void ErrorHandlerObjReg (CGcontext context, CGerror err, void* appdata);
 
   bool enable;
   bool isOpen;
+  const char* compiledProgram;
+  bool doIgnoreErrors;
 public:
   CS_LEAKGUARD_DECLARE (csGLShader_CG);
 
@@ -69,6 +63,8 @@ public:
   bool enableVP, enableFP;
   CGprofile maxProfileVertex;
   CGprofile maxProfileFragment;
+  
+  csBlockAllocator<ShaderParameter> paramAlloc;
 
   csGLShader_CG (iBase *parent);
   virtual ~csGLShader_CG ();
@@ -97,6 +93,19 @@ public:
     return (profile >= CG_PROFILE_PS_1_1) && (profile <= CG_PROFILE_PS_1_3);
   }
   bool IsRoutedProfileSupported (CGprofile profile);
+  
+  void SetCompiledSource (const char* prog)
+  { compiledProgram = prog; }
+  void SetIgnoreErrors (bool doIgnore) { doIgnoreErrors = doIgnore; }
+  void PrintCgListing (const char* listing);
+  void PrintAnyListing ()
+  {
+    const char* listing = cgGetLastListing (context);
+    if (listing && *listing && doVerbose)
+    {
+      PrintCgListing (listing);
+    }
+  }
 };
 
 }

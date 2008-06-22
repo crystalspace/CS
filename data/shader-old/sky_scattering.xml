@@ -1,0 +1,72 @@
+<shader compiler="xmlshader" name="sky_scattering" lights="1">
+  <shadervars>
+    <!-- beta1 = Rayleigh -->
+    <!-- .2
+    <shadervar name="beta' 1" type="vector3">8.3215e-06, 1.4072e-05, 2.9180e-05</shadervar>
+    <shadervar name="beta' 1" type="vector3">3.3286e-05, 5.6288e-05, 1.1672e-04</shadervar>
+    <shadervar name="beta' 1" type="vector3">4.1608e-06, 7.0360e-06, 1.4590e-05</shadervar>
+    -->
+      <shadervar name="sky base color" type="vector3">0.16643, 0.28144, 0.58360</shadervar>
+      <shadervar name="beta' 1" type="expression">
+	  <sexp>
+	    (make-vector 
+		(* 0.0000001 (elt1 "sky base color"))
+		(* 0.0000001 (elt2 "sky base color"))
+		(* 0.0000001 (elt3 "sky base color"))
+		0)
+	  </sexp>
+      </shadervar>
+    <!-- beta2 = Mie -->
+    <!-- .01
+    <shadervar name="beta' 2" type="vector3">1.3338e-05, 1.7345e-05, 2.4976e-05</shadervar>
+    <shadervar name="beta' 2" type="vector3">0.00026676, 0.00034689, 0.00049952</shadervar>
+    <shadervar name="beta' 2" type="vector3">0.00066689, 0.00086723, 0.00124881</shadervar>
+    -->
+      <shadervar name="sky sun-glow color" type="vector3">1.3338, 1.7345, 2.4976</shadervar>
+      <shadervar name="beta' 2" type="expression">
+	  <sexp>
+	    (make-vector 
+		(* 0.0000001 (elt1 "sky sun-glow color"))
+		(* 0.0000001 (elt2 "sky sun-glow color"))
+		(* 0.0000001 (elt3 "sky sun-glow color"))
+		0)
+	  </sexp>
+ 	</shadervar>
+    <!--
+    <shadervar name="beta1 + beta2" type="vector3">0.00019683, 0.00030978, 0.00059405</shadervar>
+    <shadervar name="beta1 + beta2" type="vector3">0.0017058, 0.0024231, 0.0040585</shadervar>
+    <shadervar name="beta1 + beta2" type="vector3">0.0029400, 0.0038177, 0.0055016</shadervar>
+    -->
+    <shadervar name="beta1 + beta2" type="vector3">8.5292e-07, 1.2115e-06, 2.0293e-06</shadervar>
+    
+    <!-- g = .8, hg = 1-g^2, 1+g, 2g -->
+      <shadervar name="sky sun size" type="float">0.36</shadervar>
+      <shadervar name="hg" type="expression">
+	  <sexp>
+	    (make-vector 
+		"sky sun size" 0.5 0.5 0)
+	  </sexp>
+      </shadervar>
+      <!--shadervar name="hg" type="vector3">0.36, 1.8, 1.6</shadervar-->
+    <!-- inscatter = .3 -->
+    <shadervar name="inscattering term" type="vector3">0.4, 0.4, 0.4</shadervar>
+  </shadervars>
+  
+  <technique priority="50">
+    <pass>
+      <mixmode><copy /></mixmode>
+      <vp plugin="glarb" file="/shader/scattering.avp" />
+      <texture destination="unit 0" name="standardtex white" />
+      <fp plugin="glfixed">
+        <fixedfp>
+          <layer>
+            <colorsource num="0" source="primary color" modifier="color" />
+            <coloroperation operation="replace" />
+          </layer>
+        </fixedfp>
+      </fp>
+    </pass>
+  </technique>
+
+  <fallbackshader name="std_lighting" />
+</shader>

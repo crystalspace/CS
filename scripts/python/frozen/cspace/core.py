@@ -89,6 +89,18 @@ def fix_args(funct):
         return funct(*args)
     return _inner
 
+class CustomAllocated(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _core.new_CustomAllocated(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _core.delete_CustomAllocated
+    __del__ = lambda self : None;
+CustomAllocated_swigregister = _core.CustomAllocated_swigregister
+CustomAllocated_swigregister(CustomAllocated)
+
 class csArrayThresholdVariable(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
@@ -116,17 +128,199 @@ class csArrayThresholdVariableCapacityLinear(csArrayThresholdVariable):
 csArrayThresholdVariableCapacityLinear_swigregister = _core.csArrayThresholdVariableCapacityLinear_swigregister
 csArrayThresholdVariableCapacityLinear_swigregister(csArrayThresholdVariableCapacityLinear)
 
-class csArrayCapacityDefault(csArrayThresholdVariableCapacityLinear):
+class csArrayCapacityVariableGrow(csArrayThresholdVariableCapacityLinear):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
-        this = _core.new_csArrayCapacityDefault(*args)
+        this = _core.new_csArrayCapacityVariableGrow(*args)
         try: self.this.append(this)
         except: self.this = this
-    __swig_destroy__ = _core.delete_csArrayCapacityDefault
+    __swig_destroy__ = _core.delete_csArrayCapacityVariableGrow
     __del__ = lambda self : None;
-csArrayCapacityDefault_swigregister = _core.csArrayCapacityDefault_swigregister
-csArrayCapacityDefault_swigregister(csArrayCapacityDefault)
+csArrayCapacityVariableGrow_swigregister = _core.csArrayCapacityVariableGrow_swigregister
+csArrayCapacityVariableGrow_swigregister(csArrayCapacityVariableGrow)
+
+class Vector2Array(CustomAllocated):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    __swig_destroy__ = _core.delete_Vector2Array
+    __del__ = lambda self : None;
+    def __init__(self, *args): 
+        this = _core.new_Vector2Array(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def GetSize(*args): return _core.Vector2Array_GetSize(*args)
+    def Get(*args): return _core.Vector2Array_Get(*args)
+    def Put(*args): return _core.Vector2Array_Put(*args)
+    def Push(*args): return _core.Vector2Array_Push(*args)
+    def Pop(*args): return _core.Vector2Array_Pop(*args)
+    def Top(*args): return _core.Vector2Array_Top(*args)
+    def Insert(*args): return _core.Vector2Array_Insert(*args)
+    def Contains(*args): return _core.Vector2Array_Contains(*args)
+    def DeleteAll(*args): return _core.Vector2Array_DeleteAll(*args)
+    def Truncate(*args): return _core.Vector2Array_Truncate(*args)
+    def Empty(*args): return _core.Vector2Array_Empty(*args)
+    def IsEmpty(*args): return _core.Vector2Array_IsEmpty(*args)
+    def SetMinimalCapacity(*args): return _core.Vector2Array_SetMinimalCapacity(*args)
+    def DeleteIndex(*args): return _core.Vector2Array_DeleteIndex(*args)
+    def DeleteIndexFast(*args): return _core.Vector2Array_DeleteIndexFast(*args)
+    def DeleteRange(*args): return _core.Vector2Array_DeleteRange(*args)
+    def __eq__(*args): return _core.Vector2Array___eq__(*args)
+    def __ne__(*args): return _core.Vector2Array___ne__(*args)
+    def GetAllocator(*args): return _core.Vector2Array_GetAllocator(*args)
+Vector2Array_swigregister = _core.Vector2Array_swigregister
+Vector2Array_swigregister(Vector2Array)
+cvar = _core.cvar
+csArrayItemNotFound = cvar.csArrayItemNotFound
+
+class Vector2DirtyAccessArray(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _core.new_Vector2DirtyAccessArray(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def GetArray(*args): return _core.Vector2DirtyAccessArray_GetArray(*args)
+    def GetArrayCopy(*args): return _core.Vector2DirtyAccessArray_GetArrayCopy(*args)
+    __swig_destroy__ = _core.delete_Vector2DirtyAccessArray
+    __del__ = lambda self : None;
+Vector2DirtyAccessArray_swigregister = _core.Vector2DirtyAccessArray_swigregister
+Vector2DirtyAccessArray_swigregister(Vector2DirtyAccessArray)
+
+class Vector3Array(CustomAllocated):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    __swig_destroy__ = _core.delete_Vector3Array
+    __del__ = lambda self : None;
+    def __init__(self, *args): 
+        this = _core.new_Vector3Array(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def GetSize(*args): return _core.Vector3Array_GetSize(*args)
+    def Get(*args): return _core.Vector3Array_Get(*args)
+    def Put(*args): return _core.Vector3Array_Put(*args)
+    def Push(*args): return _core.Vector3Array_Push(*args)
+    def Pop(*args): return _core.Vector3Array_Pop(*args)
+    def Top(*args): return _core.Vector3Array_Top(*args)
+    def Insert(*args): return _core.Vector3Array_Insert(*args)
+    def Contains(*args): return _core.Vector3Array_Contains(*args)
+    def DeleteAll(*args): return _core.Vector3Array_DeleteAll(*args)
+    def Truncate(*args): return _core.Vector3Array_Truncate(*args)
+    def Empty(*args): return _core.Vector3Array_Empty(*args)
+    def IsEmpty(*args): return _core.Vector3Array_IsEmpty(*args)
+    def SetMinimalCapacity(*args): return _core.Vector3Array_SetMinimalCapacity(*args)
+    def DeleteIndex(*args): return _core.Vector3Array_DeleteIndex(*args)
+    def DeleteIndexFast(*args): return _core.Vector3Array_DeleteIndexFast(*args)
+    def DeleteRange(*args): return _core.Vector3Array_DeleteRange(*args)
+    def __eq__(*args): return _core.Vector3Array___eq__(*args)
+    def __ne__(*args): return _core.Vector3Array___ne__(*args)
+    def GetAllocator(*args): return _core.Vector3Array_GetAllocator(*args)
+Vector3Array_swigregister = _core.Vector3Array_swigregister
+Vector3Array_swigregister(Vector3Array)
+
+class Vector3DirtyAccessArray(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _core.new_Vector3DirtyAccessArray(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def GetArray(*args): return _core.Vector3DirtyAccessArray_GetArray(*args)
+    def GetArrayCopy(*args): return _core.Vector3DirtyAccessArray_GetArrayCopy(*args)
+    __swig_destroy__ = _core.delete_Vector3DirtyAccessArray
+    __del__ = lambda self : None;
+Vector3DirtyAccessArray_swigregister = _core.Vector3DirtyAccessArray_swigregister
+Vector3DirtyAccessArray_swigregister(Vector3DirtyAccessArray)
+
+class Vector4Array(CustomAllocated):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    __swig_destroy__ = _core.delete_Vector4Array
+    __del__ = lambda self : None;
+    def __init__(self, *args): 
+        this = _core.new_Vector4Array(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def GetSize(*args): return _core.Vector4Array_GetSize(*args)
+    def Get(*args): return _core.Vector4Array_Get(*args)
+    def Put(*args): return _core.Vector4Array_Put(*args)
+    def Push(*args): return _core.Vector4Array_Push(*args)
+    def Pop(*args): return _core.Vector4Array_Pop(*args)
+    def Top(*args): return _core.Vector4Array_Top(*args)
+    def Insert(*args): return _core.Vector4Array_Insert(*args)
+    def Contains(*args): return _core.Vector4Array_Contains(*args)
+    def DeleteAll(*args): return _core.Vector4Array_DeleteAll(*args)
+    def Truncate(*args): return _core.Vector4Array_Truncate(*args)
+    def Empty(*args): return _core.Vector4Array_Empty(*args)
+    def IsEmpty(*args): return _core.Vector4Array_IsEmpty(*args)
+    def SetMinimalCapacity(*args): return _core.Vector4Array_SetMinimalCapacity(*args)
+    def DeleteIndex(*args): return _core.Vector4Array_DeleteIndex(*args)
+    def DeleteIndexFast(*args): return _core.Vector4Array_DeleteIndexFast(*args)
+    def DeleteRange(*args): return _core.Vector4Array_DeleteRange(*args)
+    def __eq__(*args): return _core.Vector4Array___eq__(*args)
+    def __ne__(*args): return _core.Vector4Array___ne__(*args)
+    def GetAllocator(*args): return _core.Vector4Array_GetAllocator(*args)
+Vector4Array_swigregister = _core.Vector4Array_swigregister
+Vector4Array_swigregister(Vector4Array)
+
+class Vector4DirtyAccessArray(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _core.new_Vector4DirtyAccessArray(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def GetArray(*args): return _core.Vector4DirtyAccessArray_GetArray(*args)
+    def GetArrayCopy(*args): return _core.Vector4DirtyAccessArray_GetArrayCopy(*args)
+    __swig_destroy__ = _core.delete_Vector4DirtyAccessArray
+    __del__ = lambda self : None;
+Vector4DirtyAccessArray_swigregister = _core.Vector4DirtyAccessArray_swigregister
+Vector4DirtyAccessArray_swigregister(Vector4DirtyAccessArray)
+
+class UIntArray(CustomAllocated):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    __swig_destroy__ = _core.delete_UIntArray
+    __del__ = lambda self : None;
+    def __init__(self, *args): 
+        this = _core.new_UIntArray(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def GetSize(*args): return _core.UIntArray_GetSize(*args)
+    def Get(*args): return _core.UIntArray_Get(*args)
+    def Put(*args): return _core.UIntArray_Put(*args)
+    def Push(*args): return _core.UIntArray_Push(*args)
+    def Pop(*args): return _core.UIntArray_Pop(*args)
+    def Top(*args): return _core.UIntArray_Top(*args)
+    def Insert(*args): return _core.UIntArray_Insert(*args)
+    def Contains(*args): return _core.UIntArray_Contains(*args)
+    def DeleteAll(*args): return _core.UIntArray_DeleteAll(*args)
+    def Truncate(*args): return _core.UIntArray_Truncate(*args)
+    def Empty(*args): return _core.UIntArray_Empty(*args)
+    def IsEmpty(*args): return _core.UIntArray_IsEmpty(*args)
+    def SetMinimalCapacity(*args): return _core.UIntArray_SetMinimalCapacity(*args)
+    def DeleteIndex(*args): return _core.UIntArray_DeleteIndex(*args)
+    def DeleteIndexFast(*args): return _core.UIntArray_DeleteIndexFast(*args)
+    def DeleteRange(*args): return _core.UIntArray_DeleteRange(*args)
+    def __eq__(*args): return _core.UIntArray___eq__(*args)
+    def __ne__(*args): return _core.UIntArray___ne__(*args)
+    def GetAllocator(*args): return _core.UIntArray_GetAllocator(*args)
+UIntArray_swigregister = _core.UIntArray_swigregister
+UIntArray_swigregister(UIntArray)
+
+class UIntDirtyAccessArray(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _core.new_UIntDirtyAccessArray(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def GetArray(*args): return _core.UIntDirtyAccessArray_GetArray(*args)
+    def GetArrayCopy(*args): return _core.UIntDirtyAccessArray_GetArrayCopy(*args)
+    __swig_destroy__ = _core.delete_UIntDirtyAccessArray
+    __del__ = lambda self : None;
+UIntDirtyAccessArray_swigregister = _core.UIntDirtyAccessArray_swigregister
+UIntDirtyAccessArray_swigregister(UIntDirtyAccessArray)
 
 SetCoreSCFPointer = _core.SetCoreSCFPointer
 scfCompatibleVersion = _core.scfCompatibleVersion
@@ -144,8 +338,6 @@ class scfInterfaceMetadata(object):
     __del__ = lambda self : None;
 scfInterfaceMetadata_swigregister = _core.scfInterfaceMetadata_swigregister
 scfInterfaceMetadata_swigregister(scfInterfaceMetadata)
-cvar = _core.cvar
-csArrayItemNotFound = cvar.csArrayItemNotFound
 
 class scfInterfaceMetadataList(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -374,33 +566,41 @@ class csFlags(object):
     def Get(*args): return _core.csFlags_Get(*args)
     def Check(*args): return _core.csFlags_Check(*args)
     def CheckAll(*args): return _core.csFlags_CheckAll(*args)
+    def __eq__(*args): return _core.csFlags___eq__(*args)
+    def __ne__(*args): return _core.csFlags___ne__(*args)
+    def __and__(*args): return _core.csFlags___and__(*args)
+    def __invert__(*args): return _core.csFlags___invert__(*args)
     __swig_destroy__ = _core.delete_csFlags
     __del__ = lambda self : None;
 csFlags_swigregister = _core.csFlags_swigregister
 csFlags_swigregister(csFlags)
 
-class csStringSet(object):
+class iGeneralStringSetBase(iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _core.new_csStringSet(*args)
-        try: self.this.append(this)
-        except: self.this = this
-    __swig_destroy__ = _core.delete_csStringSet
+    def Request(*args): return _core.iGeneralStringSetBase_Request(*args)
+    def Contains(*args): return _core.iGeneralStringSetBase_Contains(*args)
+    def Delete(*args): return _core.iGeneralStringSetBase_Delete(*args)
+    def Empty(*args): return _core.iGeneralStringSetBase_Empty(*args)
+    def Clear(*args): return _core.iGeneralStringSetBase_Clear(*args)
+    def GetSize(*args): return _core.iGeneralStringSetBase_GetSize(*args)
+    def IsEmpty(*args): return _core.iGeneralStringSetBase_IsEmpty(*args)
+    __swig_destroy__ = _core.delete_iGeneralStringSetBase
     __del__ = lambda self : None;
-    def assign(*args): return _core.csStringSet_assign(*args)
-    def Request(*args): return _core.csStringSet_Request(*args)
-    def Contains(*args): return _core.csStringSet_Contains(*args)
-    def Delete(*args): return _core.csStringSet_Delete(*args)
-    def Empty(*args): return _core.csStringSet_Empty(*args)
-    def GetSize(*args): return _core.csStringSet_GetSize(*args)
-    def IsEmpty(*args): return _core.csStringSet_IsEmpty(*args)
-    def Clear (*args):
-        print "csStringSet.Clear() is deprecated, use csStringSet.Empty() instead"
-        return self.Empty(*args)
+iGeneralStringSetBase_swigregister = _core.iGeneralStringSetBase_swigregister
+iGeneralStringSetBase_swigregister(iGeneralStringSetBase)
 
-csStringSet_swigregister = _core.csStringSet_swigregister
-csStringSet_swigregister(csStringSet)
+class iStringSet(iGeneralStringSetBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    scfGetVersion = staticmethod(_core.iStringSet_scfGetVersion)
+    __swig_destroy__ = _core.delete_iStringSet
+    __del__ = lambda self : None;
+iStringSet_swigregister = _core.iStringSet_swigregister
+iStringSet_swigregister(iStringSet)
+iStringSet_scfGetVersion = _core.iStringSet_scfGetVersion
 
 class csStringIDSet(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -533,18 +733,6 @@ csInitializer__SetupEventHandler = _core.csInitializer__SetupEventHandler
 csInitializer_DestroyApplication = _core.csInitializer_DestroyApplication
 csInitializer_GetDefaultAppID = _core.csInitializer_GetDefaultAppID
 
-class CustomAllocated(object):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _core.new_CustomAllocated(*args)
-        try: self.this.append(this)
-        except: self.this = this
-    __swig_destroy__ = _core.delete_CustomAllocated
-    __del__ = lambda self : None;
-CustomAllocated_swigregister = _core.CustomAllocated_swigregister
-CustomAllocated_swigregister(CustomAllocated)
-
 class csPluginRequestArray(CustomAllocated):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
@@ -573,120 +761,6 @@ class csPluginRequestArray(CustomAllocated):
     def GetAllocator(*args): return _core.csPluginRequestArray_GetAllocator(*args)
 csPluginRequestArray_swigregister = _core.csPluginRequestArray_swigregister
 csPluginRequestArray_swigregister(csPluginRequestArray)
-
-MAX_OUTPUT_VERTICES = _core.MAX_OUTPUT_VERTICES
-CS_CLIP_OUTSIDE = _core.CS_CLIP_OUTSIDE
-CS_CLIP_CLIPPED = _core.CS_CLIP_CLIPPED
-CS_CLIP_INSIDE = _core.CS_CLIP_INSIDE
-class csVertexStatus(object):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    __repr__ = _swig_repr
-    Type = _swig_property(_core.csVertexStatus_Type_get, _core.csVertexStatus_Type_set)
-    Vertex = _swig_property(_core.csVertexStatus_Vertex_get, _core.csVertexStatus_Vertex_set)
-    Pos = _swig_property(_core.csVertexStatus_Pos_get, _core.csVertexStatus_Pos_set)
-    def __init__(self, *args): 
-        this = _core.new_csVertexStatus(*args)
-        try: self.this.append(this)
-        except: self.this = this
-    __swig_destroy__ = _core.delete_csVertexStatus
-    __del__ = lambda self : None;
-csVertexStatus_swigregister = _core.csVertexStatus_swigregister
-csVertexStatus_swigregister(csVertexStatus)
-
-CS_VERTEX_ORIGINAL = _core.CS_VERTEX_ORIGINAL
-CS_VERTEX_ONEDGE = _core.CS_VERTEX_ONEDGE
-CS_VERTEX_INSIDE = _core.CS_VERTEX_INSIDE
-class iClipper2D(iBase):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    def Clip(*args): return _core.iClipper2D_Clip(*args)
-    def ClipInPlace(*args): return _core.iClipper2D_ClipInPlace(*args)
-    def ClassifyBox(*args): return _core.iClipper2D_ClassifyBox(*args)
-    def IsInside(*args): return _core.iClipper2D_IsInside(*args)
-    def GetVertexCount(*args): return _core.iClipper2D_GetVertexCount(*args)
-    def GetClipPoly(*args): return _core.iClipper2D_GetClipPoly(*args)
-    clipperPoly = _core.iClipper2D_clipperPoly
-    clipperBox = _core.iClipper2D_clipperBox
-    def GetClipperType(*args): return _core.iClipper2D_GetClipperType(*args)
-    __swig_destroy__ = _core.delete_iClipper2D
-    __del__ = lambda self : None;
-iClipper2D_swigregister = _core.iClipper2D_swigregister
-iClipper2D_swigregister(iClipper2D)
-
-class iPath(iBase):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    def Length(*args): return _core.iPath_Length(*args)
-    def CalculateAtTime(*args): return _core.iPath_CalculateAtTime(*args)
-    def GetCurrentIndex(*args): return _core.iPath_GetCurrentIndex(*args)
-    def SetPositionVectors(*args): return _core.iPath_SetPositionVectors(*args)
-    def SetUpVectors(*args): return _core.iPath_SetUpVectors(*args)
-    def SetForwardVectors(*args): return _core.iPath_SetForwardVectors(*args)
-    def SetPositionVector(*args): return _core.iPath_SetPositionVector(*args)
-    def SetUpVector(*args): return _core.iPath_SetUpVector(*args)
-    def SetForwardVector(*args): return _core.iPath_SetForwardVector(*args)
-    def GetPositionVector(*args): return _core.iPath_GetPositionVector(*args)
-    def GetUpVector(*args): return _core.iPath_GetUpVector(*args)
-    def GetForwardVector(*args): return _core.iPath_GetForwardVector(*args)
-    def GetTime(*args): return _core.iPath_GetTime(*args)
-    def SetTime(*args): return _core.iPath_SetTime(*args)
-    def GetInterpolatedPosition(*args): return _core.iPath_GetInterpolatedPosition(*args)
-    def GetInterpolatedUp(*args): return _core.iPath_GetInterpolatedUp(*args)
-    def GetInterpolatedForward(*args): return _core.iPath_GetInterpolatedForward(*args)
-    scfGetVersion = staticmethod(_core.iPath_scfGetVersion)
-    __swig_destroy__ = _core.delete_iPath
-    __del__ = lambda self : None;
-iPath_swigregister = _core.iPath_swigregister
-iPath_swigregister(iPath)
-iPath_scfGetVersion = _core.iPath_scfGetVersion
-
-class scfPath(iPath):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    def IncRef(*args): return _core.scfPath_IncRef(*args)
-    def DecRef(*args): return _core.scfPath_DecRef(*args)
-    def GetRefCount(*args): return _core.scfPath_GetRefCount(*args)
-    def QueryInterface(*args): return _core.scfPath_QueryInterface(*args)
-    def AddRefOwner(*args): return _core.scfPath_AddRefOwner(*args)
-    def RemoveRefOwner(*args): return _core.scfPath_RemoveRefOwner(*args)
-    def GetInterfaceMetadata(*args): return _core.scfPath_GetInterfaceMetadata(*args)
-scfPath_swigregister = _core.scfPath_swigregister
-scfPath_swigregister(scfPath)
-
-CS_TRIMESH_CLOSED = _core.CS_TRIMESH_CLOSED
-CS_TRIMESH_NOTCLOSED = _core.CS_TRIMESH_NOTCLOSED
-CS_TRIMESH_CONVEX = _core.CS_TRIMESH_CONVEX
-CS_TRIMESH_NOTCONVEX = _core.CS_TRIMESH_NOTCONVEX
-CS_TRIMESH_DEFORMABLE = _core.CS_TRIMESH_DEFORMABLE
-class iTriangleMesh(iBase):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    def GetVertexCount(*args): return _core.iTriangleMesh_GetVertexCount(*args)
-    def GetVertices(self):
-      return CSMutableArrayHelper(self.GetVertexByIndex, self.GetVertexCount)
-
-
-    def GetTriangleCount(*args): return _core.iTriangleMesh_GetTriangleCount(*args)
-    def GetTriangles(self):
-      return CSMutableArrayHelper(self.GetTriangleByIndex, self.GetTriangleCount)
-
-
-    def Lock(*args): return _core.iTriangleMesh_Lock(*args)
-    def Unlock(*args): return _core.iTriangleMesh_Unlock(*args)
-    def GetFlags(*args): return _core.iTriangleMesh_GetFlags(*args)
-    def GetChangeNumber(*args): return _core.iTriangleMesh_GetChangeNumber(*args)
-    def GetVertexByIndex(*args): return _core.iTriangleMesh_GetVertexByIndex(*args)
-    def GetTriangleByIndex(*args): return _core.iTriangleMesh_GetTriangleByIndex(*args)
-    scfGetVersion = staticmethod(_core.iTriangleMesh_scfGetVersion)
-    __swig_destroy__ = _core.delete_iTriangleMesh
-    __del__ = lambda self : None;
-iTriangleMesh_swigregister = _core.iTriangleMesh_swigregister
-iTriangleMesh_swigregister(iTriangleMesh)
-iTriangleMesh_scfGetVersion = _core.iTriangleMesh_scfGetVersion
 
 CS_REPORTER_SEVERITY_BUG = _core.CS_REPORTER_SEVERITY_BUG
 CS_REPORTER_SEVERITY_ERROR = _core.CS_REPORTER_SEVERITY_ERROR
@@ -933,25 +1007,6 @@ class iObjectIterator(iBase):
 iObjectIterator_swigregister = _core.iObjectIterator_swigregister
 iObjectIterator_swigregister(iObjectIterator)
 iObjectIterator_scfGetVersion = _core.iObjectIterator_scfGetVersion
-
-class iStringSet(iBase):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    def Request(*args): return _core.iStringSet_Request(*args)
-    def Contains(*args): return _core.iStringSet_Contains(*args)
-    def Delete(*args): return _core.iStringSet_Delete(*args)
-    def Empty(*args): return _core.iStringSet_Empty(*args)
-    def Clear(*args): return _core.iStringSet_Clear(*args)
-    def GetSize(*args): return _core.iStringSet_GetSize(*args)
-    def IsEmpty(*args): return _core.iStringSet_IsEmpty(*args)
-    scfGetVersion = staticmethod(_core.iStringSet_scfGetVersion)
-    __swig_destroy__ = _core.delete_iStringSet
-    __del__ = lambda self : None;
-iStringSet_swigregister = _core.iStringSet_swigregister
-iStringSet_swigregister(iStringSet)
-csInvalidStringID = cvar.csInvalidStringID
-iStringSet_scfGetVersion = _core.iStringSet_scfGetVersion
 
 class iObjectRegistry(iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -1444,7 +1499,6 @@ class iEventNameRegistry(iBase):
     __del__ = lambda self : None;
 iEventNameRegistry_swigregister = _core.iEventNameRegistry_swigregister
 iEventNameRegistry_swigregister(iEventNameRegistry)
-csHashCompute = _core.csHashCompute
 iEventNameRegistry_scfGetVersion = _core.iEventNameRegistry_scfGetVersion
 
 class csEventNameRegistry(object):
@@ -1527,6 +1581,162 @@ iPluginManager_swigregister = _core.iPluginManager_swigregister
 iPluginManager_swigregister(iPluginManager)
 iPluginManager_scfGetVersion = _core.iPluginManager_scfGetVersion
 
+class scfObject(iObject):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def IncRef(*args): return _core.scfObject_IncRef(*args)
+    def DecRef(*args): return _core.scfObject_DecRef(*args)
+    def GetRefCount(*args): return _core.scfObject_GetRefCount(*args)
+    def QueryInterface(*args): return _core.scfObject_QueryInterface(*args)
+    def AddRefOwner(*args): return _core.scfObject_AddRefOwner(*args)
+    def RemoveRefOwner(*args): return _core.scfObject_RemoveRefOwner(*args)
+    def GetInterfaceMetadata(*args): return _core.scfObject_GetInterfaceMetadata(*args)
+scfObject_swigregister = _core.scfObject_swigregister
+scfObject_swigregister(scfObject)
+csLoadPluginAlways = _core.csLoadPluginAlways
+
+class csObject(scfObject,InternalRefCount):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _core.new_csObject(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _core.delete_csObject
+    __del__ = lambda self : None;
+    def SetName(*args): return _core.csObject_SetName(*args)
+    def GetName(*args): return _core.csObject_GetName(*args)
+    def GetID(*args): return _core.csObject_GetID(*args)
+    def SetObjectParent(*args): return _core.csObject_SetObjectParent(*args)
+    def GetObjectParent(*args): return _core.csObject_GetObjectParent(*args)
+    def ObjAdd(*args): return _core.csObject_ObjAdd(*args)
+    def ObjRemove(*args): return _core.csObject_ObjRemove(*args)
+    def ObjRemoveAll(*args): return _core.csObject_ObjRemoveAll(*args)
+    def ObjAddChildren(*args): return _core.csObject_ObjAddChildren(*args)
+    def GetChildByName(*args): return _core.csObject_GetChildByName(*args)
+    def GetIterator(*args): return _core.csObject_GetIterator(*args)
+    def AddNameChangeListener(*args): return _core.csObject_AddNameChangeListener(*args)
+    def RemoveNameChangeListener(*args): return _core.csObject_RemoveNameChangeListener(*args)
+    def ObjReleaseOld(*args): return _core.csObject_ObjReleaseOld(*args)
+csObject_swigregister = _core.csObject_swigregister
+csObject_swigregister(csObject)
+
+MAX_OUTPUT_VERTICES = _core.MAX_OUTPUT_VERTICES
+CS_CLIP_OUTSIDE = _core.CS_CLIP_OUTSIDE
+CS_CLIP_CLIPPED = _core.CS_CLIP_CLIPPED
+CS_CLIP_INSIDE = _core.CS_CLIP_INSIDE
+class csVertexStatus(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    Type = _swig_property(_core.csVertexStatus_Type_get, _core.csVertexStatus_Type_set)
+    Vertex = _swig_property(_core.csVertexStatus_Vertex_get, _core.csVertexStatus_Vertex_set)
+    Pos = _swig_property(_core.csVertexStatus_Pos_get, _core.csVertexStatus_Pos_set)
+    def __init__(self, *args): 
+        this = _core.new_csVertexStatus(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _core.delete_csVertexStatus
+    __del__ = lambda self : None;
+csVertexStatus_swigregister = _core.csVertexStatus_swigregister
+csVertexStatus_swigregister(csVertexStatus)
+
+CS_VERTEX_ORIGINAL = _core.CS_VERTEX_ORIGINAL
+CS_VERTEX_ONEDGE = _core.CS_VERTEX_ONEDGE
+CS_VERTEX_INSIDE = _core.CS_VERTEX_INSIDE
+class iClipper2D(iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def Clip(*args): return _core.iClipper2D_Clip(*args)
+    def ClipInPlace(*args): return _core.iClipper2D_ClipInPlace(*args)
+    def ClassifyBox(*args): return _core.iClipper2D_ClassifyBox(*args)
+    def IsInside(*args): return _core.iClipper2D_IsInside(*args)
+    def GetVertexCount(*args): return _core.iClipper2D_GetVertexCount(*args)
+    def GetClipPoly(*args): return _core.iClipper2D_GetClipPoly(*args)
+    clipperPoly = _core.iClipper2D_clipperPoly
+    clipperBox = _core.iClipper2D_clipperBox
+    def GetClipperType(*args): return _core.iClipper2D_GetClipperType(*args)
+    __swig_destroy__ = _core.delete_iClipper2D
+    __del__ = lambda self : None;
+iClipper2D_swigregister = _core.iClipper2D_swigregister
+iClipper2D_swigregister(iClipper2D)
+
+class iPath(iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def Length(*args): return _core.iPath_Length(*args)
+    def CalculateAtTime(*args): return _core.iPath_CalculateAtTime(*args)
+    def GetCurrentIndex(*args): return _core.iPath_GetCurrentIndex(*args)
+    def SetPositionVectors(*args): return _core.iPath_SetPositionVectors(*args)
+    def SetUpVectors(*args): return _core.iPath_SetUpVectors(*args)
+    def SetForwardVectors(*args): return _core.iPath_SetForwardVectors(*args)
+    def SetPositionVector(*args): return _core.iPath_SetPositionVector(*args)
+    def SetUpVector(*args): return _core.iPath_SetUpVector(*args)
+    def SetForwardVector(*args): return _core.iPath_SetForwardVector(*args)
+    def GetPositionVector(*args): return _core.iPath_GetPositionVector(*args)
+    def GetUpVector(*args): return _core.iPath_GetUpVector(*args)
+    def GetForwardVector(*args): return _core.iPath_GetForwardVector(*args)
+    def GetTime(*args): return _core.iPath_GetTime(*args)
+    def SetTime(*args): return _core.iPath_SetTime(*args)
+    def GetInterpolatedPosition(*args): return _core.iPath_GetInterpolatedPosition(*args)
+    def GetInterpolatedUp(*args): return _core.iPath_GetInterpolatedUp(*args)
+    def GetInterpolatedForward(*args): return _core.iPath_GetInterpolatedForward(*args)
+    def QueryObject(*args): return _core.iPath_QueryObject(*args)
+    scfGetVersion = staticmethod(_core.iPath_scfGetVersion)
+    __swig_destroy__ = _core.delete_iPath
+    __del__ = lambda self : None;
+iPath_swigregister = _core.iPath_swigregister
+iPath_swigregister(iPath)
+iPath_scfGetVersion = _core.iPath_scfGetVersion
+
+class scfPath(csObject,iPath):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def IncRef(*args): return _core.scfPath_IncRef(*args)
+    def DecRef(*args): return _core.scfPath_DecRef(*args)
+    def GetRefCount(*args): return _core.scfPath_GetRefCount(*args)
+    def QueryInterface(*args): return _core.scfPath_QueryInterface(*args)
+    def AddRefOwner(*args): return _core.scfPath_AddRefOwner(*args)
+    def RemoveRefOwner(*args): return _core.scfPath_RemoveRefOwner(*args)
+    def GetInterfaceMetadata(*args): return _core.scfPath_GetInterfaceMetadata(*args)
+scfPath_swigregister = _core.scfPath_swigregister
+scfPath_swigregister(scfPath)
+
+CS_TRIMESH_CLOSED = _core.CS_TRIMESH_CLOSED
+CS_TRIMESH_NOTCLOSED = _core.CS_TRIMESH_NOTCLOSED
+CS_TRIMESH_CONVEX = _core.CS_TRIMESH_CONVEX
+CS_TRIMESH_NOTCONVEX = _core.CS_TRIMESH_NOTCONVEX
+CS_TRIMESH_DEFORMABLE = _core.CS_TRIMESH_DEFORMABLE
+class iTriangleMesh(iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetVertexCount(*args): return _core.iTriangleMesh_GetVertexCount(*args)
+    def GetVertices(self):
+      return CSMutableArrayHelper(self.GetVertexByIndex, self.GetVertexCount)
+
+
+    def GetTriangleCount(*args): return _core.iTriangleMesh_GetTriangleCount(*args)
+    def GetTriangles(self):
+      return CSMutableArrayHelper(self.GetTriangleByIndex, self.GetTriangleCount)
+
+
+    def Lock(*args): return _core.iTriangleMesh_Lock(*args)
+    def Unlock(*args): return _core.iTriangleMesh_Unlock(*args)
+    def GetFlags(*args): return _core.iTriangleMesh_GetFlags(*args)
+    def GetChangeNumber(*args): return _core.iTriangleMesh_GetChangeNumber(*args)
+    def GetVertexByIndex(*args): return _core.iTriangleMesh_GetVertexByIndex(*args)
+    def GetTriangleByIndex(*args): return _core.iTriangleMesh_GetTriangleByIndex(*args)
+    scfGetVersion = staticmethod(_core.iTriangleMesh_scfGetVersion)
+    __swig_destroy__ = _core.delete_iTriangleMesh
+    __del__ = lambda self : None;
+iTriangleMesh_swigregister = _core.iTriangleMesh_swigregister
+iTriangleMesh_swigregister(iTriangleMesh)
+iTriangleMesh_scfGetVersion = _core.iTriangleMesh_scfGetVersion
+
 csComposeNoChar = _core.csComposeNoChar
 csComposeNormalChar = _core.csComposeNormalChar
 csComposeComposedChar = _core.csComposeComposedChar
@@ -1541,7 +1751,6 @@ class iKeyComposer(iBase):
     __del__ = lambda self : None;
 iKeyComposer_swigregister = _core.iKeyComposer_swigregister
 iKeyComposer_swigregister(iKeyComposer)
-csLoadPluginAlways = _core.csLoadPluginAlways
 
 class iKeyboardDriver(iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -2008,6 +2217,7 @@ class csImageIOFileFormatDescriptions(CustomAllocated):
     def Top(*args): return _core.csImageIOFileFormatDescriptions_Top(*args)
     def Insert(*args): return _core.csImageIOFileFormatDescriptions_Insert(*args)
     def Contains(*args): return _core.csImageIOFileFormatDescriptions_Contains(*args)
+    def DeleteAll(*args): return _core.csImageIOFileFormatDescriptions_DeleteAll(*args)
     def Truncate(*args): return _core.csImageIOFileFormatDescriptions_Truncate(*args)
     def Empty(*args): return _core.csImageIOFileFormatDescriptions_Empty(*args)
     def IsEmpty(*args): return _core.csImageIOFileFormatDescriptions_IsEmpty(*args)
@@ -2075,46 +2285,6 @@ class iProcTexture(iBase):
     def GetFactory(*args): return _core.iProcTexture_GetFactory(*args)
 iProcTexture_swigregister = _core.iProcTexture_swigregister
 iProcTexture_swigregister(iProcTexture)
-
-class pycsObject(iObject):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    def IncRef(*args): return _core.pycsObject_IncRef(*args)
-    def DecRef(*args): return _core.pycsObject_DecRef(*args)
-    def GetRefCount(*args): return _core.pycsObject_GetRefCount(*args)
-    def QueryInterface(*args): return _core.pycsObject_QueryInterface(*args)
-    def AddRefOwner(*args): return _core.pycsObject_AddRefOwner(*args)
-    def RemoveRefOwner(*args): return _core.pycsObject_RemoveRefOwner(*args)
-    def GetInterfaceMetadata(*args): return _core.pycsObject_GetInterfaceMetadata(*args)
-pycsObject_swigregister = _core.pycsObject_swigregister
-pycsObject_swigregister(pycsObject)
-
-class csObject(pycsObject,InternalRefCount):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _core.new_csObject(*args)
-        try: self.this.append(this)
-        except: self.this = this
-    __swig_destroy__ = _core.delete_csObject
-    __del__ = lambda self : None;
-    def SetName(*args): return _core.csObject_SetName(*args)
-    def GetName(*args): return _core.csObject_GetName(*args)
-    def GetID(*args): return _core.csObject_GetID(*args)
-    def SetObjectParent(*args): return _core.csObject_SetObjectParent(*args)
-    def GetObjectParent(*args): return _core.csObject_GetObjectParent(*args)
-    def ObjAdd(*args): return _core.csObject_ObjAdd(*args)
-    def ObjRemove(*args): return _core.csObject_ObjRemove(*args)
-    def ObjRemoveAll(*args): return _core.csObject_ObjRemoveAll(*args)
-    def ObjAddChildren(*args): return _core.csObject_ObjAddChildren(*args)
-    def GetChildByName(*args): return _core.csObject_GetChildByName(*args)
-    def GetIterator(*args): return _core.csObject_GetIterator(*args)
-    def AddNameChangeListener(*args): return _core.csObject_AddNameChangeListener(*args)
-    def RemoveNameChangeListener(*args): return _core.csObject_RemoveNameChangeListener(*args)
-    def ObjReleaseOld(*args): return _core.csObject_ObjReleaseOld(*args)
-csObject_swigregister = _core.csObject_swigregister
-csObject_swigregister(csObject)
 
 CSKEY_SHIFT_NUM = _core.CSKEY_SHIFT_NUM
 CSKEY_CTRL_NUM = _core.CSKEY_CTRL_NUM
@@ -2333,7 +2503,8 @@ csInitializer.SetupEventHandler = \
 
 def csevCommandLineHelp(reg):
   csEventNameRegistry.GetID(reg, "crystalspace.application.commandlinehelp")
-  
+
+csInvalidStringID = ~0 # we want stringids as unsigned long
 CS_EVENTLIST_END = csInvalidStringID
 
 def _csInitializer_RequestPlugins (reg, plugins):

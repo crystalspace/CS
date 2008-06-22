@@ -31,6 +31,7 @@
 #include "iengine/lightmgr.h"
 #include "ivideo/shader/shader.h"
 
+#include "csplugincommon/rendermanager/lightsetup.h"
 #include "csplugincommon/renderstep/basesteptype.h"
 #include "csplugincommon/renderstep/basesteploader.h"
 #include "csplugincommon/renderstep/parserenderstep.h"
@@ -91,59 +92,15 @@ private:
   csRefArray<iLightRenderStep> steps;
 
   iObjectRegistry* object_reg;
-  csRef<csShaderVariable> shvar_light_0_position;
-  csRef<csShaderVariable> shvar_light_0_position_world;
-  csRef<csShaderVariable> shvar_light_0_transform;
-  csRef<csShaderVariable> shvar_light_0_transform_world;
-  csRef<csShaderVariable> shvar_light_0_diffuse;
-  csRef<csShaderVariable> shvar_light_0_specular;
-  csRef<csShaderVariable> shvar_light_0_attenuation;
-  csRef<csShaderVariable> shvar_light_0_attenuationtex;
-  csRef<csShaderVariable> shvar_light_0_inner_falloff;
-  csRef<csShaderVariable> shvar_light_0_outer_falloff;
-
-  csStringID trw_inv_name;
-
 
   csRef<iShaderManager> shadermgr;
   csRef<iLightManager> lightmgr;
   bool initialized;
 
-  class LightSVAccessor :
-    public scfImplementation2<LightSVAccessor,
-      iLightCallback, iShaderVariableAccessor>
-  {
-  private:
-    iLight* light;
-    csLightIterRenderStep* parent;
-
-    csRef<iTextureHandle> attTex;
-    int attnType;
-
-    bool needUpdate;
-
-  public:
-    CS_LEAKGUARD_DECLARE (LightSVAccessor);
-
-    LightSVAccessor (iLight* light, csLightIterRenderStep* parent);
-    virtual ~LightSVAccessor ();
-
-    virtual void OnColorChange (iLight* light, const csColor& newcolor);
-    virtual void OnPositionChange (iLight* light, const csVector3& newpos);
-    virtual void OnSectorChange (iLight* light, iSector* newsector);
-    virtual void OnRadiusChange (iLight* light, float newradius);
-    virtual void OnDestroy (iLight* light);
-    virtual void OnAttenuationChange (iLight* light, int newatt);
-
-    virtual void PreGetValue (csShaderVariable *variable);
-  };
-  friend class LightSVAccessor;
-
-  csHash<LightSVAccessor*, csPtrKey<iLight> > knownLights;
-  csRef<iTextureHandle> attTex;
-
-  LightSVAccessor* GetLightAccessor (iLight* light);
-
+  uint lastLSVHelperFrame;
+  CS::RenderManager::LightingVariablesHelper::PersistentData
+    lightSvHelperPersist;
+  CS::ShaderVarStringID sv_attn_tex_name;
 public:
   csWeakRef<iGraphics3D> g3d;
 
@@ -152,16 +109,13 @@ public:
 
   void Init ();
   virtual void Perform (iRenderView* rview, iSector* sector,
-    iShaderVarStack* stacks);
+    csShaderVariableStack& stack);
 
   virtual size_t AddStep (iRenderStep* step);
   virtual bool DeleteStep (iRenderStep* step);
   virtual iRenderStep* GetStep (size_t n) const;
   virtual size_t Find (iRenderStep* step) const;
   virtual size_t GetStepCount () const;
-
-  csPtr<iTextureHandle> GetAttenuationTexture (int attnType);
-  csPtr<iTextureHandle> GetAttenuationTexture (const csVector3& attnVec);
 };
 
 

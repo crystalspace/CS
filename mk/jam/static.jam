@@ -291,6 +291,9 @@ rule LinkStaticPlugins
       noinstall notest independent nohelp shared ;
     LibDepends $(plugin_lib_name) : $(target_link_with) ;
     LFlags $(plugin_lib_name) : $(target_lflags) ;
+    # We need to get the external libs for the plugin lib; but they have to be 
+    # specified after LinkStaticPlugins
+    $(target).PROPAGATE_EXTERNALLIBS += $(plugin_lib_name) ;
     
     appglue = [ BuildStaticGlueFile $(target) : $(plugin_lib_name) 
       : $(package) : app ] ;
@@ -412,7 +415,7 @@ rule WriteDependencies
     libname = [ LibraryBaseName $(l) ] ;
     lflags = [ MergeRemovingDups $(lflags) : -l$(libname) ] ;
   }
-  
+  lflags += $(COMPILER.LFLAGS) ;
   for l in $($(plugin).EXTERNALLIBS)
   {
     cflags += $($(l).CFLAGS) ;

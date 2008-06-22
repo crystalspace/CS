@@ -2082,6 +2082,183 @@ bool csTiledCoverageBuffer::DrawOutline (const csReversibleTransform& trans,
   return true;
 }
 
+static void Perspective (const csVector3& v, csVector2& p,
+  const CS::Math::Matrix4& proj, int screenWidth, int screenHeight)
+{
+  csVector4 v_proj (proj * csVector4 (v, 1));
+  float inv_w = 1.0f/v_proj.w;
+  p.x = (v_proj.x * inv_w + 1) * screenWidth/2;
+  p.y = (v_proj.y * inv_w + 1) * screenHeight/2;
+}
+
+// Version to cope with z <= 0. This is wrong but it in the places where
+// it is used below the result is acceptable because it generates a
+// conservative result (i.e. a box or outline that is bigger then reality).
+static void PerspectiveWrong (const csVector3& v, csVector2& p,
+  const CS::Math::Matrix4& proj, int screenWidth, int screenHeight)
+{
+  csVector3 v_new (v.x, v.y, 0.1f);
+  Perspective (v_new, p, proj, screenWidth, screenHeight);
+}
+
+bool csTiledCoverageBuffer::DrawOutline (const csReversibleTransform& trans,
+	CS::Math::Matrix4 const& camProj,
+	csVector3* verts, size_t num_verts,
+	bool* used_verts,
+	int* edges, size_t num_edges,
+	csBox2Int& bbox, float& max_depth,
+	bool splat_outline)
+{
+  size_t i;
+
+  static int* xa = 0, * ya = 0;
+  static csVector3* camv = 0;
+  static size_t max_tr_verts = 0;
+  if (num_verts > max_tr_verts)
+  {
+    //@@@ MEMORY LEAK!!!
+    delete[] xa;
+    delete[] ya;
+    delete[] camv;
+    max_tr_verts = num_verts+20;
+    xa = new int[max_tr_verts];
+    ya = new int[max_tr_verts];
+    camv = new csVector3[max_tr_verts];
+  }
+
+  //---------
+  // First transform all vertices.
+  // Then we copy the vertices to xa/ya. In the mean time
+  // we convert to integer and also search for the top vertex (lowest
+  // y coordinate) and bottom vertex.
+  //@@@ TODO: pre-shift x with 16
+  //---------
+  max_depth = -1.0;
+  const csMatrix3& trans_mat = trans.GetO2T ();
+  const csVector3& trans_vec = trans.GetO2TTranslation ();
+
+  bbox.minx = 1000000;
+  bbox.maxx = -1000000;
+  bbox.miny = 1000000;
+  bbox.maxy = -1000000;
+  csVector2 tr_vert;
+
+  bool need_splatting = false;
+  for (i = 0 ; i < num_verts ; i++)
+  {
+    // Normally we would calculate:
+    //   csVector3 camv = trans.Other2This (verts[i]);
+    // But since we often only need the z of the transformed vertex
+    // we only calculate z and calculate x,y later if needed.
+    csVector3 v = verts[i] - trans_vec;
+    camv[i].z = trans_mat.m31*v.x + trans_mat.m32*v.y + trans_mat.m33*v.z;
+
+    if (camv[i].z > max_depth) max_depth = camv[i].z;
+    if (used_verts[i])
+    {
+      camv[i].x = trans_mat.m11*v.x + trans_mat.m12*v.y + trans_mat.m13*v.z;
+      camv[i].y = trans_mat.m21*v.x + trans_mat.m22*v.y + trans_mat.m23*v.z;
+
+      // @@@ Note: originally 0.1 was used here. However this could cause
+      // very large coordinates to be generated and our coverage line drawer
+      // cannot currently cope with that. We need to improve that line
+      // drawer considerably.
+      if (camv[i].z <= 0.2)
+      {
+        if (!splat_outline) return false;
+	need_splatting = true;
+        PerspectiveWrong (camv[i], tr_vert, camProj, width, height);
+      }
+      else
+      {
+        Perspective (camv[i], tr_vert, camProj, width, height);
+      }
+
+      xa[i] = csQround (tr_vert.x);
+      ya[i] = csQround (tr_vert.y);
+
+      if (xa[i] < bbox.minx) bbox.minx = xa[i];
+      if (xa[i] > bbox.maxx) bbox.maxx = xa[i];
+      if (ya[i] < bbox.miny) bbox.miny = ya[i];
+      if (ya[i] > bbox.maxy) bbox.maxy = ya[i];
+    }
+  }
+
+  if (bbox.maxx <= 0) return false;
+  if (bbox.maxy <= 0) return false;
+  if (bbox.minx >= width) return false;
+  if (bbox.miny >= height) return false;
+
+  //---------
+  // First initialize dirty_left and dirty_right for every row.
+  //---------
+  for (i = 0 ; i < (size_t)num_tile_rows ; i++)
+  {
+    dirty_left[i] = 1000;
+    dirty_right[i] = -1;
+  }
+
+#undef COV_DRAW_LINE
+#define COV_DRAW_LINE(a_xa1,a_ya1,a_xa2,a_ya2) { \
+      int ya1 = a_ya1; \
+      int ya2 = a_ya2; \
+      if (ya1 != ya2) \
+      { \
+        int xa1, xa2; \
+        if (ya1 < ya2) \
+        { \
+	  xa1 = a_xa1; \
+          xa2 = a_xa2; \
+        } \
+        else \
+        { \
+          int y = ya1; \
+	  ya1 = ya2; \
+	  ya2 = y; \
+	  xa1 = a_xa2; \
+          xa2 = a_xa1; \
+        } \
+        DrawLine (xa1, ya1, xa2, ya2, 0); \
+      } }
+
+  //---------
+  // Draw all edges.
+  //---------
+  if (need_splatting)
+    for (i = 0 ; i < num_edges ; i++)
+    {
+      int vt1 = *edges++;
+      int vt2 = *edges++;
+      float z1 = camv[vt1].z;
+      float z2 = camv[vt2].z;
+      if ((z1 <= .200001 && z2 > .200001) ||
+          (z1 > .200001 && z2 <= .200001))
+      {
+        csVector3 isect;
+        csIntersect3::SegmentZPlane (camv[vt1], camv[vt2], 0.2f, isect);
+        PerspectiveWrong (isect, tr_vert, camProj, width, height);
+        int isect_xa = csQround (tr_vert.x);
+        int isect_ya = csQround (tr_vert.y);
+        COV_DRAW_LINE (xa[vt1], ya[vt1], isect_xa, isect_ya);
+        COV_DRAW_LINE (isect_xa, isect_ya, xa[vt2], ya[vt2]);
+      }
+      else // Both < .2 and or > .2
+      {
+        COV_DRAW_LINE (xa[vt1], ya[vt1], xa[vt2], ya[vt2]);
+      }
+    }
+  else
+    for (i = 0 ; i < num_edges ; i++)
+    {
+      int vt1 = *edges++;
+      int vt2 = *edges++;
+      COV_DRAW_LINE (xa[vt1], ya[vt1], xa[vt2], ya[vt2]);
+    }
+#undef COV_DRAW_LINE
+
+  return true;
+}
+
 bool csTiledCoverageBuffer::TestPolygon (csVector2* verts, size_t num_verts,
 	float min_depth)
 {
@@ -2321,6 +2498,57 @@ int csTiledCoverageBuffer::InsertOutline (
   csBox2Int bbox;
   float max_depth;
   if (!DrawOutline (trans, fov, sx, sy, verts, num_verts, used_verts, edges,
+  	num_edges, bbox, max_depth, splat_outline))
+    return 0;
+
+  modified_bbox.minx = 10000;
+  modified_bbox.miny = 10000;
+  modified_bbox.maxx = -10000;
+  modified_bbox.maxy = -10000;
+
+  int tx, ty;
+  int startrow, endrow;
+  startrow = bbox.miny >> SHIFT_TILEROW;
+  if (startrow < 0) startrow = 0;
+  endrow = bbox.maxy >> SHIFT_TILEROW;
+  if (endrow >= num_tile_rows) endrow = num_tile_rows-1;
+
+  int modified = 0;
+  for (ty = startrow ; ty <= endrow ; ty++)
+  {
+    csTileCol fvalue = TILECOL_EMPTY;
+    csCoverageTile* tile = GetTile (dirty_left[ty], ty);
+    int dr = dirty_right[ty];
+    if (dr >= (width_po2 >> SHIFT_TILECOL))
+      dr = (width_po2 >> SHIFT_TILECOL)-1;
+    for (tx = dirty_left[ty] ; tx <= dr ; tx++)
+    {
+      bool mod = tile->Flush (fvalue, max_depth);
+      if (mod)
+      {
+        modified++;
+	if (tx < modified_bbox.minx) modified_bbox.minx = tx;
+	if (tx > modified_bbox.maxx) modified_bbox.maxx = tx;
+	if (ty < modified_bbox.miny) modified_bbox.miny = ty;
+	if (ty > modified_bbox.maxy) modified_bbox.maxy = ty;
+      }
+      tile++;
+    }
+  }
+  return modified;
+}
+
+int csTiledCoverageBuffer::InsertOutline (
+	const csReversibleTransform& trans,
+	CS::Math::Matrix4 const& camProj,
+	csVector3* verts, size_t num_verts,
+	bool* used_verts,
+	int* edges, size_t num_edges, bool splat_outline,
+	csBox2Int& modified_bbox)
+{
+  csBox2Int bbox;
+  float max_depth;
+  if (!DrawOutline (trans, camProj, verts, num_verts, used_verts, edges,
   	num_edges, bbox, max_depth, splat_outline))
     return 0;
 

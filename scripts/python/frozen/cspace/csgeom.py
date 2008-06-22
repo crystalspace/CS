@@ -125,7 +125,6 @@ class csVector3(object):
         try: self.this.append(this)
         except: self.this = this
     def Description(*args): return _csgeom.csVector3_Description(*args)
-    def Cross(*args): return _csgeom.csVector3_Cross(*args)
     def __iadd__(*args): return _csgeom.csVector3___iadd__(*args)
     def __isub__(*args): return _csgeom.csVector3___isub__(*args)
     def __pos__(*args): return _csgeom.csVector3___pos__(*args)
@@ -150,6 +149,7 @@ class csVector3(object):
     def __idiv__(*args): return _csgeom.csVector3___idiv__(*args)
     def __div__(*args): return _csgeom.csVector3___div__(*args)
     def project(*args): return _csgeom.csVector3_project(*args)
+    def Cross(*args): return _csgeom.csVector3_Cross(*args)
     def __rmul__(*args): return _csgeom.csVector3___rmul__(*args)
     def __abs__(*args): return _csgeom.csVector3___abs__(*args)
     def __getitem__(*args): return _csgeom.csVector3___getitem__(*args)
@@ -1398,6 +1398,7 @@ class csPath(core.scfPath):
     __swig_destroy__ = _csgeom.delete_csPath
     __del__ = lambda self : None;
     def Length(*args): return _csgeom.csPath_Length(*args)
+    def QueryObject(*args): return _csgeom.csPath_QueryObject(*args)
     def CalculateAtTime(*args): return _csgeom.csPath_CalculateAtTime(*args)
     def GetCurrentIndex(*args): return _csgeom.csPath_GetCurrentIndex(*args)
     def GetTime(*args): return _csgeom.csPath_GetTime(*args)
@@ -1596,6 +1597,7 @@ class csIntArray(core.CustomAllocated):
     def Top(*args): return _csgeom.csIntArray_Top(*args)
     def Insert(*args): return _csgeom.csIntArray_Insert(*args)
     def Contains(*args): return _csgeom.csIntArray_Contains(*args)
+    def DeleteAll(*args): return _csgeom.csIntArray_DeleteAll(*args)
     def Truncate(*args): return _csgeom.csIntArray_Truncate(*args)
     def Empty(*args): return _csgeom.csIntArray_Empty(*args)
     def IsEmpty(*args): return _csgeom.csIntArray_IsEmpty(*args)
@@ -1634,6 +1636,7 @@ class csIntArrayArray(core.CustomAllocated):
     def Pop(*args): return _csgeom.csIntArrayArray_Pop(*args)
     def Top(*args): return _csgeom.csIntArrayArray_Top(*args)
     def Insert(*args): return _csgeom.csIntArrayArray_Insert(*args)
+    def DeleteAll(*args): return _csgeom.csIntArrayArray_DeleteAll(*args)
     def Truncate(*args): return _csgeom.csIntArrayArray_Truncate(*args)
     def Empty(*args): return _csgeom.csIntArrayArray_Empty(*args)
     def IsEmpty(*args): return _csgeom.csIntArrayArray_IsEmpty(*args)

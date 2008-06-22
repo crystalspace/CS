@@ -40,6 +40,8 @@ struct iRenderStep;
 struct iRenderView;
 struct iMeshWrapper;
 
+class csShaderVariableStack;
+
 /**
  * Name of the default render loop created by the engine.
  */

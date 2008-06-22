@@ -20,6 +20,8 @@
 #ifndef __CS_CSPLUGINCOMMON_SHADER_WEAVERCOMBINER_H__
 #define __CS_CSPLUGINCOMMON_SHADER_WEAVERCOMBINER_H__
 
+#include "ivideo/graph3d.h"
+
 #include "csutil/scf.h"
 #include "csgeom/vector4.h"
 #include <limits.h>
@@ -52,7 +54,7 @@ namespace CS
     
       struct iCombiner : public virtual iBase
       {
-        SCF_INTERFACE (iCombiner, 0, 2, 0);
+        SCF_INTERFACE (iCombiner, 1, 0, 0);
         
         /// Start addition of a new snippet.
         virtual void BeginSnippet (const char* annotation = 0) = 0;
@@ -94,8 +96,8 @@ namespace CS
         virtual void AddGlobal (const char* name, const char* type,
           const char* annotation = 0) = 0;
         /// Set output variable.
-        virtual void SetOutput (const char* name,
-          const char* annotation = 0) = 0;
+        virtual void SetOutput (csRenderTargetAttachment target,
+          const char* name, const char* annotation = 0) = 0;
         
         /**
          * Query a chain of coercions from a type to another.
@@ -136,7 +138,7 @@ namespace CS
       
       struct iCombinerLoader : public virtual iBase
       {
-        SCF_INTERFACE (iCombinerLoader, 0, 0, 2);
+        SCF_INTERFACE (iCombinerLoader, 0, 0, 3);
         
         virtual csPtr<iCombiner> GetCombiner (iDocumentNode* params) = 0;
 
@@ -145,6 +147,10 @@ namespace CS
           int usedComponents, const char* outputName) = 0;
         virtual void GenerateSVInputBlocks (iDocumentNode* node,
           const char* locationPrefix, const char* svName, 
+          const char* outputType, const char* outputName, 
+          const char* uniqueTag) = 0;
+        virtual void GenerateBufferInputBlocks (iDocumentNode* node,
+          const char* locationPrefix, const char* bufName, 
           const char* outputType, const char* outputName, 
           const char* uniqueTag) = 0;
       };

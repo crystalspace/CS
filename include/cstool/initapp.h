@@ -264,12 +264,20 @@ public:
   static bool CreateInputDrivers (iObjectRegistry*);
 
   /**
-   * Create the global shared string set and register it with the registry.
-   * This can be used if multiple, distinct modules want to share string IDs.
+   * Create the global shared string sets and register them with the registry.
+   * The first can be used if multiple, distinct modules want to share string IDs.
    * The set can be requested with:
    * \code
    * csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
    *   object_reg, "crystalspace.shared.stringset");
+   * \endcode
+   *
+   * The second string set is used for shader variable names and can be
+   * requested by:
+   * \code
+   * csRef<iShaderVarStringSet> strings =
+   *   csQueryRegistryTagInterface<iShaderVarStringSet> (
+   *     objectRegistry, "crystalspace.shader.variablenameset");
    * \endcode
    */
   static bool CreateStringSet (iObjectRegistry*);

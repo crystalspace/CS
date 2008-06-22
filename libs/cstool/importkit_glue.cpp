@@ -22,7 +22,6 @@
 #include "iengine/engine.h"
 #include "iengine/material.h"
 #include "iengine/mesh.h"
-#include "iengine/region.h"
 #include "iengine/texture.h"
 #include "imap/loader.h"
 #include "imesh/genmesh.h"
@@ -97,9 +96,9 @@ namespace Utility
 	"crystalspace.level.loader");
       if (!loader.IsValid()) return false;
 
-      csString regionName;
-      regionName.Format ("ImportKitRegion_%s", GetTempName());
-      csRef<iRegion> loadRegion = engine->CreateRegion (regionName);
+      csString collectionName;
+      collectionName.Format ("ImportKitCollection_%s", GetTempName());
+      csRef<iCollection> loadCollection = engine->CreateCollection (collectionName);
 
       {
 	csRef<iFile> file = vfs->Open (filename, VFS_FILE_READ);
@@ -113,16 +112,16 @@ namespace Utility
 	if (error != 0)
 	  return false;
 
-	csLoadResult rc = loader->Load (doc->GetRoot(), loadRegion);
+	csLoadResult rc = loader->Load (doc->GetRoot(), loadCollection);
 	if (!rc.success)
 	  return false;
       }
 
-      csRef<iObjectIterator> regionObjects = 
-	loadRegion->QueryObject()->GetIterator();
-      while (regionObjects->HasNext())
+      csRef<iObjectIterator> collectionObjects = 
+	loadCollection->QueryObject()->GetIterator();
+      while (collectionObjects->HasNext())
       {
-	csRef<iObject> obj = regionObjects->Next();
+	csRef<iObject> obj = collectionObjects->Next();
 
 	if (ProbeMeshFactory (container, obj)) continue;
 	if (ProbeMaterial (container, obj)) continue;
@@ -130,7 +129,7 @@ namespace Utility
 	if (ProbeMeshObject (container, obj)) continue;
       }
 
-      engine->RemoveObject (loadRegion);
+      engine->RemoveObject (loadCollection);
 
       return container.models.GetSize () > 0;
     }

@@ -296,7 +296,7 @@ namespace CS
 	  RBTraverser (csBlockAllocator<Element>& elementAlloc) :
 	    elementAlloc (elementAlloc) {}
 	  
-	  void Process (Element* el)
+	  void operator() (Element* el)
 	  {
 	    elementAlloc.Free (el);
 	  }
@@ -361,7 +361,7 @@ namespace CS
 	SearchDataTraverser (T* entry, Element*& ret) 
 	  : entry (entry), ret (ret) {}
 	
-        bool Process (Element* el)
+        bool operator() (Element* el)
 	{
 	  if (&(el->data) == entry)
 	  {
@@ -521,7 +521,8 @@ namespace CS
 	if (el != 0)
 	{
 	  ElementWrapper myElement = *el;
-	  availableResources.v.Delete (myElement);
+	  availableResources.v.DeleteExact (el);
+	  VerifyElementNotInTree (myElement);
 	  activeResources.v.PushFront (myElement);
 	  GetPurgeCondition().MarkActive (*this, myElement->GetPurgeAuxiliary());
 	  GetReuseCondition().MarkActive (*this, myElement->GetReuseAuxiliary());

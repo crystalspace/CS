@@ -106,6 +106,10 @@ rule ExternalLibs
     
     $(<).EXTERNALLIBS += $(extlib) ;
   }
+  for target in $($(<).PROPAGATE_EXTERNALLIBS)
+  {
+    ExternalLibs $(target) : $(>) ;
+  }
 }
 
 ##  ExtraObjects target : objectfiles [ : options ]

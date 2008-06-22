@@ -48,11 +48,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
                               scfFakeInterface<iShaderVariableContext> >,
     public CS::ShaderVariableContextImpl
   {
+    csRef<iRenderBuffer> index_buffer;
   public:
     const char* name;
-    csRef<iRenderBuffer> index_buffer;
     csRef<iMaterialWrapper> material;
+    struct LegacyTriangles
+    {
+      bool triangles_setup, mesh_triangle_dirty_flag;
+      csDirtyAccessArray<csTriangle> mesh_triangles;
 
+      LegacyTriangles();
+    };
+    LegacyTriangles legacyTris;
+    void CreateLegacyBuffer();
+    void ClearLegacyBuffer();
+    void UpdateFromLegacyBuffer();
+  
     // Override mixmode from parent.
     uint MixMode;
     csZBufMode zmode;
@@ -66,7 +77,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
       zmode ((csZBufMode)~0), renderPrio (-1), back2front (false), b2fTree (0)
     { }
     SubMesh (const SubMesh& other) : scfImplementationType (this), 
-      name (other.name), index_buffer (other.index_buffer), 
+      index_buffer (other.index_buffer), name (other.name), 
       material (other.material), MixMode (other.MixMode), zmode (other.zmode),
       renderPrio (other.renderPrio), back2front (other.back2front), b2fTree (0)
     { }
@@ -84,8 +95,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     iRenderBuffer* GetIndicesB2F (const csVector3& pos, uint frameNum,
       const csVector3* vertices, size_t vertNum);
 
-    iRenderBuffer* GetIndices () const
-    { return index_buffer; }
+    //iRenderBuffer* GetIndices () const
+    //{ return index_buffer; }
+    iRenderBuffer* GetIndices ();
     iMaterialWrapper* GetMaterial () const
     { return material; }
     virtual uint GetMixmode () const
@@ -105,17 +117,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
       back2front = enable;
     }
     bool GetBack2Front () const { return back2front; }
+
+    void SetIndices (iRenderBuffer* newIndices);
   };
 
   class SubMeshesContainer
   {
+    csRef<SubMesh> defaultSubmesh;
     csRefArray<SubMesh> subMeshes;
     uint changeNum;
   public:
-    SubMeshesContainer() : changeNum (0) { }
+    SubMeshesContainer();
 
     void ClearSubMeshes ()
-    { subMeshes.DeleteAll(); changeNum++; }
+    {
+      subMeshes.DeleteAll();
+      changeNum++;
+      subMeshes.Push (defaultSubmesh);
+    }
     iGeneralMeshSubMesh* AddSubMesh (iRenderBuffer* indices, 
       iMaterialWrapper *material, const char* name, uint mixmode = (uint)~0);
     SubMesh* FindSubMesh (const char* name) const;
@@ -131,6 +150,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     { return subMeshes[index]; }
     uint GetChangeNum () const
     { return changeNum; }
+    
+    SubMesh* GetDefaultSubmesh() const { return defaultSubmesh; }
   };
 
   /**
@@ -161,6 +182,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     csRef<csRenderBufferHolder> bufferHolder;
     bool back2front;
 
+    class RenderBufferAccessor : 
+      public scfImplementation1<RenderBufferAccessor, iRenderBufferAccessor>
+    {
+    public:
+      csWeakRef<SubMeshProxy> parent;
+      csRef<iRenderBufferAccessor> wrappedHolder;
+
+      RenderBufferAccessor (SubMeshProxy* parent) :
+	scfImplementationType (this), parent (parent) { }
+      void PreGetBuffer (csRenderBufferHolder* holder,
+    	csRenderBufferName buffer);
+    };
+    csRef<RenderBufferAccessor> renderBufferAccessor;
+
     void SetOverrideFlag (uint bit, bool flag) 
     { overrideFlags.SetBool (1 << bit, flag); }
     bool GetOverrideFlag (uint bit) const 
@@ -175,14 +210,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     ~SubMeshProxy ()
     { }
 
-    csRenderBufferHolder* GetBufferHolder();
+    csRenderBufferHolder* GetBufferHolder (csRenderBufferHolder* copyFrom);
 
     const char* GetName() const 
     { 
       if (parentSubMesh) return parentSubMesh->SubMesh::GetName();
       return 0;
     }
-    iRenderBuffer* GetIndices () const
+    iRenderBuffer* GetIndices ()
     { 
       if (parentSubMesh) return parentSubMesh->SubMesh::GetIndices();
       return 0;
@@ -246,17 +281,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
       return parentSubMesh->SubMesh::GetBack2Front ();
     }
 
-    virtual csShaderVariable* GetVariable (csStringID name) const
+    virtual csShaderVariable* GetVariable (CS::ShaderVarStringID name) const
     {
       csShaderVariable* var = 
         CS::ShaderVariableContextImpl::GetVariable (name);
       if (var == 0) var = parentSubMesh->SubMesh::GetVariable (name);
       return var;
     }
-    virtual void PushVariables (iShaderVarStack* stacks) const
+    virtual void PushVariables (csShaderVariableStack& stack) const
     {
-      parentSubMesh->SubMesh::PushVariables (stacks);
-      CS::ShaderVariableContextImpl::PushVariables (stacks);
+      parentSubMesh->SubMesh::PushVariables (stack);
+      CS::ShaderVariableContextImpl::PushVariables (stack);
     }
     virtual bool IsEmpty() const 
     { 
@@ -267,18 +302,29 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
 
   class SubMeshProxiesContainer
   {
+    csRef<SubMeshProxy> defaultSubmesh;
     csRefArray<SubMeshProxy> subMeshes;
   public:
+    SubMeshProxiesContainer ();
+    SubMeshProxiesContainer (SubMeshProxy* deflt);
+    
     void AddSubMesh (SubMeshProxy* subMesh);
     SubMeshProxy* FindSubMesh (const char* name) const;
-    void Empty() { subMeshes.Empty(); }
+    void Empty()
+    {
+      subMeshes.Empty();
+    }
     void Push (SubMeshProxy* subMesh)
-    { subMeshes.Push (subMesh); }
+    {
+      subMeshes.Push (subMesh);
+    }
 
     size_t GetSize() const
     { return subMeshes.GetSize(); }
     SubMeshProxy* operator[](size_t index)
     { return subMeshes[index]; }
+    
+    SubMeshProxy* GetDefaultSubmesh() const { return defaultSubmesh; }
   };
 
   class csGenmeshMeshObjectFactory;

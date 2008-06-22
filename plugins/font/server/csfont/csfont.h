@@ -88,7 +88,8 @@ public:
   csRef<iDataBuffer> bitData;
   csRef<iDataBuffer> alphaData;
   csRef<csDefaultFontServer> Parent;
-  csRefArray<iFontDeleteNotify> DeleteCallbacks;
+  csRefArray<iFontDeleteNotify, CS::Container::ArrayAllocDefault,
+    csArrayCapacityFixedGrow<4> > DeleteCallbacks;
 
   /// Create the font object
   csDefaultFont (csDefaultFontServer *parent, const char *name, 

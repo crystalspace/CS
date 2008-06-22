@@ -1,6 +1,7 @@
 %module cstool
 %import "bindings/core.i"
 %import "bindings/iengine.i"
+%import "bindings/ivaria.i"
 %{
 #include "crystalspace.h"
 %}

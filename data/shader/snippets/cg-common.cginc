@@ -22,6 +22,7 @@
 #ifndef __CG_COMMON_CG_INC__
 #define __CG_COMMON_CG_INC__
 
+// EyeVec - eye to vertex
 float2 ComputeParallaxOffset (sampler2D TexHeight, float2 OriginalCoord, 
 			      float3 EyeVec, float OffsetScale)
 {

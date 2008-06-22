@@ -27,6 +27,7 @@
 #include "csgeom/csrect.h"
 #include "csgfx/rgbpixel.h"
 #include "csutil/cfgacc.h"
+#include "csutil/setenv.h"
 #include "iutil/cfgfile.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
@@ -96,13 +97,13 @@ bool csGraphics2DCaca::Open ()
   config.AddConfig(object_reg, "/config/video.cfg");
 
   if(config->KeyExists("Video.ASCII.Console.Size"))
-    setenv ("CACA_GEOMETRY", 
+    CS::Utility::setenv ("CACA_GEOMETRY", 
       config->GetStr("Video.ASCII.Console.Size"), false);
   if(config->KeyExists("Video.ASCII.Console.Driver"))
-    setenv ("CACA_DRIVER", 
+    CS::Utility::setenv ("CACA_DRIVER", 
       config->GetStr("Video.ASCII.Console.Driver", "x11"), false);
   if(config->KeyExists("Video.ASCII.Console.Font"))
-    setenv ("CACA_FONT", 
+    CS::Utility::setenv ("CACA_FONT", 
       config->GetStr("Video.ASCII.Console.Font", "fixed"), false);
   
   fbWidth = config->GetInt("Video.Ascii.Offscreen.Width", 320);
@@ -209,33 +210,36 @@ void csGraphics2DCaca::Print (csRect const* area)
 
   /* Get all events from keyboard and mouse and put them into system queue */
   caca_event_t event;
-  while (caca_get_event (caca_display, caca_event::CACA_EVENT_ANY, &event, 0))
+  while (caca_get_event (caca_display, CACA_EVENT_ANY, &event, 0))
   {
-    switch(event.type)
+    caca_event_type evType = caca_get_event_type (&event);
+    switch(evType)
     {
-    case caca_event::CACA_EVENT_KEY_PRESS:
-    case caca_event::CACA_EVENT_KEY_RELEASE:
+    case CACA_EVENT_KEY_PRESS:
+    case CACA_EVENT_KEY_RELEASE:
       {
         utf32_char raw, cooked;
-        if (event.data.key.utf32 != 0)
-          raw = cooked = event.data.key.utf32;
+		long key_utf32 = caca_get_event_key_utf32 (&event);
+        if (key_utf32 != 0)
+          raw = cooked = key_utf32;
         else
-          raw = cooked = MapKey (event.data.key.ch);
+          raw = cooked = MapKey (caca_get_event_key_ch (&event));
 	EventOutlet->Key (raw, cooked, 
-	  (event.type == caca_event::CACA_EVENT_KEY_PRESS));
+	  (evType == CACA_EVENT_KEY_PRESS));
       }
       break;
-    case caca_event::CACA_EVENT_MOUSE_PRESS:
-      EventOutlet->Mouse (event.data.mouse.button- 1, true,
+    case CACA_EVENT_MOUSE_PRESS:
+      EventOutlet->Mouse (caca_get_event_mouse_button (&event) - 1, true,
         caca_get_mouse_x (caca_display), caca_get_mouse_y (caca_display));
       break;
-    case caca_event::CACA_EVENT_MOUSE_RELEASE:
-      EventOutlet->Mouse (event.data.mouse.button - 1, false,
+    case CACA_EVENT_MOUSE_RELEASE:
+      EventOutlet->Mouse (caca_get_event_mouse_button (&event) - 1, false,
         caca_get_mouse_x (caca_display), caca_get_mouse_y (caca_display));
       break;
-    case caca_event::CACA_EVENT_MOUSE_MOTION:
+    case CACA_EVENT_MOUSE_MOTION:
       EventOutlet->Mouse (csmbNone, false, 
-        event.data.mouse.x, event.data.mouse.y);
+        caca_get_mouse_x (caca_display),
+		caca_get_mouse_y (caca_display));
       break;
     default:
       break;

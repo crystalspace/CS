@@ -30,7 +30,7 @@
 
 class Demo;
 class DemoSequenceManager;
-class csNamedPath;
+class csPath;
 
 struct NamedSequence
 {
@@ -52,7 +52,7 @@ private:
   DemoSequenceManager* demoseq;
   csStringHash xmltokens;
 
-  csNamedPath* LoadPath (iDocumentNode* node, const char* name);
+  csPath* LoadPath (iDocumentNode* node, const char* name);
   void LoadSequence (iDocumentNode* node, iSequence* seq);
   void LoadSequences (iDocumentNode* node);
   void LoadSequencesMain (iDocumentNode* node);

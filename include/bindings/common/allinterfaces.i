@@ -31,6 +31,7 @@
   INTERFACE_APPLY(iLight)
   INTERFACE_APPLY(iLightIterator)
   INTERFACE_APPLY(iLightList)
+  INTERFACE_APPLY(iMaterialEngine)
   INTERFACE_APPLY(iMaterialWrapper)
   INTERFACE_APPLY(iMeshFactoryWrapper)
   INTERFACE_APPLY(iMeshWrapper)
@@ -42,6 +43,9 @@
   INTERFACE_APPLY(iProcTexture)
   INTERFACE_APPLY(iRenderLoop)
   INTERFACE_APPLY(iRenderLoopManager)
+  INTERFACE_APPLY(iRenderManager)
+  INTERFACE_APPLY(iRenderManagerPostEffects)
+  INTERFACE_APPLY(iRenderManagerTargets)
   INTERFACE_APPLY(iSceneNode)
   INTERFACE_APPLY(iSceneNodeArray)
   INTERFACE_APPLY(iSector)
@@ -60,6 +64,11 @@
 %enddef
 
 %define IMESH_APPLY_FOR_EACH_INTERFACE
+  INTERFACE_APPLY(iAnimatedMeshFactory)
+  INTERFACE_APPLY(iAnimatedMeshFactorySubMesh)
+  INTERFACE_APPLY(iAnimatedMesh)
+  INTERFACE_APPLY(iAnimatedMeshSubMesh)
+  INTERFACE_APPLY(iAnimatedMeshMorphTarget)
   INTERFACE_APPLY(iGeneralFactoryState)
   INTERFACE_APPLY(iGeneralMeshState)
   INTERFACE_APPLY(iParticleEmitter)
@@ -88,6 +97,22 @@
   INTERFACE_APPLY(iSkeletonGraveyard)
   INTERFACE_APPLY(iSkeletonSocket)
   INTERFACE_APPLY(iSkeletonSocketFactory)
+  INTERFACE_APPLY(iSkeletonManager2)
+  INTERFACE_APPLY(iSkeletonFactory2)
+  INTERFACE_APPLY(iSkeletonFSMNode2)
+  INTERFACE_APPLY(iSkeletonFSMNodeFactory2)
+  INTERFACE_APPLY(iSkeleton2)
+  INTERFACE_APPLY(iSkeletonAnimPacketFactory2)
+  INTERFACE_APPLY(iSkeletonAnimPacket2)
+  INTERFACE_APPLY(iSkeletonAnimNodeFactory2)
+  INTERFACE_APPLY(iSkeletonAnimNode2)
+  INTERFACE_APPLY(iSkeletonAnimation2)
+  INTERFACE_APPLY(iSkeletonAnimationNode2)
+  INTERFACE_APPLY(iSkeletonAnimationNodeFactory2)
+  INTERFACE_APPLY(iSkeletonPriorityNode2)
+  INTERFACE_APPLY(iSkeletonPriorityNodeFactory2)
+  INTERFACE_APPLY(iSkeletonBlendNodeFactory2)
+  INTERFACE_APPLY(iSkeletonBlendNode2)
   INTERFACE_APPLY(iSprite2DState)
   INTERFACE_APPLY(iSprite3DState)
   INTERFACE_APPLY(iSpriteCal3DState)
@@ -120,6 +145,7 @@
   INTERFACE_APPLY(iSndSysListener)
   INTERFACE_APPLY(iSndSysLoader)
   INTERFACE_APPLY(iSndSysSource)
+  INTERFACE_APPLY(iSndSysSource3D)
   INTERFACE_APPLY(iSndSysStream)
   INTERFACE_APPLY(iSndSysRenderer)
   INTERFACE_APPLY(iSndSysWrapper)
@@ -228,7 +254,9 @@
 
 #define CSTOOL_APPLY_FOR_EACH_INTERFACE
 
-#define CSGFX_APPLY_FOR_EACH_INTERFACE
+%define CSGFX_APPLY_FOR_EACH_INTERFACE
+  INTERFACE_APPLY(iShaderVarStringSet)
+%enddef
 
 
 %define APPLY_FOR_ALL_INTERFACES

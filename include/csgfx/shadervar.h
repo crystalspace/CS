@@ -33,6 +33,7 @@
 #include "csgeom/vector3.h"
 #include "csgeom/vector4.h"
 #include "csgfx/rgbpixel.h"
+#include "csutil/blockallocator.h"
 #include "csutil/cscolor.h"
 #include "csutil/leakguard.h"
 #include "csutil/refarr.h"
@@ -48,6 +49,27 @@ struct iTextureWrapper;
 struct csShaderVariableWrapper;
 
 class csShaderVariable;
+
+namespace CS
+{
+  namespace StringSetTag
+  {
+    struct ShaderVar;
+  } // namespace StringSetTag
+  
+  /// String ID for shader variable name
+  typedef StringID<StringSetTag::ShaderVar> ShaderVarStringID;
+  /// Invalid shader variable name
+  ShaderVarStringID const InvalidShaderVarStringID =
+    InvalidStringID<StringSetTag::ShaderVar> ();
+} // namespace CS
+
+/// String set for shader variable names
+struct iShaderVarStringSet :
+  public iStringSetBase<CS::StringSetTag::ShaderVar>
+{
+  CS_ISTRINGSSET_SCF_VERSION(iShaderVarStringSet);
+};
 
 /**\addtogroup gfx3d
  * @{ */
@@ -117,7 +139,7 @@ public:
    */
   csShaderVariable ();
   /// Construct with name.
-  csShaderVariable (csStringID name);
+  csShaderVariable (CS::ShaderVarStringID name);
 
   csShaderVariable (const csShaderVariable& other);
 
@@ -152,16 +174,12 @@ public:
    * \warning Changing the name of a variable while it's in use can cause 
    *    unexpected behaviour.
    */
-  void SetName (csStringID newName) 
-  {
-    Name = newName; 
-  }
+  void SetName (CS::ShaderVarStringID newName)
+  { Name = newName; }
   
   /// Get the name of the variable
-  csStringID GetName () const 
-  { 
-    return Name; 
-  }
+  CS::ShaderVarStringID GetName () const
+  { return Name; }
 
   /// Get the extra accessor data
   intptr_t GetAccessorData () const
@@ -377,8 +395,15 @@ public:
   bool SetValue (iTextureHandle* value)
   {    
     if (Type != TEXTURE)
+    {
       NewType (TEXTURE);
-
+      texture.WrapValue = 0;
+    }
+    else
+    {
+      if (texture.HandValue)
+	texture.HandValue->DecRef();
+    }
     texture.HandValue = value;
     
     if (value)
@@ -390,8 +415,16 @@ public:
   bool SetValue (iTextureWrapper* value)
   {    
     if (Type != TEXTURE)
+    {
       NewType (TEXTURE);
-
+      texture.HandValue = 0;
+    }
+    else
+    {
+      if (texture.WrapValue)
+	texture.WrapValue->DecRef();
+    }
+    
     texture.WrapValue = value;
     
     if (value)
@@ -404,7 +437,11 @@ public:
   {    
     if (Type != RENDERBUFFER)
       NewType (RENDERBUFFER);
-
+    else
+    {
+      if (RenderBuffer)
+	RenderBuffer ->DecRef();
+    }
     RenderBuffer = value;
     
     if (value)
@@ -441,6 +478,17 @@ public:
       NewType (VECTOR3);
 
     VectorValue.Set (value.red, value.green, value.blue, 1.0f);
+    Int = (int)value.red;
+    return true; 
+  }
+
+  /// Store a csColor4
+  bool SetValue (const csColor4& value)
+  { 
+    if (Type != VECTOR4)
+      NewType (VECTOR4);
+
+    VectorValue.Set (value.red, value.green, value.blue, value.alpha);
     Int = (int)value.red;
     return true; 
   }
@@ -533,14 +581,19 @@ public:
    */
   void SetArrayElement (size_t element, csShaderVariable *variable)
   {
+    if (Type != ARRAY) NewType (ARRAY);
     ShaderVarArray->Put (element, variable);
   }
 
 private:
-  csStringID Name;
+  CS::ShaderVarStringID Name;
   VariableType Type;
 
   // Storage for types that can be combined..
+  typedef csRefArray<csShaderVariable,
+    CS::Memory::LocalBufferAllocator<csShaderVariable*, 8,
+      CS::Memory::AllocatorMalloc, true>,
+    csArrayCapacityFixedGrow<8> > SvArrayType;
   union
   {
     // Refcounted
@@ -554,12 +607,19 @@ private:
     int Int;
     csMatrix3* MatrixValuePtr;
     csReversibleTransform* TransformPtr;
-    csRefArray<csShaderVariable> *ShaderVarArray;
+    SvArrayType* ShaderVarArray;
   };
 
   csVector4 VectorValue;  
   csRef<iShaderVariableAccessor> accessor;
   intptr_t accessorData;
+  
+  CS_DECLARE_STATIC_CLASSVAR (matrixAlloc, MatrixAlloc,
+    csBlockAllocator<csMatrix3>)
+  CS_DECLARE_STATIC_CLASSVAR (transformAlloc, TransformAlloc,
+    csBlockAllocator<csReversibleTransform>)
+  CS_DECLARE_STATIC_CLASSVAR (arrayAlloc, ShaderVarArrayAlloc,
+    csBlockAllocator<SvArrayType>)
 
   virtual void NewType (VariableType nt);
 };
@@ -569,13 +629,13 @@ namespace CS
   /// Helper class to obtain an ID for a shader variable.
   struct ShaderVarName
   {
-    csStringID name;
+    ShaderVarStringID name;
     
-    ShaderVarName() : name (csInvalidStringID) {}
-    ShaderVarName (iStringSet* strings, const char* name) 
-    { this->name = strings->Request (name); }
+    ShaderVarName() : name (InvalidShaderVarStringID) {}
+    ShaderVarName (iStringSetBase<StringSetTag::ShaderVar>* strings,
+      const char* name) : name (strings->Request (name)) { }
     
-    operator csStringID () const { return name; }
+    operator ShaderVarStringID () const { return name; }
   };
   
 } // namespace CS

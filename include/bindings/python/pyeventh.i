@@ -137,7 +137,8 @@
 
   def csevCommandLineHelp(reg):
     csEventNameRegistry.GetID(reg, "crystalspace.application.commandlinehelp")
-    
+  
+  csInvalidStringID = ~0 # we want stringids as unsigned long
   CS_EVENTLIST_END = csInvalidStringID
 %}
 

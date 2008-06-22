@@ -25,13 +25,15 @@
 #include "cstool/csview.h"
 #include "iengine/camera.h"
 #include "iengine/engine.h"
+#include "iengine/rendermanager.h"
 
 
 csView::csView (iEngine *e, iGraphics3D* ig3d) 
   : scfImplementationType (this),
   Engine (e), G3D (ig3d), RectView (0), PolyView (0), AutoResize (true)
 {
-  Camera = e->CreateCamera ();
+  csRef<iPerspectiveCamera> pcam = e->CreatePerspectiveCamera ();
+  SetPerspectiveCamera(pcam);
 
   OldWidth = G3D->GetWidth ();
   OldHeight = G3D->GetHeight ();
@@ -60,8 +62,22 @@ iCamera *csView::GetCamera ()
 
 void csView::SetCamera (iCamera* c)
 {
+  CS_ASSERT_MSG("Null camera not allowed.", c != NULL); 
   Camera = c;
 }
+
+iPerspectiveCamera *csView::GetPerspectiveCamera ()
+{
+  csRef<iPerspectiveCamera> pcam = scfQueryInterfaceSafe<iPerspectiveCamera>(Camera);
+  return pcam;
+}
+
+void csView::SetPerspectiveCamera (iPerspectiveCamera* c)
+{
+  CS_ASSERT_MSG("Null camera not allowed.", c != NULL); 
+  Camera = scfQueryInterface<iCamera>(c);
+}
+
 
 iGraphics3D* csView::GetContext ()
 {
@@ -153,11 +169,7 @@ void csView::UpdateView ()
 
 void csView::Draw (iMeshWrapper* mesh)
 {
-  UpdateClipper();
-  G3D->SetPerspectiveCenter ( (int)Camera->GetShiftX (),
-			      (int)Camera->GetShiftY () );
-
-  Engine->Draw (Camera, Clipper, mesh);
+  Engine->GetRenderManager()->RenderView (this);
 }
 
 void csView::UpdateClipper ()
@@ -202,4 +214,3 @@ iClipper2D* csView::GetClipper ()
   UpdateClipper ();
   return Clipper;
 }
-

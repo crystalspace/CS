@@ -304,6 +304,7 @@ typedef unsigned char uint8;
 %apply float * INOUT { float & iG };
 %apply float * INOUT { float & iB };
 
+
 %include "cstypes.h"
 
 %define CS_WRAP_PTR_IMPLEMENT(PtrName)
@@ -454,6 +455,20 @@ TYPEMAP_OUT_csWrapPtr
 // %typemap(default). The %extend-ing and extra code takes place after all
 // %include's are done, mentioning the header(s) it is related to.
 
+%ignore CS::Memory::CustomAllocated::operator new;
+%ignore CS::Memory::CustomAllocated::operator new[];
+%ignore CS::Memory::CustomAllocated::operator delete;
+%ignore CS::Memory::CustomAllocated::operator delete[];
+%ignore CS::Memory::CustomAllocatedDerived::operator new;
+%ignore CS::Memory::CustomAllocatedDerived::operator new[];
+%ignore CS::Memory::CustomAllocatedDerived::operator delete;
+%ignore CS::Memory::CustomAllocatedDerived::operator delete[];
+%ignore CS::Memory::CustomAllocatedDerivedVirtual::operator new;
+%ignore CS::Memory::CustomAllocatedDerivedVirtual::operator new[];
+%ignore CS::Memory::CustomAllocatedDerivedVirtual::operator delete;
+%ignore CS::Memory::CustomAllocatedDerivedVirtual::operator delete[];
+%include "csutil/customallocated.h"
+
 %include "iutil/array.h"
 %ignore csOrdering;
 %ignore csArrayCmp;
@@ -464,7 +479,6 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csArray::Capacity;
 %ignore csArray::DefaultCompare;
 %ignore csArray::Delete;
-%ignore csArray::DeleteAll;
 %ignore csArray::DeleteFast;
 %ignore csArray::Find;
 %ignore csArray::FindKey;
@@ -472,9 +486,11 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csArray::GetExtend;
 %ignore csArray::GetIndex;
 %ignore csArray::GetIterator;
+%ignore csArray::GetReverseIterator;
 %ignore csArray::InitRegion;
 %ignore csArray::InsertSorted;
 %ignore csArray::Iterator;
+%ignore csArray::ReverseIterator;
 %ignore csArray::Length;
 %ignore csArray::PushSmart;
 %ignore csArray::Section;
@@ -486,7 +502,6 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csArray::TransferTo;
 %ignore csArray::operator=;
 %ignore csArray::operator[];
-%ignore csArray::Iterator;
 /* The following is a bit ugly but otherwise there is no way pass the
    necessary directives to swig between template declarations.        */
 template <typename Threshold = csArrayThresholdVariable>
@@ -518,7 +533,17 @@ csArrayCapacityLinear<csArrayThresholdVariable >;
 %template (typename ## ArrayChangeElements) iArrayChangeElements<typename* >;
 %template (typename ## ArrayChangeAll) iArrayChangeAll<typename* >;
 %enddef
-
+#%ignore csDirtyAccessArray::Length;
+%include "csutil/dirtyaccessarray.h"
+// Provide some useful default instantiations
+%template (Vector2Array) csArray<csVector2>;
+%template (Vector2DirtyAccessArray) csDirtyAccessArray<csVector2>;
+%template (Vector3Array) csArray<csVector3>;
+%template (Vector3DirtyAccessArray) csDirtyAccessArray<csVector3>;
+%template (Vector4Array) csArray<csVector4>;
+%template (Vector4DirtyAccessArray) csDirtyAccessArray<csVector4>;
+%template (UIntArray) csArray<unsigned int>;
+%template (UIntDirtyAccessArray) csDirtyAccessArray<unsigned int>;
 
 %ignore scfInitialize;
 %immutable iSCF::SCF;
@@ -551,12 +576,18 @@ void SetCoreSCFPointer(iSCF *scf_pointer)
 
 %include "csutil/flags.h"
 
-%ignore csStringSet::GlobalIterator;
-%ignore csStringSet::GetIterator;
+%ignore CS::Utility::StringSet::GlobalIterator;
+%ignore CS::Utility::StringSet::GetIterator;
+%ignore CS::Utility::GetIterator;
+DEPRECATED_METHOD(iStringArray,Length,GetSize);
+DEPRECATED_METHOD(iStringArray,DeleteAll,Empty);
+/* %apply unsigned long { csStringID }; */
+%include "iutil/strset.h"
 DEPRECATED_METHOD(csStringSet,Clear,Empty);
 DEPRECATED_METHOD(iStringArray,Length,GetSize);
 DEPRECATED_METHOD(iStringArray,DeleteAll,Empty);
 %include "csutil/strset.h"
+DEPRECATED_METHOD(CS::Utility::StringSet,Clear,Empty);
 %ignore csSet::GlobalIterator;
 %ignore csSet::GetIterator;
 %include "csutil/set.h"
@@ -594,20 +625,6 @@ SET_HELPER(csStringID)
 %include "cstool/initapp.h"
 %typemap(default) const char * configName;
 
-%ignore CS::Memory::CustomAllocated::operator new;
-%ignore CS::Memory::CustomAllocated::operator new[];
-%ignore CS::Memory::CustomAllocated::operator delete;
-%ignore CS::Memory::CustomAllocated::operator delete[];
-%ignore CS::Memory::CustomAllocatedDerived::operator new;
-%ignore CS::Memory::CustomAllocatedDerived::operator new[];
-%ignore CS::Memory::CustomAllocatedDerived::operator delete;
-%ignore CS::Memory::CustomAllocatedDerived::operator delete[];
-%ignore CS::Memory::CustomAllocatedDerivedVirtual::operator new;
-%ignore CS::Memory::CustomAllocatedDerivedVirtual::operator new[];
-%ignore CS::Memory::CustomAllocatedDerivedVirtual::operator delete;
-%ignore CS::Memory::CustomAllocatedDerivedVirtual::operator delete[];
-%include "csutil/customallocated.h"
-
 %ignore csArray<csPluginRequest>::Capacity;
 %ignore csArray<csPluginRequest>::DefaultCompare;
 %ignore csArray<csPluginRequest>::Delete;
@@ -620,10 +637,11 @@ SET_HELPER(csStringID)
 %ignore csArray<csPluginRequest>::GetExtend;
 %ignore csArray<csPluginRequest>::GetIndex;
 %ignore csArray<csPluginRequest>::GetIterator;
+%ignore csArray<csPluginRequest>::GetReverseIterator;
 %ignore csArray<csPluginRequest>::InitRegion;
 %ignore csArray<csPluginRequest>::InsertSorted;
 %ignore csArray<csPluginRequest>::Iterator;
-%ignore csArray<csPluginRequest>::Iterator;
+%ignore csArray<csPluginRequest>::ReverseIterator;
 %ignore csArray<csPluginRequest>::PushSmart;
 %ignore csArray<csPluginRequest>::Put;
 %ignore csArray<csPluginRequest>::Section;
@@ -638,15 +656,6 @@ SET_HELPER(csStringID)
 %ignore csArray<csPluginRequest>::operator[];
 %template(csPluginRequestArray) csArray<csPluginRequest>;
 
-%include "igeom/clip2d.h"
-%include "igeom/path.h"
-%template(scfPath) scfImplementation1<csPath,iPath >;
-#ifndef CS_SWIG_PUBLISH_IGENERAL_FACTORY_STATE_ARRAYS
-%ignore iTriangleMesh::GetTriangles;
-%ignore iTriangleMesh::GetVertices;
-#endif
-%include "igeom/trimesh.h"
-
 %ignore iReporter::ReportV;
 %ignore csReporterHelper::ReportV;
 %include "ivaria/reporter.h"
@@ -660,7 +669,6 @@ SET_HELPER(csStringID)
 {
   ITERATOR_FUNCTIONS(iObjectIterator)
 }
-%include "iutil/strset.h"
 %ignore CS_QUERY_REGISTRY_TAG_is_deprecated;
 %include "iutil/objreg.h"
 %include "iutil/virtclk.h"
@@ -734,6 +742,14 @@ APPLY_TYPEMAP_ARGOUT_PTR(csCommandEventData,csCommandEventData& data)
 %ignore csHash::Get (const K& key, T& fallback);
 %ignore csHash::csHash (const csHash<T> &o);
 %ignore csHash::operator [];
+
+/* We have to declare this here, otherwise swig gets confused about a
+forward declaration of the csHash template without default parameters */
+template <class T, class K = unsigned int,
+  class ArrayMemoryAlloc = CS::Memory::AllocatorMalloc,
+  class ArrayElementHandler = csArrayElementHandler<
+    CS::Container::HashElement<T, K> > > class csHash;
+
 %include "csutil/hash.h"
 %include "iutil/eventnames.h"
 %include "csutil/eventnames.h"
@@ -743,6 +759,20 @@ APPLY_TYPEMAP_ARGOUT_PTR(csCommandEventData,csCommandEventData& data)
 {
   ITERATOR_FUNCTIONS(iPluginIterator)
 }
+
+%template(scfObject) scfImplementation1<csObject,iObject >;
+%include "csutil/csobject.h"
+
+%include "igeom/clip2d.h"
+%include "igeom/path.h"
+
+%template(scfPath) scfImplementationExt1<csPath,csObject,iPath >;
+#ifndef CS_SWIG_PUBLISH_IGENERAL_FACTORY_STATE_ARRAYS
+%ignore iTriangleMesh::GetTriangles;
+%ignore iTriangleMesh::GetVertices;
+#endif
+%include "igeom/trimesh.h"
+
 
 %include "iutil/csinput.h"
 %include "iutil/cfgfile.h"
@@ -790,8 +820,6 @@ BUFFER_RW_FUNCTIONS(iDataBuffer,GetData,GetSize,
 %include "igraphic/animimg.h"
 %include "itexture/iproctex.h"
 
-%template(pycsObject) scfImplementation1<csObject,iObject >;
-%include "csutil/csobject.h"
 %ignore iBase::~iBase(); // We replace iBase dtor with one that calls DecRef().
 			 // Swig already knows not to delete an SCF pointer.
 

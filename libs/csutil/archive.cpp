@@ -373,27 +373,31 @@ char *csArchive::Read (const char *name, size_t *size)
 
   if (!f)
     return 0;
+  char* out_buff = new char[f->info.ucsize+1];
   if (size)
     *size = f->info.ucsize;
 
-  return ReadEntry (file, f);
+  if (!ReadEntry (file, f, out_buff))
+  {
+    delete[] out_buff;
+    return 0;
+  }
+  out_buff [f->info.ucsize] = 0;
+  return out_buff;
 }
 
-char *csArchive::ReadEntry (FILE *infile, ArchiveEntry * f)
+bool csArchive::ReadEntry (FILE *infile, ArchiveEntry * f, char* out_buff)
 {
   // This routine allocates one byte more than is actually needed
   // and fills it with zero. This can be used when reading text files
 
   size_t bytes_left;
   char buff[1024];
-  char *out_buff;
   int err;
   ZIP_local_file_header lfh;
 
-  out_buff = new char[f->info.ucsize + 1];
   if (!out_buff)
-    return 0;
-  out_buff [f->info.ucsize] = 0;
+    return false;
 
   if ((fseek (infile, f->info.relative_offset_local_header, SEEK_SET))
       || (fread (buff, 1, sizeof (hdr_local), infile) < sizeof (hdr_local))
@@ -402,8 +406,7 @@ char *csArchive::ReadEntry (FILE *infile, ArchiveEntry * f)
       || (fseek (infile, lfh.filename_length + lfh.extra_field_length,
       	SEEK_CUR)))
   {
-    delete [] out_buff;
-    return 0;
+    return false;
   }
   switch (f->info.compression_method)
   {
@@ -411,8 +414,7 @@ char *csArchive::ReadEntry (FILE *infile, ArchiveEntry * f)
       {
         if (fread (out_buff, 1, f->info.csize, infile) < f->info.csize)
         {
-          delete [] out_buff;
-          return 0;
+          return false;
         } /* endif */
         break;
       }
@@ -430,8 +432,7 @@ char *csArchive::ReadEntry (FILE *infile, ArchiveEntry * f)
         err = inflateInit2 (&zs, -DEF_WBITS);
         if (err != Z_OK)
         {
-          delete [] out_buff;
-          return 0;
+          return false;
         }
         while (bytes_left)
         {
@@ -463,12 +464,11 @@ char *csArchive::ReadEntry (FILE *infile, ArchiveEntry * f)
       }
     default:
       {
-        /* Can't handle this compression algorythm */
-        delete [] out_buff;
-        return 0;
+        /* Can't handle this compression algorithm */
+        return false;
       }
   } /* endswitch */
-  return out_buff;
+  return true;
 }
 
 void *csArchive::NewFile (const char *name, size_t size, bool pack)

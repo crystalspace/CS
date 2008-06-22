@@ -50,7 +50,6 @@ struct iMeshWrapper;
 struct iObjectRegistry;
 struct iObjectRegistry;
 struct iPluginManager;
-struct iRegion;
 struct iSector;
 struct iTextureManager;
 struct iThingFactoryState;
@@ -238,6 +237,7 @@ private:
   csRef<iVirtualClock> vc;
   csRef<iFont> fnt;
   csRef<iStringSet> stringSet;
+  csRef<iShaderVarStringSet> stringSetSvName;
   csRef<iStandardReporterListener> stdrep;
   bool initialized;
   csConfigAccess config;

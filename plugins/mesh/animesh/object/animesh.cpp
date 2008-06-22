@@ -41,17 +41,17 @@ CS_IMPLEMENT_PLUGIN
 CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 {
 
-  static csStringID svNameVertexUnskinned = csInvalidStringID;
-  static csStringID svNameNormalUnskinned = csInvalidStringID;
-  static csStringID svNameTangentUnskinned = csInvalidStringID;
-  static csStringID svNameBinormalUnskinned = csInvalidStringID;
+  static CS::ShaderVarStringID svNameVertexUnskinned = CS::InvalidShaderVarStringID;
+  static CS::ShaderVarStringID svNameNormalUnskinned = CS::InvalidShaderVarStringID;
+  static CS::ShaderVarStringID svNameTangentUnskinned = CS::InvalidShaderVarStringID;
+  static CS::ShaderVarStringID svNameBinormalUnskinned = CS::InvalidShaderVarStringID;
 
-  static csStringID svNameBoneIndex = csInvalidStringID;
-  static csStringID svNameBoneWeight = csInvalidStringID;
-  static csStringID svNameBoneTransforms = csInvalidStringID;
+  static CS::ShaderVarStringID svNameBoneIndex = CS::InvalidShaderVarStringID;
+  static CS::ShaderVarStringID svNameBoneWeight = CS::InvalidShaderVarStringID;
+  static CS::ShaderVarStringID svNameBoneTransforms = CS::InvalidShaderVarStringID;
 
-  static csStringID svNameBoneTransformsReal = csInvalidStringID;
-  static csStringID svNameBoneTransformsDual = csInvalidStringID;
+  static CS::ShaderVarStringID svNameBoneTransformsReal = CS::InvalidShaderVarStringID;
+  static CS::ShaderVarStringID svNameBoneTransformsDual = CS::InvalidShaderVarStringID;
 
 
   SCF_IMPLEMENT_FACTORY(AnimeshObjectType);
@@ -68,8 +68,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   bool AnimeshObjectType::Initialize (iObjectRegistry* object_reg)
   {
-    csRef<iStringSet> strset = csQueryRegistryTagInterface<iStringSet> (
-      object_reg, "crystalspace.shared.stringset");
+    csRef<iShaderVarStringSet> strset =
+      csQueryRegistryTagInterface<iShaderVarStringSet> (
+        object_reg, "crystalspace.shader.variablenameset");
 
     // Get the SV names
     svNameVertexUnskinned = strset->Request ("position unskinned");
@@ -361,23 +362,35 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return boneInfluences.GetArray ();
   }
 
-  iAnimatedMeshMorphTarget* AnimeshObjectFactory::CreateMorphTarget ()
+  iAnimatedMeshMorphTarget* AnimeshObjectFactory::CreateMorphTarget (
+    const char* name)
   {
-    return 0;
+    csRef<MorphTarget> newTarget;
+    newTarget.AttachNew (new MorphTarget (this, name));
+    size_t targetNum = morphTargets.Push (newTarget);
+    morphTargetNames.Put (name, targetNum);
+    return newTarget;
   }
 
   iAnimatedMeshMorphTarget* AnimeshObjectFactory::GetMorphTarget (uint target)
   {
-    return 0;
+    return morphTargets[target];
   }
 
   uint AnimeshObjectFactory::GetMorphTargetCount () const
   {
-    return 0;
+    return morphTargets.GetSize();
   }
 
   void AnimeshObjectFactory::ClearMorphTargets ()
-  {    
+  {
+    morphTargets.DeleteAll ();
+    morphTargetNames.DeleteAll ();
+  }
+
+  uint AnimeshObjectFactory::FindMorphTarget (const char* name) const
+  {
+    return morphTargetNames.Get (name, (uint)~0);
   }
 
   csFlags& AnimeshObjectFactory::GetFlags ()
@@ -493,11 +506,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   void AnimeshObject::SetMorphTargetWeight (uint target, float weight)
   {
+    morphTargetWeights.SetSize (factory->morphTargets.GetSize(), 0.0f);
+    morphTargetWeights[target] = weight;
   }
 
   float AnimeshObject::GetMorphTargetWeight (uint target) const
   {
-    return 0;
+    if (morphTargetWeights.GetSize()>target)
+      return morphTargetWeights[target];
+    else
+      return 0.0;
   }
 
   iMeshObjectFactory* AnimeshObject::GetFactory () const
@@ -782,15 +800,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         sm->svContexts.Push (svContext);
       }
 
+      csRef<RenderBufferAccessor> rba;
+      rba.AttachNew (new RenderBufferAccessor (this));
       for (size_t j = 0; j < fsm->bufferHolders.GetSize (); ++j)
       {
         csRef<csRenderBufferHolder> bufferHolder;
-        bufferHolder.AttachNew (new csRenderBufferHolder (*fsm->bufferHolders[i]));        
+        bufferHolder.AttachNew (new csRenderBufferHolder (*fsm->bufferHolders[i]));
 
         // Setup the accessor to this mesh
-        bufferHolder->SetAccessor (this, 
+        bufferHolder->SetAccessor (rba, 
           CS_BUFFER_POSITION_MASK | CS_BUFFER_NORMAL_MASK | 
-          CS_BUFFER_TANGENT_MASK | CS_BUFFER_BINORMAL_MASK);          
+          CS_BUFFER_TANGENT_MASK | CS_BUFFER_BINORMAL_MASK);
 
         sm->bufferHolders.Push (bufferHolder);
       }

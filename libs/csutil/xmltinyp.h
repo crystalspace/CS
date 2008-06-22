@@ -164,7 +164,9 @@ public:
  */
 struct CS_CRYSTALSPACE_EXPORT csTinyXmlNode : 
   public scfImplementationPooled<scfImplementation1<csTinyXmlNode, 
-                                                    iDocumentNode> >
+                                                    iDocumentNode>,
+                                 CS::Memory::AllocatorMalloc,
+                                 true>
 {
 private:
   friend class csTinyXmlDocument;

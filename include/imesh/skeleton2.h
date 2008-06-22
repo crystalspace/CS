@@ -124,6 +124,12 @@ struct iSkeletonFactory2 : public virtual iBase
    */
   virtual BoneID CreateBone (BoneID parent = InvalidBoneID) = 0;
 
+  /*
+   * Find a bone id from its name
+   * \param name bone name
+   */
+  virtual BoneID FindBone (const char *name) const = 0;
+
   /**
    * Remove a bone from skeleton. Any bones having the removed bone as parent
    * will be reparented one step up the chain.
@@ -424,6 +430,7 @@ public:
     delete[] boneQuats;
 
     bitSet.SetSize (numBones);
+    bitSet.Clear ();
     boneVecs = new csVector3 [numBones];
     boneQuats = new csQuaternion [numBones];
     numberOfBones = numBones;

@@ -46,6 +46,9 @@
 // iutil/databuff.h
 %rename(asString) iDataBuffer::operator * () const;
 
+// csutil/strset.h
+%ignore csInvalidStringID;
+
 // ivaria/script.h
 %rename(SetFloat) iScriptObject::Set (const char *, float);
 %rename(GetFloat) iScriptObject::Get (const char *, float &) const;
@@ -60,7 +63,7 @@
 
 %{
 CS_EXPORT_SYM PyObject *
-_csRef_to_Python (const csRef<iBase> & ref, void * ptr, const char * name)
+_csRef_to_Python (const csRef<iBase> & ref, void * ptr, swig_type_info *name)
 {
   if (!ref.IsValid())
   {
@@ -68,7 +71,7 @@ _csRef_to_Python (const csRef<iBase> & ref, void * ptr, const char * name)
     return Py_None;
   }
   ref->IncRef();
-  return SWIG_NewPointerObj((void *)ptr, SWIG_TypeQuery(name), 1);
+  return SWIG_NewPointerObj((void *)ptr, name, 1);
 }
 %}
 
@@ -76,7 +79,7 @@ _csRef_to_Python (const csRef<iBase> & ref, void * ptr, const char * name)
 %define LANG_FUNCTIONS
 %{
 PyObject *
-_csRef_to_Python (const csRef<iBase> & ref, void * ptr, const char * name)
+_csRef_to_Python (const csRef<iBase> & ref, void * ptr, swig_type_info * name)
 {
   if (!ref.IsValid())
   {
@@ -84,7 +87,7 @@ _csRef_to_Python (const csRef<iBase> & ref, void * ptr, const char * name)
     return Py_None;
   }
   ref->IncRef();
-  return SWIG_NewPointerObj((void *)ptr, SWIG_TypeQuery(name), 1);
+  return SWIG_NewPointerObj((void *)ptr, name, 1);
 }
 %}
 %pythoncode %{
@@ -113,38 +116,44 @@ CSMutableArrayHelper = core.CSMutableArrayHelper
 */
 %define TYPEMAP_OUT_csRef_BODY(ptr, name, type, wrapper)
   csRef<type> ref((wrapper<type>&)ptr); /* explicit cast */
-  /*const csRef<iBase> ref = csRef<iBase>((type *)ref1);
+
   if (!ref.IsValid())
   {
     Py_INCREF(Py_None);
-    $result = Py_None;
+    return Py_None;
   }
-  else
-  {
-    ref->IncRef();
-    $result = SWIG_NewPointerObj((void *)(type *)ref1, SWIG_TypeQuery(name), 1);
-  }*/
-  $result = _csRef_to_Python(csRef<iBase>(
-    (type *)ref), (void *)(type *)ref, name);
+  ref->IncRef();
+  $result = SWIG_NewPointerObj((void *)(type *)ref, name, 1);
 %enddef
-/*
-  if (ref.IsValid())
-  {
-    ref->IncRef();
-    $result = SWIG_NewPointerObj((void*)(type*)ref, SWIG_TypeQuery(name), 1);
-  }
-  else
-  {
-    Py_INCREF(Py_None);
-    $result = Py_None;
-  }
-*/
+
+%typemap(directorin) CS::StringID "$input = PyLong_FromUnsignedLong((unsigned long)$1_name);"
+
+%typemap(directorout) CS::StringID
+{
+    $result = ($1_type)PyLong_AsUnsignedLong($input);
+}
+
+%typemap(out) CS::StringID
+{
+    $1_type stringid = $1;
+    $result = PyLong_FromUnsignedLong((unsigned long)stringid);
+}
+
+%typemap(in) CS::StringID
+{
+    $1 = ($1_type)PyLong_AsUnsignedLong($input);
+}
+
+%typemap(typecheck) CS::StringID
+{
+  $1 = (PyLong_Check($input) || PyInt_Check($input));
+}
 
 #undef TYPEMAP_OUT_csRef
 %define TYPEMAP_OUT_csRef(T)
   %typemap(out) csRef<T>
   {
-    TYPEMAP_OUT_csRef_BODY($1, #T " *", T, csRef)
+    TYPEMAP_OUT_csRef_BODY($1, SWIGTYPE_p_ ## T , T, csRef)
   }
 %enddef
 
@@ -152,7 +161,7 @@ CSMutableArrayHelper = core.CSMutableArrayHelper
 %define TYPEMAP_OUT_csPtr(T)
   %typemap(out) csPtr<T>
   {
-    TYPEMAP_OUT_csRef_BODY($1, #T " *", T, csPtr)
+    TYPEMAP_OUT_csRef_BODY($1, SWIGTYPE_p_ ## T , T, csPtr)
   }
 %enddef
 

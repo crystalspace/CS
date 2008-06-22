@@ -34,6 +34,8 @@
 class csColor;
 class csFlags;
 class csVector3;
+class csVector4;
+class csBox3;
 
 struct iLight;
 struct iLightingInfo;
@@ -50,6 +52,9 @@ struct iFlareHalo;
 
 /** \name Light flags
  * @{ */
+/// Indicates that a light should not cast shadows
+#define CS_LIGHT_NOSHADOWS	0x00000001
+
 /** 
  * If this flag is set, the halo for this light is active and is in the
  * engine's queue of active halos. When halo become inactive, this flag
@@ -127,12 +132,12 @@ enum csLightAttenuationMode
  * There are currently three types of lightsources:
  * - Point lights - have a position. Shines in all directions.
  * - Directional lights - have a direction and radius. Shines along it's
- *                             major axis. The direction is 0,0,1.
+ *                        major axis. The direction is 0,0,1 in light space.
  * - Spot lights - have both position and direction. Shines with full
  *                      strength along major axis and out to the hotspot angle.
  *                      Between hotspot and outer angle it will falloff, outside
  *                      outer angle there shines no light. The direction is
- *                      0,0,1.
+ *                      0,0,1 in light space.
  */
 enum csLightType
 {
@@ -230,7 +235,7 @@ struct iLightCallback : public virtual iBase
  */
 struct iLight : public virtual iBase
 {
-  SCF_INTERFACE(iLight,2,0,0);
+  SCF_INTERFACE(iLight,3,0,1);
   /// Get the id of this light. This is a 16-byte MD5.
   virtual const char* GetLightID () = 0;
 
@@ -249,20 +254,39 @@ struct iLight : public virtual iBase
   /**
    * Get the position of this light (local transformation relative
    * to whatever parent it has).
+   * \deprecate Deprecated in RM. Use GetMovable() and the iMovable interface
    */
+  CS_DEPRECATED_METHOD_MSG("Deprecated. Use GetMovable() and the iMovable interface.")
   virtual const csVector3& GetCenter () const = 0;
   /**
    * Get the position of this light. This function correctly takes
    * care of the optional parents of this light.
+   * \deprecate Deprecated in RM. Use GetMovable() and the iMovable interface
    */
+  CS_DEPRECATED_METHOD_MSG("Deprecated. Use GetMovable() and the iMovable interface.")
   virtual const csVector3 GetFullCenter () const = 0;
-  /// Set the position of this light.
+  /**
+   * Set the position of this light.
+   * \deprecate Deprecated in RM. Use GetMovable() and the iMovable interface
+   */ 
+  CS_DEPRECATED_METHOD_MSG("Deprecated. Use GetMovable() and the iMovable interface.")
   virtual void SetCenter (const csVector3& pos) = 0;
 
-  /// Get the sector for this light.
+  /**
+   * Get the sector for this light.
+   * \deprecate Deprecated in RM. Use GetMovable() and the iMovable interface
+   */
+  CS_DEPRECATED_METHOD_MSG("Deprecated. Use GetMovable() and the iMovable interface.")
   virtual iSector *GetSector () = 0;
 
-  /// Get the movable for this light.
+  /**
+   * Get the movable for this light ('this' space = light space,
+   * 'other' space = world space).
+   * The rotation of the movable determines the direction for directional and 
+   * spot lights. Lights shine along +Z in light space; thus the direction in
+   * world space can be computed by translating the direction (0,0,1) from\
+   * the movable's 'this' to 'other' space.
+   */
   virtual iMovable *GetMovable () = 0;
 
   /**
@@ -300,12 +324,12 @@ struct iLight : public virtual iBase
    * Set attenuation constants
    * \sa csLightAttenuationMode
    */
-  virtual void SetAttenuationConstants (const csVector3& constants) = 0;
+  virtual void SetAttenuationConstants (const csVector4& constants) = 0;
   /**
    * Get attenuation constants
    * \sa csLightAttenuationMode
    */
-  virtual const csVector3 &GetAttenuationConstants () const = 0;
+  virtual const csVector4 &GetAttenuationConstants () const = 0;
 
   /**
    * Get the the maximum distance at which the light is guranteed to shine. 
@@ -413,6 +437,14 @@ struct iLight : public virtual iBase
    * Get the shader variable context of the light.
    */
   virtual iShaderVariableContext* GetSVContext() = 0;
+
+  //@{
+  /**
+   * Get the bounding box of the light (the bounds define the influence area).
+   */
+  virtual const csBox3& GetLocalBBox () const = 0;
+  virtual const csBox3& GetWorldBBox () const = 0;
+  //@}
 };
 
 /**

@@ -2,6 +2,7 @@
 %include "iengine/light.h"
 %include "iengine/sector.h"
 %include "iengine/engine.h"
+%include "iengine/lod.h"
 
 %ignore iCamera::GetTransform (); // Non-const.
 %ignore iCamera::Perspective (const csVector3&, csVector2&) const;
@@ -32,7 +33,6 @@
 %include "iengine/mesh.h"
 
 %include "iengine/movable.h"
-%include "iengine/region.h"
 // Swig 1.3.24 doesn't handle pointer default args well unless we tell it
 // to use an alternate way for that function
 %feature("compactdefaultargs") IntersectSegment;
@@ -41,6 +41,7 @@
 %include "iengine/portalcontainer.h"
 %include "iengine/rendersteps/icontainer.h"
 %include "iengine/renderloop.h"
+%include "iengine/rendermanager.h"
 %template(iSwigCollectionArray) iArrayReadOnly<iCollection* >;
 %include "iengine/collection.h"
 
@@ -60,7 +61,6 @@
 LIST_OBJECT_FUNCTIONS(iMeshList,iMeshWrapper)
 LIST_OBJECT_FUNCTIONS(iMeshFactoryList,iMeshFactoryWrapper)
 LIST_OBJECT_FUNCTIONS(iMaterialList,iMaterialWrapper)
-LIST_OBJECT_FUNCTIONS(iRegionList,iRegion)
 LIST_OBJECT_FUNCTIONS(iLightList,iLight)
 LIST_OBJECT_FUNCTIONS(iCameraPositionList,iCameraPosition)
 LIST_OBJECT_FUNCTIONS(iSectorList,iSector)

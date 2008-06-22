@@ -61,7 +61,7 @@ struct csAnimatedMeshBoneInfluence
  */
 struct iAnimatedMeshFactory : public virtual iBase
 {
-  SCF_INTERFACE(iAnimatedMeshFactory, 1, 0, 0);
+  SCF_INTERFACE(iAnimatedMeshFactory, 2, 0, 0);
 
   /**\name SubMesh handling
    * @{ */
@@ -238,10 +238,16 @@ struct iAnimatedMeshFactory : public virtual iBase
 
   /** @} */
 
+  /**\name Morph targets
+   * @{ */
+
   /**
-   * Create a new morph target
+   * Create a new morph target.
+   * \param name Identifier of the morph target. Can be 0 or non-unique, but 
+   *   setting a unique name usually helps with finding a morph target later
+   *   on.
    */
-  virtual iAnimatedMeshMorphTarget* CreateMorphTarget () = 0;
+  virtual iAnimatedMeshMorphTarget* CreateMorphTarget (const char* name) = 0;
 
   /**
    * Get a specific morph target
@@ -257,6 +263,14 @@ struct iAnimatedMeshFactory : public virtual iBase
    * Remove all morph targets
    */
   virtual void ClearMorphTargets () = 0;
+
+  /**
+   * Find the index of the morph target with the given name (or (uint)~0 if no
+   * target with that name exists).
+   */
+  virtual uint FindMorphTarget (const char* name) const = 0;
+
+  /** @} */
 };
 
 /**
@@ -352,23 +366,15 @@ struct iAnimatedMeshSubMesh : public virtual iBase
  */
 struct iAnimatedMeshMorphTarget : public virtual iBase
 {
-  SCF_INTERFACE(iAnimatedMeshMorphTarget, 1, 0, 0);
+  SCF_INTERFACE(iAnimatedMeshMorphTarget, 2, 0, 0);
 
   /**
-   * Set the number of vertices affected by this morph target
+   * Set the render buffer to use for vertex offsets.   
+   * Must hold at least as many elements as the vertex buffer of the owning
+   * mesh object.
+   * \returns false if the buffer doesn't follow required specifications
    */
-  virtual void SetVertexCount (uint count) = 0;
-
-  /**
-   * Get the number of vertices affected by this morph target
-   */
-  virtual uint GetVertexCount () const = 0;
-
-  /**
-   * Get the buffer of vertex indices affects
-   * Remember to call Invalidate() after changing this data.
-   */
-  virtual iRenderBuffer* GetIndices () = 0;
+  virtual bool SetVertexOffsets (iRenderBuffer* renderBuffer) = 0;
 
   /**
    * Get the buffer of vertex offsets
@@ -377,9 +383,12 @@ struct iAnimatedMeshMorphTarget : public virtual iBase
   virtual iRenderBuffer* GetVertexOffsets () = 0;
 
   /**
-   * Update target after changes to its index or vertex offsets
+   * Update target after changes to its vertex offsets
    */
   virtual void Invalidate () = 0;
+
+  /// Get the name of this morph target
+  virtual const char* GetName() const = 0;
 };
 
 

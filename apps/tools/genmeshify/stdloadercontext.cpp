@@ -26,31 +26,10 @@ namespace genmeshify
 {
 
 StdLoaderContext::StdLoaderContext (App* app, iEngine* Engine, 
-                                    iBase* base, bool checkDupes) : 
-  scfImplementationType (this), app (app), Engine (Engine), checkDupes (checkDupes)
+                                    iCollection* collection, bool checkDupes) : 
+  scfImplementationType (this), app (app), Engine (Engine), checkDupes (checkDupes),
+      collection(collection)
 {
-  csRef<iRegion> region (scfQueryInterfaceSafe<iRegion>(base));
-  if(region)
-  {
-    InitRegion(region);
-  }
-  else
-  {
-    csRef<iCollection> collection (scfQueryInterfaceSafe<iCollection>(base));
-    InitCollection(collection);
-  }
-}
-
-void StdLoaderContext::InitCollection(iCollection* collection)
-{
-  StdLoaderContext::collection = collection;
-  StdLoaderContext::region = NULL;
-}
-
-void StdLoaderContext::InitRegion(iRegion* region)
-{
-  StdLoaderContext::collection = NULL;
-  StdLoaderContext::region = region;
 }
 
 StdLoaderContext::~StdLoaderContext ()
@@ -83,11 +62,7 @@ iMaterialWrapper* StdLoaderContext::FindMaterial (const char* filename)
     iMaterialWrapper *mat = Engine->GetMaterialList ()
       	->NewMaterial (material, n);
 
-    if(region)
-    {
-      region->QueryObject ()->ObjAdd (mat->QueryObject ());
-    }
-    else if(collection)
+    if(collection)
     {
       collection->Add(mat->QueryObject());
     }
@@ -119,11 +94,7 @@ iMaterialWrapper* StdLoaderContext::FindNamedMaterial (const char* name,
     iMaterialWrapper *mat = Engine->GetMaterialList ()
       	->NewMaterial (material, n);
 
-    if(region)
-    {
-      region->QueryObject ()->ObjAdd (mat->QueryObject ());
-    }
-    else if(collection)
+    if(collection)
     {
       collection->Add(mat->QueryObject());
     }
@@ -178,18 +149,9 @@ iTextureWrapper* StdLoaderContext::FindTexture (const char* name)
   {
     app->Report (CS_REPORTER_SEVERITY_NOTIFY, 
       "Could not find texture '%s'. Attempting to load.", name);
-    if(region)
-    {
-      csRef<iTextureWrapper> rc = app->loader->LoadTexture(name, name,
-        CS_TEXTURE_3D, 0, true, false, true, region);
-      result = rc;
-    }
-    else
-    {
-      csRef<iTextureWrapper> rc = app->loader->LoadTexture(name, name,
+    csRef<iTextureWrapper> rc = app->loader->LoadTexture(name, name,
         CS_TEXTURE_3D, 0, true, false, true, collection);
-      result = rc;
-    }
+    result = rc;
   }
   return result;
 }
@@ -203,18 +165,9 @@ iTextureWrapper* StdLoaderContext::FindNamedTexture (const char* name,
   {
     app->Report (CS_REPORTER_SEVERITY_NOTIFY, 
       "Could not find texture '%s'. Attempting to load.", name);
-    if(region)
-    {
-      csRef<iTextureWrapper> rc = app->loader->LoadTexture(name, filename,
-        CS_TEXTURE_3D, 0, false, false, true, region);
-      result = rc;
-    }
-    else
-    {
-      csRef<iTextureWrapper> rc = app->loader->LoadTexture(name, filename,
+    csRef<iTextureWrapper> rc = app->loader->LoadTexture(name, filename,
         CS_TEXTURE_3D, 0, false, false, true, collection);
-      result = rc;
-    }
+    result = rc;
   }
   return result;
 }

@@ -28,6 +28,7 @@
  * @{ */
 
 #include "csextern.h"
+#include "csgeom/math.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/vector4.h"
 #include "csutil/csstring.h"
@@ -87,6 +88,15 @@ namespace CS
 	m14 = o_t2o.x;
 	m24 = o_t2o.y;
 	m34 = o_t2o.z;
+      }
+    
+      /// Construct from a 3x3 matrix
+      Matrix4 (csMatrix3 const& m)
+	: m11(m.m11), m12(m.m12), m13(m.m13), m14 (0),
+	  m21(m.m21), m22(m.m22), m23(m.m23), m24 (0),
+	  m31(m.m31), m32(m.m32), m33(m.m33), m34 (0),
+	  m41(0), m42(0), m43(0), m44(1)
+      {
       }
     
       /// Return a textual representation of the matrix
@@ -224,6 +234,24 @@ namespace CS
 
       /// Invert this matrix. 
       void Invert() { *this = GetInverse(); }
+    
+      /// Transpose this matrix.
+      inline void Transpose ()
+      {
+        CS::Swap (m12, m21); CS::Swap (m13, m31); CS::Swap (m14, m41); 
+        CS::Swap (m23, m32); CS::Swap (m24, m42); 
+        CS::Swap (m34, m43); 
+      }
+    
+      /// Return the transpose of this matrix.
+      Matrix4 GetTranspose () const
+      {
+	return Matrix4 (
+	  m11, m21, m31, m41,
+	  m12, m22, m32, m42,
+	  m13, m23, m33, m43,
+	  m14, m24, m34, m44);
+      }
     };
 
   } // namespace Math
