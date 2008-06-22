@@ -209,6 +209,7 @@ static inline bool AddToPathEnv (csString dir, csString& pathEnv)
 }
 
 typedef void (WINAPI * LPFNSETDLLDIRECTORYA)(LPCSTR lpPathName);
+typedef BOOL (WINAPI * LPFNSETPROCESSDPIAWARE)();
 
 #include "csutil/custom_new_disable.h"
 bool csPlatformStartup(iObjectRegistry* r)
@@ -217,6 +218,16 @@ bool csPlatformStartup(iObjectRegistry* r)
    * @@@ FIXME: until Marten(or someone else) finds a better solution ... 
    */
   SetThreadAffinityMask (GetCurrentThread(), 1);
+
+  /* Mark program as DPI aware on Vista to prevent automatic scaling
+     by the system on high resolution screens */
+  {
+    cswinCacheDLL hUser32 ("user32.dll");
+    CS_ASSERT (hUser32 != 0);
+    LPFNSETPROCESSDPIAWARE SetProcessDPIAware =
+      (LPFNSETPROCESSDPIAWARE)GetProcAddress (hUser32, "SetProcessDPIAware");
+    if (SetProcessDPIAware) SetProcessDPIAware();
+  }
   
   csRef<iCommandLineParser> cmdline (csQueryRegistry<iCommandLineParser> (r));
 
