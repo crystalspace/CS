@@ -19,6 +19,10 @@
 #ifndef __CS_FSMNODE_H__
 #define __CS_FSMNODE_H__
 
+#include "csutil/fifo.h"
+#include "csutil/csstring.h"
+#include "csutil/hash.h"
+#include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
 #include "imesh/skeleton2.h"
 #include "imesh/skeleton2anim.h"
@@ -30,6 +34,46 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 {
+  class AnimationFifoCb
+  {
+  public:
+    virtual void NewAnimation (size_t data) = 0;
+  };
+
+  class AnimationFifo
+  {
+  public:
+    AnimationFifo (AnimationFifoCb* cb);
+
+    void PushAnimation (iSkeletonAnimNode2* node, bool directSwitch,
+      float blendInTime = 0.0f, size_t cbData = ~0);
+
+    void BlendState (csSkeletalState2* state, float baseWeight = 1.0f);
+    void TickAnimation (float dt);
+
+  private:
+    struct AnimationInstruction
+    {
+      csRef<iSkeletonAnimNode2> node;
+      size_t cbData;
+      float blendInTime;
+      bool directSwitch;
+    };
+
+    enum
+    { 
+      STATE_STOPPED,
+      STATE_PLAYING,      
+      STATE_BLENDING
+    } currentState;
+
+    AnimationFifoCb* cb;
+
+    csFIFO<AnimationInstruction> instructions;
+    AnimationInstruction currentAnimation;
+    float blendTime;
+  };
+
 
   class FSMNodeFactory :
     public scfImplementation2<FSMNodeFactory,
@@ -53,6 +97,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual CS::Animation::StateID GetStartState () const;
     virtual uint GetStateCount () const;
     virtual void ClearStates ();
+    virtual void SetStateTransition (CS::Animation::StateID fromState, 
+      CS::Animation::StateID toState, iSkeletonAnimNodeFactory2* fact);
+    virtual void SetTransitionCrossfade (CS::Animation::StateID fromState, 
+      CS::Animation::StateID toState, float time1, float time2);
 
     //-- iSkeletonAnimationNodeFactory2
     virtual csPtr<iSkeletonAnimNode2> CreateInstance (
@@ -60,15 +108,39 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual const char* GetNodeName () const;
     virtual iSkeletonAnimNodeFactory2* FindNode (const char* name);
 
-  private:
     struct State
     {
       csRef<iSkeletonAnimNodeFactory2> nodeFactory;
       csString name;
     };
 
+    struct StateTransitionKey
+    {
+      CS::Animation::StateID fromState, toState;
+
+      bool operator< (const StateTransitionKey& other) const
+      {
+        return (fromState < other.fromState) || 
+          (fromState == other.fromState && toState < other.toState);          
+      }
+    };
+
+    struct StateTransitionInfo
+    {
+      StateTransitionInfo ()
+        : time1 (0.0f), time2 (0.0f), directSwitch (true)
+      {}
+
+      csRef<iSkeletonAnimNodeFactory2> nodeFactory;
+      float time1, time2, directSwitch;
+    };
+
+  private:
+   
     csString name;
     csArray<State> stateList;
+    csHash<StateTransitionInfo, StateTransitionKey> transitions;
+
     CS::Animation::StateID startState;
 
     friend class FSMNode;
@@ -78,7 +150,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     public scfImplementation2<FSMNode,
                               iSkeletonFSMNode2,
                               scfFakeInterface<iSkeletonAnimNode2> >,
-    public BaseNodeSingle
+    public BaseNodeSingle,
+    public AnimationFifoCb
   {
   public:
     CS_LEAKGUARD_DECLARE(FSMNode);
@@ -105,18 +178,35 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual void AddAnimationCallback (iSkeletonAnimCallback2* callback);
     virtual void RemoveAnimationCallback (iSkeletonAnimCallback2* callback);
 
+    //-- AnimationFifoCb
+    virtual void NewAnimation (size_t data);
   private:
     struct State
     {
       csRef<iSkeletonAnimNode2> stateNode;
     };
 
+    struct StateTransitionInfo
+    {
+      StateTransitionInfo ()
+        : time1 (0.0f), time2 (0.0f), directSwitch (true)
+      {}      
+
+      csRef<iSkeletonAnimNode2> transitionNode;
+      float time1, time2;
+      bool directSwitch;
+    };
+
     csRef<FSMNodeFactory> factory;
     csArray<State> stateList;
-    CS::Animation::StateID currentState;
-    bool isActive;
+    csHash<StateTransitionInfo, FSMNodeFactory::StateTransitionKey> transitions;
 
+    CS::Animation::StateID currentState;    
     float playbackSpeed;
+
+    bool isActive;   
+    AnimationFifo blendFifo;
+
 
     friend class FSMNodeFactory;
   };
