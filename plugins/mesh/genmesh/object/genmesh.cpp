@@ -1867,6 +1867,7 @@ bool csGenmeshMeshObjectFactory::RemoveRenderBuffer (csRenderBufferName name)
 
 iRenderBuffer* csGenmeshMeshObjectFactory::GetRenderBuffer (int index)
 {
+  UpdateFromLegacyBuffers();
   csStringID bufID = user_buffer_names[index];
   return userBuffers.GetRenderBuffer (bufID);
 }
@@ -1880,6 +1881,7 @@ csRef<iString> csGenmeshMeshObjectFactory::GetRenderBufferName (int index) const
 
 iRenderBuffer* csGenmeshMeshObjectFactory::GetRenderBuffer (const char* name)
 {
+  UpdateFromLegacyBuffers();
   csStringID bufID = strings->Request (name);
   iRenderBuffer* buf = userBuffers.GetRenderBuffer (bufID);
   if (buf != 0) return buf;
@@ -1902,6 +1904,7 @@ iRenderBuffer* csGenmeshMeshObjectFactory::GetRenderBuffer (csRenderBufferName n
   const char* nameStr = csRenderBuffer::GetDescrFromBufferName (name);
   if (nameStr == 0) return 0;
 
+  UpdateFromLegacyBuffers();
   csStringID bufID = strings->Request (nameStr);
   iRenderBuffer* buf = userBuffers.GetRenderBuffer (bufID);
   if (buf != 0) return buf;
