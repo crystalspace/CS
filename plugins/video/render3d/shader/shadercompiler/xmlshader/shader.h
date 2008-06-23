@@ -297,7 +297,7 @@ public:
     if (IsFallbackTicket (ticket))
       return GetFallbackShader()->GetNumberOfPasses (GetFallbackTicket (ticket));
     csXMLShaderTech* tech = TechForTicket (ticket);
-    return tech->GetNumberOfPasses ();
+    return tech ? tech->GetNumberOfPasses () : 0;
   }
 
   /// Activate a pass for rendering
