@@ -1604,6 +1604,8 @@ void csGenmeshMeshObjectFactory::CalculateNormals (bool compress)
   }
   autonormals = true;
   autonormals_compress = compress;
+
+  legacyBuffers.mesh_normals_dirty_flag = true;
 }
 
 void csGenmeshMeshObjectFactory::GenerateCapsule (float l, float r, uint sides)
