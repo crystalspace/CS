@@ -22,6 +22,17 @@
 
 #include "fsmnode.h"
 
+template <>
+class csHashComputer<CS::Plugin::Skeleton2::FSMNodeFactory::StateTransitionKey>
+{
+public:
+  /// Compute a hash value for \a key.
+  static uint ComputeHash (const CS::Plugin::Skeleton2::FSMNodeFactory::StateTransitionKey& key)
+  {
+    return (key.fromState ^ key.toState) ^ 0xABCDEF98;
+  }
+};
+
 
 CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 {
@@ -139,17 +150,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     }
   }
 
-
-  template <>
-  class csHashComputer<FSMNodeFactory::StateTransitionKey>
-  {
-  public:
-    /// Compute a hash value for \a key.
-    static uint ComputeHash (const FSMNodeFactory::StateTransitionKey& key)
-    {
-      return (key.fromState ^ key.toState) ^ 0xABCDEF98;
-    }
-  };
 
 
   CS_LEAKGUARD_IMPLEMENT(FSMNodeFactory);
@@ -319,7 +319,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   FSMNode::FSMNode (FSMNodeFactory* factory)
     : scfImplementationType (this), BaseNodeSingle (this), factory (factory),
-    currentState (factory->startState), isActive (false), playbackSpeed (1.0f),
+    currentState (factory->startState), playbackSpeed (1.0f), isActive (false),
     blendFifo (this)
   {}
 

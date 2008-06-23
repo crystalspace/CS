@@ -4770,7 +4770,7 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
     }
     else
     {
-      l->SetAttenuationConstants (attenvec);
+      l->SetAttenuationConstants (csVector4 (attenvec, 0));
     }
   }
 

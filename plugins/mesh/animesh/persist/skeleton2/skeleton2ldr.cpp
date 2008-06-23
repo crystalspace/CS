@@ -703,7 +703,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
             csRef<iSkeletonAnimNodeFactory2> node =
               ParseAnimTreeNode (nodedoc, packet);
 
-            factnode->SetStateTransition (fromStateName, toState, node);
+            factnode->SetStateTransition (fromState, toState, node);
           }
 
           const float time1 = child->GetAttributeValueAsFloat ("time1");
