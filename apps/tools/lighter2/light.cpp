@@ -69,10 +69,11 @@ namespace lighter
 
   VisibilityTester::VisibilityTester (Light* light, Object* obj) : 
     light (light), obj (obj)
-  {
+  {    
   }
 
-  void VisibilityTester::AddSegment (KDTree* tree, const csVector3& start, const csVector3& end)
+  void VisibilityTester::AddSegment (KDTree* tree, const csVector3& start, 
+    const csVector3& end)
   {
     csVector3 dir = end-start;
     float d = dir.Norm ();
@@ -80,8 +81,8 @@ namespace lighter
     AddSegment (tree, start, dir / d, d);
   }
 
-  void VisibilityTester::AddSegment (KDTree* tree, const csVector3& start, const csVector3& dir,
-    float maxL)
+  void VisibilityTester::AddSegment (KDTree* tree, const csVector3& start, 
+    const csVector3& dir, float maxL)
   {
     Segment s;
 
@@ -101,6 +102,33 @@ namespace lighter
   {
     HitCallback hitcb (*this);
     size_t lastHitCount = transparentHits.GetSize();
+
+    bool haveAnyHit = false;
+
+    // Start by testing if we have no hits or possibly hit a non-transparent one first
+    for (size_t i = 0; i < allSegments.GetSize (); ++i)
+    {
+      Segment& s = allSegments[i];
+      s.ray.ignorePrimitive = ignorePrim;
+
+      HitPoint hit;
+      if (Raytracer::TraceAnyHit (s.tree,s.ray, hit))
+      {
+        haveAnyHit = true;
+        if (!(hit.kdFlags & KDPRIM_FLAG_TRANSPARENT))
+        {
+          // Non-transparent hit
+          return occlOccluded;
+        }
+      }
+    }
+
+    // Didn't hit anything, cannot be anything transparent either
+    if (!haveAnyHit)
+    {
+      return occlUnoccluded;
+    }
+
     for (size_t i = 0; i < allSegments.GetSize (); ++i)
     {
       Segment& s = allSegments[i];
@@ -124,6 +152,32 @@ namespace lighter
   {
     HitCallback hitcb (*this);
     size_t lastHitCount = transparentHits.GetSize();
+
+    bool haveAnyHit = false;
+
+    // Start by testing if we have no hits or possibly hit a non-transparent one first
+    for (size_t i = 0; i < allSegments.GetSize (); ++i)
+    {
+      Segment& s = allSegments[i];
+
+      HitPoint hit;
+      if (Raytracer::TraceAnyHit (s.tree,s.ray, hit, ignoreCB))
+      {
+        haveAnyHit = true;
+        if (!(hit.kdFlags & KDPRIM_FLAG_TRANSPARENT))
+        {
+          // Non-transparent hit
+          return occlOccluded;
+        }
+      }
+    }
+
+    // Didn't hit anything, cannot be anything transparent either
+    if (!haveAnyHit)
+    {
+      return occlUnoccluded;
+    }
+
     for (size_t i = 0; i < allSegments.GetSize (); ++i)
     {
       Segment& s = allSegments[i];
@@ -144,7 +198,7 @@ namespace lighter
   csColor VisibilityTester::GetFilterColor ()
   {
     csColor c (1, 1, 1);
-    transparentHits.Sort ();
+    transparentHits.Sort (); //@@TODO: Consider hits from different segments...
     for (size_t i = transparentHits.GetSize(); i-- > 0; )
     {
       const HitPoint& hit = transparentHits[i];
@@ -157,49 +211,14 @@ namespace lighter
     }
     return c;
   }
-
-  void VisibilityTester::CollectHits (HitPointCallback* hitCB, 
-    HitIgnoreCallback* ignoreCB)
-  {
-    for (size_t i = 0; i < allSegments.GetSize (); ++i)
-    {
-      Segment& s = allSegments[i];
-
-      Raytracer::TraceAllHits (s.tree, s.ray, hitCB, ignoreCB);
-    }
-  }
-
-
-  class LightingBorderIgnoreCb : public HitIgnoreCallback
-  {
-  public:
-    explicit LightingBorderIgnoreCb (const Primitive* ignorePrim)
-      : ignorePrim (ignorePrim)
-    {}
-
-    virtual bool IgnoreHit (const Primitive* prim)
-    {
-      return (prim != ignorePrim) ||
-             (ignorePrim && 
-               !(prim->GetPlane () == ignorePrim->GetPlane ()));
-    }
-
-  private:
-    const Primitive* ignorePrim;
-  };
-  
   
   //--
   PointLight::PointLight (Sector* o)
     : Light (o, true)
-  {
-
-  }
+  {}
 
   PointLight::~PointLight ()
-  {
-
-  }
+  {}
 
   csColor PointLight::SampleLight (const csVector3& point, const csVector3& n,
     float u1, float u2, csVector3& lightVec, float& pdf, VisibilityTester& vistest,
