@@ -3,20 +3,51 @@
 //Input
 //---------------------------------------------------------------------------------
 
-struct INPUT
+struct vert2frag
 {
-	float4 Position    : POSITION;
+	float4 Position    	: POSITION;
+	float4 Color	   	: COLOR;
+	float3 CamVec		: TEXCOORD0;
+	float4 TexCoord2	: TEXCOORD1;
+	float4 TexCoord3	: TEXCOORD2;
 };
 
 //---------------------------------------------------------------------------------
 //Shader entry
 //---------------------------------------------------------------------------------
 
-float4 main (INPUT IN) : COLOR        
+float4 main (vert2frag IN,
+			 uniform float4 lightPos,
+			 uniform float4 lightCol,
+			 uniform float shininess,
+			 uniform float waterAlpha,
+			 uniform sampler2D TexNormal) : COLOR        
 {       
-     float4 fColor = {1.0, 0.0, 0.0, 1.0};
-
-     return fColor; 
+/*
+    float2 lookUp;
+    lookUp.x = noise(IN.TexCoord2.x + IN.TexCoord3.x);
+    lookUp.y = noise(IN.TexCoord2.y + IN.TexCoord3.y);
+	
+	float3 N = normalize(tex2D(TexNormal, lookUp).xyz);
+	
+*/    
+    float3 N = normalize(tex2D(TexNormal, IN.TexCoord2.xy).xyz - tex2D(TexNormal, IN.TexCoord3.xy).xyz);
+	
+	//reset light position
+	float3 lightVector = -lightPos.xyz;
+	
+	//Get Specular reflection
+	float3 eyeDir = IN.CamVec;
+	float3 halfDir = normalize(lightVector + eyeDir);
+	float specularLight = pow(max(0.0, dot(N, halfDir)), shininess);
+	
+	float4 specularColor = {1.0, 1.0, 1.0, 1.0};
+	float4 specular = specularColor * specularLight;
+		
+	float4 toRet = IN.Color + specular;
+	toRet.w = waterAlpha;
+	return toRet;
+//	return tex2D(TexNormal, IN.TexCoord2.xy);
 }
 
 //---------------------------------------------------------------------------------

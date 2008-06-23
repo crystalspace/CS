@@ -28,6 +28,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgeom/tri.h"
 #include "csgfx/renderbuffer.h"
 #include "csgfx/shadervarcontext.h"
+#include "csgfx/shadervar.h"
 #include "csgfx/imagecubemapmaker.h"
 #include "cstool/rviewclipper.h"
 #include "iengine/camera.h"
@@ -35,29 +36,18 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
-#include "iengine/rendersteps/igeneric.h"
-#include "iengine/rendersteps/irenderstep.h"
-#include "iengine/rendersteps/irsfact.h"
 #include "iengine/sector.h"
-#include "igeom/clip2d.h"
-#include "igraphic/imageio.h"
-#include "imap/loader.h"
-#include "imap/ldrctxt.h"
 #include "iutil/objreg.h"
 #include "iutil/document.h"
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
-#include "iutil/virtclk.h"
 #include "iutil/strset.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/material.h"
 #include "ivideo/rendermesh.h"
 #include "ivideo/fontserv.h"
-#include "ivideo/rndbuf.h"
 #include "ivideo/shader/shader.h"
-#include "ivideo/texture.h"
-#include "ivideo/txtmgr.h"
 
 #include "watermesh.h"
 
@@ -77,7 +67,7 @@ csWaterMeshObject::csWaterMeshObject (csWaterMeshObjectFactory* factory) :
 
   material = 0;
 
-  MixMode = CS_FX_COPY;
+  MixMode = CS_FX_ALPHA;
 
   color.red = 0;
   color.green = 0;
@@ -89,8 +79,6 @@ csWaterMeshObject::csWaterMeshObject (csWaterMeshObjectFactory* factory) :
   current_features = 0;
 
   g3d = csQueryRegistry<iGraphics3D> (factory->object_reg);
-
-  shader = factory->shader;
 
   variableContext.AttachNew (new csShaderVariableContext);
 }
@@ -107,10 +95,6 @@ iMeshObjectFactory* csWaterMeshObject::GetFactory () const
 bool csWaterMeshObject::SetMaterialWrapper (iMaterialWrapper* mat)
 {
   material = mat;
-  // csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> 
-  // 	(factory->object_reg, "crystalspace.shared.stringset");
-  //   if(shader != 0)
-  //   	material->GetMaterial()->SetShader(strings->Request("general"), shader);
   return true;
 }
 
@@ -156,6 +140,18 @@ void csWaterMeshObject::SetupObject ()
     initialized = true;
     SetupBufferHolder ();
   }
+
+  if(factory->murkChanged)
+  {
+	csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> 
+	 	(factory->object_reg, "crystalspace.shared.stringset");
+
+	csShaderVariable *murkVar = variableContext->GetVariableAdd(strings->Request("murkiness"));
+	murkVar->SetType(csShaderVariable::FLOAT);
+	murkVar->SetValue(factory->waterAlpha);
+	
+	factory->murkChanged = false;	
+  }
 }
 
 /*
@@ -196,6 +192,9 @@ csRenderMesh** csWaterMeshObject::GetRenderMeshes (
     mesh_colors_dirty_flag = true;
   }
 
+  logparent->SetZBufMode(CS_ZBUF_TEST);
+  logparent->SetRenderPriority (factory->engine->GetRenderPriority ("alpha"));
+
   bool rmCreated;
   csRenderMesh*& meshPtr = rmHolder.GetUnusedMesh (rmCreated,
     rview->GetCurrentFrameNumber ());
@@ -221,6 +220,10 @@ csRenderMesh** csWaterMeshObject::GetRenderMeshes (
 
   n = 1;
   return &meshPtr;
+}
+
+void csWaterMeshObject::NextFrame (csTicks, const csVector3&, uint)
+{
 }
 
 bool csWaterMeshObject::HitBeamOutline (const csVector3& start,
@@ -292,6 +295,23 @@ iObjectModel* csWaterMeshObject::GetObjectModel ()
   return factory->GetObjectModel ();
 }
 
+void csWaterMeshObject::SetNormalMap(iTextureWrapper *map)
+{ 
+	nMap = map;
+	
+	csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> 
+	 	(factory->object_reg, "crystalspace.shared.stringset");
+	
+	nMapVar = variableContext->GetVariableAdd(strings->Request("texture normal"));
+	nMapVar->SetType(csShaderVariable::TEXTURE);
+	nMapVar->SetValue(nMap);	
+}
+
+iTextureWrapper* csWaterMeshObject::GetNormalMap()
+{
+	return nMap;
+}
+
 void csWaterMeshObject::PreGetBuffer (csRenderBufferHolder *holder, 
                                       csRenderBufferName buffer)
 {
@@ -351,14 +371,19 @@ csWaterMeshObjectFactory::csWaterMeshObjectFactory (
   mesh_normals_dirty_flag = true;
   mesh_triangle_dirty_flag = true;
 
-	len = 2;
-	wid = 2;
-	gran = 1;
+  len = 2;
+  wid = 2;
+  gran = 1;
 	
-	numVerts = 4;
-	numTris = 2;
+  numVerts = 4;
+  numTris = 2;
 	
-	size_changed = false;
+  size_changed = false;
+
+  detail = 1;
+
+  waterAlpha = 0.3;
+  murkChanged = true;
 }
 
 csWaterMeshObjectFactory::~csWaterMeshObjectFactory ()
@@ -421,6 +446,7 @@ void csWaterMeshObjectFactory::SetupFactory ()
 	verts.DeleteAll();
 	norms.DeleteAll();
 	cols.DeleteAll();
+	texs.DeleteAll();
 	tris.DeleteAll();
 
 	for(uint j = 0; j < len * gran; j++)
@@ -429,7 +455,8 @@ void csWaterMeshObjectFactory::SetupFactory ()
 		{
 			verts.Push(csVector3 (i / gran, 0, j / gran));
 			norms.Push(csVector3 (0, 1, 0));
-			cols.Push(csColor (0, 0, 1));
+			cols.Push(csColor (0.17,0.27,0.26));
+			texs.Push(csVector2((i / gran) / (1.5 * detail), (j / gran) / (1.5 * detail)));
 		}
 	}
 	
@@ -453,6 +480,17 @@ void csWaterMeshObjectFactory::SetupFactory ()
 
     PrepareBuffers ();
   }
+}
+
+void csWaterMeshObjectFactory::SetMurkiness(float murk) 
+{ 
+	waterAlpha = murk;
+	murkChanged = true;
+}
+
+float csWaterMeshObjectFactory::GetMurkiness()
+{
+	return waterAlpha;
 }
 
 void csWaterMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder, 
@@ -511,10 +549,10 @@ void csWaterMeshObjectFactory::PrepareBuffers ()
     {
       // Create a buffer that doesn't copy the data.
       texel_buffer = csRenderBuffer::CreateRenderBuffer (
-        WATER_VERTS, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
+        numVerts, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
         2);
     }
-    texel_buffer->CopyInto (texels, WATER_VERTS);
+    texel_buffer->CopyInto (texs.GetArray(), numVerts);
   }
   if (mesh_triangle_dirty_flag)
   {
