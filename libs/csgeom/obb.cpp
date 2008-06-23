@@ -165,6 +165,19 @@ float csOBB::Volume ()
   return vol;
 }
 
+float csOBB::Diameter ()
+{
+  float diam = 0.0f;
+  float d = csBox3::MaxX () - csBox3::MinX ();
+  diam += d * d;
+  d = csBox3::MaxY () - csBox3::MinY ();
+  diam += d * d;
+  d = csBox3::MaxZ () - csBox3::MinZ ();
+  diam += d * d;
+  
+  return csQsqrt (diam);
+}
+
 csOBBLine3::csOBBLine3 (const csVector3 &a, const csVector3 &b)
 {
   mA = a; mB = b;
