@@ -65,7 +65,6 @@ namespace lighter
     iObjectRegistry *objectRegistry;
     csRef<iShaderVarStringSet> svStrings;
     csRef<iJobQueue> jobManager;
-    csRef<iJobQueue> jobManager;
 
     SwapManager* swapManager;
     RayDebugHelper rayDebug;
