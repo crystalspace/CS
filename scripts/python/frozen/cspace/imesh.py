@@ -1078,6 +1078,8 @@ class iSkeletonFSMNodeFactory2(iSkeletonAnimNodeFactory2):
     def GetStartState(*args): return _imesh.iSkeletonFSMNodeFactory2_GetStartState(*args)
     def GetStateCount(*args): return _imesh.iSkeletonFSMNodeFactory2_GetStateCount(*args)
     def ClearStates(*args): return _imesh.iSkeletonFSMNodeFactory2_ClearStates(*args)
+    def SetStateTransition(*args): return _imesh.iSkeletonFSMNodeFactory2_SetStateTransition(*args)
+    def SetTransitionCrossfade(*args): return _imesh.iSkeletonFSMNodeFactory2_SetTransitionCrossfade(*args)
     scfGetVersion = staticmethod(_imesh.iSkeletonFSMNodeFactory2_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iSkeletonFSMNodeFactory2
     __del__ = lambda self : None;
