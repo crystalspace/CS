@@ -74,6 +74,7 @@ namespace CS
 	void UpdateNewFrame ()
 	{
 	  reflRefrCache.Empty();
+	  texCache.AdvanceFrame (csGetTicks ());
 	}
       };
       
