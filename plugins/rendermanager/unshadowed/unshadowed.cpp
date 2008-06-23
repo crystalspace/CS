@@ -117,7 +117,7 @@ public:
     }
 
     SetupStandardShader (context, shaderManager, layerConfig);
-
+    
     RMUnshadowed::LightSetupType::ShadowParamType shadowParam;
     RMUnshadowed::LightSetupType lightSetup (
       rmanager->lightPersistent, rmanager->lightManager,
@@ -128,9 +128,26 @@ public:
     // Setup shaders and tickets
     SetupStandardTicket (context, shaderManager,
       lightSetup.GetPostLightingLayers());
+  
+    {
+      RMUnshadowed::AutoReflectRefractType fxRR (
+        rmanager->reflectRefractPersistent, *this);
+      typedef TraverseUsedSVSets<RenderTreeType,
+        RMUnshadowed::AutoReflectRefractType> SVTraverseType;
+      SVTraverseType svTraverser
+        (fxRR, shaderManager->GetSVNameStringset ()->GetSize ());
+      // And do the iteration
+      ForEachMeshNode (context, svTraverser);
+    }
   }
 
+  // Called by RMUnshadowed::AutoReflectRefractType
+  void operator() (typename RenderTreeType::ContextNode& context)
+  {
+    typename PortalSetupType::ContextSetupData portalData (&context);
 
+    operator() (context, portalData);
+  }
 private:
   RMUnshadowed* rmanager;
   const LayerConfigType& layerConfig;
@@ -162,6 +179,7 @@ bool RMUnshadowed::RenderView (iView* view)
   contextsScannedForTargets.Empty ();
   portalPersistent.UpdateNewFrame ();
   lightPersistent.UpdateNewFrame ();
+  reflectRefractPersistent.UpdateNewFrame ();
 
   iSector* startSector = rview->GetThisSector ();
 
@@ -184,7 +202,7 @@ bool RMUnshadowed::RenderView (iView* view)
     contextSetup (*startContext, portalData);
   
     targets.PrepareQueues (shaderManager);
-    targets.EnqueueTargets (renderTree, shaderManager, renderLayer, contextsScannedForTargets);  
+    targets.EnqueueTargets (renderTree, shaderManager, renderLayer, contextsScannedForTargets);
   }
 
   // Setup all dependent targets
@@ -324,6 +342,7 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
   
   portalPersistent.Initialize (shaderManager, g3d);
   lightPersistent.Initialize (objectReg, treePersistent.debugPersist);
+  reflectRefractPersistent.Initialize (objectReg, treePersistent.debugPersist);
   
   return true;
 }

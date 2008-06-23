@@ -1,0 +1,71 @@
+<!--
+  Copyright (C) 2008 by Frank Richter
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<snippet>
+  <!-- Render a reflection of teh current view -->
+  <technique priority="100">
+    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+    
+    <input name="positionO" type="position4_object" />
+    
+    <input name="texReflect" type="tex2d" default="complex">
+      <block location="pass">
+	<texture name="tex plane reflect" destination="fragmentIn.texReflect" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<uniform type="tex2d" name="texReflect" />
+      </block>
+      
+      <block location="cg:fragmentMain">
+	texReflect = fragmentIn.texReflect;
+      </block>
+    </input>
+    
+    <input name="ModelViewProj" type="float4x4" default="complex" private="yes">
+      <block location="cg:vertexIn">
+	<uniform type="float4x4" name="ModelViewProj" binding="state.matrix.mvp" />
+      </block>
+      
+      <block location="cg:vertexMain">
+	ModelViewProj = vertexIn.ModelViewProj;
+      </block>
+    </input>
+    
+    <block location="cg:vertexToFragment">
+      <varying type="position4" name="reflTC" />
+    </block>
+    
+    <block location="cg:vertexMain">
+      surfaceColor = float4 (0, 0, 0, 1);
+      surfaceColor_attr_perfragment = true;
+      
+      reflTC = mul (ModelViewProj, positionO);
+      float halfW = reflTC.w * 0.5;
+      reflTC.xy = reflTC.xy * float2(0.5) + float2(halfW);
+    </block>
+    
+    <block location="cg:fragmentMain">
+      surfaceColor = tex2Dproj (texReflect, reflTC.xyw);
+      surfaceColor_attr_perfragment = true;
+    </block>
+    
+    <output name="surfaceColor" type="rgba">
+      <attribute name="perfragment" type="bool" />
+    </output>
+  </technique>
+</snippet>
