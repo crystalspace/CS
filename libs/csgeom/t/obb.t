@@ -29,11 +29,13 @@ private:
   static void defaultTable(csVector3 vertex_table[4]);
 
 public:
+  void testConstructors();
   void testFind();
   void testFindAccurate();
   void testFindComplex();
 
   CPPUNIT_TEST_SUITE(csOBBTest);
+    CPPUNIT_TEST(testConstructors);
     CPPUNIT_TEST(testFind);
     CPPUNIT_TEST(testFindAccurate);
     CPPUNIT_TEST(testFindComplex);
@@ -46,7 +48,7 @@ void csOBBTest::expect(csOBB const& obb, float const expected[8][3])
   {
     csVector3 const v = obb.GetCorner(i);
     for (size_t j = 0; j < 3; j++)
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(v[j], expected[i][j], EPSILON);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(expected[i][j], v[j], EPSILON);
   }
 }
 
@@ -56,6 +58,53 @@ void csOBBTest::defaultTable(csVector3 vertex_table[4])
   vertex_table[1].Set( 0,  0,  2);
   vertex_table[2].Set( 1,  0,  3);
   vertex_table[3].Set( 2,  0,  0);
+}
+
+void csOBBTest::testConstructors()
+{
+  // Test empty constructor
+  csOBB obb1;
+
+  CPPUNIT_ASSERT(obb1.GetMatrix().IsIdentity());
+  CPPUNIT_ASSERT(obb1.Empty());
+
+  // Test constructor with orientation
+  csOBB obb2(csVector3(0,1,0),
+             csVector3(1,0,0),
+             csVector3(0,0,1));
+  
+  CPPUNIT_ASSERT(!obb2.GetMatrix().IsIdentity());
+  CPPUNIT_ASSERT(obb2.Empty());
+
+  // Test construction from csBox3
+  csBox3 box(csVector3(0,0,0), csVector3(1,1,1));
+  csOBB obb3(box);
+  
+  CPPUNIT_ASSERT(obb3.GetMatrix().IsIdentity());
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(obb3.Volume(), 1.0, EPSILON);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(obb3.Diameter(), 1.73205, EPSILON);
+
+  static float const expected3[8][3] =
+    {
+      { 0, 0, 0 },
+      { 0, 0, 1 },
+      { 0, 1, 0 },
+      { 0, 1, 1 },
+      { 1, 0, 0 },
+      { 1, 0, 1 },
+      { 1, 1, 0 },
+      { 1, 1, 1 },
+    };
+  expect(obb3, expected3);
+
+  // Test copy construction
+  csOBB obb4(obb3);
+
+  CPPUNIT_ASSERT(obb4.GetMatrix().IsIdentity());
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(obb4.Volume(), 1.0, EPSILON);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(obb4.Diameter(), 1.73205, EPSILON);
+
+  expect(obb4, expected3);
 }
 
 void csOBBTest::testFind()
