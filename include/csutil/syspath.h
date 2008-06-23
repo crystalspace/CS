@@ -98,9 +98,9 @@ private:
     csArrayCapacityFixedGrow<4> > paths;
 public:
   /// Constructor.
-  csPathsList () : paths (4) {}
+  csPathsList ();
   /// Copy constructor.
-  csPathsList (csPathsList const& o) : paths(o.paths) {}
+  csPathsList (csPathsList const& o);
   /// Construct from a list of paths separated by CS_PATH_DELIMITER.
   csPathsList (const char* pathList, bool expand = false);
   /**
@@ -109,10 +109,9 @@ public:
    */
   csPathsList (const char* const pathList[], bool expand = false);
   /// Destructor.
-  ~csPathsList() {}
+  ~csPathsList();
   /// Assignment operator.
-  csPathsList& operator= (csPathsList const& o)
-  { if (&o != this) paths = o.paths; return *this; }
+  csPathsList& operator= (csPathsList const& o);
 
   /**
    * Add a path, but only if it isn't in the list already.
@@ -173,8 +172,7 @@ public:
     }
   }
   /// Remove an entry from the list.
-  void DeleteIndex (size_t index)
-  { paths.DeleteIndex (index); }
+  void DeleteIndex (size_t index);
   
   //@{
   /// Return number of contained paths.
@@ -197,32 +195,17 @@ public:
    */
   CS_CRYSTALSPACE_EXPORT friend csPathsList operator* (const csPathsList& left,
     const csPathsList& right);
-  inline csPathsList operator*= (const csPathsList& right)
-  { return (*this = *this * right); }
-  inline friend csPathsList operator* (const Entry& left, 
-    const csPathsList& right)
-  {
-    csPathsList newPaths;
-    newPaths.paths.Push (left);
-    return newPaths * right;
-  }
-  inline friend csPathsList operator* (const char* left, 
-    const csPathsList& right)
-  { return Entry (left, 0) * right; }
-  inline friend csPathsList operator* (const csPathsList& left, 
-    const Entry& right)
-  {
-    csPathsList newPaths;
-    newPaths.paths.Push (right);
-    return left * newPaths;
-  }
-  inline friend csPathsList operator* (const csPathsList& left, 
-    const char* right)
-  { return left * Entry (right, 0); }
-  inline csPathsList operator*= (const Entry& right)
-  { return (*this = *this * right); }
-  inline csPathsList operator*= (const char* right)
-  { return (*this = *this * right); }
+  csPathsList operator*= (const csPathsList& right);
+  friend csPathsList operator* (const Entry& left, 
+    const csPathsList& right);
+  friend csPathsList operator* (const char* left, 
+    const csPathsList& right);
+  friend csPathsList operator* (const csPathsList& left, 
+    const Entry& right);
+  friend csPathsList operator* (const csPathsList& left, 
+    const char* right);
+  csPathsList operator*= (const Entry& right);
+  csPathsList operator*= (const char* right);
   //@}
 };
 
