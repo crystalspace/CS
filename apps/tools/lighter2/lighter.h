@@ -23,7 +23,7 @@
 
 #include "raydebug.h"
 #include "statistics.h"
-
+#include "Photonmap.h"
 
 namespace lighter
 {
@@ -35,6 +35,7 @@ namespace lighter
   class Scene;
   class Sector;
   class SwapManager;
+  class PhotonMap;
 
   class Lighter : public csRefCount
   {
@@ -80,6 +81,9 @@ namespace lighter
     // Calculate lightmapping
     void CalculateLightmaps ();
 
+    // Build the photon map
+    void BuildPhotonMap();
+
     // Initialize objects after LM construction
     void InitializeObjects ();
 
@@ -92,6 +96,9 @@ namespace lighter
     // Shoot direct lighting
     void DoDirectLighting ();
 
+    // Do photon map samples for indirect
+    void DoIndirectIllumination();
+
     // Post-process all lightmaps
     void PostprocessLightmaps ();
 
@@ -102,6 +109,8 @@ namespace lighter
     void CommandLineHelp () const;    
 
     Scene *scene;
+
+    PhotonMap map;
 
     csRef<LightmapUVFactoryLayouter> uvLayout;
 

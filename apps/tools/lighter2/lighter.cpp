@@ -235,6 +235,9 @@ namespace lighter
 
     // Calculate lightmapping coordinates
     CalculateLightmaps ();
+
+    // Calculate the photon map if we are using it
+    BuildPhotonMap();
    
     if (!scene->SaveWorldFactories (progSaveFactories)) 
       return false;
@@ -262,6 +265,7 @@ namespace lighter
     DoDirectLighting ();   
 
     //@@ DO OTHER LIGHTING
+    DoIndirectIllumination();
 
     // Postprocessing of ligthmaps
     PostprocessLightmaps ();
@@ -348,6 +352,11 @@ namespace lighter
       }
     }
     progLightmapLayout.SetProgress (1);
+  }
+
+  void Lighter::BuildPhotonMap()
+  {
+     // TODO: Add the photon map building code here
   }
 
   void Lighter::InitializeObjects ()
@@ -440,6 +449,25 @@ namespace lighter
       }
       progDirectLighting.SetProgress (1);
     }
+  }
+
+  void Lighter::DoIndirectIllumination()
+  {
+      // iterate over all sectors
+     SectorHash::GlobalIterator sectIt = 
+        scene->GetSectors().GetIterator();
+     while (sectIt.HasNext())
+     {
+        csRef<Sector> sect = sectIt.Next();
+        ObjectHash::GlobalIterator gitr = sect->allObjects.GetIterator();
+        // loop through all the objects
+        while (gitr.HasNext())
+        {
+           csRef<Object> obj = gitr.Next();
+           csArray<PrimitiveArray>& submeshArray = obj->GetPrimitives();
+
+        }
+     }
   }
 
   void Lighter::PostprocessLightmaps ()
