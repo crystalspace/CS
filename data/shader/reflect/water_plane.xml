@@ -27,6 +27,7 @@
       <snippet id="parallax" file="/shader/snippets/surface/parallax.xml" />
       <snippet id="normalmap" file="/shader/snippets/surface/normalmap.xml" />
       <snippet id="surface" file="/shader/snippets/reflect/reflect-plane-screen.xml" />
+      <snippet id="hdrscalerefl" file="/shader/snippets/hdr-prescale.xml" />
       <snippet id="apply_mixmode_alpha" file="/shader/snippets/mixmode-alpha.xml" />
       <snippet id="glow" file="/shader/lighting/glow.xml" />
       <snippet id="sectorfog" file="/shader/snippets/fog/fog-sector.xml" />
@@ -36,7 +37,8 @@
 	   what output is linked to what input is done automatically. -->
       <connection from="position" to="parallax" />
       <connection from="parallax" to="surface" />
-      <connection from="surface" to="apply_mixmode_alpha" />
+      <connection from="surface" to="hdrscalerefl" />
+      <connection from="hdrscalerefl" to="apply_mixmode_alpha" />
       <connection from="apply_mixmode_alpha" to="glow" />
       <connection from="glow" to="sectorfog" />
       <connection from="sectorfog" to="hdrscale" />
