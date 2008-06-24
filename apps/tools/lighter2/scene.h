@@ -23,12 +23,14 @@
 #include "kdtree.h"
 #include "light.h"
 #include "material.h"
+#include "Photonmap.h"
 
 namespace lighter
 {
   class KDTree;
   class Scene;
   class Sector;
+  class PhotonMap;
 
   class Portal : public csRefCount
   {
@@ -82,6 +84,9 @@ namespace lighter
 
     // Sector-name
     csString sectorName;
+
+    // Photon map for GI lighting
+    PhotonMap map;
 
     Scene* scene;
   };

@@ -453,21 +453,20 @@ namespace lighter
 
   void Lighter::DoIndirectIllumination()
   {
-      // iterate over all sectors
-     SectorHash::GlobalIterator sectIt = 
-        scene->GetSectors().GetIterator();
-     while (sectIt.HasNext())
-     {
-        csRef<Sector> sect = sectIt.Next();
-        ObjectHash::GlobalIterator gitr = sect->allObjects.GetIterator();
-        // loop through all the objects
-        while (gitr.HasNext())
-        {
-           csRef<Object> obj = gitr.Next();
-           csArray<PrimitiveArray>& submeshArray = obj->GetPrimitives();
-
-        }
-     }
+    // iterate over all sectors
+    SectorHash::GlobalIterator sectIt = 
+      scene->GetSectors().GetIterator();
+    while (sectIt.HasNext())
+    {
+      csRef<Sector> sect = sectIt.Next();
+      ObjectHash::GlobalIterator gitr = sect->allObjects.GetIterator();
+      // loop through all the objects
+      while (gitr.HasNext())
+      {
+        csRef<Object> obj = gitr.Next();
+        csArray<PrimitiveArray>& submeshArray = obj->GetPrimitives();
+      }
+    }
   }
 
   void Lighter::PostprocessLightmaps ()

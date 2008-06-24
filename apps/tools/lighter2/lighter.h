@@ -23,7 +23,7 @@
 
 #include "raydebug.h"
 #include "statistics.h"
-#include "Photonmap.h"
+
 
 namespace lighter
 {
@@ -35,7 +35,7 @@ namespace lighter
   class Scene;
   class Sector;
   class SwapManager;
-  class PhotonMap;
+  
 
   class Lighter : public csRefCount
   {
@@ -109,8 +109,6 @@ namespace lighter
     void CommandLineHelp () const;    
 
     Scene *scene;
-
-    PhotonMap map;
 
     csRef<LightmapUVFactoryLayouter> uvLayout;
 

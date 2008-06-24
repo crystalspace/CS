@@ -95,10 +95,8 @@ namespace lighter
     // Indirect Light calculations and settings
     struct INDIProperties
     {
-       // Number of photons to emit
-       int numPhotons;
-
-       
+      // Number of photons to emit
+      int numPhotons;
     };
 
     struct DebugProperties
