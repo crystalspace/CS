@@ -38,13 +38,20 @@ namespace CS
         CS::ShaderVarStringID svTexPlaneRefl;
         CS::ShaderVarStringID svTexPlaneRefr;
         
-        //CS::ShaderVarStringID svClipPlaneReflRefr;
+        CS::ShaderVarStringID svPlaneRefl;
+        
+        CS::ShaderVarStringID svClipPlaneReflRefr;
       
         TextureCache texCache;
         struct ReflectRefractSVs
         {
           csRef<csShaderVariable> reflectSV;
           csRef<csShaderVariable> refractSV;
+          
+          csRef<iShaderVariableContext> clipPlaneReflContext;
+          csRef<csShaderVariable> clipPlaneReflSV;
+          csRef<iShaderVariableContext> clipPlaneRefrContext;
+          csRef<csShaderVariable> clipPlaneRefrSV;
         };
         csHash<ReflectRefractSVs, csPtrKey<iMeshWrapper> >
           reflRefrCache;
@@ -66,6 +73,9 @@ namespace CS
 	  iShaderVarStringSet* strings = shaderManager->GetSVNameStringset();
 	  svTexPlaneRefl = strings->Request ("tex plane reflect");
 	  svTexPlaneRefr = strings->Request ("tex plane refract");
+	  
+	  svPlaneRefl = strings->Request ("plane reflection");
+	  svClipPlaneReflRefr = strings->Request ("clip plane reflection");
 	  
 	  csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objReg);
 	  texCache.SetG3D (g3d);
@@ -102,20 +112,93 @@ namespace CS
 	typename RenderTree::ContextNode& context = node->owner;
 	RenderTree& renderTree = context.owner;
         RenderView* rview = context.renderView;
-
-        // Compute reflect/refract plane
-        // @@ FIXME: Obviously use a plane from the object
-        csPlane3 reflRefrPlane (csVector3 (0, -1, 0), -14.2);
         
-        if (names.IsBitSetTolerant (persist.svTexPlaneRefl))
+	csShaderVariableStack localStack;
+	context.svArrays.SetupSVStack (localStack, layer, mesh.contextLocalId);
+
+        bool usesReflTex = names.IsBitSetTolerant (persist.svTexPlaneRefl);
+        bool needReflTex = usesReflTex && !meshReflectRefract.reflectSV.IsValid();
+        bool usesRefrTex = names.IsBitSetTolerant (persist.svTexPlaneRefr);
+        bool needRefrTex = usesRefrTex && !meshReflectRefract.refractSV.IsValid();
+                
+        // Compute reflect/refract plane
+        csPlane3 reflRefrPlane;
+        if (needReflTex || needRefrTex)
+        {
+          if ((localStack.GetSize() > persist.svPlaneRefl)
+              && (localStack[persist.svPlaneRefl] != 0))
+          {
+            // Grab reflection plane from a SV
+            csShaderVariable* planeSV = localStack[persist.svPlaneRefl];
+            csVector4 v;
+            planeSV->GetValue (v);
+            reflRefrPlane.Set (v.x, v.y, v.z, v.w);
+          }
+          else
+          {
+	    /* Guess reflection plane from mesh bbox:
+	      Take smallest dimension of object space bounding box, make that
+	      the durection of reflect plane */
+	    const csBox3& objBB =
+	      mesh.meshWrapper->GetMeshObject()->GetObjectModel()->GetObjectBoundingBox();
+	    const csVector3& bbSize = objBB.GetSize();
+	    
+	    int axis;
+	    if ((bbSize[0] < bbSize[1]) && (bbSize[0] < bbSize[2]))
+	    {
+	      axis = 0;
+	    }
+	    else if (bbSize[1] < bbSize[2])
+	    {
+	      axis = 1;
+	    }
+	    else
+	    {
+	      axis = 2;
+	    }
+	    
+	    csVector3 planeNorm (0);
+	    planeNorm[axis] = -1;
+            reflRefrPlane.Set (planeNorm, 0);
+            reflRefrPlane.SetOrigin (objBB.GetCenter());
+	  }
+          
+          reflRefrPlane =
+            mesh.meshWrapper->GetMovable()->GetFullTransform().This2Other (reflRefrPlane);
+            
+	  meshReflectRefract.clipPlaneReflSV.AttachNew (new csShaderVariable (
+	    persist.svClipPlaneReflRefr));
+	  meshReflectRefract.clipPlaneReflSV->SetValue (csVector4 (
+	    -reflRefrPlane.A(),
+	    -reflRefrPlane.B(),
+	    -reflRefrPlane.C(),
+	    -reflRefrPlane.D()));
+	  meshReflectRefract.clipPlaneReflContext.AttachNew (
+	    new csShaderVariableContext);
+	  meshReflectRefract.clipPlaneReflContext->AddVariable (
+	    meshReflectRefract.clipPlaneReflSV);
+            
+	  meshReflectRefract.clipPlaneRefrSV.AttachNew (new csShaderVariable (
+	    persist.svClipPlaneReflRefr));
+	  meshReflectRefract.clipPlaneRefrSV->SetValue (csVector4 (
+	    reflRefrPlane.A(),
+	    reflRefrPlane.B(),
+	    reflRefrPlane.C(),
+	    -reflRefrPlane.D()));
+	  meshReflectRefract.clipPlaneRefrContext.AttachNew (
+	    new csShaderVariableContext);
+	  meshReflectRefract.clipPlaneRefrContext->AddVariable (
+	    meshReflectRefract.clipPlaneRefrSV);
+        }
+        
+        typename RenderTree::ContextNode* reflCtx = 0;
+        typename RenderTree::ContextNode* refrCtx = 0;
+        
+        if (usesReflTex)
         {
 	  csRef<csShaderVariable> svReflection;
 	  
-	  if (meshReflectRefract.reflectSV.IsValid())
-	  {
-	    svReflection = meshReflectRefract.reflectSV;
-	  }
-	  else
+	  if (needReflTex)
 	  {
 	    // Compute reflection view
 	    iCamera* cam = rview->GetCamera();
@@ -129,6 +212,7 @@ namespace CS
 	        *rview));
     #include "csutil/custom_new_enable.h"
             reflView->SetCamera (inewcam);
+            reflView->GetMeshFilter().AddFilterMesh (mesh.meshWrapper);
 	    
 	    // Change the camera transform to be a reflection across reflRefrPlane
 	    csPlane3 reflRefrPlane_cam = 
@@ -152,37 +236,32 @@ namespace CS
 	    newView.AttachNew (new csBoxClipper (clipBox));
 	    reflView->SetClipper (newView);
   
-	    typename RenderTree::ContextNode* reflCtx = 
-	      renderTree.CreateContext (reflView);
+	    reflCtx = renderTree.CreateContext (reflView);
 	    reflCtx->renderTargets[rtaColor0].texHandle = tex;
 	    reflCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
+	    reflCtx->shadervars = meshReflectRefract.clipPlaneReflContext;
 	      
-	    // Attach reflection texture to mesh
 	    svReflection.AttachNew (new csShaderVariable (
 	      persist.svTexPlaneRefl));
 	    svReflection->SetValue (tex);
 	    meshReflectRefract.reflectSV = svReflection;
 	    
 	    renderTree.AddDebugTexture (tex);
-    
-	    // Setup the new context
-	    contextFunction (*reflCtx);
+	  }
+	  else
+	  {
+	    svReflection = meshReflectRefract.reflectSV;
 	  }
 	  
-	  csShaderVariableStack localStack;
-	  context.svArrays.SetupSVStack (localStack, layer, mesh.contextLocalId);
+	  // Attach reflection texture to mesh
 	  localStack[persist.svTexPlaneRefl] = svReflection;
 	}
         
-        if (names.IsBitSetTolerant (persist.svTexPlaneRefr))
+        if (usesRefrTex)
         {
 	  csRef<csShaderVariable> svRefraction;
 	  
-	  if (meshReflectRefract.refractSV.IsValid())
-	  {
-	    svRefraction = meshReflectRefract.refractSV;
-	  }
-	  else
+	  if (needRefrTex)
 	  {
 	    // Set up context for refraction, clipped to plane
 	    
@@ -203,10 +282,11 @@ namespace CS
 	    csRef<iClipper2D> newView;
 	    newView.AttachNew (new csBoxClipper (clipBox));
 	    refrView->SetClipper (newView);
+            refrView->GetMeshFilter().AddFilterMesh (mesh.meshWrapper);
   
-	    typename RenderTree::ContextNode* refrCtx = 
-	      renderTree.CreateContext (refrView);
+	    refrCtx = renderTree.CreateContext (refrView);
 	    refrCtx->renderTargets[rtaColor0].texHandle = tex;
+	    refrCtx->shadervars = meshReflectRefract.clipPlaneRefrContext;
 	      
 	    // Attach reflection texture to mesh
 	    svRefraction.AttachNew (new csShaderVariable (
@@ -215,15 +295,18 @@ namespace CS
 	    meshReflectRefract.refractSV = svRefraction;
 	    
 	    renderTree.AddDebugTexture (tex);
-    
-	    // Attach refraction texture to mesh
-	    contextFunction (*refrCtx);
+	  }
+  	  else
+	  {
+	    svRefraction = meshReflectRefract.refractSV;
 	  }
 	  
-	  csShaderVariableStack localStack;
-	  context.svArrays.SetupSVStack (localStack, layer, mesh.contextLocalId);
+          // Attach refraction texture to mesh
 	  localStack[persist.svTexPlaneRefr] = svRefraction;
 	}
+        // Setup the new contexts
+	if (reflCtx) contextFunction (*reflCtx);
+	if (refrCtx) contextFunction (*refrCtx);
       }
     protected:
       PersistentData& persist;

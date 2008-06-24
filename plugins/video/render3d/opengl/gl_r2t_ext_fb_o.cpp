@@ -26,6 +26,14 @@
 #include "csplugincommon/opengl/glenum_identstrs.h"
 #include "csplugincommon/opengl/glhelper.h"
 
+//#define FBO_DEBUG
+
+#ifdef FBO_DEBUG
+  #define FBO_PRINTF csPrintf
+#else
+  #define FBO_PRINTF while(0) csPrintf
+#endif
+
 CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 {
 
@@ -60,6 +68,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 	currentFB != (GLint)framebuffer);
   #endif
 
+      FBO_PRINTF ("Freeing FBO %u\n", framebuffer);
       ext->glDeleteFramebuffersEXT (1, &framebuffer);
       framebuffer = 0;
     }
@@ -142,7 +151,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
   void FBOWrapper::Bind ()
   {
     if (framebuffer == 0)
+    {
       ext->glGenFramebuffersEXT (1, &framebuffer);
+      FBO_PRINTF ("Created FBO %u\n", framebuffer);
+    }
     ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer);
   #ifdef CS_DEBUG
     boundFBO = framebuffer;

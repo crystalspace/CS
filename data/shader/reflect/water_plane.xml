@@ -24,9 +24,13 @@
 
       <!-- Snippets - the building blocks of this shader. -->
       <snippet id="position" file="/shader/snippets/position.xml" />
-      <snippet id="parallax" file="/shader/snippets/surface/parallax.xml" />
       <snippet id="normalmap" file="/shader/snippets/surface/normalmap.xml" />
-      <snippet id="surface" file="/shader/snippets/reflect/reflect-plane-screen.xml" />
+      <snippet id="reflection" file="/shader/snippets/reflect/reflect-plane-screen.xml" />
+      <snippet id="refraction" file="/shader/snippets/reflect/reflect-plane-screen.xml" />
+      <snippet id="hdrscalerefl" file="/shader/snippets/hdr-prescale.xml" />
+      <snippet id="hdrscalerefr" file="/shader/snippets/hdr-prescale.xml" />
+      <snippet id="fresnel" file="/shader/snippets/reflect/fresnel.xml" />
+      <snippet id="lerp_reflect_refract" file="/shader/snippets/lerp.xml" />
       <snippet id="apply_mixmode_alpha" file="/shader/snippets/mixmode-alpha.xml" />
       <snippet id="glow" file="/shader/lighting/glow.xml" />
       <snippet id="sectorfog" file="/shader/snippets/fog/fog-sector.xml" />
@@ -34,12 +38,27 @@
       <!-- "connections" describe what snippets take input from what other
            snippets (ie the "data flow" is modeled). The exact resolution of
 	   what output is linked to what input is done automatically. -->
-      <connection from="position" to="parallax" />
-      <connection from="parallax" to="surface" />
-      <connection from="surface" to="apply_mixmode_alpha" />
+      <connection from="position" to="reflection" />
+      <connection from="position" to="refraction" />
+      <connection from="position" to="fresnel" />
+      <connection from="normalmap" to="fresnel" />
+      <connection from="reflection" to="hdrscalerefl" />
+      <connection from="refraction" to="hdrscalerefr" />
+      <connection from="hdrscalerefl" to="lerp_reflect_refract">
+	<explicit from="result" to="b" />
+      </connection>
+      <connection from="hdrscalerefr" to="lerp_reflect_refract">
+	<explicit from="result" to="a" />
+      </connection>
+      <connection from="fresnel" to="lerp_reflect_refract" />
+      <connection from="lerp_reflect_refract" to="apply_mixmode_alpha" />
       <connection from="apply_mixmode_alpha" to="glow" />
       <connection from="glow" to="sectorfog" />
       <connection from="sectorfog" to="hdrscale" />
+      
+      <parameter id="texRefract" type="shadervar" weavertype="tex2d">tex plane refract</parameter>
+      <connection from="texRefract" to="refraction" />
+      
     </pass>
   </technique>
   

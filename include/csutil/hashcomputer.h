@@ -30,7 +30,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 * Note that these keys are non-unique; some dissimilar strings may generate
 * the same key. For unique keys, see csStringSet.
 */
-CS_CRYSTALSPACE_EXPORT CS_PURE_METHOD
+CS_CRYSTALSPACE_EXPORT
 unsigned int csHashCompute (char const*);
 
 /**
@@ -39,7 +39,7 @@ unsigned int csHashCompute (char const*);
 * Note that these keys are non-unique; some dissimilar strings may generate
 * the same key. For unique keys, see csStringSet.
 */
-CS_CRYSTALSPACE_EXPORT CS_PURE_METHOD
+CS_CRYSTALSPACE_EXPORT
 unsigned int csHashCompute (char const*, size_t length);
 
 /**

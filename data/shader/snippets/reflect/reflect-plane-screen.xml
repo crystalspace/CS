@@ -16,7 +16,7 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
 <snippet>
-  <!-- Render a reflection of teh current view -->
+  <!-- Render a reflection of the current view -->
   <technique priority="100">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     

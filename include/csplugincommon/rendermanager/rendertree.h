@@ -214,6 +214,7 @@ namespace RenderManager
         iShaderVariableContext* meshObjSVs;
         csRef<csShaderVariable> svObjectToWorld;
         csRef<csShaderVariable> svObjectToWorldInv;
+        /// Bounding box (world space)
         csBox3 bbox;
         csFlags meshFlags;
 
