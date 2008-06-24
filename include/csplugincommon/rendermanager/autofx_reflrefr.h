@@ -38,6 +38,8 @@ namespace CS
         CS::ShaderVarStringID svTexPlaneRefl;
         CS::ShaderVarStringID svTexPlaneRefr;
         
+        CS::ShaderVarStringID svPlaneRefl;
+        
         //CS::ShaderVarStringID svClipPlaneReflRefr;
       
         TextureCache texCache;
@@ -66,6 +68,8 @@ namespace CS
 	  iShaderVarStringSet* strings = shaderManager->GetSVNameStringset();
 	  svTexPlaneRefl = strings->Request ("tex plane reflect");
 	  svTexPlaneRefr = strings->Request ("tex plane refract");
+	  
+	  svPlaneRefl = strings->Request ("plane reflection");
 	  
 	  csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objReg);
 	  texCache.SetG3D (g3d);
@@ -102,20 +106,61 @@ namespace CS
 	typename RenderTree::ContextNode& context = node->owner;
 	RenderTree& renderTree = context.owner;
         RenderView* rview = context.renderView;
+        
+	csShaderVariableStack localStack;
+	context.svArrays.SetupSVStack (localStack, layer, mesh.contextLocalId);
 
+        bool usesReflTex = names.IsBitSetTolerant (persist.svTexPlaneRefl);
+        bool needReflTex = usesReflTex && !meshReflectRefract.reflectSV.IsValid();
+        bool usesRefrTex = names.IsBitSetTolerant (persist.svTexPlaneRefr);
+        bool needRefrTex = usesRefrTex && !meshReflectRefract.refractSV.IsValid();
+                
         // Compute reflect/refract plane
         // @@ FIXME: Obviously use a plane from the object
-        csPlane3 reflRefrPlane (csVector3 (0, -1, 0), -14.2);
+        csPlane3 reflRefrPlane;// (csVector3 (0, -1, 0), -14.2);
+        if (needReflTex || needRefrTex)
+        {
+          if ((localStack.GetSize() > persist.svPlaneRefl)
+              && (localStack[persist.svPlaneRefl] != 0))
+          {
+            // Grab reflection plane from a SV
+            csShaderVariable* planeSV = localStack[persist.svPlaneRefl];
+            csVector4 v;
+            planeSV->GetValue (v);
+            reflRefrPlane.Set (v.x, v.y, v.z, v.w);
+          }
+          else
+          {
+	    /* Guess reflection plane from mesh bbox:
+	      Take smallest dimension of object space bounding box, make that
+	      the durection of reflect plane */
+	    const csBox3& objBB =
+	      mesh.meshWrapper->GetMeshObject()->GetObjectModel()->GetObjectBoundingBox();
+	    csVector3 bbSize = objBB.GetSize();
+	    
+	    if ((bbSize[0] < bbSize[1]) && (bbSize[0] < bbSize[2]))
+	    {
+	      reflRefrPlane.Set (csVector3 (-1, 0, 0), 0);
+	    }
+	    else if (bbSize[1] < bbSize[2])
+	    {
+	      reflRefrPlane.Set (csVector3 (0, -1, 0), 0);
+	    }
+	    else
+	    {
+	      reflRefrPlane.Set (csVector3 (0, 0, -1), 0);
+	    }
+	  }
+          
+          reflRefrPlane =
+            mesh.meshWrapper->GetMovable()->GetFullTransform().Other2This (reflRefrPlane);
+        }
         
-        if (names.IsBitSetTolerant (persist.svTexPlaneRefl))
+        if (usesReflTex)
         {
 	  csRef<csShaderVariable> svReflection;
 	  
-	  if (meshReflectRefract.reflectSV.IsValid())
-	  {
-	    svReflection = meshReflectRefract.reflectSV;
-	  }
-	  else
+	  if (needReflTex)
 	  {
 	    // Compute reflection view
 	    iCamera* cam = rview->GetCamera();
@@ -168,21 +213,19 @@ namespace CS
 	    // Setup the new context
 	    contextFunction (*reflCtx);
 	  }
+	  else
+	  {
+	    svReflection = meshReflectRefract.reflectSV;
+	  }
 	  
-	  csShaderVariableStack localStack;
-	  context.svArrays.SetupSVStack (localStack, layer, mesh.contextLocalId);
 	  localStack[persist.svTexPlaneRefl] = svReflection;
 	}
         
-        if (names.IsBitSetTolerant (persist.svTexPlaneRefr))
+        if (usesRefrTex)
         {
 	  csRef<csShaderVariable> svRefraction;
 	  
-	  if (meshReflectRefract.refractSV.IsValid())
-	  {
-	    svRefraction = meshReflectRefract.refractSV;
-	  }
-	  else
+	  if (needRefrTex)
 	  {
 	    // Set up context for refraction, clipped to plane
 	    
@@ -219,9 +262,11 @@ namespace CS
 	    // Attach refraction texture to mesh
 	    contextFunction (*refrCtx);
 	  }
+  	  else
+	  {
+	    svRefraction = meshReflectRefract.refractSV;
+	  }
 	  
-	  csShaderVariableStack localStack;
-	  context.svArrays.SetupSVStack (localStack, layer, mesh.contextLocalId);
 	  localStack[persist.svTexPlaneRefr] = svRefraction;
 	}
       }
