@@ -221,7 +221,6 @@ protected:
   /// Dump variable mapping
   void DumpVariableMappings (csString& output);
 
-  //@{
   /**
    * Resolve the SV of a ProgramParam
    */
@@ -240,47 +239,68 @@ protected:
   
     return var;
   }
+  //@{
   /**
    * Query the value of a ProgramParam variable by reading the constant or
    * resolving the shader variable.
    */
-  inline csVector4 GetParamVectorVal (const csShaderVariableStack& stack, 
-    const ProgramParam &param, const csVector4& defVal)
+  inline bool GetParamVectorVal (const csShaderVariableStack& stack, 
+    const ProgramParam &param, csVector4* result)
   {
     csShaderVariable* var (GetParamSV (stack, param));
     
     // If var is null now we have no const nor any passed value, ignore it
     if (!var)
-      return defVal;
+      return false;
   
+    var->GetValue (*result);
+    return true;
+  }
+  inline csVector4 GetParamVectorVal (const csShaderVariableStack& stack, 
+    const ProgramParam &param, const csVector4& defVal)
+  {
     csVector4 v;
-    var->GetValue (v);
+    if (!GetParamVectorVal (stack, param, &v)) return defVal;
     return v;
+  }
+  
+  inline bool GetParamTransformVal (const csShaderVariableStack& stack, 
+    const ProgramParam &param, csReversibleTransform* result)
+  {
+    csShaderVariable* var (GetParamSV (stack, param));
+    
+    // If var is null now we have no const nor any passed value, ignore it
+    if (!var)
+      return false;
+  
+    var->GetValue (*result);
+    return true;
   }
   inline csReversibleTransform GetParamTransformVal (const csShaderVariableStack& stack, 
     const ProgramParam &param, const csReversibleTransform& defVal)
   {
-    csShaderVariable* var (GetParamSV (stack, param));
-    
-    // If var is null now we have no const nor any passed value, ignore it
-    if (!var)
-      return defVal;
-  
     csReversibleTransform t;
-    var->GetValue (t);
+    if (!GetParamTransformVal (stack, param, &t)) return defVal;
     return t;
   }
-  inline float GetParamFloatVal (const csShaderVariableStack& stack, 
-    const ProgramParam &param, float defVal)
+  
+  inline bool GetParamFloatVal (const csShaderVariableStack& stack, 
+    const ProgramParam &param, float* result)
   {
     csShaderVariable* var (GetParamSV (stack, param));
     
     // If var is null now we have no const nor any passed value, ignore it
     if (!var)
-      return defVal;
+      return false;
   
+    var->GetValue (*result);
+    return true;
+  }
+  inline float GetParamFloatVal (const csShaderVariableStack& stack, 
+    const ProgramParam &param, float defVal)
+  {
     float f;
-    var->GetValue (f);
+    if (!GetParamFloatVal (stack, param, &f)) return defVal;
     return f;
   }
   //@}
