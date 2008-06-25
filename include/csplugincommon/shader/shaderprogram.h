@@ -100,7 +100,7 @@ public:
   /**
    * Program parameter, either a SV reference or a const value 
    */
-  struct ProgramParam
+  struct CS_CRYSTALSPACE_EXPORT ProgramParam
   {
     bool valid;
     
@@ -115,6 +115,12 @@ public:
     ProgramParam() : valid (false), name (CS::InvalidShaderVarStringID) { }
     /// Returns whether this parameter 
     bool IsConstant() const { return valid && var.IsValid(); }
+    
+    //@{
+    /// Set to a constant value
+    void SetValue (float val);
+    void SetValue (const csVector4& val);
+    //@}
   };
 
   class CS_CRYSTALSPACE_EXPORT ProgramParamParser
