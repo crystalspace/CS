@@ -50,10 +50,8 @@ csGLShader_CG::csGLShader_CG (iBase* parent) :
   cgSetErrorHandler (ErrorHandlerObjReg, 0);
 
   enable = false;
-  isOpen = false;
   debugDump = false;
   dumpDir = 0;
-  ext = 0;
 }
 
 csGLShader_CG::~csGLShader_CG()
@@ -175,6 +173,8 @@ void csGLShader_CG::SplitArgsString (const char* str, ArgumentArray& args)
           break;
         }
         // else fall through
+      case '\r':
+      case '\n':
       case ' ':
         if (!quote)
         {
@@ -241,6 +241,17 @@ void csGLShader_CG::GetProfileCompilerArgs (const char* type,
   typeStr.Upcase();
   typeStr = "-DPROGRAM_TYPE_" + typeStr;
   args.Push (typeStr);
+  
+  csString vendorStr;
+  switch (vendor)
+  {
+    case ATI:     vendorStr = "ATI"; break;
+    case NVIDIA:  vendorStr = "NVIDIA"; break;
+    case Other:   vendorStr = "OTHER"; break;
+    default:      CS_ASSERT(false);
+  }
+  vendorStr = "-DVENDOR_" + vendorStr;
+  args.Push (vendorStr);
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -309,27 +320,14 @@ bool csGLShader_CG::Open()
 {
   if (isOpen) return true;
   if (!object_reg) return false;
+  if (!CS::PluginCommon::ShaderProgramPluginGL::Open ()) return false;
 
   cgSetErrorHandler (ErrorHandler, this);
 
-  csRef<iGraphics3D> r = csQueryRegistry<iGraphics3D> (object_reg);
-
-  csRef<iFactory> f = scfQueryInterface<iFactory> (r);
-  if (f != 0 && strcmp ("crystalspace.graphics3d.opengl", 
-	f->QueryClassID ()) == 0)
-    enable = true;
-  else
-    return false;
+  enable = true;
 
   csRef<iConfigManager> config(csQueryRegistry<iConfigManager> (object_reg));
 
-  r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
-  if (ext == 0)
-  {
-    enable = false;
-    return false;
-  }
-  
   ext->InitGL_ARB_vertex_program();
   ext->InitGL_ARB_fragment_program();
   ext->InitGL_NV_gpu_program4();
@@ -479,7 +477,6 @@ bool csGLShader_CG::Open()
     }
   }
 
-  isOpen = true;
   return true;
 }
 
@@ -505,13 +502,9 @@ bool csGLShader_CG::IsRoutedProfileSupported (CGprofile profile)
 ////////////////////////////////////////////////////////////////////
 bool csGLShader_CG::Initialize(iObjectRegistry* reg)
 {
-  object_reg = reg;
-  csRef<iVerbosityManager> verbosemgr (
-    csQueryRegistry<iVerbosityManager> (object_reg));
-  if (verbosemgr) 
-    doVerbose = verbosemgr->Enabled ("renderer.shader");
-  else
-    doVerbose = false;
+  if (!CS::PluginCommon::ShaderProgramPluginGL::Initialize (reg))
+    return false;
+    
   return true;
 }
 

@@ -174,6 +174,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     size_t uniqueCounter;
     csArray<Snippet> snippets;
     Snippet currentSnippet;
+    csRefArray<iDocumentNode> vertexCompilerArgs;
+    csRefArray<iDocumentNode> fragmentCompilerArgs; 
     csRefArray<iDocumentNode> variableMaps;
     csString outputAssign[rtaNumAttachments];
     csRefArray<iDocumentNode> definitions;
