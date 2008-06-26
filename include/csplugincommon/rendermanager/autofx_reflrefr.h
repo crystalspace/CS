@@ -184,7 +184,7 @@ namespace CS
 	    reflRefrPlane.A(),
 	    reflRefrPlane.B(),
 	    reflRefrPlane.C(),
-	    -reflRefrPlane.D()));
+	    reflRefrPlane.D()));
 	  meshReflectRefract.clipPlaneRefrContext.AttachNew (
 	    new csShaderVariableContext);
 	  meshReflectRefract.clipPlaneRefrContext->AddVariable (
