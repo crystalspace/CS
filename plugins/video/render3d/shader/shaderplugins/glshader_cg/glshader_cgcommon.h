@@ -96,6 +96,7 @@ protected:
     ProgramParam plane;
     ProgramParam distance;
     int distComp;
+    bool distNeg;
   };
   csArray<Clip> clips;
   // Magic SV names

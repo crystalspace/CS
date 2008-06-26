@@ -58,7 +58,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 
 void csShaderGLCGCommon::ClipsToVmap ()
 {
-  uint distVarFlag = ~0;
   size_t c;
   for (c = 0; c < clips.GetSize(); c++)
   {
@@ -74,11 +73,7 @@ void csShaderGLCGCommon::ClipsToVmap ()
     sparam->assumeConstant = false;
     vme.userVal = reinterpret_cast<intptr_t> (sparam);
     variablemap.Push (vme);
-    
-    if (clip.distance.IsConstant()) distVarFlag &= ~(1 << c);
   }
-  for (; c < 6; c++)
-    distVarFlag &= ~(1 << c);
   
   for (int i = 0; i < 2; i++)
   {
@@ -90,19 +85,9 @@ void csShaderGLCGCommon::ClipsToVmap ()
     destnameDist.Format ("_clipPlanes.packedDists%d", i);
     
     VariableMapEntry vme (svName, destnameDist);
-    if ((distVarFlag & (0xf << i*4)) == 0)
-    {
-      vme.mappingParam.SetValue (csVector4 (0, 0, 0, 0));
-      ShaderParameter* sparam = shaderPlug->paramAlloc.Alloc();
-      sparam->assumeConstant = false;
-      vme.userVal = reinterpret_cast<intptr_t> (sparam);
-    }
-    else
-    {
-      ShaderParameter* sparam = shaderPlug->paramAlloc.Alloc();
-      sparam->assumeConstant = false;
-      vme.userVal = reinterpret_cast<intptr_t> (sparam);
-    }
+    ShaderParameter* sparam = shaderPlug->paramAlloc.Alloc();
+    sparam->assumeConstant = false;
+    vme.userVal = reinterpret_cast<intptr_t> (sparam);
     variablemap.Push (vme);
   }
 }
@@ -130,13 +115,10 @@ static const char clipVaryingMacro[] =
   "\n"
   "  #if " COND_STYLE_NV "\n"
   "    #define _CLIP_OUTPUT(N)  out varying float _clip_ ## N : CLP ## N;\n"
-  "    _CLIP_OUTPUT(0);\n"
-  "    _CLIP_OUTPUT(1);\n"
-  "    _CLIP_OUTPUT(2);\n"
-  "    _CLIP_OUTPUT(3);\n"
-  "    _CLIP_OUTPUT(4);\n"
-  "    _CLIP_OUTPUT(5);\n"
+  "    #define _CLIP_OUTPUT_UNUSED(N)  float _clip_ ## N;\n"
   "  #else\n"
+  "    #define _CLIP_OUTPUT(N)\n"
+  "    #define _CLIP_OUTPUT_UNUSED(N)\n"
   "    out varying float4 _clip_out_packed_distances1;\n"
   "    out varying float4 _clip_out_packed_distances2;\n"
   "  #endif\n"
@@ -160,6 +142,9 @@ static const char clipApplPreamble[] =
   "    _clip_dist ## N -= (N < 4) \\\n"
   "	? _clipPlanes.packedDists0[N] \\\n"
   "	: _clipPlanes.packedDists1[N-4];\n"
+  "  #define _CLIP_COMPUTE_DIST_CD(N, CLIP_POS, CLIP_DIST) \\\n"
+  "    float _clip_dist ## N = dot (_clipPlanes.plane ## N, CLIP_POS); \\\n"
+  "    _clip_dist ## N -= CLIP_DIST;\n"
   "  #define _CLIP_UNUSED(N) \\\n"
   "    float _clip_dist ## N = 0;\n"
   "#else\n"
@@ -229,6 +214,7 @@ void csShaderGLCGCommon::WriteClipApplications (csString& str)
   size_t c;
   csString strClipDistsVP;
   csString strClipDistsFP;
+  csString clipOutStr;
   
   strClipDistsVP += "#define _CLIP_COMPUTE_DISTS(P_Eye, P_World, P_Object) ";
   for (c = 0; c < clips.GetSize(); c++)
@@ -243,17 +229,32 @@ void csShaderGLCGCommon::WriteClipApplications (csString& str)
       case ShaderProgramPluginGL::ClipPlanes::World:  posStr = "P_Object"; break;
     }
     
-    strClipDistsVP.AppendFmt ("\\\n_CLIP_COMPUTE_DIST(%zu, %s) ", c,
-      posStr);
+    if (clip.distance.IsConstant())
+    {
+      csVector4 constDist;
+      clip.distance.var->GetValue (constDist);
+      strClipDistsVP.AppendFmt ("\\\n_CLIP_COMPUTE_DIST_CD(%zu, %s, %f) ", c,
+	posStr, constDist[clip.distComp]);
+    }
+    else
+    {
+      strClipDistsVP.AppendFmt ("\\\n_CLIP_COMPUTE_DIST(%zu, %s) ", c,
+	posStr);
+    }
+    
+    clipOutStr.AppendFmt ("_CLIP_OUTPUT(%zu)\n", c);
   }
   for (; c < 6; c++)
   {
     strClipDistsVP.AppendFmt ("\\\n_CLIP_UNUSED(%zu) ", c);
+    clipOutStr.AppendFmt ("_CLIP_OUTPUT_UNUSED(%zu)\n", c);
   }
   
   str << "#ifdef PROGRAM_TYPE_VERTEX\n";
   str << strClipDistsVP;
-  str << "\n#endif\n\n";
+  str << "\n";
+  str << clipOutStr;
+  str << "#endif\n\n";
   
   strClipDistsFP += "#define _CLIP_TO_DISTS ";
   if (clips.GetSize() > 0)

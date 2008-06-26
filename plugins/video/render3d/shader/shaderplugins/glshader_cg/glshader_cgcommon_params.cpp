@@ -213,9 +213,9 @@ void csShaderGLCGCommon::ApplyVariableMapArray (const Array& array,
   {
     const VariableMapEntry& mapping = array[i];
     
-    if (mapping.mappingParam.name == svClipPackedDist0)
+    if (mapping.mappingParam.name == (CS::StringIDValue)svClipPackedDist0)
       var = clipPackedDists[0];
-    else if (mapping.mappingParam.name == svClipPackedDist1)
+    else if (mapping.mappingParam.name == (CS::StringIDValue)svClipPackedDist1)
       var = clipPackedDists[1];
     else
       var = GetParamSV (stack, mapping.mappingParam);

@@ -67,16 +67,24 @@ bool csShaderGLCGCommon::ParseClip (iDocumentNode* node)
   }
   
   newClip.distComp = 0;
+  newClip.distNeg = false;
   csRef<iDocumentNode> distNode = node->GetNode ("dist");
   if (distNode.IsValid())
   {
-    if (!ParseProgramParam (node, newClip.distance,
+    if (!ParseProgramParam (distNode, newClip.distance,
         ParamVector | ParamShaderExp))
       return false;
       
-    const char* compStr = distNode->GetAttributeValue ("comp");
+    const char* fullCompStr = distNode->GetAttributeValue ("comp");
+    const char* compStr = fullCompStr;
     if (compStr)
     {
+      if (*compStr == '-')
+      {
+        newClip.distNeg = true;
+        compStr++;
+      }
+    
       if (strcmp (compStr, "x") == 0)
 	newClip.distComp = 0;
       else if (strcmp (compStr, "y") == 0)
@@ -91,7 +99,7 @@ bool csShaderGLCGCommon::ParseClip (iDocumentNode* node)
 	  synsrv->Report ("crystalspace.graphics3d.shader.glcg",
 	    CS_REPORTER_SEVERITY_WARNING,
 	    node,
-	    "Invalid 'comp' attribute %s", compStr);
+	    "Invalid 'comp' attribute %s", fullCompStr);
 	return false;
       }
     }

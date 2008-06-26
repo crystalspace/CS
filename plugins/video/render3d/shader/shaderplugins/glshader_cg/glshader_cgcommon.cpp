@@ -92,15 +92,58 @@ void csShaderGLCGCommon::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
                                      CS::Graphics::RenderMeshModes& /*modes*/,
                                      const csShaderVariableStack& stack)
 {
-  ApplyVariableMapArrays (stack);
-  
   if ((clips.GetSize() > 0) && (programType == progVP))
   {
+    uint clipFlags = 0;
     shaderPlug->clipPlanes.SetShaderVars (stack);
-  
-    if (shaderPlug->vendor == ShaderProgramPluginGL::NVIDIA)
+    
+    csVector4 packDist[2];
+    clipPackedDists[0]->GetValue (packDist[0]);
+    clipPackedDists[1]->GetValue (packDist[1]);
+    for (size_t c = 0; c < clips.GetSize(); c++)
     {
-      shaderPlug->clipPlanes.EnableNextClipPlane();
+      const Clip& clip = clips[c];
+	
+      if (!clip.distance.IsConstant())
+      {
+	csVector4 v (GetParamVectorVal (stack, clip.distance,
+	  csVector4 (0, 0, 0, 0)));
+	float distVal = v[clip.distComp];
+	if (clip.distNeg) distVal = -distVal;
+	packDist[c/4][c%4] = distVal;
+      }
+      
+      bool doClipping = false;
+      /* Enable a clip plane if:
+         - both plane and distance are constant
+         - one is not constant and the SV value is present
+         - both are not constant and the SV values are present
+       */
+      csVector4 v;
+      bool constPlane = clip.plane.IsConstant();
+      bool hasPlaneSV = !constPlane
+        && GetParamVectorVal (stack, clip.plane, &v);
+      bool constDist = clip.distance.IsConstant();
+      bool hasDistSV = !constDist
+        && GetParamVectorVal (stack, clip.distance, &v);
+      doClipping = (constPlane && constDist)
+        || (constPlane && hasDistSV)
+        || (hasPlaneSV && constDist)
+        || (hasPlaneSV && hasDistSV);
+      if (doClipping) clipFlags |= 1 << c;
+    }
+    clipPackedDists[0]->SetValue (packDist[0]);
+    clipPackedDists[1]->SetValue (packDist[1]);
+  
+    if ((programProfile == CG_PROFILE_VP30)
+        || (programProfile == CG_PROFILE_VP40)
+        || (programProfile == CG_PROFILE_GPU_VP))
+    {
+      for (size_t c = 0; c < clips.GetSize(); c++)
+      {
+	if (clipFlags & (1 << c))
+          shaderPlug->clipPlanes.EnableClipPlane (c);
+      }
     }
     else if (programProfile == CG_PROFILE_ARBVP1)
     {
@@ -108,13 +151,20 @@ void csShaderGLCGCommon::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
       {
 	const Clip& clip = clips[c];
 	
-      // @@@ TODO: Take clip.dist into account
-	csVector4 v (GetParamVectorVal (stack, clip.plane,
-	  csVector4 (0, 0, 0, 0)));
-	shaderPlug->clipPlanes.AddClipPlane (v, clip.space);
+	if (clipFlags & (1 << c))
+	{
+	  csVector4 v (
+	   GetParamVectorVal (stack, clip.plane, csVector4 (0, 0, 0, 0)));
+	  csPlane3 plane (v.x, v.y, v.z, v.w);
+	  float distVal = packDist[c/4][c%4];
+	  plane.DD -= distVal / plane.Normal().Norm();
+	  shaderPlug->clipPlanes.AddClipPlane (v, clip.space);
+	}
       }
     }
   }
+  
+  ApplyVariableMapArrays (stack);
 }
 
 void csShaderGLCGCommon::ResetState()
