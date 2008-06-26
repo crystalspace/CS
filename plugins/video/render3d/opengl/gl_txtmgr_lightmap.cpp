@@ -78,9 +78,8 @@ csGLRendererLightmap::~csGLRendererLightmap ()
       }
     }
 
-    if (csGLGraphics3D::statecache)
-      csGLGraphics3D::statecache->SetTexture (
-        GL_TEXTURE_2D, slm->texHandle);
+    csGLGraphics3D::statecache->SetTexture (
+      GL_TEXTURE_2D, slm->texHandle);
 
     glTexSubImage2D (GL_TEXTURE_2D, 0, rect.xmin, rect.ymin, 
       rect.Width (), rect.Height (),

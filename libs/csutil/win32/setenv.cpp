@@ -18,7 +18,6 @@
 
 
 #include "cssysdef.h"
-#include "csutil/setenv.h"
 #include "csutil/csstring.h"
 #include <stdlib.h>
 

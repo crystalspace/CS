@@ -819,12 +819,10 @@ class iMaterialEngine(core.iBase):
     def GetTextureWrapper(*args): return _iengine.iMaterialEngine_GetTextureWrapper(*args)
     def Visit(*args): return _iengine.iMaterialEngine_Visit(*args)
     def IsVisitRequired(*args): return _iengine.iMaterialEngine_IsVisitRequired(*args)
-    scfGetVersion = staticmethod(_iengine.iMaterialEngine_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iMaterialEngine
     __del__ = lambda self : None;
 iMaterialEngine_swigregister = _iengine.iMaterialEngine_swigregister
 iMaterialEngine_swigregister(iMaterialEngine)
-iMaterialEngine_scfGetVersion = _iengine.iMaterialEngine_scfGetVersion
 
 class iMaterialList(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')

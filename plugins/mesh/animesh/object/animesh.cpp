@@ -361,35 +361,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return boneInfluences.GetArray ();
   }
 
-  iAnimatedMeshMorphTarget* AnimeshObjectFactory::CreateMorphTarget (
-    const char* name)
+  iAnimatedMeshMorphTarget* AnimeshObjectFactory::CreateMorphTarget ()
   {
-    csRef<MorphTarget> newTarget;
-    newTarget.AttachNew (new MorphTarget (this, name));
-    size_t targetNum = morphTargets.Push (newTarget);
-    morphTargetNames.Put (name, targetNum);
-    return newTarget;
+    return 0;
   }
 
   iAnimatedMeshMorphTarget* AnimeshObjectFactory::GetMorphTarget (uint target)
   {
-    return morphTargets[target];
+    return 0;
   }
 
   uint AnimeshObjectFactory::GetMorphTargetCount () const
   {
-    return morphTargets.GetSize();
+    return 0;
   }
 
   void AnimeshObjectFactory::ClearMorphTargets ()
-  {
-    morphTargets.DeleteAll ();
-    morphTargetNames.DeleteAll ();
-  }
-
-  uint AnimeshObjectFactory::FindMorphTarget (const char* name) const
-  {
-    return morphTargetNames.Get (name, (uint)~0);
+  {    
   }
 
   csFlags& AnimeshObjectFactory::GetFlags ()
@@ -505,13 +493,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   void AnimeshObject::SetMorphTargetWeight (uint target, float weight)
   {
-    morphTargetWeights.SetSize (factory->morphTargets.GetSize(), 0.0f);
-    morphTargetWeights[target] = weight;
   }
 
   float AnimeshObject::GetMorphTargetWeight (uint target) const
   {
-    return morphTargetWeights[target];
+    return 0;
   }
 
   iMeshObjectFactory* AnimeshObject::GetFactory () const

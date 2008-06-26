@@ -1281,7 +1281,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
               str.Format ("%s %s %s%s;\n", 
 	        (id == ShaderCombinerLoaderCg::XMLTOKEN_UNIFORM) ? "uniform" :
 	        "varying",
-	        CgType (type).GetData(), name, bindingStr.GetDataSafe());
+	      CgType (type).GetData(), name, bindingStr.GetDataSafe());
     	      appender.Append (str);
             }
           }

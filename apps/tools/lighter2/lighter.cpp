@@ -115,7 +115,7 @@ namespace lighter
       if(maxSwapSize)
       {
         // Convert physical memory to megabytes, and use 3/4 of memory as the limit.
-        maxSwapSize /= size_t (1024/0.75f);
+        maxSwapSize /= (1024/0.75f);
       }
       else
       {

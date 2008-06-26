@@ -107,8 +107,6 @@ public:
     csRef<csShaderVariable> var;
 
     ProgramParam() : valid (false), name(csInvalidStringID) { }
-    /// Returns whether this parameter 
-    bool IsConstant() const { return valid && var.IsValid(); }
   };
 
   class CS_CRYSTALSPACE_EXPORT ProgramParamParser
