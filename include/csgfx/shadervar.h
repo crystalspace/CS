@@ -181,6 +181,12 @@ public:
   CS::ShaderVarStringID GetName () const
   { return Name; }
 
+  /// Get the accessor
+  iShaderVariableAccessor* GetAccessor () const
+  {
+    return accessor;
+  }
+
   /// Get the extra accessor data
   intptr_t GetAccessorData () const
   {
