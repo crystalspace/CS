@@ -18,6 +18,7 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
 <shader compiler="shaderweaver" name="reflect_water_plane">
+  <shadervar name="water perturb scale" type="vector4">0.05,0.05,0,0</shadervar>
   <technique priority="200">
     <pass>
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -29,6 +30,8 @@
       <snippet id="refraction" file="/shader/snippets/reflect/reflect-plane-screen.xml" />
       <snippet id="hdrscalerefl" file="/shader/snippets/hdr-prescale.xml" />
       <snippet id="hdrscalerefr" file="/shader/snippets/hdr-prescale.xml" />
+      <snippet id="perturb_norm_refl" file="/shader/snippets/tcoffset2-perturb-normal.xml" />
+      <snippet id="perturb_norm_refr" file="/shader/snippets/tcoffset2-perturb-normal.xml" />
       <snippet id="fresnel" file="/shader/snippets/reflect/fresnel.xml" />
       <snippet id="lerp_reflect_refract" file="/shader/snippets/lerp.xml" />
       <snippet id="apply_mixmode_alpha" file="/shader/snippets/mixmode-alpha.xml" />
@@ -42,6 +45,10 @@
       <connection from="position" to="refraction" />
       <connection from="position" to="fresnel" />
       <connection from="normalmap" to="fresnel" />
+      <connection from="normalmap" to="perturb_norm_refl" />
+      <connection from="normalmap" to="perturb_norm_refr" />
+      <connection from="perturb_norm_refl" to="reflection" />
+      <connection from="perturb_norm_refr" to="refraction" />
       <connection from="reflection" to="hdrscalerefl" />
       <connection from="refraction" to="hdrscalerefr" />
       <connection from="hdrscalerefl" to="lerp_reflect_refract">
@@ -59,6 +66,9 @@
       <parameter id="texRefract" type="shadervar" weavertype="tex2d">tex plane refract</parameter>
       <connection from="texRefract" to="refraction" />
       
+      <parameter id="perturbScaleSV" type="shadervar" weavertype="float4">water perturb scale</parameter>
+      <connection from="perturbScaleSV" to="perturb_norm_refl" />
+      <connection from="perturbScaleSV" to="perturb_norm_refr" />
     </pass>
   </technique>
   

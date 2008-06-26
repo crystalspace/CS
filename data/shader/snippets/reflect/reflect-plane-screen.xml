@@ -21,6 +21,7 @@
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
     <input name="positionO" type="position4_object" />
+    <input name="perturb" type="float2" default="value" defval="0,0" />
     
     <input name="texReflect" type="tex2d" default="complex">
       <block location="pass">
@@ -60,7 +61,9 @@
     </block>
     
     <block location="cg:fragmentMain">
-      surfaceColor = tex2Dproj (texReflect, reflTC.xyw);
+      float3 tc = reflTC.xyw;
+      tc.xy += perturb / reflTC.w;
+      surfaceColor = tex2Dproj (texReflect, tc);
       surfaceColor_attr_perfragment = true;
     </block>
     
