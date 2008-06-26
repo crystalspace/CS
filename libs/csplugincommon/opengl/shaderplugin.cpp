@@ -111,7 +111,7 @@ namespace CS
         if (str.IsEmpty()) continue;
         
         bool doNegate = false;
-        if (str[0] == '!')
+        if (str.GetAt(0) == '!')
         {
           doNegate = true;
           str.DeleteAt (0, 1);
