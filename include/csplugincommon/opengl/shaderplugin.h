@@ -73,7 +73,7 @@ namespace CS
       class CS_CSPLUGINCOMMON_GL_EXPORT ClipPlanes
       {
         int maxPlanes;
-        int currentPlanes;
+        uint32 currentPlanes;
         
         CS::ShaderVarStringID svObjectToWorldInv;
         CS::ShaderVarStringID svWorldToCamera;
@@ -96,6 +96,7 @@ namespace CS
         bool AddClipPlane (const csPlane3& plane, ClipSpace space);
         bool AddClipPlane (const csVector4& plane, ClipSpace space)
         { return AddClipPlane (csPlane3 (plane.x, plane.y, plane.z, plane.w), space); }
+        bool EnableClipPlane (int n);
         bool EnableNextClipPlane ();
         void DisableClipPlanes ();
       };

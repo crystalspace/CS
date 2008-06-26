@@ -185,7 +185,10 @@ namespace CS
     bool ShaderProgramPluginGL::ClipPlanes::AddClipPlane (const csPlane3& plane, 
                                                           ClipSpace space)
     {
-      if (currentPlanes >= maxPlanes) return false;
+      size_t nextPlane;
+      if (!CS::Utility::BitOps::ScanBitForward (~currentPlanes, nextPlane))
+        return false;
+      if (nextPlane >= (size_t)maxPlanes) return false;
       
       csPlane3 planeTF;
       switch (space)
@@ -208,28 +211,42 @@ namespace CS
           break;
       }
       
-      glEnable (GL_CLIP_PLANE0 + currentPlanes);
+      glEnable (GL_CLIP_PLANE0 + nextPlane);
       GLdouble glPlane[4] = { planeTF.A(), planeTF.B(), planeTF.C(), planeTF.D() };
-      glClipPlane (GL_CLIP_PLANE0 + currentPlanes, glPlane);
+      glClipPlane (GL_CLIP_PLANE0 + nextPlane, glPlane);
       
-      currentPlanes++;
+      currentPlanes |= 1 << nextPlane;
+      return true;
+    }
+    
+    bool ShaderProgramPluginGL::ClipPlanes::EnableClipPlane (int n)
+    {
+      if (n >= maxPlanes) return false;
+      
+      glEnable (GL_CLIP_PLANE0 + n);
+      currentPlanes |= 1 << n;
       return true;
     }
     
     bool ShaderProgramPluginGL::ClipPlanes::EnableNextClipPlane ()
     {
-      if (currentPlanes >= maxPlanes) return false;
+      size_t nextPlane;
+      if (!CS::Utility::BitOps::ScanBitForward (~currentPlanes, nextPlane))
+        return false;
+      if (nextPlane >= (size_t)maxPlanes) return false;
       
-      glEnable (GL_CLIP_PLANE0 + currentPlanes);
+      glEnable (GL_CLIP_PLANE0 + nextPlane);
       
-      currentPlanes++;
+      currentPlanes |= 1 << nextPlane;
       return true;
     }
     
     void ShaderProgramPluginGL::ClipPlanes::DisableClipPlanes ()
     {
-      for (int i = 0; i < currentPlanes; i++)
-        glDisable (GL_CLIP_PLANE0 + i);
+      for (int i = 0; i < maxPlanes; i++)
+      {
+        if (currentPlanes & (1 << i)) glDisable (GL_CLIP_PLANE0 + i);
+      }
       currentPlanes = 0;
     }
     
