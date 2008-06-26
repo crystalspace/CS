@@ -95,7 +95,11 @@ void csShaderGLCGCommon::ClipsToVmap ()
 #define COND_STYLE_NV     \
   "defined(PROFILE_VP30) " \
   "|| defined(PROFILE_VP40) " \
-  "|| defined(PROFILE_GP4VP) "
+  "|| defined(PROFILE_GP4VP) " \
+  "|| defined(PROFILE_FP20) " \
+  "|| defined(PROFILE_FP30) " \
+  "|| defined(PROFILE_FP40) " \
+  "|| defined(PROFILE_GP4FP) "
 #define COND_STYLE_ATI    "defined(VENDOR_ATI)"
 
 static const char clipVaryingMacro[] =
