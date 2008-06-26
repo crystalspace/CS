@@ -114,7 +114,8 @@ public:
 
     ProgramParam() : valid (false), name (CS::InvalidShaderVarStringID) { }
     /// Returns whether this parameter 
-    bool IsConstant() const { return valid && var.IsValid(); }
+    bool IsConstant() const
+    { return valid && var.IsValid() && (var->GetAccessor() == 0); }
     
     //@{
     /// Set to a constant value
