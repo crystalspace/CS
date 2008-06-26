@@ -62,7 +62,8 @@
     
     <block location="cg:fragmentMain">
       float3 tc = reflTC.xyw;
-      tc.xy += perturb / reflTC.w;
+      float perturbWeight = 1 / max (reflTC.w, 1);
+      tc.xy += perturb * perturbWeight;
       surfaceColor = tex2Dproj (texReflect, tc);
       surfaceColor_attr_perfragment = true;
     </block>
