@@ -216,7 +216,7 @@ private:
         FetchCurrentElementReal<unsigned int>();
 	break;
       case CS_BUFCOMP_UNSIGNED_INT_NORM:
-        FetchCurrentElementRealNorm<unsigned int, false, 4294967295>();
+        FetchCurrentElementRealNorm<unsigned int, false, 4294967295u>();
 	break;
       case CS_BUFCOMP_FLOAT:
         FetchCurrentElementReal<float>();

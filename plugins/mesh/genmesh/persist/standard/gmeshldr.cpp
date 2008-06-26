@@ -179,12 +179,6 @@ bool csGeneralFactoryLoader::ParseRenderBuffer(iDocumentNode *node,
   if(!state) return false;
 
   const char *name = node->GetAttributeValue("name");
-  if ((name == 0) || (*name == 0))
-  {
-    synldr->ReportError ("crystalspace.genmeshfactoryloader.parse",
-      node, "<renderbuffer>s must have names");
-    return false;
-  }
   csRef<iRenderBuffer> buf = synldr->ParseRenderBuffer (node);
   if (!buf.IsValid()) return false;
 

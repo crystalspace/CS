@@ -50,7 +50,7 @@ struct iGeneralMeshSubMesh : public virtual iBase
   SCF_INTERFACE (iGeneralMeshSubMesh, 1, 0, 3);
   
   /// Get the index render buffer
-  virtual iRenderBuffer* GetIndices () const = 0;
+  virtual iRenderBuffer* GetIndices () = 0;
 
   /// Get the material
   virtual iMaterialWrapper* GetMaterial () const = 0;
@@ -96,7 +96,7 @@ struct iGeneralMeshSubMesh : public virtual iBase
  */
 struct iGeneralMeshCommonState : public virtual iBase
 {
-  SCF_INTERFACE (iGeneralMeshCommonState, 1, 2, 1);
+  SCF_INTERFACE (iGeneralMeshCommonState, 1, 2, 2);
   
   /// Set lighting.
   virtual void SetLighting (bool l) = 0;
@@ -160,6 +160,21 @@ struct iGeneralMeshCommonState : public virtual iBase
    * Get independent render buffer by name
    */
   virtual iRenderBuffer* GetRenderBuffer (const char* name) = 0;
+
+  /**
+   * Adds an independently named render buffer.
+   */
+  virtual bool AddRenderBuffer (csRenderBufferName name, iRenderBuffer* buffer) = 0;
+
+  /**
+   * Removes an independently named render buffer.
+   */
+  virtual bool RemoveRenderBuffer (csRenderBufferName name) = 0;
+
+  /**
+   * Get independent render buffer by name
+   */
+  virtual iRenderBuffer* GetRenderBuffer (csRenderBufferName name) = 0;
   /** @} */
 };
 
@@ -179,7 +194,7 @@ struct iGeneralMeshCommonState : public virtual iBase
  */
 struct iGeneralMeshState : public virtual iGeneralMeshCommonState
 {
-  SCF_INTERFACE (iGeneralMeshState, 1, 2, 0);
+  SCF_INTERFACE (iGeneralMeshState, 2, 0, 0);
   
   /**
    * Set the animation control to use for this mesh object.
@@ -231,7 +246,7 @@ struct iGeneralMeshState : public virtual iGeneralMeshCommonState
  */
 struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
 {
-  SCF_INTERFACE (iGeneralFactoryState, 1, 2, 0);
+  SCF_INTERFACE (iGeneralFactoryState, 2, 0, 0);
   
   /// Set the color to use. Will be added to the lighting values.
   virtual void SetColor (const csColor& col) = 0;
