@@ -20,6 +20,7 @@
 
 #include "cssysdef.h"
 
+#include "csplugincommon/opengl/glextmanager.h"
 #include "ivaria/reporter.h"
 
 #include "glshader_cg.h"
