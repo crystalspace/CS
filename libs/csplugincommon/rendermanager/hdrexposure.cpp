@@ -31,9 +31,10 @@ namespace CS
   namespace RenderManager
   {
     void HDRExposureLinear::Initialize (iObjectRegistry* objReg,
-      PostEffectManager& postEffects)
+      HDRHelper& hdr)
     {
-      measureLayer = postEffects.GetLastLayer();
+      this->hdr = &hdr;
+      measureLayer = hdr.GetMeasureLayer();
       PostEffectManager::LayerOptions measureOpts = measureLayer->GetOptions();
       measureOpts.mipmap = true;
       measureOpts.maxMipmap = csMax (measureOpts.maxMipmap, 2);
@@ -44,7 +45,7 @@ namespace CS
       CS_ASSERT(loader);
       csRef<iShader> tonemap =
 	loader->LoadShader ("/shader/postproc/hdr/identity-map.xml");
-      postEffects.AddLayer (tonemap);
+      hdr.SetMappingShader (tonemap);
     
       csRef<iShaderManager> shaderManager =
 	csQueryRegistry<iShaderManager> (objReg);
@@ -59,9 +60,11 @@ namespace CS
       svHDRScale->SetValue (csVector4 (1.0f/exposure, exposure, 0, 0));
     }
     
-    void HDRExposureLinear::ApplyExposure (PostEffectManager& postEffects)
+    void HDRExposureLinear::ApplyExposure ()
     {
-      iTextureHandle* measureTex = postEffects.GetLayerOutput (measureLayer);
+      if (!measureLayer || !hdr) return;
+      iTextureHandle* measureTex =
+	hdr->GetHDRPostEffects().GetLayerOutput (measureLayer);
       int newW, newH;
       measureTex->GetRendererDimensions (newW, newH);
       csRef<iDataBuffer> newData = measureTex->Readback (readbackFmt, 2);

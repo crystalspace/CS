@@ -276,7 +276,7 @@ namespace CS
     const csPlane3* frust = ctxt->icamera->GetVisibleVolume (camMask);
     frustum_mask = 0;
     uint i;
-    for (i = 0; (1 << i) <= camMask; i++)
+    for (i = 0; (1U << i) <= camMask; i++)
     {
       if (!(camMask & (1 << i))) continue;
       frustum_mask |= (1 << i);

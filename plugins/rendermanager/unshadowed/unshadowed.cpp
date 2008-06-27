@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2007 by Marten Svanfeldt
+	      (C) 2008 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -75,7 +76,8 @@ public:
     // Make sure the clip-planes are ok
     CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext ());
     
-    context.owner.AddDebugClipPlanes (rview);
+    if (context.owner.IsDebugFlagEnabled (rmanager->dbgFlagClipPlanes))
+      context.owner.AddDebugClipPlanes (rview);
 
     // Do the culling
     iVisibilityCuller* culler = sector->GetVisibilityCuller ();
@@ -115,7 +117,7 @@ public:
     }
 
     SetupStandardShader (context, shaderManager, layerConfig);
-
+    
     RMUnshadowed::LightSetupType::ShadowParamType shadowParam;
     RMUnshadowed::LightSetupType lightSetup (
       rmanager->lightPersistent, rmanager->lightManager,
@@ -126,9 +128,26 @@ public:
     // Setup shaders and tickets
     SetupStandardTicket (context, shaderManager,
       lightSetup.GetPostLightingLayers());
+  
+    {
+      RMUnshadowed::AutoReflectRefractType fxRR (
+        rmanager->reflectRefractPersistent, *this);
+      typedef TraverseUsedSVSets<RenderTreeType,
+        RMUnshadowed::AutoReflectRefractType> SVTraverseType;
+      SVTraverseType svTraverser
+        (fxRR, shaderManager->GetSVNameStringset ()->GetSize ());
+      // And do the iteration
+      ForEachMeshNode (context, svTraverser);
+    }
   }
 
+  // Called by RMUnshadowed::AutoReflectRefractType
+  void operator() (typename RenderTreeType::ContextNode& context)
+  {
+    typename PortalSetupType::ContextSetupData portalData (&context);
 
+    operator() (context, portalData);
+  }
 private:
   RMUnshadowed* rmanager;
   const LayerConfigType& layerConfig;
@@ -140,7 +159,7 @@ private:
 RMUnshadowed::RMUnshadowed (iBase* parent)
   : scfImplementationType (this, parent), doHDRExposure (false), targets (*this)
 {
-
+  SetTreePersistent (treePersistent);
 }
 
 bool RMUnshadowed::RenderView (iView* view)
@@ -160,6 +179,7 @@ bool RMUnshadowed::RenderView (iView* view)
   contextsScannedForTargets.Empty ();
   portalPersistent.UpdateNewFrame ();
   lightPersistent.UpdateNewFrame ();
+  reflectRefractPersistent.UpdateNewFrame ();
 
   iSector* startSector = rview->GetThisSector ();
 
@@ -182,7 +202,7 @@ bool RMUnshadowed::RenderView (iView* view)
     contextSetup (*startContext, portalData);
   
     targets.PrepareQueues (shaderManager);
-    targets.EnqueueTargets (renderTree, shaderManager, renderLayer, contextsScannedForTargets);  
+    targets.EnqueueTargets (renderTree, shaderManager, renderLayer, contextsScannedForTargets);
   }
 
   // Setup all dependent targets
@@ -207,7 +227,7 @@ bool RMUnshadowed::RenderView (iView* view)
 
   postEffects.DrawPostEffects ();
   
-  if (doHDRExposure) hdrExposure.ApplyExposure (postEffects);
+  if (doHDRExposure) hdrExposure.ApplyExposure ();
   
   DebugFrameRender (rview, renderTree);
 
@@ -295,6 +315,8 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
   
   csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objectReg);
   treePersistent.Initialize (shaderManager);
+  dbgFlagClipPlanes =
+    treePersistent.debugPersist.RegisterDebugFlag ("draw.clipplanes.view");
   postEffects.Initialize (objectReg);
   
   const char* effectsFile = cfg->GetStr ("RenderManager.Unshadowed.Effects", 0);
@@ -309,18 +331,18 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
   {
     doHDRExposure = true;
     
-    HDRHelper hdr;
     hdr.Setup (objectReg, 
       hdrSettings.GetQuality(), 
-      hdrSettings.GetColorRange(), 
-      postEffects, !doHDRExposure);
+      hdrSettings.GetColorRange());
+    postEffects.SetChainedOutput (hdr.GetHDRPostEffects());
   
     // @@@ Make configurable, too
-    hdrExposure.Initialize (objectReg, postEffects);
+    hdrExposure.Initialize (objectReg, hdr);
   }
   
   portalPersistent.Initialize (shaderManager, g3d);
   lightPersistent.Initialize (objectReg, treePersistent.debugPersist);
+  reflectRefractPersistent.Initialize (objectReg, treePersistent.debugPersist);
   
   return true;
 }

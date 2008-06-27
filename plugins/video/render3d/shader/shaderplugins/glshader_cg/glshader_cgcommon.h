@@ -22,6 +22,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "cg_common.h"
 
+#include "csplugincommon/opengl/shaderplugin.h"
 #include "csplugincommon/shader/shaderplugin.h"
 #include "csplugincommon/shader/shaderprogram.h"
 #include "csgfx/shadervarcontext.h"
@@ -29,7 +30,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/strhash.h"
 #include "csutil/leakguard.h"
 
-//#include "glshader_cg.h"
+using namespace CS::PluginCommon;
 
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 {
@@ -69,7 +70,7 @@ protected:
 #include "cstool/tokenlist.h"
 #undef CS_TOKEN_ITEM_FILE
 
-  csGLShader_CG* shaderPlug;
+  csRef<csGLShader_CG> shaderPlug;
 
   CGprogram program;
   CGprofile programProfile;
@@ -87,6 +88,21 @@ protected:
   csRef<iShaderDestinationResolverCG> cgResolve;
   csSet<csString> unusedParams;
   csSafeCopyArray<VariableMapEntry>* assumedConstParams;
+  
+  struct Clip
+  {
+    ShaderProgramPluginGL::ClipPlanes::ClipSpace space;
+    
+    ProgramParam plane;
+    ProgramParam distance;
+    int distComp;
+    bool distNeg;
+  };
+  csArray<Clip> clips;
+  // Magic SV names
+  enum { svClipPackedDist0 = ~23, svClipPackedDist1 = ~42 };
+  csRef<csShaderVariable> clipPackedDists[2];
+  bool ParseClip (iDocumentNode* node);
 
   csString debugFN;
   void EnsureDumpFile();
@@ -118,10 +134,16 @@ protected:
     }
     return 0;
   }
+  
+  void ClipsToVmap ();
+  void OutputClipPreamble (csString& str);
+  void WriteClipApplications (csString& str);
+  
   void CollectUnusedParameters (csSet<csString>& unusedParams);
   template<typename Setter>
   void SetParameterValue (const Setter& setter,
     ShaderParameter* sparam, csShaderVariable* var);
+  void SetParameterValueCg (ShaderParameter* sparam, csShaderVariable* var);
   
   void SVtoCgMatrix3x3 (csShaderVariable* var, float* matrix);
   void SVtoCgMatrix4x4 (csShaderVariable* var, float* matrix);
@@ -129,6 +151,7 @@ protected:
   template<typename Array, typename ParamSetter>
   void ApplyVariableMapArray (const Array& array, const ParamSetter& setter,
     const csShaderVariableStack& stack);
+  void ApplyVariableMapArrays (const csShaderVariableStack& stack);
 public:
   CS_LEAKGUARD_DECLARE (csShaderGLCGCommon);
 

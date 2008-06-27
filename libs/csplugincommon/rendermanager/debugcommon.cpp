@@ -26,8 +26,17 @@ namespace CS
   {
     RMDebugCommonBase::RMDebugCommonBase() : wantDebugLockLines (false) {}
     
-    bool RMDebugCommonBase::DebugCommand (const char *cmd)
+    bool RMDebugCommonBase::DebugCommand (const char* _cmd)
     {
+      csString cmd (_cmd);
+      csString args;
+      size_t space = cmd.FindFirst (' ');
+      if (space != (size_t)-1)
+      {
+	cmd.SubString (args, space+1);
+	cmd.Truncate (space);
+      }
+
       if (strcmp (cmd, "toggle_debug_lines_lock") == 0)
       {
 	csPrintf ("%p got toggle_debug_lines_lock: ", this);
@@ -40,6 +49,16 @@ namespace CS
 	{
 	  wantDebugLockLines = !wantDebugLockLines;
 	  csPrintf ("%slocked\n", wantDebugLockLines ? "" : "un");
+	}
+	return true;
+      }
+      else if (strcmp (cmd, "toggle_debug_flag") == 0)
+      {
+	RenderTreeBase::DebugPersistent& persist = GetDebugPersistent ();
+	uint flag = persist.QueryDebugFlag (args);
+	if (flag != (uint)-1)
+	{
+	  persist.EnableDebugFlag (flag, !persist.IsDebugFlagEnabled (flag));
 	}
 	return true;
       }

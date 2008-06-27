@@ -159,7 +159,7 @@ namespace RenderManager
           CS::Utility::ResourceCache::PurgeConditionAfterTime<uint> (10000)),
         boxClipperCache (CS::Utility::ResourceCache::ReuseConditionFlagged (),
           CS::Utility::ResourceCache::PurgeConditionAfterTime<uint> (10000)),
-        texCache (csimg2D, "rgb8", 
+        texCache (csimg2D, "rgb8", // @@@ FIXME: Use same format as main view ...
           CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP,
           "target", TextureCache::tcachePowerOfTwo)
       {

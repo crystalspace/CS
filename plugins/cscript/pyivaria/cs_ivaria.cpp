@@ -2624,58 +2624,59 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_iObjectRegistryIterator swig_types[146]
 #define SWIGTYPE_p_iParameterESM swig_types[147]
 #define SWIGTYPE_p_iPath swig_types[148]
-#define SWIGTYPE_p_iPluginIterator swig_types[149]
-#define SWIGTYPE_p_iPluginManager swig_types[150]
-#define SWIGTYPE_p_iProcTexture swig_types[151]
-#define SWIGTYPE_p_iReporter swig_types[152]
-#define SWIGTYPE_p_iReporterIterator swig_types[153]
-#define SWIGTYPE_p_iReporterListener swig_types[154]
-#define SWIGTYPE_p_iRigidBody swig_types[155]
-#define SWIGTYPE_p_iSCF swig_types[156]
-#define SWIGTYPE_p_iScript swig_types[157]
-#define SWIGTYPE_p_iScriptObject swig_types[158]
-#define SWIGTYPE_p_iScriptValue swig_types[159]
-#define SWIGTYPE_p_iSector swig_types[160]
-#define SWIGTYPE_p_iSequence swig_types[161]
-#define SWIGTYPE_p_iSequenceCondition swig_types[162]
-#define SWIGTYPE_p_iSequenceManager swig_types[163]
-#define SWIGTYPE_p_iSequenceOperation swig_types[164]
-#define SWIGTYPE_p_iSequenceTimedOperation swig_types[165]
-#define SWIGTYPE_p_iSequenceTrigger swig_types[166]
-#define SWIGTYPE_p_iSequenceWrapper swig_types[167]
-#define SWIGTYPE_p_iSharedVariable swig_types[168]
-#define SWIGTYPE_p_iSimpleFormerState swig_types[169]
-#define SWIGTYPE_p_iStandardReporterListener swig_types[170]
-#define SWIGTYPE_p_iString swig_types[171]
-#define SWIGTYPE_p_iStringArray swig_types[172]
-#define SWIGTYPE_p_iStringSet swig_types[173]
-#define SWIGTYPE_p_iStringSetBaseTCS__StringSetTag__General_t swig_types[174]
-#define SWIGTYPE_p_iTerraFormer swig_types[175]
-#define SWIGTYPE_p_iTerraSampler swig_types[176]
-#define SWIGTYPE_p_iTerrainSystem swig_types[177]
-#define SWIGTYPE_p_iTranslator swig_types[178]
-#define SWIGTYPE_p_iTriangleMesh swig_types[179]
-#define SWIGTYPE_p_iVFS swig_types[180]
-#define SWIGTYPE_p_iView swig_types[181]
-#define SWIGTYPE_p_iVirtualClock swig_types[182]
-#define SWIGTYPE_p_int swig_types[183]
-#define SWIGTYPE_p_int16_t swig_types[184]
-#define SWIGTYPE_p_int64_t swig_types[185]
-#define SWIGTYPE_p_int8_t swig_types[186]
-#define SWIGTYPE_p_long_long swig_types[187]
-#define SWIGTYPE_p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[188]
-#define SWIGTYPE_p_scfImplementation1TcsObject_iObject_t swig_types[189]
-#define SWIGTYPE_p_scfImplementationExt1TcsPath_csObject_iPath_t swig_types[190]
-#define SWIGTYPE_p_uint16_t swig_types[191]
-#define SWIGTYPE_p_uint32_t swig_types[192]
-#define SWIGTYPE_p_uint64_t swig_types[193]
-#define SWIGTYPE_p_unsigned_char swig_types[194]
-#define SWIGTYPE_p_unsigned_int swig_types[195]
-#define SWIGTYPE_p_unsigned_long swig_types[196]
-#define SWIGTYPE_p_unsigned_long_long swig_types[197]
-#define SWIGTYPE_p_void swig_types[198]
-static swig_type_info *swig_types[200];
-static swig_module_info swig_module = {swig_types, 199, 0, 0, 0, 0};
+#define SWIGTYPE_p_iPerspectiveCamera swig_types[149]
+#define SWIGTYPE_p_iPluginIterator swig_types[150]
+#define SWIGTYPE_p_iPluginManager swig_types[151]
+#define SWIGTYPE_p_iProcTexture swig_types[152]
+#define SWIGTYPE_p_iReporter swig_types[153]
+#define SWIGTYPE_p_iReporterIterator swig_types[154]
+#define SWIGTYPE_p_iReporterListener swig_types[155]
+#define SWIGTYPE_p_iRigidBody swig_types[156]
+#define SWIGTYPE_p_iSCF swig_types[157]
+#define SWIGTYPE_p_iScript swig_types[158]
+#define SWIGTYPE_p_iScriptObject swig_types[159]
+#define SWIGTYPE_p_iScriptValue swig_types[160]
+#define SWIGTYPE_p_iSector swig_types[161]
+#define SWIGTYPE_p_iSequence swig_types[162]
+#define SWIGTYPE_p_iSequenceCondition swig_types[163]
+#define SWIGTYPE_p_iSequenceManager swig_types[164]
+#define SWIGTYPE_p_iSequenceOperation swig_types[165]
+#define SWIGTYPE_p_iSequenceTimedOperation swig_types[166]
+#define SWIGTYPE_p_iSequenceTrigger swig_types[167]
+#define SWIGTYPE_p_iSequenceWrapper swig_types[168]
+#define SWIGTYPE_p_iSharedVariable swig_types[169]
+#define SWIGTYPE_p_iSimpleFormerState swig_types[170]
+#define SWIGTYPE_p_iStandardReporterListener swig_types[171]
+#define SWIGTYPE_p_iString swig_types[172]
+#define SWIGTYPE_p_iStringArray swig_types[173]
+#define SWIGTYPE_p_iStringSet swig_types[174]
+#define SWIGTYPE_p_iStringSetBaseTCS__StringSetTag__General_t swig_types[175]
+#define SWIGTYPE_p_iTerraFormer swig_types[176]
+#define SWIGTYPE_p_iTerraSampler swig_types[177]
+#define SWIGTYPE_p_iTerrainSystem swig_types[178]
+#define SWIGTYPE_p_iTranslator swig_types[179]
+#define SWIGTYPE_p_iTriangleMesh swig_types[180]
+#define SWIGTYPE_p_iVFS swig_types[181]
+#define SWIGTYPE_p_iView swig_types[182]
+#define SWIGTYPE_p_iVirtualClock swig_types[183]
+#define SWIGTYPE_p_int swig_types[184]
+#define SWIGTYPE_p_int16_t swig_types[185]
+#define SWIGTYPE_p_int64_t swig_types[186]
+#define SWIGTYPE_p_int8_t swig_types[187]
+#define SWIGTYPE_p_long_long swig_types[188]
+#define SWIGTYPE_p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[189]
+#define SWIGTYPE_p_scfImplementation1TcsObject_iObject_t swig_types[190]
+#define SWIGTYPE_p_scfImplementationExt1TcsPath_csObject_iPath_t swig_types[191]
+#define SWIGTYPE_p_uint16_t swig_types[192]
+#define SWIGTYPE_p_uint32_t swig_types[193]
+#define SWIGTYPE_p_uint64_t swig_types[194]
+#define SWIGTYPE_p_unsigned_char swig_types[195]
+#define SWIGTYPE_p_unsigned_int swig_types[196]
+#define SWIGTYPE_p_unsigned_long swig_types[197]
+#define SWIGTYPE_p_unsigned_long_long swig_types[198]
+#define SWIGTYPE_p_void swig_types[199]
+static swig_type_info *swig_types[201];
+static swig_module_info swig_module = {swig_types, 200, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -7362,6 +7363,58 @@ SWIGINTERN PyObject *_wrap_iView_SetCamera(PyObject *SWIGUNUSEDPARM(self), PyObj
   }
   arg2 = reinterpret_cast< iCamera * >(argp2);
   (arg1)->SetCamera(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iView_GetPerspectiveCamera(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iView *arg1 = (iView *) 0 ;
+  iPerspectiveCamera *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iView_GetPerspectiveCamera",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iView, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iView_GetPerspectiveCamera" "', argument " "1"" of type '" "iView *""'"); 
+  }
+  arg1 = reinterpret_cast< iView * >(argp1);
+  result = (iPerspectiveCamera *)(arg1)->GetPerspectiveCamera();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iPerspectiveCamera, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iView_SetPerspectiveCamera(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iView *arg1 = (iView *) 0 ;
+  iPerspectiveCamera *arg2 = (iPerspectiveCamera *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iView_SetPerspectiveCamera",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iView, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iView_SetPerspectiveCamera" "', argument " "1"" of type '" "iView *""'"); 
+  }
+  arg1 = reinterpret_cast< iView * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iPerspectiveCamera, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iView_SetPerspectiveCamera" "', argument " "2"" of type '" "iPerspectiveCamera *""'"); 
+  }
+  arg2 = reinterpret_cast< iPerspectiveCamera * >(argp2);
+  (arg1)->SetPerspectiveCamera(arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -37995,6 +38048,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iView_SetEngine", _wrap_iView_SetEngine, METH_VARARGS, NULL},
 	 { (char *)"iView_GetCamera", _wrap_iView_GetCamera, METH_VARARGS, NULL},
 	 { (char *)"iView_SetCamera", _wrap_iView_SetCamera, METH_VARARGS, NULL},
+	 { (char *)"iView_GetPerspectiveCamera", _wrap_iView_GetPerspectiveCamera, METH_VARARGS, NULL},
+	 { (char *)"iView_SetPerspectiveCamera", _wrap_iView_SetPerspectiveCamera, METH_VARARGS, NULL},
 	 { (char *)"iView_GetContext", _wrap_iView_GetContext, METH_VARARGS, NULL},
 	 { (char *)"iView_SetContext", _wrap_iView_SetContext, METH_VARARGS, NULL},
 	 { (char *)"iView_SetRectangle", _wrap_iView_SetRectangle, METH_VARARGS, NULL},
@@ -39254,6 +39309,7 @@ static swig_type_info _swigt__p_iODESliderJoint = {"_p_iODESliderJoint", "iODESl
 static swig_type_info _swigt__p_iODEUniversalJoint = {"_p_iODEUniversalJoint", "iODEUniversalJoint *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iObject = {"_p_iObject", "iObject *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iParameterESM = {"_p_iParameterESM", "iParameterESM *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_iPerspectiveCamera = {"_p_iPerspectiveCamera", "iPerspectiveCamera *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iReporter = {"_p_iReporter", "iReporter *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iRigidBody = {"_p_iRigidBody", "iRigidBody *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iSCF = {"_p_iSCF", "iSCF *", 0, 0, (void*)0, 0};
@@ -39441,6 +39497,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_iObjectRegistryIterator,
   &_swigt__p_iParameterESM,
   &_swigt__p_iPath,
+  &_swigt__p_iPerspectiveCamera,
   &_swigt__p_iPluginIterator,
   &_swigt__p_iPluginManager,
   &_swigt__p_iProcTexture,
@@ -39656,6 +39713,7 @@ static swig_cast_info _swigc__p_iODESliderJoint[] = {  {&_swigt__p_iODESliderJoi
 static swig_cast_info _swigc__p_iODEUniversalJoint[] = {  {&_swigt__p_iODEUniversalJoint, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iObject[] = {  {&_swigt__p_scfImplementationExt1TcsPath_csObject_iPath_t, _p_scfImplementationExt1TcsPath_csObject_iPath_tTo_p_iObject, 0, 0},  {&_swigt__p_iObject, 0, 0, 0},  {&_swigt__p_csObject, _p_csObjectTo_p_iObject, 0, 0},  {&_swigt__p_scfImplementation1TcsObject_iObject_t, _p_scfImplementation1TcsObject_iObject_tTo_p_iObject, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iParameterESM[] = {  {&_swigt__p_iParameterESM, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_iPerspectiveCamera[] = {  {&_swigt__p_iPerspectiveCamera, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iReporter[] = {  {&_swigt__p_iReporter, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iRigidBody[] = {  {&_swigt__p_iRigidBody, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iSCF[] = {  {&_swigt__p_iSCF, 0, 0, 0},{0, 0, 0, 0}};
@@ -39843,6 +39901,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_iObjectRegistryIterator,
   _swigc__p_iParameterESM,
   _swigc__p_iPath,
+  _swigc__p_iPerspectiveCamera,
   _swigc__p_iPluginIterator,
   _swigc__p_iPluginManager,
   _swigc__p_iProcTexture,

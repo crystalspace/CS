@@ -15,10 +15,21 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
-<block>
-  <!-- SHADOW MAPPING -->
-  <!-- Shadow map -->
-  <!--uniform type="tex2d" name="lightShadowMap[8]" /-->
-  <!-- Transformation from light space to shadow map space -->
-  <!--uniform type="float4x4" name="lightShadowMapProject[8]" /-->
-</block>
+<snippet>
+  <technique priority="100">
+    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+    
+    <input name="perturbScaleXlate" type="float4" default="value" defval="1,1,0,0" />
+    <input name="N" type="normal" />
+      
+    <block location="cg:fragmentMain">
+      result = N.xy * perturbScaleXlate.xy + perturbScaleXlate.zw;
+    </block>
+
+    <block location="cg:vertexMain">
+      result = N.xy * perturbScaleXlate.xy + perturbScaleXlate.zw;
+    </block>
+    
+    <output name="result" type="float2" />
+  </technique>
+</snippet>

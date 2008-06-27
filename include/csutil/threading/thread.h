@@ -51,7 +51,7 @@ namespace Threading
   };
 
   /**
-   * Abstract base class for objects to be run in threads.
+   * Abstract base class for objects acting as executor in separate threads.
    * The lifetime of the Runnable object must at least be as long as the thread
    * object.
    */

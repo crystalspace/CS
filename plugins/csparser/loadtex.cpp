@@ -39,7 +39,6 @@
 #include "iengine/collection.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
-#include "iengine/region.h"
 #include "iengine/texture.h"
 #include "igraphic/animimg.h"
 #include "igraphic/image.h"
@@ -311,45 +310,6 @@ iTextureWrapper* csLoader::LoadTexture (const char *name,
     {
       collection->Add(matwrap->QueryObject());
     }
-  }
-
-  if (reg && tm)
-  {
-    // If we already have a texture handle then we don't register again.
-    if (!TexWrapper->GetTextureHandle ())
-      TexWrapper->Register (tm);
-    if (free_image)
-      TexWrapper->SetImageFile (0);
-  }
-
-  return TexWrapper;
-}
-
-iTextureWrapper* csLoader::LoadTexture (const char *name,
-	const char *fname, int Flags, iTextureManager *tm, bool reg,
-	bool create_material, bool free_image, iRegion* region)
-{
-  if (!Engine)
-    return 0;
-
-  csRef<iImage> img;
-  if (!tm && G3D) tm = G3D->GetTextureManager();
-  csRef<iTextureHandle> TexHandle = LoadTexture (fname, Flags, tm, &img);
-  if (!TexHandle)
-    return 0;
-
-  iTextureWrapper *TexWrapper =
-	Engine->GetTextureList ()->NewTexture(TexHandle);
-  TexWrapper->QueryObject ()->SetName (name);
-  TexWrapper->SetImageFile(img);
-  if (region) region->QueryObject ()->ObjAdd (TexWrapper->QueryObject ());
-
-  iMaterialWrapper* matwrap = 0;
-  if (create_material)
-  {
-    csRef<iMaterial> material (Engine->CreateBaseMaterial (TexWrapper));
-    matwrap = Engine->GetMaterialList ()->NewMaterial (material, name);
-    if (region) region->QueryObject ()->ObjAdd (matwrap->QueryObject ());
   }
 
   if (reg && tm)

@@ -142,6 +142,7 @@ if [ Property build : projgen_version ] != 6
 WALKTEST_STATIC.PLUGINLIST =
   $(WALKALL.PLUGINLIST)
   bruteblock
+  bindoc
   csbmpimg
   rendstep_stencil
   ;

@@ -30,6 +30,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   CS_IMPLEMENT_STATIC_VAR(GetFGen, csRandomFloatGen, ());
 
 
+  CS_LEAKGUARD_IMPLEMENT(PriorityNodeFactory);
+
   PriorityNodeFactory::PriorityNodeFactory (const char* name)
     : scfImplementationType (this), name (name)
   {
@@ -97,10 +99,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     return 0;
   }
+  
+  
+  CS_LEAKGUARD_IMPLEMENT(PriorityNode);
 
   PriorityNode::PriorityNode (PriorityNodeFactory* factory)
-    : scfImplementationType (this), factory (factory),
-    BaseNodeChildren (this), playbackSpeed (1.0f)
+    : scfImplementationType (this), BaseNodeChildren (this), 
+    playbackSpeed (1.0f), factory (factory)
   {
     if (factory)
     {
@@ -313,6 +318,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   //----------------------------------------
 
+  CS_LEAKGUARD_IMPLEMENT(RandomNodeFactory);
+
   RandomNodeFactory::RandomNodeFactory (const char* name)
   : scfImplementationType (this), name (name), autoSwitch (true)
   {}
@@ -411,9 +418,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     }
   }
 
+  
+  CS_LEAKGUARD_IMPLEMENT(RandomNode);
+
   RandomNode::RandomNode (RandomNodeFactory* factory)
-  : scfImplementationType (this), BaseNodeChildren (this), factory (factory), 
-  currentNode (0), active (false), playbackSpeed (1.0f)
+    : scfImplementationType (this), BaseNodeChildren (this), currentNode (0), 
+    active (false), playbackSpeed (1.0f), factory (factory)
   {
     // Need CB for possible automatic switch
     InstallInnerCb (true);
@@ -566,7 +576,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   {
     if (node == subNodes[currentNode] && !isPlaying)
     {
-      active == false;
+      active = false;
       FireStateChangeCb (false);
     }
   }

@@ -218,7 +218,7 @@ private:
       return parent ? parent->HandleEvent(e) : false; 
     }
     CS_EVENTHANDLER_NAMES("crystalspace.console")
-      CS_CONST_METHOD virtual const csHandlerID * GenericPrec(
+      virtual const csHandlerID * GenericPrec(
       csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,
       csEventID e) const
     {
@@ -231,7 +231,7 @@ private:
         return 0;
       }
     }
-    CS_CONST_METHOD virtual const csHandlerID * GenericSucc(
+    virtual const csHandlerID * GenericSucc(
       csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &,
       csEventID) const
     { return 0; }

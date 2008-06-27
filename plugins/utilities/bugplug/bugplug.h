@@ -50,7 +50,6 @@ struct iMeshWrapper;
 struct iObjectRegistry;
 struct iObjectRegistry;
 struct iPluginManager;
-struct iRegion;
 struct iSector;
 struct iTextureManager;
 struct iThingFactoryState;
@@ -511,11 +510,11 @@ public:
   bool ExecCommand (const char* command);
 
   CS_EVENTHANDLER_NAMES("crystalspace.bugplug")
-  CS_CONST_METHOD virtual const csHandlerID * GenericPrec(
+  virtual const csHandlerID * GenericPrec(
     csRef<iEventHandlerRegistry>&, 
     csRef<iEventNameRegistry>&,
     csEventID) const;
-  CS_CONST_METHOD virtual const csHandlerID * GenericSucc(
+  virtual const csHandlerID * GenericSucc(
     csRef<iEventHandlerRegistry>&, 
     csRef<iEventNameRegistry>&,
     csEventID) const;

@@ -3563,8 +3563,8 @@ bool csGLGraphics3D::HandleEvent (iEvent& Event)
     viewwidth = G2D->GetWidth();
     viewheight = G2D->GetHeight();
     G2D->GetFramebufferDimensions (scrwidth, scrheight);
-    asp_center_x = viewwidth/2.0f;
-    asp_center_y = viewheight/2.0f;
+    asp_center_x = (int)(viewwidth/2.0f);
+    asp_center_y = (int)(viewheight/2.0f);
     return true;
   }
   return false;

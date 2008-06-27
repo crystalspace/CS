@@ -32,8 +32,16 @@ namespace CS
   {
     /**
      * To help setting up a post effects manager for HDR rendering.
+     *
+     * Usage:
+     * - The rendermanager must have an instance member for the HDR helper.
+     * - The Setup() method must be called.
+     * - The HDR helper owns a post effects manager, retrievable with
+     *	 GetHDRPostEffects(). It should be chained to the post effects manager
+     *   set up by the render manager. (Or, if the RM does not have a post
+     *	 effects manager, properly driven like an RM one would.)
      */
-    class HDRHelper
+    class CS_CRYSTALSPACE_EXPORT HDRHelper
     {
     public:
       /// Level of HDR quality
@@ -73,62 +81,32 @@ namespace CS
        * \param quality Quality of the intermediate textures rendered to.
        * \param colorRange Range of colors for integer texture qualities.
        *   Typical values are 16 for qualInt16 and 4 for qualInt8.
-       * \param postEffects Post processing effects manager used.
-       * \param addDefaultMappingShader Whether a default effect should be
-       *   added that performs a simple linear tone mapping to the screen
-       *   color space.
        * \return Whether the setup succeeded.
-       * \remarks If no default mapping shader is added you should manually
-       *   add a tone mapping effect.
+       * \remarks By default a simple linear tone mapping to the screen
+       *   color space is used. This can be changed with SetMappingShader().
        */
       bool Setup (iObjectRegistry* objectReg, 
-        Quality quality, int colorRange,
-        PostEffectManager& postEffects, bool addDefaultMappingShader = true)
-      {
-        const char* textureFmt;
-        switch (quality)
-        {
-          /* @@@ QUESTION: With or without alpha? Some shader may want destination
-           * alpha. But without is prolly faster, and post proc shaders are less
-           * likely to need it. So perhaps allow different formats in one post
-           * effect manager ... */
-          case qualInt8:    textureFmt = "argb8"; break;
-          case qualInt10:   textureFmt = "rgb10"; break;
-          case qualInt16:   textureFmt = "rgb16"; break;
-          case qualFloat16: textureFmt = "bgr16_f"; break;
-          case qualFloat32: textureFmt = "bgr32_f"; break;
-          default: return false;
-        }
-        postEffects.SetIntermediateTargetFormat (textureFmt);
-        
-	csRef<iShaderManager> shaderManager =
-	  csQueryRegistry<iShaderManager> (objectReg);
-	if (!shaderManager) return false;
-	csRef<iShaderVarStringSet> svNameStringSet = 
-	  csQueryRegistryTagInterface<iShaderVarStringSet> (objectReg,
-	    "crystalspace.shader.variablenameset");
-	if (!svNameStringSet) return false;
-	    
-	csShaderVariable* svHdrScale =
-	  shaderManager->GetVariableAdd (svNameStringSet->Request (
-	    "hdr scale"));
-        if ((quality == qualInt8) || (quality == qualInt16))
-          svHdrScale->SetValue (csVector4 (colorRange, 1.0f/colorRange, 0, 0));
-        else
-          svHdrScale->SetValue (csVector4 (1, 1, 0, 0));
-          
-        if (addDefaultMappingShader)
-        {
-          csRef<iLoader> loader (csQueryRegistry<iLoader> (objectReg));
-          if (!loader) return false;
-	  csRef<iShader> map =
-	    loader->LoadShader ("/shader/postproc/hdr/default-map.xml");
-          if (!map) return false;
-	  postEffects.AddLayer (map);
-        }
-        return true;
-      }
+        Quality quality, int colorRange);
+
+      PostEffectManager& GetHDRPostEffects() { return postEffects; }
+
+      /// Set the shader used for tonemapping the final image.
+      void SetMappingShader (iShader* shader);
+      /// Get the shader used for tonemapping the final image.
+      iShader* GetMappingShader ();
+      /// Get the shader variable context for the tonemapping stage.
+      iShaderVariableContext* GetMapppingShaderVarContext();
+      
+      /**
+       * Get the post processing effects layer that can be used for measuring
+       * image colors (before tonemapping).
+       */
+      PostEffectManager::Layer* GetMeasureLayer() const
+      { return measureLayer; }
     private:
+      PostEffectManager postEffects;
+      PostEffectManager::Layer* measureLayer;
+      PostEffectManager::Layer* mappingLayer;
     };
   
     /// Read HDR settings from a config file

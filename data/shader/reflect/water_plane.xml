@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+  Copyright (C) 2007-2008 by Frank Richter
+	    (C) 2007 by Jorrit Tyberghein
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<shader compiler="shaderweaver" name="reflect_water_plane">
+  <shadervar name="water perturb scale" type="vector4">0.05,0.05,0,0</shadervar>
+  <technique priority="200">
+    <pass>
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+
+      <!-- Snippets - the building blocks of this shader. -->
+      <snippet id="position" file="/shader/snippets/position.xml" />
+      <snippet id="normalmap" file="/shader/snippets/surface/normalmap.xml" />
+      <snippet id="reflection" file="/shader/snippets/reflect/reflect-plane-screen.xml" />
+      <snippet id="refraction" file="/shader/snippets/reflect/reflect-plane-screen.xml" />
+      <snippet id="hdrscalerefl" file="/shader/snippets/hdr-prescale.xml" />
+      <snippet id="hdrscalerefr" file="/shader/snippets/hdr-prescale.xml" />
+      <snippet id="perturb_norm_refl" file="/shader/snippets/tcoffset2-perturb-normal.xml" />
+      <snippet id="perturb_norm_refr" file="/shader/snippets/tcoffset2-perturb-normal.xml" />
+      <snippet id="fresnel" file="/shader/snippets/reflect/fresnel.xml" />
+      <snippet id="lerp_reflect_refract" file="/shader/snippets/lerp.xml" />
+      <snippet id="apply_mixmode_alpha" file="/shader/snippets/mixmode-alpha.xml" />
+      <snippet id="glow" file="/shader/lighting/glow.xml" />
+      <snippet id="sectorfog" file="/shader/snippets/fog/fog-sector.xml" />
+      <snippet id="hdrscale" file="/shader/snippets/hdr-postscale.xml" />
+      <!-- "connections" describe what snippets take input from what other
+           snippets (ie the "data flow" is modeled). The exact resolution of
+	   what output is linked to what input is done automatically. -->
+      <connection from="position" to="reflection" />
+      <connection from="position" to="refraction" />
+      <connection from="position" to="fresnel" />
+      <connection from="normalmap" to="fresnel" />
+      <connection from="normalmap" to="perturb_norm_refl" />
+      <connection from="normalmap" to="perturb_norm_refr" />
+      <connection from="perturb_norm_refl" to="reflection" />
+      <connection from="perturb_norm_refr" to="refraction" />
+      <connection from="reflection" to="hdrscalerefl" />
+      <connection from="refraction" to="hdrscalerefr" />
+      <connection from="hdrscalerefl" to="lerp_reflect_refract">
+	<explicit from="result" to="b" />
+      </connection>
+      <connection from="hdrscalerefr" to="lerp_reflect_refract">
+	<explicit from="result" to="a" />
+      </connection>
+      <connection from="fresnel" to="lerp_reflect_refract" />
+      <connection from="lerp_reflect_refract" to="apply_mixmode_alpha" />
+      <connection from="apply_mixmode_alpha" to="glow" />
+      <connection from="glow" to="sectorfog" />
+      <connection from="sectorfog" to="hdrscale" />
+      
+      <parameter id="texRefract" type="shadervar" weavertype="tex2d">tex plane refract</parameter>
+      <connection from="texRefract" to="refraction" />
+      
+      <parameter id="perturbScaleSV" type="shadervar" weavertype="float4">water perturb scale</parameter>
+      <connection from="perturbScaleSV" to="perturb_norm_refl" />
+      <connection from="perturbScaleSV" to="perturb_norm_refr" />
+    </pass>
+  </technique>
+  
+</shader>

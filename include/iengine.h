@@ -39,7 +39,6 @@
 #include "iengine/objwatch.h"
 #include "iengine/portal.h"
 #include "iengine/portalcontainer.h"
-#include "iengine/region.h"
 #include "iengine/renderloop.h"
 #include "iengine/rendermanager.h"
 #include "iengine/rendersteps/icontainer.h"

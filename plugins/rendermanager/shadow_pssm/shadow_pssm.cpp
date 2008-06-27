@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2007 by Marten Svanfeldt
+	      (C) 2008 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -144,6 +145,7 @@ private:
 RMShadowedPSSM::RMShadowedPSSM (iBase* parent)
   : scfImplementationType (this, parent), doHDRExposure (false), targets (*this)
 {
+  SetTreePersistent (treePersistent);
 }
 
 bool RMShadowedPSSM::RenderView (iView* view)
@@ -211,7 +213,7 @@ bool RMShadowedPSSM::RenderView (iView* view)
   postEffects.DrawPostEffects ();
   
   
-  if (doHDRExposure) hdrExposure.ApplyExposure (postEffects);
+  if (doHDRExposure) hdrExposure.ApplyExposure ();
   
   DebugFrameRender (rview, renderTree);
 
@@ -299,7 +301,7 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
   csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objectReg);
   treePersistent.Initialize (shaderManager);
   dbgFlagClipPlanes =
-    treePersistent.debugPersist.RegisterDebugFlag ("draw.clipplanes");
+    treePersistent.debugPersist.RegisterDebugFlag ("draw.clipplanes.view");
   postEffects.Initialize (objectReg);
   
   const char* effectsFile = cfg->GetStr ("RenderManager.ShadowPSSM.Effects", 0);
@@ -314,14 +316,13 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
   {
     doHDRExposure = true;
     
-    HDRHelper hdr;
     hdr.Setup (objectReg, 
       hdrSettings.GetQuality(), 
-      hdrSettings.GetColorRange(), 
-      postEffects, !doHDRExposure);
+      hdrSettings.GetColorRange());
+    postEffects.SetChainedOutput (hdr.GetHDRPostEffects());
   
     // @@@ Make configurable, too
-    hdrExposure.Initialize (objectReg, postEffects);
+    hdrExposure.Initialize (objectReg, hdr);
   }
   
   portalPersistent.Initialize (shaderManager, g3d);
