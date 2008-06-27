@@ -73,6 +73,13 @@
 %ignore iFile::Read;
 %ignore iFile::Write;
 
+%ignore iSkeleton2::GetStateAbsSpace();
+%ignore iSkeleton2::GetStateBoneSpace();
+%ignore iSkeleton2::GetStateBindSpace();
+%ignore iMeshObject::HitBeamObject(const csVector3 &, const csVector3 &, csVector3 &, float *, int *, iMaterialWrapper**);
+%ignore iAnimatedMeshFactory::CreateSubMesh(const csArray< iRenderBuffer * > &, const csArray< csArray< unsigned int > > &);
+%ignore iSpriteCal3DState::SetVelocity(float vel, csRandomGen*);
+
 // cstool/initapp.h
 %extend csPluginRequest
 {

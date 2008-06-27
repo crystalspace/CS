@@ -119,6 +119,10 @@ WRAP_UNSIGNED_TYPE_CONSTREF(csTicks, unsigned int, uint, long)
 %csattributes csInitializer::SetupEventHandler(iObjectRegistry*, iEventHandler *, const csEventID[]) "[CLSCompliant(false)]";
 %csattributes csInitializer::RequestPlugins(iObjectRegistry*, csArray<csPluginRequest> const&) "[CLSCompliant(false)]";
 
+%csattributes iAnimatedMeshFactorySubMesh::GetBoneIndices(size_t) "[CLSCompliant(false)]";
+
+%typemap(csattributes) csArray<unsigned int> "[CLSCompliant(false)]";
+
 // We ignore this because we don't need and alias which only differs in the
 // case
 %ignore csImageMemory::ClearKeycolor;

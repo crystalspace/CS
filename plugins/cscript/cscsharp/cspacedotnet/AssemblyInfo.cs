@@ -27,7 +27,7 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyDescription("Crystal Space bindings")]
 [assembly: AssemblyCulture("neutral")]
 // Use the crystal space version
-[assembly: AssemblyVersion("1.3.0.0")]
+[assembly: AssemblyVersion("1.9.0.0")]
 
 // Common Language Specification compliant
 [assembly: CLSCompliant(true)]
