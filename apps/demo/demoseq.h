@@ -52,7 +52,7 @@ public:
     csNamedPath::name = csStrNew (name);
   }
   virtual ~csNamedPath () { delete[] name; }
-  char* GetName () const { return name; }
+  const char* GetName () const { return name; }
 };
 
 /**

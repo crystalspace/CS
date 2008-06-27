@@ -20,6 +20,7 @@
 #include "csutil/strhash.h"
 #include "csutil/util.h"
 
+/*
 csStringHash::csStringHash (size_t size) : registry (size)
 {
 }
@@ -84,3 +85,4 @@ void csStringHash::Empty ()
   registry.Empty();
   pool.Empty();
 }
+*/

@@ -557,9 +557,11 @@ void WalkTest::DrawFullScreenFX3D (csTicks /*elapsed_time*/,
 void WalkTest::DrawFrame3D (int drawflags, csTicks /*current_time*/)
 {
   // Tell Gfx3D we're going to display 3D things
+  /*
   if (!Gfx3D->BeginDraw (Engine->GetBeginDrawFlags () | drawflags
   	| CSDRAW_3DGRAPHICS))
     return;
+    */
 
   // Apply lighting BEFORE the very first frame
   size_t i;
@@ -584,16 +586,23 @@ void WalkTest::DrawFrame3D (int drawflags, csTicks /*current_time*/)
   if (!do_covtree_dump)
   {
     if (split == -1)
-      view->Draw ();
+      //view->Draw ();
+      Engine->GetRenderManager()->RenderView (view);
     else 
     {	
-      views[0]->Draw();
-      views[1]->Draw();
+      iRenderManager* rm = Engine->GetRenderManager();
+      rm->RenderView (views[0]);
+      rm->RenderView (views[1]);
     }
   }
 
   // no need to clear screen anymore
   drawflags = 0;
+
+  // Tell Gfx3D we're going to display 3D things
+  if (!Gfx3D->BeginDraw (/*Engine->GetBeginDrawFlags () |*/ drawflags
+  	| CSDRAW_3DGRAPHICS))
+    return;
 
   // Display the 3D parts of the console
   if (myConsole)

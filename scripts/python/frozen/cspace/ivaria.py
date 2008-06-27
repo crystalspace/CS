@@ -244,6 +244,7 @@ class iView(core.iBase):
     def GetClipper(*args): return _ivaria.iView_GetClipper(*args)
     def Draw(*args): return _ivaria.iView_Draw(*args)
     def SetAutoResize(*args): return _ivaria.iView_SetAutoResize(*args)
+    def GetMeshFilter(*args): return _ivaria.iView_GetMeshFilter(*args)
     scfGetVersion = staticmethod(_ivaria.iView_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iView
     __del__ = lambda self : None;

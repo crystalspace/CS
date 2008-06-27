@@ -94,10 +94,11 @@ public:
     };
   };
 private:
-  csArray<Entry> paths;
+  csArray<Entry, csArrayElementHandler<Entry>, CS::Container::ArrayAllocDefault,
+    csArrayCapacityFixedGrow<4> > paths;
 public:
   /// Constructor.
-  csPathsList () : paths (4, 4) {}
+  csPathsList () : paths (4) {}
   /// Copy constructor.
   csPathsList (csPathsList const& o) : paths(o.paths) {}
   /// Construct from a list of paths separated by CS_PATH_DELIMITER.

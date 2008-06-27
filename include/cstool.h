@@ -40,6 +40,7 @@
 #include "cstool/initapp.h"
 #include "cstool/keyval.h"
 #include "cstool/mapnode.h"
+#include "cstool/meshfilter.h"
 #include "cstool/meshobjtmpl.h"
 #include "cstool/normalcalc.h"
 #include "cstool/numberedfilenamehelper.h"

@@ -43,6 +43,7 @@
 #include "iutil/plugin.h"
 #include "ivaria/engseq.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/shader/shader.h"
 
 #include "proxyimage.h"
 
@@ -185,6 +186,7 @@ private:
   csRef<iEngineSequenceManager> eseqmgr;
   /// Shared string set
   csRef<iStringSet> stringSet;
+  csRef<iShaderVarStringSet> stringSetSvName;
 
   /// Pointer to built-in image texture loader.
   csRef<iLoaderPlugin> BuiltinImageTexLoader;

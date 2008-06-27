@@ -92,6 +92,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     orderListDirty (true)
   {}
 
+  BoneID SkeletonFactory::FindBone (const char *name) const
+  {
+    for (size_t i = 0; i < boneNames.GetSize (); i++)
+    {
+      if (!strcmp(name,boneNames[i]))
+        return (BoneID)i;
+    }
+    return InvalidBoneID;
+  }
+
   BoneID SkeletonFactory::CreateBone (BoneID parent)
   {
     cachedTransformsDirty = true;

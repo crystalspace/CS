@@ -397,9 +397,9 @@ csHazeHullCone::~csHazeHullCone()
 
 //------------ csHazeMeshObject -------------------------------
 
-csStringID csHazeMeshObject::vertex_name = csInvalidStringID;
-csStringID csHazeMeshObject::texel_name = csInvalidStringID;
-csStringID csHazeMeshObject::index_name = csInvalidStringID;
+CS::ShaderVarStringID csHazeMeshObject::vertex_name = CS::InvalidShaderVarStringID;
+CS::ShaderVarStringID csHazeMeshObject::texel_name = CS::InvalidShaderVarStringID;
+CS::ShaderVarStringID csHazeMeshObject::index_name = CS::InvalidShaderVarStringID;
 
 csHazeMeshObject::csHazeMeshObject (csHazeMeshObjectFactory* factory) :
   scfImplementationType(this)
@@ -429,13 +429,13 @@ csHazeMeshObject::csHazeMeshObject (csHazeMeshObjectFactory* factory) :
     layers.Push(p);
   }
 
-  csRef<iStringSet> strings;
-  strings = csQueryRegistryTagInterface<iStringSet>
-    (factory->object_reg, "crystalspace.shared.stringset");
+  csRef<iShaderVarStringSet> strings;
+  strings = csQueryRegistryTagInterface<iShaderVarStringSet>
+    (factory->object_reg, "crystalspace.shader.variablenameset");
 
-  if ((vertex_name == csInvalidStringID) ||
-    (texel_name == csInvalidStringID) ||
-    (index_name == csInvalidStringID))
+  if ((vertex_name == CS::InvalidShaderVarStringID) ||
+    (texel_name == CS::InvalidShaderVarStringID) ||
+    (index_name == CS::InvalidShaderVarStringID))
   {
     vertex_name = strings->Request ("vertices");
     texel_name = strings->Request ("texture coordinates");

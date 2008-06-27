@@ -153,9 +153,9 @@ private:
   void SetupObject ();
 
   /// Update lighting given a position.
-  void UpdateLighting (const csArray<iLightSectorInfluence*>& lights,
+  void UpdateLighting (const csSafeCopyArray<csLightInfluence>& lights,
       const csVector3& pos);
-  void UpdateLighting (const csArray<iLightSectorInfluence*>& lights,
+  void UpdateLighting (const csSafeCopyArray<csLightInfluence>& lights,
       	iMovable* movable, csVector3 offset);
 
   /// Check the start vector and recalculate the LookAt matrix if changed.
@@ -280,7 +280,7 @@ public:
   virtual void AddColor (const csColor& col);
   virtual void ScaleBy (float factor);
   virtual void Rotate (float angle);
-  virtual void UpdateLighting (const csArray<iLightSectorInfluence*>& lights,
+  virtual void UpdateLighting (const csSafeCopyArray<csLightInfluence>& lights,
 	const csReversibleTransform& transform);
   /** @} */
 };
@@ -299,7 +299,7 @@ protected:
   class animVector : public csArray<csSprite2DUVAnimation*>
   {
   public:
-    animVector () : csArray<csSprite2DUVAnimation*> (8, 16){}
+    animVector () : csArray<csSprite2DUVAnimation*> (8){}
     static int CompareKey (csSprite2DUVAnimation* const& item,
 			   char const* const& key)
     {

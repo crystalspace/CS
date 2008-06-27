@@ -23,13 +23,17 @@
 #include "iutil/plugin.h"
 #include "iutil/string.h"
 #include "iutil/vfs.h"
+#include "ivaria/pmeter.h"
 #include "ivaria/reporter.h"
 
 #include "csplugincommon/shader/weavertypes.h"
 #include "csutil/csstring.h"
 #include "csutil/documenthelper.h"
 #include "csutil/fifo.h"
+#include "csutil/platform.h"
 #include "csutil/scopeddelete.h"
+#include "csutil/threading/mutex.h"
+#include "csutil/threadjobqueue.h"
 #include "csutil/xmltiny.h"
 
 #include "combiner_default.h"
@@ -41,42 +45,50 @@
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 {
   namespace WeaverCommon = CS::PluginCommon::ShaderWeaver;
+  
+  ShaderVarNodesHelper::ShaderVarNodesHelper (iDocumentNode* shaderVarsNode)
+  : shaderVarsNode (shaderVarsNode) {}
+    
+  void ShaderVarNodesHelper::AddNode (iDocumentNode* node)
+  {
+    CS::Threading::MutexScopedLock l (lock);
+    if (node->GetType() == CS_NODE_ELEMENT)
+    {
+      const char* name = node->GetAttributeValue ("name");
+      if (name && *name && seenVars.Contains (name)) return;
+      seenVars.AddNoTest (name);
+    }
+    csRef<iDocumentNode> newNode = 
+      shaderVarsNode ->CreateNodeBefore (node->GetType ());
+    CS::DocSystem::CloneNode (node, newNode);
+  }
+    
+  //-------------------------------------------------------------------------
 
   Synthesizer::Synthesizer (WeaverCompiler* compiler, 
-                            const csPDelArray<Snippet>& outerSnippets) : 
-    compiler (compiler), xmltokens (compiler->xmltokens)
+                            const csArray<DocNodeArray>& prePassNodes,
+                            const csPDelArray<Snippet>& outerSnippets,
+                            const DocNodeArray& postPassesNodes)
+    : prePassNodes (prePassNodes), postPassesNodes (postPassesNodes), 
+      compiler (compiler), xmltokens (compiler->xmltokens)
   {
     graphs.SetSize (outerSnippets.GetSize());
     for (size_t s = 0; s < outerSnippets.GetSize(); s++)
     {
-      TechniqueGraphBuilder builder;
+      TechniqueGraphBuilder builder (snipNums);
       this->outerSnippets.Push (outerSnippets[s]);
       builder.BuildGraphs (outerSnippets[s], graphs[s]);
     }
   }
-
-  csPtr<iDocument> Synthesizer::Synthesize (iDocumentNode* sourceNode)
+  
+  //#define THREADED_TECH_SYNTHESIS
+  
+  void Synthesizer::Synthesize (iDocumentNode* shaderNode,
+                                ShaderVarNodesHelper& shaderVarNodesHelper,
+                                csRefArray<iDocumentNode>& techNodes,
+                                iDocumentNode* sourceTechNode, 
+                                iProgressMeter* progress)
   {
-    csRef<iDocumentSystem> docsys;
-    docsys.AttachNew (new csTinyDocumentSystem);
-    csRef<iDocument> synthesizedDoc = docsys->CreateDocument ();
-    
-    csRef<iDocumentNode> rootNode = synthesizedDoc->CreateRoot();
-    csRef<iDocumentNode> shaderNode = rootNode->CreateNodeBefore (CS_NODE_ELEMENT);
-    shaderNode->SetValue ("shader");
-    CS::DocSystem::CloneAttributes (sourceNode, shaderNode);
-    shaderNode->SetAttribute ("compiler", "xmlshader");
-
-    csRef<iDocumentNodeIterator> shaderVarNodes = 
-      sourceNode->GetNodes ("shadervar");
-    while (shaderVarNodes->HasNext ())
-    {
-      csRef<iDocumentNode> svNode = shaderVarNodes->Next ();
-      csRef<iDocumentNode> newNode = 
-        shaderNode->CreateNodeBefore (svNode->GetType ());
-      CS::DocSystem::CloneNode (svNode, newNode);
-    }
-    
     if (graphs.GetSize() > 0)
     {
       size_t techNum = graphs[0].GetSize();
@@ -84,53 +96,184 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       {
         techNum *= graphs[g].GetSize();
       }
+    #ifdef THREADED_TECH_SYNTHESIS
+      CS::Threading::ThreadedJobQueue synthQueue (
+	csClamp (CS::Platform::GetProcessorCount(), (uint)techNum, (uint)1));
+    #endif
+      csArray<csRefArray<SynthesizeTechnique> > synthTechs;
+      csArray<csArray<size_t> > graphIndices;
       size_t currentTech = 0;
       while (currentTech < techNum)
       {
-        csRef<iDocumentNode> techniqueNode =
-          shaderNode->CreateNodeBefore (CS_NODE_ELEMENT);
-        techniqueNode->SetValue ("technique");
-        techniqueNode->SetAttributeAsInt ("priority", int (techNum - currentTech));
-        
         size_t current = currentTech;
-        bool aPassSucceeded = false;
+	/* Conserve variations: don't generate a technique if some pass has
+	   a higher priority for a snippet than a pass that comes before it */
+        bool skipTech = false;
+        SnippetTechPriorities allTechPrios;
 	for (size_t g = 0; g < graphs.GetSize(); g++)
 	{
           const TechniqueGraph& graph = graphs.Get (g)[(current % graphs[g].GetSize())];
           current = current / graphs[g].GetSize();
+          
+	  const SnippetTechPriorities& graphPrios = graph.GetSnippetPrios();
+	  for (size_t s = 0; s < snipNums.GetAllSnippetsCount(); s++)
+	  {
+	    if (graphPrios.IsSnippetPrioritySet (s)
+	      && allTechPrios.IsSnippetPrioritySet (s)
+	      && (graphPrios.GetSnippetPriority (s) >
+	        allTechPrios.GetSnippetPriority(s)))
+	    {
+	      skipTech = true;
+	      break;
+	    }
+	  }
+	  if (skipTech) break;
+	  
+	  for (size_t s = 0; s < snipNums.GetAllSnippetsCount(); s++)
+	  {
+	    if (graphPrios.IsSnippetPrioritySet (s))
+	      allTechPrios.SetSnippetPriority (s,
+	        graphPrios.GetSnippetPriority (s));
+	  }
+	}
+	
+	if (!skipTech)
+	{
+	  csRefArray<SynthesizeTechnique> techPasses;
+	  csArray<size_t> techGraphIndices;
+	  for (size_t g = 0; g < graphs.GetSize(); g++)
+	  {
+	    const TechniqueGraph& graph = graphs.Get (g)[(current % graphs[g].GetSize())];
+	    
+	    current = current / graphs[g].GetSize();
+	    
+	    Snippet* snippet = outerSnippets[g];
+	   
+	    csRef<SynthesizeTechnique> synthTech;
+	    synthTech.AttachNew (new SynthesizeTechnique (compiler, this,
+	      shaderVarNodesHelper, shaderNode, snippet, graph));
+	    techPasses.Push (synthTech);
+	  #ifdef THREADED_TECH_SYNTHESIS
+	    synthQueue.Enqueue (synthTech);
+	  #endif
+	    techGraphIndices.Push (g);
+          }
+          synthTechs.Push (techPasses);
+          graphIndices.Push (techGraphIndices);
+        }
+        currentTech++;
+      }
+      
+      if (progress)
+      {
+	progress->SetProgressDescription (
+	  "crystalspace.graphics3d.shadercompiler.weaver.synth",
+	  "Generating %zu techniques", synthTechs.GetSize());
+	progress->SetTotal (synthTechs.GetSize());
+      }
+      for (size_t t = 0; t < synthTechs.GetSize(); t++)
+      {
+        csRef<iDocumentNodeIterator> siblings =
+          sourceTechNode->GetParent()->GetNodes();
+        
+        while (siblings->HasNext())
+        {
+          csRef<iDocumentNode> sibling = siblings->Next();
+          csDocumentNodeType siblType = sibling->GetType();
+          if (siblType == CS_NODE_ELEMENT)
+          {
+            if (sibling->Equals (sourceTechNode)) break;
+          }
+          else
+          {
+            csRef<iDocumentNode> siblCopy =
+              shaderNode->CreateNodeBefore (siblType);
+            CS::DocSystem::CloneNode (sibling, siblCopy);
+          }
+        }
+      
+	csRef<iDocumentNode> techniqueNode =
+	  shaderNode->CreateNodeBefore (CS_NODE_ELEMENT);
+	techniqueNode->SetValue ("technique");
+	techNodes.Push (techniqueNode);
+	
+        while (siblings->HasNext())
+        {
+          csRef<iDocumentNode> sibling = siblings->Next();
+          csDocumentNodeType siblType = sibling->GetType();
+          if (siblType != CS_NODE_ELEMENT)
+          {
+            csRef<iDocumentNode> siblCopy =
+              shaderNode->CreateNodeBefore (siblType);
+            CS::DocSystem::CloneNode (sibling, siblCopy);
+          }
+        }
+      
+	bool aPassSucceeded = false;
+	for (size_t p = 0; p < synthTechs[t].GetSize(); p++)
+	{
+	  size_t g = graphIndices[t].Get (p);
+	  
+	  for (size_t i = 0; i < prePassNodes[g].GetSize(); i++)
+	  {
+	    iDocumentNode* copyFrom = prePassNodes[g].Get (i);
+	    csRef<iDocumentNode> newNode =
+	      techniqueNode->CreateNodeBefore (copyFrom->GetType());
+	    CS::DocSystem::CloneNode (copyFrom, newNode);
+	  }
+	  
 	  csRef<iDocumentNode> passNode =
 	    techniqueNode->CreateNodeBefore (CS_NODE_ELEMENT);
 	  passNode->SetValue ("pass");
 	  
-	  if (!SynthesizeTechnique (passNode, outerSnippets[g], graph))
-            techniqueNode->RemoveNode (passNode);
-          else
-            aPassSucceeded = true;
+	  Snippet* snippet = outerSnippets[g];
+	  csRefArray<iDocumentNode> passForwardedNodes =
+	    snippet->GetPassForwardedNodes();
+	  for (size_t n = 0; n < passForwardedNodes.GetSize(); n++)
+	  {
+	    iDocumentNode* srcNode = passForwardedNodes[n];
+	    csRef<iDocumentNode> dstNode =
+	      passNode->CreateNodeBefore (srcNode->GetType());
+	    CS::DocSystem::CloneNode (srcNode, dstNode);
+	  }
+	  
+	  SynthesizeTechnique* synthTech = synthTechs[t].Get (p);
+	#ifdef THREADED_TECH_SYNTHESIS
+	  synthQueue.Wait (synthTech);
+	#else
+	  synthTech->Run();
+	#endif
+	  if (!synthTech->GetStatus())
+	    techniqueNode->RemoveNode (passNode);
+	  else
+	  {
+	    synthTech->WriteToPass (passNode);
+	    aPassSucceeded = true;
+	  }
 	}
-        if (!aPassSucceeded)
-          shaderNode->RemoveNode (techniqueNode);
+	if (!aPassSucceeded)
+	  shaderNode->RemoveNode (techniqueNode);
+	else
+	{
+	  for (size_t i = 0; i < postPassesNodes.GetSize(); i++)
+	  {
+	    iDocumentNode* copyFrom = postPassesNodes.Get (i);
+	    csRef<iDocumentNode> newNode =
+	      techniqueNode->CreateNodeBefore (copyFrom->GetType());
+	    CS::DocSystem::CloneNode (copyFrom, newNode);
+	  }
+	}
 	
-	currentTech++;
+	if (progress) progress->Step (1);
       }
     }
-    
-    {
-      csRef<iDocumentNode> fallback = sourceNode->GetNode ("fallbackshader");
-      if (fallback.IsValid())
-      {
-        csRef<iDocumentNode> newFallback = shaderNode->CreateNodeBefore (CS_NODE_ELEMENT);
-        CS::DocSystem::CloneNode (fallback, newFallback);
-      }
-    }
-    
-    return csPtr<iDocument> (synthesizedDoc);
   }
-
-  bool Synthesizer::SynthesizeTechnique (iDocumentNode* passNode,
-                                         const Snippet* snippet, 
-                                         const TechniqueGraph& techGraph)
+  
+  bool Synthesizer::SynthesizeTechnique::operator() (
+    ShaderVarNodesHelper& shaderVarNodes, iDocumentNode* errorNode,
+    const Snippet* snippet, const TechniqueGraph& techGraph)
   {
-    defaultCombiner.AttachNew (new CombinerDefault (compiler));
+    defaultCombiner.AttachNew (new CombinerDefault (compiler, shaderVarNodes));
 
     TechniqueGraph graph (techGraph);
     /*
@@ -153,7 +296,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
      
     CS_ASSERT(snippet->IsCompound());
     
-    csRef<WeaverCommon::iCombiner> combiner;
     const Snippet::Technique::CombinerPlugin* comb;
     {
       // Here, snippet should contain 1 tech.
@@ -169,25 +311,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  comb->classId);
       if (!loader.IsValid())
       {
-	compiler->Report (CS_REPORTER_SEVERITY_WARNING, passNode,
+	compiler->Report (CS_REPORTER_SEVERITY_WARNING, errorNode,
 	  "Could not load combiner plugin '%s'", comb->classId.GetData());
 	return false;
       }
       combiner = loader->GetCombiner (comb->params); 
       if (!combiner.IsValid())
       {
-	compiler->Report (CS_REPORTER_SEVERITY_WARNING, passNode,
+	compiler->Report (CS_REPORTER_SEVERITY_WARNING, errorNode,
 	  "Could not get combiner from '%s'", comb->classId.GetData());
 	return false;
       }
     }
     
     // Two outputs are needed: color (usually from the fragment part)...
-    const Snippet::Technique* outTechnique;
-    Snippet::Technique::Output theOutput;
-    if (!FindOutput (graph, "rgba", combiner, outTechnique, theOutput))
+    const Snippet::Technique* outTechniqueColor;
+    Snippet::Technique::Output theColorOutput;
+    if (!FindOutput (graph, "rgba", combiner, outTechniqueColor, theColorOutput))
     {
-      compiler->Report (CS_REPORTER_SEVERITY_WARNING, passNode,
+      compiler->Report (CS_REPORTER_SEVERITY_WARNING, errorNode,
 	"No suitable color output found");
       return false;
     }
@@ -197,29 +339,50 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     Snippet::Technique::Output thePosOutput;
     if (!FindOutput (graph, "position4_screen", combiner, outTechniquePos, thePosOutput))
     {
-      compiler->Report (CS_REPORTER_SEVERITY_WARNING, passNode,
+      compiler->Report (CS_REPORTER_SEVERITY_WARNING, errorNode,
 	"No suitable position output found");
       return false;
     }
     
+    // Optional: fragment depth
+    const Snippet::Technique* outTechniqueDepth;
+    Snippet::Technique::Output theDepthOutput;
+    bool hasOutputDepth = FindOutput (graph, "depth", combiner,
+      outTechniqueDepth, theDepthOutput);
+    
     
     // Generate special technique for output
-    CS::Utility::ScopedDelete<Snippet::Technique> generatedOutput (
-      snippet->CreatePassthrough ("output", "rgba"));
-    graph.AddTechnique (generatedOutput);
+    CS::Utility::ScopedDelete<Snippet::Technique> generatedOutputColor (
+      snippet->CreatePassthrough ("outputColor", "rgba"));
+    graph.AddTechnique (generatedOutputColor);
     {
       TechniqueGraph::Connection conn;
-      conn.from = outTechnique;
-      conn.to = generatedOutput;
+      conn.from = outTechniqueColor;
+      conn.to = generatedOutputColor;
       graph.AddConnection (conn);
+    }
+    csRef<Snippet::Technique> generatedOutputDepth;
+    generatedOutputDepth.AttachNew (
+      snippet->CreatePassthrough ("outputDepth", "depth"));
+    if (hasOutputDepth)
+    {
+      graph.AddTechnique (generatedOutputDepth);
+      {
+	TechniqueGraph::Connection conn;
+	conn.from = outTechniqueDepth;
+	conn.to = generatedOutputDepth;
+	graph.AddConnection (conn);
+      }
     }
     /*
       - Starting from our output nodes, collect all nodes that go into them.
         These will be emitted.
       - For each node perform input/output renaming.
      */
-    SynthesizeNodeTree synthTree (this);
-    synthTree.AddAllInputNodes (graph, generatedOutput, combiner);
+    SynthesizeNodeTree synthTree (*this);
+    synthTree.AddAllInputNodes (graph, generatedOutputColor, combiner);
+    if (hasOutputDepth)
+      synthTree.AddAllInputNodes (graph, generatedOutputDepth, combiner);
     synthTree.AddAllInputNodes (graph, outTechniquePos, combiner);
     // The input linking works better if "top" nodes come first
     synthTree.ReverseNodeArray();
@@ -257,6 +420,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	while (inputIt->HasNext())
 	{
 	  const Snippet::Technique::Input& inp = inputIt->Next();
+	  // Sanity
+	  if (node.inputLinks.Contains (inp.name))
+	  {
+            if (compiler->do_verbose)
+              compiler->Report (CS_REPORTER_SEVERITY_WARNING,
+                inp.node, "Duplicate input named '%s' of snippet '%s'",
+                inp.name.GetData(), node.tech->snippetName);
+            continue;
+	  }
 
 	  const Snippet::Technique* sourceTech;
           const Snippet::Technique::Output* output;
@@ -287,8 +459,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
           nodeAnnotation.Append (GetAnnotation ("Input: %s %s -",
             inp.type.GetData(), inp.name.GetData()));
           if (!(inp.isPrivate)
-            && FindInput (graph, combiner, nodeAnnotation, node.tech, inp, 
-            sourceTech, output, usedOutputs))
+            && (FindExplicitInput (graph, combiner, nodeAnnotation, node.tech, inp, 
+              sourceTech, output, usedOutputs)
+            || FindInput (graph, combiner, nodeAnnotation, node.tech, inp, 
+              sourceTech, output, usedOutputs)))
           {
             nodeAnnotation.Append (
               GetAnnotation (" found match: %s %s from %s\n",
@@ -313,7 +487,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
               // Subtle: may add nodes to the node tree
               synthTree.AugmentCoerceChain (compiler, tempComb, 
                 combiner, coerceChain, graph, node, inp.name,
-                sourceTech);
+                sourceTech, output->name);
 	    }
 	  }
 	  else
@@ -341,7 +515,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
                 break;
 	      case Snippet::Technique::Input::Complex:
 	        {
-                  if (prevInput != 0)
+		  bool prevInputIsDepOfNode = prevInput
+		    // Connections where from is node.tech, to is prevInput->node->tech
+		    && graph.IsDependencyOf (node.tech, prevInput->node->tech);
+                  if ((prevInput != 0) && !prevInputIsDepOfNode)
                   {
                     const StringStringHash& srcInputLinks = 
                       synthTree.GetNodeForTech (prevInput->node->tech).inputLinks;
@@ -351,12 +528,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       	    
                     node.inputLinks.Put (inp.name, linkFromName);
 
-                    // There's now a dependency on the node providing prevInput.
-                    TechniqueGraph::Connection conn;
-                    conn.from = prevInput->node->tech;
-                    conn.to = node.tech;
-                    conn.weak = true;
-                    newConnections.Push (conn);
+		    /* Previous node == this node can happen if one node
+                       uses the same input tag twice */
+		    if (prevInput->node->tech != node.tech)
+		    {
+                      // There's now a dependency on the node providing prevInput.
+                      TechniqueGraph::Connection conn;
+                      conn.from = prevInput->node->tech;
+                      conn.to = node.tech;
+                      conn.inputConnection = true;
+                      newConnections.Push (conn);
+		    }
                   }
                   else
                   {
@@ -366,13 +548,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
                     if (!inp.condition.IsEmpty())
                       emit.conditions.Push (inp.condition);
                     emit.tag = tag;
-                    size_t index = emitInputs.Push (emit);
-                    if (!tag.IsEmpty() && !inp.noMerge)
-                      taggedInputs.Put (tag, index);
+                    if (prevInputIsDepOfNode)
+                    {
+                      /* "Previous" node is a dependency of current node. So 
+                         adding a dependency on the previous node would cause
+                         a circular dep. So instead swap out all deps on 
+                         the previous node with the current node. */
+                      graph.SwitchTechs (prevInput->node->tech, node.tech, true);
+                    }
+                    else
+                    {
+		      size_t index = emitInputs.Push (emit);
+		      if (!tag.IsEmpty() && !inp.noMerge)
+			taggedInputs.Put (tag, index);
+		    }
                     
                     csString inpOutputName;
 	            inpOutputName.Format ("in_%s", inp.name.GetData());
                     node.inputLinks.Put (inp.name, inpOutputName);
+                    
                   }
                 }
 	        break;
@@ -464,7 +658,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     synthTree.Collapse (graph);
     {
       csArray<const Snippet::Technique*> outputs;
-      outputs.Push (generatedOutput);
+      outputs.Push (generatedOutputColor);
+      if (hasOutputDepth) outputs.Push (generatedOutputDepth);
       outputs.Push (outTechniquePos);
       synthTree.Rebuild (graph, outputs);
     }
@@ -563,24 +758,30 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     {
       csString outputRenamed = 
-	synthTree.GetNodeForTech (generatedOutput).outputRenames.Get (
-	  "output", (const char*)0);
+	synthTree.GetNodeForTech (generatedOutputColor).outputRenames.Get (
+	  "outputColor", (const char*)0);
       CS_ASSERT(!outputRenamed.IsEmpty());
       
-      combiner->SetOutput (outputRenamed,
+      combiner->SetOutput (rtaColor0, outputRenamed,
         GetAnnotation ("Map color output"));
     }
+    if (hasOutputDepth)
+    {
+      csString outputRenamed = 
+	synthTree.GetNodeForTech (generatedOutputDepth).outputRenames.Get (
+	  "outputDepth", (const char*)0);
+      CS_ASSERT(!outputRenamed.IsEmpty());
+      
+      combiner->SetOutput (rtaDepth, outputRenamed,
+        GetAnnotation ("Map depth output"));
+    }
     
-    defaultCombiner->WriteToPass (passNode);
-    combiner->WriteToPass (passNode);
     return true;
   }
   
-  bool Synthesizer::FindOutput (const TechniqueGraph& graph,
-                                const char* desiredType,
-                                WeaverCommon::iCombiner* combiner,
-                                const Snippet::Technique*& outTechnique,
-                                Snippet::Technique::Output& theOutput)
+  bool Synthesizer::SynthesizeTechnique::FindOutput (const TechniqueGraph& graph,
+    const char* desiredType, WeaverCommon::iCombiner* combiner,
+    const Snippet::Technique*& outTechnique, Snippet::Technique::Output& theOutput)
   {
     outTechnique = 0;
     /* Search for an output of a type.
@@ -651,7 +852,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     return outTechnique != 0;
   }
       
-  bool Synthesizer::FindInput (const TechniqueGraph& graph,
+  bool Synthesizer::SynthesizeTechnique::FindInput (
+    const TechniqueGraph& graph,
     WeaverCommon::iCombiner* combiner,
     csString& nodeAnnotation,
     const Snippet::Technique* receivingTech, 
@@ -693,6 +895,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  {
 	    const Snippet::Technique::Output& outp = outputIt->Next();
 	    if (usedOutputs.Contains (&outp)) continue;
+	    /* If we really end up using the same output twice coercions
+	     * should be folded later on */
+	    if (outp.coercionOutput) continue;
             nodeAnnotation.Append (
               GetAnnotation (" trying %s %s of %s: ",
                 outp.type.GetData(), outp.name.GetData(),
@@ -766,7 +971,101 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     return result;
   }
       
-  WeaverCommon::iCombiner* Synthesizer::GetCombiner (
+  bool Synthesizer::SynthesizeTechnique::FindExplicitInput (
+    const TechniqueGraph& graph,
+    WeaverCommon::iCombiner* combiner,
+    csString& nodeAnnotation,
+    const Snippet::Technique* receivingTech, 
+    const Snippet::Technique::Input& input,
+    const Snippet::Technique*& sourceTech,
+    const Snippet::Technique::Output*& output,
+    UsedOutputsHash& usedOutputs)
+  {
+    const TechniqueGraph::ExplicitConnectionsHash* explicitConns =
+      graph.GetExplicitConnections (receivingTech);
+    if (!explicitConns) return false;
+    
+    uint coerceCost = WeaverCommon::NoCoercion;
+    TechniqueGraph::ExplicitConnectionsHash::ConstIterator connIt (
+      explicitConns->GetIterator (input.name));
+    while (connIt.HasNext())
+    {
+      const TechniqueGraph::ExplicitConnectionSource* src =
+        &connIt.Next ();
+    
+      const WeaverCommon::TypeInfo* inputTypeInfo = 
+	WeaverCommon::QueryTypeInfo (input.type);
+    
+      const Snippet::Technique* tech = src->from;
+      CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique::Output> > 
+	outputIt (tech->GetOutputs());
+      while (outputIt->HasNext())
+      {
+	const Snippet::Technique::Output& outp = outputIt->Next();
+	if (usedOutputs.Contains (&outp)) continue;
+	if (outp.name != src->outputName) continue;
+	nodeAnnotation.Append (
+	  GetAnnotation (" trying explicit %s %s of %s: ",
+	    outp.type.GetData(), outp.name.GetData(),
+	    tech->snippetName));
+	if (outp.type == input.type)
+	{
+	  nodeAnnotation.Append ("match\n");
+	  sourceTech = tech;
+	  output = &outp;
+	  usedOutputs.AddNoTest (output);
+	  return true;
+	}
+	uint cost = combiner->CoerceCost (outp.type, input.type);
+	nodeAnnotation.Append ((cost == WeaverCommon::NoCoercion)
+	  ? "no coercion\n" : GetAnnotation ("cost %u\n", cost));
+	if (cost < coerceCost)
+	{
+	  sourceTech = tech;
+	  output = &outp;
+	  if (cost == 0)
+	  {
+	    usedOutputs.AddNoTest (output);
+	    return true;
+	  }
+	  coerceCost = cost;
+	}
+	// See if maybe we can just drop a property.
+	const WeaverCommon::TypeInfo* outputTypeInfo = 
+	  WeaverCommon::QueryTypeInfo (outp.type);
+	if (inputTypeInfo && outputTypeInfo
+	  && (outputTypeInfo->baseType == inputTypeInfo->baseType)
+	  && (outputTypeInfo->samplerIsCube == inputTypeInfo->samplerIsCube)
+	  && (outputTypeInfo->dimensions == inputTypeInfo->dimensions)
+	  && ((outputTypeInfo->semantics == inputTypeInfo->semantics)
+	    || (inputTypeInfo->semantics == WeaverCommon::TypeInfo::NoSemantics))
+	  && ((outputTypeInfo->space == inputTypeInfo->space)
+	    || (inputTypeInfo->space == WeaverCommon::TypeInfo::NoSpace))
+	  && ((outputTypeInfo->unit == inputTypeInfo->unit)
+	    || (!inputTypeInfo->unit)))
+	{
+	  bool b = compiler->annotateCombined 
+	    && (rand() <= int (INT_MAX * 0.005));
+	  nodeAnnotation.Append (
+	    GetAnnotation ("drop a prop%s\n", b ? " like it's hot" : ""));
+	  sourceTech = tech;
+	  output = &outp;
+	  usedOutputs.AddNoTest (output);
+	  return true;
+	}
+      }
+    }
+
+    bool result = coerceCost != WeaverCommon::NoCoercion;
+    if (result)
+    {
+      usedOutputs.AddNoTest (output);
+    }
+    
+    return result;
+  }
+      
+  WeaverCommon::iCombiner* Synthesizer::SynthesizeTechnique::GetCombiner (
       WeaverCommon::iCombiner* used, 
       const Snippet::Technique::CombinerPlugin& comb,
       const Snippet::Technique::CombinerPlugin& requested,
@@ -781,7 +1080,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     return used;
   }
 
-  csString Synthesizer::GetInputTag (WeaverCommon::iCombiner* combiner,
+  csString Synthesizer::SynthesizeTechnique::GetInputTag (
+    WeaverCommon::iCombiner* combiner,
     const Snippet::Technique::CombinerPlugin& comb, 
     const Snippet::Technique::CombinerPlugin& combTech,
     const Snippet::Technique::Input& input)
@@ -840,7 +1140,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         newName.Format ("%s_%zu", outp.name.GetData(), renameNr++);
         node.outputRenames.Put (outp.name, newName);
         combiner->AddGlobal (newName, outp.type,
-          synth->GetAnnotation ("Unique name for snippet \"%s<%d>\" output \"%s\"", 
+          synthTech.GetAnnotation ("Unique name for snippet \"%s<%d>\" output \"%s\"", 
             node.tech->snippetName, node.tech->priority, outp.name.GetData()));
       }
     }
@@ -888,12 +1188,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   }
   
   void Synthesizer::SynthesizeNodeTree::AugmentCoerceChain (
-    WeaverCompiler* compiler, 
+    const WeaverCompiler* compiler, 
     const Snippet::Technique::CombinerPlugin& combinerPlugin,
     WeaverCommon::iCombiner* combiner, 
     WeaverCommon::iCoerceChainIterator* linkChain,  
     TechniqueGraph& graph, Node& inNode, 
-    const char* inName, const Snippet::Technique* outTech)
+    const char* inName, const Snippet::Technique* outTech,
+    const char* outName)
   {
     {
       TechniqueGraph::Connection conn;
@@ -903,6 +1204,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     }
 
     const Snippet::Technique* lastTech = outTech;
+    const Snippet::Technique* tech2 = 0;
     while (linkChain->HasNext())
     {
       Snippet* snippet;
@@ -929,7 +1231,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       scratchSnippets.Push (snippet);
 
       Snippet::Technique* tech = 
-        snippet->LoadLibraryTechnique (compiler, link, combinerPlugin);
+        snippet->LoadLibraryTechnique (/*compiler, */link, combinerPlugin, true);
       augmentedTechniques.Push (tech);
       graph.AddTechnique (tech);
       TechniqueGraph::Connection conn;
@@ -937,31 +1239,57 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       conn.to = tech;
       graph.AddConnection (conn);
       lastTech = tech;
+      if (tech2 == 0) tech2 = tech;
       
       Node* node = nodeAlloc.Alloc();
       node->tech = tech;
       ComputeRenames (*node, combiner);
       techToNode.Put (tech, nodes.Push (node));
     }
+    
+    if (tech2 != 0)
+    {
+      TechniqueGraph::ExplicitConnectionsHash& explicitConns =
+	graph.GetExplicitConnections (tech2);
+	
+      const char* inpName;
+      CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique::Input> > 
+	inputIt (tech2->GetInputs());
+      if (inputIt->HasNext())
+      {
+	const Snippet::Technique::Input& inp = inputIt->Next();
+	inpName = inp.name;
+      }
+      else
+      {
+	/* error? */
+	return;
+      }
+      
+      TechniqueGraph::ExplicitConnectionSource& explicitSrc =
+        explicitConns.GetOrCreate (inpName);
+      explicitSrc.from = outTech;
+      explicitSrc.outputName = outName;
+    }
+    
     TechniqueGraph::Connection conn;
     conn.from = lastTech;
     conn.to = inNode.tech;
     graph.AddConnection (conn);
-    
     {
       CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique::Output> > 
-        outputIt (lastTech->GetOutputs());
+	outputIt (lastTech->GetOutputs());
       if (outputIt->HasNext())
       {
-        const Snippet::Technique::Output& outp = outputIt->Next();
-        
-        const csString& linkFromName = 
-          GetNodeForTech (lastTech).outputRenames.Get (outp.name, (const char*)0);
-        inNode.inputLinks.Put (inName, linkFromName);
+	const Snippet::Technique::Output& outp = outputIt->Next();
+	
+	const csString& linkFromName = 
+	  GetNodeForTech (lastTech).outputRenames.Get (outp.name, (const char*)0);
+	inNode.inputLinks.Put (inName, linkFromName);
       }
       else
       {
-        /* error? */
+	/* error? */
       }
     }
   }
@@ -1078,33 +1406,43 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
             /* Inputs are the same - we can remove the new node, but have to 
                make sure the nodes that depend on it get fixed up. */
             csArray<const Snippet::Technique*> deps;
-            graph.GetDependants (node->tech, deps);
-            for (size_t d = 0; d < deps.GetSize(); d++)
-            {
-              Node& dependentNode = GetNodeForTech (deps[d]);
-              StringStringHash::GlobalIterator inputLinkIt (
-                dependentNode.inputLinks.GetIterator());
-              while (inputLinkIt.HasNext ())
-              {
-                csString inputName;
-                csString& outputName = inputLinkIt.Next (inputName);
-
-                const csString* orgOutput = node->outputRenames.GetKeyPointer (
-                  outputName);
-                if (orgOutput)
-                {
-                  outputName = seenNode->outputRenames.Get (*orgOutput, 
-                    (const char*)0);
-                }
-              }
-
-              TechniqueGraph::Connection newConn;
-              newConn.from = seenNode->tech;
-              newConn.to = deps[d];
-              graph.AddConnection (newConn);
-            }
-            graph.RemoveTechnique (node->tech);
-            node->tech = 0;
+	    csFIFO<Node*> nodesToCheck;
+	    nodesToCheck.Push (node);
+	    while (nodesToCheck.GetSize() > 0)
+	    {
+	      Node* checkNode = nodesToCheck.PopTop();
+	      if (checkNode->tech == 0) continue;
+	      deps.Empty();
+	      graph.GetDependants (checkNode->tech, deps);
+	      for (size_t d = 0; d < deps.GetSize(); d++)
+	      {
+		Node& dependentNode = GetNodeForTech (deps[d]);
+		StringStringHash::GlobalIterator inputLinkIt (
+		  dependentNode.inputLinks.GetIterator());
+		while (inputLinkIt.HasNext ())
+		{
+		  csString inputName;
+		  csString& outputName = inputLinkIt.Next (inputName);
+  
+		  const csString* orgOutput = node->outputRenames.GetKeyPointer (
+		    outputName);
+		  if (orgOutput)
+		  {
+		    outputName = seenNode->outputRenames.Get (*orgOutput, 
+		      (const char*)0);
+		  }
+		}
+  
+		TechniqueGraph::Connection newConn;
+		newConn.from = seenNode->tech;
+		newConn.to = deps[d];
+		graph.AddConnection (newConn);
+		
+		nodesToCheck.Push (&dependentNode);
+	      }
+	    }
+	    graph.RemoveTechnique (node->tech);
+	    node->tech = 0;
 
             // We changed the tree, so do another collapse pass
             tryCollapse = true;

@@ -1,0 +1,10 @@
+SubDir TOP plugins rendermanager shadow_pssm ;
+
+Description rm_shadow_pssm : "Rendermanager (PSSM shadows)" ;
+
+Plugin rm_shadow_pssm : 
+  [ Wildcard *.cpp *.h ]
+  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) $(DOTDOT) include csplugincommon rendermanager ] : *.h ]
+;
+CompileGroups rm_shadow_pssm : rendermanagers ;
+LinkWith rm_shadow_pssm : crystalspace ;

@@ -278,6 +278,32 @@ protected: // 'protected' allows access by test-suite.
     }
     return true;
   }
+  /**
+   * Free all objects without releasing the memory blocks themselves.
+   * This works almost as DisposeAll but does not free the memory.
+   * \param disposer Disposer object that is passed to DestroyObject().
+   */
+  template<typename Disposer>
+  void FreeAll (Disposer& disposer)
+  {
+    insideDisposeAll = true;
+    csBitArray const mask(GetAllocationMap());
+    size_t node = 0;
+    for (size_t b = 0, bN = blocks.b.GetSize(); b < bN; b++)
+    {
+      for (uint8 *p = blocks.b[b], *pN = p + blocksize; p < pN; p += elsize)
+      {
+        if (mask.IsBitSet(node++))
+        {
+          DestroyObject (disposer, p);
+          FreeNode* f = (FreeNode*)p;
+          f->next = freenode;
+          freenode = f;          
+        }
+      }
+    }
+    insideDisposeAll = false;
+  }
 
   /// Find and allocate a block
   void* AllocCommon ()

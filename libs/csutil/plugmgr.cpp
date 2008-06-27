@@ -85,7 +85,7 @@ public:
 
 csPluginManager::csPluginManager (iObjectRegistry* object_reg) 
   : scfImplementationType (this), object_reg (object_reg),
-  Plugins (8, 8), OptionList (16, 16)
+  Plugins (8), OptionList (16)
 {
 }
 

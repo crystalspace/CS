@@ -58,8 +58,8 @@ public:
 
   iObjectRegistry *objreg;
   csRef<iShaderManager> shaderManager;
-  csStringID string_object2world;
-  csStringID string_world2camera;
+  CS::ShaderVarStringID string_object2world;
+  CS::ShaderVarStringID string_world2camera;
   csLightShaderVarCache lsvCache;
 private:
   bool isOpen;

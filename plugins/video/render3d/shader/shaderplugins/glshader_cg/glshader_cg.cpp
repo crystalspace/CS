@@ -67,6 +67,7 @@ void csGLShader_CG::ErrorHandler (CGcontext context, CGerror error,
 				  void* appData)
 {
   csGLShader_CG* This = reinterpret_cast<csGLShader_CG*> (appData);
+  if (This->doIgnoreErrors) return;
 
   bool doVerbose;
   csRef<iVerbosityManager> verbosemgr (
@@ -328,6 +329,11 @@ bool csGLShader_CG::Open()
     enable = false;
     return false;
   }
+  
+  ext->InitGL_ARB_vertex_program();
+  ext->InitGL_ARB_fragment_program();
+  ext->InitGL_NV_gpu_program4();
+  ext->InitGL_EXT_gpu_program_parameters();
 
   enableVP = config->GetBool ("Video.OpenGL.Shader.Cg.Enable.Vertex", true);
   enableFP = config->GetBool ("Video.OpenGL.Shader.Cg.Enable.Fragment", true);
@@ -398,6 +404,10 @@ bool csGLShader_CG::Open()
   if (debugDump)
     dumpDir = CS::StrDup (config->GetStr ("Video.OpenGL.Shader.Cg.DebugDumpDir",
     "/tmp/cgdump/"));
+    
+  cgSetAutoCompile (context, CG_COMPILE_MANUAL);
+  cgGLSetDebugMode (config->GetBool ("Video.OpenGL.Shader.Cg.CgDebugMode",
+    false));
  
   // Determining what profile to use:
   //  Start off with the highest supported profile.

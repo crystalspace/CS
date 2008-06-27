@@ -155,8 +155,9 @@ void csGLShader_FIXED::Open()
       || ext->CS_GL_ARB_texture_env_crossbar;
   }
   
-  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
-    object_reg, "crystalspace.shared.stringset");
+  csRef<iShaderVarStringSet> strings = 
+    csQueryRegistryTagInterface<iShaderVarStringSet> (object_reg,
+      "crystalspace.shader.variablenameset");
   lsvCache.SetStrings (strings);
 
   bool verbose = false;

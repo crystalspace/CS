@@ -21,7 +21,9 @@
 #define __CS_ENGINE_H__
 
 #include "csgeom/math3d.h"
+#include "csplugincommon/rendermanager/renderview.h"
 #include "csutil/array.h"
+#include "csutil/cfgacc.h"
 #include "csutil/csobject.h"
 #include "csutil/hash.h"
 #include "csutil/set.h"
@@ -37,6 +39,7 @@
 #include "iengine/campos.h"
 #include "iengine/engine.h"
 #include "iengine/renderloop.h"
+#include "iengine/rendermanager.h"
 #include "igraphic/imageio.h"
 #include "iutil/cache.h"
 #include "iutil/comp.h"
@@ -61,9 +64,15 @@
 #include "plugins/engine/3d/rview.h"
 #include "plugins/engine/3d/sharevar.h"
 
-class csCamera;
+#include "reflectomotron3000.h"
+
+CS_PLUGIN_NAMESPACE_BEGIN(Engine)
+{
+  class csLight;
+}
+CS_PLUGIN_NAMESPACE_END(Engine)
+
 class csEngine;
-class csLight;
 class csLightPatchPool;
 class csMaterialList;
 class csMeshWrapper;
@@ -189,6 +198,8 @@ struct csImposterUpdateQueue
   csWeakRefArray<csImposterProcTex> queue;
 };
 
+using namespace CS_PLUGIN_NAMESPACE_NAME(Engine);
+
 /**
  * The 3D engine.
  * This class manages all components which comprise a 3D world including
@@ -198,7 +209,7 @@ class csEngine : public scfImplementationExt5<csEngine, csObject,
   iEngine, iComponent, iPluginConfig, iDebugHelper, iEventHandler>
 {
   // friends
-  friend class csLight;
+  friend class CS_PLUGIN_NAMESPACE_NAME(Engine)::csLight;
   friend class csLightIt;
   friend class csRenderLoop;
   friend class csSectorList;
@@ -501,6 +512,8 @@ public:
   //-- Camera handling
 
   virtual csPtr<iCamera> CreateCamera ();
+  virtual csPtr<iPerspectiveCamera> CreatePerspectiveCamera ();
+  virtual csPtr<iCustomMatrixCamera> CreateCustomMatrixCamera (iCamera* copyFrom = 0);
 
   virtual iCameraPosition* FindCameraPosition (const char* name,
     iBase* base = 0);
@@ -574,6 +587,12 @@ public:
 
   virtual uint GetCurrentFrameNumber () const
   { return currentFrameNumber; }
+  virtual void UpdateNewFrame ()
+  { 
+    currentFrameNumber++; 
+    envTexHolder.NextFrame ();
+    ControlMeshes ();
+  }
 
   //-- Saving/loading
 
@@ -718,6 +737,8 @@ public:
    */
   void HandleImposters ();
 
+  iMaterialWrapper* GetDefaultPortalMaterial () const
+  { return defaultPortalMaterial; }
 private:
   // -- PRIVATE METHODS
 
@@ -787,12 +808,13 @@ private:
   /**
    * Add a halo attached to given light to the engine.
    */
-  void AddHalo (iCamera* camera, csLight* Light);
+  void AddHalo (iCamera* camera,
+    CS_PLUGIN_NAMESPACE_NAME(Engine)::csLight* Light);
 
   /**
    * Remove halo attached to given light from the engine.
    */
-  void RemoveHalo (csLight* Light);
+  void RemoveHalo (CS_PLUGIN_NAMESPACE_NAME(Engine)::csLight* Light);
 
   //Sector event helpers
   void FireNewSector (iSector* sector);
@@ -810,14 +832,18 @@ private:
    * this forces the search to be global. In this case 'global' will be set
    * to true.
    */
-  char* SplitRegionName(const char* name, iRegion*& region, bool& global);
-  char* SplitCollectionName(const char* name, iCollection*& collection, bool& global);
+  const char* SplitRegionName(const char* name, iRegion*& region, bool& global);
+  const char* SplitCollectionName(const char* name, iCollection*& collection, bool& global);
 
   // Precache a single mesh
   void PrecacheMesh (iMeshWrapper* s, iRenderView* rview);
 
   iMeshObjectType* GetThingType ();
 
+  iRenderManager* GetRenderManager () { return renderManager; }
+  void SetRenderManager (iRenderManager*);
+  void ReloadRenderManager (csConfigAccess& cfg);
+  void ReloadRenderManager ();
 public:
   // -- PUBLIC MEMBERS. THESE ARE FOR CONVENIANCE WITHIN ENGINE PLUGIN
 
@@ -826,8 +852,10 @@ public:
 
   /// Remember iObjectRegistry.
   iObjectRegistry* objectRegistry;
-  /// The global material/shader string set
+  /// The global string set
   csRef<iStringSet> globalStringSet;
+  /// The shader variable name string set
+  csRef<iShaderVarStringSet> svNameStringSet;
   /// The 3D driver
   csRef<iGraphics3D> G3D;
   /// Pointer to the shader manager
@@ -837,12 +865,18 @@ public:
   csRef<iVirtualClock> virtualClock;
 
   /// Store engine shadervar names
-  csStringID id_creation_time;
-  csStringID id_lod_fade;
+  CS::ShaderVarStringID id_creation_time;
+  CS::ShaderVarStringID id_lod_fade;
+  CS::ShaderVarStringID svTexEnvironmentName;
+
+  csRef<iRenderManager> renderManager;
+  EnvTex::Holder envTexHolder;
+
   /// For triangle meshes.
   csStringID colldet_id;
   csStringID viscull_id;
   csStringID base_id;
+
   /**
    * This is the Virtual File System object where all the files
    * used by the engine live. Textures, models, data, everything -
@@ -873,12 +907,18 @@ public:
   // \todo move back to private and make accessible
   csRef<iShader> defaultShader;
 
+  /// Shader variable names for light SVs
+  csLightShaderVarCache lightSvNames;
+  
+  /// Get the shader attenuation texture SV
+  csShaderVariable* GetLightAttenuationTextureSV();
 private:
 
   // -- PRIVATE MEMBERS
 
   /// Pool from which to allocate render views.
   csRenderView::Pool rviewPool;
+  CS::RenderManager::RenderView::Pool rmRviewPool;
 
   // -- Object lists
   /**
@@ -1056,13 +1096,18 @@ private:
   csRef<iMeshObjectType> thingMeshType;
   
   /// Current render context (proc texture) or 0 if global.
-  iTextureHandle* currentRenderContext; 
+  iTextureHandle* currentRenderContext;
+  
+  /// Default portal material
+  csRef<iMaterialWrapper> defaultPortalMaterial;
 
   /**
    * List of imposters that need to be rendered to texture.
    * There is a different list for every distinct camera instance.
    */
   csHash<csImposterUpdateQueue,long> imposterUpdateQueue;
+  
+  csRef<csShaderVariable> lightAttenuationTexture;
 
   CS_DECLARE_SYSTEM_EVENT_SHORTCUTS;
   csEventID CanvasResize;

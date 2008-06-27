@@ -1648,6 +1648,8 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
 
   stringSet = csQueryRegistryTagInterface<iStringSet> (
     object_reg, "crystalspace.shared.stringset");
+  stringSetSvName = csQueryRegistryTagInterface<iShaderVarStringSet> (
+    object_reg, "crystalspace.shader.variablenameset");
 
   threadedloader.AttachNew(new csThreadedLoader(this));
 
@@ -2999,6 +3001,12 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
       case XMLTOKEN_NOSHADOWS:
         stemp->GetFlags ().Set (CS_ENTITY_NOSHADOWS, CS_ENTITY_NOSHADOWS);
         break;
+      case XMLTOKEN_NOSHADOWCAST:
+        stemp->GetFlags ().Set (CS_ENTITY_NOSHADOWCAST, CS_ENTITY_NOSHADOWCAST);
+        break;
+      case XMLTOKEN_NOSHADOWRECEIVE:
+        stemp->GetFlags ().Set (CS_ENTITY_NOSHADOWRECEIVE, CS_ENTITY_NOSHADOWRECEIVE);
+        break;
       case XMLTOKEN_NOCLIP:
         stemp->GetFlags ().Set (CS_ENTITY_NOCLIP, CS_ENTITY_NOCLIP);
         break;
@@ -3014,6 +3022,13 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
         break;
       case XMLTOKEN_DETAIL:
         stemp->GetFlags ().Set (CS_ENTITY_DETAIL, CS_ENTITY_DETAIL);
+        break;
+      case XMLTOKEN_STATICLIT:
+        stemp->GetFlags ().Set (CS_ENTITY_STATICLIT, CS_ENTITY_STATICLIT);
+        break;
+      case XMLTOKEN_LIMITEDSHADOWCAST:
+        stemp->GetFlags ().Set (CS_ENTITY_LIMITEDSHADOWCAST,
+          CS_ENTITY_LIMITEDSHADOWCAST);
         break;
       case XMLTOKEN_IMPOSTER:
         {
@@ -3238,6 +3253,20 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       else
         mesh->GetFlags ().Set (CS_ENTITY_NOSHADOWS, CS_ENTITY_NOSHADOWS);
       break;
+    case XMLTOKEN_NOSHADOWCAST:
+      TEST_MISSING_MESH
+      if (recursive)
+        mesh->SetFlagsRecursive (CS_ENTITY_NOSHADOWCAST, CS_ENTITY_NOSHADOWCAST);
+      else
+        mesh->GetFlags ().Set (CS_ENTITY_NOSHADOWCAST, CS_ENTITY_NOSHADOWCAST);
+      break;
+    case XMLTOKEN_NOSHADOWRECEIVE:
+      TEST_MISSING_MESH
+      if (recursive)
+        mesh->SetFlagsRecursive (CS_ENTITY_NOSHADOWRECEIVE, CS_ENTITY_NOSHADOWRECEIVE);
+      else
+        mesh->GetFlags ().Set (CS_ENTITY_NOSHADOWRECEIVE, CS_ENTITY_NOSHADOWRECEIVE);
+      break;
     case XMLTOKEN_NOCLIP:
       TEST_MISSING_MESH
       if (recursive)
@@ -3274,6 +3303,22 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
         mesh->SetFlagsRecursive (CS_ENTITY_DETAIL, CS_ENTITY_DETAIL);
       else
         mesh->GetFlags ().Set (CS_ENTITY_DETAIL, CS_ENTITY_DETAIL);
+      break;
+    case XMLTOKEN_STATICLIT:
+      TEST_MISSING_MESH
+      if (recursive)
+        mesh->SetFlagsRecursive (CS_ENTITY_STATICLIT, CS_ENTITY_STATICLIT);
+      else
+        mesh->GetFlags ().Set (CS_ENTITY_STATICLIT, CS_ENTITY_STATICLIT);
+      break;
+    case XMLTOKEN_LIMITEDSHADOWCAST:
+      TEST_MISSING_MESH
+      if (recursive)
+        mesh->SetFlagsRecursive (CS_ENTITY_LIMITEDSHADOWCAST,
+          CS_ENTITY_LIMITEDSHADOWCAST);
+      else
+        mesh->GetFlags ().Set (CS_ENTITY_LIMITEDSHADOWCAST,
+          CS_ENTITY_LIMITEDSHADOWCAST);
       break;
     case XMLTOKEN_ZFILL:
       TEST_MISSING_MESH
@@ -3520,7 +3565,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
         //create a new variable
         const char* varname = child->GetAttributeValue ("name");
 	csRef<csShaderVariable> var;
-	var.AttachNew (new csShaderVariable (stringSet->Request (varname)));
+	var.AttachNew (new csShaderVariable (stringSetSvName->Request (varname)));
 	if (!SyntaxService->ParseShaderVar (ldr_context, child, *var))
         {
 	  SyntaxService->ReportError (
@@ -4815,6 +4860,7 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
   csVector3 attenvec (0, 0, 0);
   float spotfalloffInner = 1, spotfalloffOuter = 0;
   csLightType type = CS_LIGHT_POINTLIGHT;
+  csFlags lightFlags;
 
   bool use_light_transf = false;
   bool use_light_transf_vector = false;
@@ -5157,7 +5203,7 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
 	{
 	  const char* varname = child->GetAttributeValue ("name");
 	  csRef<csShaderVariable> var;
-	  var.AttachNew (new csShaderVariable (stringSet->Request (varname)));
+	  var.AttachNew (new csShaderVariable (stringSetSvName->Request (varname)));
 	  if (!SyntaxService->ParseShaderVar (ldr_context, child, *var))
 	  {
 	    SyntaxService->ReportError (
@@ -5168,6 +5214,14 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
 	  }
 	  //svc->AddVariable (var);
 	  shader_variables.Push(var);
+	}
+	break;
+      case XMLTOKEN_NOSHADOWS:
+	{
+	  bool flag;
+	  if (!SyntaxService->ParseBool (child, flag, true))
+	    return false;
+	  lightFlags.SetBool (CS_LIGHT_NOSHADOWS, flag);
 	}
 	break;
     default:
@@ -5188,6 +5242,7 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
   	dist, color, dyn);
   AddToRegionOrCollection (ldr_context, l->QueryObject ());
   l->SetType (type);
+  l->GetFlags() = lightFlags;
   l->SetSpotLightFalloff (spotfalloffInner, spotfalloffOuter);
 
   for (size_t i = 0; i < shader_variables.GetSize (); i++)
@@ -6105,45 +6160,13 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
       return false;
     }
   }
-
-  const char* name = shaderNode->GetAttributeValue ("name");
-  if (ldr_context->CheckDupes () && name)
+  
+  csRef<iShader> shader = SyntaxService->ParseShader (ldr_context, shaderNode);
+  if (shader.IsValid())
   {
-    iShader* shader = shaderMgr->GetShader (name);
-    if (shader)
-    {
-      AddToRegionOrCollection (ldr_context, shader->QueryObject ());
-      return true;
-    }
-  }
-
-  const char* type = shaderNode->GetAttributeValue ("compiler");
-  if (type == 0)
-    type = shaderNode->GetAttributeValue ("type");
-  if (type == 0)
-  {
-    SyntaxService->ReportError ("crystalspace.maploader", shaderNode,
-      "'compiler' attribute is missing!");
-
-    return false;
-  }
-  csRef<iShaderCompiler> shcom = shaderMgr->GetCompiler (type);
-  if (!shcom.IsValid()) 
-  {
-    SyntaxService->ReportError ("crystalspace.maploader", shaderNode,
-      "Could not get shader compiler '%s'", type);
-    return false;
-  }
-  csRef<iShader> shader = shcom->CompileShader (ldr_context, shaderNode);
-  if (shader)
-  {
-    shader->SetFileName(fileChild->GetContentsValue ());
     AddToRegionOrCollection (ldr_context, shader->QueryObject ());
-    shaderMgr->RegisterShader (shader);
   }
-  else 
-    return false;
-  return true;
+  return shader.IsValid();
 }
 
 void csLoader::CollectAllChildren (iMeshWrapper* meshWrapper,

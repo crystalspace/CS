@@ -97,6 +97,20 @@ public:
   /// Check if all the given flags are set.
   bool CheckAll (uint32 mask) const
   { return (flags & mask) == mask; }
+  
+  
+  /// Check if two sets of flags are equal
+  bool operator== (const csFlags& other) const
+  { return flags == other.flags; }
+  /// Check if two sets of flags are not equal
+  bool operator!= (const csFlags& other) const
+  { return flags != other.flags; }
+  /// AND-combine two sets of flags  
+  csFlags operator& (const csFlags& other) const
+  { return csFlags (flags & other.flags); }
+  
+  csFlags operator~() const
+  { return csFlags (~flags); }
 };
 
 #endif // __CS_FLAGS_H__

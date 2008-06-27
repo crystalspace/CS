@@ -78,8 +78,8 @@ void csFrustumView::RestoreFrustumContext (csFrustumContext *original)
 
 //---------------------------------------------------------------------------
 
-csShadowBlock::csShadowBlock (uint32 region, int max_shadows, int delta) 
-  : scfImplementationType (this), next(0), prev(0), shadows(max_shadows, delta), 
+csShadowBlock::csShadowBlock (uint32 region, int max_shadows) 
+  : scfImplementationType (this), next(0), prev(0), shadows(max_shadows), 
   shadow_region (region), bbox_valid (false)
 {
 }

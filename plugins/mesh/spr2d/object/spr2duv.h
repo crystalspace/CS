@@ -104,7 +104,7 @@ protected:
   class frameVector : public csArray<csSprite2DUVAnimationFrame*>
   {
   public:
-    frameVector () : csArray<csSprite2DUVAnimationFrame*> (8, 16){}
+    frameVector () : csArray<csSprite2DUVAnimationFrame*> (8){}
     static int CompareKey (csSprite2DUVAnimationFrame* const& item,
 			   char const* const& key)
     {

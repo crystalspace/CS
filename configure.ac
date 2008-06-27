@@ -13,7 +13,7 @@ AC_PREREQ([2.56])
 #	Keep this value synchronized with CS/include/csver.h,
 #	CS/docs/texinfo/version.txi, and CS/mk/autoconf/crystal.m4.
 #------------------------------------------------------------------------------
-m4_define([cs_version_number], [1.3])
+m4_define([cs_version_number], [1.9])
 
 
 
@@ -1337,10 +1337,21 @@ CS_CHECK_LIB_WITH([bullet],
       btSequentialImpulseConstraintSolver* s;
       btDefaultCollisionConfiguration* c;
       btDynamicsWorld* world = new btDiscreteDynamicsWorld (d, b, s, c)])],
-    [], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libbullet], [BULLET])], [],
+    [], [C++], [], [],
     [], [], [-lbulletdynamics -lbulletcollision -lbulletmath],
     [bulletdynamics])
 
+AS_IF([test $cs_cv_libbullet = yes],
+    [CS_CHECK_BUILD([if bullet is sufficiently recent (>=2.68)], [cs_cv_bullet_recent],
+	[AC_LANG_PROGRAM(
+	    [[#include "btBulletDynamicsCommon.h"]],
+	    [btManifoldPoint *p = new btManifoldPoint();
+             p->m_appliedImpulse;])],
+	[], [C++],
+	[CS_EMIT_BUILD_RESULT([cs_cv_bullet_recent], [BULLET])], [], [],
+	[$cs_cv_libbullet_cflags],
+	[$cs_cv_libbullet_lflags],
+	[$cs_cv_libbullet_libs])])
 
 
 #------------------------------------------------------------------------------

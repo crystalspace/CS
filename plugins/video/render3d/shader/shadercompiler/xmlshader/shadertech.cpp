@@ -39,15 +39,6 @@ CS_LEAKGUARD_IMPLEMENT (csXMLShaderTech);
 
 //---------------------------------------------------------------------------
 
-iRenderBuffer* csXMLShaderTech::last_buffers[shaderPass::STREAMMAX*2];
-iRenderBuffer* csXMLShaderTech::clear_buffers[shaderPass::STREAMMAX*2];
-size_t csXMLShaderTech::lastBufferCount;
-
-iTextureHandle* csXMLShaderTech::last_textures[shaderPass::TEXTUREMAX];
-iTextureHandle* csXMLShaderTech::clear_textures[shaderPass::TEXTUREMAX];
-int csXMLShaderTech::textureUnits[shaderPass::TEXTUREMAX];
-size_t csXMLShaderTech::lastTexturesCount;
-
 csXMLShaderTech::csXMLShaderTech (csXMLShader* parent) : 
   passes(0), passesCount(0), currentPass((size_t)~0),
   xmltokens (parent->compiler->xmltokens)
@@ -55,16 +46,11 @@ csXMLShaderTech::csXMLShaderTech (csXMLShader* parent) :
   csXMLShaderTech::parent = parent;
 
   do_verbose = parent->compiler->do_verbose;
-
-  int i;
-  for (i = 0; i < shaderPass::TEXTUREMAX; i++)
-    textureUnits[i] = i;
 }
 
 csXMLShaderTech::~csXMLShaderTech()
 {
   delete[] passes;
-  cs_free (metadata.description);
 }
 
 static inline bool IsDestalphaMixmode (uint mode)
@@ -72,11 +58,12 @@ static inline bool IsDestalphaMixmode (uint mode)
   return (mode == CS_FX_DESTALPHAADD);
 }
 
-bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass, 
+bool csXMLShaderTech::LoadPass (iDocumentNode *node, ShaderPass* pass, 
                                 size_t variant)
 {
   iSyntaxService* synldr = parent->compiler->synldr;
   iStringSet* strings = parent->compiler->strings;
+  iShaderVarStringSet* stringsSvName = parent->compiler->stringsSvName;
 
   //Load shadervar block
   csRef<iDocumentNode> varNode = node->GetNode(
@@ -206,6 +193,12 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
       synldr->ParseBool(nodeFlipCulling, pass->flipCulling, false);
     }
 
+    csRef<iDocumentNode> nodeZOffset = node->GetNode ("zoffset");
+    if (nodeZOffset)
+    {
+      synldr->ParseBool (nodeZOffset, pass->zoffset, false);
+    }
+
 
     pass->wmRed = true;
     pass->wmGreen = true;
@@ -333,7 +326,7 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
 	if (cname == 0)
 	  cname = source;
 
-        csStringID varID = strings->Request (cname);
+        CS::ShaderVarStringID varID = stringsSvName->Request (cname);
         pass->custommapping_id.Push (varID);
         //pass->bufferGeneric[pass->bufferCount] = CS_VATTRIB_IS_GENERIC (attrib);
 
@@ -357,7 +350,7 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
 	{
 	  pass->custommapping_attrib.Push (attrib);
 	  pass->custommapping_buffer.Push (sourceName);
-          pass->custommapping_id.Push (csInvalidStringID);
+          pass->custommapping_id.Push (CS::InvalidShaderVarStringID);
 	  /* Those buffers are mapped by default to some specific vattribs; 
 	   * since they are now to be mapped to some generic vattrib,
 	   * turn off the default map. */
@@ -379,7 +372,6 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
 
 
   //get texturemappings
-  pass->textureCount = 0;
   it = node->GetNodes (xmltokens.Request (
     csXMLShaderCompiler::XMLTOKEN_TEXTURE));
   while(it->HasNext ())
@@ -402,10 +394,42 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
       }
 
       if (texUnit < 0) continue;
-      csStringID varID = strings->Request (mapping->GetAttributeValue("name"));
-      pass->textureID[texUnit] = varID;
-
-      pass->textureCount = MAX(pass->textureCount, texUnit + 1);
+      
+      ShaderPass::TextureMapping texMap;
+      
+      const char* compareMode = mapping->GetAttributeValue ("comparemode");
+      const char* compareFunc = mapping->GetAttributeValue ("comparefunc");
+      if (compareMode && compareFunc)
+      {
+        if (strcmp (compareMode, "rToTexture") == 0)
+          texMap.texCompare.mode = CS::Graphics::TextureComparisonMode::compareR;
+        else if (strcmp (compareMode, "none") == 0)
+          texMap.texCompare.mode = CS::Graphics::TextureComparisonMode::compareNone;
+	else
+	{
+          SetFailReason ("invalid texture comparison mode '%s'",
+	    compareMode);
+          return false;
+	}
+      
+        if (strcmp (compareFunc, "lequal") == 0)
+          texMap.texCompare.function = CS::Graphics::TextureComparisonMode::funcLEqual;
+        else if (strcmp (compareFunc, "gequal") == 0)
+          texMap.texCompare.function = CS::Graphics::TextureComparisonMode::funcGEqual;
+	else
+	{
+          SetFailReason ("invalid texture comparison function '%s'",
+	    compareMode);
+          return false;
+	}
+      }
+      
+      CS::Graphics::ShaderVarNameParser parser (
+        mapping->GetAttributeValue("name"));
+      texMap.id = stringsSvName->Request (parser.GetShaderVarName ());
+      parser.FillArrayWithIndices (texMap.indices);
+      texMap.textureUnit = texUnit;
+      pass->textures.Push (texMap);
     }
   }
 
@@ -431,7 +455,7 @@ bool csXMLShaderCompiler::LoadSVBlock (iLoaderContext* ldr_context,
 }
 
 csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (
-  iShaderDestinationResolver* resolve, iDocumentNode* node, shaderPass* /*pass*/,
+  iShaderDestinationResolver* resolve, iDocumentNode* node, ShaderPass* /*pass*/,
   size_t variant)
 {
   if (node->GetAttributeValue("plugin") == 0)
@@ -560,19 +584,15 @@ bool csXMLShaderTech::Load (iLoaderContext* ldr_context,
   if (varNode)
     parent->compiler->LoadSVBlock (ldr_context, varNode, &svcontext);
 
-  // copy over metadata from parent
-  metadata.description = CS::StrDup (parent->allShaderMeta.description);
-  metadata.numberOfLights = node->GetAttributeValueAsInt ("lights");
-
   //alloc passes
-  passes = new shaderPass[passesCount];
+  passes = new ShaderPass[passesCount];
   uint i;
   for (i = 0; i < passesCount; i++)
   {
-    shaderPass& pass = passes[i];
+    ShaderPass& pass = passes[i];
     pass.alphaMode.autoAlphaMode = true;
     pass.alphaMode.autoModeTexture = 
-      strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
+      parent->compiler->stringsSvName->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
   }
 
 
@@ -600,7 +620,7 @@ bool csXMLShaderTech::ActivatePass (size_t number)
 
   currentPass = number;
 
-  shaderPass *thispass = &passes[currentPass];
+  ShaderPass* thispass = &passes[currentPass];
   if(thispass->vproc) thispass->vproc->Activate ();
   if(thispass->vp) thispass->vp->Activate ();
   if(thispass->fp) thispass->fp->Activate ();
@@ -623,7 +643,7 @@ bool csXMLShaderTech::DeactivatePass ()
 {
   if(currentPass>=passesCount)
     return false;
-  shaderPass *thispass = &passes[currentPass];
+  ShaderPass* thispass = &passes[currentPass];
   currentPass = (size_t)~0;
 
   if(thispass->vproc) thispass->vproc->Deactivate ();
@@ -631,15 +651,15 @@ bool csXMLShaderTech::DeactivatePass ()
   if(thispass->fp) thispass->fp->Deactivate ();
 
   iGraphics3D* g3d = parent->g3d;
-/*  g3d->SetBufferState(thispass->vertexattributes, clear_buffers, 
-    lastBufferCount);*/
   g3d->DeactivateBuffers (thispass->custommapping_attrib.GetArray (), 
-    (int)lastBufferCount);
-  lastBufferCount=0;
+    (int)thispass->custommapping_attrib.GetSize ());
 
-  g3d->SetTextureState(textureUnits, clear_textures, 
-    (int)lastTexturesCount);
-  lastTexturesCount=0;
+  int texturesCount = (int)thispass->textures.GetSize();
+  CS_ALLOC_STACK_ARRAY(int, textureUnits, texturesCount);
+  for (int j = 0; j < texturesCount; j++)
+    textureUnits[j] = thispass->textures[j].textureUnit;
+  g3d->SetTextureState(textureUnits, 0, texturesCount);
+  g3d->SetTextureComparisonModes (textureUnits, 0, texturesCount);
   
   if (thispass->overrideZmode)
     g3d->SetZMode (oldZmode);
@@ -651,70 +671,81 @@ bool csXMLShaderTech::DeactivatePass ()
 
 bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh, 
 			         csRenderMeshModes& modes,
-			         const iShaderVarStack* stacks)
+			         const csShaderVariableStack& stack)
 {
   if(currentPass>=passesCount)
     return false;
 
   iGraphics3D* g3d = parent->g3d;
-  shaderPass *thispass = &passes[currentPass];
+  ShaderPass* thispass = &passes[currentPass];
 
   //first run the preprocessor
-  if(thispass->vproc) thispass->vproc->SetupState (mesh, modes, stacks);
+  if(thispass->vproc) thispass->vproc->SetupState (mesh, modes, stack);
 
+  size_t buffersCount = thispass->custommapping_attrib.GetSize ();
+  CS_ALLOC_STACK_ARRAY(iRenderBuffer*, customBuffers, buffersCount);
   //now map our buffers. all refs should be set
   size_t i;
   for (i = 0; i < thispass->custommapping_attrib.GetSize (); i++)
   {
     if (thispass->custommapping_buffer[i] != CS_BUFFER_NONE)
     {
-      last_buffers[i] = modes.buffers->GetRenderBuffer (
+      customBuffers[i] = modes.buffers->GetRenderBuffer (
 	thispass->custommapping_buffer[i]);
     }
-    else if (thispass->custommapping_id[i] < (csStringID)stacks->GetSize ())
+    else if (thispass->custommapping_id[i] < (csStringID)stack.GetSize ())
     {
       csShaderVariable* var = 0;
-      var = csGetShaderVariableFromStack (stacks, thispass->custommapping_id[i]);
+      var = csGetShaderVariableFromStack (stack, thispass->custommapping_id[i]);
       if (var)
-        var->GetValue(last_buffers[i]);
+        var->GetValue (customBuffers[i]);
       else
-        last_buffers[i] = 0;
+        customBuffers[i] = 0;
     }
     else
-      last_buffers[i] = 0;
+      customBuffers[i] = 0;
   }
   g3d->ActivateBuffers (modes.buffers, thispass->defaultMappings);
   g3d->ActivateBuffers (thispass->custommapping_attrib.GetArray (), 
-    last_buffers, (uint)thispass->custommapping_attrib.GetSize ());
-  lastBufferCount = thispass->custommapping_attrib.GetSize ();
+    customBuffers, (uint)buffersCount);
   
   //and the textures
-  int j;
-  for (j = 0; j < thispass->textureCount; j++)
+  size_t textureCount = thispass->textures.GetSize();
+  CS_ALLOC_STACK_ARRAY(int, textureUnits, textureCount);
+  CS_ALLOC_STACK_ARRAY(iTextureHandle*, textureHandles, textureCount);
+  CS_ALLOC_STACK_ARRAY(CS::Graphics::TextureComparisonMode, texCompare,
+    textureCount);
+  for (size_t j = 0; j < textureCount; j++)
   {
-    if (thispass->textureID[j] < (csStringID)stacks->GetSize ())
+    textureUnits[j] = thispass->textures[j].textureUnit;
+    if (size_t (thispass->textures[j].id) < stack.GetSize ())
     {
       csShaderVariable* var = 0;
-      var = csGetShaderVariableFromStack (stacks, thispass->textureID[j]);
+      var = csGetShaderVariableFromStack (stack, thispass->textures[j].id);
+      if (var != 0)
+        var = CS::Graphics::ShaderVarArrayHelper::GetArrayItem (var, 
+          thispass->textures[j].indices.GetArray(),
+          thispass->textures[j].indices.GetSize(),
+          CS::Graphics::ShaderVarArrayHelper::maFail);
       if (var)
       {
         iTextureWrapper* wrap;
-        var->GetValue(wrap);
+        var->GetValue (wrap);
         if (wrap) 
         {
           wrap->Visit ();
-          last_textures[j] = wrap->GetTextureHandle ();
+          textureHandles[j] = wrap->GetTextureHandle ();
         } else 
-          var->GetValue(last_textures[j]);
+          var->GetValue (textureHandles[j]);
       } else
-        last_textures[j] = 0;
+        textureHandles[j] = 0;
     }
     else
-      last_textures[j] = 0;
+      textureHandles[j] = 0;
+    texCompare[j] = thispass->textures[j].texCompare;
   }
-  g3d->SetTextureState (textureUnits, last_textures, 
-    thispass->textureCount);
-  lastTexturesCount = thispass->textureCount;
+  g3d->SetTextureState (textureUnits, textureHandles, textureCount);
+  g3d->SetTextureComparisonModes (textureUnits, texCompare, textureCount);
 
   modes = *mesh;
   if (thispass->alphaMode.autoAlphaMode)
@@ -722,10 +753,10 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
     iTextureHandle* tex = 0;
     if (thispass->alphaMode.autoModeTexture != csInvalidStringID)
     {
-      if (thispass->alphaMode.autoModeTexture < (csStringID)stacks->GetSize ())
+      if (thispass->alphaMode.autoModeTexture < (csStringID)stack.GetSize ())
       {
         csShaderVariable* var = 0;
-        var = csGetShaderVariableFromStack (stacks, thispass->alphaMode.autoModeTexture);
+        var = csGetShaderVariableFromStack (stack, thispass->alphaMode.autoModeTexture);
         if (var)
           var->GetValue (tex);
       }
@@ -750,16 +781,17 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   }
   parent->shadermgr->GetVariableAdd (
     parent->compiler->string_mixmode_alpha)->SetValue (alpha);
+  modes.zoffset = thispass->zoffset;
 
-  if(thispass->vp) thispass->vp->SetupState (mesh, modes, stacks);
-  if(thispass->fp) thispass->fp->SetupState (mesh, modes, stacks);
+  if(thispass->vp) thispass->vp->SetupState (mesh, modes, stack);
+  if(thispass->fp) thispass->fp->SetupState (mesh, modes, stack);
 
   return true;
 }
 
 bool csXMLShaderTech::TeardownPass ()
 {
-  shaderPass *thispass = &passes[currentPass];
+  ShaderPass* thispass = &passes[currentPass];
 
   if(thispass->vproc) thispass->vproc->ResetState ();
   if(thispass->vp) thispass->vp->ResetState ();
@@ -768,7 +800,49 @@ bool csXMLShaderTech::TeardownPass ()
   return true;
 }
 
-int csXMLShaderTech::GetPassNumber (shaderPass* pass)
+void csXMLShaderTech::GetUsedShaderVars (csBitArray& bits) const
+{
+  csDirtyAccessArray<csStringID> allNames;
+
+  for (size_t pass = 0; pass < passesCount; pass++)
+  {
+    ShaderPass* thispass = &passes[pass];
+
+    if(thispass->vproc)
+    {
+      thispass->vproc->GetUsedShaderVars (bits);
+    }
+
+    for (size_t i = 0; i < thispass->custommapping_attrib.GetSize (); i++)
+    {
+      CS::ShaderVarStringID id = thispass->custommapping_id[i];
+      if ((id != CS::InvalidShaderVarStringID) && (bits.GetSize() > id))
+      {
+        bits.SetBit (id);
+      }
+    }
+    for (size_t j = 0; j < thispass->textures.GetSize(); j++)
+    {
+      CS::ShaderVarStringID id = thispass->textures[j].id;
+      if ((id != CS::InvalidShaderVarStringID) && (bits.GetSize() > id))
+      {
+        bits.SetBit (id);
+      }
+    }
+
+    if(thispass->vp)
+    {
+      thispass->vp->GetUsedShaderVars (bits);
+    }
+
+    if(thispass->fp)
+    {
+      thispass->fp->GetUsedShaderVars (bits);
+    }
+  }
+}
+
+int csXMLShaderTech::GetPassNumber (ShaderPass* pass)
 {
   if ((pass >= passes) && (pass < passes + passesCount))
   {

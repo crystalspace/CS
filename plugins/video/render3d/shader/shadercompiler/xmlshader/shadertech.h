@@ -37,7 +37,7 @@ class csXMLShaderTech
 private:
   friend class csXMLShader;
 
-  struct shaderPass
+  struct ShaderPass : public CS::Memory::CustomAllocated
   {
     //mix and alpha mode
     uint mixMode;
@@ -45,36 +45,39 @@ private:
     csZBufMode zMode;
     bool overrideZmode;
     bool flipCulling;
+    bool zoffset;
 
-    shaderPass () 
+    ShaderPass () : zoffset (false)
     { 
       mixMode = CS_FX_MESH;
       overrideZmode = false;
       flipCulling = false;
       //setup default mappings
-      for (unsigned int i=0; i < STREAMMAX; i++)
+      for (unsigned int i=0; i < CS_VATTRIB_SPECIFIC_NUM; i++)
         defaultMappings[i] = CS_BUFFER_NONE;
 
       defaultMappings[CS_VATTRIB_POSITION] = CS_BUFFER_POSITION;
     }
 
-    enum
-    {
-      STREAMMAX = 16,
-      TEXTUREMAX = 16
-    };
-
     // buffer mappings
     // default mapping, index is csVertexAttrib (16 first), value is
     // csRenderBufferName
-    csRenderBufferName defaultMappings[STREAMMAX];
-    csArray<csStringID> custommapping_id;
+    csRenderBufferName defaultMappings[CS_VATTRIB_SPECIFIC_NUM];
+    csArray<CS::ShaderVarStringID> custommapping_id;
     csDirtyAccessArray<csVertexAttrib> custommapping_attrib;
     csArray<csRenderBufferName> custommapping_buffer;
 
     // texture mappings
-    csStringID textureID[TEXTUREMAX];
-    int textureCount;
+    struct TextureMapping
+    {
+      CS::ShaderVarStringID id;
+      csDirtyAccessArray<size_t, csArrayElementHandler<size_t>,
+	CS::Memory::LocalBufferAllocator<size_t, 2,
+	  CS::Memory::AllocatorMalloc, true> > indices;
+      int textureUnit;
+      CS::Graphics::TextureComparisonMode texCompare;
+    };
+    csArray<TextureMapping> textures;
 
     // programs
     csRef<iShaderProgram> vp;
@@ -90,23 +93,12 @@ private:
   //variable context
   csShaderVariableContext svcontext;
 
-  //optimization stuff
-  static iRenderBuffer* last_buffers[shaderPass::STREAMMAX*2];
-  static iRenderBuffer* clear_buffers[shaderPass::STREAMMAX*2];
-  //static csVertexAttrib vertexattributes[shaderPass::STREAMMAX*2];
-  static size_t lastBufferCount;
-
-  static iTextureHandle* last_textures[shaderPass::TEXTUREMAX];
-  static iTextureHandle* clear_textures[shaderPass::TEXTUREMAX];
-  static int textureUnits[shaderPass::TEXTUREMAX];
-  static size_t lastTexturesCount;
-
   //keep this so we can reset in deactivate
   bool orig_wmRed, orig_wmGreen, orig_wmBlue, orig_wmAlpha;
   csZBufMode oldZmode;
 
   //Array of passes
-  shaderPass* passes;
+  ShaderPass* passes;
   size_t passesCount;
 
   size_t currentPass;
@@ -116,20 +108,17 @@ private:
   bool do_verbose;
   csString fail_reason;
 
-  // metadata
-  csShaderMetadata metadata;
-
   // load one pass, return false if it fails
-  bool LoadPass (iDocumentNode *node, shaderPass *pass, size_t variant);
+  bool LoadPass (iDocumentNode *node, ShaderPass* pass, size_t variant);
   // load a shaderdefinition block
   //bool LoadSVBlock (iDocumentNode *node, iShaderVariableContext *context);
   // load a shaderprogram
   csPtr<iShaderProgram> LoadProgram (iShaderDestinationResolver* resolve,
-  	iDocumentNode *node, shaderPass *pass, size_t variant);
+  	iDocumentNode *node, ShaderPass* pass, size_t variant);
   // Set reason for failure.
   void SetFailReason (const char* reason, ...) CS_GNUC_PRINTF (2, 3);
 
-  int GetPassNumber (shaderPass* pass);
+  int GetPassNumber (ShaderPass* pass);
 public:
   CS_LEAKGUARD_DECLARE (csXMLShaderTech);
 
@@ -141,9 +130,10 @@ public:
   bool ActivatePass (size_t number);
   bool SetupPass  (const CS::Graphics::RenderMesh *mesh,
     CS::Graphics::RenderMeshModes& modes,
-    const iShaderVarStack* stacks);
+    const csShaderVariableStack& stack);
   bool TeardownPass();
   bool DeactivatePass();
+  void GetUsedShaderVars (csBitArray& bits) const;
 
   bool Load (iLoaderContext* ldr_context, iDocumentNode* node,
       iDocumentNode* parentSV, size_t variant);

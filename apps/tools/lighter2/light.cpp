@@ -25,11 +25,11 @@
 #include "scene.h"
 
 // Attenuation functions
-static float LightAttnNone (float, const csVector3&);
-static float LightAttnLinear (float, const csVector3&);
-static float LightAttnInverse (float, const csVector3&);
-static float LightAttnRealistic (float, const csVector3&);
-static float LightAttnCLQ (float, const csVector3&);
+static float LightAttnNone (float, const csVector4&);
+static float LightAttnLinear (float, const csVector4&);
+static float LightAttnInverse (float, const csVector4&);
+static float LightAttnRealistic (float, const csVector4&);
+static float LightAttnCLQ (float, const csVector4&);
 
 static lighter::LightAttenuationFunc attnFuncTable[] = 
 {
@@ -56,7 +56,7 @@ namespace lighter
 
   }
 
-  void Light::SetAttenuation (csLightAttenuationMode mode, const csVector3& constants)
+  void Light::SetAttenuation (csLightAttenuationMode mode, const csVector4& constants)
   {
     attenuationMode = mode;
     attenuationConsts = constants;
@@ -323,35 +323,35 @@ namespace lighter
 
 
 // Attenuation functions
-static float LightAttnNone (float, const csVector3&)
+static float LightAttnNone (float, const csVector4&)
 {
   /// no attenuation: *1
   return 1;
 }
 
-static float LightAttnLinear (float squaredDistance, const csVector3& c)
+static float LightAttnLinear (float squaredDistance, const csVector4& c)
 {
   /// linear attenuation:  * (1 - distance / radius)
-  return csMax (0.0f, 1.0f - (sqrtf (squaredDistance) / c.x));
+  return csMax (0.0f, 1.0f - (sqrtf (squaredDistance) / c.w));
 }
 
-static float LightAttnInverse (float squaredDistance, const csVector3&)
+static float LightAttnInverse (float squaredDistance, const csVector4&)
 {
   /// inverse attenuation:  * 1 / distance
   return 1.0f / sqrtf(squaredDistance);
 }
 
-static float LightAttnRealistic (float squaredDistance, const csVector3&)
+static float LightAttnRealistic (float squaredDistance, const csVector4&)
 {
   /// realistic attenuation: * 1 / distance^2
   return 1.0f / squaredDistance;
 }
 
-static float LightAttnCLQ (float squaredDistance, const csVector3& c)
+static float LightAttnCLQ (float squaredDistance, const csVector4& c)
 {
   /** 
    * CLQ, Constant Linear Quadratic: 
    * * 1 / (constant1 + constant2*distance + constant3*distance^2)
    */
-  return c * csVector3 (1, sqrtf(squaredDistance), squaredDistance);
+  return c * csVector4 (1, sqrtf(squaredDistance), squaredDistance, 0);
 }

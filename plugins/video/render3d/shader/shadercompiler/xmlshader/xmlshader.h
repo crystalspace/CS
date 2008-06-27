@@ -28,8 +28,8 @@
 
 #include "cpi/condition.h"
 
-struct iSyntaxService;
 struct iLoaderContext;
+struct iSyntaxService;
 struct iVFS;
 
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
@@ -87,6 +87,7 @@ public:
   //Standard vars
   iObjectRegistry* objectreg;
   csRef<iStringSet> strings;
+  csRef<iShaderVarStringSet> stringsSvName;
   csWeakRef<iGraphics3D> g3d;
   csRef<iSyntaxService> synldr;
   csRef<iVFS> vfs;
@@ -94,7 +95,12 @@ public:
   /// Condition constants
   csConditionConstants condConstants;
   
-  csStringID string_mixmode_alpha;
+  csRef<csConditionEvaluator> sharedEvaluator;
+  
+  csRef<iDocumentSystem> binDocSys;
+  csRef<iDocumentSystem> xmlDocSys;
+  
+  CS::ShaderVarStringID string_mixmode_alpha;
 
 #define CS_TOKEN_ITEM_FILE \
   "plugins/video/render3d/shader/shadercompiler/xmlshader/xmlshader.tok"

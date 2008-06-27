@@ -38,14 +38,12 @@ public:
   CS_LEAKGUARD_DECLARE (csShaderGLCGVP);
 
   csShaderGLCGVP (csGLShader_CG* shaderPlug) : 
-    csShaderGLCGCommon (shaderPlug, "cgvp") { }
+    csShaderGLCGCommon (shaderPlug, progVP) { }
 
   /// Compile a program
   virtual bool Compile();
 
   virtual csVertexAttrib ResolveBufferDestination (const char* binding);
-
-  virtual const char* GetProgramType() { return "vertex"; }
 };
 
 }

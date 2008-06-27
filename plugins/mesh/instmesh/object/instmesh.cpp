@@ -34,6 +34,7 @@
 #include "csutil/csmd5.h"
 #include "csutil/memfile.h"
 #include "csutil/sysfunc.h"
+#include "csutil/scfarray.h"
 #include "iengine/camera.h"
 #include "iengine/engine.h"
 #include "iengine/light.h"
@@ -933,7 +934,7 @@ Rules for color calculation:
 */
 
 void csInstmeshMeshObject::UpdateLighting (
-  const csArray<iLightSectorInfluence*>& lights,
+  const csSafeCopyArray<csLightInfluence>& lights,
   iMovable* movable)
 {
   size_t i;
@@ -1042,7 +1043,10 @@ void csInstmeshMeshObject::UpdateLighting (
       size_t num_lights = lights.GetSize ();
       for (size_t l = 0 ; l < num_lights ; l++)
       {
-        iLight* li = lights[l]->GetLight ();
+        iLight* li = lights[l].light;
+        if (!li)
+          continue;
+
         li->AddAffectedLightingInfo ((iLightingInfo*)this);
         affecting_lights.Add (li);
         UpdateLightingOne (trans, li);
@@ -1111,8 +1115,10 @@ csRenderMesh** csInstmeshMeshObject::GetRenderMeshes (
     if (!do_manual_colors && !do_shadow_rec && factory->light_mgr)
     {
       // Remember relevant lights for later.
-      relevant_lights = factory->light_mgr->GetRelevantLights (
-        logparent, -1, false);
+      scfArrayWrap<iLightInfluenceArray, csSafeCopyArray<csLightInfluence> > 
+        relevantLightsWrap (relevant_lights); //Yes, know, its on the stack...
+
+      factory->light_mgr->GetRelevantLights (logparent, &relevantLightsWrap, -1);
     }
 
     const csReversibleTransform o2wt = movable->GetFullTransform ();
@@ -1420,8 +1426,6 @@ csInstmeshMeshObjectFactory::csInstmeshMeshObjectFactory (
   light_mgr = csQueryRegistry<iLightManager> (object_reg);
 
   g3d = csQueryRegistry<iGraphics3D> (object_reg);
-  strings = csQueryRegistryTagInterface<iStringSet> (object_reg,
-    "crystalspace.shared.stringset");
 
   autonormals = false;
   autonormals_compress = true;
