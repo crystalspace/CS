@@ -41,15 +41,7 @@
 	ModelViewProj = vertexIn.ModelViewProj;
       </block>
     </input>
-    <input name="ModelView" type="float4x4" default="complex">
-      <block location="cg:vertexIn">
-	<uniform type="float4x4" name="ModelView" binding="state.matrix.modelview" />
-      </block>
-      
-      <block location="cg:vertexMain">
-	ModelView = vertexIn.ModelView;
-      </block>
-    </input>
+    <input file="/shader/snippets/ModelView.inp" private="yes" />
 
     <input file="/shader/snippets/objectToWorld.inp" private="yes" />
 

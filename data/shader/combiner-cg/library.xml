@@ -89,22 +89,7 @@
   <coercion from="position4_world" to="position4_camera" cost="4">
     <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
 	 verbatim -->
-    <input name="ModelView" type="float4x4" default="complex"
-	private="yes">
-      <block location="vertexIn">
-	<uniform type="float4x4" name="ModelView" binding="state.matrix.modelview" />
-      </block>
-      <block location="fragmentIn">
-	<uniform type="float4x4" name="ModelView" binding="state.matrix.modelview" />
-      </block>
-      
-      <block location="vertexMain">
-	ModelView = vertexIn.ModelView;
-      </block>
-      <block location="fragmentMain">
-	ModelView = fragmentIn.ModelView;
-      </block>
-    </input>
+    <input file="/shader/combiner-cg/ModelView.inp" private="yes" />
     
     <block location="vertexMain">
       output = mul (ModelView, input);
@@ -142,18 +127,13 @@
   <coercion from="direction_world" to="direction_camera" cost="3">
     <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
 	 verbatim -->
-    <input name="ModelView" type="float4x4" default="complex"
-	private="yes">
-      <block location="vertexIn">
-	<uniform type="float4x4" name="ModelView" binding="state.matrix.modelview" />
-      </block>
-      
-      <block location="vertexMain">
-	ModelView = vertexIn.ModelView;
-      </block>
-    </input>
+    <input file="/shader/combiner-cg/ModelView.inp" private="yes" />
     
     <block location="vertexMain">
+      output = mul (ModelView, float4 (input, 0)).xyz;
+    </block>
+    
+    <block location="fragmentMain">
       output = mul (ModelView, float4 (input, 0)).xyz;
     </block>
   </coercion>
@@ -281,24 +261,7 @@
   <coercion from="normal_object" to="normal_camera" cost="3">
     <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
 	 verbatim -->
-    <input name="ModelView" type="float4x4" default="complex"
-	private="yes">
-      <block location="vertexIn">
-	<uniform type="float4x4" name="ModelView" binding="state.matrix.modelview" />
-      </block>
-      
-      <block location="fragmentIn">
-	<uniform type="float4x4" name="ModelView" binding="state.matrix.modelview" />
-      </block>
-      
-      <block location="vertexMain">
-	ModelView = vertexIn.ModelView;
-      </block>
-      
-      <block location="fragmentMain">
-	ModelView = fragmentIn.ModelView;
-      </block>
-    </input>
+    <input file="/shader/combiner-cg/ModelView.inp" private="yes" />
     
     <block location="vertexMain">
       output = mul (ModelView, float4 (input, 0)).xyz;
