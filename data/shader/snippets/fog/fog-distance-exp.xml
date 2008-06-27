@@ -18,18 +18,24 @@
 <snippet>
   <technique priority="100">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
-    
-    <input name="perturbScaleXlate" type="float4" default="value" defval="1,1,0,0" />
-    <input name="N" type="normal_camera" />
-      
-    <block location="cg:fragmentMain">
-      result = N.xy * perturbScaleXlate.xy + perturbScaleXlate.zw;
-    </block>
 
+    <input name="distance" type="float" />
+    <input name="unfoggedColor" type="rgba" />
+    <input name="fogColor" type="rgba" default="value" defval="0,0,0,0"/>
+    <input name="fogDensity" type="float" default="value" defval="1" />
+    
     <block location="cg:vertexMain">
-      result = N.xy * perturbScaleXlate.xy + perturbScaleXlate.zw;
+      float f = 1-exp (-distance * fogDensity);
+      float4 fogFaded = fogColor*f;
+      foggedColor = unfoggedColor*(1-fogFaded.a) + fogFaded;
     </block>
     
-    <output name="result" type="float2" />
+    <block location="cg:fragmentMain">
+      float f = 1-exp (-distance * fogDensity);
+      float4 fogFaded = fogColor*f;
+      foggedColor = unfoggedColor*(1-fogFaded.a) + fogFaded;
+    </block>
+    
+    <output name="foggedColor" type="rgba" />
   </technique>
 </snippet>
