@@ -5822,6 +5822,28 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csShaderVariable_GetAccessor(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csShaderVariable *arg1 = (csShaderVariable *) 0 ;
+  iShaderVariableAccessor *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csShaderVariable_GetAccessor",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariable_GetAccessor" "', argument " "1"" of type '" "csShaderVariable const *""'"); 
+  }
+  arg1 = reinterpret_cast< csShaderVariable * >(argp1);
+  result = (iShaderVariableAccessor *)((csShaderVariable const *)arg1)->GetAccessor();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iShaderVariableAccessor, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_csShaderVariable_GetAccessorData(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csShaderVariable *arg1 = (csShaderVariable *) 0 ;
@@ -11930,6 +11952,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csShaderVariable_SetAccessor", _wrap_csShaderVariable_SetAccessor, METH_VARARGS, NULL},
 	 { (char *)"csShaderVariable_SetName", _wrap_csShaderVariable_SetName, METH_VARARGS, NULL},
 	 { (char *)"csShaderVariable_GetName", _wrap_csShaderVariable_GetName, METH_VARARGS, NULL},
+	 { (char *)"csShaderVariable_GetAccessor", _wrap_csShaderVariable_GetAccessor, METH_VARARGS, NULL},
 	 { (char *)"csShaderVariable_GetAccessorData", _wrap_csShaderVariable_GetAccessorData, METH_VARARGS, NULL},
 	 { (char *)"csShaderVariable_SetValue", _wrap_csShaderVariable_SetValue, METH_VARARGS, NULL},
 	 { (char *)"csShaderVariable_AddVariableToArray", _wrap_csShaderVariable_AddVariableToArray, METH_VARARGS, NULL},
