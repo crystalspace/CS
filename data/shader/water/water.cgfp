@@ -12,6 +12,20 @@ struct vert2frag
 	float4 TexCoord3	: TEXCOORD2;
 };
 
+// Calculated from 1.3333, which is approx. refraction index for water
+// R0 is: 
+// float const R0 =  pow(1.0-refractionIndexRatio, 2.0)  
+//                 / pow(1.0+refractionIndexRatio, 2.0); 
+const float R0 = 0.02040781341208;
+
+// Copied this from a NVidia doc
+// http://developer.nvidia.com/object/fresnel_wp.html
+float fresnel(float3 view, float3 normal) 
+{ 
+    // light and normal are assumed to be normalized  
+    return saturate(R0 + (1.0-R0) * pow(1.0-dot(view, normal), 5.0));
+}
+
 //---------------------------------------------------------------------------------
 //Shader entry
 //---------------------------------------------------------------------------------
@@ -43,10 +57,20 @@ float4 main (vert2frag IN,
 	
 	float4 specularColor = {1.0, 1.0, 1.0, 1.0};
 	float4 specular = specularColor * specularLight;
-		
+
+	float3 bumpNormal = N * 2 - 1;
+    bumpNormal.z *= 5;
+    bumpNormal = normalize(bumpNormal);
+
+	float4 reflection = IN.Color + specular;
+	
+	float fresnelFactor = fresnel(normalize(IN.CamVec), bumpNormal.xyz);
+    return float4(reflection.r, reflection.g, reflection.b, 1) * fresnelFactor;
+/*
 	float4 toRet = IN.Color + specular;
 	toRet.w = waterAlpha;
 	return toRet;
+*/
 //	return tex2D(TexNormal, IN.TexCoord2.xy);
 }
 

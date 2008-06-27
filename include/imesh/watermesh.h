@@ -89,6 +89,9 @@ struct iWaterFactoryState : public virtual iBase
 
   virtual void SetMurkiness(float murk) = 0;
   virtual float GetMurkiness() = 0;
+
+  //Size must be a power of two.
+  //virtual csRef<iTextureWrapper> MakeFresnelTex(int size);
 };
 
 /**

@@ -345,6 +345,8 @@ public:
 	void SetMurkiness(float murk);
 	float GetMurkiness();
 	
+	csRef<iTextureWrapper> MakeFresnelTex(int size);
+	
   /** @} */
 
   const csBox3& GetObjectBoundingBox ();

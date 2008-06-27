@@ -36,7 +36,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
-#include "iengine/sector.h"
+#include "iengine/texture.h"
+#include "igraphic/image.h"
 #include "iutil/objreg.h"
 #include "iutil/document.h"
 #include "iutil/plugin.h"
@@ -48,6 +49,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/rendermesh.h"
 #include "ivideo/fontserv.h"
 #include "ivideo/shader/shader.h"
+#include "ivideo/txtmgr.h"
 
 #include "watermesh.h"
 
@@ -491,6 +493,57 @@ void csWaterMeshObjectFactory::SetMurkiness(float murk)
 float csWaterMeshObjectFactory::GetMurkiness()
 {
 	return waterAlpha;
+}
+
+csRef<iTextureWrapper> csWaterMeshObjectFactory::MakeFresnelTex(int size)
+{
+	if(size < 0) return 0;
+	
+	float buf[size * size];
+	
+	int i, j;
+	
+	int maxDist = size >> 1;
+	
+	int n = 1.0 / 1.33333333;
+	float g, ratio;
+	int dist;
+	
+	float a, b, d, e;
+	
+	for(i = 0; i < size; i++)
+	{
+		for(j = 0; j < size; j++)
+		{
+			dist = (i - maxDist) * (i - maxDist) + (j - maxDist) * (j - maxDist);
+			
+			if(dist > maxDist * maxDist)
+			{
+				buf[i * size + j] = 1.0;
+			}
+			else
+			{
+				ratio = sqrt(dist / (maxDist * maxDist));
+				g = sqrt((ratio * ratio) - 1.0 + (n * n));
+				a = g - ratio;
+				b = g + ratio;
+				
+				d = (ratio * b - 1) * (ratio * b - 1);
+				e = (ratio * a + 1) * (ratio * a + 1);
+				
+				buf[i * size + j] = (0.5 * ((a * a) / (b * b))) * (1 + (d / e));
+			}
+		}
+	}
+	
+	// csRef<iTextureManager> texManager = csQueryRegistry<iTextureManager> (object_reg);
+	// csPtr<iTextureHandle> texHandle = texManager->CreateTexture(size, size, 
+	// 	csimg2D, "abgr8", CS_TEXTURE_2D);
+	// texHandle->Blit(0, 0, size, size, buf, iTextureHandle::BGRA8888);
+	
+	csRef<iTextureWrapper> fresnelTexWrapper;
+	// fresnelTexWrapper->SetTextureHandle(texHandle);
+	return fresnelTexWrapper;
 }
 
 void csWaterMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder, 
