@@ -21,6 +21,7 @@
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
     <input name="positionO" type="position4_object" />
+    <input name="positionC" type="position4_camera" />
     <input name="perturb" type="float2" default="value" defval="0,0" />
     
     <input name="texReflect" type="tex2d" default="complex">
@@ -36,6 +37,19 @@
 	texReflect = fragmentIn.texReflect;
       </block>
     </input>
+    <input name="texReflectDepth" type="tex2d" default="complex">
+      <block location="pass">
+	<texture name="tex plane reflect depth" destination="fragmentIn.texReflectDepth" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<uniform type="tex2d" name="texReflectDepth" />
+      </block>
+      
+      <block location="cg:fragmentMain">
+	texReflectDepth = fragmentIn.texReflectDepth;
+      </block>
+    </input>
     
     <input name="ModelViewProj" type="float4x4" default="complex" private="yes">
       <block location="cg:vertexIn">
@@ -47,6 +61,16 @@
       </block>
     </input>
     
+    <input name="ProjInv" type="float4x4" default="complex" private="yes">
+      <block location="cg:fragmentIn">
+	<uniform type="float4x4" name="ProjInv" binding="state.matrix.projection.inverse" />
+      </block>
+      
+      <block location="cg:fragmentMain">
+	ProjInv = fragmentIn.ProjInv;
+      </block>
+    </input>
+    
     <block location="cg:vertexToFragment">
       <varying type="position4" name="reflTC" />
     </block>
@@ -54,15 +78,30 @@
     <block location="cg:vertexMain">
       surfaceColor = float4 (0, 0, 0, 1);
       surfaceColor_attr_perfragment = true;
+      mirroredPointDist = 0;
       
       reflTC = mul (ModelViewProj, positionO);
       float halfW = reflTC.w * 0.5;
-      reflTC.xy = reflTC.xy * float2(0.5) + float2(halfW);
+      reflTC.xyz = reflTC.xyz * float3(0.5, 0.5, -0.5) + float3(halfW);
     </block>
     
     <block location="cg:fragmentMain">
       float3 tc = reflTC.xyw;
-      float perturbWeight = 1 / max (reflTC.w, 1);
+      float inv_reflW = 1 / reflTC.w;
+      
+      float camDepth = tex2Dproj (texReflectDepth, tc).x*-2 + 1;
+      float2 screenPos = (reflTC.xy * inv_reflW)*float2(2)-float2(1);
+      float4 positionProjected = float4 (
+        screenPos.x, screenPos.y, camDepth, 1);
+      float4 positionUnprojected = mul (ProjInv, positionProjected);
+      positionUnprojected /= positionUnprojected.w;
+      
+      float distPlaneFromEye = length (positionC.xyz);
+      float distRefrFromEye = length (positionUnprojected.xyz);
+      
+      mirroredPointDist = distRefrFromEye - distPlaneFromEye;
+      
+      float perturbWeight = min (inv_reflW, saturate (mirroredPointDist));
       tc.xy += perturb * perturbWeight;
       surfaceColor = tex2Dproj (texReflect, tc);
       surfaceColor_attr_perfragment = true;
@@ -71,5 +110,6 @@
     <output name="surfaceColor" type="rgba">
       <attribute name="perfragment" type="bool" />
     </output>
+    <output name="mirroredPointDist" type="float" />
   </technique>
 </snippet>

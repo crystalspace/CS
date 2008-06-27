@@ -227,8 +227,10 @@ int csShaderGLCGFP::ResolveTU (const char* binding)
     CGparameter parameter = cgGetNamedParameter (program, binding);
     if (parameter)
     {
-      if ((cgGetParameterBaseResource (parameter) == CG_TEXUNIT0) ||
-	(cgGetParameterBaseResource (parameter) == CG_TEX0))
+      CGresource baseRes = cgGetParameterBaseResource (parameter);
+      if (((baseRes == CG_TEXUNIT0) || (baseRes == CG_TEX0))
+          && (cgIsParameterUsed (parameter, program)
+            || cgIsParameterReferenced (parameter)))
       {
 	newTU = cgGetParameterResourceIndex (parameter);
       }

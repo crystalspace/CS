@@ -19,6 +19,7 @@
 -->
 <shader compiler="shaderweaver" name="reflect_water_plane">
   <shadervar name="water perturb scale" type="vector4">0.05,0.05,0,0</shadervar>
+  <shadervar name="water fog color" type="vector4">0,0.17,0.49,0.6</shadervar>
   <technique priority="200">
     <pass>
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -32,6 +33,7 @@
       <snippet id="hdrscalerefr" file="/shader/snippets/hdr-prescale.xml" />
       <snippet id="perturb_norm_refl" file="/shader/snippets/tcoffset2-perturb-normal.xml" />
       <snippet id="perturb_norm_refr" file="/shader/snippets/tcoffset2-perturb-normal.xml" />
+      <snippet id="fog_refraction" file="/shader/snippets/fog/fog-distance-exp.xml" />
       <snippet id="fresnel" file="/shader/snippets/reflect/fresnel.xml" />
       <snippet id="lerp_reflect_refract" file="/shader/snippets/lerp.xml" />
       <snippet id="apply_mixmode_alpha" file="/shader/snippets/mixmode-alpha.xml" />
@@ -51,11 +53,12 @@
       <connection from="perturb_norm_refr" to="refraction" />
       <connection from="reflection" to="hdrscalerefl" />
       <connection from="refraction" to="hdrscalerefr" />
+      <connection from="hdrscalerefr" to="fog_refraction" />
       <connection from="hdrscalerefl" to="lerp_reflect_refract">
 	<explicit from="result" to="b" />
       </connection>
-      <connection from="hdrscalerefr" to="lerp_reflect_refract">
-	<explicit from="result" to="a" />
+      <connection from="fog_refraction" to="lerp_reflect_refract">
+	<explicit from="foggedColor" to="a" />
       </connection>
       <connection from="fresnel" to="lerp_reflect_refract" />
       <connection from="lerp_reflect_refract" to="apply_mixmode_alpha" />
@@ -65,6 +68,22 @@
       
       <parameter id="texRefract" type="shadervar" weavertype="tex2d">tex plane refract</parameter>
       <connection from="texRefract" to="refraction" />
+      <parameter id="texRefractDepth" type="shadervar" weavertype="tex2d">tex plane refract depth</parameter>
+      <connection from="texRefractDepth" to="refraction" />
+      
+      <!-- Use the depth of the refraction to limit perturbation for the reflection as well -->
+      <connection from="texRefractDepth" to="reflection">
+	<explicit from="output" to="texReflectDepth" />
+      </connection>
+      <!-- @@@ FIXME: Workaround to prevent automatic pickup of refract depth as 
+	              the reflect color texture -->
+      <parameter id="texReflect" type="shadervar" weavertype="tex2d">tex plane reflect</parameter>
+      <connection from="texReflect" to="reflection">
+        <explicit from="output" to="texReflect" />
+      </connection>
+      
+      <parameter id="refractFogColor" type="shadervar" weavertype="rgba">water fog color</parameter>
+      <connection from="refractFogColor" to="fog_refraction" />
       
       <parameter id="perturbScaleSV" type="shadervar" weavertype="float4">water perturb scale</parameter>
       <connection from="perturbScaleSV" to="perturb_norm_refl" />

@@ -37,16 +37,21 @@ namespace CS
       {
         CS::ShaderVarStringID svTexPlaneRefl;
         CS::ShaderVarStringID svTexPlaneRefr;
+        CS::ShaderVarStringID svTexPlaneReflDepth;
+        CS::ShaderVarStringID svTexPlaneRefrDepth;
         
         CS::ShaderVarStringID svPlaneRefl;
         
         CS::ShaderVarStringID svClipPlaneReflRefr;
       
         TextureCache texCache;
+        TextureCache texCacheDepth;
         struct ReflectRefractSVs
         {
           csRef<csShaderVariable> reflectSV;
           csRef<csShaderVariable> refractSV;
+          csRef<csShaderVariable> reflectDepthSV;
+          csRef<csShaderVariable> refractDepthSV;
           
           csRef<iShaderVariableContext> clipPlaneReflContext;
           csRef<csShaderVariable> clipPlaneReflSV;
@@ -58,6 +63,10 @@ namespace CS
         
         PersistentData() :
 	  texCache (csimg2D, "rgb8",  // @@@ FIXME: Use same format as main view ...
+	    CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP
+	     | CS_TEXTURE_NPOTS | CS_TEXTURE_CLAMP | CS_TEXTURE_SCALE_UP,
+	    "target", 0),
+	  texCacheDepth (csimg2D, "d32",
 	    CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP
 	     | CS_TEXTURE_NPOTS | CS_TEXTURE_CLAMP | CS_TEXTURE_SCALE_UP,
 	    "target", 0)
@@ -73,18 +82,22 @@ namespace CS
 	  iShaderVarStringSet* strings = shaderManager->GetSVNameStringset();
 	  svTexPlaneRefl = strings->Request ("tex plane reflect");
 	  svTexPlaneRefr = strings->Request ("tex plane refract");
+	  svTexPlaneReflDepth = strings->Request ("tex plane reflect depth");
+	  svTexPlaneRefrDepth = strings->Request ("tex plane refract depth");
 	  
 	  svPlaneRefl = strings->Request ("plane reflection");
 	  svClipPlaneReflRefr = strings->Request ("clip plane reflection");
 	  
 	  csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objReg);
 	  texCache.SetG3D (g3d);
+	  texCacheDepth.SetG3D (g3d);
 	}
       
 	void UpdateNewFrame ()
 	{
 	  reflRefrCache.Empty();
 	  texCache.AdvanceFrame (csGetTicks ());
+	  texCacheDepth.AdvanceFrame (csGetTicks ());
 	}
       };
       
@@ -117,9 +130,14 @@ namespace CS
 	context.svArrays.SetupSVStack (localStack, layer, mesh.contextLocalId);
 
         bool usesReflTex = names.IsBitSetTolerant (persist.svTexPlaneRefl);
-        bool needReflTex = usesReflTex && !meshReflectRefract.reflectSV.IsValid();
+        bool usesReflDepthTex = names.IsBitSetTolerant (persist.svTexPlaneReflDepth);
+        bool needReflTex = (usesReflTex && !meshReflectRefract.reflectSV.IsValid())
+          || (usesReflDepthTex && !meshReflectRefract.reflectDepthSV.IsValid());
+          
         bool usesRefrTex = names.IsBitSetTolerant (persist.svTexPlaneRefr);
-        bool needRefrTex = usesRefrTex && !meshReflectRefract.refractSV.IsValid();
+        bool usesRefrDepthTex = names.IsBitSetTolerant (persist.svTexPlaneRefrDepth);
+        bool needRefrTex = usesRefrTex && !meshReflectRefract.refractSV.IsValid()
+          || (usesRefrDepthTex && !meshReflectRefract.refractDepthSV.IsValid());
                 
         // Compute reflect/refract plane
         csPlane3 reflRefrPlane;
@@ -194,9 +212,10 @@ namespace CS
         typename RenderTree::ContextNode* reflCtx = 0;
         typename RenderTree::ContextNode* refrCtx = 0;
         
-        if (usesReflTex)
+        if (usesReflTex || usesReflDepthTex)
         {
 	  csRef<csShaderVariable> svReflection;
+	  csRef<csShaderVariable> svReflectionDepth;
 	  
 	  if (needReflTex)
 	  {
@@ -227,8 +246,18 @@ namespace CS
 	    inewcam->SetMirrored (true);
 	    
 	    int txt_w = 512, txt_h = 512;
-	    csRef<iTextureHandle> tex = 
-	      persist.texCache.QueryUnusedTexture (txt_w, txt_h, 0);
+	    csRef<iTextureHandle> tex;
+	    csRef<iTextureHandle> texDepth;
+	    if (usesReflTex)
+	    {
+	      tex = 
+	        persist.texCache.QueryUnusedTexture (txt_w, txt_h, 0);
+	    }
+	    if (usesReflDepthTex)
+	    {
+	      texDepth = 
+	        persist.texCacheDepth.QueryUnusedTexture (txt_w, txt_h, 0);
+	    }
 	    
 	    // Set up context for reflection, clipped to plane
 	    csBox2 clipBox (0, 0, txt_w, txt_h);
@@ -238,6 +267,7 @@ namespace CS
   
 	    reflCtx = renderTree.CreateContext (reflView);
 	    reflCtx->renderTargets[rtaColor0].texHandle = tex;
+	    reflCtx->renderTargets[rtaDepth].texHandle = texDepth;
 	    reflCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
 	    reflCtx->shadervars = meshReflectRefract.clipPlaneReflContext;
 	      
@@ -246,20 +276,29 @@ namespace CS
 	    svReflection->SetValue (tex);
 	    meshReflectRefract.reflectSV = svReflection;
 	    
+	    svReflectionDepth.AttachNew (new csShaderVariable (
+	      persist.svTexPlaneReflDepth));
+	    svReflectionDepth->SetValue (texDepth);
+	    meshReflectRefract.reflectDepthSV = svReflectionDepth;
+	    
 	    renderTree.AddDebugTexture (tex);
+	    renderTree.AddDebugTexture (texDepth);
 	  }
 	  else
 	  {
 	    svReflection = meshReflectRefract.reflectSV;
+	    svReflectionDepth = meshReflectRefract.reflectDepthSV;
 	  }
 	  
 	  // Attach reflection texture to mesh
 	  localStack[persist.svTexPlaneRefl] = svReflection;
+	  localStack[persist.svTexPlaneReflDepth] = svReflectionDepth;
 	}
         
-        if (usesRefrTex)
+        if (usesRefrTex || usesRefrDepthTex)
         {
 	  csRef<csShaderVariable> svRefraction;
+	  csRef<csShaderVariable> svRefractionDepth;
 	  
 	  if (needRefrTex)
 	  {
@@ -274,8 +313,18 @@ namespace CS
     #include "csutil/custom_new_enable.h"
 	    
 	    int txt_w = 512, txt_h = 512;
-	    csRef<iTextureHandle> tex = 
-	      persist.texCache.QueryUnusedTexture (txt_w, txt_h, 0);
+	    csRef<iTextureHandle> tex;
+	    csRef<iTextureHandle> texDepth;
+	    if (usesRefrTex)
+	    {
+	      tex = 
+	        persist.texCache.QueryUnusedTexture (txt_w, txt_h, 0);
+	    }
+	    if (usesRefrDepthTex)
+	    {
+	      texDepth = 
+	        persist.texCacheDepth.QueryUnusedTexture (txt_w, txt_h, 0);
+	    }
 	    
 	    // Set up context for reflection, clipped to plane
 	    csBox2 clipBox (0, 0, txt_w, txt_h);
@@ -286,6 +335,7 @@ namespace CS
   
 	    refrCtx = renderTree.CreateContext (refrView);
 	    refrCtx->renderTargets[rtaColor0].texHandle = tex;
+	    refrCtx->renderTargets[rtaDepth].texHandle = texDepth;
 	    refrCtx->shadervars = meshReflectRefract.clipPlaneRefrContext;
 	      
 	    // Attach reflection texture to mesh
@@ -294,15 +344,23 @@ namespace CS
 	    svRefraction->SetValue (tex);
 	    meshReflectRefract.refractSV = svRefraction;
 	    
+	    svRefractionDepth.AttachNew (new csShaderVariable (
+	      persist.svTexPlaneRefrDepth));
+	    svRefractionDepth->SetValue (texDepth);
+	    meshReflectRefract.refractDepthSV = svRefractionDepth;
+	    
 	    renderTree.AddDebugTexture (tex);
+	    renderTree.AddDebugTexture (texDepth);
 	  }
   	  else
 	  {
 	    svRefraction = meshReflectRefract.refractSV;
+	    svRefractionDepth = meshReflectRefract.refractDepthSV;
 	  }
 	  
           // Attach refraction texture to mesh
 	  localStack[persist.svTexPlaneRefr] = svRefraction;
+	  localStack[persist.svTexPlaneRefrDepth] = svRefractionDepth;
 	}
         // Setup the new contexts
 	if (reflCtx) contextFunction (*reflCtx);
