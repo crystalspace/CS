@@ -34,9 +34,15 @@ namespace lighter
 
     // the squared distance to the search point
     float distance;
+    
+    // The direction for this node
+    int planeDir;
 
     Photon *left;
     Photon *right;
+
+    // Overload for the less than operator for use with the comparator
+    bool operator< (const Photon& right) const;
 
     Photon(const csColor& color, const csVector3& dir,
            const csVector3& pos);
@@ -68,7 +74,7 @@ namespace lighter
     * /param dir - The direction the given photon was traveling
     * /param pos - The position of the photon
     */
-    void addPhoton(const csColor& color, 
+    void AddPhoton(const csColor& color, 
                    const csVector3& dir, 
                    const csVector3& pos);
 
@@ -80,26 +86,40 @@ namespace lighter
     * /param normal - the normal to check for, anything radically different
     *                 will be not be added
     */
-    csColor sampleColor(const csVector3& pos,  float radius, 
+    csColor SampleColor(const csVector3& pos,  float radius, 
                         const csVector3& normal);
 
-    /**
-    * NearestNeighbor
-    * Searches the tree for the nearest neighbors and adds them to a
-    * priority heap.
-    * /param pos - the position to search for nearest neighbors
-    * /param radius - the maximum radius to search for
-    * /param number - the max number of elements to return
-    * /return the nearest number of photons as a heap
-    */
-   csArray<Photon*> nearestNeighbor(const csVector3& pos, float radius, 
+   /**
+   * NearestNeighbor
+   * Searches the tree for the nearest neighbors and adds them to a
+   * priority que. The idea is to use the radius to judge if we are 
+   * going to search a branch of the tree or not.
+   *
+   * /param pos - the position to search for nearest neighbors
+   * /param radius - the maximum radius to search for
+   * /param number - the max number of elements to return
+   * /return the nearest number of photons as a heap
+   */
+   csArray<Photon> NearestNeighbor(const csVector3& pos, float radius, 
                                          int number);
 
-    // helper for function for the heap
-    static bool photonComp(const Photon* a, const Photon* b);
+   /**
+   * In Range
+   * A basic sphere plane intersection test to check if the search area
+   * needs to search both the left and right sides of the tree.
+   * /param tar - the position of the plane 
+   * /param pos - the position of the requested search area
+   * /param distance - the distance the search radius extends
+   * /param direction - the direction that the plane faces
+   * /return true if both branches need to be searched or false if no
+   *         intersection with the plane
+   */
+   static bool InRange(const csVector3& tar, const csVector3& pos, 
+                       const float& distance, const int& direction);
 
   private:
-      
+    // number of photons to sample
+    int photonsPerSample;
 
     // The root of the tree
     Photon *root;

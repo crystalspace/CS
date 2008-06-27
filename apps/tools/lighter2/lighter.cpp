@@ -465,6 +465,11 @@ namespace lighter
       {
         csRef<Object> obj = gitr.Next();
         csArray<PrimitiveArray>& submeshArray = obj->GetPrimitives();
+        ObjectHash::GlobalIterator primItr = submeshArray.GetIterator();
+        while (primItr.HasNext())
+        {
+
+        }
       }
     }
   }

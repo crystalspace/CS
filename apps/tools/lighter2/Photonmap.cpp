@@ -4,12 +4,15 @@
 
 #include "Photonmap.h"
 #include "lighter.h"
+#include <csutil/priorityqueue.h>
 
 namespace lighter
 {
   PhotonMap::PhotonMap()
   {
     root = 0;
+    // photons per sample will need to be set from config eventually
+    photonsPerSample = 30;
   }
 
   PhotonMap::~PhotonMap()
@@ -17,7 +20,7 @@ namespace lighter
 
   }
 
-  void PhotonMap::addPhoton(const csColor& color, const csVector3& dir,
+  void PhotonMap::AddPhoton(const csColor& color, const csVector3& dir,
                             const csVector3& pos)
   {
     // check to see if we are the first photon to be added
@@ -44,6 +47,7 @@ namespace lighter
         else
         {
           current->left = new Photon(color, dir, pos);
+          current->left->planeDir = direction;
           return;
         }
       }
@@ -59,6 +63,7 @@ namespace lighter
         else
         {
            current->right = new Photon(color, dir, pos);
+           current->right->planeDir = direction;
            return;
         }
       }
@@ -67,22 +72,131 @@ namespace lighter
     }
   }
 
-  csColor PhotonMap::sampleColor(const csVector3& pos,  float radius, 
+
+  csColor PhotonMap::SampleColor(const csVector3& pos,  float radius, 
                                  const csVector3& normal)
   {
-    return csColor();
+    csArray<Photon> nearest = NearestNeighbor(pos, radius, photonsPerSample);
+    csColor final;
+
+    // loop through the nearest photons and based on their normal 
+    // add their color to the final returned value
+    for (int num = 0; num < nearest.GetSize(); num++)
+    {
+      csVector3 pnorm = nearest[num].direction;
+      float app = normal.x*pnorm.x + normal.y*pnorm.y + normal.z*pnorm.z;
+
+      // Check to make sure the two vectors aren't radically different or 
+      // possibly on the other side of a surface
+      if (!(app < 0))
+      {
+        // The wpc can be changed for filtering, default for now
+        float wpc = 1.0;
+        final.red += nearest[num].color.red*wpc;
+        final.green += nearest[num].color.green*wpc;
+        final.blue += nearest[num].color.blue*wpc;
+      }
+    }
+
+    // Now as long as we have photons returned multiply by area / PI
+    if (nearest.GetSize() != 0)
+    {
+      // TODO: Need to lookup constant value of pi somewhere....
+      float area = radius / 3.14159;
+      final = final * area;
+    }
+    return final;
   }
 
-  csArray<Photon*> nearestNeighbor(const csVector3& pos, float radius, 
-                                            int number)
+  csArray<Photon> PhotonMap::NearestNeighbor(const csVector3& pos, 
+                                             float radius, 
+                                             int number)
   {
-    //std::priority_queue<Photon*, std::vector<Photon*>, PhotonMap::photonComp> que;
-    return csArray<Photon*>();
+    CS::Utility::PriorityQueue<Photon> que;
+    csArray<Photon> finalOut;
+    csArray<Photon*> parents;
+    float radSquared = radius * radius;
+
+    // Traverse the tree in a depth first manner
+    parents.Push(root);
+    while (parents.GetSize() > 0)
+    {
+      Photon *current = parents.Pop();
+      
+      // check to see if the photon is in range with squared distances
+      csVector3 dist = current->position - pos;
+      float totalDist = dist.x*dist.x + dist.y*dist.y + dist.z*dist.z;
+
+      if (totalDist < radSquared)
+      {
+        Photon p = *current;
+        p.distance = totalDist;
+        que.Insert(p);
+      }
+
+      // check to see if we hit the intersection plane, if we do then
+      // we need to add both sides of the tree to the parent tree.
+      if (InRange(current->position, pos, radius, current->planeDir))
+      {
+        parents.Push(current->right);
+        parents.Push(current->left);
+      }
+      // else if we need check if its on the right or left
+      else if (pos[current->planeDir] <= 
+               current->position[current->planeDir])
+      {
+        // add just the left
+        parents.Push(current->left);
+      }
+      // at this point it has to be on the right so just add the right
+      else
+      {
+        parents.Push(current->right);
+      }
+    }
+
+    // remove as many element as it takes
+    while (finalOut.GetSize() <= number && !que.IsEmpty())
+    {
+      finalOut.Push(que.Pop());
+    }
+    return finalOut;
   }
 
-  bool PhotonMap::photonComp(const Photon* a, const Photon* b)
+  bool PhotonMap::InRange(const csVector3& tar, const csVector3& pos, 
+                          const float& distance, const int& direction)
   {
-    return a->distance < b->distance;
+    // get the points distance relative to the plane
+    csVector3 dist = pos - tar;
+    csVector3 normal;
+
+    // based on the direction set the normal
+    if (direction == DIRX)
+    {
+      normal = csVector3(1, 0, 0);
+    }
+    else if (direction == DIRY)
+    {
+      normal = csVector3(0, 1, 0);
+    }
+    else
+    {
+      normal = csVector3(0, 0, 1);
+    }
+
+    // now take the dot product of the normal and the point 
+    // for total the total distance to the plane
+    float tDist = dist.x*normal.x + dist.y*normal.y + dist.z*normal.z;
+    
+    // check to see if that distance is less than the search distance
+    return distance > tDist;
+  }
+
+  bool Photon::operator < (const Photon& right) const
+  {
+    // This is backwards of what we want, but this way the smallest
+    // elements will be the top on the priority que
+    return distance > right.distance;
   }
 
   Photon::Photon(const csColor& color, const csVector3& dir,

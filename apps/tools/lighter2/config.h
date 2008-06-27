@@ -97,6 +97,10 @@ namespace lighter
     {
       // Number of photons to emit
       int numPhotons;
+      // Number of photons per sample
+      int numPerSample;
+      // The sample distance for sampling photons
+      float sampleDistance;
     };
 
     struct DebugProperties
