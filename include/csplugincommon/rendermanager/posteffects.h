@@ -203,6 +203,12 @@ namespace RenderManager
     void SetChainedOutput (PostEffectManager& nextEffects)
     { SetChainedOutput (&nextEffects); }
     //@}
+    
+    /**
+     * Returns whether the screen space is flipped in Y direction. This usually
+     * happens when rendering to a texture due post effects.
+     */
+    bool ScreenSpaceYFlipped ();
   private:
     uint frameNum;
     csRef<iGraphics3D> graphics3D;
