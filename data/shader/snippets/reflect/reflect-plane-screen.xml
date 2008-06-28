@@ -71,6 +71,20 @@
       </block>
     </input>
     
+    <input name="reflectXform" type="float4" default="complex" private="yes">
+      <block location="cg:vertexIn">
+	<uniform type="float4" name="reflectXform" />
+      </block>
+      
+      <block location="cg:variablemap">
+	<variablemap variable="reflection coord xform" destination="vertexIn.reflectXform" />
+      </block>
+      
+      <block location="cg:vertexMain">
+	reflectXform = vertexIn.reflectXform;
+      </block>
+    </input>
+    
     <block location="cg:vertexToFragment">
       <varying type="position4" name="reflTC" />
     </block>
@@ -81,8 +95,9 @@
       mirroredPointDist = 0;
       
       reflTC = mul (ModelViewProj, positionO);
-      float halfW = reflTC.w * 0.5;
-      reflTC.xyz = reflTC.xyz * float3(0.5, 0.5, -0.5) + float3(halfW);
+      float3 reflScale = float3 (reflectXform.xy, 0.5);
+      float3 reflXlate = float3 (reflectXform.zw, -0.5) * reflTC.w;
+      reflTC.xyz = reflTC.xyz * reflScale + reflXlate;
     </block>
     
     <block location="cg:fragmentMain">
@@ -100,6 +115,7 @@
       float distRefrFromEye = length (positionUnprojected.xyz);
       
       mirroredPointDist = distRefrFromEye - distPlaneFromEye;
+      //debug (float4 (float3 (mirroredPointDist), 1));
       
       float perturbWeight = min (inv_reflW, saturate (mirroredPointDist));
       tc.xy += perturb * perturbWeight;

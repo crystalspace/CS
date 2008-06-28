@@ -19,6 +19,8 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_AUTOFX_REFLREFR_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_AUTOFX_REFLREFR_H__
 
+#include "csplugincommon/rendermanager/posteffects.h"
+
 namespace CS
 {
   namespace RenderManager
@@ -41,8 +43,10 @@ namespace CS
         CS::ShaderVarStringID svTexPlaneRefrDepth;
         
         CS::ShaderVarStringID svPlaneRefl;
-        
         CS::ShaderVarStringID svClipPlaneReflRefr;
+        
+        CS::ShaderVarStringID svReflXform;
+        csRef<csShaderVariable> reflXformSV;
       
         TextureCache texCache;
         TextureCache texCacheDepth;
@@ -74,7 +78,8 @@ namespace CS
 	}
         
 	void Initialize (iObjectRegistry* objReg,
-			RenderTreeBase::DebugPersistent& dbgPersist)
+			 RenderTreeBase::DebugPersistent& dbgPersist,
+			 PostEffectManager* postEffects)
 	{
 	  csRef<iShaderManager> shaderManager =
 	    csQueryRegistry<iShaderManager> (objReg);
@@ -87,6 +92,12 @@ namespace CS
 	  
 	  svPlaneRefl = strings->Request ("plane reflection");
 	  svClipPlaneReflRefr = strings->Request ("clip plane reflection");
+	  
+	  svReflXform = strings->Request ("reflection coord xform");
+	  reflXformSV.AttachNew (new csShaderVariable (svReflXform));
+	  bool screenFlipped = postEffects ? postEffects->ScreenSpaceYFlipped() : false;
+	  reflXformSV->SetValue (csVector4 (0.5f, 
+	    screenFlipped ? 0.5f : -0.5f, 0.5f, 0.5f));
 	  
 	  csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objReg);
 	  texCache.SetG3D (g3d);
@@ -293,6 +304,7 @@ namespace CS
 	  // Attach reflection texture to mesh
 	  localStack[persist.svTexPlaneRefl] = svReflection;
 	  localStack[persist.svTexPlaneReflDepth] = svReflectionDepth;
+	  localStack[persist.svReflXform] = persist.reflXformSV;
 	}
         
         if (usesRefrTex || usesRefrDepthTex)
@@ -361,6 +373,7 @@ namespace CS
           // Attach refraction texture to mesh
 	  localStack[persist.svTexPlaneRefr] = svRefraction;
 	  localStack[persist.svTexPlaneRefrDepth] = svRefractionDepth;
+	  localStack[persist.svReflXform] = persist.reflXformSV;
 	}
         // Setup the new contexts
 	if (reflCtx) contextFunction (*reflCtx);

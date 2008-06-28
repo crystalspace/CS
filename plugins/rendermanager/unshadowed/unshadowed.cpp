@@ -342,7 +342,8 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
   
   portalPersistent.Initialize (shaderManager, g3d);
   lightPersistent.Initialize (objectReg, treePersistent.debugPersist);
-  reflectRefractPersistent.Initialize (objectReg, treePersistent.debugPersist);
+  reflectRefractPersistent.Initialize (objectReg, treePersistent.debugPersist,
+    &postEffects);
   
   return true;
 }
