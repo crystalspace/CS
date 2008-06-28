@@ -150,10 +150,12 @@ namespace CS
         bool needRefrTex = usesRefrTex && !meshReflectRefract.refractSV.IsValid()
           || (usesRefrDepthTex && !meshReflectRefract.refractDepthSV.IsValid());
                 
-        // Compute reflect/refract plane
+        int txt_w = 512, txt_h = 512;
         csPlane3 reflRefrPlane;
+        csBox2 clipBox;
         if (needReflTex || needRefrTex)
         {
+          // Compute reflect/refract plane
           if ((localStack.GetSize() > persist.svPlaneRefl)
               && (localStack[persist.svPlaneRefl] != 0))
           {
@@ -218,6 +220,15 @@ namespace CS
 	    new csShaderVariableContext);
 	  meshReflectRefract.clipPlaneRefrContext->AddVariable (
 	    meshReflectRefract.clipPlaneRefrSV);
+	    
+	  // Compute screen space bounding box
+	  {
+	    const csBox3& objBB_world =  mesh.meshWrapper->GetWorldBoundingBox();
+	    iCamera* cam = rview->GetCamera();
+	    float min_z, max_z;
+	    objBB_world.ProjectBox (cam->GetTransform(),
+	      cam->GetProjectionMatrix(), clipBox, min_z, max_z, txt_w, txt_h);
+	  }
         }
         
         typename RenderTree::ContextNode* reflCtx = 0;
@@ -256,7 +267,6 @@ namespace CS
 	    inewcam->SetTransform (reflected);
 	    inewcam->SetMirrored (true);
 	    
-	    int txt_w = 512, txt_h = 512;
 	    csRef<iTextureHandle> tex;
 	    csRef<iTextureHandle> texDepth;
 	    if (usesReflTex)
@@ -271,7 +281,6 @@ namespace CS
 	    }
 	    
 	    // Set up context for reflection, clipped to plane
-	    csBox2 clipBox (0, 0, txt_w, txt_h);
 	    csRef<iClipper2D> newView;
 	    newView.AttachNew (new csBoxClipper (clipBox));
 	    reflView->SetClipper (newView);
@@ -324,7 +333,6 @@ namespace CS
 		*rview));
     #include "csutil/custom_new_enable.h"
 	    
-	    int txt_w = 512, txt_h = 512;
 	    csRef<iTextureHandle> tex;
 	    csRef<iTextureHandle> texDepth;
 	    if (usesRefrTex)
@@ -339,7 +347,6 @@ namespace CS
 	    }
 	    
 	    // Set up context for reflection, clipped to plane
-	    csBox2 clipBox (0, 0, txt_w, txt_h);
 	    csRef<iClipper2D> newView;
 	    newView.AttachNew (new csBoxClipper (clipBox));
 	    refrView->SetClipper (newView);
@@ -348,6 +355,7 @@ namespace CS
 	    refrCtx = renderTree.CreateContext (refrView);
 	    refrCtx->renderTargets[rtaColor0].texHandle = tex;
 	    refrCtx->renderTargets[rtaDepth].texHandle = texDepth;
+	    refrCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
 	    refrCtx->shadervars = meshReflectRefract.clipPlaneRefrContext;
 	      
 	    // Attach reflection texture to mesh
