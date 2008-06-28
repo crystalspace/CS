@@ -64,6 +64,9 @@ namespace CS
         };
         csHash<ReflectRefractSVs, csPtrKey<iMeshWrapper> >
           reflRefrCache;
+          
+        int resolutionReduceRefl;
+        int resolutionReduceRefr;
         
         PersistentData() :
 	  texCache (csimg2D, "rgb8",  // @@@ FIXME: Use same format as main view ...
@@ -93,12 +96,18 @@ namespace CS
 	  svPlaneRefl = strings->Request ("plane reflection");
 	  svClipPlaneReflRefr = strings->Request ("clip plane reflection");
 	  
+	  csConfigAccess config (objReg);
+	  resolutionReduceRefl = config->GetInt (
+	    "RenderManager.Reflections.Downsample", 1);
+	  resolutionReduceRefr = config->GetInt (
+	    "RenderManager.Refractions.Downsample", resolutionReduceRefl);
+	  
 	  svReflXform = strings->Request ("reflection coord xform");
 	  reflXformSV.AttachNew (new csShaderVariable (svReflXform));
 	  bool screenFlipped = postEffects ? postEffects->ScreenSpaceYFlipped() : false;
 	  reflXformSV->SetValue (csVector4 (0.5f, 
 	    screenFlipped ? 0.5f : -0.5f, 0.5f, 0.5f));
-	  
+	    
 	  csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objReg);
 	  texCache.SetG3D (g3d);
 	  texCacheDepth.SetG3D (g3d);
@@ -149,10 +158,16 @@ namespace CS
         bool usesRefrDepthTex = names.IsBitSetTolerant (persist.svTexPlaneRefrDepth);
         bool needRefrTex = usesRefrTex && !meshReflectRefract.refractSV.IsValid()
           || (usesRefrDepthTex && !meshReflectRefract.refractDepthSV.IsValid());
-                
-        int txt_w = 512, txt_h = 512;
+        
+        int renderW = 512, renderH = 512;
+        context.GetTargetDimensions (renderW, renderH);
+        int txt_w_refl = renderW >> persist.resolutionReduceRefl;
+        int txt_h_refl = renderH >> persist.resolutionReduceRefl;
+        int txt_w_refr = renderW >> persist.resolutionReduceRefr;
+        int txt_h_refr = renderH >> persist.resolutionReduceRefr;
+        
         csPlane3 reflRefrPlane;
-        csBox2 clipBox;
+        csBox2 clipBoxRefl, clipBoxRefr;
         if (needReflTex || needRefrTex)
         {
           // Compute reflect/refract plane
@@ -227,7 +242,11 @@ namespace CS
 	    iCamera* cam = rview->GetCamera();
 	    float min_z, max_z;
 	    objBB_world.ProjectBox (cam->GetTransform(),
-	      cam->GetProjectionMatrix(), clipBox, min_z, max_z, txt_w, txt_h);
+	      cam->GetProjectionMatrix(), clipBoxRefl, min_z, max_z,
+	      txt_w_refl, txt_h_refl);
+	    objBB_world.ProjectBox (cam->GetTransform(),
+	      cam->GetProjectionMatrix(), clipBoxRefr, min_z, max_z,
+	      txt_w_refr, txt_h_refr);
 	  }
         }
         
@@ -272,17 +291,17 @@ namespace CS
 	    if (usesReflTex)
 	    {
 	      tex = 
-	        persist.texCache.QueryUnusedTexture (txt_w, txt_h, 0);
+	        persist.texCache.QueryUnusedTexture (txt_w_refl, txt_h_refl, 0);
 	    }
 	    if (usesReflDepthTex)
 	    {
 	      texDepth = 
-	        persist.texCacheDepth.QueryUnusedTexture (txt_w, txt_h, 0);
+	        persist.texCacheDepth.QueryUnusedTexture (txt_w_refl, txt_h_refl, 0);
 	    }
 	    
 	    // Set up context for reflection, clipped to plane
 	    csRef<iClipper2D> newView;
-	    newView.AttachNew (new csBoxClipper (clipBox));
+	    newView.AttachNew (new csBoxClipper (clipBoxRefl));
 	    reflView->SetClipper (newView);
   
 	    reflCtx = renderTree.CreateContext (reflView);
@@ -301,8 +320,9 @@ namespace CS
 	    svReflectionDepth->SetValue (texDepth);
 	    meshReflectRefract.reflectDepthSV = svReflectionDepth;
 	    
-	    renderTree.AddDebugTexture (tex);
-	    renderTree.AddDebugTexture (texDepth);
+	    float dbgAspect = (float)txt_w_refl/(float)txt_h_refl;
+	    renderTree.AddDebugTexture (tex, dbgAspect);
+	    renderTree.AddDebugTexture (texDepth, dbgAspect);
 	  }
 	  else
 	  {
@@ -338,17 +358,17 @@ namespace CS
 	    if (usesRefrTex)
 	    {
 	      tex = 
-	        persist.texCache.QueryUnusedTexture (txt_w, txt_h, 0);
+	        persist.texCache.QueryUnusedTexture (txt_w_refr, txt_h_refr, 0);
 	    }
 	    if (usesRefrDepthTex)
 	    {
 	      texDepth = 
-	        persist.texCacheDepth.QueryUnusedTexture (txt_w, txt_h, 0);
+	        persist.texCacheDepth.QueryUnusedTexture (txt_w_refr, txt_h_refr, 0);
 	    }
 	    
 	    // Set up context for reflection, clipped to plane
 	    csRef<iClipper2D> newView;
-	    newView.AttachNew (new csBoxClipper (clipBox));
+	    newView.AttachNew (new csBoxClipper (clipBoxRefr));
 	    refrView->SetClipper (newView);
             refrView->GetMeshFilter().AddFilterMesh (mesh.meshWrapper);
   
@@ -369,8 +389,9 @@ namespace CS
 	    svRefractionDepth->SetValue (texDepth);
 	    meshReflectRefract.refractDepthSV = svRefractionDepth;
 	    
-	    renderTree.AddDebugTexture (tex);
-	    renderTree.AddDebugTexture (texDepth);
+	    float dbgAspect = (float)txt_w_refr/(float)txt_h_refr;
+	    renderTree.AddDebugTexture (tex, dbgAspect);
+	    renderTree.AddDebugTexture (texDepth, dbgAspect);
 	  }
   	  else
 	  {
