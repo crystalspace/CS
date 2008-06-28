@@ -47,6 +47,7 @@ namespace CS
         
         CS::ShaderVarStringID svReflXform;
         csRef<csShaderVariable> reflXformSV;
+        bool screenFlipped;
       
         TextureCache texCache;
         TextureCache texCacheDepth;
@@ -104,9 +105,7 @@ namespace CS
 	  
 	  svReflXform = strings->Request ("reflection coord xform");
 	  reflXformSV.AttachNew (new csShaderVariable (svReflXform));
-	  bool screenFlipped = postEffects ? postEffects->ScreenSpaceYFlipped() : false;
-	  reflXformSV->SetValue (csVector4 (0.5f, 
-	    screenFlipped ? 0.5f : -0.5f, 0.5f, 0.5f));
+	  screenFlipped = postEffects ? postEffects->ScreenSpaceYFlipped() : false;
 	    
 	  csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objReg);
 	  texCache.SetG3D (g3d);
@@ -247,6 +246,60 @@ namespace CS
 	    objBB_world.ProjectBox (cam->GetTransform(),
 	      cam->GetProjectionMatrix(), clipBoxRefr, min_z, max_z,
 	      txt_w_refr, txt_h_refr);
+	  }
+	  
+	  /* To reduce bleeding from filtering, fuzz the reflection mapping to 
+	      be actually stretched out a pixel at the corners */
+	  if ((persist.resolutionReduceRefr > 0)
+	      || (persist.resolutionReduceRefl > 0))
+	  {
+	    /* Since reflection + refraction share the same TC transform, 
+	      compute the 'fuzz' from the smaller one. This can lead to 
+	      distortions when the resolutions differ a lot ... but hopefully
+	      doesn't happen often */
+	    csBox2 dstBox;
+	    int txt_w, txt_h;
+	    if (persist.resolutionReduceRefr > persist.resolutionReduceRefl)
+	    {
+	      dstBox = clipBoxRefr;
+	      txt_w = txt_w_refr;
+	      txt_h = txt_h_refr;
+	    }
+	    else
+	    {
+	      dstBox = clipBoxRefl;
+	      txt_w = txt_w_refl;
+	      txt_h = txt_h_refl;
+	    }
+	    
+	    float oldMinY = dstBox.MinY();
+	    dstBox.SetMin (1, txt_h-dstBox.MaxY());
+	    dstBox.SetMax (1, txt_h-oldMinY);
+	    dstBox *= csBox2 (0, 0, txt_w, txt_h);
+	    csBox2 useBox (dstBox.MinX() + 1.5f, dstBox.MinY() + 1.5f,
+	      dstBox.MaxX() - 1.5f, dstBox.MaxY() - 1.5f);
+	    float dw = dstBox.MaxX() - dstBox.MinX();
+	    float dh = dstBox.MaxY() - dstBox.MinY();
+	    float sw = useBox.MaxX() - useBox.MinX();
+	    float sh = useBox.MaxY() - useBox.MinY();
+	    float scaleX = sw/dw;
+	    float scaleY = sh/dh;
+	    float cX1 = useBox.GetCenter().x/(float)txt_w;
+	    float cY1 = useBox.GetCenter().y/(float)txt_h;
+	    float cX2 = dstBox.GetCenter().x/(float)txt_w;
+	    float cY2 = dstBox.GetCenter().y/(float)txt_h;
+	    float dX = (0.5f-cX1)*scaleX + cX2;
+	    float dY = (0.5f-cY1)*scaleY + cY2;
+	    
+	    persist.reflXformSV->SetValue (csVector4 (0.5f * scaleX,
+	      (persist.screenFlipped ? 0.5f : -0.5f) * scaleY,
+	      dX, dY));
+	  }
+	  else
+	  {
+	    persist.reflXformSV->SetValue (csVector4 (0.5f,
+	      (persist.screenFlipped ? 0.5f : -0.5f),
+	      0.5f, 0.5f));
 	  }
         }
         
