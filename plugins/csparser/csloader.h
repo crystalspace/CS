@@ -31,7 +31,6 @@
 #include "csutil/weakrefarr.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/threading/thread.h"
-#include "csutil/threadmanager.h"
 #include "csutil/strhash.h"
 #include "csutil/util.h"
 #include "imap/ldrctxt.h"
@@ -138,29 +137,10 @@ public:
 
 #include "csutil/deprecated_warn_off.h"
 
-class csThreadedLoader : public iThreadedLoader
-{
-public:
-  csThreadedLoader(csLoader* loader);
-  virtual ~csThreadedLoader();
-  virtual void LoadMapFile(const char* filename, bool clearEngine,
-                           iRegion* region, bool curRegOnly = true,
-                           bool checkDupes = false, iStreamSource* ssource = 0,
-                           iMissingLoaderData* missingdata = 0);
-  virtual void Load (iDocumentNode* node, iCollection* collection = 0,
-    bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
-    const char* override_name = 0, iMissingLoaderData* missingdata = 0,
-    uint keepFlags = KEEP_ALL);
-
-private:
-  csRef<csLoader> loader;
-};
-
 /**
  * The loader for Crystal Space maps.
  */
-class csLoader : public ThreadedCallable,
-                 public scfImplementation2<csLoader,
+class csLoader : public scfImplementation2<csLoader,
                                            iLoader,
                                            iComponent>
 {
@@ -184,8 +164,6 @@ private:
   /// Pointer to built-in checkerboard texture loader.
   //csRef<iLoaderPlugin> BuiltinCheckerTexLoader;
   csRef<iLoaderPlugin> BuiltinErrorTexLoader;
-
-  csRef<iThreadedLoader> threadedloader;
 
   /// Auto regions flag
   bool autoRegions;
@@ -594,8 +572,6 @@ public:
   // initialize the plug-in
   virtual bool Initialize(iObjectRegistry *object_reg);
 
-  iThreadedLoader* GetThreadedLoader() { return threadedloader; }
-
   /////////////////////////// Generic ///////////////////////////
 
   virtual csPtr<iImage> LoadImage (iDataBuffer* buf, int Format);
@@ -684,8 +660,6 @@ public:
   {
       return autoRegions;
   }
-
-  void RunMethod(uint methodIndex, csArray<void*> args);
 };
 
 }

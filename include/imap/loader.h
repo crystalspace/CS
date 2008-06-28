@@ -125,7 +125,7 @@ struct iMissingLoaderData : public virtual iBase
 /**
 * Return structure for the iLoader->Load() routines.
 */
-struct csLoadResult
+struct csLoadResult : public csRefCount
 {
   /// True if loading was succesful
   bool success;
@@ -148,17 +148,9 @@ struct csLoadResult
 /**
 * This interface represents the threaded map loader methods.
 */
-struct iThreadedLoader : public csRefCount
+struct iThreadedLoader : public virtual iBase
 {
-  virtual void LoadMapFile (const char* filename, bool clearEngine,
-    iRegion* region, bool curRegOnly = true,
-    bool checkDupes = false, iStreamSource* ssource = 0,
-    iMissingLoaderData* missingdata = 0) = 0;
-
-  virtual void Load (iDocumentNode* node, iCollection* collection = 0,
-    bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
-    const char* override_name = 0, iMissingLoaderData* missingdata = 0,
-    uint keepFlags = KEEP_ALL) = 0;
+  SCF_INTERFACE (iThreadedLoader, 1, 0, 0);
 };
 
 /**
@@ -622,8 +614,6 @@ struct iLoader : public virtual iBase
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
     uint keepFlags = KEEP_ALL) = 0;
   //@}
-
-  virtual iThreadedLoader* GetThreadedLoader() = 0;
 };
 
 /** @} */

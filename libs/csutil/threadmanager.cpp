@@ -38,11 +38,6 @@ ThreadManager::ThreadManager()
   queue.AttachNew(new ThreadedJobQueue(count));
 }
 
-void ThreadManager::QueueEvent(ThreadEvent* tevent)
-{
-  queue->Enqueue(static_cast<iJob*>(tevent));
-}
-
 ThreadManager* ThreadManager::GetThreadManager()
 {
   if(singletonPtr == 0)
