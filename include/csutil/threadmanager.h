@@ -103,23 +103,4 @@ private:
 #define THREADED_CALLABLE_IMP2(type, function, A1, A2) \
   void type::function##TC(A1, A2)
 
-#define THREADED_CALLABLE_DEC9(type, function, T1, A1, T2, A2, T3, A3, T4, A4, T5, A5, T6, A6, T7, A7, T8, A8, T9, A9) \
-  void function##TC(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9); \
-  void function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9) \
-  { \
-    csArray<void const*> args; \
-    EventMemPool *mempool = new EventMemPool; \
-    TC_STORE(void const*, mempool); \
-    TC_STORE(T1, A1); \
-    TC_STORE(T2, A2); \
-    TC_STORE(T3, A3); \
-    TC_STORE(T4, A4); \
-    TC_STORE(T5, A5); \
-    TC_STORE(T6, A6); \
-    TC_STORE(T7, A7); \
-    TC_STORE(T8, A8); \
-    TC_STORE(T9, A9); \
-    ThreadManager::GetThreadManager()->QueueEvent<type>(GetThreadedCallable(), &type::function##TC, args); \
-  }
-
 #endif // __CS_IUTIL_THREADMANAGER_H__
