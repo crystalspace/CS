@@ -59,6 +59,7 @@ namespace CS
         {
           csTicks lastUpdate;
           uint lastUpdateFrame;
+          csTransform lastCamera;
         
           csRef<csShaderVariable> reflectSV;
           csRef<csShaderVariable> refractSV;
@@ -79,6 +80,7 @@ namespace CS
         int resolutionReduceRefr;
         uint texUpdateInterval;
         uint maxUpdatesPerFrame;
+        float cameraChangeThresh;
         
         PersistentData() :
           currentFrame (0),
@@ -122,6 +124,8 @@ namespace CS
 	    "RenderManager.Reflections.MaxUpdatesPerFrame", 0);
 	  mappingStretch = config->GetFloat (
 	    "RenderManager.Reflections.MappingStretch", 1.0f);
+	  cameraChangeThresh = config->GetFloat (
+	    "RenderManager.Reflections.CameraChangeThreshold", 0.01f);
 	  
 	  svReflXform = strings->Request ("reflection coord xform");
 	  reflXformSV.AttachNew (new csShaderVariable (svReflXform));
@@ -208,6 +212,47 @@ namespace CS
 	
 	forceUpdate &= (persist.maxUpdatesPerFrame == 0)
 	  || (persist.updatesThisFrame < persist.maxUpdatesPerFrame);
+	  
+	
+        iCamera* cam = rview->GetCamera();
+	/* Compute a difference for the camera between the last render;
+	   if bigger than a certain threshold, rerender (whether it's the
+	   reflections's turn or not) */
+	if (!forceUpdate && (persist.cameraChangeThresh > 0))
+	{
+	  const csTransform& camTrans = cam->GetTransform();
+	  float cameraDiff;
+	  
+	  cameraDiff = fabsf (camTrans.GetO2T().m11
+	    - meshReflectRefract.lastCamera.GetO2T().m11);
+	  cameraDiff += fabsf (camTrans.GetO2T().m12
+	    - meshReflectRefract.lastCamera.GetO2T().m12);
+	  cameraDiff += fabsf (camTrans.GetO2T().m13
+	    - meshReflectRefract.lastCamera.GetO2T().m13);
+	    
+	  cameraDiff += fabsf (camTrans.GetO2T().m21
+	    - meshReflectRefract.lastCamera.GetO2T().m21);
+	  cameraDiff += fabsf (camTrans.GetO2T().m22
+	    - meshReflectRefract.lastCamera.GetO2T().m22);
+	  cameraDiff += fabsf (camTrans.GetO2T().m23
+	    - meshReflectRefract.lastCamera.GetO2T().m23);
+	    
+	  cameraDiff += fabsf (camTrans.GetO2T().m31
+	    - meshReflectRefract.lastCamera.GetO2T().m31);
+	  cameraDiff += fabsf (camTrans.GetO2T().m32
+	    - meshReflectRefract.lastCamera.GetO2T().m32);
+	  cameraDiff += fabsf (camTrans.GetO2T().m33
+	    - meshReflectRefract.lastCamera.GetO2T().m33);
+	
+	  cameraDiff += fabsf (camTrans.GetO2TTranslation().x
+	    - meshReflectRefract.lastCamera.GetO2TTranslation().x);
+	  cameraDiff += fabsf (camTrans.GetO2TTranslation().y
+	    - meshReflectRefract.lastCamera.GetO2TTranslation().y);
+	  cameraDiff += fabsf (camTrans.GetO2TTranslation().z
+	    - meshReflectRefract.lastCamera.GetO2TTranslation().z);
+	    
+	  forceUpdate = cameraDiff >= persist.cameraChangeThresh;
+	}
 
         bool usesReflTex = names.IsBitSetTolerant (persist.svTexPlaneRefl);
         bool usesReflDepthTex = names.IsBitSetTolerant (persist.svTexPlaneReflDepth);
@@ -279,7 +324,6 @@ namespace CS
           reflRefrPlane =
             mesh.meshWrapper->GetMovable()->GetFullTransform().This2Other (reflRefrPlane);
           
-          iCamera* cam = rview->GetCamera();
 	  reflRefrPlane_cam = 
 	    cam->GetTransform().Other2This (reflRefrPlane);
 	  doRender = reflRefrPlane.Classify (cam->GetTransform().GetOrigin()) <= 0;
@@ -557,6 +601,7 @@ namespace CS
 	{
 	  meshReflectRefract.lastUpdate = currentTicks;
 	  meshReflectRefract.lastUpdateFrame = persist.currentFrame;
+	  meshReflectRefract.lastCamera = cam->GetTransform();
 	  persist.updatesThisFrame++;
 	}
 	
