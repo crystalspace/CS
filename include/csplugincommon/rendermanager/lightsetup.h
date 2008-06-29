@@ -326,7 +326,8 @@ namespace RenderManager
       if ((lastMetadata.numberOfLights == 0) 
         && !layerConfig.IsAmbientLayer (layer)) return 0;
 
-      bool skipStatic = mesh.meshFlags.Check (CS_ENTITY_STATICLIT)
+      bool meshIsStaticLit = mesh.meshFlags.Check (CS_ENTITY_STATICLIT);
+      bool skipStatic = meshIsStaticLit
 	&& layerConfig.GetStaticLightsSettings (layer).nodraw;
 
       size_t layerLights = csMin (sortedLights.GetSize (skipStatic),
@@ -533,7 +534,7 @@ namespace RenderManager
 	    iLight* light = 0;
 	    for (size_t l = 0; l < thisNum; l++)
 	    {
-	      bool isStatic = renderSublights[firstLight + l]->isStatic;
+	      bool isStaticLight = renderSublights[firstLight + l]->isStatic;
 	      light = renderSublights[firstLight + l]->light;
 	      thisLightSVs = persist.lightDataCache.GetElementPointer (light);
 	      
@@ -551,7 +552,7 @@ namespace RenderManager
 	      
 		lightVarsHelper.MergeAsArrayItems (localStacks[s],
 		  *(thisLightSVs->shaderVars), l);
-		if (isStatic
+		if (isStaticLight && meshIsStaticLit
 		    && layerConfig.GetStaticLightsSettings (layer).specularOnly)
 		{
 		  lightVarsHelper.MergeAsArrayItem (localStacks[s],
