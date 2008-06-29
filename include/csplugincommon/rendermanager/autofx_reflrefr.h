@@ -48,6 +48,7 @@ namespace CS
         CS::ShaderVarStringID svReflXform;
         csRef<csShaderVariable> reflXformSV;
         bool screenFlipped;
+        float mappingStretch;
         
         uint currentFrame;
       
@@ -115,6 +116,8 @@ namespace CS
 	    "RenderManager.Refractions.Downsample", resolutionReduceRefl);
 	  texUpdateInterval = config->GetInt (
 	    "RenderManager.Reflections.UpdateInterval", 0);
+	  mappingStretch = config->GetFloat (
+	    "RenderManager.Reflections.MappngStretch", 1.0f);
 	  
 	  svReflXform = strings->Request ("reflection coord xform");
 	  reflXformSV.AttachNew (new csShaderVariable (svReflXform));
@@ -316,8 +319,10 @@ namespace CS
 	    dstBox.SetMin (1, txt_h-dstBox.MaxY());
 	    dstBox.SetMax (1, txt_h-oldMinY);
 	    dstBox *= csBox2 (0, 0, txt_w, txt_h);
-	    csBox2 useBox (dstBox.MinX() + 1.5f, dstBox.MinY() + 1.5f,
-	      dstBox.MaxX() - 1.5f, dstBox.MaxY() - 1.5f);
+	    csBox2 useBox (dstBox.MinX() + persist.mappingStretch,
+	      dstBox.MinY() + persist.mappingStretch,
+	      dstBox.MaxX() - persist.mappingStretch,
+	      dstBox.MaxY() - persist.mappingStretch);
 	    float dw = dstBox.MaxX() - dstBox.MinX();
 	    float dh = dstBox.MaxY() - dstBox.MinY();
 	    float sw = useBox.MaxX() - useBox.MinX();
