@@ -19,16 +19,18 @@
   <technique priority="100">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
-    <input name="N" type="direction_tangent" />
-    
-    <block location="cg:fragmentMain">
-      result.xy = N.xy;
-    </block>
-    
     <block location="cg:vertexMain">
-      result.xy = N.xy;
+      ambient = float3(1);
+      ambient_attr_perfragment = false;
+    </block>
+      
+    <block location="cg:fragmentMain">
+      ambient = float3(1);
+      ambient_attr_perfragment = false;
     </block>
     
-    <output name="result" type="float2" />
+    <output name="ambient" type="rgb">
+      <attribute name="perfragment" type="bool" />
+    </output>
   </technique>
 </snippet>

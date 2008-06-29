@@ -115,12 +115,15 @@
       float distRefrFromEye = length (positionUnprojected.xyz);
       
       mirroredPointDist = distRefrFromEye - distPlaneFromEye;
-      //debug (float4 (float3 (mirroredPointDist), 1));
       
-      float perturbWeight = min (inv_reflW, saturate (mirroredPointDist));
+      float perturbWeight = clamp (inv_reflW, 0, saturate (mirroredPointDist));
+      //debug (float4 (abs(perturb.x)*10, 0, 0, 1));
+      //debug (float4 (0, abs(perturb.y)*10, 0, 1));
       tc.xy += perturb * perturbWeight;
       surfaceColor = tex2Dproj (texReflect, tc);
       surfaceColor_attr_perfragment = true;
+      
+      mirroredPointDist = max (mirroredPointDist, 0);
     </block>
     
     <output name="surfaceColor" type="rgba">

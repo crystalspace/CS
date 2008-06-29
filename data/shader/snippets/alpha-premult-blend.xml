@@ -19,16 +19,17 @@
   <technique priority="100">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
-    <input name="N" type="direction_tangent" />
-    
+    <input name="a" type="rgba" />
+    <input name="b" type="rgba" />
+      
     <block location="cg:fragmentMain">
-      result.xy = N.xy;
+      result = a*(1-b.a) + b;
     </block>
-    
+
     <block location="cg:vertexMain">
-      result.xy = N.xy;
+      result = a*(1-b.a) + b;
     </block>
     
-    <output name="result" type="float2" />
+    <output name="result" type="rgba" />
   </technique>
 </snippet>
