@@ -533,6 +533,7 @@ namespace RenderManager
 	    iLight* light = 0;
 	    for (size_t l = 0; l < thisNum; l++)
 	    {
+	      bool isStatic = renderSublights[firstLight + l]->isStatic;
 	      light = renderSublights[firstLight + l]->light;
 	      thisLightSVs = persist.lightDataCache.GetElementPointer (light);
 	      
@@ -550,6 +551,12 @@ namespace RenderManager
 	      
 		lightVarsHelper.MergeAsArrayItems (localStacks[s],
 		  *(thisLightSVs->shaderVars), l);
+		if (isStatic
+		    && layerConfig.GetStaticLightsSettings (layer).specularOnly)
+		{
+		  lightVarsHelper.MergeAsArrayItem (localStacks[s],
+		    persist.diffuseBlack, l);
+		}
 	      }
 	    }
 	    firstLight += thisNum;
@@ -771,6 +778,7 @@ namespace RenderManager
       LightingSorter::PersistentData lightSorterPersist;
       csLightShaderVarCache svNames;
       CS::ShaderVarStringID svPassNum;
+      csRef<csShaderVariable> diffuseBlack;
       LightingVariablesHelper::PersistentData varsHelperPersist;
       typedef csHash<CachedLightData, csPtrKey<iLight> > LightDataCache;
       LightDataCache lightDataCache;
@@ -790,6 +798,10 @@ namespace RenderManager
 	svNames.SetStrings (strings);
         svPassNum = strings->Request ("pass number");
 	shadowPersist.Initialize (objReg, dbgPersist);
+	
+	diffuseBlack.AttachNew (new csShaderVariable (svNames.GetLightSVId (
+	  csLightShaderVarCache::lightDiffuse)));
+	diffuseBlack->SetValue (csVector4 (0, 0, 0, 0));
       }
       void UpdateNewFrame ()
       {

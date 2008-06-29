@@ -41,8 +41,10 @@ namespace RenderManager
   {
     /// Don't render static lights.
     bool nodraw;
+    /// Render, but only specular (forces diffuse color to black)
+    bool specularOnly;
     
-    StaticLightsSettings() : nodraw (false) {}
+    StaticLightsSettings() : nodraw (false), specularOnly (false) {}
   };
 
   /**
