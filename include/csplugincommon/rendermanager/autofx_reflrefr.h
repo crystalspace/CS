@@ -51,6 +51,7 @@ namespace CS
         float mappingStretch;
         
         uint currentFrame;
+        uint updatesThisFrame;
       
         TextureCacheT<CS::Utility::ResourceCache::ReuseIfOnlyOneRef> texCache;
         TextureCacheT<CS::Utility::ResourceCache::ReuseIfOnlyOneRef> texCacheDepth;
@@ -77,6 +78,7 @@ namespace CS
         int resolutionReduceRefl;
         int resolutionReduceRefr;
         uint texUpdateInterval;
+        uint maxUpdatesPerFrame;
         
         PersistentData() :
           currentFrame (0),
@@ -116,8 +118,10 @@ namespace CS
 	    "RenderManager.Refractions.Downsample", resolutionReduceRefl);
 	  texUpdateInterval = config->GetInt (
 	    "RenderManager.Reflections.UpdateInterval", 0);
+	  maxUpdatesPerFrame = config->GetInt (
+	    "RenderManager.Reflections.MaxUpdatesPerFrame", 0);
 	  mappingStretch = config->GetFloat (
-	    "RenderManager.Reflections.MappngStretch", 1.0f);
+	    "RenderManager.Reflections.MappingStretch", 1.0f);
 	  
 	  svReflXform = strings->Request ("reflection coord xform");
 	  reflXformSV.AttachNew (new csShaderVariable (svReflXform));
@@ -130,14 +134,13 @@ namespace CS
       
 	void UpdateNewFrame ()
 	{
-	  currentFrame++;
-	
 	  csTicks currentTicks = csGetTicks ();
 	  typename ReflRefrCache::GlobalIterator reflRefrIt (
 	    reflRefrCache.GetIterator ());
 	  while (reflRefrIt.HasNext())
 	  {
 	    ReflectRefractSVs& meshReflectRefract = reflRefrIt.NextNoAdvance();
+	    // Don't remove if update interval hasn't passed yet
 	    if ((texUpdateInterval > 0)
 	      && ((currentTicks - meshReflectRefract.lastUpdate) <=
 	        texUpdateInterval))
@@ -145,9 +148,20 @@ namespace CS
 	      reflRefrIt.Next();
 	      continue;
 	    }
+	    // Don't remove if not in line for round-robin update
+	    if ((maxUpdatesPerFrame > 0)
+	      && (currentFrame - meshReflectRefract.lastUpdateFrame < 
+	        ((reflRefrCache.GetSize()+maxUpdatesPerFrame-1) / maxUpdatesPerFrame)))
+	    {
+	      reflRefrIt.Next();
+	      continue;
+	    }
 	    reflRefrCache.DeleteElement (reflRefrIt);
 	  }
 	  
+	  currentFrame++;
+	  updatesThisFrame = 0;
+	
 	  texCache.AdvanceFrame (currentTicks);
 	  texCacheDepth.AdvanceFrame (currentTicks);
 	}
@@ -182,10 +196,18 @@ namespace CS
 	context.svArrays.SetupSVStack (localStack, layer, mesh.contextLocalId);
 	
 	csTicks currentTicks = csGetTicks ();
-	bool forceUpdate = (persist.texUpdateInterval > 0)
-	  && ((currentTicks - meshReflectRefract.lastUpdate) >
-	    persist.texUpdateInterval)
-	  && (persist.currentFrame != meshReflectRefract.lastUpdateFrame);
+	bool forceUpdate = (persist.currentFrame != meshReflectRefract.lastUpdateFrame);
+	forceUpdate &= (persist.texUpdateInterval == 0)
+	  || ((currentTicks - meshReflectRefract.lastUpdate) >
+	    persist.texUpdateInterval);
+	  
+	forceUpdate &= (persist.maxUpdatesPerFrame == 0)
+	  || (persist.currentFrame - meshReflectRefract.lastUpdateFrame >= 
+	    ((persist.reflRefrCache.GetSize()+persist.maxUpdatesPerFrame-1)
+	      / persist.maxUpdatesPerFrame));
+	
+	forceUpdate &= (persist.maxUpdatesPerFrame == 0)
+	  || (persist.updatesThisFrame < persist.maxUpdatesPerFrame);
 
         bool usesReflTex = names.IsBitSetTolerant (persist.svTexPlaneRefl);
         bool usesReflDepthTex = names.IsBitSetTolerant (persist.svTexPlaneReflDepth);
@@ -520,6 +542,7 @@ namespace CS
 	{
 	  meshReflectRefract.lastUpdate = currentTicks;
 	  meshReflectRefract.lastUpdateFrame = persist.currentFrame;
+	  persist.updatesThisFrame++;
 	}
 	
         // Setup the new contexts
