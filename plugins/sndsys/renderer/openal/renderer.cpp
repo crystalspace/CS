@@ -119,6 +119,52 @@ bool csSndSysRendererOpenAL::Initialize (iObjectRegistry *obj_reg)
     }
   }
 
+  // Check some OpenAL context attributes/capabilities
+  // http://opensource.creative.com/pipermail/openal/2006-February/009337.html
+  ALCint attrSize;
+  ALCint *attributes;
+  ALCint *data;
+  alcGetIntegerv(m_Device, ALC_ATTRIBUTES_SIZE, sizeof(attrSize), &attrSize);
+  attributes = (ALCint *)cs_malloc(attrSize * sizeof(ALCint));
+  alcGetIntegerv(m_Device, ALC_ALL_ATTRIBUTES, attrSize, attributes);
+  data = attributes;
+  while (data < attributes + attrSize)
+  {
+    switch (*data)
+    {
+      case ALC_FREQUENCY:
+        data += 1;
+        Report (CS_REPORTER_SEVERITY_DEBUG, "OpenAL context frequency: %d Hz",
+          *data);
+        break;
+      case ALC_REFRESH:
+        data += 1;
+        Report (CS_REPORTER_SEVERITY_DEBUG, "OpenAL context refresh: %d Hz",
+          *data);
+        break;
+      case ALC_SYNC:
+        data += 1;
+        Report (CS_REPORTER_SEVERITY_DEBUG,
+          "OpenAL context uses %s (%sthreaded) context",
+          *data ? "synchronous": "asynchronous", *data ? "non " : "");
+        break;
+      case ALC_MONO_SOURCES:
+        data += 1;
+        Report (CS_REPORTER_SEVERITY_DEBUG,
+          "OpenAL context should support %d mono sources", *data);
+        break;
+      case ALC_STEREO_SOURCES:
+        data += 1;
+        Report (CS_REPORTER_SEVERITY_DEBUG,
+          "OpenAL context should support %d stereo sources", *data);
+        break;
+      default:
+        break;
+    }
+    data += 1;
+  }
+  cs_free(attributes);
+
   // Configure sound sources
   SndSysSourceOpenAL2D::Configure( m_Config );
 
