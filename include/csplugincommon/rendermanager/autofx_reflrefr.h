@@ -230,9 +230,12 @@ namespace CS
         int txt_w_refr = renderW >> persist.resolutionReduceRefr;
         int txt_h_refr = renderH >> persist.resolutionReduceRefr;
         
-        csPlane3 reflRefrPlane;
+        // @@@ Kludge: don't render nested reflections
+        bool doRender = localStack[persist.svClipPlaneReflRefr] == 0;
+        
+        csPlane3 reflRefrPlane, reflRefrPlane_cam;
         csBox2 clipBoxRefl, clipBoxRefr;
-        if (needReflTex || needRefrTex)
+        if ((needReflTex || needRefrTex) && doRender)
         {
           // Compute reflect/refract plane
           if ((localStack.GetSize() > persist.svPlaneRefl)
@@ -272,10 +275,15 @@ namespace CS
             reflRefrPlane.Set (planeNorm, 0);
             reflRefrPlane.SetOrigin (objBB.GetCenter());
 	  }
-          
+	  
           reflRefrPlane =
             mesh.meshWrapper->GetMovable()->GetFullTransform().This2Other (reflRefrPlane);
-            
+          
+          iCamera* cam = rview->GetCamera();
+	  reflRefrPlane_cam = 
+	    cam->GetTransform().Other2This (reflRefrPlane);
+	  doRender = reflRefrPlane.Classify (cam->GetTransform().GetOrigin()) <= 0;
+          
 	  meshReflectRefract.clipPlaneReflSV.AttachNew (new csShaderVariable (
 	    persist.svClipPlaneReflRefr));
 	  meshReflectRefract.clipPlaneReflSV->SetValue (csVector4 (
@@ -303,7 +311,6 @@ namespace CS
 	  // Compute screen space bounding box
 	  {
 	    const csBox3& objBB_world =  mesh.meshWrapper->GetWorldBoundingBox();
-	    iCamera* cam = rview->GetCamera();
 	    float min_z, max_z;
 	    objBB_world.ProjectBox (cam->GetTransform(),
 	      cam->GetProjectionMatrix(), clipBoxRefl, min_z, max_z,
@@ -378,7 +385,7 @@ namespace CS
 	  csRef<csShaderVariable> svReflection;
 	  csRef<csShaderVariable> svReflectionDepth;
 	  
-	  if (needReflTex)
+	  if (needReflTex && doRender)
 	  {
 	    // Compute reflection view
 	    iCamera* cam = rview->GetCamera();
@@ -393,10 +400,9 @@ namespace CS
     #include "csutil/custom_new_enable.h"
             reflView->SetCamera (inewcam);
             reflView->GetMeshFilter().AddFilterMesh (mesh.meshWrapper);
+            reflView->SetClipPlane (reflRefrPlane_cam.Inverse ());
 	    
 	    // Change the camera transform to be a reflection across reflRefrPlane
-	    csPlane3 reflRefrPlane_cam = 
-	      inewcam->GetTransform().Other2This (reflRefrPlane);
 	    csReversibleTransform reflection (csTransform::GetReflect (reflRefrPlane));
 	    csTransform reflection_cam (csTransform::GetReflect (reflRefrPlane_cam));
 	    const csTransform& world2cam (inewcam->GetTransform());
@@ -449,12 +455,16 @@ namespace CS
 	    svReflection = meshReflectRefract.reflectSV;
 	    svReflectionDepth = meshReflectRefract.reflectDepthSV;
 	    
-	    float dbgAspect = (float)txt_w_refl/(float)txt_h_refl;
-	    iTextureHandle* texh;
-	    svReflection->GetValue (texh);
-	    renderTree.AddDebugTexture (texh, dbgAspect);
-	    svReflectionDepth->GetValue (texh);
-	    renderTree.AddDebugTexture (texh, dbgAspect);
+	    if (doRender)
+	    {
+	      float dbgAspect = (float)txt_w_refl/(float)txt_h_refl;
+	      iTextureHandle* texh = 0;
+	      if (svReflection.IsValid()) svReflection->GetValue (texh);
+	      renderTree.AddDebugTexture (texh, dbgAspect);
+	      texh = 0;
+	      if (svReflectionDepth.IsValid()) svReflectionDepth->GetValue (texh);
+	      renderTree.AddDebugTexture (texh, dbgAspect);
+	    }
 	  }
 	  
 	  // Attach reflection texture to mesh
@@ -468,7 +478,7 @@ namespace CS
 	  csRef<csShaderVariable> svRefraction;
 	  csRef<csShaderVariable> svRefractionDepth;
 	  
-	  if (needRefrTex)
+	  if (needRefrTex && doRender)
 	  {
 	    // Set up context for refraction, clipped to plane
 	    
@@ -498,6 +508,7 @@ namespace CS
 	    newView.AttachNew (new csBoxClipper (clipBoxRefr));
 	    refrView->SetClipper (newView);
             refrView->GetMeshFilter().AddFilterMesh (mesh.meshWrapper);
+            refrView->SetClipPlane (reflRefrPlane_cam);
   
 	    refrCtx = renderTree.CreateContext (refrView);
 	    refrCtx->renderTargets[rtaColor0].texHandle = tex;
@@ -525,12 +536,16 @@ namespace CS
 	    svRefraction = meshReflectRefract.refractSV;
 	    svRefractionDepth = meshReflectRefract.refractDepthSV;
 	    
-	    float dbgAspect = (float)txt_w_refl/(float)txt_h_refl;
-	    iTextureHandle* texh;
-	    svRefraction->GetValue (texh);
-	    renderTree.AddDebugTexture (texh, dbgAspect);
-	    svRefractionDepth->GetValue (texh);
-	    renderTree.AddDebugTexture (texh, dbgAspect);
+	    if (doRender)
+	    {
+	      float dbgAspect = (float)txt_w_refl/(float)txt_h_refl;
+	      iTextureHandle* texh = 0;
+	      if (svRefraction.IsValid()) svRefraction->GetValue (texh);
+	      renderTree.AddDebugTexture (texh, dbgAspect);
+	      texh = 0;
+	      if (svRefractionDepth.IsValid()) svRefractionDepth->GetValue (texh);
+	      renderTree.AddDebugTexture (texh, dbgAspect);
+	    }
 	  }
 	  
           // Attach refraction texture to mesh
