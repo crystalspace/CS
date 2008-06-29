@@ -181,7 +181,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       compiler->synldr->ReportBadToken (child);
       return false;
     }
-    aliases.PutUnique (aliasName, aliasFile);
+    
+    bool isWeak = child->GetAttributeValueAsBool ("weak");
+    if (!isWeak || !aliases.Contains (aliasName))
+      aliases.PutUnique (aliasName, aliasFile);
     return true;
   }
   
