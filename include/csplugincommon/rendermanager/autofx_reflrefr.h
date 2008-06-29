@@ -48,11 +48,16 @@ namespace CS
         CS::ShaderVarStringID svReflXform;
         csRef<csShaderVariable> reflXformSV;
         bool screenFlipped;
+        
+        uint currentFrame;
       
-        TextureCache texCache;
-        TextureCache texCacheDepth;
+        TextureCacheT<CS::Utility::ResourceCache::ReuseIfOnlyOneRef> texCache;
+        TextureCacheT<CS::Utility::ResourceCache::ReuseIfOnlyOneRef> texCacheDepth;
         struct ReflectRefractSVs
         {
+          csTicks lastUpdate;
+          uint lastUpdateFrame;
+        
           csRef<csShaderVariable> reflectSV;
           csRef<csShaderVariable> refractSV;
           csRef<csShaderVariable> reflectDepthSV;
@@ -62,22 +67,28 @@ namespace CS
           csRef<csShaderVariable> clipPlaneReflSV;
           csRef<iShaderVariableContext> clipPlaneRefrContext;
           csRef<csShaderVariable> clipPlaneRefrSV;
+          
+          ReflectRefractSVs() : lastUpdate (0), lastUpdateFrame (~0) {}
         };
-        csHash<ReflectRefractSVs, csPtrKey<iMeshWrapper> >
-          reflRefrCache;
+        typedef csHash<ReflectRefractSVs, csPtrKey<iMeshWrapper> > ReflRefrCache;
+        ReflRefrCache reflRefrCache;
           
         int resolutionReduceRefl;
         int resolutionReduceRefr;
+        uint texUpdateInterval;
         
         PersistentData() :
+          currentFrame (0),
 	  texCache (csimg2D, "rgb8",  // @@@ FIXME: Use same format as main view ...
 	    CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP
 	     | CS_TEXTURE_NPOTS | CS_TEXTURE_CLAMP | CS_TEXTURE_SCALE_UP,
-	    "target", 0),
+	    "target", 0,
+	    CS::Utility::ResourceCache::ReuseIfOnlyOneRef ()),
 	  texCacheDepth (csimg2D, "d32",
 	    CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP
 	     | CS_TEXTURE_NPOTS | CS_TEXTURE_CLAMP | CS_TEXTURE_SCALE_UP,
-	    "target", 0)
+	    "target", 0,
+	    CS::Utility::ResourceCache::ReuseIfOnlyOneRef ())
 	{
 	}
         
@@ -102,6 +113,8 @@ namespace CS
 	    "RenderManager.Reflections.Downsample", 1);
 	  resolutionReduceRefr = config->GetInt (
 	    "RenderManager.Refractions.Downsample", resolutionReduceRefl);
+	  texUpdateInterval = config->GetInt (
+	    "RenderManager.Reflections.UpdateInterval", 0);
 	  
 	  svReflXform = strings->Request ("reflection coord xform");
 	  reflXformSV.AttachNew (new csShaderVariable (svReflXform));
@@ -114,9 +127,26 @@ namespace CS
       
 	void UpdateNewFrame ()
 	{
-	  reflRefrCache.Empty();
-	  texCache.AdvanceFrame (csGetTicks ());
-	  texCacheDepth.AdvanceFrame (csGetTicks ());
+	  currentFrame++;
+	
+	  csTicks currentTicks = csGetTicks ();
+	  typename ReflRefrCache::GlobalIterator reflRefrIt (
+	    reflRefrCache.GetIterator ());
+	  while (reflRefrIt.HasNext())
+	  {
+	    ReflectRefractSVs& meshReflectRefract = reflRefrIt.NextNoAdvance();
+	    if ((texUpdateInterval > 0)
+	      && ((currentTicks - meshReflectRefract.lastUpdate) <=
+	        texUpdateInterval))
+	    {
+	      reflRefrIt.Next();
+	      continue;
+	    }
+	    reflRefrCache.DeleteElement (reflRefrIt);
+	  }
+	  
+	  texCache.AdvanceFrame (currentTicks);
+	  texCacheDepth.AdvanceFrame (currentTicks);
 	}
       };
       
@@ -147,16 +177,26 @@ namespace CS
         
 	csShaderVariableStack localStack;
 	context.svArrays.SetupSVStack (localStack, layer, mesh.contextLocalId);
+	
+	csTicks currentTicks = csGetTicks ();
+	bool forceUpdate = (persist.texUpdateInterval > 0)
+	  && ((currentTicks - meshReflectRefract.lastUpdate) >
+	    persist.texUpdateInterval)
+	  && (persist.currentFrame != meshReflectRefract.lastUpdateFrame);
 
         bool usesReflTex = names.IsBitSetTolerant (persist.svTexPlaneRefl);
         bool usesReflDepthTex = names.IsBitSetTolerant (persist.svTexPlaneReflDepth);
-        bool needReflTex = (usesReflTex && !meshReflectRefract.reflectSV.IsValid())
-          || (usesReflDepthTex && !meshReflectRefract.reflectDepthSV.IsValid());
+        bool needReflTex = (usesReflTex
+            && (!meshReflectRefract.reflectSV.IsValid() || forceUpdate))
+          || (usesReflDepthTex
+            && (!meshReflectRefract.reflectDepthSV.IsValid() || forceUpdate));
           
         bool usesRefrTex = names.IsBitSetTolerant (persist.svTexPlaneRefr);
         bool usesRefrDepthTex = names.IsBitSetTolerant (persist.svTexPlaneRefrDepth);
-        bool needRefrTex = usesRefrTex && !meshReflectRefract.refractSV.IsValid()
-          || (usesRefrDepthTex && !meshReflectRefract.refractDepthSV.IsValid());
+        bool needRefrTex = (usesRefrTex 
+            && (!meshReflectRefract.refractSV.IsValid() || forceUpdate))
+          || (usesRefrDepthTex 
+            && (!meshReflectRefract.refractDepthSV.IsValid() || forceUpdate));
         
         int renderW = 512, renderH = 512;
         context.GetTargetDimensions (renderW, renderH);
@@ -381,6 +421,13 @@ namespace CS
 	  {
 	    svReflection = meshReflectRefract.reflectSV;
 	    svReflectionDepth = meshReflectRefract.reflectDepthSV;
+	    
+	    float dbgAspect = (float)txt_w_refl/(float)txt_h_refl;
+	    iTextureHandle* texh;
+	    svReflection->GetValue (texh);
+	    renderTree.AddDebugTexture (texh, dbgAspect);
+	    svReflectionDepth->GetValue (texh);
+	    renderTree.AddDebugTexture (texh, dbgAspect);
 	  }
 	  
 	  // Attach reflection texture to mesh
@@ -450,6 +497,13 @@ namespace CS
 	  {
 	    svRefraction = meshReflectRefract.refractSV;
 	    svRefractionDepth = meshReflectRefract.refractDepthSV;
+	    
+	    float dbgAspect = (float)txt_w_refl/(float)txt_h_refl;
+	    iTextureHandle* texh;
+	    svRefraction->GetValue (texh);
+	    renderTree.AddDebugTexture (texh, dbgAspect);
+	    svRefractionDepth->GetValue (texh);
+	    renderTree.AddDebugTexture (texh, dbgAspect);
 	  }
 	  
           // Attach refraction texture to mesh
@@ -457,6 +511,12 @@ namespace CS
 	  localStack[persist.svTexPlaneRefrDepth] = svRefractionDepth;
 	  localStack[persist.svReflXform] = persist.reflXformSV;
 	}
+	if (needReflTex || needRefrTex)
+	{
+	  meshReflectRefract.lastUpdate = currentTicks;
+	  meshReflectRefract.lastUpdateFrame = persist.currentFrame;
+	}
+	
         // Setup the new contexts
 	if (reflCtx) contextFunction (*reflCtx);
 	if (refrCtx) contextFunction (*refrCtx);
