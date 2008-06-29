@@ -67,6 +67,10 @@ namespace lighter
     // Build kd tree for Sector
     void BuildKDTree (Statistics::Progress& progress);
 
+    // Emit a photon to our sectors photon map
+    void EmitPhoton(const csVector3& pos, const csVector3& dir,
+                    const csColor& color, const csColor& power);
+
     // All objects in sector
     ObjectHash allObjects;
 

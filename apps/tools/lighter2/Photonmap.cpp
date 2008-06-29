@@ -81,7 +81,7 @@ namespace lighter
 
     // loop through the nearest photons and based on their normal 
     // add their color to the final returned value
-    for (int num = 0; num < nearest.GetSize(); num++)
+    for (size_t num = 0; num < nearest.GetSize(); num++)
     {
       csVector3 pnorm = nearest[num].direction;
       float app = normal.x*pnorm.x + normal.y*pnorm.y + normal.z*pnorm.z;

@@ -31,6 +31,7 @@
 #include "tui.h"
 #include "directlight.h"
 #include "sampler.h"
+#include <csutil/floatrand.h>
 
 CS_IMPLEMENT_APPLICATION
 
@@ -356,7 +357,36 @@ namespace lighter
 
   void Lighter::BuildPhotonMap()
   {
-     // TODO: Add the photon map building code here
+    int photonsToEmitPerLight = 1000;
+    csRandomVectorGen randVect;
+    // Starting from the lights
+    SectorHash::GlobalIterator sectIt = 
+      scene->GetSectors ().GetIterator ();
+    while (sectIt.HasNext ())
+    {
+      csRef<Sector> sect = sectIt.Next ();
+      
+      // emit from the lights
+      const LightRefArray& allPDLights = sect->allPDLights;
+      for (size_t pdli = 0; pdli < allPDLights.GetSize(); ++pdli)
+      {
+        Light* pdl = allPDLights[pdli];
+        const csVector3& pos = pdl->GetPosition();
+        const csColor& color = pdl->GetColor();
+        const csColor& power = pdl->GetPower();
+        csVector3 dir;
+
+        // send out photons in random directions since we only have point
+        // lights at this point
+        for (size_t num = 0; num < photonsToEmitPerLight; ++num)
+        {
+          // generate new random direction vector
+          dir = randVect.Get();
+          sect->EmitPhoton(pos, dir, color, power);
+        }
+      }
+    }
+
   }
 
   void Lighter::InitializeObjects ()
@@ -465,8 +495,8 @@ namespace lighter
       {
         csRef<Object> obj = gitr.Next();
         csArray<PrimitiveArray>& submeshArray = obj->GetPrimitives();
-        ObjectHash::GlobalIterator primItr = submeshArray.GetIterator();
-        while (primItr.HasNext())
+        csArray<PrimitiveArray>::Iterator pItr = submeshArray.GetIterator();
+        while (pItr.HasNext())
         {
 
         }

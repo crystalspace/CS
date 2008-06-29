@@ -1990,4 +1990,17 @@ namespace lighter
     }
   }
 
+  void Sector::EmitPhoton(const csVector3& pos, const csVector3& dir,
+                          const csColor& color, const csColor& power)
+  {
+    // first check for collisions with the portal 
+    for (size_t num = 0; num < allPortals.GetSize(); ++num)
+    {
+      
+    }
+
+    // now check the scene geomtry
+
+  }
+
 }
