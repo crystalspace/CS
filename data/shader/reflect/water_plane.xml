@@ -41,6 +41,7 @@
       <!-- Possible future things:
 	   - Tinted reflections/refractions?
 	   - Fresnel for specular?
+	   - Modulate specular by depth (similar to reflection)?
 	-->
       
       <alias name="surface" weak="yes" file="/shader/snippets/surface/surface-clear.xml" />
@@ -59,6 +60,8 @@
       <snippet id="perturb_norm_refr" file="/shader/snippets/tcoffset2-perturb-normal-cam.xml" />
       <snippet id="fog_refraction" file="/shader/snippets/fog/fog-distance-exp.xml" />
       <snippet id="fresnel" file="/shader/snippets/reflect/fresnel.xml" />
+      <snippet id="fresnel_limit" file="/shader/snippets/modulate-float.xml" />
+      <snippet id="fresnel_inv" file="/shader/snippets/inverse-float.xml" />
       <snippet id="blend_surface_refract" file="/shader/snippets/alpha-premult-blend.xml" />
       <snippet id="lerp_reflect_refract" file="/shader/snippets/lerp.xml" />
       <snippet id="apply_mixmode_alpha" file="/shader/snippets/mixmode-alpha.xml" />
@@ -90,10 +93,17 @@
       <connection from="perturb_norm_refr" to="refraction" />
       <connection from="reflection" to="hdrscalerefl" />
       <connection from="refraction" to="hdrscalerefr" />
+      <connection from="refraction" to="fresnel_limit">
+	<explicit from="mirroredPointDistSat" to="b" />
+      </connection>
       <connection from="hdrscalerefr" to="fog_refraction" />
       <connection from="hdrscalerefl" to="lerp_reflect_refract">
-	<explicit from="result" to="b" />
+	<explicit from="result" to="a" />
       </connection>
+      <connection from="fresnel" to="fresnel_limit">
+	<explicit from="result" to="a" />
+      </connection>
+      <connection from="fresnel_limit" to="fresnel_inv" />
       <connection from="fog_refraction" to="blend_surface_refract">
 	<explicit from="foggedColor" to="a" />
       </connection>
@@ -101,9 +111,9 @@
 	<explicit from="result" to="b" />
       </connection>
       <connection from="blend_surface_refract" to="lerp_reflect_refract">
-	<explicit from="result" to="a" />
+	<explicit from="result" to="b" />
       </connection>
-      <connection from="fresnel" to="lerp_reflect_refract" />
+      <connection from="fresnel_inv" to="lerp_reflect_refract" />
       <connection from="lerp_reflect_refract" to="apply_lighting">
 	<explicit from="result" to="surfaceDiffuse" />
       </connection>
@@ -145,6 +155,11 @@
       <parameter id="perturbScaleSV" type="shadervar" weavertype="float4">water perturb scale</parameter>
       <connection from="perturbScaleSV" to="perturb_norm_refl" />
       <connection from="perturbScaleSV" to="perturb_norm_refr" />
+      
+      <parameter id="lightOffset" type="int">0</parameter>
+      <parameter id="maxLights" type="int">1</parameter>
+      <connection from="lightOffset" to="lighting" />
+      <connection from="maxLights" to="lighting" />
     </pass>
   </technique>
   

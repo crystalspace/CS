@@ -124,11 +124,13 @@
       surfaceColor_attr_perfragment = true;
       
       mirroredPointDist = max (mirroredPointDist, 0);
+      mirroredPointDistSat = saturate (mirroredPointDist);
     </block>
     
     <output name="surfaceColor" type="rgba">
       <attribute name="perfragment" type="bool" />
     </output>
     <output name="mirroredPointDist" type="float" />
+    <output name="mirroredPointDistSat" type="float" />
   </technique>
 </snippet>
