@@ -82,6 +82,8 @@ namespace CS
         uint maxUpdatesPerFrame;
         float cameraChangeThresh;
         
+        uint dbgReflRefrTex;
+        
         PersistentData() :
           currentFrame (0),
 	  texCache (csimg2D, "rgb8",  // @@@ FIXME: Use same format as main view ...
@@ -101,6 +103,8 @@ namespace CS
 			 RenderTreeBase::DebugPersistent& dbgPersist,
 			 PostEffectManager* postEffects)
 	{
+	  dbgReflRefrTex = dbgPersist.RegisterDebugFlag ("textures.reflrefr");
+	
 	  csRef<iShaderManager> shaderManager =
 	    csQueryRegistry<iShaderManager> (objReg);
 	  
@@ -490,16 +494,20 @@ namespace CS
 	    svReflectionDepth->SetValue (texDepth);
 	    meshReflectRefract.reflectDepthSV = svReflectionDepth;
 	    
-	    float dbgAspect = (float)txt_w_refl/(float)txt_h_refl;
-	    renderTree.AddDebugTexture (tex, dbgAspect);
-	    renderTree.AddDebugTexture (texDepth, dbgAspect);
+	    if (renderTree.IsDebugFlagEnabled (persist.dbgReflRefrTex))
+	    {
+	      float dbgAspect = (float)txt_w_refl/(float)txt_h_refl;
+	      renderTree.AddDebugTexture (tex, dbgAspect);
+	      renderTree.AddDebugTexture (texDepth, dbgAspect);
+	    }
 	  }
 	  else
 	  {
 	    svReflection = meshReflectRefract.reflectSV;
 	    svReflectionDepth = meshReflectRefract.reflectDepthSV;
 	    
-	    if (doRender)
+	    if (renderTree.IsDebugFlagEnabled (persist.dbgReflRefrTex)
+	        && doRender)
 	    {
 	      float dbgAspect = (float)txt_w_refl/(float)txt_h_refl;
 	      iTextureHandle* texh = 0;
@@ -571,16 +579,20 @@ namespace CS
 	    svRefractionDepth->SetValue (texDepth);
 	    meshReflectRefract.refractDepthSV = svRefractionDepth;
 	    
-	    float dbgAspect = (float)txt_w_refr/(float)txt_h_refr;
-	    renderTree.AddDebugTexture (tex, dbgAspect);
-	    renderTree.AddDebugTexture (texDepth, dbgAspect);
+	    if (renderTree.IsDebugFlagEnabled (persist.dbgReflRefrTex))
+	    {
+	      float dbgAspect = (float)txt_w_refr/(float)txt_h_refr;
+	      renderTree.AddDebugTexture (tex, dbgAspect);
+	      renderTree.AddDebugTexture (texDepth, dbgAspect);
+	    }
 	  }
   	  else
 	  {
 	    svRefraction = meshReflectRefract.refractSV;
 	    svRefractionDepth = meshReflectRefract.refractDepthSV;
 	    
-	    if (doRender)
+	    if (renderTree.IsDebugFlagEnabled (persist.dbgReflRefrTex)
+	        && doRender)
 	    {
 	      float dbgAspect = (float)txt_w_refl/(float)txt_h_refl;
 	      iTextureHandle* texh = 0;
