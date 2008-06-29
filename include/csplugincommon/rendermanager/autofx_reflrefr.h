@@ -597,7 +597,7 @@ namespace CS
 	  localStack[persist.svTexPlaneRefrDepth] = svRefractionDepth;
 	  localStack[persist.svReflXform] = persist.reflXformSV;
 	}
-	if (needReflTex || needRefrTex)
+	if ((needReflTex || needRefrTex) && doRender)
 	{
 	  meshReflectRefract.lastUpdate = currentTicks;
 	  meshReflectRefract.lastUpdateFrame = persist.currentFrame;
