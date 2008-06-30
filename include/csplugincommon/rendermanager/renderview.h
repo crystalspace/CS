@@ -69,6 +69,10 @@ namespace RenderManager
     * Update the frustum of the current context to the current clipper.
     */
     void UpdateFrustum ();
+    void SetFrustumFromBox (const csBox2& box);
+    
+    /// Dimensions of the view being rendered to
+    int viewWidth, viewHeight;
 
     CS::Utility::MeshFilter meshFilter;
   public:
@@ -229,6 +233,10 @@ namespace RenderManager
       ty = topy;
       by = boty;
     }
+    
+    int GetViewWidth() const { return viewWidth; }
+    int GetViewHeight() const { return viewHeight; }
+    void SetViewDimensions (int w, int h) { viewWidth = w; viewHeight = h; }
 
     //-----------------------------------------------------------------
     // The following functions operate on the current render context.

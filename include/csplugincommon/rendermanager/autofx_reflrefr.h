@@ -477,6 +477,7 @@ namespace CS
 	    }
 	    
 	    // Set up context for reflection, clipped to plane
+	    reflView->SetViewDimensions (txt_w_refl, txt_h_refl);
 	    csRef<iClipper2D> newView;
 	    newView.AttachNew (new csBoxClipper (clipBoxRefl));
 	    reflView->SetClipper (newView);
@@ -559,6 +560,7 @@ namespace CS
 	    }
 	    
 	    // Set up context for reflection, clipped to plane
+	    refrView->SetViewDimensions (txt_w_refr, txt_h_refr);
 	    csRef<iClipper2D> newView;
 	    newView.AttachNew (new csBoxClipper (clipBoxRefr));
 	    refrView->SetClipper (newView);
