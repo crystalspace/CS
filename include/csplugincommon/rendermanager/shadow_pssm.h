@@ -528,6 +528,7 @@ namespace RenderManager
 	      texHandles[t] = tex;
 	    }
 	    
+	    newRenderView->SetViewDimensions (shadowMapSize, shadowMapSize);
 	    csBox2 clipBox (0, 0, shadowMapSize, shadowMapSize);
 	    csRef<iClipper2D> newView;
 	    newView.AttachNew (new csBoxClipper (clipBox));

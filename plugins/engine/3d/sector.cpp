@@ -38,10 +38,10 @@
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
 
+#include "plugins/engine/3d/camera.h"
 #include "plugins/engine/3d/engine.h"
 #include "plugins/engine/3d/light.h"
 #include "plugins/engine/3d/material.h"
-#include "plugins/engine/3d/rview.h"
 #include "plugins/engine/3d/sector.h"
 #include "plugins/engine/3d/meshgen.h"
 #include "plugins/engine/3d/meshobj.h"
@@ -894,7 +894,8 @@ void csSector::PrepareDraw (iRenderView *rview)
 
   // Make sure the visibility culler is loaded.
   GetVisibilityCuller ();
-  csRenderView* csrview = (csRenderView*)rview;
+  CS::RenderManager::RenderView* csrview =
+    (CS::RenderManager::RenderView*)rview;
   csrview->SetThisSector ((iSector*)this);
 
   size_t i = sectorCallbackList.GetSize ();

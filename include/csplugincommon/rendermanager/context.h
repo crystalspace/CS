@@ -313,6 +313,7 @@ namespace RenderManager
 	    // Setup simple portal
 	    newRenderView->SetLastPortal (portal);
 	    newRenderView->SetPreviousSector (sector);
+	    newRenderView->SetViewDimensions (txt_w, txt_h);
 	    csBox2 clipBox (0, real_h - txt_h, txt_w, real_h);
             csRef<iClipper2D> newView;
             /* @@@ Consider PolyClipper?
