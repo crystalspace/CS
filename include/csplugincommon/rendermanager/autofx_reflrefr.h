@@ -448,7 +448,6 @@ namespace CS
     #include "csutil/custom_new_enable.h"
             reflView->SetCamera (inewcam);
             reflView->GetMeshFilter().AddFilterMesh (mesh.meshWrapper);
-            reflView->SetClipPlane (reflRefrPlane_cam.Inverse ());
 	    
 	    // Change the camera transform to be a reflection across reflRefrPlane
 	    csReversibleTransform reflection (csTransform::GetReflect (reflRefrPlane));
@@ -459,6 +458,10 @@ namespace CS
 	    reflected.SetOrigin (reflection.Other2This (world2cam.GetOrigin()));
 	    inewcam->SetTransform (reflected);
 	    inewcam->SetMirrored (true);
+	    
+	    csPlane3 reflRefrPlane_newcam;
+	    reflRefrPlane_newcam = reflected.Other2This (reflRefrPlane);
+            reflView->SetClipPlane (reflRefrPlane_newcam);
 	    
 	    csRef<iTextureHandle> tex;
 	    csRef<iTextureHandle> texDepth;
@@ -560,7 +563,7 @@ namespace CS
 	    newView.AttachNew (new csBoxClipper (clipBoxRefr));
 	    refrView->SetClipper (newView);
             refrView->GetMeshFilter().AddFilterMesh (mesh.meshWrapper);
-            refrView->SetClipPlane (reflRefrPlane_cam);
+            refrView->SetClipPlane (reflRefrPlane_cam.Inverse ());
   
 	    refrCtx = renderTree.CreateContext (refrView);
 	    refrCtx->renderTargets[rtaColor0].texHandle = tex;
