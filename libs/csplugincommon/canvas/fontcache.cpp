@@ -409,7 +409,7 @@ void csFontCache::SetupCacheData (GlyphCacheData* cacheData,
   cacheData->font = font;
   cacheData->glyph = glyph;
   cacheData->flags = flags & RELEVANT_WRITE_FLAGS;
-  if (cacheData->hasGlyph = font->font->HasGlyph (glyph))
+  if ( (cacheData->hasGlyph = font->font->HasGlyph (glyph)) )
   {
     font->font->GetGlyphMetrics (glyph, cacheData->glyphMetrics);
   }

@@ -8639,6 +8639,7 @@ sub DESTROY {
 *SetAccessor = *cspacec::csShaderVariable_SetAccessor;
 *SetName = *cspacec::csShaderVariable_SetName;
 *GetName = *cspacec::csShaderVariable_GetName;
+*GetAccessor = *cspacec::csShaderVariable_GetAccessor;
 *GetAccessorData = *cspacec::csShaderVariable_GetAccessorData;
 *GetValue = *cspacec::csShaderVariable_GetValue;
 *SetValue = *cspacec::csShaderVariable_SetValue;
@@ -11717,6 +11718,7 @@ sub new {
 *Classify = *cspacec::csPlane3_Classify;
 *Distance = *cspacec::csPlane3_Distance;
 *Invert = *cspacec::csPlane3_Invert;
+*Inverse = *cspacec::csPlane3_Inverse;
 *Normalize = *cspacec::csPlane3_Normalize;
 *FindPoint = *cspacec::csPlane3_FindPoint;
 *ProjectOnto = *cspacec::csPlane3_ProjectOnto;
@@ -19117,6 +19119,49 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csSectorVisibleRenderMeshes ##############
+
+package cspace::csSectorVisibleRenderMeshes;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_imesh_get = *cspacec::csSectorVisibleRenderMeshes_imesh_get;
+*swig_imesh_set = *cspacec::csSectorVisibleRenderMeshes_imesh_set;
+*swig_num_get = *cspacec::csSectorVisibleRenderMeshes_num_get;
+*swig_num_set = *cspacec::csSectorVisibleRenderMeshes_num_set;
+*swig_rmeshes_get = *cspacec::csSectorVisibleRenderMeshes_rmeshes_get;
+*swig_rmeshes_set = *cspacec::csSectorVisibleRenderMeshes_rmeshes_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csSectorVisibleRenderMeshes(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csSectorVisibleRenderMeshes($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iSector ##############
 
 package cspace::iSector;
@@ -19171,6 +19216,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetSVContext = *cspacec::iSector_GetSVContext;
 *PrecacheDraw = *cspacec::iSector_PrecacheDraw;
 *CallSectorCallbacks = *cspacec::iSector_CallSectorCallbacks;
+*GetVisibleRenderMeshes = *cspacec::iSector_GetVisibleRenderMeshes;
 *scfGetVersion = *cspacec::iSector_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

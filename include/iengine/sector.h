@@ -28,6 +28,8 @@
  * \addtogroup engine3d
  * @{ */
 
+#include "ivideo/rendermesh.h"
+
 #include "csutil/cscolor.h"
 #include "csutil/scf.h"
 #include "csutil/set.h"
@@ -166,6 +168,19 @@ struct csSectorHitBeamResult
 };
 
 /**
+ * Container for render meshes for one mesh wrapper
+ */
+struct csSectorVisibleRenderMeshes
+{
+  /// The mesh wrapper which is the source of the render meshes
+  iMeshWrapper* imesh;
+  /// Number of render meshes
+  int num;
+  /// Render meshes
+  csRenderMesh** rmeshes;
+};
+
+/**
  * The iSector interface is used to work with "sectors". A "sector"
  * is an empty region of space that can contain other objects (mesh
  * objects). A sector itself does not represent geometry but only
@@ -190,7 +205,7 @@ struct csSectorHitBeamResult
  */
 struct iSector : public virtual iBase
 {
-  SCF_INTERFACE(iSector,2,3,0);
+  SCF_INTERFACE(iSector,2,3,1);
   /// Get the iObject for this sector.
   virtual iObject *QueryObject () = 0;
 
@@ -484,6 +499,12 @@ struct iSector : public virtual iBase
    * Call all the sector callback functions
    */
   virtual void CallSectorCallbacks (iRenderView* rview) = 0;
+
+  /**
+   * Get the render meshes for a specific mesh wrapper. Also processes LOD.
+   */
+  virtual csSectorVisibleRenderMeshes* GetVisibleRenderMeshes (int& num,
+    iMeshWrapper* mesh, iRenderView *rview, uint32 frustum_mask) = 0;
 };
 
 

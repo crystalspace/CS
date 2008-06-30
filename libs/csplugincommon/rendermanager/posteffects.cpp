@@ -480,6 +480,12 @@ size_t PostEffectManager::GetBucketIndex (const LayerOptions& options)
   buckets[index].options = options;
   return index;
 }
+    
+bool PostEffectManager::ScreenSpaceYFlipped ()
+{
+  return (postLayers.GetSize() > 1)
+    || (chainedEffects && chainedEffects->ScreenSpaceYFlipped());
+}
 
 //---------------------------------------------------------------------------
 

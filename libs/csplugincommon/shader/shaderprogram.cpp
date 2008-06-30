@@ -31,8 +31,23 @@
 
 #include "csplugincommon/shader/shaderprogram.h"
 
-CS_LEAKGUARD_IMPLEMENT (csShaderProgram);
+void csShaderProgram::ProgramParam::SetValue (float val)
+{
+  var.AttachNew (new csShaderVariable (CS::InvalidShaderVarStringID));
+  var->SetValue (val);
+  valid = true;
+}
 
+void csShaderProgram::ProgramParam::SetValue (const csVector4& val)
+{
+  var.AttachNew (new csShaderVariable (CS::InvalidShaderVarStringID));
+  var->SetValue (val);
+  valid = true;
+}
+
+//---------------------------------------------------------------------------
+
+CS_LEAKGUARD_IMPLEMENT (csShaderProgram);
 
 csShaderProgram::csShaderProgram (iObjectRegistry* objectReg)
   : scfImplementationType (this)

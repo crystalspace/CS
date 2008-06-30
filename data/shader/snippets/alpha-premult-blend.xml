@@ -15,17 +15,21 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
-<input name="shadowClip" type="float2" default="complex">
-  <block location="cg:fragmentIn">
-    <uniform type="float2" name="shadowClip" />
-  </block>
-  
-  <block location="cg:variablemap">
-    <variablemap variable="light shadow clip" 
-		  destination="fragmentIn.shadowClip" />
-  </block>
-  
-  <block location="cg:fragmentMain">
-    shadowClip = fragmentIn.shadowClip;
-  </block>
-</input>
+<snippet>
+  <technique priority="100">
+    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+    
+    <input name="a" type="rgba" />
+    <input name="b" type="rgba" />
+      
+    <block location="cg:fragmentMain">
+      result = a*(1-b.a) + b;
+    </block>
+
+    <block location="cg:vertexMain">
+      result = a*(1-b.a) + b;
+    </block>
+    
+    <output name="result" type="rgba" />
+  </technique>
+</snippet>

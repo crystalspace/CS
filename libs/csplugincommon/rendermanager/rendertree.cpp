@@ -76,6 +76,8 @@ namespace CS
     
     void RenderTreeBase::AddDebugTexture (iTextureHandle* tex, float aspect)
     {
+      if (!tex) return;
+    
       DebugTexture dt;
       dt.texh = tex;
       dt.aspect = aspect;
