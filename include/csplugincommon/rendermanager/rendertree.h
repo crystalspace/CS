@@ -377,6 +377,15 @@ namespace RenderManager
 	    return true;
 	  }
         }
+        if (renderView.IsValid())
+        {
+          iGraphics3D* g3d = renderView->GetGraphics3D();
+          if (g3d)
+          {
+            renderW = g3d->GetWidth();
+            renderH = g3d->GetHeight();
+          }
+        }
         return false;
       }
     };
