@@ -77,6 +77,8 @@ class csShaderVariableStack;
 #define CSDRAW_CLEARZBUFFER 0x00000010
 /// Clear frame buffer ?
 #define CSDRAW_CLEARSCREEN  0x00000020
+/// Ignore clipping rectangle when clearing?
+#define CSDRAW_NOCLIPCLEAR  0x00000040
 /** @} */
 
 /**\name Type of clipper (for iGraphics3D::SetClipper())

@@ -485,7 +485,8 @@ namespace CS
 	    reflCtx = renderTree.CreateContext (reflView);
 	    reflCtx->renderTargets[rtaColor0].texHandle = tex;
 	    reflCtx->renderTargets[rtaDepth].texHandle = texDepth;
-	    reflCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
+	    reflCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER
+	      | CSDRAW_NOCLIPCLEAR;
 	    reflCtx->shadervars = meshReflectRefract.clipPlaneReflContext;
 	      
 	    svReflection.AttachNew (new csShaderVariable (
@@ -570,7 +571,8 @@ namespace CS
 	    refrCtx = renderTree.CreateContext (refrView);
 	    refrCtx->renderTargets[rtaColor0].texHandle = tex;
 	    refrCtx->renderTargets[rtaDepth].texHandle = texDepth;
-	    refrCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
+	    refrCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER
+	      | CSDRAW_NOCLIPCLEAR;
 	    refrCtx->shadervars = meshReflectRefract.clipPlaneRefrContext;
 	      
 	    // Attach reflection texture to mesh
