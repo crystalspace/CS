@@ -17670,6 +17670,28 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csPlane3_Inverse(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csPlane3 *arg1 = (csPlane3 *) 0 ;
+  csPlane3 result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csPlane3_Inverse",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csPlane3, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csPlane3_Inverse" "', argument " "1"" of type '" "csPlane3 const *""'"); 
+  }
+  arg1 = reinterpret_cast< csPlane3 * >(argp1);
+  result = ((csPlane3 const *)arg1)->Inverse();
+  resultobj = SWIG_NewPointerObj((new csPlane3(static_cast< const csPlane3& >(result))), SWIGTYPE_p_csPlane3, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_csPlane3_Normalize(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csPlane3 *arg1 = (csPlane3 *) 0 ;
@@ -48245,6 +48267,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csPlane3_Classify", _wrap_csPlane3_Classify, METH_VARARGS, NULL},
 	 { (char *)"csPlane3_Distance", _wrap_csPlane3_Distance, METH_VARARGS, NULL},
 	 { (char *)"csPlane3_Invert", _wrap_csPlane3_Invert, METH_VARARGS, NULL},
+	 { (char *)"csPlane3_Inverse", _wrap_csPlane3_Inverse, METH_VARARGS, NULL},
 	 { (char *)"csPlane3_Normalize", _wrap_csPlane3_Normalize, METH_VARARGS, NULL},
 	 { (char *)"csPlane3_FindPoint", _wrap_csPlane3_FindPoint, METH_VARARGS, NULL},
 	 { (char *)"csPlane3_ProjectOnto", _wrap_csPlane3_ProjectOnto, METH_VARARGS, NULL},

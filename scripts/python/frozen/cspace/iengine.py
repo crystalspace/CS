@@ -350,6 +350,21 @@ class csSectorHitBeamResult(object):
 csSectorHitBeamResult_swigregister = _iengine.csSectorHitBeamResult_swigregister
 csSectorHitBeamResult_swigregister(csSectorHitBeamResult)
 
+class csSectorVisibleRenderMeshes(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    imesh = _swig_property(_iengine.csSectorVisibleRenderMeshes_imesh_get, _iengine.csSectorVisibleRenderMeshes_imesh_set)
+    num = _swig_property(_iengine.csSectorVisibleRenderMeshes_num_get, _iengine.csSectorVisibleRenderMeshes_num_set)
+    rmeshes = _swig_property(_iengine.csSectorVisibleRenderMeshes_rmeshes_get, _iengine.csSectorVisibleRenderMeshes_rmeshes_set)
+    def __init__(self, *args): 
+        this = _iengine.new_csSectorVisibleRenderMeshes(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _iengine.delete_csSectorVisibleRenderMeshes
+    __del__ = lambda self : None;
+csSectorVisibleRenderMeshes_swigregister = _iengine.csSectorVisibleRenderMeshes_swigregister
+csSectorVisibleRenderMeshes_swigregister(csSectorVisibleRenderMeshes)
+
 class iSector(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
@@ -401,6 +416,7 @@ class iSector(core.iBase):
     def GetSVContext(*args): return _iengine.iSector_GetSVContext(*args)
     def PrecacheDraw(*args): return _iengine.iSector_PrecacheDraw(*args)
     def CallSectorCallbacks(*args): return _iengine.iSector_CallSectorCallbacks(*args)
+    def GetVisibleRenderMeshes(*args): return _iengine.iSector_GetVisibleRenderMeshes(*args)
     scfGetVersion = staticmethod(_iengine.iSector_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iSector
     __del__ = lambda self : None;

@@ -41,7 +41,6 @@ struct iSector;
 struct csFog;
 
 class csBox3;
-class csRenderView;
 class csReversibleTransform;
 class csSphere;
 class csVector3;

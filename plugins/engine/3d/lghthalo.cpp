@@ -25,6 +25,7 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/material.h"
 #include "ivideo/texture.h"
+#include "plugins/engine/3d/camera.h"
 #include "plugins/engine/3d/engine.h"
 #include "plugins/engine/3d/halo.h"
 #include "plugins/engine/3d/halogen.h"

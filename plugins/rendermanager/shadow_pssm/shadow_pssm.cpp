@@ -131,8 +131,27 @@ public:
     // Setup shaders and tickets
     SetupStandardTicket (context, shaderManager,
       lightSetup.GetPostLightingLayers());
+  
+    {
+      RMShadowedPSSM::AutoReflectRefractType fxRR (
+        rmanager->reflectRefractPersistent, *this);
+      typedef TraverseUsedSVSets<RenderTreeType,
+        RMShadowedPSSM::AutoReflectRefractType> SVTraverseType;
+      SVTraverseType svTraverser
+        (fxRR, shaderManager->GetSVNameStringset ()->GetSize ());
+      // And do the iteration
+      ForEachMeshNode (context, svTraverser);
+    }
   }
 
+
+  // Called by RMShadowedPSSM::AutoReflectRefractType
+  void operator() (typename RenderTreeType::ContextNode& context)
+  {
+    typename PortalSetupType::ContextSetupData portalData (&context);
+
+    operator() (context, portalData);
+  }
 
 private:
   RMShadowedPSSM* rmanager;
@@ -165,6 +184,7 @@ bool RMShadowedPSSM::RenderView (iView* view)
   contextsScannedForTargets.Empty ();
   portalPersistent.UpdateNewFrame ();
   lightPersistent.UpdateNewFrame ();
+  reflectRefractPersistent.UpdateNewFrame ();
 
   iSector* startSector = rview->GetThisSector ();
 
@@ -328,6 +348,8 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
   portalPersistent.Initialize (shaderManager, g3d);
   lightPersistent.shadowPersist.SetConfigPrefix ("RenderManager.ShadowPSSM");
   lightPersistent.Initialize (objectReg, treePersistent.debugPersist);
+  reflectRefractPersistent.Initialize (objectReg, treePersistent.debugPersist,
+    &postEffects);
   
   return true;
 }

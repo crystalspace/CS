@@ -19,15 +19,14 @@
   <technique priority="100">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
-    <input name="perturbScaleXlate" type="float4" default="value" defval="1,1,0,0" />
-    <input name="N" type="normal_camera" />
-      
+    <input name="N" type="direction_tangent" />
+    
     <block location="cg:fragmentMain">
-      result = N.xy * perturbScaleXlate.xy + perturbScaleXlate.zw;
+      result.xy = N.xy;
     </block>
-
+    
     <block location="cg:vertexMain">
-      result = N.xy * perturbScaleXlate.xy + perturbScaleXlate.zw;
+      result.xy = N.xy;
     </block>
     
     <output name="result" type="float2" />

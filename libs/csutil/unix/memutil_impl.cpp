@@ -20,7 +20,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/csstring.h"
 #include "csutil/sysfunc.h"
 #include "../memutil.h"
+#if defined(CS_HAVE_SYSINFO)
 #include <sys/sysinfo.h>
+#endif
 
 
 static size_t query_sysinfo()

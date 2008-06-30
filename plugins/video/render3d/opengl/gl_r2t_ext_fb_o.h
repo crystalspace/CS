@@ -331,34 +331,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 
   namespace CachePurge
   {
-    class RenderBuffer
-    {
-    public:
-      struct AddParameter
-      {
-        AddParameter () {}
-      };
-      struct StoredAuxiliaryInfo
-      {
-	template<typename ResourceCacheType>
-	StoredAuxiliaryInfo (const ResourceCacheType& cache, 
-	  const AddParameter& param) {}
-      };
-      
-      template<typename ResourceCacheType>
-      void MarkActive (const ResourceCacheType& cache,
-	  StoredAuxiliaryInfo& elementInfo)
-      { }
-
-      template<typename ResourceCacheType>
-      bool IsPurgeable (const ResourceCacheType& cache,
-	StoredAuxiliaryInfo& elementInfo,
-	const typename ResourceCacheType::CachedType& data)
-      {
-	return data->GetRefCount() == 1;
-      }
-    };
-    
     class FrameBuffer :
       public CS::Utility::ResourceCache::PurgeConditionAfterTime<>
     {
@@ -412,7 +384,7 @@ class csGLRender2TextureEXTfbo : public csGLRender2TextureBackend
 
   typedef CS::Utility::GenericResourceCache<csRef<RenderBufferWrapper>,
     uint, CacheSorting::RenderBuffer, CacheReuse::RenderBuffer,
-    CachePurge::RenderBuffer> RBCache;
+    CS::Utility::ResourceCache::PurgeIfOnlyOneRef> RBCache;
   RBCache depthRBCache, stencilRBCache;
   CS::Utility::GenericResourceCache<FBOWrapper,
     uint, CacheSorting::FrameBuffer, 

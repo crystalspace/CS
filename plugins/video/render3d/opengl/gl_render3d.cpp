@@ -1317,10 +1317,21 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
     clearMask = GL_COLOR_BUFFER_BIT;
   else if (doStencilClear)
     clearMask = GL_STENCIL_BUFFER_BIT;
+  
+  bool scissorWasEnabled;
+  if (drawflags & CSDRAW_NOCLIPCLEAR)
+  {
+    scissorWasEnabled = statecache->IsEnabled_GL_SCISSOR_TEST();
+    statecache->Disable_GL_SCISSOR_TEST();
+  }
+    
   if (!enableDelaySwap)
     glClear (clearMask);
   else
     delayClearFlags = clearMask;
+    
+  if ((drawflags & CSDRAW_NOCLIPCLEAR) && scissorWasEnabled)
+    statecache->Enable_GL_SCISSOR_TEST();
 
   statecache->SetCullFace (GL_FRONT);
 

@@ -71,6 +71,20 @@
       </block>
     </input>
     
+    <input name="reflectXform" type="float4" default="complex" private="yes">
+      <block location="cg:vertexIn">
+	<uniform type="float4" name="reflectXform" />
+      </block>
+      
+      <block location="cg:variablemap">
+	<variablemap variable="reflection coord xform" destination="vertexIn.reflectXform" />
+      </block>
+      
+      <block location="cg:vertexMain">
+	reflectXform = vertexIn.reflectXform;
+      </block>
+    </input>
+    
     <block location="cg:vertexToFragment">
       <varying type="position4" name="reflTC" />
     </block>
@@ -81,8 +95,9 @@
       mirroredPointDist = 0;
       
       reflTC = mul (ModelViewProj, positionO);
-      float halfW = reflTC.w * 0.5;
-      reflTC.xyz = reflTC.xyz * float3(0.5, 0.5, -0.5) + float3(halfW);
+      float3 reflScale = float3 (reflectXform.xy, 0.5);
+      float3 reflXlate = float3 (reflectXform.zw, -0.5) * reflTC.w;
+      reflTC.xyz = reflTC.xyz * reflScale + reflXlate;
     </block>
     
     <block location="cg:fragmentMain">
@@ -101,15 +116,21 @@
       
       mirroredPointDist = distRefrFromEye - distPlaneFromEye;
       
-      float perturbWeight = min (inv_reflW, saturate (mirroredPointDist));
+      float perturbWeight = clamp (inv_reflW, 0, saturate (mirroredPointDist));
+      //debug (float4 (abs(perturb.x)*10, 0, 0, 1));
+      //debug (float4 (0, abs(perturb.y)*10, 0, 1));
       tc.xy += perturb * perturbWeight;
       surfaceColor = tex2Dproj (texReflect, tc);
       surfaceColor_attr_perfragment = true;
+      
+      mirroredPointDist = max (mirroredPointDist, 0);
+      mirroredPointDistSat = saturate (mirroredPointDist);
     </block>
     
     <output name="surfaceColor" type="rgba">
       <attribute name="perfragment" type="bool" />
     </output>
     <output name="mirroredPointDist" type="float" />
+    <output name="mirroredPointDistSat" type="float" />
   </technique>
 </snippet>

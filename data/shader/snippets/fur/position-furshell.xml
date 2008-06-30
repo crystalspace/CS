@@ -99,6 +99,13 @@
       <varying type="position4" name="position_camera"/>
     </block>
     
+    <block location="cg:clips">
+      <!-- Clip for reflection/refraction rendering -->
+      <clip space="object">
+	<plane type="shadervar">clip plane reflection</plane>
+      </clip>
+    </block>
+    
     <block location="cg:vertexMain">
       position_object = Hposition;
       float furFactor = (totalPasses > 1) ? (float (passNumber)/float (totalPasses-1)) : 0;
@@ -106,10 +113,14 @@
       position_screen = position = mul (ModelViewProj, position_object);
       position_camera = mul (ModelView, position_object);
       position_world = mul (objectToWorld, position_object);
+      
+      APPLY_CLIPPING_VP(position_camera, position_world, position_object);
     </block>
     
     <block location="cg:fragmentMain">
       position = position_screen;
+      
+      APPLY_CLIPPING_FP;
     </block>
     
     <output name="position" type="position4_screen" />

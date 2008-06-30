@@ -90,7 +90,10 @@ namespace RenderManager
   /**
    * Generic cache for caching precreated textures
    */
-  class TextureCache
+  template<
+    typename ReuseCondition = CS::Utility::ResourceCache::ReuseConditionAfterTime<csTicks>,
+    typename PurgeCondition = CS::Utility::ResourceCache::PurgeConditionAfterTime<csTicks> >
+  class TextureCacheT
   {    
   public:
     enum
@@ -99,10 +102,13 @@ namespace RenderManager
       tcachePowerOfTwo = 2
     };
 
-    TextureCache (csImageType imgtype, const char* format, int textureFlags, 
-      const char* texClass, uint options) : g3d (0), 
-      backend (CS::Utility::ResourceCache::ReuseConditionAfterTime<uint> (),
-        CS::Utility::ResourceCache::PurgeConditionAfterTime<uint> (10000)),
+    TextureCacheT (csImageType imgtype, const char* format, int textureFlags, 
+      const char* texClass, uint options,
+      const ReuseCondition& reuse =
+        CS::Utility::ResourceCache::ReuseConditionAfterTime<uint> (),
+      const PurgeCondition& purge =
+        CS::Utility::ResourceCache::PurgeConditionAfterTime<uint> (10000)) : g3d (0), 
+      backend (reuse, purge),
       imgtype (imgtype),
       format (format), textureFlags (textureFlags), texClass (texClass), 
       options (options) 
@@ -178,7 +184,8 @@ namespace RenderManager
     csRef<iGraphics3D> g3d;
 
     CS::Utility::GenericResourceCache<csRef<iTextureHandle>,
-      csTicks, Implementation::TextureSizeConstraint> backend;
+      csTicks, Implementation::TextureSizeConstraint,
+      ReuseCondition, PurgeCondition> backend;
 
     csImageType imgtype;
     csString format;
@@ -187,6 +194,7 @@ namespace RenderManager
     uint options;
   };
   
+  typedef TextureCacheT<> TextureCache;
 } // namespace RenderManager
 } // namespace CS
 
