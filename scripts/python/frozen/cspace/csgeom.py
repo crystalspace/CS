@@ -595,6 +595,7 @@ class csPlane3(object):
     Classify = staticmethod(_csgeom.csPlane3_Classify)
     def Distance(*args): return _csgeom.csPlane3_Distance(*args)
     def Invert(*args): return _csgeom.csPlane3_Invert(*args)
+    def Inverse(*args): return _csgeom.csPlane3_Inverse(*args)
     def Normalize(*args): return _csgeom.csPlane3_Normalize(*args)
     def FindPoint(*args): return _csgeom.csPlane3_FindPoint(*args)
     def ProjectOnto(*args): return _csgeom.csPlane3_ProjectOnto(*args)
