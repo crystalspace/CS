@@ -155,7 +155,6 @@ void csWaterMeshObject::SetupObject ()
 {
   if (!initialized || vertsChanged)
   {
-	printf("initialized: %d\tvertsChanged: %d\n", initialized, vertsChanged);
     initialized = true;
 
 	// Make sure the factory is ok and his its buffers.
@@ -541,7 +540,6 @@ void csWaterMeshObjectFactory::SetupFactory ()
 	numVerts = verts.GetSize();
 	numTris = tris.GetSize();
 	
-	printf("Children size: %d\n", children.GetSize());
 	for(uint i = 0; i < children.GetSize(); i++)
 	{
 		children[i]->vertsChanged = true;
