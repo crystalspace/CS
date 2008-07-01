@@ -81,6 +81,15 @@ private:
   // for all types of data we need.
   void SetupBufferHolder ();
 
+  //Local buffers and variables
+  csRef<iRenderBuffer> vertex_buffer;
+  csRef<iRenderBuffer> normal_buffer;
+
+  csDirtyAccessArray<csVector3> verts;
+  csDirtyAccessArray<csVector3> norms;
+
+  void SetupVertexBuffer();
+
   // Admin stuff.
   csWeakRef<iGraphics3D> g3d;
   csRef<csWaterMeshObjectFactory> factory;
@@ -197,6 +206,8 @@ public:
           iDecalBuilder* decalBuilder)
   {
   }
+
+  bool vertsChanged;
   /** @} */
 
   /**\name iRenderBufferAccessor implementation
@@ -249,7 +260,7 @@ private:
 	csDirtyAccessArray<csColor>	cols;
 	csDirtyAccessArray<csTriangle> tris;
 	
-	uint numVerts, numTris;
+	int numVerts, numTris;
 
 
 
@@ -311,11 +322,16 @@ private:
    */
   void SetupFactory ();
 
+
+  csArray<csWaterMeshObject *> children;
+
 public:
   iObjectRegistry* object_reg;
   iMeshFactoryWrapper* logparent;
   csRef<iMeshObjectType> water_type;
   csFlags flags;
+
+  bool changedVerts;
 
   /// Constructor.
   csWaterMeshObjectFactory (iMeshObjectType *pParent,
@@ -379,6 +395,8 @@ public:
   virtual iObjectModel* GetObjectModel () { return this; }
 
   void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
+  void AddMeshObject (csWaterMeshObject* meshObj);
+  void RemoveMeshObject (csWaterMeshObject* meshObj);
 };
 
 #include "csutil/deprecated_warn_on.h"

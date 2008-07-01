@@ -66,6 +66,7 @@ csWaterMeshObject::csWaterMeshObject (csWaterMeshObjectFactory* factory) :
   csWaterMeshObject::factory = factory;
   logparent = 0;
   initialized = false;
+  vertsChanged = true;
 
   material = 0;
 
@@ -76,17 +77,20 @@ csWaterMeshObject::csWaterMeshObject (csWaterMeshObjectFactory* factory) :
   color.blue = 0;
   factory_color_nr = (uint)~0;
   mesh_colors_dirty_flag = true;
-
+	
   current_lod = 1;
   current_features = 0;
 
   g3d = csQueryRegistry<iGraphics3D> (factory->object_reg);
 
   variableContext.AttachNew (new csShaderVariableContext);
+
+  factory->AddMeshObject(this);
 }
 
 csWaterMeshObject::~csWaterMeshObject ()
 {
+	factory->RemoveMeshObject(this);
 }
 
 iMeshObjectFactory* csWaterMeshObject::GetFactory () const
@@ -105,9 +109,6 @@ void csWaterMeshObject::SetupBufferHolder ()
   if (bufferHolder == 0)
     bufferHolder.AttachNew (new csRenderBufferHolder);
 
-  // Make sure the factory is ok and his its buffers.
-  factory->SetupFactory ();
-
   // When creating buffers we basically have two ways. Either
   // we can create the buffer immediatelly and supply it in the context.
   // Or else we create an accessor for the buffer so that the
@@ -123,7 +124,7 @@ void csWaterMeshObject::SetupBufferHolder ()
   bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, factory->index_buffer);
 
   // Vertices are fetched from the factory.
-  bufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, factory->vertex_buffer);
+  bufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, vertex_buffer);
 
   // Texels are fetched from the factory.
   bufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, factory->texel_buffer);
@@ -135,11 +136,42 @@ void csWaterMeshObject::SetupBufferHolder ()
   bufferHolder->SetAccessor (myRenderBufferAccessor, CS_BUFFER_NORMAL_MASK | CS_BUFFER_COLOR_MASK);
 }
 
+void csWaterMeshObject::SetupVertexBuffer()
+{
+  if (vertsChanged)
+  {
+    if (!vertex_buffer)
+    {
+      // Create a buffer that doesn't copy the data.
+      vertex_buffer = csRenderBuffer::CreateRenderBuffer (
+        factory->numVerts, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
+        3);
+    }
+    vertex_buffer->CopyInto (verts.GetArray(), factory->numVerts);
+  }
+}
+
 void csWaterMeshObject::SetupObject ()
 {
-  if (!initialized)
+  if (!initialized || vertsChanged)
   {
     initialized = true;
+
+	// Make sure the factory is ok and his its buffers.
+	factory->SetupFactory ();
+	
+	if(vertsChanged)
+	{
+		verts.DeleteAll();
+		norms.DeleteAll();
+		for(uint i = 0; i < factory->verts.GetSize(); i++)
+		{
+			verts.Push(factory->verts[i]);
+			norms.Push(factory->norms[i]);
+		}
+	}
+
+	SetupVertexBuffer ();	
     SetupBufferHolder ();
   }
 
@@ -226,6 +258,10 @@ csRenderMesh** csWaterMeshObject::GetRenderMeshes (
 
 void csWaterMeshObject::NextFrame (csTicks, const csVector3&, uint)
 {
+	// for(uint i = 0; i < verts.GetSize(); i++)
+	// {
+	// 	printf("Vertex %d: <%f, %f, %f>\n", i, verts[i].x, verts[i].y, verts[i].z);
+	// }
 }
 
 bool csWaterMeshObject::HitBeamOutline (const csVector3& start,
@@ -329,7 +365,7 @@ void csWaterMeshObject::PreGetBuffer (csRenderBufferHolder *holder,
       }
       mesh_colors_dirty_flag = false;
       const csColor* factory_colors = factory->cols.GetArray();
-      uint i;
+      int i;
       csColor colors[factory->numVerts];
       for (i = 0 ; i < factory->numVerts ; i++)
         colors[i] = factory_colors[i]+color;
@@ -339,9 +375,20 @@ void csWaterMeshObject::PreGetBuffer (csRenderBufferHolder *holder,
     }
     holder->SetRenderBuffer (CS_BUFFER_COLOR, color_buffer);
   } 
-  else 
+  else if (buffer == CS_BUFFER_NORMAL)
   {
-    factory->PreGetBuffer (holder, buffer);
+    if (vertsChanged)
+    {
+      if (!normal_buffer)
+      {
+        normal_buffer = csRenderBuffer::CreateRenderBuffer (
+          factory->numVerts, CS_BUF_STATIC,
+          CS_BUFCOMP_FLOAT, 3);
+      }
+      // Don't copy the data, have the buffer store a pointer instead.
+      normal_buffer->SetData (norms.GetArray());
+    }
+    holder->SetRenderBuffer (CS_BUFFER_NORMAL, normal_buffer);
   }
 }
 
@@ -373,6 +420,8 @@ csWaterMeshObjectFactory::csWaterMeshObjectFactory (
   mesh_normals_dirty_flag = true;
   mesh_triangle_dirty_flag = true;
 
+  changedVerts = false;
+
   len = 2;
   wid = 2;
   gran = 1;
@@ -392,12 +441,22 @@ csWaterMeshObjectFactory::~csWaterMeshObjectFactory ()
 {
 }
 
+void csWaterMeshObjectFactory::AddMeshObject (csWaterMeshObject* meshObj)
+{
+	children.Push(meshObj);
+}
+
+void csWaterMeshObjectFactory::RemoveMeshObject (csWaterMeshObject* meshObj)
+{
+	children.Delete(children[children.Find(meshObj)]);
+}
+
 void csWaterMeshObjectFactory::CalculateBBoxRadius ()
 {
   object_bbox_valid = true;
   csVector3& v0 = verts[0];
   object_bbox.StartBoundingBox (v0);
-  uint i;
+  int i;
   for (i = 1 ; i < numVerts ; i++)
   {
     csVector3& v = verts[i];
@@ -477,7 +536,12 @@ void csWaterMeshObjectFactory::SetupFactory ()
 	
 	numVerts = verts.GetSize();
 	numTris = tris.GetSize();
-    
+	
+	for(uint i = 0; i < children.GetSize(); i++)
+	{
+		children[i]->vertsChanged = true;
+	}
+	
 	Invalidate();
 
     PrepareBuffers ();
@@ -549,22 +613,6 @@ csRef<iTextureWrapper> csWaterMeshObjectFactory::MakeFresnelTex(int size)
 void csWaterMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder, 
                                              csRenderBufferName buffer)
 {
-  if (buffer == CS_BUFFER_NORMAL)
-  {
-    if (mesh_normals_dirty_flag)
-    {
-      mesh_normals_dirty_flag = false;
-      if (!normal_buffer)
-      {
-        normal_buffer = csRenderBuffer::CreateRenderBuffer (
-          numVerts, CS_BUF_STATIC,
-          CS_BUFCOMP_FLOAT, 3);
-      }
-      // Don't copy the data, have the buffer store a pointer instead.
-      normal_buffer->SetData (norms.GetArray());
-    }
-    holder->SetRenderBuffer (CS_BUFFER_NORMAL, normal_buffer);
-  }
 }
 
 void csWaterMeshObjectFactory::Invalidate ()
