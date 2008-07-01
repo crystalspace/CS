@@ -66,7 +66,7 @@ csWaterMeshObject::csWaterMeshObject (csWaterMeshObjectFactory* factory) :
   csWaterMeshObject::factory = factory;
   logparent = 0;
   initialized = false;
-  vertsChanged = true;
+  vertsChanged = false;
 
   material = 0;
 
@@ -155,6 +155,7 @@ void csWaterMeshObject::SetupObject ()
 {
   if (!initialized || vertsChanged)
   {
+	printf("initialized: %d\tvertsChanged: %d\n", initialized, vertsChanged);
     initialized = true;
 
 	// Make sure the factory is ok and his its buffers.
@@ -169,9 +170,12 @@ void csWaterMeshObject::SetupObject ()
 			verts.Push(factory->verts[i]);
 			norms.Push(factory->norms[i]);
 		}
-	}
 
-	SetupVertexBuffer ();	
+		SetupVertexBuffer ();
+			
+		vertsChanged = false;
+	}
+	
     SetupBufferHolder ();
   }
 
@@ -537,6 +541,7 @@ void csWaterMeshObjectFactory::SetupFactory ()
 	numVerts = verts.GetSize();
 	numTris = tris.GetSize();
 	
+	printf("Children size: %d\n", children.GetSize());
 	for(uint i = 0; i < children.GetSize(); i++)
 	{
 		children[i]->vertsChanged = true;
