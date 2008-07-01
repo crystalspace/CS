@@ -69,7 +69,7 @@ bool csSoftShader_VP::Load (iShaderDestinationResolver*,
   return true;
 }
 
-bool csSoftShader_VP::Compile()
+bool csSoftShader_VP::Compile (iHierarchicalCache*)
 {
   // @@@ FIXME: Implement me.
   return true;

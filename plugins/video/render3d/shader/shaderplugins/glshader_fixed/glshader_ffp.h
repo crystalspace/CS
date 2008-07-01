@@ -161,12 +161,14 @@ public:
   { return false; }
 
   /// Compile a program
-  virtual bool Compile ();
+  virtual bool Compile (iHierarchicalCache*);
 
   virtual int ResolveTU (const char* binding)
   { return layerNames.Get (binding, -1); }
 
   virtual void GetUsedShaderVars (csBitArray& bits) const;
+  
+  virtual bool LoadFromCache (iHierarchicalCache* cache) { return false; }
 };
 
 

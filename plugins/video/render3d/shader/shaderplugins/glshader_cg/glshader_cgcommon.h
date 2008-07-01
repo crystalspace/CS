@@ -191,6 +191,8 @@ public:
 
   const csSet<csString>& GetUnusedParameters ()
   { return unusedParams; }
+  
+  virtual bool LoadFromCache (iHierarchicalCache* cache) { return false; }
 };
 
 }

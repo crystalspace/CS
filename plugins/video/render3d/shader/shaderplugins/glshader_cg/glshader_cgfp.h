@@ -61,7 +61,7 @@ public:
   virtual void ResetState ();
 
   /// Compile a program
-  virtual bool Compile();
+  virtual bool Compile (iHierarchicalCache* cache);
 
   virtual int ResolveTU (const char* binding);
 

@@ -505,7 +505,7 @@ csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (
   if (!program->Load (resolve, programNode))
     return 0;
 
-  if (!program->Compile ())
+  if (!program->Compile (0))
     return 0;
 
   return csPtr<iShaderProgram> (program);

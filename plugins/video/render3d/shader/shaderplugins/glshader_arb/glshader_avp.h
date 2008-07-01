@@ -88,7 +88,9 @@ public:
     csArray<csShaderVarMapping> &);
 
   /// Compile a program
-  virtual bool Compile();
+  virtual bool Compile (iHierarchicalCache*);
+  
+  virtual bool LoadFromCache (iHierarchicalCache* cache) { return false; }
 };
 
 

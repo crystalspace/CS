@@ -41,7 +41,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 
 CS_LEAKGUARD_IMPLEMENT (csShaderGLCGVP);
 
-bool csShaderGLCGVP::Compile ()
+bool csShaderGLCGVP::Compile (iHierarchicalCache* cache)
 {
   if (!shaderPlug->enableVP) return false;
 

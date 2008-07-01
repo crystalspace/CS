@@ -80,7 +80,7 @@ bool csShaderGLPS1_Common::Load (iShaderDestinationResolver*,
 }
 
 
-bool csShaderGLPS1_Common::Compile ()
+bool csShaderGLPS1_Common::Compile (iHierarchicalCache*)
 {
   
   for (size_t i = 0; i < variablemap.GetSize (); i++)
