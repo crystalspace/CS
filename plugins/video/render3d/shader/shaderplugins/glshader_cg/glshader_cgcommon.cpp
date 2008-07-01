@@ -84,12 +84,14 @@ void csShaderGLCGCommon::SetParameterValue (CGparameter param,
 	if (var->GetValue (i))
 	  cgGLSetParameter1f (param, i);
       }
+      break;
     case CG_FLOAT:
       {
 	float f;
 	if (var->GetValue (f))
 	  cgGLSetParameter1f (param, f);
       }
+      break;
     case CG_FLOAT2:
       {
 	csVector2 v;
