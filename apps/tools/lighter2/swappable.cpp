@@ -27,9 +27,13 @@
 
 namespace lighter
 {
-  SwapManager::SwapManager (size_t maxSize) : entryAlloc (1000),
-    maxCacheSize (maxSize), currentCacheSize (0), currentUnlockTime (1)
+  SwapManager::SwapManager (size_t maxSize) : entryAlloc (1000),   
+    currentCacheSize (0), currentUnlockTime (1)
   {
+#if CS_PROCESSOR_SIZE == 32
+    //@@ Try to make sure we don't run out of virtual address space, don't use above 1GB for swapcache
+    maxCacheSize = csMin (maxSize, 1u<<30);
+#endif
   }
 
   SwapManager::~SwapManager ()
@@ -89,7 +93,7 @@ namespace lighter
 
     if (currentCacheSize > maxCacheSize)
     {
-      FreeMemory (currentCacheSize - maxCacheSize);
+      FreeMemory ((currentCacheSize - maxCacheSize) * 2);
     }
 
     if (!SwapIn (e))
@@ -330,7 +334,7 @@ namespace lighter
       }
     }
 
-    size_t targetSize = currentCacheSize - desiredAmount;
+    size_t targetSize = csMax ((long)currentCacheSize - (long)desiredAmount, 0L);
     
     csArray<SwapEntry*>::Iterator sit = sortedList.GetIterator ();
     while ((targetSize < currentCacheSize) && sit.HasNext ())

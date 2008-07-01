@@ -591,17 +591,21 @@ namespace lighter
     if (pdLights == 0)
     {
       pdLights = new LightmapPtrDelArray;
-      for (size_t i = 0; i < lightmaps.GetSize(); i++)
-      {
-        Lightmap* lm = new Lightmap (lightmaps[i]->GetWidth(), 
-          lightmaps[i]->GetHeight());
-        lm->Grow (lightmaps[i]->GetWidth(), 
-          lightmaps[i]->GetHeight());
-        pdLights->Push (lm);
-      }
+      pdLights->SetSize (lightmaps.GetSize ());
+ 
       pdLightmaps.Put (light, pdLights);
     }
-    return pdLights->Get (realLmNum);
+
+    Lightmap* lm = pdLights->Get (realLmNum);
+    if (!lm)
+    {
+      lm = new Lightmap (lightmaps[realLmNum]->GetWidth(), 
+        lightmaps[realLmNum]->GetHeight());
+      lm->Grow (lightmaps[realLmNum]->GetWidth(), 
+        lightmaps[realLmNum]->GetHeight());
+      pdLights->Get (realLmNum) = lm;
+    }
+    return lm;
   }
 
   csArray<LightmapPtrDelArray*> Scene::GetAllLightmaps ()
@@ -1615,9 +1619,13 @@ namespace lighter
       {
         csPtrKey<Light> key;
         LightmapPtrDelArray* lm = pdlIt.Next(key);
-        if (lm->Get (i)->IsNull (
-          globalConfig.GetLMProperties().blackThreshold,
-          globalConfig.GetLMProperties().grayPDMaps)) continue;
+        if (!lm->Get (i) || 
+            lm->Get (i)->IsNull (
+              globalConfig.GetLMProperties().blackThreshold,
+              globalConfig.GetLMProperties().grayPDMaps))
+        {
+          continue;
+        }
 
         csString lmID (key->GetLightID ().HexString());
         csString textureFilename;
