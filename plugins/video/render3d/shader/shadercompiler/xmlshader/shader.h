@@ -213,7 +213,7 @@ class csXMLShader : public scfImplementationExt3<csXMLShader,
   };
   csArray<ShaderTechVariant> techVariants;
   csRef<csConditionEvaluator> sharedEvaluator;
-  csRef<iCacheManager> shaderCache;
+  csRef<iHierarchicalCache> shaderCache;
   bool readFromCache;
   csString cacheTag;
   csString cacheType;

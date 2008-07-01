@@ -65,7 +65,7 @@ private:
   csRef<iStringSet> strings;
   csRef<iShaderVarStringSet> stringsSvName;
   csRef<iEventHandler> weakEventHandler;
-  csRef<iCacheManager> shaderCache;
+  csRef<iHierarchicalCache> shaderCache;
 
   bool do_verbose;
 
@@ -183,7 +183,7 @@ public:
     return stringsSvName;
   }
   
-  iCacheManager* GetShaderCache()
+  iHierarchicalCache* GetShaderCache()
   { return shaderCache; }
   /** @} */
 

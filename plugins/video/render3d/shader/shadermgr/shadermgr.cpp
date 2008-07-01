@@ -28,7 +28,7 @@
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
-#include "csutil/vfscache.h"
+#include "csutil/vfshiercache.h"
 #include "csutil/xmltiny.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
@@ -225,8 +225,10 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   sv_time->SetValue (0.0f);
   
   if (config->GetBool ("Video.ShaderManager.EnableShaderCache", false))
-    shaderCache.AttachNew (new csVfsCacheManager (objectreg,
+  {
+    shaderCache.AttachNew (new CS::Utility::VfsHierarchicalCache (objectreg,
        "/tmp/shadercache"));
+  }
 
   return true;
 }

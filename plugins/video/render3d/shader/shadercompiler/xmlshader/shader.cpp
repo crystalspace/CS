@@ -21,7 +21,7 @@
 #include <ctype.h>
 
 #include "imap/services.h"
-#include "iutil/cache.h"
+#include "iutil/hiercache.h"
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 #include "ivideo/rendermesh.h"
@@ -462,7 +462,8 @@ void csXMLShader::Load (iDocumentNode* source)
   {
     useShaderCache = false;
     csRef<iDataBuffer> cacheData;
-    cacheData = shaderCache->ReadCache (cacheType, cacheID_header, ~0);
+    cacheData = shaderCache->ReadCache (csString().Format ("/%s/%s", cacheType.GetData(), 
+      cacheID_header.GetData()));
     if (cacheData.IsValid())
     {
       cacheFile.AttachNew (new csMemFile (cacheData, true));
@@ -595,7 +596,9 @@ void csXMLShader::Load (iDocumentNode* source)
       {
         csRef<iDataBuffer> allCacheData = cacheFile->GetAllData();
 	shaderCache->CacheData (allCacheData->GetData(),
-	  allCacheData->GetSize(), cacheType, cacheID_header, ~0);
+	  allCacheData->GetSize(), 
+	  csString().Format ("/%s/%s", cacheType.GetData(), 
+            cacheID_header.GetData()));
       }
     }
   }
@@ -794,8 +797,9 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
         csRef<iFile> cacheFile;
         if (readFromCache && shaderCache.IsValid())
         {
-          csRef<iDataBuffer> cacheData (shaderCache->ReadCache (cacheType, 
-            cacheScope_tech, cacheID));
+          csRef<iDataBuffer> cacheData (shaderCache->ReadCache (
+            csString().Format ("/%s/%s/%u", cacheType.GetData(), 
+              cacheScope_tech.GetData(), cacheID)));
           if (cacheData.IsValid())
             cacheFile.AttachNew (new csMemFile (cacheData, true));
         }
@@ -930,7 +934,8 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	      {
 		csRef<iDataBuffer> cacheData (cacheFile->GetAllData());
 		shaderCache->CacheData (cacheData->GetData(), cacheData->GetSize(),
-		  cacheType, cacheScope_tech, cacheID);
+		  csString().Format ("/%s/%s/%u", cacheType.GetData(), 
+                    cacheScope_tech.GetData(), cacheID));
 	      }
 	    }
 	  }
