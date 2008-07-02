@@ -53,7 +53,7 @@ namespace lighter
 
     // Set a pixel to given color
     inline void SetAddPixel (size_t u, size_t v, csColor c)
-    {
+    {     
       colorArray[v*GetWidth() + u] += c;
     }
 
@@ -92,8 +92,10 @@ namespace lighter
       if (!IsLocked() && (colorArray == 0))
       {
 	colorArray = AllocColors();
-      }
+      }           
       Swappable::Lock();
+
+      CS_ASSERT (colorArray);
     }
     
     virtual void GetSwapData (void*& data, size_t& size)
@@ -112,7 +114,9 @@ namespace lighter
     {
       CS_ASSERT (size == GetWidth() * GetHeight() * sizeof (csColor));
       CS_ASSERT (colorArray == BogusPointer ());
-      colorArray = (csColor*)data;
+      CS_ASSERT (data);
+
+      colorArray = (csColor*)data;      
     }
   protected:
     // The color data itself
