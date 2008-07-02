@@ -551,7 +551,8 @@ bool csShaderGLCGCommon::WriteToCache (iHierarchicalCache* cache)
     "/cg");
 }
 
-bool csShaderGLCGCommon::LoadFromCache (iHierarchicalCache* cache)
+bool csShaderGLCGCommon::LoadFromCache (iHierarchicalCache* cache,
+                                        csRef<iString>* failReason)
 {
   if (!cache) return false;
 

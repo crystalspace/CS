@@ -28,6 +28,8 @@
 
 #include "ivideo/shader/shader.h"
 
+struct iString;
+
 /**\addtogroup plugincommon
  * @{ */
 
@@ -112,7 +114,8 @@ struct iShaderProgram : public virtual iBase
   virtual void GetUsedShaderVars (csBitArray& bits) const = 0;
   
   /// Loads from a cache
-  virtual bool LoadFromCache (iHierarchicalCache* cache) = 0;
+  virtual bool LoadFromCache (iHierarchicalCache* cache,
+    csRef<iString>* failReason = 0) = 0;
 };
 
 /**

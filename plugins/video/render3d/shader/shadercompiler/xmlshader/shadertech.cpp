@@ -23,6 +23,7 @@
 #include "imap/services.h"
 #include "iutil/hiercache.h"
 #include "iutil/plugin.h"
+#include "iutil/string.h"
 #include "ivaria/reporter.h"
 #include "ivideo/rendermesh.h"
 #include "ivideo/material.h"
@@ -918,14 +919,23 @@ csPtr<iShaderProgram> csXMLShaderTech::LoadProgramFromCache (
   {
     if (parent->compiler->do_verbose)
       SetFailReason(
-	  "Couldn't retrieve shader plugin '%s' in shader '%s'",
-	  cacheInfo.pluginID.GetData(), parent->GetName ());
+	  "Couldn't retrieve shader plugin '%s' for '%s' in shader '%s'",
+	  cacheInfo.pluginID.GetData(), cacheInfo.progType.GetData(),
+	  parent->GetName ());
     return 0;
   }
 
   program = plg->CreateProgram (cacheInfo.progType);
-  if (!program->LoadFromCache (cache))
+  csRef<iString> failReason;
+  if (!program->LoadFromCache (cache, &failReason))
+  {
+    if (parent->compiler->do_verbose)
+      SetFailReason(
+	"Failed to read '%s' from cache: %s",
+	cacheInfo.progType.GetData(),
+	failReason.IsValid() ? failReason->GetData() : "no reason given");
     return 0;
+  }
 
   return csPtr<iShaderProgram> (program);
 }
