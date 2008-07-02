@@ -33,7 +33,6 @@ class csShaderGLPS1_NV : public csShaderGLPS1_Common
 {
 private:
   GLuint program_num;
-  GLuint tex_program_num;
 
   struct nv_input
   {
@@ -96,9 +95,8 @@ private:
 
 public:
   csShaderGLPS1_NV (csGLShader_PS1* shaderPlug)
-    : csShaderGLPS1_Common(shaderPlug) 
+    : csShaderGLPS1_Common(shaderPlug)
   {
-    tex_program_num = (GLuint)~0;
   }
   virtual ~csShaderGLPS1_NV ()
   {

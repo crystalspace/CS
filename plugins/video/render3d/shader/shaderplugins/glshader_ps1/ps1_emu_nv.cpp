@@ -104,48 +104,32 @@ void csShaderGLPS1_NV::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
     }
   }
 
-  // Has to go here at least the first time so that we can find
-  // the correct texture targets
-  if (shaderPlug->useLists)
-  {
-    if (tex_program_num != (GLuint)~0)
-    {
-      glCallList(tex_program_num);
-    }
-    else
-    {
-      tex_program_num = program_num + 1;
-      glNewList (tex_program_num, GL_COMPILE);
-      ActivateTextureShaders ();
-      glEndList();
-    }
-  }
-  else
-    ActivateTextureShaders ();
+  ActivateTextureShaders ();
 }
 
 void csShaderGLPS1_NV::ResetState ()
 {
+  for(i = 4; i-- > 0;)
+  {
+    shaderPlug->stateCache->SetCurrentTU ((int)i);
+    shaderPlug->stateCache->ActivateTU (csGLStateCache::activateTexEnv);
+    glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
+      GL_NONE);
+  }
 }
 
 void csShaderGLPS1_NV::ActivateTextureShaders ()
 {
+  uint tusSet = 0;
   size_t i;
-  for(i = 0; i < 4; i++)
-  {
-    shaderPlug->stateCache->SetCurrentTU ((int)i);
-    shaderPlug->stateCache->ActivateTU (csGLStateCache::activateTexCoord);
-    glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
-      GL_NONE);
-  }
-
 
   for(i = 0; i < texture_shader_stages.GetSize (); i++)
   {
     const nv_texture_shader_stage &shader = texture_shader_stages.Get(i);
 
     shaderPlug->stateCache->SetCurrentTU (shader.stage);
-    shaderPlug->stateCache->ActivateTU (csGLStateCache::activateTexCoord);
+    shaderPlug->stateCache->ActivateTU (csGLStateCache::activateTexEnv);
+    tusSet |= 1 << shader.stage;
 
     switch(shader.instruction)
     {
@@ -257,6 +241,15 @@ void csShaderGLPS1_NV::ActivateTextureShaders ()
         break;
     }
   }
+
+  for(i = 0; i < 4; i++)
+  {
+    if (tusSet & (1 << i)) continue;
+    shaderPlug->stateCache->SetCurrentTU ((int)i);
+    shaderPlug->stateCache->ActivateTU (csGLStateCache::activateTexEnv);
+    glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
+      GL_NONE);
+  }
 }
 
 bool csShaderGLPS1_NV::ActivateRegisterCombiners ()
@@ -333,15 +326,15 @@ bool csShaderGLPS1_NV::ActivateRegisterCombiners ()
 
 GLenum csShaderGLPS1_NV::GetTexTarget()
 {
-  if(glIsEnabled(GL_TEXTURE_CUBE_MAP_ARB))
-    return GL_TEXTURE_CUBE_MAP_ARB;
-  if(glIsEnabled(GL_TEXTURE_3D))
+  if(shaderPlug->stateCache->IsEnabled_GL_TEXTURE_CUBE_MAP())
+    return GL_TEXTURE_CUBE_MAP;
+  if(shaderPlug->stateCache->IsEnabled_GL_TEXTURE_3D())
     return GL_TEXTURE_3D;
-  if(glIsEnabled(GL_TEXTURE_RECTANGLE_NV))
-    return GL_TEXTURE_RECTANGLE_NV;
-  if(glIsEnabled(GL_TEXTURE_2D))
+  if(shaderPlug->stateCache->IsEnabled_GL_TEXTURE_RECTANGLE_ARB())
+    return GL_TEXTURE_RECTANGLE_ARB;
+  if(shaderPlug->stateCache->IsEnabled_GL_TEXTURE_2D())
     return GL_TEXTURE_2D;
-  if(glIsEnabled(GL_TEXTURE_1D))
+  if(shaderPlug->stateCache->IsEnabled_GL_TEXTURE_1D())
     return GL_TEXTURE_1D;
 
   return GL_NONE;
@@ -726,6 +719,7 @@ bool csShaderGLPS1_NV::LoadProgramStringToGL ()
 
   if(stages.GetSize () < 1) return false;
 
+  num_combiners = 1;
   int prev_combiner = 0;
   for(i = 0; i < stages.GetSize (); i++)
   {
