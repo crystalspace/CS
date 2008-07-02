@@ -214,9 +214,7 @@ class csXMLShader : public scfImplementationExt3<csXMLShader,
   csArray<ShaderTechVariant> techVariants;
   csRef<csConditionEvaluator> sharedEvaluator;
   csRef<iHierarchicalCache> shaderCache;
-  bool readFromCache;
   csString cacheTag;
-  csString cacheType;
   csString cacheScope_tech;
 
   /// Shader we fall back to if none of the techs validate
@@ -268,6 +266,11 @@ protected:
   void InternalRemove() { SelfDestruct(); }
 
   void Load (iDocumentNode* source);
+  
+  bool LoadTechniqueFromCache (ShaderTechVariant::Technique& tech,
+    iHierarchicalCache* cache);
+  void LoadTechnique (ShaderTechVariant::Technique& tech,
+    iHierarchicalCache* cacheTo, size_t dbgTechNum);
 public:
   CS_LEAKGUARD_DECLARE (csXMLShader);
 

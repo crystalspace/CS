@@ -32,6 +32,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 class csXMLShaderCompiler;
 class csXMLShader;
 
+struct CachedPlugin;
+struct CachedPlugins;
+
 class csXMLShaderTech
 {
 private:
@@ -109,12 +112,25 @@ private:
   csString fail_reason;
 
   // load one pass, return false if it fails
-  bool LoadPass (iDocumentNode *node, ShaderPass* pass, size_t variant);
+  bool LoadPass (iDocumentNode *node, ShaderPass* pass, size_t variant,
+    iFile* cacheFile, iHierarchicalCache* cacheTo);
+  bool WritePass (ShaderPass* pass, const CachedPlugins& plugins, iFile* cacheFile);
+  bool LoadPassFromCache (ShaderPass* pass, size_t variant,
+    iFile* cacheFile, iHierarchicalCache* cache);
+  bool ReadPass (ShaderPass* pass, iFile* cacheFile,
+    CachedPlugins& plugins);
+  
+  bool LoadBoilerplate (iLoaderContext* ldr_context, iDocumentNode* node,
+    iDocumentNode* parentSV);
+  
   // load a shaderdefinition block
   //bool LoadSVBlock (iDocumentNode *node, iShaderVariableContext *context);
   // load a shaderprogram
   csPtr<iShaderProgram> LoadProgram (iShaderDestinationResolver* resolve,
-  	iDocumentNode *node, ShaderPass* pass, size_t variant);
+  	iDocumentNode *node, ShaderPass* pass, size_t variant,
+        iHierarchicalCache* cacheTo, CachedPlugin& cacheInfo);
+  csPtr<iShaderProgram> LoadProgramFromCache (ShaderPass* pass, size_t variant,
+        iHierarchicalCache* cache, const CachedPlugin& cacheInfo);
   // Set reason for failure.
   void SetFailReason (const char* reason, ...) CS_GNUC_PRINTF (2, 3);
 
@@ -136,7 +152,9 @@ public:
   void GetUsedShaderVars (csBitArray& bits) const;
 
   bool Load (iLoaderContext* ldr_context, iDocumentNode* node,
-      iDocumentNode* parentSV, size_t variant);
+      iDocumentNode* parentSV, size_t variant, iHierarchicalCache* cacheTo);
+  bool LoadFromCache (iLoaderContext* ldr_context, iHierarchicalCache* cache,
+    iDocumentNode* parentSV, size_t variant);
 
   const char* GetFailReason()
   { return fail_reason.GetData(); }
