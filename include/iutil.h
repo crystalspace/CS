@@ -39,6 +39,7 @@
 #include "iutil/eventhandlers.h"
 #include "iutil/eventnames.h"
 #include "iutil/eventq.h"
+#include "iutil/hiercache.h"
 #include "iutil/job.h"
 #include "iutil/kitchensink.h"
 #include "iutil/memdebug.h"
