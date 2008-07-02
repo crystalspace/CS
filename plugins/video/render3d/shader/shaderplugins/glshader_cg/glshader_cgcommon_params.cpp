@@ -446,6 +446,51 @@ void csShaderGLCGCommon::GetShaderParamSlot (ShaderParameter* sparam)
   }
 }
 
+void csShaderGLCGCommon::ApplyVmap()
+{
+  size_t i = 0;
+  while (i < variablemap.GetSize ())
+  {
+    // Get the Cg parameter
+    CGparameter param = cgGetNamedParameter (program, 
+      variablemap[i].destination);
+    ShaderParameter* sparam =
+      reinterpret_cast<ShaderParameter*> (variablemap[i].userVal);
+
+    if (!param /*||
+	(cgGetParameterType (param) != CG_ARRAY && !cgIsParameterReferenced (param))*/)
+    {
+      variablemap.DeleteIndex (i);
+      FreeShaderParam (sparam);
+      continue;
+    }
+    FillShaderParam (sparam, param);
+    bool assumeConst = sparam->assumeConstant;
+    if (assumeConst)
+    {
+      if (assumedConstParams == 0)
+	assumedConstParams = new csSafeCopyArray<VariableMapEntry>;
+      assumedConstParams->Push (variablemap[i]);
+      variablemap.DeleteIndex (i);
+      continue;
+    }
+    // Mark constants as to be folded in
+    if (variablemap[i].mappingParam.IsConstant())
+    {
+      csShaderVariable* var = variablemap[i].mappingParam.var;
+      if (var != 0)
+	SetParameterValueCg (sparam, var);
+      cgSetParameterVariability (param, CG_LITERAL);
+      variablemap.DeleteIndex (i);
+      FreeShaderParam (sparam);
+      continue;
+    }
+    i++;
+  }
+
+  variablemap.ShrinkBestFit();
+}
+
 void csShaderGLCGCommon::PostCompileVmapProcess ()
 {
   for(size_t i = 0; i < variablemap.GetSize (); )

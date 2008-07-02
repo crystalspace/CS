@@ -76,6 +76,8 @@ protected:
   CGprofile programProfile;
   csString cg_profile;
   csString entrypoint;
+  csRefArray<iDocumentNode> cacheKeepNodes;
+  csString objectCode;
 
   bool validProgram;
 
@@ -103,6 +105,7 @@ protected:
   enum { svClipPackedDist0 = ~23, svClipPackedDist1 = ~42 };
   csRef<csShaderVariable> clipPackedDists[2];
   bool ParseClip (iDocumentNode* node);
+  bool ParseVmap (iDocumentNode* node);
 
   csString debugFN;
   void EnsureDumpFile();
@@ -110,22 +113,22 @@ protected:
   void FreeShaderParam (ShaderParameter* sparam);
   void FillShaderParam (ShaderParameter* sparam, CGparameter param);
   void GetShaderParamSlot (ShaderParameter* sparam);
+  void ApplyVmap();
   void PostCompileVmapProcess ();
   bool PostCompileVmapProcess (ShaderParameter* sparam);
 
   enum
   {
-    loadPrecompiled = 1,
-    loadLoadToGL = 2,
-    loadIgnoreErrors = 4,
-    loadApplyVmap = 8,
+    loadLoadToGL = 1,
+    loadIgnoreErrors = 2,
+    loadApplyVmap = 4,
   };
   bool DefaultLoadProgram (iShaderDestinationResolverCG* cgResolve,
     const char* programStr, CGGLenum type, 
     CGprofile maxProfile, uint flags = loadLoadToGL | loadApplyVmap);
   void DoDebugDump ();
   void WriteAdditionalDumpInfo (const char* description, const char* content);
-  virtual const char* GetProgramType()
+  const char* GetProgramType()
   {
     switch (programType)
     {
@@ -152,6 +155,8 @@ protected:
   void ApplyVariableMapArray (const Array& array, const ParamSetter& setter,
     const csShaderVariableStack& stack);
   void ApplyVariableMapArrays (const csShaderVariableStack& stack);
+  
+  bool WriteToCache (iHierarchicalCache* cache);
 public:
   CS_LEAKGUARD_DECLARE (csShaderGLCGCommon);
 
@@ -192,7 +197,7 @@ public:
   const csSet<csString>& GetUnusedParameters ()
   { return unusedParams; }
   
-  virtual bool LoadFromCache (iHierarchicalCache* cache) { return false; }
+  virtual bool LoadFromCache (iHierarchicalCache* cache);
 };
 
 }

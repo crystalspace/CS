@@ -215,8 +215,11 @@ bool csShaderGLCGFP::Compile (iHierarchicalCache* cache)
      * @@@ FIXME: two passes are not always needed.
      */
     CollectUnusedParameters (unusedParams);
-    return DefaultLoadProgram (this, programStr, CG_GL_FRAGMENT, 
+    bool ret = DefaultLoadProgram (this, programStr, CG_GL_FRAGMENT, 
       shaderPlug->maxProfileFragment);
+      
+    WriteToCache (cache);
+    return ret;
   }
 
   return true;

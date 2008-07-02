@@ -69,6 +69,8 @@ bool csShaderGLCGVP::Compile (iHierarchicalCache* cache)
       shaderPlug->maxProfileVertex))
     return false;
 
+  WriteToCache (cache);
+
   return true;
 }
 

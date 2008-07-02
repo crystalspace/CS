@@ -113,6 +113,54 @@ bool csShaderGLCGCommon::ParseClip (iDocumentNode* node)
   return true;
 }
 
+bool csShaderGLCGCommon::ParseVmap (iDocumentNode* node)
+{
+  //@@ REWRITE
+  const char* destname = node->GetAttributeValue ("destination");
+  if (!destname)
+  {
+    synsrv->Report ("crystalspace.graphics3d.shader.common",
+      CS_REPORTER_SEVERITY_WARNING, node,
+      "<variablemap> has no 'destination' attribute");
+    return false;
+  }
+  
+  bool assumeConst = node->GetAttributeValueAsBool ("assumeconst",
+    false);
+
+  const char* varname = node->GetAttributeValue ("variable");
+  if (!varname)
+  {
+    // "New style" variable mapping
+    VariableMapEntry vme (CS::InvalidShaderVarStringID, destname);
+    if (!ParseProgramParam (node, vme.mappingParam,
+      ParamFloat | ParamVector2 | ParamVector3 | ParamVector4))
+      return false;
+    ShaderParameter* sparam = shaderPlug->paramAlloc.Alloc();
+    sparam->assumeConstant = assumeConst;
+    vme.userVal = reinterpret_cast<intptr_t> (sparam);
+    variablemap.Push (vme);
+  }
+  else
+  {
+    // "Classic" variable mapping
+    CS::Graphics::ShaderVarNameParser nameParse (varname);
+    VariableMapEntry vme (
+      stringsSvName->Request (nameParse.GetShaderVarName()),
+      destname);
+    for (size_t n = 0; n < nameParse.GetIndexNum(); n++)
+    {
+      vme.mappingParam.indices.Push (nameParse.GetIndexValue (n));
+    }
+    ShaderParameter* sparam = shaderPlug->paramAlloc.Alloc();
+    sparam->assumeConstant = assumeConst;
+    vme.userVal = reinterpret_cast<intptr_t> (sparam);
+    variablemap.Push (vme);
+  }
+  
+  return true;
+}
+
 bool csShaderGLCGCommon::Load (iShaderDestinationResolver* resolve, 
 			       iDocumentNode* program)
 {
@@ -151,54 +199,14 @@ bool csShaderGLCGCommon::Load (iShaderDestinationResolver* resolve,
             compilerArgs);
           break;
 	case XMLTOKEN_VARIABLEMAP:
-	  {
-	    //@@ REWRITE
-	    const char* destname = child->GetAttributeValue ("destination");
-	    if (!destname)
-	    {
-	      synsrv->Report ("crystalspace.graphics3d.shader.common",
-		CS_REPORTER_SEVERITY_WARNING, child,
-		"<variablemap> has no 'destination' attribute");
-	      return false;
-	    }
-	    
-	    bool assumeConst = child->GetAttributeValueAsBool ("assumeconst",
-	      false);
-    
-	    const char* varname = child->GetAttributeValue ("variable");
-	    if (!varname)
-	    {
-	      // "New style" variable mapping
-	      VariableMapEntry vme (CS::InvalidShaderVarStringID, destname);
-	      if (!ParseProgramParam (child, vme.mappingParam,
-		ParamFloat | ParamVector2 | ParamVector3 | ParamVector4))
-		return false;
-	      ShaderParameter* sparam = shaderPlug->paramAlloc.Alloc();
-	      sparam->assumeConstant = assumeConst;
-	      vme.userVal = reinterpret_cast<intptr_t> (sparam);
-	      variablemap.Push (vme);
-	    }
-	    else
-	    {
-	      // "Classic" variable mapping
-	      CS::Graphics::ShaderVarNameParser nameParse (varname);
-	      VariableMapEntry vme (
-		stringsSvName->Request (nameParse.GetShaderVarName()),
-		destname);
-	      for (size_t n = 0; n < nameParse.GetIndexNum(); n++)
-	      {
-		vme.mappingParam.indices.Push (nameParse.GetIndexValue (n));
-	      }
-	      ShaderParameter* sparam = shaderPlug->paramAlloc.Alloc();
-	      sparam->assumeConstant = assumeConst;
-	      vme.userVal = reinterpret_cast<intptr_t> (sparam);
-	      variablemap.Push (vme);
-	    }
-	  }
+	  if (!ParseVmap (child))
+	    return false;
+	  cacheKeepNodes.Push (child);
 	  break;
 	case XMLTOKEN_CLIP:
 	  if (!ParseClip (child))
 	    return false;
+          cacheKeepNodes.Push (child);
 	  break;
         default:
 	  if (!ParseCommon (child))

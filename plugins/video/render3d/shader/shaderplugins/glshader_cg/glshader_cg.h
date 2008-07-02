@@ -68,6 +68,9 @@ public:
   CGprofile maxProfileFragment;
   
   csBlockAllocator<ShaderParameter> paramAlloc;
+  
+  csRef<iDocumentSystem> binDocSys;
+  csRef<iDocumentSystem> xmlDocSys;
 
   csGLShader_CG (iBase *parent);
   virtual ~csGLShader_CG ();

@@ -24,6 +24,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
+#include "csutil/xmltiny.h"
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
 #include "ivaria/reporter.h"
@@ -505,6 +506,13 @@ bool csGLShader_CG::Initialize(iObjectRegistry* reg)
   if (!CS::PluginCommon::ShaderProgramPluginGL::Initialize (reg))
     return false;
     
+  csRef<iPluginManager> plugin_mgr = 
+    csQueryRegistry<iPluginManager> (object_reg);
+
+  binDocSys = csLoadPluginCheck<iDocumentSystem> (plugin_mgr,
+    "crystalspace.documentsystem.binary");
+  xmlDocSys.AttachNew (new csTinyDocumentSystem);
+  
   return true;
 }
 
