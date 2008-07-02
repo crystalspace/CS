@@ -18,8 +18,11 @@
 
 #include "cssysdef.h"
 
+#include "iutil/stringarray.h"
 #include "iutil/objreg.h"
 #include "iutil/vfs.h"
+
+#include "csutil/csstring.h"
 
 #include "csutil/vfshiercache.h"
 
@@ -43,16 +46,81 @@ namespace CS
     {
     }
   
+    void VfsHierarchicalCache::EnsureDirectories (const char* path)
+    {
+      CS_ASSERT(path);
+      CS_ASSERT(*path);
+      CS_ASSERT(path[strlen(path)-1] != '/');
+      
+      csStringFast<512> pathWithSlash (path);
+      pathWithSlash.Append ("/");
+      if (vfs->Exists (pathWithSlash))
+      {
+        // File exists as directory as we want it
+      }
+      else if (vfs->Exists (path))
+      {
+        // File exists as file - delete
+        vfs->DeleteFile (path);
+      }
+      else
+      {
+        // File does not exist - VFS will create it
+      }
+    }
+    
+    void VfsHierarchicalCache::EnsureFile (const char* path)
+    {
+      CS_ASSERT(path);
+      CS_ASSERT(*path);
+      CS_ASSERT(path[strlen(path)-1] != '/');
+      
+      csStringFast<512> pathWithSlash (path);
+      pathWithSlash.Append ("/");
+      if (vfs->Exists (pathWithSlash))
+      {
+        // File exists as directory
+        RecursiveDelete (pathWithSlash);
+      }
+      else if (vfs->Exists (path))
+      {
+        // File exists as file, okay
+      }
+      else
+      {
+        // File does not exist
+        csStringFast<512> dirPart (path);
+        dirPart.Truncate (dirPart.FindLast ('/'));
+        EnsureDirectories (dirPart);
+      }
+    }
+      
+    bool VfsHierarchicalCache::RecursiveDelete (const char* fn)
+    {
+      csRef<iStringArray> files;
+      files = vfs->FindFiles (fn);
+      for (size_t i = 0; i < files->GetSize(); i++)
+      {
+	const char* entry = files->Get (i);
+	if (entry[strlen(entry)-1] == '/')
+	{
+	  RecursiveDelete (entry);
+	}
+	else
+	  vfs->DeleteFile (entry);
+      }
+      return vfs->DeleteFile (fn);
+    }
+    
     bool VfsHierarchicalCache::CacheData (const void* data, size_t size,
                                           const char* path)
     {
       if (!path || !*path || (*path != '/')) return false;
     
-      csString fullPath (vfsdir);
+      csStringFast<512> fullPath (vfsdir);
       fullPath.Append (path);
       
-      /* @@@ TODO: Check if items down to destination are dirs and destination
-       * itself a file. If not, remove as needed. */
+      EnsureFile (fullPath);
       
       return vfs->WriteFile (fullPath, (char*)data, size);
     }
@@ -61,7 +129,7 @@ namespace CS
     {
       if (!path || !*path || (*path != '/')) return 0;
     
-      csString fullPath (vfsdir);
+      csStringFast<512> fullPath (vfsdir);
       fullPath.Append (path);
       
       return vfs->ReadFile (fullPath, false);
@@ -71,10 +139,10 @@ namespace CS
     {
       if (!path || !*path || (*path != '/')) return false;
     
-      csString fullPath (vfsdir);
+      csStringFast<512> fullPath (vfsdir);
       fullPath.Append (path);
       
-      return vfs->DeleteFile (fullPath);
+      return RecursiveDelete (fullPath);
     }
     
     void VfsHierarchicalCache::Flush ()
@@ -86,7 +154,8 @@ namespace CS
     {
       if (!base || !*base || (*base != '/')) return 0;
     
-      csString fullPath (vfsdir);
+      csStringFast<512> fullPath (vfsdir);
+      fullPath.Append (base);
       
       return csPtr<iHierarchicalCache> (new VfsHierarchicalCache (object_reg, fullPath));
     }

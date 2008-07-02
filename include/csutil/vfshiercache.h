@@ -45,6 +45,13 @@ namespace CS
       iObjectRegistry* object_reg;
       csString vfsdir;
       csRef<iVFS> vfs;
+      
+      /// Makes sure all parts of \a path are directories
+      void EnsureDirectories (const char* path);
+      /// Makes sure the last part of \a path is not a directory
+      void EnsureFile (const char* path);
+      /// Revursively delete \a path and all directories below it
+      bool RecursiveDelete (const char* path);
     public:
       /**
        * Construct the cache with the given directory.
