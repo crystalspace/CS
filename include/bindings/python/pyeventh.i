@@ -66,25 +66,25 @@
     }
 
   static const char * StaticHandlerName() {return "crystalspace.cspython";};
-  CS_CONST_METHOD static const csHandlerID StaticID(csRef<iEventHandlerRegistry> &reg) 
+  static const csHandlerID StaticID(csRef<iEventHandlerRegistry> &reg) 
   { return reg->GetGenericID(StaticHandlerName()); }			;
-  CS_CONST_METHOD virtual const char * GenericName() const		
+  virtual const char * GenericName() const		
   { return StaticHandlerName(); }					;
-  CS_CONST_METHOD virtual csHandlerID GenericID(csRef<iEventHandlerRegistry> &reg) const 
+  virtual csHandlerID GenericID(csRef<iEventHandlerRegistry> &reg) const 
   { return StaticID(reg); };
 
 
-  CS_CONST_METHOD virtual const csHandlerID * GenericPrec (		
+  virtual const csHandlerID * GenericPrec (		
     csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &, 	
     csEventID) const { return 0; }	
-  CS_CONST_METHOD virtual const csHandlerID * GenericSucc (		
+  virtual const csHandlerID * GenericSucc (		
     csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &, 	
     csEventID) const { return 0; }
 
-  CS_CONST_METHOD virtual const csHandlerID * InstancePrec (		
+  virtual const csHandlerID * InstancePrec (		
       csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2, 	
     csEventID e) const { return GenericPrec(r1, r2, e); } 
-  CS_CONST_METHOD virtual const csHandlerID * InstanceSucc (		
+  virtual const csHandlerID * InstanceSucc (		
     csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2, 	
     csEventID e) const { return GenericSucc(r1, r2, e); }
 

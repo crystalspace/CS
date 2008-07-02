@@ -122,7 +122,7 @@ public:
   virtual bool PerformExtensionV (const char *iCommand, va_list);
 
   CS_EVENTHANDLER_NAMES("crystalspace.console")
-  CS_CONST_METHOD virtual const csHandlerID * GenericPrec(
+  virtual const csHandlerID * GenericPrec(
     csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,
     csEventID e) const
   {
@@ -135,7 +135,7 @@ public:
       return 0;
     }
   }
-  CS_CONST_METHOD virtual const csHandlerID * GenericSucc(
+  virtual const csHandlerID * GenericSucc(
     csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &,
     csEventID) const
   { return 0; }

@@ -163,7 +163,7 @@ public:
    * Query the state of a key. All key codes are supported. Returns true if
    * the key is pressed, false if not.
    */
-  CS_PURE_METHOD virtual bool GetKeyState (utf32_char codeRaw) const;
+  virtual bool GetKeyState (utf32_char codeRaw) const;
 
   /**
    * Query the state of a modifier key.
@@ -183,7 +183,7 @@ public:
    * \param codeRaw Raw code of the modifier key.
    * \return Bit mask with the pressed modifiers.
    */
-  CS_PURE_METHOD virtual uint32 GetModifierState (utf32_char codeRaw) const;
+  virtual uint32 GetModifierState (utf32_char codeRaw) const;
 
   virtual csPtr<iKeyComposer> CreateKeyComposer ();
 
@@ -250,20 +250,20 @@ public:
   virtual void Reset ();
 
   /// Query last mouse X position for mouse \#n (0, 1, 2, ...)
-  CS_PURE_METHOD virtual int GetLastX (uint n) const { return Last[n][0]; }
+  virtual int GetLastX (uint n) const { return Last[n][0]; }
   /// Query last mouse Y position for mouse \#n (0, 1, 2, ...)
-  CS_PURE_METHOD virtual int GetLastY (uint n) const { return Last[n][1]; }
+  virtual int GetLastY (uint n) const { return Last[n][1]; }
   /// Query last mouse position on axis (0, 1, 2, ...) for mouse n (0, 1, 2, ...)
-  CS_PURE_METHOD virtual int GetLast (uint n, uint axis) const
+  virtual int GetLast (uint n, uint axis) const
   { return Last[n][axis]; }
   /// Query last mouse axis array for mouse n (0, 1, 2, ...)
-  CS_PURE_METHOD virtual const int32 *GetLast (uint n) const
+  virtual const int32 *GetLast (uint n) const
   { return Last [n]; }
   /// Query the last known mouse button state for mouse \#0
-  CS_PURE_METHOD virtual bool GetLastButton (int button) const
+  virtual bool GetLastButton (int button) const
   { return GetLastButton(0, button); }
   /// Query the last known mouse button state
-  CS_PURE_METHOD virtual bool GetLastButton (uint number, int button) const
+  virtual bool GetLastButton (uint number, int button) const
   {
     return (number < CS_MAX_MOUSE_COUNT
 	    && button >= 0 && button < CS_MAX_MOUSE_BUTTONS) ?
@@ -333,12 +333,12 @@ public:
   /// Call to release all joystick buttons.
   virtual void Reset ();
 
-  CS_PURE_METHOD virtual const int32 *GetLast (uint number) const 
+  virtual const int32 *GetLast (uint number) const 
   { return Last [number]; }
-  CS_PURE_METHOD virtual int GetLast (uint number, uint axis) const 
+  virtual int GetLast (uint number, uint axis) const 
   { return Last [number][axis]; }
   /// Query the last known joystick button state
-  CS_PURE_METHOD virtual bool GetLastButton (uint number, int button) const
+  virtual bool GetLastButton (uint number, int button) const
   {
     return (number < CS_MAX_JOYSTICK_COUNT
          && button >= 0 && button < CS_MAX_JOYSTICK_BUTTONS) ?

@@ -2187,32 +2187,6 @@ CS_SYMBOL_QUALIFIER([how to declare deprecation],
     [CS_HEADER_PROPERTY([CS_ATTRIBUTE_DEPRECATED],
 	[$cs_cv_prog_cxx_declare_deprecated])])
 
-
-
-#------------------------------------------------------------------------------
-# Check how to declare functions and types perfectly constant (not affected by
-# any global state and always returning the same value for the same input).
-#------------------------------------------------------------------------------
-CS_SYMBOL_QUALIFIER([how to declare const function],
-    [cs_cv_prog_cxx_declare_const],
-    [__attribute__((const))], [], [C++],
-    [CS_HEADER_PROPERTY([CS_CONST_METHOD],
-	[$cs_cv_prog_cxx_declare_const])])
-
-
-
-#------------------------------------------------------------------------------
-# Check how to declare functions and types pure (not affected by any global
-# state).
-#------------------------------------------------------------------------------
-CS_SYMBOL_QUALIFIER([how to declare pure function],
-    [cs_cv_prog_cxx_declare_pure],
-    [__attribute__((pure))], [], [C++],
-    [CS_HEADER_PROPERTY([CS_PURE_METHOD],
-	[$cs_cv_prog_cxx_declare_pure])])
-
-
-
 #------------------------------------------------------------------------------
 # Check if the "malloc" attribute is available.
 #------------------------------------------------------------------------------
