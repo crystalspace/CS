@@ -109,6 +109,7 @@ void csShaderGLPS1_NV::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
 
 void csShaderGLPS1_NV::ResetState ()
 {
+  size_t i;
   for(i = 4; i-- > 0;)
   {
     shaderPlug->stateCache->SetCurrentTU ((int)i);
