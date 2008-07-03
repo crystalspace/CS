@@ -69,6 +69,7 @@ namespace CS
       virtual bool ClearCache (const char* path);
       virtual void Flush ();
       virtual csPtr<iHierarchicalCache> GetRootedCache (const char* base);
+      virtual csPtr<iStringArray> GetSubItems (const char* path);
       /** @} */
     };
   } // namespace Utility

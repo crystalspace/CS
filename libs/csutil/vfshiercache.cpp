@@ -23,6 +23,7 @@
 #include "iutil/vfs.h"
 
 #include "csutil/csstring.h"
+#include "csutil/scfstringarray.h"
 
 #include "csutil/vfshiercache.h"
 
@@ -159,7 +160,23 @@ namespace CS
       
       return csPtr<iHierarchicalCache> (new VfsHierarchicalCache (object_reg, fullPath));
     }
+    
+    csPtr<iStringArray> VfsHierarchicalCache::GetSubItems (const char* path)
+    {
+      csStringFast<512> fullPath (vfsdir);
+      fullPath.Append (path);
       
+      if (fullPath.GetAt (fullPath.Length()-1) != '/')
+        fullPath.Append ("/");
+      
+      csRef<iStringArray> vfsArray (vfs->FindFiles (fullPath));
+      scfStringArray* newArray = new scfStringArray;
+      for (size_t i = 0; i < vfsArray->GetSize(); i++)
+      {
+        newArray->Push (vfsArray->Get (i) + fullPath.Length());
+      }
+      return csPtr<iStringArray> (newArray);
+    }
   } // namespace Utility
 } // namespace CS
 
