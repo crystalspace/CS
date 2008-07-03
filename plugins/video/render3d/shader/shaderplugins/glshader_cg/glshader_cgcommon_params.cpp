@@ -364,34 +364,6 @@ void csShaderGLCGCommon::ApplyVariableMapArrays (const csShaderVariableStack& st
     ApplyVariableMapArray (variablemap, setter, stack);
   }
   
-  /* "Assumed constant" parameters are set here b/c all needed shader 
-   * vars are available */
-  if (assumedConstParams != 0)
-  {
-    csRef<csShaderVariable> var;
-  
-    SetterCg setter;
-    for(size_t i = 0; i < assumedConstParams->GetSize (); ++i)
-    {
-      VariableMapEntry& mapping = assumedConstParams->Get (i);
-      
-      var = GetParamSV (stack, mapping.mappingParam);
-      // If var is null now we have no const nor any passed value, ignore it
-      if (!var.IsValid ())
-	continue;
-  
-      ShaderParameter* param =
-	reinterpret_cast<ShaderParameter*> (mapping.userVal);
-      SetParameterValue (setter, param, var);
-      cgSetParameterVariability (param->param, CG_LITERAL);
-      FreeShaderParam (param);
-    }
-    delete assumedConstParams; assumedConstParams = 0;
-    cgCompileProgram (program);
-    if (shaderPlug->debugDump)
-      DoDebugDump();
-    PostCompileVmapProcess ();
-  }
 }
 
 void csShaderGLCGCommon::SetParameterValueCg (ShaderParameter* sparam,
@@ -466,16 +438,8 @@ void csShaderGLCGCommon::ApplyVmap()
     }
     FillShaderParam (sparam, param);
     bool assumeConst = sparam->assumeConstant;
-    if (assumeConst)
-    {
-      if (assumedConstParams == 0)
-	assumedConstParams = new csSafeCopyArray<VariableMapEntry>;
-      assumedConstParams->Push (variablemap[i]);
-      variablemap.DeleteIndex (i);
-      continue;
-    }
     // Mark constants as to be folded in
-    if (variablemap[i].mappingParam.IsConstant())
+    if (assumeConst || variablemap[i].mappingParam.IsConstant())
     {
       csShaderVariable* var = variablemap[i].mappingParam.var;
       if (var != 0)

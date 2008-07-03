@@ -89,7 +89,6 @@ protected:
   ArgumentArray compilerArgs;
   csRef<iShaderDestinationResolverCG> cgResolve;
   csSet<csString> unusedParams;
-  csSafeCopyArray<VariableMapEntry>* assumedConstParams;
   
   struct Clip
   {

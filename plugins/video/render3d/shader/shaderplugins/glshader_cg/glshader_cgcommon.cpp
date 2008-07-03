@@ -41,8 +41,7 @@ CS_LEAKGUARD_IMPLEMENT (csShaderGLCGCommon);
 
 csShaderGLCGCommon::csShaderGLCGCommon (csGLShader_CG* shaderPlug, 
 					ProgramType type) :
-  scfImplementationType (this, shaderPlug->object_reg), programType (type),
-  assumedConstParams (0)
+  scfImplementationType (this, shaderPlug->object_reg), programType (type)
 {
   validProgram = true;
   this->shaderPlug = shaderPlug;
@@ -56,20 +55,6 @@ csShaderGLCGCommon::~csShaderGLCGCommon ()
   if (program)
     cgDestroyProgram (program);
     
-  if (assumedConstParams != 0)
-  {
-    for(size_t i = 0; i < assumedConstParams->GetSize (); ++i)
-    {
-      VariableMapEntry& mapping = assumedConstParams->Get (i);
-      
-      ShaderParameter* param =
-	reinterpret_cast<ShaderParameter*> (mapping.userVal);
-      
-      FreeShaderParam (param);
-    }
-    delete assumedConstParams;
-  }
-
   for(size_t i = 0; i < variablemap.GetSize (); ++i)
   {
     VariableMapEntry& mapping = variablemap[i];
