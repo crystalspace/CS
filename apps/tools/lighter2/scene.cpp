@@ -1993,14 +1993,45 @@ namespace lighter
   void Sector::EmitPhoton(const csVector3& pos, const csVector3& dir,
                           const csColor& color, const csColor& power)
   {
-    // first check for collisions with the portal 
-    for (size_t num = 0; num < allPortals.GetSize(); ++num)
+    // TODO: Need to expand on this for checks for portals
+    lighter::HitPoint hit;
+    lighter::Ray ray;
+    ray.direction = dir;
+    ray.origin = pos;
+
+    // check to see if we hit anything, if we don't then we don't
+    // need to record the hit
+    if (lighter::Raytracer::TraceClosestHit(kdTree, ray, hit))
     {
-      
+      // create the reflected direction and emit if we meet certain properties
+      csColor refColor = color;
+      refColor *= power;
+
+      // generate the reflection ray
+      csVector3 normal = hit.primitive->ComputeNormal(hit.hitPoint);
+      float dot = normal.x*dir.x + normal.y*dir.y + normal.z*dir.z;
+      csVector3 newDir = dir;
+      newDir -= normal*2*dot;
+
+      photonMap.AddPhoton(refColor, newDir, hit.hitPoint);
+
+      // Only doing diffuse reflections right now, but this needs to be
+      // expanded to account for specular reflections as well
+      float pd = (refColor.red + refColor.green + refColor.blue) / 3.0;
+      csRandomFloatGen randGen;
+      float rand = randGen.Get();
+
+      if (rand <= pd)
+      {
+        // TODO: Need to change this to take on the attributes of 
+        // the surface it hits
+        csColor newColor = color;
+        csColor newPower = power;
+        EmitPhoton(hit.hitPoint, newDir, newColor, newPower);
+      }
     }
-
-    // now check the scene geomtry
-
+    
+    
   }
 
 }

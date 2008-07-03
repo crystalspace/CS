@@ -67,7 +67,16 @@ namespace lighter
     // Build kd tree for Sector
     void BuildKDTree (Statistics::Progress& progress);
 
-    // Emit a photon to our sectors photon map
+    /**
+    * Emit Photon
+    * Emits a photon in this sector and traces it through till its
+    * termination using a monte-carlo based technique to determine
+    * the termination.
+    * /param pos - the position we are starting the trace from
+    * /param dir - the direction we are tracing
+    * /param color - the color of the photon
+    * /param power - the power of the current photon
+    */
     void EmitPhoton(const csVector3& pos, const csVector3& dir,
                     const csColor& color, const csColor& power);
 
@@ -90,7 +99,7 @@ namespace lighter
     csString sectorName;
 
     // Photon map for GI lighting
-    PhotonMap map;
+    PhotonMap photonMap;
 
     Scene* scene;
   };

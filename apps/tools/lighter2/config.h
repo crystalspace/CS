@@ -101,6 +101,8 @@ namespace lighter
       int numPerSample;
       // The sample distance for sampling photons
       float sampleDistance;
+      // how often to sample across the lightmap
+      int sampleSize;
     };
 
     struct DebugProperties
