@@ -67,7 +67,7 @@ struct iShaderDestinationResolver : public virtual iBase
  */
 struct iShaderProgram : public virtual iBase
 {
-  SCF_INTERFACE(iShaderProgram, 3, 0, 0);
+  SCF_INTERFACE(iShaderProgram, 4, 0, 0);
   /// Sets this program to be the one used when rendering
   virtual void Activate() = 0;
 
@@ -113,8 +113,14 @@ struct iShaderProgram : public virtual iBase
    */
   virtual void GetUsedShaderVars (csBitArray& bits) const = 0;
   
+  enum CacheLoadResult
+  {
+    loadFail,
+    loadSuccessShaderInvalid,
+    loadSuccessShaderValid
+  };
   /// Loads from a cache
-  virtual bool LoadFromCache (iHierarchicalCache* cache,
+  virtual CacheLoadResult LoadFromCache (iHierarchicalCache* cache,
     csRef<iString>* failReason = 0) = 0;
 };
 

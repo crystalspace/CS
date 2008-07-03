@@ -197,8 +197,8 @@ public:
   const csSet<csString>& GetUnusedParameters ()
   { return unusedParams; }
   
-  virtual bool LoadFromCache (iHierarchicalCache* cache,
-    csRef<iString>* failReason = 0);
+  virtual iShaderProgram::CacheLoadResult LoadFromCache (
+    iHierarchicalCache* cache, csRef<iString>* failReason = 0);
 };
 
 }
