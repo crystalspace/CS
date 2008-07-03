@@ -45,6 +45,8 @@
 #include "renderer.h"
 #include "scopedlock.h"
 
+#include "al_stringlists.h"
+
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csSndSysRendererOpenAL)
@@ -118,6 +120,69 @@ bool csSndSysRendererOpenAL::Initialize (iObjectRegistry *obj_reg)
       return false;
     }
   }
+
+  // Check some OpenAL context attributes/capabilities
+  // http://opensource.creative.com/pipermail/openal/2006-February/009337.html
+  ALCenum err;
+  ALCint attrSize = 0;
+  ALCint *attributes;
+  ALCint *data;
+  alcGetIntegerv(m_Device, ALC_ATTRIBUTES_SIZE, sizeof(ALCint), &attrSize);
+  err = alcGetError (m_Device);
+  if (err == ALC_NO_ERROR)
+  {
+    attributes = (ALCint *)cs_malloc(attrSize * sizeof(ALCint));
+    alcGetIntegerv(m_Device, ALC_ALL_ATTRIBUTES, attrSize, attributes);
+    err = alcGetError (m_Device);
+    if (err == ALC_NO_ERROR)
+    {
+      data = attributes;
+      while (data < attributes + attrSize)
+      {
+	switch (*data)
+	{
+	  case ALC_FREQUENCY:
+	    data += 1;
+	    Report (CS_REPORTER_SEVERITY_DEBUG, "OpenAL context frequency: %d Hz",
+	      *data);
+	    break;
+	  case ALC_REFRESH:
+	    data += 1;
+	    Report (CS_REPORTER_SEVERITY_DEBUG, "OpenAL context refresh: %d Hz",
+	      *data);
+	    break;
+	  case ALC_SYNC:
+	    data += 1;
+	    Report (CS_REPORTER_SEVERITY_DEBUG,
+	      "OpenAL context uses %s (%sthreaded) context",
+	      *data ? "synchronous": "asynchronous", *data ? "non " : "");
+	    break;
+	  case ALC_MONO_SOURCES:
+	    data += 1;
+	    Report (CS_REPORTER_SEVERITY_DEBUG,
+	      "OpenAL context should support %d mono sources", *data);
+	    break;
+	  case ALC_STEREO_SOURCES:
+	    data += 1;
+	    Report (CS_REPORTER_SEVERITY_DEBUG,
+	      "OpenAL context should support %d stereo sources", *data);
+	    break;
+	  default:
+	    break;
+	}
+	data += 1;
+      }
+    }
+    else
+      Report (CS_REPORTER_SEVERITY_DEBUG,
+	"Can't retrieve attributes: OpenAL error %s",
+	ALCErrors.StringForIdent (err));
+    cs_free(attributes);
+  }
+  else
+    Report (CS_REPORTER_SEVERITY_DEBUG,
+      "Can't retrieve attributes size: OpenAL error %s",
+      ALCErrors.StringForIdent (err));
 
   // Configure sound sources
   SndSysSourceOpenAL2D::Configure( m_Config );
