@@ -35,6 +35,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "glshader_cgvp.h"
 #include "glshader_cg.h"
+#include "profile_limits.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 {
@@ -65,13 +66,32 @@ bool csShaderGLCGVP::Compile (iHierarchicalCache* cache)
   if (progProf < CG_PROFILE_ARBVP1)
     cg_profile = "arbvp1";
   
-  if (!DefaultLoadProgram (cgResolve, programStr, CG_GL_VERTEX, 
-      shaderPlug->maxProfileVertex))
+  bool ret = DefaultLoadProgram (cgResolve, programStr, CG_GL_VERTEX, 
+    shaderPlug->maxProfileVertex);
+
+  ProfileLimits limits (programProfile);
+  limits.GetCurrentLimits ();
+  WriteToCache (cache, limits);
+
+  return ret;
+}
+
+bool csShaderGLCGVP::Precache (const ProfileLimits& limits,
+                               iHierarchicalCache* cache)
+{
+  csRef<iDataBuffer> programBuffer = GetProgramData();
+  if (!programBuffer.IsValid())
     return false;
+  csString programStr;
+  programStr.Append ((char*)programBuffer->GetData(), programBuffer->GetSize());
 
-  WriteToCache (cache);
+  bool ret = DefaultLoadProgram (cgResolve, programStr, CG_GL_VERTEX, 
+      CG_PROFILE_UNKNOWN, loadApplyVmap | loadIgnoreConfigProgramOpts,
+      &limits);
 
-  return true;
+  WriteToCache (cache, limits);
+
+  return ret;
 }
 
 csVertexAttrib csShaderGLCGVP::ResolveBufferDestination (const char* binding)

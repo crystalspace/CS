@@ -69,11 +69,13 @@ csShaderGLCGCommon::~csShaderGLCGCommon ()
 void csShaderGLCGCommon::Activate()
 {
   cgGLEnableProfile (programProfile);
+  #if 0
   if (!cgGLIsProgramLoaded (program))
   {
     cgGLLoadProgram (program);
     PostCompileVmapProcess ();
   }
+  #endif
   cgGLBindProgram (program);
 }
 
@@ -194,7 +196,7 @@ void csShaderGLCGCommon::EnsureDumpFile()
 bool csShaderGLCGCommon::DefaultLoadProgram (
   iShaderDestinationResolverCG* cgResolve,
   const char* programStr, CGGLenum type, CGprofile maxProfile, 
-  uint flags)
+  uint flags, const ProfileLimits* customLimits)
 {
   if (!programStr || !*programStr) return false;
 
@@ -220,14 +222,21 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
   programStr = augmentedProgramStr;
   CGprofile profile = CG_PROFILE_UNKNOWN;
 
-  if (!cg_profile.IsEmpty())
-    profile = cgGetProfile (cg_profile);
-
-  if(profile == CG_PROFILE_UNKNOWN)
-    profile = cgGLGetLatestProfile (type);
-
-  if (maxProfile != CG_PROFILE_UNKNOWN)
-    profile = csMin (profile, maxProfile);
+  if (customLimits != 0)
+  {
+    profile = customLimits->profile;
+  }
+  else
+  {
+    if (!cg_profile.IsEmpty())
+      profile = cgGetProfile (cg_profile);
+  
+    if(profile == CG_PROFILE_UNKNOWN)
+      profile = cgGLGetLatestProfile (type);
+  
+    if (maxProfile != CG_PROFILE_UNKNOWN)
+      profile = csMin (profile, maxProfile);
+  }
 
   if (shaderPlug->doVerbose)
   {
@@ -237,9 +246,11 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
   }
 
   ArgumentArray args;
-  shaderPlug->GetProfileCompilerArgs (GetProgramType(), profile, args);
+  shaderPlug->GetProfileCompilerArgs (GetProgramType(), profile, 
+    flags & loadIgnoreConfigProgramOpts, args);
   for (i = 0; i < compilerArgs.GetSize(); i++) 
     args.Push (compilerArgs[i]);
+  if (customLimits != 0) customLimits->ToCgOptions (args);
   /* Work around Cg 2.0 bug: it emits "OPTION ARB_position_invariant;"
      AND computes result.position in the VP - doing both is verboten.
      Remedy: remove -posinv argument 
@@ -281,7 +292,7 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
   programProfile = cgGetProgramProfile (program);
 
   if (flags & loadApplyVmap)
-    ApplyVmap();
+    GetParamsFromVmap();
 
   if (flags & loadIgnoreErrors) shaderPlug->SetIgnoreErrors (true);
   cgCompileProgram (program);
@@ -291,7 +302,7 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
     shaderPlug->PrintAnyListing();
   
   if (flags & loadApplyVmap)
-    PostCompileVmapProcess ();
+    GetPostCompileParamProps ();
 
   if (flags & loadLoadToGL)
   {
@@ -483,9 +494,16 @@ void csShaderGLCGCommon::WriteAdditionalDumpInfo (const char* description,
 /* Magic value for cpg program files.
  * The most significant byte serves as a "version", increase when the
  * cache file format changes. */
-static const uint32 cacheFileMagic = 0x01706763;
+static const uint32 cacheFileMagic = 0x02706763;
 
-bool csShaderGLCGCommon::WriteToCache (iHierarchicalCache* cache)
+enum
+{
+  cpsValid = 0x6b726f77,
+  cpsInvalid = 0x6b723062
+};
+
+bool csShaderGLCGCommon::WriteToCache (iHierarchicalCache* cache,
+                                       const ProfileLimits& limits)
 {
   if (!cache) return false;
 
@@ -504,40 +522,55 @@ bool csShaderGLCGCommon::WriteToCache (iHierarchicalCache* cache)
 	!= sizeof (diskProfile)) return false;
   }
   
-  ProfileLimits limits (programProfile);
-  limits.GetCurrentLimits ();
   if (!limits.Write (&cacheFile)) return false;
   
-  CS::PluginCommon::ShaderCacheHelper::WriteString (&cacheFile, description);
-  
-  csRef<iDocumentSystem> docsys = shaderPlug->binDocSys;
-  if (!docsys.IsValid()) docsys = shaderPlug->xmlDocSys;
-  csRef<iDocument> doc = docsys->CreateDocument();
-  csRef<iDocumentNode> root = doc->CreateRoot();
-  for (size_t i = 0; i < cacheKeepNodes.GetSize(); i++)
+  const char* object;
+  if ((program == 0)
+    || ((object = cgGetProgramString (program, CG_COMPILED_PROGRAM)) == 0)
+    || (*object == 0))
   {
-    csRef<iDocumentNode> newNode = root->CreateNodeBefore (
-      cacheKeepNodes[i]->GetType());
-    CS::DocSystem::CloneNode (cacheKeepNodes[i], newNode);
+    uint32 diskState = csLittleEndian::UInt32 (cpsInvalid);
+    if (cacheFile.Write ((char*)&diskState, sizeof (diskState))
+	!= sizeof (diskState)) return false;
   }
-  
+  else
   {
-    csMemFile docFile;
-    const char* err = doc->Write (&docFile);
-    if (err != 0)
     {
-      csReport (objectReg, CS_REPORTER_SEVERITY_WARNING, 
-	"crystalspace.graphics3d.shader.glcg",
-	"Error writing document: %s", err);
+      uint32 diskState = csLittleEndian::UInt32 (cpsValid);
+      if (cacheFile.Write ((char*)&diskState, sizeof (diskState))
+	  != sizeof (diskState)) return false;
     }
-    csRef<iDataBuffer> docBuf = docFile.GetAllData (false);
-    if (!CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (&cacheFile,
-        docBuf))
-      return false;
+    
+    CS::PluginCommon::ShaderCacheHelper::WriteString (&cacheFile, description);
+    
+    csRef<iDocumentSystem> docsys = shaderPlug->binDocSys;
+    if (!docsys.IsValid()) docsys = shaderPlug->xmlDocSys;
+    csRef<iDocument> doc = docsys->CreateDocument();
+    csRef<iDocumentNode> root = doc->CreateRoot();
+    for (size_t i = 0; i < cacheKeepNodes.GetSize(); i++)
+    {
+      csRef<iDocumentNode> newNode = root->CreateNodeBefore (
+	cacheKeepNodes[i]->GetType());
+      CS::DocSystem::CloneNode (cacheKeepNodes[i], newNode);
+    }
+    
+    {
+      csMemFile docFile;
+      const char* err = doc->Write (&docFile);
+      if (err != 0)
+      {
+	csReport (objectReg, CS_REPORTER_SEVERITY_WARNING, 
+	  "crystalspace.graphics3d.shader.glcg",
+	  "Error writing document: %s", err);
+      }
+      csRef<iDataBuffer> docBuf = docFile.GetAllData (false);
+      if (!CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (&cacheFile,
+	  docBuf))
+	return false;
+    }
+    
+    CS::PluginCommon::ShaderCacheHelper::WriteString (&cacheFile, object);
   }
-  
-  const char* object = cgGetProgramString (program, CG_COMPILED_PROGRAM);
-  CS::PluginCommon::ShaderCacheHelper::WriteString (&cacheFile, object);
   
   csString cacheName ("/");
   cacheName += limits.ToString ();
@@ -614,7 +647,7 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
   cachedProgWrappers.Sort ();
 
   csString allReasons;
-  bool oneValid = false;
+  bool oneReadCorrectly = false;
   for (size_t i = cachedProgWrappers.GetSize(); i-- > 0;)
   {
     const CachedShaderWrapper& wrapper = cachedProgWrappers[i];
@@ -641,6 +674,19 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
     }
     
     iFile* cacheFile = wrapper.cacheFile;
+    
+    {
+      uint32 diskState;
+      if (cacheFile->Read ((char*)&diskState, sizeof (diskState))
+	  != sizeof (diskState)) continue;
+      if (csLittleEndian::UInt32 (diskState) != cpsValid)
+      {
+        oneReadCorrectly = true;
+        continue;
+      }
+    }
+  
+    
     description = CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
     
     csRef<iDataBuffer> docBuf =
@@ -703,7 +749,7 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
       CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
     if (objectCode.IsEmpty()) continue;
     
-    oneValid = true;
+    oneReadCorrectly = true;
     program = cgCreateProgram (shaderPlug->context, 
       CG_OBJECT, objectCode, wrapper.limits.profile, 0, 0);
     if (!program) continue;
@@ -718,7 +764,7 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
     programProfile = wrapper.limits.profile;
     
     ClipsToVmap();
-    ApplyVmap();
+    GetParamsFromVmap();
     
     cgGetError(); // Clear error
     cgGLLoadProgram (program);
@@ -747,7 +793,7 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
       continue;
     }
     
-    PostCompileVmapProcess ();
+    GetPostCompileParamProps ();
     
     if (shaderPlug->debugDump)
       DoDebugDump();
@@ -757,7 +803,7 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
   
   if (failReason) failReason->AttachNew (
     new scfString (allReasons));
-  return oneValid ? iShaderProgram::loadSuccessShaderInvalid : iShaderProgram::loadFail;
+  return oneReadCorrectly ? iShaderProgram::loadSuccessShaderInvalid : iShaderProgram::loadFail;
 }
 
 }

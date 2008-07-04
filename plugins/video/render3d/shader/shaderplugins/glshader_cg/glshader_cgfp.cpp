@@ -33,6 +33,7 @@
 #include "ivideo/shader/shader.h"
 
 #include "glshader_cgfp.h"
+#include "profile_limits.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 {
@@ -88,21 +89,21 @@ bool csShaderGLCGFP::Compile (iHierarchicalCache* cache)
 {
   if (!shaderPlug->enableFP) return false;
 
-  csRef<iDataBuffer> programBuffer = GetProgramData();
-  if (!programBuffer.IsValid())
-    return false;
-  csString programStr;
-  programStr.Append ((char*)programBuffer->GetData(), programBuffer->GetSize());
-
   size_t i;
 
   // See if we want to wrap through the PS plugin
   // (psplg will be 0 if wrapping isn't wanted)
   if (shaderPlug->psplg)
   {
+  csRef<iDataBuffer> programBuffer = GetProgramData();
+    if (!programBuffer.IsValid())
+      return false;
+    csString programStr;
+    programStr.Append ((char*)programBuffer->GetData(), programBuffer->GetSize());
+  
     ArgumentArray args;
     shaderPlug->GetProfileCompilerArgs ("fragment", shaderPlug->psProfile, 
-      args);
+      false, args);
     for (i = 0; i < compilerArgs.GetSize(); i++) 
       args.Push (compilerArgs[i]);
     args.Push (0);
@@ -158,71 +159,102 @@ bool csShaderGLCGFP::Compile (iHierarchicalCache* cache)
   }
   else
   {
-    csStringArray testForUnused;
-    csStringReader lines (programStr);
-    while (lines.HasMoreLines())
-    {
-      csString line;
-      lines.GetLine (line);
-      if (line.StartsWith ("//@@UNUSED? "))
-      {
-        line.DeleteAt (0, 12);
-        testForUnused.Push (line);
-      }
-    }
+    bool ret = TryCompile (shaderPlug->maxProfileFragment,
+      loadLoadToGL, 0);
   
-    if (testForUnused.GetSize() > 0)
-    {
-      /* A list of unused variables to test for has been given. Test piecemeal
-       * which variables are really unused */
-      csSet<csString> allNewUnusedParams;
-      size_t step = 8;
-      size_t offset = 0;
-      while (offset < testForUnused.GetSize())
-      {
-        unusedParams.DeleteAll();
-        for (size_t i = 0; i < offset; i++)
-          unusedParams.Add (testForUnused[i]);
-        for (size_t i = offset+step; i < testForUnused.GetSize(); i++)
-          unusedParams.Add (testForUnused[i]);
-	if (DefaultLoadProgram (0, programStr, CG_GL_FRAGMENT, 
-	  shaderPlug->maxProfileFragment, loadIgnoreErrors))
-	{
-	  csSet<csString> newUnusedParams;
-	  CollectUnusedParameters (newUnusedParams);
-	  for (size_t i = 0; i < step; i++)
-	  {
-	    if (offset+i >= testForUnused.GetSize()) break;
-	    const char* s = testForUnused[offset+i];
-	    if (newUnusedParams.Contains (s))
-	      allNewUnusedParams.Add (s);
-	  }
-	}
-        
-        offset += step;
-      }
-      unusedParams = allNewUnusedParams;
-    }
-    else
-    {
-      unusedParams.DeleteAll();
-    }
-    if (!DefaultLoadProgram (0, programStr, CG_GL_FRAGMENT, 
-      shaderPlug->maxProfileFragment, loadLoadToGL))
-      return false;
-    /* Compile twice to be able to filter out unused vertex2fragment stuff on 
-     * pass 2.
-     * @@@ FIXME: two passes are not always needed.
-     */
-    CollectUnusedParameters (unusedParams);
-    bool ret = DefaultLoadProgram (this, programStr, CG_GL_FRAGMENT, 
-      shaderPlug->maxProfileFragment);
-      
-    WriteToCache (cache);
+    ProfileLimits limits (programProfile);
+    limits.GetCurrentLimits ();
+    WriteToCache (cache, limits);
     return ret;
   }
 
   return true;
+}
+
+bool csShaderGLCGFP::Precache (const ProfileLimits& limits, 
+                               iHierarchicalCache* cache)
+{
+
+  bool ret = TryCompile (CG_PROFILE_UNKNOWN,
+    loadApplyVmap | loadIgnoreConfigProgramOpts, &limits);
+
+  WriteToCache (cache, limits);
+
+  return ret;
+}
+
+bool csShaderGLCGFP::TryCompile (CGprofile maxFrag, uint loadFlags,
+                                 const ProfileLimits* limits)
+{
+  csRef<iDataBuffer> programBuffer = GetProgramData();
+  if (!programBuffer.IsValid())
+    return false;
+  csString programStr;
+  programStr.Append ((char*)programBuffer->GetData(), programBuffer->GetSize());
+
+  csStringArray testForUnused;
+  csStringReader lines (programStr);
+  while (lines.HasMoreLines())
+  {
+    csString line;
+    lines.GetLine (line);
+    if (line.StartsWith ("//@@UNUSED? "))
+    {
+      line.DeleteAt (0, 12);
+      testForUnused.Push (line);
+    }
+  }
+
+  if (testForUnused.GetSize() > 0)
+  {
+    /* A list of unused variables to test for has been given. Test piecemeal
+      * which variables are really unused */
+    csSet<csString> allNewUnusedParams;
+    size_t step = 8;
+    size_t offset = 0;
+    while (offset < testForUnused.GetSize())
+    {
+      unusedParams.DeleteAll();
+      for (size_t i = 0; i < offset; i++)
+	unusedParams.Add (testForUnused[i]);
+      for (size_t i = offset+step; i < testForUnused.GetSize(); i++)
+	unusedParams.Add (testForUnused[i]);
+      if (DefaultLoadProgram (0, programStr, CG_GL_FRAGMENT, 
+	maxFrag, 
+	loadIgnoreErrors | (loadFlags & loadIgnoreConfigProgramOpts),
+	limits))
+      {
+	csSet<csString> newUnusedParams;
+	CollectUnusedParameters (newUnusedParams);
+	for (size_t i = 0; i < step; i++)
+	{
+	  if (offset+i >= testForUnused.GetSize()) break;
+	  const char* s = testForUnused[offset+i];
+	  if (newUnusedParams.Contains (s))
+	    allNewUnusedParams.Add (s);
+	}
+      }
+      
+      offset += step;
+    }
+    unusedParams = allNewUnusedParams;
+  }
+  else
+  {
+    unusedParams.DeleteAll();
+  }
+  if (!DefaultLoadProgram (0, programStr, CG_GL_FRAGMENT, 
+    maxFrag, loadFlags, limits))
+    return false;
+  /* Compile twice to be able to filter out unused vertex2fragment stuff on 
+    * pass 2.
+    * @@@ FIXME: two passes are not always needed.
+    */
+  CollectUnusedParameters (unusedParams);
+  bool ret = DefaultLoadProgram (this, programStr, CG_GL_FRAGMENT, 
+    maxFrag, loadFlags, limits);
+    
+  return ret;
 }
 
 int csShaderGLCGFP::ResolveTU (const char* binding)

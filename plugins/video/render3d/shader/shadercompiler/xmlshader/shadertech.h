@@ -114,9 +114,18 @@ private:
   // load one pass, return false if it fails
   bool LoadPass (iDocumentNode *node, ShaderPass* pass, size_t variant,
     iFile* cacheFile, iHierarchicalCache* cacheTo);
+  bool PrecachePass (iDocumentNode *node, ShaderPass* pass, size_t variant,
+    iFile* cacheFile, iHierarchicalCache* cacheTo);
+  struct LoadHelpers;
+  bool ParseModes (ShaderPass* pass, iDocumentNode* node, LoadHelpers& helpers);
+  bool ParseBuffers (ShaderPass* pass, iDocumentNode* node, LoadHelpers& helpers,
+    iShaderDestinationResolver* resolveFP,
+    iShaderDestinationResolver* resolveVP);
+  bool ParseTextures (ShaderPass* pass, iDocumentNode* node, LoadHelpers& helpers,
+    iShaderDestinationResolver* resolveFP);
   bool WritePass (ShaderPass* pass, const CachedPlugins& plugins, iFile* cacheFile);
-  bool LoadPassFromCache (ShaderPass* pass, size_t variant,
-    iFile* cacheFile, iHierarchicalCache* cache);
+  iShaderProgram::CacheLoadResult LoadPassFromCache (ShaderPass* pass,
+    size_t variant, iFile* cacheFile, iHierarchicalCache* cache);
   bool ReadPass (ShaderPass* pass, iFile* cacheFile,
     CachedPlugins& plugins);
   
@@ -129,8 +138,13 @@ private:
   csPtr<iShaderProgram> LoadProgram (iShaderDestinationResolver* resolve,
   	iDocumentNode *node, ShaderPass* pass, size_t variant,
         iHierarchicalCache* cacheTo, CachedPlugin& cacheInfo);
-  csPtr<iShaderProgram> LoadProgramFromCache (ShaderPass* pass, size_t variant,
-        iHierarchicalCache* cache, const CachedPlugin& cacheInfo);
+  bool PrecacheProgram (iShaderDestinationResolver* resolve,
+  	iDocumentNode *node, ShaderPass* pass, size_t variant,
+        iHierarchicalCache* cacheTo, CachedPlugin& cacheInfo,
+        csRef<iBase>& progObj);
+  iShaderProgram::CacheLoadResult LoadProgramFromCache (ShaderPass* pass, size_t variant,
+        iHierarchicalCache* cache, const CachedPlugin& cacheInfo,
+        csRef<iShaderProgram>& prog);
   // Set reason for failure.
   void SetFailReason (const char* reason, ...) CS_GNUC_PRINTF (2, 3);
 
@@ -153,8 +167,10 @@ public:
 
   bool Load (iLoaderContext* ldr_context, iDocumentNode* node,
       iDocumentNode* parentSV, size_t variant, iHierarchicalCache* cacheTo);
-  bool LoadFromCache (iLoaderContext* ldr_context, iHierarchicalCache* cache,
-    iDocumentNode* parentSV, size_t variant);
+  iShaderProgram::CacheLoadResult LoadFromCache (iLoaderContext* ldr_context,
+    iHierarchicalCache* cache, iDocumentNode* parentSV, size_t variant);
+  bool Precache (iDocumentNode* node, size_t variant,
+    iHierarchicalCache* cacheTo);
 
   const char* GetFailReason()
   { return fail_reason.GetData(); }

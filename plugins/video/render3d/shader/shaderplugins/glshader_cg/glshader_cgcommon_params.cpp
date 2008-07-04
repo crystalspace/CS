@@ -418,7 +418,7 @@ void csShaderGLCGCommon::GetShaderParamSlot (ShaderParameter* sparam)
   }
 }
 
-void csShaderGLCGCommon::ApplyVmap()
+void csShaderGLCGCommon::GetParamsFromVmap()
 {
   size_t i = 0;
   while (i < variablemap.GetSize ())
@@ -455,7 +455,7 @@ void csShaderGLCGCommon::ApplyVmap()
   variablemap.ShrinkBestFit();
 }
 
-void csShaderGLCGCommon::PostCompileVmapProcess ()
+void csShaderGLCGCommon::GetPostCompileParamProps ()
 {
   for(size_t i = 0; i < variablemap.GetSize (); )
   {
@@ -463,7 +463,7 @@ void csShaderGLCGCommon::PostCompileVmapProcess ()
     ShaderParameter* sparam =
       reinterpret_cast<ShaderParameter*> (mapping.userVal);
     
-    if (!PostCompileVmapProcess (sparam))
+    if (!GetPostCompileParamProps (sparam))
     {
       variablemap.DeleteIndex (i);
       FreeShaderParam (sparam);
@@ -475,7 +475,7 @@ void csShaderGLCGCommon::PostCompileVmapProcess ()
   }
 }
 
-bool csShaderGLCGCommon::PostCompileVmapProcess (ShaderParameter* sparam)
+bool csShaderGLCGCommon::GetPostCompileParamProps (ShaderParameter* sparam)
 {
   CGparameter param = sparam->param;
   if (sparam->paramType == CG_ARRAY)
@@ -483,7 +483,7 @@ bool csShaderGLCGCommon::PostCompileVmapProcess (ShaderParameter* sparam)
     bool ret = false;
     for (size_t i = sparam->arrayItems.GetSize(); i-- > 0; )
     {
-      if (!PostCompileVmapProcess (sparam->arrayItems[i]))
+      if (!GetPostCompileParamProps (sparam->arrayItems[i]))
       {
         if (i == sparam->arrayItems.GetSize()-1)
           sparam->arrayItems.Truncate (i);

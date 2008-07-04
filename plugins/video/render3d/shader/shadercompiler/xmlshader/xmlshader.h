@@ -71,6 +71,8 @@ public:
   virtual csPtr<iShaderPriorityList> GetPriorities (
 		  iDocumentNode* templ);
 
+  bool PrecacheShader(iDocumentNode*, iHierarchicalCache*);
+  
   void Report (int severity, const char* msg, ...);
 
   bool LoadSVBlock (iLoaderContext* ldr_context,

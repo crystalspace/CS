@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 
+#include "iutil/cfgfile.h"
 #include "iutil/vfs.h"
 
 #include "csutil/csendian.h"
@@ -26,6 +27,50 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 {
+// Tabularize what profiles use what limits
+#define PROFILES  \
+  PROFILE_BEGIN(ARBVP1) \
+    LIMIT(MaxAddressRegs, MAX_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB, 1) \
+    LIMIT(MaxInstructions, MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB, 1024) \
+    LIMIT(MaxLocalParams, MAX_PROGRAM_LOCAL_PARAMETERS_ARB, 96) \
+    LIMIT(NumTemps, MAX_PROGRAM_TEMPORARIES_ARB, 32)  \
+  PROFILE_END(ARBVP1) \
+  \
+  PROFILE_BEGIN(ARBFP1) \
+    LIMIT(MaxLocalParams, MAX_PROGRAM_LOCAL_PARAMETERS_ARB, 32) \
+    LIMIT(MaxTexIndirections, MAX_PROGRAM_NATIVE_TEX_INDIRECTIONS_ARB, ~(1 << 31)) \
+    LIMIT(NumInstructionSlots, MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB, 1024) \
+    LIMIT(NumMathInstructionSlots, MAX_PROGRAM_NATIVE_ALU_INSTRUCTIONS_ARB, 1024) \
+    LIMIT(NumTemps, MAX_PROGRAM_TEMPORARIES_ARB, 32) \
+    LIMIT(NumTexInstructionSlots, MAX_PROGRAM_NATIVE_TEX_INSTRUCTIONS_ARB, 1024) \
+  PROFILE_END(ARBFP1) \
+  \
+  PROFILE_BEGIN(VP20) \
+    LIMIT(MaxLocalParams, NONE, 96) /* spec 'hardcodes' 96 */  \
+  PROFILE_END(VP20) \
+  \
+  PROFILE_BEGIN(VP30) \
+    LIMIT(MaxLocalParams, MAX_PROGRAM_LOCAL_PARAMETERS_ARB, 256) \
+  PROFILE_END(VP30) \
+  \
+  PROFILE_BEGIN(VP40) \
+    LIMIT(MaxAddressRegs, MAX_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB, 2) \
+    LIMIT(MaxInstructions, MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB, 2048) \
+    LIMIT(MaxLocalParams, MAX_PROGRAM_LOCAL_PARAMETERS_ARB, 256) \
+    LIMIT(NumTemps, MAX_PROGRAM_TEMPORARIES_ARB, 32) \
+  PROFILE_END(VP40) \
+  \
+  PROFILE_BEGIN(FP30) \
+    LIMIT(NumInstructionSlots, MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB, 256) \
+    LIMIT(NumTemps, MAX_PROGRAM_TEMPORARIES_ARB, 32) \
+  PROFILE_END(FP30) \
+  \
+  PROFILE_BEGIN(FP40) \
+    LIMIT(MaxLocalParams, MAX_PROGRAM_LOCAL_PARAMETERS_ARB, 1024) \
+    LIMIT(NumInstructionSlots, MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB, 4096) \
+    LIMIT(NumTemps, MAX_PROGRAM_TEMPORARIES_ARB, 32) \
+  PROFILE_END(FP40)
+
   ProfileLimits::ProfileLimits (CGprofile profile)
    : profile (profile), 
      MaxAddressRegs (0),
@@ -54,12 +99,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 #define PROFILE_END(PROFILE)    \
     }                           \
     break;
-#define LIMIT(Limit, glLimit)   \
-      Limit = glGetInteger (GL_ ## glLimit);
+#define LIMIT(Limit, glLimit, cgDefault)   \
+      Limit = (GL_ ## glLimit != GL_NONE) ? glGetInteger (GL_ ## glLimit) \
+                                          : cgDefault;
   
     switch (profile)
     {
-#include "profile_limits.inc"
+      PROFILES
       default:
         break;
     }
@@ -69,6 +115,45 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 #undef LIMIT
   }
 
+  void ProfileLimits::ReadFromConfig (iConfigFile* cfg, const char* _prefix)
+  {
+    csString prefix (_prefix);
+#define READ(Limit) \
+    Limit = cfg->GetInt (prefix + "." #Limit, 0)
+    READ (MaxAddressRegs);
+    READ (MaxInstructions);
+    READ (MaxLocalParams);
+    READ (MaxTexIndirections);
+    READ (NumInstructionSlots);
+    READ (NumMathInstructionSlots);
+    READ (NumTemps);
+    READ (NumTexInstructionSlots);
+#undef READ
+  }
+  
+  void ProfileLimits::GetCgDefaults ()
+  {
+#define PROFILE_BEGIN(PROFILE)  \
+  case CG_PROFILE_ ## PROFILE:  \
+    {
+#define PROFILE_END(PROFILE)    \
+    }                           \
+    break;
+#define LIMIT(Limit, glLimit, cgDefault)   \
+      Limit = cgDefault;
+  
+    switch (profile)
+    {
+      PROFILES
+      default:
+        break;
+    }
+    
+#undef PROFILE_BEGIN
+#undef PROFILE_END
+#undef LIMIT
+  }
+  
   enum
   {
     limMaxAddressRegs,
@@ -81,7 +166,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     limNumTexInstructionSlots
   };
 
-  csString ProfileLimits::ToString ()
+  csString ProfileLimits::ToString () const
   {
     uint usedLimits = 0;
   
@@ -91,12 +176,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 #define PROFILE_END(PROFILE)    \
     }                           \
     break;
-#define LIMIT(Limit, glLimit)   \
+#define LIMIT(Limit, glLimit, cgDefault)   \
       usedLimits |= 1 << lim ## Limit;
   
     switch (profile)
     {
-#include "profile_limits.inc"
+      PROFILES
       default:
         break;
     }
@@ -107,19 +192,43 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 
     csString ret (cgGetProfileString (profile));
 #define EMIT(Limit) if (usedLimits & (1 << lim ## Limit)) ret.AppendFmt (".%u", Limit);
-    EMIT (MaxAddressRegs);
     EMIT (MaxInstructions);
-    EMIT (MaxLocalParams);
-    EMIT (MaxTexIndirections);
     EMIT (NumInstructionSlots);
     EMIT (NumMathInstructionSlots);
-    EMIT (NumTemps);
     EMIT (NumTexInstructionSlots);
+    EMIT (NumTemps);
+    EMIT (MaxLocalParams);
+    EMIT (MaxTexIndirections);
+    EMIT (MaxAddressRegs);
 #undef EMIT
     return ret;
   };
+  
+  void ProfileLimits::ToCgOptions (ArgumentArray& args) const
+  {
+#define PROFILE_BEGIN(PROFILE)  \
+  case CG_PROFILE_ ## PROFILE:  \
+    {
+#define PROFILE_END(PROFILE)    \
+    }                           \
+    break;
+#define LIMIT(Limit, glLimit, cgDefault)   \
+      args.Push ("-po"); \
+      args.Push (csString().Format (#Limit "=%u", Limit));
+  
+    switch (profile)
+    {
+      PROFILES
+      default:
+        break;
+    }
     
-  bool ProfileLimits::Write (iFile* file)
+#undef PROFILE_BEGIN
+#undef PROFILE_END
+#undef LIMIT
+  }
+    
+  bool ProfileLimits::Write (iFile* file) const
   {
 #define WRITE(Limit) \
     { \

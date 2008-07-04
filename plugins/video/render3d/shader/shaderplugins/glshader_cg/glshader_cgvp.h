@@ -42,6 +42,9 @@ public:
 
   /// Compile a program
   virtual bool Compile (iHierarchicalCache* cache);
+  
+  bool Precache (const ProfileLimits& limits,
+    iHierarchicalCache* cache);
 
   virtual csVertexAttrib ResolveBufferDestination (const char* binding);
 };

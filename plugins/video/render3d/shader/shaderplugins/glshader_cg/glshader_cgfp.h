@@ -40,6 +40,9 @@ private:
   csGLStateCache* statecache;
 
   csRef<iShaderProgram> pswrap;
+  
+  bool TryCompile (CGprofile maxFrag,
+    uint loadFlags, const ProfileLimits* limits);
 public:
   CS_LEAKGUARD_DECLARE (csShaderGLCGFP);
 
@@ -62,6 +65,9 @@ public:
 
   /// Compile a program
   virtual bool Compile (iHierarchicalCache* cache);
+  
+  bool Precache (const ProfileLimits& limits,
+    iHierarchicalCache* cache);
 
   virtual int ResolveTU (const char* binding);
 

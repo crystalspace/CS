@@ -41,9 +41,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     ProfileLimits (CGprofile profile);
     
     void GetCurrentLimits ();
-    csString ToString ();
+    void ReadFromConfig (iConfigFile* cfg, const char* prefix);
+    void GetCgDefaults ();
     
-    bool Write (iFile* file);
+    csString ToString () const;
+    void ToCgOptions (ArgumentArray& args) const;
+    
+    bool Write (iFile* file) const;
     bool Read (iFile* file);
     
     bool operator< (const ProfileLimits& other) const;

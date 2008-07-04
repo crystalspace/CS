@@ -130,9 +130,17 @@ struct iShaderProgram : public virtual iBase
  */
 struct iShaderProgramPlugin : public virtual iBase
 {
-  SCF_INTERFACE(iShaderProgramPlugin,2,0,0);
-  virtual csPtr<iShaderProgram> CreateProgram(const char* type) = 0;
-  virtual bool SupportType(const char* type) = 0;
+  SCF_INTERFACE(iShaderProgramPlugin,2,0,1);
+  virtual csPtr<iShaderProgram> CreateProgram (const char* type) = 0;
+  virtual bool SupportType (const char* type) = 0;
+  
+  /**
+   * Warm the given cache with the program specified in \a node.
+   * \a outObj can return an object which exposes iShaderDestinationResolver.
+   */
+  virtual bool Precache (const char* type, 
+    iShaderDestinationResolver* resolve, iDocumentNode* node, 
+    iHierarchicalCache* cacheTo,csRef<iBase>* outObj = 0) = 0;
 };
 
 /** @} */

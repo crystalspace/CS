@@ -265,7 +265,10 @@ class csXMLShader : public scfImplementationExt3<csXMLShader,
 protected:
   void InternalRemove() { SelfDestruct(); }
 
-  void Load (iDocumentNode* source);
+  void Load (iDocumentNode* source, bool noCacheRead);
+    
+  void PrepareTechVar (ShaderTechVariant& techVar,
+    int forcepriority);
   
   bool LoadTechniqueFromCache (ShaderTechVariant::Technique& tech,
     iHierarchicalCache* cache);
@@ -277,7 +280,10 @@ public:
   csXMLShader (csXMLShaderCompiler* compiler,
       iLoaderContext* ldr_context, iDocumentNode* source,
       int forcepriority);
+  csXMLShader (csXMLShaderCompiler* compiler);
   virtual ~csXMLShader();
+  
+  bool Precache (iDocumentNode* source, iHierarchicalCache* cacheTo);
 
   virtual iObject* QueryObject () 
   { return (iObject*)(csObject*)this; }

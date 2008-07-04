@@ -35,7 +35,8 @@ using namespace CS::PluginCommon;
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 {
 
-class csGLShader_CG;
+  class csGLShader_CG;
+  struct ProfileLimits;
 
   struct iShaderDestinationResolverCG : public virtual iBase
   {
@@ -112,19 +113,30 @@ protected:
   void FreeShaderParam (ShaderParameter* sparam);
   void FillShaderParam (ShaderParameter* sparam, CGparameter param);
   void GetShaderParamSlot (ShaderParameter* sparam);
-  void ApplyVmap();
-  void PostCompileVmapProcess ();
-  bool PostCompileVmapProcess (ShaderParameter* sparam);
+  /**
+   * Go over variablemaps and fetch Cg parameters for them
+   */
+  void GetParamsFromVmap();
+  //@{
+  /**
+   * Set properties for a mapped parameter which can only be determined
+   * after compilation
+   */
+  void GetPostCompileParamProps ();
+  bool GetPostCompileParamProps (ShaderParameter* sparam);
+  //@}
 
   enum
   {
     loadLoadToGL = 1,
     loadIgnoreErrors = 2,
     loadApplyVmap = 4,
+    loadIgnoreConfigProgramOpts = 8
   };
   bool DefaultLoadProgram (iShaderDestinationResolverCG* cgResolve,
     const char* programStr, CGGLenum type, 
-    CGprofile maxProfile, uint flags = loadLoadToGL | loadApplyVmap);
+    CGprofile maxProfile, uint flags = loadLoadToGL | loadApplyVmap,
+    const ProfileLimits* customLimits = 0);
   void DoDebugDump ();
   void WriteAdditionalDumpInfo (const char* description, const char* content);
   const char* GetProgramType()
@@ -155,7 +167,7 @@ protected:
     const csShaderVariableStack& stack);
   void ApplyVariableMapArrays (const csShaderVariableStack& stack);
   
-  bool WriteToCache (iHierarchicalCache* cache);
+  bool WriteToCache (iHierarchicalCache* cache, const ProfileLimits& limits);
 public:
   CS_LEAKGUARD_DECLARE (csShaderGLCGCommon);
 
@@ -163,6 +175,11 @@ public:
   virtual ~csShaderGLCGCommon ();
 
   void SetValid(bool val) { validProgram = val; }
+  virtual bool Precache (const ProfileLimits& limits,
+    iHierarchicalCache* cache) = 0;
+    
+  CGprofile CustomProfile ()
+  { return cg_profile.IsEmpty() ? CG_PROFILE_UNKNOWN : cgGetProfile (cg_profile); }
 
   ////////////////////////////////////////////////////////////////////
   //                      iShaderProgram
