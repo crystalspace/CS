@@ -1006,7 +1006,7 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
   return true;
 }
 
-bool csGLShaderFVP::Compile()
+bool csGLShaderFVP::Compile (iHierarchicalCache*)
 {
   shaderPlug->Open ();
   ext = shaderPlug->ext;

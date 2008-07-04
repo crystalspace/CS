@@ -49,6 +49,14 @@ private:
   bool enable;
   const char* compiledProgram;
   bool doIgnoreErrors;
+  
+  typedef csArray<ProfileLimits> ProfileLimitsArray;
+  ProfileLimitsArray precacheLimitsVP;
+  ProfileLimitsArray precacheLimitsFP;
+  void ParsePrecacheLimits (iConfigFile* config, const char* type,
+    ProfileLimitsArray& out);
+  bool Precache (csShaderGLCGCommon* prog, ProfileLimitsArray& limits,
+    iHierarchicalCache* cacheTo);
 public:
   CS_LEAKGUARD_DECLARE (csGLShader_CG);
   
@@ -68,6 +76,9 @@ public:
   CGprofile maxProfileFragment;
   
   csBlockAllocator<ShaderParameter> paramAlloc;
+  
+  csRef<iDocumentSystem> binDocSys;
+  csRef<iDocumentSystem> xmlDocSys;
 
   csGLShader_CG (iBase *parent);
   virtual ~csGLShader_CG ();
@@ -80,6 +91,10 @@ public:
 
   virtual bool SupportType(const char* type);
 
+  bool Precache (const char* type, iShaderDestinationResolver* resolve, 
+    iDocumentNode* node, iHierarchicalCache* cacheTo,
+    csRef<iBase>* outObj = 0);
+
   bool Open();
   /** @} */
 
@@ -90,7 +105,7 @@ public:
 
   void SplitArgsString (const char* str, ArgumentArray& args);
   void GetProfileCompilerArgs (const char* type, CGprofile profile, 
-    ArgumentArray& args);
+    bool noConfigArgs, ArgumentArray& args);
   static bool ProfileNeedsRouting (CGprofile profile)
   {
     return (profile >= CG_PROFILE_PS_1_1) && (profile <= CG_PROFILE_PS_1_3);

@@ -47,6 +47,10 @@ public:
   virtual csPtr<iShaderProgram> CreateProgram(const char* type) ;
 
   virtual bool SupportType(const char* type);
+  
+  bool Precache (const char* type, iShaderDestinationResolver* resolve, 
+    iDocumentNode* node, iHierarchicalCache* cacheTo,
+    csRef<iBase>* outObj = 0) { return false; }
 
   void Open();
   /** @} */

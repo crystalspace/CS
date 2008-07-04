@@ -88,7 +88,11 @@ public:
     csArray<csShaderVarMapping> &);
 
   /// Compile a program
-  virtual bool Compile();
+  virtual bool Compile (iHierarchicalCache*);
+  
+  virtual iShaderProgram::CacheLoadResult LoadFromCache (
+    iHierarchicalCache* cache, csRef<iString>* failReason = 0)
+  { return iShaderProgram::loadFail; }
 };
 
 

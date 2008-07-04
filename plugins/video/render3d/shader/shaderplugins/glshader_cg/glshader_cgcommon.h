@@ -35,7 +35,8 @@ using namespace CS::PluginCommon;
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 {
 
-class csGLShader_CG;
+  class csGLShader_CG;
+  struct ProfileLimits;
 
   struct iShaderDestinationResolverCG : public virtual iBase
   {
@@ -76,6 +77,8 @@ protected:
   CGprofile programProfile;
   csString cg_profile;
   csString entrypoint;
+  csRefArray<iDocumentNode> cacheKeepNodes;
+  csString objectCode;
 
   bool validProgram;
 
@@ -87,7 +90,6 @@ protected:
   ArgumentArray compilerArgs;
   csRef<iShaderDestinationResolverCG> cgResolve;
   csSet<csString> unusedParams;
-  csSafeCopyArray<VariableMapEntry>* assumedConstParams;
   
   struct Clip
   {
@@ -103,6 +105,7 @@ protected:
   enum { svClipPackedDist0 = ~23, svClipPackedDist1 = ~42 };
   csRef<csShaderVariable> clipPackedDists[2];
   bool ParseClip (iDocumentNode* node);
+  bool ParseVmap (iDocumentNode* node);
 
   csString debugFN;
   void EnsureDumpFile();
@@ -110,22 +113,33 @@ protected:
   void FreeShaderParam (ShaderParameter* sparam);
   void FillShaderParam (ShaderParameter* sparam, CGparameter param);
   void GetShaderParamSlot (ShaderParameter* sparam);
-  void PostCompileVmapProcess ();
-  bool PostCompileVmapProcess (ShaderParameter* sparam);
+  /**
+   * Go over variablemaps and fetch Cg parameters for them
+   */
+  void GetParamsFromVmap();
+  //@{
+  /**
+   * Set properties for a mapped parameter which can only be determined
+   * after compilation
+   */
+  void GetPostCompileParamProps ();
+  bool GetPostCompileParamProps (ShaderParameter* sparam);
+  //@}
 
   enum
   {
-    loadPrecompiled = 1,
-    loadLoadToGL = 2,
-    loadIgnoreErrors = 4,
-    loadApplyVmap = 8,
+    loadLoadToGL = 1,
+    loadIgnoreErrors = 2,
+    loadApplyVmap = 4,
+    loadIgnoreConfigProgramOpts = 8
   };
   bool DefaultLoadProgram (iShaderDestinationResolverCG* cgResolve,
     const char* programStr, CGGLenum type, 
-    CGprofile maxProfile, uint flags = loadLoadToGL | loadApplyVmap);
+    CGprofile maxProfile, uint flags = loadLoadToGL | loadApplyVmap,
+    const ProfileLimits* customLimits = 0);
   void DoDebugDump ();
   void WriteAdditionalDumpInfo (const char* description, const char* content);
-  virtual const char* GetProgramType()
+  const char* GetProgramType()
   {
     switch (programType)
     {
@@ -152,6 +166,8 @@ protected:
   void ApplyVariableMapArray (const Array& array, const ParamSetter& setter,
     const csShaderVariableStack& stack);
   void ApplyVariableMapArrays (const csShaderVariableStack& stack);
+  
+  bool WriteToCache (iHierarchicalCache* cache, const ProfileLimits& limits);
 public:
   CS_LEAKGUARD_DECLARE (csShaderGLCGCommon);
 
@@ -159,6 +175,11 @@ public:
   virtual ~csShaderGLCGCommon ();
 
   void SetValid(bool val) { validProgram = val; }
+  virtual bool Precache (const ProfileLimits& limits,
+    iHierarchicalCache* cache) = 0;
+    
+  CGprofile CustomProfile ()
+  { return cg_profile.IsEmpty() ? CG_PROFILE_UNKNOWN : cgGetProfile (cg_profile); }
 
   ////////////////////////////////////////////////////////////////////
   //                      iShaderProgram
@@ -191,6 +212,9 @@ public:
 
   const csSet<csString>& GetUnusedParameters ()
   { return unusedParams; }
+  
+  virtual iShaderProgram::CacheLoadResult LoadFromCache (
+    iHierarchicalCache* cache, csRef<iString>* failReason = 0);
 };
 
 }

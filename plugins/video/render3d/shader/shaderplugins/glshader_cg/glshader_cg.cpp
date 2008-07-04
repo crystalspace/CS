@@ -24,15 +24,18 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
+#include "csutil/xmltiny.h"
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
+
 #include "glshader_cgvp.h"
 #include "glshader_cgfp.h"
 #include "glshader_cg.h"
+#include "profile_limits.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -216,16 +219,20 @@ static int GetProfileLevel (CGprofile profile)
 
 void csGLShader_CG::GetProfileCompilerArgs (const char* type, 
                                             CGprofile profile, 
+                                            bool noConfigArgs,
                                             ArgumentArray& args)
 {
   csString profileStr (cgGetProfileString (profile));
-  csConfigAccess cfg (object_reg);
-  csString key ("Video.OpenGL.Shader.Cg.CompilerOptions");
-  SplitArgsString (cfg->GetStr (key), args);
-  key << "." << type;
-  SplitArgsString (cfg->GetStr (key), args);
-  key << "." << profileStr;
-  SplitArgsString (cfg->GetStr (key), args);
+  if (!noConfigArgs)
+  {
+    csConfigAccess cfg (object_reg);
+    csString key ("Video.OpenGL.Shader.Cg.CompilerOptions");
+    SplitArgsString (cfg->GetStr (key), args);
+    key << "." << type;
+    SplitArgsString (cfg->GetStr (key), args);
+    key << "." << profileStr;
+    SplitArgsString (cfg->GetStr (key), args);
+  }
 
   profileStr.Upcase();
   csString profileMacroArg ("-DPROFILE_");
@@ -242,16 +249,19 @@ void csGLShader_CG::GetProfileCompilerArgs (const char* type,
   typeStr = "-DPROGRAM_TYPE_" + typeStr;
   args.Push (typeStr);
   
-  csString vendorStr;
-  switch (vendor)
+  if (vendor != Invalid)
   {
-    case ATI:     vendorStr = "ATI"; break;
-    case NVIDIA:  vendorStr = "NVIDIA"; break;
-    case Other:   vendorStr = "OTHER"; break;
-    default:      CS_ASSERT(false);
+    csString vendorStr;
+    switch (vendor)
+    {
+      case ATI:     vendorStr = "ATI"; break;
+      case NVIDIA:  vendorStr = "NVIDIA"; break;
+      case Other:   vendorStr = "OTHER"; break;
+      default:      CS_ASSERT(false);
+    }
+    vendorStr = "-DVENDOR_" + vendorStr;
+    args.Push (vendorStr);
   }
-  vendorStr = "-DVENDOR_" + vendorStr;
-  args.Push (vendorStr);
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -281,8 +291,9 @@ void csGLShader_CG::Report (int severity, const char* msg, ...)
 
 csPtr<iShaderProgram> csGLShader_CG::CreateProgram(const char* type)
 {
-  if (!Open())
-    return 0;
+  Open();
+  if (!enable) return 0;
+  
   if (strcasecmp(type, "vp") == 0)
     return csPtr<iShaderProgram>(new csShaderGLCGVP(this));
   else if (strcasecmp(type, "fp") == 0)
@@ -316,17 +327,63 @@ static CGprofile ProfileUnrouted (CGprofile profile)
   }
 }
 
+void csGLShader_CG::ParsePrecacheLimits (iConfigFile* config, const char* type,
+                                         ProfileLimitsArray& out)
+{
+  csSet<csString> seenKeys;
+  csRef<iConfigIterator> vertexPrecache = config->Enumerate (
+    csString().Format ("Video.OpenGL.Shader.Cg.Precache.%s.", type));
+  while (vertexPrecache->HasNext())
+  {
+    vertexPrecache->Next();
+    csString key (vertexPrecache->GetKey (true));
+    size_t dot = key.FindFirst ('.');
+    if (dot != (size_t)-1) key.Truncate (dot);
+    if (!seenKeys.Contains (key))
+    {
+      const char* profile = config->GetStr (
+	csString().Format ("Video.OpenGL.Shader.Cg.Precache.%s.%s.Profile",
+	  type, key.GetData()), 0);
+      if (profile != 0)
+      {
+	CGprofile profile_cg = cgGetProfile (profile);
+	if (profile_cg != CG_PROFILE_UNKNOWN)
+	{
+	  ProfileLimits limits (profile_cg);
+	  limits.ReadFromConfig (config, 
+	    csString().Format ("Video.OpenGL.Shader.Cg.Precache.%s.%s",
+	      type, key.GetData()));
+	  out.Push (limits);
+	}
+      }
+      seenKeys.AddNoTest (key);
+    }
+  }
+}
+
 bool csGLShader_CG::Open()
 {
   if (isOpen) return true;
   if (!object_reg) return false;
-  if (!CS::PluginCommon::ShaderProgramPluginGL::Open ()) return false;
+  
+  csRef<iConfigManager> config (csQueryRegistry<iConfigManager> (object_reg));
 
+  ParsePrecacheLimits (config, "Vertex", precacheLimitsVP);
+  ParsePrecacheLimits (config, "Fragment", precacheLimitsFP);
+  
+  debugDump = config->GetBool ("Video.OpenGL.Shader.Cg.DebugDump", false);
+  if (debugDump)
+    dumpDir = CS::StrDup (config->GetStr ("Video.OpenGL.Shader.Cg.DebugDumpDir",
+    "/tmp/cgdump/"));
+    
+  cgSetAutoCompile (context, CG_COMPILE_MANUAL);
+  
   cgSetErrorHandler (ErrorHandler, this);
 
-  enable = true;
+  if (!CS::PluginCommon::ShaderProgramPluginGL::Open ())
+    return true;
 
-  csRef<iConfigManager> config(csQueryRegistry<iConfigManager> (object_reg));
+  enable = true;
 
   ext->InitGL_ARB_vertex_program();
   ext->InitGL_ARB_fragment_program();
@@ -398,12 +455,6 @@ bool csGLShader_CG::Open()
           "Fragment program support disabled by user");
   }
 
-  debugDump = config->GetBool ("Video.OpenGL.Shader.Cg.DebugDump", false);
-  if (debugDump)
-    dumpDir = CS::StrDup (config->GetStr ("Video.OpenGL.Shader.Cg.DebugDumpDir",
-    "/tmp/cgdump/"));
-    
-  cgSetAutoCompile (context, CG_COMPILE_MANUAL);
   cgGLSetDebugMode (config->GetBool ("Video.OpenGL.Shader.Cg.CgDebugMode",
     false));
  
@@ -497,6 +548,62 @@ bool csGLShader_CG::IsRoutedProfileSupported (CGprofile profile)
   }
 }
 
+bool csGLShader_CG::Precache (const char* type, iShaderDestinationResolver* resolve,
+                              iDocumentNode* node, iHierarchicalCache* cacheTo,
+                              csRef<iBase>* outObj)
+{
+  if (!Open()) return false;
+
+  csRef<csShaderGLCGCommon> prog;
+  ProfileLimitsArray* limits = 0;
+  if (strcasecmp(type, "vp") == 0)
+  {
+    limits = &precacheLimitsVP;
+    prog.AttachNew (new csShaderGLCGVP(this));
+  }
+  else if (strcasecmp(type, "fp") == 0)
+  {
+    limits = &precacheLimitsFP;
+    prog.AttachNew (new csShaderGLCGFP(this));
+  }
+  else
+    return false;
+    
+  if (!prog->Load (resolve, node)) return false;
+  
+  bool result = Precache (prog, *limits, cacheTo);
+  if (outObj) *outObj = prog;
+  return result;
+}
+
+bool csGLShader_CG::Precache (csShaderGLCGCommon* prog, 
+                              ProfileLimitsArray& limits,
+                              iHierarchicalCache* cacheTo)
+{
+  bool result = false;
+  
+  CGprofile customProfile = prog->CustomProfile();
+  bool profileFound = false;
+  for (size_t i = 0; i < limits.GetSize(); i++)
+  {
+    if ((customProfile != CG_PROFILE_UNKNOWN)
+        && (limits[i].profile != customProfile))
+      // If a custom profile is set, filter precached profiles by that
+      continue;
+    result |= prog->Precache (limits[i], cacheTo);
+    profileFound = true;
+  }
+  if ((customProfile != CG_PROFILE_UNKNOWN) && !profileFound)
+  {
+    /* No profile in the precache list matches the custom one,
+     * compile with default Cg limits */
+    ProfileLimits defaultLimits (customProfile);
+    defaultLimits.GetCgDefaults();
+    result |= prog->Precache (defaultLimits, cacheTo);
+  }
+  return result;
+}
+
 ////////////////////////////////////////////////////////////////////
 //                          iComponent
 ////////////////////////////////////////////////////////////////////
@@ -505,6 +612,13 @@ bool csGLShader_CG::Initialize(iObjectRegistry* reg)
   if (!CS::PluginCommon::ShaderProgramPluginGL::Initialize (reg))
     return false;
     
+  csRef<iPluginManager> plugin_mgr = 
+    csQueryRegistry<iPluginManager> (object_reg);
+
+  binDocSys = csLoadPluginCheck<iDocumentSystem> (plugin_mgr,
+    "crystalspace.documentsystem.binary");
+  xmlDocSys.AttachNew (new csTinyDocumentSystem);
+  
   return true;
 }
 

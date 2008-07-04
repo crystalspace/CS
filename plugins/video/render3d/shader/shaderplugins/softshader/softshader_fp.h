@@ -84,9 +84,13 @@ public:
   { return false; }
 
   /// Compile a program
-  virtual bool Compile();
+  virtual bool Compile (iHierarchicalCache*);
 
   virtual void GetUsedShaderVars (csBitArray& bits) const;
+  
+  virtual iShaderProgram::CacheLoadResult LoadFromCache (
+    iHierarchicalCache* cache, csRef<iString>* failReason = 0)
+  { return iShaderProgram::loadFail; }
 };
 
 }

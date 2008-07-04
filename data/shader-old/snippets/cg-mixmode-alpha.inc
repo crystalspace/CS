@@ -25,13 +25,25 @@
 
 struct Frag_MixmodeAlpha
 {
+#ifdef PROFILE_FP20
+  /* Apparent Cg bug: it uses the alpha componenz of a constant
+     register for mixmode alpha, but the library sets that to 0
+     (the value goes only to the first component)
+   */
+  uniform float4 alpha;
+#else
   uniform float alpha;
+#endif
 };
 Frag_MixmodeAlpha mixmodeAlphaFrag;
 
 float GetMixmodeAlpha()
 {
+#ifdef PROFILE_FP20
+  return mixmodeAlphaFrag.alpha.a;
+#else
   return mixmodeAlphaFrag.alpha;
+#endif
 }
 
 #endif // __CS_CG_MIXMODE_ALPHA_INC__

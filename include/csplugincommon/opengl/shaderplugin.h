@@ -40,7 +40,7 @@ namespace CS
     public:
       enum HardwareVendor
       {
-        ATI = 0, NVIDIA = 1, Other = 2
+        Invalid = -1, ATI = 0, NVIDIA = 1, Other = 2
       };
     protected:
       /**

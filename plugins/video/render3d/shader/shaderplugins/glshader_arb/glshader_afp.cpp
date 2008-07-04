@@ -307,7 +307,7 @@ bool csShaderGLAFP::Load(iShaderDestinationResolver*, iDocumentNode* program)
   return true;
 }
 
-bool csShaderGLAFP::Compile()
+bool csShaderGLAFP::Compile (iHierarchicalCache*)
 {
   shaderPlug->Open ();
 

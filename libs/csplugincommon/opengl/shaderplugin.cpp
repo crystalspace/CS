@@ -37,8 +37,8 @@ namespace CS
   {
   
     ShaderProgramPluginGL::ShaderProgramPluginGL (iBase* parent)
-     : scfImplementationType (this, parent), isOpen (false), object_reg (0),
-       ext (0), doVerbose (false)
+     : scfImplementationType (this, parent), vendor (Invalid), isOpen (false),
+       object_reg (0), ext (0), doVerbose (false)
     {
     }
   
@@ -59,16 +59,17 @@ namespace CS
     bool ShaderProgramPluginGL::Open()
     {
       if (isOpen) return true;
+      isOpen = true;
       
       csRef<iGraphics3D> r = csQueryRegistry<iGraphics3D> (object_reg);
     
       // Sanity check
-      csRef<iFactory> f = scfQueryInterface<iFactory> (r);
-      if (f != 0 && strcmp ("crystalspace.graphics3d.opengl", 
+      csRef<iFactory> f = scfQueryInterfaceSafe<iFactory> (r);
+      if (f == 0 || strcmp ("crystalspace.graphics3d.opengl", 
 	    f->QueryClassID ()) != 0)
 	return false;
     
-      r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
+      if (r) r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
       if (ext == 0)
 	return false;
 	
@@ -90,7 +91,6 @@ namespace CS
       
       clipPlanes.Initialize (object_reg);
       
-      isOpen = true;
       return true;
     }
     
