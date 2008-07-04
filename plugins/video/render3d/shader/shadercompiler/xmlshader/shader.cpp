@@ -589,7 +589,8 @@ void csXMLShader::Load (iDocumentNode* source, bool noCacheRead)
       tree.SetGrowsBy (0);
       wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (source, 
 	techsResolver, techsResolver->evaluator, extraNodes, &tree, 
-	wdnfpoOnlyOneLevelConditions | wdnfpoExpandTemplates));
+	wdnfpoHandleConditions | wdnfpoOnlyOneLevelConditions
+	| wdnfpoExpandTemplates));
       techsResolver->DumpConditionTree (tree);
       csString filename;
       filename.Format ("/tmp/shader/cond_%s_techs.txt",
@@ -599,7 +600,8 @@ void csXMLShader::Load (iDocumentNode* source, bool noCacheRead)
     else
       wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (source, 
         techsResolver, techsResolver->evaluator, extraNodes, 0,
-        wdnfpoOnlyOneLevelConditions | wdnfpoExpandTemplates));
+        wdnfpoHandleConditions | wdnfpoOnlyOneLevelConditions
+        | wdnfpoExpandTemplates));
     shaderRoot = wrappedNode;
     
     if (cacheValid)
