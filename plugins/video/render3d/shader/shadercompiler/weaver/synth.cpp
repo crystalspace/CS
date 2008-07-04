@@ -615,26 +615,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
             {
               /* Synthesize <?if?>/<?endif?> nodes around block 
                  contents */
-              DocumentNodeContainer* container = 
-                new DocumentNodeContainer (block.node->GetParent ());
-              container->AddAttributesOf (block.node);
-              container->SetValue (block.node->GetValue ());
-              csRef<iDocumentNode> piNode;
               csString conditionStr;
               conditionStr.AppendFmt ("(%s)", emitted.conditions[0].GetData());
               for (size_t c = 1; c < emitted.conditions.GetSize(); c++)
                 conditionStr.AppendFmt (" || (%s)", 
                   emitted.conditions[c].GetData());
-              csString conditionPI;
-              conditionPI.Format ("if %s", conditionStr.GetData());
-              piNode.AttachNew (new DocumentNodePI (container, 
-                conditionPI));
-              container->AddChild (piNode);
-              container->AddChildrenOf (block.node);
-              piNode.AttachNew (new DocumentNodePI (container, 
-                "endif"));
-              container->AddChild (piNode);
-              node.AttachNew (container);
+              node = EncloseInCondition (block.node, conditionStr);
             }
             else
               node = block.node;
@@ -675,6 +661,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         const char* snippetAnnotate = GetAnnotation ("snippet \"%s<%d>\"\n\n%s",
           node.tech->snippetName, node.tech->priority,
           node.annotation.GetData());
+        csString nodeCondition (node.tech->GetCondition());
         defaultCombiner->BeginSnippet (snippetAnnotate);
         combiner->BeginSnippet (snippetAnnotate);
        
@@ -747,7 +734,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	      GetCombiner (combiner, *comb, node.tech->GetCombiner(),
 	      block.combinerName));
 	    if (theCombiner.IsValid())
-	      theCombiner->WriteBlock (block.location, block.node);
+	    {
+	      csRef<iDocumentNode> node;
+	      if (!nodeCondition.IsEmpty())
+	        node = EncloseInCondition (block.node, nodeCondition);
+	      else
+		node = block.node;
+	      theCombiner->WriteBlock (block.location, node);
+	    }
 	  }
 	}
 	
@@ -1121,6 +1115,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       }
     }
     return tag;
+  }
+      
+  csPtr<iDocumentNode> Synthesizer::SynthesizeTechnique::EncloseInCondition (
+    iDocumentNode* node, const char* condition) const
+  {
+    DocumentNodeContainer* container = 
+      new DocumentNodeContainer (node->GetParent ());
+    container->AddAttributesOf (node);
+    container->SetValue (node->GetValue ());
+    csRef<iDocumentNode> piNode;
+    csString conditionPI;
+    conditionPI.Format ("if %s", condition);
+    piNode.AttachNew (new DocumentNodePI (container, 
+      conditionPI));
+    container->AddChild (piNode);
+    container->AddChildrenOf (node);
+    piNode.AttachNew (new DocumentNodePI (container, 
+      "endif"));
+    container->AddChild (piNode);
+    
+    return csPtr<iDocumentNode> (container);
   }
 
   //-------------------------------------------------------------------------
