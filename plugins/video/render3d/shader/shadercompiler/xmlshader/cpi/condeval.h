@@ -777,6 +777,9 @@ public:
   /// Evaluate a condition and return the result.
   bool Evaluate (csConditionID condition, const CS::Graphics::RenderMeshModes& modes,
     const csShaderVariableStack* stack);
+    
+  void ForceConditionResults (const csBitArray& condResults);
+    
   /**
    * Start an evaluation. If this is the first nested evaluation the evaluation cache
    * (which prevents same conditions from being evaled twice) is reset.

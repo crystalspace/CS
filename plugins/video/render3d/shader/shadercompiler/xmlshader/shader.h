@@ -103,6 +103,9 @@ class csShaderConditionResolver : public iConditionResolver
     csConditionNode* parent, csConditionNode*& node);
   bool WriteNode (iFile* cacheFile, csConditionNode* node,
     const ConditionsWriter& condWrite);
+    
+  bool SetVariantRecursive (size_t variant, csConditionNode* node,
+    csBitArray& conditionResults);
 public:
   csConditionEvaluator& evaluator;
 
@@ -126,6 +129,7 @@ public:
   size_t GetVariant ();
   size_t GetVariantCount () const
   { return nextVariant; }
+  void SetVariant (size_t variant);
   void DumpConditionTree (csString& out);
   
   bool ReadFromCache (iFile* cacheFile, ConditionsReader& condReader);
