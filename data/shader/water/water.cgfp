@@ -50,28 +50,23 @@ float4 main (vert2frag IN,
 	//reset light position
 	float3 lightVector = -lightPos.xyz;
 	
-	//Get Specular reflection
-	float3 eyeDir = IN.CamVec;
-	float3 halfDir = normalize(lightVector + eyeDir);
-	float specularLight = pow(max(0.0, dot(N, halfDir)), shininess);
+	float3 tsCamVec = IN.CamVec;
+	tsCamVec.x += N.x;
+	tsCamVec.y += N.y;
+	tsCamVec = normalize(tsCamVec);
 	
-	float4 specularColor = {1.0, 1.0, 1.0, 1.0};
+	//Get Specular reflection (computed in object coordinates)
+	float3 eyeDir = normalize(IN.CamVec);
+	float3 halfDir = normalize(lightVector + eyeDir);
+	float specularLight = pow(max(0.0, dot(N.xzy, halfDir)), shininess);
+	
+	float4 specularColor = {0.9, 0.8, 0.4, 1.0};
 	float4 specular = specularColor * specularLight;
-
-	float3 bumpNormal = N * 2 - 1;
-    bumpNormal.z *= 5;
-    bumpNormal = normalize(bumpNormal);
 
 	float4 reflection = IN.Color + specular;
 	
-	float fresnelFactor = fresnel(normalize(IN.CamVec), bumpNormal.xyz);
+	float fresnelFactor = fresnel(tsCamVec, N);
     return float4(reflection.r, reflection.g, reflection.b, 1) * fresnelFactor;
-/*
-	float4 toRet = IN.Color + specular;
-	toRet.w = waterAlpha;
-	return toRet;
-*/
-//	return tex2D(TexNormal, IN.TexCoord2.xy);
 }
 
 //---------------------------------------------------------------------------------

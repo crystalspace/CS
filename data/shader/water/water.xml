@@ -3,7 +3,7 @@
 	<shadervars>
 		<shadervar name="position" type="vector4">-1.0, -1.0, -1.0, 0.0</shadervar>
 		<shadervar name="color" type="vector4">0.9, 0.9, 0.9, 1.0</shadervar>
-		<shadervar name="shine" type="float">2.0</shadervar>
+		<shadervar name="shine" type="float">1.0</shadervar>
 		<shadervar name="murkiness" type="float">0.3</shadervar>
 		
 		<shadervar name="time" type="expression">

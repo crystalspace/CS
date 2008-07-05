@@ -38,7 +38,7 @@ vert2frag main (app2vert IN,
 	OUT.Color = IN.Color;
 
   	float4 camera = ModelViewIT[3];
-  	OUT.CamVec = (camera - IN.Position).xyz;
+	OUT.CamVec = (camera - IN.Position).xzy;
 
 	float s1, cs1, s2, cs2;
 	sincos (time, s1, cs1);
