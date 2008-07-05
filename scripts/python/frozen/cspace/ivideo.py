@@ -817,6 +817,7 @@ class iShaderCompiler(core.iBase):
     def ValidateTemplate(*args): return _ivideo.iShaderCompiler_ValidateTemplate(*args)
     def IsTemplateToCompiler(*args): return _ivideo.iShaderCompiler_IsTemplateToCompiler(*args)
     def GetPriorities(*args): return _ivideo.iShaderCompiler_GetPriorities(*args)
+    def PrecacheShader(*args): return _ivideo.iShaderCompiler_PrecacheShader(*args)
     __swig_destroy__ = _ivideo.delete_iShaderCompiler
     __del__ = lambda self : None;
 iShaderCompiler_swigregister = _ivideo.iShaderCompiler_swigregister
