@@ -1039,6 +1039,25 @@ bool csConditionEvaluator::Evaluate (csConditionID condition,
   return result;
 }
 
+void csConditionEvaluator::ForceConditionResults (const csBitArray& condResults)
+{
+  /* Hack: it can happen that while evaluating a shader, new conditions 
+   * are added (notably when a shader source is retrieved from an
+   * external source). Make sure the cache is large enough.
+   */
+  if (condChecked.GetSize() < GetNumConditions ())
+  {
+    condChecked.SetSize (GetNumConditions ());
+    condResult.SetSize (GetNumConditions ());
+  }
+
+  for (size_t i = 0; i < condResults.GetSize(); i++)
+  {
+    condChecked.Set (i, true);
+    condResult.Set (i, condResults[i]);
+  }
+}
+
 csConditionEvaluator::EvaluatorShadervar::BoolType 
 csConditionEvaluator::EvaluatorShadervar::Boolean (
   const CondOperand& operand)

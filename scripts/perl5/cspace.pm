@@ -10310,6 +10310,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *ValidateTemplate = *cspacec::iShaderCompiler_ValidateTemplate;
 *IsTemplateToCompiler = *cspacec::iShaderCompiler_IsTemplateToCompiler;
 *GetPriorities = *cspacec::iShaderCompiler_GetPriorities;
+*PrecacheShader = *cspacec::iShaderCompiler_PrecacheShader;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});

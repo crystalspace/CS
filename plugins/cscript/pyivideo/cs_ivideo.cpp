@@ -18701,6 +18701,46 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iShaderCompiler_PrecacheShader(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iShaderCompiler *arg1 = (iShaderCompiler *) 0 ;
+  iDocumentNode *arg2 = (iDocumentNode *) 0 ;
+  iHierarchicalCache *arg3 = (iHierarchicalCache *) 0 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iShaderCompiler_PrecacheShader",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShaderCompiler, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderCompiler_PrecacheShader" "', argument " "1"" of type '" "iShaderCompiler *""'"); 
+  }
+  arg1 = reinterpret_cast< iShaderCompiler * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iDocumentNode, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShaderCompiler_PrecacheShader" "', argument " "2"" of type '" "iDocumentNode *""'"); 
+  }
+  arg2 = reinterpret_cast< iDocumentNode * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_iHierarchicalCache, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iShaderCompiler_PrecacheShader" "', argument " "3"" of type '" "iHierarchicalCache *""'"); 
+  }
+  arg3 = reinterpret_cast< iHierarchicalCache * >(argp3);
+  result = (bool)(arg1)->PrecacheShader(arg2,arg3);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_delete_iShaderCompiler(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iShaderCompiler *arg1 = (iShaderCompiler *) 0 ;
@@ -24311,6 +24351,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iShaderCompiler_ValidateTemplate", _wrap_iShaderCompiler_ValidateTemplate, METH_VARARGS, NULL},
 	 { (char *)"iShaderCompiler_IsTemplateToCompiler", _wrap_iShaderCompiler_IsTemplateToCompiler, METH_VARARGS, NULL},
 	 { (char *)"iShaderCompiler_GetPriorities", _wrap_iShaderCompiler_GetPriorities, METH_VARARGS, NULL},
+	 { (char *)"iShaderCompiler_PrecacheShader", _wrap_iShaderCompiler_PrecacheShader, METH_VARARGS, NULL},
 	 { (char *)"delete_iShaderCompiler", _wrap_delete_iShaderCompiler, METH_VARARGS, NULL},
 	 { (char *)"iShaderCompiler_swigregister", iShaderCompiler_swigregister, METH_VARARGS, NULL},
 	 { (char *)"new_csRefShaderStringIDHash", _wrap_new_csRefShaderStringIDHash, METH_VARARGS, NULL},

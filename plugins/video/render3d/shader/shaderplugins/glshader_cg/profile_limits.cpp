@@ -25,6 +25,8 @@
 
 #include "profile_limits.h"
 
+#include "csplugincommon/opengl/glextmanager.h"
+
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 {
 // Tabularize what profiles use what limits

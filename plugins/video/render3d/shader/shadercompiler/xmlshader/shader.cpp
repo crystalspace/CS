@@ -221,6 +221,38 @@ size_t csShaderConditionResolver::GetVariant ()
   }
 }
 
+bool csShaderConditionResolver::SetVariantRecursive (size_t variant, 
+                                                     csConditionNode* node, 
+                                                     csBitArray& conditionResults)
+{
+  if (node->variant != csArrayItemNotFound)
+  {
+    return node->variant == variant;
+  }
+
+  if (SetVariantRecursive (variant, node->trueNode, conditionResults))
+  {
+    conditionResults.SetBit (node->condition);
+    return true;
+  }
+  else if (SetVariantRecursive (variant, node->falseNode, conditionResults))
+    return true;
+  else
+    return false;
+}
+
+void csShaderConditionResolver::SetVariant (size_t variant)
+{
+  if (rootNode == 0) return;
+
+  csBitArray conditionResults (evaluator.GetNumConditions());
+  if (SetVariantRecursive (variant, rootNode->trueNode, conditionResults))
+    conditionResults.SetBit (rootNode->condition);
+  else
+    SetVariantRecursive (variant, rootNode->falseNode, conditionResults);
+  evaluator.ForceConditionResults (conditionResults);
+}
+
 void csShaderConditionResolver::DumpConditionTree (csString& out)
 {
   if (rootNode == 0)
@@ -654,12 +686,15 @@ bool csXMLShader::Precache (iDocumentNode* source, iHierarchicalCache* cacheTo)
   
   for (size_t tvi = 0; tvi < tvc; tvi++)
   {
+    techsResolver->SetVariant (tvi);
     ShaderTechVariant& techVar = techVariants.GetExtend (tvi);
     PrepareTechVar (techVar, -1);
     
     for (size_t t = 0; t < techVar.techniques.GetSize(); t++)
     {
       ShaderTechVariant::Technique& tech = techVar.techniques[t];
+      tech.resolver = new csShaderConditionResolver (*sharedEvaluator);
+      tech.resolver->SetVariant (t);
       
       csRef<iHierarchicalCache> techCache;
       techCache = shaderCache->GetRootedCache (
@@ -681,10 +716,12 @@ bool csXMLShader::Precache (iDocumentNode* source, iHierarchicalCache* cacheTo)
   csTextProgressMeter* progress = 0;
   for (size_t tvi = 0; tvi < tvc; tvi++)
   {
+    techsResolver->SetVariant (tvi);
     ShaderTechVariant& techVar = techVariants[tvi];
     for (size_t t = 0; t < techVar.techniques.GetSize(); t++)
     {
       ShaderTechVariant::Technique& tech = techVar.techniques[t];
+      tech.resolver->SetVariant (t);
       
       csRef<iHierarchicalCache> techCache;
       techCache = shaderCache->GetRootedCache (

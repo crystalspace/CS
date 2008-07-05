@@ -170,7 +170,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  }
 	}
       }
-      passSnippets.Push (new Snippet (compiler, passNode, 0, aliases, true));
+      passSnippets.Push (new Snippet (compiler, passNode, 0, aliases, 0));
       prePassNodes.Push (nonPassNodes);
       nonPassNodes.Empty();
       
@@ -243,7 +243,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  switch (xmltokens.Request (child->GetValue ()))
 	  {
 	    case WeaverCompiler::XMLTOKEN_PASS:
-	      passSnippets.Push (new Snippet (compiler, child, 0, aliases, true));
+	      passSnippets.Push (new Snippet (compiler, child, 0, aliases, 0));
 	      prePassNodes.Push (nonPassNodes);
 	      nonPassNodes.Empty();
 	      handled = true;

@@ -42,6 +42,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     class Technique : public CS:: Utility::FastRefCount<Technique>
     {
     public:
+      const Snippet* owner;
       const char* snippetName;
       int priority;
       struct CombinerPlugin
@@ -93,9 +94,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         Output() : coercionOutput (false) {}
       };
       
-      Technique (const char* snippetName) : snippetName (snippetName), 
-        priority (0) {}
+      Technique (const Snippet* owner, const char* snippetName) : owner (owner),
+        snippetName (snippetName), priority (0) {}
       virtual ~Technique() {}
+      
+      csString GetCondition() const;
       
       virtual bool IsCompound() const = 0;
       
@@ -115,8 +118,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       csArray<Input> inputs;
       csArray<Output> outputs;
     public:
-      AtomTechnique (const char* snippetName, const csMD5::Digest& id) : 
-        Technique (snippetName), id (id) {}
+      AtomTechnique (const Snippet* owner, const char* snippetName,
+        const csMD5::Digest& id) : Technique (owner, snippetName), id (id) {}
     
       virtual bool IsCompound() const { return false; }
       const csMD5::Digest& GetID() const { return id; }
@@ -166,7 +169,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       Technique::CombinerPlugin combiner;
       csHash<ExplicitConnectionsHash, csPtrKey<Snippet> > explicitConnections;
     public:
-      CompoundTechnique (const char* snippetName) : Technique (snippetName) {}
+      CompoundTechnique (const Snippet* owner, const char* snippetName) : 
+        Technique (owner, snippetName) {}
       ~CompoundTechnique();
 
       virtual bool IsCompound() const { return true; }
@@ -188,12 +192,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     };
     
     Snippet (const WeaverCompiler* compiler, iDocumentNode* node,
-      const char* name, const FileAliases& aliases, bool topLevel = false);
+      const char* name, const FileAliases& aliases,
+      const Snippet* parent);
     Snippet (const WeaverCompiler* compiler, const char* name);
     virtual ~Snippet();
     
     const char* GetName() const { return name; }
     bool IsCompound() const { return isCompound; }
+    
+    csString GetCondition() const;
     
     BasicIterator<const Technique*>* GetTechniques() const;
     
@@ -211,11 +218,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     const WeaverCompiler* compiler;
     const csStringHash& xmltokens;
     csString name;
+    csString condition;
     typedef csPDelArray<Technique> TechniqueArray;
     TechniqueArray techniques;
     bool isCompound;
     bool passForward;
     csRefArray<iDocumentNode> passForwardedNodes;
+    const Snippet* parent;
     
     void LoadAtomTechniques (iDocumentNode* node, const FileAliases& aliases);
     void LoadAtomTechnique (iDocumentNode* node, const FileAliases& aliases);

@@ -20,30 +20,39 @@
   <technique priority="100">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
-    <input file="/shader/snippets/texCoord.inp"	/>
-    
-    <input name="texDiffuse" type="tex2d" default="complex">
-      <block location="pass">
-	<texture name="tex diffuse" destination="fragmentIn.texDiffuse" />
+    <input name="flatColor" type="rgba" default="complex">
+      <block location="cg:variablemap">
+        <variablemap variable="mat flatcolor" 
+	  destination="fragmentIn.flatColor" />
+        <variablemap variable="mat flatcolor" 
+	  destination="vertexIn.flatColor" />
       </block>
       
       <block location="cg:fragmentIn">
-	<uniform type="tex2d" name="texDiffuse" />
+	<uniform type="rgba" name="flatColor" />
+      </block>
+      
+      <block location="cg:vertexIn">
+	<uniform type="rgba" name="flatColor" />
       </block>
       
       <block location="cg:fragmentMain">
-	texDiffuse = fragmentIn.texDiffuse;
+	flatColor = fragmentIn.flatColor;
+      </block>
+
+      <block location="cg:vertexMain">
+	flatColor = vertexIn.flatColor;
       </block>
     </input>
-    
+      
     <block location="cg:vertexMain">
-      surfaceColor = float4(0);
-      surfaceColor_attr_perfragment = true;
+      surfaceColor = flatColor;
+      surfaceColor_attr_perfragment = false;
     </block>
     
     <block location="cg:fragmentMain">
-      surfaceColor = tex2D (texDiffuse, texCoord);
-      surfaceColor_attr_perfragment = true;
+      surfaceColor = flatColor;
+      surfaceColor_attr_perfragment = false;
     </block>
     
     <output name="surfaceColor" type="rgba">
