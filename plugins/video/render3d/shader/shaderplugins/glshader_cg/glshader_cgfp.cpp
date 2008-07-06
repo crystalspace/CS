@@ -160,7 +160,7 @@ bool csShaderGLCGFP::Compile (iHierarchicalCache* cache)
   else
   {
     bool ret = TryCompile (shaderPlug->maxProfileFragment,
-      loadLoadToGL, 0);
+      loadLoadToGL | loadApplyVmap, 0);
   
     ProfileLimits limits (programProfile);
     limits.GetCurrentLimits ();
