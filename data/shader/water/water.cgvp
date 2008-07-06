@@ -27,14 +27,15 @@ struct vert2frag
 //Shader entry
 //---------------------------------------------------------------------------------
 
-vert2frag main (app2vert IN, 
+vert2frag main (app2vert IN,
 			 uniform float time,
 			 uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans,
 			 uniform float4x4 ModelViewProj : state.matrix.mvp)
 {
     vert2frag OUT;
 
-    OUT.Position = mul (ModelViewProj, IN.Position);
+	OUT.Position = mul (ModelViewProj, IN.Position);
+
 	OUT.Color = IN.Color;
 
   	float4 camera = ModelViewIT[3];

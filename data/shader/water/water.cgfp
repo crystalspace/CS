@@ -37,15 +37,8 @@ float4 main (vert2frag IN,
 			 uniform float waterAlpha,
 			 uniform sampler2D TexNormal) : COLOR        
 {       
-/*
-    float2 lookUp;
-    lookUp.x = noise(IN.TexCoord2.x + IN.TexCoord3.x);
-    lookUp.y = noise(IN.TexCoord2.y + IN.TexCoord3.y);
-	
-	float3 N = normalize(tex2D(TexNormal, lookUp).xyz);
-	
-*/    
-    float3 N = normalize(tex2D(TexNormal, IN.TexCoord2.xy).xyz - tex2D(TexNormal, IN.TexCoord3.xy).xyz);
+    float3 N = normalize(tex2D(TexNormal, IN.TexCoord2.xy).xyz 
+						- tex2D(TexNormal, IN.TexCoord3.xy).xyz);
 	
 	//reset light position
 	float3 lightVector = -lightPos.xyz;
@@ -66,7 +59,7 @@ float4 main (vert2frag IN,
 	float4 reflection = IN.Color + specular;
 	
 	float fresnelFactor = fresnel(tsCamVec, N);
-    return float4(reflection.r, reflection.g, reflection.b, 1) * fresnelFactor;
+    return float4(reflection.rgb, 1) * fresnelFactor;
 }
 
 //---------------------------------------------------------------------------------
