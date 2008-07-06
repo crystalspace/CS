@@ -614,7 +614,7 @@ bool csGLShaderFFP::TryMergeTexFuncs (mtexlayer::TexFunc& newTF,
   return false;
 }
 
-bool csGLShaderFFP::Compile ()
+bool csGLShaderFFP::Compile (iHierarchicalCache*)
 {
   shaderPlug->Open ();
   ext = shaderPlug->ext;

@@ -10310,6 +10310,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *ValidateTemplate = *cspacec::iShaderCompiler_ValidateTemplate;
 *IsTemplateToCompiler = *cspacec::iShaderCompiler_IsTemplateToCompiler;
 *GetPriorities = *cspacec::iShaderCompiler_GetPriorities;
+*PrecacheShader = *cspacec::iShaderCompiler_PrecacheShader;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -22591,6 +22592,7 @@ sub CSDRAW_2DGRAPHICS () { $cspacec::CSDRAW_2DGRAPHICS }
 sub CSDRAW_3DGRAPHICS () { $cspacec::CSDRAW_3DGRAPHICS }
 sub CSDRAW_CLEARZBUFFER () { $cspacec::CSDRAW_CLEARZBUFFER }
 sub CSDRAW_CLEARSCREEN () { $cspacec::CSDRAW_CLEARSCREEN }
+sub CSDRAW_NOCLIPCLEAR () { $cspacec::CSDRAW_NOCLIPCLEAR }
 sub CS_CLIPPER_NONE () { $cspacec::CS_CLIPPER_NONE }
 sub CS_CLIPPER_OPTIONAL () { $cspacec::CS_CLIPPER_OPTIONAL }
 sub CS_CLIPPER_TOPLEVEL () { $cspacec::CS_CLIPPER_TOPLEVEL }

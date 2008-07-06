@@ -37,8 +37,8 @@
 #include "csutil/strset.h"
 #include "csutil/noncopyable.h"
 
-struct iCacheManager;
 struct iDocumentNode;
+struct iHierarchicalCache;
 struct iLight;
 struct iObject;
 struct iLoaderContext;
@@ -301,7 +301,7 @@ enum csShaderTagPresence
  */
 struct iShaderManager : public virtual iShaderVariableContext
 {
-  SCF_INTERFACE (iShaderManager, 2, 1, 1);
+  SCF_INTERFACE (iShaderManager, 3, 0, 1);
   /**
    * Register a shader to the shadermanager.
    * Compiler should register all shaders
@@ -384,7 +384,8 @@ struct iShaderManager : public virtual iShaderVariableContext
    */
   virtual iShaderVarStringSet* GetSVNameStringset () const = 0;
   
-  virtual iCacheManager* GetShaderCache() = 0;
+  /// Get the cache for storing precompiled shader data
+  virtual iHierarchicalCache* GetShaderCache() = 0;
 };
 
 /**
@@ -514,7 +515,7 @@ struct iShaderPriorityList : public virtual iBase
  */
 struct iShaderCompiler : public virtual iBase
 {
-  SCF_INTERFACE (iShaderCompiler, 0,0,1);
+  SCF_INTERFACE (iShaderCompiler, 0,0,2);
   /// Get a name identifying this compiler
   virtual const char* GetName() = 0;
 
@@ -543,6 +544,9 @@ struct iShaderCompiler : public virtual iBase
    */
   virtual csPtr<iShaderPriorityList> GetPriorities (
 		  iDocumentNode* templ) = 0;
+		  
+  virtual bool PrecacheShader (iDocumentNode* node,
+    iHierarchicalCache* cacheTo) = 0;
 };
 
 #endif // __CS_IVIDEO_SHADER_H__

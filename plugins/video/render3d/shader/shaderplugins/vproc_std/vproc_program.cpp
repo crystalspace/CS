@@ -555,7 +555,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(VProc_std)
   {
   }
 
-  bool csVProcStandardProgram::Compile ()
+  bool csVProcStandardProgram::Compile (iHierarchicalCache*)
   {
     return true;
   }

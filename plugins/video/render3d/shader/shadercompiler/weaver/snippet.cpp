@@ -59,15 +59,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   };
 
   //-------------------------------------------------------------------
+  
+  csString Snippet::Technique::GetCondition() const
+  {
+    if (owner != 0) return owner->GetCondition();
+    return (char*)0;
+  }
+      
+  //-------------------------------------------------------------------
 
   Snippet::Snippet (const WeaverCompiler* compiler, iDocumentNode* node, 
                     const char* name, const FileAliases& aliases,
-                    bool topLevel) : compiler (compiler), 
+                    const Snippet* parent) : compiler (compiler), 
     xmltokens (compiler->xmltokens), name (name), 
-    isCompound (false), passForward (false)
+    isCompound (false), passForward (false), parent (parent)
   {
     bool okay = true;
-    if (topLevel)
+    if (parent == 0)
     {
       isCompound = true;
       passForward = true;
@@ -99,14 +107,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  LoadAtomTechniques (node, aliases);
 	else
 	{
-	  LoadCompoundTechniques (node, aliases, topLevel);
+	  LoadCompoundTechniques (node, aliases, parent == 0);
 	}
       }
     }
   }
   
   Snippet::Snippet (const WeaverCompiler* compiler, const char* name) : compiler (compiler), 
-    xmltokens (compiler->xmltokens), name (name), isCompound (false)
+    xmltokens (compiler->xmltokens), name (name), isCompound (false), parent (0)
   {
   }
 
@@ -114,6 +122,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   {
   }
   
+  csString Snippet::GetCondition() const
+  {
+    if (condition.IsEmpty())
+    {
+      if (parent == 0)
+        return csString();
+      else
+        return parent->GetCondition();
+    }
+    else
+    {
+      csString cond;
+      if (parent != 0)
+      {
+        cond = parent->GetCondition();;
+        if (!cond.IsEmpty()) cond += " && ";
+      }
+      cond.AppendFmt ("(%s)", condition.GetData());
+      return cond;
+    }
+  }
+      
   BasicIterator<const Snippet::Technique*>* Snippet::GetTechniques() const
   {
     return new BasicIteratorImplCopyValue<const Technique*, TechniqueArray> (
@@ -146,7 +176,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   {
     csString hashStr;
     hashStr.Format ("__passthrough_%s_%s__", varName, type);
-    AtomTechnique* newTech = new AtomTechnique ("(passthrough)", 
+    AtomTechnique* newTech = new AtomTechnique (0, "(passthrough)", 
       csMD5::Encode (hashStr));
     
     {
@@ -237,7 +267,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     const FileAliases& _aliases, const char* defaultCombinerName) const
   {
     FileAliases aliases (_aliases);
-    AtomTechnique newTech (GetName(),
+    AtomTechnique newTech (this, GetName(),
       csMD5::Encode (CS::DocSystem::FlattenNode (node)));
     
     newTech.priority = node->GetAttributeValueAsInt ("priority");
@@ -613,7 +643,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       }
     }
 
-    CompoundTechnique* newTech = new CompoundTechnique (GetName());
+    CompoundTechnique* newTech = new CompoundTechnique (this,
+      GetName());
   
     newTech->priority = node->GetAttributeValueAsInt ("priority");
     
@@ -687,6 +718,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	return;
     }
     
+    const char* condition = node->GetAttributeValue ("condition");
+    
     csString filename;
     csRef<iDocumentNode> snippetNode = GetNodeOrFromFile (node, "snippet",
       compiler, aliases, &filename);
@@ -699,7 +732,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     }
     snippetName += id ? id : filename.GetData();
     Snippet* newSnippet = new Snippet (compiler, snippetNode, 
-      snippetName, aliases);
+      snippetName, aliases, this);
+    newSnippet->condition = condition;
     tech.AddSnippet (id, newSnippet);
   }
     

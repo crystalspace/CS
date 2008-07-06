@@ -103,6 +103,9 @@ class csShaderConditionResolver : public iConditionResolver
     csConditionNode* parent, csConditionNode*& node);
   bool WriteNode (iFile* cacheFile, csConditionNode* node,
     const ConditionsWriter& condWrite);
+    
+  bool SetVariantRecursive (size_t variant, csConditionNode* node,
+    csBitArray& conditionResults);
 public:
   csConditionEvaluator& evaluator;
 
@@ -126,6 +129,7 @@ public:
   size_t GetVariant ();
   size_t GetVariantCount () const
   { return nextVariant; }
+  void SetVariant (size_t variant);
   void DumpConditionTree (csString& out);
   
   bool ReadFromCache (iFile* cacheFile, ConditionsReader& condReader);
@@ -213,10 +217,8 @@ class csXMLShader : public scfImplementationExt3<csXMLShader,
   };
   csArray<ShaderTechVariant> techVariants;
   csRef<csConditionEvaluator> sharedEvaluator;
-  csRef<iCacheManager> shaderCache;
-  bool readFromCache;
+  csRef<iHierarchicalCache> shaderCache;
   csString cacheTag;
-  csString cacheType;
   csString cacheScope_tech;
 
   /// Shader we fall back to if none of the techs validate
@@ -267,14 +269,25 @@ class csXMLShader : public scfImplementationExt3<csXMLShader,
 protected:
   void InternalRemove() { SelfDestruct(); }
 
-  void Load (iDocumentNode* source);
+  void Load (iDocumentNode* source, bool noCacheRead);
+    
+  void PrepareTechVar (ShaderTechVariant& techVar,
+    int forcepriority);
+  
+  bool LoadTechniqueFromCache (ShaderTechVariant::Technique& tech,
+    iHierarchicalCache* cache);
+  void LoadTechnique (ShaderTechVariant::Technique& tech,
+    iHierarchicalCache* cacheTo, size_t dbgTechNum);
 public:
   CS_LEAKGUARD_DECLARE (csXMLShader);
 
   csXMLShader (csXMLShaderCompiler* compiler,
       iLoaderContext* ldr_context, iDocumentNode* source,
       int forcepriority);
+  csXMLShader (csXMLShaderCompiler* compiler);
   virtual ~csXMLShader();
+  
+  bool Precache (iDocumentNode* source, iHierarchicalCache* cacheTo);
 
   virtual iObject* QueryObject () 
   { return (iObject*)(csObject*)this; }

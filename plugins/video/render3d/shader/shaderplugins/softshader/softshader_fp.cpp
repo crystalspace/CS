@@ -138,7 +138,7 @@ void csSoftShader_FP::SetupState (const csRenderMesh* /*mesh*/,
   }
 }
 
-bool csSoftShader_FP::Compile()
+bool csSoftShader_FP::Compile (iHierarchicalCache*)
 {
   return true;
 }

@@ -116,7 +116,7 @@
       
       mirroredPointDist = distRefrFromEye - distPlaneFromEye;
       
-      float perturbWeight = clamp (inv_reflW, 0, saturate (mirroredPointDist));
+      float perturbWeight = saturate (mirroredPointDist);
       //debug (float4 (abs(perturb.x)*10, 0, 0, 1));
       //debug (float4 (0, abs(perturb.y)*10, 0, 1));
       tc.xy += perturb * perturbWeight;

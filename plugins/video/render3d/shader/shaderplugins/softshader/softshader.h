@@ -58,6 +58,10 @@ public:
   virtual bool SupportType(const char* type);
 
   virtual void Open();
+
+  bool Precache (const char* type, iShaderDestinationResolver* resolve, 
+    iDocumentNode* node, iHierarchicalCache* cacheTo,
+    csRef<iBase>* outObj = 0) { return false; }
   /** @} */
 
   /**\name iComponent implementation

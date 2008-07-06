@@ -370,8 +370,9 @@ namespace CS
 	  
 	  /* To reduce bleeding from filtering, fuzz the reflection mapping to 
 	      be actually stretched out a pixel at the corners */
-	  if ((persist.resolutionReduceRefr > 0)
-	      || (persist.resolutionReduceRefl > 0))
+	  if ((persist.mappingStretch > 0)
+	      && ((persist.resolutionReduceRefr > 0)
+		|| (persist.resolutionReduceRefl > 0)))
 	  {
 	    /* Since reflection + refraction share the same TC transform, 
 	      compute the 'fuzz' from the smaller one. This can lead to 

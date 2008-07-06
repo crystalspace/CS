@@ -125,7 +125,7 @@ public:
    */
   void SetSize (size_t n)
   {
-    superclass::SetSize (0);
+    superclass::SetSize (n, 0);
   }
 
   /**
