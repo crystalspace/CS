@@ -109,6 +109,8 @@ public:
   void testPhaseHandlers ();
   void testFrameSubEvents ();
   void testMixedHandlers ();
+  
+  void dumpHandlers ();
 
   CPPUNIT_TEST_SUITE (csEventQueueTest);
     CPPUNIT_TEST (testSmokeTest);
@@ -178,10 +180,12 @@ void csEventQueueTest::testPhaseHandlers ()
 
   handlers = new csList<csString *> ();
   queue->Process ();
+  
+  dumpHandlers ();
 
 #ifdef ADB_DEBUG
-  csEventTree *frameEvent = queue->EventTree->FindNode(csevFrame (objreg), queue);
-  frameEvent->fatRecord->SubscriberGraph->Dump (objreg);
+  // csEventTree *frameEvent = queue->EventTree->FindNode(csevFrame (objreg), queue);
+  // frameEvent->fatRecord->SubscriberGraph->Dump (objreg);
 #endif
 
   CPPUNIT_ASSERT_MESSAGE ("List is empty", !handlers->IsEmpty());
@@ -236,7 +240,7 @@ void csEventQueueTest::testFrameSubEvents ()
   iEventHandler *h2 = new HandlerOther (objreg, "Process");
   iEventHandler *h3 = new HandlerOther (objreg, "PostProcess");
   iEventHandler *h4 = new HandlerOther (objreg, "FinalProcess");
-
+  
   queue->RegisterListener (h3, csevPostProcess (objreg));
   queue->RegisterListener (h1, csevPreProcess (objreg));
   queue->RegisterListener (h2, csevProcess (objreg));
@@ -245,6 +249,8 @@ void csEventQueueTest::testFrameSubEvents ()
   handlers = new csList<csString *> ();
   queue->Process ();
 
+  dumpHandlers ();
+  
   CPPUNIT_ASSERT_MESSAGE ("List is empty", !handlers->IsEmpty());
 
   std::string message ("Expected PreProcess, got ");
@@ -281,4 +287,23 @@ void csEventQueueTest::testFrameSubEvents ()
 void csEventQueueTest::testMixedHandlers ()
 {
 
+}
+
+// Helper function to print the contents of the handlers list
+void csEventQueueTest::dumpHandlers ()
+{
+  std::cout << std::endl;
+  csList<csString*>::Iterator iter(*handlers);
+  
+  /*for (; iter.HasNext(); ++iter)
+  {
+    std::cout << (*iter)->GetDataSafe () << std::endl;
+  }*/
+  csString* item;
+  
+  while (iter.HasNext())
+  {
+    item = iter.Next();
+    std::cout << item->GetDataSafe() << std::endl;
+  }
 }
