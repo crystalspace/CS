@@ -113,21 +113,21 @@ void ASndTest::CreateWorld ()
   walls_state->SetPolygonTextureMapping (CS_POLYRANGE_ALL, 3);
 
   // Add some quick lighting
-  light = engine->CreateLight (0, csVector3 (-30, 5, 10), 20, csColor (0.22, 0.2, 0.25));
+  light = engine->CreateLight (0, csVector3 (-30, 5, 10), 20, csColor (0.22f, 0.2f, 0.25f));
   ll->Add (light);
-  light = engine->CreateLight (0, csVector3 (-30, 5, 30), 20, csColor (0.22, 0.2, 0.25));
+  light = engine->CreateLight (0, csVector3 (-30, 5, 30), 20, csColor (0.22f, 0.2f, 0.25f));
   ll->Add (light);
-  light = engine->CreateLight (0, csVector3 (-10, 5, 10), 20, csColor (0.22, 0.2, 0.25));
+  light = engine->CreateLight (0, csVector3 (-10, 5, 10), 20, csColor (0.22f, 0.2f, 0.25f));
   ll->Add (light);
-  light = engine->CreateLight (0, csVector3 (-10, 5, 30), 20, csColor (0.22, 0.2, 0.25));
+  light = engine->CreateLight (0, csVector3 (-10, 5, 30), 20, csColor (0.22f, 0.2f, 0.25f));
   ll->Add (light);
-  light = engine->CreateLight (0, csVector3 ( 10, 5, 30), 20, csColor (0.22, 0.2, 0.25));
+  light = engine->CreateLight (0, csVector3 ( 10, 5, 30), 20, csColor (0.22f, 0.2f, 0.25f));
   ll->Add (light);
-  light = engine->CreateLight (0, csVector3 ( 10, 5, 10), 20, csColor (0.22, 0.2, 0.25));
+  light = engine->CreateLight (0, csVector3 ( 10, 5, 10), 20, csColor (0.22f, 0.2f, 0.25f));
   ll->Add (light);
-  light = engine->CreateLight (0, csVector3 ( 30, 5, 30), 20, csColor (0.22, 0.2, 0.25));
+  light = engine->CreateLight (0, csVector3 ( 30, 5, 30), 20, csColor (0.22f, 0.2f, 0.25f));
   ll->Add (light);
-  light = engine->CreateLight (0, csVector3 ( 30, 5, 10), 20, csColor (0.22, 0.2, 0.25));
+  light = engine->CreateLight (0, csVector3 ( 30, 5, 10), 20, csColor (0.22f, 0.2f, 0.25f));
   ll->Add (light);
 
   // Create a small sound source
