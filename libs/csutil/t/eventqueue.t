@@ -170,9 +170,9 @@ void csEventQueueTest::testPhaseHandlers ()
   iEventHandler *h6 = new HandlerFrame (objreg);
 
   queue->RegisterListener (h6, csevFrame (objreg));
-  queue->RegisterListener (h1, csevFrame (objreg));
-  queue->RegisterListener (h5, csevFrame (objreg));
   queue->RegisterListener (h2, csevFrame (objreg));
+  queue->RegisterListener (h5, csevFrame (objreg));
+  queue->RegisterListener (h1, csevFrame (objreg));
   queue->RegisterListener (h4, csevFrame (objreg));
   queue->RegisterListener (h3, csevFrame (objreg));
 
