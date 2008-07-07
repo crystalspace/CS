@@ -23,6 +23,11 @@ struct vert2frag
 	float4 TexCoord3	: TEXCOORD2;
 };
 
+/**
+	Wave displacement functions as outlined in section 4.1 of
+	http://www.finelightvisualtechnology.com/docs/coursenotes2004.pdf
+**/
+
 //Wave displacement x-z
 float2 WaveDisp(float2 k, float amp, float2 pos, float freq, float phase, float time) 
 { 
@@ -54,24 +59,30 @@ vert2frag main (app2vert IN,
 
 	float4 inPos = IN.Position;
 
+	//Grab xz position
 	float2 xzpos = IN.Position.xz;
 
+	//Displace once
 	float2 k = float2(kxs.x, kys.x);
 	float2 wdxz1 = WaveDisp(k, amps.x, xzpos, freqs.x, phases.x, time);
 	float wdy1 = WaveDispVert(k, amps.x, xzpos, freqs.x, phases.x, time);
 	
+	//Displace twice
 	k = float2(kxs.y, kys.y);
 	float2 wdxz2 = WaveDisp(k, amps.y, xzpos, freqs.y, phases.y, time);
 	float wdy2 = WaveDispVert(k, amps.y, xzpos, freqs.y, phases.y, time);
 	
+	//Displace thrice, three times displacement!
 	k = float2(kxs.z, kys.z);
 	float2 wdxz3 = WaveDisp(k, amps.z, xzpos, freqs.z, phases.z, time);
 	float wdy3 = WaveDispVert(k, amps.z, xzpos, freqs.z, phases.z, time);
 
+	//Add all the displacements
 	inPos.x -= wdxz1.x + wdxz2.x + wdxz3.x;
 	inPos.z -= wdxz1.y + wdxz2.y + wdxz3.y;
 	inPos.y = wdy1 + wdy2 + wdy3;
 
+	//Get real position again.
 	OUT.Position = mul (ModelViewProj, inPos);
 
 	OUT.Color = IN.Color;
