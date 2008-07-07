@@ -146,9 +146,7 @@ void csBlockAllocatorTest::testMap()
   b.Free(i1);          countBits(b, 0, 4);
   i1 = b.Alloc();      countBits(b, 1, 3);
   i2 = b.Alloc();      countBits(b, 2, 2);
-  // Empty seems to keep the map around
   b.Empty();           countBits(b, 0, 4);
-  // DeleteAll is supposed to free the map
   b.DeleteAll();       countBits(b, 0, 0);
 }
 
