@@ -208,7 +208,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
       subNodes[indexList[i]]->BlendState (locState, 1.0f);
 
-      for (size_t b = 0; b < locState->GetBoneCount (); ++b)
+      for (BoneID b = 0; b < locState->GetBoneCount (); ++b)
       {
         if (locState->IsBoneUsed (b))
         {
@@ -220,7 +220,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       }
     }
 
-    for (size_t b = 0; b < totalState->GetBoneCount (); ++b)
+    for (BoneID b = 0; b < totalState->GetBoneCount (); ++b)
     {
       if (totalState->IsBoneUsed (b))
       {

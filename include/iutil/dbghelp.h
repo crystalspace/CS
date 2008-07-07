@@ -51,28 +51,17 @@ enum
  */
 struct iDebugHelper : public virtual iBase
 {
-  SCF_INTERFACE(iDebugHelper,2,0,0);
+  SCF_INTERFACE(iDebugHelper,3,0,0);
   /**
    * Return a bit field indicating what types of functions this specific
    * unit test implementation supports. This will return a combination of
-   * the CS_DBGHELP_... flags:
-   * - #CS_DBGHELP_UNITTEST
+   * the CS_DBGHELP_... flags:  
    * - #CS_DBGHELP_BENCHMARK
    * - #CS_DBGHELP_TXTDUMP
    * - #CS_DBGHELP_GFXDUMP
    * - #CS_DBGHELP_STATETEST
    */
   virtual int GetSupportedTests () const = 0;
-
-  /**
-   * Perform a unit test. This function will try to test as much as possible
-   * of the given module. This function returns 0 if the test succeeded.
-   * Otherwise an iString  is returned containing some information about
-   * the errors. DecRef() this returned string after using it.
-   * \deprecate Use the external unit testing framework instead. Deprecated in 1.3.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use the external unit testing framework instead.")
-  virtual csPtr<iString> UnitTest () = 0;
 
   /**
    * Perform a state test. This function will test if the current state

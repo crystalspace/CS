@@ -49,7 +49,6 @@ namespace CS
       csPtr<iString> Dump () { return 0; }
       int GetSupportedTests () const { return 0; }
       csPtr<iString> StateTest () { return  0; }
-      csPtr<iString> UnitTest () { return  0; }
       /** @} */
     };
     
