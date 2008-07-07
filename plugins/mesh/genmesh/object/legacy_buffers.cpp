@@ -205,7 +205,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
           csRef<iRenderBuffer> newBuffer =
             csRenderBuffer::CreateRenderBuffer (
             legacyBuffers.mesh_colors.GetSize(), CS_BUF_STATIC,
-            CS_BUFCOMP_FLOAT, 3);
+            CS_BUFCOMP_FLOAT, 4);
           newBuffer->SetData (legacyBuffers.mesh_colors.GetArray());
           InternalSetBuffer (CS_BUFFER_COLOR, newBuffer);
           legacyBuffers.mesh_colors_dirty_flag = false;
