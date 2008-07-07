@@ -342,11 +342,11 @@ public:
 
   /**\name iWaterFactoryState implementation
    * @{ */
-  // csVector3* GetVertices () { return vertices; }
-  // csVector2* GetTexels () { return texels; }
-  // csVector3* GetNormals () { return normals; }
-  // csColor* GetColors () { return colors; }
-  // csTriangle* GetTriangles () { return triangles; }
+   csVector3* GetVertices () { return vertices; }
+   csVector2* GetTexels () { return texels; }
+   csVector3* GetNormals () { return normals; }
+   csColor* GetColors () { return colors; }
+   csTriangle* GetTriangles () { return triangles; }
   void Invalidate ();
 
 	void SetLength(uint length) { len = length; size_changed = true; }

@@ -70,6 +70,12 @@ struct iWaterFactoryState : public virtual iBase
 {
   SCF_INTERFACE (iWaterFactoryState, 2, 0, 0);
 
+  virtual csVector3* GetVertices () = 0;
+  virtual csVector2* GetTexels () = 0;
+  virtual csVector3* GetNormals () = 0;
+  virtual csColor* GetColors () = 0;
+  virtual csTriangle* GetTriangles () = 0;
+
   /**
    * After making a significant change to the vertices or triangles you
    * probably want to let this object recalculate the bounding boxes

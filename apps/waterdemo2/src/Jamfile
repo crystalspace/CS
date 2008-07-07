@@ -1,0 +1,10 @@
+SubDir TOP src ;
+
+Description waterdemo2 : "Water Demo II" ;
+Application waterdemo2 :
+  [ Wildcard *.h *.hpp *.hxx *.H *.c *.cc *.cpp *.cxx *.C *.m *.mm *.M ] ;
+ExternalLibs waterdemo2 : CRYSTAL ;
+if $(CEL.DESIRED) = yes && $(CEL.AVAILABLE) = yes
+{
+  ExternalLibs waterdemo2 : CEL ;
+}
