@@ -20,6 +20,10 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_DEPENDENTTARGET_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_DEPENDENTTARGET_H__
 
+/**\file
+ * Dependent target manager.
+ */
+ 
 #include "csplugincommon/rendermanager/operations.h"
 #include "csplugincommon/rendermanager/rendertree.h"
 #include "csplugincommon/rendermanager/shadersetup.h"
@@ -33,29 +37,47 @@ namespace RenderManager
 {
 
   /**
-   * 
+   * Dependent target manager.
+   * It manages a mapping between texture handles and views. If a mesh is found
+   * to use a texture handle, a new context is set up to render associated view
+   * to that handle.
+   *
+   * The template parameter \a RenderTree gives the render tree type.
+   * The parameter \a TargetHandler gives a class used to set up the contexts
+   * for the rendering of a view mapped to a target. It must provide a method
+   * HandleTarget (RenderTree& renderTree,
+   *  const DependentTargetManager::TargetSettings& settings) which should
+   * create a new context given the values in \a settings.
    */
   template<typename RenderTree, typename TargetHandler>
   class DependentTargetManager
   {
   public:
     /**
-     * 
+     * The settings for a handle.
      */
     struct TargetSettings
     {
-      CS::ShaderVarStringID svName;
+      /// The view to be rendered to the texture.
       iView* view;
+      /// The texture to be rendered to.
       iTextureHandle* target;
-      int targetSubTexture;      
+      /// The subtexture to be rendered to.
+      int targetSubTexture;
     };
 
+    /// Construct
     DependentTargetManager (TargetHandler& targetHandler)
       : targetHandler (targetHandler)
     {}
 
     /**
-     * 
+     * Add a mapping between the texture \a target and the view \a view so
+     * \a view is rendered to \a target whenever \a target is used.
+     * If the combination \a target, \a subtexture was mapped to another view 
+     * before that mapping is removed.
+     * \a subtexture specifies the cube map face for cube maps or the depth
+     * slice for volume textures.
      */
     void RegisterRenderTarget (iTextureHandle* target, 
       iView* view, int subtexture = 0, uint flags = 0)
@@ -86,7 +108,7 @@ namespace RenderManager
     }
 
     /**
-     * 
+     * Remove the mapping of a view to \a target.
      */
     void UnregisterRenderTarget (iTextureHandle* target,
       int subtexture = 0)
@@ -108,7 +130,8 @@ namespace RenderManager
     }
 
     /**
-     * 
+     * Prepare enqueuing of render targets, must be called before
+     * EnqueueTargets().
      */
     void PrepareQueues (iShaderManager* shaderManager)
     {
@@ -121,7 +144,8 @@ namespace RenderManager
     }
 
     /**
-     * 
+     * Scan the given render tree for known targets and set up rendering of
+     * the associated view to any found target.
      */
     template<typename LayerConfigType>
     void EnqueueTargets (RenderTree& renderTree, iShaderManager* shaderManager, 
@@ -152,7 +176,7 @@ namespace RenderManager
     }
 
     /**
-     * 
+     * Whether more targets need to be rendered.
      */
     bool HaveMoreTargets() const
     {
@@ -160,7 +184,7 @@ namespace RenderManager
     }
 
     /**
-     * 
+     * Get the next target to be rendered.
      */
     void GetNextTarget (TargetSettings& settings)
     {
@@ -168,7 +192,7 @@ namespace RenderManager
     }
 
     /**
-     * 
+     * Cleanup after rendering to targets is finished.
      */
     void PostCleanupQueues ()
     {
@@ -281,19 +305,19 @@ namespace RenderManager
               int subtexture;
               const typename RenderTargetInfo::ViewInfo& viewInfo (
                 viewsIt.Next (subtexture));
-              HandleView (viewInfo.view, textureHandle, subtexture, name);
+              HandleView (viewInfo.view, textureHandle, subtexture);
             }
           }
           else
           {
-            HandleView (localView, textureHandle, 0, name);
+            HandleView (localView, textureHandle, 0);
           }
         }
       }
 
 
       void HandleView (iView* targetView,
-        iTextureHandle* texh, int subtexture, CS::ShaderVarStringID svName)
+        iTextureHandle* texh, int subtexture)
       {
         if (!targetView) return;
 
@@ -301,7 +325,6 @@ namespace RenderManager
 
         // Setup a target info struct
         TargetSettings settings;
-        settings.svName = svName;
         settings.target = texh;
         settings.targetSubTexture = subtexture;
         settings.view = targetView;        
