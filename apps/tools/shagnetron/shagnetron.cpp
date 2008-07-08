@@ -34,7 +34,7 @@ bool Shagnetron::Initialize ()
   csRef<iVerbosityManager> verbose = csQueryRegistry<iVerbosityManager> (object_reg);
   doVerbose = verbose->Enabled ("shagnetron");
   // Implicitly enable verboseness for shaders.
-  verbose->Parse ("+renderer.shader");
+  verbose->Parse ("+renderer.shader.precache");
   
   if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_VFS,

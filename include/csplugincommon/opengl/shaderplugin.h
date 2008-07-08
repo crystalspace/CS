@@ -68,6 +68,12 @@ namespace CS
       csGLExtensionManager* ext;
       /// Whether verbose reporting was enabled.
       bool doVerbose;
+      /**
+       * Whether "precache" verbose reporting was enabled.
+       * This should report progress on precaching, but not necessarily
+       * everything during shader precaching (e.g. compile errors).
+       */
+      bool doVerbosePrecache;
       
     public:
       class CS_CSPLUGINCOMMON_GL_EXPORT ClipPlanes
