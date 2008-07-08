@@ -1,0 +1,3 @@
+SubDir TOP data renderlayers ;
+
+InstallData [ Wildcard *.xml ] : data renderlayers ;
