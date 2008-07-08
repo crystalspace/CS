@@ -28,6 +28,7 @@
 /**\addtogroup loadsave	
  * @{ */
 struct iFile;
+struct iDocumentNode;
 struct iStreamSource;
 
 /**

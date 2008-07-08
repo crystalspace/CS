@@ -28,7 +28,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
 
 csTerrainFactory::csTerrainFactory (iMeshObjectType *pParent)
   : scfImplementationType (this), type (pParent), logParent (0),
-  maxLoadedCells (~0), virtualViewDistance (2.0f), autoPreLoad (false)
+  maxLoadedCells (~0), virtualViewDistance (2.0f), autoPreLoad (false),
+  defaultCell (0, 128, 128, 128, 128, false, csVector2 (0, 0),
+    csVector3 (128, 32, 128), 0, 0, 0)
 {
 }
 
@@ -115,16 +117,28 @@ uint csTerrainFactory::GetMixMode () const
 void csTerrainFactory::SetRenderer (iTerrainRenderer* renderer)
 {
   this->renderer = renderer;
+
+  csRef<iTerrainCellRenderProperties> renderProp =
+    renderer ? renderer->CreateProperties () : 0;
+  defaultCell.SetRenderProperties (renderProp);
 }
 
 void csTerrainFactory::SetCollider (iTerrainCollider* collider)
 {
   this->collider = collider;
+
+  csRef<iTerrainCellCollisionProperties> collProp =
+    collider ? collider->CreateProperties () : 0;
+  defaultCell.SetCollisionProperties (collProp);
 }
 
 void csTerrainFactory::SetFeeder (iTerrainDataFeeder* feeder)
 {
   this->dataFeeder = feeder;
+
+  csRef<iTerrainCellFeederProperties> feederProp =
+    dataFeeder ? dataFeeder->CreateProperties () : 0;
+  defaultCell.SetFeederProperties (feederProp);
 }
 
 iTerrainFactoryCell* csTerrainFactory::AddCell(const char* name, 
@@ -146,6 +160,26 @@ iTerrainFactoryCell* csTerrainFactory::AddCell(const char* name,
   cell.AttachNew (new csTerrainFactoryCell (name, gridWidth, gridHeight,
     materialMapWidth, materialMapHeight, materialMapPersistent, position, size,
     renderProp, collProp, feederProp));
+
+  cells.Push (cell);
+
+  return cell;
+}
+
+iTerrainFactoryCell* csTerrainFactory::AddCell()
+{
+  csRef<csTerrainFactoryCell> cell;
+
+  csRef<iTerrainCellRenderProperties> renderProp =
+    renderer ? renderer->CreateProperties () : 0;
+
+  csRef<iTerrainCellCollisionProperties> collProp =
+    collider ? collider->CreateProperties () : 0;
+
+  csRef<iTerrainCellFeederProperties> feederProp =
+    dataFeeder ? dataFeeder->CreateProperties () : 0;
+
+  cell.AttachNew (new csTerrainFactoryCell (defaultCell));
 
   cells.Push (cell);
 
@@ -180,6 +214,20 @@ csTerrainFactoryCell::csTerrainFactoryCell (const char* name,
   materialMapPersistent (materialMapPersistent),
   rendererProperties (renderProp), colliderProperties (collisionProp),
   feederProperties (feederProp)
+{
+}
+
+csTerrainFactoryCell::csTerrainFactoryCell (const csTerrainFactoryCell& other)
+  : scfImplementationType (this), name (other.name), position (other.position),
+  size (other.size),
+  gridWidth (other.gridWidth), gridHeight (other.gridHeight),
+  materialMapWidth (other.materialMapWidth),
+  materialMapHeight (other.materialMapHeight),
+  materialMapPersistent (other.materialMapPersistent),
+  baseMaterial (other.baseMaterial),
+  rendererProperties (other.rendererProperties),
+  colliderProperties (other.colliderProperties),
+  feederProperties (other.feederProperties)
 {
 }
 
