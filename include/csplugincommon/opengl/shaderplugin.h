@@ -25,7 +25,7 @@
 #include "csplugincommon/shader/shaderplugin.h"
 #include "csutil/scf_implementation.h"
 
-class csGLExtensionManager;
+struct csGLExtensionManager;
 
 namespace CS
 {

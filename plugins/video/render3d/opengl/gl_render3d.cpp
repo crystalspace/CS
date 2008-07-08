@@ -3142,6 +3142,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   bool restoreProjection = false;
   bool wasProjectionExplicit = false;
   CS::Math::Matrix4 oldProjection;
+  csReversibleTransform oldWorld2Camera;
 
   if (flags & csSimpleMeshScreenspace)
   {
@@ -3165,6 +3166,9 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
       oldProjection = projectionMatrix;
       
       projectionMatrix = CS::Math::Projections::Ortho (0, vwf, vhf, 0, -1.0, 10.0);
+
+      oldWorld2Camera = world2camera;
+      SetWorldToCamera (csReversibleTransform ());
       
       restoreProjection = true;
       needProjectionUpdate = true;
@@ -3259,6 +3263,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   {
     explicitProjection = wasProjectionExplicit;
     projectionMatrix = oldProjection;
+    world2camera = oldWorld2Camera;
     needProjectionUpdate = true;
   }
 }

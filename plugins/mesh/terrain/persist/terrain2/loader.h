@@ -54,6 +54,7 @@ public:
     iStreamSource*, iLoaderContext *ldr_context,
     iBase* context);	
 private:
+#if 0
   struct ParamPair
   {
     csString name, value;
@@ -76,6 +77,7 @@ private:
     bool materialmapPersist;
     csRef<iMaterialWrapper> baseMaterial;
   };
+#endif
 
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
@@ -87,17 +89,15 @@ private:
 #undef CS_TOKEN_ITEM_FILE 
 
   bool ParseCell (iDocumentNode* node, iLoaderContext* ldr_ctx,
-    iTerrainFactory* fact, const DefaultCellValues& defaults);
+    iTerrainFactory* fact, iTerrainFactoryCell* cell = 0);
 
-  bool ParseDefaultCell (iDocumentNode* node, iLoaderContext* ldr_ctx,
-    DefaultCellValues& defaults);
+  template<typename IProp>
+  bool ParseParams (IProp* props, iDocumentNode* node);
 
-  bool ParseParams (ParamPairArray& pairs, iDocumentNode* node);
-
-  bool ParseFeederParams (ParamPairArray& pairs, ParamPairArray& alphaMaps,
+  bool ParseFeederParams (iTerrainCellFeederProperties* props,
     iDocumentNode* node);
 
-  bool ParseRenderParams (ParamPairArray& pairs, csRefArray<csShaderVariable>& svs,
+  bool ParseRenderParams (iTerrainCellRenderProperties* props,
     iLoaderContext* ldr_context, iDocumentNode* node);
 };
 

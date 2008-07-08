@@ -481,7 +481,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     currState.AttachNew (new csSkeletalState2);
     currState->Setup (allBones.GetSize ());
 
-    for (size_t i = 0; i < allBones.GetSize (); ++i)
+    for (BoneID i = 0; i < allBones.GetSize (); ++i)
     {
       if (allBones[i].created)
       {

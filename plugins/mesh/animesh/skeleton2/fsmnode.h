@@ -132,7 +132,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       {}
 
       csRef<iSkeletonAnimNodeFactory2> nodeFactory;
-      float time1, time2, directSwitch;
+      float time1, time2;
+      bool directSwitch;
     };
 
   private:
