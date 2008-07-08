@@ -447,7 +447,6 @@ class iDebugHelper(iBase):
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetSupportedTests(*args): return _core.iDebugHelper_GetSupportedTests(*args)
-    def UnitTest(*args): return _core.iDebugHelper_UnitTest(*args)
     def StateTest(*args): return _core.iDebugHelper_StateTest(*args)
     def Benchmark(*args): return _core.iDebugHelper_Benchmark(*args)
     def Dump(*args): return _core.iDebugHelper_Dump(*args)

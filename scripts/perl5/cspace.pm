@@ -936,7 +936,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %OWNER = ();
 %ITERATORS = ();
 *GetSupportedTests = *cspacec::iDebugHelper_GetSupportedTests;
-*UnitTest = *cspacec::iDebugHelper_UnitTest;
 *StateTest = *cspacec::iDebugHelper_StateTest;
 *Benchmark = *cspacec::iDebugHelper_Benchmark;
 *Dump = *cspacec::iDebugHelper_Dump;
