@@ -1,0 +1,9 @@
+SubDir TOP plugins mesh clouds ;
+
+Description clouds : "Dynamic cloud simulation and rendering system" ;
+
+Plugin clouds
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith clouds : crystalspace ;
+

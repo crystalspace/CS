@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- clouds.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.clouds</name>
+        <implementation>csClouds</implementation>
+        <description>Dynamic cloud simulation and rendering system</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
