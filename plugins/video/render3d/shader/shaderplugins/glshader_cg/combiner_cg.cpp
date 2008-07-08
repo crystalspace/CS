@@ -1557,9 +1557,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 	      appender.AppendFmt ("%s[%d] = vertexToFragment.%s[%d];\n", 
 		name.GetData(), i, uniqueName.GetData(), i);
 	      appender.Append ("#else\n");
+	      appender.Append ("#ifdef _INITIALIZE_UNUSED_V2F\n");
 	      appender.AppendFmt ("%s[%d] = %s(0);\n", 
 		name.GetData(), i, 
 		CgType (node->GetAttributeValue ("type")).GetData());
+	      appender.Append ("#endif\n");
 	      appender.Append ("#endif\n");
 	    }
           }
@@ -1572,9 +1574,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 	    appender.AppendFmt ("%s = vertexToFragment.%s;\n", 
 	      name.GetData(), uniqueName.GetData());
 	    appender.Append ("#else\n");
+	      appender.Append ("#ifdef _INITIALIZE_UNUSED_V2F\n");
 	    appender.AppendFmt ("%s = %s(0);\n", 
 	      name.GetData(), 
 	      CgType (node->GetAttributeValue ("type")).GetData());
+	      appender.Append ("#endif\n");
 	    appender.Append ("#endif\n");
 	  }
         }

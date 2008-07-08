@@ -244,7 +244,7 @@ bool csShaderGLCGFP::TryCompile (CGprofile maxFrag, uint loadFlags,
     unusedParams.DeleteAll();
   }
   if (!DefaultLoadProgram (0, programStr, CG_GL_FRAGMENT, 
-    maxFrag, loadFlags & (~loadApplyVmap), limits))
+    maxFrag, (loadFlags & (~loadApplyVmap)) | loadFlagUnusedV2FForInit, limits))
     return false;
   /* Compile twice to be able to filter out unused vertex2fragment stuff on 
     * pass 2.
@@ -252,7 +252,7 @@ bool csShaderGLCGFP::TryCompile (CGprofile maxFrag, uint loadFlags,
     */
   CollectUnusedParameters (unusedParams);
   bool ret = DefaultLoadProgram (this, programStr, CG_GL_FRAGMENT, 
-    maxFrag, loadFlags, limits);
+    maxFrag, loadFlags | loadFlagUnusedV2FForInit, limits);
     
   return ret;
 }
