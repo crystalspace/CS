@@ -1052,7 +1052,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     int counter = 0;
     while (counter < polyCount)
     {
-      CS::Geom::csContour3 polygonalContour;
+      CS::Geometry::csContour3 polygonalContour;
       int numVertsInPoly = vCountElement[counter];
       int vertIndex = 0;
       while (vertIndex < numVertsInPoly)
@@ -1079,7 +1079,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     //csRef<iDocumentNode> nextPolygon;
     csRef<iDocumentNode> nextPolyPElement;
     csRef<iDocumentNodeIterator> polyPIterator;
-    CS::Geom::csContour3 polygonalContour;
+    CS::Geometry::csContour3 polygonalContour;
     int tempVertIndex;
     csArray<int> vertexIndexArrayPolys;
 
