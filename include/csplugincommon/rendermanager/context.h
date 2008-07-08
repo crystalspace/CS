@@ -19,6 +19,10 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_CONTEXT_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_CONTEXT_H__
 
+/**\file
+ * Render manager common context classes.
+ */
+
 #include "iengine/sector.h"
 
 #include "csplugincommon/rendermanager/render.h"
@@ -32,10 +36,46 @@ namespace CS
 {
 namespace RenderManager
 {
+  /**
+   * Standard portal setup.
+   * Iterates over all portals in a context and sets up new contexts to
+   * render the part of the scene "behind" the portal. Depending on the
+   * settings of a portal, it is either rendered to the same target as the
+   * context or a new texture (in which case the original context is
+   * augmented with a mesh rendering that texture).
+   *
+   * Usage: instiate. Application after the visible meshes were determined,
+   * but before mesh sorting.
+   * Example:
+   * \code
+   * // Keep track of the portal recursions to avoid infinite portal recursions
+   * if (recurseCount > 30) return;
+   *
+   * // Set up all portals
+   * {
+   *   recurseCount++;
+   *   PortalSetupType portalSetup (rmanager->portalPersistent, *this);
+   *   portalSetup (context, portalSetupData);
+   *   recurseCount--;
+   * }
+   * \endcode
+   *
+   * The template parameter \a RenderTree gives the render tree type.
+   * The parameter \a ContextSetup gives a class used to set up the contexts
+   * for the rendering of the scene behind a portal. It must provide an
+   * implementation of operator() (RenderTree& renderTree, 
+   *   RenderTree::ContextNode* context, RenderTree::ContextsContainer* container, 
+   *   iSector* sector, CS::RenderManager::RenderView* rview).
+   */
   template<typename RenderTreeType, typename ContextSetup>
   class StandardPortalSetup
   {
   public:
+    /**
+      * Data used by the helper that needs to persist over multiple frames.
+      * Render managers must store an instance of this class and provide
+      * it to the helper upon instantiation.
+      */
     struct PersistentData
     {
       TextureCache texCache;
@@ -133,6 +173,7 @@ namespace RenderManager
       csFrameDataHolder<csStringBase> stringHolder;
     #endif
       
+      /// Construct helper
       PersistentData() : texCache (csimg2D, "rgb8", 
         CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP,
         "target", TextureCache::tcachePowerOfTwo)
@@ -143,6 +184,10 @@ namespace RenderManager
         boxClipperCache.purgeAge = 10000;
       }
       
+      /**
+       * Initialize helper. Fetches various required values from objects in
+       * the object registry.
+      */
       void Initialize (iShaderManager* shmgr, iGraphics3D* g3d)
       {
         svNameTexPortal = 
@@ -150,6 +195,10 @@ namespace RenderManager
 	texCache.SetG3D (g3d);
       }
       
+      /**
+       * Do per-frame house keeping - \b MUST be called every frame/
+       * RenderView() execution.
+       */
       void UpdateNewFrame ()
       {
         csTicks time = csGetTicks ();
@@ -159,10 +208,15 @@ namespace RenderManager
       }
     };
   
+    /// Constructor.
     StandardPortalSetup (PersistentData& persistentData, ContextSetup& cfun)
       : persistentData (persistentData), contextFunction (cfun)
     {}
 
+    /**
+     * Operator doing the actual work. Goes over the portals in the given
+     * context and sets up rendering of behind the portals.
+     */
     void operator() (RenderTreeType& renderTree, 
       typename RenderTreeType::ContextNode* context, 
       typename RenderTreeType::ContextsContainer* container, 
@@ -473,7 +527,10 @@ namespace RenderManager
   };
 
 
-  
+  /**
+   * Helper to set the render targets of the iGraphics3D object to the targets
+   * specified in a context.
+   */
   template<typename RenderTreeType>
   class SetupRenderTarget
   {
@@ -486,16 +543,25 @@ namespace RenderManager
     }
   };
     
+  /**
+   * Helper to render a set of contexts. It sets up render targets,
+   * draw flags, projection, camera transform. All contexts of the tree
+   * are rendered in reverse order (thus dependencies of contexts on other
+   * contexts are handled automatically if the dependent context is pushed
+   * to the end of all contexts, which is the default action).
+   */
   template<typename RenderTreeType, typename LayerConfigType>
   class ContextRender
   {
   public:
+    /// Construct.
     ContextRender (iShaderManager* shaderManager, 
       const LayerConfigType& layerConfig)
       : shaderManager (shaderManager), layerConfig (layerConfig)
     {
     }
   
+    /// Iterate over all layers and contexts and render.
     void operator() (typename RenderTreeType::ContextsContainer* contexts, 
       RenderTreeType& tree)
     {
