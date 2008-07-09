@@ -46,13 +46,22 @@ namespace RenderManager
    * but before mesh sorting.
    * Example:
    * \code
+   *  // Type for portal setup
+   *  typedef CS::RenderManager::StandardPortalSetup<RenderTreeType, 
+   *    ContextSetupType> PortalSetupType;
+   *
+   * // Assumes there is an argument 'PortalSetupType::ContextSetupData& portalSetupData'
+   * // to the current method, taking data from the previous portal (if any)
+   *
    * // Keep track of the portal recursions to avoid infinite portal recursions
    * if (recurseCount > 30) return;
    *
    * // Set up all portals
    * {
    *   recurseCount++;
+   *   // Data needed to be passed between portal setup steps
    *   PortalSetupType portalSetup (rmanager->portalPersistent, *this);
+   *   // Actual setup
    *   portalSetup (context, portalSetupData);
    *   recurseCount--;
    * }
@@ -61,9 +70,8 @@ namespace RenderManager
    * The template parameter \a RenderTree gives the render tree type.
    * The parameter \a ContextSetup gives a class used to set up the contexts
    * for the rendering of the scene behind a portal. It must provide an
-   * implementation of operator() (RenderTree& renderTree,
-   *   RenderTree::ContextNode* context, RenderTree::ContextsContainer* container,
-   *   iSector* sector, CS::RenderManager::RenderView* rview).
+   * implementation of operator() (RenderTree::ContextNode& context,
+   *   PortalSetupType::ContextSetupData& portalSetupData).
    *
    * \par Internal workings
    * The standard setup will classify portals into simple and heavy portals
@@ -236,6 +244,7 @@ namespace RenderManager
     {
       typename RenderTreeType::ContextNode* lastSimplePortalCtx;
 
+      /// Construct, defaulting to no previous portal been rendered.
       ContextSetupData (typename RenderTreeType::ContextNode* last = 0)
         : lastSimplePortalCtx (last)
       {}
