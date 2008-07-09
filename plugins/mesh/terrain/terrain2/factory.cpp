@@ -141,6 +141,18 @@ void csTerrainFactory::SetFeeder (iTerrainDataFeeder* feeder)
   defaultCell.SetFeederProperties (feederProp);
 }
 
+iTerrainFactoryCell* csTerrainFactory::GetCell (const char* name)
+{
+  for (size_t i = 0; i < cells.GetSize(); i++)
+  {
+    const char* cellName = cells[i]->GetName();
+    if (cellName == 0) continue;
+    if (strcmp (cellName, name) == 0)
+      return cells[i];
+  }
+  return 0;
+}
+
 iTerrainFactoryCell* csTerrainFactory::AddCell(const char* name, 
   int gridWidth, int gridHeight, int materialMapWidth,
   int materialMapHeight, bool materialMapPersistent,

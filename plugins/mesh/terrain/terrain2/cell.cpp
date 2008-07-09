@@ -196,6 +196,11 @@ const char* csTerrainCell::GetName () const
   return name.GetData ();
 }
 
+void csTerrainCell::SetName (const char* name)
+{
+  this->name = name;
+}
+
 iTerrainCellRenderProperties* csTerrainCell::GetRenderProperties () const
 {
   return renderProperties;

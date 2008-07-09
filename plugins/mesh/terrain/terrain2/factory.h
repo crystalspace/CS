@@ -141,6 +141,7 @@ public:
 
   virtual size_t GetCellCount () { return cells.GetSize(); }
   virtual iTerrainFactoryCell* GetCell (size_t index) { return cells[index]; }
+  virtual iTerrainFactoryCell* GetCell (const char* name);
 
   /// Get pseudo-cell with default settings for all cells
   virtual iTerrainFactoryCell* GetDefaultCell () { return &defaultCell; }

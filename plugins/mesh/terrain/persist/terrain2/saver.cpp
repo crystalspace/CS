@@ -30,6 +30,95 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(Terrain2Loader)
 {
+  bool Terrain2SaverCommon::Initialize (iObjectRegistry *objreg)
+  {
+    synldr = csQueryRegistry<iSyntaxService> (objreg);
+    if (!synldr.IsValid()) return false;
+
+    return true;
+  }
+
+  template<typename IProp>
+  bool Terrain2SaverCommon::SaveProperties (iDocumentNode* node, IProp* props,
+				            IProp* dfltProp)
+  {
+    if (props == 0) return false;
+    if (dfltProp == 0)
+    {
+      size_t numProps = props->GetParameterCount ();
+      if (numProps == 0) return false;
+      for (size_t p = 0; p < numProps; p++)
+      {
+	const char* v = props->GetParameterValue (p);
+	if (v == 0) continue;
+        csRef<iDocumentNode> parNode = 
+          node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        parNode->SetValue ("param");
+	parNode->SetAttribute ("name", props->GetParameterName (p));
+	parNode->CreateNodeBefore (CS_NODE_TEXT, 0)
+	  ->SetValue (v);
+      }
+      return true;
+    }
+    else
+    {
+      size_t numProps = props->GetParameterCount ();
+      if (numProps == 0) return false;
+      bool wroteProps = false;
+      for (size_t p = 0; p < numProps; p++)
+      {
+	const char* dfltVal = dfltProp->GetParameterValue (
+	  props->GetParameterName (p));
+	const char* val = props->GetParameterValue (p);
+	if (val == 0) continue;
+
+	if ((dfltVal != 0)  && (strcmp (val, dfltVal) == 0)) continue;
+        csRef<iDocumentNode> parNode = 
+          node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        parNode->SetValue ("param");
+	parNode->SetAttribute ("name", props->GetParameterName (p));
+	parNode->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValue (val);
+	wroteProps = true;
+      }
+      return wroteProps;
+    }
+  }
+
+  bool Terrain2SaverCommon::SaveRenderProperties (iDocumentNode* node,
+    iTerrainCellRenderProperties* props,
+    iTerrainCellRenderProperties* dfltProp)
+  {
+    bool result = SaveProperties (node, props, dfltProp);
+
+    csSet<csPtrKey<csShaderVariable> > dfltSV;
+    if (dfltProp != 0)
+    {
+      const csRefArray<csShaderVariable>& dfltSVarr =
+	dfltProp->GetShaderVariables();
+      for (size_t i = 0; i < dfltSVarr.GetSize(); i++)
+	dfltSV.Add (dfltSVarr[i]);
+    }
+
+    const csRefArray<csShaderVariable>& SVarr =
+	props->GetShaderVariables();
+    for (size_t i = 0; i < SVarr.GetSize(); i++)
+    {
+      if (dfltSV.Contains (SVarr[i])) continue;
+
+      csRef<iDocumentNode> svNode = 
+        node->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+      svNode->SetValue ("shadervar");
+      if (!synldr->WriteShaderVar (svNode, *(SVarr[i])))
+	return false;
+
+      result = true;
+    }
+
+    return result;
+  }
+
+  //-------------------------------------------------------------------------
+
   SCF_IMPLEMENT_FACTORY (Terrain2FactorySaver)
   SCF_IMPLEMENT_FACTORY (Terrain2ObjectSaver)
 
@@ -40,8 +129,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2Loader)
 
   bool Terrain2FactorySaver::Initialize (iObjectRegistry *objreg)
   {
-    synldr = csQueryRegistry<iSyntaxService> (objreg);
-
+    if (!Terrain2SaverCommon::Initialize (objreg)) return false;
     return true;
   }
 
@@ -157,8 +245,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2Loader)
 	  csRef<iDocumentNode> node = 
 	    defaultNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
 	  node->SetValue ("renderproperties");
-	  if (!SaveProperties (node, defaultCell->GetRenderProperties(),
-	      (iTerrainCellRenderProperties*)defRenderProp))
+	  if (!SaveRenderProperties (node, defaultCell->GetRenderProperties(),
+	      defRenderProp))
 	    defaultNode->RemoveNode (node);
 	}
 
@@ -197,7 +285,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2Loader)
         csRef<iDocumentNode> cellNode = 
           cellsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
         cellNode->SetValue ("cell");
-	cellNode->SetAttribute ("name", cell->GetName());
+	const char* name = cell->GetName();
+	if (name != 0)
+	{
+	  csRef<iDocumentNode> node = 
+	    cellNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+	  node->SetValue ("name");
+	  node->CreateNodeBefore (CS_NODE_TEXT, 0)
+	    ->SetValue (name);
+	}
 
 	{
 	  csRef<iDocumentNode> node = 
@@ -250,7 +346,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2Loader)
 	  csRef<iDocumentNode> node = 
 	    cellNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
 	  node->SetValue ("renderproperties");
-	  if (!SaveProperties (node, cell->GetRenderProperties(),
+	  if (!SaveRenderProperties (node, cell->GetRenderProperties(),
 	      defaultCell->GetRenderProperties()))
 	    cellNode->RemoveNode (node);
 	}
@@ -278,53 +374,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2Loader)
     return true;
   }
 
-
-  template<typename IProp>
-  bool Terrain2FactorySaver::SaveProperties (iDocumentNode* node, IProp* props,
-					     IProp* dfltProp)
-  {
-    if (props == 0) return false;
-    if (dfltProp == 0)
-    {
-      size_t numProps = props->GetParameterCount ();
-      if (numProps == 0) return false;
-      for (size_t p = 0; p < numProps; p++)
-      {
-	const char* v = props->GetParameterValue (p);
-	if (v == 0) continue;
-        csRef<iDocumentNode> parNode = 
-          node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-        parNode->SetValue ("param");
-	parNode->SetAttribute ("name", props->GetParameterName (p));
-	parNode->CreateNodeBefore (CS_NODE_TEXT, 0)
-	  ->SetValue (v);
-      }
-      return true;
-    }
-    else
-    {
-      size_t numProps = props->GetParameterCount ();
-      if (numProps == 0) return false;
-      bool wroteProps = false;
-      for (size_t p = 0; p < numProps; p++)
-      {
-	const char* dfltVal = dfltProp->GetParameterValue (
-	  props->GetParameterName (p));
-	const char* val = props->GetParameterValue (p);
-	if (val == 0) continue;
-
-	if ((dfltVal != 0)  && (strcmp (val, dfltVal) == 0)) continue;
-        csRef<iDocumentNode> parNode = 
-          node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-        parNode->SetValue ("param");
-	parNode->SetAttribute ("name", props->GetParameterName (p));
-	parNode->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValue (val);
-	wroteProps = true;
-      }
-      return wroteProps;
-    }
-  }
-
   //-------------------------------------------------------------------------
 
   Terrain2ObjectSaver::Terrain2ObjectSaver (iBase* parent)
@@ -334,6 +383,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2Loader)
 
   bool Terrain2ObjectSaver::Initialize (iObjectRegistry *objreg)
   {
+    if (!Terrain2SaverCommon::Initialize (objreg)) return false;
     return true;
   }
 
@@ -387,7 +437,59 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2Loader)
 	}
       }
 
-      // @@@ TODO: cells
+      csRef<iDocumentNode> cellsNode = 
+        paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      cellsNode->SetValue ("cells");
+
+      size_t numCells = tmesh->GetCellCount();
+      for (size_t c = 0; c < numCells; c++)
+      {
+	iTerrainCell* cell = tmesh->GetCell (c);
+	const char* name = cell->GetName();
+	if (name == 0) continue;
+	iTerrainFactoryCell* factCell = tfact->GetCell (name);
+
+        csRef<iDocumentNode> cellNode = 
+          cellsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        cellNode->SetValue ("cell");
+	{
+	  csRef<iDocumentNode> node = 
+	    cellNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+	  node->SetValue ("name");
+	  node->CreateNodeBefore (CS_NODE_TEXT, 0)
+	    ->SetValue (name);
+	}
+
+	/* @@@ TBD what other cell settings are sensible for overriding in 
+	       the object? */
+
+	{
+	  csRef<iDocumentNode> node = 
+	    cellNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+	  node->SetValue ("renderproperties");
+	  if (!SaveRenderProperties (node, cell->GetRenderProperties(),
+	      factCell->GetRenderProperties()))
+	    cellNode->RemoveNode (node);
+	}
+
+	{
+	  csRef<iDocumentNode> node = 
+	    cellNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+	  node->SetValue ("feederproperties");
+	  if (!SaveProperties (node, cell->GetFeederProperties(),
+	      factCell->GetFeederProperties()))
+	    cellNode->RemoveNode (node);
+	}
+
+	{
+	  csRef<iDocumentNode> node = 
+	    cellNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+	  node->SetValue ("colliderproperties");
+	  if (!SaveProperties (node, cell->GetCollisionProperties(),
+	      factCell->GetCollisionProperties()))
+	    cellNode->RemoveNode (node);
+	}
+      }
     }
     return true;
   }

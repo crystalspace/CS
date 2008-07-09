@@ -825,7 +825,7 @@ struct iTerrainSystem : public virtual iBase
  */
 struct iTerrainCell : public virtual iBase
 {
-  SCF_INTERFACE (iTerrainCell, 3, 0, 0);
+  SCF_INTERFACE (iTerrainCell, 3, 0, 1);
 
   /// Enumeration that specifies current cell state
   enum LoadState
@@ -1213,6 +1213,15 @@ struct iTerrainCell : public virtual iBase
 
   /// Set feeder-specific data. Only to be used by feeder plugin.
   virtual void SetFeederData (csRefCount* data) = 0;
+
+  /**
+   * Set name of this cell.
+   * \warning The cell name is used to map object cells to factory cells.
+   *   Changing the name of a cell does not change any existing mappings,
+   *   however, it will take effect when saving the mesh. If that is done
+   *   careless changing of cell names can confuse the mapping of cells.
+   */
+  virtual void SetName (const char* name) = 0;
 };
 
 /// Factory representation of a cell
@@ -1367,7 +1376,7 @@ struct iTerrainFactoryCell : public virtual iBase
 /// Provides an interface for creating terrain system
 struct iTerrainFactory : public virtual iBase
 {
-  SCF_INTERFACE (iTerrainFactory, 2, 0, 1);
+  SCF_INTERFACE (iTerrainFactory, 2, 0, 2);
 
   /**
    * Set desired renderer (there is a single renderer for the whole terrain)
@@ -1476,6 +1485,9 @@ struct iTerrainFactory : public virtual iBase
    * you might get into trouble.
    */
   virtual iTerrainFactoryCell* AddCell () = 0;
+
+  /// Get a cell in this factory by name
+  virtual iTerrainFactoryCell* GetCell (const char* name) = 0;
 };
 
 

@@ -537,12 +537,245 @@ csPtr<iBase> csTerrain2ObjectLoader::Parse (iDocumentNode* node,
         terrain->SetMaterialPalette (pal);
         break;
       }
+      case XMLTOKEN_CELLS:
+	{
+	  csRef<iDocumentNodeIterator> it2 = child->GetNodes ();
+
+	  while (it2->HasNext ())
+	  {
+	    csRef<iDocumentNode> child2 = it2->Next ();
+
+	    if (child2->GetType () != CS_NODE_ELEMENT) 
+	      continue;
+
+	    const char* value = child2->GetValue ();
+	    csStringID id = xmltokens.Request (value);
+
+	    switch (id)
+	    {
+	    case XMLTOKEN_CELL:
+	      {
+		if (!ParseCell (child2, ldr_context, terrain))
+		  return 0;
+
+		break;
+	      }
+	    default:
+	      {
+		synldr->ReportBadToken (child2);
+		return 0;
+	      }
+	    }
+	  }
+
+	  break;
+	}
       default:
         synldr->ReportBadToken (child);
     }
   }
 
   return csPtr<iBase>(mesh);
+}
+
+bool csTerrain2ObjectLoader::ParseCell (iDocumentNode* node, 
+					iLoaderContext* ldr_ctx,
+					iTerrainSystem* terrain)
+{
+  csRef<iDocumentNode> nameNode = node->GetNode ("name");
+  if (!nameNode.IsValid())
+  {
+    synldr->ReportError (
+      "crystalspace.terrain.object.loader.cell",
+      node, "<cell> without name");
+    return false;
+  }
+
+  const char* cellName = nameNode->GetContentsValue();
+  if (cellName == 0)
+  {
+    synldr->ReportError (
+      "crystalspace.terrain.object.loader.cell",
+      node, "Empty cell name");
+    return false;
+  }
+
+  iTerrainCell* cell = terrain->GetCell (cellName);
+  if (cell == 0)
+  {
+    synldr->ReportError (
+      "crystalspace.terrain.object.loader.cell",
+      node, "Invalid cell name '%s'", cellName);
+    return false;
+  }
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+
+    if (child->GetType () != CS_NODE_ELEMENT) 
+      continue;
+
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+    case XMLTOKEN_NAME:
+      // Skip
+      break;
+    case XMLTOKEN_RENDERPROPERTIES:
+      {
+	if (!ParseRenderParams (cell->GetRenderProperties(), ldr_ctx, child))
+          return false;
+
+        break;
+      }
+    case XMLTOKEN_COLLIDERPROPERTIES:
+      {
+	if (!ParseParams (cell->GetCollisionProperties(), child))
+          return false;
+
+        break;
+      }
+    case XMLTOKEN_FEEDERPROPERTIES:
+      {
+	if (!ParseFeederParams (cell->GetFeederProperties(), child))
+          return false;
+
+        break;
+      }
+    default:
+      {
+        synldr->ReportBadToken (child);
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+template<typename IProp>
+bool csTerrain2ObjectLoader::ParseParams (IProp* props, 
+					  iDocumentNode* node)
+{
+  csRef<iDocumentNodeIterator> it2 = node->GetNodes ();
+
+  while (it2->HasNext ())
+  {
+    csRef<iDocumentNode> child2 = it2->Next ();
+
+    if (child2->GetType () != CS_NODE_ELEMENT) 
+      continue;
+
+    const char* value = child2->GetValue ();
+    csStringID id = xmltokens.Request (value);
+
+    switch (id)
+    {
+    case XMLTOKEN_PARAM:
+      {
+        const char* name = child2->GetAttributeValue ("name");
+        const char* value = child2->GetContentsValue ();
+	props->SetParameter (name, value ? value : "");
+        break;
+      }
+    default:
+      {
+        synldr->ReportBadToken (child2);
+        return false;
+      }
+    }
+  }    
+
+  return true;
+}
+
+bool csTerrain2ObjectLoader::ParseRenderParams (iTerrainCellRenderProperties* props,
+						iLoaderContext* ldr_context,
+						iDocumentNode* node)
+{
+  csRef<iDocumentNodeIterator> it2 = node->GetNodes ();
+
+  while (it2->HasNext ())
+  {
+    csRef<iDocumentNode> child2 = it2->Next ();
+
+    if (child2->GetType () != CS_NODE_ELEMENT) 
+      continue;
+
+    const char* value = child2->GetValue ();
+    csStringID id = xmltokens.Request (value);
+
+    switch (id)
+    {
+    case XMLTOKEN_SHADERVAR:
+      {
+        csRef<csShaderVariable> sv;
+        sv.AttachNew (new csShaderVariable);
+        if (!synldr->ParseShaderVar (ldr_context, child2, *sv)) return false;
+	props->AddVariable (sv);
+        break;
+      }
+    case XMLTOKEN_PARAM:
+      {
+        const char* name = child2->GetAttributeValue ("name");
+        const char* value = child2->GetContentsValue ();
+	props->SetParameter (name, value ? value : "");
+        break;
+      }
+    default:
+      {
+        synldr->ReportBadToken (child2);
+        return false;
+      }
+    }
+  }    
+
+  return true;
+}
+
+bool csTerrain2ObjectLoader::ParseFeederParams (iTerrainCellFeederProperties* props,
+						iDocumentNode* node)
+{
+  csRef<iDocumentNodeIterator> it2 = node->GetNodes ();
+
+  while (it2->HasNext ())
+  {
+    csRef<iDocumentNode> child2 = it2->Next ();
+
+    if (child2->GetType () != CS_NODE_ELEMENT) 
+      continue;
+
+    const char* value = child2->GetValue ();
+    csStringID id = xmltokens.Request (value);
+
+    switch (id)
+    {
+    case XMLTOKEN_PARAM:
+      {
+        const char* name = child2->GetAttributeValue ("name");
+        const char* value = child2->GetContentsValue ();
+	props->SetParameter (name, value ? value : "");
+        break;
+      }
+    case XMLTOKEN_ALPHAMAP:
+      {
+        const char* name = child2->GetAttributeValue ("material");
+        const char* value = child2->GetContentsValue ();
+	props->AddAlphaMap (name, value);
+	break;
+      }
+    default:
+      {
+        synldr->ReportBadToken (child2);
+        return false;
+      }
+    }
+  }    
+
+  return true;
 }
 
 }
