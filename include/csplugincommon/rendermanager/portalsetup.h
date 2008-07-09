@@ -19,6 +19,10 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_PORTALSETUP_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_PORTALSETUP_H__
 
+/**\file
+ * Render manager portal setup.
+ */
+
 #include "iengine/sector.h"
 
 #include "csplugincommon/rendermanager/renderview.h"
@@ -32,6 +36,36 @@ namespace RenderManager
 {
   /**
    * Standard setup functor for portals.
+   * Iterates over all portals in a context and sets up new contexts to
+   * render the part of the scene "behind" the portal. Depending on the
+   * settings of a portal, it is either rendered to the same target as the
+   * context or a new texture (in which case the original context is
+   * augmented with a mesh rendering that texture).
+   *
+   * Usage: instiate. Application after the visible meshes were determined,
+   * but before mesh sorting.
+   * Example:
+   * \code
+   * // Keep track of the portal recursions to avoid infinite portal recursions
+   * if (recurseCount > 30) return;
+   *
+   * // Set up all portals
+   * {
+   *   recurseCount++;
+   *   PortalSetupType portalSetup (rmanager->portalPersistent, *this);
+   *   portalSetup (context, portalSetupData);
+   *   recurseCount--;
+   * }
+   * \endcode
+   *
+   * The template parameter \a RenderTree gives the render tree type.
+   * The parameter \a ContextSetup gives a class used to set up the contexts
+   * for the rendering of the scene behind a portal. It must provide an
+   * implementation of operator() (RenderTree& renderTree,
+   *   RenderTree::ContextNode* context, RenderTree::ContextsContainer* container,
+   *   iSector* sector, CS::RenderManager::RenderView* rview).
+   *
+   * \par Internal workings
    * The standard setup will classify portals into simple and heavy portals
    * respectively where simple portals can be rendered directly without clipping
    * while heavy portals requires render-to-texture.
@@ -43,8 +77,10 @@ namespace RenderManager
     typedef StandardPortalSetup<RenderTreeType, ContextSetup> ThisType;
 
     /**
-     * Persistent data to be stored/cached between frames
-     */
+      * Data used by the helper that needs to persist over multiple frames.
+      * Render managers must store an instance of this class and provide
+      * it to the helper upon instantiation.
+      */
     struct PersistentData
     {
       
@@ -154,6 +190,7 @@ namespace RenderManager
       
       TextureCache texCache;
 
+      /// Construct helper
       PersistentData() : 
         bufCache (CS::Utility::ResourceCache::ReuseConditionAfterTime<uint> (),
           CS::Utility::ResourceCache::PurgeConditionAfterTime<uint> (10000)),
@@ -167,6 +204,10 @@ namespace RenderManager
         boxClipperCache.agedPurgeInterval = 5000;
       }
       
+      /**
+       * Initialize helper. Fetches various required values from objects in
+       * the object registry.
+       */
       void Initialize (iShaderManager* shmgr, iGraphics3D* g3d)
       {
         svNameTexPortal = 
@@ -174,7 +215,11 @@ namespace RenderManager
 	texCache.SetG3D (g3d);
       }
       
-      void UpdateNewFrame ()
+     /**
+      * Do per-frame house keeping - \b MUST be called every frame/
+      * RenderView() execution.
+      */
+     void UpdateNewFrame ()
       {
         csTicks time = csGetTicks ();
         texCache.AdvanceFrame (time);
@@ -196,12 +241,14 @@ namespace RenderManager
       {}
     };
 
+    /// Constructor.
     StandardPortalSetup (PersistentData& persistentData, ContextSetup& cfun)
       : persistentData (persistentData), contextFunction (cfun)
     {}
 
     /**
-     * Setup all portals within given context
+     * Operator doing the actual work. Goes over the portals in the given
+     * context and sets up rendering of behind the portals.
      */
     void operator() (typename RenderTreeType::ContextNode& context, 
       ContextSetupData& setupData)
