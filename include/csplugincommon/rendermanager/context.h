@@ -63,8 +63,8 @@ namespace RenderManager
    * The template parameter \a RenderTree gives the render tree type.
    * The parameter \a ContextSetup gives a class used to set up the contexts
    * for the rendering of the scene behind a portal. It must provide an
-   * implementation of operator() (RenderTree& renderTree, 
-   *   RenderTree::ContextNode* context, RenderTree::ContextsContainer* container, 
+   * implementation of operator() (RenderTree& renderTree,
+   *   RenderTree::ContextNode* context, RenderTree::ContextsContainer* container,
    *   iSector* sector, CS::RenderManager::RenderView* rview).
    */
   template<typename RenderTreeType, typename ContextSetup>
@@ -90,44 +90,44 @@ namespace RenderManager
       {
         typedef size_t KeyType;
 
-        static int IsLargerEqual (const PortalBuffers& b1, 
+        static int IsLargerEqual (const PortalBuffers& b1,
                                   const PortalBuffers& b2)
         {
           size_t s1 = b1.coordBuf->GetElementCount ();
           size_t s2 = b1.coordBuf->GetElementCount ();
-          
+
           if (s1 > s2) return true;
           return false;
         }
-      
-        static int IsEqual (const PortalBuffers& b1, 
+
+        static int IsEqual (const PortalBuffers& b1,
                             const PortalBuffers& b2)
         {
           size_t s1 = b1.coordBuf->GetElementCount ();
           size_t s2 = b1.coordBuf->GetElementCount ();
-          
+
           if (s1 == s2) return true;
           return false;
         }
-      
-        static int IsLargerEqual(const PortalBuffers& b1, 
+
+        static int IsLargerEqual(const PortalBuffers& b1,
                                  const KeyType& s2)
         {
           size_t s1 = b1.coordBuf->GetElementCount ();
-          
+
           if (s1 > s2) return true;
           return false;
         }
-      
-        static int IsEqual(const PortalBuffers& b1, 
+
+        static int IsEqual(const PortalBuffers& b1,
                            const KeyType& s2)
         {
           size_t s1 = b1.coordBuf->GetElementCount ();
-          
+
           if (s1 == s2) return true;
           return false;
         }
-      
+
       };
       CS::Utility::GenericResourceCache<PortalBuffers, csTicks,
         PortalBufferConstraint> bufCache;
@@ -137,7 +137,7 @@ namespace RenderManager
         PersistentData* owningPersistentData;
 
         csBoxClipperCached (PersistentData* owningPersistentData,
-          const csBox2& box) : csBoxClipper (box), 
+          const csBox2& box) : csBoxClipper (box),
           owningPersistentData (owningPersistentData)
         { }
 
@@ -162,7 +162,7 @@ namespace RenderManager
 
       void FreeCachedClipper (csBoxClipperCached* bcc)
       {
-        CS::Utility::ResourceCache::ReuseConditionFlagged::StoredAuxiliaryInfo* 
+        CS::Utility::ResourceCache::ReuseConditionFlagged::StoredAuxiliaryInfo*
           reuseAux = boxClipperCache.GetReuseAuxiliary (
             reinterpret_cast<csBoxClipperCachedStore*> (bcc));
         reuseAux->reusable = true;
@@ -172,9 +172,9 @@ namespace RenderManager
     #ifdef CS_DEBUG
       csFrameDataHolder<csStringBase> stringHolder;
     #endif
-      
+
       /// Construct helper
-      PersistentData() : texCache (csimg2D, "rgb8", 
+      PersistentData() : texCache (csimg2D, "rgb8",
         CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP,
         "target", TextureCache::tcachePowerOfTwo)
       {
@@ -183,18 +183,18 @@ namespace RenderManager
         boxClipperCache.agedPurgeInterval = 5000;
         boxClipperCache.purgeAge = 10000;
       }
-      
+
       /**
        * Initialize helper. Fetches various required values from objects in
        * the object registry.
       */
       void Initialize (iShaderManager* shmgr, iGraphics3D* g3d)
       {
-        svNameTexPortal = 
+        svNameTexPortal =
           shmgr->GetSVNameStringset()->Request ("tex portal");
 	texCache.SetG3D (g3d);
       }
-      
+
       /**
        * Do per-frame house keeping - \b MUST be called every frame/
        * RenderView() execution.
@@ -207,7 +207,7 @@ namespace RenderManager
         boxClipperCache.AdvanceTime (time);
       }
     };
-  
+
     /// Constructor.
     StandardPortalSetup (PersistentData& persistentData, ContextSetup& cfun)
       : persistentData (persistentData), contextFunction (cfun)
@@ -217,9 +217,9 @@ namespace RenderManager
      * Operator doing the actual work. Goes over the portals in the given
      * context and sets up rendering of behind the portals.
      */
-    void operator() (RenderTreeType& renderTree, 
-      typename RenderTreeType::ContextNode* context, 
-      typename RenderTreeType::ContextsContainer* container, 
+    void operator() (RenderTreeType& renderTree,
+      typename RenderTreeType::ContextNode* context,
+      typename RenderTreeType::ContextsContainer* container,
       iSector* sector, CS::RenderManager::RenderView* rview)
     {
       csDirtyAccessArray<csVector2> allPortalVerts2d (64);
@@ -230,7 +230,7 @@ namespace RenderManager
       {
         typename RenderTreeType::ContextNode::PortalHolder& holder = context->allPortals[pc];
         const size_t portalCount = holder.portalContainer->GetPortalCount ();
-        CS::Graphics::RenderPriority renderPrio = 
+        CS::Graphics::RenderPriority renderPrio =
           holder.meshWrapper->GetRenderPriority ();
 
         size_t allPortalVertices = holder.portalContainer->GetTotalVertexCount ();
@@ -241,8 +241,8 @@ namespace RenderManager
         csVector2* portalVerts2d = allPortalVerts2d.GetArray();
         csVector3* portalVerts3d = allPortalVerts3d.GetArray();
         /* Get clipped screen space and camera space vertices */
-        holder.portalContainer->ComputeScreenPolygons (rview, 
-          portalVerts2d, portalVerts3d, 
+        holder.portalContainer->ComputeScreenPolygons (rview,
+          portalVerts2d, portalVerts3d,
           allPortalVerts2d.GetSize(), allPortalVertsNums.GetArray());
 
         for (size_t pi = 0; pi < portalCount; ++pi)
@@ -250,15 +250,15 @@ namespace RenderManager
           iPortal* portal = holder.portalContainer->GetPortal (int (pi));
           const csFlags portalFlags (portal->GetFlags());
 
+          // Finish up the sector
+          if (!portal->CompleteSector (rview))
+            continue;
+
+          size_t count = allPortalVertsNums[pi];
+          if (count == 0) continue;
+
           if (IsSimplePortal (portalFlags))
           {
-            // Finish up the sector
-            if (!portal->CompleteSector (rview))
-              continue;
-              
-            size_t count = allPortalVertsNums[pi];
-            if (count == 0) continue;
-
             // Setup simple portal
             rview->CreateRenderContext ();
             rview->SetLastPortal (portal);
@@ -271,42 +271,33 @@ namespace RenderManager
 	      iCamera *inewcam = rview->CreateNewCamera ();
               SetupWarp (inewcam, holder.meshWrapper->GetMovable(), portal);
 	    }
-	    
-            typename RenderTreeType::ContextNode* portalCtx = 
+	
+            typename RenderTreeType::ContextNode* portalCtx =
               renderTree.CreateContext (container, rview);
 
             // Setup the new context
             contextFunction(renderTree, portalCtx, container, portal->GetSector (), rview);
 
             rview->RestoreRenderContext ();
-            portalVerts2d += count;
-            portalVerts3d += count;
           }
           else
           {
 	    // Setup heavy portal
-	    
-	    // Finish up the sector
-	    if (!portal->CompleteSector (rview))
-	      continue;
-  
-            size_t count = allPortalVertsNums[pi];
-            if (count == 0) continue;
-	    
+
 	    // Setup a bounding box, in screen-space
 	    csBox2 screenBox;
 	    ComputeVector2BoundingBox (portalVerts2d, count, screenBox);
-	    
+	
 	    // Obtain a texture handle for the portal to render to
             int sb_minX = int (screenBox.MinX());
             int sb_maxY = int (screenBox.MaxY());
 	    int txt_w = int (ceil (screenBox.MaxX() - screenBox.MinX()));
 	    int txt_h = int (ceil (screenBox.MaxY() - screenBox.MinY()));
 	    int real_w, real_h;
-	    csRef<iTextureHandle> tex = 
+	    csRef<iTextureHandle> tex =
 	      persistentData.texCache.QueryUnusedTexture (txt_w, txt_h, 0,
                 real_w, real_h);
-	          
+	
 	    iCamera* cam = rview->GetCamera();
 	    // Create a new view
 	    csRef<CS::RenderManager::RenderView> newRenderView;
@@ -314,7 +305,7 @@ namespace RenderManager
 	      new (renderTree.GetPersistentData().renderViewPool) RenderView (
 	        cam->Clone(), 0, rview->GetGraphics3D(), rview->GetGraphics2D()));
 	    newRenderView->SetEngine (rview->GetEngine ());
-	    
+	
 	    iCamera *inewcam = newRenderView->GetCamera();
 	    if (portalFlags.Check (CS_PORTAL_WARP))
 	    {
@@ -325,11 +316,11 @@ namespace RenderManager
             /* Visible cracks can occur on portal borders when the geometry
                behind the portal is supposed to fit seamlessly into geometry
                before the portal since the rendering of the target geometry
-               may not exactly line up with the portal area on the portal 
+               may not exactly line up with the portal area on the portal
                texture.
                To reduce that effect the camera position in the target sector
-               is somewhat fudged to move slightly into the target so that 
-               the rendered target sector geometry extends beyond the portal 
+               is somewhat fudged to move slightly into the target so that
+               the rendered target sector geometry extends beyond the portal
                texture area. */
             {
               // - Find portal point with largest Z (pMZ)
@@ -338,7 +329,7 @@ namespace RenderManager
 	      for (size_t c = 0; c < count; c++)
 	      {
                 float z = portalVerts3d[c].z;
-                if (z > maxz) 
+                if (z > maxz)
                 {
                   maxz = z;
                   maxc = c;
@@ -362,7 +353,7 @@ namespace RenderManager
               camorg += d * portalDir;
               inewcam->GetTransform().SetOrigin (camorg);
             }
-	    
+	
 	    // Add a new context with the texture as the target
 	    // Setup simple portal
 	    newRenderView->SetLastPortal (portal);
@@ -371,9 +362,9 @@ namespace RenderManager
 	    csBox2 clipBox (0, real_h - txt_h, txt_w, real_h);
             csRef<iClipper2D> newView;
             /* @@@ Consider PolyClipper?
-               A box has an advantage when the portal tex is rendered 
+               A box has an advantage when the portal tex is rendered
                distorted: texels from outside the portal area still have a
-               good color. May not be the case with a (more exact) poly 
+               good color. May not be the case with a (more exact) poly
                clipper. */
             PersistentData::csBoxClipperCachedStore* bccstore =
               persistentData.boxClipperCache.Query ();
@@ -387,18 +378,18 @@ namespace RenderManager
                 &persistentData, clipBox));
             newRenderView->SetClipper (newView);
 
-	    typename RenderTreeType::ContextsContainer* targetContexts = 
+	    typename RenderTreeType::ContextsContainer* targetContexts =
 	      renderTree.CreateContextContainer ();
 	    targetContexts->renderTarget = tex;
 	    targetContexts->rview = newRenderView;
-    
-            typename RenderTreeType::ContextNode* portalCtx = 
+
+            typename RenderTreeType::ContextNode* portalCtx =
               renderTree.CreateContext (targetContexts, newRenderView);
-  
+
 	    // Setup the new context
-            contextFunction(renderTree, portalCtx, targetContexts, 
+            contextFunction(renderTree, portalCtx, targetContexts,
               portal->GetSector (), newRenderView);
-  
+
 	    // Synthesize a render mesh for the portal plane
 	    iMaterialWrapper* mat = portal->GetMaterial ();
 	    csRef<csShaderVariableContext> svc;
@@ -407,17 +398,17 @@ namespace RenderManager
 	      svc->GetVariableAdd (persistentData.svNameTexPortal);
 	    svTexPortal->SetValue (tex);
 
-            PersistentData::PortalBuffers* bufs = 
+            PersistentData::PortalBuffers* bufs =
               persistentData.bufCache.Query (count);
             if (bufs == 0)
             {
               PersistentData::PortalBuffers newBufs;
-	      newBufs.coordBuf = 
+	      newBufs.coordBuf =
 	        csRenderBuffer::CreateRenderBuffer (count, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
 	      newBufs.tcBuf =
 	        csRenderBuffer::CreateRenderBuffer (count, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 4);
 	      newBufs.indexBuf =
-	        csRenderBuffer::CreateIndexRenderBuffer (count, CS_BUF_STREAM, 
+	        csRenderBuffer::CreateIndexRenderBuffer (count, CS_BUF_STREAM,
 		  CS_BUFCOMP_UNSIGNED_INT, 0, count-1);
 	      newBufs.holder.AttachNew (new csRenderBufferHolder);
               newBufs.holder->SetRenderBuffer (CS_BUFFER_INDEX, newBufs.indexBuf);
@@ -425,7 +416,7 @@ namespace RenderManager
 	      newBufs.holder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, newBufs.tcBuf);
               bufs = persistentData.bufCache.AddActive (newBufs);
             }
-	    
+	
 	    {
 	      csRenderBufferLock<csVector3> coords (bufs->coordBuf);
 	      for (size_t c = 0; c < count; c++)
@@ -440,8 +431,8 @@ namespace RenderManager
 	      for (size_t c = 0; c < count; c++)
 	      {
 	        float z = portalVerts3d[c].z;
-		tcoords[c].Set ((portalVerts2d[c].x - sb_minX) * xscale * z, 
-		  (sb_maxY - portalVerts2d[c].y) * yscale * z, 0, 
+		tcoords[c].Set ((portalVerts2d[c].x - sb_minX) * xscale * z,
+		  (sb_maxY - portalVerts2d[c].y) * yscale * z, 0,
 		  z);
 	      }
 	    }
@@ -452,9 +443,9 @@ namespace RenderManager
 	        *indices++ = uint (c);
 	      }
 	    }
-    
+
 	    bool meshCreated;
-	    csRenderMesh* rm = 
+	    csRenderMesh* rm =
 	      renderTree.GetPersistentData().rmHolder.GetUnusedMesh (
 	        meshCreated, rview->GetCurrentFrameNumber());
           #ifdef CS_DEBUG
@@ -477,14 +468,14 @@ namespace RenderManager
 	    rm->indexend = uint (count);
 	    rm->mixmode = CS_MIXMODE_BLEND(ONE, ZERO);
 	    rm->variablecontext = svc;
-	    
+	
 	    typename RenderTreeType::MeshNode::SingleMesh sm;
 	    sm.meshObjSVs = 0;
 	    renderTree.AddRenderMeshToContext (context, rm, renderPrio, sm);
-	    
-	    portalVerts2d += count;
-            portalVerts3d += count;
           }
+
+          portalVerts2d += count;
+          portalVerts3d += count;
         }
       }
     }
@@ -495,14 +486,14 @@ namespace RenderManager
 
     bool IsSimplePortal (const csFlags& portalFlags)
     {
-      return (portalFlags.Get() & (CS_PORTAL_CLIPDEST 
-        | CS_PORTAL_CLIPSTRADDLING 
+      return (portalFlags.Get() & (CS_PORTAL_CLIPDEST
+        | CS_PORTAL_CLIPSTRADDLING
         | CS_PORTAL_ZFILL
 	| CS_PORTAL_MIRROR
 	| CS_PORTAL_FLOAT)) == 0;
     }
-    
-    void ComputeVector2BoundingBox (const csVector2* verts, size_t count, 
+
+    void ComputeVector2BoundingBox (const csVector2* verts, size_t count,
                                     csBox2& box)
     {
       if (count == 0)
@@ -542,7 +533,7 @@ namespace RenderManager
         contexts->subtexture);
     }
   };
-    
+
   /**
    * Helper to render a set of contexts. It sets up render targets,
    * draw flags, projection, camera transform. All contexts of the tree
@@ -555,14 +546,14 @@ namespace RenderManager
   {
   public:
     /// Construct.
-    ContextRender (iShaderManager* shaderManager, 
+    ContextRender (iShaderManager* shaderManager,
       const LayerConfigType& layerConfig)
       : shaderManager (shaderManager), layerConfig (layerConfig)
     {
     }
-  
+
     /// Iterate over all layers and contexts and render.
-    void operator() (typename RenderTreeType::ContextsContainer* contexts, 
+    void operator() (typename RenderTreeType::ContextsContainer* contexts,
       RenderTreeType& tree)
     {
       RenderView* rview = contexts->rview;
@@ -570,15 +561,15 @@ namespace RenderManager
       int drawFlags = rview->GetEngine ()->GetBeginDrawFlags ();
       iCamera* cam = rview->GetCamera();
       iClipper2D* clipper = rview->GetClipper ();
-      
+
       drawFlags |= CSDRAW_3DGRAPHICS /*| CSDRAW_CLEARSCREEN*/;
 
       SetupRenderTarget<RenderTreeType> setupTarget (contexts, g3d);
-      g3d->SetPerspectiveCenter (int (cam->GetShiftX ()), 
+      g3d->SetPerspectiveCenter (int (cam->GetShiftX ()),
         int (cam->GetShiftY ()));
       g3d->SetPerspectiveAspect (cam->GetFOV ());
       g3d->SetClipper (clipper, CS_CLIPPER_TOPLEVEL);
-      
+
       BeginFinishDrawScope bd (g3d, drawFlags);
 
       g3d->SetWorldToCamera (cam->GetTransform ().GetInverse ());
@@ -589,7 +580,7 @@ namespace RenderManager
         tree.TraverseContextsReverse (contexts, cb);
       }
     }
-  
+
   private:
     template<typename Fn>
     struct MeshNodeCB
@@ -597,13 +588,13 @@ namespace RenderManager
       MeshNodeCB(Fn& meshNodeFunction, typename RenderTreeType::ContextNode* node, RenderTreeType& tree)
 	: meshNodeFunction (meshNodeFunction), node (node), tree (tree)
       {}
-  
-      void operator() (const typename RenderTreeType::TreeTraitsType::MeshNodeKeyType& key, 
+
+      void operator() (const typename RenderTreeType::TreeTraitsType::MeshNodeKeyType& key,
 	typename RenderTreeType::MeshNode* meshNode)
       {
 	meshNodeFunction (key, meshNode, *node, tree);
       }
-  
+
       Fn& meshNodeFunction;
       typename RenderTreeType::ContextNode* node;
       RenderTreeType& tree;
@@ -615,16 +606,16 @@ namespace RenderManager
       iGraphics3D* g3d;
       size_t layer;
 
-      ContextCB (ContextRender& parent, iGraphics3D* g3d, size_t layer) 
+      ContextCB (ContextRender& parent, iGraphics3D* g3d, size_t layer)
         : parent (parent), g3d (g3d), layer (layer)
       {}
 
-      void operator() (typename RenderTreeType::ContextNode* node, 
+      void operator() (typename RenderTreeType::ContextNode* node,
         RenderTreeType& tree)
       {
-        SimpleRender<RenderTreeType> render (g3d, 
+        SimpleRender<RenderTreeType> render (g3d,
           parent.shaderManager->GetShaderVariableStack (), layer);
-    
+
         MeshNodeCB<SimpleRender<RenderTreeType> > cb (render, node, tree);
         node->meshNodes.TraverseInOrder (cb);
       }
