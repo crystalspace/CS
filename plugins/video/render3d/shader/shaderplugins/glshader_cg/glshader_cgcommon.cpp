@@ -322,8 +322,7 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
 	  && ((type == CG_GL_VERTEX) && (profile >= CG_PROFILE_ARBVP1))
 	    || ((type == CG_GL_FRAGMENT) && (profile >= CG_PROFILE_ARBFP1)))
       {
-	//const char* err = (char*)glGetString (GL_PROGRAM_ERROR_STRING_ARB);
-	const char* err = "";
+	const char* err = (char*)glGetString (GL_PROGRAM_ERROR_STRING_ARB);
 	shaderPlug->Report (CS_REPORTER_SEVERITY_WARNING,
 	  "OpenGL error string: %s", err);
       }

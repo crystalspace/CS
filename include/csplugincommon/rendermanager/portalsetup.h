@@ -244,15 +244,15 @@ namespace RenderManager
           iPortal* portal = holder.portalContainer->GetPortal (int (pi));
           const csFlags portalFlags (portal->GetFlags());
 
+          // Finish up the sector
+          if (!portal->CompleteSector (rview))
+            continue;
+
+          size_t count = allPortalVertsNums[pi];
+          if (count == 0) continue;
+
           if (IsSimplePortal (portalFlags))
           {
-            // Finish up the sector
-            if (!portal->CompleteSector (rview))
-              continue;
-              
-            size_t count = allPortalVertsNums[pi];
-            if (count == 0) continue;
-
             // Setup simple portal
             rview->CreateRenderContext ();
             rview->SetLastPortal (portal);
@@ -280,19 +280,10 @@ namespace RenderManager
             contextFunction (*portalCtx, setupData);
 
             rview->RestoreRenderContext ();
-            portalVerts2d += count;
-            portalVerts3d += count;
           }
           else
           {
 	    // Setup heavy portal
-	    
-	    // Finish up the sector
-	    if (!portal->CompleteSector (rview))
-	      continue;
-  
-            size_t count = allPortalVertsNums[pi];
-            if (count == 0) continue;
 	    
 	    // Setup a bounding box, in screen-space
 	    csBox2 screenBox;
@@ -507,10 +498,10 @@ namespace RenderManager
 	    sm.meshObjSVs = 0;
 
             context.AddRenderMesh (rm, renderPrio, sm);
-	    
-	    portalVerts2d += count;
-            portalVerts3d += count;
           }
+
+	  portalVerts2d += count;
+          portalVerts3d += count;
         }
       }
     }
