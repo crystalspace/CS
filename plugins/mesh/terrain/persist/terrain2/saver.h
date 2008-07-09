@@ -27,11 +27,27 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(Terrain2Loader)
 {
+  class Terrain2SaverCommon
+  {
+  protected:
+    csRef<iSyntaxService> synldr;
+
+    bool Initialize (iObjectRegistry *objreg);
+
+    template<typename IProp>
+    bool SaveProperties (iDocumentNode* node, IProp* props,
+      IProp* dfltProp = 0);
+
+    bool SaveRenderProperties (iDocumentNode* node,
+      iTerrainCellRenderProperties* props,
+      iTerrainCellRenderProperties* dfltProp = 0);
+  };
 
   class Terrain2FactorySaver :
     public scfImplementation2<Terrain2FactorySaver,
 			      iSaverPlugin,
-			      iComponent>
+			      iComponent>,
+    public Terrain2SaverCommon
   {
   public:
     Terrain2FactorySaver (iBase*);
@@ -42,17 +58,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2Loader)
     bool WriteDown (iBase *obj, iDocumentNode *parent,
       iStreamSource *ssource);
   private:
-    csRef<iSyntaxService> synldr;
-
-    template<typename IProp>
-    bool SaveProperties (iDocumentNode* node, IProp* props,
-      IProp* dfltProp = 0);
   };
 
   class Terrain2ObjectSaver :
     public scfImplementation2<Terrain2ObjectSaver,
 			      iSaverPlugin,
-			      iComponent>
+			      iComponent>,
+    public Terrain2SaverCommon
   {
   public:
     Terrain2ObjectSaver (iBase*);

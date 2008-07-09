@@ -19,6 +19,10 @@
 #ifndef __CS_CSPLUGINCOMMON_OPENGL_SHADERPLUGIN_H__
 #define __CS_CSPLUGINCOMMON_OPENGL_SHADERPLUGIN_H__
 
+/**\file
+ * Common code useful for all OpenGL-based shader program plugins.
+ */
+
 #include "csextern_gl.h"
 
 #include "csgeom/plane3.h"
@@ -38,9 +42,17 @@ namespace CS
       public scfImplementation1<ShaderProgramPluginGL, iShaderProgramPlugin>
     {
     public:
+      /// Known vendors of graphics hardware/drivers.
       enum HardwareVendor
       {
-        Invalid = -1, ATI = 0, NVIDIA = 1, Other = 2
+        /// No vendor identified yet
+        Invalid = -1,
+        /// ATI/AMD
+        ATI = 0,
+        /// NVidia
+        NVIDIA = 1,
+        /// Other vendor
+        Other = 2
       };
     protected:
       /**
@@ -49,14 +61,31 @@ namespace CS
        */
       HardwareVendor vendor;
       
+      /// Construct.
       ShaderProgramPluginGL (iBase* parent);
       
       /// Initialize program plugin common stuff.
       bool Initialize (iObjectRegistry* objectReg);
+      /// Open the common part. Returns whether opened successful.
       bool Open();
+      /// Close the common part.
       void Close ();
       
     public:
+      /**
+       * Parse a string into a set of vendors.
+       * \param mask Mask string. It can be a single vendor string 
+       *   (<tt>ati</tt>, <tt>nvidia</tt>, <tt>other</tt>) causing this
+       *   vendor to be included in the mask, the special string <tt>*</tt>
+       *   including all vendors in the mask, a vendor string prefixed
+       *   by <tt>!</tt> excluding that vendor from the mask or a combination
+       *   of these, separated by <tt>,</tt>. If the first sub-string is an
+       *   exclusion mask string an <tt>*</tt> is implicitly inserted before
+       *   the first sub-string.
+       * \return A set of vendors encoded as a combination of bits.. 
+       *   If a bit <tt>1 << (vendor)</tt> is set, then that vendor is
+       *   included in the set, otherwise not.
+       */
       uint ParseVendorMask (const char* mask);
       
     protected:
@@ -68,8 +97,15 @@ namespace CS
       csGLExtensionManager* ext;
       /// Whether verbose reporting was enabled.
       bool doVerbose;
+      /**
+       * Whether "precache" verbose reporting was enabled.
+       * This should report progress on precaching, but not necessarily
+       * everything during shader precaching (e.g. compile errors).
+       */
+      bool doVerbosePrecache;
       
     public:
+      /// Helper class for user defined OpenGL clip planes.
       class CS_CSPLUGINCOMMON_GL_EXPORT ClipPlanes
       {
         int maxPlanes;
@@ -86,18 +122,38 @@ namespace CS
         ClipPlanes ();
         ~ClipPlanes ();
         
+        /// Initialize, should be called by plugin Initialize().
         void Initialize (iObjectRegistry* objectReg);
       
+        /// Set shader vars required for transforming clip planes.
         void SetShaderVars (const csShaderVariableStack& stack);
+        /// Possible clip plane spaces
         enum ClipSpace
         {
-          Object, World, Eye
+          /// Object space
+          Object,
+          /// World space
+          World,
+          /// Eye space (pre-projection camera space)
+          Eye
         };
+        //@{
+        /// Add a clip plane.
         bool AddClipPlane (const csPlane3& plane, ClipSpace space);
         bool AddClipPlane (const csVector4& plane, ClipSpace space)
         { return AddClipPlane (csPlane3 (plane.x, plane.y, plane.z, plane.w), space); }
+        //@}
+        /**
+         * Enable the \a n th OpenGL clip plane without setting it. It is up 
+         * to the caller to call glClipPlane().
+         */
         bool EnableClipPlane (int n);
+        /**
+         * Enable the next available OpenGL clip plane without setting it. 
+         * It is up  to the caller to call glClipPlane().
+         */
         bool EnableNextClipPlane ();
+        /// Disable all clip planes previously enabled.
         void DisableClipPlanes ();
       };
       /// Helper for user-defined clip planes

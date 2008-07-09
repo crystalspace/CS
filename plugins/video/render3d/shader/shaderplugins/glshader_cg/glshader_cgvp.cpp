@@ -86,7 +86,8 @@ bool csShaderGLCGVP::Precache (const ProfileLimits& limits,
   programStr.Append ((char*)programBuffer->GetData(), programBuffer->GetSize());
 
   bool ret = DefaultLoadProgram (cgResolve, programStr, CG_GL_VERTEX, 
-      CG_PROFILE_UNKNOWN, loadApplyVmap | loadIgnoreConfigProgramOpts,
+      CG_PROFILE_UNKNOWN,
+      loadApplyVmap | loadIgnoreConfigProgramOpts | loadFlagUnusedV2FForInit,
       &limits);
 
   WriteToCache (cache, limits);
