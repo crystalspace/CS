@@ -1,0 +1,5 @@
+SubDir TOP apps tutorial pathtut ;
+
+Description pathtut : "Path Tutorial" ;
+Application pathtut : [ Wildcard *.cpp *.h ] : noinstall ;
+LinkWith pathtut : crystalspace ;

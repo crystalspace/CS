@@ -1,0 +1,5 @@
+SubDir TOP apps tests lghtngtest ;
+
+Description lghtngtest : "Lightning Test" ;
+Application lghtngtest : [ Wildcard *.cpp *.h ] : noinstall ;
+LinkWith lghtngtest : crystalspace ;

@@ -1,0 +1,5 @@
+SubDir TOP apps tutorial simplept ;
+
+Description simplept : "procedural textures tutorial" ;
+Application simplept : [ Wildcard *.cpp *.h ] : noinstall ;
+LinkWith simplept : crystalspace ;

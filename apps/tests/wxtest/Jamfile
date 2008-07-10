@@ -1,0 +1,15 @@
+SubDir TOP apps tests wxtest ;
+
+if $(WX.AVAILABLE) = "yes"
+{
+  Description wxtest : "WxWidgets Canvas Test" ;
+  Application wxtest : [ Wildcard *.cpp *.h ] : noinstall ;
+  ExternalLibs wxtest : WX ;
+  CFlags wxtest :
+    $(COMPILER.C++FLAGS.STRICTALIASING.DISABLE)
+    $(COMPILER.C++FLAGS.WARNING.NO_NON_VIRTUAL_DTOR) ;
+  LinkWith wxtest : crystalspace ;
+  Win32Resource wxtest : [ ConcatDirs $(SUBDIR) wxtest.rc ] ;
+  # To locate wx.rc
+  Win32RcFlags wxtest : [ Match ^(-I.*) ^(-D.*) : [ SplitToList $(WX.CFLAGS) ] ] ;
+}

@@ -1,0 +1,10 @@
+SubDir TOP apps import maya2spr ;
+
+Description maya2spr : "Maya to CS Sprite convertor" ;
+
+Application maya2spr
+	: [ Wildcard *.cpp *.h ]
+	: console
+;
+LinkWith maya2spr : crystalspace ;
+
