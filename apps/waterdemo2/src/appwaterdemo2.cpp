@@ -17,8 +17,7 @@
 #include <celtool/initapp.h>
 #endif
 
-#include <imesh/protomesh.h>
-#include "../../../include/imesh/watermesh.h"
+#include <imesh/watermesh.h>
 
 AppWaterdemo2::AppWaterdemo2() : csApplicationFramework()
 {
@@ -333,6 +332,8 @@ bool AppWaterdemo2::Application()
     	room, 
     	csVector3 (0, 0, 0));
 
+  //watermesh->SetFlagsRecursive(CS_ENTITY_CAMERA);
+
   csRef<iWaterMeshState> watermeshstate = scfQueryInterface<iWaterMeshState> (
     watermesh->GetMeshObject ());
   csRef<iMeshObject> watermeshobj = scfQueryInterface<iMeshObject> (
@@ -348,7 +349,7 @@ bool AppWaterdemo2::Application()
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
   view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, 0));
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 3, 0));
   
   //****************** END OF INITIALIZATION STUFFS ***********************//
   // Start the default run/event loop.  This will return only when some code,
