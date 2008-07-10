@@ -204,10 +204,10 @@ namespace lighter
 
     CS::ShaderVarName lightmapName[4] =
     { 
-      CS::ShaderVarName (globalLighter->svStrings, "tex lightmap"),
-      CS::ShaderVarName (globalLighter->svStrings, "tex lightmap dir 1"),
-      CS::ShaderVarName (globalLighter->svStrings, "tex lightmap dir 2"),
-      CS::ShaderVarName (globalLighter->svStrings, "tex lightmap dir 3")
+      CS::ShaderVarName (globalLighter->strings, "tex lightmap"),
+      CS::ShaderVarName (globalLighter->strings, "tex lightmap dir 1"),
+      CS::ShaderVarName (globalLighter->strings, "tex lightmap dir 2"),
+      CS::ShaderVarName (globalLighter->strings, "tex lightmap dir 3")
     };
     int numLMs = globalConfig.GetLighterProperties().directionalLMs ? 4 : 1;
 
