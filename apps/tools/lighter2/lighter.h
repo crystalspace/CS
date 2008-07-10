@@ -98,7 +98,7 @@ namespace lighter
     void LoadConfiguration ();
 
     // Print command line help
-    void CommandLineHelp () const;    
+    void CommandLineHelp (bool expert) const;
 
     Scene *scene;
 
