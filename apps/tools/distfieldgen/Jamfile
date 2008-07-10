@@ -1,5 +1,0 @@
-SubDir TOP apps tools distfieldgen ;
-
-Description distfieldgen : "Distance field generator" ;
-Application distfieldgen : [ Wildcard *.cpp *.h ] ;
-LinkWith distfieldgen : crystalspace ;
