@@ -23,6 +23,7 @@
 #include "kdtree.h"
 #include "statistics.h"
 #include "object_genmesh.h"
+#include "object_terrain2.h"
 
 using namespace CS;
 
@@ -155,7 +156,7 @@ namespace lighter
       }
 
       // Try to extract the "level name" from the given path
-      const size_t maxPartLen = sceneFiles[i].directory.Length();
+      const size_t maxPartLen = sceneFiles[i].directory.Length()+1;
       CS_ALLOC_STACK_ARRAY(char, pathDir, maxPartLen);
       CS_ALLOC_STACK_ARRAY(char, pathFile, maxPartLen);
       csSplitPath (sceneFiles[i].directory, pathDir, maxPartLen,
@@ -1000,6 +1001,11 @@ namespace lighter
     {
       // Genmesh
       radFact.AttachNew (new ObjectFactory_Genmesh (fileInfo->sceneConfig));
+    }
+    else if (!strcasecmp (type, "crystalspace.mesh.object.terrain2"))
+    {
+      // Terrain2
+      radFact.AttachNew (new ObjectFactory_Terrain2 (fileInfo->sceneConfig));
     }
     else
       return mpNotAGenMesh;

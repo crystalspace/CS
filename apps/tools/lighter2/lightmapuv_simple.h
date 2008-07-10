@@ -44,6 +44,8 @@ namespace lighter
       csBitArray& usedVerts, bool noSplit);
 
     virtual void PrepareLighting (Statistics::Progress& progress);
+
+    uint AllocLightmap (uint lmW, uint lmH);
   protected:
     friend class SimpleUVObjectLayouter;
 

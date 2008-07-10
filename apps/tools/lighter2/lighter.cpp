@@ -267,9 +267,9 @@ namespace lighter
     PostprocessLightmaps ();
 
     //Save the result
-    if (!scene->SaveLightmaps (progSaveResult)) 
-      return false;
     if (!scene->SaveMeshesPostLighting (progSaveMeshesPostLight)) 
+      return false;
+    if (!scene->SaveLightmaps (progSaveResult)) 
       return false;
     scene->CleanLightingData ();
     if (!scene->ApplyWorldChanges (progApplyWorldChanges)) 
