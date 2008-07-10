@@ -44,7 +44,6 @@ namespace Plugins
 namespace WaterMesh
 {
 
-
 class csWaterMeshObjectFactory;
 
 #define WATER_SIZE	16
@@ -299,6 +298,8 @@ private:
   float waterAlpha;
   bool murkChanged;
 
+  waterMeshType type;
+
   // Buffers for the renderers.
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;
@@ -361,7 +362,8 @@ public:
 	void SetMurkiness(float murk);
 	float GetMurkiness();
 	
-	csRef<iTextureWrapper> MakeFresnelTex(int size);
+	 void SetWaterType(waterMeshType waterType);
+	 csRef<iTextureWrapper> MakeFresnelTex(int size);
 	
   /** @} */
 

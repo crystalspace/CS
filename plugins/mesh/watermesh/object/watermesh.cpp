@@ -499,6 +499,11 @@ void csWaterMeshObjectFactory::SetObjectBoundingBox (const csBox3& bbox)
   object_bbox = bbox;
 }
 
+void csWaterMeshObjectFactory::SetWaterType(waterMeshType waterType)
+{
+	type = waterType;
+}
+
 void csWaterMeshObjectFactory::SetupFactory ()
 {
   if (!initialized || size_changed)
@@ -517,7 +522,7 @@ void csWaterMeshObjectFactory::SetupFactory ()
 	{
 		for(uint i = 0; i < wid * gran; i++)
 		{
-			verts.Push(csVector3 (i / gran, 0, j / gran));
+			verts.Push(csVector3 ((i / gran), 0, (j / gran)));
 			norms.Push(csVector3 (0, 1, 0));
 			cols.Push(csColor (0.17,0.27,0.26));
 			texs.Push(csVector2((i / gran) / (1.5 * detail), (j / gran) / (1.5 * detail)));

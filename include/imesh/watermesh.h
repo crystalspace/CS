@@ -96,8 +96,15 @@ struct iWaterFactoryState : public virtual iBase
   virtual void SetMurkiness(float murk) = 0;
   virtual float GetMurkiness() = 0;
 
+	enum waterMeshType {
+		WATER_TYPE_LOCAL,
+		WATER_TYPE_OCEAN
+	};
+	
+	virtual void SetWaterType(waterMeshType type) = 0;
+
   //Size must be a power of two.
-  //virtual csRef<iTextureWrapper> MakeFresnelTex(int size);
+   virtual csRef<iTextureWrapper> MakeFresnelTex(int size) = 0;
 };
 
 /**
