@@ -19,6 +19,10 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_RENDERLAYERS_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_RENDERLAYERS_H__
 
+/**\file
+ * Render layers
+ */
+
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/strset.h"
 
@@ -36,7 +40,8 @@ namespace RenderManager
    *  - const csStringID* GetShaderTypes (size_t layer, size_t& num) const
    *  - iShader* GetDefaultShader (size_t layer) const
    */
-   
+  
+  /// Layer settings for handling static lights
   struct StaticLightsSettings
   {
     /// Don't render static lights.
@@ -67,7 +72,7 @@ namespace RenderManager
     {
       shaderTypes.Push (shaderType);
     }
-    /// Create a single render layer with a multiply shader type.
+    /// Create a single render layer with multiple shader types.
     SingleRenderLayer (const csStringID* shaderTypes, size_t numTypes,
       iShader* defaultShader = 0,
       size_t maxLightPasses = 3, size_t maxLights = ~0)
@@ -79,16 +84,19 @@ namespace RenderManager
         this->shaderTypes[i] = shaderTypes[i];
     }
     
+    /// Add a shader type to the list of types this layer handles.
     void AddShaderType (csStringID shaderType)
     {
       shaderTypes.Push (static_cast<StringIDValue> (shaderType));
     }
 
+    /// Get number of render layers (always 1 in this implementation)
     size_t GetLayerCount () const
     {
       return 1;
     }
 
+    /// Get the list of shader types a layer handles.
     const csStringID* GetShaderTypes (size_t layer, size_t& num) const
     {
       CS_ASSERT(layer == 0);
@@ -97,6 +105,7 @@ namespace RenderManager
       return reinterpret_cast<const csStringID*> (shaderTypes.GetArray());
     }
 
+    /// Get the default fallback shader for a layer
     iShader* GetDefaultShader (size_t layer) const
     {
       CS_ASSERT(layer == 0);
@@ -104,6 +113,12 @@ namespace RenderManager
       return defaultShader;
     }
     
+    /**
+     * Get maximum number of lights to be rendered on that layer.
+     * If a shader supports less than this amount of lights, multiple passes
+     * are rendered, until one of the light maximum or the pass maximum
+     * is reached.
+     */
     size_t GetMaxLightNum (size_t layer) const
     {
       CS_ASSERT(layer == 0);
@@ -111,22 +126,33 @@ namespace RenderManager
       return maxLights;
     }
 
+    /**
+     * Get maximum number of passes to render lights with.
+     * \sa GetMaxLightNum
+     */
     size_t GetMaxLightPasses (size_t layer) const
     {
       CS_ASSERT(layer == 0);
 
       return maxLightPasses;
     }
+    /**
+     * Whether a layer is an ambient layer (means that it's rendered even when 
+     * no lights are selected/the shader does not support lighting)
+     */
     bool IsAmbientLayer (size_t layer) const
     {
       CS_ASSERT(layer == 0);
       return isAmbient;
     }
+    /// Get per-layer shader variables
     iShaderVariableContext* GetSVContext (size_t layer) const
     {
       CS_ASSERT(layer == 0);
       return svContext;
     }
+    //@{
+    /// Get settings for handling static lights
     StaticLightsSettings& GetStaticLightsSettings (size_t layer)
     {
       CS_ASSERT(layer == 0);
@@ -137,29 +163,45 @@ namespace RenderManager
       CS_ASSERT(layer == 0);
       return staticLights;
     }
+    //@}
 
+    /// Set the list of shader types this layer handles.
     void SetShaderTypes (const csStringID* shaderTypes, size_t numTypes)
     {
       this->shaderTypes.SetSize (numTypes);
       for (size_t i = 0; i < numTypes; ++i)
         this->shaderTypes[i] = shaderTypes[i];
     }
+    /// Set the default fallback shader
     void SetDefaultShader (iShader* defaultShader)
     {
       this->defaultShader = defaultShader;
     }
+    /**
+     * Set maximum number of passes to render lights with.
+     * \sa GetMaxLightNum
+     */
     void SetMaxLightPasses (size_t maxLightPasses)
     {
       this->maxLightPasses = maxLightPasses;
     }
+    /**
+     * Get maximum number of lights to be rendered on that layer.
+     * \sa GetMaxLightNum
+     */
     void SetMaxLights (size_t maxLights)
     {
       this->maxLights = maxLights;
     }
+    /**
+     * Set whether this is an ambient layer.
+     * \sa IsAmbientLayer
+     */
     void SetAmbient (bool isAmbient)
     {
       this->isAmbient = isAmbient;
     }
+    /// Set per-layer shader variables
     void SetSVContext (iShaderVariableContext* svContext)
     {
       this->svContext = svContext;
@@ -184,7 +226,13 @@ namespace RenderManager
   class MultipleRenderLayer
   {
   public:
+    /// Create with no layers
     MultipleRenderLayer () {}
+    /**
+     * Create with \a numLayers layers, initialized with a shader type from
+     * \a shaderTypes, default shader from \a defaultShader, maximum light
+     * passes from \a maxLightPasses and maximum lights from \a maxLights.
+     */
     MultipleRenderLayer (size_t numLayers, const csStringID* shaderTypes, 
       iShader** defaultShader, 
       size_t* maxLightPasses = 0, size_t* maxLights = 0)
@@ -211,6 +259,7 @@ namespace RenderManager
     {
     }
     
+    /// Add all layers of the render layers container \a layers to this one.
     template<typename LayerType>
     void AddLayers (const LayerType& layers)
     {
@@ -237,11 +286,13 @@ namespace RenderManager
       layerTypes.ShrinkBestFit ();
     }
 
+    /// Get number of render layers
     size_t GetLayerCount () const
     {
       return layers.GetSize();
     }
 
+    /// Get the list of shader types a layer handles.
     const csStringID* GetShaderTypes (size_t layer, size_t& num) const
     {
       num = layers[layer].numTypes;
@@ -249,28 +300,46 @@ namespace RenderManager
         layerTypes.GetArray() + layers[layer].firstType);
     }
 
+    /// Get the default fallback shader for a layer
     iShader* GetDefaultShader (size_t layer) const
     {
       return layers[layer].defaultShader;
     }
     
+    /**
+     * Get maximum number of lights to be rendered on that layer.
+     * If a shader supports less than this amount of lights, multiple passes
+     * are rendered, until one of the light maximum or the pass maximum
+     * is reached.
+     */
     size_t GetMaxLightNum (size_t layer) const
     {
       return layers[layer].maxLights;
     }
 
+    /**
+     * Get maximum number of passes to render lights with.
+     * \sa GetMaxLightNum
+     */
     size_t GetMaxLightPasses (size_t layer) const
     {
       return layers[layer].maxLightPasses;
     }
+    /**
+     * Whether a layer is an ambient layer (means that it's rendered even when 
+     * no lights are selected/the shader does not support lighting)
+     */
     bool IsAmbientLayer (size_t layer) const
     {
       return layers[layer].isAmbient;
     }
+    /// Get per-layer shader variables
     iShaderVariableContext* GetSVContext (size_t layer) const
     {
       return layers[layer].svContext;
     }
+    //@{
+    /// Get settings for handling static lights
     StaticLightsSettings& GetStaticLightsSettings (size_t layer)
     {
       return layers[layer].staticLights;
@@ -279,6 +348,7 @@ namespace RenderManager
     {
       return layers[layer].staticLights;
     }
+    //@}
 
     /// Remove all layers
     void Clear()
@@ -323,7 +393,7 @@ namespace RenderManager
     MultipleRenderLayer& layers);
   
   /**
-   * Read layers setup from a file.
+   * Read layers setup from an XML file.
    */
   bool CS_CRYSTALSPACE_EXPORT AddLayersFromFile (
     iObjectRegistry* objectReg, const char* fileName,
