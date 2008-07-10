@@ -237,9 +237,6 @@ namespace lighter
 
     // Calculate lightmapping coordinates
     CalculateLightmaps ();
-
-    // Calculate the photon map if we are using it
-    BuildPhotonMap();
    
     if (!scene->SaveWorldFactories (progSaveFactories)) 
       return false;

@@ -31,7 +31,8 @@ namespace lighter
     * Default Constructor
     * Initializes the class to do the global illumination calculations
     */
-    GlobalIllumination(){}
+    GlobalIllumination()
+    {}
 
     /**
     * Shade Indirect Lighting
@@ -46,6 +47,8 @@ namespace lighter
     */
     void EmitPhotons(Sector *sect);
 
+  private:
+    csRandomVectorGen randVect;
   };
 
 }

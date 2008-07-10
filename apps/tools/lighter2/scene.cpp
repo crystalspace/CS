@@ -1995,10 +1995,12 @@ namespace lighter
   {
     // TODO: Need to expand on this for checks for portals
     lighter::HitPoint hit;
+    hit.distance = FLT_MAX*0.9f;
     lighter::Ray ray;
     ray.direction = dir;
     ray.origin = pos;
     ray.minLength = 0.01f;
+    
 
     // check to see if we hit anything, if we don't then we don't
     // need to record the hit
@@ -2014,7 +2016,7 @@ namespace lighter
 
       // generate the reflection ray
       csVector3 normal = hit.primitive->ComputeNormal(hit.hitPoint);
-      float dot = normal.x*dir.x + normal.y*dir.y + normal.z*dir.z;
+      float dot = normal*dir;
       csVector3 newDir = dir;
       newDir -= normal*2*dot;
 

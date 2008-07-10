@@ -88,7 +88,7 @@ namespace lighter
   {
     // TODO: Pull from some other area
     int photonsToEmitPerLight = 1000;
-    csRandomVectorGen randVect;
+
     // emit from the lights
     const LightRefArray& allNonPDLights = sect->allNonPDLights;
     for (size_t pdli = 0; pdli < allNonPDLights.GetSize(); ++pdli)
