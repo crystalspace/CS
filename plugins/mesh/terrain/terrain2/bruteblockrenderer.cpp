@@ -130,6 +130,55 @@ public:
 
   }
 
+  virtual size_t GetParameterCount() { return 5; }
+
+  virtual const char* GetParameterName (size_t index)
+  {
+    switch (index)
+    {
+      case 0: return "visible";
+      case 1: return "block resolution";
+      case 2: return "min steps";
+      case 3: return "lod splitcoeff";
+      case 4: return "splat distance";
+      default: return 0;
+    }
+  }
+
+  virtual const char* GetParameterValue (size_t index)
+  {
+    return GetParameterValue (GetParameterName (index));
+  }
+  virtual const char* GetParameterValue (const char* name)
+  {
+    // @@@ Not nice
+    static char scratch[32];
+    if (strcmp (name, "visible") == 0)
+      return visible ? "true" : "false";
+    else if (strcmp (name, "block resolution") == 0)
+    {
+      snprintf (scratch, sizeof (scratch), "%u", (uint)blockResolution);
+      return scratch;
+    }
+    else if (strcmp (name, "min steps") == 0)
+    {
+      snprintf (scratch, sizeof (scratch), "%u", (uint)minSteps);
+      return scratch;
+    }
+    else if (strcmp (name, "lod splitcoeff") == 0)
+    {
+      snprintf (scratch, sizeof (scratch), "%f", splitDistanceCoeff);
+      return scratch;
+    }
+    else if (strcmp (name, "splat distance") == 0)
+    {
+      snprintf (scratch, sizeof (scratch), "%f", splatDistance);
+      return scratch;
+    }
+    else
+      return 0;
+  }
+
   virtual csPtr<iTerrainCellRenderProperties> Clone ()
   {
     return csPtr<iTerrainCellRenderProperties> (

@@ -60,6 +60,7 @@ public:
   virtual iTerrainSystem* GetTerrain ();
 
   virtual const char* GetName () const;
+  virtual void SetName (const char* name);
 
   virtual iTerrainCellRenderProperties* GetRenderProperties () const;
   virtual iTerrainCellCollisionProperties* GetCollisionProperties () const;

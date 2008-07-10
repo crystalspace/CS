@@ -219,6 +219,48 @@ void csTerrainSimpleDataFeederProperties::SetParameter (const char* param, const
   }
 }
 
+size_t csTerrainSimpleDataFeederProperties::GetParameterCount() { return 4; }
+
+const char* csTerrainSimpleDataFeederProperties::GetParameterName (size_t index)
+{
+  switch (index)
+  {
+    case 0: return "heightmap source";
+    case 1: return "heightmap format";
+    case 2: return "materialmap source";
+    case 3: return "offset";
+    default: return 0;
+  }
+}
+
+const char* csTerrainSimpleDataFeederProperties::GetParameterValue (size_t index)
+{ return GetParameterValue (GetParameterName (index)); }
+
+const char* csTerrainSimpleDataFeederProperties::GetParameterValue (const char* name)
+{
+  // @@@ Not nice
+  static char scratch[32];
+
+  if (strcasecmp (name, "heightmap source") == 0)
+  {
+    return heightmapSource;
+  }
+  else if (strcasecmp (name, "heightmap format") == 0)
+  {
+    return heightmapFormat;
+  }
+  else if (strcasecmp (name, "materialmap source") == 0)
+  {
+    return materialmapSource;
+  }
+  else if (strcasecmp (name, "offset") == 0)
+  {
+    snprintf (scratch, sizeof (scratch), "%f", heightOffset);
+    return scratch;
+  }
+  return 0;
+}
+
 csPtr<iTerrainCellFeederProperties> csTerrainSimpleDataFeederProperties::Clone ()
 {
   return csPtr<iTerrainCellFeederProperties> (new csTerrainSimpleDataFeederProperties (*this));
