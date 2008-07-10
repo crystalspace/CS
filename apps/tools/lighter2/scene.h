@@ -52,11 +52,17 @@ namespace lighter
   public:
     Sector (Scene* scene)
       : kdTree (0), scene (scene)
-    {}
+    {
+      photonMap = 0;
+    }
 
     ~Sector ()
     {
       delete kdTree;
+      if (photonMap)
+      {
+        delete photonMap;
+      }
     }
 
     // Initialize any extra data in the sector
@@ -99,7 +105,7 @@ namespace lighter
     csString sectorName;
 
     // Photon map for GI lighting
-    PhotonMap photonMap;
+    PhotonMap *photonMap;
 
     Scene* scene;
   };

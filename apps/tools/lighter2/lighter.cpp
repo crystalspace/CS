@@ -30,6 +30,7 @@
 #include "statistics.h"
 #include "tui.h"
 #include "directlight.h"
+#include "globalillumination.h"
 #include "sampler.h"
 #include <csutil/floatrand.h>
 
@@ -261,6 +262,9 @@ namespace lighter
 
     // Build the KD-trees
     BuildKDTrees ();
+
+    // Build Photon Maps
+    BuildPhotonMap();
    
     // Shoot direct lighting
     DoDirectLighting ();   
@@ -357,8 +361,7 @@ namespace lighter
 
   void Lighter::BuildPhotonMap()
   {
-    int photonsToEmitPerLight = 1000;
-    csRandomVectorGen randVect;
+    lighter::GlobalIllumination lighting;
     // Starting from the lights
     SectorHash::GlobalIterator sectIt = 
       scene->GetSectors ().GetIterator ();
@@ -366,25 +369,7 @@ namespace lighter
     {
       csRef<Sector> sect = sectIt.Next ();
       
-      // emit from the lights
-      const LightRefArray& allPDLights = sect->allPDLights;
-      for (size_t pdli = 0; pdli < allPDLights.GetSize(); ++pdli)
-      {
-        Light* pdl = allPDLights[pdli];
-        const csVector3& pos = pdl->GetPosition();
-        const csColor& color = pdl->GetColor();
-        const csColor& power = pdl->GetPower();
-        csVector3 dir;
-
-        // send out photons in random directions since we only have point
-        // lights at this point
-        for (size_t num = 0; num < photonsToEmitPerLight; ++num)
-        {
-          // generate new random direction vector
-          dir = randVect.Get();
-          sect->EmitPhoton(pos, dir, color, power);
-        }
-      }
+      lighting.EmitPhotons(sect);
     }
 
   }
@@ -490,71 +475,8 @@ namespace lighter
     {
       csRef<Sector> sect = sectIt.Next();
       ObjectHash::GlobalIterator gitr = sect->allObjects.GetIterator();
-      // loop through all the objects
-      while (gitr.HasNext())
-      {
-        csRef<Object> obj = gitr.Next();
-        csArray<PrimitiveArray>& submeshArray = obj->GetPrimitives();
-        
-        for (size_t submesh = 0; submesh < submeshArray.GetSize(); ++submesh)
-        {
-          PrimitiveArray& primArray = submeshArray[submesh];
-
-          for (size_t pidx = 0; pidx < primArray.GetSize(); ++pidx)
-          {
-            Primitive& prim = primArray[pidx];
-            csVector3 ufrm = prim.GetuFormVector();
-            csVector3 vfrm = prim.GetvFormVector();
-
-            csVector2 minUV = prim.GetMinUV();
-            csVector2 maxUV = prim.GetMaxUV();
-
-            // TODO: This needs to be pulled in from the config
-            float sampleSize = 0.05;
-            float sampRad = 0.1;
-
-            // generate the poin then check to make sure it is within
-            // the primitive and if it is make a sample there
-            float usize = (maxUV.x - minUV.x) * sampleSize;
-            float vsize = (maxUV.y - minUV.y) * sampleSize;
-            csVector2 currUV = minUV;
-            while (currUV.x < maxUV.x)
-            {
-              while (currUV.y < maxUV.y)
-              {
-                // generate the point
-                csVector3 sampPoint = prim.GetMinCoord();
-                sampPoint += ufrm * (currUV.x / (maxUV.x - minUV.x))
-                             + vfrm * (currUV.y / (maxUV.y - minUV.y));
-
-                // check to see if its inside
-                if (prim.PointInside(sampPoint))
-                {
-                  // make a sample here
-                  csVector3 norm = prim.ComputeNormal(sampPoint);
-                  csColor sampColor = sect->photonMap.SampleColor(sampPoint, 
-                    sampRad, norm);
-                  // TODO: Need to figure out a way to retrieve the lightmap
-                  // and apply the color
-                  // retrieve the lightmap and color it
-                  //Lightmap *lm = sect->scene->GetLightmap(prim.GetGlobalLightmapID(), 
-                    //subLightmapNum);
-
-                  //size_t u = (size_t)(currUV.x);
-                  //size_t v = (size_t)(currUV.y);
-                  //lm->SetAddPixel(u, v, sampColor);
-                }
-
-                // increment v size
-                currUV.y += vsize;
-              }
-
-              // increment the map
-              currUV.x += usize;
-            }
-          }
-        }
-      }
+      lighter::GlobalIllumination lighting;
+      lighting.ShadeIndirectLighting(sect);
     }
   }
 

@@ -118,6 +118,9 @@ namespace lighter
                        const float& distance, const int& direction);
 
   private:
+    // helper function to delete the tree
+    void DeleteNodes(Photon *p);
+
     // number of photons to sample
     int photonsPerSample;
 

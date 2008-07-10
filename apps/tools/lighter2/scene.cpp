@@ -1998,11 +1998,16 @@ namespace lighter
     lighter::Ray ray;
     ray.direction = dir;
     ray.origin = pos;
+    ray.minLength = 0.01f;
 
     // check to see if we hit anything, if we don't then we don't
     // need to record the hit
     if (lighter::Raytracer::TraceClosestHit(kdTree, ray, hit))
     {
+      if (!hit.primitive)
+      {
+        return;
+      }
       // create the reflected direction and emit if we meet certain properties
       csColor refColor = color;
       refColor *= power;
@@ -2013,7 +2018,12 @@ namespace lighter
       csVector3 newDir = dir;
       newDir -= normal*2*dot;
 
-      photonMap.AddPhoton(refColor, newDir, hit.hitPoint);
+      // check to make sure the photon map exists
+      if (!photonMap)
+      {
+        photonMap = new PhotonMap();
+      }
+      photonMap->AddPhoton(refColor, newDir, hit.hitPoint);
 
       // Only doing diffuse reflections right now, but this needs to be
       // expanded to account for specular reflections as well

@@ -17,7 +17,21 @@ namespace lighter
 
   PhotonMap::~PhotonMap()
   {
+    // remove the tree
+    DeleteNodes(root);
+  }
 
+  void PhotonMap::DeleteNodes(Photon *p)
+  {
+    // check for null so we know when to stop
+    if (!p)
+    {
+      return;
+    }
+
+    DeleteNodes(p->left);
+    DeleteNodes(p->right);
+    delete p;
   }
 
   void PhotonMap::AddPhoton(const csColor& color, const csVector3& dir,
