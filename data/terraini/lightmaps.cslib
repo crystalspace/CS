@@ -1,0 +1,24 @@
+<library>
+    <textures>
+        <texture name="lightmaps_terraini_0_png">
+            <class>lightmap</class>
+            <file>lightmaps/terraini_0.png</file>
+            <mipmap>no</mipmap>
+        </texture>
+        <texture name="lightmaps_terraini_1_png">
+            <class>lightmap</class>
+            <file>lightmaps/terraini_1.png</file>
+            <mipmap>no</mipmap>
+        </texture>
+        <texture name="lightmaps_terraini_2_png">
+            <class>lightmap</class>
+            <file>lightmaps/terraini_2.png</file>
+            <mipmap>no</mipmap>
+        </texture>
+        <texture name="lightmaps_terraini_3_png">
+            <class>lightmap</class>
+            <file>lightmaps/terraini_3.png</file>
+            <mipmap>no</mipmap>
+        </texture>
+    </textures>
+</library>
