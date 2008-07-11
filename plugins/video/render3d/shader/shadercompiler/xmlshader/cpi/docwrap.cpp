@@ -106,6 +106,7 @@ public:
     NodeStackEntry* newPair = nodeStackEntryAlloc.Alloc();
     newPair->branches[0].Push (root);
     nodeStack.Push (newPair);
+    cheapshotCondition = (csConditionID)~2;    
   }
   ~ConditionTree ()
   {
