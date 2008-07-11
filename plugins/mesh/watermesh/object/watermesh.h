@@ -50,6 +50,8 @@ class csWaterMeshObjectFactory;
 #define WATER_VERTS (WATER_SIZE * WATER_SIZE)
 #define WATER_TRIS (2 * (WATER_SIZE - 1) * (WATER_SIZE - 1)) 
 
+#define NUM_WAVE_FUNCS 3
+
 /**
  * Watermesh version of mesh object.
  */
@@ -97,6 +99,8 @@ private:
   // Normal Map
   csRef<iTextureWrapper> nMap;
   csShaderVariable *nMapVar;
+
+  
 
   // Callback when object is rendered (in GetRenderMeshes()).
   csRef<iMeshObjectDrawCallback> vis_cb;
@@ -300,6 +304,20 @@ private:
 
   waterMeshType type;
 
+	//Ocean Attributes
+		//Amplitudes
+		float amps[NUM_WAVE_FUNCS];
+	
+		//Frequencies
+		float freqs[NUM_WAVE_FUNCS];
+		
+		//Phases
+		float phases[NUM_WAVE_FUNCS];
+		
+		//Directional vectors
+		csVector2 k1, k2, k3;
+	
+
   // Buffers for the renderers.
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;
@@ -332,7 +350,12 @@ public:
   csRef<iMeshObjectType> water_type;
   csFlags flags;
 
-  bool changedVerts;
+  bool changedVerts;	
+
+  bool amplitudes_changed;
+  bool frequencies_changed;
+  bool phases_changed;
+  bool directions_changed;
 
   /// Constructor.
   csWaterMeshObjectFactory (iMeshObjectType *pParent,
@@ -350,19 +373,33 @@ public:
    csTriangle* GetTriangles () { return triangles; }
   void Invalidate ();
 
-	void SetLength(uint length) { len = length; size_changed = true; }
+	void SetLength(uint length);
 	uint GetLength() { return len; }
 
-	void SetWidth(uint width) { wid = width; size_changed = true; }
+	void SetWidth(uint width);
 	uint GetWidth() { return wid; }
 	
-	void SetGranularity(uint granularity) { gran = granularity; size_changed = true; }
+	void SetGranularity(uint granularity);
 	uint GetGranularity() { return gran; }
 	
 	void SetMurkiness(float murk);
 	float GetMurkiness();
 	
 	 void SetWaterType(waterMeshType waterType);
+	
+	void SetAmplitudes(float amp1, float amp2, float amp3);
+	csVector3 GetAmplitudes() { return csVector3(amps[0], amps[1], amps[2]); }
+	
+	void SetFrequencies(float freq1, float freq2, float freq3);
+	csVector3 GetFrequencies() { return csVector3(freqs[0], freqs[1], freqs[2]); }
+	
+	void SetPhases(float phase1, float phase2, float phase3);
+	csVector3 GetPhases() { return csVector3(phases[0], phases[1], phases[2]); }
+	
+	void SetDirections(csVector2 dir1, csVector2 dir2, csVector2 dir3);
+	csVector3 GetDirsX() { return csVector3(k1.x, k2.x, k3.x); }
+	csVector3 GetDirsY() { return csVector3(k1.y, k2.y, k3.y); }
+	
 	 csRef<iTextureWrapper> MakeFresnelTex(int size);
 	
   /** @} */

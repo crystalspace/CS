@@ -219,10 +219,11 @@ bool AppWaterdemo2::Application()
 
 	csRef<iWaterFactoryState> waterFactState = scfQueryInterface<iWaterFactoryState> (
 		waterfact->GetMeshObjectFactory());
+	waterFactState->SetWaterType(WATER_TYPE_OCEAN);
+
 	waterFactState->SetLength(11);
 	waterFactState->SetWidth(11);
 	waterFactState->SetGranularity(2);
-	waterFactState->SetMurkiness(0.2);
 
 	// Load in lighting shaders
 	csRef<iVFS> vfs (csQueryRegistry<iVFS> (object_reg));

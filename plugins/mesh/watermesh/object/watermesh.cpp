@@ -153,6 +153,9 @@ void csWaterMeshObject::SetupVertexBuffer()
 
 void csWaterMeshObject::SetupObject ()
 {
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> 
+  	(factory->object_reg, "crystalspace.shared.stringset");
+	
   if (!initialized || vertsChanged)
   {
     initialized = true;
@@ -180,14 +183,59 @@ void csWaterMeshObject::SetupObject ()
 
   if(factory->murkChanged)
   {
-	csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> 
-	 	(factory->object_reg, "crystalspace.shared.stringset");
-
 	csShaderVariable *murkVar = variableContext->GetVariableAdd(strings->Request("murkiness"));
 	murkVar->SetType(csShaderVariable::FLOAT);
 	murkVar->SetValue(factory->waterAlpha);
 	
 	factory->murkChanged = false;	
+  }
+
+	/*
+		<shadervar name="amps" type="vector3">0.1, 0.03, 0.05</shadervar>
+		<shadervar name="kxs" type="vector3">1.4, -1.1, 0.5</shadervar>
+		<shadervar name="kys" type="vector3">1.6, 0.7, -2.5</shadervar>
+		<shadervar name="freqs" type="vector3">2.0, 1.7, 1.6</shadervar>
+		<shadervar name="phases" type="vector3">0.0, 1.0, 1.41</shadervar>
+	*/
+
+  if(factory->amplitudes_changed)
+  {
+	csShaderVariable *ampsVar = variableContext->GetVariableAdd(strings->Request("amps"));
+	ampsVar->SetType(csShaderVariable::VECTOR3);
+	ampsVar->SetValue(factory->GetAmplitudes());
+	
+	factory->amplitudes_changed = false;	
+  }
+
+  if(factory->frequencies_changed)
+  {
+	csShaderVariable *freqsVar = variableContext->GetVariableAdd(strings->Request("freqs"));
+	freqsVar->SetType(csShaderVariable::VECTOR3);
+	freqsVar->SetValue(factory->GetFrequencies());
+	
+	factory->frequencies_changed = false;	
+  }
+
+  if(factory->phases_changed)
+  {
+	csShaderVariable *phasesVar = variableContext->GetVariableAdd(strings->Request("phases"));
+	phasesVar->SetType(csShaderVariable::VECTOR3);
+	phasesVar->SetValue(factory->GetPhases());
+	
+	factory->phases_changed = false;	
+  }
+
+  if(factory->directions_changed)
+  {
+	csShaderVariable *kxsVar = variableContext->GetVariableAdd(strings->Request("kxs"));
+	kxsVar->SetType(csShaderVariable::VECTOR3);
+	kxsVar->SetValue(factory->GetDirsX());
+	
+	csShaderVariable *kysVar = variableContext->GetVariableAdd(strings->Request("kys"));
+	kysVar->SetType(csShaderVariable::VECTOR3);
+	kysVar->SetValue(factory->GetDirsY());
+
+	factory->directions_changed = false;
   }
 }
 
@@ -265,6 +313,8 @@ void csWaterMeshObject::NextFrame (csTicks, const csVector3&, uint)
 	// {
 	// 	printf("Vertex %d: <%f, %f, %f>\n", i, verts[i].x, verts[i].y, verts[i].z);
 	// }
+	
+	//printf("Vertex count: %d\n", verts.GetSize());
 }
 
 bool csWaterMeshObject::HitBeamOutline (const csVector3& start,
@@ -425,6 +475,12 @@ csWaterMeshObjectFactory::csWaterMeshObjectFactory (
 
   changedVerts = false;
 
+  amplitudes_changed = false;
+  frequencies_changed = false;
+  phases_changed = false;
+  directions_changed = false;
+
+  type = WATER_TYPE_LOCAL;
   len = 2;
   wid = 2;
   gran = 1;
@@ -502,6 +558,24 @@ void csWaterMeshObjectFactory::SetObjectBoundingBox (const csBox3& bbox)
 void csWaterMeshObjectFactory::SetWaterType(waterMeshType waterType)
 {
 	type = waterType;
+	if(type == WATER_TYPE_OCEAN)
+	{
+		wid = 50;
+		len = 50;
+		gran = 1;
+		
+		SetMurkiness(0.2);
+		
+		//Setup Ocean defaults
+		
+		SetAmplitudes(0.1, 0.03, 0.05);
+		SetFrequencies(2.0, 1.7, 1.6);
+		SetPhases(0.0, 1.0, 1.41);
+		
+		SetDirections(csVector2(1.4, 1.6), csVector2(-1.1, 0.7), csVector2(0.5, -2.5));
+		
+		size_changed = true;
+	}
 }
 
 void csWaterMeshObjectFactory::SetupFactory ()
@@ -565,6 +639,39 @@ void csWaterMeshObjectFactory::SetMurkiness(float murk)
 float csWaterMeshObjectFactory::GetMurkiness()
 {
 	return waterAlpha;
+}
+
+void csWaterMeshObjectFactory::SetAmplitudes(float amp1, float amp2, float amp3)
+{
+	amps[0] = amp1;
+	amps[1] = amp2;
+	amps[2] = amp3;
+  amplitudes_changed = true;
+}
+
+void csWaterMeshObjectFactory::SetFrequencies(float freq1, float freq2, float freq3)
+{
+	freqs[0] = freq1;
+	freqs[1] = freq2;
+	freqs[2] = freq3;
+  frequencies_changed = true;
+}
+
+void csWaterMeshObjectFactory::SetPhases(float phase1, float phase2, float phase3)
+{
+	phases[0] = phase1;
+	phases[1] = phase2;
+	phases[2] = phase3;
+  phases_changed = true;
+}
+
+void csWaterMeshObjectFactory::SetDirections(const csVector2 dir1, 
+				const csVector2 dir2, const csVector2 dir3)
+{
+	k1 = csVector2(dir1);
+	k2 = csVector2(dir2);
+	k3 = csVector2(dir3);
+  directions_changed = true;
 }
 
 csRef<iTextureWrapper> csWaterMeshObjectFactory::MakeFresnelTex(int size)
@@ -682,6 +789,33 @@ csPtr<iMeshObject> csWaterMeshObjectFactory::NewInstance ()
 
   csRef<iMeshObject> im = scfQueryInterface<iMeshObject> (cm);
   return csPtr<iMeshObject> (im);
+}
+
+void csWaterMeshObjectFactory::SetLength(uint length) 
+{ 
+	if(type == WATER_TYPE_OCEAN)
+		return;
+	
+	len = length; 
+	size_changed = true; 
+}
+
+void csWaterMeshObjectFactory::SetWidth(uint width) 
+{ 
+	if(type == WATER_TYPE_OCEAN)
+		return;
+		
+	wid = width; 
+	size_changed = true; 
+}
+
+void csWaterMeshObjectFactory::SetGranularity(uint granularity) 
+{ 
+	if(type == WATER_TYPE_OCEAN)
+		return;
+		
+	gran = granularity; 
+	size_changed = true; 
 }
 
 //----------------------------------------------------------------------
