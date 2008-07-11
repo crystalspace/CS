@@ -28,9 +28,9 @@
 namespace lighter
 {
 
-  static csPtr<iRenderBuffer> WrapBuffer (iRenderBuffer* buffer, 
-                                          const char* suffix,
-                                          const char* basename)
+  csPtr<iRenderBuffer> WrapBuffer (iRenderBuffer* buffer, 
+                                   const char* suffix,
+                                   const char* basename)
   {
     csRef<iRenderBuffer> newBuffer;
     if (globalConfig.GetLighterProperties().saveBinaryBuffers)

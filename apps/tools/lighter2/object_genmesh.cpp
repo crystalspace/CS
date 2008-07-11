@@ -200,12 +200,30 @@ namespace lighter
     const size_t vertCount = vertexData.positions.GetSize ();
     genFact->SetVertexCount ((int)vertCount);
 
-    memcpy (genFact->GetVertices (), vertexData.positions.GetArray(),
-      vertCount * sizeof (csVector3));
-    memcpy (genFact->GetNormals (), vertexData.normals.GetArray(),
-      vertCount * sizeof (csVector3));
-    memcpy (genFact->GetTexels(), vertexData.uvs.GetArray(),
-      vertCount * sizeof (csVector2));
+    {
+      csRef<iRenderBuffer> vertBuf = csRenderBuffer::CreateRenderBuffer (
+        vertexData.positions.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+      vertBuf->SetData (vertexData.positions.GetArray());
+      vertBuf = WrapBuffer (vertBuf, "v");
+      genFact->RemoveRenderBuffer ("position");
+      genFact->AddRenderBuffer ("position", vertBuf);
+    }
+    {
+      csRef<iRenderBuffer> normBuf = csRenderBuffer::CreateRenderBuffer (
+        vertexData.normals.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+      normBuf->SetData (vertexData.normals.GetArray());
+      normBuf = WrapBuffer (normBuf, "n");
+      genFact->RemoveRenderBuffer ("normal");
+      genFact->AddRenderBuffer ("normal", normBuf);
+    }
+    {
+      csRef<iRenderBuffer> tcBuf = csRenderBuffer::CreateRenderBuffer (
+        vertexData.uvs.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
+      tcBuf->SetData (vertexData.uvs.GetArray());
+      tcBuf = WrapBuffer (tcBuf, "tc");
+      genFact->RemoveRenderBuffer ("texture coordinate 0");
+      genFact->AddRenderBuffer ("texture coordinate 0", tcBuf);
+    }
 
     if (hasTangents)
     {
@@ -255,7 +273,7 @@ namespace lighter
       }
     }
 
-    findHelper.CommitSubmeshes (genFact);
+    findHelper.CommitSubmeshes (genFact, GetFileName());
 
     ObjectFactory::SaveFactory (node);
   }
@@ -349,7 +367,7 @@ namespace lighter
   }
 
   void ObjectFactory_Genmesh::SubmeshFindHelper::CommitSubmeshes (
-    iGeneralFactoryState* genFact)
+    iGeneralFactoryState* genFact, const char* factFN)
   {
     for (size_t i = 0; i < allocatedSubmeshes.GetSize(); i++)
     {
@@ -386,7 +404,9 @@ namespace lighter
         csRenderBuffer::CreateIndexRenderBuffer (indexArray.GetSize(),
           CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 
           minIndex, maxIndex);
-      indices->CopyInto (indexArray.GetArray (), indexArray.GetSize());
+      indices->SetData (indexArray.GetArray ());
+      indices = lighter::WrapBuffer (indices, csString().Format ("i%zu", i),
+        factFN);
 
       const ObjectFactory_Genmesh::Submesh* srcSubmesh = 
         factory->submeshes.GetKeyPointer (allocatedSubmeshes[i].submeshIndex);
@@ -699,7 +719,7 @@ namespace lighter
             csRef<iRenderBuffer> colorsBuf = 
               csRenderBuffer::CreateRenderBuffer (colors.GetSize(), 
                 CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
-	    staticColorsBuf = WrapBuffer (staticColorsBuf,
+	    colorsBuf = WrapBuffer (colorsBuf,
 	      csString().Format ("c%d_pd%u", b, n++));
             colorsBuf->SetData (colors.GetArray());
 
