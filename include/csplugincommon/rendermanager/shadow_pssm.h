@@ -561,7 +561,7 @@ namespace RenderManager
 	    {
 	      iTextureHandle* tex =
 		persist.settings.targets[t]->texCache.QueryUnusedTexture (
-		  shadowMapSize, shadowMapSize, 0);
+		  shadowMapSize, shadowMapSize);
 	      lightFrust.textureSVs[t]->SetValue (tex);
 	      if (renderTree.IsDebugFlagEnabled (persist.dbgShadowTex))
 	        renderTree.AddDebugTexture (tex);

@@ -118,7 +118,7 @@ namespace RenderManager
       tcacheExactSizeMatch = 1,
       /**
        * The textures created should have power of two dimensions.
-       * This flag is stronger than tcacheExactSizeMatch: returned textures
+       * This flag is stronger than #tcacheExactSizeMatch: returned textures
        * will always have power of two dimensions, even though it may mean
        * non-exact sizes.
        */
@@ -132,7 +132,7 @@ namespace RenderManager
      * \param textureFlags Flags of textures to create.
      * \param texClass Class of textures to create.
      * \param options Options for cache behaviour when querying textures.
-     *   Can be tcacheExactSizeMatch, tcachePowerOfTwo.
+     *   Can be #tcacheExactSizeMatch, #tcachePowerOfTwo.
      * \param reuse Options for the reuse condition to use.
      * \param purge Options for the purge condition to use.
      * \sa iTextureManager::CreateTexture();
@@ -176,11 +176,11 @@ namespace RenderManager
 
     /**
      * Get a texture with size that is at least \a width x \a height
-     * (or exactly that size if the tcacheExactSizeMatch option is set).
+     * (or exactly that size if the #tcacheExactSizeMatch option is set).
      * The real size of the texture acquired is stored in \a real_w 
      * and \a real_h.
      */
-    iTextureHandle* QueryUnusedTexture (int width, int height, csTicks lifetime,
+    iTextureHandle* QueryUnusedTexture (int width, int height, 
                                         int& real_w, int& real_h)
     {
       Implementation::TextureSizeConstraint::KeyType queryKey;
@@ -215,12 +215,12 @@ namespace RenderManager
 
     /**
      * Get a texture with size that is at least \a width x \a height
-     * (or exactly that size if the tcacheExactSizeMatch option is set).
+     * (or exactly that size if the #tcacheExactSizeMatch option is set).
      */
-    iTextureHandle* QueryUnusedTexture (int width, int height, csTicks lifetime)
+    iTextureHandle* QueryUnusedTexture (int width, int height)
     {
       int dummyW, dummyH;
-      return QueryUnusedTexture (width, height, lifetime, dummyW, dummyH);
+      return QueryUnusedTexture (width, height, dummyW, dummyH);
     }
 
   private:
