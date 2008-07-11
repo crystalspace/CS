@@ -90,10 +90,10 @@ namespace lighter
       const csVector2& cellPos (cell->GetPosition ());
 
       uint lmSamplesX = csMin ((uint)csFindNearestPowerOf2 (
-        cellSize.x * factory->GetLMDensity()),
+        int (cellSize.x * factory->GetLMDensity())),
         globalConfig.GetLMProperties().maxLightmapU);
       uint lmSamplesY = csMin ((uint)csFindNearestPowerOf2 (
-        cellSize.z * factory->GetLMDensity()),
+        int (cellSize.z * factory->GetLMDensity())),
         globalConfig.GetLMProperties().maxLightmapV);
 
       {
@@ -118,14 +118,30 @@ namespace lighter
 	{
 	  for (uint x = 0; x < primSamplesX; x++)
 	  {
-	    csVector2 p (x, y);
+	    // Bit of a hack to avoid terrain self-shadowing acne
+	    float height = FLT_MAX;
+	    for (int dx = -1; dx < 2; dx++)
+	    {
+	      if (int (x) + dx < 0) continue;
+	      if (x + dx >= primSamplesX) continue;
+	      for (int dy = -1; dy < 2; dy++)
+	      {
+		if (int (y) + dy < 0) continue;
+		if (y + dy >= primSamplesX) continue;
+		csVector2 p (x * posScaleX, y * posScaleY);
+		
+		height = csMin (height, cell->GetHeight (x+dx, y+dy) - 0.01f);
+	      }
+	    }
+	  
+	    csVector2 p (x * posScaleX, y * posScaleY);
 
-	    float height = cell->GetHeight (p) - 0.01f;
-	    csVector3 norm (cell->GetNormal (p));
+	    //float height = cell->GetHeight (x, y) - EPSILON;
+	    csVector3 norm (cell->GetNormal (x, y));
 	    csVector2 uv (p.x * invSamplesX, p.y * invSamplesY);
 
 	    primVertexData.positions.Push (csVector3 (
-	      x * posScaleX + cellPos.x, height, y * posScaleY + cellPos.y));
+	      p.x + cellPos.x, height, cellSize.z - p.y + cellPos.y));
 	    primVertexData.uvs.Push (uv);
 	    primVertexData.normals.Push (norm);
 	  }
@@ -158,9 +174,6 @@ namespace lighter
       }
 
       {
-	float lmScaleX = float (cell->GetGridWidth())/float (lmSamplesX);
-	float lmScaleY = float (cell->GetGridHeight())/float (lmSamplesY);
-
 	float invSamplesX = 1.0f/(lmSamplesX);
 	float invSamplesY = 1.0f/(lmSamplesY);
 
@@ -171,14 +184,14 @@ namespace lighter
 	{
 	  for (uint x = 0; x < lmSamplesX; x++)
 	  {
-	    csVector2 p ((x + 0.5f) * lmScaleX, (y + 0.5f) * lmScaleY);
+	    csVector2 p ((x + 0.5f) * pScaleX, (y + 0.5f) * pScaleY);
 
 	    float height = cell->GetHeight (p);
 	    csVector3 norm (cell->GetNormal (p));
 
 	    vertexData.positions.Push (csVector3 (
-	      (x + 0.5f) * pScaleX + cellPos.x, height, 
-	      (y + 0.5f) * pScaleY + cellPos.y));
+	      p.x + cellPos.x, height, 
+	      cellSize.z - p.y + cellPos.y));
 	    vertexData.normals.Push (norm);
 	  }
 	}
