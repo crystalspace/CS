@@ -730,7 +730,8 @@ namespace RenderManager
       SVArrayHolder& svArrays, const LayerConfigType& layerConfig,
       ShadowParamType& shadowParam)
       : persist (persist), lightmgr (lightmgr), svArrays (svArrays),
-        allMaxLights (0), newLayers (layerConfig), shadowParam (shadowParam)
+        allMaxLights (0), newLayers (layerConfig), shadowParam (shadowParam),
+	lastShader (0)
     {
       // Sum up the number of lights we can possibly handle
       for (size_t layer = 0; layer < layerConfig.GetLayerCount (); ++layer)
