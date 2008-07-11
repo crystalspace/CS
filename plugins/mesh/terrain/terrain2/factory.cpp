@@ -27,10 +27,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
 {
 
 csTerrainFactory::csTerrainFactory (iMeshObjectType *pParent)
-  : scfImplementationType (this), type (pParent), logParent (0),
-  maxLoadedCells (~0), virtualViewDistance (2.0f), autoPreLoad (false),
+  : scfImplementationType (this), type (pParent),
   defaultCell (0, 128, 128, 128, 128, false, csVector2 (0, 0),
-    csVector3 (128, 32, 128), 0, 0, 0)
+    csVector3 (128, 32, 128), 0, 0, 0), logParent (0),
+  maxLoadedCells (~0), virtualViewDistance (2.0f),
+  autoPreLoad (false)
 {
 }
 
