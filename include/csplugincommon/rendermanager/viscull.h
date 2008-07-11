@@ -19,6 +19,10 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_VISCULL_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_VISCULL_H__
 
+/**\file
+ * Render manager visibility culling
+ */
+
 #include "csplugincommon/rendermanager/rendertree.h"
 #include "csplugincommon/rendermanager/renderview.h"
 #include "iengine/viscull.h"
@@ -118,6 +122,19 @@ namespace RenderManager
   /**
    * Use the given renderview and visibility culler to perform a culling step,
    * add all found meshes to the given context.
+   *
+   * Usually the first thing done with a view and context. Example:
+   * \code
+   * // Renderview+sector setup
+   * renderView->SetThisSector (sector);
+   * sector->CallSectorCallbacks (renderView);
+   * // Make sure the clip-planes are ok
+   * CS::RenderViewClipper::SetupClipPlanes (renderView->GetRenderContext ());
+   * 
+   * // Do the culling
+   * iVisibilityCuller* culler = sector->GetVisibilityCuller ();
+   * Viscull<RenderTree> (context, renderView, culler);
+   * \endcode
    */
   template<typename RenderTree>
   bool Viscull (typename RenderTree::ContextNode& context, RenderView* rw, 
