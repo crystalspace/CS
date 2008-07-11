@@ -34,7 +34,7 @@ namespace lighter
     //Setup defaults
     lighterProperties.doDirectLight = true;
     lighterProperties.directionalLMs = false;
-    lighterProperties.numThreads = 1;
+    lighterProperties.numThreads = CS::Platform::GetProcessorCount();
 
     lmProperties.lmDensity = 4.0f;
     lmProperties.maxLightmapU = 1024;

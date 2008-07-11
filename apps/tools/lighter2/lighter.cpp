@@ -92,7 +92,7 @@ namespace lighter
     // Check for commandline help.
     if (csCommandLineHelper::CheckHelp (objectRegistry, cmdLine))
     {
-      CommandLineHelp ();
+      CommandLineHelp (cmdLine->GetOption ("expert", 0) != 0);
       return false;
     }
 
@@ -201,6 +201,9 @@ namespace lighter
 
     vfs = csQueryRegistry<iVFS> (objectRegistry);
     if (!vfs) return Report ("No iVFS!");
+
+    syntaxService = csQueryRegistry<iSyntaxService> (objectRegistry);
+    if (!syntaxService) return Report ("No iSyntaxService!");
 
     strings = csQueryRegistryTagInterface<iStringSet> (
       objectRegistry, "crystalspace.shared.stringset");
@@ -556,7 +559,7 @@ namespace lighter
     configMgr->AddDomain (cmdLineConfig, iConfigManager::ConfigPriorityUserApp);
   }
 
-  void Lighter::CommandLineHelp () const
+  void Lighter::CommandLineHelp (bool expert) const
   {
     csPrintf ("Syntax:\n");
     csPrintf ("  lighter2 [options] <file> [file] [file] ...\n\n");
@@ -602,6 +605,21 @@ namespace lighter
                 "the\n");
     csPrintf ("  lightmap layouter.\n");
     csPrintf ("   Default: 1\n");
+
+    csPrintf (" --expert\n");
+    csPrintf ("  Display advanced command line options\n");
+
+    if (expert)
+    {
+      /*
+      csPrintf (" --numthreads=<N>\n");
+      csPrintf ("  Number of threads to use\n");
+      csPrintf ("   Default: number of processors in the system\n");
+      */
+      csPrintf (" --debugOcclusionRays=<regexp>\n");
+      csPrintf ("  Write a visualization of rays and their occlusions to "
+                  "meshes matching <regexp>\n");
+    }
 
     csPrintf ("\n");
   }

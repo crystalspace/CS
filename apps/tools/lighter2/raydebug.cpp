@@ -83,44 +83,38 @@ namespace lighter
     return (reMatcher != 0) && (reMatcher->Match (name) == csrxNoError);
   }
 
+  static const size_t maxRaysPerMesh = 250000;
+
   class FactoryWriter
   {
     csRef<iDocumentNode> node;
     int numTri;
-    int numVt;
-    csRef<iDocumentNode> firstChild;
-
-    int WriteVertex (const csVector3& v, const csColor& color)
+    uint numVt;
+    
+    csDirtyAccessArray<csVector3> positions;
+    csDirtyAccessArray<csColor> colors;
+    csDirtyAccessArray<uint> indices;
+    
+    uint WriteVertex (const csVector3& v, const csColor& color)
     {
-      csRef<iDocumentNode> vertexNode = 
-        node->CreateNodeBefore (CS_NODE_ELEMENT);
-      vertexNode->SetValue ("v");
-      vertexNode->SetAttributeAsFloat("x", v.x);
-      vertexNode->SetAttributeAsFloat("y", v.y);
-      vertexNode->SetAttributeAsFloat("z", v.z);
-      if (!firstChild.IsValid()) firstChild = vertexNode;
-
-      csRef<iDocumentNode> colorNode = 
-        node->CreateNodeBefore (CS_NODE_ELEMENT);
-      colorNode->SetValue ("color");
-      colorNode->SetAttributeAsFloat("red",   color.red);
-      colorNode->SetAttributeAsFloat("green", color.green);
-      colorNode->SetAttributeAsFloat("blue",  color.blue);
-
+      positions.Push (v);
+      colors.Push (color);
       return numVt++;
     }
     void WriteTri (const csTriangle& tri)
     {
-      csRef<iDocumentNode> triNode = 
-        node->CreateNodeBefore (CS_NODE_ELEMENT);
-      triNode->SetValue ("t");
-      triNode->SetAttributeAsInt("v1", tri.a);
-      triNode->SetAttributeAsInt("v2", tri.b);
-      triNode->SetAttributeAsInt("v3", tri.c);
+      indices.Push (tri.a);
+      indices.Push (tri.b);
+      indices.Push (tri.c);
       numTri++;
     }
   public:
-    FactoryWriter (iDocumentNode* node) : node (node), numTri (0), numVt (0) {}
+    FactoryWriter (iDocumentNode* node) : node (node), numTri (0), numVt (0)
+    {
+      positions.SetCapacity (maxRaysPerMesh * 3);
+      colors.SetCapacity (maxRaysPerMesh * 3);
+      indices.SetCapacity (maxRaysPerMesh * 2 * 3);
+    }
 
     void AddLine (csVector3& v1, const csVector3& v2, const csColor& color)
     {
@@ -146,25 +140,73 @@ namespace lighter
       WriteTri (tri);
     }
 
-    void Finish ()
+    void Finish (const char* filename, iSyntaxService* synldr)
     {
-      csRef<iDocumentNode> numVtNode = 
-        node->CreateNodeBefore (CS_NODE_ELEMENT, firstChild);
-      numVtNode->SetValue ("numvt");
-      csRef<iDocumentNode> numVtContentNode = 
-        numVtNode->CreateNodeBefore (CS_NODE_TEXT);
-      numVtContentNode->SetValueAsInt (numVt);
-
-      csRef<iDocumentNode> numTriNode = 
-        node->CreateNodeBefore (CS_NODE_ELEMENT, firstChild);
-      numTriNode->SetValue ("numtri");
-      csRef<iDocumentNode> numTriContentNode = 
-        numTriNode->CreateNodeBefore (CS_NODE_TEXT);
-      numTriContentNode->SetValueAsInt (numTri);
+      {
+        csRef<iRenderBuffer> buf (csRenderBuffer::CreateRenderBuffer (
+          numVt, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3));
+        buf->SetData (positions.GetArray ());
+        
+        csString fn;
+        fn.Format ("%s_v", filename);
+        
+        csRef<CS::RenderBufferPersistent> bufPersist;
+        bufPersist.AttachNew (new CS::RenderBufferPersistent (
+          buf));
+        bufPersist->SetFileName (fn);
+        
+	csRef<iDocumentNode> bufNode = 
+	  node->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	bufNode->SetValue ("renderbuffer");
+        bufNode->SetAttribute ("name", "position");
+        bufNode->SetAttribute ("checkelementcount", "no");
+        synldr->WriteRenderBuffer (bufNode, bufPersist);
+      }
+      
+      {
+        csRef<iRenderBuffer> buf (
+          csRenderBuffer::CreateIndexRenderBuffer (
+            numTri * 3, CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 
+            0, numVt-1));
+        buf->SetData (indices.GetArray ());
+        
+        csString fn;
+        fn.Format ("%s_i", filename);
+        
+        csRef<CS::RenderBufferPersistent> bufPersist;
+        bufPersist.AttachNew (new CS::RenderBufferPersistent (
+          buf));
+        bufPersist->SetFileName (fn);
+        
+	csRef<iDocumentNode> bufNode = 
+	  node->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	bufNode->SetValue ("renderbuffer");
+        bufNode->SetAttribute ("name", "index");
+        bufNode->SetAttribute ("checkelementcount", "no");
+        synldr->WriteRenderBuffer (bufNode, bufPersist);
+      }
+      
+      {
+        csRef<iRenderBuffer> buf (csRenderBuffer::CreateRenderBuffer (
+          numVt, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3));
+        buf->SetData (colors.GetArray ());
+        
+        csString fn;
+        fn.Format ("%s_c", filename);
+        
+        csRef<CS::RenderBufferPersistent> bufPersist;
+        bufPersist.AttachNew (new CS::RenderBufferPersistent (
+          buf));
+        bufPersist->SetFileName (fn);
+        
+	csRef<iDocumentNode> bufNode = 
+	  node->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	bufNode->SetValue ("renderbuffer");
+        bufNode->SetAttribute ("name", "color");
+        synldr->WriteRenderBuffer (bufNode, bufPersist);
+      }
     }
   };
-
-  static const size_t maxRaysPerMesh = 250000;
 
   void RayDebugHelper::AppendMeshFactories (Sector* sector, 
                                             iDocumentNode* node, 
@@ -257,8 +299,6 @@ namespace lighter
           }
         }
 
-        writer.Finish ();
-
         csString nStr ("");
         if (f > 0) nStr.Format ("_%zu", f);
         csString lightName (lightAndObj.light->GetName ());
@@ -269,6 +309,8 @@ namespace lighter
           sector->sectorName.GetData(),
           lightAndObj.obj->meshName.GetData(),
           lightName.GetData(), nStr.GetData());
+
+        writer.Finish (factoryName, globalLighter->syntaxService);
 
         csString filename (factoryName);
         filename += ".xml";

@@ -50,7 +50,7 @@ namespace lighter
     
     csColor GetFilterColor ();
 
-    void CollectHits (HitPointCallback* hitCB, HitIgnoreCallback* ignoreCB);
+    //void CollectHits (HitPointCallback* hitCB, HitIgnoreCallback* ignoreCB);
 
     void AddSegment (KDTree* tree, const csVector3& start, const csVector3& end);
     void AddSegment (KDTree* tree, const csVector3& start, const csVector3& dir, float maxL);
