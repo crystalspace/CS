@@ -30,6 +30,10 @@
 
 namespace lighter
 {
+  csPtr<iRenderBuffer> WrapBuffer (iRenderBuffer* buffer, 
+                                   const char* suffix,
+                                   const char* basename);
+
   class LightmapUVFactoryLayouter;
   class LightmapUVObjectLayouter;
   class Object;
@@ -131,6 +135,13 @@ namespace lighter
     // String identifying the saver plugin. Should be set from derived
     // classes
     const char* saverPluginName;
+
+    // Helper function: get a filename prefix for this mesh
+    csString GetFileName() const;
+    
+    /* Wrap a render buffer in a RenderBufferPersistent if binary buffers
+       are enabled */
+    csPtr<iRenderBuffer> WrapBuffer (iRenderBuffer* buffer, const char* suffix);
 
     friend class Object;
   };
@@ -278,6 +289,10 @@ namespace lighter
 
     // Helper function: get a filename prefix for this mesh
     csString GetFileName() const;
+    
+    /* Wrap a render buffer in a RenderBufferPersistent if binary buffers
+       are enabled */
+    csPtr<iRenderBuffer> WrapBuffer (iRenderBuffer* buffer, const char* suffix);
 
     friend class ObjectFactory;
   };

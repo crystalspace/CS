@@ -35,6 +35,7 @@ namespace lighter
     lighterProperties.doDirectLight = true;
     lighterProperties.directionalLMs = false;
     lighterProperties.numThreads = CS::Platform::GetProcessorCount();
+    lighterProperties.saveBinaryBuffers = true;
 
     lmProperties.lmDensity = 4.0f;
     lmProperties.maxLightmapU = 1024;
@@ -66,6 +67,8 @@ namespace lighter
       lmProperties.maxLightmapU);
     lmProperties.maxLightmapV = cfgFile->GetInt ("lighter2.maxLightmapV", 
       lmProperties.maxLightmapV);
+    lighterProperties.saveBinaryBuffers = cfgFile->GetBool ("lighter2.binary",
+      lighterProperties.saveBinaryBuffers);
    
     lmProperties.blackThreshold = cfgFile->GetFloat ("lighter2.blackThreshold", 
       lmProperties.blackThreshold);

@@ -619,6 +619,8 @@ namespace lighter
       csPrintf (" --debugOcclusionRays=<regexp>\n");
       csPrintf ("  Write a visualization of rays and their occlusions to "
                   "meshes matching <regexp>\n");
+      csPrintf (" --[no]binary\n");
+      csPrintf ("  Whether to save buffers in binary format. Default: True\n");
     }
 
     csPrintf ("\n");
