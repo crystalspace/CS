@@ -187,13 +187,13 @@ bool AppWaterdemo2::Application()
   if (!engine)
     return ReportError("Failed to locate 3D engine!");
     
-  vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry());
+  vc = csQueryRegistry<iVirtualClock> (r);
   if (!vc) return ReportError("Failed to locate Virtual Clock!");
 
-  kbd = csQueryRegistry<iKeyboardDriver> (GetObjectRegistry());
+  kbd = csQueryRegistry<iKeyboardDriver> (r);
   if (!kbd) return ReportError("Failed to locate Keyboard Driver!");
 
-  loader = csQueryRegistry<iLoader> (GetObjectRegistry());
+  loader = csQueryRegistry<iLoader> (r);
   if (!loader) return ReportError("Failed to locate Loader!");
 
 

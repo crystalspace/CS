@@ -93,6 +93,7 @@ private:
 
   // Admin stuff.
   csWeakRef<iGraphics3D> g3d;
+  csWeakRef<iEngine> engine;
   csRef<csWaterMeshObjectFactory> factory;
   iMeshWrapper* logparent;
 
@@ -135,6 +136,9 @@ private:
    * Setup this object. This function will check if setup is needed.
    */
   void SetupObject ();
+
+  void updateOcean(iCamera* cam);
+  void updateLocal();
 
 public:
   /// Constructor.
@@ -210,7 +214,8 @@ public:
   {
   }
 
-  bool vertsChanged;
+  bool vertsChanged;	
+  void UpdateWater(iCamera *cam);
   /** @} */
 
   /**\name iRenderBufferAccessor implementation
@@ -387,20 +392,20 @@ public:
 	
 	 void SetWaterType(waterMeshType waterType);
 	
-	void SetAmplitudes(float amp1, float amp2, float amp3);
-	csVector3 GetAmplitudes() { return csVector3(amps[0], amps[1], amps[2]); }
-	
-	void SetFrequencies(float freq1, float freq2, float freq3);
-	csVector3 GetFrequencies() { return csVector3(freqs[0], freqs[1], freqs[2]); }
-	
-	void SetPhases(float phase1, float phase2, float phase3);
-	csVector3 GetPhases() { return csVector3(phases[0], phases[1], phases[2]); }
-	
+	void SetAmplitudes(float amp1, float amp2, float amp3);	
+	void SetFrequencies(float freq1, float freq2, float freq3);	
+	void SetPhases(float phase1, float phase2, float phase3);	
 	void SetDirections(csVector2 dir1, csVector2 dir2, csVector2 dir3);
-	csVector3 GetDirsX() { return csVector3(k1.x, k2.x, k3.x); }
-	csVector3 GetDirsY() { return csVector3(k1.y, k2.y, k3.y); }
 	
 	 csRef<iTextureWrapper> MakeFresnelTex(int size);
+	
+	//Under the hood functions
+	csVector3 GetFrequencies() { return csVector3(freqs[0], freqs[1], freqs[2]); }
+	csVector3 GetPhases() { return csVector3(phases[0], phases[1], phases[2]); }
+	csVector3 GetDirsX() { return csVector3(k1.x, k2.x, k3.x); }
+	csVector3 GetDirsY() { return csVector3(k1.y, k2.y, k3.y); }
+	csVector3 GetAmplitudes() { return csVector3(amps[0], amps[1], amps[2]); }
+	inline bool isOcean() { return type == WATER_TYPE_OCEAN; }
 	
   /** @} */
 

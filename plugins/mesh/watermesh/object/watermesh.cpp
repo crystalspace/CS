@@ -82,6 +82,7 @@ csWaterMeshObject::csWaterMeshObject (csWaterMeshObjectFactory* factory) :
   current_features = 0;
 
   g3d = csQueryRegistry<iGraphics3D> (factory->object_reg);
+  engine = csQueryRegistry<iEngine> (factory->object_reg);
 
   variableContext.AttachNew (new csShaderVariableContext);
 
@@ -253,9 +254,22 @@ csRenderMesh** csWaterMeshObject::GetRenderMeshes (
 
   if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 
+  iCamera* camera = rview->GetCamera ();
+
   SetupObject ();
 
-  iCamera* camera = rview->GetCamera ();
+  csTransform trans;
+  if(factory->isOcean())
+  {
+	float camX = camera->GetTransform().GetOrigin().x;
+	float camZ = camera->GetTransform().GetOrigin().z;
+	trans.Translate(csVector3(camX, 0, camZ));
+  }
+  else
+  {
+	trans.Identity();
+	updateLocal();
+  }
 
   int clip_portal, clip_plane, clip_z_plane;
   CS::RenderViewClipper::CalculateClipSettings (rview->GetRenderContext (),
@@ -294,7 +308,7 @@ csRenderMesh** csWaterMeshObject::GetRenderMeshes (
   meshPtr->indexend = factory->numTris * 3;
   meshPtr->material = material;		
   meshPtr->worldspace_origin = wo;
-  meshPtr->object2world = o2wt;
+  meshPtr->object2world = o2wt * trans;
   if (rmCreated)
   {
     meshPtr->buffers = bufferHolder;
@@ -340,6 +354,29 @@ bool csWaterMeshObject::HitBeamOutline (const csVector3& start,
     }
   }
   return false;
+}
+
+void csWaterMeshObject::UpdateWater(iCamera *cam)
+{
+	if(factory->isOcean())
+	{
+		updateOcean(cam);
+	}
+	else
+	{
+		updateLocal();
+	}
+}
+
+void csWaterMeshObject::updateOcean(iCamera *cam)
+{
+	const csVector3 camPos = cam->GetTransform().GetOrigin();
+	
+}
+
+void csWaterMeshObject::updateLocal()
+{
+	
 }
 
 bool csWaterMeshObject::HitBeamObject (const csVector3& start,
@@ -592,11 +629,19 @@ void csWaterMeshObjectFactory::SetupFactory ()
 	texs.DeleteAll();
 	tris.DeleteAll();
 
+	float offx, offz;
+	offx = offz = 0.0;
+	if(type == WATER_TYPE_OCEAN)
+	{
+		offx = (wid * gran) / 2;
+		offz = (len * gran) / 2;
+	}
+		
 	for(uint j = 0; j < len * gran; j++)
 	{
 		for(uint i = 0; i < wid * gran; i++)
 		{
-			verts.Push(csVector3 ((i / gran), 0, (j / gran)));
+			verts.Push(csVector3 ((i / gran) - offx, 0, (j / gran) - offz));
 			norms.Push(csVector3 (0, 1, 0));
 			cols.Push(csColor (0.17,0.27,0.26));
 			texs.Push(csVector2((i / gran) / (1.5 * detail), (j / gran) / (1.5 * detail)));
@@ -616,6 +661,37 @@ void csWaterMeshObjectFactory::SetupFactory ()
 		}
 	}
 	
+	if(type == WATER_TYPE_OCEAN);
+	{
+		//Make it a taurus...
+		
+		//Associate top row of vertices to bottom row:
+		for(uint i = 0; i < (wid * gran) - 1; i++)
+		{
+			uint j = (len * gran) - 1;
+			
+			tris.Push(csTriangle (j * (wid * gran) + i, 
+									i, 
+									j * (wid * gran) + i + 1));
+			tris.Push(csTriangle (j * (wid * gran) + i + 1,
+									i,
+									i + 1));
+		}
+		
+		//Associate left row of vertices to right row:
+		for(uint j = 0; j < (len * gran) - 1; j++)
+		{
+			uint i = (wid * gran) - 1;
+			
+			tris.Push(csTriangle (j * (wid * gran) + i, 
+									(j + 1) * (wid * gran) + i, 
+									j * (wid * gran)));
+			tris.Push(csTriangle (j * (wid * gran),
+									(j + 1) * (wid * gran) + i,
+									(j + 1) * (wid * gran)));
+		}
+	}
+	
 	numVerts = verts.GetSize();
 	numTris = tris.GetSize();
 	
@@ -623,7 +699,7 @@ void csWaterMeshObjectFactory::SetupFactory ()
 	{
 		children[i]->vertsChanged = true;
 	}
-	
+		
 	Invalidate();
 
     PrepareBuffers ();
