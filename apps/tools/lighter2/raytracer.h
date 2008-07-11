@@ -308,6 +308,7 @@ namespace lighter
   class Raytracer
   {
   public:
+    //@{
     /**
      * Raytrace until there is any hit.
      * This might not be the closest hit so it is faster but not suitable
@@ -315,6 +316,9 @@ namespace lighter
      */
     static bool TraceAnyHit (const KDTree* tree, const Ray &ray, HitPoint &hit, 
       HitIgnoreCallback* ignoreCB = 0);
+    static bool TraceAnyHit (const KDTree* tree, const Ray &ray, 
+      HitPointCallback* hitCallback, HitIgnoreCallback* ignoreCB = 0);
+    //@}
 
     /**
      * Raytrace for closest hit. 

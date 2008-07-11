@@ -202,6 +202,9 @@ namespace lighter
     vfs = csQueryRegistry<iVFS> (objectRegistry);
     if (!vfs) return Report ("No iVFS!");
 
+    syntaxService = csQueryRegistry<iSyntaxService> (objectRegistry);
+    if (!syntaxService) return Report ("No iSyntaxService!");
+
     svStrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
       objectRegistry, "crystalspace.shader.variablenameset");
     if (!svStrings) return Report ("No SV names string set!");
