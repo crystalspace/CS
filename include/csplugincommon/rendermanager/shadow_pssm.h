@@ -42,6 +42,11 @@ namespace CS
 namespace RenderManager
 {
 
+  struct ShadowPSSMExtraMeshData
+  {
+    csRef<csShaderVariable> svMeshID;
+  };
+
   /**
    * PSSM shadow handler.
    * Usage: in the \c ShadowHandler argument of the LightSetup class.

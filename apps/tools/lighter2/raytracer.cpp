@@ -296,6 +296,23 @@ namespace lighter
       return TraceFunction<true> (tree, ray, hit, hitCB, ignCB);
     }
   }
+    
+  bool Raytracer::TraceAnyHit (const KDTree* tree, const Ray &ray, 
+    HitPointCallback* hitCallback, HitIgnoreCallback* ignoreCB)
+  {
+    HitCallbackObj hitCB (hitCallback);
+    HitPoint hit;
+    if (ignoreCB)
+    {
+      IgnoreCallbackObj ignCB (ignoreCB);
+      return TraceFunction<true> (tree, ray, hit, hitCB, ignCB);
+    }
+    else
+    {
+      IgnoreCallbackNone ignCB;
+      return TraceFunction<true> (tree, ray, hit, hitCB, ignCB);
+    }
+  }
 
   bool Raytracer::TraceClosestHit (const KDTree* tree, const Ray &ray, 
     HitPoint &hit, HitIgnoreCallback* ignoreCB) 

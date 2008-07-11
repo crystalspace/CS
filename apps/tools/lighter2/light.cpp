@@ -106,20 +106,43 @@ namespace lighter
     bool haveAnyHit = false;
 
     // Start by testing if we have no hits or possibly hit a non-transparent one first
-    for (size_t i = 0; i < allSegments.GetSize (); ++i)
+    if (globalLighter->rayDebug.IsEnabled())
     {
-      Segment& s = allSegments[i];
-      s.ray.ignorePrimitive = ignorePrim;
-
-      HitPoint hit;
-      if (Raytracer::TraceAnyHit (s.tree,s.ray, hit))
+      // Use hit call back to register ray hits for debugging
+      for (size_t i = 0; i < allSegments.GetSize (); ++i)
       {
-        haveAnyHit = true;
-        if (!(hit.kdFlags & KDPRIM_FLAG_TRANSPARENT))
-        {
-          // Non-transparent hit
-          return occlOccluded;
-        }
+	Segment& s = allSegments[i];
+	s.ray.ignorePrimitive = ignorePrim;
+  
+	if (Raytracer::TraceAnyHit (s.tree,s.ray, &hitcb))
+	{
+	  haveAnyHit = true;
+	  if (transparentHits.GetSize() == lastHitCount)
+	  {
+	    // Non-transparent hit
+	    return occlOccluded;
+	  }
+	}
+      }
+    }
+    else
+    {
+      // No ray hit registration needed, so no callback needed either
+      for (size_t i = 0; i < allSegments.GetSize (); ++i)
+      {
+	Segment& s = allSegments[i];
+	s.ray.ignorePrimitive = ignorePrim;
+  
+	HitPoint hit;
+	if (Raytracer::TraceAnyHit (s.tree,s.ray, hit))
+	{
+	  haveAnyHit = true;
+	  if (!(hit.kdFlags & KDPRIM_FLAG_TRANSPARENT))
+	  {
+	    // Non-transparent hit
+	    return occlOccluded;
+	  }
+	}
       }
     }
 

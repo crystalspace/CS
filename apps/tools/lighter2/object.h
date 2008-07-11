@@ -132,6 +132,13 @@ namespace lighter
     // classes
     const char* saverPluginName;
 
+    // Helper function: get a filename prefix for this mesh
+    csString GetFileName() const;
+    
+    /* Wrap a render buffer in a RenderBufferPersistent if binary buffers
+       are enabled */
+    csPtr<iRenderBuffer> WrapBuffer (iRenderBuffer* buffer, const char* suffix);
+
     friend class Object;
   };
   typedef csRefArray<ObjectFactory> ObjectFactoryRefArray;
@@ -278,6 +285,10 @@ namespace lighter
 
     // Helper function: get a filename prefix for this mesh
     csString GetFileName() const;
+    
+    /* Wrap a render buffer in a RenderBufferPersistent if binary buffers
+       are enabled */
+    csPtr<iRenderBuffer> WrapBuffer (iRenderBuffer* buffer, const char* suffix);
 
     friend class ObjectFactory;
   };

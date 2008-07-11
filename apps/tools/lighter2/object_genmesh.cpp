@@ -210,9 +210,9 @@ namespace lighter
     if (hasTangents)
     {
       // Save tangents/bitangents, if we have them anyway
-      csRef<csRenderBuffer> tangentBuf = csRenderBuffer::CreateRenderBuffer (
+      csRef<iRenderBuffer> tangentBuf = csRenderBuffer::CreateRenderBuffer (
         vertexData.positions.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
-      csRef<csRenderBuffer> bitangentBuf = csRenderBuffer::CreateRenderBuffer (
+      csRef<iRenderBuffer> bitangentBuf = csRenderBuffer::CreateRenderBuffer (
         vertexData.positions.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
       csRenderBufferLock<csVector3> tangents (tangentBuf);
       csRenderBufferLock<csVector3> bitangents (bitangentBuf);
@@ -225,6 +225,9 @@ namespace lighter
           *((csVector3*)vertexData.GetCustomData (v, vdataBitangents));
         *bitangents++ = b;
       }
+      
+      tangentBuf = WrapBuffer (tangentBuf, "tng");
+      bitangentBuf = WrapBuffer (tangentBuf, "btg");
 
       genFact->RemoveRenderBuffer ("tangent");
       genFact->AddRenderBuffer ("tangent", tangentBuf);
@@ -542,8 +545,9 @@ namespace lighter
 
     if (!lightPerVertex)
     {
-      csRef<csRenderBuffer> lightmapBuffer = csRenderBuffer::CreateRenderBuffer (
+      csRef<iRenderBuffer> lightmapBuffer = csRenderBuffer::CreateRenderBuffer (
         vertexData.positions.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
+      lightmapBuffer = WrapBuffer (lightmapBuffer, "lm");
       genMesh->AddRenderBuffer ("texture coordinate lightmap", lightmapBuffer);
       {
         csRenderBufferLock<csVector2> bufferLock (lightmapBuffer);
@@ -657,6 +661,8 @@ namespace lighter
         csRef<iRenderBuffer> staticColorsBuf = 
           csRenderBuffer::CreateRenderBuffer (litColors[b].GetSize(), 
             CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+        staticColorsBuf = WrapBuffer (staticColorsBuf,
+          csString().Format ("c%d", b));
         staticColorsBuf->SetData (litColors[b].GetArray());
 
         if (litColorsPD[0].GetSize() > 0)
@@ -674,6 +680,7 @@ namespace lighter
             synsrv->WriteRenderBuffer (staticColorsChild, staticColorsBuf);
           }
 
+          uint n = 0;
           LitColorsPDHash::GlobalIterator pdIter (litColorsPD[0].GetIterator ());
           while (pdIter.HasNext ())
           {
@@ -692,6 +699,8 @@ namespace lighter
             csRef<iRenderBuffer> colorsBuf = 
               csRenderBuffer::CreateRenderBuffer (colors.GetSize(), 
                 CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+	    staticColorsBuf = WrapBuffer (staticColorsBuf,
+	      csString().Format ("c%d_pd%u", b, n++));
             colorsBuf->SetData (colors.GetArray());
 
             synsrv->WriteRenderBuffer (lightChild, colorsBuf);
