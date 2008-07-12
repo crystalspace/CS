@@ -20,10 +20,31 @@
 #define __GLOBALILLUMINATION_H__
 
 #include "common.h"
+#include <csutil/threading/thread.h>
 
 namespace lighter
 {
-
+	class GIRunnable : public CS::Threading::Runnable
+	{
+	public:
+		/**
+		* Default Constructor
+		* Computes the lightmaps for the given sector.
+		* /param sect - the sector to compute
+		*/
+		GIRunnable(Sector *sect);
+		
+		/**
+		* Run
+		* Implemented function from Runnable for CS threading. This function
+		* does the actual work.
+		*/
+		void Run();
+		
+	private:
+		Sector *sector;
+	};
+	
   class GlobalIllumination : private CS::NonCopyable
   {
   public:

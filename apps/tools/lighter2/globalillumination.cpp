@@ -15,6 +15,17 @@
 
 namespace lighter
 {
+	GIRunnable::GIRunnable(Sector *sect)
+	{
+		sector = sect;
+	}
+	
+	void GIRunnable::Run()
+	{
+		GlobalIllumination gi;
+		gi.ShadeIndirectLighting(sector);
+	}
+	
   void GlobalIllumination::ShadeIndirectLighting(Sector *sect)
   {
     ObjectHash::GlobalIterator gitr = sect->allObjects.GetIterator();
