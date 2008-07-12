@@ -20,8 +20,8 @@
 #include "csgeom/plane3.h"
 
 using namespace std;
-using CS::Geom::Triangulate3D;
-using CS::Geom::csContour3;
+using CS::Geometry::Triangulate3D;
+using CS::Geometry::csContour3;
 
 CS_IMPLEMENT_APPLICATION
 

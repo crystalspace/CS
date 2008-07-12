@@ -22,7 +22,7 @@
 
 namespace CS
 {
-namespace Geom
+namespace Geometry
 {
 
 	iReporter* report;
@@ -254,6 +254,6 @@ namespace Geom
 	}
 */
 
-} // namespace Geom
+} // namespace Geometry
 } // namespace CS
 

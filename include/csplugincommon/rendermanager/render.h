@@ -19,6 +19,10 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_RENDER_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_RENDER_H__
 
+/**\file
+ * Context rendering
+ */
+
 #include "csplugincommon/rendermanager/posteffects.h"
 #include "csplugincommon/rendermanager/operations.h"
 #include "csplugincommon/rendermanager/rendertree.h"
@@ -197,6 +201,21 @@ namespace RenderManager
   /**
    * Renderer for multiple contexts, grouping them by render target and
    * rendering all layers of each context to same target.
+   *
+   * Usage: with reverse iteration over all contexts.
+   * Usually used in the final step before post processing effects are
+   * applied. Example:
+   * \code
+   * // ... contexts setup etc. ...
+   *
+   * {
+   *   SimpleTreeRenderer<RenderTree> render (renderView->GetGraphics3D (),
+   *     shaderManager);
+   *   ForEachContextReverse (renderTree, render);
+   * }
+   *
+   * // ... apply post processing ...
+   * \endcode
    */
   template<typename RenderTree>
   class SimpleTreeRenderer

@@ -42,6 +42,8 @@ namespace lighter
       bool directionalLMs;
       // Number of threads to use for multicore parts
       uint numThreads;
+      // Save buffers as binary
+      bool saveBinaryBuffers;
     };
 
     // Lightmap and lightmap layout properties

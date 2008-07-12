@@ -28,6 +28,25 @@
 namespace lighter
 {
 
+  csPtr<iRenderBuffer> WrapBuffer (iRenderBuffer* buffer, 
+                                   const char* suffix,
+                                   const char* basename)
+  {
+    csRef<iRenderBuffer> newBuffer;
+    if (globalConfig.GetLighterProperties().saveBinaryBuffers)
+    {
+      csString newFn;
+      newFn.Format ("bindata/%s_%s", basename, suffix);
+      CS::RenderBufferPersistent* persistBuf =
+        new CS::RenderBufferPersistent (buffer);
+      persistBuf->SetFileName (newFn);
+      newBuffer.AttachNew (persistBuf);
+    }
+    else
+      newBuffer = buffer;
+    return csPtr<iRenderBuffer> (newBuffer);
+  }
+
   ObjectFactory::ObjectFactory (const Configuration& config)
     : lightPerVertex (false), noModify (false), hasTangents (false),
     lmScale (config.GetLMProperties ().lmDensity),
@@ -162,6 +181,22 @@ namespace lighter
     }
   }
 
+  csString ObjectFactory::GetFileName() const
+  {
+    csString filename (factoryName);
+    filename.ReplaceAll ("\\", "_");
+    filename.ReplaceAll ("/", "_"); 
+    filename.ReplaceAll (" ", "_"); 
+    filename.ReplaceAll (".", "_"); 
+    return filename;
+  }
+  
+  csPtr<iRenderBuffer> ObjectFactory::WrapBuffer (iRenderBuffer* buffer, 
+                                                  const char* suffix)
+  {
+    return lighter::WrapBuffer (buffer, suffix, GetFileName());
+  }
+  
   //-------------------------------------------------------------------------
 
   Object::Object (ObjectFactory* fact)
@@ -590,4 +625,11 @@ namespace lighter
     filename.ReplaceAll (".", "_"); 
     return filename;
   }
+  
+  csPtr<iRenderBuffer> Object::WrapBuffer (iRenderBuffer* buffer, 
+                                           const char* suffix)
+  {
+    return lighter::WrapBuffer (buffer, suffix, GetFileName());
+  }
+
 }

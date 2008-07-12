@@ -19,6 +19,10 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_SVTRAVERSE_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_SVTRAVERSE_H__
 
+/**\file
+ * Traversal of shader variables used in a render tree
+ */
+
 #include "csplugincommon/rendermanager/operations.h"
 #include "csutil/bitarray.h"
 
@@ -29,6 +33,12 @@ namespace RenderManager
   /**
    * Traverser for all meshes in a tree, returning the set of used
    * shader variables for each mesh.
+   *
+   * Usage: together with ForEachMeshNode(). A functor must be provided
+   * in \a Fn which implements void operator() (RenderTree::MeshNode* node,
+   * size_t layer, RenderTree::MeshNode::SingleMesh& mesh, csBitArray names).
+   * The \a names bit array will have a bit set for each shader variable name
+   * used by the given mesh.
    */
   template<typename RenderTree, typename Fn>
   class TraverseUsedSVSets
@@ -83,6 +93,11 @@ namespace RenderManager
   /**
    * Traverser for all meshes in a tree, calling the callback for each SV
    * used by each mesh.
+   *
+   * Usage: together with ForEachMeshNode(). A functor must be provided
+   * in \a Fn which implements void operator() (CS::ShaderVarStringID varName,
+   * csShaderVariable* sv). The functor will be called for each shader
+   * variable used in the traversed context.
    */
   template<typename RenderTree, typename Fn>
   class TraverseUsedSVs

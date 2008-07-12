@@ -215,6 +215,9 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
       param.GetData());
   }
   
+  if (flags & loadFlagUnusedV2FForInit)
+    augmentedProgramStr.Append ("#define _INITIALIZE_UNUSED_V2F\n");
+  
   OutputClipPreamble (augmentedProgramStr);
   WriteClipApplications (augmentedProgramStr);
   

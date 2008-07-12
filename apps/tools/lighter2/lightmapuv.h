@@ -52,6 +52,12 @@ namespace lighter
       csBitArray& usedVerts, bool noSplit) = 0;
 
     virtual void PrepareLighting (Statistics::Progress& progress) = 0;
+
+    /**
+     * Allocate a complete lightmap. Useful when a mesh can provide a layout
+     * on its own, specialized to the particular mesh type.
+     */
+    virtual uint AllocLightmap (uint lmW = 0, uint ulmH = 0) = 0;
   };
 
   class LightmapUVObjectLayouter : public csRefCount

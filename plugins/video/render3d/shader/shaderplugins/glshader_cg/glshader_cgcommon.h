@@ -131,11 +131,13 @@ protected:
     loadLoadToGL = 1,
     loadIgnoreErrors = 2,
     loadApplyVmap = 4,
-    loadIgnoreConfigProgramOpts = 8
+    loadIgnoreConfigProgramOpts = 8,
+    loadFlagUnusedV2FForInit = 16
   };
   bool DefaultLoadProgram (iShaderDestinationResolverCG* cgResolve,
     const char* programStr, CGGLenum type, 
-    CGprofile maxProfile, uint flags = loadLoadToGL | loadApplyVmap,
+    CGprofile maxProfile,
+    uint flags = loadLoadToGL | loadApplyVmap | loadFlagUnusedV2FForInit,
     const ProfileLimits* customLimits = 0);
   void DoDebugDump ();
   void WriteAdditionalDumpInfo (const char* description, const char* content);

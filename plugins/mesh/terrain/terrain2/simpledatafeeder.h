@@ -43,6 +43,10 @@ struct csTerrainSimpleDataFeederProperties
   virtual void SetHeightOffset (float offset);
   virtual void AddAlphaMap (const char* material, const char* alphaMapSource);
   virtual void SetParameter (const char* param, const char* value);
+  virtual size_t GetParameterCount();
+  virtual const char* GetParameterName (size_t index);
+  virtual const char* GetParameterValue (size_t index);
+  virtual const char* GetParameterValue (const char* name);
   virtual csPtr<iTerrainCellFeederProperties> Clone ();
 
   csString heightmapSource, heightmapFormat, materialmapSource;

@@ -49,9 +49,12 @@ namespace CS
       csRef<iVerbosityManager> verbosemgr (
 	csQueryRegistry<iVerbosityManager> (object_reg));
       if (verbosemgr) 
+      {
 	doVerbose = verbosemgr->Enabled ("renderer.shader");
+	doVerbosePrecache = verbosemgr->Enabled ("renderer.shader.precache");
+      }
       else
-	doVerbose = false;
+	doVerbose = doVerbosePrecache = false;
 	
       return true;
     }

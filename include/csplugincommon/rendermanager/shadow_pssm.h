@@ -19,6 +19,10 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_SHADOW_PSSM_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_SHADOW_PSSM_H__
 
+/**\file
+ * PSSM shadow handler
+ */
+
 #include "ivideo/shader/shader.h"
 
 #include "cstool/meshfilter.h"
@@ -37,17 +41,53 @@ namespace CS
 {
 namespace RenderManager
 {
+
   struct ShadowPSSMExtraMeshData
   {
     csRef<csShaderVariable> svMeshID;
   };
 
+  /**
+   * PSSM shadow handler.
+   * Usage: in the \c ShadowHandler argument of the LightSetup class.
+   * In addition, on initialization the SetConfigPrefix() method of the shadow
+   * handler persistent data (accessible through the light setup persistent
+   * data) must be called, before the light setup persistent data is
+   * initialized:
+   * \code
+   * // First, set prefix for configuration settings
+   * lightPersistent.shadowPersist.SetConfigPrefix ("RenderManager.ShadowPSSM");
+   * // Then, light setup (and shadow handler) persistent data is initialized
+   * lightPersistent.Initialize (objectReg, treePersistent.debugPersist);
+   * \endcode
+   */
   template<typename RenderTree, typename LayerConfigType>
   class ShadowPSSM
   {
   public:
     struct PersistentData;
     
+    /**
+     * Shadow per-view specific data.
+     * An instance of this class needs to be created when rendering a view and
+     * passed the light setup.
+     * Example:
+     * \code
+     * // ... basic setup ...
+     *
+     * // Setup shadow handler per-view data
+     * ShadowType::ViewSetup shadowViewSetup (
+     *   rednerManager->lightPersistent.shadowPersist, renderView);
+     *
+     * // ... perform various tasks ...
+     *
+     * // Setup lighting for meshes
+     * LightSetupType lightSetup (
+     *  renderManager->lightPersistent, renderManager->lightManager,
+     *  context.svArrays, layerConfig, shadowViewSetup);
+     * \endcode
+     * \sa LightSetup
+     */
     class ViewSetup
     {
     public:
@@ -521,7 +561,7 @@ namespace RenderManager
 	    {
 	      iTextureHandle* tex =
 		persist.settings.targets[t]->texCache.QueryUnusedTexture (
-		  shadowMapSize, shadowMapSize, 0);
+		  shadowMapSize, shadowMapSize);
 	      lightFrust.textureSVs[t]->SetValue (tex);
 	      if (renderTree.IsDebugFlagEnabled (persist.dbgShadowTex))
 	        renderTree.AddDebugTexture (tex);
@@ -683,6 +723,10 @@ private:
     };
   public:
 
+    /**
+     * Data used by the shadow handler that needs to persist over multiple frames.
+     * Generally stored inside the light setup's persistent data.
+     */
     struct PersistentData
     {
       uint dbgSplitFrustumCam;
@@ -715,6 +759,7 @@ private:
       {
       }
       
+      /// Set the prefix for configuration settings
       void SetConfigPrefix (const char* configPrefix)
       {
         this->configPrefix = configPrefix;
@@ -858,7 +903,7 @@ private:
 	      the mesh filter is inverted */
 	    lightFrustum.meshFilter.AddFilterMesh (singleMesh.meshWrapper);
 	    lightFrustum.containedObjectsPP.Push (meshBboxLightPP
-	      /** lightFrustum.volumePP*/);
+	      /* * lightFrustum.volumePP*/);
 	  }
         }
         else
@@ -867,7 +912,7 @@ private:
 	  {
 	    // Mesh casts shadow
 	    lightFrustum.containedObjectsPP.Push (meshBboxLightPP
-	      /** lightFrustum.volumePP*/);
+	      /* * lightFrustum.volumePP*/);
 	  }
 	  else
 	  {

@@ -184,6 +184,19 @@ namespace lighter
     return csPtr<LightmapUVObjectLayouter> (newFactory);
   }
 
+  uint SimpleUVFactoryLayouter::AllocLightmap (uint lmW, uint lmH)
+  {
+    if (lmW == 0) lmW = globalConfig.GetLMProperties ().maxLightmapU;
+    if (lmH == 0) lmH = globalConfig.GetLMProperties ().maxLightmapV;
+    Lightmap *newL = new Lightmap (lmW, lmH);
+    size_t index = globalLightmaps.Push (newL);
+    csRect r;
+    newL->GetAllocator().Alloc (lmW, lmH, r);
+    newL->UpdateDimensions();
+
+    return (uint)index;
+  }
+
   bool SimpleUVFactoryLayouter::Edge::equals (VertexEquality veq, 
                                               const Edge& other)
   {
