@@ -28,7 +28,7 @@ struct Data : public csRefCount
 {
   int i;
   float f;
-  double d[100];
+  double d[10000000];
   csWeakRefArray<iThreadTest> t;
   bool b;
   unsigned long long reallyBig;  
@@ -49,13 +49,18 @@ class csThreadTest : public ThreadedCallable<csThreadTest>,
 {
 public:
 
-  csThreadTest();
+  csThreadTest(iObjectRegistry* objReg);
 
-  THREADED_CALLABLE_DEC(csThreadTest, Test1)
-  THREADED_CALLABLE_DEC1(csThreadTest, Test2, bool, b)
-  THREADED_CALLABLE_DEC2(csThreadTest, Test3, int, in, float, flo)  
-  THREADED_CALLABLE_DEC1(csThreadTest, Test4, csWeakRef<iThreadTest>, myself)
-  THREADED_CALLABLE_DEC1(csThreadTest, Test5, csRef<Data>, stuff)
+  iObjectRegistry* GetObjectRegistry() { return objReg; }
+
+  THREADED_CALLABLE_DECL(csThreadTest, Test1)
+  THREADED_CALLABLE_DECL1(csThreadTest, Test2, bool, b)
+  THREADED_CALLABLE_DECL2(csThreadTest, Test3, int, in, float, flo)
+  THREADED_CALLABLE_DECL1(csThreadTest, Test4, csWeakRef<iThreadTest>, myself)
+  THREADED_CALLABLE_DECL1(csThreadTest, Test5, csRef<Data>, stuff)
+
+private:
+  iObjectRegistry* objReg;
 };
 
 #endif // __THREAD_TEST_H__

@@ -18,20 +18,22 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "cssysdef.h"
 #include "threadtest.h"
+#include "cstool/initapp.h"
 
 CS_IMPLEMENT_APPLICATION
 
-csThreadTest::csThreadTest() : scfImplementationType(this)
+csThreadTest::csThreadTest(iObjectRegistry* objReg) : scfImplementationType(this),
+                                                      objReg(objReg)
 {
 }
 
 
-THREADED_CALLABLE_IMP(csThreadTest, Test1)
+THREADED_CALLABLE_IMPL(csThreadTest, Test1)
 {
   printf("Test 1 passed!\n");
 }
 
-THREADED_CALLABLE_IMP1(csThreadTest, Test2, bool b)
+THREADED_CALLABLE_IMPL1(csThreadTest, Test2, bool b)
 {
   if(!b)
   {
@@ -43,7 +45,7 @@ THREADED_CALLABLE_IMP1(csThreadTest, Test2, bool b)
   }
 }
 
-THREADED_CALLABLE_IMP2(csThreadTest, Test3, int i, float f)
+THREADED_CALLABLE_IMPL2(csThreadTest, Test3, int i, float f)
 {
   if(i == 3 && f == 0.1415f)
   {
@@ -55,7 +57,7 @@ THREADED_CALLABLE_IMP2(csThreadTest, Test3, int i, float f)
   }
 }
 
-THREADED_CALLABLE_IMP1(csThreadTest, Test4, csWeakRef<iThreadTest> myself)
+THREADED_CALLABLE_IMPL1(csThreadTest, Test4, csWeakRef<iThreadTest> myself)
 {
   iThreadTest* me = myself;
   if(me == this)
@@ -68,7 +70,7 @@ THREADED_CALLABLE_IMP1(csThreadTest, Test4, csWeakRef<iThreadTest> myself)
   }
 }
 
-THREADED_CALLABLE_IMP1(csThreadTest, Test5, csRef<Data> stuff)
+THREADED_CALLABLE_IMPL1(csThreadTest, Test5, csRef<Data> stuff)
 {
   bool passed = true;
 
@@ -81,7 +83,7 @@ THREADED_CALLABLE_IMP1(csThreadTest, Test5, csRef<Data> stuff)
   if(b && i == 42 && f == 3.14159f && reallyBig == 123456789012345)
   {
     int counter = 0;
-    for(int x=0; x<100; x++)
+    for(int x=0; x<10000000; x++)
     {
       passed &= (stuff->d[x] == x/10);
     }
@@ -109,8 +111,11 @@ THREADED_CALLABLE_IMP1(csThreadTest, Test5, csRef<Data> stuff)
 
 int main(int argc, char* argv[])
 {
+  iObjectRegistry* objReg = csInitializer::CreateObjectRegistry();
+  iThreadManager* tm = csInitializer::CreateThreadManager(objReg);
+
   csRef<iThreadTest> threadTest;
-  threadTest.AttachNew(new csThreadTest());
+  threadTest.AttachNew(new csThreadTest(objReg));
 
   threadTest->Test1();
   threadTest->Test2(false);
@@ -126,7 +131,7 @@ int main(int argc, char* argv[])
   dat->b = true;
   dat->reallyBig = 123456789012345; 
 
-  for(int i=0; i<100; i++)
+  for(int i=0; i<10000000; i++)
   {
     dat->d[i] = i/10;
   }

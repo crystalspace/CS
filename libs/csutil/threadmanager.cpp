@@ -17,32 +17,46 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/eventnames.h"
 #include "csutil/platform.h"
 #include "csutil/threadmanager.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 
-ThreadManager* ThreadManager::singletonPtr = NULL;
-
-ThreadManager::ThreadManager()
+namespace CS
 {
-  CS_ASSERT(singletonPtr == NULL);
-
-  uint count = CS::Platform::GetProcessorCount();
-
-  // If we can't detect, assume we have one.
-  if(count == 0)
+  namespace Utility
   {
-    count = 1;
-  }
+    csThreadManager::csThreadManager(iObjectRegistry* objReg) : scfImplementationType(this),
+      objectReg(objReg)
+    {
+      uint count = CS::Platform::GetProcessorCount();
 
-  // Have 'processor count' extra threads.
-  queue.AttachNew(new ThreadedJobQueue(count));
-}
+      // If we can't detect, assume we have one.
+      if(count == 0)
+      {
+        count = 1;
+      }
 
-ThreadManager* ThreadManager::GetThreadManager()
-{
-  if(singletonPtr == 0)
-  {
-    singletonPtr = new ThreadManager();
+      // Have 'processor count' extra threads.
+      threadQueue.AttachNew(new ThreadedJobQueue(count));
+      listQueue.AttachNew(new ListAccessQueue());
+
+      eventQueue = csQueryRegistry<iEventQueue>(objectReg);
+      if(eventQueue)
+      {
+        ProcessQueue = csevFrame(objReg);
+        eventQueue->RegisterListener(this, ProcessQueue);
+      }
+    }
+
+    bool csThreadManager::HandleEvent(iEvent& Event)
+    {
+      if(Event.Name == ProcessQueue)
+      {
+        Process();
+      }
+      return false;
+    }
   }
-  return singletonPtr;
 }

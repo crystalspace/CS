@@ -3117,6 +3117,7 @@ public:
   virtual iCollection* GetCollection () const { return collection; }
   virtual uint GetKeepFlags() const { return keepFlags; }
   virtual bool CurrentCollectionOnly() const { return searchCollectionOnly; }
+  virtual void AddToCollection(iObject* obj);
 };
 
 
@@ -3206,6 +3207,14 @@ iLight* EngineLoaderContext::FindLight(const char *name)
       return light;
   }
   return 0;
+}
+
+void EngineLoaderContext::AddToCollection(iObject* obj)
+{
+  if(collection)
+  {
+    collection->Add(obj);
+  }
 }
 
 //------------------------------------------------------------------------

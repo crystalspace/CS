@@ -35,6 +35,7 @@
 #include "csutil/plugmgr.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/scfstrset.h"
+#include "csutil/threadmanager.h"
 #include "csutil/verbosity.h"
 #include "csutil/virtclk.h"
 
@@ -114,12 +115,13 @@ iObjectRegistry* csInitializer::CreateEnvironment (
     {
       if (CreatePluginManager(r) &&
           CreateEventQueue(r) &&
+          CreateThreadManager(r) &&
           CreateVirtualClock(r) &&
           CreateCommandLineParser(r, argc, argv) &&
           CreateVerbosityManager(r) &&
           CreateConfigManager(r) &&
           CreateInputDrivers(r) &&
-	  CreateStringSet (r) &&
+	        CreateStringSet (r) &&
           csPlatformStartup(r))
         reg = r;
       else
@@ -159,6 +161,13 @@ iEventQueue* csInitializer::CreateEventQueue (iObjectRegistry* r)
   csRef<iEventQueue> q = csPtr<iEventQueue> (new csEventQueue (r));
   r->Register (q, "iEventQueue");
   return q;
+}
+
+iThreadManager* csInitializer::CreateThreadManager (iObjectRegistry* r)
+{
+  csRef<iThreadManager> threadmgr = csPtr<iThreadManager> (new CS::Utility::csThreadManager (r));
+  r->Register (threadmgr, "iThreadManager");
+  return threadmgr;
 }
 
 bool csInitializer::CreateInputDrivers (iObjectRegistry* r)

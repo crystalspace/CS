@@ -254,6 +254,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return result;
   }
 
+  void csLoaderContext::AddToCollection(iObject* obj)
+  {
+    if(collection)
+    {
+      collection->Add(obj);
+    }
+  }
+
   void csLoaderContext::ReportNotify (const char* description, ...)
   {
     va_list arg;

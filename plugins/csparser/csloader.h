@@ -131,6 +131,7 @@ public:
   virtual iCollection* GetCollection() const { return collection; }
   virtual bool CurrentCollectionOnly() const { return searchCollectionOnly; }
   virtual uint GetKeepFlags() const { return keepFlags; }
+  virtual void AddToCollection(iObject* obj);
 };
 
 
