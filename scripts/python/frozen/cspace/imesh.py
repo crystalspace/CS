@@ -1864,6 +1864,9 @@ class iTerrainCellCollisionProperties(core.iBase):
     def SetCollidable(*args): return _imesh.iTerrainCellCollisionProperties_SetCollidable(*args)
     def SetParameter(*args): return _imesh.iTerrainCellCollisionProperties_SetParameter(*args)
     def Clone(*args): return _imesh.iTerrainCellCollisionProperties_Clone(*args)
+    def GetParameterCount(*args): return _imesh.iTerrainCellCollisionProperties_GetParameterCount(*args)
+    def GetParameterName(*args): return _imesh.iTerrainCellCollisionProperties_GetParameterName(*args)
+    def GetParameterValue(*args): return _imesh.iTerrainCellCollisionProperties_GetParameterValue(*args)
     scfGetVersion = staticmethod(_imesh.iTerrainCellCollisionProperties_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainCellCollisionProperties
     __del__ = lambda self : None;
@@ -1879,6 +1882,9 @@ class iTerrainCellRenderProperties(ivideo.iShaderVariableContext):
     def SetVisible(*args): return _imesh.iTerrainCellRenderProperties_SetVisible(*args)
     def SetParameter(*args): return _imesh.iTerrainCellRenderProperties_SetParameter(*args)
     def Clone(*args): return _imesh.iTerrainCellRenderProperties_Clone(*args)
+    def GetParameterCount(*args): return _imesh.iTerrainCellRenderProperties_GetParameterCount(*args)
+    def GetParameterName(*args): return _imesh.iTerrainCellRenderProperties_GetParameterName(*args)
+    def GetParameterValue(*args): return _imesh.iTerrainCellRenderProperties_GetParameterValue(*args)
     scfGetVersion = staticmethod(_imesh.iTerrainCellRenderProperties_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainCellRenderProperties
     __del__ = lambda self : None;
@@ -1896,6 +1902,9 @@ class iTerrainCellFeederProperties(core.iBase):
     def AddAlphaMap(*args): return _imesh.iTerrainCellFeederProperties_AddAlphaMap(*args)
     def SetParameter(*args): return _imesh.iTerrainCellFeederProperties_SetParameter(*args)
     def Clone(*args): return _imesh.iTerrainCellFeederProperties_Clone(*args)
+    def GetParameterCount(*args): return _imesh.iTerrainCellFeederProperties_GetParameterCount(*args)
+    def GetParameterName(*args): return _imesh.iTerrainCellFeederProperties_GetParameterName(*args)
+    def GetParameterValue(*args): return _imesh.iTerrainCellFeederProperties_GetParameterValue(*args)
     scfGetVersion = staticmethod(_imesh.iTerrainCellFeederProperties_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainCellFeederProperties
     __del__ = lambda self : None;
@@ -2071,6 +2080,7 @@ class iTerrainCell(core.iBase):
     def SetCollisionData(*args): return _imesh.iTerrainCell_SetCollisionData(*args)
     def GetFeederData(*args): return _imesh.iTerrainCell_GetFeederData(*args)
     def SetFeederData(*args): return _imesh.iTerrainCell_SetFeederData(*args)
+    def SetName(*args): return _imesh.iTerrainCell_SetName(*args)
     scfGetVersion = staticmethod(_imesh.iTerrainCell_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainCell
     __del__ = lambda self : None;
@@ -2086,6 +2096,23 @@ class iTerrainFactoryCell(core.iBase):
     def GetCollisionProperties(*args): return _imesh.iTerrainFactoryCell_GetCollisionProperties(*args)
     def GetFeederProperties(*args): return _imesh.iTerrainFactoryCell_GetFeederProperties(*args)
     def SetBaseMaterial(*args): return _imesh.iTerrainFactoryCell_SetBaseMaterial(*args)
+    def GetName(*args): return _imesh.iTerrainFactoryCell_GetName(*args)
+    def SetName(*args): return _imesh.iTerrainFactoryCell_SetName(*args)
+    def GetGridWidth(*args): return _imesh.iTerrainFactoryCell_GetGridWidth(*args)
+    def GetGridHeight(*args): return _imesh.iTerrainFactoryCell_GetGridHeight(*args)
+    def GetPosition(*args): return _imesh.iTerrainFactoryCell_GetPosition(*args)
+    def GetSize(*args): return _imesh.iTerrainFactoryCell_GetSize(*args)
+    def GetMaterialMapWidth(*args): return _imesh.iTerrainFactoryCell_GetMaterialMapWidth(*args)
+    def GetMaterialMapHeight(*args): return _imesh.iTerrainFactoryCell_GetMaterialMapHeight(*args)
+    def GetBaseMaterial(*args): return _imesh.iTerrainFactoryCell_GetBaseMaterial(*args)
+    def GetMaterialPersistent(*args): return _imesh.iTerrainFactoryCell_GetMaterialPersistent(*args)
+    def SetGridWidth(*args): return _imesh.iTerrainFactoryCell_SetGridWidth(*args)
+    def SetGridHeight(*args): return _imesh.iTerrainFactoryCell_SetGridHeight(*args)
+    def SetPosition(*args): return _imesh.iTerrainFactoryCell_SetPosition(*args)
+    def SetSize(*args): return _imesh.iTerrainFactoryCell_SetSize(*args)
+    def SetMaterialMapWidth(*args): return _imesh.iTerrainFactoryCell_SetMaterialMapWidth(*args)
+    def SetMaterialMapHeight(*args): return _imesh.iTerrainFactoryCell_SetMaterialMapHeight(*args)
+    def SetMaterialPersistent(*args): return _imesh.iTerrainFactoryCell_SetMaterialPersistent(*args)
     scfGetVersion = staticmethod(_imesh.iTerrainFactoryCell_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainFactoryCell
     __del__ = lambda self : None;
@@ -2100,10 +2127,17 @@ class iTerrainFactory(core.iBase):
     def SetRenderer(*args): return _imesh.iTerrainFactory_SetRenderer(*args)
     def SetCollider(*args): return _imesh.iTerrainFactory_SetCollider(*args)
     def SetFeeder(*args): return _imesh.iTerrainFactory_SetFeeder(*args)
-    def AddCell(*args): return _imesh.iTerrainFactory_AddCell(*args)
     def SetMaxLoadedCells(*args): return _imesh.iTerrainFactory_SetMaxLoadedCells(*args)
     def SetVirtualViewDistance(*args): return _imesh.iTerrainFactory_SetVirtualViewDistance(*args)
     def SetAutoPreLoad(*args): return _imesh.iTerrainFactory_SetAutoPreLoad(*args)
+    def GetRenderer(*args): return _imesh.iTerrainFactory_GetRenderer(*args)
+    def GetCollider(*args): return _imesh.iTerrainFactory_GetCollider(*args)
+    def GetFeeder(*args): return _imesh.iTerrainFactory_GetFeeder(*args)
+    def GetMaxLoadedCells(*args): return _imesh.iTerrainFactory_GetMaxLoadedCells(*args)
+    def GetCellCount(*args): return _imesh.iTerrainFactory_GetCellCount(*args)
+    def GetDefaultCell(*args): return _imesh.iTerrainFactory_GetDefaultCell(*args)
+    def AddCell(*args): return _imesh.iTerrainFactory_AddCell(*args)
+    def GetCell(*args): return _imesh.iTerrainFactory_GetCell(*args)
     scfGetVersion = staticmethod(_imesh.iTerrainFactory_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainFactory
     __del__ = lambda self : None;
