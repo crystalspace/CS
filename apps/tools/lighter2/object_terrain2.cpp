@@ -308,6 +308,33 @@ namespace lighter
 	  }
 	}
       }
+      LitColorsPDHash::GlobalIterator pdIter (litColorsPD[i].GetIterator ());
+      while (pdIter.HasNext ())
+      {
+	csPtrKey<Light> light;
+	LitColorArray& colors = pdIter.Next (light);
+  
+	csColor* myColor = colors.GetArray();
+	for (size_t l = 0; l < lmDims.GetSize(); l++)
+	{
+	  const LMDimensions& lmDim = lmDims[l];
+	  uint lmID = lightmapIDs[l];
+  
+	  Lightmap* normalLM = scene->GetLightmap (
+	    lmID, i, light);
+  
+	  ScopedSwapLock<Lightmap> lightLock (*normalLM);
+  
+	  csColor* lmColor = normalLM->GetData();
+	  for (int y = 0; y < lmDim.h; y++)
+	  {
+	    for (int x = 0; x < lmDim.w; x++)
+	    {
+	      *lmColor++ = *myColor++;
+	    }
+	  }
+	}
+      }
     }
   }
 
