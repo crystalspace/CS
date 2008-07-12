@@ -299,6 +299,7 @@ rule LinkStaticPlugins
       : $(package) : app ] ;
     ExtraObjects $(target) : $(appglue) : inheritcflags ;
     LinkWith $(target) : $(plugin_lib_name) ;
+    LFlags $(target) : $(target_lflags) ;
   }
   else
   {
