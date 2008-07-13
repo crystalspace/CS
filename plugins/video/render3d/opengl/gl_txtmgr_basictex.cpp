@@ -775,6 +775,7 @@ void csGLBasicTextureHandle::ApplyBlitBuffer (uint8* buf)
   {
     ApplyBlitBufferGeneric (buf);
   }
+  RegenerateMipmaps();
 }
 
 iTextureHandle::BlitBufferNature csGLBasicTextureHandle::GetBufferNature (uint8* buf)

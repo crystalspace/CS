@@ -17393,6 +17393,9 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetParameterCount = *cspacec::iTerrainCellFeederProperties_GetParameterCount;
 *GetParameterName = *cspacec::iTerrainCellFeederProperties_GetParameterName;
 *GetParameterValue = *cspacec::iTerrainCellFeederProperties_GetParameterValue;
+*GetAlphaMapCount = *cspacec::iTerrainCellFeederProperties_GetAlphaMapCount;
+*GetAlphaMapMaterial = *cspacec::iTerrainCellFeederProperties_GetAlphaMapMaterial;
+*GetAlphaMapSource = *cspacec::iTerrainCellFeederProperties_GetAlphaMapSource;
 *scfGetVersion = *cspacec::iTerrainCellFeederProperties_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

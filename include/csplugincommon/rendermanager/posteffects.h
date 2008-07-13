@@ -168,7 +168,6 @@ namespace RenderManager
         svContext.AttachNew (new csShaderVariableContext);
       }
       bool IsInput (const Layer* layer) const;
-      int GetOutTextureNum () const { return outTextureNum; }
     public:
       /// Get the shader variables for this layer.
       iShaderVariableContext* GetSVContext() { return svContext; }
@@ -184,6 +183,8 @@ namespace RenderManager
       void SetShader (iShader* shader) { effectShader = shader; }
       /// Set layer shader
       iShader* GetShader () const { return effectShader; }
+      /// @@@ Document me?
+      int GetOutTextureNum () const { return outTextureNum; }
     };
   
     PostEffectManager ();

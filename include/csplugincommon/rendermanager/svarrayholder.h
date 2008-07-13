@@ -19,6 +19,9 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_SVARRAYHOLDER_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_SVARRAYHOLDER_H__
 
+/**\file
+ * Holder for shader variable arrays.
+ */
 class csShaderVariable;
 
 namespace CS
@@ -27,7 +30,7 @@ namespace RenderManager
 {
 
   /**
-   * Holder for SV arrays
+   * Holder for SV arrays.
    *
    * Keeps a continuous array of pointers to SVs kept in three layers
    * - Layers, where each layer is a rendering layer
@@ -40,6 +43,10 @@ namespace RenderManager
   class SVArrayHolder
   {
   public:
+    /**
+     * Construct. Calls Setup if \a numLayers, \a numSVNames and \a numSets are
+     * provided.
+     */
     SVArrayHolder (size_t numLayers = 1, size_t numSVNames = 0, size_t numSets = 0)
       : numLayers (numLayers), numSVNames (numSVNames), numSets (numSets), svArray (0),
         memAllocSetUp (false)
@@ -89,7 +96,8 @@ namespace RenderManager
     }
 
     /**
-     * Initialize storage for SVs
+     * Initialize storage for SVs, given a number of layers, sets and SV names,
+     * Note that additional layers can be inserted later, sets and SVs cannot.
      */
     void Setup (size_t numLayers, size_t numSVNames, size_t numSets)
     {
@@ -99,9 +107,13 @@ namespace RenderManager
 
       const size_t sliceSVs = numSVNames*numSets;
       const size_t sliceSize = sizeof(csShaderVariable*)*sliceSVs;
+#ifndef DOXYGEN_RUN
 #include "csutil/custom_new_disable.h"
+#endif
       new (&memAlloc) csMemoryPool (sliceSize * 4);
+#ifndef DOXYGEN_RUN
 #include "csutil/custom_new_enable.h"
+#endif
       memAllocSetUp = true;
 
       csShaderVariable** superSlice = reinterpret_cast<csShaderVariable**> (
@@ -179,6 +191,9 @@ namespace RenderManager
       memcpy (svArray[to], svArray[from], sizeof(csShaderVariable*)*layerSize);
     }
 
+    /**
+     * Insert a layer after \a after, copying values from \a replicateFrom.
+     */
     void InsertLayer (size_t after, size_t replicateFrom = 0)
     {
       const size_t sliceSize = sizeof(csShaderVariable*)*numSVNames*numSets;
@@ -192,11 +207,13 @@ namespace RenderManager
       numLayers++;
     }
 
+    /// Get the number of shader variables stored per layer.
     size_t GetNumSVNames () const
     {
       return numSVNames;
     }
 
+    /// Get the number of layers.
     size_t GetNumLayers () const
     {
       return numLayers;

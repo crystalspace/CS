@@ -30,6 +30,10 @@
 
 namespace lighter
 {
+  csPtr<iRenderBuffer> WrapBuffer (iRenderBuffer* buffer, 
+                                   const char* suffix,
+                                   const char* basename);
+
   class LightmapUVFactoryLayouter;
   class LightmapUVObjectLayouter;
   class Object;

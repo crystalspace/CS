@@ -499,7 +499,7 @@ namespace RenderManager
 	  Applied limitations:
 	  - Sublights are not considered for the 'maximum lights' limit.
 	  - Sublights *are* considered for the 'maximum passes' limit.
-	  - If not all sublights of a light can't be drawn in the limits,
+	  - If not all sublights of a light can be drawn in the limits,
 	    skip the light.
 	 */
 	  
@@ -532,7 +532,6 @@ namespace RenderManager
 	    firstLight += realNum;
 	    remainingLights -= realNum;
 	  }
-	  sortedLights.PutInFront (renderLights + firstLight, remainingLights);
 	  remainingLights = firstLight;
 	}
 	
@@ -592,6 +591,7 @@ namespace RenderManager
 	  totalLayers += thisPassLayers * shadows.GetLightLayerSpread();
 	}
 	layers.Ensure (layer, totalLayers, node);
+	sortedLights.PutInFront (renderLights + firstLight, remainingLights);
 	
 	csShaderVariableStack* localStacks =
 	  new csShaderVariableStack[shadows.GetLightLayerSpread()];

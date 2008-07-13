@@ -106,7 +106,8 @@ namespace lighter
       { }
 
       IntDArray* FindSubmesh (size_t submeshIndex);
-      void CommitSubmeshes (iGeneralFactoryState* genFact);
+      void CommitSubmeshes (iGeneralFactoryState* genFact,
+        const char* factFN);
       void CommitSubmeshNames ();
     protected:
       ObjectFactory_Genmesh* factory;

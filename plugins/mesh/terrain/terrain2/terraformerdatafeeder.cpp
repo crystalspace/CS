@@ -137,6 +137,13 @@ struct TerraFormerFeederProperties : public
     return 0;
   }
 
+  size_t GetAlphaMapCount() { return 0; }
+
+  const char* GetAlphaMapMaterial (size_t index) { return 0; }
+
+  const char* GetAlphaMapSource (size_t index) { return 0; }
+  const char* GetAlphaMapSource (const char* material) { return 0; }
+  
   csPtr<iTerrainCellFeederProperties> Clone ()
   {
     return csPtr<iTerrainCellFeederProperties> (

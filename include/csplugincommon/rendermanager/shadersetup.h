@@ -19,6 +19,10 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_SHADERSETUP_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_SHADERSETUP_H__
 
+/**\file
+ * Shader selection, shader ticket setup
+ */
+
 #include "csutil/compositefunctor.h"
 
 #include "csplugincommon/rendermanager/rendertree.h"
@@ -37,6 +41,8 @@ namespace RenderManager
    * Default shader setup functor.
    * Setup per mesh & layer shader arrays for each node.
    * Assumes that the contextLocalId in each mesh is set.
+   *
+   * Typically used through SetupStandardShader().
    */
   template<typename RenderTree, typename LayerConfigType>
   class ShaderSetup
@@ -92,6 +98,9 @@ namespace RenderManager
   /**
    * Default shader ticket setup.
    * Assumes that the contextLocalId in each mesh is set.
+   *
+   * Typically used through SetupStandardTicket().
+   * Must be done after shader setup (usually SetupStandardShader()).
    */
   template<typename RenderTree, typename LayerConfigType>
   class TicketSetup
@@ -178,7 +187,7 @@ namespace RenderManager
 
   /**
    * Setup the shader ticket and shader Vs.
-   * Must be done after shader (usually SetupStandardShader()).
+   * Must be done after shader setup (usually SetupStandardShader()).
    */
   template<typename ContextNodeType, typename LayerConfigType>
   void SetupStandardTicket (ContextNodeType& context, 

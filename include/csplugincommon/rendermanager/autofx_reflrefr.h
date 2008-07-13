@@ -543,12 +543,12 @@ namespace CS
 	    if (usesReflTex)
 	    {
 	      tex = 
-	        persist.texCache.QueryUnusedTexture (txt_w_refl, txt_h_refl, 0);
+	        persist.texCache.QueryUnusedTexture (txt_w_refl, txt_h_refl);
 	    }
 	    if (usesReflDepthTex)
 	    {
 	      texDepth = 
-	        persist.texCacheDepth.QueryUnusedTexture (txt_w_refl, txt_h_refl, 0);
+	        persist.texCacheDepth.QueryUnusedTexture (txt_w_refl, txt_h_refl);
 	    }
 	    
 	    // Set up context for reflection, clipped to plane
@@ -627,12 +627,12 @@ namespace CS
 	    if (usesRefrTex)
 	    {
 	      tex = 
-	        persist.texCache.QueryUnusedTexture (txt_w_refr, txt_h_refr, 0);
+	        persist.texCache.QueryUnusedTexture (txt_w_refr, txt_h_refr);
 	    }
 	    if (usesRefrDepthTex)
 	    {
 	      texDepth = 
-	        persist.texCacheDepth.QueryUnusedTexture (txt_w_refr, txt_h_refr, 0);
+	        persist.texCacheDepth.QueryUnusedTexture (txt_w_refr, txt_h_refr);
 	    }
 	    
 	    // Set up context for reflection, clipped to plane

@@ -19,6 +19,10 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_STANDARDTREETRAITS_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_STANDARDTREETRAITS_H__
 
+/**\file
+ * Standard render tree traits
+ */
+
 #include "iengine/mesh.h"
 #include "ivaria/view.h"
 #include "ivideo/rendermesh.h"
@@ -35,40 +39,52 @@ namespace RenderManager
 {
   /**
    * Standard traits for customizing the render tree class.
+   *
+   * Render tree traits specify additional data stored with
+   * meshes, contexts and others in a render tree. 
+   * To provide custom traits, create a class and either provide a new, custom
+   * type for a trait or typedef in the respective type from
+   * RenderTreeStandardTraits.
    */
   class RenderTreeStandardTraits
   {
   public:
-    //-- Standard types
-
-    // Any extra data that should be defined for each mesh node
+    /**\name Standard types
+     * @{ */
+    /// Any extra data that should be defined for each mesh node
     struct MeshNodeExtraDataType
     {
       int   priority;
     };
 
-    // Any extra data that should be defined for each context node
+    /// Any extra data that should be defined for each context node
     struct ContextNodeExtraDataType
-    {     
+    {
     };
     
-    // Any extra data per mesh in a single mesh 
+    /// Any extra data per mesh in a single mesh 
     struct MeshExtraDataType
-    {      
+    {
     };
 
-    // The data type to use as node key for mesh nodes
+    /**
+     * The data type to use as node key for mesh nodes.
+     * The type must be sortable with csComparator<>, so either operator<
+     * must be implemented or a csComparator<> specialization provided.
+     */
     struct MeshNodeKeyType
     {
       uint8     priority    : 5;
       uint8     isPortal    : 1;
       uint8     meshSorting : 2;
     };
+    /** @} */
 
     // Enable/disables
 
-    //-- Standard functions
-    // Given a iMeshWrapper and a csRenderMesh, get the correct mesh node index
+    /**\name Standard functions
+     * @{ */
+    /// Given a iMeshWrapper and a csRenderMesh, get the correct mesh node index
     static CS_FORCEINLINE 
     MeshNodeKeyType GetMeshNodeKey (CS::Graphics::RenderPriority defaultPriority, 
 				    const csRenderMesh& rendermesh)
@@ -84,7 +100,7 @@ namespace RenderManager
       return result;
     }
 
-    // Setup a new mesh node from the first iMeshWrapper and csRenderMesh
+    /// Setup a new mesh node from the first iMeshWrapper and csRenderMesh
     template<typename T>
     static CS_FORCEINLINE_TEMPLATEMETHOD 
     void SetupMeshNode (T& meshNode, CS::Graphics::RenderPriority defaultPriority, 
@@ -95,6 +111,7 @@ namespace RenderManager
       else
         meshNode.priority = defaultPriority;
     }
+    /** @} */
 
   private:
   };
