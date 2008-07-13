@@ -41,6 +41,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2Loader)
     bool SaveRenderProperties (iDocumentNode* node,
       iTerrainCellRenderProperties* props,
       iTerrainCellRenderProperties* dfltProp = 0);
+
+    bool SaveFeederProperties (iDocumentNode* node,
+      iTerrainCellFeederProperties* props,
+      iTerrainCellFeederProperties* dfltProp = 0);
   };
 
   class Terrain2FactorySaver :
