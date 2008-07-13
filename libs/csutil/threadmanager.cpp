@@ -38,8 +38,8 @@ namespace CS
         count = 1;
       }
 
-      // Have 'processor count' extra threads.
-      threadQueue.AttachNew(new ThreadedJobQueue(count));
+      // Have 'processor count+1' extra threads.
+      threadQueue.AttachNew(new ThreadedJobQueue(count+1));
       listQueue.AttachNew(new ListAccessQueue());
 
       eventQueue = csQueryRegistry<iEventQueue>(objectReg);

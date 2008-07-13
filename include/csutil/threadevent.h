@@ -162,11 +162,10 @@ private:
 class TEventMemPool : public csMemoryPool
 {
 public:
-  template<typename T>
-  void const* Store(T* p)
+
+  void const* Store(char const* p)
   {
-    T* ptr = new (this) T(p);
-    return (void const*)ptr;
+    return (void const*)csMemoryPool::Store(p);
   }
 
   template<typename T>

@@ -142,7 +142,7 @@ struct csLoadResult : public csRefCount
   * Note! In case of a light call DecRef() after you added it to a sector.
   * Note! Use scfQueryInterface on 'result' to detect what type was loaded.
   */
-  iBase* result;
+  csRef<iBase> result;
 };
 
 /**
@@ -151,6 +151,11 @@ struct csLoadResult : public csRefCount
 struct iThreadedLoader : public virtual iBase
 {
   SCF_INTERFACE (iThreadedLoader, 1, 0, 0);
+
+  virtual void LoadNode(csRef<iDocumentNode> node, csRef<csLoadResult> loadResult = 0, 
+    csRef<iCollection> collection = 0, bool searchCollectionOnly = true, bool checkDupes = false,
+    csRef<iStreamSource> ssource = 0, const char* override_name = 0,
+    csRef<iMissingLoaderData> missingdata = 0, uint keepFlags = KEEP_ALL, bool do_verbose = false) = 0;
 };
 
 /**
