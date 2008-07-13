@@ -685,7 +685,7 @@ namespace lighter
           csString().Format ("c%d", b));
         staticColorsBuf->SetData (litColors[b].GetArray());
 
-        if (litColorsPD[0].GetSize() > 0)
+        if (litColorsPD[b].GetSize() > 0)
         {
           csRef<iDocumentNode> bufferChild = 
             animcontrolChild->CreateNodeBefore (CS_NODE_ELEMENT, 0);
@@ -701,7 +701,7 @@ namespace lighter
           }
 
           uint n = 0;
-          LitColorsPDHash::GlobalIterator pdIter (litColorsPD[0].GetIterator ());
+          LitColorsPDHash::GlobalIterator pdIter (litColorsPD[b].GetIterator ());
           while (pdIter.HasNext ())
           {
             csPtrKey<Light> light;

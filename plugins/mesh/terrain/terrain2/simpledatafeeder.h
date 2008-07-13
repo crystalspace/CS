@@ -49,6 +49,15 @@ struct csTerrainSimpleDataFeederProperties
   virtual const char* GetParameterValue (const char* name);
   virtual csPtr<iTerrainCellFeederProperties> Clone ();
 
+  size_t GetAlphaMapCount() { return alphaMaps.GetSize(); }
+
+  const char* GetAlphaMapMaterial (size_t index)
+  { return alphaMaps[index].material; }
+
+  const char* GetAlphaMapSource (size_t index)
+  { return alphaMaps[index].alphaSource; }
+  const char* GetAlphaMapSource (const char* material);
+  
   csString heightmapSource, heightmapFormat, materialmapSource;
 
   struct AlphaPair
