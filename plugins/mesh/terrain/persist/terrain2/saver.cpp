@@ -117,6 +117,57 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2Loader)
     return result;
   }
 
+  bool Terrain2SaverCommon::SaveFeederProperties (iDocumentNode* node,
+    iTerrainCellFeederProperties* props,
+    iTerrainCellFeederProperties* dfltProp)
+  {
+    bool result = SaveProperties (node, props, dfltProp);
+
+    size_t numAlphaMaps = props->GetAlphaMapCount ();
+    if (numAlphaMaps == 0) return result;
+
+    if (dfltProp != 0)
+    {
+      for (size_t a = 0; a < numAlphaMaps; a++)
+      {
+        const char* mat = props->GetAlphaMapMaterial (a);
+        if (mat == 0) continue;
+        const char* src = props->GetAlphaMapSource (a);
+        if (src == 0) continue;
+        const char* dfltSrc = dfltProp->GetAlphaMapSource (mat);
+        
+	if ((dfltSrc != 0)  && (strcmp (src, dfltSrc) == 0)) continue;
+	
+        csRef<iDocumentNode> alphaNode = 
+          node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        alphaNode->SetValue ("alphamap");
+	alphaNode->SetAttribute ("material", mat);
+	alphaNode->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValue (src);
+	
+        result = true;
+      }
+    }
+    else
+    {
+      for (size_t a = 0; a < numAlphaMaps; a++)
+      {
+        const char* mat = props->GetAlphaMapMaterial (a);
+        if (mat == 0) continue;
+        const char* src = props->GetAlphaMapSource (a);
+        if (src == 0) continue;
+        
+        csRef<iDocumentNode> alphaNode = 
+          node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        alphaNode->SetValue ("alphamap");
+	alphaNode->SetAttribute ("material", mat);
+	alphaNode->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValue (src);
+	
+        result = true;
+      }
+    }
+    return result;
+  }
+
   //-------------------------------------------------------------------------
 
   SCF_IMPLEMENT_FACTORY (Terrain2FactorySaver)
@@ -258,8 +309,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2Loader)
 	  csRef<iDocumentNode> node = 
 	    defaultNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
 	  node->SetValue ("feederproperties");
-	  if (!SaveProperties (node, defaultCell->GetFeederProperties(),
-	      (iTerrainCellFeederProperties*)defFeedProp))
+	  if (!SaveFeederProperties (node, defaultCell->GetFeederProperties(),
+	      defFeedProp))
 	    defaultNode->RemoveNode (node);
 	}
 
@@ -355,7 +406,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2Loader)
 	  csRef<iDocumentNode> node = 
 	    cellNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
 	  node->SetValue ("feederproperties");
-	  if (!SaveProperties (node, cell->GetFeederProperties(),
+	  if (!SaveFeederProperties (node, cell->GetFeederProperties(),
 	      defaultCell->GetFeederProperties()))
 	    cellNode->RemoveNode (node);
 	}
@@ -421,12 +472,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2Loader)
 	}    
       }
 
+      const csTerrainMaterialPalette& matpal = tmesh->GetMaterialPalette();
+      
+      if (matpal.GetSize() > 0)
       {
         csRef<iDocumentNode> matpalNode = 
           paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
         matpalNode->SetValue ("materialpalette");
 
-	const csTerrainMaterialPalette& matpal = tmesh->GetMaterialPalette();
 	for (size_t i = 0; i < matpal.GetSize(); i++)
 	{
 	  csRef<iDocumentNode> node = 

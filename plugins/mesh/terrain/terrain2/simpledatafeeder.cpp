@@ -265,6 +265,20 @@ csPtr<iTerrainCellFeederProperties> csTerrainSimpleDataFeederProperties::Clone (
 {
   return csPtr<iTerrainCellFeederProperties> (new csTerrainSimpleDataFeederProperties (*this));
 }
+  
+const char* csTerrainSimpleDataFeederProperties::GetAlphaMapSource (
+  const char* material)
+{
+  if (material == 0) return 0;
+  for (size_t i = 0; i < alphaMaps.GetSize (); ++i)
+  {
+    if (alphaMaps[i].material == material)
+    {
+      return alphaMaps[i].alphaSource;
+    }
+  }
+  return 0;
+}
 
 }
 CS_PLUGIN_NAMESPACE_END(Terrain2)

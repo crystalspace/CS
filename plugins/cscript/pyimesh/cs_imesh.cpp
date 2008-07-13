@@ -39306,6 +39306,169 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iTerrainCellFeederProperties_GetAlphaMapCount(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTerrainCellFeederProperties *arg1 = (iTerrainCellFeederProperties *) 0 ;
+  size_t result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellFeederProperties_GetAlphaMapCount",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellFeederProperties, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCellFeederProperties_GetAlphaMapCount" "', argument " "1"" of type '" "iTerrainCellFeederProperties *""'"); 
+  }
+  arg1 = reinterpret_cast< iTerrainCellFeederProperties * >(argp1);
+  result = (arg1)->GetAlphaMapCount();
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTerrainCellFeederProperties_GetAlphaMapMaterial(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTerrainCellFeederProperties *arg1 = (iTerrainCellFeederProperties *) 0 ;
+  size_t arg2 ;
+  char *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellFeederProperties_GetAlphaMapMaterial",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellFeederProperties, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCellFeederProperties_GetAlphaMapMaterial" "', argument " "1"" of type '" "iTerrainCellFeederProperties *""'"); 
+  }
+  arg1 = reinterpret_cast< iTerrainCellFeederProperties * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iTerrainCellFeederProperties_GetAlphaMapMaterial" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  result = (char *)(arg1)->GetAlphaMapMaterial(arg2);
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTerrainCellFeederProperties_GetAlphaMapSource__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTerrainCellFeederProperties *arg1 = (iTerrainCellFeederProperties *) 0 ;
+  size_t arg2 ;
+  char *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellFeederProperties_GetAlphaMapSource",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellFeederProperties, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCellFeederProperties_GetAlphaMapSource" "', argument " "1"" of type '" "iTerrainCellFeederProperties *""'"); 
+  }
+  arg1 = reinterpret_cast< iTerrainCellFeederProperties * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iTerrainCellFeederProperties_GetAlphaMapSource" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  result = (char *)(arg1)->GetAlphaMapSource(arg2);
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTerrainCellFeederProperties_GetAlphaMapSource__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTerrainCellFeederProperties *arg1 = (iTerrainCellFeederProperties *) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellFeederProperties_GetAlphaMapSource",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellFeederProperties, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCellFeederProperties_GetAlphaMapSource" "', argument " "1"" of type '" "iTerrainCellFeederProperties *""'"); 
+  }
+  arg1 = reinterpret_cast< iTerrainCellFeederProperties * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iTerrainCellFeederProperties_GetAlphaMapSource" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  result = (char *)(arg1)->GetAlphaMapSource((char const *)arg2);
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTerrainCellFeederProperties_GetAlphaMapSource(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[3];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 2); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iTerrainCellFeederProperties, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_size_t(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        return _wrap_iTerrainCellFeederProperties_GetAlphaMapSource__SWIG_0(self, args);
+      }
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iTerrainCellFeederProperties, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_iTerrainCellFeederProperties_GetAlphaMapSource__SWIG_1(self, args);
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iTerrainCellFeederProperties_GetAlphaMapSource'.\n  Possible C/C++ prototypes are:\n    GetAlphaMapSource(size_t)\n    GetAlphaMapSource(char const *)\n");
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iTerrainCellFeederProperties_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -50868,6 +51031,9 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iTerrainCellFeederProperties_GetParameterCount", _wrap_iTerrainCellFeederProperties_GetParameterCount, METH_VARARGS, NULL},
 	 { (char *)"iTerrainCellFeederProperties_GetParameterName", _wrap_iTerrainCellFeederProperties_GetParameterName, METH_VARARGS, NULL},
 	 { (char *)"iTerrainCellFeederProperties_GetParameterValue", _wrap_iTerrainCellFeederProperties_GetParameterValue, METH_VARARGS, NULL},
+	 { (char *)"iTerrainCellFeederProperties_GetAlphaMapCount", _wrap_iTerrainCellFeederProperties_GetAlphaMapCount, METH_VARARGS, NULL},
+	 { (char *)"iTerrainCellFeederProperties_GetAlphaMapMaterial", _wrap_iTerrainCellFeederProperties_GetAlphaMapMaterial, METH_VARARGS, NULL},
+	 { (char *)"iTerrainCellFeederProperties_GetAlphaMapSource", _wrap_iTerrainCellFeederProperties_GetAlphaMapSource, METH_VARARGS, NULL},
 	 { (char *)"iTerrainCellFeederProperties_scfGetVersion", _wrap_iTerrainCellFeederProperties_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iTerrainCellFeederProperties", _wrap_delete_iTerrainCellFeederProperties, METH_VARARGS, NULL},
 	 { (char *)"iTerrainCellFeederProperties_swigregister", iTerrainCellFeederProperties_swigregister, METH_VARARGS, NULL},

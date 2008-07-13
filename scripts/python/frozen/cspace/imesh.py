@@ -1905,6 +1905,9 @@ class iTerrainCellFeederProperties(core.iBase):
     def GetParameterCount(*args): return _imesh.iTerrainCellFeederProperties_GetParameterCount(*args)
     def GetParameterName(*args): return _imesh.iTerrainCellFeederProperties_GetParameterName(*args)
     def GetParameterValue(*args): return _imesh.iTerrainCellFeederProperties_GetParameterValue(*args)
+    def GetAlphaMapCount(*args): return _imesh.iTerrainCellFeederProperties_GetAlphaMapCount(*args)
+    def GetAlphaMapMaterial(*args): return _imesh.iTerrainCellFeederProperties_GetAlphaMapMaterial(*args)
+    def GetAlphaMapSource(*args): return _imesh.iTerrainCellFeederProperties_GetAlphaMapSource(*args)
     scfGetVersion = staticmethod(_imesh.iTerrainCellFeederProperties_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainCellFeederProperties
     __del__ = lambda self : None;
