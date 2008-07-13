@@ -183,15 +183,6 @@ iTerrainFactoryCell* csTerrainFactory::AddCell()
 {
   csRef<csTerrainFactoryCell> cell;
 
-  csRef<iTerrainCellRenderProperties> renderProp =
-    renderer ? renderer->CreateProperties () : 0;
-
-  csRef<iTerrainCellCollisionProperties> collProp =
-    collider ? collider->CreateProperties () : 0;
-
-  csRef<iTerrainCellFeederProperties> feederProp =
-    dataFeeder ? dataFeeder->CreateProperties () : 0;
-
   cell.AttachNew (new csTerrainFactoryCell (defaultCell));
 
   cells.Push (cell);
@@ -238,9 +229,9 @@ csTerrainFactoryCell::csTerrainFactoryCell (const csTerrainFactoryCell& other)
   materialMapHeight (other.materialMapHeight),
   materialMapPersistent (other.materialMapPersistent),
   baseMaterial (other.baseMaterial),
-  rendererProperties (other.rendererProperties),
-  colliderProperties (other.colliderProperties),
-  feederProperties (other.feederProperties)
+  rendererProperties (other.rendererProperties->Clone()),
+  colliderProperties (other.colliderProperties->Clone()),
+  feederProperties (other.feederProperties->Clone())
 {
 }
 
