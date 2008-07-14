@@ -40,6 +40,8 @@ namespace lighter
       bool doDirectLight;
       // HL2-style directional LMs
       bool directionalLMs;
+			// Indirect Illumination through photon mapping
+			bool indirectLMs;
       // Number of threads to use for multicore parts
       uint numThreads;
     };
@@ -101,8 +103,6 @@ namespace lighter
       int numPerSample;
       // The sample distance for sampling photons
       float sampleDistance;
-      // how often to sample across the lightmap
-      int sampleSize;
     };
 
     struct DebugProperties
@@ -133,6 +133,11 @@ namespace lighter
     {
       return debugProperties;
     }
+		
+		const INDIProperties& GetIndirectProperties() const
+		{
+			return indirectLightingProperties;
+		}
 
   protected:
     // Properties
@@ -140,6 +145,7 @@ namespace lighter
     LightmapProperties    lmProperties;
     DIProperties          diProperties;
     DebugProperties       debugProperties;
+		INDIProperties        indtLightProperties;
   };
 
 }
