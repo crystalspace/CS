@@ -606,6 +606,10 @@ namespace lighter
     csPrintf ("  Calculate direct lighting using per lumel/vertex sampling\n");
     csPrintf ("   Default: True\n");
 
+    csPrintf (" --[no]indirectlight\n");
+    csPrintf ("  Calculates indirect lighting using photon mapping\n");
+    csPrintf ("    Default: False\n");
+
     csPrintf (" --[no]directlightrandom\n");
     csPrintf ("  Use random sampling for direct lighting instead of sampling\n"
               "  every light source.\n");
@@ -633,6 +637,18 @@ namespace lighter
                 "the\n");
     csPrintf ("  lightmap layouter.\n");
     csPrintf ("   Default: 1\n");
+
+    csPrintf (" --numphotons=<number>\n");
+    csPrintf ("  Sets the number of photons to emit from the lights\n");
+    csPrintf ("   Default: 10000\n");
+
+    csPrintf (" --photonspersample=<number>\n");
+    csPrintf ("  Sets the number of photons to sample for density calculations\n");
+    csPrintf ("   Default: 25\n");
+    
+    csPrintf (" --sampledistance=<threshold>\n");
+    csPrintf ("  Sets the max distance to search for photons when sampling\n");
+    csPrintf ("   Default: 0.25\n");
 
     csPrintf ("\n");
   }

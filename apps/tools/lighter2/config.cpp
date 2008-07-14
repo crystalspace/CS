@@ -47,9 +47,9 @@ namespace lighter
     diProperties.pointLightMultiplier = 1.0f;
     diProperties.areaLightMultiplier = 1.0f;
 		
-		indtLightProperties.numPhotons = 10000;
-		indtLightProperties.numPerSample = 25;
-		indtLightProperties.sampleDistance = 0.25f;
+    indtLightProperties.numPhotons = 10000;
+    indtLightProperties.numPerSample = 25;
+    indtLightProperties.sampleDistance = 0.25f;
   }
 
   void Configuration::Initialize (iConfigFile* _cfgFile)
@@ -62,8 +62,8 @@ namespace lighter
       lighterProperties.doDirectLight);
     lighterProperties.directionalLMs = cfgFile->GetBool ("lighter2.BumpLMs", 
       lighterProperties.directionalLMs);
-		lighterProperties.indirectLMs = cfgFile->GetBool("lighter2.IndirectLight",
-			lighterProperties.indirectLMs);
+    lighterProperties.indirectLMs = cfgFile->GetBool("lighter2.IndirectLight",
+      lighterProperties.indirectLMs);
     lighterProperties.numThreads = cfgFile->GetInt ("lighter2.NumThreads", 
       lighterProperties.numThreads);
 
@@ -90,11 +90,11 @@ namespace lighter
     debugProperties.rayDebugRE =
       cfgFile->GetStr ("lighter2.debugOcclusionRays");
 		
-		indtLightProperties.numPhotons = cfgFile->GetInt("lighter2.numPhotons",
-			indtLightProperties.numPhotons);
-		indtLightProperties.numPerSample = cfgFile->GetInt("lighter2.photonsPerSample",
-			indtLightProperties.numPerSample);
-	  indtLightProperties.sampleDistance = cfgFile->GetFloat("lighter2.sampleDistance",
-			indtLightProperties.sampleDistance);
+    indtLightProperties.numPhotons = cfgFile->GetInt("lighter2.numPhotons",
+      indtLightProperties.numPhotons);
+    indtLightProperties.numPerSample = cfgFile->GetInt("lighter2.photonsPerSample",
+      indtLightProperties.numPerSample);
+    indtLightProperties.sampleDistance = cfgFile->GetFloat("lighter2.sampleDistance",
+      indtLightProperties.sampleDistance);
   }
 }
