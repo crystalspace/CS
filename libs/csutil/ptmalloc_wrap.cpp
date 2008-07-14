@@ -577,7 +577,7 @@ void cs_free (void* p)
 #ifdef CS_CHECKING_ALLOCATIONS
   ptfree_debug<true, true> (p);
 #else
-  ptmalloc_debug<true, false> (p);
+  ptfree_debug<true, false> (p);
 #endif
 }
 
