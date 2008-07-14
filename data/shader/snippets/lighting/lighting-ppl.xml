@@ -24,7 +24,7 @@
 	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
 	
 	<!-- Surface normal -->
-	<input name="i_normal" type="normal_tangent" />
+	<input name="i_normal" type="normal_tangent" default="value" defval="0,0,1"/>
 	<output name="o_normal" type="normal_tangent" />
 	
 	<block location="cg:vertexMain">
