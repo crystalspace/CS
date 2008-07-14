@@ -99,7 +99,7 @@ private:
 
   csArray<iLight*> activeLights;
 
-  csEventID PreProcess;
+  csEventID Frame;
   csEventID SystemOpen;
   csEventID SystemClose;
 
@@ -202,13 +202,23 @@ public:
   virtual const csHandlerID * GenericPrec (
     csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &,
     csEventID) const { return 0; }
-  
-  csHandlerID eventSucc[2];
+
   virtual const csHandlerID * GenericSucc (
-    csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &,
-    csEventID) const 
+    csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,
+    csEventID event) const 
   { 
-    return 0;//eventSucc; 
+    /// \todo Create signposts for the SystemOpen event
+    if (event != csevFrame(r2))
+      return 0;
+    static csHandlerID succConstraint[6] = {
+      FrameSignpost_Logic3D::StaticID(r1),
+      FrameSignpost_3D2D::StaticID(r1),
+      FrameSignpost_2DConsole::StaticID(r1),
+      FrameSignpost_ConsoleDebug::StaticID(r1),
+      FrameSignpost_DebugFrame::StaticID(r1),
+      CS_HANDLERLIST_END
+    };
+    return succConstraint; 
   }
   
   CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
