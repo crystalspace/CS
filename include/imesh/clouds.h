@@ -74,7 +74,7 @@ struct iCloudsRenderer : public virtual iBase
 	/**
 	Rendermethod. Renders the whole cloud scene.
 	*/
-	virtual const bool Render(const i3DScalarField<double>& aaaMixingRatios /*, const csMatrix& mTransformation */) = 0;
+	virtual const bool Render(const iField3<double>& aaaMixingRatios /*, const csMatrix& mTransformation */) = 0;
 };
 
 //--------------------------------------------------------------------------------------------//
@@ -99,24 +99,28 @@ struct iCloudsDynamics : public virtual iBase
 	Returns the simulation-output. A scalarfield which contains all the condensed
 	water mixing ratios for the entire cloud-volume
 	*/
-	virtual inline const i3DScalarField<double> GetCondWaterMixingRatios() const = 0;
+	virtual inline const iField3<double> GetCondWaterMixingRatios() const = 0;
 };
 
 //--------------------------------------------------------------------------------------------//
 
 /**
-This class represents a 2 dimensional scalar field
+This class represents a 2 dimensional field (may scalar or vector!)
 (used for boundary conditions e.g.)
 */
 template <typename T>
-struct i2DScalarField : public virtual iBase
+struct iField2 : public virtual iBase
 {
-	SCF_INTERFACE(i2DScalarField, 0, 0, 1);
+	SCF_INTERFACE(iField2, 0, 0, 1);
 
 	/**
-	Initialize (from iComponent) is used to set size for this
-	scalar field
 	*/
+	virtual void SetSize(const UINT iSizeX, const UINT iSizeY) = 0;
+
+	/**
+	Sets a value at position x, y
+	*/
+	virtual void SetValue(const T& Value, const UINT x, const UINT y) = 0;
 
 	/**
 	Accses operator and method. Returns the value of the scalarfield
@@ -127,18 +131,25 @@ struct i2DScalarField : public virtual iBase
 };
 
 /**
-This class represents a 3 dimensional scalar field
+This class represents a 3 dimensional field (may scalar or vector!)
 (used as input for the rendering algorithm e.g.)
 */
 template <typename T>
-struct i3DScalarField : public virtual iBase
+struct iField3 : public virtual iBase
 {
-	SCF_INTERFACE(i3DScalarField, 0, 0, 1);
+	SCF_INTERFACE(iField3, 0, 0, 1);
 
 	/**
-	Initialize (from iComponent) is used to set size for this
-	scalar field
 	*/
+	virtual void SetSize(const UINT iSizeX, const UINT iSizeY, const UINT iSizeZ) = 0;
+	virtual const UINT GetSizeX() const = 0;
+	virtual const UINT GetSizeY() const = 0;
+	virtual const UINT GetSizeZ() const = 0;
+
+	/**
+	Sets a value at position x, y, z
+	*/
+	virtual void SetValue(const T& Value, const UINT x, const UINT y, const UINT z) = 0;
 
 	/**
 	Accses operator and method. Returns the value of the scalarfield
