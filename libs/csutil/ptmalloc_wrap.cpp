@@ -613,7 +613,7 @@ void cs_free (void* p)
 #ifdef CS_DEBUG
   ptfree_debug<false, false> (p);
 #else
-  ptmalloc_::ptfree (n);
+  ptmalloc_::ptfree (p);
 #endif
 }
 void* cs_realloc (void* p, size_t n)
