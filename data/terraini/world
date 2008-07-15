@@ -14,8 +14,17 @@
         <texture name="grass.png">
             <file>/lev/terrain/grass.png</file>
         </texture>
-        <texture name="materialmap_base.png">
-            <file>/lev/terrain/materialmap_base.png</file>
+        <texture name="materialmap_base_00.png">
+            <file>/lev/terraini/materialmap_base_00.png</file>
+        </texture>
+        <texture name="materialmap_base_01.png">
+            <file>/lev/terraini/materialmap_base_01.png</file>
+        </texture>
+        <texture name="materialmap_base_10.png">
+            <file>/lev/terraini/materialmap_base_10.png</file>
+        </texture>
+        <texture name="materialmap_base_11.png">
+            <file>/lev/terraini/materialmap_base_11.png</file>
         </texture>
     </textures>
     <shaders>
@@ -31,8 +40,20 @@
         <material name="ScatterSky">
             <color red="0" green="0" blue="0" />
         </material>
-        <material name="Base">
-            <texture>materialmap_base.png</texture>
+        <material name="Base00">
+            <texture>materialmap_base_00.png</texture>
+            <shader type="ambient">terrain_fixed_base</shader>
+        </material>
+        <material name="Base01">
+            <texture>materialmap_base_01.png</texture>
+            <shader type="ambient">terrain_fixed_base</shader>
+        </material>
+        <material name="Base10">
+            <texture>materialmap_base_10.png</texture>
+            <shader type="ambient">terrain_fixed_base</shader>
+        </material>
+        <material name="Base11">
+            <texture>materialmap_base_11.png</texture>
             <shader type="ambient">terrain_fixed_base</shader>
         </material>
         <material name="Marble">
@@ -88,30 +109,45 @@
             <maxloadedcells>20</maxloadedcells>
             <cells>
                 <celldefault>
-                    <gridsize width="257" height="257" />
-                    <materialmapsize width="512" height="512" />
+                    <gridsize width="33" height="33" />
+                    <materialmapsize width="32" height="32" />
                     <size x="256" y="32" z="256" />
-                    <basematerial>Base</basematerial>
-                    <feederproperties>
-                        <param name="heightmap source">/lev/terraini/heightmap_257x257.png</param>
-                        <param name="materialmap source">/lev/terrain/materialmap.png</param>
-                    </feederproperties>
                 </celldefault>
                 <cell>
                     <name>0</name>
                     <position x="-256" y="-256" />
+                    <feederproperties>
+                        <param name="heightmap source">/lev/terraini/heightmap_01.png</param>
+                        <param name="materialmap source">/lev/terraini/material_01.png</param>
+                    </feederproperties>
+                    <basematerial>Base01</basematerial>
                 </cell>
                 <cell>
                     <name>1</name>
                     <position x="0" y="-256" />
+                    <feederproperties>
+                        <param name="heightmap source">/lev/terraini/heightmap_11.png</param>
+                        <param name="materialmap source">/lev/terraini/material_11.png</param>
+                    </feederproperties>
+                    <basematerial>Base11</basematerial>
                 </cell>
                 <cell>
                     <name>2</name>
                     <position x="-256" y="0" />
+                    <feederproperties>
+                        <param name="heightmap source">/lev/terraini/heightmap_00.png</param>
+                        <param name="materialmap source">/lev/terraini/material_00.png</param>
+                    </feederproperties>
+                    <basematerial>Base00</basematerial>
                 </cell>
                 <cell>
                     <name>3</name>
                     <position x="0" y="0" />
+                    <feederproperties>
+                        <param name="heightmap source">/lev/terraini/heightmap_10.png</param>
+                        <param name="materialmap source">/lev/terraini/material_10.png</param>
+                    </feederproperties>
+                    <basematerial>Base10</basematerial>
                 </cell>
             </cells>
         </params>
@@ -166,6 +202,7 @@
                 <v x="0" y="0" z="0" />
             </move>
             <priority>wall</priority>
+            <staticlit />
         </meshobj>
     </sector>
 </world>
