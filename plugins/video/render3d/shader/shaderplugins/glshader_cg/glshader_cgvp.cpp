@@ -72,6 +72,7 @@ bool csShaderGLCGVP::Compile (iHierarchicalCache* cache)
   ProfileLimits limits (programProfile);
   limits.GetCurrentLimits ();
   WriteToCache (cache, limits);
+  cacheKeepNodes.DeleteAll ();
 
   return ret;
 }
@@ -79,16 +80,50 @@ bool csShaderGLCGVP::Compile (iHierarchicalCache* cache)
 bool csShaderGLCGVP::Precache (const ProfileLimits& limits,
                                iHierarchicalCache* cache)
 {
+  PrecacheClear();
+
   csRef<iDataBuffer> programBuffer = GetProgramData();
   if (!programBuffer.IsValid())
     return false;
   csString programStr;
   programStr.Append ((char*)programBuffer->GetData(), programBuffer->GetSize());
 
-  bool ret = DefaultLoadProgram (cgResolve, programStr, CG_GL_VERTEX, 
+  bool needBuild = true;
+  csString sourcePreproc;
+  {
+    csString programStr;
+    programStr.Append ((char*)programBuffer->GetData(), programBuffer->GetSize());
+    
+    ArgumentArray args;
+    shaderPlug->GetProfileCompilerArgs (GetProgramType(),
+      limits.profile, true, args);
+    for (size_t i = 0; i < compilerArgs.GetSize(); i++) 
+      args.Push (compilerArgs[i]);
+  
+    // Get preprocessed result of pristine source
+    sourcePreproc = GetPreprocessedProgram (programStr, args);
+    if (!sourcePreproc.IsEmpty ())
+    {
+      // Check preprocessed source against cache
+      if (TryLoadFromCompileCache (sourcePreproc, limits, cache))
+        needBuild = false;
+    }
+  }
+  
+  bool ret;
+  if (needBuild)
+    ret = DefaultLoadProgram (cgResolve, programStr, CG_GL_VERTEX, 
       CG_PROFILE_UNKNOWN,
       loadApplyVmap | loadIgnoreConfigProgramOpts | loadFlagUnusedV2FForInit,
       &limits);
+  else
+    ret = true;
+
+  // Store program against preprocessed source in cache
+  {
+    if (needBuild && !sourcePreproc.IsEmpty ())
+      WriteToCompileCache (sourcePreproc, limits, cache);
+  }
 
   WriteToCache (cache, limits);
 

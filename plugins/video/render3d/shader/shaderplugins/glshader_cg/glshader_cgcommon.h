@@ -79,6 +79,7 @@ protected:
   csString entrypoint;
   csRefArray<iDocumentNode> cacheKeepNodes;
   csString objectCode;
+  csString objectCodeCachePath;
 
   bool validProgram;
 
@@ -126,6 +127,8 @@ protected:
   bool GetPostCompileParamProps (ShaderParameter* sparam);
   //@}
 
+  void PrecacheClear();
+
   enum
   {
     loadLoadToGL = 1,
@@ -139,6 +142,8 @@ protected:
     CGprofile maxProfile,
     uint flags = loadLoadToGL | loadApplyVmap | loadFlagUnusedV2FForInit,
     const ProfileLimits* customLimits = 0);
+  csString GetPreprocessedProgram (const char* programStr,
+    const ArgumentArray& args);
   void DoDebugDump ();
   void WriteAdditionalDumpInfo (const char* description, const char* content);
   const char* GetProgramType()
@@ -170,6 +175,15 @@ protected:
   void ApplyVariableMapArrays (const csShaderVariableStack& stack);
   
   bool WriteToCache (iHierarchicalCache* cache, const ProfileLimits& limits);
+  
+  bool TryLoadFromCompileCache (const char* source, const ProfileLimits& limits,
+    iHierarchicalCache* cache);
+  bool LoadObjectCodeFromCompileCache (const ProfileLimits& limits,
+    iHierarchicalCache* cache);
+  bool WriteToCompileCache (const char* source, const ProfileLimits& limits,
+    iHierarchicalCache* cache);
+  bool WriteToCompileCache (const ProfileLimits& limits,
+    iHierarchicalCache* cache);
 public:
   CS_LEAKGUARD_DECLARE (csShaderGLCGCommon);
 

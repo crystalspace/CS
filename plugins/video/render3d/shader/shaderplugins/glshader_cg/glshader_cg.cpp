@@ -359,6 +359,10 @@ void csGLShader_CG::ParsePrecacheLimits (iConfigFile* config, const char* type,
       seenKeys.AddNoTest (key);
     }
   }
+  /* Dirty trick: put highest profile last; most likely to compile; in the
+     case of VPs means bindings are correct.
+   */
+  out.Sort();
 }
 
 bool csGLShader_CG::Open()
