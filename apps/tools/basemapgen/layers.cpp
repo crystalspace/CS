@@ -78,7 +78,7 @@ bool AlphaLayers::AddAlphaMap (iImage* alphaMap)
   uint8* alphaPtr = alphaData;
       
   int mapFormat = alphaMap->GetFormat();
-  if (mapFormat == CS_IMGFMT_PALETTED8)
+  if ((mapFormat & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
   {
     // Assume grayscale
     uint8* srcData = (uint8*)alphaMap->GetImageData();
