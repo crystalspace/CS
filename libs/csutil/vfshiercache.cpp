@@ -33,7 +33,7 @@ namespace CS
   {
     VfsHierarchicalCache::VfsHierarchicalCache (iObjectRegistry* object_reg,
       const char* vfsdir)
-     : scfImplementationType (this), object_reg (object_reg), vfsdir (vfsdir)
+     : scfImplementationType (this), vfsdir (vfsdir)
     {
       vfs = csQueryRegistry<iVFS> (object_reg);
       CS_ASSERT(vfs);
@@ -43,6 +43,17 @@ namespace CS
         this->vfsdir.Truncate (this->vfsdir.Length()-1);
     }
   
+    VfsHierarchicalCache::VfsHierarchicalCache (VfsHierarchicalCache* parentCache,
+      const char* vfsdir)
+     : scfImplementationType (this), parent (parentCache), vfsdir (vfsdir)
+    {
+      vfs = parentCache->vfs;
+      
+      // Ensure no '/' at the end of vfsdir
+      if (this->vfsdir.GetAt (this->vfsdir.Length()-1) == '/')
+        this->vfsdir.Truncate (this->vfsdir.Length()-1);
+    }
+    
     VfsHierarchicalCache::~VfsHierarchicalCache ()
     {
     }
@@ -158,7 +169,7 @@ namespace CS
       csStringFast<512> fullPath (vfsdir);
       fullPath.Append (base);
       
-      return csPtr<iHierarchicalCache> (new VfsHierarchicalCache (object_reg, fullPath));
+      return csPtr<iHierarchicalCache> (new VfsHierarchicalCache (this, fullPath));
     }
     
     csPtr<iStringArray> VfsHierarchicalCache::GetSubItems (const char* path)
@@ -176,6 +187,11 @@ namespace CS
         newArray->Push (vfsArray->Get (i) + fullPath.Length());
       }
       return csPtr<iStringArray> (newArray);
+    }
+    
+    iHierarchicalCache* VfsHierarchicalCache::GetTopCache()
+    {
+      return parent.IsValid() ? parent->GetTopCache() : this;
     }
   } // namespace Utility
 } // namespace CS
