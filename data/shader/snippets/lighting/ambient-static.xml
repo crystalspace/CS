@@ -17,7 +17,8 @@
 -->
 <snippet type="compound">
   <technique priority="100">
-    <snippet id="ambientOcclusion" file="/shader/snippets/lighting/ambient-ao.xml" />
+    <snippet id="ambientOcclusion" file="/shader/snippets/lighting/ambient-ao.xml"
+	     condition='(vars."pass number".int == 0) &amp;&amp; (vars."pass do_ambient")'/>
     
     <snippet id="ambient_static">
       <technique priority="150">
@@ -203,7 +204,7 @@
 	</input>
 	
 	<block location="cg:fragmentMain">
-	  <?if vars."pass do_ambient" ?>
+	  <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
 	  float3 ambient_dynamic = dynamicAmbient * occlusionFactor;
 	  float3 ambient_static;
 	  <?if vars."tex lightmap dir 1".texture || vars."static color dir 1".buffer ?>
@@ -365,7 +366,7 @@
 	</input>
 	
 	<block location="cg:fragmentMain">
-	  <?if vars."pass do_ambient" ?>
+	  <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
 	    float3 ambient_dynamic = dynamicAmbient * occlusionFactor;
 	    float3 ambient_static;
 	    <?if vars."tex lightmap".texture ?>
