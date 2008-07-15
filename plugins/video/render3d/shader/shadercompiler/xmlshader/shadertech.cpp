@@ -519,7 +519,8 @@ bool csXMLShaderTech::ParseBuffers (ShaderPass* pass,
     }
     else
     {
-      if (attrib == CS_VATTRIB_INVALID)
+      if ((attrib == CS_VATTRIB_INVALID)
+        && parent->compiler->do_verbose)
       {
         parent->compiler->Report (CS_REPORTER_SEVERITY_WARNING,
 	  "Shader '%s', pass %d: invalid buffer destination '%s'",
