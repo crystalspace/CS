@@ -271,8 +271,8 @@ namespace CS
       const csReversibleTransform& tr_o2c,
       csPlane3* planes, uint32& frustum_mask)
   {
-    const csMatrix3& t2o = tr_o2c.GetT2O();
-    csVector3 o2tmult = tr_o2c.GetO2T () * tr_o2c.GetO2TTranslation ();
+    //const csMatrix3& t2o = tr_o2c.GetT2O();
+    //csVector3 o2tmult = tr_o2c.GetO2T () * tr_o2c.GetO2TTranslation ();
     const csPlane3* frust = ctxt->frustum;
     frustum_mask = 0;
     uint i;
