@@ -19,6 +19,7 @@ LinkWith basemapgen_static : crystalspace ;
 
 BASEMAPGEN.PLUGINLIST =
   bindoc
+  bruteblock
   csbmpimg
   csddsimg
   csgifimg
@@ -28,6 +29,11 @@ BASEMAPGEN.PLUGINLIST =
   imgplex
   null2d
   null3d
+  simpleformer
+  simpleformerldr
+  terrainldr
+  terrain2
+  terrain2ldr
   xmltiny
   ;
 

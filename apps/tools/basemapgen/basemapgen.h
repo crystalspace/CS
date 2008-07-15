@@ -19,8 +19,7 @@
 #ifndef __BASEMAPGEN_H__
 #define __BASEMAPGEN_H__
 
-#include "crystalspace.h"
-#include "stdarg.h"
+#include "layers.h"
 
 class BaseMapGen
 {
@@ -31,58 +30,66 @@ private:
   csRef<iKeyboardDriver> kbd;
   csRef<iVirtualClock> vc;
   csRef<iCommandLineParser> cmdline;
+  
+  csRegExpMatcher* terraformerRE;
+  csRegExpMatcher* meshRE;
 
   // The worldfile
   csRef<iDocumentNode> rootnode;
-
-  struct MaterialLayer
-  {
-    csVector2 texture_scale;
-    csString texture_name;
-    csString texture_file;
-    csRef<iImage> image;
-
-    uint8* alphaMap;
-
-    MaterialLayer() : alphaMap (0) {}
-    ~MaterialLayer() { cs_free (alphaMap); }
-  };
-
-  struct ImageMap
-  {
-    csString texture_file;
-    csRef<iImage> image;
-  };
+  
+public:
+  csHash<csString, csString> pluginMap;
+  csHash<csString, csString> textureFiles;
+  csHash<csRef<MaterialLayer>, csString> materials;
+  
+  csHash<csRef<AlphaLayers>, csString> terrain1Layers;
+  csHash<csRef<AlphaLayers>, csString> terrain1FactoryLayers;
+  
+  void ScanPluginNodes ();
+  const char* GetPluginSCFID (const char* pluginStr);
+  void ScanTextures ();
+  void ScanMaterials ();
 
   bool LoadMap ();
-
+  void ScanOldMaterialMaps();
+  void ScanTerrain1Factories ();
+  void ScanTerrain1Meshes ();
+  
+  struct Terrain2Cell : public csRefCount
+  {
+    csString name;
+    csString baseMaterial;
+    csRef<AlphaLayers> alphaLayers;
+    MaterialLayers alphaMaterials;
+    csRef<AlphaLayers> materialMapLayers;
+    
+    bool Parse (iDocumentNode* node);
+    void ApplyMaterialMap (const MaterialLayers& matMap);
+  };
+  struct Terrain2Factory : public csRefCount
+  {
+    csHash<csRef<Terrain2Cell>, csString> cells;
+  };
+  csHash<csRef<Terrain2Factory>, csString> terrain2Factories;
+  void ScanTerrain2Factories ();
+  void ScanTerrain2Meshes ();
+  
   csString GetTextureFile (const csString& texturename);
 
   csRef<iDocumentNode> GetTerrainNode ();
-  csRef<iDocumentNode> GetMaterialNode (const csString& materialname);
+  csRef<iDocumentNode> GetMaterialNode (const char* materialname);
   csRefArray<iDocumentNode> GetMaterialNodes ();
-  void AddMaterialLayer (csArray<MaterialLayer>& txt_layers, iDocumentNode* materialnode);
-
-  bool CopyAlphaMapsToLayers (const csRefArray<iImage>& alphaMaps,
-    int& matmap_w, int& matmap_h, csArray<MaterialLayer>& mat_layers);
-  bool GetMaterialMaps (csArray<MaterialLayer>& mat_layers,
-    int& matmap_w, int& matmap_h);
-  ImageMap GetBaseMap ();
-
-  csRef<iImage> LoadImage (const csString& filename, int format);
-  void SaveImage (ImageMap image);
-
-  csColor GetPixel (const MaterialLayer& material, float coord_x, float coord_y);
-  void CreateBasemap (int basemap_w, int basemap_h, 
-                      ImageMap& basemap_dst, 
-                      int matmap_w, int matmap_h,
-                      const csArray<MaterialLayer>& txt_layers);
-  void BuildAlphaMapsFromMatMap (const ImageMap& matmap,
-    csArray<MaterialLayer>& txt_layers);
+  
+  csPtr<iImage> CreateBasemap (int basemap_w, int basemap_h, 
+                               const AlphaLayers& alphaLayers,
+                               MaterialLayers& txt_layers);
+  void SaveImage (iImage* image, const char* filename);
 public:
   BaseMapGen (iObjectRegistry* object_reg);
   ~BaseMapGen ();
 
+  csRef<iImage> LoadImage (const csString& filename, int format);
+  
   bool Initialize ();
   void Start ();
   void OnCommandLineHelp();
