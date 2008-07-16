@@ -55,6 +55,8 @@
 			<!-- The wave phases -->
 			<variablemap variable="phases" destination="phases" />
 			
+			<variablemap variable="o2w transform" destination="o2w" />
+			
 			<program file="/shader/water/ocean.cgvp"/>
 			<?else ?>
 			<program file="/shader/water/water.cgvp"/>

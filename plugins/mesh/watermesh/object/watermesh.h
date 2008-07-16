@@ -94,6 +94,8 @@ private:
   // Admin stuff.
   csWeakRef<iGraphics3D> g3d;
   csWeakRef<iEngine> engine;
+  csRef<iStringSet> strings;
+
   csRef<csWaterMeshObjectFactory> factory;
   iMeshWrapper* logparent;
 
@@ -137,7 +139,6 @@ private:
    */
   void SetupObject ();
 
-  void updateOcean(iCamera* cam);
   void updateLocal();
 
 public:

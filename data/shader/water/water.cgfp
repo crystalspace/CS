@@ -60,6 +60,7 @@ float4 main (vert2frag IN,
 	
 	float fresnelFactor = fresnel(tsCamVec, N);
     return float4(reflection.rgb, 1) * fresnelFactor;
+//	return float4(IN.CamVec.xyz, 1);
 }
 
 //---------------------------------------------------------------------------------

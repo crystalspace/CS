@@ -53,6 +53,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "watermesh.h"
 
+#define OCEAN_BBOX_RADIUS 50000.0f
 
 CS_IMPLEMENT_PLUGIN
 
@@ -83,6 +84,9 @@ csWaterMeshObject::csWaterMeshObject (csWaterMeshObjectFactory* factory) :
 
   g3d = csQueryRegistry<iGraphics3D> (factory->object_reg);
   engine = csQueryRegistry<iEngine> (factory->object_reg);
+
+  strings = csQueryRegistryTagInterface<iStringSet> 
+  	(factory->object_reg, "crystalspace.shared.stringset");
 
   variableContext.AttachNew (new csShaderVariableContext);
 
@@ -153,10 +157,7 @@ void csWaterMeshObject::SetupVertexBuffer()
 }
 
 void csWaterMeshObject::SetupObject ()
-{
-  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> 
-  	(factory->object_reg, "crystalspace.shared.stringset");
-	
+{	
   if (!initialized || vertsChanged)
   {
     initialized = true;
@@ -258,9 +259,18 @@ csRenderMesh** csWaterMeshObject::GetRenderMeshes (
 
   SetupObject ();
 
-  csTransform trans;
-  if(factory->isOcean())
-  {
+//  float camY = camera->GetTransform().GetOrigin().y;
+  csReversibleTransform trans;
+  if(factory->isOcean())	
+  {	
+	// csOrthoTransform ot = camera->GetTransform();
+	// ot.Translate(-(camera->GetTransform().GetOrigin()));
+	// const csVector3 camDir = csVector3(0, 0, 1) * ot.GetInverse();
+	// 
+	// csVector3 camXZ = csVector3(camDir.x, 0, camDir.z);
+	// camXZ.Normalize();
+	// trans.RotateThis(csVector3(0, 1, 0), -acos(camXZ * csVector3(0, 0, 1)));
+  
 	float camX = camera->GetTransform().GetOrigin().x;
 	float camZ = camera->GetTransform().GetOrigin().z;
 	trans.Translate(csVector3(camX, 0, camZ));
@@ -309,6 +319,12 @@ csRenderMesh** csWaterMeshObject::GetRenderMeshes (
   meshPtr->material = material;		
   meshPtr->worldspace_origin = wo;
   meshPtr->object2world = o2wt * trans;
+  
+  //update shader variable
+  csShaderVariable *o2wtVar = variableContext->GetVariableAdd(strings->Request("o2w transform"));
+  o2wtVar->SetType(csShaderVariable::MATRIX);
+  o2wtVar->SetValue(meshPtr->object2world);
+
   if (rmCreated)
   {
     meshPtr->buffers = bufferHolder;
@@ -356,33 +372,11 @@ bool csWaterMeshObject::HitBeamOutline (const csVector3& start,
   return false;
 }
 
-void csWaterMeshObject::UpdateWater(iCamera *cam)
-{
-	if(factory->isOcean())
-	{
-		updateOcean(cam);
-	}
-	else
-	{
-		updateLocal();
-	}
-}
-
-void csWaterMeshObject::updateOcean(iCamera *cam)
-{
-	const csVector3 camPos = cam->GetTransform().GetOrigin();
-	
-}
-
-void csWaterMeshObject::updateLocal()
-{
-	
-}
-
 bool csWaterMeshObject::HitBeamObject (const csVector3& start,
                                        const csVector3& end, csVector3& isect, float *pr, int* polygon_idx,
                                        iMaterialWrapper** material)
 {
+	
   if (material) *material = csWaterMeshObject::material;
   if (polygon_idx) *polygon_idx = -1;
   // This is the slow version. Use for an accurate hit on the object.
@@ -418,6 +412,11 @@ bool csWaterMeshObject::HitBeamObject (const csVector3& start,
   return true;
 }
 
+void csWaterMeshObject::updateLocal()
+{
+	
+}
+
 iObjectModel* csWaterMeshObject::GetObjectModel ()
 {
   return factory->GetObjectModel ();
@@ -426,10 +425,6 @@ iObjectModel* csWaterMeshObject::GetObjectModel ()
 void csWaterMeshObject::SetNormalMap(iTextureWrapper *map)
 { 
 	nMap = map;
-	
-	csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> 
-	 	(factory->object_reg, "crystalspace.shared.stringset");
-	
 	nMapVar = variableContext->GetVariableAdd(strings->Request("texture normal"));
 	nMapVar->SetType(csShaderVariable::TEXTURE);
 	nMapVar->SetValue(nMap);	
@@ -568,6 +563,9 @@ void csWaterMeshObjectFactory::CalculateBBoxRadius ()
     if (sqradius > max_sqradius) max_sqradius = sqradius;
   }
 
+  if(isOcean())
+	object_bbox.SetSize(csVector3(OCEAN_BBOX_RADIUS, OCEAN_BBOX_RADIUS, OCEAN_BBOX_RADIUS));
+	  
   radius = csQsqrt (max_sqradius);
 }
 
@@ -597,14 +595,13 @@ void csWaterMeshObjectFactory::SetWaterType(waterMeshType waterType)
 	type = waterType;
 	if(type == WATER_TYPE_OCEAN)
 	{
-		wid = 50;
-		len = 50;
+		wid = 75;
+		len = 75;
 		gran = 1;
 		
 		SetMurkiness(0.2);
 		
 		//Setup Ocean defaults
-		
 		SetAmplitudes(0.1, 0.03, 0.05);
 		SetFrequencies(2.0, 1.7, 1.6);
 		SetPhases(0.0, 1.0, 1.41);
@@ -658,37 +655,6 @@ void csWaterMeshObjectFactory::SetupFactory ()
 			tris.Push(csTriangle (j * (wid * gran) + i + 1,
 									(j + 1) * (wid * gran) + i,
 									(j + 1) * (wid * gran) + i + 1));
-		}
-	}
-	
-	if(type == WATER_TYPE_OCEAN);
-	{
-		//Make it a taurus...
-		
-		//Associate top row of vertices to bottom row:
-		for(uint i = 0; i < (wid * gran) - 1; i++)
-		{
-			uint j = (len * gran) - 1;
-			
-			tris.Push(csTriangle (j * (wid * gran) + i, 
-									i, 
-									j * (wid * gran) + i + 1));
-			tris.Push(csTriangle (j * (wid * gran) + i + 1,
-									i,
-									i + 1));
-		}
-		
-		//Associate left row of vertices to right row:
-		for(uint j = 0; j < (len * gran) - 1; j++)
-		{
-			uint i = (wid * gran) - 1;
-			
-			tris.Push(csTriangle (j * (wid * gran) + i, 
-									(j + 1) * (wid * gran) + i, 
-									j * (wid * gran)));
-			tris.Push(csTriangle (j * (wid * gran),
-									(j + 1) * (wid * gran) + i,
-									(j + 1) * (wid * gran)));
 		}
 	}
 	
