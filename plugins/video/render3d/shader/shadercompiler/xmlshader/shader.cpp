@@ -563,7 +563,7 @@ void csXMLShader::Load (iDocumentNode* source, bool noCacheRead)
 	  cacheFile, hashStream))
 	cacheFile.Invalidate();
     }
-  }
+    }
   
   ConditionsReader* condReader = 0;
   if (readFromCache)
@@ -721,7 +721,6 @@ bool csXMLShader::Precache (iDocumentNode* source, iHierarchicalCache* cacheTo)
     for (size_t t = 0; t < techVar.techniques.GetSize(); t++)
     {
       ShaderTechVariant::Technique& tech = techVar.techniques[t];
-      tech.resolver->SetVariant (t);
       
       csRef<iHierarchicalCache> techCache;
       techCache = shaderCache->GetRootedCache (
@@ -730,6 +729,8 @@ bool csXMLShader::Precache (iDocumentNode* source, iHierarchicalCache* cacheTo)
       size_t vc = tech.resolver->GetVariantCount();
       for (size_t vi = 0; vi < vc; vi++)
       {
+        tech.resolver->SetVariant (vi);
+      
 	ShaderVariant var;
 	size_t ticket = ((vi*techVar.techniques.GetSize() + t) * (tvc+1) + (tvi+1));
     
@@ -985,8 +986,6 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
       
       tech.resolver->SetEvalParams (&modes, &stack);
   
-      //csPrintf ("shader = %s\nsharedEvaluator->GetNumConditions() = %zu\n", cacheType.GetData(),
-        //sharedEvaluator->GetNumConditions());
       size_t vi = tech.resolver->GetVariant ();
       if (vi != csArrayItemNotFound)
       {

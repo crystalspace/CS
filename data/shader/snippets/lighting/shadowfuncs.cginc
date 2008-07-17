@@ -16,6 +16,7 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
 <include>
+<?Include /shader/snippets/cg-common.cginc?>
 <![CDATA[
 
 #ifndef __SHADOWFUNCS_CG_INC__

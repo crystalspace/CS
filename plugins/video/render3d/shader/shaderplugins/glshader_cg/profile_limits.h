@@ -21,6 +21,7 @@
 
 #include "cg_common.h"
 
+struct csGLExtensionManager;
 struct iFile;
 
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
@@ -40,7 +41,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     
     ProfileLimits (CGprofile profile);
     
-    void GetCurrentLimits ();
+    void GetCurrentLimits (csGLExtensionManager* ext);
     void ReadFromConfig (iConfigFile* cfg, const char* prefix);
     void GetCgDefaults ();
     
@@ -53,6 +54,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     bool operator< (const ProfileLimits& other) const;
     bool operator>= (const ProfileLimits& other) const
     { return !operator< (other); }
+  private:
+    static uint glGetProgramInteger (csGLExtensionManager* ext,
+      GLenum target, GLenum what);
   };
 
 }

@@ -30,6 +30,7 @@
 #include "csutil/scf_implementation.h"
 
 struct csGLExtensionManager;
+struct csGLStateCache;
 
 namespace CS
 {
@@ -95,6 +96,8 @@ namespace CS
       iObjectRegistry* object_reg;
       /// GL extension manager
       csGLExtensionManager* ext;
+      /// GL state cache
+      csGLStateCache* statecache;
       /// Whether verbose reporting was enabled.
       bool doVerbose;
       /**

@@ -94,6 +94,7 @@ struct LightingClassic
       <texture name="tex lightmap" destination="lightingClassicFrag.lightmap" />
       <buffer source="texture coordinate lightmap" 
 	destination="lightingClassicVert.texCoordLM" />
+  <?elsif vars."static color".buffer ?>
       <buffer source="static color" 
 	destination="lightingClassicVert.staticPVLColor" />
     <?endif?>

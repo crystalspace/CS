@@ -201,6 +201,13 @@ csBugPlug::~csBugPlug ()
       RemoveWeakListener (q, weakEventHandler);
   }
 
+  if (logicEventHandler)
+  {
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
+    if (q)
+      q->RemoveListener (logicEventHandler);
+  }
+
   delete shadow;
 
   if (do_profiler_log)
@@ -228,8 +235,7 @@ bool csBugPlug::Initialize (iObjectRegistry *object_reg)
   if (q != 0)
   {
     csEventID esub[] = { 
-      PreProcess,   // TODO: this goes away (needs 2nd handler)
-      Frame,        // this replaces the above!
+      Frame,
       KeyboardEvent,
       MouseEvent,
       SystemOpen,
@@ -237,6 +243,16 @@ bool csBugPlug::Initialize (iObjectRegistry *object_reg)
       CS_EVENTLIST_END 
     };
     RegisterWeakListener (q, this, esub, weakEventHandler);
+  }
+
+  if (!logicEventHandler)
+  {
+    logicEventHandler.AttachNew (new LogicEventHandler (this));
+  }
+  if (q != 0)
+  {
+    csEventID events[2] = { Frame, CS_EVENTLIST_END };
+    q->RegisterListener (logicEventHandler, events);
   }
 
   stringSet = csQueryRegistryTagInterface<iStringSet> (object_reg,
@@ -2602,8 +2618,6 @@ bool csBugPlug::HandleEvent (iEvent& event)
     return EatKey (event);
   else if (CS_IS_MOUSE_EVENT(object_reg, event))
     return EatMouse (event);
-  else if (event.Name == PreProcess)
-    return HandleStartFrame (event);
   else if (event.Name == Frame)
     return HandleFrame (event);
   else if (event.Name == SystemOpen)

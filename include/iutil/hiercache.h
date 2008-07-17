@@ -40,7 +40,7 @@ struct iDataBuffer;
  */
 struct iHierarchicalCache : public virtual iBase
 {
-  SCF_INTERFACE(iHierarchicalCache, 1,0,1);
+  SCF_INTERFACE(iHierarchicalCache, 1,0,2);
 
   /**
    * Cache some data. Returns true if this succeeded.
@@ -77,6 +77,9 @@ struct iHierarchicalCache : public virtual iBase
   
   /// Get cache items directly under \a path.
   virtual csPtr<iStringArray> GetSubItems (const char* path) = 0;
+  
+  /// Get the cache which is the ultimate hierarchical ancestor of a cache
+  virtual iHierarchicalCache* GetTopCache() = 0;
 };
 
 #endif // __CS_IUTIL_HIERCACHE_H__

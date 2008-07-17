@@ -163,8 +163,9 @@ bool csShaderGLCGFP::Compile (iHierarchicalCache* cache)
       loadLoadToGL | loadApplyVmap, 0);
   
     ProfileLimits limits (programProfile);
-    limits.GetCurrentLimits ();
+    limits.GetCurrentLimits (shaderPlug->ext);
     WriteToCache (cache, limits);
+    cacheKeepNodes.DeleteAll ();
     return ret;
   }
 
@@ -174,12 +175,48 @@ bool csShaderGLCGFP::Compile (iHierarchicalCache* cache)
 bool csShaderGLCGFP::Precache (const ProfileLimits& limits, 
                                iHierarchicalCache* cache)
 {
+  PrecacheClear();
 
-  bool ret = TryCompile (CG_PROFILE_UNKNOWN,
-    loadApplyVmap | loadIgnoreConfigProgramOpts, &limits);
+  bool needBuild = true;
+  csString sourcePreproc;
+  {
+    csRef<iDataBuffer> programBuffer = GetProgramData();
+    if (!programBuffer.IsValid())
+      return false;
+    csString programStr;
+    programStr.Append ((char*)programBuffer->GetData(), programBuffer->GetSize());
+    
+    ArgumentArray args;
+    shaderPlug->GetProfileCompilerArgs (GetProgramType(),
+      limits.profile, true, args);
+    for (size_t i = 0; i < compilerArgs.GetSize(); i++) 
+      args.Push (compilerArgs[i]);
+  
+    // Get preprocessed result of pristine source
+    sourcePreproc = GetPreprocessedProgram (programStr, args);
+    if (!sourcePreproc.IsEmpty ())
+    {
+      // Check preprocessed source against cache
+      if (TryLoadFromCompileCache (sourcePreproc, limits, cache))
+        needBuild = false;
+    }
+  }
+  
+  bool ret;
+  if (needBuild)
+    ret = TryCompile (CG_PROFILE_UNKNOWN,
+      loadApplyVmap | loadIgnoreConfigProgramOpts, &limits);
+  else
+    ret = true;
+
+  // Store program against preprocessed source in cache
+  {
+    if (needBuild && !sourcePreproc.IsEmpty ())
+      WriteToCompileCache (sourcePreproc, limits, cache);
+  }
 
   WriteToCache (cache, limits);
-
+  
   return ret;
 }
 
@@ -207,10 +244,14 @@ bool csShaderGLCGFP::TryCompile (CGprofile maxFrag, uint loadFlags,
 
   if (testForUnused.GetSize() > 0)
   {
+    testForUnused.Push ("PARAM__clip_out_packed_distances1_UNUSED");
+    testForUnused.Push ("PARAM__clip_out_packed_distances2_UNUSED");
+  
     /* A list of unused variables to test for has been given. Test piecemeal
-      * which variables are really unused */
+     * which variables are really unused */
     csSet<csString> allNewUnusedParams;
-    size_t step = 8;
+    const size_t maxSteps = 8;
+    size_t step = maxSteps;
     size_t offset = 0;
     while (offset < testForUnused.GetSize())
     {
@@ -219,11 +260,14 @@ bool csShaderGLCGFP::TryCompile (CGprofile maxFrag, uint loadFlags,
 	unusedParams.Add (testForUnused[i]);
       for (size_t i = offset+step; i < testForUnused.GetSize(); i++)
 	unusedParams.Add (testForUnused[i]);
-      if (DefaultLoadProgram (0, programStr, CG_GL_FRAGMENT, 
+      bool compileSucceeded = DefaultLoadProgram (0, programStr, CG_GL_FRAGMENT, 
 	maxFrag, 
-	loadIgnoreErrors | (loadFlags & loadIgnoreConfigProgramOpts),
-	limits))
+	/*loadIgnoreErrors | */(loadFlags & loadIgnoreConfigProgramOpts),
+	limits);
+	
+      if (compileSucceeded)
       {
+        // Subset compiled fine, extract unused params
 	csSet<csString> newUnusedParams;
 	CollectUnusedParameters (newUnusedParams);
 	for (size_t i = 0; i < step; i++)
@@ -231,11 +275,27 @@ bool csShaderGLCGFP::TryCompile (CGprofile maxFrag, uint loadFlags,
 	  if (offset+i >= testForUnused.GetSize()) break;
 	  const char* s = testForUnused[offset+i];
 	  if (newUnusedParams.Contains (s))
+	  {
 	    allNewUnusedParams.Add (s);
+	  }
 	}
+        offset += step;
+        step = maxSteps;
       }
-      
-      offset += step;
+      else if (step > 1)
+      {
+        /* We might trip over a large array for whose elements can not be
+           allocated. Try will less parameters. */
+        step = step/2;
+      }
+      else
+      {
+        // Test for that single variable failed ... pretend it's unused
+        allNewUnusedParams.Add (testForUnused[offset]);
+        csPrintf ("marking UNUSED: %s\n", testForUnused[offset]);
+        offset += step;
+        step = maxSteps;
+      }
     }
     unusedParams = allNewUnusedParams;
   }

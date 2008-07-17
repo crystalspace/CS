@@ -32,6 +32,7 @@
 #include "csutil/fifo.h"
 #include "csutil/scfstr.h"
 #include "csutil/set.h"
+#include "csutil/stringarray.h"
 #include "csutil/xmltiny.h"
 
 #include "combiner_cg.h"
@@ -737,6 +738,114 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   
   //---------------------------------------------------------------------
   
+  class ShaderCombinerCg::V2FAutoSematicsHelper
+  {
+    csString declsPreamble;
+    csString declsPostamble;
+    csString cycleAutoSem;
+  public:
+    V2FAutoSematicsHelper (ShaderCombinerLoaderCg* loader,
+      const csArray<ShaderCombinerCg::Snippet>& allSnippets)
+    {
+      csSet<csString> allBindings;
+      
+      for (size_t n = 0; n < allSnippets.GetSize(); n++)
+      {
+	const ShaderCombinerCg::Snippet& snippet = allSnippets[n];
+	for (size_t i = 0; i < snippet.vert2frag.GetSize(); i++)
+	{
+	  iDocumentNode* node = snippet.vert2frag[i];
+	  if (node->GetType() == CS_NODE_ELEMENT)
+	  {
+	    csStringID id = loader->xmltokens.Request (node->GetValue());
+	    if (id == ShaderCombinerLoaderCg::XMLTOKEN_VARYING)
+	    {
+	      csString name = node->GetAttributeValue ("name");
+	      if (name.IsEmpty()) continue;
+	      csString binding = node->GetAttributeValue ("binding");
+	      if (binding.IsEmpty()) continue;
+	      
+	      allBindings.Add (binding);
+	    }
+	  }
+	}
+      }
+      if (allBindings.Contains ("COLOR"))
+	allBindings.Add ("COLOR0");
+      
+      static const char* const possibleBindings[] = {"COLOR1", "COLOR0"};
+      const size_t numPossibleBindings =
+	sizeof(possibleBindings)/sizeof(const char*);
+      
+      csStringArray availableBindings;
+      for (size_t i = 0; i < numPossibleBindings; i++)
+      {
+	if (!allBindings.Contains (possibleBindings[i]))
+	  availableBindings.Push (possibleBindings[i]);
+      }
+      
+      // @@@ FIXME: actually set that define somewhere
+      declsPreamble.Append ("#ifdef HAVE_ARB_color_buffer_float\n");
+      for (size_t i = 0; i < availableBindings.GetSize(); i++)
+      {
+	declsPreamble.AppendFmt ("#define _V2F_AUTOSEMANTIC_%zu\t: %s\n", i, availableBindings[i]);
+	declsPostamble.AppendFmt ("#undef _V2F_AUTOSEMANTIC_%zu\n", i);
+      }
+      if (availableBindings.GetSize() == 0)
+      {
+	declsPreamble.AppendFmt ("#define _V2F_AUTOSEMANTIC\n");
+      }
+      else
+      {
+	declsPreamble.AppendFmt ("#define _V2F_AUTOSEMANTIC\t_V2F_AUTOSEMANTIC_0\n");
+	declsPreamble.AppendFmt ("#define _V2F_AUTOSEMANTIC_CURRENT\t0\n");
+      }
+      declsPreamble.Append ("#else\n");
+      declsPreamble.Append ("#define _V2F_AUTOSEMANTIC\n");
+      declsPreamble.Append ("#endif\n");
+      declsPostamble.AppendFmt ("#undef _V2F_AUTOSEMANTIC\n");
+      
+      cycleAutoSem.Append ("#ifdef HAVE_ARB_color_buffer_float\n");
+      cycleAutoSem.Append ("#if 0\n");
+      for (size_t i = 0; i < availableBindings.GetSize()-1; i++)
+      {
+	cycleAutoSem.AppendFmt ("#elif _V2F_AUTOSEMANTIC_CURRENT == %zu\n",
+	  i);
+	cycleAutoSem.Append ("#undef _V2F_AUTOSEMANTIC_CURRENT\n");
+	cycleAutoSem.Append ("#undef _V2F_AUTOSEMANTIC\n");
+	cycleAutoSem.AppendFmt ("#define _V2F_AUTOSEMANTIC_CURRENT\t%zu\n",
+	  i+1);
+	cycleAutoSem.AppendFmt ("#define _V2F_AUTOSEMANTIC\t_V2F_AUTOSEMANTIC_%zu\n",
+	  i+1);
+      }
+      cycleAutoSem.AppendFmt ("#elif _V2F_AUTOSEMANTIC_CURRENT == %zu\n",
+	availableBindings.GetSize()-1);
+      cycleAutoSem.Append ("#undef _V2F_AUTOSEMANTIC_CURRENT\n");
+      cycleAutoSem.Append ("#undef _V2F_AUTOSEMANTIC\n");
+      cycleAutoSem.AppendFmt ("#define _V2F_AUTOSEMANTIC_CURRENT\t%zu\n",
+	availableBindings.GetSize());
+      cycleAutoSem.AppendFmt ("#define _V2F_AUTOSEMANTIC\n");
+      cycleAutoSem.Append ("#endif\n");
+      cycleAutoSem.Append ("#endif\n");
+    }
+  
+    void WriteDeclarationsPreamble (DocNodeCgAppender& appender) const
+    {
+      appender.Append (declsPreamble);
+    }
+    void WriteDeclarationsPostamble (DocNodeCgAppender& appender) const
+    {
+      appender.Append (declsPostamble);
+    }
+  
+    void WriteDeclarationPostamble (csString& str) const
+    {
+      str.Append (cycleAutoSem);
+    }
+  };
+        
+  //---------------------------------------------------------------------
+  
   ShaderCombinerCg::ShaderCombinerCg (ShaderCombinerLoaderCg* loader, 
                                       bool vp, bool fp) : 
     scfImplementationType (this), loader (loader), writeVP (vp), writeFP (fp),
@@ -1043,9 +1152,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   {
     return loader->CoerceCost (fromType, toType);
   }
-        
+  
   void ShaderCombinerCg::WriteToPass (iDocumentNode* pass)
   {
+    V2FAutoSematicsHelper autoSem (loader, snippets);
+    
     if (writeVP)
     {
       csRef<iDocumentNode> vpNode = pass->CreateNodeBefore (CS_NODE_ELEMENT);
@@ -1093,11 +1204,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       appender.Append ("struct vertex2fragment\n");
       appender.Append ("{\n");
       appender.Append ("  void dummy() {}\n");
+      autoSem.WriteDeclarationsPreamble (appender);
       for (size_t s = 0; s < snippets.GetSize(); s++)
       {
-        AppendProgramInput_V2FDecl (snippets[s], appender);
+        AppendProgramInput_V2FDecl (snippets[s], autoSem, appender);
       }
-      
+      autoSem.WriteDeclarationsPostamble (appender);
       appender.Append ("};\n\n");
       
       appender.Append ("struct VertexInput\n");
@@ -1192,11 +1304,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       appender.Append ("struct vertex2fragment\n");
       appender.Append ("{\n");
       appender.Append ("  void dummy() {}\n");
+      autoSem.WriteDeclarationsPreamble (appender);
       for (size_t s = 0; s < snippets.GetSize(); s++)
       {
-        AppendProgramInput_V2FDecl (snippets[s], appender);
+        AppendProgramInput_V2FDecl (snippets[s], autoSem, appender);
       }
-      
+      autoSem.WriteDeclarationsPostamble (appender);
       appender.Append ("};\n\n");
       
       appender.Append ("struct FragmentInput\n");
@@ -1362,7 +1475,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   }
   
   void ShaderCombinerCg::AppendProgramInput_V2FDecl (
-    const Snippet& snippet, DocNodeCgAppender& appender)
+    const Snippet& snippet, const V2FAutoSematicsHelper& semanticsHelper,
+    DocNodeCgAppender& appender)
   {
     // FIXME: error handling here
     for (size_t n = 0; n < snippet.vert2frag.GetSize(); n++)
@@ -1413,14 +1527,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 	    const char* binding = node->GetAttributeValue ("binding");
 	    if (type && *type)
 	    {
-	      csString countStr;
-	      if (count > 0) countStr.Format ("[%d]", count);
 	      csString bindingStr;
 	      if (binding) bindingStr.Format (" : %s", binding);
 	      csString str;
-	      str.Format ("varying %s %s%s%s;\n", 
-		CgType (type).GetData(), uniqueName.GetData(), 
-		countStr.GetDataSafe(), bindingStr.GetDataSafe());
+	      if (bindingStr.IsEmpty())
+	      {
+		str.Format ("varying %s %s _V2F_AUTOSEMANTIC ;\n", 
+		  CgType (type).GetData(), uniqueName.GetData());
+		semanticsHelper.WriteDeclarationPostamble (str);
+	      }
+	      else
+		str.Format ("varying %s %s%s;\n", 
+		  CgType (type).GetData(), uniqueName.GetData(), 
+		  bindingStr.GetDataSafe());
 	      appender.Append (str);
 	    }
 	    appender.Append ("#endif\n");

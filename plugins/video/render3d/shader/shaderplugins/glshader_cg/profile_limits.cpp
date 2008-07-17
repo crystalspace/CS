@@ -86,24 +86,43 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   {
   }
   
-  static uint glGetInteger (GLenum what)
+  uint ProfileLimits::glGetProgramInteger (csGLExtensionManager* ext,
+								 GLenum target, GLenum what)
   {
     GLint v;
-    glGetIntegerv (what, &v);
+    ext->glGetProgramivARB (target, what, &v);
     return v;
   }
+  
+  static GLenum GetProgramIntegerTarget (CGprofile profile)
+  {
+    switch (profile)
+    {
+      case CG_PROFILE_VP30:
+      case CG_PROFILE_VP40:
+      case CG_PROFILE_ARBVP1:
+	return GL_VERTEX_PROGRAM_ARB;
+      case CG_PROFILE_FP30:
+      case CG_PROFILE_FP40:
+      case CG_PROFILE_ARBFP1:
+	return GL_FRAGMENT_PROGRAM_ARB;
+      default:
+	return GL_NONE;
+    }
+  }
 
-  void ProfileLimits::GetCurrentLimits ()
+  void ProfileLimits::GetCurrentLimits (csGLExtensionManager* ext)
   {
 #define PROFILE_BEGIN(PROFILE)  \
   case CG_PROFILE_ ## PROFILE:  \
-    {
+    {						    \
+      const GLenum target = GetProgramIntegerTarget (CG_PROFILE_ ## PROFILE);
 #define PROFILE_END(PROFILE)    \
     }                           \
     break;
 #define LIMIT(Limit, glLimit, cgDefault)   \
-      Limit = (GL_ ## glLimit != GL_NONE) ? glGetInteger (GL_ ## glLimit) \
-                                          : cgDefault;
+      Limit = (GL_ ## glLimit != GL_NONE)	\
+	? glGetProgramInteger (ext, target, GL_ ## glLimit) : cgDefault;
   
     switch (profile)
     {

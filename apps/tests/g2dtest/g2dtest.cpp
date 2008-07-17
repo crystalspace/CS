@@ -31,6 +31,7 @@
 #include "csutil/csstring.h"
 #include "csutil/csuctransform.h"
 #include "csutil/event.h"
+#include <csutil/common_handlers.h>
 #include "csutil/randomgen.h"
 #include "csutil/refarr.h"
 #include "csutil/sysfunc.h"
@@ -123,17 +124,16 @@ public:
   csRef<iGraphics3D> myG3D;
   iObjectRegistry* object_reg;
   csRef<iCursor> cursorPlugin;
+  csRef<FramePrinter> framePrinter;
   csEventID SystemOpen;
   csEventID KeyboardDown;
-  csEventID Process;
-  csEventID FinalProcess;
   csEventID CanvasResize;
+  csEventID Frame;
 
 public:
   G2DTestSystemDriver (int argc, char* argv[]);
   virtual ~G2DTestSystemDriver ();
   void SetupFrame ();
-  void FinishFrame ();
   bool HandleEvent (iEvent &Event);
 
 private:
@@ -198,9 +198,10 @@ G2DTestSystemDriver::G2DTestSystemDriver (int argc, char* argv[])
   }
 
   if (!csInitializer::RequestPlugins (object_reg,
-  	CS_REQUEST_VFS,
-  	CS_REQUEST_FONTSERVER,
-	CS_REQUEST_END))
+    CS_REQUEST_VFS,
+    CS_REQUEST_FONTSERVER,
+    CS_REQUEST_LEVELLOADER,
+    CS_REQUEST_END))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.g2dtest",
@@ -219,6 +220,8 @@ G2DTestSystemDriver::G2DTestSystemDriver (int argc, char* argv[])
 
 G2DTestSystemDriver::~G2DTestSystemDriver ()
 {
+  framePrinter.Invalidate ();
+
   if (EventOutlet != 0)
     EventOutlet->DecRef();
   font = 0;
@@ -526,12 +529,6 @@ void G2DTestSystemDriver::SetupFrame ()
       }
       break;
   }
-}
-
-void G2DTestSystemDriver::FinishFrame ()
-{
-  myG3D->FinishDraw ();
-  myG3D->Print (0);
 }
 
 bool G2DTestSystemDriver::HandleEvent (iEvent &Event)
@@ -1647,14 +1644,9 @@ void G2DTestSystemDriver::BlitTest ()
 
 static bool G2DEventHandler (iEvent& ev)
 {
-  if (ev.Name == Sys->Process)
+  if (ev.Name == Sys->Frame)
   {
     Sys->SetupFrame ();
-    return true;
-  }
-  else if (ev.Name == Sys->FinalProcess)
-  {
-    Sys->FinishFrame ();
     return true;
   }
   else
@@ -1721,9 +1713,10 @@ int main (int argc, char *argv[])
     
   System.SystemOpen = csevSystemOpen (object_reg);
   System.KeyboardDown = csevKeyboardDown (object_reg);
-  System.Process = csevProcess (object_reg);
-  System.FinalProcess = csevFinalProcess (object_reg);
+  System.Frame = csevFrame (object_reg);
   System.CanvasResize = csevCanvasResize (object_reg, System.myG2D);
+
+  System.framePrinter.AttachNew (new FramePrinter (object_reg));
 
   if (!csInitializer::OpenApplication (object_reg))
   {
