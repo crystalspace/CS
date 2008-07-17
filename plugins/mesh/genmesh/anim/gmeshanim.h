@@ -423,12 +423,11 @@ public:
  * Genmesh animation control type.
  */
 class csGenmeshAnimationControlType :
-  public scfImplementation3<csGenmeshAnimationControlType,
-    iGenMeshAnimationControlType, iComponent, iEventHandler>
+  public scfImplementation2<csGenmeshAnimationControlType,
+    iGenMeshAnimationControlType, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
-  csRef<iEventHandler> weakEventHandler;
 
 public:
   /// Constructor.
@@ -437,17 +436,9 @@ public:
   virtual ~csGenmeshAnimationControlType ();
   /// Initialize.
   bool Initialize (iObjectRegistry* object_reg);
-  /// Event handler.
-  bool HandleEvent (iEvent& ev);
 
   virtual csPtr<iGenMeshAnimationControlFactory> CreateAnimationControlFactory
   	();
-
-  CS_EVENTHANDLER_NAMES("crystalspace.mesh.genmesh.anim")
-  CS_EVENTHANDLER_NIL_CONSTRAINTS
-
-  csEventID Frame;
-  csEventID PreProcess;
 };
 
 #endif // __CS_GENMESHANIM_H__

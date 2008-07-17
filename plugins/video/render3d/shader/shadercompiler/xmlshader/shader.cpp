@@ -721,7 +721,6 @@ bool csXMLShader::Precache (iDocumentNode* source, iHierarchicalCache* cacheTo)
     for (size_t t = 0; t < techVar.techniques.GetSize(); t++)
     {
       ShaderTechVariant::Technique& tech = techVar.techniques[t];
-      tech.resolver->SetVariant (t);
       
       csRef<iHierarchicalCache> techCache;
       techCache = shaderCache->GetRootedCache (
@@ -730,6 +729,8 @@ bool csXMLShader::Precache (iDocumentNode* source, iHierarchicalCache* cacheTo)
       size_t vc = tech.resolver->GetVariantCount();
       for (size_t vi = 0; vi < vc; vi++)
       {
+        tech.resolver->SetVariant (vi);
+      
 	ShaderVariant var;
 	size_t ticket = ((vi*techVar.techniques.GetSize() + t) * (tvc+1) + (tvi+1));
     

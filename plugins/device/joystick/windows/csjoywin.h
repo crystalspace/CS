@@ -73,7 +73,7 @@ private:
         state[i] = j.state[i];
     }
   };
-  csEventID PreProcess;
+  csEventID Frame;
 
  protected:
   iObjectRegistry *object_reg;
@@ -106,8 +106,7 @@ private:
   /**\name iEventHandler implementation
    * @{ */
   virtual bool HandleEvent (iEvent &Event);
-  CS_EVENTHANDLER_NAMES("crystalspace.device.joystick")
-  CS_EVENTHANDLER_NIL_CONSTRAINTS
+  CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.device.joystick")
   /** @} */
 };
 
