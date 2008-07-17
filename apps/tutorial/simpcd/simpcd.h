@@ -16,8 +16,8 @@ License along with this library; if not, write to the Free
 Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SIMPLE1_H__
-#define __SIMPLE1_H__
+#ifndef __SIMPCD_H__
+#define __SIMPCD_H__
 
 #include <crystalspace.h>
 
@@ -148,4 +148,4 @@ public:
   CS_EVENTHANDLER_PHASE_LOGIC("application.simpcd")
 };
 
-#endif // __SIMPLE1_H__
+#endif // __SIMPCD_H__
