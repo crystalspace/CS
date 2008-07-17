@@ -107,6 +107,9 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, ShaderPass* pass,
   programNode = node->GetNode (xmltokens.Request (
     csXMLShaderCompiler::XMLTOKEN_FP));
 
+  bool result = true;
+  bool setFailReason = true;
+  
   if (programNode)
   {
     csRef<iHierarchicalCache> fpCache;
@@ -118,9 +121,12 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, ShaderPass* pass,
       pass->fp = program;
     else
     {
-      if (do_verbose)
+      if (do_verbose && setFailReason)
+      {
         SetFailReason ("fragment program failed to load");
-      return false;
+	setFailReason = false;
+      }
+      result = false;
     }
   }
 
@@ -145,9 +151,12 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, ShaderPass* pass,
     }
     else
     {
-      if (do_verbose)
+      if (do_verbose && setFailReason)
+      {
         SetFailReason ("vertex program failed to load");
-      return false;
+	setFailReason = false;
+      }
+      result = false;
     }
   }
 
@@ -172,12 +181,16 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, ShaderPass* pass,
     }
     else
     {
-      if (do_verbose)
+      if (do_verbose && setFailReason)
+      {
         SetFailReason ("vertex preprocessor failed to load");
-      return false;
+	setFailReason = false;
+      }
+      result = false;
     }
   }
 
+  if (result)
   {
     if (!ParseModes (pass, node, hlp)) return false;
 
@@ -191,14 +204,14 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, ShaderPass* pass,
   }
 
   //if we got this far, load buffermappings
-  if (!ParseBuffers (pass, node, hlp, resolveFP, resolveVP)) return false;
+  if (result && !ParseBuffers (pass, node, hlp, resolveFP, resolveVP)) result = false;
 
   //get texturemappings
-  if (!ParseTextures (pass, node, hlp, resolveFP)) return false;
+  if (result && !ParseTextures (pass, node, hlp, resolveFP)) result = false;
   
   WritePass (pass, cachedPlugins, cacheFile);
 
-  return true;
+  return result;
 }
 
 bool csXMLShaderTech::PrecachePass (iDocumentNode *node, ShaderPass* pass, 
@@ -1024,13 +1037,16 @@ csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (
   if (!program->Load (resolve, programNode))
     return 0;
 
-  if (!program->Compile (cacheTo))
-    return 0;
-    
+  /* Even if compilation fails, for since we need to handle the case where a
+      program is valid but not supported on the current HW in caching, 
+      flag program as available */
   cacheInfo.available = true;
   cacheInfo.pluginID = plugin;
   cacheInfo.progType = programType;
-
+  
+  if (!program->Compile (cacheTo))
+    return 0;
+    
   return csPtr<iShaderProgram> (program);
 }
   
@@ -1265,14 +1281,12 @@ bool csXMLShaderTech::Load (iLoaderContext* ldr_context,
   //fail the whole technique
   int currentPassNr = 0;
   it = node->GetNodes (xmltokens.Request (csXMLShaderCompiler::XMLTOKEN_PASS));
+  bool result = true;
   while (it->HasNext ())
   {
     csRef<iDocumentNode> passNode = it->Next ();
     passes[currentPassNr].owner = this;
-    if (!LoadPass (passNode, &passes[currentPassNr++], variant, cacheFile, cacheTo))
-    {
-      return false;
-    }
+    result &= LoadPass (passNode, &passes[currentPassNr++], variant, cacheFile, cacheTo);
   }
   
   if (cacheFile.IsValid())
@@ -1281,7 +1295,7 @@ bool csXMLShaderTech::Load (iLoaderContext* ldr_context,
       "/passes");
   }
 
-  return true;
+  return result;
 }
   
 bool csXMLShaderTech::Precache (iDocumentNode* node, size_t variant, 

@@ -359,6 +359,10 @@ void csGLShader_CG::ParsePrecacheLimits (iConfigFile* config, const char* type,
       seenKeys.AddNoTest (key);
     }
   }
+  /* Dirty trick: put highest profile last; most likely to compile; in the
+     case of VPs means bindings are correct.
+   */
+  out.Sort();
 }
 
 bool csGLShader_CG::Open()
@@ -385,6 +389,7 @@ bool csGLShader_CG::Open()
 
   enable = true;
 
+  ext->InitGL_ARB_color_buffer_float();
   ext->InitGL_ARB_vertex_program();
   ext->InitGL_ARB_fragment_program();
   ext->InitGL_NV_gpu_program4();

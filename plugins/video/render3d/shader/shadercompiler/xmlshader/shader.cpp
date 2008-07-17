@@ -563,7 +563,7 @@ void csXMLShader::Load (iDocumentNode* source, bool noCacheRead)
 	  cacheFile, hashStream))
 	cacheFile.Invalidate();
     }
-  }
+    }
   
   ConditionsReader* condReader = 0;
   if (readFromCache)
@@ -986,8 +986,6 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
       
       tech.resolver->SetEvalParams (&modes, &stack);
   
-      //csPrintf ("shader = %s\nsharedEvaluator->GetNumConditions() = %zu\n", cacheType.GetData(),
-        //sharedEvaluator->GetNumConditions());
       size_t vi = tech.resolver->GetVariant ();
       if (vi != csArrayItemNotFound)
       {

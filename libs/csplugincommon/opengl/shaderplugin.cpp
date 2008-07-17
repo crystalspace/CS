@@ -72,18 +72,24 @@ namespace CS
 	    f->QueryClassID ()) != 0)
 	return false;
     
-      if (r) r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
-      if (ext == 0)
+      ext = 0;
+      statecache = 0;
+      if (r)
+      {
+	r->GetDriver2D()->PerformExtension ("getstatecache", &statecache);
+	r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
+      }
+      if ((ext == 0) || (statecache == 0))
 	return false;
 	
       csString vendorStr ((const char*)glGetString (GL_VENDOR));
       vendorStr.Downcase();
-      if (vendorStr.FindFirst ("nvidia") != (size_t)-1)
+      if (vendorStr.FindStr ("nvidia") != (size_t)-1)
       {
         vendor = NVIDIA;
       }
-      else if ((vendorStr.FindFirst ("ati") != (size_t)-1)
-          || (vendorStr.FindFirst ("amd") != (size_t)-1))
+      else if ((vendorStr.FindStr ("ati") != (size_t)-1)
+          || (vendorStr.FindStr ("amd") != (size_t)-1))
       {
         vendor = ATI;
       }
