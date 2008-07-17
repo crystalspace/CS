@@ -72,8 +72,14 @@ namespace CS
 	    f->QueryClassID ()) != 0)
 	return false;
     
-      if (r) r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
-      if (ext == 0)
+      ext = 0;
+      statecache = 0;
+      if (r)
+      {
+	r->GetDriver2D()->PerformExtension ("getstatecache", &statecache);
+	r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
+      }
+      if ((ext == 0) || (statecache == 0))
 	return false;
 	
       csString vendorStr ((const char*)glGetString (GL_VENDOR));
