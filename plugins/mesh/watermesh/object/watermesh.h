@@ -63,11 +63,13 @@ class csWaterMeshObject :
 private:
   // The render mesh holder is used by GetRenderMeshes() to supply
   // render meshes that can be returned by that function.
-  csRenderMeshHolder rmHolder;
+	csFrameDataHolder<csDirtyAccessArray<csRenderMesh*> > meshesHolder;
+	csRenderMeshHolder rmHolder;
 
   // The standard render buffer holder. It takes care of giving
   // the renderer all required renderbuffers.
   csRef<csRenderBufferHolder> bufferHolder;
+  csRef<csRenderBufferHolder> farPatchBufferHolder;
 
   // The shader variable context. Holds shader variables like the
   // object to world transform.
@@ -77,6 +79,7 @@ private:
   // the color buffer here. But we will use the basic colors
   // from the factory.
   csRef<iRenderBuffer> color_buffer;
+  csRef<iRenderBuffer> far_patch_color_buffer;
 
   // Setup the bufferholder to get the buffers and accessors
   // for all types of data we need.
@@ -263,11 +266,19 @@ class csWaterMeshObjectFactory :
 
 private:
   // The actual data.
+	//Near patch and local water
 	csDirtyAccessArray<csVector3> verts;
 	csDirtyAccessArray<csVector3> norms;
 	csDirtyAccessArray<csVector2> texs;
 	csDirtyAccessArray<csColor>	cols;
 	csDirtyAccessArray<csTriangle> tris;
+	
+	//Far patch for ocean water
+	csDirtyAccessArray<csVector3> far_verts;
+	csDirtyAccessArray<csVector3> far_norms;
+	csDirtyAccessArray<csVector2> far_texs;
+	csDirtyAccessArray<csColor>	far_cols;
+	csDirtyAccessArray<csTriangle> far_tris;
 	
 	int numVerts, numTris;
 
@@ -298,6 +309,7 @@ private:
   bool mesh_texels_dirty_flag;
   bool mesh_normals_dirty_flag;
   bool mesh_triangle_dirty_flag;
+  bool mesh_far_patch_dirty_flag;
 
   // Admin.
   bool initialized;
@@ -329,6 +341,12 @@ private:
   csRef<iRenderBuffer> texel_buffer;
   csRef<iRenderBuffer> index_buffer;
   csRef<iRenderBuffer> normal_buffer;
+
+  csRef<iRenderBuffer> far_vertex_buffer;
+  csRef<iRenderBuffer> far_texel_buffer;
+  csRef<iRenderBuffer> far_index_buffer;
+  csRef<iRenderBuffer> far_normal_buffer;
+  csRef<iRenderBuffer> far_color_buffer;
 
   // Prepare the buffers (check if they are dirty).
   // Mesh objects will call this before rendering.
@@ -362,6 +380,8 @@ public:
   bool frequencies_changed;
   bool phases_changed;
   bool directions_changed;
+
+  bool far_patch_needs_update;
 
   /// Constructor.
   csWaterMeshObjectFactory (iMeshObjectType *pParent,
