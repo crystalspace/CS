@@ -1318,7 +1318,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
   else if (doStencilClear)
     clearMask = GL_STENCIL_BUFFER_BIT;
   
-  bool scissorWasEnabled;
+  bool scissorWasEnabled = false;
   if (drawflags & CSDRAW_NOCLIPCLEAR)
   {
     scissorWasEnabled = statecache->IsEnabled_GL_SCISSOR_TEST();
