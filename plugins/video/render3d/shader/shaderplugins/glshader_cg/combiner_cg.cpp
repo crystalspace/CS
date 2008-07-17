@@ -784,6 +784,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 	  availableBindings.Push (possibleBindings[i]);
       }
       
+      // @@@ FIXME: actually set that define somewhere
+      declsPreamble.Append ("#ifdef HAVE_ARB_color_buffer_float\n");
       for (size_t i = 0; i < availableBindings.GetSize(); i++)
       {
 	declsPreamble.AppendFmt ("#define _V2F_AUTOSEMANTIC_%zu\t: %s\n", i, availableBindings[i]);
@@ -798,8 +800,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 	declsPreamble.AppendFmt ("#define _V2F_AUTOSEMANTIC\t_V2F_AUTOSEMANTIC_0\n");
 	declsPreamble.AppendFmt ("#define _V2F_AUTOSEMANTIC_CURRENT\t0\n");
       }
+      declsPreamble.Append ("#else\n");
+      declsPreamble.Append ("#define _V2F_AUTOSEMANTIC\n");
+      declsPreamble.Append ("#endif\n");
       declsPostamble.AppendFmt ("#undef _V2F_AUTOSEMANTIC\n");
       
+      cycleAutoSem.Append ("#ifdef HAVE_ARB_color_buffer_float\n");
       cycleAutoSem.Append ("#if 0\n");
       for (size_t i = 0; i < availableBindings.GetSize()-1; i++)
       {
@@ -819,6 +825,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       cycleAutoSem.AppendFmt ("#define _V2F_AUTOSEMANTIC_CURRENT\t%zu\n",
 	availableBindings.GetSize());
       cycleAutoSem.AppendFmt ("#define _V2F_AUTOSEMANTIC\n");
+      cycleAutoSem.Append ("#endif\n");
       cycleAutoSem.Append ("#endif\n");
     }
   
