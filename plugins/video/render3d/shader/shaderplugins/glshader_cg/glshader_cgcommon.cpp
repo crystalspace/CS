@@ -21,6 +21,7 @@
 #include "cssysdef.h"
 
 #include "csplugincommon/opengl/glextmanager.h"
+#include "csplugincommon/opengl/glstates.h"
 #include "csplugincommon/shader/shadercachehelper.h"
 #include "csutil/csendian.h"
 #include "csutil/documenthelper.h"
@@ -90,11 +91,21 @@ void csShaderGLCGCommon::Activate()
   }
   #endif
   cgGLBindProgram (program);
+  
+  if (shaderPlug->ext->CS_GL_ARB_color_buffer_float)
+  {
+    shaderPlug->statecache->SetClampColor (GL_CLAMP_VERTEX_COLOR_ARB, GL_FALSE);
+  }
 }
 
 void csShaderGLCGCommon::Deactivate()
 {
   cgGLDisableProfile (programProfile);
+
+  if (shaderPlug->ext->CS_GL_ARB_color_buffer_float)
+  {
+    shaderPlug->statecache->SetClampColor (GL_CLAMP_VERTEX_COLOR_ARB, GL_TRUE);
+  }
 }
 
 void csShaderGLCGCommon::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,

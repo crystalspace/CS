@@ -61,6 +61,7 @@ public:
   CS_LEAKGUARD_DECLARE (csGLShader_CG);
   
   using CS::PluginCommon::ShaderProgramPluginGL::ext;
+  using CS::PluginCommon::ShaderProgramPluginGL::statecache;
   using CS::PluginCommon::ShaderProgramPluginGL::doVerbose;
   using CS::PluginCommon::ShaderProgramPluginGL::doVerbosePrecache;
   using CS::PluginCommon::ShaderProgramPluginGL::object_reg;

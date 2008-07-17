@@ -389,6 +389,7 @@ bool csGLShader_CG::Open()
 
   enable = true;
 
+  ext->InitGL_ARB_color_buffer_float();
   ext->InitGL_ARB_vertex_program();
   ext->InitGL_ARB_fragment_program();
   ext->InitGL_NV_gpu_program4();
