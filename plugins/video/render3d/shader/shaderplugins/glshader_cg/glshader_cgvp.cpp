@@ -70,7 +70,7 @@ bool csShaderGLCGVP::Compile (iHierarchicalCache* cache)
     shaderPlug->maxProfileVertex);
 
   ProfileLimits limits (programProfile);
-  limits.GetCurrentLimits ();
+  limits.GetCurrentLimits (shaderPlug->ext);
   WriteToCache (cache, limits);
   cacheKeepNodes.DeleteAll ();
 

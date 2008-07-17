@@ -163,7 +163,7 @@ bool csShaderGLCGFP::Compile (iHierarchicalCache* cache)
       loadLoadToGL | loadApplyVmap, 0);
   
     ProfileLimits limits (programProfile);
-    limits.GetCurrentLimits ();
+    limits.GetCurrentLimits (shaderPlug->ext);
     WriteToCache (cache, limits);
     cacheKeepNodes.DeleteAll ();
     return ret;

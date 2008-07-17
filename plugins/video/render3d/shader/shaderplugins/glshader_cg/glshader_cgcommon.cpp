@@ -339,16 +339,17 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
     if ((cgGetError() != CG_NO_ERROR)
       || !cgGLIsProgramLoaded (program)) 
     {
-      //if (shaderPlug->debugDump)
-	//DoDebugDump();
+      if (shaderPlug->debugDump)
+	DoDebugDump();
 
       if (shaderPlug->doVerbose
 	  && ((type == CG_GL_VERTEX) && (profile >= CG_PROFILE_ARBVP1))
 	    || ((type == CG_GL_FRAGMENT) && (profile >= CG_PROFILE_ARBFP1)))
       {
-	const char* err = (char*)glGetString (GL_PROGRAM_ERROR_STRING_ARB);
-	shaderPlug->Report (CS_REPORTER_SEVERITY_WARNING,
-	  "OpenGL error string: %s", err);
+	csString err = (char*)glGetString (GL_PROGRAM_ERROR_STRING_ARB);
+	if (!err.IsEmpty())
+	  shaderPlug->Report (CS_REPORTER_SEVERITY_WARNING,
+	    "OpenGL error string: %s", err.GetData());
       }
 
       shaderPlug->SetCompiledSource (0);
@@ -829,7 +830,7 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
     }
     
     ProfileLimits currentLimits (wrapper.limits.profile);
-    currentLimits.GetCurrentLimits ();
+    currentLimits.GetCurrentLimits (shaderPlug->ext);
     bool limitsSupported = currentLimits >= wrapper.limits;
     if (!limitsSupported)
     {
