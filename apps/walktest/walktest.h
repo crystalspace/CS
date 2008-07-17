@@ -621,7 +621,7 @@ public:
 
         return false;
       }
-      CS_EVENTHANDLER_PHASE_FRAME("crystalspace.walktest.frame.logic")
+      CS_EVENTHANDLER_PHASE_FRAME("crystalspace.walktest.frame.frame")
     };
     csRef<FrameEventHandler> frameEventHandler;
 
