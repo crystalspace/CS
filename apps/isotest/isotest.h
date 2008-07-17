@@ -19,10 +19,7 @@
 #ifndef __ISOTEST_H__
 #define __ISOTEST_H__
 
-#include <stdarg.h>
-#include "csutil/ref.h"
-#include "csgeom/vector3.h"
-#include "iutil/eventnames.h"
+#include <crystalspace.h>
 
 struct iEngine;
 struct iLoader;
@@ -60,35 +57,55 @@ struct IsoView
   { camera_offset = original_offset = v; angle = 0.f; distance = 1.f; }
 };
 
-class IsoTest
+/**
+* This is the main class of this application. It contains the
+* basic initialization code and the main event handler.
+*
+* csApplicationFramework provides a handy object-oriented wrapper around the
+* Crystal Space initialization and start-up functions.
+*
+* csBaseEventHandler provides a base object which does absolutely nothing
+* with the events that are sent to it.
+*/
+class IsoTest : public csApplicationFramework, public csBaseEventHandler
 {
 private:
-  iObjectRegistry* object_reg;
+  /// A pointer to the 3D engine.
   csRef<iEngine> engine;
+
+  /// A pointer to the map loader plugin.
   csRef<iLoader> loader;
+
+  /// A pointer to the 3D renderer plugin.
   csRef<iGraphics3D> g3d;
+
+  /// A pointer to the keyboard driver.
   csRef<iKeyboardDriver> kbd;
+
+  /// A pointer to the virtual clock.
   csRef<iVirtualClock> vc;
-  iSector* room;
+
+  /// A pointer to the view which contains the camera.
   csRef<iView> view;
+
+  /// The render manager, cares about selecting lights+meshes to render
+  csRef<iRenderManager> rm;
+
+  /// A pointer to the sector the camera will be in.
+  iSector* room;
+
   csRef<iMeshWrapper> actor;
   iMeshWrapper* plane;
   csRef<iLight> actor_light;
   csRef<iFont> font;
-
-  csEventID Process;
-  csEventID FinalProcess;
-  csEventID KeyboardDown;
-
   int current_view;
   IsoView views[4];
   /// is the main actor walking
   bool actor_is_walking;
 
-  static bool IsoTestEventHandler (iEvent& ev);
-  bool HandleEvent (iEvent& ev);
-  void SetupFrame ();
-  void FinishFrame ();
+  /// Event handlers to draw and print the 3D canvas on each frame
+  csRef<FrameBegin3DDraw> drawer;
+  csRef<FramePrinter> printer;
 
   bool CreateActor ();
   bool LoadMap ();
@@ -100,11 +117,56 @@ private:
   void SetupIsoView(IsoView& isoview);
 
 public:
-  IsoTest (iObjectRegistry* object_reg);
+  bool SetupModules ();
+
+  /**
+  * Handle keyboard events - ie key presses and releases.
+  * This routine is called from the event handler in response to a 
+  * csevKeyboard event.
+  */
+  bool OnKeyboard (iEvent&);
+
+  /**
+  * Setup everything that needs to be rendered on screen. This routine
+  * is called from the event handler in response to a csevFrame
+  * message, and is called in the "logic" phase (meaning that all
+  * event handlers for 3D, 2D, Console, Debug, and Frame phases
+  * will be called after this one).
+  */
+  void Frame ();
+
+  /// Construct our game. This will just set the application ID for now.
+  IsoTest ();
+
+  /// Destructor.
   ~IsoTest ();
 
-  bool Initialize ();
-  void Start ();
+  /// Final cleanup.
+  void OnExit ();
+
+  /**
+  * Main initialization routine. This routine will set up some basic stuff
+  * (like load all needed plugins, setup the event handler, ...).
+  * In case of failure this routine will return false. You can assume
+  * that the error message has been reported to the user.
+  */
+  bool OnInitialize (int argc, char* argv[]);
+
+  /**
+  * Run the application.
+  * First, there are some more initialization (everything that is needed 
+  * by Simple1 to use Crystal Space), then this routine fires up the main
+  * event loop. This is where everything starts. This loop will  basically
+  * start firing events which actually causes Crystal Space to function.
+  * Only when the program exits this function will return.
+  */
+  bool Application ();
+
+  /* Declare the name by which this class is identified to the event scheduler.
+  * Declare that we want to receive the frame event in the "3D" phase,
+  * and that we're not terribly interested in having other events
+  * delivered to us before or after other modules, plugins, etc. */
+  CS_EVENTHANDLER_PHASE_3D("application.isotest")
 };
 
 #endif // __ISOTEST_H__
