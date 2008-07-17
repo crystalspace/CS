@@ -198,9 +198,10 @@ G2DTestSystemDriver::G2DTestSystemDriver (int argc, char* argv[])
   }
 
   if (!csInitializer::RequestPlugins (object_reg,
-  	CS_REQUEST_VFS,
-  	CS_REQUEST_FONTSERVER,
-	CS_REQUEST_END))
+    CS_REQUEST_VFS,
+    CS_REQUEST_FONTSERVER,
+    CS_REQUEST_LEVELLOADER,
+    CS_REQUEST_END))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.g2dtest",
