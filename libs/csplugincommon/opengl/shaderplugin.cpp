@@ -78,12 +78,12 @@ namespace CS
 	
       csString vendorStr ((const char*)glGetString (GL_VENDOR));
       vendorStr.Downcase();
-      if (vendorStr.FindFirst ("nvidia") != (size_t)-1)
+      if (vendorStr.FindStr ("nvidia") != (size_t)-1)
       {
         vendor = NVIDIA;
       }
-      else if ((vendorStr.FindFirst ("ati") != (size_t)-1)
-          || (vendorStr.FindFirst ("amd") != (size_t)-1))
+      else if ((vendorStr.FindStr ("ati") != (size_t)-1)
+          || (vendorStr.FindStr ("amd") != (size_t)-1))
       {
         vendor = ATI;
       }
