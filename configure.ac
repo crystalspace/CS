@@ -1658,7 +1658,7 @@ AC_DEFUN([CS_CHECK_LIBCG],
 	[CS_CHECK_BUILD([if Cg is sufficiently recent], [cs_cv_libCg_recent],
 	    [AC_LANG_PROGRAM(
 	    	[[#include <Cg/cg.h>]], [cgSetErrorHandler(0,0);
-	    	CGProfile profile = CG_PROFILE_GPU_VP])],
+	    	CGprofile profile = CG_PROFILE_GPU_VP])],
 	    [], [C++], [], [], [],
 	    [$cs_cv_libCg_cflags],
 	    [$cs_cv_libCg_lflags],
