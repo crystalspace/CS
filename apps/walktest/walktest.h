@@ -625,7 +625,7 @@ public:
     };
     csRef<FrameEventHandler> frameEventHandler;
 
-    CS_DECLARE_FRAME_EVENT_SHORTCUTS
+    CS_DECLARE_FRAME_EVENT_SHORTCUTS;
 };
 
 extern csVector2 coord_check_vector;

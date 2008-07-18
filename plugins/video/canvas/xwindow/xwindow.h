@@ -29,6 +29,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/event.h"
+#include "csutil/eventhandlers.h"
 #include "ivaria/xwindow.h"
 #include "plugins/video/canvas/xwindowcommon/xextf86vm.h"
 #include "ivideo/graph2d.h"
@@ -174,8 +175,7 @@ public:
     }
     virtual ~EventHandler () { }
     virtual bool HandleEvent (iEvent& e) { return parent ? parent->HandleEvent(e) : false; }
-    CS_EVENTHANDLER_NAMES("crystalspace.window")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
+    CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.window")
   };
   csRef<EventHandler> scfiEventHandler;
 
