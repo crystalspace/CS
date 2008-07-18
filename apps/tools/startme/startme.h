@@ -131,8 +131,6 @@ private:
    */
   void Frame ();
 
-  void FinishFrame ();
-
   /// Here we will create our little, simple world.
   void CreateRoom ();
 
