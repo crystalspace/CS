@@ -30,7 +30,6 @@ CS_IMPLEMENT_APPLICATION
 PySimple::PySimple ()
 {
   SetApplicationName ("CrystalSpace.PySimp");
-  motion_flags = 0;
 }
 
 PySimple::~PySimple ()
@@ -46,6 +45,8 @@ bool PySimple::OnInitialize (int /*argc*/, char* /*argv*/[])
 	CS_REQUEST_FONTSERVER,
 	CS_REQUEST_IMAGELOADER,
 	CS_REQUEST_LEVELLOADER,
+  CS_REQUEST_REPORTER,
+  CS_REQUEST_REPORTERLISTENER,
 	CS_REQUEST_PLUGIN( "crystalspace.script.python", iScript ),
 	CS_REQUEST_END))
     return ReportError ("Couldn't init app!");
@@ -56,73 +57,118 @@ bool PySimple::OnInitialize (int /*argc*/, char* /*argv*/[])
     csevAllEvents (GetObjectRegistry())))
     return ReportError("Failed to set up event handler!");
 
-  Process = csevProcess (GetObjectRegistry());
-  FinalProcess = csevFinalProcess (GetObjectRegistry());
-  KeyboardDown = csevKeyboardDown (GetObjectRegistry());
-
   return true;
+}
+
+void PySimple::OnExit()
+{
+  // Shut down the event handlers we spawned earlier.
+  drawer.Invalidate();
+  printer.Invalidate();
 }
 
 bool PySimple::Application()
 {
-  vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry());
+  // Open the main system. This will open all the previously loaded plug-ins.
+  // i.e. all windows will be opened.
+  if (!OpenApplication(GetObjectRegistry()))
+    return ReportError("Error opening system!");
 
-  // Find the pointer to engine plugin
+  if (SetupModules())
+  {
+    // This calls the default runloop. This will basically just keep
+    // broadcasting process events to keep the game going.
+    Run();
+  }
+
+  return true;
+}
+
+bool PySimple::SetupModules ()
+{
+  // Now get the pointer to various modules we need. We fetch them
+  // from the object registry. The RequestPlugins() call we did earlier
+  // registered all loaded plugins with the object registry.
+  g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry());
+  if (!g3d) return ReportError("Failed to locate 3D renderer!");
+
   engine = csQueryRegistry<iEngine> (GetObjectRegistry());
-  if (!engine)
-    return ReportError ("No iEngine plugin!");
+  if (!engine) return ReportError("Failed to locate 3D engine!");
 
-  myG3D = csQueryRegistry<iGraphics3D> (GetObjectRegistry());
-  if (!myG3D)
-    return ReportError ("No iGraphics3D loader plugin!");
-
-  LevelLoader = csQueryRegistry<iLoader> (GetObjectRegistry());
-  if (!LevelLoader)
-    return ReportError ("No iLoader plugin!");
+  vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry());
+  if (!vc) return ReportError("Failed to locate Virtual Clock!");
 
   kbd = csQueryRegistry<iKeyboardDriver> (GetObjectRegistry());
-  if (!kbd)
-    return ReportError ("No iKeyboardDriver!");
+  if (!kbd) return ReportError("Failed to locate Keyboard Driver!");
 
-  // Open the main system. This will open all the previously loaded plug-ins.
-  iNativeWindow* nw = myG3D->GetDriver2D ()->GetNativeWindow ();
+  loader = csQueryRegistry<iLoader> (GetObjectRegistry());
+  if (!loader) return ReportError("Failed to locate Loader!");
+
+  // We need a View to the virtual world.
+  view.AttachNew(new csView (engine, g3d));
+  iGraphics2D* g2d = g3d->GetDriver2D ();
+  // We use the full window to draw the world.
+  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
+
+  iNativeWindow* nw = g2d->GetNativeWindow ();
   if (nw) nw->SetTitle ("Simple Crystal Space Python Application");
-  if (!csInitializer::OpenApplication (GetObjectRegistry()))
-    return ReportError ("Error opening system!");
-
-  // Some commercials...
-  ReportInfo ("Simple Crystal Space Python Application version 0.1.");
 
   // First disable the lighting cache. Our app is simple enough
   // not to need this.
   engine->SetLightingCacheMode (0);
 
+  // Here we create our world.
+  CreateRoom();
+
+  // Let the engine prepare all lightmaps for use and also free all images 
+  // that were loaded for the texture manager.
+  engine->Prepare ();
+  rm = engine->GetRenderManager();
+
+  // these are used store the current orientation of the camera
+  rotY = rotX = 0;
+
+  // Now we need to position the camera in our world.
+  view->GetCamera ()->SetSector (room);
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
+
+  // We use some other "helper" event handlers to handle 
+  // pushing our work into the 3D engine and rendering it
+  // to the screen.
+  //drawer.AttachNew(new FrameBegin3DDraw (GetObjectRegistry (), view));
+  printer.AttachNew(new FramePrinter (GetObjectRegistry ()));
+
+  return true;
+}
+
+void PySimple::CreateRoom ()
+{
   // Create our world.
   ReportInfo ("Creating world!...");
 
-  LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
+  loader->LoadTexture ("stone", "/lib/std/stone4.gif");
   iSector *room = engine->CreateSector ("room");
 
   csRef<iPluginManager> plugin_mgr (
-  	csQueryRegistry<iPluginManager> (GetObjectRegistry()));
+    csQueryRegistry<iPluginManager> (GetObjectRegistry()));
   // Initialize the python plugin.
   csRef<iScript> is = csQueryRegistry<iScript> (GetObjectRegistry());
   if (is)
   {
     char const* module = "pysimp";
     csRef<iCommandLineParser> cmd =
-	csQueryRegistry<iCommandLineParser> (GetObjectRegistry());
+      csQueryRegistry<iCommandLineParser> (GetObjectRegistry());
     if (cmd.IsValid())
     {
       char const* file = cmd->GetName(0);
       if (file != 0)
-	module = file;
+        module = file;
     }
 
     // Load a python module.
     ReportInfo ("Loading script file `%s'...", module);
     if (!is->LoadModule (module))
-      return false;
+      return;
 
     // Set up our room.
     // Execute one method defined in pysimp.py
@@ -144,24 +190,8 @@ bool PySimple::Application()
 
   csRef<iLight> light;
   light = engine->CreateLight (0, csVector3 (0, 5, 0), 10,
-  	csColor (1, 0, 0));
+    csColor (1, 0, 0));
   room->GetLights ()->Add (light);
-
-  engine->Prepare ();
-
-  // csView is a view encapsulating both a camera and a clipper.
-  // You don't have to use csView as you can do the same by
-  // manually creating a camera and a clipper but it makes things a little
-  // easier.
-  view = csPtr<iView> (new csView (engine, myG3D));
-  view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 2, 0));
-  iGraphics2D* g2d = myG3D->GetDriver2D ();
-  view->SetRectangle (2, 2, g2d->GetWidth () - 4, g2d->GetHeight () - 4);
-
-  Run ();
-
-  return true;
 }
 
 void PySimple::OnCommandLineHelp ()
@@ -176,54 +206,85 @@ void PySimple::OnCommandLineHelp ()
 	   "by PYTHONPATH).\n\n");
 }
 
-void PySimple::ProcessFrame ()
+void PySimple::Frame ()
 {
-  csTicks elapsed_time, current_time;
-  elapsed_time = vc->GetElapsedTicks ();
-  current_time = vc->GetCurrentTicks ();
-
+  // First get elapsed time from the virtual clock.
+  csTicks elapsed_time = vc->GetElapsedTicks ();
   // Now rotate the camera according to keyboard state
-  float speed = (elapsed_time / 1000.) * (0.03 * 20);
+  float speed = (elapsed_time / 1000.0) * (0.06 * 20);
 
-  if (kbd->GetKeyState (CSKEY_RIGHT))
-    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed);
-  if (kbd->GetKeyState (CSKEY_LEFT))
-    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed);
-  if (kbd->GetKeyState (CSKEY_PGUP))
-    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed);
-  if (kbd->GetKeyState (CSKEY_PGDN))
-    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed);
-  if (kbd->GetKeyState (CSKEY_UP))
-    view->GetCamera ()->Move (CS_VEC_FORWARD * 4 * speed);
-  if (kbd->GetKeyState (CSKEY_DOWN))
-    view->GetCamera ()->Move (CS_VEC_BACKWARD * 4 * speed);
+  iCamera* c = view->GetCamera();
 
-  // Tell 3D driver we're going to display 3D things.
-  if (!myG3D->BeginDraw (CSDRAW_3DGRAPHICS)) return;
-
-  if (view)
-    view->Draw ();
-}
-
-void PySimple::FinishFrame ()
-{
-  // Drawing code ends here.
-  myG3D->FinishDraw ();
-  // Print the final output.
-  myG3D->Print (0);
-}
-
-bool PySimple::OnKeyboard (iEvent& Event)
-{
-  if ((Event.Name == KeyboardDown) &&
-      (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_ESC))
+  if (kbd->GetKeyState (CSKEY_SHIFT))
   {
-    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (GetObjectRegistry()));
-    if (q)
-      q->GetEventOutlet()->Broadcast (csevQuit (GetObjectRegistry()));
-    return true;
+    // If the user is holding down shift, the arrow keys will cause
+    // the camera to strafe up, down, left or right from it's
+    // current position.
+    if (kbd->GetKeyState (CSKEY_RIGHT))
+      c->Move (CS_VEC_RIGHT * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_LEFT))
+      c->Move (CS_VEC_LEFT * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_UP))
+      c->Move (CS_VEC_UP * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_DOWN))
+      c->Move (CS_VEC_DOWN * 4 * speed);
+  }
+  else
+  {
+    // left and right cause the camera to rotate on the global Y
+    // axis; page up and page down cause the camera to rotate on the
+    // _camera's_ X axis (more on this in a second) and up and down
+    // arrows cause the camera to go forwards and backwards.
+    if (kbd->GetKeyState (CSKEY_RIGHT))
+      rotY += speed;
+    if (kbd->GetKeyState (CSKEY_LEFT))
+      rotY -= speed;
+    if (kbd->GetKeyState (CSKEY_PGUP))
+      rotX += speed;
+    if (kbd->GetKeyState (CSKEY_PGDN))
+      rotX -= speed;
+    if (kbd->GetKeyState (CSKEY_UP))
+      c->Move (CS_VEC_FORWARD * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_DOWN))
+      c->Move (CS_VEC_BACKWARD * 4 * speed);
   }
 
+  // We now assign a new rotation transformation to the camera.  You
+  // can think of the rotation this way: starting from the zero
+  // position, you first rotate "rotY" radians on your Y axis to get
+  // the first rotation.  From there you rotate "rotX" radians on the
+  // your X axis to get the final rotation.  We multiply the
+  // individual rotations on each axis together to get a single
+  // rotation matrix.  The rotations are applied in right to left
+  // order .
+  csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
+  csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
+  c->SetTransform (ot);
+
+  rm->RenderView (view);
+}
+
+bool PySimple::OnKeyboard (iEvent& ev)
+{
+  // We got a keyboard event.
+  csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
+  if (eventtype == csKeyEventTypeDown)
+  {
+    // The user pressed a key (as opposed to releasing it).
+    utf32_char code = csKeyEventHelper::GetCookedCode(&ev);
+    if (code == CSKEY_ESC)
+    {
+      // The user pressed escape to exit the application.
+      // The proper way to quit a Crystal Space application
+      // is by broadcasting a csevQuit event. That will cause the
+      // main runloop to stop. To do that we get the event queue from
+      // the object registry and then post the event.
+      csRef<iEventQueue> q = 
+        csQueryRegistry<iEventQueue> (GetObjectRegistry());
+      if (q.IsValid()) q->GetEventOutlet()->Broadcast(
+        csevQuit(GetObjectRegistry()));
+    }
+  }
   return false;
 }
 
