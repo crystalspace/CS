@@ -62,18 +62,14 @@ private:
    */
   csRef<iStringSet> strings;
 
+  csRef<FramePrinter> printer;
+
   /**
    * Set up everything that needs to be rendered on screen.  This routine is
    * called from the event handler in response to a cscmdProcess broadcast
    * message.
    */
-  virtual void ProcessFrame();
-
-  /**
-   * Finally, render the screen.  This routine is called from the event handler
-   * in response to a cscmdFinalProcess broadcast message.
-   */
-  virtual void FinishFrame();
+  virtual void Frame();
 
   /**
    * Handle keyboard events, such as key presses and releases.  This routine is

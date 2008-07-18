@@ -606,6 +606,14 @@ namespace lighter
     csPrintf ("  lightmap layouter.\n");
     csPrintf ("   Default: 1\n");
 
+    csPrintf (" --maxterrainlightmapu=<number>\n");
+    csPrintf ("  Set maximum terrain lightmap size in u-mapping direction\n");
+    csPrintf ("   Default: value for non-terrain lightmaps\n");
+
+    csPrintf (" --maxterrainlightmapv=<number>\n");
+    csPrintf ("  Set maximum terrain lightmap size in v-mapping direction\n");
+    csPrintf ("   Default: value for non-terrain lightmaps\n");
+
     csPrintf (" --expert\n");
     csPrintf ("  Display advanced command line options\n");
 

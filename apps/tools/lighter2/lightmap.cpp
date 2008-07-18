@@ -222,6 +222,8 @@ namespace lighter
 
   bool Lightmap::IsOneColor (float threshold, csColor& color)
   {
+    ScopedSwapLock<Lightmap> l (*this);
+
     if ((width == 1) && (height == 1))
     {
       color = colorArray[0];
