@@ -28,6 +28,7 @@
 #include "csutil/csstring.h"
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
+#include "csutil/eventhandlers.h"
 
 #include "csjoylin.h"
 
@@ -206,7 +207,7 @@ bool csLinuxJoystick::Init ()
     csRef<iEventQueue> eq (csQueryRegistry<iEventQueue> (object_reg));
     if (eq != 0)
     {
-      eq->RegisterListener (static_cast<iEventHandler*> (this), PreProcess);
+      eq->RegisterListener (static_cast<iEventHandler*> (this), Frame);
       EventOutlet = eq->CreateEventOutlet (static_cast<iEventPlug*> (this));
       bHooked = true;
     }
