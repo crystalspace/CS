@@ -31,6 +31,11 @@ Simple::~Simple ()
 {
 }
 
+void Simple::OnExit ()
+{
+  printer.Invalidate ();
+}
+
 bool Simple::Setup ()
 {
   // The virtual clock.
@@ -116,10 +121,12 @@ bool Simple::Setup ()
 
   CreateGui();
 
+  printer.AttachNew (new FramePrinter (object_reg));
+
   return true;
 }
 
-void Simple::SetupFrame ()
+void Simple::Frame ()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
@@ -154,26 +161,11 @@ void Simple::SetupFrame ()
   cegui->Render();
 }
 
-void Simple::FinishFrame ()
-{
-  g3d->FinishDraw ();
-  g3d->Print (0);
-}
 
-bool Simple::HandleEvent (iEvent& ev)
+bool Simple::OnKeyboard (iEvent& ev)
 {
   bool res = false;
-  if (ev.Name == csevProcess(object_reg))
-  {
-    SetupFrame ();
-    res = true;
-  }
-  else if (ev.Name == csevFinalProcess(object_reg))
-  {
-    FinishFrame ();
-    res = true;
-  }
-  else if ((ev.Name == csevKeyboardDown(object_reg)) &&
+  if ((ev.Name == csevKeyboardDown(object_reg)) &&
     (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
   {
     csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (GetObjectRegistry ()));
@@ -199,8 +191,6 @@ bool Simple::OnInitialize(int /*argc*/, char* /*argv*/ [])
     GetApplicationName()))
     return ReportError("Failed to initialize config!");
 
-  Process = csevProcess (GetObjectRegistry ());
-  FinalProcess = csevFinalProcess (GetObjectRegistry ());
   KeyboardDown = csevKeyboardDown (GetObjectRegistry ());
   Quit = csevQuit (GetObjectRegistry ());
 
