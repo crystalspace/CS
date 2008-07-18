@@ -111,22 +111,11 @@ void Simple::SetupFrame ()
     WriteShadow( 10, 430, g2d->FindRGB (255, 150, 100),"AutoDisable ON");
 }
 
-void Simple::FinishFrame ()
-{
-  g3d->FinishDraw ();
-  g3d->Print (0);
-}
-
 bool Simple::HandleEvent (iEvent& ev)
 {
-  if (ev.Name == Process)
+  if (ev.Name == Frame)
   {
     simple->SetupFrame ();
-    return true;
-  }
-  else if (ev.Name == FinalProcess)
-  {
-    simple->FinishFrame ();
     return true;
   }
   else if (CS_IS_KEYBOARD_EVENT(object_reg, ev)) 
@@ -366,6 +355,8 @@ bool Simple::Initialize ()
     return false;
   }
 
+  printer.AttachNew (new FramePrinter (object_reg));
+
   csRef<iFontServer> fs = g3d->GetDriver2D()->GetFontServer ();
   if (fs)
     courierFont = fs->LoadFont (CSFONT_COURIER);
@@ -518,6 +509,11 @@ bool Simple::Initialize ()
   avatarbody->AttachColliderSphere (0.8f, csVector3 (0), 10, 1, 0.8f);
 
   return true;
+}
+
+void Simple::Shutdown ()
+{
+  printer.Invalidate ();
 }
 
 iRigidBody* Simple::CreateBox ()
@@ -794,6 +790,7 @@ int main (int argc, char* argv[])
   simple = new Simple (object_reg);
   if (simple->Initialize ())
     simple->Start ();
+  simple->Shutdown ();
   delete simple; simple = 0;
 
   csInitializer::DestroyApplication (object_reg);
