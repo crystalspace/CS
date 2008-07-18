@@ -1,27 +1,37 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+Copyright (C) 2001 by Jorrit Tyberghein
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Library General Public
-    License as published by the Free Software Foundation; either
-    version 2 of the License, or (at your option) any later version.
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Library General Public
+License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Library General Public License for more details.
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Library General Public License for more details.
 
-    You should have received a copy of the GNU Library General Public
-    License along with this library; if not, write to the Free
-    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+You should have received a copy of the GNU Library General Public
+License along with this library; if not, write to the Free
+Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_PYSIMP_H__
-#define __CS_PYSIMP_H__
+#ifndef __PYSIMP_H__
+#define __PYSIMP_H__
 
 #include <crystalspace.h>
 
-class PySimple : public csApplicationFramework, public csBaseEventHandler
+/**
+* This is the main class of this Tutorial. It contains the
+* basic initialization code and the main event handler.
+*
+* csApplicationFramework provides a handy object-oriented wrapper around the
+* Crystal Space initialization and start-up functions.
+*
+* csBaseEventHandler provides a base object which does absolutely nothing
+* with the events that are sent to it.
+*/
+class Simple : public csApplicationFramework, public csBaseEventHandler
 {
 private:
   /// A pointer to the 3D engine.
@@ -55,8 +65,6 @@ private:
   csRef<FrameBegin3DDraw> drawer;
   csRef<FramePrinter> printer;
 
-  void OnCommandLineHelp ();
-
 public:
   bool SetupModules ();
 
@@ -80,10 +88,10 @@ public:
   void CreateRoom ();
 
   /// Construct our game. This will just set the application ID for now.
-  PySimple ();
+  Simple ();
 
   /// Destructor.
-  ~PySimple ();
+  ~Simple ();
 
   /// Final cleanup.
   void OnExit ();
@@ -113,5 +121,4 @@ public:
   CS_EVENTHANDLER_PHASE_LOGIC("application.pysimp")
 };
 
-#endif // __CS_PYSIMP_H__
-
+#endif // __PYSIMP_H__
