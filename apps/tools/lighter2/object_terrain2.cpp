@@ -91,10 +91,10 @@ namespace lighter
 
       uint lmSamplesX = csMin ((uint)csFindNearestPowerOf2 (
         int (cellSize.x * factory->GetLMDensity())),
-        globalConfig.GetLMProperties().maxLightmapU);
+        globalConfig.GetTerrainProperties().maxLightmapU);
       uint lmSamplesY = csMin ((uint)csFindNearestPowerOf2 (
         int (cellSize.z * factory->GetLMDensity())),
-        globalConfig.GetLMProperties().maxLightmapV);
+        globalConfig.GetTerrainProperties().maxLightmapV);
 
       {
 	uint primSamplesX = cell->GetGridWidth();
