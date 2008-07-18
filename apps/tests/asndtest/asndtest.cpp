@@ -218,7 +218,7 @@ void ASndTest::CreateWorld ()
   engine->Prepare ();
 }
 
-void ASndTest::ProcessFrame ()
+void ASndTest::Frame ()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
@@ -285,12 +285,6 @@ void ASndTest::ProcessFrame ()
   view->Draw ();
 }
 
-void ASndTest::FinishFrame ()
-{
-  g3d->FinishDraw ();
-  g3d->Print (0);
-}
-
 bool ASndTest::OnKeyboard(iEvent& ev)
 {
   csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
@@ -331,6 +325,7 @@ bool ASndTest::OnInitialize(int argc, char* argv[])
 
 void ASndTest::OnExit()
 {
+  printer.Invalidate ();
 }
 
 bool ASndTest::Application()
@@ -362,7 +357,7 @@ bool ASndTest::Application()
   sndloader = csQueryRegistry<iSndSysLoader> (GetObjectRegistry());
   if (!sndloader) return ReportError("Failed to locate Sound loader!");
 
-engine->SetLightingCacheMode (0);
+  engine->SetLightingCacheMode (0);
 
   CreateWorld ();
 
@@ -372,6 +367,8 @@ engine->SetLightingCacheMode (0);
 
   view->GetCamera ()->SetSector (world);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (10, 5, 10));
+
+  printer.AttachNew (new FramePrinter (object_reg));
 
   Run();
 
