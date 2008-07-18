@@ -174,8 +174,7 @@ public:
     }
     virtual ~EventHandler () { }
     virtual bool HandleEvent (iEvent& e) { return parent ? parent->HandleEvent(e) : false; }
-    CS_EVENTHANDLER_NAMES("crystalspace.window")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
+    CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.window")
   };
   csRef<EventHandler> scfiEventHandler;
 
