@@ -25,6 +25,7 @@
 
 #include "csutil/sysfunc.h"
 #include "csutil/event.h"
+#include "csutil/common_handlers.h"
 #include "csutil/cfgfile.h"
 #include "csutil/cfgmgr.h"
 #include "iutil/vfs.h"
@@ -169,22 +170,11 @@ void Simple::SetupFrame ()
   view->Draw ();
 }
 
-void Simple::FinishFrame ()
-{
-  g3d->FinishDraw ();
-  g3d->Print (0);
-}
-
 bool Simple::HandleEvent (iEvent& ev)
 {
-  if (ev.Name == Process)
+  if (ev.Name == Frame)
   {
     SetupFrame ();
-    return true;
-  }
-  else if (ev.Name == FinalProcess)
-  {
-    FinishFrame ();
     return true;
   }
   else if (CS_IS_KEYBOARD_EVENT(object_reg, ev))
@@ -401,6 +391,8 @@ bool Simple::Initialize ()
 
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
+  printer.AttachNew (new FramePrinter (object_reg));
+
   return true;
 }
 
@@ -521,6 +513,7 @@ void MyApp::OnIdle() {
 
 int MyApp::OnExit()
 {
+  simple->Shutdown ();
   simple = 0;
   csInitializer::DestroyApplication (object_reg);
   return 0;
