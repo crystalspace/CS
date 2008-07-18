@@ -7,7 +7,7 @@
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.}
 
 Crystal Space features bindings for several popular scripting and higher-level
-languages. The list of languages includes Java, Perl, and Python.
+languages. The list of languages includes Java, C#/.Net, Perl, and Python.
 
 Some scripting language bindings also have corresponding Crystal Space plugins.
 These can be loaded like any other plugins, and allow your C++ program to
@@ -45,11 +45,13 @@ effort.
 @menu
 * iScript Interface:: The iScript Interface
 * Java Bindings::
+* C#/.Net Bindings::
 * Perl Bindings::
 * Python Bindings::
 @end menu
 
 @importss{usingcs,script,iscript.txi}
 @importsss{usingcs,script,java,java.txi}
+@importsss{usingcs,script,dotnet,dotnet.txi}
 @importsss{usingcs,script,perl,perl.txi}
 @importsss{usingcs,script,python,python.txi}

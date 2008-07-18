@@ -1,4 +1,4 @@
-@node Java Bindings, Perl Bindings, iScript Interface, Scripting Languages
+@node Java Bindings, C#/.Net Bindings, iScript Interface, Scripting Languages
 @subsection Java Bindings
 @cindex Java
 @cindex csJava

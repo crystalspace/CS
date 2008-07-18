@@ -1,4 +1,4 @@
-@node Perl Bindings, Python Bindings, Java Bindings, Scripting Languages
+@node Perl Bindings, Python Bindings, C#/.Net Bindings, Scripting Languages
 @subsection Perl Bindings
 @cindex Perl
 @cindex @code{csPerl}
