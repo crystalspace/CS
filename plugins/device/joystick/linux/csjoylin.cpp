@@ -72,7 +72,7 @@ bool csLinuxJoystick::Initialize (iObjectRegistry *oreg)
 #define CS_MAX_LINUX_JOYSTICK_AXES CS_MAX_JOYSTICK_AXES
 bool csLinuxJoystick::HandleEvent (iEvent& ev)
 {
-  if (ev.Name != PreProcess)
+  if (ev.Name != Frame)
     return false;
 
   struct js_event js;
@@ -202,7 +202,7 @@ bool csLinuxJoystick::Init ()
     }
 
     // hook into eventqueue
-    PreProcess = csevPreProcess (object_reg);
+    Frame = csevFrame (object_reg);
     csRef<iEventQueue> eq (csQueryRegistry<iEventQueue> (object_reg));
     if (eq != 0)
     {
