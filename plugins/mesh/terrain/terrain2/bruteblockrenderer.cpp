@@ -508,7 +508,7 @@ void TerrainBlock::SetupGeometry ()
         
         //@@Optimize this!
         *normalData++ = renderData->cell->GetNormal (
-          (int)(x*stepSize), (int)(y*stepSize)).Unit ();
+          (int)(x*stepSize), (int)(y*stepSize));
 
         if (height < minHeight)
           minHeight = height;
