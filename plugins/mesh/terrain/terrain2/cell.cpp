@@ -65,6 +65,7 @@ csTerrainCell::csTerrainCell (csTerrainSystem* terrain, const char* name, int gr
 
 csTerrainCell::~csTerrainCell ()
 {
+  SetLoadState (NotLoaded);
 }
 
 iTerrainSystem* csTerrainCell::GetTerrain()
@@ -158,6 +159,8 @@ void csTerrainCell::SetLoadState(LoadState state)
       {
         case NotLoaded:
         {
+          terrain->FireUnloadCallbacks (this);
+
           heightmap.DeleteAll ();
           materialmap.DeleteAll ();
 
@@ -166,8 +169,6 @@ void csTerrainCell::SetLoadState(LoadState state)
           feederData = 0;
 
           loadState = NotLoaded;
-
-          terrain->FireUnloadCallbacks (this);
 
           break;
         }
