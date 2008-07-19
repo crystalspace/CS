@@ -278,11 +278,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2Loader)
 	}
 
 	{
-	  csRef<iDocumentNode> node = 
-	    defaultNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-	  node->SetValue ("basematerial");
-	  node->CreateNodeBefore (CS_NODE_TEXT, 0)
-	    ->SetValue (defaultCell->GetBaseMaterial()->QueryObject()->GetName());
+	  iMaterialWrapper* basemat = defaultCell->GetBaseMaterial();
+	  if (basemat)
+	  {
+	    csRef<iDocumentNode> node = 
+	      defaultNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+	    node->SetValue ("basematerial");
+	    node->CreateNodeBefore (CS_NODE_TEXT, 0)
+	     ->SetValue (basemat->QueryObject()->GetName());
+	  }
 	}
 
 	synldr->WriteBool (defaultNode, "materialmappersistent",
@@ -381,13 +385,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2Loader)
 	  synldr->WriteVector (node, cell->GetSize());
 	}
 
-	if (defaultCell->GetBaseMaterial() != cell->GetBaseMaterial())
+	if ((cell->GetBaseMaterial() != 0)
+	    && (defaultCell->GetBaseMaterial() != cell->GetBaseMaterial()))
 	{
 	  csRef<iDocumentNode> node = 
 	    cellNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
 	  node->SetValue ("basematerial");
 	  node->CreateNodeBefore (CS_NODE_TEXT, 0)
-	    ->SetValue (defaultCell->GetBaseMaterial()->QueryObject()->GetName());
+	    ->SetValue (cell->GetBaseMaterial()->QueryObject()->GetName());
 	}
 
 	synldr->WriteBool (cellNode, "materialmappersistent",
