@@ -5,9 +5,9 @@
 @cindex Scripting, C#
 
 @noindent
-@emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}}.
+@emph{Written by Ronie Salgado, @email{roniesalg@@gmail.com}}.
 
-Crystal Space is accesible by the .Net Framework or other implementations as
+Crystal Space is accessible by the .Net Framework or other implementations as
 Mono using the C#/.Net bindings, which exposes a set the classes under the 
 CrystalSpace namespace.
 
