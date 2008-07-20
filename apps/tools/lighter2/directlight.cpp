@@ -113,6 +113,14 @@ namespace lighter
         defElementQuadrantConstants, clippedElementQuadrantConstants);
       ElementQuadrantConstants = clippedElementQuadrantConstants;
     }
+    
+#ifdef DUMP_NORMALS
+    {
+      const csVector3 normal = ComputeElementNormal (element, elementC);
+      const csVector3 normalBiased = normal*0.5f + csVector3 (0.5f);
+      return csColor (normalBiased.x, normalBiased.y, normalBiased.z);
+    }
+#endif
 
     for (size_t qi = 0; qi < 4; ++qi)
     {
@@ -248,6 +256,8 @@ namespace lighter
     VisibilityTester visTester (light, obj);
     float lightPdf, cosineTerm = 0;
     csVector3 lightVec;
+    const Object* ignObj = obj->GetFlags().Check (OBJECT_FLAG_NOSELFSHADOW)
+      ? obj : 0;
 
     const bool isDelta = true; //light->IsDeltaLight (); no support for area lights yet
 
@@ -266,11 +276,11 @@ namespace lighter
       {
         DirectLightingBorderIgnoreCb icb (shadowIgnorePrimitive, -lightVec,
           point);
-        occlusion = visTester.Occlusion (&icb);
+        occlusion = visTester.Occlusion (ignObj, &icb);
       }
       else
       {
-        occlusion = visTester.Occlusion (shadowIgnorePrimitive);
+        occlusion = visTester.Occlusion (ignObj, shadowIgnorePrimitive);
       }
       if (occlusion == VisibilityTester::occlOccluded)
         return csColor (0, 0, 0);
@@ -470,11 +480,13 @@ namespace lighter
 
     for (size_t i = 0; i < vdata.positions.GetSize (); ++i)
     {
-      const csVector3& pos = vdata.positions[i];
-      const csVector3& normal = ComputeVertexNormal (obj, i);
-
       csColor& c = litColors->Get (i);
-
+      const csVector3& normal = ComputeVertexNormal (obj, i);
+#ifdef DUMP_NORMALS
+      const csVector3 normalBiased = normal*0.5f + csVector3 (0.5f);
+      c = csColor (normalBiased.x, normalBiased.y, normalBiased.z);
+#else
+      const csVector3& pos = vdata.positions[i];
       c = (this->*pvlPointShader) (sector, obj, pos, normal, masterSampler);
 
       // Shade PD lights
@@ -485,6 +497,7 @@ namespace lighter
         pdlColors->Get (i) += UniformShadeOneLight (sector, obj, pos, normal, pdl,
           masterSampler);
       }
+#endif
       progress.Advance ();
     }
 

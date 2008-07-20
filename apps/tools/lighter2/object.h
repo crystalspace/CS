@@ -49,7 +49,9 @@ namespace lighter
     // Include in occlusion debugging
     OBJECT_FLAG_RAYDEBUG = 4,
     // Tangent space is available
-    OBJECT_FLAG_TANGENTS = 8
+    OBJECT_FLAG_TANGENTS = 8,
+    // Don't cast shadows on itself
+    OBJECT_FLAG_NOSELFSHADOW = 16
   };
 
   /**
@@ -94,6 +96,12 @@ namespace lighter
 
     /// Whether tangent space data is available
     bool hasTangents : 1;
+
+    /**
+     * Whether meshes of this factory should not cast shadows
+     * on themselves
+     */
+    bool noSelfShadow : 1;
   protected:
 
     // Begin remapping of submeshes

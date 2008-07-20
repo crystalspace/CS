@@ -49,6 +49,7 @@ namespace lighter
 
   ObjectFactory::ObjectFactory (const Configuration& config)
     : lightPerVertex (false), noModify (false), hasTangents (false),
+    noSelfShadow (false),
     lmScale (config.GetLMProperties ().lmDensity),
     factoryWrapper (0)
   {
@@ -122,6 +123,12 @@ namespace lighter
         const char* vVertexlight = kvp->GetValue ("vertexlight");
         if (vVertexlight != 0)
           lightPerVertex = (strcmp (vVertexlight, "yes") == 0);
+
+        const char* vNoSelfShadow = kvp->GetValue ("noselfshadow");
+        if (vNoSelfShadow != 0)
+        {
+          noSelfShadow = (strcmp (vNoSelfShadow, "yes") == 0);
+	}
 
         const char* vLMScale = kvp->GetValue ("lmscale");
         if (vLMScale)
@@ -203,6 +210,8 @@ namespace lighter
     : lightPerVertex (fact->lightPerVertex), sector (0), litColors (0), 
       litColorsPD (0), factory (fact)
   {
+    if (factory->noSelfShadow)
+      objFlags.Set (OBJECT_FLAG_NOSELFSHADOW);
   }
   
   Object::~Object ()
@@ -374,6 +383,13 @@ namespace lighter
         scfQueryInterface<iKeyValuePair> (obj);
       if (kvp.IsValid() && (strcmp (kvp->GetKey(), "lighter2") == 0))
       {
+        const char* vNoSelfShadow = kvp->GetValue ("noselfshadow");
+        if (vNoSelfShadow != 0)
+        {
+          objFlags.SetBool (OBJECT_FLAG_NOSELFSHADOW,
+            strcmp (vNoSelfShadow, "yes") == 0);
+	}
+
         if (!factory->lightPerVertex)
         {
           /* Disallow "disabling" of per-vertex lighting in an object when
