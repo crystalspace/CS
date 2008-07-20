@@ -116,38 +116,38 @@
                 <cell>
                     <name>0</name>
                     <position x="-256" y="-256" />
+                    <basematerial>Base01</basematerial>
                     <feederproperties>
                         <param name="heightmap source">/lev/terraini/heightmap_01.png</param>
                         <param name="materialmap source">/lev/terraini/material_01.png</param>
                     </feederproperties>
-                    <basematerial>Base01</basematerial>
                 </cell>
                 <cell>
                     <name>1</name>
                     <position x="0" y="-256" />
+                    <basematerial>Base11</basematerial>
                     <feederproperties>
                         <param name="heightmap source">/lev/terraini/heightmap_11.png</param>
                         <param name="materialmap source">/lev/terraini/material_11.png</param>
                     </feederproperties>
-                    <basematerial>Base11</basematerial>
                 </cell>
                 <cell>
                     <name>2</name>
                     <position x="-256" y="0" />
+                    <basematerial>Base00</basematerial>
                     <feederproperties>
                         <param name="heightmap source">/lev/terraini/heightmap_00.png</param>
                         <param name="materialmap source">/lev/terraini/material_00.png</param>
                     </feederproperties>
-                    <basematerial>Base00</basematerial>
                 </cell>
                 <cell>
                     <name>3</name>
                     <position x="0" y="0" />
+                    <basematerial>Base10</basematerial>
                     <feederproperties>
                         <param name="heightmap source">/lev/terraini/heightmap_10.png</param>
                         <param name="materialmap source">/lev/terraini/material_10.png</param>
                     </feederproperties>
-                    <basematerial>Base10</basematerial>
                 </cell>
             </cells>
         </params>

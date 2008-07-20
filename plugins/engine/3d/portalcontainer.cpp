@@ -429,6 +429,7 @@ class PerspectiveOutlet2D
 protected:
   CS::Math::Matrix4 camProj;
   csPoly2D& dest;
+  float iw, ih;
   
   static void Perspective (const csVector3& v, csVector2& p,
     const CS::Math::Matrix4& camProj)
@@ -437,15 +438,38 @@ protected:
     p.x = v_proj.x / v_proj.w;
     p.y = v_proj.y / v_proj.w;
   }
+  static void PerspectiveScreen (const csVector3& v, csVector2& p,
+    const CS::Math::Matrix4& camProj, float iw, float ih)
+  {
+    csVector4 v_proj (camProj * csVector4 (v, 1));
+    p.x = (v_proj.x / v_proj.w + 1.0f) / iw;
+    p.y = (v_proj.y / v_proj.w + 1.0f) / ih;
+  }
+
 public:
   PerspectiveOutlet2D (const CS::Math::Matrix4& camProj,
-    csPoly2D& dest) : camProj (camProj), dest (dest) {}
+    csPoly2D& dest, int viewWidth, int viewHeight)
+    : camProj (camProj), dest (dest)
+  {
+    if (viewWidth > 0 && viewHeight > 0)
+    {
+      iw = 2.0f/viewWidth;
+      ih = 2.0f/viewHeight;
+    }
+    else
+    {
+      iw = ih = 0.0f;
+    }
+  }
 
   void MakeEmpty () { dest.MakeEmpty(); }
   void Add (const csVector3 &v)
   {
     csVector2 p;
-    Perspective (v, p, camProj);
+    if (iw != 0.0f)
+      PerspectiveScreen (v, p, camProj, iw, ih);
+    else
+      Perspective (v, p, camProj);
     dest.AddVertex (p);
   }
   void AddVertex (float x, float y)
@@ -455,7 +479,10 @@ public:
   const csVector2* GetLast() { return dest.GetLast(); }
   void Perspective (const csVector3& v, csVector2& p)
   {
-    Perspective (v, p, camProj);
+    if (iw != 0.0f)
+      PerspectiveScreen (v, p, camProj, iw, ih);
+    else
+      Perspective (v, p, camProj);
   }
   bool ClipAgainst (iClipper2D* clipper)
   {
@@ -932,7 +959,12 @@ bool csPortalContainer::Draw (iRenderView* rview, iMovable* /*movable*/,
     meshwrapper->GetCsMovable ().GetFullTransform ();
 
   csPoly2D poly;
-  PerspectiveOutlet2D outlet (camera->GetProjectionMatrix(), poly);
+  int viewWidth = rview->GetGraphics3D ()->GetWidth();
+  int viewHeight = rview->GetGraphics3D ()->GetHeight();
+  float iw = 2.0f/viewWidth;
+  float ih = 2.0f/viewHeight;
+  PerspectiveOutlet2D outlet (camera->GetProjectionMatrix(), poly, viewWidth, viewHeight);
+
   size_t i;
   if (clip_plane || clip_portal || clip_z_plane || do_portal_plane || farplane)
   {
@@ -969,7 +1001,9 @@ bool csPortalContainer::Draw (iRenderView* rview, iMovable* /*movable*/,
       int j;
       outlet.MakeEmpty ();
       for (j = 0 ; j < num_vertices ; j++)
-         outlet.Add (camera_vertices[vt[j]]);
+      {
+        outlet.Add (camera_vertices[vt[j]]);
+      }
       DrawOnePortal (portals[i], poly, movtrans, rview, camera_planes[i]);
     }
   }
@@ -1085,6 +1119,7 @@ public:
 
 class PerspectiveOutlet2D3D : public PerspectiveOutlet2D
 {
+private:
   csPoly3D& dest3D;
   iCamera* cam;
   int viewWidth, viewHeight;
@@ -1100,8 +1135,8 @@ class PerspectiveOutlet2D3D : public PerspectiveOutlet2D
 public:
   PerspectiveOutlet2D3D (iCamera* cam, csPoly2D& dest2D, csPoly3D& dest3D,
     int viewWidth, int viewHeight)
-    : PerspectiveOutlet2D (cam->GetProjectionMatrix(), dest2D),
-    dest3D (dest3D), cam (cam), viewWidth (viewWidth), viewHeight (viewWidth) {}
+    : PerspectiveOutlet2D (cam->GetProjectionMatrix(), dest2D, 0, 0),
+    dest3D (dest3D), cam (cam), viewWidth (viewWidth), viewHeight (viewHeight) { }
 
   void MakeEmpty () 
   { 

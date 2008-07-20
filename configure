@@ -63592,6 +63592,7 @@ int
 main ()
 {
 cgSetErrorHandler(0,0);
+	    	CGprofile profile = CG_PROFILE_GPU_VP
   ;
   return 0;
 }
@@ -63741,6 +63742,7 @@ int
 main ()
 {
 cgSetErrorHandler(0,0);
+	    	CGprofile profile = CG_PROFILE_GPU_VP
   ;
   return 0;
 }

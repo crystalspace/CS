@@ -140,9 +140,11 @@ bool Simple::Setup ()
 
   collider_actor.SetGravity (0);
 
+  printer.AttachNew (new FramePrinter (object_reg));
+
   return true;
 }
-void Simple::ProcessFrame ()
+void Simple::Frame ()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
@@ -193,13 +195,6 @@ void Simple::ProcessFrame ()
 
   // Tell the camera to render into the frame buffer.
   rm->RenderView (view);
-}
-
-void Simple::FinishFrame ()
-{
-  // Just tell the 3D renderer that everything has been rendered.
-  g3d->FinishDraw ();
-  g3d->Print (0);
 }
 
 bool Simple::OnKeyboard(iEvent& ev)
@@ -260,6 +255,7 @@ bool Simple::OnInitialize(int /*argc*/, char* /*argv*/ [])
 
 void Simple::OnExit()
 {
+  printer.Invalidate ();
 }
 
 bool Simple::Application()

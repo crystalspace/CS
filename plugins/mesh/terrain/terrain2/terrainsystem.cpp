@@ -53,6 +53,8 @@ csTerrainSystem::csTerrainSystem (iMeshObjectFactory* factory,
 
 csTerrainSystem::~csTerrainSystem ()
 {
+  cells.Empty();
+  renderer->DisconnectTerrain (this);
 }
 
 void csTerrainSystem::AddCell (csTerrainCell* cell)

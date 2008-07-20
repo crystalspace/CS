@@ -34,7 +34,10 @@
 #include "ivaria/conin.h"
 #include "iutil/vfs.h"
 #include "iutil/plugin.h"
+#include "iutil/event.h"
+#include "iutil/eventh.h"
 #include "iutil/eventnames.h"
+#include "csutil/eventhandlers.h"
 #include "ivideo/fontserv.h"
 #include "bot.h"
 
@@ -159,8 +162,6 @@ public:
   csRef<iVirtualClock> vc;
 
   csRef<iEventNameRegistry> name_reg;
-  csEventID Process;
-  csEventID FinalProcess;
   csEventID CommandLineHelp;
   csEventID CanvasHidden;
   csEventID CanvasExposed;
@@ -564,6 +565,67 @@ public:
   void SaveCamera (const char *fName);
   bool LoadCamera (const char *fName);
   //@}
+
+  protected:
+    /**
+    * Embedded iEventHandler interface that handles frame events in the
+    * 3D phase.
+    */
+    class E3DEventHandler : 
+      public scfImplementation1<E3DEventHandler, 
+      iEventHandler>
+    {
+    private:
+      WalkTest* parent;
+    public:
+      E3DEventHandler (WalkTest* parent) :
+          scfImplementationType (this), parent (parent) { }
+      virtual ~E3DEventHandler () { }
+      virtual bool HandleEvent (iEvent& ev)
+      {
+        if (parent && (ev.Name == parent->Frame))
+        {      
+          parent->SetupFrame ();
+
+          return true;
+        }
+
+        return false;
+      }
+      CS_EVENTHANDLER_PHASE_3D("crystalspace.walktest.frame.3d")
+    };
+    csRef<E3DEventHandler> e3DEventHandler;
+
+    /**
+    * Embedded iEventHandler interface that handles frame events in the
+    * frame phase.
+    */
+    class FrameEventHandler : 
+      public scfImplementation1<FrameEventHandler, 
+      iEventHandler>
+    {
+    private:
+      WalkTest* parent;
+    public:
+      FrameEventHandler (WalkTest* parent) :
+          scfImplementationType (this), parent (parent) { }
+      virtual ~FrameEventHandler () { }
+      virtual bool HandleEvent (iEvent& ev)
+      {
+        if (parent && (ev.Name == parent->Frame))
+        {      
+          parent->FinishFrame ();
+
+          return true;
+        }
+
+        return false;
+      }
+      CS_EVENTHANDLER_PHASE_FRAME("crystalspace.walktest.frame.frame")
+    };
+    csRef<FrameEventHandler> frameEventHandler;
+
+    CS_DECLARE_FRAME_EVENT_SHORTCUTS;
 };
 
 extern csVector2 coord_check_vector;

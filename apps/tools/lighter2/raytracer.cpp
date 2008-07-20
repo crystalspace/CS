@@ -132,6 +132,10 @@ namespace lighter
         ray.ignorePrimitive->GetPlane () == prim->primPointer->GetPlane ())
         continue;
 
+      if ((ray.ignoreObject != 0)
+	  && prim->primPointer->GetObject() == ray.ignoreObject)
+        continue;
+
       haveHit = IntersectPrimitiveRay (*prim, ray, thisHit);
       if (haveHit)
       {

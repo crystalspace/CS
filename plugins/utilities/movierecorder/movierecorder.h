@@ -218,7 +218,7 @@ public:
 
       return false;
     }
-    CS_EVENTHANDLER_PHASE_FRAME("crystalspace.movierecorder.frame.logic")
+    CS_EVENTHANDLER_PHASE_FRAME("crystalspace.movierecorder.frame.frame")
   };
   csRef<FrameEventHandler> frameEventHandler;
 
