@@ -232,6 +232,10 @@ namespace lighter
         vertexData.positions.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
       csRef<iRenderBuffer> bitangentBuf = csRenderBuffer::CreateRenderBuffer (
         vertexData.positions.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+
+      tangentBuf = WrapBuffer (tangentBuf, "tng");
+      bitangentBuf = WrapBuffer (bitangentBuf, "btg");
+
       csRenderBufferLock<csVector3> tangents (tangentBuf);
       csRenderBufferLock<csVector3> bitangents (bitangentBuf);
       for (size_t v = 0; v < vertCount; v++)
@@ -243,9 +247,6 @@ namespace lighter
           *((csVector3*)vertexData.GetCustomData (v, vdataBitangents));
         *bitangents++ = b;
       }
-      
-      tangentBuf = WrapBuffer (tangentBuf, "tng");
-      bitangentBuf = WrapBuffer (tangentBuf, "btg");
 
       genFact->RemoveRenderBuffer ("tangent");
       genFact->AddRenderBuffer ("tangent", tangentBuf);
