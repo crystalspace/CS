@@ -19,11 +19,11 @@
 #ifndef __CSCLOUD_PLUGIN_H__
 #define __CSCLOUD_PLUGIN_H__
 
-//#include <csgeom/vector3.h>
+#include <csgeom/vector3.h>
 #include "imesh/clouds.h"
 
 //Supervisor-class implementation
-class csClouds : public scfImplementation<csClouds, iClouds>
+class csClouds : public scfImplementation1<csClouds, iClouds>
 {
 private:
 
@@ -32,9 +32,9 @@ public:
 	csClouds(iBase* pParent);
 	~csClouds();
 
-	virtual const bool DoTimeStep(const double dTime = 0.f);
-	virtual const bool DoAmortTimeStep(const double dTime = 0.f);
-	virtual const bool RenderClouds(/* Transformationmatrix? */);
+	virtual const bool DoTimeStep(const float fTime = 0.f);
+	virtual const bool DoAmortTimeStep(const float fTime = 0.f);
+	virtual const bool RenderClouds();
 };
 
 #endif // __CSCLOUD_PLUGIN_H__

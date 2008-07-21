@@ -20,9 +20,11 @@
 #define __CSCLOUDRENDERER_PLUGIN_H__
 
 #include "imesh/clouds.h"
+#include <csutil/array.h>
+#include <csgeom/vector3.h>
 
 template <typename T>
-class csField3 : public scfImplementation<csField3, iField3<T>>
+class csField3 : public scfImplementation1<csField3<T>, iField3<T>>
 {
 private:
 	csArray<csArray<csArray<T>>>		m_aaaArray;
@@ -67,9 +69,9 @@ inline const csVector3 Clamp(const csVector3& vPos, const UINT x, const UINT y, 
 	if(vNew.x < 0.f) vNew.x = 0.f;
 	if(vNew.y < 0.f) vNew.y = 0.f;
 	if(vNew.z < 0.f) vNew.z = 0.f;
-	if(static_cast<UINT>(vNew.x) >= x)) vNew.x = static_cast<double>(x - 1);
-	if(static_cast<UINT>(vNew.y) >= y)) vNew.y = static_cast<double>(y - 1);
-	if(static_cast<UINT>(vNew.z) >= z)) vNew.z = static_cast<double>(z - 1);
+	if(static_cast<UINT>(vNew.x) >= x) vNew.x = static_cast<double>(x - 1);
+	if(static_cast<UINT>(vNew.y) >= y) vNew.y = static_cast<double>(y - 1);
+	if(static_cast<UINT>(vNew.z) >= z) vNew.z = static_cast<double>(z - 1);
 	return vNew;
 }
 
