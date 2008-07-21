@@ -15,16 +15,27 @@
 
 namespace lighter
 {
-	GIRunnable::GIRunnable(Sector *sect)
-	{
-		sector = sect;
-	}
-	
-	void GIRunnable::Run()
-	{
-		GlobalIllumination gi;
-		gi.ShadeIndirectLighting(sector);
-	}
+  GIRunnable::GIRunnable(Sector *sect)
+  {
+    sector = sect;
+  }
+
+  void GIRunnable::Run()
+  {
+    //GlobalIllumination gi;
+    //gi.ShadeIndirectLighting(sector);
+  }
+
+  GlobalIllumination::GlobalIllumination()
+  {
+    finalGather = false;
+  }
+
+  GlobalIllumination::GlobalIllumination(Configuration::INDIProperties config)
+  {
+    finalGather = config.finalGather;
+    numFinalGatherRays = config.numFinalGatherRays;
+  }
 	
   void GlobalIllumination::ShadeIndirectLighting(Sector *sect)
   {
@@ -83,7 +94,41 @@ namespace lighter
             // check to make sure the photon map exists
             if (sect->photonMap)
             {
-              c = sect->photonMap->SampleColor(pos, radius, normal);
+              // check to see if we are supposed to do a final gather
+              if (finalGather)
+              {
+                // average over the number of FG rays
+                csColor final;
+                for (size_t num = 0; num < numFinalGatherRays; ++num)
+                {
+                  // Todo:: Need to change this so we don't sample vectors
+                  // that will point to the current surface we are on
+                  lighter::HitPoint hit;
+                  hit.distance = FLT_MAX*0.9f;
+                  lighter::Ray ray;
+                  ray.direction = randVect.Get();
+                  ray.origin = pos;
+                  ray.minLength = 0.01f;
+
+                  // raytrace another ray
+                  if (lighter::Raytracer::TraceClosestHit(sect->kdTree, ray, hit))
+                  {
+                    if (hit.primitive)
+                    {
+                      csVector3 hNorm = 
+                        hit.primitive->ComputeNormal(hit.hitPoint);
+                      final += 
+                        sect->photonMap->SampleColor(hit.hitPoint, radius, hNorm);
+                    }
+                  }
+                }
+                // average the color
+                c = final * (1.0 / numFinalGatherRays);
+              }
+              else
+              {
+                c = sect->photonMap->SampleColor(pos, radius, normal);
+              }
             }
             
             normalLM->SetAddPixel (u, v, c * pixelAreaPart);

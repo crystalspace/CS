@@ -24,26 +24,26 @@
 
 namespace lighter
 {
-	class GIRunnable : public CS::Threading::Runnable
-	{
-	public:
-		/**
-		* Default Constructor
-		* Computes the lightmaps for the given sector.
-		* /param sect - the sector to compute
-		*/
-		GIRunnable(Sector *sect);
-		
-		/**
-		* Run
-		* Implemented function from Runnable for CS threading. This function
-		* does the actual work.
-		*/
-		void Run();
-		
-	private:
-		Sector *sector;
-	};
+  class GIRunnable : public CS::Threading::Runnable
+  {
+  public:
+    /**
+    * Default Constructor
+    * Computes the lightmaps for the given sector.
+    * /param sect - the sector to compute
+    */
+    GIRunnable(Sector *sect);
+	
+    /**
+    * Run
+    * Implemented function from Runnable for CS threading. This function
+    * does the actual work.
+    */
+    void Run();
+
+  private:
+    Sector *sector;
+  };
 	
   class GlobalIllumination : private CS::NonCopyable
   {
@@ -52,8 +52,14 @@ namespace lighter
     * Default Constructor
     * Initializes the class to do the global illumination calculations
     */
-    GlobalIllumination()
-    {}
+    GlobalIllumination();
+
+    /**
+    * Constructor
+    * Initializes the class to do the global illumination calculations
+    * /param config - the config structure for indirect lighting
+    */
+    GlobalIllumination(Configuration::INDIProperties config);
 
     /**
     * Shade Indirect Lighting
@@ -70,6 +76,8 @@ namespace lighter
 
   private:
     csRandomVectorGen randVect;
+    bool finalGather;
+    int numFinalGatherRays;
   };
 
 }

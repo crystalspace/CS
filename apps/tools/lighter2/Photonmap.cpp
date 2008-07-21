@@ -41,12 +41,13 @@ namespace lighter
     if (!root)
     {
       root = new Photon(color, dir, pos);
+      root->planeDir = 0;
       return;
     }
 
     // lets find the node we should be attached to
     Photon *current = root;
-    int direction = 0;
+    int direction = 1;
     while (current)
     {
       // check the left branch
@@ -98,7 +99,7 @@ namespace lighter
     for (size_t num = 0; num < nearest.GetSize(); num++)
     {
       csVector3 pnorm = nearest[num].direction;
-      float app = normal.x*pnorm.x + normal.y*pnorm.y + normal.z*pnorm.z;
+      float app = normal*pnorm;
 
       // Check to make sure the two vectors aren't radically different or 
       // possibly on the other side of a surface
@@ -139,7 +140,7 @@ namespace lighter
       
       // check to see if the photon is in range with squared distances
       csVector3 dist = current->position - pos;
-      float totalDist = dist.x*dist.x + dist.y*dist.y + dist.z*dist.z;
+      float totalDist = dist*dist;
 
       if (totalDist < radSquared)
       {
@@ -150,20 +151,23 @@ namespace lighter
 
       // check to see if we hit the intersection plane, if we do then
       // we need to add both sides of the tree to the parent tree.
-      if (InRange(current->position, pos, radius, current->planeDir))
+      if (InRange(current->position, pos, radius, current->planeDir)
+        && current->right
+        && current->left)
       {
         parents.Push(current->right);
         parents.Push(current->left);
       }
       // else if we need check if its on the right or left
       else if (pos[current->planeDir] <= 
-               current->position[current->planeDir])
+        current->position[current->planeDir] 
+        && current->left)
       {
         // add just the left
         parents.Push(current->left);
       }
       // at this point it has to be on the right so just add the right
-      else
+      else if (current->right)
       {
         parents.Push(current->right);
       }

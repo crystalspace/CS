@@ -650,6 +650,14 @@ namespace lighter
     csPrintf ("  Sets the max distance to search for photons when sampling\n");
     csPrintf ("   Default: 0.25\n");
 
+    csPrintf (" --finalGather\n");
+    csPrintf ("  Turns on final gather for indirect lighting calculations\n");
+    csPrintf ("   Default: False\n");
+
+    csPrintf (" --numfgrays=<number>\n");
+    csPrintf ("  Sets the number of Final Gather rays to average from\n");
+    csPrintf ("   Default: 8\n");
+
     csPrintf ("\n");
   }
 

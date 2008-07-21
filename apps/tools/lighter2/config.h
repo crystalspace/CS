@@ -103,6 +103,10 @@ namespace lighter
       int numPerSample;
       // The sample distance for sampling photons
       float sampleDistance;
+      // Flag for Final Gather
+      bool finalGather;
+      // Number of final gather rays
+      int numFinalGatherRays;
     };
 
     struct DebugProperties
@@ -136,7 +140,7 @@ namespace lighter
 		
     const INDIProperties& GetIndirectProperties() const
     {
-      return indirectLightingProperties;
+      return indtLightProperties;
     }
 
   protected:
