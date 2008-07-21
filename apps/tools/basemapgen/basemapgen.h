@@ -63,7 +63,7 @@ public:
     MaterialLayers alphaMaterials;
     csRef<AlphaLayers> materialMapLayers;
     
-    bool Parse (iDocumentNode* node);
+    bool Parse (iDocumentNode* node, bool isDefault);
     void ApplyMaterialMap (const MaterialLayers& matMap);
   };
   struct Terrain2Factory : public csRefCount

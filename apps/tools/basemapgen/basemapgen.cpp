@@ -211,7 +211,12 @@ void BaseMapGen::ScanMaterials ()
     if (!tex) continue;
     const char* texname = tex->GetContentsValue();
     const char* texture_file = textureFiles.Get (texname, (const char*)0);
-    if (!texture_file) continue;
+    if (!texture_file)
+    {
+      csPrintf ("Texture file not found or no texture file given for texture '%s' used by material '%s'.\n",
+	texname, matname.GetData());
+      continue;
+    }
     
     // Set the texture scale.
     csRef<iDocumentNodeIterator> it = mat->GetNodes("shadervar");

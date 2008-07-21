@@ -24,17 +24,27 @@
 // The global pointer to basemapgen
 extern BaseMapGen *basemapgen;
 
-bool BaseMapGen::Terrain2Cell::Parse (iDocumentNode* node)
+bool BaseMapGen::Terrain2Cell::Parse (iDocumentNode* node, bool isDefault)
 {
   {
     csRef<iDocumentNode> name = node->GetNode ("name");
     if (name.IsValid())
       this->name = name->GetContentsValue();
   }
+  if (name.IsEmpty() && !isDefault)
+  {
+    csPrintf ("There is a cell without name, it will not get a basemap.\n");
+    fflush (stdout);
+  }
   {
     csRef<iDocumentNode> basematerial = node->GetNode ("basematerial");
     if (basematerial.IsValid())
       this->baseMaterial = basematerial->GetContentsValue();
+  }
+  if (baseMaterial.IsEmpty())
+  {
+    csPrintf ("Cell '%s' does not have a base material set.\n", name.GetData());
+    fflush (stdout);
   }
   {
     csRef<iDocumentNode> feederProperties = node->GetNode ("feederproperties");
@@ -107,6 +117,9 @@ void BaseMapGen::ScanTerrain2Factories ()
     csRef<iDocumentNode> cells = params->GetNode ("cells");
     if (!cells) continue;
     
+    csPrintf ("Found factory '%s' ...\n", name);
+    fflush (stdout);
+      
     csRef<Terrain2Factory> factory;
     factory.AttachNew (new Terrain2Factory);
     
@@ -114,7 +127,7 @@ void BaseMapGen::ScanTerrain2Factories ()
     csRef<iDocumentNode> celldefault = cells->GetNode ("celldefault");
     if (celldefault)
     {
-      if (!defaultCell.Parse (celldefault))
+      if (!defaultCell.Parse (celldefault, true))
         continue;
     }
     
@@ -124,7 +137,7 @@ void BaseMapGen::ScanTerrain2Factories ()
       csRef<iDocumentNode> cellNode = cellsIt->Next();
       csRef<Terrain2Cell> cell;
       cell.AttachNew (new Terrain2Cell (defaultCell));
-      if (!cell->Parse (cellNode))
+      if (!cell->Parse (cellNode, false))
         continue;
       factory->cells.Put (cell->name, cell);
     }
@@ -199,7 +212,12 @@ void BaseMapGen::ScanTerrain2Meshes ()
 	csRef<iDocumentNode> cellNode = cellsIt->Next();
 	
 	csRef<iDocumentNode> nameNode = cellNode->GetNode ("name");
-	if (!nameNode) continue;
+	if (!nameNode)
+	{
+	  csPrintf ("There is a cell without name, it will not get a basemap.\n");
+	  fflush (stdout);
+	  continue;
+	}
 	const char* cellName = nameNode->GetContentsValue();
 	
 	Terrain2Cell* factoryCell = factory->cells.Get (cellName,
@@ -207,10 +225,16 @@ void BaseMapGen::ScanTerrain2Meshes ()
 	if (!factoryCell) continue;
 	
 	Terrain2Cell cell (*factoryCell);
-	if (!cell.Parse (cellNode)) continue;
+	if (!cell.Parse (cellNode, false)) continue;
 	
 	MaterialLayer* mat = materials.Get (cell.baseMaterial, (MaterialLayer*)0);
-	if (!mat) continue;
+	if (!mat)
+	{
+	  csPrintf ("Base material '%s' in cell '%s' not found.\n",
+	    cell.baseMaterial.GetData(), cell.name.GetData());
+	  fflush (stdout);
+	  continue;
+	}
 	
 	if (!cell.alphaLayers.IsValid())
 	  cell.ApplyMaterialMap (mlayers);
