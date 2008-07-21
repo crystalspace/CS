@@ -23,6 +23,8 @@
 #include <csutil/scf_implementation.h>
 
 #include "csutil/array.h"
+#include "csutil/ref.h"
+#include "csgeom/vector3.h"
 
 /**
 This APIs implementation is a supervisor-class, which takes 
@@ -148,6 +150,16 @@ struct iCloudsDynamics : public virtual iBase
 	SCF_INTERFACE(iCloudsDynamics, 0, 0, 1);
 
 	/**
+	Following methods are used to configure the entire dynamics simulation
+	*/
+	virtual inline void SetGridScale(const float dx) = 0;
+	virtual inline void SetGridSize(const UINT x, const UINT y, const UINT z) = 0;
+	virtual inline void SetCondensedWaterScaleFactor(const float fqc) = 0;
+	virtual inline void SetGravityAcceleration(const csVector3& vG) = 0;
+	virtual inline void SetVorticityConfinementForceEpsilon(const float e) = 0;
+	virtual inline void SetReferenceVirtPotTemperature(const float T) = 0;
+
+	/**
 	Does n computation steps. The overall calculations are split into several
 	subtasks. This method computes n of those. If it gets a zero as input, it
 	performs all for an entire time-step
@@ -158,7 +170,7 @@ struct iCloudsDynamics : public virtual iBase
 	Returns the simulation-output. A scalarfield which contains all the condensed
 	water mixing ratios for the entire cloud-volume
 	*/
-	virtual inline const iField3<float> GetCondWaterMixingRatios() const = 0;
+	virtual inline const iField3<float>* GetCondWaterMixingRatios() const = 0;
 };
 
 //--------------------------------------------------------------------------------------------//

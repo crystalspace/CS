@@ -20,25 +20,57 @@
 #define __CSCLOUDRENDERER_PLUGIN_H__
 
 #include "imesh/clouds.h"
-#include <csutil/array.h>
 #include <csgeom/vector3.h>
 
 template <typename T>
 class csField3 : public scfImplementation1<csField3<T>, iField3<T>>
 {
 private:
-	csArray<csArray<csArray<T>>>		m_aaaArray;
-	UINT								m_iSizeX;
-	UINT								m_iSizeY;
-	UINT								m_iSizeZ;
+	T***			m_pppArray;
+	UINT			m_iSizeX;
+	UINT			m_iSizeY;
+	UINT			m_iSizeZ;
+
+	//O(n^2)
+	inline void DeleteField()
+	{
+		if(!m_pppArray) return;
+		for(UINT x = 0; x < m_iSizeX; ++x)
+		{
+			for(UINT y = 0; y < m_iSizeY; ++y) delete[] m_pppArray[x][y];
+			delete[] m_pppArray[x];
+		}
+		delete[] m_pppArray;
+		m_pppArray = NULL;
+		m_iSizeX = m_iSizeY = m_iSizeZ = 0;
+	}
 
 public:
-	csField3<T>(iBase* pParent);
-	~csField3<T>();
+	csField3<T>(iBase* pParent) : m_pppArray(NULL), m_iSizeX(0), m_iSizeY(0), m_iSizeZ(0), 
+		scfImplementationType(this, pParent)
+	{}
+	~csField3<T>()
+	{
+		DeleteField();
+	}
 
+	//O(n^2)
 	virtual inline void SetSize(const UINT iSizeX, const UINT iSizeY, const UINT iSizeZ)
 	{
-
+		DeleteField();
+		m_iSizeX = iSizeX;
+		m_iSizeY = iSizeY;
+		m_iSizeZ = iSizeZ;
+		//reserve memory
+		m_pppArray = new T**[m_iSizeX];
+		for(UINT x = 0; x < m_iSizeX; ++x)
+		{
+			m_pppArray[x] = new T*[m_iSizeY];
+			for(UINT y = 0; y < m_iSizeY; ++y)
+			{
+				m_pppArray[x][y] = new T[m_iSizeZ];
+			}
+		}
 	}
 	virtual const UINT GetSizeX() const {return m_iSizeX;}
 	virtual const UINT GetSizeY() const {return m_iSizeY;}
@@ -47,7 +79,7 @@ public:
 	//O(1)
 	virtual inline void SetValue(const T& Value, const UINT x, const UINT y, const UINT z)
 	{
-		m_aaaArray[x][y][z] = Value;
+		if(m_pppArray) m_pppArray[x][y][z] = Value;
 	}
 
 	//O(1)
@@ -55,9 +87,10 @@ public:
 	{
 		return GetValue(x, y, z);
 	}
+	//O(1)
 	virtual inline const T GetValue(const UINT x, const UINT y, const UINT z) const
 	{
-		return m_aaaArray[x][y][z];
+		return m_pppArray[x][y][z];
 	}
 };
 
@@ -69,9 +102,9 @@ inline const csVector3 Clamp(const csVector3& vPos, const UINT x, const UINT y, 
 	if(vNew.x < 0.f) vNew.x = 0.f;
 	if(vNew.y < 0.f) vNew.y = 0.f;
 	if(vNew.z < 0.f) vNew.z = 0.f;
-	if(static_cast<UINT>(vNew.x) >= x) vNew.x = static_cast<double>(x - 1);
-	if(static_cast<UINT>(vNew.y) >= y) vNew.y = static_cast<double>(y - 1);
-	if(static_cast<UINT>(vNew.z) >= z) vNew.z = static_cast<double>(z - 1);
+	if(static_cast<UINT>(vNew.x) >= x) vNew.x = static_cast<float>(x - 1);
+	if(static_cast<UINT>(vNew.y) >= y) vNew.y = static_cast<float>(y - 1);
+	if(static_cast<UINT>(vNew.z) >= z) vNew.z = static_cast<float>(z - 1);
 	return vNew;
 }
 
@@ -87,7 +120,7 @@ const T TrilinearInterpolation(const iField3<T>& rSrc, const csVector3& vPos)
 //------------------------------------------------------------------------------//
 
 //Advection of a field through a velocity-field
-//O(n³)
+//O(n^3)
 template <typename T>
 const bool SemiLagrangianAdvection(const iField3<T>& rSrc, iField3<T> pDest, const iField3<csVector3>& rVelField,
 								   const double& dGridScaleInv, const double& dTimeStep)
@@ -112,6 +145,36 @@ const bool SemiLagrangianAdvection(const iField3<T>& rSrc, iField3<T> pDest, con
 	}
 
 	return true;
+}
+
+//------------------------------------------------------------------------------//
+
+inline const csVector3 CalcGradient(const iField3<float>& rField, const UINT x, const UINT y, const UINT z,
+									const float dx)
+{
+	const float dx2 = 2.f * dx;
+	//Calcs partial derivations in x, y and z direction.
+	//Some special cases are those for which x, y, z are border-indizes!
+	const float fDerX = x + 1 < rField.GetSizeX() && x > 0 ? (rField.GetValue(x + 1, y, z) - rField.GetValue(x - 1, y, z)) / dx2 : x > 0 ? (rField.GetValue(x, y, z) - rField.GetValue(x - 1, y, z)) / dx : (rField.GetValue(x + 1, y, z) - rField.GetValue(x, y, z)) / dx;
+	const float fDerY = y + 1 < rField.GetSizeY() && y > 0 ? (rField.GetValue(x, y + 1, z) - rField.GetValue(x, y - 1, z)) / dx2 : y > 0 ? (rField.GetValue(x, y, z) - rField.GetValue(x, y - 1, z)) / dx :	(rField.GetValue(x, y + 1, z) - rField.GetValue(x, y, z)) / dx;
+	const float fDerZ = z + 1 < rField.GetSizeZ() && z > 0 ? (rField.GetValue(x, y, z + 1) - rField.GetValue(x, y, z - 1)) / dx2 : z > 0 ? (rField.GetValue(x, y, z) - rField.GetValue(x, y, z - 1)) / dx :	(rField.GetValue(x, y, z + 1) - rField.GetValue(x, y, z)) / dx;
+
+	return csVector3(fDerX, fDerY, fDerZ);
+}
+
+//------------------------------------------------------------------------------//
+
+inline const float CalcDivergence(const iField3<csVector3>& rField, const UINT x, const UINT y, const UINT z,
+								  const float dx)
+{
+	const float dx2 = 2.f * dx;
+	//Calcs partial derivations in x, y and z direction.
+	//Some special cases are those for which x, y, z are border-indizes!
+	const float fDerX = x + 1 < rField.GetSizeX() && x > 0 ? (rField.GetValue(x + 1, y, z).x - rField.GetValue(x - 1, y, z).x) / dx2 : x > 0 ? (rField.GetValue(x, y, z).x - rField.GetValue(x - 1, y, z).x) / dx : (rField.GetValue(x + 1, y, z).x - rField.GetValue(x, y, z).x) / dx;
+	const float fDerY = y + 1 < rField.GetSizeY() && y > 0 ? (rField.GetValue(x, y + 1, z).y - rField.GetValue(x, y - 1, z).y) / dx2 : y > 0 ? (rField.GetValue(x, y, z).y - rField.GetValue(x, y - 1, z).y) / dx :	(rField.GetValue(x, y + 1, z).y - rField.GetValue(x, y, z).y) / dx;
+	const float fDerZ = z + 1 < rField.GetSizeZ() && z > 0 ? (rField.GetValue(x, y, z + 1).z - rField.GetValue(x, y, z - 1).z) / dx2 : z > 0 ? (rField.GetValue(x, y, z).z - rField.GetValue(x, y, z - 1).z) / dx :	(rField.GetValue(x, y, z + 1).z - rField.GetValue(x, y, z).z) / dx;
+
+	return fDerX + fDerY + fDerZ;
 }
 
 //------------------------------------------------------------------------------//
