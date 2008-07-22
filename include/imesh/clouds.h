@@ -115,10 +115,16 @@ struct iField3 : public virtual iBase
 
 	/**
 	Accses operator and method. Returns the value of the scalarfield
-	at position P = (x, y)
+	at position P = (x, y, z)
 	*/
 	virtual const T operator () (const UINT x, const UINT y, const UINT z) const = 0;
 	virtual const T GetValue(const UINT x, const UINT y, const UINT z) const = 0;
+
+	/**
+	Returns the value of the field at Position x, y, z. If x, y or z are not in
+	range, they are going to be clamped first!
+	*/
+	virtual const T GetValueClamp(const int x, const int y, const int z) const = 0;
 };
 
 //--------------------------------------------------------------------------------------------//
@@ -135,7 +141,7 @@ struct iCloudsRenderer : public virtual iBase
 	/**
 	Rendermethod. Renders the whole cloud scene.
 	*/
-	virtual const bool Render(const iField3<float>& aaafMixingRatios /*, const csMatrix& mTransformation */) = 0;
+	virtual const bool Render(const csRef<iField3<float>>& aaafMixingRatios /*, const csMatrix& mTransformation */) = 0;
 };
 
 //--------------------------------------------------------------------------------------------//
@@ -150,14 +156,28 @@ struct iCloudsDynamics : public virtual iBase
 	SCF_INTERFACE(iCloudsDynamics, 0, 0, 1);
 
 	/**
+	This is the most importand initialisation method. It defines the dimensions
+	of the entire grid and MUST be called by the user!
+	*/
+	virtual inline void SetGridSize(const UINT x, const UINT y, const UINT z) = 0;
+
+	/**
 	Following methods are used to configure the entire dynamics simulation
 	*/
 	virtual inline void SetGridScale(const float dx) = 0;
-	virtual inline void SetGridSize(const UINT x, const UINT y, const UINT z) = 0;
 	virtual inline void SetCondensedWaterScaleFactor(const float fqc) = 0;
 	virtual inline void SetGravityAcceleration(const csVector3& vG) = 0;
 	virtual inline void SetVorticityConfinementForceEpsilon(const float e) = 0;
 	virtual inline void SetReferenceVirtPotTemperature(const float T) = 0;
+	virtual inline void SetTempLapseRate(const float G) = 0;
+	virtual inline void SetReferenceTemperature(const float T) = 0;
+	virtual inline void SetReferencePressure(const float p) = 0;
+	virtual inline void SetIdealGasConstant(const float R) = 0;
+	virtual inline void SetLatentHeat(const float L) = 0;
+	virtual inline void SetSpecificHeatCapacity(const float cp) = 0;
+	virtual inline void SetAmbientTemperature(const float T) = 0;
+	virtual inline void SetInitialCondWaterMixingRatio(const float qc) = 0;
+	virtual inline void SetInitialWaterVaporMixingRatio(const float qv) = 0;
 
 	/**
 	Does n computation steps. The overall calculations are split into several
@@ -170,7 +190,7 @@ struct iCloudsDynamics : public virtual iBase
 	Returns the simulation-output. A scalarfield which contains all the condensed
 	water mixing ratios for the entire cloud-volume
 	*/
-	virtual inline const iField3<float>* GetCondWaterMixingRatios() const = 0;
+	virtual inline const csRef<iField3<float>>& GetCondWaterMixingRatios() const = 0;
 };
 
 //--------------------------------------------------------------------------------------------//

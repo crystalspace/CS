@@ -92,6 +92,14 @@ public:
 	{
 		return m_pppArray[x][y][z];
 	}
+	//O(1)
+	virtual const T GetValueClamp(const int _x, const int _y, const int _z) const
+	{
+		const UINT x = _x < 0 ? 0 : _x >= static_cast<int>(m_iSizeX) ? static_cast<int>(m_iSizeX) - 1 : _x;
+		const UINT y = _y < 0 ? 0 : _y >= static_cast<int>(m_iSizeY) ? static_cast<int>(m_iSizeY) - 1 : _y;
+		const UINT z = _z < 0 ? 0 : _z >= static_cast<int>(m_iSizeZ) ? static_cast<int>(m_iSizeZ) - 1 : _z;
+		return GetValue(x, y, z);
+	}
 };
 
 //------------------------------------------------------------------------------//
@@ -149,32 +157,59 @@ const bool SemiLagrangianAdvection(const iField3<T>& rSrc, iField3<T> pDest, con
 
 //------------------------------------------------------------------------------//
 
-inline const csVector3 CalcGradient(const iField3<float>& rField, const UINT x, const UINT y, const UINT z,
+inline const csVector3 CalcGradient(const csRef<iField3<float>>& rField, const UINT x, const UINT y, const UINT z,
 									const float dx)
 {
-	const float dx2 = 2.f * dx;
+	const float fInvdx2 = 1.f / (2.f * dx);
 	//Calcs partial derivations in x, y and z direction.
-	//Some special cases are those for which x, y, z are border-indizes!
-	const float fDerX = x + 1 < rField.GetSizeX() && x > 0 ? (rField.GetValue(x + 1, y, z) - rField.GetValue(x - 1, y, z)) / dx2 : x > 0 ? (rField.GetValue(x, y, z) - rField.GetValue(x - 1, y, z)) / dx : (rField.GetValue(x + 1, y, z) - rField.GetValue(x, y, z)) / dx;
-	const float fDerY = y + 1 < rField.GetSizeY() && y > 0 ? (rField.GetValue(x, y + 1, z) - rField.GetValue(x, y - 1, z)) / dx2 : y > 0 ? (rField.GetValue(x, y, z) - rField.GetValue(x, y - 1, z)) / dx :	(rField.GetValue(x, y + 1, z) - rField.GetValue(x, y, z)) / dx;
-	const float fDerZ = z + 1 < rField.GetSizeZ() && z > 0 ? (rField.GetValue(x, y, z + 1) - rField.GetValue(x, y, z - 1)) / dx2 : z > 0 ? (rField.GetValue(x, y, z) - rField.GetValue(x, y, z - 1)) / dx :	(rField.GetValue(x, y, z + 1) - rField.GetValue(x, y, z)) / dx;
-
+	const float fDerX = (rField->GetValueClamp(x + 1, y, z) - rField->GetValueClamp(x - 1, y, z)) * fInvdx2;
+	const float fDerY = (rField->GetValueClamp(x, y + 1, z) - rField->GetValueClamp(x, y - 1, z)) * fInvdx2;
+	const float fDerZ = (rField->GetValueClamp(x, y, z + 1) - rField->GetValueClamp(x, y, z - 1)) * fInvdx2;
 	return csVector3(fDerX, fDerY, fDerZ);
 }
 
 //------------------------------------------------------------------------------//
 
-inline const float CalcDivergence(const iField3<csVector3>& rField, const UINT x, const UINT y, const UINT z,
+//Calculates the gradient of the norm of a Vectorfield
+inline const csVector3 CalcGradient(const csRef<iField3<csVector3>>& rField, const UINT x, const UINT y, const UINT z,
+									const float dx)
+{
+	const float fInvdx2 = 1.f / (2.f * dx);
+	//Calcs partial derivations in x, y and z direction.
+	const float fDerX = (rField->GetValueClamp(x + 1, y, z).Norm() - rField->GetValueClamp(x - 1, y, z).Norm()) * fInvdx2;
+	const float fDerY = (rField->GetValueClamp(x, y + 1, z).Norm() - rField->GetValueClamp(x, y - 1, z).Norm()) * fInvdx2;
+	const float fDerZ = (rField->GetValueClamp(x, y, z + 1).Norm() - rField->GetValueClamp(x, y, z - 1).Norm()) * fInvdx2;
+	return csVector3(fDerX, fDerY, fDerZ);
+}
+
+//------------------------------------------------------------------------------//
+
+inline const float CalcDivergence(const csRef<iField3<csVector3>>& rField, const UINT x, const UINT y, const UINT z,
 								  const float dx)
 {
-	const float dx2 = 2.f * dx;
+	const float fInvdx = 1.f / dx;
 	//Calcs partial derivations in x, y and z direction.
-	//Some special cases are those for which x, y, z are border-indizes!
-	const float fDerX = x + 1 < rField.GetSizeX() && x > 0 ? (rField.GetValue(x + 1, y, z).x - rField.GetValue(x - 1, y, z).x) / dx2 : x > 0 ? (rField.GetValue(x, y, z).x - rField.GetValue(x - 1, y, z).x) / dx : (rField.GetValue(x + 1, y, z).x - rField.GetValue(x, y, z).x) / dx;
-	const float fDerY = y + 1 < rField.GetSizeY() && y > 0 ? (rField.GetValue(x, y + 1, z).y - rField.GetValue(x, y - 1, z).y) / dx2 : y > 0 ? (rField.GetValue(x, y, z).y - rField.GetValue(x, y - 1, z).y) / dx :	(rField.GetValue(x, y + 1, z).y - rField.GetValue(x, y, z).y) / dx;
-	const float fDerZ = z + 1 < rField.GetSizeZ() && z > 0 ? (rField.GetValue(x, y, z + 1).z - rField.GetValue(x, y, z - 1).z) / dx2 : z > 0 ? (rField.GetValue(x, y, z).z - rField.GetValue(x, y, z - 1).z) / dx :	(rField.GetValue(x, y, z + 1).z - rField.GetValue(x, y, z).z) / dx;
-
+	const float fDerX = (rField->GetValue(x + 1, y, z).x - rField->GetValue(x, y, z).x) * fInvdx;
+	const float fDerY = (rField->GetValue(x, y + 1, z).y - rField->GetValue(x, y, z).y) * fInvdx;
+	const float fDerZ = (rField->GetValue(x, y, z + 1).z - rField->GetValue(x, y, z).z) * fInvdx;
 	return fDerX + fDerY + fDerZ;
+}
+
+//------------------------------------------------------------------------------//
+
+//Calculates the rotation vector for the center of a cell!
+inline const csVector3 CalcRotation(const csRef<iField3<csVector3>>& rField, const UINT x, const UINT y, const UINT z,
+									const float dx)
+{
+	const float fInvdx = 1.f / dx;
+	//Calcs partial derivations in x, y and z direction.
+	const float dFzdy = (rField->GetValue(x, y + 1, z).z - rField->GetValue(x, y, z).z) * fInvdx;
+	const float dFxdy = (rField->GetValue(x, y + 1, z).x - rField->GetValue(x, y, z).x) * fInvdx;
+	const float dFxdz = (rField->GetValue(x, y, z + 1).x - rField->GetValue(x, y, z).x) * fInvdx;
+	const float dFydz = (rField->GetValue(x, y, z + 1).y - rField->GetValue(x, y, z).y) * fInvdx;
+	const float dFydx = (rField->GetValue(x + 1, y, z).y - rField->GetValue(x, y, z).y) * fInvdx;
+	const float dFzdx = (rField->GetValue(x + 1, y, z).z - rField->GetValue(x, y, z).z) * fInvdx;
+	return csVector3(dFzdy - dFydz, dFxdz - dFzdx, dFydx - dFxdy);
 }
 
 //------------------------------------------------------------------------------//
