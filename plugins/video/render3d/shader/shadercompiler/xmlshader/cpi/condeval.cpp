@@ -1767,7 +1767,8 @@ ConditionsReader::ConditionsReader (csConditionEvaluator& evaluator,
   
   savedConds.SetPos (savedConds.GetSize() - sizeof (uint32));
   uint32 numCondsLE;
-  savedConds.Read ((char*)&numCondsLE, sizeof (numCondsLE));
+  if (savedConds.Read ((char*)&numCondsLE, sizeof (numCondsLE))
+    != sizeof (sizeof (numCondsLE))) return;
   numCondsLE = csLittleEndian::UInt32 (numCondsLE);
   savedConds.SetPos (0);
   
@@ -1777,7 +1778,8 @@ ConditionsReader::ConditionsReader (csConditionEvaluator& evaluator,
   for (uint32 currentID = 0; currentID < numCondsLE; currentID++)
   {
     CondOperation newCond;
-    ReadCondition (&savedConds, stringStore, newCond);
+    if (!ReadCondition (&savedConds, stringStore, newCond))
+      return;
     diskIDToCond.Put (currentID,
       evaluator.FindOptimizedCondition (newCond));
   }
@@ -1906,7 +1908,7 @@ bool ConditionsReader::ReadCondOperand (iFile* cacheFile,
 csConditionID ConditionsReader::GetConditionID (uint32 diskID) const
 {
   const csConditionID* cond = diskIDToCond.GetElementPointer (diskID);
-  CS_ASSERT(cond != 0);
+  if (cond == 0) return (csConditionID)~0;
   return *cond;
 }
 

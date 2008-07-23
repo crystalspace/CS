@@ -215,7 +215,7 @@ bool csShaderGLCGCommon::Load (iShaderDestinationResolver* resolve,
     }
   }
 
-  cgResolve = scfQueryInterfaceSafe<iShaderDestinationResolverCG> (resolve);
+  cgResolve = scfQueryInterfaceSafe<iShaderProgramCG> (resolve);
   clips.ShrinkBestFit ();
   ClipsToVmap ();
 

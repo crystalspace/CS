@@ -518,7 +518,6 @@ void csXMLShader::Load (iDocumentNode* source, bool noCacheRead)
   csRef<iFile> cacheFile;
   if (cacheValid)
   {
-    readFromCache = false;
     csRef<iDataBuffer> cacheData;
     if (readFromCache)
       cacheData = shaderCache->ReadCache (csString().Format ("/%s", cacheID_header.GetData()));
@@ -526,6 +525,8 @@ void csXMLShader::Load (iDocumentNode* source, bool noCacheRead)
     {
       cacheFile.AttachNew (new csMemFile (cacheData, true));
     }
+    else
+      readFromCache = false;
     if (cacheFile.IsValid())
     {
       do
@@ -563,7 +564,7 @@ void csXMLShader::Load (iDocumentNode* source, bool noCacheRead)
 	  cacheFile, hashStream))
 	cacheFile.Invalidate();
     }
-    }
+  }
   
   ConditionsReader* condReader = 0;
   if (readFromCache)

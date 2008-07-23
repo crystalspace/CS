@@ -614,7 +614,7 @@ bool csGLShaderFFP::TryMergeTexFuncs (mtexlayer::TexFunc& newTF,
   return false;
 }
 
-bool csGLShaderFFP::Compile (iHierarchicalCache*)
+bool csGLShaderFFP::Compile (iHierarchicalCache*, csRef<iString>* tag)
 {
   shaderPlug->Open ();
   ext = shaderPlug->ext;
@@ -666,6 +666,7 @@ bool csGLShaderFFP::Compile (iHierarchicalCache*)
     return false;
 
   validProgram = true;
+  tag->AttachNew (new scfString ("default"));
 
   return true;
 }
