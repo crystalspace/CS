@@ -20514,7 +20514,7 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-__attribute__((visibility("hidden"))) void f();
+void f() __attribute__((visibility("hidden")));
 int
 main ()
 {
@@ -20672,7 +20672,7 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-__attribute__((visibility("default"))) void f();
+void f() __attribute__((visibility("default")));
 int
 main ()
 {
@@ -80728,7 +80728,7 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-__attribute__((deprecated)) void f();
+void f() __attribute__((deprecated));
 int
 main ()
 {
@@ -80800,6 +80800,8 @@ echo "${ECHO_T}$cs_cv_prog_cxx_declare_deprecated" >&6; }
   cs_header_text="${cs_header_text}#define CS_ATTRIBUTE_DEPRECATED $cs_cv_prog_cxx_declare_deprecated
 "
 fi
+
+
 
 
 #------------------------------------------------------------------------------
@@ -80889,7 +80891,7 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-__attribute__((malloc)) void f();
+void f() __attribute__((malloc));
 int
 main ()
 {
@@ -80957,9 +80959,172 @@ fi
 fi
 { echo "$as_me:$LINENO: result: $cs_cv_prog_c_attr_malloc" >&5
 echo "${ECHO_T}$cs_cv_prog_c_attr_malloc" >&6; }
-
-if test $cs_cv_prog_c_attr_malloc != no; then
+    if test $cs_cv_prog_c_attr_malloc != no; then
   cs_header_text="${cs_header_text}#define CS_ATTRIBUTE_MALLOC $cs_cv_prog_c_attr_malloc
+"
+fi
+
+
+
+
+#------------------------------------------------------------------------------
+# Check if the "init_priority" attribute is available.
+#------------------------------------------------------------------------------
+{ echo "$as_me:$LINENO: checking how to declare object initialization priority" >&5
+echo $ECHO_N "checking how to declare object initialization priority... $ECHO_C" >&6; }
+if test "${cs_cv_prog_cxx_attr_init_priority+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cs_cv_prog_cxx_attr_init_priority='no'
+	if test "$cs_cv_prog_cxx_attr_init_priority" = no; then
+  ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+    cs_cflags_save="$CXXFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#define PRI 1010
+    class X{}; X x __attribute__((init_priority(PRI)));
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  cs_build_ok=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+
+    CXXFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_cxx_attr_init_priority='__attribute__((init_priority(PRI)))'
+else
+  cs_cv_prog_cxx_attr_init_priority='no'
+fi
+
+fi
+
+fi
+{ echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_attr_init_priority" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_attr_init_priority" >&6; }
+    if test $cs_cv_prog_cxx_attr_init_priority != no; then
+  cs_header_text="${cs_header_text}#define CS_ATTRIBUTE_INIT_PRIORITY(PRI) $cs_cv_prog_cxx_attr_init_priority
 "
 fi
 
