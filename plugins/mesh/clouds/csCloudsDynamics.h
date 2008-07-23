@@ -28,7 +28,12 @@ Supervisor-class implementation:
 This class represents a three dimensional voxel-grid of user specific size.
 Each parcel is a cube (simplifies calculations!) of size dx * dx * dx (m_fGridSize).
 The whole simulation updates each timestep the entire grid. Output of the simulation
-is the condensed water mixing ratio of each parcel.
+is the condensed water mixing ratio of each parcel. (MAC-Grid is used for the voxel volume)
+The local coordinate system is equal to the one used as global with:
++y   +/-z (left or right handed! In practice it doesn't matter)
+|  /
+|/
+---- +x
 */
 class csCloudsDynamics : public scfImplementation1<csCloudsDynamics, iCloudsDynamics>
 {
@@ -97,6 +102,8 @@ private:
 	float						m_fInitCondWaterMixingRatio;
 	//Initial-value for water vapor mixing ratio
 	float						m_fInitWaterVaporMixingRatio;
+	//Global windspeed
+	csVector3					m_vWindSpeed;
 	//====================================================//
 	
 	//Interpolates the velocity (from boundaries)
@@ -216,6 +223,7 @@ public:
 	virtual inline void SetAmbientTemperature(const float T) {m_fAmbientTemperature = T;}
 	virtual inline void SetInitialCondWaterMixingRatio(const float qc) {m_fInitCondWaterMixingRatio = qc;}
 	virtual inline void SetInitialWaterVaporMixingRatio(const float qv) {m_fInitWaterVaporMixingRatio = qv;}
+	virtual inline void SetGlobalWindSpeed(const csVector3& vWind) {m_vWindSpeed = vWind;}
 
 	//Computes N steps of the entire simulation. If iStepCount == 0, then an entire timestep
 	//is calculated

@@ -22,6 +22,17 @@
 #include "imesh/clouds.h"
 #include <csgeom/vector3.h>
 
+//------------------------------------------------------------------------------//
+
+/**
+Both function expect vPos to be scaled on gridsize. Means that it doesn't contain
+the REAL position, but coordinates on the voxelgrid
+*/
+const float GetInterpolatedValue(const csRef<iField3<float>>& rSrc, const csVector3& vPos);
+const float GetInterpolatedValue(const csRef<iField3<csVector3>>& rSrc, const csVector3& vPos, const UINT iIndex);
+
+//------------------------------------------------------------------------------//
+
 template <typename T>
 class csField3 : public scfImplementation1<csField3<T>, iField3<T>>
 {
@@ -118,45 +129,6 @@ inline const csVector3 Clamp(const csVector3& vPos, const UINT x, const UINT y, 
 
 //------------------------------------------------------------------------------//
 
-template <typename T>
-const T TrilinearInterpolation(const iField3<T>& rSrc, const csVector3& vPos)
-{
-	//TODO!
-	return rSrc(static_cast<UINT>(vPos.x), static_cast<UINT>(vPos.y), static_cast<UINT>(vPos.z));
-}
-
-//------------------------------------------------------------------------------//
-
-//Advection of a field through a velocity-field
-//O(n^3)
-template <typename T>
-const bool SemiLagrangianAdvection(const iField3<T>& rSrc, iField3<T> pDest, const iField3<csVector3>& rVelField,
-								   const double& dGridScaleInv, const double& dTimeStep)
-{
-	//Check if precondition are hold: All field have the same size!
-	if(rSrc.GetSizeX() != pDest.GetSizeX() || rSrc.GetSizeX() != rVelField.GetSizeX() ||
-	   rSrc.GetSizeY() != pDest.GetSizeY() || rSrc.GetSizeY() != rVelField.GetSizeY() ||
-	   rSrc.GetSizeZ() != pDest.GetSizeZ() || rSrc.GetSizeZ() != rVelField.GetSizeZ()) return false;
-
-	for(UINT x = 0; x < pDest.GetSizeX(); ++x)
-	{
-		for(UINT y = 0; y < pDest.GetSizeY(); ++y)
-		{
-			for(UINT z = 0; z < pDest.GetSizeZ(); ++z)
-			{
-				const csVector3 vCurrPos	= csVector3(x, y, z);
-				const csVector3 vPos		= Clamp(vCurrPos - dGridScaleInv * dTimeStep * rVelField(x, y, z),
-													pDest->GetSizeX(), pDest->GetSizeY(), pDest->GetSizeZ());
-				pDest.SetValue(TrilinearInterpolation(rSrc, vPos), x, y, z);
-			}
-		}
-	}
-
-	return true;
-}
-
-//------------------------------------------------------------------------------//
-
 inline const csVector3 CalcGradient(const csRef<iField3<float>>& rField, const UINT x, const UINT y, const UINT z,
 									const float dx)
 {
@@ -213,5 +185,85 @@ inline const csVector3 CalcRotation(const csRef<iField3<csVector3>>& rField, con
 }
 
 //------------------------------------------------------------------------------//
+
+//------------------------------------------------------------------------------//
+
+/*template <typename T>
+class csField2 : public scfImplementation1<csField2<T>, iField2<T>>
+{
+private:
+	T**				m_ppArray;
+	UINT			m_iSizeX;
+	UINT			m_iSizeY;
+
+	//O(n^2)
+	inline void DeleteField()
+	{
+		if(!m_ppArray) return;
+		for(UINT x = 0; x < m_iSizeX; ++x)
+		{
+			delete[] m_pppArray[x];
+		}
+		delete[] m_pppArray;
+		m_pppArray = NULL;
+		m_iSizeX = m_iSizeY = m_iSizeZ = 0;
+	}
+
+public:
+	csField2<T>(iBase* pParent) : m_ppArray(NULL), m_iSizeX(0), m_iSizeY(0), 
+		scfImplementationType(this, pParent)
+	{}
+	~csField2<T>()
+	{
+		DeleteField();
+	}
+
+	//O(n^2)
+	virtual inline void SetSize(const UINT iSizeX, const UINT iSizeY, const UINT iSizeZ)
+	{
+		DeleteField();
+		m_iSizeX = iSizeX;
+		m_iSizeY = iSizeY;
+		m_iSizeZ = iSizeZ;
+		//reserve memory
+		m_pppArray = new T**[m_iSizeX];
+		for(UINT x = 0; x < m_iSizeX; ++x)
+		{
+			m_pppArray[x] = new T*[m_iSizeY];
+			for(UINT y = 0; y < m_iSizeY; ++y)
+			{
+				m_pppArray[x][y] = new T[m_iSizeZ];
+			}
+		}
+	}
+	virtual const UINT GetSizeX() const {return m_iSizeX;}
+	virtual const UINT GetSizeY() const {return m_iSizeY;}
+	virtual const UINT GetSizeZ() const {return m_iSizeZ;}
+
+	//O(1)
+	virtual inline void SetValue(const T& Value, const UINT x, const UINT y, const UINT z)
+	{
+		if(m_pppArray) m_pppArray[x][y][z] = Value;
+	}
+
+	//O(1)
+	virtual inline const T operator () (const UINT x, const UINT y, const UINT z) const
+	{
+		return GetValue(x, y, z);
+	}
+	//O(1)
+	virtual inline const T GetValue(const UINT x, const UINT y, const UINT z) const
+	{
+		return m_pppArray[x][y][z];
+	}
+	//O(1)
+	virtual const T GetValueClamp(const int _x, const int _y, const int _z) const
+	{
+		const UINT x = _x < 0 ? 0 : _x >= static_cast<int>(m_iSizeX) ? static_cast<int>(m_iSizeX) - 1 : _x;
+		const UINT y = _y < 0 ? 0 : _y >= static_cast<int>(m_iSizeY) ? static_cast<int>(m_iSizeY) - 1 : _y;
+		const UINT z = _z < 0 ? 0 : _z >= static_cast<int>(m_iSizeZ) ? static_cast<int>(m_iSizeZ) - 1 : _z;
+		return GetValue(x, y, z);
+	}
+};*/
 
 #endif // __CSCLOUDRENDERER_PLUGIN_H__

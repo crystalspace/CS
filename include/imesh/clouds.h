@@ -178,6 +178,7 @@ struct iCloudsDynamics : public virtual iBase
 	virtual inline void SetAmbientTemperature(const float T) = 0;
 	virtual inline void SetInitialCondWaterMixingRatio(const float qc) = 0;
 	virtual inline void SetInitialWaterVaporMixingRatio(const float qv) = 0;
+	virtual inline void SetGlobalWindSpeed(const csVector3& vWind) = 0;
 
 	/**
 	Does n computation steps. The overall calculations are split into several

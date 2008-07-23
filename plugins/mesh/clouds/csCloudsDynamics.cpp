@@ -108,13 +108,18 @@ const csVector3 csCloudsDynamics::ComputeVorticityConfinement(const UINT x, cons
 
 void csCloudsDynamics::AdvectAllQuantities()
 {
+	//First we advect all quatities which are defined at cell center!
 	for(UINT x = 0; x < m_iGridSizeX; ++x)
 	{
 		for(UINT y = 0; y < m_iGridSizeY; ++y)
 		{
 			for(UINT z = 0; z < m_iGridSizeZ; ++z)
 			{
-				
+				const csVector3 vVel = GetVelocityOfCellCenter(m_arvVelocityField[m_iLastIndex], x, y, z);
+				const csVector3 vPos = Clamp(csVector3(x, y, z) - m_fTimeStep * m_fInvGridScale * vVel, m_iGridSizeX, m_iGridSizeY, m_iGridSizeZ);
+				//Even if vPos is on boundary, the interpolation works fine!
+				m_arfPotTemperature[m_iActualIndex]->SetValue(GetInterpolatedValue(m_arfPotTemperature[m_iLastIndex], vPos),
+					static_cast<UINT>(vPos.x), static_cast<UINT>(vPos.y), static_cast<UINT>(vPos.z));
 			}
 		}
 	}
@@ -136,7 +141,7 @@ void csCloudsDynamics::AddAcceleratingForces()
 				const float f2 = m_arvForceField->GetValue(x, y, z).y + m_arvForceField->GetValue(x, y - 1, z).y;
 				const float f3 = m_arvForceField->GetValue(x, y, z).z + m_arvForceField->GetValue(x, y, z - 1).z;
 				const csVector3 vCurrent = m_arvVelocityField[m_iActualIndex]->GetValue(x, y, z);
-				m_arvVelocityField[m_iActualIndex]->SetValue(vCurrent + m_fTimeStep * 0.5f * csVector(f1, f2, f3), x, y, z);
+				m_arvVelocityField[m_iActualIndex]->SetValue(vCurrent + m_fTimeStep * 0.5f * csVector3(f1, f2, f3), x, y, z);
 			}
 		}
 	}
@@ -146,9 +151,50 @@ void csCloudsDynamics::AddAcceleratingForces()
 
 void csCloudsDynamics::SatisfyVelocityBoundaryCond()
 {
-	//Bottom: no-slip
-	//Top: free-slip
-	//sides: user-defined windspeeds
+	//sides: user-defined windspeeds --> all eight corners are going to be overwritten by
+	//userdefined windspeeds
+	//xy-plane, z = 0 && z = MAX
+	for(UINT x = 0; x <= m_iGridSizeX; ++x)
+	{
+		for(UINT y = 0; y <= m_iGridSizeY; ++y)
+		{
+			m_arvVelocityField[m_iActualIndex]->SetValue(m_vWindSpeed, x, y, 0);
+			m_arvVelocityField[m_iActualIndex]->SetValue(m_vWindSpeed, x, y, m_iGridSizeZ);
+		}
+	}
+	//yz-Plane, x = 0 && x = MAX
+	for(UINT y = 0; y <= m_iGridSizeY; ++y)
+	{
+		for(UINT z = 0; z <= m_iGridSizeZ; ++z)
+		{
+			m_arvVelocityField[m_iActualIndex]->SetValue(m_vWindSpeed, 0, y, z);
+			m_arvVelocityField[m_iActualIndex]->SetValue(m_vWindSpeed, m_iGridSizeX, y, z);
+		}
+	}
+
+	//Bottom: no-slip (xz plane, y = 0)
+	for(UINT x = 1; x < m_iGridSizeX; ++x)
+	{
+		for(UINT z = 1; z < m_iGridSizeZ; ++z)
+		{
+			const csVector3 vCurr	= m_arvVelocityField[m_iActualIndex]->GetValue(x, 0, z);
+			const csVector3 vAbove  = m_arvVelocityField[m_iActualIndex]->GetValue(x, 1, z);
+			//Which one is correct?
+			//m_arvVelocityField[m_iActualIndex]->SetValue(csVector3(vCurr.x, -vAbove.y, vCurr.z), x, 0, z);
+			m_arvVelocityField[m_iActualIndex]->SetValue(csVector3(0.f, -vAbove.y, 0.f), x, 0, z);
+		}
+	}
+
+	//Top: free-slip (xz plane, y = MAX)
+	for(UINT x = 1; x < m_iGridSizeX; ++x)
+	{
+		for(UINT z = 1; z < m_iGridSizeZ; ++z)
+		{
+			const csVector3 vBorder = m_arvVelocityField[m_iActualIndex]->GetValue(x, m_iGridSizeY, z);
+			const csVector3 vInner  = m_arvVelocityField[m_iActualIndex]->GetValue(x, m_iGridSizeY - 1, z);
+			m_arvVelocityField[m_iActualIndex]->SetValue(csVector3(vBorder.x, vInner.y, vBorder.z), x, m_iGridSizeY, z);
+		}
+	}
 }
 
 //----------------------------------------------------------//
