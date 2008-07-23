@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2001 by Jorrit Tyberghein
+    Copyright (C) 1998-2008 by Jorrit Tyberghein
     Written by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
@@ -90,6 +90,13 @@
  */
 #ifndef CS_ATTRIBUTE_MALLOC
 # define CS_ATTRIBUTE_MALLOC
+#endif
+
+/**\def CS_ATTRIBUTE_INIT_PRIORITY()
+ * Namespace-level object initialization priority attribute.
+ */
+#ifndef CS_ATTRIBUTE_INIT_PRIORITY
+# define CS_ATTRIBUTE_INIT_PRIORITY(PRI)
 #endif
 
 // Set up deprecation macros

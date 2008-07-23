@@ -2188,15 +2188,29 @@ CS_SYMBOL_QUALIFIER([how to declare deprecation],
     [CS_HEADER_PROPERTY([CS_ATTRIBUTE_DEPRECATED],
 	[$cs_cv_prog_cxx_declare_deprecated])])
 
+
+
 #------------------------------------------------------------------------------
 # Check if the "malloc" attribute is available.
 #------------------------------------------------------------------------------
 CS_SYMBOL_QUALIFIER([how to declare allocation function],
     [cs_cv_prog_c_attr_malloc],
-    [__attribute__((malloc))], [], [C])
-AS_IF([test $cs_cv_prog_c_attr_malloc != no],
+    [__attribute__((malloc))], [], [C],
     [CS_HEADER_PROPERTY([CS_ATTRIBUTE_MALLOC],
 	[$cs_cv_prog_c_attr_malloc])])
+
+
+
+#------------------------------------------------------------------------------
+# Check if the "init_priority" attribute is available.
+#------------------------------------------------------------------------------
+CS_SYMBOL_QUALIFIER([how to declare object initialization priority],
+    [cs_cv_prog_cxx_attr_init_priority],
+    [__attribute__((init_priority(PRI)))],
+    [[#define PRI 1010
+    class X{}; X x]], [C++],
+    [CS_HEADER_PROPERTY([CS_ATTRIBUTE_INIT_PRIORITY(PRI)],
+	[$cs_cv_prog_cxx_attr_init_priority])])
 
 
 
