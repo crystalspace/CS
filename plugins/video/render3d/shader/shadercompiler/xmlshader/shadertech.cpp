@@ -1147,14 +1147,6 @@ csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (
   size_t variant, iHierarchicalCache* cacheTo, CachedPlugin& cacheInfo,
   csString& tag)
 {
-  if (node->GetAttributeValue("plugin") == 0)
-  {
-    parent->compiler->Report (CS_REPORTER_SEVERITY_ERROR,
-      "No shader program plugin specified for <%s> in shader '%s'",
-      node->GetValue (), parent->GetName ());
-    return 0;
-  }
-
   csRef<iShaderProgram> program;
 
   program = cacheInfo.programPlugin->CreateProgram (cacheInfo.progType);
