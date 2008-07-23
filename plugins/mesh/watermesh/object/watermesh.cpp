@@ -26,6 +26,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgeom/polyclip.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/tri.h"
+#include "csgeom/matrix4.h"
 #include "csgfx/renderbuffer.h"
 #include "csgfx/shadervarcontext.h"
 #include "csgfx/shadervar.h"
@@ -54,6 +55,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "watermesh.h"
 
 #define OCEAN_BBOX_RADIUS 50000.0f
+#define OCEAN_NP_WID	40.0f
+#define OCEAN_NP_LEN	40.0f
 
 CS_IMPLEMENT_PLUGIN
 
@@ -89,6 +92,8 @@ csWaterMeshObject::csWaterMeshObject (csWaterMeshObjectFactory* factory) :
   	(factory->object_reg, "crystalspace.shared.stringset");
 
   variableContext.AttachNew (new csShaderVariableContext);
+  if(factory->isOcean())
+	farPatchVariableContext.AttachNew (new csShaderVariableContext);
 
   factory->AddMeshObject(this);
 }
@@ -208,6 +213,13 @@ void csWaterMeshObject::SetupObject ()
 	murkVar->SetType(csShaderVariable::FLOAT);
 	murkVar->SetValue(factory->waterAlpha);
 	
+	if(factory->isOcean())
+	{
+		murkVar = farPatchVariableContext->GetVariableAdd(strings->Request("murkiness"));
+		murkVar->SetType(csShaderVariable::FLOAT);
+		murkVar->SetValue(factory->waterAlpha);
+	}
+	
 	factory->murkChanged = false;	
   }
 
@@ -280,6 +292,7 @@ csRenderMesh** csWaterMeshObject::GetRenderMeshes (
 
 //  float camY = camera->GetTransform().GetOrigin().y;
   csReversibleTransform trans;
+  float camY = camera->GetTransform().GetOrigin().y;
   if(factory->isOcean())	
   {	
 	// csOrthoTransform ot = camera->GetTransform();
@@ -306,6 +319,9 @@ csRenderMesh** csWaterMeshObject::GetRenderMeshes (
 
   const csReversibleTransform o2wt = movable->GetFullTransform ();
   const csVector3& wo = o2wt.GetOrigin ();
+	
+  csReversibleTransform o2world (o2wt);
+  //o2world.SetO2T(o2world.GetO2T());
 
   CS_ASSERT (material != 0);
   material->Visit ();
@@ -353,7 +369,7 @@ csRenderMesh** csWaterMeshObject::GetRenderMeshes (
 	  }
   }
 
-  renderMeshes[0]->object2world = o2wt * trans;
+  renderMeshes[0]->object2world = o2world * trans;
 
   //update shader variable
   csShaderVariable *o2wtVar = variableContext->GetVariableAdd(strings->Request("o2w transform"));
@@ -378,11 +394,62 @@ csRenderMesh** csWaterMeshObject::GetRenderMeshes (
 	fpTrans.SetO2T(fpTransMat);
 	fpTrans.SetOrigin(wo);
 	*/
-	  bool fpCreated;
-	  if(renderMeshes.GetSize() == 1)
-	  {
+
+	// float e = n * tanAlph;
+	// 
+	// float DminE = (d - e);
+	// float FminN = (f - n);
+	// 
+	// printf("n: %f\n", n);
+	// printf("halfDminE: %f\n", halfDminE);
+	// printf("halfFminN: %f\n", halfFminN);
+	// csMatrix3 tf (n, 0, halfDminE, 0, 1, 0, 0, 0, halfFminN);
+	// csVector3 tfv (halfDminE, 0, halfFminN);
+	
+	csPlane3* fp = camera->GetFarPlane();
+	float f;
+	if(fp)
+		f = fp->DD;
+	else
+		f = 500.0f;
+		
+	float tanAlph = tan((camera->GetFOVAngle() * PI) / 360);
+	float d = f * tanAlph;
+	
+	CS::Math::Matrix4 fpFirstTransMat (1, 0, 1, -1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+	CS::Math::Matrix4 fpSecondTransMat (d, 0, 0, 0, 0, 1, 0, 0, 0, 0, f, 0, 0, 0, 0, 1);
+	CS::Math::Matrix4 fpTransMat = fpFirstTransMat * fpSecondTransMat;
+	csTransform fpTrans = fpTransMat.GetTransform();
+	CS::Math::Matrix4 testMat (fpTrans);	
+
+	printf("testMat: |%.2f\t%.2f\t%.2f\t%.2f\t|\n", testMat.Row(0).x, testMat.Row(0).y, testMat.Row(0).z, testMat.Row(0).w);
+	printf("testMat: |%.2f\t%.2f\t%.2f\t%.2f\t|\n", testMat.Row(1).x, testMat.Row(1).y, testMat.Row(1).z, testMat.Row(1).w);
+	printf("testMat: |%.2f\t%.2f\t%.2f\t%.2f\t|\n", testMat.Row(2).x, testMat.Row(2).y, testMat.Row(2).z, testMat.Row(2).w);
+	printf("testMat: |%.2f\t%.2f\t%.2f\t%.2f\t|\n", testMat.Row(3).x, testMat.Row(3).y, testMat.Row(3).z, testMat.Row(3).w);
+	
+	
+	
+	csVector3 test = fpTrans * csVector3(-1.0, 0.0, 1.0);
+	printf("Vertex: <%.2f, %.2f, %.2f, %.2f> ===> <%.2f, %.2f, %.2f, %.2f>\n",-1.0, 0.0, 1.0, 1.0, test.x, test.y, test.z, 1.0);
+	// test = testMat.Row2();
+	// printf("fpTransMat: <%f, %f, %f, %f>\n", test.x, test.y, test.z, test.w);
+	// test = testMat.Row3();
+	// printf("fpTransMat: <%f, %f, %f, %f>\n", test.x, test.y, test.z, test.w);
+	// test = testMat.Row4();
+	// printf("fpTransMat: <%f, %f, %f, %f>\n", test.x, test.y, test.z, test.w);
+	// 
+	// test = csVector4(1.0, 0.0, -1.0, 1.0) * fpTrans;
+	// printf("Vertex: <%f, %f, %f> => <%f, %f, %f>\n", 1.0, 0.0, -1.0, test.x, test.y, test.z);
+	// test = csVector4(-1.0, 0.0, 1.0, 1.0) * fpTrans;
+	// printf("Vertex: <%f, %f, %f> => <%f, %f, %f>\n", -1.0, 0.0, 1.0, test.x, test.y, test.z);
+	// test = csVector4(1.0, 0.0, 1.0, 1.0) * fpTrans;
+	// printf("Vertex: <%f, %f, %f> => <%f, %f, %f>\n", 1.0, 0.0, 1.0, test.x, test.y, test.z);
+	// printf("\n");
+	bool fpCreated;
+	if(renderMeshes.GetSize() == 1)
+	{
 		renderMeshes.Push(rmHolder.GetUnusedMesh (fpCreated,
-	    	rview->GetCurrentFrameNumber ()));
+		rview->GetCurrentFrameNumber ()));
 
 		renderMeshes[1]->mixmode = MixMode;
 		renderMeshes[1]->clip_portal = clip_portal;
@@ -396,15 +463,20 @@ csRenderMesh** csWaterMeshObject::GetRenderMeshes (
 		renderMeshes[1]->worldspace_origin = wo;
 
 		renderMeshes[1]->geometryInstance = (void*)factory;
-  	  }
-	  renderMeshes[1]->object2world = o2wt * trans;
 
-	  if (fpCreated)
-	  {
-	    renderMeshes[1]->buffers = farPatchBufferHolder;
-		renderMeshes[1]->variablecontext = variableContext; //farPatchVariableContext;
-	  }
+		if (fpCreated)
+		{
+			renderMeshes[1]->buffers = farPatchBufferHolder;
+			renderMeshes[1]->variablecontext = farPatchVariableContext;
+		}
+	}
+	renderMeshes[1]->object2world = o2world * fpTrans * trans;
   }
+
+  //update shader variable
+  // o2wtVar = farPatchVariableContext->GetVariableAdd(strings->Request("o2w transform"));
+  // o2wtVar->SetType(csShaderVariable::MATRIX);
+  // o2wtVar->SetValue(renderMeshes[1]->object2world);
 
   n = renderMeshes.GetSize();
 
@@ -502,6 +574,13 @@ void csWaterMeshObject::SetNormalMap(iTextureWrapper *map)
 	nMapVar = variableContext->GetVariableAdd(strings->Request("texture normal"));
 	nMapVar->SetType(csShaderVariable::TEXTURE);
 	nMapVar->SetValue(nMap);
+	
+	if(factory->isOcean())
+	{
+		csShaderVariable *nMapFP = farPatchVariableContext->GetVariableAdd(strings->Request("texture normal"));
+		nMapFP->SetType(csShaderVariable::TEXTURE);
+		nMapFP->SetValue(nMap);
+	}
 }
 
 iTextureWrapper* csWaterMeshObject::GetNormalMap()
@@ -671,8 +750,8 @@ void csWaterMeshObjectFactory::SetWaterType(waterMeshType waterType)
 	type = waterType;
 	if(type == WATER_TYPE_OCEAN)
 	{
-		wid = 75;
-		len = 75;
+		wid = OCEAN_NP_WID;
+		len = OCEAN_NP_LEN;
 		gran = 1;
 		
 		SetMurkiness(0.2);
@@ -742,18 +821,17 @@ void csWaterMeshObjectFactory::SetupFactory ()
 		far_texs.DeleteAll();
 		far_tris.DeleteAll();
 		
-		uint fpatchH = len * gran * 2;
-		uint fpatchW = wid * gran;
-		float zoff = 0.0;
-		
-		for(uint j = 0; j < fpatchH; j++)
+		float fpatchH = len * gran;
+		float fpatchW = wid * gran;
+				
+		for(float j = 0; j < fpatchH; j+=1)
 		{
-			for(uint i = 0; i < fpatchW; i++)
+			for(float i = 0; i < fpatchW; i+=1)
 			{
-				far_verts.Push(csVector3 ((i / gran) - offx, 0, (j / gran) + offz + zoff));
+				far_verts.Push(csVector3(((j * 2) / fpatchW) - 1 , -0.5f , i / fpatchH));
 				far_norms.Push(csVector3 (0, 1, 0));
 				far_cols.Push(csColor (0.17,0.27,0.26));
-				far_texs.Push(csVector2(i, j));
+				far_texs.Push(csVector2((i / gran) / (0.1 * detail), (j / gran) / (0.1 * detail)));
 			}
 		}
 
@@ -761,12 +839,12 @@ void csWaterMeshObjectFactory::SetupFactory ()
 		{
 			for(uint i = 0; i < (fpatchW) - 1; i++)
 			{
-				far_tris.Push(csTriangle (j * (fpatchW) + i, 
+				far_tris.Push(csTriangle (j * (fpatchW) + i + 1, 
 										(j + 1) * (fpatchW) + i, 
-										j * (fpatchW) + i + 1));
-				far_tris.Push(csTriangle (j * (fpatchW) + i + 1,
+										(j * (fpatchW) + i)));
+				far_tris.Push(csTriangle ((j + 1) * (fpatchW) + i + 1,
 										(j + 1) * (fpatchW) + i,
-										(j + 1) * (fpatchW) + i + 1));
+										(j * (fpatchW) + i + 1)));
 			}
 		}
 	}

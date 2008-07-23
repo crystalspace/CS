@@ -74,6 +74,7 @@ private:
   // The shader variable context. Holds shader variables like the
   // object to world transform.
   csRef<csShaderVariableContext> variableContext;
+  csRef<csShaderVariableContext> farPatchVariableContext;
 
   // Since every mesh can have a different color we need to have
   // the color buffer here. But we will use the basic colors
