@@ -306,7 +306,14 @@ bool csShaderGLCGCommon::DefaultLoadProgram (iShaderProgramCG* cgResolve,
 	i++;
     }
   }
-  if (customLimits != 0) customLimits->ToCgOptions (args);
+  if (customLimits != 0)
+    customLimits->ToCgOptions (args);
+  else
+  {
+    ProfileLimits limits (shaderPlug->vendor, profile);
+    limits.GetCurrentLimits (shaderPlug->ext);
+    limits.ToCgOptions (args);
+  }
   args.Push (0);
  
   if (program)
