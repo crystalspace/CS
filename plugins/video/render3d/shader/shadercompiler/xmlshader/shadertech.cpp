@@ -1192,7 +1192,6 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadProgramFromCache (
   csRef<iString> failReason;
   iShaderProgram::CacheLoadResult loadRes = prog->LoadFromCache (cache, &failReason,
     &progTag);
-  if (!progTag.IsValid()) return iShaderProgram::loadFail;
   if (loadRes == iShaderProgram::loadFail)
   {
     if (parent->compiler->do_verbose)
@@ -1203,7 +1202,7 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadProgramFromCache (
     return iShaderProgram::loadFail;
   }
   
-  tag = progTag->GetData();
+  if (progTag.IsValid()) tag = progTag->GetData();
 
   return loadRes;
 }
