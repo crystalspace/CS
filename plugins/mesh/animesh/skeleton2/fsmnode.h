@@ -51,6 +51,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     void BlendState (csSkeletalState2* state, float baseWeight = 1.0f);
     void TickAnimation (float dt);
 
+    void Stop ();
+
   private:
     struct AnimationInstruction
     {
