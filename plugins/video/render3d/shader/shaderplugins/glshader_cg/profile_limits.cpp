@@ -73,8 +73,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     LIMIT(NumTemps, MAX_PROGRAM_TEMPORARIES_ARB, 32) \
   PROFILE_END(FP40)
 
-  ProfileLimits::ProfileLimits (CGprofile profile)
-   : profile (profile), 
+  ProfileLimits::ProfileLimits (
+    CS::PluginCommon::ShaderProgramPluginGL::HardwareVendor vendor,
+    CGprofile profile)
+   : vendor (vendor), profile (profile), 
      MaxAddressRegs (0),
      MaxInstructions (0),
      MaxLocalParams (0),
@@ -139,6 +141,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   void ProfileLimits::ReadFromConfig (iConfigFile* cfg, const char* _prefix)
   {
     csString prefix (_prefix);
+    vendor = CS::PluginCommon::ShaderProgramPluginGL::VendorFromString (
+      cfg->GetStr (prefix + ".Vendor", "other"));
 #define READ(Limit) \
     Limit = cfg->GetInt (prefix + "." #Limit, 0)
     READ (MaxAddressRegs);
@@ -197,6 +201,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     profile = cgGetProfile (components[i++]);
     if (profile == CG_PROFILE_UNKNOWN) return false;
   
+    if (i >= components.GetSize()) return false;
+    vendor = CS::PluginCommon::ShaderProgramPluginGL::VendorFromString (
+      components[i++]);
+    if (vendor == CS::PluginCommon::ShaderProgramPluginGL::Invalid)
+      return false;
+    
     uint usedLimits = 0;
   
 #define PROFILE_BEGIN(PROFILE)  \
@@ -265,6 +275,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 #undef LIMIT
 
     csString ret (cgGetProfileString (profile));
+    ret.AppendFmt (".%s",
+      CS::PluginCommon::ShaderProgramPluginGL::VendorToString (vendor));
 #define EMIT(Limit) if (usedLimits & (1 << lim ## Limit)) ret.AppendFmt (".%u", Limit);
     EMIT (MaxInstructions);
     EMIT (NumInstructionSlots);
@@ -304,6 +316,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     
   bool ProfileLimits::Write (iFile* file) const
   {
+    {
+      int32 diskVal = csLittleEndian::Int32 (vendor);
+      if (file->Write ((char*)&diskVal, sizeof (diskVal)) != sizeof (diskVal))
+        return false;
+    }
 #define WRITE(Limit) \
     { \
       uint32 diskVal = csLittleEndian::UInt32 (Limit); \
@@ -325,6 +342,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     
   bool ProfileLimits::Read (iFile* file)
   {
+    {
+      int32 diskVal;
+      if (file->Read ((char*)&diskVal, sizeof (diskVal)) != sizeof (diskVal))
+        return false;
+      vendor = (CS::PluginCommon::ShaderProgramPluginGL::HardwareVendor)
+        csLittleEndian::Int32 (diskVal);
+    }
 #define READ(Limit) \
     { \
       uint32 diskVal; \
@@ -373,6 +397,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     int p2 = GetProfileOrdering (other.profile);
     if (p1 < p2) return true;
     if (p1 > p2) return false;
+    
+    if (vendor < other.vendor) return true;
+    if (vendor > other.vendor) return false;
   
 #define COMPARE(Limit) \
     if (Limit < other.Limit) return true; \
@@ -396,6 +423,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     if (p1 > p2) return true;
     if (p1 < p2) return false;
   
+    if (vendor > other.vendor) return true;
+    if (vendor < other.vendor) return false;
+  
 #define COMPARE(Limit) \
     if (Limit > other.Limit) return true; \
     if (Limit < other.Limit) return false;
@@ -416,6 +446,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     int p1 = GetProfileOrdering (profile);
     int p2 = GetProfileOrdering (other.profile);
     if (p1 != p2) return false;
+    
+    if (vendor != other.vendor) return false;
   
 #define COMPARE(Limit) \
     if (Limit != other.Limit) return false;

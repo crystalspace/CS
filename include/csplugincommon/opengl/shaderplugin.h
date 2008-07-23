@@ -48,13 +48,17 @@ namespace CS
       {
         /// No vendor identified yet
         Invalid = -1,
-        /// ATI/AMD
-        ATI = 0,
-        /// NVidia
-        NVIDIA = 1,
         /// Other vendor
-        Other = 2
+        Other = 0,
+        /// ATI/AMD
+        ATI = 1,
+        /// NVidia
+        NVIDIA = 2
       };
+      /// Give a string representation from a vendor value
+      static const char* VendorToString (HardwareVendor vendor);
+      /// Convert a to a vendor value
+      static HardwareVendor VendorFromString (const char* vendorStr);
     protected:
       /**
        * Vendor of the current graphics hardware/driver.

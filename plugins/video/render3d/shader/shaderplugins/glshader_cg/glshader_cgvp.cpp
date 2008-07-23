@@ -76,7 +76,7 @@ bool csShaderGLCGVP::Compile (iHierarchicalCache* cache, csRef<iString>* tag)
     csShaderGLCGFP* prevFP = static_cast<csShaderGLCGFP*> (
       (iShaderProgramCG*)cgResolve);
   
-    ProfileLimits limits (programProfile);
+    ProfileLimits limits (shaderPlug->vendor, programProfile);
     limits.GetCurrentLimits (shaderPlug->ext);
     WriteToCache (cache, limits,
       prevFP->cacheLimits.ToString() /* Inaccurate when VP has custom profile set */
@@ -85,7 +85,7 @@ bool csShaderGLCGVP::Compile (iHierarchicalCache* cache, csRef<iString>* tag)
   }
   else
   {
-    ProfileLimits limits (programProfile);
+    ProfileLimits limits (shaderPlug->vendor, programProfile);
     limits.GetCurrentLimits (shaderPlug->ext);
     tag->AttachNew (new scfString (limits.ToString()));
   }
@@ -114,7 +114,7 @@ bool csShaderGLCGVP::Precache (const ProfileLimits& limits,
     
     ArgumentArray args;
     shaderPlug->GetProfileCompilerArgs (GetProgramType(),
-      limits.profile, true, args);
+      limits.profile, limits.vendor, true, args);
     for (size_t i = 0; i < compilerArgs.GetSize(); i++) 
       args.Push (compilerArgs[i]);
   

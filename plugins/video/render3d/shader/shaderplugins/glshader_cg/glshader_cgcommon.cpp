@@ -258,10 +258,12 @@ bool csShaderGLCGCommon::DefaultLoadProgram (iShaderProgramCG* cgResolve,
   augmentedProgramStr.Append (programStr);
   programStr = augmentedProgramStr;
   CGprofile profile = CG_PROFILE_UNKNOWN;
+  CS::PluginCommon::ShaderProgramPluginGL::HardwareVendor vendor;
 
   if (customLimits != 0)
   {
     profile = customLimits->profile;
+    vendor = customLimits->vendor;
   }
   else
   {
@@ -273,6 +275,8 @@ bool csShaderGLCGCommon::DefaultLoadProgram (iShaderProgramCG* cgResolve,
   
     if (maxProfile != CG_PROFILE_UNKNOWN)
       profile = csMin (profile, maxProfile);
+      
+    vendor = shaderPlug->vendor;
   }
 
   if (shaderPlug->doVerbose || shaderPlug->doVerbosePrecache)
@@ -284,7 +288,7 @@ bool csShaderGLCGCommon::DefaultLoadProgram (iShaderProgramCG* cgResolve,
 
   ArgumentArray args;
   shaderPlug->GetProfileCompilerArgs (GetProgramType(), profile, 
-    flags & loadIgnoreConfigProgramOpts, args);
+    vendor, flags & loadIgnoreConfigProgramOpts, args);
   for (i = 0; i < compilerArgs.GetSize(); i++) 
     args.Push (compilerArgs[i]);
   /* Work around Cg 2.0 bug: it emits "OPTION ARB_position_invariant;"
@@ -826,8 +830,18 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
       continue;
     }
     
-    ProfileLimits currentLimits (limits.profile);
+    ProfileLimits currentLimits (shaderPlug->vendor,
+      limits.profile);
     currentLimits.GetCurrentLimits (shaderPlug->ext);
+    
+    if ((limits.vendor != currentLimits.vendor)
+        && (limits.vendor != CS::PluginCommon::ShaderProgramPluginGL::Other))
+    {
+      allReasons += wrapper.name;
+      allReasons += ": vendor mismatch; ";
+      continue;
+    }
+    
     bool limitsSupported = currentLimits >= limits;
     if (!limitsSupported)
     {
@@ -1244,7 +1258,7 @@ bool csShaderGLCGCommon::WriteToCompileCache (const ProfileLimits& limits,
 
   ArgumentArray args;
   shaderPlug->GetProfileCompilerArgs (GetProgramType(),
-    limits.profile, false, args);
+    limits.profile, limits.vendor, false, args);
   for (size_t i = 0; i < compilerArgs.GetSize(); i++) 
     args.Push (compilerArgs[i]);
 

@@ -223,6 +223,7 @@ static int GetProfileLevel (CGprofile profile)
 
 void csGLShader_CG::GetProfileCompilerArgs (const char* type, 
                                             CGprofile profile, 
+                                            HardwareVendor vendor,
                                             bool noConfigArgs,
                                             ArgumentArray& args)
 {
@@ -357,7 +358,8 @@ void csGLShader_CG::ParsePrecacheLimits (iConfigFile* config,
 	CGprofile profile_cg = cgGetProfile (profile);
 	if (profile_cg != CG_PROFILE_UNKNOWN)
 	{
-	  newPair.vp = ProfileLimits (profile_cg);
+	  newPair.vp = ProfileLimits (
+	   Other, profile_cg);
 	  newPair.vp.GetCgDefaults();
 	  newPair.vp.ReadFromConfig (config, 
 	    csString().Format ("Video.OpenGL.Shader.Cg.Precache.%s.Vertex",
@@ -372,7 +374,7 @@ void csGLShader_CG::ParsePrecacheLimits (iConfigFile* config,
 	CGprofile profile_cg = cgGetProfile (profile);
 	if (profile_cg != CG_PROFILE_UNKNOWN)
 	{
-	  newPair.fp = ProfileLimits (profile_cg);
+	  newPair.fp = ProfileLimits (Other, profile_cg);
 	  newPair.fp.GetCgDefaults();
 	  newPair.fp.ReadFromConfig (config, 
 	    csString().Format ("Video.OpenGL.Shader.Cg.Precache.%s.Fragment",
