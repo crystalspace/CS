@@ -408,7 +408,20 @@ bool csShaderGLCGCommon::DefaultLoadProgram (iShaderProgramCG* cgResolve,
        
        @@@ This should be at least configurable
      */
-    result = numVaryings <= 16;
+    const int maxNumVaryings = 16;
+    if (numVaryings > maxNumVaryings)
+    {
+      if (shaderPlug->doVerbose || shaderPlug->doVerbosePrecache)
+      {
+	shaderPlug->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "Discarding compiled program for having too much varyings "
+	  "(%d, limit is %d)",
+	  numVaryings, maxNumVaryings);
+      }
+      cgDestroyProgram (program);
+      program = 0;
+      result = false;
+    }
   }
   if (!result && !debugFN.IsEmpty())
   {
