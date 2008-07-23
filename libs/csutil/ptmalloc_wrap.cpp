@@ -680,11 +680,7 @@ namespace CS
         this->func = func;
       }
     };
-    static AtexitHandler atexitHandler 
-#if defined(CS_COMPILER_GCC)
-      __attribute__ ((init_priority (101)))
-#endif
-    ;
+    static AtexitHandler atexitHandler CS_ATTRIBUTE_INIT_PRIORITY(101);
   }
 }
 

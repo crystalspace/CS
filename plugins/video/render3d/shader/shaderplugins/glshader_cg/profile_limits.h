@@ -45,6 +45,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     void ReadFromConfig (iConfigFile* cfg, const char* prefix);
     void GetCgDefaults ();
     
+    bool FromString (const char* str);
     csString ToString () const;
     void ToCgOptions (ArgumentArray& args) const;
     
@@ -52,11 +53,53 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     bool Read (iFile* file);
     
     bool operator< (const ProfileLimits& other) const;
+    bool operator> (const ProfileLimits& other) const;
+    bool operator== (const ProfileLimits& other) const;
     bool operator>= (const ProfileLimits& other) const
     { return !operator< (other); }
   private:
     static uint glGetProgramInteger (csGLExtensionManager* ext,
       GLenum target, GLenum what);
+  };
+  
+  struct ProfileLimitsPair
+  {
+    ProfileLimits vp;
+    ProfileLimits fp;
+    
+    ProfileLimitsPair() : vp (CG_PROFILE_UNKNOWN), fp (CG_PROFILE_UNKNOWN) {}
+    ProfileLimitsPair (CGprofile profileVP,
+      CGprofile profileFP) : vp (profileVP), fp (profileFP) {}
+      
+    void GetCurrentLimits (csGLExtensionManager* ext)
+    {
+      vp.GetCurrentLimits (ext);
+      fp.GetCurrentLimits (ext);
+    }
+    
+    bool FromString (const char* str);
+    csString ToString () const;
+    
+    bool operator< (const ProfileLimitsPair& other) const
+    {
+      if (fp < other.fp) return true;
+      if (fp == other.fp) return false;
+      return vp < other.vp;
+    }
+    bool operator> (const ProfileLimitsPair& other) const
+    {
+      if (fp > other.fp) return true;
+      if (fp == other.fp) return false;
+      return vp > other.vp;
+    }
+    bool operator== (const ProfileLimitsPair& other) const
+    {
+      return (fp == other.fp) && (vp == other.vp);
+    }
+    bool operator!= (const ProfileLimitsPair& other) const
+    { return !operator== (other); }
+    bool operator>= (const ProfileLimitsPair& other) const
+    { return !operator< (other); }
   };
 
 }

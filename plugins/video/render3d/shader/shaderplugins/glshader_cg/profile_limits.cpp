@@ -187,6 +187,59 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     limNumTexInstructionSlots
   };
 
+  bool ProfileLimits::FromString (const char* str)
+  {
+    csStringArray components;
+    components.SplitString (str, ".");
+    
+    if (components.GetSize() == 0) return false;
+    size_t i = 0;
+    profile = cgGetProfile (components[i++]);
+    if (profile == CG_PROFILE_UNKNOWN) return false;
+  
+    uint usedLimits = 0;
+  
+#define PROFILE_BEGIN(PROFILE)  \
+  case CG_PROFILE_ ## PROFILE:  \
+    {
+#define PROFILE_END(PROFILE)    \
+    }                           \
+    break;
+#define LIMIT(Limit, glLimit, cgDefault)   \
+      usedLimits |= 1 << lim ## Limit;
+  
+    switch (profile)
+    {
+      PROFILES
+      default:
+        break;
+    }
+    
+#undef PROFILE_BEGIN
+#undef PROFILE_END
+#undef LIMIT
+
+#define EMIT(Limit) \
+  if (usedLimits & (1 << lim ## Limit)) \
+  { \
+    if (i >= components.GetSize()) return false; \
+    int v; \
+    char dummy; \
+    if (sscanf (components[i++], "%d%c", &v, &dummy) != 1) return false; \
+    Limit = v; \
+  }
+    EMIT (MaxInstructions);
+    EMIT (NumInstructionSlots);
+    EMIT (NumMathInstructionSlots);
+    EMIT (NumTexInstructionSlots);
+    EMIT (NumTemps);
+    EMIT (MaxLocalParams);
+    EMIT (MaxTexIndirections);
+    EMIT (MaxAddressRegs);
+#undef EMIT
+    return i == components.GetSize();
+  };
+  
   csString ProfileLimits::ToString () const
   {
     uint usedLimits = 0;
@@ -332,9 +385,80 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     COMPARE (MaxLocalParams);
     COMPARE (MaxTexIndirections);
     COMPARE (MaxAddressRegs);
-#undef READ
+#undef COMPARE
     return false;
   }
+  
+  bool ProfileLimits::operator> (const ProfileLimits& other) const
+  {
+    int p1 = GetProfileOrdering (profile);
+    int p2 = GetProfileOrdering (other.profile);
+    if (p1 > p2) return true;
+    if (p1 < p2) return false;
+  
+#define COMPARE(Limit) \
+    if (Limit > other.Limit) return true; \
+    if (Limit < other.Limit) return false;
+    COMPARE (MaxInstructions);
+    COMPARE (NumInstructionSlots);
+    COMPARE (NumMathInstructionSlots);
+    COMPARE (NumTexInstructionSlots);
+    COMPARE (NumTemps);
+    COMPARE (MaxLocalParams);
+    COMPARE (MaxTexIndirections);
+    COMPARE (MaxAddressRegs);
+#undef COMPARE
+    return false;
+  }
+  
+  bool ProfileLimits::operator== (const ProfileLimits& other) const
+  {
+    int p1 = GetProfileOrdering (profile);
+    int p2 = GetProfileOrdering (other.profile);
+    if (p1 != p2) return false;
+  
+#define COMPARE(Limit) \
+    if (Limit != other.Limit) return false;
+    COMPARE (MaxInstructions);
+    COMPARE (NumInstructionSlots);
+    COMPARE (NumMathInstructionSlots);
+    COMPARE (NumTexInstructionSlots);
+    COMPARE (NumTemps);
+    COMPARE (MaxLocalParams);
+    COMPARE (MaxTexIndirections);
+    COMPARE (MaxAddressRegs);
+#undef COMPARE
+    return true;
+  }
+
+  //-------------------------------------------------------------------------
+
+  bool ProfileLimitsPair::FromString (const char* str)
+  {
+    csString tagFP (str);
+    csString tagVP;
+    {
+      size_t semicolon = tagFP.FindFirst (';');
+      if (semicolon == (size_t)-1) return false;
+      tagFP.SubString (tagVP, semicolon+1, tagFP.Length() - (semicolon+1));
+      tagFP.Truncate (semicolon);
+    }
+    
+    if (!vp.FromString (tagVP))
+      return false;
+    
+    if (!fp.FromString (tagFP))
+      return false;
+      
+    return true;
+  }
+  
+  csString ProfileLimitsPair::ToString () const
+  {
+    return csString().Format ("%s;%s",
+      fp.ToString().GetData(), vp.ToString().GetData());
+  }
+
 }
 CS_PLUGIN_NAMESPACE_END(GLShaderCg)
 

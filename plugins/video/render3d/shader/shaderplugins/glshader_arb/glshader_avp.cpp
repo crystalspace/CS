@@ -337,7 +337,7 @@ bool csShaderGLAVP::Load (iShaderDestinationResolver*, const char* program,
   return true;
 }
 
-bool csShaderGLAVP::Compile (iHierarchicalCache*)
+bool csShaderGLAVP::Compile (iHierarchicalCache*, csRef<iString>* tag)
 {
   shaderPlug->Open ();
 
@@ -358,6 +358,7 @@ bool csShaderGLAVP::Compile (iHierarchicalCache*)
   }
 
   variablemap.ShrinkBestFit();
+  tag->AttachNew (new scfString ("default"));
 
   return LoadProgramStringToGL ();
 }

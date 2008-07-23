@@ -41,10 +41,10 @@ public:
     csShaderGLCGCommon (shaderPlug, progVP) { }
 
   /// Compile a program
-  virtual bool Compile (iHierarchicalCache* cache);
+  virtual bool Compile (iHierarchicalCache* cache, csRef<iString>*);
   
   bool Precache (const ProfileLimits& limits,
-    iHierarchicalCache* cache);
+    const char* tag, iHierarchicalCache* cache);
 
   virtual csVertexAttrib ResolveBufferDestination (const char* binding);
 };

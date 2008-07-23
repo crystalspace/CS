@@ -307,7 +307,7 @@ bool csShaderGLAFP::Load(iShaderDestinationResolver*, iDocumentNode* program)
   return true;
 }
 
-bool csShaderGLAFP::Compile (iHierarchicalCache*)
+bool csShaderGLAFP::Compile (iHierarchicalCache*, csRef<iString>* tag)
 {
   shaderPlug->Open ();
 
@@ -328,6 +328,7 @@ bool csShaderGLAFP::Compile (iHierarchicalCache*)
   }
 
   variablemap.ShrinkBestFit();
+  tag->AttachNew (new scfString ("default"));
 
   return LoadProgramStringToGL ();
 }

@@ -1006,7 +1006,7 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
   return true;
 }
 
-bool csGLShaderFVP::Compile (iHierarchicalCache*)
+bool csGLShaderFVP::Compile (iHierarchicalCache*, csRef<iString>* tag)
 {
   shaderPlug->Open ();
   ext = shaderPlug->ext;
@@ -1031,6 +1031,8 @@ bool csGLShaderFVP::Compile (iHierarchicalCache*)
   csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (objectReg);
   g2d->PerformExtension ("getstatecache", &statecache);
 
+  tag->AttachNew (new scfString ("default"));
+  
   return true;
 }
 

@@ -228,8 +228,7 @@ void csShaderGLCGCommon::PrecacheClear()
   objectCodeCachePath.Empty();
 }
 
-bool csShaderGLCGCommon::DefaultLoadProgram (
-  iShaderDestinationResolverCG* cgResolve,
+bool csShaderGLCGCommon::DefaultLoadProgram (iShaderProgramCG* cgResolve,
   const char* programStr, CGGLenum type, CGprofile maxProfile, 
   uint flags, const ProfileLimits* customLimits)
 {
@@ -662,7 +661,7 @@ void csShaderGLCGCommon::WriteAdditionalDumpInfo (const char* description,
 /* Magic value for cg program files.
  * The most significant byte serves as a "version", increase when the
  * cache file format changes. */
-static const uint32 cacheFileMagic = 0x03706763;
+static const uint32 cacheFileMagic = 0x04706763;
 
 enum
 {
@@ -671,7 +670,8 @@ enum
 };
 
 bool csShaderGLCGCommon::WriteToCache (iHierarchicalCache* cache,
-                                       const ProfileLimits& limits)
+                                       const ProfileLimits& limits,
+                                       const char* tag)
 {
   if (!cache) return false;
 
@@ -680,14 +680,6 @@ bool csShaderGLCGCommon::WriteToCache (iHierarchicalCache* cache,
   uint32 diskMagic = csLittleEndian::UInt32 (cacheFileMagic);
   if (cacheFile.Write ((char*)&diskMagic, sizeof (diskMagic))
       != sizeof (diskMagic)) return false;
-  
-  {
-    uint32 diskProfile = csLittleEndian::UInt32 (limits.profile);
-    if (cacheFile.Write ((char*)&diskProfile, sizeof (diskProfile))
-	!= sizeof (diskProfile)) return false;
-  }
-  
-  if (!limits.Write (&cacheFile)) return false;
   
   csString objectCode (this->objectCode);
   if ((program != 0) && objectCode.IsEmpty())
@@ -750,7 +742,7 @@ bool csShaderGLCGCommon::WriteToCache (iHierarchicalCache* cache,
   }
   
   csString cacheName ("/");
-  cacheName += limits.ToString ();
+  cacheName += tag;
   return cache->CacheData (cacheFile.GetData(), cacheFile.GetSize(),
     cacheName);
 }
@@ -759,17 +751,17 @@ struct CachedShaderWrapper
 {
   csString name;
   csRef<iFile> cacheFile;
-  ProfileLimits limits;
+  ProfileLimitsPair limits;
   
-  CachedShaderWrapper (iFile* file, CGprofile profile) : cacheFile (file),
-    limits (profile) {}
+  CachedShaderWrapper (iFile* file) : cacheFile (file) {}
     
   bool operator< (const CachedShaderWrapper& other) const
   { return limits < other.limits; }
 };
 
 iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
-  iHierarchicalCache* cache, csRef<iString>* failReason)
+  iHierarchicalCache* cache, csRef<iString>* failReason,
+  csRef<iString>* tag)
 {
   if (!cache) return iShaderProgram::loadFail;
 
@@ -798,18 +790,10 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
     if (csLittleEndian::UInt32 (diskMagic) != cacheFileMagic)
       continue;
       
-    CGprofile profile;
-    {
-      uint32 diskProfile;
-      if (cacheFile->Read ((char*)&diskProfile, sizeof (diskProfile))
-	  != sizeof (diskProfile)) continue;
-      profile = (CGprofile)csLittleEndian::UInt32 (diskProfile);
-    }
-    
-    CachedShaderWrapper wrapper (cacheFile, profile);
-    if (!wrapper.limits.Read (cacheFile)) continue;
+    CachedShaderWrapper wrapper (cacheFile);
     
     wrapper.name = allCachedPrograms->Get (i);
+    if (!wrapper.limits.FromString (wrapper.name)) continue;
     
     cachedProgWrappers.Push (wrapper);
   }
@@ -828,11 +812,13 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
   for (size_t i = cachedProgWrappers.GetSize(); i-- > 0;)
   {
     const CachedShaderWrapper& wrapper = cachedProgWrappers[i];
+    const ProfileLimits& limits =
+      (programType == progVP) ? wrapper.limits.vp : wrapper.limits.fp;
   
     bool profileSupported =
-      (shaderPlug->ProfileNeedsRouting (wrapper.limits.profile)
-        && shaderPlug->IsRoutedProfileSupported (wrapper.limits.profile))
-      || cgGLIsProfileSupported (wrapper.limits.profile);
+      (shaderPlug->ProfileNeedsRouting (limits.profile)
+        && shaderPlug->IsRoutedProfileSupported (limits.profile))
+      || cgGLIsProfileSupported (limits.profile);
     if (!profileSupported)
     {
       allReasons += wrapper.name;
@@ -840,9 +826,9 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
       continue;
     }
     
-    ProfileLimits currentLimits (wrapper.limits.profile);
+    ProfileLimits currentLimits (limits.profile);
     currentLimits.GetCurrentLimits (shaderPlug->ext);
-    bool limitsSupported = currentLimits >= wrapper.limits;
+    bool limitsSupported = currentLimits >= limits;
     if (!limitsSupported)
     {
       allReasons += wrapper.name;
@@ -926,7 +912,7 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
       CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
     if (objectCodeCachePath.IsEmpty()) continue;
     
-    if (!LoadObjectCodeFromCompileCache (wrapper.limits, cache))
+    if (!LoadObjectCodeFromCompileCache (limits, cache))
       continue;
     
     oneReadCorrectly = true;
@@ -940,7 +926,7 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
     
     cgGetError(); // Clear error
     program = cgCreateProgram (shaderPlug->context, 
-      CG_OBJECT, objectCode, wrapper.limits.profile, 0, 0);
+      CG_OBJECT, objectCode, limits.profile, 0, 0);
     if (!program) continue;
     CGerror err = cgGetError();
     if (err != CG_NO_ERROR)
@@ -950,7 +936,7 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
 	"Cg error %s", errStr);
       continue;
     }
-    programProfile = wrapper.limits.profile;
+    programProfile = limits.profile;
     
     ClipsToVmap();
     GetParamsFromVmap();
@@ -986,6 +972,8 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
     
     if (shaderPlug->debugDump)
       DoDebugDump();
+      
+    tag->AttachNew (new scfString (wrapper.limits.ToString()));
     
     return iShaderProgram::loadSuccessShaderValid;
   }
