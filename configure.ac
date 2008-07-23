@@ -2068,7 +2068,7 @@ AS_IF([test $cs_type_wchar_t = yes],
     AC_CHECK_FUNC([wcslen], [CS_HEADER_PROPERTY([CS_HAVE_WCSLEN])])
     AC_CHECK_FUNC([fputws], [CS_HEADER_PROPERTY([CS_HAVE_FPUTWS])])
     AC_CHECK_FUNC([fwide], [CS_HEADER_PROPERTY([CS_HAVE_FWIDE])])
-    AC_CHECK_FUNC([wcsrtombs], [CS_HEADER_PROPERTY([CS_HAVE_WCSRTOMBS])])
+    AC_CHECK_FUNC([wcsnrtombs], [CS_HEADER_PROPERTY([CS_HAVE_WCSNRTOMBS])])
     AC_CHECK_SIZEOF([wchar_t], []
 	[[#if HAVE_WCHAR_H
 	#include <wchar.h>
