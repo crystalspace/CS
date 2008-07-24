@@ -33,6 +33,8 @@
 #include "csqint.h"
 #include "soft_g3d.h"
 
+using namespace CS::Threading;
+
 CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
 {
 
@@ -435,7 +437,10 @@ csPtr<iTextureHandle> csSoftwareTextureManager::RegisterTexture (iImage* image,
 
   csSoftwareTextureHandle *txt = new csSoftwareTextureHandle (
   	this, image, flags);
+
+  MutexScopedLock lock(texturesLock);
   textures.Push (txt);
+
   return csPtr<iTextureHandle> (txt);
 }
 
@@ -467,13 +472,17 @@ csPtr<iTextureHandle> csSoftwareTextureManager::CreateTexture (int w, int h,
 
   csSoftwareTextureHandle *txt = new csSoftwareTextureHandle (
     this, w, h, compMask == CS::StructuredTextureFormat::compRGBA, flags);
+
+  MutexScopedLock lock(texturesLock);
   textures.Push (txt);
+
   return csPtr<iTextureHandle> (txt);
 }
 
 void csSoftwareTextureManager::UnregisterTexture (
 		csSoftwareTextureHandle* handle)
 {
+  MutexScopedLock lock(texturesLock);
   size_t idx = textures.Find (handle);
   if (idx != csArrayItemNotFound) textures.DeleteIndexFast (idx);
 }
