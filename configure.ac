@@ -1824,12 +1824,17 @@ CS_CHECK_BUILD([for _aligned_malloc], [cs_cv__aligned_malloc],
     [], [],
     [CS_HEADER_PROPERTY([CS_HAVE__ALIGNED_MALLOC])])
     
-CS_CHECK_BUILD([for sysinfo()], [cs_cv_sysinfo],
-    [AC_LANG_PROGRAM(
-	[[#include <sys/sysinfo.h>]],
-	[struct sysinfo x; sysinfo(&x);])],
-    [],[],
-    [CS_HEADER_PROPERTY([CS_HAVE_SYSINFO])])
+AC_CHECK_HEADERS([sys/sysinfo.h],
+    [CS_HEADER_PROPERTY([CS_HAVE_SYS_SYSINFO_H])
+    CS_CHECK_BUILD([for sysinfo()], [cs_cv_sysinfo],
+	[AC_LANG_PROGRAM(
+	    [[#include <sys/sysinfo.h>]],
+	    [struct sysinfo x; sysinfo(&x);])],
+	[],[],
+	[CS_HEADER_PROPERTY([CS_HAVE_SYSINFO])])
+    AC_CHECK_MEMBERS([struct sysinfo.totalram],
+        [CS_HEADER_PROPERTY([CS_HAVE_STRUCT_SYSINFO_TOTALRAM])], [],
+        [#include <sys/sysinfo.h>])])
    
 
 
