@@ -71,7 +71,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   Snippet::Snippet (const WeaverCompiler* compiler, iDocumentNode* node, 
                     const char* name, const FileAliases& aliases,
                     const Snippet* parent) : compiler (compiler), 
-    xmltokens (compiler->xmltokens), name (name), 
+    xmltokens (compiler->xmltokens), name (name), node (node),
     isCompound (false), passForward (false), parent (parent)
   {
     bool okay = true;

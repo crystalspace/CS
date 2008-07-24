@@ -90,7 +90,7 @@ private:
     bool flipCulling;
     bool zoffset;
 
-    ShaderPass () : zoffset (false)
+    ShaderPass () : zoffset (false), minLights (0)
     { 
       mixMode = CS_FX_MESH;
       overrideZmode = false;
@@ -99,8 +99,9 @@ private:
 
     // writemasks
     bool wmRed, wmGreen, wmBlue, wmAlpha;
-
-    csXMLShaderTech* owner;
+    
+    /// Minimum light
+    int minLights;
   };
 
   //variable context

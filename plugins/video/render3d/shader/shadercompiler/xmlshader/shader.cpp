@@ -946,6 +946,14 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
   csConditionEvaluator::ScopedEvaluation scope (*sharedEvaluator);
   techsResolver->SetEvalParams (&modes, &stack);
   
+  int lightCount = 0;
+  if (stack.GetSize() > compiler->stringLightCount)
+  {
+    csShaderVariable* svLightCount = stack[compiler->stringLightCount];
+    if (svLightCount != 0)
+      svLightCount->GetValue (lightCount);
+  }
+  
   size_t tvc = techsResolver->GetVariantCount();
   if (tvc == 0) tvc = 1;
   
@@ -960,6 +968,7 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
     for (size_t t = 0; t < techVar.techniques.GetSize(); t++)
     {
       ShaderTechVariant::Technique& tech = techVar.techniques[t];
+      if (lightCount < tech.minLights) continue;
       
       csRef<iHierarchicalCache> techCache;
       if (shaderCache)
@@ -1138,6 +1147,7 @@ void csXMLShader::PrepareTechVar (ShaderTechVariant& techVar,
       const TechniqueKeeper& tk = techIt.Next();
       ShaderTechVariant::Technique newTech;
       newTech.priority = tk.priority;
+      newTech.minLights = tk.node->GetAttributeValueAsInt ("minlights");
       csRef<iWrappedDocumentNode> wrappedNode =
 	scfQueryInterface<iWrappedDocumentNode> (tk.node);
       newTech.srcNode = static_cast<csWrappedDocumentNode*> (
