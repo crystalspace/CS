@@ -75,4 +75,19 @@ const float GetInterpolatedValue(const csRef<iField3<csVector3>>& rSrc, const cs
 
 //-----------------------------------------------------//
 
+void JacobiSolver(csRef<iField3<float>> rNew, const csRef<iField3<float>>& rOld)
+{
+	//First only update interrior of the region. Then the boundaries
+	for(UINT x = 1; x < rNew->GetSizeX() - 1; ++x)
+	{
+		for(UINT y = 1; y < rNew->GetSizeY() - 1; ++y)
+		{
+			for(UINT z = 1; z < rNew->GetSizeZ() - 1; ++z)
+			{
+				
+			}
+		}
+	}
+}
+
 //-----------------------------------------------------//

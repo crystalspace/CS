@@ -31,6 +31,9 @@ the REAL position, but coordinates on the voxelgrid
 const float GetInterpolatedValue(const csRef<iField3<float>>& rSrc, const csVector3& vPos);
 const float GetInterpolatedValue(const csRef<iField3<csVector3>>& rSrc, const csVector3& vPos, const UINT iIndex);
 
+//Implements the straightforward jacobi solver
+void JacobiSolver(csRef<iField3<float>> rNew, const csRef<iField3<float>>& rOld);
+
 //Interpolates the velocity
 inline const csVector3 GetVelocityOfCellCenter(const csRef<iField3<csVector3>>& rField, 
 											   const UINT x, const UINT y, const UINT z)
@@ -205,7 +208,7 @@ inline const csVector3 CalcRotation(const csRef<iField3<csVector3>>& rField, con
 
 //------------------------------------------------------------------------------//
 
-/*template <typename T>
+template <typename T>
 class csField2 : public scfImplementation1<csField2<T>, iField2<T>>
 {
 private:
@@ -223,7 +226,7 @@ private:
 		}
 		delete[] m_pppArray;
 		m_pppArray = NULL;
-		m_iSizeX = m_iSizeY = m_iSizeZ = 0;
+		m_iSizeX = m_iSizeY = 0;
 	}
 
 public:
@@ -236,51 +239,44 @@ public:
 	}
 
 	//O(n^2)
-	virtual inline void SetSize(const UINT iSizeX, const UINT iSizeY, const UINT iSizeZ)
+	virtual inline void SetSize(const UINT iSizeX, const UINT iSizeY)
 	{
 		DeleteField();
 		m_iSizeX = iSizeX;
 		m_iSizeY = iSizeY;
-		m_iSizeZ = iSizeZ;
 		//reserve memory
-		m_pppArray = new T**[m_iSizeX];
+		m_ppArray = new T*[m_iSizeX];
 		for(UINT x = 0; x < m_iSizeX; ++x)
 		{
-			m_pppArray[x] = new T*[m_iSizeY];
-			for(UINT y = 0; y < m_iSizeY; ++y)
-			{
-				m_pppArray[x][y] = new T[m_iSizeZ];
-			}
+			m_pppArray[x] = new T[m_iSizeY];
 		}
 	}
 	virtual const UINT GetSizeX() const {return m_iSizeX;}
 	virtual const UINT GetSizeY() const {return m_iSizeY;}
-	virtual const UINT GetSizeZ() const {return m_iSizeZ;}
 
 	//O(1)
-	virtual inline void SetValue(const T& Value, const UINT x, const UINT y, const UINT z)
+	virtual inline void SetValue(const T& Value, const UINT x, const UINT y)
 	{
-		if(m_pppArray) m_pppArray[x][y][z] = Value;
+		if(m_ppArray) m_ppArray[x][y] = Value;
 	}
 
 	//O(1)
-	virtual inline const T operator () (const UINT x, const UINT y, const UINT z) const
+	virtual inline const T operator () (const UINT x, const UINT y) const
 	{
-		return GetValue(x, y, z);
+		return GetValue(x, y);
 	}
 	//O(1)
-	virtual inline const T GetValue(const UINT x, const UINT y, const UINT z) const
+	virtual inline const T GetValue(const UINT x, const UINT y) const
 	{
-		return m_pppArray[x][y][z];
+		return m_pppArray[x][y];
 	}
 	//O(1)
-	virtual const T GetValueClamp(const int _x, const int _y, const int _z) const
+	virtual const T GetValueClamp(const int _x, const int _y) const
 	{
 		const UINT x = _x < 0 ? 0 : _x >= static_cast<int>(m_iSizeX) ? static_cast<int>(m_iSizeX) - 1 : _x;
 		const UINT y = _y < 0 ? 0 : _y >= static_cast<int>(m_iSizeY) ? static_cast<int>(m_iSizeY) - 1 : _y;
-		const UINT z = _z < 0 ? 0 : _z >= static_cast<int>(m_iSizeZ) ? static_cast<int>(m_iSizeZ) - 1 : _z;
-		return GetValue(x, y, z);
+		return GetValue(x, y);
 	}
-};*/
+};
 
 #endif // __CSCLOUDRENDERER_PLUGIN_H__

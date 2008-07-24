@@ -73,11 +73,13 @@ This class represents a 2 dimensional field (may scalar or vector!)
 template <typename T>
 struct iField2 : public virtual iBase
 {
-	SCF_INTERFACE(iField2, 0, 0, 1);
+	SCF_INTERFACE(iField2, 1, 0, 0);
 
 	/**
 	*/
 	virtual void SetSize(const UINT iSizeX, const UINT iSizeY) = 0;
+	virtual const UINT GetSizeX() const = 0;
+	virtual const UINT GetSizeY() const = 0;
 
 	/**
 	Sets a value at position x, y
@@ -99,7 +101,7 @@ This class represents a 3 dimensional field (may scalar or vector!)
 template <typename T>
 struct iField3 : public virtual iBase
 {
-	SCF_INTERFACE(iField3, 0, 0, 1);
+	SCF_INTERFACE(iField3, 1, 0, 0);
 
 	/**
 	*/
@@ -153,7 +155,7 @@ is a 3d- scalar field containing all the condensed water mixing ratios.
 */
 struct iCloudsDynamics : public virtual iBase
 {
-	SCF_INTERFACE(iCloudsDynamics, 0, 0, 1);
+	SCF_INTERFACE(iCloudsDynamics, 0, 5, 1);
 
 	/**
 	This is the most importand initialisation method. It defines the dimensions
@@ -180,6 +182,8 @@ struct iCloudsDynamics : public virtual iBase
 	virtual inline void SetInitialWaterVaporMixingRatio(const float qv) = 0;
 	virtual inline void SetGlobalWindSpeed(const csVector3& vWind) = 0;
 	virtual inline void SetBaseAltitude(const float H) = 0;
+	virtual inline void SetTemperaturBottomInputField(csRef<iField2<float>> Field) = 0;
+	virtual inline void SetWaterVaporBottomInputField(csRef<iField2<float>> Field) = 0;
 
 	/**
 	Updates all constant and precomputeted parameters according to the user specific values set!

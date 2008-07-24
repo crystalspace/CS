@@ -37,6 +37,7 @@ The local coordinate system is equal to the one used as global with:
 */
 class csCloudsDynamics : public scfImplementation1<csCloudsDynamics, iCloudsDynamics>
 {
+	static const UINT			s_iTotalStepCount = 8;
 private:
 	/**
 	From each field there are two instances, because each time-step all of
@@ -56,6 +57,7 @@ private:
 	csRef<iField3<float>>		m_arfWaterVaporMixingRatios[2];		// qv
 	csRef<iField3<csVector3>>	m_arvForceField;
 	csRef<iField3<float>>		m_arfVelDivergence;
+	csRef<iField3<float>>		m_arfPressureField[2];				// p
 	/**
 	Velocity is defined at the boundaries of each cell. Half-way index
 	notation is used in consequence. These fields are of size N + 1
@@ -66,10 +68,13 @@ private:
 	csRef<iField3<csVector3>>	m_arvRotVelField;					// rot(u)
 
 	float						m_fTimeStep;
+	float						m_fTimePassed;
 	UINT						m_iGridSizeX;
 	UINT						m_iGridSizeY;
 	UINT						m_iGridSizeZ;
 	float						m_fGridScale;						// dx
+
+	UINT						m_iCurrentStep;
 
 	//Precomputed constants
 	float						m_fInvGridScale;					// 1 / dx
@@ -111,6 +116,10 @@ private:
 	csVector3					m_vWindSpeed;
 	//Absolute Height of the bottom grid face
 	float						m_fBaseAltitude;
+	//Bottom input field for Temperature
+	csRef<iField2<float>>		m_arfInputTemperature;
+	//Bottom input field for water vapor
+	csRef<iField2<float>>		m_arfInputWaterVapor;
 	//====================================================//
 
 	//Calculates the rotation of the velocity field u, and stores it in arvRotVelField
@@ -200,6 +209,10 @@ private:
 	//O(n^3)
 	void AddAcceleratingForces();
 
+	//Solves the poisson-pressure equation. Uses k iteration of a solver to do so
+	//O(k * n^3)
+	void SolvePoissonPressureEquation(const UINT k);
+
 	//After this method was invoked all velocity boundarycondition on u ar satisfied
 	void SatisfyVelocityBoundaryCond();
 	//Updates boundaries of qc, qv and PotT
@@ -216,6 +229,8 @@ private:
 		m_arvRotVelField.Invalidate();
 		m_arvForceField.Invalidate();
 		m_arfVelDivergence.Invalidate();
+		m_arfPressureField[0].Invalidate();
+		m_arfPressureField[1].Invalidate();
 	}
 
 	//For all userspecific values there are standard once too, which are set here!
@@ -246,7 +261,8 @@ private:
 
 public:
 	csCloudsDynamics(iBase* pParent) : scfImplementationType(this, pParent), m_iLastIndex(1), m_iActualIndex(0),
-		m_iGridSizeX(0), m_iGridSizeY(0), m_iGridSizeZ(0), m_fSpecificHeatCapacity(1.f)
+		m_iGridSizeX(0), m_iGridSizeY(0), m_iGridSizeZ(0), m_fSpecificHeatCapacity(1.f), m_fTimePassed(0.f),
+		m_iCurrentStep(0)
 	{
 		SetStandardValues();
 		UpdateAllDependParameters();
@@ -273,6 +289,18 @@ public:
 	virtual inline void SetInitialWaterVaporMixingRatio(const float qv) {m_fInitWaterVaporMixingRatio = qv;}
 	virtual inline void SetGlobalWindSpeed(const csVector3& vWind) {m_vWindSpeed = vWind;}
 	virtual inline void SetBaseAltitude(const float H) {m_fBaseAltitude = H;}
+	virtual inline void SetTemperaturBottomInputField(csRef<iField2<float>> Field)
+	{
+		//Größen überprüfen
+		if(Field->GetSizeX() != m_iGridSizeX || Field->GetSizeY() != m_iGridSizeZ) return;
+		m_arfInputTemperature = Field;
+	}
+	virtual inline void SetWaterVaporBottomInputField(csRef<iField2<float>> Field)
+	{
+		//Größen überprüfen
+		if(Field->GetSizeX() != m_iGridSizeX || Field->GetSizeY() != m_iGridSizeZ) return;
+		m_arfInputWaterVapor = Field;
+	}
 
 	//Updates all constant and precomputeted parameters according to the user specific values set!
 	virtual inline void UpdateAllDependParameters()
